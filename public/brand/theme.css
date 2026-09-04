@@ -1,0 +1,39 @@
+/* VASEY.AUDIO Active Theme — 2026-09-04. See docs/brand/README.md. */
+:root {
+  --va-color-deep-turquoise: #052e3a;
+  --va-color-charcoal: #29363f;
+  --va-color-silver: #c9d0d3;
+  --va-color-turquoise: #00b8d9;
+  --va-color-teal: #397281;
+  --va-canvas: var(--va-color-deep-turquoise);
+  --va-surface: var(--va-color-charcoal);
+  --va-text: var(--va-color-silver);
+  --va-text-strong: #ffffff;
+  --va-text-muted: #aab4bd;
+  --va-link: var(--va-color-turquoise);
+  --va-action: var(--va-color-turquoise);
+  --va-action-text: var(--va-color-deep-turquoise);
+  --va-action-hover: var(--va-color-teal);
+  --va-action-hover-text: #ffffff;
+  --va-focus: var(--va-color-turquoise);
+  --va-border: #6a8e98;
+  --va-rule: rgb(201 208 211 / 20%);
+  --va-font-impact: "Noto Sans Display", "Arial Narrow", sans-serif;
+  --va-font-section: "Bebas Neue", "Arial Narrow", sans-serif;
+  --va-font-body: "Reddit Sans", system-ui, sans-serif;
+  --va-font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --va-radius-panel: 2px;
+  --va-radius-control: 6px;
+  --va-space-1: 4px;
+  --va-space-2: 8px;
+  --va-space-3: 12px;
+  --va-space-4: 16px;
+  --va-space-6: 24px;
+  --va-space-8: 32px;
+  --va-space-12: 48px;
+  --va-space-16: 64px;
+  --va-space-24: 96px;
+  --va-transition-fast: 120ms;
+  --va-transition-standard: 280ms;
+  --va-easing: cubic-bezier(.2,.8,.2,1);
+}

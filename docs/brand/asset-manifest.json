@@ -1,0 +1,71 @@
+{
+  "theme": "VASEY.AUDIO Active Theme 2026-09-04",
+  "observed_at": "2026-09-04",
+  "source_page": "https://www.vasey.audio/",
+  "source_stylesheet": "https://s3.amazonaws.com/beatstarsdata/proweb/2.0/user-styles/1096218.css?_2.3.7841788360217",
+  "source_stylesheet_sha256": "c5d76ae7d93baf1e26faa1adc4d488fe3805e6f06fd02c082ea07aa9f6260768",
+  "assets": [
+    {
+      "path": "public/brand/vasey-audio-logo.png",
+      "source_url": "https://s3.amazonaws.com/beatstarsdata/proweb/2.0/user-styles/uploads/published/1096218/logo.png?_=1788293163",
+      "width": 420,
+      "height": 100,
+      "bytes": 27673,
+      "sha256": "7b0ffd26d5ddffab9695fdd3e0a4bb306d50642dc6a51e25233fd1626ff07571",
+      "modification": "none",
+      "evidence": "referenced by currently published www.vasey.audio theme stylesheet"
+    },
+    {
+      "path": "public/images/storefront-hero.jpg",
+      "source_url": "https://s3.amazonaws.com/beatstarsdata/proweb/2.0/user-styles/uploads/published/1096218/main_bg.jpg?_=1788279688",
+      "width": 2400,
+      "height": 890,
+      "bytes": 559096,
+      "sha256": "216239fd80d30f39c542560e6a97bf83cecaa4a2f9d29214c9a112b6832a7990",
+      "modification": "none",
+      "evidence": "referenced by currently published www.vasey.audio theme stylesheet"
+    },
+    {
+      "path": "public/images/storefront-hero-mobile.jpg",
+      "source_url": "https://s3.amazonaws.com/beatstarsdata/proweb/2.0/user-styles/uploads/published/1096218/main_bg_mobile.jpg?_=1788355750",
+      "width": 960,
+      "height": 890,
+      "bytes": 890975,
+      "sha256": "d8c84735db69e3c9aadcba19ee918a5b15e7bfea65c2290226190014bc9d72da",
+      "modification": "none",
+      "evidence": "referenced by currently published www.vasey.audio theme stylesheet"
+    },
+    {
+      "path": "public/images/section-banner.jpg",
+      "source_url": "https://s3.amazonaws.com/beatstarsdata/proweb/2.0/user-styles/uploads/published/1096218/section_bg.jpg?_=1788281352",
+      "width": 1800,
+      "height": 200,
+      "bytes": 156058,
+      "sha256": "b2d969b9f41b3305c1b8fec3d0b9fe6db9f099463a6e622d5cc0aad38a8978a8",
+      "modification": "none",
+      "evidence": "referenced by currently published www.vasey.audio theme stylesheet"
+    },
+    {
+      "path": "public/images/memberships.jpg",
+      "source_url": "https://s3.amazonaws.com/beatstarsdata/proweb/2.0/user-styles/uploads/published/1096218/memberships_bg.jpg?_=1788279892",
+      "width": 1440,
+      "height": 630,
+      "bytes": 146670,
+      "sha256": "baa39590e6baf52b35e3a3d9c39d1e54f5966204fd3d818a0d4517f48169c5f9",
+      "modification": "none",
+      "evidence": "referenced by currently published www.vasey.audio theme stylesheet"
+    },
+    {
+      "path": "public/images/video-studio.jpg",
+      "source_url": "https://s3.amazonaws.com/beatstarsdata/proweb/2.0/user-styles/uploads/published/1096218/youtube_bg.jpg?_=1788279938",
+      "width": 1440,
+      "height": 630,
+      "bytes": 132980,
+      "sha256": "bed849e4b56c5ff13d989344a36dccadbac6c6950dea419e8bf17e6c17afaa91",
+      "modification": "none",
+      "evidence": "referenced by currently published www.vasey.audio theme stylesheet"
+    }
+  ],
+  "total_asset_bytes": 1913452,
+  "identity_svg_status": "unverified: official source package retrieval failed; do not trace raster"
+}

@@ -1,0 +1,86 @@
+[
+  {
+    "family": "Noto Sans Display",
+    "file": "noto-sans-display-latin-standard-normal.woff2",
+    "format": "woff2",
+    "package": "@fontsource-variable/noto-sans-display",
+    "packageVersion": "5.3.0",
+    "fontVersion": "v30",
+    "axesAndUse": "100\u2013900; wdth 62.5\u2013100; impact uses wdth 62.5 and weight 900",
+    "license": {
+      "type": "OFL-1.1",
+      "url": "https://openfontlicense.org",
+      "attribution": "Copyright 2015 Google Inc. All Rights Reserved. NotoSansDisplay-Italic[wdth,wght].ttf: Copyright 2015 Google Inc. All Rights Reserved."
+    },
+    "source": "https://github.com/google/fonts",
+    "sourcePackageUrl": "https://www.npmjs.com/package/@fontsource-variable/noto-sans-display",
+    "sha256": "b669ff51021c003e3c596d9e11671ba890f87e59c017b309e4633e699133759c",
+    "subset": "Latin",
+    "preload": false,
+    "loading": "font-display: swap; self-hosted through Vite build",
+    "fallback": "Arial Narrow/sans-serif"
+  },
+  {
+    "family": "Reddit Sans",
+    "file": "reddit-sans-latin-wght-normal.woff2",
+    "format": "woff2",
+    "package": "@fontsource-variable/reddit-sans",
+    "packageVersion": "5.3.0",
+    "fontVersion": "v6",
+    "axesAndUse": "200\u2013900; body uses 400\u2013700",
+    "license": {
+      "type": "OFL-1.1",
+      "url": "https://openfontlicense.org",
+      "attribution": "Copyright (c) 2020-2023, Reddit, Inc. (https://github.com/reddit/redditsans) RedditSans-Italic[wght].ttf: Copyright (c) 2020-2023, Reddit, Inc. (https://github.com/reddit/redditsans)"
+    },
+    "source": "https://github.com/google/fonts",
+    "sourcePackageUrl": "https://www.npmjs.com/package/@fontsource-variable/reddit-sans",
+    "sha256": "3e3b66d208b63e175830ee0dedb631c5df11bd93d01e890e3692ecffab612262",
+    "subset": "Latin",
+    "preload": false,
+    "loading": "font-display: swap; self-hosted through Vite build",
+    "fallback": "system-ui/sans-serif"
+  },
+  {
+    "family": "JetBrains Mono",
+    "file": "jetbrains-mono-latin-wght-normal.woff2",
+    "format": "woff2",
+    "package": "@fontsource-variable/jetbrains-mono",
+    "packageVersion": "5.3.0",
+    "fontVersion": "v24",
+    "axesAndUse": "100\u2013800; metadata uses 400\u2013500",
+    "license": {
+      "type": "OFL-1.1",
+      "url": "https://openfontlicense.org",
+      "attribution": "Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono) JetBrainsMono-Italic[wght].ttf: Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)"
+    },
+    "source": "https://github.com/google/fonts",
+    "sourcePackageUrl": "https://www.npmjs.com/package/@fontsource-variable/jetbrains-mono",
+    "sha256": "18be452724bfdc236c074ca94a249a7f41a86752c7d04ab258ce9ed5651f6a7e",
+    "subset": "Latin",
+    "preload": false,
+    "loading": "font-display: swap; self-hosted through Vite build",
+    "fallback": "ui-monospace/monospace"
+  },
+  {
+    "family": "Bebas Neue",
+    "file": "bebas-neue-latin-400-normal.woff2",
+    "format": "woff2",
+    "package": "@fontsource/bebas-neue",
+    "packageVersion": "5.3.0",
+    "fontVersion": "v16",
+    "axesAndUse": "400; section headings",
+    "license": {
+      "type": "OFL-1.1",
+      "url": "https://openfontlicense.org",
+      "attribution": "Copyright 2019 The Bebas Neue Project Authors (https://github.com/dharmatype/Bebas-Neue)"
+    },
+    "source": "https://github.com/google/fonts",
+    "sourcePackageUrl": "https://www.npmjs.com/package/@fontsource/bebas-neue",
+    "sha256": "a7c90c89240c134f7fdd33d40c000ec90b79d675ea53e8cc5a6d423c073de412",
+    "subset": "Latin",
+    "preload": false,
+    "loading": "font-display: swap; self-hosted through Vite build",
+    "fallback": "Arial Narrow/sans-serif"
+  }
+]
