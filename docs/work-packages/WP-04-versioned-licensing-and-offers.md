@@ -1,6 +1,6 @@
 # [WP-04] Immutable license versions, reviewed terms and sellable offers
 
-Status: **First review-evidence and offer-revision increment in development; broader work package remains open.** This increment binds human review to exact content and separates editable offers from published commercial snapshots. It does not implement a complete machine-readable legal schema or buyer contract fulfillment.
+Status: **First review-evidence and offer-revision increment implemented in [PR #22](https://github.com/VASEYDEV/VASEYAUDIO/pull/22); broader work package remains open.** This increment binds human review to exact content and separates editable offers from published commercial snapshots. It does not implement a complete machine-readable legal schema or buyer contract fulfillment.
 
 - Suggested issue title: `[WP-04] Immutable license versions, reviewed terms and sellable offers`
 - Phase: 1
@@ -43,15 +43,15 @@ See [Licensing and offers](../licensing-and-offers.md) for the operator workflow
 
 ## Acceptance criteria
 
-- [ ] Published content, schema and approval hashes cannot be edited/deleted through any supported write path.
+- [x] Published content, schema and approval hashes cannot be edited/deleted through supported application/model and ordinary bulk SQL paths.
 - [ ] UI feature bullets and contract data derive from the same structured terms; contradictory or missing variables block publication.
-- [ ] Every advertised deliverable resolves to a ready exact asset revision and role; changes create a new commercial revision.
+- [x] Every advertised deliverable resolves to a ready exact asset revision and role; changes create a new commercial revision.
 - [ ] Current offers cannot change previously frozen quote/order data.
-- [ ] No legal reviewer, approval reference, license cap or production price is fabricated.
+- [x] No legal reviewer, approval reference, license cap or production price is fabricated; test-only evidence remains explicitly synthetic and nonbinding.
 
 ## Verification
 
-The integrating PR records exact commands, tested commit, environment and observed results for lifecycle, exact review binding, SQL/model immutability, effective dates, revision publication, stale selection and deliverable integrity tests. This work-package update does not claim an unobserved test run. Full legal-schema/variable consistency, buyer-contract fixtures, quote/order isolation and production policy evidence remain pending. A checklist or unexecuted test definition is not completion evidence.
+See the [verification record](../verification/licensing-and-offers.md) for exact commits, environment, commands and scope. Local integration passed 99 PHP tests / 559 assertions and 18 frontend tests, plus the production build. Independent verification passed 45 focused PHP tests / 282 assertions and found no unresolved blocking finding in the examined paths. The PR records GitHub MySQL/SQLite CI results separately. Full legal-schema/variable consistency, buyer-contract fixtures, quote/order isolation and production policy evidence remain pending.
 
 ## Rollback and boundaries
 
