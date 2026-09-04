@@ -2,18 +2,27 @@
 
 namespace App\Filament\Resources;
 
+use App\Domain\Rights\CreateLicenseDraft;
+use App\Domain\Rights\LicenseDiff;
+use App\Domain\Rights\LicenseTerms;
 use App\Domain\Rights\Models\LicenseVersion;
 use App\Domain\Rights\PublishLicense;
 use App\Domain\Rights\ReviewLicense;
+use App\Domain\Rights\UpdateLicenseDraft;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Arr;
 
 class LicenseVersionResource extends OperatorResource
 {
@@ -22,24 +31,43 @@ class LicenseVersionResource extends OperatorResource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Select::make('license_template_id')->relationship('template', 'name')->required(),
-            TextInput::make('version')->integer()->minValue(1)->required(),
-            Textarea::make('authored_source')->required()->rows(12)->columnSpanFull()->helperText('Authored legal source. No default terms are supplied.'),
-            TagsInput::make('structured_terms.features')->label('Reviewed feature summaries')->required(),
+            Select::make('license_template_id')->relationship('template', 'name')->required()->disabled(fn (?LicenseVersion $record) => $record !== null),
+            Hidden::make('structured_terms.schema_version')->default(LicenseTerms::SCHEMA_VERSION),
+            Textarea::make('authored_source')->required()->rows(12)->columnSpanFull()->helperText('Authored license source. Use Preview before requesting review.'),
+            TagsInput::make('structured_terms.features')->label('Feature summaries for review')->required(),
             Select::make('structured_terms.required_asset_roles')->label('Required deliverables')->multiple()->options(['download_mp3' => 'MP3', 'master_wav' => 'WAV master', 'stems_zip' => 'Stems ZIP'])->required(),
+            DateTimePicker::make('effective_from')->label('Effective from (UTC)')->timezone('UTC')->helperText('Leave blank for publication time.'),
+            DateTimePicker::make('effective_until')->label('Effective until (UTC)')->timezone('UTC')->helperText('Leave blank for no scheduled end.'),
         ]);
     }
 
     public static function table(Table $table): Table
     {
-        return $table->columns([TextColumn::make('template.name'), TextColumn::make('version'), TextColumn::make('status')->badge()])->recordActions([
-            EditAction::make()->visible(fn (LicenseVersion $record) => $record->status === 'draft'),
-            Action::make('submit_review')->visible(fn (LicenseVersion $record) => $record->status === 'draft')->action(fn (LicenseVersion $record) => app(ReviewLicense::class)->submit($record, auth()->user())),
-            Action::make('approve')->visible(fn (LicenseVersion $record) => $record->status === 'legal_review' && $record->author_id !== auth()->id())->schema([
-                TextInput::make('approval_reference')->label('Qualified review evidence reference')->required()->maxLength(255),
-                TextInput::make('renderer_version')->label('Pinned contract renderer version')->required()->maxLength(255),
-                TextInput::make('render_fixture_hash')->label('Reviewed rendered fixture SHA-256')->required()->regex('/^[a-f0-9]{64}$/'),
-            ])->requiresConfirmation()->action(fn (LicenseVersion $record, array $data) => app(ReviewLicense::class)->approve($record, auth()->user(), $data)),
+        return $table->defaultSort('id', 'desc')->columns([
+            TextColumn::make('template.name')->searchable(), TextColumn::make('version'), TextColumn::make('status')->badge(),
+            TextColumn::make('effective_from')->dateTime()->placeholder('On publication'), TextColumn::make('effective_until')->dateTime()->placeholder('No scheduled end'),
+        ])->recordActions([
+            EditAction::make()->visible(fn (LicenseVersion $record) => $record->status === 'draft')->using(fn (LicenseVersion $record, array $data) => app(UpdateLicenseDraft::class)->handle($record, Arr::only($data, ['authored_source', 'structured_terms', 'effective_from', 'effective_until']), auth()->user())),
+            Action::make('preview')->label('Preview')->url(fn (LicenseVersion $record) => route('filament.admin.licenses.preview', $record))->openUrlInNewTab(),
+            Action::make('compare')->label('Compare changes')->visible(fn (LicenseVersion $record) => $record->predecessor_id !== null)->modalContent(fn (LicenseVersion $record) => view('admin.license-diff', ['changes' => app(LicenseDiff::class)->between(LicenseVersion::findOrFail($record->predecessor_id), $record)]))->modalSubmitAction(false)->modalCancelActionLabel('Close'),
+            Action::make('successor')->label('New revision')->requiresConfirmation()->modalDescription('Create an editable successor draft. This version and its review evidence remain retained.')->action(function (LicenseVersion $record) {
+                $draft = app(CreateLicenseDraft::class)->handle($record->template, [
+                    'authored_source' => $record->authored_source,
+                    'structured_terms' => array_merge($record->structured_terms, ['schema_version' => LicenseTerms::SCHEMA_VERSION]),
+                    'effective_from' => $record->effective_from,
+                    'effective_until' => $record->effective_until,
+                ], auth()->user(), $record);
+                Notification::make()->title('Draft version '.$draft->version.' created')->success()->send();
+            }),
+            Action::make('submit_review')->label('Request review')->visible(fn (LicenseVersion $record) => $record->status === 'draft')->requiresConfirmation()->modalDescription('Freeze this source, its feature summaries and preview for review. Further content changes require a new revision.')->action(fn (LicenseVersion $record) => app(ReviewLicense::class)->submit($record, auth()->user())),
+            Action::make('approve')->visible(fn (LicenseVersion $record) => $record->status === 'legal_review' && $record->author_id !== auth()->id() && ! in_array(auth()->id(), $record->content_author_ids ?? [], true))
+                ->fillForm(fn (LicenseVersion $record) => ['review_hash' => $record->submission_hash, 'summary_consistency_confirmed' => false])
+                ->schema([
+                    TextInput::make('review_hash')->label('Submitted review SHA-256')->readOnly()->required(),
+                    TextInput::make('approval_reference')->label('Completed review evidence reference')->required()->maxLength(255),
+                    Checkbox::make('summary_consistency_confirmed')->label('I reviewed this version and confirm that its feature summaries match the authored source.')->accepted(),
+                ])->modalDescription('Review the source and preview using the Preview action before approving this exact submission.')
+                ->requiresConfirmation()->action(fn (LicenseVersion $record, array $data) => app(ReviewLicense::class)->approve($record, auth()->user(), $data)),
             Action::make('publish')->visible(fn (LicenseVersion $record) => $record->status === 'approved')->requiresConfirmation()->action(fn (LicenseVersion $record) => app(PublishLicense::class)->handle($record, auth()->user())),
         ]);
     }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { availableOffer, cartSubtotals, filterTracks, formatMoney, formatTime, safeMediaUrl } from '../../resources/js/lib/catalog';
+import { availableOffer, restoreCartSelections, savedCartSelection, cartSubtotals, filterTracks, formatMoney, formatTime, safeMediaUrl } from '../../resources/js/lib/catalog';
 import { fixtureTracks } from '../../resources/js/test/fixtures';
 
 describe('published catalog presentation', () => {
@@ -28,5 +28,24 @@ describe('published catalog presentation', () => {
     expect(formatTime(Number.NaN)).toBe('0:00');
     expect(formatTime(-100)).toBe('0:00');
     expect(formatTime(187.7)).toBe('3:07');
+  });
+});
+
+
+describe('saved commercial revisions', () => {
+  it('rejects a changed commercial revision even when the offer and license IDs match', () => {
+    const track = fixtureTracks[0];
+    const saved = savedCartSelection({ track, offer: track.offers[0] });
+    const changed = { ...track, offers: [{ ...track.offers[0], offerRevisionId: 'new-revision', priceMinor: 5000 }] };
+    expect(restoreCartSelections([saved], [changed])).toEqual({ lines: [], unavailable: 1 });
+  });
+  it('restores only current catalog money and removes legacy unpinned selections', () => {
+    const track = fixtureTracks[0];
+    const offer = track.offers[0];
+    const saved = savedCartSelection({ track, offer });
+    const restored = restoreCartSelections([{ ...saved, priceMinor: 1, currency: 'EUR' }], [track]);
+    expect(restored.lines[0].offer).toBe(offer);
+    expect(restored.lines[0].offer.priceMinor).toBe(2995);
+    expect(restoreCartSelections([{ trackId: saved.trackId, offerId: saved.offerId, licenseVersionId: saved.licenseVersionId }], [track]).lines).toEqual([]);
   });
 });

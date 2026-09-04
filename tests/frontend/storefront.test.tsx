@@ -57,7 +57,7 @@ describe('storefront user flows', () => {
     expect(await screen.findByText(/Checkout is not available yet. No payment was taken./)).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith('/checkout', expect.objectContaining({ method: 'POST', credentials: 'same-origin' }));
     const request = JSON.parse(String(fetchMock.mock.calls[0][1]?.body));
-    expect(request.items[0]).toEqual({ trackId: fixtureTracks[0].id, offerId: fixtureTracks[0].offers[0].id, licenseVersionId: fixtureTracks[0].offers[0].licenseVersionId });
+    expect(request.items[0]).toEqual({ trackId: fixtureTracks[0].id, offerId: fixtureTracks[0].offers[0].id, licenseVersionId: fixtureTracks[0].offers[0].licenseVersionId, offerRevisionId: fixtureTracks[0].offers[0].offerRevisionId });
     expect(request.items[0]).not.toHaveProperty('priceMinor');
     expect(screen.getByRole('button', { name: 'Open cart, 1 item' })).toBeInTheDocument();
     expect(screen.queryByText('Payment successful')).not.toBeInTheDocument();
@@ -74,4 +74,28 @@ describe('storefront user flows', () => {
     renderCatalog();
     expect(screen.getByRole('button', { name: 'Open cart, 0 items' })).toBeInTheDocument();
   });
+});
+
+
+it('removes a saved selection when updated catalog props publish a different revision', async () => {
+  const user = userEvent.setup();
+  const view = renderCatalog();
+  await user.click(screen.getAllByRole('button', { name: /^Choose license for / })[0]);
+  await user.click(screen.getByRole('button', { name: /Add license/ }));
+  expect(screen.getByRole('button', { name: 'Open cart, 1 item' })).toBeInTheDocument();
+  const changed = fixtureTracks.map(track => ({ ...track, offers: track.offers.map(offer => ({ ...offer, offerRevisionId: 'replacement-'+offer.offerRevisionId })) }));
+  view.rerender(<Storefront tracks={changed} licenseTiers={fixtureTiers} />);
+  expect(await screen.findByRole('button', { name: 'Open cart, 0 items' })).toBeInTheDocument();
+  expect(screen.getByText(/Some saved selections changed/)).toBeInTheDocument();
+});
+
+it('requires a fresh choice if an open license dialog refers to a replaced offer', async () => {
+  const user = userEvent.setup();
+  const view = renderCatalog();
+  await user.click(screen.getAllByRole('button', { name: /^Choose license for / })[0]);
+  const changed = fixtureTracks.map(track => ({ ...track, offers: track.offers.map(offer => ({ ...offer, offerRevisionId: 'replacement-'+offer.offerRevisionId })) }));
+  view.rerender(<Storefront tracks={changed} licenseTiers={fixtureTiers} />);
+  await user.click(screen.getByRole('button', { name: /Add license/ }));
+  expect(screen.getByRole('button', { name: 'Open cart, 0 items' })).toBeInTheDocument();
+  expect(screen.getByText('This offer changed. Please choose its license again.')).toBeInTheDocument();
 });

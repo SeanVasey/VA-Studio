@@ -2,9 +2,12 @@
 
 namespace App\Filament\Resources\LicenseVersionResource\Pages;
 
+use App\Domain\Rights\CreateLicenseDraft;
+use App\Domain\Rights\Models\LicenseTemplate;
 use App\Filament\Resources\LicenseVersionResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ManageRecords;
+use Illuminate\Support\Arr;
 
 class ManageLicenseVersions extends ManageRecords
 {
@@ -12,6 +15,6 @@ class ManageLicenseVersions extends ManageRecords
 
     protected function getHeaderActions(): array
     {
-        return [CreateAction::make()->mutateDataUsing(fn (array $data) => array_merge($data, ['author_id' => auth()->id(), 'status' => 'draft']))];
+        return [CreateAction::make()->using(fn (array $data) => app(CreateLicenseDraft::class)->handle(LicenseTemplate::findOrFail($data['license_template_id']), Arr::only($data, ['authored_source', 'structured_terms', 'effective_from', 'effective_until']), auth()->user()))];
     }
 }

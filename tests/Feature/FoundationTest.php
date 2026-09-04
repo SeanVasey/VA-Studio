@@ -2,10 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublicationReadiness;
+use App\Domain\Catalog\PublishOffer;
 use App\Domain\Catalog\PublishTrack;
+use App\Domain\Catalog\SaveOfferDraft;
 use App\Domain\Media\MediaProcessor;
 use App\Domain\Media\QueueMediaProcessing;
 use App\Domain\Media\VerifiedMedia;
@@ -27,6 +28,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
+use Tests\Support\LicenseFixtures;
 use Tests\Support\MediaFixtures;
 use Tests\TestCase;
 
@@ -52,18 +54,7 @@ class FoundationTest extends TestCase
 
     private function approvedLicense(): LicenseVersion
     {
-        $author = $this->admin();
-        $approver = $this->admin();
-        $template = LicenseTemplate::create(['name' => 'Test only', 'slug' => 'test-'.uniqid(), 'type' => 'non-exclusive']);
-
-        return LicenseVersion::create([
-            'license_template_id' => $template->id, 'version' => 1,
-            'authored_source' => 'NON-BINDING TEST FIXTURE ONLY.',
-            'structured_terms' => ['features' => ['Test WAV file'], 'required_asset_roles' => ['master_wav']],
-            'status' => 'approved', 'author_id' => $author->id, 'approved_by' => $approver->id,
-            'approved_at' => now(), 'approval_reference' => 'TEST-ONLY-REVIEW',
-            'renderer_version' => 'test-fixture-v1', 'render_fixture_hash' => str_repeat('a', 64),
-        ]);
+        return LicenseFixtures::approved($this->admin(), $this->admin());
     }
 
     private function readyTrack(): Track
@@ -74,7 +65,8 @@ class FoundationTest extends TestCase
         $media = MediaFixtures::readyTrackMedia($track, $operator);
         $master = $media['master_wav'];
         $license = app(PublishLicense::class)->handle($this->approvedLicense(), $operator);
-        Offer::create(['track_id' => $track->id, 'license_version_id' => $license->id, 'price_minor' => 4999, 'currency' => 'USD', 'deliverable_asset_ids' => [$master->id], 'is_active' => true]);
+        $offer = app(SaveOfferDraft::class)->handle(null, ['track_id' => $track->id, 'license_version_id' => $license->id, 'price_minor' => 4999, 'currency' => 'USD', 'deliverable_asset_ids' => [$master->id]], $operator);
+        app(PublishOffer::class)->handle($offer, $operator);
 
         return $track;
     }
@@ -115,7 +107,7 @@ class FoundationTest extends TestCase
         $this->actingAs($actor);
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $template = LicenseTemplate::create(['name' => 'Draft', 'slug' => 'draft', 'type' => 'non-exclusive']);
-        Livewire::test(ManageLicenseVersions::class)->callAction('create', data: ['license_template_id' => $template->id, 'version' => 1, 'author_id' => $other->id, 'authored_source' => 'Test draft only', 'structured_terms' => ['features' => ['Test'], 'required_asset_roles' => ['master_wav']]])->assertHasNoActionErrors();
+        Livewire::test(ManageLicenseVersions::class)->callAction('create', data: ['license_template_id' => $template->id, 'version' => 1, 'author_id' => $other->id, 'authored_source' => 'Test draft only', 'structured_terms' => ['schema_version' => 1, 'features' => ['Test'], 'required_asset_roles' => ['master_wav']]])->assertHasNoActionErrors();
         $this->assertDatabaseHas('license_versions', ['license_template_id' => $template->id, 'author_id' => $actor->id, 'status' => 'draft']);
     }
 
@@ -146,14 +138,17 @@ class FoundationTest extends TestCase
         $this->get('/media/'.$track->assets()->where('role', 'artwork')->where('status', 'ready')->first()->id)->assertOk()->assertHeader('X-Content-Type-Options', 'nosniff');
     }
 
-    public function test_missing_or_wrong_track_delivery_revision_blocks_publication(): void
+    public function test_missing_draft_delivery_revision_blocks_offer_publication_without_changing_current_offer(): void
     {
         $track = $this->readyTrack();
         $offer = $track->offers()->first();
+        $currentRevision = $offer->current_revision_id;
         $offer->update(['deliverable_asset_ids' => [99999]]);
-        $this->assertNotEmpty(app(PublicationReadiness::class)->blockers($track));
+        $this->assertNotEmpty(app(PublicationReadiness::class)->draftBlockers($offer));
+        $this->assertSame([], app(PublicationReadiness::class)->offerBlockers($offer));
+        $this->assertSame($currentRevision, $offer->refresh()->current_revision_id);
         $this->expectException(ValidationException::class);
-        app(PublishTrack::class)->handle($track, $this->admin());
+        app(PublishOffer::class)->handle($offer, $this->admin());
     }
 
     public function test_missing_asset_after_publication_hides_catalog_and_media(): void
@@ -186,11 +181,10 @@ class FoundationTest extends TestCase
     {
         $author = $this->admin();
         $reviewer = $this->admin();
-        $template = LicenseTemplate::create(['name' => 'Review fixture', 'slug' => 'review-fixture', 'type' => 'non-exclusive']);
-        $version = LicenseVersion::create(['license_template_id' => $template->id, 'version' => 1, 'authored_source' => 'NON-BINDING TEST ONLY', 'structured_terms' => ['features' => ['Test'], 'required_asset_roles' => ['master_wav']], 'author_id' => $author->id, 'status' => 'draft']);
+        $version = LicenseFixtures::draft($author);
         $review = app(ReviewLicense::class);
-        $review->submit($version, $author);
-        $evidence = ['approval_reference' => 'TEST-ONLY', 'renderer_version' => 'test-only', 'render_fixture_hash' => str_repeat('b', 64)];
+        $version = $review->submit($version, $author);
+        $evidence = ['approval_reference' => 'TEST-ONLY', 'review_hash' => $version->submission_hash, 'summary_consistency_confirmed' => true];
         try {
             $review->approve($version, $author, $evidence);
             $this->fail('Author self-approval was accepted.');
@@ -201,12 +195,11 @@ class FoundationTest extends TestCase
         $this->assertDatabaseHas('audit_events', ['subject_id' => $version->id, 'action' => 'rights.license.approved', 'actor_id' => $reviewer->id]);
     }
 
-    public function test_self_approved_license_cannot_be_published(): void
+    public function test_approval_metadata_cannot_be_replaced_with_self_approval(): void
     {
         $license = $this->approvedLicense();
-        $license->update(['approved_by' => $license->author_id]);
         $this->expectException(ValidationException::class);
-        app(PublishLicense::class)->handle($license, $this->admin());
+        $license->update(['approved_by' => $license->author_id]);
     }
 
     public function test_published_license_cannot_be_edited_or_reinterpreted_via_template(): void
@@ -291,8 +284,11 @@ class FoundationTest extends TestCase
         app(MediaProcessor::class)->handle($run->id);
         $this->assertContains('Deliverables must come from the same verified recording revision as the current preview.', app(PublicationReadiness::class)->blockers($track));
         $master = $run->outputs()->where('role', 'master_wav')->first();
-        $track->offers()->first()->update(['deliverable_asset_ids' => [$master->id]]);
-        app(PublishTrack::class)->handle($track, $this->admin());
+        $operator = $this->admin();
+        $offer = app(SaveOfferDraft::class)->handle($track->offers()->first(), ['deliverable_asset_ids' => [$master->id]], $operator);
+        $this->assertNotEmpty(app(PublicationReadiness::class)->offerBlockers($offer));
+        app(PublishOffer::class)->handle($offer, $operator);
+        app(PublishTrack::class)->handle($track, $operator);
         $this->get('/media/'.$oldPreview->id)->assertNotFound();
         $this->get('/media/'.$run->outputs()->where('role', 'preview_tagged')->first()->id)->assertOk();
     }

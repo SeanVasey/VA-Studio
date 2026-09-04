@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Http\Controllers\LicenseReviewController;
 use App\Http\Controllers\PublicMediaController;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Http\Middleware\Authenticate;
@@ -33,6 +34,9 @@ class AdminPanelProvider extends PanelProvider
                 Route::get('/media/{asset}/preview', [PublicMediaController::class, 'operator'])
                     ->middleware(['can:administer-catalog', ...Dashboard::getRouteMiddleware($panel), 'throttle:240,1'])
                     ->name('media.preview');
+                Route::get('/licenses/{license}/preview', LicenseReviewController::class)
+                    ->middleware(['can:administer-catalog', ...Dashboard::getRouteMiddleware($panel), 'throttle:60,1'])
+                    ->name('licenses.preview');
             })
             ->login()
             ->brandName('VASEY.AUDIO / Studio')
