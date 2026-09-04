@@ -60,10 +60,15 @@ jobs:
           extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip
           coverage: none
           tools: composer:v2
+      - name: Install bounded media processing tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends ffmpeg util-linux
       - run: composer install --no-interaction --prefer-dist
       - run: cp .env.example .env
       - run: php artisan key:generate
       - run: composer validate --strict
       - run: php artisan test
-      - run: DB_CONNECTION=sqlite DB_DATABASE=:memory: php artisan test
+      - run: |
+          DB_CONNECTION=sqlite DB_DATABASE=:memory: php artisan test
       - run: composer audit --no-dev

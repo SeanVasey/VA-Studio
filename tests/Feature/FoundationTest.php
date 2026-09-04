@@ -6,7 +6,9 @@ use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublicationReadiness;
 use App\Domain\Catalog\PublishTrack;
-use App\Domain\Media\Models\MediaAsset;
+use App\Domain\Media\MediaProcessor;
+use App\Domain\Media\QueueMediaProcessing;
+use App\Domain\Media\VerifiedMedia;
 use App\Domain\Rights\Models\LicenseTemplate;
 use App\Domain\Rights\Models\LicenseVersion;
 use App\Domain\Rights\Models\RightsDeclaration;
@@ -16,13 +18,16 @@ use App\Filament\Resources\LicenseVersionResource\Pages\ManageLicenseVersions;
 use App\Filament\Resources\TrackResource\Pages\ManageTracks;
 use App\Models\User;
 use Filament\Facades\Filament;
+use Filament\Pages\Dashboard;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
+use Tests\Support\MediaFixtures;
 use Tests\TestCase;
 
 class FoundationTest extends TestCase
@@ -33,7 +38,7 @@ class FoundationTest extends TestCase
     {
         parent::setUp();
         $this->withoutVite();
-        Storage::fake('local');
+        $this->fakePrivateMediaStorage();
     }
 
     private function admin(): User
@@ -66,15 +71,8 @@ class FoundationTest extends TestCase
         $operator = $this->admin();
         $track = Track::create(['title' => 'Test fixture', 'slug' => 'test-'.uniqid(), 'artist' => 'Test', 'bpm' => 90, 'musical_key' => 'C minor', 'genre' => 'Test', 'duration_seconds' => 120, 'waveform' => [0.2, 0.5, 0.8]]);
         RightsDeclaration::create(['track_id' => $track->id, 'provenance_reference' => 'TEST-ONLY', 'sample_disclosure' => 'Synthetic test only', 'status' => 'verified', 'verified_by' => $operator->id, 'verified_at' => now()]);
-        $master = null;
-        foreach (['artwork', 'preview_tagged', 'master_wav'] as $role) {
-            $path = 'fixtures/'.$track->id.'/'.$role;
-            Storage::disk('local')->put($path, 'fixture-'.$role);
-            $asset = MediaAsset::create(['track_id' => $track->id, 'role' => $role, 'disk' => 'local', 'storage_path' => $path, 'original_name' => 'fixture', 'mime_type' => $role === 'artwork' ? 'image/png' : 'audio/wav', 'size_bytes' => strlen('fixture-'.$role), 'sha256' => hash('sha256', 'fixture-'.$role), 'status' => 'ready', 'verified_by' => $operator->id, 'verified_at' => now()]);
-            if ($role === 'master_wav') {
-                $master = $asset;
-            }
-        }
+        $media = MediaFixtures::readyTrackMedia($track, $operator);
+        $master = $media['master_wav'];
         $license = app(PublishLicense::class)->handle($this->approvedLicense(), $operator);
         Offer::create(['track_id' => $track->id, 'license_version_id' => $license->id, 'price_minor' => 4999, 'currency' => 'USD', 'deliverable_asset_ids' => [$master->id], 'is_active' => true]);
 
@@ -144,8 +142,8 @@ class FoundationTest extends TestCase
         $response->assertDontSee('storage_path')->assertDontSee('fixtures/')->assertDontSee('private-draft');
         $this->get('/tracks/'.$track->slug)->assertOk();
         $this->get('/tracks/'.$draft->slug)->assertNotFound();
-        $this->get('/media/'.$track->assets()->where('role', 'master_wav')->first()->id)->assertNotFound();
-        $this->get('/media/'.$track->assets()->where('role', 'artwork')->first()->id)->assertOk()->assertHeader('X-Content-Type-Options', 'nosniff');
+        $this->get('/media/'.$track->assets()->where('role', 'master_wav')->where('status', 'ready')->first()->id)->assertNotFound();
+        $this->get('/media/'.$track->assets()->where('role', 'artwork')->where('status', 'ready')->first()->id)->assertOk()->assertHeader('X-Content-Type-Options', 'nosniff');
     }
 
     public function test_missing_or_wrong_track_delivery_revision_blocks_publication(): void
@@ -162,10 +160,10 @@ class FoundationTest extends TestCase
     {
         $track = $this->readyTrack();
         app(PublishTrack::class)->handle($track, $this->admin());
-        Storage::disk('local')->delete($track->assets()->where('role', 'master_wav')->first()->storage_path);
+        Storage::disk('local')->delete($track->assets()->where('role', 'master_wav')->where('status', 'ready')->first()->storage_path);
         $this->getJson('/api/catalog')->assertJsonCount(0, 'tracks');
         $this->get('/tracks/'.$track->slug)->assertNotFound();
-        $this->get('/media/'.$track->assets()->where('role', 'artwork')->first()->id)->assertNotFound();
+        $this->get('/media/'.$track->assets()->where('role', 'artwork')->where('status', 'ready')->first()->id)->assertNotFound();
     }
 
     public function test_new_unverified_rights_declaration_hides_a_previously_published_track(): void
@@ -259,6 +257,87 @@ class FoundationTest extends TestCase
     {
         $track = $this->readyTrack();
         $this->expectException(ValidationException::class);
-        $track->assets()->first()->update(['storage_path' => 'changed']);
+        $track->assets()->where('status', 'ready')->first()->update(['storage_path' => 'changed']);
+    }
+
+    public function test_changed_asset_bytes_hide_catalog_and_public_media(): void
+    {
+        $track = $this->readyTrack();
+        app(PublishTrack::class)->handle($track, $this->admin());
+        $artwork = $track->assets()->where('role', 'artwork')->where('status', 'ready')->first();
+        chmod(Storage::disk('local')->path($artwork->storage_path), 0600);
+        Storage::disk('local')->put($artwork->storage_path, 'tampered contents');
+        $this->getJson('/api/catalog')->assertJsonCount(0, 'tracks');
+        $this->get('/media/'.$artwork->id)->assertNotFound();
+    }
+
+    public function test_catalog_uses_measured_preview_metadata_instead_of_editable_track_values(): void
+    {
+        $track = $this->readyTrack();
+        $track->update(['duration_seconds' => 999, 'waveform' => [1]]);
+        app(PublishTrack::class)->handle($track, $this->admin());
+        $preview = $track->assets()->where('role', 'preview_tagged')->where('status', 'ready')->first();
+        $this->getJson('/api/catalog')->assertOk()
+            ->assertJsonPath('tracks.0.durationSeconds', $preview->technical_metadata['duration_seconds'])
+            ->assertJsonPath('tracks.0.waveform', $preview->technical_metadata['waveform']);
+    }
+
+    public function test_a_new_preview_requires_offers_to_select_the_new_master_revision(): void
+    {
+        $track = $this->readyTrack();
+        $oldPreview = $track->assets()->where('role', 'preview_tagged')->where('status', 'ready')->first();
+        $source = MediaFixtures::source($track, 'master_wav', MediaFixtures::wav(1.2, 880));
+        $run = app(QueueMediaProcessing::class)->handle($source, $this->admin());
+        app(MediaProcessor::class)->handle($run->id);
+        $this->assertContains('Deliverables must come from the same verified recording revision as the current preview.', app(PublicationReadiness::class)->blockers($track));
+        $master = $run->outputs()->where('role', 'master_wav')->first();
+        $track->offers()->first()->update(['deliverable_asset_ids' => [$master->id]]);
+        app(PublishTrack::class)->handle($track, $this->admin());
+        $this->get('/media/'.$oldPreview->id)->assertNotFound();
+        $this->get('/media/'.$run->outputs()->where('role', 'preview_tagged')->first()->id)->assertOk();
+    }
+
+    public function test_digest_verification_detects_same_size_tampering_after_its_window(): void
+    {
+        $track = $this->readyTrack();
+        $asset = $track->assets()->where('role', 'master_wav')->where('status', 'ready')->first();
+        $verifier = app(VerifiedMedia::class);
+        $this->assertTrue($verifier->available($asset));
+        $this->travel(30)->seconds();
+        $this->assertTrue($verifier->available($asset));
+        $this->travel(31)->seconds();
+        $path = Storage::disk('local')->path($asset->storage_path);
+        chmod($path, 0600);
+        $bytes = file_get_contents($path);
+        $bytes[strlen($bytes) - 1] = chr(ord($bytes[strlen($bytes) - 1]) ^ 1);
+        file_put_contents($path, $bytes);
+        $this->assertFalse($verifier->available($asset));
+    }
+
+    public function test_only_operators_can_review_draft_derivatives_and_masters_stay_private(): void
+    {
+        $track = $this->readyTrack();
+        $preview = $track->assets()->where('role', 'preview_tagged')->where('status', 'ready')->first();
+        $master = $track->assets()->where('role', 'master_wav')->where('status', 'ready')->first();
+        $this->get('/admin/media/'.$preview->id.'/preview')->assertRedirect('/admin/login');
+        $this->actingAs(User::factory()->create())->get('/admin/media/'.$preview->id.'/preview')->assertForbidden();
+        $this->actingAs($this->admin())->get('/admin/media/'.$preview->id.'/preview')->assertOk()->assertHeader('Cache-Control', 'no-store, private');
+        $this->get('/admin/media/'.$master->id.'/preview')->assertNotFound();
+        $this->get('/media/'.$preview->id)->assertNotFound();
+    }
+
+    public function test_draft_preview_requires_mfa_enrollment_when_the_panel_requires_it(): void
+    {
+        $track = $this->readyTrack();
+        $preview = $track->assets()->where('role', 'preview_tagged')->where('status', 'ready')->first();
+        $panel = Filament::getPanel('admin');
+        $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: true);
+        // The testing environment registers optional MFA; apply the production panel route policy.
+        Route::getRoutes()->getByName('filament.admin.media.preview')
+            ->middleware(Dashboard::getRouteMiddleware($panel));
+        Route::get('/admin/test-mfa-setup', fn () => 'Test setup destination')
+            ->name('filament.admin.auth.multi-factor-authentication.set-up-required');
+        Route::getRoutes()->refreshNameLookups();
+        $this->actingAs($this->admin())->get('/admin/media/'.$preview->id.'/preview')->assertRedirect('/admin/test-mfa-setup');
     }
 }
