@@ -1,0 +1,33 @@
+name: Bounded implementation
+description: Implement one dependency-ready VASEYAUDIO work package
+title: "[WP] "
+body:
+  - type: input
+    id: package
+    attributes:
+      label: Work package
+      description: Path under docs/work-packages
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and outcome
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: File ownership and dependencies
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria and verification
+    validations:
+      required: true
+  - type: textarea
+    id: risks
+    attributes:
+      label: Migration, rollback, and unresolved decisions
