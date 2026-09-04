@@ -112,7 +112,7 @@ class OfferRevisionTest extends TestCase
         $replayed = app(PublishOffer::class)->handle($offer, $actor);
         $this->assertSame(2, $successor->revision);
         $this->assertSame($successor->id, $replayed->id);
-        $this->assertSame($oldSnapshot, $original->refresh()->snapshot);
+        $this->assertSame(CanonicalJson::encode($oldSnapshot), CanonicalJson::encode($original->refresh()->snapshot));
         $this->assertSame(4999, $original->price_minor);
         $this->assertDatabaseCount('offer_revisions', 2);
         $this->assertSame(2, DB::table('audit_events')->where('action', 'catalog.offer.revision_published')->count());

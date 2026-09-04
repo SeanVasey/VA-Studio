@@ -4,7 +4,7 @@ This records the first WP-04 increment in [PR #22](https://github.com/VASEYDEV/V
 
 ## Reviewed application
 
-Local commit `9332fa9ebf301930feb4770b1d1aa15888ce64a7` and remote commit `52d315d38de030f5838b531b7db3b99315a75db8` have the identical source tree `97f1c8797ffe35f66ea3e75b951d90235cf01d08`. Later verification-document changes do not alter that application or its tests.
+Local commit `9332fa9ebf301930feb4770b1d1aa15888ce64a7` and remote commit `52d315d38de030f5838b531b7db3b99315a75db8` have the identical source tree `97f1c8797ffe35f66ea3e75b951d90235cf01d08`. Subsequent documentation and the JSON assertion correction below do not change the reviewed application code.
 
 Local environment: PHP 8.4.1, SQLite, FFmpeg/ffprobe 6.1.1, Linux prlimit, Node 24.19.0 and npm 11.9. These identify the executed environment; they are not a deployment recommendation.
 
@@ -42,6 +42,10 @@ Review led to corrections before the tested commit:
 - Fresh publication digest checks, same-size byte tampering, wrong/missing/duplicate delivery roles, recording replacement, expiry and public projection privacy.
 - Real Filament creation/edit/review/publication/history actions, exact-hash rejection, contributor action exclusion, private preview authorization and required panel MFA.
 - Saved-cart revision pinning, changed-catalog and open-dialog invalidation, and rejection of browser-supplied prices.
+
+## MySQL assertion correction
+
+The first [MySQL CI run](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/33918275643) passed 98 tests and exposed one snapshot-history assertion that incorrectly required associative JSON object keys to retain insertion order. MySQL normalizes that order. The assertion now compares the existing canonical JSON representation before and after reloading the immutable snapshot; value types and list order remain significant. The stored values and application hashes did not change. The PR records the final commit's MySQL and SQLite results after this correction.
 
 ## Remaining boundaries
 
