@@ -4,7 +4,9 @@ import { Icon } from '../components/Icon';
 import { Modal } from '../components/Modal';
 import { PersistentPlayer } from '../components/PersistentPlayer';
 import { player, useAudio } from '../lib/audio';
-import { availableOffer, cartSubtotals, fileRoleLabels, filterTracks, formatMoney, formatTime, safeMediaUrl, type CartLine, type Offer, type StorefrontProps, type Track } from '../lib/catalog';
+import { availableOffer, restoreCartSelections, savedCartSelection, cartSubtotals, fileRoleLabels, filterTracks, formatMoney, formatTime, safeMediaUrl, type CartLine, type Offer, type StorefrontProps, type Track } from '../lib/catalog';
+
+const EMPTY_TRACKS: Track[] = [];
 
 function Artwork({ track, size = 64 }: { track: Track; size?: number }) {
   const src = safeMediaUrl(track.artworkUrl);
@@ -44,25 +46,25 @@ function TrackRow({ track, index, onLicense, onShare, designPreview }: { track: 
 }
 
 function useCart(tracks: Track[]) {
-  const [lines, setLines] = useState<CartLine[]>(() => {
+  const [cart, setCart] = useState(() => {
     try {
-      const value: unknown = JSON.parse(sessionStorage.getItem('vaseyaudio-cart-v1') ?? '[]');
-      if (!Array.isArray(value)) return [];
-      return value.flatMap(item => {
-        if (!item || typeof item !== 'object') return [];
-        const track = tracks.find(track => track.id === item.trackId);
-        const offer = track?.offers.find(offer => offer.id === item.offerId && offer.licenseVersionId === item.licenseVersionId && availableOffer(offer));
-        return track && offer ? [{ track, offer }] : [];
-      });
-    } catch { return []; }
+      return restoreCartSelections(JSON.parse(sessionStorage.getItem('vaseyaudio-cart-v1') ?? '[]'), tracks);
+    } catch { return { lines: [] as CartLine[], unavailable: 0 }; }
   });
   useEffect(() => {
-    try { sessionStorage.setItem('vaseyaudio-cart-v1', JSON.stringify(lines.map(({ track, offer }) => ({ trackId: track.id, offerId: offer.id, licenseVersionId: offer.licenseVersionId })))); } catch { /* A cart remains usable if browser storage is unavailable. */ }
-  }, [lines]);
-  return { lines, setLines };
+    setCart(current => {
+      const checked = restoreCartSelections(current.lines.map(savedCartSelection), tracks);
+      return { lines: checked.lines, unavailable: current.unavailable + checked.unavailable };
+    });
+  }, [tracks]);
+  useEffect(() => {
+    try { sessionStorage.setItem('vaseyaudio-cart-v1', JSON.stringify(cart.lines.map(savedCartSelection))); } catch { /* Selections remain usable when browser storage is unavailable. */ }
+  }, [cart.lines]);
+  const setLines = (update: (lines: CartLine[]) => CartLine[]) => setCart(current => ({ ...current, lines: update(current.lines) }));
+  return { lines: cart.lines, setLines, unavailable: cart.unavailable };
 }
 
-export default function Storefront({ tracks = [], licenseTiers = [], selectedTrackSlug, designPreview = false }: StorefrontProps) {
+export default function Storefront({ tracks = EMPTY_TRACKS, licenseTiers = [], selectedTrackSlug, designPreview = false }: StorefrontProps) {
   const [query, setQuery] = useState('');
   const [genre, setGenre] = useState('All sounds');
   const [sort, setSort] = useState('featured');
@@ -73,7 +75,8 @@ export default function Storefront({ tracks = [], licenseTiers = [], selectedTra
   const [shareFallback, setShareFallback] = useState<string | null>(null);
   const [checkoutStatus, setCheckoutStatus] = useState('');
   const [checkingOut, setCheckingOut] = useState(false);
-  const { lines, setLines } = useCart(tracks);
+  const { lines, setLines, unavailable } = useCart(tracks);
+  useEffect(() => { if (unavailable) setNotice('Some saved selections changed or are no longer available. Please choose their licenses again.'); }, [unavailable]);
   const genres = useMemo(() => ['All sounds', ...new Set(tracks.map(track => track.genre).filter(Boolean))], [tracks]);
   const visibleTracks = useMemo(() => filterTracks(tracks, query, genre, sort), [tracks, query, genre, sort]);
   const selectedOffer = licenseTrack?.offers.find(offer => offer.id === selectedOfferId && availableOffer(offer));
@@ -81,8 +84,14 @@ export default function Storefront({ tracks = [], licenseTiers = [], selectedTra
   function openLicense(track: Track) { setLicenseTrack(track); setSelectedOfferId(lines.find(line => line.track.id === track.id)?.offer.id ?? track.offers.find(availableOffer)?.id ?? ''); }
   function addLicense() {
     if (!licenseTrack || !selectedOffer) return;
-    const track = licenseTrack;
-    setLines(existing => [...existing.filter(line => line.track.id !== track.id), { track, offer: selectedOffer }]);
+    const track = tracks.find(track => track.id === licenseTrack.id);
+    const currentOffer = track?.offers.find(offer => offer.id === selectedOffer.id && offer.offerRevisionId === selectedOffer.offerRevisionId && offer.licenseVersionId === selectedOffer.licenseVersionId && availableOffer(offer));
+    if (!track || !currentOffer) {
+      setLicenseTrack(null);
+      setNotice('This offer changed. Please choose its license again.');
+      return;
+    }
+    setLines(existing => [...existing.filter(line => line.track.id !== track.id), { track, offer: currentOffer }]);
     setLicenseTrack(null);
     setNotice(`${selectedOffer.licenseName} for ${track.title} added to your cart.`);
   }
@@ -100,7 +109,7 @@ export default function Storefront({ tracks = [], licenseTiers = [], selectedTra
     setCheckingOut(true); setCheckoutStatus('');
     try {
       const csrf = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content;
-      const response = await fetch('/checkout', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', Accept: 'application/json', ...(csrf ? { 'X-CSRF-TOKEN': csrf } : {}) }, body: JSON.stringify({ items: lines.map(({ track, offer }) => ({ trackId: track.id, offerId: offer.id, licenseVersionId: offer.licenseVersionId })) }) });
+      const response = await fetch('/checkout', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', Accept: 'application/json', ...(csrf ? { 'X-CSRF-TOKEN': csrf } : {}) }, body: JSON.stringify({ items: lines.map(savedCartSelection) }) });
       // Payment initiation is deliberately unavailable until the verified commerce pipeline is installed.
       setCheckoutStatus(response.status === 503 ? 'Checkout is not available yet. No payment was taken. Your selections are saved in this browser tab.' : 'Checkout could not be started. No order has been confirmed. Your selections are still here.');
     } catch { setCheckoutStatus('Unable to connect. No order has been confirmed. Your selections are still here; try again when connected.'); }

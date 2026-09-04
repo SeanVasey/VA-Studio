@@ -52,3 +52,10 @@ The packaged architecture recommends a modular monolith. The supplied research c
 No need for a search cluster, event-streaming platform, custom card handling, speculative multi-region writes or marketplace payouts is established. A future material departure requires a proposed ADR with one reversible decision, options including the present baseline, domain/data/API/event/provider effects, threat and cost review, acceptance evidence, migration and rollback. It becomes accepted only with its actual authority recorded.
 
 Decision readiness: **Provisional**. This does not block repository scaffolding or provider-independent implementation. Live commerce and cutover remain blocked by the applicable unresolved entries.
+
+
+## Implementation entry — 2026-09-04: review evidence and commercial revisions
+
+**Recommendation in implementation, within Sean's authorized continued development.** WP-04 now separates a server-frozen license review submission from independent approval evidence, and separates editable offer drafts from immutable published commercial revisions. Schema version 1 carries reviewed feature summaries and exact delivery roles. Its escaped offline HTML preview is review evidence; U-05 production legal policy and U-06 buyer/PDF contract rendering remain unresolved. No owner approval of license terms or qualification of a reviewer is inferred from the application workflow.
+
+Historical approvals and offers remain retained. Versions lacking the new evidence require a reviewed successor; active offers lacking a commercial revision require explicit publication. The migration does not fabricate approvals, rewrite historical terms or create purchase rights. See [Licensing and offers](../licensing-and-offers.md) and [WP-04](../work-packages/WP-04-versioned-licensing-and-offers.md). Checkout, quotes, orders and grants remain outside this increment.

@@ -1,6 +1,7 @@
 export interface Offer {
   id: string;
   licenseVersionId: string;
+  offerRevisionId: string;
   licenseName: string;
   priceMinor: number;
   currency: string;
@@ -85,4 +86,27 @@ export function cartSubtotals(lines: CartLine[]): Array<{ currency: string; amou
   const totals = new Map<string, number>();
   for (const { offer } of lines) totals.set(offer.currency, (totals.get(offer.currency) ?? 0) + offer.priceMinor);
   return Array.from(totals, ([currency, amount]) => ({ currency, amount }));
+}
+
+
+export function savedCartSelection({ track, offer }: CartLine) {
+  return { trackId: track.id, offerId: offer.id, licenseVersionId: offer.licenseVersionId, offerRevisionId: offer.offerRevisionId };
+}
+
+export function restoreCartSelections(value: unknown, tracks: Track[]): { lines: CartLine[]; unavailable: number } {
+  if (!Array.isArray(value)) return { lines: [], unavailable: 0 };
+  const lines: CartLine[] = [];
+  let unavailable = 0;
+  const seen = new Set<string>();
+  const validId = (id: unknown) => (typeof id === 'string' && id.length > 0 && id.length <= 128) || (typeof id === 'number' && Number.isSafeInteger(id) && id > 0);
+  for (const item of value.slice(0, 100)) {
+    if (!item || typeof item !== 'object' || !['trackId', 'offerId', 'licenseVersionId', 'offerRevisionId'].every(key => validId(item[key]))) { unavailable++; continue; }
+    const track = tracks.find(track => String(track.id) === String(item.trackId));
+    const offer = track?.offers.find(offer => String(offer.id) === String(item.offerId) && String(offer.licenseVersionId) === String(item.licenseVersionId) && String(offer.offerRevisionId) === String(item.offerRevisionId) && availableOffer(offer));
+    if (!track || !offer || seen.has(String(track.id))) { unavailable++; continue; }
+    seen.add(String(track.id));
+    // Current verified catalog data supplies displayed money and files, never browser storage.
+    lines.push({ track, offer });
+  }
+  return { lines, unavailable };
 }

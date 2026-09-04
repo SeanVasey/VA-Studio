@@ -27,10 +27,10 @@ class StorefrontController extends Controller
 
     private function catalog(): array
     {
-        $tracks = Track::query()->where('status', 'published')->with(['assets', 'offers.licenseVersion.template'])->orderByDesc('published_at')->get();
-        // Fail closed if a dependent declaration/offer/asset no longer passes readiness.
+        $tracks = Track::query()->where('status', 'published')->with(['assets', 'offers.currentRevision'])->orderByDesc('published_at')->get();
+        // Eligibility is current; commercial fields come only from the immutable active revision.
         $tracks = $tracks->filter(fn (Track $track) => app(PublicationReadiness::class)->blockers($track) === []);
-        $versions = $tracks->flatMap(fn ($track) => $track->offers->where('is_active', true)->map(fn ($offer) => $offer->licenseVersion))->unique('id');
+        $licenses = $tracks->flatMap(fn ($track) => $track->offers->where('is_active', true)->map(fn ($offer) => $offer->currentRevision->snapshot['license']))->unique('id');
 
         return [
             'tracks' => $tracks->map(function (Track $track) {
@@ -42,17 +42,22 @@ class StorefrontController extends Controller
                     'bpm' => $track->bpm, 'musicalKey' => $track->musical_key, 'genre' => $track->genre, 'mood' => $track->mood,
                     'durationSeconds' => $preview->technical_metadata['duration_seconds'], 'tags' => $track->tags ?? [], 'waveform' => $preview->technical_metadata['waveform'],
                     'artworkUrl' => route('media.public', $assets->firstWhere('role', 'artwork')->id),
-                    'previewUrl' => route('media.public', $assets->firstWhere('role', 'preview_tagged')->id),
+                    'previewUrl' => route('media.public', $preview->id),
                     'shareUrl' => route('tracks.show', $track->slug),
-                    'offers' => $track->offers->where('is_active', true)->map(fn ($offer) => [
-                        'id' => $offer->id, 'licenseVersionId' => $offer->license_version_id, 'licenseName' => $offer->licenseVersion->template->name,
-                        'priceMinor' => $offer->price_minor, 'currency' => $offer->currency, 'deliverableRoles' => $offer->licenseVersion->requiredAssetRoles(),
-                    ])->values()->all(),
+                    'offers' => $track->offers->where('is_active', true)->map(function ($offer) {
+                        $revision = $offer->currentRevision;
+                        $license = $revision->snapshot['license'];
+
+                        return [
+                            'id' => $offer->id, 'offerRevisionId' => $revision->id, 'licenseVersionId' => $license['id'], 'licenseName' => $license['name'],
+                            'priceMinor' => $revision->price_minor, 'currency' => $revision->currency, 'deliverableRoles' => $license['required_asset_roles'],
+                        ];
+                    })->values()->all(),
                 ];
             })->values()->all(),
-            'licenseTiers' => $versions->map(fn ($version) => [
-                'id' => $version->id, 'name' => $version->template->name, 'version' => $version->version, 'type' => $version->template->type,
-                'features' => $version->features(), 'requiredAssetRoles' => $version->requiredAssetRoles(),
+            'licenseTiers' => $licenses->map(fn ($license) => [
+                'id' => $license['id'], 'name' => $license['name'], 'version' => $license['version'], 'type' => $license['type'],
+                'features' => $license['features'], 'requiredAssetRoles' => $license['required_asset_roles'],
             ])->values()->all(),
         ];
     }

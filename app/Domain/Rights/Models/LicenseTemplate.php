@@ -13,8 +13,8 @@ class LicenseTemplate extends Model
     protected static function booted(): void
     {
         static::updating(function (LicenseTemplate $template) {
-            if ($template->versions()->whereNotNull('published_at')->exists()) {
-                throw ValidationException::withMessages(['template' => 'Published template identity is frozen. Create a successor template.']);
+            if ($template->versions()->where('status', '!=', 'draft')->exists()) {
+                throw ValidationException::withMessages(['template' => 'Reviewed template identity is frozen. Create a successor template.']);
             }
         });
     }

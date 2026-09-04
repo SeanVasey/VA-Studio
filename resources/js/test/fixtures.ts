@@ -14,5 +14,5 @@ export const fixtureTracks: Track[] = sampleNames.map((title, i) => ({
   mood: ['Atmospheric', 'Heavy', 'Reflective', 'Orchestral'][i], durationSeconds: [187, 164, 212, 198][i],
   artworkUrl: null, previewUrl: null, waveform: [], tags: [i === 2 ? 'Piano' : 'Texture'],
   shareUrl: `/tracks/fixture-track-${i}`,
-  offers: fixtureTiers.map((tier, index) => ({ id: `${tier.id}-track-${i}`, licenseVersionId: tier.id, licenseName: tier.name, priceMinor: [2995, 4995, 9995][index], currency: 'USD', deliverableRoles: tier.requiredAssetRoles })),
+  offers: fixtureTiers.map((tier, index) => ({ id: `${tier.id}-track-${i}`, licenseVersionId: tier.id, offerRevisionId: `${tier.id}-track-${i}-revision-1`, licenseName: tier.name, priceMinor: [2995, 4995, 9995][index], currency: 'USD', deliverableRoles: tier.requiredAssetRoles })),
 }));

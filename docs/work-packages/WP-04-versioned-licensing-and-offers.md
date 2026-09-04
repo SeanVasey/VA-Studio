@@ -1,6 +1,6 @@
 # [WP-04] Immutable license versions, reviewed terms and sellable offers
 
-Status: **Planned work package**. Inspect the current implementation before starting; initial foundation code may already cover part of this scope. This issue is complete only when the acceptance evidence below exists.
+Status: **First review-evidence and offer-revision increment implemented in [PR #22](https://github.com/VASEYDEV/VASEYAUDIO/pull/22); broader work package remains open.** This increment binds human review to exact content and separates editable offers from published commercial snapshots. It does not implement a complete machine-readable legal schema or buyer contract fulfillment.
 
 - Suggested issue title: `[WP-04] Immutable license versions, reviewed terms and sellable offers`
 - Phase: 1
@@ -23,17 +23,35 @@ Template/version lifecycle, normalized terms schema and product-license offer wi
 - Offer revision with integer price/currency, exact asset manifest, rights declaration and shared exclusive-scope reference.
 - Admin editor/comparator preview and readiness; synthetic nonbinding fixtures until actual reviewed terms are supplied.
 
+## Current increment — 2026-09-04
+
+- Server-authored review payload with source, schema-versioned summaries/roles, template identity, effective UTC window and deterministic escaped HTML preview hash. Review submission freezes that exact content.
+- Separate authorized reviewer approval bound to the submission SHA-256, actual review reference and explicit source/summary consistency attestation. Immutable review evidence and SQL guards protect submitted/reviewed content; human approval does not establish reviewer legal qualification.
+- Monotonic successor drafts and comparison of source, structured fields and dates. Historical approvals are retained without invented new evidence; a reviewed successor is required for new availability.
+- Editable offer drafts separated from immutable commercial revisions. Explicit publication captures price/currency, exact license/review evidence, rights identity, preview lineage and exact asset hashes/roles/MIME/size. Editing a draft keeps the current published revision intact.
+- History, deactivation and storefront/cart revision identity. Legacy active offers without a revision require explicit operator publication. Checkout remains unavailable; no quote, order, contract, grant or provider integration is included.
+
+See [Licensing and offers](../licensing-and-offers.md) for the operator workflow and upgrade sequence. Schema version 1 validates feature-summary strings and required delivery roles; it does not interpret legal prose, resolve contract variables or mechanically prove that summaries agree with the source.
+
+## Remaining work within WP-04
+
+- Actual seller-approved production source, reviewed license matrix, reviewer evidence and rights policy under U-05.
+- Complete typed rights/caps/variables schema and representative rendered-contract consistency tests. Human summary attestation remains necessary in this increment.
+- Buyer-specific deterministic contract rendering, PDF/archive format and reproducibility acceptance under U-06/WP-08.
+- Quote/order snapshot integration under WP-06/WP-07, shared exclusive inventory and reservation policy; current publication is limited to positive USD non-exclusive offers.
+- Historical source-contract reconciliation and continuity evidence. Existing records are retained; no replacement approval or executed contract is inferred from a migration.
+
 ## Acceptance criteria
 
-- [ ] Published content, schema and approval hashes cannot be edited/deleted through any supported write path.
+- [x] Published content, schema and approval hashes cannot be edited/deleted through supported application/model and ordinary bulk SQL paths.
 - [ ] UI feature bullets and contract data derive from the same structured terms; contradictory or missing variables block publication.
-- [ ] Every advertised deliverable resolves to a ready exact asset revision and role; changes create a new commercial revision.
+- [x] Every advertised deliverable resolves to a ready exact asset revision and role; changes create a new commercial revision.
 - [ ] Current offers cannot change previously frozen quote/order data.
-- [ ] No legal reviewer, approval reference, license cap or production price is fabricated.
+- [x] No legal reviewer, approval reference, license cap or production price is fabricated; test-only evidence remains explicitly synthetic and nonbinding.
 
 ## Verification
 
-Lifecycle, immutability including bulk/import write paths, schema/feature consistency, effective-date selection and missing deliverable tests. Record exact commit, environment and results. A checklist or unexecuted test definition is not completion evidence.
+See the [verification record](../verification/licensing-and-offers.md) for exact commits, environment, commands and scope. Local integration passed 99 PHP tests / 559 assertions and 18 frontend tests, plus the production build. Independent verification passed 45 focused PHP tests / 282 assertions and found no unresolved blocking finding in the examined paths. The PR records GitHub MySQL/SQLite CI results separately. Full legal-schema/variable consistency, buyer-contract fixtures, quote/order isolation and production policy evidence remain pending.
 
 ## Rollback and boundaries
 
