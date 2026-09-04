@@ -29,7 +29,7 @@ class TrackResource extends OperatorResource
             TextInput::make('musical_key')->maxLength(24),
             TextInput::make('genre')->maxLength(255),
             TextInput::make('mood')->maxLength(255),
-            TextInput::make('duration_seconds')->integer()->minValue(1),
+            TextInput::make('duration_seconds')->disabled()->dehydrated(false)->helperText('Measured from the verified preview after processing.'),
             TagsInput::make('tags'),
             Textarea::make('description')->columnSpanFull()->maxLength(10000),
         ]);

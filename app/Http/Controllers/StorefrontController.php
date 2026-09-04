@@ -35,11 +35,12 @@ class StorefrontController extends Controller
         return [
             'tracks' => $tracks->map(function (Track $track) {
                 $assets = $track->assets->where('status', 'ready')->sortByDesc('id');
+                $preview = $assets->firstWhere('role', 'preview_tagged');
 
                 return [
                     'id' => $track->id, 'slug' => $track->slug, 'title' => $track->title, 'artist' => $track->artist,
                     'bpm' => $track->bpm, 'musicalKey' => $track->musical_key, 'genre' => $track->genre, 'mood' => $track->mood,
-                    'durationSeconds' => $track->duration_seconds, 'tags' => $track->tags ?? [], 'waveform' => $track->waveform ?? [],
+                    'durationSeconds' => $preview->technical_metadata['duration_seconds'], 'tags' => $track->tags ?? [], 'waveform' => $preview->technical_metadata['waveform'],
                     'artworkUrl' => route('media.public', $assets->firstWhere('role', 'artwork')->id),
                     'previewUrl' => route('media.public', $assets->firstWhere('role', 'preview_tagged')->id),
                     'shareUrl' => route('tracks.show', $track->slug),

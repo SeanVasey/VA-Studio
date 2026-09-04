@@ -2,7 +2,7 @@
 
 Bespoke web store development replacing older, service-based e-commerce offerings. First-party music storefront, publishing administration, licensing, and secure delivery for Sean Vasey. This project replaces the current BeatStars site through staged, verifiable implementation.
 
-**Status: initial development foundation. Live payments, purchased downloads, historical migration, and production cutover are not enabled.** The current BeatStars site remains authoritative for sales and existing customer obligations.
+**Status: development foundation with the first private media-processing increment. Live payments, purchased downloads, historical migration, and production cutover are not enabled.** The current BeatStars site remains authoritative for sales and existing customer obligations.
 
 ## Start here
 
@@ -12,6 +12,7 @@ Bespoke web store development replacing older, service-based e-commerce offering
 - [Migration evidence](docs/migration/): reconciled research, feature parity, field mapping, and cutover requirements.
 - [Brand evidence](docs/brand/): current published theme, exact identity assets, and source provenance.
 - [Verification](docs/verification/): actual local checks and remaining gates.
+- [Media operations](docs/media-processing.md): worker prerequisites, approved preview tag, processing and recovery.
 
 ## Foundation scope
 
@@ -19,7 +20,7 @@ Bespoke web store development replacing older, service-based e-commerce offering
 | --- | --- | --- |
 | Storefront | Responsive catalog, filtering, license comparison, local cart, shared track links, persistent audio transport | Production catalog import, deeper discovery, collections and product-specific routes |
 | Admin | Authenticated Filament catalog and licensing management | Detailed RBAC, recovery verification, site editing, customers and fulfillment operations |
-| Media | Private storage boundaries and versioned media records | Hardened quarantine, transcoding, tagged-preview generation and managed object storage |
+| Media | Private WAV/artwork intake, queued verification, immutable master/MP3 revisions, tagged previews, measured waveforms and admin retry controls | Production scanner acceptance, worker isolation, stems/archives, resumable uploads and managed object storage |
 | Licensing | Structured license versions, approval/publication workflow and readiness checks | Reviewed executed terms, buyer-specific contracts and transactional purchase snapshots |
 | Commerce | Explicitly unavailable checkout boundary | Provider checkout, verified webhook inbox, exclusive reservations, tax, refunds, grants and delivery |
 | Full parity | Documented work packages and evidence gates | Memberships, kits, services, merch, CRM, promotions, editorial, integrations and migration |
@@ -48,7 +49,7 @@ npm run build
 php artisan serve
 ```
 
-Open `http://localhost:8000` for the storefront and `http://localhost:8000/admin` for administration. The administrator command prompts for credentials; no password or preconfigured user ships with the project. The initial catalog is empty by design. Uploaded files remain in private quarantine: the later scanning/transcoding worker must verify and promote them before a real track can pass publication. Production mode requires TOTP enrollment; a separate administrator must approve a license version before publication.
+Open `http://localhost:8000` for the storefront and `http://localhost:8000/admin` for administration. The administrator command prompts for credentials; no password or preconfigured user ships with the project. The initial catalog is empty by design. WAV and PNG/JPEG uploads enter private quarantine. Configure the scanner, seller tag and media worker using [Media operations](docs/media-processing.md) before requesting processing in the admin panel. Without those prerequisites, uploads cannot become ready for publication. Production mode requires TOTP enrollment; a separate administrator must approve a license version before publication.
 
 For frontend development, run `npm run dev` alongside `php artisan serve`. For the isolated composition preview, run `npm run preview:design`; that preview uses explicitly labeled fixtures and shares the production React components. It cannot publish, charge, or grant a license.
 
@@ -63,11 +64,11 @@ composer audit --no-dev
 npm audit --omit=dev --audit-level=high
 ```
 
-GitHub CI runs the PHP suite against MySQL 8.4 and SQLite, plus frontend tests, build, and production dependency audits. A workflow file is not evidence that GitHub has run it. MySQL concurrency, real providers, mobile Safari playback, restore drills, and production deployment remain separate acceptance gates until recorded in the verification report.
+GitHub CI is configured to run the PHP suite against MySQL 8.4 and SQLite, plus frontend tests, build, and production dependency audits. A workflow file is not evidence that GitHub has run it. MySQL concurrency, real providers, mobile Safari playback, restore drills, and production deployment remain separate acceptance gates until recorded in the verification report.
 
 ## GitHub publication
 
-Repository: [VASEYDEV/VASEYAUDIO](https://github.com/VASEYDEV/VASEYAUDIO), private. Sean created the repository during the initial implementation; the GitHub integration supplies commits and work-package issues. The first full foundation is delivered as a pull request for review.
+Repository: [VASEYDEV/VASEYAUDIO](https://github.com/VASEYDEV/VASEYAUDIO), private. Sean created the repository during the initial implementation; the GitHub integration supplies commits and work-package issues. The first foundation was merged in [PR #15](https://github.com/VASEYDEV/VASEYAUDIO/pull/15). Subsequent work is delivered through bounded pull requests with implementation evidence.
 
 For subsequent operator-driven publication, the optional helper expects the official GitHub CLI authenticated as VASEYDEV:
 

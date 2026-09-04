@@ -5,7 +5,7 @@ namespace App\Domain\Catalog;
 use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Media\Models\MediaAsset;
-use Illuminate\Support\Facades\Storage;
+use App\Domain\Media\VerifiedMedia;
 
 class PublicationReadiness
 {
@@ -35,7 +35,11 @@ class PublicationReadiness
         if ($license->requiredAssetRoles() === []) {
             $blockers[] = 'License deliverable roles are required.';
         }
+        $preview = Track::find($offer->track_id)?->assets()->where('role', 'preview_tagged')->where('status', 'ready')->latest('id')->first();
         foreach ($assets as $asset) {
+            if (! $preview || ! $preview->parent_asset_id || $asset->parent_asset_id !== $preview->parent_asset_id) {
+                $blockers[] = 'Deliverables must come from the same verified recording revision as the current preview.';
+            }
             if (! $this->available($asset)) {
                 $blockers[] = 'A deliverable revision is not available in private storage.';
             }
@@ -47,8 +51,8 @@ class PublicationReadiness
     public function blockers(Track $track): array
     {
         $blockers = [];
-        if (! $track->title || ! $track->slug || ! $track->artist || ! $track->genre || ! $track->musical_key || $track->bpm < 20 || $track->bpm > 400 || $track->duration_seconds < 1) {
-            $blockers[] = 'Complete title, slug, artist, genre, musical key, BPM (20–400), and duration.';
+        if (! $track->title || ! $track->slug || ! $track->artist || ! $track->genre || ! $track->musical_key || $track->bpm < 20 || $track->bpm > 400) {
+            $blockers[] = 'Complete title, slug, artist, genre, musical key, BPM (20–400), and BPM.';
         }
         $rights = $track->exists ? $track->rightsDeclarations()->latest('id')->first() : null;
         if (! $rights || $rights->status !== 'verified' || ! $rights->verified_by || ! $rights->verified_at) {
@@ -60,8 +64,9 @@ class PublicationReadiness
                 $blockers[] = 'A verified '.$role.' asset is required.';
             }
         }
-        if (empty($track->waveform)) {
-            $blockers[] = 'Precomputed preview waveform peaks are required.';
+        $preview = $track->exists ? $track->assets()->where('role', 'preview_tagged')->where('status', 'ready')->latest('id')->first() : null;
+        if (empty($preview?->technical_metadata['waveform']) || ($preview?->technical_metadata['duration_seconds'] ?? 0) < 1) {
+            $blockers[] = 'Measured preview duration and waveform peaks are required.';
         }
         $offers = $track->exists ? $track->offers()->where('is_active', true)->get() : collect();
         if ($offers->isEmpty()) {
@@ -76,6 +81,6 @@ class PublicationReadiness
 
     private function available(MediaAsset $asset): bool
     {
-        return $asset->disk === 'local' && $asset->sha256 !== null && Storage::disk('local')->exists($asset->storage_path);
+        return app(VerifiedMedia::class)->available($asset);
     }
 }
