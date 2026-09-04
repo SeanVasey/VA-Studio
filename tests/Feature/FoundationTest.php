@@ -38,7 +38,7 @@ class FoundationTest extends TestCase
     {
         parent::setUp();
         $this->withoutVite();
-        Storage::fake('local');
+        $this->fakePrivateMediaStorage();
     }
 
     private function admin(): User

@@ -68,7 +68,7 @@ GitHub CI is configured to run the PHP suite against MySQL 8.4 and SQLite, plus 
 
 ## GitHub publication
 
-Repository: [VASEYDEV/VASEYAUDIO](https://github.com/VASEYDEV/VASEYAUDIO), private. Sean created the repository during the initial implementation; the GitHub integration supplies commits and work-package issues. The first foundation was merged in [PR #15](https://github.com/VASEYDEV/VASEYAUDIO/pull/15). Subsequent work is delivered through bounded pull requests with implementation evidence.
+Repository: [VASEYDEV/VASEYAUDIO](https://github.com/VASEYDEV/VASEYAUDIO), private. Sean created the repository during the initial implementation; the GitHub integration supplies commits and work-package issues. The first foundation was merged in [PR #15](https://github.com/VASEYDEV/VASEYAUDIO/pull/15); private media processing is delivered in [PR #21](https://github.com/VASEYDEV/VASEYAUDIO/pull/21), with [verification evidence](docs/verification/media-pipeline.md). Subsequent work is delivered through bounded pull requests with implementation evidence.
 
 For subsequent operator-driven publication, the optional helper expects the official GitHub CLI authenticated as VASEYDEV:
 

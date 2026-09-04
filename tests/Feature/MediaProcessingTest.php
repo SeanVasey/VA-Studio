@@ -41,7 +41,7 @@ class MediaProcessingTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Storage::fake('local');
+        $this->fakePrivateMediaStorage();
         $this->scanner = MediaFixtures::configure();
         $this->actor = User::factory()->create();
         $this->actor->forceFill(['is_admin' => true])->save();
@@ -402,6 +402,20 @@ class MediaProcessingTest extends TestCase
         $files->cleanup($workspace);
         $this->assertDirectoryDoesNotExist($workspace);
         $this->assertFileExists($outside.'/test-only.wav');
+    }
+
+    public function test_private_test_storage_does_not_reuse_or_clean_another_test_root(): void
+    {
+        $previous = Storage::disk('local');
+        $previous->put('processing/other-attempt/sentinel', 'previous test');
+
+        $this->fakePrivateMediaStorage();
+        $current = Storage::disk('local');
+        $this->assertNotSame($previous->path(''), $current->path(''));
+        $this->assertSame([], glob($current->path('processing').'/*'));
+        $current->put('processing/other-attempt/sentinel', 'current test');
+        $this->assertSame('previous test', $previous->get('processing/other-attempt/sentinel'));
+        $this->assertSame('current test', $current->get('processing/other-attempt/sentinel'));
     }
 
     public function test_partial_promotion_is_removed_and_existing_revisions_are_never_unlinked(): void

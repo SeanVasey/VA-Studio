@@ -1,6 +1,6 @@
 # [WP-03] Private media ingestion, quarantine and preview processing
 
-Status: **First WAV/artwork increment in development; broader work package remains open.** The implementation below is a bounded local-storage pipeline. This issue is complete only when the acceptance evidence and remaining production work below exist.
+Status: **First WAV/artwork increment implemented in PR #21; broader work package remains open.** The implementation below is a bounded local-storage pipeline. This issue is complete only when the acceptance evidence and remaining production work below exist.
 
 - Suggested issue title: `[WP-03] Private media ingestion, quarantine and preview processing`
 - Phase: 1
@@ -51,7 +51,7 @@ See [Media operations](../media-processing.md) for setup, supported limits, fail
 
 ## Verification
 
-The first increment adds synthetic WAV/artwork integration fixtures and failure/privacy cases. The integration owner records the exact tested commit, commands, tool versions and results in the PR/verification evidence; this work-package update does not claim an unobserved test run. Archive extraction, real scanner detection, production worker isolation and browser/device evidence remain pending. A checklist or unexecuted test definition is not completion evidence.
+The first increment adds synthetic WAV/artwork integration fixtures and failure/privacy cases. See [media verification](../verification/media-pipeline.md) for exact source identity, commands, runtime versions, observed local/CI results and independent-review corrections. Archive extraction, real scanner detection, production worker isolation and browser/device evidence remain pending. A checklist or unexecuted test definition is not completion evidence.
 
 ## Rollback and boundaries
 

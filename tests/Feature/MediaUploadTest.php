@@ -25,7 +25,7 @@ class MediaUploadTest extends TestCase
     {
         parent::setUp();
         $this->withoutVite();
-        Storage::fake('local');
+        $this->fakePrivateMediaStorage();
     }
 
     private function operator(): User
