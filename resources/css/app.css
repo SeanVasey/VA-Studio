@@ -243,6 +243,12 @@ input[type='range'] { accent-color: var(--va-action); cursor: pointer; min-width
 .cart-total strong { color: var(--va-text-strong); font-size: 24px; }
 .cart-total small { font-size: 11px; font-weight: 400; }
 .checkout-status { font-size: 13px; padding-top: 16px; }
+.quote-review { margin-top: 24px; }
+.quote-review-result { padding: 18px; margin-bottom: 18px; border: 1px solid var(--va-border); background: var(--va-surface); }
+.quote-review-result h3 { color: var(--va-text-strong); font-size: 24px; }
+.quote-review-item { padding: 14px 0; border-bottom: 1px solid var(--va-border); overflow-wrap: anywhere; }
+.quote-review-item p, .quote-review-item ul { font-size: 12px; line-height: 1.6; margin: 5px 0; }
+.quote-review-item ul { padding-left: 18px; }
 .empty-cart { min-height: 260px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 20px; text-align: center; }
 .empty-cart h3 { font-family: var(--va-font-section); font-size: 30px; font-weight: 400; }
 .empty-cart p { font-size: 14px; }
