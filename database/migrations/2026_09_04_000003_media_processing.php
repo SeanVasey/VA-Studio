@@ -54,10 +54,15 @@ return new class extends Migration
                 DB::unprepared('DROP TRIGGER IF EXISTS '.$table.'_immutable_'.$operation);
             }
         }
+        // MySQL may use the compound unique index to support processing_run_id's
+        // foreign key. Remove the foreign keys before dropping that index or its columns.
+        Schema::table('media_assets', function (Blueprint $table) {
+            $table->dropForeign(['processing_run_id']);
+            $table->dropForeign(['parent_asset_id']);
+        });
         Schema::table('media_assets', function (Blueprint $table) {
             $table->dropUnique('media_outputs_run_role_unique');
-            $table->dropConstrainedForeignId('processing_run_id');
-            $table->dropConstrainedForeignId('parent_asset_id');
+            $table->dropColumn(['processing_run_id', 'parent_asset_id']);
         });
         Schema::dropIfExists('media_processing_runs');
     }

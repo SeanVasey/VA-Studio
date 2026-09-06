@@ -26,7 +26,7 @@ The full suite includes retained media, licensing and catalog regressions. Quote
 
 ## Concurrency evidence
 
-Three MySQL-only tests use separate PHP processes, committed fixtures, shared isolated media and explicit barriers inside the quote transaction. They check identical-key replay, conflicting selections with one key, and a rights hold committed while quote creation waits on a track lock. The last case verifies an actual `INNODB_TRX` lock wait under `REPEATABLE READ`; the CI test account requires permission to observe that state. SQLite skips these tests rather than claiming equivalent evidence. Their final execution results belong to the PR's MySQL CI record.
+Three MySQL-only tests use separate PHP processes, committed fixtures, shared isolated media and explicit barriers inside the quote transaction. They check identical-key replay, conflicting selections with one key, and a rights hold committed while quote creation waits on a track lock. The last case verifies an actual row-lock wait under `REPEATABLE READ` using an independent autocommit observer and Performance Schema lock/connection tables; the CI test account requires permission to observe that state. SQLite skips these tests rather than claiming equivalent evidence. Their final execution results belong to the PR's MySQL CI record.
 
 Independent review identified the potential for a repeatable-read snapshot to be established before waiting for track locks. Existing-quote lookups now use locking reads, keeping the dependent read view after the authoritative track/offer locks. The administrative-hold race specifically exercises this correction.
 
@@ -39,3 +39,11 @@ These are provisional selection reviews with `payable: false`, unresolved tax an
 Creation forces fresh media digests. Reads and same-key replays retain the existing bounded 60-second digest cache. Full tax/promotion policy, approved disclosures, purchase identity, exclusive inventory, provider reconciliation and fulfillment remain separate work. The three focused database races do not establish those future mechanisms or general production concurrency correctness.
 
 No browser/device visual QA, external legal validation, production load/restore exercise, live payment or BeatStars cutover was performed. Cold asset hashing and quote storage/retention need production capacity and policy acceptance.
+
+## CI findings
+
+The first [MySQL run](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/34058482948) exposed a pre-existing media migration rollback defect: it attempted to drop an index before removing a foreign key that depended on it. The new committed-fixture race tests exercise migration rollback, exposing an ordering path not reached by the prior transactional suite. Incomplete rollback caused subsequent missing-schema failures. This is distinct from quote business validation.
+
+The rights-hold race also failed its original `INNODB_TRX` observation of `LOCK WAIT`; its observed state remained `RUNNING`. The corrected observer uses a separate autocommit connection and requires a live worker-to-parent wait on the selected track's primary-key record in Performance Schema. It retains proof of actual contention before releasing the administrative lock. The exact cause of the earlier sampled state is not established. The integrating PR records the corrective commits and final actual MySQL results.
+
+The rollback correction explicitly removes both media foreign keys before dropping their index and columns; its `up()` path is unchanged. Populated SQLite migration rollback was independently executed successfully. The corrected MySQL race suite also exercises full migration teardown instead of bypassing the failing rollback path.

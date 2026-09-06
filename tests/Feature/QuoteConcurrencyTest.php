@@ -100,20 +100,7 @@ class QuoteConcurrencyTest extends TestCase
                 [$fixture['items']],
                 'track',
                 function (array $connectionIds) use ($fixture): void {
-                    // Verify actual database contention before committing the rights change.
-                    // The MySQL CI service runs as root; observing INNODB_TRX requires PROCESS.
-                    $deadline = microtime(true) + 10;
-                    do {
-                        $transaction = DB::selectOne(
-                            'SELECT TRX_STATE AS state FROM information_schema.INNODB_TRX WHERE TRX_MYSQL_THREAD_ID = ?',
-                            [$connectionIds[0]],
-                        );
-                        if (($transaction?->state) === 'LOCK WAIT') {
-                            break;
-                        }
-                        usleep(20000);
-                    } while (microtime(true) < $deadline);
-                    $this->assertSame('LOCK WAIT', $transaction?->state, 'The quote worker must actually wait for the track row lock.');
+                    $this->assertWorkerWaitsForParentTrackLock($connectionIds[0], $fixture['track']->id);
                     RightsDeclaration::create([
                         'track_id' => $fixture['track']->id,
                         'provenance_reference' => 'TEST-ONLY-CONCURRENT-RIGHTS-HOLD',
@@ -134,6 +121,57 @@ class QuoteConcurrencyTest extends TestCase
             if (DB::transactionLevel() > 0) {
                 DB::rollBack();
             }
+        }
+    }
+
+    private function assertWorkerWaitsForParentTrackLock(int $workerConnectionId, int $trackId): void
+    {
+        $parentConnectionId = (int) DB::selectOne('SELECT CONNECTION_ID() AS connection_id')->connection_id;
+        $database = DB::connection()->getConfig();
+        $observerName = 'quote_race_observer_'.Str::uuid();
+        config(['database.connections.'.$observerName => [...$database, 'url' => null]]);
+        try {
+            // Observe from an independent autocommit connection. Performance Schema lock tables
+            // expose live lock relationships; an INNODB_TRX state alone does not identify the blocker.
+            // CI's test account can read these tables; no application permission is changed here.
+            // https://dev.mysql.com/doc/refman/8.4/en/innodb-information-schema-internal-data.html
+            $observer = DB::connection($observerName);
+            $observerConnectionId = (int) $observer->selectOne('SELECT CONNECTION_ID() AS connection_id')->connection_id;
+            $this->assertNotContains($observerConnectionId, [$parentConnectionId, $workerConnectionId]);
+            $this->assertSame(0, $observer->transactionLevel());
+            $sql = <<<'SQL'
+SELECT requested.LOCK_STATUS AS lock_status
+FROM performance_schema.data_lock_waits AS waits
+JOIN performance_schema.threads AS requesting_thread
+    ON requesting_thread.THREAD_ID = waits.REQUESTING_THREAD_ID
+JOIN performance_schema.threads AS blocking_thread
+    ON blocking_thread.THREAD_ID = waits.BLOCKING_THREAD_ID
+JOIN performance_schema.data_locks AS requested
+    ON requested.ENGINE_LOCK_ID = waits.REQUESTING_ENGINE_LOCK_ID
+    AND requested.ENGINE = waits.ENGINE
+WHERE waits.ENGINE = 'INNODB'
+    AND requesting_thread.PROCESSLIST_ID = ?
+    AND blocking_thread.PROCESSLIST_ID = ?
+    AND requested.OBJECT_SCHEMA = ?
+    AND requested.OBJECT_NAME = 'tracks'
+    AND requested.INDEX_NAME = 'PRIMARY'
+    AND requested.LOCK_TYPE = 'RECORD'
+    AND requested.LOCK_STATUS = 'WAITING'
+    AND requested.LOCK_DATA = ?
+LIMIT 1
+SQL;
+            $deadline = microtime(true) + 10;
+            do {
+                $waitingLock = $observer->selectOne($sql, [$workerConnectionId, $parentConnectionId, $database['database'], (string) $trackId]);
+                if ($waitingLock) {
+                    break;
+                }
+                usleep(100000);
+            } while (microtime(true) < $deadline);
+            $this->assertSame('WAITING', $waitingLock?->lock_status, 'The quote worker must actually wait for the parent transaction on this exact tracks row.');
+        } finally {
+            DB::purge($observerName);
+            app('config')->offsetUnset('database.connections.'.$observerName);
         }
     }
 
