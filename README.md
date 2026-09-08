@@ -2,7 +2,7 @@
 
 Bespoke web store development replacing older, service-based e-commerce offerings. First-party music storefront, publishing administration, licensing, and secure delivery for Sean Vasey. This project replaces the current BeatStars site through staged, verifiable implementation.
 
-**Status: development foundation with private media processing, exact license review evidence and immutable offer revisions. Live payments, purchased downloads, historical migration, and production cutover are not enabled.** The current BeatStars site remains authoritative for sales and existing customer obligations.
+**Status: development foundation with private media processing, exact license review evidence, immutable offer revisions and server-side provisional selection reviews. Live payments, purchased downloads, historical migration, and production cutover are not enabled.** The current BeatStars site remains authoritative for sales and existing customer obligations.
 
 ## Start here
 
@@ -14,6 +14,7 @@ Bespoke web store development replacing older, service-based e-commerce offering
 - [Verification](docs/verification/): actual local checks and remaining gates.
 - [Media operations](docs/media-processing.md): worker prerequisites, approved preview tag, processing and recovery.
 - [Licensing and offers](docs/licensing-and-offers.md): review submission, successor versions, published prices/files and legacy upgrade steps.
+- [Provisional selection reviews](docs/provisional-quotes.md): server snapshots, session ownership, retries, expiry and the boundary before payable checkout.
 
 ## Foundation scope
 
@@ -23,11 +24,11 @@ Bespoke web store development replacing older, service-based e-commerce offering
 | Admin | Authenticated Filament catalog and licensing management | Detailed RBAC, recovery verification, site editing, customers and fulfillment operations |
 | Media | Private WAV/artwork intake, queued verification, immutable master/MP3 revisions, tagged previews, measured waveforms and admin retry controls | Production scanner acceptance, worker isolation, stems/archives, resumable uploads and managed object storage |
 | Licensing | Exact submitted review payloads, independent approval evidence, source/summary preview, successor diffs and effective dates | Approved production terms, a complete typed rights schema, buyer contracts and archival PDF rendering |
-| Offers | Editable drafts separated from immutable published price/license/file revisions; revision history and cart invalidation | Server quotes, purchase snapshots, exclusive inventory and fulfillment |
-| Commerce | Explicitly unavailable checkout boundary | Provider checkout, verified webhook inbox, exclusive reservations, tax, refunds, grants and delivery |
+| Offers | Editable drafts separated from immutable published price/license/file revisions; revision history and cart invalidation | Purchase snapshots, exclusive inventory and fulfillment |
+| Commerce | Server-validated provisional selection reviews with immutable snapshots, integer USD subtotals, expiry and owner-scoped retries; checkout remains unavailable | Payable quotes, tax policy, buyer identity/assent, orders, promotions, provider checkout, verified webhook inbox, exclusive reservations, refunds, grants and delivery |
 | Full parity | Documented work packages and evidence gates | Memberships, kits, services, merch, CRM, promotions, editorial, integrations and migration |
 
-Public metadata observed on BeatStars is evidence, not an imported production catalog. Design fixtures are development-only and carry no saleable rights. The local cart pins the advertised offer revision and invalidates selections when that revision changes. It remains provisional UI state; future server quotes must determine payable amounts.
+Public metadata observed on BeatStars is evidence, not an imported production catalog. Design fixtures are development-only and carry no saleable rights. The local cart pins the advertised offer revision and invalidates selections when that revision changes. **Review selection** asks the server to revalidate the exact selection and freeze its price, license and file evidence. The returned subtotal is provisional: tax and total are unknown, `payable` is false, and no order, reservation, assent or purchase rights are created.
 
 ## Stack
 
