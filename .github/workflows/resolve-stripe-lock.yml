@@ -1,0 +1,19 @@
+name: Resolve Stripe SDK lockfile
+on:
+  push:
+    branches: [build/stripe-sdk-lock]
+permissions:
+  contents: read
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl
+          tools: composer:v2
+      - run: composer require 'stripe/stripe-php:^21.3.1' --no-install --no-scripts --no-interaction
+      - name: Record dependency-only diff
+        run: git diff -- composer.json composer.lock
