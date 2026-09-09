@@ -29,3 +29,7 @@ The implementing PR records the tested commit and actual CI results. Local PHP a
 No database migration, data backfill, credentials, recurring service or external write is needed. Revert the application/view changes to remove the metadata; retained catalog, licenses, quotes and private media remain intact. Existing rate limits and catalog integrity-cache behavior apply. Checkout remains disabled.
 
 Next within WP-05: bounded server-side discovery/pagination with selection reconciliation, then a dedicated track-detail view and device playback/navigation verification. Payment work still needs the payable quote, tax, assent, order and fulfillment contracts described in WP-06 through WP-08.
+
+## Published URL continuity
+
+The [catalog metadata command](catalog-administration.md) permits slug changes only before first publication. The saved `published_slug` and database guards keep that identity after unpublishing, including records with older publication evidence. Unpublished links return 404; republishing restores the same URL. Renames with redirects require a future explicit continuity workflow.

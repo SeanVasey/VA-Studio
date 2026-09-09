@@ -1,12 +1,12 @@
 # Ordered development status
 
-Reconciled 2026-09-09 against `main` at `3224e0a32a1b94a05ea726010ac1f449be4540e0`, the repository implementation, issues #1–14, and the original [roadmap](architecture/roadmap.md). Sean explicitly requested returning to the pre-Stripe order and retaining every unfinished requirement.
+Reconciled 2026-09-09 against `main` at `f083c5681ad403ade445d95c78f131db784a4521`, the repository implementation, issues #1–14, and the original [roadmap](architecture/roadmap.md). Sean explicitly requested returning to the pre-Stripe order and retaining every unfinished requirement.
 
 ## Current increment and next handoff
 
-Resume the previously recorded next increment in [WP-05 / #5](https://github.com/VASEYDEV/VASEYAUDIO/issues/5): **server catalog pagination and cart/selection reconciliation**. Public sharing was merged in [PR #25](https://github.com/VASEYDEV/VASEYAUDIO/pull/25). The bounded Stripe receipt prerequisite in [PR #26](https://github.com/VASEYDEV/VASEYAUDIO/pull/26) stays in place; its earlier “payable orders next” handoff is superseded by this order.
+[PR #27](https://github.com/VASEYDEV/VASEYAUDIO/pull/27) is merged: WP-05 server catalog pagination and saved-selection reconciliation are on main. The current bounded WP-02 increment adds authorized, audited metadata commands, stale-form protection and permanent published URL reservations. See [catalog administration](catalog-administration.md) for behavior, migration and verification boundaries.
 
-After this increment, close the earlier foundation/admin acceptance gaps before advancing commerce: published slug continuity and ordinary metadata audit coverage need a focused WP-02 implementation/verification pass. `Track` currently permits published slug edits, and the Filament metadata save path needs evidence that it records edits. Existing publish/unpublish auditing does not prove that criterion. Keep the dedicated WP-05 track detail and real device playback/navigation acceptance queued behind this foundation closure and the required media/rights work.
+Next, reconcile the remaining WP-01 clean-boot/operator diagnostics and WP-02 real-browser save/error acceptance. Livewire component tests exercise server actions; they are not browser evidence. Keep broader RBAC, production MFA/recovery and independent review visible. Then continue the remaining Phase 1 media and rights dependencies before dedicated WP-05 track detail/device acceptance and further Phase 2 commerce.
 
 ## Coverage and remaining work
 
@@ -15,10 +15,10 @@ After this increment, close the earlier foundation/admin acceptance gaps before 
 | Original order | Implemented evidence | Remaining work and dependency |
 | --- | --- | --- |
 | WP-01 — foundation | PR #15 scaffold/lockfiles/CI; PR #24 tailored PR template; later PR CI exercises MySQL/SQLite, frontend build and dependency audits | Reconcile final clean-install/boot/operator setup and diagnostics acceptance. Keep runtime and provider limitations explicit. |
-| WP-02 — catalog/admin | Protected Filament resources, persistent metadata, central readiness, publish/unpublish commands, private catalog protection and synthetic seed restrictions | Published slug continuity, metadata audit coverage, direct-action denials and browser save/error acceptance; production MFA/recovery evidence remains a release gate. Address these before more Phase 2 work. |
+| WP-02 — catalog/admin | Protected Filament resources and readiness; current increment adds audited metadata commands, revision conflicts, database URL reservations and direct-action tests | Verify this increment in CI and independent review; real-browser save/error acceptance and production MFA/recovery evidence remain open. Address foundation acceptance before more Phase 2 work. |
 | WP-03 — media | PR #21 private WAV/artwork intake, quarantine, immutable derivatives, measured previews and retries | Stems/ZIP safety, resumable uploads/object-store adapter, real scanner acceptance, isolated workers, recovery and actual catalog/tag/playback evidence. Production configuration does not block unrelated reversible code. |
 | WP-04 — licensing/offers | PR #22 exact review evidence, successor versions, immutable commercial snapshots and deliverable identity | Typed rights/caps/variables and consistency fixtures, actual reviewed terms, historical continuity; buyer-specific rendering integrates with WP-08. No invented legal policy. |
-| WP-05 — storefront/player | Foundation catalog/player; PR #25 metadata; current pagination/reconciliation increment | Dedicated track detail, device navigation/playback/seek, responsive accessibility acceptance and production performance. Search pages may contain fewer than 12 eligible records; no hidden-record total is exposed. |
+| WP-05 — storefront/player | Foundation catalog/player; PR #25 metadata; merged PR #27 pagination/reconciliation | Dedicated track detail, device navigation/playback/seek, responsive accessibility acceptance and production performance. Search pages may contain fewer than 12 eligible records; no hidden-record total is exposed. |
 | WP-06 — quotes/reservations | PR #23 provisional immutable selection reviews | Payable quotes, actual tax policy, promotions, shared exclusive inventory and reservation lifecycle; follows media/rights and storefront readiness. |
 | WP-07 — checkout/finalization | PR #26 verified immutable Stripe test receipts | Test orders/assent and hosted sessions, payment validation, inbox processing/reconciliation, idempotent finalization and exception handling after WP-06. Connected Stripe accounts do not replace application implementation. |
 | WP-08 — contracts/delivery | Architecture and work package | Deterministic buyer contracts, exact asset entitlements, secure re-downloads, retries and historical preservation after payment evidence. |
@@ -31,8 +31,8 @@ After this increment, close the earlier foundation/admin acceptance gaps before 
 
 ## Sequence control
 
-1. Finish and verify the current bounded WP-05 pagination PR.
-2. Reconcile WP-01 acceptance and close the identified WP-02 admin/publication gaps in a separate PR. Continue the early WP-12 source audit when authenticated source access is available; record unknowns without pretending they are absent obligations.
+1. Preserve merged WP-05 pagination/reconciliation evidence from PR #27; finish and verify the current WP-02 metadata/URL PR.
+2. Reconcile remaining WP-01 operator diagnostics/boot and WP-02 browser acceptance. Continue the early WP-12 source audit when authenticated source access is available; record unknowns without pretending they are absent obligations.
 3. Work through remaining Phase 1 media and rights dependencies (WP-03, WP-04), then complete WP-05 track detail/player acceptance. Split large packages into explicit increments and retain external production gates separately.
 4. Resume Phase 2 in order: WP-06 payable quote/reservation work → WP-07 orders/hosted checkout/finalization → WP-08 contracts/entitlements/delivery. Reuse the merged provisional quote and Stripe receipt foundations.
 5. Complete WP-09 → WP-10/WP-11, finish WP-12 migration reconciliation, then WP-13 release validation and WP-14 cutover. Audited customer obligations may pull the required WP-10/WP-11 slice earlier, as the original roadmap requires.

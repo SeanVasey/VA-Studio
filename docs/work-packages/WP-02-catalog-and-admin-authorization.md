@@ -1,6 +1,6 @@
 # [WP-02] Persistent catalog administration and publication readiness
 
-Status: **Protected catalog/admin foundation implemented; broad acceptance remains open. Published slug continuity, ordinary metadata audit coverage and browser/direct-action verification require the next foundation closure pass.** See [ordered development status](../development-order.md).
+Status: **Current increment implements audited metadata commands, stale-form protection, permanent published URLs and direct-action tests. CI verification is pending; real-browser acceptance and independent review remain open.** See [ordered development status](../development-order.md).
 
 - Suggested issue title: `[WP-02] Persistent catalog administration and publication readiness`
 - Phase: 0
@@ -45,3 +45,11 @@ Do not add secrets, private masters, unredacted orders, customer PII or real con
 > Implement WP-02 as a protected persistent catalog increment. Inspect existing models/resources first. Centralize readiness and authorization server-side, preserve draft privacy and audit changes. Add meaningful permission/readiness tests and document what still depends on media/licensing work.
 
 Read [architecture index](../architecture/README.md), [decision register](../architecture/decision-register.md) and relevant source/brand evidence. Complete the first increment in a small PR, then split any remaining implementation into explicitly dependent issues. Preserve prior approvals and invariants; report unresolved provider/policy decisions without blocking unrelated reversible work.
+
+## Metadata and URL increment — 2026-09-09
+
+`SaveTrackMetadata` owns Filament create/edit persistence: verified staff authorization, metadata allowlist, validation, a locked current row, expected revision and transactional minimized audit evidence. A failed audit or invalid published edit rolls back the mutation. `published_slug` reserves the URL through unpublish/republish, with model and MySQL/SQLite triggers blocking rewrites and deletion/reuse. Historical backfill preserves known slugs without inventing dates or edit events. See [catalog administration](../catalog-administration.md).
+
+Targeted tests cover actual Filament create/edit/error actions, changed request actors, direct command denials, stale forms, malformed/extra fields, readiness rollback, public/draft privacy, historical migration and raw SQL URL attacks. The MySQL test requires independent processes and an observed wait on the exact track row; it intentionally skips on SQLite. Definitions are not test results: the PR must record completed CI evidence at its actual head.
+
+Next acceptance work: WP-01 clean boot/operator diagnostics and WP-02 real-browser save/error flows, followed by remaining WP-03 media and WP-04 rights dependencies. Fine-grained roles and production MFA/recovery remain explicit gates; the current gate is verified `is_admin` staff. No work package is closed by this increment.

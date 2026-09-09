@@ -15,12 +15,19 @@ class Track extends Model
 
     protected function casts(): array
     {
-        return ['tags' => 'array', 'waveform' => 'array', 'published_at' => 'datetime'];
+        return ['bpm' => 'integer', 'metadata_version' => 'integer', 'tags' => 'array', 'waveform' => 'array', 'published_at' => 'datetime'];
     }
 
     protected static function booted(): void
     {
         static::saving(function (Track $track) {
+            $reserved = $track->getRawOriginal('published_slug');
+            if ($reserved !== null && ($track->slug !== $reserved || $track->published_slug !== $reserved)) {
+                throw ValidationException::withMessages(['slug' => 'A published track URL cannot change, including after unpublishing.']);
+            }
+            if ($track->status === 'published' || $track->published_at !== null) {
+                $track->published_slug ??= $track->slug;
+            }
             if ($track->status === 'published') {
                 $blockers = app(PublicationReadiness::class)->blockers($track);
                 if ($blockers !== []) {
@@ -29,8 +36,8 @@ class Track extends Model
             }
         });
         static::deleting(function (Track $track) {
-            if ($track->status === 'published') {
-                throw ValidationException::withMessages(['track' => 'Unpublish the track before deleting it. Referenced evidence cannot be deleted.']);
+            if ($track->published_slug !== null || $track->status === 'published') {
+                throw ValidationException::withMessages(['track' => 'Retain this track to preserve its published URL. Unpublish it to remove it from the catalog.']);
             }
         });
     }
