@@ -73,7 +73,7 @@ it('ignores an older reconciliation response after navigating to another page', 
   expect(result.current.unavailable).toBe(0);
 });
 
-it.each([null, [{ id: '1', offers: [] }]])('preserves choices on a malformed lookup response: %j', async malformed => {
+it.each([{ tracks: null }, { tracks: [{ id: '1', offers: [] }] }])('preserves choices on a malformed lookup response: %j', async ({ tracks: malformed }) => {
   sessionStorage.setItem('vaseyaudio-cart-v1', JSON.stringify([selection]));
   vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({ tracks: malformed, licenseTiers: fixtureTiers })));
   const { result } = renderHook(() => useCart(secondPage, true));
