@@ -11,6 +11,10 @@ Scope: bounded WAV-only ZIP ingestion on top of merged PR #29 (`b2da258a7689c5d5
 - Filament ZIP intake ignores forged readiness fields. Unauthorized intake/queue requests and both public/operator-preview archive access are denied. Stems do not generate previews or alter measured track duration.
 - Offer publication retains its exact recording-revision blocker for a technically processed stems archive. The next increment must establish that association explicitly.
 
+## Runtime prerequisite review correction
+
+The [automated review of PR #29](https://github.com/VASEYDEV/VASEYAUDIO/pull/29#discussion_r3969241951) identified that the diagnostic's PHP probe omitted documented extensions. This increment corrects the probe to check PDO, both documented database drivers, mbstring, intl, bcmath, gd, fileinfo, ZIP and curl. This supports stems' new runtime dependency and prevents the report from passing that prerequisite when an extension is absent. Existing diagnostic and isolated clean-boot/browser checks run in CI; intentionally removing host extensions is not a performed deployment acceptance exercise. The automated prior-PR finding is not independent review of the archive implementation.
+
 ## Execution evidence
 
 Run `php artisan test` against MySQL 8.4 and `DB_CONNECTION=sqlite DB_DATABASE=:memory: php artisan test`, plus the existing frontend/build/audit and operator-browser CI gates. The PHP ZIP extension and real FFmpeg binaries are installed by the existing CI job. No workflow or dependency lockfile change is required.

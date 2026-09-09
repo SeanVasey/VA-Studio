@@ -23,8 +23,9 @@ final class InstallationReport
             $checks[] = ['id' => $id, 'status' => $ok ? 'pass' : ($required ? 'fail' : 'warn'), 'message' => $ok ? $pass : $remedy];
         };
 
-        $check('php_runtime', true, fn () => PHP_VERSION_ID >= 80400 && extension_loaded('mbstring') && extension_loaded('intl') && extension_loaded('pdo'),
-            'PHP 8.4+ and core extensions are available.', 'Install the PHP version and extensions documented in README.');
+        $check('php_runtime', true, fn () => PHP_VERSION_ID >= 80400
+            && array_filter(['pdo', 'pdo_sqlite', 'pdo_mysql', 'mbstring', 'intl', 'bcmath', 'gd', 'fileinfo', 'zip', 'curl'], fn (string $extension) => ! extension_loaded($extension)) === [],
+            'PHP 8.4+ and all documented extensions are available.', 'Install the PHP version and extensions documented in README.');
         $check('application_key', true, function () {
             $key = config('app.key');
             if (! is_string($key) || $key === '') {
