@@ -2,7 +2,7 @@
 
 Bespoke web store development replacing older, service-based e-commerce offerings. First-party music storefront, publishing administration, licensing, and secure delivery for Sean Vasey. This project replaces the current BeatStars site through staged, verifiable implementation.
 
-**Status: development foundation with private media processing, exact license review evidence, immutable offer revisions and server-side provisional selection reviews. Live payments, purchased downloads, historical migration, and production cutover are not enabled.** The current BeatStars site remains authoritative for sales and existing customer obligations.
+**Status: development foundation with private media processing, exact license review evidence, immutable offer revisions, provisional selection reviews and a Stripe test webhook inbox. Live payments, purchased downloads, historical migration, and production cutover are not enabled.** The current BeatStars site remains authoritative for sales and existing customer obligations.
 
 ## Start here
 
@@ -16,6 +16,7 @@ Bespoke web store development replacing older, service-based e-commerce offering
 - [Licensing and offers](docs/licensing-and-offers.md): review submission, successor versions, published prices/files and legacy upgrade steps.
 - [Provisional selection reviews](docs/provisional-quotes.md): server snapshots, session ownership, retries, expiry and the boundary before payable checkout.
 - [Public track sharing](docs/track-sharing.md): canonical URLs, server-rendered social metadata, Inertia navigation and publication privacy.
+- [Stripe test webhook inbox](docs/stripe-webhook-inbox.md): signed event receipt, immutable encrypted evidence, duplicate handling and development configuration.
 
 ## Foundation scope
 
@@ -26,7 +27,8 @@ Bespoke web store development replacing older, service-based e-commerce offering
 | Media | Private WAV/artwork intake, queued verification, immutable master/MP3 revisions, tagged previews, measured waveforms and admin retry controls | Production scanner acceptance, worker isolation, stems/archives, resumable uploads and managed object storage |
 | Licensing | Exact submitted review payloads, independent approval evidence, source/summary preview, successor diffs and effective dates | Approved production terms, a complete typed rights schema, buyer contracts and archival PDF rendering |
 | Offers | Editable drafts separated from immutable published price/license/file revisions; revision history and cart invalidation | Purchase snapshots, exclusive inventory and fulfillment |
-| Commerce | Server-validated provisional selection reviews with immutable snapshots, integer USD subtotals, expiry and owner-scoped retries; checkout remains unavailable | Payable quotes, tax policy, buyer identity/assent, orders, promotions, provider checkout, verified webhook inbox, exclusive reservations, refunds, grants and delivery |
+| Commerce | Server-validated provisional selection reviews with immutable snapshots, integer USD subtotals, expiry and owner-scoped retries; checkout remains unavailable | Payable quotes, tax policy, buyer identity/assent, orders, promotions, provider checkout, exclusive reservations, refunds, grants and delivery |
+| Payment evidence | Stripe test-only snapshot webhook with SDK signature verification, immutable encrypted receipts, scoped duplicate handling and a metadata-only operator command | Hosted Checkout sessions, durable processing/reconciliation, authoritative payment validation and atomic order/grant/fulfillment effects |
 | Full parity | Documented work packages and evidence gates | Memberships, kits, services, merch, CRM, promotions, editorial, integrations and migration |
 
 Public metadata observed on BeatStars is evidence, not an imported production catalog. Design fixtures are development-only and carry no saleable rights. The local cart pins the advertised offer revision and invalidates selections when that revision changes. **Review selection** asks the server to revalidate the exact selection and freeze its price, license and file evidence. The returned subtotal is provisional: tax and total are unknown, `payable` is false, and no order, reservation, assent or purchase rights are created.
@@ -39,7 +41,7 @@ No LLM is required by the storefront runtime. Astra is the requested development
 
 ## Run locally
 
-Prerequisites: a currently patched PHP 8.4 or 8.5 with `pdo_sqlite`, `pdo_mysql`, `mbstring`, `intl`, `bcmath`, `gd`, `fileinfo`, and `zip`; Composer 2; Node 24; npm. Use your platform's supported installers.
+Prerequisites: a currently patched PHP 8.4 or 8.5 with `pdo_sqlite`, `pdo_mysql`, `mbstring`, `intl`, `bcmath`, `gd`, `fileinfo`, `zip`, and `curl`; Composer 2; Node 24; npm. Use your platform's supported installers.
 
 ```sh
 composer install

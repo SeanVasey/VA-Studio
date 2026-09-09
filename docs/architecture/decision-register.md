@@ -2,6 +2,14 @@
 
 As of 2026-09-04. This is the initial register; entry keys are local tracking keys, not claims of historic accepted ADRs. Append dated changes and evidence instead of rewriting decision history.
 
+## Payment account observation — 2026-09-09
+
+Sean confirmed that Vasey Multimedia is connected to Stripe for production and test use, then instructed continued development. The connected Stripe account listing exposed **Vasey Multimedia in both live and test modes**. Account availability is observed; live charge capability, tax registrations, currency/capture settings, application credentials and a deployed webhook destination have not been verified.
+
+U-04 is therefore partially resolved: use Vasey Multimedia's **test mode** for the current payment integration, with its production mode designated for eventual launch. Do not describe missing account connection as the reason purchasing is incomplete. The remaining dependencies are application workflow/configuration and the unresolved production policy/readiness items already listed below.
+
+The 2026-09-09 WP-07 receipt prerequisite adds test-only own-account snapshot ingestion and immutable evidence without making provisional quotes payable. Its runtime account ID and endpoint secret remain host configuration. The ChatGPT connection does not configure the Laravel runtime. Live payment activation and full WP-07 completion are not implied by this observation.
+
 ## Established direction and working baseline
 
 | Key | Topic | Status / authority | Consequence |
