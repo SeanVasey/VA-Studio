@@ -44,7 +44,7 @@ final class InstallationReport
         $check('operator', true, fn () => User::query()->where('is_admin', true)->whereNotNull('email_verified_at')->exists(),
             'At least one verified operator is provisioned.', 'Run php artisan vasey:create-admin from a trusted interactive console.');
         $check('runtime_directories', true, function () {
-            foreach ([bootstrap_path('cache'), storage_path('framework/views'), storage_path('framework/sessions'), storage_path('logs')] as $path) {
+            foreach ([app()->bootstrapPath('cache'), storage_path('framework/views'), storage_path('framework/sessions'), storage_path('logs')] as $path) {
                 if (! is_dir($path) || ! is_writable($path)) {
                     return false;
                 }
