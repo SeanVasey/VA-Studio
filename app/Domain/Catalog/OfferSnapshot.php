@@ -4,6 +4,7 @@ namespace App\Domain\Catalog;
 
 use App\Domain\Catalog\Models\Offer;
 use App\Domain\Media\Models\MediaAsset;
+use App\Domain\Media\RecordingAssociation;
 use App\Domain\Rights\Models\LicenseVersion;
 use App\Domain\Rights\Models\RightsDeclaration;
 use App\Support\CanonicalJson;
@@ -51,6 +52,9 @@ class OfferSnapshot
 
     public function asset(MediaAsset $asset): array
     {
-        return $asset->only(['id', 'role', 'sha256', 'mime_type', 'size_bytes', 'original_name', 'parent_asset_id', 'processing_run_id']);
+        $snapshot = $asset->only(['id', 'role', 'sha256', 'mime_type', 'size_bytes', 'original_name', 'parent_asset_id', 'processing_run_id']);
+
+        // Preserve byte-identical historical snapshots for all existing non-stems offers.
+        return $asset->role === 'stems_zip' ? $snapshot + ['recording_binding' => app(RecordingAssociation::class)->snapshot($asset)] : $snapshot;
     }
 }

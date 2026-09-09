@@ -4,7 +4,7 @@ namespace App\Domain\Media;
 
 class AudioDerivatives
 {
-    public function probe(string $path, string $demuxer): array
+    public function probe(string $path, string $demuxer, ?int $maxDurationSeconds = null): array
     {
         $json = app(BoundedMediaProcess::class)->run([
             config('media.ffprobe'), '-v', 'error', '-threads', '1', '-protocol_whitelist', 'file,pipe',
@@ -14,7 +14,7 @@ class AudioDerivatives
         $streams = $probe['streams'] ?? [];
         $stream = $streams[0] ?? [];
         $duration = (float) ($probe['format']['duration'] ?? $stream['duration'] ?? 0);
-        if (count($streams) !== 1 || ($stream['codec_type'] ?? null) !== 'audio' || ! is_finite($duration) || $duration <= 0 || $duration > config('media.max_duration_seconds')) {
+        if (count($streams) !== 1 || ($stream['codec_type'] ?? null) !== 'audio' || ! is_finite($duration) || $duration <= 0 || $duration > ($maxDurationSeconds ?? config('media.max_duration_seconds'))) {
             throw new MediaFailure('invalid_audio', 'Audio must contain one valid, bounded audio stream.');
         }
         $sampleRate = (int) ($stream['sample_rate'] ?? 0);
@@ -32,7 +32,7 @@ class AudioDerivatives
         return ['duration_seconds' => $duration, 'sample_rate' => $sampleRate, 'channels' => $channels, 'codec' => $stream['codec_name']];
     }
 
-    public function validateWav(string $path, ?string $mime = null): array
+    public function validateWav(string $path, ?string $mime = null, ?int $maxDurationSeconds = null): array
     {
         $mime ??= (new \finfo(FILEINFO_MIME_TYPE))->file($path);
         $header = file_get_contents($path, false, null, 0, 12);
@@ -40,7 +40,7 @@ class AudioDerivatives
             throw new MediaFailure('invalid_wav', 'The upload is not a complete supported RIFF/WAVE file.');
         }
 
-        return $this->probe($path, 'wav');
+        return $this->probe($path, 'wav', $maxDurationSeconds);
     }
 
     public function build(string $master, string $tag, array $profile, string $workspace): array

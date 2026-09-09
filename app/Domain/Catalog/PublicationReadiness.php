@@ -7,6 +7,7 @@ use App\Domain\Catalog\Models\OfferRevision;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\VerifiedMedia;
+use App\Domain\Media\RecordingAssociation;
 use App\Domain\Rights\Models\LicenseVersion;
 use App\Domain\Rights\VerifiedLicense;
 use App\Support\CanonicalJson;
@@ -56,7 +57,7 @@ class PublicationReadiness
             $blockers[] = 'A verified current preview is required before publishing an offer.';
         }
         foreach ($assets as $asset) {
-            if (! $preview || ! $preview->parent_asset_id || $asset->parent_asset_id !== $preview->parent_asset_id) {
+            if (! $preview || ! app(RecordingAssociation::class)->matches($asset, $preview)) {
                 $blockers[] = 'Deliverables must come from the same verified recording revision as the current preview.';
             }
             if (! $this->available($asset)) {
@@ -109,7 +110,7 @@ class PublicationReadiness
             }
             foreach ($manifest as $entry) {
                 $asset = MediaAsset::find($entry['id'] ?? null);
-                if (! $asset || $asset->track_id !== $revision->track_id || ! $this->available($asset) || ! $preview || $asset->parent_asset_id !== $preview->parent_asset_id || ! hash_equals(CanonicalJson::hash($entry), CanonicalJson::hash($snapshots->asset($asset)))) {
+                if (! $asset || $asset->track_id !== $revision->track_id || ! $this->available($asset) || ! $preview || ! app(RecordingAssociation::class)->matches($asset, $preview) || ! hash_equals(CanonicalJson::hash($entry), CanonicalJson::hash($snapshots->asset($asset)))) {
                     $blockers[] = 'A published deliverable revision is unavailable or differs from its frozen manifest.';
                 }
             }

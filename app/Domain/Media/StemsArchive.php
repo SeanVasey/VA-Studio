@@ -8,11 +8,11 @@ use ZipArchive;
 /** Untrusted member names are metadata only; extraction always uses generated paths. */
 class StemsArchive
 {
-    public const VERSION = 'wav-stems-zip-v1';
+    public const VERSION = 'wav-stems-zip-v2';
 
     public function policy(): array
     {
-        $policy = ['archive_version' => self::VERSION];
+        $policy = ['archive_version' => self::VERSION, 'archive_max_duration_seconds' => max(1, min(1200, (int) config('media.max_duration_seconds')))];
         foreach (['entries' => 128, 'member_bytes' => 134217728, 'total_bytes' => 536870912, 'ratio' => 100, 'seconds' => 360] as $key => $ceiling) {
             $policy['archive_max_'.$key] = max(1, min($ceiling, (int) config('media.stems.max_'.$key, $ceiling)));
         }
@@ -23,13 +23,19 @@ class StemsArchive
     public function hasEvidence(array $metadata, string $hash, array $profile): bool
     {
         $manifest = $metadata['manifest'] ?? [];
-        if (($profile['archive_version'] ?? null) !== self::VERSION || ($metadata['archive_version'] ?? null) !== self::VERSION
+        $version = $profile['archive_version'] ?? null;
+        // Historical validators must not depend on the version emitted by a new worker.
+        if (! in_array($version, ['wav-stems-zip-v1', 'wav-stems-zip-v2'], true) || ($metadata['archive_version'] ?? null) !== $version
             || ! is_array($manifest) || ! array_is_list($manifest) || $manifest === [] || count($manifest) > ($profile['archive_max_entries'] ?? 0)
             || ! hash_equals($metadata['manifest_sha256'] ?? '', CanonicalJson::hash($manifest)) || ! $this->cleanScan($metadata['archive_scan'] ?? [], $hash)) {
             return false;
         }
+        if ($version === 'wav-stems-zip-v2' && (! is_int($profile['archive_max_duration_seconds'] ?? null) || $profile['archive_max_duration_seconds'] < 1 || $profile['archive_max_duration_seconds'] > 1200)) {
+            return false;
+        }
         foreach ($manifest as $member) {
-            if (! $this->cleanScan($member['scan'] ?? [], $member['sha256'] ?? '')) {
+            if (! $this->cleanScan($member['scan'] ?? [], $member['sha256'] ?? '')
+                || ($version === 'wav-stems-zip-v2' && (! is_int($member['audio']['duration_microseconds'] ?? null) || $member['audio']['duration_microseconds'] < 1 || $member['audio']['duration_microseconds'] > $profile['archive_max_duration_seconds'] * 1000000))) {
                 return false;
             }
         }
@@ -67,7 +73,7 @@ class StemsArchive
                 $hash = $this->copyMember($zip, $index, $entry, $path, $deadline);
                 $memberScan = $scan($path);
                 $this->withinDeadline($deadline);
-                $audio = app(AudioDerivatives::class)->validateWav($path);
+                $audio = app(AudioDerivatives::class)->validateWav($path, maxDurationSeconds: $profile['archive_max_duration_seconds']);
                 app(BoundedMediaProcess::class)->run([
                     config('media.ffmpeg'), '-nostdin', '-hide_banner', '-loglevel', 'error', '-xerror',
                     '-threads', '1', '-protocol_whitelist', 'file,pipe', '-err_detect', 'explode',
@@ -91,7 +97,7 @@ class StemsArchive
 
         return [[
             'role' => 'stems_zip', 'file' => $output, 'name' => 'stems.zip', 'mime_type' => 'application/zip',
-            'technical_metadata' => ['archive_version' => self::VERSION, 'manifest' => $manifest, 'manifest_sha256' => CanonicalJson::hash($manifest), 'archive_scan' => $archiveScan],
+            'technical_metadata' => ['archive_version' => $profile['archive_version'], 'manifest' => $manifest, 'manifest_sha256' => CanonicalJson::hash($manifest), 'archive_scan' => $archiveScan],
         ]];
     }
 

@@ -1,6 +1,6 @@
 # Private media processing
 
-Status: local WAV/artwork pipeline plus bounded private WAV-stems ZIP ingestion. This guide describes the code in this increment; it is not production acceptance evidence. Checkout and purchased downloads remain disabled, and the existing BeatStars site remains authoritative for sales.
+Status: local WAV/artwork pipeline, bounded private WAV-stems ZIP ingestion and explicit recording association. This guide describes the code in this increment; it is not production acceptance evidence. Checkout and purchased downloads remain disabled, and the existing BeatStars site remains authoritative for sales.
 
 ## What the pipeline accepts
 
@@ -11,13 +11,24 @@ Status: local WAV/artwork pipeline plus bounded private WAV-stems ZIP ingestion.
 | Stems ZIP | Admin upload up to 200 MiB; up to 128 entries including folders; each WAV up to 128 MiB; total expanded bytes up to 512 MiB; maximum 100:1 expansion per file | One rebuilt immutable private ZIP, exact per-member hashes/audio metadata/scanner evidence; no preview or recording association is inferred |
 | Other roles/formats | Not supported by this increment | No promotion to ready assets; no uploaded-preview bypass |
 
-The processor's internal source bound is 512 MiB; this does not increase the 200 MiB admin upload limit. Stems archive processing does not establish which exact master recording it belongs to. Offer publication continues to require the existing recording-revision match; a separate audited binding increment is required before offering stems licenses.
+The processor's internal source bound is 512 MiB; this does not increase the 200 MiB admin upload limit. Stems archive processing does not establish which exact master recording it belongs to. Offer publication requires the explicit association below, intact media evidence and the separately reviewed license/rights requirements.
 
 Every upload is private. Only explicit ready preview/artwork derivatives of a publication-ready, published track can be served through the public media route. WAV masters, untagged MP3 deliverables, original artwork, scanner evidence and private object keys are not public storefront fields. A ready database label alone is insufficient: public availability requires completed processing provenance and file integrity checks.
 
+## Associate stems with a recording
+
+1. Keep the track in draft and process its WAV master and stems ZIP successfully. In Media, select **Associate recording** on the ready stems revision.
+2. Select the verified master for the current preview. Check the seller's source export/session and audible recording correspondence; enter a short verification note and confirm that the stems belong to this master. The software cannot determine musical correspondence or aligned start points for you.
+3. Save. The Media table displays the associated master ID. The immutable association preserves exact revision IDs, hashes, operator and time. Reopen the action if the current preview changed before submission.
+4. Review and publish an offer selecting the exact assets required by its approved license. This remains a separate action. A published track must first be unpublished before adding an association.
+
+The association never changes processing ancestry or rewrites media. An identical direct retry returns the original record; a correction needs a new stems upload/revision and confirmation. Regenerating a tag on the same WAV source preserves the association, but the new preview still needs a newly published offer snapshot. A different WAV source cannot reuse the prior association. Missing or altered associated master/preview files block new offers and provisional quotes, including stems-only offers.
+
+The additive `stems_recordings` migration has no inferred backfill. Retain its populated table, all media and frozen offers during code rollback. Migration `down()` is for disposable test/development databases only. Operator verification notes stay private and are excluded from storefront responses and offer snapshots; snapshots retain association identity and evidence hash.
+
 ## Prepare a stems archive
 
-Export only complete supported RIFF/WAVE audio stems. Stored and deflated ZIP members are supported; encrypted ZIPs, nested archives, MP3s, documents, hidden macOS metadata, links, special files and unsupported compression are rejected. Each member uses the master WAV format/duration checks and a full bounded FFmpeg decode. This verifies technical validity, not audible correctness, aligned start points, rights clearance or association with a master.
+Export only complete supported RIFF/WAVE audio stems. Stored and deflated ZIP members are supported; encrypted ZIPs, nested archives, MP3s, documents, hidden macOS metadata, links, special files and unsupported compression are rejected. Each member uses the master WAV format checks and its frozen archive-profile duration ceiling (at most 20 minutes) and a full bounded FFmpeg decode. This verifies technical validity, not audible correctness, aligned start points, rights clearance or association with a master.
 
 Use relative portable names starting with a letter or digit. Each component may contain ASCII letters, numbers, spaces, underscores, hyphens and dots (up to 100 characters). No leading hidden names, trailing spaces/dots, Windows reserved names, backslashes, absolute paths or traversal components. Names must be unique ignoring case. Up to four folder levels plus a filename and 240 bytes per full name are supported. Unsupported names must be renamed in the seller's source export; the worker never silently renames members.
 
@@ -107,6 +118,8 @@ Start with the source row's **Processing details** and the application's protect
 Normal queue failures permit up to three attempts with 30/120-second backoff. The explicit admin retry reuses a failed run for the same source/profile, increasing its attempt history; it does not overwrite completed output. An active claim or completed run is returned without starting duplicate work.
 
 Ordinary failure cleanup removes an attempt's scratch files and unreferenced newly promoted files. A forcibly killed process cannot guarantee that cleanup ran. Preserve quarantined originals, durable revisions and audit records; remove abandoned scratch files only after confirming no active worker owns them. Automated orphan reconciliation and retention policy are future work.
+
+New stems jobs emit archive policy v2, including the duration ceiling in the profile fingerprint. A changed ceiling after queueing requires a new profile revision; validation consumes the accepted ceiling. Historical v1 and v2 evidence remains supported independently of the current builder version. Unknown versions fail verification.
 
 ## Verification and release boundary
 
