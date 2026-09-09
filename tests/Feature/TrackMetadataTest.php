@@ -197,10 +197,10 @@ class TrackMetadataTest extends TestCase
             ->assertHasNoTableActionErrors();
         $this->assertSame($slug, $track->refresh()->slug);
         $this->get('/tracks/'.$slug)->assertOk()->assertSee('Updated public title');
-        $before = $track->toArray();
+        $before = $track->getAttributes();
         $count = AuditEvent::count();
         Livewire::test(ManageTracks::class)->callTableAction('edit', $track, data: ['genre' => null])->assertHasTableActionErrors(['title']);
-        $this->assertSame($before, $track->fresh()->toArray());
+        $this->assertSame($before, $track->fresh()->getAttributes());
         $this->assertSame($count, AuditEvent::count());
         foreach (['published', 'draft'] as $state) {
             if ($state === 'draft') {

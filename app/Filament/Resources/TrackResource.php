@@ -6,6 +6,7 @@ use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublicationReadiness;
 use App\Domain\Catalog\PublishTrack;
 use App\Domain\Catalog\SaveTrackMetadata;
+use App\Filament\Resources\TrackResource\Pages\ManageTracks;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Hidden;
@@ -16,6 +17,7 @@ use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Validation\ValidationException;
 
 class TrackResource extends OperatorResource
 {
@@ -47,7 +49,7 @@ class TrackResource extends OperatorResource
             TextColumn::make('bpm'), TextColumn::make('musical_key'), TextColumn::make('genre'),
             TextColumn::make('status')->badge(),
         ])->recordActions([
-            EditAction::make()->using(fn (Track $record, array $data) => app(SaveTrackMetadata::class)->handle($record, $data, auth()->user())),
+            EditAction::make()->using(fn (Track $record, array $data, ManageTracks $livewire) => static::saveMetadata($record, $data, $livewire)),
             Action::make('readiness')->label('Check readiness')->action(function (Track $record) {
                 $blockers = app(PublicationReadiness::class)->blockers($record);
                 Notification::make()->title($blockers === [] ? 'Ready to publish' : 'Publication blocked')->body(implode("\n", $blockers))->persistent()->send();
@@ -56,6 +58,23 @@ class TrackResource extends OperatorResource
             Action::make('share')->visible(fn (Track $record) => $record->status === 'published')->url(fn (Track $record) => route('tracks.show', $record->slug))->openUrlInNewTab(),
             Action::make('unpublish')->visible(fn (Track $record) => $record->status === 'published')->requiresConfirmation()->action(fn (Track $record) => app(PublishTrack::class)->unpublish($record, auth()->user())),
         ]);
+    }
+
+    public static function saveMetadata(?Track $record, array $data, ManageTracks $livewire): Track
+    {
+        try {
+            return app(SaveTrackMetadata::class)->handle($record, $data, auth()->user());
+        } catch (ValidationException $exception) {
+            // Domain keys are relative. Filament needs the actual mounted schema path,
+            // including nesting, to render messages beside fields instead of hiding them.
+            $path = $livewire->getSchema($livewire->getMountedActionSchemaName())->getStatePath();
+            $errors = [];
+            foreach ($exception->errors() as $field => $messages) {
+                $visibleField = $field === 'metadata_version' ? 'title' : $field;
+                $errors[$path.'.'.$visibleField] = $messages;
+            }
+            throw ValidationException::withMessages($errors);
+        }
     }
 
     public static function getPages(): array

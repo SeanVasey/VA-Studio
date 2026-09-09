@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\TrackResource\Pages;
 
-use App\Domain\Catalog\SaveTrackMetadata;
 use App\Filament\Resources\TrackResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ManageRecords;
@@ -13,6 +12,6 @@ class ManageTracks extends ManageRecords
 
     protected function getHeaderActions(): array
     {
-        return [CreateAction::make()->using(fn (array $data) => app(SaveTrackMetadata::class)->handle(null, $data, auth()->user()))];
+        return [CreateAction::make()->using(fn (array $data) => TrackResource::saveMetadata(null, $data, $this))];
     }
 }
