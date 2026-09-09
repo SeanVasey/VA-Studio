@@ -4,7 +4,7 @@ import Storefront from './Pages/Storefront';
 import '../css/app.css';
 
 createInertiaApp({
-  title: title => title ? `${title} — VASEY.AUDIO` : 'VASEY.AUDIO — Sound with intent',
+  title: title => title || 'VASEY.AUDIO — Sound with intent',
   resolve: name => {
     if (name === 'Storefront') return Storefront;
     throw new Error(`Unknown page: ${name}`);

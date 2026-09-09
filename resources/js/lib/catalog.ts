@@ -36,11 +36,21 @@ export interface LicenseTier {
 }
 
 export interface CartLine { track: Track; offer: Offer }
+export interface PageMetadata {
+  title: string;
+  description: string;
+  canonicalUrl: string;
+  imageUrl: string;
+  imageAlt: string;
+  type: 'website' | 'music.song';
+  robots: 'index, follow' | 'noindex, nofollow';
+}
 export interface StorefrontProps {
   tracks: Track[];
   licenseTiers: LicenseTier[];
   selectedTrackSlug?: string;
   designPreview?: boolean;
+  metadata?: PageMetadata;
 }
 
 export const fileRoleLabels: Record<string, string> = {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublicationReadiness;
+use App\Support\StorefrontMetadata;
 use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -13,11 +14,15 @@ class StorefrontController extends Controller
     public function index(?string $slug = null): Response
     {
         $catalog = $this->catalog();
+        $selectedTrack = $slug === null ? null : collect($catalog['tracks'])->firstWhere('slug', $slug);
         if ($slug !== null) {
-            abort_unless(collect($catalog['tracks'])->contains('slug', $slug), 404);
+            abort_if($selectedTrack === null, 404);
         }
 
-        return Inertia::render('Storefront', $catalog + ['selectedTrackSlug' => $slug, 'commerceEnabled' => false]);
+        $metadata = app(StorefrontMetadata::class)->forPage($selectedTrack);
+
+        return Inertia::render('Storefront', $catalog + ['selectedTrackSlug' => $slug, 'commerceEnabled' => false, 'metadata' => $metadata])
+            ->withViewData(['metadata' => $metadata]);
     }
 
     public function json(): JsonResponse

@@ -4,6 +4,7 @@ import { Icon } from '../components/Icon';
 import { Modal } from '../components/Modal';
 import { PersistentPlayer } from '../components/PersistentPlayer';
 import { QuoteReview } from '../components/QuoteReview';
+import { MetadataHead } from '../components/MetadataHead';
 import { player, useAudio } from '../lib/audio';
 import { availableOffer, restoreCartSelections, savedCartSelection, cartSubtotals, fileRoleLabels, filterTracks, formatMoney, formatTime, safeMediaUrl, type CartLine, type Offer, type StorefrontProps, type Track } from '../lib/catalog';
 
@@ -65,7 +66,7 @@ function useCart(tracks: Track[]) {
   return { lines: cart.lines, setLines, unavailable: cart.unavailable };
 }
 
-export default function Storefront({ tracks = EMPTY_TRACKS, licenseTiers = [], selectedTrackSlug, designPreview = false }: StorefrontProps) {
+export default function Storefront({ tracks = EMPTY_TRACKS, licenseTiers = [], selectedTrackSlug, designPreview = false, metadata }: StorefrontProps) {
   const [query, setQuery] = useState('');
   const [genre, setGenre] = useState('All sounds');
   const [sort, setSort] = useState('featured');
@@ -123,6 +124,7 @@ export default function Storefront({ tracks = EMPTY_TRACKS, licenseTiers = [], s
   }, [selectedTrackSlug]);
 
   return <>
+    {metadata && !designPreview && <MetadataHead metadata={metadata} />}
     <a className="skip-link" href="#main">Skip to content</a>
     {designPreview && <div className="preview-banner">DEVELOPMENT PREVIEW <span>Sample catalog for design review. No purchases or licenses are issued.</span></div>}
     <header className="site-header"><a className="brand-link" href="/" onClick={event => navigate(event, designPreview)} aria-label="VASEY.AUDIO home"><img src="/brand/vasey-audio-logo.png" alt="VASEY.AUDIO" width="420" height="100" /></a><nav aria-label="Main navigation"><a href="#catalog">The catalog</a><a href="#licenses">Licensing</a><a href="#studio">The studio</a></nav><div className="header-actions"><a className="admin-link" href="/admin">Artist admin <Icon name="northeast" size={13} /></a><button className="cart-toggle" aria-label={`Open cart, ${lines.length} ${lines.length === 1 ? 'item' : 'items'}`} onClick={() => { setCartOpen(true); setCheckoutStatus(''); }}><Icon name="bag" size={19} /><span className="cart-text">Cart</span><span className="cart-count">{String(lines.length).padStart(2, '0')}</span></button></div></header>
