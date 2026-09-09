@@ -50,8 +50,9 @@ class InstallationReportTest extends TestCase
         $key = config('app.key');
         DB::enableQueryLog();
         $exit = Artisan::call('vasey:doctor', ['--json' => true]);
-        $this->assertSame(0, $exit, Artisan::output());
-        $report = json_decode(Artisan::output(), true, 32, JSON_THROW_ON_ERROR);
+        $output = Artisan::output();
+        $this->assertSame(0, $exit, $output);
+        $report = json_decode($output, true, 32, JSON_THROW_ON_ERROR);
         $queries = DB::getQueryLog();
         DB::disableQueryLog();
         $this->assertTrue($report['foundation_ready']);
@@ -68,8 +69,8 @@ class InstallationReportTest extends TestCase
         $this->assertDatabaseCount('audit_events', 0);
         $this->assertDirectoryIsReadable($this->directory.'/private');
         $this->assertSame([], (new Filesystem)->files($this->directory.'/private'));
-        $this->assertStringNotContainsString($key, Artisan::output());
-        $this->assertStringNotContainsString($this->directory, Artisan::output());
+        $this->assertStringNotContainsString($key, $output);
+        $this->assertStringNotContainsString($this->directory, $output);
     }
 
     public function test_missing_key_operator_and_build_fail_without_automatic_repairs(): void
