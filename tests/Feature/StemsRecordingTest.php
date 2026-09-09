@@ -25,6 +25,7 @@ use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -202,7 +203,7 @@ class StemsRecordingTest extends TestCase
         $binding = $this->bind();
         $offer = $this->offer();
         $first = app(PublishOffer::class)->handle($offer, $this->fixture['actor']);
-        $before = $first->snapshot;
+        $before = $first->fresh()->snapshot;
         $source = $this->fixture['media']['master_wav']->parent()->firstOrFail();
         config(['media.tag_interval_seconds' => 2]);
         $run = app(MediaProcessor::class)->handle(app(QueueMediaProcessing::class)->handle($source, $this->fixture['actor'])->id);
@@ -221,12 +222,14 @@ class StemsRecordingTest extends TestCase
 
     private function corruptMasterWithCachedRead(): void
     {
-        $this->mock(MediaIntegrity::class)->shouldReceive('matches')->andReturn(true);
+        // Force a normal-read cache hit without replacing the final integrity service.
+        Cache::partialMock()->shouldReceive('get')->withArgs(fn (string $key) => str_starts_with($key, 'media-integrity:'))->andReturn(true);
         $master = $this->fixture['media']['master_wav'];
         $path = Storage::disk('local')->path($master->storage_path);
         chmod($path, 0600);
         file_put_contents($path, str_repeat('x', $master->size_bytes));
         clearstatcache(true, $path);
+        $this->assertTrue(app(MediaIntegrity::class)->matches($master, $path));
     }
 
     public function test_new_binding_and_offer_recheck_bytes_even_when_public_integrity_reads_are_cached(): void

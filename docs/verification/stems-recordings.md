@@ -16,6 +16,8 @@ PR #30's automated review identified [historical archive version invalidation](h
 
 PHP and Composer are unavailable in the editing workspace. The integrating PR must record the actual tested remote commit, MySQL/SQLite counts (including intentional race skips), frontend/build/audit and Chromium/WebKit CI links. Test definitions alone are not successful execution evidence. `git diff --check`, local frontend and build results are recorded in the PR after execution.
 
+Initial CI at `db4a08a9d08581621d5266936beb2a2762e3d40a` passed 254 MySQL tests, including archive policy and the association race, with three new test failures: two attempted to mock a final integrity class and one compared pre-storage JSON key order with MySQL's normalized order. The correction forces a cache hit at the cache boundary while exercising the real final service, and compares the stored snapshot before/after. Production guards are unchanged. Both initial frontend and Chromium/WebKit runs passed; the final candidate and backend results are recorded in [PR #31](https://github.com/VASEYDEV/VASEYAUDIO/pull/31).
+
 Independent authorization/media/migration review remains required. Real ClamAV detection, physical-device association/upload interaction, seller export alignment, full catalog performance, isolated production workers, recovery and object-store acceptance remain unperformed. Synthetic fixtures contain generated tones and a testing-only scanner.
 
 ## Operations and next step
