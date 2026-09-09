@@ -67,6 +67,8 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
   await dialog.getByRole('button', { name: 'Create', exact: true }).click();
   await expect(dialog.getByRole('heading')).not.toBeVisible();
   await expect(row(page, title)).toBeVisible();
+  // UI assertions establish success; this barrier lets deferred modal cleanup finish before navigation.
+  await page.waitForLoadState('networkidle');
   await page.reload();
   await expect(row(page, title)).toBeVisible();
   expect((await page.request.get(`/tracks/${slug}`)).status()).toBe(404);
