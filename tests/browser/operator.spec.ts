@@ -60,7 +60,9 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
   await dialog.getByRole('button', { name: 'Create', exact: true }).click();
   await expect(dialog.getByText(/slug has already been taken/i)).toBeVisible();
   await expect(dialog.getByLabel('Title', { exact: false })).toHaveValue(title);
-  await page.screenshot({ path: testInfo.outputPath('create-validation.png'), fullPage: true });
+  await dialog.getByText(/slug has already been taken/i).scrollIntoViewIfNeeded();
+  await expect(dialog.getByText(/slug has already been taken/i)).toBeInViewport();
+  await page.screenshot({ path: testInfo.outputPath('create-validation.png'), fullPage: false });
   await dialog.getByLabel('Slug', { exact: false }).fill(slug);
   await dialog.getByRole('button', { name: 'Create', exact: true }).click();
   await expect(dialog.getByRole('heading')).not.toBeVisible();
@@ -85,7 +87,9 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
   await secondDialog.getByRole('button', { name: 'Save changes', exact: true }).click();
   await expect(secondDialog.getByText(/changed since you opened it/)).toBeVisible();
   await expect(secondDialog.getByLabel('Title', { exact: false })).toHaveValue('Synthetic losing edit');
-  await second.screenshot({ path: testInfo.outputPath('stale-edit.png'), fullPage: true });
+  await secondDialog.getByText(/changed since you opened it/).scrollIntoViewIfNeeded();
+  await expect(secondDialog.getByText(/changed since you opened it/)).toBeInViewport();
+  await second.screenshot({ path: testInfo.outputPath('stale-edit.png'), fullPage: false });
   // Cancel animates locally before its unmount request settles. A reload must not abort that request.
   const cancelResponse = second.waitForResponse(response => response.url().endsWith('/update') && response.request().method() === 'POST');
   await secondDialog.getByRole('button', { name: 'Cancel', exact: true }).click();
@@ -114,6 +118,8 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
   await expect(page.getByText('Publication blocked', { exact: true })).toBeVisible();
   await expect(page.getByText(/The latest rights declaration must be verified/)).toBeVisible();
   expect((await page.request.get(`/tracks/${slug}`)).status()).toBe(404);
-  await page.screenshot({ path: testInfo.outputPath('publication-blockers.png'), fullPage: true });
+  await page.getByText('Publication blocked', { exact: true }).scrollIntoViewIfNeeded();
+  await expect(page.getByText('Publication blocked', { exact: true })).toBeInViewport();
+  await page.screenshot({ path: testInfo.outputPath('publication-blockers.png'), fullPage: false });
   expect(failures).toEqual([]);
 });
