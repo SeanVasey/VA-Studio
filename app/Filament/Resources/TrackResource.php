@@ -23,6 +23,16 @@ class TrackResource extends OperatorResource
 {
     protected static ?string $model = Track::class;
 
+    public static function metadataModalAttributes(): array
+    {
+        return [
+            'tabindex' => '-1', 'autofocus' => true,
+            // WebKit can reject the focus trap's initial attempt during the opening transition.
+            // Retry only after that transition, without stealing focus from a field already in use.
+            'x-on:transitionend.self' => 'if (isOpen && isWindowVisible && !$el.contains(document.activeElement)) $el.focus({ preventScroll: true })',
+        ];
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
@@ -49,12 +59,22 @@ class TrackResource extends OperatorResource
             TextColumn::make('bpm'), TextColumn::make('musical_key'), TextColumn::make('genre'),
             TextColumn::make('status')->badge(),
         ])->recordActions([
-            EditAction::make()->using(fn (Track $record, array $data, ManageTracks $livewire) => static::saveMetadata($record, $data, $livewire)),
+            EditAction::make()->extraModalWindowAttributes(static::metadataModalAttributes())
+                ->using(fn (Track $record, array $data, ManageTracks $livewire) => static::saveMetadata($record, $data, $livewire)),
             Action::make('readiness')->label('Check readiness')->action(function (Track $record) {
                 $blockers = app(PublicationReadiness::class)->blockers($record);
                 Notification::make()->title($blockers === [] ? 'Ready to publish' : 'Publication blocked')->body(implode("\n", $blockers))->persistent()->send();
             }),
-            Action::make('publish')->visible(fn (Track $record) => $record->status !== 'published')->requiresConfirmation()->action(fn (Track $record) => app(PublishTrack::class)->handle($record, auth()->user())),
+            Action::make('publish')->visible(fn (Track $record) => $record->status !== 'published')->requiresConfirmation()->action(function (Track $record, Action $action) {
+                try {
+                    app(PublishTrack::class)->handle($record, auth()->user());
+                } catch (ValidationException $exception) {
+                    // A confirmation has no metadata form fields to display domain errors.
+                    Notification::make()->danger()->title('Publication blocked')
+                        ->body(implode(' ', array_merge(...array_values($exception->errors()))))->persistent()->send();
+                    $action->cancel();
+                }
+            }),
             Action::make('share')->visible(fn (Track $record) => $record->status === 'published')->url(fn (Track $record) => route('tracks.show', $record->slug))->openUrlInNewTab(),
             Action::make('unpublish')->visible(fn (Track $record) => $record->status === 'published')->requiresConfirmation()->action(fn (Track $record) => app(PublishTrack::class)->unpublish($record, auth()->user())),
         ]);

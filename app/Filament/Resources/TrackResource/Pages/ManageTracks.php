@@ -12,6 +12,8 @@ class ManageTracks extends ManageRecords
 
     protected function getHeaderActions(): array
     {
-        return [CreateAction::make()->using(fn (array $data) => TrackResource::saveMetadata(null, $data, $this))];
+        return [CreateAction::make()
+            ->extraModalWindowAttributes(TrackResource::metadataModalAttributes())
+            ->using(fn (array $data) => TrackResource::saveMetadata(null, $data, $this))];
     }
 }

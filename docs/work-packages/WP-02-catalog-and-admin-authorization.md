@@ -1,6 +1,6 @@
 # [WP-02] Persistent catalog administration and publication readiness
 
-Status: **Current increment implements audited metadata commands, stale-form protection, permanent published URLs and direct-action tests. Implemented in PR #28; exact-head CI outcomes are recorded there. Real-browser acceptance and independent review remain open.** See [ordered development status](../development-order.md).
+Status: **PR #28 is merged with audited metadata, stale-form protection and permanent URLs. PR #29 adds operator/browser verification, visible publication blockers and modal focus recovery. The PRs record exact-head results; independent review and broader production/device acceptance remain open.** See [ordered development status](../development-order.md).
 
 - Suggested issue title: `[WP-02] Persistent catalog administration and publication readiness`
 - Phase: 0
@@ -59,3 +59,7 @@ Next acceptance work: WP-01 clean boot/operator diagnostics and WP-02 real-brows
 [PR #28](https://github.com/VASEYDEV/VASEYAUDIO/pull/28) records the tested source SHA/tree and completed results for `php artisan test` on MySQL 8.4 and SQLite, `npm test`, `npm run build`, `composer validate --strict`, `composer audit --no-dev` and `npm audit --omit=dev --audit-level=high`. Local `git diff --check` passed; PHP/Composer and frontend dependencies were unavailable locally.
 
 The first candidate (`2c5279faa291443d3bec97e101fa51266fde1b74`) passed 205 MySQL tests, including the observed lock race, and failed two admin assertions: relative command errors did not render under Filament's mounted form path. The correction maps domain validation keys to the actual schema path; the assertions remain intact. This first run is diagnostic evidence, not final acceptance. Consult the PR's final verification table for the completed candidate and remaining review/browser gates.
+
+## Browser/operator follow-up — 2026-09-09
+
+PR #28 is merged. [PR #29](https://github.com/VASEYDEV/VASEYAUDIO/pull/29) uses isolated Chromium and mobile-viewport WebKit to exercise actual login, CSRF, create/edit validation, keyboard modal focus, stale forms, retained URLs and named publication blockers over HTTP. The publish confirmation now renders domain blockers as a persistent notification because it has no metadata fields for validation messages. Metadata dialogs focus the modal window, recover initial focus after the opening transition when necessary, and preserve focus already inside the form. See [operator/browser verification](../operator-setup-and-verification.md) and the follow-up PR for actual results. This does not claim physical iPhone, production MFA/recovery or full media-to-publication browser acceptance. Continue WP-03 archive/stem safety after the foundation increment is verified and accepted.

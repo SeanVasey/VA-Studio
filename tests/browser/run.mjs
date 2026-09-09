@@ -1,0 +1,43 @@
+import { randomBytes } from 'node:crypto';
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
+import { spawnSync } from 'node:child_process';
+
+const root = resolve(import.meta.dirname, '../..');
+if (!existsSync(join(root, 'vendor/autoload.php')) || !existsSync(join(root, 'public/build/manifest.json'))) {
+  throw new Error('Install Composer dependencies and run npm run build before browser verification.');
+}
+if (existsSync(join(root, 'public/hot')) || existsSync(join(root, 'storage/framework/maintenance.php'))) {
+  throw new Error('Stop the Vite development server and use a checkout outside maintenance mode.');
+}
+const directory = mkdtempSync(join(tmpdir(), 'vasey-browser-'));
+const env = {
+  ...process.env,
+  APP_ENV: 'local', APP_DEBUG: 'false', APP_URL: 'http://127.0.0.1:8173', ASSET_URL: '',
+  APP_KEY: `base64:${randomBytes(32).toString('base64')}`,
+  APP_CONFIG_CACHE: join(directory, 'config.php'), APP_ROUTES_CACHE: join(directory, 'routes.php'),
+  APP_EVENTS_CACHE: join(directory, 'events.php'), APP_LOCALE: 'en',
+  LARAVEL_STORAGE_PATH: directory,
+  DB_CONNECTION: 'sqlite', DB_DATABASE: join(directory, 'database.sqlite'), DB_URL: '',
+  SESSION_DRIVER: 'file', SESSION_ENCRYPT: 'true', SESSION_SECURE_COOKIE: 'false', SESSION_DOMAIN: 'null',
+  SESSION_COOKIE: `vasey_browser_${randomBytes(8).toString('hex')}`, CACHE_STORE: 'file',
+  QUEUE_CONNECTION: 'sync', MAIL_MAILER: 'array', LOG_CHANNEL: 'single', LOG_LEVEL: 'error',
+  FILESYSTEM_DISK: 'local', STRIPE_WEBHOOK_ENABLED: 'false',
+  VASEY_BROWSER_DIRECTORY: directory, VASEY_BROWSER_PASSWORD: `Browser-${randomBytes(24).toString('hex')}`,
+};
+try {
+  for (const child of ['framework/views', 'framework/sessions', 'framework/cache/data', 'logs', 'app/private']) {
+    mkdirSync(join(directory, child), { recursive: true, mode: 0o700 });
+  }
+  writeFileSync(env.DB_DATABASE, '', { mode: 0o600, flag: 'wx' });
+  const setup = spawnSync('php', ['tests/browser/bootstrap.php'], { cwd: root, env, stdio: 'inherit', timeout: 60000 });
+  if (setup.error || setup.status !== 0) throw new Error('Isolated browser fixture setup failed.');
+  const result = spawnSync(process.execPath, ['node_modules/@playwright/test/cli.js', 'test', ...process.argv.slice(2)], {
+    cwd: root, env, stdio: 'inherit', timeout: 600000,
+  });
+  if (result.error) throw new Error('Browser verification did not finish.');
+  process.exitCode = result.status ?? 1;
+} finally {
+  rmSync(directory, { recursive: true, force: true });
+}
