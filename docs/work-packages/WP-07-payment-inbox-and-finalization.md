@@ -1,6 +1,6 @@
 # [WP-07] Hosted checkout, durable payment inbox and idempotent finalization
 
-Status: **Planned work package**. Inspect the current implementation before starting; initial foundation code may already cover part of this scope. This issue is complete only when the acceptance evidence below exists.
+Status: **Stripe test-event receipt prerequisite implemented; broader work package remains open.** Hosted sessions and payment/order/grant finalization remain dependent work. This issue is complete only when the acceptance evidence below exists.
 
 - Suggested issue title: `[WP-07] Hosted checkout, durable payment inbox and idempotent finalization`
 - Phase: 2
@@ -15,6 +15,14 @@ Only an authoritative successful payment may grant rights, despite duplicate, de
 ## First reviewable increment
 
 Stripe test-mode hosted checkout through a verified durable inbox to one atomic paid-order/grant effect.
+
+### Receipt prerequisite — 2026-09-09
+
+The dependency-ready slice is `POST /webhooks/stripe`: official SDK raw-body verification, explicit test/own-account configuration, bounded stateless input, immutable encrypted receipt storage, account/mode/event uniqueness, substantive replay conflict detection and a metadata-only operator command. Unknown snapshot events are retained without being treated as payment success. No order or worker is dispatched from a receipt.
+
+This prerequisite can be developed before WP-06 payable quote/assent and WP-04/WP-08 grant/render contracts are complete. It does not satisfy the full checkout-to-grant milestone above. See [receipt contract, configuration and recovery](../stripe-webhook-inbox.md). The integrating PR records the exact tested commit and CI evidence, including independent-process MySQL receipt races.
+
+Next dependency: complete WP-06 payable non-exclusive quote/assent and immutable order intent under a clearly isolated test policy, then create/reconcile test Checkout sessions with stable provider idempotency. Add receipt processing state and recoverable dispatch separately from immutable evidence; authoritative finalization still depends on the agreed grant/render contracts.
 
 ## Scope
 
