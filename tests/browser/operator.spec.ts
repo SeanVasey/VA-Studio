@@ -86,7 +86,13 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
   await expect(secondDialog.getByText(/changed since you opened it/)).toBeVisible();
   await expect(secondDialog.getByLabel('Title', { exact: false })).toHaveValue('Synthetic losing edit');
   await second.screenshot({ path: testInfo.outputPath('stale-edit.png'), fullPage: true });
+  // Cancel animates locally before its unmount request settles. A reload must not abort that request.
+  const cancelResponse = second.waitForResponse(response => response.url().endsWith('/update') && response.request().method() === 'POST');
   await secondDialog.getByRole('button', { name: 'Cancel', exact: true }).click();
+  const cancelled = await cancelResponse;
+  expect(cancelled.status()).toBe(200);
+  await cancelled.finished();
+  await expect(secondDialog.getByRole('heading')).not.toBeVisible();
   await second.reload();
   await expect(row(second, winner)).toBeVisible();
   await second.close();
