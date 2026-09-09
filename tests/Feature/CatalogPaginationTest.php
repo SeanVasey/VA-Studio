@@ -53,6 +53,14 @@ class CatalogPaginationTest extends TestCase
         $detail = $this->get('/tracks/'.$oldest->slug, ['X-Inertia' => 'true'])->assertOk();
         $detail->assertJsonCount(12, 'props.tracks')->assertJsonPath('props.selectedTrack.id', (string) $oldest->id)->assertJsonPath('props.metadata.type', 'music.song');
         $this->postJson('/catalog/selections', ['trackIds' => [$oldest->id]])->assertOk()->assertJsonCount(1, 'tracks')->assertJsonPath('tracks.0.id', (string) $oldest->id);
+        foreach (['tempo', 'title'] as $sort) {
+            $sorted = $this->getJson('/api/catalog?sort='.$sort)->assertOk()->assertJsonCount(12, 'tracks');
+            $tail = $this->getJson($this->api($sorted->json('catalogPage.nextUrl')))->assertOk()->assertJsonCount(1, 'tracks');
+            $this->assertCount(13, array_unique(array_merge(array_column($sorted->json('tracks'), 'id'), array_column($tail->json('tracks'), 'id'))));
+            $roundTrip = $this->getJson($this->api($tail->json('catalogPage.previousUrl')))->assertOk();
+            $this->assertSame($sorted->json('tracks'), $roundTrip->json('tracks'));
+        }
+
     }
 
     public function test_ineligible_batches_are_bounded_private_and_can_be_traversed_in_both_directions(): void

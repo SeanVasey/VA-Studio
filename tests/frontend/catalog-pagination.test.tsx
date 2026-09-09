@@ -22,7 +22,7 @@ it('restores and changes a selection outside the current page using current serv
   await user.click(screen.getByRole('button', { name: 'Open cart, 1 item' }));
   await waitFor(() => expect(screen.queryByText('Checking your saved selections…')).not.toBeInTheDocument());
   expect(within(screen.getByRole('dialog')).getByRole('heading', { name: tracks[0].title })).toBeInTheDocument();
-  expect(screen.getByText('$29.95')).toBeInTheDocument();
+  expect(within(screen.getByRole('dialog')).getByText('$29.95', { selector: '.cart-line-price strong' })).toBeInTheDocument();
   await user.click(screen.getByRole('button', { name: 'Change license' }));
   await user.click(screen.getByRole('radio', { name: /Premium license/ }));
   await user.click(screen.getByRole('button', { name: /Add license/ }));
