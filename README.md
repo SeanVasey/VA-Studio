@@ -73,6 +73,8 @@ GitHub CI is configured to run the PHP suite against MySQL 8.4 and SQLite, plus 
 
 Repository: [VASEYDEV/VASEYAUDIO](https://github.com/VASEYDEV/VASEYAUDIO), private. Sean created the repository during the initial implementation; the GitHub integration supplies commits and work-package issues. The first foundation was merged in [PR #15](https://github.com/VASEYDEV/VASEYAUDIO/pull/15); private media processing was merged in [PR #21](https://github.com/VASEYDEV/VASEYAUDIO/pull/21), with [verification evidence](docs/verification/media-pipeline.md). Subsequent work is delivered through bounded pull requests with implementation evidence.
 
+Use the [PR template](.github/PULL_REQUEST_TEMPLATE.md) for each increment, including PR bodies supplied through CLI/API tools. Keep only applicable risks, record actual verification against the tested commit, and link the next work package. Use `Advances #issue` for partial delivery; close a work package only when its full acceptance criteria are met.
+
 For subsequent operator-driven publication, the optional helper expects the official GitHub CLI authenticated as VASEYDEV:
 
 ```sh
