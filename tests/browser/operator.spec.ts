@@ -46,6 +46,8 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
   // Filament's dialog wrapper has no box; assert its rendered content instead.
   await expect(dialog.getByRole('heading')).toBeVisible();
   await expect(dialog.locator(':focus')).toHaveCount(1);
+  await page.keyboard.press('Tab');
+  await expect(dialog.getByLabel('Title', { exact: false })).toBeFocused();
   const title = `Synthetic browser creation ${testInfo.project.name}`;
   const slug = `browser-creation-${testInfo.project.name}`;
   await dialog.getByLabel('Title', { exact: false }).fill(title);
@@ -96,7 +98,7 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
   await expect(editRetained).toBeFocused();
 
   await row(page, title).getByRole('button', { name: 'Publish', exact: true }).click();
-  dialog = page.getByRole('dialog');
+  dialog = page.getByRole('alertdialog', { name: 'Publish', exact: true });
   await dialog.getByRole('button', { name: 'Confirm', exact: true }).click();
   await expect(page.getByText('Publication blocked', { exact: true })).toBeVisible();
   await expect(page.getByText(/The latest rights declaration must be verified/)).toBeVisible();

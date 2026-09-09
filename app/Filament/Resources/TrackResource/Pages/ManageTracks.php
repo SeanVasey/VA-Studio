@@ -12,6 +12,9 @@ class ManageTracks extends ManageRecords
 
     protected function getHeaderActions(): array
     {
-        return [CreateAction::make()->using(fn (array $data) => TrackResource::saveMetadata(null, $data, $this))];
+        return [CreateAction::make()
+            // Focus a non-input first, including when mobile WebKit suppresses input autofocus.
+            ->extraModalWindowAttributes(['tabindex' => '-1', 'autofocus' => true])
+            ->using(fn (array $data) => TrackResource::saveMetadata(null, $data, $this))];
     }
 }

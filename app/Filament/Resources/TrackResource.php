@@ -49,7 +49,8 @@ class TrackResource extends OperatorResource
             TextColumn::make('bpm'), TextColumn::make('musical_key'), TextColumn::make('genre'),
             TextColumn::make('status')->badge(),
         ])->recordActions([
-            EditAction::make()->using(fn (Track $record, array $data, ManageTracks $livewire) => static::saveMetadata($record, $data, $livewire)),
+            EditAction::make()->extraModalWindowAttributes(['tabindex' => '-1', 'autofocus' => true])
+                ->using(fn (Track $record, array $data, ManageTracks $livewire) => static::saveMetadata($record, $data, $livewire)),
             Action::make('readiness')->label('Check readiness')->action(function (Track $record) {
                 $blockers = app(PublicationReadiness::class)->blockers($record);
                 Notification::make()->title($blockers === [] ? 'Ready to publish' : 'Publication blocked')->body(implode("\n", $blockers))->persistent()->send();
