@@ -70,7 +70,7 @@ class CatalogPaginationTest extends TestCase
         $eligible = QuoteFixtures::selection()['track'];
         $rows = [];
         for ($i = 0; $i < PublicCatalog::SCAN_LIMIT + 3; $i++) {
-            $rows[] = ['title' => 'PRIVATE-UNREADY-'.$i, 'slug' => 'unready-'.$i, 'status' => 'published', 'genre' => 'PRIVATE-GENRE', 'published_at' => now()->addDay()];
+            $rows[] = ['title' => 'PRIVATE-UNREADY-'.$i, 'slug' => 'unready-'.$i, 'published_slug' => 'unready-'.$i, 'status' => 'published', 'genre' => 'PRIVATE-GENRE', 'published_at' => now()->addDay()];
         }
         // Simulate stale publication flags. None has eligible rights/media/offers.
         DB::table('tracks')->insert($rows);
@@ -105,7 +105,7 @@ class CatalogPaginationTest extends TestCase
     {
         $rows = [];
         for ($i = 0; $i < 49; $i++) {
-            $rows[] = ['title' => 'Unavailable', 'slug' => 'unavailable-'.$i, 'status' => 'published', 'published_at' => now()];
+            $rows[] = ['title' => 'Unavailable', 'slug' => 'unavailable-'.$i, 'published_slug' => 'unavailable-'.$i, 'status' => 'published', 'published_at' => now()];
         }
         DB::table('tracks')->insert($rows);
         $page = $this->getJson('/api/catalog')->assertOk();

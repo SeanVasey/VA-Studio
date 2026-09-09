@@ -261,7 +261,7 @@ class MediaProcessingTest extends TestCase
     public function test_live_track_replacement_requires_unpublishing_before_queue_and_completion(): void
     {
         $source = MediaFixtures::source($this->track);
-        DB::table('tracks')->where('id', $this->track->id)->update(['status' => 'published']);
+        DB::table('tracks')->where('id', $this->track->id)->update(['status' => 'published', 'published_slug' => $this->track->slug]);
         try {
             app(QueueMediaProcessing::class)->handle($source, $this->actor);
             $this->fail('Published replacement was queued.');
@@ -269,7 +269,7 @@ class MediaProcessingTest extends TestCase
         }
         $this->track->update(['status' => 'draft']);
         $run = app(QueueMediaProcessing::class)->handle($source, $this->actor);
-        DB::table('tracks')->where('id', $this->track->id)->update(['status' => 'published']);
+        DB::table('tracks')->where('id', $this->track->id)->update(['status' => 'published', 'published_slug' => $this->track->slug]);
         try {
             app(MediaProcessor::class)->handle($run->id);
             $this->fail('Published replacement was promoted.');
