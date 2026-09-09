@@ -73,9 +73,9 @@ it('ignores an older reconciliation response after navigating to another page', 
   expect(result.current.unavailable).toBe(0);
 });
 
-it('preserves choices on a malformed lookup response', async () => {
+it.each([null, [{ id: '1', offers: [] }]])('preserves choices on a malformed lookup response: %j', async malformed => {
   sessionStorage.setItem('vaseyaudio-cart-v1', JSON.stringify([selection]));
-  vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({ tracks: null })));
+  vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({ tracks: malformed, licenseTiers: fixtureTiers })));
   const { result } = renderHook(() => useCart(secondPage, true));
   await waitFor(() => expect(result.current.error).toBe(true));
   expect(result.current.selections).toEqual([selection]);
@@ -98,6 +98,15 @@ it('submits server filters and preserves cursor/query state on page and track na
   // Finish the simulated visit before submitting a new search.
   act(() => { const options = visit.mock.calls[0][1]; options?.onFinish?.({} as never); });
   await user.type(screen.getByRole('searchbox'), 'piano');
-  await user.click(screen.getByRole('button', { name: 'Search', exact: true }));
+  await user.click(screen.getByRole('button', { name: 'Search' }));
   expect(visit).toHaveBeenLastCalledWith('/?q=piano&genre=&sort=featured', expect.objectContaining({ preserveState: true }));
+});
+
+
+it('keeps empty-result feedback tied to the submitted filters while the search field is edited', async () => {
+  const user = userEvent.setup();
+  render(<Storefront tracks={[]} licenseTiers={[]} catalogPage={{ ...page, filters: { ...page.filters, q: 'missing recording' } }} />);
+  await user.clear(screen.getByRole('searchbox'));
+  expect(screen.getByRole('heading', { name: 'NO MATCHES. KEEP EXPLORING.' })).toBeInTheDocument();
+  expect(screen.queryByRole('heading', { name: 'A NEW CHAPTER IN SOUND.' })).not.toBeInTheDocument();
 });

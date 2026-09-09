@@ -152,9 +152,19 @@ export async function resolveSelections(ids: string[], signal: AbortSignal): Pro
   });
   if (!response.ok) throw new Error('Selection lookup unavailable');
   const result = await response.json();
+  const strings = (value: unknown): value is string[] => Array.isArray(value) && value.every(item => typeof item === 'string');
+  const publicTrack = (track: Track) => track && typeof track.id === 'string' && ids.includes(track.id) &&
+    [track.slug, track.title, track.artist, track.musicalKey, track.genre, track.shareUrl].every(value => typeof value === 'string') &&
+    (track.mood === null || typeof track.mood === 'string') && Number.isFinite(track.bpm) && Number.isFinite(track.durationSeconds) &&
+    strings(track.tags) && Array.isArray(track.waveform) && track.waveform.every(peak => typeof peak === 'number' && Number.isFinite(peak)) &&
+    [track.previewUrl, track.artworkUrl].every(value => value === null || typeof value === 'string') &&
+    Array.isArray(track.offers) && track.offers.every(offer => offer &&
+      [offer.id, offer.offerRevisionId, offer.licenseVersionId, offer.licenseName].every(value => typeof value === 'string') &&
+      availableOffer(offer) && strings(offer.deliverableRoles));
+  const publicTier = (tier: LicenseTier) => tier && [tier.id, tier.name, tier.type].every(value => typeof value === 'string') &&
+    (typeof tier.version === 'string' || Number.isSafeInteger(tier.version)) && strings(tier.features) && strings(tier.requiredAssetRoles);
   if (!result || !Array.isArray(result.tracks) || !Array.isArray(result.licenseTiers) || result.tracks.length > 10 ||
-    !result.tracks.every((track: Track) => track && typeof track.id === 'string' && ids.includes(track.id) && Array.isArray(track.offers) &&
-      track.offers.every(offer => offer && typeof offer.id === 'string' && typeof offer.offerRevisionId === 'string' && typeof offer.licenseVersionId === 'string' && availableOffer(offer)))) {
+    !result.tracks.every(publicTrack) || !result.licenseTiers.every(publicTier) || new Set(result.tracks.map((track: Track) => track.id)).size !== result.tracks.length) {
     throw new Error('Invalid selection response');
   }
   return result;
