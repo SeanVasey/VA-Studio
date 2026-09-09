@@ -1,6 +1,6 @@
 # [WP-03] Private media ingestion, quarantine and preview processing
 
-Status: **First WAV/artwork increment implemented in PR #21; broader work package remains open.** The implementation below is a bounded local-storage pipeline. This issue is complete only when the acceptance evidence and remaining production work below exist.
+Status: **WAV/artwork implemented in PR #21; private stems archive increment in [PR #30](https://github.com/VASEYDEV/VASEYAUDIO/pull/30); broader work package remains open.** The implementation below is a bounded local-storage pipeline. This issue is complete only when the acceptance evidence and remaining production work below exist.
 
 - Suggested issue title: `[WP-03] Private media ingestion, quarantine and preview processing`
 - Phase: 1
@@ -33,11 +33,19 @@ One WAV upload through quarantine to an immutable master revision, tagged previe
 
 See [Media operations](../media-processing.md) for setup, supported limits, failure recovery and evidence boundaries. The test suite uses synthetic media and a test-only scanner double; those tests do not establish that a deployed ClamAV installation detects malware.
 
+## Stems archive increment — 2026-09-09
+
+Private WAV-only ZIP intake now follows the same quarantine, processing, failure/retry and immutable revision contract. The archive validator rejects unsafe paths, links/special files, duplicates/collisions, encryption, nested/unsupported formats, CRC/length corruption and bounded expansion violations. Extracted members use generated private paths; every member is scanned and fully decoded before a rebuilt archive is scanned and promoted. Per-member hashes, integer audio metadata and clean evidence form a canonical manifest. No public URL or master association is inferred.
+
+The regression fixtures are in `StemsArchiveTest` and `StemsFixtures`; [archive verification](../verification/stems-archives.md) records the evidence boundary. Existing WAV/artwork fingerprints and offer recording checks remain intact. No schema migration is required.
+
+**Next bounded WP-03 step:** audited association of a stems revision with the exact recording/master revision, stale/cross-track protections, and frozen offer evidence. Archive processing alone must not make a stems offer publishable.
+
 ## Remaining work within WP-03
 
 - Real ClamAV installation, signature-update operations and known clean/detection/error acceptance evidence in the intended deployment.
 - Production media-worker isolation, denied network access, resource sizing, queue monitoring and crash/restore drills.
-- Stems/ZIP ingestion, archive traversal/symlink/bomb rejection fixtures and safe extraction. Unsupported archives currently remain unavailable; no extraction pipeline is implemented.
+- Complete stems recording-revision binding and offer integration, then real seller-export compatibility/alignment acceptance. Archive ingestion is a bounded increment, not complete stems commerce.
 - Resumable/multipart uploads and an explicitly configured private object-store adapter with retention and recovery evidence.
 - Full-duration seller catalog processing, audible tag approval, real browser seek/playback and production performance evidence.
 
@@ -51,7 +59,7 @@ See [Media operations](../media-processing.md) for setup, supported limits, fail
 
 ## Verification
 
-The first increment adds synthetic WAV/artwork integration fixtures and failure/privacy cases. See [media verification](../verification/media-pipeline.md) for exact source identity, commands, runtime versions, observed local/CI results and independent-review corrections. Archive extraction, real scanner detection, production worker isolation and browser/device evidence remain pending. A checklist or unexecuted test definition is not completion evidence.
+The first increment adds synthetic WAV/artwork integration fixtures and failure/privacy cases. See [media verification](../verification/media-pipeline.md) for exact source identity, commands, runtime versions, observed local/CI results and independent-review corrections. Synthetic archive processing/rejection checks are added by the current increment. Real scanner detection, production worker isolation, stems/master association and browser/device evidence remain pending. A checklist or unexecuted test definition is not completion evidence.
 
 ## Rollback and boundaries
 

@@ -6,7 +6,7 @@ class MediaProfile
 {
     public function current(string $role): array
     {
-        return [
+        $profile = [
             'version' => (string) config('media.profile_version'),
             'role' => $role,
             'tag_path' => $role === 'master_wav' ? config('media.tag_path') : null,
@@ -18,6 +18,9 @@ class MediaProfile
             'waveform_algorithm' => 'absolute-peak-s16le-v1',
             'artwork' => 'sanitized-png-v1',
         ];
+
+        // Preserve fingerprints of existing WAV/artwork runs.
+        return $role === 'stems_zip' ? $profile + app(StemsArchive::class)->policy() : $profile;
     }
 
     public function fingerprint(array $profile): string

@@ -33,8 +33,8 @@ class MediaProcessor
         $promoted = [];
         try {
             $source = $run->source()->firstOrFail();
-            if ($source->disk !== 'local' || ! str_starts_with($source->storage_path, 'quarantine/') || ! in_array($source->role, ['master_wav', 'artwork'], true) || $source->processing_run_id) {
-                throw new MediaFailure('unsupported_source', 'Only private quarantined WAV masters and PNG/JPEG artwork are supported.');
+            if ($source->disk !== 'local' || ! str_starts_with($source->storage_path, 'quarantine/') || ! in_array($source->role, ['master_wav', 'artwork', 'stems_zip'], true) || $source->processing_run_id) {
+                throw new MediaFailure('unsupported_source', 'Only private quarantined WAV masters, PNG/JPEG artwork and WAV-only stems ZIPs are supported.');
             }
             $profile = app(MediaProfile::class)->current($source->role);
             if (! hash_equals($run->profile_fingerprint, app(MediaProfile::class)->fingerprint($profile))) {
@@ -59,6 +59,8 @@ class MediaProcessor
                 }
                 $evidence['tag_scan'] = $this->scan($tag);
                 $outputs = app(AudioDerivatives::class)->build($input, $tag, $profile, $workspace);
+            } elseif ($source->role === 'stems_zip') {
+                $outputs = app(StemsArchive::class)->build($input, $integrity['mime_type'], $profile, $workspace, $this->scan(...));
             } else {
                 $outputs = app(ArtworkDerivative::class)->build($input, $integrity['mime_type'], $workspace);
             }

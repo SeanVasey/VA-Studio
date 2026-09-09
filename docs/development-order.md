@@ -1,12 +1,12 @@
 # Ordered development status
 
-Reconciled 2026-09-09 against `main` at `8e26b0c1d7c18c24f14163cd3d8967139c61c013`, the repository implementation, issues #1–14, and the original [roadmap](architecture/roadmap.md). Sean explicitly requested returning to the pre-Stripe order and retaining every unfinished requirement.
+Reconciled 2026-09-09 against `main` at `b2da258a7689c5d5783f92cff29d2772a450b7f5`, the repository implementation, issues #1–14, and the original [roadmap](architecture/roadmap.md). Sean explicitly requested returning to the pre-Stripe order and retaining every unfinished requirement.
 
 ## Current increment and next handoff
 
-PR #27 catalog pagination and [PR #28 metadata/URL protection](https://github.com/VASEYDEV/VASEYAUDIO/pull/28) are merged. The current bounded [WP-01/WP-02 increment in PR #29](https://github.com/VASEYDEV/VASEYAUDIO/pull/29) adds audited interactive operator provisioning, a read-only installation report and real HTTP/browser checks for the admin metadata workflows. See [operator setup and verification](operator-setup-and-verification.md) for its scope and exact evidence boundaries.
+PRs #27–#29 are merged. PR #29 delivered the bounded operator setup/diagnostic/browser increment; its independent-review and WebKit abrupt-reload QA boundaries remain documented. Current development has returned to **WP-03: private WAV-stems ZIP ingestion and archive rejection fixtures** in [PR #30](https://github.com/VASEYDEV/VASEYAUDIO/pull/30). The same increment corrects the outstanding PR #29 diagnostic extension-list finding, including the required ZIP extension. See [stems archive verification](verification/stems-archives.md).
 
-After this increment is verified and accepted, continue WP-03 with safe stems/ZIP intake and archive rejection fixtures, then remaining WP-04 typed rights and WP-05 dedicated detail/device work. Keep independent authorization review, production MFA/recovery, physical-device accessibility and full media-to-publication browser acceptance visible. External production evidence does not block unrelated reversible implementation.
+After this archive increment is verified and accepted, complete the next WP-03 increment: audited stems-to-recording association and offer snapshot integration. Then continue WP-04 typed rights and WP-05 dedicated detail/device work. Keep resumable/object-store work and real scanner/worker/recovery acceptance visible; provider evidence does not block unrelated reversible work. Retain granular roles, production MFA/recovery, physical-device accessibility and full media-to-publication browser acceptance.
 
 ## Coverage and remaining work
 
@@ -14,9 +14,9 @@ After this increment is verified and accepted, continue WP-03 with safe stems/ZI
 
 | Original order | Implemented evidence | Remaining work and dependency |
 | --- | --- | --- |
-| WP-01 — foundation | PR #15 scaffold/lockfiles/CI; PR #24 tailored PR template; later PR CI exercises MySQL/SQLite, frontend build and dependency audits | Current operator/diagnostic/browser increment supplies clean-run installation evidence; verify its exact-head CI and independent review. Production hosting/operations remain separate. |
-| WP-02 — catalog/admin | Protected Filament resources and readiness; merged PR #28 adds audited metadata, revision conflicts, URL reservations and direct-action tests; current increment adds browser verification and visible publication blockers | Exact-head outcomes are in the relevant PRs. Retain independent review, granular roles, production MFA/recovery and complete upload/publication/device acceptance. |
-| WP-03 — media | PR #21 private WAV/artwork intake, quarantine, immutable derivatives, measured previews and retries | Stems/ZIP safety, resumable uploads/object-store adapter, real scanner acceptance, isolated workers, recovery and actual catalog/tag/playback evidence. Production configuration does not block unrelated reversible code. |
+| WP-01 — foundation | PR #15 scaffold/lockfiles/CI; PR #24 tailored PR template; later PR CI exercises MySQL/SQLite, frontend build and dependency audits | Merged PR #29 supplies clean-run installation and Chromium/WebKit workflow evidence; retain independent review and the tracked abrupt-reload QA finding. Production hosting/operations remain separate. |
+| WP-02 — catalog/admin | Protected Filament resources and readiness; merged PR #28 adds audited metadata, revision conflicts, URL reservations and direct-action tests; PR #29 adds browser verification and visible publication blockers | Exact-head outcomes are in the relevant PRs. Retain independent review, granular roles, production MFA/recovery and complete upload/publication/device acceptance. |
+| WP-03 — media | PR #21 private WAV/artwork intake, quarantine, immutable derivatives, measured previews and retries | Current increment implements bounded WAV-stems ZIP safety; next stems/master association, then resumable uploads/object-store adapter, real scanner acceptance, isolated workers, recovery and actual catalog/tag/playback evidence. Production configuration does not block unrelated reversible code. |
 | WP-04 — licensing/offers | PR #22 exact review evidence, successor versions, immutable commercial snapshots and deliverable identity | Typed rights/caps/variables and consistency fixtures, actual reviewed terms, historical continuity; buyer-specific rendering integrates with WP-08. No invented legal policy. |
 | WP-05 — storefront/player | Foundation catalog/player; PR #25 metadata; merged PR #27 pagination/reconciliation | Dedicated track detail, device navigation/playback/seek, responsive accessibility acceptance and production performance. Search pages may contain fewer than 12 eligible records; no hidden-record total is exposed. |
 | WP-06 — quotes/reservations | PR #23 provisional immutable selection reviews | Payable quotes, actual tax policy, promotions, shared exclusive inventory and reservation lifecycle; follows media/rights and storefront readiness. |
@@ -32,7 +32,7 @@ After this increment is verified and accepted, continue WP-03 with safe stems/ZI
 ## Sequence control
 
 1. Preserve merged WP-05 pagination/reconciliation and WP-02 metadata/URL evidence from PRs #27/#28.
-2. Finish and verify the current WP-01 operator diagnostics/boot and WP-02 browser increment. Continue the early WP-12 source audit when authenticated source access is available; record unknowns without pretending they are absent obligations.
+2. Preserve merged PR #29 operator diagnostics/boot and WP-02 browser evidence and its remaining review/device gates. Continue the early WP-12 source audit when authenticated source access is available; record unknowns without pretending they are absent obligations.
 3. Work through remaining Phase 1 media and rights dependencies (WP-03, WP-04), then complete WP-05 track detail/player acceptance. Split large packages into explicit increments and retain external production gates separately.
 4. Resume Phase 2 in order: WP-06 payable quote/reservation work → WP-07 orders/hosted checkout/finalization → WP-08 contracts/entitlements/delivery. Reuse the merged provisional quote and Stripe receipt foundations.
 5. Complete WP-09 → WP-10/WP-11, finish WP-12 migration reconciliation, then WP-13 release validation and WP-14 cutover. Audited customer obligations may pull the required WP-10/WP-11 slice earlier, as the original roadmap requires.

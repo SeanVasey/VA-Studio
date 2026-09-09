@@ -23,8 +23,8 @@ class QueueMediaProcessing
             if ($track->status === 'published') {
                 throw ValidationException::withMessages(['media' => 'Unpublish the track before processing a replacement media revision.']);
             }
-            if ($source->disk !== 'local' || ! str_starts_with($source->storage_path, 'quarantine/') || $source->processing_run_id || ! in_array($source->role, ['master_wav', 'artwork'], true)) {
-                throw ValidationException::withMessages(['media' => 'Only quarantined master WAV or PNG/JPEG artwork uploads are supported. Stems and uploaded previews remain quarantined.']);
+            if ($source->disk !== 'local' || ! str_starts_with($source->storage_path, 'quarantine/') || $source->processing_run_id || ! in_array($source->role, ['master_wav', 'artwork', 'stems_zip'], true)) {
+                throw ValidationException::withMessages(['media' => 'Only quarantined WAV masters, PNG/JPEG artwork and WAV-only stems ZIP uploads are supported.']);
             }
             if (! in_array($source->status, ['quarantined', 'processed'], true)) {
                 throw ValidationException::withMessages(['media' => 'This source is not eligible for processing.']);
