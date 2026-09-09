@@ -38,3 +38,7 @@ Use a branch or isolated worktree per independent writer. One owner coordinates 
 Once the exact VASEYAUDIO repository is available, publish each body intact with its title, then add dependency issue links and milestone/labels. A retry should detect already-published work-package IDs before creating duplicates. Record observed issue URLs rather than guessed URLs.
 
 The [roadmap](../architecture/roadmap.md) governs phase order. The parity/source ledger governs complete coverage: any verified feature not covered by an accepted issue becomes an explicit child issue, not an implicit omission. Active memberships, pending fulfillment and historical access can elevate later work into cutover blockers.
+
+## Current execution order
+
+Read [ordered development status](../development-order.md) before choosing the next increment. It reconciles merged work, earlier acceptance gaps and the owner’s instruction to return to the pre-Stripe sequence.

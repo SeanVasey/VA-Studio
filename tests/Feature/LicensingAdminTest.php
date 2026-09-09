@@ -132,7 +132,7 @@ class LicensingAdminTest extends TestCase
         $first = $offer->refresh()->currentRevision;
         app(PublishTrack::class)->handle($track, $actor);
         Livewire::test(ManageOffers::class)->callTableAction('edit', $offer, data: ['price_minor' => 7999])->assertHasNoTableActionErrors();
-        $this->getJson('/api/catalog')->assertJsonPath('tracks.0.offers.0.priceMinor', 4999)->assertJsonPath('tracks.0.offers.0.offerRevisionId', $first->id);
+        $this->getJson('/api/catalog')->assertJsonPath('tracks.0.offers.0.priceMinor', 4999)->assertJsonPath('tracks.0.offers.0.offerRevisionId', (string) $first->id);
         Livewire::test(ManageOffers::class)->callTableAction('publish_revision', $offer->fresh())->assertHasNoTableActionErrors();
         $this->getJson('/api/catalog')->assertJsonPath('tracks.0.offers.0.priceMinor', 7999);
         $this->assertSame(4999, $first->fresh()->price_minor);

@@ -80,7 +80,7 @@ class OfferRevisionTest extends TestCase
         $original = app(PublishOffer::class)->handle($offer, $actor);
         app(PublishTrack::class)->handle($track, $actor);
         app(SaveOfferDraft::class)->handle($offer, ['price_minor' => 12999, 'deliverable_asset_ids' => []], $actor);
-        $this->getJson('/api/catalog')->assertJsonPath('tracks.0.offers.0.priceMinor', 4999)->assertJsonPath('tracks.0.offers.0.offerRevisionId', $original->id);
+        $this->getJson('/api/catalog')->assertJsonPath('tracks.0.offers.0.priceMinor', 4999)->assertJsonPath('tracks.0.offers.0.offerRevisionId', (string) $original->id);
         $this->assertSame([], app(PublicationReadiness::class)->offerBlockers($offer->refresh()));
         $this->assertNotEmpty(app(PublicationReadiness::class)->draftBlockers($offer));
     }
@@ -117,7 +117,7 @@ class OfferRevisionTest extends TestCase
         $this->assertDatabaseCount('offer_revisions', 2);
         $this->assertSame(2, DB::table('audit_events')->where('action', 'catalog.offer.revision_published')->count());
         app(PublishTrack::class)->handle($track, $actor);
-        $this->getJson('/api/catalog')->assertJsonPath('tracks.0.offers.0.priceMinor', 7999)->assertJsonPath('tracks.0.offers.0.offerRevisionId', $successor->id);
+        $this->getJson('/api/catalog')->assertJsonPath('tracks.0.offers.0.priceMinor', 7999)->assertJsonPath('tracks.0.offers.0.offerRevisionId', (string) $successor->id);
     }
 
     public function test_deactivation_retains_history_and_reactivation_reuses_identical_snapshot(): void
@@ -225,7 +225,7 @@ class OfferRevisionTest extends TestCase
         $this->assertNotSame($original->snapshot['preview']['id'], $successor->snapshot['preview']['id']);
         $this->assertNotSame($original->snapshot['assets'][0]['id'], $successor->snapshot['assets'][0]['id']);
         app(PublishTrack::class)->handle($track, $actor);
-        $this->getJson('/api/catalog')->assertJsonPath('tracks.0.offers.0.offerRevisionId', $successor->id);
+        $this->getJson('/api/catalog')->assertJsonPath('tracks.0.offers.0.offerRevisionId', (string) $successor->id);
     }
 
     public function test_new_rights_evidence_requires_explicit_republication(): void

@@ -1,6 +1,6 @@
 # [WP-05] Branded catalog, track detail and persistent preview player
 
-Status: **Storefront foundation and public-sharing metadata increment implemented; broader work package remains open.** The current catalog/player and sharing routes do not establish complete discovery, pagination or device playback acceptance.
+Status: **Storefront foundation, public-sharing metadata and bounded pagination/reconciliation increments implemented; broader work package remains open.** Dedicated track detail, device playback/accessibility and performance acceptance remain open.
 
 - Suggested issue title: `[WP-05] Branded catalog, track detail and persistent preview player`
 - Phase: 1
@@ -35,7 +35,13 @@ Catalog-to-track-detail navigation with one persistent player, real derivative p
 
 Home and eligible track URLs include server-rendered title, description, canonical URL, Open Graph and image-card metadata, with verified public artwork and image alternatives. Inertia replaces the same keyed tags across track navigation and return home. Metadata is generated after existing publication-readiness checks; private evidence is excluded. Non-production pages request no indexing. See [Public track sharing](../track-sharing.md) for the contract, source references, tests and operational limits.
 
-This adds no payable quote, order, payment, grant, standalone track-detail layout or pagination. Current full-catalog queries and mobile playback/visual acceptance remain follow-ups. The implementing PR records actual CI results against its head; test definitions alone are not acceptance evidence.
+This adds no payable quote, order, payment, grant, standalone track-detail layout or pagination. At that increment, full-catalog queries and mobile playback/visual acceptance remained follow-ups; pagination is addressed below. The implementing PR records actual CI results against its head; test definitions alone are not acceptance evidence.
+
+## Pagination and cart reconciliation — 2026-09-09
+
+Bounded server search/filter/sort and encrypted previous/next cursor positions replace full-catalog fetching. Off-page saved selections resolve through a separate bounded public endpoint. Current revision checks, retry and stale-response protection preserve cart identities without trusting stored prices. Direct track URLs resolve independently of the current page and the shared audio owner survives navigation. See [catalog contract and verification scope](../catalog-pagination.md).
+
+The original next step was recovered from issue #5. The subsequent handoff now explicitly closes earlier foundation/admin gaps before further Phase 1 detail/player work or Phase 2 commerce; see [ordered development status](../development-order.md). CI evidence belongs to the actual PR head; device and live catalog acceptance remain unverified.
 
 ## Verification
 

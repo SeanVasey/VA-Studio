@@ -1,6 +1,6 @@
 # [WP-01] Foundation, repository governance and reproducible CI
 
-Status: **Planned work package**. Inspect the current implementation before starting; initial foundation code may already cover part of this scope. This issue is complete only when the acceptance evidence below exists.
+Status: **Foundation increment implemented; acceptance reconciliation remains open. Lockfile installs and runtime checks are exercised by merged PR CI. Complete the remaining operator setup/boot and diagnostic evidence before closing this broad package.** See [ordered development status](../development-order.md).
 
 - Suggested issue title: `[WP-01] Foundation, repository governance and reproducible CI`
 - Phase: 0

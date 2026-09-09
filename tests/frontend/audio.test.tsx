@@ -44,3 +44,18 @@ describe('single native audio owner', () => {
     expect(screen.getByRole('button', { name: `Play ${playable.title}` })).toBeInTheDocument();
   });
 });
+
+
+it('keeps the same active audio source and time while catalog pages change', async () => {
+  vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => {});
+  const play = vi.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(function (this: HTMLMediaElement) { this.dispatchEvent(new Event('playing')); return Promise.resolve(); });
+  const view = render(<PersistentPlayer tracks={[playable]} onLicense={() => {}} />);
+  await act(() => player.play(playable));
+  const source = play.mock.contexts[0] as HTMLMediaElement;
+  act(() => { source.currentTime = 42; source.dispatchEvent(new Event('timeupdate')); });
+  view.rerender(<PersistentPlayer tracks={[{ ...fixtureTracks[1], previewUrl: '/media/next-page-preview' }]} onLicense={() => {}} />);
+  expect(screen.getByRole('button', { name: 'Pause preview' })).toBeInTheDocument();
+  expect(play).toHaveBeenCalledTimes(1);
+  expect(source.currentTime).toBe(42);
+  expect(source.src).toBe(window.location.origin + playable.previewUrl);
+});

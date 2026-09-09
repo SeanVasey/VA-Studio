@@ -8,6 +8,7 @@ Bespoke web store development replacing older, service-based e-commerce offering
 
 - [Agent instructions](AGENTS.md): shared rules for Astra, Codex, Claude, and other contributors.
 - [Architecture](docs/architecture/): domain boundaries, decision register, contracts, and roadmap.
+- [Development order](docs/development-order.md): current increment, earlier gaps, and the ordered handoff across all 14 packages.
 - [Work packages](docs/work-packages/): dependency-scoped implementation assignments with acceptance criteria.
 - [Migration evidence](docs/migration/): reconciled research, feature parity, field mapping, and cutover requirements.
 - [Brand evidence](docs/brand/): current published theme, exact identity assets, and source provenance.
@@ -15,6 +16,7 @@ Bespoke web store development replacing older, service-based e-commerce offering
 - [Media operations](docs/media-processing.md): worker prerequisites, approved preview tag, processing and recovery.
 - [Licensing and offers](docs/licensing-and-offers.md): review submission, successor versions, published prices/files and legacy upgrade steps.
 - [Provisional selection reviews](docs/provisional-quotes.md): server snapshots, session ownership, retries, expiry and the boundary before payable checkout.
+- [Catalog pagination](docs/catalog-pagination.md): bounded server browsing and off-page saved-selection reconciliation.
 - [Public track sharing](docs/track-sharing.md): canonical URLs, server-rendered social metadata, Inertia navigation and publication privacy.
 - [Stripe test webhook inbox](docs/stripe-webhook-inbox.md): signed event receipt, immutable encrypted evidence, duplicate handling and development configuration.
 
@@ -22,7 +24,7 @@ Bespoke web store development replacing older, service-based e-commerce offering
 
 | Surface | Initial implementation | Remaining delivery |
 | --- | --- | --- |
-| Storefront | Responsive catalog, filtering, license comparison, local cart, shared track links with server-rendered social metadata, persistent audio transport | Production catalog import, server pagination, dedicated track detail, collections and device acceptance |
+| Storefront | Paginated server catalog/search/sort, license comparison, reconciled cart, shared track links with server-rendered social metadata, persistent audio transport | Production catalog import, dedicated track detail, collections and device acceptance |
 | Admin | Authenticated Filament catalog and licensing management | Detailed RBAC, recovery verification, site editing, customers and fulfillment operations |
 | Media | Private WAV/artwork intake, queued verification, immutable master/MP3 revisions, tagged previews, measured waveforms and admin retry controls | Production scanner acceptance, worker isolation, stems/archives, resumable uploads and managed object storage |
 | Licensing | Exact submitted review payloads, independent approval evidence, source/summary preview, successor diffs and effective dates | Approved production terms, a complete typed rights schema, buyer contracts and archival PDF rendering |

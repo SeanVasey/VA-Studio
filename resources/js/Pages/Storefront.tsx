@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type MouseEvent } from 'react';
+import { useEffect, useMemo, useState, type MouseEvent, type FormEvent } from 'react';
 import { router } from '@inertiajs/react';
 import { Icon } from '../components/Icon';
 import { Modal } from '../components/Modal';
@@ -6,7 +6,9 @@ import { PersistentPlayer } from '../components/PersistentPlayer';
 import { QuoteReview } from '../components/QuoteReview';
 import { MetadataHead } from '../components/MetadataHead';
 import { player, useAudio } from '../lib/audio';
-import { availableOffer, restoreCartSelections, savedCartSelection, cartSubtotals, fileRoleLabels, filterTracks, formatMoney, formatTime, safeMediaUrl, type CartLine, type Offer, type StorefrontProps, type Track } from '../lib/catalog';
+import { availableOffer, savedCartSelection, cartSubtotals, fileRoleLabels, filterTracks, formatMoney, formatTime, safeMediaUrl, type Offer, type CatalogFilters, type StorefrontProps, type Track } from '../lib/catalog';
+
+import { useCart } from '../lib/useCart';
 
 const EMPTY_TRACKS: Track[] = [];
 
@@ -28,7 +30,7 @@ function navigate(event: MouseEvent<HTMLAnchorElement>, preview = false) {
   if (!preview) router.visit(event.currentTarget.href, { preserveScroll: true, preserveState: true });
 }
 
-function TrackRow({ track, index, onLicense, onShare, designPreview }: { track: Track; index: number; onLicense: (track: Track) => void; onShare: (track: Track) => void; designPreview: boolean }) {
+function TrackRow({ track, index, onLicense, onShare, designPreview, querySuffix = '' }: { track: Track; index: number; onLicense: (track: Track) => void; onShare: (track: Track) => void; designPreview: boolean; querySuffix?: string }) {
   const audio = useAudio();
   const current = audio.track?.id === track.id;
   const active = current && (audio.status === 'playing' || audio.status === 'loading');
@@ -38,7 +40,7 @@ function TrackRow({ track, index, onLicense, onShare, designPreview }: { track: 
   return <article className={`track-row ${current ? 'is-current' : ''}`} aria-label={track.title} id={`track-${track.slug}`}>
     <span className="track-index">{String(index + 1).padStart(2, '0')}</span>
     <button className="track-play" onClick={() => player.toggle(track)} disabled={!preview} aria-label={!preview ? `Preview unavailable for ${track.title}` : active ? `Pause ${track.title}` : `Play ${track.title}`} title={!preview ? 'A published audio preview is not yet available.' : undefined}><Artwork track={track} /><span className="play-overlay"><Icon name={active ? 'pause' : 'play'} size={19} /></span></button>
-    <div className="track-title"><h3><a href={safeMediaUrl(track.shareUrl)} onClick={event => navigate(event, designPreview)}>{track.title}</a></h3><p>{track.artist}</p><div className="track-mobile-meta">{track.bpm} BPM <span>·</span> {track.musicalKey} <span>·</span> {track.genre}</div></div>
+    <div className="track-title"><h3><a href={safeMediaUrl(track.shareUrl + querySuffix)} onClick={event => navigate(event, designPreview)}>{track.title}</a></h3><p>{track.artist}</p><div className="track-mobile-meta">{track.bpm} BPM <span>·</span> {track.musicalKey} <span>·</span> {track.genre}</div></div>
     <div className="track-genre"><span>{track.genre}</span><span>{track.mood}</span></div>
     <div className="track-key"><span>{track.bpm} <small>BPM</small></span><span>{track.musicalKey}</span></div>
     <div className="track-wave"><Waveform track={track} current={current} time={audio.currentTime} duration={audio.duration} /><span>{formatTime(track.durationSeconds)}</span></div>
@@ -47,29 +49,12 @@ function TrackRow({ track, index, onLicense, onShare, designPreview }: { track: 
   </article>;
 }
 
-function useCart(tracks: Track[]) {
-  const [cart, setCart] = useState(() => {
-    try {
-      return restoreCartSelections(JSON.parse(sessionStorage.getItem('vaseyaudio-cart-v1') ?? '[]'), tracks);
-    } catch { return { lines: [] as CartLine[], unavailable: 0 }; }
-  });
-  useEffect(() => {
-    setCart(current => {
-      const checked = restoreCartSelections(current.lines.map(savedCartSelection), tracks);
-      return { lines: checked.lines, unavailable: current.unavailable + checked.unavailable };
-    });
-  }, [tracks]);
-  useEffect(() => {
-    try { sessionStorage.setItem('vaseyaudio-cart-v1', JSON.stringify(cart.lines.map(savedCartSelection))); } catch { /* Selections remain usable when browser storage is unavailable. */ }
-  }, [cart.lines]);
-  const setLines = (update: (lines: CartLine[]) => CartLine[]) => setCart(current => ({ ...current, lines: update(current.lines) }));
-  return { lines: cart.lines, setLines, unavailable: cart.unavailable };
-}
-
-export default function Storefront({ tracks = EMPTY_TRACKS, licenseTiers = [], selectedTrackSlug, designPreview = false, metadata }: StorefrontProps) {
-  const [query, setQuery] = useState('');
-  const [genre, setGenre] = useState('All sounds');
-  const [sort, setSort] = useState('featured');
+export default function Storefront({ tracks = EMPTY_TRACKS, licenseTiers = [], selectedTrackSlug, selectedTrack, catalogPage, designPreview = false, metadata }: StorefrontProps) {
+  const [query, setQuery] = useState(catalogPage?.filters.q ?? '');
+  const [genre, setGenre] = useState(catalogPage?.filters.genre || 'All sounds');
+  const [sort, setSort] = useState<CatalogFilters['sort']>(catalogPage?.filters.sort ?? 'featured');
+  const [browsing, setBrowsing] = useState(false);
+  const [browseError, setBrowseError] = useState('');
   const [licenseTrack, setLicenseTrack] = useState<Track | null>(null);
   const [selectedOfferId, setSelectedOfferId] = useState('');
   const [cartOpen, setCartOpen] = useState(false);
@@ -77,16 +62,44 @@ export default function Storefront({ tracks = EMPTY_TRACKS, licenseTiers = [], s
   const [shareFallback, setShareFallback] = useState<string | null>(null);
   const [checkoutStatus, setCheckoutStatus] = useState('');
   const [checkingOut, setCheckingOut] = useState(false);
-  const { lines, setLines, unavailable } = useCart(tracks);
+  const pageTracks = useMemo(() => selectedTrack && !tracks.some(track => track.id === selectedTrack.id) ? [selectedTrack, ...tracks] : tracks, [tracks, selectedTrack]);
+  const { lines, selections, setLines, unavailable, pending, error: cartError, retry, tiers } = useCart(pageTracks, !!catalogPage && !designPreview);
+  const knownTracks = useMemo(() => [...pageTracks, ...lines.map(line => line.track)], [pageTracks, lines]);
+  const knownTiers = [...licenseTiers, ...tiers];
+  useEffect(() => {
+    if (!catalogPage) return;
+    setQuery(catalogPage.filters.q); setGenre(catalogPage.filters.genre || 'All sounds'); setSort(catalogPage.filters.sort);
+  }, [catalogPage]);
+  const querySuffix = catalogPage ? catalogPage.currentUrl.slice(1) : '';
+  function browse(url: string) {
+    setBrowsing(true); setBrowseError('');
+    router.visit(url, { preserveScroll: true, preserveState: true,
+      onSuccess: () => { document.getElementById('catalog-title')?.focus({ preventScroll: true }); },
+      onError: () => setBrowseError('The catalog could not be updated. Try again or restart your search.'),
+      onFinish: () => setBrowsing(false),
+    });
+  }
+  function applyFilters(changes: Partial<CatalogFilters> = {}) {
+    const filters = { q: query, genre: genre === 'All sounds' ? '' : genre, sort, ...changes };
+    setQuery(filters.q); setGenre(filters.genre || 'All sounds'); setSort(filters.sort);
+    if (catalogPage && !designPreview) browse('/?' + new URLSearchParams(filters).toString());
+  }
+  function search(event: FormEvent) { event.preventDefault(); applyFilters(); }
+
   useEffect(() => { if (unavailable) setNotice('Some saved selections changed or are no longer available. Please choose their licenses again.'); }, [unavailable]);
-  const genres = useMemo(() => ['All sounds', ...new Set(tracks.map(track => track.genre).filter(Boolean))], [tracks]);
-  const visibleTracks = useMemo(() => filterTracks(tracks, query, genre, sort), [tracks, query, genre, sort]);
+  const genres = useMemo(() => ['All sounds', ...new Set([...(genre === 'All sounds' ? [] : [genre]), ...tracks.map(track => track.genre).filter(Boolean)])], [tracks, genre]);
+  const visibleTracks = useMemo(() => catalogPage && !designPreview ? tracks : filterTracks(tracks, query, genre, sort), [tracks, query, genre, sort, catalogPage, designPreview]);
+  const hasCatalogContext = tracks.length > 0 || (catalogPage ? !!(catalogPage.filters.q || catalogPage.filters.genre || catalogPage.hasCursor || catalogPage.nextUrl) : !!(query || genre !== 'All sounds'));
   const selectedOffer = licenseTrack?.offers.find(offer => offer.id === selectedOfferId && availableOffer(offer));
 
-  function openLicense(track: Track) { setLicenseTrack(track); setSelectedOfferId(lines.find(line => line.track.id === track.id)?.offer.id ?? track.offers.find(availableOffer)?.id ?? ''); }
+  function openLicense(track: Track) {
+    if (!knownTracks.some(item => item.id === track.id)) { if (!designPreview) router.visit(track.shareUrl + querySuffix, { preserveScroll: true, preserveState: true }); return; }
+    setLicenseTrack(knownTracks.find(item => item.id === track.id) ?? track); setSelectedOfferId(lines.find(line => line.track.id === track.id)?.offer.id ?? track.offers.find(availableOffer)?.id ?? ''); }
   function addLicense() {
     if (!licenseTrack || !selectedOffer) return;
-    const track = tracks.find(track => track.id === licenseTrack.id);
+    if (pending || cartError) { setNotice('Your saved selections need to be checked before adding another license. Open the cart to retry.'); return; }
+    if (lines.length >= 10 && !lines.some(line => line.track.id === licenseTrack.id)) { setNotice('You can select up to 10 tracks at a time.'); return; }
+    const track = knownTracks.find(track => track.id === licenseTrack.id);
     const currentOffer = track?.offers.find(offer => offer.id === selectedOffer.id && offer.offerRevisionId === selectedOffer.offerRevisionId && offer.licenseVersionId === selectedOffer.licenseVersionId && availableOffer(offer));
     if (!track || !currentOffer) {
       setLicenseTrack(null);
@@ -107,7 +120,7 @@ export default function Storefront({ tracks = EMPTY_TRACKS, licenseTiers = [], s
     } catch { setShareFallback(safeMediaUrl(track.shareUrl) ?? null); setNotice('The link could not be copied. Use the track link to share from your browser.'); }
   }
   async function checkout() {
-    if (checkingOut || !lines.length) return;
+    if (checkingOut || !lines.length || pending || cartError) return;
     setCheckingOut(true); setCheckoutStatus('');
     try {
       const csrf = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content;
@@ -127,7 +140,7 @@ export default function Storefront({ tracks = EMPTY_TRACKS, licenseTiers = [], s
     {metadata && !designPreview && <MetadataHead metadata={metadata} />}
     <a className="skip-link" href="#main">Skip to content</a>
     {designPreview && <div className="preview-banner">DEVELOPMENT PREVIEW <span>Sample catalog for design review. No purchases or licenses are issued.</span></div>}
-    <header className="site-header"><a className="brand-link" href="/" onClick={event => navigate(event, designPreview)} aria-label="VASEY.AUDIO home"><img src="/brand/vasey-audio-logo.png" alt="VASEY.AUDIO" width="420" height="100" /></a><nav aria-label="Main navigation"><a href="#catalog">The catalog</a><a href="#licenses">Licensing</a><a href="#studio">The studio</a></nav><div className="header-actions"><a className="admin-link" href="/admin">Artist admin <Icon name="northeast" size={13} /></a><button className="cart-toggle" aria-label={`Open cart, ${lines.length} ${lines.length === 1 ? 'item' : 'items'}`} onClick={() => { setCartOpen(true); setCheckoutStatus(''); }}><Icon name="bag" size={19} /><span className="cart-text">Cart</span><span className="cart-count">{String(lines.length).padStart(2, '0')}</span></button></div></header>
+    <header className="site-header"><a className="brand-link" href={"/" + querySuffix} onClick={event => navigate(event, designPreview)} aria-label="VASEY.AUDIO home"><img src="/brand/vasey-audio-logo.png" alt="VASEY.AUDIO" width="420" height="100" /></a><nav aria-label="Main navigation"><a href="#catalog">The catalog</a><a href="#licenses">Licensing</a><a href="#studio">The studio</a></nav><div className="header-actions"><a className="admin-link" href="/admin">Artist admin <Icon name="northeast" size={13} /></a><button className="cart-toggle" aria-label={`Open cart, ${selections.length} ${selections.length === 1 ? 'item' : 'items'}`} onClick={() => { setCartOpen(true); setCheckoutStatus(''); }}><Icon name="bag" size={19} /><span className="cart-text">Cart</span><span className="cart-count">{String(selections.length).padStart(2, '0')}</span></button></div></header>
     <main id="main">
       <section className="hero" aria-labelledby="hero-title">
         <div className="hero-copy"><p className="eyebrow"><span className="small-rule" />INDEPENDENT SOUND. DISTINCT IDENTITY.</p><h1 id="hero-title">SOUND<br />WITH <span>INTENT.</span></h1><div className="hero-bottom"><p>Beats with character. Sound with depth.<br />Original music and production by Sean Vasey.</p><a className="button" href="#catalog">Find your sound <Icon name="arrow" /></a></div></div>
@@ -135,12 +148,20 @@ export default function Storefront({ tracks = EMPTY_TRACKS, licenseTiers = [], s
       </section>
       <div className="discipline-strip"><span>HIP-HOP / CINEMATIC / EXPERIMENTAL</span><span>COMPOSITION <i>+</i> PRODUCTION <i>+</i> SOUND DESIGN</span><a href="#studio">FROM THE STUDIO <Icon name="northeast" size={14} /></a></div>
       <section id="catalog" className="catalog section-pad" aria-labelledby="catalog-title">
-        <div className="section-heading"><div><p className="eyebrow">01 / THE CATALOG</p><h2 id="catalog-title">FIND YOUR<br className="mobile-break" /> NEXT RECORD.</h2></div><p>Press play. Follow the feeling.<br />Find the foundation for something original.</p></div>
-        <div className="catalog-tools"><div className="search-field"><Icon name="search" size={19} /><input type="search" aria-label="Search tracks" placeholder="Search by title, mood, genre…" value={query} onChange={event => setQuery(event.target.value)} />{query && <button className="icon-button" onClick={() => setQuery('')} aria-label="Clear search"><Icon name="close" size={16} /></button>}</div><label className="sort-field"><span>Sort by</span><select aria-label="Sort tracks" value={sort} onChange={event => setSort(event.target.value)}><option value="featured">Featured</option><option value="tempo">Tempo: low to high</option><option value="title">Title: A–Z</option></select></label></div>
-        <div className="catalog-filter-row"><div className="genre-filters" aria-label="Filter by genre">{genres.map(option => <button key={option} aria-pressed={genre === option} className={genre === option ? 'filter-selected' : ''} onClick={() => setGenre(option)}>{option}</button>)}</div><span className="results-count" aria-live="polite">{String(visibleTracks.length).padStart(2, '0')} {visibleTracks.length === 1 ? 'TRACK' : 'TRACKS'}</span></div>
+        <div className="section-heading"><div><p className="eyebrow">01 / THE CATALOG</p><h2 id="catalog-title" tabIndex={-1}>FIND YOUR<br className="mobile-break" /> NEXT RECORD.</h2></div><p>Press play. Follow the feeling.<br />Find the foundation for something original.</p></div>
+        <form className="catalog-tools" onSubmit={search} role="search"><div className="search-field"><Icon name="search" size={19} /><input type="search" aria-label="Search tracks" placeholder="Search by title, mood, genre…" value={query} onChange={event => setQuery(event.target.value)} />{query && <button className="icon-button" type="button" onClick={() => applyFilters({ q: '' })} aria-label="Clear search"><Icon name="close" size={16} /></button>}</div>{catalogPage && <button className="button button-outline" type="submit" disabled={browsing}>Search</button>}<label className="sort-field"><span>Sort by</span><select aria-label="Sort tracks" value={sort} onChange={event => applyFilters({ sort: event.target.value as CatalogFilters['sort'] })}><option value="featured">Newest releases</option><option value="tempo">Tempo: low to high</option><option value="title">Title: A–Z</option></select></label></form>
+        <div className="catalog-filter-row"><div className="genre-filters" aria-label="Filter by genre">{genres.map(option => <button key={option} aria-pressed={genre === option} className={genre === option ? 'filter-selected' : ''} onClick={() => applyFilters({ genre: option === 'All sounds' ? '' : option })}>{option}</button>)}</div><span className="results-count" aria-live="polite">{String(visibleTracks.length).padStart(2, '0')} {visibleTracks.length === 1 ? 'TRACK' : 'TRACKS'}{catalogPage ? ' ON THIS PAGE' : ''}</span></div>
         {!!visibleTracks.length && <div className="track-list-header" aria-hidden="true"><span>TRACK / ARTIST</span><span>GENRE / MOOD</span><span>TEMPO / KEY</span><span>PREVIEW</span><span>LICENSE</span></div>}
-        <div className="track-list">{visibleTracks.map((track, index) => <TrackRow key={track.id} track={track} index={index} onLicense={openLicense} onShare={share} designPreview={designPreview} />)}</div>
-        {!visibleTracks.length && <div className="catalog-empty"><span className="empty-motif"><Icon name={tracks.length ? 'search' : 'music'} size={32} /></span><h3>{tracks.length ? 'NO MATCHES. KEEP EXPLORING.' : 'A NEW CHAPTER IN SOUND.'}</h3><p>{tracks.length ? 'Try another title, mood, or genre to find your next record.' : 'The independent catalog is being prepared. New music will appear here as releases are published.'}</p>{tracks.length ? <button className="button button-outline" onClick={() => { setQuery(''); setGenre('All sounds'); }}>Reset filters <Icon name="arrow" size={18} /></button> : <a className="text-link" href="#studio">Meet the producer <Icon name="arrow" size={16} /></a>}</div>}
+        {catalogPage && <p className="fine-print">Genre shortcuts reflect this page. Search explores the full published catalog.</p>}
+        {selectedTrack && !tracks.some(track => track.id === selectedTrack.id) && <div className="selected-track"><p className="eyebrow">SELECTED TRACK</p><TrackRow track={selectedTrack} index={0} onLicense={openLicense} onShare={share} designPreview={designPreview} querySuffix={querySuffix} /></div>}
+        <div className="track-list" aria-busy={browsing}>{visibleTracks.map((track, index) => <TrackRow key={track.id} track={track} index={index} onLicense={openLicense} onShare={share} designPreview={designPreview} querySuffix={querySuffix} />)}</div>
+        {!visibleTracks.length && <div className="catalog-empty"><span className="empty-motif"><Icon name={hasCatalogContext ? 'search' : 'music'} size={32} /></span><h3>{hasCatalogContext ? catalogPage?.nextUrl ? 'KEEP EXPLORING THE CATALOG.' : 'NO MATCHES. KEEP EXPLORING.' : 'A NEW CHAPTER IN SOUND.'}</h3><p>{hasCatalogContext ? catalogPage?.nextUrl ? 'Continue to the next page or try another search.' : 'Try another title, mood, or genre to find your next record.' : 'The independent catalog is being prepared. New music will appear here as releases are published.'}</p>{hasCatalogContext ? <button className="button button-outline" onClick={() => applyFilters({ q: '', genre: '' })}>Reset filters <Icon name="arrow" size={18} /></button> : <a className="text-link" href="#studio">Meet the producer <Icon name="arrow" size={16} /></a>}</div>}
+        {catalogPage && <nav className="catalog-pagination" aria-label="Catalog pages">
+          {catalogPage.previousUrl && <a className="button button-outline" href={catalogPage.previousUrl} onClick={event => { if (event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { event.preventDefault(); browse(catalogPage.previousUrl!); } }}>Previous tracks</a>}
+          {catalogPage.hasCursor && <a className="text-link" href={catalogPage.restartUrl} onClick={event => { if (event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { event.preventDefault(); browse(catalogPage.restartUrl); } }}>Back to first results</a>}
+          {catalogPage.nextUrl && <a className="button button-outline" href={catalogPage.nextUrl} onClick={event => { if (event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { event.preventDefault(); browse(catalogPage.nextUrl!); } }}>Next tracks</a>}
+        </nav>}
+        <p role="status" className="fine-print">{browsing ? 'Loading tracks…' : browseError}</p>
         <div className="catalog-footnote"><span>ORIGINAL MUSIC. A DIRECT CONNECTION TO THE CREATOR.</span><a className="text-link" href="#licenses">Find the right license <Icon name="northeast" size={14} /></a></div>
       </section>
       <section id="licenses" className="license-section section-pad" aria-labelledby="licenses-title"><div className="section-heading"><div><p className="eyebrow">02 / MAKE IT YOURS</p><h2 id="licenses-title">YOUR RECORD.<br />THE RIGHT LICENSE.</h2></div><p>Choose a license that fits your release.<br />Review the terms and included files before you commit.</p></div>
@@ -150,10 +171,10 @@ export default function Storefront({ tracks = EMPTY_TRACKS, licenseTiers = [], s
       <section id="studio" className="studio-section section-pad" aria-labelledby="studio-title"><div className="studio-visual"><img src="/images/video-studio.jpg" alt="VASEY.AUDIO production studio visual" width="1440" height="630" loading="lazy" /><span className="studio-caption">SEAN VASEY PRODUCTIONS / VASEY.AUDIO</span></div><div className="studio-copy"><p className="eyebrow">03 / BEHIND THE SOUND</p><h2 id="studio-title">CRAFT FIRST.<br />ALWAYS.</h2><p className="studio-lead">From the first note to the last detail.</p><p>Sean Vasey brings over two decades of composition, music production, and sound design to a practice shaped by hip-hop, classical music, and the space between them.</p><p>Original beats. Bespoke composition. Detailed sonic worlds. Built with intention, for artists with something to say.</p><div className="studio-disciplines"><span>MUSIC PRODUCTION</span><span>COMPOSITION</span><span>SOUND DESIGN</span></div></div></section>
       <section className="closing-statement"><span className="eyebrow">VASEY.AUDIO</span><p>MAKE SOMETHING<br /><span>ONLY YOU CAN.</span></p><a className="button button-outline" href="#catalog">Start with a sound <Icon name="northeast" /></a></section>
     </main>
-    <footer className="site-footer"><div className="footer-top"><a href="/" onClick={event => navigate(event, designPreview)} aria-label="VASEY.AUDIO home"><img className="footer-logo" src="/brand/vasey-audio-logo.png" alt="VASEY.AUDIO" width="420" height="100" /></a><p>Independent sound.<br />A studio/VASEY venture.</p><nav aria-label="Footer navigation"><a href="#catalog">Catalog</a><a href="#licenses">Licensing</a><a href="#studio">Studio</a><a href="/admin">Artist admin <Icon name="northeast" size={14} /></a></nav></div><div className="footer-bottom"><span>© {new Date().getFullYear()} VASEY.AUDIO</span><span>COMPOSED WITH INTENT.</span></div></footer>
-    <PersistentPlayer tracks={tracks} onLicense={openLicense} />
+    <footer className="site-footer"><div className="footer-top"><a href={"/" + querySuffix} onClick={event => navigate(event, designPreview)} aria-label="VASEY.AUDIO home"><img className="footer-logo" src="/brand/vasey-audio-logo.png" alt="VASEY.AUDIO" width="420" height="100" /></a><p>Independent sound.<br />A studio/VASEY venture.</p><nav aria-label="Footer navigation"><a href="#catalog">Catalog</a><a href="#licenses">Licensing</a><a href="#studio">Studio</a><a href="/admin">Artist admin <Icon name="northeast" size={14} /></a></nav></div><div className="footer-bottom"><span>© {new Date().getFullYear()} VASEY.AUDIO</span><span>COMPOSED WITH INTENT.</span></div></footer>
+    <PersistentPlayer tracks={pageTracks} onLicense={openLicense} />
     <div className={`toast ${notice ? 'toast-visible' : ''}`} role="status">{notice && <><span>{notice}{shareFallback && <a className="text-link" href={shareFallback} onClick={event => navigate(event, designPreview)}>Open track link <Icon name="northeast" size={14} /></a>}</span><button className="icon-button" aria-label="Dismiss notification" onClick={() => { setNotice(''); setShareFallback(null); }}><Icon name="close" size={17} /></button></>}</div>
-    {licenseTrack && <Modal title="CHOOSE YOUR LICENSE." eyebrow={licenseTrack.title} onClose={() => setLicenseTrack(null)}><p className="modal-description">Select the published offer for this track. Review its files and version before adding it to your cart.</p><fieldset className="offer-options"><legend className="sr-only">Available licenses for {licenseTrack.title}</legend>{licenseTrack.offers.filter(availableOffer).map(offer => { const tier = licenseTiers.find(tier => tier.id === offer.licenseVersionId); return <label className={`offer-option ${selectedOfferId === offer.id ? 'selected' : ''}`} key={offer.id}><input type="radio" name="license" value={offer.id} checked={selectedOfferId === offer.id} onChange={() => setSelectedOfferId(offer.id)} /><span className="offer-content"><span className="offer-heading"><strong>{offer.licenseName}</strong><strong>{formatMoney(offer.priceMinor, offer.currency)}</strong></span><span className="offer-files">{offer.deliverableRoles.map(role => fileRoleLabels[role] ?? role).join(' + ')}</span>{tier && <span className="offer-terms">{tier.features.join(' · ')}</span>}<span className="fine-print">{tier ? `Published terms version ${tier.version}` : 'Published license offer'}</span></span></label>; })}</fieldset><p className="checkout-advisory">Checkout and contract delivery are not available yet. Adding a license saves a selection only.</p><button className="button full-width" disabled={!selectedOffer} onClick={addLicense}>{selectedOffer ? `Add license · ${formatMoney(selectedOffer.priceMinor, selectedOffer.currency)}` : 'No license available'}<Icon name="bag" size={18} /></button></Modal>}
-    {cartOpen && <Modal title="YOUR SELECTIONS." eyebrow={`CART / ${lines.length} ${lines.length === 1 ? 'TRACK' : 'TRACKS'}`} onClose={() => setCartOpen(false)}>{lines.length ? <><div className="cart-lines">{lines.map(({ track, offer }) => <div className="cart-line" key={track.id}><Artwork track={track} size={52} /><div><h3>{track.title}</h3><p>{offer.licenseName}</p><button className="text-link small-text" onClick={() => { setCartOpen(false); openLicense(track); }}>Change license</button></div><div className="cart-line-price"><strong>{formatMoney(offer.priceMinor, offer.currency)}</strong><button className="text-link small-text" aria-label={`Remove ${track.title} from cart`} onClick={() => setLines(existing => existing.filter(line => line.track.id !== track.id))}>Remove</button></div></div>)}</div><div className="cart-total"><span>Estimated subtotal</span><div>{cartSubtotals(lines).map(total => <strong key={total.currency}>{formatMoney(total.amount, total.currency)} <small>{total.currency}</small></strong>)}</div></div><p className="fine-print">Prices and availability must be revalidated before purchase. Taxes, discounts, and final terms are not calculated here.</p><QuoteReview lines={lines} designPreview={designPreview} /><p className="checkout-advisory">Checkout is not available yet. No payment will be taken and no license will be issued.</p><button className="button full-width" onClick={checkout} disabled={checkingOut}>{checkingOut ? 'Checking availability…' : 'Check checkout availability'}<Icon name="arrow" /></button><p className="checkout-status" role="status">{checkoutStatus}</p></> : <div className="empty-cart"><Icon name="bag" size={36} /><h3>ROOM FOR YOUR NEXT RECORD.</h3><p>Choose a track and license to get started.</p><button className="button" onClick={() => { setCartOpen(false); document.getElementById('catalog')?.scrollIntoView(); }}>Browse the catalog <Icon name="arrow" /></button></div>}</Modal>}
+    {licenseTrack && <Modal title="CHOOSE YOUR LICENSE." eyebrow={licenseTrack.title} onClose={() => setLicenseTrack(null)}><p className="modal-description">Select the published offer for this track. Review its files and version before adding it to your cart.</p><fieldset className="offer-options"><legend className="sr-only">Available licenses for {licenseTrack.title}</legend>{licenseTrack.offers.filter(availableOffer).map(offer => { const tier = knownTiers.find(tier => tier.id === offer.licenseVersionId); return <label className={`offer-option ${selectedOfferId === offer.id ? 'selected' : ''}`} key={offer.id}><input type="radio" name="license" value={offer.id} checked={selectedOfferId === offer.id} onChange={() => setSelectedOfferId(offer.id)} /><span className="offer-content"><span className="offer-heading"><strong>{offer.licenseName}</strong><strong>{formatMoney(offer.priceMinor, offer.currency)}</strong></span><span className="offer-files">{offer.deliverableRoles.map(role => fileRoleLabels[role] ?? role).join(' + ')}</span>{tier && <span className="offer-terms">{tier.features.join(' · ')}</span>}<span className="fine-print">{tier ? `Published terms version ${tier.version}` : 'Published license offer'}</span></span></label>; })}</fieldset><p className="checkout-advisory">Checkout and contract delivery are not available yet. Adding a license saves a selection only.</p><button className="button full-width" disabled={!selectedOffer || pending || cartError} onClick={addLicense}>{selectedOffer ? `Add license · ${formatMoney(selectedOffer.priceMinor, selectedOffer.currency)}` : 'No license available'}<Icon name="bag" size={18} /></button></Modal>}
+    {cartOpen && <Modal title="YOUR SELECTIONS." eyebrow={`CART / ${selections.length} ${selections.length === 1 ? 'TRACK' : 'TRACKS'}`} onClose={() => setCartOpen(false)}>{pending && <p role="status">Checking your saved selections…</p>}{cartError && <div role="alert"><p>Your selections are saved. Availability could not be checked.</p><button className="button button-outline" onClick={retry}>Retry selection check</button></div>}{lines.length ? <><div className="cart-lines">{lines.map(({ track, offer }) => <div className="cart-line" key={track.id}><Artwork track={track} size={52} /><div><h3>{track.title}</h3><p>{offer.licenseName}</p><button className="text-link small-text" disabled={pending || cartError} onClick={() => { setCartOpen(false); openLicense(track); }}>Change license</button></div><div className="cart-line-price"><strong>{formatMoney(offer.priceMinor, offer.currency)}</strong><button className="text-link small-text" aria-label={`Remove ${track.title} from cart`} disabled={pending || cartError} onClick={() => setLines(existing => existing.filter(line => line.track.id !== track.id))}>Remove</button></div></div>)}</div><div className="cart-total"><span>Estimated subtotal</span><div>{cartSubtotals(lines).map(total => <strong key={total.currency}>{formatMoney(total.amount, total.currency)} <small>{total.currency}</small></strong>)}</div></div><p className="fine-print">Prices and availability must be revalidated before purchase. Taxes, discounts, and final terms are not calculated here.</p>{!pending && !cartError && <QuoteReview lines={lines} designPreview={designPreview} />}<p className="checkout-advisory">Checkout is not available yet. No payment will be taken and no license will be issued.</p><button className="button full-width" onClick={checkout} disabled={checkingOut || pending || cartError}>{checkingOut ? 'Checking availability…' : 'Check checkout availability'}<Icon name="arrow" /></button><p className="checkout-status" role="status">{checkoutStatus}</p></> : !pending && !cartError ? <div className="empty-cart"><Icon name="bag" size={36} /><h3>ROOM FOR YOUR NEXT RECORD.</h3><p>Choose a track and license to get started.</p><button className="button" onClick={() => { setCartOpen(false); document.getElementById('catalog')?.scrollIntoView(); }}>Browse the catalog <Icon name="arrow" /></button></div> : null}</Modal>}
   </>;
 }

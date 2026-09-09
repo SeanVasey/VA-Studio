@@ -45,10 +45,21 @@ export interface PageMetadata {
   type: 'website' | 'music.song';
   robots: 'index, follow' | 'noindex, nofollow';
 }
+export interface CatalogFilters { q: string; genre: string; sort: 'featured' | 'tempo' | 'title' }
+export interface CatalogPage {
+  filters: CatalogFilters;
+  previousUrl: string | null;
+  nextUrl: string | null;
+  restartUrl: string;
+  currentUrl: string;
+  hasCursor: boolean;
+}
 export interface StorefrontProps {
   tracks: Track[];
   licenseTiers: LicenseTier[];
   selectedTrackSlug?: string;
+  selectedTrack?: Track | null;
+  catalogPage?: CatalogPage;
   designPreview?: boolean;
   metadata?: PageMetadata;
 }
@@ -119,4 +130,42 @@ export function restoreCartSelections(value: unknown, tracks: Track[]): { lines:
     lines.push({ track, offer });
   }
   return { lines, unavailable };
+}
+
+export type SavedSelection = ReturnType<typeof savedCartSelection>;
+
+export function readSavedSelections(numericTrackIds = false): SavedSelection[] {
+  try {
+    const value: unknown = JSON.parse(sessionStorage.getItem('vaseyaudio-cart-v1') ?? '[]');
+    if (!Array.isArray(value)) return [];
+    return value.slice(0, 10).filter(item => item && typeof item === 'object' && (!numericTrackIds || (/^[1-9][0-9]*$/.test(String(item.trackId)) && Number.isSafeInteger(Number(item.trackId)))) && ['trackId', 'offerId', 'licenseVersionId', 'offerRevisionId'].every(key =>
+      (typeof item[key] === 'string' && item[key].length > 0 && item[key].length <= 128) || (typeof item[key] === 'number' && Number.isSafeInteger(item[key]) && item[key] > 0)
+    )).map(item => ({ trackId: String(item.trackId), offerId: String(item.offerId), licenseVersionId: String(item.licenseVersionId), offerRevisionId: String(item.offerRevisionId) }));
+  } catch { return []; }
+}
+
+export async function resolveSelections(ids: string[], signal: AbortSignal): Promise<{ tracks: Track[]; licenseTiers: LicenseTier[] }> {
+  const csrf = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content;
+  const response = await fetch('/catalog/selections', { method: 'POST', credentials: 'same-origin', signal,
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json', ...(csrf ? { 'X-CSRF-TOKEN': csrf } : {}) },
+    body: JSON.stringify({ trackIds: [...new Set(ids)] }),
+  });
+  if (!response.ok) throw new Error('Selection lookup unavailable');
+  const result = await response.json();
+  const strings = (value: unknown): value is string[] => Array.isArray(value) && value.every(item => typeof item === 'string');
+  const publicTrack = (track: Track) => track && typeof track.id === 'string' && ids.includes(track.id) &&
+    [track.slug, track.title, track.artist, track.musicalKey, track.genre, track.shareUrl].every(value => typeof value === 'string') &&
+    (track.mood === null || typeof track.mood === 'string') && Number.isFinite(track.bpm) && Number.isFinite(track.durationSeconds) &&
+    strings(track.tags) && Array.isArray(track.waveform) && track.waveform.every(peak => typeof peak === 'number' && Number.isFinite(peak)) &&
+    [track.previewUrl, track.artworkUrl].every(value => value === null || typeof value === 'string') &&
+    Array.isArray(track.offers) && track.offers.every(offer => offer &&
+      [offer.id, offer.offerRevisionId, offer.licenseVersionId, offer.licenseName].every(value => typeof value === 'string') &&
+      availableOffer(offer) && strings(offer.deliverableRoles));
+  const publicTier = (tier: LicenseTier) => tier && [tier.id, tier.name, tier.type].every(value => typeof value === 'string') &&
+    (typeof tier.version === 'string' || Number.isSafeInteger(tier.version)) && strings(tier.features) && strings(tier.requiredAssetRoles);
+  if (!result || !Array.isArray(result.tracks) || !Array.isArray(result.licenseTiers) || result.tracks.length > 10 ||
+    !result.tracks.every(publicTrack) || !result.licenseTiers.every(publicTier) || new Set(result.tracks.map((track: Track) => track.id)).size !== result.tracks.length) {
+    throw new Error('Invalid selection response');
+  }
+  return result;
 }

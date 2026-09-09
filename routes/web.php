@@ -13,6 +13,7 @@ Route::get('/media/{asset}', PublicMediaController::class)->middleware('throttle
 // JSON quote boundaries retain web sessions/CSRF but do not pass through Inertia,
 // whose response negotiation replaces the Cookie Vary header.
 Route::withoutMiddleware(HandleInertiaRequests::class)->group(function (): void {
+    Route::post('/catalog/selections', [StorefrontController::class, 'selections'])->middleware('throttle:60,1')->name('catalog.selections');
     Route::post('/quotes', [QuoteController::class, 'store'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('quotes.store');
     Route::get('/quotes/{quote}', [QuoteController::class, 'show'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('quotes.show');
 });

@@ -1,6 +1,6 @@
 # Phased delivery roadmap
 
-Status: **Recommended delivery sequence**, 2026-09-04. Dates and estimates are intentionally unset until source inventory and the first vertical slice provide evidence.
+Status: **Recommended delivery sequence**, 2026-09-04. Current implementation and handoff: [ordered development status](../development-order.md), reconciled 2026-09-09. Dates and estimates are intentionally unset until source inventory and the first vertical slice provide evidence.
 
 The goal is a complete replacement. Phases control implementation order, not a reduction of the requested feature set. A phase cannot strand an existing purchase, member, service obligation or contractual right.
 
