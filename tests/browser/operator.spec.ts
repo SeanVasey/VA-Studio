@@ -39,13 +39,18 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
   await login(page, 'browser-operator@example.test');
   await expect(page).toHaveURL(/\/admin$/);
   await page.goto('/admin/tracks');
+  await page.bringToFront();
   const launch = page.getByRole('button', { name: 'New track', exact: true });
   await launch.focus();
   await launch.press('Enter');
   let dialog = page.getByRole('dialog');
   // Filament's dialog wrapper has no box; assert its rendered content instead.
   await expect(dialog.getByRole('heading')).toBeVisible();
-  await expect(dialog.locator(':focus')).toHaveCount(1);
+  await expect.poll(() => dialog.evaluate(element => ({
+    inside: element.contains(document.activeElement),
+    activeTag: document.activeElement?.tagName,
+    documentFocused: document.hasFocus(),
+  }))).toMatchObject({ inside: true });
   await page.keyboard.press('Tab');
   await expect(dialog.getByLabel('Title', { exact: false })).toBeFocused();
   const title = `Synthetic browser creation ${testInfo.project.name}`;
