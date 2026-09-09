@@ -73,3 +73,7 @@ Do not add secrets, private masters, unredacted orders, customer PII or real con
 > Implement WP-06 with the data-contract algorithms. Keep money exact, snapshot every offered term and asset, and lock the shared underlying rights scope. Prove races on MySQL and expose paid-exception inputs for later finalization rather than assuming late payments cannot happen.
 
 Read [architecture index](../architecture/README.md), [decision register](../architecture/decision-register.md) and relevant source/brand evidence. Complete the first increment in a small PR, then split any remaining implementation into explicitly dependent issues. Preserve prior approvals and invariants; report unresolved provider/policy decisions without blocking unrelated reversible work.
+
+## Current sequencing — 2026-09-09
+
+Sean requested returning to the pre-Stripe development order. Retain implemented prerequisites, but defer further payable checkout/order work until the earlier foundation and Phase 1 gaps are addressed. The [ordered status](../development-order.md) supersedes earlier “next increment” priority notes; it does not remove this package’s scope.

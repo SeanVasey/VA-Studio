@@ -1,6 +1,6 @@
 # [WP-02] Persistent catalog administration and publication readiness
 
-Status: **Planned work package**. Inspect the current implementation before starting; initial foundation code may already cover part of this scope. This issue is complete only when the acceptance evidence below exists.
+Status: **Protected catalog/admin foundation implemented; broad acceptance remains open. Published slug continuity, ordinary metadata audit coverage and browser/direct-action verification require the next foundation closure pass.** See [ordered development status](../development-order.md).
 
 - Suggested issue title: `[WP-02] Persistent catalog administration and publication readiness`
 - Phase: 0

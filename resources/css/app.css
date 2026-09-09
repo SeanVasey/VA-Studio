@@ -428,3 +428,8 @@ input[type='range'] { accent-color: var(--va-action); cursor: pointer; min-width
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition: none !important; animation: none !important; } }
 @media (forced-colors: active) { .button, .transport-play, .play-overlay, .genre-filters button, .track-license, .offer-option, .player { border: 1px solid ButtonText; } .waveform > span { background: CanvasText; } }
+
+.catalog-pagination { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 24px; }
+.catalog-pagination .text-link { min-height: 44px; }
+.selected-track { margin-top: 24px; border-top: 1px solid var(--va-border); }
+.selected-track > .eyebrow { margin: 16px 0; }

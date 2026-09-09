@@ -45,10 +45,21 @@ export interface PageMetadata {
   type: 'website' | 'music.song';
   robots: 'index, follow' | 'noindex, nofollow';
 }
+export interface CatalogFilters { q: string; genre: string; sort: 'featured' | 'tempo' | 'title' }
+export interface CatalogPage {
+  filters: CatalogFilters;
+  previousUrl: string | null;
+  nextUrl: string | null;
+  restartUrl: string;
+  currentUrl: string;
+  hasCursor: boolean;
+}
 export interface StorefrontProps {
   tracks: Track[];
   licenseTiers: LicenseTier[];
   selectedTrackSlug?: string;
+  selectedTrack?: Track | null;
+  catalogPage?: CatalogPage;
   designPreview?: boolean;
   metadata?: PageMetadata;
 }
@@ -119,4 +130,32 @@ export function restoreCartSelections(value: unknown, tracks: Track[]): { lines:
     lines.push({ track, offer });
   }
   return { lines, unavailable };
+}
+
+export type SavedSelection = ReturnType<typeof savedCartSelection>;
+
+export function readSavedSelections(numericTrackIds = false): SavedSelection[] {
+  try {
+    const value: unknown = JSON.parse(sessionStorage.getItem('vaseyaudio-cart-v1') ?? '[]');
+    if (!Array.isArray(value)) return [];
+    return value.slice(0, 10).filter(item => item && typeof item === 'object' && (!numericTrackIds || (/^[1-9][0-9]*$/.test(String(item.trackId)) && Number.isSafeInteger(Number(item.trackId)))) && ['trackId', 'offerId', 'licenseVersionId', 'offerRevisionId'].every(key =>
+      (typeof item[key] === 'string' && item[key].length > 0 && item[key].length <= 128) || (typeof item[key] === 'number' && Number.isSafeInteger(item[key]) && item[key] > 0)
+    )).map(item => ({ trackId: String(item.trackId), offerId: String(item.offerId), licenseVersionId: String(item.licenseVersionId), offerRevisionId: String(item.offerRevisionId) }));
+  } catch { return []; }
+}
+
+export async function resolveSelections(ids: string[], signal: AbortSignal): Promise<{ tracks: Track[]; licenseTiers: LicenseTier[] }> {
+  const csrf = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content;
+  const response = await fetch('/catalog/selections', { method: 'POST', credentials: 'same-origin', signal,
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json', ...(csrf ? { 'X-CSRF-TOKEN': csrf } : {}) },
+    body: JSON.stringify({ trackIds: [...new Set(ids)] }),
+  });
+  if (!response.ok) throw new Error('Selection lookup unavailable');
+  const result = await response.json();
+  if (!result || !Array.isArray(result.tracks) || !Array.isArray(result.licenseTiers) || result.tracks.length > 10 ||
+    !result.tracks.every((track: Track) => track && typeof track.id === 'string' && ids.includes(track.id) && Array.isArray(track.offers) &&
+      track.offers.every(offer => offer && typeof offer.id === 'string' && typeof offer.offerRevisionId === 'string' && typeof offer.licenseVersionId === 'string' && availableOffer(offer)))) {
+    throw new Error('Invalid selection response');
+  }
+  return result;
 }

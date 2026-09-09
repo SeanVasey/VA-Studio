@@ -74,7 +74,7 @@ class FoundationTest extends TestCase
     public function test_storefront_and_empty_catalog_do_not_invent_products(): void
     {
         $this->get('/')->assertOk();
-        $this->getJson('/api/catalog')->assertOk()->assertExactJson(['tracks' => [], 'licenseTiers' => [], 'commerceEnabled' => false]);
+        $this->getJson('/api/catalog')->assertOk()->assertJsonCount(0, 'tracks')->assertJsonCount(0, 'licenseTiers')->assertJsonPath('commerceEnabled', false)->assertJsonPath('catalogPage.nextUrl', null)->assertJsonPath('catalogPage.previousUrl', null);
         $this->assertDatabaseCount('users', 0);
     }
 

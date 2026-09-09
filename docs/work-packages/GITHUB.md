@@ -19,4 +19,4 @@ The following issues were created in the private VASEYDEV/VASEYAUDIO repository 
 | WP-13 | [Security, reliability and exact-candidate release validation](https://github.com/VASEYDEV/VASEYAUDIO/issues/13) | Open |
 | WP-14 | [Rehearsed domain cutover and post-launch reconciliation](https://github.com/VASEYDEV/VASEYAUDIO/issues/14) | Open |
 
-Next implementation: finish the safe media-processing path in WP-03 while closing remaining foundation/admin gates. Preserve dependencies documented in each issue. Refer to the PR verification record for actual results; an issue's existence does not prove its feature is implemented.
+Current implementation and subsequent dependency order: [ordered development status](../development-order.md). The earlier WP-03-only handoff was superseded by merged media, license, quote, sharing and Stripe receipt increments. Broad issues stay open until their remaining acceptance evidence exists.
