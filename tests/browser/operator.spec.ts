@@ -50,7 +50,7 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
     inside: element.contains(document.activeElement),
     activeTag: document.activeElement?.tagName,
     documentFocused: document.hasFocus(),
-  }))).toMatchObject({ inside: true });
+  }))).toEqual({ inside: true, activeTag: 'FORM', documentFocused: true });
   await page.keyboard.press('Tab');
   await expect(dialog.getByLabel('Title', { exact: false })).toBeFocused();
   const title = `Synthetic browser creation ${testInfo.project.name}`;

@@ -23,6 +23,16 @@ class TrackResource extends OperatorResource
 {
     protected static ?string $model = Track::class;
 
+    public static function metadataModalAttributes(): array
+    {
+        return [
+            'tabindex' => '-1', 'autofocus' => true,
+            // WebKit can reject the focus trap's initial attempt during the opening transition.
+            // Retry only after that transition, without stealing focus from a field already in use.
+            'x-on:transitionend.self' => 'if (isOpen && isWindowVisible && !$el.contains(document.activeElement)) $el.focus({ preventScroll: true })',
+        ];
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
@@ -49,7 +59,7 @@ class TrackResource extends OperatorResource
             TextColumn::make('bpm'), TextColumn::make('musical_key'), TextColumn::make('genre'),
             TextColumn::make('status')->badge(),
         ])->recordActions([
-            EditAction::make()->extraModalWindowAttributes(['tabindex' => '-1', 'autofocus' => true])
+            EditAction::make()->extraModalWindowAttributes(static::metadataModalAttributes())
                 ->using(fn (Track $record, array $data, ManageTracks $livewire) => static::saveMetadata($record, $data, $livewire)),
             Action::make('readiness')->label('Check readiness')->action(function (Track $record) {
                 $blockers = app(PublicationReadiness::class)->blockers($record);
