@@ -16,7 +16,7 @@ class VerifiedMedia
     public function path(MediaAsset $asset): ?string
     {
         try {
-            if ($asset->status !== 'ready' || $asset->disk !== 'local' || ! $asset->verified_at || ! $asset->verified_by || ! $asset->parent_asset_id || ! $asset->processing_run_id || ! preg_match('~\Amedia/revisions/[a-f0-9-]{36}/(?:master\.wav|delivery\.mp3|preview\.mp3|artwork\.png)\z~D', $asset->storage_path)) {
+            if ($asset->status !== 'ready' || $asset->disk !== 'local' || ! $asset->verified_at || ! $asset->verified_by || ! $asset->parent_asset_id || ! $asset->processing_run_id || ! preg_match('~\Amedia/revisions/[a-f0-9-]{36}/(?:master\.wav|delivery\.mp3|preview\.mp3|artwork\.png|stems\.zip)\z~D', $asset->storage_path)) {
                 return null;
             }
             $run = $asset->processingRun()->first();
@@ -29,7 +29,12 @@ class VerifiedMedia
             if (($scan['status'] ?? null) !== 'clean' || ! hash_equals($run->input_sha256, $scan['sha256'] ?? '') || ! ($engine === 'clamav' || ($engine === 'test-only' && app()->environment('testing')))) {
                 return null;
             }
-            $expectedRoles = $source->role === 'master_wav' ? ['download_mp3', 'master_wav', 'preview_tagged'] : ($source->role === 'artwork' ? ['artwork'] : []);
+            $expectedRoles = match ($source->role) {
+                'master_wav' => ['download_mp3', 'master_wav', 'preview_tagged'],
+                'artwork' => ['artwork'],
+                'stems_zip' => ['stems_zip'],
+                default => [],
+            };
             $outputs = $run->outputs()->get();
             if ($expectedRoles === [] || $outputs->pluck('role')->sort()->values()->all() !== $expectedRoles || $outputs->pluck('id')->sort()->values()->all() !== collect($run->output_asset_ids)->sort()->values()->all()) {
                 return null;
@@ -47,6 +52,9 @@ class VerifiedMedia
                 if (($tagScan['status'] ?? null) !== 'clean' || ! hash_equals($run->profile['tag_sha256'] ?? '', $tagScan['sha256'] ?? '') || ! (($tagScan['engine'] ?? null) === 'clamav' || (($tagScan['engine'] ?? null) === 'test-only' && app()->environment('testing')))) {
                     return null;
                 }
+            }
+            if ($source->role === 'stems_zip' && ! app(StemsArchive::class)->hasEvidence($asset->technical_metadata ?? [], $asset->sha256 ?? '', $run->profile)) {
+                return null;
             }
             if ($asset->role === 'preview_tagged') {
                 $metadata = $asset->technical_metadata ?? [];

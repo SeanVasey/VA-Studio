@@ -12,6 +12,8 @@ return [
     'tag_sha256' => env('MEDIA_TAG_SHA256'),
     'tag_interval_seconds' => 30,
     'max_source_bytes' => 536870912,
+    // Lower these for a smaller worker; StemsArchive enforces these hard ceilings.
+    'stems' => ['max_entries' => 128, 'max_member_bytes' => 134217728, 'max_total_bytes' => 536870912, 'max_ratio' => 100, 'max_seconds' => 360],
     'max_artwork_bytes' => 20971520,
     'max_duration_seconds' => 1200,
     'max_tag_duration_seconds' => 15,

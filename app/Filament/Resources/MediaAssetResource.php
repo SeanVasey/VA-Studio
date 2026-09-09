@@ -22,7 +22,7 @@ class MediaAssetResource extends OperatorResource
         return $schema->components([
             Select::make('track_id')->relationship('track', 'title')->searchable()->required(),
             Select::make('role')->options(IngestMediaUpload::ROLES)->required(),
-            FileUpload::make('upload')->label('Private upload')->disk('local')->visibility('private')->storeFiles(false)->maxSize(204800)->acceptedFileTypes(['image/jpeg', 'image/png', 'audio/wav', 'audio/x-wav'])->required()->downloadable(false)->openable(false)->previewable(false)->helperText('Upload a WAV master or PNG/JPEG artwork. Select Process after uploading. Masters stay private; verified previews can be reviewed here before track publication.'),
+            FileUpload::make('upload')->label('Private upload')->disk('local')->visibility('private')->storeFiles(false)->maxSize(204800)->acceptedFileTypes(['image/jpeg', 'image/png', 'audio/wav', 'audio/x-wav', 'application/zip', 'application/x-zip'])->required()->downloadable(false)->openable(false)->previewable(false)->helperText('Upload a WAV master, PNG/JPEG artwork or WAV-only stems ZIP (up to 200 MiB). Select Process after uploading. Masters and stems stay private. Stems recording association is required before licensing.'),
         ]);
     }
 

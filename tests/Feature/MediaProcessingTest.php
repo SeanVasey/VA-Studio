@@ -238,9 +238,9 @@ class MediaProcessingTest extends TestCase
         app(QueueMediaProcessing::class)->handle($source, $this->actor);
     }
 
-    public function test_stems_and_arbitrary_uploaded_previews_are_unsupported(): void
+    public function test_arbitrary_uploaded_previews_and_delivery_mp3s_are_unsupported(): void
     {
-        foreach (['stems_zip', 'preview_tagged', 'download_mp3'] as $role) {
+        foreach (['preview_tagged', 'download_mp3'] as $role) {
             $source = MediaFixtures::source($this->track, $role);
             try {
                 app(QueueMediaProcessing::class)->handle($source, $this->actor);

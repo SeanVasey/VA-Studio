@@ -1,6 +1,6 @@
 # Private media processing
 
-Status: first local WAV/artwork increment. This guide describes the code in this increment; it is not production acceptance evidence. Checkout and purchased downloads remain disabled, and the existing BeatStars site remains authoritative for sales.
+Status: local WAV/artwork pipeline plus bounded private WAV-stems ZIP ingestion. This guide describes the code in this increment; it is not production acceptance evidence. Checkout and purchased downloads remain disabled, and the existing BeatStars site remains authoritative for sales.
 
 ## What the pipeline accepts
 
@@ -8,23 +8,36 @@ Status: first local WAV/artwork increment. This guide describes the code in this
 | --- | --- | --- |
 | WAV master | Admin upload up to 200 MiB; complete RIFF/WAVE with one PCM audio stream; 16/24/32-bit integer or 32-bit float; mono/stereo; 8–192 kHz; duration up to 20 minutes | Immutable WAV master preserving input bytes, untagged 320 kbps delivery MP3, full-length 192 kbps tagged MP3 preview, duration and 200 waveform peaks measured from that preview |
 | PNG/JPEG artwork | Up to 20 MiB; each dimension 1–6,000 pixels | Re-encoded PNG with format/dimension verification and metadata stripped |
-| Other roles/formats | Not supported by this increment | No promotion to ready assets; no ZIP extraction or uploaded-preview bypass |
+| Stems ZIP | Admin upload up to 200 MiB; up to 128 entries including folders; each WAV up to 128 MiB; total expanded bytes up to 512 MiB; maximum 100:1 expansion per file | One rebuilt immutable private ZIP, exact per-member hashes/audio metadata/scanner evidence; no preview or recording association is inferred |
+| Other roles/formats | Not supported by this increment | No promotion to ready assets; no uploaded-preview bypass |
 
-The processor's internal source bound is 512 MiB; this does not increase the 200 MiB admin upload limit. Existing role names for stems and other media do not imply an implemented processing or delivery path.
+The processor's internal source bound is 512 MiB; this does not increase the 200 MiB admin upload limit. Stems archive processing does not establish which exact master recording it belongs to. Offer publication continues to require the existing recording-revision match; a separate audited binding increment is required before offering stems licenses.
 
 Every upload is private. Only explicit ready preview/artwork derivatives of a publication-ready, published track can be served through the public media route. WAV masters, untagged MP3 deliverables, original artwork, scanner evidence and private object keys are not public storefront fields. A ready database label alone is insufficient: public availability requires completed processing provenance and file integrity checks.
+
+## Prepare a stems archive
+
+Export only complete supported RIFF/WAVE audio stems. Stored and deflated ZIP members are supported; encrypted ZIPs, nested archives, MP3s, documents, hidden macOS metadata, links, special files and unsupported compression are rejected. Each member uses the master WAV format/duration checks and a full bounded FFmpeg decode. This verifies technical validity, not audible correctness, aligned start points, rights clearance or association with a master.
+
+Use relative portable names starting with a letter or digit. Each component may contain ASCII letters, numbers, spaces, underscores, hyphens and dots (up to 100 characters). No leading hidden names, trailing spaces/dots, Windows reserved names, backslashes, absolute paths or traversal components. Names must be unique ignoring case. Up to four folder levels plus a filename and 240 bytes per full name are supported. Unsupported names must be renamed in the seller's source export; the worker never silently renames members.
+
+The worker validates the entire archive directory first, streams each member by index into a generated private scratch filename, and checks actual bytes and CRC against the declared member size. It scans and decodes each member, then rebuilds a stored ZIP with sorted safe names, fixed timestamps, read-only file attributes and no copied archive comments/extra metadata. It scans that rebuilt ZIP before immutable promotion. Archive member names never become extraction paths. Input and output ZIP hashes can differ while WAV bytes remain exact.
+
+The `media.stems` limits may be lowered; code enforces the documented ceilings. Each policy is included in the processing fingerprint, so a changed bound gets a new run without rewriting earlier evidence. The archive stage has a 360-second elapsed budget checked during streaming and between bounded subprocesses. An in-flight subprocess can take up to its existing 120-second cap before the elapsed-budget failure is recorded. Original-archive scanning precedes this budget. Queue timeout/claim settings remain unchanged. The PHP/libzip parser itself still requires production worker memory/filesystem/process isolation; application bounds are not proof of deployed isolation.
+
+A ZIP run produces only `stems_zip`, preserves its quarantined source and records a canonical integer-valued member manifest. It does not change track duration/waveform, generate a public preview, or automatically attach to a license. **Recording-revision binding is the next WP-03 dependency.** Both the public media route and the operator preview route deny stems archives. Future buyer access must go through WP-08 entitlements.
 
 ## Public integrity checks
 
 Each request rechecks private path safety, immutable completed processing provenance and fresh file identity/size. Successful full SHA-256 checks are shared for at most 60 seconds, keyed by asset ID, expected hash, path and device/inode/size/modification/change timestamps. Cache hits do not extend that window. The worker prewarms these checks after promotion to avoid reading whole private masters repeatedly for catalog and player range requests. A privileged same-size write preserving the observable file timestamps may take up to 60 seconds to detect; this is a bounded integrity cache, not an instantaneous tamper monitor. Only trusted application processes may write the private disk or cache.
 
-A cold large catalog still requires full digest verification. Catalog pagination/indexing, dedicated integrity reconciliation and realistic cold-cache load testing remain release-scale work; the current catalog returns the full eligible catalog. Public catalog, track and media routes are throttled.
+A cold large catalog still requires full digest verification. Catalog pagination/indexing, dedicated integrity reconciliation and realistic cold-cache load testing remain release-scale work; the catalog now uses bounded pagination (PR #27). Public catalog, track and media routes are throttled.
 
 ## Prepare the local worker
 
 Complete the application setup in [README](../README.md). The application and worker need access to the same private local disk, which defaults to `storage/app/private`; the web document root must remain `public/`. Do not expose the private disk through static serving, symlinks or object URLs.
 
-The worker needs patched, compatible FFmpeg/ffprobe binaries with the `libmp3lame` encoder, Linux `prlimit`, and ClamAV's `clamscan` with usable signatures. These tools are external dependencies; Composer does not install them. Configure their absolute executable paths in `.env`:
+The worker needs the PHP ZIP extension and patched, compatible FFmpeg/ffprobe binaries with the `libmp3lame` encoder, Linux `prlimit`, and ClamAV's `clamscan` with usable signatures. These tools are external dependencies; Composer does not install them. Configure their absolute executable paths in `.env`:
 
 ```dotenv
 QUEUE_CONNECTION=database
@@ -65,7 +78,7 @@ The admin's temporary uploads use authenticated, authorized private storage, wit
 ## Publish a track through the admin
 
 1. Create or edit a draft track and complete its title, slug, artist, genre, BPM and key. Keep rights review and approved/published license versions current.
-2. Open **Media Assets**, choose the track and either **WAV master** or **Artwork (PNG or JPEG)**, then upload the actual file. The server records its MIME, byte count and SHA-256 into a quarantined source record. The form cannot provide a trusted ready status or private object path.
+2. Open **Media Assets**, choose the track and **WAV master**, **Artwork (PNG or JPEG)** or **Stems (WAV-only ZIP)**, then upload the actual file. The server records its MIME, byte count and SHA-256 into a quarantined source record. The form cannot provide a trusted ready status or private object path.
 3. Choose **Process / retry** on the source row. Uploading alone does not start processing. The worker changes the run from `queued` to `processing`; the table refreshes its processing status, and **Processing details** shows progress or a failure message.
 4. Wait for `completed`. The source becomes `processed`; its derived asset rows become `ready` together. A WAV run produces three distinct immutable asset records, linked to the source and the completed run. Repeated requests with the same source/profile return that existing result.
 5. Choose **Review preview** on the ready preview/artwork rows to listen and inspect before release. This route requires an authenticated operator and never serves a master or delivery MP3. Select the exact ready deliverable revisions required by each license offer; uploading or generating media does not automatically approve rights, license text or offers.
@@ -86,6 +99,8 @@ Start with the source row's **Processing details** and the application's protect
 | `source_changed`, intake integrity mismatch or `unsafe_path` | Investigate storage changes or symlinks. Preserve the existing evidence and upload a new valid source; do not rewrite the recorded hash. |
 | `profile_changed` | The worker configuration changed after this run was queued. Reload consistent configuration and request processing to create/use the current profile. |
 | `tool_unavailable`, `processor_failed`, `processor_timeout` or `processor_output_limit` | Check executable availability, encoder support, source validity and resource usage. Correct the cause before retrying; review a profile/tool change as a new revision rather than weakening validation. |
+| `invalid_archive`, `unsafe_archive`, `unsupported_archive`, `archive_limit` or `invalid_wav` for stems | Inspect the source export and re-create a supported WAV-only ZIP. Preserve the rejected source; upload corrected bytes as a new revision. |
+| `zip_unavailable` or `archive_timeout` | Install PHP ZIP or investigate worker capacity and archive size. Lower source complexity or split the source export; do not raise hard safety ceilings to force acceptance. |
 | `track_published` | Unpublish the track and request processing again. |
 | `processing` after a worker crash | Confirm the old worker is stopped. A fresh request can reclaim the run after its 960-second lease expires; the queue connection retries an abandoned reservation after 1,200 seconds. Inspect failed jobs if the queue has exhausted attempts. |
 
@@ -104,7 +119,7 @@ Before production media acceptance, record:
 - A real ClamAV clean/detection/error exercise, maintained signature-update procedure and verification of scanner permissions/resource requirements. The code rejects an absent/unparseable, future-dated, or older-than-48-hours signature timestamp; actual detection and signature-update operations still require deployment evidence.
 - Isolated worker permissions/network policy, supported patched tool versions, full-duration seller catalog timings, available disk capacity, queue failure alerting, restart behavior and crash recovery.
 - Seller approval of the audible tag mix and real browser/device preview playback, seeking and waveform behavior.
-- Storage-provider privacy/retention/restore evidence, ZIP/stem safety where required, and resumable uploads if required by the seller's actual source files.
+- Storage-provider privacy/retention/restore evidence, real seller ZIP/stem export compatibility and recording association, and resumable uploads if required by the seller's actual source files.
 - Publication/rights/license evidence and the separate payment, contract, entitlement, migration and cutover gates.
 
 To roll back the increment, stop accepting new processing requests and drain or stop media workers while retaining original/private objects and evidence. Restore the reviewed application release only after checking its schema compatibility. Corrected derivatives should use a new profile/revision; never overwrite assets referenced by an offer or a future purchase.

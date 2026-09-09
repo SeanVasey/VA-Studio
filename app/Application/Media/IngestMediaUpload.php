@@ -18,7 +18,7 @@ use Throwable;
 
 final class IngestMediaUpload
 {
-    public const ROLES = ['master_wav' => 'WAV master', 'artwork' => 'Artwork (PNG or JPEG)'];
+    public const ROLES = ['master_wav' => 'WAV master', 'artwork' => 'Artwork (PNG or JPEG)', 'stems_zip' => 'Stems (WAV-only ZIP)'];
 
     public function handle(Track $track, mixed $upload, string $role, User $actor): MediaAsset
     {
@@ -33,14 +33,18 @@ final class IngestMediaUpload
         $size = $upload->getSize();
         $limit = $role === 'artwork' ? 20 * 1024 * 1024 : 200 * 1024 * 1024;
         if (! is_int($size) || $size < 1 || $size > $limit) {
-            throw ValidationException::withMessages(['upload' => $role === 'artwork' ? 'Artwork must be between 1 byte and 20 MiB.' : 'WAV masters must be between 1 byte and 200 MiB.']);
+            throw ValidationException::withMessages(['upload' => $role === 'artwork' ? 'Artwork must be between 1 byte and 20 MiB.' : 'WAV masters and stems ZIPs must be between 1 byte and 200 MiB.']);
         }
         $source = $upload->getRealPath();
         if (! is_string($source) || ! is_file($source) || is_link($upload->getPathname())) {
             throw ValidationException::withMessages(['upload' => 'The temporary upload is no longer available. Upload it again.']);
         }
         $mime = (new \finfo(FILEINFO_MIME_TYPE))->file($source);
-        $allowed = $role === 'artwork' ? ['image/png', 'image/jpeg'] : ['audio/wav', 'audio/x-wav', 'audio/vnd.wave', 'audio/wave'];
+        $allowed = match ($role) {
+            'artwork' => ['image/png', 'image/jpeg'],
+            'stems_zip' => ['application/zip', 'application/x-zip'],
+            default => ['audio/wav', 'audio/x-wav', 'audio/vnd.wave', 'audio/wave'],
+        };
         if (! in_array($mime, $allowed, true)) {
             throw ValidationException::withMessages(['upload' => 'File contents do not match the selected upload role.']);
         }
