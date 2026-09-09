@@ -1,0 +1,31 @@
+import { defineConfig, devices } from '@playwright/test';
+
+// The wrapper owns a fresh database and credentials. Never reuse a running developer/production server.
+if (!process.env.VASEY_BROWSER_DIRECTORY) throw new Error('Use npm run test:browser.');
+
+export default defineConfig({
+  testDir: './tests/browser',
+  testMatch: '**/*.spec.ts',
+  fullyParallel: false,
+  workers: 1,
+  retries: 0,
+  forbidOnly: !!process.env.CI,
+  timeout: 60_000,
+  expect: { timeout: 10_000 },
+  reporter: [['list'], ['html', { open: 'never' }]],
+  use: {
+    baseURL: 'http://127.0.0.1:8173',
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+  },
+  projects: [
+    { name: 'chromium-desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 1000 } } },
+    { name: 'webkit-mobile', use: { ...devices['iPhone 13'], browserName: 'webkit' } },
+  ],
+  webServer: {
+    command: 'php artisan serve --host=127.0.0.1 --port=8173 --no-reload',
+    url: 'http://127.0.0.1:8173/up',
+    reuseExistingServer: false,
+    timeout: 30_000,
+  },
+});

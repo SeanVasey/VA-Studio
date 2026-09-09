@@ -6,6 +6,7 @@ Bespoke web store development replacing older, service-based e-commerce offering
 
 ## Start here
 
+- [Operator setup and diagnostics](docs/operator-setup-and-verification.md): audited console provisioning, read-only installation checks and isolated browser verification.
 - [Agent instructions](AGENTS.md): shared rules for Astra, Codex, Claude, and other contributors.
 - [Architecture](docs/architecture/): domain boundaries, decision register, contracts, and roadmap.
 - [Development order](docs/development-order.md): current increment, earlier gaps, and the ordered handoff across all 14 packages.
@@ -55,10 +56,11 @@ php -r "file_exists('database/database.sqlite') || touch('database/database.sqli
 php artisan migrate
 php artisan vasey:create-admin
 npm run build
+php artisan vasey:doctor
 php artisan serve
 ```
 
-Open `http://localhost:8000` for the storefront and `http://localhost:8000/admin` for administration. The administrator command prompts for credentials; no password or preconfigured user ships with the project. The initial catalog is empty by design. WAV and PNG/JPEG uploads enter private quarantine. Configure the scanner, seller tag and media worker using [Media operations](docs/media-processing.md) before requesting processing in the admin panel. Without those prerequisites, uploads cannot become ready for publication. Production mode requires TOTP enrollment. License publication requires a separate authorized reviewer, an exact submission hash, a consistency attestation and an actual review reference. See [Licensing and offers](docs/licensing-and-offers.md) before publishing licenses or commercial revisions.
+Open `http://localhost:8000` for the storefront and `http://localhost:8000/admin` for administration. The administrator command prompts for credentials and records console provisioning in the audit trail; no password or preconfigured user ships with the project. The read-only doctor command identifies missing installation prerequisites and optional configuration without changing them. The initial catalog is empty by design. WAV and PNG/JPEG uploads enter private quarantine. Configure the scanner, seller tag and media worker using [Media operations](docs/media-processing.md) before requesting processing in the admin panel. Without those prerequisites, uploads cannot become ready for publication. Production mode requires TOTP enrollment. License publication requires a separate authorized reviewer, an exact submission hash, a consistency attestation and an actual review reference. See [Licensing and offers](docs/licensing-and-offers.md) before publishing licenses or commercial revisions.
 
 For frontend development, run `npm run dev` alongside `php artisan serve`. For the isolated composition preview, run `npm run preview:design`; that preview uses explicitly labeled fixtures and shares the production React components. It cannot publish, charge, or grant a license.
 
@@ -73,7 +75,7 @@ composer audit --no-dev
 npm audit --omit=dev --audit-level=high
 ```
 
-GitHub CI is configured to run the PHP suite against MySQL 8.4 and SQLite, plus frontend tests, build, and production dependency audits. A workflow file is not evidence that GitHub has run it. MySQL concurrency, real providers, mobile Safari playback, restore drills, and production deployment remain separate acceptance gates until recorded in the verification report.
+GitHub CI runs the PHP suite against MySQL 8.4 and SQLite, frontend tests/build and production dependency audits, plus an isolated operator browser job using Chromium and WebKit. See [browser verification](docs/operator-setup-and-verification.md#browser-verification) for commands, fixture isolation and evidence boundaries. A workflow file is not evidence that GitHub has run it. MySQL concurrency, real providers, mobile Safari playback, restore drills, and production deployment remain separate acceptance gates until recorded in the verification report.
 
 ## GitHub publication
 

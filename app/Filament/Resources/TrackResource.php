@@ -54,7 +54,16 @@ class TrackResource extends OperatorResource
                 $blockers = app(PublicationReadiness::class)->blockers($record);
                 Notification::make()->title($blockers === [] ? 'Ready to publish' : 'Publication blocked')->body(implode("\n", $blockers))->persistent()->send();
             }),
-            Action::make('publish')->visible(fn (Track $record) => $record->status !== 'published')->requiresConfirmation()->action(fn (Track $record) => app(PublishTrack::class)->handle($record, auth()->user())),
+            Action::make('publish')->visible(fn (Track $record) => $record->status !== 'published')->requiresConfirmation()->action(function (Track $record, Action $action) {
+                try {
+                    app(PublishTrack::class)->handle($record, auth()->user());
+                } catch (ValidationException $exception) {
+                    // A confirmation has no metadata form fields to display domain errors.
+                    Notification::make()->danger()->title('Publication blocked')
+                        ->body(implode(' ', array_merge(...array_values($exception->errors()))))->persistent()->send();
+                    $action->cancel();
+                }
+            }),
             Action::make('share')->visible(fn (Track $record) => $record->status === 'published')->url(fn (Track $record) => route('tracks.show', $record->slug))->openUrlInNewTab(),
             Action::make('unpublish')->visible(fn (Track $record) => $record->status === 'published')->requiresConfirmation()->action(fn (Track $record) => app(PublishTrack::class)->unpublish($record, auth()->user())),
         ]);
