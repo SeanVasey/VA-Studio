@@ -67,16 +67,15 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
   await dialog.getByRole('button', { name: 'Create', exact: true }).click();
   await expect(dialog.getByRole('heading')).not.toBeVisible();
   await expect(row(page, title)).toBeVisible();
-  // UI assertions establish success; this barrier lets deferred modal cleanup finish before navigation.
-  await page.waitForLoadState('networkidle');
-  await page.reload();
-  await expect(row(page, title)).toBeVisible();
-  expect((await page.request.get(`/tracks/${slug}`)).status()).toBe(404);
-
-  // Two real tabs load one revision. The second save must remain visible and preserve the winner.
+  // A new document verifies persistence through a fresh server read, with no retained component state.
   const second = await context.newPage();
   watch(second);
   await second.goto('/admin/tracks');
+  await expect(row(second, title)).toBeVisible();
+  expect((await page.request.get(`/tracks/${slug}`)).status()).toBe(404);
+
+  // Two real tabs load one revision. The second save must remain visible and preserve the winner.
+  await page.bringToFront();
   await row(page, fixture.editable.title).getByRole('button', { name: 'Edit', exact: true }).click();
   await row(second, fixture.editable.title).getByRole('button', { name: 'Edit', exact: true }).click();
   dialog = page.getByRole('dialog');
@@ -92,16 +91,18 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
   await secondDialog.getByText(/changed since you opened it/).scrollIntoViewIfNeeded();
   await expect(secondDialog.getByText(/changed since you opened it/)).toBeInViewport();
   await second.screenshot({ path: testInfo.outputPath('stale-edit.png'), fullPage: false });
-  // Cancel animates locally before its unmount request settles. A reload must not abort that request.
+  // Cancel animates locally before its unmount request settles. Wait for the server acknowledgement.
   const cancelResponse = second.waitForResponse(response => response.url().endsWith('/update') && response.request().method() === 'POST');
   await secondDialog.getByRole('button', { name: 'Cancel', exact: true }).click();
   const cancelled = await cancelResponse;
   expect(cancelled.status()).toBe(200);
   await cancelled.finished();
   await expect(secondDialog.getByRole('heading')).not.toBeVisible();
-  await second.reload();
-  await expect(row(second, winner)).toBeVisible();
-  await second.close();
+  const recovered = await context.newPage();
+  watch(recovered);
+  await recovered.goto('/admin/tracks');
+  await expect(row(recovered, winner)).toBeVisible();
+  await page.bringToFront();
 
   const editRetained = row(page, fixture.retained.title).getByRole('button', { name: 'Edit', exact: true });
   await editRetained.focus();
