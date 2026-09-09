@@ -43,7 +43,8 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
   await launch.focus();
   await launch.press('Enter');
   let dialog = page.getByRole('dialog');
-  await expect(dialog).toBeVisible();
+  // Filament's dialog wrapper has no box; assert its rendered content instead.
+  await expect(dialog.getByRole('heading')).toBeVisible();
   await expect(dialog.locator(':focus')).toHaveCount(1);
   const title = `Synthetic browser creation ${testInfo.project.name}`;
   const slug = `browser-creation-${testInfo.project.name}`;
@@ -55,7 +56,7 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
   await page.screenshot({ path: testInfo.outputPath('create-validation.png'), fullPage: true });
   await dialog.getByLabel('Slug', { exact: false }).fill(slug);
   await dialog.getByRole('button', { name: 'Create', exact: true }).click();
-  await expect(dialog).not.toBeVisible();
+  await expect(dialog.getByRole('heading')).not.toBeVisible();
   await expect(row(page, title)).toBeVisible();
   await page.reload();
   await expect(row(page, title)).toBeVisible();
@@ -72,7 +73,7 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
   const winner = `Synthetic winning edit ${testInfo.project.name}`;
   await dialog.getByLabel('Title', { exact: false }).fill(winner);
   await dialog.getByRole('button', { name: 'Save changes', exact: true }).click();
-  await expect(dialog).not.toBeVisible();
+  await expect(dialog.getByRole('heading')).not.toBeVisible();
   await secondDialog.getByLabel('Title', { exact: false }).fill('Synthetic losing edit');
   await secondDialog.getByRole('button', { name: 'Save changes', exact: true }).click();
   await expect(secondDialog.getByText(/changed since you opened it/)).toBeVisible();
@@ -91,7 +92,7 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
   await expect(dialog.getByText('This URL stays reserved, including after unpublishing.')).toBeVisible();
   await dialog.getByRole('button', { name: 'Cancel', exact: true }).focus();
   await dialog.getByRole('button', { name: 'Cancel', exact: true }).press('Enter');
-  await expect(dialog).not.toBeVisible();
+  await expect(dialog.getByRole('heading')).not.toBeVisible();
   await expect(editRetained).toBeFocused();
 
   await row(page, title).getByRole('button', { name: 'Publish', exact: true }).click();
