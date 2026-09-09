@@ -105,7 +105,7 @@ it('submits server filters and preserves cursor/query state on page and track na
 
 it('keeps empty-result feedback tied to the submitted filters while the search field is edited', async () => {
   const user = userEvent.setup();
-  render(<Storefront tracks={[]} licenseTiers={[]} catalogPage={{ ...page, filters: { ...page.filters, q: 'missing recording' } }} />);
+  render(<Storefront tracks={[]} licenseTiers={[]} catalogPage={{ ...page, nextUrl: null, filters: { ...page.filters, q: 'missing recording' } }} />);
   await user.clear(screen.getByRole('searchbox'));
   expect(screen.getByRole('heading', { name: 'NO MATCHES. KEEP EXPLORING.' })).toBeInTheDocument();
   expect(screen.queryByRole('heading', { name: 'A NEW CHAPTER IN SOUND.' })).not.toBeInTheDocument();
