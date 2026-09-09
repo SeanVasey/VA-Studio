@@ -25,7 +25,7 @@ class StorefrontMetadataTest extends TestCase
         config(['app.url' => 'https://audio.example.test', 'app.debug' => false]);
     }
 
-    private function head(TestResponse $response): DOMXPath
+    private function parsedHead(TestResponse $response): DOMXPath
     {
         $dom = new DOMDocument;
         $previous = libxml_use_internal_errors(true);
@@ -41,7 +41,7 @@ class StorefrontMetadataTest extends TestCase
 
     private function assertMetadata(TestResponse $response, array $metadata): void
     {
-        $head = $this->head($response);
+        $head = $this->parsedHead($response);
         $this->assertSame($metadata['title'], $head->evaluate('string(//head/title)'));
         $this->assertSame($metadata['canonicalUrl'], $head->evaluate('string(//head/link[@rel="canonical"]/@href)'));
         foreach ([
@@ -101,7 +101,7 @@ class StorefrontMetadataTest extends TestCase
         $selection = QuoteFixtures::selection();
         $path = '/tracks/'.$selection['track']->slug;
         $response = $this->get('https://untrusted.example'.$path.'?url=https://untrusted.example&token=tracking-only')->assertOk();
-        $head = $this->head($response);
+        $head = $this->parsedHead($response);
         $this->assertSame('https://audio.example.test'.$path, $head->evaluate('string(//head/link[@rel="canonical"]/@href)'));
         $this->assertSame('https://audio.example.test'.$path, $head->evaluate('string(//head/meta[@property="og:url"]/@content)'));
         $this->assertSame('https://audio.example.test/media/'.$selection['media']['artwork']->id, $head->evaluate('string(//head/meta[@property="og:image"]/@content)'));
@@ -115,7 +115,7 @@ class StorefrontMetadataTest extends TestCase
         $html = $this->get($path)->assertOk();
         $metadata = $this->get($path, ['X-Inertia' => 'true'])->assertOk()->json('props.metadata');
         $this->assertMetadata($html, $metadata);
-        $head = $this->head($html);
+        $head = $this->parsedHead($html);
         $this->assertCount(0, $head->query('//head/meta[@name="injected"] | //head/script | //head/*[@onload]'));
         $this->assertStringContainsString('Écho & "Keys"', $metadata['title']);
         $this->assertLessThanOrEqual(200, mb_strlen($metadata['description']));
