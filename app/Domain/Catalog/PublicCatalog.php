@@ -26,6 +26,7 @@ final class PublicCatalog
             'cursor' => ['nullable', 'string', 'max:4096'],
         ])->validate();
         $filters = ['q' => trim($input['q'] ?? ''), 'genre' => trim($input['genre'] ?? ''), 'sort' => $input['sort'] ?? 'featured'];
+        $path = $request->routeIs('catalog.index') ? '/api/catalog' : '/';
         $cursor = $this->decodeCursor($input['cursor'] ?? null, $filters);
         $query = $this->query();
         foreach (preg_split('/\s+/u', mb_strtolower($filters['q']), -1, PREG_SPLIT_NO_EMPTY) as $term) {
@@ -83,7 +84,7 @@ final class PublicCatalog
             $eligible = $eligible->reverse()->values();
             $scanned = $scanned->reverse()->values();
         }
-        $link = function (?Track $track, bool $next) use ($filters, $orders): ?string {
+        $link = function (?Track $track, bool $next) use ($filters, $orders, $path): ?string {
             if (! $track) {
                 return null;
             }
@@ -93,7 +94,7 @@ final class PublicCatalog
             }
             $token = Crypt::encryptString(json_encode(['version' => 1, 'filters' => $filters, 'position' => (new Cursor($parameters, $next))->encode()], JSON_THROW_ON_ERROR));
 
-            return '/?'.http_build_query($filters + ['cursor' => $token]);
+            return $path.'?'.http_build_query($filters + ['cursor' => $token]);
         };
 
         return $this->project($eligible) + [
@@ -101,8 +102,8 @@ final class PublicCatalog
                 'filters' => $filters,
                 'previousUrl' => ($backwards ? $more : $cursor !== null) ? $link($scanned->first(), false) : null,
                 'nextUrl' => ($backwards ? $cursor !== null : $more) ? $link($scanned->last(), true) : null,
-                'restartUrl' => '/?'.http_build_query($filters),
-                'currentUrl' => '/?'.http_build_query($filters + (isset($input['cursor']) ? ['cursor' => $input['cursor']] : [])),
+                'restartUrl' => $path.'?'.http_build_query($filters),
+                'currentUrl' => $path.'?'.http_build_query($filters + (isset($input['cursor']) ? ['cursor' => $input['cursor']] : [])),
                 'hasCursor' => $cursor !== null,
             ],
         ];

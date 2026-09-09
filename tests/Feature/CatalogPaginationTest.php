@@ -25,7 +25,9 @@ class CatalogPaginationTest extends TestCase
 
     private function api(string $url): string
     {
-        return str_replace('/?', '/api/catalog?', $url);
+        $this->assertStringStartsWith('/api/catalog?', $url);
+
+        return $url;
     }
 
     public function test_pages_round_trip_without_duplicates_and_direct_links_resolve_off_page(): void
