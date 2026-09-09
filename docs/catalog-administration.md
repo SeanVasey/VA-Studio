@@ -1,6 +1,6 @@
 # Catalog metadata and published URLs
 
-WP-02 increment, 2026-09-09. The PR records executed checks against the actual candidate; this document describes implemented behavior and retained acceptance gates.
+WP-02 increment, 2026-09-09. [PR #28](https://github.com/VASEYDEV/VASEYAUDIO/pull/28) records executed checks against the actual candidate; this document describes implemented behavior and retained acceptance gates.
 
 ## Operator workflow
 
@@ -16,7 +16,7 @@ A slug remains editable until the track is first published. After that, its URL 
 
 Track persistence and `catalog.track.created` / `catalog.track.metadata_updated` audit insertion share one transaction. Context includes schema version, new metadata revision, changed field names, canonicalization version and before/after hashes. The audit stores the explicit actor, subject and timestamp through the existing audit model; it does not copy draft descriptions into event context. These hashes detect differences; they are not a recoverable copy of earlier metadata. Published commercial/quote evidence retains its separate immutable snapshots.
 
-Filament create/edit actions invoke this command, including direct submitted actions. New import/editor integrations must use it. Media-derived measurements and publish/unpublish remain separate commands. Metadata revision/audit coverage is for the supported command path; arbitrary privileged SQL is not a supported metadata editor. Database URL constraints independently cover bulk writes. Fine-grained RBAC, broader audit storage hardening and production MFA/recovery remain tracked acceptance work.
+Filament create/edit actions invoke this command, including direct submitted actions. The resource adapter maps relative validation errors into the actual mounted form path so conflicts and readiness failures render beside the visible field. New import/editor integrations must use it. Media-derived measurements and publish/unpublish remain separate commands. Metadata revision/audit coverage is for the supported command path; arbitrary privileged SQL is not a supported metadata editor. Database URL constraints independently cover bulk writes. Fine-grained RBAC, broader audit storage hardening and production MFA/recovery remain tracked acceptance work.
 
 ## Migration and recovery
 

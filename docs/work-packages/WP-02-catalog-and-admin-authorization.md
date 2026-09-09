@@ -1,6 +1,6 @@
 # [WP-02] Persistent catalog administration and publication readiness
 
-Status: **Current increment implements audited metadata commands, stale-form protection, permanent published URLs and direct-action tests. CI verification is pending; real-browser acceptance and independent review remain open.** See [ordered development status](../development-order.md).
+Status: **Current increment implements audited metadata commands, stale-form protection, permanent published URLs and direct-action tests. Implemented in PR #28; exact-head CI outcomes are recorded there. Real-browser acceptance and independent review remain open.** See [ordered development status](../development-order.md).
 
 - Suggested issue title: `[WP-02] Persistent catalog administration and publication readiness`
 - Phase: 0
@@ -53,3 +53,9 @@ Read [architecture index](../architecture/README.md), [decision register](../arc
 Targeted tests cover actual Filament create/edit/error actions, changed request actors, direct command denials, stale forms, malformed/extra fields, readiness rollback, public/draft privacy, historical migration and raw SQL URL attacks. The MySQL test requires independent processes and an observed wait on the exact track row; it intentionally skips on SQLite. Definitions are not test results: the PR must record completed CI evidence at its actual head.
 
 Next acceptance work: WP-01 clean boot/operator diagnostics and WP-02 real-browser save/error flows, followed by remaining WP-03 media and WP-04 rights dependencies. Fine-grained roles and production MFA/recovery remain explicit gates; the current gate is verified `is_admin` staff. No work package is closed by this increment.
+
+### Verification record
+
+[PR #28](https://github.com/VASEYDEV/VASEYAUDIO/pull/28) records the tested source SHA/tree and completed results for `php artisan test` on MySQL 8.4 and SQLite, `npm test`, `npm run build`, `composer validate --strict`, `composer audit --no-dev` and `npm audit --omit=dev --audit-level=high`. Local `git diff --check` passed; PHP/Composer and frontend dependencies were unavailable locally.
+
+The first candidate (`2c5279faa291443d3bec97e101fa51266fde1b74`) passed 205 MySQL tests, including the observed lock race, and failed two admin assertions: relative command errors did not render under Filament's mounted form path. The correction maps domain validation keys to the actual schema path; the assertions remain intact. This first run is diagnostic evidence, not final acceptance. Consult the PR's final verification table for the completed candidate and remaining review/browser gates.
