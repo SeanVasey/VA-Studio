@@ -8,8 +8,8 @@ const password = process.env.VASEY_BROWSER_PASSWORD!;
 
 async function login(page: Page, email: string) {
   await page.goto('/admin/login');
-  await page.getByLabel('Email address', { exact: true }).fill(email);
-  await page.getByLabel('Password', { exact: true }).fill(password);
+  await page.getByLabel(/^Email address\s*\*?$/).fill(email);
+  await page.getByLabel(/^Password\s*\*?$/).fill(password);
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
 }
 
@@ -20,7 +20,9 @@ function row(page: Page, title: string) {
 test('guest/customer denial and real CSRF protection', async ({ page }) => {
   await page.goto('/admin/tracks');
   await expect(page).toHaveURL(/\/admin\/login$/);
-  const csrf = await page.request.post('/livewire/update', { data: { components: [] } });
+  const updateUri = await page.locator('script[data-update-uri]').getAttribute('data-update-uri');
+  expect(updateUri).toBeTruthy();
+  const csrf = await page.request.post(updateUri!, { data: { components: [] } });
   expect(csrf.status()).toBe(419);
   await login(page, 'browser-customer@example.test');
   await expect(page.getByText('These credentials do not match our records.')).toBeVisible();
@@ -45,13 +47,13 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
   await expect(dialog.locator(':focus')).toHaveCount(1);
   const title = `Synthetic browser creation ${testInfo.project.name}`;
   const slug = `browser-creation-${testInfo.project.name}`;
-  await dialog.getByLabel('Title', { exact: true }).fill(title);
-  await dialog.getByLabel('Slug', { exact: true }).fill(fixture.retained.slug);
+  await dialog.getByLabel(/^Title\s*\*?$/).fill(title);
+  await dialog.getByLabel(/^Slug\s*\*?$/).fill(fixture.retained.slug);
   await dialog.getByRole('button', { name: 'Create', exact: true }).click();
   await expect(dialog.getByText(/slug has already been taken/i)).toBeVisible();
-  await expect(dialog.getByLabel('Title', { exact: true })).toHaveValue(title);
+  await expect(dialog.getByLabel(/^Title\s*\*?$/)).toHaveValue(title);
   await page.screenshot({ path: testInfo.outputPath('create-validation.png'), fullPage: true });
-  await dialog.getByLabel('Slug', { exact: true }).fill(slug);
+  await dialog.getByLabel(/^Slug\s*\*?$/).fill(slug);
   await dialog.getByRole('button', { name: 'Create', exact: true }).click();
   await expect(dialog).not.toBeVisible();
   await expect(row(page, title)).toBeVisible();
@@ -68,13 +70,13 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
   dialog = page.getByRole('dialog');
   const secondDialog = second.getByRole('dialog');
   const winner = `Synthetic winning edit ${testInfo.project.name}`;
-  await dialog.getByLabel('Title', { exact: true }).fill(winner);
+  await dialog.getByLabel(/^Title\s*\*?$/).fill(winner);
   await dialog.getByRole('button', { name: 'Save changes', exact: true }).click();
   await expect(dialog).not.toBeVisible();
-  await secondDialog.getByLabel('Title', { exact: true }).fill('Synthetic losing edit');
+  await secondDialog.getByLabel(/^Title\s*\*?$/).fill('Synthetic losing edit');
   await secondDialog.getByRole('button', { name: 'Save changes', exact: true }).click();
   await expect(secondDialog.getByText(/changed since you opened it/)).toBeVisible();
-  await expect(secondDialog.getByLabel('Title', { exact: true })).toHaveValue('Synthetic losing edit');
+  await expect(secondDialog.getByLabel(/^Title\s*\*?$/)).toHaveValue('Synthetic losing edit');
   await second.screenshot({ path: testInfo.outputPath('stale-edit.png'), fullPage: true });
   await secondDialog.getByRole('button', { name: 'Cancel', exact: true }).click();
   await second.reload();
@@ -85,7 +87,7 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
   await editRetained.focus();
   await editRetained.press('Enter');
   dialog = page.getByRole('dialog');
-  await expect(dialog.getByLabel('Slug', { exact: true })).toBeDisabled();
+  await expect(dialog.getByLabel(/^Slug\s*\*?$/)).toBeDisabled();
   await expect(dialog.getByText('This URL stays reserved, including after unpublishing.')).toBeVisible();
   await dialog.getByRole('button', { name: 'Cancel', exact: true }).focus();
   await dialog.getByRole('button', { name: 'Cancel', exact: true }).press('Enter');

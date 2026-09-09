@@ -49,7 +49,8 @@ class InstallationReportTest extends TestCase
         LicenseFixtures::admin();
         $key = config('app.key');
         DB::enableQueryLog();
-        $this->assertSame(0, Artisan::call('vasey:doctor', ['--json' => true]));
+        $exit = Artisan::call('vasey:doctor', ['--json' => true]);
+        $this->assertSame(0, $exit, Artisan::output());
         $report = json_decode(Artisan::output(), true, 32, JSON_THROW_ON_ERROR);
         $queries = DB::getQueryLog();
         DB::disableQueryLog();
