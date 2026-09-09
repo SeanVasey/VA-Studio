@@ -1,6 +1,6 @@
 # [WP-05] Branded catalog, track detail and persistent preview player
 
-Status: **Planned work package**. Inspect the current implementation before starting; initial foundation code may already cover part of this scope. This issue is complete only when the acceptance evidence below exists.
+Status: **Storefront foundation and public-sharing metadata increment implemented; broader work package remains open.** The current catalog/player and sharing routes do not establish complete discovery, pagination or device playback acceptance.
 
 - Suggested issue title: `[WP-05] Branded catalog, track detail and persistent preview player`
 - Phase: 1
@@ -30,6 +30,12 @@ Catalog-to-track-detail navigation with one persistent player, real derivative p
 - [ ] Waveform/controls correspond to the actual preview; absent media never produces fake playback.
 - [ ] License comparison reflects structured version data; purchasing UI respects server readiness and checkout availability.
 - [ ] Desktop/mobile browser review shows no overflow, illegible contrast, cut-off logo, unreachable player or keyboard trap.
+
+## Current sharing increment — 2026-09-09
+
+Home and eligible track URLs include server-rendered title, description, canonical URL, Open Graph and image-card metadata, with verified public artwork and image alternatives. Inertia replaces the same keyed tags across track navigation and return home. Metadata is generated after existing publication-readiness checks; private evidence is excluded. Non-production pages request no indexing. See [Public track sharing](../track-sharing.md) for the contract, source references, tests and operational limits.
+
+This adds no payable quote, order, payment, grant, standalone track-detail layout or pagination. Current full-catalog queries and mobile playback/visual acceptance remain follow-ups. The implementing PR records actual CI results against its head; test definitions alone are not acceptance evidence.
 
 ## Verification
 

@@ -15,12 +15,13 @@ Bespoke web store development replacing older, service-based e-commerce offering
 - [Media operations](docs/media-processing.md): worker prerequisites, approved preview tag, processing and recovery.
 - [Licensing and offers](docs/licensing-and-offers.md): review submission, successor versions, published prices/files and legacy upgrade steps.
 - [Provisional selection reviews](docs/provisional-quotes.md): server snapshots, session ownership, retries, expiry and the boundary before payable checkout.
+- [Public track sharing](docs/track-sharing.md): canonical URLs, server-rendered social metadata, Inertia navigation and publication privacy.
 
 ## Foundation scope
 
 | Surface | Initial implementation | Remaining delivery |
 | --- | --- | --- |
-| Storefront | Responsive catalog, filtering, license comparison, local cart, shared track links, persistent audio transport | Production catalog import, deeper discovery, collections and product-specific routes |
+| Storefront | Responsive catalog, filtering, license comparison, local cart, shared track links with server-rendered social metadata, persistent audio transport | Production catalog import, server pagination, dedicated track detail, collections and device acceptance |
 | Admin | Authenticated Filament catalog and licensing management | Detailed RBAC, recovery verification, site editing, customers and fulfillment operations |
 | Media | Private WAV/artwork intake, queued verification, immutable master/MP3 revisions, tagged previews, measured waveforms and admin retry controls | Production scanner acceptance, worker isolation, stems/archives, resumable uploads and managed object storage |
 | Licensing | Exact submitted review payloads, independent approval evidence, source/summary preview, successor diffs and effective dates | Approved production terms, a complete typed rights schema, buyer contracts and archival PDF rendering |
