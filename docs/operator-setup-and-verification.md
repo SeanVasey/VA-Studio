@@ -1,6 +1,6 @@
 # Operator setup and installation verification
 
-WP-01/WP-02 increment, 2026-09-09. Run these commands from a trusted console on the installation you intend to administer. Use the [README prerequisites and fresh-install steps](../README.md#run-locally); do not regenerate an existing installation's encryption key.
+WP-01/WP-02 increment in [PR #29](https://github.com/VASEYDEV/VASEYAUDIO/pull/29), 2026-09-09. Run these commands from a trusted console on the installation you intend to administer. Use the [README prerequisites and fresh-install steps](../README.md#run-locally); do not regenerate an existing installation's encryption key.
 
 ## Provision an operator
 
@@ -44,6 +44,8 @@ npm run test:browser
 ```
 
 The locked Playwright 1.63.0 suite runs desktop Chromium and WebKit with an iPhone-sized viewport. Each project checks guest/customer denial, a rejected tokenless Livewire request, actual operator sign-in, persistent draft creation, visible uniqueness errors, keyboard modal focus, two-tab stale-edit rejection/recovery, a disabled retained-URL field, and named publication blockers. It captures screenshots of validation, stale-edit and publication-blocker states. These are automated rendered browser checks; WebKit emulation is not a physical iPhone/Safari or VoiceOver acceptance claim.
+
+Metadata create/edit modals initially focus their window, then Tab reaches the first field. A transition-end fallback recovers focus if WebKit rejected the initial attempt while the window was opening; it does not move focus away from a field already in use. The stale-edit browser flow waits for the cancellation response before reloading, so the normal recovery check does not abort its own pending request.
 
 The Node wrapper creates a new private temporary directory, empty SQLite database, per-run encryption key and random credentials. A guarded CLI fixture builder verifies that exact empty database and temporary directory before running fresh migrations and the real interactive operator command through Symfony's command tester. It then creates synthetic draft fixtures. A retained draft URL represents synthetic history only; no media, rights, scanner evidence or purchase is invented.
 

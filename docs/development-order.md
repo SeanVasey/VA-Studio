@@ -4,7 +4,7 @@ Reconciled 2026-09-09 against `main` at `8e26b0c1d7c18c24f14163cd3d8967139c61c01
 
 ## Current increment and next handoff
 
-PR #27 catalog pagination and [PR #28 metadata/URL protection](https://github.com/VASEYDEV/VASEYAUDIO/pull/28) are merged. The current bounded WP-01/WP-02 increment adds audited interactive operator provisioning, a read-only installation report and real HTTP/browser checks for the admin metadata workflows. See [operator setup and verification](operator-setup-and-verification.md) for its scope and exact evidence boundaries.
+PR #27 catalog pagination and [PR #28 metadata/URL protection](https://github.com/VASEYDEV/VASEYAUDIO/pull/28) are merged. The current bounded [WP-01/WP-02 increment in PR #29](https://github.com/VASEYDEV/VASEYAUDIO/pull/29) adds audited interactive operator provisioning, a read-only installation report and real HTTP/browser checks for the admin metadata workflows. See [operator setup and verification](operator-setup-and-verification.md) for its scope and exact evidence boundaries.
 
 After this increment is verified and accepted, continue WP-03 with safe stems/ZIP intake and archive rejection fixtures, then remaining WP-04 typed rights and WP-05 dedicated detail/device work. Keep independent authorization review, production MFA/recovery, physical-device accessibility and full media-to-publication browser acceptance visible. External production evidence does not block unrelated reversible implementation.
 
