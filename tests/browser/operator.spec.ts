@@ -9,7 +9,7 @@ const password = process.env.VASEY_BROWSER_PASSWORD!;
 async function login(page: Page, email: string) {
   await page.goto('/admin/login');
   await page.getByLabel('Email address', { exact: false }).fill(email);
-  await page.getByLabel('Password', { exact: false }).fill(password);
+  await page.getByLabel('Password', { exact: false }).and(page.locator('input[type="password"]')).fill(password);
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
 }
 
