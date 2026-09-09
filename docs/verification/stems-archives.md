@@ -15,7 +15,9 @@ Scope: bounded WAV-only ZIP ingestion on top of merged PR #29 (`b2da258a7689c5d5
 
 Run `php artisan test` against MySQL 8.4 and `DB_CONNECTION=sqlite DB_DATABASE=:memory: php artisan test`, plus the existing frontend/build/audit and operator-browser CI gates. The PHP ZIP extension and real FFmpeg binaries are installed by the existing CI job. No workflow or dependency lockfile change is required.
 
-PHP and Composer are unavailable in the editing workspace. The integrating PR records the actual tested remote commit, CI run links, counts and any failures/corrections; this document does not claim an unexecuted test passed. Review the final PR verification table before acceptance.
+PHP and Composer are unavailable in the editing workspace. [PR #30](https://github.com/VASEYDEV/VASEYAUDIO/pull/30) records the actual tested remote commit, CI run links, counts and any failures/corrections; this document does not claim an unexecuted test passed. Review the final PR verification table before acceptance.
+
+Initial CI at `ee23d19be7d91093f37cfd43be237f2f5fc6129f` passed 242 MySQL tests with one test-fixture failure: the simulated published track omitted its mandatory permanent slug. The corrected fixture supplies that reservation; the production URL trigger is preserved. Both initial frontend jobs and Chromium/WebKit operator jobs passed. Local `npm test -- --maxWorkers=1` passed all 39 tests and `npm run build` passed after the default parallel run hit one existing 5-second storefront timeout. CI keeps the default test settings. Final backend outcomes and candidate identity are recorded in PR #30.
 
 Fixtures are generated at runtime and contain synthetic tones only. The scanner is an explicit testing-only double. Tests do not establish real ClamAV detection, physical-device upload behavior, full seller-catalog processing, actual stems alignment, production resource isolation, crash recovery, object-store privacy or launch readiness. Independent security/media review remains required; self-review is not independent review.
 

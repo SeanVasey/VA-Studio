@@ -4,7 +4,7 @@ Reconciled 2026-09-09 against `main` at `b2da258a7689c5d5783f92cff29d2772a450b7f
 
 ## Current increment and next handoff
 
-PRs #27–#29 are merged. PR #29 delivered the bounded operator setup/diagnostic/browser increment; its independent-review and WebKit abrupt-reload QA boundaries remain documented. Current development has returned to **WP-03: private WAV-stems ZIP ingestion and archive rejection fixtures**. See [stems archive verification](verification/stems-archives.md).
+PRs #27–#29 are merged. PR #29 delivered the bounded operator setup/diagnostic/browser increment; its independent-review and WebKit abrupt-reload QA boundaries remain documented. Current development has returned to **WP-03: private WAV-stems ZIP ingestion and archive rejection fixtures** in [PR #30](https://github.com/VASEYDEV/VASEYAUDIO/pull/30). See [stems archive verification](verification/stems-archives.md).
 
 After this archive increment is verified and accepted, complete the next WP-03 increment: audited stems-to-recording association and offer snapshot integration. Then continue WP-04 typed rights and WP-05 dedicated detail/device work. Keep resumable/object-store work and real scanner/worker/recovery acceptance visible; provider evidence does not block unrelated reversible work. Retain granular roles, production MFA/recovery, physical-device accessibility and full media-to-publication browser acceptance.
 

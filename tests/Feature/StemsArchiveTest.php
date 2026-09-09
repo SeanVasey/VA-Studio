@@ -247,7 +247,7 @@ class StemsArchiveTest extends TestCase
         } catch (MediaFailure $failure) {
             $this->assertSame('source_changed', $failure->failureCode);
         }
-        DB::table('tracks')->where('id', $this->track->id)->update(['status' => 'published']);
+        DB::table('tracks')->where('id', $this->track->id)->update(['status' => 'published', 'published_slug' => $this->track->slug]);
         $this->expectException(ValidationException::class);
         app(QueueMediaProcessing::class)->handle($this->source(), $this->actor);
     }

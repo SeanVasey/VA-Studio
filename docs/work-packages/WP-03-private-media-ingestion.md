@@ -1,6 +1,6 @@
 # [WP-03] Private media ingestion, quarantine and preview processing
 
-Status: **WAV/artwork implemented in PR #21; private stems archive increment in development; broader work package remains open.** The implementation below is a bounded local-storage pipeline. This issue is complete only when the acceptance evidence and remaining production work below exist.
+Status: **WAV/artwork implemented in PR #21; private stems archive increment in [PR #30](https://github.com/VASEYDEV/VASEYAUDIO/pull/30); broader work package remains open.** The implementation below is a bounded local-storage pipeline. This issue is complete only when the acceptance evidence and remaining production work below exist.
 
 - Suggested issue title: `[WP-03] Private media ingestion, quarantine and preview processing`
 - Phase: 1
