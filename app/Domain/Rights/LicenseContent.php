@@ -19,6 +19,9 @@ final class LicenseContent
             throw ValidationException::withMessages(['structured_terms' => 'Structured terms must be an object.']);
         }
         $terms = app(LicenseTerms::class)->validate($content['structured_terms']);
+        if ($terms['schema_version'] === 2) {
+            app(LicenseSourceVariables::class)->render($source, $terms);
+        }
         $dates = Validator::make($content, ['effective_from' => ['nullable', 'date'], 'effective_until' => ['nullable', 'date']])->validate();
         $from = $this->date($dates['effective_from'] ?? null);
         $until = $this->date($dates['effective_until'] ?? null);

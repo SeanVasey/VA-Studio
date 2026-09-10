@@ -15,6 +15,6 @@ class ManageLicenseVersions extends ManageRecords
 
     protected function getHeaderActions(): array
     {
-        return [CreateAction::make()->using(fn (array $data) => app(CreateLicenseDraft::class)->handle(LicenseTemplate::findOrFail($data['license_template_id']), Arr::only($data, ['authored_source', 'structured_terms', 'effective_from', 'effective_until']), auth()->user()))];
+        return [CreateAction::make()->using(fn (array $data, $livewire) => LicenseVersionResource::withFormErrors(fn () => app(CreateLicenseDraft::class)->handle(LicenseTemplate::findOrFail($data['license_template_id']), Arr::only($data, ['authored_source', 'structured_terms', 'effective_from', 'effective_until']), auth()->user()), $livewire))];
     }
 }

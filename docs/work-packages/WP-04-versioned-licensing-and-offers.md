@@ -33,10 +33,18 @@ Template/version lifecycle, normalized terms schema and product-license offer wi
 
 See [Licensing and offers](../licensing-and-offers.md) for the operator workflow and upgrade sequence. Schema version 1 validates feature-summary strings and required delivery roles; it does not interpret legal prose, resolve contract variables or mechanically prove that summaries agree with the source.
 
+## Typed usage terms increment — 2026-09-10
+
+Schema v2 requires explicit prohibited/limited/unlimited choices for seven usage categories, four permitted/prohibited choices, a producer-credit decision and exact deliverable roles. It accepts no independently authored feature list. The domain generates summaries and the same allowlisted source-variable values; missing, unknown or malformed variables and contradictory/invalid limits block content validation and review submission. The v2 review preview shows retained source, substituted text, generated cards and a variable comparison table. Human review still assesses surrounding prose and actual policy.
+
+New admin drafts use these typed fields. **Define usage rights** deliberately maps a v1 version into a linked typed successor without inferred caps; **New revision** retains its predecessor's schema. Existing v1 validators, literal preview bytes, review hashes and frozen offers/quotes remain valid. A forward migration replaces only the lifecycle state guard, allowing the exact v1/v1 and v2/v2 schema/renderer pairs while preserving all content/evidence protections. It installs the successor guard before removing the old guard and changes no stored rows.
+
+See [typed licensing verification](../verification/typed-licensing.md) and [operator/schema guide](../typed-license-terms.md). The integrating PR records actual CI outcomes; this is a bounded usage-policy model, not a complete license or executed buyer contract.
+
 ## Remaining work within WP-04
 
 - Actual seller-approved production source, reviewed license matrix, reviewer evidence and rights policy under U-05.
-- Complete typed rights/caps/variables schema and representative rendered-contract consistency tests. Human summary attestation remains necessary in this increment.
+- Remaining typed fields for territory, license duration, ownership/publishing/royalties and versioned policy references; representative policy/contract consistency fixtures. The current usage/permission/credit variables are bounded and still require human source-consistency review.
 - Buyer-specific deterministic contract rendering, PDF/archive format and reproducibility acceptance under U-06/WP-08.
 - Quote/order snapshot integration under WP-06/WP-07, shared exclusive inventory and reservation policy; current publication is limited to positive USD non-exclusive offers.
 - Historical source-contract reconciliation and continuity evidence. Existing records are retained; no replacement approval or executed contract is inferred from a migration.
@@ -55,7 +63,7 @@ See the [verification record](../verification/licensing-and-offers.md) for exact
 
 ## Rollback and boundaries
 
-Disable a new offer/version without altering prior records. Supersede terms with a new version; preserve every referenced version.
+Retain the v2-aware application validator/renderer and database guard wherever v2 versions are retained. Reverting to v1-only code makes v2 licenses unavailable; do not rewrite them to fit v1. The migration down restores the prior transition guard for disposable/verified-compatible environments only and does not erase records. Disable a new offer/version without altering prior records. Supersede terms with a new version; preserve every referenced version.
 
 Do not add secrets, private masters, unredacted orders, customer PII or real contract documents to this issue/PR. Do not change an external provider, charge a customer, publish marketing or alter the live domain unless that action is within the recorded authorization and applicable readiness gates.
 
