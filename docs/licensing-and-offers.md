@@ -1,3 +1,5 @@
+> Typed usage terms are now available for new drafts. See [typed license terms](typed-license-terms.md) for the current editor, required variables, explicit legacy mapping and compatible migration. The v1 workflow below remains supported for retained revisions; it is not silently upgraded.
+
 # Licensing and published offers
 
 Status: first exact-review and commercial-revision increment. This guide describes the implemented workflow and the operator steps needed to use it. Test results belong to the integrating PR and verification record. Production legal policy, buyer-specific contracts, quotes, orders and payment processing remain separate work; checkout returns an unavailable response.
@@ -78,7 +80,7 @@ The integrating PR records the tested commit, runtime/database environments and 
 The following remain open within WP-04 and its dependent packages:
 
 - Seller identity, approved production license matrix, exact source terms, actual review evidence and rights/refund/exclusive policies under U-05.
-- A complete typed rights/caps/variables model with representative source-to-contract consistency fixtures. Current summary strings require human review.
+- The remaining territory/duration/ownership/royalty/policy-reference fields and contract-specific variables. Typed usage/permission/credit summaries now share source variables; the surrounding prose still requires human review.
 - Buyer-specific contract inputs, deterministic rendering, archival/PDF format, rendering isolation and reproducibility evidence under U-06/WP-08.
 - Server quotes and frozen purchase snapshots, exclusive reservations, verified payment finalization, grants and entitlements under WP-06–WP-08.
 - Historical contract/order reconciliation, customer obligations and migration/cutover acceptance. Immutable new revisions do not by themselves establish continuity of an old purchase.

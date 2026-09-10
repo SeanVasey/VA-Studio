@@ -3,6 +3,7 @@
 namespace App\Domain\Rights\Models;
 
 use App\Domain\Rights\VerifiedLicense;
+use App\Domain\Rights\TypedLicenseTerms;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -38,6 +39,10 @@ class LicenseVersion extends Model
 
     public function features(): array
     {
+        if (($this->structured_terms['schema_version'] ?? null) === 2) {
+            return array_values(app(TypedLicenseTerms::class)->statements($this->structured_terms));
+        }
+
         return $this->structured_terms['features'] ?? [];
     }
 

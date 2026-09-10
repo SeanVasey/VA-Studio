@@ -29,7 +29,7 @@ class ReviewLicense
             $payload = app(LicenseReviewPayload::class)->build($locked);
             $locked->update([
                 'status' => 'legal_review', 'submission_payload' => $payload, 'submission_hash' => CanonicalJson::hash($payload),
-                'canonicalization_version' => CanonicalJson::VERSION, 'terms_schema_version' => LicenseTerms::SCHEMA_VERSION,
+                'canonicalization_version' => CanonicalJson::VERSION, 'terms_schema_version' => $payload['structured_terms']['schema_version'],
                 'submitted_by' => $actor->id, 'submitted_at' => now()->startOfSecond(),
                 'source_hash' => $payload['source_hash'], 'model_hash' => $payload['model_hash'],
                 'renderer_version' => $payload['renderer_version'], 'render_fixture_hash' => $payload['render_fixture_hash'],

@@ -6,15 +6,19 @@ use Illuminate\Validation\ValidationException;
 
 final class LicenseTerms
 {
-    public const SCHEMA_VERSION = 1;
+    public const SCHEMA_VERSION = 2;
 
     public const ASSET_ROLES = ['download_mp3', 'master_wav', 'stems_zip'];
 
     public function validate(array $terms): array
     {
+        if (($terms['schema_version'] ?? null) === 2) {
+            return app(TypedLicenseTerms::class)->validate($terms);
+        }
         $keys = array_keys($terms);
         sort($keys);
-        if ($keys !== ['features', 'required_asset_roles', 'schema_version'] || ($terms['schema_version'] ?? null) !== self::SCHEMA_VERSION) {
+        // Preserve the historical v1 validator independently of the current authoring schema.
+        if ($keys !== ['features', 'required_asset_roles', 'schema_version'] || ($terms['schema_version'] ?? null) !== 1) {
             $this->fail('Terms require only schema_version (integer 1), features and required_asset_roles.');
         }
         $features = $terms['features'];

@@ -35,7 +35,7 @@ final class VerifiedLicense
         if (! is_array($authors) || ! array_is_list($authors) || $authors === [] || count(array_filter($authors, is_int(...))) !== count($authors) || count(array_unique($authors)) !== count($authors) || ! in_array($version->author_id, $authors, true)) {
             $this->fail('Submitted content requires its complete server-recorded contributor list.');
         }
-        if ($version->canonicalization_version !== CanonicalJson::VERSION || $version->terms_schema_version !== LicenseTerms::SCHEMA_VERSION
+        if ($version->canonicalization_version !== CanonicalJson::VERSION || $version->terms_schema_version !== $payload['structured_terms']['schema_version']
             || ! $version->submitted_at || ! $version->submitted_by
             || $version->submission_hash !== CanonicalJson::hash($payload)
             || CanonicalJson::hash($version->submission_payload) !== $version->submission_hash

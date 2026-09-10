@@ -12,6 +12,9 @@ final class LicensePreview
     public function render(LicenseVersion $version): array
     {
         app(LicenseContent::class)->validate($version->only(['authored_source', 'structured_terms', 'effective_from', 'effective_until']));
+        if ($version->structured_terms['schema_version'] === 2) {
+            return app(TypedLicensePreview::class)->render($version);
+        }
         $escape = static fn (mixed $text): string => htmlspecialchars((string) $text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $template = $version->template()->firstOrFail();
         $items = implode('', array_map(fn (string $feature) => '<li>'.$escape($feature).'</li>', $version->features()));
