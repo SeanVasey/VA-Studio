@@ -1,6 +1,6 @@
 # [WP-03] Private media ingestion, quarantine and preview processing
 
-Status: **WAV/artwork implemented in PR #21; private stems archive increment in [PR #30](https://github.com/VASEYDEV/VASEYAUDIO/pull/30); broader work package remains open.** The implementation below is a bounded local-storage pipeline. This issue is complete only when the acceptance evidence and remaining production work below exist.
+Status: **WAV/artwork implemented in PR #21; private stems archive increment merged in [PR #30](https://github.com/VASEYDEV/VASEYAUDIO/pull/30); broader work package remains open.** The implementation below is a bounded local-storage pipeline. This issue is complete only when the acceptance evidence and remaining production work below exist.
 
 - Suggested issue title: `[WP-03] Private media ingestion, quarantine and preview processing`
 - Phase: 1
@@ -39,13 +39,19 @@ Private WAV-only ZIP intake now follows the same quarantine, processing, failure
 
 The regression fixtures are in `StemsArchiveTest` and `StemsFixtures`; [archive verification](../verification/stems-archives.md) records the evidence boundary. Existing WAV/artwork fingerprints and offer recording checks remain intact. No schema migration is required.
 
-**Next bounded WP-03 step:** audited association of a stems revision with the exact recording/master revision, stale/cross-track protections, and frozen offer evidence. Archive processing alone must not make a stems offer publishable.
+## Recording association increment — 2026-09-09
+
+The admin Media action now requires a selected current master, an explicit same-recording confirmation and a source/session verification note. A separate immutable `stems_recordings` row records the operator, exact stems/master/preview/source IDs and canonical evidence hash. Processing parent IDs and media bytes are preserved. Draft/current-preview guards, fresh role authorization, fresh file digests, a unique stems revision and the shared track lock reject stale, cross-track, altered and conflicting submissions. Identical repeats retain the original evidence.
+
+Offer readiness now checks this association and freezes its identity/hash in stems deliverables; publication and provisional quote selection freshly hash the associated master and retained preview even for stems-only offers. Tag-only regeneration of the same WAV source remains associated, while offers still require a new snapshot for the new preview. A new WAV source requires a new stems revision and explicit association.
+
+Archive v2 fingerprints and enforces its duration ceiling. Explicit historical v1 validation preserves existing immutable archive evidence; unsupported versions fail closed. See [association verification](../verification/stems-recordings.md). Next ordered code work after acceptance: WP-04 typed rights and consistency fixtures.
 
 ## Remaining work within WP-03
 
 - Real ClamAV installation, signature-update operations and known clean/detection/error acceptance evidence in the intended deployment.
 - Production media-worker isolation, denied network access, resource sizing, queue monitoring and crash/restore drills.
-- Complete stems recording-revision binding and offer integration, then real seller-export compatibility/alignment acceptance. Archive ingestion is a bounded increment, not complete stems commerce.
+- Accept the association increment with CI and independent review, then record real seller-export compatibility/alignment acceptance. Archive ingestion is a bounded increment, not complete stems commerce.
 - Resumable/multipart uploads and an explicitly configured private object-store adapter with retention and recovery evidence.
 - Full-duration seller catalog processing, audible tag approval, real browser seek/playback and production performance evidence.
 
@@ -59,11 +65,11 @@ The regression fixtures are in `StemsArchiveTest` and `StemsFixtures`; [archive 
 
 ## Verification
 
-The first increment adds synthetic WAV/artwork integration fixtures and failure/privacy cases. See [media verification](../verification/media-pipeline.md) for exact source identity, commands, runtime versions, observed local/CI results and independent-review corrections. Synthetic archive processing/rejection checks are added by the current increment. Real scanner detection, production worker isolation, stems/master association and browser/device evidence remain pending. A checklist or unexecuted test definition is not completion evidence.
+The first increment adds synthetic WAV/artwork integration fixtures and failure/privacy cases. See [media verification](../verification/media-pipeline.md) for exact source identity, commands, runtime versions, observed local/CI results and independent-review corrections. Synthetic archive processing/rejection checks are added by the current increment. Association regression and MySQL race cases are added by this increment. Real scanner detection, production worker isolation, seller alignment and browser/device evidence remain pending. A checklist or unexecuted test definition is not completion evidence.
 
 ## Rollback and boundaries
 
-Pause new media jobs and retain original/private objects. Reprocess derivatives under a new profile version; do not overwrite assets already sold.
+Pause new media jobs and retain original/private objects. Apply the additive `stems_recordings` migration; no inferred backfill occurs. For code rollback retain this table and all associated assets/offers. Its destructive `down()` is only for disposable databases, not production recovery. A correction requires a new stems revision and attestation, never an UPDATE/DELETE of recorded evidence. Reprocess derivatives under a new profile version; do not overwrite assets already sold.
 
 Do not add secrets, private masters, unredacted orders, customer PII or real contract documents to this issue/PR. Do not change an external provider, charge a customer, publish marketing or alter the live domain unless that action is within the recorded authorization and applicable readiness gates.
 

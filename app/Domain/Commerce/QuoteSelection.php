@@ -7,6 +7,7 @@ use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublicationReadiness;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\VerifiedMedia;
+use App\Domain\Media\RecordingAssociation;
 
 /** Resolve and lock authoritative selections; called only inside a database transaction. */
 final class QuoteSelection
@@ -29,7 +30,10 @@ final class QuoteSelection
             }
             if ($freshDigests) {
                 $assetIds = [...array_column($revision->snapshot['assets'], 'id'), $revision->snapshot['preview']['id']];
-                foreach ($assetIds as $assetId) {
+                foreach (MediaAsset::whereIn('id', $assetIds)->get() as $asset) {
+                    $assetIds = [...$assetIds, ...app(RecordingAssociation::class)->relatedAssetIds($asset)];
+                }
+                foreach (array_unique($assetIds) as $assetId) {
                     $asset = MediaAsset::find($assetId);
                     $path = $asset ? app(VerifiedMedia::class)->path($asset) : null;
                     if ($path) {
