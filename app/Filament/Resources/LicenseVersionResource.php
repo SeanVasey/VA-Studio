@@ -100,7 +100,7 @@ class LicenseVersionResource extends OperatorResource
         try {
             return $command();
         } catch (ValidationException $exception) {
-            $path = $livewire->getMountedActionSchema()->getStatePath();
+            $path = $livewire->getSchema($livewire->getMountedActionSchemaName())->getStatePath();
             $errors = [];
             foreach ($exception->errors() as $field => $messages) {
                 $errors[$path.'.'.$field] = $messages;

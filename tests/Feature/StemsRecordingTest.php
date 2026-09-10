@@ -144,6 +144,16 @@ class StemsRecordingTest extends TestCase
         $this->assertDatabaseCount('stems_recordings', 0);
     }
 
+    public function test_recording_action_shows_domain_integrity_errors_at_the_master_field(): void
+    {
+        ['actor' => $actor, 'stems' => $stems, 'data' => $data] = $this->fixture;
+        $this->actingAs($actor);
+        $form = Livewire::test(ManageMediaAssets::class)->mountTableAction('associate_recording', $stems)->setTableActionData($data);
+        $this->corruptMasterWithCachedRead();
+        $form->callMountedTableAction()->assertHasTableActionErrors(['master_asset_id']);
+        $this->assertDatabaseCount('stems_recordings', 0);
+    }
+
     public function test_mounted_action_reauthorizes_and_stale_preview_is_rejected(): void
     {
         ['actor' => $actor, 'stems' => $stems, 'data' => $data, 'track' => $track] = $this->fixture;

@@ -180,6 +180,8 @@ class TypedLicenseTest extends TestCase
         $draft = LicenseVersion::sole();
         $this->assertSame(2, $draft->structured_terms['schema_version']);
         $this->assertSame(2, $draft->structured_terms['usage']['audio_releases']['limit']);
+        Livewire::test(ManageLicenseVersions::class)->callTableAction('edit', $draft, data: ['authored_source' => 'Missing variables'])->assertHasTableActionErrors(['authored_source']);
+        $this->assertSame(TypedLicenseFixtures::source(), $draft->fresh()->authored_source);
         Livewire::test(ManageLicenseVersions::class)->callTableAction('edit', $draft, data: ['structured_terms.usage.audio_releases.limit' => '1.5'])->assertHasTableActionErrors();
         $changed = $draft->structured_terms;
         $changed['usage']['audio_releases'] = ['mode' => 'unlimited'];
@@ -238,7 +240,7 @@ class TypedLicenseTest extends TestCase
         $revision = app(PublishOffer::class)->handle($offer, $actor);
         $features = $typed->features();
         $this->assertSame($features, $revision->snapshot['license']['features']);
-        $this->getJson('/api/catalog')->assertJsonPath('tracks.0.offers.0.features', $features);
+        $this->getJson('/api/catalog')->assertJsonPath('licenseTiers.0.features', $features);
         $items = [['trackId' => $fixture['track']->id, 'offerId' => $offer->id, 'offerRevisionId' => $revision->id, 'licenseVersionId' => $typed->id]];
         $typedQuote = app(CreateQuote::class)->handle(str_repeat('a', 64), 'typed-review', $items);
         $typedSnapshot = $typedQuote->fresh()->snapshot;
