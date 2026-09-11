@@ -10,6 +10,7 @@ use App\Domain\Rights\PublishLicense;
 use App\Domain\Rights\ReviewLicense;
 use App\Domain\Rights\UpdateLicenseDraft;
 use App\Filament\Forms\TypedLicenseFields;
+use App\Filament\Forms\LicenseScopeFields;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Checkbox;
@@ -45,8 +46,9 @@ class LicenseVersionResource extends OperatorResource
             TagsInput::make('structured_terms.features')->label('Feature summaries for review')->required()->visible(fn (Get $get) => (int) $get('structured_terms.schema_version') === 1),
             Select::make('structured_terms.required_asset_roles')->label('Required deliverables')->multiple()->options(['download_mp3' => 'MP3', 'master_wav' => 'WAV master', 'stems_zip' => 'Stems ZIP'])->required(),
             TypedLicenseFields::make(),
-            DateTimePicker::make('effective_from')->label('Effective from (UTC)')->timezone('UTC')->helperText('Leave blank for publication time.'),
-            DateTimePicker::make('effective_until')->label('Effective until (UTC)')->timezone('UTC')->helperText('Leave blank for no scheduled end.'),
+            LicenseScopeFields::make(),
+            DateTimePicker::make('effective_from')->label('Offer availability starts (UTC)')->timezone('UTC')->helperText('Leave blank for publication time. This does not start the licensed-use duration.'),
+            DateTimePicker::make('effective_until')->label('Offer availability ends (UTC)')->timezone('UTC')->helperText('Leave blank for no scheduled end. This stops new availability; it does not terminate existing rights.'),
         ];
     }
 
@@ -54,7 +56,7 @@ class LicenseVersionResource extends OperatorResource
     {
         return $table->defaultSort('id', 'desc')->columns([
             TextColumn::make('template.name')->searchable(), TextColumn::make('version'), TextColumn::make('status')->badge(),
-            TextColumn::make('effective_from')->dateTime()->placeholder('On publication'), TextColumn::make('effective_until')->dateTime()->placeholder('No scheduled end'),
+            TextColumn::make('effective_from')->label('Availability starts')->dateTime()->placeholder('On publication'), TextColumn::make('effective_until')->label('Availability ends')->dateTime()->placeholder('No scheduled end'),
         ])->recordActions([
             EditAction::make()->visible(fn (LicenseVersion $record) => $record->status === 'draft')->using(fn (LicenseVersion $record, array $data, $livewire) => self::withFormErrors(fn () => app(UpdateLicenseDraft::class)->handle($record, Arr::only($data, ['authored_source', 'structured_terms', 'effective_from', 'effective_until']), auth()->user()), $livewire)),
             Action::make('preview')->label('Preview')->url(fn (LicenseVersion $record) => route('filament.admin.licenses.preview', $record))->openUrlInNewTab(),
@@ -68,6 +70,16 @@ class LicenseVersionResource extends OperatorResource
                 ], auth()->user(), $record);
                 Notification::make()->title('Draft version '.$draft->version.' created')->success()->send();
             }),
+            Action::make('scoped_successor')->label('Define license scope')->visible(fn (LicenseVersion $record) => ($record->structured_terms['schema_version'] ?? null) === 2)
+                ->modalDescription('Create a successor with explicit territory and duration. Retain and review the source, add both variables, and choose each new mode. No scope is inferred from existing terms.')
+                ->fillForm(fn (LicenseVersion $record) => ['license_template_id' => $record->license_template_id, 'authored_source' => $record->authored_source,
+                    'structured_terms' => array_replace($record->structured_terms, ['schema_version' => 3, 'duration' => ['starts_at' => 'grant']]),
+                    'effective_from' => $record->effective_from, 'effective_until' => $record->effective_until])
+                ->schema(fn () => self::fields())
+                ->action(function (LicenseVersion $record, array $data, $livewire) {
+                    $draft = self::withFormErrors(fn () => app(CreateLicenseDraft::class)->handle($record->template, Arr::only($data, ['authored_source', 'structured_terms', 'effective_from', 'effective_until']), auth()->user(), $record), $livewire);
+                    Notification::make()->title('Scope draft version '.$draft->version.' created')->body('Review the new scope and source before requesting approval.')->success()->send();
+                }),
             Action::make('typed_successor')->label('Define usage rights')->visible(fn (LicenseVersion $record) => ($record->structured_terms['schema_version'] ?? null) === 1)
                 ->modalDescription('Create a successor with explicit usage rights. Map the retained source deliberately and add the shown variables. No permission or cap is inferred from the old summaries.')
                 ->fillForm(fn (LicenseVersion $record) => ['license_template_id' => $record->license_template_id, 'authored_source' => $record->authored_source,

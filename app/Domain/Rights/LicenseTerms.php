@@ -6,12 +6,15 @@ use Illuminate\Validation\ValidationException;
 
 final class LicenseTerms
 {
-    public const SCHEMA_VERSION = 2;
+    public const SCHEMA_VERSION = 3;
 
     public const ASSET_ROLES = ['download_mp3', 'master_wav', 'stems_zip'];
 
     public function validate(array $terms): array
     {
+        if (($terms['schema_version'] ?? null) === 3) {
+            return app(ScopedLicenseTerms::class)->validate($terms);
+        }
         if (($terms['schema_version'] ?? null) === 2) {
             return app(TypedLicenseTerms::class)->validate($terms);
         }
@@ -48,6 +51,15 @@ final class LicenseTerms
 
         // Feature prose is reviewed alongside source. This schema does not interpret legal meaning.
         return $terms;
+    }
+
+    public function statements(array $terms): array
+    {
+        return match ($terms['schema_version'] ?? null) {
+            2 => app(TypedLicenseTerms::class)->statements($terms),
+            3 => app(ScopedLicenseTerms::class)->statements($terms),
+            default => $this->fail('Generated statements require a supported typed license schema.'),
+        };
     }
 
     private function fail(string $message): never

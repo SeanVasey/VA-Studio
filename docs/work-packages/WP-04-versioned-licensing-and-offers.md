@@ -1,6 +1,6 @@
 # [WP-04] Immutable license versions, reviewed terms and sellable offers
 
-Status: **First review-evidence and offer-revision increment implemented in [PR #22](https://github.com/VASEYDEV/VASEYAUDIO/pull/22); broader work package remains open.** This increment binds human review to exact content and separates editable offers from published commercial snapshots. It does not implement a complete machine-readable legal schema or buyer contract fulfillment.
+Status: **PR #32 is merged; territory/duration is the current bounded increment. WP-04 remains open.** PR #22 established review evidence and commercial snapshots; PR #32 added typed usage/permission/credit terms and source variables. Remaining rights-policy fields and buyer contract fulfillment remain separate dependencies.
 
 - Suggested issue title: `[WP-04] Immutable license versions, reviewed terms and sellable offers`
 - Phase: 1
@@ -23,7 +23,7 @@ Template/version lifecycle, normalized terms schema and product-license offer wi
 - Offer revision with integer price/currency, exact asset manifest, rights declaration and shared exclusive-scope reference.
 - Admin editor/comparator preview and readiness; synthetic nonbinding fixtures until actual reviewed terms are supplied.
 
-## Current increment — 2026-09-04
+## Historical increment — 2026-09-04
 
 - Server-authored review payload with source, schema-versioned summaries/roles, template identity, effective UTC window and deterministic escaped HTML preview hash. Review submission freezes that exact content.
 - Separate authorized reviewer approval bound to the submission SHA-256, actual review reference and explicit source/summary consistency attestation. Immutable review evidence and SQL guards protect submitted/reviewed content; human approval does not establish reviewer legal qualification.
@@ -41,10 +41,16 @@ New admin drafts use these typed fields. **Define usage rights** deliberately ma
 
 See [typed licensing verification](../verification/typed-licensing.md) and [operator/schema guide](../typed-license-terms.md). The integrating PR records actual CI outcomes; this is a bounded usage-policy model, not a complete license or executed buyer contract.
 
+## Territory and duration increment — 2026-09-11
+
+Schema v3 adds explicit permitted territory and perpetual/fixed calendar-month duration from grant, separate from new-offer availability. Cards and source variables share exact statements. New admin drafts use v3; a deliberate v2-to-v3 mapping preserves earlier evidence and requires both new choices. Ordinary successors keep their predecessor schema. A dedicated v3 renderer and additive migration retain all v1/v2 bytes and review evidence. No grant endpoint, geographic enforcement or legal policy is inferred.
+
+See [operator/schema guide](../license-territory-duration.md) and [verification record](../verification/license-scope.md). The integrating PR records actual tested candidate, results and independent review. Ownership/publishing/royalty concepts and versioned policy references follow before WP-05 detail/device work.
+
 ## Remaining work within WP-04
 
 - Actual seller-approved production source, reviewed license matrix, reviewer evidence and rights policy under U-05.
-- Remaining typed fields for territory, license duration, ownership/publishing/royalties and versioned policy references; representative policy/contract consistency fixtures. The current usage/permission/credit variables are bounded and still require human source-consistency review.
+- Remaining typed fields for ownership/publishing/royalties and versioned policy references; representative policy/contract consistency fixtures. The current usage/permission/credit variables are bounded and still require human source-consistency review.
 - Buyer-specific deterministic contract rendering, PDF/archive format and reproducibility acceptance under U-06/WP-08.
 - Quote/order snapshot integration under WP-06/WP-07, shared exclusive inventory and reservation policy; current publication is limited to positive USD non-exclusive offers.
 - Historical source-contract reconciliation and continuity evidence. Existing records are retained; no replacement approval or executed contract is inferred from a migration.
@@ -63,7 +69,7 @@ See the [verification record](../verification/licensing-and-offers.md) for exact
 
 ## Rollback and boundaries
 
-Retain the v2-aware application validator/renderer and database guard wherever v2 versions are retained. Reverting to v1-only code makes v2 licenses unavailable; do not rewrite them to fit v1. The migration down restores the prior transition guard for disposable/verified-compatible environments only and does not erase records. Disable a new offer/version without altering prior records. Supersede terms with a new version; preserve every referenced version.
+Retain compatible v1/v2/v3 validators/renderers and database guards wherever their versions are retained. Reverting to older-only code makes later licenses unavailable; do not rewrite them to fit an old schema. The migration down restores the prior transition guard for disposable/verified-compatible environments only and does not erase records. Disable a new offer/version without altering prior records. Supersede terms with a new version; preserve every referenced version.
 
 Do not add secrets, private masters, unredacted orders, customer PII or real contract documents to this issue/PR. Do not change an external provider, charge a customer, publish marketing or alter the live domain unless that action is within the recorded authorization and applicable readiness gates.
 

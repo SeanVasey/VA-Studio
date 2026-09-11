@@ -9,7 +9,7 @@ final class LicenseSourceVariables
 {
     public function render(string $source, array $terms): string
     {
-        $values = app(TypedLicenseTerms::class)->statements($terms);
+        $values = app(LicenseTerms::class)->statements($terms);
         $used = [];
         $rendered = preg_replace_callback('/\{\{([^{}]*)\}\}/u', function (array $match) use ($values, &$used) {
             $key = $match[1];
