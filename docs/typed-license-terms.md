@@ -1,6 +1,6 @@
 # Typed license usage terms
 
-New drafts now use [schema v3 territory and duration](license-territory-duration.md). This page retains the v2 vocabulary and historical workflow.
+New drafts now use [schema v4 economic policies](license-economic-policies.md), including v3 territory and duration. This page retains the v2 vocabulary and historical workflow.
 
 This WP-04 increment supplies a bounded, versioned usage-policy model. It does not supply actual seller terms or a complete buyer contract. No cap or permission is preselected for new admin drafts. Production policy and independent review remain U-05.
 
@@ -35,7 +35,7 @@ Wrap each listed variable in double braces, for example `{{usage.monetized_strea
 
 The root contains exactly `schema_version: 2`, `required_asset_roles`, `usage`, `permissions`, and `credit`. Each limited usage value is `{mode: "limited", limit: INTEGER}` with a cap of 1–2,147,483,647; other modes contain only `mode`. Permissions are enum strings. Credit is `{mode: "required", text: STRING}` (up to 120 characters) or `{mode: "not_required"}`. Unknown keys, floating-point/string/boolean caps, contradictory unused caps, unapproved role names and editable `features` are rejected by the domain. The admin form validates a whole-number input before converting its numeric string to an integer.
 
-This vocabulary is deliberately limited. Ownership, publishing, royalties, sample/clearance duties, renewal/overage/termination and versioned policy references remain explicit follow-up work. Territory and license duration are added explicitly in schema v3; availability dates do not represent license duration. Do not squeeze an unsupported condition into an unrelated field or claim this model represents every legal term. Buyer/order/seller variables and actual contract generation belong to WP-08.
+This vocabulary is deliberately limited. Schema v4 adds ownership policy declarations, publishing income, recording royalties and retained policy references. Sample/clearance duties and renewal/overage/termination conditions still require explicit source-policy review under U-05; no mechanical enforcement of those conditions is supplied. Territory and license duration are added explicitly in schema v3; availability dates do not represent license duration. Do not squeeze an unsupported condition into an unrelated field or claim this model represents every legal term. Buyer/order/seller variables and actual contract generation belong to WP-08.
 
 ## Compatibility and rollout
 

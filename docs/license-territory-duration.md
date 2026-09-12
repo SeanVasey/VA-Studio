@@ -4,7 +4,7 @@ WP-04 schema v3 adds two explicit scope decisions to the existing usage, permiss
 
 ## Author and review
 
-1. New license drafts use schema v3. Complete the existing usage fields, choose **Worldwide** or **Selected countries**, then choose **Perpetual from grant** or **Calendar months from grant**. A fixed duration requires 1–1,200 whole months. These limits describe software capability, not recommended production terms.
+1. This retained schema v3 workflow uses the explicit scope fields. New drafts now use [schema v4](license-economic-policies.md), which includes these fields. Complete the existing usage fields, choose **Worldwide** or **Selected countries**, then choose **Perpetual from grant** or **Calendar months from grant**. A fixed duration requires 1–1,200 whole months. These limits describe software capability, not recommended production terms.
 2. Include `{{territory}}` and `{{duration}}` in the source alongside the thirteen [v2 variables](typed-license-terms.md). Each substitutes the complete generated statement, including its label. All fifteen source values and license-card statements derive from the same model.
 3. Preview and compare the original source, substitutions, card statements and variable table. A separate reviewer must assess the surrounding source and actual rights. Submit, approve and publish through the existing immutable lifecycle, then publish the commercial offer separately.
 
@@ -39,7 +39,7 @@ Apply `2026_09_11_000011_license_scope_terms.php` with compatible code. It insta
 
 Retained v3 evidence requires v3-aware validators and renderer. Migration down restores the v2 guard without rewriting/deleting records and is suitable only for disposable or verified-compatible environments. For recovery with retained v3 versions, keep compatible code and evidence; deactivate affected offers if needed. Never coerce published terms into an older schema.
 
-See [verification](verification/license-scope.md) and the [ordered development plan](development-order.md). Next are ownership/publishing/royalty concepts and versioned policy references, followed by WP-05 detail/device work. Buyer-specific contracts and fulfillment remain WP-08.
+See [verification](verification/license-scope.md) and the [ordered development plan](development-order.md). Schema v4 now adds ownership/publishing/royalty declarations and retained policy references. After its acceptance, WP-05 detail/disclosure/device work follows. Buyer-specific contracts and fulfillment remain WP-08.
 
 ## Later authoring schema
 

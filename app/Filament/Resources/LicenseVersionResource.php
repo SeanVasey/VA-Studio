@@ -125,8 +125,15 @@ class LicenseVersionResource extends OperatorResource
             return $command();
         } catch (ValidationException $exception) {
             $path = $livewire->getSchema($livewire->getMountedActionSchemaName())->getStatePath();
+            // Repeater submits a numeric list, but mounted rows retain stable UUID keys.
+            // Translate the domain index back to the visible input before returning errors.
+            $policyRows = data_get($livewire, $path.'.structured_terms.policies', []);
+            $policyKeys = is_array($policyRows) ? array_keys($policyRows) : [];
             $errors = [];
             foreach ($exception->errors() as $field => $messages) {
+                if (preg_match('/\Astructured_terms\.policies\.(\d+)\.(key|version|text)\z/', $field, $match) && array_key_exists((int) $match[1], $policyKeys)) {
+                    $field = 'structured_terms.policies.'.$policyKeys[(int) $match[1]].'.'.$match[2];
+                }
                 $errors[$path.'.'.$field] = $messages;
             }
             throw ValidationException::withMessages($errors);

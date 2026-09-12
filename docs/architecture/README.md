@@ -32,4 +32,4 @@ Inspected for this initial draft: current task, supplied replacement specificati
 
 A complete replacement means every source capability and every active customer obligation is accounted for as implemented and verified, integrated and verified, or explicitly retired by Sean with a compliant continuity plan. A beautiful catalog and a working payment test are intermediate milestones. Unknown exports, subscriptions, licenses, grants, balances, or redirects block the relevant cutover scope.
 
-The smallest safe next action is to verify the foundation against WP-01 and WP-02, then implement private media ingestion under WP-03. Provider-independent development continues while external choices are resolved.
+Follow the current [ordered development record](../development-order.md) for accepted increments and the next dependency. WP-04 economic policy declarations currently follow merged territory/duration work; WP-05 detail/disclosure/device work is next after acceptance. Provider-independent development continues while external choices are resolved.

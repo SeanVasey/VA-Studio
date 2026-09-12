@@ -249,6 +249,25 @@ class EconomicLicenseTest extends TestCase
         $this->assertSame($published->authored_source, $successor->authored_source);
     }
 
+    public function test_policy_byte_limit_errors_attach_to_the_mounted_repeater_row_and_preserve_the_draft(): void
+    {
+        $actor = LicenseFixtures::admin();
+        $draft = EconomicLicenseFixtures::draft($actor);
+        $before = $draft->fresh()->getAttributes();
+        $this->actingAs($actor);
+        $form = Livewire::test(ManageLicenseVersions::class)->mountTableAction('edit', $draft);
+        $rows = $form->get('mountedActions.0.data.structured_terms.policies');
+        $rowKey = array_key_first($rows);
+        $this->assertIsString($rowKey);
+        $this->assertFalse(ctype_digit($rowKey));
+        $field = 'structured_terms.policies.'.$rowKey.'.text';
+        $form->set('mountedActions.0.data.'.$field, str_repeat('x', 20001))
+            ->callMountedTableAction()
+            ->assertHasTableActionErrors([$field])
+            ->assertSee('Retain complete plain UTF-8 buyer-facing policy text');
+        $this->assertSame($before, $draft->fresh()->getAttributes());
+    }
+
     public function test_economic_mapping_rechecks_staff_authorization_after_mounting(): void
     {
         $actor = LicenseFixtures::admin();

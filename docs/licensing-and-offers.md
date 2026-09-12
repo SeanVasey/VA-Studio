@@ -1,6 +1,6 @@
 > Typed usage terms are now available for new drafts. See [typed license terms](typed-license-terms.md) for the current editor, required variables, explicit legacy mapping and compatible migration. The v1 workflow below remains supported for retained revisions; it is not silently upgraded.
 
-Current authoring uses [territory and duration schema v3](license-territory-duration.md), retaining the historical workflows below.
+Current authoring uses [ownership and economic policy schema v4](license-economic-policies.md), retaining the historical workflows below.
 
 # Licensing and published offers
 
