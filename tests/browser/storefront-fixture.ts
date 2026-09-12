@@ -53,11 +53,12 @@ export async function storefrontFixture(page: Page, options: { failFirstTerms?: 
   const shellResponse = await page.request.get('/');
   expect(shellResponse.ok()).toBe(true);
   const shell = await shellResponse.text();
-  const baseResponse = await page.request.get('/', { headers: { 'X-Inertia': 'true' } });
-  expect(baseResponse.ok()).toBe(true);
-  const base = await baseResponse.json();
-  const pageScript = /(<script\b[^>]*data-page="app"[^>]*>)[\s\S]*?(<\/script>)/;
-  expect(shell).toMatch(pageScript);
+  // Bootstrap the exact page/version from the real HTML. A bare X-Inertia GET
+  // without that asset version correctly triggers Inertia's 409 reload protocol.
+  const pageScript = /(<script\b[^>]*data-page="app"[^>]*>)([\s\S]*?)(<\/script>)/;
+  const embedded = shell.match(pageScript);
+  expect(embedded).not.toBeNull();
+  const base = JSON.parse(embedded![2]);
 
   // Observe allocation/state without replacing playback, events, seeking or promises.
   await page.addInitScript(() => {
@@ -97,7 +98,7 @@ export async function storefrontFixture(page: Page, options: { failFirstTerms?: 
       return route.fulfill({ headers: { 'X-Inertia': 'true', Vary: 'X-Inertia' }, json: payload });
     }
     const json = JSON.stringify(payload).replaceAll('<', '\\u003c');
-    return route.fulfill({ contentType: 'text/html', body: shell.replace(pageScript, (_match, opening, closing) => opening + json + closing) });
+    return route.fulfill({ contentType: 'text/html', body: shell.replace(pageScript, (_match, opening, _original, closing) => opening + json + closing) });
   });
   return { navigation, termsRequests: () => termsRequests };
 }
