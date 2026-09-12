@@ -58,8 +58,11 @@ test('full license disclosure recovers, follows the selected offer and supports 
   await extended.check();
   await expect(text).toHaveText(policyText(1));
   await text.focus();
+  await expect(text).toBeFocused();
+  await expect.poll(() => text.evaluate(element => element.scrollHeight - element.clientHeight)).toBeGreaterThan(0);
   await text.press('End');
-  expect(await text.evaluate(element => element.scrollTop > 0)).toBe(true);
+  // Native keyboard scrolling settles after keyup; observe it without setting scrollTop.
+  await expect.poll(() => text.evaluate(element => Math.abs(element.scrollHeight - element.clientHeight - element.scrollTop))).toBeLessThanOrEqual(1);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath('full-license-disclosure.png'), fullPage: false });
   await page.keyboard.press('Escape');
