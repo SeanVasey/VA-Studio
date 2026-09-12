@@ -264,7 +264,7 @@ class EconomicLicenseTest extends TestCase
         $form->set('mountedActions.0.data.'.$field, str_repeat('x', 20001))
             ->callMountedTableAction()
             ->assertHasTableActionErrors([$field])
-            ->assertSee('Retain complete plain UTF-8 buyer-facing policy text');
+            ->assertMountedActionModalSee('Retain complete plain UTF-8 buyer-facing policy text');
         $this->assertSame($before, $draft->fresh()->getAttributes());
     }
 
