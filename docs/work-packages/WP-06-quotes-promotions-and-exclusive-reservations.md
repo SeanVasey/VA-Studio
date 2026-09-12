@@ -1,6 +1,6 @@
 # [WP-06] Server quotes, promotion calculations and exclusive reservations
 
-Status: **Provisional selection reviews merged; owned full-license disclosure implemented for candidate verification. The broader work package remains open.** The server freezes and revalidates selected published offer revisions, with a provisional USD subtotal. It does not calculate payable totals, collect assent, create orders or reserve exclusives. This issue is complete only when the full acceptance evidence below exists.
+Status: **Provisional selection reviews merged; owned full-license disclosure merged in PR #41; immutable pricing/test-tax evidence implemented for candidate verification. The broader work package remains open.** The server freezes and revalidates selected published offer revisions, with a provisional USD subtotal. It does not calculate payable totals, collect assent, create orders or reserve exclusives. This issue is complete only when the full acceptance evidence below exists.
 
 - Suggested issue title: `[WP-06] Server quotes, promotion calculations and exclusive reservations`
 - Phase: 2
@@ -41,6 +41,12 @@ See [Provisional selection reviews](../provisional-quotes.md) for the exact impl
 ### Frozen quote disclosure increment — 2026-09-12
 
 The quote review exposes an on-demand full license source for its exact immutable line, with quote/offer/license identities, expiry and a fingerprint of the public disclosure. Owner checks, current availability, hashes, session locking, rate limiting and generic private failures are reused from the existing quote reader. New UI validates the quote envelope and discards obsolete text on selection/review changes. The [contract and verification scope](../quote-license-disclosure.md) distinguishes disclosure from assent, payable tax or an executed contract. This is the next bounded WP-06 prerequisite after WP-05's full public offer disclosure; it creates no new quote schema or live policy. Final candidate evidence belongs in its PR.
+
+### Pricing/tax evidence increment — 2026-09-12
+
+The [pricing contract](../quote-pricing.md) and [D-08](../architecture/D-08-quote-pricing-evidence.md) add one immutable calculation beside an owned quote. The server freezes exact amounts/disclosures, an explicit policy/hash, rounding trace and expiry; current policies are local/testing-only. Unknown tax stays null. Unique quote linkage and retained quote locks serialize first requests. The private API rejects client calculation inputs. An internal historical amount comparator produces mismatch evidence for a later WP-07 caller; it does not verify a provider or authorize a grant. No promotion, live tax choice or price guarantee is inferred. Tests include MySQL first-write races, immutable constraints, safe ownership, rounding, policy drift and settlement mismatches; the PR records actual final candidate results.
+
+Continue promotion policy/allocation/redemption and shared exclusive inventory/reservations after this batch's CI/review. The wider acceptance criteria remain open.
 
 ### Remaining requirements
 

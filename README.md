@@ -18,6 +18,7 @@ Bespoke web store development replacing older, service-based e-commerce offering
 - [Licensing and offers](docs/licensing-and-offers.md): review submission, successor versions, published prices/files and legacy upgrade steps.
 - [Provisional selection reviews](docs/provisional-quotes.md): server snapshots, session ownership, retries, expiry and the boundary before payable checkout.
 - [Quote license disclosure](docs/quote-license-disclosure.md): full frozen terms tied to the owning selection review, disclosure identity and recovery.
+- [Quote pricing](docs/quote-pricing.md): immutable server calculation evidence, explicit test tax policies, owner-checked pricing API and amount comparison boundaries.
 - [Catalog administration](docs/catalog-administration.md): audited metadata saves, edit conflicts and stable published track URLs.
 - [Catalog pagination](docs/catalog-pagination.md): bounded server browsing and off-page saved-selection reconciliation.
 - [Public track sharing](docs/track-sharing.md): canonical URLs, server-rendered social metadata, Inertia navigation and publication privacy.

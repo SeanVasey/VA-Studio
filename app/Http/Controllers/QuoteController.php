@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Domain\Commerce\CreateQuote;
 use App\Domain\Commerce\Models\Quote;
+use App\Domain\Commerce\PriceQuote;
+use App\Domain\Commerce\PricingSnapshot;
 use App\Domain\Commerce\QuoteException;
 use App\Domain\Commerce\ReadQuote;
 use App\Domain\Commerce\ReadQuoteDisclosure;
@@ -43,6 +45,34 @@ final class QuoteController
     {
         try {
             return $this->response($read->handle($quote, $owner->forRequest($request), $revision));
+        } catch (QuoteException $exception) {
+            return $this->failure($exception);
+        }
+    }
+
+    public function price(string $quote, Request $request, QuoteOwner $owner, PriceQuote $pricing): JsonResponse
+    {
+        // This operation accepts an empty JSON object only. Configuration owns all calculations.
+        try {
+            $body = $request->isJson() && $request->query->count() === 0 && strlen($request->getContent()) <= 1024
+                ? json_decode($request->getContent(), false, 4, JSON_THROW_ON_ERROR) : null;
+        } catch (JsonException) {
+            $body = null;
+        }
+        if (! $body instanceof stdClass || get_object_vars($body) !== []) {
+            return $this->failure(new QuoteException('INVALID_QUOTE_REQUEST', 422));
+        }
+        try {
+            return $this->response(['pricing' => app(PricingSnapshot::class)->present($pricing->create($quote, $owner->forRequest($request)))]);
+        } catch (QuoteException $exception) {
+            return $this->failure($exception);
+        }
+    }
+
+    public function pricing(string $quote, Request $request, QuoteOwner $owner, PriceQuote $pricing): JsonResponse
+    {
+        try {
+            return $this->response(['pricing' => app(PricingSnapshot::class)->present($pricing->read($quote, $owner->forRequest($request)))]);
         } catch (QuoteException $exception) {
             return $this->failure($exception);
         }
@@ -114,6 +144,10 @@ final class QuoteController
             'QUOTE_EXPIRED' => 'This selection review has expired. Review your selection again.',
             'SELECTION_CHANGED' => 'A selected offer has changed or is unavailable. Choose again.',
             'QUOTE_NOT_FOUND' => 'This selection review is unavailable.',
+            'PRICING_NOT_FOUND' => 'This selection does not have a pricing review.',
+            'PRICING_EXPIRED' => 'This pricing review has expired. Review your selection again.',
+            'PRICING_CHANGED' => 'Pricing rules have changed. Start a new selection review.',
+            'PRICING_UNAVAILABLE' => 'Pricing is temporarily unavailable. Try again later.',
             default => 'Choose a valid selection and try again.',
         };
 
