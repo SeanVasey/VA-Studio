@@ -182,7 +182,7 @@ class ScopedLicenseTest extends TestCase
         $this->actingAs($actor);
         $template = LicenseTemplate::create(['name' => 'SYNTHETIC SCOPE ADMIN', 'slug' => 'scope-admin', 'type' => 'non-exclusive']);
         Livewire::test(ManageLicenseVersions::class)->mountAction('create')
-            ->assertSet('mountedActions.0.data.structured_terms.schema_version', 3)
+            ->assertSet('mountedActions.0.data.structured_terms.schema_version', 4)
             ->assertSet('mountedActions.0.data.structured_terms.territory.mode', null)
             ->assertSet('mountedActions.0.data.structured_terms.duration.mode', null)
             ->assertSet('mountedActions.0.data.structured_terms.duration.starts_at', 'grant');

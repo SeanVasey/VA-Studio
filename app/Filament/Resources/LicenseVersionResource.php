@@ -11,6 +11,7 @@ use App\Domain\Rights\ReviewLicense;
 use App\Domain\Rights\UpdateLicenseDraft;
 use App\Filament\Forms\TypedLicenseFields;
 use App\Filament\Forms\LicenseScopeFields;
+use App\Filament\Forms\LicenseEconomicFields;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Checkbox;
@@ -47,6 +48,7 @@ class LicenseVersionResource extends OperatorResource
             Select::make('structured_terms.required_asset_roles')->label('Required deliverables')->multiple()->options(['download_mp3' => 'MP3', 'master_wav' => 'WAV master', 'stems_zip' => 'Stems ZIP'])->required(),
             TypedLicenseFields::make(),
             LicenseScopeFields::make(),
+            LicenseEconomicFields::make(),
             DateTimePicker::make('effective_from')->label('Offer availability starts (UTC)')->timezone('UTC')->helperText('Leave blank for publication time. This does not start the licensed-use duration.'),
             DateTimePicker::make('effective_until')->label('Offer availability ends (UTC)')->timezone('UTC')->helperText('Leave blank for no scheduled end. This stops new availability; it does not terminate existing rights.'),
         ];
@@ -70,6 +72,16 @@ class LicenseVersionResource extends OperatorResource
                 ], auth()->user(), $record);
                 Notification::make()->title('Draft version '.$draft->version.' created')->success()->send();
             }),
+            Action::make('economic_successor')->label('Define economic policies')->visible(fn (LicenseVersion $record) => ($record->structured_terms['schema_version'] ?? null) === 3)
+                ->modalDescription('Create a successor with explicit ownership declarations, income and royalty choices, and retained policy text. Preserve the existing terms and add the new source variables. No economic policy is inferred.')
+                ->fillForm(fn (LicenseVersion $record) => ['license_template_id' => $record->license_template_id, 'authored_source' => $record->authored_source,
+                    'structured_terms' => array_replace($record->structured_terms, ['schema_version' => 4]),
+                    'effective_from' => $record->effective_from, 'effective_until' => $record->effective_until])
+                ->schema(fn () => self::fields())
+                ->action(function (LicenseVersion $record, array $data, $livewire) {
+                    $draft = self::withFormErrors(fn () => app(CreateLicenseDraft::class)->handle($record->template, Arr::only($data, ['authored_source', 'structured_terms', 'effective_from', 'effective_until']), auth()->user(), $record), $livewire);
+                    Notification::make()->title('Economic policy draft version '.$draft->version.' created')->body('Review the retained policy text and generated declarations before requesting approval.')->success()->send();
+                }),
             Action::make('scoped_successor')->label('Define license scope')->visible(fn (LicenseVersion $record) => ($record->structured_terms['schema_version'] ?? null) === 2)
                 ->modalDescription('Create a successor with explicit territory and duration. Retain and review the source, add both variables, and choose each new mode. No scope is inferred from existing terms.')
                 ->fillForm(fn (LicenseVersion $record) => ['license_template_id' => $record->license_template_id, 'authored_source' => $record->authored_source,

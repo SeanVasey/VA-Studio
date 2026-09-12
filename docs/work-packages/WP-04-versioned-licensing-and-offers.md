@@ -1,6 +1,6 @@
 # [WP-04] Immutable license versions, reviewed terms and sellable offers
 
-Status: **PR #32 is merged; territory/duration is the current bounded increment. WP-04 remains open.** PR #22 established review evidence and commercial snapshots; PR #32 added typed usage/permission/credit terms and source variables. Remaining rights-policy fields and buyer contract fulfillment remain separate dependencies.
+Status: **PRs #32/#33 are merged; economic policies are the current bounded increment. WP-04 remains open.** PR #22 established review evidence and commercial snapshots; PR #32 added typed usage/permission/credit terms and source variables. PR #33 added territory/duration. Current schema v4 supplies ownership policy declarations, income/royalty fields and retained policy references. Actual reviewed policy and buyer contract fulfillment remain separate dependencies.
 
 - Suggested issue title: `[WP-04] Immutable license versions, reviewed terms and sellable offers`
 - Phase: 1
@@ -47,10 +47,18 @@ Schema v3 adds explicit permitted territory and perpetual/fixed calendar-month d
 
 See [operator/schema guide](../license-territory-duration.md) and [verification record](../verification/license-scope.md). The integrating PR records actual tested candidate, results and independent review. Ownership/publishing/royalty concepts and versioned policy references follow before WP-05 detail/device work.
 
+## Ownership and economic policy increment — 2026-09-12
+
+Schema v4 separates four ownership subjects through explicit retained policy declarations, a licensor publishing-income share and a licensee-to-licensor recording royalty with a defined receipts basis. Integer basis points have no production default; no ownership remainder or collaborator payout is inferred. Every policy reference resolves to complete text retained in the same immutable license version. The server hashes exact policy bytes, and the full bundle occurs exactly once in source substitution. Compact card statements identify the referenced policies; complete text stays in source/review/offer/quote evidence.
+
+New admin drafts use v4. Explicit v3-to-v4 mapping starts new economic decisions blank; ordinary successors preserve their schema. A pinned v4 renderer and forward lifecycle-guard migration preserve v1–v3 validators, previews, review evidence and commercial snapshots. See [schema/operator guide](../license-economic-policies.md) and [verification](../verification/license-economics.md), with actual tested commits/results in the integrating PR.
+
+After acceptance, the next ordered implementation is WP-05 track detail, full frozen policy disclosure and device/player work. This is a bounded policy-declaration model, not verified chain of title, an ownership allocation engine, royalty accounting or an executed contract.
+
 ## Remaining work within WP-04
 
 - Actual seller-approved production source, reviewed license matrix, reviewer evidence and rights policy under U-05.
-- Remaining typed fields for ownership/publishing/royalties and versioned policy references; representative policy/contract consistency fixtures. The current usage/permission/credit variables are bounded and still require human source-consistency review.
+- Production representative policy/contract consistency evidence and full buyer-facing policy disclosure under WP-05. Economic declarations and retained references are implemented in this increment; actual ownership allocations and policy prose still require source-consistency review and approval.
 - Buyer-specific deterministic contract rendering, PDF/archive format and reproducibility acceptance under U-06/WP-08.
 - Quote/order snapshot integration under WP-06/WP-07, shared exclusive inventory and reservation policy; current publication is limited to positive USD non-exclusive offers.
 - Historical source-contract reconciliation and continuity evidence. Existing records are retained; no replacement approval or executed contract is inferred from a migration.
@@ -69,7 +77,7 @@ See the [verification record](../verification/licensing-and-offers.md) for exact
 
 ## Rollback and boundaries
 
-Retain compatible v1/v2/v3 validators/renderers and database guards wherever their versions are retained. Reverting to older-only code makes later licenses unavailable; do not rewrite them to fit an old schema. The migration down restores the prior transition guard for disposable/verified-compatible environments only and does not erase records. Disable a new offer/version without altering prior records. Supersede terms with a new version; preserve every referenced version.
+Retain compatible v1/v2/v3/v4 validators/renderers and database guards wherever their versions are retained. Reverting to older-only code makes later licenses unavailable; do not rewrite them to fit an old schema. The migration down restores the prior transition guard for disposable/verified-compatible environments only and does not erase records. Disable a new offer/version without altering prior records. Supersede terms with a new version; preserve every referenced version.
 
 Do not add secrets, private masters, unredacted orders, customer PII or real contract documents to this issue/PR. Do not change an external provider, charge a customer, publish marketing or alter the live domain unless that action is within the recorded authorization and applicable readiness gates.
 

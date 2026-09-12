@@ -40,3 +40,7 @@ Apply `2026_09_11_000011_license_scope_terms.php` with compatible code. It insta
 Retained v3 evidence requires v3-aware validators and renderer. Migration down restores the v2 guard without rewriting/deleting records and is suitable only for disposable or verified-compatible environments. For recovery with retained v3 versions, keep compatible code and evidence; deactivate affected offers if needed. Never coerce published terms into an older schema.
 
 See [verification](verification/license-scope.md) and the [ordered development plan](development-order.md). Next are ownership/publishing/royalty concepts and versioned policy references, followed by WP-05 detail/device work. Buyer-specific contracts and fulfillment remain WP-08.
+
+## Later authoring schema
+
+New drafts use [schema v4 economic policies](license-economic-policies.md), which retains these exact territory/duration rules. This page documents pinned v3 behavior and deliberate v2-to-v3 mapping. Existing v3 versions, their previews and ordinary successors remain v3; use **Define economic policies** for an explicit v4 successor.

@@ -97,7 +97,7 @@ class TypedLicenseTest extends TestCase
         $published = $this->publish($draft, $actor);
         $before = $published->fresh()->getAttributes();
         $this->publish(TypedLicenseFixtures::draft($actor), $actor);
-        $this->assertSame(3, LicenseTerms::SCHEMA_VERSION);
+        $this->assertSame(4, LicenseTerms::SCHEMA_VERSION);
         $this->assertSame(1, $published->terms_schema_version);
         $this->assertSame(hash('sha256', $golden), $published->render_fixture_hash);
         $this->assertSame($before, $published->fresh()->getAttributes());

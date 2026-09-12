@@ -6,12 +6,15 @@ use Illuminate\Validation\ValidationException;
 
 final class LicenseTerms
 {
-    public const SCHEMA_VERSION = 3;
+    public const SCHEMA_VERSION = 4;
 
     public const ASSET_ROLES = ['download_mp3', 'master_wav', 'stems_zip'];
 
     public function validate(array $terms): array
     {
+        if (($terms['schema_version'] ?? null) === 4) {
+            return app(EconomicLicenseTerms::class)->validate($terms);
+        }
         if (($terms['schema_version'] ?? null) === 3) {
             return app(ScopedLicenseTerms::class)->validate($terms);
         }
@@ -58,8 +61,16 @@ final class LicenseTerms
         return match ($terms['schema_version'] ?? null) {
             2 => app(TypedLicenseTerms::class)->statements($terms),
             3 => app(ScopedLicenseTerms::class)->statements($terms),
+            4 => app(EconomicLicenseTerms::class)->statements($terms),
             default => $this->fail('Generated statements require a supported typed license schema.'),
         };
+    }
+
+    public function sourceValues(array $terms): array
+    {
+        return ($terms['schema_version'] ?? null) === 4
+            ? app(EconomicLicenseTerms::class)->sourceValues($terms)
+            : $this->statements($terms);
     }
 
     private function fail(string $message): never

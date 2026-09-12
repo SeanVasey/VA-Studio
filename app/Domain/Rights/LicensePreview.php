@@ -12,6 +12,9 @@ final class LicensePreview
     public function render(LicenseVersion $version): array
     {
         app(LicenseContent::class)->validate($version->only(['authored_source', 'structured_terms', 'effective_from', 'effective_until']));
+        if ($version->structured_terms['schema_version'] === 4) {
+            return app(EconomicLicensePreview::class)->render($version);
+        }
         if ($version->structured_terms['schema_version'] === 3) {
             return app(ScopedLicensePreview::class)->render($version);
         }

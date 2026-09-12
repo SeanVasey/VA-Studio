@@ -29,6 +29,6 @@ final class TypedLicenseFields
         $fields[] = TextInput::make('structured_terms.credit.text')->label('Approved credit text')->maxLength(120)->visible($required)->required($required)->dehydrated($required);
 
         return Section::make('Usage rights')->description('Choose every permission explicitly. License-card summaries are generated from these values. Include each shown variable, plus {{deliverables}}, in the authored source and review the resulting text.')
-            ->schema($fields)->columns(2)->columnSpanFull()->visible(fn (Get $get) => in_array((int) $get('structured_terms.schema_version'), [2, 3], true));
+            ->schema($fields)->columns(2)->columnSpanFull()->visible(fn (Get $get) => in_array((int) $get('structured_terms.schema_version'), [2, 3, 4], true));
     }
 }

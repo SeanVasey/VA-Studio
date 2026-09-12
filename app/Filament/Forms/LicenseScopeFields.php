@@ -13,7 +13,7 @@ final class LicenseScopeFields
 {
     public static function make(): Section
     {
-        $scoped = fn (Get $get) => (int) $get('structured_terms.schema_version') === 3;
+        $scoped = fn (Get $get) => in_array((int) $get('structured_terms.schema_version'), [3, 4], true);
         $countries = fn (Get $get) => $get('structured_terms.territory.mode') === 'countries';
         $fixed = fn (Get $get) => $get('structured_terms.duration.mode') === 'fixed_months';
 
