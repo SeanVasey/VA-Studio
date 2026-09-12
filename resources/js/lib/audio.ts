@@ -32,7 +32,7 @@ export const player = {
     if (!url) return;
     const element = owner();
     const currentRequest = ++request;
-    if (snapshot.track?.id !== track.id || snapshot.status === 'error') {
+    if (snapshot.track?.id !== track.id || snapshot.track?.previewUrl !== track.previewUrl || snapshot.status === 'error') {
       element.pause();
       element.src = url;
       update({ track, currentTime: 0, duration: 0, error: null, status: 'loading' });
@@ -47,7 +47,7 @@ export const player = {
   toggle(track?: Track) {
     const target = track ?? snapshot.track;
     if (!target) return;
-    if (snapshot.track?.id === target.id && (snapshot.status === 'playing' || snapshot.status === 'loading')) player.pause();
+    if (snapshot.track?.id === target.id && snapshot.track?.previewUrl === target.previewUrl && (snapshot.status === 'playing' || snapshot.status === 'loading')) player.pause();
     else void player.play(target);
   },
   seek(time: number) {

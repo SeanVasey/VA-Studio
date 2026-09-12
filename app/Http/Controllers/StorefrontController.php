@@ -29,6 +29,12 @@ class StorefrontController extends Controller
         return response()->json(app(PublicCatalog::class)->page($request) + ['commerceEnabled' => false]);
     }
 
+    public function license(string $slug, string $revision): JsonResponse
+    {
+        return response()->json(app(PublicCatalog::class)->license($slug, $revision))
+            ->header('Cache-Control', 'private, no-store');
+    }
+
     public function selections(Request $request): JsonResponse
     {
         $input = $request->validate([
