@@ -8,6 +8,7 @@ use App\Domain\Catalog\PublishTrack;
 use App\Domain\Catalog\SaveOfferDraft;
 use App\Domain\Rights\LicenseSourceVariables;
 use App\Domain\Rights\Models\RightsDeclaration;
+use App\Support\CanonicalJson;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -101,7 +102,9 @@ class PublicLicenseDisclosureTest extends TestCase
         $this->getJson($url)->assertNotFound()->assertDontSee($original['termsText']);
         $this->getJson($this->url($selection))->assertOk()->assertJsonPath('termsText', 'NONBINDING changed test terms.')->assertJsonPath('licenseVersionId', (string) $successorLicense->id);
         $this->assertDatabaseHas('offer_revisions', ['id' => $original['offerRevisionId']]);
-        $this->assertSame($snapshot, \App\Domain\Catalog\Models\OfferRevision::findOrFail($original['offerRevisionId'])->snapshot);
+        $retained = \App\Domain\Catalog\Models\OfferRevision::findOrFail($original['offerRevisionId']);
+        $this->assertSame(CanonicalJson::encode($snapshot), CanonicalJson::encode($retained->snapshot));
+        $this->assertSame(CanonicalJson::hash($snapshot), $retained->snapshot_hash);
     }
 
     public static function unavailableCases(): array
