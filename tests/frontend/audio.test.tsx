@@ -59,3 +59,16 @@ it('keeps the same active audio source and time while catalog pages change', asy
   expect(source.currentTime).toBe(42);
   expect(source.src).toBe(window.location.origin + playable.previewUrl);
 });
+
+it('replaces the native source when the same track publishes a new preview', async () => {
+  vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => {});
+  const play = vi.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(function (this: HTMLMediaElement) { this.dispatchEvent(new Event('playing')); return Promise.resolve(); });
+  render(<PersistentPlayer tracks={[playable]} onLicense={() => {}} />);
+  await act(() => player.play(playable));
+  const source = play.mock.contexts[0] as HTMLMediaElement;
+  await act(async () => player.toggle({ ...playable, previewUrl: '/media/revised-preview' }));
+  expect(play).toHaveBeenCalledTimes(2);
+  expect(play.mock.contexts[1]).toBe(source);
+  expect(source.src).toBe(window.location.origin + '/media/revised-preview');
+  expect(screen.getByRole('button', { name: 'Pause preview' })).toBeInTheDocument();
+});

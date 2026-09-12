@@ -20,13 +20,14 @@ Bespoke web store development replacing older, service-based e-commerce offering
 - [Catalog administration](docs/catalog-administration.md): audited metadata saves, edit conflicts and stable published track URLs.
 - [Catalog pagination](docs/catalog-pagination.md): bounded server browsing and off-page saved-selection reconciliation.
 - [Public track sharing](docs/track-sharing.md): canonical URLs, server-rendered social metadata, Inertia navigation and publication privacy.
+- [Track details and full license terms](docs/track-detail-and-license-disclosure.md): published offer disclosure, resilient selection, persistent playback and browser verification scope.
 - [Stripe test webhook inbox](docs/stripe-webhook-inbox.md): signed event receipt, immutable encrypted evidence, duplicate handling and development configuration.
 
 ## Foundation scope
 
 | Surface | Initial implementation | Remaining delivery |
 | --- | --- | --- |
-| Storefront | Paginated server catalog/search/sort, license comparison, reconciled cart, shared track links with server-rendered social metadata, persistent audio transport | Production catalog import, dedicated track detail, collections and device acceptance |
+| Storefront | Paginated catalog/search/sort, dedicated track pages, frozen full license disclosure, reconciled cart, social metadata and persistent audio transport | Production catalog import, collections, physical-device and broader accessibility/performance acceptance |
 | Admin | Authenticated Filament catalog/licensing management, audited metadata edits and permanent published track URLs | Detailed RBAC, recovery verification, site editing, customers and fulfillment operations |
 | Media | Private WAV/artwork and bounded WAV-stems ZIP intake, queued verification, immutable master/MP3 revisions, tagged previews, measured waveforms, admin retry controls and audited stems/master associations frozen in offers | Production scanner acceptance, worker isolation, real stems alignment acceptance, resumable uploads and managed object storage |
 | Licensing | Exact submitted review payloads, independent approval evidence, source/summary preview, successor diffs and effective dates | Approved production terms, a complete typed rights schema, buyer contracts and archival PDF rendering |

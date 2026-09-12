@@ -117,6 +117,16 @@ final class PublicCatalog
         return $this->project(collect([$track]));
     }
 
+    public function license(string $slug, string $revisionId): array
+    {
+        $track = $this->query()->where('slug', $slug)->first();
+        abort_unless($track && $this->eligible($track), 404);
+        $offer = $track->offers->first(fn ($offer) => $offer->is_active && (string) $offer->currentRevision?->id === $revisionId);
+        abort_unless($offer, 404);
+
+        return app(PublicLicenseDisclosure::class)->fromRevision($offer->currentRevision);
+    }
+
     public function selections(array $ids): array
     {
         // At most ten public records; never treat absence from a catalog page as withdrawal.
@@ -168,13 +178,14 @@ final class PublicCatalog
                     'artworkUrl' => route('media.public', $assets->firstWhere('role', 'artwork')->id),
                     'previewUrl' => route('media.public', $preview->id),
                     'shareUrl' => route('tracks.show', $track->slug),
-                    'offers' => $track->offers->where('is_active', true)->map(function ($offer) {
+                    'offers' => $track->offers->where('is_active', true)->map(function ($offer) use ($track) {
                         $revision = $offer->currentRevision;
                         $license = $revision->snapshot['license'];
 
                         return [
                             'id' => (string) $offer->id, 'offerRevisionId' => (string) $revision->id, 'licenseVersionId' => (string) $license['id'], 'licenseName' => $license['name'],
                             'priceMinor' => $revision->price_minor, 'currency' => $revision->currency, 'deliverableRoles' => $license['required_asset_roles'],
+                            'licenseUrl' => route('tracks.license', ['slug' => $track->slug, 'revision' => $revision->id]),
                         ];
                     })->values()->all(),
                 ];

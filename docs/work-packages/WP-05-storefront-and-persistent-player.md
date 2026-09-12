@@ -1,6 +1,6 @@
 # [WP-05] Branded catalog, track detail and persistent preview player
 
-Status: **Storefront foundation, public-sharing metadata and bounded pagination/reconciliation increments implemented; broader work package remains open.** Dedicated track detail, device playback/accessibility and performance acceptance remain open.
+Status: **Foundation, public-sharing metadata and pagination/reconciliation merged; dedicated track detail and full license disclosure implemented for candidate verification.** Physical-device playback, broader accessibility and production performance acceptance remain open.
 
 - Suggested issue title: `[WP-05] Branded catalog, track detail and persistent preview player`
 - Phase: 1
@@ -43,7 +43,13 @@ Bounded server search/filter/sort and encrypted previous/next cursor positions r
 
 The original next step was recovered from issue #5. The subsequent handoff now explicitly closes earlier foundation/admin gaps before further Phase 1 detail/player work or Phase 2 commerce; see [ordered development status](../development-order.md). CI evidence belongs to the actual PR head; device and live catalog acceptance remain unverified.
 
-## Verification
+## Detail, disclosure and native browser coverage — 2026-09-12
+
+Dedicated track artwork/metadata, exact published offer cards and full frozen license text now use the current catalog/offer revision. Same-origin lazy disclosure handles changed offers, failure, retry and late responses; all internal review and private-media evidence remains excluded. Native audio source identity includes the preview URL so a replacement for the same track loads correctly. See [contract and scoped tests](../track-detail-and-license-disclosure.md).
+
+The candidate adds desktop Chromium/mobile WebKit scenarios for real Inertia navigation, native synthetic-WAV decoding/seeking, one audio owner, full policy scrolling, responsive overflow and dialog keyboard recovery. Browser transport fixtures are test-owned; they do not certify production publication or physical-device behavior. PHP readiness/projection tests use the real synthetic media/review/publication services. The PR records executed outcomes at the actual candidate. After this bounded increment is merged under Sean's continuous-development authorization, resume WP-06 while retaining the broader gates above.
+
+## Verification approach
 
 Frontend type/build checks plus browser scenarios for navigation/playback/error state at desktop and mobile widths; inspect active-theme token usage and accessibility. Record exact commit, environment and results. A checklist or unexecuted test definition is not completion evidence.
 

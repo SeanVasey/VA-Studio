@@ -6,6 +6,19 @@ export interface Offer {
   priceMinor: number;
   currency: string;
   deliverableRoles: string[];
+  licenseUrl?: string;
+}
+
+export interface LicenseDisclosure {
+  offerId: string;
+  offerRevisionId: string;
+  licenseVersionId: string;
+  name: string;
+  version: number;
+  type: string;
+  features: string[];
+  deliverableRoles: string[];
+  termsText: string;
 }
 
 export interface Track {

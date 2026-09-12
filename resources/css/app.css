@@ -433,3 +433,49 @@ input[type='range'] { accent-color: var(--va-action); cursor: pointer; min-width
 .catalog-pagination .text-link { min-height: 44px; }
 .selected-track { margin-top: 24px; border-top: 1px solid var(--va-border); }
 .selected-track > .eyebrow { margin: 16px 0; }
+
+.track-detail { padding-top: 32px; padding-bottom: 24px; }
+.detail-back { min-height: 44px; margin-bottom: 24px; }
+.detail-hero { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: clamp(32px, 5vw, 80px); align-items: center; }
+.detail-artwork { aspect-ratio: 1; background: var(--va-surface); display: flex; align-items: center; justify-content: center; border: 1px solid var(--va-rule); }
+.detail-artwork img { width: 100%; height: 100%; object-fit: cover; }
+.detail-copy { min-width: 0; }
+.detail-copy h1 { font-size: clamp(44px, 6.5vw, 102px); line-height: .98; letter-spacing: -.035em; overflow-wrap: anywhere; margin: 20px 0 12px; }
+.detail-artist { font-size: 18px; color: var(--va-text-muted); }
+.detail-metadata { display: flex; flex-wrap: wrap; gap: 28px; margin: 28px 0; }
+.detail-metadata dt { font-size: 11px; color: var(--va-text-muted); margin-bottom: 8px; }
+.detail-metadata dd { font: 13px var(--va-font-mono); margin: 0; }
+.detail-waveform { display: flex; align-items: center; gap: 3px; height: 56px; margin: 24px 0; }
+.detail-waveform span { flex: 1; min-width: 1px; background: var(--va-border); }
+.detail-waveform .played { background: var(--va-action); }
+.detail-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.detail-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 0; padding: 0; list-style: none; }
+.detail-tags li { border: 1px solid var(--va-rule); padding: 8px 12px; font-size: 11px; overflow-wrap: anywhere; }
+.detail-licenses { padding-top: 72px; }
+.detail-licenses h2 { font-size: clamp(36px, 4.5vw, 64px); }
+.detail-offers { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 20px; }
+.detail-offer { display: flex; flex-direction: column; gap: 20px; min-width: 0; padding: 28px; border: 1px solid var(--va-border); background: var(--va-surface); }
+.detail-offer h3 { margin: 12px 0; font-size: 24px; overflow-wrap: anywhere; }
+.detail-offer-price { display: flex; align-items: baseline; gap: 10px; }
+.detail-offer-price strong { font: 32px var(--va-font-mono); }
+.detail-offer-price span { font-size: 11px; color: var(--va-text-muted); }
+.detail-offer summary { cursor: pointer; min-height: 44px; padding: 10px 0; font-size: 12px; }
+.detail-offer summary:focus-visible { outline: 3px solid var(--va-focus); outline-offset: 3px; }
+.detail-offer ul { padding-left: 20px; font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
+.detail-offer li + li { margin-top: 8px; }
+.detail-offer > .button { margin-top: auto; }
+.license-disclosure { border-top: 1px solid var(--va-rule); border-bottom: 1px solid var(--va-rule); padding: 16px 0; margin: 20px 0; }
+.license-disclosure > button { min-height: 44px; color: var(--va-action); }
+.license-disclosure h3 { font-size: 18px; margin: 12px 0; }
+.license-disclosure [role="alert"] .button { margin-top: 16px; }
+.license-source { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 55dvh; overflow-y: auto; padding: 20px; margin-top: 20px; background: var(--va-canvas); border: 1px solid var(--va-border); font: 14px/1.8 var(--va-font-body); }
+@media (max-width: 700px) {
+  .detail-hero { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .detail-artwork { width: min(100%, 440px); margin: auto; }
+  .detail-copy h1 { font-size: clamp(42px, 12vw, 74px); }
+  .detail-waveform { gap: 2px; }
+  .detail-actions .button { flex: 1; padding: 0 14px; gap: 12px; }
+  .detail-licenses { padding-top: 48px; }
+  .detail-offer { padding: 24px; }
+  .license-source { padding: 14px; font-size: 13px; }
+}
