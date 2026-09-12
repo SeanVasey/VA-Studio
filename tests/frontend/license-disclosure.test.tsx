@@ -77,3 +77,14 @@ it('does not fetch a foreign-origin terms URL', async () => {
   expect(await screen.findByRole('alert')).toBeInTheDocument();
   expect(fetcher).not.toHaveBeenCalled();
 });
+
+it.each([
+  { quoteId: 'another-quote', disclosureSchema: 1, disclosureHash: 'a'.repeat(64) },
+  { quoteId: 'selected-quote', disclosureSchema: 2, disclosureHash: 'a'.repeat(64) },
+  { quoteId: 'selected-quote', disclosureSchema: 1, disclosureHash: 'invalid' },
+])('rejects a mismatched quote disclosure envelope: %j', async envelope => {
+  vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({ ...terms(offer), ...envelope })));
+  render(<LicenseDisclosure offer={offer} quoteId="selected-quote" defaultOpen />);
+  expect(await screen.findByRole('alert')).toBeInTheDocument();
+  expect(screen.queryByRole('region', { name: 'Published license text' })).not.toBeInTheDocument();
+});

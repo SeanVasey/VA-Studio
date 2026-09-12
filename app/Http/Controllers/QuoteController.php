@@ -6,6 +6,7 @@ use App\Domain\Commerce\CreateQuote;
 use App\Domain\Commerce\Models\Quote;
 use App\Domain\Commerce\QuoteException;
 use App\Domain\Commerce\ReadQuote;
+use App\Domain\Commerce\ReadQuoteDisclosure;
 use App\Support\QuoteOwner;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -38,6 +39,15 @@ final class QuoteController
         }
     }
 
+    public function license(string $quote, string $revision, Request $request, QuoteOwner $owner, ReadQuoteDisclosure $read): JsonResponse
+    {
+        try {
+            return $this->response($read->handle($quote, $owner->forRequest($request), $revision));
+        } catch (QuoteException $exception) {
+            return $this->failure($exception);
+        }
+    }
+
     /** Read the declared JSON contract only; never merge query, form, price or owner fields. */
     private function items(Request $request): ?array
     {
@@ -65,7 +75,7 @@ final class QuoteController
 
     private function present(Quote $quote): JsonResponse
     {
-        $items = array_map(static function (array $line): array {
+        $items = array_map(static function (array $line) use ($quote): array {
             $snapshot = $line['offer_snapshot'];
 
             return [
@@ -80,6 +90,7 @@ final class QuoteController
                 'currency' => $snapshot['commercial']['currency'],
                 'deliverableRoles' => array_values(array_unique(array_column($snapshot['assets'], 'role'))),
                 'features' => $snapshot['license']['features'],
+                'licenseUrl' => route('quotes.license', ['quote' => $quote->public_id, 'revision' => $line['offer_revision_id']]),
             ];
         }, $quote->snapshot['lines']);
 

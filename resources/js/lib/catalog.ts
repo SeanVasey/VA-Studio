@@ -10,6 +10,9 @@ export interface Offer {
 }
 
 export interface LicenseDisclosure {
+  quoteId?: string;
+  disclosureSchema?: number;
+  disclosureHash?: string;
   offerId: string;
   offerRevisionId: string;
   licenseVersionId: string;

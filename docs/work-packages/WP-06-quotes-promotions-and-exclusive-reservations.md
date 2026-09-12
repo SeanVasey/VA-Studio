@@ -1,6 +1,6 @@
 # [WP-06] Server quotes, promotion calculations and exclusive reservations
 
-Status: **First provisional selection-review increment; broader work package remains open.** The server freezes and revalidates selected published offer revisions, with a provisional USD subtotal. It does not calculate payable totals, collect assent, create orders or reserve exclusives. This issue is complete only when the full acceptance evidence below exists.
+Status: **Provisional selection reviews merged; owned full-license disclosure implemented for candidate verification. The broader work package remains open.** The server freezes and revalidates selected published offer revisions, with a provisional USD subtotal. It does not calculate payable totals, collect assent, create orders or reserve exclusives. This issue is complete only when the full acceptance evidence below exists.
 
 - Suggested issue title: `[WP-06] Server quotes, promotion calculations and exclusive reservations`
 - Phase: 2
@@ -37,6 +37,12 @@ The original wider milestone—frozen assent disclosure plus reservation of the 
 See [Provisional selection reviews](../provisional-quotes.md) for the exact implemented HTTP contract and recovery behavior. The proposed architecture interfaces describe the fuller target and do not supersede this deliberately smaller schema.
 
 ## Remaining work within WP-06 and dependencies
+
+### Frozen quote disclosure increment — 2026-09-12
+
+The quote review exposes an on-demand full license source for its exact immutable line, with quote/offer/license identities, expiry and a fingerprint of the public disclosure. Owner checks, current availability, hashes, session locking, rate limiting and generic private failures are reused from the existing quote reader. New UI validates the quote envelope and discards obsolete text on selection/review changes. The [contract and verification scope](../quote-license-disclosure.md) distinguishes disclosure from assent, payable tax or an executed contract. This is the next bounded WP-06 prerequisite after WP-05's full public offer disclosure; it creates no new quote schema or live policy. Final candidate evidence belongs in its PR.
+
+### Remaining requirements
 
 - Approved price/promotion policies, effective dates, allocation and rounding trace, stacking rules, redemption caps and independent-connection race tests.
 - A complete tax-policy envelope with authoritative calculation and permitted finalization rules. Unknown tax cannot be treated as zero.

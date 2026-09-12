@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { fileRoleLabels, formatMoney, savedCartSelection, type CartLine } from '../lib/catalog';
+import { fileRoleLabels, formatMoney, savedCartSelection, safeMediaUrl, type CartLine } from '../lib/catalog';
+import { LicenseDisclosure } from './LicenseDisclosure';
 
 interface ReviewedItem {
   trackId: string | number; offerId: string | number; offerRevisionId: string | number; licenseVersionId: string | number;
-  title: string; artist: string; licenseName: string; priceMinor: number; currency: string; deliverableRoles: string[]; features: string[];
+  title: string; artist: string; licenseName: string; priceMinor: number; currency: string; deliverableRoles: string[]; features: string[]; licenseUrl: string;
 }
 interface ReviewedQuote {
   id: string; expiresAt: string; currency: string; subtotalMinor: number;
@@ -31,6 +32,7 @@ function validQuote(value: unknown, selection: string): value is ReviewedQuote {
     && q.taxMinor === null && q.totalMinor === null && q.taxStatus === 'unresolved' && q.payable === false
     && Array.isArray(q.items) && q.items.length > 0 && q.items.length <= 10 && q.items.every(item => item && ids.every(key => typeof item[key] === 'string' || typeof item[key] === 'number')
       && typeof item.title === 'string' && typeof item.artist === 'string' && typeof item.licenseName === 'string'
+      && typeof item.licenseUrl === 'string' && !!safeMediaUrl(item.licenseUrl)
       && item.currency === q.currency && Number.isSafeInteger(item.priceMinor) && item.priceMinor > 0
       && Array.isArray(item.deliverableRoles) && item.deliverableRoles.every(role => typeof role === 'string')
       && Array.isArray(item.features) && item.features.every(feature => typeof feature === 'string'))
@@ -103,7 +105,7 @@ export function QuoteReview({ lines, designPreview }: { lines: CartLine[]; desig
   return <section className="quote-review" aria-label="Selection review">
     {quote && !expired ? <div className="quote-review-result">
       <h3>SELECTION REVIEWED</h3>
-      {quote.items.map(item => <div className="quote-review-item" key={String(item.trackId)}><strong>{item.title}</strong><p>{item.licenseName} · {formatMoney(item.priceMinor, item.currency)}</p><p>{item.deliverableRoles.map(role => fileRoleLabels[role] ?? role).join(' + ')}</p><ul>{item.features.map((feature, index) => <li key={index}>{feature}</li>)}</ul></div>)}
+      {quote.items.map(item => <div className="quote-review-item" key={String(item.trackId)}><strong>{item.title}</strong><p>{item.licenseName} · {formatMoney(item.priceMinor, item.currency)}</p><p>{item.deliverableRoles.map(role => fileRoleLabels[role] ?? role).join(' + ')}</p><ul>{item.features.map((feature, index) => <li key={index}>{feature}</li>)}</ul><LicenseDisclosure quoteId={quote.id} offer={{ id: String(item.offerId), offerRevisionId: String(item.offerRevisionId), licenseVersionId: String(item.licenseVersionId), licenseName: item.licenseName, priceMinor: item.priceMinor, currency: item.currency, deliverableRoles: item.deliverableRoles, licenseUrl: item.licenseUrl }} /></div>)}
       <div className="cart-total"><span>Reviewed subtotal</span><strong>{formatMoney(quote.subtotalMinor, quote.currency)} <small>{quote.currency}</small></strong></div>
       <p className="fine-print">Review expires at <time dateTime={quote.expiresAt}>{new Date(quote.expiresAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</time>. Availability can change. Tax and final total are not determined. This review does not reserve rights or create an order.</p>
     </div> : null}
