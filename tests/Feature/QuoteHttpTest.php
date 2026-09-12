@@ -53,7 +53,7 @@ class QuoteHttpTest extends TestCase
         $this->assertNull($quote['totalMinor']);
         $this->assertSame('unresolved', $quote['taxStatus']);
         $this->assertFalse($quote['payable']);
-        $this->assertSame(['trackId', 'offerId', 'offerRevisionId', 'licenseVersionId', 'title', 'artist', 'licenseName', 'priceMinor', 'currency', 'deliverableRoles', 'features'], array_keys($quote['items'][0]));
+        $this->assertSame(['trackId', 'offerId', 'offerRevisionId', 'licenseVersionId', 'title', 'artist', 'licenseName', 'priceMinor', 'currency', 'deliverableRoles', 'features', 'licenseUrl'], array_keys($quote['items'][0]));
         $this->assertSame(['master_wav'], $quote['items'][0]['deliverableRoles']);
         $stored = Quote::sole();
         foreach ([$stored->owner_key, $stored->snapshot_hash, $selection['revision']->snapshot_hash, $selection['media']['master_wav']->sha256, $selection['media']['master_wav']->storage_path, $selection['revision']->snapshot['license']['authored_source']] as $private) {

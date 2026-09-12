@@ -1,12 +1,12 @@
 import { useEffect, useId, useState } from 'react';
 import { safeMediaUrl, type LicenseDisclosure as Disclosure, type Offer } from '../lib/catalog';
 
-export function LicenseDisclosure({ offer, defaultOpen = false }: { offer: Offer; defaultOpen?: boolean }) {
+export function LicenseDisclosure({ offer, defaultOpen = false, quoteId }: { offer: Offer; defaultOpen?: boolean; quoteId?: string }) {
   const region = useId();
   const [open, setOpen] = useState(defaultOpen);
   const [attempt, setAttempt] = useState(0);
   const [result, setResult] = useState<{ key: string; data?: Disclosure; error?: string } | null>(null);
-  const key = `${offer.id}:${offer.offerRevisionId}:${offer.licenseVersionId}:${offer.licenseUrl ?? ''}`;
+  const key = `${quoteId ?? ''}:${offer.id}:${offer.offerRevisionId}:${offer.licenseVersionId}:${offer.licenseUrl ?? ''}`;
   const current = result?.key === key ? result : null;
   useEffect(() => {
     if (!open) return;
@@ -21,17 +21,20 @@ export function LicenseDisclosure({ offer, defaultOpen = false }: { offer: Offer
         if (!response.ok) throw new Error('Unavailable license');
         const data: Disclosure = await response.json();
         if (!data || data.offerId !== offer.id || data.offerRevisionId !== offer.offerRevisionId || data.licenseVersionId !== offer.licenseVersionId ||
+          (quoteId !== undefined && (data.quoteId !== quoteId || data.disclosureSchema !== 1 || typeof data.disclosureHash !== 'string' || !/^[a-f0-9]{64}$/.test(data.disclosureHash))) ||
           typeof data.name !== 'string' || !Number.isSafeInteger(data.version) || typeof data.type !== 'string' || typeof data.termsText !== 'string' ||
           !Array.isArray(data.features) || !data.features.every(value => typeof value === 'string') ||
           !Array.isArray(data.deliverableRoles) || !data.deliverableRoles.every(value => typeof value === 'string')) throw new Error('Mismatched license');
         if (active) setResult({ key, data });
       } catch {
-        if (active) setResult({ key, error: 'These terms could not be loaded. The offer may have changed, or the connection was interrupted. Retry or reopen the track for its current licenses.' });
+        if (active) setResult({ key, error: quoteId
+          ? 'These terms could not be loaded. Retry after a connection interruption, or review your selection again if its terms or availability changed.'
+          : 'These terms could not be loaded. The offer may have changed, or the connection was interrupted. Retry or reopen the track for its current licenses.' });
       }
     }
     void load();
     return () => { active = false; controller.abort(); };
-  }, [open, attempt, key, offer.id, offer.offerRevisionId, offer.licenseVersionId, offer.licenseUrl]);
+  }, [open, attempt, key, quoteId, offer.id, offer.offerRevisionId, offer.licenseVersionId, offer.licenseUrl]);
 
   return <section className="license-disclosure" aria-label="Full license terms">
     <button type="button" className="text-link" aria-expanded={open} aria-controls={region} onClick={() => setOpen(!open)}>{open ? 'Hide full terms' : 'Read full terms'}</button>

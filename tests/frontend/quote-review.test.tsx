@@ -7,7 +7,7 @@ import { fixtureTracks } from '../../resources/js/test/fixtures';
 
 const lines = [{ track: fixtureTracks[0], offer: fixtureTracks[0].offers[0] }];
 const reviewed = (overrides = {}) => ({ id: 'review-test-only', expiresAt: new Date(Date.now() + 60000).toISOString(), currency: 'USD', subtotalMinor: 4900, taxMinor: null, totalMinor: null, taxStatus: 'unresolved', payable: false,
-  items: [{ ...savedCartSelection(lines[0]), title: 'Server-verified title', artist: 'Test', licenseName: 'Reviewed license', priceMinor: 4900, currency: 'USD', deliverableRoles: ['master_wav'], features: ['Synthetic reviewed feature'] }], ...overrides });
+  items: [{ ...savedCartSelection(lines[0]), title: 'Server-verified title', artist: 'Test', licenseName: 'Reviewed license', priceMinor: 4900, currency: 'USD', deliverableRoles: ['master_wav'], features: ['Synthetic reviewed feature'], licenseUrl: '/quotes/review-test-only/offers/1/license' }], ...overrides });
 const response = (quote = reviewed()) => new Response(JSON.stringify({ quote }), { status: 200 });
 
 describe('server selection review', () => {
@@ -104,5 +104,38 @@ describe('server selection review', () => {
     render(<QuoteReview lines={lines} designPreview={false} />);
     await user.dblClick(screen.getByRole('button', { name: 'Review selection' }));
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+  });
+
+  it('loads full terms from the reviewed quote URL and never substitutes the catalog terms', async () => {
+    const user = userEvent.setup();
+    const quote = reviewed();
+    const item = quote.items[0];
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(quote)).mockResolvedValueOnce(new Response(JSON.stringify({
+      quoteId: quote.id, disclosureSchema: 1, disclosureHash: 'a'.repeat(64),
+      offerId: item.offerId, offerRevisionId: item.offerRevisionId, licenseVersionId: item.licenseVersionId,
+      name: item.licenseName, version: 1, type: 'non-exclusive', features: item.features, deliverableRoles: item.deliverableRoles,
+      termsText: 'NONBINDING frozen quote terms. Full retained policy.',
+    })));
+    render(<QuoteReview lines={lines} designPreview={false} />);
+    await user.click(screen.getByRole('button', { name: 'Review selection' }));
+    await user.click(await screen.findByRole('button', { name: 'Read full terms' }));
+    expect(await screen.findByRole('region', { name: 'Published license text' })).toHaveTextContent('NONBINDING frozen quote terms. Full retained policy.');
+    expect(fetcher.mock.calls[1][0]).toBe(window.location.origin + item.licenseUrl);
+    expect(fetcher.mock.calls[1][1]).toEqual(expect.objectContaining({ credentials: 'same-origin', cache: 'no-store' }));
+  });
+
+  it('discards pending terms when a quote is restarted after its selection changes', async () => {
+    const user = userEvent.setup();
+    const quote = reviewed();
+    let finishTerms!: (response: Response) => void;
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(quote)).mockImplementationOnce(() => new Promise(resolve => { finishTerms = resolve; }));
+    const view = render(<QuoteReview lines={lines} designPreview={false} />);
+    await user.click(screen.getByRole('button', { name: 'Review selection' }));
+    await user.click(await screen.findByRole('button', { name: 'Read full terms' }));
+    view.rerender(<QuoteReview lines={[{ ...lines[0], offer: { ...lines[0].offer, offerRevisionId: 'replacement' } }]} designPreview={false} />);
+    await act(async () => { finishTerms(new Response(JSON.stringify({ termsText: 'Obsolete response' }))); });
+    expect(screen.queryByText('SELECTION REVIEWED')).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Published license text' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Obsolete response')).not.toBeInTheDocument();
   });
 });
