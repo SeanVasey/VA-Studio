@@ -39,7 +39,7 @@ class LicenseVersion extends Model
 
     public function features(): array
     {
-        if (in_array($this->structured_terms['schema_version'] ?? null, [2, 3], true)) {
+        if (in_array($this->structured_terms['schema_version'] ?? null, [2, 3, 4], true)) {
             return array_values(app(LicenseTerms::class)->statements($this->structured_terms));
         }
 

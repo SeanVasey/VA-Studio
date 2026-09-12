@@ -1,6 +1,6 @@
 > Typed usage terms are now available for new drafts. See [typed license terms](typed-license-terms.md) for the current editor, required variables, explicit legacy mapping and compatible migration. The v1 workflow below remains supported for retained revisions; it is not silently upgraded.
 
-Current authoring uses [territory and duration schema v3](license-territory-duration.md), retaining the historical workflows below.
+Current authoring uses [ownership and economic policy schema v4](license-economic-policies.md), retaining the historical workflows below.
 
 # Licensing and published offers
 
@@ -88,3 +88,7 @@ The following remain open within WP-04 and its dependent packages:
 - Historical contract/order reconciliation, customer obligations and migration/cutover acceptance. Immutable new revisions do not by themselves establish continuity of an old purchase.
 
 For operational rollback, deactivate affected offers or unpublish affected tracks while retaining every referenced version/revision. Correct content through a new reviewed successor and new commercial revision. Do not roll back evidence migrations or replace a snapshot in place as a shortcut.
+
+## Ownership and economic policy declarations
+
+New drafts now use [schema v4](license-economic-policies.md): explicit ownership policy references, publishing income and recording royalties, plus complete retained policy text. Earlier v1–v3 evidence and ordinary successor schemas remain compatible. **Define economic policies** deliberately maps a v3 predecessor without default rights or rates. Full policy bytes are frozen with review and commercial evidence; buyer disclosure and contracts remain WP-05/WP-08 dependencies. See [verification](verification/license-economics.md).
