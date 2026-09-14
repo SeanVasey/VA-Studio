@@ -6,6 +6,7 @@ use App\Domain\Commerce\CreateQuote;
 use App\Domain\Commerce\Models\Quote;
 use App\Domain\Commerce\PriceQuote;
 use App\Domain\Commerce\PricingSnapshot;
+use App\Domain\Commerce\PromotionPolicy;
 use App\Domain\Commerce\QuoteException;
 use App\Domain\Commerce\ReadQuote;
 use App\Domain\Commerce\ReadQuoteDisclosure;
@@ -73,6 +74,25 @@ final class QuoteController
     {
         try {
             return $this->response(['pricing' => app(PricingSnapshot::class)->present($pricing->read($quote, $owner->forRequest($request)))]);
+        } catch (QuoteException $exception) {
+            return $this->failure($exception);
+        }
+    }
+
+    public function promotionPrice(string $quote, Request $request, QuoteOwner $owner, PriceQuote $pricing): JsonResponse
+    {
+        try {
+            $body = $request->isJson() && $request->query->count() === 0 && strlen($request->getContent()) <= 1024
+                ? json_decode($request->getContent(), false, 4, JSON_THROW_ON_ERROR) : null;
+        } catch (JsonException) {
+            $body = null;
+        }
+        if (! $body instanceof stdClass || array_keys(get_object_vars($body)) !== ['promotionCode'] || ! PromotionPolicy::validCode($body->promotionCode)) {
+            return $this->failure(new QuoteException('INVALID_QUOTE_REQUEST', 422));
+        }
+        try {
+            return $this->response(['pricing' => app(PricingSnapshot::class)->present(
+                $pricing->createWithPromotion($quote, $owner->forRequest($request), $body->promotionCode))]);
         } catch (QuoteException $exception) {
             return $this->failure($exception);
         }
@@ -148,6 +168,10 @@ final class QuoteController
             'PRICING_EXPIRED' => 'This pricing review has expired. Review your selection again.',
             'PRICING_CHANGED' => 'Pricing rules have changed. Start a new selection review.',
             'PRICING_UNAVAILABLE' => 'Pricing is temporarily unavailable. Try again later.',
+            'PROMOTION_UNAVAILABLE' => 'This promotion is unavailable.',
+            'PROMOTION_NOT_ELIGIBLE' => 'This selection does not qualify for that promotion.',
+            'PROMOTION_LIMIT_REACHED' => 'This promotion has reached its usage limit.',
+            'PROMOTION_CHANGED' => 'Promotion rules have changed. Start a new selection review.',
             default => 'Choose a valid selection and try again.',
         };
 

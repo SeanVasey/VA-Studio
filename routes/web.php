@@ -19,6 +19,7 @@ Route::withoutMiddleware(HandleInertiaRequests::class)->group(function (): void 
     Route::get('/quotes/{quote}', [QuoteController::class, 'show'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('quotes.show');
     Route::get('/quotes/{quote}/offers/{revision}/license', [QuoteController::class, 'license'])->whereNumber('revision')->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('quotes.license');
     Route::post('/quotes/{quote}/pricing', [QuoteController::class, 'price'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('quotes.price');
+    Route::post('/quotes/{quote}/pricing/promotions', [QuoteController::class, 'promotionPrice'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('quotes.promotion-price');
     Route::get('/quotes/{quote}/pricing', [QuoteController::class, 'pricing'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('quotes.pricing');
 });
 Route::post('/checkout', fn () => response()->json([
