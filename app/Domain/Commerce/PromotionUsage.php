@@ -93,6 +93,16 @@ final class PromotionUsage
             if ($use->expires_at->lessThanOrEqualTo($at)) {
                 throw new QuoteException('PRICING_EXPIRED', 410);
             }
+            // Another worker may already have reused this hold's expired capacity.
+            // Recheck under the retained campaign lock so clock skew/rollback cannot
+            // revive an old hold into an extra pending attempt. Pending uses always count.
+            $otherUses = PromotionUse::query()->where('promotion_campaign_id', $use->promotion_campaign_id)
+                ->where('id', '<>', $use->id)
+                ->where(fn ($query) => $query->where('state', '<>', 'held')->orWhere('expires_at', '>', $at))
+                ->limit($pricing->snapshot['promotion']['max_uses'])->lockForUpdate()->pluck('id')->count();
+            if ($otherUses >= $pricing->snapshot['promotion']['max_uses']) {
+                throw new QuoteException('PROMOTION_LIMIT_REACHED', 409);
+            }
             try {
                 $changed = DB::table('promotion_uses')->where('id', $use->id)->where('state', 'held')->update([
                     'state' => 'pending', 'attempt_id' => $attemptId, 'pending_at' => $at,

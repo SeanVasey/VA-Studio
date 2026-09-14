@@ -168,6 +168,32 @@ class PromotionPricingTest extends TestCase
         $this->assertSame('pending', $use->refresh()->state);
     }
 
+    public function test_clock_rollback_cannot_reuse_capacity_already_assigned_to_a_newer_hold_or_attempt(): void
+    {
+        $this->travelTo(now()->startOfSecond());
+        PromotionFixtures::configure([PromotionFixtures::policy(['max_uses' => 1])]);
+        $oldQuote = $this->quote(); $oldPricing = $this->price($oldQuote);
+        $this->travelTo($oldPricing->expires_at);
+        $newQuote = $this->quote(); $newPricing = $this->price($newQuote);
+        $usage = app(PromotionUsage::class);
+        $this->travelTo($oldPricing->expires_at->subSecond());
+        $this->rejects('PROMOTION_LIMIT_REACHED', fn () => $usage->beginAttempt($oldQuote->public_id, self::OWNER, (string) Str::uuid()));
+        $this->assertSame(0, PromotionUse::where('state', 'pending')->count());
+        $this->assertSame(0, DB::table('audit_events')->where('action', 'commerce.promotion.pending')->count());
+
+        $this->travelTo($oldPricing->expires_at);
+        $attempt = (string) Str::uuid();
+        $use = $usage->beginAttempt($newQuote->public_id, self::OWNER, $attempt);
+        $this->assertSame($newPricing->id, $use->quote_pricing_id);
+        $this->assertSame($use->id, $usage->beginAttempt($newQuote->public_id, self::OWNER, $attempt)->id);
+        $this->travelTo($oldPricing->expires_at->subSecond());
+        $this->rejects('PROMOTION_LIMIT_REACHED', fn () => $usage->beginAttempt($oldQuote->public_id, self::OWNER, (string) Str::uuid()));
+        $this->assertSame(1, PromotionUse::where('state', 'pending')->count());
+        $this->assertSame(1, DB::table('audit_events')->where('action', 'commerce.promotion.pending')->count());
+        $this->assertSame('held', PromotionUse::where('quote_pricing_id', $oldPricing->id)->sole()->state);
+        $this->assertSame($oldPricing->snapshot_hash, $oldPricing->refresh()->snapshot_hash);
+    }
+
     public function test_attempt_identity_is_unique_and_outer_rollback_removes_the_transition_and_audit(): void
     {
         $first = $this->quote(); $this->price($first);

@@ -29,7 +29,9 @@ class PromotionConcurrencyTest extends TestCase
 
     public static function races(): array
     {
-        return array_map(static fn ($name) => [$name], ['last_use', 'same_quote', 'conflicting_policy', 'expired_hold', 'pending_hold', 'same_attempt', 'different_attempt']);
+        $names = ['last_use', 'same_quote', 'conflicting_policy', 'expired_hold', 'pending_hold', 'same_attempt', 'different_attempt', 'clock_skew'];
+
+        return array_combine($names, array_map(static fn ($name) => [$name], $names));
     }
 
     #[DataProvider('races')]
@@ -42,26 +44,37 @@ class PromotionConcurrencyTest extends TestCase
         PromotionFixtures::configure([$policy]);
         $make = fn () => app(CreateQuote::class)->handle($owner, (string) Str::uuid(), QuoteFixtures::selection()['items']);
         $first = $make();
-        $attempts = in_array($scenario, ['same_attempt', 'different_attempt'], true);
+        $attempts = in_array($scenario, ['same_attempt', 'different_attempt', 'clock_skew'], true);
         if ($attempts || in_array($scenario, ['expired_hold', 'pending_hold'], true)) {
             $prior = app(PriceQuote::class)->createWithPromotion($first->public_id, $owner, 'SYNTHETIC');
             if ($scenario === 'pending_hold') {
                 app(PromotionUsage::class)->beginAttempt($first->public_id, $owner, (string) Str::uuid());
             }
-            if (in_array($scenario, ['expired_hold', 'pending_hold'], true)) { $this->travelTo($prior->expires_at); }
+            if (in_array($scenario, ['expired_hold', 'pending_hold', 'clock_skew'], true)) { $this->travelTo($prior->expires_at); }
             if ($scenario === 'pending_hold') { $first = $make(); }
         }
         // Different quotes use distinct tracks/offers so their earlier catalog locks
         // cannot serialize the campaign test before the intended shared guard.
-        $sameQuote = $attempts || $scenario === 'same_quote';
+        $sameQuote = in_array($scenario, ['same_quote', 'same_attempt', 'different_attempt'], true);
+        $sentinels = 0;
+        if (in_array($scenario, ['last_use', 'conflicting_policy', 'pending_hold'], true)) {
+            // Split the missing quote_id lookup gaps before concurrent pricing inserts.
+            // Otherwise one worker can wait on quote_pricings while its peer waits
+            // at the later campaign barrier, creating a test-only circular wait.
+            $sentinel = app(CreateQuote::class)->handle($owner, (string) Str::uuid(), $first->request);
+            app(PriceQuote::class)->create($sentinel->public_id, $owner);
+            $sentinels = 1;
+        }
         $second = $sameQuote ? $first : $make();
+        if ($scenario === 'clock_skew') { app(PriceQuote::class)->createWithPromotion($second->public_id, $owner, 'SYNTHETIC'); }
         $attempt = (string) Str::uuid();
         $inputs = [];
         foreach ([$first, $second] as $index => $quote) {
             $configured = $policy;
             if ($scenario === 'conflicting_policy' && $index === 1) { $configured['discount']['amount_minor']++; }
             $inputs[] = ['quote' => $quote->public_id, 'owner' => $owner, 'policy' => $configured,
-                'now' => now()->toIso8601ZuluString(), 'action' => $attempts ? 'attempt' : 'price',
+                'now' => $scenario === 'clock_skew' && $index === 0 ? $prior->expires_at->subSecond()->toIso8601ZuluString() : now()->toIso8601ZuluString(),
+                'action' => $attempts ? 'attempt' : 'price',
                 'attempt' => $scenario === 'different_attempt' && $index === 1 ? (string) Str::uuid() : $attempt,
                 'barrier' => $sameQuote || $scenario === 'expired_hold' ? 'quotes' : 'promotion_campaigns'];
         }
@@ -116,12 +129,12 @@ class PromotionConcurrencyTest extends TestCase
                 $this->assertSame($results[0]['effect_id'], $results[1]['effect_id']);
                 $this->assertSame($results[0]['fingerprint'], $results[1]['fingerprint']);
             }
-            $uses = $scenario === 'expired_hold' ? 2 : 1;
+            $uses = in_array($scenario, ['expired_hold', 'clock_skew'], true) ? 2 : 1;
             $this->assertDatabaseCount('promotion_campaigns', 1);
             $this->assertDatabaseCount('promotion_uses', $uses);
-            $this->assertDatabaseCount('quote_pricings', $uses);
+            $this->assertDatabaseCount('quote_pricings', $uses + $sentinels);
             $this->assertSame($uses, DB::table('audit_events')->where('action', 'commerce.promotion.held')->count());
-            $this->assertSame($uses, DB::table('audit_events')->where('action', 'commerce.quote.priced')->count());
+            $this->assertSame($uses + $sentinels, DB::table('audit_events')->where('action', 'commerce.quote.priced')->count());
             $pending = $attempts || $scenario === 'pending_hold' ? 1 : 0;
             $this->assertSame($pending, PromotionUse::where('state', 'pending')->count());
             $this->assertSame($pending, DB::table('audit_events')->where('action', 'commerce.promotion.pending')->count());

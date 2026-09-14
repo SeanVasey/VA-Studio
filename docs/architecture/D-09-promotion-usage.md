@@ -17,7 +17,7 @@ Continuing without promotions leaves the ordered requirement unimplemented. Rewr
 | Domain | Versioned exact allocation before tax; one code per quote; retained v1 implementation | Boundary/reordering/historical tests; withdraw new caller, preserve readers |
 | Data | Add immutable campaign evidence and constrained usage identities; held → pending only | MySQL/SQLite schema/rollback tests; retain tables after useful records exist |
 | HTTP | Identifier-only promotion pricing POST; existing ownership/CSRF/private headers/throttles | Real HTTP/CSRF, foreign owner, malformed input, safe DTO tests |
-| Concurrency | Quote → catalog → pricing → campaign → uses; locking capacity read and idempotent retry | Independent MySQL processes at quote/campaign barriers; SQLite is not concurrency evidence |
+| Concurrency | Quote → catalog → pricing → campaign → uses; locking capacity reads at initial hold and attempt handoff, plus idempotent retry | Independent MySQL processes at quote/campaign barriers, including clock skew after slot reuse; SQLite is not concurrency evidence |
 | Audit | Single pricing/hold/pending effects, with safe IDs/hashes | Replay, last-slot race and nested transaction rollback assertions |
 | Payment | Internal test attempt binding before future external request; pending capacity cannot expire | No provider calls; WP-07 supplies durable order linkage, paid verification and terminal reconciliation |
 | UI/operations | No new visual surface or service; optional explicit local/test JSON list | Existing regression CI; production rejects test configuration; no live coupon seeded |

@@ -9,6 +9,7 @@ use App\Domain\Commerce\PriceQuote;
 use App\Models\User;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use RuntimeException;
@@ -103,7 +104,13 @@ class PromotionPricingHttpTest extends TestCase
     {
         $quote = $this->quote();
         $this->withoutMiddleware(PreventRequestForgery::class);
-        $this->app->instance('env', 'production');
+        // Validate the synthetic catalog in testing, then exercise the production
+        // policy boundary. Test-only media intentionally fails production readiness.
+        DB::listen(function ($query) {
+            if (str_starts_with($query->sql, 'select') && str_contains($query->sql, 'quote_pricings')) {
+                $this->app->instance('env', 'production');
+            }
+        });
         $this->assertPrivate($this->postPromotion($quote['id'])->assertStatus(503)->assertJsonPath('code', 'PROMOTION_UNAVAILABLE'));
         $this->assertDatabaseCount('promotion_campaigns', 0);
         config(['app.debug' => true]);
