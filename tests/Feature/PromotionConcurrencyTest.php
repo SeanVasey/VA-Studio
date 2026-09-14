@@ -75,7 +75,7 @@ class PromotionConcurrencyTest extends TestCase
             $inputs[] = ['quote' => $quote->public_id, 'owner' => $owner, 'policy' => $configured,
                 'now' => $scenario === 'clock_skew' && $index === 0 ? $prior->expires_at->subSecond()->toIso8601ZuluString() : now()->toIso8601ZuluString(),
                 'action' => $attempts ? 'attempt' : 'price',
-                'attempt' => $scenario === 'different_attempt' && $index === 1 ? (string) Str::uuid() : $attempt,
+                'attempt' => in_array($scenario, ['different_attempt', 'clock_skew'], true) && $index === 1 ? (string) Str::uuid() : $attempt,
                 'barrier' => $sameQuote || $scenario === 'expired_hold' ? 'quotes' : 'promotion_campaigns'];
         }
         $this->assertSame(0, DB::transactionLevel(), 'Fixtures must be committed before independent workers start.');
