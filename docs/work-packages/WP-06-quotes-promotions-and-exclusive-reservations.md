@@ -46,7 +46,13 @@ The quote review exposes an on-demand full license source for its exact immutabl
 
 The [pricing contract](../quote-pricing.md) and [D-08](../architecture/D-08-quote-pricing-evidence.md) add one immutable calculation beside an owned quote. The server freezes exact amounts/disclosures, an explicit policy/hash, rounding trace and expiry; current policies are local/testing-only. Unknown tax stays null. Unique quote linkage and retained quote locks serialize first requests. The private API rejects client calculation inputs. An internal historical amount comparator produces mismatch evidence for a later WP-07 caller; it does not verify a provider or authorize a grant. No promotion, live tax choice or price guarantee is inferred. Tests include MySQL first-write races, immutable constraints, safe ownership, rounding, policy drift and settlement mismatches; the PR records actual final candidate results.
 
-Continue promotion policy/allocation/redemption and shared exclusive inventory/reservations after this batch's CI/review. The wider acceptance criteria remain open.
+PR #42 merged this pricing increment with passing MySQL/SQLite/frontend/browser/build/audit CI and independent review. Its PR and issue #6 retain the exact source and run evidence.
+
+### Promotion pricing and usage holds — 2026-09-14
+
+The current [promotion contract](../promotion-pricing.md) and [D-09](../architecture/D-09-promotion-usage.md) add exact v2 allocation and campaign capacity while preserving v1 pricing. Explicit test policies select eligible offers, a fixed or capped-percentage discount, dates, no stacking and a lifetime use limit. One guarded hold per pricing is created atomically; current locking reads enforce the shared cap. Unstarted expiry releases capacity by captured rule; an internal attempt binding keeps pending capacity occupied indefinitely until WP-07 verified reconciliation. It does not count as paid redemption or provider verification.
+
+The owner-checked code-only API, immutable policy/hold identity, replay/conflict/expiry behavior and MySQL process races are implemented for verification. Record actual final CI/review in the PR. Continue shared exclusive inventory/reservations after acceptance, then bind these guards to WP-07 order/payment/terminal usage effects. Operator promotion authoring and per-customer policy remain WP-09/U-07 requirements. The wider acceptance criteria stay open.
 
 ### Remaining requirements
 
