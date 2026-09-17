@@ -1,6 +1,6 @@
 # [WP-06] Server quotes, promotion calculations and exclusive reservations
 
-Status: **Provisional selection reviews merged; owned full-license disclosure merged in PR #41; immutable pricing/test-tax evidence implemented for candidate verification. The broader work package remains open.** The server freezes and revalidates selected published offer revisions, with a provisional USD subtotal. It does not calculate payable totals, collect assent, create orders or reserve exclusives. This issue is complete only when the full acceptance evidence below exists.
+Status: **Provisional reviews, full disclosure, pricing/test-tax and promotion holds are merged through PR #43. Shared rights inventory foundation is the current candidate; exclusive sale integration remains open.** Existing published quotes stay non-exclusive and non-payable. The broad work package is not complete.
 
 - Suggested issue title: `[WP-06] Server quotes, promotion calculations and exclusive reservations`
 - Phase: 2
@@ -52,7 +52,13 @@ PR #42 merged this pricing increment with passing MySQL/SQLite/frontend/browser/
 
 The current [promotion contract](../promotion-pricing.md) and [D-09](../architecture/D-09-promotion-usage.md) add exact v2 allocation and campaign capacity while preserving v1 pricing. Explicit test policies select eligible offers, a fixed or capped-percentage discount, dates, no stacking and a lifetime use limit. One guarded hold per pricing is created atomically; current locking reads enforce the shared cap. Unstarted expiry releases capacity by captured rule; an internal attempt binding keeps pending capacity occupied indefinitely until WP-07 verified reconciliation. It does not count as paid redemption or provider verification.
 
-The owner-checked code-only API, immutable policy/hold identity, replay/conflict/expiry behavior and MySQL process races are implemented for verification. Record actual final CI/review in the PR. Continue shared exclusive inventory/reservations after acceptance, then bind these guards to WP-07 order/payment/terminal usage effects. Operator promotion authoring and per-customer policy remain WP-09/U-07 requirements. The wider acceptance criteria stay open.
+PR #43 merged the owner-checked code-only API, immutable policy/hold identity and replay/conflict/expiry behavior after final CI and independent review. Its exact evidence is retained in the PR and issue #6. Bind these guards to WP-07 order/payment/terminal usage effects after the inventory dependencies. Operator promotion authoring and per-customer policy remain WP-09/U-07 requirements. The wider acceptance criteria stay open.
+
+### Shared inventory foundation — 2026-09-17
+
+The [inventory contract](../shared-rights-inventory.md) and [D-10](../architecture/D-10-shared-inventory.md) define immutable underlying scope identity, audited exact revision links and staff block/version controls. Internal local/testing commands validate quote ownership/current license/media evidence, acquire sorted scope locks, preserve one reservation per quote, expire reusable holds irreversibly and retain pending attempts. New MySQL process races and SQLite/schema cases accompany the candidate; executed results belong in its PR. These are inventory exercises on existing non-exclusive provisional quotes, not exclusive licenses or an enabled checkout.
+
+Next: versioned exclusive offer/quote snapshots and inventory-aware publication/selection/pricing. Preserve original readers and freeze exact scope linkage, then integrate the primitives with orders/assent and provider reconciliation. Complete sold/grant, paid-exception and verified release paths in WP-07; keep U-08 production policy explicit.
 
 ### Remaining requirements
 

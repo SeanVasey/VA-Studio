@@ -6,4 +6,6 @@ return [
     'test_pricing_policy' => env('VASEY_TEST_PRICING_POLICY'),
     // Explicit test-only campaign list. Setup installs no coupons or commercial choices.
     'test_promotions' => env('VASEY_TEST_PROMOTIONS'),
+    // Internal inventory exercises only; no production reservation policy or default TTL.
+    'test_inventory_policy' => env('VASEY_TEST_INVENTORY_POLICY'),
 ];

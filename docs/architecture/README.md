@@ -33,3 +33,5 @@ Inspected for this initial draft: current task, supplied replacement specificati
 A complete replacement means every source capability and every active customer obligation is accounted for as implemented and verified, integrated and verified, or explicitly retired by Sean with a compliant continuity plan. A beautiful catalog and a working payment test are intermediate milestones. Unknown exports, subscriptions, licenses, grants, balances, or redirects block the relevant cutover scope.
 
 Follow the current [ordered development record](../development-order.md) for accepted increments and the next dependency. PRs #39–#42 merged economic policies, public/owned quote disclosure and pricing evidence under [D-08](D-08-quote-pricing-evidence.md). Current promotion allocation/usage holds are defined in [D-09](D-09-promotion-usage.md); shared exclusive inventory follows their acceptance. Provider-independent development continues while external choices are resolved.
+
+[D-10](D-10-shared-inventory.md) records recovery of merged PR #43 and the shared-inventory foundation, followed by exclusive offer/quote integration before WP-07.
