@@ -82,3 +82,7 @@ The customer action is **Review selection**. `payable` stays false; tax and tota
 ## D-09 implementation entry — 2026-09-14: promotion pricing and usage holds
 
 **Recommendation in implementation, within Sean's continuous-development authorization.** [D-09](D-09-promotion-usage.md) preserves v1 pricing and adds v2 exact single-promotion allocation, immutable test campaign policies and serialized capacity. Unstarted holds expire by their captured rule; a guarded internal attempt binding retains pending capacity until WP-07 supplies verified terminal reconciliation. No live promotion, customer identity policy, provider success or completed redemption is inferred. The integrating PR records final tests/review; shared exclusive inventory/reservations is next in WP-06.
+
+## D-10 — Shared rights inventory foundation (2026-09-17)
+
+[Decision and boundary](D-10-shared-inventory.md): build shared scope identity, exact revision linkage and internal test reservation lifecycle before versioning exclusive offers/quotes. Candidate CI/review remains in the integrating PR; no production TTL, ownership or payment outcome is inferred.
