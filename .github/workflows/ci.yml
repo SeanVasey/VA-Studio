@@ -23,7 +23,7 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
-      - run: npm audit --omit=dev --audit-level=high
+      - run: npm audit --audit-level=high
 
   backend:
     runs-on: ubuntu-latest
@@ -68,10 +68,11 @@ jobs:
       - run: cp .env.example .env
       - run: php artisan key:generate
       - run: composer validate --strict
+      - run: vendor/bin/pint --version
       - run: php artisan test
       - run: |
           DB_CONNECTION=sqlite DB_DATABASE=:memory: php artisan test
-      - run: composer audit --no-dev
+      - run: composer audit
 
   operator-browser:
     runs-on: ubuntu-latest

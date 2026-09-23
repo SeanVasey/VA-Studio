@@ -21,6 +21,7 @@ Bespoke web store development replacing older, service-based e-commerce offering
 - [Quote pricing](docs/quote-pricing.md): immutable server calculation evidence, explicit test tax policies, owner-checked pricing API and amount comparison boundaries.
 - [Exclusive offer preparation](docs/exclusive-offer-preparation.md): inactive v2 revisions with explicit scope evidence, historical compatibility and the remaining activation boundary.
 - [Atomic test pricing and inventory](docs/atomic-priced-inventory.md)
+- [Dependency PR integration and compatibility decisions](docs/dependency-pr-integration.md)
 - [Shared rights inventory](docs/shared-rights-inventory.md): internal scope/revision linkage, guarded test reservations and the boundary before exclusive sales.
 - [Promotion pricing](docs/promotion-pricing.md): versioned discount allocations, shared test campaign limits and guarded usage holds.
 - [Catalog administration](docs/catalog-administration.md): audited metadata saves, edit conflicts and stable published track URLs.
@@ -78,11 +79,11 @@ composer validate --strict
 php artisan test
 npm test
 npm run build
-composer audit --no-dev
-npm audit --omit=dev --audit-level=high
+composer audit
+npm audit --audit-level=high
 ```
 
-GitHub CI runs the PHP suite against MySQL 8.4 and SQLite, frontend tests/build and production dependency audits, plus an isolated operator browser job using Chromium and WebKit. See [browser verification](docs/operator-setup-and-verification.md#browser-verification) for commands, fixture isolation and evidence boundaries. A workflow file is not evidence that GitHub has run it. MySQL concurrency, real providers, mobile Safari playback, restore drills, and production deployment remain separate acceptance gates until recorded in the verification report.
+GitHub CI runs the PHP suite against MySQL 8.4 and SQLite, frontend tests/build and dependency audits (including development tools), plus an isolated operator browser job using Chromium and WebKit. See [browser verification](docs/operator-setup-and-verification.md#browser-verification) for commands, fixture isolation and evidence boundaries. A workflow file is not evidence that GitHub has run it. MySQL concurrency, real providers, mobile Safari playback, restore drills, and production deployment remain separate acceptance gates until recorded in the verification report.
 
 ## GitHub publication
 
