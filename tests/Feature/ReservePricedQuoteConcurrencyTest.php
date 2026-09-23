@@ -54,7 +54,9 @@ class ReservePricedQuoteConcurrencyTest extends TestCase
                 'promotion' => $promotion, 'action' => $attempting ? 'priced_attempt' : 'priced_hold',
                 'attempt' => $scenario === 'different_attempt' && $index === 1 ? (string) Str::uuid() : $attempt,
                 'now' => now()->toIso8601ZuluString(),
-                'barrier' => $same ? 'quotes' : ($scenario === 'shared_scope' ? 'rights_scopes' : 'promotion_campaigns')];
+                // Start both operations before their first lock. Empty pricing-index gap locks can
+                // legitimately serialize creation before either campaign/scope lock is reached.
+                'barrier' => 'quotes'];
         }
         $results = InventoryRace::run($this, $inputs);
         $outcomes = array_column($results, 'result'); sort($outcomes);
