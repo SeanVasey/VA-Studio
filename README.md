@@ -52,7 +52,7 @@ No LLM is required by the storefront runtime. Astra is the requested development
 
 ## Run locally
 
-Prerequisites: a currently patched PHP 8.4 or 8.5 with `pdo_sqlite`, `pdo_mysql`, `mbstring`, `intl`, `bcmath`, `gd`, `fileinfo`, `zip`, and `curl`; Composer 2; Node 24; npm. Use your platform's supported installers.
+Prerequisites: a currently patched PHP 8.4 or 8.5 with `pdo_sqlite`, `pdo_mysql`, `mbstring`, `intl`, `bcmath`, `gd`, `fileinfo`, `zip`, and `curl`; Composer 2; Node 24.15+ (within Node 24); npm. Use your platform's supported installers.
 
 ```sh
 composer install
