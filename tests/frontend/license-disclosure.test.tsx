@@ -82,9 +82,18 @@ it.each([
   { quoteId: 'another-quote', disclosureSchema: 1, disclosureHash: 'a'.repeat(64) },
   { quoteId: 'selected-quote', disclosureSchema: 2, disclosureHash: 'a'.repeat(64) },
   { quoteId: 'selected-quote', disclosureSchema: 1, disclosureHash: 'invalid' },
+  { quoteId: 'selected-quote', disclosureSchema: 3, testOnly: true, disclosureHash: 'a'.repeat(64) },
 ])('rejects a mismatched quote disclosure envelope: %j', async envelope => {
   vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({ ...terms(offer), ...envelope })));
   render(<LicenseDisclosure offer={offer} quoteId="selected-quote" defaultOpen />);
   expect(await screen.findByRole('alert')).toBeInTheDocument();
   expect(screen.queryByRole('region', { name: 'Published license text' })).not.toBeInTheDocument();
+});
+
+it('renders a version-two owned exclusive disclosure with its explicit test boundary', async () => {
+  vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({ ...terms(offer), type: 'exclusive',
+    quoteId: 'selected-quote', disclosureSchema: 2, testOnly: true, disclosureHash: 'a'.repeat(64) })));
+  render(<LicenseDisclosure offer={offer} quoteId="selected-quote" defaultOpen />);
+  expect(await screen.findByRole('region', { name: 'Published license text' })).toHaveTextContent('Retained text and conditions.');
+  expect(screen.getByText('Test selection only. Purchasing is unavailable.')).toBeInTheDocument();
 });

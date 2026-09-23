@@ -94,6 +94,18 @@ class PublicationReadiness
     /** Validate frozen evidence against present eligibility; never read editable commercial fields. */
     public function revisionBlockers(Offer $offer, OfferRevision $revision): array
     {
+        if (($revision->snapshot['schema_version'] ?? null) === 2) {
+            try {
+                app(ExclusiveActivationEvidence::class)->current($revision);
+            } catch (\Illuminate\Database\QueryException $exception) {
+                throw $exception;
+            } catch (Throwable) {
+                return ['An intact explicit test activation is required for this exclusive revision.'];
+            }
+
+            return $this->preparedExclusiveBlockers($offer, $revision);
+        }
+
         return $this->revisionEvidenceBlockers($offer, $revision, 1, 'non-exclusive');
     }
 

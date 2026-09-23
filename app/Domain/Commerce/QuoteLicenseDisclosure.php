@@ -12,10 +12,11 @@ final class QuoteLicenseDisclosure
     public function fromLine(Quote $quote, array $line): array
     {
         $disclosure = [
-            'disclosureSchema' => 1, 'quoteId' => $quote->public_id,
+            'disclosureSchema' => $quote->snapshot['schema_version'] === 2 ? 2 : 1, 'quoteId' => $quote->public_id,
             'expiresAt' => $quote->expires_at->utc()->toISOString(),
             'offerId' => (string) $line['offer_id'], 'offerRevisionId' => (string) $line['offer_revision_id'],
         ] + app(LicenseDisclosure::class)->fromSnapshot($line['offer_snapshot']['license']);
+        if ($quote->snapshot['schema_version'] === 2) { $disclosure['testOnly'] = true; }
 
         return $disclosure + ['disclosureHash' => CanonicalJson::hash($disclosure)];
     }

@@ -46,6 +46,11 @@ final class QuoteSelection
                 }
             }
             $lines[] = ['track_id' => $track->id, 'offer_id' => $offer->id, 'offer_revision_id' => $revision->id, 'license_version_id' => $revision->license_version_id, 'offer_snapshot_hash' => $revision->snapshot_hash, 'offer_snapshot' => $revision->snapshot];
+            if ($revision->snapshot['schema_version'] === 2) {
+                $activation = app(\App\Domain\Catalog\ExclusiveActivationEvidence::class)->current($revision);
+                $lines[array_key_last($lines)]['exclusive_activation'] = ['id' => $activation->id,
+                    'snapshot_hash' => $activation->snapshot_hash, 'snapshot' => $activation->snapshot];
+            }
         }
 
         return $lines;

@@ -14,11 +14,17 @@ final class PricingSnapshot
 
     public function build(Quote $quote, string $id, CarbonImmutable $issuedAt, ?array $policy): array
     {
+        if (($quote->snapshot['schema_version'] ?? null) === 2) {
+            return app(PricingSnapshotV3::class)->build($quote, $id, $issuedAt, $policy);
+        }
         return app(PricingSnapshotV1::class)->build($quote, $id, $issuedAt, $policy);
     }
 
     public function buildWithPromotion(Quote $quote, string $id, CarbonImmutable $issuedAt, ?array $policy, array $promotion): array
     {
+        if (($quote->snapshot['schema_version'] ?? null) === 2) {
+            return app(PricingSnapshotV3::class)->build($quote, $id, $issuedAt, $policy, $promotion);
+        }
         return app(PricingSnapshotV2::class)->build($quote, $id, $issuedAt, $policy, $promotion);
     }
 
@@ -32,11 +38,12 @@ final class PricingSnapshot
         return $this->reader($pricing)->present($pricing);
     }
 
-    private function reader(QuotePricing $pricing): PricingSnapshotV1|PricingSnapshotV2
+    private function reader(QuotePricing $pricing): PricingSnapshotV1|PricingSnapshotV2|PricingSnapshotV3
     {
         return match ($pricing->snapshot['schema_version'] ?? null) {
             1 => app(PricingSnapshotV1::class),
             2 => app(PricingSnapshotV2::class),
+            3 => app(PricingSnapshotV3::class),
             default => throw new InvalidArgumentException('Unsupported pricing evidence version.'),
         };
     }

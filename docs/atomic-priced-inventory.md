@@ -25,4 +25,4 @@ The integrating PR records actual tested source/tree and CI results. PHP/Compose
 
 ## Next dependency
 
-Integrate inactive exclusive revisions with versioned activation, quote/disclosure/pricing, discount eligibility and inventory-aware selection, including explicit pending non-exclusive cutoff. Then WP-07 adds buyer assent/orders, hosted test checkout and verified terminal promotion/inventory effects; WP-08 adds contracts and private delivery. See [ordered development status](development-order.md) and [WP-06](work-packages/WP-06-quotes-promotions-and-exclusive-reservations.md).
+The [exclusive selection integration](exclusive-selection.md) now connects these commands to test activation, quote/disclosure v2, pricing v3, explicit discount eligibility and governed scope availability/cutoff. Its integrating PR records acceptance. Next WP-07 adds buyer assent/orders, hosted test checkout and verified terminal promotion/inventory effects; WP-08 adds contracts and private delivery. See [ordered development status](development-order.md) and [WP-06](work-packages/WP-06-quotes-promotions-and-exclusive-reservations.md).

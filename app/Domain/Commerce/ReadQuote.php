@@ -37,7 +37,7 @@ final class ReadQuote
             $items = QuoteRequest::items($quote->request);
             $snapshot = $quote->snapshot;
             $lines = app(QuoteSelection::class)->resolve($items, false);
-            $expected = ['schema_version' => 1, 'purpose' => 'selection_review', 'payable' => false, 'public_id' => $quote->public_id, 'issued_at' => $quote->created_at->utc()->toIso8601ZuluString(), 'expires_at' => $quote->expires_at->utc()->toIso8601ZuluString(), 'currency' => 'USD', 'subtotal_minor' => array_sum(array_column(array_column(array_column($lines, 'offer_snapshot'), 'commercial'), 'price_minor')), 'tax_status' => 'unresolved', 'tax_minor' => null, 'total_minor' => null, 'lines' => $lines];
+            $expected = app(QuoteSnapshot::class)->capture($quote->public_id, $quote->created_at, $quote->expires_at, $lines);
             $references = $quote->lines()->orderBy('position')->get();
             if ($quote->canonicalization_version !== CanonicalJson::VERSION || ! hash_equals($quote->request_hash, CanonicalJson::hash($items)) || ! hash_equals($quote->snapshot_hash, CanonicalJson::hash($snapshot)) || ! hash_equals($quote->snapshot_hash, CanonicalJson::hash($expected)) || $quote->subtotal_minor !== $expected['subtotal_minor'] || $quote->currency !== 'USD' || $references->count() !== count($lines)) {
                 throw new QuoteException('SELECTION_CHANGED', 409);
@@ -48,6 +48,7 @@ final class ReadQuote
                     throw new QuoteException('SELECTION_CHANGED', 409);
                 }
             }
+            app(Inventory\SelectionInventory::class)->assertAvailable($lines, $quote->id);
         } catch (QueryException $exception) {
             // Preserve database deadlocks for the outer transaction's bounded retry.
             throw $exception;

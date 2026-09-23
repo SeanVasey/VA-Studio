@@ -140,7 +140,11 @@ final class PublicCatalog
 
     private function eligible(Track $track): bool
     {
-        return app(PublicationReadiness::class)->blockers($track) === [];
+        if (app(PublicationReadiness::class)->blockers($track) !== []) { return false; }
+        $track->setRelation('offers', $track->offers->filter(fn ($offer) =>
+            app(\App\Domain\Commerce\Inventory\SelectionInventory::class)->available($offer->current_revision_id)));
+
+        return $track->offers->isNotEmpty();
     }
 
     private function decodeCursor(?string $token, array $filters): ?Cursor

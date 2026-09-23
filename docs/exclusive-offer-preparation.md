@@ -31,3 +31,7 @@ Next implementation must version exclusive activation, quote/disclosure and pric
 The PR records actual tested commit, counts, CI URLs, dependency audits and independent-review status. PHP/Composer are unavailable in the implementation workspace, so PHP/MySQL/SQLite/browser results must come from actual GitHub Actions runs. Test definitions alone establish no pass. No production load, real source rights, physical device or completed purchase has been verified by this increment.
 
 Roll back the caller/code while retaining immutable evidence; no destructive migration is needed. Current public readers already reject these inactive v2 records. Preserve records for forward integration and review rather than rewriting them as v1 or deleting their links.
+
+## Subsequent activation integration
+
+The [exclusive selection contract](exclusive-selection.md) adds separate immutable activation evidence for exact v2 preparations under explicit test-only policy. It preserves these snapshots and the inactive default. Public activation now requires that evidence and versioned quote/disclosure/pricing support; an active flag alone remains insufficient. The original preparation boundary above describes PR #48.

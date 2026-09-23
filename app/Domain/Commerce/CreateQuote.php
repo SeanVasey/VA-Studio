@@ -37,6 +37,7 @@ final class CreateQuote
             $lines = app(QuoteSelection::class)->resolve($items, true);
             // File hashing may take time; recheck effective licenses after all selected bytes have been read.
             app(QuoteSelection::class)->resolve($items, false);
+            app(Inventory\SelectionInventory::class)->assertAvailable($lines);
             $issuedAt = now()->toImmutable()->utc()->startOfSecond();
             $expiresAt = $issuedAt->addMinutes(self::LIFETIME_MINUTES);
             $publicId = (string) Str::uuid();
@@ -44,7 +45,7 @@ final class CreateQuote
             foreach ($lines as $line) {
                 $subtotal += $line['offer_snapshot']['commercial']['price_minor'];
             }
-            $snapshot = ['schema_version' => 1, 'purpose' => 'selection_review', 'payable' => false, 'public_id' => $publicId, 'issued_at' => $issuedAt->toIso8601ZuluString(), 'expires_at' => $expiresAt->toIso8601ZuluString(), 'currency' => 'USD', 'subtotal_minor' => $subtotal, 'tax_status' => 'unresolved', 'tax_minor' => null, 'total_minor' => null, 'lines' => $lines];
+            $snapshot = app(QuoteSnapshot::class)->capture($publicId, $issuedAt, $expiresAt, $lines);
             $quote = Quote::create(['public_id' => $publicId, 'owner_key' => $ownerKey, 'idempotency_key_hash' => $keyHash, 'request' => $items, 'request_hash' => $requestHash, 'snapshot' => $snapshot, 'snapshot_hash' => CanonicalJson::hash($snapshot), 'canonicalization_version' => CanonicalJson::VERSION, 'subtotal_minor' => $subtotal, 'currency' => 'USD', 'created_at' => $issuedAt, 'expires_at' => $expiresAt]);
             foreach ($lines as $position => $line) {
                 QuoteLine::create(['quote_id' => $quote->id, 'offer_revision_id' => $line['offer_revision_id'], 'position' => $position, 'line_hash' => CanonicalJson::hash($line)]);

@@ -21,7 +21,8 @@ export function LicenseDisclosure({ offer, defaultOpen = false, quoteId }: { off
         if (!response.ok) throw new Error('Unavailable license');
         const data: Disclosure = await response.json();
         if (!data || data.offerId !== offer.id || data.offerRevisionId !== offer.offerRevisionId || data.licenseVersionId !== offer.licenseVersionId ||
-          (quoteId !== undefined && (data.quoteId !== quoteId || data.disclosureSchema !== 1 || typeof data.disclosureHash !== 'string' || !/^[a-f0-9]{64}$/.test(data.disclosureHash))) ||
+          (quoteId !== undefined && (data.quoteId !== quoteId || ![1, 2].includes(data.disclosureSchema ?? 0) ||
+            (data.disclosureSchema === 2 && data.testOnly !== true) || typeof data.disclosureHash !== 'string' || !/^[a-f0-9]{64}$/.test(data.disclosureHash))) ||
           typeof data.name !== 'string' || !Number.isSafeInteger(data.version) || typeof data.type !== 'string' || typeof data.termsText !== 'string' ||
           !Array.isArray(data.features) || !data.features.every(value => typeof value === 'string') ||
           !Array.isArray(data.deliverableRoles) || !data.deliverableRoles.every(value => typeof value === 'string')) throw new Error('Mismatched license');
@@ -41,7 +42,7 @@ export function LicenseDisclosure({ offer, defaultOpen = false, quoteId }: { off
     {open && <div id={region} aria-busy={!current}>
       {!current && <p role="status">Loading the selected license…</p>}
       {current?.error && <div role="alert"><p>{current.error}</p><button type="button" className="button button-outline" onClick={() => setAttempt(value => value + 1)}>Retry terms</button></div>}
-      {current?.data && <><h3>{current.data.name} · version {current.data.version}</h3><p className="fine-print">Published terms for this selection. Saving a selection does not establish a purchase or a rights grant.</p><div className="license-source" role="region" aria-label="Published license text" tabIndex={0}>{current.data.termsText}</div></>}
+      {current?.data && <><h3>{current.data.name} · version {current.data.version}</h3>{current.data.testOnly && <p className="fine-print">Test selection only. Purchasing is unavailable.</p>}<p className="fine-print">Published terms for this selection. Saving a selection does not establish a purchase or a rights grant.</p><div className="license-source" role="region" aria-label="Published license text" tabIndex={0}>{current.data.termsText}</div></>}
     </div>}
   </section>;
 }

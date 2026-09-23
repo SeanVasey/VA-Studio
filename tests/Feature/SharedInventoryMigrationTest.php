@@ -20,7 +20,9 @@ class SharedInventoryMigrationTest extends TestCase
         $prior = app(CreateQuote::class)->handle(F::OWNER, (string) Str::uuid(), QuoteFixtures::selection()['items']);
         $priorHash = $prior->snapshot_hash;
         $migration = require database_path('migrations/2026_09_17_000015_shared_rights_inventory.php');
-        $migration->down(); $migration->up();
+        $activations = require database_path('migrations/2026_09_23_000016_exclusive_activations.php');
+        $this->assertDatabaseCount('exclusive_activations', 0);
+        $activations->down(); $migration->down(); $migration->up(); $activations->up();
         $this->assertSame($priorHash, $prior->refresh()->snapshot_hash);
         $f = F::selection(); $hash = $f['quote']->snapshot_hash;
         app(ReserveQuoteInventory::class)->hold($f['quote']->public_id, F::OWNER);

@@ -83,6 +83,12 @@ final class PriceQuote
                     'tax_status' => $snapshot['tax_status'], 'policy_hash' => $snapshot['policy_hash'],
                 ]);
             }
+            if ($quote->snapshot['schema_version'] === 2) {
+                // All pricing/campaign/use locks are already retained. A failed shared
+                // scope acquisition rolls back first pricing and promotion creation.
+                $inventory = app(Inventory\ReserveQuoteInventory::class);
+                $create ? $inventory->hold($quoteId, $ownerKey) : $inventory->read($quoteId, $ownerKey);
+            }
             // Policy validation/rendering must not extend a lifetime across a boundary.
             if ($pricing->expires_at->lessThanOrEqualTo(now())) {
                 throw new QuoteException('PRICING_EXPIRED', 410);

@@ -10,9 +10,11 @@ final class PublicLicenseDisclosure
 {
     public function fromRevision(OfferRevision $revision): array
     {
-        return [
+        $data = [
             'offerId' => (string) $revision->offer_id,
             'offerRevisionId' => (string) $revision->id,
         ] + app(LicenseDisclosure::class)->fromSnapshot($revision->snapshot['license']);
+
+        return $revision->snapshot['schema_version'] === 2 ? $data + ['testOnly' => true] : $data;
     }
 }
