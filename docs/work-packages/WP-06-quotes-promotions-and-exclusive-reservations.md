@@ -1,6 +1,6 @@
 # [WP-06] Server quotes, promotion calculations and exclusive reservations
 
-Status: **Provisional reviews, disclosure, pricing/test-tax, promotion holds and shared inventory are merged through PR #44. PR #48 adds inactive scope-bound exclusive preparation (CI passed; independent review pending). Atomic test pricing/promotion/inventory is the next candidate increment.** Published customer quotes remain non-exclusive and non-payable; exclusive activation/quote/pricing integration and the broad work package are not complete.
+Status: **Provisional reviews, disclosure, pricing/test-tax, promotion holds and shared inventory are merged through PR #44. PR #48 merged inactive scope-bound exclusive preparation after CI and independent review. PR #49 implements atomic test pricing/promotion/inventory; its PR retains final acceptance evidence.** Published customer quotes remain non-exclusive and non-payable; exclusive activation/quote/pricing integration and the broad work package are not complete.
 
 - Suggested issue title: `[WP-06] Server quotes, promotion calculations and exclusive reservations`
 - Phase: 2
@@ -70,7 +70,7 @@ Next: versioned exclusive activation, quote/disclosure and pricing with atomic i
 
 ### Atomic test pricing and inventory — 2026-09-23
 
-The [coordinator contract](../atomic-priced-inventory.md) composes exact pricing, optional promotion usage and shared inventory in one outer transaction. Inventory failure cannot leave a newly created price or consumed promotion capacity, and a failed inventory attempt rolls back the promotion pending transition and audit. Both resources must share lifecycle and attempt identity; original snapshots and expiry remain intact. Scope waits are followed by a final pricing-expiry check. MySQL process tests exercise shared scopes, campaign caps and retries; actual results belong in the integrating PR.
+[PR #49](https://github.com/VASEYDEV/VASEYAUDIO/pull/49) and the [coordinator contract](../atomic-priced-inventory.md) compose exact pricing, optional promotion usage and shared inventory in one outer transaction. Inventory failure cannot leave a newly created price or consumed promotion capacity, and a failed inventory attempt rolls back the promotion pending transition and audit. Both resources must share lifecycle and attempt identity; original snapshots and expiry remain intact. Scope waits are followed by a final pricing-expiry check. MySQL process tests exercise shared scopes, campaign caps and retries; actual results belong in the integrating PR.
 
 This remains internal local/testing orchestration on existing provisional non-exclusive quotes. It adds no activation, buyer order, provider call or terminal rights effect. The next dependency remains versioned exclusive activation/quote/disclosure/pricing, promotion eligibility and pending non-exclusive cutoff, followed by WP-07/WP-08. Keep this package open and preserve all broader acceptance criteria.
 
