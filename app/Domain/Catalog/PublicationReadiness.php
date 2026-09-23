@@ -17,6 +17,17 @@ class PublicationReadiness
 {
     public function draftBlockers(Offer $offer): array
     {
+        return $this->draftEvidenceBlockers($offer, 'non-exclusive');
+    }
+
+    /** Internal preparation only. Public publication still requires a non-exclusive license. */
+    public function exclusiveDraftBlockers(Offer $offer): array
+    {
+        return $this->draftEvidenceBlockers($offer, 'exclusive');
+    }
+
+    private function draftEvidenceBlockers(Offer $offer, string $type): array
+    {
         $blockers = [];
         $license = $offer->licenseVersion()->first();
         if (! $license || ! app(VerifiedLicense::class)->available($license)) {
@@ -25,8 +36,8 @@ class PublicationReadiness
         if ($offer->price_minor <= 0 || $offer->price_minor > 2147483647 || $offer->currency !== 'USD') {
             $blockers[] = 'Launch offers require a positive USD price in integer cents.';
         }
-        if ($license->template->type !== 'non-exclusive') {
-            $blockers[] = 'Exclusive and free commerce workflows are not enabled in this foundation.';
+        if ($license->template->type !== $type) {
+            $blockers[] = $type === 'exclusive' ? 'Exclusive preparation requires an explicitly reviewed exclusive license.' : 'Exclusive and free commerce workflows are not enabled in this foundation.';
         }
         $track = Track::find($offer->track_id);
         $rights = $track?->rightsDeclarations()->latest('id')->first();
@@ -83,9 +94,21 @@ class PublicationReadiness
     /** Validate frozen evidence against present eligibility; never read editable commercial fields. */
     public function revisionBlockers(Offer $offer, OfferRevision $revision): array
     {
+        return $this->revisionEvidenceBlockers($offer, $revision, 1, 'non-exclusive');
+    }
+
+    /** A valid prepared revision is still inactive and unsupported by public selection/pricing. */
+    public function preparedExclusiveBlockers(Offer $offer, OfferRevision $revision): array
+    {
+        return array_merge($this->revisionEvidenceBlockers($offer, $revision, 2, 'exclusive'),
+            app(ExclusiveOfferScope::class)->blockers($revision));
+    }
+
+    private function revisionEvidenceBlockers(Offer $offer, OfferRevision $revision, int $schema, string $type): array
+    {
         try {
             $snapshot = $revision->snapshot;
-            if ($revision->offer_id !== $offer->id || $revision->track_id !== $offer->track_id || $revision->canonicalization_version !== CanonicalJson::VERSION || ! hash_equals($revision->snapshot_hash, CanonicalJson::hash($snapshot)) || ($snapshot['schema_version'] ?? null) !== 1 || ($snapshot['product']['id'] ?? null) !== $offer->track_id || ($snapshot['commercial']['price_minor'] ?? null) !== $revision->price_minor || ($snapshot['commercial']['currency'] ?? null) !== $revision->currency || $revision->price_minor < 1 || $revision->price_minor > 2147483647 || $revision->currency !== 'USD' || ($snapshot['commercial']['type'] ?? null) !== 'non-exclusive') {
+            if ($revision->offer_id !== $offer->id || $revision->track_id !== $offer->track_id || $revision->canonicalization_version !== CanonicalJson::VERSION || ! hash_equals($revision->snapshot_hash, CanonicalJson::hash($snapshot)) || ($snapshot['schema_version'] ?? null) !== $schema || ($snapshot['product']['id'] ?? null) !== $offer->track_id || ($snapshot['commercial']['price_minor'] ?? null) !== $revision->price_minor || ($snapshot['commercial']['currency'] ?? null) !== $revision->currency || $revision->price_minor < 1 || $revision->price_minor > 2147483647 || $revision->currency !== 'USD' || ($snapshot['commercial']['type'] ?? null) !== $type || ($snapshot['license']['type'] ?? null) !== $type) {
                 return ['The published commercial snapshot is invalid.'];
             }
             $blockers = [];

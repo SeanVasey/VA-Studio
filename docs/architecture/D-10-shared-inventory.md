@@ -1,6 +1,6 @@
 # D-10 — Shared inventory before exclusive publication
 
-Status: implementation candidate for independent review and CI, 2026-09-17.
+Status: merged in [PR #44](https://github.com/VASEYDEV/VASEYAUDIO/pull/44), 2026-09-17, with CI and independent source-review evidence in that PR. Status reconciled 2026-09-23.
 
 Recovered baseline: PR #43 is merged on `main` at `4c08c0caf9239230cb1b6e5caec3e6b59301a0fe`, tree `be1c97027c55cdd7377785813fd768c1628eb807`, with successful final CI and documented review. No open PR or uncommitted work was found in the recovered registered worktrees. A retired cleanup-review directory has an obsolete worktree pointer and is not an active development branch; it was preserved.
 

@@ -86,3 +86,7 @@ The customer action is **Review selection**. `payable` stays false; tax and tota
 ## D-10 — Shared rights inventory foundation (2026-09-17)
 
 [Decision and boundary](D-10-shared-inventory.md): build shared scope identity, exact revision linkage and internal test reservation lifecycle before versioning exclusive offers/quotes. Candidate CI/review remains in the integrating PR; no production TTL, ownership or payment outcome is inferred.
+
+## D-11 — Scope-bound exclusive preparation (2026-09-23)
+
+[Decision and boundary](D-11-exclusive-offer-preparation.md): preserve historical v1 commerce, prepare inactive v2 exclusive revisions with explicit immutable scope/link evidence, and keep public activation blocked until versioned quote/disclosure/pricing and reservation integration exist. This is authorized reversible development, not approval of U-05/U-08 legal or production policy. PR #44 is merged; the integrating preparation PR records the next candidate's actual CI/review evidence.
