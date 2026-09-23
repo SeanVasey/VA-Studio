@@ -20,6 +20,7 @@ Bespoke web store development replacing older, service-based e-commerce offering
 - [Quote license disclosure](docs/quote-license-disclosure.md): full frozen terms tied to the owning selection review, disclosure identity and recovery.
 - [Quote pricing](docs/quote-pricing.md): immutable server calculation evidence, explicit test tax policies, owner-checked pricing API and amount comparison boundaries.
 - [Exclusive offer preparation](docs/exclusive-offer-preparation.md): inactive v2 revisions with explicit scope evidence, historical compatibility and the remaining activation boundary.
+- [Atomic test pricing and inventory](docs/atomic-priced-inventory.md)
 - [Shared rights inventory](docs/shared-rights-inventory.md): internal scope/revision linkage, guarded test reservations and the boundary before exclusive sales.
 - [Promotion pricing](docs/promotion-pricing.md): versioned discount allocations, shared test campaign limits and guarded usage holds.
 - [Catalog administration](docs/catalog-administration.md): audited metadata saves, edit conflicts and stable published track URLs.

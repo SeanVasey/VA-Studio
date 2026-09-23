@@ -21,6 +21,7 @@ try {
     $input = json_decode(stream_get_contents(STDIN, 16384), true, 16, JSON_THROW_ON_ERROR);
     config(['commerce.test_inventory_policy' => json_encode($input['policy'], JSON_THROW_ON_ERROR),
         'filesystems.disks.local.root' => $mediaRoot, 'filesystems.disks.local.serve' => false, 'filesystems.disks.local.visibility' => 'private']);
+    if (isset($input['promotion'])) { config(['commerce.test_promotions' => json_encode([$input['promotion']], JSON_THROW_ON_ERROR)]); }
     Storage::forgetDisk('local'); \Illuminate\Support\Carbon::setTestNow($input['now']); \Carbon\CarbonImmutable::setTestNow($input['now']);
     DB::statement('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
     $connectionId = DB::selectOne('SELECT CONNECTION_ID() AS connection_id')->connection_id; $passed = false;
@@ -37,6 +38,8 @@ try {
     try {
         $service = app(ReserveQuoteInventory::class);
         $effect = match ($input['action']) {
+            'priced_hold' => app(\App\Domain\Commerce\ReservePricedQuote::class)->hold($input['quote'], $input['owner'], $input['promotion']['code'])['reservation'],
+            'priced_attempt' => app(\App\Domain\Commerce\ReservePricedQuote::class)->beginAttempt($input['quote'], $input['owner'], $input['attempt'])['reservation'],
             'prepare' => app(\App\Domain\Catalog\PrepareExclusiveOffer::class)->handle(\App\Domain\Catalog\Models\Offer::findOrFail($input['offer']), $input['scope'], 'SYNTHETIC-RACE-LINK', User::findOrFail($input['actor'])),
             'attempt' => $service->beginAttempt($input['quote'], $input['owner'], $input['attempt']),
             'block' => app(ManageRightsScope::class)->block($input['scope'], true, 0, 'SYNTHETIC-RACE-HOLD', User::findOrFail($input['actor'])),
