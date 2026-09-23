@@ -37,11 +37,13 @@ try {
     try {
         $service = app(ReserveQuoteInventory::class);
         $effect = match ($input['action']) {
+            'prepare' => app(\App\Domain\Catalog\PrepareExclusiveOffer::class)->handle(\App\Domain\Catalog\Models\Offer::findOrFail($input['offer']), $input['scope'], 'SYNTHETIC-RACE-LINK', User::findOrFail($input['actor'])),
             'attempt' => $service->beginAttempt($input['quote'], $input['owner'], $input['attempt']),
             'block' => app(ManageRightsScope::class)->block($input['scope'], true, 0, 'SYNTHETIC-RACE-HOLD', User::findOrFail($input['actor'])),
             default => $service->hold($input['quote'], $input['owner']),
         };
-        $result = ['result' => 'ok', 'effect_id' => $effect->public_id];
+        $result = ['result' => 'ok', 'effect_id' => $input['action'] === 'prepare' ? $effect->id : $effect->public_id];
+    } catch (\Illuminate\Validation\ValidationException $error) { $result = ['result' => 'rejected', 'code' => 'EXCLUSIVE_PREPARATION_BLOCKED'];
     } catch (QuoteException $error) { $result = ['result' => 'rejected', 'code' => $error->errorCode]; }
     if (! $passed) { throw new LogicException('Operation missed the intended shared lock.'); }
     echo json_encode($result + ['pid' => getmypid()], JSON_THROW_ON_ERROR); exit(0);

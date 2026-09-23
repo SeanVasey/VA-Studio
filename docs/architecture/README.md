@@ -35,3 +35,5 @@ A complete replacement means every source capability and every active customer o
 Follow the current [ordered development record](../development-order.md) for accepted increments and the next dependency. PRs #39–#42 merged economic policies, public/owned quote disclosure and pricing evidence under [D-08](D-08-quote-pricing-evidence.md). Current promotion allocation/usage holds are defined in [D-09](D-09-promotion-usage.md); shared exclusive inventory follows their acceptance. Provider-independent development continues while external choices are resolved.
 
 [D-10](D-10-shared-inventory.md) records recovery of merged PR #43 and the shared-inventory foundation, followed by exclusive offer/quote integration before WP-07.
+
+[D-11](D-11-exclusive-offer-preparation.md) defines inactive scope-bound exclusive revisions as the first integration step after merged PR #44; activation and quote/pricing integration remain separate acceptance gates.

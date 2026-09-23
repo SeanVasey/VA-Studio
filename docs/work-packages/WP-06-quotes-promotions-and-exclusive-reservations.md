@@ -1,6 +1,6 @@
 # [WP-06] Server quotes, promotion calculations and exclusive reservations
 
-Status: **Provisional reviews, full disclosure, pricing/test-tax and promotion holds are merged through PR #43. Shared rights inventory foundation is the current candidate; exclusive sale integration remains open.** Existing published quotes stay non-exclusive and non-payable. The broad work package is not complete.
+Status: **Provisional reviews, disclosure, pricing/test-tax, promotion holds and shared inventory are merged through PR #44. Inactive scope-bound exclusive preparation is the current increment.** Published customer quotes remain non-exclusive and non-payable; exclusive activation/quote/pricing integration and the broad work package are not complete.
 
 - Suggested issue title: `[WP-06] Server quotes, promotion calculations and exclusive reservations`
 - Phase: 2
@@ -59,6 +59,14 @@ PR #43 merged the owner-checked code-only API, immutable policy/hold identity an
 The [inventory contract](../shared-rights-inventory.md) and [D-10](../architecture/D-10-shared-inventory.md) define immutable underlying scope identity, audited exact revision links and staff block/version controls. Internal local/testing commands validate quote ownership/current license/media evidence, acquire sorted scope locks, preserve one reservation per quote, expire reusable holds irreversibly and retain pending attempts. New MySQL process races and SQLite/schema cases accompany the candidate; executed results belong in its PR. These are inventory exercises on existing non-exclusive provisional quotes, not exclusive licenses or an enabled checkout.
 
 Next: versioned exclusive offer/quote snapshots and inventory-aware publication/selection/pricing. Preserve original readers and freeze exact scope linkage, then integrate the primitives with orders/assent and provider reconciliation. Complete sold/grant, paid-exception and verified release paths in WP-07; keep U-08 production policy explicit.
+
+### Scope-bound exclusive preparation — 2026-09-23
+
+PR #44 merged the inventory foundation with the actual CI and source-review evidence recorded in that PR. The [next preparation increment](../exclusive-offer-preparation.md) freezes an explicitly reviewed exclusive license, exact assets, immutable underlying scope and private linkage reference hash in an inactive v2 commercial revision. The revision, link, pointer and audits commit together, and exact retries reuse the same evidence. Shared scopes may back several prepared variants without reserving or selling them. V1 non-exclusive publication/readers remain supported and public readers continue rejecting v2 preparations.
+
+The command is internal and local/testing only; there is no production policy, customer route or activation toggle. The [D-11 boundary](../architecture/D-11-exclusive-offer-preparation.md) separates preparation from activation to avoid offering a license that quote/pricing cannot honor. Adversarial tests cover identity, authorized staff, blocked scopes, file digests, license expiry, rollback, SQL evidence guards, privacy and historical compatibility. Three independent-process MySQL cases cover duplicate preparation, shared variants and administrative blocks; executed results and review status belong in the PR.
+
+Next: versioned exclusive activation, quote/disclosure and pricing with atomic inventory holds, discount eligibility and explicit pending non-exclusive cutoff. Complete WP-07 verified terminal effects and WP-08 delivery afterward. This preparation does not satisfy the package's sale/reservation acceptance criteria by itself.
 
 ### Remaining requirements
 
