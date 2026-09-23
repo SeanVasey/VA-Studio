@@ -156,4 +156,19 @@ class ExclusiveActivationTest extends TestCase
         $this->assertNotEmpty(app(PublicationReadiness::class)->revisionBlockers($f['offer']->refresh(), $f['revision']));
         $this->assertSame($hash, $activation->refresh()->snapshot_hash);
     }
+
+    public function test_a_different_historical_scope_cannot_create_an_unusable_activation(): void
+    {
+        $f = F::active(); $original = $f['activation']->snapshot_hash;
+        app(DeactivateOffer::class)->handle($f['offer'], $f['actor']);
+        app(DeactivateOffer::class)->handle($f['legacy']['offer'], $f['actor']);
+        $scope = app(ManageRightsScope::class)->register('different-test-scope', 'SECOND-ASSERTION', $f['actor']);
+        $f['revision'] = app(PrepareExclusiveOffer::class)->handle($f['offer'], $scope->id, 'SECOND-PREPARED-LINK', $f['actor']);
+        $audits = DB::table('audit_events')->count();
+        try { $this->activate($f); $this->fail('Incompatible scope activation created.'); }
+        catch (QuoteException $error) { $this->assertSame('INVENTORY_SCOPE_CONFLICT', $error->errorCode); }
+        $this->assertDatabaseCount('exclusive_activations', 1); $this->assertFalse($f['offer']->refresh()->is_active);
+        $this->assertSame($audits, DB::table('audit_events')->count());
+        $this->assertSame($original, $f['activation']->refresh()->snapshot_hash);
+    }
 }

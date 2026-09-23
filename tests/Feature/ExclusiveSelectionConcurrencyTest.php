@@ -77,6 +77,28 @@ class ExclusiveSelectionConcurrencyTest extends TestCase
 
     public static function activationRaces(): array { return [['duplicate'], ['successor'], ['block']]; }
 
+    public function test_a_scope_block_committed_before_activation_acquires_its_lock_is_never_hidden_by_a_snapshot(): void
+    {
+        $this->fakePrivateMediaStorage(); $this->travelTo(now()->startOfSecond()); F::configure();
+        $a = F::prepared(); $b = F::prepared($a['scope']); $inputs = [];
+        foreach ([$a, $b] as $f) {
+            $inputs[] = ['action' => 'activate', 'offer' => $f['offer']->id, 'revision' => $f['revision']->id,
+                'actor' => $f['actor']->id, 'scope' => $f['scope']->id, 'policy' => InventoryFixtures::policy(),
+                'exclusive_policy' => F::policy(), 'now' => now()->toIso8601ZuluString(), 'barrier' => 'rights_scopes'];
+        }
+        $results = InventoryRace::run($this, $inputs, function () use ($a): void {
+            // Both independent workers have reached their scope lock, after earlier
+            // track/offer/license locks. Commit the block BEFORE releasing that barrier.
+            app(\App\Domain\Commerce\Inventory\ManageRightsScope::class)->block($a['scope']->id, true, 0, 'COMMITTED-BEFORE-LOCK', $a['actor']);
+            $this->assertSame(0, DB::transactionLevel());
+        });
+        $this->assertSame(['rejected', 'rejected'], array_column($results, 'result'));
+        $this->assertSame(['SELECTION_CHANGED', 'SELECTION_CHANGED'], array_column($results, 'code'));
+        $this->assertFalse($a['offer']->refresh()->is_active); $this->assertFalse($b['offer']->refresh()->is_active);
+        $this->assertDatabaseCount('exclusive_activations', 0);
+        $this->assertSame(0, DB::table('audit_events')->where('action', 'catalog.offer.exclusive_activated')->count());
+    }
+
     #[DataProvider('activationRaces')]
     public function test_activation_cannot_lose_sibling_or_administrative_controls(string $scenario): void
     {

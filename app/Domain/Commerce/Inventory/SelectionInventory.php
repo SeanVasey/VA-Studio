@@ -19,10 +19,7 @@ final class SelectionInventory
         if (! $revision) { return false; }
         // Once a track has explicitly linked into an activated scope, a new unlinked
         // successor cannot evade its cutoff. This only blocks; it never creates a link.
-        $governed = DB::table('rights_scope_offers as links')->join('offer_revisions as revisions', 'revisions.id', '=', 'links.offer_revision_id')
-            ->where('revisions.track_id', $revision->track_id)->whereExists(fn ($query) => $query->selectRaw('1')
-                ->from('exclusive_activations')->whereColumn('exclusive_activations.rights_scope_id', 'links.rights_scope_id'))
-            ->distinct()->pluck('links.rights_scope_id')->map(fn ($id) => (int) $id)->all();
+        $governed = $this->governedScopes($revision->track_id);
         if ($governed !== [] && (count($governed) !== 1 || ! $link || $link->rights_scope_id !== $governed[0])) { return false; }
         // Legacy inventory exercises retain their original behavior until an exclusive is explicitly activated.
         if (! $link || ! ExclusiveActivation::where('rights_scope_id', $link->rights_scope_id)->exists()) { return true; }
@@ -35,6 +32,14 @@ final class SelectionInventory
             ->where(fn ($query) => $query->where('state', 'pending')->orWhere(fn ($held) =>
                 $held->where('state', 'held')->where('expires_at', '>', now())))
             ->exists();
+    }
+
+    public function governedScopes(int $trackId): array
+    {
+        return DB::table('rights_scope_offers as links')->join('offer_revisions as revisions', 'revisions.id', '=', 'links.offer_revision_id')
+            ->where('revisions.track_id', $trackId)->whereExists(fn ($query) => $query->selectRaw('1')
+                ->from('exclusive_activations')->whereColumn('exclusive_activations.rights_scope_id', 'links.rights_scope_id'))
+            ->distinct()->pluck('links.rights_scope_id')->map(fn ($id) => (int) $id)->all();
     }
 
     public function assertAvailable(array $lines, ?int $ownQuoteId = null): void

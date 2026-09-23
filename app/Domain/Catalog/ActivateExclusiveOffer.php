@@ -27,7 +27,8 @@ final class ActivateExclusiveOffer
         return DB::transaction(function () use ($offer, $expectedRevisionId, $actor, $policy) {
             $track = Track::whereKey($offer->track_id)->lockForUpdate()->firstOrFail();
             $locked = Offer::whereKey($offer->id)->lockForUpdate()->firstOrFail();
-            $revision = $locked->currentRevision()->first();
+            // Do not establish a REPEATABLE READ snapshot before the later control locks.
+            $revision = $locked->currentRevision()->lockForUpdate()->first();
             if ($locked->track_id !== $track->id || ! $revision || $revision->id !== $expectedRevisionId) {
                 throw new QuoteException('SELECTION_CHANGED', 409);
             }
@@ -35,8 +36,11 @@ final class ActivateExclusiveOffer
             $track->rightsDeclarations()->latest('id')->lockForUpdate()->first();
             $scope = RightsScope::whereKey($revision->snapshot['inventory']['scope_id'] ?? 0)->lockForUpdate()->first();
             $readiness = app(PublicationReadiness::class);
-            if (! $scope || $readiness->preparedExclusiveBlockers($locked, $revision) !== []) {
+            if (! $scope || $scope->blocked || $readiness->preparedExclusiveBlockers($locked, $revision) !== []) {
                 throw new QuoteException('SELECTION_CHANGED', 409);
+            }
+            if (array_diff(app(\App\Domain\Commerce\Inventory\SelectionInventory::class)->governedScopes($track->id), [$scope->id]) !== []) {
+                throw new QuoteException('INVENTORY_SCOPE_CONFLICT', 409);
             }
             // Every currently selectable sibling needs its own explicit exact-revision link.
             // The track lock serializes sibling publication; no association is inferred or backfilled.

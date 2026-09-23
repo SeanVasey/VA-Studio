@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 final class InventoryRace
 {
-    public static function run(TestCase $test, array $inputs): array
+    public static function run(TestCase $test, array $inputs, ?callable $beforeRelease = null): array
     {
         $test->assertSame(0, DB::transactionLevel());
         $directory = storage_path('framework/testing/inventory-race-'.Str::uuid());
@@ -35,7 +35,9 @@ final class InventoryRace
             foreach ($paths as $path) { $test->assertFileExists($path, 'Worker missed the shared lock barrier.'); }
             $connections = array_map(fn ($path) => (int) file_get_contents($path), $paths);
             $connections[] = (int) DB::selectOne('SELECT CONNECTION_ID() AS connection_id')->connection_id;
-            $test->assertCount(3, array_unique($connections)); touch($directory.'/release'); $results = [];
+            $test->assertCount(3, array_unique($connections));
+            if ($beforeRelease !== null) { $beforeRelease(); }
+            touch($directory.'/release'); $results = [];
             foreach ($processes as $process) {
                 $process->wait(); $test->assertSame(0, $process->getExitCode(), $process->getOutput());
                 $results[] = json_decode($process->getOutput(), true, 8, JSON_THROW_ON_ERROR);
