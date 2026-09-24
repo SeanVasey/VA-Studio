@@ -172,6 +172,9 @@ final class QuoteController
             'PROMOTION_NOT_ELIGIBLE' => 'This selection does not qualify for that promotion.',
             'PROMOTION_LIMIT_REACHED' => 'This promotion has reached its usage limit.',
             'PROMOTION_CHANGED' => 'Promotion rules have changed. Start a new selection review.',
+            'INVENTORY_UNAVAILABLE', 'INVENTORY_BLOCKED', 'INVENTORY_SCOPE_UNAVAILABLE' => 'A selected offer is currently unavailable. Choose again.',
+            'INVENTORY_EXPIRED', 'INVENTORY_CHANGED', 'INVENTORY_NOT_FOUND' => 'This selection is no longer reserved. Start a new selection review.',
+            'INVENTORY_POLICY_UNAVAILABLE', 'EXCLUSIVE_POLICY_UNAVAILABLE' => 'Selection review is temporarily unavailable.',
             default => 'Choose a valid selection and try again.',
         };
 

@@ -37,3 +37,5 @@ Follow the current [ordered development record](../development-order.md) for acc
 [D-10](D-10-shared-inventory.md) records recovery of merged PR #43 and the shared-inventory foundation, followed by exclusive offer/quote integration before WP-07.
 
 [D-11](D-11-exclusive-offer-preparation.md) defines inactive scope-bound exclusive revisions as the first integration step after merged PR #44; activation and quote/pricing integration remain separate acceptance gates.
+
+[D-12](D-12-exclusive-selection.md) connects test exclusive activation to versioned selection/disclosure/pricing and atomic inventory, preserving the WP-07/WP-08 handoff.

@@ -13,6 +13,7 @@ export interface LicenseDisclosure {
   quoteId?: string;
   disclosureSchema?: number;
   disclosureHash?: string;
+  testOnly?: boolean;
   offerId: string;
   offerRevisionId: string;
   licenseVersionId: string;

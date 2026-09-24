@@ -38,3 +38,7 @@ Next: versioned exclusive offer and quote snapshots with full source disclosure,
 ## Rollout and recovery
 
 The migration is additive and performs no backfill or historical inference. Deploy schema before internal callers. Withdraw callers/configuration to stop new exercises while preserving scopes, links, reservations, claims and audits. Do not run `down` on useful evidence. Down/up is tested only for disposable empty new tables. There is no automatic pending release or refund restocking; a clock or code rollback cannot establish that payment failed.
+
+## Subsequent exclusive integration
+
+The [exclusive selection increment](exclusive-selection.md) connects this foundation to activated test revisions, versioned quotes/disclosure/pricing and explicit cutoff. It adds non-mutating reservation verification for pricing reads and freezes scope bindings/policy in exclusive quotes. Pending inventory remains retained; WP-07 terminal effects are still required. The initial foundation boundaries above describe the original PR #44 scope.

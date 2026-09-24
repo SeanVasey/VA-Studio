@@ -78,7 +78,7 @@ final class PromotionUsage
             if (! $this->validAttempt($attemptId)) {
                 throw new QuoteException('INVALID_QUOTE_REQUEST', 422);
             }
-            if (($pricing->snapshot['schema_version'] ?? null) !== 2) {
+            if (! in_array($pricing->snapshot['schema_version'] ?? null, [2, 3], true) || ! isset($pricing->snapshot['promotion'])) {
                 throw new QuoteException('PROMOTION_NOT_ELIGIBLE', 409);
             }
             $use = $this->currentUse($pricing);

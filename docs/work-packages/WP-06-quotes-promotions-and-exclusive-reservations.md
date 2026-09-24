@@ -1,6 +1,6 @@
 # [WP-06] Server quotes, promotion calculations and exclusive reservations
 
-Status: **Provisional reviews, disclosure, pricing/test-tax, promotion holds and shared inventory are merged through PR #44. PR #48 merged inactive scope-bound exclusive preparation after CI and independent review. PR #49 implements atomic test pricing/promotion/inventory; its PR retains final acceptance evidence.** Published customer quotes remain non-exclusive and non-payable; exclusive activation/quote/pricing integration and the broad work package are not complete.
+Status: **Foundations through PR #50 are merged. The current integration batch adds explicitly configured test exclusive activation, quote/disclosure v2, pricing v3, promotion eligibility and atomic scoped acquisition. Final CI/review belongs in its PR.** Quotes remain non-payable; order/assent/verified terminal effects and production-policy acceptance remain open.
 
 - Suggested issue title: `[WP-06] Server quotes, promotion calculations and exclusive reservations`
 - Phase: 2
@@ -73,6 +73,12 @@ Next: versioned exclusive activation, quote/disclosure and pricing with atomic i
 [PR #49](https://github.com/VASEYDEV/VASEYAUDIO/pull/49) and the [coordinator contract](../atomic-priced-inventory.md) compose exact pricing, optional promotion usage and shared inventory in one outer transaction. Inventory failure cannot leave a newly created price or consumed promotion capacity, and a failed inventory attempt rolls back the promotion pending transition and audit. Both resources must share lifecycle and attempt identity; original snapshots and expiry remain intact. Scope waits are followed by a final pricing-expiry check. MySQL process tests exercise shared scopes, campaign caps and retries; actual results belong in the integrating PR.
 
 This remains internal local/testing orchestration on existing provisional non-exclusive quotes. It adds no activation, buyer order, provider call or terminal rights effect. The next dependency remains versioned exclusive activation/quote/disclosure/pricing, promotion eligibility and pending non-exclusive cutoff, followed by WP-07/WP-08. Keep this package open and preserve all broader acceptance criteria.
+
+### Exclusive selection integration — 2026-09-23
+
+The [exclusive selection contract](../exclusive-selection.md) and [D-12](../architecture/D-12-exclusive-selection.md) connect prepared evidence to authorized exact-revision activation, versioned owned quote/disclosure and integer pricing, explicit exclusive promotion eligibility, anonymous/owner availability and atomic inventory acquisition. Active siblings require explicit links and governed successors cannot evade cutoff by omitting a link. Pending inventory attempts retain occupancy. Historical offer/quote/pricing evidence and old algorithms are preserved. This is local/testing only, with independent MySQL races and functional/frontend/migration coverage; the integrating PR records actual final execution and review.
+
+After acceptance, resume WP-07 identity/assent/orders and hosted test checkout with aggregate attempt binding and verified terminal effects, then WP-08 contracts and private delivery. This does not complete production U-08 policy or the whole WP-06 work package.
 
 ### Remaining requirements
 

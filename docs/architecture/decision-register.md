@@ -90,3 +90,7 @@ The customer action is **Review selection**. `payable` stays false; tax and tota
 ## D-11 — Scope-bound exclusive preparation (2026-09-23)
 
 [Decision and boundary](D-11-exclusive-offer-preparation.md): preserve historical v1 commerce, prepare inactive v2 exclusive revisions with explicit immutable scope/link evidence, and keep public activation blocked until versioned quote/disclosure/pricing and reservation integration exist. This is authorized reversible development, not approval of U-05/U-08 legal or production policy. PR #44 is merged; the integrating preparation PR records the next candidate's actual CI/review evidence.
+
+## D-12 — Exclusive selection integration (2026-09-23)
+
+[Decision and boundary](D-12-exclusive-selection.md): immutable explicit test activation, governed scope coverage, quote/disclosure v2 and pricing v3 with atomic inventory. Existing non-exclusive pricing algorithms remain unchanged. U-05/U-08 production decisions remain unresolved; WP-07 supplies order/assent/provider and terminal effects next. Final candidate evidence belongs in the integrating PR.
