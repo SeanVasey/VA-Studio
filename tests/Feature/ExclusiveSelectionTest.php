@@ -59,7 +59,8 @@ class ExclusiveSelectionTest extends TestCase
         $response = $this->postJson('/quotes', ['items' => $f['items']], ['Idempotency-Key' => $key])->assertOk();
         $quote = $response->json('quote'); $stored = Quote::sole(); $hash = $stored->snapshot_hash;
         $this->assertSame(2, $stored->snapshot['schema_version']);
-        $this->assertSame(F::policy(), $stored->snapshot['selection_policy']);
+        // MySQL JSON storage may reorder object keys; all keys, values and types must still match.
+        $this->assertSame(CanonicalJson::encode(F::policy()), CanonicalJson::encode($stored->snapshot['selection_policy']));
         $this->assertCount(1, $stored->snapshot['scope_bindings']);
         $this->assertDatabaseCount('inventory_reservations', 0);
         $this->postJson('/quotes', ['items' => $f['items']], ['Idempotency-Key' => $key])->assertOk()->assertJsonPath('quote.id', $quote['id']);
