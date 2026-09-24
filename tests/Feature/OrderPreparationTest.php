@@ -320,13 +320,15 @@ class OrderPreparationTest extends TestCase
             $before = $model->refresh()->getAttributes();
             try {
                 match ($operation) {
-                    'orm_update' => $model->forceFill(['created_at' => now()->addDay()])->save(),
+                    'orm_update' => $model->forceFill($model instanceof OrderLine
+                        ? ['position' => $model->position + 1] : ['created_at' => now()->addDay()])->save(),
                     'orm_delete' => $model->delete(),
                     'sql_update' => DB::table($model->getTable())->where('id', $model->id)->update(['id' => $model->id]),
                     'sql_delete' => DB::table($model->getTable())->where('id', $model->id)->delete(),
                 };
                 $this->fail('Immutable '.$model->getTable().' evidence was changed.');
-            } catch (LogicException|QueryException) {
+            } catch (LogicException|QueryException $error) {
+                $this->assertInstanceOf(str_starts_with($operation, 'orm_') ? LogicException::class : QueryException::class, $error);
                 $this->assertSame($before, $model->fresh()->getAttributes());
             }
         }
