@@ -39,3 +39,5 @@ Follow the current [ordered development record](../development-order.md) for acc
 [D-11](D-11-exclusive-offer-preparation.md) defines inactive scope-bound exclusive revisions as the first integration step after merged PR #44; activation and quote/pricing integration remain separate acceptance gates.
 
 [D-12](D-12-exclusive-selection.md) connects test exclusive activation to versioned selection/disclosure/pricing and atomic inventory, preserving the WP-07/WP-08 handoff.
+
+[D-13](D-13-order-preparation.md) defines the next WP-07 prerequisite: explicit test order review/assent, encrypted immutable order evidence and atomic pending attempt binding. Hosted checkout, verified terminal effects and WP-08 delivery remain subsequent work.

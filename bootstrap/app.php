@@ -25,9 +25,14 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => $request->is('api/*', 'quotes', 'quotes/*', 'webhooks/stripe') || $request->expectsJson(),
+            fn (Request $request) => $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
         );
         $exceptions->report(function (Throwable $exception) {
+            if (request()->is('orders', 'orders/*', 'quotes/*/order', 'quotes/*/order-review')) {
+                Log::error('Order request failed.', ['exception_class' => $exception::class]);
+
+                return false;
+            }
             if (request()->is('webhooks/stripe')) {
                 // SQL bindings and provider exception traces can contain private bodies.
                 Log::error('Stripe webhook request failed.', ['exception_class' => $exception::class]);
@@ -56,16 +61,17 @@ return Application::configure(basePath: dirname(__DIR__))
 
                 return response()->json(['code' => $code], $status >= 500 ? 503 : $status, $headers);
             }
-            if (! $request->is('quotes', 'quotes/*')) {
+            if (! $request->is('quotes', 'quotes/*', 'orders', 'orders/*')) {
                 return $response;
             }
+            $isOrder = $request->is('orders', 'orders/*', 'quotes/*/order', 'quotes/*/order-review');
             $status = $exception instanceof LockTimeoutException ? 503 : $response->getStatusCode();
             [$code, $message] = match ($status) {
-                404 => ['QUOTE_NOT_FOUND', 'This selection review is unavailable.'],
+                404 => [$isOrder ? 'ORDER_NOT_FOUND' : 'QUOTE_NOT_FOUND', 'This selection review is unavailable.'],
                 419 => ['SESSION_EXPIRED', 'Your session has expired. Refresh the page and try again.'],
                 429 => ['RATE_LIMITED', 'Too many requests. Wait a moment and try again.'],
-                400, 405, 413, 415, 422 => ['INVALID_QUOTE_REQUEST', 'Choose a valid selection and try again.'],
-                default => ['QUOTE_UNAVAILABLE', 'Selection review is temporarily unavailable. Try again later.'],
+                400, 405, 413, 415, 422 => [$isOrder ? 'INVALID_ORDER_REQUEST' : 'INVALID_QUOTE_REQUEST', 'Choose a valid selection and try again.'],
+                default => [$isOrder ? 'ORDER_UNAVAILABLE' : 'QUOTE_UNAVAILABLE', 'Selection review is temporarily unavailable. Try again later.'],
             };
             $headers = ['Cache-Control' => 'private, no-store', 'Vary' => 'Cookie', 'X-Content-Type-Options' => 'nosniff'];
             foreach (['Allow', 'Retry-After', 'X-RateLimit-Limit', 'X-RateLimit-Remaining'] as $name) {

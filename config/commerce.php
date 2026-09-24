@@ -10,4 +10,6 @@ return [
     'test_inventory_policy' => env('VASEY_TEST_INVENTORY_POLICY'),
     // No exclusive selection or cutoff policy is installed by default.
     'test_exclusive_selection_policy' => env('VASEY_TEST_EXCLUSIVE_SELECTION_POLICY'),
+    // Explicit synthetic seller/assent policy; no real merchant or legal terms are supplied.
+    'test_order_policy' => env('VASEY_TEST_ORDER_POLICY'),
 ];

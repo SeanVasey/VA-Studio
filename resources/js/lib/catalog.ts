@@ -78,6 +78,7 @@ export interface StorefrontProps {
   selectedTrack?: Track | null;
   catalogPage?: CatalogPage;
   designPreview?: boolean;
+  testOrderPreparationEnabled?: boolean;
   metadata?: PageMetadata;
 }
 

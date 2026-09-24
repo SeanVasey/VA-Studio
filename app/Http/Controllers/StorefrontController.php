@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Catalog\PublicCatalog;
+use App\Domain\Commerce\Orders\OrderPolicy;
 use App\Support\StorefrontMetadata;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,7 +21,8 @@ class StorefrontController extends Controller
         $catalog['licenseTiers'] = collect(array_merge($catalog['licenseTiers'], $selected['licenseTiers'] ?? []))->unique('id')->values()->all();
         $metadata = app(StorefrontMetadata::class)->forPage($selectedTrack);
 
-        return Inertia::render('Storefront', $catalog + ['selectedTrack' => $selectedTrack, 'selectedTrackSlug' => $slug, 'commerceEnabled' => false, 'metadata' => $metadata])
+        return Inertia::render('Storefront', $catalog + ['selectedTrack' => $selectedTrack, 'selectedTrackSlug' => $slug, 'commerceEnabled' => false,
+            'testOrderPreparationEnabled' => app(OrderPolicy::class)->enabled(), 'metadata' => $metadata])
             ->withViewData(['metadata' => $metadata]);
     }
 

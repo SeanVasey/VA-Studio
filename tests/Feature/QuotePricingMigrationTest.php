@@ -23,7 +23,12 @@ class QuotePricingMigrationTest extends TestCase
         $before = CanonicalJson::encode($quote->snapshot);
         $migration = require database_path('migrations/2026_09_12_000013_quote_pricing.php');
         $promotions = require database_path('migrations/2026_09_14_000014_promotion_usage.php');
+        $orders = require database_path('migrations/2026_09_24_000017_order_preparation.php');
         // Reverse dependency order, as the migrator does; retain foreign-key enforcement.
+        foreach (['orders', 'order_lines', 'order_attempts'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
+        $orders->down();
         $this->assertDatabaseCount('promotion_uses', 0);
         $this->assertDatabaseCount('promotion_campaigns', 0);
         $promotions->down();
@@ -33,6 +38,7 @@ class QuotePricingMigrationTest extends TestCase
         $this->assertSame($before, CanonicalJson::encode($quote->refresh()->snapshot));
         $migration->up();
         $promotions->up();
+        $orders->up();
         $pricing = app(PriceQuote::class)->create($quote->public_id, str_repeat('a', 64));
         $this->assertSame($quote->snapshot_hash, $pricing->snapshot['quote_snapshot_hash']);
         $this->assertSame($before, CanonicalJson::encode($quote->refresh()->snapshot));

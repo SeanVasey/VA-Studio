@@ -27,7 +27,11 @@ class PromotionMigrationTest extends TestCase
         $this->assertDatabaseCount('promotion_uses', 0);
         $this->assertDatabaseCount('promotion_campaigns', 0);
         $migration = require database_path('migrations/2026_09_14_000014_promotion_usage.php');
-        $migration->down(); $migration->up();
+        $orders = require database_path('migrations/2026_09_24_000017_order_preparation.php');
+        foreach (['orders', 'order_lines', 'order_attempts'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
+        $orders->down(); $migration->down(); $migration->up(); $orders->up();
         $this->assertSame($hash, $pricing->refresh()->snapshot_hash);
         $this->assertSame($hash, CanonicalJson::hash(app(PricingSnapshot::class)->verify($pricing, $quote)));
         PromotionFixtures::configure([PromotionFixtures::policy()]);
