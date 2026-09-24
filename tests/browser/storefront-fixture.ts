@@ -49,7 +49,7 @@ async function serveAudio(route: Route) {
 
 declare global { interface Window { __nativePreviews: HTMLAudioElement[] } }
 
-export async function storefrontFixture(page: Page, options: { failFirstTerms?: boolean } = {}) {
+export async function storefrontFixture(page: Page, options: { failFirstTerms?: boolean; testOrderPreparationEnabled?: boolean } = {}) {
   const shellResponse = await page.request.get('/');
   expect(shellResponse.ok()).toBe(true);
   const shell = await shellResponse.text();
@@ -91,6 +91,7 @@ export async function storefrontFixture(page: Page, options: { failFirstTerms?: 
     const metadata = { ...base.props.metadata, title: detail ? `${fixtureTrack.title} — VASEY.AUDIO` : base.props.metadata.title, canonicalUrl: url.origin + url.pathname, type: detail ? 'music.song' : 'website' };
     const payload = { ...base, url: url.pathname + url.search, props: { ...base.props, tracks: [fixtureTrack], licenseTiers: tiers,
       selectedTrack: detail ? fixtureTrack : null, selectedTrackSlug: detail ? fixtureTrack.slug : null, metadata,
+      testOrderPreparationEnabled: options.testOrderPreparationEnabled ?? base.props.testOrderPreparationEnabled,
       catalogPage: { filters: { q: url.searchParams.get('q') ?? '', genre: url.searchParams.get('genre') ?? '', sort: url.searchParams.get('sort') ?? 'featured' }, previousUrl: null, nextUrl: null, restartUrl: currentUrl, currentUrl, hasCursor: false },
     } };
     if (request.headers()['x-inertia']) {

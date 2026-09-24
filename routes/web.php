@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PublicMediaController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\StorefrontController;
@@ -21,6 +22,10 @@ Route::withoutMiddleware(HandleInertiaRequests::class)->group(function (): void 
     Route::post('/quotes/{quote}/pricing', [QuoteController::class, 'price'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('quotes.price');
     Route::post('/quotes/{quote}/pricing/promotions', [QuoteController::class, 'promotionPrice'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('quotes.promotion-price');
     Route::get('/quotes/{quote}/pricing', [QuoteController::class, 'pricing'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('quotes.pricing');
+    Route::get('/quotes/{quote}/order-review', [OrderController::class, 'review'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.review');
+    Route::post('/orders', [OrderController::class, 'store'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.store');
+    Route::get('/orders/{order}/status', [OrderController::class, 'status'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.status');
+    Route::get('/quotes/{quote}/order', [OrderController::class, 'forQuote'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.for-quote');
 });
 Route::post('/checkout', fn () => response()->json([
     'code' => 'COMMERCE_NOT_ENABLED',

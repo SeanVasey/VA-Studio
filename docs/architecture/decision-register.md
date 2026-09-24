@@ -94,3 +94,7 @@ The customer action is **Review selection**. `payable` stays false; tax and tota
 ## D-12 — Exclusive selection integration (2026-09-23)
 
 [Decision and boundary](D-12-exclusive-selection.md): immutable explicit test activation, governed scope coverage, quote/disclosure v2 and pricing v3 with atomic inventory. Existing non-exclusive pricing algorithms remain unchanged. U-05/U-08 production decisions remain unresolved; WP-07 supplies order/assent/provider and terminal effects next. Final candidate evidence belongs in the integrating PR.
+
+## D-13 — Private test order preparation (2026-09-24)
+
+[Decision and boundary](D-13-order-preparation.md): after merged PR #51, bind a complete hashed review and explicit test assent to encrypted immutable order/line evidence and one pending inventory/promotion attempt. The policy is absent by default, fresh preparation is local/testing only and requires fixed test tax. Owned retained reads/retries survive expiry and current-policy changes; terminal state support must preserve that evidence when added. This does not resolve U-04/U-05/U-07/U-08 or enable provider checkout. Final candidate/review/CI evidence belongs in the integrating PR; hosted test sessions, authoritative payment/terminal effects and then WP-08 are next.

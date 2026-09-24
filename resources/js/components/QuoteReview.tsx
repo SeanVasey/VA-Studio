@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { fileRoleLabels, formatMoney, savedCartSelection, safeMediaUrl, type CartLine } from '../lib/catalog';
 import { LicenseDisclosure } from './LicenseDisclosure';
+import { OrderPreparation } from './OrderPreparation';
 
 interface ReviewedItem {
   trackId: string | number; offerId: string | number; offerRevisionId: string | number; licenseVersionId: string | number;
@@ -39,7 +40,7 @@ function validQuote(value: unknown, selection: string): value is ReviewedQuote {
     && q.items.reduce((sum, item) => sum + item.priceMinor, 0) === q.subtotalMinor && selectionKey(q.items) === selection;
 }
 
-export function QuoteReview({ lines, designPreview }: { lines: CartLine[]; designPreview: boolean }) {
+export function QuoteReview({ lines, designPreview, testOrderPreparationEnabled = false }: { lines: CartLine[]; designPreview: boolean; testOrderPreparationEnabled?: boolean }) {
   const items = lines.map(savedCartSelection);
   const selection = selectionKey(items);
   const latestSelection = useRef(selection);
@@ -109,6 +110,7 @@ export function QuoteReview({ lines, designPreview }: { lines: CartLine[]; desig
       <div className="cart-total"><span>Reviewed subtotal</span><strong>{formatMoney(quote.subtotalMinor, quote.currency)} <small>{quote.currency}</small></strong></div>
       <p className="fine-print">Review expires at <time dateTime={quote.expiresAt}>{new Date(quote.expiresAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</time>. Availability can change. Tax and final total are not determined. This review does not reserve rights or create an order.</p>
     </div> : null}
+    {quote && testOrderPreparationEnabled && !designPreview && <OrderPreparation quoteId={quote.id} expiresAt={quote.expiresAt} offerRevisionIds={quote.items.map(item => String(item.offerRevisionId))} />}
     {expired && <p role="status">This review expired. Review your selection again.</p>}
     <button className="button button-outline full-width" onClick={expired ? restart : review} disabled={busy || designPreview || items.length > 10}>{busy ? 'Reviewing selection…' : quote ? 'Review selection again' : 'Review selection'}</button>
     {designPreview && <p className="fine-print">Selection review is unavailable for the sample catalog.</p>}

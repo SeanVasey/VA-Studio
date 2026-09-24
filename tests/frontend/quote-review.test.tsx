@@ -94,9 +94,30 @@ describe('server selection review', () => {
   it('never requests a server quote for design fixtures', async () => {
     const user = userEvent.setup();
     const fetch = vi.spyOn(globalThis, 'fetch');
-    render(<QuoteReview lines={lines} designPreview />);
+    render(<QuoteReview lines={lines} designPreview testOrderPreparationEnabled />);
     await user.click(screen.getByRole('button', { name: 'Review selection' }));
     expect(fetch).not.toHaveBeenCalled();
+    expect(screen.queryByRole('region', { name: 'Test order preparation' })).not.toBeInTheDocument();
+  });
+  it('does not expose test order preparation unless its server flag is explicitly enabled', async () => {
+    const user = userEvent.setup();
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValue(response());
+    render(<QuoteReview lines={lines} designPreview={false} />);
+    await user.click(screen.getByRole('button', { name: 'Review selection' }));
+    expect(await screen.findByText('SELECTION REVIEWED')).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Test order preparation' })).not.toBeInTheDocument();
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+  it('enables owned order recovery only after the flagged current selection is successfully reviewed', async () => {
+    const user = userEvent.setup();
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response()).mockResolvedValueOnce(new Response('{}', { status: 404 }));
+    const view = render(<QuoteReview lines={lines} designPreview={false} testOrderPreparationEnabled />);
+    expect(screen.queryByRole('region', { name: 'Test order preparation' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Review selection' }));
+    expect(await screen.findByRole('button', { name: 'Review test order' })).toBeEnabled();
+    expect(fetcher.mock.calls[1][0]).toBe('/quotes/review-test-only/order');
+    view.rerender(<QuoteReview lines={[{ ...lines[0], offer: { ...lines[0].offer, offerRevisionId: 'replacement' } }]} designPreview={false} testOrderPreparationEnabled />);
+    expect(screen.queryByRole('region', { name: 'Test order preparation' })).not.toBeInTheDocument();
   });
   it('does not duplicate a pending request on repeated clicks', async () => {
     const user = userEvent.setup();

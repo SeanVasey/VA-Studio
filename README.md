@@ -2,7 +2,7 @@
 
 Bespoke web store development replacing older, service-based e-commerce offerings. First-party music storefront, publishing administration, licensing, and secure delivery for Sean Vasey. This project replaces the current BeatStars site through staged, verifiable implementation.
 
-**Status: development foundation with private media processing, exact license review evidence, immutable offer revisions, provisional selection reviews and a Stripe test webhook inbox. Live payments, purchased downloads, historical migration, and production cutover are not enabled.** The current BeatStars site remains authoritative for sales and existing customer obligations.
+**Status: development foundation with private media processing, versioned licensing/offers, scoped selection/pricing, isolated test order preparation and a Stripe test webhook inbox. Hosted checkout, live payments, purchased downloads, historical migration and production cutover are not enabled.** The current BeatStars site remains authoritative for sales and existing customer obligations. The current order increment's tested candidate and acceptance evidence are recorded in its integrating PR.
 
 ## Start here
 
@@ -19,6 +19,7 @@ Bespoke web store development replacing older, service-based e-commerce offering
 - [Provisional selection reviews](docs/provisional-quotes.md): server snapshots, session ownership, retries, expiry and the boundary before payable checkout.
 - [Quote license disclosure](docs/quote-license-disclosure.md): full frozen terms tied to the owning selection review, disclosure identity and recovery.
 - [Quote pricing](docs/quote-pricing.md): immutable server calculation evidence, explicit test tax policies, owner-checked pricing API and amount comparison boundaries.
+- [Test order preparation](docs/order-preparation.md): complete review/assent, encrypted immutable records, owner recovery and atomic attempt binding before hosted checkout.
 - [Exclusive selection and atomic test pricing](docs/exclusive-selection.md): explicit test activation, scope coverage, versioned quotes/disclosure/pricing and reservation cutoff.
 - [Exclusive offer preparation](docs/exclusive-offer-preparation.md): inactive v2 revisions with explicit scope evidence, historical compatibility and the remaining activation boundary.
 - [Atomic test pricing and inventory](docs/atomic-priced-inventory.md)
@@ -39,12 +40,14 @@ Bespoke web store development replacing older, service-based e-commerce offering
 | Admin | Authenticated Filament catalog/licensing management, audited metadata edits and permanent published track URLs | Detailed RBAC, recovery verification, site editing, customers and fulfillment operations |
 | Media | Private WAV/artwork and bounded WAV-stems ZIP intake, queued verification, immutable master/MP3 revisions, tagged previews, measured waveforms, admin retry controls and audited stems/master associations frozen in offers | Production scanner acceptance, worker isolation, real stems alignment acceptance, resumable uploads and managed object storage |
 | Licensing | Exact submitted review payloads, independent approval evidence, source/summary preview, successor diffs and effective dates | Approved production terms, a complete typed rights schema, buyer contracts and archival PDF rendering |
-| Offers | Editable drafts separated from immutable published price/license/file revisions; revision history and cart invalidation; internal inactive exclusive revisions with frozen scope/link evidence | Production exclusive policy, purchase snapshots and fulfillment; test activation/quote/pricing integration is documented in the current increment |
-| Commerce | Immutable owned selection/license disclosure and pricing/test-tax evidence; v2 promotion allocation/campaign limits and internal shared-inventory test reservations | Actual production policies, buyer identity/assent/orders, provider checkout, terminal coupon redemption/release, refunds, grants and delivery |
+| Offers | Editable drafts separated from immutable published price/license/file revisions; revision history and cart invalidation; scope-bound exclusive preparation and explicit test activation/selection | Production exclusive policy and fulfillment |
+| Commerce | Immutable selection/disclosure/pricing, promotion limits and shared inventory; current increment adds full test order review/assent, encrypted order/line evidence and atomic pending attempt binding | Production identity/legal/tax policy, hosted checkout, verified terminal inventory/coupon effects, refunds, grants and delivery |
 | Payment evidence | Stripe test-only snapshot webhook with SDK signature verification, immutable encrypted receipts, scoped duplicate handling and a metadata-only operator command | Hosted Checkout sessions, durable processing/reconciliation, authoritative payment validation and atomic order/grant/fulfillment effects |
 | Full parity | Documented work packages and evidence gates | Memberships, kits, services, merch, CRM, promotions, editorial, integrations and migration |
 
 Public metadata observed on BeatStars is evidence, not an imported production catalog. Design fixtures are development-only and carry no saleable rights. The local cart pins the advertised offer revision and invalidates selections when that revision changes. **Review selection** asks the server to revalidate the exact selection and freeze its price, license and file evidence. The returned subtotal is provisional: tax and total are unknown, `payable` is false, and no order, reservation, assent or purchase rights are created.
+
+The separate **Test order preparation** action requires explicit local/testing order, fixed-tax and inventory policies. It captures full terms and affirmative assent, privately retains supplied unverified buyer details and binds pending resources atomically. No policy is installed by default. Recovery is owner-checked, and checkout still returns 503; preparing a test order does not start payment or grant rights. See the [order contract](docs/order-preparation.md) and its pending terminal-state integration.
 
 ## Stack
 
