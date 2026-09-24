@@ -62,7 +62,7 @@ class OrderPreparationConcurrencyTest extends TestCase
         $before = null;
         if ($scenario === 'expired_replay') {
             $order = app(PrepareOrder::class)->handle(InventoryFixtures::OWNER, $key, $first);
-            $before = ['order' => $order->getAttributes(), 'attempt' => OrderAttempt::sole()->getAttributes(),
+            $before = ['order' => $order->refresh()->getAttributes(), 'attempt' => OrderAttempt::sole()->getAttributes(),
                 'reservation' => InventoryReservation::sole()->getAttributes(), 'promotion' => PromotionUse::sole()->getAttributes(),
                 'audits' => DB::table('audit_events')->count()];
             $this->travelTo($a['quote']->expires_at->addDay());

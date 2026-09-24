@@ -23,7 +23,7 @@ class OrderPreparationMigrationTest extends TestCase
         $f = F::priced(false, true); $service = app(ReservePricedQuote::class);
         $held = $service->hold($f['quote']->public_id, InventoryFixtures::OWNER, 'SYNTHETIC');
         $service->beginAttempt($f['quote']->public_id, InventoryFixtures::OWNER, (string) Str::uuid());
-        $quote = $f['quote']->getAttributes(); $price = $f['pricing']->getAttributes();
+        $quote = $f['quote']->refresh()->getAttributes(); $price = $f['pricing']->refresh()->getAttributes();
         $reservation = $held['reservation']->refresh()->getAttributes(); $promotion = $held['promotion_use']->refresh()->getAttributes();
         $audits = DB::table('audit_events')->count();
         $migration = require database_path('migrations/2026_09_24_000017_order_preparation.php');

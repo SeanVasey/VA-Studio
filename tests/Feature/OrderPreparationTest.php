@@ -79,7 +79,9 @@ class OrderPreparationTest extends TestCase
     #[DataProvider('kinds')]
     public function test_exact_priced_review_and_assent_commit_one_private_order_and_one_pending_attempt(bool $exclusive, bool $promoted): void
     {
-        Queue::fake(); $f = F::priced($exclusive, $promoted); $request = F::request($f['quote']);
+        $f = F::priced($exclusive, $promoted); $request = F::request($f['quote']);
+        // Media fixtures queue their own processing jobs; measure only order work below.
+        Queue::fake();
         $review = app(ReviewOrder::class)->handle($f['quote']->public_id, InventoryFixtures::OWNER);
         $digest = $review['reviewHash']; unset($review['reviewHash']);
         $this->assertSame(CanonicalJson::hash($review), $digest);
@@ -151,7 +153,7 @@ class OrderPreparationTest extends TestCase
     public function test_replay_and_owned_status_retain_exact_evidence_after_expiry_configuration_and_publication_change(): void
     {
         $f = F::priced(true, true); $request = F::request($f['quote']); $key = (string) Str::uuid();
-        $order = $this->prepare($f, $request, $key); $before = $order->getAttributes();
+        $order = $this->prepare($f, $request, $key); $before = $order->refresh()->getAttributes();
         $status = app(ReadOrder::class)->handle($order->public_id, InventoryFixtures::OWNER);
         $reservation = InventoryReservation::sole()->getAttributes(); $promotion = PromotionUse::sole()->getAttributes();
         app(DeactivateOffer::class)->handle($f['offer'], $f['actor']);
@@ -314,7 +316,8 @@ class OrderPreparationTest extends TestCase
     {
         $f = F::priced(); $order = $this->prepare($f);
         foreach ([$order, OrderLine::sole(), OrderAttempt::sole()] as $model) {
-            $before = $model->getAttributes();
+            // Compare persisted representations, including database column/key ordering.
+            $before = $model->refresh()->getAttributes();
             try {
                 match ($operation) {
                     'orm_update' => $model->forceFill(['created_at' => now()->addDay()])->save(),
@@ -410,7 +413,14 @@ class OrderPreparationTest extends TestCase
         $f = F::priced(); $request = F::request($f['quote']);
         $asset = $f['media']['master_wav'];
         $path = \Illuminate\Support\Facades\Storage::disk('local')->path($asset->storage_path);
-        $bytes = file_get_contents($path); $bytes[0] = $bytes[0] === 'X' ? 'Y' : 'X'; file_put_contents($path, $bytes);
+        $bytes = file_get_contents($path); $mtime = filemtime($path);
+        $bytes[strlen($bytes) - 1] = chr(ord($bytes[strlen($bytes) - 1]) ^ 1);
+        $this->assertTrue(chmod($path, 0600));
+        try {
+            $this->assertSame(strlen($bytes), file_put_contents($path, $bytes));
+            $this->assertTrue(touch($path, $mtime));
+        } finally { chmod($path, 0440); }
+        clearstatcache(true, $path);
         $before = DB::table('audit_events')->count();
         $this->rejected(['SELECTION_CHANGED'], fn () => $this->prepare($f, $request), 409);
         foreach (['orders', 'order_lines', 'order_attempts', 'inventory_reservations'] as $table) { $this->assertDatabaseCount($table, 0); }
