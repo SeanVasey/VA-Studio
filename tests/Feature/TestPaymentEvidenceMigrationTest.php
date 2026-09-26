@@ -44,14 +44,15 @@ class TestPaymentEvidenceMigrationTest extends TestCase
             $before[$table] = DB::table($table)->orderBy('id')->get()->map(fn ($row) => (array) $row)->all();
         }
         $migration = require database_path('migrations/2026_09_26_000019_test_payment_evidence.php');
+        $finalizations = require database_path('migrations/2026_09_26_000020_test_order_finalization.php');
         foreach (['stripe_receipt_work', 'payment_observations', 'verified_payments'] as $table) {
             $this->assertDatabaseCount($table, 0);
         }
-        $migration->down();
+        $finalizations->down(); $migration->down();
         foreach (['stripe_receipt_work', 'payment_observations', 'verified_payments'] as $table) {
             $this->assertFalse(Schema::hasTable($table));
         }
-        $migration->up();
+        $migration->up(); $finalizations->up();
         foreach ($tables as $table) {
             $this->assertSame($before[$table], DB::table($table)->orderBy('id')->get()->map(fn ($row) => (array) $row)->all());
         }

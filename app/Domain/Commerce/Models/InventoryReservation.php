@@ -14,7 +14,7 @@ class InventoryReservation extends Model
     protected function casts(): array
     {
         return ['quote_id' => 'integer', 'snapshot' => 'array', 'created_at' => 'immutable_datetime',
-            'expires_at' => 'immutable_datetime', 'pending_at' => 'immutable_datetime', 'expired_at' => 'immutable_datetime'];
+            'expires_at' => 'immutable_datetime', 'pending_at' => 'immutable_datetime', 'consumed_at' => 'immutable_datetime', 'expired_at' => 'immutable_datetime'];
     }
 
     protected static function booted(): void

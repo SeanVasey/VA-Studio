@@ -30,6 +30,7 @@ class PromotionMigrationTest extends TestCase
         $orders = require database_path('migrations/2026_09_24_000017_order_preparation.php');
         $checkout = require database_path('migrations/2026_09_26_000018_hosted_test_checkout.php');
         $payments = require database_path('migrations/2026_09_26_000019_test_payment_evidence.php');
+        $finalizations = require database_path('migrations/2026_09_26_000020_test_order_finalization.php');
         foreach (['stripe_receipt_work', 'payment_observations', 'verified_payments'] as $table) { $this->assertDatabaseCount($table, 0); }
         foreach (['checkout_intents', 'checkout_sessions', 'checkout_observations'] as $table) {
             $this->assertDatabaseCount($table, 0);
@@ -37,7 +38,7 @@ class PromotionMigrationTest extends TestCase
         foreach (['orders', 'order_lines', 'order_attempts'] as $table) {
             $this->assertDatabaseCount($table, 0);
         }
-        $payments->down(); $checkout->down(); $orders->down(); $migration->down(); $migration->up(); $orders->up(); $checkout->up(); $payments->up();
+        $finalizations->down(); $payments->down(); $checkout->down(); $orders->down(); $migration->down(); $migration->up(); $orders->up(); $checkout->up(); $payments->up(); $finalizations->up();
         $this->assertSame($hash, $pricing->refresh()->snapshot_hash);
         $this->assertSame($hash, CanonicalJson::hash(app(PricingSnapshot::class)->verify($pricing, $quote)));
         PromotionFixtures::configure([PromotionFixtures::policy()]);

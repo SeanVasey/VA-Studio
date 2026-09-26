@@ -13,7 +13,7 @@ class PromotionUse extends Model
     protected function casts(): array
     {
         return ['promotion_campaign_id' => 'integer', 'quote_pricing_id' => 'integer',
-            'created_at' => 'immutable_datetime', 'expires_at' => 'immutable_datetime', 'pending_at' => 'immutable_datetime'];
+            'created_at' => 'immutable_datetime', 'expires_at' => 'immutable_datetime', 'pending_at' => 'immutable_datetime', 'consumed_at' => 'immutable_datetime'];
     }
 
     protected static function booted(): void

@@ -6,6 +6,7 @@ use App\Domain\Catalog\Models\ExclusiveActivation;
 use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Commerce\Inventory\ExclusiveSelectionPolicy;
+use App\Domain\Commerce\Models\ExclusiveSale;
 use App\Domain\Commerce\Models\InventoryReservation;
 use App\Domain\Commerce\Models\RightsScope;
 use App\Domain\Commerce\Models\RightsScopeOffer;
@@ -36,7 +37,9 @@ final class ActivateExclusiveOffer
             $track->rightsDeclarations()->latest('id')->lockForUpdate()->first();
             $scope = RightsScope::whereKey($revision->snapshot['inventory']['scope_id'] ?? 0)->lockForUpdate()->first();
             $readiness = app(PublicationReadiness::class);
-            if (! $scope || $scope->blocked || $readiness->preparedExclusiveBlockers($locked, $revision) !== []) {
+            if (! $scope || $scope->blocked ||
+                ExclusiveSale::where('rights_scope_id', $scope->id)->lockForUpdate()->first() ||
+                $readiness->preparedExclusiveBlockers($locked, $revision) !== []) {
                 throw new QuoteException('SELECTION_CHANGED', 409);
             }
             if (array_diff(app(\App\Domain\Commerce\Inventory\SelectionInventory::class)->governedScopes($track->id), [$scope->id]) !== []) {

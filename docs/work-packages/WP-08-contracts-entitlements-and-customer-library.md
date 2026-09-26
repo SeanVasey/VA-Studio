@@ -1,6 +1,6 @@
 # [WP-08] Deterministic contracts, entitlements and customer re-downloads
 
-Status: **Planned work package**. Inspect the current implementation before starting; initial foundation code may already cover part of this scope. This issue is complete only when the acceptance evidence below exists.
+Status: **Buyer PDFs, fulfillment activation and customer downloads remain planned. The current WP-07 candidate supplies the frozen grant/render interface and pending entitlement/outbox prerequisites.** Candidate implementation is not accepted runtime evidence; this issue is complete only when the acceptance evidence below exists.
 
 - Suggested issue title: `[WP-08] Deterministic contracts, entitlements and customer re-downloads`
 - Phase: 2
@@ -46,3 +46,12 @@ Do not add secrets, private masters, unredacted orders, customer PII or real con
 > Implement WP-08 using frozen grant snapshots, private storage and explicit entitlement policies. Make rendering and URL issuance retry-safe, and verify ownership and concurrent caps. Do not infer unlimited download rights or guest identity beyond the recorded policy.
 
 Read [architecture index](../architecture/README.md), [decision register](../architecture/decision-register.md) and relevant source/brand evidence. Complete the first increment in a small PR, then split any remaining implementation into explicitly dependent issues. Preserve prior approvals and invariants; report unresolved provider/policy decisions without blocking unrelated reversible work.
+
+
+## WP-07 prerequisite handoff — 2026-09-26
+
+The [finalization candidate](../test-payment-finalization.md) under [D-16](../architecture/D-16-test-payment-finalization.md) defines one immutable grant per original order line. Its encrypted render input freezes the original unverified guest buyer, seller policy, affirmative assent and review hash, exact selection/pricing/full disclosure, purchased asset references, inventory binding, grant/finalization identity, policy and explicit effective/confirmation timestamps. Existing license `renderer_version` is historical review-HTML provenance; it does not select the buyer PDF renderer. Do not substitute current customer, seller, catalog, license, preview or asset revisions.
+
+Paid finalization creates only pending exact-asset entitlements and a pending outbox. Paid exceptions create neither grants nor entitlements and retain pending resources for later operator resolution. There is no rendering worker, PDF output, entitlement activation or download route in that increment. Its own full CI/review is required before treating those prerequisites as accepted.
+
+Next choose and pin an offline deterministic buyer PDF profile with local fonts/assets, preserve original private output bytes and hashes, then implement retry-safe all-required-evidence activation and owner-authorized downloads. Activation must agree with and deliberately extend the complete finalization graph verifier; do not mutate pending records into unsupported states or weaken retained verification. Guest/account recovery, issuance limits, storage and production legal/privacy policies still need their scoped decisions and evidence.

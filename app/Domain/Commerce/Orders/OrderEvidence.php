@@ -7,6 +7,9 @@ use App\Domain\Commerce\Models\PromotionCampaign;
 use App\Domain\Commerce\Models\PromotionUse;
 use App\Domain\Commerce\Models\Quote;
 use App\Domain\Commerce\Models\QuotePricing;
+use App\Domain\Commerce\Models\Order;
+use App\Domain\Commerce\Models\OrderFinalization;
+use App\Domain\Commerce\Finalization\FinalizationEvidence;
 use App\Domain\Commerce\QuoteException;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
@@ -19,6 +22,35 @@ final class OrderEvidence
     public const MAX_BYTES = 16777216;
 
     public function capture(string $orderId, string $attemptId, Quote $quote, QuotePricing $pricing,
+        InventoryReservation $reservation, ?PromotionUse $use, array $policy,
+        #[SensitiveParameter] array $request, CarbonImmutable $at): array
+    {
+        return $this->reconstruct($orderId, $attemptId, $quote, $pricing, $reservation, $use, $policy, $request, $at);
+    }
+
+    public function historical(Order $order, $attempt, Quote $quote, QuotePricing $pricing,
+        InventoryReservation $reservation, ?PromotionUse $use, array $policy,
+        #[SensitiveParameter] array $request): array
+    {
+        $finalization = OrderFinalization::where('order_id', $order->id)->first();
+        if ($finalization) {
+            app(FinalizationEvidence::class)->resourceDisposition($finalization, $order, $attempt, $reservation, $use);
+        } elseif ($reservation->consumed_at !== null || $use?->consumed_at !== null) {
+            throw new QuoteException('ORDER_CHANGED', 409);
+        }
+        // Only this historical path can reconstruct a proved consumed resource as its original pending state.
+        $originalReservation = clone $reservation;
+        $originalUse = $use === null ? null : clone $use;
+        if ($finalization?->outcome === 'paid') {
+            $originalReservation->state = 'pending';
+            if ($originalUse) { $originalUse->state = 'pending'; }
+        }
+
+        return $this->reconstruct($order->public_id, $attempt->public_id, $quote, $pricing,
+            $originalReservation, $originalUse, $policy, $request, $order->created_at);
+    }
+
+    private function reconstruct(string $orderId, string $attemptId, Quote $quote, QuotePricing $pricing,
         InventoryReservation $reservation, ?PromotionUse $use, array $policy,
         #[SensitiveParameter] array $request, CarbonImmutable $at): array
     {

@@ -95,3 +95,10 @@ Envelope: event_id, schema_version, occurred_at UTC, aggregate_type/id/version, 
 | migration.batch.committed | Import transaction | Import manifest hash + batch ID; deterministic mapping and reconciliation. |
 
 Workers have explicit queue, timeout, maximum attempts, exponential backoff with jitter, terminal failure reason, correlation and authorized replay action. Outbox dispatch is at least once; consumers enforce idempotency. Every new job includes poison-payload and retry-after-partial-failure evidence. Operational values are configured from measured file sizes and provider limits; unbounded retries or silent job discard are prohibited.
+
+
+## Current test-finalization interfaces — 2026-09-26
+
+The earlier tables are target contracts. The [D-16 candidate](D-16-test-payment-finalization.md) adds trusted console `vasey:finalize-test-payments {order?} --limit=25 --after=` and an ID-only `FinalizeTestPaymentJob`. The command accepts an opaque order UUID or a scoped keyset page, emits the last attempted UUID as `NEXT_AFTER`, advances past failed attempts and performs no provider I/O. The asynchronous job is scheduled only after the payment evidence transaction commits; missed dispatch is recoverable by the scanner. There is no public finalization POST or arbitrary mark-paid operation.
+
+Existing owned order/checkout GETs gain explicit payment/finalization/fulfillment projections, described in [customer status](../test-payment-finalization.md#customer-status). They validate retained evidence and remain read-only. Pending outbox entries are durable future-work records; no PDF renderer, notification consumer, active entitlement or download exchange is implemented in this candidate. Its own runtime evidence and reviews remain required.

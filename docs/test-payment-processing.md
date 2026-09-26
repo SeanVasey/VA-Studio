@@ -1,6 +1,6 @@
 # Durable test-payment processing
 
-Status: WP-07 implementation candidate, 2026-09-26, following merged [PR #62](https://github.com/VASEYDEV/VASEYAUDIO/pull/62). Final source, executed CI and independent reviews belong in the integrating PR. This document describes the candidate contract; it is not evidence of an actual Stripe transaction, production deployment or completed work package.
+Status: merged WP-07 increment, 2026-09-26. Merged [PR #63](https://github.com/VASEYDEV/VASEYAUDIO/pull/63) accepted candidate `4107d449`, tree `f2960409947b53bfedf07f0336210ca9b8a48bf0`, on main `89d7ea1`. [CI 36220050595](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36220050595) passed 145 focused payment tests / 1,092 assertions, the full 1,033 MySQL tests / 8,651 assertions, 971 SQLite tests / 7,392 assertions with 62 intentional MySQL-only skips, 150 frontend tests, 12 browser cases, build and dependency audits. Two independent Codex reviews accepted the final source. These are synthetic provider-fixture results, not an actual Stripe transaction. Production deployment and the broader work package remain incomplete.
 
 The increment consumes the [immutable test webhook inbox](stripe-webhook-inbox.md) and reconciles known [hosted test sessions](hosted-test-checkout.md). It records authoritative test-payment evidence and stops at `awaiting_finalization`. It does not mark an order paid, consume or release inventory/promotion capacity, grant rights, render contracts, create entitlements, deliver files, issue refunds or enable live payments.
 
@@ -51,7 +51,7 @@ Payment observations are append-only and identify receipt processing or explicit
 | `retry_exhausted` | Quarantine; further replay requires an explicit audited operator action. |
 | `stale` | The claim no longer owns the work; commit no evidence or failure update. |
 
-The existing owner checkout/order GET projections remain unchanged and may still report `paymentStatus: not_verified` after an internal confirmation exists. This is a deliberately retained historical API contract, not a read model for new payment confirmations. The future customer-status increment must expose confirmation, finalization, exception and fulfillment separately. No new public processing endpoint or browser write is introduced here.
+In merged PR #63, owner checkout/order GET projections remain unchanged and may still report `paymentStatus: not_verified` after internal confirmation. That historical API contract is not a read model for new confirmations. The subsequent [finalization candidate](test-payment-finalization.md#customer-status) adds read-only confirmation, finalization, exception and fulfillment status. It introduces no public processing/finalization command and does not establish payment from browser input.
 
 ## Console recovery and missing webhooks
 
@@ -76,11 +76,11 @@ Commands emit bounded identifiers and outcome/error codes. Preserve their actual
 
 ## Verification and recovery boundaries
 
-The integrating PR must record the actual final source and MySQL/SQLite outcomes, including independent-process lease takeover and competing confirmation tests; SDK fixtures for correct and wrong account/mode/metadata/amount/currency/payment states; missed dispatch/work creation and missing-webhook recovery; poison messages and retry exhaustion; read-only provider behavior; and rollback safety. SQLite cannot prove MySQL concurrency. New test definitions or a reviewer reading source do not establish executed acceptance. PHP/Composer runtime limits must be reported instead of represented as local passes.
+PR #63 records accepted final source and MySQL/SQLite outcomes, including independent-process lease takeover and competing confirmation tests; SDK fixtures for correct and wrong account/mode/metadata/amount/currency/payment states; missed dispatch/work creation and missing-webhook recovery; poison messages and retry exhaustion; read-only provider behavior; and rollback safety. SQLite cannot prove MySQL concurrency. New test definitions or a reviewer reading source do not establish executed acceptance. PHP/Composer runtime limits must be reported instead of represented as local passes.
 
 Stop fresh checkout if necessary while retaining receipt, evidence and recovery data. Disabling processing pauses new verification; it does not undo a confirmation. Do not delete receipts, work history, observations, confirmations or encryption keys during operational rollback, and do not reclassify paid evidence as unpaid. Schema `down` operations are for disposable development databases.
 
-Next extend/version the historical order verifier, which currently requires pending inventory/promotion bindings, so original order evidence remains readable after valid terminal transitions. Agree the WP-04/WP-08 grant/render contract before implementing atomic terminal inventory/promotion/order effects, idempotent grants/pending entitlements/outbox or `paid_exception`. Then complete WP-08 deterministic buyer contracts and secure delivery. All 14 work packages, 103 parity requirements and source/migration/cutover obligations remain in the [ordered development record](development-order.md).
+The dependent [finalization candidate](test-payment-finalization.md) extends historical verification without rewriting original order hashes, freezes the grant/render contract and adds atomic resource effects, unique grants, pending entitlements/outbox or `paid_exception`. A separate after-commit dispatch may schedule its ID-only finalization job only when that independent policy is enabled; a bounded scanner recovers missed dispatch. Full candidate CI/review precedes acceptance, then WP-08 deterministic buyer contracts and secure delivery. All 14 work packages, 103 parity requirements and source/migration/cutover obligations remain in the [ordered development record](development-order.md).
 
 ## Official references
 

@@ -19,14 +19,14 @@ function fixture(quoteId = 'quote-1') {
       name: 'Synthetic license', version: 1, type: 'exclusive', features: ['Synthetic feature'], deliverableRoles: ['master_wav'], termsText: 'Full frozen terms <script>alert("never execute")</script>',
     } }], testOnly: true, payable: false, reviewHash: digest,
   };
-  const order = { orderSchema: 1, id: 'order-1', quoteId, pricingId: 'pricing-1', reviewHash: digest, createdAt: new Date().toISOString(), status: 'prepared', paymentStatus: 'not_started', testOnly: true, payable: false, currency: 'USD', totalMinor: 4280 };
+  const order = { orderSchema: 1, id: 'order-1', quoteId, pricingId: 'pricing-1', reviewHash: digest, createdAt: new Date().toISOString(), status: 'prepared', paymentStatus: 'not_started', finalizationStatus: 'not_started', fulfillmentStatus: 'not_started', testOnly: true, payable: false, currency: 'USD', totalMinor: 4280 };
   return { pricing, review, order, expiresAt };
 }
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
 function mockFlow(data = fixture()) {
   return vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
     const url = String(input);
-    if (url.endsWith('/checkout')) return json({ checkout: { checkoutSchema: 1, orderId: data.order.id, id: null, currency: 'USD', totalMinor: data.order.totalMinor, status: 'not_started', testOnly: true, paymentStatus: 'not_verified', fulfillmentStatus: 'not_started', url: null, expiresAt: null, observedAt: null } });
+    if (url.endsWith('/checkout')) return json({ checkout: { checkoutSchema: 1, orderId: data.order.id, id: null, currency: 'USD', totalMinor: data.order.totalMinor, status: 'not_started', testOnly: true, paymentStatus: 'not_verified', finalizationStatus: 'not_started', fulfillmentStatus: 'not_started', url: null, expiresAt: null, observedAt: null } });
     if (url.endsWith('/order')) return json({}, 404);
     if (url.endsWith('/pricing')) return json({ pricing: data.pricing });
     if (url.endsWith('/order-review')) return json({ review: data.review });
@@ -72,7 +72,7 @@ describe('test order preparation', () => {
     await identify(user);
     await user.click(submit);
     expect(await screen.findByText('TEST ORDER PREPARED')).toBeInTheDocument();
-    expect(screen.getByText(/This prepared record does not confirm payment/)).toBeInTheDocument();
+    expect(screen.getByText(/This prepared record alone does not confirm payment/)).toBeInTheDocument();
     const [url, request] = fetcher.mock.calls.find(([url]) => url === '/orders')!;
     expect(url).toBe('/orders');
     expect(request?.credentials).toBe('same-origin');

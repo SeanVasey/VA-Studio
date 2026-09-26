@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { fileRoleLabels, formatMoney, type LicenseDisclosure } from '../lib/catalog';
-import { TestCheckout } from './TestCheckout';
+import { TestCheckout, validPaymentProgress, type PaymentProgress } from './TestCheckout';
 
 interface PricedLine {
   offerRevisionId: string; quantity: number; baseMinor: number; discountMinor: number;
@@ -18,9 +18,9 @@ interface OrderReview {
   items: Array<{ offerRevisionId: string; title: string; licenseName: string; disclosure: LicenseDisclosure }>;
   testOnly: true; payable: false; reviewHash: string;
 }
-interface PreparedOrder {
+interface PreparedOrder extends PaymentProgress {
   orderSchema: 1; id: string; quoteId: string; pricingId: string; reviewHash: string; createdAt: string;
-  status: 'prepared'; paymentStatus: 'not_started' | 'not_verified'; testOnly: true; payable: false; currency: 'USD'; totalMinor: number;
+  status: 'prepared' | 'paid' | 'paid_exception'; testOnly: true; payable: false; currency: 'USD'; totalMinor: number;
 }
 interface Props { quoteId: string; expiresAt: string; offerRevisionIds: string[]; testCheckoutEnabled?: boolean }
 const recoveryStorageKey = 'vaseyaudio-order-recovery-v1';
@@ -84,7 +84,8 @@ function validOrder(value: unknown, quoteId: string, review?: OrderReview): valu
   if (!value || typeof value !== 'object') return false;
   const o = value as PreparedOrder;
   return o.orderSchema === 1 && text(o.id) && o.quoteId === quoteId && text(o.pricingId) && hash(o.reviewHash) && timestamp(o.createdAt)
-    && o.status === 'prepared' && ['not_started', 'not_verified'].includes(o.paymentStatus) && o.testOnly === true && o.payable === false && o.currency === 'USD' && money(o.totalMinor)
+    && validPaymentProgress(o)
+    && o.status === (o.finalizationStatus === 'paid' || o.finalizationStatus === 'paid_exception' ? o.finalizationStatus : 'prepared') && o.testOnly === true && o.payable === false && o.currency === 'USD' && money(o.totalMinor)
     && (!review || (o.reviewHash === review.reviewHash && o.pricingId === review.pricing.id && o.totalMinor === review.pricing.totalMinor));
 }
 
@@ -103,7 +104,7 @@ async function readPreparedOrder(quoteId: string): Promise<PreparedOrder | null>
 }
 
 function OrderStatus({ order, testCheckoutEnabled = false }: { order: PreparedOrder; testCheckoutEnabled?: boolean }) {
-  return <div className="quote-review-result" role="status"><h3>TEST ORDER PREPARED</h3><p>Order {order.id}</p><p>Prepared total: {formatMoney(order.totalMinor, order.currency)} {order.currency}</p><p>This prepared record does not confirm payment or grant download access or usage rights.</p><TestCheckout orderId={order.id} expectedTotalMinor={order.totalMinor} enabled={testCheckoutEnabled} /></div>;
+  return <div className="quote-review-result" role="status"><h3>{order.paymentStatus === 'verified' ? 'TEST ORDER STATUS' : 'TEST ORDER PREPARED'}</h3><p>Order {order.id}</p><p>Prepared total: {formatMoney(order.totalMinor, order.currency)} {order.currency}</p><p>This prepared record alone does not confirm payment or grant download access or usage rights.</p><TestCheckout orderId={order.id} expectedTotalMinor={order.totalMinor} enabled={testCheckoutEnabled} retainedProgress={order} /></div>;
 }
 
 // Mount outside catalog and policy gates: an immutable order outlives its quote and the creation policy.

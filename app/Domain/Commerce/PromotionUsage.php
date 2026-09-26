@@ -34,7 +34,8 @@ final class PromotionUsage
         // A locking read sees the latest committed uses under MySQL REPEATABLE READ,
         // even when quote validation previously established a consistent-read snapshot.
         $used = PromotionUse::query()->where('promotion_campaign_id', $campaign->id)
-            ->where(fn ($query) => $query->where('state', '<>', 'held')->orWhere('expires_at', '>', $at))
+            ->where(fn ($query) => $query->whereIn('state', ['pending', 'consumed'])
+                ->orWhere(fn ($held) => $held->where('state', 'held')->where('expires_at', '>', $at)))
             ->limit($policy['max_uses'])->lockForUpdate()->pluck('id')->count();
         if ($used >= $policy['max_uses']) {
             throw new QuoteException('PROMOTION_LIMIT_REACHED', 409);
@@ -95,10 +96,11 @@ final class PromotionUsage
             }
             // Another worker may already have reused this hold's expired capacity.
             // Recheck under the retained campaign lock so clock skew/rollback cannot
-            // revive an old hold into an extra pending attempt. Pending uses always count.
+            // revive an old hold into an extra pending attempt. Pending and consumed uses always count.
             $otherUses = PromotionUse::query()->where('promotion_campaign_id', $use->promotion_campaign_id)
                 ->where('id', '<>', $use->id)
-                ->where(fn ($query) => $query->where('state', '<>', 'held')->orWhere('expires_at', '>', $at))
+                ->where(fn ($query) => $query->whereIn('state', ['pending', 'consumed'])
+                    ->orWhere(fn ($held) => $held->where('state', 'held')->where('expires_at', '>', $at)))
                 ->limit($pricing->snapshot['promotion']['max_uses'])->lockForUpdate()->pluck('id')->count();
             if ($otherUses >= $pricing->snapshot['promotion']['max_uses']) {
                 throw new QuoteException('PROMOTION_LIMIT_REACHED', 409);

@@ -11,7 +11,7 @@ function fixture(status = 'not_started', id = orderId) {
   return {
     checkoutSchema: 1, orderId: id, id: status === 'not_started' ? null : checkoutId,
     currency: 'USD', totalMinor: 4280, status, testOnly: true,
-    paymentStatus: 'not_verified', fulfillmentStatus: 'not_started',
+    paymentStatus: 'not_verified', finalizationStatus: 'not_started', fulfillmentStatus: 'not_started',
     url: status === 'open' ? checkoutUrl : null,
     expiresAt: status === 'not_started' || status === 'pending' ? null : new Date(Date.now() + 60_000).toISOString(),
     observedAt: status === 'not_started' || status === 'pending' ? null : new Date().toISOString(),
@@ -26,6 +26,84 @@ afterEach(() => {
 });
 
 describe('hosted Stripe test checkout', () => {
+
+  it.each([
+    ['awaiting_finalization', 'not_started', 'Order finalization is pending.'],
+    ['paid', 'pending_contracts', 'Contracts are pending;'],
+    ['paid_exception', 'blocked', 'This order needs review'],
+  ])('shows verified %s without payment actions, fulfillment claims or private evidence', async (finalizationStatus, fulfillmentStatus, copy) => {
+    const user = userEvent.setup();
+    const body = { ...fixture('complete'), paymentStatus: 'verified', finalizationStatus, fulfillmentStatus,
+      providerPaymentIntentId: 'pi_PRIVATE_SHOULD_NOT_RENDER', reason: 'PRIVATE_FAILURE_REASON', buyer: { email: 'private@example.invalid' } };
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => json(body));
+    const store = vi.spyOn(Storage.prototype, 'setItem');
+    render(<TestCheckout orderId={orderId} enabled />);
+    expect(await screen.findByRole('status')).toHaveTextContent(copy);
+    expect(screen.getByRole('status')).toHaveTextContent('Test payment verified');
+    expect(screen.queryByRole('link', { name: 'Continue to Stripe test checkout' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Open Stripe|Retry Stripe|Check Stripe/ })).not.toBeInTheDocument();
+    expect(screen.queryByText(/license granted|download ready|pi_PRIVATE|PRIVATE_FAILURE_REASON|private@example/i)).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Refresh test order status' }));
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    expect(fetcher.mock.calls.every(([url, init]) => url === checkoutPath() && init?.method === 'GET')).toBe(true);
+    expect(postCalls(fetcher)).toHaveLength(0);
+    expect(store).not.toHaveBeenCalled();
+  });
+
+  it('advances a verified payment to a finalized order using only a read-only refresh', async () => {
+    const user = userEvent.setup();
+    const fetcher = vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(json({ ...fixture('complete'), paymentStatus: 'verified', finalizationStatus: 'awaiting_finalization' }))
+      .mockResolvedValueOnce(json({ ...fixture('complete'), paymentStatus: 'verified', finalizationStatus: 'paid', fulfillmentStatus: 'pending_contracts' }));
+    render(<TestCheckout orderId={orderId} enabled />);
+    await user.click(await screen.findByRole('button', { name: 'Refresh test order status' }));
+    expect(screen.getByRole('status')).toHaveTextContent('order finalized');
+    expect(postCalls(fetcher)).toHaveLength(0);
+  });
+
+  it('allows a historical open observation only without a payment URL after verification', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(json({ ...fixture('open'), url: null, paymentStatus: 'verified', finalizationStatus: 'awaiting_finalization' }));
+    render(<TestCheckout orderId={orderId} enabled />);
+    expect(await screen.findByRole('status')).toHaveTextContent('Order finalization is pending');
+    expect(screen.queryByRole('link', { name: 'Continue to Stripe test checkout' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Open Stripe|Retry Stripe|Check Stripe/ })).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ['missing finalization', { finalizationStatus: undefined }],
+    ['unverified paid', { finalizationStatus: 'paid', fulfillmentStatus: 'pending_contracts' }],
+    ['verified without finalization', { paymentStatus: 'verified' }],
+    ['verified awaiting with contracts', { paymentStatus: 'verified', finalizationStatus: 'awaiting_finalization', fulfillmentStatus: 'pending_contracts' }],
+    ['paid without pending contracts', { paymentStatus: 'verified', finalizationStatus: 'paid' }],
+    ['exception without blocked fulfillment', { paymentStatus: 'verified', finalizationStatus: 'paid_exception' }],
+    ['verified without intent', { paymentStatus: 'verified', finalizationStatus: 'awaiting_finalization', id: null }],
+    ['verified without started checkout', { paymentStatus: 'verified', finalizationStatus: 'awaiting_finalization', id: null, status: 'not_started' }],
+    ['verified with payment URL', { paymentStatus: 'verified', finalizationStatus: 'awaiting_finalization', status: 'open', url: checkoutUrl }],
+  ])('rejects incoherent payment progress: %s', async (_name, change) => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(json({ ...fixture('complete'), ...change }));
+    render(<TestCheckout orderId={orderId} enabled />);
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Continue to Stripe test checkout' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Open Stripe|Retry Stripe|Check Stripe/ })).not.toBeInTheDocument();
+  });
+
+  it.each(['unverified', 'awaiting_finalization', 'paid_exception', 'unavailable', 'expired'])('retains finalized verification after a %s refresh result without restarting payment', async outcome => {
+    const user = userEvent.setup();
+    const paid = { ...fixture('complete'), paymentStatus: 'verified', finalizationStatus: 'paid', fulfillmentStatus: 'pending_contracts' };
+    const changed = outcome === 'unverified' ? fixture('open') : { ...paid, finalizationStatus: outcome, fulfillmentStatus: outcome === 'paid_exception' ? 'blocked' : 'not_started' };
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(json(paid))
+      .mockResolvedValueOnce(outcome === 'unavailable' ? new Response('{}', { status: 500 })
+        : outcome === 'expired' ? new Response(JSON.stringify({ code: 'CHECKOUT_EXPIRED' }), { status: 410 }) : json(changed));
+    render(<TestCheckout orderId={orderId} enabled />);
+    await user.click(await screen.findByRole('button', { name: 'Refresh test order status' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('previously verified test payment remains recorded');
+    expect(screen.getByRole('status')).toHaveTextContent('order finalized');
+    expect(screen.queryByRole('link', { name: 'Continue to Stripe test checkout' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Open Stripe|Retry Stripe|Check Stripe/ })).not.toBeInTheDocument();
+    expect(postCalls(fetcher)).toHaveLength(0);
+  });
+
   it('recovers an existing checkout when creation is disabled without writes or browser persistence', async () => {
     const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValue(json(fixture('open')));
     const store = vi.spyOn(Storage.prototype, 'setItem');

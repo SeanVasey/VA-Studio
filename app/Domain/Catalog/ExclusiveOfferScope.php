@@ -4,6 +4,7 @@ namespace App\Domain\Catalog;
 
 use App\Domain\Catalog\Models\OfferRevision;
 use App\Domain\Commerce\Inventory\InventoryPolicy;
+use App\Domain\Commerce\Models\ExclusiveSale;
 use App\Domain\Commerce\Models\RightsScope;
 use App\Domain\Commerce\Models\RightsScopeOffer;
 use App\Support\CanonicalJson;
@@ -36,7 +37,9 @@ final class ExclusiveOfferScope
                 return ['The prepared exclusive revision has no matching immutable scope evidence.'];
             }
 
-            return $scope->blocked ? ['The underlying rights scope is administratively blocked.'] : [];
+            if ($scope->blocked) { return ['The underlying rights scope is administratively blocked.']; }
+            return ExclusiveSale::where('rights_scope_id', $scope->id)->exists()
+                ? ['The underlying rights scope has already been sold exclusively.'] : [];
         } catch (QueryException $exception) {
             throw $exception;
         } catch (Throwable) {

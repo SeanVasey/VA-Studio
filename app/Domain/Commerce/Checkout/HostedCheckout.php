@@ -148,6 +148,10 @@ final class HostedCheckout
             'currency' => 'USD', 'totalMinor' => $payload['pricing']['snapshot']['total_minor'], 'status' => 'not_started',
             'testOnly' => true, 'paymentStatus' => 'not_verified', 'fulfillmentStatus' => 'not_started',
             'url' => null, 'expiresAt' => null, 'observedAt' => null];
+        $paymentState = app(\App\Domain\Commerce\Finalization\ReadPaymentState::class)->projection($order, $payload);
+        $data['paymentStatus'] = $paymentState['paymentStatus'] === 'verified' ? 'verified' : 'not_verified';
+        $data['finalizationStatus'] = $paymentState['finalizationStatus'];
+        $data['fulfillmentStatus'] = $paymentState['fulfillmentStatus'];
         if (! $intent) { return $data; }
         $request = $this->evidence->verifyIntent($intent, $order);
         $data['expiresAt'] = $intent->provider_expires_at->utc()->toISOString();
@@ -160,7 +164,7 @@ final class HostedCheckout
         $latest = $this->latest($session, $request);
         $data['status'] = $latest['status'];
         $data['observedAt'] = $latest['observed_at'];
-        if ($latest['status'] === 'open') {
+        if ($latest['status'] === 'open' && $data['paymentStatus'] !== 'verified') {
             if ($intent->provider_expires_at->greaterThan(now())) { $data['url'] = $latest['url']; }
             else { $data['status'] = 'reconciliation_required'; }
         }

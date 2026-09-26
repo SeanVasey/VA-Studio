@@ -83,7 +83,7 @@ final class VerifyTestPayment
     public function commit(array $inspection, ?StripeReceiptWork $claim): string
     {
         app(PaymentProcessingPolicy::class)->outsideTransactions();
-        return DB::transaction(function () use ($inspection, $claim): string {
+        $outcome = DB::transaction(function () use ($inspection, $claim): string {
             $order = Order::whereKey($inspection['order_id'])->lockForUpdate()->firstOrFail();
             $intent = CheckoutIntent::whereKey($inspection['intent_id'])->lockForUpdate()->firstOrFail();
             $work = $claim ? app(PaymentWork::class)->owns($claim) : null;
@@ -131,5 +131,13 @@ final class VerifyTestPayment
 
             return $outcome;
         }, 5);
+        if ($outcome === 'awaiting_finalization') {
+            $paymentId = VerifiedPayment::where('order_id', $inspection['order_id'])->value('id');
+            if ($paymentId !== null) {
+                app(\App\Domain\Commerce\Finalization\DispatchTestFinalization::class)->handle((int) $paymentId);
+            }
+        }
+
+        return $outcome;
     }
 }

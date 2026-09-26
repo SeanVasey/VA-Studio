@@ -7,6 +7,9 @@ use App\Domain\Commerce\Models\Order;
 use App\Domain\Commerce\Models\PromotionUse;
 use App\Domain\Commerce\Models\Quote;
 use App\Domain\Commerce\Models\QuotePricing;
+use App\Domain\Commerce\Models\OrderFinalization;
+use App\Domain\Commerce\Finalization\ReadFinalization;
+use App\Domain\Commerce\Finalization\ReadPaymentState;
 use App\Domain\Commerce\QuoteException;
 use App\Domain\Commerce\QuoteRequest;
 use App\Support\CanonicalJson;
@@ -64,8 +67,8 @@ final class ReadOrder
                 $attempt->public_id !== $payload['attempt_id'] || ! $attempt->created_at->equalTo($order->created_at)) {
                 throw new \UnexpectedValueException;
             }
-            $expected = app(OrderEvidence::class)->capture($order->public_id, $attempt->public_id, $quote, $pricing,
-                $reservation, $use, $payload['policy'], $payload['request'], $order->created_at);
+            $expected = app(OrderEvidence::class)->historical($order, $attempt, $quote, $pricing,
+                $reservation, $use, $payload['policy'], $payload['request']);
             if (! hash_equals($canonical, CanonicalJson::encode($expected)) ||
                 CanonicalJson::hash($expected['attempt']) !== $attempt->binding_hash ||
                 CanonicalJson::hash($attempt->binding) !== $attempt->binding_hash ||
@@ -81,6 +84,9 @@ final class ReadOrder
                     throw new \UnexpectedValueException;
                 }
             }
+
+            $finalization = OrderFinalization::where('order_id', $order->id)->first();
+            if ($finalization) { app(ReadFinalization::class)->verify($finalization, $payload); }
 
             return $payload;
         } catch (QueryException $error) {
@@ -98,9 +104,8 @@ final class ReadOrder
 
         return ['orderSchema' => 1, 'id' => $order->public_id, 'quoteId' => $payload['quote']['public_id'],
             'pricingId' => $payload['pricing']['public_id'], 'reviewHash' => $payload['review']['reviewHash'],
-            'createdAt' => $order->created_at->utc()->toISOString(), 'status' => 'prepared',
-            'paymentStatus' => \App\Domain\Commerce\Models\CheckoutIntent::where('order_id', $order->id)->exists() ? 'not_verified' : 'not_started',
+            'createdAt' => $order->created_at->utc()->toISOString(),
             'testOnly' => true, 'payable' => false, 'currency' => $payload['pricing']['snapshot']['currency'],
-            'totalMinor' => $payload['pricing']['snapshot']['total_minor']];
+            'totalMinor' => $payload['pricing']['snapshot']['total_minor']] + app(ReadPaymentState::class)->projection($order, $payload);
     }
 }
