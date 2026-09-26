@@ -42,4 +42,6 @@ Follow the current [ordered development record](../development-order.md) for acc
 
 [D-13](D-13-order-preparation.md) records merged PR #52: explicit test order review/assent, encrypted immutable order evidence and atomic pending attempt binding.
 
-[D-14](D-14-hosted-test-checkout.md) defines the current hosted test-session/reconciliation candidate, with durable encrypted requests and retained pending resources. Final CI/review remains in its PR. Authoritative payment validation, inbox processing, terminal verifier extension/finalization/grants and WP-08 delivery remain dependent work.
+[D-14](D-14-hosted-test-checkout.md) records merged PR #62: hosted test-session/reconciliation with durable encrypted requests and retained pending resources, accepted after final CI and two independent Codex reviews.
+
+[D-15](D-15-test-payment-processing.md) defines the current durable receipt-processing and authoritative test-payment verification candidate. Its immutable confirmation stops at awaiting finalization; final CI/review remains in its integrating PR. Terminal verifier extension, finalization/grants and WP-08 delivery remain dependent work.

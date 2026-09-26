@@ -12,7 +12,8 @@ final class StripeWebhookController
     public function __invoke(Request $request, ReceiveStripeWebhook $receiver): JsonResponse
     {
         try {
-            $receiver->handle($request->attributes->get('_stripe_raw_body', ''), $request->header('Stripe-Signature', ''));
+            $receipt = $receiver->handle($request->attributes->get('_stripe_raw_body', ''), $request->header('Stripe-Signature', ''));
+            app(\App\Domain\Commerce\Payments\DispatchStripeReceipt::class)->handle($receipt->id);
         } catch (StripeWebhookException $exception) {
             return response()->json(['code' => $exception->errorCode], $exception->status, $this->headers());
         }

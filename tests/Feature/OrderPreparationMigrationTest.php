@@ -28,13 +28,15 @@ class OrderPreparationMigrationTest extends TestCase
         $audits = DB::table('audit_events')->count();
         $migration = require database_path('migrations/2026_09_24_000017_order_preparation.php');
         $checkout = require database_path('migrations/2026_09_26_000018_hosted_test_checkout.php');
+        $payments = require database_path('migrations/2026_09_26_000019_test_payment_evidence.php');
+        foreach (['stripe_receipt_work', 'payment_observations', 'verified_payments'] as $table) { $this->assertDatabaseCount($table, 0); }
         foreach (['checkout_intents', 'checkout_sessions', 'checkout_observations'] as $table) { $this->assertDatabaseCount($table, 0); }
-        $checkout->down();
+        $payments->down(); $checkout->down();
         foreach (['orders', 'order_lines', 'order_attempts'] as $table) { $this->assertDatabaseCount($table, 0); }
         $migration->down();
         foreach (['orders', 'order_lines', 'order_attempts'] as $table) { $this->assertFalse(Schema::hasTable($table)); }
         $migration->up();
-        $checkout->up();
+        $checkout->up(); $payments->up();
         $this->assertSame($quote, $f['quote']->refresh()->getAttributes());
         $this->assertSame($price, $f['pricing']->refresh()->getAttributes());
         $this->assertSame($reservation, $held['reservation']->refresh()->getAttributes());

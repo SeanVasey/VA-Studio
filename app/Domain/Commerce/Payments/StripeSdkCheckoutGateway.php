@@ -14,7 +14,7 @@ use Stripe\Stripe;
 use Stripe\StripeClient;
 use Throwable;
 
-final class StripeSdkCheckoutGateway implements StripeCheckoutGateway
+final class StripeSdkCheckoutGateway implements StripeCheckoutGateway, StripePaymentGateway
 {
     // Pin the retained request contract independently of mutable global SDK settings.
     public const API_VERSION = '2026-08-26.dahlia';
@@ -63,6 +63,33 @@ final class StripeSdkCheckoutGateway implements StripeCheckoutGateway
             }
 
             return $this->session($client, $session);
+        });
+    }
+
+    public function paymentIntent(string $paymentIntentId): array
+    {
+        if (preg_match('/\Api_[A-Za-z0-9]{1,240}\z/', $paymentIntentId) !== 1) {
+            throw new RuntimeException('STRIPE_CHECKOUT_UNAVAILABLE');
+        }
+
+        return $this->withClient(function (StripeClient $client, string $account) use ($paymentIntentId): array {
+            $this->verifyAccount($client, $account);
+            $payment = $client->paymentIntents->retrieve($paymentIntentId, [])->toArray();
+            if (($payment['object'] ?? null) !== 'payment_intent'
+                || ($payment['id'] ?? null) !== $paymentIntentId
+                || ($payment['livemode'] ?? null) !== false) {
+                throw new RuntimeException('STRIPE_CHECKOUT_UNAVAILABLE');
+            }
+            foreach (['account', 'context', 'application', 'application_fee_amount', 'on_behalf_of', 'transfer_data', 'transfer_group'] as $field) {
+                if (($payment[$field] ?? null) !== null) {
+                    throw new RuntimeException('STRIPE_CHECKOUT_UNAVAILABLE');
+                }
+            }
+            // The server reconciles provider state; it never needs a client-side secret.
+            // Domain validation separately binds amount, currency, status and metadata.
+            unset($payment['client_secret']);
+
+            return $payment;
         });
     }
 
