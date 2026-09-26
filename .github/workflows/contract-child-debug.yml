@@ -1,0 +1,38 @@
+name: Diagnose synthetic isolated contract child
+
+on:
+  push:
+    branches: [work/wp08-contract-child-debug]
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-child:
+    if: github.repository == 'VASEYDEV/VASEYAUDIO' && github.ref == 'refs/heads/work/wp08-contract-child-debug'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ':memory:'
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, xml, zlib
+          coverage: none
+          tools: composer:v2
+      - run: composer install --no-interaction --prefer-dist
+      - run: cp .env.example .env
+      - run: php artisan key:generate
+      - name: Diagnose the unchanged bounded child using only synthetic fixture data
+        run: php scripts/diagnose-test-contract-child.php
