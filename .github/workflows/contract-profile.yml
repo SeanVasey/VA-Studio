@@ -1,0 +1,136 @@
+name: Resolve test contract profile
+
+on:
+  push:
+    branches: [work/wp08-contract-profile]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: test-contract-profile
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    if: github.repository == 'VASEYDEV/VASEYAUDIO' && github.ref == 'refs/heads/work/wp08-contract-profile'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, xml, zlib
+          coverage: none
+          tools: composer:v2
+      - name: Install independent PDF validators for synthetic build evidence
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends poppler-utils qpdf
+      - name: Resolve the exact renderer with the existing locked graph
+        run: |
+          composer require tecnickcom/tc-lib-pdf:8.76.2 tecnickcom/tc-lib-pdf-font:4.4.0 --no-update --no-interaction --no-scripts --no-plugins
+          composer update tecnickcom/tc-lib-pdf tecnickcom/tc-lib-pdf-font --with-dependencies --minimal-changes --no-interaction --prefer-dist --no-scripts --no-plugins
+          composer validate --strict --no-plugins
+          composer audit --no-plugins
+      - name: Build the offline font profile from pinned source bytes
+        run: php scripts/build-contract-profile.php
+      - name: Exercise the released PDF API
+        run: php scripts/contract-profile-smoke.php
+      - name: Package only inert allowlisted outputs
+        env:
+          EXPECTED_SOURCE: ${{ github.sha }}
+        run: |
+          python3 - <<'PY'
+          import base64, json, os, pathlib
+          root = pathlib.Path.cwd()
+          files = ['composer.json', 'composer.lock', 'resources/contracts/test-v1/profile-assets.json']
+          files += ['resources/contracts/test-v1/fonts/generated/' + name + suffix for name in ['dejavusans', 'dejavusansb'] for suffix in ['.json', '.z', '.ctg.z']]
+          payload = {}
+          for name in files:
+              path = root / name
+              assert not path.is_symlink() and path.is_file()
+              data = path.read_bytes()
+              assert 0 < len(data) <= 16777216
+              payload[name] = base64.b64encode(data).decode('ascii')
+          target = pathlib.Path(os.environ['RUNNER_TEMP']) / 'contract-profile-output'
+          target.mkdir()
+          (target / 'bundle.json').write_text(json.dumps({'source': os.environ['EXPECTED_SOURCE'], 'files': payload}), encoding='utf-8')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: test-contract-profile-output-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/contract-profile-output/bundle.json
+          retention-days: 7
+          if-no-files-found: error
+      - name: Retain synthetic PDF evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: test-contract-profile-smoke-${{ github.run_id }}-${{ github.run_attempt }}
+          path: storage/app/contract-profile-smoke/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  retain:
+    needs: resolve
+    if: github.repository == 'VASEYDEV/VASEYAUDIO' && github.ref == 'refs/heads/work/wp08-contract-profile'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: test-contract-profile-output-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/contract-profile-inert-output
+      - name: Validate and retain inert data without executing resolved dependencies
+        env:
+          EXPECTED_SOURCE: ${{ github.sha }}
+        run: |
+          test "$GITHUB_REF" = refs/heads/work/wp08-contract-profile
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SOURCE"
+          test "$(git ls-remote origin refs/heads/work/wp08-contract-profile | cut -f1)" = "$EXPECTED_SOURCE"
+          python3 - <<'PY'
+          import base64, json, os, pathlib
+          root = pathlib.Path.cwd()
+          source = pathlib.Path(os.environ['RUNNER_TEMP']) / 'contract-profile-inert-output'
+          assert sorted(p.name for p in source.iterdir()) == ['bundle.json']
+          bundle = source / 'bundle.json'
+          assert not bundle.is_symlink() and bundle.is_file() and bundle.stat().st_size < 67108864
+          content = json.loads(bundle.read_text(encoding='utf-8'))
+          assert set(content) == {'source', 'files'} and content['source'] == os.environ['EXPECTED_SOURCE']
+          allowed = {'composer.json', 'composer.lock', 'resources/contracts/test-v1/profile-assets.json'}
+          allowed |= {'resources/contracts/test-v1/fonts/generated/' + name + suffix for name in ['dejavusans', 'dejavusansb'] for suffix in ['.json', '.z', '.ctg.z']}
+          assert isinstance(content['files'], dict) and set(content['files']) == allowed
+          decoded = {name: base64.b64decode(data, validate=True) for name, data in content['files'].items()}
+          assert all(0 < len(data) <= 16777216 for data in decoded.values())
+          expected_composer = json.loads((root / 'composer.json').read_text())
+          expected_composer['require']['tecnickcom/tc-lib-pdf'] = '8.76.2'
+          expected_composer['require']['tecnickcom/tc-lib-pdf-font'] = '4.4.0'
+          assert json.loads(decoded['composer.json']) == expected_composer
+          assert isinstance(json.loads(decoded['composer.lock']), dict)
+          assert isinstance(json.loads(decoded['resources/contracts/test-v1/profile-assets.json']), dict)
+          for name, data in decoded.items():
+              path = root / name
+              assert not path.is_symlink()
+              parent = path.parent
+              while parent != root:
+                  assert not parent.is_symlink()
+                  parent = parent.parent
+              path.parent.mkdir(parents=True, exist_ok=True)
+              path.write_bytes(data)
+          PY
+          git add -- composer.json composer.lock resources/contracts/test-v1/fonts/generated resources/contracts/test-v1/profile-assets.json
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name='VASEY contract profile CI' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'build: pin offline test contract renderer profile'
+          git push origin HEAD:refs/heads/work/wp08-contract-profile
