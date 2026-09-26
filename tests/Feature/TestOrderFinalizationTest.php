@@ -367,7 +367,11 @@ class TestOrderFinalizationTest extends TestCase
             }
         };
         $provenance->retainedPath = $path; $this->app->instance(VerifiedMedia::class, $provenance);
-        $bytes = file_get_contents($path); $bytes[0] = $bytes[0] === 'X' ? 'Y' : 'X'; file_put_contents($path, $bytes);
+        $bytes = file_get_contents($path); $bytes[0] = $bytes[0] === 'X' ? 'Y' : 'X';
+        // Published fixture files are read-only; deliberately corrupt only this isolated test copy.
+        $this->assertTrue(chmod($path, 0600));
+        try { $this->assertSame(strlen($bytes), file_put_contents($path, $bytes)); }
+        finally { chmod($path, 0440); }
         $this->assertSame('paid_exception', app(FinalizeTestPayment::class)->handle($f['payment']->id));
         $this->assertSame('asset_unavailable', OrderFinalization::sole()->reason); $this->assertExceptionGraph($f, $before);
         $this->assertSame([0], $provenance->transactionLevels);
