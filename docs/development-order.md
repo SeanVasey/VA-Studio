@@ -1,6 +1,6 @@
 # Ordered development status
 
-Reconciled 2026-09-26 against merged `main` at `69b28a9` after PRs #61–#64. Hosted test checkout, durable payment verification, atomic finalization/grants/pending fulfillment and the September dependency reconciliation are accepted. PRs #65 (private test-contract issuance), #66 (read-only staff operations), #67 (whole-order activation) #68 (CI trigger efficiency) and #69 (internal delivery) remain drafts awaiting their final acceptance gates. The next internal D-19 delivery foundation is implemented as a dependent candidate; customer download HTTP/UI is still unimplemented. Synthetic fixtures do not establish an actual Stripe transaction.
+Reconciled 2026-09-26 against merged `main` at `69b28a9` after PRs #61–#64. Hosted test checkout, durable payment verification, atomic finalization/grants/pending fulfillment and the September dependency reconciliation are accepted. PRs #65 (private test-contract issuance), #66 (read-only staff operations), #67 (whole-order activation), #68 (CI trigger efficiency) and #69 (internal delivery) remain drafts awaiting their final acceptance gates. The next internal D-19 delivery foundation is implemented as a dependent candidate; customer download HTTP/UI is still unimplemented. Synthetic fixtures do not establish an actual Stripe transaction.
 
 ## Current increment and next handoff
 
