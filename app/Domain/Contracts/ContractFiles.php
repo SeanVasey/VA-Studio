@@ -205,7 +205,7 @@ final class ContractFiles
         }
         $path = '/'.implode('/', $parts); $tail = [];
         while (($real = realpath($path)) === false) {
-            if ($path === '/') { throw new \UnexpectedValueException; }
+            if ($path === '/' || is_link($path)) { throw new \UnexpectedValueException; }
             array_unshift($tail, basename($path)); $path = dirname($path);
         }
 

@@ -226,6 +226,22 @@ class TestContractStorageTest extends TestCase
         $this->assertDirectoryDoesNotExist($root.'/contracts/render-cache');
     }
 
+    public function test_a_dangling_public_symlink_cannot_become_live_when_the_first_contract_is_written(): void
+    {
+        $root = rtrim(config('filesystems.disks.local.root'), '/');
+        $alias = $root.'-dangling-public';
+        $this->assertDirectoryDoesNotExist($root.'/contracts');
+        $this->assertTrue(symlink($root.'/contracts', $alias));
+        $this->beforeApplicationDestroyed(fn () => unlink($alias));
+        config(['filesystems.disks.exposed' => ['driver' => 'local', 'root' => $alias.'/test/future', 'serve' => true]]);
+
+        $files = new ContractFiles;
+        $this->failure('storage_failed', fn () => $files->store(self::REQUEST, self::CLAIM, $this->document()));
+        $this->failure('storage_failed', fn () => $files->createRendererWorkspace());
+        $this->assertDirectoryDoesNotExist($root.'/contracts');
+        $this->assertSame($root.'/contracts', readlink($alias));
+    }
+
     public function test_failed_write_permissions_and_preexisting_path_do_not_change_foreign_bytes(): void
     {
         $root = Storage::disk('local')->path(''); mkdir($root.'/contracts', 0500);
