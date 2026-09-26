@@ -77,7 +77,7 @@ class TestContractStorageTest extends TestCase
 
     public static function unsafeDisks(): array
     {
-        return [['serve', true], ['visibility', 'public'], ['driver', 's3']];
+        return [['serve', true], ['visibility', 'public'], ['driver', 's3'], ['prefix', 'contracts']];
     }
 
     #[DataProvider('unsafeDisks')]
@@ -179,6 +179,51 @@ class TestContractStorageTest extends TestCase
 
         $this->failure('original_unavailable', fn () => $files->verify($record));
         $this->assertDirectoryDoesNotExist($root);
+    }
+
+    public static function reachablePublicPaths(): array
+    {
+        return [['reverse_link_chain'], ['other_served_link'], ['future_symlink_subtree'], ['existing_public_link'], ['filesystem_root']];
+    }
+
+    #[DataProvider('reachablePublicPaths')]
+    public function test_public_link_chains_and_future_targets_cannot_expose_originals_or_renderer_cache(string $case): void
+    {
+        $files = new ContractFiles;
+        $record = $files->store(self::REQUEST, self::CLAIM, $this->document());
+        $root = rtrim(config('filesystems.disks.local.root'), '/');
+        if ($case === 'reverse_link_chain') {
+            // A duplicate initial root must not conceal discovery of the chain's first target.
+            config(['filesystems.disks.exposed' => ['driver' => 'local', 'root' => public_path(), 'serve' => true],
+                'filesystems.links' => [storage_path('synthetic-contract-chain/child') => $root.'/contracts',
+                    public_path('synthetic-contract-chain') => storage_path('synthetic-contract-chain')]]);
+        }
+        if ($case === 'other_served_link') {
+            config(['filesystems.disks.exposed' => ['driver' => 'local', 'root' => storage_path('synthetic-served-contracts'), 'serve' => true],
+                'filesystems.links' => [storage_path('synthetic-served-contracts/link') => $root.'/contracts']]);
+        }
+        if ($case === 'future_symlink_subtree') {
+            $alias = $root.'-alias';
+            $this->assertTrue(symlink($root, $alias));
+            $this->beforeApplicationDestroyed(fn () => unlink($alias));
+            config(['filesystems.disks.exposed' => ['driver' => 'local', 'root' => $alias.'/future', 'visibility' => 'public']]);
+        }
+        if ($case === 'existing_public_link') {
+            $link = public_path('synthetic-contract-link-'.basename($root));
+            $this->assertTrue(symlink($root.'/contracts', $link));
+            $this->beforeApplicationDestroyed(fn () => unlink($link));
+            config(['filesystems.links' => [$link => $root.'/contracts']]);
+        }
+        if ($case === 'filesystem_root') {
+            config(['filesystems.disks.exposed' => ['driver' => 'local', 'root' => '/', 'serve' => true]]);
+        }
+
+        $this->failure('original_unavailable', fn () => $files->verify($record));
+        $this->failure('storage_failed', fn () => $files->store(self::REQUEST, (string) Str::uuid(), $this->document()));
+        $this->failure('storage_failed', fn () => $files->createRendererWorkspace());
+        $this->assertSame($this->document()->pdfBytes, file_get_contents($root.'/'.$record['storage_path']));
+        $this->assertDirectoryDoesNotExist($root.'/future');
+        $this->assertDirectoryDoesNotExist($root.'/contracts/render-cache');
     }
 
     public function test_failed_write_permissions_and_preexisting_path_do_not_change_foreign_bytes(): void

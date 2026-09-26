@@ -146,7 +146,7 @@ final class ContractFiles
     {
         $disk = config('filesystems.disks.local');
         if (! is_array($disk) || ($disk['driver'] ?? null) !== 'local' || ($disk['serve'] ?? false) !== false
-            || ($disk['visibility'] ?? 'private') !== 'private') { throw new \UnexpectedValueException; }
+            || ($disk['visibility'] ?? 'private') !== 'private' || ($disk['prefix'] ?? '') !== '') { throw new \UnexpectedValueException; }
         // Resolving a Flysystem adapter may create its root; historical verification must stay read-only.
         if (! is_string($disk['root'] ?? null)) { throw new \UnexpectedValueException; }
         $path = rtrim($disk['root'], '/');
@@ -165,19 +165,51 @@ final class ContractFiles
                 $publicRoots[] = $other['root'] ?? '';
             }
         }
-        foreach ((array) config('filesystems.links', []) as $link => $target) {
-            if (str_starts_with($link, rtrim(public_path(), '/').'/')) { $publicRoots[] = $target; }
+        // Deduplicate first so repeated configured roots cannot hide growth through a link chain.
+        $publicRoots = array_values(array_unique(array_map(fn ($root) => $this->potentialPath($root), $publicRoots)));
+        $links = (array) config('filesystems.links', []);
+        for ($pass = 0; $pass <= count($links); $pass++) {
+            $before = count($publicRoots);
+            foreach ($links as $link => $target) {
+                if (! is_string($link) || ! str_starts_with($link, '/') || str_contains($link, "\0")) { throw new \UnexpectedValueException; }
+                // Resolve the parent only: an existing link's location establishes its public reachability.
+                $location = rtrim($this->potentialPath(dirname($link)), '/').'/'.basename($link);
+                foreach ($publicRoots as $public) {
+                    if ($location === $public || str_starts_with($location, $public.'/')) {
+                        $publicRoots[] = $this->potentialPath($target); break;
+                    }
+                }
+            }
+            $publicRoots = array_values(array_unique($publicRoots));
+            if (count($publicRoots) === $before) { break; }
         }
         foreach ($publicRoots as $public) {
-            if (! is_string($public) || $public === '') { continue; }
-            $public = realpath($public) ?: rtrim($public, '/');
             // A served subtree inside the private root can expose future contract claim paths too.
-            if ($real === $public || str_starts_with($real, $public.'/') || str_starts_with($public, $real.'/')) {
+            if ($public === '/' || $real === $public || str_starts_with($real, $public.'/') || str_starts_with($public, $real.'/')) {
                 throw new \UnexpectedValueException;
             }
         }
 
         return $real;
+    }
+
+    /** Missing future targets still inherit the resolved location of an existing symlink ancestor. */
+    private function potentialPath(mixed $path): string
+    {
+        if (! is_string($path) || ! str_starts_with($path, '/') || str_contains($path, "\0")) { throw new \UnexpectedValueException; }
+        $parts = [];
+        foreach (explode('/', $path) as $part) {
+            if ($part === '' || $part === '.') { continue; }
+            if ($part === '..') { throw new \UnexpectedValueException; }
+            $parts[] = $part;
+        }
+        $path = '/'.implode('/', $parts); $tail = [];
+        while (($real = realpath($path)) === false) {
+            if ($path === '/') { throw new \UnexpectedValueException; }
+            array_unshift($tail, basename($path)); $path = dirname($path);
+        }
+
+        return $tail === [] ? $real : rtrim($real, '/').'/'.implode('/', $tail);
     }
 
     private function directory(string $path, bool $create, bool $private): void
