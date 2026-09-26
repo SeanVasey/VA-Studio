@@ -34,6 +34,7 @@ class IsolatedContractRendererAcceptanceTest extends TestCase
 
         // Each fresh adapter invokes the real child script. No process factory or renderer fake is installed.
         $first = (new IsolatedContractRenderer)->render($input, $profile);
+        usleep(1_100_000); // A different wall-clock second must not alter any page metadata.
         $second = (new IsolatedContractRenderer)->render(array_reverse($input, true), $profile);
         $this->assertSame($first->pdfBytes, $second->pdfBytes);
         $this->assertSame(hash('sha256', $first->pdfBytes), $first->sha256);
@@ -43,6 +44,9 @@ class IsolatedContractRendererAcceptanceTest extends TestCase
         $this->assertSame($first->textDigest, $second->textDigest);
         $this->assertGreaterThan(1, $first->pageCount);
         $this->assertLessThanOrEqual(100, $first->pageCount);
+        preg_match_all('/\/LastModified \(([^)]+)\)/', $first->pdfBytes, $pageDates);
+        $this->assertCount($first->pageCount, $pageDates[1]);
+        $this->assertSame(["D:20260101000000+00'00'"], array_values(array_unique($pageDates[1])));
         foreach (['/JavaScript', '/EmbeddedFiles', '/URI'] as $activeContent) {
             $this->assertStringNotContainsString($activeContent, $first->pdfBytes);
         }

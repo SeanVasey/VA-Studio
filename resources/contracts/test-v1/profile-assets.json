@@ -72,7 +72,7 @@
     },
     "implementation": {
         "app/Domain/Contracts/ContractText.php": "46d145c921ff5a94b3d2928c9b7d9caf0697d33f8ba5c5c30ca65598e1d68a08",
-        "app/Domain/Contracts/TcpdfContractRenderer.php": "16af1c2153abada8601480a8c86e613d63cd336a816254fdf2d04fe3ef3f25ce"
+        "app/Domain/Contracts/TcpdfContractRenderer.php": "620b66766143ab72532e8fa3a161d3eb1012368bbf195cea70b9b8907cdd763a"
     },
     "assets": {
         "fonts/generated/dejavusans.ctg.z": {

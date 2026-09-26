@@ -92,7 +92,7 @@ jobs:
       - name: Prove the complete MySQL test partition
         run: python3 scripts/ci/phpunit-shards.py --shards=4 --prefix=phpunit-ci-mysql
       - name: Run all tests assigned to this MySQL shard
-        run: php artisan test --configuration=phpunit-ci-mysql-${{ matrix.shard }}.xml --log-junit=phpunit-ci-mysql-${{ matrix.shard }}-results.xml --fail-on-phpunit-warning
+        run: php vendor/bin/phpunit --configuration=phpunit-ci-mysql-${{ matrix.shard }}.xml --log-junit=phpunit-ci-mysql-${{ matrix.shard }}-results.xml --fail-on-phpunit-warning --display-warnings
       - name: Retain partition and test evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -135,7 +135,7 @@ jobs:
       - name: Prove the complete SQLite test partition
         run: python3 scripts/ci/phpunit-shards.py --shards=2 --prefix=phpunit-ci-sqlite
       - name: Run all tests assigned to this SQLite shard
-        run: php artisan test --configuration=phpunit-ci-sqlite-${{ matrix.shard }}.xml --log-junit=phpunit-ci-sqlite-${{ matrix.shard }}-results.xml --fail-on-phpunit-warning
+        run: php vendor/bin/phpunit --configuration=phpunit-ci-sqlite-${{ matrix.shard }}.xml --log-junit=phpunit-ci-sqlite-${{ matrix.shard }}-results.xml --fail-on-phpunit-warning --display-warnings
       - name: Retain partition and test evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

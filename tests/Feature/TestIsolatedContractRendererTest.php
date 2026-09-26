@@ -13,6 +13,12 @@ use Tests\TestCase;
 /** Subprocess transport and containment tests; direct renderer tests prove the document itself. */
 class TestIsolatedContractRendererTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->fakePrivateMediaStorage();
+    }
+
     private function reply(array $profile): array
     {
         $bytes = "%PDF-1.7\nSynthetic transport-only envelope\n%%EOF\n";
@@ -50,7 +56,10 @@ class TestIsolatedContractRendererTest extends TestCase
                 $this->assertContains('memory_limit=128M', $command);
                 $this->assertContains('allow_url_fopen=0', $command);
                 $this->assertContains('allow_url_include=0', $command);
-                $this->assertContains('open_basedir='.$root, $command);
+                $this->assertContains('open_basedir='.$root.PATH_SEPARATOR.$environment['TMPDIR'], $command);
+                $this->assertContains('upload_tmp_dir='.$environment['TMPDIR'], $command);
+                $this->assertContains('sys_temp_dir='.$environment['TMPDIR'], $command);
+                $this->assertSame(0700, fileperms($environment['TMPDIR']) & 0777);
                 $this->assertSame(false, $environment['CONTRACT_PRIVATE_MARKER']);
                 $this->assertSame('UTC', $environment['TZ']);
                 $this->assertSame(['input' => ['test' => 'synthetic-input'], 'profile' => ['test' => 'synthetic-profile']],
@@ -123,5 +132,31 @@ class TestIsolatedContractRendererTest extends TestCase
             $renderer = new IsolatedContractRenderer(function () { $this->fail('Open transaction started a renderer.'); });
             $this->rejectedRender('unavailable', fn () => $renderer->render([], []));
         } finally { $connection->rollBack(); DB::purge('contract_render_guard'); }
+    }
+
+    public function test_failed_child_cleans_only_its_private_cache_and_keeps_the_original_boundary(): void
+    {
+        $workspace = null;
+        $renderer = new IsolatedContractRenderer(function ($command, $root, $environment, $payload) use (&$workspace) {
+            $workspace = $environment['TMPDIR'];
+            $this->assertFileDoesNotExist($workspace.'/partial-cache');
+            file_put_contents($workspace.'/partial-cache', 'Synthetic private partial render');
+            return new Process([PHP_BINARY, '-r', 'fwrite(STDERR, "Synthetic child failure");'], $root, $environment, $payload, 60);
+        });
+        $this->rejectedRender('render_failed', fn () => $renderer->render([], []));
+        $this->assertIsString($workspace);
+        $this->assertDirectoryDoesNotExist($workspace);
+    }
+
+    public function test_pure_child_autoloader_does_not_load_application_or_agent_detection_hooks(): void
+    {
+        $code = 'require '.var_export(base_path('scripts/contract-renderer-autoload.php'), true).';'
+            .'echo json_encode([class_exists("Com\\\\Tecnick\\\\Pdf\\\\Tcpdf"),'
+            .'class_exists("App\\\\Domain\\\\Contracts\\\\ContractText"),'
+            .'function_exists("app"),class_exists("Laravel\\\\AgentDetector\\\\AgentDetector",false)],JSON_THROW_ON_ERROR);';
+        $process = new Process([PHP_BINARY, '-r', $code], base_path(), [], null, 20);
+        $process->mustRun();
+        $this->assertSame('', $process->getErrorOutput());
+        $this->assertSame([true, true, false, false], json_decode($process->getOutput(), true, 8, JSON_THROW_ON_ERROR));
     }
 }

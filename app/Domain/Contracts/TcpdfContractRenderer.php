@@ -26,6 +26,20 @@ final class TcpdfContractRenderer implements ContractRenderer
             $pdf = new Tcpdf(unit: 'mm', isunicode: true, subsetfont: false, compress: false, mode: '', fileOptions: [
                 'allowedHosts' => [], 'allowedPaths' => [rtrim($fonts, '/')], 'markupAllowedPaths' => [],
             ]);
+            // Auto-created pages discard their predecessor's time. Freeze the page sanitizer too.
+            $pdf->page = new class($document['timestamp'], $pdf->color, $pdf->encrypt) extends \Com\Tecnick\Pdf\Page\Page
+            {
+                public function __construct(private readonly int $timestamp, \Com\Tecnick\Color\Pdf $color,
+                    \Com\Tecnick\Pdf\Encrypt\Encrypt $encrypt)
+                {
+                    parent::__construct('mm', $color, $encrypt, notransparency: false, compress: false, sigapp: false);
+                }
+
+                public function sanitizeTime(array &$data): void
+                {
+                    $data['time'] = $this->timestamp;
+                }
+            };
             $pdf->enableDefaultPageContent(false);
             $profileHash = ContractRenderProfile::hash($profile);
             $identity = hash('sha256', $input['grant_id'].':'.$document['input_hash'].':'.$profileHash);

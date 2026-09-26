@@ -2,7 +2,6 @@
 
 namespace App\Domain\Contracts;
 
-use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 /** Private append-only originals. No record publication, overwrite, replacement or cleanup. */
@@ -10,6 +9,23 @@ final class ContractFiles
 {
     private const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}';
     public const MAX_BYTES = 16777216;
+
+    /** Ephemeral renderer cache shares the original-storage privacy boundary, never its original paths. */
+    public function createRendererWorkspace(): ContractRenderWorkspace
+    {
+        ContractIo::outsideTransactions();
+        try {
+            $directory = $this->root(true);
+            foreach (['contracts', 'render-cache'] as $component) {
+                $directory .= '/'.$component;
+                $this->directory($directory, true, true);
+            }
+
+            return ContractRenderWorkspace::create($directory);
+        } catch (Throwable) {
+            throw new ContractIssuanceException('storage_failed');
+        }
+    }
 
     /** @return array{disk:string,storage_path:string,pdf_hash:string,size_bytes:int,page_count:int,profile_hash:string} */
     public function store(string $requestId, string $claimId, RenderedContract $rendered): array
@@ -131,7 +147,9 @@ final class ContractFiles
         $disk = config('filesystems.disks.local');
         if (! is_array($disk) || ($disk['driver'] ?? null) !== 'local' || ($disk['serve'] ?? false) !== false
             || ($disk['visibility'] ?? 'private') !== 'private') { throw new \UnexpectedValueException; }
-        $path = rtrim(Storage::disk('local')->path(''), '/');
+        // Resolving a Flysystem adapter may create its root; historical verification must stay read-only.
+        if (! is_string($disk['root'] ?? null)) { throw new \UnexpectedValueException; }
+        $path = rtrim($disk['root'], '/');
         if (! str_starts_with($path, '/') || str_contains($path, '//')) { throw new \UnexpectedValueException; }
         $current = '';
         foreach (explode('/', ltrim($path, '/')) as $component) {
