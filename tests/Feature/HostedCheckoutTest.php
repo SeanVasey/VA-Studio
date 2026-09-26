@@ -310,9 +310,15 @@ class HostedCheckoutTest extends TestCase
         if ($scenario === 'production') { $this->app->instance('env', 'production'); }
         if ($scenario === 'mode') { config(['payments.stripe.mode' => 'live']); }
         if ($scenario === 'account') { $this->gateway->accountResponse['id'] = 'acct_DIFFERENT'; }
-        $this->rejected($scenario === 'account' ? 'CHECKOUT_CHANGED' : 'CHECKOUT_UNAVAILABLE', fn () => $this->startCheckout($f), $scenario === 'account' ? 409 : 503);
-        $this->assertCount(0, $this->creates()); $this->assertDatabaseCount('checkout_sessions', 0);
-        $this->assertSame('pending', InventoryReservation::sole()->state);
+        try {
+            $this->rejected($scenario === 'account' ? 'CHECKOUT_CHANGED' : 'CHECKOUT_UNAVAILABLE', fn () => $this->startCheckout($f), $scenario === 'account' ? 409 : 503);
+            $this->assertCount(0, $this->creates()); $this->assertDatabaseCount('checkout_sessions', 0);
+            $this->assertSame('pending', InventoryReservation::sole()->state);
+        } finally {
+            // DatabaseMigrations must roll back the disposable test schema without
+            // inheriting this case's simulated production confirmation prompt.
+            if ($scenario === 'production') { $this->app->instance('env', 'testing'); }
+        }
     }
 
     public function test_nonzero_test_tax_and_expired_first_attempt_cannot_initiate_a_provider_session(): void
@@ -393,7 +399,8 @@ class HostedCheckoutTest extends TestCase
         $this->getJson($url.'?session_id=cs_test_ATTACKER&success=true')->assertOk()->assertJsonPath('checkout.paymentStatus', 'not_verified');
         $return = $this->get($url.'/return?session_id=cs_test_ATTACKER&success=true')->assertOk();
         $return->assertHeader('Cache-Control', 'no-store, private')->assertHeader('Referrer-Policy', 'no-referrer')->assertHeader('X-Robots-Tag', 'noindex, nofollow');
-        $vary = array_map('trim', explode(',', $return->headers->get('Vary')));
+        // Symfony may retain Vary as multiple field lines; get() reads only the first.
+        $vary = $return->baseResponse->getVary();
         $this->assertContains('Cookie', $vary); $this->assertContains('X-Inertia', $vary);
         $this->assertSame($calls, $this->gateway->calls); $this->assertSame($before, $this->retained());
         $this->assertSame($audits, DB::table('audit_events')->count());
