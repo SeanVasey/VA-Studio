@@ -1,6 +1,6 @@
 # Foundation CI trigger scope
 
-Status: source change with static verification, 2026-09-26. GitHub repository metadata confirms `main` is the default branch. This change does not establish an executed Actions pass.
+Status: merged through [PR #68](https://github.com/VASEYDEV/VASEYAUDIO/pull/68), 2026-09-26. GitHub repository metadata confirms `main` is the default branch. See the [ordered acceptance record](../development-order.md#current-increment-and-next-handoff) for the integrating PR's actual CI and merge status; static verification alone does not establish an executed Actions pass.
 
 An update to an open feature PR previously started two copies of Foundation CI: one from its branch push and another from the PR event. Restricting the push trigger to `main` retains complete PR checks and the post-merge run without that duplicate feature-branch run. Explicit `workflow_dispatch` permits a deliberate manual run.
 
@@ -14,6 +14,6 @@ An update to an open feature PR previously started two copies of Foundation CI: 
 
 The jobs, four MySQL shards, two SQLite shards, frontend/browser checks, audits, concurrency behavior and required backend aggregate are unchanged. No test command, matrix partition, failure condition or permission was relaxed.
 
-Static validation parses the workflow as YAML, checks the event cases above and compares every non-trigger top-level field against base commit `fa209fe`. `git diff --check` also passes. Actual GitHub Actions execution remains pending; this source change neither restores consumed runner minutes nor changes the account's spending controls. Available runner capacity is still required for remote acceptance.
+Static validation parses the workflow as YAML, checks the event cases above and compares every non-trigger top-level field against base commit `fa209fe`. `git diff --check` also passes. The initial Actions attempt was rejected before any test steps; resumed execution and final acceptance are recorded in the linked status checkpoint. This trigger change does not change the account's spending controls or replace runner capacity.
 
-The change belongs to WP-01's reproducible CI work. Review and merge it as a separate focused change; do not treat it as acceptance of pending commerce work. Reverting its trigger block restores the prior duplicate feature-branch scheduling behavior.
+The change belongs to WP-01's reproducible CI work. Its acceptance is separate from the domain evidence required for each commerce increment. Reverting its trigger block restores the prior duplicate feature-branch scheduling behavior.
