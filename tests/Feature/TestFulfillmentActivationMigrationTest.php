@@ -47,9 +47,10 @@ class TestFulfillmentActivationMigrationTest extends TestCase
         $this->activationSchemaOriginal($fixture['grants'][0]);
         $before = ContractFixtures::retained();
         $migration = require database_path('migrations/2026_09_26_000022_test_fulfillment_activation.php');
-        $migration->down(); $this->assertFalse(Schema::hasTable('test_fulfillment_activations'));
+        $delivery = require database_path('migrations/2026_09_26_000023_test_owner_delivery.php');
+        $delivery->down(); $migration->down(); $this->assertFalse(Schema::hasTable('test_fulfillment_activations'));
         $this->assertSame($before, ContractFixtures::retained());
-        $migration->up(); $this->assertDatabaseCount('test_fulfillment_activations', 0);
+        $migration->up(); $delivery->up(); $this->assertDatabaseCount('test_fulfillment_activations', 0);
         $this->assertSame($before, ContractFixtures::retained());
         $this->assertSame('pending', DB::table('pending_entitlements')->sole()->state);
         $this->assertSame('pending', DB::table('fulfillment_outbox')->sole()->state);
