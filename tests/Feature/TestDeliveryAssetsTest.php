@@ -152,7 +152,8 @@ class TestDeliveryAssetsTest extends TestCase
         $revision = app(PublishOffer::class)->handle($offer, $actor); $original = $this->original($revision);
         $evidence = app(DeliveryAssets::class)->inspect($original);
         $this->assertSame($binding->evidence_hash, $evidence[0]['descriptor']['recording_binding']['evidence_hash']);
-        $this->assertSame($binding->evidence, $evidence[0]['recording']['evidence']);
+        // MySQL normalizes JSON object-key order; preserve strict values/types and list order through the existing canonical format.
+        $this->assertSame(CanonicalJson::encode($binding->evidence), CanonicalJson::encode($evidence[0]['recording']['evidence']));
         app(DeliveryAssets::class)->verify($evidence);
         $this->app->instance(PrivateMediaFiles::class, new class extends PrivateMediaFiles {
             public int $calls = 0;
