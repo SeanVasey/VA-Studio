@@ -5,21 +5,23 @@ import Storefront from '../../resources/js/Pages/Storefront';
 
 const quoteId = 'c89f5e3a-bb81-427b-9c4f-77620fc110e0';
 const recoveryKey = 'vaseyaudio-order-recovery-v1';
-const order = { orderSchema: 1, id: 'a182f5e0-b99c-4b2b-840c-0138a04ff82c', quoteId, pricingId: 'pricing-test', reviewHash: 'a'.repeat(64), createdAt: '2026-01-01T00:00:00Z', status: 'prepared', paymentStatus: 'not_started', finalizationStatus: 'not_started', fulfillmentStatus: 'not_started', testOnly: true, payable: false, currency: 'USD', totalMinor: 4280 };
+const order = { orderSchema: 1, id: 'a182f5e0-b99c-4b2b-840c-0138a04ff82c', quoteId, pricingId: 'pricing-test', reviewHash: 'a'.repeat(64), createdAt: '2026-01-01T00:00:00Z', status: 'prepared', paymentStatus: 'not_started', finalizationStatus: 'not_started', contractStatus: 'not_started', fulfillmentStatus: 'not_started', testOnly: true, payable: false, currency: 'USD', totalMinor: 4280 };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
-const checkoutResponse = () => json({ checkout: { checkoutSchema: 1, orderId: order.id, id: null, currency: 'USD', totalMinor: order.totalMinor, status: 'not_started', testOnly: true, paymentStatus: 'not_verified', finalizationStatus: 'not_started', fulfillmentStatus: 'not_started', url: null, expiresAt: null, observedAt: null } });
+const checkoutResponse = () => json({ checkout: { checkoutSchema: 1, orderId: order.id, id: null, currency: 'USD', totalMinor: order.totalMinor, status: 'not_started', testOnly: true, paymentStatus: 'not_verified', finalizationStatus: 'not_started', contractStatus: 'not_started', fulfillmentStatus: 'not_started', url: null, expiresAt: null, observedAt: null } });
 
 describe('storefront durable order recovery', () => {
 
   it.each([
-    ['prepared', 'awaiting_finalization', 'not_started', 'Order finalization is pending.'],
-    ['paid', 'paid', 'pending_contracts', 'Contracts are pending;'],
-    ['paid_exception', 'paid_exception', 'blocked', 'This order needs review'],
-  ])('recovers a verified %s order despite an unavailable checkout read', async (status, finalizationStatus, fulfillmentStatus, copy) => {
+    ['prepared', 'awaiting_finalization', 'not_started', 'not_started', 'Order finalization is pending.'],
+    ['paid', 'paid', 'pending', 'pending_contracts', 'Contracts are pending;'],
+    ['paid', 'paid', 'issued', 'pending_activation', 'Test contracts have been issued. Delivery is pending;'],
+    ['paid', 'paid', 'attention', 'blocked', 'Contract preparation needs attention.'],
+    ['paid_exception', 'paid_exception', 'blocked', 'blocked', 'This order needs review'],
+  ])('recovers a verified %s order despite an unavailable checkout read', async (status, finalizationStatus, contractStatus, fulfillmentStatus, copy) => {
     const user = userEvent.setup();
     sessionStorage.setItem(recoveryKey, JSON.stringify([quoteId]));
     const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(async input => String(input).endsWith('/checkout')
-      ? json({}, 503) : json({ order: { ...order, status, paymentStatus: 'verified', finalizationStatus, fulfillmentStatus } }));
+      ? json({}, 503) : json({ order: { ...order, status, paymentStatus: 'verified', finalizationStatus, contractStatus, fulfillmentStatus } }));
     render(<Storefront tracks={[]} licenseTiers={[]} testCheckoutEnabled />);
     await user.click(screen.getByRole('button', { name: 'Open cart, 0 items' }));
     expect(await screen.findByText('TEST ORDER STATUS')).toBeInTheDocument();
@@ -36,7 +38,7 @@ describe('storefront durable order recovery', () => {
     const user = userEvent.setup();
     sessionStorage.setItem(recoveryKey, JSON.stringify([quoteId]));
     const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(async input => String(input).endsWith('/checkout')
-      ? checkoutResponse() : json({ order: { ...order, status: 'paid', paymentStatus: 'verified', finalizationStatus: 'paid', fulfillmentStatus: 'pending_contracts' } }));
+      ? checkoutResponse() : json({ order: { ...order, status: 'paid', paymentStatus: 'verified', finalizationStatus: 'paid', contractStatus: 'pending', fulfillmentStatus: 'pending_contracts' } }));
     render(<Storefront tracks={[]} licenseTiers={[]} testCheckoutEnabled />);
     await user.click(screen.getByRole('button', { name: 'Open cart, 0 items' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('previously verified test payment remains recorded');
@@ -47,8 +49,10 @@ describe('storefront durable order recovery', () => {
 
   it.each([
     ['missing finalization', { finalizationStatus: undefined }],
-    ['paid without verification', { status: 'paid', finalizationStatus: 'paid', fulfillmentStatus: 'pending_contracts' }],
-    ['verified prepared with paid progress', { paymentStatus: 'verified', finalizationStatus: 'paid', fulfillmentStatus: 'pending_contracts' }],
+    ['missing contract status', { contractStatus: undefined }],
+    ['paid issued without pending activation', { status: 'paid', paymentStatus: 'verified', finalizationStatus: 'paid', contractStatus: 'issued', fulfillmentStatus: 'pending_contracts' }],
+    ['paid without verification', { status: 'paid', finalizationStatus: 'paid', contractStatus: 'pending', fulfillmentStatus: 'pending_contracts' }],
+    ['verified prepared with paid progress', { paymentStatus: 'verified', finalizationStatus: 'paid', contractStatus: 'pending', fulfillmentStatus: 'pending_contracts' }],
     ['exception without blocked fulfillment', { status: 'paid_exception', paymentStatus: 'verified', finalizationStatus: 'paid_exception' }],
     ['paid order awaiting finalization', { status: 'paid', paymentStatus: 'verified', finalizationStatus: 'awaiting_finalization' }],
   ])('rejects an incoherent recovered order: %s', async (_name, changes) => {
@@ -67,7 +71,7 @@ describe('storefront durable order recovery', () => {
     sessionStorage.setItem(recoveryKey, JSON.stringify([quoteId]));
     const url = 'https://checkout.stripe.com/c/pay/cs_test_RecoveryOnly';
     const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(async input => String(input).endsWith('/checkout')
-      ? json({ checkout: { checkoutSchema: 1, orderId: order.id, id: 'checkout-recovery', currency: 'USD', totalMinor: order.totalMinor, status: 'open', testOnly: true, paymentStatus: 'not_verified', finalizationStatus: 'not_started', fulfillmentStatus: 'not_started', url, expiresAt: new Date(Date.now() + 60_000).toISOString(), observedAt: new Date().toISOString() } })
+      ? json({ checkout: { checkoutSchema: 1, orderId: order.id, id: 'checkout-recovery', currency: 'USD', totalMinor: order.totalMinor, status: 'open', testOnly: true, paymentStatus: 'not_verified', finalizationStatus: 'not_started', contractStatus: 'not_started', fulfillmentStatus: 'not_started', url, expiresAt: new Date(Date.now() + 60_000).toISOString(), observedAt: new Date().toISOString() } })
       : json({ order: { ...order, paymentStatus: 'not_verified' } }));
     render(<Storefront tracks={[]} licenseTiers={[]} testCheckoutEnabled={false} />);
     await user.click(screen.getByRole('button', { name: 'Open cart, 0 items' }));

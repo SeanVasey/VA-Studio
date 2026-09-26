@@ -27,12 +27,13 @@ class QuotePricingMigrationTest extends TestCase
         $checkout = require database_path('migrations/2026_09_26_000018_hosted_test_checkout.php');
         $payments = require database_path('migrations/2026_09_26_000019_test_payment_evidence.php');
         $finalizations = require database_path('migrations/2026_09_26_000020_test_order_finalization.php');
+        $contracts = require database_path('migrations/2026_09_26_000021_test_contract_issuance.php');
         foreach (['stripe_receipt_work', 'payment_observations', 'verified_payments'] as $table) { $this->assertDatabaseCount($table, 0); }
         // Reverse dependency order, as the migrator does; retain foreign-key enforcement.
         foreach (['checkout_intents', 'checkout_sessions', 'checkout_observations'] as $table) {
             $this->assertDatabaseCount($table, 0);
         }
-        $finalizations->down(); $payments->down(); $checkout->down();
+        $contracts->down(); $finalizations->down(); $payments->down(); $checkout->down();
         foreach (['orders', 'order_lines', 'order_attempts'] as $table) {
             $this->assertDatabaseCount($table, 0);
         }
@@ -47,7 +48,7 @@ class QuotePricingMigrationTest extends TestCase
         $migration->up();
         $promotions->up();
         $orders->up();
-        $checkout->up(); $payments->up(); $finalizations->up();
+        $checkout->up(); $payments->up(); $finalizations->up(); $contracts->up();
         $pricing = app(PriceQuote::class)->create($quote->public_id, str_repeat('a', 64));
         $this->assertSame($quote->snapshot_hash, $pricing->snapshot['quote_snapshot_hash']);
         $this->assertSame($before, CanonicalJson::encode($quote->refresh()->snapshot));

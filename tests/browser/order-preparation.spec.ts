@@ -34,7 +34,7 @@ test('full test-order assent and an uncertain response retain one request withou
     items: [{ offerRevisionId: offer.offerRevisionId, title: fixtureTrack.title, licenseName: offer.licenseName, disclosure }],
     testOnly: true, payable: false, reviewHash };
   const order = { orderSchema: 1, id: orderId, quoteId, pricingId, reviewHash, createdAt: new Date().toISOString(),
-    status: 'prepared', paymentStatus: 'not_started', finalizationStatus: 'not_started', fulfillmentStatus: 'not_started', testOnly: true, payable: false, currency: 'USD', totalMinor: 1075 };
+    status: 'prepared', paymentStatus: 'not_started', finalizationStatus: 'not_started', contractStatus: 'not_started', fulfillmentStatus: 'not_started', testOnly: true, payable: false, currency: 'USD', totalMinor: 1075 };
   const submissions: Array<{ body: string; key: string | undefined; csrf: string | undefined }> = [];
   const pricingMethods: string[] = [];
   await page.route('**/quotes**', async route => {
@@ -67,7 +67,7 @@ test('full test-order assent and an uncertain response retain one request withou
   });
   await page.route(`**/orders/${orderId}/checkout`, route => route.fulfill({ json: { checkout: {
     checkoutSchema: 1, orderId, id: null, currency: 'USD', totalMinor: 1075, status: 'not_started',
-    testOnly: true, paymentStatus: 'not_verified', finalizationStatus: 'not_started', fulfillmentStatus: 'not_started', url: null, expiresAt: null, observedAt: null,
+    testOnly: true, paymentStatus: 'not_verified', finalizationStatus: 'not_started', contractStatus: 'not_started', fulfillmentStatus: 'not_started', url: null, expiresAt: null, observedAt: null,
   } } }));
 
   await page.goto(fixtureTrack.shareUrl + query);

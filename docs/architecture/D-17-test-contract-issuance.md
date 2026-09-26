@@ -1,0 +1,15 @@
+# D-17 — Private immutable test-contract originals
+
+Status: WP-08 implementation candidate, 2026-09-26, within Sean's continuous-development authorization. Its prerequisite, [D-16 finalization](D-16-test-payment-finalization.md), was accepted in [PR #64](https://github.com/VASEYDEV/VASEYAUDIO/pull/64) at main `69b28a9` after full CI and independent review. This dependent candidate needs its own integrated runtime results and independent reviews.
+
+Issue one private original PDF for each frozen paid grant, using a separate disabled-by-default local/testing policy. Bind an immutable request to the existing grant/render outbox and exact input/profile hashes. Keep mutable work claims separate; use bounded UUID leases, five attempts and deadline/token checks before committing a result. A queue delivery improves latency, while durable scanning recovers missed dispatch and abandoned claims. Rendering and storage must remain outside database transactions.
+
+The versioned `test-buyer-pdf-v1` profile pins the PHP runtime, Composer package references, font source/generated-asset hashes, template, layout and deterministic metadata. Only frozen grant input and full terms feed the document. Unsupported scripts/glyphs or changed profile evidence fail rather than silently altering a buyer's agreement. Existing license renderer metadata continues to describe historical review HTML. Plain PDF is not accepted PDF/A, PDF/UA, legal approval or universal language support.
+
+Use an isolated PHP subprocess with restricted environment/resources, bounded execution/output and no Laravel bootstrap. These are partial application/process protections; this increment does not establish an OS container, network namespace or fully isolated production worker. Record that limitation rather than claiming complete sandboxing.
+
+Write a candidate to an exclusively created private claim path, verify its bytes/hash, then atomically retain one original manifest and complete the winning claim. Stale/failed workers may leave private unreferenced candidates but cannot replace an original. A committed original is never rerendered on loss: preserve its record and restore the exact bytes from backup. Completed work and original manifests remain immutable. Populated issuance migrations refuse rollback.
+
+Leave entitlements and fulfillment outbox pending. Owner projections add contract progress: pending, attention or issued; issued maps to delivery pending activation and provides no URL. Ordinary GETs verify recorded database evidence, not current PDF bytes. A later activation boundary must check every required original and purchased asset before activating access. No contract/asset download route, entitlement activation, refund, live payment or cutover is included.
+
+See [test-contract issuance](../test-contract-issuance.md) for the exact policy, records, profile provenance, storage/isolation boundaries, customer contract and evidence requirements. Next complete guarded activation and owner-authorized exact-asset/contract delivery while retaining production identity, archival, storage and recovery decisions.

@@ -31,13 +31,13 @@ final class ReadPaymentState
         if (! $payment) {
             return ['status' => 'prepared',
                 'paymentStatus' => CheckoutIntent::where('order_id', $order->id)->exists() ? 'not_verified' : 'not_started',
-                'finalizationStatus' => 'not_started', 'fulfillmentStatus' => 'not_started'];
+                'finalizationStatus' => 'not_started', 'contractStatus' => 'not_started', 'fulfillmentStatus' => 'not_started'];
         }
         $this->verify($payment, $order, $original);
         $outcome = OrderFinalization::where('order_id', $order->id)->value('outcome');
 
         return ['status' => $outcome ?? 'prepared', 'paymentStatus' => 'verified',
-            'finalizationStatus' => $outcome ?? 'awaiting_finalization',
-            'fulfillmentStatus' => match ($outcome) { 'paid' => 'pending_contracts', 'paid_exception' => 'blocked', default => 'not_started' }];
+            'finalizationStatus' => $outcome ?? 'awaiting_finalization']
+            + app(\App\Domain\Contracts\ReadContractStatus::class)->forOrder($order);
     }
 }

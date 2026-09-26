@@ -159,6 +159,11 @@ final class FinalizeTestPayment
                 AuditEvent::record('commerce.order.test_finalized', $finalization, ['order_public_id' => $locked->public_id,
                     'outcome' => $finalization->outcome, 'reason' => $reason, 'test_only' => true]);
                 app(ReadFinalization::class)->verify($finalization, $fresh);
+                if ($finalization->outcome === 'paid') {
+                    foreach (LicenseGrant::where('order_finalization_id', $finalization->id)->orderBy('id')->pluck('id') as $grantId) {
+                        app(\App\Domain\Contracts\DispatchTestContract::class)->handle((int) $grantId);
+                    }
+                }
 
                 return $finalization->outcome;
             }, 5);

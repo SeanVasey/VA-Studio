@@ -1,6 +1,6 @@
 # D-16 — Test-payment finalization and frozen grant input
 
-Status: implementation candidate, 2026-09-26, within Sean's continuous-development authorization. Merged PR #63 provides authoritative test-payment confirmation. This candidate requires its own final CI and independent reviews; accepted earlier test counts are not evidence for these new effects.
+Status: **Accepted in [PR #64](https://github.com/VASEYDEV/VASEYAUDIO/pull/64), 2026-09-26**, within Sean's continuous-development authorization. Merged PR #63 provides authoritative test-payment confirmation. Candidate `cf7657a`, tree `b152cb8`, reached main `69b28a9` after full CI and two independent Codex source reviews; [exact results](../test-payment-finalization.md#verification-and-operational-rollback) belong to this increment, not earlier payment-processing checks.
 
 Keep payment confirmation, purchase finalization and fulfillment distinct. Use a separate disabled-by-default local/testing flag and an exact, explicitly installed test policy. Eligibility is strict `confirmed_at < original OrderAttempt.expires_at`. The confirmation timestamp records when this application observed and retained verified payment; it does not claim the provider's payment occurrence time. Finalization may happen later without moving that cutoff. This conservative development rule does not settle production U-08 timing or late-payment policy.
 
