@@ -6,6 +6,7 @@ use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\Models\OfferRevision;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Commerce\Inventory\InventoryPolicy;
+use App\Domain\Commerce\Models\ExclusiveSale;
 use App\Domain\Commerce\Models\RightsScope;
 use App\Domain\Commerce\Models\RightsScopeOffer;
 use App\Models\User;
@@ -45,8 +46,8 @@ final class PrepareExclusiveOffer
             $blockers = $readiness->exclusiveDraftBlockers($locked);
             if ($blockers !== []) { throw ValidationException::withMessages(['offer' => implode(' ', $blockers)]); }
             $scope = RightsScope::whereKey($scopeId)->lockForUpdate()->firstOrFail();
-            if ($scope->blocked) {
-                throw ValidationException::withMessages(['inventory' => 'The underlying rights scope is administratively blocked.']);
+            if ($scope->blocked || ExclusiveSale::where('rights_scope_id', $scope->id)->lockForUpdate()->first()) {
+                throw ValidationException::withMessages(['inventory' => 'The underlying rights scope is unavailable.']);
             }
             app(VerifyOfferFiles::class)->handle($locked, $track);
             // Hashing can span a license's effective boundary. Never freeze newly expired terms.

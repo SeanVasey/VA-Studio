@@ -46,10 +46,11 @@ final class CheckoutEvidence
             'account_id' => $account, 'mode' => 'test', 'policy' => $policy, 'params' => $params];
     }
 
-    public function verifyIntent(CheckoutIntent $intent, Order $order): array
+    public function verifyIntent(CheckoutIntent $intent, Order $order, ?array $verifiedOrderEvidence = null): array
     {
         $payload = $this->decrypt($intent->request_ciphertext, $intent->request_hash, $intent->canonicalization_version);
-        $evidence = app(ReadOrder::class)->verify($order);
+        // The finalization reader already verified the original order; this avoids recursive graph reads.
+        $evidence = $verifiedOrderEvidence ?? app(ReadOrder::class)->verify($order);
         $expected = $this->request($order, $evidence, $intent->public_id, $payload['policy'] ?? [], $intent->account_id, $intent->created_at);
         if ($intent->order_id !== $order->id || $intent->order_attempt_id !== $order->attempt()->sole()->id || $intent->mode !== 'test' ||
             ! $intent->initiate_before->equalTo(CarbonImmutable::parse($evidence['attempt']['expires_at'])) ||

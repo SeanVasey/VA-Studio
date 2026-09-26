@@ -2,6 +2,7 @@
 
 namespace App\Domain\Commerce\Inventory;
 
+use App\Domain\Commerce\Models\ExclusiveSale;
 use App\Domain\Commerce\Models\InventoryReservation;
 use App\Domain\Commerce\Models\Quote;
 use App\Domain\Commerce\Models\RightsScope;
@@ -57,6 +58,11 @@ final class ReserveQuoteInventory
             if ($scopes->count() !== count($scopeIds) || $scopes->contains('blocked', true)) {
                 throw new QuoteException('INVENTORY_BLOCKED', 409);
             }
+            // The scope lock serializes this current read with finalization. A consumed
+            // reservation alone does not occupy inventory; an exclusive sale does forever.
+            if (ExclusiveSale::whereIn('rights_scope_id', $scopeIds)->orderBy('id')->lockForUpdate()->first()) {
+                throw new QuoteException('INVENTORY_UNAVAILABLE', 409);
+            }
             $at = now()->toImmutable()->utc()->startOfSecond();
             if ($quote->expires_at->lessThanOrEqualTo($at)) { throw new QuoteException('QUOTE_EXPIRED', 410); }
             $bindings = $links->map(fn ($link) => ['scope_id' => $link->rights_scope_id,
@@ -83,6 +89,9 @@ final class ReserveQuoteInventory
                 if ($reservation->state === 'expired' || ($reservation->state === 'held' && $reservation->expires_at->lessThanOrEqualTo($at))) {
                     throw new QuoteException('INVENTORY_EXPIRED', 410);
                 }
+                if ($reservation->state === 'consumed') {
+                    throw new QuoteException('INVENTORY_UNAVAILABLE', 409);
+                }
                 if ($reservation->state === 'pending') {
                     if ($attemptId !== null && $reservation->attempt_id !== $attemptId) {
                         throw new QuoteException('INVENTORY_ATTEMPT_CONFLICT', 409);
@@ -90,6 +99,7 @@ final class ReserveQuoteInventory
 
                     return $reservation;
                 }
+                if ($reservation->state !== 'held') { throw new QuoteException('INVENTORY_CHANGED', 409); }
             } elseif ($attemptId !== null || $readOnly) {
                 throw new QuoteException('INVENTORY_NOT_FOUND', 404);
             }

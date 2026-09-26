@@ -19,7 +19,7 @@ test('a return URL cannot confirm payment and an interrupted pending checkout re
   const checkout = {
     checkoutSchema: 1, orderId, id: '75000000-0000-4000-8000-000000000002',
     currency: 'USD', totalMinor: 4280, status: 'pending', testOnly: true,
-    paymentStatus: 'not_verified', fulfillmentStatus: 'not_started',
+    paymentStatus: 'not_verified', finalizationStatus: 'not_started', fulfillmentStatus: 'not_started',
     url: null as string | null, expiresAt: null as string | null, observedAt: null as string | null,
   };
   const requests: Array<{ path: string; method: string; body: string | null; csrf: string | undefined }> = [];

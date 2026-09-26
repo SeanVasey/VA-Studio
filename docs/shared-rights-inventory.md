@@ -42,3 +42,8 @@ The migration is additive and performs no backfill or historical inference. Depl
 ## Subsequent exclusive integration
 
 The [exclusive selection increment](exclusive-selection.md) connects this foundation to activated test revisions, versioned quotes/disclosure/pricing and explicit cutoff. It adds non-mutating reservation verification for pricing reads and freezes scope bindings/policy in exclusive quotes. Pending inventory remains retained; WP-07 terminal effects are still required. The initial foundation boundaries above describe the original PR #44 scope.
+
+
+## Terminal-effect handoff — 2026-09-26
+
+The original foundation above remains historical. Merged PRs #52/#62/#63 now supply immutable order attempts, hosted test sessions and authoritative test-payment evidence. The current [finalization candidate](test-payment-finalization.md) adds one atomic verified `pending` → `consumed` effect for inventory and any promotion use, with matching immutable finalization proof; consumed promotion usage continues to count against lifetime capacity. Paid exceptions retain pending resources, and exclusive sales persist under a unique shared-scope constraint. Replays and historical reads must verify the complete effect graph. Candidate runtime acceptance is separate from these foundation results. No automatic release, refund restock or production policy is introduced.

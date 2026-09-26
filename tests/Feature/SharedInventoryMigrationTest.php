@@ -24,6 +24,7 @@ class SharedInventoryMigrationTest extends TestCase
         $orders = require database_path('migrations/2026_09_24_000017_order_preparation.php');
         $checkout = require database_path('migrations/2026_09_26_000018_hosted_test_checkout.php');
         $payments = require database_path('migrations/2026_09_26_000019_test_payment_evidence.php');
+        $finalizations = require database_path('migrations/2026_09_26_000020_test_order_finalization.php');
         foreach (['stripe_receipt_work', 'payment_observations', 'verified_payments'] as $table) { $this->assertDatabaseCount($table, 0); }
         $this->assertDatabaseCount('exclusive_activations', 0);
         foreach (['checkout_intents', 'checkout_sessions', 'checkout_observations'] as $table) {
@@ -32,7 +33,7 @@ class SharedInventoryMigrationTest extends TestCase
         foreach (['orders', 'order_lines', 'order_attempts'] as $table) {
             $this->assertDatabaseCount($table, 0);
         }
-        $payments->down(); $checkout->down(); $orders->down(); $activations->down(); $migration->down(); $migration->up(); $activations->up(); $orders->up(); $checkout->up(); $payments->up();
+        $finalizations->down(); $payments->down(); $checkout->down(); $orders->down(); $activations->down(); $migration->down(); $migration->up(); $activations->up(); $orders->up(); $checkout->up(); $payments->up(); $finalizations->up();
         $this->assertSame($priorHash, $prior->refresh()->snapshot_hash);
         $f = F::selection(); $hash = $f['quote']->snapshot_hash;
         app(ReserveQuoteInventory::class)->hold($f['quote']->public_id, F::OWNER);
