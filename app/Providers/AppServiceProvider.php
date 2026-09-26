@@ -15,6 +15,8 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(\App\Domain\Commerce\Payments\StripeCheckoutGateway::class,
             \App\Domain\Commerce\Payments\StripeSdkCheckoutGateway::class);
+        $this->app->bind(\App\Domain\Commerce\Payments\StripePaymentGateway::class,
+            \App\Domain\Commerce\Payments\StripeSdkCheckoutGateway::class);
     }
 
     public function boot(): void

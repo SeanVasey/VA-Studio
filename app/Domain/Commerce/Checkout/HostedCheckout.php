@@ -112,26 +112,33 @@ final class HostedCheckout
             throw new QuoteException('CHECKOUT_CHANGED', 409);
         }
         $at = now()->toImmutable()->utc()->startOfSecond();
-        DB::transaction(function () use ($intent, $request, $observed, $at): void {
-            CheckoutIntent::whereKey($intent->id)->lockForUpdate()->firstOrFail();
-            $session = CheckoutSession::where('checkout_intent_id', $intent->id)->first();
-            if ($session) {
-                if ($session->provider_session_id !== $observed['session_id']) { throw new QuoteException('CHECKOUT_CHANGED', 409); }
-                $latest = $this->latest($session, $request);
-                // An older in-flight response cannot regress a terminal observation.
-                if ($latest['status'] !== 'open' && $observed['status'] === 'open') { return; }
-                if ($latest['status'] !== 'open' && $observed['status'] !== $latest['status']) { throw new QuoteException('CHECKOUT_CHANGED', 409); }
-            }
-            [$ciphertext, $hash] = $this->evidence->encrypt($observed);
-            if (! $session) {
-                $session = CheckoutSession::create(['checkout_intent_id' => $intent->id, 'account_id' => $intent->account_id, 'mode' => 'test',
-                    'provider_session_id' => $observed['session_id'], 'evidence_ciphertext' => $ciphertext, 'evidence_hash' => $hash,
-                    'canonicalization_version' => CanonicalJson::VERSION, 'created_at' => $at]);
-                AuditEvent::record('commerce.checkout.bound', $session, ['intent_public_id' => $intent->public_id, 'test_only' => true]);
-            }
-            CheckoutObservation::create(['checkout_session_id' => $session->id, 'observed_at' => $at, 'status' => $observed['status'],
-                'evidence_ciphertext' => $ciphertext, 'evidence_hash' => $hash, 'canonicalization_version' => CanonicalJson::VERSION]);
-        }, 5);
+        DB::transaction(fn () => $this->recordObservation($intent, $request, $observed, $at), 5);
+    }
+
+    /** Internal persistence only. Caller must hold its transaction and any required work fence. */
+    public function recordObservation(CheckoutIntent $intent, array $request, array $observed, \Carbon\CarbonImmutable $at): CheckoutSession
+    {
+        if (DB::transactionLevel() === 0) { throw new QuoteException('CHECKOUT_UNAVAILABLE', 503); }
+        CheckoutIntent::whereKey($intent->id)->lockForUpdate()->firstOrFail();
+        $session = CheckoutSession::where('checkout_intent_id', $intent->id)->first();
+        if ($session) {
+            if ($session->provider_session_id !== $observed['session_id']) { throw new QuoteException('CHECKOUT_CHANGED', 409); }
+            $latest = $this->latest($session, $request);
+            // An older in-flight response cannot regress a terminal observation.
+            if ($latest['status'] !== 'open' && $observed['status'] === 'open') { return $session; }
+            if ($latest['status'] !== 'open' && $observed['status'] !== $latest['status']) { throw new QuoteException('CHECKOUT_CHANGED', 409); }
+        }
+        [$ciphertext, $hash] = $this->evidence->encrypt($observed);
+        if (! $session) {
+            $session = CheckoutSession::create(['checkout_intent_id' => $intent->id, 'account_id' => $intent->account_id, 'mode' => 'test',
+                'provider_session_id' => $observed['session_id'], 'evidence_ciphertext' => $ciphertext, 'evidence_hash' => $hash,
+                'canonicalization_version' => CanonicalJson::VERSION, 'created_at' => $at]);
+            AuditEvent::record('commerce.checkout.bound', $session, ['intent_public_id' => $intent->public_id, 'test_only' => true]);
+        }
+        CheckoutObservation::create(['checkout_session_id' => $session->id, 'observed_at' => $at, 'status' => $observed['status'],
+            'evidence_ciphertext' => $ciphertext, 'evidence_hash' => $hash, 'canonicalization_version' => CanonicalJson::VERSION]);
+
+        return $session;
     }
 
     private function projection(Order $order, ?CheckoutIntent $intent): array

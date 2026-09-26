@@ -41,10 +41,12 @@ class HostedCheckoutMigrationTest extends TestCase
         foreach ($tables as $table) { $before[$table] = DB::table($table)->orderBy('id')->get()->map(fn ($row) => (array) $row)->all(); }
         $status = app(ReadOrder::class)->handle($order->public_id, InventoryFixtures::OWNER);
         $migration = require database_path('migrations/2026_09_26_000018_hosted_test_checkout.php');
+        $payments = require database_path('migrations/2026_09_26_000019_test_payment_evidence.php');
+        foreach (['stripe_receipt_work', 'payment_observations', 'verified_payments'] as $table) { $this->assertDatabaseCount($table, 0); }
         foreach (['checkout_intents', 'checkout_sessions', 'checkout_observations'] as $table) { $this->assertDatabaseCount($table, 0); }
-        $migration->down();
+        $payments->down(); $migration->down();
         foreach (['checkout_intents', 'checkout_sessions', 'checkout_observations'] as $table) { $this->assertFalse(Schema::hasTable($table)); }
-        $migration->up();
+        $migration->up(); $payments->up();
         foreach ($tables as $table) {
             $this->assertSame($before[$table], DB::table($table)->orderBy('id')->get()->map(fn ($row) => (array) $row)->all());
         }

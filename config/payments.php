@@ -2,6 +2,7 @@
 
 return [
     'stripe' => [
+        'processing_enabled' => env('STRIPE_TEST_PAYMENT_PROCESSING_ENABLED', false),
         'checkout_enabled' => env('STRIPE_TEST_CHECKOUT_ENABLED', false),
         'secret_key' => env('STRIPE_TEST_SECRET_KEY'),
         // This receiver is deliberately limited to test events in non-production environments.

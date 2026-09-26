@@ -69,6 +69,8 @@ jobs:
       - run: php artisan key:generate
       - run: composer validate --strict
       - run: vendor/bin/pint --version
+      - name: Verify payment processing regressions before the full suites
+        run: php artisan test --filter='TestPayment|StripePaymentGateway|PaymentEvidenceMigration'
       - run: php artisan test
       - run: |
           DB_CONNECTION=sqlite DB_DATABASE=:memory: php artisan test
