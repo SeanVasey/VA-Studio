@@ -32,14 +32,15 @@ class OrderPreparationMigrationTest extends TestCase
         $finalizations = require database_path('migrations/2026_09_26_000020_test_order_finalization.php');
         $contracts = require database_path('migrations/2026_09_26_000021_test_contract_issuance.php');
         $fulfillmentActivations = require database_path('migrations/2026_09_26_000022_test_fulfillment_activation.php');
+        $delivery = require database_path('migrations/2026_09_26_000023_test_owner_delivery.php');
         foreach (['stripe_receipt_work', 'payment_observations', 'verified_payments'] as $table) { $this->assertDatabaseCount($table, 0); }
         foreach (['checkout_intents', 'checkout_sessions', 'checkout_observations'] as $table) { $this->assertDatabaseCount($table, 0); }
-        $fulfillmentActivations->down(); $contracts->down(); $finalizations->down(); $payments->down(); $checkout->down();
+        $delivery->down(); $fulfillmentActivations->down(); $contracts->down(); $finalizations->down(); $payments->down(); $checkout->down();
         foreach (['orders', 'order_lines', 'order_attempts'] as $table) { $this->assertDatabaseCount($table, 0); }
         $migration->down();
         foreach (['orders', 'order_lines', 'order_attempts'] as $table) { $this->assertFalse(Schema::hasTable($table)); }
         $migration->up();
-        $checkout->up(); $payments->up(); $finalizations->up(); $contracts->up(); $fulfillmentActivations->up();
+        $checkout->up(); $payments->up(); $finalizations->up(); $contracts->up(); $fulfillmentActivations->up(); $delivery->up();
         $this->assertSame($quote, $f['quote']->refresh()->getAttributes());
         $this->assertSame($price, $f['pricing']->refresh()->getAttributes());
         $this->assertSame($reservation, $held['reservation']->refresh()->getAttributes());

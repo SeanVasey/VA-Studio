@@ -12,6 +12,26 @@ class DeliveryAssetFiles
 
     public function verify(array $entry, ?int $deadline = null): void
     {
+        $this->readVerified($entry, null, $deadline);
+    }
+
+    /** Copy only while hashing the same protected source descriptor; failed callers must discard their destination. */
+    public function copyVerified(array $entry, $destination, ?int $deadline = null): void
+    {
+        if (! is_resource($destination) || get_resource_type($destination) !== 'stream') { throw new DeliveryException('asset_unavailable'); }
+        $this->readVerified($entry, $destination, $deadline);
+    }
+
+    /** Internal local adapter root, validated without resolving Storage or creating a directory. */
+    public function privateRoot(): string
+    {
+        ActivationPolicy::outsideTransactions();
+        try { return $this->root(); }
+        catch (Throwable) { throw new DeliveryException('asset_unavailable'); }
+    }
+
+    private function readVerified(array $entry, $destination, ?int $deadline): void
+    {
         ActivationPolicy::outsideTransactions();
         $input = null;
         try {
@@ -42,6 +62,15 @@ class DeliveryAssetFiles
                 $bytes += strlen($chunk);
                 if ($bytes > $entry['size_bytes']) { throw new \UnexpectedValueException; }
                 hash_update($hash, $chunk);
+                if ($destination !== null) {
+                    $offset = 0; $length = strlen($chunk);
+                    while ($offset < $length) {
+                        if (hrtime(true) > $deadline) { throw new \UnexpectedValueException; }
+                        $written = @fwrite($destination, substr($chunk, $offset));
+                        if (! is_int($written) || $written < 1) { throw new \UnexpectedValueException; }
+                        $offset += $written;
+                    }
+                }
             }
             if (hrtime(true) > $deadline || $bytes !== $entry['size_bytes'] || ! hash_equals($entry['sha256'], hash_final($hash))) { throw new \UnexpectedValueException; }
             $this->sameFile($path, fstat($input), $root, $entry['size_bytes']);

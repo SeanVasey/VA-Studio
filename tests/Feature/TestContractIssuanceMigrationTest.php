@@ -44,10 +44,11 @@ class TestContractIssuanceMigrationTest extends TestCase
         $retained = F::retained();
         $migration = require database_path('migrations/2026_09_26_000021_test_contract_issuance.php');
         $fulfillmentActivations = require database_path('migrations/2026_09_26_000022_test_fulfillment_activation.php');
-        $fulfillmentActivations->down(); $migration->down();
+        $delivery = require database_path('migrations/2026_09_26_000023_test_owner_delivery.php');
+        $delivery->down(); $fulfillmentActivations->down(); $migration->down();
         foreach ($this->contractSchemaTables() as $table) { $this->assertFalse(Schema::hasTable($table)); }
         $this->assertSame($retained, F::retained());
-        $migration->up(); $fulfillmentActivations->up();
+        $migration->up(); $fulfillmentActivations->up(); $delivery->up();
         foreach ($this->contractSchemaTables() as $table) { $this->assertDatabaseCount($table, 0); }
         $this->assertSame($retained, F::retained());
         $this->assertSame('pending', DB::table('pending_entitlements')->sole()->state);
