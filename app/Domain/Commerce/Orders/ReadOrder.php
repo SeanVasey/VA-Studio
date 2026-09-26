@@ -98,7 +98,8 @@ final class ReadOrder
 
         return ['orderSchema' => 1, 'id' => $order->public_id, 'quoteId' => $payload['quote']['public_id'],
             'pricingId' => $payload['pricing']['public_id'], 'reviewHash' => $payload['review']['reviewHash'],
-            'createdAt' => $order->created_at->utc()->toISOString(), 'status' => 'prepared', 'paymentStatus' => 'not_started',
+            'createdAt' => $order->created_at->utc()->toISOString(), 'status' => 'prepared',
+            'paymentStatus' => \App\Domain\Commerce\Models\CheckoutIntent::where('order_id', $order->id)->exists() ? 'not_verified' : 'not_started',
             'testOnly' => true, 'payable' => false, 'currency' => $payload['pricing']['snapshot']['currency'],
             'totalMinor' => $payload['pricing']['snapshot']['total_minor']];
     }

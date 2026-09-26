@@ -22,7 +22,8 @@ class StorefrontController extends Controller
         $metadata = app(StorefrontMetadata::class)->forPage($selectedTrack);
 
         return Inertia::render('Storefront', $catalog + ['selectedTrack' => $selectedTrack, 'selectedTrackSlug' => $slug, 'commerceEnabled' => false,
-            'testOrderPreparationEnabled' => app(OrderPolicy::class)->enabled(), 'metadata' => $metadata])
+            'testOrderPreparationEnabled' => app(OrderPolicy::class)->enabled(),
+            'testCheckoutEnabled' => app(\App\Domain\Commerce\Checkout\CheckoutPolicy::class)->enabled(), 'metadata' => $metadata])
             ->withViewData(['metadata' => $metadata]);
     }
 

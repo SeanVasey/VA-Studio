@@ -26,6 +26,7 @@ const json = (body: unknown, status = 200) => new Response(JSON.stringify(body),
 function mockFlow(data = fixture()) {
   return vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
     const url = String(input);
+    if (url.endsWith('/checkout')) return json({ checkout: { checkoutSchema: 1, orderId: data.order.id, id: null, currency: 'USD', totalMinor: data.order.totalMinor, status: 'not_started', testOnly: true, paymentStatus: 'not_verified', fulfillmentStatus: 'not_started', url: null, expiresAt: null, observedAt: null } });
     if (url.endsWith('/order')) return json({}, 404);
     if (url.endsWith('/pricing')) return json({ pricing: data.pricing });
     if (url.endsWith('/order-review')) return json({ review: data.review });
@@ -71,8 +72,8 @@ describe('test order preparation', () => {
     await identify(user);
     await user.click(submit);
     expect(await screen.findByText('TEST ORDER PREPARED')).toBeInTheDocument();
-    expect(screen.getByText(/Payment has not started/)).toBeInTheDocument();
-    const [url, request] = fetcher.mock.calls.at(-1)!;
+    expect(screen.getByText(/This prepared record does not confirm payment/)).toBeInTheDocument();
+    const [url, request] = fetcher.mock.calls.find(([url]) => url === '/orders')!;
     expect(url).toBe('/orders');
     expect(request?.credentials).toBe('same-origin');
     expect((request?.headers as Record<string, string>)['Idempotency-Key']).toMatch(/^[a-f0-9-]{36}$/);
@@ -147,7 +148,8 @@ describe('test order preparation', () => {
     expect(await screen.findByText('TEST ORDER PREPARED')).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Prepare test order' })).not.toBeInTheDocument();
-    expect(fetcher).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(fetcher.mock.calls.map(([url]) => url)).toEqual(['/quotes/quote-1/order', '/orders/order-1/checkout']));
+    expect(fetcher.mock.calls.every(([, init]) => (init?.method ?? 'GET') === 'GET')).toBe(true);
   });
 
   it('blocks creation until recovery is checked successfully and rejects a mismatched recovered order', async () => {
@@ -256,7 +258,7 @@ describe('test order preparation', () => {
     mount(data); await load(user); await identify(user);
     await user.click(screen.getByRole('button', { name: 'Prepare test order' }));
     expect(await screen.findByText('TEST ORDER PREPARED')).toBeInTheDocument();
-    expect(fetcher.mock.calls.at(-1)?.[0]).toBe('/quotes/quote-1/order');
+    expect(fetcher.mock.calls.filter(([url]) => url === '/quotes/quote-1/order')).toHaveLength(2);
     expect(fetcher.mock.calls.filter(([url]) => url === '/orders')).toHaveLength(1);
     expect(fetcher.mock.calls.filter(([url]) => url === '/quotes')).toHaveLength(0);
   });

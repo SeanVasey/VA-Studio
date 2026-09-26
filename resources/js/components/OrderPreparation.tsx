@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { fileRoleLabels, formatMoney, type LicenseDisclosure } from '../lib/catalog';
+import { TestCheckout } from './TestCheckout';
 
 interface PricedLine {
   offerRevisionId: string; quantity: number; baseMinor: number; discountMinor: number;
@@ -19,9 +20,9 @@ interface OrderReview {
 }
 interface PreparedOrder {
   orderSchema: 1; id: string; quoteId: string; pricingId: string; reviewHash: string; createdAt: string;
-  status: 'prepared'; paymentStatus: 'not_started'; testOnly: true; payable: false; currency: 'USD'; totalMinor: number;
+  status: 'prepared'; paymentStatus: 'not_started' | 'not_verified'; testOnly: true; payable: false; currency: 'USD'; totalMinor: number;
 }
-interface Props { quoteId: string; expiresAt: string; offerRevisionIds: string[] }
+interface Props { quoteId: string; expiresAt: string; offerRevisionIds: string[]; testCheckoutEnabled?: boolean }
 const recoveryStorageKey = 'vaseyaudio-order-recovery-v1';
 const recoveryChangedEvent = 'vaseyaudio-order-recovery-changed';
 const locator = (value: unknown): value is string => typeof value === 'string' && /^[a-zA-Z0-9_-]{1,128}$/.test(value);
@@ -83,7 +84,7 @@ function validOrder(value: unknown, quoteId: string, review?: OrderReview): valu
   if (!value || typeof value !== 'object') return false;
   const o = value as PreparedOrder;
   return o.orderSchema === 1 && text(o.id) && o.quoteId === quoteId && text(o.pricingId) && hash(o.reviewHash) && timestamp(o.createdAt)
-    && o.status === 'prepared' && o.paymentStatus === 'not_started' && o.testOnly === true && o.payable === false && o.currency === 'USD' && money(o.totalMinor)
+    && o.status === 'prepared' && ['not_started', 'not_verified'].includes(o.paymentStatus) && o.testOnly === true && o.payable === false && o.currency === 'USD' && money(o.totalMinor)
     && (!review || (o.reviewHash === review.reviewHash && o.pricingId === review.pricing.id && o.totalMinor === review.pricing.totalMinor));
 }
 
@@ -101,12 +102,12 @@ async function readPreparedOrder(quoteId: string): Promise<PreparedOrder | null>
   return body.order;
 }
 
-function OrderStatus({ order }: { order: PreparedOrder }) {
-  return <div className="quote-review-result" role="status"><h3>TEST ORDER PREPARED</h3><p>Order {order.id}</p><p>Prepared total: {formatMoney(order.totalMinor, order.currency)} {order.currency}</p><p>Payment has not started. This record does not grant download access or usage rights.</p></div>;
+function OrderStatus({ order, testCheckoutEnabled = false }: { order: PreparedOrder; testCheckoutEnabled?: boolean }) {
+  return <div className="quote-review-result" role="status"><h3>TEST ORDER PREPARED</h3><p>Order {order.id}</p><p>Prepared total: {formatMoney(order.totalMinor, order.currency)} {order.currency}</p><p>This prepared record does not confirm payment or grant download access or usage rights.</p><TestCheckout orderId={order.id} expectedTotalMinor={order.totalMinor} enabled={testCheckoutEnabled} /></div>;
 }
 
 // Mount outside catalog and policy gates: an immutable order outlives its quote and the creation policy.
-export function PreparedOrderRecovery() {
+export function PreparedOrderRecovery({ testCheckoutEnabled = false }: { testCheckoutEnabled?: boolean }) {
   const [quoteIds, setQuoteIds] = useState(recoveryLocators);
   useEffect(() => {
     const refresh = () => setQuoteIds(recoveryLocators());
@@ -116,11 +117,11 @@ export function PreparedOrderRecovery() {
   if (!quoteIds.length) return null;
   return <section className="quote-review" aria-label="Previous test order recovery"><h3>PREVIOUS TEST ORDERS</h3>
     <p className="fine-print">Read-only status for recent preparation attempts in this browser tab. No payment or license is issued.</p>
-    {quoteIds.map(quoteId => <RecoveredOrder key={quoteId} quoteId={quoteId} />)}
+    {quoteIds.map(quoteId => <RecoveredOrder key={quoteId} quoteId={quoteId} testCheckoutEnabled={testCheckoutEnabled} />)}
   </section>;
 }
 
-function RecoveredOrder({ quoteId }: { quoteId: string }) {
+function RecoveredOrder({ quoteId, testCheckoutEnabled }: { quoteId: string; testCheckoutEnabled: boolean }) {
   const [attempt, setAttempt] = useState(0);
   const [order, setOrder] = useState<PreparedOrder | null>(null);
   const [busy, setBusy] = useState(true);
@@ -137,7 +138,7 @@ function RecoveredOrder({ quoteId }: { quoteId: string }) {
     }).finally(() => { if (active) setBusy(false); });
     return () => { active = false; };
   }, [quoteId, attempt]);
-  return <div aria-busy={busy}>{order ? <OrderStatus order={order} /> : <>
+  return <div aria-busy={busy}>{order ? <OrderStatus order={order} testCheckoutEnabled={testCheckoutEnabled} /> : <>
     {message && <p role="status">{message}</p>}
     <button type="button" className="button button-outline full-width" disabled={busy} onClick={() => setAttempt(value => value + 1)}>{busy ? 'Checking saved test order…' : 'Check saved test order again'}</button>
   </>}</div>;
@@ -148,7 +149,7 @@ export function OrderPreparation(props: Props) {
   return <Preparation key={`${props.quoteId}:${[...props.offerRevisionIds].sort().join(':')}`} {...props} />;
 }
 
-function Preparation({ quoteId, expiresAt, offerRevisionIds }: Props) {
+function Preparation({ quoteId, expiresAt, offerRevisionIds, testCheckoutEnabled = false }: Props) {
   const active = useRef(false);
   const inFlight = useRef(false);
   const captured = useRef<{ key: string; body: string; review: OrderReview } | null>(null);
@@ -289,8 +290,8 @@ function Preparation({ quoteId, expiresAt, offerRevisionIds }: Props) {
 
   return <section className="quote-review" aria-label="Test order preparation" aria-busy={busy}>
     <h3>TEST ORDER PREPARATION</h3>
-    <p className="checkout-advisory">Test only. No payment will be taken and no license will be issued.</p>
-    {order ? <OrderStatus order={order} /> : <>
+    <p className="checkout-advisory">Test only. Preparing this order does not take payment or issue a license.</p>
+    {order ? <OrderStatus order={order} testCheckoutEnabled={testCheckoutEnabled} /> : <>
       {!recovered ? <button type="button" className="button button-outline full-width" disabled={busy} onClick={() => void recover()}>{busy ? 'Checking existing test order…' : 'Retry existing order check'}</button> : !review && <button type="button" className="button button-outline full-width" disabled={busy || expired} onClick={() => void loadReview()}>{busy ? 'Loading test order review…' : 'Review test order'}</button>}
       {review && <form onSubmit={submit} autoComplete="off">
         <div className="quote-review-result">

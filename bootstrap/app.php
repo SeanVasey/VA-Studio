@@ -74,6 +74,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 default => [$isOrder ? 'ORDER_UNAVAILABLE' : 'QUOTE_UNAVAILABLE', 'Selection review is temporarily unavailable. Try again later.'],
             };
             $headers = ['Cache-Control' => 'private, no-store', 'Vary' => 'Cookie', 'X-Content-Type-Options' => 'nosniff'];
+            if ($request->is('orders/*/checkout', 'orders/*/checkout/*')) {
+                $headers['Referrer-Policy'] = 'no-referrer';
+                $headers['X-Robots-Tag'] = 'noindex, nofollow';
+            }
             foreach (['Allow', 'Retry-After', 'X-RateLimit-Limit', 'X-RateLimit-Remaining'] as $name) {
                 if ($response->headers->has($name)) {
                     $headers[$name] = $response->headers->get($name);

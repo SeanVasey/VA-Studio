@@ -12,4 +12,5 @@ return [
     'test_exclusive_selection_policy' => env('VASEY_TEST_EXCLUSIVE_SELECTION_POLICY'),
     // Explicit synthetic seller/assent policy; no real merchant or legal terms are supplied.
     'test_order_policy' => env('VASEY_TEST_ORDER_POLICY'),
+    'test_checkout_policy' => env('VASEY_TEST_CHECKOUT_POLICY'),
 ];

@@ -1,0 +1,13 @@
+# D-14 — Durable hosted test sessions before payment finalization
+
+Status: implementation candidate, 2026-09-26, within Sean's continuous-development authorization. Final review and CI belong to the integrating PR. Merged PR #52 supplies immutable private order/assent and pending resource bindings; this decision advances a bounded part of WP-07.
+
+Retain one immutable encrypted provider intent before I/O, keyed to the order and attempt. Freeze API version, request mapping, policy, account and idempotency key. Initiate before the original attempt deadline; use an explicit 60-minute provider expiry and 15-minute create/retry window. The only supported amount mapping is USD post-discount quantity-one lines with fixed zero test tax. Production and staging cannot enable this local/testing path.
+
+Use short database transactions for intent creation and session/observation binding; provider calls hold no application transaction. Concurrent dispatch is allowed with the exact same provider key/request. There is no dispatch lease or automatic reconciliation worker. A durable intent and manual bounded recovery command preserve uncertain outcomes without minting replacement keys. A supplied session ID is only a locator for full evidence verification.
+
+Retain encrypted session URLs and append-only allowlisted observations. Ignore stale open observations after terminal status and reject conflicting terminal statuses. Owner GET/return reads are non-mutating; explicit POST reconciliation performs provider I/O. Provider session/payment-status fields remain observations, and both checkout and order reads report payment as unverified once an intent exists. No grants or terminal resource release follow from redirect, elapsed time or session status.
+
+Pending inventory/promotion resources remain bound until authoritative finalization. Before implementing that next increment, extend the historical order verifier to preserve original evidence across valid terminal resource states. Authoritative PaymentIntent retrieval/validation, durable inbox processing, paid/exception effects and grant/render contracts remain required before WP-08 delivery. Production policy, live account activation and cutover are unchanged.
+
+See [the implementation contract](../hosted-test-checkout.md) for exact policy, routes, manual recovery, adapter guards, verification and rollback. The tradeoff is bounded recoverable provider uncertainty with resources retained, rather than automatic timeout-based release. Acceptance requires fixtures and real MySQL races at the final source; neither this document nor an SDK adapter proves an actual Stripe test transaction.

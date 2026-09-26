@@ -22,11 +22,15 @@ class SharedInventoryMigrationTest extends TestCase
         $migration = require database_path('migrations/2026_09_17_000015_shared_rights_inventory.php');
         $activations = require database_path('migrations/2026_09_23_000016_exclusive_activations.php');
         $orders = require database_path('migrations/2026_09_24_000017_order_preparation.php');
+        $checkout = require database_path('migrations/2026_09_26_000018_hosted_test_checkout.php');
         $this->assertDatabaseCount('exclusive_activations', 0);
+        foreach (['checkout_intents', 'checkout_sessions', 'checkout_observations'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
         foreach (['orders', 'order_lines', 'order_attempts'] as $table) {
             $this->assertDatabaseCount($table, 0);
         }
-        $orders->down(); $activations->down(); $migration->down(); $migration->up(); $activations->up(); $orders->up();
+        $checkout->down(); $orders->down(); $activations->down(); $migration->down(); $migration->up(); $activations->up(); $orders->up(); $checkout->up();
         $this->assertSame($priorHash, $prior->refresh()->snapshot_hash);
         $f = F::selection(); $hash = $f['quote']->snapshot_hash;
         app(ReserveQuoteInventory::class)->hold($f['quote']->public_id, F::OWNER);

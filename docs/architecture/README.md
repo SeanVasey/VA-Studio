@@ -40,4 +40,6 @@ Follow the current [ordered development record](../development-order.md) for acc
 
 [D-12](D-12-exclusive-selection.md) connects test exclusive activation to versioned selection/disclosure/pricing and atomic inventory, preserving the WP-07/WP-08 handoff.
 
-[D-13](D-13-order-preparation.md) defines the next WP-07 prerequisite: explicit test order review/assent, encrypted immutable order evidence and atomic pending attempt binding. Hosted checkout, verified terminal effects and WP-08 delivery remain subsequent work.
+[D-13](D-13-order-preparation.md) records merged PR #52: explicit test order review/assent, encrypted immutable order evidence and atomic pending attempt binding.
+
+[D-14](D-14-hosted-test-checkout.md) defines the current hosted test-session/reconciliation candidate, with durable encrypted requests and retained pending resources. Final CI/review remains in its PR. Authoritative payment validation, inbox processing, terminal verifier extension/finalization/grants and WP-08 delivery remain dependent work.

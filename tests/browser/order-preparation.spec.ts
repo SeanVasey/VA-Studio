@@ -65,6 +65,10 @@ test('full test-order assent and an uncertain response retain one request withou
     if (submissions.length === 1) return route.abort('failed');
     return route.fulfill({ json: { order } });
   });
+  await page.route(`**/orders/${orderId}/checkout`, route => route.fulfill({ json: { checkout: {
+    checkoutSchema: 1, orderId, id: null, currency: 'USD', totalMinor: 1075, status: 'not_started',
+    testOnly: true, paymentStatus: 'not_verified', fulfillmentStatus: 'not_started', url: null, expiresAt: null, observedAt: null,
+  } } }));
 
   await page.goto(fixtureTrack.shareUrl + query);
   await page.getByRole('button', { name: 'Read terms & choose', exact: true }).first().click();
@@ -98,7 +102,7 @@ test('full test-order assent and an uncertain response retain one request withou
   await expectNoSavedBuyer(page, buyer, submissions[0].key);
   await preparation.getByRole('button', { name: 'Retry same test order', exact: true }).press('Enter');
   await expect(preparation.getByRole('heading', { name: 'TEST ORDER PREPARED', exact: true })).toBeVisible();
-  await expect(preparation).toContainText('Payment has not started.');
+  await expect(preparation).toContainText('This prepared record does not confirm payment or grant download access or usage rights.');
   await expect(preparation).toContainText('Prepared total: $10.75 USD');
   await expect(preparation.getByRole('textbox')).toHaveCount(0);
   expect(submissions).toHaveLength(2);
