@@ -46,7 +46,7 @@ class StripeCheckoutGatewayTest extends TestCase
     {
         Stripe::$apiVersion = '2000-01-01';
         Stripe::$maxNetworkRetries = 9;
-        $http = new CheckoutHttpFixture([$this->account(), $this->session(), $this->account(), $this->session()]);
+        $http = new CheckoutHttpFixture([$this->account(), $this->providerSessionFixture(), $this->account(), $this->providerSessionFixture()]);
         $gateway = new StripeSdkCheckoutGateway($http);
         $params = ['mode' => 'payment', 'expand' => ['line_items'], 'metadata' => ['order' => 'synthetic']];
 
@@ -87,7 +87,7 @@ class StripeCheckoutGatewayTest extends TestCase
 
     public function test_retrieve_expands_items_and_never_uses_a_creation_key(): void
     {
-        $http = new CheckoutHttpFixture([$this->account(), $this->session()]);
+        $http = new CheckoutHttpFixture([$this->account(), $this->providerSessionFixture()]);
         $session = (new StripeSdkCheckoutGateway($http))->retrieve('cs_test_synthetic');
         $this->assertSame('cs_test_synthetic', $session['id']);
         $this->assertCount(2, $http->requests);
@@ -105,7 +105,7 @@ class StripeCheckoutGatewayTest extends TestCase
     #[DataProvider('operations')]
     public function test_partial_expansion_uses_one_bounded_complete_list(string $operation): void
     {
-        $partial = $this->session();
+        $partial = $this->providerSessionFixture();
         $partial['line_items']['has_more'] = true;
         $all = ['object' => 'list', 'has_more' => false, 'data' => [['id' => 'li_synthetic', 'object' => 'item']]];
         $http = new CheckoutHttpFixture([$this->account(), $partial, $all]);
@@ -118,7 +118,7 @@ class StripeCheckoutGatewayTest extends TestCase
 
     public function test_more_than_one_page_fails_without_an_unbounded_pagination_loop(): void
     {
-        $partial = $this->session();
+        $partial = $this->providerSessionFixture();
         $partial['line_items']['has_more'] = true;
         $http = new CheckoutHttpFixture([$this->account(), $partial, $partial['line_items']]);
         $this->assertUnavailable(fn () => (new StripeSdkCheckoutGateway($http))->retrieve('cs_test_synthetic'));
@@ -204,7 +204,7 @@ class StripeCheckoutGatewayTest extends TestCase
     #[DataProvider('invalidSessionEvidence')]
     public function test_wrong_session_identity_mode_or_incomplete_items_fail_closed(string $key, mixed $value): void
     {
-        $session = $this->session();
+        $session = $this->providerSessionFixture();
         $session[$key] = $value;
         $http = new CheckoutHttpFixture([$this->account(), $session]);
         $this->assertUnavailable(fn () => (new StripeSdkCheckoutGateway($http))->retrieve('cs_test_synthetic'));
@@ -275,7 +275,7 @@ class StripeCheckoutGatewayTest extends TestCase
         return ['id' => 'acct_synthetic', 'object' => 'account'];
     }
 
-    private function session(): array
+    private function providerSessionFixture(): array
     {
         return [
             'id' => 'cs_test_synthetic', 'object' => 'checkout.session', 'livemode' => false,
