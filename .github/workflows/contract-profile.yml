@@ -35,8 +35,8 @@ jobs:
           sudo apt-get install --yes --no-install-recommends poppler-utils qpdf
       - name: Resolve the exact renderer with the existing locked graph
         run: |
-          composer require tecnickcom/tc-lib-pdf:8.76.2 tecnickcom/tc-lib-pdf-font:4.4.0 --no-update --no-interaction --no-scripts --no-plugins
-          composer update tecnickcom/tc-lib-pdf tecnickcom/tc-lib-pdf-font --with-dependencies --minimal-changes --no-interaction --prefer-dist --no-scripts --no-plugins
+          composer require 'tecnickcom/tc-lib-pdf:^8.76.2' 'tecnickcom/tc-lib-pdf-font:^4.4.0' --no-update --no-interaction --no-scripts --no-plugins
+          composer update tecnickcom/tc-lib-pdf:8.76.2 tecnickcom/tc-lib-pdf-font:4.4.0 --with-dependencies --minimal-changes --no-interaction --prefer-dist --no-scripts --no-plugins
           composer validate --strict --no-plugins
           composer audit --no-plugins
       - name: Build the offline font profile from pinned source bytes
@@ -115,8 +115,8 @@ jobs:
           decoded = {name: base64.b64decode(data, validate=True) for name, data in content['files'].items()}
           assert all(0 < len(data) <= 16777216 for data in decoded.values())
           expected_composer = json.loads((root / 'composer.json').read_text())
-          expected_composer['require']['tecnickcom/tc-lib-pdf'] = '8.76.2'
-          expected_composer['require']['tecnickcom/tc-lib-pdf-font'] = '4.4.0'
+          expected_composer['require']['tecnickcom/tc-lib-pdf'] = '^8.76.2'
+          expected_composer['require']['tecnickcom/tc-lib-pdf-font'] = '^4.4.0'
           assert json.loads(decoded['composer.json']) == expected_composer
           assert isinstance(json.loads(decoded['composer.lock']), dict)
           assert isinstance(json.loads(decoded['resources/contracts/test-v1/profile-assets.json']), dict)
