@@ -43,10 +43,11 @@ class TestOrderFinalizationMigrationTest extends TestCase
         $before = $this->finalizationSchemaRows($tables);
         $migration = require database_path('migrations/2026_09_26_000020_test_order_finalization.php');
         $contracts = require database_path('migrations/2026_09_26_000021_test_contract_issuance.php');
-        $contracts->down(); $migration->down();
+        $fulfillmentActivations = require database_path('migrations/2026_09_26_000022_test_fulfillment_activation.php');
+        $fulfillmentActivations->down(); $contracts->down(); $migration->down();
         foreach ($this->finalizationSchemaTables() as $table) { $this->assertFalse(Schema::hasTable($table)); }
         foreach (['inventory_reservations', 'promotion_uses'] as $table) { $this->assertFalse(Schema::hasColumn($table, 'consumed_at')); }
-        $migration->up(); $contracts->up();
+        $migration->up(); $contracts->up(); $fulfillmentActivations->up();
         $this->assertSame($before, $this->finalizationSchemaRows($tables));
         foreach ($this->finalizationSchemaTables() as $table) { $this->assertDatabaseCount($table, 0); }
         $this->assertSame('pending', DB::table('inventory_reservations')->where('id', $f['attempt']->inventory_reservation_id)->value('state'));

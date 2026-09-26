@@ -22,7 +22,8 @@ class RecordingAssociation
         return in_array($asset->role, ['master_wav', 'download_mp3'], true) && $asset->parent_asset_id === $preview->parent_asset_id;
     }
 
-    public function verified(MediaAsset $stems): ?StemsRecording
+    /** Immutable recording attestation, without opening any media file. */
+    public function retained(MediaAsset $stems): ?StemsRecording
     {
         try {
             $binding = StemsRecording::where('stems_asset_id', $stems->id)->first();
@@ -36,7 +37,18 @@ class RecordingAssociation
                 || ! hash_equals($binding->evidence_hash, CanonicalJson::hash($this->evidence($binding, $stems, $master, $preview)))) {
                 return null;
             }
-            foreach ([$stems, $master, $preview] as $asset) {
+            return $binding;
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    public function verified(MediaAsset $stems): ?StemsRecording
+    {
+        try {
+            $binding = $this->retained($stems);
+            if (! $binding) { return null; }
+            foreach ([$stems, $binding->master, $binding->preview] as $asset) {
                 if (! app(VerifiedMedia::class)->available($asset)) {
                     return null;
                 }
