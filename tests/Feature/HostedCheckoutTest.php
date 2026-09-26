@@ -43,9 +43,9 @@ class HostedCheckoutTest extends TestCase
         $this->gateway = F::gateway(); $this->app->instance(StripeCheckoutGateway::class, $this->gateway);
     }
 
-    private function start(array $f): array { return app(HostedCheckout::class)->start($f['order']->public_id, InventoryFixtures::OWNER); }
-    private function status(array $f): array { return app(HostedCheckout::class)->status($f['order']->public_id, InventoryFixtures::OWNER); }
-    private function reconcile(array $f): array { return app(HostedCheckout::class)->reconcile($f['order']->public_id, InventoryFixtures::OWNER); }
+    private function startCheckout(array $f): array { return app(HostedCheckout::class)->start($f['order']->public_id, InventoryFixtures::OWNER); }
+    private function checkoutStatus(array $f): array { return app(HostedCheckout::class)->status($f['order']->public_id, InventoryFixtures::OWNER); }
+    private function reconcileCheckout(array $f): array { return app(HostedCheckout::class)->reconcile($f['order']->public_id, InventoryFixtures::OWNER); }
     private function creates(): array { return array_values(array_filter($this->gateway->calls, fn ($call) => $call['operation'] === 'create')); }
 
     private function rejected(string $code, callable $operation, ?int $status = null): void
@@ -80,8 +80,8 @@ class HostedCheckoutTest extends TestCase
     public function test_hosted_test_session_uses_frozen_discounted_lines_and_changes_no_payment_or_order_evidence(bool $exclusive, bool $promoted): void
     {
         $f = F::prepared($exclusive, $promoted); Queue::fake(); $before = $this->retained();
-        $this->assertSame('not_started', $this->status($f)['status']); $this->assertCount(0, $this->gateway->calls);
-        $result = $this->start($f);
+        $this->assertSame('not_started', $this->checkoutStatus($f)['status']); $this->assertCount(0, $this->gateway->calls);
+        $result = $this->startCheckout($f);
         $this->assertSame('open', $result['status']); $this->assertTrue($result['testOnly']);
         $this->assertSame('not_verified', $result['paymentStatus']); $this->assertSame('not_started', $result['fulfillmentStatus']);
         $this->assertSame($exclusive ? ($promoted ? 122956 : 123456) : ($promoted ? 4499 : 4999), $result['totalMinor']);
@@ -116,7 +116,7 @@ class HostedCheckoutTest extends TestCase
         foreach ([...array_values(OrderFixtures::buyer()), config('payments.stripe.secret_key')] as $private) { $this->assertStringNotContainsString($private, $safe); }
         $this->assertSame($before, $this->retained());
         $audits = DB::table('audit_events')->count(); $observations = CheckoutObservation::count(); $callCount = count($this->gateway->calls);
-        $this->assertSame($result, $this->status($f));
+        $this->assertSame($result, $this->checkoutStatus($f));
         $this->assertSame($callCount, count($this->gateway->calls)); $this->assertSame($audits, DB::table('audit_events')->count());
         $this->assertSame($observations, CheckoutObservation::count());
         $this->assertSame('prepared', app(ReadOrder::class)->handle($f['order']->public_id, InventoryFixtures::OWNER)['status']);
@@ -136,7 +136,7 @@ class HostedCheckoutTest extends TestCase
 
             return F::session($params);
         };
-        try { $this->start($f); } finally { DB::purge('checkout_observer'); }
+        try { $this->startCheckout($f); } finally { DB::purge('checkout_observer'); }
         $this->assertDatabaseCount('checkout_sessions', 1);
     }
 
@@ -144,11 +144,11 @@ class HostedCheckoutTest extends TestCase
     {
         $f = F::prepared(false, true); $before = $this->retained();
         $this->gateway->onCreate = fn () => throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);
-        $this->rejected('CHECKOUT_UNAVAILABLE', fn () => $this->start($f), 503);
+        $this->rejected('CHECKOUT_UNAVAILABLE', fn () => $this->startCheckout($f), 503);
         $intent = CheckoutIntent::sole()->getAttributes(); $this->assertDatabaseCount('checkout_sessions', 0);
-        $this->assertSame('pending', $this->status($f)['status']);
+        $this->assertSame('pending', $this->checkoutStatus($f)['status']);
         $this->travelTo(InventoryReservation::sole()->expires_at->addSecond());
-        $this->gateway->onCreate = null; $result = $this->start($f);
+        $this->gateway->onCreate = null; $result = $this->startCheckout($f);
         $this->assertSame('open', $result['status']); $this->assertCount(2, $this->creates());
         $this->assertSame($this->creates()[0]['params'], $this->creates()[1]['params']);
         $this->assertSame($this->creates()[0]['key'], $this->creates()[1]['key']);
@@ -158,9 +158,9 @@ class HostedCheckoutTest extends TestCase
     public function test_unknown_provider_outcome_past_retry_window_requires_reconciliation_without_new_session(): void
     {
         $f = F::prepared(); $this->gateway->onCreate = fn () => throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);
-        $this->rejected('CHECKOUT_UNAVAILABLE', fn () => $this->start($f));
+        $this->rejected('CHECKOUT_UNAVAILABLE', fn () => $this->startCheckout($f));
         $intent = CheckoutIntent::sole(); $this->travelTo($intent->retry_before->addSecond());
-        foreach ([$this->status($f), $this->start($f), $this->reconcile($f)] as $result) {
+        foreach ([$this->checkoutStatus($f), $this->startCheckout($f), $this->reconcileCheckout($f)] as $result) {
             $this->assertSame('reconciliation_required', $result['status']); $this->assertNull($result['url']);
         }
         $this->assertCount(1, $this->creates()); $this->assertDatabaseCount('checkout_intents', 1); $this->assertDatabaseCount('checkout_sessions', 0);
@@ -169,19 +169,19 @@ class HostedCheckoutTest extends TestCase
 
     public function test_reconciliation_of_known_session_works_after_policy_withdrawal_and_never_finalizes_paid_evidence(): void
     {
-        $f = F::prepared(true, true); $this->start($f); $before = $this->retained();
+        $f = F::prepared(true, true); $this->startCheckout($f); $before = $this->retained();
         $session = CheckoutSession::sole()->getAttributes(); $firstObservations = CheckoutObservation::count();
         $this->travelTo(now()->addHours(2));
         config(['commerce.test_checkout_policy' => null, 'payments.stripe.checkout_enabled' => false]);
         $this->gateway->session['status'] = 'complete'; $this->gateway->session['payment_status'] = 'paid';
         $this->gateway->session['url'] = null; $this->gateway->session['payment_intent'] = 'pi_SYNTHETIC';
-        $result = $this->reconcile($f);
+        $result = $this->reconcileCheckout($f);
         $this->assertSame('complete', $result['status']); $this->assertNull($result['url']);
         $this->assertSame('not_verified', $result['paymentStatus']); $this->assertSame('not_started', $result['fulfillmentStatus']);
         $this->assertSame($session, CheckoutSession::sole()->getAttributes());
         $this->assertGreaterThan($firstObservations, CheckoutObservation::count());
         $this->assertSame($before, $this->retained()); $this->assertCount(1, $this->creates());
-        $calls = $this->gateway->calls; $this->assertSame($result, $this->status($f)); $this->assertSame($calls, $this->gateway->calls);
+        $calls = $this->gateway->calls; $this->assertSame($result, $this->checkoutStatus($f)); $this->assertSame($calls, $this->gateway->calls);
     }
 
 
@@ -192,7 +192,7 @@ class HostedCheckoutTest extends TestCase
             $accepted = F::session($params);
             throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);
         };
-        $this->rejected('CHECKOUT_UNAVAILABLE', fn () => $this->start($f));
+        $this->rejected('CHECKOUT_UNAVAILABLE', fn () => $this->startCheckout($f));
         $intent = CheckoutIntent::sole(); $this->travelTo($intent->retry_before->addSecond());
         $this->gateway->session = $accepted;
         $result = app(HostedCheckout::class)->recover($intent, F::SESSION);
@@ -207,11 +207,11 @@ class HostedCheckoutTest extends TestCase
         $aged = [];
         $this->gateway->onCreate = fn () => throw new RuntimeException('Synthetic lost provider response.');
         foreach ([0, 1] as $_) {
-            $f = F::prepared(); $this->rejected('CHECKOUT_UNAVAILABLE', fn () => $this->start($f));
+            $f = F::prepared(); $this->rejected('CHECKOUT_UNAVAILABLE', fn () => $this->startCheckout($f));
             $aged[] = CheckoutIntent::where('order_id', $f['order']->id)->sole()->public_id;
         }
         $this->travelTo(now()->addMinutes(16));
-        $fresh = F::prepared(); $this->rejected('CHECKOUT_UNAVAILABLE', fn () => $this->start($fresh));
+        $fresh = F::prepared(); $this->rejected('CHECKOUT_UNAVAILABLE', fn () => $this->startCheckout($fresh));
         $freshId = CheckoutIntent::where('order_id', $fresh['order']->id)->sole()->public_id;
         $this->gateway->onCreate = null; $before = $this->retained();
         $this->assertSame(0, Artisan::call('vasey:reconcile-test-checkout', ['--limit' => '1']));
@@ -228,7 +228,7 @@ class HostedCheckoutTest extends TestCase
         $this->gateway->onCreate = function (array $params) use (&$accepted): array {
             $accepted = F::session($params); throw new RuntimeException('Synthetic lost provider response.');
         };
-        $this->rejected('CHECKOUT_UNAVAILABLE', fn () => $this->start($f));
+        $this->rejected('CHECKOUT_UNAVAILABLE', fn () => $this->startCheckout($f));
         $intent = CheckoutIntent::sole(); $this->travelTo($intent->retry_before->addSecond());
         $this->gateway->onRetrieve = fn () => throw new RuntimeException('secret-provider-marker buyer-private@example.invalid https://private.invalid');
         $arguments = ['intent' => $intent->public_id, '--session' => F::SESSION];
@@ -250,7 +250,7 @@ class HostedCheckoutTest extends TestCase
         $f = F::prepared();
         $this->gateway->onCreate = static fn (array $params) => F::session($params) + [
             'customer_details' => ['email' => 'provider-private@example.invalid'], 'client_secret' => 'secret-provider-marker'];
-        $result = $this->start($f);
+        $result = $this->startCheckout($f);
         $retained = json_encode($result, JSON_THROW_ON_ERROR).Crypt::decryptString(CheckoutSession::sole()->evidence_ciphertext).
             Crypt::decryptString(CheckoutObservation::sole()->evidence_ciphertext).json_encode(DB::table('audit_events')->get(), JSON_THROW_ON_ERROR);
         foreach (['provider-private@example.invalid', 'secret-provider-marker', 'customer_details', 'client_secret'] as $private) {
@@ -294,9 +294,9 @@ class HostedCheckoutTest extends TestCase
 
             return $value;
         };
-        $this->rejected('CHECKOUT_CHANGED', fn () => $this->start($f), 409);
+        $this->rejected('CHECKOUT_CHANGED', fn () => $this->startCheckout($f), 409);
         $this->assertDatabaseCount('checkout_intents', 1); $this->assertDatabaseCount('checkout_sessions', 0); $this->assertDatabaseCount('checkout_observations', 0);
-        $this->assertSame($before, $this->retained()); $this->assertSame('pending', $this->status($f)['status']);
+        $this->assertSame($before, $this->retained()); $this->assertSame('pending', $this->checkoutStatus($f)['status']);
     }
 
     public static function unavailableConfigurations(): array { return [['disabled'], ['policy'], ['production'], ['mode'], ['account']]; }
@@ -310,7 +310,7 @@ class HostedCheckoutTest extends TestCase
         if ($scenario === 'production') { $this->app->instance('env', 'production'); }
         if ($scenario === 'mode') { config(['payments.stripe.mode' => 'live']); }
         if ($scenario === 'account') { $this->gateway->accountResponse['id'] = 'acct_DIFFERENT'; }
-        $this->rejected($scenario === 'account' ? 'CHECKOUT_CHANGED' : 'CHECKOUT_UNAVAILABLE', fn () => $this->start($f), $scenario === 'account' ? 409 : 503);
+        $this->rejected($scenario === 'account' ? 'CHECKOUT_CHANGED' : 'CHECKOUT_UNAVAILABLE', fn () => $this->startCheckout($f), $scenario === 'account' ? 409 : 503);
         $this->assertCount(0, $this->creates()); $this->assertDatabaseCount('checkout_sessions', 0);
         $this->assertSame('pending', InventoryReservation::sole()->state);
     }
@@ -318,9 +318,9 @@ class HostedCheckoutTest extends TestCase
     public function test_nonzero_test_tax_and_expired_first_attempt_cannot_initiate_a_provider_session(): void
     {
         PricingFixtures::configure(PricingFixtures::policy()); $taxed = F::prepared();
-        $this->rejected('CHECKOUT_UNSUPPORTED', fn () => $this->start($taxed), 409);
+        $this->rejected('CHECKOUT_UNSUPPORTED', fn () => $this->startCheckout($taxed), 409);
         F::configure(); $expired = F::prepared(); $this->travelTo($expired['order']->attempt()->sole()->expires_at);
-        $this->rejected('CHECKOUT_EXPIRED', fn () => $this->start($expired), 410);
+        $this->rejected('CHECKOUT_EXPIRED', fn () => $this->startCheckout($expired), 410);
         $this->assertCount(0, $this->creates()); $this->assertDatabaseCount('checkout_intents', 0);
     }
 
@@ -331,9 +331,9 @@ class HostedCheckoutTest extends TestCase
     {
         $f = F::preparedPrice($amount);
         if ($accepted) {
-            $this->assertSame($amount, $this->start($f)['totalMinor']); $this->assertCount(1, $this->creates());
+            $this->assertSame($amount, $this->startCheckout($f)['totalMinor']); $this->assertCount(1, $this->creates());
         } else {
-            $this->rejected('CHECKOUT_UNSUPPORTED', fn () => $this->start($f), 409);
+            $this->rejected('CHECKOUT_UNSUPPORTED', fn () => $this->startCheckout($f), 409);
             $this->assertCount(0, $this->creates()); $this->assertDatabaseCount('checkout_intents', 0);
         }
         $this->assertSame('pending', InventoryReservation::sole()->state);
@@ -350,14 +350,14 @@ class HostedCheckoutTest extends TestCase
                 $failed = true; throw new RuntimeException('Synthetic checkout persistence failure.');
             }
         });
-        try { $this->start($f); $this->fail('Expected checkout persistence failure.'); }
+        try { $this->startCheckout($f); $this->fail('Expected checkout persistence failure.'); }
         catch (QuoteException $error) { $this->assertSame('CHECKOUT_UNAVAILABLE', $error->errorCode); }
         catch (RuntimeException $error) { $this->assertSame('Synthetic checkout persistence failure.', $error->getMessage()); }
         $this->assertTrue($failed); $this->assertDatabaseCount('checkout_sessions', 0); $this->assertDatabaseCount('checkout_observations', 0);
         $this->assertDatabaseCount('checkout_intents', $table === 'checkout_intents' ? 0 : 1);
         $first = $this->creates(); $this->assertCount($table === 'checkout_intents' ? 0 : 1, $first);
         $this->assertSame($before, $this->retained());
-        $this->assertSame('open', $this->start($f)['status']);
+        $this->assertSame('open', $this->startCheckout($f)['status']);
         if ($first !== []) { $this->assertSame($first[0]['params'], $this->creates()[1]['params']); $this->assertSame($first[0]['key'], $this->creates()[1]['key']); }
         $this->assertDatabaseCount('checkout_sessions', 1);
     }
