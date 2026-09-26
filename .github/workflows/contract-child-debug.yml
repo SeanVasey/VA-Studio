@@ -34,5 +34,11 @@ jobs:
       - run: composer install --no-interaction --prefer-dist
       - run: cp .env.example .env
       - run: php artisan key:generate
+      - name: Install independent PDF acceptance tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends poppler-utils qpdf
       - name: Diagnose the unchanged bounded child using only synthetic fixture data
         run: php scripts/diagnose-test-contract-child.php
+      - name: Require actual renderer, private storage and independent PDF acceptance
+        run: vendor/bin/phpunit --filter='ContractRenderer|TestContractStorage'

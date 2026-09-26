@@ -1,7 +1,7 @@
 <?php
 
 // Protocol-only child: deliberately no Laravel application, .env loading, DB or provider client.
-require dirname(__DIR__).'/vendor/autoload.php';
+require __DIR__.'/contract-renderer-autoload.php';
 
 try {
     $raw = stream_get_contents(STDIN, 1048577);

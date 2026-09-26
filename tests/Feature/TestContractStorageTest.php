@@ -121,6 +121,7 @@ class TestContractStorageTest extends TestCase
         // The public target need not exist yet to expose a future original.
         config([$setting => $exposed]);
         $this->failure('storage_failed', fn () => $files->store(self::REQUEST, self::CLAIM, $this->document()));
+        $this->failure('storage_failed', fn () => $files->createRendererWorkspace());
         $this->assertDirectoryDoesNotExist($root.'/contracts');
 
         config([$setting => $original]);
@@ -132,6 +133,52 @@ class TestContractStorageTest extends TestCase
 
         config([$setting => $original]);
         $this->assertSame($this->document()->pdfBytes, $files->verify($record));
+    }
+
+    public function test_renderer_cache_cleanup_preserves_other_claims_originals_and_symlink_targets(): void
+    {
+        $files = new ContractFiles;
+        $record = $files->store(self::REQUEST, self::CLAIM, $this->document());
+        $first = $files->createRendererWorkspace();
+        $second = $files->createRendererWorkspace();
+        $this->assertNotSame($first->path, $second->path);
+        file_put_contents($first->path.'/partial', 'Synthetic partial cache');
+        file_put_contents($second->path.'/retained', 'Another child cache');
+        $this->assertTrue(symlink($second->path, $first->path.'/foreign-child'));
+        $first->close();
+        $this->assertDirectoryDoesNotExist($first->path);
+        $this->assertSame('Another child cache', file_get_contents($second->path.'/retained'));
+        $this->assertSame($this->document()->pdfBytes, $files->verify($record));
+        $second->close();
+        $this->assertDirectoryDoesNotExist($second->path);
+    }
+
+    public function test_renderer_cache_cleanup_rejects_a_replaced_directory(): void
+    {
+        $files = new ContractFiles;
+        $first = $files->createRendererWorkspace();
+        $other = $files->createRendererWorkspace();
+        file_put_contents($other->path.'/retained', 'Do not traverse this replacement');
+        $this->assertTrue(rename($first->path, $first->path.'.saved'));
+        $this->assertTrue(symlink($other->path, $first->path));
+        $this->failure('storage_failed', fn () => $first->close());
+        $this->assertSame('Do not traverse this replacement', file_get_contents($other->path.'/retained'));
+        $this->assertTrue(unlink($first->path));
+        $this->assertTrue(rename($first->path.'.saved', $first->path));
+        $first->close(); $other->close();
+    }
+
+    public function test_missing_original_root_is_not_recreated_by_read_only_verification(): void
+    {
+        $files = new ContractFiles;
+        $record = $files->store(self::REQUEST, self::CLAIM, $this->document());
+        $root = rtrim(Storage::disk('local')->path(''), '/');
+        $this->assertSame($root, rtrim(config('filesystems.disks.local.root'), '/'));
+        Storage::forgetDisk('local');
+        $this->assertTrue((new \Illuminate\Filesystem\Filesystem)->deleteDirectory($root));
+
+        $this->failure('original_unavailable', fn () => $files->verify($record));
+        $this->assertDirectoryDoesNotExist($root);
     }
 
     public function test_failed_write_permissions_and_preexisting_path_do_not_change_foreign_bytes(): void

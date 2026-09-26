@@ -610,12 +610,14 @@ class TestContractIssuanceTest extends TestCase
         ContractRenderWork::addGlobalScope('synthetic-missing-first-work', fn ($query) => $query->where('contract_render_request_id', '!=', $request->id));
         try {
             $this->assertSame(0, Artisan::call('vasey:issue-test-contracts', ['--limit' => '1']));
-            $this->assertStringContainsString($first->public_id.' changed', Artisan::output());
-            $this->assertStringContainsString('NEXT_AFTER='.$first->public_id, Artisan::output());
+            $output = Artisan::output();
+            $this->assertStringContainsString($first->public_id.' changed', $output);
+            $this->assertStringContainsString('NEXT_AFTER='.$first->public_id, $output);
             $this->assertSame(0, $created); $this->assertSame($before, F::retained()); $this->assertSame([], $this->renderer->calls);
             $this->assertSame(0, Artisan::call('vasey:issue-test-contracts', ['--limit' => '1', '--after' => $first->public_id]));
-            $this->assertStringContainsString($second->public_id.' ready', Artisan::output());
-            $this->assertStringContainsString('NEXT_AFTER='.$second->public_id, Artisan::output());
+            $output = Artisan::output();
+            $this->assertStringContainsString($second->public_id.' ready', $output);
+            $this->assertStringContainsString('NEXT_AFTER='.$second->public_id, $output);
         } finally { ContractRenderWork::setAllGlobalScopes($scopes); }
         $this->assertSame(1, $created); $this->assertSame($second->id, GrantContract::sole()->license_grant_id);
         $this->assertSame('pending', ContractRenderWork::where('contract_render_request_id', $request->id)->sole()->state);

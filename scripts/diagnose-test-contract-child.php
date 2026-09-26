@@ -27,6 +27,11 @@ $renderer = new App\Domain\Contracts\IsolatedContractRenderer(function ($command
         'synthetic_stderr' => $errors], JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR)."\n");
     return new Symfony\Component\Process\Process($command, $root, $environment, $payload, 60);
 });
-$rendered = $renderer->render($input, $profile);
+try {
+    $rendered = $renderer->render($input, $profile);
+} catch (Throwable $error) {
+    fwrite(STDERR, get_class($error).': '.$error->getMessage()."\n");
+    exit(1);
+}
 fwrite(STDOUT, json_encode(['adapter_pages' => $rendered->pageCount, 'adapter_bytes' => $rendered->sizeBytes,
     'adapter_sha256' => $rendered->sha256], JSON_THROW_ON_ERROR)."\n");

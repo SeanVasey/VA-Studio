@@ -20,18 +20,22 @@ final class IsolatedContractRenderer implements ContractRenderer
     {
         ContractIo::outsideTransactions();
         $process = null;
+        $workspace = null;
         try {
             $payload = CanonicalJson::encode(['input' => $input, 'profile' => $profile]);
             if (strlen($payload) > self::MAX_INPUT) { throw new ContractIssuanceException('unsupported_input'); }
             $projectRoot = dirname(__DIR__, 3);
+            $workspace = (new ContractFiles)->createRendererWorkspace();
             $environment = [];
             foreach (array_unique([...array_keys((array) getenv()), ...array_keys($_ENV), ...array_keys($_SERVER)]) as $name) {
                 $environment[$name] = false;
             }
             $environment['LANG'] = 'C'; $environment['LC_ALL'] = 'C'; $environment['TZ'] = 'UTC';
+            $environment['TMPDIR'] = $workspace->path;
             $command = [PHP_BINARY, '-d', 'memory_limit=128M', '-d', 'max_execution_time=60',
                 '-d', 'display_errors=stderr', '-d', 'log_errors=0', '-d', 'allow_url_fopen=0', '-d', 'allow_url_include=0',
-                '-d', 'open_basedir='.$projectRoot,
+                '-d', 'open_basedir='.$projectRoot.PATH_SEPARATOR.$workspace->path,
+                '-d', 'upload_tmp_dir='.$workspace->path, '-d', 'sys_temp_dir='.$workspace->path,
                 '-d', 'disable_functions=curl_init,curl_exec,curl_multi_exec,fsockopen,pfsockopen,stream_socket_client,stream_socket_server,socket_create,exec,passthru,shell_exec,system,popen,proc_open',
                 $projectRoot.'/scripts/render-test-contract.php'];
             $process = $this->processFactory === null
@@ -84,6 +88,7 @@ final class IsolatedContractRenderer implements ContractRenderer
             throw new ContractIssuanceException('render_failed');
         } finally {
             if ($process instanceof Process && $process->isRunning()) { $process->stop(0); }
+            if ($workspace instanceof ContractRenderWorkspace) { $workspace->close(); }
         }
     }
 }
