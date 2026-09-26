@@ -25,8 +25,30 @@ jobs:
       - run: npm run build
       - run: npm audit --audit-level=high
 
-  backend:
+  backend-quality:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl
+          coverage: none
+          tools: composer:v2
+      - run: composer install --no-interaction --prefer-dist
+      - run: composer validate --strict
+      - run: vendor/bin/pint --version
+      - run: composer audit
+      - name: Verify shard partition safeguards
+        run: python3 scripts/ci/test-phpunit-shards.py
+
+  backend-mysql:
+    name: backend-mysql (${{ matrix.shard }}/4)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     services:
       mysql:
         image: mysql:8.4
@@ -60,21 +82,84 @@ jobs:
           extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl
           coverage: none
           tools: composer:v2
-      - name: Install bounded media processing tools
+      - name: Install bounded media and PDF verification tools
         run: |
           sudo apt-get update
-          sudo apt-get install --yes --no-install-recommends ffmpeg util-linux
+          sudo apt-get install --yes --no-install-recommends ffmpeg util-linux qpdf poppler-utils
       - run: composer install --no-interaction --prefer-dist
       - run: cp .env.example .env
       - run: php artisan key:generate
-      - run: composer validate --strict
-      - run: vendor/bin/pint --version
-      - name: Verify finalization regressions before the full suites
-        run: php artisan test --filter='TestOrderFinalization|TestFinalizedInventory'
-      - run: php artisan test
-      - run: |
-          DB_CONNECTION=sqlite DB_DATABASE=:memory: php artisan test
-      - run: composer audit
+      - name: Prove the complete MySQL test partition
+        run: python3 scripts/ci/phpunit-shards.py --shards=4 --prefix=phpunit-ci-mysql
+      - name: Run all tests assigned to this MySQL shard
+        run: php vendor/bin/phpunit --configuration=phpunit-ci-mysql-${{ matrix.shard }}.xml --log-junit=phpunit-ci-mysql-${{ matrix.shard }}-results.xml --fail-on-phpunit-warning --display-warnings
+      - name: Retain partition and test evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: backend-mysql-${{ matrix.shard }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: phpunit-ci-mysql-*
+          retention-days: 7
+          if-no-files-found: error
+
+  backend-sqlite:
+    name: backend-sqlite (${{ matrix.shard }}/2)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ':memory:'
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl
+          coverage: none
+          tools: composer:v2
+      - name: Install bounded media and PDF verification tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends ffmpeg util-linux qpdf poppler-utils
+      - run: composer install --no-interaction --prefer-dist
+      - run: cp .env.example .env
+      - run: php artisan key:generate
+      - name: Prove the complete SQLite test partition
+        run: python3 scripts/ci/phpunit-shards.py --shards=2 --prefix=phpunit-ci-sqlite
+      - name: Run all tests assigned to this SQLite shard
+        run: php vendor/bin/phpunit --configuration=phpunit-ci-sqlite-${{ matrix.shard }}.xml --log-junit=phpunit-ci-sqlite-${{ matrix.shard }}-results.xml --fail-on-phpunit-warning --display-warnings
+      - name: Retain partition and test evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: backend-sqlite-${{ matrix.shard }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: phpunit-ci-sqlite-*
+          retention-days: 7
+          if-no-files-found: error
+
+  backend:
+    # Preserve the required check name. Never accept a skipped/cancelled/failed matrix or quality job.
+    if: always()
+    needs: [backend-quality, backend-mysql, backend-sqlite]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every backend gate
+        env:
+          BACKEND_QUALITY_RESULT: ${{ needs.backend-quality.result }}
+          BACKEND_MYSQL_RESULT: ${{ needs.backend-mysql.result }}
+          BACKEND_SQLITE_RESULT: ${{ needs.backend-sqlite.result }}
+        run: |
+          test "$BACKEND_QUALITY_RESULT" = success
+          test "$BACKEND_MYSQL_RESULT" = success
+          test "$BACKEND_SQLITE_RESULT" = success
 
   operator-browser:
     runs-on: ubuntu-latest

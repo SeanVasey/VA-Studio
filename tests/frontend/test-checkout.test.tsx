@@ -11,7 +11,7 @@ function fixture(status = 'not_started', id = orderId) {
   return {
     checkoutSchema: 1, orderId: id, id: status === 'not_started' ? null : checkoutId,
     currency: 'USD', totalMinor: 4280, status, testOnly: true,
-    paymentStatus: 'not_verified', finalizationStatus: 'not_started', fulfillmentStatus: 'not_started',
+    paymentStatus: 'not_verified', finalizationStatus: 'not_started', contractStatus: 'not_started', fulfillmentStatus: 'not_started',
     url: status === 'open' ? checkoutUrl : null,
     expiresAt: status === 'not_started' || status === 'pending' ? null : new Date(Date.now() + 60_000).toISOString(),
     observedAt: status === 'not_started' || status === 'pending' ? null : new Date().toISOString(),
@@ -28,12 +28,14 @@ afterEach(() => {
 describe('hosted Stripe test checkout', () => {
 
   it.each([
-    ['awaiting_finalization', 'not_started', 'Order finalization is pending.'],
-    ['paid', 'pending_contracts', 'Contracts are pending;'],
-    ['paid_exception', 'blocked', 'This order needs review'],
-  ])('shows verified %s without payment actions, fulfillment claims or private evidence', async (finalizationStatus, fulfillmentStatus, copy) => {
+    ['awaiting_finalization', 'not_started', 'not_started', 'Order finalization is pending.'],
+    ['paid', 'pending', 'pending_contracts', 'Contracts are pending;'],
+    ['paid', 'issued', 'pending_activation', 'Test contracts have been issued. Delivery is pending;'],
+    ['paid', 'attention', 'blocked', 'Contract preparation needs attention.'],
+    ['paid_exception', 'blocked', 'blocked', 'This order needs review'],
+  ])('shows verified %s without payment actions, fulfillment claims or private evidence', async (finalizationStatus, contractStatus, fulfillmentStatus, copy) => {
     const user = userEvent.setup();
-    const body = { ...fixture('complete'), paymentStatus: 'verified', finalizationStatus, fulfillmentStatus,
+    const body = { ...fixture('complete'), paymentStatus: 'verified', finalizationStatus, contractStatus, fulfillmentStatus,
       providerPaymentIntentId: 'pi_PRIVATE_SHOULD_NOT_RENDER', reason: 'PRIVATE_FAILURE_REASON', buyer: { email: 'private@example.invalid' } };
     const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => json(body));
     const store = vi.spyOn(Storage.prototype, 'setItem');
@@ -50,11 +52,55 @@ describe('hosted Stripe test checkout', () => {
     expect(store).not.toHaveBeenCalled();
   });
 
+
+  it('refreshes pending, attention and issued contract states without repeating any payment operation', async () => {
+    const user = userEvent.setup();
+    const base = { ...fixture('complete'), paymentStatus: 'verified', finalizationStatus: 'paid' };
+    const fetcher = vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(json({ ...base, contractStatus: 'pending', fulfillmentStatus: 'pending_contracts' }))
+      .mockResolvedValueOnce(json({ ...base, contractStatus: 'attention', fulfillmentStatus: 'blocked' }))
+      .mockResolvedValueOnce(json({ ...base, contractStatus: 'pending', fulfillmentStatus: 'pending_contracts' }))
+      .mockResolvedValueOnce(json({ ...base, contractStatus: 'issued', fulfillmentStatus: 'pending_activation',
+        contractUrl: 'https://private.invalid/contract.pdf', privatePath: '/private/contracts/secret.pdf', buyer: 'PRIVATE_BUYER' }));
+    render(<TestCheckout orderId={orderId} enabled />);
+    expect(await screen.findByRole('status')).toHaveTextContent('Contracts are pending;');
+    await user.click(screen.getByRole('button', { name: 'Refresh test order status' }));
+    expect(screen.getByRole('status')).toHaveTextContent('Contract preparation needs attention.');
+    await user.click(screen.getByRole('button', { name: 'Refresh test order status' }));
+    expect(screen.getByRole('status')).toHaveTextContent('Contracts are pending;');
+    await user.click(screen.getByRole('button', { name: 'Refresh test order status' }));
+    expect(screen.getByRole('status')).toHaveTextContent('Test contracts have been issued. Delivery is pending;');
+    expect(screen.getByRole('status')).toHaveTextContent('contracts and downloads are not available here yet');
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(screen.queryByText(/PRIVATE_BUYER|private.invalid|secret.pdf|refund/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Open Stripe|Retry Stripe|Check Stripe/ })).not.toBeInTheDocument();
+    expect(fetcher).toHaveBeenCalledTimes(4);
+    expect(postCalls(fetcher)).toHaveLength(0);
+  });
+
+  it('rejects stale pending status after issuance but accepts a server-reported contract issue while retaining verified payment', async () => {
+    const user = userEvent.setup();
+    const base = { ...fixture('complete'), paymentStatus: 'verified', finalizationStatus: 'paid' };
+    const fetcher = vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(json({ ...base, contractStatus: 'issued', fulfillmentStatus: 'pending_activation' }))
+      .mockResolvedValueOnce(json({ ...base, contractStatus: 'pending', fulfillmentStatus: 'pending_contracts' }))
+      .mockResolvedValueOnce(json({ ...base, contractStatus: 'attention', fulfillmentStatus: 'blocked' }));
+    render(<TestCheckout orderId={orderId} enabled />);
+    await user.click(await screen.findByRole('button', { name: 'Refresh test order status' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('previously verified test payment remains recorded');
+    expect(screen.getByRole('status')).toHaveTextContent('Test contracts have been issued.');
+    await user.click(screen.getByRole('button', { name: 'Refresh test order status' }));
+    expect(screen.getByRole('status')).toHaveTextContent('Test payment verified and order finalized. Contract preparation needs attention.');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Open Stripe|Retry Stripe|Check Stripe/ })).not.toBeInTheDocument();
+    expect(postCalls(fetcher)).toHaveLength(0);
+  });
+
   it('advances a verified payment to a finalized order using only a read-only refresh', async () => {
     const user = userEvent.setup();
     const fetcher = vi.spyOn(globalThis, 'fetch')
       .mockResolvedValueOnce(json({ ...fixture('complete'), paymentStatus: 'verified', finalizationStatus: 'awaiting_finalization' }))
-      .mockResolvedValueOnce(json({ ...fixture('complete'), paymentStatus: 'verified', finalizationStatus: 'paid', fulfillmentStatus: 'pending_contracts' }));
+      .mockResolvedValueOnce(json({ ...fixture('complete'), paymentStatus: 'verified', finalizationStatus: 'paid', contractStatus: 'pending', fulfillmentStatus: 'pending_contracts' }));
     render(<TestCheckout orderId={orderId} enabled />);
     await user.click(await screen.findByRole('button', { name: 'Refresh test order status' }));
     expect(screen.getByRole('status')).toHaveTextContent('order finalized');
@@ -71,7 +117,15 @@ describe('hosted Stripe test checkout', () => {
 
   it.each([
     ['missing finalization', { finalizationStatus: undefined }],
-    ['unverified paid', { finalizationStatus: 'paid', fulfillmentStatus: 'pending_contracts' }],
+    ['missing contract status', { contractStatus: undefined }],
+    ['unknown contract status', { contractStatus: 'ready' }],
+    ['unverified with issued contracts', { contractStatus: 'issued' }],
+    ['awaiting finalization with contracts', { paymentStatus: 'verified', finalizationStatus: 'awaiting_finalization', contractStatus: 'issued' }],
+    ['paid with issued contracts but pending rendering', { paymentStatus: 'verified', finalizationStatus: 'paid', contractStatus: 'issued', fulfillmentStatus: 'pending_contracts' }],
+    ['paid with attention but unblocked fulfillment', { paymentStatus: 'verified', finalizationStatus: 'paid', contractStatus: 'attention', fulfillmentStatus: 'pending_activation' }],
+    ['paid with pending contracts but pending activation', { paymentStatus: 'verified', finalizationStatus: 'paid', contractStatus: 'pending', fulfillmentStatus: 'pending_activation' }],
+    ['paid exception with issued contracts', { paymentStatus: 'verified', finalizationStatus: 'paid_exception', contractStatus: 'issued', fulfillmentStatus: 'blocked' }],
+    ['unverified paid', { finalizationStatus: 'paid', contractStatus: 'pending', fulfillmentStatus: 'pending_contracts' }],
     ['verified without finalization', { paymentStatus: 'verified' }],
     ['verified awaiting with contracts', { paymentStatus: 'verified', finalizationStatus: 'awaiting_finalization', fulfillmentStatus: 'pending_contracts' }],
     ['paid without pending contracts', { paymentStatus: 'verified', finalizationStatus: 'paid' }],
@@ -90,8 +144,8 @@ describe('hosted Stripe test checkout', () => {
 
   it.each(['unverified', 'awaiting_finalization', 'paid_exception', 'unavailable', 'expired'])('retains finalized verification after a %s refresh result without restarting payment', async outcome => {
     const user = userEvent.setup();
-    const paid = { ...fixture('complete'), paymentStatus: 'verified', finalizationStatus: 'paid', fulfillmentStatus: 'pending_contracts' };
-    const changed = outcome === 'unverified' ? fixture('open') : { ...paid, finalizationStatus: outcome, fulfillmentStatus: outcome === 'paid_exception' ? 'blocked' : 'not_started' };
+    const paid = { ...fixture('complete'), paymentStatus: 'verified', finalizationStatus: 'paid', contractStatus: 'pending', fulfillmentStatus: 'pending_contracts' };
+    const changed = outcome === 'unverified' ? fixture('open') : { ...paid, finalizationStatus: outcome, contractStatus: outcome === 'paid_exception' ? 'blocked' : 'not_started', fulfillmentStatus: outcome === 'paid_exception' ? 'blocked' : 'not_started' };
     const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(json(paid))
       .mockResolvedValueOnce(outcome === 'unavailable' ? new Response('{}', { status: 500 })
         : outcome === 'expired' ? new Response(JSON.stringify({ code: 'CHECKOUT_EXPIRED' }), { status: 410 }) : json(changed));

@@ -19,7 +19,7 @@ test('a return URL cannot confirm payment and an interrupted pending checkout re
   const checkout = {
     checkoutSchema: 1, orderId, id: '75000000-0000-4000-8000-000000000002',
     currency: 'USD', totalMinor: 4280, status: 'pending', testOnly: true,
-    paymentStatus: 'not_verified', finalizationStatus: 'not_started', fulfillmentStatus: 'not_started',
+    paymentStatus: 'not_verified', finalizationStatus: 'not_started', contractStatus: 'not_started', fulfillmentStatus: 'not_started',
     url: null as string | null, expiresAt: null as string | null, observedAt: null as string | null,
   };
   const requests: Array<{ path: string; method: string; body: string | null; csrf: string | undefined }> = [];
@@ -73,5 +73,59 @@ test('a return URL cannot confirm payment and an interrupted pending checkout re
   expect(await page.evaluate(() => JSON.stringify({ local: Object.entries(localStorage), session: Object.entries(sessionStorage) }))).toBe('{"local":[],"session":[]}');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath('test-checkout-return.png'), fullPage: true });
+  expect(errors).toEqual([]);
+});
+
+/** Synthetic contract states prove UI handling only, not rendering or PDF durability. */
+test('contract progress stays read-only and never offers another payment or an unavailable download', async ({ page }, testInfo) => {
+  const shellResponse = await page.request.get('/');
+  expect(shellResponse.ok()).toBe(true);
+  const shell = await shellResponse.text();
+  const pageScript = /(<script\b[^>]*data-page="app"[^>]*>)([\s\S]*?)(<\/script>)/;
+  const embedded = shell.match(pageScript);
+  expect(embedded).not.toBeNull();
+  const base = JSON.parse(embedded![2]);
+  const orderId = '75000000-0000-4000-8000-000000000003';
+  const path = `/orders/${orderId}/checkout`;
+  const returnPath = '/synthetic-contract-status';
+  const progress = [
+    { contractStatus: 'pending', fulfillmentStatus: 'pending_contracts' },
+    { contractStatus: 'attention', fulfillmentStatus: 'blocked' },
+    { contractStatus: 'issued', fulfillmentStatus: 'pending_activation' },
+  ];
+  const requests: string[] = [];
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.route('**/*', async route => {
+    const request = route.request(), url = new URL(request.url());
+    if (url.pathname === returnPath) {
+      const payload = { ...base, component: 'CheckoutReturn', url: url.pathname, props: { ...base.props, orderId } };
+      const serialized = JSON.stringify(payload).replaceAll('<', '\\u003c');
+      return route.fulfill({ contentType: 'text/html', body: shell.replace(pageScript, (_match, opening, _old, closing) => opening + serialized + closing) });
+    }
+    if (url.pathname !== path) return route.continue();
+    requests.push(request.method());
+    return route.fulfill({ json: { checkout: {
+      checkoutSchema: 1, orderId, id: '75000000-0000-4000-8000-000000000004', currency: 'USD', totalMinor: 4280,
+      status: 'complete', testOnly: true, paymentStatus: 'verified', finalizationStatus: 'paid',
+      ...progress[Math.min(requests.length - 1, progress.length - 1)], url: null, expiresAt: null, observedAt: new Date().toISOString(),
+    } } });
+  });
+  await page.goto(returnPath);
+  const status = page.getByRole('region', { name: 'Stripe test checkout', exact: true });
+  await expect(status).toContainText('Contracts are pending;');
+  const refresh = status.getByRole('button', { name: 'Refresh test order status', exact: true });
+  await refresh.focus(); await refresh.press('Enter');
+  await expect(status).toContainText('Contract preparation needs attention.');
+  await expect(status).toContainText('Do not start another payment.');
+  await refresh.press('Enter');
+  await expect(status).toContainText('Test contracts have been issued. Delivery is pending;');
+  await expect(status).toContainText('contracts and downloads are not available here yet.');
+  await expect(status.getByRole('link')).toHaveCount(0);
+  await expect(status.getByRole('button', { name: /Open Stripe|Retry Stripe|Check Stripe/ })).toHaveCount(0);
+  expect(requests).toEqual(['GET', 'GET', 'GET']);
+  expect(await page.evaluate(() => JSON.stringify({ local: Object.entries(localStorage), session: Object.entries(sessionStorage) }))).toBe('{"local":[],"session":[]}');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath('test-contract-status.png'), fullPage: true });
   expect(errors).toEqual([]);
 });

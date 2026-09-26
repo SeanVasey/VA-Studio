@@ -4,17 +4,22 @@ import { formatMoney } from '../lib/catalog';
 export interface PaymentProgress {
   paymentStatus: 'not_started' | 'not_verified' | 'verified';
   finalizationStatus: 'not_started' | 'awaiting_finalization' | 'paid' | 'paid_exception';
-  fulfillmentStatus: 'not_started' | 'pending_contracts' | 'blocked';
+  contractStatus: 'not_started' | 'blocked' | 'pending' | 'attention' | 'issued';
+  fulfillmentStatus: 'not_started' | 'pending_contracts' | 'pending_activation' | 'blocked';
 }
 
 export function validPaymentProgress(value: PaymentProgress): boolean {
   if (value.paymentStatus === 'not_started' || value.paymentStatus === 'not_verified') {
-    return value.finalizationStatus === 'not_started' && value.fulfillmentStatus === 'not_started';
+    return value.finalizationStatus === 'not_started' && value.contractStatus === 'not_started' && value.fulfillmentStatus === 'not_started';
   }
   return value.paymentStatus === 'verified' && (
-    (value.finalizationStatus === 'awaiting_finalization' && value.fulfillmentStatus === 'not_started')
-    || (value.finalizationStatus === 'paid' && value.fulfillmentStatus === 'pending_contracts')
-    || (value.finalizationStatus === 'paid_exception' && value.fulfillmentStatus === 'blocked')
+    (value.finalizationStatus === 'awaiting_finalization' && value.contractStatus === 'not_started' && value.fulfillmentStatus === 'not_started')
+    || (value.finalizationStatus === 'paid' && (
+      (value.contractStatus === 'pending' && value.fulfillmentStatus === 'pending_contracts')
+      || (value.contractStatus === 'issued' && value.fulfillmentStatus === 'pending_activation')
+      || (value.contractStatus === 'attention' && value.fulfillmentStatus === 'blocked')
+    ))
+    || (value.finalizationStatus === 'paid_exception' && value.contractStatus === 'blocked' && value.fulfillmentStatus === 'blocked')
   );
 }
 
@@ -59,9 +64,18 @@ const descriptions: Record<CheckoutStatus['status'], string> = {
 };
 const verifiedDescriptions = {
   awaiting_finalization: 'Test payment verified. Order finalization is pending. Contracts and download access are not available yet.',
-  paid: 'Test payment verified and order finalized. Contracts are pending; download access is not available yet.',
   paid_exception: 'Test payment verified. This order needs review before fulfillment can continue. Contracts and download access are blocked. Do not start another payment.',
 };
+const contractDescriptions = {
+  pending: 'Test payment verified and order finalized. Contracts are pending; download access is not available yet.',
+  issued: 'Test payment verified and order finalized. Test contracts have been issued. Delivery is pending; contracts and downloads are not available here yet.',
+  attention: 'Test payment verified and order finalized. Contract preparation needs attention. Delivery is blocked; contracts and downloads are not available. Do not start another payment.',
+};
+function verifiedDescription(progress: PaymentProgress): string {
+  return progress.finalizationStatus === 'paid'
+    ? contractDescriptions[progress.contractStatus as keyof typeof contractDescriptions]
+    : verifiedDescriptions[progress.finalizationStatus as keyof typeof verifiedDescriptions];
+}
 const rejectionMessages = {
   unsupported: 'This order’s pricing is not supported by Stripe test checkout. Review your selection again and prepare an eligible test order.',
   expired: 'This order’s checkout preparation window has expired. Review your selection again and prepare a new test order.',
@@ -111,7 +125,8 @@ function Checkout({ orderId, enabled = false, expectedTotalMinor, retainedProgre
       const next: CheckoutStatus = body.checkout;
       // A later unavailable or stale response cannot reopen payment after retained verification.
       if (verified && (next.paymentStatus !== 'verified'
-        || (progress.finalizationStatus !== 'awaiting_finalization' && next.finalizationStatus !== progress.finalizationStatus))) {
+        || (progress.finalizationStatus !== 'awaiting_finalization' && next.finalizationStatus !== progress.finalizationStatus)
+        || (progress.contractStatus === 'issued' && next.contractStatus === 'pending'))) {
         throw new Error('Payment status regressed');
       }
       setStatus(next); setUncertain(null);
@@ -150,7 +165,7 @@ function Checkout({ orderId, enabled = false, expectedTotalMinor, retainedProgre
   return <section className="quote-review" aria-label="Stripe test checkout" aria-busy={busy}>
     <h3>STRIPE TEST CHECKOUT</h3>
     <p className="checkout-advisory">{verified ? 'Test mode only. This status does not make contracts or downloads available.' : 'Test mode only. This page does not verify payment, issue a license or grant download access.'}</p>
-    {verified && <p role="status">{verifiedDescriptions[progress.finalizationStatus as keyof typeof verifiedDescriptions]}</p>}
+    {verified && <p role="status">{verifiedDescription(progress)}</p>}
     {status && <>
       {!verified && <p role="status">{expired && status.status === 'open' ? 'This checkout link has expired. Check the current Stripe test checkout status.' : descriptions[status.status]}</p>}
       <p>Test order total: {formatMoney(status.totalMinor, status.currency)} {status.currency}</p>

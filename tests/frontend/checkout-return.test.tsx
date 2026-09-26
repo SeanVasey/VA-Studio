@@ -7,7 +7,7 @@ function response(status: 'not_started' | 'complete' | 'open') {
   return new Response(JSON.stringify({ checkout: {
     checkoutSchema: 1, orderId, id: status === 'not_started' ? null : '74000000-0000-4000-8000-000000000002',
     currency: 'USD', totalMinor: 4280, status, testOnly: true,
-    paymentStatus: 'not_verified', finalizationStatus: 'not_started', fulfillmentStatus: 'not_started',
+    paymentStatus: 'not_verified', finalizationStatus: 'not_started', contractStatus: 'not_started', fulfillmentStatus: 'not_started',
     url: status === 'open' ? 'https://checkout.stripe.com/c/pay/cs_test_ReturnFixture' : null,
     expiresAt: status === 'not_started' ? null : new Date(Date.now() + 60_000).toISOString(),
     observedAt: status === 'not_started' ? null : new Date().toISOString(),
@@ -21,7 +21,7 @@ describe('read-only checkout return', () => {
     window.history.replaceState({}, '', '/checkout/return?canceled=true&payment_status=unpaid');
     const body = await response('complete').json();
     const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({ checkout: {
-      ...body.checkout, paymentStatus: 'verified', finalizationStatus: 'paid', fulfillmentStatus: 'pending_contracts',
+      ...body.checkout, paymentStatus: 'verified', finalizationStatus: 'paid', contractStatus: 'pending', fulfillmentStatus: 'pending_contracts',
     } })));
     render(<CheckoutReturn orderId={orderId} />);
     expect(await screen.findByRole('status')).toHaveTextContent('Test payment verified and order finalized');

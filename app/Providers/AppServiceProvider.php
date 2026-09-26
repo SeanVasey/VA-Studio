@@ -13,6 +13,8 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(\App\Domain\Contracts\ContractRenderer::class,
+            \App\Domain\Contracts\IsolatedContractRenderer::class);
         $this->app->bind(\App\Domain\Commerce\Payments\StripeCheckoutGateway::class,
             \App\Domain\Commerce\Payments\StripeSdkCheckoutGateway::class);
         $this->app->bind(\App\Domain\Commerce\Payments\StripePaymentGateway::class,

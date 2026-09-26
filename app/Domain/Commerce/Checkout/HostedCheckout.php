@@ -151,6 +151,7 @@ final class HostedCheckout
         $paymentState = app(\App\Domain\Commerce\Finalization\ReadPaymentState::class)->projection($order, $payload);
         $data['paymentStatus'] = $paymentState['paymentStatus'] === 'verified' ? 'verified' : 'not_verified';
         $data['finalizationStatus'] = $paymentState['finalizationStatus'];
+        $data['contractStatus'] = $paymentState['contractStatus'];
         $data['fulfillmentStatus'] = $paymentState['fulfillmentStatus'];
         if (! $intent) { return $data; }
         $request = $this->evidence->verifyIntent($intent, $order);

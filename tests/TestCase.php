@@ -17,6 +17,8 @@ abstract class TestCase extends BaseTestCase
         $disk = Storage::fake($name, config('filesystems.disks.local'));
         Storage::set('local', $disk);
         $root = $disk->path('');
+        // Keep read-only local adapters on the same already-created isolated root without resolving Storage.
+        config(['filesystems.disks.local.root' => rtrim($root, '/')]);
         $this->beforeApplicationDestroyed(function () use ($root) {
             (new Filesystem)->deleteDirectory($root);
         });

@@ -46,4 +46,6 @@ Follow the current [ordered development record](../development-order.md) for acc
 
 [D-15](D-15-test-payment-processing.md) records merged PR #63: durable receipt processing and authoritative test-payment verification, accepted after full CI and two independent Codex reviews.
 
-[D-16](D-16-test-payment-finalization.md) defines the current local/testing finalization candidate: immutable paid/exception effects, complete historical verification, unique grants with frozen render input, pending exact-asset entitlements/outbox and read-only customer status. Its final CI/review is separate; WP-08 buyer PDFs, activation and downloads remain pending.
+[D-16](D-16-test-payment-finalization.md) records merged PR #64 local/testing finalization: immutable paid/exception effects, complete historical verification, unique grants with frozen render input, pending exact-asset entitlements/outbox and read-only customer status. Its full CI and two independent source reviews are accepted at main `69b28a9`; WP-08 buyer-PDF candidate acceptance, activation and downloads remain pending.
+
+[D-17](D-17-test-contract-issuance.md) defines the dependent WP-08 private test-contract issuance candidate: pinned offline profile, immutable originals, recoverable rendering work and contract status. PR #64 has satisfied its prerequisite acceptance; this candidate still needs its own runtime CI and review before guarded entitlement activation and owner-authorized downloads.
