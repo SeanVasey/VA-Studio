@@ -1,6 +1,6 @@
 # D-13 — Prepare private orders and bind retained assent to attempts
 
-Status: implementation candidate, 2026-09-24. Actual CI and independent review belong to the integrating PR. This is partial WP-07 delivery under Sean's continuous-development authorization.
+Status: merged and verified in PR #52, main `5e53c2cc57938bfc1b55bfdff4d8b22c1c70fb08`; status updated 2026-09-26. Acceptance: 797 MySQL tests / 6,396 assertions; 745 SQLite tests / 5,303 assertions and 52 intentional skips; 91 frontend tests; 10 browser cases; all CI/build/audit and independent-review gates passed. This remains partial WP-07 delivery under Sean's continuous-development authorization.
 
 Merged PR #51 supplies exclusive selection/disclosure/pricing and atomic scoped inventory. The next coherent prerequisite is a server-reproduced test order review, explicit assent to its exact hash, immutable encrypted order/line evidence and one atomic promotion/inventory attempt binding.
 
@@ -8,6 +8,6 @@ Use an explicit policy absent by default and accepted only in local/testing. Req
 
 One owner-scoped idempotency key resolves to one request and order. Exact retries and owned recovery verify retained evidence before consulting today's availability, so ordinary expiry or policy/publication changes do not destroy access to the preparation record. Fresh creation retains the existing lock order and commits its order, lines, audit and same-UUID pending resource bindings together. A failed or expired preparation leaves none of those partial effects.
 
-Current reads require the retained inventory/promotion bindings to remain pending. The next terminal-state implementation must extend this historical verifier before adding sold/redeemed/released transitions. Hosted Stripe test sessions, authoritative payment validation, durable processing/reconciliation and terminal business effects remain next, followed by WP-08 contracts/entitlements.
+Current reads require the retained inventory/promotion bindings to remain pending. The next terminal-state implementation must extend this historical verifier before adding sold/redeemed/released transitions. [D-14](D-14-hosted-test-checkout.md) now defines the separate hosted test-session candidate. Authoritative PaymentIntent validation, durable inbox processing and terminal business effects remain subsequent work, followed by WP-08 contracts/entitlements.
 
-The [implementation contract](../order-preparation.md) documents HTTP, privacy, schema, retries, verification and rollback. `/checkout` remains 503; no provider session, payment, grant or entitlement is created. U-04/U-05/U-07/U-08 and the production/cutover gates remain unresolved for their relevant scope.
+The [implementation contract](../order-preparation.md) documents HTTP, privacy, schema, retries, verification and rollback. The preparation increment itself creates no provider session, payment, grant or entitlement; legacy `/checkout` remains 503. D-14 adds distinct owned test-session routes without verified payment effects. U-04/U-05/U-07/U-08 and the production/cutover gates remain unresolved for their relevant scope.

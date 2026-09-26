@@ -1,6 +1,6 @@
 # [WP-07] Hosted checkout, durable payment inbox and idempotent finalization
 
-Status: **Stripe test-event receipt prerequisite implemented; private test order preparation is the current implementation candidate. The broader work package and issue #7 remain open.** Hosted sessions and verified payment/terminal business effects remain dependent work. This issue is complete only when the acceptance evidence below exists.
+Status: **Stripe test-event receipts and private test order preparation are merged; hosted test sessions/manual reconciliation are the current implementation candidate. The broader work package and issue #7 remain open.** Authoritative PaymentIntent verification, inbox processing, terminal business effects and grants remain dependent work. This issue is complete only when the acceptance evidence below exists.
 
 - Suggested issue title: `[WP-07] Hosted checkout, durable payment inbox and idempotent finalization`
 - Phase: 2
@@ -26,13 +26,19 @@ This historical receipt prerequisite precedes the accepted WP-06 integration. Th
 
 ### Order preparation prerequisite — 2026-09-24
 
-After merged PR #51, the current candidate adds [test order preparation](../order-preparation.md) under [D-13](../architecture/D-13-order-preparation.md): owner-checked complete review and affirmative assent, encrypted immutable order/line evidence and one atomic pending inventory/promotion attempt. It preserves legacy snapshots/attempts, rejects client totals, keeps buyer identity unverified and infers no marketing consent. Fresh preparation requires an explicit local/testing policy absent by default, existing fixed test tax and valid scoped inventory. Private canonical capture is bounded to 16 MiB.
+Merged PR #52, following PR #51, adds [test order preparation](../order-preparation.md) under [D-13](../architecture/D-13-order-preparation.md): owner-checked complete review and affirmative assent, encrypted immutable order/line evidence and one atomic pending inventory/promotion attempt. It preserves legacy snapshots/attempts, rejects client totals, keeps buyer identity unverified and infers no marketing consent. Fresh preparation requires an explicit local/testing policy absent by default, existing fixed test tax and valid scoped inventory. Private canonical capture is bounded to 16 MiB.
 
-The storefront renders all frozen terms and amounts before assent, fixes the body/key during uncertain-result retry and requires renewed assent after recognized validation or stale-review rejection. It persists only bounded opaque recovery locators, never buyer details or order request bodies/keys. Owned status recovery remains separate from fresh preparation, including after expiry or policy withdrawal. Identical owner-scoped retries remain possible after quote expiry or current policy/publication changes. `/checkout` stays 503: no provider session, payment, grant, contract or entitlement is created.
+The storefront renders all frozen terms and amounts before assent, fixes the body/key during uncertain-result retry and requires renewed assent after recognized validation or stale-review rejection. It persists only bounded opaque recovery locators, never buyer details or order request bodies/keys. Owned status recovery remains separate from fresh preparation, including after expiry or policy withdrawal. Identical owner-scoped retries remain possible after quote expiry or current policy/publication changes. The preparation increment creates no provider session, payment, grant, contract or entitlement. Legacy `/checkout` stays 503; the later hosted candidate uses distinct owned order routes.
 
-The integrating PR records the actual final candidate, MySQL/SQLite and frontend/browser outcomes, privacy/rollback/race coverage and independent review. Test definitions or this status text do not establish passing verification. The broad acceptance checklist below remains open.
+PR #52 merged at `5e53c2cc57938bfc1b55bfdff4d8b22c1c70fb08` with 797 MySQL tests / 6,396 assertions, 745 SQLite tests / 5,303 assertions and 52 intentional skips, 91 frontend tests, 10 browser cases, all build/audit gates and independent review. The broad acceptance checklist below remains open.
 
-Next dependency: create/reconcile hosted Stripe test sessions with stable provider idempotency outside database locks; add durable inbox processing/recoverable dispatch and authoritative account/mode/object/amount/currency/tax validation. Implement verified terminal inventory/promotion effects, idempotent paid/grant effects or `paid_exception` and the agreed WP-08 grant/render interface. **The current historical order verifier requires pending resource bindings; extend/version it before terminal transitions so original order evidence stays readable.**
+### Hosted test-session candidate — 2026-09-26
+
+[Hosted test checkout](../hosted-test-checkout.md) and [D-14](../architecture/D-14-hosted-test-checkout.md) define the current candidate. Explicit local/testing policy freezes a 60-minute expiry, 15-minute retry window, post-discount fixed-zero-test-tax mapping and retained pending resources. One encrypted durable request is committed before provider I/O, using the same exact idempotency key for concurrent retries. Encrypted session bindings and append-only observations reject terminal regressions; owner GET/return reads do not mutate, and explicit POST/console reconciliation handles uncertainty. There is no dispatch lease or automatic queue. Default console scanning covers only still-retryable unknown intents; aged unknown outcomes require explicit verified session-locator recovery.
+
+The adapter/fixture and concurrency suites require executed final CI and independent review in the integrating PR. No actual Stripe request or production evidence is claimed. Order/checkout status remains payment-unverified after initiation even if a session observation says complete or paid.
+
+Next dependency after candidate acceptance: authoritative PaymentIntent verification, durable inbox processing/recoverable finalization and account/mode/object/amount/currency/tax validation. Implement verified terminal inventory/promotion effects, idempotent paid/grant effects or `paid_exception` and the agreed WP-08 grant/render interface. **The current historical order verifier requires pending resource bindings; extend/version it before terminal transitions so original order evidence stays readable.**
 
 ## Scope
 
@@ -66,6 +72,6 @@ Do not add secrets, private masters, unredacted orders, customer PII or real con
 
 Read [architecture index](../architecture/README.md), [decision register](../architecture/decision-register.md) and relevant source/brand evidence. Complete the first increment in a small PR, then split any remaining implementation into explicitly dependent issues. Preserve prior approvals and invariants; report unresolved provider/policy decisions without blocking unrelated reversible work.
 
-## Current sequencing — 2026-09-24
+## Current sequencing — 2026-09-26
 
-The [ordered status](../development-order.md) records accepted WP-06 PR #51 and the current private order/assent prerequisite. Continue hosted test checkout and verified terminal effects next, then WP-08 contracts/entitlements; keep unresolved production media/security/legal/tax/customer-recovery and launch gates explicit. This supersedes the September 9 pre-Stripe priority note without treating those external gates or broad package criteria as completed.
+The [ordered status](../development-order.md) records accepted WP-06 PR #51, merged order/assent PR #52 and the current hosted test-session candidate. Complete that candidate’s verification, then authoritative payment/inbox/finalization/grants with the historical verifier extension, followed by WP-08 contracts/entitlements; keep unresolved production media/security/legal/tax/customer-recovery and launch gates explicit. This supersedes the September 9 pre-Stripe priority note without treating those external gates or broad package criteria as completed.

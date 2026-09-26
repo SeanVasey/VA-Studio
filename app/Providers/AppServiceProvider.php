@@ -11,7 +11,11 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    public function register(): void {}
+    public function register(): void
+    {
+        $this->app->bind(\App\Domain\Commerce\Payments\StripeCheckoutGateway::class,
+            \App\Domain\Commerce\Payments\StripeSdkCheckoutGateway::class);
+    }
 
     public function boot(): void
     {

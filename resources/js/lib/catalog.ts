@@ -79,6 +79,7 @@ export interface StorefrontProps {
   catalogPage?: CatalogPage;
   designPreview?: boolean;
   testOrderPreparationEnabled?: boolean;
+  testCheckoutEnabled?: boolean;
   metadata?: PageMetadata;
 }
 
