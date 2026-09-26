@@ -516,10 +516,11 @@ class TestPaymentProcessingTest extends TestCase
     {
         $f = F::started($this->gateway);
         $this->assertSame(0, Artisan::call('vasey:reconcile-test-payments', ['intent' => $f['intent']->public_id]));
-        $this->assertStringContainsString('awaiting_finalization', Artisan::output());
+        $output = Artisan::output();
+        $this->assertStringContainsString('awaiting_finalization', $output);
         $this->assertDatabaseCount('verified_payments', 1); $this->assertDatabaseCount('stripe_webhook_receipts', 0);
-        $this->assertStringNotContainsString(F::PAYMENT, Artisan::output());
-        $this->assertStringNotContainsString(CheckoutFixtures::SESSION, Artisan::output());
+        $this->assertStringNotContainsString(F::PAYMENT, $output);
+        $this->assertStringNotContainsString(CheckoutFixtures::SESSION, $output);
     }
 
     public function test_reconciliation_cursor_can_pass_a_permanent_provider_failure_and_reach_later_work(): void
@@ -536,8 +537,9 @@ class TestPaymentProcessingTest extends TestCase
             return $secondSession;
         };
         $this->assertSame(0, Artisan::call('vasey:reconcile-test-payments', ['--limit' => '1']));
-        $this->assertStringContainsString($first['intent']->public_id.' retry', Artisan::output());
-        $this->assertStringContainsString('NEXT_AFTER='.$first['intent']->public_id, Artisan::output());
+        $output = Artisan::output();
+        $this->assertStringContainsString($first['intent']->public_id.' retry', $output);
+        $this->assertStringContainsString('NEXT_AFTER='.$first['intent']->public_id, $output);
         $this->assertDatabaseCount('verified_payments', 0);
         $this->assertSame(0, Artisan::call('vasey:reconcile-test-payments', ['--limit' => '1', '--after' => $first['intent']->public_id]));
         $this->assertStringContainsString($second['intent']->public_id.' awaiting_finalization', Artisan::output());
