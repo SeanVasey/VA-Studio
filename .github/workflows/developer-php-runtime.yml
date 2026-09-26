@@ -1,0 +1,114 @@
+name: Disposable developer PHP runtime
+
+on:
+  push:
+    branches: [work/dev-php-runtime]
+    paths:
+      - .github/workflows/developer-php-runtime.yml
+      - scripts/dev-runtime/**
+
+permissions:
+  contents: read
+
+jobs:
+  runtime:
+    if: github.repository == 'VASEYDEV/VASEYAUDIO' && github.ref == 'refs/heads/work/dev-php-runtime'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          path: kit
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: 5f660db780e58cae4d0b2b773d4b9a93390fcc92
+          path: source
+          persist-credentials: false
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl
+          coverage: none
+          tools: composer:v2
+      - name: Install packaging and PDF verification tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends patchelf qpdf poppler-utils zstd
+      - name: Install the exact lock without project scripts or plugins
+        working-directory: source
+        run: |
+          test "$(git rev-parse HEAD)" = 5f660db780e58cae4d0b2b773d4b9a93390fcc92
+          composer validate --strict
+          composer install --no-interaction --prefer-dist --no-scripts --no-plugins
+          composer check-platform-reqs
+          git diff --exit-code -- composer.json composer.lock
+      - name: Build and inspect the bounded runtime bundle
+        run: |
+          python3 kit/scripts/dev-runtime/test-install.py
+          python3 kit/scripts/dev-runtime/package.py --project source --output bundle --candidate 5f660db780e58cae4d0b2b773d4b9a93390fcc92
+          python3 kit/scripts/dev-runtime/install.py --parts bundle --destination verification --verify-only
+      - name: Retain manifest and installer
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: developer-php-runtime-manifest
+          path: |
+            bundle/manifest.json
+            kit/scripts/dev-runtime/install.py
+            kit/scripts/dev-runtime/README.md
+          compression-level: 0
+          retention-days: 3
+          if-no-files-found: error
+      - name: Retain runtime part 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: developer-php-runtime-01
+          path: bundle/part-01.bin
+          compression-level: 0
+          retention-days: 3
+          if-no-files-found: error
+      - name: Retain runtime part 2
+        if: hashFiles('bundle/part-02.bin') != ''
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: developer-php-runtime-02
+          path: bundle/part-02.bin
+          compression-level: 0
+          retention-days: 3
+          if-no-files-found: error
+      - name: Retain runtime part 3
+        if: hashFiles('bundle/part-03.bin') != ''
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: developer-php-runtime-03
+          path: bundle/part-03.bin
+          compression-level: 0
+          retention-days: 3
+          if-no-files-found: error
+      - name: Retain runtime part 4
+        if: hashFiles('bundle/part-04.bin') != ''
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: developer-php-runtime-04
+          path: bundle/part-04.bin
+          compression-level: 0
+          retention-days: 3
+          if-no-files-found: error
+      - name: Retain runtime part 5
+        if: hashFiles('bundle/part-05.bin') != ''
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: developer-php-runtime-05
+          path: bundle/part-05.bin
+          compression-level: 0
+          retention-days: 3
+          if-no-files-found: error
+      - name: Retain runtime part 6
+        if: hashFiles('bundle/part-06.bin') != ''
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: developer-php-runtime-06
+          path: bundle/part-06.bin
+          compression-level: 0
+          retention-days: 3
+          if-no-files-found: error
