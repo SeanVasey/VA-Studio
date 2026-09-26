@@ -13,7 +13,8 @@ class VerifiedMedia
         return $this->path($asset) !== null;
     }
 
-    public function path(MediaAsset $asset): ?string
+    /** Historical database evidence only: no private paths are opened and no integrity cache is consulted. */
+    public function evidence(MediaAsset $asset, bool $historical = false): ?array
     {
         try {
             if ($asset->status !== 'ready' || $asset->disk !== 'local' || ! $asset->verified_at || ! $asset->verified_by || ! $asset->parent_asset_id || ! $asset->processing_run_id || ! preg_match('~\Amedia/revisions/[a-f0-9-]{36}/(?:master\.wav|delivery\.mp3|preview\.mp3|artwork\.png|stems\.zip)\z~D', $asset->storage_path)) {
@@ -26,7 +27,7 @@ class VerifiedMedia
             }
             $scan = $run->evidence['source_scan'] ?? [];
             $engine = $scan['engine'] ?? null;
-            if (($scan['status'] ?? null) !== 'clean' || ! hash_equals($run->input_sha256, $scan['sha256'] ?? '') || ! ($engine === 'clamav' || ($engine === 'test-only' && app()->environment('testing')))) {
+            if (($scan['status'] ?? null) !== 'clean' || ! hash_equals($run->input_sha256, $scan['sha256'] ?? '') || ! ($engine === 'clamav' || ($engine === 'test-only' && ($historical || app()->environment('testing'))))) {
                 return null;
             }
             $expectedRoles = match ($source->role) {
@@ -49,11 +50,11 @@ class VerifiedMedia
             }
             if ($source->role === 'master_wav') {
                 $tagScan = $run->evidence['tag_scan'] ?? [];
-                if (($tagScan['status'] ?? null) !== 'clean' || ! hash_equals($run->profile['tag_sha256'] ?? '', $tagScan['sha256'] ?? '') || ! (($tagScan['engine'] ?? null) === 'clamav' || (($tagScan['engine'] ?? null) === 'test-only' && app()->environment('testing')))) {
+                if (($tagScan['status'] ?? null) !== 'clean' || ! hash_equals($run->profile['tag_sha256'] ?? '', $tagScan['sha256'] ?? '') || ! (($tagScan['engine'] ?? null) === 'clamav' || (($tagScan['engine'] ?? null) === 'test-only' && ($historical || app()->environment('testing'))))) {
                     return null;
                 }
             }
-            if ($source->role === 'stems_zip' && ! app(StemsArchive::class)->hasEvidence($asset->technical_metadata ?? [], $asset->sha256 ?? '', $run->profile)) {
+            if ($source->role === 'stems_zip' && ! app(StemsArchive::class)->hasEvidence($asset->technical_metadata ?? [], $asset->sha256 ?? '', $run->profile, $historical)) {
                 return null;
             }
             if ($asset->role === 'preview_tagged') {
@@ -62,6 +63,23 @@ class VerifiedMedia
                     return null;
                 }
             }
+            $identity = fn (MediaAsset $item) => $item->only(['id', 'track_id', 'role', 'disk', 'storage_path', 'original_name',
+                'mime_type', 'size_bytes', 'sha256', 'status', 'parent_asset_id', 'processing_run_id', 'verified_by', 'technical_metadata'])
+                + ['verified_at' => $item->verified_at?->toISOString()];
+
+            return ['asset' => $identity($asset), 'source' => $identity($source),
+                'run' => $run->only(['id', 'source_asset_id', 'status', 'input_sha256', 'profile', 'profile_fingerprint', 'output_asset_ids', 'evidence'])
+                    + ['completed_at' => $run->completed_at?->toISOString()],
+                'outputs' => $outputs->sortBy('id')->values()->map($identity)->all()];
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    public function path(MediaAsset $asset): ?string
+    {
+        try {
+            if ($this->evidence($asset) === null) { return null; }
             $path = app(PrivateMediaFiles::class)->resolve($asset->storage_path);
             if (! app(MediaIntegrity::class)->matches($asset, $path)) {
                 return null;
