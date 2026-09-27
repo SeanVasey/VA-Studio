@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { TestCheckout } from '../../resources/js/components/TestCheckout';
 
+vi.mock('../../resources/js/components/TestOwnerDelivery', () => ({ TestOwnerDelivery: ({ orderId }: { orderId: string }) => <div data-testid="test-owner-delivery" data-order-id={orderId}>Separate test downloads</div> }));
+
 const orderId = '73000000-0000-4000-8000-000000000001';
 const checkoutId = '73000000-0000-4000-8000-000000000002';
 const checkoutUrl = 'https://checkout.stripe.com/c/pay/cs_test_SyntheticOnly';
@@ -30,7 +32,7 @@ describe('hosted Stripe test checkout', () => {
   it.each([
     ['awaiting_finalization', 'not_started', 'not_started', 'Order finalization is pending.'],
     ['paid', 'pending', 'pending_contracts', 'Contracts are pending;'],
-    ['paid', 'issued', 'pending_activation', 'Test contracts have been issued. Delivery is pending;'],
+    ['paid', 'issued', 'pending_activation', 'Test contracts have been issued. Check the separate test downloads panel'],
     ['paid', 'attention', 'blocked', 'Contract preparation needs attention.'],
     ['paid_exception', 'blocked', 'blocked', 'This order needs review'],
   ])('shows verified %s without payment actions, fulfillment claims or private evidence', async (finalizationStatus, contractStatus, fulfillmentStatus, copy) => {
@@ -42,6 +44,7 @@ describe('hosted Stripe test checkout', () => {
     render(<TestCheckout orderId={orderId} enabled />);
     expect(await screen.findByRole('status')).toHaveTextContent(copy);
     expect(screen.getByRole('status')).toHaveTextContent('Test payment verified');
+    expect(screen.queryByTestId('test-owner-delivery') !== null).toBe(contractStatus === 'issued');
     expect(screen.queryByRole('link', { name: 'Continue to Stripe test checkout' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Open Stripe|Retry Stripe|Check Stripe/ })).not.toBeInTheDocument();
     expect(screen.queryByText(/license granted|download ready|pi_PRIVATE|PRIVATE_FAILURE_REASON|private@example/i)).not.toBeInTheDocument();
@@ -69,8 +72,8 @@ describe('hosted Stripe test checkout', () => {
     await user.click(screen.getByRole('button', { name: 'Refresh test order status' }));
     expect(screen.getByRole('status')).toHaveTextContent('Contracts are pending;');
     await user.click(screen.getByRole('button', { name: 'Refresh test order status' }));
-    expect(screen.getByRole('status')).toHaveTextContent('Test contracts have been issued. Delivery is pending;');
-    expect(screen.getByRole('status')).toHaveTextContent('contracts and downloads are not available here yet');
+    expect(screen.getByRole('status')).toHaveTextContent('Test contracts have been issued. Check the separate test downloads panel');
+    expect(screen.getByRole('status')).toHaveTextContent('current availability');
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
     expect(screen.queryByText(/PRIVATE_BUYER|private.invalid|secret.pdf|refund/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Open Stripe|Retry Stripe|Check Stripe/ })).not.toBeInTheDocument();

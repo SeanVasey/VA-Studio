@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\TestCheckoutController;
+use App\Http\Controllers\TestOwnerDeliveryController;
 use App\Http\Controllers\PublicMediaController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\StorefrontController;
@@ -30,6 +31,9 @@ Route::withoutMiddleware(HandleInertiaRequests::class)->group(function (): void 
     Route::post('/orders/{order}/checkout', [TestCheckoutController::class, 'start'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.checkout');
     Route::get('/orders/{order}/checkout', [TestCheckoutController::class, 'status'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.checkout-status');
     Route::post('/orders/{order}/checkout/reconcile', [TestCheckoutController::class, 'reconcile'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.checkout-reconcile');
+    Route::get('/orders/{order}/delivery', [TestOwnerDeliveryController::class, 'show'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.delivery');
+    Route::post('/orders/{order}/delivery/authorizations', [TestOwnerDeliveryController::class, 'issue'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.delivery-authorizations');
+    Route::post('/orders/{order}/delivery/download', [TestOwnerDeliveryController::class, 'download'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.delivery-download');
 });
 Route::get('/orders/{order}/checkout/return', [TestCheckoutController::class, 'returned'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.checkout-return');
 Route::post('/checkout', fn () => response()->json([

@@ -103,6 +103,7 @@ test('contract progress stays read-only and never offers another payment or an u
       const serialized = JSON.stringify(payload).replaceAll('<', '\\u003c');
       return route.fulfill({ contentType: 'text/html', body: shell.replace(pageScript, (_match, opening, _old, closing) => opening + serialized + closing) });
     }
+    if (url.pathname === `/orders/${orderId}/delivery`) return route.fulfill({ json: { delivery: { deliverySchema: 1, orderId, testOnly: true, status: 'unavailable', items: [], history: [], historyLimit: 20, historyHasMore: false } } });
     if (url.pathname !== path) return route.continue();
     requests.push(request.method());
     return route.fulfill({ json: { checkout: {
@@ -119,8 +120,8 @@ test('contract progress stays read-only and never offers another payment or an u
   await expect(status).toContainText('Contract preparation needs attention.');
   await expect(status).toContainText('Do not start another payment.');
   await refresh.press('Enter');
-  await expect(status).toContainText('Test contracts have been issued. Delivery is pending;');
-  await expect(status).toContainText('contracts and downloads are not available here yet.');
+  await expect(status).toContainText('Test contracts have been issued. Check the separate test downloads panel');
+  await expect(status).toContainText('current availability.');
   await expect(status.getByRole('link')).toHaveCount(0);
   await expect(status.getByRole('button', { name: /Open Stripe|Retry Stripe|Check Stripe/ })).toHaveCount(0);
   expect(requests).toEqual(['GET', 'GET', 'GET']);

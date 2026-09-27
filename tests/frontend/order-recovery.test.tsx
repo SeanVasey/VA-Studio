@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import Storefront from '../../resources/js/Pages/Storefront';
@@ -14,7 +14,7 @@ describe('storefront durable order recovery', () => {
   it.each([
     ['prepared', 'awaiting_finalization', 'not_started', 'not_started', 'Order finalization is pending.'],
     ['paid', 'paid', 'pending', 'pending_contracts', 'Contracts are pending;'],
-    ['paid', 'paid', 'issued', 'pending_activation', 'Test contracts have been issued. Delivery is pending;'],
+    ['paid', 'paid', 'issued', 'pending_activation', 'Test contracts have been issued. Check the separate test downloads panel'],
     ['paid', 'paid', 'attention', 'blocked', 'Contract preparation needs attention.'],
     ['paid_exception', 'paid_exception', 'blocked', 'blocked', 'This order needs review'],
   ])('recovers a verified %s order despite an unavailable checkout read', async (status, finalizationStatus, contractStatus, fulfillmentStatus, copy) => {
@@ -25,7 +25,7 @@ describe('storefront durable order recovery', () => {
     render(<Storefront tracks={[]} licenseTiers={[]} testCheckoutEnabled />);
     await user.click(screen.getByRole('button', { name: 'Open cart, 0 items' }));
     expect(await screen.findByText('TEST ORDER STATUS')).toBeInTheDocument();
-    expect(await screen.findByRole('alert')).toHaveTextContent('previously verified test payment remains recorded');
+    expect(await within(screen.getByRole('region', { name: 'Stripe test checkout' })).findByRole('alert')).toHaveTextContent('previously verified test payment remains recorded');
     expect(screen.getByText(new RegExp(copy))).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Continue to Stripe test checkout' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Open Stripe|Retry Stripe|Check Stripe|Prepare test order/ })).not.toBeInTheDocument();

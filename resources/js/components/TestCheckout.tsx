@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { formatMoney } from '../lib/catalog';
+import { TestOwnerDelivery } from './TestOwnerDelivery';
 
 export interface PaymentProgress {
   paymentStatus: 'not_started' | 'not_verified' | 'verified';
@@ -68,7 +69,7 @@ const verifiedDescriptions = {
 };
 const contractDescriptions = {
   pending: 'Test payment verified and order finalized. Contracts are pending; download access is not available yet.',
-  issued: 'Test payment verified and order finalized. Test contracts have been issued. Delivery is pending; contracts and downloads are not available here yet.',
+  issued: 'Test payment verified and order finalized. Test contracts have been issued. Check the separate test downloads panel for current availability.',
   attention: 'Test payment verified and order finalized. Contract preparation needs attention. Delivery is blocked; contracts and downloads are not available. Do not start another payment.',
 };
 function verifiedDescription(progress: PaymentProgress): string {
@@ -162,7 +163,7 @@ function Checkout({ orderId, enabled = false, expectedTotalMinor, retainedProgre
   // URLs stay only in this component's memory and disappear while an observation is uncertain or expired.
   const link = !verified && status?.status === 'open' && status.url && !busy && !message && !uncertain && !rejected && !expired && Date.parse(status.expiresAt!) > Date.now() ? status.url : null;
   const retry = !verified && !rejected && (uncertain === 'create' || status?.status === 'pending');
-  return <section className="quote-review" aria-label="Stripe test checkout" aria-busy={busy}>
+  return <><section className="quote-review" aria-label="Stripe test checkout" aria-busy={busy}>
     <h3>STRIPE TEST CHECKOUT</h3>
     <p className="checkout-advisory">{verified ? 'Test mode only. This status does not make contracts or downloads available.' : 'Test mode only. This page does not verify payment, issue a license or grant download access.'}</p>
     {verified && <p role="status">{verifiedDescription(progress)}</p>}
@@ -180,5 +181,7 @@ function Checkout({ orderId, enabled = false, expectedTotalMinor, retainedProgre
     {verified && <button type="button" className="button button-outline full-width" disabled={busy} onClick={() => void request('read')}>Refresh test order status</button>}
     {!verified && (!status || message) && <button type="button" className="button button-outline full-width" disabled={busy} onClick={() => void request('read')}>{busy && !status ? 'Loading checkout status…' : 'Reload checkout status'}</button>}
     {!verified && status?.status === 'not_started' && !enabled && !uncertain && <p className="fine-print">Starting a new Stripe test checkout is currently unavailable.</p>}
-  </section>;
+  </section>
+    {verified && progress.finalizationStatus === 'paid' && progress.contractStatus === 'issued' && <TestOwnerDelivery orderId={orderId} />}
+  </>;
 }
