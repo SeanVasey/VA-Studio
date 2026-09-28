@@ -2,15 +2,17 @@
 
 namespace App\Support;
 
+use App\Domain\SiteBuilder\SiteContentSchema;
 use Illuminate\Support\Str;
 
 /** Metadata accepts only the already eligible, public catalog projection. */
 final class StorefrontMetadata
 {
-    public function forPage(?array $track): array
+    public function forPage(?array $track, ?array $siteContent = null): array
     {
-        $title = 'VASEY.AUDIO — Sound with intent';
-        $description = 'Original music, beats and sound design by Sean Vasey. Explore the VASEY.AUDIO catalog and listen to published previews.';
+        $siteContent ??= SiteContentSchema::defaults();
+        $title = $this->text($siteContent['seo']['title'], 120);
+        $description = $this->text($siteContent['seo']['description'], 300);
         $path = route('home', [], false);
         $imagePath = '/images/storefront-hero.jpg';
         $imageAlt = 'VASEY.AUDIO studio and audio production artwork';

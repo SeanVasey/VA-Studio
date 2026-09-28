@@ -47,3 +47,12 @@ Do not add secrets, private masters, unredacted orders, customer PII or real con
 > Implement WP-09 as a usable seller publishing workflow. Keep content releases distinct from transaction history, connect promotions to server rules and create real share metadata. Work in reviewable increments and do not send marketing messages as part of testing.
 
 Read [architecture index](../architecture/README.md), [decision register](../architecture/decision-register.md) and relevant source/brand evidence. Complete the first increment in a small PR, then split any remaining implementation into explicitly dependent issues. Preserve prior approvals and invariants; report unresolved provider/policy decisions without blocking unrelated reversible work.
+
+
+## First CMS slice — September 28, 2026
+
+Candidate implementation: [site content/releases](../site-content-releases.md), [D-21](../architecture/D-21-site-content-releases.md). This adds immutable plain-text home/studio/footer/navigation/SEO snapshots, private staff previews, atomic publication and rollback with original-baseline retention. Drafts cannot change live text; purchase/provider/rights records are outside these commands. Existing theme artwork and identity remain fixed.
+
+Local integrated CMS checks: 24 passed /229 assertions and two intentional MySQL-only skips. MySQL contention and actual browser publish/preview/rollback remain CI gates; independent domain review accepted the component, while final integrated review and required CI remain pending. Exact final source/run/merge disposition belongs in the integrating PR. This broad work package remains open.
+
+The first slice deliberately precedes the promotion editor; existing track sharing metadata remains available. Next implement promotion administration using the accepted server currency/limits/inventory rules, then persisted contact/about/blog/video, editable asset references and scheduling. Free-download consent and business-resolution/support workflows remain separate domain-dependent work. Do not close the original acceptance checklist from this slice.

@@ -1,3 +1,5 @@
+import type { SiteContent } from './site-content';
+
 export interface Offer {
   id: string;
   licenseVersionId: string;
@@ -78,6 +80,8 @@ export interface StorefrontProps {
   selectedTrack?: Track | null;
   catalogPage?: CatalogPage;
   designPreview?: boolean;
+  sitePreview?: boolean;
+  siteContent?: SiteContent;
   testOrderPreparationEnabled?: boolean;
   testCheckoutEnabled?: boolean;
   metadata?: PageMetadata;

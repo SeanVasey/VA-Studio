@@ -1,8 +1,16 @@
 # Ordered development status
 
-Reconciled 2026-09-27 after merged private test-contract issuance (#65), read-only staff operations (#66), whole-order activation (#67), CI trigger efficiency (#68), internal delivery (#69) and status documentation (#70). Main `1a6ecebd` passed [CI 36280010722](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36280010722). The current dependent [D-20 owner HTTP/UI candidate](test-owner-delivery-http.md) is implemented and still requires its own final integrated CI and independent review; its guide distinguishes executed component checks from pending HTTP/browser acceptance. Synthetic fixtures do not establish an actual Stripe transaction.
+Reconciled 2026-09-28. Main `1a6ecebd` contains accepted originals, activation and internal delivery. PR #71 implements the owner HTTP/UI boundary; its corrected head `fe0fec46` (tree `242fe6c0a4fb666d15dd96289c205d49f9b677ee`) is under final CI after clock-skew and browser-fixture corrections. The next dependent source implements the first WP-09 CMS slice described below. These are candidate implementations until their linked PRs pass all required checks and review; no production activation or actual provider transaction is claimed.
 
 ## Current increment and next handoff
+
+### Current candidate sequence — September 28
+
+1. Accept [PR #71](https://github.com/VASEYDEV/VASEYAUDIO/pull/71) only after corrected [CI 36469253751](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36469253751) passes. Independent source review accepted exact tree `242fe6c0`; the earlier run's WebKit fixture failure is retained in the [delivery verification guide](test-owner-delivery-http.md#resumed-review--2026-09-28). No branch or gate is skipped.
+2. Review this dependent [D-21 CMS slice](site-content-releases.md): typed home/studio/navigation/footer/SEO text, immutable private drafts/copies, authenticated preview without purchase controls, atomic publication and rollback, including the retained original site baseline. It adds no provider or payment capability. Its own MySQL/SQLite/browser/build/audit checks and integrated independent review are required before merge.
+3. Next WP-09 scope: promotion administration over the accepted currency/limits/inventory services, followed by persisted contact/about/blog/video content, asset references and scheduling with their own tests. Guest/account recovery, the complete cross-order library, verified financial exception/refund/dispute resolution, other products, memberships, source migration and production readiness remain open.
+
+The dated entries below retain earlier acceptance evidence. Their prior “next” wording is historical and superseded by this sequence.
 
 PRs #27–#33, #39–#44, #48–#52 and #61–#70 are merged. [PR #44](https://github.com/VASEYDEV/VASEYAUDIO/pull/44) merged shared rights inventory on September 17. Its accepted candidate `a9dc1704c45ce1e728269d5a6df145bd33b1eaeb` passed 642 MySQL tests / 4,771 assertions, 616 SQLite tests / 4,140 assertions with 26 intentional MySQL-only skips, 55 frontend tests, 8 browser cases, build/audits and the source review recorded in the PR. The former “current candidate” wording was stale, not missing implementation.
 
