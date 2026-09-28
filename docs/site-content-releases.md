@@ -1,6 +1,6 @@
 # Site content releases
 
-Status: **WP-09 candidate, pending integrated tests and independent review.** [D-21](architecture/D-21-site-content-releases.md) defines the decision and security boundary. The [ordered development record](development-order.md) records actual prerequisite acceptance, executed checks and the next handoff.
+Status: **WP-09 candidate; independent source review accepted, full CI pending.** [D-21](architecture/D-21-site-content-releases.md) defines the decision and security boundary. The [ordered development record](development-order.md) records exact candidates, pending prerequisite acceptance, executed checks and the next handoff. Source review does not establish merge or runtime acceptance.
 
 The CMS saves homepage copy as private immutable drafts. Publishing selects one complete saved version for the public homepage. Saving or previewing a draft does not change the live selection. Track/catalog publication, license offers, payments and customer rights are separate workflows.
 
