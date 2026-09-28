@@ -8,11 +8,13 @@ use App\Domain\SiteBuilder\SiteContent;
 use App\Domain\SiteBuilder\SiteContentSchema;
 use App\Filament\Resources\SiteReleaseResource;
 use App\Filament\Resources\SiteReleaseResource\Pages\ListSiteReleases;
+use App\Http\Middleware\HandleInertiaRequests;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use Filament\Facades\Filament;
 use Filament\Pages\Dashboard;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\TestResponse;
 use Livewire\Livewire;
@@ -50,6 +52,14 @@ class SiteContentHttpTest extends TestCase
         return route('filament.admin.site-releases.preview', $release);
     }
 
+    private function inertiaHeaders(): array
+    {
+        return [
+            'X-Inertia' => 'true',
+            'X-Inertia-Version' => (string) app(HandleInertiaRequests::class)->version(Request::create('/')),
+        ];
+    }
+
     private function assertPrivatePreview(TestResponse $response): void
     {
         $response->assertHeader('Cache-Control', 'no-store, private')
@@ -64,7 +74,7 @@ class SiteContentHttpTest extends TestCase
             $this->get($url)->assertOk()->assertDontSee('UNPUBLISHED SYNTHETIC', false)
                 ->assertDontSee($release->content_hash, false)->assertDontSee($release->label, false);
         }
-        $this->get('/', ['X-Inertia' => 'true'])->assertOk()
+        $this->get('/', $this->inertiaHeaders())->assertOk()
             ->assertJsonPath('props.siteContent.hero.title', 'SOUND')
             ->assertJsonPath('props.metadata.title', 'VASEY.AUDIO — Sound with intent');
         $this->assertSame(0, SitePublication::findOrFail(1)->revision);
@@ -79,7 +89,7 @@ class SiteContentHttpTest extends TestCase
         $draft = $this->release('PRIVATE SYNTHETIC', $actor);
         $audits = AuditEvent::count();
         $this->actingAs($actor);
-        foreach ([[], ['X-Inertia' => 'true']] as $headers) {
+        foreach ([[], $this->inertiaHeaders()] as $headers) {
             $response = $this->get($this->previewUrl($draft), $headers)->assertOk();
             $this->assertPrivatePreview($response);
             $response->assertDontSee($draft->content_hash, false)->assertDontSee($draft->label, false);
@@ -92,7 +102,7 @@ class SiteContentHttpTest extends TestCase
                     ->assertJsonPath('props.metadata.robots', 'noindex, nofollow');
             }
         }
-        $public = $this->get('/', ['X-Inertia' => 'true'])->assertOk();
+        $public = $this->get('/', $this->inertiaHeaders())->assertOk();
         $this->assertEquals($active->content, $public->json('props.siteContent'));
         $public->assertDontSee('PRIVATE SYNTHETIC', false);
         $this->assertSame(1, SitePublication::findOrFail(1)->revision);
@@ -162,16 +172,16 @@ class SiteContentHttpTest extends TestCase
         $second = $this->release('SECOND PUBLIC', $actor);
         $selection = QuoteFixtures::selection();
         $trackUrl = '/tracks/'.$selection['track']->slug;
-        $originalTrackMetadata = $this->get($trackUrl, ['X-Inertia' => 'true'])->assertOk()->json('props.metadata');
+        $originalTrackMetadata = $this->get($trackUrl, $this->inertiaHeaders())->assertOk()->json('props.metadata');
         foreach ([['publish', $first], ['publish', $second], ['rollback', $first]] as $index => [$operation, $release]) {
             $site->{$operation}($release->id, $index, $actor);
-            $home = $this->get('/', ['X-Inertia' => 'true'])->assertOk();
+            $home = $this->get('/', $this->inertiaHeaders())->assertOk();
             $this->assertEquals($release->content, $home->json('props.siteContent'));
             $home->assertJsonPath('props.metadata.title', $release->content['seo']['title'])
                 ->assertJsonPath('props.metadata.description', $release->content['seo']['description'])
                 ->assertJsonPath('props.metadata.canonicalUrl', 'https://audio.example.test/');
             $this->get('/')->assertOk()->assertSee('<title data-inertia="title">'.$release->content['seo']['title'].'</title>', false);
-            $track = $this->get($trackUrl, ['X-Inertia' => 'true'])->assertOk();
+            $track = $this->get($trackUrl, $this->inertiaHeaders())->assertOk();
             $this->assertEquals($release->content, $track->json('props.siteContent'));
             $this->assertSame($originalTrackMetadata, $track->json('props.metadata'));
             $this->assertSame($selection['revision']->id, $selection['offer']->fresh()->current_revision_id);

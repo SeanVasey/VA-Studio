@@ -10,6 +10,7 @@ async function confirm(page: Page, label: string, action: 'Publish release' | 'R
 }
 
 test('private draft preview, publication, immutable copy and rollback preserve the active site', async ({ page, context, playwright }, testInfo) => {
+  test.setTimeout(120_000);
   const failures: string[] = [];
   page.on('pageerror', error => failures.push(error.message));
   await page.goto('/admin/login');
@@ -38,6 +39,7 @@ test('private draft preview, publication, immutable copy and rollback preserve t
     expect([302, 403]).toContain(denied.status());
     expect(await denied.text()).not.toContain(firstHeading);
     const preview = await context.newPage();
+    preview.on('pageerror', error => failures.push(error.message));
     const previewResponse = await preview.goto(previewUrl!);
     expect(previewResponse?.headers()['cache-control']).toContain('no-store');
     expect(previewResponse?.headers()['x-robots-tag']).toContain('noindex');
@@ -56,6 +58,21 @@ test('private draft preview, publication, immutable copy and rollback preserve t
     await expect(row(page, secondLabel).getByText('Private draft', { exact: true })).toBeVisible();
     expect(await (await visitor.get('/')).text()).toContain(firstHeading);
     expect(await (await visitor.get('/')).text()).not.toContain(secondHeading);
+    // Keep one confirmation open while another editor changes the active publication.
+    await row(page, secondLabel).getByRole('button', { name: 'Publish release', exact: true }).click();
+    const secondEditor = await context.newPage();
+    secondEditor.on('pageerror', error => failures.push(error.message));
+    await secondEditor.goto('/admin/site-releases');
+    await confirm(secondEditor, 'Original site content', 'Restore previous release');
+    await page.getByRole('alertdialog', { name: 'Publish release', exact: true }).getByRole('button', { name: 'Confirm', exact: true }).click();
+    await expect(page.getByText('Publication blocked', { exact: true })).toBeVisible();
+    await expect(page.getByText(/The published site changed/)).toBeVisible();
+    const afterConflict = await (await visitor.get('/')).text();
+    expect(afterConflict).not.toContain(firstHeading); expect(afterConflict).not.toContain(secondHeading);
+    await secondEditor.close();
+    await page.bringToFront();
+    await expect(page.getByRole('alertdialog', { name: 'Publish release', exact: true })).not.toBeVisible();
+    // A fresh confirmation can deliberately publish the unchanged private snapshot.
     await confirm(page, secondLabel, 'Publish release');
     expect(await (await visitor.get('/')).text()).toContain(secondHeading);
     await confirm(page, firstLabel, 'Restore previous release');
