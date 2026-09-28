@@ -23,7 +23,7 @@ export default defineConfig({
     { name: 'webkit-mobile', use: { ...devices['iPhone 13'], browserName: 'webkit' } },
   ],
   webServer: {
-    command: 'php artisan serve --host=127.0.0.1 --port=8173 --no-reload',
+    command: 'php -S 127.0.0.1:8173 -t public tests/browser/server.php',
     url: 'http://127.0.0.1:8173/up',
     reuseExistingServer: false,
     timeout: 30_000,
