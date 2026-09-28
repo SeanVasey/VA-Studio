@@ -118,7 +118,6 @@ describe('test owner delivery transport and controls', () => {
   });
 
   it.each([
-    ['expired', { expiresAt: utc(new Date(now().getTime() - 1000)) }], ['future', { expiresAt: utc(new Date(now().getTime() + 600_000)) }],
     ['token shape', { token: 'secret?url' }], ['wrong file', { filename: '../private.pdf' }], ['wrong grant', { filename: `${orderId}-contract.pdf` }],
     ['wrong MIME', { mimeType: 'text/html' }], ['extra metadata', { privatePath: 'PRIVATE' }], ['invalid time', { expiresAt: '2026-02-30T00:00:00Z' }],
   ])('rejects %s issuance without streaming and preserves the operation for an explicit retry', async (_name, change) => {
@@ -202,9 +201,11 @@ describe('bounded delivery schema', () => {
     ['history bound', { historyLimit: 21 }], ['invalid more flag', { historyHasMore: true }],
   ])('rejects %s', (_name, change) => expect(validDelivery(listing(change), orderId)).toBe(false));
 
-  it('checks authorization expiry at the boundary without treating client validation as entitlement', () => {
-    expect(validAuthorization(authorization(), item(), now().getTime())).toBe(true);
-    expect(validAuthorization(authorization(), item(), now().getTime() + 60_000)).toBe(false);
+  it.each([-600_000, -10_000, 0, 60_000, 600_000])('leaves expiry to server redemption when the browser clock differs by %s ms', offset => {
+    const serverNow = now().getTime();
+    const response = authorization();
+    vi.spyOn(Date, 'now').mockReturnValue(serverNow + offset);
+    expect(validAuthorization(response, item())).toBe(true);
   });
 
   it('stops reading an oversized body and refuses malformed JSON', async () => {

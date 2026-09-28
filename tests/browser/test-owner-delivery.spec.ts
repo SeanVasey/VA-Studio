@@ -1,5 +1,7 @@
-import { test, expect, type Page, type Route } from '@playwright/test';
+import { test as baseTest, expect, type Page, type Route } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
+import { createServer } from 'node:http';
+import type { AddressInfo } from 'node:net';
 
 /** Synthetic transport verifies built React, browser POST/download behavior and privacy in
  * Chromium/WebKit only. PHP feature/MySQL tests separately prove actual owner authorization,
@@ -12,6 +14,37 @@ const token = 'SYNTHETIC_BROWSER_ONLY_PRIVATE_TOKEN'.padEnd(43, '0');
 const path = `/orders/${orderId}/delivery`;
 const returnPath = '/synthetic-owner-delivery';
 const filename = `${grantId}-contract.pdf`;
+const fixtureBytes = '%PDF-1.4\nSYNTHETIC TEST ONLY\n%%EOF\n';
+interface AttachmentServer { url: string; received: string[] }
+const test = baseTest.extend<{ attachmentServer: AttachmentServer }>({
+  attachmentServer: async ({}, use) => {
+    const received: string[] = [];
+    // WebKit does not reliably expose downloads from route.fulfill (Playwright #22691).
+    // Serve actual HTTP attachment bytes while retaining the native POST and download assertions.
+    const server = createServer(async (request, response) => {
+      if (request.method !== 'POST' || request.url !== '/attachment') { response.writeHead(404).end(); return; }
+      if (request.headers['content-type'] !== 'application/x-www-form-urlencoded') { response.writeHead(415).end(); return; }
+      try {
+        const chunks: Buffer[] = []; let size = 0;
+        for await (const chunk of request) {
+          size += chunk.length;
+          if (size > 4096) { response.writeHead(413).end(); return; }
+          chunks.push(Buffer.from(chunk));
+        }
+        const body = Buffer.concat(chunks).toString('utf8'), fields = new URLSearchParams(body);
+        if (fields.size !== 3 || fields.get('authorizationId') !== authorizationId || fields.get('token') !== token
+          || !/^[A-Za-z0-9]{40}$/.test(fields.get('_token') ?? '')) { response.writeHead(422).end(); return; }
+        received.push(body);
+        response.writeHead(200, { 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="${filename}"`,
+          'Content-Length': Buffer.byteLength(fixtureBytes), 'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff' });
+        response.end(fixtureBytes);
+      } catch { if (!response.writableEnded) response.writeHead(400).end(); }
+    });
+    await new Promise<void>((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
+    try { await use({ url: `http://127.0.0.1:${(server.address() as AddressInfo).port}/attachment`, received }); }
+    finally { server.closeAllConnections(); await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve())); }
+  },
+});
 const utc = (time = Date.now()) => new Date(Math.floor(time / 1000) * 1000).toISOString().replace('.000Z', 'Z');
 const delivery = () => ({ deliverySchema: 1, orderId, testOnly: true, status: 'available',
   items: [{ grantId, kind: 'contract', filename, mimeType: 'application/pdf', sizeBytes: 32 }], history: [] as unknown[], historyLimit: 20, historyHasMore: false });
@@ -50,14 +83,13 @@ async function assertPrivate(page: Page) {
   await expect(page.locator('input[name="token"], form[action$="/delivery/download"]')).toHaveCount(0);
 }
 
-test('native attachment uses an exact CSRF-protected POST and reports attempts without claiming receipt', async ({ page }, testInfo) => {
+test('native attachment uses an exact CSRF-protected POST and reports attempts without claiming receipt', async ({ page, attachmentServer }, testInfo) => {
   let attempted = false;
-  const fixtureBytes = '%PDF-1.4\nSYNTHETIC TEST ONLY\n%%EOF\n';
   const { requests, errors } = await install(page, async (route, request) => {
     if (request.path === path) return route.fulfill({ json: { delivery: { ...delivery(), history: attempted ? [{ authorizationId, grantId, kind: 'contract', issuedAt: utc(), expiresAt: utc(Date.now() + 60_000), status: 'attempted', attemptedAt: utc() }] : [] } } });
     if (request.path.endsWith('/authorizations')) return route.fulfill({ status: 201, json: { authorization: authorization() } });
     attempted = true;
-    return route.fulfill({ status: 200, headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="${filename}"`, 'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff' }, body: fixtureBytes });
+    return route.continue({ url: attachmentServer.url });
   });
   await page.goto(returnPath);
   const panel = page.getByRole('region', { name: 'Test order downloads', exact: true });
@@ -75,6 +107,7 @@ test('native attachment uses an exact CSRF-protected POST and reports attempts w
   const native = requests.find(request => request.path.endsWith('/download'))!;
   expect(native.method).toBe('POST'); expect(native.headers['content-type']).toContain('application/x-www-form-urlencoded');
   expect(Object.fromEntries(new URLSearchParams(native.body!))).toEqual({ authorizationId, token, _token: issue.headers['x-csrf-token'] });
+  expect(attachmentServer.received).toEqual([native.body]);
   await assertPrivate(page);
   await panel.getByRole('button', { name: 'Refresh downloads and recent attempts' }).click();
   await expect(panel).toContainText('Stream attempted'); expect(requests.filter(request => request.method === 'POST')).toHaveLength(2);
@@ -112,13 +145,13 @@ test('uncertain issuance retries one key, replacement is explicit, and native ex
   await assertPrivate(page); expect(errors).toEqual([]);
 });
 
-test('malformed and expired responses cannot submit a file request or expose server metadata', async ({ page }) => {
+test('malformed responses never submit, while server expiry handles a skewed browser clock privately', async ({ page }) => {
   let reads = 0, issues = 0;
   const { requests, errors } = await install(page, async (route, request) => {
     if (request.path === path) return route.fulfill({ json: { delivery: ++reads === 1 ? { ...delivery(), privatePath: 'PRIVATE_SERVER_PATH' } : delivery() } });
     if (request.path.endsWith('/authorizations')) return route.fulfill({ status: 201, json: { authorization: ++issues === 1
-      ? { ...authorization(), filename: '../PRIVATE_SERVER_PATH.pdf' } : { ...authorization(), expiresAt: utc(Date.now() - 1000) } } });
-    throw new Error('A malformed authorization must never start native download');
+      ? { ...authorization(), filename: '../PRIVATE_SERVER_PATH.pdf' } : authorization() } });
+    return route.fulfill({ status: 410, json: { code: 'DELIVERY_EXPIRED', message: 'PRIVATE_SERVER_PATH' } });
   });
   await page.goto(returnPath); const panel = page.getByRole('region', { name: 'Test order downloads', exact: true });
   await expect(panel.getByRole('alert')).toContainText('could not be loaded');
@@ -126,10 +159,12 @@ test('malformed and expired responses cannot submit a file request or expose ser
   await panel.getByRole('button', { name: 'Refresh downloads and recent attempts' }).click();
   await panel.getByRole('button', { name: 'Download Original contract', exact: true }).click();
   await expect(panel.getByRole('alert')).toContainText('unconfirmed');
-  await panel.getByRole('button', { name: 'Start a new authorization request' }).click();
-  await panel.getByRole('button', { name: 'Download Original contract', exact: true }).click();
-  await expect(panel.getByRole('alert')).toContainText('unconfirmed');
   expect(requests.filter(request => request.path.endsWith('/download'))).toHaveLength(0);
+  await panel.getByRole('button', { name: 'Start a new authorization request' }).click();
+  await page.evaluate(() => { const originalNow = Date.now; Date.now = () => originalNow() + 600_000; });
+  await panel.getByRole('button', { name: 'Download Original contract', exact: true }).click();
+  await expect(panel.getByRole('alert')).toContainText('authorization expired');
+  expect(requests.filter(request => request.path.endsWith('/download'))).toHaveLength(1);
   await expect(panel).not.toContainText('PRIVATE_SERVER_PATH'); await assertPrivate(page); expect(errors).toEqual([]);
 });
 

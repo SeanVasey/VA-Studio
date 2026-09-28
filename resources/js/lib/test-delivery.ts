@@ -50,10 +50,11 @@ export function validDelivery(value: unknown, orderId: string): value is Deliver
   return true;
 }
 
-export function validAuthorization(value: unknown, item: DeliveryItem, now = Date.now()): value is Authorization {
+export function validAuthorization(value: unknown, item: DeliveryItem): value is Authorization {
   return record(value) && keys(value, ['authorizationId', 'token', 'expiresAt', 'filename', 'mimeType'])
     && uuid(value.authorizationId) && typeof value.token === 'string' && /^[A-Za-z0-9_-]{43}$/.test(value.token)
-    && utc(value.expiresAt) && Date.parse(value.expiresAt) > now && Date.parse(value.expiresAt) <= now + 65_000
+    // The server enforces the retained deadline on redemption; a browser clock is not authoritative.
+    && utc(value.expiresAt)
     && descriptor(value, item.grantId, item.kind);
 }
 
