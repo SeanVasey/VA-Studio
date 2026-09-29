@@ -20,17 +20,19 @@ try {
         throw new LogicException('Missing CMS race configuration.');
     }
     $input = json_decode(stream_get_contents(STDIN, 4096), true, 16, JSON_THROW_ON_ERROR);
-    if (! in_array($input['operation'] ?? null, ['publish', 'rollback'], true)) {
+    if (! in_array($input['operation'] ?? null, ['publish', 'rollback', 'run_schedule', 'cancel_schedule'], true)) {
         throw new LogicException('Unsupported CMS race operation.');
     }
     DB::statement('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
     $connection = (int) DB::selectOne('SELECT CONNECTION_ID() AS id')->id;
-    $wait = function (string $path): void {
+    $wait = function (string ...$paths): void {
         $deadline = microtime(true) + 30;
         do {
-            clearstatcache(true, $path);
-            if (is_file($path)) {
-                return;
+            foreach ($paths as $path) {
+                clearstatcache(true, $path);
+                if (is_file($path)) {
+                    return;
+                }
             }
             usleep(10000);
         } while (microtime(true) < $deadline);
@@ -41,7 +43,7 @@ try {
     DB::connection()->beforeExecuting(function ($query) use ($isPublicationLock, $directory, $worker, $connection, $wait): void {
         if ($isPublicationLock($query)) {
             file_put_contents($directory.'/ready-'.$worker, (string) $connection);
-            $wait($directory.'/start');
+            $wait($directory.'/start', $directory.'/start-'.$worker);
         }
     });
     DB::listen(function ($query) use ($isPublicationLock, $directory, $worker, $wait): void {
@@ -51,10 +53,20 @@ try {
         }
     });
     try {
-        $publication = app(SiteContent::class)->{$input['operation']}(
-            $input['release_id'], $input['revision'], User::findOrFail($input['actor_id'])
-        );
-        $result = ['result' => 'published', 'revision' => $publication->revision, 'release_id' => $publication->active_release_id];
+        $site = app(SiteContent::class);
+        if ($input['operation'] === 'run_schedule') {
+            // The scheduler reads the real clock; fixtures make the schedule due and within its grace window.
+            $run = $site->runDueSchedule();
+            $result = ['result' => 'schedule', 'outcome' => $run['outcome'] ?? null, 'revision' => $run['publication_revision'] ?? null];
+        } elseif ($input['operation'] === 'cancel_schedule') {
+            $schedule = $site->cancelSchedule($input['schedule_id'], User::findOrFail($input['actor_id']));
+            $result = ['result' => 'cancelled', 'state' => $schedule->state];
+        } else {
+            $publication = $site->{$input['operation']}(
+                $input['release_id'], $input['revision'], User::findOrFail($input['actor_id']), $input['expected_schedule_id'] ?? null
+            );
+            $result = ['result' => 'published', 'revision' => $publication->revision, 'release_id' => $publication->active_release_id];
+        }
     } catch (ValidationException $exception) {
         $result = ['result' => 'rejected', 'errors' => $exception->errors()];
     }

@@ -11,7 +11,12 @@ use Tests\TestCase;
 /** Two independent workers must demonstrably contend on the singleton publication row. */
 final class SiteContentRace
 {
-    public static function run(TestCase $test, array $jobs): array
+    /**
+     * @param  (callable(array, int, int): void)|null  $outcomes  Asserts worker results by winner and loser; the default
+     *                                                            expects one publication and one stale-revision rejection.
+     * @param  int|null  $first  Worker released to take the lock first, so each serialization order is tested; null races both.
+     */
+    public static function run(TestCase $test, array $jobs, ?callable $outcomes = null, ?int $first = null): array
     {
         $test->assertCount(2, $jobs);
         $test->assertSame(0, DB::transactionLevel(), 'Race fixtures must be committed.');
@@ -38,7 +43,14 @@ final class SiteContentRace
             $ids = [(int) file_get_contents($directory.'/ready-0'), (int) file_get_contents($directory.'/ready-1')];
             $parent = (int) DB::selectOne('SELECT CONNECTION_ID() AS id')->id;
             $test->assertCount(3, array_unique([...$ids, $parent]));
-            touch($directory.'/start');
+            if ($first === null) {
+                touch($directory.'/start');
+            } else {
+                $test->assertContains($first, [0, 1]);
+                touch($directory.'/start-'.$first);
+                self::until($test, $processes, fn () => is_file($directory.'/locked-'.$first), 'first publication lock');
+                touch($directory.'/start-'.(1 - $first));
+            }
             self::until($test, $processes, fn () => is_file($directory.'/locked-0') || is_file($directory.'/locked-1'), 'publication lock');
             $winner = is_file($directory.'/locked-0') ? 0 : 1;
             $loser = 1 - $winner;
@@ -62,10 +74,14 @@ SQL;
                 $results[] = json_decode($process->getOutput(), true, 16, JSON_THROW_ON_ERROR);
             }
             $test->assertCount(3, array_unique([...array_column($results, 'pid'), getmypid()]));
-            $test->assertSame('published', $results[$winner]['result']);
-            $test->assertSame('rejected', $results[$loser]['result']);
-            $test->assertArrayHasKey('publication', $results[$loser]['errors']);
-            $test->assertStringContainsString('published site changed', $results[$loser]['errors']['publication'][0]);
+            if ($outcomes === null) {
+                $test->assertSame('published', $results[$winner]['result']);
+                $test->assertSame('rejected', $results[$loser]['result']);
+                $test->assertArrayHasKey('publication', $results[$loser]['errors']);
+                $test->assertStringContainsString('published site changed', $results[$loser]['errors']['publication'][0]);
+            } else {
+                $outcomes($results, $winner, $loser);
+            }
             foreach ($results as $result) {
                 $test->assertSame(0, $result['transaction_level']);
             }

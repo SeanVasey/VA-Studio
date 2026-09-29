@@ -15,6 +15,12 @@ class ListSiteReleases extends ListRecords
     #[Locked]
     public ?int $expectedPublicationRevision = null;
 
+    #[Locked]
+    public ?int $expectedScheduleId = null;
+
+    #[Locked]
+    public ?int $schedulingReleaseId = null;
+
     public function boot(): void
     {
         // Recheck the database role and MFA on every reactive request, including search and actions.
@@ -31,8 +37,13 @@ class ListSiteReleases extends ListRecords
         return in_array($this->tableRecordsPerPage, [10, 25, 50, '10', '25', '50'], true) ? (int) $this->tableRecordsPerPage : 25;
     }
 
+    public function getSubheading(): ?string
+    {
+        return SiteReleaseResource::scheduleSummary();
+    }
+
     protected function getHeaderActions(): array
     {
-        return [SiteReleaseResource::createDraftAction()];
+        return [SiteReleaseResource::createDraftAction(), SiteReleaseResource::cancelScheduleAction(), SiteReleaseResource::scheduleHistoryAction()];
     }
 }
