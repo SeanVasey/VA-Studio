@@ -18,6 +18,7 @@ async function changeAvailability(page: Page, code: string, action: 'Enable prom
   const dialog = page.getByRole('alertdialog', { name: action, exact: true });
   await dialog.getByRole('button', { name: 'Confirm', exact: true }).click();
   await expect(row(page, code).getByText(action === 'Enable promotion' ? 'Active' : 'Disabled', { exact: true })).toBeVisible();
+  await expect(dialog.getByRole('heading', { name: action, exact: true })).not.toBeVisible();
 }
 
 test('promotion administration rejects guests and customer accounts', async ({ page }) => {
@@ -85,9 +86,16 @@ test('real monetary inputs, immutable copying and enable/disable changes persist
   const review = editor.getByRole('dialog');
   await expect(review.getByText('250 USD cents', { exact: true })).toBeVisible();
   await expect(review.getByText('Remaining capacity: 7', { exact: true })).toBeVisible();
-  const closeReview = editor.waitForResponse(response => response.url().endsWith('/update') && response.request().method() === 'POST');
-  await review.getByRole('button', { name: 'Close', exact: true }).click();
-  await (await closeReview).finished();
+  const closeReview = editor.waitForResponse(response => {
+    if (!response.url().endsWith('/update') || response.request().method() !== 'POST') return false;
+    const payload = response.request().postDataJSON() as { components?: { calls?: { method?: string }[] }[] };
+    return payload.components?.some(component => component.calls?.some(call => call.method === 'unmountAction')) ?? false;
+  });
+  await review.locator('.fi-modal-footer').getByRole('button', { name: 'Close', exact: true }).click();
+  const closedReview = await closeReview;
+  expect(closedReview.status()).toBe(200);
+  await closedReview.finished();
+  await expect(review.getByRole('heading', { name: 'Test promotion terms and usage', exact: true })).not.toBeVisible();
   await changeAvailability(editor, firstCode, 'Enable promotion');
   await row(editor, firstCode).getByRole('button', { name: 'Copy as new promotion', exact: true }).click();
   dialog = editor.getByRole('dialog');

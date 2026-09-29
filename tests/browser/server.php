@@ -7,6 +7,8 @@ if (PHP_SAPI !== 'cli-server' || getenv('APP_ENV') !== 'local' || getenv('APP_UR
     || ! is_string($directory) || is_link($directory) || realpath($directory) !== $directory
     || realpath(dirname($directory)) !== realpath(sys_get_temp_dir()) || ! preg_match('/\Avasey-browser-[A-Za-z0-9]+\z/D', basename($directory))
     || getenv('LARAVEL_STORAGE_PATH') !== $directory || getenv('DB_DATABASE') !== $directory.'/database.sqlite'
+    // Match Laravel Application::storagePath(), not only getenv(): GPCS cli-server otherwise uses checkout storage.
+    || ($_ENV['LARAVEL_STORAGE_PATH'] ?? $_SERVER['LARAVEL_STORAGE_PATH'] ?? null) !== $directory
     || getenv('APP_CONFIG_CACHE') !== $directory.'/config.php' || ! is_file($directory.'/fixtures.json')) {
     http_response_code(503);
     exit;
