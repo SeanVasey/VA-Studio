@@ -4,14 +4,15 @@ namespace Tests\Feature;
 
 use App\Domain\SiteBuilder\Models\SitePublication;
 use App\Domain\SiteBuilder\Models\SitePublicationRevision;
+use App\Domain\SiteBuilder\Models\SiteRelease;
 use App\Domain\SiteBuilder\SiteContent;
-use App\Domain\SiteBuilder\SiteContentSchema;
 use App\Support\Audit\AuditEvent;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\SiteContentRace;
+use Tests\Support\SiteEditorialFixtures;
 use Tests\TestCase;
 
 class SiteContentConcurrencyTest extends TestCase
@@ -31,7 +32,7 @@ class SiteContentConcurrencyTest extends TestCase
         $actors = [LicenseFixtures::admin(), LicenseFixtures::admin()];
         $releases = [];
         foreach ($actors as $index => $actor) {
-            $content = SiteContentSchema::defaults();
+            $content = $index === 0 ? SiteEditorialFixtures::legacy() : SiteEditorialFixtures::content('RACE TWO');
             $content['hero']['title'] = 'SYNTHETIC RACE '.$index;
             $releases[] = $site->create($content, 'Race '.$index, $actor);
         }
@@ -42,6 +43,9 @@ class SiteContentConcurrencyTest extends TestCase
         $winner = $race['winner'];
         $this->assertSame(1, SitePublication::findOrFail(1)->revision);
         $this->assertEquals($releases[$winner]->content, $site->current());
+        $this->assertSame($winner === 0 ? 1 : 2, $site->current()['schema_version']);
+        $this->assertSame($releases[0]->content_hash, $releases[0]->fresh()->content_hash);
+        $this->assertSame($releases[1]->content_hash, $releases[1]->fresh()->content_hash);
         $history = SitePublicationRevision::where('revision', 1)->sole();
         $this->assertSame($releases[$winner]->id, $history->release_id);
         $this->assertSame($actors[$winner]->id, $history->actor_id);
@@ -62,7 +66,7 @@ class SiteContentConcurrencyTest extends TestCase
         $actors = [LicenseFixtures::admin(), LicenseFixtures::admin()];
         $releases = [];
         foreach (['FIRST', 'SECOND', 'THIRD'] as $title) {
-            $content = SiteContentSchema::defaults();
+            $content = $title === 'FIRST' ? SiteEditorialFixtures::legacy() : SiteEditorialFixtures::content($title);
             $content['hero']['title'] = 'SYNTHETIC '.$title;
             $releases[] = $site->create($content, $title, $actors[0]);
         }
@@ -76,6 +80,7 @@ class SiteContentConcurrencyTest extends TestCase
         $winner = $jobs[$race['winner']];
         $this->assertSame(3, SitePublication::findOrFail(1)->revision);
         $this->assertSame($winner['release_id'], SitePublication::findOrFail(1)->active_release_id);
+        $this->assertEquals(SiteRelease::findOrFail($winner['release_id'])->content, $site->current());
         $history = SitePublicationRevision::where('revision', 3)->sole();
         $this->assertSame($winner['release_id'], $history->release_id);
         $this->assertSame($releases[1]->id, $history->previous_release_id);
@@ -100,6 +105,8 @@ class SiteContentConcurrencyTest extends TestCase
         $this->assertSame($publication->revision, SitePublication::findOrFail(1)->revision);
         $this->assertSame($releases[0]->id, SitePublication::findOrFail(1)->active_release_id);
         $this->assertEquals($releases[0]->content, $site->current());
+        $this->assertSame(1, $site->current()['schema_version']);
+        $this->assertArrayNotHasKey('about', $site->current());
         $this->assertSame($count, SitePublicationRevision::count());
         $this->assertSame($audits, AuditEvent::count());
     }

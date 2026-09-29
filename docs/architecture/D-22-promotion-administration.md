@@ -1,6 +1,6 @@
 # D-22 — Test promotion administration
 
-Status: **Implemented test-only contract within Sean's continuous-development authorization, 2026-09-29.** This bounded WP-09 increment follows accepted CMS PR #72. It is not a separately approved production promotion policy. The integrating PR and [WP-09 issue #9](https://github.com/VASEYDEV/VASEYAUDIO/issues/9) record the exact tested commit, executed CI, independent review and merge disposition. The [ordered record](../development-order.md) retains the dependency sequence.
+Status: **Accepted test-only WP-09 increment, merged in PR #73 on 2026-09-29 within Sean's continuous-development authorization.** This bounded WP-09 increment follows accepted CMS PR #72. It is not a separately approved production promotion policy. The [ordered acceptance record](../development-order.md#accepted-test-promotion-administration--september-29), PR and [WP-09 issue #9](https://github.com/VASEYDEV/VASEYAUDIO/issues/9) retain the exact tested commit, all ten passing CI jobs, independent review, merge disposition and passing post-merge CI.
 
 ## Context and choice
 
@@ -56,4 +56,4 @@ Deploy the additive availability/history migration before application callers. R
 
 Required verification covers strict money/dates/eligibility/currency, legacy compatibility/collisions, fresh authorization, audit rollback, stale/ABA confirmations, database guards/retention, aggregate usage and frozen-order continuity. Independent-process MySQL tests must prove competing controls and disable-versus-hold/held-to-pending serialization; SQLite cannot establish those races. Actual Chromium/WebKit flows, full backend/frontend/build/audit gates and independent review must assess the final integrated candidate. Acceptance requires those gates on the final tested commit; the integrating PR and WP-09 issue #9 record their actual outcomes.
 
-After acceptance, continue persisted contact/about/blog/video content, then additional asset references and scheduling. Guest recovery, the complete customer library, operational payment resolution, free-download licensing/consent, other products, memberships, migration and production readiness remain open.
+The next bounded increment is [persisted contact/about/blog/video content](D-23-editorial-content.md), then additional asset references and scheduling. Guest recovery, the complete customer library, operational payment resolution, free-download licensing/consent, other products, memberships, migration and production readiness remain open.

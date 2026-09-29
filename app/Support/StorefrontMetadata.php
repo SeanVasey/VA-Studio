@@ -5,7 +5,7 @@ namespace App\Support;
 use App\Domain\SiteBuilder\SiteContentSchema;
 use Illuminate\Support\Str;
 
-/** Metadata accepts only the already eligible, public catalog projection. */
+/** Metadata accepts verified catalog or site-release projections, never request URLs. */
 final class StorefrontMetadata
 {
     public function forPage(?array $track, ?array $siteContent = null): array
@@ -40,6 +40,19 @@ final class StorefrontMetadata
             'imageUrl' => $this->absolute($imagePath),
             'imageAlt' => $imageAlt,
             'type' => $track === null ? 'website' : 'music.song',
+            'robots' => app()->environment('production') ? 'index, follow' : 'noindex, nofollow',
+        ];
+    }
+
+    public function forEditorial(array $page): array
+    {
+        return [
+            'title' => $this->text($page['title'].' — VASEY.AUDIO', 160),
+            'description' => $this->text($page['description'], 300),
+            'canonicalUrl' => $this->absolute($page['path']),
+            'imageUrl' => $this->absolute('/images/storefront-hero.jpg'),
+            'imageAlt' => 'VASEY.AUDIO studio and audio production artwork',
+            'type' => $page['section'] === 'blog' && $page['kind'] === 'entry' ? 'article' : 'website',
             'robots' => app()->environment('production') ? 'index, follow' : 'noindex, nofollow',
         ];
     }

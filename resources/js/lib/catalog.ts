@@ -81,6 +81,7 @@ export interface StorefrontProps {
   catalogPage?: CatalogPage;
   designPreview?: boolean;
   sitePreview?: boolean;
+  sitePreviewBase?: string | null;
   siteContent?: SiteContent;
   testOrderPreparationEnabled?: boolean;
   testCheckoutEnabled?: boolean;

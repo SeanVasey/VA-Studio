@@ -28,3 +28,19 @@ The feature matrix's `evidence_status` concerns the benchmark/source claim. `tar
 All imported material requires source identity, acquired-at time, raw hash or value, transform version, target identity, batch and reconciliation outcome. Values such as `not_acquired` and blank resolution fields are intentional. No customer list, executed contract, original attachment binary, provider credential or raw account export belongs in git. Acquire those through approved private storage and reference them by opaque identifier and hash.
 
 The route file contains proposals, not deployed redirects. Preserve paths when useful and avoid redirecting authenticated routes into public pages. BeatStars-owned hostnames cannot be redirected without verified control.
+
+
+## Editorial implementation checkpoint — September 29, 2026
+
+[D-23](../architecture/D-23-editorial-content.md) and the [editorial guide](../editorial-content.md) describe a bounded implementation candidate. The integrating PR and WP-09 issue #9 record acceptance against tested source. The source observations, `planned` baseline rows and acquisition fields in these ledgers are not completion evidence and are not converted to verified migration by this code.
+
+| Stable requirement | Implemented contract | Still required for full acceptance |
+| --- | --- | --- |
+| FP-011 — Blog and updates | Plain-text entries with private complete-release drafts, published listing/detail routes and rollback. | Source slug/date acquisition, homepage feature policy and broader editorial/embedding acceptance. |
+| FP-012 — Video gallery and related video | Typed YouTube/Vimeo IDs and curated provider watch links in published listing/detail routes. | Consent-aware embeds, related-track links and verified media/source rights. |
+| FP-013 — About, credits and contact | Persisted about/contact copy and an encoded public mail link. | Owner-reviewed production copy, real inquiry delivery and spam protection. |
+| FP-014 — Search/social metadata | Server-derived canonical/social route metadata for active editorial pages. | Complete sitemap/structured-data coverage and migration/canonical reconciliation. |
+| M-041 — Blog/video/about/contact source | Target schema and publication workflow exist; no import runs. | Authorized original content, source identities/slugs/dates, raw hashes, fresh-content decisions and reconciliation. |
+| URL-010 — Legacy `/blog` | Current implementation uses `/blog`; its detail paths reflect active entries. | The older `/updates` target remains an unimplemented proposal; actual legacy routes and redirects still need verification and approval. |
+
+No seller original, customer record, external media, inbox or legacy redirect is acquired or activated by this increment. Keep unknown source facts unresolved and preserve IDs when later updating these rows with actual acceptance evidence.

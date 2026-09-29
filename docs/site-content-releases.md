@@ -2,7 +2,7 @@
 
 Status: **Accepted WP-09 increment, merged in PR #72.** [D-21](architecture/D-21-site-content-releases.md) defines the decision and security boundary. The [ordered development record](development-order.md) records the accepted source, full CI, prerequisite acceptance and next handoff. This bounded increment does not complete WP-09.
 
-The CMS saves homepage copy as private immutable drafts. Publishing selects one complete saved version for the public homepage. Saving or previewing a draft does not change the live selection. Track/catalog publication, license offers, payments and customer rights are separate workflows.
+The accepted original CMS saves homepage copy as private immutable drafts. [Editorial/contact content](editorial-content.md) extends new schema-v2 drafts to optional about, contact, blog and video pages while preserving stored v1 releases. Publishing selects one complete saved version for the public homepage. Saving or previewing a draft does not change the live selection. Track/catalog publication, license offers, payments and customer rights are separate workflows.
 
 ## Staff workflow
 
@@ -14,9 +14,9 @@ The CMS saves homepage copy as private immutable drafts. Publishing selects one 
 
 Rows distinguish **Active**, **Previously published** and **Private draft**. An active release cannot be activated again. A draft never published cannot be used as a rollback target. First publication retains **Original site content**, an immutable capture of the previous code-default homepage with revision-zero history, so it can be restored like another previous release. Restoration always selects retained content; it never resets the publication revision.
 
-## Editable schema
+## Original schema-v1 fields
 
-All values are bounded plain text, with no markup or unsupported keys. Label length is at most 120 characters; the content schema version is integer `1`.
+All values are bounded plain text, with no markup or unsupported keys. Label length is at most 120 characters. These are the original integer schema-version `1` fields; new editor copies use schema version `2` and its additional bounded fields.
 
 | Content | Fields and maximum lengths |
 | --- | --- |
@@ -26,7 +26,7 @@ All values are bounded plain text, with no markup or unsupported keys. Label len
 | Navigation | One to four items; label 48; unique destination selected from `/`, `/#catalog`, `/#licenses`, `/#studio`. |
 | Home SEO | Title 120; description 300. |
 
-The CMS does not replace official logo geometry, approved artwork, theme or font assets. It cannot add arbitrary links, rich HTML, scripts, price/license changes or new page types. Use copy suitable for publication and keep secrets and customer information out of labels and drafts. A private draft is access-controlled content, not a confidential-record vault.
+The CMS does not replace official logo geometry, approved artwork, theme or font assets. It cannot add arbitrary links, rich HTML, scripts or price/license changes. V2 adds only the named editorial/contact page types and validates their navigation targets. Use copy suitable for publication and keep secrets and customer information out of labels and drafts. A private draft is access-controlled content, not a confidential-record vault.
 
 ## Failure handling and retained evidence
 
@@ -40,7 +40,7 @@ Content rollback changes only the site pointer and its history/audit. It does no
 
 The accepted candidate passed full CI and independent review in [PR #72](https://github.com/VASEYDEV/VASEYAUDIO/pull/72), including schema/authorization/privacy, immutable database evidence, atomic audit failures, stale revision conflicts, independent MySQL publish/rollback races and browser editing/preview/publication/rollback. The [ordered acceptance record](development-order.md#accepted-downloads-and-cms--september-28-2026) retains exact source, run and results. Follow the repository [verification commands](../README.md#verify) when changing these boundaries.
 
-Test promotion administration is implemented as a bounded WP-09 addition, with acceptance evidence in the integrating PR and issue #9. After its acceptance, persisted contact/about/blog/video flows, scheduling and additional asset controls follow. This increment does not complete WP-09 or the BeatStars replacement; [development order](development-order.md) retains customer recovery/library, payment operations, additional products, memberships, migration and production-readiness work.
+Test promotion administration is accepted in PR #73. [D-23](architecture/D-23-editorial-content.md) is the bounded persisted contact/about/blog/video addition, with final acceptance evidence in the integrating PR and issue #9. Editable asset references and scheduling follow; contact delivery, consent-aware embeds and migration remain open. This increment does not complete WP-09 or the BeatStars replacement; [development order](development-order.md) retains customer recovery/library, payment operations, additional products, memberships, migration and production-readiness work.
 
 ## September 28 candidate verification history
 
