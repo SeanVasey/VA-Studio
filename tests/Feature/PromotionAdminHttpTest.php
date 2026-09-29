@@ -83,8 +83,9 @@ class PromotionAdminHttpTest extends TestCase
             'rate_bps' => '1250', 'max_discount_minor' => '300',
         ]))->assertHasNoTableActionErrors();
         $copy = PromotionCampaign::whereKeyNot($campaign->id)->sole();
-        $this->assertSame(['type' => 'percentage', 'rate_bps' => 1250, 'max_discount_minor' => 300], $copy->snapshot['discount']);
-        $this->assertSame($snapshot, $campaign->fresh()->snapshot);
+        // MySQL may reorder JSON object keys; canonical bytes still preserve every value type and list order.
+        $this->assertSame(CanonicalJson::encode(['type' => 'percentage', 'rate_bps' => 1250, 'max_discount_minor' => 300]), CanonicalJson::encode($copy->snapshot['discount']));
+        $this->assertSame(CanonicalJson::encode($snapshot), CanonicalJson::encode($campaign->fresh()->snapshot));
         $this->assertFalse(app(PromotionAdministration::class)->detail($copy->id, $actor)['enabled']);
     }
 
