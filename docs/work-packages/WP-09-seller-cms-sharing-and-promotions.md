@@ -1,6 +1,6 @@
 # [WP-09] Seller CMS, publishing, sharing and promotion administration
 
-Status: **Partially implemented; remains open.** The first CMS increment is accepted in PR #72 and test promotion administration in PR #73. Persisted editorial/contact content is the next bounded increment; its acceptance record is maintained in issue #9 and the integrating PR. This issue is complete only when all acceptance evidence below exists.
+Status: **Partially implemented; remains open.** The first CMS increment is accepted in PR #72, test promotion administration in PR #73 and persisted editorial/contact content in PR #74. Scheduled whole-release publication is the current bounded increment; its acceptance record is maintained in issue #9 and the integrating PR. This issue is complete only when all acceptance evidence below exists.
 
 - Suggested issue title: `[WP-09] Seller CMS, publishing, sharing and promotion administration`
 - Phase: 3
@@ -70,3 +70,9 @@ The next increment is persisted contact/about/blog/video content, then editable 
 This is a bounded implementation contract; the integrating PR and issue #9 record actual acceptance against the final tested source. Required coverage includes v1/v2 compatibility, link/provider/email validation, draft privacy, active-only route/metadata projection, fresh staff/MFA checks, preview pinning, publication/rollback and full MySQL/SQLite/browser/build/audit gates with independent review.
 
 Contact supplies published copy and an encoded email link, not an inbound inquiry service or verified delivery. Video entries supply typed provider watch links, not consent-aware embeds or related-track associations. Editable assets, scheduling, source slug/date migration, broader sharing/support and free-download licensing/consent remain open. The original broad acceptance checklist is not complete from these partial flows.
+
+## Scheduled publication — September 29, 2026
+
+[D-24](../architecture/D-24-scheduled-site-publication.md) and the [operator guide](../site-content-releases.md#scheduled-publication) add one pending schedule for a complete saved release at a whole UTC minute. A minute runner publishes it through the existing lock, expected revision and audit transaction, attributed to the scheduling administrator. Staff publication or restoration replaces a pending schedule after a warning, and cancellation is explicit. Missed, unauthorized, stale or corrupt schedules fail closed and keep their reasons. Production needs a scheduler cron entry on the undecided host.
+
+Editorial content from PR #74 is accepted; the [ordered record](../development-order.md#accepted-editorial-content--september-29) retains its evidence. Editable asset references are next. Track-release scheduling, local-time display and chained schedules remain separate work. The original broad acceptance checklist is not complete from these partial flows.

@@ -1,16 +1,39 @@
 # Ordered development status
 
-Reconciled 2026-09-29. Accepted starting baseline `1260e00b1b7f0d80e750b00d83f094359246e935`, tree `2c62cf2245000ed6d961b2740f669b7551ab9b78`, contains customer-facing test downloads, the first WP-09 CMS slice and test promotion administration. Each completed full CI and independent review before merge; post-merge [CI 36603935742](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36603935742) passed. No production activation or actual provider transaction is claimed.
+Reconciled 2026-09-29. Accepted starting baseline `5b99777bb1bf0634a65588aca6ae08aabc76a83a`, tree `136521112207e96d2a3d56a6f2d3f2cc92332eb4`, contains customer-facing test downloads, the first WP-09 CMS slice, test promotion administration, persisted editorial content and the repository engineering standard from [PR #75](https://github.com/VASEYDEV/VASEYAUDIO/pull/75). Each completed full CI and independent review before merge; post-merge [CI 36642175431](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36642175431) passed. No production activation or actual provider transaction is claimed.
 
 ## Current increment and next handoff
 
-### Editorial content increment — September 29
+### Scheduled publication increment — September 29
 
-Persisted about/contact/blog/video content is the next bounded WP-09 increment, under [D-23](architecture/D-23-editorial-content.md) and the [operator guide](editorial-content.md). Schema-v2 immutable site releases include optional pages and entry listings, active-only public routes/metadata and private previews pinned to the saved release. Existing v1 hashes, original baseline and rollback remain intact. Contact supplies an encoded mail link; videos supply typed YouTube/Vimeo watch links. This does not implement inbound inquiry delivery, consent-aware embeds, source migration or scheduled publication.
+Scheduled whole-release publication is the current bounded WP-09 increment, under [D-24](architecture/D-24-scheduled-site-publication.md) and the [operator guide](site-content-releases.md#scheduled-publication). Sean set the order after PR #74 merged (scheduling, then editable asset references) and approved its defaults:
+
+- staff publication or restoration supersedes a pending schedule;
+- one pending schedule at a time;
+- a 60-minute grace window;
+- whole UTC minutes from one minute to 365 days ahead.
+
+A retained schedule names an exact saved release and the reviewed revision. A minute runner publishes it through the D-21 lock, revision check and audit transaction. Every outcome is retained, and failures close without activation. Production needs the standard scheduler cron on the undecided host (U-02). Payments remain test-only.
 
 The integrating PR and [WP-09 issue #9](https://github.com/VASEYDEV/VASEYAUDIO/issues/9) record the exact tested source, actual checks, independent review and merge disposition. Required full CI and review must pass on the final candidate before acceptance; implementation and test definitions alone do not establish that result.
 
-After this increment is accepted, continue editable asset references and scheduling with their own tests. Inbound contact/spam handling, consent-aware embeds/related-track links, broader sharing/support and free-download licensing/consent remain unfinished. Guest/account recovery, the complete cross-order library, verified financial exception/refund/dispute resolution, other products, memberships, source migration and production readiness remain open.
+After this increment is accepted, continue editable asset references under their own plan and tests; Sean chooses which image slots become editable. Inbound contact/spam handling, consent-aware embeds/related-track links, broader sharing/support and free-download licensing/consent remain unfinished. Guest/account recovery, the complete cross-order library, verified financial exception/refund/dispute resolution, other products, memberships, source migration and production readiness remain open.
+
+### Accepted editorial content — September 29
+
+[PR #74](https://github.com/VASEYDEV/VASEYAUDIO/pull/74) merged tested head `03ed4438acb3969c87913d988eaa904ca04a5b96` as `f76f0c9e38de1f90ca4116bd8f64ec6fa14286b7`; both have source tree `cf207034942779bf71d458cf8fb8947500ab0c8f`. [CI 36634374341](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36634374341) passed all ten required jobs:
+
+- MySQL: 1,600 tests /16,621 assertions, zero skips.
+- SQLite: 1,517 executed tests /14,196 assertions, plus the same 83 expected MySQL-only skips as PR #73.
+- 257 frontend tests, the build and the audits.
+- All 30 Chromium/mobile-WebKit cases.
+- The backend aggregate.
+
+The PR records verified artifact digests for all six database shards and the browser job, and exact once-only case coverage. Both mixed-version MySQL publication races executed. Independent review of the integrated source left no blocking findings.
+
+[D-23](architecture/D-23-editorial-content.md) and the [operator guide](editorial-content.md) add optional about/contact pages and blog/video listings with detail routes to schema-v2 immutable releases. Stored v1 hashes, the original baseline and rollback remain intact. Contact is an encoded mail link and videos are typed YouTube/Vimeo watch links, not inbound delivery or consent-aware embeds.
+
+The push run for `f76f0c9` ([36638738888](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36638738888)) was cancelled when the PR #75 merge superseded it. Main `5b99777`, which contains both merges, passed all ten jobs of post-merge [CI 36642175431](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36642175431).
 
 ### Accepted test promotion administration — September 29
 
@@ -111,7 +134,7 @@ An explicit GitHub `is:open` query exposed ten older Dependabot PRs omitted by t
 | WP-06 — quotes/reservations | PR #23 provisional immutable selection reviews; merged #41 full disclosure and #42 pricing/test-tax evidence; merged #43 promotion/usage holds and #44 shared inventory; merged #48 inactive exclusive preparation, #49 atomic coordinator and #51 test activation/versioned selection integration | Merged PR #64 now supplies test paid-resource consumption and retained exception resources. Production policies, verified unpaid release and refund/dispute inventory decisions remain open WP-07 work. |
 | WP-07 — checkout/finalization | PR #26 receipts; merged #52 order/assent, #62 hosted checkout and #63 authoritative payment verification; merged #64 adds atomic paid/exception effects, grants and terminal evidence verification; merged #66 adds read-only operator visibility | Operator exception resolution, verified unpaid release/refunds/disputes, actual test-account interoperability and production policies remain. |
 | WP-08 — contracts/delivery | Merged #64 defines frozen grant input and pending entitlements/outbox; #65 adds private originals/recovery/status; #67 supplies complete-order activation; #69 supplies internal controls/authorization/snapshots; #71 adds accepted D-20 owner HTTP/privacy/native attachments and bounded order history | Complete cross-order library, guest recovery, production archival/storage/restore and historical preservation remain. |
-| WP-09 — seller workflows | Catalog administration and public sharing cover portions; merged #66 supplies read-only commerce visibility; #72 accepts private content drafts/preview/publication/baseline rollback; #73 accepts test promotion administration | D-23 persisted contact/about/blog/video is the current bounded increment; its integrating PR/issue record acceptance. Editable assets, scheduling, inbound contact, consent-aware embeds and broader sharing/support remain. |
+| WP-09 — seller workflows | Catalog administration and public sharing cover portions; merged #66 supplies read-only commerce visibility; #72 accepts private content drafts/preview/publication/baseline rollback; #73 accepts test promotion administration; #74 accepts persisted about/contact/blog/video content | D-24 scheduled publication is the current bounded increment; its integrating PR/issue record acceptance. Editable assets, inbound contact, consent-aware embeds and broader sharing/support remain. |
 | WP-10 — other products | Parity requirements retained | Collections, kits, services, merchandise and fulfillment after media/delivery/seller foundations; bring forward any audited active obligations. |
 | WP-11 — memberships/CRM | Parity and consent rules retained | Membership continuity, renewal/failure/cancellation, customer library/CRM and integrations; bring forward audited active obligations. |
 | WP-12 — source/migration | Three-attachment research, 103-item parity baseline, field/route maps and audit checklist | Authenticated source audit is unperformed. Acquire inventory/obligations privately, then restartable import dry-runs, SEO redirects and reconciliation. Begin source truth early, complete migration after target workflows exist. |
@@ -120,12 +143,12 @@ An explicit GitHub `is:open` query exposed ten older Dependabot PRs omitted by t
 
 ## Next dependency-ready development slices
 
-[D-20 owner HTTP/UI delivery](test-owner-delivery-http.md) in PR #71, [D-21 versioned site content](site-content-releases.md) in PR #72 and [D-22 test promotion administration](architecture/D-22-promotion-administration.md) in PR #73 are accepted. Subsequent scopes remain bounded development work, not production approvals:
+[D-20 owner HTTP/UI delivery](test-owner-delivery-http.md) in PR #71, [D-21 versioned site content](site-content-releases.md) in PR #72, [D-22 test promotion administration](architecture/D-22-promotion-administration.md) in PR #73 and [D-23 editorial content](architecture/D-23-editorial-content.md) in PR #74 are accepted. Subsequent scopes remain bounded development work, not production approvals:
 
 | Order / lane | Reviewable scope | Entry condition and completion evidence |
 | --- | --- | --- |
-| Current increment, WP-09 | Persisted contact/about/blog/video content | Preserve v1 evidence and immutable release/publication boundaries; prove active-only routes/metadata, strict links, private pinned previews, authorization and cross-version rollback with full CI and independent review on the final tested source. |
-| After editorial content acceptance, WP-09 | Editable asset references and scheduling | Add explicit asset readiness and time-dependent publication behavior with their own authorization, persistence, concurrency and browser evidence. Retain inbound contact, consent-aware embeds and broader sharing/support boundaries. |
+| Current increment, WP-09 | Scheduled whole-release publication | Preserve the D-21 publication mutex, revision and audit contract. Prove retained schedule evidence, supersession, cancellation, fail-closed runner outcomes, MySQL races and the browser flow with full CI and independent review on the final tested source. |
+| After scheduling acceptance, WP-09 | Editable asset references | Add explicit asset readiness with its own authorization, persistence, concurrency and browser evidence; Sean chooses the image slots. Retain inbound contact, consent-aware embeds and broader sharing/support boundaries. |
 | After WP-08/WP-09, WP-10 | Collections and licensed sound-kit manifests using exact digital delivery | Verify purchased composition/license semantics and archive privacy. Services and merchandise remain separate workflows; do not fabricate shipping, return or deposit policy. |
 | Ongoing, WP-12 | Authorized private source inventory and restartable import dry-run tooling | When authenticated source evidence is available, inventory all active orders, contracts, subscriptions, balances, services, routes and consent. Preserve source hashes and unknowns; do not activate imported rights. Audited obligations can advance the corresponding WP-10/WP-11 work. |
 
