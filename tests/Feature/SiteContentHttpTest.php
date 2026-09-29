@@ -201,7 +201,7 @@ class SiteContentHttpTest extends TestCase
             ->assertHasNoActionErrors();
         $first = SiteRelease::sole();
         $this->assertSame(0, SitePublication::findOrFail(1)->revision);
-        $this->assertEquals($content, $first->content);
+        $this->assertEquals(SiteContentSchema::forEditing($content), $first->content);
         $content['hero']['title'] = 'SYNTHETIC EDITOR TWO';
         $formContent['hero']['title'] = $content['hero']['title'];
         Livewire::test(ListSiteReleases::class)->callTableAction('duplicateDraft', $first, data: ['label' => 'Synthetic editor two', 'content' => $formContent])
@@ -215,6 +215,60 @@ class SiteContentHttpTest extends TestCase
         }
         $this->assertDatabaseCount('site_releases', 3);
         $this->assertDatabaseCount('site_publication_revisions', 4);
+    }
+
+    public function test_editor_saves_all_editorial_sections_and_copy_remains_private(): void
+    {
+        $actor = LicenseFixtures::admin();
+        $this->actingAs($actor);
+        $content = SiteContentSchema::forEditing(SiteContentSchema::defaults());
+        $content['about'] = ['title' => 'Synthetic about', 'description' => 'Synthetic about description.', 'paragraphs' => ['Synthetic about paragraph.']];
+        $content['contact'] = ['title' => 'Synthetic contact', 'description' => 'Synthetic contact description.', 'paragraphs' => ['Synthetic contact paragraph.'], 'email' => 'editor@example.test'];
+        $content['blog'] = ['title' => 'Synthetic blog', 'description' => 'Synthetic blog description.', 'entries' => [
+            ['slug' => 'synthetic-article', 'title' => 'Synthetic article', 'description' => 'Synthetic article description.', 'paragraphs' => ['Synthetic article paragraph.']],
+        ]];
+        $content['videos'] = ['title' => 'Synthetic videos', 'description' => 'Synthetic videos description.', 'entries' => [
+            ['slug' => 'synthetic-video', 'title' => 'Synthetic video', 'description' => 'Synthetic video description.', 'provider' => 'youtube', 'video_id' => 'abcdefghijk'],
+        ]];
+        $content['navigation'] = [['label' => 'About', 'href' => '/about'], ['label' => 'Contact', 'href' => '/contact'], ['label' => 'Blog', 'href' => '/blog'], ['label' => 'Videos', 'href' => '/videos']];
+        $form = $content;
+        foreach (['studio', 'about', 'contact'] as $section) {
+            $form[$section]['paragraphs'] = array_map(fn (string $text): array => ['text' => $text], $form[$section]['paragraphs']);
+        }
+        $form['blog']['entries'][0]['paragraphs'] = [['text' => $content['blog']['entries'][0]['paragraphs'][0]]];
+        $enabled = array_fill_keys(['about', 'contact', 'blog', 'videos'], true);
+        Livewire::test(ListSiteReleases::class)->callAction('createDraft', data: ['label' => 'All editorial sections', 'content' => $form, 'enabled' => $enabled])
+            ->assertHasNoActionErrors();
+        $first = SiteRelease::sole();
+        $this->assertEquals($content, $first->content);
+        $this->assertSame(0, SitePublication::findOrFail(1)->revision);
+        Livewire::test(ListSiteReleases::class)->callTableAction('duplicateDraft', $first, data: ['label' => 'Copied editorial sections'])
+            ->assertHasNoTableActionErrors();
+        $copy = SiteRelease::whereKeyNot($first->id)->sole();
+        $this->assertEquals($content, $copy->content);
+        $this->assertSame(0, SitePublication::findOrFail(1)->revision);
+        $this->assertDatabaseCount('site_publication_revisions', 0);
+    }
+
+    public function test_editor_disables_a_section_in_a_new_snapshot_and_rejects_a_dangling_navigation_link(): void
+    {
+        $actor = LicenseFixtures::admin();
+        $this->actingAs($actor);
+        $content = SiteContentSchema::forEditing(SiteContentSchema::defaults());
+        $content['about'] = ['title' => 'Retained about', 'description' => 'Retained description.', 'paragraphs' => ['Retained paragraph.']];
+        $content['navigation'][] = ['label' => 'About', 'href' => '/about'];
+        $first = app(SiteContent::class)->create($content, 'Retained source', $actor);
+        Livewire::test(ListSiteReleases::class)->callTableAction('duplicateDraft', $first, data: ['label' => 'Invalid removal', 'enabled' => ['about' => false]])
+            ->assertHasTableActionErrors();
+        $this->assertDatabaseCount('site_releases', 1);
+        Livewire::test(ListSiteReleases::class)->callTableAction('duplicateDraft', $first, data: [
+            'label' => 'Page removed in private copy', 'enabled' => ['about' => false],
+            'content.navigation' => SiteContentSchema::defaults()['navigation'],
+        ])->assertHasNoTableActionErrors();
+        $copy = SiteRelease::whereKeyNot($first->id)->sole();
+        $this->assertNull($copy->content['about']);
+        $this->assertSame('Retained about', $first->fresh()->content['about']['title']);
+        $this->assertSame(0, SitePublication::findOrFail(1)->revision);
     }
 
     public static function publicationActions(): array

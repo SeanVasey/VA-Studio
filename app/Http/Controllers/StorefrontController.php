@@ -6,6 +6,7 @@ use App\Domain\Catalog\PublicCatalog;
 use App\Domain\Commerce\Checkout\CheckoutPolicy;
 use App\Domain\Commerce\Orders\OrderPolicy;
 use App\Domain\SiteBuilder\SiteContent;
+use App\Domain\SiteBuilder\EditorialContent;
 use App\Support\StorefrontMetadata;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -24,7 +25,7 @@ class StorefrontController extends Controller
         $siteContent = app(SiteContent::class)->current();
         $metadata = app(StorefrontMetadata::class)->forPage($selectedTrack, $siteContent);
 
-        return Inertia::render('Storefront', $catalog + ['siteContent' => $siteContent, 'selectedTrack' => $selectedTrack, 'selectedTrackSlug' => $slug, 'commerceEnabled' => false,
+        return Inertia::render('Storefront', $catalog + ['siteContent' => app(EditorialContent::class)->chrome($siteContent), 'selectedTrack' => $selectedTrack, 'selectedTrackSlug' => $slug, 'commerceEnabled' => false,
             'testOrderPreparationEnabled' => app(OrderPolicy::class)->enabled(),
             'testCheckoutEnabled' => app(CheckoutPolicy::class)->enabled(), 'metadata' => $metadata])
             ->withViewData(['metadata' => $metadata]);

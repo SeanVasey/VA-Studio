@@ -41,6 +41,11 @@ class AdminPanelProvider extends PanelProvider
                 Route::get('/site-releases/{release}/preview', SiteReleasePreviewController::class)
                     ->middleware(['can:administer-catalog', ...Dashboard::getRouteMiddleware($panel), 'throttle:60,1'])
                     ->name('site-releases.preview');
+                Route::get('/site-releases/{release}/preview/{section}/{slug?}', SiteReleasePreviewController::class)
+                    ->where('section', 'about|contact|blog|videos')
+                    ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
+                    ->middleware(['can:administer-catalog', ...Dashboard::getRouteMiddleware($panel), 'throttle:60,1'])
+                    ->name('site-releases.editorial-preview');
             })
             ->login()
             ->brandName('VASEY.AUDIO / Studio')

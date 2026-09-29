@@ -6,15 +6,19 @@ use App\Domain\SiteBuilder\Models\SitePublication;
 use App\Domain\SiteBuilder\Models\SitePublicationRevision;
 use App\Domain\SiteBuilder\Models\SiteRelease;
 use App\Domain\SiteBuilder\SiteContent;
+use App\Domain\SiteBuilder\SiteContentSchema;
 use App\Filament\Resources\SiteReleaseResource\Pages\ListSiteReleases;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Auth\Access\Response;
@@ -71,19 +75,92 @@ class SiteReleaseResource extends OperatorResource
                     ->simple(Textarea::make('text')->required()->maxLength(1500)->rows(3))->minItems(1)->maxItems(4),
             ]),
             Section::make('Navigation and footer')->schema([
-                Repeater::make('content.navigation')->label('Navigation links')->schema([
+                Repeater::make('content.navigation')->label('Navigation links')->addActionLabel('Add navigation link')->schema([
                     TextInput::make('label')->required()->maxLength(48),
                     Select::make('href')->label('Destination')->options([
                         '/' => 'Home', '/#catalog' => 'Catalog', '/#licenses' => 'Licensing', '/#studio' => 'Studio',
+                        '/about' => 'About', '/contact' => 'Contact', '/blog' => 'Blog', '/videos' => 'Videos',
                     ])->required(),
-                ])->minItems(1)->maxItems(4),
+                ])->minItems(1)->maxItems(8)->helperText('A page must be included in this release before linking to it.'),
                 Textarea::make('content.footer.description')->label('Footer description')->required()->maxLength(300)->rows(2),
             ]),
+            ...static::editorialFields(),
             Section::make('Homepage sharing metadata')->description('Published track pages retain their own title, description and canonical URL.')->schema([
                 TextInput::make('content.seo.title')->label('Page title')->required()->maxLength(120),
                 Textarea::make('content.seo.description')->label('Page description')->required()->maxLength(300)->rows(3),
             ]),
         ];
+    }
+
+    private static function editorialFields(): array
+    {
+        $sections = [];
+        foreach (['about' => 'About', 'contact' => 'Contact', 'blog' => 'Blog', 'videos' => 'Videos'] as $key => $label) {
+            $fields = [
+                TextInput::make("content.{$key}.title")->label("{$label} page title")->required()->maxLength(120),
+                Textarea::make("content.{$key}.description")->label("{$label} page description")->required()->maxLength(300)->rows(3),
+            ];
+            if (in_array($key, ['about', 'contact'], true)) {
+                $fields[] = Repeater::make("content.{$key}.paragraphs")->label("{$label} paragraphs")
+                    ->simple(Textarea::make('text')->label("{$label} paragraph")->required()->maxLength(1500)->rows(4))
+                    ->minItems(1)->maxItems(12)->defaultItems(1);
+            }
+            if ($key === 'contact') {
+                $fields[] = TextInput::make('content.contact.email')->label('Contact email address')->required()->email()->maxLength(254)
+                    ->helperText('A public contact address. The published link opens the visitor’s email app; this site does not send a message.');
+            }
+            if (in_array($key, ['blog', 'videos'], true)) {
+                $entryLabel = $key === 'blog' ? 'Article' : 'Video';
+                $entryFields = [
+                    TextInput::make('slug')->label("{$entryLabel} URL slug")->required()->maxLength(80)
+                        ->helperText('Lowercase letters, digits and single hyphens. Each entry needs a unique URL.'),
+                    TextInput::make('title')->label("{$entryLabel} title")->required()->maxLength(120),
+                    Textarea::make('description')->label("{$entryLabel} description")->required()->maxLength(300)->rows(3),
+                ];
+                if ($key === 'blog') {
+                    $entryFields[] = Repeater::make('paragraphs')->label('Article paragraphs')
+                        ->simple(Textarea::make('text')->label('Article paragraph')->required()->maxLength(1500)->rows(4))
+                        ->minItems(1)->maxItems(12)->defaultItems(1);
+                } else {
+                    $entryFields[] = Select::make('provider')->label('Video provider')->options(['youtube' => 'YouTube', 'vimeo' => 'Vimeo'])->native()->required();
+                    $entryFields[] = TextInput::make('video_id')->label('Video ID')->required()->maxLength(12)
+                        ->helperText('Use the 11-character YouTube ID or the numeric Vimeo ID. A watch link is created without loading an embedded player.');
+                }
+                $fields[] = Repeater::make("content.{$key}.entries")->label("{$label} entries")->schema($entryFields)
+                    ->itemLabel(fn (array $state): string => ($state['title'] ?? '') ?: "New {$entryLabel}")->minItems(1)->maxItems(30)->defaultItems(1)->collapsible();
+            }
+            $sections[] = Section::make("{$label} content")->collapsible()->schema([
+                Checkbox::make("enabled.{$key}")->label("Include {$label} page")->live(),
+                Group::make($fields)->visible(fn (Get $get): bool => (bool) $get("enabled.{$key}")),
+            ]);
+        }
+
+        return $sections;
+    }
+
+    private static function draftForm(array $content, string $label = ''): array
+    {
+        $content = SiteContentSchema::forEditing($content);
+        $enabled = [];
+        foreach (['about', 'contact', 'blog', 'videos'] as $key) {
+            $enabled[$key] = $content[$key] !== null;
+            if ($enabled[$key]) {
+                continue;
+            }
+            $content[$key] = ['title' => '', 'description' => ''];
+            if (in_array($key, ['about', 'contact'], true)) {
+                $content[$key]['paragraphs'] = [''];
+            }
+            if ($key === 'contact') {
+                $content[$key]['email'] = '';
+            }
+            if (in_array($key, ['blog', 'videos'], true)) {
+                $content[$key]['entries'] = [['slug' => '', 'title' => '', 'description' => ''] + ($key === 'blog'
+                    ? ['paragraphs' => ['']] : ['provider' => 'youtube', 'video_id' => ''])];
+            }
+        }
+
+        return ['label' => $label, 'content' => $content, 'enabled' => $enabled];
     }
 
     public static function createDraftAction(): Action
@@ -93,7 +170,7 @@ class SiteReleaseResource extends OperatorResource
             ->fillForm(function (): array {
                 static::actor();
 
-                return ['label' => '', 'content' => app(SiteContent::class)->current()];
+                return static::draftForm(app(SiteContent::class)->current());
             })
             ->action(fn (array $data, ListSiteReleases $livewire) => static::saveDraft($data, $livewire));
     }
@@ -102,7 +179,13 @@ class SiteReleaseResource extends OperatorResource
     {
         try {
             // Schema version is a server contract, never an operator-editable field.
-            app(SiteContent::class)->create(['schema_version' => 1] + $data['content'], $data['label'], static::actor());
+            $content = ['schema_version' => 2] + $data['content'];
+            foreach (['about', 'contact', 'blog', 'videos'] as $key) {
+                if (($data['enabled'][$key] ?? false) !== true) {
+                    $content[$key] = null;
+                }
+            }
+            app(SiteContent::class)->create($content, $data['label'], static::actor());
             Notification::make()->success()->title('Private draft saved')->body('Preview the release before publishing.')->send();
         } catch (ValidationException $exception) {
             $path = $livewire->getSchema($livewire->getMountedActionSchemaName())->getStatePath();
@@ -118,7 +201,7 @@ class SiteReleaseResource extends OperatorResource
     {
         return Action::make($operation)->label($label)->requiresConfirmation()
             ->modalHeading($label)
-            ->modalDescription('This changes the public site text and homepage sharing metadata. Catalog, purchases and licenses retain their existing records.')
+            ->modalDescription('This changes all included public pages, navigation and sharing metadata. Catalog, purchases and licenses retain their existing records.')
             ->mountUsing(function (ListSiteReleases $livewire): void {
                 static::actor();
                 // Retained on the locked component, not re-read when the operator confirms.
@@ -155,7 +238,7 @@ class SiteReleaseResource extends OperatorResource
                 Action::make('preview')->url(fn (SiteRelease $record): string => route('filament.admin.site-releases.preview', $record))->openUrlInNewTab(),
                 Action::make('duplicateDraft')->label('Edit as new draft')->schema(static::editor())
                     ->modalHeading('Edit a copy as a private draft')->modalSubmitActionLabel('Save private draft')
-                    ->fillForm(fn (SiteRelease $record): array => ['label' => $record->label, 'content' => app(SiteContent::class)->preview($record->id, static::actor())])
+                    ->fillForm(fn (SiteRelease $record): array => static::draftForm(app(SiteContent::class)->preview($record->id, static::actor()), $record->label))
                     ->action(fn (array $data, ListSiteReleases $livewire) => static::saveDraft($data, $livewire)),
                 static::publicationAction('publish', 'Publish release'),
                 static::publicationAction('rollback', 'Restore previous release'),

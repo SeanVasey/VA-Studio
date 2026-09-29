@@ -1,9 +1,9 @@
 export interface SiteContent {
-  schema_version: 1;
+  schema_version: 1 | 2;
   hero: { eyebrow: string; title: string; line_two: string; description: string };
   studio: { eyebrow: string; title: string; line_two: string; lead: string; paragraphs: string[] };
   footer: { description: string };
-  navigation: { label: string; href: '/' | '/#catalog' | '/#licenses' | '/#studio' }[];
+  navigation: { label: string; href: '/' | '/#catalog' | '/#licenses' | '/#studio' | '/about' | '/contact' | '/blog' | '/videos' }[];
   seo: { title: string; description: string };
 }
 
@@ -29,3 +29,29 @@ export const defaultSiteContent: SiteContent = {
     description: 'Original music, beats and sound design by Sean Vasey. Explore the VASEY.AUDIO catalog and listen to published previews.',
   },
 };
+
+export interface EditorialEntrySummary {
+  slug: string;
+  title: string;
+  description: string;
+  path: string;
+}
+
+export interface EditorialDescriptor {
+  section: 'about' | 'contact' | 'blog' | 'videos';
+  kind: 'page' | 'collection' | 'entry';
+  path: string;
+  title: string;
+  description: string;
+  paragraphs: string[];
+  entries: EditorialEntrySummary[];
+  email: string | null;
+  contactHref: string | null;
+  video: { provider: 'youtube' | 'vimeo'; videoId: string; watchUrl: string } | null;
+}
+
+/** A private preview never sends an internal content link outside its saved release. */
+export function siteContentHref(href: string, previewBase: string | null = null): string {
+  if (!previewBase) return href;
+  return previewBase + (href === '/' ? '' : href.startsWith('/#') ? href.slice(1) : href);
+}

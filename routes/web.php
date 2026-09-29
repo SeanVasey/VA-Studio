@@ -6,10 +6,14 @@ use App\Http\Controllers\TestOwnerDeliveryController;
 use App\Http\Controllers\PublicMediaController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\StorefrontController;
+use App\Http\Controllers\EditorialController;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [StorefrontController::class, 'index'])->middleware('throttle:120,1')->name('home');
+Route::get('/{section}/{slug?}', EditorialController::class)
+    ->where('section', 'about|contact|blog|videos')->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
+    ->middleware('throttle:120,1')->name('editorial.show');
 Route::get('/tracks/{slug}', [StorefrontController::class, 'index'])->middleware('throttle:120,1')->name('tracks.show');
 Route::get('/api/catalog', [StorefrontController::class, 'json'])->middleware('throttle:120,1')->name('catalog.index');
 Route::get('/media/{asset}', PublicMediaController::class)->middleware('throttle:240,1')->name('media.public');

@@ -3,6 +3,7 @@
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\StripeWebhookBodyLimit;
 use App\Http\Middleware\TestDeliveryPrivacy;
+use App\Http\Middleware\SitePreviewPrivacy;
 use App\Http\Responses\TestDeliveryResponse;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Foundation\Application;
@@ -11,6 +12,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -23,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(StripeWebhookBodyLimit::class);
         $middleware->prepend(TestDeliveryPrivacy::class);
+        $middleware->prepend(SitePreviewPrivacy::class);
         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
         $middleware->web(append: [HandleInertiaRequests::class]);
     })
@@ -31,6 +34,11 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
         );
         $exceptions->report(function (Throwable $exception) {
+            if (SitePreviewPrivacy::matches(request())) {
+                try { Log::error('Site preview request failed.', ['exception_class' => $exception::class]); }
+                catch (Throwable) { /* Preserve a generic private response if reporting fails. */ }
+                return false;
+            }
             if (TestDeliveryResponse::matches(request())) {
                 try { Log::error('Test delivery middleware failed.', ['exception_class' => $exception::class]); }
                 catch (Throwable) { /* Reporting failure must preserve the generic private response. */ }
@@ -51,6 +59,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // Middleware failures occur before the controller. Keep those private and
         // generic too, including in debug mode, without changing other routes.
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request): Response {
+            if (SitePreviewPrivacy::matches($request)) {
+                $status = $exception instanceof ValidationException ? $exception->status : $response->getStatusCode();
+
+                return $status >= 400 ? SitePreviewPrivacy::error($status, $response) : SitePreviewPrivacy::protect($response);
+            }
             if (TestDeliveryResponse::matches($request)) {
                 $status = $exception instanceof LockTimeoutException ? 503 : $response->getStatusCode();
                 $headers = [];

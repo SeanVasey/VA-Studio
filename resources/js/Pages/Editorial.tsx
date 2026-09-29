@@ -1,0 +1,47 @@
+import type { MouseEvent } from 'react';
+import { router } from '@inertiajs/react';
+import { Icon } from '../components/Icon';
+import { MetadataHead } from '../components/MetadataHead';
+import { PersistentPlayer } from '../components/PersistentPlayer';
+import { SiteFooter, SiteHeader } from '../components/SiteChrome';
+import { siteContentHref, type EditorialDescriptor, type SiteContent } from '../lib/site-content';
+import type { PageMetadata } from '../lib/catalog';
+
+interface EditorialProps {
+  siteContent: SiteContent;
+  editorial: EditorialDescriptor;
+  sitePreview?: boolean;
+  sitePreviewBase?: string | null;
+  metadata: PageMetadata;
+}
+
+export default function Editorial({ siteContent, editorial, sitePreview = false, sitePreviewBase = null, metadata }: EditorialProps) {
+  const href = (path: string) => siteContentHref(path, sitePreviewBase);
+  function navigate(event: MouseEvent<HTMLAnchorElement>) {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+    event.preventDefault();
+    router.visit(event.currentTarget.href, { preserveScroll: false, onSuccess: () => (document.getElementById('editorial-title') ?? document.getElementById('detail-title') ?? document.getElementById('catalog-title'))?.focus({ preventScroll: true }) });
+  }
+  const provider = editorial.video?.provider === 'youtube' ? 'YouTube' : 'Vimeo';
+  const chrome = { content: siteContent, homeHref: href('/'), href, onNavigate: navigate };
+  return <>
+    <MetadataHead metadata={metadata} />
+    <a className="skip-link" href="#main">Skip to content</a>
+    {sitePreview && <div className="preview-banner">PRIVATE CONTENT PREVIEW <span>Visible only to staff. Purchasing and external actions are disabled.</span></div>}
+    <SiteHeader {...chrome} currentPath={`/${editorial.section}`} />
+    <main id="main" className="editorial-page section-pad">
+      <div className="editorial-heading"><p className="eyebrow">VASEY.AUDIO / {editorial.section}</p>
+        {editorial.kind === 'entry' && <a className="text-link editorial-back" href={href(`/${editorial.section}`)} onClick={navigate}>Back to {editorial.section === 'blog' ? 'blog' : 'videos'} <Icon name="arrow" size={16} /></a>}
+        <h1 id="editorial-title" tabIndex={-1}>{editorial.title}</h1><p className="editorial-description">{editorial.description}</p>
+      </div>
+      {editorial.paragraphs.length > 0 && <div className="editorial-prose">{editorial.paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div>}
+      {editorial.kind === 'collection' && <div className="editorial-list">{editorial.entries.map((entry, index) => <article className="editorial-entry" key={entry.slug}>
+        <span className="editorial-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><div><h2><a href={href(entry.path)} onClick={navigate}>{entry.title}</a></h2><p>{entry.description}</p><a className="text-link" href={href(entry.path)} onClick={navigate} aria-label={`${editorial.section === 'blog' ? 'Read' : 'View'} ${entry.title}`}>{editorial.section === 'blog' ? 'Read article' : 'View video'} <Icon name="arrow" size={16} /></a></div>
+      </article>)}</div>}
+      {editorial.email && <div className="editorial-contact"><p className="eyebrow">Email</p><p>{editorial.email}</p>{!sitePreview && editorial.contactHref ? <a className="button" href={editorial.contactHref}>Open email <Icon name="northeast" size={18} /></a> : <span className="fine-print">Email action disabled in private preview.</span>}</div>}
+      {editorial.video && <div className="editorial-video"><Icon name="play" size={32} /><div><p className="eyebrow">{provider}</p><p>This video opens on {provider}.</p>{!sitePreview ? <a className="button" href={editorial.video.watchUrl} target="_blank" rel="noopener noreferrer">Watch on {provider} <Icon name="northeast" size={18} /></a> : <span className="fine-print">Video link disabled in private preview.</span>}</div></div>}
+    </main>
+    <SiteFooter {...chrome} />
+    <PersistentPlayer tracks={[]} purchasingDisabled={sitePreview} catalogUrl={href('/#catalog')} onNavigate={navigate} onLicense={track => { if (!sitePreview) router.visit(track.shareUrl); }} />
+  </>;
+}

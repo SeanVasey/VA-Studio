@@ -1,15 +1,15 @@
-import { useState } from 'react';
+import { useState, type MouseEvent } from 'react';
 import { player, useAudio } from '../lib/audio';
 import { formatTime, safeMediaUrl, type Track } from '../lib/catalog';
 import { Icon } from './Icon';
 
-export function PersistentPlayer({ tracks, onLicense, purchasingDisabled = false }: { tracks: Track[]; onLicense: (track: Track) => void; purchasingDisabled?: boolean }) {
+export function PersistentPlayer({ tracks, onLicense, purchasingDisabled = false, catalogUrl = '#catalog', onNavigate }: { tracks: Track[]; onLicense: (track: Track) => void; purchasingDisabled?: boolean; catalogUrl?: string; onNavigate?: (event: MouseEvent<HTMLAnchorElement>) => void }) {
   const audio = useAudio();
   const [queueOpen, setQueueOpen] = useState(false);
   const queue = tracks.filter(track => safeMediaUrl(track.previewUrl));
   const index = queue.findIndex(track => track.id === audio.track?.id);
   const active = audio.status === 'playing' || audio.status === 'loading';
-  if (!audio.track) return <div className="player player-idle" aria-label="Audio preview player"><span className="idle-icon"><Icon name="music" /></span><div><strong>Your next idea starts with a sound.</strong><span>Select a track to preview.</span></div><a className="text-link" href="#catalog">Explore the catalog <Icon name="arrow" size={16} /></a></div>;
+  if (!audio.track) return <div className="player player-idle" aria-label="Audio preview player"><span className="idle-icon"><Icon name="music" /></span><div><strong>Your next idea starts with a sound.</strong><span>Select a track to preview.</span></div><a className="text-link" href={catalogUrl} onClick={onNavigate}>Explore the catalog <Icon name="arrow" size={16} /></a></div>;
   const track = audio.track;
   return <aside className="player-wrap" aria-label="Audio preview player">
     {queueOpen && <div className="queue-panel"><div className="queue-heading"><strong>Preview queue</strong><button className="icon-button" aria-label="Close queue" onClick={() => setQueueOpen(false)}><Icon name="close" /></button></div><p className="fine-print">Tracks play only when selected. Automatic playback is off.</p><div className="queue-volume"><button className="icon-button" aria-label={audio.muted ? 'Unmute audio' : 'Mute audio'} onClick={() => player.mute()}><Icon name={audio.muted ? 'mute' : 'volume'} size={18} /></button><input aria-label="Playback volume" type="range" min="0" max="1" step="0.01" value={audio.muted ? 0 : audio.volume} onChange={event => { if (audio.muted) player.mute(); player.volume(Number(event.target.value)); }} /><button className="text-link" disabled={purchasingDisabled || !track.offers.length} onClick={() => { setQueueOpen(false); onLicense(track); }}>License this track <Icon name="arrow" size={15} /></button></div>{queue.map(item => <button key={item.id} className={`queue-track ${track.id === item.id ? 'selected' : ''}`} onClick={() => player.toggle(item)}><span>{item.title}</span><span>{formatTime(item.durationSeconds)}</span></button>)}</div>}

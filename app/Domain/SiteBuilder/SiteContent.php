@@ -24,11 +24,11 @@ final class SiteContent
             $content = SiteContentSchema::validate($content);
             Validator::make(['label' => $label], ['label' => ['required', 'string', 'max:120', 'not_regex:/[<>\x00-\x1F\x7F]/u']])->validate();
             $release = SiteRelease::create([
-                'label' => $label, 'schema_version' => 1, 'content' => $content,
+                'label' => $label, 'schema_version' => $content['schema_version'], 'content' => $content,
                 'content_hash' => CanonicalJson::hash($content), 'canonicalization_version' => CanonicalJson::VERSION,
                 'created_by' => $actor->id, 'created_at' => now(),
             ]);
-            AuditEvent::record('site.release.created', $release, ['content_hash' => $release->content_hash, 'schema_version' => 1], $actor->id);
+            AuditEvent::record('site.release.created', $release, ['content_hash' => $release->content_hash, 'schema_version' => $release->schema_version], $actor->id);
 
             return $release;
         });
@@ -128,8 +128,9 @@ final class SiteContent
     private function content(SiteRelease $release): array
     {
         $content = $release->content;
-        if ($release->schema_version !== 1 || $release->canonicalization_version !== CanonicalJson::VERSION
-            || ! is_array($content) || ! hash_equals($release->content_hash, CanonicalJson::hash($content))) {
+        if (! in_array($release->schema_version, [1, 2], true) || $release->canonicalization_version !== CanonicalJson::VERSION
+            || ! is_array($content) || ($content['schema_version'] ?? null) !== $release->schema_version
+            || ! hash_equals($release->content_hash, CanonicalJson::hash($content))) {
             throw ValidationException::withMessages(['publication' => 'The retained site release failed its integrity check.']);
         }
 

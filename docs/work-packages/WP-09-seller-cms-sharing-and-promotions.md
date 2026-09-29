@@ -1,6 +1,6 @@
 # [WP-09] Seller CMS, publishing, sharing and promotion administration
 
-Status: **Partially implemented; remains open.** The first CMS increment is accepted in PR #72. Test promotion administration is implemented for local/testing; its acceptance record is maintained in issue #9 and the integrating PR. This issue is complete only when all acceptance evidence below exists.
+Status: **Partially implemented; remains open.** The first CMS increment is accepted in PR #72 and test promotion administration in PR #73. Persisted editorial/contact content is the next bounded increment; its acceptance record is maintained in issue #9 and the integrating PR. This issue is complete only when all acceptance evidence below exists.
 
 - Suggested issue title: `[WP-09] Seller CMS, publishing, sharing and promotion administration`
 - Phase: 3
@@ -29,7 +29,7 @@ Versioned home/navigation/content release with preview and rollback, plus sharea
 - [ ] Draft changes do not affect live content; publication validates links/assets and records actor/version.
 - [ ] Rollback restores content without changing catalog purchases, grants or provider state.
 - [ ] Blog/video/contact and social metadata are real persisted flows, not static placeholder links.
-- [ ] Promotion editor cannot bypass server currency/limits/inventory; expired promotions display correctly.
+- [x] Test-mode promotion editor preserves server currency/limits/inventory and displays expired promotions correctly. Production promotion readiness remains open.
 - [ ] Public/free-download flows show the actual license and separate optional marketing consent.
 
 ## Verification
@@ -57,8 +57,16 @@ The [ordered acceptance record](../development-order.md#accepted-downloads-and-c
 
 ## Test promotion administration — September 29, 2026
 
-Implemented local/testing scope: [D-22](../architecture/D-22-promotion-administration.md) and the [promotion administration contract](../promotion-pricing.md#seller-administration--september-29-2026). Staff create immutable disabled test campaigns, review terms, enable/disable them using a monotonic expected revision and inspect bounded aggregate usage. Copying requires a fresh lifetime key/code; there is no mutable published policy or persisted editable promotion draft. Legacy configured campaigns remain read-only in administration.
+Accepted local/testing scope in [PR #73](https://github.com/VASEYDEV/VASEYAUDIO/pull/73): [D-22](../architecture/D-22-promotion-administration.md) and the [promotion administration contract](../promotion-pricing.md#seller-administration--september-29-2026). Staff create immutable disabled test campaigns, review terms, enable/disable them using a monotonic expected revision and inspect bounded aggregate usage. Copying requires a fresh lifetime key/code; there is no mutable published policy or persisted editable promotion draft. Legacy configured campaigns remain read-only in administration.
 
-The domain reuses server-owned USD/currency, money, eligibility, dates, non-stacking, allocation and lifetime-capacity rules. Availability shares the campaign lock with new usage holds and held-to-pending transitions. Disabling does not erase pending/consumed usage or rewrite frozen orders. Authorization, audit atomicity, stale/ABA confirmation, strict inputs, database retention, independent MySQL contention and actual browser workflow are required gates. Acceptance requires all required CI and independent review on the final tested commit. The integrating PR and [WP-09 issue #9](https://github.com/VASEYDEV/VASEYAUDIO/issues/9) record the exact tested commit, executed CI, independent review and merge disposition.
+The domain reuses server-owned USD/currency, money, eligibility, dates, non-stacking, allocation and lifetime-capacity rules. Availability shares the campaign lock with new usage holds and held-to-pending transitions. Disabling does not erase pending/consumed usage or rewrite frozen orders. Authorization, audit atomicity, stale/ABA confirmation, strict inputs, database retention, independent MySQL contention and actual browser workflow are required gates. All ten required CI jobs and independent review accepted the final tested commit. The [ordered acceptance record](../development-order.md#accepted-test-promotion-administration--september-29) retains the exact tested source, merge, MySQL/SQLite/browser results and post-merge verification.
 
-After promotion administration is accepted, continue persisted contact/about/blog/video content, then editable asset references and scheduling. Existing public track sharing metadata remains available. Free-download licensing/consent, broader sharing controls and business-resolution/support workflows remain separate domain-dependent work. Do not close the original acceptance checklist from these partial slices.
+The next increment is persisted contact/about/blog/video content, then editable asset references and scheduling. Existing public track sharing metadata remains available. Free-download licensing/consent, broader sharing controls and business-resolution/support workflows remain separate domain-dependent work. Do not close the original acceptance checklist from these partial slices.
+
+## Persisted editorial/contact content — September 29, 2026
+
+[D-23](../architecture/D-23-editorial-content.md) and the [operator guide](../editorial-content.md) extend immutable complete site releases to optional about/contact pages and blog/video listings with detail routes. Newly authored schema-v2 releases preserve all retained v1 evidence; private previews remain pinned to one saved release and public routes project only selected content. Navigation validates enabled destinations. Publication/rollback continue through the existing monotonic pointer, authorization and audit transaction. No new migration, imported source content or commerce mutation is introduced.
+
+This is a bounded implementation contract; the integrating PR and issue #9 record actual acceptance against the final tested source. Required coverage includes v1/v2 compatibility, link/provider/email validation, draft privacy, active-only route/metadata projection, fresh staff/MFA checks, preview pinning, publication/rollback and full MySQL/SQLite/browser/build/audit gates with independent review.
+
+Contact supplies published copy and an encoded email link, not an inbound inquiry service or verified delivery. Video entries supply typed provider watch links, not consent-aware embeds or related-track associations. Editable assets, scheduling, source slug/date migration, broader sharing/support and free-download licensing/consent remain open. The original broad acceptance checklist is not complete from these partial flows.
