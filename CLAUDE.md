@@ -36,6 +36,8 @@ The network policy blocks GitHub's archive download hosts, so Composer falls bac
 
 - Focused: `php artisan test --filter=<TestClass>`, `npm test`, `npm run build` (includes the TypeScript check).
 - Full SQLite suite in parallel: `python3 scripts/ci/phpunit-shards.py --shards=4 --prefix=phpunit-ci-local` (the prefix must match `phpunit-ci-*`), then run `php vendor/bin/phpunit --configuration=phpunit-ci-local-<n>.xml` for each shard. The generated `phpunit-ci-local-*` files are scratch and not gitignored: delete them before regenerating and never commit them.
+- Under Claude Code, `laravel/pao` replaces PHPUnit's progress output with a single JSON summary printed when the run ends, so a shard's log stays empty while it runs.
+- Run PHP tests while `public/build` is absent (move it aside after `npm run build`). Some HTTP tests send Inertia requests without an asset-version header, so they fail with 409 once a Vite manifest exists. CI's backend jobs never build assets and cannot catch this.
 - Before opening a PR: `composer validate --strict`, `composer audit` and `npm audit --audit-level=high`. The PR must then pass all ten jobs in `.github/workflows/ci.yml`, including the MySQL shards and the Chromium/WebKit browser job (`npm run test:browser`).
 
 ## Workflow
