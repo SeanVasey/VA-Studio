@@ -1,4 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
+import { resetBrowserLoginRateLimit } from './auth-fixture';
+
+test.beforeEach(() => resetBrowserLoginRateLimit());
 
 const password = process.env.VASEY_BROWSER_PASSWORD!;
 const row = (page: Page, code: string) => page.getByRole('row').filter({ has: page.getByText(code, { exact: true }) });
@@ -69,7 +72,7 @@ test('real monetary inputs, immutable copying and enable/disable changes persist
   await page.screenshot({ path: testInfo.outputPath('promotion-numeric-validation.png'), fullPage: false });
   await dialog.getByLabel('Minimum eligible subtotal (cents)', { exact: false }).fill('1000');
   await dialog.getByRole('button', { name: 'Create disabled promotion', exact: true }).click();
-  await expect(dialog.getByRole('heading')).not.toBeVisible();
+  await expect(dialog.getByRole('heading', { name: 'Create a disabled test promotion', exact: true })).not.toBeVisible();
   await expect(row(page, firstCode).getByText('Disabled', { exact: true })).toBeVisible();
 
   // A fresh document verifies the saved campaign rather than retained component state.
@@ -104,7 +107,7 @@ test('real monetary inputs, immutable copying and enable/disable changes persist
   await dialog.getByLabel('Minimum eligible subtotal (cents)', { exact: false }).fill('2000');
   await dialog.getByLabel('Lifetime use limit', { exact: false }).fill('3');
   await dialog.getByRole('button', { name: 'Create disabled promotion', exact: true }).click();
-  await expect(dialog.getByRole('heading')).not.toBeVisible();
+  await expect(dialog.getByRole('heading', { name: 'Create a disabled test promotion', exact: true })).not.toBeVisible();
   await expect(row(editor, secondCode).getByText('Disabled', { exact: true })).toBeVisible();
   await expect(row(editor, firstCode).getByText('Active', { exact: true })).toBeVisible();
   await changeAvailability(editor, secondCode, 'Enable promotion');

@@ -1,6 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test, expect, type Page } from '@playwright/test';
+import { resetBrowserLoginRateLimit } from './auth-fixture';
+
+test.beforeEach(() => resetBrowserLoginRateLimit());
 
 type Fixture = { editable: { title: string; slug: string }; retained: { title: string; slug: string } };
 const fixtures = JSON.parse(readFileSync(join(process.env.VASEY_BROWSER_DIRECTORY!, 'fixtures.json'), 'utf8')) as Record<string, Fixture>;
