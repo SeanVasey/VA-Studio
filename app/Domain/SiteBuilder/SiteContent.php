@@ -69,9 +69,7 @@ final class SiteContent
             $publication = SitePublication::query()->lockForUpdate()->findOrFail(1);
             $actor = $this->actor($actor);
             $this->verifyPointer($publication);
-            if ($expectedVersion < 0 || $expectedVersion !== $publication->revision || $publication->revision >= 2147483646) {
-                throw ValidationException::withMessages(['publication' => 'The published site changed. Refresh the release list before publishing or rolling back.']);
-            }
+            $this->expectRevision($publication, $expectedVersion);
             $release = SiteRelease::findOrFail($releaseId);
             $this->content($release);
             if ($publication->active_release_id === $releaseId) {
@@ -80,37 +78,50 @@ final class SiteContent
             if ($operation === 'rollback' && ! SitePublicationRevision::where('release_id', $releaseId)->exists()) {
                 throw ValidationException::withMessages(['publication' => 'Rollback requires a previously published release. Publish a draft to activate it for the first time.']);
             }
-            if ($publication->revision === 0) {
-                // Retain the exact pre-CMS content as rollback evidence in the same first-publication transaction.
-                // The actor captures this existing baseline; they are not represented as its original author.
-                $baselineContent = SiteContentSchema::defaults();
-                $baseline = SiteRelease::create([
-                    'label' => 'Original site content', 'schema_version' => 1, 'content' => $baselineContent,
-                    'content_hash' => CanonicalJson::hash($baselineContent), 'canonicalization_version' => CanonicalJson::VERSION,
-                    'created_by' => $actor->id, 'created_at' => now(),
-                ]);
-                SitePublicationRevision::create([
-                    'revision' => 0, 'release_id' => $baseline->id, 'previous_release_id' => null,
-                    'operation' => 'baseline', 'content_hash' => $baseline->content_hash, 'actor_id' => $actor->id, 'created_at' => now(),
-                ]);
-                AuditEvent::record('site.release.baseline_retained', $baseline, [
-                    'content_hash' => $baseline->content_hash, 'publication_revision' => 0,
-                ], $actor->id);
-            }
-            $previous = $publication->active_release_id;
-            $revision = $publication->revision + 1;
-            SitePublicationRevision::create([
-                'revision' => $revision, 'release_id' => $releaseId, 'previous_release_id' => $previous,
-                'operation' => $operation, 'content_hash' => $release->content_hash, 'actor_id' => $actor->id, 'created_at' => now(),
-            ]);
-            $publication->update(['active_release_id' => $releaseId, 'revision' => $revision, 'updated_at' => now()]);
-            AuditEvent::record('site.release.'.$operation, $release, [
-                'publication_revision' => $revision, 'previous_release_id' => $previous,
-                'release_id' => $releaseId, 'content_hash' => $release->content_hash,
-            ], $actor->id);
+            $this->applyActivation($publication, $release, $actor, $operation);
 
             return $publication;
         });
+    }
+
+    /** Caller holds the singleton lock and has verified the actor, pointer, revision and release. */
+    private function applyActivation(SitePublication $publication, SiteRelease $release, User $actor, string $operation): void
+    {
+        if ($publication->revision === 0) {
+            // Retain the exact pre-CMS content as rollback evidence in the same first-publication transaction.
+            // The actor captures this existing baseline; they are not represented as its original author.
+            $baselineContent = SiteContentSchema::defaults();
+            $baseline = SiteRelease::create([
+                'label' => 'Original site content', 'schema_version' => 1, 'content' => $baselineContent,
+                'content_hash' => CanonicalJson::hash($baselineContent), 'canonicalization_version' => CanonicalJson::VERSION,
+                'created_by' => $actor->id, 'created_at' => now(),
+            ]);
+            SitePublicationRevision::create([
+                'revision' => 0, 'release_id' => $baseline->id, 'previous_release_id' => null,
+                'operation' => 'baseline', 'content_hash' => $baseline->content_hash, 'actor_id' => $actor->id, 'created_at' => now(),
+            ]);
+            AuditEvent::record('site.release.baseline_retained', $baseline, [
+                'content_hash' => $baseline->content_hash, 'publication_revision' => 0,
+            ], $actor->id);
+        }
+        $previous = $publication->active_release_id;
+        $revision = $publication->revision + 1;
+        SitePublicationRevision::create([
+            'revision' => $revision, 'release_id' => $release->id, 'previous_release_id' => $previous,
+            'operation' => $operation, 'content_hash' => $release->content_hash, 'actor_id' => $actor->id, 'created_at' => now(),
+        ]);
+        $publication->update(['active_release_id' => $release->id, 'revision' => $revision, 'updated_at' => now()]);
+        AuditEvent::record('site.release.'.$operation, $release, [
+            'publication_revision' => $revision, 'previous_release_id' => $previous,
+            'release_id' => $release->id, 'content_hash' => $release->content_hash,
+        ], $actor->id);
+    }
+
+    private function expectRevision(SitePublication $publication, int $expectedVersion): void
+    {
+        if ($expectedVersion < 0 || $expectedVersion !== $publication->revision || $publication->revision >= 2147483646) {
+            throw ValidationException::withMessages(['publication' => 'The published site changed. Refresh the release list before publishing or rolling back.']);
+        }
     }
 
     private function actor(User $actor): User
