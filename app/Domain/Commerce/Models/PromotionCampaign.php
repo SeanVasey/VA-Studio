@@ -3,6 +3,7 @@
 namespace App\Domain\Commerce\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use LogicException;
 
 class PromotionCampaign extends Model
@@ -14,6 +15,11 @@ class PromotionCampaign extends Model
     protected function casts(): array
     {
         return ['snapshot' => 'array', 'created_at' => 'immutable_datetime'];
+    }
+
+    public function availability(): HasOne
+    {
+        return $this->hasOne(PromotionAvailability::class);
     }
 
     protected static function booted(): void

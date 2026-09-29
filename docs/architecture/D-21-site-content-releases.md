@@ -1,6 +1,6 @@
 # D-21 — Versioned site content and atomic publication
 
-Status: **Implementation direction within Sean's continuous-development authorization, 2026-09-28; candidate pending integrated verification and independent review.** This is the bounded WP-09 handoff after D-20 acceptance, not a separately approved owner policy or a production-readiness claim. The [ordered record](../development-order.md) owns prerequisite and final acceptance evidence.
+Status: **Accepted bounded WP-09 increment, merged in PR #72 on 2026-09-28.** Implementation proceeded within Sean's continuous-development authorization after D-20 acceptance. The [ordered record](../development-order.md#accepted-downloads-and-cms--september-28-2026) retains the exact source, full CI and independent review. This is not a separately approved owner policy or a production-readiness claim.
 
 ## Context and choice
 

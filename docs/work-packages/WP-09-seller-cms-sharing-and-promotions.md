@@ -1,6 +1,6 @@
 # [WP-09] Seller CMS, publishing, sharing and promotion administration
 
-Status: **Planned work package**. Inspect the current implementation before starting; initial foundation code may already cover part of this scope. This issue is complete only when the acceptance evidence below exists.
+Status: **Partially implemented; remains open.** The first CMS increment is accepted in PR #72. Test promotion administration is implemented for local/testing; its acceptance record is maintained in issue #9 and the integrating PR. This issue is complete only when all acceptance evidence below exists.
 
 - Suggested issue title: `[WP-09] Seller CMS, publishing, sharing and promotion administration`
 - Phase: 3
@@ -51,8 +51,14 @@ Read [architecture index](../architecture/README.md), [decision register](../arc
 
 ## First CMS slice — September 28, 2026
 
-Candidate implementation: [site content/releases](../site-content-releases.md), [D-21](../architecture/D-21-site-content-releases.md). This adds immutable plain-text home/studio/footer/navigation/SEO snapshots, private staff previews, atomic publication and rollback with original-baseline retention. Drafts cannot change live text; purchase/provider/rights records are outside these commands. Existing theme artwork and identity remain fixed.
+Accepted in [PR #72](https://github.com/VASEYDEV/VASEYAUDIO/pull/72): [site content/releases](../site-content-releases.md), [D-21](../architecture/D-21-site-content-releases.md). This adds immutable plain-text home/studio/footer/navigation/SEO snapshots, private staff previews, atomic publication and rollback with original-baseline retention. Drafts cannot change live text; purchase/provider/rights records are outside these commands. Existing theme artwork and identity remain fixed.
 
-Local integrated CMS checks: 24 passed /229 assertions and two intentional MySQL-only skips. MySQL contention and actual browser publish/preview/rollback remain CI gates; independent domain review accepted the component, while final integrated review and required CI remain pending. Exact final source/run/merge disposition belongs in the integrating PR. This broad work package remains open.
+The [ordered acceptance record](../development-order.md#accepted-downloads-and-cms--september-28-2026) retains exact source/tree/merge and all 10 passing CI jobs, including full MySQL/SQLite suites, real MySQL publication/rollback races, Chromium/WebKit flows, build/audits and independent source review. The prerequisite owner downloads in PR #71 are also accepted. This broad work package remains open.
 
-The first slice deliberately precedes the promotion editor; existing track sharing metadata remains available. Next implement promotion administration using the accepted server currency/limits/inventory rules, then persisted contact/about/blog/video, editable asset references and scheduling. Free-download consent and business-resolution/support workflows remain separate domain-dependent work. Do not close the original acceptance checklist from this slice.
+## Test promotion administration — September 29, 2026
+
+Implemented local/testing scope: [D-22](../architecture/D-22-promotion-administration.md) and the [promotion administration contract](../promotion-pricing.md#seller-administration--september-29-2026). Staff create immutable disabled test campaigns, review terms, enable/disable them using a monotonic expected revision and inspect bounded aggregate usage. Copying requires a fresh lifetime key/code; there is no mutable published policy or persisted editable promotion draft. Legacy configured campaigns remain read-only in administration.
+
+The domain reuses server-owned USD/currency, money, eligibility, dates, non-stacking, allocation and lifetime-capacity rules. Availability shares the campaign lock with new usage holds and held-to-pending transitions. Disabling does not erase pending/consumed usage or rewrite frozen orders. Authorization, audit atomicity, stale/ABA confirmation, strict inputs, database retention, independent MySQL contention and actual browser workflow are required gates. Acceptance requires all required CI and independent review on the final tested commit. The integrating PR and [WP-09 issue #9](https://github.com/VASEYDEV/VASEYAUDIO/issues/9) record the exact tested commit, executed CI, independent review and merge disposition.
+
+After promotion administration is accepted, continue persisted contact/about/blog/video content, then editable asset references and scheduling. Existing public track sharing metadata remains available. Free-download licensing/consent, broader sharing controls and business-resolution/support workflows remain separate domain-dependent work. Do not close the original acceptance checklist from these partial slices.

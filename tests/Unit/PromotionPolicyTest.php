@@ -5,12 +5,15 @@ namespace Tests\Unit;
 use App\Domain\Commerce\PromotionPolicy;
 use App\Domain\Commerce\QuoteException;
 use InvalidArgumentException;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\PromotionFixtures;
 use Tests\TestCase;
 
 class PromotionPolicyTest extends TestCase
 {
+    use RefreshDatabase;
+
     public static function invalidPolicies(): array
     {
         return [

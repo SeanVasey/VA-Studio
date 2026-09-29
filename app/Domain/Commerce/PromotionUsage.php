@@ -22,6 +22,7 @@ final class PromotionUsage
         $this->requireTransaction();
         $policy = $pricing->snapshot['promotion'];
         $campaign = $this->campaign($policy, true);
+        app(PromotionAdministration::class)->requireAvailable($campaign);
         $at = now()->toImmutable(); // Sample only after the shared campaign lock.
         if ($pricing->expires_at->lessThanOrEqualTo($at)) {
             throw new QuoteException('PRICING_EXPIRED', 410);
@@ -90,6 +91,9 @@ final class PromotionUsage
 
                 return $use;
             }
+            // currentUse retained the campaign lock. Re-read availability as current
+            // evidence after that lock, not the earlier pricing transaction's snapshot.
+            app(PromotionAdministration::class)->requireAvailable(PromotionCampaign::findOrFail($use->promotion_campaign_id));
             $at = now()->toImmutable()->utc()->startOfSecond();
             if ($use->expires_at->lessThanOrEqualTo($at)) {
                 throw new QuoteException('PRICING_EXPIRED', 410);

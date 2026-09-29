@@ -1,6 +1,6 @@
 # D-20 — Owner HTTP boundary for test delivery
 
-Status: **Implemented candidate within Sean's existing continuous-development authorization, 2026-09-27.** D-17, D-18 and D-19 are accepted in merged PRs #65, #67 and #69. Main `1a6ecebd`, including documentation PR #70, passed [CI 36280010722](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36280010722). This dependent HTTP/UI candidate requires its own integrated tests and independent review; prerequisite acceptance is not acceptance of this candidate.
+Status: **Accepted test-only increment, merged in PR #71 on 2026-09-28.** D-17, D-18 and D-19 were accepted prerequisites; this HTTP/UI boundary subsequently completed its own full CI and independent review. The [ordered acceptance record](../development-order.md#accepted-downloads-and-cms--september-28-2026) retains the exact tested source, tree, merge and results. Dated implementation requirements below preserve the original scope and do not imply production readiness.
 
 Expose D-19 through the original order owner's existing same-origin session, a minimal database-only item/history projection, explicit authorization POST and native attachment POST. Reuse domain reconstruction, policy, order control, snapshot preparation and atomic redemption. Do not introduce another entitlement model or infer ownership from an email address, client owner key, payment return or knowledge of a UUID.
 
