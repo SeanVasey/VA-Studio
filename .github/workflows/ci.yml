@@ -25,6 +25,8 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+      - name: Scan the built client bundle for server secrets
+        run: python3 scripts/ci/scan-client-bundle.py
       - run: npm audit --audit-level=high
 
   backend-quality:
