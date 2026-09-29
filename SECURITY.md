@@ -2,7 +2,7 @@
 
 This repository contains an initial development foundation. It is not approved for live commerce or customer-data migration.
 
-Report security findings privately to the repository owner. Do not put exploit credentials, customer records, payment data, private audio, or production logs in public issues. GitHub private vulnerability reporting should be enabled once the repository exists.
+Report security findings privately to support@vasey.audio. Do not put exploit credentials, customer records, payment data, private audio, or production logs in public issues.
 
 No credentials are committed or seeded. Copy `.env.example` locally, generate the application key, and create an operator using the documented command. Production must use HTTPS, secure cookies, real secret storage, an audited staff-role workflow and mandatory admin MFA before exposure.
 
@@ -11,3 +11,11 @@ The foundation deliberately refuses checkout. The later commerce implementation 
 Keep uploads quarantined until decoded, scanned and validated. Never use browser-supplied paths or MIME types as authority. Separate public tagged previews and artwork from private masters, stems and contracts.
 
 Run dependency audits with lockfiles installed. Record advisory remediation and rollout impacts; do not disable audit gates without an explicit, evidence-backed decision.
+
+## Supported versions
+
+There are no releases yet. Security fixes land on `main`. The live store remains on BeatStars until cutover.
+
+## Audit exceptions
+
+None. CI fails on any Composer security advisory and on npm advisories of high severity or above.
