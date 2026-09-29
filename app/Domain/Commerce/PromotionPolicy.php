@@ -17,25 +17,15 @@ final class PromotionPolicy
 
     public function current(string $code): array
     {
+        if (! app()->environment('local', 'testing')) {
+            throw new QuoteException('PROMOTION_UNAVAILABLE', 503);
+        }
+        $selected = app(PromotionAdministration::class)->currentPolicy($code);
         try {
-            $json = config('commerce.test_promotions');
-            if (! app()->environment('local', 'testing') || ! is_string($json) || strlen($json) > 65536) {
-                throw new InvalidArgumentException('Test promotions are unavailable.');
-            }
-            $decoded = json_decode($json, false, 8, JSON_THROW_ON_ERROR);
-            if (! is_array($decoded) || count($decoded) > 50) {
-                throw new InvalidArgumentException('Invalid promotion configuration.');
-            }
-            $policies = json_decode($json, true, 8, JSON_THROW_ON_ERROR);
-            $keys = $codes = [];
-            $selected = null;
-            foreach ($policies as $input) {
-                $policy = $this->validate($input);
-                if (isset($keys[$policy['key']]) || isset($codes[$policy['code']])) {
-                    throw new InvalidArgumentException('Ambiguous promotion identity.');
+            if ($selected === null) {
+                foreach ($this->configuredPolicies() as $policy) {
+                    if ($policy['code'] === $code) { $selected = $policy; }
                 }
-                $keys[$policy['key']] = $codes[$policy['code']] = true;
-                if ($policy['code'] === $code) { $selected = $policy; }
             }
         } catch (Throwable) {
             throw new QuoteException('PROMOTION_UNAVAILABLE', 503);
@@ -50,6 +40,35 @@ final class PromotionPolicy
         }
 
         return $selected;
+    }
+
+    /** The compatibility reader stays strict; only authoring permits absent configuration. */
+    public function configuredPolicies(bool $allowUnconfigured = false): array
+    {
+        $json = config('commerce.test_promotions');
+        if ($allowUnconfigured && ($json === null || (is_string($json) && trim($json) === ''))) { return []; }
+        if (! is_string($json) || strlen($json) > 65536) {
+            throw new InvalidArgumentException('Test promotions are unavailable.');
+        }
+        try {
+            $decoded = json_decode($json, false, 8, JSON_THROW_ON_ERROR);
+            if (! is_array($decoded) || count($decoded) > 50) {
+                throw new InvalidArgumentException('Invalid promotion configuration.');
+            }
+            $policies = json_decode($json, true, 8, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $exception) {
+            throw new InvalidArgumentException('Invalid promotion configuration.', 0, $exception);
+        }
+        $keys = $codes = [];
+        foreach ($policies as $input) {
+            $policy = $this->validate($input);
+            if (isset($keys[$policy['key']]) || isset($codes[$policy['code']])) {
+                throw new InvalidArgumentException('Ambiguous promotion identity.');
+            }
+            $keys[$policy['key']] = $codes[$policy['code']] = true;
+        }
+
+        return $policies;
     }
 
     public function validate(mixed $policy): array

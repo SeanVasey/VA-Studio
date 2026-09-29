@@ -236,7 +236,7 @@ class PromotionPricingTest extends TestCase
         $this->assertSame($policy['effective_until'], $pricing->expires_at->toIso8601ZuluString());
         $waited = false;
         DB::listen(function ($query) use (&$waited, $pricing) {
-            if (! $waited && str_starts_with($query->sql, 'select') && str_contains($query->sql, 'promotion_campaigns')) {
+            if (! $waited && str_starts_with($query->sql, 'select') && str_contains($query->sql, 'promotion_campaigns') && str_contains($query->sql, 'policy_key')) {
                 $waited = true; $this->travelTo($pricing->expires_at);
             }
         });
@@ -250,7 +250,7 @@ class PromotionPricingTest extends TestCase
         $quote = $this->quote();
         $waited = false;
         DB::listen(function ($query) use (&$waited, $quote) {
-            if (! $waited && str_starts_with($query->sql, 'select') && str_contains($query->sql, 'promotion_campaigns')) {
+            if (! $waited && str_starts_with($query->sql, 'select') && str_contains($query->sql, 'promotion_campaigns') && str_contains($query->sql, 'policy_key')) {
                 $waited = true; $this->travelTo($quote->expires_at);
             }
         });

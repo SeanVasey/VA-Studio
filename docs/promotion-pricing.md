@@ -1,6 +1,6 @@
 # Promotion pricing and usage holds
 
-This WP-06 increment adds one configured test promotion to a new owned pricing review. It calculates exact discounts, reserves one campaign slot atomically and can bind that slot to a future payment attempt. The [D-09 decision](architecture/D-09-promotion-usage.md) records scope and recovery. Paid redemption and release after provider reconciliation belong to WP-07; this increment makes no provider request.
+The accepted WP-06 foundation adds one configured test promotion to a new owned pricing review. It calculates exact discounts, reserves one campaign slot atomically and can bind that slot to a future payment attempt. The [D-09 decision](architecture/D-09-promotion-usage.md) records scope and recovery. Later accepted WP-07 finalization supplies verified consumption; release after provider reconciliation remains unfinished. The implemented WP-09 administration increment is described below. These promotion commands make no provider request.
 
 ## Selection and compatibility
 
@@ -31,7 +31,7 @@ Each campaign has exactly these fields:
 
 A fixed amount must be positive and fit the eligible subtotal; excessive fixed discounts are rejected. A percentage is 1–10000 basis points: round the eligible subtotal percentage half-up, then apply the positive explicit maximum discount. No eligible lines, a failed threshold or a result rounded to zero returns `PROMOTION_NOT_ELIGIBLE` 409 before any hold survives.
 
-The first successful use registers immutable campaign policy evidence. Both key and code are unique for the retained campaign lifetime. Changing payload, version, code or capacity under an existing identity cannot reset its budget: new selections receive `PROMOTION_CHANGED` 409, while existing pricing detects changed captured policy. A separate test campaign requires a new key and code. Configuration removal stops new/current use but does not delete history or pending holds. Editable successor campaigns and operator promotion administration remain WP-09 work and must preserve lifetime usage identity.
+The first successful use registers immutable campaign policy evidence. Both key and code are unique for the retained campaign lifetime. Changing payload, version, code or capacity under an existing identity cannot reset its budget: new selections receive `PROMOTION_CHANGED` 409, while existing pricing detects changed captured policy. A separate test campaign requires a new key and code. Configuration removal stops new/current use but does not delete history or pending holds. The WP-09 editor below creates independent campaigns under fresh identities and preserves these lifetime rules; retained policy terms are never edited.
 
 ## Calculation and shared capacity
 
@@ -60,4 +60,39 @@ Next ordered WP-06 batch: shared underlying exclusive inventory and reservation 
 
 ## Terminal-effect handoff — 2026-09-26
 
-The original foundation above remains historical. Merged PRs #52/#62/#63 now supply immutable order attempts, hosted test sessions and authoritative test-payment evidence. The current [finalization candidate](test-payment-finalization.md) adds one atomic verified `pending` → `consumed` effect for inventory and any promotion use, with matching immutable finalization proof; consumed promotion usage continues to count against lifetime capacity. Paid exceptions retain pending resources, and exclusive sales persist under a unique shared-scope constraint. Replays and historical reads must verify the complete effect graph. Candidate runtime acceptance is separate from these foundation results. No automatic release, refund restock or production policy is introduced.
+The original foundation above remains historical. Merged PRs #52/#62/#63 now supply immutable order attempts, hosted test sessions and authoritative test-payment evidence. Accepted [finalization in PR #64](test-payment-finalization.md) adds one atomic verified `pending` → `consumed` effect for inventory and any promotion use, with matching immutable finalization proof; consumed promotion usage continues to count against lifetime capacity. Paid exceptions retain pending resources, and exclusive sales persist under a unique shared-scope constraint. Replays and historical reads must verify the complete effect graph. Its accepted source and executed results are recorded in the linked finalization guide and ordered development record. No automatic release, refund restock or production policy is introduced.
+
+
+## Seller administration — September 29, 2026
+
+Status: **Implemented local/testing WP-09 increment.** [D-22](architecture/D-22-promotion-administration.md) defines immutable authoring, revisioned availability and the shared-lock boundary. The integrating PR and [WP-09 issue #9](https://github.com/VASEYDEV/VASEYAUDIO/issues/9) record the exact tested commit, executed CI, independent review and merge disposition. The [ordered record](development-order.md) retains the dependency sequence.
+
+### Staff workflow
+
+1. In a local/testing installation, sign in as a verified administrator and open **Test commerce → Test promotions** at `/admin/test-promotions`. Existing panel MFA requirements still apply.
+2. Choose **New test promotion**. Enter a new campaign key/code, exact start/end UTC timestamps, discount, eligible-subtotal minimum, lifetime maximum uses and eligibility. **Create disabled promotion** saves immutable terms and initial disabled history; it does not enable the code.
+3. Open **Review and usage** to inspect the exact retained policy and aggregate capacity. **Enable promotion** confirms the availability revision captured when the action opened. Effective dates and normal quote/inventory validation still apply.
+4. Choose **Disable promotion** to reject new eligible use. Refresh and reassess if another operator changed availability while confirmation was open. A stale or already-satisfied action is rejected without another history/audit entry.
+5. For different terms, choose **Copy as new promotion**. The form copies terms and clears key/code; submit a fresh identity, then review and enable it separately. Saved campaign terms cannot be edited or deleted. There is no persisted editable promotion draft.
+
+The form labels monetary values in cents (`100` means `$1.00`) and percentages in basis points (`1250` means `12.5%`), with an explicit maximum discount. Values are exact bounded integers; decimals, exponent notation, booleans and overflow must not become accepted amounts through coercion. Start/end fields require exact UTC seconds. Currency `USD`, test scope, schema/version `1`, non-stacking, largest-remainder allocation and unstarted-at-expiry release are server-owned. This editor does not approve production money or terms.
+
+Eligibility is **All non-exclusive offers**, or up to 100 **Exact offer revisions** found by track title. The latter captures immutable revision IDs, including an exclusive revision only when explicitly selected; normal exclusive scope/inventory checks remain authoritative. Choosing a discount cannot make an otherwise unavailable offer saleable.
+
+### Availability and usage
+
+Managed campaigns show **Managed here**; registered legacy campaigns show **Configuration (read only)**. Configuration-owned campaigns have no enable/disable action and cannot be silently adopted. Authoring rejects key or code collisions with retained campaigns and valid configured legacy policies, including policies not yet used. Missing/empty legacy configuration permits authoring; malformed nonempty configuration blocks creation.
+
+Managed code resolution happens before the legacy fallback and only in local/testing. A disabled or corrupt managed campaign cannot be re-enabled by adding the same code to configuration. Unmanaged codes keep their existing strict configuration path. Availability and effective dates are separate: enabling a future campaign leaves it scheduled, and enabling an expired campaign is rejected.
+
+Usage shows aggregate held, expired-held, pending and consumed counts, plus used/remaining capacity. **Capacity used** counts unexpired held + pending + consumed against the immutable maximum. Expired unstarted holds remain retained but do not occupy capacity. Reads disclose no customer identities, owner keys or payment-attempt identifiers. Counts may change before the next action; checkout rechecks capacity under lock.
+
+Availability changes share the campaign lock with new holds and held-to-pending transitions. Disable stops new eligible use once it commits; it does not remove pending/consumed rows, restore their capacity, change a captured price or rewrite an order/contract/grant. Existing retained-order recovery and payment verification remain valid. The standalone internal `beginAttempt` command continues to require current pricing and is not a post-disable historical-order recovery API.
+
+### Evidence and recovery
+
+Creation retains campaign, disabled revision `1`, history and audit atomically. Enable/disable advances the revision and appends history/audit; stale/ABA or no-op requests leave all records unchanged. Authorization is freshly checked at the domain boundary and again on reactive panel requests. The public storefront has no promotion-management endpoint or campaign index.
+
+Apply the additive availability/history migration before using these commands. To withdraw a code, disable it through the domain workflow; do not edit its snapshot, lower its lifetime usage count or remove retained rows. Code rollback must preserve campaign/control/history/usage/order evidence; the migration refuses down with retained availability/history. Pre-D-22 code ignores these controls, so withdraw managed use and keep its codes out of legacy configuration during a rollback. Restoring older code alone does not disable a campaign. No production restore rehearsal, provider request, customer export, marketing send or consent change is part of this increment.
+
+Final verification must include actual MySQL disable/hold/attempt contention, strict-policy and legacy compatibility cases, authorization/audit/stale-confirmation tests, retained-order continuity, database retention and Chromium/WebKit editor workflows. Acceptance requires all required CI and independent review on the final tested commit; the integrating PR and WP-09 issue #9 record their actual outcomes. After acceptance, WP-09 continues with persisted contact/about/blog/video, asset references and scheduling; per-customer promotion limits, bundles, free-download licensing/consent and production promotion approval remain separate work.

@@ -1,4 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
+import { resetBrowserLoginRateLimit } from './auth-fixture';
+
+test.beforeEach(() => resetBrowserLoginRateLimit());
 
 const password = process.env.VASEY_BROWSER_PASSWORD!;
 const row = (page: Page, label: string) => page.getByRole('row').filter({ has: page.getByText(label, { exact: true }) });

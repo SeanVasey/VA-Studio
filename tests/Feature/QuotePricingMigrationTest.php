@@ -30,6 +30,7 @@ class QuotePricingMigrationTest extends TestCase
         $contracts = require database_path('migrations/2026_09_26_000021_test_contract_issuance.php');
         $fulfillmentActivations = require database_path('migrations/2026_09_26_000022_test_fulfillment_activation.php');
         $delivery = require database_path('migrations/2026_09_26_000023_test_owner_delivery.php');
+        $administration = require database_path('migrations/2026_09_29_000025_promotion_administration.php');
         foreach (['stripe_receipt_work', 'payment_observations', 'verified_payments'] as $table) { $this->assertDatabaseCount($table, 0); }
         // Reverse dependency order, as the migrator does; retain foreign-key enforcement.
         foreach (['checkout_intents', 'checkout_sessions', 'checkout_observations'] as $table) {
@@ -42,7 +43,7 @@ class QuotePricingMigrationTest extends TestCase
         $orders->down();
         $this->assertDatabaseCount('promotion_uses', 0);
         $this->assertDatabaseCount('promotion_campaigns', 0);
-        $promotions->down();
+        $administration->down(); $promotions->down();
         $this->assertDatabaseCount('quote_pricings', 0); // Down is exercised only on empty, disposable new evidence.
         $migration->down();
         $this->assertFalse(Schema::hasTable('quote_pricings'));
@@ -50,7 +51,7 @@ class QuotePricingMigrationTest extends TestCase
         $migration->up();
         $promotions->up();
         $orders->up();
-        $checkout->up(); $payments->up(); $finalizations->up(); $contracts->up(); $fulfillmentActivations->up(); $delivery->up();
+        $checkout->up(); $payments->up(); $finalizations->up(); $contracts->up(); $fulfillmentActivations->up(); $delivery->up(); $administration->up();
         $pricing = app(PriceQuote::class)->create($quote->public_id, str_repeat('a', 64));
         $this->assertSame($quote->snapshot_hash, $pricing->snapshot['quote_snapshot_hash']);
         $this->assertSame($before, CanonicalJson::encode($quote->refresh()->snapshot));
