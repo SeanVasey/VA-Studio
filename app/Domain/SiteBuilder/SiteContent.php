@@ -364,12 +364,15 @@ final class SiteContent
 
     private function verifyPointer(SitePublication $publication): void
     {
-        if ($publication->revision === 0 && $publication->active_release_id === null) {
+        // Only a site that has never been published may show code defaults. A seed row re-created after publication fails instead.
+        if ($publication->revision === 0 && $publication->active_release_id === null && ! SitePublicationRevision::query()->exists()) {
             return;
         }
         $history = SitePublicationRevision::where('revision', $publication->revision)->first();
-        if ($history === null || $history->release_id !== $publication->active_release_id
-            || ! hash_equals($history->content_hash, SiteRelease::findOrFail($history->release_id)->content_hash)) {
+        // A release missing behind its history (a restore with foreign-key checks off) is the same integrity failure, not a 404.
+        $release = $history === null ? null : SiteRelease::find($history->release_id);
+        if ($history === null || $release === null || $history->release_id !== $publication->active_release_id
+            || ! hash_equals($history->content_hash, $release->content_hash)) {
             throw ValidationException::withMessages(['publication' => 'The retained site publication failed its integrity check.']);
         }
     }

@@ -26,7 +26,8 @@ final class SiteContentUnavailable extends ValidationException
     private const PAGE = '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
         .'<title>Temporarily unavailable</title></head><body><p>This site is temporarily unavailable. Please try again shortly.</p></body></html>';
 
-    public readonly string $reason;
+    /** Set by because(); an instance built any other way is treated as needing a backup restore. */
+    private string $reason = self::PUBLICATION;
 
     /** @param  array<string, string|list<string>>  $errors */
     public static function because(string $reason, array $errors): self
