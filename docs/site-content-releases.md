@@ -7,10 +7,10 @@ The accepted original CMS saves homepage copy as private immutable drafts. [Edit
 ## Staff workflow
 
 1. Sign in to the existing seller panel as a verified administrator and open **Publishing → Site content** at `/admin/site-releases`.
-2. Choose **New content draft** to start from the current content, or **Edit as new draft** on an existing release. Edit the allowed text and navigation fields, then save a new draft with a descriptive release label. A save creates a retained snapshot; it does not overwrite its source or publish it.
+2. Choose **New content draft** to start from the current content, or **More → Edit as new draft** on an existing release. Each row shows **Preview** and **Publish release** directly; the other actions are in its **More** menu. Edit the allowed text and navigation fields, then save a new draft with a descriptive release label. A save creates a retained snapshot; it does not overwrite its source or publish it.
 3. Choose **Preview** on the saved release. `/admin/site-releases/{release}/preview` uses the storefront composition with cart, selection and purchase actions suppressed. It remains private. Verify copy, responsive layout and home metadata before publishing.
 4. Choose **Publish release** and confirm the exact saved release. The action submits the publication revision captured when the confirmation opened. If another operator changed the selected release, refresh and reassess before retrying; a stale operation cannot overwrite the newer selection.
-5. To restore content, choose **Restore previous release** on a previously published inactive snapshot. The restored release becomes active at a new revision; both its original publication and the superseded release remain in history.
+5. To restore content, choose **More → Restore previous release** on a previously published inactive snapshot. The restored release becomes active at a new revision; both its original publication and the superseded release remain in history.
 
 Rows distinguish **Active**, **Previously published** and **Private draft**. An active release cannot be activated again. A draft never published cannot be used as a rollback target. First publication retains **Original site content**, an immutable capture of the previous code-default homepage with revision-zero history, so it can be restored like another previous release. Restoration always selects retained content; it never resets the publication revision.
 
@@ -18,7 +18,7 @@ Rows distinguish **Active**, **Previously published** and **Private draft**. An 
 
 [D-24](architecture/D-24-scheduled-site-publication.md) lets staff choose one saved release and a future time. Times are UTC.
 
-1. Choose **Schedule publication** on a saved release that is not active. Enter a whole minute at least one minute and at most 365 days ahead; the form shows the current UTC time. The page heading and the release's **Schedule** badge then show the pending schedule. Saving the schedule does not change the live site.
+1. Choose **More → Schedule publication** on a saved release that is not active. Enter a whole minute at least one minute and at most 365 days ahead; the form shows the current UTC time. The page heading and the release's **Schedule** badge then show the pending schedule. Saving the schedule does not change the live site.
 2. At that time the scheduler publishes the exact saved release with the same checks as **Publish release**. It is recorded as a publication by the administrator who scheduled it.
 3. **Cancel scheduled publication** cancels only the schedule named in its confirmation. The live site does not change.
 4. Publishing or restoring any release while a schedule is pending replaces the schedule. The confirmation says so first, and the history records which staff action replaced it.
@@ -63,7 +63,7 @@ Each release retains its schema, canonicalization version and content hash. Publ
 
 While that is the case, pages that read site content answer a generic, uncacheable `503` with `Retry-After: 60`. The failure never becomes a redirect and never shows code defaults. The application log records `Published site content is unavailable.` at critical level with the reason, revision and release id: at most once a minute while the cache works, and on every request when it does not. **New content draft** reports the failure instead of opening, and says which of these recoveries applies:
 
-- `release`: the active release failed its checks. Publish or restore an intact release; **Edit as new draft** on a saved release gives you one to publish.
+- `release`: the active release failed its checks. Publish or restore an intact release; **More → Edit as new draft** on a saved release gives you one to publish.
 - `publication`: the publication record or its history failed its checks, so publishing and restoring are refused with *The retained site publication failed its integrity check*. Restore verified database data from a backup before retrying.
 - `missing`: the publication record is gone. The guards refuse a `DELETE`, but a MySQL `TRUNCATE` skips them. Staff cannot recover it in the panel, where the Site Releases page may answer Not Found: restore verified data from a backup. Re-creating the empty record by hand does not help. Once the site has been published, an empty record fails its check too and reports `publication`; the original copy never comes back.
 

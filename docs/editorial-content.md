@@ -6,12 +6,12 @@ About, contact, blog and video content share the existing complete site release.
 
 ## Staff workflow
 
-1. Open **Publishing → Site content** at `/admin/site-releases` as a verified administrator. Choose **New content draft** or **Edit as new draft** on a retained version.
+1. Open **Publishing → Site content** at `/admin/site-releases` as a verified administrator. Choose **New content draft**, or **More → Edit as new draft** on a retained version.
 2. Open **About content**, **Contact content**, **Blog content** or **Videos content** and select its **Include … page** checkbox. Enter the bounded page copy and blog/video entries. Use a contact email only if it is intended to be public. New optional pages start disabled when copying an older v1 release.
 3. Add enabled sections to navigation when appropriate. Blog and video entries receive detail URLs from their slugs. Save a descriptive release label; the saved draft is immutable.
 4. Open **Preview** and follow its internal navigation to review each page and entry. Preview content links remain inside that saved release. Email and provider actions are disabled; preview does not send messages, fetch videos or expose purchase controls.
 5. Use **Publish release** to select the saved release. If another operator published while confirmation was open, refresh and reassess before retrying. Publication validates the complete release and retains actor/history/audit.
-6. Use **Restore previous release** to recover a previously activated snapshot. Restoring a v1 release also removes these new pages from the selected public site. History and the original baseline remain retained.
+6. Use **More → Restore previous release** to recover a previously activated snapshot. Restoring a v1 release also removes these new pages from the selected public site. History and the original baseline remain retained.
 
 Preview is available only to currently authorized staff, with private no-store/noindex responses. It is not a public share link. Keep credentials and customer data out of copy, labels and drafts.
 
