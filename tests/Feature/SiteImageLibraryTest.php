@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use LogicException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Symfony\Component\Process\Process;
 use Tests\Support\LicenseFixtures;
@@ -177,17 +178,26 @@ class SiteImageLibraryTest extends TestCase
         }
     }
 
-    public function test_metadata_never_reaches_a_prepared_file_and_does_not_change_the_pixels(): void
+    /** @return array<string, array{string}> */
+    public static function slots(): array
     {
+        return array_map(fn (string $slot): array => [$slot], array_combine(array_keys(SiteImageSlot::DEFINITIONS), array_keys(SiteImageSlot::DEFINITIONS)));
+    }
+
+    /** Every slot, because each has its own sizes and the share image takes the cropping path. */
+    #[DataProvider('slots')]
+    public function test_metadata_never_reaches_a_prepared_file_and_does_not_change_the_pixels(string $slot): void
+    {
+        ['width' => $width, 'height' => $height] = SiteImageSlot::DEFINITIONS[$slot];
         $pairs = [
-            [F::jpeg(1440, 630), F::jpeg(1440, 630, ['exif' => 1, 'xmp' => true, 'iptc' => true, 'icc' => true, 'comment' => true])],
-            [F::png(1440, 630), F::png(1440, 630, 'rgb', F::pngMetadataChunks())],
+            [F::jpeg($width, $height), F::jpeg($width, $height, ['exif' => 1, 'xmp' => true, 'iptc' => true, 'icc' => true, 'comment' => true])],
+            [F::png($width, $height), F::png($width, $height, 'rgb', F::pngMetadataChunks())],
         ];
         $forbidden = [...F::MARKERS, 'Exif', 'ICC_PROFILE', 'ns.adobe.com', '8BIM', 'Photoshop', 'Lavc', 'CREATOR', 'XMP ', 'ICCP', 'EXIF'];
         foreach ($pairs as [$plain, $marked]) {
-            $clean = $this->process($this->ingest('studio', $plain))->variants()->get();
-            $stripped = $this->process($this->ingest('studio', $marked))->variants()->get();
-            $this->assertCount(6, $stripped);
+            $clean = $this->process($this->ingest($slot, $plain))->variants()->get();
+            $stripped = $this->process($this->ingest($slot, $marked))->variants()->get();
+            $this->assertCount(SiteImageSlot::variantCount($slot), $stripped);
             foreach ($stripped as $index => $variant) {
                 $bytes = $this->bytes($variant);
                 foreach ($forbidden as $marker) {

@@ -133,6 +133,20 @@ class SiteImageHttpTest extends TestCase
         Queue::assertPushedOn('media', ProcessSiteImage::class);
     }
 
+    public function test_the_upload_field_neither_describes_nor_accepts_a_stored_path_placed_in_its_state(): void
+    {
+        $this->actingAs($this->actor);
+        $stored = $this->ingest(F::jpeg(1440, 630));
+        $component = Livewire::test(ListSiteImages::class)->mountAction('uploadSiteImage')
+            ->fillForm(['slot' => 'studio', 'credit' => 'Synthetic studio photograph', 'rights_confirmed' => true])
+            ->set('mountedActions.0.data.upload', ['forged' => $stored->source_path]);
+
+        // The browser asks the field to describe its files; a path this form did not issue gets no name, size, type or link.
+        $this->assertSame(['forged' => null], $component->instance()->callSchemaComponentMethod('mountedActionSchema0.upload', 'getUploadedFiles'));
+        $component->callMountedAction()->assertHasActionErrors(['upload']);
+        $this->assertSame([$stored->id], SiteImage::pluck('id')->all());
+    }
+
     public function test_retry_is_offered_only_for_waiting_images_and_the_problem_is_explained(): void
     {
         $ready = $this->ready();
