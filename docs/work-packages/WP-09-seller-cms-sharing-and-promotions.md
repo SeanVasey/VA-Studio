@@ -1,6 +1,6 @@
 # [WP-09] Seller CMS, publishing, sharing and promotion administration
 
-Status: **Partially implemented; remains open.** The first CMS increment is accepted in PR #72, test promotion administration in PR #73, persisted editorial/contact content in PR #74, scheduled whole-release publication in PR #76, fail-closed public pages in PR #77 and the Site Releases row menu in PR #78. Editable site images (D-25) land in two PRs: the private site-image library in PR #81, then image slots in site releases with their public serving, the current increment; acceptance records are maintained in issue #9 and the integrating PRs. This issue is complete only when all acceptance evidence below exists.
+Status: **Partially implemented; remains open.** The first CMS increment is accepted in PR #72, test promotion administration in PR #73, persisted editorial/contact content in PR #74, scheduled whole-release publication in PR #76, fail-closed public pages in PR #77, the Site Releases row menu in PR #78 and editable site images (D-25) in PRs #81 and #82: the private library, then image slots in site releases with their public serving. Acceptance records are maintained in issue #9 and the integrating PRs. This issue is complete only when all acceptance evidence below exists.
 
 - Suggested issue title: `[WP-09] Seller CMS, publishing, sharing and promotion administration`
 - Phase: 3
@@ -93,4 +93,4 @@ The Site Releases row menu from PR #78 is accepted; the [ordered record](../deve
 - **Storefront.** WebP and JPEG sources are sized to how each image is painted, and sharing metadata uses the share image with its dimensions.
 - **Staff tools.** The editor warns about a bright hero under the heading, and `vasey:doctor` checks the active release's image files.
 
-MySQL race tests cover pinning against processing completion and publishing against the scheduler. Withdrawing a live image, blog and video thumbnails, and a CDN remain out of scope.
+MySQL race tests cover pinning against processing completion and publishing against the scheduler. Both parts are accepted; the [ordered record](../development-order.md#accepted-image-slots-in-site-releases--september-30) retains their evidence. Withdrawing a live image, blog and video thumbnails, and a CDN remain out of scope.
