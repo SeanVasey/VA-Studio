@@ -5,7 +5,8 @@
     @if ($rows === [])
         <p>No publication has been scheduled.</p>
     @else
-        <div style="overflow-x: auto;">
+        {{-- Focusable so keyboard users can scroll the table sideways in narrow windows. --}}
+        <div style="overflow-x: auto;" tabindex="0" role="region" aria-label="Schedule history table">
             <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem; line-height: 1.25rem;">
                 <thead>
                     <tr>
