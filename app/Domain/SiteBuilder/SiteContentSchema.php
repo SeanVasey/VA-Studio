@@ -39,9 +39,12 @@ final class SiteContentSchema
         ];
     }
 
+    /** A v3 release starts with every image slot on its built-in image. */
+    public const NO_IMAGES = ['hero' => null, 'studio' => null, 'share' => null];
+
     public static function validate(array $content): array
     {
-        if (($content['schema_version'] ?? null) === 2) {
+        if (in_array($content['schema_version'] ?? null, [2, 3], true)) {
             return self::validateEditorial($content);
         }
         $text = fn (int $max): array => ['required', 'string', 'max:'.$max, function (string $attribute, mixed $value, \Closure $fail): void {
@@ -75,12 +78,15 @@ final class SiteContentSchema
         return $content;
     }
 
-    /** Upgrade an editor copy only; retained v1 releases and their hashes never change. */
+    /**
+     * Upgrade an editor copy only; retained releases and their hashes never change. Version 3 adds only image references, so a copy
+     * without images stays version 2 and older application code can still read it.
+     */
     public static function forEditing(array $content): array
     {
         $content = self::validate($content);
 
-        return $content['schema_version'] === 2 ? $content : array_replace($content, [
+        return $content['schema_version'] !== 1 ? $content : array_replace($content, [
             'schema_version' => 2, 'about' => null, 'contact' => null, 'blog' => null, 'videos' => null,
         ]);
     }
@@ -98,9 +104,10 @@ final class SiteContentSchema
                 $destinations[] = '/'.$section;
             }
         }
+        $version = $content['schema_version'];
         $rules = [
-            'content' => ['required', 'array:schema_version,hero,studio,footer,navigation,seo,about,contact,blog,videos'],
-            'content.schema_version' => ['required', 'integer', Rule::in([2])],
+            'content' => ['required', 'array:schema_version,hero,studio,footer,navigation,seo,about,contact,blog,videos'.($version === 3 ? ',images' : '')],
+            'content.schema_version' => ['required', 'integer', Rule::in([2, 3])],
             'content.hero' => ['required', 'array:eyebrow,title,line_two,description'],
             'content.hero.eyebrow' => $text(120), 'content.hero.title' => $text(80),
             'content.hero.line_two' => $text(80), 'content.hero.description' => $text(600),
@@ -155,6 +162,9 @@ final class SiteContentSchema
                 }
             }
         }
+        if ($version === 3) {
+            $rules += self::imageRules($content, $text);
+        }
         if (($content['contact'] ?? null) !== null) {
             $rules['content.contact.email'] = ['required', 'string', 'max:254', function (string $attribute, mixed $value, \Closure $fail): void {
                 if (! is_string($value) || preg_match('/[^\x21-\x7E]/', $value) !== 0 || filter_var($value, FILTER_VALIDATE_EMAIL) === false) {
@@ -165,5 +175,42 @@ final class SiteContentSchema
         Validator::make(['content' => $content], $rules)->validate();
 
         return $content;
+    }
+
+    /**
+     * Each slot holds a reference or null for the built-in image; the two hero images are set together. References name the
+     * image and pin its manifest; whether the image exists and is ready is checked by SiteImageReferences, not here.
+     */
+    private static function imageRules(array $content, \Closure $text): array
+    {
+        $reference = fn (string $prefix): array => [
+            $prefix.'.id' => ['required', function (string $attribute, mixed $value, \Closure $fail): void {
+                if (! is_int($value) || $value < 1) {
+                    $fail('Choose an uploaded site image.');
+                }
+            }],
+            $prefix.'.manifest' => ['required', 'string', 'regex:/\A[a-f0-9]{64}\z/D'],
+        ];
+        $images = is_array($content['images'] ?? null) ? $content['images'] : [];
+        $rules = [
+            'content.images' => ['present', 'array:hero,studio,share'],
+            'content.images.hero' => ['present', 'nullable', 'array:desktop,mobile,alt'],
+            'content.images.studio' => ['present', 'nullable', 'array:id,manifest,alt'],
+            'content.images.share' => ['present', 'nullable', 'array:id,manifest,alt'],
+        ];
+        if (is_array($images['hero'] ?? null)) {
+            $rules += [
+                'content.images.hero.desktop' => ['required', 'array:id,manifest'],
+                'content.images.hero.mobile' => ['required', 'array:id,manifest'],
+                'content.images.hero.alt' => $text(200),
+            ] + $reference('content.images.hero.desktop') + $reference('content.images.hero.mobile');
+        }
+        foreach (['studio', 'share'] as $slot) {
+            if (is_array($images[$slot] ?? null)) {
+                $rules += ["content.images.{$slot}.alt" => $text(200)] + $reference("content.images.{$slot}");
+            }
+        }
+
+        return $rules;
     }
 }

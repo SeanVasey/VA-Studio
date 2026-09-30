@@ -38,14 +38,18 @@ final class SiteContent
     {
         return DB::transaction(function () use ($content, $label, $actor): SiteRelease {
             $actor = $this->actor($actor);
-            $content = SiteContentSchema::validate($content);
+            // Images are pinned to the manifest of their ready row, locked, before the content (and its hash) is fixed.
+            $images = app(SiteImageReferences::class);
+            $content = SiteContentSchema::validate($images->pin($content));
             Validator::make(['label' => $label], ['label' => ['required', 'string', 'max:120', 'not_regex:/[<>\x00-\x1F\x7F]/u']])->validate();
             $release = SiteRelease::create([
                 'label' => $label, 'schema_version' => $content['schema_version'], 'content' => $content,
                 'content_hash' => CanonicalJson::hash($content), 'canonicalization_version' => CanonicalJson::VERSION,
                 'created_by' => $actor->id, 'created_at' => now(),
             ]);
-            AuditEvent::record('site.release.created', $release, ['content_hash' => $release->content_hash, 'schema_version' => $release->schema_version], $actor->id);
+            $images->index($release, $content);
+            AuditEvent::record('site.release.created', $release, ['content_hash' => $release->content_hash, 'schema_version' => $release->schema_version]
+                + ($release->schema_version === 3 ? ['images' => array_map(fn (array $reference): int => $reference['id'], SiteImageReferences::of($content))] : []), $actor->id);
 
             return $release;
         });
@@ -54,11 +58,15 @@ final class SiteContent
     /** The expected schedule is the pending schedule the operator reviewed; null asserts none was pending. */
     public function publish(int $releaseId, int $expectedVersion, User $actor, ?int $expectedScheduleId = null): SitePublication
     {
+        $this->verifyImageFiles($releaseId, $actor);
+
         return $this->activate($releaseId, $expectedVersion, $actor, 'publish', $expectedScheduleId);
     }
 
     public function rollback(int $releaseId, int $expectedVersion, User $actor, ?int $expectedScheduleId = null): SitePublication
     {
+        $this->verifyImageFiles($releaseId, $actor);
+
         return $this->activate($releaseId, $expectedVersion, $actor, 'rollback', $expectedScheduleId);
     }
 
@@ -171,12 +179,15 @@ final class SiteContent
         }
         // Unlocked probe only; the decision is repeated under the publication and schedule locks.
         $candidate = SitePublicationSchedule::query()->where('state', 'pending')
-            ->where('publish_at', '<=', now()->toImmutable()->utc()->startOfSecond())->value('id');
+            ->where('publish_at', '<=', now()->toImmutable()->utc()->startOfSecond())->first(['id', 'release_id']);
         if ($candidate === null) {
             return null;
         }
+        // Image files are hashed before the lock is taken. A schedule's release never changes, so this is the release decided below.
+        $filesIntact = $this->imageFilesIntact($candidate->release_id);
+        $candidate = $candidate->id;
 
-        return DB::transaction(function () use ($candidate): array {
+        return DB::transaction(function () use ($candidate, $filesIntact): array {
             $publication = SitePublication::query()->lockForUpdate()->findOrFail(1);
             $schedule = SitePublicationSchedule::query()->lockForUpdate()->findOrFail($candidate);
             // Read the clock after any lock wait: lateness is judged at the moment of the decision.
@@ -196,7 +207,7 @@ final class SiteContent
             $release = SiteRelease::find($schedule->release_id);
             try {
                 $this->verifyPointer($publication);
-                if ($release === null || ! hash_equals($schedule->release_content_hash, $release->content_hash)) {
+                if ($release === null || ! hash_equals($schedule->release_content_hash, $release->content_hash) || ! $filesIntact) {
                     throw ValidationException::withMessages(['publication' => 'The scheduled release changed.']);
                 }
                 $this->content($release);
@@ -352,16 +363,45 @@ final class SiteContent
         }
     }
 
+    /** Staff authority first, then every stored image file, all before the publication lock is taken. */
+    private function verifyImageFiles(int $releaseId, User $actor): void
+    {
+        $this->actor($actor);
+        $release = SiteRelease::find($releaseId);
+        if ($release?->schema_version === 3 && is_array($release->content)) {
+            app(SiteImageReferences::class)->verifyFiles($release->content);
+        }
+    }
+
+    private function imageFilesIntact(int $releaseId): bool
+    {
+        $release = SiteRelease::find($releaseId);
+        if ($release?->schema_version !== 3 || ! is_array($release->content)) {
+            return true;
+        }
+        try {
+            app(SiteImageReferences::class)->verifyFiles($release->content);
+
+            return true;
+        } catch (ValidationException) {
+            return false;
+        }
+    }
+
     private function content(SiteRelease $release): array
     {
         $content = $release->content;
-        if (! in_array($release->schema_version, [1, 2], true) || $release->canonicalization_version !== CanonicalJson::VERSION
+        if (! in_array($release->schema_version, [1, 2, 3], true) || $release->canonicalization_version !== CanonicalJson::VERSION
             || ! is_array($content) || ($content['schema_version'] ?? null) !== $release->schema_version
             || ! hash_equals($release->content_hash, CanonicalJson::hash($content))) {
             throw ValidationException::withMessages(['publication' => 'The retained site release failed its integrity check.']);
         }
+        $content = SiteContentSchema::validate($content);
+        if ($release->schema_version === 3) {
+            app(SiteImageReferences::class)->verify($release, $content);
+        }
 
-        return SiteContentSchema::validate($content);
+        return $content;
     }
 
     /**

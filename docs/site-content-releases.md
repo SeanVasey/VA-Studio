@@ -43,7 +43,9 @@ The scheduler must run every minute on the production host, which is not chosen 
 
 ## Site images
 
-[D-25](architecture/D-25-editable-site-images.md) adds a private library for four fixed images: the home hero (a desktop and a mobile crop), the studio image and the share image. This part stores and prepares them only. No site release uses them yet, so uploading changes nothing on the public site; the next increment adds the slots to site releases.
+[D-25](architecture/D-25-editable-site-images.md) makes four images editable: the home hero (a desktop and a mobile crop), the studio image and the share image. Staff upload them to a private library, then use them in a site release.
+
+### Upload and prepare
 
 1. Open **Publishing → Site images** at `/admin/site-images` as a verified administrator. Uploading and retrying recheck MFA wherever the admin panel requires it.
 2. Choose **Upload site image**. Pick what the image is **Used for**, and the form shows that slot's size and shape. Choose a JPEG or PNG of up to 20 MiB, enter its **Source or credit**, and confirm that we have the rights to use it. Upload refuses a shape more than 3% off the slot's, an image narrower than the slot's largest size (or, for the share image, smaller than 1200 × 630), transparency, CMYK, more than 8 bits per channel, a rotation tag, other formats and larger files, with the reason beside the field. Crop hero and studio images yourself; only the share image is trimmed to 1200 × 630.
@@ -52,9 +54,20 @@ The scheduler must run every minute on the production host, which is not chosen 
 
 Uploads, their credit and rights confirmation, and every outcome are kept permanently; there is no edit or delete. The original upload is never served, not even to staff: the preview shows a prepared file through a private, no-store admin route. The worker, scanner and backup requirements are in [media operations](media-processing.md).
 
+### Use images in a release
+
+1. In a content draft, the **Images** section offers the **Ready** images for each place, or the built-in image. Set both hero images or neither, and describe each image for people who cannot see it. The editor warns when a hero image is bright where the heading sits; check the preview.
+2. The share image is what social platforms show when a page is shared. Without one, pages share the hero in use.
+3. Preview the release. Its images come from the private preview route and are not public yet.
+4. Publishing checks every stored file of the release's images first.
+
+Once a release that uses an image is published, the image is public at its own content-hashed address, and browsers may keep it for a year. Restoring another release stops the site using it but does not withdraw copies that browsers or platforms already hold.
+
+A release without images is saved exactly as before, so code that predates site images can still read it.
+
 ## Original schema-v1 fields
 
-All values are bounded plain text, with no markup or unsupported keys. Label length is at most 120 characters. These are the original integer schema-version `1` fields; new editor copies use schema version `2` and its additional bounded fields.
+All values are bounded plain text, with no markup or unsupported keys. Label length is at most 120 characters. These are the original integer schema-version `1` fields; new editor copies use schema version `2` and its additional bounded fields, or version `3`, which adds site image references ([D-25](architecture/D-25-editable-site-images.md)), when they use an image.
 
 | Content | Fields and maximum lengths |
 | --- | --- |
@@ -74,9 +87,11 @@ Each release retains its schema, canonicalization version and content hash. Publ
 
 While that is the case, pages that read site content answer a generic, uncacheable `503` with `Retry-After: 60`. The failure never becomes a redirect and never shows code defaults. The application log records `Published site content is unavailable.` at critical level with the reason, revision and release id: at most once a minute while the cache works, and on every request when it does not. **New content draft** reports the failure instead of opening, and says which of these recoveries applies:
 
-- `release`: the active release failed its checks. Publish or restore an intact release; **More → Edit as new draft** on a saved release gives you one to publish.
+- `release`: the active release failed its checks, or an image it uses did. Publish or restore an intact release; **More → Edit as new draft** on a saved release gives you one to publish.
 - `publication`: the publication record or its history failed its checks, so publishing and restoring are refused with *The retained site publication failed its integrity check*. Restore verified database data from a backup before retrying.
 - `missing`: the publication record is gone. The guards refuse a `DELETE`, but a MySQL `TRUNCATE` skips them. Staff cannot recover it in the panel, where the Site Releases page may answer Not Found: restore verified data from a backup. Once the site has been published, re-creating the empty record by hand does not help: the publication history remains, so an empty record fails its check too and reports `publication`.
+
+A damaged stored file of a site image breaks only that image: the page still renders and shows the image's description, and `vasey:doctor` warns (`site_images`). Restore `storage/app/private/site-images/` from the same backup as the database, or publish a release that uses another image.
 
 Content rollback changes only the site pointer and its history/audit. It does not refund, cancel, reprice or alter any purchased license, original contract, entitlement or provider object. Application rollback must retain these tables. The migration refuses rollback once releases exist; old application code may display its own baseline copy instead of the retained active release.
 
@@ -84,7 +99,7 @@ Content rollback changes only the site pointer and its history/audit. It does no
 
 The accepted candidate passed full CI and independent review in [PR #72](https://github.com/VASEYDEV/VASEYAUDIO/pull/72), including schema/authorization/privacy, immutable database evidence, atomic audit failures, stale revision conflicts, independent MySQL publish/rollback races and browser editing/preview/publication/rollback. The [ordered acceptance record](development-order.md#accepted-downloads-and-cms--september-28-2026) retains exact source, run and results. Follow the repository [verification commands](../README.md#verify) when changing these boundaries.
 
-Test promotion administration is accepted in PR #73. [D-23](architecture/D-23-editorial-content.md) persisted contact/about/blog/video content is accepted in PR #74. [D-24](architecture/D-24-scheduled-site-publication.md) adds scheduled publication, with acceptance evidence in its integrating PR and issue #9. [D-25](architecture/D-25-editable-site-images.md) adds the private [site-image library](#site-images); image slots in site releases and their public serving follow. Contact delivery, consent-aware embeds and migration remain open. This increment does not complete WP-09 or the BeatStars replacement; [development order](development-order.md) retains customer recovery/library, payment operations, additional products, memberships, migration and production-readiness work.
+Test promotion administration is accepted in PR #73. [D-23](architecture/D-23-editorial-content.md) persisted contact/about/blog/video content is accepted in PR #74. [D-24](architecture/D-24-scheduled-site-publication.md) adds scheduled publication, with acceptance evidence in its integrating PR and issue #9. [D-25](architecture/D-25-editable-site-images.md) adds editable [site images](#site-images): a private library, and image slots in site releases with their public serving. Contact delivery, consent-aware embeds and migration remain open. This increment does not complete WP-09 or the BeatStars replacement; [development order](development-order.md) retains customer recovery/library, payment operations, additional products, memberships, migration and production-readiness work.
 
 ## September 28 candidate verification history
 

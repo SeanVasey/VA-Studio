@@ -19,7 +19,7 @@ final class EditorialContent
 
     public function page(array $verifiedContent, string $section, ?string $slug = null): ?array
     {
-        if (($verifiedContent['schema_version'] ?? null) !== 2
+        if (! in_array($verifiedContent['schema_version'] ?? null, [2, 3], true)
             || ! in_array($section, ['about', 'contact', 'blog', 'videos'], true)
             || ($verifiedContent[$section] ?? null) === null) {
             return null;

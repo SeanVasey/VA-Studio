@@ -1,4 +1,4 @@
-import type { SiteContent } from './site-content';
+import type { SiteContent, SiteImages } from './site-content';
 
 export interface Offer {
   id: string;
@@ -61,6 +61,9 @@ export interface PageMetadata {
   canonicalUrl: string;
   imageUrl: string;
   imageAlt: string;
+  imageWidth?: number | null;
+  imageHeight?: number | null;
+  imageType?: string | null;
   type: 'website' | 'music.song';
   robots: 'index, follow' | 'noindex, nofollow';
 }
@@ -83,6 +86,7 @@ export interface StorefrontProps {
   sitePreview?: boolean;
   sitePreviewBase?: string | null;
   siteContent?: SiteContent;
+  siteImages?: SiteImages;
   testOrderPreparationEnabled?: boolean;
   testCheckoutEnabled?: boolean;
   metadata?: PageMetadata;

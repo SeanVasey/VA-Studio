@@ -23,8 +23,8 @@ try {
     if (! is_string($directory) || ! is_dir($directory) || ! in_array($worker, ['0', '1'], true)) {
         throw new LogicException('Missing CMS race configuration.');
     }
-    $input = json_decode(stream_get_contents(STDIN, 4096), true, 16, JSON_THROW_ON_ERROR);
-    if (! in_array($input['operation'] ?? null, ['publish', 'rollback', 'run_schedule', 'cancel_schedule', 'process_site_image'], true)) {
+    $input = json_decode(stream_get_contents(STDIN, 65536), true, 32, JSON_THROW_ON_ERROR);
+    if (! in_array($input['operation'] ?? null, ['publish', 'rollback', 'run_schedule', 'cancel_schedule', 'process_site_image', 'create_site_release'], true)) {
         throw new LogicException('Unsupported CMS race operation.');
     }
     $table = getenv('VASEY_SITE_RACE_LOCK_TABLE') ?: 'site_publications';
@@ -48,31 +48,42 @@ try {
     };
     $isPublicationLock = fn (string $sql): bool => preg_match('/\Aselect\b/i', $sql)
         && str_contains($sql, 'from `'.$table.'`') && str_contains($sql, 'for update');
-    DB::connection()->beforeExecuting(function ($query) use ($isPublicationLock, $directory, $worker, $connection, $wait): void {
-        if ($isPublicationLock($query)) {
+    // A worker can let its first locks pass, so the race happens at a later lock, such as an image's completion rather than its claim.
+    $skip = (int) ($input['skip_locks'] ?? 0);
+    $locks = 0;
+    $armed = false;
+    DB::connection()->beforeExecuting(function ($query) use ($isPublicationLock, $directory, $worker, $connection, $wait, $skip, &$locks, &$armed): void {
+        if ($isPublicationLock($query) && ++$locks > $skip) {
+            $armed = true;
             file_put_contents($directory.'/ready-'.$worker, (string) $connection);
             $wait($directory.'/start', $directory.'/start-'.$worker);
         }
     });
-    DB::listen(function ($query) use ($isPublicationLock, $directory, $worker, $wait): void {
-        if ($isPublicationLock($query->sql)) {
+    DB::listen(function ($query) use ($isPublicationLock, $directory, $worker, $wait, &$armed): void {
+        if ($armed && $isPublicationLock($query->sql)) {
+            $armed = false;
             touch($directory.'/locked-'.$worker);
             $wait($directory.'/commit');
         }
     });
     try {
+        // Share the test's private storage in every operation: processing writes image files, and publishing and the
+        // scheduler check a release's image files before they lock.
+        $root = getenv('VASEY_SITE_RACE_STORAGE_ROOT');
+        if (! is_string($root) || ! is_dir($root)) {
+            throw new LogicException('Missing site image storage root.');
+        }
+        config(['filesystems.disks.local.root' => $root]);
+        Storage::forgetDisk('local');
         $site = app(SiteContent::class);
         if ($input['operation'] === 'process_site_image') {
-            // Share the test's private storage, and its synthetic scanner, which the testing environment alone accepts.
-            $root = getenv('VASEY_SITE_RACE_STORAGE_ROOT');
-            if (! is_string($root) || ! is_dir($root)) {
-                throw new LogicException('Missing site image storage root.');
-            }
-            config(['filesystems.disks.local.root' => $root]);
-            Storage::forgetDisk('local');
+            // The synthetic scanner, which the testing environment alone accepts.
             app()->instance(MalwareScanner::class, new TestOnlyMediaScanner);
             $image = app(SiteImageProcessor::class)->handle($input['image_id']);
             $result = ['result' => 'processed', 'status' => $image->status, 'attempts' => $image->attempts];
+        } elseif ($input['operation'] === 'create_site_release') {
+            $release = $site->create($input['content'], $input['label'], User::findOrFail($input['actor_id']));
+            $result = ['result' => 'created', 'release_id' => $release->id, 'images' => $release->content['images'] ?? null];
         } elseif ($input['operation'] === 'run_schedule') {
             // The scheduler reads the real clock; fixtures make the schedule due and within its grace window.
             $run = $site->runDueSchedule();
