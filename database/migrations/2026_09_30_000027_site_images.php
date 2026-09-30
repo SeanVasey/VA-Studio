@@ -74,12 +74,7 @@ return new class extends Migration
     {
         $name = $table.'_'.$suffix;
         if ($valid !== null && DB::getDriverName() === 'mysql') {
-            // Compare bytes, as SQLite does. The default collation ignores case, accents and trailing spaces, so 'Studio' would
-            // pass as a slot and a case-only change to a credit or path would pass as unchanged.
-            $text = ['NEW.status', 'OLD.status', 'i.status', 'NEW.slot', 'OLD.slot', 'NEW.original_name', 'OLD.original_name', 'NEW.source_path', 'OLD.source_path',
-                'NEW.source_sha256', 'OLD.source_sha256', 'NEW.mime_type', 'OLD.mime_type', 'NEW.credit', 'OLD.credit', 'NEW.claim_token', 'OLD.claim_token',
-                'NEW.format', 'NEW.storage_path'];
-            $valid = str_replace($text, array_map(fn (string $column): string => "CAST({$column} AS BINARY)", $text), $valid);
+            $valid = $this->bytewise($valid);
         }
         if (DB::getDriverName() === 'sqlite') {
             $when = $valid === null ? '' : ' WHEN NOT COALESCE(('.$valid.'), 0)';
@@ -89,6 +84,22 @@ return new class extends Migration
             if ($valid !== null) { $body = "IF NOT COALESCE(({$valid}), 0) THEN {$body} END IF;"; }
             DB::unprepared("CREATE TRIGGER {$name} BEFORE {$operation} ON {$table} FOR EACH ROW BEGIN {$body} END");
         }
+    }
+
+    /**
+     * Makes a MySQL guard condition compare its text columns byte for byte, as SQLite does. The default collation ignores case,
+     * accents and trailing spaces, so 'Studio' would pass as a slot and a case-only change to a credit or path would pass as
+     * unchanged. Only whole names are wrapped, so a column such as NEW.slot_x is never read as NEW.slot plus a suffix.
+     */
+    public function bytewise(string $condition): string
+    {
+        $text = ['NEW.status', 'OLD.status', 'i.status', 'NEW.slot', 'OLD.slot', 'NEW.original_name', 'OLD.original_name', 'NEW.source_path', 'OLD.source_path',
+            'NEW.source_sha256', 'OLD.source_sha256', 'NEW.mime_type', 'OLD.mime_type', 'NEW.credit', 'OLD.credit', 'NEW.claim_token', 'OLD.claim_token',
+            'NEW.format', 'NEW.storage_path'];
+        $names = implode('|', array_map(fn (string $column): string => preg_quote($column, '/'), $text));
+
+        return preg_replace('/(?<![\w$.])(?:'.$names.')(?![\w$])/', 'CAST($0 AS BINARY)', $condition)
+            ?? throw new \LogicException('The guard condition could not be rewritten.');
     }
 
     public function down(): void
