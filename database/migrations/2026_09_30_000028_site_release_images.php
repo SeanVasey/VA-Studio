@@ -38,6 +38,10 @@ return new class extends Migration
     private function guard(string $suffix, string $operation, ?string $valid = null): void
     {
         $name = 'site_release_images_'.$suffix;
+        if ($valid !== null && DB::getDriverName() === 'mysql') {
+            // Slot and status spellings are exact, as on SQLite, even under MySQL's case-insensitive PAD SPACE default collation.
+            $valid = str_replace(['NEW.slot', 'i.slot', 'i.status'], ['CAST(NEW.slot AS BINARY)', 'CAST(i.slot AS BINARY)', 'CAST(i.status AS BINARY)'], $valid);
+        }
         if (DB::getDriverName() === 'sqlite') {
             $when = $valid === null ? '' : ' WHEN NOT COALESCE(('.$valid.'), 0)';
             DB::unprepared("CREATE TRIGGER {$name} BEFORE {$operation} ON site_release_images{$when} BEGIN SELECT RAISE(ABORT, 'Site release image evidence is invalid or immutable'); END");

@@ -18,8 +18,10 @@ Route::get('/{section}/{slug?}', EditorialController::class)
 Route::get('/tracks/{slug}', [StorefrontController::class, 'index'])->middleware('throttle:120,1')->name('tracks.show');
 Route::get('/api/catalog', [StorefrontController::class, 'json'])->middleware('throttle:120,1')->name('catalog.index');
 Route::get('/media/{asset}', PublicMediaController::class)->middleware('throttle:240,1')->name('media.public');
-// Immutable public files: no session, cookies or Inertia, so a cached response never carries a visitor's state.
-Route::get('/site-images/{file}', PublicSiteImageController::class)->where('file', '[a-f0-9]{64}\.(?:jpg|webp)')
+// Immutable public files: no session, cookies or Inertia, so a cached response never carries a visitor's state. There is
+// no route pattern: the controller checks every name itself and answers each bad one with the same empty no-store 404.
+// A shared cache may keep the throttle's X-RateLimit-* counters with a cached image; stale counts are harmless advice.
+Route::get('/site-images/{file}', PublicSiteImageController::class)
     ->withoutMiddleware('web')->middleware('throttle:600,1')->name('site-images.show');
 // JSON quote boundaries retain web sessions/CSRF but do not pass through Inertia,
 // whose response negotiation replaces the Cookie Vary header.

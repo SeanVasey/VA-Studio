@@ -105,6 +105,22 @@ class SiteImagePublicTest extends TestCase
         $this->get($this->url($jpeg))->assertOk();
     }
 
+    public function test_malformed_names_get_the_same_throttled_empty_404_as_private_images(): void
+    {
+        $studio = F::ready('studio', $this->actor);
+        $site = app(SiteContent::class);
+        $site->publish($site->create($this->content(['studio' => $studio], 'SYNTHETIC LIVE'), 'Live', $this->actor)->id, 0, $this->actor);
+        $jpeg = $studio->variants()->where('format', 'jpeg')->firstOrFail();
+        $this->get($this->url($jpeg))->assertOk()->assertHeader('X-RateLimit-Limit', '600');
+
+        // Near misses of a live file's name reach the controller rather than the framework's HTML error page.
+        foreach ([strtoupper($jpeg->sha256).'.jpg', $jpeg->sha256.'.jpeg', $jpeg->sha256.'.JPG', substr($jpeg->sha256, 1).'.jpg', $jpeg->sha256] as $name) {
+            $response = $this->get('/site-images/'.$name);
+            $this->assertMissing($response);
+            $response->assertHeader('X-RateLimit-Limit', '600');
+        }
+    }
+
     public function test_the_storefront_shows_release_images_with_every_size_and_shares_the_share_image(): void
     {
         $images = [];

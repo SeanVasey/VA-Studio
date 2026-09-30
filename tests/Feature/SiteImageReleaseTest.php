@@ -175,6 +175,11 @@ class SiteImageReleaseTest extends TestCase
         $refused(fn () => DB::table('site_release_images')->insert($row($imageFree->id, 'share', $images['share']->id)), 'a release without images');
         $refused(fn () => DB::table('site_release_images')->insert($row($release->id, 'logo', $images['share']->id)), 'an unknown slot');
         $refused(fn () => DB::table('site_release_images')->insert($row($release->id, 'studio', $images['studio']->id)), 'a second row for a slot');
+        // Slots are spelled exactly on both engines. This release has no studio row, so MySQL's unique index cannot refuse these.
+        $shareOnly = $site->create($this->content(['share' => $images['share']], 'SYNTHETIC SHARE ONLY'), 'Share only', $this->actor);
+        foreach (['STUDIO', 'studio '] as $slot) {
+            $refused(fn () => DB::table('site_release_images')->insert($row($shareOnly->id, $slot, $images['studio']->id)), "the slot '{$slot}'");
+        }
         $indexed = DB::table('site_release_images')->where('site_release_id', $release->id);
         $refused(fn () => $indexed->update(['site_image_id' => $images['share']->id]), 'a changed row');
         $refused(fn () => DB::table('site_release_images')->where('site_release_id', $release->id)->delete(), 'a deleted row');

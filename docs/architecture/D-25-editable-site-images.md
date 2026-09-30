@@ -166,6 +166,8 @@ A MySQL race test found that a plain read of the variants could use a snapshot t
 - the release is version 3;
 - the release has never been scheduled or published.
 
+Slot and status spellings compare exactly on both engines; on MySQL the trigger compares bytes, because the default collation ignores case and trailing spaces.
+
 Every read of a version 3 release checks that the index lists exactly the release's references.
 
 **Reads.** `content()` accepts versions 1–3. For version 3 it checks, from the database only, that every referenced image is ready and of its slot. Its recomputed manifest must equal the pinned one, and its scan evidence must be accepted. A failure is a `release` integrity failure, so public pages answer 503 and staff restore another release. The pointer check never looks at images, so restoring away from a broken release always works.
@@ -178,7 +180,7 @@ Every read of a version 3 release checks that the index lists exactly the releas
 - its manifest still matches;
 - the bytes read now match its hash.
 
-It answers with `public, max-age=31536000, immutable` and `nosniff`. Anything else, missing, private or never live, gets the same empty 404 with `no-store`. The route runs without the web middleware: no session, cookies, CSRF or Inertia, so a cached response never carries a visitor's state. It is throttled to 600 requests a minute.
+It answers with `public, max-age=31536000, immutable` and `nosniff`. Anything else, missing, private or never live, gets the same empty 404 with `no-store`. The route has no pattern of its own, so the controller checks every name and a malformed one, such as upper-case hex or `.jpeg`, gets that 404 too. The route runs without the web middleware: no session, cookies, CSRF or Inertia, so a cached response never carries a visitor's state. It is throttled to 600 requests a minute. Every response carries the throttle's per-client `X-RateLimit-*` counts, and a shared cache may keep them with an image it stores. That is harmless: the counts are advisory and never change the bytes.
 
 Identical outputs can share a hash, so the route serves any live candidate whose bytes verify. Once an image has been live it stays reachable after the site moves on; withdrawal is out of scope.
 
@@ -230,10 +232,10 @@ The PHP suite uses the testing-only scanner double or a scripted clamscan, so it
 
 Part 2 evidence adds:
 
-- pinning and refusal on release creation, and the index guards;
+- pinning and refusal on release creation, and the index guards, including slot spellings that differ only in case or trailing spaces;
 - file checks before publish, restore and the scheduler;
 - reads failing closed when a variant hash, the index or the scan evidence changes behind dropped guards, while staff can still restore another release;
-- the public route: never-live, draft, scheduled, live, rolled-back, staff-session and damaged-file cases;
+- the public route: never-live, draft, scheduled, live, rolled-back, staff-session, malformed-name and damaged-file cases;
 - storefront, editorial and preview props, with sharing metadata;
 - the editor: options, both hero images, descriptions and the contrast warning;
 - the doctor check;
