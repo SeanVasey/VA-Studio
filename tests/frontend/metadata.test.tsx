@@ -78,3 +78,19 @@ it('keeps markup-like public text inert in client titles and attributes', async 
   expect(document.head.querySelector('#injected')).toBeNull();
   expect(document.head.querySelector('[onerror], [onload]')).toBeNull();
 });
+
+it('emits the share image size and type only when the metadata gives them', async () => {
+  const sizeTags = () => Object.fromEntries(['og:image:width', 'og:image:height', 'og:image:type']
+    .map(key => [key, [...document.head.querySelectorAll(`meta[property="${key}"]`)].map(node => node.getAttribute('content'))]));
+  const shared = { ...home, imageWidth: 1200, imageHeight: 630, imageType: 'image/jpeg' };
+  await mount(shared);
+  await expectMetadata(shared);
+  await waitFor(() => expect(sizeTags()).toEqual({ 'og:image:width': ['1200'], 'og:image:height': ['630'], 'og:image:type': ['image/jpeg'] }));
+  // Track pages share artwork of unknown size, sent as nulls: the previous page's tags must go, not linger.
+  const artwork = { ...track, imageWidth: null, imageHeight: null, imageType: null };
+  await act(async () => { router.push({ component: 'Storefront', url: '/tracks/night-signal', props: { errors: {}, tracks: [], licenseTiers: [], metadata: artwork }, preserveScroll: true }); });
+  await expectMetadata(artwork);
+  await waitFor(() => expect(sizeTags()).toEqual({ 'og:image:width': [], 'og:image:height': [], 'og:image:type': [] }));
+  await act(async () => { router.push({ component: 'Storefront', url: '/', props: { errors: {}, tracks: [], licenseTiers: [], metadata: shared }, preserveScroll: true }); });
+  await waitFor(() => expect(sizeTags()).toEqual({ 'og:image:width': ['1200'], 'og:image:height': ['630'], 'og:image:type': ['image/jpeg'] }));
+});

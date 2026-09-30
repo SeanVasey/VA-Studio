@@ -105,6 +105,22 @@ class SiteImagePublicTest extends TestCase
         $this->get($this->url($jpeg))->assertOk();
     }
 
+    public function test_a_live_image_still_serves_after_a_rollback_stops_the_site_using_it(): void
+    {
+        $studio = F::ready('studio', $this->actor);
+        $site = app(SiteContent::class);
+        $before = $site->create(SiteEditorialFixtures::content('SYNTHETIC BEFORE'), 'Before', $this->actor);
+        $site->publish($before->id, 0, $this->actor);
+        $site->publish($site->create($this->content(['studio' => $studio], 'SYNTHETIC WITH IMAGE'), 'With an image', $this->actor)->id, 1, $this->actor);
+        $jpeg = $studio->variants()->where('format', 'jpeg')->where('width', 1440)->sole();
+        $this->assertSame($this->url($jpeg), $this->get('/', $this->inertia())->assertOk()->json('props.siteImages.studio.jpeg.2.url'));
+
+        $site->rollback($before->id, 2, $this->actor);
+        $this->assertNull($this->get('/', $this->inertia())->assertOk()->json('props.siteImages.studio'));
+        $response = $this->get($this->url($jpeg))->assertOk()->assertHeader('Cache-Control', 'immutable, max-age=31536000, public');
+        $this->assertSame(Storage::disk('local')->get($jpeg->storage_path), $response->getContent());
+    }
+
     public function test_malformed_names_get_the_same_throttled_empty_404_as_private_images(): void
     {
         $studio = F::ready('studio', $this->actor);

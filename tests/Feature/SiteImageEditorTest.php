@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Media\MalwareScanner;
 use App\Domain\SiteBuilder\Models\SiteImage;
 use App\Domain\SiteBuilder\Models\SiteRelease;
 use App\Domain\SiteBuilder\SiteContent;
@@ -126,10 +127,47 @@ class SiteImageEditorTest extends TestCase
             'hero_desktop' => (string) $images['hero_desktop']->id, 'hero_mobile' => (string) $images['hero_mobile']->id, 'hero_alt' => '   ',
             'studio' => (string) $images['studio']->id, 'share' => (string) $images['share']->id, 'share_alt' => 'Synthetic share',
         ]])->assertHasActionErrors(['images.hero_alt', 'images.studio_alt']);
-        // An image of another slot, as a forged request could send, is refused beside its field.
+        // An image of another slot, as a forged request could send, is not among the field's options, so the form itself refuses it.
         Livewire::test(ListSiteReleases::class)->callAction('createDraft', data: $this->form() + ['images' => [
             'studio' => (string) $images['share']->id, 'studio_alt' => 'Synthetic studio',
         ]])->assertHasActionErrors(['images.studio']);
+        $this->assertDatabaseCount('site_releases', 0);
+    }
+
+    public function test_a_ready_image_the_domain_refuses_is_reported_beside_its_own_field(): void
+    {
+        $studio = F::ready('studio', $this->actor);
+        $desktop = F::ready('hero_desktop', $this->actor);
+        $mobile = F::ready('hero_mobile', $this->actor);
+        // A stand-in for real ClamAV evidence, which every environment accepts, so that below only the mobile image is refused.
+        app()->instance(MalwareScanner::class, new class extends MalwareScanner
+        {
+            public function scan(string $path): array
+            {
+                return ['engine' => 'clamav', 'version' => 'synthetic-stand-in', 'status' => 'clean', 'sha256' => hash_file('sha256', $path)];
+            }
+        });
+        $acceptedDesktop = F::ready('hero_desktop', $this->actor);
+        $cases = [
+            'images.studio' => [['studio' => (string) $studio->id, 'studio_alt' => 'Synthetic studio'], 'Studio image'],
+            'images.hero_desktop' => [['hero_desktop' => (string) $desktop->id, 'hero_mobile' => (string) $mobile->id, 'hero_alt' => 'Synthetic hero'], 'Home hero, desktop'],
+            'images.hero_mobile' => [['hero_desktop' => (string) $acceptedDesktop->id, 'hero_mobile' => (string) $mobile->id, 'hero_alt' => 'Synthetic hero'], 'Home hero, mobile'],
+        ];
+        // Outside testing the testing-only scan evidence is not accepted. The fields still offer these ready images of their own
+        // slot, so the form passes them on and SiteImageReferences::pin() refuses them. Production also requires staff MFA.
+        $this->actor->saveAppAuthenticationSecret('JBSWY3DPEHPK3PXP');
+        foreach ($cases as $field => [$chosen, $label]) {
+            // Filament fills forms in tests only under the testing environment, so only the submission runs as production.
+            $component = Livewire::test(ListSiteReleases::class)->mountAction('createDraft')->fillForm($this->form() + ['images' => $chosen]);
+            app()->instance('env', 'production');
+            try {
+                $component->callMountedAction();
+            } finally {
+                app()->instance('env', 'testing');
+            }
+            $others = array_values(array_diff(['images.hero_desktop', 'images.hero_mobile', 'images.studio', 'images.share'], [$field]));
+            $component->assertHasActionErrors([$field => "Choose a ready image uploaded for this slot ({$label})."])->assertHasNoActionErrors($others);
+        }
         $this->assertDatabaseCount('site_releases', 0);
     }
 
