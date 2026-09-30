@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
+use Tests\Support\MediaFixtures;
 use Tests\Support\SiteContentRace;
 use Tests\Support\SiteImageFixtures as F;
 use Tests\TestCase;
@@ -104,6 +105,38 @@ class SiteImageConcurrencyTest extends TestCase
                 // Never a partial manifest: the release pins exactly what completion recorded, and verifies.
                 $this->assertSame($ready->manifest_sha256, $release->content['images']['studio']['manifest']);
                 $this->assertSame([$image->id], SiteReleaseImage::query()->where('site_release_id', $release->id)->pluck('site_image_id')->map(fn ($id): int => (int) $id)->all());
+                $this->assertEquals($release->content, app(SiteContent::class)->preview($release->id, $actor));
+            } else {
+                $this->assertNull($release);
+            }
+        }
+    }
+
+    public function test_a_release_pinning_a_ready_image_and_one_completing_does_not_deadlock(): void
+    {
+        $actor = LicenseFixtures::admin();
+        MediaFixtures::configure();
+        foreach ([0, 1] as $first) {
+            // The ready image has the lower id, so its variants sit just before where the completing image's go.
+            $studio = F::ready('studio', $actor);
+            $share = F::quarantined('share', F::jpeg(1200, 630), 1200, 630, $actor);
+            $content = SiteContentSchema::forEditing(SiteContentSchema::defaults());
+            $content['schema_version'] = 3;
+            $content['images'] = ['hero' => null, 'studio' => ['id' => $studio->id, 'alt' => 'Synthetic studio'], 'share' => ['id' => $share->id, 'alt' => 'Synthetic share']];
+            $jobs = [
+                // Both let their first image lock pass: the processor its claim, the release the ready studio image.
+                ['operation' => 'process_site_image', 'image_id' => $share->id, 'skip_locks' => 1],
+                ['operation' => 'create_site_release', 'content' => $content, 'label' => 'Synthetic pair '.$first, 'actor_id' => $actor->id, 'skip_locks' => 1],
+            ];
+            SiteContentRace::run($this, $jobs, function (array $results) use ($first): void {
+                $this->assertSame(['processed', 'ready'], [$results[0]['result'], $results[0]['status']]);
+                $this->assertSame($first === 0 ? 'created' : 'rejected', $results[1]['result']);
+            }, $first, ['table' => 'site_images', 'id' => $share->id]);
+
+            $release = SiteRelease::query()->where('label', 'Synthetic pair '.$first)->first();
+            if ($first === 0) {
+                $this->assertSame([$studio->manifest_sha256, $share->fresh()->manifest_sha256],
+                    [$release->content['images']['studio']['manifest'], $release->content['images']['share']['manifest']]);
                 $this->assertEquals($release->content, app(SiteContent::class)->preview($release->id, $actor));
             } else {
                 $this->assertNull($release);

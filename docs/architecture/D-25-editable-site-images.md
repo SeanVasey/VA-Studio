@@ -154,11 +154,13 @@ The editor writes version 3 **only when a release uses an image**. An image-free
 
 **Creating a release.** `SiteContent::create()` pins each reference inside its transaction:
 
-- It locks the image row, which must be a ready image of the slot with an intact manifest and accepted scan evidence.
-- It reads the variants with a locking read and records the image's manifest. A manifest the caller supplied must match.
+- It locks every referenced image row, in ascending id order, before reading any variants. Each must be a ready image of the slot with an intact manifest and accepted scan evidence.
+- It then reads each image's variants with a locking read and records the image's manifest. A manifest the caller supplied must match.
 - It writes one `site_release_images` row per slot.
 
 A MySQL race test found that a plain read of the variants could use a snapshot taken before the lock waited for the image's completion. It then saw a ready image without its variants and refused it. The locking read always sees the latest commit. A release created while its image completes either pins the whole manifest or is refused; it never pins part of one.
+
+Another MySQL race test found a deadlock when the image rows were locked one slot at a time. The shared locks on one image's variants cover the index gap where a later image's variants go, and the processor completing that image holds its row while it inserts them. The release then waited for that row while the processor waited for the gap, and InnoDB rolled the processor back. Locking every row first means the release never holds variant locks while it waits for an image.
 
 **The release image index.** `site_release_images` (release, slot, image) is insert-only. Triggers on both engines accept a row only when:
 
@@ -201,7 +203,7 @@ A damaged file fails only that image: the page still renders, the image URL answ
 - warns when a hero image's mean relative luminance under the heading exceeds 0.3, roughly the 3:1 large-text limit for white text;
 - notes that platforms keep their own copy of a share image.
 
-**Doctor.** `vasey:doctor` adds `site_images`, which warns when a stored file of an image in the active release fails its hash.
+**Doctor.** `vasey:doctor` adds `site_images`, which warns when a stored file of an image in the active release fails its hash. It also warns when a referenced image has no row or no variants left, rather than passing with nothing to hash.
 
 ## Operations
 
@@ -238,8 +240,8 @@ Part 2 evidence adds:
 - the public route: never-live, draft, scheduled, live, rolled-back, staff-session, malformed-name and damaged-file cases;
 - storefront, editorial and preview props, with sharing metadata;
 - the editor: options, both hero images, descriptions and the contrast warning;
-- the doctor check;
-- a MySQL race between release creation and image completion in both lock orders;
+- the doctor check, including image rows and variant rows removed behind dropped guards;
+- MySQL races between release creation and image completion in both lock orders, for one image and for a ready image pinned alongside one completing;
 - frontend tests of the rendered `<picture>` elements.
 
 The browser harness has no scanner, so no image becomes ready there. Its spec shows the editor offering only built-in images, and the ready-image flow is covered by the PHP and frontend tests.

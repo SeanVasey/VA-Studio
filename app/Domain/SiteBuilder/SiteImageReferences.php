@@ -20,6 +20,8 @@ final class SiteImageReferences
 
     private const DAMAGED = 'An image in the retained site release failed its integrity check.';
 
+    private const DAMAGED_FILE = 'A stored file of an image in this release failed its integrity check. Restore it from a backup, or publish a release that uses another image.';
+
     /**
      * The references in validated content, keyed by slot; slots showing their built-in image are absent.
      *
@@ -47,13 +49,25 @@ final class SiteImageReferences
      */
     public function pin(array $content): array
     {
-        foreach (self::of($content) as $slot => $reference) {
+        $references = self::of($content);
+        // Every image row is locked, in ascending id order, before any variant is read. Share-locking one image's variants and
+        // then waiting for another image's row deadlocks with a processor completing that image: it holds the row and must
+        // insert its variants into an index gap those shared locks cover.
+        $ids = array_values(array_unique(array_filter(array_column($references, 'id'), 'is_int')));
+        sort($ids);
+        $images = [];
+        foreach ($ids as $id) {
+            $images[$id] = SiteImage::query()->whereKey($id)->lockForUpdate()->first();
+        }
+        // Locking reads see the latest commit. Under REPEATABLE READ a plain read here could use the transaction's snapshot,
+        // taken before a lock above waited for an image's completion, and find the image ready but none of its variants.
+        foreach ($images as $image) {
+            $image?->setRelation('variants', $image->variants()->sharedLock()->get());
+        }
+        foreach ($references as $slot => $reference) {
             $path = self::PATHS[$slot];
             $field = 'content.images.'.$path;
-            $image = is_int($reference['id']) ? SiteImage::query()->whereKey($reference['id'])->lockForUpdate()->first() : null;
-            // Locking reads see the latest commit. A plain read here could use a snapshot taken before this lock waited for the
-            // image's completion, and find the image ready but none of its variants.
-            $image?->setRelation('variants', $image->variants()->sharedLock()->get());
+            $image = is_int($reference['id']) ? $images[$reference['id']] : null;
             if ($image === null || $image->slot !== $slot || ! $this->intact($image)) {
                 throw ValidationException::withMessages([$field => 'Choose a ready image uploaded for this slot ('.SiteImageSlot::label($slot).').']);
             }
@@ -99,14 +113,23 @@ final class SiteImageReferences
         }
     }
 
-    /** Hashes every stored file of the referenced images. Publishing runs this before taking the publication lock. */
+    /**
+     * Hashes every stored file of the referenced images. Publishing runs this before taking the publication lock. A referenced
+     * image with no row or no variants has no file to hash and fails too, so the check never passes with nothing checked.
+     */
     public function verifyFiles(array $content): void
     {
+        $references = self::of($content);
+        $images = $this->images($references);
         $files = app(SiteImageFiles::class);
-        foreach ($this->images(self::of($content)) as $image) {
+        foreach ($references as $reference) {
+            $image = $images->get($reference['id']);
+            if ($image === null || $image->variants->isEmpty()) {
+                throw ValidationException::withMessages(['publication' => self::DAMAGED_FILE]);
+            }
             foreach ($image->variants as $variant) {
                 if ($files->verifiedBytes($variant->setRelation('image', $image)) === null) {
-                    throw ValidationException::withMessages(['publication' => 'A stored file of an image in this release failed its integrity check. Restore it from a backup, or publish a release that uses another image.']);
+                    throw ValidationException::withMessages(['publication' => self::DAMAGED_FILE]);
                 }
             }
         }

@@ -6,9 +6,11 @@ use App\Domain\SiteBuilder\Models\SiteImage;
 use App\Domain\SiteBuilder\Models\SitePublication;
 use App\Domain\SiteBuilder\SiteContent;
 use App\Models\User;
+use App\Support\Diagnostics\InstallationReport;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -101,5 +103,28 @@ class SiteImageReleaseDamageTest extends TestCase
         // The pointer check never looks at images, so restoring an intact release works.
         $site->rollback($before->id, 2, $this->actor);
         $this->get('/')->assertOk()->assertSee('SYNTHETIC BEFORE HOME');
+    }
+
+    public static function lostRows(): array
+    {
+        return [
+            'the image row' => ['site_images_retain', fn (SiteImage $image) => DB::table('site_images')->where('id', $image->id)->delete()],
+            'its variant rows' => ['site_image_variants_retain', fn (SiteImage $image) => DB::table('site_image_variants')->where('site_image_id', $image->id)->delete()],
+        ];
+    }
+
+    /** With nothing left to hash, the doctor's file check must not pass by default. */
+    #[DataProvider('lostRows')]
+    public function test_the_doctor_warns_when_an_active_image_has_no_files_to_check(string $guard, \Closure $lose): void
+    {
+        $studio = F::ready('studio', $this->actor);
+        $site = app(SiteContent::class);
+        $site->publish($site->create($this->withStudio($studio, 'SYNTHETIC DOCTOR'), 'Doctor', $this->actor)->id, 0, $this->actor);
+        $status = fn (): string => array_column(app(InstallationReport::class)->collect()['checks'], 'status', 'id')['site_images'];
+        $this->assertSame('pass', $status());
+
+        DB::unprepared('DROP TRIGGER '.$guard);
+        Schema::withoutForeignKeyConstraints(fn () => $lose($studio));
+        $this->assertSame('warn', $status());
     }
 }
