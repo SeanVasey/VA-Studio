@@ -182,6 +182,8 @@ test('the row menu shows keyboard focus and returns it to More when a dialog is 
   await edit.evaluate(element => (element as HTMLElement).focus());
   await page.waitForTimeout(1000);
   await expect(edit).toBeFocused();
-  await page.unroute('**/update', slowUpdates);
+  // An update can still be waiting in slowUpdates here, such as the one the saved-draft notification sends when it closes
+  // itself. Unrouting without waiting would let Playwright continue that request, and the handler's own continue would fail.
+  await page.unrouteAll({ behavior: 'wait' });
   expect(failures).toEqual([]);
 });

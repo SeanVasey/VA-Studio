@@ -27,6 +27,7 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 ### Fixed
 
 - A site image URL that identical uploads share serves an intact live copy however many earlier copies are damaged. The public route tried only the first five live copies, so five damaged copies made an intact sixth answer 404.
+- The row menu's keyboard-focus browser test waits for its slowed updates to finish before it removes their route. On a slow runner, an update was still held as the test removed the route (by its timing, the one the saved-draft notification sends when it closes itself); Playwright then continued that request itself, and the test's own continue failed (CI run 36751214435).
 - CI's browser job may run for 25 minutes instead of 15. Installing the browsers usually takes about 4.5 minutes, but took 14 on a slow runner, and the old limit cancelled the job 38 seconds into its tests (CI run 36740802516).
 - Public storefront and editorial pages answer a generic, uncacheable 503 when the published site content fails its integrity check. They used to redirect to the site root in a loop, or back to the referring site. Missing content rows fail the same way instead of answering 404. The outage is logged with its reason (at most once a minute while the cache works), and New content draft reports it with the recovery that applies instead of breaking.
 
