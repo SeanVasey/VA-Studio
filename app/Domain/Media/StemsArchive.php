@@ -64,6 +64,8 @@ class StemsArchive
         }
         $manifest = [];
         $members = [];
+        $scanLimit = (int) config('media.scanner.timeout_seconds');
+        $toolLimit = (int) config('media.process_timeout_seconds');
         try {
             // Validate the entire directory before reading or scanning any expanded member.
             $entries = $this->inspect($zip, $profile);
@@ -71,15 +73,13 @@ class StemsArchive
                 $this->withinDeadline($deadline);
                 $path = $workspace.'/stem-'.$index.'.wav';
                 $hash = $this->copyMember($zip, $index, $entry, $path, $deadline);
-                $memberScan = $this->scanWithinBudget($scan, $path, $deadline);
-                $this->withinDeadline($deadline);
-                $audio = app(AudioDerivatives::class)->validateWav($path, maxDurationSeconds: $profile['archive_max_duration_seconds']);
-                app(BoundedMediaProcess::class)->run([
+                $memberScan = $this->withinBudget(fn (int $seconds) => $scan($path, $seconds), $deadline, $scanLimit);
+                $audio = $this->withinBudget(fn (int $seconds) => app(AudioDerivatives::class)->validateWav($path, maxDurationSeconds: $profile['archive_max_duration_seconds'], timeoutSeconds: min($toolLimit, $seconds)), $deadline, $toolLimit);
+                $this->withinBudget(fn (int $seconds) => app(BoundedMediaProcess::class)->run([
                     config('media.ffmpeg'), '-nostdin', '-hide_banner', '-loglevel', 'error', '-xerror',
                     '-threads', '1', '-protocol_whitelist', 'file,pipe', '-err_detect', 'explode',
                     '-f', 'wav', '-i', $path, '-map', '0:a:0', '-threads', '1', '-f', 'null', '-',
-                ], $workspace);
-                $this->withinDeadline($deadline);
+                ], $workspace, min($toolLimit, $seconds)), $deadline, $toolLimit);
                 // Integer duration keeps the manifest stable through MySQL JSON normalization.
                 $audio['duration_microseconds'] = (int) round($audio['duration_seconds'] * 1000000);
                 unset($audio['duration_seconds']);
@@ -92,7 +92,7 @@ class StemsArchive
         usort($manifest, fn (array $a, array $b) => strcmp($a['name'], $b['name']));
         $output = $workspace.'/stems.zip';
         $this->package($output, $members, $deadline);
-        $archiveScan = $this->scanWithinBudget($scan, $output, $deadline);
+        $archiveScan = $this->withinBudget(fn (int $seconds) => $scan($output, $seconds), $deadline, $scanLimit);
         $this->withinDeadline($deadline);
 
         return [[
@@ -246,21 +246,24 @@ class StemsArchive
     }
 
     /**
-     * One scan inside what is left of the budget: none starts after the deadline, the archive just written included, and none may
-     * take longer than the seconds that remain. Without that a scan that started an instant before the deadline could run for
-     * its own 300 seconds, and the job, whose 900 seconds also hold the scan of the upload, would be cut off with the media still
-     * claimed. A scan the budget cut off is the budget's failure, not the scanner's: a timeout ends a scan for the budget's sake
-     * when the seconds it was given do not exceed the scanner's own limit. (The deadline is no test of that: the scanner counts
-     * whole seconds against what is left and stops a little before it.)
+     * One process inside what is left of the budget: none starts after the deadline, and none may take longer than the seconds that
+     * remain, which $run is given. The malware scans and the FFprobe and FFmpeg calls of a member all run through here. Without it
+     * a call that started an instant before the deadline could run for its own limit, 300 seconds for a scan and 120 for a tool, and
+     * FFprobe and FFmpeg run one after the other; the job, whose 900 seconds also hold the scan of the upload, would be cut off with
+     * the media still claimed. A call the budget cut off is the budget's failure, not the tool's: a timeout ends a call for the
+     * budget's sake when the seconds it was given do not exceed $limit, its own. (The deadline is no test of that: the scanner
+     * counts whole seconds against what is left and stops a little before it.)
+     *
+     * @param  callable(int): mixed  $run
      */
-    private function scanWithinBudget(callable $scan, string $path, int $deadline): array
+    private function withinBudget(callable $run, int $deadline, int $limit): mixed
     {
         $this->withinDeadline($deadline);
         $seconds = max(1, (int) ceil(($deadline - $this->clock()) / 1000000000));
         try {
-            return $scan($path, $seconds);
+            return $run($seconds);
         } catch (MediaFailure $failure) {
-            if ($failure->failureCode === 'processor_timeout' && $seconds <= (int) config('media.scanner.timeout_seconds')) {
+            if ($failure->failureCode === 'processor_timeout' && $seconds <= $limit) {
                 throw new MediaFailure('archive_timeout', 'Archive processing exceeded its bounded time budget.');
             }
             throw $failure;

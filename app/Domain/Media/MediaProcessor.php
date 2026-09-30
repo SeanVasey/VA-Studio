@@ -13,6 +13,12 @@ use Throwable;
 
 class MediaProcessor
 {
+    /**
+     * Seconds a tool gets to print its version. It answers at once, and a run's worst case, which the job's 900 seconds must hold, is
+     * better without two more calls of the 120 seconds every tool has.
+     */
+    private const VERSION_CALL_SECONDS = 15;
+
     public function handle(int $runId): MediaProcessingRun
     {
         $token = (string) Str::uuid();
@@ -65,8 +71,8 @@ class MediaProcessor
                 $outputs = app(ArtworkDerivative::class)->build($input, $integrity['mime_type'], $workspace);
             }
             $runner = app(BoundedMediaProcess::class);
-            $evidence['ffmpeg_version'] = strtok($runner->run([config('media.ffmpeg'), '-version'], $workspace), "\n");
-            $evidence['ffprobe_version'] = strtok($runner->run([config('media.ffprobe'), '-version'], $workspace), "\n");
+            $evidence['ffmpeg_version'] = strtok($runner->run([config('media.ffmpeg'), '-version'], $workspace, self::VERSION_CALL_SECONDS), "\n");
+            $evidence['ffprobe_version'] = strtok($runner->run([config('media.ffprobe'), '-version'], $workspace, self::VERSION_CALL_SECONDS), "\n");
             $directory = (string) Str::uuid();
             $records = [];
             foreach ($outputs as $output) {

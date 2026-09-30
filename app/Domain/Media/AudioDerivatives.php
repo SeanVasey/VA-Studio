@@ -4,12 +4,13 @@ namespace App\Domain\Media;
 
 class AudioDerivatives
 {
-    public function probe(string $path, string $demuxer, ?int $maxDurationSeconds = null): array
+    /** @param  int  $timeoutSeconds  the wall-clock seconds ffprobe may take; 0 is the limit every tool has */
+    public function probe(string $path, string $demuxer, ?int $maxDurationSeconds = null, int $timeoutSeconds = 0): array
     {
         $json = app(BoundedMediaProcess::class)->run([
             config('media.ffprobe'), '-v', 'error', '-threads', '1', '-protocol_whitelist', 'file,pipe',
             '-f', $demuxer, '-show_entries', 'format=duration:stream=codec_name,codec_type,sample_rate,channels,duration', '-of', 'json', $path,
-        ], dirname($path));
+        ], dirname($path), $timeoutSeconds);
         $probe = json_decode($json, true, 32, JSON_THROW_ON_ERROR);
         $streams = $probe['streams'] ?? [];
         $stream = $streams[0] ?? [];
@@ -32,7 +33,8 @@ class AudioDerivatives
         return ['duration_seconds' => $duration, 'sample_rate' => $sampleRate, 'channels' => $channels, 'codec' => $stream['codec_name']];
     }
 
-    public function validateWav(string $path, ?string $mime = null, ?int $maxDurationSeconds = null): array
+    /** @param  int  $timeoutSeconds  the wall-clock seconds ffprobe may take; 0 is the limit every tool has */
+    public function validateWav(string $path, ?string $mime = null, ?int $maxDurationSeconds = null, int $timeoutSeconds = 0): array
     {
         $mime ??= (new \finfo(FILEINFO_MIME_TYPE))->file($path);
         $header = file_get_contents($path, false, null, 0, 12);
@@ -40,7 +42,7 @@ class AudioDerivatives
             throw new MediaFailure('invalid_wav', 'The upload is not a complete supported RIFF/WAVE file.');
         }
 
-        return $this->probe($path, 'wav', $maxDurationSeconds);
+        return $this->probe($path, 'wav', $maxDurationSeconds, $timeoutSeconds);
     }
 
     public function build(string $master, string $tag, array $profile, string $workspace): array
