@@ -12,6 +12,7 @@ use App\Domain\Media\MediaProcessor;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\Models\MediaProcessingRun;
 use App\Domain\Media\QueueMediaProcessing;
+use App\Domain\Media\StemsArchive;
 use App\Domain\Media\VerifiedMedia;
 use App\Domain\Rights\Models\RightsDeclaration;
 use App\Filament\Resources\MediaAssetResource\Pages\ManageMediaAssets;
@@ -272,6 +273,123 @@ class StemsArchiveTest extends TestCase
         }
         $this->expectException(AuthorizationException::class);
         app(IngestMediaUpload::class)->handle($this->track, UploadedFile::fake()->createWithContent('stems.zip', StemsFixtures::zip([['name' => 'audio.wav']])), 'stems_zip', User::factory()->create());
+    }
+
+    /** A stems archive whose budget clock is the test's: it stands still until the test moves it. */
+    private function archiveWithClock(): StemsArchive
+    {
+        return new class extends StemsArchive {
+            public int $now = 0;
+
+            protected function clock(): int
+            {
+                return $this->now;
+            }
+        };
+    }
+
+    public function test_no_scan_starts_after_the_budget_ran_out_while_the_archive_was_written(): void
+    {
+        // The budget's time passes when the rebuilt archive is written, as it does for one of 512 MiB, and at no other moment.
+        $archive = new class extends StemsArchive {
+            public ?string $written = null;
+
+            protected function clock(): int
+            {
+                return $this->written !== null && is_file($this->written) ? PHP_INT_MAX : 0;
+            }
+        };
+        $scanner = new class($archive) extends TestOnlyMediaScanner {
+            public array $scanned = [];
+
+            public function __construct(private object $archive) {}
+
+            public function scan(string $path): array
+            {
+                $this->scanned[] = basename($path);
+                if (str_starts_with(basename($path), 'stem-')) {
+                    $this->archive->written = dirname($path).'/stems.zip';
+                }
+
+                return parent::scan($path);
+            }
+        };
+        app()->instance(StemsArchive::class, $archive);
+        app()->instance(MalwareScanner::class, $scanner);
+
+        $this->assertRejected(StemsFixtures::zip([['name' => 'audio.wav']]), ['archive_timeout']);
+
+        // The upload and the member were scanned; the archive, written after the deadline, was not.
+        $this->assertSame(['source.bin', 'stem-0.wav'], $scanner->scanned);
+    }
+
+    public function test_each_scan_of_the_archive_stage_gets_only_the_seconds_left_of_its_budget(): void
+    {
+        config(['media.stems.max_seconds' => 30]);
+        $archive = $this->archiveWithClock();
+        $scanner = new class($archive) extends TestOnlyMediaScanner {
+            public array $scans = [];
+
+            public ?int $bound = null;
+
+            public function __construct(private object $archive) {}
+
+            public function boundBy(?int $seconds): void
+            {
+                $this->bound = $seconds;
+            }
+
+            public function scan(string $path): array
+            {
+                $this->scans[] = [basename($path), $this->bound];
+                if (str_starts_with(basename($path), 'stem-')) {
+                    $this->archive->now += 12000000000; // Each member's scan takes 12 seconds.
+                }
+
+                return parent::scan($path);
+            }
+        };
+        app()->instance(StemsArchive::class, $archive);
+        app()->instance(MalwareScanner::class, $scanner);
+
+        $this->process($this->source());
+
+        // The upload is scanned before the budget begins and is not bound by it; then 30 seconds, 18 after one member, 6 after two.
+        $this->assertSame([['source.bin', null], ['stem-0.wav', 30], ['stem-1.wav', 18], ['stems.zip', 6]], $scanner->scans);
+        // Nothing stays bound afterwards: the next scan, of another run's upload, is limited by the configuration alone.
+        $this->assertNull($scanner->bound);
+    }
+
+    public static function scansTheBudgetCutOff(): array
+    {
+        return [
+            'the budget was spent when the scan was cut off' => [PHP_INT_MAX, 'archive_timeout'],
+            'the scan ran out of its own limit with budget left' => [1000000000, 'processor_timeout'],
+        ];
+    }
+
+    #[DataProvider('scansTheBudgetCutOff')]
+    public function test_a_scan_the_budget_cut_off_is_the_budgets_failure_and_one_that_ran_out_by_itself_is_not(int $clock, string $code): void
+    {
+        $archive = $this->archiveWithClock();
+        $scanner = new class($archive, $clock) extends TestOnlyMediaScanner {
+            public function __construct(private object $archive, private int $clock) {}
+
+            public function scan(string $path): array
+            {
+                if (str_starts_with(basename($path), 'stem-')) {
+                    $this->archive->now = $this->clock;
+
+                    throw new MediaFailure('processor_timeout', 'Media processing exceeded its time limit.');
+                }
+
+                return parent::scan($path);
+            }
+        };
+        app()->instance(StemsArchive::class, $archive);
+        app()->instance(MalwareScanner::class, $scanner);
+
+        $this->assertRejected(StemsFixtures::zip([['name' => 'audio.wav']]), [$code]);
     }
 
     public function test_archive_budget_expiry_during_member_scanning_prevents_promotion(): void

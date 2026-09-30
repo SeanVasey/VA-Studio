@@ -18,8 +18,6 @@ class BoundedMediaProcess
 
     private ?int $memoryBytes = null;
 
-    private ?int $timeoutSeconds = null;
-
     private ?int $fileBytes = null;
 
     private string $lastErrorLine = '';
@@ -28,14 +26,13 @@ class BoundedMediaProcess
      * A copy of this runner whose calls run under these limits instead of the shared media.* ones. An argument left null keeps this
      * runner's own value, which is the shared one until a limit has been given. The largest file a process may write is fileBytes.
      * They are not arguments of run(): a subclass that overrides run() must accept every argument of it, so each new one would
-     * break every such override.
+     * break every such override. The wall-clock limit already is one.
      */
-    public function withLimits(?int $cpuSeconds = null, ?int $memoryBytes = null, ?int $timeoutSeconds = null, ?int $fileBytes = null): static
+    public function withLimits(?int $cpuSeconds = null, ?int $memoryBytes = null, ?int $fileBytes = null): static
     {
         $limited = clone $this;
         $limited->cpuSeconds = $cpuSeconds ?? $this->cpuSeconds;
         $limited->memoryBytes = $memoryBytes ?? $this->memoryBytes;
-        $limited->timeoutSeconds = $timeoutSeconds ?? $this->timeoutSeconds;
         $limited->fileBytes = $fileBytes ?? $this->fileBytes;
         $limited->lastErrorLine = '';
 
@@ -69,7 +66,7 @@ class BoundedMediaProcess
         // A tool prints a local time in the zone of its process (clamscan --version does), and callers read it as UTC, so the worker's
         // own zone, from its host or its container, must not reach the tool.
         $process = new Process($command, $cwd, ['TMPDIR' => $cwd, 'TZ' => 'UTC', 'OPENBLAS_NUM_THREADS' => '1', 'OMP_NUM_THREADS' => '1']);
-        $process->setTimeout($timeout ?: $this->timeoutSeconds ?: (int) config('media.process_timeout_seconds'));
+        $process->setTimeout($timeout ?: (int) config('media.process_timeout_seconds'));
         $stdout = '';
         $errorHead = '';
         $bytes = 0;

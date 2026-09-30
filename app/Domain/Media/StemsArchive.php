@@ -57,7 +57,7 @@ class StemsArchive
         if (! in_array($mime, ['application/zip', 'application/x-zip'], true) || file_get_contents($input, false, null, 0, 4) !== "PK\x03\x04") {
             throw new MediaFailure('invalid_archive', 'Stems require a complete ZIP containing only WAV audio.');
         }
-        $deadline = hrtime(true) + $profile['archive_max_seconds'] * 1000000000;
+        $deadline = $this->clock() + $profile['archive_max_seconds'] * 1000000000;
         $zip = new ZipArchive;
         if ($zip->open($input, ZipArchive::RDONLY | ZipArchive::CHECKCONS) !== true) {
             throw new MediaFailure('invalid_archive', 'The ZIP structure is corrupt or unsupported.');
@@ -71,7 +71,7 @@ class StemsArchive
                 $this->withinDeadline($deadline);
                 $path = $workspace.'/stem-'.$index.'.wav';
                 $hash = $this->copyMember($zip, $index, $entry, $path, $deadline);
-                $memberScan = $scan($path);
+                $memberScan = $this->scanWithinBudget($scan, $path, $deadline);
                 $this->withinDeadline($deadline);
                 $audio = app(AudioDerivatives::class)->validateWav($path, maxDurationSeconds: $profile['archive_max_duration_seconds']);
                 app(BoundedMediaProcess::class)->run([
@@ -92,7 +92,7 @@ class StemsArchive
         usort($manifest, fn (array $a, array $b) => strcmp($a['name'], $b['name']));
         $output = $workspace.'/stems.zip';
         $this->package($output, $members, $deadline);
-        $archiveScan = $scan($output);
+        $archiveScan = $this->scanWithinBudget($scan, $output, $deadline);
         $this->withinDeadline($deadline);
 
         return [[
@@ -245,10 +245,35 @@ class StemsArchive
         }
     }
 
+    /**
+     * One scan inside what is left of the budget: none starts after the deadline, the archive just written included, and none may
+     * take longer than the seconds that remain. Without that a scan that started an instant before the deadline could run for
+     * its own 300 seconds, and the job, whose 900 seconds also hold the scan of the upload, would be cut off with the media still
+     * claimed. A scan the budget cut off is the budget's failure, not the scanner's.
+     */
+    private function scanWithinBudget(callable $scan, string $path, int $deadline): array
+    {
+        $this->withinDeadline($deadline);
+        try {
+            return $scan($path, max(1, (int) ceil(($deadline - $this->clock()) / 1000000000)));
+        } catch (MediaFailure $failure) {
+            if ($failure->failureCode === 'processor_timeout' && $this->clock() >= $deadline) {
+                throw new MediaFailure('archive_timeout', 'Archive processing exceeded its bounded time budget.');
+            }
+            throw $failure;
+        }
+    }
+
     private function withinDeadline(int $deadline): void
     {
-        if (hrtime(true) > $deadline) {
+        if ($this->clock() > $deadline) {
             throw new MediaFailure('archive_timeout', 'Archive processing exceeded its bounded time budget.');
         }
+    }
+
+    /** The budget's clock, in nanoseconds. Apart so that a test can move it. */
+    protected function clock(): int
+    {
+        return hrtime(true);
     }
 }
