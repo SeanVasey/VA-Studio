@@ -19,4 +19,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 - `SECURITY.md` names `support@vasey.audio` as the reporting channel and records supported versions and audit exceptions.
 - `.gitignore` covers every `.env*` file except `.env.example`, and `CLAUDE.local.md`.
 
+### Fixed
+
+- Public storefront and editorial pages answer a generic, uncacheable 503 when the published site content fails its integrity check. They used to redirect to the site root in a loop, or back to the referring site. Missing content rows fail the same way instead of answering 404. The outage is logged with its reason (at most once a minute while the cache works), and New content draft reports it with the recovery that applies instead of breaking.
+
 [Unreleased]: https://github.com/VASEYDEV/VASEYAUDIO/commits/main

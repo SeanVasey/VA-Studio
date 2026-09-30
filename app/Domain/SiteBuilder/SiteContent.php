@@ -13,11 +13,15 @@ use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use LogicException;
+use Throwable;
 
 /** Site changes do not write catalog, commercial or customer records. */
 final class SiteContent
@@ -60,13 +64,27 @@ final class SiteContent
 
     public function current(): array
     {
-        // Capture the pointer once. Immutable snapshots and history keep this coherent if publication changes next.
-        $publication = SitePublication::findOrFail(1);
-        $this->verifyPointer($publication);
+        $publication = null;
+        $reason = SiteContentUnavailable::MISSING;
+        try {
+            // History first: it is appended in the transaction that moves the pointer, so the pointer read next is never older than it.
+            $published = SitePublicationRevision::query()->exists();
+            // Capture the pointer once. Immutable snapshots and history keep this coherent if publication changes next.
+            $publication = SitePublication::findOrFail(1);
+            $reason = SiteContentUnavailable::PUBLICATION;
+            $this->verifyPointer($publication, $published);
+            if ($publication->active_release_id === null) {
+                return SiteContentSchema::defaults();
+            }
+            $reason = SiteContentUnavailable::RELEASE;
 
-        return $publication->active_release_id === null
-            ? SiteContentSchema::defaults()
-            : $this->content(SiteRelease::findOrFail($publication->active_release_id));
+            return $this->content(SiteRelease::findOrFail($publication->active_release_id));
+        } catch (ValidationException|ModelNotFoundException $exception) {
+            $this->reportUnavailable($publication, $reason);
+
+            throw SiteContentUnavailable::because($reason, $exception instanceof ModelNotFoundException
+                ? ['publication' => 'The published site content is missing.'] : $exception->errors());
+        }
     }
 
     public function preview(int $id, User $actor): array
@@ -314,6 +332,26 @@ final class SiteContent
         return $current;
     }
 
+    /** Every request fails closed; the operator log records the outage at most once a minute while the cache works, and on every request when it does not. */
+    private function reportUnavailable(?SitePublication $publication, string $reason): void
+    {
+        try {
+            try {
+                $first = Cache::add('site-content:unavailable-reported', true, 60);
+            } catch (Throwable) {
+                // A failing cache only removes the once-a-minute limit; it must not silence the report.
+                $first = true;
+            }
+            if ($first) {
+                Log::critical('Published site content is unavailable.', [
+                    'reason' => $reason, 'revision' => $publication?->revision, 'release_id' => $publication?->active_release_id,
+                ]);
+            }
+        } catch (Throwable) {
+            // Reporting must never replace the fail-closed response.
+        }
+    }
+
     private function content(SiteRelease $release): array
     {
         $content = $release->content;
@@ -326,14 +364,22 @@ final class SiteContent
         return SiteContentSchema::validate($content);
     }
 
-    private function verifyPointer(SitePublication $publication): void
+    /**
+     * @param  bool|null  $published  Whether publication history existed before the pointer was read. Callers holding the publication
+     *                                lock omit it; an unlocked reader must read history first so a first publication in between
+     *                                cannot pair the old pointer with the new history.
+     */
+    private function verifyPointer(SitePublication $publication, ?bool $published = null): void
     {
-        if ($publication->revision === 0 && $publication->active_release_id === null) {
+        // Only a site that has never been published may show code defaults. A seed row re-created after publication fails instead.
+        if ($publication->revision === 0 && $publication->active_release_id === null && ! ($published ?? SitePublicationRevision::query()->exists())) {
             return;
         }
         $history = SitePublicationRevision::where('revision', $publication->revision)->first();
-        if ($history === null || $history->release_id !== $publication->active_release_id
-            || ! hash_equals($history->content_hash, SiteRelease::findOrFail($history->release_id)->content_hash)) {
+        // A release missing behind its history (a restore with foreign-key checks off) is the same integrity failure, not a 404.
+        $release = $history === null ? null : SiteRelease::find($history->release_id);
+        if ($history === null || $release === null || $history->release_id !== $publication->active_release_id
+            || ! hash_equals($history->content_hash, $release->content_hash)) {
             throw ValidationException::withMessages(['publication' => 'The retained site publication failed its integrity check.']);
         }
     }
