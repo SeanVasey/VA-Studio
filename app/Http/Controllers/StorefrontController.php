@@ -7,6 +7,7 @@ use App\Domain\Commerce\Checkout\CheckoutPolicy;
 use App\Domain\Commerce\Orders\OrderPolicy;
 use App\Domain\SiteBuilder\SiteContent;
 use App\Domain\SiteBuilder\EditorialContent;
+use App\Domain\SiteBuilder\SiteImagePresentation;
 use App\Support\StorefrontMetadata;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -23,9 +24,11 @@ class StorefrontController extends Controller
         $selectedTrack = $selected['tracks'][0] ?? null;
         $catalog['licenseTiers'] = collect(array_merge($catalog['licenseTiers'], $selected['licenseTiers'] ?? []))->unique('id')->values()->all();
         $siteContent = app(SiteContent::class)->current();
-        $metadata = app(StorefrontMetadata::class)->forPage($selectedTrack, $siteContent);
+        $images = app(SiteImagePresentation::class);
+        $metadata = app(StorefrontMetadata::class)->forPage($selectedTrack, $siteContent, $images->share($siteContent));
 
-        return Inertia::render('Storefront', $catalog + ['siteContent' => app(EditorialContent::class)->chrome($siteContent), 'selectedTrack' => $selectedTrack, 'selectedTrackSlug' => $slug, 'commerceEnabled' => false,
+        return Inertia::render('Storefront', $catalog + ['siteContent' => app(EditorialContent::class)->chrome($siteContent), 'siteImages' => $images->storefront($siteContent),
+            'selectedTrack' => $selectedTrack, 'selectedTrackSlug' => $slug, 'commerceEnabled' => false,
             'testOrderPreparationEnabled' => app(OrderPolicy::class)->enabled(),
             'testCheckoutEnabled' => app(CheckoutPolicy::class)->enabled(), 'metadata' => $metadata])
             ->withViewData(['metadata' => $metadata]);

@@ -14,6 +14,9 @@ export function MetadataHead({ metadata }: { metadata: PageMetadata }) {
     <meta head-key="og:url" property="og:url" content={metadata.canonicalUrl} />
     <meta head-key="og:image" property="og:image" content={metadata.imageUrl} />
     <meta head-key="og:image:alt" property="og:image:alt" content={metadata.imageAlt} />
+    {metadata.imageWidth != null && <meta head-key="og:image:width" property="og:image:width" content={String(metadata.imageWidth)} />}
+    {metadata.imageHeight != null && <meta head-key="og:image:height" property="og:image:height" content={String(metadata.imageHeight)} />}
+    {metadata.imageType != null && <meta head-key="og:image:type" property="og:image:type" content={metadata.imageType} />}
     <meta head-key="twitter:card" name="twitter:card" content="summary_large_image" />
     <meta head-key="twitter:title" name="twitter:title" content={metadata.title} />
     <meta head-key="twitter:description" name="twitter:description" content={metadata.description} />

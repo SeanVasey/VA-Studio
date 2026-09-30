@@ -20,7 +20,7 @@ final class SiteImageFiles
     public function verifiedBytes(SiteImageVariant $variant): ?string
     {
         try {
-            $image = $variant->image()->first();
+            $image = $variant->relationLoaded('image') ? $variant->image : $variant->image()->first();
             if ($image === null || ! SiteImageManifest::matches($image)
                 || ! preg_match('~\Asite-images/revisions/[a-f0-9-]{36}/[0-9]+\.(?:jpg|webp)\z~D', $variant->storage_path)
                 || ! preg_match('/\A[a-f0-9]{64}\z/D', $variant->sha256) || $variant->size_bytes < 1 || $variant->size_bytes > self::MAX_BYTES) {

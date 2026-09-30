@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Domain\SiteBuilder\EditorialContent;
 use App\Domain\SiteBuilder\SiteContent;
+use App\Domain\SiteBuilder\SiteImagePresentation;
 use App\Support\StorefrontMetadata;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -16,7 +17,7 @@ final class EditorialController extends Controller
         $content = app(SiteContent::class)->current();
         $page = app(EditorialContent::class)->page($content, $section, $slug);
         abort_if($page === null, 404);
-        $metadata = app(StorefrontMetadata::class)->forEditorial($page);
+        $metadata = app(StorefrontMetadata::class)->forEditorial($page, app(SiteImagePresentation::class)->share($content));
 
         return Inertia::render('Editorial', [
             'siteContent' => app(EditorialContent::class)->chrome($content), 'editorial' => $page,

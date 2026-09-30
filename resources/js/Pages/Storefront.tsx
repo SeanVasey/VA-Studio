@@ -12,7 +12,8 @@ import { player, useAudio } from '../lib/audio';
 import { availableOffer, savedCartSelection, cartSubtotals, fileRoleLabels, filterTracks, formatMoney, formatTime, safeMediaUrl, type Offer, type CatalogFilters, type StorefrontProps, type Track } from '../lib/catalog';
 
 import { useCart } from '../lib/useCart';
-import { defaultSiteContent, siteContentHref } from '../lib/site-content';
+import { builtInSiteImages, defaultSiteContent, siteContentHref } from '../lib/site-content';
+import { HeroPicture, StudioPicture } from '../components/SiteImagery';
 import { SiteFooter, SiteHeader } from '../components/SiteChrome';
 
 const EMPTY_TRACKS: Track[] = [];
@@ -54,7 +55,7 @@ function TrackRow({ track, index, onLicense, onShare, designPreview, purchasingD
   </article>;
 }
 
-export default function Storefront({ tracks = EMPTY_TRACKS, licenseTiers = [], selectedTrackSlug, selectedTrack, catalogPage, designPreview = false, sitePreview = false, sitePreviewBase = null, siteContent = defaultSiteContent, testOrderPreparationEnabled = false, testCheckoutEnabled = false, metadata }: StorefrontProps) {
+export default function Storefront({ tracks = EMPTY_TRACKS, licenseTiers = [], selectedTrackSlug, selectedTrack, catalogPage, designPreview = false, sitePreview = false, sitePreviewBase = null, siteContent = defaultSiteContent, siteImages = builtInSiteImages, testOrderPreparationEnabled = false, testCheckoutEnabled = false, metadata }: StorefrontProps) {
   const [query, setQuery] = useState(catalogPage?.filters.q ?? '');
   const [genre, setGenre] = useState(catalogPage?.filters.genre || 'All sounds');
   const [sort, setSort] = useState<CatalogFilters['sort']>(catalogPage?.filters.sort ?? 'featured');
@@ -165,7 +166,7 @@ export default function Storefront({ tracks = EMPTY_TRACKS, licenseTiers = [], s
       {selectedTrack ? <TrackDetail track={selectedTrack} tiers={knownTiers} catalogUrl={"/" + querySuffix} onNavigate={event => navigate(event, designPreview || sitePreview)} onLicense={openLicense} onShare={share} /> : <>
       <section className="hero" aria-labelledby="hero-title">
         <div className="hero-copy"><p className="eyebrow"><span className="small-rule" />{siteContent.hero.eyebrow}</p><h1 id="hero-title">{siteContent.hero.title}<br />{siteContent.hero.line_two.slice(0, heroAccentStart)}<span>{siteContent.hero.line_two.slice(heroAccentStart)}</span></h1><div className="hero-bottom"><p style={{ whiteSpace: 'pre-line' }}>{siteContent.hero.description}</p><a className="button" href="#catalog">Find your sound <Icon name="arrow" /></a></div></div>
-        <div className="hero-media"><picture><source media="(max-width: 700px)" srcSet="/images/storefront-hero-mobile.jpg" /><img src="/images/storefront-hero.jpg" alt="Audio production console in the VASEY.AUDIO visual world" width="2400" height="890" fetchPriority="high" /></picture><div className="hero-media-caption"><span className="eyebrow">THE INDEPENDENT FREQUENCY</span></div></div>
+        <div className="hero-media"><HeroPicture image={siteImages.hero} /><div className="hero-media-caption"><span className="eyebrow">THE INDEPENDENT FREQUENCY</span></div></div>
       </section>
       <div className="discipline-strip"><span>HIP-HOP / CINEMATIC / EXPERIMENTAL</span><span>COMPOSITION <i>+</i> PRODUCTION <i>+</i> SOUND DESIGN</span><a href="#studio">FROM THE STUDIO <Icon name="northeast" size={14} /></a></div></>}
       <section id="catalog" className="catalog section-pad" aria-labelledby="catalog-title">
@@ -188,7 +189,7 @@ export default function Storefront({ tracks = EMPTY_TRACKS, licenseTiers = [], s
         {licenseTiers.length ? <div className="license-grid">{licenseTiers.map((tier, index) => <article className="license-card" key={tier.id}><div className="license-number">0{index + 1}<span>{tier.type.replace(/_/g, ' ')}</span></div><h3>{tier.name}</h3><p className="license-files">{tier.requiredAssetRoles.map(role => fileRoleLabels[role] ?? role).join(' + ')}</p><ul>{tier.features.map(feature => <li key={feature}><Icon name="check" size={16} />{feature}</li>)}</ul><div className="license-card-bottom"><span className="fine-print">Terms version {tier.version}</span><a className="text-link" href="#catalog">Choose a track <Icon name="arrow" size={16} /></a></div></article>)}</div> : <div className="license-empty"><div><h3>GOOD MUSIC. CLEAR TERMS.</h3><p>Release-specific licensing and file options will be listed alongside each published track. Published terms are not available yet.</p></div><a href="#catalog" className="button button-outline">Explore the catalog <Icon name="arrow" /></a></div>}
         <p className="licensing-note">License availability, pricing, and included files depend on the track. Only published terms apply.</p>
       </section>}
-      <section id="studio" className="studio-section section-pad" aria-labelledby="studio-title"><div className="studio-visual"><img src="/images/video-studio.jpg" alt="VASEY.AUDIO production studio visual" width="1440" height="630" loading="lazy" /><span className="studio-caption">SEAN VASEY PRODUCTIONS / VASEY.AUDIO</span></div><div className="studio-copy"><p className="eyebrow">{siteContent.studio.eyebrow}</p><h2 id="studio-title">{siteContent.studio.title}<br />{siteContent.studio.line_two}</h2><p className="studio-lead">{siteContent.studio.lead}</p>{siteContent.studio.paragraphs.map((paragraph, index) => <p key={index} style={{ whiteSpace: 'pre-line' }}>{paragraph}</p>)}<div className="studio-disciplines"><span>MUSIC PRODUCTION</span><span>COMPOSITION</span><span>SOUND DESIGN</span></div></div></section>
+      <section id="studio" className="studio-section section-pad" aria-labelledby="studio-title"><div className="studio-visual"><StudioPicture image={siteImages.studio} /><span className="studio-caption">SEAN VASEY PRODUCTIONS / VASEY.AUDIO</span></div><div className="studio-copy"><p className="eyebrow">{siteContent.studio.eyebrow}</p><h2 id="studio-title">{siteContent.studio.title}<br />{siteContent.studio.line_two}</h2><p className="studio-lead">{siteContent.studio.lead}</p>{siteContent.studio.paragraphs.map((paragraph, index) => <p key={index} style={{ whiteSpace: 'pre-line' }}>{paragraph}</p>)}<div className="studio-disciplines"><span>MUSIC PRODUCTION</span><span>COMPOSITION</span><span>SOUND DESIGN</span></div></div></section>
       <section className="closing-statement"><span className="eyebrow">VASEY.AUDIO</span><p>MAKE SOMETHING<br /><span>ONLY YOU CAN.</span></p><a className="button button-outline" href="#catalog">Start with a sound <Icon name="northeast" /></a></section>
     </main>
     <SiteFooter content={siteContent} homeHref={navigationHref('/')} href={navigationHref} onNavigate={navigateContent} />

@@ -2,6 +2,8 @@
 
 namespace App\Support\Diagnostics;
 
+use App\Domain\SiteBuilder\Models\SiteRelease;
+use App\Domain\SiteBuilder\SiteImageReferences;
 use App\Models\User;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\DB;
@@ -84,6 +86,17 @@ final class InstallationReport
         $check('scheduled_publication', false, fn () => ! DB::table('site_publication_schedules')->where('state', 'pending')
             ->where('publish_at', '<', now()->subMinutes(2))->exists(),
             'No scheduled site publication is overdue.', 'A scheduled site publication is overdue. Run `php artisan schedule:run` every minute from cron and check the application log; a run more than 60 minutes after its time records it as expired, unpublished.');
+
+        // A damaged stored file of an image in the active release is already missing from the live site; each file is hashed.
+        $check('site_images', false, function (): bool {
+            $release = SiteRelease::find(DB::table('site_publications')->where('id', 1)->value('active_release_id'));
+            if ($release?->schema_version === 3 && is_array($release->content)) {
+                app(SiteImageReferences::class)->verifyFiles($release->content);
+            }
+
+            return true;
+        }, 'The stored files of the active site release’s images match their recorded hashes.',
+            'A stored file of an image in the active site release failed its integrity check, so visitors see its description instead. Restore `storage/app/private/site-images/` from the same backup as the database, or publish a release that uses another image.');
 
         return ['schema_version' => 1, 'scope' => 'installation', 'foundation_ready' => ! in_array('fail', array_column($checks, 'status'), true), 'checks' => $checks];
     }

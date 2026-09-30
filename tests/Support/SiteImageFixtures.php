@@ -3,6 +3,7 @@
 namespace Tests\Support;
 
 use App\Domain\SiteBuilder\Models\SiteImage;
+use App\Domain\SiteBuilder\SiteImageProcessor;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -28,14 +29,17 @@ final class SiteImageFixtures
      * GD's own first segment behind a stray byte, which decoders and getimagesize() skip. adobe_rgb adds an Adobe marker declaring
      * the samples RGB (transform 0), which FFmpeg decodes as planar RGB (gbrp). hidden_exif places a sideways EXIF block where
      * FFmpeg reads it but intake's header reader does not: after the scan data, inside a DNL segment, or behind "Exif\0\x01".
+     * solid fills the whole image with one colour.
      *
-     * @param  array{exif?: int|list<int>, xmp?: bool, iptc?: bool, icc?: bool, comment?: bool, progressive?: bool, stray?: bool, adobe_rgb?: bool, hidden_exif?: 'after_scan'|'dnl'|'id'}  $options
+     * @param  array{exif?: int|list<int>, xmp?: bool, iptc?: bool, icc?: bool, comment?: bool, progressive?: bool, stray?: bool, adobe_rgb?: bool, hidden_exif?: 'after_scan'|'dnl'|'id', solid?: array{int, int, int}}  $options
      */
     public static function jpeg(int $width, int $height, array $options = []): string
     {
         $image = imagecreatetruecolor($width, $height);
-        imagefilledrectangle($image, 0, 0, $width - 1, $height - 1, imagecolorallocate($image, ...self::FIELD));
-        imagefilledrectangle($image, 0, 0, intdiv($width, 3) - 1, intdiv($height, 3) - 1, imagecolorallocate($image, ...self::BLOCK));
+        imagefilledrectangle($image, 0, 0, $width - 1, $height - 1, imagecolorallocate($image, ...($options['solid'] ?? self::FIELD)));
+        if (! isset($options['solid'])) {
+            imagefilledrectangle($image, 0, 0, intdiv($width, 3) - 1, intdiv($height, 3) - 1, imagecolorallocate($image, ...self::BLOCK));
+        }
         imageinterlace($image, $options['progressive'] ?? false);
         ob_start();
         imagejpeg($image, null, 92);
@@ -176,14 +180,29 @@ final class SiteImageFixtures
         return pack('N', strlen($data)).$type.$data.pack('N', crc32($type.$data));
     }
 
+    /** The size each slot's fixtures use: the slot's own reference size, so every check passes. */
+    public const SIZES = ['hero_desktop' => [2400, 890], 'hero_mobile' => [960, 890], 'studio' => [1440, 630], 'share' => [1200, 630]];
+
+    /** A processed, ready image for a slot. The caller has bound the testing-only scanner (MediaFixtures::configure()). */
+    public static function ready(string $slot, User $uploader, ?string $bytes = null, string $name = 'synthetic-fixture'): SiteImage
+    {
+        [$width, $height] = self::SIZES[$slot];
+        $image = app(SiteImageProcessor::class)->handle(self::quarantined($slot, $bytes ?? self::jpeg($width, $height), $width, $height, $uploader, name: $name)->id);
+        if ($image->status !== 'ready') {
+            throw new \LogicException('The synthetic site image did not become ready: '.$image->failure_code);
+        }
+
+        return $image;
+    }
+
     /** Stores bytes as a quarantined upload and records it directly, as a bypassed or older intake would. */
-    public static function quarantined(string $slot, string $bytes, int $width, int $height, User $uploader, ?string $mime = null): SiteImage
+    public static function quarantined(string $slot, string $bytes, int $width, int $height, User $uploader, ?string $mime = null, string $name = 'synthetic-fixture'): SiteImage
     {
         $path = 'site-images/quarantine/'.Str::uuid().'/source.upload';
         Storage::disk('local')->put($path, $bytes);
 
         return SiteImage::create([
-            'slot' => $slot, 'original_name' => 'synthetic-fixture', 'source_path' => $path, 'source_sha256' => hash('sha256', $bytes),
+            'slot' => $slot, 'original_name' => $name, 'source_path' => $path, 'source_sha256' => hash('sha256', $bytes),
             'size_bytes' => strlen($bytes), 'mime_type' => $mime ?? (new \finfo(FILEINFO_MIME_TYPE))->buffer($bytes), 'width' => $width, 'height' => $height,
             'credit' => 'Synthetic test fixture', 'rights_confirmed_at' => now(), 'uploaded_by' => $uploader->id, 'status' => 'quarantined', 'attempts' => 0,
         ]);

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Domain\SiteBuilder\Models\SiteImage;
 use App\Domain\SiteBuilder\Models\SitePublication;
 use App\Domain\SiteBuilder\Models\SitePublicationRevision;
 use App\Domain\SiteBuilder\Models\SitePublicationSchedule;
@@ -9,6 +10,7 @@ use App\Domain\SiteBuilder\Models\SiteRelease;
 use App\Domain\SiteBuilder\SiteContent;
 use App\Domain\SiteBuilder\SiteContentSchema;
 use App\Domain\SiteBuilder\SiteContentUnavailable;
+use App\Domain\SiteBuilder\SiteImageContrast;
 use App\Filament\Resources\SiteReleaseResource\Pages\ListSiteReleases;
 use App\Models\User;
 use Carbon\CarbonImmutable;
@@ -83,6 +85,26 @@ class SiteReleaseResource extends OperatorResource
                 Repeater::make('content.studio.paragraphs')->label('Paragraphs')
                     ->simple(Textarea::make('text')->required()->maxLength(1500)->rows(3))->minItems(1)->maxItems(4),
             ]),
+            Section::make('Images')->description('Choose a ready image from Publishing → Site images for each place, or keep the built-in image. An image stays private until a release that uses it is published; from then on it stays reachable at its own address.')
+                ->schema([
+                    Select::make('images.hero_desktop')->label('Home hero, desktop')->placeholder('Built-in image')->native()->live()
+                        ->options(fn (): array => static::imageOptions('hero_desktop'))
+                        ->helperText(fn (Get $get): ?string => static::contrastWarning($get('images.hero_desktop'))),
+                    Select::make('images.hero_mobile')->label('Home hero, mobile')->placeholder('Built-in image')->native()->live()
+                        ->options(fn (): array => static::imageOptions('hero_mobile'))
+                        ->helperText(fn (Get $get): string => static::contrastWarning($get('images.hero_mobile')) ?? 'Shown below 700 px wide. Set both hero images, or neither.'),
+                    TextInput::make('images.hero_alt')->label('Hero image description')->maxLength(200)
+                        ->helperText('For people who cannot see the image. Required with hero images.'),
+                    Select::make('images.studio')->label('Studio image')->placeholder('Built-in image')->native()
+                        ->options(fn (): array => static::imageOptions('studio')),
+                    TextInput::make('images.studio_alt')->label('Studio image description')->maxLength(200)
+                        ->helperText('Required with a studio image.'),
+                    Select::make('images.share')->label('Share image')->placeholder('The hero in use')->native()
+                        ->options(fn (): array => static::imageOptions('share'))
+                        ->helperText('Shown when a page is shared on social platforms, which keep their own copy: it cannot be withdrawn later.'),
+                    TextInput::make('images.share_alt')->label('Share image description')->maxLength(200)
+                        ->helperText('Required with a share image.'),
+                ]),
             Section::make('Navigation and footer')->schema([
                 Repeater::make('content.navigation')->label('Navigation links')->addActionLabel('Add navigation link')->schema([
                     TextInput::make('label')->required()->maxLength(48),
@@ -147,9 +169,77 @@ class SiteReleaseResource extends OperatorResource
         return $sections;
     }
 
+    /** @return array<int, string> ready images uploaded for one slot, newest first */
+    private static function imageOptions(string $slot): array
+    {
+        return SiteImage::query()->where('slot', $slot)->where('status', 'ready')->orderByDesc('id')->get()
+            ->mapWithKeys(fn (SiteImage $image): array => [$image->id => '#'.$image->id.' · '.$image->original_name.' ('.$image->width.' × '.$image->height.')'])->all();
+    }
+
+    private static function contrastWarning(mixed $id): ?string
+    {
+        $image = is_numeric($id) ? SiteImage::find((int) $id) : null;
+
+        return $image !== null && app(SiteImageContrast::class)->brightUnderHeading($image) === true
+            ? 'This image is bright where the heading sits, so the white heading may be hard to read. Check the preview before publishing.' : null;
+    }
+
+    /** Form state for image slots: ids and descriptions only. The manifest is pinned from the image row when the draft is saved. */
+    private static function imageForm(array $content): array
+    {
+        $images = is_array($content['images'] ?? null) ? $content['images'] : SiteContentSchema::NO_IMAGES;
+
+        return [
+            'hero_desktop' => $images['hero']['desktop']['id'] ?? null, 'hero_mobile' => $images['hero']['mobile']['id'] ?? null,
+            'hero_alt' => $images['hero']['alt'] ?? '', 'studio' => $images['studio']['id'] ?? null, 'studio_alt' => $images['studio']['alt'] ?? '',
+            'share' => $images['share']['id'] ?? null, 'share_alt' => $images['share']['alt'] ?? '',
+        ];
+    }
+
+    /** @return array{0: array{hero: ?array, studio: ?array, share: ?array}, 1: array<string, string>} the references and any form errors */
+    private static function imageReferences(array $state): array
+    {
+        $id = fn (string $key): ?int => is_numeric($state[$key] ?? null) ? (int) $state[$key] : null;
+        $alt = fn (string $key): string => trim((string) ($state[$key] ?? ''));
+        $errors = [];
+        [$desktop, $mobile] = [$id('hero_desktop'), $id('hero_mobile')];
+        $hero = null;
+        if ($desktop !== null || $mobile !== null) {
+            if ($desktop === null || $mobile === null) {
+                $errors[$desktop === null ? 'images.hero_desktop' : 'images.hero_mobile'] = 'Choose both hero images, or neither.';
+            }
+            $hero = ['desktop' => ['id' => $desktop], 'mobile' => ['id' => $mobile], 'alt' => $alt('hero_alt')];
+        }
+        $single = fn (string $slot): ?array => $id($slot) === null ? null : ['id' => $id($slot), 'alt' => $alt($slot.'_alt')];
+        $references = ['hero' => $hero, 'studio' => $single('studio'), 'share' => $single('share')];
+        foreach (['hero', 'studio', 'share'] as $slot) {
+            if ($references[$slot] !== null && $references[$slot]['alt'] === '') {
+                $errors['images.'.$slot.'_alt'] = 'Describe the image for people who cannot see it.';
+            }
+        }
+
+        return [$references, $errors];
+    }
+
+    /** Domain errors name content paths; the form shows them beside its own image fields. */
+    private static function imageErrorField(string $field): string
+    {
+        if (! str_starts_with($field, 'content.images.')) {
+            return $field;
+        }
+        $path = explode('.', substr($field, strlen('content.images.')));
+        if (($path[1] ?? null) === 'alt') {
+            return 'images.'.$path[0].'_alt';
+        }
+
+        return $path[0] === 'hero' ? 'images.hero_'.(($path[1] ?? 'desktop') === 'mobile' ? 'mobile' : 'desktop') : 'images.'.$path[0];
+    }
+
     private static function draftForm(array $content, string $label = ''): array
     {
         $content = SiteContentSchema::forEditing($content);
+        $images = static::imageForm($content);
+        unset($content['images']);
         $enabled = [];
         foreach (['about', 'contact', 'blog', 'videos'] as $key) {
             $enabled[$key] = $content[$key] !== null;
@@ -169,7 +259,7 @@ class SiteReleaseResource extends OperatorResource
             }
         }
 
-        return ['label' => $label, 'content' => $content, 'enabled' => $enabled];
+        return ['label' => $label, 'content' => $content, 'enabled' => $enabled, 'images' => $images];
     }
 
     public static function createDraftAction(): Action
@@ -195,8 +285,14 @@ class SiteReleaseResource extends OperatorResource
     public static function saveDraft(array $data, ListSiteReleases $livewire): void
     {
         try {
-            // Schema version is a server contract, never an operator-editable field.
-            $content = ['schema_version' => 2] + $data['content'];
+            [$images, $imageErrors] = static::imageReferences($data['images'] ?? []);
+            if ($imageErrors !== []) {
+                throw ValidationException::withMessages($imageErrors);
+            }
+            // Schema version is a server contract, never an operator-editable field. Only a release that uses an image
+            // needs version 3, so an image-free release stays readable by code that predates site images.
+            $version = array_filter($images) === [] ? 2 : 3;
+            $content = ['schema_version' => $version] + $data['content'] + ($version === 3 ? ['images' => $images] : []);
             foreach (['about', 'contact', 'blog', 'videos'] as $key) {
                 if (($data['enabled'][$key] ?? false) !== true) {
                     $content[$key] = null;
@@ -208,7 +304,7 @@ class SiteReleaseResource extends OperatorResource
             $path = $livewire->getSchema($livewire->getMountedActionSchemaName())->getStatePath();
             $errors = [];
             foreach ($exception->errors() as $field => $messages) {
-                $errors[$path.'.'.$field] = $messages;
+                $errors[$path.'.'.static::imageErrorField($field)] = array_merge($errors[$path.'.'.static::imageErrorField($field)] ?? [], $messages);
             }
             throw ValidationException::withMessages($errors);
         }

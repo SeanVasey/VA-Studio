@@ -3,6 +3,10 @@
 namespace Tests\Feature;
 
 use App\Domain\SiteBuilder\Models\SiteImage;
+use App\Domain\SiteBuilder\Models\SiteRelease;
+use App\Domain\SiteBuilder\Models\SiteReleaseImage;
+use App\Domain\SiteBuilder\SiteContent;
+use App\Domain\SiteBuilder\SiteContentSchema;
 use App\Support\Audit\AuditEvent;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -68,5 +72,42 @@ class SiteImageConcurrencyTest extends TestCase
         $image->forceFill(['status' => 'processing', 'claim_token' => (string) Str::uuid(), 'claimed_until' => now()->subMinute(), 'attempts' => 1])->save();
 
         $this->race($image, 0, 2);
+    }
+
+    public function test_a_release_created_while_its_image_completes_pins_the_whole_manifest_or_is_refused(): void
+    {
+        $actor = LicenseFixtures::admin();
+        foreach ([0, 1] as $first) {
+            $image = F::quarantined('studio', F::jpeg(1440, 630), 1440, 630, $actor);
+            $content = SiteContentSchema::forEditing(SiteContentSchema::defaults());
+            $content['schema_version'] = 3;
+            $content['images'] = ['hero' => null, 'studio' => ['id' => $image->id, 'alt' => 'Synthetic studio'], 'share' => null];
+            $jobs = [
+                // The processor's claim passes; the race is between its completion and the release reading the image.
+                ['operation' => 'process_site_image', 'image_id' => $image->id, 'skip_locks' => 1],
+                ['operation' => 'create_site_release', 'content' => $content, 'label' => 'Synthetic race '.$first, 'actor_id' => $actor->id],
+            ];
+            SiteContentRace::run($this, $jobs, function (array $results) use ($first): void {
+                $this->assertSame(['processed', 'ready'], [$results[0]['result'], $results[0]['status']]);
+                if ($first === 0) {
+                    $this->assertSame('created', $results[1]['result']);
+                } else {
+                    $this->assertSame('rejected', $results[1]['result']);
+                    $this->assertArrayHasKey('content.images.studio', $results[1]['errors']);
+                }
+            }, $first, ['table' => 'site_images', 'id' => $image->id]);
+
+            $ready = $image->fresh();
+            $this->assertSame('ready', $ready->status);
+            $release = SiteRelease::query()->where('label', 'Synthetic race '.$first)->first();
+            if ($first === 0) {
+                // Never a partial manifest: the release pins exactly what completion recorded, and verifies.
+                $this->assertSame($ready->manifest_sha256, $release->content['images']['studio']['manifest']);
+                $this->assertSame([$image->id], SiteReleaseImage::query()->where('site_release_id', $release->id)->pluck('site_image_id')->map(fn ($id): int => (int) $id)->all());
+                $this->assertEquals($release->content, app(SiteContent::class)->preview($release->id, $actor));
+            } else {
+                $this->assertNull($release);
+            }
+        }
     }
 }

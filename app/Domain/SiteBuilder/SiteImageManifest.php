@@ -24,12 +24,17 @@ final class SiteImageManifest
     }
 
     /**
-     * Recomputes a ready image's manifest from its stored variant rows. The manifest pins that exact set, and the ready trigger
-     * required the full set at completion, so the slot's current sizes are not consulted: a later profile keeps older images valid.
+     * Recomputes a ready image's manifest from its stored variant rows, as loaded when the caller loaded them. The manifest pins
+     * that exact set, and the ready trigger required the full set at completion, so the slot's current sizes are not consulted: a
+     * later profile keeps older images valid.
      */
     public static function matches(SiteImage $image): bool
     {
-        return $image->status === 'ready' && is_string($image->manifest_sha256) && is_string($image->profile_fingerprint)
-            && hash_equals($image->manifest_sha256, self::hash($image->slot, $image->profile_fingerprint, $image->variants()->get()));
+        if ($image->status !== 'ready' || ! is_string($image->manifest_sha256) || ! is_string($image->profile_fingerprint)) {
+            return false;
+        }
+        $variants = $image->relationLoaded('variants') ? $image->variants : $image->variants()->get();
+
+        return hash_equals($image->manifest_sha256, self::hash($image->slot, $image->profile_fingerprint, $variants));
     }
 }

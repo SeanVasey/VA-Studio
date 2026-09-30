@@ -53,5 +53,18 @@ test('staff upload a site image privately and, without a scanner, it waits for a
   // Still no scanner: a second attempt ran and the image is back to waiting with the same explanation.
   await expect(row.locator('.fi-ta-cell-attempts')).toHaveText('2');
   await expect(row.getByText('Waiting', { exact: true })).toBeVisible();
+
+  // The release editor offers only ready images, so every place keeps its built-in image here.
+  await page.goto('/admin/site-releases');
+  await page.getByRole('button', { name: 'New content draft', exact: true }).click();
+  const editor = page.getByRole('dialog', { name: 'Create a private content draft', exact: true });
+  for (const [label, placeholder] of [['Home hero, desktop', 'Built-in image'], ['Home hero, mobile', 'Built-in image'], ['Studio image', 'Built-in image'], ['Share image', 'The hero in use']]) {
+    const select = editor.getByLabel(label, { exact: true });
+    await expect(select).toHaveValue('');
+    await expect(select.locator('option')).toHaveText([placeholder]);
+  }
+  await expect(editor.getByText('which keep their own copy: it cannot be withdrawn later.', { exact: false })).toBeVisible();
+  await editor.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await expect(editor).toBeHidden();
   expect(failures).toEqual([]);
 });
