@@ -20,6 +20,7 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 - `SECURITY.md` names `support@vasey.audio` as the reporting channel and records supported versions and audit exceptions.
 - `.gitignore` covers every `.env*` file except `.env.example`, and `CLAUDE.local.md`.
 - CI balances the MySQL and SQLite test shards by measured duration instead of test count. MySQL shard 4 used to run 39 minutes while shards 1 to 3 ran 18 to 19 (CI run 36674655225), and that shard alone set the run's length. The per-file timings in `scripts/ci/phpunit-timings-mysql.json` and `phpunit-timings-sqlite.json` come from two full CI runs. Refresh them with `scripts/ci/phpunit-timings.py` from the shard JUnit artifacts when tests are added or the database speed changes; a test file without an entry still runs, at the suite's mean cost per case, and CI warns about it. The partition proof, `--fail-on-phpunit-warning`, the zero-skip MySQL run and every other gate are unchanged.
+- The MySQL 8.4 CI service keeps its data directory on tmpfs. Test classes that rebuild the schema around each test made up 80 to 94 per cent of every MySQL shard's test time, and each rebuild is about 440 DDL statements and thousands of fsyncs on a default MySQL. Only the storage changes: the server version, its settings and `performance_schema`, which the lock-wait race tests read, are as before.
 
 ### Fixed
 

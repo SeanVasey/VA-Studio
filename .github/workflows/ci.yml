@@ -61,7 +61,12 @@ jobs:
           MYSQL_ROOT_PASSWORD: ci-only-password
         ports:
           - 3306:3306
+        # Test classes rebuild the schema around every test (hundreds of DDL statements and thousands
+        # of fsyncs each time on a default MySQL), and this database is disposable, so keep its data
+        # directory in memory. A service container cannot take server flags. The cap only protects
+        # runner memory: a shard needs a few hundred MB.
         options: >-
+          --tmpfs /var/lib/mysql:rw,size=2g
           --health-cmd="mysqladmin ping -h 127.0.0.1 -pci-only-password"
           --health-interval=10s
           --health-timeout=5s
