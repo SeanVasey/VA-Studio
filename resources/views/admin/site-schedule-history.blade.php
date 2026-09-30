@@ -1,31 +1,33 @@
-<div class="space-y-4">
+{{-- Filament's stylesheet does not compile Tailwind utilities used in custom views, so this table carries its own spacing. --}}
+@php($cell = 'padding: 0.5rem 0.75rem; vertical-align: top;')
+<div style="display: grid; gap: 1rem;">
     <p>Every scheduled publication is retained. Times are UTC. A schedule publishes only through the same checks as Publish release.</p>
     @if ($rows === [])
         <p>No publication has been scheduled.</p>
     @else
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem; line-height: 1.25rem;">
                 <thead>
                     <tr>
-                        <th scope="col" class="p-2">Schedule</th>
-                        <th scope="col" class="p-2">Release</th>
-                        <th scope="col" class="p-2">Publish at</th>
-                        <th scope="col" class="p-2">State</th>
-                        <th scope="col" class="p-2">Outcome</th>
-                        <th scope="col" class="p-2">Scheduled by</th>
-                        <th scope="col" class="p-2">Resolved</th>
+                        <th scope="col" style="{{ $cell }} font-weight: 600;">Schedule</th>
+                        <th scope="col" style="{{ $cell }} font-weight: 600;">Release</th>
+                        <th scope="col" style="{{ $cell }} font-weight: 600;">Publish at</th>
+                        <th scope="col" style="{{ $cell }} font-weight: 600;">State</th>
+                        <th scope="col" style="{{ $cell }} font-weight: 600;">Outcome</th>
+                        <th scope="col" style="{{ $cell }} font-weight: 600;">Scheduled by</th>
+                        <th scope="col" style="{{ $cell }} font-weight: 600;">Resolved</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($rows as $row)
-                        <tr class="border-t border-gray-300 dark:border-gray-700">
-                            <td class="p-2">#{{ $row['id'] }}</td>
-                            <td class="p-2">{{ $row['release'] }}</td>
-                            <td class="p-2">{{ $row['publish_at'] }}</td>
-                            <td class="p-2">{{ $row['state'] }}</td>
-                            <td class="p-2">{{ $row['reason'] }}@if ($row['revision'] !== null) (publication revision {{ $row['revision'] }})@endif</td>
-                            <td class="p-2">{{ $row['scheduled_by'] }}</td>
-                            <td class="p-2">{{ $row['resolved'] }}</td>
+                        <tr style="border-top: 1px solid color-mix(in srgb, currentColor 20%, transparent);">
+                            <td style="{{ $cell }}">#{{ $row['id'] }}</td>
+                            <td style="{{ $cell }}">{{ $row['release'] }}</td>
+                            <td style="{{ $cell }} white-space: nowrap;">{{ $row['publish_at'] }}</td>
+                            <td style="{{ $cell }}">{{ $row['state'] }}</td>
+                            <td style="{{ $cell }}">{{ $row['reason'] }}@if ($row['revision'] !== null) (publication revision {{ $row['revision'] }})@endif</td>
+                            <td style="{{ $cell }}">{{ $row['scheduled_by'] }}</td>
+                            <td style="{{ $cell }}">{{ $row['resolved'] }}</td>
                         </tr>
                     @endforeach
                 </tbody>

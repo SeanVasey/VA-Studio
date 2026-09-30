@@ -34,6 +34,8 @@ async function history(page: Page, label: string, outcome: string) {
   await page.getByRole('button', { name: 'Schedule history', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: 'Scheduled publication history', exact: true });
   await expect(dialog.getByRole('row').filter({ hasText: label }).first()).toContainText(outcome);
+  // Filament's stylesheet has no utility classes for custom views, so the columns need their own spacing.
+  expect(await dialog.getByRole('cell').first().evaluate(cell => parseFloat(getComputedStyle(cell).paddingLeft))).toBeGreaterThan(0);
   // Closing sends its own Livewire request. Finish it before a later reload, which otherwise aborts it in WebKit.
   const closeHistory = page.waitForResponse(response => {
     if (!response.url().endsWith('/update') || response.request().method() !== 'POST') return false;
