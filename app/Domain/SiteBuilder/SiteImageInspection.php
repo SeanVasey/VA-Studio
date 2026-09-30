@@ -72,7 +72,7 @@ final class SiteImageInspection
         if (($dimensions['bits'] ?? 8) > 8) {
             return 'unsupported_depth';
         }
-        $header = self::pngHeader($path);
+        $header = self::pngHeader($path, true);
         if ($header['transparent']) {
             return 'transparent_image';
         }
@@ -80,13 +80,13 @@ final class SiteImageInspection
             return 'oversized_metadata';
         }
 
-        return self::rotated($header['orientations']) ? 'rotated_image' : null;
+        return $header['rotated'] ? 'rotated_image' : null;
     }
 
     /** True when a PNG declares an alpha channel or a transparency chunk. Only the chunk headers before the image data are read. */
     public static function pngHasTransparency(string $path): bool
     {
-        return self::pngHeader($path)['transparent'];
+        return self::pngHeader($path, false)['transparent'];
     }
 
     /**
@@ -97,19 +97,33 @@ final class SiteImageInspection
      */
     private static function rotated(array $orientations): bool
     {
-        return array_filter($orientations, fn (?int $orientation): bool => $orientation !== null && $orientation !== 1) !== [];
+        return array_filter($orientations, self::turns(...)) !== [];
     }
 
-    /** @return array{transparent: bool, orientations: list<?int>, oversized_metadata: bool} */
-    private static function pngHeader(string $path): array
+    /** Whether one EXIF orientation rotates or flips the image. A block without the tag does not. */
+    private static function turns(?int $orientation): bool
+    {
+        return $orientation !== null && $orientation !== 1;
+    }
+
+    /**
+     * Walks a PNG's chunks. The header and transparency chunks belong before the image data, so they are read only there, and
+     * without $toEnd the walk stops at the first IDAT. With it, the walk goes on to IEND for eXIf chunks alone: FFmpeg 6.1
+     * ignores PNG eXIf wherever it sits, so a rotation after the image data would otherwise pass unchecked. Each pass consumes
+     * a whole chunk of at least 12 bytes, so the file's size bounds the walk, and nothing is kept per chunk.
+     *
+     * @return array{transparent: bool, rotated: bool, oversized_metadata: bool}
+     */
+    private static function pngHeader(string $path, bool $toEnd): array
     {
         $handle = @fopen($path, 'rb');
         if ($handle === false) {
             throw new MediaFailure('invalid_image', 'The image is unavailable.');
         }
         $transparent = false;
-        $orientations = [];
+        $rotated = false;
         $oversized = false;
+        $imageData = false;
         try {
             if (fread($handle, 8) !== "\x89PNG\r\n\x1a\n") {
                 throw new MediaFailure('invalid_image', 'The image is not a PNG.');
@@ -117,30 +131,36 @@ final class SiteImageInspection
             while (($header = fread($handle, 8)) !== false && strlen($header) === 8) {
                 ['length' => $length] = unpack('Nlength', substr($header, 0, 4));
                 $type = substr($header, 4, 4);
-                if ($type === 'IDAT' || $type === 'IEND') {
-                    return ['transparent' => $transparent, 'orientations' => $orientations, 'oversized_metadata' => $oversized];
+                if ($type === 'IEND' || ($type === 'IDAT' && ! $toEnd)) {
+                    return ['transparent' => $transparent, 'rotated' => $rotated, 'oversized_metadata' => $oversized];
                 }
-                if ($type === 'IHDR' && $length !== 13) {
+                $imageData = $imageData || $type === 'IDAT';
+                $ihdr = $type === 'IHDR' && ! $imageData;
+                if ($ihdr && $length !== 13) {
                     throw new MediaFailure('invalid_image', 'The image header is malformed.');
                 }
                 // An eXIf chunk too large to read could carry a rotation tag that nothing else checks: FFmpeg 6.1 ignores PNG eXIf.
                 $oversized = $oversized || ($type === 'eXIf' && $length > self::MAX_EXIF_BYTES);
-                if ($type === 'IHDR' || ($type === 'eXIf' && $length <= self::MAX_EXIF_BYTES)) {
+                if ($ihdr || ($type === 'eXIf' && $length <= self::MAX_EXIF_BYTES)) {
                     $data = $length > 0 ? fread($handle, $length) : '';
                     if ($data === false || strlen($data) !== $length) {
                         throw new MediaFailure('invalid_image', 'The image header is incomplete.');
                     }
-                    if ($type === 'IHDR') {
+                    if ($ihdr) {
                         $transparent = $transparent || in_array(ord($data[9]), [4, 6], true);
                     } else {
-                        $orientations[] = self::tiffOrientation($data);
+                        $rotated = $rotated || self::turns(self::tiffOrientation($data));
                     }
                     fseek($handle, 4, SEEK_CUR);
 
                     continue;
                 }
-                $transparent = $transparent || $type === 'tRNS';
+                $transparent = $transparent || (! $imageData && $type === 'tRNS');
                 fseek($handle, $length + 4, SEEK_CUR);
+            }
+            // FFmpeg decodes a file that ends after its image data without IEND, and no chunk is left to hide an orientation.
+            if ($imageData) {
+                return ['transparent' => $transparent, 'rotated' => $rotated, 'oversized_metadata' => $oversized];
             }
 
             throw new MediaFailure('invalid_image', 'The image ended early.');

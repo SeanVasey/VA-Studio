@@ -298,6 +298,10 @@ class SiteImageLibraryTest extends TestCase
             'sideways second PNG eXIf chunk' => ['studio', F::png(1440, 630, 'rgb', [F::pngExif(1), F::pngExif(6)]), $message('rotated_image')],
             // FFmpeg does not read PNG eXIf at all, so a chunk too large to check is refused.
             'oversized PNG eXIf' => ['studio', F::png(1440, 630, 'rgb', [F::pngExif(6, 70 * 1024)]), $message('oversized_metadata')],
+            // Nor does it wherever the chunk sits, so the walk goes on past the image data for eXIf under the same rules.
+            'sideways PNG eXIf after the image data' => ['studio', F::png(1440, 630, 'rgb', [], [F::pngExif(6)]), $message('rotated_image')],
+            'oversized PNG eXIf after the image data' => ['studio', F::png(1440, 630, 'rgb', [], [F::pngExif(6, 70 * 1024)]), $message('oversized_metadata')],
+            'PNG cut inside an eXIf after the image data' => ['studio', substr(F::png(1440, 630, 'rgb', [], [F::pngExif(1)]), 0, -30), $message('invalid_image')],
             '16-bit PNG' => ['studio', F::png(1440, 630, 'rgb16'), $message('unsupported_depth')],
             '16-bit grey PNG' => ['studio', F::png(1440, 630, 'gray16'), $message('unsupported_depth')],
             'alpha PNG' => ['studio', F::png(1440, 630, 'rgba'), $message('transparent_image')],
@@ -324,6 +328,9 @@ class SiteImageLibraryTest extends TestCase
         // Within 3% of the slot's shape is accepted, and so is an upright eXIf chunk of the largest size that is still read.
         $this->assertSame('quarantined', $this->ingest('studio', F::jpeg(1480, 630))->fresh()->status);
         $this->assertSame('quarantined', $this->ingest('studio', F::png(1440, 630, 'rgb', [F::pngExif(1, SiteImageInspection::MAX_EXIF_BYTES)]))->fresh()->status);
+        // So are an upright eXIf chunk after the image data, and a file that ends after its image data without IEND, which FFmpeg decodes.
+        $this->assertSame('quarantined', $this->ingest('studio', F::png(1440, 630, 'rgb', [], [F::pngExif(1)]))->fresh()->status);
+        $this->assertSame('quarantined', $this->ingest('studio', substr(F::png(1440, 630), 0, -12))->fresh()->status);
     }
 
     public function test_intake_requires_authorization_mfa_provenance_and_a_fresh_upload(): void
@@ -375,6 +382,8 @@ class SiteImageLibraryTest extends TestCase
             ['rotated_image', F::jpeg(1440, 630, ['exif' => 6]), 1440, 630],
             ['rotated_image', F::jpeg(1440, 630, ['exif' => [1, 6]]), 1440, 630],
             ['oversized_metadata', F::png(1440, 630, 'rgb', [F::pngExif(6, 70 * 1024)]), 1440, 630],
+            // FFmpeg ignores PNG eXIf, so the repeated header check is what stops a rotation after the image data here.
+            ['rotated_image', F::png(1440, 630, 'rgb', [], [F::pngExif(6)]), 1440, 630],
             ['unsupported_pixel_format', F::flatJpeg(1440, 630, 4), 1440, 630],
             ['unsupported_depth', F::png(1440, 630, 'rgb16'), 1440, 630],
             ['transparent_image', F::png(1440, 630, 'palette_alpha'), 1440, 630],

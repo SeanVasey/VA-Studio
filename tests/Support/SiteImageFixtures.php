@@ -109,8 +109,9 @@ final class SiteImageFixtures
      *
      * @param  'rgb'|'rgba'|'gray'|'gray_alpha'|'palette'|'palette_alpha'|'rgb_key'|'gray_key'|'rgb16'|'gray16'  $kind
      * @param  list<string>  $chunks  extra chunks from {@see pngChunk()}, written before the image data
+     * @param  list<string>  $trailing  extra chunks written after the image data, before IEND
      */
-    public static function png(int $width, int $height, string $kind = 'rgb', array $chunks = []): string
+    public static function png(int $width, int $height, string $kind = 'rgb', array $chunks = [], array $trailing = []): string
     {
         $third = intdiv($width, 3);
         [$type, $depth, $field, $block, $extra] = match ($kind) {
@@ -130,7 +131,7 @@ final class SiteImageFixtures
         $rows = str_repeat($marked, intdiv($height, 3)).str_repeat($plain, $height - intdiv($height, 3));
 
         return "\x89PNG\r\n\x1a\n".self::pngChunk('IHDR', pack('NNCCCCC', $width, $height, $depth, $type, 0, 0, 0))
-            .implode('', $extra).implode('', $chunks).self::pngChunk('IDAT', (string) gzcompress($rows, 6)).self::pngChunk('IEND', '');
+            .implode('', $extra).implode('', $chunks).self::pngChunk('IDAT', (string) gzcompress($rows, 6)).implode('', $trailing).self::pngChunk('IEND', '');
     }
 
     /** A PNG whose header claims a size far beyond the limit, with no real image data behind it. */
