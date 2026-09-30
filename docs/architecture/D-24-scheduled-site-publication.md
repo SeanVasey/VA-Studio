@@ -106,14 +106,14 @@ The **Site content** page adds:
 - a **Cancel scheduled publication** confirmation naming the release and time;
 - a read-only **Schedule history** of the last 20 schedules, with state, reason, actors, times and publication revision.
 
-The publish and restore confirmations warn when they will supersede a pending schedule. Confirmations retain the revision or schedule they displayed on the locked Livewire component, and the cancel confirmation describes that captured schedule. Open schedule and cancel confirmations stay callable, so a schedule, cancellation or publication made meanwhile is reported rather than dropped silently. The existing per-request role and MFA recheck applies to every action.
+The publish and restore confirmations warn when they will supersede a pending schedule. Confirmations retain the revision or schedule they displayed on the locked Livewire component, and the cancel confirmation describes that captured schedule. Open schedule, cancel, publish and restore confirmations stay callable, so a schedule, cancellation or publication made meanwhile is reported rather than dropped silently. The existing per-request role and MFA recheck applies to every action.
 
 ## Verification, recovery and remaining scope
 
 Required evidence:
 
 - domain bounds, fresh authority including the runner's MFA recheck, stale and integrity rejection, supersession, cancellation and immutability;
-- forged-row and transition rejection on both engines, with each publication-evidence check isolated;
+- forged-row and transition rejection on both engines, with each independently testable publication-evidence check isolated;
 - every runner outcome, the command's output and exit codes, and the scheduler registration;
 - Livewire actions, including stale confirmations and the role/MFA rechecks;
 - independent-process MySQL races in both lock orders;

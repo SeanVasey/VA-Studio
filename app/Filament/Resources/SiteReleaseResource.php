@@ -214,8 +214,12 @@ class SiteReleaseResource extends OperatorResource
                 $livewire->expectedPublicationRevision = SitePublication::findOrFail(1)->revision;
                 $livewire->expectedScheduleId = app(SiteContent::class)->pendingSchedule()?->id;
             })
-            ->visible(fn (SiteRelease $record): bool => SitePublication::findOrFail(1)->active_release_id !== $record->id
-                && ($operation !== 'rollback' || SitePublicationRevision::where('release_id', $record->id)->exists()))
+            // Stays callable while its confirmation is open, so a publication made meanwhile (including this release
+            // by the scheduler) is reported rather than silently dropped.
+            ->visible(fn (SiteRelease $record, ListSiteReleases $livewire): bool => ($livewire->expectedPublicationRevision !== null
+                    && static::isOpen($livewire, $operation, $record))
+                || (SitePublication::findOrFail(1)->active_release_id !== $record->id
+                    && ($operation !== 'rollback' || SitePublicationRevision::where('release_id', $record->id)->exists())))
             ->action(function (SiteRelease $record, ListSiteReleases $livewire, Action $action) use ($operation): void {
                 $actor = static::actor();
                 abort_if($livewire->expectedPublicationRevision === null, 409);
@@ -268,7 +272,7 @@ class SiteReleaseResource extends OperatorResource
             ->schema([
                 DateTimePicker::make('publish_at')->label('Publish at (UTC)')->timezone('UTC')->seconds(false)->required()
                     ->helperText(fn (): string => 'Current time: '.static::utc(now()).'. Choose a time at least one minute ahead and within '
-                        .SiteContent::SCHEDULE_MAX_DAYS.' days. If the scheduler has not run within '.SiteContent::SCHEDULE_GRACE_MINUTES
+                        .SiteContent::SCHEDULE_MAX_DAYS.' days. If it is not published within '.SiteContent::SCHEDULE_GRACE_MINUTES
                         .' minutes of this time, the schedule expires unpublished.'),
             ])
             ->mountUsing(function (ListSiteReleases $livewire, SiteRelease $record, ?Schema $schema = null): void {

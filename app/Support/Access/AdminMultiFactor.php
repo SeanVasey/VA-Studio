@@ -12,7 +12,7 @@ final class AdminMultiFactor
     /** A missing panel fails closed. Without a request, the admin panel's own configuration applies. */
     public static function satisfiedBy(User $user, ?Panel $panel = null): bool
     {
-        $panel ??= Filament::getPanel('admin', isStrict: false);
+        $panel ??= Filament::getPanel('admin');
         if ($panel === null) {
             return false;
         }

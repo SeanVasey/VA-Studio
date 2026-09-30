@@ -361,6 +361,40 @@ class SiteScheduleTest extends TestCase
         $this->assertSame(['superseded', 'manual_rollback', 2], [$schedule->fresh()->state, $schedule->fresh()->outcome, $schedule->fresh()->publication_revision]);
     }
 
+    public function test_database_guard_isolates_the_published_revision_and_pointer_checks(): void
+    {
+        $site = app(SiteContent::class);
+        $scheduler = LicenseFixtures::admin();
+        $scheduled = $this->draft($scheduler, 'REVISION EVIDENCE');
+        $other = $this->draft($scheduler, 'INTERVENING EVIDENCE');
+        $schedule = $site->schedule($scheduled->id, $this->at('2026-10-01 12:05:00'), 0, $scheduler);
+        $published = ['state' => 'published', 'outcome' => 'published', 'pending_slot' => null, 'resolved_at' => '2026-10-01 12:05:00'];
+        $update = fn (array $values) => fn () => DB::table('site_publication_schedules')->where('id', $schedule->id)->update($values);
+        // Exact history at the next revision, but the pointer has moved on: only the pointer check rejects it.
+        $this->advance(1, $scheduled, 'publish', $scheduler);
+        $this->advance(2, $other, 'publish', $scheduler);
+        $this->forged($update($published + ['publication_revision' => 1]));
+        // Exact history and pointer, but not the revision after the reviewed one: only that check rejects it.
+        $this->advance(3, $scheduled, 'publish', $scheduler);
+        $this->forged($update($published + ['publication_revision' => 3]));
+        $this->assertSame('pending', $schedule->fresh()->state);
+    }
+
+    public function test_database_guard_rejects_a_superseding_revision_the_schedule_was_reviewed_against(): void
+    {
+        $site = app(SiteContent::class);
+        $scheduler = LicenseFixtures::admin();
+        $staff = LicenseFixtures::admin();
+        $site->publish($this->draft($staff, 'REVIEWED LIVE')->id, 0, $staff);
+        $schedule = $site->schedule($this->draft($scheduler, 'REVIEWED SCHEDULE')->id, $this->at('2026-10-01 12:05:00'), 1, $scheduler);
+        // Revision 1 is a staff publication and the live pointer, but the schedule already reviewed it.
+        $this->forged(fn () => DB::table('site_publication_schedules')->where('id', $schedule->id)->update([
+            'state' => 'superseded', 'outcome' => 'manual_publish', 'pending_slot' => null, 'resolved_at' => '2026-10-01 12:01:00',
+            'resolved_by' => $staff->id, 'publication_revision' => 1,
+        ]));
+        $this->assertSame('pending', $schedule->fresh()->state);
+    }
+
     public function test_populated_schedule_migration_rollback_is_refused_and_the_guards_remain(): void
     {
         $site = app(SiteContent::class);

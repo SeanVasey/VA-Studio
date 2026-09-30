@@ -257,6 +257,22 @@ class SiteScheduleHttpTest extends TestCase
         $this->assertDatabaseCount('site_publication_revisions', 0);
     }
 
+    public function test_open_publish_confirmation_reports_its_release_becoming_active_meanwhile(): void
+    {
+        $actor = LicenseFixtures::admin();
+        $other = LicenseFixtures::admin();
+        $target = $this->release('ACTIVATED MEANWHILE', $actor);
+        $this->actingAs($actor);
+        $component = Livewire::test(ListSiteReleases::class)->mountTableAction('publish', $target)
+            ->assertSet('expectedPublicationRevision', 0);
+        // Another operator (or the scheduler) publishes this very release while the confirmation is open.
+        app(SiteContent::class)->publish($target->id, 0, $other);
+        $component->callMountedTableAction()->assertSet('expectedPublicationRevision', null);
+        $this->assertStringContainsString('The published site changed', $this->notificationBody('Publication blocked'));
+        $this->assertSame([1, $target->id], [SitePublication::findOrFail(1)->revision, SitePublication::findOrFail(1)->active_release_id]);
+        $this->assertDatabaseCount('site_publication_revisions', 2);
+    }
+
     public function test_actions_follow_the_live_state(): void
     {
         $actor = LicenseFixtures::admin();
