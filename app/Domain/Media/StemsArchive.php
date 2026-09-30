@@ -46,7 +46,7 @@ class StemsArchive
     private function cleanScan(array $scan, string $hash, bool $historical = false): bool
     {
         return preg_match('/\A[a-f0-9]{64}\z/D', $hash) && ($scan['status'] ?? null) === 'clean' && hash_equals($hash, $scan['sha256'] ?? '')
-            && (($scan['engine'] ?? null) === 'clamav' || (($scan['engine'] ?? null) === 'test-only' && ($historical || app()->environment('testing'))));
+            && ScanEngines::accepted($scan['engine'] ?? null, $historical);
     }
 
     public function build(string $input, string $mime, array $profile, string $workspace, callable $scan): array
