@@ -151,6 +151,10 @@ class SiteScheduleHttpTest extends TestCase
         // Meanwhile the reviewed schedule is cancelled elsewhere and a different release is scheduled.
         app(SiteContent::class)->cancelSchedule($reviewed->id, $other);
         $replacement = $this->scheduleFor($second, $other, '2026-10-01 12:10:00');
+        // A re-render still describes the reviewed schedule, never the replacement the confirmation would not cancel.
+        $component->call('$refresh')
+            ->assertMountedActionModalSee('The scheduled publication of “FIRST CANCEL LABEL” at 2026-10-01 12:05 UTC was already resolved.')
+            ->assertMountedActionModalDontSee('SECOND CANCEL LABEL');
         $component->callMountedAction()->assertNotified('Cancellation blocked')->assertSet('expectedScheduleId', null);
         $this->assertSame('pending', $replacement->fresh()->state);
         $this->assertSame($other->id, $reviewed->fresh()->resolved_by);
@@ -163,9 +167,49 @@ class SiteScheduleHttpTest extends TestCase
             ->assertMountedActionModalSee(['Cancelled by staff', 'by '.$actor->name, 'by '.$other->name, 'SECOND CANCEL LABEL (#'.$second->id.')']);
     }
 
+    public static function resolutionsWithNothingPending(): array
+    {
+        return ['cancelled by another administrator' => ['cancel'], 'replaced by a staff publication' => ['publish']];
+    }
+
+    #[DataProvider('resolutionsWithNothingPending')]
+    public function test_open_cancel_confirmation_reports_a_schedule_resolved_meanwhile_with_nothing_else_pending(string $resolution): void
+    {
+        $actor = LicenseFixtures::admin();
+        $other = LicenseFixtures::admin();
+        $reviewed = $this->scheduleFor($this->release('RESOLVED CANCEL', $actor), $actor);
+        $live = $this->release('RESOLVING PUBLICATION', $other);
+        $this->actingAs($actor);
+        $component = Livewire::test(ListSiteReleases::class)->mountAction('cancelScheduledPublication')
+            ->assertSet('expectedScheduleId', $reviewed->id);
+        $resolution === 'cancel' ? app(SiteContent::class)->cancelSchedule($reviewed->id, $other)
+            : app(SiteContent::class)->publish($live->id, 0, $other, $reviewed->id);
+        $this->assertNull(app(SiteContent::class)->pendingSchedule());
+        // Nothing is pending, yet the open confirmation still reaches the domain instead of doing nothing.
+        $component->callMountedAction()->assertSet('expectedScheduleId', null);
+        $this->assertStringContainsString('already resolved', $this->notificationBody('Cancellation blocked'));
+        $this->assertSame($other->id, $reviewed->fresh()->resolved_by);
+        $this->assertSame($resolution === 'cancel' ? 'cancelled' : 'superseded', $reviewed->fresh()->state);
+        Livewire::test(ListSiteReleases::class)->assertActionHidden('cancelScheduledPublication');
+    }
+
+    public function test_a_dismissed_schedule_confirmation_leaves_the_action_hidden_once_another_schedule_is_pending(): void
+    {
+        $actor = LicenseFixtures::admin();
+        $other = LicenseFixtures::admin();
+        $dismissed = $this->release('DISMISSED SCHEDULE', $actor);
+        $this->actingAs($actor);
+        $component = Livewire::test(ListSiteReleases::class)->mountTableAction('schedulePublication', $dismissed)
+            ->assertSet('schedulingReleaseId', $dismissed->id)
+            ->unmountTableAction();
+        $this->scheduleFor($this->release('OTHER SCHEDULE', $other), $other);
+        $component->call('$refresh')->assertTableActionHidden('schedulePublication', $dismissed);
+        $this->assertSame(1, SitePublicationSchedule::count());
+    }
+
     public static function manualOperations(): array
     {
-        return ['publish' => ['publish', 'manual_publish', 'Replaced when staff published another release'],
+        return ['publish' => ['publish', 'manual_publish', 'Replaced when staff published a release'],
             'restore' => ['rollback', 'manual_rollback', 'Replaced when staff restored a previous release']];
     }
 
@@ -237,7 +281,8 @@ class SiteScheduleHttpTest extends TestCase
         Livewire::test(ListSiteReleases::class)->assertSee('publishes at 2026-10-01 12:05 UTC.')->assertDontSee('Overdue');
         $this->travelTo(CarbonImmutable::parse('2026-10-01 12:07:01', 'UTC'));
         Livewire::test(ListSiteReleases::class)
-            ->assertSee('Overdue: the scheduler has not run. It expires unpublished after 2026-10-01 13:05 UTC.');
+            ->assertSee('Overdue: not yet published. Check that the scheduler runs every minute and review the application log.'
+                .' It expires unpublished after 2026-10-01 13:05 UTC.');
     }
 
     public static function revokedPrivileges(): array

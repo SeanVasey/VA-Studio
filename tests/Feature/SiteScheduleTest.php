@@ -19,6 +19,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use LogicException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\LicenseFixtures;
 use Tests\TestCase;
 
@@ -67,6 +68,17 @@ class SiteScheduleTest extends TestCase
             $this->fail('Forged schedule evidence was accepted.');
         } catch (QueryException) {
         }
+    }
+
+    /** Append history and advance the pointer directly, as D-21's own guards allow, to build exact revision evidence. */
+    private function advance(int $revision, SiteRelease $release, string $operation, User $actor): void
+    {
+        DB::transaction(function () use ($revision, $release, $operation, $actor): void {
+            $previous = DB::table('site_publications')->where('id', 1)->value('active_release_id');
+            DB::table('site_publication_revisions')->insert(['revision' => $revision, 'release_id' => $release->id, 'previous_release_id' => $previous,
+                'operation' => $operation, 'content_hash' => $release->content_hash, 'actor_id' => $actor->id, 'created_at' => now()]);
+            DB::table('site_publications')->where('id', 1)->update(['revision' => $revision, 'active_release_id' => $release->id, 'updated_at' => now()]);
+        });
     }
 
     public function test_scheduling_retains_the_exact_release_revision_and_time_without_changing_the_live_site(): void
@@ -216,7 +228,7 @@ class SiteScheduleTest extends TestCase
         $pending = $site->schedule($scheduled->id, $this->at('2026-10-01 13:00:00'), 0, $actor);
         foreach ([null, $pending->id + 1] as $unreviewed) {
             $message = $this->rejected(fn () => $site->publish($release->id, 0, $actor, $unreviewed), 'publication')->errors()['publication'][0];
-            $this->assertStringContainsString('scheduled or cancelled after you opened', $message);
+            $this->assertStringContainsString('changed after you opened this confirmation', $message);
         }
         // A stale revision fails before the reviewed schedule could be resolved.
         $this->rejected(fn () => $site->publish($release->id, 7, $actor, $pending->id), 'publication');
@@ -288,6 +300,65 @@ class SiteScheduleTest extends TestCase
         }
         $this->assertSame('cancelled', $pending->fresh()->state);
         $this->assertDatabaseCount('site_publication_schedules', 1);
+    }
+
+    public static function publishedEvidence(): array
+    {
+        return ['history by another administrator' => ['other', 'scheduled', 'publish', false],
+            'history for another release' => ['scheduler', 'other', 'publish', false],
+            'restore history' => ['scheduler', 'scheduled', 'rollback', false],
+            'exact history' => ['scheduler', 'scheduled', 'publish', true]];
+    }
+
+    #[DataProvider('publishedEvidence')]
+    public function test_database_guard_links_a_published_schedule_to_its_exact_history_and_grace_window(
+        string $historyActor, string $historyRelease, string $operation, bool $exact
+    ): void {
+        $site = app(SiteContent::class);
+        $scheduler = LicenseFixtures::admin();
+        $other = LicenseFixtures::admin();
+        $scheduled = $this->draft($scheduler, 'PUBLISHED EVIDENCE');
+        $otherRelease = $this->draft($scheduler, 'OTHER EVIDENCE');
+        $schedule = $site->schedule($scheduled->id, $this->at('2026-10-01 12:05:00'), 0, $scheduler);
+        $this->advance(1, $historyRelease === 'scheduled' ? $scheduled : $otherRelease, $operation, $historyActor === 'scheduler' ? $scheduler : $other);
+        $published = ['state' => 'published', 'outcome' => 'published', 'pending_slot' => null, 'resolved_at' => '2026-10-01 12:05:00', 'publication_revision' => 1];
+        $update = fn (array $values) => fn () => DB::table('site_publication_schedules')->where('id', $schedule->id)->update($values);
+        // Each forgery differs from an accepted publication in one detail only.
+        foreach ([['resolved_at' => '2026-10-01 12:04:59'], ['resolved_at' => '2026-10-01 13:05:01'],
+            ['resolved_by' => $scheduler->id], ['publication_revision' => 2]] as $change) {
+            $this->forged($update($change + $published));
+        }
+        if (! $exact) {
+            $this->forged($update($published));
+            $this->assertSame('pending', $schedule->fresh()->state);
+
+            return;
+        }
+        // Positive control: exact evidence is accepted at the last second of the grace window.
+        $update(['resolved_at' => '2026-10-01 13:05:00'] + $published)();
+        $this->assertSame(['published', 1], [$schedule->fresh()->state, $schedule->fresh()->publication_revision]);
+    }
+
+    public function test_database_guard_links_a_superseded_schedule_to_the_replacing_staff_revision(): void
+    {
+        $site = app(SiteContent::class);
+        $scheduler = LicenseFixtures::admin();
+        $staff = LicenseFixtures::admin();
+        $scheduled = $this->draft($scheduler, 'SUPERSEDED EVIDENCE');
+        $manual = $this->draft($staff, 'MANUAL EVIDENCE');
+        $schedule = $site->schedule($scheduled->id, $this->at('2026-10-01 12:05:00'), 0, $scheduler);
+        $this->advance(1, $manual, 'publish', $staff);
+        $superseded = ['state' => 'superseded', 'outcome' => 'manual_publish', 'pending_slot' => null, 'resolved_at' => '2026-10-01 12:01:00',
+            'resolved_by' => $staff->id, 'publication_revision' => 1];
+        $update = fn (array $values) => fn () => DB::table('site_publication_schedules')->where('id', $schedule->id)->update($values);
+        foreach ([['resolved_by' => $scheduler->id], ['resolved_by' => null], ['outcome' => 'manual_rollback'], ['publication_revision' => 0]] as $change) {
+            $this->forged($update($change + $superseded));
+        }
+        // Once the pointer moves on, the earlier revision no longer describes the live site.
+        $this->advance(2, $scheduled, 'rollback', $staff);
+        $this->forged($update($superseded));
+        $update(['outcome' => 'manual_rollback', 'publication_revision' => 2] + $superseded)();
+        $this->assertSame(['superseded', 'manual_rollback', 2], [$schedule->fresh()->state, $schedule->fresh()->outcome, $schedule->fresh()->publication_revision]);
     }
 
     public function test_populated_schedule_migration_rollback_is_refused_and_the_guards_remain(): void

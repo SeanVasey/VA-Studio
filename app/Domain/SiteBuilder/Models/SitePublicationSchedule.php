@@ -8,8 +8,6 @@ use LogicException;
 /** One requested future activation. Only the site content service resolves it, exactly once. */
 class SitePublicationSchedule extends Model
 {
-    public const STATES = ['pending', 'published', 'cancelled', 'superseded', 'failed', 'expired'];
-
     public $timestamps = false;
     protected $guarded = ['id'];
 

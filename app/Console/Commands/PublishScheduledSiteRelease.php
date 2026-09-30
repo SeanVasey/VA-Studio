@@ -19,7 +19,9 @@ final class PublishScheduledSiteRelease extends Command
             $result = $site->runDueSchedule();
         } catch (Throwable $exception) {
             // The transaction rolled back, so the schedule stays pending and the next run retries within its grace window.
-            // Only the class is printed: messages can carry SQL, paths or configuration.
+            // The private application log keeps the details; output shows only the class, because messages can carry
+            // SQL, paths or configuration.
+            report($exception);
             $this->error('UNAVAILABLE '.class_basename($exception));
 
             return self::FAILURE;

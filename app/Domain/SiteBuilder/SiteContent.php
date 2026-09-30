@@ -7,6 +7,7 @@ use App\Domain\SiteBuilder\Models\SitePublicationRevision;
 use App\Domain\SiteBuilder\Models\SitePublicationSchedule;
 use App\Domain\SiteBuilder\Models\SiteRelease;
 use App\Models\User;
+use App\Support\Access\AdminMultiFactor;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
@@ -21,7 +22,10 @@ use LogicException;
 /** Site changes do not write catalog, commercial or customer records. */
 final class SiteContent
 {
-    /** A schedule that the scheduler reaches later than this expires unpublished instead of surprising staff. */
+    /**
+     * A schedule that the scheduler reaches later than this expires unpublished instead of surprising staff. The
+     * schedule migration's transition trigger enforces the same 60 minutes; changing it needs a new migration.
+     */
     public const SCHEDULE_GRACE_MINUTES = 60;
 
     public const SCHEDULE_MAX_DAYS = 365;
@@ -165,9 +169,10 @@ final class SiteContent
             if ($now->greaterThan($schedule->publish_at->addMinutes(self::SCHEDULE_GRACE_MINUTES))) {
                 return $this->resolveSchedule($schedule, 'expired', 'grace_expired');
             }
-            // The scheduling operator must still hold the role; a withdrawn account cannot publish later.
+            // The scheduling operator must still hold the role, with MFA enrolled where the admin panel requires it;
+            // a withdrawn account cannot publish later.
             $actor = User::find($schedule->created_by);
-            if ($actor === null || ! Gate::forUser($actor)->allows('administer-catalog')) {
+            if ($actor === null || ! Gate::forUser($actor)->allows('administer-catalog') || ! AdminMultiFactor::satisfiedBy($actor)) {
                 return $this->resolveSchedule($schedule, 'failed', 'actor_unauthorized');
             }
             $release = SiteRelease::find($schedule->release_id);
@@ -221,7 +226,7 @@ final class SiteContent
             // Scheduling does not move the pointer, so the reviewed pending schedule is a separate expectation.
             $pending = SitePublicationSchedule::query()->where('state', 'pending')->lockForUpdate()->first();
             if ($pending?->id !== $expectedScheduleId) {
-                throw ValidationException::withMessages(['publication' => 'A publication was scheduled or cancelled after you opened this confirmation. Refresh the release list before publishing or rolling back.']);
+                throw ValidationException::withMessages(['publication' => 'The scheduled publication changed after you opened this confirmation. Refresh the release list before publishing or rolling back.']);
             }
             $release = SiteRelease::findOrFail($releaseId);
             $this->content($release);

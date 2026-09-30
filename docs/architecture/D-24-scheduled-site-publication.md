@@ -65,7 +65,7 @@ The runner's decision, in order:
 
 1. Not pending or not yet due: no-op.
 2. More than 60 minutes late: `expired`, `grace_expired`.
-3. The scheduling administrator no longer passes `administer-catalog`: `failed`, `actor_unauthorized`.
+3. The scheduling administrator no longer passes `administer-catalog`, or the admin panel requires MFA and the account has none enrolled: `failed`, `actor_unauthorized`. Every interactive administration request applies the same MFA rule.
 4. The pointer or release fails verification, or the release hash changed: `failed`, `integrity`.
 5. The revision moved, reached its ceiling, or the release is already active: `failed`, `stale_revision`.
 6. Otherwise activate through the D-21 path and mark the schedule `published` with its revision. Audit `site.schedule.published`.
@@ -92,7 +92,7 @@ Every command locks the singleton first and the schedule row second. Under MySQL
 | `PUBLISHED schedule=<id> revision=<n>` | 0 | The release is live. |
 | `EXPIRED schedule=<id>` | 1 | The grace window passed; the site did not change. |
 | `FAILED <outcome> schedule=<id>` | 1 | A recorded fail-closed outcome; the site did not change. |
-| `UNAVAILABLE <exception class>` | 1 | Rolled back; still pending and retried next minute within grace. |
+| `UNAVAILABLE <exception class>` | 1 | Rolled back and reported to the private application log; still pending and retried next minute within grace. |
 
 `routes/console.php` registers the command every minute with `withoutOverlapping(5)`. Laravel's default overlap lock lasts 24 hours, so a crashed run could otherwise block publication for a day. The database locks guarantee correctness; the overlap lock only avoids redundant runs. Production needs the standard cron entry `* * * * * php artisan schedule:run` on the chosen host. `php artisan schedule:list` shows the registration. Laravel skips scheduled commands in maintenance mode: a schedule that falls due during maintenance publishes afterwards if still within grace, and expires otherwise. `vasey:doctor` warns (`scheduled_publication`) when a pending schedule is more than two minutes overdue.
 
@@ -106,14 +106,14 @@ The **Site content** page adds:
 - a **Cancel scheduled publication** confirmation naming the release and time;
 - a read-only **Schedule history** of the last 20 schedules, with state, reason, actors, times and publication revision.
 
-The publish and restore confirmations warn when they will supersede a pending schedule. Confirmations retain the revision or schedule they displayed on the locked Livewire component. The schedule action stays callable for the release whose confirmation is open, so a schedule or publication made meanwhile is reported rather than dropped silently. The existing per-request role and MFA recheck applies to every action.
+The publish and restore confirmations warn when they will supersede a pending schedule. Confirmations retain the revision or schedule they displayed on the locked Livewire component, and the cancel confirmation describes that captured schedule. Open schedule and cancel confirmations stay callable, so a schedule, cancellation or publication made meanwhile is reported rather than dropped silently. The existing per-request role and MFA recheck applies to every action.
 
 ## Verification, recovery and remaining scope
 
 Required evidence:
 
-- domain bounds, fresh authority, stale and integrity rejection, supersession, cancellation and immutability;
-- forged-row and transition rejection on both engines;
+- domain bounds, fresh authority including the runner's MFA recheck, stale and integrity rejection, supersession, cancellation and immutability;
+- forged-row and transition rejection on both engines, with each publication-evidence check isolated;
 - every runner outcome, the command's output and exit codes, and the scheduler registration;
 - Livewire actions, including stale confirmations and the role/MFA rechecks;
 - independent-process MySQL races in both lock orders;

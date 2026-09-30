@@ -41,7 +41,7 @@ Scheduled site publication ([D-24](architecture/D-24-scheduled-site-publication.
 * * * * * cd /path/to/vaseyaudio && php artisan schedule:run >> /dev/null 2>&1
 ```
 
-`php artisan schedule:list` shows `vasey:publish-scheduled-site-release` registered every minute. Without cron, schedules never publish: the doctor's `scheduled_publication` check warns once one is more than two minutes overdue, and each expires unpublished 60 minutes after its time. No cron is configured by this repository; the production host remains undecided (U-02).
+`php artisan schedule:list` shows `vasey:publish-scheduled-site-release` registered every minute. Without cron, schedules never publish: the doctor's `scheduled_publication` check warns once one is more than two minutes overdue. A run more than 60 minutes after a schedule's time records it as expired, unpublished. Runner errors are written to the application log. No cron is configured by this repository; the production host remains undecided (U-02).
 
 ## Browser verification
 

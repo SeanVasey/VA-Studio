@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\SiteReleaseResource\Pages;
 
 use App\Filament\Resources\SiteReleaseResource;
-use Filament\Auth\MultiFactor\MultiFactorChallenge;
+use App\Support\Access\AdminMultiFactor;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\ListRecords;
 use Livewire\Attributes\Locked;
@@ -26,10 +26,7 @@ class ListSiteReleases extends ListRecords
         // Recheck the database role and MFA on every reactive request, including search and actions.
         $actor = SiteReleaseResource::actor();
         $panel = Filament::getCurrentOrDefaultPanel();
-        abort_if($panel === null, 403);
-        if ($panel->isMultiFactorAuthenticationRequired()) {
-            abort_unless(MultiFactorChallenge::make()->hasEnabledProviders($actor), 403);
-        }
+        abort_unless($panel !== null && AdminMultiFactor::satisfiedBy($actor, $panel), 403);
     }
 
     public function getTableRecordsPerPage(): int

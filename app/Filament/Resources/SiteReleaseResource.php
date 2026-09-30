@@ -280,7 +280,8 @@ class SiteReleaseResource extends OperatorResource
             })
             // Filament silently drops a call to a hidden action, so the open confirmation stays callable and the domain
             // reports a schedule or publication made meanwhile.
-            ->visible(fn (SiteRelease $record, ListSiteReleases $livewire): bool => $livewire->schedulingReleaseId === $record->id
+            ->visible(fn (SiteRelease $record, ListSiteReleases $livewire): bool => ($livewire->schedulingReleaseId === $record->id
+                    && static::isOpen($livewire, 'schedulePublication', $record))
                 || (SitePublication::findOrFail(1)->active_release_id !== $record->id && app(SiteContent::class)->pendingSchedule() === null))
             ->action(function (array $data, SiteRelease $record, ListSiteReleases $livewire, Action $action): void {
                 $actor = static::actor();
@@ -316,18 +317,26 @@ class SiteReleaseResource extends OperatorResource
     {
         return Action::make('cancelScheduledPublication')->label('Cancel scheduled publication')->color('danger')->requiresConfirmation()
             ->modalHeading('Cancel scheduled publication')
-            ->modalDescription(function (): string {
-                $pending = app(SiteContent::class)->pendingSchedule();
+            // Describe the schedule this confirmation will cancel, not whichever one is pending when it re-renders.
+            ->modalDescription(function (ListSiteReleases $livewire): string {
+                $schedule = $livewire->expectedScheduleId === null ? null : SitePublicationSchedule::find($livewire->expectedScheduleId);
+                if ($schedule === null) {
+                    return 'No publication is scheduled.';
+                }
+                $subject = '“'.SiteRelease::findOrFail($schedule->release_id)->label.'” at '.static::utc($schedule->publish_at);
 
-                return $pending === null ? 'No publication is scheduled.' : 'Cancel the scheduled publication of “'.SiteRelease::findOrFail($pending->release_id)->label
-                    .'” at '.static::utc($pending->publish_at).'? The live site does not change.';
+                return $schedule->state === 'pending' ? 'Cancel the scheduled publication of '.$subject.'? The live site does not change.'
+                    : 'The scheduled publication of '.$subject.' was already resolved. Close this dialog and check the schedule history.';
             })
             ->mountUsing(function (ListSiteReleases $livewire): void {
                 static::actor();
                 // Cancel exactly the schedule the operator reviewed, never a different one created meanwhile.
                 $livewire->expectedScheduleId = app(SiteContent::class)->pendingSchedule()?->id;
             })
-            ->visible(fn (): bool => app(SiteContent::class)->pendingSchedule() !== null)
+            // Stays callable while its confirmation is open, so a schedule resolved meanwhile is reported, not dropped.
+            ->visible(fn (ListSiteReleases $livewire): bool => ($livewire->expectedScheduleId !== null
+                    && static::isOpen($livewire, 'cancelScheduledPublication'))
+                || app(SiteContent::class)->pendingSchedule() !== null)
             ->action(function (ListSiteReleases $livewire, Action $action): void {
                 $actor = static::actor();
                 abort_if($livewire->expectedScheduleId === null, 409);
@@ -374,11 +383,27 @@ class SiteReleaseResource extends OperatorResource
         }
         $summary = 'Scheduled: “'.SiteRelease::findOrFail($pending->release_id)->label.'” (release #'.$pending->release_id.') publishes at '.static::utc($pending->publish_at).'.';
         if ($pending->publish_at->addMinutes(2)->isPast()) {
-            $summary .= ' Overdue: the scheduler has not run. It expires unpublished after '
-                .static::utc($pending->publish_at->addMinutes(SiteContent::SCHEDULE_GRACE_MINUTES)).'.';
+            $summary .= ' Overdue: not yet published. Check that the scheduler runs every minute and review the application log.'
+                .' It expires unpublished after '.static::utc($pending->publish_at->addMinutes(SiteContent::SCHEDULE_GRACE_MINUTES)).'.';
         }
 
         return $summary;
+    }
+
+    /**
+     * Whether the operator's open confirmation is this action (and record). Filament lists an action as mounted before
+     * checking its visibility, so callers pair this with state that only the action's mount sets.
+     */
+    private static function isOpen(ListSiteReleases $livewire, string $name, ?SiteRelease $record = null): bool
+    {
+        foreach ($livewire->mountedActions as $mounted) {
+            if (($mounted['name'] ?? null) === $name
+                && ($record === null || (string) ($mounted['context']['recordKey'] ?? '') === (string) $record->getKey())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /** Built from the schedule captured when the confirmation opened, matching what the domain will require. */
@@ -396,10 +421,10 @@ class SiteReleaseResource extends OperatorResource
             null => 'Waiting for its time',
             'published' => 'Published by the scheduler',
             'cancelled' => 'Cancelled by staff',
-            'manual_publish' => 'Replaced when staff published another release',
+            'manual_publish' => 'Replaced when staff published a release',
             'manual_rollback' => 'Replaced when staff restored a previous release',
-            'grace_expired' => 'Expired: the scheduler did not run within '.SiteContent::SCHEDULE_GRACE_MINUTES.' minutes',
-            'actor_unauthorized' => 'Not published: the scheduling account is no longer an authorized administrator',
+            'grace_expired' => 'Expired: not published within '.SiteContent::SCHEDULE_GRACE_MINUTES.' minutes of its time',
+            'actor_unauthorized' => 'Not published: the scheduling account lost administrator access or required MFA',
             'stale_revision' => 'Not published: the live site changed after scheduling',
             'integrity' => 'Not published: the release or publication failed its integrity check',
             default => 'Unknown outcome',

@@ -80,10 +80,10 @@ final class InstallationReport
             'An asynchronous queue is selected; worker liveness and recovery are unverified.', 'Select and run the documented asynchronous media queue before processing real uploads.');
         $check('mail_transport', false, fn () => in_array(config('mail.default'), ['smtp', 'ses', 'postmark', 'resend', 'mailgun'], true),
             'An outbound mail transport is selected; delivery is unverified.', 'Configure and test outbound transactional mail before customer email workflows.');
-        // A pending schedule more than two minutes past its time means the every-minute scheduler is not running.
+        // A pending schedule more than two minutes past its time means the every-minute scheduler is not running or keeps failing.
         $check('scheduled_publication', false, fn () => ! DB::table('site_publication_schedules')->where('state', 'pending')
             ->where('publish_at', '<', now()->subMinutes(2))->exists(),
-            'No scheduled site publication is overdue.', 'A scheduled site publication is overdue. Run `php artisan schedule:run` every minute from cron; it expires unpublished 60 minutes after its time.');
+            'No scheduled site publication is overdue.', 'A scheduled site publication is overdue. Run `php artisan schedule:run` every minute from cron and check the application log; a run more than 60 minutes after its time records it as expired, unpublished.');
 
         return ['schema_version' => 1, 'scope' => 'installation', 'foundation_ready' => ! in_array('fail', array_column($checks, 'status'), true), 'checks' => $checks];
     }

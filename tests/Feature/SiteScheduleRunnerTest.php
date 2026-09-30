@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
+use Filament\Facades\Filament;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Artisan;
@@ -113,6 +114,35 @@ class SiteScheduleRunnerTest extends TestCase
         [$schedule, , $actor] = $this->scheduled();
         DB::table('users')->where('id', $actor->id)->update(['is_admin' => false]);
         $this->travelTo(CarbonImmutable::parse('2026-10-01 12:05:00', 'UTC'));
+        $this->assertSame([1, 'FAILED actor_unauthorized schedule='.$schedule->id], $this->runScheduler());
+        $this->assertSame(['failed', 'actor_unauthorized'], [$schedule->fresh()->state, $schedule->fresh()->outcome]);
+        $this->assertSame(0, SitePublication::findOrFail(1)->revision);
+        $this->assertDatabaseCount('site_publication_revisions', 0);
+        $this->assertNull(AuditEvent::where('action', 'site.schedule.failed')->sole()->actor_id);
+    }
+
+    public static function mfaEnrollment(): array
+    {
+        return ['required MFA is no longer enrolled' => [false], 'required MFA is enrolled' => [true]];
+    }
+
+    #[DataProvider('mfaEnrollment')]
+    public function test_runner_rechecks_required_mfa_for_the_scheduling_administrator(bool $enrolled): void
+    {
+        [$schedule, , $actor] = $this->scheduled();
+        // Production requires enrolled MFA for administration; the runner applies the same rule when it publishes.
+        $panel = Filament::getPanel('admin');
+        $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: true);
+        if ($enrolled) {
+            $actor->forceFill(['app_authentication_secret' => 'JBSWY3DPEHPK3PXP'])->save();
+        }
+        $this->travelTo(CarbonImmutable::parse('2026-10-01 12:05:00', 'UTC'));
+        if ($enrolled) {
+            $this->assertSame([0, 'PUBLISHED schedule='.$schedule->id.' revision=1'], $this->runScheduler());
+            $this->assertSame($actor->id, SitePublicationRevision::where('revision', 1)->sole()->actor_id);
+
+            return;
+        }
         $this->assertSame([1, 'FAILED actor_unauthorized schedule='.$schedule->id], $this->runScheduler());
         $this->assertSame(['failed', 'actor_unauthorized'], [$schedule->fresh()->state, $schedule->fresh()->outcome]);
         $this->assertSame(0, SitePublication::findOrFail(1)->revision);

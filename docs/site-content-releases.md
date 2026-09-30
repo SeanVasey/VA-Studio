@@ -26,8 +26,8 @@ Rows distinguish **Active**, **Previously published** and **Private draft**. An 
 
 Only one schedule can be pending. A schedule never publishes, and records why, when:
 
-- the scheduler has not run within 60 minutes of its time (expired);
-- the scheduling account is no longer a verified administrator;
+- no scheduler run reached it within 60 minutes of its time (the next run records it as expired);
+- the scheduling account is no longer a verified administrator, or has no MFA enrolled where the admin panel requires it;
 - the release or publication fails its integrity checks;
 - the live site changed through a path that did not replace the schedule.
 
@@ -39,7 +39,7 @@ The scheduler must run every minute on the production host, which is not chosen 
 * * * * * cd /path/to/vaseyaudio && php artisan schedule:run >> /dev/null 2>&1
 ```
 
-`php artisan schedule:list` confirms the registration. `php artisan vasey:publish-scheduled-site-release` runs one pass by hand; D-24 lists its output and exit codes. `php artisan vasey:doctor` warns when a pending schedule is more than two minutes overdue, which usually means cron is not running. Scheduled tasks do not run while the application is in maintenance mode.
+`php artisan schedule:list` confirms the registration. `php artisan vasey:publish-scheduled-site-release` runs one pass by hand; D-24 lists its output and exit codes. `php artisan vasey:doctor` warns when a pending schedule is more than two minutes overdue, which usually means cron is not running; runner errors are written to the application log. Scheduled tasks do not run while the application is in maintenance mode.
 
 ## Original schema-v1 fields
 
