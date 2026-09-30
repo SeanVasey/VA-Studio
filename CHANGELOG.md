@@ -27,6 +27,6 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Security
 
-- The media upload form no longer describes or accepts a stored file path, or a number naming a stored file, placed in its form state. A catalog administrator who knew the storage path of a private object, such as another upload or a contract, could learn whether it existed, its size and its detected file type. No file contents were exposed, and such a path was never ingested. A test now fails if any admin upload field does not refuse stored paths.
+- The media upload form no longer describes or accepts a stored file path, or a number naming a stored file, placed in its form state. A catalog administrator who knew the storage path of a private object, such as another upload or a contract, could learn whether it existed, its size and its detected file type. No file contents were exposed, and such a path was never ingested. A test now fails if any upload field in the application does not refuse stored paths, or if any code turns that guard off.
 
 [Unreleased]: https://github.com/VASEYDEV/VASEYAUDIO/commits/main
