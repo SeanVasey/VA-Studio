@@ -94,7 +94,7 @@ jobs:
       - run: cp .env.example .env
       - run: php artisan key:generate
       - name: Prove the complete MySQL test partition
-        run: python3 scripts/ci/phpunit-shards.py --shards=4 --prefix=phpunit-ci-mysql
+        run: python3 scripts/ci/phpunit-shards.py --shards=4 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json
       - name: Run all tests assigned to this MySQL shard
         run: php vendor/bin/phpunit --configuration=phpunit-ci-mysql-${{ matrix.shard }}.xml --log-junit=phpunit-ci-mysql-${{ matrix.shard }}-results.xml --fail-on-phpunit-warning --display-warnings
       - name: Retain partition and test evidence
@@ -137,7 +137,7 @@ jobs:
       - run: cp .env.example .env
       - run: php artisan key:generate
       - name: Prove the complete SQLite test partition
-        run: python3 scripts/ci/phpunit-shards.py --shards=2 --prefix=phpunit-ci-sqlite
+        run: python3 scripts/ci/phpunit-shards.py --shards=2 --prefix=phpunit-ci-sqlite --timings=scripts/ci/phpunit-timings-sqlite.json
       - name: Run all tests assigned to this SQLite shard
         run: php vendor/bin/phpunit --configuration=phpunit-ci-sqlite-${{ matrix.shard }}.xml --log-junit=phpunit-ci-sqlite-${{ matrix.shard }}-results.xml --fail-on-phpunit-warning --display-warnings
       - name: Retain partition and test evidence

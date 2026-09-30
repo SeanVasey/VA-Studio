@@ -4,6 +4,7 @@
 from collections import Counter
 from copy import deepcopy
 import importlib.util
+import json
 from pathlib import Path
 import sys
 import tempfile
@@ -15,6 +16,11 @@ module = importlib.util.module_from_spec(spec)
 sys.modules[spec.name] = module
 spec.loader.exec_module(module)
 Inventory, PartitionError = module.Inventory, module.PartitionError
+
+timings_spec = importlib.util.spec_from_file_location("phpunit_timings", Path(__file__).with_name("phpunit-timings.py"))
+timings_module = importlib.util.module_from_spec(timings_spec)
+sys.modules[timings_spec.name] = timings_module
+timings_spec.loader.exec_module(timings_module)
 
 
 class PartitionProofTest(unittest.TestCase):
@@ -32,8 +38,8 @@ class PartitionProofTest(unittest.TestCase):
             Counter({("money", "A::one"): 1, ("money", "B::one"): 1}),
         )
 
-    def selections(self, count=2):
-        assignments = module.partition(self.source, count)
+    def selections(self, count=2, weights=None):
+        assignments = module.partition(self.source, count, weights)
         observed = []
         for selected in assignments:
             cases = {name: file for name, file in self.source.cases.items() if file in selected}
@@ -158,6 +164,124 @@ class PartitionProofTest(unittest.TestCase):
             path.write_text("<?php // " + spelling)
             with self.assertRaises(PartitionError):
                 module.refuse_cross_file_dependencies(self.root, {"tests/A.php"})
+
+    def timings(self, files, fallback=1000):
+        return module.Timings("mysql", "fixture", fallback, files, "0" * 64)
+
+    def test_measured_duration_outweighs_case_count(self):
+        # A holds three cheap cases; B and C are one slow case each. Counting cases puts both slow files together.
+        timings = self.timings({"tests/A.php": (3, 30), "tests/B.php": (1, 10_000), "tests/C.php": (1, 10_000), "tests/D.phpt": (1, 10)})
+        slow = {"tests/B.php", "tests/C.php"}
+        self.assertEqual(1, sum(slow <= shard for shard in module.partition(self.source, 2)))
+        weights, untimed = module.file_weights(self.source, timings)
+        self.assertEqual([], untimed)
+        assignments, observed = self.selections(2, weights)
+        self.assertTrue(all(len(shard & slow) == 1 for shard in assignments))
+        module.prove(self.source, assignments, observed)
+
+    def test_timed_partition_is_deterministic_and_independent_of_input_order(self):
+        weights = {"tests/A.php": 30, "tests/B.php": 10_000, "tests/C.php": 10_000, "tests/D.phpt": 10}
+        reversed_source = Inventory(dict(reversed(list(self.source.cases.items()))), self.source.groups)
+        self.assertEqual(module.partition(self.source, 2, weights), module.partition(reversed_source, 2, dict(reversed(list(weights.items())))))
+
+    def test_timed_files_keep_their_per_case_cost_and_unknown_files_use_the_fallback(self):
+        timings = self.timings({"tests/A.php": (1, 100), "tests/C.php": (2, 50)}, fallback=700)
+        weights, untimed = module.file_weights(self.source, timings)
+        # A gained cases since it was timed (1 to 3), so its 100 ms per case now counts three times; C shrank (2 to 1).
+        self.assertEqual({"tests/A.php": 300, "tests/B.php": 700, "tests/C.php": 25, "tests/D.phpt": 700}, weights)
+        self.assertEqual(["tests/B.php", "tests/D.phpt"], untimed)
+        self.assertEqual(({"tests/A.php": 3, "tests/B.php": 1, "tests/C.php": 1, "tests/D.phpt": 1}, []), module.file_weights(self.source, None))
+
+    def test_zero_millisecond_timings_still_leave_no_shard_empty(self):
+        weights, _ = module.file_weights(self.source, self.timings({name: (1, 0) for name in self.source.files}))
+        self.assertEqual({1}, set(weights.values()))
+        self.assertTrue(all(len(shard) == 1 for shard in module.partition(self.source, 4, weights)))
+
+    def test_weights_must_be_positive_whole_numbers_for_exactly_the_discovered_files(self):
+        good = {name: 1 for name in self.source.files}
+        without_a = {name: weight for name, weight in good.items() if name != "tests/A.php"}
+        for bad in [{**good, "tests/Extra.php": 1}, without_a, {**good, "tests/A.php": 0}, {**good, "tests/A.php": 1.5}, {**good, "tests/A.php": True}]:
+            with self.assertRaises(PartitionError):
+                module.partition(self.source, 2, bad)
+
+    def test_timing_file_rejects_unknown_shapes_and_values(self):
+        valid = {"schema_version": 1, "driver": "mysql", "source": "fixture", "fallback_ms_per_case": 5,
+                 "files": {"tests/A.php": {"cases": 1, "ms": 0}}}
+        path = self.root / "timings.json"
+
+        def read(document):
+            path.write_text(document if isinstance(document, str) else json.dumps(document))
+            return module.read_timings(path)
+
+        parsed = read(valid)
+        self.assertEqual({"tests/A.php": (1, 0)}, parsed.files)
+        self.assertEqual(64, len(parsed.sha256))
+        broken = [
+            "not json", "[]", {**valid, "schema_version": 2}, {**valid, "schema_version": True}, {**valid, "schema_version": 1.0}, {**valid, "extra": 1},
+            {key: value for key, value in valid.items() if key != "source"},
+            {**valid, "driver": ""}, {**valid, "source": 3}, {**valid, "fallback_ms_per_case": 0}, {**valid, "fallback_ms_per_case": True},
+            {**valid, "files": {}}, {**valid, "files": {"tests/A.php": [1, 1]}},
+            {**valid, "files": {"tests/A.php": {"cases": 0, "ms": 1}}}, {**valid, "files": {"tests/A.php": {"cases": 1, "ms": -1}}},
+            {**valid, "files": {"tests/A.php": {"cases": 1, "ms": 1.5}}}, {**valid, "files": {"tests/A.php": {"cases": 1, "ms": 1, "extra": 2}}},
+        ]
+        for document in broken:
+            with self.assertRaises(PartitionError, msg=str(document)):
+                read(document)
+
+    def test_committed_timing_files_are_well_formed(self):
+        # Shape only: a renamed or deleted test file leaves a harmless stale entry until the next refresh.
+        for driver in ["mysql", "sqlite"]:
+            parsed = module.read_timings(Path(__file__).with_name(f"phpunit-timings-{driver}.json"))
+            self.assertEqual(driver, parsed.driver)
+            self.assertTrue(all(name.startswith("tests/") and name.endswith(".php") for name in parsed.files))
+
+
+class TimingGeneratorTest(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name).resolve()
+        for file in ["tests/A.php", "tests/B.php"]:
+            (self.root / file).parent.mkdir(parents=True, exist_ok=True)
+            (self.root / file).write_text("<?php // isolated timing fixture\n")
+
+    def log(self, name, cases):
+        body = "".join(f'<testcase name="t{index}" file="{file}" time="{seconds}"/>' for index, (file, seconds) in enumerate(cases))
+        path = self.root / name
+        path.write_text(f'<?xml version="1.0"?><testsuites><testsuite name="fixture">{body}</testsuite></testsuites>')
+        return path
+
+    def test_runner_paths_map_to_repository_files_and_vanished_files_are_reported(self):
+        log = self.log("runner.xml", [("/home/runner/work/app/app/tests/A.php", "1.5"), ("/home/runner/work/app/app/tests/A.php", "0.5"),
+                                      ("/home/runner/work/app/app/tests/Gone.php", "9")])
+        totals, gone = timings_module.read_junit(log, self.root)
+        self.assertEqual({"tests/A.php": [2, 2.0]}, totals)
+        self.assertEqual({"/home/runner/work/app/app/tests/Gone.php"}, gone)
+
+    def test_local_absolute_paths_resolve_and_parent_traversal_is_refused(self):
+        log = self.log("local.xml", [(str(self.root / "tests/B.php"), "1"), ("/elsewhere/../tests/A.php", "1")])
+        totals, gone = timings_module.read_junit(log, self.root)
+        self.assertEqual({"tests/B.php": [1, 1.0]}, totals)
+        self.assertEqual({"/elsewhere/../tests/A.php"}, gone)
+
+    def test_a_case_without_a_file_is_refused_instead_of_undercounted(self):
+        log = self.root / "nofile.xml"
+        log.write_text('<testsuites><testsuite><testcase name="t" time="1"/></testsuite></testsuites>')
+        with self.assertRaises(timings_module.TimingError):
+            timings_module.read_junit(log, self.root)
+
+    def test_several_runs_are_averaged_and_render_as_a_timing_file_the_partitioner_accepts(self):
+        first = timings_module.read_junit(self.log("a.xml", [("tests/A.php", "2"), ("tests/A.php", "2"), ("tests/B.php", "1")]), self.root)[0]
+        second = timings_module.read_junit(self.log("b.xml", [("tests/A.php", "4"), ("tests/A.php", "4"), ("tests/B.php", "3")]), self.root)[0]
+        combined = timings_module.combine([first, second])
+        self.assertEqual({"tests/A.php": (2, 6000), "tests/B.php": (1, 2000)}, combined)
+        path = self.root / "rendered.json"
+        path.write_text(timings_module.render("sqlite", "fixture runs", combined))
+        parsed = module.read_timings(path)
+        self.assertEqual((combined, "sqlite", "fixture runs"), (parsed.files, parsed.driver, parsed.source))
+        self.assertEqual(round(8000 / 3), parsed.fallback_ms_per_case)
+        with self.assertRaises(timings_module.TimingError):
+            timings_module.render("mysql", "nothing", {})
 
 
 if __name__ == "__main__":
