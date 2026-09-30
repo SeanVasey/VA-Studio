@@ -38,7 +38,7 @@ return new class extends Migration
             .' AND NEW.failure_code IS NULL AND NEW.profile_version IS NULL AND NEW.profile_fingerprint IS NULL AND NEW.evidence IS NULL'
             .' AND NEW.manifest_sha256 IS NULL AND NEW.processed_at IS NULL'
             ." AND NEW.slot IN ({$slots}) AND NEW.mime_type IN ('image/jpeg', 'image/png') AND LENGTH(NEW.source_sha256) = 64"
-            ." AND NEW.source_path LIKE 'site-images/quarantine/%' AND NEW.size_bytes > 0 AND NEW.width > 0 AND NEW.height > 0"
+            ." AND SUBSTR(NEW.source_path, 1, 23) = 'site-images/quarantine/' AND NEW.size_bytes > 0 AND NEW.width > 0 AND NEW.height > 0"
             ." AND LENGTH(TRIM(NEW.credit)) > 0");
         $identity = 'NEW.id = OLD.id AND NEW.slot = OLD.slot AND NEW.original_name = OLD.original_name AND NEW.source_path = OLD.source_path'
             .' AND NEW.source_sha256 = OLD.source_sha256 AND NEW.size_bytes = OLD.size_bytes AND NEW.mime_type = OLD.mime_type'
@@ -65,7 +65,8 @@ return new class extends Migration
         }
         $this->guard('site_image_variants', 'valid_insert', 'insert',
             "NEW.format IN ('jpeg', 'webp') AND NEW.width > 0 AND NEW.height > 0 AND LENGTH(NEW.sha256) = 64 AND NEW.size_bytes > 0"
-            ." AND NEW.storage_path LIKE 'site-images/revisions/%'"
+            // A prefix comparison rather than LIKE, which ignores ASCII case on SQLite.
+            ." AND SUBSTR(NEW.storage_path, 1, 22) = 'site-images/revisions/'"
             ." AND EXISTS (SELECT 1 FROM site_images i WHERE i.id = NEW.site_image_id AND i.status = 'processing')");
     }
 

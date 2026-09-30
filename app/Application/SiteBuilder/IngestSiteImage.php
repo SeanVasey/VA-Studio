@@ -114,7 +114,16 @@ final class IngestSiteImage
                 return $image;
             });
         } catch (Throwable $exception) {
-            $disk->delete($path);
+            // A commit can report an error after the server applied it; an upload a stored row may name is never removed, and
+            // without a working lookup the upload is kept as an orphan rather than risked.
+            try {
+                $named = SiteImage::query()->where('source_path', $path)->exists();
+            } catch (Throwable) {
+                $named = true;
+            }
+            if (! $named) {
+                $disk->delete($path);
+            }
             throw $exception;
         }
         // The row and its upload are committed, so a queue outage must not remove either: the image waits and staff retry it.

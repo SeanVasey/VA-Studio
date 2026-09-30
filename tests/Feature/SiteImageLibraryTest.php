@@ -729,6 +729,28 @@ class SiteImageLibraryTest extends TestCase
         $this->assertSame('ready', $this->process($stored)->status);
     }
 
+    public function test_intake_keeps_the_upload_when_its_commit_reports_an_error_after_applying(): void
+    {
+        // The row is committed, then the commit reports an error, as a connection lost while acknowledging it would.
+        $raised = false;
+        Event::listen(TransactionCommitted::class, function () use (&$raised): void {
+            if (! $raised && SiteImage::query()->exists()) {
+                $raised = true;
+                throw new PDOException('Synthetic failure after the upload commit.');
+            }
+        });
+        try {
+            $this->ingest('studio', F::jpeg(1440, 630));
+            $this->fail('The commit error should reach the caller.');
+        } catch (PDOException) {
+        }
+
+        $stored = SiteImage::query()->sole();
+        $this->assertTrue(Storage::disk('local')->exists($stored->source_path), 'The upload of a committed image was deleted.');
+        $this->assertTrue(RetrySiteImage::retryable($stored));
+        $this->assertSame('ready', $this->process($stored)->status);
+    }
+
     public function test_database_guards_keep_images_immutable_and_transitions_valid(): void
     {
         $refused = function (callable $statement, string $case): void {
@@ -747,7 +769,8 @@ class SiteImageLibraryTest extends TestCase
         // Spellings that MySQL's default collation would call equal (case, accents, trailing spaces) are refused like any other.
         foreach ([['status' => 'ready'], ['slot' => 'logo'], ['mime_type' => 'image/gif'], ['source_path' => 'media/quarantine/x/source.bin'],
             ['credit' => '   '], ['attempts' => 1], ['failure_code' => 'x'], ['status' => 'Quarantined'], ['slot' => 'Studio'], ['slot' => 'studio '],
-            ['mime_type' => 'IMAGE/JPEG'], ['source_path' => 'sïte-images/quarantine/'.Str::uuid().'/source.upload']] as $overrides) {
+            ['mime_type' => 'IMAGE/JPEG'], ['source_path' => 'sïte-images/quarantine/'.Str::uuid().'/source.upload'],
+            ['source_path' => 'SITE-IMAGES/quarantine/'.Str::uuid().'/source.upload']] as $overrides) {
             $refused(fn () => DB::table('site_images')->insert($row($overrides)), 'insert '.json_encode($overrides));
         }
         $waiting = DB::table('site_images')->insertGetId($row());
@@ -774,6 +797,8 @@ class SiteImageLibraryTest extends TestCase
             'processed_at' => now(), 'profile_version' => 'v', 'profile_fingerprint' => str_repeat('d', 64), 'evidence' => '{}']), 'ready without variants');
         $refused(fn () => DB::table('site_image_variants')->insert(['site_image_id' => $waiting, 'format' => 'jpeg', 'width' => 1, 'height' => 1,
             'storage_path' => 'media/revisions/x/1.jpg', 'sha256' => str_repeat('c', 64), 'size_bytes' => 1, 'created_at' => now()]), 'variant outside site-images');
+        $refused(fn () => DB::table('site_image_variants')->insert(['site_image_id' => $waiting, 'format' => 'jpeg', 'width' => 1, 'height' => 1,
+            'storage_path' => 'SITE-IMAGES/revisions/x/1.jpg', 'sha256' => str_repeat('c', 64), 'size_bytes' => 1, 'created_at' => now()]), 'variant path case');
         $refused(fn () => DB::table('site_image_variants')->insert(['site_image_id' => $waiting, 'format' => 'JPEG', 'width' => 1, 'height' => 1,
             'storage_path' => 'site-images/revisions/x/1.jpg', 'sha256' => str_repeat('c', 64), 'size_bytes' => 1, 'created_at' => now()]), 'variant format case');
         $table()->update(['status' => 'failed', 'claim_token' => null, 'claimed_until' => null, 'failure_code' => 'invalid_image', 'processed_at' => now()]);
