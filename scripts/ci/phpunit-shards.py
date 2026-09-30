@@ -6,6 +6,12 @@ configurations stay beside phpunit.xml so every relative bootstrap/source/env/
 extension path keeps its meaning. Existing directory and exclude declarations
 are retained; additional file exclusions select each shard.
 
+Files are balanced on their expanded case count, or, with --timings, on the measured
+milliseconds recorded by scripts/ci/phpunit-timings.py. Weights only decide which shard
+gets a file; the proof below requires every expanded case exactly once regardless.
+Each CI job derives the same partition from the same commit, so the committed timing
+file is an input to that partition and changes only through review.
+
 CLI contract: https://docs.phpunit.de/en/12.5/textui.html#listing-tests
 Source checked at composer.lock's PHPUnit 12.5.34 reference
 6cbff63d670de92cb1cb3d2ff9f40327e9da9c7f:
@@ -21,6 +27,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -46,6 +53,66 @@ class Inventory:
     @property
     def files(self) -> set[str]:
         return set(self.cases.values())
+
+
+@dataclass
+class Timings:
+    driver: str
+    source: str
+    fallback_ms_per_case: int
+    # repository file -> (expanded cases when it was timed, measured milliseconds)
+    files: dict[str, tuple[int, int]]
+    sha256: str
+
+
+def is_count(value: object, minimum: int) -> bool:
+    return type(value) is int and value >= minimum
+
+
+def read_timings(path: Path) -> Timings:
+    raw = path.read_bytes()
+    try:
+        data = json.loads(raw)
+    except ValueError as error:
+        raise PartitionError("Timing file is not valid JSON") from error
+    keys = {"schema_version", "driver", "source", "fallback_ms_per_case", "files"}
+    if not isinstance(data, dict) or set(data) != keys or not is_count(data["schema_version"], 1) or data["schema_version"] != 1:
+        raise PartitionError("Unknown timing file shape")
+    if not all(isinstance(data[key], str) and data[key] for key in ("driver", "source")):
+        raise PartitionError("Timing file must name its driver and source")
+    if not is_count(data["fallback_ms_per_case"], 1):
+        raise PartitionError("Timing fallback must be a positive whole number of milliseconds")
+    if not isinstance(data["files"], dict) or not data["files"]:
+        raise PartitionError("Timing file lists no test files")
+    files = {}
+    for name, entry in data["files"].items():
+        if not isinstance(entry, dict) or set(entry) != {"cases", "ms"} or not is_count(entry["cases"], 1) or not is_count(entry["ms"], 0):
+            raise PartitionError("Unknown timing entry: " + name)
+        files[name] = (entry["cases"], entry["ms"])
+    return Timings(data["driver"], data["source"], data["fallback_ms_per_case"], files, hashlib.sha256(raw).hexdigest())
+
+
+def file_weights(source: Inventory, timings: Timings | None) -> tuple[dict[str, int], list[str]]:
+    """Weigh each file by measured milliseconds, or by case count when there are no timings.
+
+    A timed file keeps its per-case cost, so a file that gained cases since it was timed grows
+    with them. A file with no timing entry costs the suite-wide mean per case and is returned
+    so the caller can report that the timings need a refresh. Integer weights of at least one
+    keep ties and the no-empty-shard guarantee exactly as they are for case counts.
+    """
+    cases = Counter(source.cases.values())
+    if timings is None:
+        return dict(cases), []
+    weights, untimed = {}, []
+    for file, count in cases.items():
+        timed = timings.files.get(file)
+        if timed is None:
+            weights[file] = count * timings.fallback_ms_per_case
+            untimed.append(file)
+        else:
+            timed_cases, milliseconds = timed
+            weights[file] = max(1, (milliseconds * count + timed_cases // 2) // timed_cases)
+    return weights, sorted(untimed)
 
 
 def relative_file(value: str, root: Path) -> str:
@@ -95,13 +162,16 @@ def read_inventory(path: Path, root: Path) -> Inventory:
     return Inventory(cases, groups)
 
 
-def partition(source: Inventory, count: int) -> list[set[str]]:
+def partition(source: Inventory, count: int, weights: dict[str, int] | None = None) -> list[set[str]]:
     if count < 1 or count > len(source.files):
         raise PartitionError("Shard count would create an empty shard")
-    weights = Counter(source.cases.values())
+    if weights is None:
+        weights = file_weights(source, None)[0]
+    if set(weights) != source.files or not all(is_count(weight, 1) for weight in weights.values()):
+        raise PartitionError("Weights must be positive whole numbers for exactly the discovered files")
     shards: list[set[str]] = [set() for _ in range(count)]
     loads = [0] * count
-    # Largest expanded-case files first; lexical and shard-index ties are stable.
+    # Heaviest files first; lexical and shard-index ties are stable.
     for file in sorted(weights, key=lambda name: (-weights[name], name)):
         index = min(range(count), key=lambda candidate: (loads[candidate], candidate))
         shards[index].add(file)
@@ -182,6 +252,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--shards", type=int, required=True)
     parser.add_argument("--prefix", required=True)
+    parser.add_argument("--timings", type=Path, help="Balance on measured per-file milliseconds (scripts/ci/phpunit-timings.py) instead of case counts")
     args = parser.parse_args()
     if not re.fullmatch(r"phpunit-ci-[a-z0-9-]+", args.prefix):
         raise PartitionError("Invalid generated configuration prefix")
@@ -190,10 +261,12 @@ def main() -> None:
     source = ET.parse(source_path)
     if source.getroot().tag != "phpunit":
         raise PartitionError("Unknown PHPUnit configuration root")
+    timings = read_timings(root / args.timings) if args.timings else None
     with tempfile.TemporaryDirectory(prefix="phpunit-partition-") as temp:
         full = discover(source_path, Path(temp) / "all.xml", root)
         refuse_cross_file_dependencies(root, full.files)
-        assignments = partition(full, args.shards)
+        weights, untimed = file_weights(full, timings)
+        assignments = partition(full, args.shards, weights)
         observed = []
         lists = [(Path(temp) / "all.xml", root / f"{args.prefix}-source-tests.xml")]
         for index, selected in enumerate(assignments, 1):
@@ -216,18 +289,29 @@ def main() -> None:
         "source_case_identity_sha256": hashlib.sha256(json.dumps(sorted(full.cases.items())).encode()).hexdigest(),
         "source_group_identity_sha256": hashlib.sha256(json.dumps(sorted(full.groups.items())).encode()).hexdigest(),
         "proof": "every expanded source case, file and group appears exactly once",
+        "weighting": {"basis": "expanded-cases"} if timings is None else {
+            "basis": "measured-milliseconds", "timings_file": args.timings.as_posix(), "timings_sha256": timings.sha256,
+            "timings_driver": timings.driver, "timings_source": timings.source, "untimed_files": untimed,
+        },
         "shards": [
             {"index": index, "configuration": f"{args.prefix}-{index}.xml", "files": sorted(selected),
-             "test_cases": len(shard.cases)}
+             "test_cases": len(shard.cases), "weight": sum(weights[file] for file in selected)}
             for index, (selected, shard) in enumerate(zip(assignments, observed, strict=True), 1)
         ],
     }
     with (root / f"{args.prefix}-manifest.json").open("x") as output:
         json.dump(manifest, output, indent=2)
         output.write("\n")
+    if untimed:
+        # A stale timing file only costs balance, never coverage, so warn instead of failing the run.
+        marker = "::warning title=Untimed PHPUnit files::" if os.environ.get("GITHUB_ACTIONS") == "true" else "warning: "
+        names = ", ".join(untimed[:5]) + (", ..." if len(untimed) > 5 else "")
+        print(f"{marker}{len(untimed)} test file(s) have no entry in {args.timings} and use the fallback weight; "
+              f"refresh it with scripts/ci/phpunit-timings.py: {names}", file=sys.stderr)
     print(f"Proved {len(full.cases)} expanded tests in {len(full.files)} files across {args.shards} nonempty shards.")
     for item in manifest["shards"]:
-        print(f"Shard {item['index']}: {item['test_cases']} tests; {len(item['files'])} complete files.")
+        estimate = f"; estimated {item['weight'] // 60000}m {item['weight'] // 1000 % 60:02d}s" if timings else ""
+        print(f"Shard {item['index']}: {item['test_cases']} tests; {len(item['files'])} complete files{estimate}.")
 
 
 if __name__ == "__main__":
