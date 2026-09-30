@@ -79,6 +79,7 @@ final class SiteImageProcessor
                 $variants[] = ['format' => $output['format'], 'width' => $output['width'], 'height' => $output['height'],
                     'storage_path' => $relative, 'sha256' => hash_file('sha256', $path), 'size_bytes' => filesize($path)];
             }
+
             return $this->complete($imageId, $token, $variants, $evidence, $committing);
         } catch (MediaFailure $failure) {
             if ($failure->failureCode !== 'claim_lost') {
