@@ -10,6 +10,7 @@ use App\Domain\Media\PrivateMediaFiles;
 use App\Domain\SiteBuilder\Models\SiteImage;
 use App\Domain\SiteBuilder\Models\SiteImageVariant;
 use App\Domain\SiteBuilder\SiteImageDerivatives;
+use App\Domain\SiteBuilder\SiteImageFiles;
 use App\Domain\SiteBuilder\SiteImageInspection;
 use App\Domain\SiteBuilder\SiteImageManifest;
 use App\Domain\SiteBuilder\SiteImageProblem;
@@ -20,17 +21,21 @@ use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\QueryException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Testing\Fakes\QueueFake;
 use Illuminate\Validation\ValidationException;
 use LogicException;
+use PDOException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Symfony\Component\Process\Process;
@@ -608,6 +613,93 @@ class SiteImageLibraryTest extends TestCase
             $this->assertNotContains('site.image.failed', $this->actions($image));
             $this->assertSame([], Storage::disk('local')->allFiles('site-images/revisions'));
         }
+    }
+
+    public function test_an_error_after_the_ready_commit_keeps_every_prepared_file(): void
+    {
+        Exceptions::fake();
+        $image = $this->ingest('studio', F::jpeg(1440, 630));
+        $raised = false;
+        // The ready transaction commits and then something fails, as a dropped connection or a listener can.
+        Event::listen(TransactionCommitted::class, function () use ($image, &$raised): void {
+            if (! $raised && SiteImage::query()->whereKey($image->id)->value('status') === 'ready') {
+                $raised = true;
+                throw new PDOException('Synthetic failure after the ready commit.');
+            }
+        });
+        $ready = $this->process($image);
+
+        $this->assertTrue($raised);
+        Exceptions::assertReported(PDOException::class);
+        $this->assertSame(['ready', null], [$ready->status, $ready->failure_code]);
+        $variants = $ready->variants()->get();
+        $this->assertCount(6, $variants);
+        foreach ($variants as $variant) {
+            $this->assertFileExists(Storage::disk('local')->path($variant->storage_path));
+            $bytes = app(SiteImageFiles::class)->verifiedBytes($variant);
+            $this->assertIsString($bytes, $variant->storage_path);
+            $this->assertSame($variant->sha256, hash('sha256', $bytes));
+        }
+    }
+
+    public function test_cleanup_leaves_orphans_when_it_cannot_check_what_the_rows_reference(): void
+    {
+        Exceptions::fake();
+        $image = $this->ingest('studio', F::jpeg(1440, 630));
+        $real = app(SiteImageDerivatives::class);
+        // Another worker takes the image over while this run prepares it, so this run promotes files it never records.
+        app()->instance(SiteImageDerivatives::class, new class($real, $image->id)
+        {
+            public function __construct(private SiteImageDerivatives $real, private int $id) {}
+
+            public function build(string $png, string $slot, int $width, int $height, string $workspace): array
+            {
+                $outputs = $this->real->build($png, $slot, $width, $height, $workspace);
+                DB::table('site_images')->where('id', $this->id)->update(['claim_token' => (string) Str::uuid(), 'claimed_until' => now()->addMinutes(20), 'attempts' => 2]);
+
+                return $outputs;
+            }
+        });
+        DB::connection()->beforeExecuting(function (string $query): void {
+            if (preg_match('/from [`"]site_image_variants[`"] where [`"]storage_path[`"] in /', $query) === 1) {
+                throw new PDOException('Synthetic failure of the reference lookup.');
+            }
+        });
+        $after = $this->process($image);
+
+        $this->assertSame(['processing', 2, 0], [$after->status, $after->attempts, $after->variants()->count()]);
+        Exceptions::assertReported(fn (PDOException $exception): bool => $exception->getMessage() === 'Synthetic failure of the reference lookup.');
+        $this->assertCount(6, Storage::disk('local')->allFiles('site-images/revisions'));
+    }
+
+    public function test_a_queue_outage_after_intake_keeps_the_waiting_image_and_its_upload(): void
+    {
+        Exceptions::fake();
+        // Like a real connection, an after-commit job is sent once its transaction commits, and here the send fails.
+        Queue::swap(new class(app()) extends QueueFake
+        {
+            public function push($job, $data = '', $queue = null)
+            {
+                $send = fn () => throw new RuntimeException('Synthetic queue outage.');
+
+                return is_object($job) && ($job->afterCommit ?? false) ? app('db.transactions')->addCallback($send) : $send();
+            }
+        });
+        $failure = null;
+        try {
+            $image = $this->ingest('studio', F::jpeg(1440, 630));
+        } catch (RuntimeException $failure) {
+        }
+
+        $stored = SiteImage::query()->sole();
+        $this->assertSame(['quarantined', 0], [$stored->status, $stored->attempts]);
+        $this->assertTrue(Storage::disk('local')->exists($stored->source_path), 'The committed upload was deleted.');
+        $this->assertNull($failure, 'Intake failed after it had committed the image.');
+        $this->assertSame($stored->id, $image->id);
+        $this->assertTrue(RetrySiteImage::retryable($stored));
+        Exceptions::assertReported(fn (RuntimeException $exception): bool => $exception->getMessage() === 'Synthetic queue outage.');
+        $this->assertSame(['site.image.uploaded'], $this->actions($stored));
+        $this->assertSame('ready', $this->process($stored)->status);
     }
 
     public function test_database_guards_keep_images_immutable_and_transitions_valid(): void

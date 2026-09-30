@@ -101,7 +101,7 @@ final class IngestSiteImage
             $name = basename(str_replace('\\', '/', $upload->getClientOriginalName()));
             $name = Str::limit(preg_replace('/[\x00-\x1F\x7F]/', '', $name) ?? '', 240, '');
 
-            return DB::transaction(function () use ($slot, $path, $name, $hash, $size, $mime, $width, $height, $credit, $actor): SiteImage {
+            $image = DB::transaction(function () use ($slot, $path, $name, $hash, $size, $mime, $width, $height, $credit, $actor): SiteImage {
                 $image = SiteImage::create([
                     'slot' => $slot, 'original_name' => $name !== '' ? $name : 'Uploaded image', 'source_path' => $path,
                     'source_sha256' => $hash, 'size_bytes' => $size, 'mime_type' => $mime, 'width' => $width, 'height' => $height,
@@ -110,7 +110,6 @@ final class IngestSiteImage
                     'status' => 'quarantined', 'attempts' => 0,
                 ]);
                 AuditEvent::record('site.image.uploaded', $image, ['slot' => $slot, 'sha256' => $hash, 'size_bytes' => $size, 'width' => $width, 'height' => $height], $actor->id);
-                ProcessSiteImage::dispatch($image->id)->onQueue(config('media.queue'))->afterCommit();
 
                 return $image;
             });
@@ -118,5 +117,21 @@ final class IngestSiteImage
             $disk->delete($path);
             throw $exception;
         }
+        // The row and its upload are committed, so a queue outage must not remove either: the image waits and staff retry it.
+        // A caller's own transaction still holds the job back, so a worker never looks for a row that is not committed yet.
+        $send = static function () use ($image): void {
+            try {
+                ProcessSiteImage::dispatch($image->id)->onQueue(config('media.queue'));
+            } catch (Throwable $exception) {
+                report($exception);
+            }
+        };
+        if (DB::transactionLevel() > 0) {
+            DB::afterCommit($send);
+        } else {
+            $send();
+        }
+
+        return $image;
     }
 }

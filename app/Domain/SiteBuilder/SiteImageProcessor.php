@@ -94,12 +94,18 @@ final class SiteImageProcessor
 
             return SiteImage::findOrFail($imageId);
         } finally {
-            foreach ($promoted as $relative) {
-                // Only files this run created and nothing references.
-                @unlink($files->root().'/'.$relative);
-            }
             if ($promoted !== []) {
-                @rmdir(dirname($files->root().'/'.$promoted[0]));
+                // A commit can succeed and still raise afterwards (a listener, a dropped connection), so only files no variant
+                // row references are this run's to remove. If that cannot be checked, orphans are safer than a ready image's files.
+                try {
+                    $referenced = SiteImageVariant::query()->whereIn('storage_path', $promoted)->pluck('storage_path')->all();
+                    foreach (array_diff($promoted, $referenced) as $relative) {
+                        @unlink($files->root().'/'.$relative);
+                    }
+                    @rmdir(dirname($files->root().'/'.$promoted[0]));
+                } catch (Throwable $cleanup) {
+                    report($cleanup);
+                }
             }
             if ($workspace !== null) {
                 $files->cleanup($workspace);
