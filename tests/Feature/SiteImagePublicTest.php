@@ -137,6 +137,15 @@ class SiteImagePublicTest extends TestCase
         }
     }
 
+    public function test_image_requests_keep_their_own_throttle_and_never_spend_the_pages_budget(): void
+    {
+        // Unprefixed throttles share one counter per client, and the pages allow 120 requests a minute.
+        for ($request = 0; $request < 120; $request++) {
+            $this->assertMissing($this->get('/site-images/'.str_repeat('0', 64).'.jpg'));
+        }
+        $this->get('/')->assertOk()->assertHeader('X-RateLimit-Limit', '120')->assertHeader('X-RateLimit-Remaining', '119');
+    }
+
     public function test_the_storefront_shows_release_images_with_every_size_and_shares_the_share_image(): void
     {
         $images = [];

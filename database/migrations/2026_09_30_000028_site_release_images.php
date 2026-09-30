@@ -39,8 +39,7 @@ return new class extends Migration
     {
         $name = 'site_release_images_'.$suffix;
         if ($valid !== null && DB::getDriverName() === 'mysql') {
-            // Slot and status spellings are exact, as on SQLite, even under MySQL's case-insensitive PAD SPACE default collation.
-            $valid = str_replace(['NEW.slot', 'i.slot', 'i.status'], ['CAST(NEW.slot AS BINARY)', 'CAST(i.slot AS BINARY)', 'CAST(i.status AS BINARY)'], $valid);
+            $valid = $this->bytewise($valid);
         }
         if (DB::getDriverName() === 'sqlite') {
             $when = $valid === null ? '' : ' WHEN NOT COALESCE(('.$valid.'), 0)';
@@ -50,6 +49,19 @@ return new class extends Migration
             if ($valid !== null) { $body = "IF NOT COALESCE(({$valid}), 0) THEN {$body} END IF;"; }
             DB::unprepared("CREATE TRIGGER {$name} BEFORE {$operation} ON site_release_images FOR EACH ROW BEGIN {$body} END");
         }
+    }
+
+    /**
+     * Makes a MySQL guard condition compare slot and status spellings byte for byte, as SQLite does, even under MySQL's
+     * case-insensitive PAD SPACE default collation. Only whole names are wrapped, so a column such as i.slot_group is never
+     * read as i.slot plus a suffix.
+     */
+    public function bytewise(string $condition): string
+    {
+        $names = implode('|', array_map(fn (string $column): string => preg_quote($column, '/'), ['NEW.slot', 'i.slot', 'i.status']));
+
+        return preg_replace('/(?<![\w$.])(?:'.$names.')(?![\w$])/', 'CAST($0 AS BINARY)', $condition)
+            ?? throw new \LogicException('The guard condition could not be rewritten.');
     }
 
     public function down(): void

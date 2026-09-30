@@ -19,7 +19,7 @@ Use `App\Domain\SiteBuilder\SiteContent` as the sole application command/read bo
 
 `SiteContentSchema` accepts only the named plain-text hero, studio, footer, navigation and home SEO fields. Unknown keys, unsupported schema versions, markup/control characters, missing values and excessive lengths fail validation. Navigation has one to four unique targets drawn only from `/`, `/#catalog`, `/#licenses` and `/#studio`. The [operator guide](../site-content-releases.md) records exact field bounds.
 
-Logo geometry, artwork paths, typography, theme, catalog/license presentation and checkout behavior remain application-owned. The copy schema contains no raw HTML, CSS, script, arbitrary URL, upload, secret or customer field. Home canonical/social URLs and imagery remain server-owned; track metadata continues through its existing publication checks.
+Logo geometry, artwork paths, typography, theme, catalog/license presentation and checkout behavior remain application-owned. The copy schema contains no raw HTML, CSS, script, arbitrary URL, upload, secret or customer field. Home canonical/social URLs remain server-owned. Home imagery is server-owned except the four image slots [D-25](D-25-editable-site-images.md) adds to releases: the hero (desktop and mobile), the studio image and the share image. Track metadata continues through its existing publication checks.
 
 | Table | Retained contract |
 | --- | --- |

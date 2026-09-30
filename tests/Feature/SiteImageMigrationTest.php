@@ -18,11 +18,18 @@ class SiteImageMigrationTest extends TestCase
     public function test_empty_tables_roll_back_and_the_migration_runs_again_with_its_guards(): void
     {
         $migration = require database_path('migrations/2026_09_30_000027_site_images.php');
+        // The release image index references site_images, so it rolls back first, as migrate:rollback would; MySQL refuses to
+        // drop a table another table's foreign key still names.
+        $index = require database_path('migrations/2026_09_30_000028_site_release_images.php');
+        $index->down();
+        $this->assertFalse(Schema::hasTable('site_release_images'));
         $migration->down();
         $this->assertFalse(Schema::hasTable('site_image_variants'));
         $this->assertFalse(Schema::hasTable('site_images'));
 
         $migration->up();
+        $index->up();
+        $this->assertTrue(Schema::hasTable('site_release_images'));
         $uploader = User::factory()->create()->id;
         $row = fn (array $overrides = []): array => $overrides + [
             'slot' => 'studio', 'original_name' => 'raw.jpg', 'source_path' => 'site-images/quarantine/'.Str::uuid().'/source.upload',

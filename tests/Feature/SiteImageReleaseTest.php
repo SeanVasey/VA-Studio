@@ -9,6 +9,7 @@ use App\Domain\SiteBuilder\Models\SiteReleaseImage;
 use App\Domain\SiteBuilder\SiteContent;
 use App\Domain\SiteBuilder\SiteImageProcessor;
 use App\Domain\SiteBuilder\SiteImageReferences;
+use App\Http\Middleware\HandleInertiaRequests;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
@@ -16,6 +17,7 @@ use App\Support\Diagnostics\InstallationReport;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -232,9 +234,12 @@ class SiteImageReleaseTest extends TestCase
         $this->get($url)->assertOk();
         $this->damageFile($images['studio']);
 
-        // The page still renders with the release's copy; only the damaged file is refused, and the built-in image is not swapped in.
-        $page = $this->get('/')->assertOk()->assertSee('SYNTHETIC WITH IMAGE HOME')->assertSee('Synthetic studio');
-        $this->assertStringNotContainsString('/images/video-studio.jpg', (string) $page->getContent());
+        // The page still renders with the release's copy; only the damaged file is refused. The built-in image is not swapped in:
+        // the page still names the release's image, whose URL now fails, where a null slot would make the storefront use its own file.
+        $this->get('/')->assertOk()->assertSee('SYNTHETIC WITH IMAGE HOME')->assertSee('Synthetic studio');
+        $inertia = ['X-Inertia' => 'true', 'X-Inertia-Version' => (string) app(HandleInertiaRequests::class)->version(Request::create('/'))];
+        $studio = $this->get('/', $inertia)->assertOk()->json('props.siteImages.studio');
+        $this->assertContains($url, array_column($studio['jpeg'], 'url'));
         $this->get($url)->assertNotFound();
         $site->rollback($imageFree->id, 2, $this->actor);
         $this->get('/')->assertOk()->assertSee('SYNTHETIC BEFORE HOME');
