@@ -233,6 +233,8 @@ class SiteImageHttpTest extends TestCase
         // Changed bytes of the same size, a missing file and a symlink all fail closed; the restored file is served again.
         $original = Storage::disk('local')->get($jpeg->storage_path);
         $path = Storage::disk('local')->path($jpeg->storage_path);
+        // Promotion seals variants read-only; unseal the file before changing it, as the media tests do.
+        chmod($path, 0600);
         file_put_contents($path, strrev($original));
         $this->assertPrivate($this->get($url($jpeg->id)))->assertNotFound();
         unlink($path);
