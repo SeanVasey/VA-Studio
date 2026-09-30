@@ -34,7 +34,16 @@ async function history(page: Page, label: string, outcome: string) {
   await page.getByRole('button', { name: 'Schedule history', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: 'Scheduled publication history', exact: true });
   await expect(dialog.getByRole('row').filter({ hasText: label }).first()).toContainText(outcome);
-  await page.keyboard.press('Escape');
+  // Closing sends its own Livewire request. Finish it before a later reload, which otherwise aborts it in WebKit.
+  const closeHistory = page.waitForResponse(response => {
+    if (!response.url().endsWith('/update') || response.request().method() !== 'POST') return false;
+    const payload = response.request().postDataJSON() as { components?: { calls?: { method?: string }[] }[] };
+    return payload.components?.some(component => component.calls?.some(call => call.method === 'unmountAction')) ?? false;
+  });
+  await dialog.locator('.fi-modal-footer').getByRole('button', { name: 'Close', exact: true }).click();
+  const closed = await closeHistory;
+  expect(closed.status()).toBe(200);
+  expect(await closed.finished()).toBeNull();
   await expect(dialog).toBeHidden();
 }
 
