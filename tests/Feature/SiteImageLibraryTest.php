@@ -521,6 +521,8 @@ class SiteImageLibraryTest extends TestCase
             '  found) echo "$path: Eicar-Test-Signature FOUND"; exit 1 ;;',
             '  flood) yes "$path: OK" | head -c 300000 ;;',
             '  noisy) yes "LibClamAV Warning: synthetic warning" | head -c 300000 >&2; echo "$path: OK" ;;',
+            '  infected_noisy) yes "LibClamAV Warning: synthetic warning" | head -c 300000 >&2; echo "$path: Eicar-Test-Signature FOUND"; exit 1 ;;',
+            '  deluge) yes "LibClamAV Warning: synthetic warning" | head -c 5000000 >&2; echo "$path: OK" ;;',
             '  warning) echo "WARNING: Ignoring deprecated option --synthetic-option"; echo "$path: OK" ;;',
             '  unverified) echo "$path: Scanned" ;;',
             '  silent) ;;',
@@ -541,16 +543,17 @@ class SiteImageLibraryTest extends TestCase
         config(['media.clamscan' => $clamscan]);
         $timeout = config('media.process_timeout_seconds');
         $cases = [
-            'clean' => ['ready', null],
-            // Only a detection (exit 1) is a verdict on this file.
-            'found' => ['failed', 'scan_not_clean'],
+            // The verdict is standard output and the exit status. Warnings on standard error are diagnostics, however many.
+            'clean' => ['ready', null], 'noisy' => ['ready', null],
+            // Only a detection (exit 1) is a verdict on this file, with or without warnings.
+            'found' => ['failed', 'scan_not_clean'], 'infected_noisy' => ['failed', 'scan_not_clean'],
             // An exit 0 without the exact clean line is not: the scanner's own warning ahead of the clean line, an unknown result
             // or no output at all waits for a retry, and never makes the image ready.
             'warning' => ['quarantined', 'scanner_unavailable'], 'unverified' => ['quarantined', 'scanner_unavailable'],
             'silent' => ['quarantined', 'scanner_unavailable'],
-            // Nor is a scan cut off at the output limit, whether by its own results or by warnings on standard error ahead of a
-            // clean line: it never reached a verdict.
-            'noisy' => ['quarantined', 'scanner_unavailable'], 'flood' => ['quarantined', 'scanner_unavailable'],
+            // Nor is a scan whose standard output ran past the limit, or whose warnings ran past their own, larger bound: it never
+            // reached a verdict.
+            'flood' => ['quarantined', 'scanner_unavailable'], 'deluge' => ['quarantined', 'scanner_unavailable'],
             // Nor does a scanner error, crash, impostor or timeout say anything about the file.
             'error' => ['quarantined', 'scanner_unavailable'], 'signal' => ['quarantined', 'scanner_unavailable'],
             'impostor' => ['quarantined', 'scanner_unavailable'], 'slow' => ['quarantined', 'processor_timeout'],
@@ -563,10 +566,11 @@ class SiteImageLibraryTest extends TestCase
             $this->assertSame([$status, $code, 1], [$image->status, $image->failure_code, $image->attempts], $case);
             $this->assertSame($status === 'quarantined', RetrySiteImage::retryable($image), $case);
             $this->assertSame($status === 'ready' ? 6 : 0, $image->variants()->count(), $case);
+            if ($status === 'ready') {
+                $this->assertSame(['clamav', 'clean'], [$image->evidence['source_scan']['engine'], $image->evidence['source_scan']['status']], $case);
+                $this->assertStringStartsWith('ClamAV 1.4.1/27400/', $image->evidence['source_scan']['version'], $case);
+            }
         }
-        $clean = SiteImage::query()->where('status', 'ready')->sole();
-        $this->assertSame(['clamav', 'clean'], [$clean->evidence['source_scan']['engine'], $clean->evidence['source_scan']['status']]);
-        $this->assertStringStartsWith('ClamAV 1.4.1/27400/', $clean->evidence['source_scan']['version']);
     }
 
     public function test_retry_is_refused_unless_the_image_is_waiting_and_checks_staff_access(): void
