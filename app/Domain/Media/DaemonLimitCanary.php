@@ -26,32 +26,25 @@ final class DaemonLimitCanary
     /** Seconds the daemon gets to refuse the file. It only has to look at the size. */
     public const TIMEOUT_SECONDS = 30;
 
-    /** How long a pass holds in this process. A reconfigured or replaced daemon is noticed within it. */
-    private const PASS_SECONDS = 300;
-
     private const REFUSAL = 'Heuristics.Limits.Exceeded.MaxFileSize FOUND';
-
-    /** @var array<string, int> the time each scanner last refused the canary in this process; a failure is never kept */
-    private array $passes = [];
 
     /**
      * Returns when the daemon behind $binary refused the canary; otherwise throws what it did instead: an answer, an error, no answer
      * in time, or a canary that could not be made. Runs $binary under $runner in $directory, which takes a sparse file.
      *
+     * Nothing is remembered. A scan asks every time: the question costs about what the version call that precedes it does (a median
+     * of 7 milliseconds against a real clamd), and a daemon reconfigured to fail open is caught by the next scan, not some minutes
+     * later.
+     *
      * @throws MediaFailure
      */
     public function confirm(string $binary, BoundedMediaProcess $runner, string $directory, int $timeoutSeconds = self::TIMEOUT_SECONDS): void
     {
-        if (($this->passes[$binary] ?? 0) > now()->getTimestamp() - self::PASS_SECONDS) {
-            return;
-        }
         $canary = $this->create($directory);
         try {
             $answer = $runner->run([$binary, '--no-summary', '--stdout', '--fdpass', '--', $canary], $directory, min($timeoutSeconds, self::TIMEOUT_SECONDS), ignoreErrorOutput: true);
         } catch (MediaFailure $failure) {
             if ($failure->failureCode === 'processor_failed' && $failure->exitCode === 1 && $failure->outputLine === $canary.': '.self::REFUSAL) {
-                $this->passes[$binary] = now()->getTimestamp();
-
                 return;
             }
             throw $failure;
