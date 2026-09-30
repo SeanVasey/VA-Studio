@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\LicenseFixtures;
 use Tests\TestCase;
 
@@ -130,6 +131,49 @@ class InstallationReportTest extends TestCase
         $this->assertSame('warn', $this->statuses()['media_scanner_limits']);
 
         $this->assertDirectoryDoesNotExist($this->directory.'/not-there');
+        $this->assertSame([], $this->asked());
+    }
+
+    public static function usersWhoDoNotOwnPrivateStorage(): array
+    {
+        return [
+            // Root under sudo, for one, on the storage of the worker's user.
+            'another user' => [fn (int $owner): ?int => $owner + 1],
+            'a user that cannot be told, for want of the posix extension' => [fn (int $owner): ?int => null],
+        ];
+    }
+
+    #[DataProvider('usersWhoDoNotOwnPrivateStorage')]
+    public function test_the_scanner_limits_check_makes_nothing_for_a_user_who_does_not_own_private_storage(\Closure $user): void
+    {
+        $this->scanner('clamdscan', 'refuse');
+        // A run that a signal ends skips its cleanup, and what it leaves belongs to whoever ran it, so a worker of another user could
+        // not make its own workspace in a processing/ that root made: the check is not run, and leaves nothing to clean up.
+        $owner = fileowner($this->directory.'/private');
+        app()->instance(InstallationReport::class, new InstallationReport(effectiveUserId: fn () => $user($owner)));
+
+        $check = collect(app(InstallationReport::class)->collect()['checks'])->firstWhere('id', 'media_scanner_limits');
+
+        $this->assertSame('warn', $check['status']);
+        $this->assertStringContainsString('Run vasey:doctor as the user that owns private storage, the worker\'s.', $check['message']);
+        $this->assertSame([], $this->asked());
+        $this->assertSame(['.', '..'], scandir($this->directory.'/private'));
+    }
+
+    public function test_a_workspace_that_cannot_be_made_leaves_no_processing_directory_that_the_check_made(): void
+    {
+        $this->scanner('clamdscan', 'refuse');
+        // The workspace is made below processing/, which the check has just made, and a name whose parent is not there stands for a
+        // directory that cannot be made (a full disk, a quota): the check must not leave a processing/ that it made for nothing.
+        Str::createUuidsUsing(fn () => 'no/such/parent');
+        try {
+            $status = $this->statuses()['media_scanner_limits'];
+        } finally {
+            Str::createUuidsNormally();
+        }
+
+        $this->assertSame('warn', $status);
+        $this->assertDirectoryDoesNotExist($this->directory.'/private/processing');
         $this->assertSame([], $this->asked());
     }
 

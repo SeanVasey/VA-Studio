@@ -13,10 +13,15 @@ use Throwable;
 
 /**
  * Read-only installation checks, but for one scratch directory of private storage that the scanner limits check makes and removes
- * again. Never connect to payment, mail or storage providers.
+ * again, and makes only for the user that owns private storage. Never connect to payment, mail or storage providers.
  */
 final class InstallationReport
 {
+    /**
+     * @param  ?\Closure(): ?int  $effectiveUserId  the user this process runs as, null when that cannot be told; a test gives another
+     */
+    public function __construct(private readonly ?\Closure $effectiveUserId = null) {}
+
     public function collect(): array
     {
         $checks = [];
@@ -84,27 +89,34 @@ final class InstallationReport
         // file where the private disk may not.
         $check('media_scanner_limits', false, function () {
             $root = config('filesystems.disks.local.root');
-            if (! is_string($root) || ! is_dir($root)) {
-                // The private_storage check says so. Nothing is made for this one: a directory the doctor makes belongs to whoever ran it.
+            // Nothing is made where private storage does not exist, which the private_storage check reports, or for a user who does not
+            // own it. A run that a signal ends (SIGINT, SIGKILL) skips the cleanup below, and what it leaves, processing/, a workspace and
+            // the canary, belongs to whoever ran it. For root that is a processing/ in which a worker of another user cannot make its own
+            // workspace, and every media run then fails until someone deletes it. The owner of private storage is the worker's user.
+            if (! is_string($root) || ! is_dir($root) || @fileowner($root) !== $this->currentUser()) {
                 return false;
             }
             $files = app(PrivateMediaFiles::class);
             $base = $files->root().'/processing';
             $existed = is_dir($base);
-            $workspace = $files->workspace();
+            $workspace = null;
             try {
+                $workspace = $files->workspace();
                 app(MalwareScanner::class)->confirmLimits($workspace);
             } finally {
-                $files->cleanup($workspace);
+                // A workspace that could not be made is not there to remove, and the directory made for it must not stay behind.
+                if ($workspace !== null) {
+                    $files->cleanup($workspace);
+                }
                 if (! $existed) {
-                    // The worker may not be able to use a directory that the user of the doctor owns.
+                    // This run made processing/, and leaves private storage as it found it.
                     @rmdir($base);
                 }
             }
 
             return true;
         }, 'The scanner refuses a file over its size limits.',
-            'With clamdscan, set MaxFileSize and MaxScanSize to '.MalwareScanner::limitMebibytes().'M and AlertExceedsMax yes in clamd.conf and restart clamd; otherwise install ClamAV and prlimit first. The check makes a sparse file of 4 GiB in a scratch directory of private storage, so that storage must keep holes in a file, the worker may write a file that large, and the PHP posix extension must be there to tell.');
+            'With clamdscan, set MaxFileSize and MaxScanSize to '.MalwareScanner::limitMebibytes().'M and AlertExceedsMax yes in clamd.conf and restart clamd; otherwise install ClamAV and prlimit first. The check makes a sparse file of 4 GiB in a scratch directory of private storage, so that storage must keep holes in a file, the worker may write a file that large, and the PHP posix extension must be there to tell. Run vasey:doctor as the user that owns private storage, the worker\'s.');
         $check('seller_tag', false, fn () => is_string(config('media.tag_path')) && preg_match('~\A[a-zA-Z0-9][a-zA-Z0-9_./-]*\z~D', config('media.tag_path'))
             && ! str_contains(config('media.tag_path'), '..') && ! str_contains(config('media.tag_path'), '//')
             && is_string(config('media.tag_sha256')) && preg_match('/\A[a-f0-9]{64}\z/D', config('media.tag_sha256')),
@@ -130,6 +142,16 @@ final class InstallationReport
             'A stored file of an image in the active site release failed its integrity check, so visitors see its description instead. Restore `storage/app/private/site-images/` from the same backup as the database, or publish a release that uses another image.');
 
         return ['schema_version' => 1, 'scope' => 'installation', 'foundation_ready' => ! in_array('fail', array_column($checks, 'status'), true), 'checks' => $checks];
+    }
+
+    /** The user this process runs as; null without the PHP posix extension, which is never the owner of anything. */
+    private function currentUser(): ?int
+    {
+        if ($this->effectiveUserId !== null) {
+            return ($this->effectiveUserId)();
+        }
+
+        return function_exists('posix_geteuid') ? posix_geteuid() : null;
     }
 
     private function executable(string $key): bool

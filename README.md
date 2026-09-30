@@ -79,6 +79,7 @@ php -r "file_exists('database/database.sqlite') || touch('database/database.sqli
 php artisan migrate
 php artisan vasey:create-admin
 npm run build
+# As the user that owns storage/app/private: you here, the worker's user on a server (sudo -u <worker user> php artisan vasey:doctor)
 php artisan vasey:doctor
 php artisan serve
 ```
