@@ -72,6 +72,14 @@ return new class extends Migration
     private function guard(string $table, string $suffix, string $operation, ?string $valid = null): void
     {
         $name = $table.'_'.$suffix;
+        if ($valid !== null && DB::getDriverName() === 'mysql') {
+            // Compare bytes, as SQLite does. The default collation ignores case, accents and trailing spaces, so 'Studio' would
+            // pass as a slot and a case-only change to a credit or path would pass as unchanged.
+            $text = ['NEW.status', 'OLD.status', 'i.status', 'NEW.slot', 'OLD.slot', 'NEW.original_name', 'OLD.original_name', 'NEW.source_path', 'OLD.source_path',
+                'NEW.source_sha256', 'OLD.source_sha256', 'NEW.mime_type', 'OLD.mime_type', 'NEW.credit', 'OLD.credit', 'NEW.claim_token', 'OLD.claim_token',
+                'NEW.format', 'NEW.storage_path'];
+            $valid = str_replace($text, array_map(fn (string $column): string => "CAST({$column} AS BINARY)", $text), $valid);
+        }
         if (DB::getDriverName() === 'sqlite') {
             $when = $valid === null ? '' : ' WHEN NOT COALESCE(('.$valid.'), 0)';
             DB::unprepared("CREATE TRIGGER {$name} BEFORE {$operation} ON {$table}{$when} BEGIN SELECT RAISE(ABORT, 'Site image evidence is invalid or immutable'); END");

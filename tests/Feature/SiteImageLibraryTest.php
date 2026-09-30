@@ -241,6 +241,15 @@ class SiteImageLibraryTest extends TestCase
         }
     }
 
+    public function test_an_rgb_jpeg_declared_by_an_adobe_marker_is_prepared(): void
+    {
+        // Three 8-bit components with Adobe transform 0 are RGB samples, which FFmpeg decodes as planar RGB.
+        $image = $this->process($this->ingest('studio', F::jpeg(1440, 630, ['adobe_rgb' => true])));
+
+        $this->assertSame(['ready', null, 'gbrp'], [$image->status, $image->failure_code, $image->evidence['pixel_format'] ?? null]);
+        $this->assertSame(6, $image->variants()->count());
+    }
+
     public function test_a_valid_upload_is_quarantined_with_its_provenance_and_queued(): void
     {
         $bytes = F::jpeg(960, 890);
@@ -274,6 +283,12 @@ class SiteImageLibraryTest extends TestCase
             'upside-down JPEG' => ['studio', F::jpeg(1440, 630, ['exif' => 3]), $message('rotated_image')],
             'mirrored JPEG' => ['studio', F::jpeg(1440, 630, ['exif' => 2]), $message('rotated_image')],
             'sideways PNG' => ['studio', F::png(1440, 630, 'rgb', [F::pngExif(8)]), $message('rotated_image')],
+            // FFmpeg reads the last of several EXIF blocks, and skips a stray byte before a marker as libjpeg does.
+            'sideways second JPEG EXIF block' => ['studio', F::jpeg(1440, 630, ['exif' => [1, 6]]), $message('rotated_image')],
+            'sideways JPEG EXIF after a stray byte' => ['studio', F::jpeg(1440, 630, ['exif' => 6, 'stray' => true]), $message('rotated_image')],
+            'sideways second PNG eXIf chunk' => ['studio', F::png(1440, 630, 'rgb', [F::pngExif(1), F::pngExif(6)]), $message('rotated_image')],
+            // FFmpeg does not read PNG eXIf at all, so a chunk too large to check is refused.
+            'oversized PNG eXIf' => ['studio', F::png(1440, 630, 'rgb', [F::pngExif(6, 70 * 1024)]), $message('oversized_metadata')],
             '16-bit PNG' => ['studio', F::png(1440, 630, 'rgb16'), $message('unsupported_depth')],
             '16-bit grey PNG' => ['studio', F::png(1440, 630, 'gray16'), $message('unsupported_depth')],
             'alpha PNG' => ['studio', F::png(1440, 630, 'rgba'), $message('transparent_image')],
@@ -297,8 +312,9 @@ class SiteImageLibraryTest extends TestCase
             $this->assertStringContainsString($expected, $errors['upload'][0], $case);
         }
         $this->assertNothingStored();
-        // Within 3% of the slot's shape is accepted.
+        // Within 3% of the slot's shape is accepted, and so is an upright eXIf chunk of the largest size that is still read.
         $this->assertSame('quarantined', $this->ingest('studio', F::jpeg(1480, 630))->fresh()->status);
+        $this->assertSame('quarantined', $this->ingest('studio', F::png(1440, 630, 'rgb', [F::pngExif(1, SiteImageInspection::MAX_EXIF_BYTES)]))->fresh()->status);
     }
 
     public function test_intake_requires_authorization_mfa_provenance_and_a_fresh_upload(): void
@@ -348,6 +364,8 @@ class SiteImageLibraryTest extends TestCase
         $jpeg = F::jpeg(1440, 630);
         $cases = [
             ['rotated_image', F::jpeg(1440, 630, ['exif' => 6]), 1440, 630],
+            ['rotated_image', F::jpeg(1440, 630, ['exif' => [1, 6]]), 1440, 630],
+            ['oversized_metadata', F::png(1440, 630, 'rgb', [F::pngExif(6, 70 * 1024)]), 1440, 630],
             ['unsupported_pixel_format', F::flatJpeg(1440, 630, 4), 1440, 630],
             ['unsupported_depth', F::png(1440, 630, 'rgb16'), 1440, 630],
             ['transparent_image', F::png(1440, 630, 'palette_alpha'), 1440, 630],
@@ -717,8 +735,10 @@ class SiteImageLibraryTest extends TestCase
             'source_sha256' => str_repeat('a', 64), 'size_bytes' => 10, 'mime_type' => 'image/jpeg', 'width' => 1440, 'height' => 630,
             'credit' => 'Raw', 'rights_confirmed_at' => now(), 'uploaded_by' => $this->actor->id, 'created_at' => now(), 'updated_at' => now(),
         ];
+        // Spellings that MySQL's default collation would call equal (case, accents, trailing spaces) are refused like any other.
         foreach ([['status' => 'ready'], ['slot' => 'logo'], ['mime_type' => 'image/gif'], ['source_path' => 'media/quarantine/x/source.bin'],
-            ['credit' => '   '], ['attempts' => 1], ['failure_code' => 'x']] as $overrides) {
+            ['credit' => '   '], ['attempts' => 1], ['failure_code' => 'x'], ['status' => 'Quarantined'], ['slot' => 'Studio'], ['slot' => 'studio '],
+            ['mime_type' => 'IMAGE/JPEG'], ['source_path' => 'sïte-images/quarantine/'.Str::uuid().'/source.upload']] as $overrides) {
             $refused(fn () => DB::table('site_images')->insert($row($overrides)), 'insert '.json_encode($overrides));
         }
         $waiting = DB::table('site_images')->insertGetId($row());
@@ -729,11 +749,24 @@ class SiteImageLibraryTest extends TestCase
         $refused(fn () => $table()->update(['status' => 'processing', 'claim_token' => (string) Str::uuid(), 'claimed_until' => now()]), 'claim without an attempt');
         $refused(fn () => DB::table('site_image_variants')->insert(['site_image_id' => $waiting, 'format' => 'jpeg', 'width' => 1, 'height' => 1,
             'storage_path' => 'site-images/revisions/x/1.jpg', 'sha256' => str_repeat('c', 64), 'size_bytes' => 1, 'created_at' => now()]), 'variant for a waiting image');
-        $table()->update(['status' => 'processing', 'claim_token' => (string) Str::uuid(), 'claimed_until' => now(), 'attempts' => 1]);
+        // Each identity change rides along with an otherwise valid claim, so only the byte-exact identity check can refuse it.
+        $claim = fn (): array => ['status' => 'processing', 'claim_token' => (string) Str::uuid(), 'claimed_until' => now(), 'attempts' => 1];
+        foreach (['credit case' => ['credit' => DB::raw('UPPER(credit)')], 'credit accent' => ['credit' => 'Ráw'], 'credit padding' => ['credit' => 'Raw '],
+            'name case' => ['original_name' => DB::raw('UPPER(original_name)')], 'path case' => ['source_path' => DB::raw('UPPER(source_path)')],
+            'hash case' => ['source_sha256' => str_repeat('A', 64)], 'type case' => ['mime_type' => 'IMAGE/JPEG'], 'slot case' => ['slot' => 'STUDIO']] as $case => $change) {
+            $refused(fn () => $table()->update($change + $claim()), $case.' with a claim');
+        }
+        $token = (string) Str::uuid();
+        $table()->update(['status' => 'processing', 'claim_token' => $token, 'claimed_until' => now(), 'attempts' => 1]);
+        $refused(fn () => $table()->update(['claim_token' => $token, 'claimed_until' => now()->addMinutes(20), 'attempts' => 2]), 'claim again with the same token');
+        $refused(fn () => $table()->update(['status' => 'quarantined', 'claim_token' => null, 'claimed_until' => null]), 'back to waiting without a failure code');
+        $refused(fn () => $table()->update(['status' => 'failed', 'claim_token' => null, 'claimed_until' => null, 'failure_code' => 'invalid_image']), 'failed without a processing time');
         $refused(fn () => $table()->update(['status' => 'ready', 'claim_token' => null, 'claimed_until' => null, 'manifest_sha256' => str_repeat('b', 64),
             'processed_at' => now(), 'profile_version' => 'v', 'profile_fingerprint' => str_repeat('d', 64), 'evidence' => '{}']), 'ready without variants');
         $refused(fn () => DB::table('site_image_variants')->insert(['site_image_id' => $waiting, 'format' => 'jpeg', 'width' => 1, 'height' => 1,
             'storage_path' => 'media/revisions/x/1.jpg', 'sha256' => str_repeat('c', 64), 'size_bytes' => 1, 'created_at' => now()]), 'variant outside site-images');
+        $refused(fn () => DB::table('site_image_variants')->insert(['site_image_id' => $waiting, 'format' => 'JPEG', 'width' => 1, 'height' => 1,
+            'storage_path' => 'site-images/revisions/x/1.jpg', 'sha256' => str_repeat('c', 64), 'size_bytes' => 1, 'created_at' => now()]), 'variant format case');
         $table()->update(['status' => 'failed', 'claim_token' => null, 'claimed_until' => null, 'failure_code' => 'invalid_image', 'processed_at' => now()]);
         $refused(fn () => $table()->update(['status' => 'quarantined', 'processed_at' => null]), 'failed back to waiting');
 

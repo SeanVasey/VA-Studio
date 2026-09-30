@@ -19,6 +19,7 @@ final class SiteImageProblem
         'invalid_image' => 'The image could not be read, or it no longer matched its size check. Export it again and upload a new copy.',
         'invalid_artwork' => 'The image could not be re-encoded. Export it again and upload a new copy.',
         'rotated_image' => 'The image relies on a rotation tag. Rotate it in an editor, export it again and upload the new copy.',
+        'oversized_metadata' => 'The image carries more embedded camera data than can be checked. Export it again without metadata and upload the new copy.',
         'transparent_image' => 'The image has transparency or an alpha channel. Export it without transparency and upload it again.',
         'unsupported_depth' => 'The image is more than 8 bits per channel. Export an 8-bit JPEG or PNG.',
         'unsupported_pixel_format' => 'The image uses an unsupported colour format, such as CMYK. Export an 8-bit RGB or grayscale JPEG or PNG.',

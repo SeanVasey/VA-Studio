@@ -9,11 +9,16 @@ use App\Domain\Media\MediaFailure;
  * Reads a scanned upload's real pixel format and orientation with the bounded prober, and checks sanitized output for transparency.
  *
  * Intake also reads the file headers, so staff learn about a problem when they upload rather than from a failed row that must be kept.
- * Processing repeats every check on the decoded image and is the one that decides.
+ * Processing repeats the header checks on its scanned snapshot, then reads the decoded frame. The prober also sees a JPEG's
+ * orientation, but FFmpeg 6.1 does not read a PNG's eXIf chunk, so for PNG the header check is the only orientation check.
  */
 final class SiteImageInspection
 {
-    private const OPAQUE = ['yuvj420p', 'yuvj422p', 'yuvj444p', 'yuvj440p', 'yuvj411p', 'yuv420p', 'yuv422p', 'yuv444p', 'yuv440p', 'yuv411p', 'gray', 'monob', 'rgb24', 'bgr24', 'pal8'];
+    /** The largest PNG eXIf chunk read for its orientation. A larger one cannot be checked, so the file is refused. */
+    public const MAX_EXIF_BYTES = 65536;
+
+    // gbrp: an 8-bit three-component JPEG whose Adobe marker declares RGB (transform 0) decodes as planar RGB.
+    private const OPAQUE = ['yuvj420p', 'yuvj422p', 'yuvj444p', 'yuvj440p', 'yuvj411p', 'yuv420p', 'yuv422p', 'yuv444p', 'yuv440p', 'yuv411p', 'gray', 'monob', 'rgb24', 'bgr24', 'pal8', 'gbrp'];
 
     private const ALPHA = ['rgba', 'bgra', 'argb', 'abgr', 'ya8', 'ya16be', 'ya16le', 'rgba64be', 'rgba64le', 'bgra64be', 'bgra64le'];
 
@@ -61,9 +66,8 @@ final class SiteImageInspection
             if (($dimensions['bits'] ?? 8) !== 8) {
                 return 'unsupported_depth';
             }
-            $orientation = self::jpegOrientation($path);
 
-            return $orientation !== null && $orientation !== 1 ? 'rotated_image' : null;
+            return self::rotated(self::jpegOrientations($path)) ? 'rotated_image' : null;
         }
         if (($dimensions['bits'] ?? 8) > 8) {
             return 'unsupported_depth';
@@ -72,8 +76,11 @@ final class SiteImageInspection
         if ($header['transparent']) {
             return 'transparent_image';
         }
+        if ($header['oversized_metadata']) {
+            return 'oversized_metadata';
+        }
 
-        return $header['orientation'] !== null && $header['orientation'] !== 1 ? 'rotated_image' : null;
+        return self::rotated($header['orientations']) ? 'rotated_image' : null;
     }
 
     /** True when a PNG declares an alpha channel or a transparency chunk. Only the chunk headers before the image data are read. */
@@ -82,7 +89,18 @@ final class SiteImageInspection
         return self::pngHeader($path)['transparent'];
     }
 
-    /** @return array{transparent: bool, orientation: ?int} */
+    /**
+     * Readers disagree about which of several EXIF blocks counts: FFmpeg keeps the last one, while other readers may take the
+     * first. So any block that rotates or flips the image refuses it.
+     *
+     * @param  list<?int>  $orientations
+     */
+    private static function rotated(array $orientations): bool
+    {
+        return array_filter($orientations, fn (?int $orientation): bool => $orientation !== null && $orientation !== 1) !== [];
+    }
+
+    /** @return array{transparent: bool, orientations: list<?int>, oversized_metadata: bool} */
     private static function pngHeader(string $path): array
     {
         $handle = @fopen($path, 'rb');
@@ -90,7 +108,8 @@ final class SiteImageInspection
             throw new MediaFailure('invalid_image', 'The image is unavailable.');
         }
         $transparent = false;
-        $orientation = null;
+        $orientations = [];
+        $oversized = false;
         try {
             if (fread($handle, 8) !== "\x89PNG\r\n\x1a\n") {
                 throw new MediaFailure('invalid_image', 'The image is not a PNG.');
@@ -99,12 +118,14 @@ final class SiteImageInspection
                 ['length' => $length] = unpack('Nlength', substr($header, 0, 4));
                 $type = substr($header, 4, 4);
                 if ($type === 'IDAT' || $type === 'IEND') {
-                    return ['transparent' => $transparent, 'orientation' => $orientation];
+                    return ['transparent' => $transparent, 'orientations' => $orientations, 'oversized_metadata' => $oversized];
                 }
                 if ($type === 'IHDR' && $length !== 13) {
                     throw new MediaFailure('invalid_image', 'The image header is malformed.');
                 }
-                if ($type === 'IHDR' || ($type === 'eXIf' && $length <= 65536)) {
+                // An eXIf chunk too large to read could carry a rotation tag that nothing else checks: FFmpeg 6.1 ignores PNG eXIf.
+                $oversized = $oversized || ($type === 'eXIf' && $length > self::MAX_EXIF_BYTES);
+                if ($type === 'IHDR' || ($type === 'eXIf' && $length <= self::MAX_EXIF_BYTES)) {
                     $data = $length > 0 ? fread($handle, $length) : '';
                     if ($data === false || strlen($data) !== $length) {
                         throw new MediaFailure('invalid_image', 'The image header is incomplete.');
@@ -112,7 +133,7 @@ final class SiteImageInspection
                     if ($type === 'IHDR') {
                         $transparent = $transparent || in_array(ord($data[9]), [4, 6], true);
                     } else {
-                        $orientation ??= self::tiffOrientation($data);
+                        $orientations[] = self::tiffOrientation($data);
                     }
                     fseek($handle, 4, SEEK_CUR);
 
@@ -128,43 +149,54 @@ final class SiteImageInspection
         }
     }
 
-    /** The Orientation tag of a JPEG's first EXIF block, or null. Only the markers before the image data are read. */
-    private static function jpegOrientation(string $path): ?int
+    /**
+     * The Orientation tag of every EXIF block in a JPEG, in file order. Only the markers before the image data are read, and
+     * stray bytes before a marker are skipped the way libjpeg skips them, so no block a decoder would find is missed.
+     *
+     * @return list<?int>
+     */
+    private static function jpegOrientations(string $path): array
     {
         $handle = @fopen($path, 'rb');
-        if ($handle === false || fread($handle, 2) !== "\xFF\xD8") {
-            return null;
+        if ($handle === false) {
+            return [];
         }
+        $orientations = [];
         try {
+            if (fread($handle, 2) !== "\xFF\xD8") {
+                return [];
+            }
             while (true) {
-                $marker = fread($handle, 2);
-                if ($marker === false || strlen($marker) !== 2 || $marker[0] !== "\xFF") {
-                    return null;
+                // As libjpeg's next_marker(): skip anything but 0xFF, swallow fill bytes, and pass over a stuffed zero (0xFF 0x00).
+                do {
+                    do {
+                        $byte = fgetc($handle);
+                    } while ($byte !== false && $byte !== "\xFF");
+                    do {
+                        $byte = fgetc($handle);
+                    } while ($byte === "\xFF");
+                } while ($byte === "\x00");
+                if ($byte === false) {
+                    return $orientations;
                 }
-                $code = ord($marker[1]);
-                if ($code === 0xFF) {
-                    // Fill byte before a marker.
-                    fseek($handle, -1, SEEK_CUR);
-
-                    continue;
-                }
+                $code = ord($byte);
                 if ($code === 0x01 || ($code >= 0xD0 && $code <= 0xD7)) {
                     continue;
                 }
                 if ($code === 0xDA || $code === 0xD9 || $code === 0xD8) {
-                    return null;
+                    return $orientations;
                 }
                 $size = fread($handle, 2);
                 if ($size === false || strlen($size) !== 2 || ($length = unpack('n', $size)[1]) < 2) {
-                    return null;
+                    return $orientations;
                 }
                 if ($code === 0xE1 && $length > 8) {
                     $data = fread($handle, $length - 2);
                     if ($data === false || strlen($data) !== $length - 2) {
-                        return null;
+                        return $orientations;
                     }
                     if (str_starts_with($data, "Exif\0\0")) {
-                        return self::tiffOrientation(substr($data, 6));
+                        $orientations[] = self::tiffOrientation(substr($data, 6));
                     }
 
                     continue;

@@ -24,7 +24,11 @@ final class SiteImageFixtures
     /**
      * An RGB JPEG of the test pattern, optionally carrying metadata segments.
      *
-     * @param  array{exif?: int, xmp?: bool, iptc?: bool, icc?: bool, comment?: bool, progressive?: bool}  $options  exif is the Orientation value; GPS data is always added with it.
+     * exif is the Orientation value, or one value per EXIF block; GPS data is always added with it. stray moves the metadata after
+     * GD's own first segment behind a stray byte, which decoders and getimagesize() skip. adobe_rgb adds an Adobe marker declaring
+     * the samples RGB (transform 0), which FFmpeg decodes as planar RGB (gbrp).
+     *
+     * @param  array{exif?: int|list<int>, xmp?: bool, iptc?: bool, icc?: bool, comment?: bool, progressive?: bool, stray?: bool, adobe_rgb?: bool}  $options
      */
     public static function jpeg(int $width, int $height, array $options = []): string
     {
@@ -36,8 +40,12 @@ final class SiteImageFixtures
         imagejpeg($image, null, 92);
         $jpeg = (string) ob_get_clean();
         $segments = '';
-        if (isset($options['exif'])) {
-            $segments .= self::segment(0xE1, "Exif\0\0".self::tiff($options['exif']));
+        if ($options['adobe_rgb'] ?? false) {
+            // APP14 "Adobe": version 100, flags 0 and 0, transform 0.
+            $segments .= self::segment(0xEE, 'Adobe'.pack('nnn', 100, 0, 0)."\0");
+        }
+        foreach ((array) ($options['exif'] ?? []) as $orientation) {
+            $segments .= self::segment(0xE1, "Exif\0\0".self::tiff($orientation));
         }
         if ($options['xmp'] ?? false) {
             $segments .= self::segment(0xE1, "http://ns.adobe.com/xap/1.0/\0".self::xmp());
@@ -52,6 +60,12 @@ final class SiteImageFixtures
         }
         if ($options['comment'] ?? false) {
             $segments .= self::segment(0xFE, 'SYNTHETIC-COMMENT-MARKER');
+        }
+        if ($options['stray'] ?? false) {
+            // After a complete first segment, so the file still starts like a JPEG; its length field counts itself.
+            $first = 4 + unpack('n', $jpeg, 4)[1];
+
+            return substr($jpeg, 0, $first)."\x00".$segments.substr($jpeg, $first);
         }
 
         // Cameras and editors put metadata straight after the start-of-image marker.
@@ -137,10 +151,10 @@ final class SiteImageFixtures
         ];
     }
 
-    /** A PNG eXIf chunk holding an Orientation tag (and GPS data). */
-    public static function pngExif(int $orientation): string
+    /** A PNG eXIf chunk holding an Orientation tag (and GPS data), zero-padded to at least $bytes. */
+    public static function pngExif(int $orientation, int $bytes = 0): string
     {
-        return self::pngChunk('eXIf', self::tiff($orientation));
+        return self::pngChunk('eXIf', str_pad(self::tiff($orientation), $bytes, "\0"));
     }
 
     public static function pngChunk(string $type, string $data): string
