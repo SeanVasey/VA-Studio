@@ -18,7 +18,7 @@ final class Doctor extends Command
             $this->line(json_encode($report, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
         } else {
             $this->table(['Check', 'Status', 'Result / next action'], array_map(fn (array $check) => array_values($check), $report['checks']));
-            $this->line('Read-only installation checks. Optional warnings identify unfinished setup; passing is not production acceptance.');
+            $this->line('Installation checks. They change nothing but a scratch directory in private storage that the scanner limits check makes and removes, and a warning in the application log when the scanner fails that check. Optional warnings identify unfinished setup; passing is not production acceptance.');
         }
 
         return $report['foundation_ready'] ? self::SUCCESS : self::FAILURE;
