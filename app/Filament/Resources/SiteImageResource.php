@@ -107,7 +107,9 @@ class SiteImageResource extends OperatorResource
                 Select::make('slot')->label('Used for')->options(SiteImageSlot::options())->required()->live()
                     ->helperText(fn (Get $get): ?string => SiteImageSlot::exists((string) $get('slot')) ? SiteImageSlot::requirement((string) $get('slot')) : null),
                 // Only files uploaded through this form: a stored path placed in the form's state is neither described nor accepted.
+                // The form only creates, so it describes no stored file at all; Filament's guard checks only values that are strings.
                 FileUpload::make('upload')->label('Image (JPEG or PNG)')->disk('local')->visibility('private')->storeFiles(false)->preventFilePathTampering()
+                    ->getUploadedFileUsing(fn (): ?array => null)
                     ->maxSize(20480)->acceptedFileTypes(['image/jpeg', 'image/png'])->required()
                     ->downloadable(false)->openable(false)->previewable(false)
                     ->helperText('Up to 20 MiB. No transparency, no rotation tag, no text or prices in the image.'),

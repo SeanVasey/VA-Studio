@@ -144,8 +144,13 @@ class SiteImageHttpTest extends TestCase
 
         // The browser asks the field to describe its files; a path this form did not issue gets no name, size, type or link.
         $this->assertSame(['forged' => null], $component->instance()->callSchemaComponentMethod('mountedActionSchema0.upload', 'getUploadedFiles'));
-        $component->callMountedAction()->assertHasActionErrors(['upload']);
+        $component->callMountedAction()->assertHasActionErrors(['upload' => 'The image (JPEG or PNG) field contains a file path that is not permitted.']);
         $this->assertSame([$stored->id], SiteImage::pluck('id')->all());
+
+        // Filament checks only string paths, so a number naming a root-level object must get nothing either.
+        Storage::disk('local')->put('123', 'root-level object');
+        $component->set('mountedActions.0.data.upload', ['numeric' => 123]);
+        $this->assertSame(['numeric' => null], $component->instance()->callSchemaComponentMethod('mountedActionSchema0.upload', 'getUploadedFiles'));
     }
 
     public function test_retry_is_offered_only_for_waiting_images_and_the_problem_is_explained(): void
