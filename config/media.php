@@ -24,6 +24,9 @@ return [
     'memory_bytes' => 2147483648,
     'max_output_bytes' => 1073741824,
     'max_process_log_bytes' => 262144,
+    // clamscan loads its whole signature database on every call and scans an archive against a budget of up to 768 MiB, so the
+    // scanner, and only the scanner, has limits of its own. ffmpeg and every other tool keep the ones above.
+    'scanner' => ['cpu_seconds' => 180, 'memory_bytes' => 3221225472, 'timeout_seconds' => 300],
     // Exceeds the job timeout; a crashed worker can be retried after this lease.
     'claim_lease_seconds' => 960,
     'queue' => 'media',
