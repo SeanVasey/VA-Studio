@@ -31,7 +31,7 @@ The report checks PHP/core extensions, encryption-key format, a read-only databa
 | Exit 0 / `foundation_ready: true` | No required installation check failed. Optional warnings may remain. |
 | Exit 1 / `foundation_ready: false` | Resolve required failures and rerun the report. |
 
-JSON uses `schema_version: 1`, `scope: installation` and a stable list of check IDs/statuses/messages. Values, file paths, account identities and raw connection exceptions are not printed. The command creates no directories, users, keys, migrations, jobs or audit records, and makes no external provider calls. It does not scan audio, validate tag bytes, send mail, prove worker liveness, test backups or certify production. A configured executable or transport does not establish successful operation.
+JSON uses `schema_version: 1`, `scope: installation` and a stable list of check IDs/statuses/messages. Values, file paths, account identities and raw connection exceptions are not printed. The command creates no users, keys, migrations, jobs or audit records and makes no external provider calls, and no directory stays behind: the scanner limits check (`media_scanner_limits`) makes one scratch directory under `processing/` in private storage, with a sparse file of 4 GiB and a byte in it, and removes both before it returns, and `processing/` too when it made that. Where private storage does not exist, that check makes nothing and warns. It does not scan audio, validate tag bytes, send mail, prove worker liveness, test backups or certify production. A configured executable or transport does not establish successful operation.
 
 ## Run the scheduler
 

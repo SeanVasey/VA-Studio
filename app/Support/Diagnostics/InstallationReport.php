@@ -3,6 +3,7 @@
 namespace App\Support\Diagnostics;
 
 use App\Domain\Media\MalwareScanner;
+use App\Domain\Media\PrivateMediaFiles;
 use App\Domain\SiteBuilder\Models\SiteRelease;
 use App\Domain\SiteBuilder\SiteImageReferences;
 use App\Models\User;
@@ -10,7 +11,10 @@ use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-/** Read-only installation checks. Never connect to payment, mail or storage providers. */
+/**
+ * Read-only installation checks, but for one scratch directory of private storage that the scanner limits check makes and removes
+ * again. Never connect to payment, mail or storage providers.
+ */
 final class InstallationReport
 {
     public function collect(): array
@@ -75,13 +79,32 @@ final class InstallationReport
             'Media executables exist; processing and worker isolation still need acceptance.', 'Install and configure ffmpeg, ffprobe and prlimit before media processing.');
         $check('media_scanner', false, fn () => $this->executable('media.clamscan'),
             'The scanner executable exists; signatures and detection are unverified.', 'Install ClamAV and complete signature/detection acceptance before media promotion.');
-        // clamscan gets its size limits from the application; a resident clamd has to alert on a file over its own.
+        // clamscan gets its size limits from the application; a resident clamd has to alert on a file over its own. The canary is made
+        // where every scan makes its own, in a workspace of private storage: a temporary directory is often tmpfs, which keeps holes in a
+        // file where the private disk may not.
         $check('media_scanner_limits', false, function () {
-            app(MalwareScanner::class)->confirmLimits(sys_get_temp_dir());
+            $root = config('filesystems.disks.local.root');
+            if (! is_string($root) || ! is_dir($root)) {
+                // The private_storage check says so. Nothing is made for this one: a directory the doctor makes belongs to whoever ran it.
+                return false;
+            }
+            $files = app(PrivateMediaFiles::class);
+            $base = $files->root().'/processing';
+            $existed = is_dir($base);
+            $workspace = $files->workspace();
+            try {
+                app(MalwareScanner::class)->confirmLimits($workspace);
+            } finally {
+                $files->cleanup($workspace);
+                if (! $existed) {
+                    // The worker may not be able to use a directory that the user of the doctor owns.
+                    @rmdir($base);
+                }
+            }
 
             return true;
         }, 'The scanner refuses a file over its size limits.',
-            'With clamdscan, set MaxFileSize and MaxScanSize to '.MalwareScanner::limitMebibytes().'M and AlertExceedsMax yes in clamd.conf and restart clamd; otherwise install ClamAV and prlimit first. The check needs a temporary directory that takes a sparse file of 4 GiB, and the PHP posix extension to tell that the worker may write one.');
+            'With clamdscan, set MaxFileSize and MaxScanSize to '.MalwareScanner::limitMebibytes().'M and AlertExceedsMax yes in clamd.conf and restart clamd; otherwise install ClamAV and prlimit first. The check makes a sparse file of 4 GiB in a scratch directory of private storage, so that storage must keep holes in a file, the worker may write a file that large, and the PHP posix extension must be there to tell.');
         $check('seller_tag', false, fn () => is_string(config('media.tag_path')) && preg_match('~\A[a-zA-Z0-9][a-zA-Z0-9_./-]*\z~D', config('media.tag_path'))
             && ! str_contains(config('media.tag_path'), '..') && ! str_contains(config('media.tag_path'), '//')
             && is_string(config('media.tag_sha256')) && preg_match('/\A[a-f0-9]{64}\z/D', config('media.tag_sha256')),

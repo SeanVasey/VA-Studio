@@ -17,6 +17,10 @@ namespace App\Domain\Media;
  *
  * This shows that the daemon alerts, not that its limits are as large as the application needs. A daemon that alerts with
  * MaxFileSize 25M refuses every large upload as a detection, which the acceptance list in docs/media-processing.md finds.
+ *
+ * The file is made anew for every scan, in the scan's workspace on private storage, and it only costs nothing where the filesystem
+ * keeps holes. Where it does not, every scan would write 4 GiB of zeros before asking the daemon anything, so the canary is refused
+ * there: see create().
  */
 final class DaemonLimitCanary
 {
@@ -26,7 +30,24 @@ final class DaemonLimitCanary
     /** Seconds the daemon gets to refuse the file. It only has to look at the size. */
     public const TIMEOUT_SECONDS = 30;
 
+    /** The size the canary is grown to first, to learn cheaply whether the filesystem keeps holes: see create(). */
+    private const PROBE_BYTES = 67108864;
+
+    /**
+     * What a file of holes may show as allocated and still count as sparse: 1 MiB. Every filesystem measured here keeps none of it:
+     * ext4, ext2, tmpfs and ramfs showed 0 bytes allocated for files of 64 MiB and of 4 GiB and a byte. One that keeps holes but
+     * counts some metadata against the file shows a block or a few, a few KiB, and 1 MiB is some 250 times one 4 KiB block. One that
+     * keeps no holes shows the whole file, 64 MiB at the first step, which is 64 times this. No filesystem without holes was at hand
+     * to measure; the refusal is tested with a stand-in.
+     */
+    private const MAX_ALLOCATED_BYTES = 1048576;
+
     private const REFUSAL = 'Heuristics.Limits.Exceeded.MaxFileSize FOUND';
+
+    /**
+     * @param  ?\Closure(resource): int  $allocated  reads the bytes allocated to an open file; a test gives it a filesystem without holes
+     */
+    public function __construct(private readonly ?\Closure $allocated = null) {}
 
     /**
      * Returns when the daemon behind $binary refused the canary; otherwise throws what it did instead: an answer, an error, no answer
@@ -71,6 +92,26 @@ final class DaemonLimitCanary
         return $soft === 'unlimited' || (is_int($soft) && $soft >= self::BYTES);
     }
 
+    /**
+     * Bytes the filesystem has allocated to an open file: its 512-byte blocks, which for a file of holes are next to none. A file that
+     * cannot be measured counts as allocated in full, and is not risked.
+     *
+     * @param  resource  $handle
+     */
+    public static function allocation($handle): int
+    {
+        $blocks = (@fstat($handle) ?: [])['blocks'] ?? -1;
+
+        return $blocks < 0 ? PHP_INT_MAX : $blocks * 512;
+    }
+
+    /**
+     * Makes the canary: a file of holes, 4 GiB and a byte long, which takes no disk where the filesystem keeps holes and all of it
+     * where it does not. There every scan would write 4 GiB before it asked the daemon a thing, and on a small disk it would fail for
+     * want of room. So the file grows in two steps, 64 MiB and then the whole, and what the filesystem has allocated is read after
+     * each: more than MAX_ALLOCATED_BYTES refuses the canary, before the daemon is asked. A filesystem without holes is found at the
+     * first step, for a 64th of the cost, and the scan fails as scanner_unavailable.
+     */
     private function create(string $directory): string
     {
         if (! self::mayBeCreated()) {
@@ -79,15 +120,28 @@ final class DaemonLimitCanary
         $path = rtrim($directory, '/').'/.limit-canary-'.bin2hex(random_bytes(8));
         $handle = @fopen($path, 'xb');
         if (! is_resource($handle)) {
-            throw new MediaFailure('storage_failed', 'The scanner daemon check could not create its test file.');
+            throw new MediaFailure('storage_failed', 'The scanner daemon check could not create its test file in the workspace.');
         }
-        // Only the size counts: the file holds no data and takes no disk.
-        $made = @ftruncate($handle, self::BYTES) && @chmod($path, 0600);
-        fclose($handle);
-        if (! $made) {
+        try {
+            if (! @chmod($path, 0600)) {
+                throw new MediaFailure('storage_failed', 'The scanner daemon check could not protect its test file.');
+            }
+            foreach ([self::PROBE_BYTES, self::BYTES] as $size) {
+                // Only the size counts: the file holds no data.
+                if (! @ftruncate($handle, $size)) {
+                    throw new MediaFailure('storage_failed', 'The scanner daemon check could not size its test file: the filesystem of the workspace does not take a file of 4 GiB.');
+                }
+                if (($this->allocated ?? self::allocation(...))($handle) > self::MAX_ALLOCATED_BYTES) {
+                    throw new MediaFailure('storage_failed', 'The filesystem of the workspace does not keep holes in a file, so the scanner daemon check would write 4 GiB for every scan. Use a filesystem that does, such as ext4, XFS or btrfs.');
+                }
+            }
+        } catch (MediaFailure $failure) {
+            fclose($handle);
             @unlink($path);
-            throw new MediaFailure('storage_failed', 'The scanner daemon check could not size its test file.');
+
+            throw $failure;
         }
+        fclose($handle);
 
         return $path;
     }
