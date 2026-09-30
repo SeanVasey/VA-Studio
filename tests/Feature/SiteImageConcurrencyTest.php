@@ -3,14 +3,17 @@
 namespace Tests\Feature;
 
 use App\Domain\SiteBuilder\Models\SiteImage;
+use App\Domain\SiteBuilder\Models\SitePublication;
 use App\Domain\SiteBuilder\Models\SiteRelease;
 use App\Domain\SiteBuilder\Models\SiteReleaseImage;
 use App\Domain\SiteBuilder\SiteContent;
 use App\Domain\SiteBuilder\SiteContentSchema;
 use App\Support\Audit\AuditEvent;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\MediaFixtures;
@@ -73,6 +76,52 @@ class SiteImageConcurrencyTest extends TestCase
         $image->forceFill(['status' => 'processing', 'claim_token' => (string) Str::uuid(), 'claimed_until' => now()->subMinute(), 'attempts' => 1])->save();
 
         $this->race($image, 0, 2);
+    }
+
+    public static function orders(): array
+    {
+        return ['scheduler takes the lock first' => [0], 'staff take the lock first' => [1]];
+    }
+
+    /** The scheduler checks an image release's files before its lock; a manual publication racing it still yields one outcome. */
+    #[DataProvider('orders')]
+    public function test_a_scheduled_image_release_and_a_manual_publication_serialize_and_only_the_winner_is_served(int $first): void
+    {
+        $scheduler = LicenseFixtures::admin();
+        $staff = LicenseFixtures::admin();
+        $studio = F::ready('studio', $scheduler);
+        $content = SiteContentSchema::forEditing(SiteContentSchema::defaults());
+        $content['schema_version'] = 3;
+        $content['images'] = ['hero' => null, 'studio' => ['id' => $studio->id, 'alt' => 'Synthetic scheduled studio'], 'share' => null];
+        // Workers read the real clock, so the schedule is created in the past and is due, within its grace window, when they run.
+        $real = CarbonImmutable::now('UTC');
+        $this->travelTo($real->subMinutes(10));
+        $scheduled = app(SiteContent::class)->create($content, 'Scheduled with an image', $scheduler);
+        $schedule = app(SiteContent::class)->schedule($scheduled->id, $real->subMinutes(5)->startOfMinute(), 0, $scheduler);
+        $this->travelBack();
+        $manual = app(SiteContent::class)->create(SiteContentSchema::defaults(), 'Manual without images', $staff);
+
+        $race = SiteContentRace::run($this, [
+            ['operation' => 'run_schedule'],
+            ['operation' => 'publish', 'release_id' => $manual->id, 'revision' => 0, 'actor_id' => $staff->id, 'expected_schedule_id' => $schedule->id],
+        ], function (array $results, int $winner): void {
+            if ($winner === 0) {
+                $this->assertSame(['schedule', 'published', 1], [$results[0]['result'], $results[0]['outcome'], $results[0]['revision']]);
+                $this->assertSame('rejected', $results[1]['result']);
+            } else {
+                $this->assertSame(['published', 1], [$results[1]['result'], $results[1]['revision']]);
+                $this->assertSame(['schedule', 'already_resolved'], [$results[0]['result'], $results[0]['outcome']]);
+            }
+        }, $first);
+
+        $this->assertSame($first, $race['winner']);
+        $publication = SitePublication::findOrFail(1);
+        $this->assertSame([$first === 0 ? $scheduled->id : $manual->id, 1], [$publication->active_release_id, $publication->revision]);
+        $this->assertSame($first === 0 ? 'published' : 'superseded', $schedule->fresh()->state);
+        // An image is public only once a release using it has been live: the scheduled release's image, if it won.
+        $jpeg = $studio->variants()->where('format', 'jpeg')->firstOrFail();
+        $response = $this->get('/site-images/'.$jpeg->sha256.'.jpg');
+        $first === 0 ? $response->assertOk() : $response->assertNotFound();
     }
 
     public function test_a_release_created_while_its_image_completes_pins_the_whole_manifest_or_is_refused(): void

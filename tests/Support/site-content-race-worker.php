@@ -67,15 +67,17 @@ try {
         }
     });
     try {
+        // Share the test's private storage in every operation: processing writes image files, and publishing and the
+        // scheduler check a release's image files before they lock.
+        $root = getenv('VASEY_SITE_RACE_STORAGE_ROOT');
+        if (! is_string($root) || ! is_dir($root)) {
+            throw new LogicException('Missing site image storage root.');
+        }
+        config(['filesystems.disks.local.root' => $root]);
+        Storage::forgetDisk('local');
         $site = app(SiteContent::class);
         if ($input['operation'] === 'process_site_image') {
-            // Share the test's private storage, and its synthetic scanner, which the testing environment alone accepts.
-            $root = getenv('VASEY_SITE_RACE_STORAGE_ROOT');
-            if (! is_string($root) || ! is_dir($root)) {
-                throw new LogicException('Missing site image storage root.');
-            }
-            config(['filesystems.disks.local.root' => $root]);
-            Storage::forgetDisk('local');
+            // The synthetic scanner, which the testing environment alone accepts.
             app()->instance(MalwareScanner::class, new TestOnlyMediaScanner);
             $image = app(SiteImageProcessor::class)->handle($input['image_id']);
             $result = ['result' => 'processed', 'status' => $image->status, 'attempts' => $image->attempts];
