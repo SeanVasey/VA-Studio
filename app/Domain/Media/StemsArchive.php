@@ -249,15 +249,18 @@ class StemsArchive
      * One scan inside what is left of the budget: none starts after the deadline, the archive just written included, and none may
      * take longer than the seconds that remain. Without that a scan that started an instant before the deadline could run for
      * its own 300 seconds, and the job, whose 900 seconds also hold the scan of the upload, would be cut off with the media still
-     * claimed. A scan the budget cut off is the budget's failure, not the scanner's.
+     * claimed. A scan the budget cut off is the budget's failure, not the scanner's: a timeout ends a scan for the budget's sake
+     * when the seconds it was given do not exceed the scanner's own limit. (The deadline is no test of that: the scanner counts
+     * whole seconds against what is left and stops a little before it.)
      */
     private function scanWithinBudget(callable $scan, string $path, int $deadline): array
     {
         $this->withinDeadline($deadline);
+        $seconds = max(1, (int) ceil(($deadline - $this->clock()) / 1000000000));
         try {
-            return $scan($path, max(1, (int) ceil(($deadline - $this->clock()) / 1000000000)));
+            return $scan($path, $seconds);
         } catch (MediaFailure $failure) {
-            if ($failure->failureCode === 'processor_timeout' && $this->clock() >= $deadline) {
+            if ($failure->failureCode === 'processor_timeout' && $seconds <= (int) config('media.scanner.timeout_seconds')) {
                 throw new MediaFailure('archive_timeout', 'Archive processing exceeded its bounded time budget.');
             }
             throw $failure;

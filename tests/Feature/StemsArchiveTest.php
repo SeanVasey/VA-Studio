@@ -360,33 +360,30 @@ class StemsArchiveTest extends TestCase
         $this->assertNull($scanner->bound);
     }
 
-    public static function scansTheBudgetCutOff(): array
+    public static function scansThatTimedOut(): array
     {
         return [
-            'the budget was spent when the scan was cut off' => [PHP_INT_MAX, 'archive_timeout'],
-            'the scan ran out of its own limit with budget left' => [1000000000, 'processor_timeout'],
+            // The scan is given what is left of the budget, at most 360 seconds, and its own limit is 300.
+            'the budget was the shorter limit' => [30, 'archive_timeout'],
+            'the budget was as long as the scan limit' => [300, 'archive_timeout'],
+            'the scan limit was the shorter' => [360, 'processor_timeout'],
         ];
     }
 
-    #[DataProvider('scansTheBudgetCutOff')]
-    public function test_a_scan_the_budget_cut_off_is_the_budgets_failure_and_one_that_ran_out_by_itself_is_not(int $clock, string $code): void
+    #[DataProvider('scansThatTimedOut')]
+    public function test_a_scan_the_budget_cut_off_is_the_budgets_failure_and_one_that_ran_out_by_itself_is_not(int $budget, string $code): void
     {
-        $archive = $this->archiveWithClock();
-        $scanner = new class($archive, $clock) extends TestOnlyMediaScanner {
-            public function __construct(private object $archive, private int $clock) {}
-
+        config(['media.stems.max_seconds' => $budget]);
+        $scanner = new class extends TestOnlyMediaScanner {
             public function scan(string $path): array
             {
                 if (str_starts_with(basename($path), 'stem-')) {
-                    $this->archive->now = $this->clock;
-
                     throw new MediaFailure('processor_timeout', 'Media processing exceeded its time limit.');
                 }
 
                 return parent::scan($path);
             }
         };
-        app()->instance(StemsArchive::class, $archive);
         app()->instance(MalwareScanner::class, $scanner);
 
         $this->assertRejected(StemsFixtures::zip([['name' => 'audio.wav']]), [$code]);
