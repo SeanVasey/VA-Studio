@@ -81,7 +81,7 @@ final class InstallationReport
 
             return true;
         }, 'The scanner refuses a file over its size limits.',
-            'With clamdscan, set MaxFileSize and MaxScanSize to '.MalwareScanner::limitMebibytes().'M and AlertExceedsMax yes in clamd.conf and restart clamd; otherwise install ClamAV and prlimit first. The check needs a temporary directory that takes a sparse file of 4 GiB.');
+            'With clamdscan, set MaxFileSize and MaxScanSize to '.MalwareScanner::limitMebibytes().'M and AlertExceedsMax yes in clamd.conf and restart clamd; otherwise install ClamAV and prlimit first. The check needs a temporary directory that takes a sparse file of 4 GiB, and the PHP posix extension to tell that the worker may write one.');
         $check('seller_tag', false, fn () => is_string(config('media.tag_path')) && preg_match('~\A[a-zA-Z0-9][a-zA-Z0-9_./-]*\z~D', config('media.tag_path'))
             && ! str_contains(config('media.tag_path'), '..') && ! str_contains(config('media.tag_path'), '//')
             && is_string(config('media.tag_sha256')) && preg_match('/\A[a-f0-9]{64}\z/D', config('media.tag_sha256')),

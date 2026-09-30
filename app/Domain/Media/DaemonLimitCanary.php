@@ -57,22 +57,24 @@ final class DaemonLimitCanary
 
     /**
      * Whether this process may extend a file to the canary's size. A worker with a lower file-size limit is ended by SIGXFSZ when it
-     * tries, instead of being refused, so the canary is not made for it.
+     * tries, instead of being refused, so the canary is not made for it. Nor is it made when the limit cannot be read, without the
+     * posix extension or when the call fails: a worker that cannot be shown to be safe is not risked.
      */
     public static function mayBeCreated(): bool
     {
         if (! function_exists('posix_getrlimit')) {
-            return true;
+            return false;
         }
-        $soft = posix_getrlimit()['soft filesize'] ?? 'unlimited';
+        // A call that fails, or a limit that is not there to read, is null here, which is no.
+        $soft = posix_getrlimit()['soft filesize'] ?? null;
 
-        return $soft === 'unlimited' || $soft >= self::BYTES;
+        return $soft === 'unlimited' || (is_int($soft) && $soft >= self::BYTES);
     }
 
     private function create(string $directory): string
     {
         if (! self::mayBeCreated()) {
-            throw new MediaFailure('storage_failed', 'The worker may not write a file as large as the scanner daemon check needs.');
+            throw new MediaFailure('storage_failed', 'The scanner daemon check cannot make sure the worker may write a file as large as it needs: its file-size limit is lower, or cannot be read without the PHP posix extension.');
         }
         $path = rtrim($directory, '/').'/.limit-canary-'.bin2hex(random_bytes(8));
         $handle = @fopen($path, 'xb');
