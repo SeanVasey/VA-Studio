@@ -24,6 +24,9 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 ### Fixed
 
 - Public storefront and editorial pages answer a generic, uncacheable 503 when the published site content fails its integrity check. They used to redirect to the site root in a loop, or back to the referring site. Missing content rows fail the same way instead of answering 404. The outage is logged with its reason (at most once a minute while the cache works), and New content draft reports it with the recovery that applies instead of breaking.
-- The media upload form no longer describes or accepts a stored file path placed in its form state. A catalog administrator who knew the storage path of a private object, such as another upload or a contract, could learn whether it existed, its size and its detected file type. No file contents were exposed, and such a path was never ingested.
+
+### Security
+
+- The media upload form no longer describes or accepts a stored file path, or a number naming a stored file, placed in its form state. A catalog administrator who knew the storage path of a private object, such as another upload or a contract, could learn whether it existed, its size and its detected file type. No file contents were exposed, and such a path was never ingested. A test now fails if any admin upload field does not refuse stored paths.
 
 [Unreleased]: https://github.com/VASEYDEV/VASEYAUDIO/commits/main

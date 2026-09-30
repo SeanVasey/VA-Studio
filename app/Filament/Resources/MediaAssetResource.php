@@ -29,7 +29,8 @@ class MediaAssetResource extends OperatorResource
             Select::make('track_id')->relationship('track', 'title')->searchable()->required(),
             Select::make('role')->options(IngestMediaUpload::ROLES)->required(),
             // Only files uploaded through this form: a stored path placed in the form's state is neither described nor accepted.
-            FileUpload::make('upload')->label('Private upload')->disk('local')->visibility('private')->storeFiles(false)->preventFilePathTampering()->maxSize(204800)->acceptedFileTypes(['image/jpeg', 'image/png', 'audio/wav', 'audio/x-wav', 'application/zip', 'application/x-zip'])->required()->downloadable(false)->openable(false)->previewable(false)->helperText('Upload a WAV master, PNG/JPEG artwork or WAV-only stems ZIP (up to 200 MiB). Select Process after uploading. Masters and stems stay private. Stems recording association is required before licensing.'),
+            // The form only creates, so it describes no stored file at all; Filament's guard checks only values that are strings.
+            FileUpload::make('upload')->label('Private upload')->disk('local')->visibility('private')->storeFiles(false)->preventFilePathTampering()->getUploadedFileUsing(fn (): ?array => null)->maxSize(204800)->acceptedFileTypes(['image/jpeg', 'image/png', 'audio/wav', 'audio/x-wav', 'application/zip', 'application/x-zip'])->required()->downloadable(false)->openable(false)->previewable(false)->helperText('Upload a WAV master, PNG/JPEG artwork or WAV-only stems ZIP (up to 200 MiB). Select Process after uploading. Masters and stems stay private. Stems recording association is required before licensing.'),
         ]);
     }
 

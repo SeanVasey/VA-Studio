@@ -126,9 +126,15 @@ class MediaUploadTest extends TestCase
         // The browser asks the field to describe its files; a path this form did not issue gets no name, size, type or link.
         $component->call('callSchemaComponentMethod', 'mountedActionSchema0.upload', 'getUploadedFiles')
             ->assertReturned(['forged' => null, 'contract' => null]);
-        $component->callMountedAction()->assertHasActionErrors(['upload']);
+        $component->callMountedAction()->assertHasActionErrors(['upload' => 'The private upload field contains a file path that is not permitted.']);
         $this->assertSame([$stored->id], MediaAsset::pluck('id')->all());
         $this->assertSame($files, Storage::disk('local')->allFiles());
+
+        // Filament checks only string paths, so a number naming a root-level object must get nothing either.
+        Storage::disk('local')->put('123', 'root-level object');
+        $component->set('mountedActions.0.data.upload', ['numeric' => 123])
+            ->call('callSchemaComponentMethod', 'mountedActionSchema0.upload', 'getUploadedFiles')
+            ->assertReturned(['numeric' => null]);
     }
 
     public function test_intake_rejects_a_publicly_served_local_disk_before_copying(): void
