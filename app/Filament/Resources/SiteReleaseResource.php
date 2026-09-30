@@ -7,12 +7,13 @@ use App\Domain\SiteBuilder\Models\SitePublicationRevision;
 use App\Domain\SiteBuilder\Models\SitePublicationSchedule;
 use App\Domain\SiteBuilder\Models\SiteRelease;
 use App\Domain\SiteBuilder\SiteContent;
-use App\Domain\SiteBuilder\SiteContentUnavailable;
 use App\Domain\SiteBuilder\SiteContentSchema;
+use App\Domain\SiteBuilder\SiteContentUnavailable;
 use App\Filament\Resources\SiteReleaseResource\Pages\ListSiteReleases;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Checkbox;
@@ -24,6 +25,9 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\IconPosition;
+use Filament\Support\Enums\Size;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Auth\Access\Response;
@@ -250,25 +254,35 @@ class SiteReleaseResource extends OperatorResource
     {
         return $table->columns([
             TextColumn::make('id')->label('Release')->sortable(),
-            TextColumn::make('label')->searchable(),
+            // Long labels without spaces must break too, or the table scrolls sideways again; the floor keeps words whole on
+            // narrower screens, where the table scrolls instead. The compact schedule and creation times leave the floor room
+            // at 1440 px.
+            TextColumn::make('label')->searchable()->wrap()->extraAttributes(['style' => 'overflow-wrap: anywhere; min-width: 7rem']),
             TextColumn::make('publication_status')->label('Status')->badge()->state(fn (SiteRelease $record): string => SitePublication::findOrFail(1)->active_release_id === $record->id ? 'Active' :
                     (SitePublicationRevision::where('release_id', $record->id)->exists() ? 'Previously published' : 'Private draft')),
             TextColumn::make('schedule_status')->label('Schedule')->badge()->color('warning')->state(function (SiteRelease $record): ?string {
                 $pending = app(SiteContent::class)->pendingSchedule();
 
-                return $pending !== null && $pending->release_id === $record->id ? 'Scheduled '.static::utc($pending->publish_at) : null;
+                // The column heading names the time, which keeps the widest badge short.
+                return $pending !== null && $pending->release_id === $record->id ? static::utc($pending->publish_at) : null;
             }),
-            TextColumn::make('created_at')->dateTime()->sortable(),
+            TextColumn::make('created_at')->dateTime('Y-m-d H:i')->sortable(),
         ])->defaultSort('id', 'desc')->paginated([10, 25, 50])->defaultPaginationPageOption(25)->recordUrl(null)
             ->recordActions([
                 Action::make('preview')->url(fn (SiteRelease $record): string => route('filament.admin.site-releases.preview', $record))->openUrlInNewTab(),
-                Action::make('duplicateDraft')->label('Edit as new draft')->schema(static::editor())
-                    ->modalHeading('Edit a copy as a private draft')->modalSubmitActionLabel('Save private draft')
-                    ->fillForm(fn (SiteRelease $record): array => static::draftForm(app(SiteContent::class)->preview($record->id, static::actor()), $record->label))
-                    ->action(fn (array $data, ListSiteReleases $livewire) => static::saveDraft($data, $livewire)),
                 static::publicationAction('publish', 'Publish release'),
-                static::publicationAction('rollback', 'Restore previous release'),
-                static::scheduleAction(),
+                // Secondary actions share one menu so the table fits a 1440 px window without scrolling sideways.
+                ActionGroup::make([
+                    Action::make('duplicateDraft')->label('Edit as new draft')->schema(static::editor())
+                        ->modalHeading('Edit a copy as a private draft')->modalSubmitActionLabel('Save private draft')
+                        ->fillForm(fn (SiteRelease $record): array => static::draftForm(app(SiteContent::class)->preview($record->id, static::actor()), $record->label))
+                        ->action(fn (array $data, ListSiteReleases $livewire) => static::saveDraft($data, $livewire)),
+                    static::publicationAction('rollback', 'Restore previous release'),
+                    static::scheduleAction(),
+                ])->label('More')->link()->size(Size::Small)->icon(Heroicon::ChevronDown)->iconPosition(IconPosition::After)
+                    // Each row's trigger names its release, starting with the visible word (WCAG 2.5.3). Filament merges extra
+                    // attributes unescaped, and labels may contain quotes.
+                    ->extraAttributes(fn (SiteRelease $record): array => ['aria-label' => e('More actions for “'.$record->label.'”')]),
             ])->toolbarActions([]);
     }
 

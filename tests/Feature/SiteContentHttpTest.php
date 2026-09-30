@@ -217,6 +217,18 @@ class SiteContentHttpTest extends TestCase
         $this->assertDatabaseCount('site_publication_revisions', 4);
     }
 
+    public function test_each_row_menu_is_named_for_its_release_with_the_label_escaped(): void
+    {
+        $actor = LicenseFixtures::admin();
+        $this->actingAs($actor);
+        app(SiteContent::class)->create(SiteContentSchema::defaults(), 'Spring "Launch" & q" x-init=window.probe=1 z="', $actor);
+
+        $html = Livewire::test(ListSiteReleases::class)->html();
+        // Filament merges extra attributes unescaped, and labels may contain quotes: one must never end the attribute.
+        $this->assertStringContainsString('aria-label="More actions for “Spring &quot;Launch&quot; &amp; q&quot; x-init=window.probe=1 z=&quot;”"', $html);
+        $this->assertStringNotContainsString('" x-init=window.probe', $html);
+    }
+
     public function test_editor_saves_all_editorial_sections_and_copy_remains_private(): void
     {
         $actor = LicenseFixtures::admin();

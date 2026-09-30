@@ -1,12 +1,15 @@
 import { test, expect, type Page } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
 import { fixtureTrack, storefrontFixture } from './storefront-fixture';
+import { releaseMenuAction, releaseRow as row } from './site-release-row';
 
 test.beforeEach(() => resetBrowserLoginRateLimit());
-const row = (page: Page, label: string) => page.getByRole('row').filter({ has: page.getByText(label, { exact: true }) });
 
 async function activate(page: Page, label: string, action: 'Publish release' | 'Restore previous release') {
-  await row(page, label).getByRole('button', { name: action, exact: true }).click();
+  const trigger = action === 'Publish release'
+    ? row(page, label).getByRole('button', { name: action, exact: true })
+    : await releaseMenuAction(page, label, action);
+  await trigger.click();
   const dialog = page.getByRole('alertdialog', { name: action, exact: true });
   await dialog.getByRole('button', { name: 'Confirm', exact: true }).click();
   await expect(row(page, label).getByText('Active', { exact: true })).toBeVisible();
@@ -139,7 +142,7 @@ test('seller edits persisted pages, previews one private release and restores th
     await expect(published.locator('iframe, video')).toHaveCount(0);
     await published.close();
 
-    await row(page, firstLabel).getByRole('button', { name: 'Edit as new draft', exact: true }).click();
+    await (await releaseMenuAction(page, firstLabel, 'Edit as new draft')).click();
     dialog = page.getByRole('dialog');
     await expect(dialog.getByRole('heading', { name: 'Edit a copy as a private draft', exact: true })).toBeVisible();
     await expect(dialog.getByLabel('Include Blog page', { exact: true })).toBeChecked();

@@ -100,7 +100,7 @@ Every command locks the singleton first and the schedule row second. Under MySQL
 
 The **Site content** page adds:
 
-- a **Schedule publication** row action with a whole-minute UTC field;
+- a **Schedule publication** action in the **More** menu of each release that is not active, while nothing is scheduled, with a whole-minute UTC field;
 - a subheading naming the pending schedule, with an overdue warning;
 - a **Schedule** badge on the scheduled release;
 - a **Cancel scheduled publication** confirmation naming the release and time;

@@ -1,19 +1,30 @@
 # Ordered development status
 
-Reconciled 2026-09-30. Accepted starting baseline `520f66fb8af69d9d393a362fd2627779a53d701a`, tree `aed8711612486f34a3221537a06619cc3bf9210a`, contains customer-facing test downloads, the first WP-09 CMS slice, test promotion administration, persisted editorial content, the repository engineering standard and scheduled site publication from [PR #76](https://github.com/VASEYDEV/VASEYAUDIO/pull/76). Each completed full CI and independent review before merge; post-merge [CI 36659889154](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36659889154) passed. No production activation or actual provider transaction is claimed.
+Reconciled 2026-09-30. Accepted starting baseline `fdbc7cdca7194024aadd5622a926869605d652cb`, tree `03f45e3679059114cd40c38e04cfa0878accfb0d`, contains customer-facing test downloads, the first WP-09 CMS slice, test promotion administration, persisted editorial content, the repository engineering standard, scheduled site publication and fail-closed public pages from [PR #77](https://github.com/VASEYDEV/VASEYAUDIO/pull/77). Each completed full CI and independent review before merge. No production activation or actual provider transaction is claimed.
 
 ## Current increment and next handoff
 
-### Fail-closed public pages — September 30
+### Site Releases row menu — September 30
 
-Found while planning editable site images: when the published site content failed its integrity check, `SiteContent::current()` raised a validation error that Laravel rendered as a redirect to the previous URL. `/` redirected to the site root in a loop, and a page reached from another site sent the visitor back there. Public storefront and editorial pages now answer a generic, uncacheable 503 with `Retry-After`, including when content rows are missing. The outage is logged with its reason (at most once a minute while the cache works), and **New content draft** reports the failure and the recovery that applies instead of breaking. The integrating PR records the exact tested source, checks and review.
+The Site Releases table needed about 1,420 px in a 1,056 px content area, so staff scrolled sideways to reach **Schedule publication** and **Restore previous release**. Each row now keeps **Preview** and, except on the active release, **Publish release**. **Edit as new draft**, **Restore previous release** and **Schedule publication** move into a **More** menu named for its release. Long labels wrap even without spaces, while a width floor keeps ordinary words whole; the **Schedule** badge shows only the UTC time under its heading and **Created at** shows minutes, which leaves the floor room at 1440 px with a schedule showing. Narrower windows scroll the table rather than split words. Admin menu items gain a visible keyboard focus outline. When a dialog opened from a menu is dismissed, or Escape closes the menu, focus returns to the menu's button instead of falling to the page; a submitted dialog closes without the event this relies on, so focus after a confirmed action is unchanged. The integrating PR records the exact tested source, checks and review.
 
-Next, in the order of the plan Sean approved on September 30:
-
-1. The Site Releases row menu, because the table needs horizontal scrolling at 1440 px.
-2. Editable site images, as two PRs: a private site-image library, then image slots in site releases with their public serving. The D-25 decision record lands with the library PR. Sean chose the slots: the home hero (desktop and mobile), the studio image and the share image.
+Next, in the order of the plan Sean approved on September 30: editable site images, as two PRs. First comes a private site-image library, then image slots in site releases with their public serving. The D-25 decision record lands with the library PR. Sean chose the slots: the home hero (desktop and mobile), the studio image and the share image.
 
 Inbound contact/spam handling, consent-aware embeds/related-track links, broader sharing/support and free-download licensing/consent remain unfinished. Guest/account recovery, the complete cross-order library, verified financial exception/refund/dispute resolution, other products, memberships, source migration and production readiness remain open.
+
+### Accepted fail-closed public pages — September 30
+
+[PR #77](https://github.com/VASEYDEV/VASEYAUDIO/pull/77) merged tested head `eb28b3cb8e6afa4ac06ef8438c4955b047c9b27f` as `fdbc7cdca7194024aadd5622a926869605d652cb`; both have source tree `03f45e3679059114cd40c38e04cfa0878accfb0d`. [CI 36674655225](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36674655225), attempt 2, passed all ten required jobs on the tested head:
+
+- MySQL 8.4: 1,662 tests /17,826 assertions, zero skips.
+- SQLite: 1,574 executed tests /14,964 assertions, plus the 88 expected MySQL-only skips.
+- 257 frontend tests, the build and the audits.
+- All 32 Chromium/mobile-WebKit cases.
+- The backend aggregate.
+
+Its first attempt, and the run before it, got no runners because of an account-level Actions limit; the re-run followed Sean's budget increase. Independent review approved the final commit after four rounds of fixes, which the PR records.
+
+Found while planning editable site images: a published site release or pointer that failed its integrity check raised a validation error, which Laravel rendered as a redirect. `/` looped to itself, and a page reached from another site sent the visitor back there. Public storefront and editorial pages now answer a generic, uncacheable 503 with `Retry-After`, including when content rows are missing. The outage is logged with its reason (`release`, `publication` or `missing`), and **New content draft** reports the recovery that applies. A publication record re-created after publishing, or history naming a missing release, now fails its check instead of serving defaults or Not Found. Payments remain test-only.
 
 ### Accepted scheduled publication — September 30
 
