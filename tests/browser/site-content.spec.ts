@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page, type Route } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
 import { expectReleaseTableFits, releaseMenuAction, releaseMenuTrigger, releaseRow as row } from './site-release-row';
 
@@ -152,5 +152,23 @@ test('the row menu shows keyboard focus and returns it to More when a dialog is 
   await page.keyboard.press('Escape');
   await expect(edit).toBeHidden();
   await expect(trigger).toBeFocused();
+
+  // Keys pressed while a slow dismissal update runs, such as a second Escape or the Ctrl that silences a screen reader,
+  // do not stop focus returning to More.
+  const slowUpdates = async (route: Route) => {
+    await new Promise(resolve => setTimeout(resolve, 600));
+    await route.continue();
+  };
+  await page.route('**/update', slowUpdates);
+  await openMenuFromKeyboard();
+  await page.keyboard.press('Enter');
+  await expect(heading).toBeVisible();
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(150);
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('Control');
+  await expect(heading).toBeHidden();
+  await expect(trigger).toBeFocused();
+  await page.unroute('**/update', slowUpdates);
   expect(failures).toEqual([]);
 });

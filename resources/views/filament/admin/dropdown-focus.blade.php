@@ -24,7 +24,7 @@
         const lost = (active) => active === null || active === document.body || ! visible(active)
             || active.closest('.fi-dropdown-panel, .fi-modal:not(.fi-modal-open)') !== null;
         // Keeps focus on the menu's button while it drifts, for as long as Livewire's update may keep the button disabled
-        // and replace the menu, and stops at the user's next key or pointer press so a reopened menu keeps its focus.
+        // and replace the menu, and stops at the user's next input so a reopened menu keeps its focus.
         const returnFocus = (trigger) => {
             const started = performance.now();
             const step = () => {
@@ -54,11 +54,16 @@
         };
         document.addEventListener('focusin', remember, true);
         document.addEventListener('click', remember, true);
-        for (const type of ['keydown', 'pointerdown']) {
-            document.addEventListener(type, (event) => {
+        // A key pressed while focus is lost, such as a second Escape or the Ctrl that silences a screen reader, does not stop
+        // the return, and Tab ends it by moving focus. A key on a focused control or a pointer press anywhere stops it.
+        document.addEventListener('keydown', (event) => {
+            if (! lost(document.activeElement)) {
                 lastInput = event.timeStamp;
-            }, true);
-        }
+            }
+        }, true);
+        document.addEventListener('pointerdown', (event) => {
+            lastInput = event.timeStamp;
+        }, true);
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape' && event.target.closest?.('.fi-dropdown-panel')) {
                 returnFocus(triggerOf(event.target));

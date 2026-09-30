@@ -255,16 +255,18 @@ class SiteReleaseResource extends OperatorResource
         return $table->columns([
             TextColumn::make('id')->label('Release')->sortable(),
             // Long labels without spaces must break too, or the table scrolls sideways again; the floor keeps words whole on
-            // narrower screens, where the table scrolls instead.
+            // narrower screens, where the table scrolls instead. The compact schedule and creation times leave the floor room
+            // at 1440 px.
             TextColumn::make('label')->searchable()->wrap()->extraAttributes(['style' => 'overflow-wrap: anywhere; min-width: 7rem']),
             TextColumn::make('publication_status')->label('Status')->badge()->state(fn (SiteRelease $record): string => SitePublication::findOrFail(1)->active_release_id === $record->id ? 'Active' :
                     (SitePublicationRevision::where('release_id', $record->id)->exists() ? 'Previously published' : 'Private draft')),
             TextColumn::make('schedule_status')->label('Schedule')->badge()->color('warning')->state(function (SiteRelease $record): ?string {
                 $pending = app(SiteContent::class)->pendingSchedule();
 
-                return $pending !== null && $pending->release_id === $record->id ? 'Scheduled '.static::utc($pending->publish_at) : null;
+                // The column heading names the time, which keeps the widest badge short.
+                return $pending !== null && $pending->release_id === $record->id ? static::utc($pending->publish_at) : null;
             }),
-            TextColumn::make('created_at')->dateTime()->sortable(),
+            TextColumn::make('created_at')->dateTime('Y-m-d H:i')->sortable(),
         ])->defaultSort('id', 'desc')->paginated([10, 25, 50])->defaultPaginationPageOption(25)->recordUrl(null)
             ->recordActions([
                 Action::make('preview')->url(fn (SiteRelease $record): string => route('filament.admin.site-releases.preview', $record))->openUrlInNewTab(),

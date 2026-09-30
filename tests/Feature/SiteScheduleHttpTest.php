@@ -76,7 +76,8 @@ class SiteScheduleHttpTest extends TestCase
         $page = Livewire::test(ListSiteReleases::class)
             ->assertSee('Scheduled: “SCHEDULED UI LABEL” (release #'.$release->id.') publishes at 2026-10-01 12:05 UTC.')
             ->assertDontSee('Overdue')
-            ->assertSee('Scheduled 2026-10-01 12:05 UTC')
+            ->assertTableColumnStateSet('schedule_status', '2026-10-01 12:05 UTC', $release)
+            ->assertTableColumnFormattedStateSet('created_at', $release->created_at->utc()->format('Y-m-d H:i'), $release)
             ->assertTableActionHidden('schedulePublication', $release)
             ->assertActionVisible('cancelScheduledPublication');
         $page->mountAction('scheduleHistory')

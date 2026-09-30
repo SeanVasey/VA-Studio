@@ -74,7 +74,7 @@ test('a scheduled release waits, the scheduler publishes it, and a pending sched
 
     const publishAt = futureMinute(3);
     await schedule(page, label, publishAt);
-    await expect(row(page, label).getByText(`Scheduled ${publishAt.display}`, { exact: true })).toBeVisible();
+    await expect(row(page, label).getByText(publishAt.display, { exact: true })).toBeVisible();
     // The schedule badge is the widest cell; the desktop admin must still fit without scrolling sideways.
     if (testInfo.project.name === 'chromium-desktop') await expectReleaseTableFits(page);
     // Opened, so a missing action is really absent rather than hidden inside a closed menu.
