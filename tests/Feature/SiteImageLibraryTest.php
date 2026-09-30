@@ -307,6 +307,8 @@ class SiteImageLibraryTest extends TestCase
             'PNG with a chunk after the image data claiming 1 GiB' => ['studio', substr(F::png(1440, 630), 0, -12).pack('N', 1 << 30).'tEXtComment', $message('invalid_image')],
             'PNG with stray bytes after the image data' => ['studio', substr(F::png(1440, 630), 0, -12)."\0\0\0\0\0", $message('invalid_image')],
             'PNG cut inside its image data' => ['studio', substr(F::png(1440, 630), 0, -112), $message('invalid_image')],
+            // IHDR then IEND: FFmpeg reads no frame, so intake refuses it rather than keep a row that can only fail.
+            'PNG ending before any image data' => ['studio', substr(F::png(1440, 630), 0, 33).substr(F::png(1440, 630), -12), $message('invalid_image')],
             '16-bit PNG' => ['studio', F::png(1440, 630, 'rgb16'), $message('unsupported_depth')],
             '16-bit grey PNG' => ['studio', F::png(1440, 630, 'gray16'), $message('unsupported_depth')],
             'alpha PNG' => ['studio', F::png(1440, 630, 'rgba'), $message('transparent_image')],

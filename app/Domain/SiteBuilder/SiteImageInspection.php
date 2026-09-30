@@ -133,6 +133,11 @@ final class SiteImageInspection
                 ['length' => $length] = unpack('Nlength', substr($header, 0, 4));
                 $type = substr($header, 4, 4);
                 if ($type === 'IEND' || ($type === 'IDAT' && ! $toEnd)) {
+                    if ($toEnd && ! $imageData) {
+                        // FFmpeg reads no frame from a file that ends before any image data, so intake refuses it.
+                        throw new MediaFailure('invalid_image', 'The image has no image data.');
+                    }
+
                     return ['transparent' => $transparent, 'rotated' => $rotated, 'oversized_metadata' => $oversized];
                 }
                 $imageData = $imageData || $type === 'IDAT';
