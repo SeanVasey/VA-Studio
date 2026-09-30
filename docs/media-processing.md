@@ -34,7 +34,7 @@ Use relative portable names starting with a letter or digit. Each component may 
 
 The worker validates the entire archive directory first, streams each member by index into a generated private scratch filename, and checks actual bytes and CRC against the declared member size. It scans and decodes each member, then rebuilds a stored ZIP with sorted safe names, fixed timestamps, read-only file attributes and no copied archive comments/extra metadata. It scans that rebuilt ZIP before immutable promotion. Archive member names never become extraction paths. Input and output ZIP hashes can differ while WAV bytes remain exact.
 
-The `media.stems` limits may be lowered; code enforces the documented ceilings. Each policy is included in the processing fingerprint, so a changed bound gets a new run without rewriting earlier evidence. The archive stage has a 360-second elapsed budget checked during streaming and between bounded subprocesses. An in-flight subprocess can take up to its existing 120-second cap before the elapsed-budget failure is recorded. Original-archive scanning precedes this budget. Queue timeout/claim settings remain unchanged. The PHP/libzip parser itself still requires production worker memory/filesystem/process isolation; application bounds are not proof of deployed isolation.
+The `media.stems` limits may be lowered; code enforces the documented ceilings. Each policy is included in the processing fingerprint, so a changed bound gets a new run without rewriting earlier evidence. The archive stage has a 360-second elapsed budget checked during streaming and between bounded subprocesses. An in-flight subprocess can take up to its own cap (120 seconds; 300 for a malware scan) before the elapsed-budget failure is recorded. Original-archive scanning precedes this budget. A ZIP is scanned once as uploaded, once per member and once rebuilt, so a scanner that takes 15 to 20 seconds per call limits how many members fit in the budget: see [Production malware scanner](#production-malware-scanner). Queue timeout/claim settings remain unchanged. The PHP/libzip parser itself still requires production worker memory/filesystem/process isolation; application bounds are not proof of deployed isolation.
 
 A ZIP run produces only `stems_zip`, preserves its quarantined source and records a canonical integer-valued member manifest. It does not change track duration/waveform, generate a public preview, or automatically attach to a license. **Recording-revision binding is the next WP-03 dependency.** Both the public media route and the operator preview route deny stems archives. Future buyer access must go through WP-08 entitlements.
 
@@ -48,7 +48,7 @@ A cold large catalog still requires full digest verification. Catalog pagination
 
 Complete the application setup in [README](../README.md). The application and worker need access to the same private local disk, which defaults to `storage/app/private`; the web document root must remain `public/`. Do not expose the private disk through static serving, symlinks or object URLs.
 
-The worker needs the PHP ZIP extension and patched, compatible FFmpeg/ffprobe binaries with the `libmp3lame` encoder, Linux `prlimit`, and ClamAV's `clamscan` with usable signatures. These tools are external dependencies; Composer does not install them. Configure their absolute executable paths in `.env`:
+The worker needs the PHP ZIP extension and patched, compatible FFmpeg/ffprobe binaries with the `libmp3lame` encoder, Linux `prlimit`, and ClamAV with usable signatures: `clamscan`, or `clamdscan` with a running `clamd`, which production should prefer (see [Production malware scanner](#production-malware-scanner)). These tools are external dependencies; Composer does not install them. Configure their absolute executable paths in `.env`:
 
 ```dotenv
 QUEUE_CONNECTION=database
@@ -86,9 +86,81 @@ The same `media` worker, scanner and FFmpeg tools prepare [site images](architec
 
 A site-image commit that reports an error can leave files that no row names, as can a process killed before its cleanup: the prepared files of an image that never became ready under `site-images/revisions/<uuid>/`, or an intake upload under `site-images/quarantine/<uuid>/`. They are private and unreferenced. Remove such a directory only after confirming that no `site_image_variants.storage_path` row, or `site_images.source_path` row for quarantine, names anything in it, and only when nothing is in flight: the directory is older than the 16-minute processing lease and no upload is in progress, or the media workers and admin uploads are stopped. A run between promoting its files and its ready commit, or an upload between storing and committing, has files that no row names yet. Nothing sweeps them automatically.
 
-The media process wrapper limits each subprocess to 120 seconds wall time, 90 CPU seconds, 2 GiB address space, 1 GiB file output, 64 open files and 256 KiB captured output. The malware scan's standard error is counted separately, up to 4 MiB, so scanner warnings do not end a scan. Those are code bounds, not evidence of production worker isolation or measured catalog throughput. FFmpeg receives explicit input formats and a `file,pipe` protocol allowlist; production still needs a dedicated restricted worker and network policy.
+The media process wrapper limits each subprocess to 120 seconds wall time, 90 CPU seconds, 2 GiB address space, 1 GiB file output, 64 open files and 256 KiB captured output, and starts it with `TZ=UTC`. Only the malware scanner has larger limits, 300 seconds wall time, 180 CPU seconds and 3 GiB address space (`media.scanner` in `config/media.php`), because `clamscan` loads every signature on each call. The malware scan's standard error is counted separately, up to 4 MiB, so scanner warnings do not end a scan. Those are code bounds, not evidence of production worker isolation or measured catalog throughput. FFmpeg receives explicit input formats and a `file,pipe` protocol allowlist; production still needs a dedicated restricted worker and network policy.
 
 The admin's temporary uploads use authenticated, authorized private storage, with a 200 MiB temporary-file limit and 15-minute upload allowance. Set PHP `upload_max_filesize` and web-server/proxy request limits to admit the intended upload size; `post_max_size` needs room for multipart overhead. A lower upstream limit can reject a request before the application reports its own validation error. Temporary-upload settings do not implement resumable or multipart object-store uploads.
+
+## Production malware scanner
+
+Run `clamd` on the media worker's host and set `MEDIA_CLAMSCAN=/usr/bin/clamdscan`. Per-call `clamscan`, the default, works but is slow; it is the fallback. The figures below were measured with ClamAV 1.5.4 (Ubuntu 24.04 packages, official signatures) on a 4-vCPU, 16 GiB virtual machine without systemd, with other jobs running. They size a deployment and give it a checklist; they are not acceptance evidence for your host.
+
+| | `clamdscan --fdpass` with `clamd` | `clamscan` per call |
+| --- | --- | --- |
+| Time for a small file | 0.01 to 0.03 s | 11 to 20 s: each call loads every signature, about 1 GiB resident |
+| Where the size limits live | `clamd.conf`, below | the options the application passes, below |
+| A stems ZIP of 24 members | built in 5.2 s (120 members: 23.6 s) | `archive_timeout` after 23 scans |
+
+A stems ZIP is scanned once as uploaded, once per member and once rebuilt, all inside the 360-second archive budget, so at 15 to 20 seconds a scan `clamscan` fits about 17 to 21 members. The 24-member figures above come from an earlier measurement on the same machine.
+
+The application calls a binary whose file name is exactly `clamdscan` with `--fdpass` and without `clamscan`'s size options, which `clamdscan` ignores with a warning. `--fdpass` hands the daemon an open file. Without it the daemon opens the path as its own user, which cannot read the worker's private files: `Permission denied`, exit 2, and the media waits as `scanner_unavailable`. `clamdscan` finds the daemon through `/etc/clamav/clamd.conf`. If yours is elsewhere, point `MEDIA_CLAMSCAN` at a wrapper that adds `--config-file=...` and is itself named `clamdscan`.
+
+### The `clamscan` fallback
+
+The application runs `clamscan --no-summary --stdout --max-filesize=768M --max-scansize=768M --alert-exceeds-max=yes` under `prlimit` with 3 GiB of address space, 180 CPU seconds and 300 seconds of wall time (`media.scanner` in `config/media.php`). Its version call runs under the same limits. ffmpeg and the other tools keep the shared limits. A worker whose own hard address-space limit is below 3 GiB fails every scan as `scanner_unavailable`: `prlimit` cannot raise it, and the worker log says so.
+
+- **768 MiB for both sizes.** ClamAV counts an archive plus everything extracted from it against `--max-scansize`, so a stems ZIP of 200 MiB that expands to 512 MiB needs 708 MiB. At 512M, ClamAV rejected the largest archive the application admits (196 MiB, four members of 128 MiB) with `Heuristics.Limits.Exceeded.MaxScanSize`; at 768M it scans clean. Keep the two equal. ClamAV cuts an oversize archive member down to `--max-filesize` without an alert, and only a spent scan budget turns the cut into one: with 512M and 1G, a deflate bomb of 1 GiB of zeros in a 1 MiB ZIP was reported `OK`, and with 768M twice it is reported as over the limit. `--alert-exceeds-max=yes` makes a file over a limit an error, not a pass.
+- **3 GiB of address space.** Loading the signatures takes 1.08 GiB, that 196 MiB archive 1.4 GiB, and the deflate bomb, whose cut member is mapped, 1.85 GiB. Below about 1.1 GiB the scanner cannot load its database at all.
+- **180 CPU seconds and 300 seconds.** That archive took 53 seconds of CPU here (54 of wall time), against the 90 seconds every other tool gets, and up to 82 seconds of CPU (85 of wall time) in earlier runs on a busier machine.
+
+### `clamd.conf`
+
+The packaged `/etc/clamav/clamd.conf` of Ubuntu 24.04 must not be used as it is. It **fails open**: with `MaxFileSize 25M`, `MaxScanSize 100M` and no `AlertExceedsMax`, a file over a limit is skipped and answered `OK`. A 30 MiB ZIP with an EICAR member and an 800 MiB file both came back `OK` from it. It also sets `EnableVersionCommand false`, so `clamdscan --version` prints only `ClamAV <version>` and the application refuses every scan as `scanner_signatures_stale`, and `LocalSocketMode 666`, which lets any local user scan through the daemon. Set these:
+
+| Setting | Value | Why |
+| --- | --- | --- |
+| `LocalSocket` | `/run/clamav/clamd.ctl` | where `clamdscan` looks by default |
+| `LocalSocketGroup`, `LocalSocketMode` | the worker's group, `660` | only the worker may use the daemon; packaged: mode `666` |
+| `EnableVersionCommand` | `yes` | the application reads the signature date from the daemon's answer; packaged: `false` |
+| `MaxFileSize`, `MaxScanSize` | `768M` and `768M` | as for `clamscan` above; packaged: `25M` and `100M`. Keep them equal |
+| `AlertExceedsMax` | `yes` | a file over a limit is reported as `Heuristics.Limits.Exceeded` (exit 1, so `scan_not_clean`), not skipped; packaged: not set |
+| `MaxScanTime` | `240000` | milliseconds; keeps the daemon's give-up time under the 300-second wall limit of the client |
+| `MaxThreads` | the number of media workers | each scan of a large archive added about 250 MiB resident and can extract up to 768 MiB to disk |
+| `TemporaryDirectory` | a disk-backed directory the daemon owns, such as `/var/tmp/clamd` | recommended, not measured |
+| `ConcurrentDatabaseReload` | `yes` (the default) | scans keep running during a reload, at the memory cost under host sizing |
+
+Keep `freshclam` running as a daemon and confirm that the daemon reloads after an update: step 1 of the acceptance list shows the signature date the daemon reports. `media.max_signature_age_seconds` (48 hours) measures the build time of the newest daily database, not the time of freshclam's last check, so alert well before the limit. The upstream publishing cadence was not measured; 24 to 36 hours of age is a starting point.
+
+### Time zone of `clamd`
+
+`clamdscan --version` prints the signature time in the time zone of the daemon, and the application reads it as UTC. The application starts every tool it runs, `clamscan` included, with `TZ=UTC`, but it cannot change the zone of a daemon that is already running. A daemon in `Asia/Tokyo` printed `15:24:18` at 13:24 UTC for signatures built at 06:24 UTC, and the application refused them as dated in the future until they were eight hours old; a daemon west of UTC reports them older than they are. Give the daemon's service a zone of UTC with a drop-in:
+
+```ini
+# /etc/systemd/system/clamav-daemon.service.d/timezone.conf
+[Service]
+Environment=TZ=UTC
+```
+
+Run `systemctl daemon-reload` and restart `clamav-daemon`. The drop-in itself was not exercised here, because the test machine has no running systemd. The effect was: a daemon started with `TZ=UTC` in its environment printed the UTC time, and one started with `TZ=Asia/Tokyo` did not.
+
+### Host sizing
+
+- `clamd` holds about 1.0 GiB resident when idle, and reached 1.2 GiB after scanning archives that expand to 512 MiB.
+- A reload with `ConcurrentDatabaseReload yes` peaked at 2.0 GiB resident, twice the idle size. An earlier run timed it at about 17 seconds, with scans going on. Starting the daemon took 11 to 18 seconds, nearly all of it CPU.
+- Reserve 3 GiB for `clamd`, plus the media workers, each of which may use 2 GiB of address space for FFmpeg. A practical minimum is a 4 GiB host. A `MemoryMax` below about 3 GiB can kill a reload.
+- On a smaller host set `ConcurrentDatabaseReload no`. The peak stays near 1.0 GiB, but a scan submitted during a reload waited 55 seconds in the one run of it.
+- Leave disk for extraction: up to `MaxThreads` times 768 MiB in `TemporaryDirectory`. That is an upper bound from the limits, not a measurement.
+
+### Acceptance list
+
+Run these on the deployed host as the worker's user, with the configured binary and its options (`--fdpass` for `clamdscan`), before relying on the scanner. Assemble the EICAR test string at run time from its published text, in a scratch directory outside the repository. Check that a test ZIP is really scanned before trusting its result: ClamAV did not scan the members of ZIPs written with Python's `ZipFile.open(..., force_zip64=True)` and answered `OK`, which passed the EICAR member and the bomb below. The same archives written without `force_zip64` were scanned and detected.
+
+1. `clamdscan --version` prints `ClamAV <version>/<number>/<date>`, and the date, which is UTC, is within 48 hours of `date -u`.
+2. The EICAR test file reports `Eicar-Test-Signature FOUND` and exits 1.
+3. A ZIP over 25 MiB with an EICAR member reports `FOUND`. This catches the packaged limits.
+4. An 800 MiB file (`truncate -s 800M big.bin`) reports `Heuristics.Limits.Exceeded.MaxFileSize FOUND`. With `clamscan` it exits 2, which the application treats as a scanner problem, not a detection.
+5. A deflate bomb, 1 GiB of zeros in a ZIP of about 1 MiB, reports `Heuristics.Limits.Exceeded.MaxScanSize FOUND`.
+6. A ZIP just under 200 MiB with four members of 128 MiB each (512 MiB expanded), the largest the application admits, reports `OK`. Give each member about 49 MiB of random data and zeros for the rest.
+7. Stop the daemon. The application must report `scanner_signatures_stale` or `scan_not_clean` for both a clean file and the EICAR file, never a clean result: `clamdscan --version` then prints an error and only `ClamAV <version>`.
 
 ## Publish a track through the admin
 
@@ -108,8 +180,8 @@ Start with the source row's **Processing details** and the application's protect
 | Observation | Operator action |
 | --- | --- |
 | `queued` remains unchanged | Verify a worker is listening to `media` on the same queue connection/database and private disk. Restart/recover the worker, not the stored media records. |
-| `scanner_unavailable` or `scanner_signatures_stale` | The scanner is missing, reported an error, crashed, is not ClamAV, or has out-of-date signatures; it exited 0 without the exact clean line (for example with a warning of its own, such as a deprecated option after an upgrade, in its output); or its standard output ran past the 256 KiB limit, or its warnings on standard error past 4 MiB. Fewer warnings than that do not affect the result. A scan that runs out of time reads `processor_timeout`. None of these says anything about the file. Fix the scanner, its configuration or its signatures, then retry. |
-| `scan_not_clean` | The scanner reported a detection (clamscan exit 1). Investigate the original file; retry only after the cause is understood. |
+| `scanner_unavailable` or `scanner_signatures_stale` | The scanner is missing, reported an error, crashed, is not ClamAV, or has out-of-date signatures; it exited 0 without the exact clean line (for example with a warning of its own, such as a deprecated option after an upgrade, in its output); or its standard output ran past the 256 KiB limit, or its warnings on standard error past 4 MiB. Fewer warnings than that do not affect the result. A scan that runs out of time reads `processor_timeout`. None of these says anything about the file. Fix the scanner, its configuration or its signatures, then retry. The worker log says why: a warning, `The malware scan did not finish.`, with `reason` (the failure code), `exit_code` (128 plus the signal for a scan a signal ended: 137 is SIGKILL, which is how the CPU limit ends one), and `error_line` and `output_line`, the first line the scanner wrote to standard error and to standard output, each without the upload's directory and at most 200 characters. None of it reaches the message shown in the admin. `scanner_signatures_stale` is also what a signature date more than an hour in the future reads, which a `clamd` in a zone east of UTC prints, and with `clamdscan` a daemon that is not running or has `EnableVersionCommand false`: run `clamdscan --version` to see which. |
+| `scan_not_clean` | The scanner reported a detection (clamscan exit 1). `clamscan` and `clamd` also report an archive over a scan limit this way (`Heuristics.Limits.Exceeded`). Investigate the original file; retry only after the cause is understood. |
 | `tag_not_configured`, `tag_hash_mismatch` or `invalid_tag` | Correct the private approved tag/path/hash or supported format. Reload worker configuration and request processing again; a changed profile gets its own run. |
 | `invalid_wav`, `unsupported_wav`, `invalid_audio` or `invalid_artwork` | Export a supported complete source and upload it as a new revision. Renaming an extension does not convert the file. |
 | `source_changed`, intake integrity mismatch or `unsafe_path` | Investigate storage changes, or a symbolic link in place of the stored file itself. Preserve the existing evidence and upload a new valid source; do not rewrite the recorded hash. |
@@ -135,7 +207,7 @@ The integrating PR records exact commands, runtime versions, tested commit and o
 
 Before production media acceptance, record:
 
-- A real ClamAV clean/detection/error exercise, maintained signature-update procedure and verification of scanner permissions/resource requirements. The code rejects an absent/unparseable, future-dated, or older-than-48-hours signature timestamp; actual detection and signature-update operations still require deployment evidence.
+- A real ClamAV clean/detection/error exercise, maintained signature-update procedure and verification of scanner permissions/resource requirements: the [acceptance list](#acceptance-list) above. The code rejects an absent/unparseable, future-dated, or older-than-48-hours signature timestamp; actual detection and signature-update operations still require deployment evidence.
 - Isolated worker permissions/network policy, supported patched tool versions, full-duration seller catalog timings, available disk capacity, queue failure alerting, restart behavior and crash recovery.
 - Seller approval of the audible tag mix and real browser/device preview playback, seeking and waveform behavior.
 - Storage-provider privacy/retention/restore evidence, real seller ZIP/stem export compatibility and recording association, and resumable uploads if required by the seller's actual source files.
