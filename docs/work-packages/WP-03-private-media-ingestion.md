@@ -1,6 +1,6 @@
 # [WP-03] Private media ingestion, quarantine and preview processing
 
-Status: **WAV/artwork implemented in PR #21; private stems archive increment merged in [PR #30](https://github.com/VASEYDEV/VASEYAUDIO/pull/30); broader work package remains open.** The implementation below is a bounded local-storage pipeline. This issue is complete only when the acceptance evidence and remaining production work below exist.
+Status: **WAV/artwork implemented in PR #21; private stems archive increment merged in [PR #30](https://github.com/VASEYDEV/VASEYAUDIO/pull/30); the production malware scanner fit is the current increment; broader work package remains open.** The implementation below is a bounded local-storage pipeline. This issue is complete only when the acceptance evidence and remaining production work below exist.
 
 - Suggested issue title: `[WP-03] Private media ingestion, quarantine and preview processing`
 - Phase: 1
@@ -49,7 +49,7 @@ Archive v2 fingerprints and enforces its duration ceiling. Explicit historical v
 
 ## Remaining work within WP-03
 
-- Real ClamAV installation, signature-update operations and known clean/detection/error acceptance evidence in the intended deployment.
+- Real ClamAV installation, signature-update operations and known clean/detection/error acceptance evidence in the intended deployment. The [production scanner guide](../media-processing.md#production-malware-scanner) gives the configuration, measurements from ClamAV 1.5.4 and the acceptance list; the deployed host still has to pass it.
 - Production media-worker isolation, denied network access, resource sizing, queue monitoring and crash/restore drills.
 - Accept the association increment with CI and independent review, then record real seller-export compatibility/alignment acceptance. Archive ingestion is a bounded increment, not complete stems commerce.
 - Resumable/multipart uploads and an explicitly configured private object-store adapter with retention and recovery evidence.
