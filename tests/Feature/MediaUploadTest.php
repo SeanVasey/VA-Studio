@@ -13,6 +13,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -106,6 +107,28 @@ class MediaUploadTest extends TestCase
         $this->assertSame('quarantined', $asset->status);
         $this->assertNull($asset->verified_by);
         $this->assertStringStartsWith('quarantine/', $asset->storage_path);
+    }
+
+    public function test_the_upload_field_neither_describes_nor_accepts_a_stored_path_placed_in_its_state(): void
+    {
+        $track = Track::create(['title' => 'Upload test', 'slug' => 'upload-test']);
+        // Private objects this administrator never uploaded: another operator's upload and a contract.
+        $stored = app(IngestMediaUpload::class)->handle($track, $this->artwork(), 'artwork', $this->operator());
+        $contract = 'contracts/test/'.Str::uuid().'/'.Str::uuid().'/original.pdf';
+        Storage::disk('local')->put($contract, '%PDF-1.4 test-only');
+        $files = Storage::disk('local')->allFiles();
+        $this->actingAs($this->operator());
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $component = Livewire::test(ManageMediaAssets::class)->mountAction('create')
+            ->fillForm(['track_id' => $track->id, 'role' => 'artwork'])
+            ->set('mountedActions.0.data.upload', ['forged' => $stored->storage_path, 'contract' => $contract]);
+
+        // The browser asks the field to describe its files; a path this form did not issue gets no name, size, type or link.
+        $component->call('callSchemaComponentMethod', 'mountedActionSchema0.upload', 'getUploadedFiles')
+            ->assertReturned(['forged' => null, 'contract' => null]);
+        $component->callMountedAction()->assertHasActionErrors(['upload']);
+        $this->assertSame([$stored->id], MediaAsset::pluck('id')->all());
+        $this->assertSame($files, Storage::disk('local')->allFiles());
     }
 
     public function test_intake_rejects_a_publicly_served_local_disk_before_copying(): void
