@@ -120,6 +120,7 @@ final class SiteImageInspection
         if ($handle === false) {
             throw new MediaFailure('invalid_image', 'The image is unavailable.');
         }
+        $size = fstat($handle)['size'] ?? -1;
         $transparent = false;
         $rotated = false;
         $oversized = false;
@@ -158,8 +159,10 @@ final class SiteImageInspection
                 $transparent = $transparent || (! $imageData && $type === 'tRNS');
                 fseek($handle, $length + 4, SEEK_CUR);
             }
-            // FFmpeg decodes a file that ends after its image data without IEND, and no chunk is left to hide an orientation.
-            if ($imageData) {
+            // FFmpeg decodes a file that ends at a chunk boundary after its image data without IEND, and no chunk is left to hide an
+            // orientation. Anything else ran off the file: a chunk cut short or claiming more than is there (the seek passed the
+            // end), or stray bytes too few for a chunk header. The prober and the sanitizer refuse those, so intake does too.
+            if ($imageData && $header === '' && ftell($handle) === $size) {
                 return ['transparent' => $transparent, 'rotated' => $rotated, 'oversized_metadata' => $oversized];
             }
 

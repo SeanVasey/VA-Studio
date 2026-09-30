@@ -302,6 +302,11 @@ class SiteImageLibraryTest extends TestCase
             'sideways PNG eXIf after the image data' => ['studio', F::png(1440, 630, 'rgb', [], [F::pngExif(6)]), $message('rotated_image')],
             'oversized PNG eXIf after the image data' => ['studio', F::png(1440, 630, 'rgb', [], [F::pngExif(6, 70 * 1024)]), $message('oversized_metadata')],
             'PNG cut inside an eXIf after the image data' => ['studio', substr(F::png(1440, 630, 'rgb', [], [F::pngExif(1)]), 0, -30), $message('invalid_image')],
+            // Without IEND, a file must end at a chunk boundary. One that runs off its end cannot be prepared, so no row is kept.
+            'PNG cut inside a chunk after the image data' => ['studio', substr(F::png(1440, 630, 'rgb', [], [F::pngChunk('tEXt', "Comment\0Synthetic trailing text")]), 0, -20), $message('invalid_image')],
+            'PNG with a chunk after the image data claiming 1 GiB' => ['studio', substr(F::png(1440, 630), 0, -12).pack('N', 1 << 30).'tEXtComment', $message('invalid_image')],
+            'PNG with stray bytes after the image data' => ['studio', substr(F::png(1440, 630), 0, -12)."\0\0\0\0\0", $message('invalid_image')],
+            'PNG cut inside its image data' => ['studio', substr(F::png(1440, 630), 0, -112), $message('invalid_image')],
             '16-bit PNG' => ['studio', F::png(1440, 630, 'rgb16'), $message('unsupported_depth')],
             '16-bit grey PNG' => ['studio', F::png(1440, 630, 'gray16'), $message('unsupported_depth')],
             'alpha PNG' => ['studio', F::png(1440, 630, 'rgba'), $message('transparent_image')],
@@ -328,9 +333,10 @@ class SiteImageLibraryTest extends TestCase
         // Within 3% of the slot's shape is accepted, and so is an upright eXIf chunk of the largest size that is still read.
         $this->assertSame('quarantined', $this->ingest('studio', F::jpeg(1480, 630))->fresh()->status);
         $this->assertSame('quarantined', $this->ingest('studio', F::png(1440, 630, 'rgb', [F::pngExif(1, SiteImageInspection::MAX_EXIF_BYTES)]))->fresh()->status);
-        // So are an upright eXIf chunk after the image data, and a file that ends after its image data without IEND, which FFmpeg decodes.
+        // So are an upright eXIf chunk after the image data, and a file that ends at a chunk boundary after its image data without
+        // IEND, which FFmpeg decodes and prepares.
         $this->assertSame('quarantined', $this->ingest('studio', F::png(1440, 630, 'rgb', [], [F::pngExif(1)]))->fresh()->status);
-        $this->assertSame('quarantined', $this->ingest('studio', substr(F::png(1440, 630), 0, -12))->fresh()->status);
+        $this->assertSame('ready', $this->process($this->ingest('studio', substr(F::png(1440, 630), 0, -12)))->status);
     }
 
     public function test_intake_requires_authorization_mfa_provenance_and_a_fresh_upload(): void
