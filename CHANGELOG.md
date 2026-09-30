@@ -26,6 +26,7 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Fixed
 
+- CI's browser job may run for 25 minutes instead of 15. Installing the browsers usually takes about 4.5 minutes, but took 14 on a slow runner, and the old limit cancelled the job 38 seconds into its tests (CI run 36740802516).
 - Public storefront and editorial pages answer a generic, uncacheable 503 when the published site content fails its integrity check. They used to redirect to the site root in a loop, or back to the referring site. Missing content rows fail the same way instead of answering 404. The outage is logged with its reason (at most once a minute while the cache works), and New content draft reports it with the recovery that applies instead of breaking.
 
 ### Security
