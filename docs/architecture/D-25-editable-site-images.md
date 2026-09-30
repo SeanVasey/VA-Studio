@@ -103,7 +103,7 @@ It is recomputed from the variant rows whenever an image is used or served. Only
 
 1. Claims the image under a 16-minute lease, longer than the 15-minute job timeout. Taking over an expired lease first records `site.image.retry_pending` with `processing_interrupted`, the interrupted attempt and the lease's end.
 2. Snapshots the upload and rechecks its hash, size and type.
-3. Scans it. Only ClamAV evidence is accepted outside tests, and only a completed scan is a verdict on the file: a detection (clamscan exit 1), runaway output, or anything but the exact clean line is `scan_not_clean`. A scanner error, crash or time-out, a missing tool, or a binary that is not ClamAV says nothing about the file, so the image waits.
+3. Scans it. Only ClamAV evidence is accepted outside tests, and only a completed scan is a verdict on the file: a detection (clamscan exit 1) or runaway output is `scan_not_clean`. A scanner error, crash or time-out, a missing tool, a binary that is not ClamAV, or an exit 0 without the exact clean line (for example with a warning of clamscan's own in the output) says nothing about the file, so the image waits. Without that exact line the image never becomes ready.
 4. Repeats the header checks on the scanned snapshot, then reads the decoded frame with bounded `ffprobe`. The pixel format and dimensions must match intake, and a JPEG must not carry a rotation. FFmpeg 6.1 does not read PNG eXIf, so for PNG the header check is the only orientation check. The accepted 8-bit formats include planar RGB (`gbrp`), which an RGB JPEG marked with Adobe transform 0 decodes to.
 5. Re-encodes it to a sanitized PNG and refuses palette transparency found there.
 6. Prepares and verifies every variant.
@@ -116,8 +116,8 @@ Problems with the environment return the image to Waiting for an audited retry; 
 
 | Kind | Codes | Result |
 | --- | --- | --- |
-| Temporary | `scanner_unavailable` (the scanner is missing, fails, crashes or is not ClamAV), `scanner_signatures_stale`, `tool_unavailable`, `processor_timeout` (including a scan that runs out of time), `storage_failed`, `unsafe_storage` (a served or public disk, or a storage directory that is a symbolic link), `missing_source`, `processing_interrupted` (an unexpected error, reported to the log, or a worker that stopped while holding its claim) | Back to Waiting. The job retries after 30 seconds and again after 2 minutes; after that, staff choose **Retry processing**. |
-| Permanent | `scan_not_clean` (a detection, or no confirmed clean result), `source_changed`, `invalid_image`, `invalid_artwork`, `rotated_image`, `oversized_metadata`, `transparent_image`, `unsupported_depth`, `unsupported_pixel_format`, `processor_failed`, `processor_output_limit`, `unsafe_path` (an unsafe key, or a symbolic link in place of the upload itself), `invalid_size` | Failed and kept. Staff export the image again and upload a new copy. |
+| Temporary | `scanner_unavailable` (the scanner is missing, fails, crashes, is not ClamAV, or exits 0 without the exact clean line), `scanner_signatures_stale`, `tool_unavailable`, `processor_timeout` (including a scan that runs out of time), `storage_failed`, `unsafe_storage` (a served or public disk, or a storage directory that is a symbolic link), `missing_source`, `processing_interrupted` (an unexpected error, reported to the log, or a worker that stopped while holding its claim) | Back to Waiting. The job retries after 30 seconds and again after 2 minutes; after that, staff choose **Retry processing**. |
+| Permanent | `scan_not_clean` (a detection or runaway output), `source_changed`, `invalid_image`, `invalid_artwork`, `rotated_image`, `oversized_metadata`, `transparent_image`, `unsupported_depth`, `unsupported_pixel_format`, `processor_failed`, `processor_output_limit`, `unsafe_path` (an unsafe key, or a symbolic link in place of the upload itself), `invalid_size` | Failed and kept. Staff export the image again and upload a new copy. |
 
 A worker that dies holding a claim leaves the image in Processing until its lease expires. After that, the list shows it as Interrupted with the `processing_interrupted` explanation, **Retry processing** is offered, and any worker may take it over. The takeover records the interrupted attempt as `site.image.retry_pending` before its own `site.image.processing`. Audit events: `site.image.uploaded`, `site.image.processing`, `site.image.processed`, `site.image.failed`, `site.image.retry_pending` and `site.image.retry_requested`.
 
@@ -147,7 +147,7 @@ It refreshes every 5 seconds. **Upload site image** asks for the slot (showing i
 ## Operations
 
 - A worker must consume the `media` queue, as for track media: `php artisan queue:work --queue=media --timeout=900 --tries=3 --sleep=1`. Without one, uploads stay Waiting.
-- Production needs ClamAV with current signatures ([Media operations](../media-processing.md)). Without it, images wait with `scanner_unavailable`; there is no bypass. A scanner error or time-out also leaves images waiting; only a detection or an unconfirmed result fails one.
+- Production needs ClamAV with current signatures ([Media operations](../media-processing.md)). Without it, images wait with `scanner_unavailable`; there is no bypass. A scanner error or time-out, or a scan without the exact clean line, also leaves images waiting; only a detection or runaway output fails one.
 - Back up `storage/app/private/site-images/` together with the database. The manifest and hashes pin the stored bytes, so restore both from the same point, or verification fails and the image is not served.
 - Temporary Livewire uploads follow the admin's existing private upload settings.
 
@@ -159,7 +159,7 @@ Required evidence:
 - per-slot sizes, formats and hashes;
 - metadata stripping, with byte-identical output from sources with and without metadata;
 - colour fidelity;
-- failure classification in the processor, in the prober itself, and in the scanner, driven by a scripted clamscan through a detection, an error, a crash, a time-out and a binary that is not ClamAV;
+- failure classification in the processor, in the prober itself, and in the scanner, driven by a scripted clamscan through a detection, runaway output, an exit 0 without the exact clean line (a warning ahead of it, another result, no output), an error, a crash, a time-out and a binary that is not ClamAV;
 - transient failure and retry, including a symbolically linked storage directory;
 - lease takeover, its audit and the Interrupted status, and lost-claim cleanup;
 - errors raised after the ready commit or after intake's commit, which keep every committed file;

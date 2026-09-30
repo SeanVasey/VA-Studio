@@ -500,7 +500,10 @@ class SiteImageLibraryTest extends TestCase
             'case "$mode" in',
             '  clean) echo "$path: OK" ;;',
             '  found) echo "$path: Eicar-Test-Signature FOUND"; exit 1 ;;',
+            '  flood) yes "$path: OK" | head -c 300000 ;;',
+            '  warning) echo "WARNING: Ignoring deprecated option --synthetic-option"; echo "$path: OK" ;;',
             '  unverified) echo "$path: Scanned" ;;',
+            '  silent) ;;',
             '  error) echo "$path: Can\'t open file or directory ERROR" >&2; exit 2 ;;',
             '  signal) kill -KILL $$ ;;',
             '  slow) exec sleep 3 ;;',
@@ -519,9 +522,13 @@ class SiteImageLibraryTest extends TestCase
         $timeout = config('media.process_timeout_seconds');
         $cases = [
             'clean' => ['ready', null],
-            // A detection, or an exit 0 without the exact clean line, is a verdict on this file.
-            'found' => ['failed', 'scan_not_clean'], 'unverified' => ['failed', 'scan_not_clean'],
-            // A scanner error, crash, impostor or timeout says nothing about the file.
+            // A detection (exit 1) or runaway output is a verdict on this file.
+            'found' => ['failed', 'scan_not_clean'], 'flood' => ['failed', 'scan_not_clean'],
+            // An exit 0 without the exact clean line is not: the scanner's own warning ahead of the clean line, an unknown result
+            // or no output at all waits for a retry, and never makes the image ready.
+            'warning' => ['quarantined', 'scanner_unavailable'], 'unverified' => ['quarantined', 'scanner_unavailable'],
+            'silent' => ['quarantined', 'scanner_unavailable'],
+            // Nor does a scanner error, crash, impostor or timeout say anything about the file.
             'error' => ['quarantined', 'scanner_unavailable'], 'signal' => ['quarantined', 'scanner_unavailable'],
             'impostor' => ['quarantined', 'scanner_unavailable'], 'slow' => ['quarantined', 'processor_timeout'],
         ];
