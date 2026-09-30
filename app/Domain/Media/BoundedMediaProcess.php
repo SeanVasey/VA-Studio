@@ -10,6 +10,9 @@ class BoundedMediaProcess
     /** How much standard error a caller that ignores it tolerates before the tool counts as runaway. */
     private const IGNORED_ERROR_OUTPUT_BYTES = 4 * 1024 * 1024;
 
+    /** How much of a tool's output is read for its first line, to say why it failed. */
+    private const FIRST_LINE_BYTES = 1024;
+
     // Limits of this runner's own, in place of the shared media.* ones; null keeps the shared value.
     private ?int $cpuSeconds = null;
 
@@ -35,7 +38,8 @@ class BoundedMediaProcess
     /**
      * Runs a media tool under the resource limiter and returns its standard output. Standard error counts toward the output
      * limit unless the caller's verdict rests on standard output and the exit status alone; its warnings then have their own,
-     * larger bound, so they cannot cut off a result that finished.
+     * larger bound, so they cannot cut off a result that finished. A failure carries the first line of each stream for the
+     * caller's log.
      */
     public function run(array $arguments, string $cwd, int $timeout = 0, bool $ignoreErrorOutput = false): string
     {
@@ -49,10 +53,14 @@ class BoundedMediaProcess
         $process = new Process($command, $cwd, ['TMPDIR' => $cwd, 'TZ' => 'UTC', 'OPENBLAS_NUM_THREADS' => '1', 'OMP_NUM_THREADS' => '1']);
         $process->setTimeout($timeout ?: $this->timeoutSeconds ?: (int) config('media.process_timeout_seconds'));
         $stdout = '';
+        $errorHead = '';
         $bytes = 0;
         $errorBytes = 0;
         try {
-            $process->run(function (string $type, string $buffer) use (&$stdout, &$bytes, &$errorBytes, $process, $ignoreErrorOutput) {
+            $process->run(function (string $type, string $buffer) use (&$stdout, &$errorHead, &$bytes, &$errorBytes, $process, $ignoreErrorOutput) {
+                if ($type === Process::ERR && strlen($errorHead) < self::FIRST_LINE_BYTES) {
+                    $errorHead .= substr($buffer, 0, self::FIRST_LINE_BYTES - strlen($errorHead));
+                }
                 if ($ignoreErrorOutput && $type === Process::ERR) {
                     $errorBytes += strlen($buffer);
                 } else {
@@ -60,19 +68,25 @@ class BoundedMediaProcess
                 }
                 if ($bytes > config('media.max_process_log_bytes') || $errorBytes > self::IGNORED_ERROR_OUTPUT_BYTES) {
                     $process->stop(0);
-                    throw new MediaFailure('processor_output_limit', 'Media processing exceeded its output limit.');
+                    throw new MediaFailure('processor_output_limit', 'Media processing exceeded its output limit.', null, self::firstLine($errorHead), self::firstLine($stdout));
                 }
                 if ($type === Process::OUT) {
                     $stdout .= $buffer;
                 }
             });
         } catch (ProcessTimedOutException) {
-            throw new MediaFailure('processor_timeout', 'Media processing exceeded its time limit.');
+            throw new MediaFailure('processor_timeout', 'Media processing exceeded its time limit.', null, self::firstLine($errorHead), self::firstLine($stdout));
         }
         if (! $process->isSuccessful()) {
-            throw new MediaFailure('processor_failed', 'Media processing or validation failed. Verify the file and installed tools before retrying.', $process->getExitCode());
+            throw new MediaFailure('processor_failed', 'Media processing or validation failed. Verify the file and installed tools before retrying.', $process->getExitCode(), self::firstLine($errorHead), self::firstLine($stdout));
         }
 
         return $stdout;
+    }
+
+    /** The first line of what a tool wrote to a stream, as far as it is kept; empty when it wrote none. */
+    public static function firstLine(string $output): string
+    {
+        return (string) strtok(substr($output, 0, self::FIRST_LINE_BYTES), "\r\n");
     }
 }
