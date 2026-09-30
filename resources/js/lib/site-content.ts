@@ -1,10 +1,26 @@
 export interface SiteContent {
-  schema_version: 1 | 2;
+  schema_version: 1 | 2 | 3;
   hero: { eyebrow: string; title: string; line_two: string; description: string };
   studio: { eyebrow: string; title: string; line_two: string; lead: string; paragraphs: string[] };
   footer: { description: string };
   navigation: { label: string; href: '/' | '/#catalog' | '/#licenses' | '/#studio' | '/about' | '/contact' | '/blog' | '/videos' }[];
   seo: { title: string; description: string };
+}
+
+/** One prepared size of a site image (D-25). */
+export interface SiteImageSource { url: string; width: number; height: number }
+/** Every prepared size of one image, smallest first; width and height are the largest JPEG's. */
+export interface SiteImageSet { width: number; height: number; jpeg: SiteImageSource[]; webp: SiteImageSource[] }
+/** Images a published release sets; null keeps the built-in image for that place. */
+export interface SiteImages {
+  hero: { alt: string; desktop: SiteImageSet; mobile: SiteImageSet } | null;
+  studio: (SiteImageSet & { alt: string }) | null;
+}
+
+export const builtInSiteImages: SiteImages = { hero: null, studio: null };
+
+export function imageSrcSet(sources: SiteImageSource[]): string {
+  return sources.map(source => `${source.url} ${source.width}w`).join(', ');
 }
 
 // Keep the isolated design preview aligned with SiteContentSchema::defaults().
