@@ -129,7 +129,7 @@ final class DaemonLimitCanary
             foreach ([self::PROBE_BYTES, self::BYTES] as $size) {
                 // Only the size counts: the file holds no data.
                 if (! @ftruncate($handle, $size)) {
-                    throw new MediaFailure('storage_failed', 'The scanner daemon check could not size its test file: the filesystem of the workspace does not take a file of 4 GiB.');
+                    throw new MediaFailure('storage_failed', 'The scanner daemon check could not size its test file: the filesystem of the workspace does not take a file of 4 GiB, or has no room for it.');
                 }
                 if (($this->allocated ?? self::allocation(...))($handle) > self::MAX_ALLOCATED_BYTES) {
                     throw new MediaFailure('storage_failed', 'The filesystem of the workspace does not keep holes in a file, so the scanner daemon check would write 4 GiB for every scan. Use a filesystem that does, such as ext4, XFS or btrfs.');
