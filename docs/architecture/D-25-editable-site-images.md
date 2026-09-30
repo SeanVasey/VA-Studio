@@ -1,0 +1,168 @@
+# D-25 — Editable site images
+
+Status: **Implemented WP-09 contract, part 1 of 2, within Sean's continuous-development authorization, 2026-09-30; acceptance is recorded against the final tested commit in the integrating PR and [issue #9](https://github.com/VASEYDEV/VASEYAUDIO/issues/9).** Sean chose the slots and approved the defaults below on 2026-09-30. This part adds the private image library. Image slots in site releases and public serving follow in the next PR, under the URL and lifetime rules fixed here. Nothing here configures a production scanner, queue worker or host (U-02), publishes an image or completes WP-09.
+
+## Context and choice
+
+The storefront's editable copy lives in site releases ([D-21](D-21-site-content-releases.md), [D-23](D-23-editorial-content.md)), but its imagery is fixed files in `public/images`:
+
+| Slot | Current file | Used in |
+| --- | --- | --- |
+| Home hero, desktop | `storefront-hero.jpg`, 2400 × 890 | the storefront hero `<picture>` |
+| Home hero, mobile | `storefront-hero-mobile.jpg`, 960 × 890 | the same `<picture>`, below 700 px |
+| Studio image | `video-studio.jpg`, 1440 × 630 | the storefront studio section |
+| Share image | the desktop hero | `og:image` and `twitter:image` |
+
+The track media pipeline cannot hold these images: `media_assets.track_id` is required, and intake, processing, verification and public serving all assume a published track.
+
+| Option | Assessment |
+| --- | --- |
+| Reuse `media_assets` with an optional track | Widens a guarded commerce table, its triggers and every track-bound check. |
+| Files committed to the repository or a public disk | No scan, provenance or staff workflow, and public before any release uses them. |
+| A separate site-image library, with slot-specific variants pinned by a manifest in site releases | Chosen: reuses the scanner, bounded FFmpeg runner and private storage, and keeps images private until a live release references them. |
+| Image fields throughout content | Deferred: blog and video thumbnails are out of scope. |
+
+## Approved defaults
+
+1. **Image lifetime.** Once a release that uses an image has been live, that image stays reachable at an unguessable, content-hashed URL cached for a year. Rolling back stops the site linking to it, but cannot recall copies that browsers, CDNs or social platforms saved. An audited withdrawal action can come later.
+2. **Size and shape.** Each slot has a fixed shape. An upload must match it within 3% and be at least as large as the largest size shown, so nothing is enlarged. Staff crop hero and studio images themselves; only the share image is trimmed automatically. The two hero images are set or cleared together (next PR).
+3. **Upload checks.** Transparency, CMYK, more than 8 bits per channel, rotation tags, formats other than JPEG and PNG, and files over 20 MiB are refused. Every file is scanned, re-encoded and stripped of metadata. The original upload is never served, not even to staff.
+4. **Provenance.** Every upload records a source or credit line and a confirmation that we hold the rights. Both are required and kept permanently with the uploader.
+5. **Hero contrast warning** in the editor (next PR).
+6. **Built-in images stay selectable.** A slot shows the built-in image until a release sets one; without a share image, the share image follows the hero in use (next PR).
+
+## Slots and prepared sizes
+
+| Slot | Shape | Accepted upload | Prepared files |
+| --- | --- | --- | --- |
+| `hero_desktop` | 2400 × 890, about 2.70:1 | at least 2400 px wide | JPEG and WebP, 1200, 1800 and 2400 px wide |
+| `hero_mobile` | 960 × 890, about 1.08:1 | at least 960 px wide | JPEG and WebP, 480, 720 and 960 px wide |
+| `studio` | 1440 × 630, about 2.29:1 | at least 1440 px wide | JPEG and WebP, 720, 1080 and 1440 px wide |
+| `share` | 1200 × 630, about 1.90:1 | at least 1200 × 630 | one JPEG, trimmed from the centre to exactly 1200 × 630 |
+
+Heights keep the upload's own shape: each height is the width times the upload's height divided by its width, rounded. Uploads are at most 6000 px on a side (`media.max_artwork_dimension`).
+
+Profile `site-image-v1` fixes the encoding. The upload is first re-encoded to a sanitized PNG by the track artwork step. Each output then drops all frame side data (which carries an ICC profile), scales with Lanczos and writes bitexact output with no encoder comment:
+
+- JPEG: `mjpeg`, `-q:v 3`, full-range 4:2:0 (`yuvj420p`);
+- WebP: `libwebp`, quality 80, compression level 4.
+
+The profile's fingerprint is recorded with each image, so a changed profile is visible in the evidence. There is no colour management: pixel values are kept and any colour profile is dropped, so staff should export sRGB.
+
+## Persistence contract
+
+Migration `2026_09_30_000027_site_images.php` adds two tables and changes no existing table, trigger or row.
+
+| `site_images` column | Contract |
+| --- | --- |
+| `slot` | One of the four slots. |
+| `original_name` | The client's file name: last path segment, control characters removed, at most 240 characters. Display only. |
+| `source_path`, `source_sha256`, `size_bytes`, `mime_type`, `width`, `height` | The quarantined upload under `site-images/quarantine/<uuid>/source.upload`, as measured at intake. |
+| `credit`, `rights_confirmed_at`, `uploaded_by` | Provenance: 1–200 characters of plain text, the confirmation time and the uploader. |
+| `status`, `attempts`, `claim_token`, `claimed_until`, `failure_code` | `quarantined` (shown as Waiting), `processing`, `ready` or `failed`; the processing lease and the last failure. |
+| `profile_version`, `profile_fingerprint`, `evidence`, `manifest_sha256`, `processed_at` | Set when processing ends. Evidence holds the scan result, decoded pixel format and tool versions. |
+
+`site_image_variants` holds each prepared file: format, width, height, private `storage_path` under `site-images/revisions/<uuid>/`, SHA-256 and size.
+
+SQLite and MySQL triggers forbid deleting either table's rows. A new image must be quarantined, with no processing fields, an allowed slot and type, a quarantine path and a non-blank credit. The identity and provenance columns never change. The only allowed moves are:
+
+- claim: from Waiting, or from Processing with a new token, adding one attempt and clearing the last failure;
+- return to Waiting with a failure code;
+- fail with a failure code and a processing time;
+- become ready with a manifest, profile and evidence, and exactly the slot's variant count (6, or 1 for the share image).
+
+Ready and failed rows are immutable. Variants can be added only while their image is processing, only under `site-images/revisions/`, and never change. `down()` refuses to drop populated tables. These guards back up the application boundary; they do not stop a privileged database administrator.
+
+## Manifest
+
+`manifest_sha256` is the canonical-JSON SHA-256 (the site-release canonicalization) of:
+
+```
+{ "profile": <profile fingerprint>, "slot": <slot>,
+  "variants": [ { "format", "width", "height", "sha256", "size_bytes" }, … sorted by format, then width ] }
+```
+
+It is recomputed from the variant rows whenever an image is used or served. The next PR's release references pin `{id, manifest}`, so a release can only show the exact bytes it was reviewed with.
+
+## Intake
+
+`App\Application\SiteBuilder\IngestSiteImage`:
+
+1. Checks `administer-catalog` and the admin MFA rule.
+2. Validates the slot, the credit (trimmed, 1–200 characters, no control characters or angle brackets) and the rights confirmation.
+3. Requires a freshly uploaded file. A path to an existing object is never accepted. The file must be 12 bytes to 20 MiB, not a symlink, a JPEG or PNG by content, readable by `getimagesize` with a matching type, and within 6000 px.
+4. Checks the slot's shape and minimum size.
+5. Checks the headers: JPEG component count, bit depth and EXIF orientation; PNG bit depth, alpha or transparency chunk, and eXIf orientation. A refused upload leaves nothing behind, while a failed row is kept for good, so problems visible in the headers are caught here.
+6. Stores the quarantined copy and verifies its size and hash. It then creates the row and the `site.image.uploaded` audit in one transaction and queues `ProcessSiteImage` on the `media` queue after commit.
+
+## Processing and failures
+
+`SiteImageProcessor`:
+
+1. Claims the image under a 16-minute lease, longer than the 15-minute job timeout.
+2. Snapshots the upload and rechecks its hash, size and type.
+3. Scans it: only ClamAV evidence is accepted outside tests.
+4. Repeats the header checks, then reads the decoded frame with bounded `ffprobe`: the orientation, pixel format and dimensions must match intake.
+5. Re-encodes it to a sanitized PNG and refuses palette transparency found there.
+6. Prepares and verifies every variant.
+7. Promotes the variants to private storage.
+8. In one locked transaction checks that its claim is still held, inserts the variants, records the manifest and marks the image ready.
+
+It never throws for a processing outcome, so an upload handled by a synchronous queue still completes. A run that lost its claim writes nothing and removes the files it promoted.
+
+| Kind | Codes | Result |
+| --- | --- | --- |
+| Temporary | `scanner_unavailable`, `scanner_signatures_stale`, `tool_unavailable`, `processor_timeout`, `storage_failed`, `unsafe_storage`, `missing_source`, `processing_interrupted` (an unexpected error, reported to the log) | Back to Waiting. The job retries after 30 seconds and again after 2 minutes; after that, staff choose **Retry processing**. |
+| Permanent | `scan_not_clean`, `source_changed`, `invalid_image`, `invalid_artwork`, `rotated_image`, `transparent_image`, `unsupported_depth`, `unsupported_pixel_format`, `processor_failed`, `processor_output_limit`, `unsafe_path`, `invalid_size` | Failed and kept. Staff export the image again and upload a new copy. |
+
+A worker that dies holding a claim leaves the image in Processing until its lease expires. After that, **Retry processing** is offered and any worker may take it over. Audit events: `site.image.uploaded`, `site.image.processing`, `site.image.processed`, `site.image.failed`, `site.image.retry_pending` and `site.image.retry_requested`.
+
+## Staff interface
+
+**Publishing → Site images** lists every upload:
+
+- preview thumbnail and id;
+- slot;
+- status (Waiting, Processing, Ready or Failed);
+- size, file name and credit;
+- a plain-language problem;
+- uploader and upload time (UTC).
+
+It refreshes every 5 seconds. **Upload site image** asks for the slot (showing its size requirement), the file, the credit and the rights confirmation. **Retry processing** appears only for waiting images and expired claims. There is no edit or delete. The page and every Livewire request recheck the role and MFA.
+
+`GET /admin/site-images/{variant}/preview` requires the panel's authentication and MFA middleware and `administer-catalog`, and is throttled to 240 requests a minute. It serves a variant only when its image is ready and its manifest matches, hashing the file's bytes on every request and sending exactly the bytes it hashed. Every response, including authentication failures and 404s, is `no-store, private`, `nosniff`, `noindex, nofollow` and `no-referrer`.
+
+## Public serving: fixed for the next PR
+
+- URL: `/site-images/{variant sha256}.{jpg|webp}`.
+- Served only when the variant belongs to an image referenced by a release that has been live (publication history joined with an insert-only release image index), with `public, max-age=31536000, immutable` and `nosniff`.
+- Anything else, missing or never live, gets the same 404 with `no-store`.
+- Bytes are rechecked on every serve; the route ignores the session and is throttled.
+- A damaged variant fails only that image: the page renders its alt text and never swaps in the built-in file.
+
+## Operations
+
+- A worker must consume the `media` queue, as for track media: `php artisan queue:work --queue=media --timeout=900 --tries=3 --sleep=1`. Without one, uploads stay Waiting.
+- Production needs ClamAV with current signatures ([Media operations](../media-processing.md)). Without it, images wait with `scanner_unavailable`; there is no bypass.
+- Back up `storage/app/private/site-images/` together with the database. The manifest and hashes pin the stored bytes, so restore both from the same point, or verification fails and the image is not served.
+- Temporary Livewire uploads follow the admin's existing private upload settings.
+
+## Verification and remaining scope
+
+Required evidence:
+
+- intake rules, header problems and authorization, including MFA;
+- per-slot sizes, formats and hashes;
+- metadata stripping, with byte-identical output from sources with and without metadata;
+- colour fidelity;
+- failure classification in the processor and in the prober itself;
+- transient failure and retry;
+- lease takeover and lost-claim cleanup;
+- database guards on both engines;
+- the page, upload and retry actions, escaping and preview headers, including tampered, missing and symlinked files;
+- an independent-process MySQL race between two processors in both lock orders, and over an expired claim;
+- a Chromium and WebKit upload in the real admin. The isolated harness has no scanner, so the upload ends Waiting.
+
+The PHP suite uses the testing-only scanner double, so it proves the handling of scanner results, not real malware detection. Test definitions do not establish these results; the integrating PR records the executed commands and CI.
+
+Next: image slots in site releases (schema v3, the release image index, public URLs and rendering), as one PR. Blog and video thumbnails, responsive track artwork (FP-045), image withdrawal, a CDN, and the logo, theme and fonts are out of scope.
