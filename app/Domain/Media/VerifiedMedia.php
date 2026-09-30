@@ -26,8 +26,7 @@ class VerifiedMedia
                 return null;
             }
             $scan = $run->evidence['source_scan'] ?? [];
-            $engine = $scan['engine'] ?? null;
-            if (($scan['status'] ?? null) !== 'clean' || ! hash_equals($run->input_sha256, $scan['sha256'] ?? '') || ! ($engine === 'clamav' || ($engine === 'test-only' && ($historical || app()->environment('testing'))))) {
+            if (($scan['status'] ?? null) !== 'clean' || ! hash_equals($run->input_sha256, $scan['sha256'] ?? '') || ! ScanEngines::accepted($scan['engine'] ?? null, $historical)) {
                 return null;
             }
             $expectedRoles = match ($source->role) {
@@ -50,7 +49,7 @@ class VerifiedMedia
             }
             if ($source->role === 'master_wav') {
                 $tagScan = $run->evidence['tag_scan'] ?? [];
-                if (($tagScan['status'] ?? null) !== 'clean' || ! hash_equals($run->profile['tag_sha256'] ?? '', $tagScan['sha256'] ?? '') || ! (($tagScan['engine'] ?? null) === 'clamav' || (($tagScan['engine'] ?? null) === 'test-only' && ($historical || app()->environment('testing'))))) {
+                if (($tagScan['status'] ?? null) !== 'clean' || ! hash_equals($run->profile['tag_sha256'] ?? '', $tagScan['sha256'] ?? '') || ! ScanEngines::accepted($tagScan['engine'] ?? null, $historical)) {
                     return null;
                 }
             }

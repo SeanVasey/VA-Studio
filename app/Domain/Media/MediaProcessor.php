@@ -140,9 +140,7 @@ class MediaProcessor
     private function scan(string $path): array
     {
         $result = app(MalwareScanner::class)->scan($path);
-        $engine = $result['engine'] ?? null;
-        $allowed = $engine === 'clamav' || ($engine === 'test-only' && app()->environment('testing'));
-        if (! $allowed || ($result['status'] ?? null) !== 'clean' || ! hash_equals(hash_file('sha256', $path), $result['sha256'] ?? '')) {
+        if (! ScanEngines::accepted($result['engine'] ?? null) || ($result['status'] ?? null) !== 'clean' || ! hash_equals(hash_file('sha256', $path), $result['sha256'] ?? '')) {
             throw new MediaFailure('scan_not_clean', 'The scanner did not return clean evidence for these exact bytes.');
         }
 

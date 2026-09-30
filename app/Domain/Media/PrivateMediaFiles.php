@@ -107,7 +107,17 @@ class PrivateMediaFiles
 
     public function promote(string $source, string $directory, string $name): string
     {
-        $relative = 'media/revisions/'.$directory.'/'.$name;
+        return $this->promoteUnder('media/revisions', $source, $directory, $name);
+    }
+
+    /** Copies a verified output into one of the fixed immutable revision roots; no other location can be written this way. */
+    public function promoteUnder(string $revisions, string $source, string $directory, string $name): string
+    {
+        if (! in_array($revisions, ['media/revisions', 'site-images/revisions'], true)
+            || ! preg_match('~\A[a-zA-Z0-9-]+\z~D', $directory) || ! preg_match('~\A[a-zA-Z0-9][a-zA-Z0-9_-]*\.[a-z0-9]+\z~D', $name)) {
+            throw new MediaFailure('unsafe_path', 'Revisions are written only under a fixed root with a safe name.');
+        }
+        $relative = $revisions.'/'.$directory.'/'.$name;
         $root = $this->root();
         $current = $root;
         foreach (explode('/', dirname($relative)) as $component) {
