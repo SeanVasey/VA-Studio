@@ -149,6 +149,7 @@ It refreshes every 5 seconds. **Upload site image** asks for the slot (showing i
 - A worker must consume the `media` queue, as for track media: `php artisan queue:work --queue=media --timeout=900 --tries=3 --sleep=1`. Without one, uploads stay Waiting.
 - Production needs ClamAV with current signatures ([Media operations](../media-processing.md)). Without it, images wait with `scanner_unavailable`; there is no bypass. A scanner error or time-out, output past the limit, or a scan without the exact clean line also leaves images waiting; only a detection fails one.
 - Back up `storage/app/private/site-images/` together with the database. The manifest and hashes pin the stored bytes, so restore both from the same point, or verification fails and the image is not served.
+- A commit that reports an error can leave files that no row names, as can a process killed before its cleanup: the prepared files of an image that never became ready under `site-images/revisions/<uuid>/`, or an intake upload under `site-images/quarantine/<uuid>/`. They are private and unreferenced. Remove such a directory only after confirming that no `site_image_variants.storage_path` row, or `site_images.source_path` row for quarantine, names anything in it. Nothing sweeps them automatically.
 - Temporary Livewire uploads follow the admin's existing private upload settings.
 
 ## Verification and remaining scope
