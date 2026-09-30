@@ -6,6 +6,8 @@ Bespoke web store development replacing older, service-based e-commerce offering
 
 ## Start here
 
+Recovery checkpoint, September 30: [PR #84](https://github.com/VASEYDEV/VASEYAUDIO/pull/84) preserves Claude's scanner increment and adds the shared worker budget and mobile browser-test correction. The [ordered record](docs/development-order.md#claude-run-recovery--september-30) distinguishes the verified baseline from the candidate's pending CI. PR #85's older stack is superseded by the already accepted row menu and site images.
+
 - [Editorial and contact content](docs/editorial-content.md): accepted about/contact/blog/video pages in one immutable release, private pinned previews and safe mail/provider links; editable site images are accepted under [D-25](docs/architecture/D-25-editable-site-images.md).
 - [Site content and releases](docs/site-content-releases.md): accepted private text drafts, exact previews, audited publication and previous-release rollback, plus [scheduled publication](docs/site-content-releases.md#scheduled-publication) and [site images](docs/site-content-releases.md#site-images) in a private library and in releases; remaining WP-09 scope.
 - [Promotion administration](docs/promotion-pricing.md#seller-administration--september-29-2026): disabled creation, reviewed enable/disable and aggregate usage over immutable test campaign terms; accepted in PR #73 with all required CI and independent review.

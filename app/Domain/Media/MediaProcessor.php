@@ -37,6 +37,8 @@ class MediaProcessor
         $files = app(PrivateMediaFiles::class);
         $workspace = null;
         $promoted = [];
+        $budget = app(MediaWorkflowBudget::class);
+        $previousDeadline = $budget->enter();
         try {
             $source = $run->source()->firstOrFail();
             if ($source->disk !== 'local' || ! str_starts_with($source->storage_path, 'quarantine/') || ! in_array($source->role, ['master_wav', 'artwork', 'stems_zip'], true) || $source->processing_run_id) {
@@ -73,6 +75,7 @@ class MediaProcessor
             $runner = app(BoundedMediaProcess::class);
             $evidence['ffmpeg_version'] = strtok($runner->run([config('media.ffmpeg'), '-version'], $workspace, self::VERSION_CALL_SECONDS), "\n");
             $evidence['ffprobe_version'] = strtok($runner->run([config('media.ffprobe'), '-version'], $workspace, self::VERSION_CALL_SECONDS), "\n");
+            $budget->assertRemaining();
             $directory = (string) Str::uuid();
             $records = [];
             foreach ($outputs as $output) {
@@ -81,7 +84,7 @@ class MediaProcessor
                 $path = $files->resolve($relative);
                 $records[] = ['track_id' => $source->track_id, 'parent_asset_id' => $source->id, 'processing_run_id' => $run->id, 'role' => $output['role'], 'disk' => 'local', 'storage_path' => $relative, 'original_name' => $output['name'], 'mime_type' => $output['mime_type'], 'size_bytes' => filesize($path), 'sha256' => hash_file('sha256', $path), 'technical_metadata' => $output['technical_metadata'], 'status' => 'ready', 'verified_by' => $run->requested_by, 'verified_at' => now()];
             }
-            $result = DB::transaction(function () use ($run, $source, $token, $records, $evidence) {
+            $result = DB::transaction(function () use ($run, $source, $token, $records, $evidence, $budget) {
                 // Match queue lock ordering: source before run.
                 $lockedSource = MediaAsset::query()->lockForUpdate()->findOrFail($source->id);
                 $track = Track::query()->lockForUpdate()->findOrFail($source->track_id);
@@ -93,6 +96,7 @@ class MediaProcessor
                     throw new MediaFailure('claim_lost', 'This media attempt no longer owns the processing claim.');
                 }
                 $ids = [];
+                $budget->assertRemaining();
                 foreach ($records as $record) {
                     $asset = MediaAsset::create($record);
                     $ids[] = $asset->id;
@@ -131,6 +135,7 @@ class MediaProcessor
             });
             throw $failure;
         } finally {
+            $budget->leave($previousDeadline);
             foreach ($promoted as $relative) {
                 // Only this unsuccessful attempt's unreferenced random objects.
                 if (! MediaAsset::query()->where('storage_path', $relative)->exists()) {

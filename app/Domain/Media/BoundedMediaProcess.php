@@ -58,6 +58,7 @@ class BoundedMediaProcess
     public function run(array $arguments, string $cwd, int $timeout = 0, bool $ignoreErrorOutput = false): string
     {
         $this->lastErrorLine = '';
+        $timeout = app(MediaWorkflowBudget::class)->limit($timeout ?: (int) config('media.process_timeout_seconds'));
         $limiter = config('media.prlimit');
         if (! is_string($limiter) || ! is_executable($limiter) || ! is_executable($arguments[0])) {
             throw new MediaFailure('tool_unavailable', 'A required media processor or resource limiter is unavailable.');
@@ -66,7 +67,7 @@ class BoundedMediaProcess
         // A tool prints a local time in the zone of its process (clamscan --version does), and callers read it as UTC, so the worker's
         // own zone, from its host or its container, must not reach the tool.
         $process = new Process($command, $cwd, ['TMPDIR' => $cwd, 'TZ' => 'UTC', 'OPENBLAS_NUM_THREADS' => '1', 'OMP_NUM_THREADS' => '1']);
-        $process->setTimeout($timeout ?: (int) config('media.process_timeout_seconds'));
+        $process->setTimeout($timeout);
         $stdout = '';
         $errorHead = '';
         $bytes = 0;

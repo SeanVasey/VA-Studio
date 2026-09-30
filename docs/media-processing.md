@@ -92,6 +92,12 @@ The admin's temporary uploads use authenticated, authorized private storage, wit
 
 ## Production malware scanner
 
+### Whole-attempt subprocess budget
+
+Every track-media and site-image processing attempt starts one scoped, monotonic 840-second budget before copying its private snapshot. All `BoundedMediaProcess` instances, including scanner runners cloned with larger resource limits, cap each call at the smaller of its own limit and the whole seconds left in that budget. A call cannot start with less than one second left. Promotion checks the budget again, including after acquiring its database lock. Budget expiry uses the existing `processor_timeout` failure: track media retains its original source and records a failed attempt; site images remain quarantined and retryable. Both processors restore any enclosing budget in `finally`, including after failures, so a long-running queue worker does not carry an expired budget into its next job. Site-image tool-version calls now use the same 15-second limit as track media.
+
+The queue timeout stays 900 seconds, the claim lease stays 960 seconds, and retry-after stays 1200 seconds. The 60-second margin is for file/database work and cleanup; those operations are checked at boundaries, not individually interrupted by this budget. Production filesystem latency and worker isolation still require deployed-host acceptance. Existing per-scan (300-second) and stems-stage (360-second) limits also apply; neither can extend the whole-attempt deadline.
+
 Run `clamd` on the media worker's host and set `MEDIA_CLAMSCAN=/usr/bin/clamdscan`. Per-call `clamscan`, the default, works but is slow; it is the fallback. The figures below were measured with ClamAV 1.5.4 (Ubuntu 24.04 packages, official signatures) on a 4-vCPU, 16 GiB virtual machine without systemd, with other jobs running. They size a deployment and give it a checklist; they are not acceptance evidence for your host.
 
 | | `clamdscan --fdpass` with `clamd` | `clamscan` per call |

@@ -7,6 +7,7 @@ use App\Domain\Media\ArtworkDerivative;
 use App\Domain\Media\BoundedMediaProcess;
 use App\Domain\Media\MalwareScanner;
 use App\Domain\Media\MediaFailure;
+use App\Domain\Media\MediaWorkflowBudget;
 use App\Domain\Media\PrivateMediaFiles;
 use App\Domain\Media\ScanEngines;
 use App\Domain\SiteBuilder\Models\SiteImage;
@@ -40,6 +41,8 @@ final class SiteImageProcessor
         $promoted = [];
         // Set by the ready transaction's last statement, once only its commit remains.
         $committing = false;
+        $budget = app(MediaWorkflowBudget::class);
+        $previousDeadline = $budget->enter();
         try {
             $workspace = $files->workspace();
             $input = $workspace.'/source';
@@ -67,9 +70,10 @@ final class SiteImageProcessor
             $runner = app(BoundedMediaProcess::class);
             $evidence = [
                 'source_scan' => $scan, 'pixel_format' => $probe['pix_fmt'],
-                'ffmpeg_version' => strtok($runner->run([config('media.ffmpeg'), '-version'], $workspace), "\n"),
-                'ffprobe_version' => strtok($runner->run([config('media.ffprobe'), '-version'], $workspace), "\n"),
+                'ffmpeg_version' => strtok($runner->run([config('media.ffmpeg'), '-version'], $workspace, 15), "\n"),
+                'ffprobe_version' => strtok($runner->run([config('media.ffprobe'), '-version'], $workspace, 15), "\n"),
             ];
+            $budget->assertRemaining();
             $directory = (string) Str::uuid();
             $variants = [];
             foreach ($outputs as $output) {
@@ -79,6 +83,8 @@ final class SiteImageProcessor
                 $variants[] = ['format' => $output['format'], 'width' => $output['width'], 'height' => $output['height'],
                     'storage_path' => $relative, 'sha256' => hash_file('sha256', $path), 'size_bytes' => filesize($path)];
             }
+
+            $budget->assertRemaining();
 
             return $this->complete($imageId, $token, $variants, $evidence, $committing);
         } catch (MediaFailure $failure) {
@@ -94,6 +100,7 @@ final class SiteImageProcessor
 
             return SiteImage::findOrFail($imageId);
         } finally {
+            $budget->leave($previousDeadline);
             // Before the ready commit, no row references these files: the transaction never started, or an error inside it (a lost
             // claim, a refused insert or transition) rolled it back. A commit can report an error after the server applied it (a
             // dropped connection, a listener), and a lookup from a reconnected session can run before the server has finished
@@ -152,6 +159,7 @@ final class SiteImageProcessor
             if ($image->status !== 'processing' || $image->claim_token !== $token) {
                 throw new MediaFailure('claim_lost', 'Another worker took over this image.');
             }
+            app(MediaWorkflowBudget::class)->assertRemaining();
             $now = now();
             foreach ($variants as $variant) {
                 SiteImageVariant::create($variant + ['site_image_id' => $image->id, 'created_at' => $now]);
