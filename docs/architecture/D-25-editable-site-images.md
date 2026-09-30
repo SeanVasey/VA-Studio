@@ -47,7 +47,7 @@ Profile `site-image-v1` fixes the encoding. The upload is first re-encoded to a 
 - JPEG: `mjpeg`, `-q:v 3`, full-range 4:2:0 (`yuvj420p`);
 - WebP: `libwebp`, quality 80, compression level 4.
 
-The profile's fingerprint is recorded with each image, so a changed profile is visible in the evidence. There is no colour management: pixel values are kept and any colour profile is dropped, so staff should export sRGB.
+The profile's fingerprint is recorded with each image, so a changed profile is visible in the evidence. The encoder arguments are built from the same recorded settings, so the fingerprint always describes the bytes produced. There is no colour management: pixel values are kept and any colour profile is dropped, so staff should export sRGB.
 
 ## Persistence contract
 
@@ -64,7 +64,7 @@ Migration `2026_09_30_000027_site_images.php` adds two tables and changes no exi
 
 `site_image_variants` holds each prepared file: format, width, height, private `storage_path` under `site-images/revisions/<uuid>/`, SHA-256 and size.
 
-SQLite and MySQL triggers forbid deleting either table's rows. A new image must be quarantined, with no processing fields, an allowed slot and type, a quarantine path and a non-blank credit. The identity and provenance columns never change. The only allowed moves are:
+SQLite and MySQL triggers forbid deleting either table's rows. A new image must be quarantined, with no processing fields, an allowed slot and type, a quarantine path and a non-blank credit. The identity and provenance columns never change. On MySQL the triggers compare text byte for byte, as SQLite does. A change of case, accents or trailing spaces, which MySQL's default collation ignores, therefore counts as a change, and `Studio` is not a slot. The only allowed moves are:
 
 - claim: from Waiting, or from Processing with a new token, adding one attempt and clearing the last failure;
 - return to Waiting with a failure code;
@@ -72,6 +72,8 @@ SQLite and MySQL triggers forbid deleting either table's rows. A new image must 
 - become ready with a manifest, profile and evidence, and exactly the slot's variant count (6, or 1 for the share image).
 
 Ready and failed rows are immutable. Variants can be added only while their image is processing, only under `site-images/revisions/`, and never change. `down()` refuses to drop populated tables. These guards back up the application boundary; they do not stop a privileged database administrator.
+
+The ready trigger hard-codes today's variant counts. A profile that changes a slot's sizes therefore needs a new profile version and a new migration that replaces the trigger. Images that are already ready keep the variant set their manifest pins; verification does not compare it with the slot's current sizes.
 
 ## Manifest
 
@@ -82,7 +84,7 @@ Ready and failed rows are immutable. Variants can be added only while their imag
   "variants": [ { "format", "width", "height", "sha256", "size_bytes" }, … sorted by format, then width ] }
 ```
 
-It is recomputed from the variant rows whenever an image is used or served. The next PR's release references pin `{id, manifest}`, so a release can only show the exact bytes it was reviewed with.
+It is recomputed from the variant rows whenever an image is used or served. Only those rows count, so a later profile leaves existing ready images valid. The next PR's release references pin `{id, manifest}`, so a release can only show the exact bytes it was reviewed with.
 
 ## Intake
 
@@ -92,30 +94,32 @@ It is recomputed from the variant rows whenever an image is used or served. The 
 2. Validates the slot, the credit (trimmed, 1–200 characters, no control characters or angle brackets) and the rights confirmation.
 3. Requires a freshly uploaded file. A path to an existing object is never accepted. The file must be 12 bytes to 20 MiB, not a symlink, a JPEG or PNG by content, readable by `getimagesize` with a matching type, and within 6000 px.
 4. Checks the slot's shape and minimum size.
-5. Checks the headers: JPEG component count, bit depth and EXIF orientation; PNG bit depth, alpha or transparency chunk, and eXIf orientation. A refused upload leaves nothing behind, while a failed row is kept for good, so problems visible in the headers are caught here.
-6. Stores the quarantined copy and verifies its size and hash. It then creates the row and the `site.image.uploaded` audit in one transaction and queues `ProcessSiteImage` on the `media` queue after commit.
+5. Checks the headers: JPEG component count, bit depth and the orientation in every EXIF block; PNG bit depth, alpha or transparency chunk, and the orientation in every eXIf chunk. Readers disagree about which of several blocks counts (FFmpeg keeps the last), so any block that rotates or flips the image refuses it. The JPEG reader skips stray bytes before a marker, as libjpeg does. A PNG eXIf chunk over 64 KiB cannot be checked, and FFmpeg does not read PNG eXIf at all, so it is refused as `oversized_metadata`. A refused upload leaves nothing behind, while a failed row is kept for good, so problems visible in the headers are caught here.
+6. Stores the quarantined copy and verifies its size and hash. It then creates the row and the `site.image.uploaded` audit in one transaction. After the commit it queues `ProcessSiteImage` on the `media` queue. If the queue is unavailable, the error is reported, the upload is kept, and the image stays Waiting for **Retry processing**.
 
 ## Processing and failures
 
 `SiteImageProcessor`:
 
-1. Claims the image under a 16-minute lease, longer than the 15-minute job timeout.
+1. Claims the image under a 16-minute lease, longer than the 15-minute job timeout. Taking over an expired lease first records `site.image.retry_pending` with `processing_interrupted`, the interrupted attempt and the lease's end.
 2. Snapshots the upload and rechecks its hash, size and type.
-3. Scans it: only ClamAV evidence is accepted outside tests.
-4. Repeats the header checks, then reads the decoded frame with bounded `ffprobe`: the orientation, pixel format and dimensions must match intake.
+3. Scans it. Only ClamAV evidence is accepted outside tests, and only a completed scan is a verdict on the file: a detection (clamscan exit 1), runaway output, or anything but the exact clean line is `scan_not_clean`. A scanner error, crash or time-out, a missing tool, or a binary that is not ClamAV says nothing about the file, so the image waits.
+4. Repeats the header checks on the scanned snapshot, then reads the decoded frame with bounded `ffprobe`. The pixel format and dimensions must match intake, and a JPEG must not carry a rotation. FFmpeg 6.1 does not read PNG eXIf, so for PNG the header check is the only orientation check. The accepted 8-bit formats include planar RGB (`gbrp`), which an RGB JPEG marked with Adobe transform 0 decodes to.
 5. Re-encodes it to a sanitized PNG and refuses palette transparency found there.
 6. Prepares and verifies every variant.
 7. Promotes the variants to private storage.
 8. In one locked transaction checks that its claim is still held, inserts the variants, records the manifest and marks the image ready.
 
-It never throws for a processing outcome, so an upload handled by a synchronous queue still completes. A run that lost its claim writes nothing and removes the files it promoted.
+It never throws for a processing outcome, so an upload handled by a synchronous queue still completes. A run that lost its claim writes nothing and removes the files it promoted. Cleanup removes only promoted files that no variant row references, so an error raised after the ready commit cannot remove a ready image's files. If that check itself fails, the files are left as orphans and the error is reported.
+
+Problems with the environment return the image to Waiting for an audited retry; problems with the file fail it for good.
 
 | Kind | Codes | Result |
 | --- | --- | --- |
-| Temporary | `scanner_unavailable`, `scanner_signatures_stale`, `tool_unavailable`, `processor_timeout`, `storage_failed`, `unsafe_storage`, `missing_source`, `processing_interrupted` (an unexpected error, reported to the log) | Back to Waiting. The job retries after 30 seconds and again after 2 minutes; after that, staff choose **Retry processing**. |
-| Permanent | `scan_not_clean`, `source_changed`, `invalid_image`, `invalid_artwork`, `rotated_image`, `transparent_image`, `unsupported_depth`, `unsupported_pixel_format`, `processor_failed`, `processor_output_limit`, `unsafe_path`, `invalid_size` | Failed and kept. Staff export the image again and upload a new copy. |
+| Temporary | `scanner_unavailable` (the scanner is missing, fails, crashes or is not ClamAV), `scanner_signatures_stale`, `tool_unavailable`, `processor_timeout` (including a scan that runs out of time), `storage_failed`, `unsafe_storage` (a served or public disk, or a storage directory that is a symbolic link), `missing_source`, `processing_interrupted` (an unexpected error, reported to the log, or a worker that stopped while holding its claim) | Back to Waiting. The job retries after 30 seconds and again after 2 minutes; after that, staff choose **Retry processing**. |
+| Permanent | `scan_not_clean` (a detection, or no confirmed clean result), `source_changed`, `invalid_image`, `invalid_artwork`, `rotated_image`, `oversized_metadata`, `transparent_image`, `unsupported_depth`, `unsupported_pixel_format`, `processor_failed`, `processor_output_limit`, `unsafe_path` (an unsafe key, or a symbolic link in place of the upload itself), `invalid_size` | Failed and kept. Staff export the image again and upload a new copy. |
 
-A worker that dies holding a claim leaves the image in Processing until its lease expires. After that, **Retry processing** is offered and any worker may take it over. Audit events: `site.image.uploaded`, `site.image.processing`, `site.image.processed`, `site.image.failed`, `site.image.retry_pending` and `site.image.retry_requested`.
+A worker that dies holding a claim leaves the image in Processing until its lease expires. After that, the list shows it as Interrupted with the `processing_interrupted` explanation, **Retry processing** is offered, and any worker may take it over. The takeover records the interrupted attempt as `site.image.retry_pending` before its own `site.image.processing`. Audit events: `site.image.uploaded`, `site.image.processing`, `site.image.processed`, `site.image.failed`, `site.image.retry_pending` and `site.image.retry_requested`.
 
 ## Staff interface
 
@@ -123,7 +127,7 @@ A worker that dies holding a claim leaves the image in Processing until its leas
 
 - preview thumbnail and id;
 - slot;
-- status (Waiting, Processing, Ready or Failed);
+- status (Waiting, Processing, Interrupted, Ready or Failed) and the number of attempts;
 - size, file name and credit;
 - a plain-language problem;
 - uploader and upload time (UTC).
@@ -143,7 +147,7 @@ It refreshes every 5 seconds. **Upload site image** asks for the slot (showing i
 ## Operations
 
 - A worker must consume the `media` queue, as for track media: `php artisan queue:work --queue=media --timeout=900 --tries=3 --sleep=1`. Without one, uploads stay Waiting.
-- Production needs ClamAV with current signatures ([Media operations](../media-processing.md)). Without it, images wait with `scanner_unavailable`; there is no bypass.
+- Production needs ClamAV with current signatures ([Media operations](../media-processing.md)). Without it, images wait with `scanner_unavailable`; there is no bypass. A scanner error or time-out also leaves images waiting; only a detection or an unconfirmed result fails one.
 - Back up `storage/app/private/site-images/` together with the database. The manifest and hashes pin the stored bytes, so restore both from the same point, or verification fails and the image is not served.
 - Temporary Livewire uploads follow the admin's existing private upload settings.
 
@@ -155,14 +159,15 @@ Required evidence:
 - per-slot sizes, formats and hashes;
 - metadata stripping, with byte-identical output from sources with and without metadata;
 - colour fidelity;
-- failure classification in the processor and in the prober itself;
-- transient failure and retry;
-- lease takeover and lost-claim cleanup;
-- database guards on both engines;
+- failure classification in the processor, in the prober itself, and in the scanner, driven by a scripted clamscan through a detection, an error, a crash, a time-out and a binary that is not ClamAV;
+- transient failure and retry, including a symbolically linked storage directory;
+- lease takeover, its audit and the Interrupted status, and lost-claim cleanup;
+- errors raised after the ready commit or after intake's commit, which keep every committed file;
+- database guards on both engines, including byte-exact text on MySQL, and rollback of empty tables;
 - the page, upload and retry actions, escaping and preview headers, including tampered, missing and symlinked files;
 - an independent-process MySQL race between two processors in both lock orders, and over an expired claim;
 - a Chromium and WebKit upload in the real admin. The isolated harness has no scanner, so the upload ends Waiting.
 
-The PHP suite uses the testing-only scanner double, so it proves the handling of scanner results, not real malware detection. Test definitions do not establish these results; the integrating PR records the executed commands and CI.
+The PHP suite uses the testing-only scanner double or a scripted clamscan, so it proves the handling of scanner results, not real malware detection. Test definitions do not establish these results; the integrating PR records the executed commands and CI.
 
 Next: image slots in site releases (schema v3, the release image index, public URLs and rendering), as one PR. Blog and video thumbnails, responsive track artwork (FP-045), image withdrawal, a CDN, and the logo, theme and fonts are out of scope.

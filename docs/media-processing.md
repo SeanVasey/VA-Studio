@@ -106,10 +106,12 @@ Start with the source row's **Processing details** and the application's protect
 | Observation | Operator action |
 | --- | --- |
 | `queued` remains unchanged | Verify a worker is listening to `media` on the same queue connection/database and private disk. Restart/recover the worker, not the stored media records. |
-| `scanner_unavailable`, `scanner_signatures_stale` or `scan_not_clean` | Verify the configured executable, signature updates and scanner operation. A detection, error or unavailable scanner prevents promotion. Investigate the original file; retry only after the cause is understood. |
+| `scanner_unavailable` or `scanner_signatures_stale` | The scanner is missing, reported an error, crashed, is not ClamAV, or has out-of-date signatures. A scan that runs out of time reads `processor_timeout`. None of these says anything about the file. Fix the scanner or its signatures, then retry. |
+| `scan_not_clean` | The scanner reported a detection (clamscan exit 1), produced runaway output, or did not return the exact clean line. Investigate the original file; retry only after the cause is understood. |
 | `tag_not_configured`, `tag_hash_mismatch` or `invalid_tag` | Correct the private approved tag/path/hash or supported format. Reload worker configuration and request processing again; a changed profile gets its own run. |
 | `invalid_wav`, `unsupported_wav`, `invalid_audio` or `invalid_artwork` | Export a supported complete source and upload it as a new revision. Renaming an extension does not convert the file. |
-| `source_changed`, intake integrity mismatch or `unsafe_path` | Investigate storage changes or symlinks. Preserve the existing evidence and upload a new valid source; do not rewrite the recorded hash. |
+| `source_changed`, intake integrity mismatch or `unsafe_path` | Investigate storage changes, or a symbolic link in place of the stored file itself. Preserve the existing evidence and upload a new valid source; do not rewrite the recorded hash. |
+| `unsafe_storage` | The private disk is served or public, or one of its directories is a symbolic link. Fix the storage layout, then request processing again; the stored source is unchanged. |
 | `profile_changed` | The worker configuration changed after this run was queued. Reload consistent configuration and request processing to create/use the current profile. |
 | `tool_unavailable`, `processor_failed`, `processor_timeout` or `processor_output_limit` | Check executable availability, encoder support, source validity and resource usage. Correct the cause before retrying; review a profile/tool change as a new revision rather than weakening validation. |
 | `invalid_archive`, `unsafe_archive`, `unsupported_archive`, `archive_limit` or `invalid_wav` for stems | Inspect the source export and re-create a supported WAV-only ZIP. Preserve the rejected source; upload corrected bytes as a new revision. |
