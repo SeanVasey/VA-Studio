@@ -169,6 +169,19 @@ test('the row menu shows keyboard focus and returns it to More when a dialog is 
   await page.keyboard.press('Control');
   await expect(heading).toBeHidden();
   await expect(trigger).toBeFocused();
+
+  // A screen reader activates More with mouse events and no pointer press, as WebKit simulates it, then moves focus into
+  // the menu while focus may still be returning; the menu keeps its focus. More is disabled until the update finishes.
+  await expect(trigger).toBeEnabled();
+  await trigger.evaluate(element => {
+    for (const type of ['mousedown', 'mouseup', 'click']) {
+      element.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, button: 0 }));
+    }
+  });
+  await expect(edit).toBeVisible();
+  await edit.evaluate(element => (element as HTMLElement).focus());
+  await page.waitForTimeout(1000);
+  await expect(edit).toBeFocused();
   await page.unroute('**/update', slowUpdates);
   expect(failures).toEqual([]);
 });

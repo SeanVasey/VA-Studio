@@ -55,15 +55,18 @@
         document.addEventListener('focusin', remember, true);
         document.addEventListener('click', remember, true);
         // A key pressed while focus is lost, such as a second Escape or the Ctrl that silences a screen reader, does not stop
-        // the return, and Tab ends it by moving focus. A key on a focused control or a pointer press anywhere stops it.
+        // the return, and Tab ends it by moving focus. A key on a focused control, or a press or click anywhere, stops it: a
+        // screen reader may activate a button with mouse events alone, then move focus into the menu it opened.
         document.addEventListener('keydown', (event) => {
             if (! lost(document.activeElement)) {
                 lastInput = event.timeStamp;
             }
         }, true);
-        document.addEventListener('pointerdown', (event) => {
-            lastInput = event.timeStamp;
-        }, true);
+        for (const type of ['pointerdown', 'mousedown', 'click']) {
+            document.addEventListener(type, (event) => {
+                lastInput = event.timeStamp;
+            }, true);
+        }
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape' && event.target.closest?.('.fi-dropdown-panel')) {
                 returnFocus(triggerOf(event.target));
