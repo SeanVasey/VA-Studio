@@ -1,6 +1,6 @@
 # [WP-09] Seller CMS, publishing, sharing and promotion administration
 
-Status: **Partially implemented; remains open.** The first CMS increment is accepted in PR #72, test promotion administration in PR #73 and persisted editorial/contact content in PR #74. Scheduled whole-release publication is the current bounded increment; its acceptance record is maintained in issue #9 and the integrating PR. This issue is complete only when all acceptance evidence below exists.
+Status: **Partially implemented; remains open.** The first CMS increment is accepted in PR #72, test promotion administration in PR #73 and persisted editorial/contact content in PR #74, and scheduled whole-release publication in PR #76. Fail-closed public pages are the current increment, followed by the Site Releases row menu and D-25 editable site images; acceptance records are maintained in issue #9 and the integrating PRs. This issue is complete only when all acceptance evidence below exists.
 
 - Suggested issue title: `[WP-09] Seller CMS, publishing, sharing and promotion administration`
 - Phase: 3
