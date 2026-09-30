@@ -2,8 +2,10 @@
 """Executable safeguards for CI selection; PHP itself proves runtime discovery."""
 
 from collections import Counter
+import contextlib
 from copy import deepcopy
 import importlib.util
+import io
 import json
 from pathlib import Path
 import sys
@@ -192,6 +194,13 @@ class PartitionProofTest(unittest.TestCase):
         self.assertEqual(["tests/B.php", "tests/D.phpt"], untimed)
         self.assertEqual(({"tests/A.php": 3, "tests/B.php": 1, "tests/C.php": 1, "tests/D.phpt": 1}, []), module.file_weights(self.source, None))
 
+    def test_an_untimed_file_costs_the_fallback_for_each_of_its_cases(self):
+        # Every untimed file above has one case, which cannot tell a per-case cost from a flat one. A has three.
+        timings = self.timings({"tests/B.php": (1, 10), "tests/C.php": (1, 10), "tests/D.phpt": (1, 10)}, fallback=700)
+        weights, untimed = module.file_weights(self.source, timings)
+        self.assertEqual(["tests/A.php"], untimed)
+        self.assertEqual({"tests/A.php": 3 * 700, "tests/B.php": 10, "tests/C.php": 10, "tests/D.phpt": 10}, weights)
+
     def test_zero_millisecond_timings_still_leave_no_shard_empty(self):
         weights, _ = module.file_weights(self.source, self.timings({name: (1, 0) for name in self.source.files}))
         self.assertEqual({1}, set(weights.values()))
@@ -237,6 +246,31 @@ class PartitionProofTest(unittest.TestCase):
 
 
 class TimingGeneratorTest(unittest.TestCase):
+    # A log shaped as PHPUnit 12.5 writes it: the structure comes from a real run, and the paths, times and attributes
+    # this script never reads are simplified. A method's `file` is the file that declares it, here a trait or an
+    # abstract parent; the class-level suite's `file` is the class that runs it; the class::method suite around a
+    # data provider's sets has no `file` at all.
+    INHERITED_LOG = r"""<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/home/runner/work/app/app/phpunit-ci-mysql-1.xml" tests="6" time="1.875000">
+    <testsuite name="Feature" tests="6" time="1.875000">
+      <testsuite name="Tests\Feature\ExtendsAbstractTest" file="/home/runner/work/app/app/tests/Feature/ExtendsAbstractTest.php" tests="2" time="0.750000">
+        <testcase name="test_declared_in_the_abstract_parent" file="/home/runner/work/app/app/tests/Support/BaseCases.php" line="8" class="Tests\Feature\ExtendsAbstractTest" time="0.500000"/>
+        <testcase name="test_declared_in_the_child" file="/home/runner/work/app/app/tests/Feature/ExtendsAbstractTest.php" line="8" class="Tests\Feature\ExtendsAbstractTest" time="0.250000"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\UsesTraitTest" file="/home/runner/work/app/app/tests/Feature/UsesTraitTest.php" tests="4" time="1.125000">
+        <testcase name="test_declared_in_the_class" file="/home/runner/work/app/app/tests/Feature/UsesTraitTest.php" line="11" class="Tests\Feature\UsesTraitTest" time="0.125000"/>
+        <testcase name="test_declared_in_a_trait" file="/home/runner/work/app/app/tests/Support/SharedCases.php" line="8" class="Tests\Feature\UsesTraitTest" time="0.500000"/>
+        <testsuite name="Tests\Feature\UsesTraitTest::test_trait_with_data_sets" tests="2" time="0.500000">
+          <testcase name="test_trait_with_data_sets with data set #0" file="/home/runner/work/app/app/tests/Support/SharedCases.php" line="15" class="Tests\Feature\UsesTraitTest" time="0.250000"/>
+          <testcase name="test_trait_with_data_sets with data set #1" file="/home/runner/work/app/app/tests/Support/SharedCases.php" line="15" class="Tests\Feature\UsesTraitTest" time="0.250000"/>
+        </testsuite>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>
+"""
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -246,29 +280,128 @@ class TimingGeneratorTest(unittest.TestCase):
             (self.root / file).write_text("<?php // isolated timing fixture\n")
 
     def log(self, name, cases):
-        body = "".join(f'<testcase name="t{index}" file="{file}" time="{seconds}"/>' for index, (file, seconds) in enumerate(cases))
+        """A log with one test class suite per file, as PHPUnit writes it; each case is declared in its class."""
+        by_file = {}
+        for index, (file, seconds) in enumerate(cases):
+            by_file.setdefault(file, []).append(f'<testcase name="t{index}" file="{file}" class="Fixture" time="{seconds}"/>')
+        suites = "".join(f'<testsuite name="Fixture{number}" file="{file}">{"".join(body)}</testsuite>' for number, (file, body) in enumerate(by_file.items()))
         path = self.root / name
-        path.write_text(f'<?xml version="1.0"?><testsuites><testsuite name="fixture">{body}</testsuite></testsuites>')
+        path.write_text(f'<?xml version="1.0"?><testsuites><testsuite name="config"><testsuite name="Feature">{suites}</testsuite></testsuite></testsuites>')
         return path
+
+    def inherited_log(self):
+        for file in ["tests/Feature/UsesTraitTest.php", "tests/Feature/ExtendsAbstractTest.php", "tests/Support/SharedCases.php", "tests/Support/BaseCases.php"]:
+            (self.root / file).parent.mkdir(parents=True, exist_ok=True)
+            (self.root / file).write_text("<?php // isolated timing fixture\n")
+        path = self.root / "phpunit-ci-mysql-1-results.xml"
+        path.write_text(self.INHERITED_LOG)
+        return path
+
+    def run_main(self, driver, *logs):
+        """Run the command against this fixture repository and return (output file, stdout, stderr)."""
+        output, stdout, stderr = self.root / "timings.json", io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            timings_module.main(["--driver", driver, "--source", "fixture", "--output", str(output), *map(str, logs)], root=self.root)
+        return output, stdout.getvalue(), stderr.getvalue()
 
     def test_runner_paths_map_to_repository_files_and_vanished_files_are_reported(self):
         log = self.log("runner.xml", [("/home/runner/work/app/app/tests/A.php", "1.5"), ("/home/runner/work/app/app/tests/A.php", "0.5"),
                                       ("/home/runner/work/app/app/tests/Gone.php", "9")])
-        totals, gone = timings_module.read_junit(log, self.root)
+        totals, gone, _ = timings_module.read_junit(log, self.root)
         self.assertEqual({"tests/A.php": [2, 2.0]}, totals)
         self.assertEqual({"/home/runner/work/app/app/tests/Gone.php"}, gone)
 
     def test_local_absolute_paths_resolve_and_parent_traversal_is_refused(self):
         log = self.log("local.xml", [(str(self.root / "tests/B.php"), "1"), ("/elsewhere/../tests/A.php", "1")])
-        totals, gone = timings_module.read_junit(log, self.root)
+        totals, gone, _ = timings_module.read_junit(log, self.root)
         self.assertEqual({"tests/B.php": [1, 1.0]}, totals)
         self.assertEqual({"/elsewhere/../tests/A.php"}, gone)
+
+    def test_the_longest_existing_suffix_of_a_recorded_path_wins(self):
+        # Shorter suffixes of the recorded path exist here too. Matching one of them would time the wrong file.
+        for decoy in ["Feature/A.php", "A.php"]:
+            (self.root / decoy).parent.mkdir(parents=True, exist_ok=True)
+            (self.root / decoy).write_text("<?php // a shorter suffix that also exists\n")
+        (self.root / "tests/Feature").mkdir()
+        (self.root / "tests/Feature/A.php").write_text("<?php // the file the runner meant\n")
+        recorded = "/home/runner/work/app/app/tests/Feature/A.php"
+        self.assertEqual("tests/Feature/A.php", timings_module.repository_file(recorded, self.root))
+        totals, _, _ = timings_module.read_junit(self.log("suffix.xml", [(recorded, "1")]), self.root)
+        self.assertEqual({"tests/Feature/A.php": [1, 1.0]}, totals)
 
     def test_a_case_without_a_file_is_refused_instead_of_undercounted(self):
         log = self.root / "nofile.xml"
         log.write_text('<testsuites><testsuite><testcase name="t" time="1"/></testsuite></testsuites>')
         with self.assertRaises(timings_module.TimingError):
             timings_module.read_junit(log, self.root)
+
+    def test_a_test_method_outside_any_test_class_suite_is_refused_instead_of_guessed(self):
+        log = self.root / "orphan.xml"
+        log.write_text('<testsuites><testsuite name="Feature"><testcase name="t" file="tests/A.php" class="Tests\\A" time="1"/></testsuite></testsuites>')
+        with self.assertRaises(timings_module.TimingError):
+            timings_module.read_junit(log, self.root)
+
+    def test_a_phpt_case_has_no_class_and_is_timed_under_its_own_file(self):
+        (self.root / "tests/Legacy.phpt").write_text("--TEST--\nfixture\n")
+        log = self.root / "phpt.xml"
+        # PHPUnit puts a PHPT case straight under the named suite and gives it no class attribute.
+        log.write_text('<testsuites><testsuite name="Feature">'
+                       '<testcase name="Legacy.phpt" file="/home/runner/work/app/app/tests/Legacy.phpt" assertions="1" time="0.5"/>'
+                       '</testsuite></testsuites>')
+        self.assertEqual(({"tests/Legacy.phpt": [1, 0.5]}, set(), set()), timings_module.read_junit(log, self.root))
+
+    def test_a_method_declared_in_a_trait_or_parent_class_is_timed_under_the_class_that_runs_it(self):
+        totals, gone, shared = timings_module.read_junit(self.inherited_log(), self.root)
+        # Keyed on the declaring file, the trait would hold three cases and each running class would be short of them.
+        self.assertEqual({"tests/Feature/ExtendsAbstractTest.php": [2, 0.75], "tests/Feature/UsesTraitTest.php": [4, 1.125]}, totals)
+        self.assertEqual(set(), gone)
+        self.assertEqual({"tests/Support/BaseCases.php", "tests/Support/SharedCases.php"}, shared)
+
+    def test_declaring_files_that_are_not_test_classes_are_reported_and_never_become_timing_keys(self):
+        output, stdout, stderr = self.run_main("mysql", self.inherited_log())
+        self.assertEqual({"tests/Feature/ExtendsAbstractTest.php": (2, 750), "tests/Feature/UsesTraitTest.php": (4, 1125)}, module.read_timings(output).files)
+        self.assertIn("2 files, 6 cases", stdout)
+        self.assertIn("declared in tests/Support/BaseCases.php, tests/Support/SharedCases.php to the test classes that run them", stderr)
+        self.assertNotIn("UsesTraitTest", stderr)
+
+    def test_a_declaring_file_that_is_also_a_test_class_keeps_its_entry_and_is_not_reported(self):
+        # B inherits a test from the concrete test class A. A's own entry counts one case, and B is credited with the inherited one.
+        log = self.root / "phpunit-ci-mysql-1-results.xml"
+        log.write_text('<testsuites><testsuite name="Feature">'
+                       '<testsuite name="A" file="tests/A.php"><testcase name="t" file="tests/A.php" class="A" time="1"/></testsuite>'
+                       '<testsuite name="B" file="tests/B.php"><testcase name="t" file="tests/A.php" class="B" time="2"/></testsuite>'
+                       '</testsuite></testsuites>')
+        output, _, stderr = self.run_main("mysql", log)
+        self.assertEqual({"tests/A.php": (1, 1000), "tests/B.php": (1, 2000)}, module.read_timings(output).files)
+        self.assertEqual("", stderr)
+
+    def test_a_time_that_is_not_a_finite_number_of_seconds_of_at_least_zero_is_refused(self):
+        for bad in ["nan", "NaN", "inf", "-inf", "1e999", "-0.5", "abc", "1s", ""]:
+            with self.assertRaises(timings_module.TimingError, msg=repr(bad)):
+                timings_module.read_junit(self.log("bad.xml", [("tests/A.php", bad)]), self.root)
+        missing = self.root / "missing.xml"
+        missing.write_text('<testsuites><testsuite name="Feature"><testsuite name="A" file="tests/A.php"><testcase name="t" class="A"/></testsuite></testsuite></testsuites>')
+        with self.assertRaises(timings_module.TimingError):
+            timings_module.read_junit(missing, self.root)
+        totals, _, _ = timings_module.read_junit(self.log("zero.xml", [("tests/A.php", "0"), ("tests/A.php", "0.5")]), self.root)
+        self.assertEqual({"tests/A.php": [2, 0.5]}, totals)
+        # A refused run leaves no timing file behind for anyone to commit.
+        with self.assertRaises(timings_module.TimingError):
+            self.run_main("mysql", self.log("phpunit-ci-mysql-9-results.xml", [("tests/A.php", "nan")]))
+        self.assertFalse((self.root / "timings.json").exists())
+
+    def test_a_log_whose_name_lacks_the_chosen_driver_is_refused_before_any_log_is_read(self):
+        (self.root / "backend-mysql-1-7-1").mkdir()
+        sqlite_in_a_mysql_directory = self.root / "backend-mysql-1-7-1" / "phpunit-ci-sqlite-1-results.xml"
+        unnamed = self.root / "junit-1.xml"
+        mysql = self.root / "phpunit-ci-mysql-1-results.xml"
+        for path in [sqlite_in_a_mysql_directory, unnamed, mysql]:
+            path.write_text("not XML, so any attempt to parse it fails differently")
+        for driver, logs in [("mysql", [mysql, sqlite_in_a_mysql_directory]), ("mysql", [mysql, unnamed]), ("sqlite", [mysql])]:
+            with self.assertRaises(timings_module.TimingError, msg=f"{driver}: {[log.name for log in logs]}"):
+                self.run_main(driver, *logs)
+        timings_module.require_driver([Path("backend-mysql-1-7-1/phpunit-ci-mysql-1-results.xml"), Path("phpunit-ci-mysql-4-results.xml")], "mysql")
+        timings_module.require_driver([Path("backend-sqlite-2-7-1/phpunit-ci-sqlite-2-results.xml")], "sqlite")
 
     def test_several_runs_are_averaged_and_render_as_a_timing_file_the_partitioner_accepts(self):
         first = timings_module.read_junit(self.log("a.xml", [("tests/A.php", "2"), ("tests/A.php", "2"), ("tests/B.php", "1")]), self.root)[0]

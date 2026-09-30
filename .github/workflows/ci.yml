@@ -102,6 +102,12 @@ jobs:
         run: python3 scripts/ci/phpunit-shards.py --shards=4 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json
       - name: Run all tests assigned to this MySQL shard
         run: php vendor/bin/phpunit --configuration=phpunit-ci-mysql-${{ matrix.shard }}.xml --log-junit=phpunit-ci-mysql-${{ matrix.shard }}-results.xml --fail-on-phpunit-warning --display-warnings
+      - name: Show the MySQL data directory filesystem and usage
+        if: always()
+        env:
+          MYSQL_CONTAINER: ${{ job.services.mysql.id }}
+        # Diagnostic only: shows whether the tmpfs option applied and how full it got. It never fails the job.
+        run: docker exec "$MYSQL_CONTAINER" df -h /var/lib/mysql || true
       - name: Retain partition and test evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
