@@ -43,6 +43,8 @@ Scheduled site publication ([D-24](architecture/D-24-scheduled-site-publication.
 
 `php artisan schedule:list` shows `vasey:publish-scheduled-site-release` registered every minute. Without cron, schedules never publish: the doctor's `scheduled_publication` check warns once one is more than two minutes overdue. A run more than 60 minutes after a schedule's time records it as expired, unpublished. Runner errors are written to the application log. No cron is configured by this repository; the production host remains undecided (U-02).
 
+The doctor's `site_images` check hashes every stored file of the active site release's images and warns when one no longer matches ([D-25](architecture/D-25-editable-site-images.md)). Back up `storage/app/private/site-images/` with the database and restore both from the same point.
+
 ## Browser verification
 
 After Composer and npm dependencies are installed:
