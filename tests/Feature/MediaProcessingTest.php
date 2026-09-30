@@ -368,7 +368,7 @@ class MediaProcessingTest extends TestCase
             {
                 public function __construct(private string $version) {}
 
-                public function run(array $arguments, string $cwd, int $timeout = 0): string
+                public function run(array $arguments, string $cwd, int $timeout = 0, bool $ignoreErrorOutput = false): string
                 {
                     return $this->version;
                 }

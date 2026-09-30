@@ -24,6 +24,8 @@ const env = {
   SESSION_COOKIE: `vasey_browser_${randomBytes(8).toString('hex')}`, CACHE_STORE: 'file',
   QUEUE_CONNECTION: 'sync', MAIL_MAILER: 'array', LOG_CHANNEL: 'single', LOG_LEVEL: 'error',
   FILESYSTEM_DISK: 'local', STRIPE_WEBHOOK_ENABLED: 'false',
+  // No malware scanner, as in CI. A scanner installed on the host would otherwise run inside synchronous uploads.
+  MEDIA_CLAMSCAN: join(directory, 'no-clamscan'),
   VASEY_BROWSER_DIRECTORY: directory, VASEY_BROWSER_PASSWORD: `Browser-${randomBytes(24).toString('hex')}`,
 };
 try {

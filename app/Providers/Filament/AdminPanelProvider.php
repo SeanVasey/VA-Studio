@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Http\Controllers\LicenseReviewController;
 use App\Http\Controllers\PublicMediaController;
+use App\Http\Controllers\SiteImagePreviewController;
 use App\Http\Controllers\SiteReleasePreviewController;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Http\Middleware\Authenticate;
@@ -39,6 +40,10 @@ class AdminPanelProvider extends PanelProvider
                 Route::get('/licenses/{license}/preview', LicenseReviewController::class)
                     ->middleware(['can:administer-catalog', ...Dashboard::getRouteMiddleware($panel), 'throttle:60,1'])
                     ->name('licenses.preview');
+                Route::get('/site-images/{variant}/preview', SiteImagePreviewController::class)
+                    ->where('variant', '[0-9]+')
+                    ->middleware(['can:administer-catalog', ...Dashboard::getRouteMiddleware($panel), 'throttle:240,1'])
+                    ->name('site-images.preview');
                 Route::get('/site-releases/{release}/preview', SiteReleasePreviewController::class)
                     ->middleware(['can:administer-catalog', ...Dashboard::getRouteMiddleware($panel), 'throttle:60,1'])
                     ->name('site-releases.preview');

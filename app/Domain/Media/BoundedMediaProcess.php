@@ -7,7 +7,15 @@ use Symfony\Component\Process\Process;
 
 class BoundedMediaProcess
 {
-    public function run(array $arguments, string $cwd, int $timeout = 0): string
+    /** How much standard error a caller that ignores it tolerates before the tool counts as runaway. */
+    private const IGNORED_ERROR_OUTPUT_BYTES = 4 * 1024 * 1024;
+
+    /**
+     * Runs a media tool under the resource limiter and returns its standard output. Standard error counts toward the output
+     * limit unless the caller's verdict rests on standard output and the exit status alone; its warnings then have their own,
+     * larger bound, so they cannot cut off a result that finished.
+     */
+    public function run(array $arguments, string $cwd, int $timeout = 0, bool $ignoreErrorOutput = false): string
     {
         $limiter = config('media.prlimit');
         if (! is_string($limiter) || ! is_executable($limiter) || ! is_executable($arguments[0])) {
@@ -18,10 +26,15 @@ class BoundedMediaProcess
         $process->setTimeout($timeout ?: (int) config('media.process_timeout_seconds'));
         $stdout = '';
         $bytes = 0;
+        $errorBytes = 0;
         try {
-            $process->run(function (string $type, string $buffer) use (&$stdout, &$bytes, $process) {
-                $bytes += strlen($buffer);
-                if ($bytes > config('media.max_process_log_bytes')) {
+            $process->run(function (string $type, string $buffer) use (&$stdout, &$bytes, &$errorBytes, $process, $ignoreErrorOutput) {
+                if ($ignoreErrorOutput && $type === Process::ERR) {
+                    $errorBytes += strlen($buffer);
+                } else {
+                    $bytes += strlen($buffer);
+                }
+                if ($bytes > config('media.max_process_log_bytes') || $errorBytes > self::IGNORED_ERROR_OUTPUT_BYTES) {
                     $process->stop(0);
                     throw new MediaFailure('processor_output_limit', 'Media processing exceeded its output limit.');
                 }
@@ -33,7 +46,7 @@ class BoundedMediaProcess
             throw new MediaFailure('processor_timeout', 'Media processing exceeded its time limit.');
         }
         if (! $process->isSuccessful()) {
-            throw new MediaFailure('processor_failed', 'Media processing or validation failed. Verify the file and installed tools before retrying.');
+            throw new MediaFailure('processor_failed', 'Media processing or validation failed. Verify the file and installed tools before retrying.', $process->getExitCode());
         }
 
         return $stdout;

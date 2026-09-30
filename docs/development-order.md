@@ -1,16 +1,51 @@
 # Ordered development status
 
-Reconciled 2026-09-30. Accepted starting baseline `fdbc7cdca7194024aadd5622a926869605d652cb`, tree `03f45e3679059114cd40c38e04cfa0878accfb0d`, contains customer-facing test downloads, the first WP-09 CMS slice, test promotion administration, persisted editorial content, the repository engineering standard, scheduled site publication and fail-closed public pages from [PR #77](https://github.com/VASEYDEV/VASEYAUDIO/pull/77). Each completed full CI and independent review before merge. No production activation or actual provider transaction is claimed.
+Reconciled 2026-09-30. Accepted starting baseline `b38ffe5c224a4b98d5f78fa66d35d6d5218f62a3`, tree `801aa7c4e29b889b332f436c18ebe546c47de49e`, contains customer-facing test downloads, the first WP-09 CMS slice, test promotion administration, persisted editorial content, the repository engineering standard, scheduled site publication, fail-closed public pages, the Site Releases row menu, duration-balanced CI shards and the media upload path fix from [PR #80](https://github.com/VASEYDEV/VASEYAUDIO/pull/80). Each completed full CI and independent review before merge. No production activation or actual provider transaction is claimed.
 
 ## Current increment and next handoff
 
-### Site Releases row menu — September 30
+### Private site-image library — September 30
 
-The Site Releases table needed about 1,420 px in a 1,056 px content area, so staff scrolled sideways to reach **Schedule publication** and **Restore previous release**. Each row now keeps **Preview** and, except on the active release, **Publish release**. **Edit as new draft**, **Restore previous release** and **Schedule publication** move into a **More** menu named for its release. Long labels wrap even without spaces, while a width floor keeps ordinary words whole; the **Schedule** badge shows only the UTC time under its heading and **Created at** shows minutes, which leaves the floor room at 1440 px with a schedule showing. Narrower windows scroll the table rather than split words. Admin menu items gain a visible keyboard focus outline. When a dialog opened from a menu is dismissed, or Escape closes the menu, focus returns to the menu's button instead of falling to the page; a submitted dialog closes without the event this relies on, so focus after a confirmed action is unchanged. The integrating PR records the exact tested source, checks and review.
+[D-25](architecture/D-25-editable-site-images.md) adds editable images for the four slots Sean chose, as two PRs. This first part is a private library under **Publishing → Site images**. Administrators upload the home hero (a desktop and a mobile crop), the studio image or the share image as a JPEG or PNG, with a source or credit line and a rights confirmation. Intake refuses a shape more than 3% off the slot's, an undersized image, transparency, CMYK, more than 8 bits per channel, rotation tags, other formats and files over 20 MiB. The `media` worker scans each upload, re-encodes it without metadata into the slot's JPEG and WebP sizes (JPEG alone for the share image) and pins them by a manifest hash. Database triggers keep uploads and outcomes permanent, and a scanner, tool or storage outage waits for an audited retry. The original is never served; staff see a prepared thumbnail through a private, no-store route. Track media now records why a scan reached no verdict (`scanner_unavailable`, `processor_timeout` or `tool_unavailable`) where it mostly recorded `scan_not_clean`; a detection still records `scan_not_clean`, and the CHANGELOG lists each case. The integrating PR records the exact tested source, checks and review.
 
-Next, in the order of the plan Sean approved on September 30: editable site images, as two PRs. First comes a private site-image library, then image slots in site releases with their public serving. The D-25 decision record lands with the library PR. Sean chose the slots: the home hero (desktop and mobile), the studio image and the share image.
+Next: image slots in site releases (schema v3, a release image index and the editor's Images section), with live images served at content-hashed URLs. Nothing in this part reaches the public site.
 
 Inbound contact/spam handling, consent-aware embeds/related-track links, broader sharing/support and free-download licensing/consent remain unfinished. Guest/account recovery, the complete cross-order library, verified financial exception/refund/dispute resolution, other products, memberships, source migration and production readiness remain open.
+
+### Accepted Site Releases row menu — September 30
+
+[PR #78](https://github.com/VASEYDEV/VASEYAUDIO/pull/78) merged tested head `2cfafc913bf2b2bc054b9da9f197f41354c50190` as `c0e97da2b6431bc44ca5958eeff95fa9e0ce44b0`; both have source tree `3f0e66234443c1c50981e574451121d386be451d`. [CI 36690776546](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36690776546) passed all ten required jobs on the tested head:
+
+- MySQL 8.4: 1,663 tests /17,875 assertions, zero skips.
+- SQLite: 1,575 executed tests /14,971 assertions, plus the 88 expected MySQL-only skips.
+- 257 frontend tests, the build and the audits.
+- 33 Chromium/mobile-WebKit cases; the keyboard-focus case is skipped on WebKit by design.
+- The backend aggregate.
+
+Post-merge main `c0e97da` passed all ten jobs of [CI 36695324637](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36695324637). Independent review approved the final commit after four rounds of fixes, which the PR records; one caught an admin stored cross-site scripting defect in the new menu's name before merge.
+
+The Site Releases table needed about 1,420 px in a 1,056 px content area, so staff scrolled sideways to reach **Schedule publication** and **Restore previous release**. Each row now keeps **Preview** and, except on the active release, **Publish release**. **Edit as new draft**, **Restore previous release** and **Schedule publication** move into a **More** menu named for its release. Long labels wrap even without spaces, while a width floor keeps ordinary words whole; the **Schedule** badge shows only the UTC time under its heading and **Created at** shows minutes, which leaves the floor room at 1440 px with a schedule showing. Narrower windows scroll the table rather than split words. Admin menu items gain a visible keyboard focus outline. When a dialog opened from a menu is dismissed, or Escape closes the menu, focus returns to the menu's button instead of falling to the page; a submitted dialog closes without the event this relies on, so focus after a confirmed action is unchanged.
+
+### Accepted CI shard balancing and upload path fix — September 30
+
+[PR #79](https://github.com/VASEYDEV/VASEYAUDIO/pull/79) merged tested head `7b0f8aed3ae7ce17dc52dcbfec73d4545c47cdab` as `ee8a1c99176d6a7e113030afb934a190484a5b87`; both have source tree `a178db3f6c6f959734daf16eb2b9116a391fd107`. CI now balances the PHPUnit shards by measured duration instead of test count. [CI 36713765061](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36713765061), attempt 2, passed all ten jobs. Its MySQL test steps took 25m10s, 25m12s, 24m28s and 25m42s; before, one shard alone took 39 minutes. Attempt 1 failed at startup before creating any job, on a workflow identical to the last green run's. Post-merge main `ee8a1c9` passed all ten jobs of [CI 36717296476](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36717296476).
+
+[PR #80](https://github.com/VASEYDEV/VASEYAUDIO/pull/80) merged tested head `2928134fda05e53d78e92cb725649d5b496eac56` as `b38ffe5c224a4b98d5f78fa66d35d6d5218f62a3`; both have source tree `801aa7c4e29b889b332f436c18ebe546c47de49e`. [CI 36717435052](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36717435052) passed all ten required jobs on the tested head:
+
+- MySQL 8.4: 1,667 tests /17,870 assertions, zero skips.
+- SQLite: 1,579 executed tests /14,986 assertions, plus the 88 expected MySQL-only skips.
+- 257 frontend tests, the build and the audits.
+- 33 Chromium/mobile-WebKit cases; the keyboard-focus case is skipped on WebKit by design.
+- The backend aggregate.
+
+**Why MySQL shard 3 was slow:**
+- It took about 56 minutes, against 23 to 27 for the other shards.
+- Its schema-rebuilding classes ran 2.3 to 3.3 times their measured weights, while CPU-bound classes ran at their usual pace.
+- Main's concurrent run on the base tree was just as slow in the same shard.
+
+So the runner's storage was slow, not the change.
+
+The **Private upload** field on **Media assets** now refuses stored file paths. A catalog administrator who knew a private object's storage key could place it in the create form's state. The field then described that object's name, size, type and a URL. No bytes were exposed while the private disk is unserved. The field now calls Filament's tampering guard and describes no stored file. A unit test fails if any upload field in the application lacks the guard, or if any code turns it off. Independent review approved the final commits of both PRs. Payments remain test-only.
 
 ### Accepted fail-closed public pages — September 30
 

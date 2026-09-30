@@ -34,10 +34,14 @@ class PrivateMediaFiles
             throw new MediaFailure('unsafe_path', 'Media paths must be safe relative private object keys.');
         }
         $path = $this->root();
-        foreach (explode('/', $relative) as $component) {
+        $components = explode('/', $relative);
+        foreach ($components as $index => $component) {
             $path .= '/'.$component;
             if (is_link($path)) {
-                throw new MediaFailure('unsafe_path', 'Symbolic links are not accepted for media.');
+                // A linked directory is a storage layout an operator can fix; a linked file is a problem with that object itself.
+                throw $index === array_key_last($components)
+                    ? new MediaFailure('unsafe_path', 'Symbolic links are not accepted for media.')
+                    : new MediaFailure('unsafe_storage', 'A private media directory is a symbolic link.');
             }
         }
         $real = realpath($path);
@@ -94,7 +98,7 @@ class PrivateMediaFiles
     {
         $base = $this->root().'/processing';
         if (is_link($base)) {
-            throw new MediaFailure('unsafe_path', 'The processing directory cannot be a symbolic link.');
+            throw new MediaFailure('unsafe_storage', 'The processing directory cannot be a symbolic link.');
         }
         if (! is_dir($base)) {
             mkdir($base, 0700, true);
@@ -107,13 +111,23 @@ class PrivateMediaFiles
 
     public function promote(string $source, string $directory, string $name): string
     {
-        $relative = 'media/revisions/'.$directory.'/'.$name;
+        return $this->promoteUnder('media/revisions', $source, $directory, $name);
+    }
+
+    /** Copies a verified output into one of the fixed immutable revision roots; no other location can be written this way. */
+    public function promoteUnder(string $revisions, string $source, string $directory, string $name): string
+    {
+        if (! in_array($revisions, ['media/revisions', 'site-images/revisions'], true)
+            || ! preg_match('~\A[a-zA-Z0-9-]+\z~D', $directory) || ! preg_match('~\A[a-zA-Z0-9][a-zA-Z0-9_-]*\.[a-z0-9]+\z~D', $name)) {
+            throw new MediaFailure('unsafe_path', 'Revisions are written only under a fixed root with a safe name.');
+        }
+        $relative = $revisions.'/'.$directory.'/'.$name;
         $root = $this->root();
         $current = $root;
         foreach (explode('/', dirname($relative)) as $component) {
             $current .= '/'.$component;
             if (is_link($current)) {
-                throw new MediaFailure('unsafe_path', 'The revision directory cannot be a symbolic link.');
+                throw new MediaFailure('unsafe_storage', 'The revision directory cannot be a symbolic link.');
             }
             if (! is_dir($current)) {
                 mkdir($current, 0700);
