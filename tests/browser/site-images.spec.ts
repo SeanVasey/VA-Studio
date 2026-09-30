@@ -42,7 +42,7 @@ test('staff upload a site image privately and, without a scanner, it waits for a
   await expect(row.getByText('Waiting', { exact: true })).toBeVisible();
   await expect(row.getByText('Studio image', { exact: true })).toBeVisible();
   await expect(row.getByText('1440 × 630', { exact: true })).toBeVisible();
-  await expect(row.getByText('The malware scanner was unavailable. Retry once it is running.', { exact: true })).toBeVisible();
+  await expect(row.getByText('The malware scanner was unavailable or gave no clear result. Retry once it is working.', { exact: true })).toBeVisible();
   await expect(row.locator('.fi-ta-cell-attempts')).toHaveText('1');
 
   await row.getByRole('button', { name: 'Retry processing', exact: true }).click();
