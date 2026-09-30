@@ -13,6 +13,12 @@ use Throwable;
 
 class MediaProcessor
 {
+    /**
+     * Seconds a tool gets to print its version. It answers at once, and a run's worst case, which the job's 900 seconds must hold, is
+     * better without two more calls of the 120 seconds every tool has.
+     */
+    private const VERSION_CALL_SECONDS = 15;
+
     public function handle(int $runId): MediaProcessingRun
     {
         $token = (string) Str::uuid();
@@ -31,6 +37,8 @@ class MediaProcessor
         $files = app(PrivateMediaFiles::class);
         $workspace = null;
         $promoted = [];
+        $budget = app(MediaWorkflowBudget::class);
+        $previousDeadline = $budget->enter();
         try {
             $source = $run->source()->firstOrFail();
             if ($source->disk !== 'local' || ! str_starts_with($source->storage_path, 'quarantine/') || ! in_array($source->role, ['master_wav', 'artwork', 'stems_zip'], true) || $source->processing_run_id) {
@@ -65,8 +73,9 @@ class MediaProcessor
                 $outputs = app(ArtworkDerivative::class)->build($input, $integrity['mime_type'], $workspace);
             }
             $runner = app(BoundedMediaProcess::class);
-            $evidence['ffmpeg_version'] = strtok($runner->run([config('media.ffmpeg'), '-version'], $workspace), "\n");
-            $evidence['ffprobe_version'] = strtok($runner->run([config('media.ffprobe'), '-version'], $workspace), "\n");
+            $evidence['ffmpeg_version'] = strtok($runner->run([config('media.ffmpeg'), '-version'], $workspace, self::VERSION_CALL_SECONDS), "\n");
+            $evidence['ffprobe_version'] = strtok($runner->run([config('media.ffprobe'), '-version'], $workspace, self::VERSION_CALL_SECONDS), "\n");
+            $budget->assertRemaining();
             $directory = (string) Str::uuid();
             $records = [];
             foreach ($outputs as $output) {
@@ -75,7 +84,7 @@ class MediaProcessor
                 $path = $files->resolve($relative);
                 $records[] = ['track_id' => $source->track_id, 'parent_asset_id' => $source->id, 'processing_run_id' => $run->id, 'role' => $output['role'], 'disk' => 'local', 'storage_path' => $relative, 'original_name' => $output['name'], 'mime_type' => $output['mime_type'], 'size_bytes' => filesize($path), 'sha256' => hash_file('sha256', $path), 'technical_metadata' => $output['technical_metadata'], 'status' => 'ready', 'verified_by' => $run->requested_by, 'verified_at' => now()];
             }
-            $result = DB::transaction(function () use ($run, $source, $token, $records, $evidence) {
+            $result = DB::transaction(function () use ($run, $source, $token, $records, $evidence, $budget) {
                 // Match queue lock ordering: source before run.
                 $lockedSource = MediaAsset::query()->lockForUpdate()->findOrFail($source->id);
                 $track = Track::query()->lockForUpdate()->findOrFail($source->track_id);
@@ -87,6 +96,7 @@ class MediaProcessor
                     throw new MediaFailure('claim_lost', 'This media attempt no longer owns the processing claim.');
                 }
                 $ids = [];
+                $budget->assertRemaining();
                 foreach ($records as $record) {
                     $asset = MediaAsset::create($record);
                     $ids[] = $asset->id;
@@ -125,6 +135,7 @@ class MediaProcessor
             });
             throw $failure;
         } finally {
+            $budget->leave($previousDeadline);
             foreach ($promoted as $relative) {
                 // Only this unsuccessful attempt's unreferenced random objects.
                 if (! MediaAsset::query()->where('storage_path', $relative)->exists()) {
@@ -137,9 +148,16 @@ class MediaProcessor
         }
     }
 
-    private function scan(string $path): array
+    /** @param  ?int  $budgetSeconds  the wall-clock seconds this scan may take at most, when the caller has a budget of its own */
+    private function scan(string $path, ?int $budgetSeconds = null): array
     {
-        $result = app(MalwareScanner::class)->scan($path);
+        $scanner = app(MalwareScanner::class);
+        $scanner->boundBy($budgetSeconds);
+        try {
+            $result = $scanner->scan($path);
+        } finally {
+            $scanner->boundBy(null);
+        }
         if (! ScanEngines::accepted($result['engine'] ?? null) || ($result['status'] ?? null) !== 'clean' || ! hash_equals(hash_file('sha256', $path), $result['sha256'] ?? '')) {
             throw new MediaFailure('scan_not_clean', 'The scanner did not return clean evidence for these exact bytes.');
         }

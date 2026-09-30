@@ -1,6 +1,6 @@
 # [WP-01] Foundation, repository governance and reproducible CI
 
-Status: **Current increment adds audited operator provisioning, read-only installation diagnostics and fresh-run browser CI. Exact-head runtime results and independent review determine acceptance; production operations are separate.** See [ordered development status](../development-order.md).
+Status: **Current increment adds audited operator provisioning, installation diagnostics and fresh-run browser CI. Exact-head runtime results and independent review determine acceptance; production operations are separate.** See [ordered development status](../development-order.md).
 
 - Suggested issue title: `[WP-01] Foundation, repository governance and reproducible CI`
 - Phase: 0
@@ -47,6 +47,6 @@ Read [architecture index](../architecture/README.md), [decision register](../arc
 
 ## Operator acceptance increment — 2026-09-09
 
-The [operator guide](../operator-setup-and-verification.md) documents `vasey:create-admin`, `vasey:doctor [--json]` and `npm run test:browser`. Provisioning requires hidden interactive password input and commits the account/audit event together. Diagnostics are read-only and redacted, with required failures distinguished from optional setup warnings. The isolated browser job installs lockfiles, migrates an empty temporary SQLite database, invokes the actual operator command, passes required diagnostics and starts the built application over HTTP.
+The [operator guide](../operator-setup-and-verification.md) documents `vasey:create-admin`, `vasey:doctor [--json]` and `npm run test:browser`. Provisioning requires hidden interactive password input and commits the account/audit event together. Diagnostics change nothing but a scratch directory that the scanner limits check makes in private storage and removes and, when the scanner fails that check, a warning in the application log; they are redacted, with required failures distinguished from optional setup warnings. The isolated browser job installs lockfiles, migrates an empty temporary SQLite database, invokes the actual operator command, passes required diagnostics and starts the built application over HTTP.
 
 Local `npm ci`, 39 frontend tests, TypeScript/Vite build, npm production audit and whitespace checks passed. PHP/Composer were unavailable locally. The PR records exact-head MySQL/SQLite and rendered Chromium/WebKit results; do not infer a browser pass from unit tests or configuration. Independent authorization review and production operator MFA/recovery remain open. Next dependency: WP-03 archive/stem safety, with the remaining original order retained.

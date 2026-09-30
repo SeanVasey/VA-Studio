@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\LicenseFixtures;
 use Tests\TestCase;
 
@@ -58,7 +59,7 @@ class InstallationReportTest extends TestCase
         $this->assertTrue($report['foundation_ready']);
         $this->assertSame(1, $report['schema_version']);
         $status = array_column($report['checks'], 'status', 'id');
-        foreach (['media_tools', 'media_scanner', 'seller_tag', 'media_queue', 'mail_transport'] as $id) {
+        foreach (['media_tools', 'media_scanner', 'media_scanner_limits', 'seller_tag', 'media_queue', 'mail_transport'] as $id) {
             $this->assertSame('warn', $status[$id]);
         }
         foreach ($queries as $query) {
@@ -71,6 +72,129 @@ class InstallationReportTest extends TestCase
         $this->assertSame([], (new Filesystem)->files($this->directory.'/private'));
         $this->assertStringNotContainsString($key, $output);
         $this->assertStringNotContainsString($this->directory, $output);
+    }
+
+    /**
+     * A scripted scanner that prints a version and answers every file the way $answer says: refuse, as a daemon that alerts does, or
+     * skip. The paths it is asked to scan, other than for its version, are noted in the file asked, beside the script.
+     */
+    private function scanner(string $name, string $answer = 'skip'): void
+    {
+        $script = $this->directory.'/'.$name;
+        $verdict = $answer === 'refuse' ? 'echo "$path: Heuristics.Limits.Exceeded.MaxFileSize FOUND"; exit 1' : 'echo "$path: OK"';
+        file_put_contents($script, "#!/bin/sh\nfor arg; do path=\$arg; done\nif [ \"\$1\" = --version ]; then echo 'ClamAV 1.5.4'; exit 0; fi\nprintf '%s\\n' \"\$path\" >> \"\$(dirname \"\$0\")/asked\"\n".$verdict."\n");
+        chmod($script, 0700);
+        config(['media.clamscan' => $script, 'media.prlimit' => '/usr/bin/prlimit']);
+    }
+
+    /** The paths the scripted scanner was asked to scan. */
+    private function asked(): array
+    {
+        return is_file($this->directory.'/asked') ? file($this->directory.'/asked', FILE_IGNORE_NEW_LINES) : [];
+    }
+
+    public function test_a_daemon_that_alerts_on_files_over_its_limits_passes_and_leaves_nothing_behind(): void
+    {
+        $this->scanner('clamdscan', 'refuse');
+
+        $status = $this->statuses();
+
+        $this->assertSame('pass', $status['media_scanner_limits']);
+        // The canary was made where scans make theirs, in a workspace of private storage, and not in the temporary directory.
+        $asked = $this->asked();
+        $this->assertCount(1, $asked);
+        $this->assertMatchesRegularExpression('~\A'.preg_quote(realpath($this->directory.'/private'), '~').'/processing/[0-9a-f-]{36}/\.limit-canary-[0-9a-f]{16}\z~', $asked[0]);
+        // It is gone, with its workspace and the processing directory that the doctor had to make: no trace, for a worker to trip over.
+        $this->assertFileDoesNotExist($asked[0]);
+        $this->assertDirectoryDoesNotExist($this->directory.'/private/processing');
+    }
+
+    public function test_a_processing_directory_that_was_there_stays_and_its_workspace_does_not(): void
+    {
+        $this->scanner('clamdscan', 'refuse');
+        mkdir($this->directory.'/private/processing', 0700);
+
+        $this->assertSame('pass', $this->statuses()['media_scanner_limits']);
+
+        $this->assertDirectoryExists($this->directory.'/private/processing');
+        // Empty, hidden files included: the workspace and the canary in it are gone.
+        $this->assertSame([], array_values(array_diff(scandir($this->directory.'/private/processing'), ['.', '..'])));
+        $this->assertCount(1, $this->asked());
+    }
+
+    public function test_the_scanner_limits_check_makes_nothing_where_private_storage_does_not_exist(): void
+    {
+        $this->scanner('clamdscan', 'refuse');
+        // A directory that the doctor made would belong to whoever ran it, and the worker could not use it.
+        config(['filesystems.disks.local.root' => $this->directory.'/not-there']);
+
+        $this->assertSame('warn', $this->statuses()['media_scanner_limits']);
+
+        $this->assertDirectoryDoesNotExist($this->directory.'/not-there');
+        $this->assertSame([], $this->asked());
+    }
+
+    public static function usersWhoDoNotOwnPrivateStorage(): array
+    {
+        return [
+            // Root under sudo, for one, on the storage of the worker's user.
+            'another user' => [fn (int $owner): ?int => $owner + 1],
+            'a user that cannot be told, for want of the posix extension' => [fn (int $owner): ?int => null],
+        ];
+    }
+
+    #[DataProvider('usersWhoDoNotOwnPrivateStorage')]
+    public function test_the_scanner_limits_check_makes_nothing_for_a_user_who_does_not_own_private_storage(\Closure $user): void
+    {
+        $this->scanner('clamdscan', 'refuse');
+        // A run that a signal ends skips its cleanup, and what it leaves belongs to whoever ran it, so a worker of another user could
+        // not make its own workspace in a processing/ that root made: the check is not run, and leaves nothing to clean up.
+        $owner = fileowner($this->directory.'/private');
+        app()->instance(InstallationReport::class, new InstallationReport(effectiveUserId: fn () => $user($owner)));
+
+        $check = collect(app(InstallationReport::class)->collect()['checks'])->firstWhere('id', 'media_scanner_limits');
+
+        $this->assertSame('warn', $check['status']);
+        $this->assertStringContainsString('Run vasey:doctor as the user that owns private storage, the worker\'s.', $check['message']);
+        $this->assertSame([], $this->asked());
+        $this->assertSame(['.', '..'], scandir($this->directory.'/private'));
+    }
+
+    public function test_a_workspace_that_cannot_be_made_leaves_no_processing_directory_that_the_check_made(): void
+    {
+        $this->scanner('clamdscan', 'refuse');
+        // The workspace is made below processing/, which the check has just made, and a name whose parent is not there stands for a
+        // directory that cannot be made (a full disk, a quota): the check must not leave a processing/ that it made for nothing.
+        Str::createUuidsUsing(fn () => 'no/such/parent');
+        try {
+            $status = $this->statuses()['media_scanner_limits'];
+        } finally {
+            Str::createUuidsNormally();
+        }
+
+        $this->assertSame('warn', $status);
+        $this->assertDirectoryDoesNotExist($this->directory.'/private/processing');
+        $this->assertSame([], $this->asked());
+    }
+
+    public function test_a_daemon_that_skips_files_over_its_limits_is_a_warning_that_names_the_fix(): void
+    {
+        $this->scanner('clamdscan', 'skip');
+
+        $check = collect(app(InstallationReport::class)->collect()['checks'])->firstWhere('id', 'media_scanner_limits');
+
+        $this->assertSame('warn', $check['status']);
+        $this->assertStringContainsString('MaxFileSize and MaxScanSize to 1280M and AlertExceedsMax yes', $check['message']);
+        $this->assertCount(1, $this->asked());
+        $this->assertFileDoesNotExist($this->asked()[0]);
+        $this->assertDirectoryDoesNotExist($this->directory.'/private/processing');
+    }
+
+    public function test_clamscan_carries_its_own_limits_and_passes_the_scanner_limits_check(): void
+    {
+        $this->scanner('clamscan');
+
+        $this->assertSame('pass', $this->statuses()['media_scanner_limits']);
     }
 
     public function test_missing_key_operator_and_build_fail_without_automatic_repairs(): void

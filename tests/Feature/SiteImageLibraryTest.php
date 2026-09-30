@@ -543,7 +543,8 @@ class SiteImageLibraryTest extends TestCase
         [$clamscan, $mode] = $this->scriptedClamscan();
         app()->instance(MalwareScanner::class, new MalwareScanner);
         config(['media.clamscan' => $clamscan]);
-        $timeout = config('media.process_timeout_seconds');
+        // A scan has a wall-clock limit of its own; the one the other tools share does not apply to it.
+        $timeout = config('media.scanner.timeout_seconds');
         $cases = [
             // The verdict is standard output and the exit status. Warnings on standard error are diagnostics, however many.
             'clean' => ['ready', null], 'noisy' => ['ready', null],
@@ -562,7 +563,7 @@ class SiteImageLibraryTest extends TestCase
         ];
         foreach ($cases as $case => [$status, $code]) {
             file_put_contents($mode, $case);
-            config(['media.process_timeout_seconds' => $case === 'slow' ? 1 : $timeout]);
+            config(['media.scanner.timeout_seconds' => $case === 'slow' ? 1 : $timeout]);
             $image = $this->process($this->ingest('studio', F::jpeg(1440, 630)));
 
             $this->assertSame([$status, $code, 1], [$image->status, $image->failure_code, $image->attempts], $case);

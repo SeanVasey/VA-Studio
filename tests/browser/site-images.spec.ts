@@ -37,6 +37,10 @@ test('staff upload a site image privately and, without a scanner, it waits for a
   await dialog.getByRole('button', { name: 'Upload privately', exact: true }).click();
   await expect(page.getByText('Image uploaded', { exact: true })).toBeVisible();
   await expect(dialog).toBeHidden();
+  const uploadedNotice = page.locator('.fi-no-notification').filter({ has: page.getByText('Image uploaded', { exact: true }) });
+  await uploadedNotice.getByRole('button', { name: 'Close notification', exact: true }).click();
+  // Hidden precedes Livewire's notificationClosed update. Wait for server removal before later navigation can abort it.
+  await expect(uploadedNotice).toHaveCount(0);
 
   const row = page.getByRole('row').filter({ has: page.getByText(name, { exact: true }) });
   await expect(row.getByText('Waiting', { exact: true })).toBeVisible();
@@ -50,6 +54,9 @@ test('staff upload a site image privately and, without a scanner, it waits for a
   await expect(confirm.getByText('Queues another attempt to scan and prepare this image. Nothing is published.', { exact: true })).toBeVisible();
   await confirm.getByRole('button', { name: 'Confirm', exact: true }).click();
   await expect(page.getByText('Processing queued', { exact: true })).toBeVisible();
+  const queuedNotice = page.locator('.fi-no-notification').filter({ has: page.getByText('Processing queued', { exact: true }) });
+  await queuedNotice.getByRole('button', { name: 'Close notification', exact: true }).click();
+  await expect(queuedNotice).toHaveCount(0);
   // Still no scanner: a second attempt ran and the image is back to waiting with the same explanation.
   await expect(row.locator('.fi-ta-cell-attempts')).toHaveText('2');
   await expect(row.getByText('Waiting', { exact: true })).toBeVisible();
