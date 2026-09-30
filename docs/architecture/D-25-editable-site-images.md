@@ -1,6 +1,6 @@
 # D-25 — Editable site images
 
-Status: **Implemented WP-09 contract, part 1 of 2, within Sean's continuous-development authorization, 2026-09-30; acceptance is recorded against the final tested commit in the integrating PR and [issue #9](https://github.com/VASEYDEV/VASEYAUDIO/issues/9).** Sean chose the slots and approved the defaults below on 2026-09-30. This part adds the private image library. Image slots in site releases and public serving follow in the next PR, under the URL and lifetime rules fixed here. Nothing here configures a production scanner, queue worker or host (U-02), publishes an image or completes WP-09.
+Status: **Implemented WP-09 contract in two PRs within Sean's continuous-development authorization, 2026-09-30; acceptance is recorded against the final tested commit of each integrating PR and [issue #9](https://github.com/VASEYDEV/VASEYAUDIO/issues/9).** Sean chose the slots and approved the defaults below on 2026-09-30. Part 1 adds the private image library. Part 2 adds image slots to site releases, serves live images publicly and renders them. Nothing here configures a production scanner, queue worker or host (U-02), publishes an image or completes WP-09.
 
 ## Context and choice
 
@@ -25,11 +25,11 @@ The track media pipeline cannot hold these images: `media_assets.track_id` is re
 ## Approved defaults
 
 1. **Image lifetime.** Once a release that uses an image has been live, that image stays reachable at an unguessable, content-hashed URL cached for a year. Rolling back stops the site linking to it, but cannot recall copies that browsers, CDNs or social platforms saved. An audited withdrawal action can come later.
-2. **Size and shape.** Each slot has a fixed shape. An upload must match it within 3% and be at least as large as the largest size shown, so nothing is enlarged. Staff crop hero and studio images themselves; only the share image is trimmed automatically. The two hero images are set or cleared together (next PR).
+2. **Size and shape.** Each slot has a fixed shape. An upload must match it within 3% and be at least as large as the largest size shown, so nothing is enlarged. Staff crop hero and studio images themselves; only the share image is trimmed automatically. The two hero images are set or cleared together.
 3. **Upload checks.** Transparency, CMYK, more than 8 bits per channel, rotation tags, formats other than JPEG and PNG, and files over 20 MiB are refused. Every file is scanned, re-encoded and stripped of metadata. The original upload is never served, not even to staff.
 4. **Provenance.** Every upload records a source or credit line and a confirmation that we hold the rights. Both are required and kept permanently with the uploader.
-5. **Hero contrast warning** in the editor (next PR).
-6. **Built-in images stay selectable.** A slot shows the built-in image until a release sets one; without a share image, the share image follows the hero in use (next PR).
+5. **Hero contrast warning.** The editor warns when a hero image is bright where the white heading sits, which is printed straight onto it. The preview is where staff confirm it.
+6. **Built-in images stay selectable.** A slot shows the built-in image until a release sets one; without a share image, the share image follows the hero in use.
 
 ## Slots and prepared sizes
 
@@ -82,7 +82,7 @@ Ready and failed rows are immutable. Variants can be added only while their imag
   "variants": [ { "format", "width", "height", "sha256", "size_bytes" }, … sorted by format, then width ] }
 ```
 
-It is recomputed from the variant rows whenever an image is used or served. The next PR's release references pin `{id, manifest}`, so a release can only show the exact bytes it was reviewed with.
+It is recomputed from the variant rows whenever an image is used or served. Release references pin `{id, manifest}`, so a release can only show the exact bytes it was reviewed with.
 
 ## Intake
 
@@ -132,13 +132,69 @@ It refreshes every 5 seconds. **Upload site image** asks for the slot (showing i
 
 `GET /admin/site-images/{variant}/preview` requires the panel's authentication and MFA middleware and `administer-catalog`, and is throttled to 240 requests a minute. It serves a variant only when its image is ready and its manifest matches, hashing the file's bytes on every request and sending exactly the bytes it hashed. Every response, including authentication failures and 404s, is `no-store, private`, `nosniff`, `noindex, nofollow` and `no-referrer`.
 
-## Public serving: fixed for the next PR
+## Image slots in site releases (part 2)
 
-- URL: `/site-images/{variant sha256}.{jpg|webp}`.
-- Served only when the variant belongs to an image referenced by a release that has been live (publication history joined with an insert-only release image index), with `public, max-age=31536000, immutable` and `nosniff`.
-- Anything else, missing or never live, gets the same 404 with `no-store`.
-- Bytes are rechecked on every serve; the route ignores the session and is throttled.
-- A damaged variant fails only that image: the page renders its alt text and never swaps in the built-in file.
+**Schema version 3** is version 2 plus `images`:
+
+```
+images: {
+  hero:   { desktop: { id, manifest }, mobile: { id, manifest }, alt } | null,
+  studio: { id, manifest, alt } | null,
+  share:  { id, manifest, alt } | null
+}
+```
+
+`null` keeps the built-in image. Descriptions are 1–200 characters of plain text and required with an image. Ids are integers. The release hash covers the references, so a release pins its exact images.
+
+The editor writes version 3 **only when a release uses an image**. An image-free draft stays version 2, so code that predates site images can still read it if the application is rolled back. Retained version 1 and 2 releases never change. `forEditing()` still upgrades only version 1 to 2.
+
+**Creating a release.** `SiteContent::create()` pins each reference inside its transaction:
+
+- It locks the image row, which must be a ready image of the slot with an intact manifest and accepted scan evidence.
+- It reads the variants with a locking read and records the image's manifest. A manifest the caller supplied must match.
+- It writes one `site_release_images` row per slot.
+
+A MySQL race test found that a plain read of the variants could use a snapshot taken before the lock waited for the image's completion. It then saw a ready image without its variants and refused it. The locking read always sees the latest commit. A release created while its image completes either pins the whole manifest or is refused; it never pins part of one.
+
+**The release image index.** `site_release_images` (release, slot, image) is insert-only. Triggers on both engines accept a row only when:
+
+- the image is ready and of the same slot;
+- the release is version 3;
+- the release has never been scheduled or published.
+
+Every read of a version 3 release checks that the index lists exactly the release's references.
+
+**Reads.** `content()` accepts versions 1–3. For version 3 it checks, from the database only, that every referenced image is ready and of its slot. Its recomputed manifest must equal the pinned one, and its scan evidence must be accepted. A failure is a `release` integrity failure, so public pages answer 503 and staff restore another release. The pointer check never looks at images, so restoring away from a broken release always works.
+
+**Publishing.** Publish and restore check the stored files of the target release's images before taking the publication lock, hashing every variant. The scheduler does the same in its unlocked probe and records a failure as its existing `integrity` outcome.
+
+**Public serving.** `GET /site-images/{sha256}.{jpg|webp}` serves a variant only when:
+
+- its image is referenced by a release that has publication history;
+- its manifest still matches;
+- the bytes read now match its hash.
+
+It answers with `public, max-age=31536000, immutable` and `nosniff`. Anything else, missing, private or never live, gets the same empty 404 with `no-store`. The route runs without the web middleware: no session, cookies, CSRF or Inertia, so a cached response never carries a visitor's state. It is throttled to 600 requests a minute.
+
+Identical outputs can share a hash, so the route serves any live candidate whose bytes verify. Once an image has been live it stays reachable after the site moves on; withdrawal is out of scope.
+
+A damaged file fails only that image: the page still renders, the image URL answers 404 and the browser shows the description. The built-in file is never swapped in.
+
+**Rendering.** A `siteImages` prop is built separately from the page chrome:
+
+- The storefront hero is a `<picture>` with mobile WebP and JPEG sources below 700 px, then desktop WebP, then a JPEG `<img>` carrying every width in `srcset`.
+- The studio image is the same with `(max-width: 900px) 100vw, 50vw`.
+- Every source carries the release's description and the intrinsic size of its largest JPEG.
+- A staff preview links the private preview route instead of the public one.
+
+**Sharing metadata** uses the share image's JPEG. Without one it uses the desktop hero's 1200 px JPEG, and without that the built-in hero. `og:image:width`, `og:image:height` and `og:image:type` are added where the size is known: always for site images, never for track artwork. Both the server's first render and the client's head management emit them.
+
+**Editor.** An **Images** section offers, for each place, the ready images of that slot, newest first, or the built-in image. Option labels are escaped. The form holds ids and descriptions only; saving pins manifests as above. The section:
+
+- warns when a hero image's mean relative luminance under the heading exceeds 0.3, roughly the 3:1 large-text limit for white text;
+- notes that platforms keep their own copy of a share image.
+
+**Doctor.** `vasey:doctor` adds `site_images`, which warns when a stored file of an image in the active release fails its hash.
 
 ## Operations
 
@@ -165,4 +221,18 @@ Required evidence:
 
 The PHP suite uses the testing-only scanner double, so it proves the handling of scanner results, not real malware detection. Test definitions do not establish these results; the integrating PR records the executed commands and CI.
 
-Next: image slots in site releases (schema v3, the release image index, public URLs and rendering), as one PR. Blog and video thumbnails, responsive track artwork (FP-045), image withdrawal, a CDN, and the logo, theme and fonts are out of scope.
+Part 2 evidence adds:
+
+- pinning and refusal on release creation, and the index guards;
+- file checks before publish, restore and the scheduler;
+- reads failing closed when a variant hash, the index or the scan evidence changes behind dropped guards, while staff can still restore another release;
+- the public route: never-live, draft, scheduled, live, rolled-back, staff-session and damaged-file cases;
+- storefront, editorial and preview props, with sharing metadata;
+- the editor: options, both hero images, descriptions and the contrast warning;
+- the doctor check;
+- a MySQL race between release creation and image completion in both lock orders;
+- frontend tests of the rendered `<picture>` elements.
+
+The browser harness has no scanner, so no image becomes ready there. Its spec shows the editor offering only built-in images, and the ready-image flow is covered by the PHP and frontend tests.
+
+Blog and video thumbnails, responsive track artwork (FP-045), image withdrawal, a CDN, and the logo, theme and fonts are out of scope.

@@ -14,6 +14,20 @@ The accepted original CMS saves homepage copy as private immutable drafts. [Edit
 
 Rows distinguish **Active**, **Previously published** and **Private draft**. An active release cannot be activated again. A draft never published cannot be used as a rollback target. First publication retains **Original site content**, an immutable capture of the previous code-default homepage with revision-zero history, so it can be restored like another previous release. Restoration always selects retained content; it never resets the publication revision.
 
+## Site images
+
+[D-25](architecture/D-25-editable-site-images.md) makes four images editable: the home hero (desktop and mobile), the studio image and the share image.
+
+1. Upload the image under **Publishing → Site images**, choosing its place and giving a credit line and a rights confirmation. It is scanned and prepared in the sizes that place needs. Only **Ready** images can be used.
+2. In a content draft, the **Images** section offers the ready images for each place, or the built-in image. Set both hero images or neither, and describe each image for people who cannot see it. The editor warns when a hero image is bright where the heading sits; check the preview.
+3. The share image is what social platforms show when a page is shared. Without one, pages share the hero in use.
+4. Preview the release. Its images come from the private preview route and are not public yet.
+5. Publishing checks every stored file of the release's images first.
+
+Once a release that uses an image is published, the image is public at its own content-hashed address, and browsers may keep it for a year. Restoring another release stops the site using it but does not withdraw copies that browsers or platforms already hold.
+
+A release without images is saved exactly as before, so code that predates site images can still read it.
+
 ## Scheduled publication
 
 [D-24](architecture/D-24-scheduled-site-publication.md) lets staff choose one saved release and a future time. Times are UTC.
@@ -63,9 +77,11 @@ Each release retains its schema, canonicalization version and content hash. Publ
 
 While that is the case, pages that read site content answer a generic, uncacheable `503` with `Retry-After: 60`. The failure never becomes a redirect and never shows code defaults. The application log records `Published site content is unavailable.` at critical level with the reason, revision and release id: at most once a minute while the cache works, and on every request when it does not. **New content draft** reports the failure instead of opening, and says which of these recoveries applies:
 
-- `release`: the active release failed its checks. Publish or restore an intact release; **More → Edit as new draft** on a saved release gives you one to publish.
+- `release`: the active release failed its checks, or an image it uses did. Publish or restore an intact release; **More → Edit as new draft** on a saved release gives you one to publish.
 - `publication`: the publication record or its history failed its checks, so publishing and restoring are refused with *The retained site publication failed its integrity check*. Restore verified database data from a backup before retrying.
 - `missing`: the publication record is gone. The guards refuse a `DELETE`, but a MySQL `TRUNCATE` skips them. Staff cannot recover it in the panel, where the Site Releases page may answer Not Found: restore verified data from a backup. Re-creating the empty record by hand does not help. Once the site has been published, an empty record fails its check too and reports `publication`; the original copy never comes back.
+
+A damaged stored file of a site image breaks only that image: the page still renders and shows the image's description, and `vasey:doctor` warns (`site_images`). Restore `storage/app/private/site-images/` from the same backup as the database, or publish a release that uses another image.
 
 Content rollback changes only the site pointer and its history/audit. It does not refund, cancel, reprice or alter any purchased license, original contract, entitlement or provider object. Application rollback must retain these tables. The migration refuses rollback once releases exist; old application code may display its own baseline copy instead of the retained active release.
 
