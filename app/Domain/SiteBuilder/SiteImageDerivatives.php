@@ -21,14 +21,12 @@ final class SiteImageDerivatives
             $filter = 'sidedata=mode=delete,'.($crop
                 ? "scale={$width}:{$height}:force_original_aspect_ratio=increase:flags=lanczos,crop={$width}:{$height}"
                 : "scale={$width}:{$height}:flags=lanczos");
-            $codec = $format === 'webp'
-                ? ['-c:v', 'libwebp', '-quality', '80', '-compression_level', '4']
-                : ['-c:v', 'mjpeg', '-q:v', '3', '-pix_fmt', 'yuvj420p'];
             app(BoundedMediaProcess::class)->run([
                 config('media.ffmpeg'), '-nostdin', '-hide_banner', '-loglevel', 'error', '-xerror', '-n', '-threads', '1', '-filter_threads', '1',
                 '-protocol_whitelist', 'file,pipe', '-err_detect', 'explode', '-f', 'png_pipe', '-i', $png,
                 // Bitexact output omits the encoder version comment, so the same source and tools give the same bytes.
-                '-map', '0:v:0', '-map_metadata', '-1', '-frames:v', '1', '-vf', $filter, ...$codec, '-flags:v', '+bitexact', '-fflags', '+bitexact',
+                '-map', '0:v:0', '-map_metadata', '-1', '-frames:v', '1', '-vf', $filter, ...SiteImageSlot::encoderArguments($format),
+                '-flags:v', '+bitexact', '-fflags', '+bitexact',
                 '-f', 'image2', '-update', '1', $file,
             ], $workspace);
             $actual = @getimagesize($file);

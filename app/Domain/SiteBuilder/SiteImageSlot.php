@@ -29,6 +29,24 @@ final class SiteImageSlot
     private const ENCODING = ['jpeg' => ['codec' => 'mjpeg', 'q' => 3, 'pix_fmt' => 'yuvj420p'], 'webp' => ['codec' => 'libwebp', 'quality' => 80, 'compression_level' => 4],
         'scaler' => 'lanczos', 'metadata' => 'none', 'bitexact' => true];
 
+    /** The FFmpeg option that carries each recorded encoder setting. */
+    private const ENCODER_OPTIONS = ['codec' => '-c:v', 'q' => '-q:v', 'pix_fmt' => '-pix_fmt', 'quality' => '-quality', 'compression_level' => '-compression_level'];
+
+    /**
+     * A format's encoder arguments, built from the recorded settings in their order, so the fingerprint always describes the bytes.
+     *
+     * @return list<string>
+     */
+    public static function encoderArguments(string $format): array
+    {
+        $arguments = [];
+        foreach (self::ENCODING[$format] as $setting => $value) {
+            array_push($arguments, self::ENCODER_OPTIONS[$setting], (string) $value);
+        }
+
+        return $arguments;
+    }
+
     public static function exists(string $slot): bool
     {
         return array_key_exists($slot, self::DEFINITIONS);
