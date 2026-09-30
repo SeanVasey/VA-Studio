@@ -1,10 +1,14 @@
 <?php
 
+use App\Domain\Media\MalwareScanner;
 use App\Domain\SiteBuilder\SiteContent;
+use App\Domain\SiteBuilder\SiteImageProcessor;
 use App\Models\User;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Tests\Support\TestOnlyMediaScanner;
 
 require dirname(__DIR__, 2).'/vendor/autoload.php';
 
@@ -20,8 +24,12 @@ try {
         throw new LogicException('Missing CMS race configuration.');
     }
     $input = json_decode(stream_get_contents(STDIN, 4096), true, 16, JSON_THROW_ON_ERROR);
-    if (! in_array($input['operation'] ?? null, ['publish', 'rollback', 'run_schedule', 'cancel_schedule'], true)) {
+    if (! in_array($input['operation'] ?? null, ['publish', 'rollback', 'run_schedule', 'cancel_schedule', 'process_site_image'], true)) {
         throw new LogicException('Unsupported CMS race operation.');
+    }
+    $table = getenv('VASEY_SITE_RACE_LOCK_TABLE') ?: 'site_publications';
+    if (! in_array($table, ['site_publications', 'site_images'], true)) {
+        throw new LogicException('Unsupported CMS race lock.');
     }
     DB::statement('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
     $connection = (int) DB::selectOne('SELECT CONNECTION_ID() AS id')->id;
@@ -39,7 +47,7 @@ try {
         throw new RuntimeException('CMS worker barrier timed out.');
     };
     $isPublicationLock = fn (string $sql): bool => preg_match('/\Aselect\b/i', $sql)
-        && str_contains($sql, 'from `site_publications`') && str_contains($sql, 'for update');
+        && str_contains($sql, 'from `'.$table.'`') && str_contains($sql, 'for update');
     DB::connection()->beforeExecuting(function ($query) use ($isPublicationLock, $directory, $worker, $connection, $wait): void {
         if ($isPublicationLock($query)) {
             file_put_contents($directory.'/ready-'.$worker, (string) $connection);
@@ -54,7 +62,18 @@ try {
     });
     try {
         $site = app(SiteContent::class);
-        if ($input['operation'] === 'run_schedule') {
+        if ($input['operation'] === 'process_site_image') {
+            // Share the test's private storage, and its synthetic scanner, which the testing environment alone accepts.
+            $root = getenv('VASEY_SITE_RACE_STORAGE_ROOT');
+            if (! is_string($root) || ! is_dir($root)) {
+                throw new LogicException('Missing site image storage root.');
+            }
+            config(['filesystems.disks.local.root' => $root]);
+            Storage::forgetDisk('local');
+            app()->instance(MalwareScanner::class, new TestOnlyMediaScanner);
+            $image = app(SiteImageProcessor::class)->handle($input['image_id']);
+            $result = ['result' => 'processed', 'status' => $image->status, 'attempts' => $image->attempts];
+        } elseif ($input['operation'] === 'run_schedule') {
             // The scheduler reads the real clock; fixtures make the schedule due and within its grace window.
             $run = $site->runDueSchedule();
             $result = ['result' => 'schedule', 'outcome' => $run['outcome'] ?? null, 'revision' => $run['publication_revision'] ?? null];

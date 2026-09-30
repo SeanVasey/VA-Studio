@@ -8,16 +8,18 @@ use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 use Tests\TestCase;
 
-/** Two independent workers must demonstrably contend on the singleton publication row. */
+/** Two independent workers must demonstrably contend on one locked row: by default the singleton publication row. */
 final class SiteContentRace
 {
     /**
      * @param  (callable(array, int, int): void)|null  $outcomes  Asserts worker results by winner and loser; the default
      *                                                            expects one publication and one stale-revision rejection.
      * @param  int|null  $first  Worker released to take the lock first, so each serialization order is tested; null races both.
+     * @param  array{table: 'site_publications'|'site_images', id: int}  $lock  The row both workers must lock.
      */
-    public static function run(TestCase $test, array $jobs, ?callable $outcomes = null, ?int $first = null): array
+    public static function run(TestCase $test, array $jobs, ?callable $outcomes = null, ?int $first = null, array $lock = ['table' => 'site_publications', 'id' => 1]): array
     {
+        $test->assertContains($lock['table'], ['site_publications', 'site_images']);
         $test->assertCount(2, $jobs);
         $test->assertSame(0, DB::transactionLevel(), 'Race fixtures must be committed.');
         $directory = storage_path('framework/testing/site-content-race-'.Str::uuid());
@@ -35,6 +37,7 @@ final class SiteContentRace
                     'DB_PASSWORD' => (string) $database['password'], 'DB_SOCKET' => (string) ($database['unix_socket'] ?? ''),
                     'CACHE_STORE' => 'array', 'SESSION_DRIVER' => 'array', 'QUEUE_CONNECTION' => 'sync',
                     'VASEY_SITE_RACE_DIRECTORY' => $directory, 'VASEY_SITE_RACE_WORKER' => (string) $worker,
+                    'VASEY_SITE_RACE_LOCK_TABLE' => $lock['table'], 'VASEY_SITE_RACE_STORAGE_ROOT' => (string) config('filesystems.disks.local.root'),
                 ], json_encode($job, JSON_THROW_ON_ERROR), 50);
                 $process->start();
                 $processes[] = $process;
@@ -61,11 +64,12 @@ JOIN performance_schema.threads AS requesting_thread ON requesting_thread.THREAD
 JOIN performance_schema.threads AS blocking_thread ON blocking_thread.THREAD_ID = waits.BLOCKING_THREAD_ID
 JOIN performance_schema.data_locks AS requested ON requested.ENGINE_LOCK_ID = waits.REQUESTING_ENGINE_LOCK_ID AND requested.ENGINE = waits.ENGINE
 WHERE waits.ENGINE = 'INNODB' AND requesting_thread.PROCESSLIST_ID = ? AND blocking_thread.PROCESSLIST_ID = ?
-  AND requested.OBJECT_SCHEMA = ? AND requested.OBJECT_NAME = 'site_publications' AND requested.INDEX_NAME = 'PRIMARY'
-  AND requested.LOCK_TYPE = 'RECORD' AND requested.LOCK_STATUS = 'WAITING' AND requested.LOCK_DATA = '1'
+  AND requested.OBJECT_SCHEMA = ? AND requested.OBJECT_NAME = ? AND requested.INDEX_NAME = 'PRIMARY'
+  AND requested.LOCK_TYPE = 'RECORD' AND requested.LOCK_STATUS = 'WAITING' AND requested.LOCK_DATA = ?
 LIMIT 1
 SQL;
-            self::until($test, $processes, fn () => DB::selectOne($sql, [$ids[$loser], $ids[$winner], $database['database']])?->lock_status === 'WAITING', 'same-row contention');
+            $bindings = [$ids[$loser], $ids[$winner], $database['database'], $lock['table'], (string) $lock['id']];
+            self::until($test, $processes, fn () => DB::selectOne($sql, $bindings)?->lock_status === 'WAITING', 'same-row contention');
             touch($directory.'/commit');
             $results = [];
             foreach ($processes as $process) {

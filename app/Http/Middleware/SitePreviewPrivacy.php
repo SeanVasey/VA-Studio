@@ -11,7 +11,7 @@ final class SitePreviewPrivacy
 {
     public static function matches(Request $request): bool
     {
-        return $request->is('admin/site-releases/*/preview', 'admin/site-releases/*/preview/*');
+        return $request->is('admin/site-releases/*/preview', 'admin/site-releases/*/preview/*', 'admin/site-images/*/preview');
     }
 
     public function handle(Request $request, Closure $next): Response
