@@ -16,12 +16,15 @@ use App\Domain\Media\VerifiedMedia;
 use App\Jobs\ProcessMedia;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use PDOException;
 use Symfony\Component\Process\Process;
 use Tests\Support\MediaFixtures;
 use Tests\Support\ShortReadMediaStream;
@@ -443,6 +446,146 @@ class MediaProcessingTest extends TestCase
             $this->assertSame('storage_failed', $failure->failureCode);
         }
         $this->assertSame($hash, hash_file('sha256', Storage::disk('local')->path($key)));
+    }
+
+    public function test_an_error_after_the_completion_commit_keeps_durable_outputs_and_duplicate_handling(): void
+    {
+        $source = MediaFixtures::source($this->track);
+        $run = app(QueueMediaProcessing::class)->handle($source, $this->actor);
+        $raised = false;
+        Event::listen(TransactionCommitted::class, function () use ($run, &$raised): void {
+            if (! $raised && MediaProcessingRun::query()->whereKey($run->id)->value('status') === 'completed') {
+                $raised = true;
+                throw new PDOException('Synthetic failure after the media completion commit.');
+            }
+        });
+
+        try {
+            app(MediaProcessor::class)->handle($run->id);
+            $this->fail('The completion listener error was swallowed.');
+        } catch (MediaFailure $failure) {
+            $this->assertSame('processing_failed', $failure->failureCode);
+        }
+
+        $this->assertTrue($raised);
+        $completed = $run->fresh();
+        $this->assertSame(['completed', null, null], [$completed->status, $completed->failure_code, $completed->claim_token]);
+        $this->assertSame('processed', $source->fresh()->status);
+        $this->assertFileExists(Storage::disk('local')->path($source->storage_path));
+        $outputs = $completed->outputs()->get();
+        $this->assertCount(3, $outputs);
+        foreach ($outputs as $asset) {
+            $this->assertFileExists(Storage::disk('local')->path($asset->storage_path));
+            $this->assertSame($asset->sha256, hash_file('sha256', Storage::disk('local')->path($asset->storage_path)));
+            $this->assertTrue(app(VerifiedMedia::class)->available($asset));
+        }
+        $this->assertSame([], glob(Storage::disk('local')->path('processing').'/*'));
+        $again = app(MediaProcessor::class)->handle($run->id);
+        $this->assertSame($completed->output_asset_ids, $again->output_asset_ids);
+        $this->assertSame(1, $again->attempts);
+        $this->assertSame(3, MediaAsset::query()->where('status', 'ready')->count());
+        $this->assertCount(3, Storage::disk('local')->allFiles('media/revisions'));
+    }
+
+    /** Simulates a commit whose rows are not visible by undoing its savepoint inside RefreshDatabase's outer transaction. */
+    private function undoLastCommit(): void
+    {
+        $connection = DB::connection();
+        $connection->getPdo()->exec($connection->getQueryGrammar()->compileSavepointRollBack('trans'.($connection->transactionLevel() + 1)));
+    }
+
+    public function test_an_ambiguous_completion_commit_keeps_promoted_files_and_allows_a_fresh_retry(): void
+    {
+        $source = MediaFixtures::source($this->track);
+        $run = app(QueueMediaProcessing::class)->handle($source, $this->actor);
+        $raised = false;
+        $retained = [];
+        Event::listen(TransactionCommitted::class, function () use ($run, &$raised, &$retained): void {
+            if (! $raised && MediaProcessingRun::query()->whereKey($run->id)->value('status') === 'completed') {
+                $raised = true;
+                $retained = $run->outputs()->get()->pluck('sha256', 'storage_path')->all();
+                $this->undoLastCommit();
+                throw new PDOException('Synthetic failure while committing completed media.');
+            }
+        });
+
+        try {
+            app(MediaProcessor::class)->handle($run->id);
+            $this->fail('The ambiguous completion error was swallowed.');
+        } catch (MediaFailure $failure) {
+            $this->assertSame('processing_failed', $failure->failureCode);
+        }
+
+        $this->assertTrue($raised);
+        $this->assertCount(3, $retained);
+        $this->assertSame(['failed', 'processing_failed', null], [$run->fresh()->status, $run->fresh()->failure_code, $run->fresh()->claim_token]);
+        $this->assertSame('quarantined', $source->fresh()->status);
+        $this->assertSame(0, $run->outputs()->count());
+        $this->assertCount(3, Storage::disk('local')->allFiles('media/revisions'), 'Files were deleted while the completion commit was in doubt.');
+        foreach ($retained as $path => $hash) {
+            $this->assertFileExists(Storage::disk('local')->path($path));
+            $this->assertSame($hash, hash_file('sha256', Storage::disk('local')->path($path)));
+        }
+        $this->assertFileExists(Storage::disk('local')->path($source->storage_path));
+        $this->assertSame([], glob(Storage::disk('local')->path('processing').'/*'));
+
+        $retry = app(QueueMediaProcessing::class)->handle($source, $this->actor);
+        $this->assertSame($run->id, $retry->id);
+        $completed = app(MediaProcessor::class)->handle($retry->id);
+        $this->assertSame(['completed', 2], [$completed->status, $completed->attempts]);
+        $this->assertSame('processed', $source->fresh()->status);
+        $outputs = $completed->outputs()->get();
+        $this->assertCount(3, $outputs);
+        $this->assertSame([], array_values(array_intersect(array_keys($retained), $outputs->pluck('storage_path')->all())));
+        foreach ($outputs as $asset) {
+            $this->assertSame($asset->sha256, hash_file('sha256', Storage::disk('local')->path($asset->storage_path)));
+            $this->assertTrue(app(VerifiedMedia::class)->available($asset));
+        }
+        foreach ($retained as $path => $hash) {
+            $this->assertSame($hash, hash_file('sha256', Storage::disk('local')->path($path)));
+        }
+        $this->assertSame(3, MediaAsset::query()->where('status', 'ready')->count());
+        $this->assertCount(6, Storage::disk('local')->allFiles('media/revisions'));
+        $this->assertSame([], glob(Storage::disk('local')->path('processing').'/*'));
+    }
+
+    public function test_an_error_after_a_child_insert_rolls_back_and_cleans_only_the_new_attempt(): void
+    {
+        $existing = $this->process();
+        $original = $existing->outputs()->get()->pluck('sha256', 'storage_path')->all();
+        $source = MediaFixtures::source($this->track);
+        $run = app(QueueMediaProcessing::class)->handle($source, $this->actor);
+        $inserted = false;
+        Event::listen('eloquent.created: '.MediaAsset::class, function (MediaAsset $asset) use ($run, &$inserted): void {
+            if (! $inserted && (int) $asset->processing_run_id === (int) $run->id) {
+                $inserted = true;
+                throw new PDOException('Synthetic failure after inserting a media output.');
+            }
+        });
+
+        try {
+            app(MediaProcessor::class)->handle($run->id);
+            $this->fail('The output insertion error was swallowed.');
+        } catch (MediaFailure $failure) {
+            $this->assertSame('processing_failed', $failure->failureCode);
+        }
+
+        $this->assertTrue($inserted);
+        $this->assertSame(['failed', 'processing_failed', null], [$run->fresh()->status, $run->fresh()->failure_code, $run->fresh()->claim_token]);
+        $this->assertSame(0, $run->outputs()->count());
+        $this->assertSame('quarantined', $source->fresh()->status);
+        $this->assertFileExists(Storage::disk('local')->path($source->storage_path));
+        $paths = array_keys($original);
+        sort($paths);
+        $this->assertSame($paths, Storage::disk('local')->allFiles('media/revisions'));
+        foreach ($original as $path => $hash) {
+            $this->assertSame($hash, hash_file('sha256', Storage::disk('local')->path($path)));
+        }
+        $this->assertSame('completed', $existing->fresh()->status);
+        foreach ($existing->outputs()->get() as $asset) {
+            $this->assertTrue(app(VerifiedMedia::class)->available($asset));
+        }
+        $this->assertSame([], glob(Storage::disk('local')->path('processing').'/*'));
     }
 
     private function decode(MediaAsset $asset): array
