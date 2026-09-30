@@ -381,6 +381,10 @@ class SiteImageLibraryTest extends TestCase
         $cases = [
             ['rotated_image', F::jpeg(1440, 630, ['exif' => 6]), 1440, 630],
             ['rotated_image', F::jpeg(1440, 630, ['exif' => [1, 6]]), 1440, 630],
+            // The header reader does not see EXIF in these places, but FFmpeg does, so the prober refuses them.
+            ['rotated_image', F::jpeg(1440, 630, ['hidden_exif' => 'after_scan']), 1440, 630],
+            ['rotated_image', F::jpeg(1440, 630, ['hidden_exif' => 'dnl']), 1440, 630],
+            ['rotated_image', F::jpeg(1440, 630, ['hidden_exif' => 'id']), 1440, 630],
             ['oversized_metadata', F::png(1440, 630, 'rgb', [F::pngExif(6, 70 * 1024)]), 1440, 630],
             // FFmpeg ignores PNG eXIf, so the repeated header check is what stops a rotation after the image data here.
             ['rotated_image', F::png(1440, 630, 'rgb', [], [F::pngExif(6)]), 1440, 630],

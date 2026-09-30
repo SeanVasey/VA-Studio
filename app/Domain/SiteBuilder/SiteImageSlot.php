@@ -25,15 +25,21 @@ final class SiteImageSlot
         'share' => ['label' => 'Share image', 'width' => 1200, 'height' => 630, 'widths' => [1200], 'formats' => ['jpeg'], 'crop' => true],
     ];
 
-    /** Encoder settings that are part of the recorded profile, so any change is visible in the evidence. */
+    /**
+     * Encoder settings recorded in the profile fingerprint. The per-format values build the encoder arguments; scaler, metadata
+     * and bitexact only describe choices that SiteImageDerivatives makes in code.
+     */
     private const ENCODING = ['jpeg' => ['codec' => 'mjpeg', 'q' => 3, 'pix_fmt' => 'yuvj420p'], 'webp' => ['codec' => 'libwebp', 'quality' => 80, 'compression_level' => 4],
         'scaler' => 'lanczos', 'metadata' => 'none', 'bitexact' => true];
 
-    /** The FFmpeg option that carries each recorded encoder setting. */
+    /** The FFmpeg option that carries each recorded encoder setting. This mapping is code, outside the fingerprint. */
     private const ENCODER_OPTIONS = ['codec' => '-c:v', 'q' => '-q:v', 'pix_fmt' => '-pix_fmt', 'quality' => '-quality', 'compression_level' => '-compression_level'];
 
     /**
-     * A format's encoder arguments, built from the recorded settings in their order, so the fingerprint always describes the bytes.
+     * A format's encoder arguments, built from the recorded settings in their order, so changing a setting changes the fingerprint.
+     * The fingerprint covers only the recorded slot definitions, tolerance and encoder settings. Changing the option mapping
+     * above, or the fixed filter chain and flags in SiteImageDerivatives, can change the bytes without changing it, so either
+     * needs a new PROFILE_VERSION.
      *
      * @return list<string>
      */

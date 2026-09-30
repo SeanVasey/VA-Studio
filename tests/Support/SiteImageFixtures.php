@@ -26,9 +26,10 @@ final class SiteImageFixtures
      *
      * exif is the Orientation value, or one value per EXIF block; GPS data is always added with it. stray moves the metadata after
      * GD's own first segment behind a stray byte, which decoders and getimagesize() skip. adobe_rgb adds an Adobe marker declaring
-     * the samples RGB (transform 0), which FFmpeg decodes as planar RGB (gbrp).
+     * the samples RGB (transform 0), which FFmpeg decodes as planar RGB (gbrp). hidden_exif places a sideways EXIF block where
+     * FFmpeg reads it but intake's header reader does not: after the scan data, inside a DNL segment, or behind "Exif\0\x01".
      *
-     * @param  array{exif?: int|list<int>, xmp?: bool, iptc?: bool, icc?: bool, comment?: bool, progressive?: bool, stray?: bool, adobe_rgb?: bool}  $options
+     * @param  array{exif?: int|list<int>, xmp?: bool, iptc?: bool, icc?: bool, comment?: bool, progressive?: bool, stray?: bool, adobe_rgb?: bool, hidden_exif?: 'after_scan'|'dnl'|'id'}  $options
      */
     public static function jpeg(int $width, int $height, array $options = []): string
     {
@@ -60,6 +61,18 @@ final class SiteImageFixtures
         }
         if ($options['comment'] ?? false) {
             $segments .= self::segment(0xFE, 'SYNTHETIC-COMMENT-MARKER');
+        }
+        $hidden = $options['hidden_exif'] ?? null;
+        if ($hidden === 'after_scan') {
+            // Between the scan data and the end-of-image marker.
+            $end = (int) strrpos($jpeg, "\xFF\xD9");
+            $jpeg = substr($jpeg, 0, $end).self::segment(0xE1, "Exif\0\0".self::tiff(6)).substr($jpeg, $end);
+        } elseif ($hidden === 'dnl') {
+            // FFmpeg looks for the next marker inside a segment it does not parse; a reader that skips by length does not.
+            $segments .= self::segment(0xDC, "\0\0".self::segment(0xE1, "Exif\0\0".self::tiff(6)));
+        } elseif ($hidden === 'id') {
+            // FFmpeg checks only "Exif" and skips the next two bytes unread.
+            $segments .= self::segment(0xE1, "Exif\0\x01".self::tiff(6));
         }
         if ($options['stray'] ?? false) {
             // After a complete first segment, so the file still starts like a JPEG; its length field counts itself.

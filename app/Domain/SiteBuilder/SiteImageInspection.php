@@ -170,8 +170,11 @@ final class SiteImageInspection
     }
 
     /**
-     * The Orientation tag of every EXIF block in a JPEG, in file order. Only the markers before the image data are read, and
-     * stray bytes before a marker are skipped the way libjpeg skips them, so no block a decoder would find is missed.
+     * The Orientation tag of each EXIF block this reader finds in a JPEG, in file order: APP1 segments starting "Exif\0\0" among
+     * the markers before the first scan, with stray bytes before a marker skipped the way libjpeg skips them. FFmpeg also reads
+     * EXIF placed after the scan data, inside the payload of a segment it does not parse (such as DNL), or behind "Exif"
+     * followed by anything but two zero bytes. Those pass here, but the bounded prober reports their orientation at
+     * processing, which refuses the image.
      *
      * @return list<?int>
      */
