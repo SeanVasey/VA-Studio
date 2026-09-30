@@ -6,7 +6,7 @@ Reconciled 2026-09-30. Accepted starting baseline `520f66fb8af69d9d393a362fd2627
 
 ### Fail-closed public pages — September 30
 
-Found while planning editable site images: when the published site content failed its integrity check, `SiteContent::current()` raised a validation error that Laravel rendered as a redirect to the previous URL. `/` redirected to the site root in a loop, and a page reached from another site sent the visitor back there. Public storefront and editorial pages now answer a generic, uncacheable 503 with `Retry-After`, including when content rows are missing. The outage is logged at most once a minute, and **New content draft** reports the failure instead of breaking. The integrating PR records the exact tested source, checks and review.
+Found while planning editable site images: when the published site content failed its integrity check, `SiteContent::current()` raised a validation error that Laravel rendered as a redirect to the previous URL. `/` redirected to the site root in a loop, and a page reached from another site sent the visitor back there. Public storefront and editorial pages now answer a generic, uncacheable 503 with `Retry-After`, including when content rows are missing. The outage is logged with its reason (at most once a minute while the cache works), and **New content draft** reports the failure and the recovery that applies instead of breaking. The integrating PR records the exact tested source, checks and review.
 
 Next, in the order of the plan Sean approved on September 30:
 
@@ -149,7 +149,7 @@ An explicit GitHub `is:open` query exposed ten older Dependabot PRs omitted by t
 
 | Order / lane | Reviewable scope | Entry condition and completion evidence |
 | --- | --- | --- |
-| Current increment, WP-09 | Fail-closed public pages | A published release that fails integrity yields a generic 503 on every public page, never a redirect or code defaults; the editor reports it. Tests fail on the previous code. |
+| Current increment, WP-09 | Fail-closed public pages | Published content that fails integrity yields a generic 503 on public pages instead of a redirect or code defaults (a malformed catalog query is still validated, and redirected, first); the editor reports it. Tests fail on the previous code. |
 | Next, WP-09 | Site Releases row menu | Secondary row actions move into a menu so the table fits a 1440 px window; browser specs open the menu rather than passing on a closed one. |
 | Then, WP-09 | Editable site images (D-25, recorded with the library PR), as two PRs | Sean chose the home hero (desktop and mobile), studio and share slots. A private site-image library (intake, scan, re-encode, variants, staff preview) lands first; image slots in site releases and their public serving follow atomically, with explicit readiness, authorization, persistence, concurrency and browser evidence. Retain inbound contact, consent-aware embeds and broader sharing/support boundaries. |
 | After WP-08/WP-09, WP-10 | Collections and licensed sound-kit manifests using exact digital delivery | Verify purchased composition/license semantics and archive privacy. Services and merchandise remain separate workflows; do not fabricate shipping, return or deposit policy. |

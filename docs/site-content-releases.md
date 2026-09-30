@@ -61,9 +61,11 @@ Create and activation operations reload staff authorization. Losing the administ
 
 Each release retains its schema, canonicalization version and content hash. Publication retains the actor, selected/previous release, increasing revision and hash, together with an audit event. A failed activation transaction must leave all three unchanged. A configured release or pointer that fails integrity validation is an error, not permission to fall back silently to code copy. Preserve evidence and restore verified data before retrying.
 
-While that is the case, pages that read site content answer a generic, uncacheable `503` with `Retry-After: 60`. The failure never becomes a redirect and never shows code defaults. The application log records `Published site content is unavailable.` at critical level, at most once a minute, with the reason (`integrity` or `missing`), revision and release id. **New content draft** reports the failure instead of opening.
+While that is the case, pages that read site content answer a generic, uncacheable `503` with `Retry-After: 60`. The failure never becomes a redirect and never shows code defaults. The application log records `Published site content is unavailable.` at critical level with the reason, revision and release id: at most once a minute while the cache works, and on every request when it does not. **New content draft** reports the failure instead of opening, and says which of these recoveries applies:
 
-To recover, publish or restore an intact release; **More → Edit as new draft** on a saved release gives you one to publish. If publishing and restoring are refused with *The retained site publication failed its integrity check*, the publication record itself is damaged: restore verified database data from a backup before retrying.
+- `release`: the active release failed its checks. Publish or restore an intact release; **Edit as new draft** on a saved release gives you one to publish.
+- `publication`: the publication record or its history failed its checks, so publishing and restoring are refused with *The retained site publication failed its integrity check*. Restore verified database data from a backup before retrying.
+- `missing`: the publication record is gone. The guards refuse a `DELETE`, but a MySQL `TRUNCATE` skips them. The Site Releases page answers Not Found until verified data is restored from a backup.
 
 Content rollback changes only the site pointer and its history/audit. It does not refund, cancel, reprice or alter any purchased license, original contract, entitlement or provider object. Application rollback must retain these tables. The migration refuses rollback once releases exist; old application code may display its own baseline copy instead of the retained active release.
 

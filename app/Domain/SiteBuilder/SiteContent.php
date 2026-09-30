@@ -65,19 +65,22 @@ final class SiteContent
     public function current(): array
     {
         $publication = null;
+        $reason = SiteContentUnavailable::MISSING;
         try {
             // Capture the pointer once. Immutable snapshots and history keep this coherent if publication changes next.
             $publication = SitePublication::findOrFail(1);
+            $reason = SiteContentUnavailable::PUBLICATION;
             $this->verifyPointer($publication);
+            if ($publication->active_release_id === null) {
+                return SiteContentSchema::defaults();
+            }
+            $reason = SiteContentUnavailable::RELEASE;
 
-            return $publication->active_release_id === null
-                ? SiteContentSchema::defaults()
-                : $this->content(SiteRelease::findOrFail($publication->active_release_id));
+            return $this->content(SiteRelease::findOrFail($publication->active_release_id));
         } catch (ValidationException|ModelNotFoundException $exception) {
-            $missing = $exception instanceof ModelNotFoundException;
-            $this->reportUnavailable($publication, $missing ? 'missing' : 'integrity');
+            $this->reportUnavailable($publication, $reason);
 
-            throw SiteContentUnavailable::because($missing
+            throw SiteContentUnavailable::because($reason, $exception instanceof ModelNotFoundException
                 ? ['publication' => 'The published site content is missing.'] : $exception->errors());
         }
     }
@@ -327,7 +330,7 @@ final class SiteContent
         return $current;
     }
 
-    /** Every request fails closed; the operator log records the outage at most once a minute. */
+    /** Every request fails closed; the operator log records the outage at most once a minute while the cache works, and on every request when it does not. */
     private function reportUnavailable(?SitePublication $publication, string $reason): void
     {
         try {

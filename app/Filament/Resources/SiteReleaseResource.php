@@ -176,9 +176,11 @@ class SiteReleaseResource extends OperatorResource
                 static::actor();
                 try {
                     return static::draftForm(app(SiteContent::class)->current());
-                } catch (SiteContentUnavailable) {
-                    Notification::make()->danger()->title('The published site content failed its integrity check')
-                        ->body('Public pages are showing a temporary error. Publish or restore an intact release. If that is refused too, the publication record itself failed its check: restore verified data from a backup before retrying.')
+                } catch (SiteContentUnavailable $exception) {
+                    Notification::make()->danger()->title('The published site content is unavailable')
+                        ->body($exception->recoverableByStaff()
+                            ? 'The active release failed its integrity check, so public pages are showing a temporary error. Publish or restore an intact release to recover.'
+                            : 'The site publication record failed its integrity check or is missing, so public pages are showing a temporary error and publishing is refused. Restore verified data from a backup before retrying.')
                         ->persistent()->send();
                     $action->cancel();
                 }

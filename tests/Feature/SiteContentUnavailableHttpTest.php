@@ -108,7 +108,7 @@ class SiteContentUnavailableHttpTest extends TestCase
         }
         // Every request fails closed; the operator log records the outage once a minute rather than once a request.
         Log::shouldHaveReceived('critical')->once()->withArgs(fn (string $message, array $context) => $message === 'Published site content is unavailable.'
-            && $context === ['reason' => 'integrity', 'revision' => 1, 'release_id' => $corrupt]);
+            && $context === ['reason' => 'release', 'revision' => 1, 'release_id' => $corrupt]);
     }
 
     public function test_staff_can_recover_by_publishing_an_intact_release(): void
@@ -144,7 +144,7 @@ class SiteContentUnavailableHttpTest extends TestCase
         $this->assertUnavailable($this->get('/about'));
         // Without the cache there is no once-a-minute limit, but each failure is still reported and still fails closed.
         Log::shouldHaveReceived('critical')->twice()->withArgs(fn (string $message, array $context) => $message === 'Published site content is unavailable.'
-            && $context === ['reason' => 'integrity', 'revision' => 1, 'release_id' => $corrupt]);
+            && $context === ['reason' => 'release', 'revision' => 1, 'release_id' => $corrupt]);
     }
 
     public function test_new_content_draft_reports_unavailable_published_content_instead_of_opening(): void
@@ -153,9 +153,14 @@ class SiteContentUnavailableHttpTest extends TestCase
         $this->actingAs($actor);
         $this->corruptActiveRelease($actor);
 
-        Livewire::test(ListSiteReleases::class)->mountAction('createDraft')
-            ->assertNotified('The published site content failed its integrity check')
-            ->assertSet('mountedActions', []);
+        $page = Livewire::test(ListSiteReleases::class)->mountAction('createDraft');
+        $notification = collect(session('filament.claimed_notifications', session('filament.notifications', [])))
+            ->firstWhere('title', 'The published site content is unavailable');
+        $this->assertNotNull($notification);
+        // A damaged release is recoverable in the panel, so staff are not sent to a needless backup restore.
+        $this->assertStringContainsString('Publish or restore an intact release', (string) $notification['body']);
+        $this->assertStringNotContainsString('backup', (string) $notification['body']);
+        $page->assertNotified('The published site content is unavailable')->assertSet('mountedActions', []);
         $this->assertDatabaseCount('site_releases', 1);
     }
 }
