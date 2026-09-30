@@ -16,6 +16,7 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Changed
 
+- Site Releases shows **Preview** and **Publish release** on each row and moves **Edit as new draft**, **Restore previous release** and **Schedule publication** into a **More** menu. Long labels wrap, so the table fits a 1440 px window without scrolling sideways.
 - `SECURITY.md` names `support@vasey.audio` as the reporting channel and records supported versions and audit exceptions.
 - `.gitignore` covers every `.env*` file except `.env.example`, and `CLAUDE.local.md`.
 

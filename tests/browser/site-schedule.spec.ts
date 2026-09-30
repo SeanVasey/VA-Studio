@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { test, expect, type Page } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
+import { expectReleaseTableFits, openReleaseMenu, releaseMenuAction } from './site-release-row';
 
 test.beforeEach(() => resetBrowserLoginRateLimit());
 
@@ -21,7 +22,7 @@ function runDueSchedule(): string {
 }
 
 async function schedule(page: Page, label: string, at: { input: string; display: string }) {
-  await row(page, label).getByRole('button', { name: 'Schedule publication', exact: true }).click();
+  await (await releaseMenuAction(page, label, 'Schedule publication')).click();
   const dialog = page.getByRole('dialog', { name: 'Schedule publication', exact: true });
   await expect(dialog.getByText(/Current time: \d{4}-\d{2}-\d{2} \d{2}:\d{2} UTC\./)).toBeVisible();
   await dialog.getByLabel('Publish at (UTC)', { exact: false }).fill(at.input);
@@ -75,7 +76,11 @@ test('a scheduled release waits, the scheduler publishes it, and a pending sched
     const publishAt = futureMinute(3);
     await schedule(page, label, publishAt);
     await expect(row(page, label).getByText(`Scheduled ${publishAt.display}`, { exact: true })).toBeVisible();
-    await expect(row(page, label).getByRole('button', { name: 'Schedule publication', exact: true })).toHaveCount(0);
+    // The schedule badge is the widest cell; the desktop admin must still fit without scrolling sideways.
+    if (testInfo.project.name === 'chromium-desktop') await expectReleaseTableFits(page);
+    // Opened, so a missing action is really absent rather than hidden inside a closed menu.
+    await expect((await openReleaseMenu(page, label)).getByRole('button', { name: 'Schedule publication', exact: true })).toHaveCount(0);
+    await page.keyboard.press('Escape');
     expect(await (await visitor.get('/')).text()).not.toContain(heading);
     await history(page, label, 'Waiting for its time');
 
@@ -98,7 +103,7 @@ test('a scheduled release waits, the scheduler publishes it, and a pending sched
     expect(await (await visitor.get('/')).text()).toContain(heading);
 
     // Leave the public site on its original content, as the other content specs do.
-    await row(page, 'Original site content').getByRole('button', { name: 'Restore previous release', exact: true }).click();
+    await (await releaseMenuAction(page, 'Original site content', 'Restore previous release')).click();
     await page.getByRole('alertdialog', { name: 'Restore previous release', exact: true }).getByRole('button', { name: 'Confirm', exact: true }).click();
     await expect(row(page, 'Original site content').getByText('Active', { exact: true })).toBeVisible();
     expect(await (await visitor.get('/')).text()).not.toContain(heading);

@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
+import { expectReleaseTableFits, releaseMenuAction } from './site-release-row';
 
 test.beforeEach(() => resetBrowserLoginRateLimit());
 
@@ -7,7 +8,10 @@ const password = process.env.VASEY_BROWSER_PASSWORD!;
 const row = (page: Page, label: string) => page.getByRole('row').filter({ has: page.getByText(label, { exact: true }) });
 
 async function confirm(page: Page, label: string, action: 'Publish release' | 'Restore previous release') {
-  await row(page, label).getByRole('button', { name: action, exact: true }).click();
+  const trigger = action === 'Publish release'
+    ? row(page, label).getByRole('button', { name: action, exact: true })
+    : await releaseMenuAction(page, label, action);
+  await trigger.click();
   await page.getByRole('alertdialog', { name: action, exact: true }).getByRole('button', { name: 'Confirm', exact: true }).click();
   await expect(row(page, label).getByText('Active', { exact: true })).toBeVisible();
 }
@@ -53,7 +57,7 @@ test('private draft preview, publication, immutable copy and rollback preserve t
 
     await confirm(page, firstLabel, 'Publish release');
     expect(await (await visitor.get('/')).text()).toContain(firstHeading);
-    await row(page, firstLabel).getByRole('button', { name: 'Edit as new draft', exact: true }).click();
+    await (await releaseMenuAction(page, firstLabel, 'Edit as new draft')).click();
     dialog = page.getByRole('dialog');
     await dialog.getByLabel('Release label', { exact: false }).fill(secondLabel);
     await dialog.getByLabel('Heading, first line', { exact: false }).first().fill(secondHeading);
@@ -78,6 +82,8 @@ test('private draft preview, publication, immutable copy and rollback preserve t
     // A fresh confirmation can deliberately publish the unchanged private snapshot.
     await confirm(page, secondLabel, 'Publish release');
     expect(await (await visitor.get('/')).text()).toContain(secondHeading);
+    // Three releases, two of them restorable: the widest rows must still fit the desktop admin.
+    if (testInfo.project.name === 'chromium-desktop') await expectReleaseTableFits(page);
     await confirm(page, firstLabel, 'Restore previous release');
     const restored = await (await visitor.get('/')).text();
     expect(restored).toContain(firstHeading); expect(restored).not.toContain(secondHeading);
