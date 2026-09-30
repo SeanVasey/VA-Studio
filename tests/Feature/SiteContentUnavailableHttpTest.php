@@ -14,12 +14,15 @@ use App\Filament\Resources\SiteReleaseResource\Pages\ListSiteReleases;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Models\User;
 use App\Support\CanonicalJson;
+use Illuminate\Cache\ArrayStore;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Testing\TestResponse;
 use Livewire\Livewire;
+use RuntimeException;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\MediaFixtures;
 use Tests\TestCase;
@@ -82,7 +85,8 @@ class SiteContentUnavailableHttpTest extends TestCase
     private function assertUnavailable(TestResponse $response): void
     {
         $response->assertStatus(503)->assertHeaderMissing('Location')
-            ->assertHeader('Cache-Control', 'no-store, private')->assertHeader('Retry-After', '60');
+            ->assertHeader('Cache-Control', 'no-store, private')->assertHeader('Retry-After', '60')
+            ->assertHeader('Content-Type', 'text/html; charset=UTF-8')->assertHeader('X-Robots-Tag', 'noindex');
         foreach (['integrity', 'CORRUPTED', 'publication', 'Synthetic corrupt restoration'] as $private) {
             $this->assertStringNotContainsString($private, (string) $response->getContent());
         }
@@ -119,6 +123,28 @@ class SiteContentUnavailableHttpTest extends TestCase
 
         $this->get('/')->assertOk()->assertSee('SYNTHETIC RECOVERY');
         $this->assertSame($release->id, SitePublication::findOrFail(1)->active_release_id);
+    }
+
+    public function test_a_failing_cache_does_not_silence_the_outage_report(): void
+    {
+        $actor = LicenseFixtures::admin();
+        $corrupt = $this->corruptActiveRelease($actor);
+        // The default store fails on add; rate limiting keeps its own working store.
+        Cache::extend('failing-add', fn () => Cache::repository(new class extends ArrayStore
+        {
+            public function add($key, $value, $seconds)
+            {
+                throw new RuntimeException('Synthetic cache failure');
+            }
+        }));
+        config(['cache.stores.failing-add' => ['driver' => 'failing-add'], 'cache.default' => 'failing-add', 'cache.limiter' => 'array']);
+        Log::spy();
+
+        $this->assertUnavailable($this->get('/'));
+        $this->assertUnavailable($this->get('/about'));
+        // Without the cache there is no once-a-minute limit, but each failure is still reported and still fails closed.
+        Log::shouldHaveReceived('critical')->twice()->withArgs(fn (string $message, array $context) => $message === 'Published site content is unavailable.'
+            && $context === ['reason' => 'integrity', 'revision' => 1, 'release_id' => $corrupt]);
     }
 
     public function test_new_content_draft_reports_unavailable_published_content_instead_of_opening(): void

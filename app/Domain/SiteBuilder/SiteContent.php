@@ -13,6 +13,7 @@ use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -63,18 +64,21 @@ final class SiteContent
 
     public function current(): array
     {
-        // Capture the pointer once. Immutable snapshots and history keep this coherent if publication changes next.
-        $publication = SitePublication::findOrFail(1);
+        $publication = null;
         try {
+            // Capture the pointer once. Immutable snapshots and history keep this coherent if publication changes next.
+            $publication = SitePublication::findOrFail(1);
             $this->verifyPointer($publication);
 
             return $publication->active_release_id === null
                 ? SiteContentSchema::defaults()
                 : $this->content(SiteRelease::findOrFail($publication->active_release_id));
-        } catch (ValidationException $exception) {
-            $this->reportUnavailable($publication);
+        } catch (ValidationException|ModelNotFoundException $exception) {
+            $missing = $exception instanceof ModelNotFoundException;
+            $this->reportUnavailable($publication, $missing ? 'missing' : 'integrity');
 
-            throw SiteContentUnavailable::because($exception->errors());
+            throw SiteContentUnavailable::because($missing
+                ? ['publication' => 'The published site content is missing.'] : $exception->errors());
         }
     }
 
@@ -324,12 +328,18 @@ final class SiteContent
     }
 
     /** Every request fails closed; the operator log records the outage at most once a minute. */
-    private function reportUnavailable(SitePublication $publication): void
+    private function reportUnavailable(?SitePublication $publication, string $reason): void
     {
         try {
-            if (Cache::add('site-content:unavailable-reported', true, 60)) {
+            try {
+                $first = Cache::add('site-content:unavailable-reported', true, 60);
+            } catch (Throwable) {
+                // A failing cache only removes the once-a-minute limit; it must not silence the report.
+                $first = true;
+            }
+            if ($first) {
                 Log::critical('Published site content is unavailable.', [
-                    'reason' => 'integrity', 'revision' => $publication->revision, 'release_id' => $publication->active_release_id,
+                    'reason' => $reason, 'revision' => $publication?->revision, 'release_id' => $publication?->active_release_id,
                 ]);
             }
         } catch (Throwable) {

@@ -21,6 +21,6 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Fixed
 
-- Public storefront and editorial pages answer a generic, uncacheable 503 when the published site content fails its integrity check. They used to redirect to the site root in a loop, or back to the referring site. The outage is logged at most once a minute, and New content draft reports it instead of breaking.
+- Public storefront and editorial pages answer a generic, uncacheable 503 when the published site content fails its integrity check. They used to redirect to the site root in a loop, or back to the referring site. Missing content rows fail the same way instead of answering 404. The outage is logged at most once a minute, and New content draft reports it instead of breaking.
 
 [Unreleased]: https://github.com/VASEYDEV/VASEYAUDIO/commits/main
