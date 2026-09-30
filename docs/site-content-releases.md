@@ -68,7 +68,7 @@ Uploads, their credit and rights confirmation, and every outcome are kept perman
 
 ## Original schema-v1 fields
 
-All values are bounded plain text, with no markup or unsupported keys. Label length is at most 120 characters. These are the original integer schema-version `1` fields; new editor copies use schema version `2` and its additional bounded fields.
+All values are bounded plain text, with no markup or unsupported keys. Label length is at most 120 characters. These are the original integer schema-version `1` fields; new editor copies use schema version `2` and its additional bounded fields, or version `3`, which adds site image references ([D-25](architecture/D-25-editable-site-images.md)), when they use an image.
 
 | Content | Fields and maximum lengths |
 | --- | --- |

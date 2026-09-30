@@ -174,7 +174,7 @@ Every read of a version 3 release checks that the index lists exactly the releas
 
 **Reads.** `content()` accepts versions 1–3. For version 3 it checks, from the database only, that every referenced image is ready and of its slot. Its recomputed manifest must equal the pinned one, and its scan evidence must be accepted. A failure is a `release` integrity failure, so public pages answer 503 and staff restore another release. The pointer check never looks at images, so restoring away from a broken release always works.
 
-**Publishing.** Publish and restore check the stored files of the target release's images before taking the publication lock, hashing every variant. The scheduler does the same in its unlocked probe and records a failure as its existing `integrity` outcome.
+**Publishing.** Publish and restore check the stored files of the target release's images before taking the publication lock, hashing every variant. The scheduler does the same in its unlocked probe and records a failure as its existing `integrity` outcome. That outcome is final. If an image file cannot be read at the scheduled minute, even briefly during a storage outage, the schedule fails closed and is not retried within its grace window. Staff schedule the release again, or publish it, once the files are back.
 
 **Public serving.** `GET /site-images/{sha256}.{jpg|webp}` serves a variant only when:
 
@@ -193,7 +193,7 @@ A damaged file fails only that image: the page still renders, the image URL answ
 - The storefront hero is a `<picture>` with mobile WebP and JPEG sources below 700 px, then desktop WebP, then a JPEG `<img>` carrying every width in `srcset`.
 - The studio image is the same without the mobile sources.
 - Each `sizes` is the width the image is painted at, not its box's width. Both boxes use `object-fit: cover`, which paints the image at the larger of the box's width and its height times the image's own aspect ratio, often far wider than the box. The box sizes follow the storefront CSS at each breakpoint. The hero is as tall as its minimum height or its copy, whichever is taller, so its `sizes` takes copy as tall as the built-in copy at its tallest: a three-line heading and a two-line description. Longer copy is painted wider than that, and a two-line heading can get the next larger file on standard-density screens.
-- Every source carries the release's description and the intrinsic size of its largest JPEG.
+- The `<img>` carries the release's description as its `alt`, and the width and height of its image's largest JPEG. A `<source>` has no description of its own. The mobile hero sources carry the mobile image's size, because its shape differs from the desktop image's; the desktop and studio WebP sources use the `<img>`'s.
 - A staff preview links the private preview route instead of the public one.
 
 **Sharing metadata** uses the share image's JPEG. Without one it uses the desktop hero's 1200 px JPEG, and without that the built-in hero. `og:image:width`, `og:image:height` and `og:image:type` are added where the size is known: always for site images, never for track artwork. Both the server's first render and the client's head management emit them.

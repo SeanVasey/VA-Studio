@@ -56,7 +56,7 @@ Creation, publication and rollback retain D-21's freshly loaded verified-adminis
 
 ## Compatibility, recovery and acceptance
 
-There is no new migration or content import. The existing release table already retains schema version, canonical JSON and hash; application validation supports exactly v1 and v2 and checks that row and payload versions agree. Existing retention guards and restrictive references remain in force. First publication still captures the original schema-v1 code baseline. Copy promotion does not alter it.
+There is no new migration or content import. The existing release table already retains schema version, canonical JSON and hash; application validation supports v1, v2 and, since [D-25](D-25-editable-site-images.md), v3, which adds image references. It checks that row and payload versions agree. Existing retention guards and restrictive references remain in force. First publication still captures the original schema-v1 code baseline. Copy promotion does not alter it.
 
 Content recovery uses ordinary audited publication or rollback with a fresh expected revision. Restoring a retained v1 release hides editorial routes and restores its original navigation/copy. Removing an entry in a new active snapshot makes that detail route unavailable; automatic redirects and permanent slug reservation are not supplied. Retained old releases remain private unless explicitly selected through the authorized publication workflow.
 
