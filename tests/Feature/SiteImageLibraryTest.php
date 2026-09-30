@@ -514,6 +514,7 @@ class SiteImageLibraryTest extends TestCase
             '  clean) echo "$path: OK" ;;',
             '  found) echo "$path: Eicar-Test-Signature FOUND"; exit 1 ;;',
             '  flood) yes "$path: OK" | head -c 300000 ;;',
+            '  noisy) yes "LibClamAV Warning: synthetic warning" | head -c 300000 >&2; echo "$path: OK" ;;',
             '  warning) echo "WARNING: Ignoring deprecated option --synthetic-option"; echo "$path: OK" ;;',
             '  unverified) echo "$path: Scanned" ;;',
             '  silent) ;;',
@@ -535,12 +536,15 @@ class SiteImageLibraryTest extends TestCase
         $timeout = config('media.process_timeout_seconds');
         $cases = [
             'clean' => ['ready', null],
-            // A detection (exit 1) or runaway output is a verdict on this file.
-            'found' => ['failed', 'scan_not_clean'], 'flood' => ['failed', 'scan_not_clean'],
+            // Only a detection (exit 1) is a verdict on this file.
+            'found' => ['failed', 'scan_not_clean'],
             // An exit 0 without the exact clean line is not: the scanner's own warning ahead of the clean line, an unknown result
             // or no output at all waits for a retry, and never makes the image ready.
             'warning' => ['quarantined', 'scanner_unavailable'], 'unverified' => ['quarantined', 'scanner_unavailable'],
             'silent' => ['quarantined', 'scanner_unavailable'],
+            // Nor is a scan cut off at the output limit, whether by its own results or by warnings on standard error ahead of a
+            // clean line: it never reached a verdict.
+            'noisy' => ['quarantined', 'scanner_unavailable'], 'flood' => ['quarantined', 'scanner_unavailable'],
             // Nor does a scanner error, crash, impostor or timeout say anything about the file.
             'error' => ['quarantined', 'scanner_unavailable'], 'signal' => ['quarantined', 'scanner_unavailable'],
             'impostor' => ['quarantined', 'scanner_unavailable'], 'slow' => ['quarantined', 'processor_timeout'],
