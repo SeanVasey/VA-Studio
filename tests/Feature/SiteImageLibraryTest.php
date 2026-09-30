@@ -796,6 +796,12 @@ class SiteImageLibraryTest extends TestCase
         $this->assertNotSame($hash, SiteImageManifest::hash('studio', $ready->profile_fingerprint, $changed));
         $stale = $ready->replicate()->forceFill(['id' => $ready->id, 'profile_fingerprint' => str_repeat('0', 64)]);
         $this->assertFalse(SiteImageManifest::matches($stale));
+        // A later profile may change a slot's sizes; an image keeps the exact set its manifest pins. Here six stored files stand
+        // for a slot whose current definition has one size.
+        $older = $ready->replicate()->forceFill(['id' => $ready->id, 'slot' => 'share',
+            'manifest_sha256' => SiteImageManifest::hash('share', $ready->profile_fingerprint, $variants)]);
+        $this->assertNotSame(count($variants), SiteImageSlot::variantCount('share'));
+        $this->assertTrue(SiteImageManifest::matches($older));
     }
 
     public function test_migration_rollback_is_refused_once_an_image_exists(): void

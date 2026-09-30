@@ -23,11 +23,13 @@ final class SiteImageManifest
         return CanonicalJson::hash(['profile' => $fingerprint, 'slot' => $slot, 'variants' => $entries]);
     }
 
-    /** Recomputes a ready image's manifest from its stored variant rows. */
+    /**
+     * Recomputes a ready image's manifest from its stored variant rows. The manifest pins that exact set, and the ready trigger
+     * required the full set at completion, so the slot's current sizes are not consulted: a later profile keeps older images valid.
+     */
     public static function matches(SiteImage $image): bool
     {
         return $image->status === 'ready' && is_string($image->manifest_sha256) && is_string($image->profile_fingerprint)
-            && $image->variants()->count() === SiteImageSlot::variantCount($image->slot)
             && hash_equals($image->manifest_sha256, self::hash($image->slot, $image->profile_fingerprint, $image->variants()->get()));
     }
 }
