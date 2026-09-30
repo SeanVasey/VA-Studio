@@ -448,10 +448,13 @@ class StemsArchiveTest extends TestCase
     public static function toolsThatTimedOut(): array
     {
         return [
-            // The tool is given what is left of the budget, at most 120 seconds, and 120 is its own limit.
+            // The tool is given what is left of the budget, at most 120 seconds, and 120 is its own limit. The scan's is 300, so a
+            // budget between the two shows which of them a timeout is measured against.
             'ffprobe, the budget the shorter limit' => ['ffprobe', 30, 'archive_timeout'],
             'ffmpeg, the budget the shorter limit' => ['ffmpeg', 30, 'archive_timeout'],
             'ffprobe, the budget as long as its own limit' => ['ffprobe', 120, 'archive_timeout'],
+            'ffprobe, its own limit the shorter, under the scan limit' => ['ffprobe', 200, 'processor_timeout'],
+            'ffmpeg, its own limit the shorter, under the scan limit' => ['ffmpeg', 200, 'processor_timeout'],
             'ffprobe, its own limit the shorter' => ['ffprobe', 360, 'processor_timeout'],
             'ffmpeg, its own limit the shorter' => ['ffmpeg', 360, 'processor_timeout'],
         ];
