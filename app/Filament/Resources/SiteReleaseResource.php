@@ -26,6 +26,7 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\IconPosition;
+use Filament\Support\Enums\Size;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -253,7 +254,8 @@ class SiteReleaseResource extends OperatorResource
     {
         return $table->columns([
             TextColumn::make('id')->label('Release')->sortable(),
-            TextColumn::make('label')->searchable()->wrap(),
+            // Long labels without spaces must break too, or the table scrolls sideways again.
+            TextColumn::make('label')->searchable()->wrap()->extraAttributes(['style' => 'overflow-wrap: anywhere']),
             TextColumn::make('publication_status')->label('Status')->badge()->state(fn (SiteRelease $record): string => SitePublication::findOrFail(1)->active_release_id === $record->id ? 'Active' :
                     (SitePublicationRevision::where('release_id', $record->id)->exists() ? 'Previously published' : 'Private draft')),
             TextColumn::make('schedule_status')->label('Schedule')->badge()->color('warning')->state(function (SiteRelease $record): ?string {
@@ -274,7 +276,9 @@ class SiteReleaseResource extends OperatorResource
                         ->action(fn (array $data, ListSiteReleases $livewire) => static::saveDraft($data, $livewire)),
                     static::publicationAction('rollback', 'Restore previous release'),
                     static::scheduleAction(),
-                ])->label('More')->link()->icon(Heroicon::ChevronDown)->iconPosition(IconPosition::After),
+                ])->label('More')->link()->size(Size::Small)->icon(Heroicon::ChevronDown)->iconPosition(IconPosition::After)
+                    // Each row's trigger names its release, starting with the visible word (WCAG 2.5.3).
+                    ->extraAttributes(fn (SiteRelease $record): array => ['aria-label' => 'More actions for “'.$record->label.'”']),
             ])->toolbarActions([]);
     }
 

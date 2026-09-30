@@ -1,11 +1,10 @@
 import { test, expect, type Page } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
-import { expectReleaseTableFits, releaseMenuAction } from './site-release-row';
+import { expectReleaseTableFits, releaseMenuAction, releaseMenuTrigger, releaseRow as row } from './site-release-row';
 
 test.beforeEach(() => resetBrowserLoginRateLimit());
 
 const password = process.env.VASEY_BROWSER_PASSWORD!;
-const row = (page: Page, label: string) => page.getByRole('row').filter({ has: page.getByText(label, { exact: true }) });
 
 async function confirm(page: Page, label: string, action: 'Publish release' | 'Restore previous release') {
   const trigger = action === 'Publish release'
@@ -27,7 +26,8 @@ test('private draft preview, publication, immutable copy and rollback preserve t
   await expect(page).toHaveURL(/\/admin$/);
   await page.goto('/admin/site-releases');
   const firstLabel = `Synthetic content one ${testInfo.project.name}`;
-  const secondLabel = `Synthetic content two ${testInfo.project.name}`;
+  // An unbroken token must wrap too, or the table scrolls sideways again.
+  const secondLabel = `Synthetic content two ${testInfo.project.name} SYNTHETIC_UNBROKEN_LABEL_TOKEN_0123456789_0123456789_0123456789`;
   const firstHeading = `SYNTHETIC FIRST ${testInfo.project.name.toUpperCase()}`;
   const secondHeading = `SYNTHETIC SECOND ${testInfo.project.name.toUpperCase()}`;
   const visitor = await playwright.request.newContext({ baseURL: 'http://127.0.0.1:8173' });
@@ -96,4 +96,50 @@ test('private draft preview, publication, immutable copy and rollback preserve t
   } finally {
     await visitor.dispose();
   }
+});
+
+test('the row menu shows keyboard focus and returns it to More when a dialog or the menu closes', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium-desktop', 'Keyboard focus is checked on the desktop project.');
+  const failures: string[] = [];
+  page.on('pageerror', error => failures.push(error.message));
+  await page.goto('/admin/login');
+  await page.getByLabel('Email address', { exact: false }).fill('browser-operator@example.test');
+  await page.getByLabel('Password', { exact: false }).and(page.locator('input[type="password"]')).fill(password);
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await expect(page).toHaveURL(/\/admin$/);
+  await page.goto('/admin/site-releases');
+  // Published and then replaced by the previous test, so its menu offers Restore previous release.
+  const label = `Synthetic content one ${testInfo.project.name}`;
+  const trigger = releaseMenuTrigger(page, label);
+  const restore = row(page, label).getByRole('button', { name: 'Restore previous release', exact: true });
+
+  await trigger.focus();
+  await page.keyboard.press('Enter');
+  await expect(restore).toBeVisible();
+  for (let step = 0; step < 4 && !(await restore.evaluate(element => element === document.activeElement)); step++) {
+    await page.keyboard.press('Tab');
+  }
+  await expect(restore).toBeFocused();
+  // A visible outline, not only the faint background Filament gives a focused menu item.
+  expect(await restore.evaluate(element => {
+    const style = getComputedStyle(element);
+    return [style.outlineStyle, parseFloat(style.outlineWidth) >= 2];
+  })).toEqual(['solid', true]);
+
+  await page.keyboard.press('Enter');
+  // Filament's dialog element has no box of its own, so check its heading.
+  const heading = page.getByRole('alertdialog', { name: 'Restore previous release', exact: true }).getByRole('heading', { name: 'Restore previous release', exact: true });
+  await expect(heading).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(heading).toBeHidden();
+  await expect(trigger).toBeFocused();
+
+  // Escape inside the open menu closes it and also keeps focus on More.
+  await page.keyboard.press('Enter');
+  await expect(restore).toBeVisible();
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Escape');
+  await expect(restore).toBeHidden();
+  await expect(trigger).toBeFocused();
+  expect(failures).toEqual([]);
 });

@@ -1,10 +1,9 @@
 import { test, expect, type Page } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
 import { fixtureTrack, storefrontFixture } from './storefront-fixture';
-import { releaseMenuAction } from './site-release-row';
+import { releaseMenuAction, releaseRow as row } from './site-release-row';
 
 test.beforeEach(() => resetBrowserLoginRateLimit());
-const row = (page: Page, label: string) => page.getByRole('row').filter({ has: page.getByText(label, { exact: true }) });
 
 async function activate(page: Page, label: string, action: 'Publish release' | 'Restore previous release') {
   const trigger = action === 'Publish release'

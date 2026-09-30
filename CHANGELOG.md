@@ -16,7 +16,7 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Changed
 
-- Site Releases shows **Preview** and **Publish release** on each row and moves **Edit as new draft**, **Restore previous release** and **Schedule publication** into a **More** menu. Long labels wrap, so the table fits a 1440 px window without scrolling sideways.
+- Site Releases keeps **Preview** and, except on the active release, **Publish release** on each row and moves **Edit as new draft**, **Restore previous release** and **Schedule publication** into a **More** menu named for its release. Long labels wrap, even without spaces, so the table fits a 1440 px window without scrolling sideways. Admin menu items now show a visible keyboard focus outline, and closing a dialog opened from a menu, or pressing Escape in the menu, returns focus to the menu's button.
 - `SECURITY.md` names `support@vasey.audio` as the reporting channel and records supported versions and audit exceptions.
 - `.gitignore` covers every `.env*` file except `.env.example`, and `CLAUDE.local.md`.
 

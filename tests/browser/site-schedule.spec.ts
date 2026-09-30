@@ -1,12 +1,11 @@
 import { execFileSync } from 'node:child_process';
 import { test, expect, type Page } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
-import { expectReleaseTableFits, openReleaseMenu, releaseMenuAction } from './site-release-row';
+import { expectReleaseTableFits, openReleaseMenu, releaseMenuAction, releaseRow as row } from './site-release-row';
 
 test.beforeEach(() => resetBrowserLoginRateLimit());
 
 const password = process.env.VASEY_BROWSER_PASSWORD!;
-const row = (page: Page, label: string) => page.getByRole('row').filter({ has: page.getByText(label, { exact: true }) });
 
 /** A whole UTC minute at least `minutes` ahead, as the native input value and as the admin displays it. */
 function futureMinute(minutes: number) {
