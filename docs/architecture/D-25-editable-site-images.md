@@ -187,7 +187,8 @@ A damaged file fails only that image: the page still renders, the image URL answ
 **Rendering.** A `siteImages` prop is built separately from the page chrome:
 
 - The storefront hero is a `<picture>` with mobile WebP and JPEG sources below 700 px, then desktop WebP, then a JPEG `<img>` carrying every width in `srcset`.
-- The studio image is the same with `(max-width: 900px) 100vw, 50vw`.
+- The studio image is the same without the mobile sources.
+- Each `sizes` is the width the image is painted at, not its box's width. Both boxes use `object-fit: cover`, which paints the image at the larger of the box's width and its height times the image's own aspect ratio, often far wider than the box. The box sizes follow the storefront CSS at each breakpoint. The hero is as tall as its minimum height or its copy, whichever is taller, so its `sizes` takes copy as tall as the built-in copy at its tallest: a three-line heading and a two-line description. Longer copy is painted wider than that, and a two-line heading can get the next larger file on standard-density screens.
 - Every source carries the release's description and the intrinsic size of its largest JPEG.
 - A staff preview links the private preview route instead of the public one.
 
