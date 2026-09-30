@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Domain\SiteBuilder\Models\SiteImage;
 use App\Domain\SiteBuilder\Models\SiteImageVariant;
 use App\Domain\SiteBuilder\SiteContent;
+use App\Domain\SiteBuilder\SiteImageFiles;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Models\User;
 use Carbon\CarbonImmutable;
@@ -119,6 +120,42 @@ class SiteImagePublicTest extends TestCase
         $this->assertNull($this->get('/', $this->inertia())->assertOk()->json('props.siteImages.studio'));
         $response = $this->get($this->url($jpeg))->assertOk()->assertHeader('Cache-Control', 'immutable, max-age=31536000, public');
         $this->assertSame(Storage::disk('local')->get($jpeg->storage_path), $response->getContent());
+    }
+
+    public function test_a_shared_url_serves_an_intact_live_copy_however_many_earlier_copies_are_damaged(): void
+    {
+        // Identical uploads prepare identical files, so their variants share one URL.
+        $bytes = F::jpeg(1440, 630);
+        $site = app(SiteContent::class);
+        $variants = [];
+        for ($copy = 0; $copy < 6; $copy++) {
+            $image = F::ready('studio', $this->actor, $bytes);
+            $site->publish($site->create($this->content(['studio' => $image], 'SYNTHETIC COPY '.$copy), 'Copy '.$copy, $this->actor)->id, $copy, $this->actor);
+            $variants[] = $image->variants()->where('format', 'jpeg')->where('width', 1440)->sole();
+        }
+        $this->assertCount(1, array_unique(array_map(fn (SiteImageVariant $variant): string => $variant->sha256, $variants)));
+        $files = app(SiteImageFiles::class);
+        $intact = Storage::disk('local')->get($variants[5]->storage_path);
+        $damage = function (SiteImageVariant $variant) use ($files, $intact): void {
+            $path = Storage::disk('local')->path($variant->storage_path);
+            // Promotion seals variants read-only; unseal the file before changing it, as the media tests do.
+            chmod($path, 0600);
+            file_put_contents($path, strrev($intact));
+            $this->assertNull($files->verifiedBytes($variant));
+        };
+        foreach (array_slice($variants, 0, 5) as $variant) {
+            $damage($variant);
+        }
+
+        $response = $this->get($this->url($variants[5]))->assertOk()->assertHeader('Cache-Control', 'immutable, max-age=31536000, public');
+        $this->assertSame($intact, $response->getContent());
+
+        // With every live copy damaged, an intact copy that no release has used is still not served.
+        $damage($variants[5]);
+        $unused = F::ready('studio', $this->actor, $bytes)->variants()->where('format', 'jpeg')->where('width', 1440)->sole();
+        $this->assertSame($variants[5]->sha256, $unused->sha256);
+        $this->assertSame($intact, $files->verifiedBytes($unused));
+        $this->assertMissing($this->get($this->url($variants[5])));
     }
 
     public function test_malformed_names_get_the_same_throttled_empty_404_as_private_images(): void
