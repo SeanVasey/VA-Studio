@@ -14,20 +14,6 @@ The accepted original CMS saves homepage copy as private immutable drafts. [Edit
 
 Rows distinguish **Active**, **Previously published** and **Private draft**. An active release cannot be activated again. A draft never published cannot be used as a rollback target. First publication retains **Original site content**, an immutable capture of the previous code-default homepage with revision-zero history, so it can be restored like another previous release. Restoration always selects retained content; it never resets the publication revision.
 
-## Site images
-
-[D-25](architecture/D-25-editable-site-images.md) makes four images editable: the home hero (desktop and mobile), the studio image and the share image.
-
-1. Upload the image under **Publishing → Site images**, choosing its place and giving a credit line and a rights confirmation. It is scanned and prepared in the sizes that place needs. Only **Ready** images can be used.
-2. In a content draft, the **Images** section offers the ready images for each place, or the built-in image. Set both hero images or neither, and describe each image for people who cannot see it. The editor warns when a hero image is bright where the heading sits; check the preview.
-3. The share image is what social platforms show when a page is shared. Without one, pages share the hero in use.
-4. Preview the release. Its images come from the private preview route and are not public yet.
-5. Publishing checks every stored file of the release's images first.
-
-Once a release that uses an image is published, the image is public at its own content-hashed address, and browsers may keep it for a year. Restoring another release stops the site using it but does not withdraw copies that browsers or platforms already hold.
-
-A release without images is saved exactly as before, so code that predates site images can still read it.
-
 ## Scheduled publication
 
 [D-24](architecture/D-24-scheduled-site-publication.md) lets staff choose one saved release and a future time. Times are UTC.
@@ -57,7 +43,9 @@ The scheduler must run every minute on the production host, which is not chosen 
 
 ## Site images
 
-[D-25](architecture/D-25-editable-site-images.md) adds a private library for four fixed images: the home hero (a desktop and a mobile crop), the studio image and the share image. This part stores and prepares them only. No site release uses them yet, so uploading changes nothing on the public site; the next increment adds the slots to site releases.
+[D-25](architecture/D-25-editable-site-images.md) makes four images editable: the home hero (a desktop and a mobile crop), the studio image and the share image. Staff upload them to a private library, then use them in a site release.
+
+### Upload and prepare
 
 1. Open **Publishing → Site images** at `/admin/site-images` as a verified administrator. Uploading and retrying recheck MFA wherever the admin panel requires it.
 2. Choose **Upload site image**. Pick what the image is **Used for**, and the form shows that slot's size and shape. Choose a JPEG or PNG of up to 20 MiB, enter its **Source or credit**, and confirm that we have the rights to use it. Upload refuses a shape more than 3% off the slot's, an image narrower than the slot's largest size (or, for the share image, smaller than 1200 × 630), transparency, CMYK, more than 8 bits per channel, a rotation tag, other formats and larger files, with the reason beside the field. Crop hero and studio images yourself; only the share image is trimmed to 1200 × 630.
@@ -65,6 +53,17 @@ The scheduler must run every minute on the production host, which is not chosen 
 4. **Retry processing** appears while an image is waiting, for example after the scanner, a tool or storage was unavailable, the scanner gave no clear result, or the queue did not take the job, and when a worker stopped mid-run (**Interrupted**). It queues another attempt; the **Attempts** column counts them. A detection, an unreadable file or a refused format is final: export a corrected copy and upload it as a new image.
 
 Uploads, their credit and rights confirmation, and every outcome are kept permanently; there is no edit or delete. The original upload is never served, not even to staff: the preview shows a prepared file through a private, no-store admin route. The worker, scanner and backup requirements are in [media operations](media-processing.md).
+
+### Use images in a release
+
+1. In a content draft, the **Images** section offers the **Ready** images for each place, or the built-in image. Set both hero images or neither, and describe each image for people who cannot see it. The editor warns when a hero image is bright where the heading sits; check the preview.
+2. The share image is what social platforms show when a page is shared. Without one, pages share the hero in use.
+3. Preview the release. Its images come from the private preview route and are not public yet.
+4. Publishing checks every stored file of the release's images first.
+
+Once a release that uses an image is published, the image is public at its own content-hashed address, and browsers may keep it for a year. Restoring another release stops the site using it but does not withdraw copies that browsers or platforms already hold.
+
+A release without images is saved exactly as before, so code that predates site images can still read it.
 
 ## Original schema-v1 fields
 
@@ -100,7 +99,7 @@ Content rollback changes only the site pointer and its history/audit. It does no
 
 The accepted candidate passed full CI and independent review in [PR #72](https://github.com/VASEYDEV/VASEYAUDIO/pull/72), including schema/authorization/privacy, immutable database evidence, atomic audit failures, stale revision conflicts, independent MySQL publish/rollback races and browser editing/preview/publication/rollback. The [ordered acceptance record](development-order.md#accepted-downloads-and-cms--september-28-2026) retains exact source, run and results. Follow the repository [verification commands](../README.md#verify) when changing these boundaries.
 
-Test promotion administration is accepted in PR #73. [D-23](architecture/D-23-editorial-content.md) persisted contact/about/blog/video content is accepted in PR #74. [D-24](architecture/D-24-scheduled-site-publication.md) adds scheduled publication, with acceptance evidence in its integrating PR and issue #9. [D-25](architecture/D-25-editable-site-images.md) adds the private [site-image library](#site-images); image slots in site releases and their public serving follow. Contact delivery, consent-aware embeds and migration remain open. This increment does not complete WP-09 or the BeatStars replacement; [development order](development-order.md) retains customer recovery/library, payment operations, additional products, memberships, migration and production-readiness work.
+Test promotion administration is accepted in PR #73. [D-23](architecture/D-23-editorial-content.md) persisted contact/about/blog/video content is accepted in PR #74. [D-24](architecture/D-24-scheduled-site-publication.md) adds scheduled publication, with acceptance evidence in its integrating PR and issue #9. [D-25](architecture/D-25-editable-site-images.md) adds editable [site images](#site-images): a private library, and image slots in site releases with their public serving. Contact delivery, consent-aware embeds and migration remain open. This increment does not complete WP-09 or the BeatStars replacement; [development order](development-order.md) retains customer recovery/library, payment operations, additional products, memberships, migration and production-readiness work.
 
 ## September 28 candidate verification history
 

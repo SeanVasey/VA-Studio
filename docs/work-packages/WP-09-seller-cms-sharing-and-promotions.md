@@ -1,6 +1,6 @@
 # [WP-09] Seller CMS, publishing, sharing and promotion administration
 
-Status: **Partially implemented; remains open.** The first CMS increment is accepted in PR #72, test promotion administration in PR #73, persisted editorial/contact content in PR #74, scheduled whole-release publication in PR #76, fail-closed public pages in PR #77 and the Site Releases row menu in PR #78. A private site-image library (D-25, part 1) is the current increment, followed by image slots in site releases with their public serving; acceptance records are maintained in issue #9 and the integrating PRs. This issue is complete only when all acceptance evidence below exists.
+Status: **Partially implemented; remains open.** The first CMS increment is accepted in PR #72, test promotion administration in PR #73, persisted editorial/contact content in PR #74, scheduled whole-release publication in PR #76, fail-closed public pages in PR #77 and the Site Releases row menu in PR #78. Editable site images (D-25) land in two PRs: the private site-image library in PR #81, then image slots in site releases with their public serving, the current increment; acceptance records are maintained in issue #9 and the integrating PRs. This issue is complete only when all acceptance evidence below exists.
 
 - Suggested issue title: `[WP-09] Seller CMS, publishing, sharing and promotion administration`
 - Phase: 3
@@ -79,6 +79,18 @@ Editorial content from PR #74 is accepted; the [ordered record](../development-o
 
 ## Editable site images, part 1 — September 30, 2026
 
-[D-25](../architecture/D-25-editable-site-images.md) and the [staff guide](../site-content-releases.md#site-images) add a private library for the four fixed images Sean chose: the home hero (a desktop and a mobile crop), the studio image and the share image. Administrators upload a JPEG or PNG with a source or credit line and a rights confirmation. Intake checks the slot's shape and minimum size and refuses transparency, CMYK, more than 8 bits per channel, rotation tags, other formats and files over 20 MiB. The `media` worker scans each upload, re-encodes it without metadata into the slot's sizes and pins them by a manifest hash; database triggers keep every upload and outcome permanent. A scanner, tool or storage outage leaves the image waiting for an audited retry, while a detection or a refused file fails for good. Nothing is public yet: the next increment adds the slots to site releases and serves live images at content-hashed URLs.
+[D-25](../architecture/D-25-editable-site-images.md) and the [staff guide](../site-content-releases.md#site-images) add a private library for the four fixed images Sean chose: the home hero (a desktop and a mobile crop), the studio image and the share image. Administrators upload a JPEG or PNG with a source or credit line and a rights confirmation. Intake checks the slot's shape and minimum size and refuses transparency, CMYK, more than 8 bits per channel, rotation tags, other formats and files over 20 MiB. The `media` worker scans each upload, re-encodes it without metadata into the slot's sizes and pins them by a manifest hash; database triggers keep every upload and outcome permanent. A scanner, tool or storage outage leaves the image waiting for an audited retry, while a detection or a refused file fails for good. Nothing in this part is public; part 2, below, adds the slots to site releases and serves live images at content-hashed URLs.
 
 The Site Releases row menu from PR #78 is accepted; the [ordered record](../development-order.md#accepted-site-releases-row-menu--september-30) retains its evidence. Blog and video thumbnails, withdrawing an image and a CDN remain out of scope.
+
+## Editable site images, part 2 — September 30, 2026
+
+[D-25](../architecture/D-25-editable-site-images.md) part 2 lets a site release use the library's ready images. The four slots are the hero (desktop and mobile together), the studio image and the share image, each with a description.
+
+- **Saving.** Each image's manifest is pinned in the release (schema version 3, used only when a release has an image). The references are recorded in an insert-only index whose database triggers accept only ready images of the right slot, before the release is ever scheduled or published.
+- **Reading.** Reads check every reference against the database and fail the release closed on any mismatch. Publishing, restoring and the scheduler check the stored files first. Restoring away from a broken release always works.
+- **Public serving.** An image is served publicly at an unguessable content-hashed URL only once a release using it has been live, with year-long immutable caching. Anything else gets the same empty no-store 404, and a damaged file fails only that image.
+- **Storefront.** WebP and JPEG sources are sized to how each image is painted, and sharing metadata uses the share image with its dimensions.
+- **Staff tools.** The editor warns about a bright hero under the heading, and `vasey:doctor` checks the active release's image files.
+
+MySQL race tests cover pinning against processing completion and publishing against the scheduler. Withdrawing a live image, blog and video thumbnails, and a CDN remain out of scope.

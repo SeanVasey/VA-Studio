@@ -152,6 +152,8 @@ images: {
 
 The editor writes version 3 **only when a release uses an image**. An image-free draft stays version 2, so code that predates site images can still read it if the application is rolled back. Retained version 1 and 2 releases never change. `forEditing()` still upgrades only version 1 to 2.
 
+Code that predates part 2 reads only versions 1 and 2, so it fails closed while a version 3 release is active: public pages answer 503. Before rolling the application back to such code, publish or restore an image-free release while this code runs. The index table stays: migration 000028 refuses to roll back once it has rows, and older code never reads it.
+
 **Creating a release.** `SiteContent::create()` pins each reference inside its transaction:
 
 - It locks every referenced image row, in ascending id order, before reading any variants. Each must be a ready image of the slot with an intact manifest and accepted scan evidence.
@@ -242,6 +244,7 @@ Part 2 evidence adds:
 - the editor: options, both hero images, descriptions and the contrast warning;
 - the doctor check, including image rows and variant rows removed behind dropped guards;
 - MySQL races between release creation and image completion in both lock orders, for one image and for a ready image pinned alongside one completing;
+- a MySQL race between the scheduler publishing a version 3 release and staff publishing another, in both lock orders, where the scheduled release's image is served only when the scheduler wins;
 - frontend tests of the rendered `<picture>` elements.
 
 The browser harness has no scanner, so no image becomes ready there. Its spec shows the editor offering only built-in images, and the ready-image flow is covered by the PHP and frontend tests.
