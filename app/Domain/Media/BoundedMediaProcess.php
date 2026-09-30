@@ -20,6 +20,8 @@ class BoundedMediaProcess
 
     private ?int $timeoutSeconds = null;
 
+    private string $lastErrorLine = '';
+
     /**
      * A copy of this runner whose calls run under these limits instead of the shared media.* ones; an argument left null keeps the
      * shared value. They are not arguments of run(): a subclass that overrides run() must accept every argument of it, so each new
@@ -31,18 +33,30 @@ class BoundedMediaProcess
         $limited->cpuSeconds = $cpuSeconds ?? $this->cpuSeconds;
         $limited->memoryBytes = $memoryBytes ?? $this->memoryBytes;
         $limited->timeoutSeconds = $timeoutSeconds ?? $this->timeoutSeconds;
+        $limited->lastErrorLine = '';
 
         return $limited;
+    }
+
+    /**
+     * The first line the latest run that returned wrote to standard error, empty when it wrote none. A caller reports with it on a
+     * run that succeeded, such as a version call that printed no date, which returns only standard output. A run that fails
+     * carries the line on its MediaFailure instead.
+     */
+    public function lastErrorLine(): string
+    {
+        return $this->lastErrorLine;
     }
 
     /**
      * Runs a media tool under the resource limiter and returns its standard output. Standard error counts toward the output
      * limit unless the caller's verdict rests on standard output and the exit status alone; its warnings then have their own,
      * larger bound, so they cannot cut off a result that finished. A failure carries the first line of each stream for the
-     * caller's log.
+     * caller's log, and a run that returns leaves the first line of standard error in lastErrorLine().
      */
     public function run(array $arguments, string $cwd, int $timeout = 0, bool $ignoreErrorOutput = false): string
     {
+        $this->lastErrorLine = '';
         $limiter = config('media.prlimit');
         if (! is_string($limiter) || ! is_executable($limiter) || ! is_executable($arguments[0])) {
             throw new MediaFailure('tool_unavailable', 'A required media processor or resource limiter is unavailable.');
@@ -80,6 +94,7 @@ class BoundedMediaProcess
         if (! $process->isSuccessful()) {
             throw new MediaFailure('processor_failed', 'Media processing or validation failed. Verify the file and installed tools before retrying.', $process->getExitCode(), self::firstLine($errorHead), self::firstLine($stdout));
         }
+        $this->lastErrorLine = self::firstLine($errorHead);
 
         return $stdout;
     }
