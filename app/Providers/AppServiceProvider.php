@@ -19,6 +19,8 @@ class AppServiceProvider extends ServiceProvider
             \App\Domain\Commerce\Payments\StripeSdkCheckoutGateway::class);
         $this->app->bind(\App\Domain\Commerce\Payments\StripePaymentGateway::class,
             \App\Domain\Commerce\Payments\StripeSdkCheckoutGateway::class);
+        // One instance per process, so a worker remembers for a few minutes that its daemon refused the canary.
+        $this->app->singleton(\App\Domain\Media\DaemonLimitCanary::class);
     }
 
     public function boot(): void

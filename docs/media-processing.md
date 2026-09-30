@@ -114,7 +114,7 @@ The application runs `clamscan --no-summary --stdout --max-filesize=1280M --max-
 
 ### `clamd.conf`
 
-The packaged `/etc/clamav/clamd.conf` of Ubuntu 24.04 must not be used as it is. It **fails open**: with `MaxFileSize 25M`, `MaxScanSize 100M` and no `AlertExceedsMax`, a file over a limit is skipped and answered `OK`. A 30 MiB ZIP with an EICAR member and an 800 MiB file both came back `OK` from it. It also sets `EnableVersionCommand false`, so `clamdscan --version` prints only `ClamAV <version>` and the application refuses every scan as `scanner_signatures_stale`, and `LocalSocketMode 666`, which lets any local user scan through the daemon. Set these:
+The packaged `/etc/clamav/clamd.conf` of Ubuntu 24.04 must not be used as it is. It **fails open**: with `MaxFileSize 25M`, `MaxScanSize 100M`, `MaxScanTime 120000` and no `AlertExceedsMax`, a file over a limit, and a scan that outlasts the time limit, is skipped and answered `OK`. A 30 MiB ZIP with an EICAR member and an 800 MiB file both came back `OK` from it. So did a 400 MiB ZIP with its EICAR member last, once the scan ran past `MaxScanTime` (set to 2 seconds for the test): with `AlertExceedsMax yes` the same scan reports `Heuristics.Limits.Exceeded.MaxScanTime` and exits 1, and with the recommended 240 seconds it finishes and reports `Eicar-Test-Signature`. It also sets `EnableVersionCommand false`, so `clamdscan --version` prints only `ClamAV <version>` and the application refuses every scan as `scanner_signatures_stale`, and `LocalSocketMode 666`, which lets any local user scan through the daemon. Set these:
 
 | Setting | Value | Why |
 | --- | --- | --- |
@@ -127,6 +127,12 @@ The packaged `/etc/clamav/clamd.conf` of Ubuntu 24.04 must not be used as it is.
 | `MaxThreads` | the number of media workers | each scan of a large archive added about 250 MiB resident and can extract up to 768 MiB to disk |
 | `TemporaryDirectory` | a disk-backed directory the daemon owns, such as `/var/tmp/clamd` | recommended, not measured |
 | `ConcurrentDatabaseReload` | `yes` (the default) | scans keep running during a reload, at the memory cost under host sizing |
+
+### Whether the daemon refuses what it cannot scan
+
+Nothing in a daemon's answer to a clean file says whether `AlertExceedsMax` is set, and without it the limits above turn a file the daemon cannot scan into `OK`. So before the application trusts any answer from `clamdscan` it asks the daemon to scan a canary: a sparse file of 4 GiB and a byte, made in the scan's own workspace, holding no data and taking no disk, and removed afterwards. A daemon that alerts refuses it whatever its limits are, with `Heuristics.Limits.Exceeded.MaxFileSize FOUND` and exit status 1 in 0.01 second. ClamAV 1.5.4 did so with the limits at `25M`, `1280M`, `4000M`, `4096M`, `8192M` and `0` (no limit), because the engine's own ceiling is below 2 GiB; without `AlertExceedsMax` it answered `OK` at each of them. Anything else, an `OK`, another line, an error, a signal or no answer within 30 seconds, fails the scan as `scanner_unavailable` before the upload is handed to the daemon, and the worker log says what the daemon did and names the fix: `MaxFileSize` and `MaxScanSize` at 1280M and `AlertExceedsMax yes`.
+
+A pass is remembered by the worker process for five minutes, so a daemon that is reconfigured or replaced is noticed within them; a failure is never remembered. `php artisan vasey:doctor` runs the same check as `media_scanner_limits`. It shows that the daemon alerts, not that its limits are large enough: a daemon with `AlertExceedsMax yes` and the packaged 25M refuses every large upload as a detection, which step 6 of the acceptance list finds. A canary of one byte over the application's own limit would not do, because a daemon with a higher limit scans it, for minutes. The worker itself must be allowed to write a file of 4 GiB (`ulimit -f`, `LimitFSIZE=`); when it is not, the check fails without making the file.
 
 Keep `freshclam` running as a daemon and confirm that the daemon reloads after an update: step 1 of the acceptance list shows the signature date the daemon reports. `media.max_signature_age_seconds` (48 hours) measures the build time of the newest daily database, not the time of freshclam's last check, so alert well before the limit. The upstream publishing cadence was not measured; 24 to 36 hours of age is a starting point.
 
@@ -161,6 +167,7 @@ Run these on the deployed host as the worker's user, with the configured binary 
 5. A deflate bomb, 1 GiB of zeros in a ZIP of about 1 MiB, reports `Heuristics.Limits.Exceeded.MaxScanSize FOUND`.
 6. A ZIP just under 200 MiB with four members of 128 MiB each (512 MiB expanded), the largest the application admits, reports `OK`. Give each member about 49 MiB of random data and zeros for the rest.
 7. Stop the daemon. The application must report `scanner_signatures_stale` or `scan_not_clean` for both a clean file and the EICAR file, never a clean result: `clamdscan --version` then prints an error and only `ClamAV <version>`.
+8. `php artisan vasey:doctor` as the worker's user reports `media_scanner_limits` as `pass`. With the packaged limits it is a warning, and the worker log names the fix.
 
 ## Publish a track through the admin
 
