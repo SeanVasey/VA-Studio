@@ -254,8 +254,9 @@ class SiteReleaseResource extends OperatorResource
     {
         return $table->columns([
             TextColumn::make('id')->label('Release')->sortable(),
-            // Long labels without spaces must break too, or the table scrolls sideways again.
-            TextColumn::make('label')->searchable()->wrap()->extraAttributes(['style' => 'overflow-wrap: anywhere']),
+            // Long labels without spaces must break too, or the table scrolls sideways again; the floor keeps words whole on
+            // narrower screens, where the table scrolls instead.
+            TextColumn::make('label')->searchable()->wrap()->extraAttributes(['style' => 'overflow-wrap: anywhere; min-width: 7rem']),
             TextColumn::make('publication_status')->label('Status')->badge()->state(fn (SiteRelease $record): string => SitePublication::findOrFail(1)->active_release_id === $record->id ? 'Active' :
                     (SitePublicationRevision::where('release_id', $record->id)->exists() ? 'Previously published' : 'Private draft')),
             TextColumn::make('schedule_status')->label('Schedule')->badge()->color('warning')->state(function (SiteRelease $record): ?string {
@@ -277,8 +278,9 @@ class SiteReleaseResource extends OperatorResource
                     static::publicationAction('rollback', 'Restore previous release'),
                     static::scheduleAction(),
                 ])->label('More')->link()->size(Size::Small)->icon(Heroicon::ChevronDown)->iconPosition(IconPosition::After)
-                    // Each row's trigger names its release, starting with the visible word (WCAG 2.5.3).
-                    ->extraAttributes(fn (SiteRelease $record): array => ['aria-label' => 'More actions for “'.$record->label.'”']),
+                    // Each row's trigger names its release, starting with the visible word (WCAG 2.5.3). Filament merges extra
+                    // attributes unescaped, and labels may contain quotes.
+                    ->extraAttributes(fn (SiteRelease $record): array => ['aria-label' => e('More actions for “'.$record->label.'”')]),
             ])->toolbarActions([]);
     }
 

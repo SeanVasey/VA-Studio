@@ -98,7 +98,7 @@ test('private draft preview, publication, immutable copy and rollback preserve t
   }
 });
 
-test('the row menu shows keyboard focus and returns it to More when a dialog or the menu closes', async ({ page }, testInfo) => {
+test('the row menu shows keyboard focus and returns it to More when a dialog is dismissed or the menu closes', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium-desktop', 'Keyboard focus is checked on the desktop project.');
   const failures: string[] = [];
   page.on('pageerror', error => failures.push(error.message));
@@ -108,38 +108,49 @@ test('the row menu shows keyboard focus and returns it to More when a dialog or 
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await expect(page).toHaveURL(/\/admin$/);
   await page.goto('/admin/site-releases');
-  // Published and then replaced by the previous test, so its menu offers Restore previous release.
-  const label = `Synthetic content one ${testInfo.project.name}`;
+  // Its own draft. The quotes check that the button keeps its full name.
+  const label = `Synthetic "keyboard" & menu ${testInfo.project.name}`;
+  await page.getByRole('button', { name: 'New content draft', exact: true }).click();
+  const create = page.getByRole('dialog');
+  await create.getByLabel('Release label', { exact: false }).fill(label);
+  await create.getByRole('button', { name: 'Save private draft', exact: true }).click();
+  await expect(row(page, label).getByText('Private draft', { exact: true })).toBeVisible();
   const trigger = releaseMenuTrigger(page, label);
-  const restore = row(page, label).getByRole('button', { name: 'Restore previous release', exact: true });
+  const edit = row(page, label).getByRole('button', { name: 'Edit as new draft', exact: true });
+  const openMenuFromKeyboard = async () => {
+    await page.keyboard.press('Enter');
+    await expect(edit).toBeVisible();
+    for (let step = 0; step < 4 && !(await edit.evaluate(element => element === document.activeElement)); step++) {
+      await page.keyboard.press('Tab');
+    }
+    await expect(edit).toBeFocused();
+  };
 
   await trigger.focus();
-  await page.keyboard.press('Enter');
-  await expect(restore).toBeVisible();
-  for (let step = 0; step < 4 && !(await restore.evaluate(element => element === document.activeElement)); step++) {
-    await page.keyboard.press('Tab');
-  }
-  await expect(restore).toBeFocused();
+  await openMenuFromKeyboard();
   // A visible outline, not only the faint background Filament gives a focused menu item.
-  expect(await restore.evaluate(element => {
+  expect(await edit.evaluate(element => {
     const style = getComputedStyle(element);
     return [style.outlineStyle, parseFloat(style.outlineWidth) >= 2];
   })).toEqual(['solid', true]);
 
+  // Dismissing the dialog the menu opened returns focus to More.
   await page.keyboard.press('Enter');
   // Filament's dialog element has no box of its own, so check its heading.
-  const heading = page.getByRole('alertdialog', { name: 'Restore previous release', exact: true }).getByRole('heading', { name: 'Restore previous release', exact: true });
+  const heading = page.getByRole('dialog').getByRole('heading', { name: 'Edit a copy as a private draft', exact: true });
   await expect(heading).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(heading).toBeHidden();
   await expect(trigger).toBeFocused();
 
-  // Escape inside the open menu closes it and also keeps focus on More.
-  await page.keyboard.press('Enter');
-  await expect(restore).toBeVisible();
-  await page.keyboard.press('Tab');
+  // Reopening the menu straight away keeps focus in the menu, well past the time focus may still be returning.
+  await openMenuFromKeyboard();
+  await page.waitForTimeout(1000);
+  await expect(edit).toBeFocused();
+
+  // Escape from inside the open menu closes it and returns focus to More.
   await page.keyboard.press('Escape');
-  await expect(restore).toBeHidden();
+  await expect(edit).toBeHidden();
   await expect(trigger).toBeFocused();
   expect(failures).toEqual([]);
 });
