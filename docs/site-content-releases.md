@@ -61,6 +61,8 @@ Create and activation operations reload staff authorization. Losing the administ
 
 Each release retains its schema, canonicalization version and content hash. Publication retains the actor, selected/previous release, increasing revision and hash, together with an audit event. A failed activation transaction must leave all three unchanged. A configured release or pointer that fails integrity validation is an error, not permission to fall back silently to code copy. Preserve evidence and restore verified data before retrying.
 
+While that is the case, public pages answer a generic, uncacheable `503` with `Retry-After: 60`. They never redirect and never show code defaults. The application log records `Published site content is unavailable.` at critical level, at most once a minute, with the revision and release id. **New content draft** reports the failure instead of opening. To recover, publish or restore an intact release, or use **Edit as new draft** on a saved release and publish that.
+
 Content rollback changes only the site pointer and its history/audit. It does not refund, cancel, reprice or alter any purchased license, original contract, entitlement or provider object. Application rollback must retain these tables. The migration refuses rollback once releases exist; old application code may display its own baseline copy instead of the retained active release.
 
 ## Verification and remaining work

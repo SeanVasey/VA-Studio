@@ -13,11 +13,14 @@ use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use LogicException;
+use Throwable;
 
 /** Site changes do not write catalog, commercial or customer records. */
 final class SiteContent
@@ -62,11 +65,17 @@ final class SiteContent
     {
         // Capture the pointer once. Immutable snapshots and history keep this coherent if publication changes next.
         $publication = SitePublication::findOrFail(1);
-        $this->verifyPointer($publication);
+        try {
+            $this->verifyPointer($publication);
 
-        return $publication->active_release_id === null
-            ? SiteContentSchema::defaults()
-            : $this->content(SiteRelease::findOrFail($publication->active_release_id));
+            return $publication->active_release_id === null
+                ? SiteContentSchema::defaults()
+                : $this->content(SiteRelease::findOrFail($publication->active_release_id));
+        } catch (ValidationException $exception) {
+            $this->reportUnavailable($publication);
+
+            throw SiteContentUnavailable::because($exception->errors());
+        }
     }
 
     public function preview(int $id, User $actor): array
@@ -312,6 +321,20 @@ final class SiteContent
         Gate::forUser($current)->authorize('administer-catalog');
 
         return $current;
+    }
+
+    /** Every request fails closed; the operator log records the outage at most once a minute. */
+    private function reportUnavailable(SitePublication $publication): void
+    {
+        try {
+            if (Cache::add('site-content:unavailable-reported', true, 60)) {
+                Log::critical('Published site content is unavailable.', [
+                    'reason' => 'integrity', 'revision' => $publication->revision, 'release_id' => $publication->active_release_id,
+                ]);
+            }
+        } catch (Throwable) {
+            // Reporting must never replace the fail-closed response.
+        }
     }
 
     private function content(SiteRelease $release): array

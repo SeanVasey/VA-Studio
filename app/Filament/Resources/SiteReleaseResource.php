@@ -7,6 +7,7 @@ use App\Domain\SiteBuilder\Models\SitePublicationRevision;
 use App\Domain\SiteBuilder\Models\SitePublicationSchedule;
 use App\Domain\SiteBuilder\Models\SiteRelease;
 use App\Domain\SiteBuilder\SiteContent;
+use App\Domain\SiteBuilder\SiteContentUnavailable;
 use App\Domain\SiteBuilder\SiteContentSchema;
 use App\Filament\Resources\SiteReleaseResource\Pages\ListSiteReleases;
 use App\Models\User;
@@ -171,10 +172,16 @@ class SiteReleaseResource extends OperatorResource
     {
         return Action::make('createDraft')->label('New content draft')->schema(static::editor())
             ->modalHeading('Create a private content draft')->modalSubmitActionLabel('Save private draft')
-            ->fillForm(function (): array {
+            ->fillForm(function (Action $action): array {
                 static::actor();
-
-                return static::draftForm(app(SiteContent::class)->current());
+                try {
+                    return static::draftForm(app(SiteContent::class)->current());
+                } catch (SiteContentUnavailable) {
+                    Notification::make()->danger()->title('The published site content failed its integrity check')
+                        ->body('Public pages are showing a temporary error. Publish or restore an intact release, or use Edit as new draft on a saved release.')
+                        ->persistent()->send();
+                    $action->cancel();
+                }
             })
             ->action(fn (array $data, ListSiteReleases $livewire) => static::saveDraft($data, $livewire));
     }
