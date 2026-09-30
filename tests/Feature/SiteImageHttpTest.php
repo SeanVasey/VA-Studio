@@ -21,6 +21,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use Livewire\Livewire;
 use Tests\Support\LicenseFixtures;
@@ -170,6 +171,28 @@ class SiteImageHttpTest extends TestCase
             ->callTableAction('retry', $waiting)->assertNotified('Processing queued');
         $this->assertSame(1, AuditEvent::query()->where('action', 'site.image.retry_requested')->where('subject_id', $waiting->id)->count());
         Queue::assertPushed(ProcessSiteImage::class, fn (ProcessSiteImage $job): bool => $job->imageId === $waiting->id);
+    }
+
+    public function test_an_expired_claim_is_shown_as_interrupted_with_its_attempts_and_can_be_retried(): void
+    {
+        $live = $this->ingest(F::jpeg(1440, 630));
+        $live->forceFill(['status' => 'processing', 'claim_token' => (string) Str::uuid(), 'claimed_until' => now()->addMinutes(10), 'attempts' => 1])->save();
+        // A second worker took over once and then stopped too.
+        $interrupted = $this->ingest(F::jpeg(1440, 630));
+        $interrupted->forceFill(['status' => 'processing', 'claim_token' => (string) Str::uuid(), 'claimed_until' => now()->subMinutes(20), 'attempts' => 1])->save();
+        $interrupted->forceFill(['claim_token' => (string) Str::uuid(), 'claimed_until' => now()->subMinute(), 'attempts' => 2])->save();
+        $this->actingAs($this->actor);
+
+        Livewire::test(ListSiteImages::class)
+            ->assertTableColumnFormattedStateSet('status', 'Processing', $live)->assertTableColumnStateSet('failure_code', null, $live)
+            ->assertTableColumnFormattedStateSet('status', 'Interrupted', $interrupted)
+            ->assertTableColumnFormattedStateSet('failure_code', SiteImageProblem::MESSAGES['processing_interrupted'], $interrupted)
+            ->assertTableColumnStateSet('attempts', 1, $live)->assertTableColumnStateSet('attempts', 2, $interrupted)
+            ->assertSee('Interrupted')->assertSee(SiteImageProblem::MESSAGES['processing_interrupted'])->assertSeeHtml('fi-ta-cell-attempts')
+            ->assertTableActionHidden('retry', $live)->assertTableActionVisible('retry', $interrupted)
+            ->callTableAction('retry', $interrupted)->assertNotified('Processing queued');
+        $this->assertEquals(['status' => 'processing', 'failure_code' => null],
+            AuditEvent::query()->where('action', 'site.image.retry_requested')->where('subject_id', $interrupted->id)->sole()->context);
     }
 
     public function test_the_list_escapes_upload_names_and_shows_thumbnails_through_the_private_preview(): void

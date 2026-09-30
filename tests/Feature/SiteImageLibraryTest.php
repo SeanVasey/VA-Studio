@@ -446,11 +446,87 @@ class SiteImageLibraryTest extends TestCase
         $this->assertSame([], Storage::disk('local')->allFiles('site-images/revisions'));
     }
 
+    /**
+     * A scripted clamscan whose version line carries today's signature date. Each scan follows the mode file beside it.
+     *
+     * @return array{string, string} the executable and its mode file
+     */
+    private function scriptedClamscan(): array
+    {
+        $directory = sys_get_temp_dir().'/site-image-clamscan-'.Str::uuid();
+        mkdir($directory, 0700);
+        $this->beforeApplicationDestroyed(fn () => (new Filesystem)->deleteDirectory($directory));
+        $script = $directory.'/clamscan';
+        file_put_contents($script, implode("\n", [
+            '#!/bin/sh',
+            'mode=$(cat "$(dirname "$0")/mode")',
+            'if [ "$1" = "--version" ]; then',
+            '  if [ "$mode" = impostor ]; then echo "Impostor 1.0/1/'.date('D M d H:i:s Y').'"; else echo "ClamAV 1.4.1/27400/'.date('D M d H:i:s Y').'"; fi',
+            '  exit 0',
+            'fi',
+            'for path; do :; done',
+            'case "$mode" in',
+            '  clean) echo "$path: OK" ;;',
+            '  found) echo "$path: Eicar-Test-Signature FOUND"; exit 1 ;;',
+            '  unverified) echo "$path: Scanned" ;;',
+            '  error) echo "$path: Can\'t open file or directory ERROR" >&2; exit 2 ;;',
+            '  signal) kill -KILL $$ ;;',
+            '  slow) exec sleep 3 ;;',
+            'esac',
+        ])."\n");
+        chmod($script, 0700);
+
+        return [$script, $directory.'/mode'];
+    }
+
+    public function test_only_a_completed_scan_decides_and_scanner_problems_wait_for_a_retry(): void
+    {
+        [$clamscan, $mode] = $this->scriptedClamscan();
+        app()->instance(MalwareScanner::class, new MalwareScanner);
+        config(['media.clamscan' => $clamscan]);
+        $timeout = config('media.process_timeout_seconds');
+        $cases = [
+            'clean' => ['ready', null],
+            // A detection, or an exit 0 without the exact clean line, is a verdict on this file.
+            'found' => ['failed', 'scan_not_clean'], 'unverified' => ['failed', 'scan_not_clean'],
+            // A scanner error, crash, impostor or timeout says nothing about the file.
+            'error' => ['quarantined', 'scanner_unavailable'], 'signal' => ['quarantined', 'scanner_unavailable'],
+            'impostor' => ['quarantined', 'scanner_unavailable'], 'slow' => ['quarantined', 'processor_timeout'],
+        ];
+        foreach ($cases as $case => [$status, $code]) {
+            file_put_contents($mode, $case);
+            config(['media.process_timeout_seconds' => $case === 'slow' ? 1 : $timeout]);
+            $image = $this->process($this->ingest('studio', F::jpeg(1440, 630)));
+
+            $this->assertSame([$status, $code, 1], [$image->status, $image->failure_code, $image->attempts], $case);
+            $this->assertSame($status === 'quarantined', RetrySiteImage::retryable($image), $case);
+            $this->assertSame($status === 'ready' ? 6 : 0, $image->variants()->count(), $case);
+        }
+        $clean = SiteImage::query()->where('status', 'ready')->sole();
+        $this->assertSame(['clamav', 'clean'], [$clean->evidence['source_scan']['engine'], $clean->evidence['source_scan']['status']]);
+        $this->assertStringStartsWith('ClamAV 1.4.1/27400/', $clean->evidence['source_scan']['version']);
+    }
+
     public function test_retry_is_refused_unless_the_image_is_waiting_and_checks_staff_access(): void
     {
         $ready = $this->process($this->ingest('studio', F::jpeg(1440, 630)));
         $this->assertSame(['image' => ['This image is not waiting for a retry.']], $this->refusal(fn () => app(RetrySiteImage::class)->handle($ready, $this->actor)));
         $waiting = $this->ingest('studio', F::jpeg(1440, 630));
+
+        $panel = Filament::getPanel('admin');
+        $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: true);
+        try {
+            app(RetrySiteImage::class)->handle($waiting, $this->actor);
+            $this->fail('An administrator without MFA must not retry while MFA is required.');
+        } catch (AuthorizationException $exception) {
+            $this->assertSame('Multi-factor authentication is required.', $exception->getMessage());
+        }
+        $this->assertNotContains('site.image.retry_requested', $this->actions($waiting));
+        Queue::assertPushed(ProcessSiteImage::class, 2);
+        $this->actor->saveAppAuthenticationSecret('JBSWY3DPEHPK3PXP');
+        app(RetrySiteImage::class)->handle($waiting, $this->actor);
+        Queue::assertPushed(ProcessSiteImage::class, 3);
+
         $this->expectException(AuthorizationException::class);
         app(RetrySiteImage::class)->handle($waiting, User::factory()->create());
     }
@@ -467,8 +543,38 @@ class SiteImageLibraryTest extends TestCase
 
         $this->travel(SiteImageProcessor::LEASE_SECONDS + 1)->seconds();
         $this->assertTrue(RetrySiteImage::retryable($untouched->fresh()));
+        $expired = $untouched->fresh()->claimed_until->utc()->toIso8601ZuluString();
         $ready = $this->process($image);
         $this->assertSame(['ready', 2], [$ready->status, $ready->attempts]);
+        // The crashed worker's attempt is on record before the takeover's own attempt.
+        $this->assertSame(['site.image.uploaded', 'site.image.retry_pending', 'site.image.processing', 'site.image.processed'], $this->actions($image));
+        $this->assertEquals(['failure_code' => 'processing_interrupted', 'attempt' => 1, 'claimed_until' => $expired],
+            AuditEvent::query()->where('action', 'site.image.retry_pending')->sole()->context);
+        $this->assertEquals(['attempt' => 2], AuditEvent::query()->where('action', 'site.image.processing')->sole()->context);
+    }
+
+    public function test_a_linked_storage_directory_waits_for_a_fix_while_a_linked_upload_fails(): void
+    {
+        $root = rtrim(Storage::disk('local')->path(''), '/');
+        $image = $this->ingest('studio', F::jpeg(1440, 630));
+        rename($root.'/site-images', $root.'/site-images-moved');
+        symlink($root.'/site-images-moved', $root.'/site-images');
+
+        $waiting = $this->process($image);
+        $this->assertSame(['quarantined', 'unsafe_storage', 1], [$waiting->status, $waiting->failure_code, $waiting->attempts]);
+        $this->assertTrue(RetrySiteImage::retryable($waiting));
+        // Once the operator restores the directory, the retry prepares the same upload.
+        unlink($root.'/site-images');
+        rename($root.'/site-images-moved', $root.'/site-images');
+        $this->assertSame(['ready', 2], [($ready = $this->process($image))->status, $ready->attempts]);
+
+        // A link in place of the upload itself is a problem with that file, so it fails for good.
+        $linked = $this->ingest('studio', F::jpeg(1440, 630));
+        $path = $root.'/'.$linked->source_path;
+        rename($path, $path.'.moved');
+        symlink($path.'.moved', $path);
+        $failed = $this->process($linked);
+        $this->assertSame(['failed', 'unsafe_path'], [$failed->status, $failed->failure_code]);
     }
 
     public function test_a_run_that_lost_its_claim_writes_nothing(): void

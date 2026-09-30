@@ -33,7 +33,7 @@ class BoundedMediaProcess
             throw new MediaFailure('processor_timeout', 'Media processing exceeded its time limit.');
         }
         if (! $process->isSuccessful()) {
-            throw new MediaFailure('processor_failed', 'Media processing or validation failed. Verify the file and installed tools before retrying.');
+            throw new MediaFailure('processor_failed', 'Media processing or validation failed. Verify the file and installed tools before retrying.', $process->getExitCode());
         }
 
         return $stdout;

@@ -120,6 +120,11 @@ final class SiteImageProcessor
                 || ($image->status === 'processing' && $image->claimed_until !== null && $image->claimed_until->isFuture())) {
                 return [null, null];
             }
+            if ($image->status === 'processing') {
+                // The worker holding this claim stopped without recording an outcome; audit that attempt before taking over.
+                AuditEvent::record('site.image.retry_pending', $image, ['failure_code' => 'processing_interrupted', 'attempt' => $image->attempts,
+                    'claimed_until' => $image->claimed_until?->utc()->toIso8601ZuluString()]);
+            }
             $token = (string) Str::uuid();
             $image->forceFill(['status' => 'processing', 'claim_token' => $token, 'claimed_until' => now()->addSeconds(self::LEASE_SECONDS),
                 'attempts' => $image->attempts + 1, 'failure_code' => null])->save();

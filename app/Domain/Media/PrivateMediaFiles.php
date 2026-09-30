@@ -34,10 +34,14 @@ class PrivateMediaFiles
             throw new MediaFailure('unsafe_path', 'Media paths must be safe relative private object keys.');
         }
         $path = $this->root();
-        foreach (explode('/', $relative) as $component) {
+        $components = explode('/', $relative);
+        foreach ($components as $index => $component) {
             $path .= '/'.$component;
             if (is_link($path)) {
-                throw new MediaFailure('unsafe_path', 'Symbolic links are not accepted for media.');
+                // A linked directory is a storage layout an operator can fix; a linked file is a problem with that object itself.
+                throw $index === array_key_last($components)
+                    ? new MediaFailure('unsafe_path', 'Symbolic links are not accepted for media.')
+                    : new MediaFailure('unsafe_storage', 'A private media directory is a symbolic link.');
             }
         }
         $real = realpath($path);
@@ -94,7 +98,7 @@ class PrivateMediaFiles
     {
         $base = $this->root().'/processing';
         if (is_link($base)) {
-            throw new MediaFailure('unsafe_path', 'The processing directory cannot be a symbolic link.');
+            throw new MediaFailure('unsafe_storage', 'The processing directory cannot be a symbolic link.');
         }
         if (! is_dir($base)) {
             mkdir($base, 0700, true);
@@ -123,7 +127,7 @@ class PrivateMediaFiles
         foreach (explode('/', dirname($relative)) as $component) {
             $current .= '/'.$component;
             if (is_link($current)) {
-                throw new MediaFailure('unsafe_path', 'The revision directory cannot be a symbolic link.');
+                throw new MediaFailure('unsafe_storage', 'The revision directory cannot be a symbolic link.');
             }
             if (! is_dir($current)) {
                 mkdir($current, 0700);

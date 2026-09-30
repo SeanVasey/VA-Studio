@@ -36,7 +36,13 @@ class SiteImageResource extends OperatorResource
 
     protected static ?string $recordTitleAttribute = 'original_name';
 
-    public const STATUS_LABELS = ['quarantined' => 'Waiting', 'processing' => 'Processing', 'ready' => 'Ready', 'failed' => 'Failed'];
+    public const STATUS_LABELS = ['quarantined' => 'Waiting', 'processing' => 'Processing', 'interrupted' => 'Interrupted', 'ready' => 'Ready', 'failed' => 'Failed'];
+
+    /** A processing claim that expired without an outcome: its worker stopped, and a retry may take the image over. */
+    private static function interrupted(SiteImage $record): bool
+    {
+        return $record->status === 'processing' && RetrySiteImage::retryable($record);
+    }
 
     public static function actor(): User
     {
@@ -63,12 +69,15 @@ class SiteImageResource extends OperatorResource
                 ->extraImgAttributes(fn (SiteImage $record): array => ['alt' => SiteImageSlot::label($record->slot).' #'.$record->id, 'loading' => 'lazy']),
             TextColumn::make('id')->label('Image')->sortable(),
             TextColumn::make('slot')->label('Used for')->formatStateUsing(fn (string $state): string => SiteImageSlot::label($state)),
-            TextColumn::make('status')->badge()->formatStateUsing(fn (string $state): string => self::STATUS_LABELS[$state] ?? $state)
+            TextColumn::make('status')->badge()->state(fn (SiteImage $record): string => self::interrupted($record) ? 'interrupted' : $record->status)
+                ->formatStateUsing(fn (string $state): string => self::STATUS_LABELS[$state] ?? $state)
                 ->color(fn (string $state): string => match ($state) { 'ready' => 'success', 'failed' => 'danger', default => 'warning' }),
+            TextColumn::make('attempts')->label('Attempts')->numeric(),
             TextColumn::make('size')->label('Size')->state(fn (SiteImage $record): string => $record->width.' × '.$record->height),
             TextColumn::make('original_name')->label('File')->searchable()->wrap(),
             TextColumn::make('credit')->label('Source or credit')->wrap(),
             TextColumn::make('failure_code')->label('Problem')->wrap()
+                ->state(fn (SiteImage $record): ?string => self::interrupted($record) ? 'processing_interrupted' : $record->failure_code)
                 ->formatStateUsing(fn (?string $state): string => SiteImageProblem::describe($state)),
             TextColumn::make('uploader.name')->label('Uploaded by'),
             TextColumn::make('created_at')->label('Uploaded (UTC)')->dateTime('Y-m-d H:i', 'UTC')->sortable(),
