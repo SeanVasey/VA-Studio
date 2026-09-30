@@ -676,34 +676,61 @@ class SiteImageLibraryTest extends TestCase
         }
     }
 
-    public function test_cleanup_leaves_orphans_when_it_cannot_check_what_the_rows_reference(): void
+    /**
+     * Undoes the application transaction that just committed inside this test's own transaction, as if its commit had not been
+     * applied yet when the next query ran. Laravel keeps a committed savepoint until the outer transaction ends.
+     */
+    private function undoLastCommit(): void
+    {
+        $connection = DB::connection();
+        $connection->getPdo()->exec($connection->getQueryGrammar()->compileSavepointRollBack('trans'.($connection->transactionLevel() + 1)));
+    }
+
+    public function test_a_ready_commit_that_reports_an_error_keeps_the_files_even_when_no_row_is_visible(): void
     {
         Exceptions::fake();
         $image = $this->ingest('studio', F::jpeg(1440, 630));
-        $real = app(SiteImageDerivatives::class);
-        // Another worker takes the image over while this run prepares it, so this run promotes files it never records.
-        app()->instance(SiteImageDerivatives::class, new class($real, $image->id)
-        {
-            public function __construct(private SiteImageDerivatives $real, private int $id) {}
-
-            public function build(string $png, string $slot, int $width, int $height, string $workspace): array
-            {
-                $outputs = $this->real->build($png, $slot, $width, $height, $workspace);
-                DB::table('site_images')->where('id', $this->id)->update(['claim_token' => (string) Str::uuid(), 'claimed_until' => now()->addMinutes(20), 'attempts' => 2]);
-
-                return $outputs;
-            }
-        });
-        DB::connection()->beforeExecuting(function (string $query): void {
-            if (preg_match('/from [`"]site_image_variants[`"] where [`"]storage_path[`"] in /', $query) === 1) {
-                throw new PDOException('Synthetic failure of the reference lookup.');
+        $raised = false;
+        // The commit reports an error and later reads find no ready image, as when a reconnected session reads before the server
+        // has finished applying the commit. Here it never applies, so the kept files end up as orphans.
+        Event::listen(TransactionCommitted::class, function () use ($image, &$raised): void {
+            if (! $raised && SiteImage::query()->whereKey($image->id)->value('status') === 'ready') {
+                $raised = true;
+                $this->undoLastCommit();
+                throw new PDOException('Synthetic failure while committing the ready image.');
             }
         });
         $after = $this->process($image);
 
-        $this->assertSame(['processing', 2, 0], [$after->status, $after->attempts, $after->variants()->count()]);
-        Exceptions::assertReported(fn (PDOException $exception): bool => $exception->getMessage() === 'Synthetic failure of the reference lookup.');
-        $this->assertCount(6, Storage::disk('local')->allFiles('site-images/revisions'));
+        $this->assertTrue($raised);
+        Exceptions::assertReported(PDOException::class);
+        $this->assertSame(['quarantined', 'processing_interrupted', 0], [$after->status, $after->failure_code, $after->variants()->count()]);
+        $this->assertCount(6, Storage::disk('local')->allFiles('site-images/revisions'), 'Files were deleted while the ready commit was in doubt.');
+        // The orphans do not block a retry, which prepares a fresh set.
+        $this->assertSame('ready', $this->process($after)->status);
+        $this->assertCount(12, Storage::disk('local')->allFiles('site-images/revisions'));
+    }
+
+    public function test_an_error_inside_the_ready_transaction_removes_the_promoted_files(): void
+    {
+        Exceptions::fake();
+        $image = $this->ingest('studio', F::jpeg(1440, 630));
+        $real = app(SiteImageDerivatives::class);
+        // One size goes missing, so the ready guard refuses the transition after the other variants were inserted.
+        app()->instance(SiteImageDerivatives::class, new class($real)
+        {
+            public function __construct(private SiteImageDerivatives $real) {}
+
+            public function build(string $png, string $slot, int $width, int $height, string $workspace): array
+            {
+                return array_slice($this->real->build($png, $slot, $width, $height, $workspace), 1);
+            }
+        });
+        $after = $this->process($image);
+
+        Exceptions::assertReported(fn (QueryException $exception): bool => str_contains($exception->getMessage(), 'Site image evidence is invalid or immutable'));
+        $this->assertSame(['quarantined', 'processing_interrupted', 0], [$after->status, $after->failure_code, $after->variants()->count()]);
+        $this->assertSame([], Storage::disk('local')->allFiles('site-images/revisions'));
     }
 
     public function test_a_queue_outage_after_intake_keeps_the_waiting_image_and_its_upload(): void
@@ -756,6 +783,58 @@ class SiteImageLibraryTest extends TestCase
         $this->assertTrue(Storage::disk('local')->exists($stored->source_path), 'The upload of a committed image was deleted.');
         $this->assertTrue(RetrySiteImage::retryable($stored));
         $this->assertSame('ready', $this->process($stored)->status);
+    }
+
+    public function test_intake_keeps_the_upload_when_its_commit_reports_an_error_and_no_row_is_visible(): void
+    {
+        // The commit reports an error and later reads find no row, as when a reconnected session reads before the server has
+        // finished applying the commit. Here it never applies, so the kept upload ends up as an orphan.
+        $raised = false;
+        Event::listen(TransactionCommitted::class, function () use (&$raised): void {
+            if (! $raised && SiteImage::query()->exists()) {
+                $raised = true;
+                $this->undoLastCommit();
+                throw new PDOException('Synthetic failure while committing the upload.');
+            }
+        });
+        try {
+            $this->ingest('studio', F::jpeg(1440, 630));
+            $this->fail('The commit error should reach the caller.');
+        } catch (PDOException) {
+        }
+
+        $this->assertTrue($raised);
+        $this->assertSame(0, SiteImage::count());
+        $this->assertCount(1, Storage::disk('local')->allFiles('site-images/quarantine'), 'The upload was deleted while its commit was in doubt.');
+        Queue::assertNothingPushed();
+    }
+
+    public function test_intake_removes_the_upload_when_its_transaction_fails_before_the_commit(): void
+    {
+        $case = null;
+        // The insert guard refuses a new image that claims an attempt.
+        Event::listen('eloquent.creating: '.SiteImage::class, function (SiteImage $image) use (&$case): void {
+            if ($case === 'refused insert') {
+                $image->forceFill(['attempts' => 1]);
+            }
+        });
+        // Or the row is written and the audit insert after it fails.
+        DB::connection()->beforeExecuting(function (string $query) use (&$case): void {
+            if ($case === 'failed audit' && preg_match('/insert into [`"]audit_events[`"]/', $query) === 1) {
+                throw new PDOException('Synthetic failure inside the upload transaction.');
+            }
+        });
+        foreach (['refused insert' => 'Site image evidence is invalid or immutable', 'failed audit' => 'Synthetic failure inside the upload transaction.'] as $current => $message) {
+            $case = $current;
+            try {
+                $this->ingest('studio', F::jpeg(1440, 630));
+                $this->fail("{$current}: the error should reach the caller.");
+            } catch (PDOException $exception) {
+                $this->assertStringContainsString($message, $exception->getMessage(), $current);
+            }
+            $case = null;
+            $this->assertNothingStored();
+        }
     }
 
     public function test_database_guards_keep_images_immutable_and_transitions_valid(): void

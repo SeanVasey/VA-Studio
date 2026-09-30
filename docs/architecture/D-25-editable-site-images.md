@@ -95,7 +95,7 @@ It is recomputed from the variant rows whenever an image is used or served. Only
 3. Requires a freshly uploaded file. A path to an existing object is never accepted. The file must be 12 bytes to 20 MiB, not a symlink, a JPEG or PNG by content, readable by `getimagesize` with a matching type, and within 6000 px.
 4. Checks the slot's shape and minimum size.
 5. Checks the headers: JPEG component count, bit depth and the orientation in every EXIF block; PNG bit depth, alpha or transparency chunk, and the orientation in every eXIf chunk. Readers disagree about which of several blocks counts (FFmpeg keeps the last), so any block that rotates or flips the image refuses it. The JPEG reader skips stray bytes before a marker, as libjpeg does. A PNG eXIf chunk over 64 KiB cannot be checked, and FFmpeg does not read PNG eXIf at all, so it is refused as `oversized_metadata`. A refused upload leaves nothing behind, while a failed row is kept for good, so problems visible in the headers are caught here.
-6. Stores the quarantined copy and verifies its size and hash. It then creates the row and the `site.image.uploaded` audit in one transaction. After the commit it queues `ProcessSiteImage` on the `media` queue. If the queue is unavailable, the error is reported, the upload is kept, and the image stays Waiting for **Retry processing**.
+6. Stores the quarantined copy and verifies its size and hash. It then creates the row and the `site.image.uploaded` audit in one transaction. If that fails before its commit, the transaction rolls back and the copy is removed. Once the commit has started, the copy is kept even if the commit reports an error, because the commit may have been applied; at worst it is an orphan. After the commit it queues `ProcessSiteImage` on the `media` queue. If the queue is unavailable, the error is reported, the upload is kept, and the image stays Waiting for **Retry processing**.
 
 ## Processing and failures
 
@@ -110,7 +110,7 @@ It is recomputed from the variant rows whenever an image is used or served. Only
 7. Promotes the variants to private storage.
 8. In one locked transaction checks that its claim is still held, inserts the variants, records the manifest and marks the image ready.
 
-It never throws for a processing outcome, so an upload handled by a synchronous queue still completes. A run that lost its claim writes nothing and removes the files it promoted. Cleanup removes only promoted files that no variant row references, so an error raised after the ready commit cannot remove a ready image's files. If that check itself fails, the files are left as orphans and the error is reported.
+It never throws for a processing outcome, so an upload handled by a synchronous queue still completes. A run that lost its claim writes nothing and removes the files it promoted. Cleanup follows the ready transaction rather than a lookup: an error before its commit (a lost claim, a refused insert or transition) rolls it back, so the run's promoted files are removed. Once the commit has started, the files are kept even if the commit reports an error. The commit may have been applied, and after a dropped connection a lookup from the reconnected session can run before the server has finished applying it. Orphaned files are the accepted cost. An error during cleanup is reported.
 
 Problems with the environment return the image to Waiting for an audited retry; problems with the file fail it for good.
 
@@ -162,7 +162,7 @@ Required evidence:
 - failure classification in the processor, in the prober itself, and in the scanner, driven by a scripted clamscan through a detection, runaway output, an exit 0 without the exact clean line (a warning ahead of it, another result, no output), an error, a crash, a time-out and a binary that is not ClamAV;
 - transient failure and retry, including a symbolically linked storage directory;
 - lease takeover, its audit and the Interrupted status, and lost-claim cleanup;
-- errors raised after the ready commit or after intake's commit, which keep every committed file;
+- errors reported by the ready commit or intake's commit, which keep the files whether or not the row is visible afterwards, and errors inside those transactions, which remove them;
 - database guards on both engines, including byte-exact text on MySQL, and rollback of empty tables;
 - the page, upload and retry actions, escaping and preview headers, including tampered, missing and symlinked files;
 - an independent-process MySQL race between two processors in both lock orders, and over an expired claim;

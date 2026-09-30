@@ -38,6 +38,8 @@ final class SiteImageProcessor
         $files = app(PrivateMediaFiles::class);
         $workspace = null;
         $promoted = [];
+        // Set by the ready transaction's last statement, once only its commit remains.
+        $committing = false;
         try {
             $workspace = $files->workspace();
             $input = $workspace.'/source';
@@ -77,10 +79,7 @@ final class SiteImageProcessor
                 $variants[] = ['format' => $output['format'], 'width' => $output['width'], 'height' => $output['height'],
                     'storage_path' => $relative, 'sha256' => hash_file('sha256', $path), 'size_bytes' => filesize($path)];
             }
-            $ready = $this->complete($imageId, $token, $variants, $evidence);
-            $promoted = [];
-
-            return $ready;
+            return $this->complete($imageId, $token, $variants, $evidence, $committing);
         } catch (MediaFailure $failure) {
             if ($failure->failureCode !== 'claim_lost') {
                 $this->fail($imageId, $token, $failure->failureCode);
@@ -94,12 +93,13 @@ final class SiteImageProcessor
 
             return SiteImage::findOrFail($imageId);
         } finally {
-            if ($promoted !== []) {
-                // A commit can succeed and still raise afterwards (a listener, a dropped connection), so only files no variant
-                // row references are this run's to remove. If that cannot be checked, orphans are safer than a ready image's files.
+            // Before the ready commit, no row references these files: the transaction never started, or an error inside it (a lost
+            // claim, a refused insert or transition) rolled it back. A commit can report an error after the server applied it (a
+            // dropped connection, a listener), and a lookup from a reconnected session can run before the server has finished
+            // applying it, so once the commit has started the files are kept, at worst as orphans.
+            if ($promoted !== [] && ! $committing) {
                 try {
-                    $referenced = SiteImageVariant::query()->whereIn('storage_path', $promoted)->pluck('storage_path')->all();
-                    foreach (array_diff($promoted, $referenced) as $relative) {
+                    foreach ($promoted as $relative) {
                         @unlink($files->root().'/'.$relative);
                     }
                     @rmdir(dirname($files->root().'/'.$promoted[0]));
@@ -140,10 +140,13 @@ final class SiteImageProcessor
         });
     }
 
-    /** @param  list<array{format: string, width: int, height: int, storage_path: string, sha256: string, size_bytes: int}>  $variants */
-    private function complete(int $imageId, string $token, array $variants, array $evidence): SiteImage
+    /**
+     * @param  list<array{format: string, width: int, height: int, storage_path: string, sha256: string, size_bytes: int}>  $variants
+     * @param  bool  $committing  set by the transaction's last statement, so an error after it may follow an applied commit
+     */
+    private function complete(int $imageId, string $token, array $variants, array $evidence, bool &$committing): SiteImage
     {
-        return DB::transaction(function () use ($imageId, $token, $variants, $evidence): SiteImage {
+        return DB::transaction(function () use ($imageId, $token, $variants, $evidence, &$committing): SiteImage {
             $image = SiteImage::query()->whereKey($imageId)->lockForUpdate()->firstOrFail();
             if ($image->status !== 'processing' || $image->claim_token !== $token) {
                 throw new MediaFailure('claim_lost', 'Another worker took over this image.');
@@ -157,8 +160,10 @@ final class SiteImageProcessor
             $image->forceFill(['status' => 'ready', 'claim_token' => null, 'claimed_until' => null, 'profile_version' => SiteImageSlot::PROFILE_VERSION,
                 'profile_fingerprint' => $fingerprint, 'evidence' => $evidence, 'manifest_sha256' => $manifest, 'processed_at' => $now])->save();
             AuditEvent::record('site.image.processed', $image, ['variants' => count($variants), 'manifest_sha256' => $manifest]);
+            $ready = $image->fresh();
+            $committing = true;
 
-            return $image->fresh();
+            return $ready;
         });
     }
 

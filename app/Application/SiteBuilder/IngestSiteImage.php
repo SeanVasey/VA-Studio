@@ -94,6 +94,8 @@ final class IngestSiteImage
         } finally {
             fclose($stream);
         }
+        // Set by the transaction's last statement, once only its commit remains.
+        $committing = false;
         try {
             if ($disk->size($path) !== $size || ! hash_equals($hash, hash_file('sha256', $disk->path($path)))) {
                 throw new RuntimeException('Upload integrity verification failed.');
@@ -101,7 +103,7 @@ final class IngestSiteImage
             $name = basename(str_replace('\\', '/', $upload->getClientOriginalName()));
             $name = Str::limit(preg_replace('/[\x00-\x1F\x7F]/', '', $name) ?? '', 240, '');
 
-            $image = DB::transaction(function () use ($slot, $path, $name, $hash, $size, $mime, $width, $height, $credit, $actor): SiteImage {
+            $image = DB::transaction(function () use ($slot, $path, $name, $hash, $size, $mime, $width, $height, $credit, $actor, &$committing): SiteImage {
                 $image = SiteImage::create([
                     'slot' => $slot, 'original_name' => $name !== '' ? $name : 'Uploaded image', 'source_path' => $path,
                     'source_sha256' => $hash, 'size_bytes' => $size, 'mime_type' => $mime, 'width' => $width, 'height' => $height,
@@ -110,18 +112,15 @@ final class IngestSiteImage
                     'status' => 'quarantined', 'attempts' => 0,
                 ]);
                 AuditEvent::record('site.image.uploaded', $image, ['slot' => $slot, 'sha256' => $hash, 'size_bytes' => $size, 'width' => $width, 'height' => $height], $actor->id);
+                $committing = true;
 
                 return $image;
             });
         } catch (Throwable $exception) {
-            // A commit can report an error after the server applied it; an upload a stored row may name is never removed, and
-            // without a working lookup the upload is kept as an orphan rather than risked.
-            try {
-                $named = SiteImage::query()->where('source_path', $path)->exists();
-            } catch (Throwable) {
-                $named = true;
-            }
-            if (! $named) {
+            // Before the commit, no row names the upload: the transaction never started or rolled back. A commit can report an
+            // error after the server applied it, and a lookup from a reconnected session can run before the server has finished
+            // applying it, so once the commit has started the upload is kept, at worst as an orphan.
+            if (! $committing) {
                 $disk->delete($path);
             }
             throw $exception;
