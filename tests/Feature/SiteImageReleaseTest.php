@@ -84,6 +84,8 @@ class SiteImageReleaseTest extends TestCase
         $variant = $image->variants()->where('format', 'jpeg')->orderBy('width')->firstOrFail();
         $path = Storage::disk('local')->path($variant->storage_path);
         $original = (string) file_get_contents($path);
+        // Promotion seals variants read-only; unseal the file before changing it, as the media tests do.
+        chmod($path, 0600);
         file_put_contents($path, strrev($original));
 
         return $original;

@@ -56,6 +56,8 @@ class SiteImageReleaseDamageTest extends TestCase
         $schedule = $site->schedule($release->id, CarbonImmutable::parse('2026-10-01 12:05:00', 'UTC'), 0, $this->actor);
         $variant = $studio->variants()->where('format', 'webp')->orderByDesc('width')->firstOrFail();
         $path = Storage::disk('local')->path($variant->storage_path);
+        // Promotion seals variants read-only; unseal the file before changing it, as the media tests do.
+        chmod($path, 0600);
         file_put_contents($path, strrev((string) file_get_contents($path)));
 
         $this->travelTo(CarbonImmutable::parse('2026-10-01 12:05:00', 'UTC'));

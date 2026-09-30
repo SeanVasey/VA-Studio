@@ -87,6 +87,7 @@ class SiteImageConcurrencyTest extends TestCase
     #[DataProvider('orders')]
     public function test_a_scheduled_image_release_and_a_manual_publication_serialize_and_only_the_winner_is_served(int $first): void
     {
+        MediaFixtures::configure();
         $scheduler = LicenseFixtures::admin();
         $staff = LicenseFixtures::admin();
         $studio = F::ready('studio', $scheduler);
@@ -108,6 +109,7 @@ class SiteImageConcurrencyTest extends TestCase
             if ($winner === 0) {
                 $this->assertSame(['schedule', 'published', 1], [$results[0]['result'], $results[0]['outcome'], $results[0]['revision']]);
                 $this->assertSame('rejected', $results[1]['result']);
+                $this->assertStringContainsString('published site changed', $results[1]['errors']['publication'][0]);
             } else {
                 $this->assertSame(['published', 1], [$results[1]['result'], $results[1]['revision']]);
                 $this->assertSame(['schedule', 'already_resolved'], [$results[0]['result'], $results[0]['outcome']]);
