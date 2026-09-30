@@ -82,6 +82,8 @@ php artisan queue:work --queue=media --timeout=900 --tries=3 --sleep=1
 
 For a deployment that caches configuration, rebuild its config cache and restart long-running workers after a configuration change. Do not assume an already-running worker has read an edited `.env`.
 
+The same `media` worker, scanner and FFmpeg tools prepare [site images](architecture/D-25-editable-site-images.md). Back up `storage/app/private/site-images/` together with the database: each image's manifest and hashes pin its stored bytes, so restore both from the same point.
+
 The media process wrapper limits each subprocess to 120 seconds wall time, 90 CPU seconds, 2 GiB address space, 1 GiB file output, 64 open files and 256 KiB captured output. Those are code bounds, not evidence of production worker isolation or measured catalog throughput. FFmpeg receives explicit input formats and a `file,pipe` protocol allowlist; production still needs a dedicated restricted worker and network policy.
 
 The admin's temporary uploads use authenticated, authorized private storage, with a 200 MiB temporary-file limit and 15-minute upload allowance. Set PHP `upload_max_filesize` and web-server/proxy request limits to admit the intended upload size; `post_max_size` needs room for multipart overhead. A lower upstream limit can reject a request before the application reports its own validation error. Temporary-upload settings do not implement resumable or multipart object-store uploads.
