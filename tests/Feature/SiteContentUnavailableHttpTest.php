@@ -10,11 +10,13 @@ use App\Domain\Rights\Models\RightsDeclaration;
 use App\Domain\SiteBuilder\Models\SitePublication;
 use App\Domain\SiteBuilder\SiteContent;
 use App\Domain\SiteBuilder\SiteContentSchema;
+use App\Domain\SiteBuilder\SiteContentUnavailable;
 use App\Filament\Resources\SiteReleaseResource\Pages\ListSiteReleases;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Models\User;
 use App\Support\CanonicalJson;
 use Illuminate\Cache\ArrayStore;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -22,6 +24,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Testing\TestResponse;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\MediaFixtures;
@@ -162,5 +165,46 @@ class SiteContentUnavailableHttpTest extends TestCase
         $this->assertStringNotContainsString('backup', (string) $notification['body']);
         $page->assertNotified('The published site content is unavailable')->assertSet('mountedActions', []);
         $this->assertDatabaseCount('site_releases', 1);
+    }
+
+    public static function firstPublicationMoments(): array
+    {
+        return [
+            'after the history read' => ['/from [`"]site_publication_revisions[`"]/', true],
+            'after the pointer read' => ['/from [`"]site_publications[`"] where/', false],
+        ];
+    }
+
+    #[DataProvider('firstPublicationMoments')]
+    public function test_a_first_publication_committing_during_a_public_read_never_reports_an_outage(string $pattern, bool $showsPublication): void
+    {
+        $actor = LicenseFixtures::admin();
+        $content = SiteContentSchema::defaults();
+        $content['hero']['title'] = 'SYNTHETIC FIRST';
+        $release = app(SiteContent::class)->create($content, 'Synthetic first publication', $actor);
+        Log::spy();
+        $done = false;
+        DB::listen(function (QueryExecuted $query) use (&$done, $pattern, $release, $actor): void {
+            if (! $done && preg_match($pattern, $query->sql) === 1 && ! str_contains($query->sql, 'for update')) {
+                $done = true;
+                app(SiteContent::class)->publish($release->id, 0, $actor);
+            }
+        });
+
+        $response = $this->get('/')->assertOk();
+        $this->assertTrue($done);
+        // The site as it was before the publication or after it, never an outage.
+        $this->assertSame($showsPublication, str_contains((string) $response->getContent(), 'SYNTHETIC FIRST'));
+        Log::shouldNotHaveReceived('critical');
+        $this->assertSame(1, SitePublication::findOrFail(1)->revision);
+    }
+
+    public function test_an_unavailable_exception_without_a_named_reason_never_claims_staff_can_recover(): void
+    {
+        $this->assertFalse(SiteContentUnavailable::withMessages(['publication' => 'Synthetic'])->recoverableByStaff());
+        $this->assertTrue(SiteContentUnavailable::because(SiteContentUnavailable::RELEASE, ['publication' => 'Synthetic'])->recoverableByStaff());
+        foreach ([SiteContentUnavailable::PUBLICATION, SiteContentUnavailable::MISSING] as $reason) {
+            $this->assertFalse(SiteContentUnavailable::because($reason, ['publication' => 'Synthetic'])->recoverableByStaff());
+        }
     }
 }

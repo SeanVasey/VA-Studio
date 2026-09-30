@@ -65,7 +65,7 @@ While that is the case, pages that read site content answer a generic, uncacheab
 
 - `release`: the active release failed its checks. Publish or restore an intact release; **Edit as new draft** on a saved release gives you one to publish.
 - `publication`: the publication record or its history failed its checks, so publishing and restoring are refused with *The retained site publication failed its integrity check*. Restore verified database data from a backup before retrying.
-- `missing`: the publication record is gone. The guards refuse a `DELETE`, but a MySQL `TRUNCATE` skips them. Staff cannot recover it in the panel, where the Site Releases page may answer Not Found: restore verified data from a backup. Re-creating the empty record by hand does not help. Once the site has been published, an empty record fails its check too and reports `publication`; the original copy never comes back.
+- `missing`: the publication record is gone. The guards refuse a `DELETE`, but a MySQL `TRUNCATE` skips them. Staff cannot recover it in the panel, where the Site Releases page may answer Not Found: restore verified data from a backup. Once the site has been published, re-creating the empty record by hand does not help: the publication history remains, so an empty record fails its check too and reports `publication`.
 
 Content rollback changes only the site pointer and its history/audit. It does not refund, cancel, reprice or alter any purchased license, original contract, entitlement or provider object. Application rollback must retain these tables. The migration refuses rollback once releases exist; old application code may display its own baseline copy instead of the retained active release.
 

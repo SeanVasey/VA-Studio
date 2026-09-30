@@ -67,10 +67,12 @@ final class SiteContent
         $publication = null;
         $reason = SiteContentUnavailable::MISSING;
         try {
+            // History first: it is appended in the transaction that moves the pointer, so the pointer read next is never older than it.
+            $published = SitePublicationRevision::query()->exists();
             // Capture the pointer once. Immutable snapshots and history keep this coherent if publication changes next.
             $publication = SitePublication::findOrFail(1);
             $reason = SiteContentUnavailable::PUBLICATION;
-            $this->verifyPointer($publication);
+            $this->verifyPointer($publication, $published);
             if ($publication->active_release_id === null) {
                 return SiteContentSchema::defaults();
             }
@@ -362,10 +364,15 @@ final class SiteContent
         return SiteContentSchema::validate($content);
     }
 
-    private function verifyPointer(SitePublication $publication): void
+    /**
+     * @param  bool|null  $published  Whether publication history existed before the pointer was read. Callers holding the publication
+     *                                lock omit it; an unlocked reader must read history first so a first publication in between
+     *                                cannot pair the old pointer with the new history.
+     */
+    private function verifyPointer(SitePublication $publication, ?bool $published = null): void
     {
         // Only a site that has never been published may show code defaults. A seed row re-created after publication fails instead.
-        if ($publication->revision === 0 && $publication->active_release_id === null && ! SitePublicationRevision::query()->exists()) {
+        if ($publication->revision === 0 && $publication->active_release_id === null && ! ($published ?? SitePublicationRevision::query()->exists())) {
             return;
         }
         $history = SitePublicationRevision::where('revision', $publication->revision)->first();
