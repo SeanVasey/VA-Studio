@@ -96,7 +96,7 @@ Run `clamd` on the media worker's host and set `MEDIA_CLAMSCAN=/usr/bin/clamdsca
 
 | | `clamdscan --fdpass` with `clamd` | `clamscan` per call |
 | --- | --- | --- |
-| Time for a small file | 0.01 to 0.07 s | 11 to 23 s: each call loads every signature, about 1 GiB resident |
+| Time for a small file | 0.01 to 0.07 s | 14.5 to 22.8 s, about 11 s on an idle host: each call loads every signature, about 1 GiB resident |
 | Where the size limits live | `clamd.conf`, below | the options the application passes, below |
 | A stems ZIP of 24 members | built in 5.2 s (120 members: 23.6 s) | `archive_timeout` after 23 scans |
 
