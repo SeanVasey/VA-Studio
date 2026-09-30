@@ -54,3 +54,7 @@ Framework references: [Laravel 13 pessimistic locking](https://laravel.com/docs/
 ## Schema-v2 compatibility extension — September 29, 2026
 
 [D-23](D-23-editorial-content.md) adds required nullable editorial/contact sections only to schema-v2 releases. The v1 schema described above remains an exact supported read/preview/publication/rollback format; existing records are not rewritten. The editor promotes a copy to v2 with the new sections disabled. The original code baseline remains v1, and restoring v1 makes editorial routes unavailable. V2 uses the same retained tables, hash validation, expected-revision publication and audit transaction; no new migration is needed. Consult the D-23 application-rollback boundary before returning to v1-only code.
+
+## Scheduling extension — September 29, 2026
+
+[D-24](D-24-scheduled-site-publication.md) adds retained schedules without changing this document's tables, triggers or stored rows. `publish` and `rollback` now take the pending schedule ID their confirmation displayed. If a different schedule is pending at commit, they reject the stale confirmation. Otherwise they resolve the pending schedule as superseded in the same transaction. A scheduled activation is an ordinary `publish` history row through this same lock, revision check and audit path, attributed to the administrator who scheduled it.

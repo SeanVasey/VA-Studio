@@ -1,6 +1,6 @@
 # Site content releases
 
-Status: **Accepted WP-09 increment, merged in PR #72.** [D-21](architecture/D-21-site-content-releases.md) defines the decision and security boundary. The [ordered development record](development-order.md) records the accepted source, full CI, prerequisite acceptance and next handoff. This bounded increment does not complete WP-09.
+Status: **Accepted WP-09 increment, merged in PR #72.** [D-21](architecture/D-21-site-content-releases.md) defines the decision and security boundary. The [ordered development record](development-order.md) records the accepted source, full CI, prerequisite acceptance and next handoff. [Scheduled publication](#scheduled-publication) follows under [D-24](architecture/D-24-scheduled-site-publication.md); its integrating PR records acceptance. These bounded increments do not complete WP-09.
 
 The accepted original CMS saves homepage copy as private immutable drafts. [Editorial/contact content](editorial-content.md) extends new schema-v2 drafts to optional about, contact, blog and video pages while preserving stored v1 releases. Publishing selects one complete saved version for the public homepage. Saving or previewing a draft does not change the live selection. Track/catalog publication, license offers, payments and customer rights are separate workflows.
 
@@ -13,6 +13,33 @@ The accepted original CMS saves homepage copy as private immutable drafts. [Edit
 5. To restore content, choose **Restore previous release** on a previously published inactive snapshot. The restored release becomes active at a new revision; both its original publication and the superseded release remain in history.
 
 Rows distinguish **Active**, **Previously published** and **Private draft**. An active release cannot be activated again. A draft never published cannot be used as a rollback target. First publication retains **Original site content**, an immutable capture of the previous code-default homepage with revision-zero history, so it can be restored like another previous release. Restoration always selects retained content; it never resets the publication revision.
+
+## Scheduled publication
+
+[D-24](architecture/D-24-scheduled-site-publication.md) lets staff choose one saved release and a future time. Times are UTC.
+
+1. Choose **Schedule publication** on a saved release that is not active. Enter a whole minute at least one minute and at most 365 days ahead; the form shows the current UTC time. The page heading and the release's **Schedule** badge then show the pending schedule. Saving the schedule does not change the live site.
+2. At that time the scheduler publishes the exact saved release with the same checks as **Publish release**. It is recorded as a publication by the administrator who scheduled it.
+3. **Cancel scheduled publication** cancels only the schedule named in its confirmation. The live site does not change.
+4. Publishing or restoring any release while a schedule is pending replaces the schedule. The confirmation says so first, and the history records which staff action replaced it.
+5. **Schedule history** lists the last 20 schedules with their outcome, actors and times.
+
+Only one schedule can be pending. A schedule never publishes, and records why, when:
+
+- no scheduler run reached it within 60 minutes of its time (the next run records it as expired);
+- the scheduling account is no longer a verified administrator, or has no MFA enrolled where the admin panel requires it;
+- the release or publication fails its integrity checks;
+- the live site changed through a path that did not replace the schedule.
+
+Every outcome is retained. Schedule again if the change is still wanted.
+
+The scheduler must run every minute on the production host, which is not chosen yet (U-02):
+
+```sh
+* * * * * cd /path/to/vaseyaudio && php artisan schedule:run >> /dev/null 2>&1
+```
+
+`php artisan schedule:list` confirms the registration. `php artisan vasey:publish-scheduled-site-release` runs one pass by hand; D-24 lists its output and exit codes. `php artisan vasey:doctor` warns when a pending schedule is more than two minutes overdue, which usually means cron is not running; runner errors are written to the application log. Scheduled tasks do not run while the application is in maintenance mode.
 
 ## Original schema-v1 fields
 
@@ -40,7 +67,7 @@ Content rollback changes only the site pointer and its history/audit. It does no
 
 The accepted candidate passed full CI and independent review in [PR #72](https://github.com/VASEYDEV/VASEYAUDIO/pull/72), including schema/authorization/privacy, immutable database evidence, atomic audit failures, stale revision conflicts, independent MySQL publish/rollback races and browser editing/preview/publication/rollback. The [ordered acceptance record](development-order.md#accepted-downloads-and-cms--september-28-2026) retains exact source, run and results. Follow the repository [verification commands](../README.md#verify) when changing these boundaries.
 
-Test promotion administration is accepted in PR #73. [D-23](architecture/D-23-editorial-content.md) is the bounded persisted contact/about/blog/video addition, with final acceptance evidence in the integrating PR and issue #9. Editable asset references and scheduling follow; contact delivery, consent-aware embeds and migration remain open. This increment does not complete WP-09 or the BeatStars replacement; [development order](development-order.md) retains customer recovery/library, payment operations, additional products, memberships, migration and production-readiness work.
+Test promotion administration is accepted in PR #73. [D-23](architecture/D-23-editorial-content.md) persisted contact/about/blog/video content is accepted in PR #74. [D-24](architecture/D-24-scheduled-site-publication.md) adds scheduled publication, with acceptance evidence in its integrating PR and issue #9. Editable asset references follow; contact delivery, consent-aware embeds and migration remain open. This increment does not complete WP-09 or the BeatStars replacement; [development order](development-order.md) retains customer recovery/library, payment operations, additional products, memberships, migration and production-readiness work.
 
 ## September 28 candidate verification history
 
