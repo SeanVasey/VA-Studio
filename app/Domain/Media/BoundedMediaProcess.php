@@ -22,7 +22,9 @@ class BoundedMediaProcess
             throw new MediaFailure('tool_unavailable', 'A required media processor or resource limiter is unavailable.');
         }
         $command = [$limiter, '--cpu='.config('media.cpu_seconds'), '--as='.config('media.memory_bytes'), '--fsize='.config('media.max_output_bytes'), '--nofile=64', '--', ...$arguments];
-        $process = new Process($command, $cwd, ['TMPDIR' => $cwd, 'OPENBLAS_NUM_THREADS' => '1', 'OMP_NUM_THREADS' => '1']);
+        // A tool prints a local time in the zone of its process (clamscan --version does), and callers read it as UTC, so the worker's
+        // own zone, from its host or its container, must not reach the tool.
+        $process = new Process($command, $cwd, ['TMPDIR' => $cwd, 'TZ' => 'UTC', 'OPENBLAS_NUM_THREADS' => '1', 'OMP_NUM_THREADS' => '1']);
         $process->setTimeout($timeout ?: (int) config('media.process_timeout_seconds'));
         $stdout = '';
         $bytes = 0;
