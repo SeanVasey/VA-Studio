@@ -10,6 +10,17 @@ test('public preview iframe has native controls, no autoplay and a keyboard-acce
   expect(unavailable.status()).toBe(404);
   const headers = unavailable.headers();
   const embed = 'http://127.0.0.1:8173/embed/tracks/synthetic-browser-track';
+  const fonts: { url: string; status: number }[] = [];
+  page.on('response', response => {
+    if (response.request().resourceType() === 'font') fonts.push({ url: response.url(), status: response.status() });
+  });
+  await context.addInitScript(() => {
+    const target = window as unknown as Window & { __embedCspViolations: string[] };
+    target.__embedCspViolations = [];
+    document.addEventListener('securitypolicyviolation', event => {
+      target.__embedCspViolations.push(event.effectiveDirective + ' ' + event.blockedURI);
+    });
+  });
   await context.route(embed, route => route.fulfill({ status: 200, body: rendered.stdout, headers: {
     'Content-Type': 'text/html; charset=UTF-8', 'Content-Security-Policy': headers['content-security-policy'],
     'Permissions-Policy': headers['permissions-policy'], 'Referrer-Policy': 'no-referrer', 'Cache-Control': 'no-store',
@@ -37,6 +48,35 @@ test('public preview iframe has native controls, no autoplay and a keyboard-acce
   await page.goto('http://localhost:8173/synthetic-embed-host');
   const frame = page.frameLocator('iframe');
   await expect(frame.getByRole('heading', { name: 'Synthetic browser preview' })).toBeVisible();
+  const loadedFonts = await frame.locator('body').evaluate(async element => {
+    const fontSet = element.ownerDocument.fonts;
+    const requested = [
+      { family: 'Reddit Sans', font: '400 16px "Reddit Sans"' },
+      { family: 'Noto Sans Display', font: '900 16px "Noto Sans Display"' },
+      { family: 'JetBrains Mono', font: '400 16px "JetBrains Mono"' },
+      { family: 'Bebas Neue', font: '400 16px "Bebas Neue"' },
+    ];
+    return Promise.all(requested.map(async ({ family, font }) => {
+      const faces = await fontSet.load(font, 'VASEY AUDIO 0123456789');
+      return { family, checked: fontSet.check(font, 'VASEY AUDIO 0123456789'),
+        faces: faces.map(face => ({ family: face.family.replace(/^(['"])(.*)\1$/, '$2'), status: face.status })) };
+    }));
+  });
+  for (const loaded of loadedFonts) {
+    expect(loaded.checked).toBe(true);
+    expect(loaded.faces.length).toBeGreaterThan(0);
+    expect(loaded.faces.every(face => face.family === loaded.family && face.status === 'loaded')).toBe(true);
+  }
+  expect(fonts).toHaveLength(4);
+  for (const prefix of ['reddit-sans-latin-wght-normal-', 'noto-sans-display-latin-standard-normal-',
+    'jetbrains-mono-latin-wght-normal-', 'bebas-neue-latin-400-normal-']) {
+    expect(fonts.filter(font => new URL(font.url).pathname.split('/').at(-1)?.startsWith(prefix))).toHaveLength(1);
+  }
+  for (const font of fonts) {
+    expect(new URL(font.url).origin).toBe(new URL(embed).origin);
+    expect(new URL(font.url).pathname).toMatch(/\.woff2$/);
+    expect(font.status).toBe(200);
+  }
   const audio = frame.locator('audio');
   await expect(audio).toHaveAttribute('preload', 'none');
   await expect(audio).not.toHaveAttribute('autoplay');
@@ -64,7 +104,6 @@ test('public preview iframe has native controls, no autoplay and a keyboard-acce
   await expect.poll(() => audio.evaluate(element => (element as HTMLAudioElement).paused)).toBe(false);
   await expect.poll(() => audio.evaluate(element => (element as HTMLAudioElement).currentTime)).toBeGreaterThan(0);
   expect(await audio.evaluate(element => element.ownerDocument.documentElement.scrollWidth <= element.ownerDocument.documentElement.clientWidth)).toBe(true);
-  await page.screenshot({ path: testInfo.outputPath('public-preview-embed.png'), fullPage: true });
   await toggleNativePlayback();
   await expect.poll(() => audio.evaluate(element => (element as HTMLAudioElement).paused)).toBe(true);
   const store = frame.getByRole('link', { name: 'Open track on VASEY.AUDIO (new tab)' });
@@ -75,4 +114,10 @@ test('public preview iframe has native controls, no autoplay and a keyboard-acce
   const popup = await opened;
   await expect(popup).toHaveURL('http://127.0.0.1:8173/tracks/synthetic-browser-track');
   expect(await popup.evaluate(() => window.opener)).toBeNull();
+  const cspViolations = await frame.locator('body').evaluate(element =>
+    (element.ownerDocument.defaultView as unknown as Window & { __embedCspViolations: string[] }).__embedCspViolations);
+  expect(cspViolations).toEqual([]);
+  await testInfo.attach('embed-font-evidence', { contentType: 'application/json', body: Buffer.from(JSON.stringify({ loadedFonts, fonts, cspViolations })) });
+  // Capture after all journey assertions so Playwright's injected screenshot style is not attributed to the app.
+  await page.screenshot({ path: testInfo.outputPath('public-preview-embed.png'), fullPage: true });
 });

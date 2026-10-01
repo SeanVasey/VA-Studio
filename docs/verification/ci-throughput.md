@@ -155,3 +155,55 @@ The unchanged partitioner applies a minimum one-millisecond weight to zero-time 
 The candidate base differs from the measured source: `RelatedTrackBrowserFixtureGuardTest.php` adds three methods, and browser preparation/observation repairs change runtime behavior. Its timing entry intentionally remains the original six measured cases. Normal discovery and the existing per-case scaling rule determine the current whole-file weight; no measured runtime is fabricated for the later expected 2,218-case source. PHP is unavailable locally, so this preparation does not claim fresh current-source PHPUnit discovery, application execution, native-browser success or MySQL execution. Independent candidate review and its ordinary full CI remain required before adoption.
 
 The older accepted PR #88 timing source had 125 files / 1,903 cases; this database measurement adds 21 files / 312 cases. Different application sources and hosted runtimes prevent causal runtime comparisons. Final PR #89 run `36835120458`, head `bb41dbd5b6fba22f4f213b93e041ba322276f14b`, actual merge `33cc70475a4bdb610a6aa04700f3cdb674e4e209`, tree `8ceb8393d66b0ea4c2c2f46e429b0106ac4f5402`, is separate and pending at preparation time. Its receipts and results must be verified afresh; the old run cannot be reused as final-source acceptance. No redundant full run was started to prepare this weighting-only candidate.
+
+## Completed corrected-source measurement and font successor
+
+This later refresh starts from local `58d1ad8458a1f21763eaa0b4ae05f093c6cbf594`, tree `005180401e36259460e875e09971971688009cf5`. It changes only the two timing manifests and this guide. The previous measurements and preparation-time statements above remain historical records. The partitioner, timing generator, discovery, configurations, shard counts, skip policy, tests, timeouts, required jobs and receipt/reuse gates are unchanged.
+
+[Foundation run 36851992293](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36851992293), attempt 1, completed **SUCCESS** on PR #89 head `45050eb8f6a229ec6a115eeb584e3b2d08c5e161`, actual checkout merge `c43770c37df417e90a333e3f788b13fc6f881332`, tree `1c4a61767267d693b58a879e4d93a42d891ceed1`. Its ordered parents are `cc591daa001f774626e574885cbc7b4904f6b2d2` and `45050eb8f6a229ec6a115eeb584e3b2d08c5e161`. The subsequently confirmed [standalone preview font defect](public-track-embed-fonts.md) blocks that source from merging. These completed measurements are source-specific diagnostic evidence; they do not establish acceptance of the font successor or its changed timing inputs. The narrow font proof and fresh complete Foundation acceptance remain pending at this refresh checkpoint.
+
+All four MySQL and both SQLite original archives passed hard SHA-256, full-member CRC, exact current-run source/runtime/discovery/JUnit ownership and unchanged strict collector checks. The locally collected result matches the actual hosted shadow member byte-for-byte: 63,293 bytes, SHA-256 `a0b2ad33310e107503d6c47299e776b52a029e475f23e9cd2f71206c080fdf32`. Its original artifact is `11159162420`, ZIP SHA-256 `b535bed6d71e0359c823c1434f7e7d868c2150b73da4e5df497dd49cbaa6fb8f`. [Receipt collection](ci-database-receipts.md) still authorizes no reuse.
+
+| Engine | Successful shards | Files / listed cases | Executed cases | Assertions | Reviewed skips | Errors / failures |
+| --- | ---: | --- | ---: | ---: | ---: | ---: |
+| MySQL | 4 | 146 / 2,272 | 2,272 | 32,685 | 0 | 0 |
+| SQLite | 2 | 146 / 2,272 | 2,167 | 25,996 | 105 | 0 |
+
+The 105 SQLite skip identities exactly match the existing reviewed policy; their counterparts all executed on MySQL. Both engines have case/owner digest `51899bd7b6ef7b14a19a56c50e1346b2b59caf782b0fa02a79ddc2ac161ea5d0` and group digest `96d11df22c02b21cf99efbe51b889e108c0253432cf90a1e5f57c8c2a7c27587`. Retained runtime is PHP 8.4.26 / PHPUnit 12.5.34, MySQL 8.4.11 with `lower_case_table_names=0` and repeatable-read isolation, and SQLite 3.45.1.
+
+| Artifact | ID | Verified ZIP SHA-256 | Full job | Test step |
+| --- | --- | --- | ---: | ---: |
+| MySQL 1 | 11158580476 | `f1e0a83a6ebab48a0c87c730fd7b0840398cd0989b2a73c394c2fcac617bd0aa` | 27m28s | 26m11s |
+| MySQL 2 | 11158857178 | `40c43ed1247cd1cfe1ec8cebbd5ab30c55f8e97d7e8100deca805f659e82f21b` | 37m35s | 36m08s |
+| MySQL 3 | 11158822571 | `75d9b9afc82a99ec8c143eedc55b18e3839f10fdd0b9c0aff4621c5de770afb2` | 39m33s | 38m05s |
+| MySQL 4 | 11158827333 | `46e43d92ea961809991879571237c3ae4e74183748df20fff446ba33a9606685` | 37m44s | 36m28s |
+| SQLite 1 | 11157260107 | `31293497cfdf1400e51b9711999243306536955ef438d92feec6b6fe408bafc9` | 14m48s | 13m56s |
+| SQLite 2 | 11156870412 | `e75851c5fae87bcf50900d3b9ced8807e447a121ea5de0a7223141d2787c2521` | 13m34s | 12m39s |
+
+Full-job and test-step durations are actual API intervals. JUnit testcase time sums are 8,210.374959s for MySQL and 1,593.123864s for SQLite; they exclude other process costs. The largest MySQL whole-file sums are contract issuance (611.165957s), order finalization (580.997631s), owner delivery (579.161209s), delivery HTTP (530.315997s) and exception inspection (472.579668s).
+
+The unchanged generator used only the four MySQL or two SQLite original `phpunit-ci-<driver>-<shard>-results.xml` files from this run. Each of the 146 owning files contributes exactly one sample per engine. Every expanded case count matches its retained authoritative owning file; inherited methods stay credited to the enclosing test class, and no file is dropped. SQLite records include reviewed skipped cases and their recorded durations, rather than assigning them fabricated execution time. No older, partial, cancelled or separate follow-up measurements are mixed in.
+
+```bash
+gh run download 36851992293 --dir /tmp/vaseyaudio-timings/36851992293 --pattern 'backend-mysql-*'
+gh run download 36851992293 --dir /tmp/vaseyaudio-timings/36851992293 --pattern 'backend-sqlite-*'
+python3 scripts/ci/phpunit-timings.py --driver mysql \
+  --source "<exact source string from phpunit-timings-mysql.json>" \
+  --output /tmp/phpunit-timings-mysql.json \
+  /tmp/vaseyaudio-timings/36851992293/backend-mysql-*/phpunit-ci-mysql-*-results.xml
+python3 scripts/ci/phpunit-timings.py --driver sqlite \
+  --source "<exact source string from phpunit-timings-sqlite.json>" \
+  --output /tmp/phpunit-timings-sqlite.json \
+  /tmp/vaseyaudio-timings/36851992293/backend-sqlite-*/phpunit-ci-sqlite-*-results.xml
+python3 scripts/ci/test-phpunit-shards.py
+git diff --check
+```
+
+The generated manifests have SHA-256 MySQL `7349629ce860c35fda2c44287804aae5295e28810d483c58a80821c989688447` and SQLite `361d8983f9eb1dad442186d4227483df34c7e8990cb2f8b363272c57bc9f0e05`. A second unchanged-generator invocation reproduced both byte-for-byte. All 35 unchanged partition/timing safeguards passed. Replaying the original retained inventories and projecting the refreshed whole-file assignments through the unchanged partition proof preserve exactly 146 files, 2,272 expanded cases and every group membership on each engine. This is an offline proof over retained discovery, not fresh local PHPUnit discovery or execution.
+
+| Engine | Total rounded case time | Fallback ms/case | Original placement under these measurements | Refreshed placement under these measurements | Refreshed listed case counts |
+| --- | ---: | ---: | --- | --- | --- |
+| MySQL | 8,210.370s | 3,614 | 1,571.076 / 2,167.844 / 2,284.126 / 2,187.324s | 2,052.599 / 2,052.591 / 2,052.590 / 2,052.590s | 449 / 669 / 657 / 497 |
+| SQLite | 1,593.124s | 701 | 834.358 / 758.766s | 796.563 / 796.561s | 1,173 / 1,099 |
+
+The partitioner's unchanged one-millisecond minimum for 23 zero-time SQLite files makes its refreshed weight estimates 796.574 / 796.573s. The table retains their recorded zero times. These are offline redistribution estimates, not executed refreshed shards, guaranteed durations or a controlled speedup. Different sources and hosted runtimes also prevent causal comparison with the historical measurements above. PHP is unavailable locally; the font repair changes the candidate source, and the later five-file follow-up readiness data remain separate and unadopted. Independent source review and a fresh complete Foundation on the final composed candidate remain required.
