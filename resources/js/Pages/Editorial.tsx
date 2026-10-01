@@ -18,9 +18,10 @@ interface EditorialProps {
   metadata: PageMetadata;
   contactInquiryEnabled?: boolean;
   contactInquiryPrivacyNotice?: string | null;
+  contactInquiryNoticeToken?: string | null;
 }
 
-export default function Editorial({ siteContent, editorial, sitePreview = false, sitePreviewBase = null, metadata, contactInquiryEnabled = false, contactInquiryPrivacyNotice = null }: EditorialProps) {
+export default function Editorial({ siteContent, editorial, sitePreview = false, sitePreviewBase = null, metadata, contactInquiryEnabled = false, contactInquiryPrivacyNotice = null, contactInquiryNoticeToken = null }: EditorialProps) {
   const href = (path: string) => siteContentHref(path, sitePreviewBase);
   function navigate(event: MouseEvent<HTMLAnchorElement>) {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
@@ -42,7 +43,7 @@ export default function Editorial({ siteContent, editorial, sitePreview = false,
       {editorial.kind === 'collection' && <div className="editorial-list">{editorial.entries.map((entry, index) => <article className="editorial-entry" key={entry.slug}>
         <span className="editorial-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><div><h2><a href={href(entry.path)} onClick={navigate}>{entry.title}</a></h2><p>{entry.description}</p><a className="text-link" href={href(entry.path)} onClick={navigate} aria-label={`${editorial.section === 'blog' ? 'Read' : 'View'} ${entry.title}`}>{editorial.section === 'blog' ? 'Read article' : 'View video'} <Icon name="arrow" size={16} /></a></div>
       </article>)}</div>}
-      {!sitePreview && editorial.section === 'contact' && contactInquiryEnabled && contactInquiryPrivacyNotice && <ContactInquiryForm privacyNotice={contactInquiryPrivacyNotice} />}
+      {!sitePreview && editorial.section === 'contact' && contactInquiryEnabled && contactInquiryPrivacyNotice && contactInquiryNoticeToken && <ContactInquiryForm privacyNotice={contactInquiryPrivacyNotice} noticeToken={contactInquiryNoticeToken} />}
       {editorial.email && <div className="editorial-contact"><p className="eyebrow">Email</p><p>{editorial.email}</p>{!sitePreview && editorial.contactHref ? <a className="button" href={editorial.contactHref}>Open email <Icon name="northeast" size={18} /></a> : <span className="fine-print">Email action disabled in private preview.</span>}</div>}
       {editorial.video && <EditorialVideo key={`${editorial.path}:${editorial.video.provider}:${editorial.video.videoId}:${sitePreview}`} video={editorial.video} title={editorial.title} privatePreview={sitePreview} />}
       {editorial.kind === 'entry' && editorial.relatedTracks && editorial.relatedTracks.length > 0 && <section aria-labelledby="related-tracks-title">

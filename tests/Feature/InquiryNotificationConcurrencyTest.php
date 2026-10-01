@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Inquiries\InquiryPolicy;
 use App\Domain\Inquiries\Models\CustomerInquiry;
 use App\Domain\Inquiries\Models\InquiryNotificationIntent;
 use App\Domain\Inquiries\SubmitInquiry;
@@ -36,7 +37,8 @@ class InquiryNotificationConcurrencyTest extends TestCase
         $release = $site->create(SiteEditorialFixtures::content(), 'Synthetic notification race', $operator);
         $site->publish($release->id, 0, $operator);
         app(SubmitInquiry::class)->handle(['name' => 'Synthetic sender', 'email' => 'sender@example.test', 'subject' => 'Synthetic subject',
-            'message' => 'Private synthetic race message', 'website' => '', 'requestKey' => (string) Str::uuid()], hash('sha256', 'synthetic-race-owner'));
+            'message' => 'Private synthetic race message', 'website' => '', 'requestKey' => (string) Str::uuid(),
+            'noticeToken' => app(InquiryPolicy::class)->publicSetup($site->current())['noticeToken']], hash('sha256', 'synthetic-race-owner'));
         $intent = InquiryNotificationIntent::sole();
         $race = InquiryNotificationRace::run($this, [['intent_id' => $intent->id], ['intent_id' => $intent->id]]);
         $this->assertSame('submitted', $race['results'][$race['winner']]['state']);

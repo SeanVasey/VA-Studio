@@ -30,6 +30,8 @@ class CustomerInquiryConcurrencyTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
 
+    private string $noticeToken;
+
     protected function beforeRefreshingDatabase(): void
     {
         if (DB::getDriverName() !== 'mysql') {
@@ -49,6 +51,7 @@ class CustomerInquiryConcurrencyTest extends TestCase
         $site->publish($release->id, 0, $operator);
         config(['inquiries.enabled' => true, 'inquiries.privacy_notice' => 'SYNTHETIC RACE PRIVACY NOTICE',
             'inquiries.retention_policy_reference' => 'SYNTHETIC-RACE-RETENTION', 'inquiries.operator_user_id' => $operator->id]);
+        $this->noticeToken = app(InquiryPolicy::class)->publicSetup($site->current())['noticeToken'];
 
         return [$operator, $release];
     }
@@ -56,7 +59,8 @@ class CustomerInquiryConcurrencyTest extends TestCase
     private function payload(): array
     {
         return ['name' => 'Synthetic Race Buyer', 'email' => 'race-buyer@example.test', 'subject' => 'Synthetic concurrency inquiry',
-            'message' => "Synthetic private message.\nRetain exact input.", 'website' => '', 'requestKey' => (string) Str::uuid()];
+            'message' => "Synthetic private message.\nRetain exact input.", 'website' => '', 'requestKey' => (string) Str::uuid(),
+            'noticeToken' => $this->noticeToken];
     }
 
     private function inquiryJob(array $payload, string $owner, User $operator): array
@@ -82,7 +86,7 @@ class CustomerInquiryConcurrencyTest extends TestCase
         $this->assertSame($saved['receipt'], $inquiry->public_id);
         $this->assertSame($owners[$winner], $inquiry->owner_hash);
         $this->assertSame($payload['requestKey'], $inquiry->request_key);
-        $this->assertSame(array_diff_key($payload, ['requestKey' => true]), $inquiry->payload);
+        $this->assertSame(array_diff_key($payload, ['requestKey' => true, 'noticeToken' => true]), $inquiry->payload);
         $this->assertSame($release->id, $inquiry->site_release_id);
         $audit = AuditEvent::where('action', 'inquiry.received')->sole();
         $this->assertSame($inquiry->id, (int) $audit->subject_id);
@@ -151,6 +155,74 @@ class CustomerInquiryConcurrencyTest extends TestCase
         ];
     }
 
+    #[DataProvider('lockOrders')]
+    public function test_successor_publication_and_first_notice_admission_serialize_without_stale_context(int $first): void
+    {
+        [$operator, $release] = $this->publishedContact();
+        $successor = app(SiteContent::class)->create($release->content, 'Synthetic enabled contact successor', $operator);
+        $payload = $this->payload();
+        $owner = hash('sha256', 'synthetic-notice-publication-owner');
+        $race = InquiryRace::run($this, [
+            $this->inquiryJob($payload, $owner, $operator),
+            ['operation' => 'withdraw', 'release_id' => $successor->id, 'revision' => 1, 'operator_id' => $operator->id],
+        ], $first);
+        $this->assertSame($first, $race['winner']);
+        $this->assertSame('published', $race['results'][1]['result']);
+        $this->assertSame([2, $successor->id], [SitePublication::findOrFail(1)->revision, SitePublication::findOrFail(1)->active_release_id]);
+        $this->assertSame($release->content_hash, $successor->content_hash);
+        $current = app(InquiryPolicy::class)->publicSetup(app(SiteContent::class)->current())['noticeToken'];
+        $this->assertNotSame($payload['noticeToken'], $current);
+        $before = $this->operatorRaceEvidence();
+        if ($first === 0) {
+            $this->assertSame(['saved', false], [$race['results'][0]['state'], $race['results'][0]['replayed']]);
+            $inquiry = CustomerInquiry::sole();
+            $this->assertSame([$release->id, $release->content_hash], [$inquiry->site_release_id, $inquiry->site_content_hash]);
+            $this->assertSame(array_diff_key($payload, ['requestKey' => true, 'noticeToken' => true]), $inquiry->payload);
+            $this->assertSame(CanonicalJson::hash(array_diff_key($payload, ['requestKey' => true])), $inquiry->payload_hash);
+            $this->assertSame(['state' => 'saved', 'receipt' => $inquiry->public_id, 'replayed' => true], app(SubmitInquiry::class)->handle($payload, $owner));
+            $this->assertDenied(array_replace($payload, ['noticeToken' => $current]), $owner, 409);
+        } else {
+            $this->assertSame(['rejected', 422], [$race['results'][0]['result'], $race['results'][0]['status']]);
+            $this->assertDenied($payload, $owner, 422);
+        }
+        $this->assertSame($before, $this->operatorRaceEvidence());
+        $this->assertDatabaseCount('customer_inquiries', $first === 0 ? 1 : 0);
+        $this->assertSame($first === 0 ? 1 : 0, AuditEvent::where('action', 'inquiry.received')->count());
+
+        // Repeat with an outer RR snapshot and changed content, before either mutex contender starts.
+        $content = SiteContentSchema::forEditing($successor->content);
+        $content['contact']['title'] = 'Synthetic different current contact';
+        $changed = app(SiteContent::class)->create($content, 'Synthetic changed contact successor', $operator);
+        $snapshotPayload = array_replace($this->payload(), ['noticeToken' => $current]);
+        $snapshotOwner = hash('sha256', 'synthetic-old-site-snapshot-owner');
+        $inquiriesBefore = CustomerInquiry::count();
+        $auditsBefore = AuditEvent::where('action', 'inquiry.received')->count();
+        $snapshotRace = InquiryRace::run($this, [
+            $this->inquiryJob($snapshotPayload, $snapshotOwner, $operator) + ['site_snapshot_before_admission' => true],
+            ['operation' => 'withdraw', 'release_id' => $changed->id, 'revision' => 2, 'operator_id' => $operator->id],
+        ], $first);
+        $this->assertSame($first, $snapshotRace['winner']);
+        $this->assertSame('published', $snapshotRace['results'][1]['result']);
+        $this->assertSame([$successor->id, $successor->content_hash], [
+            $snapshotRace['results'][0]['displayed_release_id'], $snapshotRace['results'][0]['displayed_content_hash'],
+        ]);
+        $this->assertNotSame($successor->content_hash, $changed->content_hash);
+        $this->assertSame([3, $changed->id], [SitePublication::findOrFail(1)->revision, SitePublication::findOrFail(1)->active_release_id]);
+        if ($first === 0) {
+            $this->assertSame(['saved', false], [$snapshotRace['results'][0]['state'], $snapshotRace['results'][0]['replayed']]);
+            $retained = CustomerInquiry::where('owner_hash', $snapshotOwner)->sole();
+            $this->assertSame([$successor->id, $successor->content_hash], [$retained->site_release_id, $retained->site_content_hash]);
+            $this->assertSame(array_diff_key($snapshotPayload, ['requestKey' => true, 'noticeToken' => true]), $retained->payload);
+            $this->assertSame(CanonicalJson::hash(array_diff_key($snapshotPayload, ['requestKey' => true])), $retained->payload_hash);
+        } else {
+            $this->assertSame(['rejected', 404], [$snapshotRace['results'][0]['result'], $snapshotRace['results'][0]['status']]);
+            $this->assertArrayNotHasKey('receipt', $snapshotRace['results'][0]);
+            $this->assertArrayNotHasKey('state', $snapshotRace['results'][0]);
+        }
+        $this->assertDatabaseCount('customer_inquiries', $inquiriesBefore + ($first === 0 ? 1 : 0));
+        $this->assertSame($auditsBefore + ($first === 0 ? 1 : 0), AuditEvent::where('action', 'inquiry.received')->count());
+    }
+
     #[DataProvider('operatorRevocations')]
     public function test_operator_authority_revocation_and_admission_share_the_current_user_lock(string $field, mixed $value, int $first): void
     {
@@ -183,12 +255,12 @@ class CustomerInquiryConcurrencyTest extends TestCase
                 $this->assertSame($race['results'][0]['receipt'], $inquiry->public_id);
                 $this->assertSame($owner, $inquiry->owner_hash);
                 $this->assertSame($payload['requestKey'], $inquiry->request_key);
-                $expectedPayload = array_diff_key($payload, ['requestKey' => true]);
+                $expectedPayload = array_diff_key($payload, ['requestKey' => true, 'noticeToken' => true]);
                 $actualPayload = $inquiry->payload;
                 ksort($expectedPayload, SORT_STRING);
                 ksort($actualPayload, SORT_STRING);
                 $this->assertSame($expectedPayload, $actualPayload);
-                $this->assertSame(CanonicalJson::hash($expectedPayload), $inquiry->payload_hash);
+                $this->assertSame(CanonicalJson::hash(array_diff_key($payload, ['requestKey' => true])), $inquiry->payload_hash);
                 $this->assertSame($operator->id, $inquiry->operator_user_id);
                 $this->assertSame([$release->id, $release->content_hash], [$inquiry->site_release_id, $inquiry->site_content_hash]);
                 $this->assertSame('SYNTHETIC RACE PRIVACY NOTICE', $inquiry->privacy_notice);

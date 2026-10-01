@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Inquiries\InquiryPolicy;
 use App\Domain\Inquiries\Models\CustomerInquiry;
 use App\Domain\Inquiries\Models\InquiryNotificationIntent;
 use App\Domain\Inquiries\Notifications\InquiryAlertNotSubmitted;
@@ -13,6 +14,7 @@ use App\Domain\SiteBuilder\SiteContent;
 use App\Jobs\NotifyInquiryOperatorJob;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
+use App\Support\CanonicalJson;
 use Filament\Facades\Filament;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -50,7 +52,8 @@ class InquiryNotificationWorkTest extends TestCase
         $release = app(SiteContent::class)->create(SiteEditorialFixtures::content(), 'Synthetic alert fixture', $this->operator);
         app(SiteContent::class)->publish($release->id, 0, $this->operator);
         $this->body = ['name' => 'Private sender', 'email' => 'private-sender@example.test', 'subject' => 'Private subject',
-            'message' => 'Private message', 'website' => '', 'requestKey' => (string) Str::uuid()];
+            'message' => 'Private message', 'website' => '', 'requestKey' => (string) Str::uuid(),
+            'noticeToken' => app(InquiryPolicy::class)->publicSetup(app(SiteContent::class)->current())['noticeToken']];
     }
 
     private function save(): InquiryNotificationIntent
@@ -98,8 +101,10 @@ class InquiryNotificationWorkTest extends TestCase
         $this->assertSame((int) $inquiry->id, $intent->customer_inquiry_id);
         $this->assertSame((int) $inquiry->operator_user_id, $intent->operator_user_id);
         $this->assertSame('pending', $intent->state);
+        $this->assertSame(CanonicalJson::hash(array_diff_key($this->body, ['requestKey' => true])), $inquiry->payload_hash);
+        $this->assertArrayNotHasKey('noticeToken', $inquiry->payload);
         $raw = json_encode(DB::table('inquiry_notification_intents')->sole());
-        foreach (['Private sender', 'private-sender@example.test', 'Private subject', 'Private message', 'SYNTHETIC NOTIFICATION NOTICE', 'SYNTHETIC-TEST-POLICY'] as $private) {
+        foreach (['Private sender', 'private-sender@example.test', 'Private subject', 'Private message', 'SYNTHETIC NOTIFICATION NOTICE', 'SYNTHETIC-TEST-POLICY', $this->body['noticeToken']] as $private) {
             $this->assertStringNotContainsString($private, $raw);
         }
         $this->assertSame('disabled', app(InquiryNotificationWork::class)->process($intent->id));
@@ -113,7 +118,7 @@ class InquiryNotificationWorkTest extends TestCase
         Queue::assertPushed(NotifyInquiryOperatorJob::class, 1);
         Queue::assertPushed(NotifyInquiryOperatorJob::class, function (NotifyInquiryOperatorJob $job): bool {
             $this->assertSame(InquiryNotificationIntent::latest('id')->firstOrFail()->id, $job->intentId);
-            foreach (['Private sender', 'private-sender@example.test', 'Private subject', 'Private message', 'SYNTHETIC NOTIFICATION NOTICE', 'SYNTHETIC-TEST-POLICY'] as $private) {
+            foreach (['Private sender', 'private-sender@example.test', 'Private subject', 'Private message', 'SYNTHETIC NOTIFICATION NOTICE', 'SYNTHETIC-TEST-POLICY', $this->body['noticeToken']] as $private) {
                 $this->assertStringNotContainsString($private, serialize($job));
             }
 

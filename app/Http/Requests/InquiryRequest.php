@@ -25,7 +25,7 @@ final class InquiryRequest
             throw new InquiryException(422);
         }
         $body = get_object_vars($object);
-        if (count($body) !== 6 || array_diff(array_keys($body), InquiryInput::FIELDS) !== [] || count(array_filter($body, 'is_string')) !== 6) {
+        if (count($body) !== 7 || array_diff(array_keys($body), InquiryInput::FIELDS) !== [] || count(array_filter($body, 'is_string')) !== 7) {
             throw new InquiryException(422);
         }
         // Scan the bounded, already-valid string-only object without regex recursion on long messages.
@@ -53,7 +53,7 @@ final class InquiryRequest
             }
             $offset++; // Comma.
         }
-        if (count($keys) !== 6) {
+        if (count($keys) !== 7) {
             throw new InquiryException(422);
         }
 
