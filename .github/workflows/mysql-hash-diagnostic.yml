@@ -1,0 +1,134 @@
+name: MySQL hash diagnostic (not merge acceptance)
+
+on:
+  push:
+    branches: [codex/mysql-hash-diagnostic-20261001]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mysql-hash-diagnostic-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mysql-hash-diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: vaseyaudio_test
+          MYSQL_ROOT_PASSWORD: ci-only-password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -pci-only-password"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      DB_URL: ''
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: vaseyaudio_test
+      DB_USERNAME: root
+      DB_PASSWORD: ci-only-password
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+    defaults:
+      run:
+        shell: bash
+        working-directory: application
+    steps:
+      - name: Check out the isolated diagnostic bundle
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          path: diagnostic
+          persist-credentials: false
+      - name: Check out the exact failing application source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: e08e90d69b8716b2641b6de603375358f6404176
+          path: application
+          persist-credentials: false
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          coverage: none
+          tools: composer:v2
+      - name: Record distinct diagnostic and application identities
+        run: |
+          mkdir -p ../diagnostic-output
+          python3 - <<'PY'
+          import json, pathlib, subprocess
+          def git(*arguments, directory='.'):
+              return subprocess.check_output(['git', *arguments], cwd=directory, text=True).strip()
+          evidence = {
+              'purpose': 'synthetic-mysql-diagnostic-not-merge-acceptance',
+              'application_commit': git('rev-parse', 'HEAD'),
+              'application_tree': git('rev-parse', 'HEAD^{tree}'),
+              'diagnostic_commit': git('rev-parse', 'HEAD', directory='../diagnostic'),
+              'diagnostic_tree': git('rev-parse', 'HEAD^{tree}', directory='../diagnostic'),
+              'application_tracked_worktree_clean': git('status', '--porcelain', '--untracked-files=no') == '',
+              'migration_blob': git('rev-parse', 'HEAD:database/migrations/2026_10_01_000029_byte_exact_hash_guards.php'),
+              'test_blob': git('rev-parse', 'HEAD:tests/Feature/HashByteGuardMigrationTest.php'),
+          }
+          pathlib.Path('../diagnostic-output/source-identity.json').write_text(json.dumps(evidence, indent=2) + '\n')
+          assert evidence['application_commit'] == 'e08e90d69b8716b2641b6de603375358f6404176'
+          assert evidence['application_tree'] == '38ef073721fb766e1875ba020f94f9d32c16e85b'
+          assert evidence['application_tracked_worktree_clean']
+          PY
+      - name: Install the exact locked PHP dependencies
+        run: composer install --no-interaction --prefer-dist
+      - name: Install bounded media and PDF verification tools
+        run: |
+          timeout --signal=TERM --kill-after=10s 180s sudo apt-get update
+          timeout --signal=TERM --kill-after=10s 180s sudo apt-get install --yes --no-install-recommends ffmpeg util-linux qpdf poppler-utils
+      - name: Configure a fresh synthetic Laravel database
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan migrate --force
+      - name: Capture bounded MySQL byte and trigger probes
+        id: probes
+        continue-on-error: true
+        run: timeout --signal=TERM --kill-after=10s 180s php ../diagnostic/scripts/ci/mysql-hash-diagnostic.php > ../diagnostic-output/mysql-hash-probes.jsonl
+      - name: Execute all seven original hash migration tests
+        id: original_tests
+        if: always()
+        continue-on-error: true
+        run: |
+          timeout --signal=TERM --kill-after=10s 300s php vendor/bin/phpunit tests/Feature/HashByteGuardMigrationTest.php --log-junit=../diagnostic-output/hash-guard-original-results.xml --fail-on-phpunit-warning --display-warnings | tee ../diagnostic-output/hash-guard-original.log
+      - name: Retain synthetic diagnostic evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: mysql-hash-diagnostic-${{ github.run_id }}-${{ github.run_attempt }}
+          path: diagnostic-output/*
+          retention-days: 7
+          if-no-files-found: error
+      - name: Preserve probe and original-test failure outcomes
+        if: always()
+        env:
+          PROBE_OUTCOME: ${{ steps.probes.outcome }}
+          ORIGINAL_TEST_OUTCOME: ${{ steps.original_tests.outcome }}
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, xml.etree.ElementTree as ET
+          records = [json.loads(line) for line in pathlib.Path('../diagnostic-output/mysql-hash-probes.jsonl').read_text().splitlines()]
+          assert records and records[-1]['kind'] == 'complete', 'MySQL probe did not finish and clean up'
+          assert records[-1]['application_rows_rolled_back'] is True
+          cases = ET.parse('../diagnostic-output/hash-guard-original-results.xml').getroot().findall('.//testcase')
+          assert len(cases) == 7, 'Original seven-method census changed or did not execute'
+          assert not any(case.find('skipped') is not None for case in cases), 'Original hash tests skipped'
+          PY
+          test "$PROBE_OUTCOME" = success
+          test "$ORIGINAL_TEST_OUTCOME" = success
