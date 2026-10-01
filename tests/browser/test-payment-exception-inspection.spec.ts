@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process';
-import { expect, test, type Locator, type Page, type Response } from '@playwright/test';
+import { writeFileSync } from 'node:fs';
+import { expect, test, type Locator, type Page, type Response, type TestInfo } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
 
 type Fixture = { operatorEmail: string; verifiedId: string; attentionId: string; orderId: string; privateMarkers: string[] };
@@ -39,9 +40,38 @@ async function close(page: Page, returnTo: Locator) {
   await expect(cancel).toHaveCount(1);
   await expect(cancel).toBeVisible();
   await expect(cancel).toBeEnabled();
+  await cancel.scrollIntoViewIfNeeded();
+  await expect(cancel).toBeInViewport({ ratio: 1 });
   await operate(page, cancel);
   await expect(dialog.getByRole('heading', { name: 'Retained test-payment evidence', exact: true })).not.toBeVisible();
   await expect(returnTo).toBeFocused();
+}
+
+async function captureInspection(page: Page, dialog: Locator, verdict: 'Stored graph verified' | 'Evidence needs attention', phase: 'verified' | 'attention', testInfo: TestInfo) {
+  const window = dialog.locator('.fi-modal-window');
+  const heading = dialog.getByRole('heading', { name: 'Retained test-payment evidence', exact: true });
+  const result = dialog.getByText(verdict, { exact: true });
+  // Visibility alone accepts opacity zero. Wait for the ordinary modal's natural paint state.
+  await expect(window).toHaveCount(1);
+  await expect(window).toBeVisible();
+  await expect(window).toHaveCSS('opacity', '1');
+  await heading.scrollIntoViewIfNeeded();
+  await expect(heading).toBeInViewport({ ratio: 1 });
+  await expect(result).toBeInViewport({ ratio: 1 });
+  const layout = {
+    schemaVersion: 1,
+    viewport: page.viewportSize(),
+    window: await window.boundingBox(),
+    heading: await heading.boundingBox(),
+    verdict: await result.boundingBox(),
+    windowOpaque: await window.evaluate(element => getComputedStyle(element).opacity === '1'),
+  };
+  expect(layout.windowOpaque).toBe(true);
+  for (const bounds of [layout.viewport, layout.window, layout.heading, layout.verdict]) expect(bounds).not.toBeNull();
+  const path = testInfo.outputPath(`retained-exception-${phase}-layout.json`);
+  writeFileSync(path, JSON.stringify(layout, null, 2), 'utf8');
+  await testInfo.attach(`retained-exception-${phase}-layout`, { path, contentType: 'application/json' });
+  await page.screenshot({ path: testInfo.outputPath(`retained-exception-${phase}.png`), fullPage: false });
 }
 
 async function assertPrivate(page: Page, fixture: Fixture, response?: Response) {
@@ -86,7 +116,7 @@ test('ordinary operator inspects retained synthetic exceptions and stale authori
     const initial = verify(testInfo.project.name, 'first');
     expect(initial.inspectionAudits.verified).toBeGreaterThanOrEqual(1);
     expect(initial.inspectionAudits.attention).toBe(0);
-    await page.screenshot({ path: testInfo.outputPath('retained-exception-verified.png'), fullPage: false });
+    await captureInspection(page, dialog, 'Stored graph verified', 'verified', testInfo);
     await close(page, verified);
 
     const reopened = await operate(page, verified);
@@ -104,7 +134,7 @@ test('ordinary operator inspects retained synthetic exceptions and stale authori
     await expect(dialog.getByText('0 grants · 0 exclusive sales', { exact: true })).toHaveCount(0);
     await assertPrivate(page, fixture, corrupt);
     expect(verify(testInfo.project.name, 'attention').inspectionAudits.attention).toBeGreaterThanOrEqual(1);
-    await page.screenshot({ path: testInfo.outputPath('retained-exception-attention.png'), fullPage: false });
+    await captureInspection(page, dialog, 'Evidence needs attention', 'attention', testInfo);
     await close(page, attention);
     expect(errors).toEqual([]);
 
