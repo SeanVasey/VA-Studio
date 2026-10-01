@@ -67,7 +67,21 @@ test('seller edits persisted pages, previews one private release and restores th
     await dialog.getByLabel('Video provider', { exact: false }).selectOption('youtube');
     await dialog.getByLabel('Video ID', { exact: false }).fill('abcdefghijk');
     const navigation = dialog.getByRole('region', { name: 'Navigation and footer', exact: true });
-    await navigation.getByRole('button', { name: 'Add navigation link', exact: true }).click();
+    // A new draft copies the active release. Another journey failing before restoration may leave
+    // four editorial links here already; adding a fifth would leave a required empty destination.
+    const links = navigation.getByLabel('Destination', { exact: false });
+    const inheritedLinks = await links.count();
+    expect(inheritedLinks).toBeGreaterThan(0);
+    expect(inheritedLinks).toBeLessThanOrEqual(8);
+    for (let count = inheritedLinks; count > 4; count--) {
+      await navigation.getByRole('button', { name: 'Delete', exact: true }).last().click();
+      await expect(links).toHaveCount(count - 1);
+    }
+    for (let count = inheritedLinks; count < 4; count++) {
+      await navigation.getByRole('button', { name: 'Add navigation link', exact: true }).click();
+      await expect(links).toHaveCount(count + 1);
+    }
+    await expect(links).toHaveCount(4);
     for (const [index, section] of ['About', 'Contact', 'Blog', 'Videos'].entries()) {
       await navigation.getByLabel('Label', { exact: false }).nth(index).fill(section === 'About' ? 'A'.repeat(48) : section);
       await navigation.getByLabel('Destination', { exact: false }).nth(index).selectOption(`/${section.toLowerCase()}`);
