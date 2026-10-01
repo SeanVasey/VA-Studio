@@ -1,0 +1,227 @@
+name: Public embed route cache CSP focused proof
+
+# Source-specific feedback only; complete Foundation acceptance remains required.
+# Both original fresh-boot workers use disposable SQLite, including in MySQL CI.
+on:
+  push:
+    branches: [codex/embed-cache-csp-proof]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: embed-cache-csp-proof
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  embed-cache-csp-proof:
+    if: github.repository == 'VASEYDEV/VASEYAUDIO' && github.ref == 'refs/heads/codex/embed-cache-csp-proof'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      APP_URL: https://audio.example.test
+      ASSET_URL: ''
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ':memory:'
+      DB_URL: ''
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      BROADCAST_CONNECTION: 'null'
+      MAIL_MAILER: array
+      PULSE_ENABLED: 'false'
+      TELESCOPE_ENABLED: 'false'
+      NIGHTWATCH_ENABLED: 'false'
+      CONTACT_INQUIRIES_ENABLED: 'false'
+      CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED: 'false'
+      STRIPE_WEBHOOK_ENABLED: 'false'
+      STRIPE_TEST_CHECKOUT_ENABLED: 'false'
+      STRIPE_TEST_PAYMENT_PROCESSING_ENABLED: 'false'
+      STRIPE_TEST_FINALIZATION_ENABLED: 'false'
+      STRIPE_TEST_FINALIZATION_POLICY: ''
+      STRIPE_TEST_SECRET_KEY: ''
+      STRIPE_WEBHOOK_SECRET: ''
+      STRIPE_ACCOUNT_ID: ''
+      VASEY_TEST_CONTRACT_ISSUANCE_ENABLED: 'false'
+      VASEY_TEST_FULFILLMENT_ACTIVATION_ENABLED: 'false'
+      VASEY_TEST_DELIVERY_ACCESS_ENABLED: 'false'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 2
+      - name: Require the exact parent and sole CSP expectation correction
+        run: |
+          set -euo pipefail
+          mkdir embed-cache-csp-evidence
+          python3 <<'PY' 2>&1 | tee embed-cache-csp-evidence/source-guard.log
+          from pathlib import Path
+          import hashlib, json, os, subprocess
+          git = lambda *args: subprocess.check_output(['git', *args], text=True).strip()
+          parent = '1635101e646825f293c25459fa79cd09b11e9825'
+          parent_tree = '447044c33badbd6eeb61630b051bfb2911f30ba4'
+          worker = 'tests/Support/public-embed-route-cache-worker.php'
+          feature = 'tests/Feature/PublicTrackEmbedRouteCacheTest.php'
+          workflow = '.github/workflows/embed-cache-csp-proof.yml'
+          if (os.environ['GITHUB_EVENT_NAME'], os.environ['GITHUB_REPOSITORY'], os.environ['GITHUB_REF']) != ('push', 'VASEYDEV/VASEYAUDIO', 'refs/heads/codex/embed-cache-csp-proof'):
+              raise SystemExit('Unexpected execution event/repository/ref.')
+          if git('rev-parse', 'HEAD') != os.environ['GITHUB_SHA'] or git('rev-parse', 'HEAD^') != parent or git('rev-parse', 'HEAD^^{tree}') != parent_tree:
+              raise SystemExit('Unexpected execution head, parent or parent tree.')
+          wanted = {worker: 'M', workflow: 'A'}
+          actual = {path: status for status, path in (line.split('\t') for line in git('diff', '--name-status', '--no-renames', parent, 'HEAD').splitlines())}
+          if actual != wanted or git('status', '--porcelain', '--untracked-files=no'):
+              raise SystemExit('Unexpected source delta or dirty tracked worktree.')
+          expected = {worker: '5ecabccaac462cf178ae2f1ba01c203dbafd1851ad4507da490d72a2159c737e',
+              feature: '9630666a629b956ddb34a77ccab947f19b8d6d49960d1462d809d20ef6b44398'}
+          for path, digest in expected.items():
+              if hashlib.sha256(Path(path).read_bytes()).hexdigest() != digest:
+                  raise SystemExit('Unexpected reviewed source hash: ' + path)
+          old = subprocess.check_output(['git', 'show', parent + ':' + worker])
+          before = b"style-src 'self'; media-src 'self';"
+          after = b"style-src 'self'; font-src 'self'; media-src 'self';"
+          if old.count(before) != 1 or old.replace(before, after, 1) != Path(worker).read_bytes():
+              raise SystemExit('The worker must contain only the exact font-src expectation insertion.')
+          if subprocess.check_output(['git', 'show', parent + ':' + feature]) != Path(feature).read_bytes():
+              raise SystemExit('The original Feature file must remain byte identical.')
+          directory = Path('embed-cache-csp-evidence')
+          for path in (worker, feature):
+              (directory / Path(path).name).write_bytes(Path(path).read_bytes())
+          (directory / 'baseline-public-embed-route-cache-worker.php').write_bytes(old)
+          (directory / 'source.patch').write_bytes(subprocess.check_output(['git', 'diff', '--binary', parent, 'HEAD']))
+          files = git('ls-files').splitlines()
+          manifest = {'head': git('rev-parse', 'HEAD'), 'tree': git('rev-parse', 'HEAD^{tree}'),
+              'parent': parent, 'parent_tree': parent_tree,
+              'reviewed_source': '41850ec6799d2195172dc3fd9744d92460b5f7a9',
+              'reviewed_tree': 'c57521c29bac8eca12dad6e82f5085f840d44d3e', 'source_delta': actual,
+              'sha256': {path: hashlib.sha256(Path(path).read_bytes()).hexdigest() for path in files},
+              'scope': 'Original two fresh-boot route-cache cases on disposable SQLite; no MySQL, frontend or native acceptance claim.'}
+          (directory / 'source.json').write_text(json.dumps(manifest, indent=2, sort_keys=True) + '\n')
+          print(json.dumps({'head': manifest['head'], 'tree': manifest['tree'], 'parent': parent, 'tracked_files': len(files), 'source_delta': actual}, sort_keys=True))
+          PY
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          coverage: none
+          tools: composer:v2
+      - name: Install locked backend dependencies and verify ordinary quality gates
+        run: |
+          set -euo pipefail
+          composer install --no-interaction --prefer-dist 2>&1 | tee embed-cache-csp-evidence/composer-install.log
+          composer validate --strict 2>&1 | tee embed-cache-csp-evidence/composer-validate.log
+          composer audit 2>&1 | tee embed-cache-csp-evidence/composer-audit.log
+          {
+            php -l tests/Support/public-embed-route-cache-worker.php
+            php -l tests/Feature/PublicTrackEmbedRouteCacheTest.php
+          } 2>&1 | tee embed-cache-csp-evidence/php-syntax.log
+          vendor/bin/pint --test tests/Support/public-embed-route-cache-worker.php tests/Feature/PublicTrackEmbedRouteCacheTest.php 2>&1 | tee embed-cache-csp-evidence/pint.log
+      - name: Prepare the isolated application and record actual fresh SQLite runtime
+        run: |
+          set -euo pipefail
+          {
+            cp .env.example .env
+            php artisan key:generate
+          } 2>&1 | tee embed-cache-csp-evidence/application-setup.log
+          {
+            php --version
+            composer --version
+            vendor/bin/phpunit --version
+            vendor/bin/pint --version
+            php <<'PHP'
+          <?php
+          if (PHP_MAJOR_VERSION !== 8 || PHP_MINOR_VERSION !== 4) { exit(1); }
+          $db = new PDO('sqlite::memory:');
+          $count = (int) $db->query("SELECT COUNT(*) FROM sqlite_master WHERE type = 'table'")->fetchColumn();
+          if ($count !== 0) { exit(1); }
+          echo json_encode(['driver' => 'sqlite', 'database' => ':memory:', 'version' => $db->query('SELECT sqlite_version()')->fetchColumn(), 'tables_before_tests' => $count], JSON_THROW_ON_ERROR).PHP_EOL;
+          PHP
+          } 2>&1 | tee embed-cache-csp-evidence/runtime.log
+      - name: Discover exactly the original uncached and cached identities
+        run: |
+          set -euo pipefail
+          php vendor/bin/phpunit tests/Feature/PublicTrackEmbedRouteCacheTest.php --list-tests-xml=embed-cache-csp-evidence/php-discovery.xml --fail-on-empty-test-suite --fail-on-all-issues --fail-on-phpunit-warning --display-all-issues 2>&1 | tee embed-cache-csp-evidence/php-discovery.log
+      - name: Run the unchanged fresh-boot route-cache Feature file
+        run: |
+          set -euo pipefail
+          php vendor/bin/phpunit tests/Feature/PublicTrackEmbedRouteCacheTest.php --log-junit=embed-cache-csp-evidence/php-results.xml --fail-on-empty-test-suite --fail-on-all-issues --fail-on-phpunit-warning --fail-on-warning --fail-on-risky --fail-on-incomplete --fail-on-skipped --display-all-issues 2>&1 | tee embed-cache-csp-evidence/phpunit.log
+      - name: Require both genuine identities, exact assertion counts and unchanged source
+        run: |
+          set -euo pipefail
+          python3 <<'PY' 2>&1 | tee embed-cache-csp-evidence/receipt-check.log
+          from collections import Counter
+          from pathlib import Path
+          import hashlib, json, math, subprocess, xml.etree.ElementTree as E
+          root = Path.cwd()
+          directory = root / 'embed-cache-csp-evidence'
+          cls = 'Tests\\Feature\\PublicTrackEmbedRouteCacheTest'
+          file = root / 'tests/Feature/PublicTrackEmbedRouteCacheTest.php'
+          method = 'test_fresh_boots_preserve_ip_only_separate_embed_budgets'
+          expected_assertions = {method + ' with data set "uncached"': 374, method + ' with data set "cached"': 376}
+          ids = [cls + '::' + method + '#uncached', cls + '::' + method + '#cached']
+          discovery = E.parse(directory / 'php-discovery.xml')
+          ns = {'s': 'https://xml.phpunit.de/testSuite'}
+          if discovery.getroot().tag != '{https://xml.phpunit.de/testSuite}testSuite':
+              raise SystemExit('Unexpected discovery root.')
+          classes = discovery.findall('.//s:testClass', ns)
+          if len(classes) != 1 or classes[0].get('name') != cls or Path(classes[0].get('file', '')).resolve() != file:
+              raise SystemExit('Unexpected discovery class/file.')
+          methods = discovery.findall('.//s:testMethod', ns)
+          if Counter(node.get('id') for node in methods) != Counter(ids) or any(node.get('name') != method for node in methods):
+              raise SystemExit('Discovery must contain exactly the original two unique identities.')
+          junit = E.parse(directory / 'php-results.xml')
+          cases = junit.findall('.//testcase')
+          if junit.getroot().tag != 'testsuites' or Counter(case.get('name') for case in cases) != Counter(expected_assertions.keys()):
+              raise SystemExit('JUnit must contain exactly the original two unique identities.')
+          if any(junit.findall('.//' + tag) for tag in ['failure', 'error', 'skipped']):
+              raise SystemExit('Failed, errored or skipped case.')
+          for case in cases:
+              if case.get('class') != cls or case.get('classname') != cls.replace('\\', '.') or Path(case.get('file', '')).resolve() != file or int(case.get('assertions', '-1')) != expected_assertions[case.get('name')]:
+                  raise SystemExit('Unexpected JUnit class/file/assertion count.')
+              seconds = float(case.get('time', 'nan'))
+              if not math.isfinite(seconds) or seconds < 0:
+                  raise SystemExit('Invalid JUnit case duration.')
+          suites = junit.findall('.//testsuite')
+          if not suites or len(junit.findall('./testsuite')) != 1:
+              raise SystemExit('Missing or duplicated JUnit aggregate.')
+          owners = [suite for suite in suites if suite.get('file')]
+          if len(owners) != 1 or owners[0].get('name') != cls or Path(owners[0].get('file')).resolve() != file or len(owners[0].findall('.//testcase')) != 2:
+              raise SystemExit('Unexpected JUnit owning class/file.')
+          if any(suites[0].get(key) != str(value) for key, value in [('tests', 2), ('assertions', 750), ('failures', 0), ('errors', 0), ('skipped', 0)]):
+              raise SystemExit('JUnit aggregate must record both cases and all 750 assertions with zero defects.')
+          for suite in suites:
+              children = suite.findall('.//testcase')
+              totals = {'tests': len(children), 'assertions': sum(int(case.get('assertions')) for case in children), 'failures': 0, 'errors': 0, 'skipped': 0}
+              if any(suite.get(key) != str(value) for key, value in totals.items()):
+                  raise SystemExit('JUnit suite totals differ from their genuine case descendants.')
+          manifest = json.loads((directory / 'source.json').read_text())
+          if subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=no'], text=True).strip():
+              raise SystemExit('Verification changed tracked source.')
+          for path, digest in manifest['sha256'].items():
+              if hashlib.sha256((root / path).read_bytes()).hexdigest() != digest:
+                  raise SystemExit('Verification changed source bytes: ' + path)
+          receipt = {'head': manifest['head'], 'tree': manifest['tree'], 'php_cases': 2,
+              'php_assertions': 750, 'assertions_by_case': expected_assertions, 'php_failures': 0, 'php_errors': 0, 'php_skips': 0,
+              'http_requests_per_mode': 364, 'http_requests_total': 728,
+              'request_evidence': 'Unchanged worker foreach handles 121 page + 241 audio + 2 other-IP requests; each original PHPUnit case asserts every response and privacy/auth/header result.',
+              'worker_process_timeout_seconds': 60, 'page_budget_per_ip': 120, 'audio_budget_per_ip': 240,
+              'outer_database': 'SQLite :memory:', 'worker_database': 'Per-case disposable SQLite file',
+              'php_seconds': suites[0].get('time'), 'issue_policy': 'Successful PHPUnit exit with --fail-on-all-issues and all explicit strict flags.',
+              'evidence_sha256': {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in directory.iterdir() if path.is_file() and path.name != 'receipt-check.log'}}
+          (directory / 'receipt.json').write_text(json.dumps(receipt, indent=2, sort_keys=True) + '\n')
+          print(json.dumps(receipt, sort_keys=True))
+          PY
+      - name: Retain complete raw logs, source, runtime, discovery and JUnit
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: embed-cache-csp-proof-${{ github.run_id }}-${{ github.run_attempt }}
+          path: embed-cache-csp-evidence/
+          retention-days: 7
+          if-no-files-found: error

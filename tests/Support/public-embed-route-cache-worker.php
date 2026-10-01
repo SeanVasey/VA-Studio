@@ -75,7 +75,7 @@ try {
         $response = $kernel->handle($request);
         $result['responses'][] = [$response->getStatusCode(), (int) $response->headers->get('X-RateLimit-Remaining'),
             (int) $response->headers->get('X-RateLimit-Limit')];
-        $csp = "default-src 'none'; style-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors http: https:";
+        $csp = "default-src 'none'; style-src 'self'; font-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors http: https:";
         if ($request->hasSession() || $response->headers->has('Set-Cookie') || $response->headers->has('X-Inertia')
             || $response->headers->has('X-Frame-Options')
             || $response->headers->get('Cache-Control') !== 'no-store, private'
