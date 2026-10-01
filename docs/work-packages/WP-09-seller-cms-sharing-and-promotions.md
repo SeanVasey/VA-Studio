@@ -98,3 +98,9 @@ MySQL race tests cover pinning against processing completion and publishing agai
 ## Inquiry and embed children — October 1, 2026
 
 The [single-seller experience candidate](../verification/single-seller-experience-increment.md) adds private saved inquiries with an audited operator inbox, explicit-consent video frames and a script-free public tagged-preview embed. Public inquiry intake stays disabled until the owner-approved notice, retention reference and eligible operator are configured. The current contact email fallback remains available. These children do not establish real email delivery, buyer/order support, private support attachments, related-track associations, free-download licensing or full WP-09 acceptance. Final MySQL/native/browser and independent review evidence belongs to the integrating candidate.
+
+## Manual related tracks child — October 1, 2026
+
+[T16-RELATED-TRACKS-01](../verification/editorial-related-tracks.md) implements ordered first-party track links on selected blog/video detail pages. Schema 4 retains only native track IDs, with the existing immutable release and image evidence; current public readiness and inventory decide which links appear. Private previews omit track destinations on the server. Withdrawal preserves retained CMS identity and restoration, while fresh public requests omit unavailable tracks. Existing schemas 1–3 remain exact.
+
+The isolated candidate has focused schema/domain/editor/HTTP/migration and frontend evidence. Actual MySQL contention and a genuine ordinary eligible-track native fixture remain acceptance gates, so this child, broader T16 and WP-09 are not complete. The child guide records exact checks, source boundaries and the genuine ClamAV fixture prerequisite; operational rollback never deletes retained schema-4 evidence.

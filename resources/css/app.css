@@ -498,9 +498,10 @@ input[type='range'] { accent-color: var(--va-action); cursor: pointer; min-width
 .editorial-prose { max-width: 72ch; padding-top: 38px; }
 .editorial-prose p { margin-bottom: 24px; font-size: 16px; line-height: 1.8; white-space: pre-line; overflow-wrap: anywhere; }
 .editorial-list { max-width: 960px; }
+ol.editorial-list { list-style: none; margin: 0; padding: 0; }
 .editorial-entry { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 24px; padding: 36px 0; border-bottom: 1px solid var(--va-rule); }
 .editorial-index { font-family: var(--va-font-mono); font-size: 11px; padding-top: 9px; color: var(--va-text-muted); }
-.editorial-entry h2 { font-family: var(--va-font-section); font-size: clamp(32px, 4vw, 48px); font-weight: 400; line-height: 1.1; letter-spacing: 0; overflow-wrap: anywhere; }
+.editorial-entry h2, .editorial-entry h3 { font-family: var(--va-font-section); font-size: clamp(32px, 4vw, 48px); font-weight: 400; line-height: 1.1; letter-spacing: 0; overflow-wrap: anywhere; }
 .editorial-entry p { max-width: 68ch; margin-top: 16px; font-size: 15px; white-space: pre-line; overflow-wrap: anywhere; }
 .editorial-entry .text-link { margin-top: 16px; min-height: 44px; }
 .editorial-contact, .editorial-video { margin-top: 38px; padding: 28px; border: 1px solid var(--va-border); background: var(--va-surface); max-width: 720px; }

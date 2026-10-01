@@ -44,6 +44,14 @@ export default function Editorial({ siteContent, editorial, sitePreview = false,
       {!sitePreview && editorial.section === 'contact' && contactInquiryEnabled && contactInquiryPrivacyNotice && <ContactInquiryForm privacyNotice={contactInquiryPrivacyNotice} />}
       {editorial.email && <div className="editorial-contact"><p className="eyebrow">Email</p><p>{editorial.email}</p>{!sitePreview && editorial.contactHref ? <a className="button" href={editorial.contactHref}>Open email <Icon name="northeast" size={18} /></a> : <span className="fine-print">Email action disabled in private preview.</span>}</div>}
       {editorial.video && <EditorialVideo key={`${editorial.path}:${editorial.video.provider}:${editorial.video.videoId}:${sitePreview}`} video={editorial.video} title={editorial.title} privatePreview={sitePreview} />}
+      {editorial.kind === 'entry' && editorial.relatedTracks && editorial.relatedTracks.length > 0 && <section aria-labelledby="related-tracks-title">
+        <h2 id="related-tracks-title">Related tracks</h2>
+        <p className="fine-print">{sitePreview ? 'Current catalog availability is shown here. Track links are disabled in private preview.' : 'Selected by VASEY.AUDIO. Availability is checked when you open a track.'}</p>
+        <ol className="editorial-list">{editorial.relatedTracks.map((track, index) => <li className="editorial-entry" key={`${index}:${track.title}`}>
+          <span className="editorial-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+          <div><h3>{!sitePreview && track.href ? <a href={track.href} onClick={navigate}>{track.title}</a> : track.title}</h3><p>{track.artist}</p></div>
+        </li>)}</ol>
+      </section>}
     </main>
     <SiteFooter {...chrome} />
     <PersistentPlayer tracks={[]} purchasingDisabled={sitePreview} catalogUrl={href('/#catalog')} onNavigate={navigate} onLicense={track => { if (!sitePreview) router.visit(track.shareUrl); }} />
