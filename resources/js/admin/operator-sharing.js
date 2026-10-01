@@ -15,7 +15,7 @@
 
         current(operation, field) {
             return !this.disposed && this.operation === operation
-                && this.$el.isConnected && field.isConnected && this.$el.contains(field);
+                && this.$root?.isConnected && field.isConnected && this.$root.contains(field);
         },
 
         manualMessage(kind) {
@@ -27,7 +27,7 @@
         async copy(kind) {
             const field = this.field(kind);
             if (this.disposed || this.copying !== null || !field
-                || !this.$el.isConnected || !field.isConnected || !this.$el.contains(field)) return;
+                || !this.$root?.isConnected || !field.isConnected || !this.$root.contains(field)) return;
 
             const operation = ++this.operation;
             this.copying = kind;
@@ -59,7 +59,7 @@
         select(kind) {
             const field = this.field(kind);
             if (this.disposed || this.copying !== null || !field
-                || !this.$el.isConnected || !field.isConnected || !this.$el.contains(field)) return;
+                || !this.$root?.isConnected || !field.isConnected || !this.$root.contains(field)) return;
 
             try {
                 field.focus();

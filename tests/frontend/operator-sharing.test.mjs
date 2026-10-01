@@ -19,14 +19,16 @@ function fixture({ clipboard, secure = true, navigator } = {}) {
         focus() { calls.push('focus-embed'); },
         select() { calls.push('select-embed'); },
     };
-    const root = { isConnected: true, contains: field => field === trackLink || field === embed };
+    const root = { nodeName: 'DIV', isConnected: true, contains: field => field === trackLink || field === embed };
+    const trigger = { nodeName: 'BUTTON', isConnected: true, contains: () => false };
     const state = runInNewContext(source, {
         navigator: navigator ?? { clipboard },
         isSecureContext: secure,
     });
-    state.$el = root;
+    state.$el = trigger;
+    state.$root = root;
     state.$refs = { trackLink, embedCode: embed };
-    return { state, calls, root, trackLink, embed };
+    return { state, calls, root, trigger, trackLink, embed };
 }
 
 function deferred() {
@@ -213,4 +215,87 @@ test('manual selection errors use fixed text and do not expose raw DOM errors', 
     trackLink.select = () => { throw new Error('raw DOM detail'); };
     state.select('link');
     assert.equal(state.status, 'Select the field and copy it manually.');
+});
+
+test('child-triggered copy and manual selection use the sharing component root', async () => {
+    const values = [];
+    const { state, calls, root, trigger, trackLink, embed } = fixture({ clipboard: { async writeText(value) { values.push(value); } } });
+    assert.notEqual(state.$el, state.$root);
+    assert.equal(trigger.nodeName, 'BUTTON');
+    assert.equal(root.nodeName, 'DIV');
+    for (const [kind, field] of [['link', trackLink], ['embed', embed]]) {
+        assert.equal(trigger.contains(field), false, 'a sibling field is outside the clicked button');
+        assert.equal(root.contains(field), true, 'the field belongs to the sharing component');
+        await state.copy(kind);
+        assert.equal(state.status, kind === 'link' ? 'Public link copied.' : 'Embed code copied.');
+        state.select(kind);
+        assert.equal(state.status, kind === 'link'
+            ? 'Public link selected. Use your device’s copy command.'
+            : 'Embed code selected. Use your device’s copy command.');
+    }
+    assert.deepEqual(values, [publicLink, embedCode]);
+    assert.deepEqual(calls, ['focus-link', 'select-link', 'focus-embed', 'select-embed']);
+});
+
+test('a wrong or disconnected component root refuses copy and selection despite a containing event element', async () => {
+    for (const invalid of ['wrong', 'disconnected']) {
+        const { state, calls, root } = fixture({ clipboard: { writeText() { assert.fail('invalid component root writes nothing'); } } });
+        state.$el = root;
+        if (invalid === 'wrong') state.$root = { isConnected: true, contains: () => false };
+        if (invalid === 'disconnected') root.isConnected = false;
+        for (const kind of ['link', 'embed']) {
+            await state.copy(kind);
+            state.select(kind);
+        }
+        assert.equal(state.status, '');
+        assert.equal(state.copying, null);
+        assert.equal(state.operation, 0);
+        assert.deepEqual(calls, []);
+    }
+});
+
+test('component root replacement prevents a late copy announcement while the old root remains connected', async () => {
+    const write = deferred();
+    const { state, root } = fixture({ clipboard: { writeText() { return write.promise; } } });
+    state.$el = root;
+    const pending = state.copy('link');
+    state.$root = { isConnected: true, contains: () => false };
+    write.resolve();
+    await pending;
+    assert.equal(root.isConnected, true);
+    assert.equal(state.status, 'Copying link…');
+    assert.equal(state.copying, null);
+});
+
+test('an absent component root refuses child-triggered copy and manual selection without throwing', async () => {
+    for (const missing of [undefined, null]) {
+        const { state, calls } = fixture({ clipboard: { writeText() { assert.fail('absent root writes nothing'); } } });
+        state.$root = missing;
+        for (const kind of ['link', 'embed']) {
+            await state.copy(kind);
+            state.select(kind);
+        }
+        assert.equal(state.status, '');
+        assert.equal(state.operation, 0);
+        assert.equal(state.copying, null);
+        assert.deepEqual(calls, []);
+    }
+});
+
+test('losing the component root suppresses fulfilled and rejected pending copy callbacks without throwing', async () => {
+    for (const missing of [undefined, null]) {
+        for (const outcome of ['fulfilled', 'rejected']) {
+            const write = deferred();
+            const { state, calls } = fixture({ clipboard: { writeText() { return write.promise; } } });
+            const pending = state.copy('link');
+            assert.equal(state.status, 'Copying link…');
+            state.$root = missing;
+            if (outcome === 'fulfilled') write.resolve();
+            if (outcome === 'rejected') write.reject(new Error('detached trigger permission result'));
+            await pending;
+            assert.equal(state.status, 'Copying link…');
+            assert.equal(state.copying, null);
+            assert.deepEqual(calls, []);
+        }
+    }
 });
