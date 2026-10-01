@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use stdClass;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 final class TestCheckoutController
@@ -40,7 +41,7 @@ final class TestCheckoutController
         return $this->run(fn () => $checkout->status($order, $owner->forRequest($request)));
     }
 
-    public function returned(string $order, Request $request, QuoteOwner $owner, HostedCheckout $checkout): \Symfony\Component\HttpFoundation\Response
+    public function returned(string $order, Request $request, QuoteOwner $owner, HostedCheckout $checkout): Response
     {
         // Ownership and retained evidence only. Query parameters and redirect arrival prove nothing.
         try {

@@ -1,0 +1,159 @@
+name: Isolated checkout return formatting feedback
+
+# Informative syntax/style bridge only; this does not replay or replace Foundation.
+on:
+  push:
+    branches: [codex/checkout-return-format-proof-20261001]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: isolated-checkout-return-format-feedback
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  checkout-return-format:
+    name: Checkout return exact formatting feedback
+    if: github.repository == 'VASEYDEV/VASEYAUDIO' && github.ref == 'refs/heads/codex/checkout-return-format-proof-20261001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ':memory:'
+      DB_URL: ''
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+      CONTACT_INQUIRIES_ENABLED: 'false'
+      CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED: 'false'
+      STRIPE_TEST_CHECKOUT_ENABLED: 'false'
+      STRIPE_TEST_PAYMENT_PROCESSING_ENABLED: 'false'
+      STRIPE_TEST_FINALIZATION_ENABLED: 'false'
+      STRIPE_WEBHOOK_ENABLED: 'false'
+      STRIPE_TEST_SECRET_KEY: ''
+      STRIPE_WEBHOOK_SECRET: ''
+      STRIPE_ACCOUNT_ID: ''
+      VASEY_TEST_CONTRACT_ISSUANCE_ENABLED: 'false'
+      VASEY_TEST_FULFILLMENT_ACTIVATION_ENABLED: 'false'
+      VASEY_TEST_DELIVERY_ACCESS_ENABLED: 'false'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 2
+      - name: Record the exact source and refuse any extra source change
+        run: |
+          set -euo pipefail
+          test "$GITHUB_EVENT_NAME" = push
+          test "$GITHUB_REPOSITORY" = VASEYDEV/VASEYAUDIO
+          test "$GITHUB_REF" = refs/heads/codex/checkout-return-format-proof-20261001
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD^)" = 9e32aaad9125acd5c0b54b9651d3423c7599ba82
+          git diff --exit-code HEAD --
+          test -z "$(git ls-files --others --exclude-standard)"
+          mkdir checkout-return-format-evidence
+          python <<'PYTHON'
+          import subprocess
+          expected = {
+              ('M', 'app/Http/Controllers/TestCheckoutController.php'),
+              ('D', '.github/workflows/checkout-return-proof.yml'),
+              ('A', '.github/workflows/checkout-return-format-proof.yml'),
+          }
+          actual = {tuple(line.split('\t')) for line in subprocess.check_output(
+              ['git', 'diff', '--no-renames', '--name-status', 'HEAD^', 'HEAD'], text=True).splitlines()}
+          if actual != expected:
+              raise SystemExit('Unexpected checkout type-format source delta.')
+          PYTHON
+          {
+            git rev-parse HEAD HEAD^{tree} HEAD^ HEAD^^{tree}
+            sha256sum .github/workflows/checkout-return-format-proof.yml composer.json composer.lock phpunit.xml app/Http/Controllers/TestCheckoutController.php tests/Feature/CheckoutReturnPresentationTest.php resources/js/Pages/CheckoutReturn.tsx resources/js/components/PrivatePageHead.tsx resources/views/app.blade.php tests/frontend/checkout-return.test.tsx tests/frontend/metadata.test.tsx
+          } 2>&1 | tee checkout-return-format-evidence/source.log
+          git show 9e32aaad9125acd5c0b54b9651d3423c7599ba82:app/Http/Controllers/TestCheckoutController.php > checkout-return-format-evidence/previous-controller.php
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          coverage: none
+          tools: composer:v2
+      - name: Install locked backend dependencies
+        run: |
+          set -euo pipefail
+          composer install --no-interaction --prefer-dist 2>&1 | tee checkout-return-format-evidence/composer-install.log
+      - run: cp .env.example .env
+      - run: php artisan key:generate
+      - name: Verify real PHP syntax and the exact same resolved return type
+        run: |
+          set -euo pipefail
+          php --version | tee checkout-return-format-evidence/php-runtime.log
+          {
+            php --syntax-check app/Http/Controllers/TestCheckoutController.php
+            php --syntax-check tests/Feature/CheckoutReturnPresentationTest.php
+          } 2>&1 | tee checkout-return-format-evidence/php-syntax.log
+          php <<'PHP' 2>&1 | tee checkout-return-format-evidence/php-type-bridge.log
+          <?php
+          $previous = file_get_contents('checkout-return-format-evidence/previous-controller.php');
+          $current = file_get_contents('app/Http/Controllers/TestCheckoutController.php');
+          if (hash('sha256', $previous) !== '0b16448c81159c1f883e56e8d2e933acb7f7b533adfe07a73742961800c49a6d'
+              || hash('sha256', $current) !== '6f22a970c0fa3417cfc60ccb13ed2082914efca847b0d32175629f76a539d2b4') {
+              throw new RuntimeException('Unexpected old/current controller source.');
+          }
+          $import = 'use Symfony\\Component\\HttpFoundation\\Response;'."\n";
+          $alias = '): Response'."\n";
+          $absolute = '): \\Symfony\\Component\\HttpFoundation\\Response'."\n";
+          if (substr_count($current, $import) !== 1 || substr_count($current, $alias) !== 1) {
+              throw new RuntimeException('Unexpected response import/type declaration.');
+          }
+          $inverse = str_replace($alias, $absolute, str_replace($import, '', $current));
+          if ($inverse !== $previous) {
+              throw new RuntimeException('Controller changed beyond the exact import/type spelling.');
+          }
+          function strictTokens(string $source): array
+          {
+              $result = [];
+              foreach (token_get_all($source, TOKEN_PARSE) as $token) {
+                  if (is_array($token)) {
+                      if ($token[0] === T_WHITESPACE) continue;
+                      $result[] = [$token[0], $token[1]];
+                  } else {
+                      $result[] = $token;
+                  }
+              }
+              return $result;
+          }
+          $originalTokens = strictTokens($previous);
+          if (strictTokens($inverse) !== $originalTokens) {
+              throw new RuntimeException('The exact inverse changed PHP tokens.');
+          }
+          strictTokens($current);
+          require 'vendor/autoload.php';
+          $type = (new ReflectionMethod(App\Http\Controllers\TestCheckoutController::class, 'returned'))->getReturnType();
+          if (! $type instanceof ReflectionNamedType || $type->getName() !== Symfony\Component\HttpFoundation\Response::class || $type->allowsNull()) {
+              throw new RuntimeException('The loaded controller has an unexpected return type.');
+          }
+          echo json_encode(['previousSourceSha256' => hash('sha256', $previous), 'currentSourceSha256' => hash('sha256', $current),
+              'exactImportTypeInverseEqual' => true, 'inverseTokensEqual' => true, 'originalTokenCount' => count($originalTokens),
+              'resolvedReturnType' => $type->getName(), 'allowsNull' => $type->allowsNull()], JSON_THROW_ON_ERROR), PHP_EOL;
+          PHP
+      - name: Verify the exact two PHP formatting paths
+        run: |
+          set -euo pipefail
+          php vendor/bin/pint --test -v app/Http/Controllers/TestCheckoutController.php tests/Feature/CheckoutReturnPresentationTest.php \
+            2>&1 | tee checkout-return-format-evidence/pint.log
+      - name: Retain complete informative type and formatting evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: checkout-return-format-${{ github.run_id }}-${{ github.run_attempt }}
+          path: checkout-return-format-evidence/
+          retention-days: 7
+          if-no-files-found: error
+          overwrite: false
