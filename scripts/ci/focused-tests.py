@@ -49,6 +49,7 @@ PHP_TARGETS = {
         "tests/Feature/StripeWebhookConcurrencyTest.php",
         "tests/Feature/HashByteGuardMigrationTest.php", "tests/Feature/UuidByteGuardMigrationTest.php",
         "tests/Feature/OwnedTestOrderHistoryTest.php", "tests/Feature/SyntheticPrivateRestoreTest.php",
+        "tests/Feature/CheckoutReturnPresentationTest.php",
     ),
     "seller": (
         "tests/Feature/CustomerInquiryHttpTest.php", "tests/Feature/CustomerInquiryMigrationTest.php",
@@ -68,6 +69,7 @@ PHP_TARGETS = {
         "tests/Feature/OperatorAuthorityTest.php", "tests/Feature/OperatorMfaTest.php",
         "tests/Feature/TrackMetadataTest.php", "tests/Feature/LicensingAdminTest.php",
         "tests/Feature/BulkTrackTagsTest.php", "tests/Feature/BulkTrackTagsConcurrencyTest.php",
+        "tests/Feature/ReadTrackSharingTest.php",
     ),
 }
 FRONTEND_TARGETS = (
@@ -83,6 +85,7 @@ FRONTEND_TARGETS = (
     "tests/frontend/editorial-video.test.tsx", "tests/frontend/owned-order-history.test.tsx",
     "tests/frontend/contact-inquiry.test.tsx",
     "tests/frontend/editorial-related-tracks.test.tsx",
+    "tests/frontend/operator-sharing.test.ts",
 )
 BROWSER_TARGETS = (
     "tests/browser/storefront.spec.ts", "tests/browser/operator.spec.ts",
