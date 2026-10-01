@@ -37,6 +37,8 @@ class MediaProcessor
         $files = app(PrivateMediaFiles::class);
         $workspace = null;
         $promoted = [];
+        // Set by the completion transaction's last statement, once only its commit remains.
+        $committing = false;
         $budget = app(MediaWorkflowBudget::class);
         $previousDeadline = $budget->enter();
         try {
@@ -84,7 +86,7 @@ class MediaProcessor
                 $path = $files->resolve($relative);
                 $records[] = ['track_id' => $source->track_id, 'parent_asset_id' => $source->id, 'processing_run_id' => $run->id, 'role' => $output['role'], 'disk' => 'local', 'storage_path' => $relative, 'original_name' => $output['name'], 'mime_type' => $output['mime_type'], 'size_bytes' => filesize($path), 'sha256' => hash_file('sha256', $path), 'technical_metadata' => $output['technical_metadata'], 'status' => 'ready', 'verified_by' => $run->requested_by, 'verified_at' => now()];
             }
-            $result = DB::transaction(function () use ($run, $source, $token, $records, $evidence, $budget) {
+            $result = DB::transaction(function () use ($run, $source, $token, $records, $evidence, $budget, &$committing) {
                 // Match queue lock ordering: source before run.
                 $lockedSource = MediaAsset::query()->lockForUpdate()->findOrFail($source->id);
                 $track = Track::query()->lockForUpdate()->findOrFail($source->track_id);
@@ -110,6 +112,7 @@ class MediaProcessor
                     Track::query()->whereKey($source->track_id)->where('status', 'draft')->update(['duration_seconds' => (int) ceil($preview['technical_metadata']['duration_seconds']), 'waveform' => json_encode($preview['technical_metadata']['waveform'], JSON_THROW_ON_ERROR)]);
                 }
                 AuditEvent::record('media.processing.completed', $locked, ['source_asset_id' => $source->id, 'output_asset_ids' => $ids], $locked->requested_by);
+                $committing = true;
 
                 return $locked;
             });
@@ -136,10 +139,17 @@ class MediaProcessor
             throw $failure;
         } finally {
             $budget->leave($previousDeadline);
-            foreach ($promoted as $relative) {
-                // Only this unsuccessful attempt's unreferenced random objects.
-                if (! MediaAsset::query()->where('storage_path', $relative)->exists()) {
-                    @unlink($files->root().'/'.$relative);
+            // Before completion reaches its commit, any inserted rows have rolled back. Once committing starts, a lost
+            // acknowledgement can hide an applied or still-in-flight commit from a later read. Keep those private files,
+            // at worst as orphans, rather than delete bytes that durable revisions may reference.
+            if ($promoted !== [] && ! $committing) {
+                try {
+                    foreach ($promoted as $relative) {
+                        @unlink($files->root().'/'.$relative);
+                    }
+                    @rmdir(dirname($files->root().'/'.$promoted[0]));
+                } catch (Throwable $cleanup) {
+                    report($cleanup);
                 }
             }
             if ($workspace) {

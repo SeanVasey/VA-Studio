@@ -1,6 +1,6 @@
 # [WP-03] Private media ingestion, quarantine and preview processing
 
-Status: **WAV/artwork implemented in PR #21; private stems archive increment merged in [PR #30](https://github.com/VASEYDEV/VASEYAUDIO/pull/30); the production malware scanner fit is the current increment; broader work package remains open.** The implementation below is a bounded local-storage pipeline. This issue is complete only when the acceptance evidence and remaining production work below exist.
+Status: **WAV/artwork implemented in PR #21; private stems archive increment merged in [PR #30](https://github.com/VASEYDEV/VASEYAUDIO/pull/30); production scanner support and the shared worker budget merged in [PR #84](https://github.com/VASEYDEV/VASEYAUDIO/pull/84). The current increment protects track-media revisions after an uncertain completion commit; broader work package remains open.** The implementation below is a bounded local-storage pipeline. This issue is complete only when the acceptance evidence and remaining production work below exist.
 
 - Suggested issue title: `[WP-03] Private media ingestion, quarantine and preview processing`
 - Phase: 1
@@ -48,6 +48,14 @@ Offer readiness now checks this association and freezes its identity/hash in ste
 Archive v2 fingerprints and enforces its duration ceiling. Explicit historical v1 validation preserves existing immutable archive evidence; unsupported versions fail closed. See [association verification](../verification/stems-recordings.md). Next ordered code work after acceptance: WP-04 typed rights and consistency fixtures.
 
 ## Remaining work within WP-03
+
+### Track-media commit cleanup — September 30
+
+The processor now retains promoted private files once the completion transaction reaches its commit. A connection or listener error can follow an applied commit, and an immediate lookup may not see a commit still in flight; cleanup no longer treats a missing row as permission to delete those files. Errors inside the transaction still roll back and clean only the failed attempt's files. Existing revisions, source files and retry semantics remain intact. The operations guide describes quiescent orphan reconciliation; nothing deletes retained orphans automatically.
+
+Regression coverage exercises an applied commit followed by an error, an uncertain commit with no visible rows and a healthy retry, and a pre-commit insert failure alongside an existing revision. Full SQLite/MySQL CI and independent review must establish acceptance on the integrating PR's exact head; local PHP execution is unavailable in the recovery environment. The next code dependency is encoder preflight/doctor diagnostics, followed by the remaining byte guards and archive/scanner edge cases in the ordered development record.
+
+### Deployment and broader scope
 
 - Real ClamAV installation, signature-update operations and known clean/detection/error acceptance evidence in the intended deployment. The [production scanner guide](../media-processing.md#production-malware-scanner) gives the configuration, measurements from ClamAV 1.5.4 and the acceptance list; the deployed host still has to pass it.
 - Production media-worker isolation, denied network access, resource sizing, queue monitoring and crash/restore drills.
