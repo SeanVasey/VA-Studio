@@ -11,6 +11,14 @@
       "test_overlapping_batches_with_separate_actors_wait_on_the_shared_track_and_the_loser_has_no_partial_changes"
     ],
     [
+      "Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest",
+      "test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders"
+    ],
+    [
+      "Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest",
+      "test_livewire_private_getters_reject_revocation_hidden_by_an_old_repeatable_read_snapshot"
+    ],
+    [
       "Tests\\Feature\\CustomerInquiryConcurrencyTest",
       "test_competing_owners_with_one_global_request_key_save_exactly_one_inquiry_and_receipt_audit"
     ],
