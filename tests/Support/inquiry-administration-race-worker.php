@@ -87,8 +87,7 @@ try {
                     $body = $service->authorizedRead($oldOperator, function () use ($service, $oldOperator): array {
                         $service->openInbox($oldOperator);
 
-                        return CustomerInquiry::query()->orderBy('id')->get()->map(fn ($inquiry): array =>
-                            ['receipt' => $inquiry->public_id, 'state' => $inquiry->state, 'version' => $inquiry->version, 'payload' => $inquiry->payload])->all();
+                        return CustomerInquiry::query()->orderBy('id')->get()->map(fn ($inquiry): array => ['receipt' => $inquiry->public_id, 'state' => $inquiry->state, 'version' => $inquiry->version, 'payload' => $inquiry->payload])->all();
                     });
                 } else {
                     $inquiry = $input['operation'] === 'view' ? $service->view($input['inquiry_id'], $oldOperator)
