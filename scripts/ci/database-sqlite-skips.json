@@ -16,6 +16,10 @@
     ],
     [
       "Tests\\Feature\\CustomerInquiryConcurrencyTest",
+      "test_operator_authority_revocation_and_admission_share_the_current_user_lock"
+    ],
+    [
+      "Tests\\Feature\\CustomerInquiryConcurrencyTest",
       "test_publication_withdrawal_and_admission_share_one_mutex_without_stale_admission"
     ],
     [

@@ -4,13 +4,17 @@ namespace App\Domain\Inquiries;
 
 use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 final class InquiryPolicy
 {
     /** Only privacyNotice belongs in public page props. Internal setup values stay private. */
-    public function publicSetup(array $verifiedCurrentContent): ?array
+    public function publicSetup(array $verifiedCurrentContent, bool $lockForUpdate = false): ?array
     {
+        if ($lockForUpdate && DB::transactionLevel() === 0) {
+            return null;
+        }
         $notice = config('inquiries.privacy_notice');
         $reference = config('inquiries.retention_policy_reference');
         $operatorId = config('inquiries.operator_user_id');
@@ -19,8 +23,9 @@ final class InquiryPolicy
             || ! is_scalar($operatorId) || ! preg_match('/\A[1-9][0-9]{0,15}\z/D', (string) $operatorId)) {
             return null;
         }
-        $operator = User::find($operatorId);
-        if ($operator === null || ! Gate::forUser($operator)->allows('administer-catalog') || ! AdminMultiFactor::satisfiedBy($operator)) {
+        $operator = $lockForUpdate ? User::query()->lockForUpdate()->find($operatorId) : User::find($operatorId);
+        if ($operator === null || ! Gate::forUser($operator)->allows('administer-catalog', $lockForUpdate ? [true] : [])
+            || ! AdminMultiFactor::satisfiedBy($operator, lockForUpdate: $lockForUpdate)) {
             return null;
         }
 
