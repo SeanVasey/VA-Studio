@@ -1,5 +1,11 @@
 # Ordered development status
 
+## Remaining execution plan — September 30, 2026
+
+The [remaining development plan](remaining-development-plan.md) defines 40 completion deliverables, dependencies, design coverage and batching across all 14 work packages. [Its task register](remaining-development-tasks.csv) and [103-row parity map](remaining-parity-coverage.csv) retain the full scope. The [CI strategy](ci-development-strategy.md) proposes focused cloud checks and fewer duplicate full runs; workflows and required gates remain unchanged until that implementation is verified. Start with T01/T02 CI throughput, batch the six known media fixes T03–T08, and run source/policy/design work T09–T11 in parallel. This supersedes earlier one-increment handoff wording as the execution sequence, while preserving the dated evidence below.
+
+[PR #87](https://github.com/VASEYDEV/VASEYAUDIO/pull/87) is accepted: tested head `e27001edde722815f65bc2f0588840078471bf2f`, merged as `8be3bd7271595f2c21a3c5017b3b19ceb821a842`, same tree `c389602f8acb43287a8d8125b482c4c0dd2b3dba`. [CI 36795680362](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36795680362) passed all ten jobs: MySQL 1,870 tests /21,998 assertions; SQLite 1,776 executed /18,288 assertions plus 94 expected skips; frontend 262; browser 35 plus one intended skip. Independent and automated reviews found no blocking issue. Encoder diagnostics are complete; prior candidate wording below is historical.
+
 Reconciled 2026-09-30. Accepted starting baseline `383354729e506ef93a4c458552c6087cb717fa9c`, tree `c36e602d2392423ad73e6ef797e2b89e8de12d51`, contains customer-facing test downloads, the first WP-09 CMS slice, test promotion administration, persisted editorial content, the repository engineering standard, scheduled site publication, fail-closed public pages, the Site Releases row menu, duration-balanced CI shards, the media upload path fix from PR #80, editable site images from PRs #81 and #82, and their follow-ups with CI time limits in [PR #83](https://github.com/VASEYDEV/VASEYAUDIO/pull/83), plus production scanner support and the shared worker budget in [PR #84](https://github.com/VASEYDEV/VASEYAUDIO/pull/84), and conservative track-media commit cleanup in [PR #86](https://github.com/VASEYDEV/VASEYAUDIO/pull/86). Each completed full CI and independent review before merge. No production activation or actual provider transaction is claimed.
 
 ## Current increment and next handoff
@@ -287,3 +293,4 @@ Read-only exception visibility is accepted in #66; verified-admin/MFA checks on 
 Before each PR: inspect current main, this record and the selected issue; name its dependency and remaining criteria; record tests at the actual head; update the next handoff here and in the issue. Do not close broad work packages from a partial increment, revive stale “next task” paragraphs, or use provider setup as a reason to skip earlier work.
 
 The [source/parity records](migration/README.md) remain the omission checklist. Their `planned` target statuses are a baseline, not a fresh implementation audit; mark a requirement accepted only with its specific implementation and acceptance evidence. No authenticated audit, completed import, production transaction or live cutover is implied by this reconciliation.
+

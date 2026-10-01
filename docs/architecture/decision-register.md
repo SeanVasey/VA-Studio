@@ -2,6 +2,16 @@
 
 As of 2026-09-04. This is the initial register; entry keys are local tracking keys, not claims of historic accepted ADRs. Append dated changes and evidence instead of rewriting decision history.
 
+## D-07 confirmed — single-seller personal-use store (2026-09-30)
+
+**Explicit owner decision.** Sean clarified that the BeatStars replacement is for his personal business use: upload, publish, share, license and sell his own content to front-end listeners and customers. It is not a competing platform for multiple independent sellers. This confirms the existing first-party house-store direction.
+
+Include Sean's administration, his catalog and commerce, customer accounts/recovery/downloads/support, and retained products/memberships offered by him. Authorized helpers or reviewers do not imply tenant businesses. Collaborator rights/credits or agreed revenue accounting concern his own content.
+
+Exclude seller onboarding, tenant stores, seller SaaS subscriptions, marketplace discovery/ranking across sellers, platform commissions, connected-seller payout infrastructure and enterprise organization hierarchies. Do not add those systems from generic BeatStars platform research. Any collaborator-payment integration requires its own actual business need; it does not authorize a marketplace.
+
+The [remaining execution plan](../remaining-development-plan.md) applies this boundary to every task and parity row. The architecture already uses a single-seller modular application, so existing customer/payment/rights/privacy/continuity requirements remain applicable. Product families or optional integrations may be narrowed only by an explicit scope decision that preserves actual obligations.
+
 ## Payment account observation — 2026-09-09
 
 Sean confirmed that Vasey Multimedia is connected to Stripe for production and test use, then instructed continued development. The connected Stripe account listing exposed **Vasey Multimedia in both live and test modes**. Account availability is observed; live charge capability, tax registrations, currency/capture settings, application credentials and a deployed webhook destination have not been verified.
@@ -20,7 +30,7 @@ The 2026-09-09 WP-07 receipt prerequisite adds test-only own-account snapshot in
 | D-04 | Baseline Laravel modular monolith | **Recommendation in implementation** — architecture skill baseline plus authorized reversible implementation | Laravel 13 / PHP 8.4, MySQL 8.4, Inertia 3 + React/TypeScript, Filament 5, Redis workers. Do not call this a separate explicit owner stack approval. |
 | D-05 | Checkout during the foundation phase | **Recommendation implemented as a development boundary** | Checkout remains disabled until payment/rights/fulfillment evidence is complete. No simulated successful sale may be presented as a real transaction. |
 | D-06 | Production traffic | **Unresolved** — current task begins development | Preserve the existing live business until an exact candidate, reconciliation, and cutover procedure are reviewable. |
-| D-07 | First-party house store | **Recommendation** | Single seller, not a multi-vendor marketplace. Contributor metadata belongs in the core; collaborator payouts need a separate business/provider decision. |
+| D-07 | First-party house store | **Decision** — explicitly confirmed by Sean on 2026-09-30 | Sean publishes/shares/sells his own content to customers. No independent seller onboarding, tenants, marketplace commissions or seller SaaS. Contributor metadata concerns his catalog; collaborator payouts need a separate actual business/provider decision. |
 
 ## Decisions that remain open
 
@@ -180,3 +190,4 @@ Persisted editorial and contact content [PR #74](https://github.com/VASEYDEV/VAS
 ## D-25 — Editable site images (2026-09-30)
 
 **Accepted in [PR #81](https://github.com/VASEYDEV/VASEYAUDIO/pull/81), the library (tested head `4111672`, merged as `edf6ee1`; [CI 36732001572](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36732001572) and post-merge [CI 36739781811](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36739781811) passed all ten jobs), and [PR #82](https://github.com/VASEYDEV/VASEYAUDIO/pull/82), the image slots (tested head `c173ec0`, merged as `e0e0873`; [CI 36746399582](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36746399582) passed all ten jobs, and post-merge [CI 36751214435](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36751214435) passed nine, its browser job failing one test on a race in the test that [PR #83](https://github.com/VASEYDEV/VASEYAUDIO/pull/83) fixes), with the slots and defaults Sean approved on 2026-09-30.** [D-25](D-25-editable-site-images.md) adds a private site-image library for four fixed slots: the home hero (desktop and mobile), the studio image and the share image. Uploads record a credit line and rights confirmation and are refused at intake for the wrong shape or size, transparency, CMYK, more than 8 bits per channel, rotation tags, other formats or more than 20 MiB. Each image is scanned, re-encoded without metadata into the slot's sizes (JPEG and WebP, or JPEG alone for the share image) and pinned by a manifest hash; the original is never served. Database guards on both engines retain every upload and outcome, and a lease-based claim serializes processing. Staff see a private, verified preview. Part 2 adds the slots to site releases (schema version 3, used only when a release has an image), pins each image's manifest and records the references in an insert-only index. An image is served publicly at a content-hashed URL, cached for a year, only once a release using it has been live, and a damaged file fails only that image. No commerce, rights or provider state changes.
+
