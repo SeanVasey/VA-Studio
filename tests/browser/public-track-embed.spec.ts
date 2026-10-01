@@ -1,7 +1,34 @@
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
-import { test, expect } from '@playwright/test';
+import { test, expect, type Locator } from '@playwright/test';
+
+async function inspectEmbedHeading(locator: Locator) {
+  const heading = await locator.evaluate(async element => {
+    const style = getComputedStyle(element);
+    const fontSet = element.ownerDocument.fonts;
+    const font = style.fontWeight + ' ' + style.fontSize + ' ' + style.fontFamily;
+    const text = element.textContent ?? '';
+    const faces = await fontSet.load(font, text);
+    const bounds = element.getBoundingClientRect();
+    return { family: style.fontFamily, weight: style.fontWeight, stretch: style.fontStretch,
+      synthesis: style.fontSynthesis, size: style.fontSize, lineHeight: style.lineHeight,
+      bounds: { x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height },
+      checked: fontSet.check(font, text),
+      faces: faces.map(face => ({ family: face.family.replace(/^(['"])(.*)\1$/, '$2'), status: face.status })) };
+  });
+  expect(heading.family.split(',')[0].trim().replace(/^(['"])(.*)\1$/, '$2')).toBe('Noto Sans Display');
+  expect(heading.weight).toBe('900');
+  // CSSOM may serialize the identical width as its keyword or percentage.
+  expect(heading.stretch === 'extra-condensed' ? '62.5%' : heading.stretch).toBe('62.5%');
+  expect(heading.synthesis).toBe('none');
+  expect(heading.checked).toBe(true);
+  expect(heading.faces.length).toBeGreaterThan(0);
+  expect(heading.faces.every(face => face.family === 'Noto Sans Display' && face.status === 'loaded')).toBe(true);
+  expect(heading.bounds.width).toBeGreaterThan(0);
+  expect(heading.bounds.height).toBeGreaterThan(0);
+  return heading;
+}
 
 // Real Blade/CSS and native audio/keyboard in a foreign-origin iframe; synthetic audio transport.
 // Backend feature tests separately establish publication, file integrity and withdrawal behavior.
@@ -69,6 +96,7 @@ test('public preview iframe has native controls, no autoplay and a keyboard-acce
     expect(loaded.faces.length).toBeGreaterThan(0);
     expect(loaded.faces.every(face => face.family === loaded.family && face.status === 'loaded')).toBe(true);
   }
+  const heading = await inspectEmbedHeading(frame.getByRole('heading', { name: 'Synthetic browser preview' }));
   expect(fonts).toHaveLength(4);
   for (const file of ['reddit-sans-latin-wght-normal.woff2', 'noto-sans-display-latin-standard-normal.woff2',
     'jetbrains-mono-latin-wght-normal.woff2', 'bebas-neue-latin-400-normal.woff2']) {
@@ -119,7 +147,7 @@ test('public preview iframe has native controls, no autoplay and a keyboard-acce
   const cspViolations = await frame.locator('body').evaluate(element =>
     (element.ownerDocument.defaultView as unknown as Window & { __embedCspViolations: string[] }).__embedCspViolations);
   expect(cspViolations).toEqual([]);
-  await testInfo.attach('embed-font-evidence', { contentType: 'application/json', body: Buffer.from(JSON.stringify({ loadedFonts, fonts, cspViolations })) });
+  await testInfo.attach('embed-font-evidence', { contentType: 'application/json', body: Buffer.from(JSON.stringify({ loadedFonts, heading, fonts, cspViolations })) });
   // Capture after all journey assertions so Playwright's injected screenshot style is not attributed to the app.
   await page.screenshot({ path: testInfo.outputPath('public-preview-embed.png'), fullPage: true });
 });
@@ -185,6 +213,7 @@ test('public preview fonts remain same-origin with development hot and foreign a
         expect(loaded.faces.length).toBeGreaterThan(0);
         expect(loaded.faces.every(face => face.family === loaded.family && face.status === 'loaded')).toBe(true);
       }
+      const heading = await inspectEmbedHeading(preview.getByRole('heading', { name: 'Synthetic browser preview' }));
       const fonts = await Promise.all(pendingFonts);
       expect(fonts).toHaveLength(4);
       for (const font of approved) {
@@ -198,7 +227,7 @@ test('public preview fonts remain same-origin with development hot and foreign a
       const cspViolations = await preview.evaluate(() =>
         (window as unknown as Window & { __embedCspViolations: string[] }).__embedCspViolations);
       expect(cspViolations).toEqual([]);
-      configurations.push({ environment, loadedFonts, fonts, styles, foreignRequests, cspViolations });
+      configurations.push({ environment, loadedFonts, heading, fonts, styles, foreignRequests, cspViolations });
     } finally { await context.close(); }
   }
   await testInfo.attach('embed-font-origin-evidence', { contentType: 'application/json', body: Buffer.from(JSON.stringify({ configurations })) });
