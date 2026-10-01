@@ -79,8 +79,11 @@ const lastPreview = { ...fixtureTracks[2], previewUrl: '/media/last-tagged-previ
 function nativePlayback() {
   vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => {});
   vi.spyOn(HTMLMediaElement.prototype, 'duration', 'get').mockReturnValue(60);
-  vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(function (this: HTMLMediaElement) { this.dispatchEvent(new Event('pause')); });
+  let paused = true;
+  vi.spyOn(HTMLMediaElement.prototype, 'paused', 'get').mockImplementation(() => paused);
+  vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(function (this: HTMLMediaElement) { paused = true; this.dispatchEvent(new Event('pause')); });
   return vi.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(function (this: HTMLMediaElement) {
+    paused = false;
     this.dispatchEvent(new Event('durationchange'));
     this.dispatchEvent(new Event('playing'));
     return Promise.resolve();
@@ -209,10 +212,43 @@ it('keeps loop markers accessible, rejects reversed bounds, loops within the pre
   act(() => player.seek(40));
   expect(source.currentTime).toBe(40);
   expect(screen.getByText('Loop off')).toBeInTheDocument();
-  await screen.getByRole('button', { name: 'Set A here' }).focus();
+  expect(screen.getByRole('button', { name: 'Set A here' })).toHaveFocus();
   await user.keyboard('{Escape}');
   expect(screen.queryByRole('region', { name: 'Preview queue and loop controls' })).not.toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Queue & loop' })).toHaveFocus();
+});
+
+it('keeps the section loop alive through native seek waiting without restarting or resuming playback', async () => {
+  const play = nativePlayback();
+  const frames = new Map<number, FrameRequestCallback>();
+  let frameId = 0;
+  vi.spyOn(window, 'requestAnimationFrame').mockImplementation(callback => { frames.set(++frameId, callback); return frameId; });
+  vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(id => { frames.delete(id); });
+  render(<PersistentPlayer tracks={[playable]} onLicense={() => {}} />);
+  await act(() => player.play(playable));
+  const source = play.mock.contexts[0] as HTMLMediaElement;
+  act(() => { player.seek(10); player.markLoopStart(); player.seek(20); player.markLoopEnd(); });
+  expect(frames.size).toBe(1);
+  act(() => { source.dispatchEvent(new Event('waiting')); source.currentTime = 20.4; source.dispatchEvent(new Event('timeupdate')); });
+  expect(source.currentTime).toBe(10);
+  act(() => { source.currentTime = 20.5; const [id, callback] = [...frames][0]; frames.delete(id); callback(100); });
+  expect(source.currentTime).toBe(10);
+  expect(frames.size).toBe(1);
+  let seeking = true;
+  vi.spyOn(HTMLMediaElement.prototype, 'seeking', 'get').mockImplementation(() => seeking);
+  act(() => { source.currentTime = 20.6; source.dispatchEvent(new Event('timeupdate')); });
+  expect(source.currentTime).toBe(20.6);
+  act(() => { seeking = false; source.dispatchEvent(new Event('seeked')); });
+  expect(source.currentTime).toBe(10);
+  expect(frames.size).toBe(1);
+  expect(play).toHaveBeenCalledTimes(1);
+  act(() => player.pause());
+  expect(frames.size).toBe(0);
+  // A late waiting/timeupdate cannot turn a paused element into an active loop.
+  act(() => { source.currentTime = 30; source.dispatchEvent(new Event('waiting')); source.dispatchEvent(new Event('timeupdate')); });
+  expect(source.currentTime).toBe(30);
+  expect(source.paused).toBe(true);
+  expect(play).toHaveBeenCalledTimes(1);
 });
 
 it('setting loop bounds while paused never starts playback, and source replacement clears the old loop', async () => {
@@ -284,6 +320,7 @@ it('changes and resets preview speed without starting a paused player, requests 
     await user.click(screen.getByRole('button', { name: 'Reset speed' }));
     expect(speed).toHaveValue('1');
     expect(source.playbackRate).toBe(1);
+    expect(speed).toHaveFocus();
     act(() => player.speed(2));
     act(() => player.close());
     await act(() => player.play(playable));

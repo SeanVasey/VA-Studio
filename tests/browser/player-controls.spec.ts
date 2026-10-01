@@ -64,6 +64,7 @@ test('section markers loop native preview playback and remain reachable with key
   await page.screenshot({ path: testInfo.outputPath('queue-section-loop.png'), fullPage: false });
   await controls.getByRole('button', { name: 'Clear loop' }).click();
   await expect(controls.getByText('Loop off', { exact: true })).toBeVisible();
+  await expect(controls.getByRole('button', { name: 'Set A here' })).toBeFocused();
   await page.evaluate(() => { window.__nativePreviews[0].currentTime = 12; });
   await expect.poll(() => page.evaluate(() => window.__nativePreviews[0].currentTime)).toBeGreaterThan(12);
   await page.keyboard.press('Escape');
@@ -98,6 +99,7 @@ test('speed changes stay paused until play, survive a native source change and c
   await controls.getByRole('button', { name: 'Reset speed', exact: true }).click();
   await expect(speed).toHaveValue('1');
   expect(await page.evaluate(() => window.__nativePreviews[0].playbackRate)).toBe(1);
+  await expect(speed).toBeFocused();
   await speed.selectOption('0.5');
   await controls.getByRole('button', { name: 'Close queue', exact: true }).click();
   await page.getByRole('button', { name: 'Close player', exact: true }).click();

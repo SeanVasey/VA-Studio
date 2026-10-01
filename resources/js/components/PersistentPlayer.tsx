@@ -10,6 +10,8 @@ export function PersistentPlayer({ tracks, onLicense, purchasingDisabled = false
   const [queueOpen, setQueueOpen] = useState(false);
   const queueId = useId();
   const queueButton = useRef<HTMLButtonElement>(null);
+  const loopStartButton = useRef<HTMLButtonElement>(null);
+  const speedSelect = useRef<HTMLSelectElement>(null);
   useEffect(() => { player.catalog(tracks); }, [tracks]);
   const queue = audio.queue;
   const index = queue.findIndex(track => track.id === audio.track?.id && track.previewUrl === audio.track?.previewUrl);
@@ -28,7 +30,7 @@ export function PersistentPlayer({ tracks, onLicense, purchasingDisabled = false
       <p className="fine-print">{audio.autoNext ? 'The next queued preview plays when this one ends.' : 'Automatic next is off.'} {audio.repeat === 'track' ? 'This track repeats until you stop it.' : audio.repeat === 'queue' ? 'The queue repeats from the start.' : ''}</p>
       <fieldset className="section-loop">
         <legend>Preview speed</legend>
-        <div className="queue-options"><label>Playback speed <select value={audio.rate} onChange={event => player.speed(Number(event.target.value))}>{playbackRates.map(rate => <option key={rate} value={rate}>{rate}×</option>)}</select></label><button type="button" className="text-link" disabled={audio.rate === 1} onClick={() => player.speed(1)}>Reset speed</button></div>
+        <div className="queue-options"><label>Playback speed <select ref={speedSelect} value={audio.rate} onChange={event => player.speed(Number(event.target.value))}>{playbackRates.map(rate => <option key={rate} value={rate}>{rate}×</option>)}</select></label><button type="button" className="text-link" disabled={audio.rate === 1} onClick={() => { player.speed(1); speedSelect.current?.focus(); }}>Reset speed</button></div>
         <p className="fine-print">{audio.pitchPreservation ? 'Pitch preservation is requested from your browser; results can vary.' : 'This browser could not enable pitch preservation; changing speed may change pitch.'}</p>
         {audio.speedError && <p className="playback-error" role="alert">{audio.speedError}</p>}
       </fieldset>
@@ -37,9 +39,9 @@ export function PersistentPlayer({ tracks, onLicense, purchasingDisabled = false
         <p className="fine-print">Seek to a position, then set A and B. Clear the loop to seek outside it.</p>
         <div className="loop-bounds" aria-live="polite"><span>A: {loopTime(audio.loopStart)}</span><span>B: {loopTime(audio.loopEnd)}</span><strong>{audio.loopEnd !== null ? 'Loop on' : 'Loop off'}</strong></div>
         <div className="loop-actions">
-          <button type="button" className="button button-outline button-small" disabled={!audio.duration} onClick={() => player.markLoopStart()}>Set A here</button>
+          <button type="button" ref={loopStartButton} className="button button-outline button-small" disabled={!audio.duration} onClick={() => player.markLoopStart()}>Set A here</button>
           <button type="button" className="button button-outline button-small" disabled={!audio.duration || audio.loopStart === null} onClick={() => player.markLoopEnd()}>Set B here</button>
-          <button type="button" className="text-link" disabled={audio.loopStart === null} onClick={() => player.clearLoop()}>Clear loop</button>
+          <button type="button" className="text-link" disabled={audio.loopStart === null} onClick={() => { player.clearLoop(); loopStartButton.current?.focus(); }}>Clear loop</button>
         </div>
         {audio.loopError && <p className="playback-error" role="alert">{audio.loopError}</p>}
       </fieldset>

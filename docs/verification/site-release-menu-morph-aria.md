@@ -1,6 +1,6 @@
 # Site-release menu ARIA after a Livewire morph
 
-Status: **Production correction and focused regressions prepared; native candidate execution remains pending.** This resolves observed browser failures without dropping the menu's ARIA assertions, introducing retries, increasing timeouts or skipping a journey. It changes no publication, schedule, authorization or content-retention command.
+Status: **The exact production correction passed the four focused native specs in Chromium and WebKit; final PR acceptance remains pending.** This resolves observed browser failures without dropping the menu's ARIA assertions, introducing retries, increasing timeouts or skipping a journey. It changes no publication, schedule, authorization or content-retention command.
 
 ## Retained failure evidence
 
@@ -39,4 +39,8 @@ The editorial test normalizes its copied navigation to exactly four rows through
 - A scratch jsdom check executed the exact production Blade script and passed current/replaced/removed/reinserted nodes, stripped attributes, late attribute-only initialization, initial empty-node discovery, nested ancestor-scope isolation, same-root new-scope replacement and destroy isolation. This verifies observer logic, not browser actionability or an actual Alpine/Livewire journey.
 - The controlled native regression loads the exact production script and covers these same lifecycle boundaries. The earlier helper-readiness fixture stays intact, as do the real content, editorial, schedule and focus journeys.
 
-Before another expensive full database run, execute these four real/controlled specs in a focused native diagnostic on the exact corrected candidate with ordinary application bootstrap and both native projects. Inspect its current-source trace/screenshots and retain its result. Only the required full Foundation run can accept the eventual PR candidate; neither these definitions, jsdom checks nor an informative diagnostic substitute for that gate.
+[Focused native diagnostic run 36815591697](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36815591697) checked out clean commit `1d0c080e43fe23e54a98819b15ebf78bbdffd779`, tree `b7e283ad4bb996f76731f6d75132cfa543821bf0`. Its four menu-related specs executed **11 passing cases and one existing mobile keyboard-focus skip, with zero failures**. All six previously failed editorial/content/schedule journeys passed; both helper-readiness cases and both exact-production-script lifecycle cases passed. The production view, readiness spec and editorial fixture are the same blobs included in this PR correction.
+
+The whole 14-spec diagnostic remained failed: **48 passed, seven failed and one intended skip**. Its failures concern later inquiry/history/player/embed feature work outside PR #88. The downloaded 25,065,606-byte artifact `11141113584` was verified against SHA-256 `b61235194422b4a9fa115a6ad7f868b2e1617f55aadb77f05d8fdad62f137719`; its JUnit census contains all 56 unique project/spec/case identities. This is focused evidence for these unchanged menu source blobs, not whole-run success or PR acceptance.
+
+The focused browser allowlist now also includes the three actual editorial/content/schedule files, increasing PR #88's selection from five to eight files. The standard wrapper, timeouts, failure reporting, source checks and required full Foundation gate remain intact. Complete the final Foundation run on the corrected PR head and independently review that actual source before merging.

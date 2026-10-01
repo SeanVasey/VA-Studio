@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 
 // Real Blade/CSS and native audio/keyboard in a foreign-origin iframe; synthetic audio transport.
 // Backend feature tests separately establish publication, file integrity and withdrawal behavior.
-test('public preview iframe has native controls, no autoplay and a keyboard-accessible store exit', async ({ page, context }, testInfo) => {
+test('public preview iframe has native controls, no autoplay and a keyboard-accessible store exit', async ({ page, context, browserName }, testInfo) => {
   const rendered = spawnSync('php', ['tests/browser/render-public-embed.php'], { encoding: 'utf8', timeout: 30_000 });
   expect(rendered.status, rendered.stderr).toBe(0);
   const unavailable = await page.request.get('/embed/tracks/synthetic-browser-track');
@@ -45,13 +45,27 @@ test('public preview iframe has native controls, no autoplay and a keyboard-acce
   expect(await audio.evaluate(element => (element as HTMLAudioElement).currentTime)).toBe(0);
   await audio.focus();
   await expect(audio).toBeFocused();
-  await audio.press('Space');
+  const toggleNativePlayback = async () => {
+    if (browserName === 'webkit') {
+      // This pinned mobile project's UA controls expose no DOM Play button. Its outer
+      // audio focus ignores Space; tap the visible native left play/pause control.
+      expect(testInfo.project.use.hasTouch).toBe(true);
+      const bounds = await audio.boundingBox();
+      expect(bounds).not.toBeNull();
+      expect(bounds!.width).toBeGreaterThan(48);
+      expect(bounds!.height).toBeGreaterThan(0);
+      await audio.tap({ position: { x: 24, y: bounds!.height / 2 } });
+    } else {
+      await audio.press('Space');
+    }
+  };
+  await toggleNativePlayback();
   await expect.poll(() => requests.length).toBeGreaterThan(0);
   await expect.poll(() => audio.evaluate(element => (element as HTMLAudioElement).paused)).toBe(false);
   await expect.poll(() => audio.evaluate(element => (element as HTMLAudioElement).currentTime)).toBeGreaterThan(0);
   expect(await audio.evaluate(element => element.ownerDocument.documentElement.scrollWidth <= element.ownerDocument.documentElement.clientWidth)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath('public-preview-embed.png'), fullPage: true });
-  await audio.press('Space');
+  await toggleNativePlayback();
   await expect.poll(() => audio.evaluate(element => (element as HTMLAudioElement).paused)).toBe(true);
   const store = frame.getByRole('link', { name: 'Open track on VASEY.AUDIO (new tab)' });
   await store.focus();

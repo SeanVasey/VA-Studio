@@ -42,12 +42,19 @@ test('real customer inquiry persists encrypted and ordinary staff can read and a
     }
     const csrf = await page.locator('meta[name="csrf-token"]').getAttribute('content');
     expect(csrf).toBeTruthy();
+    // The real form prefers the current cookie so another tab can renew a pending inquiry's token.
+    const xsrf = await page.evaluate(() => {
+      const cookie = document.cookie.split(';').map(value => value.trim()).find(value => value.startsWith('XSRF-TOKEN='));
+      return cookie ? decodeURIComponent(cookie.slice('XSRF-TOKEN='.length)) : null;
+    });
+    expect(xsrf).toBeTruthy();
     const submission = page.waitForResponse(response => response.url().endsWith('/contact/inquiries') && response.request().method() === 'POST');
     await page.getByRole('button', { name: 'Send inquiry', exact: true }).click();
     const saved = await submission;
     expect(saved.status()).toBe(201);
     expect(saved.headers()['cache-control']).toContain('no-store');
-    expect(saved.request().headers()['x-csrf-token']).toBe(csrf);
+    expect(await saved.request().headerValue('x-xsrf-token')).toBe(xsrf);
+    expect(await saved.request().headerValue('x-csrf-token')).toBeNull();
     const body = saved.request().postData()!;
     expect(JSON.parse(body)).toEqual({ ...fixture.values, requestKey: expect.stringMatching(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/) });
     const savedBody = await saved.json();
@@ -58,6 +65,17 @@ test('real customer inquiry persists encrypted and ordinary staff can read and a
     await expect(page.getByRole('region', { name: 'Contact inquiry', exact: true }).getByRole('status')).toBeFocused();
     await expect(page.getByText(receipt, { exact: true })).toBeVisible();
     fixtureOperation('verify', testInfo.project.name, receipt, 'new');
+    // API requests have no browser fetch-metadata bypass: missing/invalid tokens must fail before replay.
+    const rejectedHeaders: Record<string, string>[] = [{}, { 'X-XSRF-TOKEN': 'synthetic-invalid-xsrf' }];
+    for (const headers of rejectedHeaders) {
+      const rejected = await page.request.post('/contact/inquiries', { data: body, headers: {
+        'Content-Type': 'application/json', Accept: 'application/json', Origin: 'http://127.0.0.1:8173', ...headers,
+      } });
+      expect(rejected.status()).toBe(419);
+      expect(rejected.headers()['cache-control']).toContain('no-store');
+      expect(await rejected.json()).toEqual({ code: 'INQUIRY_REQUEST_EXPIRED', message: 'Your session expired. Refresh the page before trying again.' });
+      fixtureOperation('verify', testInfo.project.name, receipt, 'new');
+    }
     // A real same-session HTTP replay must retain one receipt and one received audit.
     const replay = await page.request.post('/contact/inquiries', { data: body, headers: {
       'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-TOKEN': csrf!, Origin: 'http://127.0.0.1:8173',

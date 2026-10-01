@@ -34,15 +34,20 @@ function stopLoopWatch() {
   loopFrame = null;
 }
 
+function loopPlaybackActive(element: HTMLAudioElement): boolean {
+  // A native seek can emit waiting without another playing event even while audio advances.
+  return (snapshot.status === 'playing' || snapshot.status === 'loading') && !element.paused && !element.ended;
+}
+
 function enforceLoop(element: HTMLAudioElement): boolean {
-  if (snapshot.status !== 'playing' || !looping() || (element.currentTime < snapshot.loopEnd! && element.currentTime >= snapshot.loopStart!)) return false;
+  if (!loopPlaybackActive(element) || element.seeking || !looping() || (element.currentTime < snapshot.loopEnd! && element.currentTime >= snapshot.loopStart!)) return false;
   element.currentTime = snapshot.loopStart!;
   return true;
 }
 
 function watchLoop() {
   stopLoopWatch();
-  if (!audio || snapshot.status !== 'playing' || !looping() || typeof requestAnimationFrame !== 'function') return;
+  if (!audio || !loopPlaybackActive(audio) || !looping() || typeof requestAnimationFrame !== 'function') return;
   loopFrame = requestAnimationFrame(() => {
     loopFrame = null;
     if (audio && enforceLoop(audio)) update({ currentTime: audio.currentTime });
@@ -69,7 +74,13 @@ function owner(): HTMLAudioElement {
   const element = audio;
   element.addEventListener('playing', () => { if (snapshot.track) { update({ status: 'playing', error: null }); watchLoop(); } });
   element.addEventListener('pause', () => { stopLoopWatch(); if (snapshot.track && !element.ended && snapshot.status !== 'error') update({ status: 'paused' }); });
-  element.addEventListener('waiting', () => { if (snapshot.track) update({ status: 'loading' }); });
+  element.addEventListener('waiting', () => { if (snapshot.track && !element.paused && !element.ended && snapshot.status !== 'error') update({ status: 'loading' }); });
+  element.addEventListener('seeked', () => {
+    if (!snapshot.track) return;
+    enforceLoop(element);
+    update({ currentTime: element.currentTime });
+    watchLoop();
+  });
   element.addEventListener('timeupdate', () => {
     if (!snapshot.track) return;
     enforceLoop(element);
@@ -175,7 +186,7 @@ export const player = {
       return;
     }
     update({ loopEnd: end, loopError: null });
-    if (snapshot.status === 'playing') player.seek(snapshot.loopStart);
+    if (loopPlaybackActive(audio)) player.seek(snapshot.loopStart);
     watchLoop();
   },
   clearLoop() { stopLoopWatch(); update(noLoop); },
