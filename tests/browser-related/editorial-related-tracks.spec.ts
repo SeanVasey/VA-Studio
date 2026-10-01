@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { lstatSync, readFileSync, realpathSync } from 'node:fs';
 import { join } from 'node:path';
@@ -40,11 +39,23 @@ async function persisted(testInfo: TestInfo, manifest: Manifest, state: 'publish
 }
 
 async function props(request: APIRequestContext, path: string) {
-  const version = createHash('md5').update(readFileSync('public/build/manifest.json')).digest('hex');
+  // Bootstrap this route's exact server version; private panel previews legitimately use an empty version.
+  const shell = await request.get(path, { headers: { Accept: 'text/html, application/xhtml+xml' } });
+  expect(shell.status()).toBe(200);
+  const embedded = (await shell.text()).match(/<script\b[^>]*data-page="app"[^>]*>([\s\S]*?)<\/script>/);
+  expect(embedded).not.toBeNull();
+  const bootstrap = JSON.parse(embedded![1]) as { component: string; version: string };
+  expect(bootstrap.component).toBe('Editorial');
+  expect(typeof bootstrap.version).toBe('string');
+  const version = bootstrap.version;
   const inertiaHeaders = { 'X-Inertia': 'true', 'X-Inertia-Version': version, Accept: 'text/html, application/xhtml+xml' };
   const response = await request.get(path, { headers: inertiaHeaders });
   expect(response.status()).toBe(200);
-  return (await response.json()).props as { editorial: { relatedTracks?: Array<{ title: string; artist: string; href?: string }> }; sitePreview?: boolean; commerceEnabled?: boolean };
+  expect(response.headers()['x-inertia']).toBe('true');
+  const payload = await response.json();
+  expect(payload.component).toBe('Editorial');
+  expect(payload.version).toBe(version);
+  return payload.props as { editorial: { relatedTracks?: Array<{ title: string; artist: string; href?: string }> }; sitePreview?: boolean; commerceEnabled?: boolean };
 }
 
 async function activate(page: Page, label: string, action: 'Publish release' | 'Restore previous release') {
@@ -70,6 +81,15 @@ async function addTrack(group: Locator, track: Track) {
   await expect(select).toContainText(track.title);
 }
 
+async function clearTracks(group: Locator) {
+  let remaining = await group.getByRole('combobox').count();
+  while (remaining > 0) {
+    await group.getByRole('button', { name: 'Delete', exact: true }).last().click();
+    await expect(group.getByRole('combobox')).toHaveCount(--remaining);
+  }
+  await expect(group.getByRole('combobox')).toHaveCount(0);
+}
+
 test('ordinary editorial associations preserve private order, current eligibility and first-party destinations', async ({ page, context, playwright }, testInfo) => {
   test.setTimeout(150_000);
   const manifest = loadManifest();
@@ -87,8 +107,10 @@ test('ordinary editorial associations preserve private order, current eligibilit
   const externalRequests: string[] = [];
   const editorialMediaRequests: string[] = [];
   let watchMedia = true;
-  const watch = (target: Page) => {
+  const watch = (target: Page, editorial = false) => {
     target.on('pageerror', error => failures.push(error.message));
+    // The no-provider requirement covers every request from editorial previews/public pages; admin keeps its own shell.
+    if (!editorial) return;
     target.on('request', request => {
       const url = new URL(request.url());
       if (url.origin !== manifest.origin) externalRequests.push(url.origin);
@@ -131,6 +153,9 @@ test('ordinary editorial associations preserve private order, current eligibilit
     await dialog.getByLabel('Video ID', { exact: false }).fill('abcdefghijk');
     const groups = dialog.getByRole('group', { name: 'Related tracks', exact: true });
     await expect(groups).toHaveCount(2);
+    // New drafts copy the active release. Remove any inherited choices through its normal repeater controls.
+    await clearTracks(groups.nth(0));
+    await clearTracks(groups.nth(1));
     await addTrack(groups.nth(0), first);
     await addTrack(groups.nth(0), second);
     const move = groups.nth(0).getByRole('button', { name: 'Move up', exact: true }).nth(1);
@@ -147,7 +172,7 @@ test('ordinary editorial associations preserve private order, current eligibilit
     const denied = await visitor.get(privatePath, { maxRedirects: 0 });
     expect([302, 403]).toContain(denied.status());
     expect(await denied.text()).not.toContain(firstParagraph);
-    const preview = await context.newPage(); watch(preview);
+    const preview = await context.newPage(); watch(preview, true);
     const privateResponse = await preview.goto(privatePath);
     expect(privateResponse?.headers()['cache-control']).toContain('no-store');
     expect(privateResponse?.headers()['x-robots-tag']).toContain('noindex');
@@ -165,7 +190,7 @@ test('ordinary editorial associations preserve private order, current eligibilit
     expect((await props(visitor, `/blog/${slug}`)).editorial.relatedTracks).toEqual(publicLinks);
     expect((await props(visitor, `/videos/${slug}`)).editorial.relatedTracks).toEqual([publicLinks[1]]);
     for (const path of ['/blog', '/videos']) expect((await props(visitor, path)).editorial.relatedTracks).toBeUndefined();
-    const publicPage = await context.newPage(); watch(publicPage);
+    const publicPage = await context.newPage(); watch(publicPage, true);
     await publicPage.goto(`/blog/${slug}`);
     const related = publicPage.getByRole('region', { name: 'Related tracks', exact: true });
     await expect(related.getByRole('link')).toHaveText([second.title, first.title]);

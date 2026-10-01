@@ -4,12 +4,17 @@ namespace Tests\Unit;
 
 use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Media\MediaFailure;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\Models\MediaProcessingRun;
 use App\Domain\Rights\Models\LicenseVersion;
 use App\Domain\Rights\Models\RightsDeclaration;
 use App\Models\User;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use RuntimeException;
@@ -125,6 +130,78 @@ class RelatedTrackBrowserFixtureGuardTest extends TestCase
         $method = new ReflectionMethod(\RelatedTrackBrowserFixture::class, 'elf');
         $this->expectException(RuntimeException::class);
         $method->invoke(null, $this->directory.'/clamscan');
+    }
+
+    public function test_failure_diagnostics_never_print_private_exception_or_tool_content(): void
+    {
+        $secret = 'PRIVATE-CUSTOMER-CONTENT /tmp/private.wav SELECT secret FROM orders';
+        foreach ([new RuntimeException($secret), new \TypeError($secret), new \Exception($secret)] as $error) {
+            $summary = json_decode(\RelatedTrackBrowserFixture::failureSummary($error), true, 8, JSON_THROW_ON_ERROR);
+            $this->assertSame(['phase', 'category', 'code', 'exitStatus', 'fields'], array_keys($summary));
+            $this->assertContains($summary['category'], ['runtime', 'type', 'unexpected']);
+            $this->assertSame('unclassified', $summary['code']);
+            $this->assertNull($summary['exitStatus']);
+            $this->assertSame([], $summary['fields']);
+            $this->assertStringNotContainsString($secret, json_encode($summary, JSON_THROW_ON_ERROR));
+        }
+        foreach (['processor_failed', 'invalid_tag', 'invalid_artwork', $secret] as $code) {
+            $error = new MediaFailure($code, $secret, 2, $secret, $secret);
+            $summary = json_decode(\RelatedTrackBrowserFixture::failureSummary($error), true, 8, JSON_THROW_ON_ERROR);
+            $this->assertSame('media', $summary['category']);
+            $this->assertSame($code === $secret ? 'unclassified' : $code, $summary['code']);
+            $this->assertSame(2, $summary['exitStatus']);
+            $this->assertStringNotContainsString($secret, json_encode($summary, JSON_THROW_ON_ERROR));
+        }
+        foreach ([null, -1, 256] as $exitStatus) {
+            $summary = json_decode(\RelatedTrackBrowserFixture::failureSummary(new MediaFailure('processor_failed', $secret, $exitStatus)), true, 8, JSON_THROW_ON_ERROR);
+            $this->assertNull($summary['exitStatus']);
+        }
+    }
+
+    public function test_validation_diagnostics_print_only_allowlisted_root_field_names(): void
+    {
+        $validator = new Validator(new Translator(new ArrayLoader, 'en'), [], []);
+        $validator->errors()->add('structured_terms.private_customer_content', 'PRIVATE /tmp/customer.wav');
+        $validator->errors()->add('structured_terms.features.0', 'PRIVATE repeated terms');
+        $validator->errors()->add('upload', 'PRIVATE uploaded file');
+        $validator->errors()->add('private_unknown_field', 'PRIVATE unknown value');
+        $summary = json_decode(\RelatedTrackBrowserFixture::failureSummary(new ValidationException($validator)), true, 8, JSON_THROW_ON_ERROR);
+        $this->assertSame('validation', $summary['category']);
+        $this->assertSame('unclassified', $summary['code']);
+        $this->assertSame(['structured_terms', 'upload'], $summary['fields']);
+        foreach (['PRIVATE', 'private_customer_content', '/tmp/', 'features', 'private_unknown_field'] as $private) {
+            $this->assertStringNotContainsString($private, json_encode($summary, JSON_THROW_ON_ERROR));
+        }
+    }
+
+    public function test_retained_media_digest_preserves_fractional_measurements_and_the_complete_proof(): void
+    {
+        $method = new ReflectionMethod(\RelatedTrackBrowserFixture::class, 'mediaEvidenceHash');
+        $proof = ['asset' => ['duration_seconds' => 1.2, 'waveform' => [0.0, 0.125, 0.9375]],
+            'source' => ['sha256' => str_repeat('a', 64)], 'run' => ['evidence' => ['source_scan' => ['status' => 'clean']]]];
+        $hash = $method->invoke(null, $proof);
+        $this->assertMatchesRegularExpression('/\A[a-f0-9]{64}\z/D', $hash);
+        $reordered = ['run' => $proof['run'], 'source' => $proof['source'],
+            'asset' => ['waveform' => $proof['asset']['waveform'], 'duration_seconds' => 1.2]];
+        $this->assertSame($hash, $method->invoke(null, $reordered));
+        foreach ([['asset', 'duration_seconds', 1.21], ['asset', 'waveform', [0.0, 0.126, 0.9375]],
+            ['asset', 'waveform', [0.9375, 0.125, 0.0]], ['source', 'sha256', str_repeat('b', 64)],
+            ['run', 'evidence', ['source_scan' => ['status' => 'unconfirmed']]]] as [$section, $field, $value]) {
+            $changed = $proof;
+            $changed[$section][$field] = $value;
+            $this->assertNotSame($hash, $method->invoke(null, $changed));
+        }
+        $integer = $proof;
+        $integer['asset']['waveform'][0] = 0;
+        $this->assertNotSame($hash, $method->invoke(null, $integer));
+        foreach ([INF, -INF, NAN, new \stdClass] as $invalid) {
+            try {
+                $method->invoke(null, ['invalid' => $invalid]);
+                $this->fail('Non-finite or non-JSON media evidence was accepted.');
+            } catch (\InvalidArgumentException) {
+                $this->addToAssertionCount(1);
+            }
+        }
     }
 
     public function test_missing_duplicated_foreign_subject_and_wrong_actor_audits_are_refused(): void

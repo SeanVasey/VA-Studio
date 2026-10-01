@@ -25,6 +25,19 @@ async function addTags(dialog: Locator, label: string, tags: string[]) {
   await expect(input).toHaveValue('');
 }
 
+async function searchTracks(page: Page, query: string) {
+  const response = page.waitForResponse(response => {
+    if (!response.url().endsWith('/update') || response.request().method() !== 'POST') return false;
+    const payload = response.request().postDataJSON() as { components?: { updates?: Record<string, unknown> }[] };
+    return payload.components?.some(component => component.updates?.tableSearch === query) ?? false;
+  });
+  await page.getByRole('searchbox', { name: 'Search', exact: true }).fill(query);
+  const committed = await response;
+  expect(committed.status()).toBe(200);
+  expect(await committed.finished()).toBeNull();
+  await expect(page.getByText(`Search: ${query}`, { exact: true })).toBeVisible();
+}
+
 async function draft(page: Page, title: string, slug: string, oldTag: string): Promise<Omit<Draft, 'id'>> {
   await page.getByRole('button', { name: 'New track', exact: true }).click();
   const dialog = page.getByRole('dialog');
@@ -36,7 +49,7 @@ async function draft(page: Page, title: string, slug: string, oldTag: string): P
   await dialog.getByRole('button', { name: 'Create', exact: true }).click();
   await expect(heading).toBeHidden();
   // Other ordinary journeys retain their drafts; find this saved track across table pages.
-  await page.getByRole('searchbox', { name: 'Search', exact: true }).fill(title);
+  await searchTracks(page, title);
   await expect(trackRow(page, title)).toBeVisible();
   expect((await page.request.get(`/tracks/${slug}`)).status()).toBe(404);
   return { title, slug, oldTag };
@@ -44,7 +57,8 @@ async function draft(page: Page, title: string, slug: string, oldTag: string): P
 
 async function findPair(page: Page, prefix: string) {
   await page.goto('/admin/tracks');
-  await page.getByRole('searchbox', { name: 'Search', exact: true }).fill(prefix);
+  // These rows can already be present before a debounced search clears selection.
+  await searchTracks(page, prefix);
   await expect(page.getByRole('row').filter({ has: page.getByText(new RegExp(`^${prefix}`)) })).toHaveCount(2);
 }
 
