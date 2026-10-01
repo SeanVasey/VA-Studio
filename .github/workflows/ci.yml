@@ -84,6 +84,7 @@ jobs:
         run: |
           python3 scripts/ci/test-ci-scope.py
           python3 scripts/ci/test-focused-tests.py
+          python3 scripts/ci/test-database-receipts.py
 
   backend-mysql:
     needs: scope
@@ -123,6 +124,8 @@ jobs:
       QUEUE_CONNECTION: sync
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
       - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
         with:
           php-version: '8.4'
@@ -136,10 +139,21 @@ jobs:
       - run: composer install --no-interaction --prefer-dist
       - run: cp .env.example .env
       - run: php artisan key:generate
+      - name: Record source and MySQL runtime before tests
+        env:
+          MYSQL_CONTAINER_ID: ${{ job.services.mysql.id }}
+        run: python3 scripts/ci/database-receipts.py start --engine=mysql --shard=${{ matrix.shard }}
       - name: Prove the complete MySQL test partition
         run: python3 scripts/ci/phpunit-shards.py --shards=4 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json
       - name: Run all tests assigned to this MySQL shard
+        id: database_tests
         run: php vendor/bin/phpunit --configuration=phpunit-ci-mysql-${{ matrix.shard }}.xml --log-junit=phpunit-ci-mysql-${{ matrix.shard }}-results.xml --fail-on-phpunit-warning --display-warnings
+      - name: Verify complete MySQL shard receipt
+        if: always()
+        env:
+          MYSQL_CONTAINER_ID: ${{ job.services.mysql.id }}
+          DATABASE_TEST_OUTCOME: ${{ steps.database_tests.outcome }}
+        run: python3 scripts/ci/database-receipts.py finish --engine=mysql --shard=${{ matrix.shard }}
       - name: Retain partition and test evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -148,6 +162,7 @@ jobs:
           path: phpunit-ci-mysql-*
           retention-days: 7
           if-no-files-found: error
+          overwrite: false
 
   backend-sqlite:
     needs: scope
@@ -170,6 +185,8 @@ jobs:
       QUEUE_CONNECTION: sync
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
       - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
         with:
           php-version: '8.4'
@@ -183,10 +200,18 @@ jobs:
       - run: composer install --no-interaction --prefer-dist
       - run: cp .env.example .env
       - run: php artisan key:generate
+      - name: Record source and SQLite runtime before tests
+        run: python3 scripts/ci/database-receipts.py start --engine=sqlite --shard=${{ matrix.shard }}
       - name: Prove the complete SQLite test partition
         run: python3 scripts/ci/phpunit-shards.py --shards=2 --prefix=phpunit-ci-sqlite --timings=scripts/ci/phpunit-timings-sqlite.json
       - name: Run all tests assigned to this SQLite shard
+        id: database_tests
         run: php vendor/bin/phpunit --configuration=phpunit-ci-sqlite-${{ matrix.shard }}.xml --log-junit=phpunit-ci-sqlite-${{ matrix.shard }}-results.xml --fail-on-phpunit-warning --display-warnings
+      - name: Verify complete SQLite shard receipt
+        if: always()
+        env:
+          DATABASE_TEST_OUTCOME: ${{ steps.database_tests.outcome }}
+        run: python3 scripts/ci/database-receipts.py finish --engine=sqlite --shard=${{ matrix.shard }}
       - name: Retain partition and test evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -195,6 +220,7 @@ jobs:
           path: phpunit-ci-sqlite-*
           retention-days: 7
           if-no-files-found: error
+          overwrite: false
 
   backend:
     # Preserve the required check name and explicitly validate the selected mode.
@@ -203,6 +229,9 @@ jobs:
     needs: [scope, documentation, backend-quality, backend-mysql, backend-sqlite, frontend, operator-browser]
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -211,6 +240,20 @@ jobs:
         env:
           NEEDS_JSON: ${{ toJSON(needs) }}
         run: python3 scripts/ci/ci-scope.py gate
+      - name: Verify all six current-run database receipts without enabling reuse
+        if: needs.scope.outputs.mode == 'full'
+        env:
+          RECEIPT_GITHUB_TOKEN: ${{ github.token }}
+        run: python3 scripts/ci/database-receipts.py collect
+      - name: Retain database collection and full-only shadow decision
+        if: needs.scope.outputs.mode == 'full'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: database-shadow-${{ github.run_id }}-${{ github.run_attempt }}
+          path: phpunit-ci-shadow-receipt.json
+          retention-days: 7
+          if-no-files-found: error
+          overwrite: false
 
   operator-browser:
     needs: scope
