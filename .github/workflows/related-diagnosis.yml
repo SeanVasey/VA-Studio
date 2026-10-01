@@ -1,0 +1,54 @@
+name: Isolated related native diagnosis
+
+on:
+  push:
+    branches: [codex/related-stage-diagnostic-20261001]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: isolated-related-native-diagnosis
+  cancel-in-progress: true
+
+jobs:
+  related-browser:
+    # Keep genuinely ready catalog fixtures separate from the empty-catalog native suite.
+    runs-on: ubuntu-latest
+    # Tool setup and fixture preparation each have their own ten-minute ceiling;
+    # browser installation has previously taken fourteen minutes on hosted runners.
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          coverage: none
+          tools: composer:v2
+      - name: Install genuine scanner and current official signatures on this disposable runner
+        run: bash tests/browser/install-related-scanner.sh
+      - run: composer install --no-interaction --prefer-dist
+      - run: npm ci
+      - name: Verify isolated related-browser startup boundaries
+        run: python3 scripts/ci/test-related-browser-stage.py
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Prepare genuine media and run only the related-track native journeys
+        run: node tests/browser/run-related.mjs
+      - name: Retain genuine related-track browser evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: related-browser-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            playwright-report-related/
+            test-results-related/
+          retention-days: 7
+          if-no-files-found: ignore
