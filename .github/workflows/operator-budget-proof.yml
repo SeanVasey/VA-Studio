@@ -1,0 +1,53 @@
+name: Isolated operator native feedback
+
+on:
+  push:
+    branches: [codex/operator-budget-proof-20261001]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: isolated-operator-native-feedback
+  cancel-in-progress: true
+
+jobs:
+  operator-browser:
+    runs-on: ubuntu-latest
+    # Installing the browsers takes 1 to 4.5 minutes and has taken 14; the tests take 7 to 9.
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          coverage: none
+          tools: composer:v2
+      - name: Install application media fixture prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends ffmpeg util-linux
+          test -x /usr/bin/ffmpeg
+          test -x /usr/bin/ffprobe
+          test -x /usr/bin/prlimit
+      - run: composer install --no-interaction --prefer-dist
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm run test:browser
+      - name: Retain synthetic browser evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: operator-browser-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+          if-no-files-found: ignore
+

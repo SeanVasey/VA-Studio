@@ -45,6 +45,50 @@ final class RelatedTrackBrowserFixture
 
     private const JSON_FLAGS = JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
 
+    private static string $phase = 'invocation';
+
+    /** Fixed diagnostic labels only: exception messages, paths, SQL and tool output never leave the disposable fixture. */
+    public static function failureSummary(Throwable $error): string
+    {
+        $category = match (true) {
+            $error instanceof MediaFailure => 'media',
+            $error instanceof \Illuminate\Validation\ValidationException => 'validation',
+            $error instanceof \Illuminate\Database\QueryException => 'database',
+            $error instanceof \Illuminate\Auth\Access\AuthorizationException => 'authorization',
+            $error instanceof \Illuminate\Database\Eloquent\ModelNotFoundException => 'missing-record',
+            $error instanceof \Symfony\Component\Process\Exception\ExceptionInterface => 'process',
+            $error instanceof TypeError => 'type',
+            $error instanceof Error => 'php-error',
+            $error instanceof RuntimeException => 'runtime',
+            default => 'unexpected',
+        };
+        $code = $error instanceof MediaFailure && in_array($error->failureCode, ['tool_unavailable', 'processor_timeout',
+            'processor_failed', 'processor_output_limit', 'scanner_unavailable', 'scanner_signatures_stale', 'scan_not_clean',
+            'storage_failed', 'invalid_audio', 'unsupported_wav', 'invalid_wav', 'invalid_tag', 'silent_tag', 'duration_mismatch',
+            'invalid_waveform', 'unsupported_source', 'profile_changed', 'source_changed', 'tag_not_configured', 'tag_hash_mismatch',
+            'track_published', 'claim_lost', 'processing_failed', 'unsafe_storage', 'unsafe_path', 'missing_source', 'invalid_size',
+            'unsupported_artwork', 'invalid_artwork'], true) ? $error->failureCode : 'unclassified';
+        $exitStatus = $error instanceof MediaFailure && is_int($error->exitCode) && $error->exitCode >= 0
+            && $error->exitCode <= 255 ? $error->exitCode : null;
+        $fields = [];
+        if ($error instanceof \Illuminate\Validation\ValidationException) {
+            $allowed = ['authored_source', 'structured_terms', 'effective_from', 'effective_until', 'license', 'review_hash',
+                'title', 'slug', 'artist', 'bpm', 'musical_key', 'genre', 'mood', 'tags', 'description', 'upload', 'role',
+                'media', 'offer', 'deliverable_asset_ids', 'currency', 'price_minor', 'rights'];
+            foreach (array_keys($error->errors()) as $field) {
+                $root = explode('.', $field, 2)[0];
+                if (in_array($root, $allowed, true)) {
+                    $fields[] = $root;
+                }
+            }
+            $fields = array_values(array_unique($fields));
+            sort($fields);
+        }
+
+        return json_encode(['phase' => self::$phase, 'category' => $category, 'code' => $code, 'exitStatus' => $exitStatus,
+            'fields' => $fields], self::JSON_FLAGS);
+    }
+
     public static function guard(array $env, array $arguments): array
     {
         $directory = $env['VASEY_BROWSER_DIRECTORY'] ?? null;
@@ -94,11 +138,14 @@ final class RelatedTrackBrowserFixture
 
     public static function execute(array $arguments, array $env): array
     {
+        self::$phase = 'invocation';
         $guard = self::guard($env, $arguments);
+        self::$phase = 'application-bootstrap';
         require_once __DIR__.'/../../vendor/autoload.php';
         $app = require __DIR__.'/../../bootstrap/app.php';
         $kernel = $app->make(Kernel::class);
         $kernel->bootstrap();
+        self::$phase = 'effective-configuration';
         $directory = $guard['directory'];
         self::require($app->environment('local') && config('app.debug') === false && config('app.url') === 'http://127.0.0.1:8173'
             && config('database.default') === 'sqlite' && config('database.connections.sqlite.database') === $directory.'/database.sqlite'
@@ -115,6 +162,7 @@ final class RelatedTrackBrowserFixture
         self::require(User::where('email', 'browser-customer@example.test')->count() === 1, 'bootstrap customer');
 
         if (! $guard['prepare']) {
+            self::$phase = 'retained-evidence-verification';
             self::require(config('media.clamscan') === $directory.'/no-clamscan', 'unchanged HTTP scanner configuration');
             $manifest = self::json($directory.'/related-track-fixtures.json', 262144);
             self::verify($manifest, $guard, $operator, $arguments[1], $arguments[2]);
@@ -123,6 +171,7 @@ final class RelatedTrackBrowserFixture
                 'retainedEvidence' => true, 'currentEligibility' => true];
         }
 
+        self::$phase = 'source-and-bootstrap-census';
         $sourceIdentity = self::source(); // Fail on an untracked or dirty helper before scans, scratch writes or domain commands.
         self::require(get_class(app(MalwareScanner::class)) === MalwareScanner::class
             && get_class(app(BoundedMediaProcess::class)) === BoundedMediaProcess::class
@@ -135,6 +184,7 @@ final class RelatedTrackBrowserFixture
                 self::require($track->title === ($fixture[$kind]['title'] ?? null) && $track->status === 'draft', 'bootstrap track identity');
             }
         }
+        self::$phase = 'scanner-and-tool-integrity';
         $scanner = self::scannerIdentity();
         $tools = [];
         foreach (['ffmpeg', 'ffprobe', 'prlimit'] as $tool) {
@@ -142,6 +192,7 @@ final class RelatedTrackBrowserFixture
         }
         $input = $directory.'/related-track-inputs';
         self::require(! file_exists($input) && ! is_link($input) && mkdir($input, 0700), 'exclusive input directory');
+        self::$phase = 'genuine-detection-canary';
         $eicar = $input.'/detection-canary.txt';
         // Assemble the public antivirus canary only inside this disposable private directory, never as a committed test file.
         self::writeExclusive($eicar, 'X5O!P%@AP[4\\PZX54(P^)7CC)7}$'.'EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*');
@@ -153,14 +204,17 @@ final class RelatedTrackBrowserFixture
         } finally {
             unlink($eicar);
         }
+        self::$phase = 'scanner-version';
         $runner = app(BoundedMediaProcess::class);
         $scanner['version'] = trim($runner->run(['/usr/bin/clamscan', '--version'], $input, 15));
         self::require(preg_match('~\AClamAV [^/\r\n]+/[0-9]+/[^\r\n]+\z~D', $scanner['version']) === 1, 'genuine scanner version');
+        self::$phase = 'synthetic-tag-generation';
         $tagDirectory = $directory.'/app/private/approved-tags';
         self::require(! file_exists($tagDirectory) && ! is_link($tagDirectory) && mkdir($tagDirectory, 0700), 'exclusive synthetic tag');
         $tag = $tagDirectory.'/related-native.wav';
         self::tone($tag, 0.2, 1800, $input);
         config(['media.tag_path' => 'approved-tags/related-native.wav', 'media.tag_sha256' => hash_file('sha256', $tag)]);
+        self::$phase = 'independent-console-reviewer';
         $counts = self::counts();
         self::require($counts === ['orders' => 0, 'license_grants' => 0, 'stripe_webhook_receipts' => 0], 'empty commerce');
         $auditStart = (int) (AuditEvent::max('id') ?? 0);
@@ -172,14 +226,18 @@ final class RelatedTrackBrowserFixture
         $reviewer = User::where('email', 'browser-related-reviewer@example.test')->sole();
         self::require($reviewer->id !== $operator->id && Gate::forUser($reviewer)->allows('administer-catalog')
             && AdminMultiFactor::satisfiedBy($reviewer), 'independent reviewer authority');
+        self::$phase = 'license-draft';
         $template = LicenseTemplate::create(['name' => 'NONBINDING RELATED NATIVE FIXTURE', 'slug' => 'synthetic-related-native', 'type' => 'non-exclusive']);
         $license = app(CreateLicenseDraft::class)->handle($template, [
             'authored_source' => 'NONBINDING SYNTHETIC NATIVE FIXTURE. No real rights, price or payment obligation.',
             'structured_terms' => ['schema_version' => 1, 'features' => ['NONBINDING synthetic WAV fixture only'], 'required_asset_roles' => ['master_wav']],
         ], $operator);
+        self::$phase = 'license-review-submission';
         $submitted = app(ReviewLicense::class)->submit($license, $operator);
+        self::$phase = 'independent-license-approval';
         $approved = app(ReviewLicense::class)->approve($submitted, $reviewer, ['approval_reference' => 'SYNTHETIC-RELATED-NATIVE-ONLY',
             'review_hash' => $submitted->submission_hash, 'summary_consistency_confirmed' => true]);
+        self::$phase = 'license-publication';
         $license = app(PublishLicense::class)->handle($approved, $operator);
         self::require(app(VerifiedLicense::class)->available($license), 'published reviewed fixture license');
         $path = $directory.'/related-track-fixtures.json';
@@ -191,14 +249,17 @@ final class RelatedTrackBrowserFixture
             foreach (self::PROJECTS as $project) {
                 $projects[$project] = ['tracks' => []];
                 foreach ([0, 1] as $position) {
+                    self::$phase = 'track-metadata';
                     $title = $position === 0 ? str_pad('SyntheticRelated'.str_replace('-', '', $project), 255, 'W')
                         : 'Synthetic related second track '.$project;
                     $track = app(SaveTrackMetadata::class)->handle(null, ['title' => $title, 'slug' => 'related-'.$project.'-'.($position + 1),
                         'artist' => 'Synthetic native fixture', 'genre' => 'Synthetic fixture', 'bpm' => 90, 'musical_key' => 'C minor'], $operator);
+                    self::$phase = 'rights-declaration';
                     $rights = RightsDeclaration::create(['track_id' => $track->id, 'status' => 'pending',
                         'provenance_reference' => 'SYNTHETIC-NATIVE-GENERATED-'.strtoupper($project).'-'.$position,
                         'sample_disclosure' => 'NONBINDING generated tone and generated pixels; no imported sample or production clearance.']);
                     app(VerifyRightsDeclaration::class)->handle($rights, $operator);
+                    self::$phase = 'synthetic-track-media-generation';
                     $wav = $input.'/'.$project.'-'.$position.'.wav';
                     self::tone($wav, 1.2, 440 + count($records) * 80, $input);
                     $png = $input.'/'.$project.'-'.$position.'.png';
@@ -208,8 +269,10 @@ final class RelatedTrackBrowserFixture
                     self::require(imagepng($image, $png) && chmod($png, 0600), 'synthetic artwork');
                     imagedestroy($image);
                     foreach (['master_wav' => $wav, 'artwork' => $png] as $role => $file) {
+                        self::$phase = $role === 'master_wav' ? 'master-intake' : 'artwork-intake';
                         // PHP's upload-origin flag is a CLI adapter for these exclusively generated temporary inputs, not a scanner double.
                         $source = app(IngestMediaUpload::class)->handle($track, new UploadedFile($file, basename($file), null, UPLOAD_ERR_OK, true), $role, $operator);
+                        self::$phase = $role === 'master_wav' ? 'master-processing' : 'artwork-processing';
                         $run = app(QueueMediaProcessing::class)->handle($source, $operator)->fresh();
                         self::require($run->status === 'completed', 'ordinary synchronous processing');
                         foreach ([$run->evidence['source_scan'] ?? null, ...($role === 'master_wav' ? [$run->evidence['tag_scan'] ?? null] : [])] as $scan) {
@@ -217,10 +280,13 @@ final class RelatedTrackBrowserFixture
                                 && ($scan['version'] ?? null) === $scanner['version'], 'genuine persisted scan');
                         }
                     }
+                    self::$phase = 'offer-draft';
                     $master = $track->assets()->where('role', 'master_wav')->where('status', 'ready')->sole();
                     $offer = app(SaveOfferDraft::class)->handle(null, ['track_id' => $track->id, 'license_version_id' => $license->id,
                         'price_minor' => 1, 'currency' => 'USD', 'deliverable_asset_ids' => [$master->id]], $operator);
+                    self::$phase = 'offer-publication';
                     $revision = app(PublishOffer::class)->handle($offer, $operator);
+                    self::$phase = 'track-publication';
                     $track = app(PublishTrack::class)->handle($track, $operator)->fresh();
                     self::require(app(PublicationReadiness::class)->blockers($track) === [] && app(SelectionInventory::class)->available($revision->id), 'current public readiness');
                     $summary = ['id' => $track->id, 'title' => $track->title, 'artist' => $track->artist, 'slug' => $track->slug,
@@ -228,9 +294,11 @@ final class RelatedTrackBrowserFixture
                     self::require($track->published_slug === $track->slug && app(PublicCatalog::class)->relatedLinks([$track->id])
                         === [array_intersect_key($summary, array_flip(['title', 'artist', 'href']))], 'current eligible projection');
                     $projects[$project]['tracks'][] = $summary;
+                    self::$phase = 'retained-track-graph';
                     $records[] = self::trackEvidence($track);
                 }
             }
+            self::$phase = 'final-evidence-verification';
             self::require(self::scannerIdentity() === array_diff_key($scanner, ['version' => true]), 'unchanged genuine signatures');
             self::require(self::source() === $sourceIdentity, 'unchanged preparation source');
             $evidence = ['source' => $sourceIdentity, 'initialCounts' => $counts, 'operatorId' => $operator->id, 'reviewerId' => $reviewer->id,
@@ -318,7 +386,7 @@ final class RelatedTrackBrowserFixture
                 self::require($proof !== null && app(VerifiedMedia::class)->available($asset)
                     && ($run->evidence['source_scan']['engine'] ?? null) === 'clamav', 'intact genuinely verified output');
                 $outputs[] = ['id' => $asset->id, 'role' => $asset->role, 'sha256' => $asset->sha256,
-                    'sizeBytes' => (int) $asset->size_bytes, 'verifiedEvidenceHash' => CanonicalJson::hash($proof)];
+                    'sizeBytes' => (int) $asset->size_bytes, 'verifiedEvidenceHash' => self::mediaEvidenceHash($proof)];
             }
             $sources[] = ['id' => $source->id, 'role' => $source->role, 'sha256' => $source->sha256, 'sizeBytes' => (int) $source->size_bytes,
                 'runId' => $run->id, 'profileFingerprint' => $run->profile_fingerprint, 'evidenceHash' => CanonicalJson::hash($run->evidence), 'outputs' => $outputs];
@@ -336,6 +404,32 @@ final class RelatedTrackBrowserFixture
 
         return ['id' => $license->id, 'templateId' => $license->license_template_id, 'submissionHash' => $license->submission_hash,
             'sourceHash' => $license->source_hash, 'modelHash' => $license->model_hash, 'reviewId' => $review->id, 'evidenceHash' => $review->evidence_hash];
+    }
+
+    /** Fixture-only digest of the complete media proof, including measured fractional durations and waveform peaks. */
+    private static function mediaEvidenceHash(array $proof): string
+    {
+        $normalize = function (mixed $value) use (&$normalize): mixed {
+            if (is_array($value)) {
+                if (array_is_list($value)) {
+                    return array_map($normalize, $value);
+                }
+                ksort($value, SORT_STRING);
+                $object = new stdClass;
+                foreach ($value as $key => $item) {
+                    $object->{(string) $key} = $normalize($item);
+                }
+
+                return $object;
+            }
+            if (is_null($value) || is_bool($value) || is_int($value) || is_string($value)
+                || (is_float($value) && is_finite($value))) {
+                return $value;
+            }
+            throw new InvalidArgumentException('Media fixture proof must contain only finite JSON values.');
+        };
+
+        return hash('sha256', json_encode($normalize($proof), self::JSON_FLAGS | JSON_PRESERVE_ZERO_FRACTION));
     }
 
     private static function audits(iterable $events): array
@@ -489,6 +583,7 @@ if (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') === __FILE__) {
         $result = RelatedTrackBrowserFixture::execute(array_slice($argv, 1), getenv());
         echo json_encode($result, JSON_THROW_ON_ERROR)."\n";
     } catch (Throwable $error) {
+        fwrite(STDERR, 'Related-track fixture diagnostic: '.RelatedTrackBrowserFixture::failureSummary($error)."\n");
         if ($error instanceof RuntimeException && str_starts_with($error->getMessage(), 'Related-track fixture refused: ')) {
             fwrite(STDERR, $error->getMessage()."\n"); // Only fixed check labels, never arbitrary domain/tool output.
         }
