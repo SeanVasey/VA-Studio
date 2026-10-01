@@ -19,17 +19,21 @@ use App\Domain\Commerce\Payments\StripePaymentGateway;
 use App\Domain\Commerce\Payments\VerifyTestPayment;
 use App\Domain\Commerce\PriceQuote;
 use App\Domain\Commerce\QuoteException;
+use App\Domain\Media\MediaFailure;
 use App\Domain\Rights\Models\RightsDeclaration;
 use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
 use App\Support\Audit\AuditEvent;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Tests\Support\CheckoutFixtures;
 use Tests\Support\FinalizationFixtures;
 use Tests\Support\LicenseFixtures;
@@ -37,6 +41,10 @@ use Tests\Support\MediaFixtures;
 use Tests\Support\PaymentFixtures;
 
 // CLI-only proof fixtures: no route invokes this file, no existing installation/database is reset.
+// Diagnostic-only static stages/classes/tool booleans; never exception messages, identities or private paths.
+$diagnosticPhase = 'raw_guards';
+$diagnosticTrusted = false;
+$diagnosticTools = null;
 try {
     $directory = getenv('VASEY_BROWSER_DIRECTORY');
     $marker = getenv('VASEY_BROWSER_EXCEPTION_MARKER');
@@ -64,6 +72,7 @@ try {
         || count($argv) !== ($mode === 'verify' ? 4 : 3) || ($mode === 'verify' && ! in_array($phase, ['first', 'reopened', 'attention', 'withdrawn', 'restored'], true))) {
         throw new RuntimeException('Not an isolated exception-inspection browser run.');
     }
+    $diagnosticPhase = 'storage_guard';
     foreach (['framework/views', 'framework/sessions', 'framework/cache/data', 'logs', 'app/private'] as $child) {
         if (is_link($directory.'/'.$child) || realpath($directory.'/'.$child) !== $directory.'/'.$child) {
             throw new RuntimeException('Unsafe temporary storage path.');
@@ -74,6 +83,7 @@ try {
             throw new RuntimeException('Missing fixture identity.');
         }
     }
+    $diagnosticPhase = 'marker_identity';
     $fixtures = json_decode(file_get_contents($directory.'/fixtures.json'), true, 16, JSON_THROW_ON_ERROR);
     $identity = json_decode(file_get_contents($directory.'/exception-inspection-fixture-marker.json'), true, 8, JSON_THROW_ON_ERROR);
     if (! is_array($fixtures) || array_keys($fixtures) !== ['chromium-desktop', 'webkit-mobile']
@@ -81,10 +91,12 @@ try {
             'origin' => 'http://127.0.0.1:8173', 'baseOperatorId' => 1, 'account' => 'acct_SYNTHETICONLY']) {
         throw new RuntimeException('Fixture identity mismatch.');
     }
+    $diagnosticPhase = 'bootstrap';
     require __DIR__.'/../../vendor/autoload.php';
     $app = require __DIR__.'/../../bootstrap/app.php';
     $kernel = $app->make(Kernel::class);
     $kernel->bootstrap();
+    $diagnosticPhase = 'effective_config';
     if (! $app->environment('local') || config('app.url') !== 'http://127.0.0.1:8173' || config('app.debug') !== false
         || config('database.default') !== 'sqlite' || config('database.connections.sqlite.database') !== $directory.'/database.sqlite'
         || ! in_array(config('database.connections.sqlite.url'), [null, ''], true)
@@ -99,16 +111,22 @@ try {
         || config('payments.stripe.processing_enabled') !== false || config('payments.stripe.finalization_enabled') !== false || config('payments.stripe.webhook_enabled') !== false) {
         throw new RuntimeException('Effective paths or disabled payment configuration do not match.');
     }
+    $diagnosticPhase = 'database_attachment';
     $databases = DB::select('PRAGMA database_list');
     if (collect($databases)->firstWhere('name', 'main')?->file !== $directory.'/database.sqlite'
         || collect($databases)->contains(fn ($db): bool => ! in_array($db->name, ['main', 'temp'], true))) {
         throw new RuntimeException('Unexpected database attachment.');
     }
+    $diagnosticPhase = 'shared_operator_authority';
     $baseOperator = User::findOrFail(1);
     if ($baseOperator->name !== 'Synthetic Browser Operator' || $baseOperator->email !== 'browser-operator@example.test'
         || ! Gate::forUser($baseOperator)->allows('administer-catalog') || ! AdminMultiFactor::satisfiedBy($baseOperator)) {
         throw new RuntimeException('Base operator does not match.');
     }
+    $diagnosticTrusted = true;
+    $diagnosticTools = array_map(fn ($key): bool => is_string(config($key)) && is_executable(config($key)),
+        ['ffmpeg' => 'media.ffmpeg', 'ffprobe' => 'media.ffprobe', 'prlimit' => 'media.prlimit']);
+    $diagnosticPhase = 'metadata_guard';
     $path = $directory.'/exception-inspection-'.$project.'.json';
     if (is_link($path)) {
         throw new RuntimeException('Unsafe fixture metadata path.');
@@ -118,14 +136,18 @@ try {
         if (file_exists($path)) {
             throw new RuntimeException('Exception fixture already prepared.');
         }
+        $diagnosticPhase = 'evidence_snapshot';
         $beforeRows = financialRows();
         $triggerHash = triggerHash();
+        $diagnosticPhase = 'provision_inspector';
         $operator = provision($kernel, 'Synthetic exception inspector '.$project, 'exception-inspector-'.$project.'@example.test', $password);
+        $diagnosticPhase = 'provision_reviewer';
         $reviewer = provision($kernel, 'Synthetic exception reviewer '.$project, 'exception-reviewer-'.$project.'@example.test', $password);
         $records = [];
         try {
             // Only this guarded CLI process enters testing for the existing nonbinding media/provider fixtures.
             $app->detectEnvironment(fn () => 'testing');
+            $diagnosticPhase = 'configure_fixture_policies';
             FinalizationFixtures::configure();
             foreach (['verified', 'attention'] as $case) {
                 $records[$case] = prepareRecord($project, $case, $marker, $baseOperator, $reviewer);
@@ -135,10 +157,12 @@ try {
             CarbonImmutable::setTestNow();
             $app->detectEnvironment(fn () => 'local');
         }
+        $diagnosticPhase = 'synthetic_corruption';
         corruptOnlyDesignatedHash($records['attention']);
         if (triggerHash() !== $triggerHash) {
             throw new RuntimeException('A guard definition changed.');
         }
+        $diagnosticPhase = 'preserve_preexisting_evidence';
         $afterRows = financialRows();
         foreach ($beforeRows as $table => $rows) {
             foreach ($rows as $id => $row) {
@@ -152,6 +176,7 @@ try {
             'operatorVerifiedAt' => $operator->getRawOriginal('email_verified_at'), 'operatorAdmin' => true,
             'records' => $records, 'financialHash' => hash('sha256', json_encode($afterRows, JSON_THROW_ON_ERROR)), 'triggerHash' => $triggerHash,
             'state' => 'prepared', 'auditCounts' => ['verified' => 0, 'attention' => 0]];
+        $diagnosticPhase = 'retain_fixture';
         writeFixture($path, $fixture, true);
         echo json_encode(['operatorEmail' => $operator->email, 'verifiedId' => $records['verified']['publicId'],
             'attentionId' => $records['attention']['publicId'], 'orderId' => $records['verified']['orderPublicId'],
@@ -215,8 +240,25 @@ try {
             echo json_encode(['phase' => $phase, 'inspectionAudits' => $counts, 'evidenceUnchanged' => true, 'guardsRestored' => true], JSON_THROW_ON_ERROR)."\n";
         }
     }
-} catch (Throwable) {
+} catch (Throwable $error) {
     fwrite(STDERR, "Isolated exception-inspection fixture operation failed; no private details are printed.\n");
+    if ($diagnosticTrusted) {
+        $classification = match (true) {
+            $error instanceof ProcessFailedException => 'ProcessFailedException',
+            $error instanceof MediaFailure => 'MediaFailure',
+            $error instanceof QuoteException => 'QuoteException',
+            $error instanceof QueryException => 'QueryException',
+            $error instanceof AuthorizationException => 'AuthorizationException',
+            $error instanceof TypeError => 'TypeError',
+            $error instanceof ErrorException => 'ErrorException',
+            $error instanceof LogicException => 'LogicException',
+            $error instanceof RuntimeException => 'RuntimeException',
+            default => 'Throwable',
+        };
+        fwrite(STDERR, json_encode(['diagnostic' => 'fixture-phase-only', 'phase' => $diagnosticPhase,
+            'exceptionClass' => $classification, 'trustedIsolation' => true,
+            'toolAvailability' => $diagnosticTools], JSON_THROW_ON_ERROR)."\n");
+    }
     exit(1);
 }
 
@@ -237,32 +279,47 @@ function provision(Kernel $kernel, string $name, string $email, string $password
 
 function prepareRecord(string $project, string $case, string $marker, User $actor, User $reviewer): array
 {
+    global $diagnosticPhase;
     $suffix = str_replace('-', '', $project).$case.substr($marker, 0, 12);
+    $diagnosticPhase = 'prepare_track';
     $track = app(SaveTrackMetadata::class)->handle(null, ['title' => 'Synthetic exception '.$project.' '.$case,
         'slug' => 'synthetic-exception-'.$project.'-'.$case.'-'.substr($marker, 0, 12), 'artist' => 'Synthetic test only', 'bpm' => 90, 'musical_key' => 'C minor', 'genre' => 'Test'], $actor);
+    $diagnosticPhase = 'synthetic_rights';
     RightsDeclaration::create(['track_id' => $track->id, 'provenance_reference' => 'SYNTHETIC-BROWSER-EXCEPTION',
         'sample_disclosure' => 'Nonbinding synthetic fixture', 'status' => 'verified', 'verified_by' => $actor->id, 'verified_at' => now()]);
+    $diagnosticPhase = 'prepare_media';
     $media = MediaFixtures::readyTrackMedia($track, $actor);
+    $diagnosticPhase = 'publish_license';
     $license = LicenseFixtures::published($actor, $reviewer);
+    $diagnosticPhase = 'prepare_offer';
     $offer = app(SaveOfferDraft::class)->handle(null, ['track_id' => $track->id, 'license_version_id' => $license->id,
         'price_minor' => 4999, 'currency' => 'USD', 'deliverable_asset_ids' => [$media['master_wav']->id]], $actor);
+    $diagnosticPhase = 'publish_offer';
     $revision = app(PublishOffer::class)->handle($offer, $actor);
+    $diagnosticPhase = 'publish_track';
     $track = app(PublishTrack::class)->handle($track, $actor);
     try {
+        $diagnosticPhase = 'link_scope';
         $inventory = app(ManageRightsScope::class);
         $scope = $inventory->register('synthetic-browser-'.$suffix, 'SYNTHETIC-BROWSER-ONLY', $actor);
         $inventory->link($scope->id, $revision->id, 'SYNTHETIC-BROWSER-ONLY', $actor);
         $owner = hash_hmac('sha256', $suffix, $marker);
+        $diagnosticPhase = 'create_quote';
         $quote = app(CreateQuote::class)->handle($owner, (string) Str::uuid(), [['trackId' => $track->id, 'offerId' => $offer->id,
             'licenseVersionId' => $license->id, 'offerRevisionId' => $revision->id]]);
+        $diagnosticPhase = 'price_quote';
         app(PriceQuote::class)->create($quote->public_id, $owner);
+        $diagnosticPhase = 'review_order';
         $review = app(ReviewOrder::class)->handle($quote->public_id, $owner);
         $buyer = ['legalName' => 'Synthetic private exception buyer '.$project.' '.$case, 'email' => 'exception-buyer-'.$project.'-'.$case.'@example.test'];
+        $diagnosticPhase = 'prepare_order';
         $order = app(PrepareOrder::class)->handle($owner, (string) Str::uuid(), ['quoteId' => $quote->public_id, 'reviewHash' => $review['reviewHash'], 'buyer' => $buyer, 'accepted' => true]);
+        $diagnosticPhase = 'synthetic_gateway';
         $gateway = PaymentFixtures::gateway();
         $gateway->onCreate = fn (array $params): array => CheckoutFixtures::session($params, 'cs_test_BROWSER'.$suffix);
         app()->instance(StripeCheckoutGateway::class, $gateway);
         app()->instance(StripePaymentGateway::class, $gateway);
+        $diagnosticPhase = 'hosted_checkout';
         app(HostedCheckout::class)->start($order->public_id, $owner);
         $gateway->session['status'] = 'complete';
         $gateway->session['payment_status'] = 'paid';
@@ -274,14 +331,17 @@ function prepareRecord(string $project, string $case, string $marker, User $acto
         $cutoff = $order->attempt()->sole()->expires_at;
         Carbon::setTestNow($cutoff);
         CarbonImmutable::setTestNow($cutoff);
+        $diagnosticPhase = 'verify_test_payment';
         if (app(VerifyTestPayment::class)->reconcile($intent) !== 'awaiting_finalization') {
             throw new RuntimeException('Synthetic confirmation failed.');
         }
         $payment = VerifiedPayment::where('order_id', $order->id)->sole();
+        $diagnosticPhase = 'finalize_exception';
         if (app(FinalizeTestPayment::class)->handle($payment->id) !== 'paid_exception') {
             throw new RuntimeException('Synthetic exception failed.');
         }
         $finalization = OrderFinalization::where('order_id', $order->id)->sole();
+        $diagnosticPhase = 'verify_historical_graph';
         app(ReadOrder::class)->verify($order);
 
         return ['id' => $finalization->id, 'publicId' => $finalization->public_id, 'orderId' => $order->id, 'orderPublicId' => $order->public_id,
