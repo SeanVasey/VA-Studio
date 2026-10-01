@@ -2,6 +2,8 @@
 
 This October 1, 2026 candidate continues the [remaining development plan](../remaining-development-plan.md) after the first CI/media increment in PR #88. It preserves the single-seller scope: Sean administers his content; listeners and buyers use the public store. It is under integrated verification, not a production launch or completion of the parent work packages.
 
+The resumed composition includes [ordered editorial related-track links](editorial-related-tracks.md), their [separate genuine-scanner native stage](related-track-native-stage.md), and [current-run database receipts](ci-database-receipts.md). It fixes the initial PR #89 run's strict MySQL JSON member-order assertion and mobile bulk-draft page lookup without changing application behavior. The receipt collector additionally binds every case to its authoritative source file. Independent source reviews and fresh Python safeguards are complete; new hosted acceptance on the whole composition is still required. Historical component runs below are retained as component evidence, not a pass for this successor.
+
 ## Implemented children
 
 | Parent | Implemented behavior | Evidence and remaining boundary |

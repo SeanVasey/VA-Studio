@@ -25,6 +25,7 @@ PHP_TARGETS = {
         "tests/Unit/AllocateDiscountTest.php", "tests/Unit/CommerceGuardBytesTest.php", "tests/Unit/ContractTextTest.php",
         "tests/Unit/EconomicLicenseTermsTest.php", "tests/Unit/FileUploadPathGuardTest.php",
         "tests/Unit/MediaEvidenceValuesTest.php", "tests/Unit/MinorUnitsTest.php",
+        "tests/Unit/RelatedTrackBrowserFixtureGuardTest.php",
         "tests/Unit/PricingPolicyTest.php", "tests/Unit/PromotionPolicyTest.php",
         "tests/Unit/ScopedLicenseTermsTest.php", "tests/Unit/SiteImageGuardBytesTest.php",
         "tests/Unit/StripeCheckoutGatewayTest.php", "tests/Unit/StripePaymentGatewayTest.php",
@@ -55,6 +56,10 @@ PHP_TARGETS = {
         "tests/Feature/PublicTrackEmbedTest.php", "tests/Feature/PublicTrackEmbedRouteCacheTest.php",
         "tests/Feature/SiteEditorialHttpTest.php", "tests/Feature/SiteEditorialContentTest.php",
         "tests/Feature/PublicLicenseDisclosureTest.php", "tests/Feature/SiteContentUnavailableHttpTest.php",
+        "tests/Feature/PublicCatalogRelatedLinksTest.php", "tests/Feature/SiteRelatedTrackContentTest.php",
+        "tests/Feature/SiteRelatedTrackDamageTest.php", "tests/Feature/SiteRelatedTrackEditorTest.php",
+        "tests/Feature/SiteRelatedTrackHttpTest.php", "tests/Feature/SiteRelatedTrackImageMigrationTest.php",
+        "tests/Feature/SiteContentConcurrencyTest.php",
     ),
     "operator": (
         "tests/Feature/FoundationTest.php", "tests/Feature/OperatorSetupTest.php",
@@ -75,6 +80,7 @@ FRONTEND_TARGETS = (
     "tests/frontend/track-detail.test.tsx",
     "tests/frontend/editorial-video.test.tsx", "tests/frontend/owned-order-history.test.tsx",
     "tests/frontend/contact-inquiry.test.tsx",
+    "tests/frontend/editorial-related-tracks.test.tsx",
 )
 BROWSER_TARGETS = (
     "tests/browser/storefront.spec.ts", "tests/browser/operator.spec.ts",

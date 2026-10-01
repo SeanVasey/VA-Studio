@@ -66,6 +66,16 @@ class SelectionTests(unittest.TestCase):
                 focused.selection({"FOCUSED_SUITE": suite, "FOCUSED_ENGINE": "mysql"})
         self.assertEqual(focused.selection({"FOCUSED_SUITE": "frontend", "FOCUSED_ENGINE": "sqlite"}).engine, "none")
 
+    def test_related_source_is_covered_without_putting_ready_fixtures_in_the_default_browser_set(self):
+        for target in ("tests/Feature/PublicCatalogRelatedLinksTest.php", "tests/Feature/SiteRelatedTrackContentTest.php",
+                       "tests/Feature/SiteRelatedTrackDamageTest.php", "tests/Feature/SiteRelatedTrackEditorTest.php",
+                       "tests/Feature/SiteRelatedTrackHttpTest.php", "tests/Feature/SiteRelatedTrackImageMigrationTest.php",
+                       "tests/Feature/SiteContentConcurrencyTest.php"):
+            self.assertIn(target, focused.PHP_TARGETS["seller"])
+        self.assertIn("tests/Unit/RelatedTrackBrowserFixtureGuardTest.php", focused.PHP_TARGETS["unit"])
+        self.assertIn("tests/frontend/editorial-related-tracks.test.tsx", focused.FRONTEND_TARGETS)
+        self.assertFalse(any("related" in target for target in focused.BROWSER_TARGETS))
+
     def test_missing_and_escaping_targets_cannot_silently_reduce_selection(self):
         with tempfile.TemporaryDirectory() as temp, tempfile.TemporaryDirectory() as external:
             root = Path(temp)

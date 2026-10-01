@@ -4,6 +4,8 @@ Status: execution plan prepared September 30, 2026 (America/Chicago), against ma
 
 Sean requested a firm plan for the remaining code and design, with fewer repeated full CI/MySQL runs. The execution baseline is **40 tracked completion deliverables across 11 workstreams** in [the task register](remaining-development-tasks.csv). These are outcome groups, not 40 equally sized tasks or a promise of 40 PRs. Larger product/state-machine groups need several reviewable increments. The existing 14 work-package issues retain their acceptance criteria.
 
+October 1 resume: PR #89 remains under verification after its initial full-run assertion/pagination failures. The independently reviewed corrections are composed with the prepared T16 ordered editorial links and T01 exact database receipts for one new complete acceptance run. The dedicated related-browser job uses genuine scanner evidence and an isolated catalog; it is required by the full aggregate. This is implementation progress, not acceptance of either parent task. See the [resumed ordered record](development-order.md).
+
 ## Product boundary — explicit owner clarification
 
 Sean clarified on September 30, 2026: this is a personal-use replacement for his BeatStars tooling, so he can upload, publish, share, license and sell **his own content** to front-end listeners and customers. It is a **single-seller VASEY.AUDIO store**, not a competing marketplace or a SaaS product for independent sellers. This confirms and strengthens the existing D-07 house-store architecture.

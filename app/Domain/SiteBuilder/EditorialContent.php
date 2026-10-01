@@ -2,6 +2,8 @@
 
 namespace App\Domain\SiteBuilder;
 
+use App\Domain\Catalog\PublicCatalog;
+
 /** Route projections accept one already verified release, never a second pointer read. */
 final class EditorialContent
 {
@@ -17,9 +19,9 @@ final class EditorialContent
         ]));
     }
 
-    public function page(array $verifiedContent, string $section, ?string $slug = null): ?array
+    public function page(array $verifiedContent, string $section, ?string $slug = null, bool $includeRelatedHref = true): ?array
     {
-        if (! in_array($verifiedContent['schema_version'] ?? null, [2, 3], true)
+        if (! in_array($verifiedContent['schema_version'] ?? null, [2, 3, 4], true)
             || ! in_array($section, ['about', 'contact', 'blog', 'videos'], true)
             || ($verifiedContent[$section] ?? null) === null) {
             return null;
@@ -68,6 +70,10 @@ final class EditorialContent
                     ? 'https://www.youtube.com/watch?v='.$entry['video_id']
                     : 'https://vimeo.com/'.$entry['video_id'],
             ];
+        }
+
+        if ($entry !== null && $verifiedContent['schema_version'] === 4) {
+            $page['relatedTracks'] = app(PublicCatalog::class)->relatedLinks($entry['related_track_ids'], $includeRelatedHref);
         }
 
         return $page;

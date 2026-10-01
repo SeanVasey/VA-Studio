@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Catalog\PublicCatalog;
+use App\Domain\SiteBuilder\EditorialContent;
 use App\Domain\SiteBuilder\Models\SiteRelease;
 use App\Domain\SiteBuilder\SiteContent;
-use App\Domain\SiteBuilder\EditorialContent;
 use App\Domain\SiteBuilder\SiteImagePresentation;
 use App\Http\Middleware\SitePreviewPrivacy;
 use App\Support\StorefrontMetadata;
@@ -21,7 +21,7 @@ class SiteReleasePreviewController extends Controller
         $content = app(SiteContent::class)->preview($release->id, $request->user());
         $base = route('filament.admin.site-releases.preview', $release, false);
         if ($section !== null) {
-            $page = app(EditorialContent::class)->page($content, $section, $slug);
+            $page = app(EditorialContent::class)->page($content, $section, $slug, false);
             abort_if($page === null, 404);
             $metadata = app(StorefrontMetadata::class)->forEditorial($page, app(SiteImagePresentation::class)->share($content, true));
             $metadata['robots'] = 'noindex, nofollow';

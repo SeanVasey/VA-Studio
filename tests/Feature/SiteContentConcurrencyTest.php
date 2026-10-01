@@ -9,10 +9,13 @@ use App\Domain\SiteBuilder\SiteContent;
 use App\Support\Audit\AuditEvent;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
+use Tests\Support\QuoteFixtures;
 use Tests\Support\SiteContentRace;
 use Tests\Support\SiteEditorialFixtures;
+use Tests\Support\SiteRelatedTrackFixtures;
 use Tests\TestCase;
 
 class SiteContentConcurrencyTest extends TestCase
@@ -109,5 +112,57 @@ class SiteContentConcurrencyTest extends TestCase
         $this->assertArrayNotHasKey('about', $site->current());
         $this->assertSame($count, SitePublicationRevision::count());
         $this->assertSame($audits, AuditEvent::count());
+    }
+
+    public static function v4LockOrders(): array
+    {
+        return ['publish first' => [0], 'rollback first' => [1]];
+    }
+
+    #[DataProvider('v4LockOrders')]
+    public function test_v4_publish_and_rollback_preserve_exact_winner_and_retained_loser_in_both_lock_orders(int $first): void
+    {
+        $site = app(SiteContent::class);
+        $actors = [LicenseFixtures::admin(), LicenseFixtures::admin()];
+        $this->fakePrivateMediaStorage();
+        $track = QuoteFixtures::selection()['track'];
+        $previous = $site->create(SiteRelatedTrackFixtures::content([$track->id], [$track->id], 'V4 PREVIOUS'), 'V4 previous', $actors[1]);
+        $current = $site->create(SiteEditorialFixtures::content('V2 CURRENT'), 'V2 current', $actors[0]);
+        $next = $site->create(SiteRelatedTrackFixtures::content([$track->id], [$track->id], 'V4 NEXT'), 'V4 next', $actors[0]);
+        $site->publish($previous->id, 0, $actors[1]);
+        $site->publish($current->id, 1, $actors[0]);
+        $jobs = [
+            ['operation' => 'publish', 'release_id' => $next->id, 'revision' => 2, 'actor_id' => $actors[0]->id],
+            ['operation' => 'rollback', 'release_id' => $previous->id, 'revision' => 2, 'actor_id' => $actors[1]->id],
+        ];
+        $race = SiteContentRace::run($this, $jobs, first: $first);
+        $this->assertSame($first, $race['winner']);
+        $winner = $jobs[$first];
+        $publication = SitePublication::findOrFail(1);
+        $this->assertSame(3, $publication->revision);
+        $this->assertSame($winner['release_id'], $publication->active_release_id);
+        $winningRelease = SiteRelease::findOrFail($winner['release_id']);
+        $this->assertEquals($winningRelease->content, $site->current());
+        $this->assertSame(4, $site->current()['schema_version']);
+        $history = SitePublicationRevision::where('revision', 3)->sole();
+        $this->assertSame($winningRelease->content_hash, $history->content_hash);
+        $this->assertSame($current->id, $history->previous_release_id);
+        $this->assertSame($winner['release_id'], $history->release_id);
+        $this->assertSame($winner['actor_id'], $history->actor_id);
+        $this->assertSame($winner['operation'], $history->operation);
+        $audit = AuditEvent::where('action', 'site.release.'.$winner['operation'])->where('subject_id', $winner['release_id'])->orderByDesc('id')->firstOrFail();
+        $this->assertSame($winner['actor_id'], $audit->actor_id);
+        $this->assertSame($winner['release_id'], (int) $audit->subject_id);
+        $this->assertSame(3, $audit->context['publication_revision']);
+        $this->assertSame($current->id, $audit->context['previous_release_id']);
+        $this->assertSame($winner['release_id'], $audit->context['release_id']);
+        $this->assertSame($winningRelease->content_hash, $audit->context['content_hash']);
+        foreach ([$previous, $current, $next] as $release) {
+            $this->assertEquals($release->content, $release->fresh()->content);
+            $this->assertSame($release->content_hash, $release->fresh()->content_hash);
+        }
+        $this->assertDatabaseCount('site_publication_revisions', 4);
+        $this->assertSame(3, AuditEvent::whereIn('action', ['site.release.publish', 'site.release.rollback'])->count());
+        $this->assertSame(3, AuditEvent::where('action', 'site.release.created')->count());
     }
 }

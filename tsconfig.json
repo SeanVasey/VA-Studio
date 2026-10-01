@@ -27,7 +27,9 @@
     "vite.preview.config.ts",
     "vitest.config.ts",
     "playwright.config.ts",
+    "playwright.related.config.ts",
     "tests/frontend",
-    "tests/browser"
+    "tests/browser",
+    "tests/browser-related"
   ]
 }

@@ -100,7 +100,10 @@ class TestPaymentExceptionInspectionTest extends TestCase
         $this->assertSame('commerce.payment_exception.inspected', $audit->action);
         $this->assertSame(OrderFinalization::class, $audit->subject_type);
         $this->assertSame($f['finalization']->id, $audit->subject_id);
-        $this->assertSame(['finalization_id' => $f['finalization']->public_id, 'result' => 'verified', 'test_only' => true], $audit->context);
+        $context = $audit->context;
+        // JSON object member order is not retained by MySQL; types, values and the exact key set remain strict.
+        ksort($context, SORT_STRING);
+        $this->assertSame(['finalization_id' => $f['finalization']->public_id, 'result' => 'verified', 'test_only' => true], $context);
         $this->assertPrivateAbsent(json_encode([$result, $audit->context], JSON_THROW_ON_ERROR), $f);
     }
 

@@ -1,5 +1,11 @@
 # Ordered development status
 
+## Resumed experience, editorial links and CI evidence — October 1, 2026
+
+PR #89's initial full run, [36823137903](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36823137903), failed five MySQL inspection assertions because persisted JSON object keys were reordered and one mobile bulk-tag journey because retained drafts filled the first catalog page. The resumed candidate preserves the complete strict audit comparison while normalizing object key order, and finds new drafts through ordinary table search. Both repairs received independent source review; new full acceptance remains required.
+
+The same candidate integrates ordered editorial related-track links, their retained schema/image guards and an isolated real-scanner Chromium/WebKit journey. It also collects exact current-run database evidence and rejects coherently remapped test-file ownership. [Related-track evidence](verification/editorial-related-tracks.md), [native-stage contract](verification/related-track-native-stage.md) and [database receipts](verification/ci-database-receipts.md) record scope and limitations. Independent source reviews found no outstanding blocker in these components. Full gates remain required and post-merge proof reuse stays disabled. Local Python safeguards pass; PHP, frontend dependencies, MySQL and native execution require the hosted run at this checkpoint. No parent task, live commerce or cutover is declared complete.
+
 ## Single-seller experience increment — October 1, 2026
 
 A parallel implementation candidate now combines persisted operator authorization/MFA checks, the UUID guard follow-up, a private inquiry inbox and contact form, explicit-consent video playback, a public tagged-preview embed, current-session test-order history, player queue/loop/speed/media controls, reviewed bulk tag additions, read-only retained test-payment inspection and a synthetic private-original restore rehearsal. [The integrated evidence record](verification/single-seller-experience-increment.md) links the separately reviewed children and states their remaining acceptance boundaries. These are partial children of T04/T12/T15–T17/T19/T24/T25/T33, not completed parent tasks or production activation.

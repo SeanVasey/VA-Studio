@@ -35,6 +35,8 @@ __pycache__/
 /dist/
 /playwright-report/
 /test-results/
+/playwright-report-related/
+/test-results-related/
 *.bundle
 
 /database/*.sqlite*
