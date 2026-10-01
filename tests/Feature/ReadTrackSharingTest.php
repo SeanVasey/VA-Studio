@@ -183,7 +183,11 @@ class ReadTrackSharingTest extends TestCase
         } elseif ($state === 'rights_hold') {
             RightsDeclaration::create(['track_id' => $fixture['track']->id, 'provenance_reference' => 'PRIVATE NEW HOLD', 'sample_disclosure' => 'Private', 'status' => 'pending']);
         } else {
-            $role = match ($state) { 'missing_artwork' => 'artwork', 'missing_master' => 'master_wav', default => 'preview_tagged' };
+            $role = match ($state) {
+                'missing_artwork' => 'artwork',
+                'missing_master' => 'master_wav',
+                default => 'preview_tagged'
+            };
             $path = Storage::disk('local')->path($fixture['media'][$role]->storage_path);
             if ($state === 'corrupt_preview') {
                 $bytes = file_get_contents($path);
