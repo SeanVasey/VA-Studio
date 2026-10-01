@@ -32,6 +32,10 @@ class CustomerInquiryMigrationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // Operational inquiry rollback must first remove its empty dependent notification schema.
+        if (Schema::hasTable('inquiry_notification_intents') && ! DB::table('inquiry_notification_intents')->exists()) {
+            (require database_path('migrations/2026_10_01_000033_inquiry_notification_intents.php'))->down();
+        }
         $this->fakePrivateMediaStorage();
         $this->travelTo(now()->startOfSecond());
         $this->operator = LicenseFixtures::admin();
@@ -519,10 +523,14 @@ class CustomerInquiryMigrationTest extends TestCase
         $release = $this->release->refresh()->getAttributes();
         $operator = $this->operator->refresh()->getAttributes();
         $audits = DB::table('audit_events')->count();
+        // Roll back the empty dependent notification table first, as ordinary migration order requires.
+        $notifications = require database_path('migrations/2026_10_01_000033_inquiry_notification_intents.php');
+        $notifications->down();
         $migration = require database_path('migrations/2026_10_01_000031_customer_inquiries.php');
         $migration->down();
         $this->assertFalse(Schema::hasTable('customer_inquiries'));
         $migration->up();
+        $notifications->up();
         $this->assertDatabaseCount('customer_inquiries', 0);
         $this->assertSame($release, $this->release->fresh()->getAttributes());
         $this->assertSame($operator, $this->operator->fresh()->getAttributes());

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { fixtureTrack, query, storefrontFixture } from './storefront-fixture';
 
 /** Synthetic HTTP transport exercises built React and native controls only.
  * PHP feature/race tests prove authorization, durable intent and provider semantics.
@@ -128,5 +129,101 @@ test('contract progress stays read-only and never offers another payment or an u
   expect(await page.evaluate(() => JSON.stringify({ local: Object.entries(localStorage), session: Object.entries(sessionStorage) }))).toBe('{"local":[],"session":[]}');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath('test-contract-status.png'), fullPage: true });
+  expect(errors).toEqual([]);
+});
+
+/** Built shell/navigation and native audio only; synthetic GET status is not payment proof. */
+test('private checkout chrome preserves one native preview through keyboard navigation and mobile reflow', async ({ page }, testInfo) => {
+  const orderId = '75000000-0000-4000-8000-000000000005';
+  const returnPath = `/orders/${orderId}/checkout/return`;
+  const path = `/orders/${orderId}/checkout`;
+  const track = { ...fixtureTrack, shareUrl: returnPath };
+  await storefrontFixture(page, { tracks: [track] });
+  const shellResponse = await page.request.get('/');
+  expect(shellResponse.ok()).toBe(true);
+  const shell = await shellResponse.text();
+  const embedded = shell.match(/(<script\b[^>]*data-page="app"[^>]*>)([\s\S]*?)(<\/script>)/);
+  expect(embedded).not.toBeNull();
+  const base = JSON.parse(embedded![2]);
+  const reads: string[] = [];
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.route('**/*', async route => {
+    const request = route.request(), url = new URL(request.url());
+    if (url.pathname === returnPath) {
+      expect(request.method()).toBe('GET');
+      expect(request.headers()['x-inertia']).toBe('true');
+      return route.fulfill({ headers: { 'X-Inertia': 'true', Vary: 'Cookie, X-Inertia', 'Cache-Control': 'private, no-store' }, json: {
+        ...base, component: 'CheckoutReturn', url: url.pathname + url.search,
+        props: { errors: {}, orderId, siteContent: base.props.siteContent },
+      } });
+    }
+    if (url.pathname.startsWith(`/orders/${orderId}/`)) {
+      reads.push(`${request.method()} ${url.pathname}`);
+      expect(url.pathname).toBe(path);
+      expect(request.method()).toBe('GET');
+      return route.fulfill({ headers: { 'Cache-Control': 'private, no-store' }, json: { checkout: {
+        checkoutSchema: 1, orderId, id: null, currency: 'USD', totalMinor: 4280,
+        status: 'not_started', testOnly: true, paymentStatus: 'not_verified', finalizationStatus: 'not_started',
+        contractStatus: 'not_started', fulfillmentStatus: 'not_started', url: null, expiresAt: null, observedAt: null,
+      } } });
+    }
+    return route.fallback();
+  });
+  const mobile = testInfo.project.name === 'webkit-mobile';
+  if (mobile) await page.setViewportSize({ width: 320, height: 844 });
+  await page.goto('/' + query);
+  await expect(page.locator('head link[rel="canonical"]')).toHaveCount(1);
+  const article = page.getByRole('article', { name: track.title, exact: true });
+  await article.getByRole('button', { name: `Play ${track.title}`, exact: true }).click();
+  await expect.poll(() => page.evaluate(() => window.__nativePreviews[0].currentTime)).toBeGreaterThan(0);
+  const before = await page.evaluate(() => ({ source: window.__nativePreviews[0].src, time: window.__nativePreviews[0].currentTime }));
+  const destination = article.getByRole('link', { name: track.title, exact: true });
+  await destination.focus(); await destination.press('Enter');
+  await expect(page).toHaveURL(returnPath + query);
+  await expect(page.getByRole('heading', { name: 'CHECKOUT STATUS', exact: true })).toBeFocused();
+  await expect(page).toHaveTitle('Checkout status — VASEY.AUDIO');
+  await expect(page.locator('head meta[name="description"]')).toHaveAttribute('content', 'View the saved test order status for this session. A browser return does not verify payment.');
+  await expect(page.locator('head meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow');
+  await expect(page.locator('head meta[name="referrer"]')).toHaveAttribute('content', 'no-referrer');
+  await expect(page.locator('head link[rel="canonical"], head meta[property^="og:"], head meta[name^="twitter:"]')).toHaveCount(0);
+  expect(await page.evaluate(() => document.head.innerHTML)).not.toContain(orderId);
+  await expect(page.locator('header .brand-link img')).toHaveAttribute('src', '/brand/vasey-audio-logo.png');
+  await expect(page.locator('header .brand-link img')).toHaveAttribute('width', '420');
+  await expect(page.locator('header .brand-link img')).toHaveAttribute('height', '100');
+  await expect(page.getByRole('navigation', { name: 'Footer navigation', exact: true })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Stripe test checkout', exact: true })).toContainText('This page does not verify payment, issue a license or grant download access.');
+  expect(reads).toEqual([`GET ${path}`]);
+  await expect.poll(() => page.evaluate(() => window.__nativePreviews[0].currentTime)).toBeGreaterThanOrEqual(before.time);
+  expect(await page.evaluate(() => ({ count: window.__nativePreviews.length, source: window.__nativePreviews[0].src, paused: window.__nativePreviews[0].paused })))
+    .toEqual({ count: 1, source: before.source, paused: false });
+  if (mobile) {
+    const menu = page.getByRole('button', { name: /^(Menu|Close menu)$/ });
+    await menu.click();
+    await expect(menu).toHaveAttribute('aria-expanded', 'true');
+    const navigation = page.getByRole('navigation', { name: 'Main navigation', exact: true });
+    await expect(navigation).toBeVisible();
+    await navigation.getByRole('link').first().focus();
+    await page.keyboard.press('Escape');
+    await expect(menu).toHaveAttribute('aria-expanded', 'false');
+    await expect(menu).toBeFocused();
+  }
+  const skip = page.getByRole('link', { name: 'Skip to content', exact: true });
+  await skip.focus(); await skip.press('Enter');
+  await expect(page.getByRole('main')).toBeFocused();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  const pause = page.getByRole('button', { name: 'Pause preview', exact: true });
+  await pause.focus(); await pause.press('Enter');
+  expect(await page.evaluate(() => window.__nativePreviews[0].paused)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath('private-checkout-shell.png'), fullPage: true });
+  const home = page.getByRole('link', { name: 'Return to the catalog', exact: true });
+  await home.focus(); await home.press('Enter');
+  await expect(page).toHaveURL('/');
+  await expect(page.locator('#catalog-title')).toBeFocused();
+  await expect(page.locator('head link[rel="canonical"]')).toHaveCount(1);
+  await expect(page.locator('head meta[name="referrer"]')).toHaveCount(0);
+  expect(await page.evaluate(() => ({ count: window.__nativePreviews.length, source: window.__nativePreviews[0].src, paused: window.__nativePreviews[0].paused })))
+    .toEqual({ count: 1, source: before.source, paused: true });
+  expect(reads).toEqual([`GET ${path}`]);
   expect(errors).toEqual([]);
 });

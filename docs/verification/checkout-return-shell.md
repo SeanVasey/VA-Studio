@@ -1,0 +1,104 @@
+# Private checkout-return shell
+
+This bounded T11 candidate adds the existing public site header, footer and persistent preview controls to the owner-checked saved test-order return page. It follows the [approved remaining-journey contract](../design/remaining-journeys-and-states.md#next-bounded-implementation-contract-checkoutreturn-shell). The focused hosted functional results and separate formatting bridge recorded below are complete as of 2026-10-01. Final combined Foundation acceptance, native/rendered checkout-shell evidence, physical-device acceptance and parent T11/WP08 closure remain open. PHP, npm, frontend tests, browser tests, typechecking and builds were not executed locally.
+
+The initial application/test source is frozen at `3f37602ec0ed0d7e44d61b8b6514cffbc82a8058` (tree `0d286e646474437a9a47fe2d86039d961b087109`) from approved base `05fa8669308aefc75908a8e1f4b43ad969685737`. This document is the eighth scoped path; the source commit owns only the return page, returned controller presentation, private head, private Blade fallback, two existing frontend suites and the new HTTP presentation suite.
+
+The requested controller formatting follow-up is `a6047ba521a03f5f3c430141f0e850efc67d3418` (tree `68c59b24477655174528bb33bbb8160d9f8def9b`). It expands existing compact control-flow bodies and return spacing across the controller without changing any non-whitespace token, quoted string or comment. Single-line array expressions preserve existing punctuation. This separately recorded source check is not a local Pint result; the locked runtime must validate formatting.
+
+The narrow test-setup correction is `8ea0039088c9a5eac4f07bebcf4d617eac07ca61` (tree `998a9ece75b13b9339f2430ae8e09d471819dceb`) after the failed hosted run below. It renames the private DOM helper to `privateHeadDocument()` and mounts the seven checkout cases through genuine `createInertiaApp`/`App` with the real head manager. It adds managed-head cleanup, keeps redirect URLs, and preserves every existing assertion and case identity. Checkout test bodies change at their mounting calls; they are no longer claimed byte-identical to the original bare-render bodies. At this correction boundary, production and the metadata suite remain byte-identical to the reviewed `91ebe142` boundary. Its fresh hosted results are recorded below.
+
+The subsequent controller type-spelling correction is `265d94c13a94205fd161d5f81f3b2f0411eae143` (tree `d002e35000e636269efe98e92ac20fd98eef9ee1`), integrated as permanent source `754d53e6d5ccdc67f1d0a2f3ec8dfc6e447a4257` with the same tree. It imports `Symfony\Component\HttpFoundation\Response` and changes only `returned()`'s absolute return-type spelling to `Response`, matching the actual Pint proposal. This is an import/type-spelling edit, not a whitespace-only edit. Its exact inverse and reflected class identity were executed in the separate formatting bridge below; all other application/test bytes remain unchanged from the functional proof source.
+
+The controller retains the original owner/status check before any CMS read. One verified `SiteContent::current()` snapshot supplies `EditorialContent::chrome()`. Draft bodies, release IDs, labels, hashes, image provenance and preview bases are not projected. Only typed `SiteContentUnavailable` uses the original approved static defaults for this private shell; it neither repairs publication nor changes the public routes' unavailable response. The private status page still depends on its original saved-order evidence and owner session.
+
+`TestCheckout` still receives only `orderId`. Its initial saved-status GET and existing explicit actions/delivery behavior are unchanged. Redirect query parameters verify nothing. Arrival does not create checkout, reconcile payment, issue rights, authorize delivery, download a file or contact a provider.
+
+## Private metadata and navigation
+
+`PrivatePageHead` and the Blade fallback use matching `title`, `description`, `robots` and `referrer` keys. The fixed title is `Checkout status — VASEY.AUDIO`; the fixed description is `View the saved test order status for this session. A browser return does not verify payment.` Robots are `noindex, nofollow` and referrer policy is `no-referrer`. Private metadata has no canonical URL, Open Graph/Twitter tags, imagery, order/customer/provider identifiers or money. Generic public `MetadataHead` remains unchanged. HTTP responses retain private no-store, Cookie/X-Inertia variance, nosniff, noindex/no-referrer and foreign-owner 404.
+
+The shell supplies a named, focusable main region, native skip destination and focusable status H1. The heading receives focus on entry. Ordinary public chrome/catalog links use Inertia; modified clicks retain native behavior. After a public visit, the destination section's heading or existing page heading receives focus; previously nonfocusable public section headings receive `tabIndex=-1` before focus. The mobile menu reuses its existing expanded/collapsed state and Escape focus recovery. No product route or parallel customer layout framework is added.
+
+The page reuses `PersistentPlayer` with an empty catalog input and the existing single audio owner. Existing queue/source/position and playback controls remain available. License controls navigate to the queued public track; they do not initiate checkout. No audio element, autoplay policy or player state machine is added.
+
+## Active-theme and state evidence
+
+The [active repository theme](../brand/README.md) takes precedence over generic Edition 04 palette defaults under the requested brand UI skill. Existing `.editorial-page`, `.section-pad`, `.editorial-heading`, `.editorial-description`, `.quote-review` and `.text-link` treatments use the established semantic tokens:
+
+| Role | Existing tokens / source |
+| --- | --- |
+| Canvas, panel, readable text | `--va-canvas`, `--va-surface`, `--va-text`, `--va-text-strong` |
+| Links, focus, boundaries | `--va-link`, `--va-focus`, `--va-border`, `--va-rule` |
+| Display, body, status metadata | `--va-font-impact`, `--va-font-body`, `--va-font-mono` |
+| Mobile spacing and player clearance | Existing page margin, section breakpoints, body player padding and safe-area rules |
+
+SiteHeader/SiteFooter use the unchanged approved navbar PNG at its natural 420:100 ratio. Its SHA-256 is `7b0ffd26d5ddffab9695fdd3e0a4bb306d50642dc6a51e25233fd1626ff07571`, matching the committed [asset manifest](../brand/asset-manifest.json). No identity redraw, new image/font, motif, CSS or theme change is introduced. Existing player icons describe playback/queue state; there is no decorative signal art or simulated waveform on this page. Exact font sources remain in the [font manifest](../brand/font-manifest.json); loaded-font/rendered evidence is not established by reuse.
+
+The existing checkout loading, unverified, pending, verified, blocked, error and explicit retry states retain their original domain-driven copy/actions. Header hover/focus/current/menu states and idle/active/error player controls are inherited. The new shell has no independent success, cancellation, payment, readonly or fulfillment state. Session/permission failures remain server denials; a CMS integrity outage changes chrome to static defaults without relabeling saved payment truth.
+
+## Regression sources and hosted results
+
+The original checkout-return assertions and identities remain unchanged; their setup now uses the genuine Inertia wrapper. Additive cases cover shared chrome and logo dimensions, hostile public text as inert text, entry/skip/menu/destination focus, native modified clicks and GET-only arrival. The metadata suite uses actual `createInertiaApp`/router transitions from public sharing tags (including image dimensions/type) to the private return and back, checks server fallback adoption, retained CSRF/theme tags and private referrer removal, and retains the same native preview source/time/queue without another playback call. All seven checkout and five metadata cases passed in the corrected hosted frontend run below. These are frontend test results, not native-browser, rendered-layout or physical-audio acceptance.
+
+The new real HTTP presentation tests use synthetic checkout/site fixtures to cover owner/nonowner boundaries, direct/Inertia private headers, active public versus unpublished chrome, fixed metadata, damaged/unavailable CMS fallback and unchanged retained records/provider calls. Synthetic CMS damage setup does not weaken production guards. All six cases executed and passed with 612 assertions on each engine in the corrected hosted selection below.
+
+The first isolated [hosted run 36845119693](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36845119693) failed on proof source `a50c356f03a579cfc455b91019ddb0f1a0074f60` (tree `8d997a70020ffed8f9e390883f581693d94a7136`), whose artifact source hashes match the reviewed `91ebe142` application/tests. The SQLite job used PHP 8.4.26/PHPUnit 12.5.34 and SQLite 3.45.1, then stopped because private `CheckoutReturnPresentationTest::head()` conflicts with Laravel's inherited public HTTP `head()`. Its JUnit member is zero bytes: there is no parseable discovery/execution census or PHP assertion result. The frontend job used Node 24.21.0/npm 11.19.0 and recorded 340 cases: 333 passed, seven failed, zero errors and zero skips. All seven failures are the bare checkout renders reaching a null Inertia head manager (`createProvider`); all five genuine Inertia metadata cases passed, including private/public cleanup and retained audio. These results establish the failure boundary, not an overall frontend acceptance pass. Subsequent typecheck/build/bundle scan/audit and Pint were not executed after these initial failures.
+
+The MySQL job also stopped at the same PHP helper visibility fatal before producing parseable JUnit. It used MySQL 8.4.11/repeatable-read/`lower_case_table_names=0`, a fresh database with zero tables, and PHP 8.4.26/PHPUnit 12.5.34. Neither engine has a discovered/executed PHP case census or Pint result for this failed run; the final run conclusion is failure.
+
+The reviewed SQLite artifact `11153425664` ZIP has SHA-256 `2a91b70b9e7636617bdde044280307a631c08bca3f2f59ba8757264a139ddd17`; frontend artifact `11151879255` ZIP has SHA-256 `9caa68450e7182e034ad19bd7e78e64312992455848322a146ea11d59f590d6f`; MySQL artifact `11152878389` ZIP has SHA-256 `7bcbbcf604afe84790b45806c9fd50ca483d22a51a23693c820e2cbb07ea02b0`. All three archives passed local CRC inspection; source-log hashes, both empty PHP results, frontend census and five metadata passes were independently read from the retained archives.
+
+### Corrected functional proof: overall failure solely from Pint
+
+The second isolated [hosted run 36845828375](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36845828375), attempt 1, checked out `9e32aaad9125acd5c0b54b9651d3423c7599ba82` (tree `9b25fea74362dba7befd5a6d766ee1357fac9b5d`). Its complete source tree differs from permanent `54f52a91a1617abb1b73298e60592ab96f855ac2` (tree `07e9047595d4b0512683fcf3c5a961f1c2181dd7`) only by the isolated proof workflow. The application, corrected tests and metadata suite match the approved `0ad45d577841548f76abca1b9fee16df272b1a65` composition. The unchanged proof workflow has SHA-256 `f5acf2272f882f6f86e73a7fce194f154a8cda848b3f96fa9a1924da4a57d924`; it runs the fixed three PHP feature files on fresh disposable SQLite/MySQL, the standard frontend commands, and Pint on the two PHP presentation paths once. Provider flags remain disabled and mail uses the array transport.
+
+| Actual job | Executed result | Runtime / boundary |
+| --- | --- | --- |
+| Frontend `110315608394` | 21 files, 340 cases passed; zero failures, errors or skips. The seven checkout and five metadata identities all passed. | Node 24.21.0/npm 11.19.0. Typecheck and Vite 8.3.0 build passed; scan checked three bundle files for eight secret names and Stripe key prefixes with no hits; npm audit reported zero vulnerabilities. |
+| SQLite `110315608151` | PHP selection: 67 reported, 66 executed/passed, 1 existing skip, 1,323 assertions, zero failures/errors. CLI duration `02:13.928`. Job failed only at subsequent Pint: two files checked, one controller type-spelling issue. | PHP 8.4.26/PHPUnit 12.5.34, SQLite 3.45.1, zero tables before tests. |
+| MySQL `110315608345` | PHP selection: 67 reported/executed/passed, 1,328 assertions, zero failures/errors/skips. CLI duration `11:28.413`. Job passed; Pint is not selected on this engine. | PHP 8.4.26/PHPUnit 12.5.34, MySQL 8.4.11/repeatable-read/`lower_case_table_names=0`, zero tables before tests. |
+
+Both PHP archives contain the same 67 unique class/case identities: six `CheckoutReturnPresentationTest`, 47 `HostedCheckoutTest` and 14 `OwnedTestOrderHistoryTest` cases. The sole SQLite skip is the unchanged `HostedCheckoutTest::test_provider_create_observes_a_committed_intent_from_an_independent_mysql_connection`, whose existing engine guard and policy entry require MySQL. No new skip, assertion removal, retry, production provider call or CMS guard bypass was introduced. The six new real HTTP cases passed on both engines with these per-engine assertion counts:
+
+| Checkout presentation case | Assertions |
+| --- | ---: |
+| Owned HTML/Inertia use current public chrome without private body/payment writes | 143 |
+| Never-published site uses static defaults and ignores private draft queries | 82 |
+| Real corrupt active hash falls back without repairing publication | 90 |
+| Missing singleton retains private status without CMS writes | 90 |
+| Revision without retained history retains private status without CMS writes | 90 |
+| Foreign/unknown orders are identically denied before CMS reads | 117 |
+| Total per engine | 612 |
+
+The overall run remains **failure** because SQLite Pint rejected the absolute return-type spelling. The frontend and both fixed PHP selections passed on this source; those component results do not turn the failed run into full Foundation acceptance.
+
+| Original corrected-run archive | SHA-256 |
+| --- | --- |
+| Frontend `11152884254` | `48f5c6908ccc7ee310ed8f2a25f4eccf918467bee930713a4ebd717767a5f138` |
+| SQLite `11153268096` | `4ca3c3a20914e91fa90d2afe04407684d5ca7e410b3f5acf366d44368e86a03c` |
+| MySQL `11153776908` | `3929228d9d4c80522e592964e2feb24dc7c9de3250cc2ef33f2b11f38647ddc8` |
+
+All three original ZIP digests match published artifact metadata, all members passed CRC, and retained source logs, runtime logs, complete JUnit identities/counters, frontend follow-on commands and Pint failure were independently inspected. JUnit SHA-256 values are frontend `434317b9fd126448d5082fcd8471aa1d00f08834f603d2ce838bb9d5e32438a8`, SQLite `9a32ba8e4b725fa450792e9fe1e332f1b0d0102bddf34335cbd01d07f8eec067`, and MySQL `98246dbeaee44440277a7eab2bf64272eb5b88a3e6a5067596aa607ef10fc52d`.
+
+### Separate controller type-spelling bridge
+
+The isolated [formatting run 36847409339](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36847409339), attempt 1, and job `110320748545` passed on `1939e0de976e04b4718791fc1102ad71ca869e38` (tree `9d54a1931e7cea046d035df90c3cc419200e9e38`). Its actual sole parent is the functional-proof commit `9e32aaad9125acd5c0b54b9651d3423c7599ba82`, not a rebuilt approximation. Against that parent, the strict source guard allows only the controller modification, old proof workflow deletion and new formatting workflow addition. Against permanent `754d53e6d5ccdc67f1d0a2f3ec8dfc6e447a4257`/tree `d002e35000e636269efe98e92ac20fd98eef9ee1`, the tree adds only the temporary formatting workflow; it does not change the permanent Foundation workflow or runtime gates.
+
+The executed PHP 8.4.26 bridge archived the actual parent controller and required its SHA-256 `0b16448c81159c1f883e56e8d2e933acb7f7b533adfe07a73742961800c49a6d`, the current controller SHA-256 `6f22a970c0fa3417cfc60ccb13ed2082914efca847b0d32175629f76a539d2b4`, and exact whole-file equality after reversing only the one import and one return-type alias. PHP `TOKEN_PARSE` compared all 634 original non-whitespace tokens against that exact inverse, retaining comments and strings; it also parsed the current source. Actual autoloaded reflection resolved `returned()` to nonnullable `Symfony\Component\HttpFoundation\Response`. Real syntax checks passed for the controller and HTTP presentation test, and Pint passed both fixed paths. This establishes the bounded type-spelling/formatting correction; it does not replay or invent a fresh PHPUnit/frontend census.
+
+Original artifact `11153499313` has ZIP SHA-256 `dd464429a49fed0a31bc35fc5b02b89d67a500476532738b5bdce3bc178b450f`. Its seven members passed CRC; all 11 source hashes match the exact reviewed tree, the archived parent controller matches its hard hash, and the actual inverse/token/reflection/Pint records were independently inspected. The temporary formatting workflow SHA-256 is `db7f8f24481137610b610a8145a41a23144c1cd26c3d1724c9a587d0c7b69f25`. Both isolated workflows remain outside the permanent candidate. These separately sourced receipts leave final combined full Foundation, native/rendered checkout-shell and physical-device acceptance open.
+
+The fixed functional commands retained by the isolated protocol include:
+
+```sh
+npm test -- --reporter=default --reporter=junit --outputFile=checkout-return-evidence/frontend-results.xml
+npm run build
+php vendor/bin/phpunit tests/Feature/CheckoutReturnPresentationTest.php tests/Feature/HostedCheckoutTest.php tests/Feature/OwnedTestOrderHistoryTest.php --log-junit=checkout-return-evidence/checkout-return-results.xml --fail-on-empty-test-suite --fail-on-phpunit-warning --display-warnings
+```
+
+Local successor checks are limited to `git diff --check`, source-preservation/metadata-key checks and the unchanged logo hash. At the initial `3f37602` source boundary, reversing only the added presentation/imports restores the original controller byte-for-byte; the `a6047ba` formatting follow-up preserves its tokens rather than its whitespace. The later `265d94c` import/type-spelling edit is separately proven by the exact inverse/reflection bridge above. Reversing only the private fallback restores the original public Blade branch. The test correction inverses byte-exact to `91ebe142` after undoing only the DOM-helper rename and real mounting/import/cleanup substitutions; all assertions remain unchanged. All three original metadata test bodies remain byte-identical. `MetadataHead`, `TestCheckout`, shared chrome/player, audio owner, CSS, routes and package/lock sources are unchanged. The 46 `id`-ordered raw retention tables and separate `quote_owners.owner_key` ordering were checked against migration sources. The seven checkout, five metadata and six new HTTP cases (five methods including a two-case provider) have the actual corrected-run results above, with no new skip policy.
+
+There are no measured route bytes, request latency, LCP/INP/CLS, font loading, image layout shifts or audio-start measurements. No 320px/200% zoom, tablet/desktop, forced-colors, reduced-motion, keyboard/touch rendered run, screen-reader pairing or physical iPhone/Android playback/background acceptance is claimed. Existing CSS breakpoints/player clearance are source reuse, not proof of reflow or unobscured focus. The focused functional and type-spelling receipts do not establish final combined full Foundation acceptance, close parent T11/WP08, or supply native checkout-shell/device proof. Root owns the final composition and its independent exact-source review.
+
+Rollback reverts this presentation slice while preserving all existing order, checkout, payment, grant, contract, entitlement, delivery and publication evidence. Customer identity/recovery, production providers, fulfillment/storage and broader WP08/T11 device acceptance remain their existing separate boundaries.

@@ -59,6 +59,26 @@
       "test_provider_create_observes_a_committed_intent_from_an_independent_mysql_connection"
     ],
     [
+      "Tests\\Feature\\InquiryNotificationConcurrencyTest",
+      "test_independent_workers_serialize_one_handoff_without_duplicate_attempt_or_submission"
+    ],
+    [
+      "Tests\\Feature\\InquiryNotificationMigrationTest",
+      "test_changed_mysql_notification_fk_support_index_in_a_partial_installation_is_refused_before_any_ddl"
+    ],
+    [
+      "Tests\\Feature\\InquiryNotificationMigrationTest",
+      "test_changed_mysql_notification_foreign_key_is_refused_before_any_ddl"
+    ],
+    [
+      "Tests\\Feature\\InquiryNotificationMigrationTest",
+      "test_nonempty_notification_table_with_a_missing_mysql_foreign_key_is_never_retroactively_adopted"
+    ],
+    [
+      "Tests\\Feature\\InquiryNotificationMigrationTest",
+      "test_shortened_mysql_notification_due_index_prefix_is_refused_before_any_ddl"
+    ],
+    [
       "Tests\\Feature\\OrderPreparationConcurrencyTest",
       "test_price_expiry_during_owner_mutex_wait_cannot_create_an_order_or_extend_capacity"
     ],

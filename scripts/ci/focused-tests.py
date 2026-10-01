@@ -53,6 +53,8 @@ PHP_TARGETS = {
     "seller": (
         "tests/Feature/CustomerInquiryHttpTest.php", "tests/Feature/CustomerInquiryMigrationTest.php",
         "tests/Feature/CustomerInquiryAdminTest.php", "tests/Feature/CustomerInquiryConcurrencyTest.php",
+        "tests/Feature/InquiryNotificationWorkTest.php", "tests/Feature/InquiryNotificationMigrationTest.php",
+        "tests/Feature/InquiryNotificationConcurrencyTest.php",
         "tests/Feature/PublicTrackEmbedTest.php", "tests/Feature/PublicTrackEmbedRouteCacheTest.php",
         "tests/Feature/SiteEditorialHttpTest.php", "tests/Feature/SiteEditorialContentTest.php",
         "tests/Feature/PublicLicenseDisclosureTest.php", "tests/Feature/SiteContentUnavailableHttpTest.php",
