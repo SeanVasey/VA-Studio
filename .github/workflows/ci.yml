@@ -230,6 +230,13 @@ jobs:
           extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
           coverage: none
           tools: composer:v2
+      - name: Install application media fixture prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends ffmpeg util-linux
+          test -x /usr/bin/ffmpeg
+          test -x /usr/bin/ffprobe
+          test -x /usr/bin/prlimit
       - run: composer install --no-interaction --prefer-dist
       - run: npm ci
       - run: npm run build

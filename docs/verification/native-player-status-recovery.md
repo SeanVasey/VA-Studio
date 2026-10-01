@@ -1,6 +1,6 @@
 # Native preview loading-status recovery
 
-Status: the initial correction is refined by captured native evidence on October 1, 2026. Narrow source correction, local checks and independent final-source review are complete; corrected native execution remains pending.
+Status: the initial correction is refined by captured native evidence on October 1, 2026. Narrow source correction, local checks, independent final-source review and corrected focused native execution are complete; full integrating acceptance remains pending.
 
 ## Finding and boundary
 
@@ -43,3 +43,9 @@ Author checkout is isolated from base `04e4743301a47ca720d849e01bdeba9203708a23`
 - Independent review approved frozen commit `ffe6f8f6be6be28030b3a907b6671f45dc963a47`, tree `0af76e6bd0716b6ee114e8ee293cd081ebbede9c`, verified all three changed blobs and retained native assertion/observation identities, and independently passed all 23 player cases. The reviewer found no blocking issue; corrected native execution is a separate gate.
 
 These client-state regressions supplement the captured native evidence; they do not prove the corrected native journey. After independent review of the exact frozen source, run the original uninstrumented six player cases through the proper native browser wrapper on Chromium desktop and WebKit mobile. Keep the status, actual position, loop, owner-count, pause, navigation and keyboard/focus assertions intact. No extra waits, retries, skips, mocked native playback or weakened assertions are part of this correction.
+
+## Corrected original native result
+
+[Run 36821634366](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36821634366), attempt 1, tested clean diagnostic head `88ebf06a59f502a4a18b545baa0cd6d51112b33a`, tree `98f61b538581835752b65261199317024d6d396e`. Its canonical application source is `4dfb1e0c47a42870f749b227def8aedcc48abb19`, tree `1d5e6b67670a6a742406c0b6c269ec02c8c47bab`; only the established informative workflow and fixed two-spec selection were added. The original uninstrumented player spec `78c2c6acd1009ebe85a6f83a532da234d9067a32` and corrected audio `e4766fc11341078c58aea657b9559a72e40f3135` were retained. No native observation instrumentation enters this run.
+
+All six original player cases and both bulk-tag cases executed and passed: **eight unique cases, zero errors/failures/skips**, combined native duration 151.08 seconds. The previously failing WebKit Loading assertion passed unchanged alongside actual native position, loop, pause, keyboard/focus and single-owner assertions. Artifact `11143772780` matched SHA-256 `e5b6d6473bfdb9c5e11315e89e877040998fcc103c0cd598d8abc6f3dc5eb8a0`; independent review reconciled every case and actual checked-out source and inspected the mobile loop controls. This supplies focused native acceptance of the correction, not complete integrating or physical-device/OS-background acceptance.

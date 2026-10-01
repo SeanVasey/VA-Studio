@@ -19,11 +19,15 @@ const env = {
   APP_CONFIG_CACHE: join(directory, 'config.php'), APP_ROUTES_CACHE: join(directory, 'routes.php'),
   APP_EVENTS_CACHE: join(directory, 'events.php'), APP_LOCALE: 'en',
   LARAVEL_STORAGE_PATH: directory,
-  DB_CONNECTION: 'sqlite', DB_DATABASE: join(directory, 'database.sqlite'), DB_URL: '',
+  DB_CONNECTION: 'sqlite', DB_DATABASE: join(directory, 'database.sqlite'), DB_URL: '', DB_FOREIGN_KEYS: 'true',
   SESSION_DRIVER: 'file', SESSION_ENCRYPT: 'true', SESSION_SECURE_COOKIE: 'false', SESSION_DOMAIN: 'null',
   SESSION_COOKIE: `vasey_browser_${randomBytes(8).toString('hex')}`, CACHE_STORE: 'file',
   QUEUE_CONNECTION: 'sync', MAIL_MAILER: 'array', LOG_CHANNEL: 'single', LOG_LEVEL: 'error',
   FILESYSTEM_DISK: 'local', STRIPE_WEBHOOK_ENABLED: 'false',
+  // Only retained synthetic test evidence is readable; no HTTP payment initiation/processing is enabled.
+  STRIPE_ACCOUNT_ID: 'acct_SYNTHETICONLY', STRIPE_MODE: 'test', STRIPE_TEST_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '',
+  STRIPE_TEST_CHECKOUT_ENABLED: 'false', STRIPE_TEST_PAYMENT_PROCESSING_ENABLED: 'false', STRIPE_TEST_FINALIZATION_ENABLED: 'false',
+  VASEY_BROWSER_EXCEPTION_MARKER: randomBytes(32).toString('hex'),
   // No malware scanner, as in CI. A scanner installed on the host would otherwise run inside synchronous uploads.
   MEDIA_CLAMSCAN: join(directory, 'no-clamscan'),
   VASEY_BROWSER_DIRECTORY: directory, VASEY_BROWSER_PASSWORD: `Browser-${randomBytes(24).toString('hex')}`,
@@ -44,6 +48,10 @@ try {
   writeFileSync(join(directory, 'inquiry-fixture-marker.json'), JSON.stringify({
     marker: env.VASEY_BROWSER_INQUIRY_MARKER, database: env.DB_DATABASE,
     origin: env.APP_URL, operatorId: 1,
+  }), { mode: 0o600, flag: 'wx' });
+  writeFileSync(join(directory, 'exception-inspection-fixture-marker.json'), JSON.stringify({
+    purpose: 'retained-exception-native', marker: env.VASEY_BROWSER_EXCEPTION_MARKER,
+    database: env.DB_DATABASE, origin: env.APP_URL, baseOperatorId: 1, account: env.STRIPE_ACCOUNT_ID,
   }), { mode: 0o600, flag: 'wx' });
   const result = spawnSync(process.execPath, ['node_modules/@playwright/test/cli.js', 'test', ...process.argv.slice(2)], {
     cwd: root, env, stdio: 'inherit', timeout: 600000,
