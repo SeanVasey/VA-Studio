@@ -104,3 +104,9 @@ The [single-seller experience candidate](../verification/single-seller-experienc
 [T16-RELATED-TRACKS-01](../verification/editorial-related-tracks.md) implements ordered first-party track links on selected blog/video detail pages. Schema 4 retains only native track IDs, with the existing immutable release and image evidence; current public readiness and inventory decide which links appear. Private previews omit track destinations on the server. Withdrawal preserves retained CMS identity and restoration, while fresh public requests omit unavailable tracks. Existing schemas 1–3 remain exact.
 
 The isolated candidate has focused schema/domain/editor/HTTP/migration and frontend evidence. Actual MySQL contention and a genuine ordinary eligible-track native fixture remain acceptance gates, so this child, broader T16 and WP-09 are not complete. The child guide records exact checks, source boundaries and the genuine ClamAV fixture prerequisite; operational rollback never deletes retained schema-4 evidence.
+
+## Retained inquiry alert intents — October 1, 2026 candidate
+
+The [T15b engineering contract](../verification/inquiry-notification-intents.md) atomically retains one minimal original-operator alert intent with each saved inquiry. Optional locator-only queue wakeups and a bounded scanner recover missed dispatch; fenced claims, definite-failure retry limits and terminal unknown outcomes prevent automatic replay of ambiguous handoffs. Original encrypted input, privacy/retention evidence and truthful saved receipts are unchanged.
+
+Both intake and notification activation remain disabled by default. No mail/provider binding is supplied; only synthetic adapters exercise this child. Submitted means handoff acceptance, not recipient delivery. Final MySQL/SQLite/source acceptance, processor/policy decisions and unknown-state operator resolution remain open. This child does not complete T15 or the original WP-09 checklist.

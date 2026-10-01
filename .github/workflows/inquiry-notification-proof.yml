@@ -1,0 +1,89 @@
+name: Isolated inquiry notification feedback
+
+# Informative only. This temporary branch does not replace Foundation acceptance.
+on:
+  push:
+    branches: [codex/inquiry-notification-proof-20261001]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: isolated-inquiry-notification-feedback
+  cancel-in-progress: true
+
+jobs:
+  inquiry-notifications:
+    name: Inquiry notification feedback (${{ matrix.engine }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [sqlite, mysql]
+    services:
+      mysql:
+        image: ${{ matrix.engine == 'mysql' && 'mysql:8.4' || '' }}
+        env:
+          MYSQL_DATABASE: vaseyaudio_inquiry_feedback
+          MYSQL_ROOT_PASSWORD: ci-only-password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -pci-only-password"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      DB_CONNECTION: ${{ matrix.engine }}
+      DB_DATABASE: ${{ matrix.engine == 'mysql' && 'vaseyaudio_inquiry_feedback' || ':memory:' }}
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USERNAME: root
+      DB_PASSWORD: ci-only-password
+      DB_URL: ''
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+      CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED: 'false'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          coverage: none
+          tools: composer:v2
+      - run: composer install --no-interaction --prefer-dist
+      - run: cp .env.example .env
+      - run: php artisan key:generate
+      - name: Record the actual focused source and runtime
+        run: |
+          git rev-parse HEAD HEAD^{tree}
+          php --version
+          php vendor/bin/phpunit --version
+      - name: Verify inquiry save, notification guards and independent worker contention
+        run: >-
+          php vendor/bin/phpunit
+          tests/Feature/CustomerInquiryHttpTest.php
+          tests/Feature/CustomerInquiryMigrationTest.php
+          tests/Feature/CustomerInquiryAdminTest.php
+          tests/Feature/CustomerInquiryConcurrencyTest.php
+          tests/Feature/InquiryNotificationWorkTest.php
+          tests/Feature/InquiryNotificationMigrationTest.php
+          tests/Feature/InquiryNotificationConcurrencyTest.php
+          --log-junit=inquiry-notification-results.xml
+          --fail-on-empty-test-suite --fail-on-phpunit-warning --display-warnings
+      - name: Retain informative synthetic test results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: inquiry-notification-${{ matrix.engine }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: inquiry-notification-results.xml
+          retention-days: 7
+          if-no-files-found: error

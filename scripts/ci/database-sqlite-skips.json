@@ -47,6 +47,10 @@
       "test_provider_create_observes_a_committed_intent_from_an_independent_mysql_connection"
     ],
     [
+      "Tests\\Feature\\InquiryNotificationConcurrencyTest",
+      "test_independent_workers_serialize_one_handoff_without_duplicate_attempt_or_submission"
+    ],
+    [
       "Tests\\Feature\\OrderPreparationConcurrencyTest",
       "test_price_expiry_during_owner_mutex_wait_cannot_create_an_order_or_extend_capacity"
     ],
