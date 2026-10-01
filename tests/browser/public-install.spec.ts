@@ -92,7 +92,9 @@ test('public installation guidance and real assets survive private preview navig
   const before = await page.evaluate(() => ({ source: window.__nativePreviews[0].src, time: window.__nativePreviews[0].currentTime }));
   const destination = article.getByRole('link', { name: track.title, exact: true });
   await destination.focus(); await destination.press('Enter');
-  await expect(page).toHaveURL(privatePath + query);
+  const canonicalPrivateQuery = new URLSearchParams(query);
+  canonicalPrivateQuery.sort();
+  await expect(page).toHaveURL(privatePath + '?' + canonicalPrivateQuery.toString());
   await expect(page.locator('.preview-banner')).toContainText('PRIVATE CONTENT PREVIEW');
   await expect(page.locator('head link[rel="manifest"], head link[rel="apple-touch-icon"]')).toHaveCount(0);
   await expect(page.locator('summary').filter({ hasText: 'Add VASEY.AUDIO to your device' })).toHaveCount(0);
