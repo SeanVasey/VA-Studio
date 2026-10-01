@@ -19,6 +19,18 @@
       "test_publication_withdrawal_and_admission_share_one_mutex_without_stale_admission"
     ],
     [
+      "Tests\\Feature\\CustomerInquiryMigrationTest",
+      "test_changed_mysql_foreign_key_definition_is_refused_before_any_ddl"
+    ],
+    [
+      "Tests\\Feature\\CustomerInquiryMigrationTest",
+      "test_nonempty_partial_table_with_a_missing_mysql_foreign_key_is_never_retroactively_adopted"
+    ],
+    [
+      "Tests\\Feature\\CustomerInquiryMigrationTest",
+      "test_shortened_mysql_unique_index_prefix_is_refused_before_any_ddl"
+    ],
+    [
       "Tests\\Feature\\ExclusiveOfferConcurrencyTest",
       "test_independent_connections_preserve_preparation_identity_and_scope_controls"
     ],
