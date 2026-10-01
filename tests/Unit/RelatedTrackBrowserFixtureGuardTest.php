@@ -174,6 +174,36 @@ class RelatedTrackBrowserFixtureGuardTest extends TestCase
         }
     }
 
+    public function test_retained_media_digest_preserves_fractional_measurements_and_the_complete_proof(): void
+    {
+        $method = new ReflectionMethod(\RelatedTrackBrowserFixture::class, 'mediaEvidenceHash');
+        $proof = ['asset' => ['duration_seconds' => 1.2, 'waveform' => [0.0, 0.125, 0.9375]],
+            'source' => ['sha256' => str_repeat('a', 64)], 'run' => ['evidence' => ['source_scan' => ['status' => 'clean']]]];
+        $hash = $method->invoke(null, $proof);
+        $this->assertMatchesRegularExpression('/\A[a-f0-9]{64}\z/D', $hash);
+        $reordered = ['run' => $proof['run'], 'source' => $proof['source'],
+            'asset' => ['waveform' => $proof['asset']['waveform'], 'duration_seconds' => 1.2]];
+        $this->assertSame($hash, $method->invoke(null, $reordered));
+        foreach ([['asset', 'duration_seconds', 1.21], ['asset', 'waveform', [0.0, 0.126, 0.9375]],
+            ['asset', 'waveform', [0.9375, 0.125, 0.0]], ['source', 'sha256', str_repeat('b', 64)],
+            ['run', 'evidence', ['source_scan' => ['status' => 'unconfirmed']]]] as [$section, $field, $value]) {
+            $changed = $proof;
+            $changed[$section][$field] = $value;
+            $this->assertNotSame($hash, $method->invoke(null, $changed));
+        }
+        $integer = $proof;
+        $integer['asset']['waveform'][0] = 0;
+        $this->assertNotSame($hash, $method->invoke(null, $integer));
+        foreach ([INF, -INF, NAN, new \stdClass] as $invalid) {
+            try {
+                $method->invoke(null, ['invalid' => $invalid]);
+                $this->fail('Non-finite or non-JSON media evidence was accepted.');
+            } catch (\InvalidArgumentException) {
+                $this->addToAssertionCount(1);
+            }
+        }
+    }
+
     public function test_missing_duplicated_foreign_subject_and_wrong_actor_audits_are_refused(): void
     {
         $evidence = ['operatorId' => 1, 'reviewerId' => 3, 'license' => ['id' => 1], 'tracks' => [], 'audits' => []];

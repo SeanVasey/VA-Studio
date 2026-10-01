@@ -386,7 +386,7 @@ final class RelatedTrackBrowserFixture
                 self::require($proof !== null && app(VerifiedMedia::class)->available($asset)
                     && ($run->evidence['source_scan']['engine'] ?? null) === 'clamav', 'intact genuinely verified output');
                 $outputs[] = ['id' => $asset->id, 'role' => $asset->role, 'sha256' => $asset->sha256,
-                    'sizeBytes' => (int) $asset->size_bytes, 'verifiedEvidenceHash' => CanonicalJson::hash($proof)];
+                    'sizeBytes' => (int) $asset->size_bytes, 'verifiedEvidenceHash' => self::mediaEvidenceHash($proof)];
             }
             $sources[] = ['id' => $source->id, 'role' => $source->role, 'sha256' => $source->sha256, 'sizeBytes' => (int) $source->size_bytes,
                 'runId' => $run->id, 'profileFingerprint' => $run->profile_fingerprint, 'evidenceHash' => CanonicalJson::hash($run->evidence), 'outputs' => $outputs];
@@ -404,6 +404,32 @@ final class RelatedTrackBrowserFixture
 
         return ['id' => $license->id, 'templateId' => $license->license_template_id, 'submissionHash' => $license->submission_hash,
             'sourceHash' => $license->source_hash, 'modelHash' => $license->model_hash, 'reviewId' => $review->id, 'evidenceHash' => $review->evidence_hash];
+    }
+
+    /** Fixture-only digest of the complete media proof, including measured fractional durations and waveform peaks. */
+    private static function mediaEvidenceHash(array $proof): string
+    {
+        $normalize = function (mixed $value) use (&$normalize): mixed {
+            if (is_array($value)) {
+                if (array_is_list($value)) {
+                    return array_map($normalize, $value);
+                }
+                ksort($value, SORT_STRING);
+                $object = new stdClass;
+                foreach ($value as $key => $item) {
+                    $object->{(string) $key} = $normalize($item);
+                }
+
+                return $object;
+            }
+            if (is_null($value) || is_bool($value) || is_int($value) || is_string($value)
+                || (is_float($value) && is_finite($value))) {
+                return $value;
+            }
+            throw new InvalidArgumentException('Media fixture proof must contain only finite JSON values.');
+        };
+
+        return hash('sha256', json_encode($normalize($proof), self::JSON_FLAGS | JSON_PRESERVE_ZERO_FRACTION));
     }
 
     private static function audits(iterable $events): array
