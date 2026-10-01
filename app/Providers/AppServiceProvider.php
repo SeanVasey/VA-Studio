@@ -13,6 +13,7 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
@@ -42,9 +43,15 @@ class AppServiceProvider extends ServiceProvider
 
             return [Limit::perMinute(5)->by($key.':minute'), Limit::perHour(20)->by($key.':hour')];
         });
-        Gate::define('administer-catalog', function (User $user): bool {
+        Gate::define('administer-catalog', function (User $user, bool $lockForUpdate = false): bool {
+            // Only transactional domain callers request a current locking authority read.
+            if ($lockForUpdate && DB::transactionLevel() === 0) {
+                return false;
+            }
             // Editors and background callers may retain a model after its authority changes.
-            $current = $user->exists ? User::find($user->getKey()) : null;
+            $current = $user->exists ? ($lockForUpdate
+                ? User::query()->lockForUpdate()->find($user->getKey())
+                : User::find($user->getKey())) : null;
 
             return $current !== null && $current->is_admin && $current->email_verified_at !== null;
         });

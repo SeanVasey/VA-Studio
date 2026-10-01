@@ -26,7 +26,9 @@ final class SubmitInquiry
             return DB::transaction(function () use ($body, $payload, $hash, $ownerHash): array {
                 // Publication withdrawal serializes with admission; drafts cannot activate this intake.
                 $publication = SitePublication::lockForUpdate()->find(1);
-                $setup = app(InquiryPolicy::class)->publicSetup(app(SiteContent::class)->current());
+                // Keep publication -> operator lock order; every authority reload is current,
+                // including when the caller already established a repeatable-read snapshot.
+                $setup = app(InquiryPolicy::class)->publicSetup(app(SiteContent::class)->current(), lockForUpdate: true);
                 if ($setup === null || $publication?->active_release_id === null) {
                     throw new InquiryException(404);
                 }
