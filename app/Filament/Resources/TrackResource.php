@@ -60,7 +60,8 @@ class TrackResource extends OperatorResource
             TextColumn::make('bpm'), TextColumn::make('musical_key'), TextColumn::make('genre'),
             TextColumn::make('status')->badge(),
         ])->selectCurrentPageOnly()->maxSelectableRecords(25)->toolbarActions([
-            BulkAction::make('addTags')->label('Add tags')->accessSelectedRecords(false)
+            // Keep Filament's Alpine selection transport; the domain loads and locks the exact bounded IDs itself.
+            BulkAction::make('addTags')->label('Add tags')->fetchSelectedRecords(false)
                 ->modalHeading('Add tags to selected tracks')->modalSubmitActionLabel('Review additions')
                 ->extraModalWindowAttributes(static::metadataModalAttributes())
                 ->schema([TagsInput::make('additions')->label('Tags to add')->required()

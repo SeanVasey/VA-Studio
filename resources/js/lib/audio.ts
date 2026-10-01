@@ -73,8 +73,10 @@ function owner(): HTMLAudioElement {
   audio.muted = snapshot.muted;
   const element = audio;
   let progressTime: number | null = null;
+  // WebKit can advance after a seek while reporting only current data.
+  // Readiness alone never recovers playback; a later native position must increase.
   const nativeTimeReady = () => !element.paused && !element.ended && !element.seeking && !element.error
-    && element.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA && Number.isFinite(element.currentTime);
+    && element.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA && Number.isFinite(element.currentTime);
   const readNativeProgress = () => {
     const time = element.currentTime;
     const ready = nativeTimeReady();

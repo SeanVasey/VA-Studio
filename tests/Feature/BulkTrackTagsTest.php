@@ -10,6 +10,8 @@ use App\Domain\Contracts\ContractRenderer;
 use App\Filament\Resources\TrackResource\Pages\ManageTracks;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
+use DOMDocument;
+use DOMXPath;
 use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
@@ -287,6 +289,53 @@ class BulkTrackTagsTest extends TestCase
         $this->assertNull($page->get('bulkTagReview'));
         $this->assertSame(['Original 1', 'UI tag'], $tracks[0]->fresh()->tags);
         $this->assertSame(['Original 2', 'UI tag'], $tracks[1]->fresh()->tags);
+    }
+
+    public function test_rendered_bulk_control_transports_selection_through_the_real_mounted_action_sequence(): void
+    {
+        $actor = LicenseFixtures::admin();
+        $tracks = $this->drafts($actor);
+        $this->actingAs($actor);
+        $before = $this->evidence();
+        $page = Livewire::test(ManageTracks::class);
+        $document = new DOMDocument;
+        $previous = libxml_use_internal_errors(true);
+        try {
+            $document->loadHTML($page->html());
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
+        }
+        $buttons = (new DOMXPath($document))->query('//button[normalize-space(.)="Add tags"]');
+        $this->assertCount(1, $buttons);
+        $button = $buttons->item(0);
+        // The ordinary Alpine table handler transports its selected IDs before mounting. A wire-only action does not.
+        $this->assertStringContainsString("mountAction('addTags'", $button->getAttribute('x-on:click'));
+        $this->assertFalse($button->hasAttribute('wire:click'));
+        $this->assertFalse($page->instance()->getTable()->getBulkAction('addTags')->shouldFetchSelectedRecords());
+
+        $ids = array_map(fn ($track) => (string) $track->id, $tracks);
+        $page->set('selectedTableRecords', $ids)
+            ->call('mountAction', 'addTags', [], ['table' => true, 'bulk' => true])
+            ->assertSet('mountedActions.0.name', 'addTags')
+            ->set('mountedActions.0.data.additions', ['UI tag'])
+            ->call('callMountedAction')
+            ->assertHasNoErrors()->assertSee('Review tag additions')
+            ->assertSet('selectedTableRecords', $ids)
+            ->assertSet('mountedActions.0.name', 'reviewTagAdditions');
+        $this->assertSame(array_column($tracks, 'id'), array_column($page->get('bulkTagReview')['tracks'], 'id'));
+        $this->assertSame($before, $this->evidence());
+        $page->call('mountAction', 'backToAdditions')
+            ->assertSet('bulkTagReview', null)->assertSee('Add tags to selected tracks')
+            ->assertSet('mountedActions.0.name', 'addTags')
+            ->call('callMountedAction')->assertHasNoErrors()->assertSee('Review tag additions');
+        $this->assertSame($before, $this->evidence());
+        $page->call('callMountedAction')->assertHasNoErrors()
+            ->assertNotified('Tags added to 2 tracks. 0 tracks already contained these tags.')
+            ->assertSet('bulkTagReview', null)->assertSet('mountedActions', []);
+        $this->assertSame(['Original 1', 'UI tag'], $tracks[0]->fresh()->tags);
+        $this->assertSame(['Original 2', 'UI tag'], $tracks[1]->fresh()->tags);
+        $this->assertSame(2, AuditEvent::where('action', 'catalog.track.metadata_updated')->count());
     }
 
     public function test_back_close_selection_change_and_client_tampering_cannot_reuse_a_review(): void

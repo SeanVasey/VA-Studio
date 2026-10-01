@@ -1,6 +1,6 @@
 # Media integrity evidence and follow-ups
 
-Status: T03–T08 integrated for full candidate verification, October 1, 2026 (UTC). Focused SQLite checks are executed; full MySQL/cloud acceptance remains pending. This document does not authorize production migration or cutover.
+Status: T03 and T05–T08 accepted in [PR #88](https://github.com/VASEYDEV/VASEYAUDIO/pull/88) on October 1, 2026 (UTC). T04's hash correction is accepted; its UUID child keeps T04 open until integrating MySQL acceptance. The actual tested head is `5e44354785c44e46a93dd97705ef050d62fc6ab5`, tree `4161be856fad978394368a1708bcec8f9085b7d3`, merged as `cc591daa001f774626e574885cbc7b4904f6b2d2`. [Foundation 36817029405](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36817029405) passed all complete gates. This evidence does not authorize a production migration or cutover.
 
 ## Executed evidence
 
@@ -37,7 +37,7 @@ Inventory UUID guards and retained-row exceptions, reproduce direct insert/updat
 
 ## Remaining acceptance
 
-No local MySQL server was available. qpdf was absent; the selected suites did not require it. Full candidate MySQL/SQLite/frontend/browser/audit gates and actual-head independent review remain required. MySQL must prove trigger DDL/retry/definition matching, text coercion, retained-data preflight, direct byte rejection and real commerce/concurrency behavior. Record exact tested commit/tree, run URL and per-engine results in the PR; local SQLite evidence does not substitute for that proof.
+The earlier local environment had no MySQL server or qpdf; its focused SQLite evidence is historical component proof. Accepted [Foundation 36817029405](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36817029405) now supplies 1,903 passing MySQL cases / 22,594 assertions with zero skips, and 1,809 passing SQLite cases / 18,647 assertions plus 94 intended MySQL-only skips. All 125 files and expanded identities reconcile exactly once per engine. MySQL verified trigger DDL/retry/definition matching, column conversion, retained-data preflight, stored-byte rejection and the complete commerce/concurrency suite. Both native site-image journeys passed, including the staff presentation of queue state. T03's whole-identifier regressions, T05's ten queue cases, T06's 47 stems cases, T07's 81 scanner and 26 media-processing cases, and T08's deadline/budget/claim/recovery cases are accepted on both relevant engines. These selections overlap; do not add their counts as distinct coverage. Real deployed workers, representative approved media, private transport/storage, production migration and broader work-package acceptance remain separate gates.
 
 ## MySQL raw input and stored-byte verification
 

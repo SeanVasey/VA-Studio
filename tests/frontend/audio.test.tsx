@@ -251,9 +251,9 @@ it('keeps the section loop alive through native seek waiting without restarting 
   expect(play).toHaveBeenCalledTimes(1);
 });
 
-it('clears seek loading only after ready native time advances without a replacement playing event', async () => {
+it.each([HTMLMediaElement.HAVE_FUTURE_DATA, HTMLMediaElement.HAVE_CURRENT_DATA])('clears seek loading only after native time advances at readyState %i without a replacement playing event', async (playbackReady) => {
   const play = nativePlayback();
-  let ready: number = HTMLMediaElement.HAVE_FUTURE_DATA;
+  let ready: number = playbackReady;
   let seeking = false;
   vi.spyOn(HTMLMediaElement.prototype, 'readyState', 'get').mockImplementation(() => ready);
   vi.spyOn(HTMLMediaElement.prototype, 'seeking', 'get').mockImplementation(() => seeking);
@@ -261,12 +261,12 @@ it('clears seek loading only after ready native time advances without a replacem
   await act(() => player.play(playable));
   const source = play.mock.contexts[0] as HTMLMediaElement;
   const status = screen.getByRole('status');
-  act(() => { ready = HTMLMediaElement.HAVE_CURRENT_DATA; source.dispatchEvent(new Event('waiting')); });
+  act(() => { ready = HTMLMediaElement.HAVE_METADATA; source.dispatchEvent(new Event('waiting')); });
   expect(status).toHaveTextContent('Loading');
-  act(() => { ready = HTMLMediaElement.HAVE_FUTURE_DATA; source.currentTime = 2; source.dispatchEvent(new Event('timeupdate')); });
+  act(() => { ready = playbackReady; source.currentTime = 2; source.dispatchEvent(new Event('timeupdate')); });
   expect(status).toHaveTextContent('Loading');
   act(() => { seeking = true; source.dispatchEvent(new Event('seeking')); });
-  act(() => { source.currentTime = 12; ready = HTMLMediaElement.HAVE_FUTURE_DATA; seeking = false; source.dispatchEvent(new Event('timeupdate')); source.dispatchEvent(new Event('seeked')); });
+  act(() => { source.currentTime = 12; ready = playbackReady; seeking = false; source.dispatchEvent(new Event('timeupdate')); source.dispatchEvent(new Event('seeked')); });
   // The seek's own position jump and completion are not playback-progress proof.
   expect(status).toHaveTextContent('Loading');
   act(() => source.dispatchEvent(new Event('timeupdate')));
@@ -278,9 +278,9 @@ it('clears seek loading only after ready native time advances without a replacem
   expect(play).toHaveBeenCalledTimes(1);
 });
 
-it('does not replace real waiting, paused, ended or error states with a progress claim', async () => {
+it.each([HTMLMediaElement.HAVE_FUTURE_DATA, HTMLMediaElement.HAVE_CURRENT_DATA])('does not replace real waiting, paused, ended or error states with a progress claim at readyState %i', async (playbackReady) => {
   const play = nativePlayback();
-  let ready: number = HTMLMediaElement.HAVE_FUTURE_DATA;
+  let ready: number = playbackReady;
   let seeking = false;
   let ended = false;
   let mediaError: MediaError | null = null;
@@ -296,9 +296,9 @@ it('does not replace real waiting, paused, ended or error states with a progress
     act(() => source.dispatchEvent(new Event('waiting')));
     act(() => { source.currentTime = 2; source.dispatchEvent(new Event('timeupdate')); source.dispatchEvent(new Event('timeupdate')); });
     expect(status).toHaveTextContent('Loading');
-    act(() => { ready = HTMLMediaElement.HAVE_CURRENT_DATA; source.currentTime = 3; source.dispatchEvent(new Event('timeupdate')); source.currentTime = 4; source.dispatchEvent(new Event('timeupdate')); });
+    act(() => { ready = HTMLMediaElement.HAVE_METADATA; source.currentTime = 3; source.dispatchEvent(new Event('timeupdate')); source.currentTime = 4; source.dispatchEvent(new Event('timeupdate')); });
     expect(status).toHaveTextContent('Loading');
-    act(() => { ready = HTMLMediaElement.HAVE_FUTURE_DATA; seeking = true; source.currentTime = 5; source.dispatchEvent(new Event('timeupdate')); source.currentTime = 6; source.dispatchEvent(new Event('timeupdate')); });
+    act(() => { ready = playbackReady; seeking = true; source.currentTime = 5; source.dispatchEvent(new Event('timeupdate')); source.currentTime = 6; source.dispatchEvent(new Event('timeupdate')); });
     expect(status).toHaveTextContent('Loading');
     act(() => { seeking = false; mediaError = { code: 3, message: 'Synthetic decode failure' } as MediaError; source.currentTime = 7; source.dispatchEvent(new Event('timeupdate')); source.currentTime = 8; source.dispatchEvent(new Event('timeupdate')); });
     expect(status).toHaveTextContent('Loading');
