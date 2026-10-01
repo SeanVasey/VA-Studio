@@ -14,7 +14,7 @@ Once this workflow exists on the default branch, GitHub Actions → **Focused de
 | `media` | 12 reviewed upload/evidence/diagnostics/scanner/master/budget/private-root/site-image/archive files. | `sqlite` or `mysql` |
 | `commerce` | 14 reviewed money/pricing/promotion/gateway/quote/hosted-checkout/webhook/hash-integrity files, including selected independent-process MySQL races. It excludes heavy finalization/delivery/membership coverage. | `sqlite` or `mysql`; MySQL-only cases are reported as skipped on SQLite. |
 | `frontend` | 17 reviewed frontend files, TypeScript/Vite production build and client-bundle secret scan. | Select `sqlite`; recorded engine is `none`. |
-| `browser` | Storefront, operator, test checkout, owner-download and row-menu readiness specs in both configured Chromium/WebKit projects, using the existing isolated fixture/server wrapper. | `sqlite` only |
+| `browser` | Eight reviewed specs: storefront, operator, test checkout, owner-download, row-menu readiness and actual editorial/content/schedule journeys in both configured Chromium/WebKit projects, using the isolated fixture/server wrapper. | `sqlite` only |
 
 The exact paths live in `scripts/ci/focused-tests.py`, are printed before execution and retained in JSON evidence. Files are a bounded reviewed allowlist, not a changing-files heuristic or arbitrary user filter. Unknown/empty enums, invalid combinations, missing files, repository escapes and empty/duplicate/oversized lists fail closed. Add a new relevant test to that allowlist in a reviewed change, or run the necessary test separately and the full candidate gate; do not infer coverage for unselected features.
 
