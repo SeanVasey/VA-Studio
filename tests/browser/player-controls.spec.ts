@@ -43,6 +43,30 @@ test('section markers loop native preview playback and remain reachable with key
   await storefrontFixture(page);
   await page.goto('/' + query);
   await page.getByRole('button', { name: `Play ${fixtureTrack.title}`, exact: true }).click();
+  // DIAGNOSTIC ONLY: observe native media without replacing methods/events or changing assertions.
+  // The bounded tail contains fixed event/sample types and numeric/boolean media fields only.
+  const nativeProbe = await page.evaluateHandle(() => {
+    const element = window.__nativePreviews[0];
+    const events = ['loadstart', 'loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough', 'play', 'playing', 'pause', 'waiting', 'stalled', 'seeking', 'seeked', 'timeupdate', 'ended', 'error', 'emptied', 'abort'] as const;
+    type Observation = { type: string; time: number; readyState: number; paused: boolean; seeking: boolean; ended: boolean; errorCode: number | null };
+    const rows: Observation[] = [];
+    const record = (type: string) => {
+      if (rows.length === 128) rows.shift();
+      rows.push({ type, time: element.currentTime, readyState: element.readyState, paused: element.paused,
+        seeking: element.seeking, ended: element.ended, errorCode: element.error?.code ?? null });
+    };
+    const observe = (event: Event) => record(event.type);
+    events.forEach(type => element.addEventListener(type, observe));
+    // Sampling can show native advancement even if WebKit emits no timeupdate during the status assertion.
+    const timer = window.setInterval(() => record('sample'), 250);
+    record('sample');
+    return { finish() {
+      record('sample');
+      window.clearInterval(timer);
+      events.forEach(type => element.removeEventListener(type, observe));
+      return rows.slice();
+    } };
+  });
   await expect(page.getByRole('slider', { name: 'Seek preview' })).toBeEnabled();
   await page.getByRole('button', { name: 'Queue & loop', exact: true }).click();
   const controls = page.getByRole('region', { name: 'Preview queue and loop controls' });
@@ -65,9 +89,15 @@ test('section markers loop native preview playback and remain reachable with key
   await controls.getByRole('button', { name: 'Clear loop' }).click();
   await expect(controls.getByText('Loop off', { exact: true })).toBeVisible();
   await expect(controls.getByRole('button', { name: 'Set A here' })).toBeFocused();
-  await page.evaluate(() => { window.__nativePreviews[0].currentTime = 12; });
-  await expect.poll(() => page.evaluate(() => window.__nativePreviews[0].currentTime)).toBeGreaterThan(12);
-  await expect(page.getByRole('complementary', { name: 'Audio preview player' }).getByRole('status')).toHaveText('');
+  try {
+    await page.evaluate(() => { window.__nativePreviews[0].currentTime = 12; });
+    await expect.poll(() => page.evaluate(() => window.__nativePreviews[0].currentTime)).toBeGreaterThan(12);
+    await expect(page.getByRole('complementary', { name: 'Audio preview player' }).getByRole('status')).toHaveText('');
+  } finally {
+    const observations = await nativeProbe.evaluate(probe => probe.finish());
+    await testInfo.attach('native-player-observations', { body: Buffer.from(JSON.stringify(observations, null, 2)), contentType: 'application/json' });
+    await nativeProbe.dispose();
+  }
   await page.keyboard.press('Escape');
   await expect(controls).toBeHidden();
   await expect(page.getByRole('button', { name: 'Queue & loop', exact: true })).toBeFocused();
