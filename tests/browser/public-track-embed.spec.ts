@@ -15,7 +15,7 @@ test('public preview iframe has native controls, no autoplay and a keyboard-acce
     if (response.request().resourceType() === 'font') fonts.push({ url: response.url(), status: response.status() });
   });
   await context.addInitScript(() => {
-    const target = window as Window & { __embedCspViolations: string[] };
+    const target = window as unknown as Window & { __embedCspViolations: string[] };
     target.__embedCspViolations = [];
     document.addEventListener('securitypolicyviolation', event => {
       target.__embedCspViolations.push(event.effectiveDirective + ' ' + event.blockedURI);
@@ -116,6 +116,6 @@ test('public preview iframe has native controls, no autoplay and a keyboard-acce
   await expect(popup).toHaveURL('http://127.0.0.1:8173/tracks/synthetic-browser-track');
   expect(await popup.evaluate(() => window.opener)).toBeNull();
   expect(await frame.locator('body').evaluate(element =>
-    (element.ownerDocument.defaultView as Window & { __embedCspViolations: string[] }).__embedCspViolations)).toEqual([]);
+    (element.ownerDocument.defaultView as unknown as Window & { __embedCspViolations: string[] }).__embedCspViolations)).toEqual([]);
   await testInfo.attach('embed-font-evidence', { contentType: 'application/json', body: Buffer.from(JSON.stringify({ loadedFonts, fonts })) });
 });
