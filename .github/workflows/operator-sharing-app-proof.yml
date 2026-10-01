@@ -1,0 +1,229 @@
+name: Isolated operator sharing application feedback
+
+# Informative only. This temporary branch does not replace Foundation acceptance.
+on:
+  push:
+    branches: [codex/operator-sharing-app-proof-20261001]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: isolated-operator-sharing-app-feedback
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  sharing-php:
+    name: Operator sharing PHP feedback (${{ matrix.engine }})
+    if: github.repository == 'VASEYDEV/VASEYAUDIO' && github.ref == 'refs/heads/codex/operator-sharing-app-proof-20261001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [sqlite, mysql]
+    services:
+      mysql:
+        # The only selector is the fixed, workflow-owned engine enum above.
+        image: ${{ matrix.engine == 'mysql' && 'mysql:8.4' || '' }}
+        env:
+          MYSQL_DATABASE: vaseyaudio_sharing_feedback
+          MYSQL_ROOT_PASSWORD: ci-only-password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -pci-only-password"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      DB_CONNECTION: ${{ matrix.engine }}
+      DB_DATABASE: ${{ matrix.engine == 'mysql' && 'vaseyaudio_sharing_feedback' || ':memory:' }}
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USERNAME: root
+      DB_PASSWORD: ci-only-password
+      DB_URL: ''
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+      CONTACT_INQUIRIES_ENABLED: 'false'
+      CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED: 'false'
+      STRIPE_TEST_CHECKOUT_ENABLED: 'false'
+      STRIPE_TEST_PAYMENT_PROCESSING_ENABLED: 'false'
+      STRIPE_TEST_FINALIZATION_ENABLED: 'false'
+      STRIPE_WEBHOOK_ENABLED: 'false'
+      STRIPE_TEST_SECRET_KEY: ''
+      STRIPE_WEBHOOK_SECRET: ''
+      STRIPE_ACCOUNT_ID: ''
+      VASEY_TEST_CONTRACT_ISSUANCE_ENABLED: 'false'
+      VASEY_TEST_FULFILLMENT_ACTIVATION_ENABLED: 'false'
+      VASEY_TEST_DELIVERY_ACCESS_ENABLED: 'false'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Record the exact informative source and fixed PHP selection
+        run: |
+          set -euo pipefail
+          test "$GITHUB_EVENT_NAME" = push
+          test "$GITHUB_REPOSITORY" = VASEYDEV/VASEYAUDIO
+          test "$GITHUB_REF" = refs/heads/codex/operator-sharing-app-proof-20261001
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git diff --exit-code HEAD --
+          test -z "$(git ls-files --others --exclude-standard)"
+          mkdir operator-sharing-app-evidence
+          {
+            git rev-parse HEAD HEAD^{tree}
+            sha256sum .github/workflows/operator-sharing-app-proof.yml composer.json composer.lock phpunit.xml tests/Feature/ReadTrackSharingTest.php
+          } 2>&1 | tee operator-sharing-app-evidence/php-source.log
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          coverage: none
+          tools: composer:v2
+      - name: Install Foundation media and PDF fixture prerequisites
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends ffmpeg util-linux qpdf poppler-utils
+          test -x /usr/bin/ffmpeg
+          test -x /usr/bin/ffprobe
+          test -x /usr/bin/prlimit
+      - name: Install the locked backend dependencies
+        run: |
+          set -euo pipefail
+          composer install --no-interaction --prefer-dist 2>&1 | tee operator-sharing-app-evidence/composer-install.log
+      - run: cp .env.example .env
+      - run: php artisan key:generate
+      - name: Record actual PHP, tool and fresh database runtimes
+        run: |
+          set -euo pipefail
+          {
+            php --version
+            php vendor/bin/phpunit --version
+            composer --version
+            ffmpeg -version
+            ffprobe -version
+            prlimit --version
+            qpdf --version
+            pdfinfo -v
+            php <<'PHP'
+          <?php
+          if (getenv('DB_CONNECTION') === 'mysql') {
+              $database = new PDO('mysql:host=127.0.0.1;port=3306;dbname=vaseyaudio_sharing_feedback', getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
+              $runtime = $database->query('SELECT VERSION() AS version, DATABASE() AS database_name, @@version_comment AS version_comment, @@sql_mode AS sql_mode, @@transaction_isolation AS transaction_isolation')->fetch(PDO::FETCH_ASSOC);
+              if (! str_starts_with($runtime['version'], '8.4.') || $runtime['database_name'] !== 'vaseyaudio_sharing_feedback') {
+                  throw new RuntimeException('Unexpected disposable MySQL runtime.');
+              }
+              $tables = (int) $database->query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'vaseyaudio_sharing_feedback'")->fetchColumn();
+          } elseif (getenv('DB_CONNECTION') === 'sqlite' && getenv('DB_DATABASE') === ':memory:') {
+              $database = new PDO('sqlite::memory:');
+              $runtime = ['version' => $database->query('SELECT sqlite_version()')->fetchColumn(), 'database_name' => ':memory:'];
+              $tables = (int) $database->query("SELECT COUNT(*) FROM sqlite_master WHERE type = 'table'")->fetchColumn();
+          } else {
+              throw new RuntimeException('Unexpected fixed database selection.');
+          }
+          if ($tables !== 0) {
+              throw new RuntimeException('The disposable database is not empty before tests.');
+          }
+          echo json_encode(['driver' => $database->getAttribute(PDO::ATTR_DRIVER_NAME), 'runtime' => $runtime, 'tables_before_tests' => $tables], JSON_THROW_ON_ERROR), PHP_EOL;
+          PHP
+          } 2>&1 | tee operator-sharing-app-evidence/php-runtime.log
+      - name: Run only the fixed sharing feature file on the selected disposable database
+        run: |
+          set -euo pipefail
+          php vendor/bin/phpunit tests/Feature/ReadTrackSharingTest.php \
+            --log-junit=operator-sharing-app-evidence/sharing-results.xml \
+            --fail-on-empty-test-suite --fail-on-phpunit-warning --display-warnings \
+            2>&1 | tee operator-sharing-app-evidence/phpunit.log
+      - name: Check formatting of the three sharing PHP paths once
+        if: matrix.engine == 'sqlite'
+        run: |
+          set -euo pipefail
+          php vendor/bin/pint --test app/Domain/Catalog/ReadTrackSharing.php \
+            app/Filament/Resources/TrackResource.php tests/Feature/ReadTrackSharingTest.php \
+            2>&1 | tee operator-sharing-app-evidence/pint.log
+      - name: Retain complete informative PHP evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: operator-sharing-app-${{ matrix.engine }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: operator-sharing-app-evidence/
+          retention-days: 7
+          if-no-files-found: error
+          overwrite: false
+
+  sharing-frontend:
+    name: Operator sharing standard frontend feedback
+    if: github.repository == 'VASEYDEV/VASEYAUDIO' && github.ref == 'refs/heads/codex/operator-sharing-app-proof-20261001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Record the exact informative frontend source
+        run: |
+          set -euo pipefail
+          test "$GITHUB_EVENT_NAME" = push
+          test "$GITHUB_REPOSITORY" = VASEYDEV/VASEYAUDIO
+          test "$GITHUB_REF" = refs/heads/codex/operator-sharing-app-proof-20261001
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git diff --exit-code HEAD --
+          test -z "$(git ls-files --others --exclude-standard)"
+          mkdir operator-sharing-app-evidence
+          {
+            git rev-parse HEAD HEAD^{tree}
+            sha256sum .github/workflows/operator-sharing-app-proof.yml package.json package-lock.json vitest.config.ts tests/frontend/operator-sharing.test.ts tests/frontend/operator-sharing.test.mjs resources/js/admin/operator-sharing.js
+          } 2>&1 | tee operator-sharing-app-evidence/frontend-source.log
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Record the actual frontend runtime
+        run: |
+          set -euo pipefail
+          {
+            node --version
+            npm --version
+          } 2>&1 | tee operator-sharing-app-evidence/frontend-runtime.log
+      - name: Install locked frontend dependencies
+        run: |
+          set -euo pipefail
+          npm ci 2>&1 | tee operator-sharing-app-evidence/npm-ci.log
+      - name: Run the complete standard frontend test suite
+        run: |
+          set -euo pipefail
+          npm test 2>&1 | tee operator-sharing-app-evidence/frontend-tests.log
+      - name: Run the standard TypeScript and client build
+        run: |
+          set -euo pipefail
+          npm run build 2>&1 | tee operator-sharing-app-evidence/frontend-build.log
+      - name: Scan the built client bundle for server secrets
+        run: |
+          set -euo pipefail
+          python3 scripts/ci/scan-client-bundle.py 2>&1 | tee operator-sharing-app-evidence/client-scan.log
+      - name: Run the standard high-severity frontend dependency audit
+        run: |
+          set -euo pipefail
+          npm audit --audit-level=high 2>&1 | tee operator-sharing-app-evidence/npm-audit.log
+      - name: Retain complete informative frontend evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: operator-sharing-app-frontend-${{ github.run_id }}-${{ github.run_attempt }}
+          path: operator-sharing-app-evidence/
+          retention-days: 7
+          if-no-files-found: error
+          overwrite: false
