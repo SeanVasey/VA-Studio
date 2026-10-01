@@ -15,6 +15,10 @@ concurrency:
 env:
   FOCUSED_SUITE: browser
   FOCUSED_ENGINE: sqlite
+  # The real synthetic media worker uses application tools, independently of Playwright's cached FFmpeg.
+  MEDIA_FFMPEG: /usr/bin/ffmpeg
+  MEDIA_FFPROBE: /usr/bin/ffprobe
+  MEDIA_PRLIMIT: /usr/bin/prlimit
 
 jobs:
   browser-diagnostic:
@@ -38,6 +42,40 @@ jobs:
           extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
           coverage: none
           tools: composer:v2
+      - name: Record application media-tool availability before installation
+        run: |
+          python3 - <<'PYTOOLS'
+          import json, os
+          from pathlib import Path
+          tools = {name: {"configured_path": os.environ[key], "executable": os.path.isfile(os.environ[key]) and os.access(os.environ[key], os.X_OK)}
+                   for name, key in (("ffmpeg", "MEDIA_FFMPEG"), ("ffprobe", "MEDIA_FFPROBE"), ("prlimit", "MEDIA_PRLIMIT"))}
+          evidence = {"schema_version": 1, "purpose": "diagnostic-prerequisite-observation", "phase": "before-installation", "tools": tools}
+          text = json.dumps(evidence, indent=2, sort_keys=True) + "\n"
+          Path("focused-ci-media-tools-before.json").write_text(text)
+          print(text)
+          PYTOOLS
+      - name: Install declared application media fixture prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends ffmpeg util-linux
+      - name: Verify declared application media fixture prerequisites
+        run: |
+          python3 - <<'PYTOOLS'
+          import json, os, subprocess
+          from pathlib import Path
+          tools = {name: {"configured_path": os.environ[key], "executable": os.path.isfile(os.environ[key]) and os.access(os.environ[key], os.X_OK)}
+                   for name, key in (("ffmpeg", "MEDIA_FFMPEG"), ("ffprobe", "MEDIA_FFPROBE"), ("prlimit", "MEDIA_PRLIMIT"))}
+          ready = all(tool["executable"] for tool in tools.values())
+          evidence = {"schema_version": 1, "purpose": "diagnostic-prerequisite-observation", "phase": "after-installation", "tools": tools, "ready": ready}
+          if ready:
+              evidence["version_first_lines"] = {name: subprocess.run([tool["configured_path"], "--version" if name == "prlimit" else "-version"],
+                  check=True, text=True, capture_output=True, timeout=10).stdout.splitlines()[0] for name, tool in tools.items()}
+          text = json.dumps(evidence, indent=2, sort_keys=True) + "\n"
+          Path("focused-ci-media-tools-after.json").write_text(text)
+          print(text)
+          if not ready:
+              raise SystemExit("A declared application media fixture prerequisite is unavailable.")
+          PYTOOLS
       - run: composer install --no-interaction --prefer-dist
       - run: npm ci
       - run: npm run build
