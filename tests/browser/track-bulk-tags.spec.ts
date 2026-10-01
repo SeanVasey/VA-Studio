@@ -35,6 +35,8 @@ async function draft(page: Page, title: string, slug: string, oldTag: string): P
   await addTags(dialog, 'Tags', [oldTag]);
   await dialog.getByRole('button', { name: 'Create', exact: true }).click();
   await expect(heading).toBeHidden();
+  // Other ordinary journeys retain their drafts; find this saved track across table pages.
+  await page.getByRole('searchbox', { name: 'Search', exact: true }).fill(title);
   await expect(trackRow(page, title)).toBeVisible();
   expect((await page.request.get(`/tracks/${slug}`)).status()).toBe(404);
   return { title, slug, oldTag };
