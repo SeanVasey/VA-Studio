@@ -61,8 +61,12 @@ return new class extends Migration
                 $matches = $existing === null || ($existing->name === $name && $existing->tbl_name === 'site_release_images'
                     && in_array($existing->sql, $owned, true));
             } else {
-                $existing = DB::table('information_schema.TRIGGERS')->where('TRIGGER_SCHEMA', DB::getDatabaseName())
-                    ->where('TRIGGER_NAME', $name)->first();
+                $named = DB::table('information_schema.TRIGGERS')->where('TRIGGER_SCHEMA', DB::getDatabaseName())
+                    ->whereRaw('LOWER(TRIGGER_NAME) = ?', [$name])->get();
+                if ($named->count() > 1) {
+                    throw new LogicException("Unexpected site release image guard identity for {$name}; existing guards and evidence are unchanged.");
+                }
+                $existing = $named->first();
                 $matches = $existing === null || ($existing->TRIGGER_NAME === $name && $existing->EVENT_OBJECT_TABLE === 'site_release_images'
                     && $existing->ACTION_TIMING === 'BEFORE' && $existing->EVENT_MANIPULATION === 'INSERT'
                     && $existing->ACTION_STATEMENT === $definition['body']);

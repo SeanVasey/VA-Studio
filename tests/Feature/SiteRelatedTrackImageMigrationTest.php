@@ -353,6 +353,30 @@ class SiteRelatedTrackImageMigrationTest extends TestCase
         $name = $target
             ? ($upgrade ? self::RELATED_TRACKS_GUARD : self::LEGACY_GUARD)
             : ($upgrade ? self::LEGACY_GUARD : self::RELATED_TRACKS_GUARD);
+        if (DB::getDriverName() === 'mysql') {
+            // The expected canonical guard must not conceal an unrelated same-folded name.
+            $this->insert($this->release(3), 'share', $this->readyImage('share'));
+            Schema::create('synthetic_image_guard_sibling', function ($table): void {
+                $table->id();
+                $table->text('foreign_private_evidence');
+            });
+            DB::table('synthetic_image_guard_sibling')->insert(['foreign_private_evidence' => 'Synthetic image guard sibling evidence must survive.']);
+            $uppercase = strtoupper($name);
+            DB::unprepared("CREATE TRIGGER {$uppercase} BEFORE DELETE ON synthetic_image_guard_sibling FOR EACH ROW BEGIN SET @synthetic_image_collision = 1; END");
+            $tables = ['site_release_images', 'site_releases', 'site_images', 'site_publication_revisions', 'site_publication_schedules', 'users'];
+            $before = [$this->siteSchema(), (array) DB::selectOne('SHOW CREATE TABLE synthetic_image_guard_sibling'),
+                $this->rows('synthetic_image_guard_sibling'), array_map($this->rows(...), $tables)];
+            try {
+                foreach ([fn () => $migration->up(), fn () => $migration->down()] as $operation) {
+                    $this->migrationRefused($operation);
+                    $this->assertSame($before, [$this->siteSchema(), (array) DB::selectOne('SHOW CREATE TABLE synthetic_image_guard_sibling'),
+                        $this->rows('synthetic_image_guard_sibling'), array_map($this->rows(...), $tables)]);
+                }
+            } finally {
+                DB::unprepared('DROP TRIGGER '.$uppercase);
+                Schema::dropIfExists('synthetic_image_guard_sibling');
+            }
+        }
         DB::unprepared('DROP TRIGGER '.$name);
         $uppercase = strtoupper($name);
         DB::unprepared(DB::getDriverName() === 'sqlite'

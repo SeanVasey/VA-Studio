@@ -121,7 +121,7 @@ jobs:
           <?php
           if (getenv('DB_CONNECTION') === 'mysql') {
               $database = new PDO('mysql:host=127.0.0.1;port=3306;dbname=vaseyaudio_migration_feedback', getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
-              $runtime = $database->query('SELECT VERSION() AS version, DATABASE() AS database_name, @@version_comment AS version_comment, @@sql_mode AS sql_mode, @@transaction_isolation AS transaction_isolation')->fetch(PDO::FETCH_ASSOC);
+              $runtime = $database->query('SELECT VERSION() AS version, DATABASE() AS database_name, @@version_comment AS version_comment, @@sql_mode AS sql_mode, @@transaction_isolation AS transaction_isolation, @@lower_case_table_names AS lower_case_table_names')->fetch(PDO::FETCH_ASSOC);
               if (! str_starts_with($runtime['version'], '8.4.') || $runtime['database_name'] !== 'vaseyaudio_migration_feedback') {
                   throw new RuntimeException('Unexpected disposable MySQL runtime.');
               }
@@ -163,4 +163,3 @@ jobs:
           retention-days: 7
           if-no-files-found: error
           overwrite: false
-

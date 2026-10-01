@@ -107,11 +107,22 @@ return new class extends Migration
 
     private function tableExists(): bool
     {
-        $existing = DB::getDriverName() === 'sqlite'
-            ? DB::table('sqlite_master')->whereRaw('name COLLATE NOCASE = ?', ['customer_inquiries'])->first()
-            : DB::table('information_schema.TABLES')->where('TABLE_SCHEMA', DB::getDatabaseName())->where('TABLE_NAME', 'customer_inquiries')->first();
-        if ($existing !== null && (DB::getDriverName() === 'sqlite' ? ($existing->name !== 'customer_inquiries' || $existing->type !== 'table')
-            : ($existing->TABLE_NAME !== 'customer_inquiries' || $existing->TABLE_TYPE !== 'BASE TABLE'))) {
+        if (DB::getDriverName() === 'mysql') {
+            // I_S table-name equality can be case sensitive even when its collation is not.
+            // Collect every folded match so a canonical name cannot mask a foreign sibling.
+            $matches = DB::table('information_schema.TABLES')->where('TABLE_SCHEMA', DB::getDatabaseName())
+                ->whereRaw('LOWER(TABLE_NAME) = ?', ['customer_inquiries'])->get();
+            if ($matches->isEmpty()) {
+                return false;
+            }
+            if ($matches->count() !== 1 || $matches->first()->TABLE_NAME !== 'customer_inquiries' || $matches->first()->TABLE_TYPE !== 'BASE TABLE') {
+                $this->unexpected('table identity');
+            }
+
+            return true;
+        }
+        $existing = DB::table('sqlite_master')->whereRaw('name COLLATE NOCASE = ?', ['customer_inquiries'])->first();
+        if ($existing !== null && ($existing->name !== 'customer_inquiries' || $existing->type !== 'table')) {
             $this->unexpected('table identity');
         }
 
@@ -297,7 +308,12 @@ return new class extends Migration
                 $existing = DB::table('sqlite_master')->where('type', 'trigger')->whereRaw('name COLLATE NOCASE = ?', [$name])->first();
                 $matches = $existing === null || ($existing->name === $name && $existing->tbl_name === 'customer_inquiries' && $existing->sql === $definition['statement']);
             } else {
-                $existing = DB::table('information_schema.TRIGGERS')->where('TRIGGER_SCHEMA', DB::getDatabaseName())->where('TRIGGER_NAME', $name)->first();
+                $named = DB::table('information_schema.TRIGGERS')->where('TRIGGER_SCHEMA', DB::getDatabaseName())
+                    ->whereRaw('LOWER(TRIGGER_NAME) = ?', [$name])->get();
+                if ($named->count() > 1) {
+                    $this->unexpected('guard identity for '.$name);
+                }
+                $existing = $named->first();
                 $matches = $existing === null || ($existing->TRIGGER_NAME === $name && $existing->EVENT_OBJECT_TABLE === 'customer_inquiries' && $existing->ACTION_TIMING === 'BEFORE'
                     && $existing->EVENT_MANIPULATION === $definition['operation'] && $existing->ACTION_STATEMENT === $definition['body']);
             }

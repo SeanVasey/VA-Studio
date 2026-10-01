@@ -252,6 +252,32 @@ class CustomerInquiryMigrationTest extends TestCase
     public function test_differently_cased_foreign_table_is_neither_adopted_nor_dropped(): void
     {
         $migration = require database_path('migrations/2026_10_01_000031_customer_inquiries.php');
+        if (DB::getDriverName() === 'mysql' && (int) DB::selectOne('SELECT @@lower_case_table_names AS value')->value === 0) {
+            // A complete empty owned table must not hide a second case-folded match.
+            Schema::create('CUSTOMER_INQUIRIES', function ($table): void {
+                $table->id();
+                $table->text('foreign_private_evidence');
+            });
+            DB::table('CUSTOMER_INQUIRIES')->insert(['foreign_private_evidence' => 'Synthetic sibling evidence must survive.']);
+            $before = [$this->schemaRows(), $this->rows('customer_inquiries'), $this->rows('CUSTOMER_INQUIRIES'), $this->parentEvidence()];
+            try {
+                foreach ([fn () => $migration->up(), fn () => $migration->down()] as $operation) {
+                    $ddl = $this->ddl(function () use ($operation): void {
+                        try {
+                            $operation();
+                            $this->fail('A case-folded foreign sibling was hidden by the canonical table.');
+                        } catch (LogicException $error) {
+                            $this->assertStringContainsString('table identity', $error->getMessage());
+                        }
+                    });
+                    $this->assertSame([], $ddl);
+                    $this->assertSame($before, [$this->schemaRows(), $this->rows('customer_inquiries'), $this->rows('CUSTOMER_INQUIRIES'), $this->parentEvidence()]);
+                }
+            } finally {
+                // Remove only the synthetic sibling fixture before the original lone-name case.
+                Schema::dropIfExists('CUSTOMER_INQUIRIES');
+            }
+        }
         $migration->down();
         Schema::create('CUSTOMER_INQUIRIES', function ($table): void {
             $table->id();
@@ -277,6 +303,32 @@ class CustomerInquiryMigrationTest extends TestCase
     public function test_differently_cased_schema_wide_names_are_refused_before_any_create(string $part): void
     {
         $migration = require database_path('migrations/2026_10_01_000031_customer_inquiries.php');
+        if ($part === 'trigger' && DB::getDriverName() === 'mysql') {
+            Schema::create('synthetic_inquiry_guard_sibling', function ($table): void {
+                $table->id();
+                $table->text('foreign_private_evidence');
+            });
+            DB::table('synthetic_inquiry_guard_sibling')->insert(['foreign_private_evidence' => 'Synthetic sibling guard evidence must survive.']);
+            DB::unprepared('CREATE TRIGGER CUSTOMER_INQUIRIES_DELETE BEFORE DELETE ON synthetic_inquiry_guard_sibling FOR EACH ROW BEGIN SET @synthetic_inquiry_collision = 1; END');
+            $before = [$this->schemaRows(), $this->rows('synthetic_inquiry_guard_sibling'), $this->rows('customer_inquiries'), $this->parentEvidence()];
+            try {
+                foreach ([fn () => $migration->up(), fn () => $migration->down()] as $operation) {
+                    $ddl = $this->ddl(function () use ($operation): void {
+                        try {
+                            $operation();
+                            $this->fail('A canonical guard concealed a case-folded foreign sibling.');
+                        } catch (LogicException $error) {
+                            $this->assertStringContainsString('guard identity', $error->getMessage());
+                        }
+                    });
+                    $this->assertSame([], $ddl);
+                    $this->assertSame($before, [$this->schemaRows(), $this->rows('synthetic_inquiry_guard_sibling'), $this->rows('customer_inquiries'), $this->parentEvidence()]);
+                }
+            } finally {
+                DB::unprepared('DROP TRIGGER CUSTOMER_INQUIRIES_DELETE');
+                Schema::dropIfExists('synthetic_inquiry_guard_sibling');
+            }
+        }
         $migration->down();
         Schema::create('synthetic_inquiry_case_collision', function ($table) use ($part): void {
             $table->id();

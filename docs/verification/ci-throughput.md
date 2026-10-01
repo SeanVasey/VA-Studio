@@ -1,5 +1,13 @@
 # CI throughput timing refresh
 
+## Current integration boundary — October 1, 2026
+
+The database-only T02 weighting candidate described below was prepared separately from active PR #89. Its two reviewed timing manifests are now composed, unchanged, with the inquiry/related-image migration recovery into checkpoint `b41f8f58845f25e686f8f11ca70b147a362af9ec`, tree `3b5aa741c0c9a1407514390ca7d740488704e814`. The historical measurement remains **146 files / 2,215 cases from run `36830305836`**, whose six database jobs passed but overall browser gates failed. Those measurements and offline redistribution estimates are not rewritten as current-source results or a demonstrated speedup.
+
+The separate old-source [Foundation run `36835120458`](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36835120458) has now completed successfully: head `bb41dbd5b6fba22f4f213b93e041ba322276f14b`, actual merge `33cc70475a4bdb610a6aa04700f3cdb674e4e209`, tree `8ceb8393d66b0ea4c2c2f46e429b0106ac4f5402`. Its independent [six-receipt/collector proof](ci-database-receipts.md) establishes 146 files / 2,218 actual cases and complete runtime gates for that old source, which did not contain this timing refresh. Independent P2 migration review still prevents merging that old head. The newly composed recovery/weighting source needs its own full Foundation/receipt acceptance; neither an old green run nor historical timing samples provide it. No reuse, gate reduction, parent-task completion or controlled runtime improvement is claimed.
+
+## Historical preparation record
+
 Status: a separate T02 weighting-data candidate now uses the six successful database shards from PR #89 run `36830305836`, whose overall Foundation run failed its browser gates. See the [latest database-only measurement](#october-1-database-only-weight-refresh). Only the two timing JSON files and this guide change; algorithms, tests, workflows, gates and reuse policy retain their existing contracts. The PR #88 record below remains historical. This is not full T01/T02 completion or candidate runtime acceptance.
 
 ## Historical PR #88 accepted measurement source
