@@ -1,0 +1,265 @@
+# Temporary native-only query feedback; original PHP/frontend component results stay source-specific.
+name: Public installation native query proof
+'on':
+  push:
+    branches:
+    - codex/public-installation-query-proof-20261001
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  installation-native:
+    name: Installation native guidance with canonical private query
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      APP_URL: http://127.0.0.1:8173
+      ASSET_URL: ''
+      DB_URL: ''
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+      STRIPE_WEBHOOK_ENABLED: 'false'
+      STRIPE_TEST_CHECKOUT_ENABLED: 'false'
+      STRIPE_TEST_PAYMENT_PROCESSING_ENABLED: 'false'
+      STRIPE_TEST_FINALIZATION_ENABLED: 'false'
+      CONTACT_INQUIRIES_ENABLED: 'false'
+      CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED: 'false'
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ':memory:'
+    steps:
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      with:
+        fetch-depth: 3
+        persist-credentials: false
+    - name: Require the exact reviewed checkpoint and sole temporary workflow
+      run: |
+        set -euo pipefail
+        mkdir pwa-evidence
+        python3 <<'CODE' 2>&1 | tee pwa-evidence/source-guard.log
+        from pathlib import Path
+        import hashlib,json,os,subprocess,tempfile
+        root=Path.cwd()
+        git=lambda *args:subprocess.check_output(['git',*args],text=True).strip()
+        event={key:os.environ.get(key) for key in ['GITHUB_SHA','GITHUB_EVENT_NAME','GITHUB_REPOSITORY','GITHUB_REF']}
+        if event['GITHUB_SHA']!=git('rev-parse','HEAD') or event['GITHUB_EVENT_NAME']!='push' or event['GITHUB_REPOSITORY']!='VASEYDEV/VASEYAUDIO' or event['GITHUB_REF']!='refs/heads/codex/public-installation-query-proof-20261001':
+            raise SystemExit('Unexpected actual event, repository, branch or triggering source.')
+        checkpoint='36ab8871f7fb7acdf4090bcf4f65489403235948'
+        permanent_tree='75d815fdf64db0f10102c32705c82e26022fa3cc'
+        baseline='0751e9638119516e64db13c8a2b0c47e989489a6'
+        baseline_tree='5b2c123d49dd839d1d64cdfaa2bc94d369dfa2d2'
+        workflow='.github/workflows/public-installation-fixture-proof.yml'
+        if git('rev-parse','HEAD^')!=checkpoint or git('rev-parse','HEAD~1^{tree}')!=permanent_tree:
+            raise SystemExit('Unexpected permanent source checkpoint.')
+        if git('rev-parse','HEAD~2')!=baseline or git('rev-parse','HEAD~2^{tree}')!=baseline_tree:
+            raise SystemExit('Unexpected checkpoint provenance.')
+        if git('diff','--name-status','HEAD^','HEAD')!='A\t'+workflow or git('status','--porcelain','--untracked-files=no'):
+            raise SystemExit('Only the reviewed temporary workflow may differ from the checkpoint.')
+        with tempfile.TemporaryDirectory(prefix='pwa-source-index-') as directory:
+            env={**os.environ,'GIT_INDEX_FILE':str(Path(directory)/'index')}
+            subprocess.run(['git','read-tree','HEAD'],env=env,check=True)
+            subprocess.run(['git','update-index','--force-remove',workflow],env=env,check=True)
+            removed_tree=subprocess.check_output(['git','write-tree'],env=env,text=True).strip()
+        if removed_tree!=permanent_tree:
+            raise SystemExit('Removing the sole workflow did not restore the exact permanent tree.')
+        expected_delta=[['M','docs/verification/public-app-installation.md'],['M','tests/browser/public-install.spec.ts']]
+        if [line.split('\t') for line in git('diff','--name-status','HEAD~2','HEAD^').splitlines()]!=expected_delta:
+            raise SystemExit('Only the two reviewed native query/doc paths may change at the permanent checkpoint.')
+        files=git('ls-files').splitlines()
+        if len(files)!=942:raise SystemExit('Unexpected tracked source inventory.')
+        sha={path:hashlib.sha256(Path(path).read_bytes()).hexdigest() for path in files}
+        manifest={'head':git('rev-parse','HEAD'),'tree':git('rev-parse','HEAD^{tree}'),'actual_event':event,
+            'checkpoint':checkpoint,'checkpoint_tree':permanent_tree,'baseline':baseline,'baseline_tree':baseline_tree,
+            'tree_after_removing_workflow':removed_tree,'reviewed_pwa_source':'71d97cd5fad38e12a3de2319bc84fe943ddf5fa6',
+            'reviewed_guide_correction':'ccb1425e2ce8bb720da96fb7439419be77b39524',
+            'local_permanent_composition':'631c0c5f3cba3c7b9093c538d7889477f8b48739',
+            'reviewed_query_correction':'44bcaa2afe46574b7b175e8c45b62f358919db73',
+            'reviewed_fixture_correction':'58c7e5125c600e89bd84eef88a68d1535228edf7',
+            'shared_worker_fix':'41850ec6799d2195172dc3fd9744d92460b5f7a9',
+            'checkpoint_delta':[line.split('\t') for line in git('diff','--name-status','HEAD~2','HEAD^').splitlines()],
+            'sha256':sha,'previous_php_frontend_proof':{'head':'e905f711fa308c99f86a1c037b7489819d63d989','tree':'620ec9c8bd806060b132061f871d725e82cc85cf','run':36865662042,'sqlite_cases':6,'mysql_cases':6,'frontend_cases':361},
+            'scope':'Native canonical-query/guidance proof only. Application/assets/PHP Feature/frontend test source is unchanged from the earlier failed proof whose PHP/frontend components passed. No PHP feature or frontend cases are rerun here; the inherited authority finding, complete Foundation and OS installation remain open.'}
+        Path('pwa-evidence/source.json').write_text(json.dumps(manifest,indent=2,sort_keys=True)+'\n')
+        print(json.dumps({'head':manifest['head'],'tree':manifest['tree'],'checkpoint':checkpoint,'permanent_tree':removed_tree,'tracked_files':len(files)}))
+        CODE
+    - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+      with:
+        node-version: '24'
+        cache: npm
+    - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45
+      with:
+        php-version: '8.4'
+        extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+        coverage: none
+        tools: composer:v2
+    - name: Install genuine media and PDF fixture prerequisites
+      run: |
+        set -euo pipefail
+        sudo apt-get update
+        sudo apt-get install --yes --no-install-recommends ffmpeg util-linux qpdf poppler-utils
+        for binary in ffmpeg ffprobe prlimit qpdf pdfinfo; do test -x "/usr/bin/$binary"; done
+    - name: Install locked Composer dependencies and verify backend quality
+      run: |
+        set -euo pipefail
+        composer install --no-interaction --prefer-dist 2>&1 | tee pwa-evidence/composer-install.log
+        composer validate --strict 2>&1 | tee pwa-evidence/composer-validate.log
+        composer audit 2>&1 | tee pwa-evidence/composer-audit.log
+        vendor/bin/pint --version 2>&1 | tee pwa-evidence/pint-version.log
+        php -l tests/browser/verify-public-installation-fixture.php 2>&1 | tee pwa-evidence/php-syntax.log
+        php -l tests/Support/public-embed-route-cache-worker.php 2>&1 | tee -a pwa-evidence/php-syntax.log
+        cp .env.example .env
+        php artisan key:generate
+    - name: Use a fresh locked frontend install, real build and security checks
+      run: |
+        set -euo pipefail
+        npm ci 2>&1 | tee pwa-evidence/npm-install.log
+        {
+          date -u '+%Y-%m-%dT%H:%M:%SZ'
+          node --version
+          npm --version
+          php --version
+          composer --version
+          vendor/bin/phpunit --version
+          vendor/bin/pint --version
+        } 2>&1 | tee pwa-evidence/runtime.log
+        npm run build 2>&1 | tee pwa-evidence/build.log
+        python3 scripts/ci/scan-client-bundle.py 2>&1 | tee pwa-evidence/client-scan.log
+        npm audit --audit-level=high --json > pwa-evidence/npm-audit.json 2> pwa-evidence/npm-audit.stderr
+        cat pwa-evidence/npm-audit.json
+        cp public/build/manifest.json pwa-evidence/vite-manifest.json
+    - name: Install the ordinary locked Chromium and WebKit projects
+      run: |
+        set -euo pipefail
+        npx playwright install --with-deps chromium webkit 2>&1 | tee pwa-evidence/browser-install.log
+    - name: Discover and execute only the reviewed journey through the original wrapper
+      run: |
+        set -euo pipefail
+        PLAYWRIGHT_JSON_OUTPUT_NAME=pwa-evidence/native-discovery.json node tests/browser/run.mjs public-install.spec.ts --list --reporter=json 2>&1 | tee pwa-evidence/native-discovery.log
+        PLAYWRIGHT_JSON_OUTPUT_NAME=pwa-evidence/native-results.json node tests/browser/run.mjs public-install.spec.ts --reporter=list,html,json 2>&1 | tee pwa-evidence/native.log
+    - name: Require both real native projects and exact fixture/privacy/audio receipts
+      run: |
+        set -euo pipefail
+        python3 <<'CODE' 2>&1 | tee pwa-evidence/native-receipt-check.log
+        from collections import Counter
+        from pathlib import Path
+        import base64,hashlib,json,math,struct,xml.etree.ElementTree as E
+        root=Path.cwd();directory=root/'pwa-evidence'
+        audit=json.loads((directory/'npm-audit.json').read_text());vulnerabilities=audit['metadata']['vulnerabilities']
+        if vulnerabilities['high'] or vulnerabilities['critical']:raise SystemExit('High/critical dependency audit findings.')
+        title='public installation guidance and real assets survive private preview navigation without replacing the audio owner'
+        pairs={('chromium-desktop',title),('webkit-mobile',title)}
+        def native_cases(report):
+            if Path(report['config']['rootDir']).resolve()!=root/'tests/browser' or report.get('errors'):
+                raise SystemExit('Unexpected ordinary native root/errors.')
+            if report['config'].get('globalTimeout')!=840000 or report['config'].get('workers')!=1:
+                raise SystemExit('Ordinary native suite limits changed.')
+            projects=report['config']['projects']
+            if Counter(project['name'] for project in projects)!=Counter(['chromium-desktop','webkit-mobile']) or any(project['retries']!=0 or project['timeout']!=60000 or project['repeatEach']!=1 for project in projects):
+                raise SystemExit('Ordinary native projects/case limits changed.')
+            found=[]
+            def walk(suite):
+                for spec in suite.get('specs',[]):
+                    if (root/'tests/browser'/spec['file']).resolve()!=root/'tests/browser/public-install.spec.ts' or spec['title']!=title:
+                        raise SystemExit('Unexpected native file/title.')
+                    found.extend((test['projectName'],spec['title'],spec,test) for test in spec['tests'])
+                for child in suite.get('suites',[]):walk(child)
+            for suite in report['suites']:walk(suite)
+            if Counter((project,name) for project,name,_,_ in found)!=Counter(pairs):
+                raise SystemExit('Exactly the two reviewed file/project identities are required.')
+            return found
+        native_cases(json.loads((directory/'native-discovery.json').read_text()))
+        result=json.loads((directory/'native-results.json').read_text())
+        if any(result['stats'].get(key)!=value for key,value in [('expected',2),('unexpected',0),('flaky',0),('skipped',0)]):
+            raise SystemExit('Native statistics must contain two first-attempt passes.')
+        manifest=json.loads((root/'public/manifest.webmanifest').read_text());receipts=[]
+        for project,_,spec,test in native_cases(result):
+            attempts=test['results']
+            if not spec['ok'] or test['expectedStatus']!='passed' or test['timeout']!=60000 or len(attempts)!=1 or attempts[0]['status']!='passed' or attempts[0]['retry']!=0 or attempts[0].get('errors') or not math.isfinite(attempts[0]['duration']) or attempts[0]['duration']<0:
+                raise SystemExit('Failed, skipped or retried native case.')
+            attachments=[a for a in attempts[0]['attachments'] if a['name']=='public-installation-metadata' and a['contentType']=='application/json']
+            if len(attachments)!=1:raise SystemExit('Missing genuine native installation metadata attachment.')
+            attachment=attachments[0]
+            if 'body' in attachment:body=base64.b64decode(attachment['body'],validate=True)
+            else:
+                path=Path(attachment['path']).resolve()
+                if not path.is_relative_to(root/'test-results'):raise SystemExit('Unexpected attachment path.')
+                body=path.read_bytes()
+            evidence=json.loads(body)
+            if set(evidence)!=set(['manifest','privateHeadRemoved','publicHeadRestored','nativeOwnerPreserved','physicalInstallationVerified']) or evidence['manifest']!=manifest or any(evidence[key] is not True for key in ['privateHeadRemoved','publicHeadRestored','nativeOwnerPreserved']) or evidence['physicalInstallationVerified'] is not False:
+                raise SystemExit('Native metadata/privacy/audio receipt is incomplete or overclaims installation.')
+            fixtures=[a for a in attempts[0]['attachments'] if a['name']=='public-installation-fixture' and a['contentType']=='application/json']
+            if len(fixtures)!=1:raise SystemExit('Missing genuine read-only fixture preservation attachment.')
+            fixture_attachment=fixtures[0]
+            if 'body' in fixture_attachment:fixture_body=base64.b64decode(fixture_attachment['body'],validate=True)
+            else:
+                path=Path(fixture_attachment['path']).resolve()
+                if not path.is_relative_to(root/'test-results'):raise SystemExit('Unexpected fixture attachment path.')
+                fixture_body=path.read_bytes()
+            fixture=json.loads(fixture_body)
+            if set(fixture)!=set(['phase','onlyPrivateDraftAndAuditAdded','releaseId','contentHash','snapshotHash','journeyRowsAndSchemaUnchanged']) or fixture['phase']!='verify' or fixture['onlyPrivateDraftAndAuditAdded'] is not True or fixture['journeyRowsAndSchemaUnchanged'] is not True or type(fixture['releaseId']) is not int or fixture['releaseId']<1 or any(not isinstance(fixture[key],str) or len(fixture[key])!=64 or any(char not in '0123456789abcdef' for char in fixture[key]) for key in ['contentHash','snapshotHash']):
+                raise SystemExit('Unpublished draft/setup-only delta or complete journey retention proof is missing.')
+            receipts.append({'project':project,'duration_ms':attempts[0]['duration'],'attachment_sha256':hashlib.sha256(body).hexdigest(),'evidence':evidence,'fixture_attachment_sha256':hashlib.sha256(fixture_body).hexdigest(),'fixture':fixture})
+        if len({receipt['fixture']['releaseId'] for receipt in receipts})!=2:
+            raise SystemExit('Each project must create its own immutable private draft.')
+        screenshots=list((root/'test-results').rglob('public-installation-guidance.png'))
+        if len(screenshots)!=2:raise SystemExit('Both genuine guidance screenshots are required.')
+        images=[]
+        for project,width in [('chromium-desktop',1440),('webkit-mobile',960)]:
+            matching=[path for path in screenshots if project in str(path.relative_to(root/'test-results'))]
+            if len(matching)!=1:raise SystemExit('Missing/duplicate project screenshot.')
+            data=matching[0].read_bytes()
+            if data[:8]!=b'\x89PNG\r\n\x1a\n' or len(data)<1000:raise SystemExit('Invalid genuine PNG screenshot.')
+            dimensions=struct.unpack('>II',data[16:24])
+            if dimensions[0]!=width or dimensions[1]<1:raise SystemExit('Unexpected project screenshot geometry.')
+            images.append({'project':project,'path':str(matching[0].relative_to(root)),'dimensions':dimensions,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()})
+        if not (root/'playwright-report/index.html').is_file() or not (root/'public/build/manifest.json').is_file():
+            raise SystemExit('Missing genuine HTML report/build manifest.')
+        built={str(path.relative_to(root)):{'bytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()} for path in (root/'public/build').rglob('*') if path.is_file()}
+        receipt={'php_feature_cases_rerun':False,'frontend_cases_rerun':False,'previous_component_run':36865662042,'native_cases':2,'native_retries':0,'native_receipts':receipts,'screenshots':images,'npm_vulnerabilities':vulnerabilities,'built_files':built,'scope':'PWA metadata/guidance/audio/privacy only; OS installation and complete Foundation acceptance remain open.'}
+        (directory/'native-receipt.json').write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n')
+        print(json.dumps(receipt,sort_keys=True))
+        CODE
+    - name: Verify style of only the new read-only fixture helper after native behavior
+      run: |
+        set -euo pipefail
+        vendor/bin/pint --test tests/browser/verify-public-installation-fixture.php 2>&1 | tee pwa-evidence/pint-test.log
+    - name: Require unchanged tracked source and digest all retained evidence
+      id: evidence_bookend
+      if: always()
+      run: |
+        set -euo pipefail
+        python3 <<'CODE' 2>&1 | tee pwa-evidence/source-bookend.log
+        from pathlib import Path
+        import hashlib,json,subprocess
+        root=Path.cwd();source=json.loads(Path('pwa-evidence/source.json').read_text())
+        files=subprocess.check_output(['git','ls-files'],text=True).splitlines()
+        actual={path:hashlib.sha256(Path(path).read_bytes()).hexdigest() for path in files}
+        if actual!=source['sha256'] or subprocess.check_output(['git','status','--porcelain','--untracked-files=no'],text=True).strip():
+            raise SystemExit('Verification changed tracked source.')
+        for folder in ['pwa-evidence','playwright-report','test-results']:
+            for path in (root/folder).rglob('*'):
+                relative=path.relative_to(root)
+                if any(part.startswith('.') for part in relative.parts) and relative.as_posix()!='test-results/.last-run.json':
+                    raise SystemExit('Unexpected hidden evidence path; refusing upload.')
+        evidence={str(path.relative_to(root)):{'bytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()} for folder in ['pwa-evidence','playwright-report','test-results'] for path in (root/folder).rglob('*') if path.is_file() and path.name not in ['source-bookend.log','evidence-digests.json']}
+        Path('pwa-evidence/evidence-digests.json').write_text(json.dumps({'head':source['head'],'tree':source['tree'],'tracked_source_unchanged':True,'files':evidence},indent=2,sort_keys=True)+'\n')
+        print(json.dumps({'tracked_source_unchanged':True,'retained_files':len(evidence)}))
+        CODE
+        printf 'upload_safe=true\n' >> "$GITHUB_OUTPUT"
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: public-installation-native-query-${{ github.run_id }}-${{ github.run_attempt }}
+        path: |-
+          pwa-evidence/
+          playwright-report/
+          test-results/
+        retention-days: 7
+        if-no-files-found: error
+        overwrite: false
+        include-hidden-files: true
+      if: always() && steps.evidence_bookend.outputs.upload_safe == 'true'
