@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Inquiries\InquiryPolicy;
 use App\Domain\Inquiries\Models\CustomerInquiry;
 use App\Domain\SiteBuilder\Models\SitePublication;
 use App\Domain\SiteBuilder\Models\SiteRelease;
@@ -11,6 +12,7 @@ use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\InquiryPrivacy;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
+use App\Support\CanonicalJson;
 use Filament\Facades\Filament;
 use Illuminate\Cache\ArrayLock;
 use Illuminate\Cache\ArrayStore;
@@ -21,6 +23,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -45,6 +48,8 @@ class CustomerInquiryHttpTest extends TestCase
 
     private SiteRelease $release;
 
+    private string $noticeToken;
+
     private int $requestNumber = 0;
 
     protected function setUp(): void
@@ -65,6 +70,7 @@ class CustomerInquiryHttpTest extends TestCase
             'inquiries.operator_user_id' => $this->operator->id,
         ]);
         $this->release = $this->publishContact();
+        $this->noticeToken = app(InquiryPolicy::class)->publicSetup(app(SiteContent::class)->current())['noticeToken'];
         $this->csrf = Str::random(40);
         $this->withSession(['_token' => $this->csrf]);
     }
@@ -87,7 +93,7 @@ class CustomerInquiryHttpTest extends TestCase
         return array_replace([
             'name' => 'Synthetic Buyer', 'email' => 'synthetic-buyer@example.test',
             'subject' => 'Synthetic recording inquiry', 'message' => "Synthetic private inquiry.\nSecond line.",
-            'website' => '', 'requestKey' => (string) Str::uuid(),
+            'website' => '', 'requestKey' => (string) Str::uuid(), 'noticeToken' => $this->noticeToken,
         ], $changes);
     }
 
@@ -124,7 +130,7 @@ class CustomerInquiryHttpTest extends TestCase
             $errors = $response->json('errors');
             $this->assertIsArray($errors);
             $this->assertNotEmpty($errors);
-            $this->assertSame([], array_diff(array_keys($errors), ['name', 'email', 'subject', 'message', 'website', 'requestKey', 'form']));
+            $this->assertSame([], array_diff(array_keys($errors), ['name', 'email', 'subject', 'message', 'website', 'requestKey', 'noticeToken', 'form']));
         }
     }
 
@@ -149,6 +155,7 @@ class CustomerInquiryHttpTest extends TestCase
         $response = $this->get('https://audio.example.test/contact', $this->editorialHeaders())->assertOk();
         $response->assertJsonPath('props.contactInquiryEnabled', true)
             ->assertJsonPath('props.contactInquiryPrivacyNotice', config('inquiries.privacy_notice'))
+            ->assertJsonPath('props.contactInquiryNoticeToken', $this->noticeToken)
             ->assertJsonPath('props.sitePreview', false)
             ->assertJsonPath('props.editorial.contactHref', 'mailto:operator%40example.test');
         $response->assertDontSee(config('inquiries.retention_policy_reference'), false)
@@ -157,6 +164,7 @@ class CustomerInquiryHttpTest extends TestCase
             $this->assertArrayNotHasKey($privateKey, $response->json('props'));
         }
         $this->assertFalse(session()->has('_inquiry_owner'));
+        $this->assertMatchesRegularExpression('/\A[a-f0-9]{64}\z/D', $response->json('props.contactInquiryNoticeToken'));
         $this->assertDatabaseCount('customer_inquiries', 0);
     }
 
@@ -165,14 +173,16 @@ class CustomerInquiryHttpTest extends TestCase
         config(['inquiries.enabled' => false]);
         $this->get('https://audio.example.test/contact', $this->editorialHeaders())->assertOk()
             ->assertJsonPath('props.contactInquiryEnabled', false)
-            ->assertJsonPath('props.contactInquiryPrivacyNotice', null);
+            ->assertJsonPath('props.contactInquiryPrivacyNotice', null)
+            ->assertJsonPath('props.contactInquiryNoticeToken', null);
         $this->assertError($this->submit($this->payload()), 404, 'INQUIRY_UNAVAILABLE');
 
         config(['inquiries.enabled' => true]);
         User::whereKey($this->operator->id)->update(['is_admin' => false]);
         $this->get('https://audio.example.test/contact', $this->editorialHeaders())->assertOk()
             ->assertJsonPath('props.contactInquiryEnabled', false)
-            ->assertJsonPath('props.contactInquiryPrivacyNotice', null);
+            ->assertJsonPath('props.contactInquiryPrivacyNotice', null)
+            ->assertJsonPath('props.contactInquiryNoticeToken', null);
         $this->assertError($this->submit($this->payload()), 404, 'INQUIRY_UNAVAILABLE');
         $this->assertDatabaseCount('customer_inquiries', 0);
     }
@@ -187,6 +197,7 @@ class CustomerInquiryHttpTest extends TestCase
         $this->assertPrivate($response);
         $this->assertFalse($response->json('props.contactInquiryEnabled') ?? false);
         $this->assertNull($response->json('props.contactInquiryPrivacyNotice'));
+        $this->assertNull($response->json('props.contactInquiryNoticeToken'));
         $response->assertDontSee(config('inquiries.privacy_notice'), false)
             ->assertDontSee(config('inquiries.retention_policy_reference'), false);
         $this->assertSame($this->release->id, SitePublication::findOrFail(1)->active_release_id);
@@ -211,6 +222,8 @@ class CustomerInquiryHttpTest extends TestCase
         $this->assertSame(config('inquiries.privacy_notice'), $inquiry->privacy_notice);
         $this->assertSame(hash('sha256', config('inquiries.privacy_notice')), $inquiry->privacy_notice_hash);
         $this->assertSame(config('inquiries.retention_policy_reference'), $inquiry->retention_policy_reference);
+        $this->assertSame(CanonicalJson::hash(array_diff_key($payload, ['requestKey' => true])), $inquiry->payload_hash);
+        $this->assertArrayNotHasKey('noticeToken', $inquiry->payload);
         foreach (['name', 'email', 'subject', 'message'] as $field) {
             $this->assertSame($payload[$field], $inquiry->payload[$field]);
             $response->assertDontSee($payload[$field], false);
@@ -221,7 +234,7 @@ class CustomerInquiryHttpTest extends TestCase
         $audit = AuditEvent::orderByDesc('id')->firstOrFail();
         $this->assertSame(CustomerInquiry::class, $audit->subject_type);
         $this->assertSame($inquiry->id, $audit->subject_id);
-        foreach (['name', 'email', 'subject', 'message', 'requestKey'] as $field) {
+        foreach (['name', 'email', 'subject', 'message', 'requestKey', 'noticeToken'] as $field) {
             $this->assertStringNotContainsString($payload[$field], json_encode($audit->getAttributes(), JSON_THROW_ON_ERROR));
         }
         foreach (['owner_hash', 'payload_hash', 'privacy_notice_hash', 'site_content_hash', 'request_key'] as $field) {
@@ -245,6 +258,112 @@ class CustomerInquiryHttpTest extends TestCase
         $this->assertSame($retained, CustomerInquiry::sole()->getAttributes());
         $this->assertSame($audits, AuditEvent::count());
         $this->assertDatabaseCount('customer_inquiries', 1);
+    }
+
+    public static function displayedContextChanges(): array
+    {
+        return ['notice' => ['notice'], 'retention reference' => ['retention'], 'operator association' => ['operator'],
+            'selected release' => ['release'], 'restored original release' => ['restored release']];
+    }
+
+    private function changeDisplayedContext(string $context): void
+    {
+        match ($context) {
+            'notice' => config(['inquiries.privacy_notice' => 'SYNTHETIC CHANGED NOTICE: review this exact notice before sending.']),
+            'retention' => config(['inquiries.retention_policy_reference' => 'SYNTHETIC-CHANGED-RETENTION']),
+            'operator' => config(['inquiries.operator_user_id' => LicenseFixtures::admin()->id]),
+            'release', 'restored release' => $this->publishContact(),
+        };
+        if ($context === 'restored release') {
+            app(SiteContent::class)->rollback($this->release->id, SitePublication::findOrFail(1)->revision, $this->operator);
+        }
+    }
+
+    private function noticeEvidence(): array
+    {
+        $evidence = [];
+        foreach (['customer_inquiries', 'audit_events', 'site_publications', 'site_releases', 'users'] as $table) {
+            $evidence[$table] = DB::table($table)->orderBy('id')->get()->map(fn ($row): array => (array) $row)->all();
+        }
+
+        return $evidence;
+    }
+
+    #[DataProvider('displayedContextChanges')]
+    public function test_first_attempt_rejects_stale_displayed_context_and_accepts_only_a_refreshed_token(string $context): void
+    {
+        $displayed = $this->get('https://audio.example.test/contact', $this->editorialHeaders())->assertOk();
+        $original = $displayed->json('props.contactInquiryNoticeToken');
+        $this->assertSame($this->noticeToken, $original);
+        $payload = $this->payload(['noticeToken' => $original]);
+        $this->changeDisplayedContext($context);
+        $before = $this->noticeEvidence();
+        $response = $this->submit($payload);
+        $this->assertError($response, 422, 'INQUIRY_VALIDATION_FAILED');
+        $response->assertJsonPath('errors.noticeToken', ['Refresh contact to review the current privacy notice before sending.']);
+        $this->assertSame(['noticeToken'], array_keys($response->json('errors')));
+        $response->assertDontSee($original, false)->assertDontSee($payload['message'], false);
+        $this->assertSame($before, $this->noticeEvidence());
+        $this->assertDatabaseCount('customer_inquiries', 0);
+
+        $refreshed = $this->get('https://audio.example.test/contact', $this->editorialHeaders())->assertOk();
+        $token = $refreshed->json('props.contactInquiryNoticeToken');
+        $this->assertMatchesRegularExpression('/\A[a-f0-9]{64}\z/D', $token);
+        $this->assertNotSame($original, $token);
+        $this->assertSame($before, $this->noticeEvidence());
+        $payload['noticeToken'] = $token;
+        $this->submit($payload)->assertCreated();
+        $inquiry = CustomerInquiry::sole();
+        $this->assertSame(config('inquiries.privacy_notice'), $inquiry->privacy_notice);
+        $this->assertSame(config('inquiries.retention_policy_reference'), $inquiry->retention_policy_reference);
+        $this->assertSame(config('inquiries.operator_user_id'), $inquiry->operator_user_id);
+        $this->assertSame(SitePublication::findOrFail(1)->active_release_id, $inquiry->site_release_id);
+        $this->assertSame(CanonicalJson::hash(array_diff_key($payload, ['requestKey' => true])), $inquiry->payload_hash);
+        $this->assertArrayNotHasKey('noticeToken', $inquiry->payload);
+        Http::assertNothingSent();
+        Mail::assertNothingOutgoing();
+        Queue::assertNothingPushed();
+    }
+
+    #[DataProvider('displayedContextChanges')]
+    public function test_saved_replay_keeps_original_notice_context_and_replacing_its_token_conflicts(string $context): void
+    {
+        $payload = $this->payload();
+        $receipt = $this->submit($payload)->assertCreated()->json('receipt');
+        $retained = CustomerInquiry::sole()->getRawOriginal();
+        $this->changeDisplayedContext($context);
+        $before = $this->noticeEvidence();
+        $this->submit($payload)->assertOk()->assertExactJson(['state' => 'saved', 'receipt' => $receipt]);
+        $this->assertSame($retained, CustomerInquiry::sole()->getRawOriginal());
+        $this->assertSame($before, $this->noticeEvidence());
+        $current = $this->get('https://audio.example.test/contact', $this->editorialHeaders())->assertOk()
+            ->json('props.contactInquiryNoticeToken');
+        $this->assertNotSame($payload['noticeToken'], $current);
+        $changed = array_replace($payload, ['noticeToken' => $current]);
+        $conflict = $this->submit($changed);
+        $this->assertError($conflict, 409, 'INQUIRY_REQUEST_CONFLICT');
+        $conflict->assertDontSee($receipt, false)->assertDontSee($current, false);
+        $this->assertSame($retained, CustomerInquiry::sole()->getRawOriginal());
+        $this->assertSame($before, $this->noticeEvidence());
+        $this->assertDatabaseCount('customer_inquiries', 1);
+        Http::assertNothingSent();
+        Mail::assertNothingOutgoing();
+        Queue::assertNothingPushed();
+    }
+
+    public function test_notice_issuer_refuses_unselected_content_or_missing_key_without_retaining_evidence(): void
+    {
+        $content = app(SiteContent::class)->current();
+        $this->publishContact();
+        // Identical content still needs a new token for a different selected release/revision.
+        $this->assertNotSame($this->noticeToken, app(InquiryPolicy::class)->publicSetup($content)['noticeToken']);
+        $foreign = $content;
+        $foreign['contact']['title'] = 'Different synthetic displayed content';
+        $before = $this->noticeEvidence();
+        $this->assertNull(app(InquiryPolicy::class)->publicSetup($foreign));
+        config(['app.key' => '']);
+        $this->assertNull(app(InquiryPolicy::class)->publicSetup($content));
+        $this->assertSame($before, $this->noticeEvidence());
     }
 
     public function test_lost_and_foreign_sessions_cannot_recover_a_previous_receipt_using_its_request_key(): void
@@ -318,6 +437,16 @@ class CustomerInquiryHttpTest extends TestCase
             'request key wrong version' => ['requestKey', 'a939278e-7ddb-1ba6-8b33-5adb441b05dd', false],
             'request key wrong variant' => ['requestKey', 'a939278e-7ddb-4ba6-7b33-5adb441b05dd', false],
             'request key padded' => ['requestKey', ' a939278e-7ddb-4ba6-8b33-5adb441b05dd ', false],
+            'notice token missing' => ['noticeToken', null, true],
+            'notice token null' => ['noticeToken', null, false],
+            'notice token array' => ['noticeToken', ['private'], false],
+            'notice token short' => ['noticeToken', str_repeat('a', 63), false],
+            'notice token long' => ['noticeToken', str_repeat('a', 65), false],
+            'notice token uppercase' => ['noticeToken', str_repeat('A', 64), false],
+            'notice token padded' => ['noticeToken', ' '.str_repeat('a', 64).' ', false],
+            'notice token final newline' => ['noticeToken', str_repeat('a', 64)."\n", false],
+            'notice token nonhex' => ['noticeToken', str_repeat('g', 64), false],
+            'notice token forged' => ['noticeToken', str_repeat('a', 64), false],
         ];
     }
 

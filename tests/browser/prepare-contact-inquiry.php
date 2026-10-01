@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\Inquiries\InquiryInput;
 use App\Domain\Inquiries\InquiryPolicy;
 use App\Domain\Inquiries\Models\CustomerInquiry;
 use App\Domain\SiteBuilder\Models\SitePublication;
@@ -21,6 +22,8 @@ try {
     $marker = getenv('VASEY_BROWSER_INQUIRY_MARKER');
     $mode = $argv[1] ?? null;
     $project = $argv[2] ?? null;
+    $transport = in_array($mode, ['transport-prepare', 'transport-rotate', 'transport-restore'], true);
+    $operation = $transport ? substr($mode, strlen('transport-')) : $mode;
     if (PHP_SAPI !== 'cli' || ! is_string($directory) || is_link($directory) || realpath($directory) !== $directory
         || realpath(dirname($directory)) !== realpath(sys_get_temp_dir()) || ! preg_match('/\Avasey-browser-[A-Za-z0-9]+\z/D', basename($directory))
         || getenv('APP_ENV') !== 'local' || getenv('APP_URL') !== 'http://127.0.0.1:8173'
@@ -33,7 +36,8 @@ try {
         || file_exists($directory.'/routes.php') || file_exists($directory.'/events.php')
         || ! is_string($marker) || preg_match('/\A[a-f0-9]{64}\z/D', $marker) !== 1
         || ! in_array($project, ['chromium-desktop', 'webkit-mobile'], true)
-        || ! in_array($mode, ['prepare', 'verify', 'restore'], true) || count($argv) !== ($mode === 'verify' ? 5 : 3)) {
+        || ! in_array($mode, ['prepare', 'verify', 'restore', 'transport-prepare', 'transport-rotate', 'transport-restore'], true)
+        || count($argv) !== ($operation === 'verify' ? 5 : 3)) {
         throw new RuntimeException('Not an isolated inquiry browser run.');
     }
     foreach (['fixtures.json', 'inquiry-fixture-marker.json'] as $file) {
@@ -62,17 +66,30 @@ try {
     if ($operator->email !== 'browser-operator@example.test' || ! Gate::forUser($operator)->allows('administer-catalog') || ! AdminMultiFactor::satisfiedBy($operator)) {
         throw new RuntimeException('Synthetic operator identity mismatch.');
     }
-    $path = $directory.'/inquiry-'.$project.'.json';
+    $path = $directory.'/inquiry-'.($transport ? 'transport-' : '').$project.'.json';
+    $rotationPath = $path.'.rotation.json';
     if (is_link($path)) {
         throw new RuntimeException('Unsafe fixture record.');
     }
     $site = app(SiteContent::class);
-    if ($mode === 'prepare') {
-        if (file_exists($path)) {
+    $inquiryGraph = static fn (): string => CanonicalJson::hash([
+        'inquiries' => DB::table('customer_inquiries')->orderBy('id')->get()->map(fn ($row): array => (array) $row)->all(),
+        'audits' => DB::table('audit_events')->where('action', 'like', 'inquiry.%')->orderBy('id')->get()->map(fn ($row): array => (array) $row)->all(),
+    ]);
+    $retainedRows = static fn (int $auditEnd): string => CanonicalJson::hash([
+        'orders' => DB::table('orders')->orderBy('id')->get()->map(fn ($row): array => (array) $row)->all(),
+        'grants' => DB::table('license_grants')->orderBy('id')->get()->map(fn ($row): array => (array) $row)->all(),
+        'audits' => DB::table('audit_events')->where('id', '<=', $auditEnd)->orderBy('id')->get()->map(fn ($row): array => (array) $row)->all(),
+    ]);
+    if ($operation === 'prepare') {
+        if (file_exists($path) || file_exists($rotationPath)) {
             throw new RuntimeException('Inquiry fixture already prepared.');
         }
-        $fixture = DB::transaction(function () use ($site, $path, $project, $operator, $marker, &$writtenPath): array {
+        $fixture = DB::transaction(function () use ($site, $path, $project, $operator, $marker, $inquiryGraph, $retainedRows, $transport, &$writtenPath): array {
             $before = SitePublication::lockForUpdate()->findOrFail(1);
+            $auditStartId = (int) (AuditEvent::max('id') ?? 0);
+            $inquiryGraphHash = $transport ? $inquiryGraph() : null;
+            $retainedRowsHash = $transport ? $retainedRows($auditStartId) : null;
             $values = ['name' => 'Synthetic inquiry visitor '.$project, 'email' => 'inquiry-'.$project.'@example.test',
                 'subject' => 'Synthetic inquiry subject '.$project, 'message' => "Synthetic private message.\nKeep exact Unicode: é 🎧.\n<script>synthetic escaped text</script>", 'website' => ''];
             $release = $site->create(SiteEditorialFixtures::content('SYNTHETIC INQUIRY '.$project), 'Synthetic inquiry '.$project, $operator);
@@ -83,6 +100,10 @@ try {
                 'previewPath' => '/admin/site-releases/'.$preview->id.'/preview/contact', 'privacyNotice' => config('inquiries.privacy_notice'),
                 'values' => $values, 'inquiryCount' => CustomerInquiry::count(), 'orders' => DB::table('orders')->count(),
                 'grants' => DB::table('license_grants')->count(), 'inboxAuditLastId' => (int) (AuditEvent::where('action', 'inquiry.inbox_viewed')->max('id') ?? 0), 'restored' => false];
+            if ($transport) {
+                $fixture += ['inquiryGraphHash' => $inquiryGraphHash, 'retainedRowsHash' => $retainedRowsHash,
+                    'auditStartId' => $auditStartId, 'baselineRetained' => $before->revision === 0];
+            }
             if (app(InquiryPolicy::class)->publicSetup($site->current()) === null) {
                 throw new RuntimeException('Synthetic public intake did not become eligible.');
             }
@@ -114,10 +135,53 @@ try {
         if (($fixture['marker'] ?? null) !== $marker || ($fixture['project'] ?? null) !== $project) {
             throw new RuntimeException('Prepared fixture identity mismatch.');
         }
-        if ($mode === 'restore') {
+        if ($operation === 'rotate') {
+            if (! $transport || file_exists($rotationPath) || is_link($rotationPath)) {
+                throw new RuntimeException('This transport fixture cannot rotate again.');
+            }
+            DB::transaction(function () use ($site, $fixture, $project, $operator, $marker, $rotationPath, &$writtenPath): void {
+                $current = SitePublication::lockForUpdate()->findOrFail(1);
+                if ($current->active_release_id !== $fixture['releaseId']) {
+                    throw new RuntimeException('Another publication replaced the transport fixture.');
+                }
+                $release = $site->create(SiteEditorialFixtures::content('SYNTHETIC REFRESHED INQUIRY '.$project), 'Synthetic refreshed inquiry '.$project, $operator);
+                $site->publish($release->id, $current->revision, $operator);
+                $rotation = ['marker' => $marker, 'project' => $project, 'releaseId' => $release->id, 'previousReleaseId' => $fixture['releaseId']];
+                umask(0077);
+                $stream = fopen($rotationPath, 'x');
+                if ($stream === false) {
+                    throw new RuntimeException('Unable to retain disposable rotation evidence.');
+                }
+                $writtenPath = $rotationPath;
+                try {
+                    $json = json_encode($rotation, JSON_THROW_ON_ERROR);
+                    if (! chmod($rotationPath, 0600) || fwrite($stream, $json) !== strlen($json) || ! fflush($stream)) {
+                        throw new RuntimeException('Unable to retain disposable rotation evidence.');
+                    }
+                } finally {
+                    fclose($stream);
+                }
+            });
+            $writtenPath = null;
+            echo "{\"rotated\":true}\n";
+        } elseif ($operation === 'restore') {
+            $expectedReleaseId = $fixture['releaseId'];
+            $rotations = 0;
+            if ($transport && file_exists($rotationPath)) {
+                if (is_link($rotationPath) || realpath($rotationPath) !== $rotationPath) {
+                    throw new RuntimeException('Unsafe transport rotation evidence.');
+                }
+                $rotation = json_decode(file_get_contents($rotationPath), true, 8, JSON_THROW_ON_ERROR);
+                if (($rotation['marker'] ?? null) !== $marker || ($rotation['project'] ?? null) !== $project
+                    || ($rotation['previousReleaseId'] ?? null) !== $fixture['releaseId']) {
+                    throw new RuntimeException('Transport rotation identity mismatch.');
+                }
+                $expectedReleaseId = $rotation['releaseId'];
+                $rotations = 1;
+            }
             $current = SitePublication::findOrFail(1);
             if ($fixture['restored'] !== true) {
-                if ($current->active_release_id !== $fixture['releaseId']) {
+                if ($current->active_release_id !== $expectedReleaseId) {
                     throw new RuntimeException('Another publication replaced the fixture.');
                 }
                 $site->rollback($fixture['restoreReleaseId'], $current->revision, $operator);
@@ -129,7 +193,26 @@ try {
             if (SitePublication::findOrFail(1)->active_release_id !== $fixture['restoreReleaseId']) {
                 throw new RuntimeException('The prior publication was not restored.');
             }
-            echo "{\"restored\":true}\n";
+            if ($transport) {
+                $audits = AuditEvent::where('id', '>', $fixture['auditStartId'])->get();
+                $expected = ['site.release.created' => 2 + $rotations, 'site.release.publish' => 1 + $rotations, 'site.release.rollback' => 1];
+                if ($fixture['baselineRetained']) {
+                    $expected['site.release.baseline_retained'] = 1;
+                }
+                if (! hash_equals($fixture['inquiryGraphHash'], $inquiryGraph())
+                    || ! hash_equals($fixture['retainedRowsHash'], $retainedRows($fixture['auditStartId'])) || DB::table('orders')->count() !== $fixture['orders']
+                    || DB::table('license_grants')->count() !== $fixture['grants'] || $audits->count() !== array_sum($expected)
+                    || $audits->contains(fn (AuditEvent $event): bool => $event->actor_id !== 1)
+                    || $audits->groupBy('action')->map->count()->sortKeys()->all() !== collect($expected)->sortKeys()->all()) {
+                    throw new RuntimeException('Transport fixture changed retained inquiry, commerce or publication evidence.');
+                }
+                if (($rotations === 1 && ! unlink($rotationPath)) || ! unlink($path)) {
+                    throw new RuntimeException('Unable to remove this restored transport fixture metadata.');
+                }
+            }
+            echo json_encode($transport ? ['restored' => true, 'unchangedInquiryGraph' => true, 'unchangedCommerceCounts' => true, 'unchangedOriginalRowsAndAudits' => true,
+                'expectedSitePublicationAudits' => true, 'rotations' => $rotations, 'inquiryGraphHash' => $fixture['inquiryGraphHash'],
+                'retainedRowsHash' => $fixture['retainedRowsHash']] : ['restored' => true], JSON_THROW_ON_ERROR)."\n";
         } else {
             $receipt = $argv[3] ?? '';
             $state = $argv[4] ?? '';
@@ -137,11 +220,22 @@ try {
             if (preg_match('/\A[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/D', $receipt) !== 1 || $version === null) {
                 throw new RuntimeException('Invalid verification arguments.');
             }
+            $submitted = stream_get_contents(STDIN, 16385);
+            if (! is_string($submitted) || strlen($submitted) === 0 || strlen($submitted) > 16384) {
+                throw new RuntimeException('Missing bounded browser submission evidence.');
+            }
+            $body = InquiryInput::validate(json_decode($submitted, true, 3, JSON_THROW_ON_ERROR));
+            $setup = app(InquiryPolicy::class)->publicSetup($site->current());
+            if ($setup === null || ! hash_equals($setup['noticeToken'], $body['noticeToken'])
+                || array_diff_key($body, ['requestKey' => true, 'noticeToken' => true]) !== $fixture['values']) {
+                throw new RuntimeException('The browser did not submit the exact issued notice and private fields.');
+            }
             $inquiry = CustomerInquiry::where('public_id', $receipt)->sole();
             $raw = DB::table('customer_inquiries')->where('id', $inquiry->id)->sole();
             if ($inquiry->payload !== $fixture['values'] || $inquiry->state !== $state || $inquiry->version !== $version
                 || $inquiry->privacy_notice !== $fixture['privacyNotice'] || $inquiry->privacy_notice_hash !== hash('sha256', $fixture['privacyNotice'])
-                || $inquiry->payload_hash !== CanonicalJson::hash($fixture['values']) || $inquiry->site_release_id !== $fixture['releaseId']
+                || $inquiry->payload_hash !== CanonicalJson::hash(array_diff_key($body, ['requestKey' => true]))
+                || $inquiry->request_key !== $body['requestKey'] || $inquiry->site_release_id !== $fixture['releaseId']
                 || $inquiry->site_content_hash !== $fixture['releaseHash']
                 || $inquiry->operator_user_id !== 1 || $inquiry->retention_policy_reference !== 'SYNTHETIC-BROWSER-ONLY'
                 || CustomerInquiry::count() !== $fixture['inquiryCount'] + 1 || DB::table('orders')->count() !== $fixture['orders']
@@ -152,6 +246,11 @@ try {
                 if (str_contains($raw->payload, $value) || str_contains($raw->privacy_notice, $fixture['privacyNotice'])) {
                     throw new RuntimeException('Private input was retained as plaintext.');
                 }
+            }
+            if (str_contains(json_encode((array) $raw, JSON_THROW_ON_ERROR), $body['noticeToken'])
+                || str_contains(file_get_contents($path), $body['noticeToken'])
+                || DB::table('jobs')->get()->contains(fn ($job): bool => str_contains($job->payload, $body['noticeToken']))) {
+                throw new RuntimeException('The raw notice token was retained outside the request.');
             }
             foreach (['received' => 1, 'read' => $version >= 1 ? 1 : 0, 'archived' => $version === 2 ? 1 : 0] as $action => $count) {
                 $events = AuditEvent::where('subject_type', CustomerInquiry::class)->where('subject_id', $inquiry->id)->where('action', 'inquiry.'.$action)->get();
@@ -172,8 +271,11 @@ try {
                         throw new RuntimeException('Private input appeared in audit context.');
                     }
                 }
+                if (str_contains($context, $body['noticeToken'])) {
+                    throw new RuntimeException('The raw notice token appeared in audit context.');
+                }
             }
-            echo json_encode(['state' => $state, 'version' => $version, 'exactEncryptedInput' => true, 'audited' => true], JSON_THROW_ON_ERROR)."\n";
+            echo json_encode(['state' => $state, 'version' => $version, 'exactEncryptedInput' => true, 'issuedNoticeToken' => true, 'rawNoticeTokenRetained' => false, 'audited' => true], JSON_THROW_ON_ERROR)."\n";
         }
     }
 } catch (Throwable) {

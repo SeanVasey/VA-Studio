@@ -25,6 +25,7 @@ final class EditorialController extends Controller
         return Inertia::render('Editorial', [
             'siteContent' => app(EditorialContent::class)->chrome($content), 'editorial' => $page,
             'contactInquiryEnabled' => $inquiry !== null, 'contactInquiryPrivacyNotice' => $inquiry['privacyNotice'] ?? null,
+            'contactInquiryNoticeToken' => $inquiry['noticeToken'] ?? null,
             'sitePreview' => false, 'sitePreviewBase' => null, 'metadata' => $metadata,
             'commerceEnabled' => false, 'testOrderPreparationEnabled' => false, 'testCheckoutEnabled' => false,
         ])->withViewData(['metadata' => $metadata]);

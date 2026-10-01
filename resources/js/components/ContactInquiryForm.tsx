@@ -5,13 +5,14 @@ type Fields = { name: string; email: string; subject: string; message: string; w
 type VisibleField = Exclude<keyof Fields, 'website'>;
 type Errors = Partial<Record<VisibleField, string>>;
 type Status = { kind: 'editing' | 'sending' | 'error'; message?: string; sessionExpired?: boolean } | { kind: 'saved'; receipt: string };
-type Attempt = { body: string; uncertain: boolean };
+type Attempt = { body: string; privacyNotice: string; uncertain: boolean };
 
 const empty: Fields = { name: '', email: '', subject: '', message: '', website: '' };
 const limits = { name: 120, email: 254, subject: 160, message: 8000 };
 const labels = { name: 'Name', email: 'Email', subject: 'Subject', message: 'Message' };
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 const isUuid = (value: string) => value.length === 36 && uuid.test(value);
+const isNoticeToken = (value: string) => value.length === 64 && /^[0-9a-f]{64}$/.test(value);
 const uncertainMessage = 'We could not confirm whether your inquiry was saved. Your original message is kept here. Retry the same inquiry to avoid sending it twice.';
 
 function csrfHeaders(): Record<string, string> {
@@ -25,11 +26,12 @@ function csrfHeaders(): Record<string, string> {
 }
 
 /** Public contact only; the parent must gate this surface on the server's enabled projection. */
-export function ContactInquiryForm({ privacyNotice }: { privacyNotice: string }) {
+export function ContactInquiryForm({ privacyNotice, noticeToken }: { privacyNotice: string; noticeToken: string }) {
   const prefix = useId();
   const [fields, setFields] = useState<Fields>({ ...empty });
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<Status>({ kind: 'editing' });
+  const [rejectedNoticeToken, setRejectedNoticeToken] = useState<string | null>(null);
   const attempt = useRef<Attempt | null>(null);
   const inFlight = useRef(false);
   const active = useRef(true);
@@ -39,6 +41,8 @@ export function ContactInquiryForm({ privacyNotice }: { privacyNotice: string })
   const emailInput = useRef<HTMLInputElement>(null);
   const sending = status.kind === 'sending';
   const locked = attempt.current !== null;
+  const noticeRefreshRequired = rejectedNoticeToken !== null && rejectedNoticeToken === noticeToken;
+  const displayedNotice = attempt.current?.privacyNotice ?? privacyNotice;
 
   useEffect(() => {
     active.current = true;
@@ -47,6 +51,12 @@ export function ContactInquiryForm({ privacyNotice }: { privacyNotice: string })
   useEffect(() => {
     if (status.kind === 'error' || status.kind === 'saved') summary.current?.focus();
   }, [status]);
+  useEffect(() => {
+    if (rejectedNoticeToken !== null && isNoticeToken(noticeToken) && noticeToken !== rejectedNoticeToken) {
+      setRejectedNoticeToken(null);
+      if (!attempt.current && !inFlight.current) { setErrors({}); setStatus({ kind: 'editing' }); }
+    }
+  }, [noticeToken, rejectedNoticeToken]);
 
   function change(field: keyof Fields, value: string) {
     if (attempt.current || inFlight.current) return;
@@ -73,6 +83,7 @@ export function ContactInquiryForm({ privacyNotice }: { privacyNotice: string })
     event.preventDefault();
     if (inFlight.current) return;
     if (!attempt.current) {
+      if (noticeRefreshRequired || !isNoticeToken(noticeToken)) return;
       const invalid = validate();
       if (Object.keys(invalid).length) {
         setErrors(invalid); setStatus({ kind: 'error', message: 'Check the highlighted fields before sending.' }); return;
@@ -84,12 +95,12 @@ export function ContactInquiryForm({ privacyNotice }: { privacyNotice: string })
       if (!isUuid(requestKey)) {
         setStatus({ kind: 'error', message: 'This browser could not prepare a private inquiry. Use the email contact option below.' }); return;
       }
-      const body = JSON.stringify({ ...fields, requestKey });
+      const body = JSON.stringify({ ...fields, noticeToken, requestKey });
       if (new TextEncoder().encode(body).byteLength > 16384) {
         setErrors({ message: 'This inquiry is too large to send. Shorten the message and try again.' });
         setStatus({ kind: 'error', message: 'Shorten your inquiry before sending.' }); return;
       }
-      attempt.current = { body, uncertain: false };
+      attempt.current = { body, privacyNotice, uncertain: false };
     }
 
     const current = attempt.current;
@@ -112,14 +123,18 @@ export function ContactInquiryForm({ privacyNotice }: { privacyNotice: string })
       }
       // Only a definitive first validation/body rejection releases the editable draft.
       // An uncertain earlier send must keep its original payload/key even if a retry is rejected.
-      if (!current.uncertain && response.status === 422 && data.code === 'INQUIRY_VALIDATION_FAILED' && data.errors && typeof data.errors === 'object') {
+      if (!current.uncertain && response.status === 422 && data.code === 'INQUIRY_VALIDATION_FAILED' && data.errors && typeof data.errors === 'object' && !Array.isArray(data.errors)) {
         const invalid: Errors = {};
+        const rejected = data.errors;
         for (const field of Object.keys(limits) as VisibleField[]) {
-          if (Object.hasOwn(data.errors, field)) invalid[field] = field === 'email' ? 'Enter a valid email address of 254 characters or fewer.' : `Check your ${field}; use ${limits[field].toLocaleString('en-US')} characters or fewer.`;
+          if (Object.hasOwn(rejected, field)) invalid[field] = field === 'email' ? 'Enter a valid email address of 254 characters or fewer.' : `Check your ${field}; use ${limits[field].toLocaleString('en-US')} characters or fewer.`;
         }
-        if (Object.keys(invalid).length) {
-          attempt.current = null; setErrors(invalid); setStatus({ kind: 'error', message: 'Check the highlighted fields before sending.' }); return;
+        attempt.current = null; setFields(value => ({ ...value, website: '' })); setErrors(invalid);
+        if (Object.hasOwn(rejected, 'noticeToken')) {
+          setRejectedNoticeToken(noticeToken);
+          setStatus({ kind: 'error', message: 'Your inquiry was not saved. Copy your draft before refreshing contact to review the current privacy notice.' }); return;
         }
+        setStatus({ kind: 'error', message: Object.keys(invalid).length ? 'Check the highlighted fields before sending.' : 'Check your inquiry before sending again.' }); return;
       }
       if (!current.uncertain && response.status === 413) {
         attempt.current = null; setErrors({ message: 'This inquiry is too large to send. Shorten the message and try again.' });
@@ -141,7 +156,7 @@ export function ContactInquiryForm({ privacyNotice }: { privacyNotice: string })
     }
   }
 
-  if (!privacyNotice.trim()) return null;
+  if (!attempt.current && (!privacyNotice.trim() || !isNoticeToken(noticeToken))) return null;
 
   if (status.kind === 'saved') return <section className="contact-inquiry" aria-label="Contact inquiry">
     <div className="contact-inquiry-summary" role="status" tabIndex={-1} ref={summary}>
@@ -153,12 +168,13 @@ export function ContactInquiryForm({ privacyNotice }: { privacyNotice: string })
 
   return <section className="contact-inquiry" aria-labelledby={`${prefix}-title`}>
     <div className="contact-inquiry-heading"><h2 id={`${prefix}-title`}>Send an inquiry</h2><p>Your inquiry will be saved privately for VASEY.AUDIO.</p></div>
-    <p className="contact-inquiry-privacy" id={`${prefix}-privacy`}>{privacyNotice}</p>
+    <p className="contact-inquiry-privacy" id={`${prefix}-privacy`}>{displayedNotice}</p>
     <form noValidate onSubmit={submit} aria-describedby={`${prefix}-privacy`}>
       {status.kind === 'error' && <div className="contact-inquiry-summary" role="alert" tabIndex={-1} ref={summary}>
         <p>{status.message}</p>
         {Object.keys(errors).length > 0 && <ul>{(Object.keys(errors) as VisibleField[]).map(field => <li key={field}><a href={`#${prefix}-${field}`} onClick={event => { event.preventDefault(); document.getElementById(`${prefix}-${field}`)?.focus(); }}>{errors[field]}</a></li>)}</ul>}
         {status.sessionExpired && <a href="/contact" target="_blank" rel="noopener noreferrer">Open contact in a new tab</a>}
+        {noticeRefreshRequired && <a href="/contact">Refresh contact to review the current privacy notice</a>}
       </div>}
       <div className="contact-inquiry-fields">
         {(Object.keys(limits) as VisibleField[]).map(field => {
@@ -175,7 +191,7 @@ export function ContactInquiryForm({ privacyNotice }: { privacyNotice: string })
         <div className="contact-inquiry-trap" aria-hidden="true"><label htmlFor={`${prefix}-website`}>Website</label><input id={`${prefix}-website`} name="website" type="text" tabIndex={-1} autoComplete="off" value={fields.website} maxLength={200} onChange={event => change('website', event.target.value)} /></div>
       </div>
       <p className="contact-inquiry-note" id={`${prefix}-limit`}>{[...fields.message].length.toLocaleString('en-US')} / 8,000 message characters. Your draft stays only on this page.</p>
-      <div className="contact-inquiry-actions"><button className="button" type="submit" disabled={sending}>{sending ? 'Saving inquiry…' : locked ? 'Retry same inquiry' : 'Send inquiry'}</button>
+      <div className="contact-inquiry-actions"><button className="button" type="submit" disabled={sending || noticeRefreshRequired}>{sending ? 'Saving inquiry…' : locked ? 'Retry same inquiry' : 'Send inquiry'}</button>
         {sending && <p role="status">Saving your inquiry. Please keep this page open.</p>}
         {locked && !sending && <p>The original fields are read-only while this inquiry is unconfirmed.</p>}
       </div>
