@@ -1,0 +1,163 @@
+name: Isolated inquiry recovery application feedback
+
+# Informative only. This temporary branch does not replace Foundation acceptance.
+on:
+  push:
+    branches: [codex/inquiry-recovery-proof-20261001]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: isolated-inquiry-recovery-feedback
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  inquiry-recovery-php:
+    name: Inquiry recovery PHP feedback (${{ matrix.engine }})
+    if: github.repository == 'VASEYDEV/VASEYAUDIO' && github.ref == 'refs/heads/codex/inquiry-recovery-proof-20261001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [sqlite, mysql]
+    services:
+      mysql:
+        # The only selector is the fixed, workflow-owned engine enum above.
+        image: ${{ matrix.engine == 'mysql' && 'mysql:8.4' || '' }}
+        env:
+          MYSQL_DATABASE: vaseyaudio_inquiry_recovery_feedback
+          MYSQL_ROOT_PASSWORD: ci-only-password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -pci-only-password"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      DB_CONNECTION: ${{ matrix.engine }}
+      DB_DATABASE: ${{ matrix.engine == 'mysql' && 'vaseyaudio_inquiry_recovery_feedback' || ':memory:' }}
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USERNAME: root
+      DB_PASSWORD: ci-only-password
+      DB_URL: ''
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+      CONTACT_INQUIRIES_ENABLED: 'false'
+      CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED: 'false'
+      STRIPE_TEST_CHECKOUT_ENABLED: 'false'
+      STRIPE_TEST_PAYMENT_PROCESSING_ENABLED: 'false'
+      STRIPE_TEST_FINALIZATION_ENABLED: 'false'
+      STRIPE_WEBHOOK_ENABLED: 'false'
+      STRIPE_TEST_SECRET_KEY: ''
+      STRIPE_WEBHOOK_SECRET: ''
+      STRIPE_ACCOUNT_ID: ''
+      VASEY_TEST_CONTRACT_ISSUANCE_ENABLED: 'false'
+      VASEY_TEST_FULFILLMENT_ACTIVATION_ENABLED: 'false'
+      VASEY_TEST_DELIVERY_ACCESS_ENABLED: 'false'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Record the exact informative source and fixed PHP selection
+        run: |
+          set -euo pipefail
+          test "$GITHUB_EVENT_NAME" = push
+          test "$GITHUB_REPOSITORY" = VASEYDEV/VASEYAUDIO
+          test "$GITHUB_REF" = refs/heads/codex/inquiry-recovery-proof-20261001
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git diff --exit-code HEAD --
+          test -z "$(git ls-files --others --exclude-standard)"
+          mkdir inquiry-recovery-evidence
+          {
+            git rev-parse HEAD HEAD^{tree}
+            sha256sum .github/workflows/inquiry-recovery-proof.yml composer.json composer.lock phpunit.xml scripts/ci/database-sqlite-skips.json app/Console/Commands/ProcessInquiryAlerts.php app/Domain/Inquiries/Models/InquiryNotificationIntent.php app/Domain/Inquiries/Notifications/InquiryAlertNotSubmitted.php app/Domain/Inquiries/Notifications/InquiryAlertTransport.php app/Domain/Inquiries/Notifications/InquiryNotificationWork.php app/Domain/Inquiries/Notifications/OperatorInquiryAlert.php app/Domain/Inquiries/SubmitInquiry.php app/Jobs/NotifyInquiryOperatorJob.php config/inquiries.php database/migrations/2026_10_01_000031_customer_inquiries.php database/migrations/2026_10_01_000032_editorial_related_tracks_images.php database/migrations/2026_10_01_000033_inquiry_notification_intents.php tests/Feature/CustomerInquiryMigrationTest.php tests/Feature/InquiryNotificationConcurrencyTest.php tests/Feature/InquiryNotificationMigrationTest.php tests/Feature/InquiryNotificationWorkTest.php tests/Feature/SiteRelatedTrackImageMigrationTest.php tests/Support/InquiryNotificationRace.php tests/Support/inquiry-notification-race-worker.php tests/Feature/CustomerInquiryHttpTest.php tests/Feature/CustomerInquiryAdminTest.php tests/Feature/CustomerInquiryConcurrencyTest.php
+          } 2>&1 | tee inquiry-recovery-evidence/php-source.log
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          coverage: none
+          tools: composer:v2
+      - name: Install Foundation media and PDF fixture prerequisites
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends ffmpeg util-linux qpdf poppler-utils
+          test -x /usr/bin/ffmpeg
+          test -x /usr/bin/ffprobe
+          test -x /usr/bin/prlimit
+      - name: Install the locked backend dependencies
+        run: |
+          set -euo pipefail
+          composer install --no-interaction --prefer-dist 2>&1 | tee inquiry-recovery-evidence/composer-install.log
+      - run: cp .env.example .env
+      - run: php artisan key:generate
+      - name: Record actual PHP, tool and fresh database runtimes
+        run: |
+          set -euo pipefail
+          {
+            php --version
+            php vendor/bin/phpunit --version
+            composer --version
+            ffmpeg -version
+            ffprobe -version
+            prlimit --version
+            qpdf --version
+            pdfinfo -v
+            php <<'PHP'
+          <?php
+          if (getenv('DB_CONNECTION') === 'mysql') {
+              $database = new PDO('mysql:host=127.0.0.1;port=3306;dbname=vaseyaudio_inquiry_recovery_feedback', getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
+              $runtime = $database->query('SELECT VERSION() AS version, DATABASE() AS database_name, @@version_comment AS version_comment, @@sql_mode AS sql_mode, @@transaction_isolation AS transaction_isolation, @@lower_case_table_names AS lower_case_table_names')->fetch(PDO::FETCH_ASSOC);
+              if (! str_starts_with($runtime['version'], '8.4.') || $runtime['database_name'] !== 'vaseyaudio_inquiry_recovery_feedback') {
+                  throw new RuntimeException('Unexpected disposable MySQL runtime.');
+              }
+              $tables = (int) $database->query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'vaseyaudio_inquiry_recovery_feedback'")->fetchColumn();
+          } elseif (getenv('DB_CONNECTION') === 'sqlite' && getenv('DB_DATABASE') === ':memory:') {
+              $database = new PDO('sqlite::memory:');
+              $runtime = ['version' => $database->query('SELECT sqlite_version()')->fetchColumn(), 'database_name' => ':memory:'];
+              $tables = (int) $database->query("SELECT COUNT(*) FROM sqlite_master WHERE type = 'table'")->fetchColumn();
+          } else {
+              throw new RuntimeException('Unexpected fixed database selection.');
+          }
+          if ($tables !== 0) {
+              throw new RuntimeException('The disposable database is not empty before tests.');
+          }
+          echo json_encode(['driver' => $database->getAttribute(PDO::ATTR_DRIVER_NAME), 'runtime' => $runtime, 'tables_before_tests' => $tables], JSON_THROW_ON_ERROR), PHP_EOL;
+          PHP
+          } 2>&1 | tee inquiry-recovery-evidence/php-runtime.log
+      - name: Verify the fixed seven inquiry files including recovery and independent worker contention
+        run: |
+          set -euo pipefail
+          php vendor/bin/phpunit tests/Feature/CustomerInquiryHttpTest.php tests/Feature/CustomerInquiryMigrationTest.php tests/Feature/CustomerInquiryAdminTest.php tests/Feature/CustomerInquiryConcurrencyTest.php tests/Feature/InquiryNotificationWorkTest.php tests/Feature/InquiryNotificationMigrationTest.php tests/Feature/InquiryNotificationConcurrencyTest.php \
+            --log-junit=inquiry-recovery-evidence/inquiry-results.xml \
+            --fail-on-empty-test-suite --fail-on-phpunit-warning --display-warnings \
+            2>&1 | tee inquiry-recovery-evidence/phpunit.log
+      - name: Check formatting of the fixed changed inquiry and dependency PHP paths once
+        if: matrix.engine == 'sqlite'
+        run: |
+          set -euo pipefail
+          php vendor/bin/pint --test -v app/Console/Commands/ProcessInquiryAlerts.php app/Domain/Inquiries/Models/InquiryNotificationIntent.php app/Domain/Inquiries/Notifications/InquiryAlertNotSubmitted.php app/Domain/Inquiries/Notifications/InquiryAlertTransport.php app/Domain/Inquiries/Notifications/InquiryNotificationWork.php app/Domain/Inquiries/Notifications/OperatorInquiryAlert.php app/Domain/Inquiries/SubmitInquiry.php app/Jobs/NotifyInquiryOperatorJob.php config/inquiries.php database/migrations/2026_10_01_000031_customer_inquiries.php database/migrations/2026_10_01_000032_editorial_related_tracks_images.php database/migrations/2026_10_01_000033_inquiry_notification_intents.php tests/Feature/CustomerInquiryMigrationTest.php tests/Feature/InquiryNotificationConcurrencyTest.php tests/Feature/InquiryNotificationMigrationTest.php tests/Feature/InquiryNotificationWorkTest.php tests/Feature/SiteRelatedTrackImageMigrationTest.php tests/Support/InquiryNotificationRace.php tests/Support/inquiry-notification-race-worker.php \
+            2>&1 | tee inquiry-recovery-evidence/pint.log
+      - name: Retain complete informative inquiry PHP evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: inquiry-recovery-${{ matrix.engine }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: inquiry-recovery-evidence/
+          retention-days: 7
+          if-no-files-found: error
+          overwrite: false
