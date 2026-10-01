@@ -1,0 +1,119 @@
+name: Site experience full default browser diagnostic
+
+# Informative synthetic feedback only; Foundation CI remains the merge gate.
+on:
+  push:
+    branches: [codex/site-experience-browser-20261001]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-experience-browser-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PLAYWRIGHT_JUNIT_OUTPUT_FILE: full-default-native-results.xml
+
+jobs:
+  browser-diagnostic:
+    name: Full default native browser diagnostic (informative)
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Verify unchanged focused selector safeguards
+        run: python3 scripts/ci/test-focused-tests.py
+      - name: Record exact source and default native scope
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          def git(*args):
+              return subprocess.check_output(['git', *args], text=True).strip()
+          assert git('rev-parse', 'HEAD') == os.environ['GITHUB_SHA']
+          for args in [('diff', '--exit-code'), ('diff', '--cached', '--exit-code')]:
+              subprocess.run(['git', *args], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+          files = sorted(path.as_posix() for path in Path('tests/browser').glob('*.spec.ts'))
+          assert len(files) == 19 and all(Path(path).is_file() for path in files)
+          evidence = {'schema_version': 1, 'purpose': 'full-default-native-feedback-not-merge-acceptance',
+              'event': os.environ['GITHUB_EVENT_NAME'], 'checked_out_commit': git('rev-parse', 'HEAD'),
+              'checked_out_tree': git('rev-parse', 'HEAD^{tree}'), 'tracked_worktree_clean': True,
+              'command': ['npm', 'run', 'test:browser', '--', '--reporter=line,junit'],
+              'default_source_files': files, 'expected_project_cases': 68, 'status': 'prepared'}
+          Path('full-default-native-evidence.json').write_text(json.dumps(evidence, indent=2) + '\n')
+          print(json.dumps(evidence, indent=2))
+          PY
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          coverage: none
+          tools: composer:v2
+      - name: Install application media fixture prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends ffmpeg util-linux
+          test -x /usr/bin/ffmpeg
+          test -x /usr/bin/ffprobe
+          test -x /usr/bin/prlimit
+      - run: composer install --no-interaction --prefer-dist
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Run every default native journey through the unchanged isolated wrapper
+        id: native
+        run: npm run test:browser -- --reporter=line,junit
+      - name: Reconcile actual default native results and unchanged source
+        if: always()
+        env:
+          NATIVE_OUTCOME: ${{ steps.native.outcome }}
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, xml.etree.ElementTree as ET
+          from pathlib import Path
+          path = Path('full-default-native-evidence.json')
+          evidence = json.loads(path.read_text())
+          def git(*args):
+              return subprocess.check_output(['git', *args], text=True).strip()
+          assert git('rev-parse', 'HEAD') == evidence['checked_out_commit'] == os.environ['GITHUB_SHA']
+          assert git('rev-parse', 'HEAD^{tree}') == evidence['checked_out_tree']
+          for args in [('diff', '--exit-code'), ('diff', '--cached', '--exit-code')]:
+              subprocess.run(['git', *args], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+          results = Path('full-default-native-results.xml')
+          cases = []
+          if results.is_file():
+              for suite in ET.parse(results).getroot().iter('testsuite'):
+                  for case in suite.findall('testcase'):
+                      status = 'error' if case.find('error') is not None else 'failure' if case.find('failure') is not None else 'skipped' if case.find('skipped') is not None else 'passed'
+                      cases.append({'project': suite.get('hostname'), 'spec': case.get('classname'), 'name': case.get('name'), 'status': status})
+          counts = {status: sum(case['status'] == status for case in cases) for status in ['passed', 'error', 'failure', 'skipped']}
+          counts['reported'] = len(cases)
+          counts['executed'] = counts['reported'] - counts['skipped']
+          identities = {(case['project'], case['spec'], case['name']) for case in cases}
+          skips = [case for case in cases if case['status'] == 'skipped']
+          expected_skip = ('webkit-mobile', 'site-content.spec.ts', 'the row menu shows keyboard focus and returns it to More when a dialog is dismissed or the menu closes')
+          complete = len(cases) == len(identities) == evidence['expected_project_cases'] and all(sum(case['project'] == project for case in cases) == 34 for project in ['chromium-desktop', 'webkit-mobile']) and {case['spec'] for case in cases} == {Path(file).name for file in evidence['default_source_files']}
+          allowed_skip = len(skips) == 1 and (skips[0]['project'], skips[0]['spec'], skips[0]['name']) == expected_skip
+          passed = os.environ.get('NATIVE_OUTCOME') == 'success' and complete and allowed_skip and counts['error'] == counts['failure'] == 0
+          evidence.update({'status': 'passed' if passed else 'failed', 'native_step_outcome': os.environ.get('NATIVE_OUTCOME'),
+              'test_counts': counts, 'exact_default_case_file_census': complete, 'only_existing_keyboard_skip': allowed_skip, 'cases': cases})
+          path.write_text(json.dumps(evidence, indent=2) + '\n')
+          print(json.dumps({key: value for key, value in evidence.items() if key != 'cases'}, indent=2))
+          raise SystemExit(0 if passed else 1)
+          PY
+      - name: Retain full default synthetic browser evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: site-experience-full-default-browser-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            full-default-native-*
+            test-results/
+          retention-days: 7
+          if-no-files-found: error
