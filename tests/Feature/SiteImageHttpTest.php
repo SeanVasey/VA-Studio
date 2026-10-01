@@ -18,12 +18,15 @@ use Filament\Pages\Dashboard;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Testing\Fakes\QueueFake;
 use Illuminate\Testing\TestResponse;
 use Livewire\Livewire;
+use RuntimeException;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\MediaFixtures;
 use Tests\Support\SiteImageFixtures as F;
@@ -153,6 +156,72 @@ class SiteImageHttpTest extends TestCase
         $this->assertSame(['numeric' => null], $component->instance()->callSchemaComponentMethod('mountedActionSchema0.upload', 'getUploadedFiles'));
     }
 
+    public function test_waiting_images_show_a_queue_hint_without_diagnosing_an_outage_or_dispatching_more_work(): void
+    {
+        $image = $this->ingest(F::jpeg(1440, 630));
+        Queue::assertPushedOn('media', ProcessSiteImage::class, fn (ProcessSiteImage $job): bool => $job->imageId === $image->id);
+        Queue::assertPushed(ProcessSiteImage::class, 1);
+        $before = $image->fresh()->getAttributes();
+        $audits = AuditEvent::count();
+        $this->actingAs($this->actor);
+
+        $component = Livewire::test(ListSiteImages::class)
+            ->assertTableColumnFormattedStateSet('status', 'Waiting', $image)
+            ->assertTableColumnFormattedStateSet('failure_code', SiteImageProblem::MESSAGES['processing_waiting'], $image)
+            ->assertSee(SiteImageProblem::MESSAGES['processing_waiting'])
+            ->assertTableActionVisible('retry', $image)
+            ->assertDontSee($image->source_path)->assertDontSee($image->source_sha256);
+        // A longer wait is still not evidence that a healthy queue failed. Polling only reads the same retained state.
+        $this->travel(30)->minutes();
+        $component->call('$refresh')->assertTableColumnFormattedStateSet('status', 'Waiting', $image)
+            ->assertTableColumnFormattedStateSet('failure_code', SiteImageProblem::MESSAGES['processing_waiting'], $image);
+
+        $this->assertSame($before, $image->fresh()->getAttributes());
+        $this->assertSame($audits, AuditEvent::count());
+        $this->assertDatabaseCount('site_image_variants', 0);
+        Queue::assertPushed(ProcessSiteImage::class, 1);
+    }
+
+    public function test_an_upload_dispatch_failure_keeps_a_visible_hint_until_staff_explicitly_retry(): void
+    {
+        Exceptions::fake();
+        $queue = new class(app()) extends QueueFake
+        {
+            public int $pushes = 0;
+
+            public function push($job, $data = '', $queue = null)
+            {
+                $this->pushes++;
+                $send = fn () => throw new RuntimeException('Synthetic queue outage.');
+
+                return is_object($job) && ($job->afterCommit ?? false) ? app('db.transactions')->addCallback($send) : $send();
+            }
+        };
+        Queue::swap($queue);
+        $this->actingAs($this->actor);
+        Livewire::test(ListSiteImages::class)->callAction('uploadSiteImage', data: $this->uploadData())
+            ->assertHasNoActionErrors()->assertNotified('Image uploaded')
+            ->assertSee(SiteImageProblem::MESSAGES['processing_waiting']);
+        $image = SiteImage::sole();
+        $this->assertSame(['quarantined', 0, null], [$image->status, $image->attempts, $image->failure_code]);
+        $this->assertTrue(Storage::disk('local')->exists($image->source_path));
+        Exceptions::assertReported(fn (RuntimeException $exception): bool => $exception->getMessage() === 'Synthetic queue outage.');
+
+        $component = Livewire::test(ListSiteImages::class)->call('$refresh')
+            ->assertTableColumnFormattedStateSet('failure_code', SiteImageProblem::MESSAGES['processing_waiting'], $image)
+            ->assertTableActionVisible('retry', $image);
+        $this->assertSame(1, $queue->pushes);
+        $this->assertSame(0, AuditEvent::where('action', 'site.image.retry_requested')->count());
+
+        Queue::fake();
+        $component->callTableAction('retry', $image)->assertNotified('Processing queued');
+        Queue::assertPushedOn('media', ProcessSiteImage::class, fn (ProcessSiteImage $job): bool => $job->imageId === $image->id);
+        Queue::assertPushed(ProcessSiteImage::class, 1);
+        $this->assertSame(1, AuditEvent::where('action', 'site.image.retry_requested')->where('subject_id', $image->id)->count());
+        $this->assertSame(['quarantined', 0, null], [$image->fresh()->status, $image->fresh()->attempts, $image->fresh()->failure_code]);
+        $this->assertDatabaseCount('site_image_variants', 0);
+    }
+
     public function test_retry_is_offered_only_for_waiting_images_and_the_problem_is_explained(): void
     {
         $ready = $this->ready();
@@ -170,6 +239,7 @@ class SiteImageHttpTest extends TestCase
 
         Livewire::test(ListSiteImages::class)
             ->assertSee(SiteImageProblem::MESSAGES['scanner_unavailable'])->assertSee(SiteImageProblem::MESSAGES['scan_not_clean'])
+            ->assertDontSee(SiteImageProblem::MESSAGES['processing_waiting'])->assertTableColumnStateSet('failure_code', null, $ready)
             ->assertSee('Waiting')->assertSee('Failed')->assertSee('Ready')
             ->assertTableActionHidden('retry', $ready)->assertTableActionHidden('retry', $failed)
             ->assertTableActionVisible('retry', $waiting)
@@ -190,6 +260,7 @@ class SiteImageHttpTest extends TestCase
 
         Livewire::test(ListSiteImages::class)
             ->assertTableColumnFormattedStateSet('status', 'Processing', $live)->assertTableColumnStateSet('failure_code', null, $live)
+            ->assertDontSee(SiteImageProblem::MESSAGES['processing_waiting'])
             ->assertTableColumnFormattedStateSet('status', 'Interrupted', $interrupted)
             ->assertTableColumnFormattedStateSet('failure_code', SiteImageProblem::MESSAGES['processing_interrupted'], $interrupted)
             ->assertTableColumnStateSet('attempts', 1, $live)->assertTableColumnStateSet('attempts', 2, $interrupted)

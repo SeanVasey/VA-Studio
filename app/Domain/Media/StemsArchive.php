@@ -49,7 +49,18 @@ class StemsArchive
             && ScanEngines::accepted($scan['engine'] ?? null, $historical);
     }
 
-    public function build(string $input, string $mime, array $profile, string $workspace, callable $scan): array
+    /** Check the complete directory without extracting a member or invoking a scanner. */
+    public function inspectUpload(string $input, string $mime, array $profile): void
+    {
+        $zip = $this->open($input, $mime);
+        try {
+            $this->inspect($zip, $profile);
+        } finally {
+            $zip->close();
+        }
+    }
+
+    private function open(string $input, string $mime): ZipArchive
     {
         if (! class_exists(ZipArchive::class)) {
             throw new MediaFailure('zip_unavailable', 'Install the PHP ZIP extension before processing stems.');
@@ -57,11 +68,18 @@ class StemsArchive
         if (! in_array($mime, ['application/zip', 'application/x-zip'], true) || file_get_contents($input, false, null, 0, 4) !== "PK\x03\x04") {
             throw new MediaFailure('invalid_archive', 'Stems require a complete ZIP containing only WAV audio.');
         }
-        $deadline = $this->clock() + $profile['archive_max_seconds'] * 1000000000;
         $zip = new ZipArchive;
         if ($zip->open($input, ZipArchive::RDONLY | ZipArchive::CHECKCONS) !== true) {
             throw new MediaFailure('invalid_archive', 'The ZIP structure is corrupt or unsupported.');
         }
+
+        return $zip;
+    }
+
+    public function build(string $input, string $mime, array $profile, string $workspace, callable $scan): array
+    {
+        $deadline = $this->clock() + $profile['archive_max_seconds'] * 1000000000;
+        $zip = $this->open($input, $mime);
         $manifest = [];
         $members = [];
         $scanLimit = (int) config('media.scanner.timeout_seconds');
@@ -259,20 +277,26 @@ class StemsArchive
     private function withinBudget(callable $run, int $deadline, int $limit): mixed
     {
         $this->withinDeadline($deadline);
-        $seconds = max(1, (int) ceil(($deadline - $this->clock()) / 1000000000));
+        $seconds = (int) floor(($deadline - $this->clock()) / 1000000000);
+        if ($seconds < 1) {
+            throw new MediaFailure('archive_timeout', 'Archive processing exceeded its bounded time budget.');
+        }
         try {
-            return $run($seconds);
+            $result = $run($seconds);
         } catch (MediaFailure $failure) {
             if ($failure->failureCode === 'processor_timeout' && $seconds <= $limit) {
                 throw new MediaFailure('archive_timeout', 'Archive processing exceeded its bounded time budget.');
             }
             throw $failure;
         }
+        $this->withinDeadline($deadline);
+
+        return $result;
     }
 
     private function withinDeadline(int $deadline): void
     {
-        if ($this->clock() > $deadline) {
+        if ($this->clock() >= $deadline) {
             throw new MediaFailure('archive_timeout', 'Archive processing exceeded its bounded time budget.');
         }
     }

@@ -14,10 +14,19 @@ export const releaseMenuTrigger = (page: Page, label: string) =>
  */
 export async function openReleaseMenu(page: Page, label: string): Promise<Locator> {
   const trigger = releaseMenuTrigger(page, label);
+  // A Livewire morph can replace a closed panel before Alpine repairs the surviving trigger's
+  // old id/expanded attributes. Wait for those public DOM states to agree before deciding to toggle.
+  await expect.poll(() => trigger.evaluate(element => {
+    const panel = element.closest('.fi-dropdown')?.querySelector<HTMLElement>(':scope > .fi-dropdown-panel');
+    if (!panel?.id || element.getAttribute('aria-controls') !== panel.id) return false;
+    const visible = panel.getClientRects().length > 0 && getComputedStyle(panel).visibility !== 'hidden';
+    return element.getAttribute('aria-expanded') === String(visible);
+  })).toBe(true);
   // Clicking a menu that is already open would close it.
   if (await trigger.getAttribute('aria-expanded') !== 'true') await trigger.click();
   const row = releaseRow(page, label);
   await expect(row.getByRole('button', { name: 'Edit as new draft', exact: true })).toBeVisible();
+  await expect(trigger).toHaveAttribute('aria-expanded', 'true');
   return row;
 }
 

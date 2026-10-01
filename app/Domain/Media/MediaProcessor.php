@@ -56,6 +56,10 @@ class MediaProcessor
             if (! hash_equals($run->input_sha256, $integrity['sha256']) || ! hash_equals($source->sha256 ?? '', $integrity['sha256']) || (int) $source->size_bytes !== $integrity['size_bytes'] || $source->mime_type !== $integrity['mime_type']) {
                 throw new MediaFailure('source_changed', 'Source hash, size, or MIME no longer matches its intake evidence.');
             }
+            if ($source->role === 'stems_zip') {
+                // Refuse hostile directory metadata before ClamAV gets an opportunity to expand it.
+                app(StemsArchive::class)->inspectUpload($input, $integrity['mime_type'], $profile);
+            }
             $scan = $this->scan($input);
             $evidence = ['source_scan' => $scan];
             if ($source->role === 'master_wav') {

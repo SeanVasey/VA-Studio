@@ -1,0 +1,233 @@
+#!/usr/bin/env python3
+"""Exercise scope routing with real Git histories and acceptance failure states."""
+
+import importlib.util
+from pathlib import Path
+import subprocess
+import tempfile
+import unittest
+
+
+spec = importlib.util.spec_from_file_location("ci_scope", Path(__file__).with_name("ci-scope.py"))
+scope = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(scope)
+
+
+class HistoryTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.run_git("init", "-q")
+        self.run_git("config", "user.email", "ci@example.invalid")
+        self.run_git("config", "user.name", "CI fixture")
+        self.write("README.md", "# Initial\n")
+        self.write("app/code.php", "<?php // fixture\n")
+        self.base = self.commit()
+
+    def run_git(self, *args):
+        return subprocess.check_output(["git", *args], cwd=self.root, stderr=subprocess.PIPE).decode().strip()
+
+    def write(self, name, value):
+        path = self.root / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(value)
+
+    def commit(self):
+        self.run_git("add", "--all")
+        self.run_git("commit", "-qm", "fixture", "--allow-empty")
+        return self.run_git("rev-parse", "HEAD")
+
+    def decision(self, head, base=None):
+        return scope.classify(self.root, "pull_request", {"pull_request": {"base": {"sha": base or self.base}}}, head)
+
+    def test_prose_update_has_verified_identity_and_passes_documents(self):
+        self.write("README.md", "# Updated\n")
+        head = self.commit()
+        decision = self.decision(head)
+        self.assertEqual("docs", decision["mode"])
+        self.assertEqual(["README.md"], decision["paths"])
+        self.assertEqual(head, decision["head"])
+        self.assertEqual(1, scope.validate_documents(self.root, decision))
+
+    def test_two_parent_pr_merge_compares_to_the_current_base(self):
+        self.run_git("checkout", "-qb", "fixture-feature")
+        self.write("README.md", "feature docs\n")
+        feature = self.commit()
+        self.run_git("checkout", "--detach", self.base)
+        self.write("app/code.php", "<?php // independently accepted base\n")
+        advanced_base = self.commit()
+        self.run_git("merge", "--no-ff", "-m", "synthetic PR merge", feature)
+        merged = self.run_git("rev-parse", "HEAD")
+        self.assertEqual("docs", self.decision(merged, advanced_base)["mode"])
+        self.assertEqual("full", self.decision(merged, self.base)["mode"])
+        self.assertEqual("full", self.decision(feature, advanced_base)["mode"])
+
+    def test_new_unknown_document_requires_full(self):
+        self.write("docs/not-in-allowlist.md", "# New\n")
+        self.assertEqual("full", self.decision(self.commit())["mode"])
+
+    def test_mixed_application_and_docs_requires_full(self):
+        self.write("README.md", "# Updated\n")
+        self.write("app/code.php", "<?php // changed\n")
+        self.assertEqual("full", self.decision(self.commit())["mode"])
+
+    def test_workflow_classifier_and_lock_changes_require_full(self):
+        for name in (".github/workflows/ci.yml", "scripts/ci/ci-scope.py", "composer.lock", "AGENTS.md", "docs/brand/asset-manifest.json"):
+            with self.subTest(name=name):
+                self.run_git("reset", "--hard", self.base)
+                self.write(name, "changed\n")
+                self.assertEqual("full", self.decision(self.commit())["mode"])
+
+    def test_rename_from_runtime_into_allowed_document_is_full(self):
+        self.run_git("mv", "app/code.php", "CHANGELOG.md")
+        self.assertEqual("full", self.decision(self.commit())["mode"])
+
+    def test_allowed_document_deletion_is_validated(self):
+        (self.root / "README.md").unlink()
+        head = self.commit()
+        self.assertEqual("docs", self.decision(head)["mode"])
+        self.assertEqual(0, scope.validate_documents(self.root, self.decision(head)))
+
+    def test_deletion_cannot_leave_retained_dangling_link(self):
+        self.write("CHANGELOG.md", "[Readme](README.md)\n")
+        self.base = self.commit()
+        (self.root / "README.md").unlink()
+        head = self.commit()
+        with self.assertRaises(scope.EvidenceError):
+            scope.validate_documents(self.root, self.decision(head))
+
+    def test_link_outside_checkout_is_rejected(self):
+        self.write("README.md", "[Outside](../)\n")
+        head = self.commit()
+        with self.assertRaises(scope.EvidenceError):
+            scope.validate_documents(self.root, self.decision(head))
+
+    def test_symlink_and_executable_document_require_full(self):
+        for mode in ("symlink", "executable"):
+            with self.subTest(mode=mode):
+                self.run_git("reset", "--hard", self.base)
+                path = self.root / "README.md"
+                if mode == "symlink":
+                    path.unlink()
+                    path.symlink_to("app/code.php")
+                else:
+                    path.chmod(0o755)
+                    self.write("README.md", "changed\n")
+                self.assertEqual("full", self.decision(self.commit())["mode"])
+
+    def test_empty_diff_missing_base_and_stale_checkout_are_full(self):
+        self.assertEqual("full", self.decision(self.base)["mode"])
+        self.write("README.md", "changed\n")
+        head = self.commit()
+        self.assertEqual("full", self.decision(head, "0" * 40)["mode"])
+        self.assertEqual("full", self.decision(self.base)["mode"])
+        self.assertEqual("full", self.decision(head, "--output=bad")["mode"])
+
+    def test_unrelated_base_is_full(self):
+        self.write("README.md", "branch one\n")
+        other = self.commit()
+        self.run_git("reset", "--hard", self.base)
+        self.write("README.md", "branch two\n")
+        self.assertEqual("full", self.decision(self.commit(), other)["mode"])
+
+    def test_manual_and_unknown_event_always_full(self):
+        self.write("README.md", "changed\n")
+        head = self.commit()
+        for event in ("workflow_dispatch", "schedule", "merge_group", "unknown"):
+            with self.subTest(event=event):
+                self.assertEqual("full", scope.classify(self.root, event, {}, head)["mode"])
+
+    def test_main_push_uses_entire_before_after_diff(self):
+        self.write("README.md", "changed\n")
+        head = self.commit()
+        event = {"ref": "refs/heads/main", "before": self.base, "after": head}
+        self.assertEqual("docs", scope.classify(self.root, "push", event, head)["mode"])
+        event["ref"] = "refs/heads/feature"
+        self.assertEqual("full", scope.classify(self.root, "push", event, head)["mode"])
+
+    def test_docs_validator_rejects_changed_evidence_and_checkout(self):
+        self.write("README.md", "changed\n")
+        head = self.commit()
+        decision = self.decision(head)
+        decision["paths"] = []
+        with self.assertRaises(scope.EvidenceError):
+            scope.validate_documents(self.root, decision)
+        decision = self.decision(head)
+        self.write("README.md", "newer\n")
+        self.commit()
+        with self.assertRaises(scope.EvidenceError):
+            scope.validate_documents(self.root, decision)
+
+    def test_csv_width_and_text_nul_are_rejected(self):
+        for name, content in (("docs/remaining-development-tasks.csv", "id,value\na\n"), ("README.md", "bad\0text\n")):
+            with self.subTest(name=name):
+                self.run_git("reset", "--hard", self.base)
+                self.write(name, content)
+                head = self.commit()
+                with self.assertRaises(scope.EvidenceError):
+                    scope.validate_documents(self.root, self.decision(head))
+
+    def test_git_evidence_bound_falls_back_to_full(self):
+        self.write("README.md", "changed\n")
+        head = self.commit()
+        previous = scope.MAX_DIFF_BYTES
+        try:
+            scope.MAX_DIFF_BYTES = 1
+            self.assertEqual("full", self.decision(head)["mode"])
+        finally:
+            scope.MAX_DIFF_BYTES = previous
+
+
+class AcceptanceTests(unittest.TestCase):
+    def needs(self, mode):
+        return {"scope": {"result": "success", "outputs": {"mode": mode}}, "documentation": {"result": "success" if mode == "docs" else "skipped"}, **{job: {"result": "skipped" if mode == "docs" else "success"} for job in scope.RUNTIME_JOBS}}
+
+    def test_both_valid_modes(self):
+        for mode in ("docs", "full"):
+            self.assertEqual(mode, scope.accept(self.needs(mode)))
+
+    def test_runtime_gate_rejects_every_unsuccessful_mandatory_job(self):
+        for job in ("scope", *scope.RUNTIME_JOBS):
+            for result in ("failure", "cancelled", "skipped", "", "neutral", "unknown"):
+                with self.subTest(job=job, result=result):
+                    needs = self.needs("full")
+                    needs[job]["result"] = result
+                    with self.assertRaises(scope.EvidenceError):
+                        scope.accept(needs)
+
+    def test_docs_gate_requires_success_and_exact_mode(self):
+        for job in ("scope", "documentation"):
+            for result in ("failure", "cancelled", "skipped", "", "unknown"):
+                with self.subTest(job=job, result=result):
+                    needs = self.needs("docs")
+                    needs[job]["result"] = result
+                    with self.assertRaises(scope.EvidenceError):
+                        scope.accept(needs)
+        for mode in (None, "", "doc", "FULL"):
+            needs = self.needs("docs")
+            needs["scope"]["outputs"]["mode"] = mode
+            with self.assertRaises(scope.EvidenceError):
+                scope.accept(needs)
+
+    def test_absent_or_extra_job_cannot_satisfy_gate(self):
+        for job in self.needs("full"):
+            needs = self.needs("full")
+            del needs[job]
+            with self.assertRaises(scope.EvidenceError):
+                scope.accept(needs)
+        needs = self.needs("docs")
+        needs["unexpected"] = {"result": "success"}
+        with self.assertRaises(scope.EvidenceError):
+            scope.accept(needs)
+
+    def test_inconsistent_docs_runtime_results_are_rejected(self):
+        for job in scope.RUNTIME_JOBS:
+            needs = self.needs("docs")
+            needs[job]["result"] = "failure"
+            with self.assertRaises(scope.EvidenceError):
+                scope.accept(needs)
+
+
+if __name__ == "__main__":
+    unittest.main()

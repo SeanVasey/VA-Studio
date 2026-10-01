@@ -6,6 +6,7 @@ namespace App\Domain\SiteBuilder;
 final class SiteImageProblem
 {
     public const MESSAGES = [
+        'processing_waiting' => 'Waiting for processing to start. If this continues, check the media queue and worker, then retry processing.',
         'scanner_unavailable' => 'The malware scanner was unavailable or gave no clear result. Retry once it is working.',
         'scanner_signatures_stale' => 'The malware scanner’s signatures are out of date. Update them, then retry.',
         'tool_unavailable' => 'An image tool is missing on the server. Retry once it is installed.',

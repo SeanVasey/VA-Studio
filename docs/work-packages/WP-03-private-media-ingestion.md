@@ -1,5 +1,9 @@
 # [WP-03] Private media ingestion, quarantine and preview processing
 
+## Integrated T03–T08 candidate — October 1, 2026
+
+Whole-identifier migration rewriting, additive byte-exact hash guards, truthful waiting-image diagnosis, pre-scan stems limits, scanner expanded-size bounds and remaining worker deadlines are implemented in the current candidate. Focused PHP 8.4.26/SQLite checks passed 193 tests / 1,654 assertions with zero failures or skips; independent reviews found no blocking defect. Full integrated MySQL/SQLite/frontend/browser acceptance remains required. See [evidence and safe migration rollout](../verification/media-integrity-followups.md). The newly verified SQLite UUID NUL-suffix weakness is a separately tracked integrity child increment. Deployed storage, queue/scanner/encoder acceptance and other production work below remain open. Earlier checkpoint wording is historical.
+
 Status: **WAV/artwork implemented in PR #21; private stems archive increment merged in [PR #30](https://github.com/VASEYDEV/VASEYAUDIO/pull/30); production scanner support and the shared worker budget merged in [PR #84](https://github.com/VASEYDEV/VASEYAUDIO/pull/84); conservative track-media commit cleanup merged in [PR #86](https://github.com/VASEYDEV/VASEYAUDIO/pull/86). The current increment adds optional encoder diagnostics; broader work package remains open.** The implementation below is a bounded local-storage pipeline. This issue is complete only when the acceptance evidence and remaining production work below exist.
 
 - Suggested issue title: `[WP-03] Private media ingestion, quarantine and preview processing`

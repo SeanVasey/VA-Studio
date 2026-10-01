@@ -191,7 +191,7 @@ return new class extends Migration
         $name = $table.'_'.$suffix;
         if ($allowed !== null && DB::getDriverName() === 'mysql') {
             // Policy/kind spellings are exact even on MySQL's PAD SPACE identity collation.
-            $allowed = str_replace(['NEW.kind', 'x.kind'], ['CAST(NEW.kind AS BINARY)', 'CAST(x.kind AS BINARY)'], $allowed);
+            $allowed = $this->bytewise($allowed);
         }
         if (DB::getDriverName() === 'sqlite') {
             $when = $allowed === null ? '' : " WHEN NOT COALESCE(({$allowed}), 0)";
@@ -201,6 +201,15 @@ return new class extends Migration
             $body = $allowed === null ? $signal : "IF NOT COALESCE(({$allowed}), 0) THEN {$signal} END IF;";
             DB::unprepared("CREATE TRIGGER {$name} BEFORE {$operation} ON {$table} FOR EACH ROW BEGIN {$body} END");
         }
+    }
+
+    /** Compare only whole whitelisted column names; longer or additionally qualified names stay unchanged. */
+    public function bytewise(string $condition): string
+    {
+        $names = implode('|', array_map(fn (string $column): string => preg_quote($column, '/'), ['NEW.kind', 'x.kind']));
+
+        return preg_replace('/(?<![\w$.])(?:'.$names.')(?![\w$])/', 'CAST($0 AS BINARY)', $condition)
+            ?? throw new \LogicException('The guard condition could not be rewritten.');
     }
 
     public function down(): void

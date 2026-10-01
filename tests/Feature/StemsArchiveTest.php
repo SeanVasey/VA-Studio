@@ -160,7 +160,7 @@ class StemsArchiveTest extends TestCase
         }
     }
 
-    public function test_entry_member_total_and_ratio_limits_reject_before_member_scanning(): void
+    public function test_entry_member_total_and_ratio_limits_reject_before_any_scanning(): void
     {
         $scanner = new class extends TestOnlyMediaScanner {
             public int $calls = 0;
@@ -172,9 +172,38 @@ class StemsArchiveTest extends TestCase
             config(['media.stems.max_'.$limit => $value]);
             $scanner->calls = 0;
             $this->assertRejected(StemsFixtures::zip([['name' => 'a.wav', 'method' => 8], ['name' => 'b.wav']]), ['archive_limit']);
-            $this->assertSame(1, $scanner->calls); // Only the original archive was scanned.
+            $this->assertSame(0, $scanner->calls); // Even the original archive is refused before a scanner can expand it.
             config(['media.stems.max_'.$limit => $previous]);
         }
+    }
+
+    public function test_unsafe_directory_metadata_is_refused_before_the_uploaded_archive_reaches_the_scanner(): void
+    {
+        $scanner = new class extends TestOnlyMediaScanner
+        {
+            public int $calls = 0;
+
+            public function scan(string $path): array
+            {
+                $this->calls++;
+                throw new MediaFailure('scan_not_clean', 'The scanner must not receive this unsafe upload.');
+            }
+        };
+        app()->instance(MalwareScanner::class, $scanner);
+        foreach ([
+            [['name' => '../escape.wav']],
+            [['name' => 'link.wav', 'mode' => 0120777]],
+            [['name' => 'nested.zip']],
+            [['name' => 'locked.wav', 'flags' => 1]],
+            [['name' => 'same.wav'], ['name' => 'Same.wav']],
+        ] as $entries) {
+            $this->assertRejected(StemsFixtures::zip($entries), ['unsafe_archive', 'unsupported_archive', 'invalid_archive']);
+        }
+        $this->assertSame(0, $scanner->calls);
+
+        // A supported directory still requires the original upload's scan, and its failure still prevents all output.
+        $this->assertRejected(StemsFixtures::zip([['name' => 'audio.wav']]), ['scan_not_clean']);
+        $this->assertSame(1, $scanner->calls);
     }
 
     public function test_corrupt_zip_crc_forged_lengths_and_non_audio_members_never_promote(): void
@@ -287,6 +316,80 @@ class StemsArchiveTest extends TestCase
                 return $this->now;
             }
         };
+    }
+
+    public static function exhaustedArchiveBudgets(): array
+    {
+        return [
+            'exact deadline' => [30000000000],
+            'less than a whole second remains' => [29500000000],
+            'past deadline' => [31000000000],
+        ];
+    }
+
+    #[DataProvider('exhaustedArchiveBudgets')]
+    public function test_no_tool_starts_after_a_member_scan_leaves_less_than_one_whole_second(int $elapsed): void
+    {
+        config(['media.stems.max_seconds' => 30]);
+        $archive = $this->archiveWithClock();
+        $runner = $this->runnerThatNotes($archive);
+        $scanner = new class($archive, $elapsed) extends TestOnlyMediaScanner
+        {
+            public function __construct(private object $archive, private int $elapsed) {}
+
+            public function scan(string $path): array
+            {
+                if (str_starts_with(basename($path), 'stem-')) {
+                    $this->archive->now = $this->elapsed;
+                }
+
+                return parent::scan($path);
+            }
+        };
+        app()->instance(StemsArchive::class, $archive);
+        app()->instance(BoundedMediaProcess::class, $runner);
+        app()->instance(MalwareScanner::class, $scanner);
+
+        $this->assertRejected(StemsFixtures::zip([['name' => 'audio.wav']]), ['archive_timeout']);
+
+        $this->assertSame([], $runner->calls->getArrayCopy());
+    }
+
+    public function test_tools_get_whole_seconds_without_rounding_up_the_archive_budget(): void
+    {
+        config(['media.stems.max_seconds' => 30]);
+        $archive = $this->archiveWithClock();
+        $runner = $this->runnerThatNotes($archive, ['ffprobe' => 1500000000]);
+        app()->instance(StemsArchive::class, $archive);
+        $run = $this->queuedWith($runner);
+
+        app(MediaProcessor::class)->handle($run->id);
+
+        // FFprobe spent 1.5 seconds; FFmpeg must receive 28, not 29 seconds of the original 30.
+        $this->assertSame([['ffprobe', 30], ['ffmpeg', 28], ['ffmpeg', 15], ['ffprobe', 15]], $runner->calls->getArrayCopy());
+    }
+
+    public function test_a_rebuilt_archive_scan_returning_at_the_deadline_never_promotes(): void
+    {
+        config(['media.stems.max_seconds' => 30]);
+        $archive = $this->archiveWithClock();
+        $scanner = new class($archive) extends TestOnlyMediaScanner
+        {
+            public function __construct(private object $archive) {}
+
+            public function scan(string $path): array
+            {
+                if (basename($path) === 'stems.zip') {
+                    $this->archive->now = 30000000000;
+                }
+
+                return parent::scan($path);
+            }
+        };
+        app()->instance(StemsArchive::class, $archive);
+        app()->instance(MalwareScanner::class, $scanner);
+
+        $this->assertRejected(StemsFixtures::zip([['name' => 'audio.wav']]), ['archive_timeout']);
     }
 
     public function test_no_scan_starts_after_the_budget_ran_out_while_the_archive_was_written(): void
