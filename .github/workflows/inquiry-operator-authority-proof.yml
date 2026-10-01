@@ -1,0 +1,271 @@
+name: Inquiry operator authority locking focused proof
+
+# Source-specific feedback; complete Foundation and expected-head merge remain required.
+on:
+  push:
+    branches: [codex/inquiry-operator-authority-proof]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: inquiry-operator-authority-proof
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  inquiry-operator-authority-proof:
+    name: Operator authority PHP proof (${{ matrix.engine }})
+    if: github.repository == 'VASEYDEV/VASEYAUDIO' && github.ref == 'refs/heads/codex/inquiry-operator-authority-proof'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [sqlite, mysql]
+    services:
+      mysql:
+        image: ${{ matrix.engine == 'mysql' && 'mysql:8.4' || '' }}
+        env:
+          MYSQL_DATABASE: vaseyaudio_operator_proof
+          MYSQL_ROOT_PASSWORD: ci-only-password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -pci-only-password"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      APP_URL: https://audio.example.test
+      ASSET_URL: ''
+      DB_CONNECTION: ${{ matrix.engine }}
+      DB_DATABASE: ${{ matrix.engine == 'mysql' && 'vaseyaudio_operator_proof' || ':memory:' }}
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USERNAME: root
+      DB_PASSWORD: ci-only-password
+      DB_URL: ''
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      BROADCAST_CONNECTION: 'null'
+      MAIL_MAILER: array
+      PULSE_ENABLED: 'false'
+      TELESCOPE_ENABLED: 'false'
+      NIGHTWATCH_ENABLED: 'false'
+      CONTACT_INQUIRIES_ENABLED: 'false'
+      CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED: 'false'
+      STRIPE_WEBHOOK_ENABLED: 'false'
+      STRIPE_TEST_CHECKOUT_ENABLED: 'false'
+      STRIPE_TEST_PAYMENT_PROCESSING_ENABLED: 'false'
+      STRIPE_TEST_FINALIZATION_ENABLED: 'false'
+      STRIPE_TEST_FINALIZATION_POLICY: ''
+      STRIPE_TEST_SECRET_KEY: ''
+      STRIPE_WEBHOOK_SECRET: ''
+      STRIPE_ACCOUNT_ID: ''
+      VASEY_TEST_CONTRACT_ISSUANCE_ENABLED: 'false'
+      VASEY_TEST_FULFILLMENT_ACTIVATION_ENABLED: 'false'
+      VASEY_TEST_DELIVERY_ACCESS_ENABLED: 'false'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 2
+      - name: Require the exact published parent and reviewed permanent source
+        run: |
+          set -euo pipefail
+          mkdir inquiry-operator-evidence
+          python3 <<'PY' 2>&1 | tee inquiry-operator-evidence/source-guard.log
+          from pathlib import Path
+          import hashlib, json, os, subprocess, tempfile
+          git = lambda *args: subprocess.check_output(['git', *args], text=True).strip()
+          parent = '1635101e646825f293c25459fa79cd09b11e9825'
+          parent_tree = '447044c33badbd6eeb61630b051bfb2911f30ba4'
+          workflow = '.github/workflows/inquiry-operator-authority-proof.yml'
+          if (os.environ['GITHUB_EVENT_NAME'], os.environ['GITHUB_REPOSITORY'], os.environ['GITHUB_REF']) != ('push', 'VASEYDEV/VASEYAUDIO', 'refs/heads/codex/inquiry-operator-authority-proof'):
+              raise SystemExit('Unexpected execution event/repository/ref.')
+          if git('rev-parse', 'HEAD') != os.environ['GITHUB_SHA'] or git('rev-parse', 'HEAD^') != parent or git('rev-parse', 'HEAD^^{tree}') != parent_tree:
+              raise SystemExit('Unexpected execution head, parent or parent tree.')
+          wanted = {'app/Domain/Inquiries/InquiryPolicy.php': 'M', 'app/Domain/Inquiries/SubmitInquiry.php': 'M', 'app/Providers/AppServiceProvider.php': 'M', 'app/Support/Access/AdminMultiFactor.php': 'M', 'docs/verification/inquiry-operator-admission-locking.md': 'A', 'docs/verification/public-track-embed-fonts.md': 'M', 'scripts/ci/database-sqlite-skips.json': 'M', 'tests/Feature/CustomerInquiryConcurrencyTest.php': 'M', 'tests/Support/InquiryOperatorRace.php': 'A', 'tests/Support/inquiry-operator-race-worker.php': 'A', 'tests/Support/public-embed-route-cache-worker.php': 'M'}
+          wanted[workflow] = 'A'
+          actual = {path: status for status, path in (line.split('\t') for line in git('diff', '--name-status', '--no-renames', parent, 'HEAD').splitlines())}
+          if actual != wanted or git('status', '--porcelain', '--untracked-files=no'):
+              raise SystemExit('Unexpected source delta or dirty tracked worktree.')
+          expected = {'app/Domain/Inquiries/InquiryPolicy.php': '3a4bf164002519eb1c4a8297ee7b14ec0db5af3cd35636bd3c8f74aee6a8b5b7', 'app/Domain/Inquiries/SubmitInquiry.php': '069eaed2d256289e90bc5ae58d3492a5e7fc6ffce3be39f50f22b43d89c9ac04', 'app/Providers/AppServiceProvider.php': 'fb1e5ff7e48338817ab93dd570d269a2715d20e2af133290c467bbe940006de8', 'app/Support/Access/AdminMultiFactor.php': 'dc83e64ae86754c6ac2a6b64cb420e687d5ecaf4f5d87225060d021597681710', 'docs/verification/inquiry-operator-admission-locking.md': '03a688596a0fcfd1fe4ce8eb6fb239992f7cf1ff1e732ad9cafad2eaab900056', 'docs/verification/public-track-embed-fonts.md': 'a756481578b5b2f115fa5c27b4d2beeda34cd2b492947d64494b4c14ff7aff81', 'scripts/ci/database-sqlite-skips.json': '71378e813f22215224e08bcc5a26fedf9993121bb373b63d598e94eeda04fb8a', 'tests/Feature/CustomerInquiryConcurrencyTest.php': '64c25ddbe8134af4edb1e732dcb7abb37157436d32cec3c8f4c588c158962e9b', 'tests/Support/InquiryOperatorRace.php': '9357b2d390525b2cddaad01187efffa501131bffa30f41d3b88ebaf5b010372a', 'tests/Support/inquiry-operator-race-worker.php': '7c6711d539e7b78edfa1f22dea726bc3699432bb3c63dab9ab7a3fade4fab3f0', 'tests/Support/public-embed-route-cache-worker.php': '5ecabccaac462cf178ae2f1ba01c203dbafd1851ad4507da490d72a2159c737e', 'composer.json': '132cb2a16c6ce2960d059cfddecae8e1accf6138a258dd8bab2c0c7b822f5607', 'composer.lock': '51e9c3cc1073e96a1c130376e1ab9980765a5c441c0dcd2a5454fd0909406962', 'phpunit.xml': '493369cfb7feea104da4bec214c2cc6526ca2f1b9d937c50a2961fc59cb61aaf', 'scripts/ci/database-receipts.py': '95e47929e01746d2fa560a95910b93108bc7a48aca59701115306fcb029aca3f', 'tests/Feature/CustomerInquiryHttpTest.php': '0f5e1be7a80ef1bfd607d45db348b684c5eca9dc24072e7d5a930a3aaf960a4b', 'tests/Feature/CustomerInquiryAdminTest.php': '7ecceb49e8ed4dcdc6bf3652a86e5da16eec8e31cbc57de6fa4c13e10cda986e', 'tests/Support/InquiryRace.php': 'e37d564dec05e2b1dee51a94f0291be16a9e06ba4c37d2035e816d537b1809e0', 'tests/Support/inquiry-race-worker.php': '005048865d37681d7e4284bc0ed92bf139dec9bd946f4c9f7365902707978ac3'}
+          for path, digest in expected.items():
+              if hashlib.sha256(Path(path).read_bytes()).hexdigest() != digest:
+                  raise SystemExit('Unexpected reviewed source hash: ' + path)
+          # A separate disposable index verifies all permanent modes/blobs, without changing the checkout index.
+          with tempfile.TemporaryDirectory() as tmp:
+              env = dict(os.environ, GIT_INDEX_FILE=str(Path(tmp) / 'index'))
+              subprocess.run(['git', 'read-tree', 'HEAD'], env=env, check=True)
+              subprocess.run(['git', 'update-index', '--force-remove', workflow], env=env, check=True)
+              permanent_tree = subprocess.check_output(['git', 'write-tree'], env=env, text=True).strip()
+          if permanent_tree != '9d0d770b5bbb225f341ba85147052fa08ac3cf12':
+              raise SystemExit('Permanent source tree differs from frozen reviewed 49a362a.')
+          directory = Path('inquiry-operator-evidence')
+          (directory / 'source.patch').write_bytes(subprocess.check_output(['git', 'diff', '--binary', parent, 'HEAD']))
+          files = git('ls-files').splitlines()
+          manifest = {'head': git('rev-parse', 'HEAD'), 'tree': git('rev-parse', 'HEAD^{tree}'),
+              'parent': parent, 'parent_tree': parent_tree, 'reviewed_source': '49a362aeb53390b155ba2d662af37da801fd0d3a',
+              'reviewed_tree': permanent_tree, 'source_delta': actual,
+              'sha256': {path: hashlib.sha256(Path(path).read_bytes()).hexdigest() for path in files},
+              'scope': 'Three fixed inquiry feature files on disposable SQLite/MySQL; full Foundation and merge still required.'}
+          (directory / 'source.json').write_text(json.dumps(manifest, indent=2, sort_keys=True) + '\n')
+          print(json.dumps({'head': manifest['head'], 'tree': manifest['tree'], 'permanent_tree': permanent_tree, 'tracked_files': len(files), 'source_delta': actual}, sort_keys=True))
+          PY
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          coverage: none
+          tools: composer:v2
+      - name: Install genuine Foundation fixture prerequisites
+        run: |
+          set -euo pipefail
+          sudo apt-get update 2>&1 | tee inquiry-operator-evidence/apt-update.log
+          sudo apt-get install --yes --no-install-recommends ffmpeg util-linux qpdf poppler-utils 2>&1 | tee inquiry-operator-evidence/apt-install.log
+          test -x /usr/bin/ffmpeg
+          test -x /usr/bin/ffprobe
+          test -x /usr/bin/prlimit
+      - name: Install and validate the exact locked backend dependencies
+        run: |
+          set -euo pipefail
+          composer install --no-interaction --prefer-dist 2>&1 | tee inquiry-operator-evidence/composer-install.log
+          composer validate --strict 2>&1 | tee inquiry-operator-evidence/composer-validate.log
+          composer audit 2>&1 | tee inquiry-operator-evidence/composer-audit.log
+      - name: Check syntax of all seven changed PHP paths
+        run: |
+          set -euo pipefail
+          paths=(app/Domain/Inquiries/InquiryPolicy.php app/Domain/Inquiries/SubmitInquiry.php app/Providers/AppServiceProvider.php app/Support/Access/AdminMultiFactor.php tests/Feature/CustomerInquiryConcurrencyTest.php tests/Support/InquiryOperatorRace.php tests/Support/inquiry-operator-race-worker.php)
+          { for path in "${paths[@]}"; do php -l "$path"; done; } 2>&1 | tee inquiry-operator-evidence/php-syntax.log
+      - name: Prepare the isolated application and record actual fresh database runtime
+        run: |
+          set -euo pipefail
+          { cp .env.example .env; php artisan key:generate; } 2>&1 | tee inquiry-operator-evidence/application-setup.log
+          {
+            php --version
+            php vendor/bin/phpunit --version
+            php vendor/bin/pint --version
+            composer --version
+            ffmpeg -version
+            ffprobe -version
+            prlimit --version
+            qpdf --version
+            pdfinfo -v
+            php <<'PHP'
+          <?php
+          if (PHP_MAJOR_VERSION !== 8 || PHP_MINOR_VERSION !== 4) { throw new RuntimeException('PHP 8.4 required.'); }
+          if (getenv('DB_CONNECTION') === 'mysql' && getenv('DB_DATABASE') === 'vaseyaudio_operator_proof') {
+              $db = new PDO('mysql:host=127.0.0.1;port=3306;dbname=vaseyaudio_operator_proof', getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
+              $runtime = $db->query('SELECT VERSION() AS version, DATABASE() AS database_name, @@version_comment AS version_comment, @@sql_mode AS sql_mode, @@transaction_isolation AS transaction_isolation, @@lower_case_table_names AS lower_case_table_names')->fetch(PDO::FETCH_ASSOC);
+              if (! str_starts_with($runtime['version'], '8.4.') || $runtime['database_name'] !== 'vaseyaudio_operator_proof' || $runtime['transaction_isolation'] !== 'REPEATABLE-READ' || (int) $runtime['lower_case_table_names'] !== 0) {
+                  throw new RuntimeException('Unexpected disposable MySQL runtime.');
+              }
+              $tables = (int) $db->query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'vaseyaudio_operator_proof'")->fetchColumn();
+          } elseif (getenv('DB_CONNECTION') === 'sqlite' && getenv('DB_DATABASE') === ':memory:') {
+              $db = new PDO('sqlite::memory:');
+              $runtime = ['version' => $db->query('SELECT sqlite_version()')->fetchColumn(), 'database_name' => ':memory:'];
+              $tables = (int) $db->query("SELECT COUNT(*) FROM sqlite_master WHERE type = 'table'")->fetchColumn();
+          } else { throw new RuntimeException('Unexpected fixed database selection.'); }
+          if ($tables !== 0) { throw new RuntimeException('Disposable database not empty before tests.'); }
+          echo json_encode(['driver' => $db->getAttribute(PDO::ATTR_DRIVER_NAME), 'runtime' => $runtime, 'tables_before_tests' => $tables], JSON_THROW_ON_ERROR), PHP_EOL;
+          PHP
+          } 2>&1 | tee inquiry-operator-evidence/runtime.log
+      - name: Discover and require the exact three-file source/provider inventory
+        run: |
+          set -euo pipefail
+          php vendor/bin/phpunit tests/Feature/CustomerInquiryHttpTest.php tests/Feature/CustomerInquiryAdminTest.php tests/Feature/CustomerInquiryConcurrencyTest.php --list-tests-xml=inquiry-operator-evidence/php-discovery.xml --fail-on-empty-test-suite --fail-on-all-issues --fail-on-phpunit-warning --display-all-issues 2>&1 | tee inquiry-operator-evidence/php-discovery.log
+          python3 <<'PY' 2>&1 | tee inquiry-operator-evidence/discovery-check.log
+          from pathlib import Path
+          from collections import Counter
+          import hashlib, importlib.util, json, os
+          root = Path.cwd()
+          directory = root / 'inquiry-operator-evidence'
+          spec = importlib.util.spec_from_file_location('receipts', root / 'scripts/ci/database-receipts.py')
+          r = importlib.util.module_from_spec(spec); spec.loader.exec_module(r)
+          expected = {'Tests\\Feature\\CustomerInquiryAdminTest': ['test_guest_customer_and_unverified_staff_cannot_list_view_or_apply_private_actions', 'test_actual_staff_inbox_detail_and_actions_persist_and_audit_without_sending_or_mutating_original_input', 'test_detail_actions_update_visible_state_and_action_availability_without_a_page_reload', 'test_retained_staff_actions_and_livewire_refresh_recheck_persisted_authority#role', 'test_retained_staff_actions_and_livewire_refresh_recheck_persisted_authority#verification', 'test_required_mfa_withdrawal_denies_retained_private_component_and_direct_action', 'test_stale_actions_and_archive_replay_do_not_duplicate_audits_or_reopen_inquiries', 'test_failed_audit_rolls_back_archive_and_prevents_private_view_result', 'test_inbox_has_bounded_pagination_and_no_create_edit_delete_or_bulk_abilities'], 'Tests\\Feature\\CustomerInquiryConcurrencyTest': ['test_competing_owners_with_one_global_request_key_save_exactly_one_inquiry_and_receipt_audit', 'test_publication_withdrawal_and_admission_share_one_mutex_without_stale_admission#admission takes the lock first', 'test_publication_withdrawal_and_admission_share_one_mutex_without_stale_admission#withdrawal takes the lock first', 'test_operator_authority_revocation_and_admission_share_the_current_user_lock#admin admission first', 'test_operator_authority_revocation_and_admission_share_the_current_user_lock#admin revocation first', 'test_operator_authority_revocation_and_admission_share_the_current_user_lock#verified email admission first', 'test_operator_authority_revocation_and_admission_share_the_current_user_lock#verified email revocation first', 'test_operator_authority_revocation_and_admission_share_the_current_user_lock#MFA enrollment admission first', 'test_operator_authority_revocation_and_admission_share_the_current_user_lock#MFA enrollment revocation first'], 'Tests\\Feature\\CustomerInquiryHttpTest': ['test_current_public_contact_exposes_only_enabled_and_exact_public_notice_setup_props', 'test_public_contact_props_and_submission_both_fail_closed_when_setup_or_persisted_operator_is_withdrawn', 'test_private_contact_preview_cannot_project_intake_or_policy_props_even_when_public_setup_is_ready', 'test_save_is_durable_encrypted_audited_and_exposes_only_an_opaque_receipt_without_sending', 'test_exact_replay_ignores_json_field_order_and_whitespace_but_changed_payload_conflicts', 'test_lost_and_foreign_sessions_cannot_recover_a_previous_receipt_using_its_request_key', 'test_authentication_context_changes_rotate_inquiry_ownership_even_when_returning_to_an_earlier_user', 'test_login_and_logout_without_an_intervening_inquiry_cannot_revive_guest_ownership', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#missing name', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#empty name', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#nonstring name', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#name over Unicode limit', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#name control', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#email too long', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#malformed email', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#email object', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#missing subject', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#subject too long', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#subject boolean', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#empty subject', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#message missing', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#message too long', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#empty message', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#message array', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#message invalid control', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#honeypot filled', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#honeypot null', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#honeypot missing', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#request key invalid', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#request key missing', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#request key uppercase', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#request key wrong version', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#request key wrong variant', 'test_fields_have_strict_types_bounds_and_fixed_errors_without_retaining_invalid_submissions#request key padded', 'test_exact_unicode_field_limits_and_exact_body_byte_limit_are_accepted', 'test_message_bounds_count_unicode_characters_and_literal_markup_is_retained_as_text', 'test_validation_errors_are_identical_for_different_private_invalid_values', 'test_malformed_json_and_duplicate_fields_are_rejected_privately#invalid JSON', 'test_malformed_json_and_duplicate_fields_are_rejected_privately#empty body', 'test_malformed_json_and_duplicate_fields_are_rejected_privately#array root', 'test_malformed_json_and_duplicate_fields_are_rejected_privately#null root', 'test_malformed_json_and_duplicate_fields_are_rejected_privately#scalar root', 'test_malformed_json_and_duplicate_fields_are_rejected_privately#two JSON objects', 'test_malformed_json_and_duplicate_fields_are_rejected_privately#UTF8 failure', 'test_malformed_json_and_duplicate_fields_are_rejected_privately#duplicate fields', 'test_malformed_json_and_duplicate_fields_are_rejected_privately#escaped duplicate fields', 'test_malformed_json_and_duplicate_fields_are_rejected_privately#duplicate nested fields', 'test_malformed_json_and_duplicate_fields_are_rejected_privately#trailing comma', 'test_complete_duplicate_and_extra_keys_are_rejected_including_unicode_escaped_duplicates', 'test_raw_queries_media_encoding_and_method_overrides_are_rejected_before_session_work', 'test_only_post_is_supported_and_unsupported_methods_are_private_even_without_json_accept', 'test_raw_stream_is_bounded_even_when_content_length_is_absent_or_dishonest#0', 'test_raw_stream_is_bounded_even_when_content_length_is_absent_or_dishonest#1', 'test_raw_stream_is_bounded_even_when_content_length_is_absent_or_dishonest#2', 'test_invalid_or_excessive_declared_lengths_and_one_byte_over_body_limit_are_private', 'test_cross_origin_requests_are_denied_without_creating_a_session_owner#foreign host', 'test_cross_origin_requests_are_denied_without_creating_a_session_owner#scheme downgrade', 'test_cross_origin_requests_are_denied_without_creating_a_session_owner#foreign port', 'test_cross_origin_requests_are_denied_without_creating_a_session_owner#null origin', 'test_cross_origin_requests_are_denied_without_creating_a_session_owner#two origins', 'test_cross_origin_requests_are_denied_without_creating_a_session_owner#origin with credentials', 'test_cross_origin_requests_are_denied_without_creating_a_session_owner#origin with path', 'test_cross_origin_requests_are_denied_without_creating_a_session_owner#cross site fetch', 'test_real_csrf_rejects_missing_or_wrong_tokens_and_accepts_matching_session_token_under_debug', 'test_same_origin_token_fallback_accepts_clients_without_fetch_metadata_headers', 'test_enabled_gate_and_required_policy_configuration_fail_closed_without_changing_retained_records', 'test_a_private_contact_draft_cannot_admit_inquiries_when_the_active_release_has_no_contact', 'test_current_contact_withdrawal_denies_new_and_replayed_submissions_and_preserves_the_original_evidence', 'test_operator_privilege_withdrawal_is_rechecked_from_persistence_for_new_and_replayed_submissions#0', 'test_operator_privilege_withdrawal_is_rechecked_from_persistence_for_new_and_replayed_submissions#1', 'test_required_operator_mfa_withdrawal_blocks_submissions_without_losing_the_receipt', 'test_site_and_policy_changes_never_rewrite_an_exact_replay_snapshot', 'test_audit_failure_rolls_back_the_save_returns_truthful_generic_failure_and_allows_retry', 'test_database_insert_failure_returns_no_receipt_or_private_logs_and_can_retry', 'test_ip_limiter_survives_session_rotation_and_ignores_forged_forwarded_addresses', 'test_hourly_ip_budget_remains_after_the_minute_window_resets', 'test_session_lock_timeout_is_generic_private_and_happens_before_persistence#0', 'test_session_lock_timeout_is_generic_private_and_happens_before_persistence#1']}
+          expected_cases = {cls+'::'+suffix: 'tests/Feature/'+cls.split('\\')[-1]+'.php' for cls, suffixes in expected.items() for suffix in suffixes}
+          observed = r.inventory((directory / 'php-discovery.xml').read_bytes(), str(root))
+          if observed['cases'] != expected_cases or len(expected_cases) != 96 or Counter(observed['cases'].values()) != Counter({'tests/Feature/CustomerInquiryHttpTest.php': 78, 'tests/Feature/CustomerInquiryAdminTest.php': 9, 'tests/Feature/CustomerInquiryConcurrencyTest.php': 9}):
+              raise SystemExit('Actual discovery differs from the fixed 96 source/provider identities.')
+          policy = r.sqlite_skip_pairs(root)
+          skipped = {i for i,m in observed['methods'].items() if m in policy}
+          expected_skipped = {i for i in expected_cases if i.startswith('Tests\\Feature\\CustomerInquiryConcurrencyTest::')}
+          if skipped != expected_skipped or len(skipped) != 9:
+              raise SystemExit('Fixed selection must expand exactly the nine reviewed MySQL-only identities.')
+          result = {'cases': observed['cases'], 'census': r.census(observed), 'expected_sqlite_skip_ids': sorted(skipped),
+              'discovery_sha256': hashlib.sha256((directory / 'php-discovery.xml').read_bytes()).hexdigest(),
+              'sqlite_policy_sha256': hashlib.sha256((root / 'scripts/ci/database-sqlite-skips.json').read_bytes()).hexdigest(),
+              'engine': os.environ['DB_CONNECTION']}
+          (directory / 'discovery-receipt.json').write_text(json.dumps(result, indent=2, sort_keys=True)+'\n')
+          print(json.dumps(result, sort_keys=True))
+          PY
+      - name: Run all three unchanged selections with strict issue handling
+        run: |
+          set -euo pipefail
+          flags=(--fail-on-empty-test-suite --fail-on-all-issues --fail-on-phpunit-warning --fail-on-warning --fail-on-risky --fail-on-incomplete --display-all-issues)
+          case "$DB_CONNECTION" in
+            mysql) flags+=(--fail-on-skipped) ;;
+            sqlite) flags+=(--do-not-fail-on-skipped) ;; # Only the nine exact discovered MySQL-only cases may skip.
+            *) exit 1 ;;
+          esac
+          php vendor/bin/phpunit tests/Feature/CustomerInquiryHttpTest.php tests/Feature/CustomerInquiryAdminTest.php tests/Feature/CustomerInquiryConcurrencyTest.php --testdox --log-junit=inquiry-operator-evidence/php-results.xml "${flags[@]}" 2>&1 | tee inquiry-operator-evidence/phpunit.log
+      - name: Require full genuine JUnit identities, exact skips and unchanged source
+        run: |
+          set -euo pipefail
+          python3 <<'PY' 2>&1 | tee inquiry-operator-evidence/receipt-check.log
+          from pathlib import Path
+          import hashlib, importlib.util, json, os, subprocess
+          root = Path.cwd(); directory = root / 'inquiry-operator-evidence'
+          spec = importlib.util.spec_from_file_location('receipts', root / 'scripts/ci/database-receipts.py')
+          r = importlib.util.module_from_spec(spec); spec.loader.exec_module(r)
+          discovery = json.loads((directory / 'discovery-receipt.json').read_text())
+          raw = (directory / 'php-discovery.xml').read_bytes()
+          expected = r.inventory(raw, str(root))
+          if expected['cases'] != discovery['cases'] or r.census(expected) != discovery['census'] or hashlib.sha256(raw).hexdigest() != discovery['discovery_sha256']:
+              raise SystemExit('Discovery evidence changed after its strict source/provider check.')
+          engine = os.environ['DB_CONNECTION']
+          result = r.junit((directory / 'php-results.xml').read_bytes(), expected, str(root), engine, r.sqlite_skip_pairs(root))
+          if (result['reported_cases'], result['executed_cases'], result['skipped_cases']) != (96, 96 if engine == 'mysql' else 87, 0 if engine == 'mysql' else 9):
+              raise SystemExit('Unexpected genuine execution/skip census.')
+          if engine == 'sqlite' and result['skipped_ids'] != discovery['expected_sqlite_skip_ids']:
+              raise SystemExit('SQLite skip set differs from its exact nine expanded identities.')
+          junit = r.xml((directory / 'php-results.xml').read_bytes())
+          for case in junit.iter('testcase'):
+              if case.find('skipped') is None and int(case.get('assertions', '0')) <= 0:
+                  raise SystemExit('Every executed case must retain positive real assertions.')
+          manifest = json.loads((directory / 'source.json').read_text())
+          if subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=no'], text=True).strip():
+              raise SystemExit('Verification changed tracked source.')
+          for path,digest in manifest['sha256'].items():
+              if hashlib.sha256((root / path).read_bytes()).hexdigest() != digest:
+                  raise SystemExit('Verification changed source bytes: '+path)
+          receipt = {'head': manifest['head'], 'tree': manifest['tree'], 'parent': manifest['parent'], 'reviewed_permanent_tree': manifest['reviewed_tree'],
+              'engine': engine, 'discovery': discovery['census'], 'results': result,
+              'new_operator_race_cases': 6 if engine == 'mysql' else 0,
+              'race_contract': 'Unchanged assertions require separate PHP workers/connections and actual users PRIMARY row waiter/blocker in both orders, including an old valid RR snapshot; SQLite skips these precise MySQL-only identities.',
+              'evidence_sha256': {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in directory.iterdir() if p.is_file() and p.name != 'receipt-check.log'}}
+          (directory / 'receipt.json').write_text(json.dumps(receipt, indent=2, sort_keys=True)+'\n')
+          print(json.dumps(receipt, sort_keys=True))
+          PY
+      - name: Check formatting of all seven changed PHP paths after functional proof
+        run: |
+          set -euo pipefail
+          php vendor/bin/pint --test -v app/Domain/Inquiries/InquiryPolicy.php app/Domain/Inquiries/SubmitInquiry.php app/Providers/AppServiceProvider.php app/Support/Access/AdminMultiFactor.php tests/Feature/CustomerInquiryConcurrencyTest.php tests/Support/InquiryOperatorRace.php tests/Support/inquiry-operator-race-worker.php 2>&1 | tee inquiry-operator-evidence/pint.log
+      - name: Retain complete source, runtime, discovery, formatting and raw PHPUnit evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: inquiry-operator-authority-${{ matrix.engine }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: inquiry-operator-evidence/
+          retention-days: 7
+          if-no-files-found: error
+          overwrite: false
