@@ -97,6 +97,7 @@ final class InquiryNotificationWork
         if ($claim === null) {
             return InquiryNotificationIntent::findOrFail($id)->state;
         }
+
         return $this->handoff($claim);
     }
 

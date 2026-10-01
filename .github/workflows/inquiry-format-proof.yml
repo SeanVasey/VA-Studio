@@ -1,0 +1,192 @@
+name: Isolated inquiry notification formatting feedback
+
+# Informative syntax/style bridge only; this does not replay or replace Foundation.
+on:
+  push:
+    branches: [codex/inquiry-format-proof-20261001]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: isolated-inquiry-format-feedback
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  inquiry-format:
+    name: Inquiry notification exact formatting feedback
+    if: github.repository == 'VASEYDEV/VASEYAUDIO' && github.ref == 'refs/heads/codex/inquiry-format-proof-20261001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ':memory:'
+      DB_URL: ''
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+      CONTACT_INQUIRIES_ENABLED: 'false'
+      CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED: 'false'
+      STRIPE_TEST_CHECKOUT_ENABLED: 'false'
+      STRIPE_TEST_PAYMENT_PROCESSING_ENABLED: 'false'
+      STRIPE_TEST_FINALIZATION_ENABLED: 'false'
+      STRIPE_WEBHOOK_ENABLED: 'false'
+      STRIPE_TEST_SECRET_KEY: ''
+      STRIPE_WEBHOOK_SECRET: ''
+      STRIPE_ACCOUNT_ID: ''
+      VASEY_TEST_CONTRACT_ISSUANCE_ENABLED: 'false'
+      VASEY_TEST_FULFILLMENT_ACTIVATION_ENABLED: 'false'
+      VASEY_TEST_DELIVERY_ACCESS_ENABLED: 'false'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 2
+      - name: Record exact source and refuse any extra source change
+        run: |
+          set -euo pipefail
+          test "$GITHUB_EVENT_NAME" = push
+          test "$GITHUB_REPOSITORY" = VASEYDEV/VASEYAUDIO
+          test "$GITHUB_REF" = refs/heads/codex/inquiry-format-proof-20261001
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD^)" = 6f499bdcec696320b2bef64f205c3a79c8fedf98
+          git diff --exit-code HEAD --
+          test -z "$(git ls-files --others --exclude-standard)"
+          mkdir inquiry-format-evidence
+          python <<'PY'
+          import subprocess
+          expected = {
+              'app/Domain/Inquiries/Notifications/InquiryNotificationWork.php',
+              'app/Domain/Inquiries/Notifications/OperatorInquiryAlert.php',
+              'tests/Feature/InquiryNotificationWorkTest.php',
+              'tests/Support/inquiry-notification-race-worker.php',
+              '.github/workflows/inquiry-recovery-proof.yml',
+              '.github/workflows/inquiry-format-proof.yml',
+          }
+          actual = set(subprocess.check_output(['git', 'diff', '--name-only', 'HEAD^', 'HEAD'], text=True).splitlines())
+          if actual != expected:
+              raise SystemExit('Unexpected formatting successor source delta.')
+          PY
+          {
+            git rev-parse HEAD HEAD^{tree} HEAD^ HEAD^^{tree}
+            sha256sum .github/workflows/inquiry-format-proof.yml composer.json composer.lock phpunit.xml scripts/ci/database-sqlite-skips.json app/Console/Commands/ProcessInquiryAlerts.php app/Domain/Inquiries/Models/InquiryNotificationIntent.php app/Domain/Inquiries/Notifications/InquiryAlertNotSubmitted.php app/Domain/Inquiries/Notifications/InquiryAlertTransport.php app/Domain/Inquiries/Notifications/InquiryNotificationWork.php app/Domain/Inquiries/Notifications/OperatorInquiryAlert.php app/Domain/Inquiries/SubmitInquiry.php app/Jobs/NotifyInquiryOperatorJob.php config/inquiries.php database/migrations/2026_10_01_000031_customer_inquiries.php database/migrations/2026_10_01_000032_editorial_related_tracks_images.php database/migrations/2026_10_01_000033_inquiry_notification_intents.php tests/Feature/CustomerInquiryMigrationTest.php tests/Feature/InquiryNotificationConcurrencyTest.php tests/Feature/InquiryNotificationMigrationTest.php tests/Feature/InquiryNotificationWorkTest.php tests/Feature/SiteRelatedTrackImageMigrationTest.php tests/Support/InquiryNotificationRace.php tests/Support/inquiry-notification-race-worker.php tests/Feature/CustomerInquiryHttpTest.php tests/Feature/CustomerInquiryAdminTest.php tests/Feature/CustomerInquiryConcurrencyTest.php
+          } 2>&1 | tee inquiry-format-evidence/php-source.log
+          for path in app/Domain/Inquiries/Notifications/InquiryNotificationWork.php app/Domain/Inquiries/Notifications/OperatorInquiryAlert.php tests/Feature/InquiryNotificationWorkTest.php tests/Support/inquiry-notification-race-worker.php; do
+            git show "6f499bdcec696320b2bef64f205c3a79c8fedf98:$path" > "inquiry-format-evidence/previous-$(basename "$path")"
+          done
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          coverage: none
+          tools: composer:v2
+      - name: Install locked backend dependencies
+        run: |
+          set -euo pipefail
+          composer install --no-interaction --prefer-dist 2>&1 | tee inquiry-format-evidence/composer-install.log
+      - run: cp .env.example .env
+      - run: php artisan key:generate
+      - name: Check real PHP syntax and the exact approved formatting bridge
+        run: |
+          set -euo pipefail
+          php --version | tee inquiry-format-evidence/php-runtime.log
+          {
+            for path in app/Domain/Inquiries/Notifications/InquiryNotificationWork.php app/Domain/Inquiries/Notifications/OperatorInquiryAlert.php tests/Feature/InquiryNotificationWorkTest.php tests/Support/inquiry-notification-race-worker.php; do
+              php --syntax-check "$path"
+            done
+          } 2>&1 | tee inquiry-format-evidence/php-syntax.log
+          php <<'PHP' 2>&1 | tee inquiry-format-evidence/php-source-bridge.log
+          <?php
+          $expected = [
+              'app/Domain/Inquiries/Notifications/InquiryNotificationWork.php' => ['e7dded172adc031d2ec1531526c9d1da3cd26c293862f3df374c41b4928b4db7', 'f9d851ef49e29a3b5199cfe381b08e45b01e25287ca9f1d308731eab3d4d0665'],
+              'app/Domain/Inquiries/Notifications/OperatorInquiryAlert.php' => ['35f4aad53b49e0c9b8a112bc6b40345e84320d5e67b48fb743517cdf7213e086', '2dbda5cbf9dd976e533be2215b9e069f46bbaf88b11ba475c3ea5df748aa8ec0'],
+              'tests/Feature/InquiryNotificationWorkTest.php' => ['5c47ce39b5e3a7dd0eceb338569459998e2b83f35e3a5fbf2091e21816a73dbe', 'dfb872cea2e68a97326eba23bc718f4dbf4b8b11848f3d3d12ca0a7fc424f51f'],
+              'tests/Support/inquiry-notification-race-worker.php' => ['9fd7fe06d3950794578b702914e72077df473b5e0551a6cb3bbc6935a34db5c6', 'a4f4028019e668d087cd9c00df25bce283ff7835598bc94169e730aeee968cba'],
+          ];
+          function strictTokens(string $source): array
+          {
+              $result = [];
+              foreach (token_get_all($source, TOKEN_PARSE) as $token) {
+                  if (is_array($token)) {
+                      if ($token[0] === T_WHITESPACE) {
+                          continue;
+                      }
+                      $result[] = [$token[0], $token[1]];
+                  } else {
+                      $result[] = $token;
+                  }
+              }
+
+              return $result;
+          }
+          foreach ($expected as $path => [$previousHash, $currentHash]) {
+              $previous = file_get_contents('inquiry-format-evidence/previous-'.basename($path));
+              $current = file_get_contents($path);
+              if (hash('sha256', $previous) !== $previousHash || hash('sha256', $current) !== $currentHash) {
+                  throw new RuntimeException('Unexpected old/current formatting source for '.$path);
+              }
+              $originalTokens = strictTokens($previous);
+              if ($path !== 'tests/Support/inquiry-notification-race-worker.php') {
+                  $currentTokens = strictTokens($current);
+                  if ($originalTokens !== $currentTokens) {
+                      throw new RuntimeException('Non-whitespace PHP tokens changed for '.$path);
+                  }
+                  $bridge = ['nonWhitespaceTokensEqual' => true, 'tokenCount' => count($currentTokens)];
+              } else {
+                  // This global script changes three imports/four name references, not only whitespace.
+                  $normalized = $current;
+                  foreach (['InquiryAlertTransport', 'InquiryNotificationWork', 'OperatorInquiryAlert'] as $alias) {
+                      $declaration = 'use App\\Domain\\Inquiries\\Notifications\\'.$alias.";\n";
+                      if (substr_count($normalized, $declaration) !== 1) {
+                          throw new RuntimeException('Unexpected worker import.');
+                      }
+                      $normalized = str_replace($declaration, '', $normalized);
+                  }
+                  $references = [
+                      'InquiryAlertTransport::class' => '\\App\\Domain\\Inquiries\\Notifications\\InquiryAlertTransport::class',
+                      'implements InquiryAlertTransport' => 'implements \\App\\Domain\\Inquiries\\Notifications\\InquiryAlertTransport',
+                      'submit(OperatorInquiryAlert $alert)' => 'submit(\\App\\Domain\\Inquiries\\Notifications\\OperatorInquiryAlert $alert)',
+                      'app(InquiryNotificationWork::class)' => 'app(\\App\\Domain\\Inquiries\\Notifications\\InquiryNotificationWork::class)',
+                  ];
+                  foreach ($references as $from => $to) {
+                      if (substr_count($normalized, $from) !== 1) {
+                          throw new RuntimeException('Unexpected worker reference.');
+                      }
+                      $normalized = str_replace($from, $to, $normalized);
+                  }
+                  $constructor = '            public function __construct(private string $directory) {}';
+                  if (substr_count($normalized, $constructor) !== 1) {
+                      throw new RuntimeException('Unexpected worker constructor.');
+                  }
+                  $normalized = str_replace($constructor, '            public function __construct(private string $directory)'."\n            {\n            }", $normalized);
+                  if ($normalized !== $previous || strictTokens($normalized) !== $originalTokens) {
+                      throw new RuntimeException('Worker changed beyond the exact reviewed class imports and formatting.');
+                  }
+                  strictTokens($current);
+                  $bridge = ['exactReviewedInverseEqual' => true, 'globalImports' => 3, 'classReferenceSites' => 4];
+              }
+              echo json_encode(['path' => $path, 'previousSourceSha256' => $previousHash, 'currentSourceSha256' => $currentHash] + $bridge, JSON_THROW_ON_ERROR), PHP_EOL;
+          }
+          PHP
+      - name: Verify all nineteen fixed PHP formatting paths
+        run: |
+          set -euo pipefail
+          php vendor/bin/pint --test -v app/Console/Commands/ProcessInquiryAlerts.php app/Domain/Inquiries/Models/InquiryNotificationIntent.php app/Domain/Inquiries/Notifications/InquiryAlertNotSubmitted.php app/Domain/Inquiries/Notifications/InquiryAlertTransport.php app/Domain/Inquiries/Notifications/InquiryNotificationWork.php app/Domain/Inquiries/Notifications/OperatorInquiryAlert.php app/Domain/Inquiries/SubmitInquiry.php app/Jobs/NotifyInquiryOperatorJob.php config/inquiries.php database/migrations/2026_10_01_000031_customer_inquiries.php database/migrations/2026_10_01_000032_editorial_related_tracks_images.php database/migrations/2026_10_01_000033_inquiry_notification_intents.php tests/Feature/CustomerInquiryMigrationTest.php tests/Feature/InquiryNotificationConcurrencyTest.php tests/Feature/InquiryNotificationMigrationTest.php tests/Feature/InquiryNotificationWorkTest.php tests/Feature/SiteRelatedTrackImageMigrationTest.php tests/Support/InquiryNotificationRace.php tests/Support/inquiry-notification-race-worker.php \
+            2>&1 | tee inquiry-format-evidence/pint.log
+      - name: Retain complete informative syntax and formatting evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: inquiry-format-${{ github.run_id }}-${{ github.run_attempt }}
+          path: inquiry-format-evidence/
+          retention-days: 7
+          if-no-files-found: error
+          overwrite: false

@@ -5,9 +5,7 @@ namespace App\Domain\Inquiries\Notifications;
 /** No inquiry body or recipient address crosses this processor boundary. */
 final readonly class OperatorInquiryAlert
 {
-    public function __construct(public int $operatorId, public string $receipt)
-    {
-    }
+    public function __construct(public int $operatorId, public string $receipt) {}
 
     public function subject(): string
     {

@@ -1,5 +1,8 @@
 <?php
 
+use App\Domain\Inquiries\Notifications\InquiryAlertTransport;
+use App\Domain\Inquiries\Notifications\InquiryNotificationWork;
+use App\Domain\Inquiries\Notifications\OperatorInquiryAlert;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
 
@@ -21,14 +24,12 @@ try {
         throw new LogicException('Unsupported inquiry notification race locator.');
     }
     config(['inquiries.operator_notifications_enabled' => true]);
-    app()->instance(\App\Domain\Inquiries\Notifications\InquiryAlertTransport::class,
-        new class($directory) implements \App\Domain\Inquiries\Notifications\InquiryAlertTransport
+    app()->instance(InquiryAlertTransport::class,
+        new class($directory) implements InquiryAlertTransport
         {
-            public function __construct(private string $directory)
-            {
-            }
+            public function __construct(private string $directory) {}
 
-            public function submit(\App\Domain\Inquiries\Notifications\OperatorInquiryAlert $alert): void
+            public function submit(OperatorInquiryAlert $alert): void
             {
                 if (DB::transactionLevel() !== 0) {
                     throw new LogicException('Synthetic handoff received an uncommitted claim.');
@@ -72,7 +73,7 @@ try {
             $wait($directory.'/commit');
         }
     });
-    $state = app(\App\Domain\Inquiries\Notifications\InquiryNotificationWork::class)->process($input['intent_id']);
+    $state = app(InquiryNotificationWork::class)->process($input['intent_id']);
     $result = ['state' => $state];
     echo json_encode($result + ['connection_id' => $connection, 'pid' => getmypid(), 'transaction_level' => DB::transactionLevel()], JSON_THROW_ON_ERROR);
     exit(0);

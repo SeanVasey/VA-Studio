@@ -66,9 +66,7 @@ class InquiryNotificationWorkTest extends TestCase
         {
             public array $alerts = [];
 
-            public function __construct(private $effect)
-            {
-            }
+            public function __construct(private $effect) {}
 
             public function submit(OperatorInquiryAlert $alert): void
             {
