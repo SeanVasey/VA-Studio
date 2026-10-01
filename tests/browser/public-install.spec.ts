@@ -1,8 +1,16 @@
 import { test, expect } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
 import { fixtureTrack, query, storefrontFixture } from './storefront-fixture';
+import { releaseRow } from './site-release-row';
+import { execFileSync } from 'node:child_process';
 
 test.beforeEach(() => resetBrowserLoginRateLimit());
+
+function fixtureEvidence(mode: 'before' | 'after-setup' | 'verify', project: string) {
+  return JSON.parse(execFileSync('php', ['tests/browser/verify-public-installation-fixture.php', mode, project], {
+    cwd: process.cwd(), env: process.env, encoding: 'utf8', timeout: 30_000,
+  }));
+}
 
 /** Real static files, built UI, authenticated preview endpoint, Inertia and native audio.
  * Only the existing storefront/WAV transport is synthetic; no installer event or OS installation is simulated.
@@ -15,8 +23,27 @@ test('public installation guidance and real assets survive private preview navig
   await page.getByLabel('Password', { exact: false }).and(page.locator('input[type="password"]')).fill(process.env.VASEY_BROWSER_PASSWORD!);
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await expect(page).toHaveURL(/\/admin$/);
-  const privatePath = '/admin/site-releases/1/preview';
-  // Read the existing original snapshot: no new release, publication or readiness mutation.
+  const beforeFixture = fixtureEvidence('before', testInfo.project.name);
+  expect(beforeFixture.phase).toBe('before');
+  await page.goto('/admin/site-releases');
+  const label = `Synthetic installation preview ${testInfo.project.name}`;
+  await page.getByRole('button', { name: 'New content draft', exact: true }).click();
+  const draft = page.getByRole('dialog');
+  await draft.getByLabel('Release label', { exact: false }).fill(label);
+  await draft.getByRole('button', { name: 'Save private draft', exact: true }).click();
+  const row = releaseRow(page, label);
+  await expect(row.getByText('Private draft', { exact: true })).toBeVisible();
+  const setupFixture = fixtureEvidence('after-setup', testInfo.project.name);
+  expect(setupFixture.phase).toBe('after-setup');
+  expect(setupFixture.onlyPrivateDraftAndAuditAdded).toBe(true);
+  const previewHref = await row.getByRole('link', { name: 'Preview', exact: true }).getAttribute('href');
+  expect(previewHref).toBeTruthy();
+  const previewUrl = new URL(previewHref!, 'http://127.0.0.1:8173');
+  expect(previewUrl.origin).toBe('http://127.0.0.1:8173');
+  expect(previewUrl.search).toBe(''); expect(previewUrl.hash).toBe('');
+  const privatePath = `/admin/site-releases/${setupFixture.releaseId}/preview`;
+  expect(previewUrl.pathname).toBe(privatePath);
+  // One genuine unpublished draft is prepared through the normal UI; publication/readiness are unchanged.
   const privateResponse = await page.request.get(privatePath);
   expect(privateResponse.status()).toBe(200);
   expect(privateResponse.headers()['cache-control']).toContain('no-store');
@@ -25,7 +52,7 @@ test('public installation guidance and real assets survive private preview navig
   const track = { ...fixtureTrack, shareUrl: privatePath };
   await storefrontFixture(page, { tracks: [track] });
   // Bypass the UI-only catalog fixture for this real authorized controller response.
-  await page.route('**/admin/site-releases/1/preview*', async route => {
+  await page.route(`**${privatePath}*`, async route => {
     expect(route.request().method()).toBe('GET');
     await route.continue();
   });
@@ -92,6 +119,14 @@ test('public installation guidance and real assets survive private preview navig
   await expect(page.locator('head meta[name="theme-color"]')).toHaveAttribute('content', '#052e3a');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   expect(external).toEqual([]); expect(privateAssets).toEqual([]); expect(errors).toEqual([]);
+  const retainedFixture = fixtureEvidence('verify', testInfo.project.name);
+  expect(retainedFixture.phase).toBe('verify');
+  expect(retainedFixture.onlyPrivateDraftAndAuditAdded).toBe(true);
+  expect(retainedFixture.journeyRowsAndSchemaUnchanged).toBe(true);
+  expect(retainedFixture.releaseId).toBe(setupFixture.releaseId);
+  expect(retainedFixture.contentHash).toBe(setupFixture.contentHash);
+  expect(retainedFixture.snapshotHash).toBe(setupFixture.snapshotHash);
+  await testInfo.attach('public-installation-fixture', { body: JSON.stringify(retainedFixture), contentType: 'application/json' });
   await testInfo.attach('public-installation-metadata', { body: JSON.stringify({ manifest, privateHeadRemoved: true, publicHeadRestored: true, nativeOwnerPreserved: true, physicalInstallationVerified: false }), contentType: 'application/json' });
   await summary.focus(); await summary.press('Enter');
   await expect(help).toHaveAttribute('open', '');
