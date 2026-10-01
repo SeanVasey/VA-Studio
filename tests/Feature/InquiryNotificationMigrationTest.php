@@ -70,6 +70,15 @@ class InquiryNotificationMigrationTest extends TestCase
         return InquiryNotificationIntent::create($this->attributes($this->inquiry()));
     }
 
+    /** Compare every raw column and its type; SQL column order is not retained evidence. */
+    private function rawAttributes(CustomerInquiry|InquiryNotificationIntent $model): array
+    {
+        $attributes = $model->getRawOriginal();
+        ksort($attributes, SORT_STRING);
+
+        return $attributes;
+    }
+
     private function rejected(callable $operation): void
     {
         try {
@@ -102,12 +111,12 @@ class InquiryNotificationMigrationTest extends TestCase
     public function test_empty_rollback_reapply_retains_parent_records_and_restores_guards(): void
     {
         $inquiry = $this->inquiry();
-        $before = $inquiry->getAttributes();
+        $before = $this->rawAttributes($inquiry);
         $migration = require database_path('migrations/2026_10_01_000033_inquiry_notification_intents.php');
         $migration->down();
         $this->assertFalse(Schema::hasTable('inquiry_notification_intents'));
         $migration->up();
-        $this->assertSame($before, $inquiry->fresh()->getAttributes());
+        $this->assertSame($before, $this->rawAttributes($inquiry->fresh()));
         $this->rejected(fn () => DB::table('inquiry_notification_intents')->insert($this->attributes($inquiry, ['kind' => 'operator_inbox_v1 '])));
         InquiryNotificationIntent::create($this->attributes($inquiry));
         $this->assertDatabaseCount('inquiry_notification_intents', 1);
@@ -116,7 +125,7 @@ class InquiryNotificationMigrationTest extends TestCase
     public function test_populated_rollback_refuses_deletion_and_leaves_identity_and_state_guards_active(): void
     {
         $intent = $this->intent();
-        $before = $intent->getAttributes();
+        $before = $this->rawAttributes($intent);
         $migration = require database_path('migrations/2026_10_01_000033_inquiry_notification_intents.php');
         try {
             $migration->down();
@@ -127,7 +136,7 @@ class InquiryNotificationMigrationTest extends TestCase
         $this->assertTrue(Schema::hasTable('inquiry_notification_intents'));
         $this->rejected(fn () => DB::table('inquiry_notification_intents')->where('id', $intent->id)->delete());
         $this->rejected(fn () => DB::table('inquiry_notification_intents')->where('id', $intent->id)->update(['state' => 'submitted']));
-        $this->assertSame($before, $intent->fresh()->getAttributes());
+        $this->assertSame($before, $this->rawAttributes($intent->fresh()));
     }
 
     public function test_one_id_only_intent_per_inquiry_has_the_original_operator_and_restrictive_foreign_keys(): void
@@ -149,7 +158,7 @@ class InquiryNotificationMigrationTest extends TestCase
             'lease_expires_at', 'next_attempt_at', 'outcome', 'created_at', 'updated_at'];
         sort($expected);
         $this->assertSame($expected, $columns);
-        $this->assertStringNotContainsString('notification-buyer@example.test', json_encode($intent->getAttributes(), JSON_THROW_ON_ERROR));
+        $this->assertStringNotContainsString('notification-buyer@example.test', json_encode($this->rawAttributes($intent), JSON_THROW_ON_ERROR));
         $this->assertCount(1, array_filter(Schema::getIndexes('inquiry_notification_intents'),
             fn ($index) => $index['unique'] && $index['columns'] === ['customer_inquiry_id']));
         $keys = Schema::getForeignKeys('inquiry_notification_intents');
@@ -177,7 +186,7 @@ class InquiryNotificationMigrationTest extends TestCase
     public function test_identity_cannot_be_rewritten_even_with_an_otherwise_valid_claim(): void
     {
         $intent = $this->intent();
-        $before = $intent->getAttributes();
+        $before = $this->rawAttributes($intent);
         $other = $this->inquiry();
         $claim = ['state' => 'processing', 'attempts' => 1, 'claim_token' => (string) Str::uuid(),
             'lease_expires_at' => now()->addMinute(), 'updated_at' => now()];
@@ -185,29 +194,31 @@ class InquiryNotificationMigrationTest extends TestCase
             'operator_user_id' => LicenseFixtures::admin()->id, 'kind' => 'OPERATOR_INBOX_V1',
             'created_at' => now()->subSecond()] as $column => $value) {
             $this->rejected(fn () => DB::table('inquiry_notification_intents')->where('id', $intent->id)->update(array_replace($claim, [$column => $value])));
-            $this->assertSame($before, $intent->fresh()->getAttributes(), $column.' changed immutable evidence.');
+            $this->assertSame($before, $this->rawAttributes($intent->fresh()), $column.' changed immutable evidence.');
         }
     }
 
     public function test_claim_requires_exact_uuid_one_attempt_and_an_unexpired_lease(): void
     {
         $intent = $this->intent();
-        $before = $intent->getAttributes();
+        $before = $this->rawAttributes($intent);
         $uuid = '12345678-9abc-4def-8123-123456789abc';
         $claim = ['state' => 'processing', 'attempts' => 1, 'claim_token' => $uuid, 'lease_expires_at' => now()->addMinute()];
         foreach ([['state' => 'processing '], ['state' => 'PROCESSING'], ['attempts' => 0], ['attempts' => 2], ['attempts' => 1.5],
             ['claim_token' => null], ['claim_token' => str_repeat('a', 36)], ['claim_token' => strtoupper($uuid)],
             ['claim_token' => $uuid.' '], ['claim_token' => $uuid."\0"], ['claim_token' => $uuid."\n"],
+            ['claim_token' => $uuid.str_repeat(' ', 28)], ['claim_token' => $uuid.str_repeat(' ', 29)],
+            ['claim_token' => "\0".substr($uuid, 1)], ['claim_token' => 'é'.substr($uuid, 1)],
             ['lease_expires_at' => null], ['lease_expires_at' => 'invalid-date'], ['lease_expires_at' => '2027-02-31 00:00:00'],
             ['lease_expires_at' => now()], ['next_attempt_at' => now()->addMinute()],
             ['outcome' => 'handed_off'], ['updated_at' => now()->subSecond()]] as $invalid) {
             $this->rejected(fn () => DB::table('inquiry_notification_intents')->where('id', $intent->id)->update(array_replace($claim, $invalid)));
-            $this->assertSame($before, $intent->fresh()->getAttributes());
+            $this->assertSame($before, $this->rawAttributes($intent->fresh()));
         }
         $this->claim($intent);
-        $processing = $intent->getAttributes();
+        $processing = $this->rawAttributes($intent);
         $this->rejected(fn () => DB::table('inquiry_notification_intents')->where('id', $intent->id)->update(['claim_token' => (string) Str::uuid(), 'attempts' => 2]));
-        $this->assertSame($processing, $intent->fresh()->getAttributes());
+        $this->assertSame($processing, $this->rawAttributes($intent->fresh()));
         $this->assertArrayNotHasKey('claim_token', $intent->attributesToArray());
     }
 
@@ -217,12 +228,12 @@ class InquiryNotificationMigrationTest extends TestCase
         for ($attempt = 1; $attempt <= 3; $attempt++) {
             $start = ($attempt - 1) * 20;
             $this->claim($intent, $start);
-            $before = $intent->getAttributes();
+            $before = $this->rawAttributes($intent);
             $retry = array_replace($this->finish('retry', 'definitely_not_submitted', $start + 1),
                 ['next_attempt_at' => now()->addSeconds($start + 20)]);
             if ($attempt === 3) {
                 $this->rejected(fn () => DB::table('inquiry_notification_intents')->where('id', $intent->id)->update($retry));
-                $this->assertSame($before, $intent->fresh()->getAttributes());
+                $this->assertSame($before, $this->rawAttributes($intent->fresh()));
                 $this->update($intent, $this->finish('blocked', 'retry_exhausted', $start + 1));
                 break;
             }
@@ -230,16 +241,16 @@ class InquiryNotificationMigrationTest extends TestCase
                 ['next_attempt_at' => null], ['next_attempt_at' => now()->addSeconds($start + 1)],
                 ['claim_token' => (string) Str::uuid()], ['attempts' => $attempt + 1]] as $invalid) {
                 $this->rejected(fn () => DB::table('inquiry_notification_intents')->where('id', $intent->id)->update(array_replace($retry, $invalid)));
-                $this->assertSame($before, $intent->fresh()->getAttributes());
+                $this->assertSame($before, $this->rawAttributes($intent->fresh()));
             }
             $this->update($intent, $retry);
-            $retryBefore = $intent->getAttributes();
+            $retryBefore = $this->rawAttributes($intent);
             $this->rejected(fn () => DB::table('inquiry_notification_intents')->where('id', $intent->id)->update([
                 'state' => 'processing', 'attempts' => $attempt + 1, 'claim_token' => (string) Str::uuid(),
                 'lease_expires_at' => now()->addSeconds($start + 80), 'next_attempt_at' => null, 'outcome' => null,
                 'updated_at' => now()->addSeconds($start + 19),
             ]));
-            $this->assertSame($retryBefore, $intent->fresh()->getAttributes());
+            $this->assertSame($retryBefore, $this->rawAttributes($intent->fresh()));
         }
         $this->assertSame(['blocked', 3, 'retry_exhausted'], [$intent->state, $intent->attempts, $intent->outcome]);
     }
@@ -250,21 +261,21 @@ class InquiryNotificationMigrationTest extends TestCase
             ['blocked', 'configuration_withdrawn']] as [$state, $outcome]) {
             $intent = $this->intent();
             $this->claim($intent);
-            $before = $intent->getAttributes();
+            $before = $this->rawAttributes($intent);
             $finish = $this->finish($state, $outcome);
             foreach ([['outcome' => 'private provider exception text'], ['outcome' => $outcome.' '],
                 ['claim_token' => $intent->claim_token], ['lease_expires_at' => $intent->lease_expires_at],
                 ['next_attempt_at' => now()->addMinute()], ['attempts' => 2], ['updated_at' => now()->addMinute()]] as $invalid) {
                 $this->rejected(fn () => DB::table('inquiry_notification_intents')->where('id', $intent->id)->update(array_replace($finish, $invalid)));
-                $this->assertSame($before, $intent->fresh()->getAttributes());
+                $this->assertSame($before, $this->rawAttributes($intent->fresh()));
             }
             $this->update($intent, $finish);
-            $terminal = $intent->getAttributes();
+            $terminal = $this->rawAttributes($intent);
             foreach ([$finish, ['state' => 'processing', 'attempts' => 2, 'claim_token' => (string) Str::uuid(),
                 'lease_expires_at' => now()->addMinutes(2), 'outcome' => null, 'updated_at' => now()->addSecond()],
                 array_replace($this->finish('retry', 'definitely_not_submitted'), ['next_attempt_at' => now()->addMinute()])] as $invalid) {
                 $this->rejected(fn () => DB::table('inquiry_notification_intents')->where('id', $intent->id)->update($invalid));
-                $this->assertSame($terminal, $intent->fresh()->getAttributes());
+                $this->assertSame($terminal, $this->rawAttributes($intent->fresh()));
             }
         }
     }
@@ -273,14 +284,14 @@ class InquiryNotificationMigrationTest extends TestCase
     {
         $intent = $this->intent();
         $this->claim($intent);
-        $before = $intent->getAttributes();
+        $before = $this->rawAttributes($intent);
         $expired = $this->finish('unknown', 'lease_expired', 60);
         foreach ([['updated_at' => now()->addSeconds(59)], ['outcome' => 'handoff_uncertain'],
             ['state' => 'submitted', 'outcome' => 'handed_off'], ['state' => 'blocked', 'outcome' => 'authority_withdrawn'],
             ['state' => 'processing', 'attempts' => 2, 'claim_token' => (string) Str::uuid(), 'lease_expires_at' => now()->addMinutes(2), 'outcome' => null],
             ['state' => 'retry', 'outcome' => 'definitely_not_submitted', 'next_attempt_at' => now()->addMinutes(2)]] as $invalid) {
             $this->rejected(fn () => DB::table('inquiry_notification_intents')->where('id', $intent->id)->update(array_replace($expired, $invalid)));
-            $this->assertSame($before, $intent->fresh()->getAttributes());
+            $this->assertSame($before, $this->rawAttributes($intent->fresh()));
         }
         $this->update($intent, $expired);
         $this->assertSame(['unknown', 1, 'lease_expired'], [$intent->state, $intent->attempts, $intent->outcome]);
@@ -294,12 +305,12 @@ class InquiryNotificationMigrationTest extends TestCase
                 $this->claim($intent);
                 $this->update($intent, array_replace($this->finish('retry', 'definitely_not_submitted'), ['next_attempt_at' => now()->addMinute()]));
             }
-            $before = $intent->getAttributes();
+            $before = $this->rawAttributes($intent);
             $blocked = $this->finish('blocked', 'authority_withdrawn', 2);
             foreach ([['outcome' => 'retry_exhausted'], ['outcome' => 'configuration_withdrawn'], ['attempts' => $intent->attempts + 1],
                 ['next_attempt_at' => now()->addMinute()]] as $invalid) {
                 $this->rejected(fn () => DB::table('inquiry_notification_intents')->where('id', $intent->id)->update(array_replace($blocked, $invalid)));
-                $this->assertSame($before, $intent->fresh()->getAttributes());
+                $this->assertSame($before, $this->rawAttributes($intent->fresh()));
             }
             $this->update($intent, $blocked);
             $this->assertSame($retry ? 1 : 0, $intent->attempts);
@@ -309,7 +320,7 @@ class InquiryNotificationMigrationTest extends TestCase
     public function test_orm_rejects_identity_deletion_and_invalid_state_changes_but_accepts_valid_claim_and_handoff(): void
     {
         $intent = $this->intent();
-        $before = $intent->getAttributes();
+        $before = $this->rawAttributes($intent);
         foreach ([fn () => $intent->delete(), fn () => $intent->forceFill(['kind' => 'operator_inbox_v2'])->save(),
             fn () => $intent->fresh()->forceFill(['state' => 'pending '])->save(),
             fn () => $intent->fresh()->forceFill(['state' => 'submitted', 'outcome' => 'handed_off'])->save()] as $operation) {
@@ -319,7 +330,7 @@ class InquiryNotificationMigrationTest extends TestCase
             } catch (LogicException) {
                 $this->addToAssertionCount(1);
             }
-            $this->assertSame($before, $intent->fresh()->getAttributes());
+            $this->assertSame($before, $this->rawAttributes($intent->fresh()));
         }
         $intent->refresh()->update(['state' => 'processing', 'attempts' => 1, 'claim_token' => (string) Str::uuid(), 'lease_expires_at' => now()->addMinute()]);
         $intent->update($this->finish('submitted', 'handed_off'));

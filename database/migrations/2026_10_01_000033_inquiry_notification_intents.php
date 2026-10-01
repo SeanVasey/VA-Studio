@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('kind', 24)->collation($collation);
             $table->string('state', 16)->collation($collation);
             $table->unsignedInteger('attempts');
-            // VARCHAR retains trailing bytes for the exact UUID guard; CHAR may trim them on MySQL.
-            $table->string('claim_token', 36)->collation($collation)->nullable();
+            // Wider storage keeps UUID padding visible to the exact 36-byte guard after MySQL column coercion.
+            $table->string('claim_token', 64)->collation($collation)->nullable();
             $table->dateTime('lease_expires_at')->nullable();
             $table->dateTime('next_attempt_at')->nullable();
             $table->string('outcome', 32)->collation($collation)->nullable();

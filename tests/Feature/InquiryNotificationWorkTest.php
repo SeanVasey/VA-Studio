@@ -248,7 +248,7 @@ class InquiryNotificationWorkTest extends TestCase
         $wasRequired = $panel->isMultiFactorAuthenticationRequired();
         try {
             foreach (['verification', 'mfa', 'configuration', 'tampered_claim'] as $withdrawal) {
-                $this->operator->forceFill(['is_admin' => true, 'email_verified_at' => now()])->save();
+                $this->operator->refresh()->forceFill(['is_admin' => true, 'email_verified_at' => now()])->save();
                 $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: false);
                 config(['inquiries.operator_user_id' => $this->operator->id, 'inquiries.operator_notifications_enabled' => true]);
                 if ($withdrawal === 'mfa') {
