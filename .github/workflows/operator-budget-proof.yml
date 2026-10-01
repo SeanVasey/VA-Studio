@@ -39,15 +39,15 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps chromium webkit
-      - run: npm run test:browser
+      - name: Run both native bulk-tag journeys through the ordinary isolated wrapper
+        run: npm run test:browser -- tests/browser/track-bulk-tags.spec.ts
       - name: Retain synthetic browser evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: operator-browser-${{ github.run_id }}-${{ github.run_attempt }}
+          name: operator-bulk-browser-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             playwright-report/
             test-results/
           retention-days: 7
           if-no-files-found: ignore
-
