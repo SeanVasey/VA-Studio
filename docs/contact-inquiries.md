@@ -51,3 +51,9 @@ Payload and the original privacy notice are encrypted in the private database. E
 Nonempty migration rollback is refused. This is protection against accidental data loss during code rollback, not an invented permanent retention policy. A later approved deletion/export workflow must implement the chosen policy explicitly. Disabling intake leaves authorized staff access to retained inquiries intact.
 
 Before schema rollback, disable intake and drain in-flight submissions and operator mutations. MySQL DDL is not atomic with the empty-table check; the populated-table refusal does not lock out concurrent writers. Retain populated tables during application rollback.
+
+## Operator alert intent candidate — October 1, 2026
+
+The [T15b engineering child](verification/inquiry-notification-intents.md) retains one minimal operator-alert intent with each newly saved inquiry. Queue wakeups are optional; a bounded scanner recovers missed dispatch. Original customer data stays encrypted in the inquiry and never enters the queue or transport projection. Existing intake remains disabled by default, and the separate notification flag is also false with no transport binding supplied.
+
+`submitted` means only transport acceptance. Ambiguous or expired handoffs become `unknown` and are held for later operator resolution, with no automatic resend. This candidate does not send mail, choose a processor or change the truthful saved-inbox receipt. Final database/concurrency/source acceptance is pending.

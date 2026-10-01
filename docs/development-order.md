@@ -1,5 +1,11 @@
 # Ordered development status
 
+## Durable inquiry alert intents — October 1, 2026
+
+The separate T15b candidate adds a minimal notification intent in the inquiry's existing transaction, with locator-only queue wakeups, bounded scanning and fenced worker claims. It keeps the original operator binding and fresh persisted authorization/MFA checks. Only a typed guarantee that no submission occurred permits bounded retries; uncertain handoffs and expired active claims stop at `unknown`. The transport remains disabled and unbound, customer receipts still say only `saved`, and no provider or production notification policy is introduced.
+
+[Focused hosted run 36833281893](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36833281893) passed the complete 115-case inquiry slice: MySQL executed all 115 with 3,486 assertions and no skips; SQLite executed 111 with 3,219 assertions and the four explicit MySQL-only skips. Actual MySQL process contention, immutable association/state guards, strict malformed-token rejection, authority withdrawal and ambiguous outcome handling passed. Independent source and retained-artifact reviews approved the exact candidate. [The evidence record](verification/inquiry-notification-intents.md) retains the initial fixture failures, their strict repairs, exact source/runtime/artifact identities and remaining integration requirements. This feature is separate from PR #89; temporary proof workflows are excluded. Full Foundation acceptance on its final integrating source remains required. T15/WP-09 and actual email delivery remain open.
+
 ## Resumed experience, editorial links and CI evidence — October 1, 2026
 
 PR #89's initial full run, [36823137903](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36823137903), failed five MySQL inspection assertions because persisted JSON object keys were reordered and one mobile bulk-tag journey because retained drafts filled the first catalog page. The resumed candidate preserves the complete strict audit comparison while normalizing object key order, and finds new drafts through ordinary table search. Both repairs received independent source review; new full acceptance remains required.
