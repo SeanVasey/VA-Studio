@@ -72,19 +72,36 @@ function owner(): HTMLAudioElement {
   audio.volume = snapshot.volume;
   audio.muted = snapshot.muted;
   const element = audio;
+  let progressTime: number | null = null;
+  const nativeTimeReady = () => !element.paused && !element.ended && !element.seeking && !element.error
+    && element.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA && Number.isFinite(element.currentTime);
+  const readNativeProgress = () => {
+    const time = element.currentTime;
+    const ready = nativeTimeReady();
+    const recovered = snapshot.status === 'loading' && ready && progressTime !== null && time > progressTime;
+    progressTime = ready ? time : null;
+    return recovered;
+  };
+  const resetProgress = () => { progressTime = null; };
+  element.addEventListener('seeking', resetProgress);
+  element.addEventListener('loadstart', resetProgress);
+  element.addEventListener('emptied', resetProgress);
   element.addEventListener('playing', () => { if (snapshot.track) { update({ status: 'playing', error: null }); watchLoop(); } });
-  element.addEventListener('pause', () => { stopLoopWatch(); if (snapshot.track && !element.ended && snapshot.status !== 'error') update({ status: 'paused' }); });
-  element.addEventListener('waiting', () => { if (snapshot.track && !element.paused && !element.ended && snapshot.status !== 'error') update({ status: 'loading' }); });
+  element.addEventListener('pause', () => { resetProgress(); stopLoopWatch(); if (snapshot.track && !element.ended && snapshot.status !== 'error') update({ status: 'paused' }); });
+  element.addEventListener('waiting', () => { resetProgress(); if (snapshot.track && !element.paused && !element.ended && snapshot.status !== 'error') update({ status: 'loading' }); });
   element.addEventListener('seeked', () => {
     if (!snapshot.track) return;
     enforceLoop(element);
+    // Completion and its preceding timeupdate can report a seek jump, not playback.
+    progressTime = nativeTimeReady() ? element.currentTime : null;
     update({ currentTime: element.currentTime });
     watchLoop();
   });
   element.addEventListener('timeupdate', () => {
     if (!snapshot.track) return;
+    const recovered = readNativeProgress();
     enforceLoop(element);
-    update({ currentTime: element.currentTime });
+    update({ currentTime: element.currentTime, ...(recovered ? { status: 'playing' as const } : {}) });
   });
   element.addEventListener('durationchange', () => {
     if (!snapshot.track) return;
@@ -109,7 +126,7 @@ function owner(): HTMLAudioElement {
     }
   });
   element.addEventListener('ratechange', () => { if (snapshot.track && Number.isFinite(element.playbackRate) && element.playbackRate > 0) update({ rate: element.playbackRate }); });
-  element.addEventListener('error', () => { if (snapshot.track) update({ status: 'error', error: 'This preview could not load. Check your connection and try again.' }); });
+  element.addEventListener('error', () => { resetProgress(); if (snapshot.track) update({ status: 'error', error: 'This preview could not load. Check your connection and try again.' }); });
   return element;
 }
 

@@ -73,8 +73,10 @@ class CustomerInquiryAdminTest extends TestCase
     public function test_actual_staff_inbox_detail_and_actions_persist_and_audit_without_sending_or_mutating_original_input(): void
     {
         $this->actingAs($this->operator);
-        Livewire::test(ListCustomerInquiries::class)->assertCanSeeTableRecords([$this->inquiry])->assertSee('Private test subject');
-        $response = $this->get('/admin/customer-inquiries/'.$this->inquiry->public_id)->assertOk();
+        $expectedUrl = url('/admin/customer-inquiries/'.$this->inquiry->public_id);
+        Livewire::test(ListCustomerInquiries::class)->assertCanSeeTableRecords([$this->inquiry])
+            ->assertSee('Private test subject')->assertTableActionHasUrl('view', $expectedUrl, $this->inquiry);
+        $response = $this->get(CustomerInquiryResource::getUrl('view', ['record' => $this->inquiry]))->assertOk();
         $response->assertHeader('Cache-Control', 'no-store, private')->assertSee('private@example.test', false)
             ->assertDontSee('<script>synthetic body only</script>', false)->assertSee('&lt;script&gt;synthetic body only&lt;/script&gt;', false);
         $this->assertSame($this->operator->id, AuditEvent::where('action', 'inquiry.viewed')->sole()->actor_id);

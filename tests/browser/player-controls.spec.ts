@@ -67,6 +67,7 @@ test('section markers loop native preview playback and remain reachable with key
   await expect(controls.getByRole('button', { name: 'Set A here' })).toBeFocused();
   await page.evaluate(() => { window.__nativePreviews[0].currentTime = 12; });
   await expect.poll(() => page.evaluate(() => window.__nativePreviews[0].currentTime)).toBeGreaterThan(12);
+  await expect(page.getByRole('complementary', { name: 'Audio preview player' }).getByRole('status')).toHaveText('');
   await page.keyboard.press('Escape');
   await expect(controls).toBeHidden();
   await expect(page.getByRole('button', { name: 'Queue & loop', exact: true })).toBeFocused();

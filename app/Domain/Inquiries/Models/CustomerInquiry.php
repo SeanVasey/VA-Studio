@@ -13,6 +13,11 @@ final class CustomerInquiry extends Model
 
     protected $hidden = ['payload', 'privacy_notice', 'owner_hash', 'request_key', 'payload_hash', 'retention_policy_reference'];
 
+    public function getRouteKeyName(): string
+    {
+        return 'public_id';
+    }
+
     protected function casts(): array
     {
         return ['payload' => 'encrypted:array', 'privacy_notice' => 'encrypted', 'version' => 'integer', 'created_at' => 'immutable_datetime', 'updated_at' => 'immutable_datetime'];

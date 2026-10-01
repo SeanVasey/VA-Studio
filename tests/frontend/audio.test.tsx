@@ -251,6 +251,74 @@ it('keeps the section loop alive through native seek waiting without restarting 
   expect(play).toHaveBeenCalledTimes(1);
 });
 
+it('clears seek loading only after ready native time advances without a replacement playing event', async () => {
+  const play = nativePlayback();
+  let ready: number = HTMLMediaElement.HAVE_FUTURE_DATA;
+  let seeking = false;
+  vi.spyOn(HTMLMediaElement.prototype, 'readyState', 'get').mockImplementation(() => ready);
+  vi.spyOn(HTMLMediaElement.prototype, 'seeking', 'get').mockImplementation(() => seeking);
+  render(<PersistentPlayer tracks={[playable]} onLicense={() => {}} />);
+  await act(() => player.play(playable));
+  const source = play.mock.contexts[0] as HTMLMediaElement;
+  const status = screen.getByRole('status');
+  act(() => { ready = HTMLMediaElement.HAVE_CURRENT_DATA; source.dispatchEvent(new Event('waiting')); });
+  expect(status).toHaveTextContent('Loading');
+  act(() => { ready = HTMLMediaElement.HAVE_FUTURE_DATA; source.currentTime = 2; source.dispatchEvent(new Event('timeupdate')); });
+  expect(status).toHaveTextContent('Loading');
+  act(() => { seeking = true; source.dispatchEvent(new Event('seeking')); });
+  act(() => { source.currentTime = 12; ready = HTMLMediaElement.HAVE_FUTURE_DATA; seeking = false; source.dispatchEvent(new Event('timeupdate')); source.dispatchEvent(new Event('seeked')); });
+  // The seek's own position jump and completion are not playback-progress proof.
+  expect(status).toHaveTextContent('Loading');
+  act(() => source.dispatchEvent(new Event('timeupdate')));
+  expect(status).toHaveTextContent('Loading');
+  act(() => { source.currentTime = 12.25; source.dispatchEvent(new Event('timeupdate')); });
+  expect(status).toBeEmptyDOMElement();
+  expect(screen.getByRole('button', { name: 'Pause preview' })).toBeInTheDocument();
+  expect(source.paused).toBe(false);
+  expect(play).toHaveBeenCalledTimes(1);
+});
+
+it('does not replace real waiting, paused, ended or error states with a progress claim', async () => {
+  const play = nativePlayback();
+  let ready: number = HTMLMediaElement.HAVE_FUTURE_DATA;
+  let seeking = false;
+  let ended = false;
+  let mediaError: MediaError | null = null;
+  vi.spyOn(HTMLMediaElement.prototype, 'readyState', 'get').mockImplementation(() => ready);
+  vi.spyOn(HTMLMediaElement.prototype, 'seeking', 'get').mockImplementation(() => seeking);
+  vi.spyOn(HTMLMediaElement.prototype, 'ended', 'get').mockImplementation(() => ended);
+  render(<PersistentPlayer tracks={[playable]} onLicense={() => {}} />);
+  await act(() => player.play(playable));
+  const source = play.mock.contexts[0] as HTMLMediaElement;
+  const status = screen.getByRole('status');
+  Object.defineProperty(source, 'error', { configurable: true, get: () => mediaError });
+  try {
+    act(() => source.dispatchEvent(new Event('waiting')));
+    act(() => { source.currentTime = 2; source.dispatchEvent(new Event('timeupdate')); source.dispatchEvent(new Event('timeupdate')); });
+    expect(status).toHaveTextContent('Loading');
+    act(() => { ready = HTMLMediaElement.HAVE_CURRENT_DATA; source.currentTime = 3; source.dispatchEvent(new Event('timeupdate')); source.currentTime = 4; source.dispatchEvent(new Event('timeupdate')); });
+    expect(status).toHaveTextContent('Loading');
+    act(() => { ready = HTMLMediaElement.HAVE_FUTURE_DATA; seeking = true; source.currentTime = 5; source.dispatchEvent(new Event('timeupdate')); source.currentTime = 6; source.dispatchEvent(new Event('timeupdate')); });
+    expect(status).toHaveTextContent('Loading');
+    act(() => { seeking = false; mediaError = { code: 3, message: 'Synthetic decode failure' } as MediaError; source.currentTime = 7; source.dispatchEvent(new Event('timeupdate')); source.currentTime = 8; source.dispatchEvent(new Event('timeupdate')); });
+    expect(status).toHaveTextContent('Loading');
+    act(() => { mediaError = null; ended = true; source.currentTime = 8.5; source.dispatchEvent(new Event('timeupdate')); source.currentTime = 8.75; source.dispatchEvent(new Event('timeupdate')); });
+    expect(status).toHaveTextContent('Loading');
+    act(() => { ended = false; player.pause(); source.currentTime = 9; source.dispatchEvent(new Event('timeupdate')); source.currentTime = 10; source.dispatchEvent(new Event('timeupdate')); source.dispatchEvent(new Event('seeked')); });
+    expect(screen.getByRole('button', { name: `Play ${playable.title}` })).toBeInTheDocument();
+    // End/error state must remain authoritative even if later time updates arrive.
+    act(() => { ended = true; source.dispatchEvent(new Event('ended')); source.currentTime = 11; source.dispatchEvent(new Event('timeupdate')); source.currentTime = 12; source.dispatchEvent(new Event('timeupdate')); });
+    expect(status).toHaveTextContent('Preview ended');
+    act(() => { ended = false; source.dispatchEvent(new Event('error')); source.currentTime = 13; source.dispatchEvent(new Event('timeupdate')); source.currentTime = 14; source.dispatchEvent(new Event('timeupdate')); });
+    expect(status).toHaveTextContent('This preview could not load');
+    expect(play).toHaveBeenCalledTimes(1);
+    act(() => player.close());
+    act(() => { source.currentTime = 15; source.dispatchEvent(new Event('timeupdate')); source.dispatchEvent(new Event('seeked')); });
+    expect(screen.getByText('Select a track to preview.')).toBeInTheDocument();
+    expect(play).toHaveBeenCalledTimes(1);
+  } finally { Reflect.deleteProperty(source, 'error'); }
+});
+
 it('setting loop bounds while paused never starts playback, and source replacement clears the old loop', async () => {
   const play = nativePlayback();
   const user = userEvent.setup();
