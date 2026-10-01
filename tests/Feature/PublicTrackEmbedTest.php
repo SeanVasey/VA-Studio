@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\ContractFixtures;
@@ -38,7 +39,6 @@ class PublicTrackEmbedTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->withoutVite();
         $this->fakePrivateMediaStorage();
         config(['app.url' => 'https://audio.example.test']);
     }
@@ -92,6 +92,43 @@ class PublicTrackEmbedTest extends TestCase
         $outside = $this->get($this->audio($fixture), ['Range' => 'bytes='.strlen($bytes).'-'.(strlen($bytes) + 9)])->assertStatus(416);
         $this->assertHeaders($outside);
         $this->assertSame('', $this->fileBytes($outside));
+    }
+
+    public static function assetOriginConfigurations(): array
+    {
+        return [
+            'development hot server' => [true, ''],
+            'cross-origin assets' => [false, 'https://assets.example.test'],
+            'hot server and cross-origin assets' => [true, 'https://assets.example.test'],
+        ];
+    }
+
+    #[DataProvider('assetOriginConfigurations')]
+    public function test_embed_styles_remain_same_origin_with_a_hot_server_or_foreign_asset_origin(bool $hot, string $assetOrigin): void
+    {
+        $fixture = QuoteFixtures::selection();
+        $hotFile = tempnam(sys_get_temp_dir(), 'vasey-embed-hot-');
+        $this->assertNotFalse($hotFile);
+        try {
+            if ($hot) { file_put_contents($hotFile, 'http://localhost:5173'); }
+            else { unlink($hotFile); }
+            Vite::useHotFile($hotFile);
+            config(['app.asset_url' => $assetOrigin]);
+            app('url')->forceRootUrl('https://audio.example.test');
+            app('url')->forceScheme('https');
+            app('url')->useAssetOrigin($assetOrigin);
+            $this->assertSame($hot, Vite::isRunningHot());
+            $this->assertSame(($assetOrigin ?: 'https://audio.example.test').'/css/track-embed-fonts.css', asset('css/track-embed-fonts.css'));
+            $response = $this->get($this->page($fixture))->assertOk();
+            $this->assertHeaders($response);
+            $html = $this->document($response->getContent());
+            $this->assertSame(['/css/track-embed-fonts.css', '/brand/theme.css', '/css/track-embed.css'],
+                array_map(fn ($node) => $node->nodeValue, iterator_to_array($html->query('//link[@rel="stylesheet"]/@href'))));
+            $this->assertCount(0, $html->query('//script | //link[@rel="modulepreload"] | //style'));
+            $response->assertDontSee('localhost:5173', false)->assertDontSee('assets.example.test', false)->assertDontSee('/build/', false);
+        } finally {
+            if (is_file($hotFile)) { unlink($hotFile); }
+        }
     }
 
     public function test_an_unsafe_configured_store_origin_is_not_emitted_as_a_link(): void

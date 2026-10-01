@@ -2,9 +2,13 @@
 
 use App\Domain\Inquiries\InquiryAdministration;
 use App\Domain\Inquiries\Models\CustomerInquiry;
+use App\Filament\Resources\CustomerInquiryResource;
+use App\Filament\Resources\CustomerInquiryResource\Pages\ListCustomerInquiries;
 use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
 use Filament\Facades\Filament;
+use Filament\Schemas\Schema;
+use Filament\Tables\Table;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
@@ -24,7 +28,7 @@ try {
         throw new LogicException('Missing administration race configuration.');
     }
     $input = json_decode(stream_get_contents(STDIN, 65536), true, 16, JSON_THROW_ON_ERROR);
-    if (! in_array($input['operation'] ?? null, ['view', 'inbox', 'transition', 'revoke'], true)
+    if (! in_array($input['operation'] ?? null, ['view', 'inbox', 'transition', 'revoke', 'detail_projection', 'inbox_projection', 'cached_inbox_projection'], true)
         || (($input['operation'] !== 'revoke') && (! is_int($input['inquiry_id'] ?? null) || $input['inquiry_id'] < 1))
         || ! is_int($input['operator_id'] ?? null) || $input['operator_id'] < 1
         || (($input['operation'] === 'revoke') && ! in_array($input['field'] ?? null, ['is_admin', 'email_verified_at', 'app_authentication_secret'], true))) {
@@ -35,9 +39,53 @@ try {
         'inquiries.operator_notifications_enabled' => false]);
     $panel = Filament::getPanel('admin');
     $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: true);
+    Filament::setCurrentPanel($panel);
     DB::statement('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
     $connection = (int) DB::selectOne('SELECT CONNECTION_ID() AS id')->id;
     $isolation = DB::selectOne('SELECT @@transaction_isolation AS isolation')->isolation;
+    $projectionOperation = str_ends_with($input['operation'], '_projection');
+    $snapshotEligible = null;
+    if ($projectionOperation) {
+        // Prime a retained model (and optionally Filament's scalar cache) in a
+        // completed getter transaction. No outer transaction may accidentally
+        // hold that getter's users lock through the later state projection.
+        DB::beginTransaction();
+        try {
+            $oldOperator = User::findOrFail($input['operator_id']);
+            $snapshotEligible = Gate::forUser($oldOperator)->allows('administer-catalog') && AdminMultiFactor::satisfiedBy($oldOperator);
+            if (! $snapshotEligible) {
+                throw new LogicException('The synthetic old authority snapshot must be eligible.');
+            }
+            Filament::auth()->setUser($oldOperator);
+            $retained = app(InquiryAdministration::class)->authorizedRead($oldOperator, fn () => CustomerInquiry::findOrFail($input['inquiry_id']));
+            if ($input['operation'] === 'detail_projection') {
+                $projection = CustomerInquiryResource::infolist(Schema::make()->record($retained))->getComponentByStatePath('payload.message');
+                $field = 'message';
+            } else {
+                $inbox = new ListCustomerInquiries;
+                $table = CustomerInquiryResource::table(Table::make($inbox));
+                // Bind the exact resource table to the real page without a test
+                // HTTP request: Filament's column cache asks its page for row keys.
+                (new ReflectionProperty($inbox, 'table'))->setValue($inbox, $table);
+                $projection = $table->getColumn('payload.subject')->record($retained);
+                $field = 'subject';
+            }
+            if ($input['operation'] === 'cached_inbox_projection') {
+                $primed = $projection->getState();
+                if (! is_string($primed) || $primed === '') {
+                    throw new LogicException('The synthetic inquiry column cache must contain its private subject.');
+                }
+            }
+            DB::commit();
+        } catch (Throwable $error) {
+            DB::rollBack();
+            throw $error;
+        }
+        $getterTransactionLevel = DB::transactionLevel();
+        if ($getterTransactionLevel !== 0) {
+            throw new LogicException('The retained inquiry getter must release its transaction before projection.');
+        }
+    }
     $wait = function (string ...$paths): void {
         $deadline = microtime(true) + 30;
         do {
@@ -70,10 +118,26 @@ try {
             $wait($directory.'/commit');
         }
     });
-    DB::beginTransaction();
-    $snapshotEligible = null;
+    if (! $projectionOperation) {
+        DB::beginTransaction();
+    }
     try {
-        if ($input['operation'] !== 'revoke') {
+        if ($projectionOperation) {
+            $projectionOuterTransactionLevel = DB::transactionLevel();
+            if ($projectionOuterTransactionLevel !== 0) {
+                throw new LogicException('A late projection must acquire its own authority transaction.');
+            }
+            try {
+                $value = $projection->getState();
+                $result = ['result' => 'authorized', 'operation' => $input['operation'],
+                    'body' => [['receipt' => $retained->public_id, 'field' => $field, 'value' => $value]]];
+            } catch (AuthorizationException) {
+                $result = ['result' => 'rejected', 'status' => 403];
+            }
+            $result += ['getter_transaction_level' => $getterTransactionLevel,
+                'projection_outer_transaction_level' => $projectionOuterTransactionLevel,
+                'state_was_cached' => $input['operation'] === 'cached_inbox_projection'];
+        } elseif ($input['operation'] !== 'revoke') {
             // Deliberately keep an old valid consistent read view before either users lock.
             // Current-lock authority decisions must not consult this retained RR snapshot.
             $oldOperator = User::findOrFail($input['operator_id']);
@@ -106,9 +170,13 @@ try {
             }
             $result = ['result' => 'revoked', 'field' => $input['field']];
         }
-        DB::commit();
+        if (! $projectionOperation) {
+            DB::commit();
+        }
     } catch (Throwable $error) {
-        DB::rollBack();
+        if (DB::transactionLevel() > 0) {
+            DB::rollBack();
+        }
         throw $error;
     }
     echo json_encode($result + ['snapshot_eligible' => $snapshotEligible, 'connection_id' => $connection,

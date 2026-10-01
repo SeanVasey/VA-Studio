@@ -9,12 +9,16 @@ use App\Domain\Inquiries\InquiryPolicy;
 use App\Domain\Inquiries\Models\CustomerInquiry;
 use App\Domain\Inquiries\SubmitInquiry;
 use App\Domain\SiteBuilder\SiteContent;
+use App\Filament\Resources\CustomerInquiryResource;
+use App\Filament\Resources\CustomerInquiryResource\Components\InquiryTextColumn;
+use App\Filament\Resources\CustomerInquiryResource\Components\InquiryTextEntry;
 use App\Filament\Resources\CustomerInquiryResource\Pages\ListCustomerInquiries;
 use App\Filament\Resources\CustomerInquiryResource\Pages\ViewCustomerInquiry;
 use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
 use App\Support\Audit\AuditEvent;
 use Filament\Facades\Filament;
+use Filament\Schemas\Schema;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -94,7 +98,7 @@ class CustomerInquiryAdministrationConcurrencyTest extends TestCase
     public static function administrationLockOrders(): array
     {
         $cases = [];
-        foreach (['view', 'inbox', 'transition'] as $operation) {
+        foreach (['view', 'inbox', 'transition', 'detail_projection', 'inbox_projection', 'cached_inbox_projection'] as $operation) {
             foreach (self::revocations() as $label => [$field, $value]) {
                 foreach ([0 => 'administration first', 1 => 'revocation first'] as $first => $order) {
                     $cases[$operation.' '.$label.' '.$order] = [$operation, $field, $value, $first];
@@ -131,10 +135,22 @@ class CustomerInquiryAdministrationConcurrencyTest extends TestCase
         }
         unset($row);
         $result = $race['results'][0];
+        $projection = str_ends_with($operation, '_projection');
+        if ($projection) {
+            $this->assertSame(0, $result['getter_transaction_level']);
+            $this->assertSame(0, $result['projection_outer_transaction_level']);
+            $this->assertSame($operation === 'cached_inbox_projection', $result['state_was_cached']);
+        }
         if ($first === 0) {
             $this->assertSame(['authorized', $operation], [$result['result'], $result['operation']]);
-            $this->assertSame([['receipt' => $this->inquiry->public_id, 'state' => $operation === 'transition' ? 'archived' : 'new',
-                'version' => $operation === 'transition' ? 1 : 0, 'payload' => $this->inquiry->payload]], $result['body']);
+            if ($projection) {
+                $field = $operation === 'detail_projection' ? 'message' : 'subject';
+                $this->assertSame([['receipt' => $this->inquiry->public_id, 'field' => $field,
+                    'value' => $this->inquiry->payload[$field]]], $result['body']);
+            } else {
+                $this->assertSame([['receipt' => $this->inquiry->public_id, 'state' => $operation === 'transition' ? 'archived' : 'new',
+                    'version' => $operation === 'transition' ? 1 : 0, 'payload' => $this->inquiry->payload]], $result['body']);
+            }
             if ($operation === 'transition') {
                 $retained = $after['customer_inquiries'][0];
                 $original = $before['customer_inquiries'][0];
@@ -144,25 +160,27 @@ class CustomerInquiryAdministrationConcurrencyTest extends TestCase
                 $this->assertNotNull($retained['updated_at']);
                 $expected['customer_inquiries'][0] = $retained;
             }
-            $action = match ($operation) {
-                'view' => 'inquiry.viewed', 'inbox' => 'inquiry.inbox_viewed', 'transition' => 'inquiry.archived',
-            };
-            $audit = AuditEvent::where('action', $action)->sole();
-            $this->assertSame($this->operator->id, $audit->actor_id);
-            $this->assertSame($operation === 'inbox' ? User::class : CustomerInquiry::class, $audit->subject_type);
-            $this->assertSame($operation === 'inbox' ? $this->operator->id : $this->inquiry->id, $audit->subject_id);
-            $context = match ($operation) {
-                'view' => ['receipt' => $this->inquiry->public_id, 'state' => 'new'],
-                'inbox' => ['scope' => 'retained inquiries'],
-                'transition' => ['receipt' => $this->inquiry->public_id, 'before' => 'new', 'version' => 1],
-            };
-            $actualContext = $audit->context;
-            ksort($context, SORT_STRING);
-            ksort($actualContext, SORT_STRING);
-            $this->assertSame($context, $actualContext);
-            $this->assertCount(count($before['audit_events']) + 1, $after['audit_events']);
-            $this->assertSame($before['audit_events'], array_slice($after['audit_events'], 0, count($before['audit_events'])));
-            $expected['audit_events'][] = (array) DB::table('audit_events')->where('id', $audit->id)->first();
+            if (! $projection) {
+                $action = match ($operation) {
+                    'view' => 'inquiry.viewed', 'inbox' => 'inquiry.inbox_viewed', 'transition' => 'inquiry.archived',
+                };
+                $audit = AuditEvent::where('action', $action)->sole();
+                $this->assertSame($this->operator->id, $audit->actor_id);
+                $this->assertSame($operation === 'inbox' ? User::class : CustomerInquiry::class, $audit->subject_type);
+                $this->assertSame($operation === 'inbox' ? $this->operator->id : $this->inquiry->id, $audit->subject_id);
+                $context = match ($operation) {
+                    'view' => ['receipt' => $this->inquiry->public_id, 'state' => 'new'],
+                    'inbox' => ['scope' => 'retained inquiries'],
+                    'transition' => ['receipt' => $this->inquiry->public_id, 'before' => 'new', 'version' => 1],
+                };
+                $actualContext = $audit->context;
+                ksort($context, SORT_STRING);
+                ksort($actualContext, SORT_STRING);
+                $this->assertSame($context, $actualContext);
+                $this->assertCount(count($before['audit_events']) + 1, $after['audit_events']);
+                $this->assertSame($before['audit_events'], array_slice($after['audit_events'], 0, count($before['audit_events'])));
+                $expected['audit_events'][] = (array) DB::table('audit_events')->where('id', $audit->id)->first();
+            }
         } else {
             $this->assertSame(['rejected', 403], [$result['result'], $result['status']]);
             $this->assertArrayNotHasKey('body', $result);
@@ -252,6 +270,49 @@ class CustomerInquiryAdministrationConcurrencyTest extends TestCase
         }
         $this->assertSame($this->inquiry->public_id, $service->authorizedRead($this->operator, fn () => CustomerInquiry::sole())->public_id);
         $this->assertSame($before, $this->evidence());
+        [$inbox, $detail] = $this->retainedPages();
+        $before = $this->evidence();
+        $column = $inbox->getTable()->getColumn('payload.subject')->record($this->inquiry);
+        $column->clearCachedState();
+        $levels = [];
+        $column->getStateUsing(function () use (&$levels): string {
+            $levels[] = DB::transactionLevel();
+
+            return $this->inquiry->payload['subject'];
+        });
+        $queries = [];
+        $inspect = true;
+        DB::listen(function ($query) use (&$queries, &$inspect): void {
+            if ($inspect && (str_contains($query->sql, 'from `users`') || str_contains($query->sql, 'from "users"'))) {
+                $queries[] = $query->sql;
+            }
+        });
+        try {
+            $this->assertSame(0, DB::transactionLevel());
+            $this->assertSame($this->inquiry->payload['subject'], $column->getState());
+            $this->assertCount(1, $levels);
+            $this->assertGreaterThan(0, $levels[0], 'Actual Filament decryption must execute inside its authority transaction.');
+            $count = count($queries);
+            $this->assertGreaterThan(0, $count);
+            $this->assertSame($this->inquiry->payload['subject'], $column->getState());
+            $this->assertCount(1, $levels, 'The second scalar read must use Filament\'s genuine state cache.');
+            $this->assertGreaterThan($count, count($queries), 'A cached scalar return must still recheck current authority.');
+            $schema = CustomerInquiryResource::infolist(Schema::make($detail)->record($this->inquiry));
+            foreach (['name', 'email', 'subject', 'message'] as $field) {
+                $entry = $schema->getComponentByStatePath('payload.'.$field);
+                $entry->state(function () use (&$levels, $field): string {
+                    $levels[] = DB::transactionLevel();
+
+                    return $this->inquiry->payload[$field];
+                });
+                $this->assertSame($this->inquiry->payload[$field], $entry->getState());
+                $this->assertGreaterThan(0, $levels[array_key_last($levels)]);
+            }
+        } finally {
+            $inspect = false;
+        }
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertSame($before, $this->evidence());
     }
 
     private function retainedPages(): array
@@ -262,6 +323,13 @@ class CustomerInquiryAdministrationConcurrencyTest extends TestCase
         $this->assertSame($this->inquiry->id, $inbox->getTableRecord((string) $this->inquiry->id)->id);
         $this->assertSame(1, $inbox->getAllTableRecordsCount());
         $this->assertSame($this->inquiry->id, $detail->getRecord()->id);
+        $column = $inbox->getTable()->getColumn('payload.subject')->record($this->inquiry);
+        $this->assertSame($this->inquiry->payload['subject'], $column->getState());
+        $schema = CustomerInquiryResource::infolist(Schema::make($detail)->record($this->inquiry));
+        foreach (['name', 'email', 'subject', 'message'] as $field) {
+            $this->assertSame($this->inquiry->payload[$field], $schema->getComponentByStatePath('payload.'.$field)->getState());
+        }
+        $this->assertSame(0, DB::transactionLevel(), 'The retained page getters must release authority before a later projection.');
 
         return [$inbox, $detail];
     }
@@ -280,6 +348,21 @@ class CustomerInquiryAdministrationConcurrencyTest extends TestCase
                 fn () => $inbox->getAllTableRecordsCount(), fn () => $detail->getRecord(),
                 fn () => (new \ReflectionMethod($detail, 'resolveRecord'))->invoke($detail, $this->inquiry->public_id)] as $read) {
                 $this->assertDenied($read);
+            }
+            // These states execute after the page/model getters have already returned.
+            // A warmed column must not bypass authority through Filament's state cache.
+            $poisoned = clone $this->inquiry;
+            $poisoned->setRawAttributes(array_replace($poisoned->getAttributes(), ['payload' => 'SYNTHETIC INVALID CIPHERTEXT']), true);
+            $subject = $inbox->getTable()->getColumn('payload.subject')->record($poisoned);
+            $this->assertInstanceOf(InquiryTextColumn::class, $subject);
+            $this->assertDenied(fn () => $subject->getState());
+            $subject->clearCachedState();
+            $this->assertDenied(fn () => $subject->getState());
+            $schema = CustomerInquiryResource::infolist(Schema::make($detail)->record($poisoned));
+            foreach (['name', 'email', 'subject', 'message'] as $field) {
+                $entry = $schema->getComponentByStatePath('payload.'.$field);
+                $this->assertInstanceOf(InquiryTextEntry::class, $entry);
+                $this->assertDenied(fn () => $entry->getState());
             }
             $this->assertSame([], $privateQueries, 'Revoked private getters must fail before any inquiry SQL or cached body return.');
         } finally {

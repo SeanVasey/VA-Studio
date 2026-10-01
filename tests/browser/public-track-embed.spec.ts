@@ -1,4 +1,6 @@
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { test, expect } from '@playwright/test';
 
 // Real Blade/CSS and native audio/keyboard in a foreign-origin iframe; synthetic audio transport.
@@ -68,9 +70,9 @@ test('public preview iframe has native controls, no autoplay and a keyboard-acce
     expect(loaded.faces.every(face => face.family === loaded.family && face.status === 'loaded')).toBe(true);
   }
   expect(fonts).toHaveLength(4);
-  for (const prefix of ['reddit-sans-latin-wght-normal-', 'noto-sans-display-latin-standard-normal-',
-    'jetbrains-mono-latin-wght-normal-', 'bebas-neue-latin-400-normal-']) {
-    expect(fonts.filter(font => new URL(font.url).pathname.split('/').at(-1)?.startsWith(prefix))).toHaveLength(1);
+  for (const file of ['reddit-sans-latin-wght-normal.woff2', 'noto-sans-display-latin-standard-normal.woff2',
+    'jetbrains-mono-latin-wght-normal.woff2', 'bebas-neue-latin-400-normal.woff2']) {
+    expect(fonts.filter(font => new URL(font.url).pathname === '/brand/fonts/' + file)).toHaveLength(1);
   }
   for (const font of fonts) {
     expect(new URL(font.url).origin).toBe(new URL(embed).origin);
@@ -120,4 +122,84 @@ test('public preview iframe has native controls, no autoplay and a keyboard-acce
   await testInfo.attach('embed-font-evidence', { contentType: 'application/json', body: Buffer.from(JSON.stringify({ loadedFonts, fonts, cspViolations })) });
   // Capture after all journey assertions so Playwright's injected screenshot style is not attributed to the app.
   await page.screenshot({ path: testInfo.outputPath('public-preview-embed.png'), fullPage: true });
+});
+
+test('public preview fonts remain same-origin with development hot and foreign asset configurations', async ({ browser, page }, testInfo) => {
+  const embed = 'http://127.0.0.1:8173/embed/tracks/synthetic-browser-track';
+  const unavailable = await page.request.get(embed);
+  expect(unavailable.status()).toBe(404);
+  const headers = unavailable.headers();
+  expect(headers['content-security-policy']).toBe("default-src 'none'; style-src 'self'; font-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors http: https:");
+  const approved = JSON.parse(readFileSync(new URL('../../docs/brand/font-manifest.json', import.meta.url), 'utf8')) as {
+    family: string; file: string; sha256: string;
+  }[];
+  const configurations = [];
+  for (const mode of ['hot-server', 'foreign-assets', 'hot-server-and-foreign-assets']) {
+    const rendered = spawnSync('php', ['tests/browser/render-public-embed.php', mode], { encoding: 'utf8', timeout: 30_000 });
+    expect(rendered.status, rendered.stderr).toBe(0);
+    const environment = JSON.parse(rendered.stderr.trim()) as { mode: string; hot: boolean; assetProbe: string };
+    expect(environment).toEqual({ mode, hot: mode !== 'foreign-assets',
+      assetProbe: (mode === 'hot-server' ? 'http://127.0.0.1:8173' : 'https://assets.example.test') + '/css/track-embed-fonts.css' });
+    expect(rendered.stdout).not.toMatch(/localhost:5173|assets\.example\.test|\/build\/|<script|<base/);
+    const context = await browser.newContext({ viewport: testInfo.project.use.viewport,
+      hasTouch: testInfo.project.use.hasTouch, isMobile: testInfo.project.use.isMobile,
+      userAgent: testInfo.project.use.userAgent, deviceScaleFactor: testInfo.project.use.deviceScaleFactor });
+    try {
+      await context.addInitScript(() => {
+        const target = window as unknown as Window & { __embedCspViolations: string[] };
+        target.__embedCspViolations = [];
+        document.addEventListener('securitypolicyviolation', event => {
+          target.__embedCspViolations.push(event.effectiveDirective + ' ' + event.blockedURI);
+        });
+      });
+      await context.route(embed, route => route.fulfill({ status: 200, body: rendered.stdout, headers: {
+        'Content-Type': 'text/html; charset=UTF-8', 'Content-Security-Policy': headers['content-security-policy'],
+        'Permissions-Policy': headers['permissions-policy'], 'Referrer-Policy': 'no-referrer', 'Cache-Control': 'no-store',
+      } }));
+      const preview = await context.newPage();
+      const pendingFonts: Promise<{ url: string; status: number; sha256: string }>[] = [];
+      const styles: { url: string; status: number }[] = [];
+      const foreignRequests: string[] = [];
+      preview.on('request', request => {
+        if (new URL(request.url()).origin !== new URL(embed).origin) foreignRequests.push(request.url());
+      });
+      preview.on('response', response => {
+        if (response.request().resourceType() === 'font') pendingFonts.push(response.body().then(bytes => ({
+          url: response.url(), status: response.status(), sha256: createHash('sha256').update(bytes).digest('hex'),
+        })));
+        if (response.request().resourceType() === 'stylesheet') styles.push({ url: response.url(), status: response.status() });
+      });
+      await preview.goto(embed);
+      await expect(preview.getByRole('heading', { name: 'Synthetic browser preview' })).toBeVisible();
+      const loadedFonts = await preview.locator('body').evaluate(async (element, families) => {
+        const fontSet = element.ownerDocument.fonts;
+        return Promise.all(families.map(async family => {
+          const font = (family === 'Noto Sans Display' ? '900' : '400') + ' 16px "' + family + '"';
+          const faces = await fontSet.load(font, 'VASEY AUDIO 0123456789');
+          return { family, checked: fontSet.check(font, 'VASEY AUDIO 0123456789'),
+            faces: faces.map(face => ({ family: face.family.replace(/^(['"])(.*)\1$/, '$2'), status: face.status })) };
+        }));
+      }, approved.map(font => font.family));
+      for (const loaded of loadedFonts) {
+        expect(loaded.checked).toBe(true);
+        expect(loaded.faces.length).toBeGreaterThan(0);
+        expect(loaded.faces.every(face => face.family === loaded.family && face.status === 'loaded')).toBe(true);
+      }
+      const fonts = await Promise.all(pendingFonts);
+      expect(fonts).toHaveLength(4);
+      for (const font of approved) {
+        expect(fonts.filter(response => response.url === 'http://127.0.0.1:8173/brand/fonts/' + font.file)).toEqual([
+          { url: 'http://127.0.0.1:8173/brand/fonts/' + font.file, status: 200, sha256: font.sha256 },
+        ]);
+      }
+      expect(styles.sort((a, b) => a.url.localeCompare(b.url))).toEqual(['/brand/theme.css', '/css/track-embed-fonts.css', '/css/track-embed.css']
+        .map(path => ({ url: 'http://127.0.0.1:8173' + path, status: 200 })).sort((a, b) => a.url.localeCompare(b.url)));
+      expect(foreignRequests).toEqual([]);
+      const cspViolations = await preview.evaluate(() =>
+        (window as unknown as Window & { __embedCspViolations: string[] }).__embedCspViolations);
+      expect(cspViolations).toEqual([]);
+      configurations.push({ environment, loadedFonts, fonts, styles, foreignRequests, cspViolations });
+    } finally { await context.close(); }
+  }
+  await testInfo.attach('embed-font-origin-evidence', { contentType: 'application/json', body: Buffer.from(JSON.stringify({ configurations })) });
 });

@@ -4,16 +4,16 @@ namespace App\Filament\Resources;
 
 use App\Domain\Inquiries\InquiryAdministration;
 use App\Domain\Inquiries\Models\CustomerInquiry;
+use App\Filament\Resources\CustomerInquiryResource\Components\InquiryTextColumn;
+use App\Filament\Resources\CustomerInquiryResource\Components\InquiryTextEntry;
 use App\Filament\Resources\CustomerInquiryResource\Pages\ListCustomerInquiries;
 use App\Filament\Resources\CustomerInquiryResource\Pages\ViewCustomerInquiry;
 use Filament\Actions\Action;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Actions\ViewAction;
 use Filament\Facades\Filament;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Auth\Access\Response;
@@ -58,9 +58,9 @@ final class CustomerInquiryResource extends OperatorResource
     {
         return $table->description('Private inquiries saved in this store. No email or reply is sent by these actions.')
             ->columns([
-                TextColumn::make('public_id')->label('Receipt')->copyable(),
-                TextColumn::make('payload.subject')->label('Subject')->limit(80),
-                TextColumn::make('state')->badge(), TextColumn::make('created_at')->label('Received (UTC)')->dateTime('Y-m-d H:i:s', 'UTC')->sortable(),
+                InquiryTextColumn::make('public_id')->label('Receipt')->copyable(),
+                InquiryTextColumn::make('payload.subject')->label('Subject')->limit(80),
+                InquiryTextColumn::make('state')->badge(), InquiryTextColumn::make('created_at')->label('Received (UTC)')->dateTime('Y-m-d H:i:s', 'UTC')->sortable(),
             ])->filters([SelectFilter::make('state')->options(['new' => 'New', 'read' => 'Read', 'archived' => 'Archived'])->default('new')])
             ->defaultSort('id', 'desc')->paginated([10, 25, 50])->defaultPaginationPageOption(25)
             ->recordActions([ViewAction::make(), self::stateAction('markRead', 'Mark read', 'read'), self::stateAction('archive', 'Archive', 'archived')])
@@ -70,11 +70,11 @@ final class CustomerInquiryResource extends OperatorResource
     public static function infolist(Schema $schema): Schema
     {
         return $schema->components([
-            TextEntry::make('public_id')->label('Receipt'), TextEntry::make('state'),
-            TextEntry::make('payload.name')->label('Name'), TextEntry::make('payload.email')->label('Email'),
-            TextEntry::make('payload.subject')->label('Subject'), TextEntry::make('payload.message')->label('Message')->columnSpanFull()->extraAttributes(['class' => 'whitespace-pre-wrap']),
-            TextEntry::make('created_at')->label('Received (UTC)')->dateTime('Y-m-d H:i:s', 'UTC'),
-            TextEntry::make('retention_policy_reference')->label('Retention policy reference'),
+            InquiryTextEntry::make('public_id')->label('Receipt'), InquiryTextEntry::make('state'),
+            InquiryTextEntry::make('payload.name')->label('Name'), InquiryTextEntry::make('payload.email')->label('Email'),
+            InquiryTextEntry::make('payload.subject')->label('Subject'), InquiryTextEntry::make('payload.message')->label('Message')->columnSpanFull()->extraAttributes(['class' => 'whitespace-pre-wrap']),
+            InquiryTextEntry::make('created_at')->label('Received (UTC)')->dateTime('Y-m-d H:i:s', 'UTC'),
+            InquiryTextEntry::make('retention_policy_reference')->label('Retention policy reference'),
         ]);
     }
 

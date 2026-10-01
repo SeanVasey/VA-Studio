@@ -11,6 +11,39 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class RelatedBrowserStageSafeguards(unittest.TestCase):
+    def test_source_renderer_uses_only_signed_official_ubuntu_origins(self):
+        result = subprocess.run(
+            ["bash", "-c", 'source "$1"; render_related_ubuntu_sources "$2"', "related-source-test",
+             "tests/browser/install-related-scanner.sh", "noble"],
+            cwd=ROOT, text=True, capture_output=True, timeout=10,
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stderr, "")
+        stanzas = [dict(line.split(": ", 1) for line in stanza.splitlines())
+                   for stanza in result.stdout.strip().split("\n\n")]
+        self.assertEqual(stanzas, [
+            {"Types": "deb", "URIs": "https://archive.ubuntu.com/ubuntu",
+             "Suites": "noble noble-updates noble-backports",
+             "Components": "main restricted universe multiverse",
+             "Signed-By": "/usr/share/keyrings/ubuntu-archive-keyring.gpg"},
+            {"Types": "deb", "URIs": "https://security.ubuntu.com/ubuntu",
+             "Suites": "noble-security", "Components": "main restricted universe multiverse",
+             "Signed-By": "/usr/share/keyrings/ubuntu-archive-keyring.gpg"},
+        ])
+
+    def test_source_renderer_refuses_missing_duplicate_or_injected_codenames(self):
+        for arguments in [[], [""], ["noble", "jammy"], ["NOBLE"], ["noble\nTrusted: yes"],
+                          ["noble; true"], ["../../noble"], ["$(true)"]]:
+            with self.subTest(arguments=arguments):
+                result = subprocess.run(
+                    ["bash", "-c", 'source "$1"; shift; render_related_ubuntu_sources "$@"',
+                     "related-source-test", "tests/browser/install-related-scanner.sh", *arguments],
+                    cwd=ROOT, text=True, capture_output=True, timeout=10,
+                )
+                self.assertEqual(result.returncode, 1)
+                self.assertEqual(result.stdout, "")
+                self.assertEqual(result.stderr, "")
+
     def test_config_refuses_missing_stage_or_noncanonical_marker(self):
         for stage, marker in [("", "0" * 64), ("1", ""), ("1", "A" * 64), ("1", "0" * 64 + "\n")]:
             with self.subTest(stage=stage, marker=repr(marker)):

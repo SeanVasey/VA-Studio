@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
     <title>{{ $title }} — VASEY.AUDIO preview</title>
-    @vite('resources/css/fonts.css')
+    <link rel="stylesheet" href="/css/track-embed-fonts.css">
     <link rel="stylesheet" href="/brand/theme.css">
     <link rel="stylesheet" href="/css/track-embed.css">
 </head>
