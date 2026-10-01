@@ -1,0 +1,699 @@
+# Temporary source-pinned correction feedback; complete Foundation acceptance remains required.
+name: Contact inquiry correction proof
+'on':
+  push:
+    branches:
+    - codex/contact-inquiry-correction-retry-20261001
+permissions:
+  contents: read
+concurrency:
+  group: contact-inquiry-correction-proof
+  cancel-in-progress: true
+defaults:
+  run:
+    shell: bash
+jobs:
+  contact-php:
+    name: Contact inquiry PHP correction (${{ matrix.engine }})
+    if: github.repository == 'VASEYDEV/VASEYAUDIO' && github.ref == 'refs/heads/codex/contact-inquiry-correction-retry-20261001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        engine:
+        - sqlite
+        - mysql
+    services:
+      mysql:
+        image: ${{ matrix.engine == 'mysql' && 'mysql:8.4' || '' }}
+        env:
+          MYSQL_DATABASE: vaseyaudio_contact_correction_proof
+          MYSQL_ROOT_PASSWORD: ci-only-password
+        ports:
+        - 3306:3306
+        options: --health-cmd="mysqladmin ping -h 127.0.0.1 -pci-only-password" --health-interval=10s --health-timeout=5s --health-retries=10
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      APP_URL: https://audio.example.test
+      ASSET_URL: ''
+      DB_CONNECTION: ${{ matrix.engine }}
+      DB_DATABASE: ${{ matrix.engine == 'mysql' && 'vaseyaudio_contact_correction_proof' || ':memory:' }}
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USERNAME: root
+      DB_PASSWORD: ci-only-password
+      DB_URL: ''
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      BROADCAST_CONNECTION: 'null'
+      MAIL_MAILER: array
+      PULSE_ENABLED: 'false'
+      TELESCOPE_ENABLED: 'false'
+      NIGHTWATCH_ENABLED: 'false'
+      CONTACT_INQUIRIES_ENABLED: 'false'
+      CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED: 'false'
+      STRIPE_WEBHOOK_ENABLED: 'false'
+      STRIPE_TEST_CHECKOUT_ENABLED: 'false'
+      STRIPE_TEST_PAYMENT_PROCESSING_ENABLED: 'false'
+      STRIPE_TEST_FINALIZATION_ENABLED: 'false'
+      STRIPE_TEST_FINALIZATION_POLICY: ''
+      STRIPE_TEST_SECRET_KEY: ''
+      STRIPE_WEBHOOK_SECRET: ''
+      STRIPE_ACCOUNT_ID: ''
+      VASEY_TEST_CONTRACT_ISSUANCE_ENABLED: 'false'
+      VASEY_TEST_FULFILLMENT_ACTIVATION_ENABLED: 'false'
+      VASEY_TEST_DELIVERY_ACCESS_ENABLED: 'false'
+    steps:
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      with:
+        ref: ${{ github.sha }}
+        persist-credentials: false
+        fetch-depth: 3
+    - name: Require the exact published checkpoint and all reviewed permanent bytes
+      run: |
+        set -euo pipefail
+        mkdir contact-inquiry-evidence
+        python3 <<'PY' 2>&1 | tee contact-inquiry-evidence/source-guard.log
+        from pathlib import Path
+        import hashlib, json, os, subprocess, tempfile
+        git = lambda *args: subprocess.check_output(['git', *args], text=True).strip()
+        parent = '1872179f5455d819e471ca3f015bc859f8879012'
+        parent_tree = '94f3c72a67ec33c8009134603e420923966484c5'
+        baseline = '8b7747421714670117b0ee1023b9d226638a2630'
+        baseline_tree = 'af3571e2b290cbc57189d538883bcc2ad24625fe'
+        workflow = '.github/workflows/contact-inquiry-correction-proof.yml'
+        expected = {'app/Domain/Inquiries/InquiryInput.php': 'f6537ffb9a931e868159b117eb0225fbcabcee8fa386e681e7787ac87cac692c', 'app/Domain/Inquiries/InquiryPolicy.php': 'e488dd79b099d8f3e2a43ec6cc49d67b6dc6e2fe9626578226f8433c2d6bc458', 'app/Domain/Inquiries/SubmitInquiry.php': '4050effe895f4950f4b5a8e0e80d528f9c669673eba8b3164e18f50d7d4d5a4f', 'app/Http/Controllers/EditorialController.php': '587993d6662cec2586abe0629fc00ebe6c13152aff25c794b07909e9fad8ee77', 'app/Http/Requests/InquiryRequest.php': 'c92598202d8677c5b7db1dacbeb301ead8c9738d895802ae7a4e72136f996e05', 'docs/contact-inquiries.md': '65de685ddd7720432f8246142e8c0dead9c4fa279f2cb87b59162f0d06b2e516', 'resources/js/Pages/Editorial.tsx': 'fcf0ee39472c5392dcb5e612d3375dba7404c71a02d5c7f8dcdfaeed54f1d62c', 'resources/js/components/ContactInquiryForm.tsx': 'e838ecde4a073f2e264df2637f8230fed38bcabc42d8f2664a809194a95ae956', 'scripts/ci/database-sqlite-skips.json': '9156f27372e2fe6236d17f4959111624b130938702a998ba3b6ea257cbc4ac0c', 'tests/Feature/CustomerInquiryAdminTest.php': '648992af567b4c07e375e79775ad18e0ce5ba27e2d01caf44282f147b8ffff23', 'tests/Feature/CustomerInquiryAdministrationConcurrencyTest.php': '273a9b948b282cbee20aec47d2f44af2d1577ca4595ad34970955dc2e572ee36', 'tests/Feature/CustomerInquiryConcurrencyTest.php': '8294b51790aafc2384adf8ace78cb7c39db3974129833db6716c4c09297e2583', 'tests/Feature/CustomerInquiryHttpTest.php': 'be8b4e6bd1ad403320a8a7d8925c5f0544f6292223acffd5d2b1ded4e626774a', 'tests/Support/inquiry-race-worker.php': '42573b858447ecd25e523e342d097b61c381e9907146612341806e4cc1debe54', 'tests/browser/contact-inquiry-fixture.ts': 'a371030f31a34d3387583581db549d24b4b6b31a9a344890ec8061c1ab39967e', 'tests/browser/contact-inquiry-persistence.spec.ts': '40490cb05c8f2c6a4e12ad44e87990d8b82556bfc237c91ee1d632b3936c377e', 'tests/browser/contact-inquiry.spec.ts': '360328f8ba0c613436dac4c123b9a4bcf5141662afba269689dbf3af2fca79b6', 'tests/browser/prepare-contact-inquiry.php': 'f900a663a15f5236f017344662c80bc26a8837516ed76adb86e8ee172331619e', 'tests/frontend/contact-inquiry.test.tsx': '99744054726a0d26eb6653aab0fe5474b2f83ab502054c7933ac30ed8cffbbae', 'tests/frontend/editorial-content.test.tsx': '636f742b63fd9333a1418d0cfa0546f6de5475df4471965d135a6c8b2bb94768'}
+        permanent_file_count = 911
+        permanent_delta = {'app/Domain/Inquiries/InquiryInput.php': 'M', 'app/Domain/Inquiries/InquiryPolicy.php': 'M', 'app/Domain/Inquiries/SubmitInquiry.php': 'M', 'app/Http/Controllers/EditorialController.php': 'M', 'app/Http/Requests/InquiryRequest.php': 'M', 'docs/contact-inquiries.md': 'M', 'resources/js/Pages/Editorial.tsx': 'M', 'resources/js/components/ContactInquiryForm.tsx': 'M', 'scripts/ci/database-sqlite-skips.json': 'M', 'tests/Feature/CustomerInquiryAdminTest.php': 'M', 'tests/Feature/CustomerInquiryAdministrationConcurrencyTest.php': 'M', 'tests/Feature/CustomerInquiryConcurrencyTest.php': 'M', 'tests/Feature/CustomerInquiryHttpTest.php': 'M', 'tests/Support/inquiry-race-worker.php': 'M', 'tests/browser/contact-inquiry-fixture.ts': 'A', 'tests/browser/contact-inquiry-persistence.spec.ts': 'M', 'tests/browser/contact-inquiry.spec.ts': 'M', 'tests/browser/prepare-contact-inquiry.php': 'M', 'tests/frontend/contact-inquiry.test.tsx': 'M', 'tests/frontend/editorial-content.test.tsx': 'M'}
+        event = {key: os.environ.get(key) for key in ['GITHUB_SHA', 'GITHUB_EVENT_NAME', 'GITHUB_REPOSITORY', 'GITHUB_REF']}
+        if (event['GITHUB_EVENT_NAME'], event['GITHUB_REPOSITORY'], event['GITHUB_REF']) != ('push', 'VASEYDEV/VASEYAUDIO', 'refs/heads/codex/contact-inquiry-correction-retry-20261001'):
+            raise SystemExit('Unexpected execution event/repository/ref.')
+        if git('rev-parse', 'HEAD') != event['GITHUB_SHA'] or git('rev-parse', 'HEAD^') != parent or git('rev-parse', 'HEAD^^{tree}') != parent_tree:
+            raise SystemExit('Unexpected actual proof head/checkpoint/tree.')
+        if git('rev-parse', 'HEAD~2') != baseline or git('rev-parse', 'HEAD~2^{tree}') != baseline_tree:
+            raise SystemExit('Unexpected source checkpoint ancestry.')
+        status = lambda first,last: {path: change for change,path in (line.split('\t',1) for line in git('diff','--name-status','--no-renames',first,last).splitlines())}
+        if status(parent,'HEAD') != {workflow:'A'} or status(baseline,parent) != permanent_delta:
+            raise SystemExit('Unexpected temporary workflow or permanent correction delta.')
+        if git('status','--porcelain','--untracked-files=no'):
+            raise SystemExit('Tracked source is not clean.')
+        with tempfile.TemporaryDirectory() as tmp:
+            env = dict(os.environ, GIT_INDEX_FILE=str(Path(tmp)/'index'))
+            subprocess.run(['git','read-tree','HEAD'],env=env,check=True)
+            subprocess.run(['git','update-index','--force-remove',workflow],env=env,check=True)
+            restored = subprocess.check_output(['git','write-tree'],env=env,text=True).strip()
+        if restored != parent_tree:
+            raise SystemExit('Removing the sole proof workflow does not restore the reviewed permanent tree.')
+        files = git('ls-files').splitlines()
+        parent_files = git('ls-tree','-r','--name-only',parent).splitlines()
+        if set(files) != set(parent_files)|{workflow} or len(parent_files) != permanent_file_count or not set(expected).issubset(parent_files):
+            raise SystemExit('Unexpected complete permanent/proof source census.')
+        actual = {path:hashlib.sha256(Path(path).read_bytes()).hexdigest() for path in files}
+        if {path:actual[path] for path in expected} != expected:
+            raise SystemExit('Reviewed permanent source hashes do not match actual checkout.')
+        d = Path('contact-inquiry-evidence')
+        (d/'source.patch').write_bytes(subprocess.check_output(['git','diff','--binary',parent,'HEAD']))
+        (d/'checkpoint.patch').write_bytes(subprocess.check_output(['git','diff','--binary',baseline,parent]))
+        source = {'head':git('rev-parse','HEAD'),'tree':git('rev-parse','HEAD^{tree}'),'actual_event':event,
+            'parent':parent,'reviewed_tree':parent_tree,'baseline':baseline,'baseline_tree':baseline_tree,
+            'source_delta':{workflow:'A'},'checkpoint_delta':permanent_delta,'permanent_file_count':permanent_file_count,'sha256':actual,
+            'scope':'Source-specific contact notice/retry feedback. No complete Foundation, future follow-up, external delivery or launch acceptance is inferred.'}
+        (d/'source.json').write_text(json.dumps(source,indent=2,sort_keys=True)+'\n')
+        print(json.dumps({key:source[key] for key in ['head','tree','parent','reviewed_tree','permanent_file_count','checkpoint_delta']},sort_keys=True))
+        PY
+    - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45
+      with:
+        php-version: '8.4'
+        extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+        coverage: none
+        tools: composer:v2
+    - name: Install genuine Foundation fixture prerequisites
+      run: |
+        set -euo pipefail
+        sudo apt-get update 2>&1 | tee contact-inquiry-evidence/apt-update.log
+        sudo apt-get install --yes --no-install-recommends ffmpeg util-linux qpdf poppler-utils gcc 2>&1 | tee contact-inquiry-evidence/apt-install.log
+        test -x /usr/bin/ffmpeg
+        test -x /usr/bin/ffprobe
+        test -x /usr/bin/prlimit
+        test -x /usr/bin/qpdf
+        test -x /usr/bin/pdfinfo
+        test -x /usr/bin/gcc
+    - name: Install and validate the exact locked backend dependencies
+      run: |
+        set -euo pipefail
+        composer install --no-interaction --prefer-dist 2>&1 | tee contact-inquiry-evidence/composer-install.log
+        composer validate --strict 2>&1 | tee contact-inquiry-evidence/composer-validate.log
+        composer audit 2>&1 | tee contact-inquiry-evidence/composer-audit.log
+    - name: Prepare the isolated application and record actual fresh database runtime
+      run: |
+        set -euo pipefail
+        { cp .env.example .env; php artisan key:generate; } 2>&1 | tee contact-inquiry-evidence/application-setup.log
+        {
+          php --version
+          php vendor/bin/phpunit --version
+          php vendor/bin/pint --version
+          composer --version
+          ffmpeg -version
+          ffprobe -version
+          prlimit --version
+          qpdf --version
+          pdfinfo -v
+          gcc --version
+          php <<'PHP'
+        <?php
+        if (PHP_MAJOR_VERSION !== 8 || PHP_MINOR_VERSION !== 4) { throw new RuntimeException('PHP 8.4 required.'); }
+        if (getenv('DB_CONNECTION') === 'mysql' && getenv('DB_DATABASE') === 'vaseyaudio_contact_correction_proof') {
+            $db = new PDO('mysql:host=127.0.0.1;port=3306;dbname=vaseyaudio_contact_correction_proof', getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
+            $runtime = $db->query('SELECT VERSION() AS version, DATABASE() AS database_name, @@version_comment AS version_comment, @@sql_mode AS sql_mode, @@transaction_isolation AS transaction_isolation, @@lower_case_table_names AS lower_case_table_names')->fetch(PDO::FETCH_ASSOC);
+            if (! str_starts_with($runtime['version'], '8.4.') || $runtime['database_name'] !== 'vaseyaudio_contact_correction_proof' || $runtime['transaction_isolation'] !== 'REPEATABLE-READ' || (int) $runtime['lower_case_table_names'] !== 0) {
+                throw new RuntimeException('Unexpected disposable MySQL runtime.');
+            }
+            $tables = (int) $db->query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'vaseyaudio_contact_correction_proof'")->fetchColumn();
+        } elseif (getenv('DB_CONNECTION') === 'sqlite' && getenv('DB_DATABASE') === ':memory:') {
+            $db = new PDO('sqlite::memory:');
+            $runtime = ['version' => $db->query('SELECT sqlite_version()')->fetchColumn(), 'database_name' => ':memory:'];
+            $tables = (int) $db->query("SELECT COUNT(*) FROM sqlite_master WHERE type = 'table'")->fetchColumn();
+        } else { throw new RuntimeException('Unexpected fixed database selection.'); }
+        if ($tables !== 0) { throw new RuntimeException('Disposable database not empty before tests.'); }
+        echo json_encode(['driver' => $db->getAttribute(PDO::ATTR_DRIVER_NAME), 'runtime' => $runtime, 'tables_before_tests' => $tables], JSON_THROW_ON_ERROR), PHP_EOL;
+        PHP
+        } 2>&1 | tee contact-inquiry-evidence/runtime.log
+    - name: Verify unchanged routing, partition and receipt safeguards
+      run: |
+        set -euo pipefail
+        { python3 scripts/ci/test-phpunit-shards.py; python3 scripts/ci/test-ci-scope.py; python3 scripts/ci/test-focused-tests.py; python3 scripts/ci/test-database-receipts.py; } 2>&1 | tee contact-inquiry-evidence/guards.log
+    - name: Record genuine installed dependencies and source runtime identity
+      env:
+        MYSQL_CONTAINER_ID: ${{ job.services.mysql.id }}
+      run: |
+        set -euo pipefail
+        python3 <<'PY' 2>&1 | tee contact-inquiry-evidence/runtime-identity.log
+        from pathlib import Path
+        import importlib.util, json, os
+        root = Path.cwd()
+        spec = importlib.util.spec_from_file_location('receipts',root/'scripts/ci/database-receipts.py')
+        r = importlib.util.module_from_spec(spec); spec.loader.exec_module(r)
+        actual = r.runtime_identity(root, os.environ['DB_CONNECTION'], dict(os.environ))
+        r.validate_runtime(actual, os.environ['DB_CONNECTION'])
+        (root/'contact-inquiry-evidence/runtime-identity.json').write_text(json.dumps(actual,indent=2,sort_keys=True)+'\n')
+        print(json.dumps({'engine':actual['engine'],'php':actual['php']['version'],'dependencies':actual['dependencies']},sort_keys=True))
+        PY
+    - name: Discover the exact reviewed four-file source/provider inventory
+      run: |
+        set -euo pipefail
+        php vendor/bin/phpunit tests/Feature/CustomerInquiryHttpTest.php tests/Feature/CustomerInquiryAdminTest.php tests/Feature/CustomerInquiryConcurrencyTest.php tests/Feature/CustomerInquiryAdministrationConcurrencyTest.php --list-tests-xml=contact-inquiry-evidence/php-discovery.xml --fail-on-empty-test-suite --fail-on-all-issues --fail-on-phpunit-warning --display-all-issues 2>&1 | tee contact-inquiry-evidence/php-discovery.log
+        python3 <<'PY' 2>&1 | tee contact-inquiry-evidence/discovery-check.log
+        from pathlib import Path
+        from collections import Counter
+        import hashlib, importlib.util, json, os
+        root = Path.cwd()
+        directory = root / 'contact-inquiry-evidence'
+        spec = importlib.util.spec_from_file_location('receipts', root / 'scripts/ci/database-receipts.py')
+        r = importlib.util.module_from_spec(spec); spec.loader.exec_module(r)
+        import base64, zlib
+        expected_cases = json.loads(zlib.decompress(base64.b64decode('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',validate=True)))
+        observed = r.inventory((directory / 'php-discovery.xml').read_bytes(), str(root))
+        if observed['cases'] != expected_cases:
+            raise SystemExit('Fresh discovery differs from the exact reviewed four-file source/provider inventory.')
+        if observed['groups'] != Counter({('default',identifier):1 for identifier in expected_cases}):
+            raise SystemExit('Every reviewed contact case must belong to default exactly once, without extra groups.')
+        policy = r.sqlite_skip_pairs(root)
+        skipped = {i for i,m in observed['methods'].items() if m in policy}
+        if skipped != set(['Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders#inbox MFA enrollment administration first', 'Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders#inbox MFA enrollment revocation first', 'Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders#inbox admin role administration first', 'Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders#inbox admin role revocation first', 'Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders#inbox verified email administration first', 'Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders#inbox verified email revocation first', 'Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders#transition MFA enrollment administration first', 'Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders#transition MFA enrollment revocation first', 'Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders#transition admin role administration first', 'Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders#transition admin role revocation first', 'Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders#transition verified email administration first', 'Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders#transition verified email revocation first', 'Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders#view MFA enrollment administration first', 'Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders#view MFA enrollment revocation first', 'Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders#view admin role administration first', 'Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders#view admin role revocation first', 'Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders#view verified email administration first', 'Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders#view verified email revocation first', 'Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_livewire_private_getters_reject_revocation_hidden_by_an_old_repeatable_read_snapshot#MFA enrollment', 'Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_livewire_private_getters_reject_revocation_hidden_by_an_old_repeatable_read_snapshot#admin role', 'Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest::test_livewire_private_getters_reject_revocation_hidden_by_an_old_repeatable_read_snapshot#verified email', 'Tests\\Feature\\CustomerInquiryConcurrencyTest::test_competing_owners_with_one_global_request_key_save_exactly_one_inquiry_and_receipt_audit', 'Tests\\Feature\\CustomerInquiryConcurrencyTest::test_operator_authority_revocation_and_admission_share_the_current_user_lock#MFA enrollment admission first', 'Tests\\Feature\\CustomerInquiryConcurrencyTest::test_operator_authority_revocation_and_admission_share_the_current_user_lock#MFA enrollment revocation first', 'Tests\\Feature\\CustomerInquiryConcurrencyTest::test_operator_authority_revocation_and_admission_share_the_current_user_lock#admin admission first', 'Tests\\Feature\\CustomerInquiryConcurrencyTest::test_operator_authority_revocation_and_admission_share_the_current_user_lock#admin revocation first', 'Tests\\Feature\\CustomerInquiryConcurrencyTest::test_operator_authority_revocation_and_admission_share_the_current_user_lock#verified email admission first', 'Tests\\Feature\\CustomerInquiryConcurrencyTest::test_operator_authority_revocation_and_admission_share_the_current_user_lock#verified email revocation first', 'Tests\\Feature\\CustomerInquiryConcurrencyTest::test_publication_withdrawal_and_admission_share_one_mutex_without_stale_admission#admission takes the lock first', 'Tests\\Feature\\CustomerInquiryConcurrencyTest::test_publication_withdrawal_and_admission_share_one_mutex_without_stale_admission#withdrawal takes the lock first', 'Tests\\Feature\\CustomerInquiryConcurrencyTest::test_successor_publication_and_first_notice_admission_serialize_without_stale_context#admission takes the lock first', 'Tests\\Feature\\CustomerInquiryConcurrencyTest::test_successor_publication_and_first_notice_admission_serialize_without_stale_context#withdrawal takes the lock first']):
+            raise SystemExit('Current policy expands a different exact MySQL-only selection.')
+        result = {'cases': observed['cases'], 'census': r.census(observed), 'expected_sqlite_skip_ids': sorted(skipped),
+            'discovery_sha256': hashlib.sha256((directory / 'php-discovery.xml').read_bytes()).hexdigest(),
+            'sqlite_policy_sha256': hashlib.sha256((root / 'scripts/ci/database-sqlite-skips.json').read_bytes()).hexdigest(),
+            'engine': os.environ['DB_CONNECTION']}
+        (directory / 'discovery-receipt.json').write_text(json.dumps(result, indent=2, sort_keys=True)+'\n')
+        print(json.dumps(result, sort_keys=True))
+        PY
+    - name: Run every selected contact regression with strict issue handling
+      run: |
+        set -euo pipefail
+        flags=(--fail-on-empty-test-suite --fail-on-all-issues --fail-on-phpunit-warning --fail-on-warning --fail-on-risky --fail-on-incomplete --display-all-issues)
+        case "$DB_CONNECTION" in
+          mysql) flags+=(--fail-on-skipped) ;;
+          sqlite) flags+=(--do-not-fail-on-skipped) ;; # Only the 32 exact discovered MySQL-only cases may skip.
+          *) exit 1 ;;
+        esac
+        php vendor/bin/phpunit tests/Feature/CustomerInquiryHttpTest.php tests/Feature/CustomerInquiryAdminTest.php tests/Feature/CustomerInquiryConcurrencyTest.php tests/Feature/CustomerInquiryAdministrationConcurrencyTest.php --testdox --log-junit=contact-inquiry-evidence/php-results.xml "${flags[@]}" 2>&1 | tee contact-inquiry-evidence/phpunit.log
+    - name: Require full genuine JUnit identities, exact skips and unchanged source
+      run: |
+        set -euo pipefail
+        python3 <<'PY' 2>&1 | tee contact-inquiry-evidence/receipt-check.log
+        from pathlib import Path
+        import hashlib, importlib.util, json, os, subprocess
+        root = Path.cwd(); directory = root / 'contact-inquiry-evidence'
+        spec = importlib.util.spec_from_file_location('receipts', root / 'scripts/ci/database-receipts.py')
+        r = importlib.util.module_from_spec(spec); spec.loader.exec_module(r)
+        discovery = json.loads((directory / 'discovery-receipt.json').read_text())
+        raw = (directory / 'php-discovery.xml').read_bytes()
+        expected = r.inventory(raw, str(root))
+        if expected['cases'] != discovery['cases'] or r.census(expected) != discovery['census'] or hashlib.sha256(raw).hexdigest() != discovery['discovery_sha256']:
+            raise SystemExit('Discovery evidence changed after its strict source/provider check.')
+        engine = os.environ['DB_CONNECTION']
+        result = r.junit((directory / 'php-results.xml').read_bytes(), expected, str(root), engine, r.sqlite_skip_pairs(root))
+        if (result['reported_cases'], result['executed_cases'], result['skipped_cases']) != (144, 144 if engine == 'mysql' else 112, 0 if engine == 'mysql' else 32):
+            raise SystemExit('Unexpected genuine execution/skip census.')
+        if engine == 'sqlite' and result['skipped_ids'] != discovery['expected_sqlite_skip_ids']:
+            raise SystemExit('SQLite skip set differs from its exact 32 expanded identities.')
+        junit = r.xml((directory / 'php-results.xml').read_bytes())
+        for case in junit.iter('testcase'):
+            if case.find('skipped') is None and int(case.get('assertions', '0')) <= 0:
+                raise SystemExit('Every executed case must retain positive real assertions.')
+        manifest = json.loads((directory / 'source.json').read_text())
+        if subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=no'], text=True).strip():
+            raise SystemExit('Verification changed tracked source.')
+        for path,digest in manifest['sha256'].items():
+            if hashlib.sha256((root / path).read_bytes()).hexdigest() != digest:
+                raise SystemExit('Verification changed source bytes: '+path)
+        runtime = json.loads((directory/'runtime-identity.json').read_text())
+        if r.runtime_identity(root,engine,dict(os.environ)) != runtime:
+            raise SystemExit('Runtime/dependencies changed during actual selected execution.')
+        receipt = {'runtime':runtime,'head': manifest['head'], 'tree': manifest['tree'], 'parent': manifest['parent'], 'reviewed_permanent_tree': manifest['reviewed_tree'],
+            'engine': engine, 'discovery': discovery['census'], 'results': result,
+            'evidence_sha256': {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in directory.iterdir() if p.is_file() and p.name != 'receipt-check.log'}}
+        (directory / 'receipt.json').write_text(json.dumps(receipt, indent=2, sort_keys=True)+'\n')
+        print(json.dumps(receipt, sort_keys=True))
+        PY
+      env:
+        MYSQL_CONTAINER_ID: ${{ job.services.mysql.id }}
+    - name: Check syntax of the fixed reviewed PHP union after behavior
+      run: |
+        set -euo pipefail
+        paths=(app/Domain/Inquiries/InquiryAdministration.php app/Domain/Inquiries/InquiryInput.php app/Domain/Inquiries/InquiryPolicy.php app/Domain/Inquiries/SubmitInquiry.php app/Filament/Resources/CustomerInquiryResource/Pages/ListCustomerInquiries.php app/Filament/Resources/CustomerInquiryResource/Pages/ViewCustomerInquiry.php app/Http/Controllers/EditorialController.php app/Http/Requests/InquiryRequest.php app/Support/Access/AdminMultiFactor.php tests/Feature/CustomerInquiryAdminTest.php tests/Feature/CustomerInquiryAdministrationConcurrencyTest.php tests/Feature/CustomerInquiryConcurrencyTest.php tests/Feature/CustomerInquiryHttpTest.php tests/Support/InquiryAdministrationRace.php tests/Support/InquiryOperatorRace.php tests/Support/InquiryRace.php tests/Support/inquiry-administration-race-worker.php tests/Support/inquiry-operator-race-worker.php tests/Support/inquiry-race-worker.php tests/browser/prepare-contact-inquiry.php)
+        { for path in "${paths[@]}"; do php -l "$path"; done; } 2>&1 | tee contact-inquiry-evidence/php-syntax.log
+    - name: Check formatting of the fixed reviewed PHP union after behavior
+      run: |
+        set -euo pipefail
+        php vendor/bin/pint --test -v app/Domain/Inquiries/InquiryAdministration.php app/Domain/Inquiries/InquiryInput.php app/Domain/Inquiries/InquiryPolicy.php app/Domain/Inquiries/SubmitInquiry.php app/Filament/Resources/CustomerInquiryResource/Pages/ListCustomerInquiries.php app/Filament/Resources/CustomerInquiryResource/Pages/ViewCustomerInquiry.php app/Http/Controllers/EditorialController.php app/Http/Requests/InquiryRequest.php app/Support/Access/AdminMultiFactor.php tests/Feature/CustomerInquiryAdminTest.php tests/Feature/CustomerInquiryAdministrationConcurrencyTest.php tests/Feature/CustomerInquiryConcurrencyTest.php tests/Feature/CustomerInquiryHttpTest.php tests/Support/InquiryAdministrationRace.php tests/Support/InquiryOperatorRace.php tests/Support/InquiryRace.php tests/Support/inquiry-administration-race-worker.php tests/Support/inquiry-operator-race-worker.php tests/Support/inquiry-race-worker.php tests/browser/prepare-contact-inquiry.php 2>&1 | tee contact-inquiry-evidence/pint.log
+    - name: Require unchanged tracked source and safe complete raw evidence before upload
+      id: evidence_bookend
+      if: always()
+      run: |
+        set -euo pipefail
+        python3 <<'PY' 2>&1 | tee contact-inquiry-evidence/source-bookend.log
+        from pathlib import Path
+        import hashlib, json, subprocess
+        root = Path.cwd(); directory = root / 'contact-inquiry-evidence'
+        source = json.loads((directory / 'source.json').read_text())
+        files = subprocess.check_output(['git', 'ls-files'], text=True).splitlines()
+        actual = {path: hashlib.sha256((root / path).read_bytes()).hexdigest() for path in files}
+        if len(files) != source['permanent_file_count'] + 1 or actual != source['sha256'] or subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=no'], text=True).strip():
+            raise SystemExit('Verification changed the exact tracked source inventory/bytes.')
+        for path in directory.rglob('*'):
+            if path.is_symlink() or any(part.startswith('.') for part in path.relative_to(root).parts):
+                raise SystemExit('Unexpected symlink or hidden raw evidence path; refusing upload.')
+        evidence = {str(path.relative_to(root)): {'bytes': path.stat().st_size, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()} for path in directory.rglob('*') if path.is_file() and path.name not in ['source-bookend.log', 'evidence-digests.json']}
+        (directory / 'evidence-digests.json').write_text(json.dumps({'head': source['head'], 'tree': source['tree'], 'tracked_source_unchanged': True, 'files': evidence}, indent=2, sort_keys=True) + '\n')
+        print(json.dumps({'tracked_source_unchanged': True, 'retained_files': len(evidence)}, sort_keys=True))
+        PY
+        printf 'upload_safe=true\n' >> "$GITHUB_OUTPUT"
+    - name: Retain complete source, runtime, discovery, formatting and raw PHPUnit evidence only after safe bookend
+      if: always() && steps.evidence_bookend.outputs.upload_safe == 'true'
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: contact-inquiry-${{ matrix.engine }}-${{ github.run_id }}-${{ github.run_attempt }}
+        path: contact-inquiry-evidence/
+        retention-days: 7
+        if-no-files-found: error
+        overwrite: false
+  contact-frontend:
+    name: Contact inquiry complete frontend correction
+    if: github.repository == 'VASEYDEV/VASEYAUDIO' && github.ref == 'refs/heads/codex/contact-inquiry-correction-retry-20261001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      with:
+        ref: ${{ github.sha }}
+        persist-credentials: false
+        fetch-depth: 3
+    - name: Require the exact published checkpoint and all reviewed permanent bytes
+      run: |
+        set -euo pipefail
+        mkdir contact-inquiry-evidence
+        python3 <<'PY' 2>&1 | tee contact-inquiry-evidence/source-guard.log
+        from pathlib import Path
+        import hashlib, json, os, subprocess, tempfile
+        git = lambda *args: subprocess.check_output(['git', *args], text=True).strip()
+        parent = '1872179f5455d819e471ca3f015bc859f8879012'
+        parent_tree = '94f3c72a67ec33c8009134603e420923966484c5'
+        baseline = '8b7747421714670117b0ee1023b9d226638a2630'
+        baseline_tree = 'af3571e2b290cbc57189d538883bcc2ad24625fe'
+        workflow = '.github/workflows/contact-inquiry-correction-proof.yml'
+        expected = {'app/Domain/Inquiries/InquiryInput.php': 'f6537ffb9a931e868159b117eb0225fbcabcee8fa386e681e7787ac87cac692c', 'app/Domain/Inquiries/InquiryPolicy.php': 'e488dd79b099d8f3e2a43ec6cc49d67b6dc6e2fe9626578226f8433c2d6bc458', 'app/Domain/Inquiries/SubmitInquiry.php': '4050effe895f4950f4b5a8e0e80d528f9c669673eba8b3164e18f50d7d4d5a4f', 'app/Http/Controllers/EditorialController.php': '587993d6662cec2586abe0629fc00ebe6c13152aff25c794b07909e9fad8ee77', 'app/Http/Requests/InquiryRequest.php': 'c92598202d8677c5b7db1dacbeb301ead8c9738d895802ae7a4e72136f996e05', 'docs/contact-inquiries.md': '65de685ddd7720432f8246142e8c0dead9c4fa279f2cb87b59162f0d06b2e516', 'resources/js/Pages/Editorial.tsx': 'fcf0ee39472c5392dcb5e612d3375dba7404c71a02d5c7f8dcdfaeed54f1d62c', 'resources/js/components/ContactInquiryForm.tsx': 'e838ecde4a073f2e264df2637f8230fed38bcabc42d8f2664a809194a95ae956', 'scripts/ci/database-sqlite-skips.json': '9156f27372e2fe6236d17f4959111624b130938702a998ba3b6ea257cbc4ac0c', 'tests/Feature/CustomerInquiryAdminTest.php': '648992af567b4c07e375e79775ad18e0ce5ba27e2d01caf44282f147b8ffff23', 'tests/Feature/CustomerInquiryAdministrationConcurrencyTest.php': '273a9b948b282cbee20aec47d2f44af2d1577ca4595ad34970955dc2e572ee36', 'tests/Feature/CustomerInquiryConcurrencyTest.php': '8294b51790aafc2384adf8ace78cb7c39db3974129833db6716c4c09297e2583', 'tests/Feature/CustomerInquiryHttpTest.php': 'be8b4e6bd1ad403320a8a7d8925c5f0544f6292223acffd5d2b1ded4e626774a', 'tests/Support/inquiry-race-worker.php': '42573b858447ecd25e523e342d097b61c381e9907146612341806e4cc1debe54', 'tests/browser/contact-inquiry-fixture.ts': 'a371030f31a34d3387583581db549d24b4b6b31a9a344890ec8061c1ab39967e', 'tests/browser/contact-inquiry-persistence.spec.ts': '40490cb05c8f2c6a4e12ad44e87990d8b82556bfc237c91ee1d632b3936c377e', 'tests/browser/contact-inquiry.spec.ts': '360328f8ba0c613436dac4c123b9a4bcf5141662afba269689dbf3af2fca79b6', 'tests/browser/prepare-contact-inquiry.php': 'f900a663a15f5236f017344662c80bc26a8837516ed76adb86e8ee172331619e', 'tests/frontend/contact-inquiry.test.tsx': '99744054726a0d26eb6653aab0fe5474b2f83ab502054c7933ac30ed8cffbbae', 'tests/frontend/editorial-content.test.tsx': '636f742b63fd9333a1418d0cfa0546f6de5475df4471965d135a6c8b2bb94768'}
+        permanent_file_count = 911
+        permanent_delta = {'app/Domain/Inquiries/InquiryInput.php': 'M', 'app/Domain/Inquiries/InquiryPolicy.php': 'M', 'app/Domain/Inquiries/SubmitInquiry.php': 'M', 'app/Http/Controllers/EditorialController.php': 'M', 'app/Http/Requests/InquiryRequest.php': 'M', 'docs/contact-inquiries.md': 'M', 'resources/js/Pages/Editorial.tsx': 'M', 'resources/js/components/ContactInquiryForm.tsx': 'M', 'scripts/ci/database-sqlite-skips.json': 'M', 'tests/Feature/CustomerInquiryAdminTest.php': 'M', 'tests/Feature/CustomerInquiryAdministrationConcurrencyTest.php': 'M', 'tests/Feature/CustomerInquiryConcurrencyTest.php': 'M', 'tests/Feature/CustomerInquiryHttpTest.php': 'M', 'tests/Support/inquiry-race-worker.php': 'M', 'tests/browser/contact-inquiry-fixture.ts': 'A', 'tests/browser/contact-inquiry-persistence.spec.ts': 'M', 'tests/browser/contact-inquiry.spec.ts': 'M', 'tests/browser/prepare-contact-inquiry.php': 'M', 'tests/frontend/contact-inquiry.test.tsx': 'M', 'tests/frontend/editorial-content.test.tsx': 'M'}
+        event = {key: os.environ.get(key) for key in ['GITHUB_SHA', 'GITHUB_EVENT_NAME', 'GITHUB_REPOSITORY', 'GITHUB_REF']}
+        if (event['GITHUB_EVENT_NAME'], event['GITHUB_REPOSITORY'], event['GITHUB_REF']) != ('push', 'VASEYDEV/VASEYAUDIO', 'refs/heads/codex/contact-inquiry-correction-retry-20261001'):
+            raise SystemExit('Unexpected execution event/repository/ref.')
+        if git('rev-parse', 'HEAD') != event['GITHUB_SHA'] or git('rev-parse', 'HEAD^') != parent or git('rev-parse', 'HEAD^^{tree}') != parent_tree:
+            raise SystemExit('Unexpected actual proof head/checkpoint/tree.')
+        if git('rev-parse', 'HEAD~2') != baseline or git('rev-parse', 'HEAD~2^{tree}') != baseline_tree:
+            raise SystemExit('Unexpected source checkpoint ancestry.')
+        status = lambda first,last: {path: change for change,path in (line.split('\t',1) for line in git('diff','--name-status','--no-renames',first,last).splitlines())}
+        if status(parent,'HEAD') != {workflow:'A'} or status(baseline,parent) != permanent_delta:
+            raise SystemExit('Unexpected temporary workflow or permanent correction delta.')
+        if git('status','--porcelain','--untracked-files=no'):
+            raise SystemExit('Tracked source is not clean.')
+        with tempfile.TemporaryDirectory() as tmp:
+            env = dict(os.environ, GIT_INDEX_FILE=str(Path(tmp)/'index'))
+            subprocess.run(['git','read-tree','HEAD'],env=env,check=True)
+            subprocess.run(['git','update-index','--force-remove',workflow],env=env,check=True)
+            restored = subprocess.check_output(['git','write-tree'],env=env,text=True).strip()
+        if restored != parent_tree:
+            raise SystemExit('Removing the sole proof workflow does not restore the reviewed permanent tree.')
+        files = git('ls-files').splitlines()
+        parent_files = git('ls-tree','-r','--name-only',parent).splitlines()
+        if set(files) != set(parent_files)|{workflow} or len(parent_files) != permanent_file_count or not set(expected).issubset(parent_files):
+            raise SystemExit('Unexpected complete permanent/proof source census.')
+        actual = {path:hashlib.sha256(Path(path).read_bytes()).hexdigest() for path in files}
+        if {path:actual[path] for path in expected} != expected:
+            raise SystemExit('Reviewed permanent source hashes do not match actual checkout.')
+        d = Path('contact-inquiry-evidence')
+        (d/'source.patch').write_bytes(subprocess.check_output(['git','diff','--binary',parent,'HEAD']))
+        (d/'checkpoint.patch').write_bytes(subprocess.check_output(['git','diff','--binary',baseline,parent]))
+        source = {'head':git('rev-parse','HEAD'),'tree':git('rev-parse','HEAD^{tree}'),'actual_event':event,
+            'parent':parent,'reviewed_tree':parent_tree,'baseline':baseline,'baseline_tree':baseline_tree,
+            'source_delta':{workflow:'A'},'checkpoint_delta':permanent_delta,'permanent_file_count':permanent_file_count,'sha256':actual,
+            'scope':'Source-specific contact notice/retry feedback. No complete Foundation, future follow-up, external delivery or launch acceptance is inferred.'}
+        (d/'source.json').write_text(json.dumps(source,indent=2,sort_keys=True)+'\n')
+        print(json.dumps({key:source[key] for key in ['head','tree','parent','reviewed_tree','permanent_file_count','checkpoint_delta']},sort_keys=True))
+        PY
+    - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+      with:
+        node-version: '24'
+        cache: npm
+    - name: Install exact frontend lock and record actual tools
+      run: |
+        set -euo pipefail
+        npm ci 2>&1 | tee contact-inquiry-evidence/npm-install.log
+        { node --version; npm --version; } 2>&1 | tee contact-inquiry-evidence/runtime.log
+    - name: Run every frontend test, build and security check
+      run: |
+        set -euo pipefail
+        npm test -- --reporter=default --reporter=json --reporter=junit --outputFile.json=contact-inquiry-evidence/frontend-results.json --outputFile.junit=contact-inquiry-evidence/frontend-results.xml 2>&1 | tee contact-inquiry-evidence/frontend-tests.log
+        npm run build 2>&1 | tee contact-inquiry-evidence/build.log
+        python3 scripts/ci/scan-client-bundle.py 2>&1 | tee contact-inquiry-evidence/client-scan.log
+        npm audit --audit-level=high --json > contact-inquiry-evidence/npm-audit.json 2> contact-inquiry-evidence/npm-audit.stderr
+        cp public/build/manifest.json contact-inquiry-evidence/vite-manifest.json
+    - name: Require every exact reviewed frontend identity and raw JUnit
+      run: |
+        set -euo pipefail
+        python3 <<'PY' 2>&1 | tee contact-inquiry-evidence/frontend-receipt-check.log
+        from collections import Counter
+        from pathlib import Path
+        import base64, json, zlib, xml.etree.ElementTree as E
+        root = Path.cwd(); directory = root/'contact-inquiry-evidence'
+        expected = json.loads(zlib.decompress(base64.b64decode('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',validate=True)))
+        result = json.loads((directory/'frontend-results.json').read_text())
+        records = result['testResults']; actual = {}
+        for record in records:
+            path = Path(record['name']).resolve()
+            if not path.is_relative_to(root): raise SystemExit('Unexpected frontend owning path.')
+            file = str(path.relative_to(root))
+            cases = record['assertionResults']
+            if file in actual or any(case['status'] != 'passed' for case in cases):
+                raise SystemExit('Duplicate or unsuccessful frontend source file.')
+            names = [case['fullName'] for case in cases]
+            actual[file] = sorted(names)
+        expected = {file:sorted(names) for file,names in expected.items()}
+        count = sum(map(len,expected.values()))
+        if actual != expected or result['success'] is not True or any(result[key] != value for key,value in [('numTotalTests',count),('numPassedTests',count),('numFailedTests',0),('numPendingTests',0)]):
+            raise SystemExit('Fresh frontend result differs from the exact reviewed complete inventory.')
+        xml = E.parse(directory/'frontend-results.xml')
+        if len(xml.findall('.//testcase')) != count or any(xml.findall('.//'+tag) for tag in ['failure','error','skipped']):
+            raise SystemExit('Incomplete or unsuccessful frontend JUnit.')
+        audit = json.loads((directory/'npm-audit.json').read_text())
+        if audit['metadata']['vulnerabilities']['high'] or audit['metadata']['vulnerabilities']['critical']:
+            raise SystemExit('High/critical frontend dependencies.')
+        receipt = {'files':len(actual),'cases':count,'inventory':actual,'all_passed':True,'failed':0,'pending':0,'scope':'Complete frontend only; full Foundation remains required.'}
+        (directory/'frontend-receipt.json').write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n')
+        print(json.dumps({'files':len(actual),'cases':count,'all_passed':True},sort_keys=True))
+        PY
+    - name: Require unchanged tracked source and safe complete raw evidence before upload
+      id: evidence_bookend
+      if: always()
+      run: |
+        set -euo pipefail
+        python3 <<'PY' 2>&1 | tee contact-inquiry-evidence/source-bookend.log
+        from pathlib import Path
+        import hashlib, json, subprocess
+        root = Path.cwd(); directory = root / 'contact-inquiry-evidence'
+        source = json.loads((directory / 'source.json').read_text())
+        files = subprocess.check_output(['git', 'ls-files'], text=True).splitlines()
+        actual = {path: hashlib.sha256((root / path).read_bytes()).hexdigest() for path in files}
+        if len(files) != source['permanent_file_count'] + 1 or actual != source['sha256'] or subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=no'], text=True).strip():
+            raise SystemExit('Verification changed the exact tracked source inventory/bytes.')
+        for path in directory.rglob('*'):
+            if path.is_symlink() or any(part.startswith('.') for part in path.relative_to(root).parts):
+                raise SystemExit('Unexpected symlink or hidden raw evidence path; refusing upload.')
+        evidence = {str(path.relative_to(root)): {'bytes': path.stat().st_size, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()} for path in directory.rglob('*') if path.is_file() and path.name not in ['source-bookend.log', 'evidence-digests.json']}
+        (directory / 'evidence-digests.json').write_text(json.dumps({'head': source['head'], 'tree': source['tree'], 'tracked_source_unchanged': True, 'files': evidence}, indent=2, sort_keys=True) + '\n')
+        print(json.dumps({'tracked_source_unchanged': True, 'retained_files': len(evidence)}, sort_keys=True))
+        PY
+        printf 'upload_safe=true\n' >> "$GITHUB_OUTPUT"
+    - name: Retain complete source, runtime, discovery, formatting and raw PHPUnit evidence only after safe bookend
+      if: always() && steps.evidence_bookend.outputs.upload_safe == 'true'
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: contact-inquiry-frontend-${{ github.run_id }}-${{ github.run_attempt }}
+        path: contact-inquiry-evidence/
+        retention-days: 7
+        if-no-files-found: error
+        overwrite: false
+  contact-native:
+    name: Contact inquiry ordinary native correction
+    if: github.repository == 'VASEYDEV/VASEYAUDIO' && github.ref == 'refs/heads/codex/contact-inquiry-correction-retry-20261001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      with:
+        ref: ${{ github.sha }}
+        persist-credentials: false
+        fetch-depth: 3
+    - name: Require the exact published checkpoint and all reviewed permanent bytes
+      run: |
+        set -euo pipefail
+        mkdir contact-inquiry-evidence
+        python3 <<'PY' 2>&1 | tee contact-inquiry-evidence/source-guard.log
+        from pathlib import Path
+        import hashlib, json, os, subprocess, tempfile
+        git = lambda *args: subprocess.check_output(['git', *args], text=True).strip()
+        parent = '1872179f5455d819e471ca3f015bc859f8879012'
+        parent_tree = '94f3c72a67ec33c8009134603e420923966484c5'
+        baseline = '8b7747421714670117b0ee1023b9d226638a2630'
+        baseline_tree = 'af3571e2b290cbc57189d538883bcc2ad24625fe'
+        workflow = '.github/workflows/contact-inquiry-correction-proof.yml'
+        expected = {'app/Domain/Inquiries/InquiryInput.php': 'f6537ffb9a931e868159b117eb0225fbcabcee8fa386e681e7787ac87cac692c', 'app/Domain/Inquiries/InquiryPolicy.php': 'e488dd79b099d8f3e2a43ec6cc49d67b6dc6e2fe9626578226f8433c2d6bc458', 'app/Domain/Inquiries/SubmitInquiry.php': '4050effe895f4950f4b5a8e0e80d528f9c669673eba8b3164e18f50d7d4d5a4f', 'app/Http/Controllers/EditorialController.php': '587993d6662cec2586abe0629fc00ebe6c13152aff25c794b07909e9fad8ee77', 'app/Http/Requests/InquiryRequest.php': 'c92598202d8677c5b7db1dacbeb301ead8c9738d895802ae7a4e72136f996e05', 'docs/contact-inquiries.md': '65de685ddd7720432f8246142e8c0dead9c4fa279f2cb87b59162f0d06b2e516', 'resources/js/Pages/Editorial.tsx': 'fcf0ee39472c5392dcb5e612d3375dba7404c71a02d5c7f8dcdfaeed54f1d62c', 'resources/js/components/ContactInquiryForm.tsx': 'e838ecde4a073f2e264df2637f8230fed38bcabc42d8f2664a809194a95ae956', 'scripts/ci/database-sqlite-skips.json': '9156f27372e2fe6236d17f4959111624b130938702a998ba3b6ea257cbc4ac0c', 'tests/Feature/CustomerInquiryAdminTest.php': '648992af567b4c07e375e79775ad18e0ce5ba27e2d01caf44282f147b8ffff23', 'tests/Feature/CustomerInquiryAdministrationConcurrencyTest.php': '273a9b948b282cbee20aec47d2f44af2d1577ca4595ad34970955dc2e572ee36', 'tests/Feature/CustomerInquiryConcurrencyTest.php': '8294b51790aafc2384adf8ace78cb7c39db3974129833db6716c4c09297e2583', 'tests/Feature/CustomerInquiryHttpTest.php': 'be8b4e6bd1ad403320a8a7d8925c5f0544f6292223acffd5d2b1ded4e626774a', 'tests/Support/inquiry-race-worker.php': '42573b858447ecd25e523e342d097b61c381e9907146612341806e4cc1debe54', 'tests/browser/contact-inquiry-fixture.ts': 'a371030f31a34d3387583581db549d24b4b6b31a9a344890ec8061c1ab39967e', 'tests/browser/contact-inquiry-persistence.spec.ts': '40490cb05c8f2c6a4e12ad44e87990d8b82556bfc237c91ee1d632b3936c377e', 'tests/browser/contact-inquiry.spec.ts': '360328f8ba0c613436dac4c123b9a4bcf5141662afba269689dbf3af2fca79b6', 'tests/browser/prepare-contact-inquiry.php': 'f900a663a15f5236f017344662c80bc26a8837516ed76adb86e8ee172331619e', 'tests/frontend/contact-inquiry.test.tsx': '99744054726a0d26eb6653aab0fe5474b2f83ab502054c7933ac30ed8cffbbae', 'tests/frontend/editorial-content.test.tsx': '636f742b63fd9333a1418d0cfa0546f6de5475df4471965d135a6c8b2bb94768'}
+        permanent_file_count = 911
+        permanent_delta = {'app/Domain/Inquiries/InquiryInput.php': 'M', 'app/Domain/Inquiries/InquiryPolicy.php': 'M', 'app/Domain/Inquiries/SubmitInquiry.php': 'M', 'app/Http/Controllers/EditorialController.php': 'M', 'app/Http/Requests/InquiryRequest.php': 'M', 'docs/contact-inquiries.md': 'M', 'resources/js/Pages/Editorial.tsx': 'M', 'resources/js/components/ContactInquiryForm.tsx': 'M', 'scripts/ci/database-sqlite-skips.json': 'M', 'tests/Feature/CustomerInquiryAdminTest.php': 'M', 'tests/Feature/CustomerInquiryAdministrationConcurrencyTest.php': 'M', 'tests/Feature/CustomerInquiryConcurrencyTest.php': 'M', 'tests/Feature/CustomerInquiryHttpTest.php': 'M', 'tests/Support/inquiry-race-worker.php': 'M', 'tests/browser/contact-inquiry-fixture.ts': 'A', 'tests/browser/contact-inquiry-persistence.spec.ts': 'M', 'tests/browser/contact-inquiry.spec.ts': 'M', 'tests/browser/prepare-contact-inquiry.php': 'M', 'tests/frontend/contact-inquiry.test.tsx': 'M', 'tests/frontend/editorial-content.test.tsx': 'M'}
+        event = {key: os.environ.get(key) for key in ['GITHUB_SHA', 'GITHUB_EVENT_NAME', 'GITHUB_REPOSITORY', 'GITHUB_REF']}
+        if (event['GITHUB_EVENT_NAME'], event['GITHUB_REPOSITORY'], event['GITHUB_REF']) != ('push', 'VASEYDEV/VASEYAUDIO', 'refs/heads/codex/contact-inquiry-correction-retry-20261001'):
+            raise SystemExit('Unexpected execution event/repository/ref.')
+        if git('rev-parse', 'HEAD') != event['GITHUB_SHA'] or git('rev-parse', 'HEAD^') != parent or git('rev-parse', 'HEAD^^{tree}') != parent_tree:
+            raise SystemExit('Unexpected actual proof head/checkpoint/tree.')
+        if git('rev-parse', 'HEAD~2') != baseline or git('rev-parse', 'HEAD~2^{tree}') != baseline_tree:
+            raise SystemExit('Unexpected source checkpoint ancestry.')
+        status = lambda first,last: {path: change for change,path in (line.split('\t',1) for line in git('diff','--name-status','--no-renames',first,last).splitlines())}
+        if status(parent,'HEAD') != {workflow:'A'} or status(baseline,parent) != permanent_delta:
+            raise SystemExit('Unexpected temporary workflow or permanent correction delta.')
+        if git('status','--porcelain','--untracked-files=no'):
+            raise SystemExit('Tracked source is not clean.')
+        with tempfile.TemporaryDirectory() as tmp:
+            env = dict(os.environ, GIT_INDEX_FILE=str(Path(tmp)/'index'))
+            subprocess.run(['git','read-tree','HEAD'],env=env,check=True)
+            subprocess.run(['git','update-index','--force-remove',workflow],env=env,check=True)
+            restored = subprocess.check_output(['git','write-tree'],env=env,text=True).strip()
+        if restored != parent_tree:
+            raise SystemExit('Removing the sole proof workflow does not restore the reviewed permanent tree.')
+        files = git('ls-files').splitlines()
+        parent_files = git('ls-tree','-r','--name-only',parent).splitlines()
+        if set(files) != set(parent_files)|{workflow} or len(parent_files) != permanent_file_count or not set(expected).issubset(parent_files):
+            raise SystemExit('Unexpected complete permanent/proof source census.')
+        actual = {path:hashlib.sha256(Path(path).read_bytes()).hexdigest() for path in files}
+        if {path:actual[path] for path in expected} != expected:
+            raise SystemExit('Reviewed permanent source hashes do not match actual checkout.')
+        d = Path('contact-inquiry-evidence')
+        (d/'source.patch').write_bytes(subprocess.check_output(['git','diff','--binary',parent,'HEAD']))
+        (d/'checkpoint.patch').write_bytes(subprocess.check_output(['git','diff','--binary',baseline,parent]))
+        source = {'head':git('rev-parse','HEAD'),'tree':git('rev-parse','HEAD^{tree}'),'actual_event':event,
+            'parent':parent,'reviewed_tree':parent_tree,'baseline':baseline,'baseline_tree':baseline_tree,
+            'source_delta':{workflow:'A'},'checkpoint_delta':permanent_delta,'permanent_file_count':permanent_file_count,'sha256':actual,
+            'scope':'Source-specific contact notice/retry feedback. No complete Foundation, future follow-up, external delivery or launch acceptance is inferred.'}
+        (d/'source.json').write_text(json.dumps(source,indent=2,sort_keys=True)+'\n')
+        print(json.dumps({key:source[key] for key in ['head','tree','parent','reviewed_tree','permanent_file_count','checkpoint_delta']},sort_keys=True))
+        PY
+    - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+      with:
+        node-version: '24'
+        cache: npm
+    - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45
+      with:
+        php-version: '8.4'
+        extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+        coverage: none
+        tools: composer:v2
+    - name: Install genuine Foundation fixture prerequisites
+      run: |
+        set -euo pipefail
+        sudo apt-get update 2>&1 | tee contact-inquiry-evidence/apt-update.log
+        sudo apt-get install --yes --no-install-recommends ffmpeg util-linux qpdf poppler-utils gcc 2>&1 | tee contact-inquiry-evidence/apt-install.log
+        test -x /usr/bin/ffmpeg
+        test -x /usr/bin/ffprobe
+        test -x /usr/bin/prlimit
+        test -x /usr/bin/qpdf
+        test -x /usr/bin/pdfinfo
+        test -x /usr/bin/gcc
+    - name: Install and validate the exact locked backend dependencies
+      run: |
+        set -euo pipefail
+        composer install --no-interaction --prefer-dist 2>&1 | tee contact-inquiry-evidence/composer-install.log
+        composer validate --strict 2>&1 | tee contact-inquiry-evidence/composer-validate.log
+        composer audit 2>&1 | tee contact-inquiry-evidence/composer-audit.log
+    - name: Verify genuine backend dependencies and build the native client
+      run: |
+        set -euo pipefail
+        python3 <<'PY' 2>&1 | tee contact-inquiry-evidence/installed-dependencies.log
+        from pathlib import Path
+        import importlib.util, json
+        root=Path.cwd(); spec=importlib.util.spec_from_file_location('receipts',root/'scripts/ci/database-receipts.py')
+        r=importlib.util.module_from_spec(spec); spec.loader.exec_module(r)
+        value=r.installed_dependencies(root)
+        (root/'contact-inquiry-evidence/installed-dependencies.json').write_text(json.dumps(value,indent=2,sort_keys=True)+'\n')
+        print(json.dumps(value,sort_keys=True))
+        PY
+        { node --version; npm --version; php --version; composer --version; } 2>&1 | tee contact-inquiry-evidence/runtime.log
+        npm ci 2>&1 | tee contact-inquiry-evidence/npm-install.log
+        npm run build 2>&1 | tee contact-inquiry-evidence/build.log
+        python3 scripts/ci/scan-client-bundle.py 2>&1 | tee contact-inquiry-evidence/client-scan.log
+        npm audit --audit-level=high --json > contact-inquiry-evidence/npm-audit.json 2> contact-inquiry-evidence/npm-audit.stderr
+        cp public/build/manifest.json contact-inquiry-evidence/vite-manifest.json
+    - name: Install ordinary locked Chromium and WebKit projects
+      run: |
+        set -euo pipefail
+        npx playwright install --with-deps chromium webkit 2>&1 | tee contact-inquiry-evidence/browser-install.log
+    - name: Discover and execute the two contact files through the unchanged disposable wrapper
+      run: |
+        set -euo pipefail
+        PLAYWRIGHT_JSON_OUTPUT_NAME=contact-inquiry-evidence/native-discovery.json node tests/browser/run.mjs contact-inquiry.spec.ts contact-inquiry-persistence.spec.ts --list --reporter=json 2>&1 | tee contact-inquiry-evidence/native-discovery.log
+        PLAYWRIGHT_JSON_OUTPUT_NAME=contact-inquiry-evidence/native-results.json node tests/browser/run.mjs contact-inquiry.spec.ts contact-inquiry-persistence.spec.ts --reporter=list,html,json 2>&1 | tee contact-inquiry-evidence/native.log
+    - name: Require all exact native identities and their genuine first attempts
+      run: |
+        set -euo pipefail
+        python3 <<'PY' 2>&1 | tee contact-inquiry-evidence/native-receipt-check.log
+        from collections import Counter
+        from pathlib import Path
+        import base64, hashlib, importlib.util, json, math, re
+        root=Path.cwd(); directory=root/'contact-inquiry-evidence'
+        expected=[{'file': 'tests/browser/contact-inquiry-persistence.spec.ts', 'title': 'real customer inquiry persists encrypted and ordinary staff can read and archive it', 'project': 'chromium-desktop', 'timeout': 120000}, {'file': 'tests/browser/contact-inquiry.spec.ts', 'title': 'inquiry stays absent for disabled contact', 'project': 'chromium-desktop', 'timeout': 60000}, {'file': 'tests/browser/contact-inquiry.spec.ts', 'title': 'inquiry stays absent for private contact preview', 'project': 'chromium-desktop', 'timeout': 60000}, {'file': 'tests/browser/contact-inquiry.spec.ts', 'title': 'inquiry stays absent for another editorial section', 'project': 'chromium-desktop', 'timeout': 60000}, {'file': 'tests/browser/contact-inquiry.spec.ts', 'title': 'keyboard validation and uncertain retry preserve a private inquiry on desktop and mobile', 'project': 'chromium-desktop', 'timeout': 60000}, {'file': 'tests/browser/contact-inquiry.spec.ts', 'title': 'first definitive website rejection keeps an editable draft and starts a new request', 'project': 'chromium-desktop', 'timeout': 60000}, {'file': 'tests/browser/contact-inquiry.spec.ts', 'title': 'first definitive requestKey rejection keeps an editable draft and starts a new request', 'project': 'chromium-desktop', 'timeout': 60000}, {'file': 'tests/browser/contact-inquiry.spec.ts', 'title': 'hidden rejections after uncertainty retain the exact original body, key and notice token', 'project': 'chromium-desktop', 'timeout': 60000}, {'file': 'tests/browser/contact-inquiry.spec.ts', 'title': 'stale notice keeps the editable draft until an explicit refresh and a new reviewed attempt', 'project': 'chromium-desktop', 'timeout': 60000}, {'file': 'tests/browser/contact-inquiry-persistence.spec.ts', 'title': 'real customer inquiry persists encrypted and ordinary staff can read and archive it', 'project': 'webkit-mobile', 'timeout': 120000}, {'file': 'tests/browser/contact-inquiry.spec.ts', 'title': 'inquiry stays absent for disabled contact', 'project': 'webkit-mobile', 'timeout': 60000}, {'file': 'tests/browser/contact-inquiry.spec.ts', 'title': 'inquiry stays absent for private contact preview', 'project': 'webkit-mobile', 'timeout': 60000}, {'file': 'tests/browser/contact-inquiry.spec.ts', 'title': 'inquiry stays absent for another editorial section', 'project': 'webkit-mobile', 'timeout': 60000}, {'file': 'tests/browser/contact-inquiry.spec.ts', 'title': 'keyboard validation and uncertain retry preserve a private inquiry on desktop and mobile', 'project': 'webkit-mobile', 'timeout': 60000}, {'file': 'tests/browser/contact-inquiry.spec.ts', 'title': 'first definitive website rejection keeps an editable draft and starts a new request', 'project': 'webkit-mobile', 'timeout': 60000}, {'file': 'tests/browser/contact-inquiry.spec.ts', 'title': 'first definitive requestKey rejection keeps an editable draft and starts a new request', 'project': 'webkit-mobile', 'timeout': 60000}, {'file': 'tests/browser/contact-inquiry.spec.ts', 'title': 'hidden rejections after uncertainty retain the exact original body, key and notice token', 'project': 'webkit-mobile', 'timeout': 60000}, {'file': 'tests/browser/contact-inquiry.spec.ts', 'title': 'stale notice keeps the editable draft until an explicit refresh and a new reviewed attempt', 'project': 'webkit-mobile', 'timeout': 60000}]
+        wanted=Counter((item['file'],item['title'],item['project']) for item in expected)
+        if any(count != 1 for count in wanted.values()): raise SystemExit('Duplicate reviewed native identity.')
+        timeouts={(item['file'],item['title'],item['project']):item['timeout'] for item in expected}
+        def cases(report):
+            if Path(report['config']['rootDir']).resolve()!=root/'tests/browser' or report.get('errors'):
+                raise SystemExit('Unexpected ordinary native root/errors.')
+            if report['config'].get('globalTimeout')!=840000 or report['config'].get('workers')!=1:
+                raise SystemExit('Ordinary native suite limits changed.')
+            projects=report['config']['projects']
+            if Counter(project['name'] for project in projects)!=Counter(['chromium-desktop','webkit-mobile']) or any(project['retries']!=0 or project['timeout']!=60000 or project['repeatEach']!=1 for project in projects):
+                raise SystemExit('Ordinary native projects/case limits changed.')
+            found=[]
+            def walk(suite):
+                for spec in suite.get('specs',[]):
+                    file=str((root/'tests/browser'/spec['file']).resolve().relative_to(root))
+                    found.extend(((file,spec['title'],test['projectName']),spec,test) for test in spec['tests'])
+                for child in suite.get('suites',[]):walk(child)
+            for suite in report['suites']:walk(suite)
+            if Counter(key for key,_,_ in found)!=wanted:
+                raise SystemExit('Native discovery/results differ from exact reviewed file/title/project identities.')
+            return found
+        cases(json.loads((directory/'native-discovery.json').read_text()))
+        result=json.loads((directory/'native-results.json').read_text())
+        if any(result['stats'].get(key)!=value for key,value in [('expected',len(expected)),('unexpected',0),('flaky',0),('skipped',0)]):
+            raise SystemExit('Native statistics differ from first-attempt passes.')
+        measured=[]
+        for key,spec,test in cases(result):
+            attempts=test['results']
+            if not spec['ok'] or test['expectedStatus']!='passed' or test['timeout']!=timeouts[key] or len(attempts)!=1 or attempts[0]['status']!='passed' or attempts[0]['retry']!=0 or attempts[0].get('errors') or not math.isfinite(attempts[0]['duration']) or attempts[0]['duration']<0:
+                raise SystemExit('Failed, skipped, retried or incorrectly bounded native identity.')
+            transport=key[0]=='tests/browser/contact-inquiry.spec.ts'
+            attachment_name='unchanged-real-inquiry-and-publication-evidence' if transport else 'real-issued-notice-and-encrypted-five-field-evidence'
+            attachments=[value for value in attempts[0]['attachments'] if value['name']==attachment_name and value['contentType']=='application/json']
+            if len(attachments)!=1:raise SystemExit('Missing exact retained fixture proof attachment.')
+            attachment=attachments[0]
+            if 'body' in attachment:
+                raw=base64.b64decode(attachment['body'],validate=True)
+            else:
+                path=Path(attachment['path']).resolve()
+                if not path.is_relative_to(root/'test-results') or not path.is_file() or path.is_symlink():
+                    raise SystemExit('Unexpected retained fixture attachment path.')
+                raw=path.read_bytes()
+            if not 0 < len(raw) < 32768:raise SystemExit('Unbounded retained fixture attachment.')
+            evidence=json.loads(raw)
+            if transport:
+                flags=['restored','unchangedInquiryGraph','unchangedCommerceCounts','unchangedOriginalRowsAndAudits','expectedSitePublicationAudits']
+                hashes=['inquiryGraphHash','retainedRowsHash']
+                rotations=1 if key[1]=='stale notice keeps the editable draft until an explicit refresh and a new reviewed attempt' else 0
+                if set(evidence)!=set(flags+hashes+['rotations']) or any(evidence[field] is not True for field in flags) or type(evidence['rotations']) is not int or evidence['rotations']!=rotations:
+                    raise SystemExit('Incomplete original-row/audit restoration attachment.')
+            else:
+                hashes=['noticeTokenHash']
+                if set(evidence)!=set(['state','version','exactEncryptedInput','issuedNoticeToken','rawNoticeTokenRetained','audited','noticeTokenHash']) or evidence['state']!='new' or type(evidence['version']) is not int or evidence['version']!=0 or any(evidence[field] is not True for field in ['exactEncryptedInput','issuedNoticeToken','audited']) or evidence['rawNoticeTokenRetained'] is not False:
+                    raise SystemExit('Incomplete actual issued-token/encrypted-five-field attachment.')
+            if any(not isinstance(evidence[field],str) or re.fullmatch('[a-f0-9]{64}',evidence[field]) is None for field in hashes):
+                raise SystemExit('Missing exact hash-only retained fixture evidence.')
+            measured.append({'file':key[0],'title':key[1],'project':key[2],'timeout':test['timeout'],'duration_ms':attempts[0]['duration'],'fixture_sha256':hashlib.sha256(raw).hexdigest(),'fixture':evidence})
+        spec=importlib.util.spec_from_file_location('receipts',root/'scripts/ci/database-receipts.py')
+        r=importlib.util.module_from_spec(spec);spec.loader.exec_module(r)
+        if r.installed_dependencies(root)!=json.loads((directory/'installed-dependencies.json').read_text()):
+            raise SystemExit('Installed backend dependency map changed during genuine native execution.')
+        audit=json.loads((directory/'npm-audit.json').read_text())
+        if audit['metadata']['vulnerabilities']['high'] or audit['metadata']['vulnerabilities']['critical']:
+            raise SystemExit('High/critical client dependency findings.')
+        receipt={'native_cases':len(measured),'all_first_attempt_passed':True,'failed':0,'skipped':0,'flaky':0,'cases':measured,'scope':'Two contact files and both ordinary native projects only; full Foundation remains required.'}
+        (directory/'native-receipt.json').write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n')
+        print(json.dumps(receipt,sort_keys=True))
+        PY
+    - name: Require unchanged tracked source and safe complete raw evidence before upload
+      id: evidence_bookend
+      if: always()
+      run: |
+        set -euo pipefail
+        python3 <<'PY' 2>&1 | tee contact-inquiry-evidence/source-bookend.log
+        from pathlib import Path
+        import hashlib, json, subprocess
+        root = Path.cwd(); directory = root / 'contact-inquiry-evidence'
+        source = json.loads((directory / 'source.json').read_text())
+        files = subprocess.check_output(['git', 'ls-files'], text=True).splitlines()
+        actual = {path: hashlib.sha256((root / path).read_bytes()).hexdigest() for path in files}
+        if len(files) != source['permanent_file_count'] + 1 or actual != source['sha256'] or subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=no'], text=True).strip():
+            raise SystemExit('Verification changed the exact tracked source inventory/bytes.')
+        folders=[directory,root/'test-results',root/'playwright-report']
+        for path in [p for folder in folders for p in folder.rglob('*')]:
+            if path.is_symlink() or (any(part.startswith('.') for part in path.relative_to(root).parts) and path.relative_to(root).as_posix()!='test-results/.last-run.json'):
+                raise SystemExit('Unexpected symlink or hidden raw evidence path; refusing upload.')
+        evidence = {str(path.relative_to(root)): {'bytes': path.stat().st_size, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()} for path in [p for folder in folders for p in folder.rglob('*')] if path.is_file() and path.name not in ['source-bookend.log', 'evidence-digests.json']}
+        (directory / 'evidence-digests.json').write_text(json.dumps({'head': source['head'], 'tree': source['tree'], 'tracked_source_unchanged': True, 'files': evidence}, indent=2, sort_keys=True) + '\n')
+        print(json.dumps({'tracked_source_unchanged': True, 'retained_files': len(evidence)}, sort_keys=True))
+        PY
+        printf 'upload_safe=true\n' >> "$GITHUB_OUTPUT"
+    - name: Retain complete source, runtime, discovery, formatting and raw PHPUnit evidence only after safe bookend
+      if: always() && steps.evidence_bookend.outputs.upload_safe == 'true'
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: contact-inquiry-native-${{ github.run_id }}-${{ github.run_attempt }}
+        path: |-
+          contact-inquiry-evidence/
+          playwright-report/
+          test-results/
+        retention-days: 7
+        if-no-files-found: error
+        overwrite: false
+        include-hidden-files: true
