@@ -1,0 +1,145 @@
+name: Isolated checkout return native feedback
+
+# Informative built UI/native audio only. Full Foundation and device acceptance remain separate.
+on:
+  push:
+    branches: [codex/checkout-return-native-proof-20261001]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: isolated-checkout-return-native-feedback
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  checkout-return-native:
+    if: github.repository == 'VASEYDEV/VASEYAUDIO' && github.ref == 'refs/heads/codex/checkout-return-native-proof-20261001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED: 'false'
+      STRIPE_TEST_CHECKOUT_ENABLED: 'false'
+      STRIPE_TEST_PAYMENT_PROCESSING_ENABLED: 'false'
+      STRIPE_TEST_FINALIZATION_ENABLED: 'false'
+      STRIPE_WEBHOOK_ENABLED: 'false'
+      STRIPE_TEST_SECRET_KEY: ''
+      STRIPE_WEBHOOK_SECRET: ''
+      STRIPE_ACCOUNT_ID: ''
+      VASEY_TEST_CONTRACT_ISSUANCE_ENABLED: 'false'
+      VASEY_TEST_FULFILLMENT_ACTIVATION_ENABLED: 'false'
+      VASEY_TEST_DELIVERY_ACCESS_ENABLED: 'false'
+      MAIL_MAILER: array
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 2
+      - name: Record the exact source and refuse any extra source change
+        run: |
+          set -euo pipefail
+          test "$GITHUB_EVENT_NAME" = push
+          test "$GITHUB_REPOSITORY" = VASEYDEV/VASEYAUDIO
+          test "$GITHUB_REF" = refs/heads/codex/checkout-return-native-proof-20261001
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD^^{tree})" = e0eec79b7e0460de53ecd7e68e3606cf10205d3c
+          git diff --exit-code HEAD --
+          test -z "$(git ls-files --others --exclude-standard)"
+          mkdir checkout-return-native-evidence
+          python <<'PYTHON'
+          import subprocess
+          actual = subprocess.check_output(['git', 'diff', '--no-renames', '--name-status', 'HEAD^', 'HEAD'], text=True).splitlines()
+          if actual != ['A\t.github/workflows/checkout-return-native-proof.yml']:
+              raise SystemExit('Unexpected checkout native proof source delta.')
+          PYTHON
+          {
+            git rev-parse HEAD HEAD^{tree} HEAD^ HEAD^^{tree}
+            sha256sum .github/workflows/checkout-return-native-proof.yml composer.json composer.lock package.json package-lock.json playwright.config.ts tests/browser/run.mjs tests/browser/bootstrap.php tests/browser/storefront-fixture.ts tests/browser/test-checkout.spec.ts resources/js/app.tsx resources/js/Pages/CheckoutReturn.tsx resources/js/Pages/Storefront.tsx resources/js/components/SiteChrome.tsx resources/js/components/PrivatePageHead.tsx resources/js/components/MetadataHead.tsx resources/js/components/PersistentPlayer.tsx resources/js/lib/audio.ts resources/css/app.css public/brand/theme.css public/brand/vasey-audio-logo.png
+          } 2>&1 | tee checkout-return-native-evidence/source.log
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          coverage: none
+          tools: composer:v2
+      - name: Install locked backend dependencies
+        run: |
+          set -euo pipefail
+          composer install --no-interaction --prefer-dist 2>&1 | tee checkout-return-native-evidence/composer-install.log
+      - name: Install locked frontend dependencies
+        run: |
+          set -euo pipefail
+          npm ci 2>&1 | tee checkout-return-native-evidence/npm-install.log
+      - name: Record the actual supported runtime
+        run: |
+          set -euo pipefail
+          {
+            php --version
+            node --version
+            npm --version
+            node node_modules/@playwright/test/cli.js --version
+          } 2>&1 | tee checkout-return-native-evidence/runtime.log
+      - name: Prove the fixed six-case browser selection
+        run: |
+          set -euo pipefail
+          VASEY_BROWSER_DIRECTORY=/tmp/checkout-native-list node node_modules/@playwright/test/cli.js test tests/browser/test-checkout.spec.ts --list --reporter=json > checkout-return-native-evidence/discovery.json
+          python <<'PYTHON' 2>&1 | tee checkout-return-native-evidence/discovery-check.log
+          import json
+          from pathlib import Path
+          report = json.loads(Path('checkout-return-native-evidence/discovery.json').read_text())
+          if report.get('errors', []):
+              raise SystemExit('Browser discovery reported errors.')
+          names = {
+              'a return URL cannot confirm payment and an interrupted pending checkout recovers explicitly',
+              'contract progress stays read-only and never offers another payment or an unavailable download',
+              'private checkout chrome preserves one native preview through keyboard navigation and mobile reflow',
+          }
+          observed = []
+          def collect(suite):
+              for spec in suite.get('specs', []):
+                  if spec.get('file') != 'test-checkout.spec.ts':
+                      raise SystemExit('Unexpected browser file selected.')
+                  for case in spec.get('tests', []):
+                      observed.append((spec['title'], case['projectName']))
+              for child in suite.get('suites', []):
+                  collect(child)
+          for suite in report.get('suites', []):
+              collect(suite)
+          expected = {(name, project) for name in names for project in ('chromium-desktop', 'webkit-mobile')}
+          if len(observed) != 6 or len(set(observed)) != 6 or set(observed) != expected:
+              raise SystemExit('Incomplete or unexpected native checkout case selection.')
+          print('Exactly six distinct checkout cases: three identities on each approved browser project.')
+          PYTHON
+      - name: Typecheck and build the unchanged application dependencies
+        run: |
+          set -euo pipefail
+          npm run build 2>&1 | tee checkout-return-native-evidence/build.log
+      - name: Install the actual native browser engines
+        run: |
+          set -euo pipefail
+          node node_modules/@playwright/test/cli.js install --with-deps chromium webkit 2>&1 | tee checkout-return-native-evidence/browser-install.log
+      - name: Execute all six cases through the disposable browser wrapper
+        run: |
+          set -euo pipefail
+          PLAYWRIGHT_JUNIT_OUTPUT_FILE="$GITHUB_WORKSPACE/checkout-return-native-evidence/browser-results.xml" node tests/browser/run.mjs tests/browser/test-checkout.spec.ts --reporter=list,html,junit 2>&1 | tee checkout-return-native-evidence/browser.log
+      - name: Retain complete informative native evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: checkout-return-native-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            checkout-return-native-evidence/
+            playwright-report/
+            test-results/
+          retention-days: 7
+          if-no-files-found: error
+          overwrite: false
