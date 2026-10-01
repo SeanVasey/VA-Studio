@@ -104,7 +104,6 @@ test('public preview iframe has native controls, no autoplay and a keyboard-acce
   await expect.poll(() => audio.evaluate(element => (element as HTMLAudioElement).paused)).toBe(false);
   await expect.poll(() => audio.evaluate(element => (element as HTMLAudioElement).currentTime)).toBeGreaterThan(0);
   expect(await audio.evaluate(element => element.ownerDocument.documentElement.scrollWidth <= element.ownerDocument.documentElement.clientWidth)).toBe(true);
-  await page.screenshot({ path: testInfo.outputPath('public-preview-embed.png'), fullPage: true });
   await toggleNativePlayback();
   await expect.poll(() => audio.evaluate(element => (element as HTMLAudioElement).paused)).toBe(true);
   const store = frame.getByRole('link', { name: 'Open track on VASEY.AUDIO (new tab)' });
@@ -115,7 +114,10 @@ test('public preview iframe has native controls, no autoplay and a keyboard-acce
   const popup = await opened;
   await expect(popup).toHaveURL('http://127.0.0.1:8173/tracks/synthetic-browser-track');
   expect(await popup.evaluate(() => window.opener)).toBeNull();
-  expect(await frame.locator('body').evaluate(element =>
-    (element.ownerDocument.defaultView as unknown as Window & { __embedCspViolations: string[] }).__embedCspViolations)).toEqual([]);
-  await testInfo.attach('embed-font-evidence', { contentType: 'application/json', body: Buffer.from(JSON.stringify({ loadedFonts, fonts })) });
+  const cspViolations = await frame.locator('body').evaluate(element =>
+    (element.ownerDocument.defaultView as unknown as Window & { __embedCspViolations: string[] }).__embedCspViolations);
+  expect(cspViolations).toEqual([]);
+  await testInfo.attach('embed-font-evidence', { contentType: 'application/json', body: Buffer.from(JSON.stringify({ loadedFonts, fonts, cspViolations })) });
+  // Capture after all journey assertions so Playwright's injected screenshot style is not attributed to the app.
+  await page.screenshot({ path: testInfo.outputPath('public-preview-embed.png'), fullPage: true });
 });

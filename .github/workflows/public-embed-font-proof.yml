@@ -37,7 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          fetch-depth: 3
+          fetch-depth: 4
           persist-credentials: false
       - name: Require the exact reviewed seven-file source and record its manifest
         run: |
@@ -46,13 +46,16 @@ jobs:
           from pathlib import Path
           import hashlib, json, subprocess
           git = lambda *args: subprocess.check_output(['git', *args], text=True).strip()
-          parent = '4a1829eac450a82b63a8e3187b5224667554eb3f'
+          parent = 'eabe5747ff53b3e779bf96110dc8d717f5bed2cf'
+          intermediate = '4a1829eac450a82b63a8e3187b5224667554eb3f'
           baseline = '45050eb8f6a229ec6a115eeb584e3b2d08c5e161'
           if git('rev-parse', 'HEAD^') != parent:
               raise SystemExit('Unexpected runtime parent.')
-          if git('rev-parse', 'HEAD^^{tree}') != 'eea7c4659c298ed90cb83d3837ff52d2077d0d14':
+          if git('rev-parse', 'HEAD^^{tree}') != '07d4c1f885dc9b2f3dad4583196e259005c3ef67':
               raise SystemExit('Unexpected parent tree.')
-          if git('rev-parse', 'HEAD^^') != baseline or git('rev-parse', 'HEAD^^^{tree}') != '1c4a61767267d693b58a879e4d93a42d891ceed1':
+          if git('rev-parse', 'HEAD^^') != intermediate or git('rev-parse', 'HEAD^^^{tree}') != 'eea7c4659c298ed90cb83d3837ff52d2077d0d14':
+              raise SystemExit('Unexpected intermediate ancestry.')
+          if git('rev-parse', 'HEAD^^^') != baseline or git('rev-parse', 'HEAD^^^^{tree}') != '1c4a61767267d693b58a879e4d93a42d891ceed1':
               raise SystemExit('Unexpected source baseline ancestry.')
           expected = {
               'app/Http/Responses/PublicTrackEmbedResponse.php': 'ba06e248cf7c522733836d4be1ee147d5ebb9cf42d8d9b2181ffd0140ec5bd63',
@@ -60,7 +63,7 @@ jobs:
               'resources/css/fonts.css': 'e6cce4c4965503ef190f5b571ebe8f339487118671bbd2aa610e621d4880a2dd',
               'resources/views/public-track-embed.blade.php': 'aab0f06a7f61aaa20949967cc9c18aadcf75f93381805597a5fe49f95fda0e93',
               'tests/Feature/PublicTrackEmbedTest.php': 'f5b88ab9d23fcb9ba56075fee1dd6c987dbf54bca880ff791f8feb966d4dbde4',
-              'tests/browser/public-track-embed.spec.ts': '3e35033e65f3897d733f43da18e20a4631b8116877deede006c792536dd688bb',
+              'tests/browser/public-track-embed.spec.ts': '139cedb96ba52392f39ccfff2af49515f1622f60c69fe2f681f732e8335e06d4',
               'vite.config.ts': '154164dd3f8c4ad31f9ba45d1a91e8b513954d9371c79bdb62c88adb82bc187e',
           }
           wanted = {path: 'A' if path == 'resources/css/fonts.css' else 'M' for path in expected}
@@ -74,9 +77,10 @@ jobs:
           files = git('ls-files').splitlines()
           manifest = {'head': git('rev-parse', 'HEAD'), 'tree': git('rev-parse', 'HEAD^{tree}'),
               'parent': parent, 'parent_tree': git('rev-parse', 'HEAD^^{tree}'),
-              'baseline': baseline, 'baseline_tree': git('rev-parse', 'HEAD^^^{tree}'),
-              'reviewed_source': '06c459da17c84fb95808d1e6be328ed868af542a',
-              'reviewed_tree': '89e0964ce84da3a0b5ada6f399af5e9fb3b2a65d', 'source_delta': actual,
+              'intermediate': intermediate, 'intermediate_tree': git('rev-parse', 'HEAD^^^{tree}'),
+              'baseline': baseline, 'baseline_tree': git('rev-parse', 'HEAD^^^^{tree}'),
+              'reviewed_source': '543113552eda465f3e45a70bac8ff9342d3d037b',
+              'reviewed_tree': 'd1bcbb52f4b508e6436b63bab7634a2be57614cb', 'source_delta': actual,
               'sha256': {path: hashlib.sha256(Path(path).read_bytes()).hexdigest() for path in files},
               'scope': 'Narrow embed/font proof only; complete Foundation acceptance remains required.'}
           Path('embed-font-evidence/source.json').write_text(json.dumps(manifest, indent=2, sort_keys=True) + '\n')
@@ -230,6 +234,8 @@ jobs:
                   if not path.is_relative_to(root / 'test-results'): raise SystemExit('Unexpected attachment path.')
                   body = path.read_bytes()
               fonts = json.loads(body)
+              if fonts['cspViolations'] != []:
+                  raise SystemExit('The application journey must retain an exact empty CSP violation receipt.')
               if Counter(font['family'] for font in fonts['loadedFonts']) != Counter(families) or len(fonts['fonts']) != 4:
                   raise SystemExit('All four real font families/network responses are required.')
               for prefix in ['reddit-sans-latin-wght-normal-', 'noto-sans-display-latin-standard-normal-', 'jetbrains-mono-latin-wght-normal-', 'bebas-neue-latin-400-normal-']:
