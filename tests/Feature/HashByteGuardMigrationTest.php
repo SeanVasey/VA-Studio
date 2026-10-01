@@ -56,9 +56,11 @@ class HashByteGuardMigrationTest extends TestCase
     public function test_direct_image_inserts_reject_nul_suffixes_and_multibyte_lengths_and_preserve_mysql_text_coercion(): void
     {
         $uploader = User::factory()->create()->id;
-        foreach ([str_repeat('a', 64)."\0suffix", str_repeat('a', 64)."\n", str_repeat('é', 64), str_repeat('a', 63)] as $hash) {
-            $this->rejected(fn () => DB::table('site_images')->insert($this->image($uploader, ['source_sha256' => $hash])));
+        foreach ($this->malformedHashes() as $case => $hash) {
+            $this->rejected(fn () => DB::table('site_images')->insert($this->image($uploader, ['source_sha256' => $hash])), 'site_images.source_sha256: '.$case);
         }
+        $this->whitespaceWrites('site_images', 'source_sha256', str_repeat('a', 64),
+            fn ($hash) => DB::table('site_images')->insertGetId($this->image($uploader, ['source_sha256' => $hash])));
         $binary = DB::raw("CAST('".str_repeat('a', 64)."' AS ".(DB::getDriverName() === 'sqlite' ? 'BLOB' : 'BINARY').')');
         if (DB::getDriverName() === 'sqlite') {
             $this->rejected(fn () => DB::table('site_images')->insert($this->image($uploader, ['source_sha256' => $binary])));
@@ -80,17 +82,21 @@ class HashByteGuardMigrationTest extends TestCase
         $variant = ['site_image_id' => $id, 'format' => 'jpeg', 'width' => 1200, 'height' => 630,
             'storage_path' => 'site-images/revisions/'.Str::uuid().'/share.jpg', 'sha256' => str_repeat('b', 64),
             'size_bytes' => 10, 'created_at' => now()];
-        foreach ($this->malformedHashes() as $hash) {
-            $this->rejected(fn () => DB::table('site_image_variants')->insert([...$variant, 'sha256' => $hash]));
+        foreach ($this->malformedHashes() as $case => $hash) {
+            $this->rejected(fn () => DB::table('site_image_variants')->insert([...$variant, 'sha256' => $hash]), 'site_image_variants.sha256: '.$case);
         }
+        $this->whitespaceWrites('site_image_variants', 'sha256', $variant['sha256'],
+            fn ($hash) => DB::table('site_image_variants')->insertGetId([...$variant, 'sha256' => $hash]));
         DB::table('site_image_variants')->insert($variant);
         $ready = ['status' => 'ready', 'claim_token' => null, 'claimed_until' => null, 'failure_code' => null,
             'manifest_sha256' => str_repeat('c', 64), 'profile_fingerprint' => str_repeat('d', 64),
             'profile_version' => 'synthetic-schema-test', 'processed_at' => now(), 'evidence' => '{}'];
         foreach (['manifest_sha256', 'profile_fingerprint'] as $column) {
-            foreach ($this->malformedHashes() as $hash) {
-                $this->rejected(fn () => DB::table('site_images')->where('id', $id)->update([...$ready, $column => $hash]));
+            foreach ($this->malformedHashes() as $case => $hash) {
+                $this->rejected(fn () => DB::table('site_images')->where('id', $id)->update([...$ready, $column => $hash]), 'site_images.'.$column.': '.$case);
             }
+            $this->whitespaceWrites('site_images', $column, $ready[$column],
+                fn ($hash) => tap($id, fn () => DB::table('site_images')->where('id', $id)->update([...$ready, $column => $hash])));
             $this->assertSame('processing', DB::table('site_images')->where('id', $id)->value('status'));
         }
         DB::table('site_images')->where('id', $id)->update($ready);
@@ -122,18 +128,24 @@ class HashByteGuardMigrationTest extends TestCase
             'evidence_ciphertext' => 'synthetic schema evidence', 'evidence_hash' => hash('sha256', 'synthetic schema evidence'),
             'canonicalization_version' => 'vasey-json-v1'];
         foreach (['token_hash', 'idempotency_key_hash', 'request_hash', 'evidence_hash'] as $column) {
-            foreach ($this->malformedHashes() as $hash) {
-                $this->rejected(fn () => DB::table('test_delivery_authorizations')->insert([...$attributes, $column => $hash]));
+            foreach ($this->malformedHashes(true) as $case => $hash) {
+                $this->rejected(fn () => DB::table('test_delivery_authorizations')->insert([...$attributes, $column => $hash]), 'test_delivery_authorizations.'.$column.': '.$case);
             }
+            $this->whitespaceWrites('test_delivery_authorizations', $column, $attributes[$column],
+                fn ($hash) => DB::table('test_delivery_authorizations')->insertGetId([...$attributes, $column => $hash]));
+            $this->assertSame($before, DeliveryFixtures::retained(), 'Authorization probes must not change historical evidence.');
         }
         $authorization = DB::table('test_delivery_authorizations')->insertGetId($attributes);
         $redemption = ['public_id' => (string) Str::uuid(), 'test_delivery_authorization_id' => $authorization,
             'control_version' => $control->control_version, 'content_hash' => $contract->pdf_hash, 'size_bytes' => $contract->size_bytes,
             'evidence_ciphertext' => 'synthetic schema evidence', 'evidence_hash' => hash('sha256', 'synthetic schema evidence'),
             'canonicalization_version' => 'vasey-json-v1', 'redeemed_at' => now()];
-        foreach ($this->malformedHashes() as $hash) {
-            $this->rejected(fn () => DB::table('test_delivery_redemptions')->insert([...$redemption, 'evidence_hash' => $hash]));
+        foreach ($this->malformedHashes(true) as $case => $hash) {
+            $this->rejected(fn () => DB::table('test_delivery_redemptions')->insert([...$redemption, 'evidence_hash' => $hash]), 'test_delivery_redemptions.evidence_hash: '.$case);
         }
+        $this->whitespaceWrites('test_delivery_redemptions', 'evidence_hash', $redemption['evidence_hash'],
+            fn ($hash) => DB::table('test_delivery_redemptions')->insertGetId([...$redemption, 'evidence_hash' => $hash]));
+        $this->assertSame($before, DeliveryFixtures::retained(), 'Redemption probes must not change historical evidence.');
         DB::table('test_delivery_redemptions')->insert($redemption);
         $this->assertSame($before, DeliveryFixtures::retained());
         $migration->down();
@@ -219,12 +231,40 @@ class HashByteGuardMigrationTest extends TestCase
             'created_at' => now(), 'updated_at' => now()];
     }
 
-    private function malformedHashes(): array
+    private function malformedHashes(bool $hexadecimal = false): array
     {
-        $values = [str_repeat('a', 64)."\0suffix", str_repeat('a', 64)."\n", str_repeat('é', 64)];
-        if (DB::getDriverName() === 'sqlite') { $values[] = DB::raw("CAST('".str_repeat('a', 64)."' AS BLOB)"); }
+        $values = ['NUL suffix' => str_repeat('a', 64)."\0suffix", 'NUL terminator' => str_repeat('a', 64)."\0",
+            'ordinary overflow' => str_repeat('a', 65), 'multibyte' => str_repeat('é', 64), 'short' => str_repeat('a', 63)];
+        if ($hexadecimal) {
+            $values += ['embedded NUL' => str_repeat('a', 31)."\0".str_repeat('a', 32),
+                'uppercase' => str_repeat('A', 64), 'nonhex' => str_repeat('g', 64)];
+        }
+        if (DB::getDriverName() === 'sqlite') { $values['BLOB'] = DB::raw("CAST('".str_repeat('a', 64)."' AS BLOB)"); }
 
         return $values;
+    }
+
+    /** The invariant is stored bytes: MySQL converts excess whitespace before BEFORE triggers. */
+    private function whitespaceWrites(string $table, string $column, string $expected, callable $write): void
+    {
+        $retained = fn (): array => DB::table($table)->orderBy('id')->get()->map(fn ($row) => (array) $row)->all();
+        foreach (['newline suffix' => "\n", 'CRLF suffix' => "\r\n", 'space suffix' => ' '] as $case => $suffix) {
+            $before = $retained(); $label = $table.'.'.$column.': '.$case;
+            DB::beginTransaction();
+            try {
+                if (DB::getDriverName() === 'sqlite') {
+                    $this->rejected(fn () => $write($expected.$suffix), $label);
+                } else {
+                    $id = $write($expected.$suffix);
+                    $stored = DB::selectOne("SELECT {$column} AS value, HEX({$column}) AS bytes_hex, OCTET_LENGTH({$column}) AS byte_length FROM {$table} WHERE id = ?", [$id]);
+                    $this->assertNotNull($stored, $label);
+                    $this->assertSame($expected, $stored->value, $label.' must retain only the exact valid prefix.');
+                    $this->assertSame(strtoupper(bin2hex($expected)), $stored->bytes_hex, $label.' stored HEX');
+                    $this->assertSame(64, (int) $stored->byte_length, $label.' stored byte count');
+                }
+            } finally { DB::rollBack(); }
+            $this->assertSame($before, $retained(), $label.' rollback must preserve every existing row.');
+        }
     }
 
     private function triggers(): array
@@ -238,9 +278,9 @@ class HashByteGuardMigrationTest extends TestCase
         return $names;
     }
 
-    private function rejected(callable $operation): void
+    private function rejected(callable $operation, string $case = 'immutable evidence'): void
     {
-        try { $operation(); $this->fail('Malformed or immutable evidence was accepted.'); }
+        try { $operation(); $this->fail('Malformed or immutable evidence was accepted: '.$case); }
         catch (QueryException) { $this->addToAssertionCount(1); }
     }
 }

@@ -27,6 +27,12 @@ const env = {
   // No malware scanner, as in CI. A scanner installed on the host would otherwise run inside synchronous uploads.
   MEDIA_CLAMSCAN: join(directory, 'no-clamscan'),
   VASEY_BROWSER_DIRECTORY: directory, VASEY_BROWSER_PASSWORD: `Browser-${randomBytes(24).toString('hex')}`,
+  // Synthetic inquiry setup belongs exclusively to this disposable loopback installation.
+  CONTACT_INQUIRIES_ENABLED: 'true',
+  CONTACT_INQUIRIES_PRIVACY_NOTICE: 'Synthetic browser privacy notice. Inquiries are saved privately for verification.',
+  CONTACT_INQUIRIES_RETENTION_REFERENCE: 'SYNTHETIC-BROWSER-ONLY',
+  CONTACT_INQUIRIES_OPERATOR_ID: '1',
+  VASEY_BROWSER_INQUIRY_MARKER: randomBytes(32).toString('hex'),
 };
 try {
   for (const child of ['framework/views', 'framework/sessions', 'framework/cache/data', 'logs', 'app/private']) {
@@ -35,6 +41,10 @@ try {
   writeFileSync(env.DB_DATABASE, '', { mode: 0o600, flag: 'wx' });
   const setup = spawnSync('php', ['tests/browser/bootstrap.php'], { cwd: root, env, stdio: 'inherit', timeout: 60000 });
   if (setup.error || setup.status !== 0) throw new Error('Isolated browser fixture setup failed.');
+  writeFileSync(join(directory, 'inquiry-fixture-marker.json'), JSON.stringify({
+    marker: env.VASEY_BROWSER_INQUIRY_MARKER, database: env.DB_DATABASE,
+    origin: env.APP_URL, operatorId: 1,
+  }), { mode: 0o600, flag: 'wx' });
   const result = spawnSync(process.execPath, ['node_modules/@playwright/test/cli.js', 'test', ...process.argv.slice(2)], {
     cwd: root, env, stdio: 'inherit', timeout: 600000,
   });

@@ -38,3 +38,7 @@ Inventory UUID guards and retained-row exceptions, reproduce direct insert/updat
 ## Remaining acceptance
 
 No local MySQL server was available. qpdf was absent; the selected suites did not require it. Full candidate MySQL/SQLite/frontend/browser/audit gates and actual-head independent review remain required. MySQL must prove trigger DDL/retry/definition matching, text coercion, retained-data preflight, direct byte rejection and real commerce/concurrency behavior. Record exact tested commit/tree, run URL and per-engine results in the PR; local SQLite evidence does not substitute for that proof.
+
+## MySQL raw input and stored-byte verification
+
+The initial PR #88 MySQL run exposed an incorrect newline-input rejection expectation. A [pinned disposable diagnostic](mysql-byte-guard-diagnosis.md) verified that MySQL converts excess newline/CRLF/space bytes before triggers and retains an exact valid-width value. NUL tails and ordinary overflow are rejected. The corrected regression retains each input case and asserts exact persisted bytes plus rollback/history preservation where MySQL normalizes; raw predicates and malformed retained-byte rejection remain required. Neither migration nor historical evidence was changed. The diagnostic is separate from the final required acceptance run.

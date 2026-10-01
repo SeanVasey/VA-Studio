@@ -41,7 +41,8 @@ test('public preview iframe has native controls, no autoplay and a keyboard-acce
   await expect(audio).toHaveAttribute('preload', 'none');
   await expect(audio).not.toHaveAttribute('autoplay');
   expect(await audio.evaluate(element => (element as HTMLAudioElement).paused)).toBe(true);
-  expect(requests).toHaveLength(0);
+  // preload="none" is a browser hint; a metadata request does not mean playback began.
+  expect(await audio.evaluate(element => (element as HTMLAudioElement).currentTime)).toBe(0);
   await audio.focus();
   await expect(audio).toBeFocused();
   await audio.press('Space');

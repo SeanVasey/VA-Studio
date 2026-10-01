@@ -1,0 +1,122 @@
+import { execFileSync } from 'node:child_process';
+import { expect, test, type BrowserContext, type Page } from '@playwright/test';
+import { resetBrowserLoginRateLimit } from './auth-fixture';
+
+type Fixture = { previewPath: string; privacyNotice: string; values: { name: string; email: string; subject: string; message: string; website: string } };
+
+function fixtureOperation(mode: 'prepare' | 'verify' | 'restore', project: string, receipt?: string, state?: string) {
+  return JSON.parse(execFileSync('php', ['tests/browser/prepare-contact-inquiry.php', mode, project, ...(receipt ? [receipt, state!] : [])], {
+    cwd: process.cwd(), env: process.env, encoding: 'utf8', timeout: 30_000, stdio: 'pipe',
+  }));
+}
+
+async function confirm(page: Page, label: 'Mark read' | 'Archive') {
+  await page.getByRole('button', { name: label, exact: true }).click();
+  const persisted = page.waitForResponse(response => {
+    if (response.request().method() !== 'POST' || ! new URL(response.url()).pathname.endsWith('/update')) return false;
+    try {
+      const body = JSON.parse(response.request().postData()!) as { components?: { calls?: { method?: string }[] }[] };
+      return body.components?.some(component => component.calls?.some(call => call.method === 'callMountedAction')) ?? false;
+    } catch { return false; }
+  });
+  await page.getByRole('alertdialog', { name: label, exact: true }).getByRole('button', { name: 'Confirm', exact: true }).click();
+  expect((await persisted).status()).toBe(200);
+  await expect(page.getByRole('alertdialog', { name: label, exact: true })).not.toBeVisible();
+}
+
+test('real customer inquiry persists encrypted and ordinary staff can read and archive it', async ({ page, browser }, testInfo) => {
+  test.setTimeout(120_000);
+  resetBrowserLoginRateLimit();
+  const fixture: Fixture = fixtureOperation('prepare', testInfo.project.name);
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  let staff: BrowserContext | undefined;
+  try {
+    staff = await browser.newContext({ ...testInfo.project.use, baseURL: 'http://127.0.0.1:8173' });
+    await page.goto('/contact');
+    await expect(page.getByRole('heading', { name: `SYNTHETIC INQUIRY ${testInfo.project.name} CONTACT`, exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Open email/ })).toHaveAttribute('href', 'mailto:editorial%2Bsynthetic%40example.test');
+    await expect(page.getByText(fixture.privacyNotice, { exact: true })).toBeVisible();
+    for (const label of ['Name', 'Email', 'Subject', 'Message'] as const) {
+      await page.getByLabel(new RegExp(`^${label}`)).fill(fixture.values[label.toLowerCase() as keyof Fixture['values']]);
+    }
+    const csrf = await page.locator('meta[name="csrf-token"]').getAttribute('content');
+    expect(csrf).toBeTruthy();
+    const submission = page.waitForResponse(response => response.url().endsWith('/contact/inquiries') && response.request().method() === 'POST');
+    await page.getByRole('button', { name: 'Send inquiry', exact: true }).click();
+    const saved = await submission;
+    expect(saved.status()).toBe(201);
+    expect(saved.headers()['cache-control']).toContain('no-store');
+    expect(saved.request().headers()['x-csrf-token']).toBe(csrf);
+    const body = saved.request().postData()!;
+    expect(JSON.parse(body)).toEqual({ ...fixture.values, requestKey: expect.stringMatching(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/) });
+    const savedBody = await saved.json();
+    const { receipt } = savedBody;
+    expect(receipt).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+    expect(savedBody).toEqual({ state: 'saved', receipt });
+    await expect(page.getByRole('heading', { name: 'Inquiry saved', exact: true })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Contact inquiry', exact: true }).getByRole('status')).toBeFocused();
+    await expect(page.getByText(receipt, { exact: true })).toBeVisible();
+    fixtureOperation('verify', testInfo.project.name, receipt, 'new');
+    // A real same-session HTTP replay must retain one receipt and one received audit.
+    const replay = await page.request.post('/contact/inquiries', { data: body, headers: {
+      'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-TOKEN': csrf!, Origin: 'http://127.0.0.1:8173',
+    } });
+    expect(replay.status()).toBe(200);
+    expect(await replay.json()).toEqual({ state: 'saved', receipt });
+    fixtureOperation('verify', testInfo.project.name, receipt, 'new');
+    const stored = await page.evaluate(() => [...Object.values(localStorage), ...Object.values(sessionStorage)].join('\n'));
+    for (const value of Object.values(fixture.values).filter(Boolean)) expect(stored).not.toContain(value);
+    await page.screenshot({ path: testInfo.outputPath('real-inquiry-customer-receipt.png'), fullPage: true });
+    const denied = await page.request.get(`/admin/customer-inquiries/${receipt}`, { maxRedirects: 0 });
+    expect(denied.status()).toBe(302);
+    expect(denied.headers()['cache-control']).toContain('no-store');
+    expect(await denied.text()).not.toContain(fixture.values.email);
+
+    const operator = await staff.newPage();
+    operator.on('pageerror', error => errors.push(error.message));
+    await operator.goto('/admin/login');
+    await operator.getByLabel('Email address', { exact: false }).fill('browser-operator@example.test');
+    await operator.getByLabel('Password', { exact: false }).and(operator.locator('input[type="password"]')).fill(process.env.VASEY_BROWSER_PASSWORD!);
+    await operator.getByRole('button', { name: 'Sign in', exact: true }).click();
+    await expect(operator).toHaveURL(/\/admin$/);
+    const inbox = await operator.goto('/admin/customer-inquiries');
+    expect(inbox?.status()).toBe(200);
+    expect(inbox?.headers()['cache-control']).toContain('no-store');
+    await expect(operator.getByText(fixture.values.subject, { exact: true })).toBeVisible();
+    await operator.getByRole('row').filter({ hasText: receipt }).getByRole('link', { name: 'View', exact: true }).click();
+    await expect(operator).toHaveURL(new RegExp(`/admin/customer-inquiries/${receipt}$`));
+    await expect(operator.getByText(fixture.values.email, { exact: true })).toBeVisible();
+    await expect(operator.getByText(fixture.values.message, { exact: true })).toBeVisible();
+    await confirm(operator, 'Mark read');
+    await expect(operator.getByRole('button', { name: 'Mark read', exact: true })).toHaveCount(0);
+    await expect(operator.getByText('read', { exact: true })).toBeVisible();
+    fixtureOperation('verify', testInfo.project.name, receipt, 'read');
+    await confirm(operator, 'Archive');
+    await expect(operator.getByRole('button', { name: 'Archive', exact: true })).toHaveCount(0);
+    await expect(operator.getByText('archived', { exact: true })).toBeVisible();
+    fixtureOperation('verify', testInfo.project.name, receipt, 'archived');
+    await operator.reload();
+    await expect(operator.getByText('archived', { exact: true })).toBeVisible();
+    await expect(operator.getByText(fixture.values.message, { exact: true })).toBeVisible();
+    await expect(operator.getByRole('button', { name: 'Archive', exact: true })).toHaveCount(0);
+    fixtureOperation('verify', testInfo.project.name, receipt, 'archived');
+    await operator.screenshot({ path: testInfo.outputPath('real-inquiry-operator-archived.png'), fullPage: true });
+    await operator.goto('/admin/customer-inquiries');
+    await expect(operator.getByText(receipt, { exact: true })).toHaveCount(0);
+    const preview = await operator.goto(fixture.previewPath);
+    expect(preview?.status()).toBe(200);
+    expect(preview?.headers()['cache-control']).toContain('no-store');
+    await expect(operator.getByRole('heading', { name: /PRIVATE SYNTHETIC INQUIRY .* CONTACT/ })).toBeVisible();
+    await expect(operator.getByRole('button', { name: 'Send inquiry', exact: true })).toHaveCount(0);
+    await expect(operator.getByRole('region', { name: 'Contact inquiry', exact: true })).toHaveCount(0);
+    await expect(operator.getByText(fixture.privacyNotice, { exact: true })).toHaveCount(0);
+    const previewText = await operator.locator('body').innerText();
+    for (const value of Object.values(fixture.values).filter(Boolean)) expect(previewText).not.toContain(value);
+    await operator.screenshot({ path: testInfo.outputPath('real-inquiry-private-preview-disabled.png'), fullPage: true });
+    expect(errors).toEqual([]);
+  } finally {
+    // Restore even when closing the independently authenticated browser context fails.
+    try { await staff?.close(); } finally { fixtureOperation('restore', testInfo.project.name); }
+  }
+});

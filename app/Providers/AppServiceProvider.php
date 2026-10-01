@@ -33,6 +33,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Route files are not executed when a cached route collection is loaded.
+        // Keep these IP-only named budgets available on every application boot.
+        RateLimiter::for('public-track-embed', fn (Request $request) => Limit::perMinute(120)->by($request->ip()));
+        RateLimiter::for('public-track-embed-audio', fn (Request $request) => Limit::perMinute(240)->by($request->ip()));
         RateLimiter::for('customer-inquiries', function (Request $request): array {
             $key = hash_hmac('sha256', (string) $request->ip(), (string) config('app.key'));
 

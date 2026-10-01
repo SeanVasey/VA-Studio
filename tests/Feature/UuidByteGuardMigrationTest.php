@@ -62,9 +62,11 @@ class UuidByteGuardMigrationTest extends TestCase
         $fixture = ContractFixtures::paid($this->gateway());
         $attributes = $this->request($fixture);
         foreach (['public_id', 'document_public_id'] as $column) {
-            foreach ($this->malformedUuids() as $uuid) {
-                $this->rejected(fn () => DB::table('contract_render_requests')->insert([...$attributes, $column => $uuid]));
+            foreach ($this->malformedUuids(true) as $case => $uuid) {
+                $this->rejected(fn () => DB::table('contract_render_requests')->insert([...$attributes, $column => $uuid]), $case);
             }
+            $this->whitespaceWrites('contract_render_requests', $column, self::UUID,
+                fn (string $uuid): int => DB::table('contract_render_requests')->insertGetId([...$attributes, $column => $uuid]));
         }
         $request = DB::table('contract_render_requests')->insertGetId($attributes);
         $work = DB::table('contract_render_work')->insertGetId(['contract_render_request_id' => $request,
@@ -73,9 +75,11 @@ class UuidByteGuardMigrationTest extends TestCase
         $this->assertNull(DB::table('contract_render_work')->where('id', $work)->value('claim_token'));
         $claim = ['state' => 'processing', 'attempts' => 1, 'claim_token' => self::UUID,
             'lease_expires_at' => now()->addSeconds(300), 'next_attempt_at' => null, 'reason' => null, 'updated_at' => now()];
-        foreach ($this->malformedUuids() as $uuid) {
-            $this->rejected(fn () => DB::table('contract_render_work')->where('id', $work)->update([...$claim, 'claim_token' => $uuid]));
+        foreach ($this->malformedUuids(true) as $case => $uuid) {
+            $this->rejected(fn () => DB::table('contract_render_work')->where('id', $work)->update([...$claim, 'claim_token' => $uuid]), $case);
         }
+        $this->whitespaceWrites('contract_render_work', 'claim_token', self::UUID,
+            fn (string $uuid): int => tap($work, fn () => DB::table('contract_render_work')->where('id', $work)->update([...$claim, 'claim_token' => $uuid])));
         DB::table('contract_render_work')->where('id', $work)->update($claim);
         $this->migration()->up();
         $this->assertSame(self::UUID, DB::table('contract_render_work')->where('id', $work)->value('claim_token'));
@@ -90,9 +94,11 @@ class UuidByteGuardMigrationTest extends TestCase
         $work = $this->receiptWork();
         $this->assertNull(DB::table('stripe_receipt_work')->where('id', $work)->value('claim_token'));
         $claim = ['state' => 'processing', 'attempts' => 1, 'claim_token' => str_repeat('g', 36), 'lease_expires_at' => now()->addMinute()];
-        foreach ($this->malformedUuids() as $uuid) {
-            $this->rejected(fn () => DB::table('stripe_receipt_work')->where('id', $work)->update([...$claim, 'claim_token' => $uuid]));
+        foreach ($this->malformedUuids() as $case => $uuid) {
+            $this->rejected(fn () => DB::table('stripe_receipt_work')->where('id', $work)->update([...$claim, 'claim_token' => $uuid]), $case);
         }
+        $this->whitespaceWrites('stripe_receipt_work', 'claim_token', self::UUID,
+            fn (string $uuid): int => tap($work, fn () => DB::table('stripe_receipt_work')->where('id', $work)->update([...$claim, 'claim_token' => $uuid])));
         DB::table('stripe_receipt_work')->where('id', $work)->update($claim);
         $this->migration()->up();
         $this->assertSame(str_repeat('g', 36), DB::table('stripe_receipt_work')->where('id', $work)->value('claim_token'));
@@ -114,10 +120,14 @@ class UuidByteGuardMigrationTest extends TestCase
         $migration->up(); $migration->up();
         $this->assertSame($before, DeliveryFixtures::retained());
         $this->assertSame($control, (array) DB::table('test_delivery_controls')->where('id', $control['id'])->sole());
-        foreach ($this->malformedUuids() as $uuid) {
+        foreach ($this->malformedUuids(true) as $case => $uuid) {
             $this->rejected(fn () => DB::table('test_delivery_controls')->where('id', $control['id'])
-                ->update(['public_id' => $uuid, 'blocked' => true, 'control_version' => $control['control_version'] + 1]));
+                ->update(['public_id' => $uuid, 'blocked' => true, 'control_version' => $control['control_version'] + 1]), $case);
         }
+        $this->whitespaceWrites('test_delivery_controls', 'public_id', $control['public_id'],
+            fn (string $uuid): int => tap($control['id'], fn () => DB::table('test_delivery_controls')->where('id', $control['id'])
+                ->update(['public_id' => $uuid, 'blocked' => true, 'control_version' => $control['control_version'] + 1])));
+        $this->assertSame($before, DeliveryFixtures::retained());
         DB::table('test_delivery_controls')->where('id', $control['id'])
             ->update(['blocked' => true, 'control_version' => $control['control_version'] + 1]);
         $this->assertSame($control['public_id'], DB::table('test_delivery_controls')->where('id', $control['id'])->value('public_id'));
@@ -230,12 +240,50 @@ class UuidByteGuardMigrationTest extends TestCase
             'claim_token' => null, 'attempts' => 0, 'created_at' => now(), 'updated_at' => now()]);
     }
 
-    private function malformedUuids(): array
+    private function malformedUuids(bool $canonical = false): array
     {
-        $values = [self::UUID."\0suffix", self::UUID."\0", self::UUID."\n", str_repeat('é', 36)];
-        if (DB::getDriverName() === 'sqlite') { $values[] = DB::raw("CAST('".self::UUID."' AS BLOB)"); }
+        $values = [
+            'NUL suffix' => self::UUID."\0suffix",
+            'NUL terminator' => self::UUID."\0",
+            'ordinary overflow' => self::UUID.'a',
+            'multibyte characters' => str_repeat('é', 36),
+            'short' => substr(self::UUID, 0, 35),
+        ];
+        if ($canonical) {
+            $values += [
+                'embedded NUL' => substr(self::UUID, 0, 20)."\0".substr(self::UUID, 21),
+                'uppercase' => strtoupper(self::UUID),
+                'non-hex characters' => str_repeat('g', 36),
+                'wrong separators' => str_replace('-', '_', self::UUID),
+            ];
+        }
+        if (DB::getDriverName() === 'sqlite') { $values['BLOB'] = DB::raw("CAST('".self::UUID."' AS BLOB)"); }
 
         return $values;
+    }
+
+    /** MySQL converts a value to VARCHAR(36) before BEFORE triggers observe NEW. */
+    private function whitespaceWrites(string $table, string $column, string $expected, callable $write): void
+    {
+        $before = DB::table($table)->orderBy('id')->get()->map(fn (object $row): array => (array) $row)->all();
+        foreach (['newline' => "\n", 'CRLF' => "\r\n", 'space' => ' '] as $case => $suffix) {
+            DB::beginTransaction();
+            try {
+                if (DB::getDriverName() === 'sqlite') {
+                    $this->rejected(fn () => $write($expected.$suffix), $table.'.'.$column.' '.$case);
+                } else {
+                    $id = $write($expected.$suffix);
+                    $stored = DB::selectOne("SELECT {$column} AS value, HEX({$column}) AS bytes, OCTET_LENGTH({$column}) AS size FROM {$table} WHERE id = ?", [$id]);
+                    $this->assertSame($expected, $stored->value, $table.'.'.$column.' '.$case);
+                    $this->assertSame(strtoupper(bin2hex($expected)), $stored->bytes, $table.'.'.$column.' '.$case.' bytes');
+                    $this->assertSame(36, (int) $stored->size, $table.'.'.$column.' '.$case.' size');
+                }
+            } finally {
+                DB::rollBack();
+            }
+            $this->assertSame($before, DB::table($table)->orderBy('id')->get()->map(fn (object $row): array => (array) $row)->all(),
+                $table.'.'.$column.' '.$case.' rollback');
+        }
     }
 
     private function preflightRejected(object $migration, string $field): void
@@ -263,9 +311,9 @@ class UuidByteGuardMigrationTest extends TestCase
         return $names;
     }
 
-    private function rejected(callable $operation): void
+    private function rejected(callable $operation, string $case = ''): void
     {
-        try { $operation(); $this->fail('Invalid or immutable UUID evidence was accepted.'); }
+        try { $operation(); $this->fail('Invalid or immutable UUID evidence was accepted. '.$case); }
         catch (QueryException) { $this->addToAssertionCount(1); }
     }
 }
