@@ -9,7 +9,7 @@ if (process.env.VASEY_BROWSER_RELATED_STAGE !== '1' || marker.length !== 64 || !
 export default defineConfig({
   ...base,
   testDir: './tests/browser-related',
-  testMatch: 'editorial-related-tracks.spec.ts',
+  testMatch: ['editorial-related-tracks.spec.ts', 'operator-sharing.spec.ts'],
   outputDir: 'test-results-related',
   reporter: [['list'], ['html', { open: 'never', outputFolder: 'playwright-report-related' }]],
 });

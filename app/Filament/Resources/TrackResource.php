@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublicationReadiness;
 use App\Domain\Catalog\PublishTrack;
+use App\Domain\Catalog\ReadTrackSharing;
 use App\Domain\Catalog\SaveTrackMetadata;
 use App\Filament\Resources\TrackResource\Pages\ManageTracks;
 use Filament\Actions\Action;
@@ -86,7 +87,18 @@ class TrackResource extends OperatorResource
                     $action->cancel();
                 }
             }),
-            Action::make('share')->visible(fn (Track $record) => $record->status === 'published')->url(fn (Track $record) => route('tracks.show', $record->slug))->openUrlInNewTab(),
+            Action::make('share')->label('Share')->visible(fn (Track $record) => $record->status === 'published')
+                ->modalHeading('Share public track')->modalSubmitAction(false)->modalCancelActionLabel('Close')
+                ->extraModalWindowAttributes(static::metadataModalAttributes())
+                ->modalContent(function (Track $record) {
+                    try {
+                        $sharing = app(ReadTrackSharing::class)->handle($record->id, auth()->user());
+                    } catch (ValidationException) {
+                        $sharing = null;
+                    }
+
+                    return view('filament.catalog.track-sharing', ['sharing' => $sharing]);
+                }),
             Action::make('unpublish')->visible(fn (Track $record) => $record->status === 'published')->requiresConfirmation()->action(fn (Track $record) => app(PublishTrack::class)->unpublish($record, auth()->user())),
         ]);
     }
