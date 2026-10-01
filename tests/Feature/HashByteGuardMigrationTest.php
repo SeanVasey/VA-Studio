@@ -7,6 +7,7 @@ use App\Domain\Commerce\Payments\StripePaymentGateway;
 use App\Domain\Contracts\ContractRenderer;
 use App\Domain\Contracts\Models\GrantContract;
 use App\Models\User;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -217,6 +218,88 @@ class HashByteGuardMigrationTest extends TestCase
         $this->assertStringContainsString(DB::getDriverName() === 'sqlite' ? 'SELECT 1;' : 'Synthetic collision', $actual);
     }
 
+    public function test_rollback_preflights_late_guard_drift_before_any_drop_and_preserves_all_retained_rows(): void
+    {
+        $id = DB::table('site_images')->insertGetId($this->image(User::factory()->create()->id));
+        DB::unprepared('CREATE TABLE synthetic_hash_rollback_owner (sha256 VARCHAR(64))');
+        DB::table('synthetic_hash_rollback_owner')->insert(['sha256' => str_repeat('a', 64)]);
+        $migration = $this->migration();
+        $name = 'hash_bytes_site_image_variants_insert';
+        $original = $this->triggerStatement($name);
+        foreach (['body', 'table', 'timing', 'operation'] as $part) {
+            $this->dropGuard($name);
+            $changed = match ($part) {
+                'body' => str_replace('Invalid hash byte representation', 'Synthetic rollback drift', $original),
+                'table' => str_replace('ON site_image_variants', 'ON synthetic_hash_rollback_owner', $original),
+                'timing' => str_replace('BEFORE INSERT', 'AFTER INSERT', $original),
+                'operation' => str_replace('BEFORE INSERT', 'BEFORE UPDATE', $original),
+            };
+            $this->assertNotSame($original, $changed, $part);
+            DB::unprepared($changed);
+            $before = [$this->schemaRows(), $this->retainedRows()];
+            $this->rollbackRejected($migration, $name);
+            $this->assertSame($before, [$this->schemaRows(), $this->retainedRows()], $part.' must not remove any earlier guard or change retained evidence.');
+            $this->dropGuard($name);
+            DB::unprepared($original);
+        }
+        $migration->up();
+        $this->rejected(fn () => DB::table('site_images')->where('id', $id)->delete());
+    }
+
+    public function test_rollback_refuses_a_late_differently_cased_guard_without_adopting_or_dropping_it(): void
+    {
+        $id = DB::table('site_images')->insertGetId($this->image(User::factory()->create()->id));
+        $migration = $this->migration();
+        $name = 'hash_bytes_site_image_variants_insert';
+        $original = $this->triggerStatement($name);
+        $this->dropGuard($name);
+        $foreign = strtoupper($name);
+        DB::unprepared(str_replace($name, $foreign, $original));
+        $before = [$this->schemaRows(), $this->retainedRows()];
+        $this->rollbackRejected($migration, $name);
+        $this->assertSame($before, [$this->schemaRows(), $this->retainedRows()]);
+        $this->dropGuard($foreign);
+        DB::unprepared($original);
+        $migration->up();
+        $this->rejected(fn () => DB::table('site_images')->where('id', $id)->delete());
+    }
+
+    public function test_rollback_retries_missing_guards_without_dropping_original_or_temporary_guards(): void
+    {
+        $id = DB::table('site_images')->insertGetId($this->image(User::factory()->create()->id));
+        $migration = $this->migration();
+        $expected = $this->triggers();
+        $originalGuards = $this->originalGuards();
+        $rows = $this->retainedRows();
+        $this->dropGuard('hash_bytes_license_review_evidence_insert');
+        $temporary = [];
+        if (DB::getDriverName() === 'sqlite') {
+            DB::unprepared('CREATE TEMP TABLE synthetic_hash_rollback_shadow (value TEXT)');
+            DB::table('synthetic_hash_rollback_shadow')->insert(['value' => 'retained temporary evidence']);
+            DB::unprepared('CREATE TEMP TRIGGER hash_bytes_license_versions_update BEFORE UPDATE ON synthetic_hash_rollback_shadow BEGIN SELECT 1; END');
+            $temporary = [$this->temporarySchema(), DB::table('synthetic_hash_rollback_shadow')->get()->map(fn ($row): array => (array) $row)->all()];
+        }
+        $migration->down();
+        $this->assertSame([], $this->triggers());
+        $this->assertSame($originalGuards, $this->originalGuards());
+        $this->assertSame($rows, $this->retainedRows());
+        $beforeRetry = [$this->schemaRows(), $this->retainedRows()];
+        $migration->down();
+        $this->assertSame($beforeRetry, [$this->schemaRows(), $this->retainedRows()]);
+        $this->rejected(fn () => DB::table('site_images')->where('id', $id)->delete());
+        if (DB::getDriverName() === 'sqlite') {
+            $this->assertSame($temporary, [$this->temporarySchema(), DB::table('synthetic_hash_rollback_shadow')->get()->map(fn ($row): array => (array) $row)->all()]);
+        }
+        $migration->up();
+        $migration->up();
+        $this->assertSame($expected, $this->triggers());
+        $this->assertSame($originalGuards, $this->originalGuards());
+        $this->assertSame($rows, $this->retainedRows());
+        if (DB::getDriverName() === 'sqlite') {
+            $this->assertSame($temporary, [$this->temporarySchema(), DB::table('synthetic_hash_rollback_shadow')->get()->map(fn ($row): array => (array) $row)->all()]);
+        }
+    }
+
     private function migration(): object
     {
         return require database_path('migrations/2026_10_01_000029_byte_exact_hash_guards.php');
@@ -265,6 +348,112 @@ class HashByteGuardMigrationTest extends TestCase
             } finally { DB::rollBack(); }
             $this->assertSame($before, $retained(), $label.' rollback must preserve every existing row.');
         }
+    }
+
+    private function rollbackRejected(object $migration, string $name): void
+    {
+        $ddl = [];
+        $checking = true;
+        DB::listen(function (QueryExecuted $event) use (&$ddl, &$checking): void {
+            if ($checking && preg_match('/\A\s*(?:CREATE|DROP|ALTER)\b/i', $event->sql) === 1) {
+                $ddl[] = $event->sql;
+            }
+        });
+        try {
+            $migration->down();
+            $this->fail('An unowned hash guard was removed during rollback.');
+        } catch (LogicException $error) {
+            $this->assertSame("Unexpected hash guard definition for {$name}; the existing guard is unchanged. Investigate before retrying the migration.", $error->getMessage());
+        } finally {
+            $checking = false;
+        }
+        $this->assertSame([], $ddl, 'The complete guard set must pass ownership preflight before any DDL.');
+    }
+
+    private function dropGuard(string $name): void
+    {
+        $qualified = DB::getDriverName() === 'sqlite' ? 'main.'.$name : DB::getDatabaseName().'.'.$name;
+        DB::unprepared('DROP TRIGGER '.DB::connection()->getQueryGrammar()->wrapTable($qualified));
+    }
+
+    private function triggerStatement(string $name): string
+    {
+        if (DB::getDriverName() === 'sqlite') {
+            return DB::table('sqlite_master')->where('type', 'trigger')->where('name', $name)->value('sql');
+        }
+        $guard = DB::table('information_schema.TRIGGERS')->whereRaw('CAST(TRIGGER_SCHEMA AS BINARY) = ?', [DB::getDatabaseName()])
+            ->whereRaw('CAST(TRIGGER_NAME AS BINARY) = ?', [$name])->sole();
+
+        return "CREATE TRIGGER {$name} {$guard->ACTION_TIMING} {$guard->EVENT_MANIPULATION} ON {$guard->EVENT_OBJECT_TABLE} FOR EACH ROW {$guard->ACTION_STATEMENT}";
+    }
+
+    private function schemaRows(): array
+    {
+        if (DB::getDriverName() === 'sqlite') {
+            return DB::table('sqlite_master')->orderBy('type')->orderBy('name')->get()->map(fn ($row): array => (array) $row)->all();
+        }
+        $tables = DB::table('information_schema.TABLES')->whereRaw('CAST(TABLE_SCHEMA AS BINARY) = ?', [DB::getDatabaseName()])
+            ->orderBy('TABLE_NAME')->pluck('TABLE_NAME')->all();
+
+        return [array_map(fn (string $table): array => (array) DB::selectOne('SHOW CREATE TABLE '.DB::connection()->getQueryGrammar()->wrapTable($table)), $tables),
+            DB::table('information_schema.TRIGGERS')->whereRaw('CAST(TRIGGER_SCHEMA AS BINARY) = ?', [DB::getDatabaseName()])
+                ->orderBy('TRIGGER_NAME')->get()->map(fn ($row): array => (array) $row)->all()];
+    }
+
+    private function retainedRows(): array
+    {
+        $tables = DB::getDriverName() === 'sqlite'
+            ? DB::table('sqlite_master')->where('type', 'table')->orderBy('name')->pluck('name')->all()
+            : DB::table('information_schema.TABLES')->whereRaw('CAST(TABLE_SCHEMA AS BINARY) = ?', [DB::getDatabaseName()])
+                ->orderBy('TABLE_NAME')->pluck('TABLE_NAME')->all();
+        $retained = [];
+        foreach ($tables as $table) {
+            $rows = DB::table($table)->get()->map(fn ($row): array => (array) $row)->all();
+            usort($rows, fn (array $left, array $right): int => strcmp(serialize($left), serialize($right)));
+            $retained[$table] = $rows;
+        }
+
+        return $retained;
+    }
+
+    private function originalGuards(): array
+    {
+        $guards = DB::getDriverName() === 'sqlite'
+            ? DB::table('sqlite_master')->where('type', 'trigger')->orderBy('name')->get()->map(fn ($row): array => (array) $row)->all()
+            : DB::table('information_schema.TRIGGERS')->whereRaw('CAST(TRIGGER_SCHEMA AS BINARY) = ?', [DB::getDatabaseName()])
+                ->orderBy('TRIGGER_NAME')->get()->map(fn ($row): array => (array) $row)->all();
+
+        $guards = array_values(array_filter($guards, fn (array $guard): bool => ! str_starts_with($guard[DB::getDriverName() === 'sqlite' ? 'name' : 'TRIGGER_NAME'], 'hash_bytes_')));
+        if (DB::getDriverName() === 'sqlite') {
+            return $guards;
+        }
+
+        // MySQL renumbers ACTION_ORDER after a DROP. Preserve every other raw catalog
+        // field and verify the surviving execution order within each table/event/timing.
+        $definitions = [];
+        $order = [];
+        foreach ($guards as $guard) {
+            $group = json_encode([$guard['EVENT_OBJECT_SCHEMA'], $guard['EVENT_OBJECT_TABLE'], $guard['ACTION_TIMING'], $guard['EVENT_MANIPULATION']], JSON_THROW_ON_ERROR);
+            $ordinal = (int) $guard['ACTION_ORDER'];
+            $this->assertGreaterThan(0, $ordinal);
+            $this->assertArrayNotHasKey($ordinal, $order[$group] ?? []);
+            $order[$group][$ordinal] = $guard['TRIGGER_NAME'];
+            unset($guard['ACTION_ORDER']);
+            $definitions[] = $guard;
+        }
+        ksort($order);
+        foreach ($order as &$names) {
+            ksort($names, SORT_NUMERIC);
+            $names = array_values($names);
+        }
+        unset($names);
+
+        return [$definitions, $order];
+    }
+
+    private function temporarySchema(): array
+    {
+        return DB::table('sqlite_temp_master')->orderBy('type')->orderBy('name')->get()->map(fn ($row): array => (array) $row)->all();
     }
 
     private function triggers(): array

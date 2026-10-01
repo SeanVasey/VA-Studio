@@ -106,13 +106,17 @@ return new class extends Migration
     private function installed(string $name, string $table, string $operation, string $definition): bool
     {
         if (DB::getDriverName() === 'sqlite') {
-            $existing = DB::table('sqlite_master')->where('type', 'trigger')->where('name', $name)->first();
+            $named = DB::table('sqlite_master')->where('type', 'trigger')->whereRaw('name COLLATE NOCASE = ?', [$name])->get();
+            $existing = $named->first();
             if ($existing === null) { return false; }
-            $matches = $existing->tbl_name === $table && $this->normalized($existing->sql) === $this->normalized($definition);
+            $matches = $named->count() === 1 && $existing->name === $name && $existing->tbl_name === $table
+                && $this->normalized($existing->sql) === $this->normalized($definition);
         } else {
-            $existing = DB::table('information_schema.TRIGGERS')->where('TRIGGER_SCHEMA', DB::getDatabaseName())->where('TRIGGER_NAME', $name)->first();
+            $named = DB::table('information_schema.TRIGGERS')->whereRaw('CAST(TRIGGER_SCHEMA AS BINARY) = ?', [DB::getDatabaseName()])
+                ->whereRaw('LOWER(TRIGGER_NAME) = ?', [$name])->get();
+            $existing = $named->first();
             if ($existing === null) { return false; }
-            $matches = $existing->EVENT_OBJECT_TABLE === $table && $existing->ACTION_TIMING === 'BEFORE'
+            $matches = $named->count() === 1 && $existing->TRIGGER_NAME === $name && $existing->EVENT_OBJECT_TABLE === $table && $existing->ACTION_TIMING === 'BEFORE'
                 && $existing->EVENT_MANIPULATION === $operation && $this->normalized($existing->ACTION_STATEMENT) === $this->normalized($definition);
         }
         if (! $matches) {
@@ -129,12 +133,34 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! in_array(DB::getDriverName(), ['sqlite', 'mysql'], true)) {
+            throw new RuntimeException('Hash byte enforcement requires SQLite or MySQL.');
+        }
+
         // Remove only this migration's supplemental guards. All original lifecycle, relational
-        // and immutable-evidence guards and every retained row remain in place.
-        foreach (array_keys(self::FIELDS) as $table) {
+        // and immutable-evidence guards and every retained row remain in place. Verify the
+        // entire present set before the first drop; MySQL DDL cannot roll earlier drops back.
+        $installed = [];
+        foreach (self::FIELDS as $table => $fields) {
+            $allowed = implode(' AND ', array_map(fn (string $column): string =>
+                '('.$this->field($table, $column, $fields[$column], 'NEW.').')', array_keys($fields)));
             foreach ($this->operations($table) as $operation) {
-                DB::unprepared('DROP TRIGGER IF EXISTS '.$this->name($table, $operation));
+                $name = $this->name($table, $operation);
+                $body = "BEGIN IF NOT COALESCE(({$allowed}), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid hash byte representation'; END IF; END";
+                $statement = DB::getDriverName() === 'sqlite'
+                    ? "CREATE TRIGGER {$name} BEFORE {$operation} ON {$table} WHEN NOT COALESCE(({$allowed}), 0) BEGIN SELECT RAISE(ABORT, 'Invalid hash byte representation'); END"
+                    : "CREATE TRIGGER {$name} BEFORE {$operation} ON {$table} FOR EACH ROW {$body}";
+                if ($this->installed($name, $table, $operation, DB::getDriverName() === 'sqlite' ? $statement : $body)) {
+                    $installed[] = $name;
+                }
             }
+        }
+
+        // An interrupted rollback may already have removed any subset. Drop only verified
+        // guards in the inspected schema, never a same-named temporary or foreign guard.
+        foreach ($installed as $name) {
+            $qualified = DB::getDriverName() === 'sqlite' ? 'main.'.$name : DB::getDatabaseName().'.'.$name;
+            DB::unprepared('DROP TRIGGER IF EXISTS '.DB::connection()->getQueryGrammar()->wrapTable($qualified));
         }
     }
 };
