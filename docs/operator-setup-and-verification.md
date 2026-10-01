@@ -23,7 +23,7 @@ php artisan vasey:doctor --json
 sudo -u <worker user> php artisan vasey:doctor
 ```
 
-The report checks PHP/core extensions, encryption-key format, a read-only database query, applied migrations, verified operator presence, writable runtime directories, the Vite manifest and listed files, private local media storage and basic production HTTPS/debug/cookie settings. It reports optional media executables, scanner, seller-tag configuration, asynchronous queue selection, outbound mail configuration and an overdue scheduled site publication separately.
+The report checks PHP/core extensions, encryption-key format, a read-only database query, applied migrations, verified operator presence, writable runtime directories, the Vite manifest and listed files, private local media storage and basic production HTTPS/debug/cookie settings. It reports optional media executables and encoders, scanner, seller-tag configuration, asynchronous queue selection, outbound mail configuration and an overdue scheduled site publication separately.
 
 | Status / output | Meaning |
 | --- | --- |
@@ -34,6 +34,8 @@ The report checks PHP/core extensions, encryption-key format, a read-only databa
 | Exit 1 / `foundation_ready: false` | Resolve required failures and rerun the report. |
 
 JSON uses `schema_version: 1`, `scope: installation` and a stable list of check IDs/statuses/messages. Values, file paths, account identities and raw connection exceptions are not printed. The command creates no users, keys, migrations, jobs or audit records and makes no external provider calls. The scanner limits check (`media_scanner_limits`) makes one scratch directory under `processing/` in private storage, with a sparse file of 4 GiB and a byte in it, and removes both before it returns, and `processing/` too when it made that. A run interrupted during that check can leave them behind, so the check runs only as the user that owns private storage: run the doctor as the worker's user (`sudo -u <worker user> php artisan vasey:doctor`). For anyone else, and where private storage does not exist, it makes nothing and warns. It does not scan audio, validate tag bytes, send mail, prove worker liveness, test backups or certify production. A configured executable or transport does not establish successful operation.
+
+The optional `media_encoders` check runs the configured `ffmpeg -hide_banner -encoders` through the existing resource-limited runner, with a 15-second wall limit and bounded output. It requires exact encoder rows for `libmp3lame` (MP3), `pcm_s16le` (waveform decoding), `png` (artwork), and `mjpeg`/`libwebp` (site images). Missing executables or capabilities, a failed command, excess output or timeout produce a fixed, redacted warning; they do not change the foundation result or exit status. This command reads no uploaded media and creates no media files. An advertised encoder is only a prerequisite: real encoding, filters, supported inputs and worker isolation still need acceptance on the deployment host.
 
 ## Run the scheduler
 

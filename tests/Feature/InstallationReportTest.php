@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Media\BoundedMediaProcess;
+use App\Domain\Media\MediaFailure;
 use App\Support\Diagnostics\InstallationReport;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -16,6 +18,15 @@ use Tests\TestCase;
 class InstallationReportTest extends TestCase
 {
     use RefreshDatabase;
+
+    /** Actual six-flag encoder rows; descriptions alone must never establish a capability. */
+    private const ENCODER_ROWS = [
+        'libmp3lame' => ' A....D libmp3lame           libmp3lame MP3 (codec mp3)',
+        'pcm_s16le' => ' A....D pcm_s16le            PCM signed 16-bit little-endian',
+        'png' => ' VF...D png                  PNG (Portable Network Graphics) image',
+        'mjpeg' => ' VFS... mjpeg                MJPEG (Motion JPEG)',
+        'libwebp' => ' V....D libwebp              libwebp WebP image (codec webp)',
+    ];
 
     private string $directory;
 
@@ -59,7 +70,7 @@ class InstallationReportTest extends TestCase
         $this->assertTrue($report['foundation_ready']);
         $this->assertSame(1, $report['schema_version']);
         $status = array_column($report['checks'], 'status', 'id');
-        foreach (['media_tools', 'media_scanner', 'media_scanner_limits', 'seller_tag', 'media_queue', 'mail_transport'] as $id) {
+        foreach (['media_tools', 'media_encoders', 'media_scanner', 'media_scanner_limits', 'seller_tag', 'media_queue', 'mail_transport'] as $id) {
             $this->assertSame('warn', $status[$id]);
         }
         foreach ($queries as $query) {
@@ -72,6 +83,181 @@ class InstallationReportTest extends TestCase
         $this->assertSame([], (new Filesystem)->files($this->directory.'/private'));
         $this->assertStringNotContainsString($key, $output);
         $this->assertStringNotContainsString($this->directory, $output);
+    }
+
+    /** Executes the real bounded runner; only FFmpeg's capability listing and failure modes are scripted. */
+    private function encoderListing(array $rows = self::ENCODER_ROWS, string $mode = 'ok'): void
+    {
+        $script = <<<'SH'
+#!/bin/sh
+directory=$(dirname "$0")
+printf '%s\n' "$@" > "$directory/encoder-argv"
+cat "$directory/encoder-list"
+case "$(cat "$directory/encoder-mode")" in
+    fail) printf 'PRIVATE-ENCODER-TOKEN in %s\n' "$directory" >&2; exit 2 ;;
+    flood) yes PRIVATE-ENCODER-TOKEN | head -c 300000 ;;
+esac
+SH;
+        file_put_contents($this->directory.'/ffmpeg', $script."\n");
+        chmod($this->directory.'/ffmpeg', 0700);
+        file_put_contents($this->directory.'/encoder-list', "Encoders:\n V..... = Video\n A..... = Audio\n S..... = Subtitle\n ------\n".implode("\n", $rows)."\n");
+        file_put_contents($this->directory.'/encoder-mode', $mode);
+        config(['media.ffmpeg' => $this->directory.'/ffmpeg', 'media.prlimit' => '/usr/bin/prlimit']);
+    }
+
+    public function test_required_media_encoders_are_reported_without_mutating_the_installation(): void
+    {
+        $this->encoderListing();
+        LicenseFixtures::admin();
+        $key = config('app.key');
+        DB::enableQueryLog();
+        $exit = Artisan::call('vasey:doctor', ['--json' => true]);
+        $output = Artisan::output();
+        $queries = DB::getQueryLog();
+        DB::disableQueryLog();
+        $report = json_decode($output, true, 32, JSON_THROW_ON_ERROR);
+
+        $this->assertSame(0, $exit, $output);
+        $this->assertTrue($report['foundation_ready']);
+        $this->assertSame('pass', array_column($report['checks'], 'status', 'id')['media_encoders']);
+        $this->assertSame(['-hide_banner', '-encoders'], file($this->directory.'/encoder-argv', FILE_IGNORE_NEW_LINES));
+        foreach ($queries as $query) {
+            $this->assertDoesNotMatchRegularExpression('/\A\s*(insert|update|delete|create|alter|drop|replace)\b/i', $query['query']);
+        }
+        $this->assertSame($key, config('app.key'));
+        $this->assertDatabaseCount('audit_events', 0);
+        $this->assertSame([], (new Filesystem)->allFiles($this->directory.'/private'));
+        $this->assertDirectoryDoesNotExist($this->directory.'/private/processing');
+        $this->assertStringNotContainsString($key, $output);
+        $this->assertStringNotContainsString($this->directory, $output);
+    }
+
+    public static function missingRequiredEncoders(): array
+    {
+        return array_combine(array_keys(self::ENCODER_ROWS), array_map(fn (string $encoder): array => [$encoder], array_keys(self::ENCODER_ROWS)));
+    }
+
+    #[DataProvider('missingRequiredEncoders')]
+    public function test_each_missing_required_encoder_is_an_optional_warning(string $encoder): void
+    {
+        $rows = self::ENCODER_ROWS;
+        unset($rows[$encoder]);
+        $this->encoderListing($rows);
+        LicenseFixtures::admin();
+        $report = app(InstallationReport::class)->collect();
+
+        $this->assertTrue($report['foundation_ready']);
+        $this->assertSame('warn', array_column($report['checks'], 'status', 'id')['media_encoders']);
+    }
+
+    public static function misleadingEncoderRows(): array
+    {
+        return [
+            'description only' => [' A....D alternative          Uses libmp3lame internally'],
+            'identifier prefix' => [' A....D libmp3lame_extra     Different encoder'],
+            'punctuation suffix' => [' A....D libmp3lame!          Not an exact identifier'],
+            'unanchored row' => ['Warning: A....D libmp3lame   Not an encoder row'],
+            'too many flags' => [' A....DX libmp3lame          Seven flags'],
+            'wrong flag alphabet' => [' A----D libmp3lame           Invalid flags'],
+            'wrong flag position' => [' AD.... libmp3lame           Invalid flag position'],
+        ];
+    }
+
+    #[DataProvider('misleadingEncoderRows')]
+    public function test_descriptions_prefixes_and_malformed_rows_cannot_confirm_an_encoder(string $replacement): void
+    {
+        $rows = self::ENCODER_ROWS;
+        $rows['libmp3lame'] = $replacement;
+        $this->encoderListing($rows);
+
+        $this->assertSame('warn', $this->statuses()['media_encoders']);
+    }
+
+    public static function missingEncoderTools(): array
+    {
+        return ['ffmpeg missing' => ['media.ffmpeg'], 'prlimit missing' => ['media.prlimit']];
+    }
+
+    #[DataProvider('missingEncoderTools')]
+    public function test_encoder_diagnostics_do_not_run_without_the_executable_and_limiter(string $key): void
+    {
+        $this->encoderListing();
+        config([$key => '/missing-PRIVATE-ENCODER-TOKEN']);
+
+        $this->assertSame('warn', $this->statuses()['media_encoders']);
+        $this->assertFileDoesNotExist($this->directory.'/encoder-argv');
+    }
+
+    public static function failedEncoderListings(): array
+    {
+        return ['nonzero exit despite complete listing' => ['fail'], 'captured output limit' => ['flood']];
+    }
+
+    #[DataProvider('failedEncoderListings')]
+    public function test_failed_bounded_encoder_commands_warn_without_exposing_their_output(string $mode): void
+    {
+        $this->encoderListing(mode: $mode);
+        LicenseFixtures::admin();
+        $this->assertSame(0, Artisan::call('vasey:doctor', ['--json' => true]));
+        $output = Artisan::output();
+        $report = json_decode($output, true, 32, JSON_THROW_ON_ERROR);
+
+        $this->assertTrue($report['foundation_ready']);
+        $this->assertSame('warn', array_column($report['checks'], 'status', 'id')['media_encoders']);
+        $this->assertStringNotContainsString('PRIVATE-ENCODER-TOKEN', $output);
+        $this->assertStringNotContainsString($this->directory, $output);
+        $this->assertSame([], (new Filesystem)->allFiles($this->directory.'/private'));
+        $this->assertDirectoryDoesNotExist($this->directory.'/private/processing');
+    }
+
+    public function test_encoder_command_timeout_is_bounded_and_remains_a_redacted_optional_warning(): void
+    {
+        $this->encoderListing();
+        LicenseFixtures::admin();
+        $runner = new class extends BoundedMediaProcess
+        {
+            public array $calls = [];
+
+            public function run(array $arguments, string $cwd, int $timeout = 0, bool $ignoreErrorOutput = false): string
+            {
+                $this->calls[] = [$arguments, $cwd, $timeout, $ignoreErrorOutput];
+                throw new MediaFailure('processor_timeout', 'PRIVATE-ENCODER-TOKEN timed out.');
+            }
+        };
+        app()->instance(BoundedMediaProcess::class, $runner);
+        $this->assertSame(0, Artisan::call('vasey:doctor', ['--json' => true]));
+        $output = Artisan::output();
+        $report = json_decode($output, true, 32, JSON_THROW_ON_ERROR);
+
+        $this->assertTrue($report['foundation_ready']);
+        $this->assertSame('warn', array_column($report['checks'], 'status', 'id')['media_encoders']);
+        $this->assertSame([[[$this->directory.'/ffmpeg', '-hide_banner', '-encoders'], base_path(), 15, false]], $runner->calls);
+        $this->assertStringNotContainsString('PRIVATE-ENCODER-TOKEN', $output);
+        $this->assertStringNotContainsString($this->directory, $output);
+        $this->assertFileDoesNotExist($this->directory.'/encoder-argv');
+    }
+
+    public function test_encoder_diagnostics_disable_inherited_ffmpeg_reports_without_changing_the_parent_environment(): void
+    {
+        LicenseFixtures::admin();
+        config(['media.ffmpeg' => '/usr/bin/ffmpeg', 'media.prlimit' => '/usr/bin/prlimit']);
+        $path = $this->directory.'/unexpected-ffmpeg-report.log';
+        $previous = getenv('FFREPORT');
+        $inherited = 'file='.$path.':level=32';
+        putenv('FFREPORT='.$inherited);
+        try {
+            $this->assertSame(0, Artisan::call('vasey:doctor', ['--json' => true]));
+            $output = Artisan::output();
+            $report = json_decode($output, true, 32, JSON_THROW_ON_ERROR);
+
+            $this->assertSame('pass', array_column($report['checks'], 'status', 'id')['media_encoders']);
+            $this->assertFileDoesNotExist($path);
+            $this->assertSame($inherited, getenv('FFREPORT'));
+            $this->assertStringNotContainsString($this->directory, $output);
+            $this->assertStringNotContainsString('FFREPORT', $output);
+        } finally {
+            putenv($previous === false ? 'FFREPORT' : 'FFREPORT='.$previous);
+        }
     }
 
     /**

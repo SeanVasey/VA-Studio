@@ -2,6 +2,7 @@
 
 namespace App\Support\Diagnostics;
 
+use App\Domain\Media\BoundedMediaProcess;
 use App\Domain\Media\MalwareScanner;
 use App\Domain\Media\PrivateMediaFiles;
 use App\Domain\SiteBuilder\Models\SiteRelease;
@@ -82,6 +83,9 @@ final class InstallationReport
 
         $check('media_tools', false, fn () => $this->executable('media.ffmpeg') && $this->executable('media.ffprobe') && $this->executable('media.prlimit'),
             'Media executables exist; processing and worker isolation still need acceptance.', 'Install and configure ffmpeg, ffprobe and prlimit before media processing.');
+        $check('media_encoders', false, $this->hasMediaEncoders(...),
+            'FFmpeg advertises the required audio and image encoders; actual processing still needs acceptance.',
+            'Install and configure FFmpeg with libmp3lame, pcm_s16le, png, mjpeg and libwebp, plus prlimit; rerun vasey:doctor as the worker user before media processing.');
         $check('media_scanner', false, fn () => $this->executable('media.clamscan'),
             'The scanner executable exists; signatures and detection are unverified.', 'Install ClamAV and complete signature/detection acceptance before media promotion.');
         // clamscan gets its size limits from the application; a resident clamd has to alert on a file over its own. The canary is made
@@ -159,6 +163,19 @@ final class InstallationReport
         $path = config($key);
 
         return is_string($path) && is_file($path) && is_executable($path);
+    }
+
+    private function hasMediaEncoders(): bool
+    {
+        if (! $this->executable('media.ffmpeg') || ! $this->executable('media.prlimit')) {
+            return false;
+        }
+
+        $listing = app(BoundedMediaProcess::class)->run([config('media.ffmpeg'), '-hide_banner', '-encoders'], base_path(), 15);
+        // Read encoder identifiers from FFmpeg's six-flag rows, never names mentioned in descriptions or the legend.
+        preg_match_all('/^[ \t]*[AVS][F.][S.][X.][B.][D.][ \t]+([a-zA-Z0-9_-]+)(?:[ \t]|$)/m', $listing, $matches);
+
+        return array_diff(['libmp3lame', 'pcm_s16le', 'png', 'mjpeg', 'libwebp'], $matches[1]) === [];
     }
 
     private function hasFrontendBuild(): bool

@@ -46,6 +46,8 @@ A cold large catalog still requires full digest verification. Catalog pagination
 
 ## Prepare the local worker
 
+Run `php artisan vasey:doctor` as the worker's user before processing. Its optional `media_encoders` check requires the configured FFmpeg to advertise `libmp3lame`, `pcm_s16le`, `png`, `mjpeg` and `libwebp` as exact encoder identifiers. The listing runs through `prlimit`, with a 15-second wall limit and the existing output/resource bounds, without reading uploads or producing derivatives. A warning also covers missing tools, command failure or timeout; it leaves installation foundation readiness unchanged. Passing this prerequisite does not prove actual encoding/filter support, catalog compatibility or production worker acceptance. See [operator diagnostics](operator-setup-and-verification.md#inspect-the-installation).
+
 Complete the application setup in [README](../README.md). The application and worker need access to the same private local disk, which defaults to `storage/app/private`; the web document root must remain `public/`. Do not expose the private disk through static serving, symlinks or object URLs.
 
 The worker needs the PHP ZIP extension and patched, compatible FFmpeg/ffprobe binaries with the `libmp3lame` encoder, Linux `prlimit`, and ClamAV with usable signatures: `clamscan`, or `clamdscan` with a running `clamd`, which production should prefer (see [Production malware scanner](#production-malware-scanner)). These tools are external dependencies; Composer does not install them. Configure their absolute executable paths in `.env`:
