@@ -1,14 +1,7 @@
-import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { expect, test, type BrowserContext, type Page } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
-
-type Fixture = { previewPath: string; privacyNotice: string; values: { name: string; email: string; subject: string; message: string; website: string } };
-
-function fixtureOperation(mode: 'prepare' | 'verify' | 'restore', project: string, receipt?: string, state?: string) {
-  return JSON.parse(execFileSync('php', ['tests/browser/prepare-contact-inquiry.php', mode, project, ...(receipt ? [receipt, state!] : [])], {
-    cwd: process.cwd(), env: process.env, encoding: 'utf8', timeout: 30_000, stdio: 'pipe',
-  }));
-}
+import { fixtureOperation, type InquiryFixture as Fixture } from './contact-inquiry-fixture';
 
 async function confirm(page: Page, label: 'Mark read' | 'Archive') {
   await page.getByRole('button', { name: label, exact: true }).click();
@@ -33,7 +26,15 @@ test('real customer inquiry persists encrypted and ordinary staff can read and a
   let staff: BrowserContext | undefined;
   try {
     staff = await browser.newContext({ ...testInfo.project.use, baseURL: 'http://127.0.0.1:8173' });
-    await page.goto('/contact');
+    const contact = await page.goto('/contact');
+    expect(contact?.status()).toBe(200);
+    const embedded = (await contact!.text()).match(/<script\b[^>]*data-page="app"[^>]*>([\s\S]*?)<\/script>/);
+    expect(embedded).not.toBeNull();
+    const contactProps = JSON.parse(embedded![1]).props;
+    expect(contactProps.contactInquiryEnabled).toBe(true);
+    expect(contactProps.contactInquiryPrivacyNotice).toBe(fixture.privacyNotice);
+    const noticeToken = contactProps.contactInquiryNoticeToken;
+    expect(noticeToken).toMatch(/^[0-9a-f]{64}$/);
     await expect(page.getByRole('heading', { name: `SYNTHETIC INQUIRY ${testInfo.project.name} CONTACT`, exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: /Open email/ })).toHaveAttribute('href', 'mailto:editorial%2Bsynthetic%40example.test');
     await expect(page.getByText(fixture.privacyNotice, { exact: true })).toBeVisible();
@@ -56,7 +57,7 @@ test('real customer inquiry persists encrypted and ordinary staff can read and a
     expect(await saved.request().headerValue('x-xsrf-token')).toBe(xsrf);
     expect(await saved.request().headerValue('x-csrf-token')).toBeNull();
     const body = saved.request().postData()!;
-    expect(JSON.parse(body)).toEqual({ ...fixture.values, requestKey: expect.stringMatching(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/) });
+    expect(JSON.parse(body)).toEqual({ ...fixture.values, requestKey: expect.stringMatching(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/), noticeToken });
     const savedBody = await saved.json();
     const { receipt } = savedBody;
     expect(receipt).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
@@ -64,7 +65,11 @@ test('real customer inquiry persists encrypted and ordinary staff can read and a
     await expect(page.getByRole('heading', { name: 'Inquiry saved', exact: true })).toBeVisible();
     await expect(page.getByRole('region', { name: 'Contact inquiry', exact: true }).getByRole('status')).toBeFocused();
     await expect(page.getByText(receipt, { exact: true })).toBeVisible();
-    fixtureOperation('verify', testInfo.project.name, receipt, 'new');
+    const verified = fixtureOperation('verify', testInfo.project.name, receipt, 'new', body);
+    expect(verified).toEqual({ state: 'new', version: 0, exactEncryptedInput: true, issuedNoticeToken: true, rawNoticeTokenRetained: false, audited: true });
+    await testInfo.attach('real-issued-notice-and-encrypted-five-field-evidence', {
+      body: Buffer.from(JSON.stringify({ ...verified, noticeTokenHash: createHash('sha256').update(noticeToken).digest('hex') })), contentType: 'application/json',
+    });
     // API requests have no browser fetch-metadata bypass: missing/invalid tokens must fail before replay.
     const rejectedHeaders: Record<string, string>[] = [{}, { 'X-XSRF-TOKEN': 'synthetic-invalid-xsrf' }];
     for (const headers of rejectedHeaders) {
@@ -74,7 +79,7 @@ test('real customer inquiry persists encrypted and ordinary staff can read and a
       expect(rejected.status()).toBe(419);
       expect(rejected.headers()['cache-control']).toContain('no-store');
       expect(await rejected.json()).toEqual({ code: 'INQUIRY_REQUEST_EXPIRED', message: 'Your session expired. Refresh the page before trying again.' });
-      fixtureOperation('verify', testInfo.project.name, receipt, 'new');
+      fixtureOperation('verify', testInfo.project.name, receipt, 'new', body);
     }
     // A real same-session HTTP replay must retain one receipt and one received audit.
     const replay = await page.request.post('/contact/inquiries', { data: body, headers: {
@@ -82,9 +87,11 @@ test('real customer inquiry persists encrypted and ordinary staff can read and a
     } });
     expect(replay.status()).toBe(200);
     expect(await replay.json()).toEqual({ state: 'saved', receipt });
-    fixtureOperation('verify', testInfo.project.name, receipt, 'new');
+    fixtureOperation('verify', testInfo.project.name, receipt, 'new', body);
     const stored = await page.evaluate(() => [...Object.values(localStorage), ...Object.values(sessionStorage)].join('\n'));
     for (const value of Object.values(fixture.values).filter(Boolean)) expect(stored).not.toContain(value);
+    expect(stored).not.toContain(noticeToken);
+    expect(stored).not.toContain(JSON.parse(body).requestKey);
     await page.screenshot({ path: testInfo.outputPath('real-inquiry-customer-receipt.png'), fullPage: true });
     const denied = await page.request.get(`/admin/customer-inquiries/${receipt}`, { maxRedirects: 0 });
     expect(denied.status()).toBe(302);
@@ -111,16 +118,16 @@ test('real customer inquiry persists encrypted and ordinary staff can read and a
     await confirm(operator, 'Mark read');
     await expect(operator.getByRole('button', { name: 'Mark read', exact: true })).toHaveCount(0);
     await expect(operator.getByText('read', { exact: true })).toBeVisible();
-    fixtureOperation('verify', testInfo.project.name, receipt, 'read');
+    fixtureOperation('verify', testInfo.project.name, receipt, 'read', body);
     await confirm(operator, 'Archive');
     await expect(operator.getByRole('button', { name: 'Archive', exact: true })).toHaveCount(0);
     await expect(operator.getByText('archived', { exact: true })).toBeVisible();
-    fixtureOperation('verify', testInfo.project.name, receipt, 'archived');
+    fixtureOperation('verify', testInfo.project.name, receipt, 'archived', body);
     await operator.reload();
     await expect(operator.getByText('archived', { exact: true })).toBeVisible();
     await expect(operator.getByText(fixture.values.message, { exact: true })).toBeVisible();
     await expect(operator.getByRole('button', { name: 'Archive', exact: true })).toHaveCount(0);
-    fixtureOperation('verify', testInfo.project.name, receipt, 'archived');
+    fixtureOperation('verify', testInfo.project.name, receipt, 'archived', body);
     await operator.screenshot({ path: testInfo.outputPath('real-inquiry-operator-archived.png'), fullPage: true });
     await operator.goto('/admin/customer-inquiries');
     await expect(operator.getByText(receipt, { exact: true })).toHaveCount(0);

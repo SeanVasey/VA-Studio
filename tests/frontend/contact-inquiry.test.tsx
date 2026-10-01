@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ContactInquiryForm } from '../../resources/js/components/ContactInquiryForm';
 
+const noticeToken = 'a'.repeat(64);
+const nextNoticeToken = 'b'.repeat(64);
 const privacy = 'Synthetic approved privacy notice. Messages are held privately for inquiry handling.';
 const receipt = 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
 const firstKey = '11111111-2222-4333-8444-555555555555';
@@ -10,7 +12,7 @@ const nextKey = '66666666-7777-4888-8999-aaaaaaaaaaaa';
 const draft = { name: 'Synthetic visitor', email: 'visitor@example.test', subject: 'Synthetic collaboration', message: 'Synthetic private inquiry.', website: '' };
 const response = (status: number, data: unknown) => new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } });
 const saved = (status = 201) => response(status, { state: 'saved', receipt });
-function form() { return render(<ContactInquiryForm privacyNotice={privacy} />); }
+function form() { return render(<ContactInquiryForm privacyNotice={privacy} noticeToken={noticeToken} />); }
 function fill(values: Partial<typeof draft> = {}) {
   for (const [name, value] of Object.entries({ ...draft, ...values })) {
     if (name === 'website') continue;
@@ -27,15 +29,20 @@ beforeEach(() => {
 afterEach(() => { document.head.innerHTML = ''; document.cookie = 'XSRF-TOKEN=; Max-Age=0; Path=/'; vi.useRealTimers(); });
 
 describe('private contact inquiry', () => {
+  it.each(['', 'a'.repeat(63), 'A'.repeat(64), `${noticeToken}\n`])('does not offer collection without an exact opaque notice token: %s', token => {
+    const fetcher = vi.spyOn(globalThis, 'fetch'); render(<ContactInquiryForm privacyNotice={privacy} noticeToken={token} />);
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument(); expect(fetcher).not.toHaveBeenCalled();
+  });
+
   it('does not offer collection without a nonempty approved privacy notice', () => {
-    const fetcher = vi.spyOn(globalThis, 'fetch'); render(<ContactInquiryForm privacyNotice="   " />);
+    const fetcher = vi.spyOn(globalThis, 'fetch'); render(<ContactInquiryForm privacyNotice="   " noticeToken={noticeToken} />);
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument(); expect(fetcher).not.toHaveBeenCalled();
   });
 
   it('renders escaped approved privacy copy and labelled fields without network or browser storage', () => {
     const fetcher = vi.spyOn(globalThis, 'fetch');
     const read = vi.spyOn(Storage.prototype, 'getItem'); const write = vi.spyOn(Storage.prototype, 'setItem');
-    render(<ContactInquiryForm privacyNotice={'<img src="https://example.test/tracker"> Approved synthetic notice.'} />);
+    render(<ContactInquiryForm privacyNotice={'<img src="https://example.test/tracker"> Approved synthetic notice.'} noticeToken={noticeToken} />);
     expect(screen.getByText(/<img src=/)).toBeVisible();
     expect(document.querySelector('img, iframe, script')).toBeNull();
     for (const label of ['Name', 'Email', 'Subject', 'Message']) expect(screen.getByLabelText(new RegExp(`^${label}`))).toBeRequired();
@@ -58,7 +65,7 @@ describe('private contact inquiry', () => {
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Inquiry saved' })).toBeVisible());
     await waitFor(() => expect(screen.getByRole('status')).toHaveFocus()); expect(screen.getByText(receipt)).toBeVisible();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument(); expect(document.body.textContent).not.toContain(draft.email);
-    expect(fetcher).toHaveBeenCalledWith('/contact/inquiries', expect.objectContaining({ method: 'POST', credentials: 'same-origin', cache: 'no-store', redirect: 'error', headers: expect.objectContaining({ 'X-CSRF-TOKEN': 'synthetic-csrf' }), body: JSON.stringify({ ...draft, requestKey: firstKey }) }));
+    expect(fetcher).toHaveBeenCalledWith('/contact/inquiries', expect.objectContaining({ method: 'POST', credentials: 'same-origin', cache: 'no-store', redirect: 'error', headers: expect.objectContaining({ 'X-CSRF-TOKEN': 'synthetic-csrf' }), body: JSON.stringify({ ...draft, noticeToken, requestKey: firstKey }) }));
     expect(write).not.toHaveBeenCalled();
     await userEvent.click(screen.getByRole('button', { name: 'Write another inquiry' }));
     await waitFor(() => expect(screen.getByLabelText(/^Name/)).toHaveFocus());
@@ -114,7 +121,116 @@ describe('private contact inquiry', () => {
     expect(screen.queryByText(/PRIVATE SERVER DETAIL/)).not.toBeInTheDocument();
     fireEvent.change(screen.getByLabelText(/^Subject/), { target: { value: 'Corrected subject' } }); send();
     await waitFor(() => expect(screen.getByText(receipt)).toBeVisible());
-    expect(JSON.parse(fetcher.mock.calls[1][1]?.body as string)).toEqual({ ...draft, subject: 'Corrected subject', requestKey: nextKey });
+    expect(JSON.parse(fetcher.mock.calls[1][1]?.body as string)).toEqual({ ...draft, subject: 'Corrected subject', noticeToken, requestKey: nextKey });
+  });
+
+  it.each(['website', 'requestKey', 'unknownField'])('releases a definitive first hidden %s rejection and clears the honeypot without losing the visible draft', async field => {
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(422, { code: 'INQUIRY_VALIDATION_FAILED', errors: { [field]: ['PRIVATE SERVER DETAIL'] } })).mockResolvedValueOnce(saved());
+    form(); fill(); fireEvent.change(document.querySelector<HTMLInputElement>('[name="website"]')!, { target: { value: 'Autofilled hidden value' } }); send();
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveFocus());
+    expect(screen.getByRole('alert')).toHaveTextContent('Check your inquiry before sending again.');
+    expect(screen.queryByText(/PRIVATE SERVER DETAIL/)).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/^Message/)).toHaveValue(draft.message);
+    expect(screen.getByLabelText(/^Message/)).not.toHaveAttribute('readonly');
+    expect(document.querySelector('[name="website"]')).toHaveValue('');
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    fireEvent.change(screen.getByLabelText(/^Subject/), { target: { value: 'Corrected visible subject' } }); send();
+    await waitFor(() => expect(screen.getByText(receipt)).toBeVisible());
+    expect(JSON.parse(fetcher.mock.calls[0][1]?.body as string)).toEqual({ ...draft, website: 'Autofilled hidden value', noticeToken, requestKey: firstKey });
+    expect(JSON.parse(fetcher.mock.calls[1][1]?.body as string)).toEqual({ ...draft, subject: 'Corrected visible subject', noticeToken, requestKey: nextKey });
+  });
+
+  it('retains visible field guidance while clearing a rejected hidden value', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(422, { code: 'INQUIRY_VALIDATION_FAILED', errors: { website: ['PRIVATE HIDDEN DETAIL'], email: ['PRIVATE EMAIL DETAIL'] } }));
+    form(); fill(); fireEvent.change(document.querySelector<HTMLInputElement>('[name="website"]')!, { target: { value: 'Autofilled hidden value' } }); send();
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveFocus());
+    expect(screen.getByRole('alert')).toHaveTextContent('Check the highlighted fields before sending.');
+    expect(screen.getByLabelText(/^Email/)).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByLabelText(/^Email/)).not.toHaveAttribute('readonly');
+    expect(document.querySelector('[name="website"]')).toHaveValue('');
+    expect(screen.queryByText(/PRIVATE .* DETAIL/)).not.toBeInTheDocument();
+  });
+
+  it('uses fixed generic guidance for a definite validation rejection with an empty errors object', async () => {
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValue(response(422, { code: 'INQUIRY_VALIDATION_FAILED', errors: {} }));
+    form(); fill(); send();
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Check your inquiry before sending again.'));
+    expect(screen.getByLabelText(/^Message/)).not.toHaveAttribute('readonly');
+    expect(screen.getByLabelText(/^Message/)).toHaveValue(draft.message);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([undefined, null, [], 'PRIVATE SERVER DETAIL'])('keeps a malformed validation errors response %s uncertain under the same body and key', async errors => {
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(422, { code: 'INQUIRY_VALIDATION_FAILED', errors })).mockResolvedValueOnce(saved(200));
+    form(); fill(); send();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Retry same inquiry' })).toBeEnabled());
+    expect(screen.getByRole('alert')).toHaveTextContent('could not confirm whether your inquiry was saved');
+    expect(screen.getByLabelText(/^Message/)).toHaveAttribute('readonly');
+    expect(screen.getByLabelText(/^Message/)).toHaveValue(draft.message);
+    expect(screen.queryByText('PRIVATE SERVER DETAIL')).not.toBeInTheDocument();
+    expect(fetcher).toHaveBeenCalledTimes(1); send();
+    await waitFor(() => expect(screen.getByText(receipt)).toBeVisible());
+    expect(fetcher.mock.calls[0][1]?.body).toBe(fetcher.mock.calls[1][1]?.body);
+    expect(JSON.parse(fetcher.mock.calls[0][1]?.body as string)).toEqual({ ...draft, noticeToken, requestKey: firstKey });
+    expect(crypto.randomUUID).toHaveBeenCalledTimes(1);
+  });
+
+  it('requires an explicitly refreshed notice before a first stale-notice rejection can be resubmitted', async () => {
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(422, { code: 'INQUIRY_VALIDATION_FAILED', errors: { noticeToken: ['PRIVATE SERVER DETAIL'] } })).mockResolvedValueOnce(saved());
+    const rendered = form(); fill(); fireEvent.change(document.querySelector<HTMLInputElement>('[name="website"]')!, { target: { value: 'Autofilled hidden value' } }); send();
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveFocus());
+    expect(screen.getByRole('alert')).toHaveTextContent('Your inquiry was not saved. Copy your draft before refreshing contact');
+    expect(screen.getByRole('link', { name: 'Refresh contact to review the current privacy notice' })).toHaveAttribute('href', '/contact');
+    expect(screen.getByRole('button', { name: 'Send inquiry' })).toBeDisabled();
+    expect(screen.getByLabelText(/^Message/)).not.toHaveAttribute('readonly');
+    expect(document.querySelector('[name="website"]')).toHaveValue('');
+    expect(screen.queryByText(/PRIVATE SERVER DETAIL/)).not.toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(/^Subject/), { target: { value: 'Edited draft before refresh' } });
+    fireEvent.submit(screen.getByRole('button', { name: 'Send inquiry' }).closest('form')!);
+    expect(fetcher).toHaveBeenCalledTimes(1); expect(crypto.randomUUID).toHaveBeenCalledTimes(1);
+    rendered.rerender(<ContactInquiryForm privacyNotice={privacy} noticeToken={noticeToken} />);
+    expect(screen.getByRole('button', { name: 'Send inquiry' })).toBeDisabled();
+    rendered.rerender(<ContactInquiryForm privacyNotice="New synthetic approved privacy notice." noticeToken={nextNoticeToken} />);
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Send inquiry' })).toBeEnabled());
+    expect(screen.getByText('New synthetic approved privacy notice.')).toBeVisible();
+    expect(screen.getByLabelText(/^Subject/)).toHaveValue('Edited draft before refresh');
+    expect(screen.getByLabelText(/^Message/)).toHaveValue(draft.message); expect(fetcher).toHaveBeenCalledTimes(1);
+    send(); await waitFor(() => expect(screen.getByText(receipt)).toBeVisible());
+    expect(JSON.parse(fetcher.mock.calls[1][1]?.body as string)).toEqual({ ...draft, subject: 'Edited draft before refresh', noticeToken: nextNoticeToken, requestKey: nextKey });
+  });
+
+  it('freezes the displayed notice and original token through uncertain retries after notice props change', async () => {
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockRejectedValueOnce(new TypeError('response lost'))
+      .mockResolvedValueOnce(response(422, { code: 'INQUIRY_VALIDATION_FAILED', errors: { noticeToken: ['PRIVATE SERVER DETAIL'] } })).mockResolvedValueOnce(saved(200)).mockResolvedValue(saved());
+    const rendered = form(); fill(); send(); await waitFor(() => expect(screen.getByRole('button', { name: 'Retry same inquiry' })).toBeEnabled());
+    rendered.rerender(<ContactInquiryForm privacyNotice="New synthetic approved privacy notice." noticeToken={nextNoticeToken} />);
+    expect(screen.getByText(privacy)).toBeVisible(); expect(screen.queryByText('New synthetic approved privacy notice.')).not.toBeInTheDocument();
+    send(); await waitFor(() => expect(screen.getByRole('button', { name: 'Retry same inquiry' })).toBeEnabled());
+    expect(screen.getByRole('alert')).toHaveTextContent('could not confirm whether your inquiry was saved');
+    expect(screen.getByLabelText(/^Message/)).toHaveAttribute('readonly');
+    expect(screen.queryByRole('link', { name: 'Refresh contact to review the current privacy notice' })).not.toBeInTheDocument();
+    expect(screen.queryByText(/PRIVATE SERVER DETAIL/)).not.toBeInTheDocument();
+    send(); await waitFor(() => expect(screen.getByText(receipt)).toBeVisible());
+    expect(new Set(fetcher.mock.calls.slice(0, 3).map(call => call[1]?.body)).size).toBe(1);
+    expect(JSON.parse(fetcher.mock.calls[0][1]?.body as string)).toEqual({ ...draft, noticeToken, requestKey: firstKey });
+    expect(crypto.randomUUID).toHaveBeenCalledTimes(1);
+    await userEvent.click(screen.getByRole('button', { name: 'Write another inquiry' })); fill(); send();
+    await waitFor(() => expect(fetcher).toHaveBeenCalledTimes(4));
+    expect(JSON.parse(fetcher.mock.calls[3][1]?.body as string)).toEqual({ ...draft, noticeToken: nextNoticeToken, requestKey: nextKey });
+  });
+
+  it('does not reset a hidden value or replace an uncertain attempt after a hidden rejection', async () => {
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockRejectedValueOnce(new TypeError('response lost')).mockResolvedValueOnce(response(422, { code: 'INQUIRY_VALIDATION_FAILED', errors: { website: ['PRIVATE HIDDEN DETAIL'] } })).mockResolvedValueOnce(saved(200));
+    form(); fill(); fireEvent.change(document.querySelector<HTMLInputElement>('[name="website"]')!, { target: { value: 'Original hidden value' } }); send();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Retry same inquiry' })).toBeEnabled());
+    send(); await waitFor(() => expect(screen.getByRole('button', { name: 'Retry same inquiry' })).toBeEnabled());
+    expect(screen.getByLabelText(/^Message/)).toHaveAttribute('readonly');
+    expect(document.querySelector('[name="website"]')).toHaveValue('Original hidden value');
+    expect(screen.getByRole('alert')).toHaveTextContent('could not confirm whether your inquiry was saved');
+    expect(screen.queryByText(/PRIVATE HIDDEN DETAIL/)).not.toBeInTheDocument(); send();
+    await waitFor(() => expect(screen.getByText(receipt)).toBeVisible());
+    expect(new Set(fetcher.mock.calls.map(call => call[1]?.body)).size).toBe(1);
+    expect(crypto.randomUUID).toHaveBeenCalledTimes(1);
   });
 
   it('does not replace an uncertain original after a later validation rejection', async () => {

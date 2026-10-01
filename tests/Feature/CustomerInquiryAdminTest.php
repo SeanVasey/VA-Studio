@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Domain\Inquiries\InquiryAdministration;
+use App\Domain\Inquiries\InquiryPolicy;
 use App\Domain\Inquiries\Models\CustomerInquiry;
 use App\Domain\Inquiries\SubmitInquiry;
 use App\Domain\SiteBuilder\SiteContent;
@@ -43,7 +44,8 @@ class CustomerInquiryAdminTest extends TestCase
         $release = app(SiteContent::class)->create(SiteEditorialFixtures::content(), 'Synthetic test contact', $this->operator);
         app(SiteContent::class)->publish($release->id, 0, $this->operator);
         app(SubmitInquiry::class)->handle(['name' => 'Private synthetic buyer', 'email' => 'private@example.test', 'subject' => 'Private test subject',
-            'message' => '<script>synthetic body only</script>', 'website' => '', 'requestKey' => (string) Str::uuid()], str_repeat('a', 64));
+            'message' => '<script>synthetic body only</script>', 'website' => '', 'requestKey' => (string) Str::uuid(),
+            'noticeToken' => app(InquiryPolicy::class)->publicSetup(app(SiteContent::class)->current())['noticeToken']], str_repeat('a', 64));
         $this->inquiry = CustomerInquiry::sole();
     }
 

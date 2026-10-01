@@ -2,8 +2,10 @@
 
 use App\Domain\Inquiries\InquiryException;
 use App\Domain\Inquiries\SubmitInquiry;
+use App\Domain\SiteBuilder\Models\SitePublication;
 use App\Domain\SiteBuilder\SiteContent;
 use App\Models\User;
+use App\Support\CanonicalJson;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
 
@@ -28,6 +30,17 @@ try {
         'inquiries.retention_policy_reference' => 'SYNTHETIC-RACE-RETENTION', 'inquiries.operator_user_id' => $input['operator_id']]);
     DB::statement('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
     $connection = (int) DB::selectOne('SELECT CONNECTION_ID() AS id')->id;
+    $snapshot = [];
+    $captureSnapshot = ($input['site_snapshot_before_admission'] ?? false) === true;
+    if ($captureSnapshot) {
+        if ($input['operation'] !== 'submit') {
+            throw new LogicException('Only admission can capture the displayed site snapshot.');
+        }
+        DB::beginTransaction();
+        $displayed = app(SiteContent::class)->current();
+        $snapshot = ['displayed_release_id' => SitePublication::findOrFail(1)->active_release_id,
+            'displayed_content_hash' => CanonicalJson::hash($displayed)];
+    }
     $wait = function (string ...$paths): void {
         $deadline = microtime(true) + 30;
         do {
@@ -68,7 +81,10 @@ try {
     } catch (InquiryException $error) {
         $result = ['result' => 'rejected', 'status' => $error->status];
     }
-    echo json_encode($result + ['connection_id' => $connection, 'pid' => getmypid(), 'transaction_level' => DB::transactionLevel()], JSON_THROW_ON_ERROR);
+    if ($captureSnapshot) {
+        DB::commit();
+    }
+    echo json_encode($result + $snapshot + ['connection_id' => $connection, 'pid' => getmypid(), 'transaction_level' => DB::transactionLevel()], JSON_THROW_ON_ERROR);
     exit(0);
 } catch (Throwable $error) {
     echo json_encode(['result' => 'worker_failed', 'exception' => $error::class], JSON_THROW_ON_ERROR);

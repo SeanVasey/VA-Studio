@@ -20,8 +20,9 @@ final class SubmitInquiry
         if (preg_match('/\A[a-f0-9]{64}\z/D', $ownerHash) !== 1) {
             throw new InquiryException(422);
         }
-        $payload = array_diff_key($body, ['requestKey' => true]);
-        $hash = CanonicalJson::hash($payload);
+        $payload = array_diff_key($body, ['requestKey' => true, 'noticeToken' => true]);
+        // Replay identity includes the displayed context; the encrypted private payload stays five fields.
+        $hash = CanonicalJson::hash(array_diff_key($body, ['requestKey' => true]));
         try {
             return DB::transaction(function () use ($body, $payload, $hash, $ownerHash): array {
                 // Publication withdrawal serializes with admission; drafts cannot activate this intake.
@@ -35,6 +36,9 @@ final class SubmitInquiry
                 $existing = CustomerInquiry::where('request_key', $body['requestKey'])->first();
                 if ($existing !== null) {
                     return $this->replay($existing, $hash, $ownerHash);
+                }
+                if (! hash_equals($setup['noticeToken'], $body['noticeToken'])) {
+                    throw new InquiryException(422, ['noticeToken' => ['Refresh contact to review the current privacy notice before sending.']]);
                 }
                 $release = SiteRelease::findOrFail($publication->active_release_id);
                 $inquiry = CustomerInquiry::create([

@@ -12,7 +12,9 @@ T15a adds a private database inbox and truthful saved receipt. It sends no email
 - `CONTACT_INQUIRIES_OPERATOR_ID` must identify an existing verified staff member satisfying the panel's required MFA enrollment rule.
 - The currently published verified site release must contain a contact page. Draft/private previews cannot enable public submission. Withdrawal of any required condition stops new submissions and receipt replay with the same generic unavailable response.
 
-The public contact controller may call `InquiryPolicy::publicSetup($verifiedCurrentContent)` on its existing verified snapshot. Expose only `contactInquiryEnabled` and `contactInquiryPrivacyNotice`; internal operator, retention reference and hashes stay private. Private preview pages keep the form disabled. The frontend consumes the same `/contact/inquiries` endpoint and existing CSRF cookie/token.
+The public contact controller calls `InquiryPolicy::publicSetup($verifiedCurrentContent)` on its verified snapshot. Expose only `contactInquiryEnabled`, `contactInquiryPrivacyNotice` and the opaque `contactInquiryNoticeToken`; internal operator, retention reference and hashes stay private. Private preview pages keep the form disabled and receive no token. The frontend consumes the same `/contact/inquiries` endpoint and existing CSRF cookie/token.
+
+The token is a purpose-separated HMAC using the application key. It binds the displayed notice hash, selected release/hash/publication revision, private retention-reference hash and configured operator identity. Issuance fails closed if the verified content does not match the selected release or the key is unavailable. This binds the displayed context; it is not a consent record, delivery receipt or new policy. During admission, current publication and persisted operator authority are locked in that order. A caller's old repeatable-read content snapshot cannot issue a token for different current content.
 
 ## Submission and retry contract
 
@@ -26,10 +28,15 @@ The public contact controller may call `InquiryPolicy::publicSetup($verifiedCurr
 | `message` | Required, 8,000 Unicode characters; ordinary line breaks allowed |
 | `website` | Honeypot; must be exactly empty |
 | `requestKey` | Fresh canonical lowercase UUIDv4 |
+| `noticeToken` | Exact 64 lowercase hexadecimal characters issued with the displayed notice |
 
 The complete raw body is capped at 16,384 bytes, including JSON escaping/envelope. Duplicate keys, extra/nested fields, query parameters, method overrides, range/encoding tricks and other media types fail before admission. Same-origin checks supplement the framework's CSRF/fetch-metadata protection. IP budgets are five requests per minute and twenty per hour; cache keys hash the IP and no IP is stored in the inquiry.
 
-Accepted values are retained exactly, without trimming, case folding or Unicode normalization. JSON property order/escaping/whitespace is immaterial. A request key is reserved globally so a lost response followed by session/authentication rotation cannot create a second inquiry. Receipt replay still requires the exact owning session context and payload. A foreign owner or changed payload gets the same generic conflict without a receipt, saved state or private data. Login/logout invalidates the separate inquiry-owner secret, including a login/logout round trip between submissions.
+Accepted values are retained exactly, without trimming, case folding or Unicode normalization. JSON property order/escaping/whitespace is immaterial. A request key is reserved globally so a lost response followed by session/authentication rotation cannot create a second inquiry. Receipt replay still requires the exact owning session context and body, including its original notice token. A foreign owner, changed payload or replacement token gets the same generic conflict without a receipt, saved state or private data. Login/logout invalidates the separate inquiry-owner secret, including a login/logout round trip between submissions.
+
+A first submission with a stale or forged token is rejected with 422 and the fixed `errors.noticeToken` message: “Refresh contact to review the current privacy notice before sending.” Nothing is retained. After refreshing and reviewing the current notice, a new first attempt may use the newly issued token. An exact already-saved replay with its original token returns the original receipt after a valid policy, operator or selected-release change, preserving the original encrypted notice, policy and association. Existing setup/authority withdrawal still denies replay before this lookup. An uncertain retry must retain the original token, UUID and body; it must not silently adopt new page props.
+
+The canonical replay fingerprint includes the token but excludes `requestKey`. The encrypted payload remains exactly the five input fields `name`, `email`, `subject`, `message` and `website`. Raw notice tokens are not stored in payloads, audit contexts, queue jobs or error diagnostics. Historical fingerprints made before this mandatory seven-field contract cannot replay through it; this unmerged, disabled feature does not add a legacy bypass or rewrite retained rows.
 
 | Status | Response |
 | --- | --- |

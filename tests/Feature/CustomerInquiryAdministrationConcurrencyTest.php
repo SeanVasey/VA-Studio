@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Domain\Commerce\Checkout\HostedCheckout;
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use App\Domain\Inquiries\InquiryAdministration;
+use App\Domain\Inquiries\InquiryPolicy;
 use App\Domain\Inquiries\Models\CustomerInquiry;
 use App\Domain\Inquiries\SubmitInquiry;
 use App\Domain\SiteBuilder\SiteContent;
@@ -69,7 +70,8 @@ class CustomerInquiryAdministrationConcurrencyTest extends TestCase
         $site->publish($release->id, 0, $this->operator);
         app(SubmitInquiry::class)->handle(['name' => 'Synthetic Authority Buyer', 'email' => 'authority-buyer@example.test',
             'subject' => 'Synthetic retained private subject', 'message' => "Synthetic retained private body.\nExact second line.",
-            'website' => '', 'requestKey' => (string) Str::uuid()], hash('sha256', 'synthetic-administration-owner'));
+            'website' => '', 'requestKey' => (string) Str::uuid(),
+            'noticeToken' => app(InquiryPolicy::class)->publicSetup($site->current())['noticeToken']], hash('sha256', 'synthetic-administration-owner'));
         $this->inquiry = CustomerInquiry::sole();
         $this->actingAs($this->operator);
     }

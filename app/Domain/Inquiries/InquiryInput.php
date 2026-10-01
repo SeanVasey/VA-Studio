@@ -6,11 +6,11 @@ use Illuminate\Support\Facades\Validator;
 
 final class InquiryInput
 {
-    public const FIELDS = ['name', 'email', 'subject', 'message', 'website', 'requestKey'];
+    public const FIELDS = ['name', 'email', 'subject', 'message', 'website', 'requestKey', 'noticeToken'];
 
     public static function validate(array $body): array
     {
-        if (count($body) !== 6 || array_diff(array_keys($body), self::FIELDS) !== [] || count(array_filter($body, 'is_string')) !== 6) {
+        if (count($body) !== 7 || array_diff(array_keys($body), self::FIELDS) !== [] || count(array_filter($body, 'is_string')) !== 7) {
             throw new InquiryException(422);
         }
         foreach ($body as $value) {
@@ -25,11 +25,13 @@ final class InquiryInput
             'message' => ['required', 'string', 'max:8000', 'not_regex:/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u'],
             'website' => ['present'],
             'requestKey' => ['required', 'regex:/\A[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/D'],
+            'noticeToken' => ['required', 'regex:/\A[a-f0-9]{64}\z/D'],
         ]);
         if ($body['website'] !== '' || $validator->fails()) {
             $messages = ['name' => 'Enter a name of at most 120 characters.', 'email' => 'Enter a valid email address of at most 254 characters.',
                 'subject' => 'Enter a subject of at most 160 characters.', 'message' => 'Enter a message of at most 8000 characters.',
-                'website' => 'This request cannot be accepted.', 'requestKey' => 'Start a new request before sending.'];
+                'website' => 'This request cannot be accepted.', 'requestKey' => 'Start a new request before sending.',
+                'noticeToken' => 'Refresh contact to review the current privacy notice before sending.'];
             $failed = $validator->failed();
             if ($body['website'] !== '') {
                 $failed['website'] = [];
