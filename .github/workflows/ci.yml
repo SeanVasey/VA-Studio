@@ -14,7 +14,38 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  scope:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      mode: ${{ steps.classify.outputs.mode }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Prove the changed-file scope
+        id: classify
+        run: python3 scripts/ci/ci-scope.py classify
+
+  documentation:
+    needs: scope
+    if: needs.scope.outputs.mode == 'docs'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify documentation routing safeguards
+        run: python3 scripts/ci/test-ci-scope.py
+      - name: Validate the documentation-only candidate
+        run: python3 scripts/ci/ci-scope.py docs
+
   frontend:
+    needs: scope
+    if: needs.scope.outputs.mode != 'docs'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -31,6 +62,8 @@ jobs:
       - run: npm audit --audit-level=high
 
   backend-quality:
+    needs: scope
+    if: needs.scope.outputs.mode != 'docs'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -47,8 +80,14 @@ jobs:
       - run: composer audit
       - name: Verify shard partition safeguards
         run: python3 scripts/ci/test-phpunit-shards.py
+      - name: Verify CI routing and focused-selection safeguards
+        run: |
+          python3 scripts/ci/test-ci-scope.py
+          python3 scripts/ci/test-focused-tests.py
 
   backend-mysql:
+    needs: scope
+    if: needs.scope.outputs.mode != 'docs'
     name: backend-mysql (${{ matrix.shard }}/4)
     runs-on: ubuntu-latest
     # A shard takes 22 to 38 minutes and has taken 57 on a slow runner. A hung test must not hold a runner for the 6-hour default.
@@ -111,6 +150,8 @@ jobs:
           if-no-files-found: error
 
   backend-sqlite:
+    needs: scope
+    if: needs.scope.outputs.mode != 'docs'
     name: backend-sqlite (${{ matrix.shard }}/2)
     runs-on: ubuntu-latest
     # A shard takes 7 to 20 minutes; a slow runner and a slow package mirror together could take it past 40.
@@ -156,23 +197,24 @@ jobs:
           if-no-files-found: error
 
   backend:
-    # Preserve the required check name. Never accept a skipped/cancelled/failed matrix or quality job.
+    # Preserve the required check name and explicitly validate the selected mode.
+    # Runtime mode requires every full database, frontend, browser and quality job.
     if: always()
-    needs: [backend-quality, backend-mysql, backend-sqlite]
+    needs: [scope, documentation, backend-quality, backend-mysql, backend-sqlite, frontend, operator-browser]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Require every backend gate
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Require all evidence for the classified mode
         env:
-          BACKEND_QUALITY_RESULT: ${{ needs.backend-quality.result }}
-          BACKEND_MYSQL_RESULT: ${{ needs.backend-mysql.result }}
-          BACKEND_SQLITE_RESULT: ${{ needs.backend-sqlite.result }}
-        run: |
-          test "$BACKEND_QUALITY_RESULT" = success
-          test "$BACKEND_MYSQL_RESULT" = success
-          test "$BACKEND_SQLITE_RESULT" = success
+          NEEDS_JSON: ${{ toJSON(needs) }}
+        run: python3 scripts/ci/ci-scope.py gate
 
   operator-browser:
+    needs: scope
+    if: needs.scope.outputs.mode != 'docs'
     runs-on: ubuntu-latest
     # Installing the browsers takes 1 to 4.5 minutes and has taken 14; the tests take 7 to 9.
     timeout-minutes: 35

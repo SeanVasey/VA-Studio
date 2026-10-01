@@ -1,6 +1,10 @@
 # Development CI strategy
 
-Status: proposed implementation contract for T01/T02, September 30, 2026 (America/Chicago). The planning change does not modify workflows, required checks or branch protection.
+Status: T01/T02 implementation candidate, September 30, 2026 (America/Chicago). The integrating change adds informative focused feedback, conservative documentation routing, an explicit full-mode aggregate and refreshed timing weights. Full cloud acceptance is pending; branch protection is unchanged. Draft suppression and runtime post-merge deduplication remain proposed follow-ups.
+
+## Current increment
+
+The [focused feedback workflow](verification/focused-ci.md), [documentation routing](verification/ci-scope.md), and [timing refresh](verification/ci-throughput.md) are implemented in this candidate. Runtime PRs, runtime main pushes and full dispatch still execute the complete suite. The backend aggregate now also requires frontend/browser success. No runtime post-merge evidence reuse, schedule or draft suppression is introduced. Later sections distinguish the longer-term target from this bounded implementation.
 
 ## Observed evidence
 
@@ -32,7 +36,7 @@ Before T01 changes workflows, compose related work on a branch without a PR, run
 
 Do not make tiny status-only commits after successful CI just to insert that run's result into the same source. Put exact run results in the PR body and update durable status in the next substantive batch. A changed runtime candidate always needs fresh acceptance.
 
-The current workspace has no PHP, Composer or MySQL runtime. Node/Python/source review can run here. Fast backend feedback therefore requires either a provisioned development runtime or a separate focused cloud workflow; it cannot be achieved by claiming local checks ran.
+During preparation, a compatible PHP 8.4.26 runtime and exact-lock dependency caches were recovered from an earlier same-project workspace. A reconstructed checkout matches all 764 baseline Git blobs and actual PHPUnit discovery matches 123 files /1,870 cases. Focused local SQLite/PHP checks are now available; a Composer executable, local MySQL and qpdf remain unavailable at this checkpoint. Focused cloud execution supplies the database/tool environments that local checks lack. Record each actual test environment separately.
 
 ## Target verification tiers
 
@@ -90,4 +94,3 @@ T01 is complete only when the intended event/aggregate behavior is observed, req
 - [Partitioner](../scripts/ci/phpunit-shards.py), [timing tool](../scripts/ci/phpunit-timings.py), [partition safeguards](../scripts/ci/test-phpunit-shards.py)
 - [GitHub required status checks](https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks): skipped workflows can leave checks pending; conditional jobs and dependent aggregates need explicit handling; manual dispatch checks are not a substitute for an eligible PR required-check event.
 - [GitHub workflow events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows): PR workflows normally check out the synthetic merge ref; record actual source and handle ready-for-review explicitly when needed.
-

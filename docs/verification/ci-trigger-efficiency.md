@@ -1,5 +1,11 @@
 # Foundation CI trigger scope
 
+## T01/T02 candidate — September 30, 2026
+
+The new [documentation routing](ci-scope.md) and [focused feedback](focused-ci.md) guides describe the current candidate. Runtime PR/main/manual events retain complete Foundation CI, while an explicit allowlist can select documentation validation. Feature pushes run a separate informative unit workflow. The `backend` aggregate requires every selected-mode result, including frontend/browser in full mode. The dated PR #68 record below describes the earlier unconditional policy; it remains provenance, not the new docs exception. Actual integration and event execution results belong to the integrating PR. No runtime post-merge deduplication, draft suppression or scheduled run is introduced.
+
+## Accepted PR #68 policy (historical)
+
 Status: merged through [PR #68](https://github.com/VASEYDEV/VASEYAUDIO/pull/68), 2026-09-26. GitHub repository metadata confirms `main` is the default branch. See the [ordered acceptance record](../development-order.md#current-increment-and-next-handoff) for the integrating PR's actual CI and merge status; static verification alone does not establish an executed Actions pass.
 
 An update to an open feature PR previously started two copies of Foundation CI: one from its branch push and another from the PR event. Restricting the push trigger to `main` retains complete PR checks and the post-merge run without that duplicate feature-branch run. Explicit `workflow_dispatch` permits a deliberate manual run.

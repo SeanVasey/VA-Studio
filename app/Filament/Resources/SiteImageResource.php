@@ -44,6 +44,16 @@ class SiteImageResource extends OperatorResource
         return $record->status === 'processing' && RetrySiteImage::retryable($record);
     }
 
+    /** Presentation only: waiting does not establish whether dispatch failed or the worker is simply busy. */
+    private static function problem(SiteImage $record): ?string
+    {
+        if (self::interrupted($record)) {
+            return 'processing_interrupted';
+        }
+
+        return $record->failure_code ?? ($record->status === 'quarantined' ? 'processing_waiting' : null);
+    }
+
     public static function actor(): User
     {
         $actor = auth()->user()?->fresh();
@@ -71,13 +81,15 @@ class SiteImageResource extends OperatorResource
             TextColumn::make('slot')->label('Used for')->formatStateUsing(fn (string $state): string => SiteImageSlot::label($state)),
             TextColumn::make('status')->badge()->state(fn (SiteImage $record): string => self::interrupted($record) ? 'interrupted' : $record->status)
                 ->formatStateUsing(fn (string $state): string => self::STATUS_LABELS[$state] ?? $state)
-                ->color(fn (string $state): string => match ($state) { 'ready' => 'success', 'failed' => 'danger', default => 'warning' }),
+                ->color(fn (string $state): string => match ($state) {
+                    'ready' => 'success', 'failed' => 'danger', default => 'warning'
+                }),
             TextColumn::make('attempts')->label('Attempts')->numeric(),
             TextColumn::make('size')->label('Size')->state(fn (SiteImage $record): string => $record->width.' × '.$record->height),
             TextColumn::make('original_name')->label('File')->searchable()->wrap(),
             TextColumn::make('credit')->label('Source or credit')->wrap(),
             TextColumn::make('failure_code')->label('Problem')->wrap()
-                ->state(fn (SiteImage $record): ?string => self::interrupted($record) ? 'processing_interrupted' : $record->failure_code)
+                ->state(fn (SiteImage $record): ?string => self::problem($record))
                 ->formatStateUsing(fn (?string $state): string => SiteImageProblem::describe($state)),
             TextColumn::make('uploader.name')->label('Uploaded by'),
             TextColumn::make('created_at')->label('Uploaded (UTC)')->dateTime('Y-m-d H:i', 'UTC')->sortable(),
@@ -121,7 +133,7 @@ class SiteImageResource extends OperatorResource
                 try {
                     app(IngestSiteImage::class)->handle((string) ($data['slot'] ?? ''), $data['upload'] ?? null, (string) ($data['credit'] ?? ''),
                         ($data['rights_confirmed'] ?? false) === true, static::actor());
-                    Notification::make()->success()->title('Image uploaded')->body('It will be scanned and prepared in a moment.')->send();
+                    Notification::make()->success()->title('Image uploaded')->body('The image is stored privately. Check its processing status in the list.')->send();
                 } catch (ValidationException $exception) {
                     // Domain keys are relative; the form shows errors beside its own fields.
                     $path = $livewire->getSchema($livewire->getMountedActionSchemaName())->getStatePath();

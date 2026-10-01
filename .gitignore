@@ -42,3 +42,9 @@ __pycache__/
 /public/css/filament/
 /public/fonts/filament/
 /storage/app/private/*
+
+# Generated CI evidence and temporary suite configurations
+/ci-scope.json
+/focused-ci-*
+/phpunit-focused.xml
+/phpunit-ci-*

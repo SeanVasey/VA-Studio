@@ -105,7 +105,7 @@ composer audit
 npm audit --audit-level=high
 ```
 
-GitHub CI runs the PHP suite against MySQL 8.4 and SQLite, frontend tests/build and dependency audits (including development tools), plus an isolated operator browser job using Chromium and WebKit. The complete workflow runs for pull requests, pushes to `main` and manual dispatch. Feature branches receive the full checks through their PR, avoiding a second copy for the same branch push; PR events have no branch or path filter. See [CI trigger scope and verification](docs/verification/ci-trigger-efficiency.md). See [browser verification](docs/operator-setup-and-verification.md#browser-verification) for commands, fixture isolation and evidence boundaries. A workflow file is not evidence that GitHub has run it. MySQL concurrency, real providers, mobile Safari playback, restore drills, and production deployment remain separate acceptance gates until recorded in the verification report.
+GitHub CI runs the PHP suite against MySQL 8.4 and SQLite, frontend tests/build and dependency audits (including development tools), plus an isolated operator browser job using Chromium and WebKit. The complete workflow runs for runtime pull requests, runtime pushes to `main` and manual dispatch. A conservative [documentation mode](docs/verification/ci-scope.md) validates only explicitly allowlisted prose/ledger changes; all unknown or mixed changes use full checks. Feature-branch pushes provide distinct [focused feedback](docs/verification/focused-ci.md), while the ready PR remains the full runtime acceptance gate. See [CI trigger scope and verification](docs/verification/ci-trigger-efficiency.md). See [browser verification](docs/operator-setup-and-verification.md#browser-verification) for commands, fixture isolation and evidence boundaries. A workflow file is not evidence that GitHub has run it. MySQL concurrency, real providers, mobile Safari playback, restore drills, and production deployment remain separate acceptance gates until recorded in the verification report.
 
 ## GitHub publication
 
@@ -130,4 +130,3 @@ The merchant-of-record, tax, payment methods, storage/hosting, license terms, ex
 ## Ownership
 
 Project code and VASEY.AUDIO assets are proprietary unless a file states otherwise. Third-party dependencies and self-hosted fonts retain their upstream licenses. See the brand provenance records and lockfiles. Never commit secrets, private masters/stems, customer exports, generated contracts, or production databases.
-

@@ -234,7 +234,7 @@ return new class extends Migration
     {
         if ($allowed !== null && DB::getDriverName() === 'mysql' && in_array($table, ['inventory_reservations', 'promotion_uses'], true)) {
             // Historical state columns use the database's default collation; state spelling is still exact.
-            $allowed = str_replace(['NEW.state', 'OLD.state'], ['CAST(NEW.state AS BINARY)', 'CAST(OLD.state AS BINARY)'], $allowed);
+            $allowed = $this->bytewise($allowed);
         }
         if (DB::getDriverName() === 'sqlite') {
             $when = $allowed === null ? '' : " WHEN NOT COALESCE(({$allowed}), 0)";
@@ -244,6 +244,15 @@ return new class extends Migration
             $body = $allowed === null ? $signal : "IF NOT COALESCE(({$allowed}), 0) THEN {$signal} END IF;";
             DB::unprepared("CREATE TRIGGER {$name} BEFORE {$operation} ON {$table} FOR EACH ROW BEGIN {$body} END");
         }
+    }
+
+    /** Compare only whole whitelisted column names; longer or additionally qualified names stay unchanged. */
+    public function bytewise(string $condition): string
+    {
+        $names = implode('|', array_map(fn (string $column): string => preg_quote($column, '/'), ['NEW.state', 'OLD.state']));
+
+        return preg_replace('/(?<![\w$.])(?:'.$names.')(?![\w$])/', 'CAST($0 AS BINARY)', $condition)
+            ?? throw new \LogicException('The guard condition could not be rewritten.');
     }
 
     public function down(): void

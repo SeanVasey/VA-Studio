@@ -1,6 +1,6 @@
 # Remaining development and completion plan
 
-Status: execution plan prepared September 30, 2026 (America/Chicago), against main `8be3bd7271595f2c21a3c5017b3b19ceb821a842`. This document defines the remaining work; it does not claim that the proposed CI changes or product features are implemented.
+Status: execution plan prepared September 30, 2026 (America/Chicago), against main `8be3bd7271595f2c21a3c5017b3b19ceb821a842`. This document defines the remaining work. T01/T02 now have a bounded implementation candidate described in the CI evidence guides; acceptance remains tied to executed checks and review. T03–T08 have also passed focused SQLite checks and independent reviews; the first integrated candidate combines those six fixes with the CI increment to avoid duplicate full acceptance runs. See [media evidence](verification/media-integrity-followups.md). Other task statuses remain explicit.
 
 Sean requested a firm plan for the remaining code and design, with fewer repeated full CI/MySQL runs. The execution baseline is **40 tracked completion deliverables across 11 workstreams** in [the task register](remaining-development-tasks.csv). These are outcome groups, not 40 equally sized tasks or a promise of 40 PRs. Larger product/state-machine groups need several reviewable increments. The existing 14 work-package issues retain their acceptance criteria.
 
@@ -98,7 +98,7 @@ This replaces repeated one-fix/one-full-run stops with complete feature batches.
 
 See [the CI development strategy](ci-development-strategy.md) for the executable acceptance requirements for T01/T02.
 
-Current full CI has ten jobs and executes on every PR update and each main push. PR #68 already removed the extra feature-branch push run. Draft status alone does not reduce checks today. The last accepted PR run took **62m06s**, with its slowest MySQL PHPUnit step taking **60m00s**; setup was a small fraction of that shard. These are observed values for one run, not guaranteed future durations.
+Baseline full CI has ten jobs and executes on every PR update and each main push. PR #68 already removed the extra feature-branch push run. Draft status alone does not reduce checks today. The last accepted PR run took **62m06s**, with its slowest MySQL PHPUnit step taking **60m00s**; setup was a small fraction of that shard. These are observed values for one run, not guaranteed future durations.
 
 The intended cadence is focused checks during construction, full MySQL/SQLite and integration coverage once per finished runtime batch, and a post-merge smoke/provenance check instead of an unconditional identical second full run once its replacement is proven. Documentation-only changes get explicit documentation checks through a conservative classifier. A full run remains required whenever the classifier or provenance is uncertain.
 
@@ -149,4 +149,3 @@ Top risks: unknown active obligations (high impact; resolve T09 early), policy/p
 - [Accepted main](https://github.com/VASEYDEV/VASEYAUDIO/commit/8be3bd7271595f2c21a3c5017b3b19ceb821a842), [PR #87](https://github.com/VASEYDEV/VASEYAUDIO/pull/87), [CI 36795680362](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36795680362).
 - [Ordered record](development-order.md), [work packages](work-packages/README.md), [decision register](architecture/decision-register.md), [migration/parity controls](migration/README.md), [brand sources](brand/README.md).
 - This plan changes documentation only. Proposed automation behavior requires a tested implementation before adoption; no live migration, production payment activation or cutover is performed here.
-
