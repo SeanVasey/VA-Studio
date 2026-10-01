@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
-import { router } from '@inertiajs/react';
+import { createInertiaApp, router } from '@inertiajs/react';
 import type { Page } from '@inertiajs/core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import CheckoutReturn from '../../resources/js/Pages/CheckoutReturn';
@@ -17,7 +17,29 @@ function response(status: 'not_started' | 'complete' | 'open') {
   } }));
 }
 
-afterEach(() => window.history.replaceState({}, '', '/'));
+async function mount(siteContent = defaultSiteContent) {
+  const host = document.createElement('div'); host.id = 'checkout-return-app'; document.body.appendChild(host);
+  vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+  const page: Page = {
+    component: 'CheckoutReturn', props: { errors: {}, orderId, siteContent },
+    url: window.location.pathname + window.location.search, version: null, rescuedProps: [], flash: {}, rememberedState: {},
+  };
+  await act(async () => {
+    await createInertiaApp({
+      id: host.id, page, progress: false, title: title => title || 'VASEY.AUDIO — Sound with intent',
+      resolve: name => {
+        if (name === 'CheckoutReturn') return CheckoutReturn;
+        throw new Error(`Unknown checkout test page: ${name}`);
+      },
+      setup({ App, props }) { render(<App {...props} />, { container: host }); },
+    });
+  });
+}
+
+afterEach(() => {
+  document.head.querySelectorAll('[data-inertia]').forEach(node => node.remove());
+  window.history.replaceState({}, '', '/');
+});
 
 describe('read-only checkout return', () => {
   it('displays retained verification despite contradictory redirect parameters without performing a payment operation', async () => {
@@ -26,7 +48,7 @@ describe('read-only checkout return', () => {
     const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({ checkout: {
       ...body.checkout, paymentStatus: 'verified', finalizationStatus: 'paid', contractStatus: 'pending', fulfillmentStatus: 'pending_contracts',
     } })));
-    render(<CheckoutReturn orderId={orderId} />);
+    await mount();
     expect(await screen.findByRole('status')).toHaveTextContent('Test payment verified and order finalized');
     expect(screen.getByRole('status')).toHaveTextContent('download access is not available yet');
     expect(screen.queryByRole('button', { name: /Open Stripe|Retry Stripe|Check Stripe/ })).not.toBeInTheDocument();
@@ -38,7 +60,7 @@ describe('read-only checkout return', () => {
     window.history.replaceState({}, '', `/checkout/return?${query}`);
     const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValue(response('not_started'));
     const store = vi.spyOn(Storage.prototype, 'setItem');
-    render(<CheckoutReturn orderId={orderId} />);
+    await mount();
     await act(async () => {});
     expect(fetcher).toHaveBeenCalledTimes(1);
     expect(fetcher.mock.calls[0]).toEqual([`/orders/${orderId}/checkout`, expect.objectContaining({ credentials: 'same-origin', cache: 'no-store' })]);
@@ -51,7 +73,7 @@ describe('read-only checkout return', () => {
 
   it('shows a completed provider session without asserting payment or starting fulfillment', async () => {
     const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValue(response('complete'));
-    render(<CheckoutReturn orderId={orderId} />);
+    await mount();
     await screen.findByRole('button', { name: 'Check Stripe test checkout status' });
     expect(fetcher).toHaveBeenCalledTimes(1);
     expect(fetcher.mock.calls.every(([, init]) => (init?.method ?? 'GET') === 'GET')).toBe(true);
@@ -65,7 +87,7 @@ describe('private return page chrome', () => {
     const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValue(response('not_started'));
     const hostile = '<img src=x onerror=alert(1)>';
     const siteContent = { ...defaultSiteContent, navigation: [{ label: hostile, href: '/#catalog' as const }], footer: { description: hostile } };
-    render(<CheckoutReturn orderId={orderId} siteContent={siteContent} />);
+    await mount(siteContent);
     expect(screen.getByRole('heading', { level: 1, name: 'CHECKOUT STATUS' })).toHaveFocus();
     const main = screen.getByRole('main', { name: 'CHECKOUT STATUS' });
     fireEvent.click(screen.getByRole('link', { name: 'Skip to content' }));
@@ -88,7 +110,7 @@ describe('private return page chrome', () => {
   it('keeps modified clicks native and gives ordinary Inertia visits a reachable destination heading', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(response('not_started'));
     const visit = vi.spyOn(router, 'visit').mockImplementation(() => {});
-    render(<CheckoutReturn orderId={orderId} />);
+    await mount();
     const licensing = within(screen.getByRole('navigation', { name: 'Main navigation' })).getByRole('link', { name: 'Licensing' });
     fireEvent.click(licensing, { ctrlKey: true });
     expect(visit).not.toHaveBeenCalled();

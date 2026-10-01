@@ -160,7 +160,7 @@ class CheckoutReturnPresentationTest extends TestCase
         return $response;
     }
 
-    private function head(TestResponse $response): DOMXPath
+    private function privateHeadDocument(TestResponse $response): DOMXPath
     {
         $dom = new DOMDocument;
         $previous = libxml_use_internal_errors(true);
@@ -176,7 +176,7 @@ class CheckoutReturnPresentationTest extends TestCase
 
     private function assertPrivateHead(TestResponse $response, array $sensitive = []): void
     {
-        $head = $this->head($response);
+        $head = $this->privateHeadDocument($response);
         $this->assertCount(1, $head->query('//head/title'));
         $this->assertSame('title', $head->query('//head/title')->item(0)->getAttribute('data-inertia'));
         $this->assertSame(self::TITLE, $head->evaluate('string(//head/title)'));
