@@ -136,7 +136,8 @@ test('operator sharing uses the current public route and fixed embed with truthf
   await dialog.getByRole('button', { name: 'Select link', exact: true }).click();
   await expect(link).toBeFocused();
   await page.screenshot({ path: testInfo.outputPath('operator-sharing.png'), fullPage: true });
-  await dialog.getByRole('button', { name: 'Close', exact: true }).click();
+  // Filament also has a header Close icon; invoke the named footer cancel action.
+  await dialog.locator('.fi-modal-footer').getByRole('button', { name: 'Close', exact: true }).click();
   await expect(dialog.getByRole('heading')).toBeHidden();
   await expect.poll(() => row.evaluate(element => element.contains(document.activeElement))).toBe(true);
   await persisted('sharing-after-read-only-track-evidence');
