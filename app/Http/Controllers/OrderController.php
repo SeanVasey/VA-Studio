@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Domain\Commerce\Orders\PrepareOrder;
 use App\Domain\Commerce\Orders\ReadOrder;
+use App\Domain\Commerce\Orders\ReadOwnedTestOrders;
 use App\Domain\Commerce\Orders\ReviewOrder;
 use App\Domain\Commerce\QuoteException;
 use App\Support\QuoteOwner;
@@ -15,6 +16,20 @@ use Throwable;
 
 final class OrderController
 {
+    public function history(Request $request, QuoteOwner $owner, ReadOwnedTestOrders $read): JsonResponse
+    {
+        return $this->run(function () use ($request, $owner, $read): array {
+            $raw = $request->server->get('QUERY_STRING', '');
+            // One canonical optional public locator; duplicates, arrays and additional query fields are rejected.
+            if (! is_string($raw) || ($raw !== '' && (strlen($raw) !== 43
+                || preg_match('/\Abefore=[0-9a-f-]{36}\z/D', $raw) !== 1))) {
+                throw new QuoteException('ORDER_HISTORY_CURSOR_INVALID', 422);
+            }
+
+            return ['history' => $read->handle($owner->forRequest($request), $raw === '' ? null : substr($raw, 7))];
+        });
+    }
+
     public function review(string $quote, Request $request, QuoteOwner $owner, ReviewOrder $review): JsonResponse
     {
         return $this->run(fn () => ['review' => $review->handle($quote, $owner->forRequest($request))]);
@@ -69,6 +84,7 @@ final class OrderController
         } catch (QuoteException $exception) {
             return $this->response(['code' => $exception->errorCode, 'message' => match ($exception->errorCode) {
                 'ORDER_NOT_FOUND', 'QUOTE_NOT_FOUND' => 'This order review is unavailable.',
+                'ORDER_HISTORY_CURSOR_INVALID' => 'This order history page is unavailable. Refresh the list to start again.',
                 'ORDER_ALREADY_PREPARED' => 'This selection already has a prepared order. Reload to recover its status.',
                 'IDEMPOTENCY_CONFLICT' => 'This request key belongs to a different order request.',
                 'INVALID_ORDER_REQUEST', 'INVALID_QUOTE_REQUEST' => 'Enter your name and email and accept the displayed terms.',

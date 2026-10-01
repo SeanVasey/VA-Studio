@@ -12,6 +12,11 @@ final class AdminMultiFactor
     /** A missing panel fails closed. Without a request, the admin panel's own configuration applies. */
     public static function satisfiedBy(User $user, ?Panel $panel = null): bool
     {
+        // Enrollment removal must take effect even when a caller retained the old secret.
+        $current = $user->exists ? User::find($user->getKey()) : null;
+        if ($current === null) {
+            return false;
+        }
         $panel ??= Filament::getPanel('admin');
         if ($panel === null) {
             return false;
@@ -20,7 +25,7 @@ final class AdminMultiFactor
             return true;
         }
         foreach ($panel->getMultiFactorAuthenticationProviders() as $provider) {
-            if ($provider->isEnabled($user)) {
+            if ($provider->isEnabled($current)) {
                 return true;
             }
         }

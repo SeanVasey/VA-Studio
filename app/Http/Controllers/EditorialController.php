@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Inquiries\InquiryPolicy;
 use App\Domain\SiteBuilder\EditorialContent;
 use App\Domain\SiteBuilder\SiteContent;
 use App\Domain\SiteBuilder\SiteImagePresentation;
@@ -19,8 +20,11 @@ final class EditorialController extends Controller
         abort_if($page === null, 404);
         $metadata = app(StorefrontMetadata::class)->forEditorial($page, app(SiteImagePresentation::class)->share($content));
 
+        $inquiry = $section === 'contact' ? app(InquiryPolicy::class)->publicSetup($content) : null;
+
         return Inertia::render('Editorial', [
             'siteContent' => app(EditorialContent::class)->chrome($content), 'editorial' => $page,
+            'contactInquiryEnabled' => $inquiry !== null, 'contactInquiryPrivacyNotice' => $inquiry['privacyNotice'] ?? null,
             'sitePreview' => false, 'sitePreviewBase' => null, 'metadata' => $metadata,
             'commerceEnabled' => false, 'testOrderPreparationEnabled' => false, 'testCheckoutEnabled' => false,
         ])->withViewData(['metadata' => $metadata]);

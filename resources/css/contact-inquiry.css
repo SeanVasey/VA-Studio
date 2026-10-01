@@ -1,0 +1,25 @@
+.contact-inquiry { max-width: 840px; margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--va-border); }
+.contact-inquiry h2 { font-family: var(--va-font-section); font-size: clamp(32px, 4vw, 44px); font-weight: 400; letter-spacing: 0; line-height: 1.1; }
+.contact-inquiry-heading p, .contact-inquiry-privacy { margin-top: 16px; max-width: 72ch; }
+.contact-inquiry-privacy { padding: 16px 0; font-size: 14px; overflow-wrap: anywhere; }
+.contact-inquiry-fields { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; margin-top: 24px; }
+.contact-inquiry-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.contact-inquiry-field label { font-weight: 600; font-size: 15px; }
+.contact-inquiry-field label span { color: var(--va-text-muted); font-weight: 400; font-size: 13px; }
+.contact-inquiry-field input, .contact-inquiry-field textarea { width: 100%; min-height: 48px; padding: 12px 14px; border: 1px solid var(--va-border); border-radius: var(--va-radius-control); background: var(--va-canvas); color: var(--va-text-strong); font: inherit; font-size: 16px; line-height: 1.5; }
+.contact-inquiry-field textarea { resize: vertical; min-height: 180px; outline-offset: 5px; }
+.contact-inquiry-field [aria-invalid=true] { border: 2px solid var(--va-text-strong); }
+.contact-inquiry-field [readonly] { background: var(--va-surface); }
+.contact-inquiry-field-error { font-size: 14px; font-weight: 600; }
+.contact-inquiry-summary { margin-top: 16px; padding: 20px; border: 1px solid var(--va-border); background: var(--va-surface); overflow-wrap: anywhere; }
+.contact-inquiry-summary a { text-decoration: underline; text-underline-offset: 3px; display: inline-block; min-height: 44px; padding: 8px 0; }
+.contact-inquiry-summary ul { margin: 8px 0 0; padding-left: 20px; }
+.contact-inquiry-note, .contact-inquiry-actions p { margin-top: 16px; font-size: 13px; color: var(--va-text-muted); line-height: 1.5; }
+.contact-inquiry-actions { margin-top: 24px; }
+.contact-inquiry-actions .button, .contact-inquiry > .button { min-height: 48px; }
+.contact-inquiry > .button { margin-top: 24px; }
+.contact-inquiry-receipt { margin-top: 16px; }
+.contact-inquiry-receipt code { display: block; margin-top: 8px; font-family: var(--va-font-mono); font-size: 13px; overflow-wrap: anywhere; }
+.contact-inquiry-trap { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (min-width: 640px) { .contact-inquiry-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); } .contact-inquiry-subject, .contact-inquiry-message { grid-column: 1 / -1; } }
+@media (forced-colors: active) { .contact-inquiry-field [aria-invalid=true] { outline: 2px solid CanvasText; } }

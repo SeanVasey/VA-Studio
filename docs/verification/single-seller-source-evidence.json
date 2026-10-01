@@ -1,0 +1,429 @@
+{
+  "captured_at": "2026-10-01T02:05:02.078203+00:00",
+  "repository": "VASEYDEV/VASEYAUDIO",
+  "head": "df12ea64e1e05df7682cb5b62e3fa750134da552",
+  "tree": "38ef073721fb766e1875ba020f94f9d32c16e85b",
+  "tracked_changes": [],
+  "source_audit_rows": [
+    {
+      "audit_id": "A-001",
+      "area": "Account and plan",
+      "required_capture": "Plan; enabled modules; limits; legal entity; account roles without credentials",
+      "authority": "explicit_read_only_walkthrough_or_owner_official_export",
+      "status": "not_performed",
+      "captured_at": "",
+      "evidence_reference": "",
+      "prohibited": "No payment/DNS/contract/source writes; no raw secrets or unnecessary customer content"
+    },
+    {
+      "audit_id": "A-002",
+      "area": "Tracks and editor",
+      "required_capture": "All fields; statuses; validation; license assignments; preview/master/stems roles; pagination",
+      "authority": "explicit_read_only_walkthrough_or_owner_official_export",
+      "status": "not_performed",
+      "captured_at": "",
+      "evidence_reference": "",
+      "prohibited": "No payment/DNS/contract/source writes; no raw secrets or unnecessary customer content"
+    },
+    {
+      "audit_id": "A-003",
+      "area": "File storage",
+      "required_capture": "Unattached uploads; retention; upload size limits; supported official export/download actions",
+      "authority": "explicit_read_only_walkthrough_or_owner_official_export",
+      "status": "not_performed",
+      "captured_at": "",
+      "evidence_reference": "",
+      "prohibited": "No payment/DNS/contract/source writes; no raw secrets or unnecessary customer content"
+    },
+    {
+      "audit_id": "A-004",
+      "area": "Contracts",
+      "required_capture": "Exact template text; active/archive versions; feature bullets; prices; delivered roles; overrides",
+      "authority": "explicit_read_only_walkthrough_or_owner_official_export",
+      "status": "not_performed",
+      "captured_at": "",
+      "evidence_reference": "",
+      "prohibited": "No payment/DNS/contract/source writes; no raw secrets or unnecessary customer content"
+    },
+    {
+      "audit_id": "A-005",
+      "area": "Promotions and offers",
+      "required_capture": "Coupons; bulk deals; schedules; stacking; floors; counters; open/accepted negotiations",
+      "authority": "explicit_read_only_walkthrough_or_owner_official_export",
+      "status": "not_performed",
+      "captured_at": "",
+      "evidence_reference": "",
+      "prohibited": "No payment/DNS/contract/source writes; no raw secrets or unnecessary customer content"
+    },
+    {
+      "audit_id": "A-006",
+      "area": "Customers and orders",
+      "required_capture": "Export columns; buyer links; money; statuses; original contract links; refund/download evidence",
+      "authority": "explicit_read_only_walkthrough_or_owner_official_export",
+      "status": "not_performed",
+      "captured_at": "",
+      "evidence_reference": "",
+      "prohibited": "No payment/DNS/contract/source writes; no raw secrets or unnecessary customer content"
+    },
+    {
+      "audit_id": "A-007",
+      "area": "Memberships",
+      "required_capture": "Plans; eligible tiers; active subscriptions; period boundaries; credit transactions; direct provider ownership",
+      "authority": "explicit_read_only_walkthrough_or_owner_official_export",
+      "status": "not_performed",
+      "captured_at": "",
+      "evidence_reference": "",
+      "prohibited": "No payment/DNS/contract/source writes; no raw secrets or unnecessary customer content"
+    },
+    {
+      "audit_id": "A-008",
+      "area": "Services",
+      "required_capture": "Listings; inquiry/fixed pricing; open work; deposits; milestone/revision obligations",
+      "authority": "explicit_read_only_walkthrough_or_owner_official_export",
+      "status": "not_performed",
+      "captured_at": "",
+      "evidence_reference": "",
+      "prohibited": "No payment/DNS/contract/source writes; no raw secrets or unnecessary customer content"
+    },
+    {
+      "audit_id": "A-009",
+      "area": "Kits and collections",
+      "required_capture": "Product IDs; license assignments; manifests; file roles; collections member order",
+      "authority": "explicit_read_only_walkthrough_or_owner_official_export",
+      "status": "not_performed",
+      "captured_at": "",
+      "evidence_reference": "",
+      "prohibited": "No payment/DNS/contract/source writes; no raw secrets or unnecessary customer content"
+    },
+    {
+      "audit_id": "A-010",
+      "area": "Merch",
+      "required_capture": "Fulfillment provider ownership; variants; pending orders/returns; shipping and tax configuration",
+      "authority": "explicit_read_only_walkthrough_or_owner_official_export",
+      "status": "not_performed",
+      "captured_at": "",
+      "evidence_reference": "",
+      "prohibited": "No payment/DNS/contract/source writes; no raw secrets or unnecessary customer content"
+    },
+    {
+      "audit_id": "A-011",
+      "area": "Content and customization",
+      "required_capture": "Navigation; SEO; hero/footer/current SVG; exact colors/fonts; desktop/mobile media constraints",
+      "authority": "explicit_read_only_walkthrough_or_owner_official_export",
+      "status": "not_performed",
+      "captured_at": "",
+      "evidence_reference": "",
+      "prohibited": "No payment/DNS/contract/source writes; no raw secrets or unnecessary customer content"
+    },
+    {
+      "audit_id": "A-012",
+      "area": "Marketing and consent",
+      "required_capture": "Provider links; suppression/consent provenance; analytics definitions; cookie controls",
+      "authority": "explicit_read_only_walkthrough_or_owner_official_export",
+      "status": "not_performed",
+      "captured_at": "",
+      "evidence_reference": "",
+      "prohibited": "No payment/DNS/contract/source writes; no raw secrets or unnecessary customer content"
+    },
+    {
+      "audit_id": "A-013",
+      "area": "Buyer and mobile journeys",
+      "required_capture": "Login/guest differences; contracts; re-download; offers; membership cancellation; mobile capability",
+      "authority": "explicit_read_only_walkthrough_or_owner_official_export",
+      "status": "not_performed",
+      "captured_at": "",
+      "evidence_reference": "",
+      "prohibited": "No payment/DNS/contract/source writes; no raw secrets or unnecessary customer content"
+    },
+    {
+      "audit_id": "A-014",
+      "area": "Domain and external obligations",
+      "required_capture": "DNS/SSL authority; complete zone backup; distribution/publishing/Content ID residual relationships",
+      "authority": "explicit_read_only_walkthrough_or_owner_official_export",
+      "status": "not_performed",
+      "captured_at": "",
+      "evidence_reference": "",
+      "prohibited": "No payment/DNS/contract/source writes; no raw secrets or unnecessary customer content"
+    }
+  ],
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "f3b157ccd14748feca1cb377335b6ca9a4fc9930ce4327ed90eaf4488bca516a",
+      "bytes": 4780
+    },
+    {
+      "path": "README.md",
+      "sha256": "94d53a06e832c353a33ce2c7348b5c447cf4ff90bfee6ca08e8a7a8501f8d314",
+      "bytes": 20710
+    },
+    {
+      "path": "docs/remaining-development-plan.md",
+      "sha256": "c16943a6eeee0be49c7a5ad5b4d80bda2181a1f7022ace92dc4e24d6f1314510",
+      "bytes": 22205
+    },
+    {
+      "path": "docs/remaining-development-tasks.csv",
+      "sha256": "9e82625e61e295b8745b1d1417a2574fff46bedf3f6a6c7b08a962c650600983",
+      "bytes": 16388
+    },
+    {
+      "path": "docs/remaining-parity-coverage.csv",
+      "sha256": "4186a55e710c3cdcc5bf298217fc5579591da2b95e7ee91be59920e2dea26cda",
+      "bytes": 21236
+    },
+    {
+      "path": "docs/migration/authenticated_studio_audit_checklist.csv",
+      "sha256": "37c073bf481b20cc265dc104e6b83147ea31992f4d04e74fa046c0528e8e7e95",
+      "bytes": 3945
+    },
+    {
+      "path": "docs/migration/source_ledger.csv",
+      "sha256": "691c1484b38f7a5e6a1b5c6c6bb2ed38920447a57fe9e14c4575404bffe49607",
+      "bytes": 9570
+    },
+    {
+      "path": "docs/migration/known_unknowns_and_validation.csv",
+      "sha256": "8b0e9c96da5c3ecf72dd64cd19c5409b541ed49a9ddd0a08c16785860ec57c1e",
+      "bytes": 6750
+    },
+    {
+      "path": "docs/brand/README.md",
+      "sha256": "f04e5dbca96b5bf5469150a1942e5edfb8f069a46c4124e4f63fd49c34442b1d",
+      "bytes": 7761
+    },
+    {
+      "path": "docs/brand/asset-manifest.json",
+      "sha256": "4d13d5b6fa09ebc05bda690ecfb87e3503b0de6db742fe34b40853a805cdbb11",
+      "bytes": 3307
+    },
+    {
+      "path": "docs/brand/font-manifest.json",
+      "sha256": "f14a781f3dfb4689bee599409d70aa9989f93da6fd58752395f1f5d58536f446",
+      "bytes": 3751
+    },
+    {
+      "path": "docs/architecture/decision-register.md",
+      "sha256": "63403b3cf232ae91fb2c203e2ca1c39237c5e08e51133cb70948a10713307485",
+      "bytes": 37232
+    },
+    {
+      "path": "docs/work-packages/WP-02-catalog-and-admin-authorization.md",
+      "sha256": "0e08261846da6e52c4179be3cf3ee816407d6f0f4c5a5b354d280fe0be339eaf",
+      "bytes": 6887
+    },
+    {
+      "path": "app/Models/User.php",
+      "sha256": "82c286cd31e18b7af641151726a163ce7a5c0b70fa381bd2260ebb8ce1eb0fe3",
+      "bytes": 1184
+    },
+    {
+      "path": "app/Providers/AppServiceProvider.php",
+      "sha256": "99a0df0de48b84fa6afc6d84ea5ebc9c67dc68ea78b196cb54cc99a21107b496",
+      "bytes": 1375
+    },
+    {
+      "path": "app/Providers/Filament/AdminPanelProvider.php",
+      "sha256": "267656dd6368145705a343d7735332975cfaacbb95104288ae54a9796bef1508",
+      "bytes": 4297
+    },
+    {
+      "path": "app/Support/Access/AdminMultiFactor.php",
+      "sha256": "057504356da2021bb4b75569ffa5b6e99e1ee831b611a369e234dffeb8e7e608",
+      "bytes": 866
+    },
+    {
+      "path": "app/Domain/Catalog/SaveTrackMetadata.php",
+      "sha256": "d13770145dd729d5c7b9a46a8d4b4158487fea1e2afa6c498bcda290cc7e09d1",
+      "bytes": 5997
+    },
+    {
+      "path": "app/Domain/Catalog/PublishTrack.php",
+      "sha256": "f112fbf97805f80d759dbb487f62517d05d086cee7543d687315318891412523",
+      "bytes": 1456
+    },
+    {
+      "path": "app/Domain/Catalog/Models/Track.php",
+      "sha256": "6d1cebe6d6c23e56ba59917e5e66eecd0b2e253468bd1f3b82ecd341f513f914",
+      "bytes": 2123
+    },
+    {
+      "path": "app/Filament/Resources/TrackResource.php",
+      "sha256": "60522a6d11c67b85de78278be8d6e38ee3ab95dbc26d5fc3f58e8e5c003d8ea8",
+      "bytes": 5738
+    },
+    {
+      "path": "app/Filament/Resources/MediaAssetResource.php",
+      "sha256": "2d269a113572b25254f54fce9da34c68e100b628fbbf77db169db0f91a60a253",
+      "bytes": 7278
+    },
+    {
+      "path": "app/Domain/Media/PrivateMediaFiles.php",
+      "sha256": "897af9d7368435f53da0c2464ecb77f94df52cfcbacc2ec4005b2b83399e44ea",
+      "bytes": 7973
+    },
+    {
+      "path": "app/Domain/Media/QueueMediaProcessing.php",
+      "sha256": "b32fb0fc9466753ca2f67ccf1176d71930e1b381580b30152ced6e6d73f9b673",
+      "bytes": 3802
+    },
+    {
+      "path": "config/media.php",
+      "sha256": "09d0f58d0479d354e60bed1e02d8f5d7490c3abe9d2ff753c4ef09dcaed80602",
+      "bytes": 1940
+    },
+    {
+      "path": "config/filesystems.php",
+      "sha256": "167dd51e6b13f1b338b703f8cb2b49828b98289306208915ec9dac347471c64d",
+      "bytes": 2533
+    },
+    {
+      "path": "app/Domain/SiteBuilder/SiteContent.php",
+      "sha256": "af3ea640317a2c99046a352da1b7755725a8e5525e1c34650734afb8ca1c0e83",
+      "bytes": 23772
+    },
+    {
+      "path": "app/Domain/SiteBuilder/EditorialContent.php",
+      "sha256": "6f66a4c632de58db386ae2acc0e00df99977f79a5dc46c312a405eca50fe0aea",
+      "bytes": 3028
+    },
+    {
+      "path": "app/Domain/Delivery/TestAccessPolicy.php",
+      "sha256": "f6717994afbd8c48fc814fab413029c7e46f1f8fe7b7dd79611ffcb588c1c04a",
+      "bytes": 2054
+    },
+    {
+      "path": "app/Domain/Commerce/Models/FulfillmentOutbox.php",
+      "sha256": "da7396fd580e2c4198ed4c516a11ad5ac23fab00be3b8de814583a4197e54b1e",
+      "bytes": 1238
+    },
+    {
+      "path": "resources/js/Pages/Editorial.tsx",
+      "sha256": "bd62ea18f18748dc17618d7b0ab6cb47c94e262c92ba6e27f66f2fcf60f1fb58",
+      "bytes": 4218
+    },
+    {
+      "path": "resources/js/Pages/Storefront.tsx",
+      "sha256": "93963434e43b1bee0f9820ce0b15b2ddcaeee2e1ea8547d917e05631f3f7c3c0",
+      "bytes": 27975
+    },
+    {
+      "path": "resources/js/lib/site-content.ts",
+      "sha256": "1d8c96d1c46ef93275fd94b9a9a8a4a3f7cddfb776b176f755a1ab915303495f",
+      "bytes": 3427
+    },
+    {
+      "path": "routes/web.php",
+      "sha256": "d27f425279d9b67ba78616d2699c2d4f6dabbd4e41dad232339928cbd655c43c",
+      "bytes": 5517
+    },
+    {
+      "path": "routes/console.php",
+      "sha256": "a8f59fe29174f0ea5714cdc1ac1731af09e0d413825eb877a159d96bb157c2a3",
+      "bytes": 572
+    },
+    {
+      "path": "tests/Feature/OperatorSetupTest.php",
+      "sha256": "788617c28e5d4c3f259d9b173ce9b142ddc1827dc0dbcc095f778e8ab5b3bb51",
+      "bytes": 3139
+    },
+    {
+      "path": "tests/Feature/TrackMetadataTest.php",
+      "sha256": "a5d6eabf725c3d9f1fdd4d3eb4e2e8d1630e95e389a3e0806651c876c9193aeb",
+      "bytes": 13887
+    },
+    {
+      "path": "tests/Feature/FoundationTest.php",
+      "sha256": "adeb0eae6dca0abeb3f782fa322b415c6ac1fd8545c8e461f3e85c073739ff9b",
+      "bytes": 18052
+    },
+    {
+      "path": "tests/Feature/LicensingAdminTest.php",
+      "sha256": "9683898d334c460d0122e5126dbd9fdac851226aae4733659f259128d840fd4a",
+      "bytes": 8894
+    },
+    {
+      "path": "tests/Feature/MediaUploadTest.php",
+      "sha256": "17c2acdd5dbed549659931f8506219de190f3dc0ddd0cb1dc44e3ea448907059",
+      "bytes": 7530
+    },
+    {
+      "path": "tests/Feature/PrivateMediaRevisionRootsTest.php",
+      "sha256": "b708f158e3a11c9249825dca75c78c5765355884583ca1d4d5a81690d5fda31d",
+      "bytes": 3274
+    },
+    {
+      "path": "tests/Feature/MediaProcessingTest.php",
+      "sha256": "a7eebd80e7551794324e813f6905eb337d24a58eaa4c1e9626a155be9a866fd7",
+      "bytes": 30594
+    },
+    {
+      "path": "tests/Feature/MalwareScannerTest.php",
+      "sha256": "6e68a62dc75c8cc7d436ca133cdd8b76be197499cf600dfe1e45be543e864fae",
+      "bytes": 58156
+    },
+    {
+      "path": "tests/Feature/StemsArchiveTest.php",
+      "sha256": "4f72d3371c5b946fdf895b3fab2f76d79ca915da05035380f639ad73de38c0b9",
+      "bytes": 29755
+    },
+    {
+      "path": "tests/Feature/StemsRecordingTest.php",
+      "sha256": "7a4c8c4f489a218370646a46c381b5adc4125fc5fcbd39e08e664015f72880ee",
+      "bytes": 15644
+    },
+    {
+      "path": "tests/Feature/MediaWorkflowBudgetTest.php",
+      "sha256": "74f277ddc19fa853b2afc0a59adb27de0aa7212582c54b850507edae6b27611f",
+      "bytes": 8901
+    },
+    {
+      "path": "tests/Feature/SiteEditorialHttpTest.php",
+      "sha256": "771e85cd3cd756b43eed19a1f90d3ab65663b9f7abea8f44562184a7aa20e202",
+      "bytes": 17193
+    },
+    {
+      "path": "tests/Feature/SiteEditorialContentTest.php",
+      "sha256": "9a5ff1816b76ae45dd54d572e92819587a22be65453821f43b44782a505d4f1f",
+      "bytes": 11733
+    },
+    {
+      "path": "tests/Feature/TestCommerceOperationsTest.php",
+      "sha256": "57e6fca51e9d29d78d007ade37a8c055f63e01092d4d651999bc05abd31779c8",
+      "bytes": 16110
+    },
+    {
+      "path": "tests/Feature/TestOwnerDeliveryHttpTest.php",
+      "sha256": "013f963fbc776eeba0ffd3ff5729328798fc0a504a16430e3636445014ca8472",
+      "bytes": 33658
+    },
+    {
+      "path": "tests/frontend/editorial-content.test.tsx",
+      "sha256": "a9e2575098744d7120fd34ec020ca19aaf3b2cbaf0271f5e0efed2dbb3e655c4",
+      "bytes": 7631
+    },
+    {
+      "path": "tests/frontend/order-recovery.test.tsx",
+      "sha256": "57b793a5111f4e59a73a034621d38d154e885cca5dfe55e0a2f54723ec601e99",
+      "bytes": 14456
+    }
+  ],
+  "runtime_tests_executed": false,
+  "public_retrievals": [
+    {
+      "url": "https://www.vasey.audio/",
+      "retrieved": "2026-10-01",
+      "kind": "crawler text",
+      "reported_age": "last week",
+      "authority": "public display only"
+    },
+    {
+      "url": "https://www.vasey.audio/memberships",
+      "retrieved": "2026-10-01",
+      "kind": "crawler text",
+      "reported_age": "three weeks",
+      "authority": "public display only"
+    }
+  ],
+  "remote_equivalent_head": "e08e90d69b8716b2641b6de603375358f6404176"
+}

@@ -1,6 +1,6 @@
 # [WP-08] Deterministic contracts, entitlements and customer re-downloads
 
-Status: **Merged PR #64 supplies frozen grants and pending entitlements/outbox; merged #65 supplies D-17 private originals/recovery, #67 D-18 activation and #69 D-19 internal delivery. D-20 owner HTTP/UI and bounded order history is implemented as the current dependent candidate.** Main `1a6ecebd` passed [CI 36280010722](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36280010722). The candidate needs its own integrated tests/review; guest recovery, complete customer library, production fulfillment and the full criteria below remain open.
+Status: **Original contract issuance, complete-order test activation and owner HTTP/UI delivery are accepted through PR #71.** The [single-seller experience candidate](../verification/single-seller-experience-increment.md) adds current-session test-order history and a synthetic exact-original restore rehearsal. Guest recovery, the complete customer library, production archival/storage and fulfillment remain open.
 
 - Suggested issue title: `[WP-08] Deterministic contracts, entitlements and customer re-downloads`
 - Phase: 2

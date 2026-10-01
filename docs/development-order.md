@@ -1,5 +1,11 @@
 # Ordered development status
 
+## Single-seller experience increment — October 1, 2026
+
+A parallel implementation candidate now combines persisted operator authorization/MFA checks, the UUID guard follow-up, a private inquiry inbox and contact form, explicit-consent video playback, a public tagged-preview embed, current-session test-order history, player queue/loop/speed/media controls and a synthetic private-original restore rehearsal. [The integrated evidence record](verification/single-seller-experience-increment.md) links the separately reviewed children and states their remaining acceptance boundaries. These are partial children of T04/T12/T15–T17/T24/T25/T33, not completed parent tasks or production activation.
+
+PR #88 is still a prerequisite under verification. Its first cloud run found a mobile menu-helper synchronization defect and three MySQL hash-test failures; both remain blockers until corrected source passes the full required checks. Continue focused implementation/review while diagnosing them; do not rerun the entire suite for every edit or merge on partial results. The private source audit, owner policy decisions and live-host/provider evidence remain open.
+
 ## CI throughput and media integrity candidate — October 1, 2026
 
 The T01/T02 candidate integrates the single-seller plan with an informative focused workflow, conservative documentation-only routing, an always-running acceptance gate that checks all runtime surfaces, and updated 123-file/1,870-case timing weights. See [focused feedback](verification/focused-ci.md), [scope routing](verification/ci-scope.md) and [timing evidence](verification/ci-throughput.md). Full runtime PR/main/manual checks remain in place; their cloud acceptance and measured duration belong to the integrating PR. No full T01/T02 completion or timing improvement is claimed before those results. The six media follow-ups T03–T08 are included in this integrated candidate after 193 focused SQLite tests / 1,654 assertions passed without failures or skips. See [media integrity evidence and rollout](verification/media-integrity-followups.md). MySQL and full cloud acceptance remain pending; the separate UUID byte-guard finding is tracked as a child follow-up.

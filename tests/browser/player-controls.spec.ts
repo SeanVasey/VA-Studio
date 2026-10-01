@@ -1,0 +1,108 @@
+import { test, expect } from '@playwright/test';
+import { fixtureTrack, query, storefrontFixture } from './storefront-fixture';
+
+const nextTrack = { ...fixtureTrack, id: '7002', title: 'Synthetic next preview', slug: 'synthetic-next-preview', previewUrl: '/media/synthetic-next-preview', shareUrl: '/tracks/synthetic-next-preview', offers: [] };
+
+test('listener-enabled automatic next and queue repeat reuse one real audio owner across navigation', async ({ page }) => {
+  await storefrontFixture(page, { tracks: [fixtureTrack, nextTrack] });
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('/' + query);
+  expect(await page.evaluate(() => window.__nativePreviews.length)).toBe(0);
+  await page.getByRole('article', { name: fixtureTrack.title, exact: true }).getByRole('button', { name: `Play ${fixtureTrack.title}`, exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Pause preview', exact: true })).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.__nativePreviews[0].currentTime)).toBeGreaterThan(0);
+  await page.getByRole('button', { name: 'Queue & loop', exact: true }).click();
+  const controls = page.getByRole('region', { name: 'Preview queue and loop controls' });
+  const autoNext = controls.getByRole('checkbox', { name: 'Play next automatically' });
+  await expect(autoNext).not.toBeChecked();
+  await autoNext.focus();
+  await autoNext.press('Space');
+  await expect(autoNext).toBeChecked();
+  await controls.getByRole('button', { name: 'Close queue', exact: true }).click();
+  await page.getByRole('article', { name: fixtureTrack.title, exact: true }).getByRole('link', { name: fixtureTrack.title, exact: true }).click();
+  await expect(page).toHaveURL(fixtureTrack.shareUrl + query);
+  // Advance the real element near its end; decoding, ended and the next play promise remain native.
+  await page.evaluate(() => { window.__nativePreviews[0].currentTime = 59.7; });
+  await expect.poll(() => page.evaluate(() => window.__nativePreviews[0].src)).toContain(nextTrack.previewUrl);
+  await expect.poll(() => page.evaluate(() => window.__nativePreviews[0].paused)).toBe(false);
+  await expect.poll(() => page.evaluate(() => window.__nativePreviews[0].currentTime)).toBeGreaterThan(0);
+  await page.getByRole('button', { name: 'Queue & loop', exact: true }).click();
+  await expect(controls.getByRole('listitem')).toHaveCount(2);
+  await controls.getByRole('combobox', { name: 'Repeat' }).selectOption('queue');
+  await page.evaluate(() => { window.__nativePreviews[0].currentTime = 59.7; });
+  await expect.poll(() => page.evaluate(() => window.__nativePreviews[0].src)).toContain(fixtureTrack.previewUrl!);
+  await expect.poll(() => page.evaluate(() => window.__nativePreviews[0].paused)).toBe(false);
+  expect(await page.evaluate(() => window.__nativePreviews.length)).toBe(1);
+  await page.getByRole('button', { name: 'Pause preview', exact: true }).click();
+  expect(await page.evaluate(() => window.__nativePreviews[0].paused)).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test('section markers loop native preview playback and remain reachable with keyboard on both viewports', async ({ page }, testInfo) => {
+  await storefrontFixture(page);
+  await page.goto('/' + query);
+  await page.getByRole('button', { name: `Play ${fixtureTrack.title}`, exact: true }).click();
+  await expect(page.getByRole('slider', { name: 'Seek preview' })).toBeEnabled();
+  await page.getByRole('button', { name: 'Queue & loop', exact: true }).click();
+  const controls = page.getByRole('region', { name: 'Preview queue and loop controls' });
+  await expect(controls.getByRole('button', { name: 'Set B here' })).toBeDisabled();
+  await page.evaluate(() => { window.__nativePreviews[0].currentTime = 2; });
+  await controls.getByRole('button', { name: 'Set A here' }).focus();
+  await page.keyboard.press('Enter');
+  await page.evaluate(() => { window.__nativePreviews[0].currentTime = 4; });
+  await controls.getByRole('button', { name: 'Set B here' }).focus();
+  await page.keyboard.press('Enter');
+  await expect(controls.getByText('Loop on', { exact: true })).toBeVisible();
+  await expect(controls.getByText(/^A: 0:02/)).toBeVisible();
+  await expect(controls.getByText(/^B: 0:04/)).toBeVisible();
+  await page.evaluate(() => { window.__nativePreviews[0].currentTime = 4.5; });
+  await expect.poll(() => page.evaluate(() => window.__nativePreviews[0].currentTime)).toBeLessThan(3);
+  expect(await page.evaluate(() => window.__nativePreviews[0].paused)).toBe(false);
+  expect(await page.evaluate(() => window.__nativePreviews.length)).toBe(1);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath('queue-section-loop.png'), fullPage: false });
+  await controls.getByRole('button', { name: 'Clear loop' }).click();
+  await expect(controls.getByText('Loop off', { exact: true })).toBeVisible();
+  await page.evaluate(() => { window.__nativePreviews[0].currentTime = 12; });
+  await expect.poll(() => page.evaluate(() => window.__nativePreviews[0].currentTime)).toBeGreaterThan(12);
+  await page.keyboard.press('Escape');
+  await expect(controls).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Queue & loop', exact: true })).toBeFocused();
+});
+
+test('speed changes stay paused until play, survive a native source change and clear on close', async ({ page }) => {
+  await storefrontFixture(page, { tracks: [fixtureTrack, nextTrack] });
+  await page.goto('/' + query);
+  expect(await page.evaluate(() => window.__nativePreviews.length)).toBe(0);
+  await page.getByRole('article', { name: fixtureTrack.title, exact: true }).getByRole('button', { name: `Play ${fixtureTrack.title}`, exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Pause preview', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Pause preview', exact: true }).click();
+  await page.getByRole('button', { name: 'Queue & loop', exact: true }).click();
+  const controls = page.getByRole('region', { name: 'Preview queue and loop controls' });
+  const speed = controls.getByRole('combobox', { name: 'Playback speed' });
+  await expect(speed).toHaveValue('1');
+  await speed.selectOption('1.5');
+  expect(await page.evaluate(() => window.__nativePreviews[0].playbackRate)).toBe(1.5);
+  expect(await page.evaluate(() => window.__nativePreviews[0].paused)).toBe(true);
+  const preservesPitch = await page.evaluate(() => 'preservesPitch' in window.__nativePreviews[0] && window.__nativePreviews[0].preservesPitch);
+  await expect(controls.getByText(preservesPitch ? 'Pitch preservation is requested from your browser; results can vary.' : 'This browser could not enable pitch preservation; changing speed may change pitch.', { exact: true })).toBeVisible();
+  await controls.getByRole('button', { name: nextTrack.title + ' 1:00', exact: true }).click();
+  await expect.poll(() => page.evaluate(() => window.__nativePreviews[0].currentTime)).toBeGreaterThan(0);
+  expect(await page.evaluate(() => window.__nativePreviews[0].src)).toContain(nextTrack.previewUrl);
+  expect(await page.evaluate(() => window.__nativePreviews[0].playbackRate)).toBe(1.5);
+  if (await page.evaluate(() => 'mediaSession' in navigator && typeof MediaMetadata === 'function')) {
+    await expect.poll(() => page.evaluate(() => navigator.mediaSession.metadata?.title)).toBe(nextTrack.title);
+    expect(await page.evaluate(() => navigator.mediaSession.playbackState)).toBe('playing');
+  }
+  await controls.getByRole('button', { name: 'Reset speed', exact: true }).click();
+  await expect(speed).toHaveValue('1');
+  expect(await page.evaluate(() => window.__nativePreviews[0].playbackRate)).toBe(1);
+  await speed.selectOption('0.5');
+  await controls.getByRole('button', { name: 'Close queue', exact: true }).click();
+  await page.getByRole('button', { name: 'Close player', exact: true }).click();
+  expect(await page.evaluate(() => window.__nativePreviews[0].paused)).toBe(true);
+  expect(await page.evaluate(() => window.__nativePreviews[0].playbackRate)).toBe(1);
+  expect(await page.evaluate(() => navigator.mediaSession?.metadata ?? null)).toBeNull();
+  expect(await page.evaluate(() => window.__nativePreviews.length)).toBe(1);
+});

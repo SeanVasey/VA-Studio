@@ -1,0 +1,11 @@
+.editorial-video.editorial-video-consent { display: block; }
+.editorial-video-intro { display: flex; align-items: flex-start; gap: 24px; }
+.editorial-video-intro > svg { color: var(--va-action); flex-shrink: 0; }
+.editorial-video-intro > div { min-width: 0; }
+.editorial-video-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.editorial-video-loaded { margin-top: 24px; }
+.editorial-video-loaded iframe { display: block; width: 100%; height: auto; min-height: 200px; aspect-ratio: 16 / 9; border: 0; background: var(--va-surface); }
+@media (max-width: 600px) {
+  .editorial-video-intro { gap: 12px; }
+  .editorial-video-actions .button { width: 100%; white-space: normal; }
+}

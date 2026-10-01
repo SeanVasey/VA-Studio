@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\InquiryPrivacy;
+use App\Http\Middleware\SitePreviewPrivacy;
 use App\Http\Middleware\StripeWebhookBodyLimit;
 use App\Http\Middleware\TestDeliveryPrivacy;
-use App\Http\Middleware\SitePreviewPrivacy;
+use App\Http\Responses\InquiryResponse;
+use App\Http\Responses\PublicTrackEmbedResponse;
 use App\Http\Responses\TestDeliveryResponse;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Foundation\Application;
@@ -20,12 +23,16 @@ return Application::configure(basePath: dirname(__DIR__))
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
-        then: fn () => Route::group([], base_path('routes/webhooks.php')),
+        then: function (): void {
+            Route::group([], base_path('routes/webhooks.php'));
+            Route::group([], base_path('routes/embeds.php'));
+        },
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(StripeWebhookBodyLimit::class);
         $middleware->prepend(TestDeliveryPrivacy::class);
         $middleware->prepend(SitePreviewPrivacy::class);
+        $middleware->prepend(InquiryPrivacy::class);
         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
         $middleware->web(append: [HandleInertiaRequests::class]);
     })
@@ -34,14 +41,33 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
         );
         $exceptions->report(function (Throwable $exception) {
+            if (PublicTrackEmbedResponse::matches(request())) {
+                try { Log::error('Public track preview failed.', ['exception_class' => $exception::class]); }
+                catch (Throwable) { /* Preserve the generic public response if reporting fails. */ }
+                return false;
+            }
+            if (InquiryResponse::matches(request())) {
+                try {
+                    Log::error('Inquiry request failed.', ['exception_class' => $exception::class]);
+                } catch (Throwable) { /* Keep reporting generic even if the logger fails. */
+                }
+
+                return false;
+            }
             if (SitePreviewPrivacy::matches(request())) {
-                try { Log::error('Site preview request failed.', ['exception_class' => $exception::class]); }
-                catch (Throwable) { /* Preserve a generic private response if reporting fails. */ }
+                try {
+                    Log::error('Site preview request failed.', ['exception_class' => $exception::class]);
+                } catch (Throwable) { /* Preserve a generic private response if reporting fails. */
+                }
+
                 return false;
             }
             if (TestDeliveryResponse::matches(request())) {
-                try { Log::error('Test delivery middleware failed.', ['exception_class' => $exception::class]); }
-                catch (Throwable) { /* Reporting failure must preserve the generic private response. */ }
+                try {
+                    Log::error('Test delivery middleware failed.', ['exception_class' => $exception::class]);
+                } catch (Throwable) { /* Reporting failure must preserve the generic private response. */
+                }
+
                 return false;
             }
             if (request()->is('orders', 'orders/*', 'quotes/*/order', 'quotes/*/order-review')) {
@@ -59,6 +85,26 @@ return Application::configure(basePath: dirname(__DIR__))
         // Middleware failures occur before the controller. Keep those private and
         // generic too, including in debug mode, without changing other routes.
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request): Response {
+            if (PublicTrackEmbedResponse::matches($request)) {
+                return PublicTrackEmbedResponse::error($response->getStatusCode(), $response);
+            }
+            if (InquiryResponse::matches($request)) {
+                $status = $exception instanceof LockTimeoutException ? 503 : $response->getStatusCode();
+                if ($status < 400) {
+                    return InquiryResponse::protect($response);
+                }
+                $headers = [];
+                foreach (['Allow', 'Retry-After', 'X-RateLimit-Limit', 'X-RateLimit-Remaining'] as $name) {
+                    if ($response->headers->has($name)) {
+                        $headers[$name] = $response->headers->get($name);
+                    }
+                }
+                if ($request->is('contact/inquiries')) {
+                    return InquiryResponse::error($status, headers: $headers);
+                }
+
+                return InquiryResponse::protect(response('Inquiry inbox is unavailable.', $status >= 500 ? 503 : $status, $headers));
+            }
             if (SitePreviewPrivacy::matches($request)) {
                 $status = $exception instanceof ValidationException ? $exception->status : $response->getStatusCode();
 
@@ -68,8 +114,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 $status = $exception instanceof LockTimeoutException ? 503 : $response->getStatusCode();
                 $headers = [];
                 foreach (['Allow', 'Retry-After', 'X-RateLimit-Limit', 'X-RateLimit-Remaining'] as $name) {
-                    if ($response->headers->has($name)) { $headers[$name] = $response->headers->get($name); }
+                    if ($response->headers->has($name)) {
+                        $headers[$name] = $response->headers->get($name);
+                    }
                 }
+
                 return TestDeliveryResponse::error($status, headers: $headers);
             }
             if ($request->is('webhooks/stripe')) {

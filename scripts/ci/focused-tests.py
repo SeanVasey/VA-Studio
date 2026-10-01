@@ -45,7 +45,21 @@ PHP_TARGETS = {
         "tests/Feature/QuoteHttpTest.php", "tests/Feature/QuotePricingHttpTest.php",
         "tests/Feature/QuotePricingConcurrencyTest.php", "tests/Feature/HostedCheckoutTest.php",
         "tests/Feature/HostedCheckoutConcurrencyTest.php", "tests/Feature/StripeWebhookTest.php",
-        "tests/Feature/StripeWebhookConcurrencyTest.php", "tests/Feature/HashByteGuardMigrationTest.php",
+        "tests/Feature/StripeWebhookConcurrencyTest.php",
+        "tests/Feature/HashByteGuardMigrationTest.php", "tests/Feature/UuidByteGuardMigrationTest.php",
+        "tests/Feature/OwnedTestOrderHistoryTest.php", "tests/Feature/SyntheticPrivateRestoreTest.php",
+    ),
+    "seller": (
+        "tests/Feature/CustomerInquiryHttpTest.php", "tests/Feature/CustomerInquiryMigrationTest.php",
+        "tests/Feature/CustomerInquiryAdminTest.php", "tests/Feature/CustomerInquiryConcurrencyTest.php",
+        "tests/Feature/PublicTrackEmbedTest.php",
+        "tests/Feature/SiteEditorialHttpTest.php", "tests/Feature/SiteEditorialContentTest.php",
+        "tests/Feature/PublicLicenseDisclosureTest.php", "tests/Feature/SiteContentUnavailableHttpTest.php",
+    ),
+    "operator": (
+        "tests/Feature/FoundationTest.php", "tests/Feature/OperatorSetupTest.php",
+        "tests/Feature/OperatorAuthorityTest.php", "tests/Feature/OperatorMfaTest.php",
+        "tests/Feature/TrackMetadataTest.php", "tests/Feature/LicensingAdminTest.php",
     ),
 }
 FRONTEND_TARGETS = (
@@ -58,10 +72,15 @@ FRONTEND_TARGETS = (
     "tests/frontend/site-images.test.tsx", "tests/frontend/storefront.test.tsx",
     "tests/frontend/test-checkout.test.tsx", "tests/frontend/test-owner-delivery.test.tsx",
     "tests/frontend/track-detail.test.tsx",
+    "tests/frontend/editorial-video.test.tsx", "tests/frontend/owned-order-history.test.tsx",
+    "tests/frontend/contact-inquiry.test.tsx",
 )
 BROWSER_TARGETS = (
     "tests/browser/storefront.spec.ts", "tests/browser/operator.spec.ts",
     "tests/browser/test-checkout.spec.ts", "tests/browser/test-owner-delivery.spec.ts",
+    "tests/browser/player-controls.spec.ts", "tests/browser/owned-order-history.spec.ts",
+    "tests/browser/editorial-video-consent.spec.ts", "tests/browser/site-release-menu-readiness.spec.ts",
+    "tests/browser/contact-inquiry.spec.ts", "tests/browser/public-track-embed.spec.ts",
 )
 SUITES = (*PHP_TARGETS, "frontend", "browser")
 ENGINES = ("sqlite", "mysql")

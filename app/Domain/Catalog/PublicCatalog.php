@@ -3,6 +3,7 @@
 namespace App\Domain\Catalog;
 
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Media\Models\MediaAsset;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Cursor;
@@ -111,16 +112,31 @@ final class PublicCatalog
 
     public function track(string $slug): array
     {
+        return $this->project(collect([$this->publishedTrack($slug)]));
+    }
+
+    /** Internal model only. HTTP embeds must explicitly project public text and route IDs. */
+    public function preview(string $slug): MediaAsset
+    {
+        $track = $this->publishedTrack($slug);
+        $preview = $track->assets->where('status', 'ready')->where('role', 'preview_tagged')->sortByDesc('id')->first();
+        abort_unless($preview, 404);
+        $preview->setRelation('track', $track);
+
+        return $preview;
+    }
+
+    private function publishedTrack(string $slug): Track
+    {
         $track = $this->query()->where('slug', $slug)->first();
         abort_unless($track && $this->eligible($track), 404);
 
-        return $this->project(collect([$track]));
+        return $track;
     }
 
     public function license(string $slug, string $revisionId): array
     {
-        $track = $this->query()->where('slug', $slug)->first();
-        abort_unless($track && $this->eligible($track), 404);
+        $track = $this->publishedTrack($slug);
         $offer = $track->offers->first(fn ($offer) => $offer->is_active && (string) $offer->currentRevision?->id === $revisionId);
         abort_unless($offer, 404);
 

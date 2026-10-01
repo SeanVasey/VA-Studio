@@ -14,6 +14,8 @@ Account creation and `access.operator.created` audit insertion commit together. 
 
 The console is a privileged operator boundary. This command does not add a public registration path, an owner role hierarchy or an automated provisioning API.
 
+The panel and catalog gate use current persisted operator authority, and required MFA enrollment uses the current persisted secret. See [the authority and MFA verification increment](verification/operator-authority.md) for revoked/stale-model regressions and actual Filament enrollment, challenge and one-time recovery-code checks. Rendered and physical-device recovery acceptance remains separately tracked.
+
 ## Inspect the installation
 
 ```sh
