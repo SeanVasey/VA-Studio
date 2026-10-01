@@ -1,0 +1,90 @@
+name: Isolated operator sharing feedback
+
+# Temporary informative branch only; this does not replace the permanent four-case stage or Foundation acceptance.
+on:
+  push:
+    branches: [codex/operator-sharing-proof-20261001]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: isolated-operator-sharing-feedback
+  cancel-in-progress: true
+
+jobs:
+  operator-sharing:
+    # Keep genuinely ready catalog fixtures separate from the empty-catalog native suite.
+    runs-on: ubuntu-latest
+    # Tool setup and fixture preparation each have their own ten-minute ceiling;
+    # browser installation has previously taken fourteen minutes on hosted runners.
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          coverage: none
+          tools: composer:v2
+      - name: Install genuine scanner and current official signatures on this disposable runner
+        run: bash tests/browser/install-related-scanner.sh
+      - run: composer install --no-interaction --prefer-dist
+      - run: npm ci
+      - name: Record the exact informative source and runtime
+        run: |
+          git rev-parse HEAD HEAD^{tree}
+          php --version
+          node --version
+          node node_modules/@playwright/test/cli.js --version
+      - name: Verify isolated related-browser startup boundaries
+        run: python3 scripts/ci/test-related-browser-stage.py
+      - name: Verify the fixed informative sharing selection
+        run: |
+          python3 - <<'PYTHON'
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+          import tempfile
+          root = Path.cwd().resolve()
+          test_root = root / 'tests/browser-related'
+          with tempfile.TemporaryDirectory(prefix='vasey-sharing-discovery-') as directory:
+              env = {**os.environ, 'VASEY_BROWSER_DIRECTORY': directory, 'VASEY_BROWSER_RELATED_STAGE': '1', 'VASEY_BROWSER_RELATED_MARKER': '0' * 64}
+              result = subprocess.run(['node', 'node_modules/@playwright/test/cli.js', 'test', '--config=playwright.sharing-proof.config.ts', '--list', '--reporter=json'], env=env, text=True, capture_output=True, timeout=10, check=True)
+          report = json.loads(result.stdout)
+          assert report.get('errors', []) == []
+          assert Path(report['config']['rootDir']).resolve() == test_root
+          observed = []
+          def collect(suite):
+              for spec in suite.get('specs', []):
+                  for case in spec.get('tests', []):
+                      file = (test_root / spec['file']).resolve().relative_to(test_root).as_posix()
+                      observed.append((file, case['projectName']))
+              for child in suite.get('suites', []):
+                  collect(child)
+          for suite in report.get('suites', []):
+              collect(suite)
+          assert sorted(observed) == [('operator-sharing.spec.ts', 'chromium-desktop'), ('operator-sharing.spec.ts', 'webkit-mobile')], observed
+          print('Exactly two sharing cases selected: chromium-desktop and webkit-mobile.')
+          PYTHON
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Prepare genuine media and run only the fixed sharing journey
+        run: node tests/browser/run-sharing-proof.mjs
+      - name: Retain genuine related-track browser evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: related-browser-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            playwright-report-related/
+            test-results-related/
+          retention-days: 7
+          if-no-files-found: ignore
