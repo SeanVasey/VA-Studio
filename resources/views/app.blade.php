@@ -8,6 +8,12 @@
     @viteReactRefresh
     @vite('resources/js/app.tsx')
     <x-inertia::head>
+        @isset($privateMetadata)
+            <title data-inertia="title">{{ $privateMetadata['title'] }}</title>
+            <meta data-inertia="description" name="description" content="{{ $privateMetadata['description'] }}">
+            <meta data-inertia="robots" name="robots" content="{{ $privateMetadata['robots'] }}">
+            <meta data-inertia="referrer" name="referrer" content="no-referrer">
+        @else
         @isset($metadata)
             <title data-inertia="title">{{ $metadata['title'] }}</title>
             <meta data-inertia="description" name="description" content="{{ $metadata['description'] }}">
@@ -30,6 +36,7 @@
             <meta data-inertia="twitter:description" name="twitter:description" content="{{ $metadata['description'] }}">
             <meta data-inertia="twitter:image" name="twitter:image" content="{{ $metadata['imageUrl'] }}">
             <meta data-inertia="twitter:image:alt" name="twitter:image:alt" content="{{ $metadata['imageAlt'] }}">
+        @endisset
         @endisset
     </x-inertia::head>
 </head>
