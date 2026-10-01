@@ -1,0 +1,56 @@
+name: Test exception browser diagnostic
+
+# Informative synthetic feedback only; Foundation CI remains the merge gate.
+on:
+  push:
+    branches: [codex/test-exception-browser-20261001]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: test-exception-browser-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FOCUSED_SUITE: browser
+  FOCUSED_ENGINE: sqlite
+
+jobs:
+  browser-diagnostic:
+    name: Test exception browser diagnostic (informative)
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Verify focused selector safeguards
+        run: python3 scripts/ci/test-focused-tests.py
+      - name: Validate browser selection and record actual source
+        run: python3 scripts/ci/focused-tests.py --plan
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          coverage: none
+          tools: composer:v2
+      - run: composer install --no-interaction --prefer-dist
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Run selected native journeys through the isolated browser wrapper
+        run: python3 scripts/ci/focused-tests.py
+      - name: Retain focused synthetic browser evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: test-exception-browser-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            focused-ci-*
+            test-results/
+          retention-days: 7
+          if-no-files-found: error
