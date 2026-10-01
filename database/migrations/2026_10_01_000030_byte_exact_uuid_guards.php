@@ -41,8 +41,7 @@ return new class extends Migration
         }
 
         foreach (self::FIELDS as $table => $fields) {
-            $allowed = implode(' AND ', array_map(fn (string $column): string =>
-                '('.$this->field($table, $column, $fields[$column], 'NEW.').')', array_keys($fields)));
+            $allowed = implode(' AND ', array_map(fn (string $column): string => '('.$this->field($table, $column, $fields[$column], 'NEW.').')', array_keys($fields)));
             foreach ($this->operations($table) as $operation) {
                 $name = $this->name($table, $operation);
                 $body = "BEGIN IF NOT COALESCE(({$allowed}), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid UUID byte representation'; END IF; END";
@@ -51,7 +50,9 @@ return new class extends Migration
                     : "CREATE TRIGGER {$name} BEFORE {$operation} ON {$table} FOR EACH ROW {$body}";
                 // MySQL DDL commits individually. A retry after partial installation retains
                 // verified guards and adds only missing ones, with no drop/recreate interval.
-                if ($this->installed($name, $table, $operation, DB::getDriverName() === 'sqlite' ? $statement : $body)) { continue; }
+                if ($this->installed($name, $table, $operation, DB::getDriverName() === 'sqlite' ? $statement : $body)) {
+                    continue;
+                }
                 DB::unprepared($statement);
             }
         }
@@ -104,14 +105,18 @@ return new class extends Migration
         if (DB::getDriverName() === 'sqlite') {
             $named = DB::table('sqlite_master')->where('type', 'trigger')->whereRaw('name COLLATE NOCASE = ?', [$name])->get();
             $existing = $named->first();
-            if ($existing === null) { return false; }
+            if ($existing === null) {
+                return false;
+            }
             $matches = $named->count() === 1 && $existing->name === $name && $existing->tbl_name === $table
                 && $this->normalized($existing->sql) === $this->normalized($definition);
         } else {
             $named = DB::table('information_schema.TRIGGERS')->whereRaw('CAST(TRIGGER_SCHEMA AS BINARY) = ?', [DB::getDatabaseName()])
                 ->whereRaw('LOWER(TRIGGER_NAME) = ?', [$name])->get();
             $existing = $named->first();
-            if ($existing === null) { return false; }
+            if ($existing === null) {
+                return false;
+            }
             $matches = $named->count() === 1 && $existing->TRIGGER_NAME === $name && $existing->EVENT_OBJECT_TABLE === $table && $existing->ACTION_TIMING === 'BEFORE'
                 && $existing->EVENT_MANIPULATION === $operation && $this->normalized($existing->ACTION_STATEMENT) === $this->normalized($definition);
         }
@@ -138,8 +143,7 @@ return new class extends Migration
         // entire present set before the first drop; MySQL DDL cannot roll earlier drops back.
         $installed = [];
         foreach (self::FIELDS as $table => $fields) {
-            $allowed = implode(' AND ', array_map(fn (string $column): string =>
-                '('.$this->field($table, $column, $fields[$column], 'NEW.').')', array_keys($fields)));
+            $allowed = implode(' AND ', array_map(fn (string $column): string => '('.$this->field($table, $column, $fields[$column], 'NEW.').')', array_keys($fields)));
             foreach ($this->operations($table) as $operation) {
                 $name = $this->name($table, $operation);
                 $body = "BEGIN IF NOT COALESCE(({$allowed}), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid UUID byte representation'; END IF; END";

@@ -106,19 +106,23 @@ class HashByteGuardMigrationTest extends TestCase
 
     public function test_populated_upgrade_preserves_originals_and_delivery_guards_reject_malformed_new_evidence(): void
     {
-        $this->fakePrivateMediaStorage(); $this->travelTo(now()->startOfSecond()); DeliveryFixtures::configure();
+        $this->fakePrivateMediaStorage();
+        $this->travelTo(now()->startOfSecond());
+        DeliveryFixtures::configure();
         $gateway = PaymentFixtures::gateway();
         $this->app->instance(StripeCheckoutGateway::class, $gateway);
         $this->app->instance(StripePaymentGateway::class, $gateway);
         $this->app->instance(ContractRenderer::class, ContractFixtures::renderer());
-        $migration = $this->migration(); $migration->down();
+        $migration = $this->migration();
+        $migration->down();
         // The ordinary pre-upgrade domain flow creates all original payment/license/contract
         // evidence. Upgrading must retain every byte and keep later valid authorization possible.
         $fixture = DeliveryFixtures::ready($gateway);
         $before = DeliveryFixtures::retained();
         $migration->up();
         $this->assertSame($before, DeliveryFixtures::retained());
-        $control = $fixture['delivery_control']; $contract = GrantContract::where('license_grant_id', $fixture['grant']->id)->sole();
+        $control = $fixture['delivery_control'];
+        $contract = GrantContract::where('license_grant_id', $fixture['grant']->id)->sole();
         $attributes = ['public_id' => (string) Str::uuid(), 'order_id' => $fixture['order']->id,
             'test_fulfillment_activation_id' => $fixture['fulfillment_activation']->id, 'test_delivery_control_id' => $control->id,
             'control_version' => $control->control_version, 'owner_key' => $fixture['order']->owner_key,
@@ -158,7 +162,8 @@ class HashByteGuardMigrationTest extends TestCase
 
     public function test_preflight_reports_malformed_retained_evidence_before_installing_any_guard(): void
     {
-        $migration = $this->migration(); $migration->down();
+        $migration = $this->migration();
+        $migration->down();
         // SQLite's original length-only guard actually admits this NUL-suffixed value. MySQL's
         // byte length already rejects it; simulate a missing legacy guard there to exercise
         // the same preflight boundary without claiming the SQLite bypass exists on MySQL.
@@ -169,8 +174,10 @@ class HashByteGuardMigrationTest extends TestCase
         }
         $id = DB::table('site_images')->insertGetId($this->image(User::factory()->create()->id, ['source_sha256' => $hash]));
         $before = (array) DB::table('site_images')->where('id', $id)->sole();
-        try { $migration->up(); $this->fail('Malformed retained evidence was silently accepted.'); }
-        catch (LogicException $error) {
+        try {
+            $migration->up();
+            $this->fail('Malformed retained evidence was silently accepted.');
+        } catch (LogicException $error) {
             $this->assertSame('Invalid retained hash bytes in site_images.source_sha256; evidence is unchanged. Investigate before retrying the migration.', $error->getMessage());
         }
         $this->assertSame([], $this->triggers());
@@ -189,26 +196,33 @@ class HashByteGuardMigrationTest extends TestCase
             'hash_bytes_test_delivery_authorizations_insert', 'hash_bytes_test_delivery_redemptions_insert',
             'hash_bytes_test_fulfillment_activations_insert',
         ];
-        sort($expected); $this->assertSame($expected, $this->triggers());
-        DB::unprepared('DROP TRIGGER hash_bytes_site_images_update');
-        $migration->up(); $migration->up();
+        sort($expected);
         $this->assertSame($expected, $this->triggers());
-        $migration->down(); $this->assertSame([], $this->triggers());
+        DB::unprepared('DROP TRIGGER hash_bytes_site_images_update');
+        $migration->up();
+        $migration->up();
+        $this->assertSame($expected, $this->triggers());
+        $migration->down();
+        $this->assertSame([], $this->triggers());
         $id = DB::table('site_images')->insertGetId($this->image(User::factory()->create()->id));
         $this->rejected(fn () => DB::table('site_images')->where('id', $id)->delete());
-        $migration->up(); $this->assertSame($expected, $this->triggers());
+        $migration->up();
+        $this->assertSame($expected, $this->triggers());
     }
 
     public function test_retry_refuses_a_same_named_trigger_with_a_different_definition(): void
     {
-        $migration = $this->migration(); $migration->down();
+        $migration = $this->migration();
+        $migration->down();
         $name = 'hash_bytes_license_versions_update';
         $statement = DB::getDriverName() === 'sqlite'
             ? "CREATE TRIGGER {$name} BEFORE UPDATE ON license_versions BEGIN SELECT 1; END"
             : "CREATE TRIGGER {$name} BEFORE UPDATE ON license_versions FOR EACH ROW BEGIN IF 1 = 0 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Synthetic collision'; END IF; END";
         DB::unprepared($statement);
-        try { $migration->up(); $this->fail('A same-named unrelated trigger was trusted.'); }
-        catch (LogicException $error) {
+        try {
+            $migration->up();
+            $this->fail('A same-named unrelated trigger was trusted.');
+        } catch (LogicException $error) {
             $this->assertSame("Unexpected hash guard definition for {$name}; the existing guard is unchanged. Investigate before retrying the migration.", $error->getMessage());
         }
         $this->assertSame([$name], $this->triggers());
@@ -322,7 +336,9 @@ class HashByteGuardMigrationTest extends TestCase
             $values += ['embedded NUL' => str_repeat('a', 31)."\0".str_repeat('a', 32),
                 'uppercase' => str_repeat('A', 64), 'nonhex' => str_repeat('g', 64)];
         }
-        if (DB::getDriverName() === 'sqlite') { $values['BLOB'] = DB::raw("CAST('".str_repeat('a', 64)."' AS BLOB)"); }
+        if (DB::getDriverName() === 'sqlite') {
+            $values['BLOB'] = DB::raw("CAST('".str_repeat('a', 64)."' AS BLOB)");
+        }
 
         return $values;
     }
@@ -332,7 +348,8 @@ class HashByteGuardMigrationTest extends TestCase
     {
         $retained = fn (): array => DB::table($table)->orderBy('id')->get()->map(fn ($row) => (array) $row)->all();
         foreach (['newline suffix' => "\n", 'CRLF suffix' => "\r\n", 'space suffix' => ' '] as $case => $suffix) {
-            $before = $retained(); $label = $table.'.'.$column.': '.$case;
+            $before = $retained();
+            $label = $table.'.'.$column.': '.$case;
             DB::beginTransaction();
             try {
                 if (DB::getDriverName() === 'sqlite') {
@@ -345,7 +362,9 @@ class HashByteGuardMigrationTest extends TestCase
                     $this->assertSame(strtoupper(bin2hex($expected)), $stored->bytes_hex, $label.' stored HEX');
                     $this->assertSame(64, (int) $stored->byte_length, $label.' stored byte count');
                 }
-            } finally { DB::rollBack(); }
+            } finally {
+                DB::rollBack();
+            }
             $this->assertSame($before, $retained(), $label.' rollback must preserve every existing row.');
         }
     }
@@ -469,7 +488,11 @@ class HashByteGuardMigrationTest extends TestCase
 
     private function rejected(callable $operation, string $case = 'immutable evidence'): void
     {
-        try { $operation(); $this->fail('Malformed or immutable evidence was accepted: '.$case); }
-        catch (QueryException) { $this->addToAssertionCount(1); }
+        try {
+            $operation();
+            $this->fail('Malformed or immutable evidence was accepted: '.$case);
+        } catch (QueryException) {
+            $this->addToAssertionCount(1);
+        }
     }
 }

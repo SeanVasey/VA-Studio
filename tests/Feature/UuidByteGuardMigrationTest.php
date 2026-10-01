@@ -114,11 +114,13 @@ class UuidByteGuardMigrationTest extends TestCase
 
     public function test_populated_upgrade_retains_originals_and_canonical_identifiers_without_weakening_lifecycle_guards(): void
     {
-        $migration = $this->migration(); $migration->down();
+        $migration = $this->migration();
+        $migration->down();
         $fixture = DeliveryFixtures::ready($this->gateway());
         $before = DeliveryFixtures::retained();
         $control = (array) DB::table('test_delivery_controls')->where('id', $fixture['delivery_control']->id)->sole();
-        $migration->up(); $migration->up();
+        $migration->up();
+        $migration->up();
         $this->assertSame($before, DeliveryFixtures::retained());
         $this->assertSame($control, (array) DB::table('test_delivery_controls')->where('id', $control['id'])->sole());
         foreach ($this->malformedUuids(true) as $case => $uuid) {
@@ -141,7 +143,8 @@ class UuidByteGuardMigrationTest extends TestCase
 
     public function test_preflight_reports_a_retained_request_uuid_with_no_rewrite_or_partial_installation(): void
     {
-        $migration = $this->migration(); $migration->down();
+        $migration = $this->migration();
+        $migration->down();
         $fixture = ContractFixtures::paid($this->gateway());
         $uuid = self::UUID."\0suffix";
         if (DB::getDriverName() === 'mysql') {
@@ -159,8 +162,10 @@ class UuidByteGuardMigrationTest extends TestCase
 
     public function test_preflight_reports_a_retained_nullable_claim_with_no_rewrite(): void
     {
-        $migration = $this->migration(); $migration->down();
-        $id = $this->receiptWork(); $uuid = self::UUID."\0suffix";
+        $migration = $this->migration();
+        $migration->down();
+        $id = $this->receiptWork();
+        $uuid = self::UUID."\0suffix";
         if (DB::getDriverName() === 'mysql') {
             DB::unprepared('DROP TRIGGER stripe_receipt_work_valid_update');
             $uuid = 'retained-invalid-claim';
@@ -183,26 +188,33 @@ class UuidByteGuardMigrationTest extends TestCase
             'uuid_bytes_test_delivery_controls_insert', 'uuid_bytes_test_delivery_controls_update',
             'uuid_bytes_test_delivery_authorizations_insert', 'uuid_bytes_test_delivery_redemptions_insert',
         ];
-        sort($expected); $this->assertSame($expected, $this->triggers());
+        sort($expected);
+        $this->assertSame($expected, $this->triggers());
         $migration = $this->migration();
         DB::unprepared('DROP TRIGGER uuid_bytes_contract_render_work_update');
-        $migration->up(); $migration->up();
+        $migration->up();
+        $migration->up();
         $this->assertSame($expected, $this->triggers());
-        $migration->down(); $this->assertSame([], $this->triggers());
+        $migration->down();
+        $this->assertSame([], $this->triggers());
         $work = $this->receiptWork();
         $this->rejected(fn () => DB::table('stripe_receipt_work')->where('id', $work)->delete());
-        $migration->up(); $this->assertSame($expected, $this->triggers());
+        $migration->up();
+        $this->assertSame($expected, $this->triggers());
     }
 
     public function test_retry_refuses_a_same_named_unrelated_trigger_without_replacing_it(): void
     {
-        $migration = $this->migration(); $migration->down();
+        $migration = $this->migration();
+        $migration->down();
         $name = 'uuid_bytes_stripe_receipt_work_insert';
         DB::unprepared(DB::getDriverName() === 'sqlite'
             ? "CREATE TRIGGER {$name} BEFORE INSERT ON stripe_receipt_work BEGIN SELECT 1; END"
             : "CREATE TRIGGER {$name} BEFORE INSERT ON stripe_receipt_work FOR EACH ROW BEGIN IF 1 = 0 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Synthetic collision'; END IF; END");
-        try { $migration->up(); $this->fail('An unrelated UUID trigger was trusted.'); }
-        catch (LogicException $error) {
+        try {
+            $migration->up();
+            $this->fail('An unrelated UUID trigger was trusted.');
+        } catch (LogicException $error) {
             $this->assertSame("Unexpected UUID guard definition for {$name}; the existing guard is unchanged. Investigate before retrying the migration.", $error->getMessage());
         }
         $this->assertSame([$name], $this->triggers());
@@ -210,7 +222,9 @@ class UuidByteGuardMigrationTest extends TestCase
 
     private function gateway(): StripePaymentGateway
     {
-        $this->fakePrivateMediaStorage(); $this->travelTo(now()->startOfSecond()); DeliveryFixtures::configure();
+        $this->fakePrivateMediaStorage();
+        $this->travelTo(now()->startOfSecond());
+        DeliveryFixtures::configure();
         $gateway = PaymentFixtures::gateway();
         $this->app->instance(StripeCheckoutGateway::class, $gateway);
         $this->app->instance(StripePaymentGateway::class, $gateway);
@@ -221,7 +235,8 @@ class UuidByteGuardMigrationTest extends TestCase
 
     private function request(array $fixture): array
     {
-        $profile = ['schema_version' => 1, 'purpose' => 'synthetic_uuid_schema_test']; $grant = $fixture['grant'];
+        $profile = ['schema_version' => 1, 'purpose' => 'synthetic_uuid_schema_test'];
+        $grant = $fixture['grant'];
 
         return ['public_id' => (string) Str::uuid(), 'license_grant_id' => $grant->id,
             'fulfillment_outbox_id' => FulfillmentOutbox::where('license_grant_id', $grant->id)->sole()->id,
@@ -258,7 +273,9 @@ class UuidByteGuardMigrationTest extends TestCase
                 'wrong separators' => str_replace('-', '_', self::UUID),
             ];
         }
-        if (DB::getDriverName() === 'sqlite') { $values['BLOB'] = DB::raw("CAST('".self::UUID."' AS BLOB)"); }
+        if (DB::getDriverName() === 'sqlite') {
+            $values['BLOB'] = DB::raw("CAST('".self::UUID."' AS BLOB)");
+        }
 
         return $values;
     }
@@ -289,8 +306,10 @@ class UuidByteGuardMigrationTest extends TestCase
 
     private function preflightRejected(object $migration, string $field): void
     {
-        try { $migration->up(); $this->fail('Malformed retained UUID was accepted.'); }
-        catch (LogicException $error) {
+        try {
+            $migration->up();
+            $this->fail('Malformed retained UUID was accepted.');
+        } catch (LogicException $error) {
             $this->assertSame("Invalid retained UUID bytes in {$field}; evidence is unchanged. Investigate before retrying the migration.", $error->getMessage());
         }
         $this->assertSame([], $this->triggers());
@@ -502,7 +521,11 @@ class UuidByteGuardMigrationTest extends TestCase
 
     private function rejected(callable $operation, string $case = ''): void
     {
-        try { $operation(); $this->fail('Invalid or immutable UUID evidence was accepted. '.$case); }
-        catch (QueryException) { $this->addToAssertionCount(1); }
+        try {
+            $operation();
+            $this->fail('Invalid or immutable UUID evidence was accepted. '.$case);
+        } catch (QueryException) {
+            $this->addToAssertionCount(1);
+        }
     }
 }
