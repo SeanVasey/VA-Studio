@@ -34,7 +34,12 @@ async function operate(page: Page, button: Locator, expectedStatus = 200): Promi
 
 async function close(page: Page, returnTo: Locator) {
   const dialog = page.getByRole('dialog');
-  await operate(page, dialog.getByRole('button', { name: 'Close', exact: true }));
+  // Filament also labels the header icon Close; operate the ordinary footer cancel action.
+  const cancel = dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Close', exact: true });
+  await expect(cancel).toHaveCount(1);
+  await expect(cancel).toBeVisible();
+  await expect(cancel).toBeEnabled();
+  await operate(page, cancel);
   await expect(dialog.getByRole('heading', { name: 'Retained test-payment evidence', exact: true })).not.toBeVisible();
   await expect(returnTo).toBeFocused();
 }
