@@ -146,7 +146,7 @@ class ReadTrackSharingTest extends TestCase
     {
         $ordinary = QuoteFixtures::selection();
         foreach (['legacy/private', 'legacy?order=PRIVATE', 'legacy#PRIVATE', 'legacy%2fadmin', 'legacy\\admin',
-            'Legacy', 'legacy ', 'café'] as $slug) {
+            'Legacy-uppercase', 'legacy-trailing ', 'café'] as $slug) {
             // Model-level legacy imports can bypass the ordinary metadata command's slug grammar.
             // Build a genuinely eligible recording before its first publication; do not relax guards.
             $track = Track::create(['title' => 'Synthetic legacy URL', 'slug' => $slug, 'artist' => 'Test only',
@@ -256,7 +256,8 @@ class ReadTrackSharingTest extends TestCase
             try {
                 app(ReadTrackSharing::class)->handle($fixture['track']->id, $actor);
                 $this->fail('Unauthorized actor read sharing destinations.');
-            } catch (AuthorizationException) {
+            } catch (AuthorizationException $error) {
+                $this->assertInstanceOf(AuthorizationException::class, $error);
             }
         }
     }
@@ -301,14 +302,15 @@ class ReadTrackSharingTest extends TestCase
         try {
             $fixture['actor']->saveAppAuthenticationSecret('JBSWY3DPEHPK3PXP');
             $this->actingAs($fixture['actor']);
-            $page = Livewire::test(ManageTracks::class)->mountTableAction('share', $fixture['track'])->assertSee('Share public track');
+            $page = Livewire::test(ManageTracks::class)->mountTableAction('share', $fixture['track'])->assertMountedActionModalSee('Share public track');
             $this->read($fixture);
             User::findOrFail($fixture['actor']->id)->saveAppAuthenticationSecret(null);
             $page->call('$refresh')->assertForbidden();
             try {
                 $this->read($fixture);
                 $this->fail('Removed MFA enrollment disclosed sharing destinations.');
-            } catch (AuthorizationException) {
+            } catch (AuthorizationException $error) {
+                $this->assertInstanceOf(AuthorizationException::class, $error);
             }
         } finally {
             $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: $wasRequired);
@@ -321,13 +323,13 @@ class ReadTrackSharingTest extends TestCase
         $this->actingAs($fixture['actor']);
         $before = $this->evidence();
         $page = Livewire::test(ManageTracks::class)->mountTableAction('share', $fixture['track'])
-            ->assertSee('Share public track')->assertSee('Copy link')->assertSee('Copy embed')
-            ->assertSee('https://audio.example.test/tracks/'.$fixture['track']->slug)
-            ->assertSee('https://audio.example.test/embed/tracks/'.$fixture['track']->slug);
+            ->assertMountedActionModalSee('Share public track')->assertMountedActionModalSee('Copy link')->assertMountedActionModalSee('Copy embed')
+            ->assertMountedActionModalSee('https://audio.example.test/tracks/'.$fixture['track']->slug)
+            ->assertMountedActionModalSee('https://audio.example.test/embed/tracks/'.$fixture['track']->slug);
         $this->assertSame($before, $this->evidence());
         RightsDeclaration::create(['track_id' => $fixture['track']->id, 'provenance_reference' => 'NEW PRIVATE HOLD', 'sample_disclosure' => 'Private', 'status' => 'pending']);
         $before = $this->evidence();
-        $page->call('$refresh')->assertSee('Public sharing is unavailable')->assertDontSee('Copy embed');
+        $page->call('$refresh')->assertMountedActionModalSee('Public sharing is unavailable')->assertMountedActionModalDontSee('Copy embed');
         $this->assertSame($before, $this->evidence());
     }
 
@@ -336,7 +338,7 @@ class ReadTrackSharingTest extends TestCase
     {
         $fixture = QuoteFixtures::selection();
         $this->actingAs($fixture['actor']);
-        $page = Livewire::test(ManageTracks::class)->mountTableAction('share', $fixture['track'])->assertSee('Copy embed');
+        $page = Livewire::test(ManageTracks::class)->mountTableAction('share', $fixture['track'])->assertMountedActionModalSee('Copy embed');
         User::whereKey($fixture['actor']->id)->update([$field => $value]);
         $page->call('$refresh')->assertForbidden();
     }
