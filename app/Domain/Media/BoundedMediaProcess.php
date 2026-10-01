@@ -66,7 +66,8 @@ class BoundedMediaProcess
         $command = [$limiter, '--cpu='.($this->cpuSeconds ?? config('media.cpu_seconds')), '--as='.($this->memoryBytes ?? config('media.memory_bytes')), '--fsize='.($this->fileBytes ?? config('media.max_output_bytes')), '--nofile=64', '--', ...$arguments];
         // A tool prints a local time in the zone of its process (clamscan --version does), and callers read it as UTC, so the worker's
         // own zone, from its host or its container, must not reach the tool.
-        $process = new Process($command, $cwd, ['TMPDIR' => $cwd, 'TZ' => 'UTC', 'OPENBLAS_NUM_THREADS' => '1', 'OMP_NUM_THREADS' => '1']);
+        // FFREPORT would create a separate, unbounded FFmpeg report in the working directory or a path inherited from the host.
+        $process = new Process($command, $cwd, ['TMPDIR' => $cwd, 'TZ' => 'UTC', 'OPENBLAS_NUM_THREADS' => '1', 'OMP_NUM_THREADS' => '1', 'FFREPORT' => false]);
         $process->setTimeout($timeout);
         $stdout = '';
         $errorHead = '';

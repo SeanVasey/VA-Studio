@@ -1,6 +1,6 @@
 # [WP-03] Private media ingestion, quarantine and preview processing
 
-Status: **WAV/artwork implemented in PR #21; private stems archive increment merged in [PR #30](https://github.com/VASEYDEV/VASEYAUDIO/pull/30); production scanner support and the shared worker budget merged in [PR #84](https://github.com/VASEYDEV/VASEYAUDIO/pull/84). The current increment protects track-media revisions after an uncertain completion commit; broader work package remains open.** The implementation below is a bounded local-storage pipeline. This issue is complete only when the acceptance evidence and remaining production work below exist.
+Status: **WAV/artwork implemented in PR #21; private stems archive increment merged in [PR #30](https://github.com/VASEYDEV/VASEYAUDIO/pull/30); production scanner support and the shared worker budget merged in [PR #84](https://github.com/VASEYDEV/VASEYAUDIO/pull/84); conservative track-media commit cleanup merged in [PR #86](https://github.com/VASEYDEV/VASEYAUDIO/pull/86). The current increment adds optional encoder diagnostics; broader work package remains open.** The implementation below is a bounded local-storage pipeline. This issue is complete only when the acceptance evidence and remaining production work below exist.
 
 - Suggested issue title: `[WP-03] Private media ingestion, quarantine and preview processing`
 - Phase: 1
@@ -53,7 +53,13 @@ Archive v2 fingerprints and enforces its duration ceiling. Explicit historical v
 
 The processor now retains promoted private files once the completion transaction reaches its commit. A connection or listener error can follow an applied commit, and an immediate lookup may not see a commit still in flight; cleanup no longer treats a missing row as permission to delete those files. Errors inside the transaction still roll back and clean only the failed attempt's files. Existing revisions, source files and retry semantics remain intact. The operations guide describes quiescent orphan reconciliation; nothing deletes retained orphans automatically.
 
-Regression coverage exercises an applied commit followed by an error, an uncertain commit with no visible rows and a healthy retry, and a pre-commit insert failure alongside an existing revision. Full SQLite/MySQL CI and independent review must establish acceptance on the integrating PR's exact head; local PHP execution is unavailable in the recovery environment. The next code dependency is encoder preflight/doctor diagnostics, followed by the remaining byte guards and archive/scanner edge cases in the ordered development record.
+Regression coverage exercises an applied commit followed by an error, an uncertain commit with no visible rows and a healthy retry, and a pre-commit insert failure alongside an existing revision. PR #86 accepted tested head `9465f08dc7a566b53d151d6e5e24a2d7322efc67` after all ten CI jobs and independent review; merged main `383354729e506ef93a4c458552c6087cb717fa9c` has the identical source tree. All three new cases passed on both MySQL and SQLite. Local PHP execution is unavailable in the recovery environment.
+
+### Encoder diagnostics — current increment
+
+The optional `media_encoders` installation check asks the configured FFmpeg for its encoder listing through `BoundedMediaProcess`, with a 15-second wall limit and the existing resource/output limits. Exact rows for `libmp3lame`, `pcm_s16le`, `png`, `mjpeg` and `libwebp` are required. Missing or failed tools, misleading listings, excess output and timeout warn with fixed redacted messages, without changing foundation readiness. No upload is read or derivative produced. Advertised capabilities do not prove real encoding, filter availability or deployment acceptance.
+
+The integrating PR records actual MySQL/SQLite CI and independent review on its tested head; local PHP/Composer are unavailable. The next code dependency is whole-identifier byte guards in migrations 000020, 000022 and 000023, followed by the remaining hash guards and archive/scanner edge cases in the ordered development record.
 
 ### Deployment and broader scope
 
