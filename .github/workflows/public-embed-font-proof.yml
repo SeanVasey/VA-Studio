@@ -1,0 +1,265 @@
+name: Public embed fonts focused proof
+
+# Temporary source-specific feedback; the complete Foundation gate remains required.
+on:
+  push:
+    branches: [codex/public-embed-font-proof-20261001]
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  embed-font-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      APP_URL: http://127.0.0.1:8173
+      ASSET_URL: ''
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ':memory:'
+      DB_URL: ''
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+      STRIPE_WEBHOOK_ENABLED: 'false'
+      STRIPE_TEST_CHECKOUT_ENABLED: 'false'
+      STRIPE_TEST_PAYMENT_PROCESSING_ENABLED: 'false'
+      STRIPE_TEST_FINALIZATION_ENABLED: 'false'
+      CONTACT_INQUIRIES_ENABLED: 'false'
+      CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED: 'false'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Require the exact reviewed seven-file source and record its manifest
+        run: |
+          mkdir embed-font-evidence
+          python <<'PY' 2>&1 | tee embed-font-evidence/source-guard.log
+          from pathlib import Path
+          import hashlib, json, subprocess
+          git = lambda *args: subprocess.check_output(['git', *args], text=True).strip()
+          parent = '45050eb8f6a229ec6a115eeb584e3b2d08c5e161'
+          if git('rev-parse', 'HEAD^') != parent:
+              raise SystemExit('Unexpected runtime parent.')
+          if git('rev-parse', 'HEAD^^{tree}') != '1c4a61767267d693b58a879e4d93a42d891ceed1':
+              raise SystemExit('Unexpected parent tree.')
+          expected = {
+              'app/Http/Responses/PublicTrackEmbedResponse.php': 'ba06e248cf7c522733836d4be1ee147d5ebb9cf42d8d9b2181ffd0140ec5bd63',
+              'resources/css/app.css': '6b12a0f313ee2b41cf721b1e3487bc88ff60c0cc1a5cddb297ae7ba0ef326444',
+              'resources/css/fonts.css': 'e6cce4c4965503ef190f5b571ebe8f339487118671bbd2aa610e621d4880a2dd',
+              'resources/views/public-track-embed.blade.php': 'aab0f06a7f61aaa20949967cc9c18aadcf75f93381805597a5fe49f95fda0e93',
+              'tests/Feature/PublicTrackEmbedTest.php': 'f5b88ab9d23fcb9ba56075fee1dd6c987dbf54bca880ff791f8feb966d4dbde4',
+              'tests/browser/public-track-embed.spec.ts': '5eebc1df5a3a9ab321112602ed34677bb296570560506df07dfe3e62926b3d84',
+              'vite.config.ts': '154164dd3f8c4ad31f9ba45d1a91e8b513954d9371c79bdb62c88adb82bc187e',
+          }
+          wanted = {path: 'A' if path == 'resources/css/fonts.css' else 'M' for path in expected}
+          wanted['.github/workflows/public-embed-font-proof.yml'] = 'A'
+          actual = {path: status for status, path in (line.split('\t') for line in git('diff', '--name-status', parent, 'HEAD').splitlines())}
+          if actual != wanted or git('status', '--porcelain', '--untracked-files=no'):
+              raise SystemExit('Unexpected source delta or dirty tracked worktree.')
+          for path, digest in expected.items():
+              if hashlib.sha256(Path(path).read_bytes()).hexdigest() != digest:
+                  raise SystemExit('Source hash mismatch: ' + path)
+          files = git('ls-files').splitlines()
+          manifest = {'head': git('rev-parse', 'HEAD'), 'tree': git('rev-parse', 'HEAD^{tree}'),
+              'parent': parent, 'parent_tree': git('rev-parse', 'HEAD^^{tree}'),
+              'reviewed_source': 'eef4918605de0096a03a30ac10026080834c9890',
+              'reviewed_tree': '897386a6a66b377db93f2442c12242f1cf91fa07', 'source_delta': actual,
+              'sha256': {path: hashlib.sha256(Path(path).read_bytes()).hexdigest() for path in files},
+              'scope': 'Narrow embed/font proof only; complete Foundation acceptance remains required.'}
+          Path('embed-font-evidence/source.json').write_text(json.dumps(manifest, indent=2, sort_keys=True) + '\n')
+          print(json.dumps({'head': manifest['head'], 'tree': manifest['tree'], 'parent': parent, 'verified_changed_files': len(expected), 'tracked_files': len(files)}))
+          PY
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          coverage: none
+          tools: composer:v2
+      - name: Install genuine application media and PDF fixture prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends ffmpeg util-linux qpdf poppler-utils
+          test -x /usr/bin/ffmpeg
+          test -x /usr/bin/ffprobe
+          test -x /usr/bin/prlimit
+          test -x /usr/bin/qpdf
+          test -x /usr/bin/pdfinfo
+      - name: Install locked dependencies and apply ordinary backend quality checks
+        run: |
+          composer install --no-interaction --prefer-dist 2>&1 | tee embed-font-evidence/composer-install.log
+          composer validate --strict 2>&1 | tee embed-font-evidence/composer-validate.log
+          composer audit 2>&1 | tee embed-font-evidence/composer-audit.log
+          vendor/bin/pint --version 2>&1 | tee embed-font-evidence/pint-version.log
+          php -l app/Http/Responses/PublicTrackEmbedResponse.php 2>&1 | tee embed-font-evidence/php-syntax.log
+          php -l tests/Feature/PublicTrackEmbedTest.php 2>&1 | tee -a embed-font-evidence/php-syntax.log
+          npm ci 2>&1 | tee embed-font-evidence/npm-install.log
+          cp .env.example .env
+          php artisan key:generate
+      - name: Record actual tool and fresh SQLite runtimes
+        run: |
+          {
+            node --version
+            npm --version
+            php --version
+            vendor/bin/phpunit --version
+            vendor/bin/pint --version
+            composer --version
+            /usr/bin/ffmpeg -version
+            /usr/bin/ffprobe -version
+            /usr/bin/prlimit --version
+            /usr/bin/qpdf --version
+            /usr/bin/pdfinfo -v
+            php -r '$db = new PDO("sqlite::memory:"); $count = (int) $db->query("SELECT COUNT(*) FROM sqlite_master WHERE type = '\''table'\''")->fetchColumn(); if ($count !== 0) { exit(1); } echo json_encode(["driver" => "sqlite", "database" => ":memory:", "version" => $db->query("SELECT sqlite_version()")->fetchColumn(), "tables_before_tests" => $count], JSON_THROW_ON_ERROR).PHP_EOL;'
+          } 2>&1 | tee embed-font-evidence/runtime.log
+      - name: Run all frontend tests, type checks, production build and security checks
+        run: |
+          npm test -- --reporter=default --reporter=junit --outputFile.junit=embed-font-evidence/frontend-results.xml 2>&1 | tee embed-font-evidence/frontend-tests.log
+          npm run build 2>&1 | tee embed-font-evidence/build.log
+          python3 scripts/ci/scan-client-bundle.py 2>&1 | tee embed-font-evidence/client-scan.log
+          npm audit --audit-level=high 2>&1 | tee embed-font-evidence/npm-audit.log
+          cp public/build/manifest.json embed-font-evidence/vite-manifest.json
+      - name: Discover and run the unchanged public embed feature file on SQLite
+        run: |
+          php vendor/bin/phpunit tests/Feature/PublicTrackEmbedTest.php --list-tests-xml=embed-font-evidence/php-discovery.xml --fail-on-empty-test-suite --fail-on-phpunit-warning --display-warnings 2>&1 | tee embed-font-evidence/php-discovery.log
+          php vendor/bin/phpunit tests/Feature/PublicTrackEmbedTest.php --log-junit=embed-font-evidence/php-results.xml --fail-on-empty-test-suite --fail-on-phpunit-warning --fail-on-warning --fail-on-risky --fail-on-incomplete --fail-on-skipped --display-warnings 2>&1 | tee embed-font-evidence/phpunit.log
+      - name: Install the two ordinary pinned browser projects
+        run: npx playwright install --with-deps chromium webkit 2>&1 | tee embed-font-evidence/browser-install.log
+      - name: Discover and run only the existing embed journey through its unchanged isolated wrapper
+        run: |
+          VASEY_BROWSER_DIRECTORY="$RUNNER_TEMP/vasey-embed-discovery" PLAYWRIGHT_JSON_OUTPUT_NAME=embed-font-evidence/native-discovery.json node node_modules/@playwright/test/cli.js test public-track-embed.spec.ts --list --reporter=json 2>&1 | tee embed-font-evidence/native-discovery.log
+          PLAYWRIGHT_JSON_OUTPUT_NAME=embed-font-evidence/native-results.json node tests/browser/run.mjs public-track-embed.spec.ts --reporter=list,html,json 2>&1 | tee embed-font-evidence/native.log
+      - name: Require complete feature and native identities, genuine fonts and retained reports
+        run: |
+          python <<'PY' 2>&1 | tee embed-font-evidence/receipt-check.log
+          from collections import Counter
+          from pathlib import Path
+          import base64, hashlib, json, math, subprocess, xml.etree.ElementTree as E
+          from urllib.parse import urlsplit
+          root = Path.cwd()
+          directory = root / 'embed-font-evidence'
+          cls = 'Tests\\Feature\\PublicTrackEmbedTest'
+          methods = '''test_embed_is_script_free_minimal_escaped_and_independent_of_session_or_host
+          test_preview_preserves_exact_bytes_head_and_single_range_responses_without_cookies
+          test_an_unsafe_configured_store_origin_is_not_emitted_as_a_link
+          test_drafts_unknown_tracks_private_roles_and_cross_track_ids_have_only_generic_responses
+          test_republication_uses_only_the_current_tagged_preview_and_rejects_an_old_embed_audio_url
+          test_sold_scope_removes_embed_and_preview_without_changing_retained_purchase_evidence
+          test_rate_limits_keep_generic_no_store_frame_policy
+          test_debug_storage_failure_does_not_disclose_paths_or_database_details'''.split()
+          method = 'test_current_publication_and_files_are_rechecked_after_a_successful_load'
+          ids = {cls + '::' + name for name in methods} | {cls + '::' + method + '#' + str(i) for i in range(7)}
+          names = set(methods) | {method + ' with data set #' + str(i) for i in range(7)}
+          discovery = E.parse(directory / 'php-discovery.xml')
+          namespace = {'s': 'https://xml.phpunit.de/testSuite'}
+          classes = discovery.findall('.//s:testClass', namespace)
+          if len(classes) != 1 or classes[0].get('name') != cls or Path(classes[0].get('file', '')).resolve() != root / 'tests/Feature/PublicTrackEmbedTest.php':
+              raise SystemExit('Unexpected PHP discovery class/file.')
+          if Counter(node.get('id') for node in discovery.findall('.//s:testMethod', namespace)) != Counter(ids):
+              raise SystemExit('PHP discovery must contain exactly the existing 15 identities.')
+          php = E.parse(directory / 'php-results.xml')
+          cases = php.findall('.//testcase')
+          if Counter(case.get('name') for case in cases) != Counter(names) or any(php.findall('.//' + tag) for tag in ['failure', 'error', 'skipped']):
+              raise SystemExit('Incomplete, duplicate or unsuccessful PHP cases.')
+          for case in cases:
+              if case.get('class') != cls or case.get('classname') != cls.replace('\\', '.') or Path(case.get('file', '')).resolve() != root / 'tests/Feature/PublicTrackEmbedTest.php' or int(case.get('assertions', '0')) < 1 or not math.isfinite(float(case.get('time', 'nan'))):
+                  raise SystemExit('Invalid PHP case receipt.')
+          assertions = sum(int(case.get('assertions')) for case in cases)
+          suite = php.find('testsuite')
+          if suite is None or any(suite.get(key) != str(value) for key, value in [('tests', 15), ('assertions', assertions), ('failures', 0), ('errors', 0), ('skipped', 0)]):
+              raise SystemExit('PHP aggregate does not match all 15 cases.')
+          frontend = E.parse(directory / 'frontend-results.xml')
+          front_cases = frontend.findall('.//testcase')
+          if len(front_cases) != 336 or any(frontend.findall('.//' + tag) for tag in ['failure', 'error', 'skipped']):
+              raise SystemExit('Frontend execution must complete without failures or skips.')
+          title = 'public preview iframe has native controls, no autoplay and a keyboard-accessible store exit'
+          pairs = {('chromium-desktop', title), ('webkit-mobile', title)}
+          def native_cases(report):
+              if Path(report['config']['rootDir']).resolve() != root / 'tests/browser' or report.get('errors'):
+                  raise SystemExit('Unexpected native root or discovery/runtime errors.')
+              if report['config'].get('globalTimeout') != 840000 or report['config'].get('workers') != 1:
+                  raise SystemExit('Unexpected ordinary native suite limits.')
+              if Counter(project['name'] for project in report['config']['projects']) != Counter(['chromium-desktop', 'webkit-mobile']):
+                  raise SystemExit('Unexpected native projects.')
+              if any(project['retries'] != 0 or project['timeout'] != 60000 or project['repeatEach'] != 1 for project in report['config']['projects']):
+                  raise SystemExit('Unexpected native case limits or repeats.')
+              found = []
+              def walk(suite):
+                  for spec in suite.get('specs', []):
+                      if (root / 'tests/browser' / spec['file']).resolve() != root / 'tests/browser/public-track-embed.spec.ts' or spec['title'] != title:
+                          raise SystemExit('Unexpected native file/title.')
+                      found.extend((test['projectName'], spec['title'], spec, test) for test in spec['tests'])
+                  for child in suite.get('suites', []): walk(child)
+              for suite in report['suites']: walk(suite)
+              if Counter((project, name) for project, name, _, _ in found) != Counter(pairs):
+                  raise SystemExit('Exactly the existing two file/project identities are required.')
+              return found
+          native_cases(json.loads((directory / 'native-discovery.json').read_text()))
+          result = json.loads((directory / 'native-results.json').read_text())
+          if any(result['stats'].get(key) != value for key, value in [('expected', 2), ('unexpected', 0), ('flaky', 0), ('skipped', 0)]):
+              raise SystemExit('Native statistics must record two first-attempt passes.')
+          families = {'Reddit Sans', 'Noto Sans Display', 'JetBrains Mono', 'Bebas Neue'}
+          font_receipts = []
+          for project, _, spec, test in native_cases(result):
+              attempts = test['results']
+              if not spec['ok'] or test['expectedStatus'] != 'passed' or test['timeout'] != 60000 or len(attempts) != 1 or attempts[0]['status'] != 'passed' or attempts[0]['retry'] != 0 or attempts[0].get('errors') or not math.isfinite(attempts[0]['duration']) or attempts[0]['duration'] < 0:
+                  raise SystemExit('Skipped, retried or failed native case.')
+              attachments = [item for item in attempts[0]['attachments'] if item['name'] == 'embed-font-evidence' and item['contentType'] == 'application/json']
+              if len(attachments) != 1: raise SystemExit('Missing genuine font attachment.')
+              attachment = attachments[0]
+              if 'body' in attachment:
+                  body = base64.b64decode(attachment['body'], validate=True)
+              else:
+                  path = Path(attachment['path']).resolve()
+                  if not path.is_relative_to(root / 'test-results'): raise SystemExit('Unexpected attachment path.')
+                  body = path.read_bytes()
+              fonts = json.loads(body)
+              if Counter(font['family'] for font in fonts['loadedFonts']) != Counter(families) or len(fonts['fonts']) != 4:
+                  raise SystemExit('All four real font families/network responses are required.')
+              for prefix in ['reddit-sans-latin-wght-normal-', 'noto-sans-display-latin-standard-normal-', 'jetbrains-mono-latin-wght-normal-', 'bebas-neue-latin-400-normal-']:
+                  if sum(Path(urlsplit(font['url']).path).name.startswith(prefix) for font in fonts['fonts']) != 1:
+                      raise SystemExit('Missing or duplicated font network identity.')
+              for font in fonts['loadedFonts']:
+                  if font['checked'] is not True or not font['faces'] or not all(face['family'] == font['family'] and face['status'] == 'loaded' for face in font['faces']):
+                      raise SystemExit('FontFaceSet did not load every declared family.')
+              for font in fonts['fonts']:
+                  url = urlsplit(font['url'])
+                  file = root / 'public' / url.path.lstrip('/')
+                  if (url.scheme, url.netloc) != ('http', '127.0.0.1:8173') or not url.path.startswith('/build/assets/') or not url.path.endswith('.woff2') or url.query or url.fragment or font['status'] != 200 or not file.is_file() or file.read_bytes()[:4] != b'wOF2':
+                      raise SystemExit('Font response is not a genuine same-origin built WOFF2.')
+              font_receipts.append({'project': project, 'duration_ms': attempts[0]['duration'], 'attachment_sha256': hashlib.sha256(body).hexdigest(), 'fonts': fonts})
+          manifest = json.loads((root / 'public/build/manifest.json').read_text())
+          if not manifest.get('resources/css/fonts.css', {}).get('isEntry') or not manifest['resources/css/fonts.css']['file'].endswith('.css') or not (root / 'playwright-report/index.html').is_file():
+              raise SystemExit('Missing genuine font CSS entry or HTML browser report.')
+          if subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=no'], text=True).strip():
+              raise SystemExit('Verification changed tracked source.')
+          built = {str(path.relative_to(root)): {'bytes': path.stat().st_size, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()} for path in (root / 'public/build').rglob('*') if path.is_file()}
+          receipt = {'php_cases': 15, 'php_assertions': assertions, 'php_seconds': suite.get('time'), 'php_failures': 0, 'php_errors': 0, 'php_skips': 0,
+              'frontend_cases': len(front_cases), 'native_cases': 2, 'native_retries': 0, 'font_receipts': font_receipts,
+              'built_files': built, 'evidence_sha256': {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in directory.iterdir() if path.is_file() and path.name != 'receipt-check.log'}}
+          (directory / 'receipt.json').write_text(json.dumps(receipt, indent=2, sort_keys=True) + '\n')
+          print(json.dumps(receipt, sort_keys=True))
+          PY
+      - name: Retain all original logs, discovery, JUnit, font evidence and browser reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: public-embed-font-proof-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            embed-font-evidence/
+            playwright-report/
+            test-results/
+          retention-days: 7
+          if-no-files-found: error

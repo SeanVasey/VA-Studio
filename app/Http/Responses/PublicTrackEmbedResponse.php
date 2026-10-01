@@ -20,7 +20,7 @@ final class PublicTrackEmbedResponse
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('Referrer-Policy', 'no-referrer');
         $response->headers->set('Permissions-Policy', 'autoplay=(), camera=(), microphone=(), geolocation=()');
-        $response->headers->set('Content-Security-Policy', "default-src 'none'; style-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors http: https:");
+        $response->headers->set('Content-Security-Policy', "default-src 'none'; style-src 'self'; font-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors http: https:");
         $response->headers->remove('X-Frame-Options');
 
         return $response;

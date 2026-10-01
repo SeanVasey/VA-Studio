@@ -1,0 +1,5 @@
+@import '@fontsource/bebas-neue/latin-400.css';
+
+@font-face { font-family: 'Reddit Sans'; font-style: normal; font-weight: 200 900; font-display: swap; src: url('@fontsource-variable/reddit-sans/files/reddit-sans-latin-wght-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Noto Sans Display'; font-style: normal; font-weight: 100 900; font-stretch: 62.5% 100%; font-display: swap; src: url('@fontsource-variable/noto-sans-display/files/noto-sans-display-latin-standard-normal.woff2') format('woff2'); }
+@font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 100 800; font-display: swap; src: url('@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2') format('woff2'); }
