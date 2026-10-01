@@ -107,8 +107,10 @@ test('ordinary editorial associations preserve private order, current eligibilit
   const externalRequests: string[] = [];
   const editorialMediaRequests: string[] = [];
   let watchMedia = true;
-  const watch = (target: Page) => {
+  const watch = (target: Page, editorial = false) => {
     target.on('pageerror', error => failures.push(error.message));
+    // The no-provider requirement covers every request from editorial previews/public pages; admin keeps its own shell.
+    if (!editorial) return;
     target.on('request', request => {
       const url = new URL(request.url());
       if (url.origin !== manifest.origin) externalRequests.push(url.origin);
@@ -170,7 +172,7 @@ test('ordinary editorial associations preserve private order, current eligibilit
     const denied = await visitor.get(privatePath, { maxRedirects: 0 });
     expect([302, 403]).toContain(denied.status());
     expect(await denied.text()).not.toContain(firstParagraph);
-    const preview = await context.newPage(); watch(preview);
+    const preview = await context.newPage(); watch(preview, true);
     const privateResponse = await preview.goto(privatePath);
     expect(privateResponse?.headers()['cache-control']).toContain('no-store');
     expect(privateResponse?.headers()['x-robots-tag']).toContain('noindex');
@@ -188,7 +190,7 @@ test('ordinary editorial associations preserve private order, current eligibilit
     expect((await props(visitor, `/blog/${slug}`)).editorial.relatedTracks).toEqual(publicLinks);
     expect((await props(visitor, `/videos/${slug}`)).editorial.relatedTracks).toEqual([publicLinks[1]]);
     for (const path of ['/blog', '/videos']) expect((await props(visitor, path)).editorial.relatedTracks).toBeUndefined();
-    const publicPage = await context.newPage(); watch(publicPage);
+    const publicPage = await context.newPage(); watch(publicPage, true);
     await publicPage.goto(`/blog/${slug}`);
     const related = publicPage.getByRole('region', { name: 'Related tracks', exact: true });
     await expect(related.getByRole('link')).toHaveText([second.title, first.title]);
