@@ -1,0 +1,543 @@
+# Temporary informative proof only; permanent Foundation gates remain required.
+# The 90-minute bound follows an actual 45-minute cancellation, not a measured one-file duration.
+name: Isolated inquiry notification migration MySQL progress
+'on':
+  push:
+    branches:
+    - codex/inquiry-mysql-profile-20261001
+permissions:
+  contents: read
+concurrency:
+  group: isolated-inquiry-mysql-profile
+  cancel-in-progress: true
+defaults:
+  run:
+    shell: bash
+jobs:
+  inquiry-mysql-profile:
+    name: Inquiry notification migration MySQL named progress
+    if: github.repository == 'VASEYDEV/VASEYAUDIO' && github.ref == 'refs/heads/codex/inquiry-mysql-profile-20261001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: vaseyaudio_inquiry_migration_profile
+          MYSQL_ROOT_PASSWORD: ci-only-password
+        ports:
+        - 3306:3306
+        options: --health-cmd="mysqladmin ping -h 127.0.0.1 -pci-only-password" --health-interval=10s --health-timeout=5s --health-retries=10
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      DB_CONNECTION: mysql
+      DB_DATABASE: vaseyaudio_inquiry_migration_profile
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USERNAME: root
+      DB_PASSWORD: ci-only-password
+      DB_URL: ''
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+      CONTACT_INQUIRIES_ENABLED: 'false'
+      CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED: 'false'
+      STRIPE_TEST_CHECKOUT_ENABLED: 'false'
+      STRIPE_TEST_PAYMENT_PROCESSING_ENABLED: 'false'
+      STRIPE_TEST_FINALIZATION_ENABLED: 'false'
+      STRIPE_WEBHOOK_ENABLED: 'false'
+      STRIPE_TEST_SECRET_KEY: ''
+      STRIPE_WEBHOOK_SECRET: ''
+      STRIPE_ACCOUNT_ID: ''
+      VASEY_TEST_CONTRACT_ISSUANCE_ENABLED: 'false'
+      VASEY_TEST_FULFILLMENT_ACTIVATION_ENABLED: 'false'
+      VASEY_TEST_DELIVERY_ACCESS_ENABLED: 'false'
+    steps:
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      with:
+        ref: ${{ github.sha }}
+        persist-credentials: false
+        fetch-depth: 3
+    - name: Refuse extra source changes and record the reviewed style/source bridge
+      run: |
+        set -euo pipefail
+        test "$GITHUB_EVENT_NAME" = push
+        test "$GITHUB_REPOSITORY" = VASEYDEV/VASEYAUDIO
+        test "$GITHUB_REF" = refs/heads/codex/inquiry-mysql-profile-20261001
+        test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+        test "$(git rev-parse HEAD^)" = 47604d8ca165343950fb5716e49b3f93cd01527e
+        test "$(git rev-parse HEAD^^)" = 6f499bdcec696320b2bef64f205c3a79c8fedf98
+        test "$(git rev-parse HEAD^^{tree})" = e4de068d7cd545a8d3ae61d31f49596d3610a21f
+        test "$(git rev-parse HEAD^^^{tree})" = 2fd875f50dbfb397dff0958884866913ad7ab9e1
+        git diff --exit-code HEAD --
+        test -z "$(git ls-files --others --exclude-standard)"
+        mkdir inquiry-mysql-profile-evidence
+        python <<'PYTHON' 2>&1 | tee inquiry-mysql-profile-evidence/source-guard.log
+        from pathlib import Path
+        import hashlib, json, subprocess
+        expected_delta = {
+            '.github/workflows/inquiry-format-proof.yml': 'D',
+            '.github/workflows/inquiry-mysql-profile-proof.yml': 'A',
+        }
+        lines = subprocess.check_output(['git', 'diff', '--name-status', 'HEAD^', 'HEAD'], text=True).splitlines()
+        actual_delta = {}
+        for line in lines:
+            fields = line.split('\t')
+            if len(fields) != 2 or fields[1] in actual_delta:
+                raise SystemExit('Unexpected source delta or duplicate path.')
+            actual_delta[fields[1]] = fields[0]
+        if actual_delta != expected_delta:
+            raise SystemExit('Only the temporary proof workflow may be replaced.')
+        expected_hashes = {'composer.json': '132cb2a16c6ce2960d059cfddecae8e1accf6138a258dd8bab2c0c7b822f5607',
+         'composer.lock': '51e9c3cc1073e96a1c130376e1ab9980765a5c441c0dcd2a5454fd0909406962',
+         'phpunit.xml': '493369cfb7feea104da4bec214c2cc6526ca2f1b9d937c50a2961fc59cb61aaf',
+         'scripts/ci/database-sqlite-skips.json': '54a58679e118d15416a1e4bdeea1f05b5e7db45241ff285bb90bf209c61b9630',
+         'app/Console/Commands/ProcessInquiryAlerts.php': 'aedf1527ecc91cb458e9da681e3a2d08f4cee65d355efe6782e1a8eb93ea8920',
+         'app/Domain/Inquiries/Models/InquiryNotificationIntent.php': 'dc6c6cf9ba5995cc33f7ce92ae0670e746a77b8a066efc1036f7c9457a0ea0f8',
+         'app/Domain/Inquiries/Notifications/InquiryAlertNotSubmitted.php': 'ab392132f117e3ae9f051c582f3c15cac27808a9c7fc4119415a78506c91c7d2',
+         'app/Domain/Inquiries/Notifications/InquiryAlertTransport.php': '2d4c04fe70a4b34882bc9a429bc3d480cbca008ea3db8fb04ad2022044fdfb29',
+         'app/Domain/Inquiries/Notifications/InquiryNotificationWork.php': 'f9d851ef49e29a3b5199cfe381b08e45b01e25287ca9f1d308731eab3d4d0665',
+         'app/Domain/Inquiries/Notifications/OperatorInquiryAlert.php': '2dbda5cbf9dd976e533be2215b9e069f46bbaf88b11ba475c3ea5df748aa8ec0',
+         'app/Domain/Inquiries/SubmitInquiry.php': 'e409fd8695ee4f7f89411fcaf79cb4df25c2093bd736f76cbc80fee5aadbc8cf',
+         'app/Jobs/NotifyInquiryOperatorJob.php': '07a340798444c64adca47ce828291ef924ad88d465df9a55d89c62039711f20a',
+         'config/inquiries.php': '8a57ee52c98715d293b4b26533f586ab0f443700029a731c0a794255971f3341',
+         'database/migrations/2026_10_01_000031_customer_inquiries.php': '7dba3048f15ec167aeb8e15bb9f4ec8bdbb4a97839545afed498b79a0e70c282',
+         'database/migrations/2026_10_01_000032_editorial_related_tracks_images.php': '873b168c47558a4a7de58db9dbbc72589d310da28b8fc13f9687514dc438c43a',
+         'database/migrations/2026_10_01_000033_inquiry_notification_intents.php': '97a532a0c3b9113d6d7a44d24674231649f877e4346ade999546c2c31b0f4db7',
+         'tests/Feature/CustomerInquiryMigrationTest.php': 'd9e84365ea95a3e71f795e81ac4a69dcd0cbe8070f369444a86b87c57a02f4c5',
+         'tests/Feature/InquiryNotificationConcurrencyTest.php': 'cd37fbe505c2cab8e274ba9979eba4f8f9c7193603d6d60a8e5fb56466c0e20c',
+         'tests/Feature/InquiryNotificationMigrationTest.php': 'e15ebee61277883fb76294e747d15c206d155a6ad04c89ea29f0a36965f651a3',
+         'tests/Feature/InquiryNotificationWorkTest.php': 'dfb872cea2e68a97326eba23bc718f4dbf4b8b11848f3d3d12ca0a7fc424f51f',
+         'tests/Feature/SiteRelatedTrackImageMigrationTest.php': '3f0e0cfd8bbcb9e4de67263c26c779dc343215271a186e647e12e46b7746392c',
+         'tests/Support/InquiryNotificationRace.php': '50be75435d2db84a432b5fb043b83512b09d954e8dc6378fb63545ccfa0f5d3d',
+         'tests/Support/inquiry-notification-race-worker.php': 'a4f4028019e668d087cd9c00df25bce283ff7835598bc94169e730aeee968cba',
+         'tests/Feature/CustomerInquiryHttpTest.php': '0f5e1be7a80ef1bfd607d45db348b684c5eca9dc24072e7d5a930a3aaf960a4b',
+         'tests/Feature/CustomerInquiryAdminTest.php': '7ecceb49e8ed4dcdc6bf3652a86e5da16eec8e31cbc57de6fa4c13e10cda986e',
+         'tests/Feature/CustomerInquiryConcurrencyTest.php': '7ac7e7052b258d7c049370533205008b4e08898902c50acddd6e2e39d9a4842b'}
+        for path, expected in expected_hashes.items():
+            if hashlib.sha256(Path(path).read_bytes()).hexdigest() != expected:
+                raise SystemExit('Reviewed application/test/policy source changed: ' + path)
+        parent_workflow = subprocess.check_output(['git', 'show', 'HEAD^:.github/workflows/inquiry-format-proof.yml'])
+        if hashlib.sha256(parent_workflow).hexdigest() != 'ae04d5ab3dc602b2ede4ced1483796d4661b3e69c44905849b03964c1a7d0aa6':
+            raise SystemExit('Unexpected reviewed parent formatting protocol.')
+        print(json.dumps({'verified_source_hashes': len(expected_hashes), 'source_delta': actual_delta, 'permanent_source': 'a420c519eae457f70384405abf0fc41501ff3824', 'permanent_tree': '41f3f339abd650f606e04410debce0b5d96f2c5e', 'original_cancelled_run': 36845246416, 'original_format_run': 36846842003, 'job_ceiling_minutes': 90, 'ceiling_basis': 'Original fixed seven-file job cancelled after 45 minutes 21 seconds; no measured single-file duration is claimed.'}, sort_keys=True))
+        PYTHON
+        {
+          git rev-parse HEAD HEAD^{tree} HEAD^ HEAD^^{tree} HEAD^^ HEAD^^^{tree}
+          sha256sum .github/workflows/inquiry-mysql-profile-proof.yml composer.json composer.lock phpunit.xml scripts/ci/database-sqlite-skips.json app/Console/Commands/ProcessInquiryAlerts.php app/Domain/Inquiries/Models/InquiryNotificationIntent.php app/Domain/Inquiries/Notifications/InquiryAlertNotSubmitted.php app/Domain/Inquiries/Notifications/InquiryAlertTransport.php app/Domain/Inquiries/Notifications/InquiryNotificationWork.php app/Domain/Inquiries/Notifications/OperatorInquiryAlert.php app/Domain/Inquiries/SubmitInquiry.php app/Jobs/NotifyInquiryOperatorJob.php config/inquiries.php database/migrations/2026_10_01_000031_customer_inquiries.php database/migrations/2026_10_01_000032_editorial_related_tracks_images.php database/migrations/2026_10_01_000033_inquiry_notification_intents.php tests/Feature/CustomerInquiryMigrationTest.php tests/Feature/InquiryNotificationConcurrencyTest.php tests/Feature/InquiryNotificationMigrationTest.php tests/Feature/InquiryNotificationWorkTest.php tests/Feature/SiteRelatedTrackImageMigrationTest.php tests/Support/InquiryNotificationRace.php tests/Support/inquiry-notification-race-worker.php tests/Feature/CustomerInquiryHttpTest.php tests/Feature/CustomerInquiryAdminTest.php tests/Feature/CustomerInquiryConcurrencyTest.php
+        } 2>&1 | tee inquiry-mysql-profile-evidence/php-source.log
+        for path in app/Domain/Inquiries/Notifications/InquiryNotificationWork.php app/Domain/Inquiries/Notifications/OperatorInquiryAlert.php tests/Feature/InquiryNotificationWorkTest.php tests/Support/inquiry-notification-race-worker.php; do
+          git show "6f499bdcec696320b2bef64f205c3a79c8fedf98:$path" > "inquiry-mysql-profile-evidence/previous-$(basename "$path")"
+        done
+    - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45
+      with:
+        php-version: '8.4'
+        extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+        coverage: none
+        tools: composer:v2
+    - name: Install Foundation media and PDF fixture prerequisites
+      run: |
+        set -euo pipefail
+        sudo apt-get update
+        sudo apt-get install --yes --no-install-recommends ffmpeg util-linux qpdf poppler-utils
+        test -x /usr/bin/ffmpeg
+        test -x /usr/bin/ffprobe
+        test -x /usr/bin/prlimit
+    - name: Install the locked backend dependencies
+      run: |
+        set -euo pipefail
+        composer install --no-interaction --prefer-dist 2>&1 | tee inquiry-mysql-profile-evidence/composer-install.log
+    - run: cp .env.example .env
+    - run: php artisan key:generate
+    - name: Check the exact reviewed four-path syntax and style inverse
+      run: |
+        set -euo pipefail
+        php --version | tee inquiry-mysql-profile-evidence/php-runtime.log
+        {
+          for path in app/Domain/Inquiries/Notifications/InquiryNotificationWork.php app/Domain/Inquiries/Notifications/OperatorInquiryAlert.php tests/Feature/InquiryNotificationWorkTest.php tests/Support/inquiry-notification-race-worker.php; do
+            php --syntax-check "$path"
+          done
+        } 2>&1 | tee inquiry-mysql-profile-evidence/php-syntax.log
+        php <<'PHP' 2>&1 | tee inquiry-mysql-profile-evidence/php-source-bridge.log
+        <?php
+        $expected = [
+            'app/Domain/Inquiries/Notifications/InquiryNotificationWork.php' => ['e7dded172adc031d2ec1531526c9d1da3cd26c293862f3df374c41b4928b4db7', 'f9d851ef49e29a3b5199cfe381b08e45b01e25287ca9f1d308731eab3d4d0665'],
+            'app/Domain/Inquiries/Notifications/OperatorInquiryAlert.php' => ['35f4aad53b49e0c9b8a112bc6b40345e84320d5e67b48fb743517cdf7213e086', '2dbda5cbf9dd976e533be2215b9e069f46bbaf88b11ba475c3ea5df748aa8ec0'],
+            'tests/Feature/InquiryNotificationWorkTest.php' => ['5c47ce39b5e3a7dd0eceb338569459998e2b83f35e3a5fbf2091e21816a73dbe', 'dfb872cea2e68a97326eba23bc718f4dbf4b8b11848f3d3d12ca0a7fc424f51f'],
+            'tests/Support/inquiry-notification-race-worker.php' => ['9fd7fe06d3950794578b702914e72077df473b5e0551a6cb3bbc6935a34db5c6', 'a4f4028019e668d087cd9c00df25bce283ff7835598bc94169e730aeee968cba'],
+        ];
+        function strictTokens(string $source): array
+        {
+            $result = [];
+            foreach (token_get_all($source, TOKEN_PARSE) as $token) {
+                if (is_array($token)) {
+                    if ($token[0] === T_WHITESPACE) {
+                        continue;
+                    }
+                    $result[] = [$token[0], $token[1]];
+                } else {
+                    $result[] = $token;
+                }
+            }
+
+            return $result;
+        }
+        foreach ($expected as $path => [$previousHash, $currentHash]) {
+            $previous = file_get_contents('inquiry-mysql-profile-evidence/previous-'.basename($path));
+            $current = file_get_contents($path);
+            if (hash('sha256', $previous) !== $previousHash || hash('sha256', $current) !== $currentHash) {
+                throw new RuntimeException('Unexpected old/current formatting source for '.$path);
+            }
+            $originalTokens = strictTokens($previous);
+            if ($path !== 'tests/Support/inquiry-notification-race-worker.php') {
+                $currentTokens = strictTokens($current);
+                if ($originalTokens !== $currentTokens) {
+                    throw new RuntimeException('Non-whitespace PHP tokens changed for '.$path);
+                }
+                $bridge = ['nonWhitespaceTokensEqual' => true, 'tokenCount' => count($currentTokens)];
+            } else {
+                // This global script changes three imports/four name references, not only whitespace.
+                $normalized = $current;
+                foreach (['InquiryAlertTransport', 'InquiryNotificationWork', 'OperatorInquiryAlert'] as $alias) {
+                    $declaration = 'use App\\Domain\\Inquiries\\Notifications\\'.$alias.";\n";
+                    if (substr_count($normalized, $declaration) !== 1) {
+                        throw new RuntimeException('Unexpected worker import.');
+                    }
+                    $normalized = str_replace($declaration, '', $normalized);
+                }
+                $references = [
+                    'InquiryAlertTransport::class' => '\\App\\Domain\\Inquiries\\Notifications\\InquiryAlertTransport::class',
+                    'implements InquiryAlertTransport' => 'implements \\App\\Domain\\Inquiries\\Notifications\\InquiryAlertTransport',
+                    'submit(OperatorInquiryAlert $alert)' => 'submit(\\App\\Domain\\Inquiries\\Notifications\\OperatorInquiryAlert $alert)',
+                    'app(InquiryNotificationWork::class)' => 'app(\\App\\Domain\\Inquiries\\Notifications\\InquiryNotificationWork::class)',
+                ];
+                foreach ($references as $from => $to) {
+                    if (substr_count($normalized, $from) !== 1) {
+                        throw new RuntimeException('Unexpected worker reference.');
+                    }
+                    $normalized = str_replace($from, $to, $normalized);
+                }
+                $constructor = '            public function __construct(private string $directory) {}';
+                if (substr_count($normalized, $constructor) !== 1) {
+                    throw new RuntimeException('Unexpected worker constructor.');
+                }
+                $normalized = str_replace($constructor, '            public function __construct(private string $directory)'."\n            {\n            }", $normalized);
+                if ($normalized !== $previous || strictTokens($normalized) !== $originalTokens) {
+                    throw new RuntimeException('Worker changed beyond the exact reviewed class imports and formatting.');
+                }
+                strictTokens($current);
+                $bridge = ['exactReviewedInverseEqual' => true, 'globalImports' => 3, 'classReferenceSites' => 4];
+            }
+            echo json_encode(['path' => $path, 'previousSourceSha256' => $previousHash, 'currentSourceSha256' => $currentHash] + $bridge, JSON_THROW_ON_ERROR), PHP_EOL;
+        }
+        PHP
+    - name: Record actual PHP, tool and fresh database runtimes
+      run: |
+        set -euo pipefail
+        {
+          php --version
+          php vendor/bin/phpunit --version
+          composer --version
+          ffmpeg -version
+          ffprobe -version
+          prlimit --version
+          qpdf --version
+          pdfinfo -v
+          php <<'PHP'
+        <?php
+        if (getenv('DB_CONNECTION') !== 'mysql' || getenv('DB_DATABASE') !== 'vaseyaudio_inquiry_migration_profile') {
+            throw new RuntimeException('Unexpected fixed disposable database selection.');
+        }
+        $database = new PDO('mysql:host=127.0.0.1;port=3306;dbname=vaseyaudio_inquiry_migration_profile', getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
+        $runtime = $database->query('SELECT VERSION() AS version, DATABASE() AS database_name, @@version_comment AS version_comment, @@sql_mode AS sql_mode, @@transaction_isolation AS transaction_isolation, @@lower_case_table_names AS lower_case_table_names')->fetch(PDO::FETCH_ASSOC);
+        if (! str_starts_with($runtime['version'], '8.4.') || $runtime['database_name'] !== 'vaseyaudio_inquiry_migration_profile' || (int) $runtime['lower_case_table_names'] !== 0) {
+            throw new RuntimeException('Unexpected disposable MySQL runtime or case setting.');
+        }
+        $tables = (int) $database->query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'vaseyaudio_inquiry_migration_profile'")->fetchColumn();
+        if ($tables !== 0) {
+            throw new RuntimeException('The disposable database is not empty before tests.');
+        }
+        echo json_encode(['driver' => $database->getAttribute(PDO::ATTR_DRIVER_NAME), 'runtime' => $runtime, 'tables_before_tests' => $tables], JSON_THROW_ON_ERROR), PHP_EOL;
+        PHP
+        } 2>&1 | tee inquiry-mysql-profile-evidence/php-runtime.log
+    - name: Discover and require exactly the fixed 34 migration identities
+      run: |
+        set -euo pipefail
+        php vendor/bin/phpunit tests/Feature/InquiryNotificationMigrationTest.php \
+          --list-tests-xml=inquiry-mysql-profile-evidence/discovery.xml \
+          --fail-on-empty-test-suite --fail-on-phpunit-warning --display-warnings \
+          2>&1 | tee inquiry-mysql-profile-evidence/discovery.log
+        python <<'PYTHON' 2>&1 | tee inquiry-mysql-profile-evidence/discovery-check.log
+        from pathlib import Path
+        from collections import Counter
+        import hashlib, json, math, xml.etree.ElementTree as E
+        expected_cases = [{'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_every_committed_installation_prefix_can_resume_and_repeated_up_preserves_all_guards',
+          'name': 'test_every_committed_installation_prefix_can_resume_and_repeated_up_preserves_all_guards'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_fully_protected_retained_table_can_resume_without_any_ddl_or_evidence_change',
+          'name': 'test_fully_protected_retained_table_can_resume_without_any_ddl_or_evidence_change'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_nonempty_partial_table_is_never_retroactively_adopted#insert',
+          'name': 'test_nonempty_partial_table_is_never_retroactively_adopted with data set "insert"'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_nonempty_partial_table_is_never_retroactively_adopted#update',
+          'name': 'test_nonempty_partial_table_is_never_retroactively_adopted with data set "update"'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_nonempty_partial_table_is_never_retroactively_adopted#delete',
+          'name': 'test_nonempty_partial_table_is_never_retroactively_adopted with data set "delete"'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_nonempty_partial_table_is_never_retroactively_adopted#unique index',
+          'name': 'test_nonempty_partial_table_is_never_retroactively_adopted with data set "unique index"'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_nonempty_notification_table_with_a_missing_mysql_foreign_key_is_never_retroactively_adopted',
+          'name': 'test_nonempty_notification_table_with_a_missing_mysql_foreign_key_is_never_retroactively_adopted'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_every_empty_rollback_prefix_and_absent_table_can_resume_without_changing_parent_evidence',
+          'name': 'test_every_empty_rollback_prefix_and_absent_table_can_resume_without_changing_parent_evidence'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_foreign_schema_or_guard_residue_is_refused_before_any_ddl#extra column',
+          'name': 'test_foreign_schema_or_guard_residue_is_refused_before_any_ddl with data set "extra column"'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_foreign_schema_or_guard_residue_is_refused_before_any_ddl#wrong unique index',
+          'name': 'test_foreign_schema_or_guard_residue_is_refused_before_any_ddl with data set "wrong unique index"'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_foreign_schema_or_guard_residue_is_refused_before_any_ddl#wrong guard body',
+          'name': 'test_foreign_schema_or_guard_residue_is_refused_before_any_ddl with data set "wrong guard body"'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_foreign_schema_or_guard_residue_is_refused_before_any_ddl#additional table trigger',
+          'name': 'test_foreign_schema_or_guard_residue_is_refused_before_any_ddl with data set "additional table trigger"'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_changed_mysql_notification_foreign_key_is_refused_before_any_ddl',
+          'name': 'test_changed_mysql_notification_foreign_key_is_refused_before_any_ddl'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_shortened_mysql_notification_due_index_prefix_is_refused_before_any_ddl',
+          'name': 'test_shortened_mysql_notification_due_index_prefix_is_refused_before_any_ddl'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_missing_owned_guard_does_not_allow_foreign_named_guard_to_be_overwritten',
+          'name': 'test_missing_owned_guard_does_not_allow_foreign_named_guard_to_be_overwritten'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_changed_mysql_notification_fk_support_index_in_a_partial_installation_is_refused_before_any_ddl',
+          'name': 'test_changed_mysql_notification_fk_support_index_in_a_partial_installation_is_refused_before_any_ddl'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_unrelated_table_with_an_owned_schema_wide_name_is_refused_before_creating_notifications',
+          'name': 'test_unrelated_table_with_an_owned_schema_wide_name_is_refused_before_creating_notifications'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_foreign_minimal_table_is_not_repaired_or_dropped_as_an_owned_partial_table',
+          'name': 'test_foreign_minimal_table_is_not_repaired_or_dropped_as_an_owned_partial_table'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_differently_cased_foreign_table_is_neither_adopted_nor_dropped',
+          'name': 'test_differently_cased_foreign_table_is_neither_adopted_nor_dropped'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_differently_cased_schema_wide_names_are_refused_before_any_create#SQLite global index or MySQL global foreign key',
+          'name': 'test_differently_cased_schema_wide_names_are_refused_before_any_create with data set "SQLite global index or MySQL global foreign key"'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_differently_cased_schema_wide_names_are_refused_before_any_create#global trigger',
+          'name': 'test_differently_cased_schema_wide_names_are_refused_before_any_create with data set "global trigger"'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_temporary_objects_cannot_hide_retained_inquiries_or_shadow_owned_schema_names',
+          'name': 'test_temporary_objects_cannot_hide_retained_inquiries_or_shadow_owned_schema_names'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_empty_rollback_reapply_retains_parent_records_and_restores_guards',
+          'name': 'test_empty_rollback_reapply_retains_parent_records_and_restores_guards'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_populated_rollback_refuses_deletion_and_leaves_identity_and_state_guards_active',
+          'name': 'test_populated_rollback_refuses_deletion_and_leaves_identity_and_state_guards_active'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_one_id_only_intent_per_inquiry_has_the_original_operator_and_restrictive_foreign_keys',
+          'name': 'test_one_id_only_intent_per_inquiry_has_the_original_operator_and_restrictive_foreign_keys'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_insert_guards_reject_nonempty_nonpending_padded_or_unknown_values',
+          'name': 'test_insert_guards_reject_nonempty_nonpending_padded_or_unknown_values'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_identity_cannot_be_rewritten_even_with_an_otherwise_valid_claim',
+          'name': 'test_identity_cannot_be_rewritten_even_with_an_otherwise_valid_claim'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_claim_requires_exact_uuid_one_attempt_and_an_unexpired_lease',
+          'name': 'test_claim_requires_exact_uuid_one_attempt_and_an_unexpired_lease'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_only_definite_non_submission_may_retry_and_due_retry_stops_after_three_claims',
+          'name': 'test_only_definite_non_submission_may_retry_and_due_retry_stops_after_three_claims'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_active_claim_completes_once_and_ambiguous_outcomes_never_become_retryable',
+          'name': 'test_active_claim_completes_once_and_ambiguous_outcomes_never_become_retryable'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_expired_claim_becomes_unknown_without_reclaim_or_definite_outcome',
+          'name': 'test_expired_claim_becomes_unknown_without_reclaim_or_definite_outcome'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_authority_withdrawal_blocks_pending_or_scheduled_retry_without_consuming_an_attempt',
+          'name': 'test_authority_withdrawal_blocks_pending_or_scheduled_retry_without_consuming_an_attempt'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_orm_rejects_identity_deletion_and_invalid_state_changes_but_accepts_valid_claim_and_handoff',
+          'name': 'test_orm_rejects_identity_deletion_and_invalid_state_changes_but_accepts_valid_claim_and_handoff'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_invalid_notification_insert_rolls_back_the_new_inquiry_in_the_same_transaction',
+          'name': 'test_invalid_notification_insert_rolls_back_the_new_inquiry_in_the_same_transaction'}]
+        expected_ids = {case['id'] for case in expected_cases}
+        expected_names = {case['name'] for case in expected_cases}
+        if len(expected_cases) != 34 or len(expected_ids) != 34 or len(expected_names) != 34:
+            raise SystemExit('Invalid fixed 34-case protocol inventory.')
+        expected_class = 'Tests\\Feature\\InquiryNotificationMigrationTest'
+        expected_file = (Path.cwd() / 'tests/Feature/InquiryNotificationMigrationTest.php').resolve()
+        ns = {'x': 'https://xml.phpunit.de/testSuite'}
+        discovery_path = Path('inquiry-mysql-profile-evidence/discovery.xml')
+        discovery = E.parse(discovery_path).getroot()
+        if discovery.tag != '{https://xml.phpunit.de/testSuite}testSuite':
+            raise SystemExit('Unexpected PHPUnit discovery XML format.')
+        classes = discovery.findall('./x:tests/x:testClass', ns)
+        methods = discovery.findall('.//x:testMethod', ns)
+        if len(classes) != 1 or classes[0].get('name') != expected_class or Path(classes[0].get('file', '')).resolve() != expected_file or discovery.findall('.//x:phpt', ns):
+            raise SystemExit('Discovery selected a different class/file or a PHPT test.')
+        class_methods = classes[0].findall('./x:testMethod', ns)
+        ids = [method.get('id') for method in methods]
+        if len(class_methods) != 34 or len(methods) != 34 or Counter(ids) != Counter(expected_ids):
+            raise SystemExit('Discovery must include each of the exact 34 cases once.')
+        for method in methods:
+            if method.get('name') != method.get('id', '').split('::', 1)[-1].split('#', 1)[0]:
+                raise SystemExit('Discovery method identity is inconsistent.')
+        receipt = {'cases': len(ids), 'class': expected_class, 'file': str(expected_file), 'identities': sorted(ids), 'xml_sha256': hashlib.sha256(discovery_path.read_bytes()).hexdigest()}
+        Path('inquiry-mysql-profile-evidence/discovery-receipt.json').write_text(json.dumps(receipt, indent=2, sort_keys=True) + '\n')
+        print(json.dumps(receipt, sort_keys=True))
+        PYTHON
+    - name: Run only the unchanged notification migration file with named lifecycle and timing logs
+      run: |
+        set -euo pipefail
+        php vendor/bin/phpunit tests/Feature/InquiryNotificationMigrationTest.php \
+          --testdox \
+          --log-events-text=inquiry-mysql-profile-evidence/events.log \
+          --log-events-verbose-text=inquiry-mysql-profile-evidence/events-timing.log \
+          --log-junit=inquiry-mysql-profile-evidence/inquiry-results.xml \
+          --fail-on-empty-test-suite --fail-on-phpunit-warning --fail-on-warning \
+          --fail-on-risky --fail-on-incomplete --fail-on-skipped --display-warnings \
+          2>&1 | tee inquiry-mysql-profile-evidence/phpunit-testdox.log
+    - name: Require complete no-skip MySQL JUnit and named-event receipts
+      run: |
+        set -euo pipefail
+        python <<'PYTHON' 2>&1 | tee inquiry-mysql-profile-evidence/runtime-receipt-check.log
+        from pathlib import Path
+        from collections import Counter
+        import hashlib, json, math, re, xml.etree.ElementTree as E
+        expected_cases = [{'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_every_committed_installation_prefix_can_resume_and_repeated_up_preserves_all_guards',
+          'name': 'test_every_committed_installation_prefix_can_resume_and_repeated_up_preserves_all_guards'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_fully_protected_retained_table_can_resume_without_any_ddl_or_evidence_change',
+          'name': 'test_fully_protected_retained_table_can_resume_without_any_ddl_or_evidence_change'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_nonempty_partial_table_is_never_retroactively_adopted#insert',
+          'name': 'test_nonempty_partial_table_is_never_retroactively_adopted with data set "insert"'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_nonempty_partial_table_is_never_retroactively_adopted#update',
+          'name': 'test_nonempty_partial_table_is_never_retroactively_adopted with data set "update"'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_nonempty_partial_table_is_never_retroactively_adopted#delete',
+          'name': 'test_nonempty_partial_table_is_never_retroactively_adopted with data set "delete"'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_nonempty_partial_table_is_never_retroactively_adopted#unique index',
+          'name': 'test_nonempty_partial_table_is_never_retroactively_adopted with data set "unique index"'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_nonempty_notification_table_with_a_missing_mysql_foreign_key_is_never_retroactively_adopted',
+          'name': 'test_nonempty_notification_table_with_a_missing_mysql_foreign_key_is_never_retroactively_adopted'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_every_empty_rollback_prefix_and_absent_table_can_resume_without_changing_parent_evidence',
+          'name': 'test_every_empty_rollback_prefix_and_absent_table_can_resume_without_changing_parent_evidence'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_foreign_schema_or_guard_residue_is_refused_before_any_ddl#extra column',
+          'name': 'test_foreign_schema_or_guard_residue_is_refused_before_any_ddl with data set "extra column"'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_foreign_schema_or_guard_residue_is_refused_before_any_ddl#wrong unique index',
+          'name': 'test_foreign_schema_or_guard_residue_is_refused_before_any_ddl with data set "wrong unique index"'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_foreign_schema_or_guard_residue_is_refused_before_any_ddl#wrong guard body',
+          'name': 'test_foreign_schema_or_guard_residue_is_refused_before_any_ddl with data set "wrong guard body"'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_foreign_schema_or_guard_residue_is_refused_before_any_ddl#additional table trigger',
+          'name': 'test_foreign_schema_or_guard_residue_is_refused_before_any_ddl with data set "additional table trigger"'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_changed_mysql_notification_foreign_key_is_refused_before_any_ddl',
+          'name': 'test_changed_mysql_notification_foreign_key_is_refused_before_any_ddl'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_shortened_mysql_notification_due_index_prefix_is_refused_before_any_ddl',
+          'name': 'test_shortened_mysql_notification_due_index_prefix_is_refused_before_any_ddl'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_missing_owned_guard_does_not_allow_foreign_named_guard_to_be_overwritten',
+          'name': 'test_missing_owned_guard_does_not_allow_foreign_named_guard_to_be_overwritten'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_changed_mysql_notification_fk_support_index_in_a_partial_installation_is_refused_before_any_ddl',
+          'name': 'test_changed_mysql_notification_fk_support_index_in_a_partial_installation_is_refused_before_any_ddl'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_unrelated_table_with_an_owned_schema_wide_name_is_refused_before_creating_notifications',
+          'name': 'test_unrelated_table_with_an_owned_schema_wide_name_is_refused_before_creating_notifications'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_foreign_minimal_table_is_not_repaired_or_dropped_as_an_owned_partial_table',
+          'name': 'test_foreign_minimal_table_is_not_repaired_or_dropped_as_an_owned_partial_table'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_differently_cased_foreign_table_is_neither_adopted_nor_dropped',
+          'name': 'test_differently_cased_foreign_table_is_neither_adopted_nor_dropped'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_differently_cased_schema_wide_names_are_refused_before_any_create#SQLite global index or MySQL global foreign key',
+          'name': 'test_differently_cased_schema_wide_names_are_refused_before_any_create with data set "SQLite global index or MySQL global foreign key"'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_differently_cased_schema_wide_names_are_refused_before_any_create#global trigger',
+          'name': 'test_differently_cased_schema_wide_names_are_refused_before_any_create with data set "global trigger"'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_temporary_objects_cannot_hide_retained_inquiries_or_shadow_owned_schema_names',
+          'name': 'test_temporary_objects_cannot_hide_retained_inquiries_or_shadow_owned_schema_names'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_empty_rollback_reapply_retains_parent_records_and_restores_guards',
+          'name': 'test_empty_rollback_reapply_retains_parent_records_and_restores_guards'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_populated_rollback_refuses_deletion_and_leaves_identity_and_state_guards_active',
+          'name': 'test_populated_rollback_refuses_deletion_and_leaves_identity_and_state_guards_active'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_one_id_only_intent_per_inquiry_has_the_original_operator_and_restrictive_foreign_keys',
+          'name': 'test_one_id_only_intent_per_inquiry_has_the_original_operator_and_restrictive_foreign_keys'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_insert_guards_reject_nonempty_nonpending_padded_or_unknown_values',
+          'name': 'test_insert_guards_reject_nonempty_nonpending_padded_or_unknown_values'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_identity_cannot_be_rewritten_even_with_an_otherwise_valid_claim',
+          'name': 'test_identity_cannot_be_rewritten_even_with_an_otherwise_valid_claim'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_claim_requires_exact_uuid_one_attempt_and_an_unexpired_lease',
+          'name': 'test_claim_requires_exact_uuid_one_attempt_and_an_unexpired_lease'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_only_definite_non_submission_may_retry_and_due_retry_stops_after_three_claims',
+          'name': 'test_only_definite_non_submission_may_retry_and_due_retry_stops_after_three_claims'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_active_claim_completes_once_and_ambiguous_outcomes_never_become_retryable',
+          'name': 'test_active_claim_completes_once_and_ambiguous_outcomes_never_become_retryable'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_expired_claim_becomes_unknown_without_reclaim_or_definite_outcome',
+          'name': 'test_expired_claim_becomes_unknown_without_reclaim_or_definite_outcome'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_authority_withdrawal_blocks_pending_or_scheduled_retry_without_consuming_an_attempt',
+          'name': 'test_authority_withdrawal_blocks_pending_or_scheduled_retry_without_consuming_an_attempt'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_orm_rejects_identity_deletion_and_invalid_state_changes_but_accepts_valid_claim_and_handoff',
+          'name': 'test_orm_rejects_identity_deletion_and_invalid_state_changes_but_accepts_valid_claim_and_handoff'},
+         {'id': 'Tests\\Feature\\InquiryNotificationMigrationTest::test_invalid_notification_insert_rolls_back_the_new_inquiry_in_the_same_transaction',
+          'name': 'test_invalid_notification_insert_rolls_back_the_new_inquiry_in_the_same_transaction'}]
+        expected_ids = {case['id'] for case in expected_cases}
+        expected_names = {case['name'] for case in expected_cases}
+        if len(expected_cases) != 34 or len(expected_ids) != 34 or len(expected_names) != 34:
+            raise SystemExit('Invalid fixed 34-case protocol inventory.')
+        expected_class = 'Tests\\Feature\\InquiryNotificationMigrationTest'
+        expected_file = (Path.cwd() / 'tests/Feature/InquiryNotificationMigrationTest.php').resolve()
+        ns = {'x': 'https://xml.phpunit.de/testSuite'}
+        discovery_path = Path('inquiry-mysql-profile-evidence/discovery.xml')
+        discovery = E.parse(discovery_path).getroot()
+        if discovery.tag != '{https://xml.phpunit.de/testSuite}testSuite':
+            raise SystemExit('Unexpected PHPUnit discovery XML format.')
+        classes = discovery.findall('./x:tests/x:testClass', ns)
+        methods = discovery.findall('.//x:testMethod', ns)
+        if len(classes) != 1 or classes[0].get('name') != expected_class or Path(classes[0].get('file', '')).resolve() != expected_file or discovery.findall('.//x:phpt', ns):
+            raise SystemExit('Discovery selected a different class/file or a PHPT test.')
+        class_methods = classes[0].findall('./x:testMethod', ns)
+        ids = [method.get('id') for method in methods]
+        if len(class_methods) != 34 or len(methods) != 34 or Counter(ids) != Counter(expected_ids):
+            raise SystemExit('Discovery must include each of the exact 34 cases once.')
+        for method in methods:
+            if method.get('name') != method.get('id', '').split('::', 1)[-1].split('#', 1)[0]:
+                raise SystemExit('Discovery method identity is inconsistent.')
+        result_path = Path('inquiry-mysql-profile-evidence/inquiry-results.xml')
+        root = E.parse(result_path).getroot()
+        if root.tag != 'testsuites':
+            raise SystemExit('Unexpected JUnit format.')
+        suites = root.findall('./testsuite')
+        cases = root.findall('.//testcase')
+        if len(suites) != 1 or len(cases) != 34 or Counter(case.get('name') for case in cases) != Counter(expected_names):
+            raise SystemExit('JUnit must record all exact 34 cases once.')
+        if root.findall('.//failure') or root.findall('.//error') or root.findall('.//skipped'):
+            raise SystemExit('No failed, errored or skipped MySQL case is allowed.')
+        assertions = 0
+        case_receipts = []
+        for case in cases:
+            if case.get('class') != expected_class or case.get('classname') != expected_class.replace('\\', '.') or Path(case.get('file', '')).resolve() != expected_file:
+                raise SystemExit('JUnit selected a different class/file.')
+            count = case.get('assertions', '')
+            elapsed = float(case.get('time', 'nan'))
+            if not count.isdigit() or int(count) < 1 or not math.isfinite(elapsed) or elapsed < 0:
+                raise SystemExit('Each completed case needs assertions and finite timing.')
+            assertions += int(count)
+            case_receipts.append({'name': case.get('name'), 'assertions': int(count), 'seconds': elapsed})
+        for attribute, required in [('tests', 34), ('errors', 0), ('failures', 0), ('skipped', 0), ('assertions', assertions)]:
+            if suites[0].get(attribute) != str(required):
+                raise SystemExit('JUnit aggregate is inconsistent: ' + attribute)
+        plain = Path('inquiry-mysql-profile-evidence/events.log').read_text()
+        verbose = Path('inquiry-mysql-profile-evidence/events-timing.log').read_text()
+        event_times = {}
+        for label in ['Test Preparation Started', 'Test Finished']:
+            prefix = label + ' ('
+            named = [line[len(prefix):-1] for line in plain.splitlines() if line.startswith(prefix) and line.endswith(')')]
+            if Counter(named) != Counter(expected_ids):
+                raise SystemExit('Named event census is incomplete or duplicated: ' + label)
+            timed = []
+            for line in verbose.splitlines():
+                marker = ' ' + prefix
+                if marker in line and line.endswith(')'):
+                    timing, identity = line.split(marker, 1)
+                    pattern = r'^\[(\d{2,}):(\d{2}):(\d{2})\.(\d{9}) / \d{2,}:\d{2}:\d{2}\.\d{9}\] \[\d+ bytes\]$'
+                    match = re.fullmatch(pattern, timing)
+                    if match is None:
+                        raise SystemExit('Missing or malformed locked PHPUnit telemetry prefix.')
+                    total = int(match[1]) * 3600 + int(match[2]) * 60 + int(match[3]) + int(match[4]) / 1_000_000_000
+                    event_times[(label, identity[:-1])] = total
+                    timed.append(identity[:-1])
+            if Counter(timed) != Counter(expected_ids):
+                raise SystemExit('Timed named event census is incomplete: ' + label)
+        intervals = []
+        for identity in sorted(expected_ids):
+            start = event_times[('Test Preparation Started', identity)]
+            finish = event_times[('Test Finished', identity)]
+            if finish < start:
+                raise SystemExit('A named test finished before preparation started.')
+            intervals.append({'id': identity, 'start_seconds': start, 'finish_seconds': finish, 'elapsed_seconds': finish - start})
+        receipt = {'cases': 34, 'assertions': assertions, 'failures': 0, 'errors': 0, 'skips': 0, 'discovery_identities': sorted(expected_ids), 'junit_case_timings': sorted(case_receipts, key=lambda case: case['name']), 'event_intervals': intervals, 'junit_sha256': hashlib.sha256(result_path.read_bytes()).hexdigest(), 'events_sha256': hashlib.sha256(plain.encode()).hexdigest(), 'timed_events_sha256': hashlib.sha256(verbose.encode()).hexdigest()}
+        Path('inquiry-mysql-profile-evidence/runtime-receipt.json').write_text(json.dumps(receipt, indent=2, sort_keys=True) + '\n')
+        print(json.dumps(receipt, sort_keys=True))
+        PYTHON
+    - name: Retain complete named migration progress even on cancellation
+      if: always()
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: inquiry-mysql-profile-${{ github.run_id }}-${{ github.run_attempt }}
+        path: inquiry-mysql-profile-evidence/
+        retention-days: 7
+        if-no-files-found: error
+        overwrite: false
