@@ -38,6 +38,7 @@ class PublicTrackEmbedTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->withoutVite();
         $this->fakePrivateMediaStorage();
         config(['app.url' => 'https://audio.example.test']);
     }
@@ -215,7 +216,7 @@ class PublicTrackEmbedTest extends TestCase
         $response->assertHeader('Cache-Control', 'no-store, private')->assertHeader('X-Robots-Tag', 'noindex, nofollow')
             ->assertHeader('Referrer-Policy', 'no-referrer')->assertHeader('X-Content-Type-Options', 'nosniff')
             ->assertHeader('Permissions-Policy', 'autoplay=(), camera=(), microphone=(), geolocation=()')
-            ->assertHeader('Content-Security-Policy', "default-src 'none'; style-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors http: https:")
+            ->assertHeader('Content-Security-Policy', "default-src 'none'; style-src 'self'; font-src 'self'; media-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors http: https:")
             ->assertHeaderMissing('X-Frame-Options')->assertHeaderMissing('Set-Cookie')->assertHeaderMissing('X-Inertia');
         $this->assertNotContains('Cookie', $response->headers->get('Vary') ? explode(', ', $response->headers->get('Vary')) : []);
     }
