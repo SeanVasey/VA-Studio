@@ -62,6 +62,7 @@ FRONTEND_TARGETS = (
 BROWSER_TARGETS = (
     "tests/browser/storefront.spec.ts", "tests/browser/operator.spec.ts",
     "tests/browser/test-checkout.spec.ts", "tests/browser/test-owner-delivery.spec.ts",
+    "tests/browser/site-release-menu-readiness.spec.ts",
 )
 SUITES = (*PHP_TARGETS, "frontend", "browser")
 ENGINES = ("sqlite", "mysql")
