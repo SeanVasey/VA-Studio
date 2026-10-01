@@ -1,62 +1,76 @@
 # CI throughput timing refresh
 
-Status: T02 timing refresh prepared for integrated CI validation; October 1, 2026 (UTC). This change updates measured weighting data only. No test, partitioner, warning/audit setting, workflow trigger, timeout, shard count or required check is changed. Full candidate CI and independent review remain acceptance gates. Measured fixture/bootstrap optimization remains future work.
+Status: bounded T02 weighting-data refresh prepared for review on October 1, 2026 (UTC). Only the two timing JSON files and this guide change. The partitioner, timing generator, tests, workflows, warning/audit settings, timeouts, shard counts and required checks remain unchanged. This is not full T01/T02 completion or candidate runtime acceptance.
 
-## Source evidence
+## Accepted measurement source
 
-Both timing files use the complete successful [PR #87 CI run 36795680362](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36795680362), attempt 1. Its head was `e27001edde722815f65bc2f0588840078471bf2f`, base `383354729e506ef93a4c458552c6087cb717fa9c`. Checkout logs identify the actual synthetic merge commit `2a87cdad2f9a5fb017cdd04198870c25164343d6`. GitHub commit metadata confirms its tree is `c389602f8acb43287a8d8125b482c4c0dd2b3dba`, also the tree of accepted main `8be3bd7271595f2c21a3c5017b3b19ceb821a842`.
+Both timing files use [PR #88 Foundation run 36817029405](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36817029405), attempt 1. The reviewed head was `5e44354785c44e46a93dd97705ef050d62fc6ab5`; the actual checked-out synthetic merge was `c9dc8ad1f164bdbfac526a9c2c996fd36576dff3`. Both have tree `4161be856fad978394368a1708bcec8f9085b7d3`, also the tree of accepted main `cc591daa001f774626e574885cbc7b4904f6b2d2`. Checkout logs, commit/tree readback, completed jobs and independent full-census review agree. This source is separate from later application and informative browser candidates.
 
-| Engine | Artifact IDs, in shard order | Files | Listed cases | Assertions | Skips | Errors/failures |
-| --- | --- | ---: | ---: | ---: | ---: | ---: |
-| MySQL, four shards | 11135369039, 11134995732, 11134996456, 11135000294 | 123 | 1,870 | 21,998 | 0 | 0 |
-| SQLite, two shards | 11133887481, 11133937557 | 123 | 1,870 | 18,288 | 94 | 0 |
+| Engine | Complete shards | Files / listed cases | Passed cases | Assertions | Skips | Errors / failures |
+| --- | ---: | --- | ---: | ---: | ---: | ---: |
+| MySQL | 4 | 125 / 1,903 | 1,903 | 22,594 | 0 | 0 |
+| SQLite | 2 | 125 / 1,903 | 1,809 | 18,647 | 94 | 0 |
 
-SQLite executed 1,776 of its 1,870 listed cases. The 94 SQLite skips are the existing MySQL-only cases; SQLite does not establish their concurrency behavior. The complete MySQL run supplies that separate execution evidence. Each downloaded ZIP's SHA-256 was checked against GitHub's artifact digest before reading it. Artifacts have the workflow's existing seven-day retention; preserve provenance when refreshing again.
+The 94 SQLite skips are the existing MySQL-only cases. Their SQLite timing entries do not establish concurrency behavior; the complete accepted MySQL execution supplies that separate evidence. Artifact ZIP SHA-256 values were checked against GitHub's published digests before extraction. Original extracted discovery, manifest and JUnit files were retained and individually fingerprinted again during preparation. Artifacts have seven-day retention; preserve provenance when refreshing.
 
-The prior timing files covered 121 files and 1,744 cases from PR #82. The new files include the previously untimed `MalwareScannerTest` and `MediaWorkflowBudgetTest`, plus current counts for expanded existing classes. Unknown future files continue to receive the partitioner's fallback weight and are never omitted.
+| Artifact | ID | Verified ZIP SHA-256 |
+| --- | --- | --- |
+| MySQL 1 | 11142312624 | `348ce3aff07279cc6fc4de6fc034d75e3afba3074c6235910735da4184a329bb` |
+| MySQL 2 | 11141824218 | `388953b4c1fbb1c8836ead6868d61884de9e63afb63a2b035224096b3d69019d` |
+| MySQL 3 | 11142148662 | `93fa68bd093e002955362acb9c49a99a5140bcc8c5cf81698529726c84d1f902` |
+| MySQL 4 | 11141849932 | `3e22a461b330061861d90f42c4f3c6f9b4c551910790985f233ebaccb0f4138f` |
+| SQLite 1 | 11142042442 | `38dc4279fb2e185b5a57ce7f13bd00911ef18d8365450790338d3a90cdf21dfe` |
+| SQLite 2 | 11142635755 | `6c8402383661901c0a8c0166d4df02dd0cdc6617fa26d07b7da9ebd6b1b96a59` |
 
-## Generation and census reconciliation
+## Generation and reconciliation
 
-The unchanged [timing tool](../../scripts/ci/phpunit-timings.py) credits every JUnit case to its enclosing test-class file, validates finite nonnegative times and engine-specific filenames, aggregates complete file timings, and computes the fallback mean. Each current file appears in exactly one shard, so this refresh is one accepted-run sample rather than an average of different suite versions. This preserves the present 1,870-case census. Runner variability remains a limitation; use later comparable ordinary full runs for subsequent averages.
+The unchanged [timing generator](../../scripts/ci/phpunit-timings.py) processed all four MySQL and both SQLite JUnit logs separately. It attributes cases to their enclosing test-class file, validates driver and finite nonnegative time, rounds each complete file's milliseconds and computes the fallback mean. Each measured file appears in exactly one shard: one accepted sample per file, without averaging different source versions or assigning invented durations to later tests. It adds real measurements for `HashByteGuardMigrationTest` and `CommerceGuardBytesTest`, which used fallback in PR88.
 
-The preparation workspace contains a partial source materialization rather than a full checkout. A temporary adapter therefore replaced **only source-path reconciliation** with a read-only authoritative Git-tree lookup for tree `c389602f8acb43287a8d8125b482c4c0dd2b3dba`. The complete recursive tree was verified nontruncated. Only exact tracked blob paths under the known runner repository prefix, or exact repository-relative paths, were accepted; unknown/escaping paths failed. No placeholder test files or fabricated test contents were created, and neither production Python tool was edited.
+Some unrelated historical blobs were unavailable locally. Preparation materialized the 129 exact tracked blobs needed for accepted test-class and declaring-file paths, PHPUnit configuration and three unchanged CI tools from the complete 783-blob tree manifest. Every required blob was available and fingerprinted; no placeholder source was created. The timing generator ran normally against these real files using its existing runner-path suffix matching. For retained discovery XML only, copies replaced the exact `/home/runner/work/VASEYAUDIO/VASEYAUDIO/` file prefix with materialized paths; original evidence stayed unchanged. Unknown or escaping paths were rejected. Neither production tool was edited or monkey-patched.
 
-The adapter called the existing timing tool's driver validation, JUnit parser, combination, rendering and entry point. It also used the existing partitioner's XML inventory parser and proof with the same authoritative path lookup to validate all original source/shard lists and group identities. JUnit per-file case counts had to match the discovered inventory for each executed shard. Both engines had to describe the same complete source case/group census.
+All six original manifests agree within their engine. The unchanged inventory parser and proof reconcile actual JUnit identities and per-class counts to each executed shard, then preserve every accepted file, expanded case and PHPUnit group exactly once. Both engines have identical accepted source identities:
 
-| Source identity | SHA-256 |
+| Accepted census identity | SHA-256 |
 | --- | --- |
-| Expanded cases and owning files | `e9cfcdfb8a4a3ef2ac8ec04f4c702d0408a121a0cbf9e059af5f4711afe59319` |
-| Groups and expanded cases | `bc5b5ad81c0571e278ad75ebf7ca6df06276c1d3e631e80a2f9345e4421f569a` |
+| Expanded cases and owning files | `5b2446d549a3941853299f00f0a46915856b724a288f6d788efba43e0d99a39e` |
+| PHPUnit groups and expanded cases | `17b1d6a5d2b66136af80a8ae013be373c712dcd6eae9876247fa67be216804ac` |
 
-A full source checkout can reproduce the outputs directly, without this adapter:
+A full checkout of accepted tree `4161be8` can reproduce generation directly. Download the backend artifacts and run the following there with each JSON file's exact `source` string. Compare outputs before integration into newer source:
 
 ```bash
-gh run download 36795680362 --dir /tmp/vaseyaudio-timings/36795680362 --pattern 'backend-mysql-*'
-gh run download 36795680362 --dir /tmp/vaseyaudio-timings/36795680362 --pattern 'backend-sqlite-*'
+gh run download 36817029405 --dir /tmp/vaseyaudio-timings/36817029405 --pattern 'backend-mysql-*'
+gh run download 36817029405 --dir /tmp/vaseyaudio-timings/36817029405 --pattern 'backend-sqlite-*'
 python3 scripts/ci/phpunit-timings.py --driver mysql \
-  --source "<source string from phpunit-timings-mysql.json>" \
-  --output scripts/ci/phpunit-timings-mysql.json \
-  /tmp/vaseyaudio-timings/36795680362/backend-mysql-*/phpunit-ci-mysql-*-results.xml
+  --source "<exact source string from phpunit-timings-mysql.json>" \
+  --output /tmp/phpunit-timings-mysql.json \
+  /tmp/vaseyaudio-timings/36817029405/backend-mysql-*/phpunit-ci-mysql-*-results.xml
 python3 scripts/ci/phpunit-timings.py --driver sqlite \
-  --source "<source string from phpunit-timings-sqlite.json>" \
-  --output scripts/ci/phpunit-timings-sqlite.json \
-  /tmp/vaseyaudio-timings/36795680362/backend-sqlite-*/phpunit-ci-sqlite-*-results.xml
+  --source "<exact source string from phpunit-timings-sqlite.json>" \
+  --output /tmp/phpunit-timings-sqlite.json \
+  /tmp/vaseyaudio-timings/36817029405/backend-sqlite-*/phpunit-ci-sqlite-*-results.xml
 python3 scripts/ci/test-phpunit-shards.py
 ```
 
-## Offline results and next acceptance
+Generated JSON SHA-256: MySQL `8b8ff41d562b4413eef47084c59e6ae98af8622380e242fe973a4abadf65a103`; SQLite `803e8b4040443547e9ed65a92eb2262baa94231798e027788baab1a05fc4d5b3`.
 
-The 35 unchanged partition/timing safeguards pass. Both refreshed files parse through the partitioner, contain exactly the current discovered files/case counts, and leave no current file untimed. Offline redistribution of the retained inventory through the unchanged partition/proof functions preserves every expanded case, owning file and group exactly once. This is a static redistribution proof of retained CI evidence, not a new PHP discovery or runtime pass; the integrated candidate must run the actual CI discovery and execution.
+## Retrospective estimates and current coverage
 
-| Engine | Recorded total case time | New fallback milliseconds/case | Retrospective shard estimates | Cases per new shard |
-| --- | ---: | ---: | --- | --- |
-| MySQL | 8,521.911s after per-file rounding | 4,557 | 2,130.479 / 2,130.479 / 2,130.477 / 2,130.476s | 481 / 448 / 396 / 545 |
-| SQLite | 1,157.342s after per-file rounding | 619 | 578.682 / 578.681s | 927 / 943 |
+Previous weights came from PR87's 123-file / 1,870-case run. Applying those weights to the accepted PR88 census reproduces its exact original whole-file placement. Evaluating that placement and refreshed placement using the same retained PR88 measurements gives this offline comparison:
 
-Current JSON SHA-256: MySQL `5cdd96623afaafa4c8240af29bdf36940025a7c631529c1c965eb390e81b4e66`; SQLite `8089709e515a005c5c7bccd50ed422bacfbffabd76892469773f3cbbb1c3d1f4`.
+| Engine | Total rounded case time | New fallback ms/case | Original placement under PR88 measurements | Refreshed placement under PR88 measurements | Cases per refreshed shard |
+| --- | ---: | ---: | --- | --- | --- |
+| MySQL | 6,289.152s | 3,305 | 1,062.232 / 1,670.117 / 1,593.412 / 1,963.391s | 1,572.286 / 1,572.287 / 1,572.286 / 1,572.293s | 518 / 469 / 389 / 527 |
+| SQLite | 1,376.316s | 723 | 691.369 / 684.968s | 688.169 / 688.168s | 887 / 1,016 |
 
-The prior accepted run's MySQL test steps were 60m00s, 26m51s, 31m35s and 23m37s; full wall time was 62m06s. These new weights estimate approximately 35m30s per MySQL shard and 9m39s per SQLite shard **under the retained measurements**. Changed placement and hosted-runner variability may change real costs. No improvement is claimed until executed candidate CI supplies it.
+The unchanged partitioner gives zero-time files a minimum one-millisecond weight, adding 0.021s to SQLite partition totals. JUnit suite elapsed time and summed case times may differ slightly. These are redistribution estimates, not newly executed shards or guaranteed durations. Placement, fixtures and runner variability can change costs.
 
-Record the next ordinary full run's slowest shard, total runner-minutes, full wall time and per-engine counts in the PR evidence. The following ordinary passing run provides a second measurement without launching a redundant suite solely to improve the average. Continue profiling the measured heavy files in a separate reviewed change if timing variance or fixture costs remain significant. See [the development strategy](../ci-development-strategy.md) for the proposed broader CI cadence; this timing refresh does not implement it.
+Fresh PHP 8.4.26 discovery on isolated current source `04e4743301a47ca720d849e01bdeba9203708a23`, tree `6fbd125d143afead56bbb8dced0a30a1eef25595`, found **138 files / 2,072 expanded cases**. Both four-shard and two-shard CLI dry partitions independently rediscovered their assigned files and passed the unchanged exact-case/file/group proof. All 1,903 accepted cases retain their original owning files. The 13 new files contain all 169 additional cases and remain explicitly untimed; no existing measured file's case count changed. They use normal fallback weights and are included exactly once. The 35 unchanged partition/timing safeguards pass.
 
-The integrated T03–T08 candidate adds two test files and 33 cases beyond this measured baseline (125 files / 1,903 cases). Those new files use the existing explicit fallback weights until actual accepted-run timing is available; the partition census still discovers the entire current suite and refuses omitted or duplicated cases. No fabricated timings are assigned to the new tests.
+| Current source dry partition | Old-weight estimates | Refreshed-weight estimates | Refreshed shard case counts |
+| --- | --- | --- | --- |
+| MySQL, four shards | 2,347.936 / 2,347.996 / 2,347.938 / 2,347.934s | 1,711.922 / 1,711.924 / 1,711.922 / 1,711.929s | 535 / 538 / 538 / 461 |
+| SQLite, two shards | 639.210 / 639.209s | 749.262 / 749.262s | 1,070 / 1,002 |
+
+The current-source table uses weights from different accepted runs, not a controlled runtime comparison. SQLite's newer weights increase its estimate. Application tests, native browsers and MySQL were not executed during preparation; discovery does not establish their behavior. Independent source review and ordinary full CI remain required for integration. Later additions must be rediscovered rather than assuming this frozen census still applies.
+
+For historical context, accepted PR88's full wall time was 34m22s versus PR87's 62m06s; longest MySQL test steps were approximately 32m44s and 60m00s. These actual observations involve different censuses and runs and do not prove this refresh will reproduce improvement. Use subsequent ordinary accepted runs for measurements; no redundant cloud run was started. Fixture/bootstrap optimization and broader cadence changes remain separate reviewed work under [the development strategy](../ci-development-strategy.md).
