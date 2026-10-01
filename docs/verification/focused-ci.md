@@ -10,9 +10,9 @@ Once this workflow exists on the default branch, GitHub Actions → **Focused de
 
 | Suite enum | Fixed scope | Engine |
 | --- | --- | --- |
-| `unit` | All 14 currently reviewed unit files: money/discount/pricing/promotion, licensing terms, contract text/renderer, upload/media/image evidence and Stripe gateway fixtures. | `sqlite` or `mysql`; pure cases do not establish database concurrency. |
-| `media` | 11 reviewed upload/evidence/diagnostics/scanner/master/budget/private-root/site-image/archive files. | `sqlite` or `mysql` |
-| `commerce` | 13 reviewed money/pricing/promotion/gateway/quote/hosted-checkout/webhook files, including selected independent-process MySQL races. It excludes heavy finalization/delivery/membership coverage. | `sqlite` or `mysql`; MySQL-only cases are reported as skipped on SQLite. |
+| `unit` | All 15 currently reviewed unit files: money/discount/pricing/promotion, licensing terms, contract text/renderer, upload/media/image and whole-identifier evidence and Stripe gateway fixtures. | `sqlite` or `mysql`; pure cases do not establish database concurrency. |
+| `media` | 12 reviewed upload/evidence/diagnostics/scanner/master/budget/private-root/site-image/archive files. | `sqlite` or `mysql` |
+| `commerce` | 14 reviewed money/pricing/promotion/gateway/quote/hosted-checkout/webhook/hash-integrity files, including selected independent-process MySQL races. It excludes heavy finalization/delivery/membership coverage. | `sqlite` or `mysql`; MySQL-only cases are reported as skipped on SQLite. |
 | `frontend` | 17 reviewed frontend files, TypeScript/Vite production build and client-bundle secret scan. | Select `sqlite`; recorded engine is `none`. |
 | `browser` | Storefront, operator, test checkout and owner-download specs in both configured Chromium/WebKit projects, using the existing isolated fixture/server wrapper. | `sqlite` only |
 
@@ -44,3 +44,5 @@ The runner removes stale result XML before execution and marks failure on missin
 This implementation was independently source-reviewed and all 20 Python safeguards passed locally. After recovering compatible PHP 8.4.26 and exact-lock dependencies, the actual local unit selection passed 330 tests / 1,269 assertions with zero errors, failures or skips on integration tree `537607cc0bdae289ab0367158e2b0341fa15b407` (before the final documentation clarification). Real GitHub workflow outcomes must still be recorded on the integrating tested head. This document does not claim cloud event eligibility, runtime suite success or full T01 completion from static validation.
 
 References: [planning strategy](../ci-development-strategy.md), [GitHub workflow syntax and input/service semantics](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax), [PHPUnit empty-suite/warning flags](https://docs.phpunit.de/en/12.5/textui.html), [Vitest reporters](https://vitest.dev/guide/reporters), [Playwright reporters](https://playwright.dev/docs/test-reporters).
+
+The integrating review added `CommerceGuardBytesTest` to unit feedback, `SiteImageHttpTest` to media feedback and `HashByteGuardMigrationTest` to commerce feedback, so the new safeguards receive focused coverage before the full gate. Current selections contain 15 unit, 12 media and 14 commerce files.

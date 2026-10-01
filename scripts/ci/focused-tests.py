@@ -22,7 +22,7 @@ import xml.etree.ElementTree as ET
 
 PHP_TARGETS = {
     "unit": (
-        "tests/Unit/AllocateDiscountTest.php", "tests/Unit/ContractTextTest.php",
+        "tests/Unit/AllocateDiscountTest.php", "tests/Unit/CommerceGuardBytesTest.php", "tests/Unit/ContractTextTest.php",
         "tests/Unit/EconomicLicenseTermsTest.php", "tests/Unit/FileUploadPathGuardTest.php",
         "tests/Unit/MediaEvidenceValuesTest.php", "tests/Unit/MinorUnitsTest.php",
         "tests/Unit/PricingPolicyTest.php", "tests/Unit/PromotionPolicyTest.php",
@@ -35,7 +35,7 @@ PHP_TARGETS = {
         "tests/Unit/SiteImageGuardBytesTest.php", "tests/Feature/InstallationReportTest.php",
         "tests/Feature/MalwareScannerTest.php", "tests/Feature/MediaProcessingTest.php",
         "tests/Feature/MediaWorkflowBudgetTest.php", "tests/Feature/PrivateMediaRevisionRootsTest.php",
-        "tests/Feature/SiteImageLibraryTest.php", "tests/Feature/StemsArchivePolicyTest.php",
+        "tests/Feature/SiteImageLibraryTest.php", "tests/Feature/SiteImageHttpTest.php", "tests/Feature/StemsArchivePolicyTest.php",
         "tests/Feature/StemsArchiveTest.php",
     ),
     "commerce": (
@@ -45,7 +45,7 @@ PHP_TARGETS = {
         "tests/Feature/QuoteHttpTest.php", "tests/Feature/QuotePricingHttpTest.php",
         "tests/Feature/QuotePricingConcurrencyTest.php", "tests/Feature/HostedCheckoutTest.php",
         "tests/Feature/HostedCheckoutConcurrencyTest.php", "tests/Feature/StripeWebhookTest.php",
-        "tests/Feature/StripeWebhookConcurrencyTest.php",
+        "tests/Feature/StripeWebhookConcurrencyTest.php", "tests/Feature/HashByteGuardMigrationTest.php",
     ),
 }
 FRONTEND_TARGETS = (
