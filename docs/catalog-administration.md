@@ -24,6 +24,10 @@ See [the T12 preset evidence](verification/track-metadata-presets.md) for actual
 
 Tracks also offers **Edit metadata** for 1–25 explicit tracks on the current filtered page. Artist, BPM, musical key, genre and mood start at Keep; Set supplies an ordinary valid value and Clear is available for nullable fields. Review displays exact current/proposed values before **Save reviewed metadata**. A changed selection/table view or stale target requires a fresh review. The command checks current locked authority/MFA and applies the entire reviewed batch atomically through `SaveTrackMetadata`, retaining all other fields and per-track audit evidence. See [the bulk metadata evidence](verification/bulk-track-metadata.md) for actual checks, recovery and hosted acceptance gates.
 
+## Protected operator track review
+
+**Review track** opens a close-only private staff modal with current descriptive metadata, ordinary publication blockers and verified artwork/tagged preview or explicit unavailable states. It uses fresh persisted authority/MFA and exact protected derivative URLs; it cannot edit or publish a track and grants no anonymous access. Reopening reads current values. See [protected review evidence](verification/private-track-review.md) for privacy, read-only guarantees and actual acceptance gates.
+
 ## Command and audit boundary
 
 `SaveTrackMetadata::handle(?Track, array, User)` authorizes verified `is_admin` staff before reading or writing the target. Existing records require `metadata_version`; creation cannot supply one. Only the listed metadata plus that expected revision is accepted. The command reads/locks the current row before merging omitted fields and comparing the expected revision. The unique slug index arbitrates conflicting URL claims.
