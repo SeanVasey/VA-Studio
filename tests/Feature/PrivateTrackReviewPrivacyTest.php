@@ -2,15 +2,19 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Catalog\SaveTrackMetadata;
 use App\Filament\Resources\TrackResource\Pages\ManageTracks;
 use App\Models\User;
 use Closure;
 use Filament\Facades\Filament;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\TestResponse;
+use Livewire\Component;
 use Livewire\Livewire;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
@@ -106,6 +110,157 @@ class PrivateTrackReviewPrivacyTest extends TestCase
         $this->assertSame('Public synthetic response', $response->getContent());
     }
 
+    public function test_signed_tracks_snapshot_remains_private_when_real_csrf_rejects_before_component_boot(): void
+    {
+        config(['app.debug' => true]);
+        $actor = LicenseFixtures::admin();
+        $this->actingAs($actor);
+        $track = app(SaveTrackMetadata::class)->handle(null, ['title' => 'Private early failure fixture',
+            'slug' => 'private-early-failure-fixture'], $actor);
+        $sentinel = 'SYNTHETIC-PRIVATE-REVIEW-BEFORE-CSRF';
+        $changes = array_replace(array_fill_keys(['artist', 'bpm', 'musical_key', 'genre', 'mood'], ['mode' => 'keep']),
+            ['genre' => ['mode' => 'set', 'value' => $sentinel]]);
+        $page = Livewire::test(ManageTracks::class)->callTableBulkAction('editMetadata', [$track], data: ['changes' => $changes]);
+        $snapshot = json_encode($page->snapshot, JSON_THROW_ON_ERROR);
+        $this->assertStringContainsString($sentinel, $snapshot, 'Use actual private data in a genuinely signed mounted review.');
+        Livewire::component('synthetic-public-privacy-component', PrivateTrackReviewPublicComponent::class);
+        $otherSnapshot = json_encode(Livewire::test('synthetic-public-privacy-component')->snapshot, JSON_THROW_ON_ERROR);
+        $before = [DB::table('tracks')->get()->toJson(), DB::table('audit_events')->get()->toJson()];
+        $this->enableRealCsrf();
+        $hydrations = 0;
+        $stop = \Livewire\on('snapshot-verified', function () use (&$hydrations): void {
+            $hydrations++;
+        });
+        try {
+            foreach ([null, 'invalid-synthetic-token', 'expired-synthetic-session-token'] as $submittedToken) {
+                if ($submittedToken === 'expired-synthetic-session-token') {
+                    auth()->logout();
+                }
+                // A signed Tracks component protects the entire mixed response even when it is not first.
+                $payload = ['components' => [
+                    ['snapshot' => $otherSnapshot, 'updates' => [], 'calls' => []],
+                    ['snapshot' => $snapshot, 'updates' => [],
+                        'calls' => [['method' => 'applyReviewedMetadataChanges', 'params' => [], 'path' => '']]],
+                ]];
+                if ($submittedToken !== null) {
+                    $payload['_token'] = $submittedToken;
+                }
+                $response = $this->withSession(['_token' => 'expected-synthetic-session-token'])
+                    ->post(app('livewire')->getUpdateUri(), $payload, ['X-Livewire' => 'true', 'Accept' => 'text/html'])
+                    ->assertStatus(419)->assertContent('Private track review is unavailable.')->assertDontSee($sentinel);
+                $this->privateResponse($response);
+            }
+        } finally {
+            $stop();
+        }
+        $this->assertSame(0, $hydrations, 'The real CSRF rejection must happen before Livewire component verification/boot.');
+        $this->assertSame($before, [DB::table('tracks')->get()->toJson(), DB::table('audit_events')->get()->toJson()]);
+    }
+
+    public function test_unsigned_names_and_signed_unrelated_components_or_routes_cannot_opt_into_early_privacy(): void
+    {
+        config(['app.debug' => true]);
+        $this->actingAs(LicenseFixtures::admin());
+        $trackSnapshot = Livewire::test(ManageTracks::class)->snapshot;
+        Livewire::component('synthetic-public-privacy-component', PrivateTrackReviewPublicComponent::class);
+        $otherSnapshot = Livewire::test('synthetic-public-privacy-component')->snapshot;
+        $forged = $otherSnapshot;
+        $forged['memo']['name'] = $trackSnapshot['memo']['name']; // Keep the genuine unrelated signature.
+        $invalid = $trackSnapshot;
+        $invalid['checksum'] = str_repeat('0', 64);
+        $this->enableRealCsrf();
+        Route::post('/synthetic-unrelated-livewire-endpoint', fn () => response('Unrelated public response'))
+            ->middleware('web')->name('synthetic.livewire.update');
+        $hydrations = 0;
+        $stop = \Livewire\on('snapshot-verified', function () use (&$hydrations): void {
+            $hydrations++;
+        });
+        try {
+            foreach ([
+                [app('livewire')->getUpdateUri(), $forged],
+                [app('livewire')->getUpdateUri(), $invalid],
+                [app('livewire')->getUpdateUri(), $otherSnapshot],
+                ['/synthetic-unrelated-livewire-endpoint', $trackSnapshot],
+            ] as [$uri, $snapshot]) {
+                $response = $this->withSession(['_token' => 'expected-synthetic-session-token'])
+                    ->post($uri, ['_track_private_review' => true, 'components' => [[
+                        'snapshot' => json_encode($snapshot, JSON_THROW_ON_ERROR), 'updates' => [], 'calls' => [],
+                    ]]], ['X-Livewire' => 'true', 'Accept' => 'text/html'])->assertStatus(419)->assertHeaderMissing('X-Robots-Tag');
+                $this->assertNotSame('Private track review is unavailable.', $response->getContent());
+            }
+        } finally {
+            $stop();
+        }
+        $this->assertSame(0, $hydrations);
+    }
+
+    public function test_maximum_signed_track_review_remains_private_during_a_pre_boot_debug_failure(): void
+    {
+        config(['app.debug' => true]);
+        $actor = LicenseFixtures::admin();
+        $this->actingAs($actor);
+        $sentinel = 'SYNTHETIC-PRIVATE-MAXIMUM-REVIEW';
+        $tracks = [];
+        for ($index = 1; $index <= 25; $index++) {
+            $tracks[] = app(SaveTrackMetadata::class)->handle(null, [
+                'title' => str_pad("Private early failure {$index}", 255, 't'),
+                'slug' => "private-maximum-early-failure-{$index}",
+                'artist' => str_repeat('a', 255), 'genre' => str_repeat('g', 255), 'mood' => str_repeat('m', 255),
+            ], $actor);
+        }
+        $changes = array_replace(array_fill_keys(['artist', 'bpm', 'musical_key', 'genre', 'mood'], ['mode' => 'keep']),
+            ['genre' => ['mode' => 'set', 'value' => $sentinel]]);
+        $page = Livewire::test(ManageTracks::class)->set('tableRecordsPerPage', 25)
+            ->callTableBulkAction('editMetadata', $tracks, data: ['changes' => $changes]);
+        $this->assertCount(25, $page->get('bulkMetadataReview')['tracks']);
+        $snapshot = json_encode($page->snapshot, JSON_THROW_ON_ERROR);
+        $this->assertGreaterThan(32768, strlen($snapshot), 'Exercise the legitimate maximum review with large private metadata.');
+        $this->assertStringContainsString($sentinel, $snapshot);
+        $before = [DB::table('tracks')->get()->toJson(), DB::table('audit_events')->get()->toJson()];
+        $this->app->bind(PreventRequestForgery::class, fn ($app) => new class($app, $app['encrypter']) extends PreventRequestForgery
+        {
+            protected function runningUnitTests(): bool
+            {
+                return false;
+            }
+
+            protected function tokensMatch($request): bool
+            {
+                throw new RuntimeException('SYNTHETIC-PRIVATE-MAXIMUM-REVIEW');
+            }
+        });
+        Log::spy();
+        $hydrations = 0;
+        $stop = \Livewire\on('snapshot-verified', function () use (&$hydrations): void {
+            $hydrations++;
+        });
+        try {
+            $response = $this->withSession(['_token' => 'expected-synthetic-session-token'])
+                ->post(app('livewire')->getUpdateUri(), ['components' => [[
+                    'snapshot' => $snapshot, 'updates' => [],
+                    'calls' => [['method' => 'applyReviewedMetadataChanges', 'params' => [], 'path' => '']],
+                ]]], ['X-Livewire' => 'true', 'Accept' => 'text/html'])
+                ->assertStatus(503)->assertContent('Private track review is unavailable.')->assertDontSee($sentinel);
+            $this->privateResponse($response);
+        } finally {
+            $stop();
+        }
+        Log::shouldHaveReceived('error')->once()->with('Private track review failed.', ['exception_class' => RuntimeException::class]);
+        $this->assertSame(0, $hydrations);
+        $this->assertSame($before, [DB::table('tracks')->get()->toJson(), DB::table('audit_events')->get()->toJson()]);
+    }
+
+    private function enableRealCsrf(): void
+    {
+        $this->app->bind(PreventRequestForgery::class, fn ($app) => new class($app, $app['encrypter']) extends PreventRequestForgery
+        {
+            protected function runningUnitTests(): bool
+            {
+                return false;
+            }
+        });
+    }
+
     private function privateResponse(TestResponse $response): void
     {
         $response->assertHeader('Cache-Control', 'no-store, private')->assertHeader('X-Robots-Tag', 'noindex, nofollow')
@@ -119,5 +274,13 @@ class PrivateTrackReviewSyntheticFailure
     public function handle(Request $request, Closure $next): Response
     {
         throw new RuntimeException('SYNTHETIC PRIVATE /srv/private/media/source.wav SQL_BINDINGS');
+    }
+}
+
+class PrivateTrackReviewPublicComponent extends Component
+{
+    public function render(): string
+    {
+        return '<div>Unrelated synthetic component</div>';
     }
 }

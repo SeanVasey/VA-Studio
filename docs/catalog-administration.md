@@ -26,7 +26,7 @@ Tracks also offers **Edit metadata** for 1–25 explicit tracks on the current f
 
 ## Protected operator track review
 
-**Review track** opens a close-only private staff modal with current descriptive metadata, ordinary publication blockers and verified artwork/tagged preview or explicit unavailable states. It uses fresh persisted authority/MFA and exact protected derivative URLs; it cannot edit or publish a track and grants no anonymous access. Reopening reads current values. See [protected review evidence](verification/private-track-review.md) for privacy, read-only guarantees and actual acceptance gates.
+**Review track** opens a close-only private staff modal with current descriptive metadata, ordinary publication blockers and verified artwork/tagged preview or explicit unavailable states. It uses fresh persisted authority/MFA and exact protected derivative URLs; it cannot edit or publish a track and grants no anonymous access. Reopening reads current values. Signed Tracks updates on the actual server Livewire route remain private when CSRF or another early middleware failure precedes component boot; CSRF failures retain HTTP 419. Unrelated routes and unsigned client markers cannot establish this boundary. See [protected review evidence](verification/private-track-review.md) and the [PR #104 repair record](verification/private-track-review-repairs.md) for read-only guarantees, actual checks and pending hosted acceptance.
 
 ## Reviewed manual publication
 

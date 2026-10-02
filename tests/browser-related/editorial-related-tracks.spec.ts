@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { lstatSync, readFileSync, realpathSync } from 'node:fs';
 import { join } from 'node:path';
-import { test, expect, type APIRequestContext, type Locator, type Page, type Response, type TestInfo } from '@playwright/test';
+import { test, expect, type APIRequestContext, type Locator, type Page, type Request, type Response, type TestInfo } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from '../browser/auth-fixture';
 import { releaseMenuAction, releaseRow } from '../browser/site-release-row';
 
@@ -106,14 +106,22 @@ async function reviewVerifiedPrivateTrack(page: Page, visitor: APIRequestContext
   expect(previews).toHaveLength(1);
   const media = [artwork[0], previews[0]];
   const expectedUrls = media.map(output => `/admin/media/${output.id}/preview`);
-  const previewResponses: Array<{ status: number; cacheControl: string }> = [];
+  let playbackRequested = false;
+  const previewObservations: Array<{ response: Response; postGesture: boolean }> = [];
+  const previewFailures: Array<{ errorText: string | null; postGesture: boolean }> = [];
   const observePreview = (response: Response) => {
     if (response.url() === new URL(expectedUrls[1], manifest.origin).href) {
-      previewResponses.push({ status: response.status(), cacheControl: response.headers()['cache-control'] ?? '' });
+      previewObservations.push({ response, postGesture: playbackRequested });
+    }
+  };
+  const observePreviewFailure = (request: Request) => {
+    if (request.url() === new URL(expectedUrls[1], manifest.origin).href) {
+      previewFailures.push({ errorText: request.failure()?.errorText ?? null, postGesture: playbackRequested });
     }
   };
   // preload=none is a browser hint. Observe from insertion so an early metadata fetch also retains its real response evidence.
   page.on('response', observePreview);
+  page.on('requestfailed', observePreviewFailure);
   await page.bringToFront();
   const launch = page.getByRole('row').filter({ has: page.getByText(track.title, { exact: true }) })
     .getByRole('button', { name: 'Review track', exact: true });
@@ -150,6 +158,7 @@ async function reviewVerifiedPrivateTrack(page: Page, visitor: APIRequestContext
   expect(await audio.evaluate(element => (element as HTMLAudioElement).currentTime)).toBe(0);
 
   const receipts = [];
+  let verifiedPreviewBytes: Buffer | undefined;
   for (const [index, output] of media.entries()) {
     const response = await page.request.get(expectedUrls[index]);
     expect(response.status()).toBe(200);
@@ -162,6 +171,7 @@ async function reviewVerifiedPrivateTrack(page: Page, visitor: APIRequestContext
     expect(bytes.length).toBe(output.sizeBytes);
     const sha256 = createHash('sha256').update(bytes).digest('hex');
     expect(sha256).toBe(output.sha256);
+    if (index === 1) verifiedPreviewBytes = bytes;
     const denied = await visitor.get(expectedUrls[index], { maxRedirects: 0, headers: { Accept: 'text/html' } });
     expect(denied.status()).toBe(302);
     expect(new URL(denied.headers().location, manifest.origin).pathname).toBe('/admin/login');
@@ -184,21 +194,93 @@ async function reviewVerifiedPrivateTrack(page: Page, visitor: APIRequestContext
     const bounds = await audio.boundingBox();
     expect(bounds).not.toBeNull();
     expect(bounds!.width).toBeGreaterThan(48);
+    playbackRequested = true;
     await audio.tap({ position: { x: 24, y: bounds!.height / 2 } });
   } else {
+    playbackRequested = true;
     await audio.press('Space');
   }
   await expect.poll(() => audio.evaluate(element => (element as HTMLAudioElement).currentTime)).toBeGreaterThan(0);
-  await expect.poll(() => previewResponses.length).toBeGreaterThan(0);
-  for (const response of previewResponses) {
-    expect([200, 206]).toContain(response.status);
-    expect(response.cacheControl).toContain('no-store');
+  await expect.poll(() => previewObservations.length).toBeGreaterThan(0);
+  await expect.poll(() => previewObservations.some(observation => observation.postGesture && [200, 206].includes(observation.response.status()))).toBe(true);
+  const previewResponses = [];
+  for (let index = 0; index < previewObservations.length; index++) {
+    const { response, postGesture } = previewObservations[index];
+    const finished = await response.finished();
+    const request = response.request();
+    const requestHeaders = await request.allHeaders();
+    const headers = await response.allHeaders();
+    let body: Buffer | null = null;
+    let bodyError: string | null = null;
+    try {
+      body = await response.body();
+    } catch (error) {
+      bodyError = error instanceof Error ? error.message : String(error);
+    }
+    previewResponses.push({
+      status: response.status(), statusText: response.statusText(), postGesture,
+      method: request.method(), resourceType: request.resourceType(),
+      requestHeaderNames: Object.keys(requestHeaders), responseHeaderNames: Object.keys(headers),
+      cacheControl: headers['cache-control'] ?? '', contentType: headers['content-type'] ?? '', contentRange: headers['content-range'] ?? '',
+      finishedError: finished?.message ?? null, requestFailure: request.failure()?.errorText ?? null,
+      body, bodyError, bodyBytes: body?.length ?? null, sha256: body === null ? null : createHash('sha256').update(body).digest('hex'),
+    });
   }
+  // Seal the observation window synchronously after draining every captured response, before attaching evidence.
+  // Reopening below independently checks a fresh stopped player; it is outside this native-playback interval.
+  page.off('response', observePreview);
+  page.off('requestfailed', observePreviewFailure);
+  // Attach all transport outcomes before assertions. Headerless driver observations are never media success.
+  const nativeReceipts = previewResponses.map(({ body: _body, ...receipt }) => receipt);
+  await testInfo.attach('private-track-review-native-preview-lifecycle', {
+    body: Buffer.from(JSON.stringify({ trackId: track.id, evidenceHash: manifest.evidenceHash, browserName, nativeReceipts, previewFailures })),
+    contentType: 'application/json',
+  });
+  expect(previewFailures).toEqual([]);
+  expect(verifiedPreviewBytes).toBeDefined();
+  for (const response of previewResponses) {
+    expect(response.finishedError).toBeNull();
+    expect(response.requestFailure).toBeNull();
+    expect(response.method).toBe('GET');
+    if (response.status === 0) {
+      // The original locked WebKit trace contains headerless pre-gesture observations with no retained body.
+      // Require its exact lifecycle and Network.getResponseBody protocol classification; do not call it cancelled.
+      expect(browserName).toBe('webkit');
+      expect(response.postGesture).toBe(false);
+      expect(response.resourceType).toBe('other');
+      expect(response.statusText).toBe('');
+      expect(response.requestHeaderNames).toEqual([]);
+      expect(response.responseHeaderNames).toEqual([]);
+      expect(response.body).toBeNull();
+      expect(response.bodyError).toMatch(/Protocol error \(Network\.getResponseBody\)/);
+      continue;
+    }
+    expect([200, 206]).toContain(response.status);
+    expect(response.cacheControl).toContain('private');
+    expect(response.cacheControl).toContain('no-store');
+    expect(response.contentType).toMatch(/^audio\/mpeg(?:;|$)/);
+    expect(response.bodyError).toBeNull();
+    expect(response.body).not.toBeNull();
+    if (response.status === 206) {
+      const range = /^bytes (\d+)-(\d+)\/(\d+)$/.exec(response.contentRange);
+      expect(range).not.toBeNull();
+      const [, startText, endText, totalText] = range!;
+      const start = Number(startText), end = Number(endText), total = Number(totalText);
+      expect(Number.isSafeInteger(start) && start >= 0 && Number.isSafeInteger(end) && end >= start && end < total).toBe(true);
+      expect(total).toBe(verifiedPreviewBytes!.length);
+      expect(response.bodyBytes).toBe(end - start + 1);
+      expect(response.body!.equals(verifiedPreviewBytes!.subarray(start, end + 1))).toBe(true);
+    } else {
+      expect(response.bodyBytes).toBe(verifiedPreviewBytes!.length);
+      expect(response.body!.equals(verifiedPreviewBytes!)).toBe(true);
+    }
+  }
+  expect(previewResponses.some(response => response.postGesture && [200, 206].includes(response.status))).toBe(true);
   await expect.poll(() => dialog.evaluate(element => element.contains(document.activeElement))).toBe(true);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
   expect(await dialog.locator('.fi-modal-window').evaluate(element => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath('private-track-review-verified-media.png'), fullPage: false });
-  await testInfo.attach('private-track-review-verified-bytes', { body: Buffer.from(JSON.stringify({ trackId: track.id, evidenceHash: manifest.evidenceHash, receipts, previewResponses })), contentType: 'application/json' });
+  await testInfo.attach('private-track-review-verified-bytes', { body: Buffer.from(JSON.stringify({ trackId: track.id, evidenceHash: manifest.evidenceHash, receipts, previewResponses: nativeReceipts })), contentType: 'application/json' });
   const close = async () => {
     const closeButton = dialog.locator('.fi-modal-footer').getByRole('button', { name: 'Close', exact: true });
     await closeButton.focus();
@@ -226,7 +308,6 @@ async function reviewVerifiedPrivateTrack(page: Page, visitor: APIRequestContext
   expect(await audio.evaluate(element => (element as HTMLAudioElement).currentTime)).toBe(0);
   await close();
   expect((await visitor.get(track.href)).status()).toBe(404);
-  page.off('response', observePreview);
 }
 
 test('ordinary editorial associations preserve private order, current eligibility and first-party destinations', async ({ page, context, playwright, browserName }, testInfo) => {

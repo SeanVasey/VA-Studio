@@ -2,7 +2,9 @@
 """Exercise scope routing with real Git histories and acceptance failure states."""
 
 import importlib.util
+import json
 from pathlib import Path
+import re
 import subprocess
 import tempfile
 import unittest
@@ -227,6 +229,53 @@ class AcceptanceTests(unittest.TestCase):
             needs[job]["result"] = "failure"
             with self.assertRaises(scope.EvidenceError):
                 scope.accept(needs)
+
+
+class BrowserWorkflowTests(unittest.TestCase):
+    root = Path(__file__).resolve().parents[2]
+
+    def operator_job(self):
+        workflow = (self.root / ".github/workflows/ci.yml").read_text()
+        match = re.search(r"(?ms)^  operator-browser:\n(.*?)(?=^  [\w-]+:\n|\Z)", workflow)
+        self.assertIsNotNone(match)
+        return match.group(1)
+
+    def test_matrix_covers_every_configured_engine_through_the_complete_isolated_wrapper(self):
+        job = self.operator_job()
+        matrix = re.search(r"(?m)^        project: \[([^\]]+)\]$", job)
+        self.assertIsNotNone(matrix)
+        projects = [project.strip() for project in matrix.group(1).split(",")]
+        config = (self.root / "playwright.config.ts").read_text()
+        configured = re.findall(r"\{ name: '([^']+)', use:", config)
+        self.assertEqual(["chromium-desktop", "webkit-mobile"], projects)
+        self.assertEqual(configured, projects)
+        self.assertIn("      fail-fast: false\n", job)
+        self.assertIn("    runs-on: ubuntu-latest\n", job)
+        for forbidden in ("include:", "exclude:", "fromJSON", "continue-on-error"):
+            self.assertNotIn(forbidden, job)
+        self.assertIn("      BROWSER_PROJECT: ${{ matrix.project }}\n", job)
+        browser_commands = [command for command in re.findall(r"(?m)^      - run: (.+)$", job) if "test:browser" in command]
+        # A project is the sole selector: no file subset, alternate config, grep or additional runner.
+        self.assertEqual(['npm run test:browser -- --project="$BROWSER_PROJECT"'], browser_commands)
+        package = json.loads((self.root / "package.json").read_text())
+        self.assertEqual("node tests/browser/run.mjs", package["scripts"]["test:browser"])
+        self.assertIn("  testDir: './tests/browser',\n", config)
+        self.assertIn("  testMatch: '**/*.spec.ts',\n", config)
+
+    def test_each_engine_retains_failure_evidence_without_run_or_attempt_collisions(self):
+        job = self.operator_job()
+        upload = re.search(r"(?ms)^      - name: [^\n]+\n        if: always\(\)\n        uses: actions/upload-artifact@[^\n]+\n        with:\n(.*?)(?=^      - |\Z)", job)
+        self.assertIsNotNone(upload)
+        artifact = re.search(r"(?m)^          name: (.+)$", upload.group(1))
+        self.assertIsNotNone(artifact)
+        template = artifact.group(1)
+        for identity in ("${{ matrix.project }}", "${{ github.run_id }}", "${{ github.run_attempt }}"):
+            self.assertIn(identity, template)
+        names = {template.replace("${{ matrix.project }}", project).replace("${{ github.run_id }}", run).replace("${{ github.run_attempt }}", attempt)
+                 for project in ("chromium-desktop", "webkit-mobile") for run in ("1", "2") for attempt in ("1", "2")}
+        self.assertEqual(8, len(names))
+        self.assertIn("          path: |\n            playwright-report/\n            test-results/\n", upload.group(1))
+        self.assertIn("          retention-days: 7\n", upload.group(1))
 
 
 if __name__ == "__main__":
