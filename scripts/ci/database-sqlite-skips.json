@@ -11,6 +11,18 @@
       "test_overlapping_batches_with_separate_actors_wait_on_the_shared_track_and_the_loser_has_no_partial_changes"
     ],
     [
+      "Tests\\Feature\\BulkUpdateTrackMetadataConcurrencyTest",
+      "test_authority_withdrawal_and_batch_serialize_on_the_exact_persisted_actor_row"
+    ],
+    [
+      "Tests\\Feature\\BulkUpdateTrackMetadataConcurrencyTest",
+      "test_overlapping_batches_with_distinct_actors_wait_on_the_exact_shared_row_and_the_loser_has_no_partial_changes"
+    ],
+    [
+      "Tests\\Feature\\BulkUpdateTrackMetadataConcurrencyTest",
+      "test_review_and_apply_reject_authority_revocation_hidden_by_an_old_repeatable_read_snapshot"
+    ],
+    [
       "Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest",
       "test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders"
     ],

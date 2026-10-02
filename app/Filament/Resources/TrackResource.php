@@ -11,10 +11,13 @@ use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -77,6 +80,15 @@ class TrackResource extends OperatorResource
                     ->helperText('Add exact tags to up to 25 selected tracks. Existing tags stay in order; each track can contain at most 20 tags.')])
                 ->fillForm(fn (ManageTracks $livewire) => ['additions' => $livewire->lastTagAdditions])
                 ->action(fn (array $data, ManageTracks $livewire) => $livewire->reviewTagAdditions($data)),
+            BulkAction::make('editMetadata')->label('Edit metadata')->fetchSelectedRecords(false)
+                ->modalHeading('Edit metadata for selected tracks')->modalSubmitActionLabel('Review metadata changes')
+                ->extraModalWindowAttributes(static::metadataModalAttributes())
+                ->modalDescription('Choose what changes for up to 25 selected tracks on this page. Review every current and proposed value before saving.')
+                ->schema(static::bulkMetadataFields())
+                ->fillForm(fn (ManageTracks $livewire): array => $livewire->lastMetadataChoices === []
+                    ? ['changes' => array_fill_keys(array_keys(static::bulkMetadataLabels()), ['mode' => 'keep'])]
+                    : $livewire->lastMetadataChoices)
+                ->action(fn (array $data, ManageTracks $livewire) => $livewire->reviewMetadataChanges($data)),
         ])->recordActions([
             EditAction::make()->extraModalWindowAttributes(static::metadataModalAttributes())
                 ->using(fn (Track $record, array $data, ManageTracks $livewire) => static::saveMetadata($record, $data, $livewire)),
@@ -97,6 +109,35 @@ class TrackResource extends OperatorResource
             Action::make('share')->visible(fn (Track $record) => $record->status === 'published')->url(fn (Track $record) => route('tracks.show', $record->slug))->openUrlInNewTab(),
             Action::make('unpublish')->visible(fn (Track $record) => $record->status === 'published')->requiresConfirmation()->action(fn (Track $record) => app(PublishTrack::class)->unpublish($record, auth()->user())),
         ]);
+    }
+
+    public static function bulkMetadataLabels(): array
+    {
+        return ['artist' => 'Artist', 'bpm' => 'BPM', 'musical_key' => 'Musical key', 'genre' => 'Genre', 'mood' => 'Mood'];
+    }
+
+    public static function bulkMetadataFields(): array
+    {
+        $fields = [];
+        foreach (static::bulkMetadataLabels() as $field => $label) {
+            $isSet = fn (Get $get): bool => $get('changes.'.$field.'.mode') === 'set';
+            $input = TextInput::make('changes.'.$field.'.value')->label($label.' value')
+                ->visible($isSet)->required($isSet)->dehydrated($isSet);
+            if ($field === 'bpm') {
+                $input->integer()->minValue(20)->maxValue(400);
+            } else {
+                $input->maxLength($field === 'musical_key' ? 24 : 255);
+            }
+            $fields[] = Section::make($label)->columns(2)->schema([
+                Select::make('changes.'.$field.'.mode')->label($label.' change')->native()->required()->live()
+                    ->options(['keep' => 'Keep', 'set' => 'Set', ...($field === 'artist' ? [] : ['clear' => 'Clear'])])
+                    ->default('keep')->selectablePlaceholder(false)
+                    ->helperText($field === 'artist' ? 'Keep the current artist or set a required artist value.' : 'Keep the current value, set a value, or clear it.'),
+                $input,
+            ]);
+        }
+
+        return $fields;
     }
 
     public static function saveMetadata(?Track $record, array $data, ManageTracks $livewire): Track
