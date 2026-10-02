@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Domain\Catalog\SaveTrackMetadata;
 use App\Filament\Resources\TrackResource\Pages\ManageTracks;
+use App\Http\Middleware\InquiryPrivacy;
+use App\Http\Middleware\PrivateTrackReviewPrivacy;
 use App\Models\User;
 use Closure;
 use Filament\Facades\Filament;
@@ -16,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\TestResponse;
 use Livewire\Component;
 use Livewire\Livewire;
+use Livewire\Mechanisms\HandleRequests\HandleRequests;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\Support\LicenseFixtures;
@@ -108,6 +111,43 @@ class PrivateTrackReviewPrivacyTest extends TestCase
         $response = $this->get('/synthetic-unrelated-review?_track_private_review=true', ['_track_private_review' => 'true'])->assertOk();
         $response->assertHeader('Cache-Control', 'max-age=60, public')->assertHeaderMissing('X-Robots-Tag');
         $this->assertSame('Public synthetic response', $response->getContent());
+    }
+
+    public function test_unresolved_or_unrelated_routes_do_not_interpret_raw_inquiry_method_overrides(): void
+    {
+        // The kernel enables parameter overrides, but the inquiry envelope rejects them first.
+        Request::enableHttpMethodParameterOverride();
+        $body = '{"\\u005fmethod":"INVALID_PRIVATE_METHOD"}';
+        $routes = [
+            null,
+            new \Illuminate\Routing\Route('POST', '/contact/inquiries', fn () => 'unrelated'),
+            (new \Illuminate\Routing\Route('POST', '/contact/inquiries', fn () => 'wrong action'))->name('synthetic.livewire.update'),
+            (new \Illuminate\Routing\Route('POST', '/contact/inquiries', [HandleRequests::class, 'handleUpdate']))->name('synthetic.unrelated.update'),
+        ];
+        foreach ($routes as $route) {
+            $request = Request::createFromBase(\Symfony\Component\HttpFoundation\Request::create(
+                '/contact/inquiries', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], $body,
+            ));
+            $request->setRouteResolver(fn () => $route);
+            $this->assertSame('INVALID_PRIVATE_METHOD', $request->request->get('_method'));
+            $this->assertFalse(PrivateTrackReviewPrivacy::matches($request));
+            $response = (new PrivateTrackReviewPrivacy)->handle($request,
+                fn (Request $request) => (new InquiryPrivacy)->handle($request, function () {
+                    $this->fail('The invalid raw envelope must be rejected before inquiry admission.');
+                }));
+            $this->assertSame(422, $response->getStatusCode());
+            $this->assertSame('INQUIRY_VALIDATION_FAILED', json_decode($response->getContent(), true, flags: JSON_THROW_ON_ERROR)['code']);
+            $this->assertSame($body, $request->attributes->get('_inquiry_body'));
+            $this->privateResponse(TestResponse::fromBaseResponse($response));
+            $this->assertNull($request->attributes->get('_track_private_review'));
+        }
+        foreach (['GET', 'PUT', 'OPTIONS'] as $method) {
+            $request = Request::create('/livewire/update', $method);
+            $route = (new \Illuminate\Routing\Route('POST', '/livewire/update', [HandleRequests::class, 'handleUpdate']))
+                ->name('synthetic.livewire.update');
+            $request->setRouteResolver(fn () => $route);
+            $this->assertFalse(PrivateTrackReviewPrivacy::matches($request));
+        }
     }
 
     public function test_signed_tracks_snapshot_remains_private_when_real_csrf_rejects_before_component_boot(): void

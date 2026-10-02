@@ -25,8 +25,9 @@ final class PrivateTrackReviewPrivacy
     private static function hasSignedTrackUpdate(Request $request): bool
     {
         $route = $request->route();
-        if (! $request->isMethod('POST') || ! ($route instanceof Route) || ! $route->named('*livewire.update')
-            || $route->getActionName() !== HandleRequests::class.'@handleUpdate') {
+        // Only the resolved Livewire update needs its effective method inspected here.
+        if (! ($route instanceof Route) || ! $route->named('*livewire.update')
+            || $route->getActionName() !== HandleRequests::class.'@handleUpdate' || ! $request->isMethod('POST')) {
             return false;
         }
         $components = $request->input('components');
