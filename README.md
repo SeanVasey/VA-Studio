@@ -6,6 +6,12 @@ Bespoke web store development replacing older, service-based e-commerce offering
 
 The [PR #104 acceptance record](docs/development-order.md#pr-104-staff-authoring-acceptance) binds all thirteen successful hosted jobs and original receipts to exact head `0c7dbd8`, tree `a3ed238`; separate main-push verification remains distinct. Earlier failed runs and repairs are historical evidence. The [verified-rights SQL guards](docs/verification/rights-evidence-guards.md) are verified and merged in PR #105; its thirteen applicable PR jobs passed, while separate main verification is blocked before job startup by GitHub payment authorization. The [current development queue](docs/development-control.md) records active ownership and dependencies. Seven owned triggers retain existing verified evidence; they introduce no fresh transactional actor/MFA checks or writer fence. The [transactional rights writers and participating offer correction](docs/verification/rights-declaration-writers.md) are the current candidate; reviewed publication-manifest compare/apply follows verified writer participation; track scheduling and its timing policy remain open.
 
+## Current GitLab development
+
+Development now continues in private [VA-Studio](https://gitlab.com/vaseydev/va-studio), [draft MR !1](https://gitlab.com/vaseydev/va-studio/-/merge_requests/1). The [native GitLab workflow](.gitlab-ci.yml) configures full acceptance; current failures and bounded repairs are recorded in [GitLab acceptance corrections](docs/verification/gitlab-acceptance-corrections.md). Configuration and focused passes do not imply the corrected candidate is accepted or merged.
+
+Use the [current agent queue](docs/development-agent-queue.md) for ownership and dependency order, and [Mac development setup](docs/development-macos.md) for the prepared bootstrap. Actual Mac installation, private-server deployment, production commerce and cutover remain unverified. GitHub references below preserve their historical source and results.
+
 ## Start here
 
 - [Remaining development plan](docs/remaining-development-plan.md): 40 tracked completion deliverables, dependency order, design coverage and reviewable development batches.

@@ -2,6 +2,7 @@
 
 namespace App\Domain\Commerce\Orders;
 
+use App\Domain\Commerce\CommerceAuditActor;
 use App\Domain\Commerce\Models\Order;
 use App\Domain\Commerce\Models\OrderAttempt;
 use App\Domain\Commerce\Models\OrderLine;
@@ -12,6 +13,7 @@ use App\Domain\Commerce\QuoteRequest;
 use App\Domain\Commerce\QuoteSelection;
 use App\Domain\Commerce\ReadQuote;
 use App\Domain\Commerce\ReservePricedQuote;
+use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
 use Illuminate\Support\Facades\Crypt;
@@ -21,12 +23,16 @@ use SensitiveParameter;
 
 final class PrepareOrder
 {
-    public function handle(string $ownerKey, string $idempotencyKey, #[SensitiveParameter] array $request): Order
+    public function handle(string $ownerKey, string $idempotencyKey, #[SensitiveParameter] array $request, ?User $actor = null): Order
     {
-        QuoteRequest::owner($ownerKey); QuoteRequest::key($idempotencyKey);
-        $request = OrderRequest::normalize($request); $keyHash = hash('sha256', $idempotencyKey);
+        QuoteRequest::owner($ownerKey);
+        QuoteRequest::key($idempotencyKey);
+        $request = OrderRequest::normalize($request);
+        $keyHash = hash('sha256', $idempotencyKey);
 
-        return DB::transaction(function () use ($ownerKey, $keyHash, $request) {
+        return DB::transaction(function () use ($ownerKey, $keyHash, $request, $actor) {
+            // Explicit customer identity precedes resource locks; null remains anonymous/system.
+            $actorId = app(CommerceAuditActor::class)->lock($actor);
             // Owner mutex also serializes the same key targeting different quotes.
             DB::table('quote_owners')->insertOrIgnore(['owner_key' => $ownerKey]);
             DB::table('quote_owners')->where('owner_key', $ownerKey)->lockForUpdate()->firstOrFail();
@@ -41,24 +47,29 @@ final class PrepareOrder
                 return $existing;
             }
             $quote = Quote::where('public_id', $request['quoteId'])->where('owner_key', $ownerKey)->lockForUpdate()->first();
-            if (! $quote) { throw new QuoteException('QUOTE_NOT_FOUND', 404); }
+            if (! $quote) {
+                throw new QuoteException('QUOTE_NOT_FOUND', 404);
+            }
             if (Order::where('quote_id', $quote->id)->lockForUpdate()->exists()) {
                 throw new QuoteException('ORDER_ALREADY_PREPARED', 409);
             }
             $policy = app(OrderPolicy::class)->current();
-            if ($quote->expires_at->lessThanOrEqualTo(now())) { throw new QuoteException('QUOTE_EXPIRED', 410); }
+            if ($quote->expires_at->lessThanOrEqualTo(now())) {
+                throw new QuoteException('QUOTE_EXPIRED', 410);
+            }
             // A new commercial promise checks actual frozen bytes again, before pricing/scope locks.
             app(QuoteSelection::class)->resolve(QuoteRequest::items($quote->request), true);
             app(ReadQuote::class)->verified($quote);
-            $pricing = app(PriceQuote::class)->read($quote->public_id, $ownerKey);
+            $pricing = app(PriceQuote::class)->read($quote->public_id, $ownerKey, $actor);
             $review = app(ReviewOrder::class)->capture($quote, $pricing, $policy);
             if (! hash_equals($review['reviewHash'], $request['reviewHash'])) {
                 throw new QuoteException('ORDER_REVIEW_CHANGED', 409);
             }
             $service = app(ReservePricedQuote::class);
-            $service->hold($quote->public_id, $ownerKey, $pricing->snapshot['promotion']['code'] ?? null);
-            $orderId = (string) Str::uuid(); $attemptId = (string) Str::uuid();
-            $resources = $service->beginAttempt($quote->public_id, $ownerKey, $attemptId);
+            $service->hold($quote->public_id, $ownerKey, $pricing->snapshot['promotion']['code'] ?? null, $actor);
+            $orderId = (string) Str::uuid();
+            $attemptId = (string) Str::uuid();
+            $resources = $service->beginAttempt($quote->public_id, $ownerKey, $attemptId, $actor);
             $at = now()->toImmutable()->utc()->startOfSecond();
             $payload = app(OrderEvidence::class)->capture($orderId, $attemptId, $quote, $resources['pricing'],
                 $resources['reservation'], $resources['promotion_use'], $policy, $request, $at);
@@ -81,11 +92,13 @@ final class PrepareOrder
                 'inventory_reservation_id' => $resources['reservation']->id, 'promotion_use_id' => $resources['promotion_use']?->id,
                 'binding' => $payload['attempt'], 'binding_hash' => CanonicalJson::hash($payload['attempt']),
                 'canonicalization_version' => CanonicalJson::VERSION, 'created_at' => $at, 'expires_at' => $payload['attempt']['expires_at']]);
-            AuditEvent::record('commerce.order.prepared', $order, ['public_id' => $orderId,
-                'quote_public_id' => $quote->public_id, 'attempt_id' => $attemptId, 'test_only' => true]);
+            AuditEvent::recordAttributed('commerce.order.prepared', $order, ['public_id' => $orderId,
+                'quote_public_id' => $quote->public_id, 'attempt_id' => $attemptId, 'test_only' => true], $actorId);
             // Encryption, inserts, hooks and locks cannot extend the accepted price or reservation deadline.
             if ($resources['reservation']->expires_at->lessThanOrEqualTo(now()) || $pricing->expires_at->lessThanOrEqualTo(now()) ||
-                $quote->expires_at->lessThanOrEqualTo(now())) { throw new QuoteException('INVENTORY_EXPIRED', 410); }
+                $quote->expires_at->lessThanOrEqualTo(now())) {
+                throw new QuoteException('INVENTORY_EXPIRED', 410);
+            }
 
             return $order;
         }, 5);

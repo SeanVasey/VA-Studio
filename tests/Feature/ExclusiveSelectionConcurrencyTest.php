@@ -13,6 +13,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\ExclusiveSelectionFixtures as F;
 use Tests\Support\InventoryFixtures;
 use Tests\Support\InventoryRace;
+use Tests\Support\LicenseFixtures;
 use Tests\Support\PromotionFixtures;
 use Tests\TestCase;
 
@@ -86,10 +87,11 @@ class ExclusiveSelectionConcurrencyTest extends TestCase
                 'actor' => $f['actor']->id, 'scope' => $f['scope']->id, 'policy' => InventoryFixtures::policy(),
                 'exclusive_policy' => F::policy(), 'now' => now()->toIso8601ZuluString(), 'barrier' => 'rights_scopes'];
         }
-        $results = InventoryRace::run($this, $inputs, function () use ($a): void {
+        $blocker = LicenseFixtures::admin();
+        $results = InventoryRace::run($this, $inputs, function () use ($a, $blocker): void {
             // Both independent workers have reached their scope lock, after earlier
             // track/offer/license locks. Commit the block BEFORE releasing that barrier.
-            app(\App\Domain\Commerce\Inventory\ManageRightsScope::class)->block($a['scope']->id, true, 0, 'COMMITTED-BEFORE-LOCK', $a['actor']);
+            app(\App\Domain\Commerce\Inventory\ManageRightsScope::class)->block($a['scope']->id, true, 0, 'COMMITTED-BEFORE-LOCK', $blocker);
             $this->assertSame(0, DB::transactionLevel());
         });
         $this->assertSame(['rejected', 'rejected'], array_column($results, 'result'));
@@ -107,6 +109,8 @@ class ExclusiveSelectionConcurrencyTest extends TestCase
             'actor' => $f['actor']->id, 'scope' => $f['scope']->id, 'policy' => InventoryFixtures::policy(),
             'exclusive_policy' => F::policy(), 'now' => now()->toIso8601ZuluString(), 'barrier' => 'tracks'];
         $second = $first;
+        // Keep this race at the resource barrier rather than the earlier actor fence.
+        $second['actor'] = LicenseFixtures::admin()->id;
         if ($scenario === 'successor') { $second['action'] = 'publish_successor'; $second['offer'] = $f['legacy']['offer']->id; }
         if ($scenario === 'block') { $second['action'] = 'block'; $second['barrier'] = 'rights_scopes'; }
         $results = InventoryRace::run($this, [$first, $second]);

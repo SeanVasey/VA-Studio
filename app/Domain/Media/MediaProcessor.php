@@ -91,14 +91,16 @@ class MediaProcessor
                 $records[] = ['track_id' => $source->track_id, 'parent_asset_id' => $source->id, 'processing_run_id' => $run->id, 'role' => $output['role'], 'disk' => 'local', 'storage_path' => $relative, 'original_name' => $output['name'], 'mime_type' => $output['mime_type'], 'size_bytes' => filesize($path), 'sha256' => hash_file('sha256', $path), 'technical_metadata' => $output['technical_metadata'], 'status' => 'ready', 'verified_by' => $run->requested_by, 'verified_at' => now()];
             }
             $result = DB::transaction(function () use ($run, $source, $token, $records, $evidence, $budget, &$committing) {
-                // Match queue lock ordering: source before run.
+                // Attribution precedes queue-compatible source -> track -> run locks.
+                app(MediaWriterActor::class)->requester((int) $run->requested_by);
                 $lockedSource = MediaAsset::query()->lockForUpdate()->findOrFail($source->id);
                 $track = Track::query()->lockForUpdate()->findOrFail($source->track_id);
                 if ($track->status === 'published') {
                     throw new MediaFailure('track_published', 'Unpublish the track before processing a replacement media revision.');
                 }
                 $locked = MediaProcessingRun::query()->lockForUpdate()->findOrFail($run->id);
-                if ($locked->status !== 'processing' || $locked->claim_token !== $token) {
+                if ($locked->requested_by !== $run->requested_by || $locked->source_asset_id !== $source->id
+                    || $lockedSource->track_id !== $track->id || $locked->status !== 'processing' || $locked->claim_token !== $token) {
                     throw new MediaFailure('claim_lost', 'This media attempt no longer owns the processing claim.');
                 }
                 $ids = [];
@@ -133,8 +135,12 @@ class MediaProcessor
             return $result;
         } catch (Throwable $error) {
             $failure = $error instanceof MediaFailure ? $error : new MediaFailure('processing_failed', 'Media processing failed. Review worker logs and retry after correcting the cause.');
-            DB::transaction(function () use ($runId, $token, $failure) {
+            DB::transaction(function () use ($runId, $token, $failure, $run) {
+                app(MediaWriterActor::class)->requester((int) $run->requested_by);
                 $locked = MediaProcessingRun::query()->lockForUpdate()->findOrFail($runId);
+                if ($locked->requested_by !== $run->requested_by) {
+                    throw new MediaFailure('claim_lost', 'This media attempt no longer retains its requester identity.');
+                }
                 if ($locked->status === 'processing' && $locked->claim_token === $token) {
                     $locked->update(['status' => 'failed', 'failed_at' => now(), 'failure_code' => $failure->failureCode, 'failure_message' => $failure->getMessage(), 'claim_token' => null]);
                     AuditEvent::record('media.processing.failed', $locked, ['failure_code' => $failure->failureCode], $locked->requested_by);

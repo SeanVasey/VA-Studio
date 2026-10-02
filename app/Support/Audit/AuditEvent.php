@@ -26,4 +26,10 @@ class AuditEvent extends Model
     {
         static::create(['actor_id' => $actorId ?? auth()->id(), 'action' => $action, 'subject_type' => $subject::class, 'subject_id' => $subject->getKey(), 'context' => $context]);
     }
+
+    /** Explicit attribution, including anonymous/system null; never consult ambient authentication. */
+    public static function recordAttributed(string $action, Model $subject, array $context, ?int $actorId): void
+    {
+        static::create(['actor_id' => $actorId, 'action' => $action, 'subject_type' => $subject::class, 'subject_id' => $subject->getKey(), 'context' => $context]);
+    }
 }

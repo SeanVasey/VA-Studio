@@ -5,6 +5,7 @@ namespace App\Domain\Commerce;
 use App\Domain\Commerce\Models\PromotionCampaign;
 use App\Domain\Commerce\Models\PromotionUse;
 use App\Domain\Commerce\Models\QuotePricing;
+use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -17,9 +18,10 @@ use LogicException;
  */
 final class PromotionUsage
 {
-    public function hold(QuotePricing $pricing): PromotionUse
+    public function hold(QuotePricing $pricing, ?User $actor = null): PromotionUse
     {
         $this->requireTransaction();
+        $actorId = app(CommerceAuditActor::class)->lock($actor);
         $policy = $pricing->snapshot['promotion'];
         $campaign = $this->campaign($policy, true);
         app(PromotionAdministration::class)->requireAvailable($campaign);
@@ -43,10 +45,10 @@ final class PromotionUsage
         }
         $use = PromotionUse::create(['promotion_campaign_id' => $campaign->id, 'quote_pricing_id' => $pricing->id,
             'state' => 'held', 'created_at' => $pricing->created_at, 'expires_at' => $pricing->expires_at]);
-        AuditEvent::record('commerce.promotion.held', $use, [
+        AuditEvent::recordAttributed('commerce.promotion.held', $use, [
             'pricing_public_id' => $pricing->public_id, 'policy_hash' => $campaign->snapshot_hash,
             'expires_at' => $use->expires_at->toIso8601ZuluString(),
-        ]);
+        ], $actorId);
 
         return $use;
     }
@@ -73,10 +75,12 @@ final class PromotionUsage
     /** Internal test-mode handoff. WP-07 must commit this binding in its order/intent
      * transaction BEFORE making any provider request. There is no customer route.
      */
-    public function beginAttempt(string $quoteId, string $ownerKey, string $attemptId): PromotionUse
+    public function beginAttempt(string $quoteId, string $ownerKey, string $attemptId, ?User $actor = null): PromotionUse
     {
-        return DB::transaction(function () use ($quoteId, $ownerKey, $attemptId) {
-            $pricing = app(PriceQuote::class)->read($quoteId, $ownerKey);
+        return DB::transaction(function () use ($quoteId, $ownerKey, $attemptId, $actor) {
+            // Explicit customer identity precedes resource locks; null remains anonymous/system.
+            $actorId = app(CommerceAuditActor::class)->lock($actor);
+            $pricing = app(PriceQuote::class)->read($quoteId, $ownerKey, $actor);
             if (! $this->validAttempt($attemptId)) {
                 throw new QuoteException('INVALID_QUOTE_REQUEST', 422);
             }
@@ -116,10 +120,12 @@ final class PromotionUsage
             } catch (UniqueConstraintViolationException) {
                 throw new QuoteException('PROMOTION_ATTEMPT_CONFLICT', 409);
             }
-            if ($changed !== 1) { throw new LogicException('Promotion attempt transition lost its lock.'); }
-            AuditEvent::record('commerce.promotion.pending', $use, [
+            if ($changed !== 1) {
+                throw new LogicException('Promotion attempt transition lost its lock.');
+            }
+            AuditEvent::recordAttributed('commerce.promotion.pending', $use, [
                 'pricing_public_id' => $pricing->public_id, 'attempt_id' => $attemptId,
-            ]);
+            ], $actorId);
             if ($use->expires_at->lessThanOrEqualTo(now())) {
                 throw new QuoteException('PRICING_EXPIRED', 410);
             }
@@ -153,8 +159,12 @@ final class PromotionUsage
 
     private function requireTransaction(): void
     {
-        if (DB::transactionLevel() < 1) { throw new LogicException('Promotion usage requires the quote transaction.'); }
-        if (! app()->environment('local', 'testing')) { throw new QuoteException('PROMOTION_UNAVAILABLE', 503); }
+        if (DB::transactionLevel() < 1) {
+            throw new LogicException('Promotion usage requires the quote transaction.');
+        }
+        if (! app()->environment('local', 'testing')) {
+            throw new QuoteException('PROMOTION_UNAVAILABLE', 503);
+        }
     }
 
     private function validAttempt(mixed $id): bool

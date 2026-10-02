@@ -17,10 +17,82 @@ async function activate(page: Page, label: string, action: 'Publish release' | '
 }
 
 async function followNavigation(page: Page, label: string) {
-  const menu = page.getByRole('button', { name: 'Menu', exact: true });
-  if (await menu.isVisible()) await menu.click();
-  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: label, exact: true }).click();
+  // createRoot may commit the header after goto resolves. Establish its presence
+  // before choosing the responsive path: isVisible is an immediate observation.
+  const menu = page.locator('#site-menu-toggle');
+  await expect(menu).toBeAttached();
+  if (await menu.isVisible() && await menu.getAttribute('aria-expanded') !== 'true') {
+    await menu.click();
+    await expect(menu).toHaveAttribute('aria-expanded', 'true');
+  }
+  const navigation = page.getByRole('navigation', { name: 'Main navigation' });
+  await expect(navigation).toBeVisible();
+  await navigation.getByRole('link', { name: label, exact: true }).click();
 }
+
+async function delayedHeaderFixture(page: Page, width: number, initiallyOpen = false) {
+  await page.setViewportSize({ width, height: 844 });
+  // This fixture exercises the real helper against a delayed DOM commit and
+  // responsive closed/open navigation, not Laravel content publication.
+  await page.setContent(`<style>
+    #site-menu-toggle { display: none; }
+    @media (max-width: 1100px) {
+      #site-menu-toggle { display: inline-flex; }
+      #site-navigation { display: none; }
+      #site-navigation.is-open { display: flex; }
+    }
+  </style><script>
+    window.addEventListener('mount-navigation-header', () => window.setTimeout(() => {
+      const header = document.createElement('header');
+      header.innerHTML = '<nav id="site-navigation" aria-label="Main navigation" class="${initiallyOpen ? 'is-open' : ''}"><a href="#followed-blog">Blog</a></nav><button id="site-menu-toggle" aria-controls="site-navigation" aria-expanded="${initiallyOpen}">${initiallyOpen ? 'Close menu' : 'Menu'}</button>';
+      const menu = header.querySelector('button');
+      const navigation = header.querySelector('nav');
+      document.body.dataset.menuClicks = '0';
+      menu.addEventListener('click', () => {
+        document.body.dataset.menuClicks = String(Number(document.body.dataset.menuClicks) + 1);
+        const open = menu.getAttribute('aria-expanded') !== 'true';
+        menu.setAttribute('aria-expanded', String(open));
+        menu.textContent = open ? 'Close menu' : 'Menu';
+        navigation.classList.toggle('is-open', open);
+      });
+      navigation.querySelector('a').addEventListener('click', event => {
+        event.preventDefault();
+        document.body.dataset.followed = 'Blog';
+      });
+      document.body.append(header);
+    }, 200), { once: true });
+  </script>`);
+}
+
+async function followAfterHeaderCommit(page: Page) {
+  // Initialize the browser's locator world before scheduling the deferred commit:
+  // otherwise its first injection can make an immediate isVisible run too late.
+  await expect(page.locator('#site-menu-toggle')).not.toBeAttached();
+  await page.evaluate(() => window.dispatchEvent(new Event('mount-navigation-header')));
+  await followNavigation(page, 'Blog');
+}
+
+test('navigation helper waits for a delayed mobile header and opens its menu', async ({ page }) => {
+  await delayedHeaderFixture(page, 390);
+  await followAfterHeaderCommit(page);
+  await expect(page.locator('body')).toHaveAttribute('data-followed', 'Blog');
+  await expect(page.locator('body')).toHaveAttribute('data-menu-clicks', '1');
+});
+
+test('navigation helper waits for a delayed desktop header without clicking its hidden menu', async ({ page }) => {
+  await delayedHeaderFixture(page, 1440);
+  await followAfterHeaderCommit(page);
+  await expect(page.locator('body')).toHaveAttribute('data-followed', 'Blog');
+  await expect(page.locator('body')).toHaveAttribute('data-menu-clicks', '0');
+});
+
+test('navigation helper follows an already open mobile menu without closing it', async ({ page }) => {
+  await delayedHeaderFixture(page, 390, true);
+  await followAfterHeaderCommit(page);
+  await expect(page.locator('body')).toHaveAttribute('data-followed', 'Blog');
+  await expect(page.locator('body')).toHaveAttribute('data-menu-clicks', '0');
+  await expect(page.locator('#site-menu-toggle')).toHaveAttribute('aria-expanded', 'true');
+});
 
 test('seller edits persisted pages, previews one private release and restores the original site', async ({ page, context, playwright }, testInfo) => {
   test.setTimeout(150_000);

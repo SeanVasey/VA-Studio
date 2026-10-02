@@ -9,7 +9,6 @@ use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -17,24 +16,21 @@ class BindStemsToRecording
 {
     public function handle(MediaAsset $stems, array $data, User $actor): StemsRecording
     {
-        // Re-read role state for direct callers holding an older User instance.
-        $actor = User::findOrFail($actor->id);
-        Gate::forUser($actor)->authorize('administer-catalog');
-        if (array_diff(array_keys($data), ['master_asset_id', 'preview_asset_id', 'verification_reference', 'same_recording_confirmed'])) {
-            throw ValidationException::withMessages(['master_asset_id' => 'Only recording selection and confirmation fields may be submitted.']);
-        }
-        if (is_string($data['verification_reference'] ?? null)) {
-            $data['verification_reference'] = trim($data['verification_reference']);
-        }
-        $data = Validator::make($data, [
-            'master_asset_id' => ['required', 'integer', 'min:1'],
-            'preview_asset_id' => ['required', 'integer', 'min:1'],
-            'verification_reference' => ['required', 'string', 'max:240'],
-            'same_recording_confirmed' => ['required', 'accepted'],
-        ])->validate();
-        $stems = MediaAsset::findOrFail($stems->id);
-
         return DB::transaction(function () use ($stems, $data, $actor) {
+            $actor = app(MediaWriterActor::class)->authorize($actor);
+            if (array_diff(array_keys($data), ['master_asset_id', 'preview_asset_id', 'verification_reference', 'same_recording_confirmed'])) {
+                throw ValidationException::withMessages(['master_asset_id' => 'Only recording selection and confirmation fields may be submitted.']);
+            }
+            if (is_string($data['verification_reference'] ?? null)) {
+                $data['verification_reference'] = trim($data['verification_reference']);
+            }
+            $data = Validator::make($data, [
+                'master_asset_id' => ['required', 'integer', 'min:1'],
+                'preview_asset_id' => ['required', 'integer', 'min:1'],
+                'verification_reference' => ['required', 'string', 'max:240'],
+                'same_recording_confirmed' => ['required', 'accepted'],
+            ])->validate();
+            $stems = MediaAsset::findOrFail($stems->id);
             // This track lock serializes association with publication, quote selection and media completion.
             $track = Track::query()->lockForUpdate()->findOrFail($stems->track_id);
             if ($track->status !== 'draft') {

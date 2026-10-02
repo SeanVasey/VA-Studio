@@ -2,6 +2,8 @@
 
 namespace App\Domain\Commerce\Checkout;
 
+use App\Domain\Commerce\CommerceAuditActor;
+use App\Domain\Commerce\Finalization\ReadPaymentState;
 use App\Domain\Commerce\Models\CheckoutIntent;
 use App\Domain\Commerce\Models\CheckoutObservation;
 use App\Domain\Commerce\Models\CheckoutSession;
@@ -11,8 +13,10 @@ use App\Domain\Commerce\Orders\ReadOrder;
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use App\Domain\Commerce\QuoteException;
 use App\Domain\Commerce\QuoteRequest;
+use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -20,18 +24,28 @@ final class HostedCheckout
 {
     public function __construct(private CheckoutEvidence $evidence, private CheckoutPolicy $policy) {}
 
-    public function start(string $id, string $ownerKey): array
+    public function start(string $id, string $ownerKey, ?User $actor = null): array
     {
         $order = $this->owned($id, $ownerKey);
-        $intent = DB::transaction(function () use ($order): CheckoutIntent {
+        $intent = DB::transaction(function () use ($order, $actor): CheckoutIntent {
+            $actorId = app(CommerceAuditActor::class)->lock($actor);
             // A short order lock serializes one durable provider intent; never includes provider I/O.
             $locked = Order::whereKey($order->id)->lockForUpdate()->firstOrFail();
             $existing = CheckoutIntent::where('order_id', $locked->id)->first();
-            if ($existing) { $this->evidence->verifyIntent($existing, $locked); return $existing; }
-            $policy = $this->policy->current(); $account = $this->policy->account();
-            $captured = app(ReadOrder::class)->verify($locked); $attempt = $locked->attempt()->sole();
-            if ($attempt->expires_at->lessThanOrEqualTo(now())) { throw new QuoteException('CHECKOUT_EXPIRED', 410); }
-            $at = now()->toImmutable()->utc()->startOfSecond(); $publicId = (string) Str::uuid();
+            if ($existing) {
+                $this->evidence->verifyIntent($existing, $locked);
+
+                return $existing;
+            }
+            $policy = $this->policy->current();
+            $account = $this->policy->account();
+            $captured = app(ReadOrder::class)->verify($locked);
+            $attempt = $locked->attempt()->sole();
+            if ($attempt->expires_at->lessThanOrEqualTo(now())) {
+                throw new QuoteException('CHECKOUT_EXPIRED', 410);
+            }
+            $at = now()->toImmutable()->utc()->startOfSecond();
+            $publicId = (string) Str::uuid();
             $payload = $this->evidence->request($locked, $captured, $publicId, $policy, $account, $at);
             [$ciphertext, $hash] = $this->evidence->encrypt($payload);
             $intent = CheckoutIntent::create(['public_id' => $publicId, 'order_id' => $locked->id, 'order_attempt_id' => $attempt->id,
@@ -39,12 +53,16 @@ final class HostedCheckout
                 'request_ciphertext' => $ciphertext, 'request_hash' => $hash, 'canonicalization_version' => CanonicalJson::VERSION,
                 'created_at' => $at, 'initiate_before' => $attempt->expires_at, 'retry_before' => $at->addSeconds(900),
                 'provider_expires_at' => $at->addSeconds(3600)]);
-            AuditEvent::record('commerce.checkout.initiated', $intent, ['public_id' => $publicId, 'order_public_id' => $locked->public_id, 'test_only' => true]);
-            if ($attempt->expires_at->lessThanOrEqualTo(now())) { throw new QuoteException('CHECKOUT_EXPIRED', 410); }
+            AuditEvent::recordAttributed('commerce.checkout.initiated', $intent, ['public_id' => $publicId, 'order_public_id' => $locked->public_id, 'test_only' => true], $actorId);
+            if ($attempt->expires_at->lessThanOrEqualTo(now())) {
+                throw new QuoteException('CHECKOUT_EXPIRED', 410);
+            }
 
             return $intent;
         }, 5);
-        if (! CheckoutSession::where('checkout_intent_id', $intent->id)->exists()) { $this->dispatch($intent); }
+        if (! CheckoutSession::where('checkout_intent_id', $intent->id)->exists()) {
+            $this->dispatch($intent);
+        }
 
         return $this->projection($order, $intent);
     }
@@ -60,7 +78,9 @@ final class HostedCheckout
     {
         $order = $this->owned($id, $ownerKey);
         $intent = CheckoutIntent::where('order_id', $order->id)->first();
-        if ($intent) { $this->dispatch($intent, true); }
+        if ($intent) {
+            $this->dispatch($intent, true);
+        }
 
         return $this->projection($order, $intent);
     }
@@ -76,9 +96,13 @@ final class HostedCheckout
     private function owned(string $id, string $ownerKey): Order
     {
         QuoteRequest::owner($ownerKey);
-        if (! OrderRequest::uuid($id)) { throw new QuoteException('ORDER_NOT_FOUND', 404); }
+        if (! OrderRequest::uuid($id)) {
+            throw new QuoteException('ORDER_NOT_FOUND', 404);
+        }
         $order = Order::where('public_id', $id)->where('owner_key', $ownerKey)->first();
-        if (! $order) { throw new QuoteException('ORDER_NOT_FOUND', 404); }
+        if (! $order) {
+            throw new QuoteException('ORDER_NOT_FOUND', 404);
+        }
         app(ReadOrder::class)->verify($order);
 
         return $order;
@@ -86,27 +110,44 @@ final class HostedCheckout
 
     private function dispatch(CheckoutIntent $intent, bool $refresh = false, ?string $candidate = null): void
     {
-        if (DB::transactionLevel() !== 0) { throw new QuoteException('CHECKOUT_UNAVAILABLE', 503); }
+        if (DB::transactionLevel() !== 0) {
+            throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);
+        }
         $request = $this->evidence->verifyIntent($intent, Order::findOrFail($intent->order_id));
         $session = CheckoutSession::where('checkout_intent_id', $intent->id)->first();
         if ($candidate !== null && (! preg_match('/\Acs_test_[A-Za-z0-9]{1,120}\z/', $candidate) ||
-            ($session && $session->provider_session_id !== $candidate))) { throw new QuoteException('CHECKOUT_CHANGED', 409); }
-        if ($session && ! $refresh && $candidate === null) { return; }
+            ($session && $session->provider_session_id !== $candidate))) {
+            throw new QuoteException('CHECKOUT_CHANGED', 409);
+        }
+        if ($session && ! $refresh && $candidate === null) {
+            return;
+        }
         // No unbounded POST replay beyond the captured safe window, even when the outcome is unknown.
-        if (! $session && $candidate === null && $intent->retry_before->lessThanOrEqualTo(now())) { return; }
-        if ($this->policy->account() !== $intent->account_id) { throw new QuoteException('CHECKOUT_UNAVAILABLE', 503); }
+        if (! $session && $candidate === null && $intent->retry_before->lessThanOrEqualTo(now())) {
+            return;
+        }
+        if ($this->policy->account() !== $intent->account_id) {
+            throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);
+        }
         $gateway = app(StripeCheckoutGateway::class);
-        try { $account = $gateway->account(); }
-        catch (\Throwable) { throw new QuoteException('CHECKOUT_UNAVAILABLE', 503); }
+        try {
+            $account = $gateway->account();
+        } catch (\Throwable) {
+            throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);
+        }
         if (($account['id'] ?? null) !== $intent->account_id || ($account['object'] ?? null) !== 'account') {
             throw new QuoteException('CHECKOUT_CHANGED', 409);
         }
         // Account validation may take time. Recheck the frozen send window just before a create.
-        if (! $session && $candidate === null && $intent->retry_before->lessThanOrEqualTo(now())) { return; }
+        if (! $session && $candidate === null && $intent->retry_before->lessThanOrEqualTo(now())) {
+            return;
+        }
         try {
             $raw = $session || $candidate !== null ? $gateway->retrieve($session?->provider_session_id ?? $candidate) :
                 $gateway->create($request['params'], $intent->idempotency_key);
-        } catch (\Throwable) { throw new QuoteException('CHECKOUT_UNAVAILABLE', 503); }
+        } catch (\Throwable) {
+            throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);
+        }
         $observed = $this->evidence->session($raw, $request);
         if (($session && $observed['session_id'] !== $session->provider_session_id) || ($candidate !== null && $observed['session_id'] !== $candidate)) {
             throw new QuoteException('CHECKOUT_CHANGED', 409);
@@ -116,24 +157,32 @@ final class HostedCheckout
     }
 
     /** Internal persistence only. Caller must hold its transaction and any required work fence. */
-    public function recordObservation(CheckoutIntent $intent, array $request, array $observed, \Carbon\CarbonImmutable $at): CheckoutSession
+    public function recordObservation(CheckoutIntent $intent, array $request, array $observed, CarbonImmutable $at): CheckoutSession
     {
-        if (DB::transactionLevel() === 0) { throw new QuoteException('CHECKOUT_UNAVAILABLE', 503); }
+        if (DB::transactionLevel() === 0) {
+            throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);
+        }
         CheckoutIntent::whereKey($intent->id)->lockForUpdate()->firstOrFail();
         $session = CheckoutSession::where('checkout_intent_id', $intent->id)->first();
         if ($session) {
-            if ($session->provider_session_id !== $observed['session_id']) { throw new QuoteException('CHECKOUT_CHANGED', 409); }
+            if ($session->provider_session_id !== $observed['session_id']) {
+                throw new QuoteException('CHECKOUT_CHANGED', 409);
+            }
             $latest = $this->latest($session, $request);
             // An older in-flight response cannot regress a terminal observation.
-            if ($latest['status'] !== 'open' && $observed['status'] === 'open') { return $session; }
-            if ($latest['status'] !== 'open' && $observed['status'] !== $latest['status']) { throw new QuoteException('CHECKOUT_CHANGED', 409); }
+            if ($latest['status'] !== 'open' && $observed['status'] === 'open') {
+                return $session;
+            }
+            if ($latest['status'] !== 'open' && $observed['status'] !== $latest['status']) {
+                throw new QuoteException('CHECKOUT_CHANGED', 409);
+            }
         }
         [$ciphertext, $hash] = $this->evidence->encrypt($observed);
         if (! $session) {
             $session = CheckoutSession::create(['checkout_intent_id' => $intent->id, 'account_id' => $intent->account_id, 'mode' => 'test',
                 'provider_session_id' => $observed['session_id'], 'evidence_ciphertext' => $ciphertext, 'evidence_hash' => $hash,
                 'canonicalization_version' => CanonicalJson::VERSION, 'created_at' => $at]);
-            AuditEvent::record('commerce.checkout.bound', $session, ['intent_public_id' => $intent->public_id, 'test_only' => true]);
+            AuditEvent::recordAttributed('commerce.checkout.bound', $session, ['intent_public_id' => $intent->public_id, 'test_only' => true], null);
         }
         CheckoutObservation::create(['checkout_session_id' => $session->id, 'observed_at' => $at, 'status' => $observed['status'],
             'evidence_ciphertext' => $ciphertext, 'evidence_hash' => $hash, 'canonicalization_version' => CanonicalJson::VERSION]);
@@ -148,12 +197,14 @@ final class HostedCheckout
             'currency' => 'USD', 'totalMinor' => $payload['pricing']['snapshot']['total_minor'], 'status' => 'not_started',
             'testOnly' => true, 'paymentStatus' => 'not_verified', 'fulfillmentStatus' => 'not_started',
             'url' => null, 'expiresAt' => null, 'observedAt' => null];
-        $paymentState = app(\App\Domain\Commerce\Finalization\ReadPaymentState::class)->projection($order, $payload);
+        $paymentState = app(ReadPaymentState::class)->projection($order, $payload);
         $data['paymentStatus'] = $paymentState['paymentStatus'] === 'verified' ? 'verified' : 'not_verified';
         $data['finalizationStatus'] = $paymentState['finalizationStatus'];
         $data['contractStatus'] = $paymentState['contractStatus'];
         $data['fulfillmentStatus'] = $paymentState['fulfillmentStatus'];
-        if (! $intent) { return $data; }
+        if (! $intent) {
+            return $data;
+        }
         $request = $this->evidence->verifyIntent($intent, $order);
         $data['expiresAt'] = $intent->provider_expires_at->utc()->toISOString();
         $session = CheckoutSession::where('checkout_intent_id', $intent->id)->first();
@@ -166,8 +217,11 @@ final class HostedCheckout
         $data['status'] = $latest['status'];
         $data['observedAt'] = $latest['observed_at'];
         if ($latest['status'] === 'open' && $data['paymentStatus'] !== 'verified') {
-            if ($intent->provider_expires_at->greaterThan(now())) { $data['url'] = $latest['url']; }
-            else { $data['status'] = 'reconciliation_required'; }
+            if ($intent->provider_expires_at->greaterThan(now())) {
+                $data['url'] = $latest['url'];
+            } else {
+                $data['status'] = 'reconciliation_required';
+            }
         }
 
         return $data;

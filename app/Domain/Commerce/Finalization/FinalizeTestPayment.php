@@ -19,6 +19,7 @@ use App\Domain\Commerce\Orders\ReadOrder;
 use App\Domain\Commerce\Payments\PaymentProcessingPolicy;
 use App\Domain\Commerce\Payments\PaymentVerificationException;
 use App\Domain\Commerce\QuoteException;
+use App\Domain\Contracts\DispatchTestContract;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Rights\Models\RightsDeclaration;
 use App\Support\Audit\AuditEvent;
@@ -34,15 +35,22 @@ final class FinalizeTestPayment
     {
         try {
             $policyService = app(FinalizationPolicy::class);
-            $policy = $policyService->current(); $account = $policyService->account();
+            $policy = $policyService->current();
+            $account = $policyService->account();
             app(PaymentProcessingPolicy::class)->outsideTransactions();
             $payment = VerifiedPayment::whereKey($paymentId)->where('mode', 'test')->where('account_id', $account)->first();
-            if (! $payment) { return 'unverified'; }
+            if (! $payment) {
+                return 'unverified';
+            }
             $order = Order::findOrFail($payment->order_id);
             $original = app(ReadOrder::class)->verify($order);
             app(ReadPaymentState::class)->verify($payment, $order, $original);
             $existing = OrderFinalization::where('order_id', $order->id)->first();
-            if ($existing) { app(ReadFinalization::class)->verify($existing, $original); return $existing->outcome; }
+            if ($existing) {
+                app(ReadFinalization::class)->verify($existing, $original);
+
+                return $existing->outcome;
+            }
             // A proved late confirmation cannot become eligible when storage recovers.
             // Timely file hashing stays outside every transaction and lock; null records no inspection.
             $assetsAvailable = $payment->confirmed_at->lessThan($original['attempt']['expires_at'])
@@ -60,8 +68,13 @@ final class FinalizeTestPayment
                     throw new FinalizationException('changed');
                 }
                 app(ReadPaymentState::class)->verify($payment, $locked, $fresh);
-                if ($existing) { app(ReadFinalization::class)->verify($existing, $fresh); return $existing->outcome; }
-                $attempt = $locked->attempt()->sole(); $use = null;
+                if ($existing) {
+                    app(ReadFinalization::class)->verify($existing, $fresh);
+
+                    return $existing->outcome;
+                }
+                $attempt = $locked->attempt()->sole();
+                $use = null;
                 if ($attempt->promotion_use_id !== null) {
                     $campaignId = PromotionUse::whereKey($attempt->promotion_use_id)->value('promotion_campaign_id');
                     PromotionCampaign::whereKey($campaignId)->lockForUpdate()->firstOrFail();
@@ -83,13 +96,16 @@ final class FinalizeTestPayment
                     ->whereIn('inventory_reservations.state', ['held', 'pending'])
                     ->orderBy('inventory_reservations.id')->lockForUpdate()->get();
                 $at = now()->toImmutable()->utc()->startOfSecond();
-                if ($at->lessThan($payment->confirmed_at)) { throw new FinalizationException('retry'); }
-                $inventoryAvailable = $sold->isEmpty() && ! $others->contains(fn ($other) =>
-                    $other->state === 'pending' || $other->expires_at->greaterThan($at));
+                if ($at->lessThan($payment->confirmed_at)) {
+                    throw new FinalizationException('retry');
+                }
+                $inventoryAvailable = $sold->isEmpty() && ! $others->contains(fn ($other) => $other->state === 'pending' || $other->expires_at->greaterThan($at));
                 $scopeControls = [];
                 foreach ($bindings as $binding) {
                     $scope = $scopes->firstWhere('id', $binding['scope_id']);
-                    if ($scope->public_id !== $binding['scope_public_id']) { throw new FinalizationException('changed'); }
+                    if ($scope->public_id !== $binding['scope_public_id']) {
+                        throw new FinalizationException('changed');
+                    }
                     $scopeControls[] = ['scope_id' => $scope->id, 'scope_public_id' => $scope->public_id,
                         'control_version' => $scope->control_version, 'blocked' => $scope->blocked];
                 }
@@ -112,13 +128,16 @@ final class FinalizeTestPayment
                         if (! $asset || CanonicalJson::encode(app(OfferSnapshot::class)->asset($asset)) !== CanonicalJson::encode($entry)) {
                             throw new FinalizationException('changed');
                         }
-                        if ($assetsAvailable !== null && $asset->status !== 'ready') { $assetsAvailable = false; }
+                        if ($assetsAvailable !== null && $asset->status !== 'ready') {
+                            $assetsAvailable = false;
+                        }
                     }
                 }
                 $checks = ['scope_controls' => $scopeControls, 'inventory_available' => $inventoryAvailable,
                     'assets_available' => $assetsAvailable, 'rights_controls' => $rightsControls];
                 $reason = app(ReadFinalization::class)->reason($payment, $attempt->expires_at, $checks);
-                $id = (string) Str::uuid(); $evidence = app(FinalizationEvidence::class);
+                $id = (string) Str::uuid();
+                $evidence = app(FinalizationEvidence::class);
                 $payload = $evidence->capture($locked, $fresh, $payment, $id, $policy, $at, $reason, $checks);
                 [$ciphertext, $hash] = $evidence->encrypt($payload);
                 $finalization = OrderFinalization::create(['public_id' => $id, 'order_id' => $locked->id,
@@ -131,7 +150,8 @@ final class FinalizeTestPayment
                 } else {
                     $references = $locked->lines()->orderBy('position')->get();
                     foreach ($fresh['lines'] as $position => $line) {
-                        $reference = $references[$position]; $grantId = (string) Str::uuid();
+                        $reference = $references[$position];
+                        $grantId = (string) Str::uuid();
                         $input = app(GrantRenderInput::class)->capture($locked, $fresh, $line, $reference, $finalization, $grantId, $policy);
                         [$inputCipher, $inputHash] = $evidence->encrypt($input);
                         $grant = LicenseGrant::create(['public_id' => $grantId, 'order_line_id' => $reference->id,
@@ -152,25 +172,34 @@ final class FinalizeTestPayment
                         }
                     }
                     if (DB::table('inventory_reservations')->where('id', $reservation->id)->where('state', 'pending')
-                        ->update(['state' => 'consumed', 'consumed_at' => $at]) !== 1) { throw new FinalizationException('changed'); }
+                        ->update(['state' => 'consumed', 'consumed_at' => $at]) !== 1) {
+                        throw new FinalizationException('changed');
+                    }
                     if ($use && DB::table('promotion_uses')->where('id', $use->id)->where('state', 'pending')
-                        ->update(['state' => 'consumed', 'consumed_at' => $at]) !== 1) { throw new FinalizationException('changed'); }
+                        ->update(['state' => 'consumed', 'consumed_at' => $at]) !== 1) {
+                        throw new FinalizationException('changed');
+                    }
                 }
-                AuditEvent::record('commerce.order.test_finalized', $finalization, ['order_public_id' => $locked->public_id,
-                    'outcome' => $finalization->outcome, 'reason' => $reason, 'test_only' => true]);
+                AuditEvent::recordAttributed('commerce.order.test_finalized', $finalization, ['order_public_id' => $locked->public_id,
+                    'outcome' => $finalization->outcome, 'reason' => $reason, 'test_only' => true], null);
                 app(ReadFinalization::class)->verify($finalization, $fresh);
                 if ($finalization->outcome === 'paid') {
                     foreach (LicenseGrant::where('order_finalization_id', $finalization->id)->orderBy('id')->pluck('id') as $grantId) {
-                        app(\App\Domain\Contracts\DispatchTestContract::class)->handle((int) $grantId);
+                        app(DispatchTestContract::class)->handle((int) $grantId);
                     }
                 }
 
                 return $finalization->outcome;
             }, 5);
-        } catch (FinalizationException $error) { return $error->reason; }
-        catch (PaymentVerificationException $error) { return $error->reason === 'unavailable' ? 'unavailable' : 'changed'; }
-        catch (QuoteException) { return 'changed'; }
-        catch (Throwable) { return 'retry'; }
+        } catch (FinalizationException $error) {
+            return $error->reason;
+        } catch (PaymentVerificationException $error) {
+            return $error->reason === 'unavailable' ? 'unavailable' : 'changed';
+        } catch (QuoteException) {
+            return 'changed';
+        } catch (Throwable) {
+            return 'retry';
+        }
     }
 
     private function outbox(OrderFinalization $finalization, ?LicenseGrant $grant, string $key, string $kind, string $hash): void

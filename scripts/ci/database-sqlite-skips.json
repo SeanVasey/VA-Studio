@@ -23,6 +23,18 @@
       "test_review_and_apply_reject_authority_revocation_hidden_by_an_old_repeatable_read_snapshot"
     ],
     [
+      "Tests\\Feature\\CommerceAuditActorConcurrencyTest",
+      "test_existing_order_replay_and_checkout_fence_actor_before_order_in_both_orders"
+    ],
+    [
+      "Tests\\Feature\\CommerceAuditActorConcurrencyTest",
+      "test_explicit_guest_commits_while_ambient_customer_row_remains_locked"
+    ],
+    [
+      "Tests\\Feature\\CommerceAuditActorConcurrencyTest",
+      "test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"
+    ],
+    [
       "Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest",
       "test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders"
     ],
@@ -93,6 +105,18 @@
     [
       "Tests\\Feature\\LicenseWriterConcurrencyTest",
       "test_license_and_offer_publication_complete_in_both_orders_with_exact_user_or_license_fences"
+    ],
+    [
+      "Tests\\Feature\\MediaWorkerIdentityTest",
+      "test_locked_completion_refuses_changed_retained_identity_without_redirecting_attribution"
+    ],
+    [
+      "Tests\\Feature\\MediaWriterAuthorityTest",
+      "test_old_repeatable_read_authority_is_not_used_by_media_mutation"
+    ],
+    [
+      "Tests\\Feature\\MediaWriterConcurrencyTest",
+      "test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"
     ],
     [
       "Tests\\Feature\\OrderPreparationConcurrencyTest",
