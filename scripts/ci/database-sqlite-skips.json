@@ -351,6 +351,14 @@
       "test_snapshot_and_archive_serialize_on_the_exact_preset_row"
     ],
     [
+      "Tests\\Feature\\TrackPublicationApplyConcurrencyTest",
+      "test_one_actor_cannot_apply_the_same_review_twice_concurrently"
+    ],
+    [
+      "Tests\\Feature\\TrackPublicationApplyConcurrencyTest",
+      "test_reviewed_publication_and_participating_writers_serialize_current_evidence"
+    ],
+    [
       "Tests\\Feature\\TrackPublicationGuardConcurrencyTest",
       "test_authority_withdrawal_and_reviewed_publication_serialize_on_the_exact_actor_row"
     ],

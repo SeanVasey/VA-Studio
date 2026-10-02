@@ -64,6 +64,12 @@ PHP_TARGETS = {
         "tests/Feature/SiteRelatedTrackHttpTest.php", "tests/Feature/SiteRelatedTrackImageMigrationTest.php",
         "tests/Feature/SiteContentConcurrencyTest.php",
     ),
+    "publication": (
+        "tests/Feature/TrackPublicationApplyTest.php", "tests/Feature/TrackPublicationApplyConcurrencyTest.php",
+        "tests/Feature/TrackPublicationManifestEditorTest.php",
+        "tests/Feature/TrackPublicationManifestTest.php", "tests/Feature/TrackPublicationManifestConcurrencyTest.php",
+        "tests/Feature/TrackPublicationGuardTest.php", "tests/Feature/TrackPublicationGuardConcurrencyTest.php",
+    ),
     "operator": (
         "tests/Feature/FoundationTest.php", "tests/Feature/OperatorSetupTest.php",
         "tests/Feature/OperatorAuthorityTest.php", "tests/Feature/OperatorMfaTest.php",
@@ -76,6 +82,7 @@ PHP_TARGETS = {
         "tests/Feature/TrackPublicationGuardTest.php", "tests/Feature/TrackPublicationGuardMigrationTest.php",
         "tests/Feature/TrackPublicationGuardConcurrencyTest.php",
         "tests/Feature/TrackPublicationManifestTest.php", "tests/Feature/TrackPublicationManifestConcurrencyTest.php",
+        "tests/Feature/TrackPublicationManifestEditorTest.php",
         "tests/Feature/RightsEvidenceGuardTest.php", "tests/Feature/RightsEvidenceGuardMigrationTest.php",
         "tests/Feature/RightsEvidenceGuardConcurrencyTest.php",
         "tests/Feature/RightsDeclarationWriterTest.php", "tests/Feature/RightsDeclarationWriterActionTest.php",

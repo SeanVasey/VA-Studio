@@ -82,6 +82,13 @@ class SelectionTests(unittest.TestCase):
         for target in ("tests/Feature/TrackPublicationManifestTest.php", "tests/Feature/TrackPublicationManifestConcurrencyTest.php"):
             self.assertIn(target, focused.PHP_TARGETS["operator"])
 
+    def test_publication_feedback_keeps_operator_bounded_and_covers_apply_and_editor(self):
+        for target in ("tests/Feature/TrackPublicationApplyTest.php", "tests/Feature/TrackPublicationApplyConcurrencyTest.php",
+                       "tests/Feature/TrackPublicationManifestEditorTest.php"):
+            self.assertIn(target, focused.PHP_TARGETS["publication"])
+        self.assertIn("tests/Feature/TrackPublicationManifestEditorTest.php", focused.PHP_TARGETS["operator"])
+        self.assertIn("publication", (ROOT / ".github/workflows/focused.yml").read_text())
+
     def test_mysql_only_reaches_php_modes_and_browser_reports_isolated_sqlite(self):
         for suite in focused.PHP_TARGETS:
             self.assertEqual(focused.selection({"FOCUSED_SUITE": suite, "FOCUSED_ENGINE": "mysql"}).engine, "mysql")

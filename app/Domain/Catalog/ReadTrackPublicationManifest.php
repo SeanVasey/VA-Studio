@@ -47,29 +47,38 @@ final class ReadTrackPublicationManifest
                 throw (new ModelNotFoundException)->setModel(Track::class, [$trackId]);
             }
             $track = Track::query()->lockForUpdate()->findOrFail($trackId);
-            $capturedAt = CarbonImmutable::instance(now())->utc();
-            $blockers = app(PublicationReadiness::class)->blockers($track);
-            if ($blockers !== []) {
-                throw ValidationException::withMessages(['publication' => implode(' ', $blockers)]);
-            }
 
-            // No source/run locks follow the track lock; verified revisions are immutable.
-            $rights = $track->rightsDeclarations()->latest('id')->first();
-            if ($rights === null || $rights->status !== 'verified' || ! $rights->verified_by || ! $rights->verified_at) {
-                $this->invalid();
-            }
-            $offers = $track->getRelation('offers')->sortBy('id')->values()->map(fn (Offer $offer) => $this->offer($offer, $capturedAt))->all();
-
-            return new TrackPublicationManifest([
-                'schema_version' => TrackPublicationManifest::SCHEMA_VERSION,
-                'canonicalization_version' => CanonicalJson::VERSION,
-                'track' => $this->track($track),
-                'rights' => ['id' => $this->integer($rights->id), 'identity_hash' => app(OfferSnapshot::class)->rightsHash($rights)],
-                'artwork' => $this->derivative($track, 'artwork'),
-                'preview_tagged' => $this->derivative($track, 'preview_tagged'),
-                'offers' => $offers,
-            ], $this->integer($current->id), $capturedAt);
+            return $this->captureLocked($track, $current, CarbonImmutable::instance(now())->utc());
         });
+    }
+
+    /** Internal projection: caller has authorized and locked actor/track, and owns the child-read view. */
+    public function captureLocked(Track $track, User $actor, CarbonImmutable $capturedAt): TrackPublicationManifest
+    {
+        if (DB::transactionLevel() === 0) {
+            throw new LogicException('A locked publication capture requires its caller transaction.');
+        }
+        $blockers = app(PublicationReadiness::class)->blockers($track);
+        if ($blockers !== []) {
+            throw ValidationException::withMessages(['publication' => implode(' ', $blockers)]);
+        }
+
+        // No source/run locks follow the track lock; verified revisions are immutable.
+        $rights = $track->rightsDeclarations()->latest('id')->first();
+        if ($rights === null || $rights->status !== 'verified' || ! $rights->verified_by || ! $rights->verified_at) {
+            $this->invalid();
+        }
+        $offers = $track->getRelation('offers')->sortBy('id')->values()->map(fn (Offer $offer) => $this->offer($offer, $capturedAt))->all();
+
+        return new TrackPublicationManifest([
+            'schema_version' => TrackPublicationManifest::SCHEMA_VERSION,
+            'canonicalization_version' => CanonicalJson::VERSION,
+            'track' => $this->track($track),
+            'rights' => ['id' => $this->integer($rights->id), 'identity_hash' => app(OfferSnapshot::class)->rightsHash($rights)],
+            'artwork' => $this->derivative($track, 'artwork'),
+            'preview_tagged' => $this->derivative($track, 'preview_tagged'),
+            'offers' => $offers,
+        ], $this->integer($actor->id), $capturedAt);
     }
 
     private function track(Track $track): array
