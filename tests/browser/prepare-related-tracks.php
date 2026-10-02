@@ -360,7 +360,9 @@ final class RelatedTrackBrowserFixture
             self::require($track->status === ($withdrawn ? 'draft' : 'published'), 'ordinary current track state');
             $withdrawals = AuditEvent::where('action', 'catalog.track.unpublished')->where('subject_type', Track::class)->where('subject_id', $track->id)->get();
             self::require($withdrawals->count() === ($withdrawn ? 1 : 0)
-                && $withdrawals->every(fn (AuditEvent $audit): bool => $audit->actor_id === $operator->id && $audit->context === []), 'exact ordinary withdrawal audit');
+                && $withdrawals->every(fn (AuditEvent $audit): bool => $audit->actor_id === $operator->id && $audit->context === [
+                    'schema_version' => 1, 'metadata_version' => 1, 'previous_publication_version' => 1, 'publication_version' => 2,
+                ]), 'exact ordinary withdrawal audit');
             if (! $withdrawn) {
                 self::require(app(PublicationReadiness::class)->blockers($track) === [], 'current track readiness');
                 $visible[] = array_intersect_key($summary, array_flip(['title', 'artist', 'href']));

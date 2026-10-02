@@ -1,12 +1,17 @@
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { lstatSync, readFileSync, realpathSync } from 'node:fs';
 import { join } from 'node:path';
-import { test, expect, type APIRequestContext, type Locator, type Page, type TestInfo } from '@playwright/test';
+import { test, expect, type APIRequestContext, type Locator, type Page, type Response, type TestInfo } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from '../browser/auth-fixture';
 import { releaseMenuAction, releaseRow } from '../browser/site-release-row';
 
 type Track = { id: number; title: string; artist: string; slug: string; href: string };
-type Manifest = { schemaVersion: 1; marker: string; origin: string; database: string; projects: Record<string, { tracks: [Track, Track] }>; evidenceHash: string };
+type MediaOutput = { id: number; role: string; sha256: string; sizeBytes: number };
+type Manifest = {
+  schemaVersion: 1; marker: string; origin: string; database: string; projects: Record<string, { tracks: [Track, Track] }>; evidenceHash: string;
+  evidence: { tracks: Array<{ trackId: number; sources: Array<{ outputs: MediaOutput[] }> }> };
+};
 function loadManifest(): Manifest {
   const directory = process.env.VASEY_BROWSER_DIRECTORY!;
   const manifestPath = join(directory, 'related-track-fixtures.json');
@@ -90,7 +95,141 @@ async function clearTracks(group: Locator) {
   await expect(group.getByRole('combobox')).toHaveCount(0);
 }
 
-test('ordinary editorial associations preserve private order, current eligibility and first-party destinations', async ({ page, context, playwright }, testInfo) => {
+async function reviewVerifiedPrivateTrack(page: Page, visitor: APIRequestContext, testInfo: TestInfo, manifest: Manifest, track: Track, browserName: string) {
+  // These IDs/hashes come from genuinely scanned ordinary pipeline output, already checked by persisted(), not injected ready records.
+  const record = manifest.evidence.tracks.find(record => record.trackId === track.id);
+  expect(record).toBeDefined();
+  const outputs = record!.sources.flatMap(source => source.outputs);
+  const artwork = outputs.filter(output => output.role === 'artwork');
+  const previews = outputs.filter(output => output.role === 'preview_tagged');
+  expect(artwork).toHaveLength(1);
+  expect(previews).toHaveLength(1);
+  const media = [artwork[0], previews[0]];
+  const expectedUrls = media.map(output => `/admin/media/${output.id}/preview`);
+  const previewResponses: Array<{ status: number; cacheControl: string }> = [];
+  const observePreview = (response: Response) => {
+    if (response.url() === new URL(expectedUrls[1], manifest.origin).href) {
+      previewResponses.push({ status: response.status(), cacheControl: response.headers()['cache-control'] ?? '' });
+    }
+  };
+  // preload=none is a browser hint. Observe from insertion so an early metadata fetch also retains its real response evidence.
+  page.on('response', observePreview);
+  await page.bringToFront();
+  const launch = page.getByRole('row').filter({ has: page.getByText(track.title, { exact: true }) })
+    .getByRole('button', { name: 'Review track', exact: true });
+  await launch.focus();
+  await launch.press('Enter');
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByRole('heading', { name: 'Private track review', exact: true })).toBeVisible();
+  await expect(dialog.getByText('Private staff review. This track keeps its current publication state.', { exact: true })).toBeVisible();
+  await expect(dialog.getByText('Status: draft', { exact: true })).toBeVisible();
+  const metadata = dialog.getByRole('group', { name: 'Metadata', exact: true });
+  for (const [label, value] of [['Track ID', String(track.id)], ['Title', track.title], ['URL', track.slug], ['Artist', track.artist], ['BPM', '90'],
+    ['Musical key', 'C minor'], ['Genre', 'Synthetic fixture'], ['Mood', 'Not set']]) {
+    const term = metadata.locator('dt').filter({ hasText: new RegExp(`^${label}$`) });
+    await expect(term).toHaveCount(1);
+    await expect(term.locator('xpath=following-sibling::dd[1]')).toHaveText(value);
+  }
+  await expect(metadata.getByText('No tags', { exact: true })).toBeVisible();
+  const readiness = dialog.getByRole('group', { name: 'Publication readiness', exact: true });
+  await expect(readiness.getByText('Ready to publish', { exact: true })).toBeVisible();
+  await expect(readiness.getByRole('listitem')).toHaveCount(0);
+  await expect(dialog.locator('input:not([type="hidden"]), select, textarea')).toHaveCount(0);
+  await expect(dialog.getByRole('button', { name: /Save|Publish/i })).toHaveCount(0);
+  await expect(dialog.getByRole('link')).toHaveCount(0);
+  const image = dialog.getByRole('group', { name: 'Artwork', exact: true }).getByRole('img', { name: `Artwork for ${track.title}`, exact: true });
+  await expect(image).toHaveAttribute('src', expectedUrls[0]);
+  await expect.poll(() => image.evaluate(element => (element as HTMLImageElement).complete && (element as HTMLImageElement).naturalWidth > 0)).toBe(true);
+  const audio = dialog.getByRole('group', { name: 'Tagged preview', exact: true }).locator('audio');
+  await expect(audio).toHaveAttribute('aria-label', `Tagged preview for ${track.title}`);
+  await expect(audio).toHaveAttribute('src', expectedUrls[1]);
+  await expect(audio).toHaveAttribute('preload', 'none');
+  await expect(audio).toHaveAttribute('controls', /.*/);
+  await expect(audio).not.toHaveAttribute('autoplay');
+  expect(await audio.evaluate(element => (element as HTMLAudioElement).paused)).toBe(true);
+  expect(await audio.evaluate(element => (element as HTMLAudioElement).currentTime)).toBe(0);
+
+  const receipts = [];
+  for (const [index, output] of media.entries()) {
+    const response = await page.request.get(expectedUrls[index]);
+    expect(response.status()).toBe(200);
+    expect(response.headers()['cache-control']).toContain('private');
+    expect(response.headers()['cache-control']).toContain('no-store');
+    expect(response.headers()['x-content-type-options']).toBe('nosniff');
+    expect(response.headers()['x-robots-tag']).toContain('noindex');
+    expect(response.headers()['referrer-policy']).toBe('no-referrer');
+    const bytes = await response.body();
+    expect(bytes.length).toBe(output.sizeBytes);
+    const sha256 = createHash('sha256').update(bytes).digest('hex');
+    expect(sha256).toBe(output.sha256);
+    const denied = await visitor.get(expectedUrls[index], { maxRedirects: 0, headers: { Accept: 'text/html' } });
+    expect(denied.status()).toBe(302);
+    expect(new URL(denied.headers().location, manifest.origin).pathname).toBe('/admin/login');
+    expect(denied.headers()['content-type']).toContain('text/html');
+    expect(denied.headers()['cache-control']).toContain('private');
+    expect(denied.headers()['cache-control']).toContain('no-store');
+    expect(denied.headers()['x-robots-tag']).toContain('noindex');
+    expect(denied.headers()['x-content-type-options']).toBe('nosniff');
+    expect(denied.headers()['referrer-policy']).toBe('no-referrer');
+    expect(createHash('sha256').update(await denied.body()).digest('hex')).not.toBe(output.sha256);
+    expect((await visitor.get(`/media/${output.id}`)).status()).toBe(404);
+    receipts.push({ role: output.role, id: output.id, sizeBytes: bytes.length, sha256, cacheControl: response.headers()['cache-control'], guestStatus: denied.status() });
+  }
+
+  // Exercise browser-owned controls against the real protected MP3; the generated preview is short, so it may finish before polling.
+  await audio.focus();
+  await expect(audio).toBeFocused();
+  if (browserName === 'webkit') {
+    expect(testInfo.project.use.hasTouch).toBe(true);
+    const bounds = await audio.boundingBox();
+    expect(bounds).not.toBeNull();
+    expect(bounds!.width).toBeGreaterThan(48);
+    await audio.tap({ position: { x: 24, y: bounds!.height / 2 } });
+  } else {
+    await audio.press('Space');
+  }
+  await expect.poll(() => audio.evaluate(element => (element as HTMLAudioElement).currentTime)).toBeGreaterThan(0);
+  await expect.poll(() => previewResponses.length).toBeGreaterThan(0);
+  for (const response of previewResponses) {
+    expect([200, 206]).toContain(response.status);
+    expect(response.cacheControl).toContain('no-store');
+  }
+  await expect.poll(() => dialog.evaluate(element => element.contains(document.activeElement))).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+  expect(await dialog.locator('.fi-modal-window').evaluate(element => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath('private-track-review-verified-media.png'), fullPage: false });
+  await testInfo.attach('private-track-review-verified-bytes', { body: Buffer.from(JSON.stringify({ trackId: track.id, evidenceHash: manifest.evidenceHash, receipts, previewResponses })), contentType: 'application/json' });
+  const close = async () => {
+    const closeButton = dialog.locator('.fi-modal-footer').getByRole('button', { name: 'Close', exact: true });
+    await closeButton.focus();
+    await expect(closeButton).toBeFocused();
+    const [unmounted] = await Promise.all([
+      page.waitForResponse(response => {
+        if (!response.url().endsWith('/update') || response.request().method() !== 'POST') return false;
+        const payload = response.request().postDataJSON() as { components?: { calls?: { method?: string }[] }[] };
+        return payload.components?.some(component => component.calls?.some(call => call.method === 'unmountAction')) ?? false;
+      }),
+      closeButton.press('Enter'),
+    ]);
+    expect(unmounted.status()).toBe(200);
+    expect(await unmounted.finished()).toBeNull();
+    await expect(dialog.getByRole('heading')).toBeHidden();
+    await expect(launch).toBeFocused();
+  };
+  await close();
+  // Reopening performs another authorized read and starts with a fresh, stopped native player.
+  await launch.press('Enter');
+  await expect(dialog.getByRole('heading', { name: 'Private track review', exact: true })).toBeVisible();
+  await expect(image).toHaveAttribute('src', expectedUrls[0]);
+  await expect(audio).toHaveAttribute('src', expectedUrls[1]);
+  expect(await audio.evaluate(element => (element as HTMLAudioElement).paused)).toBe(true);
+  expect(await audio.evaluate(element => (element as HTMLAudioElement).currentTime)).toBe(0);
+  await close();
+  expect((await visitor.get(track.href)).status()).toBe(404);
+  page.off('response', observePreview);
+}
+
+test('ordinary editorial associations preserve private order, current eligibility and first-party destinations', async ({ page, context, playwright, browserName }, testInfo) => {
   test.setTimeout(150_000);
   const manifest = loadManifest();
   const fixture = manifest.projects[testInfo.project.name];
@@ -204,6 +343,8 @@ test('ordinary editorial associations preserve private order, current eligibilit
     await withdrawal.getByRole('button', { name: 'Confirm', exact: true }).click();
     await expect(trackRow.getByRole('button', { name: 'Publish', exact: true })).toBeVisible();
     await persisted(testInfo, manifest, 'withdrawn', 'ordinary-withdrawal-evidence');
+    await reviewVerifiedPrivateTrack(page, visitor, testInfo, manifest, first, browserName);
+    await persisted(testInfo, manifest, 'withdrawn', 'private-track-review-unchanged-evidence');
     expect((await props(visitor, `/blog/${slug}`)).editorial.relatedTracks).toEqual([publicLinks[0]]);
     expect((await props(visitor, `/videos/${slug}`)).editorial.relatedTracks).toEqual([]);
     expect((await visitor.get(first.href)).status()).toBe(404);

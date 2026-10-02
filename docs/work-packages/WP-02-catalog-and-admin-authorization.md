@@ -1,6 +1,6 @@
 # [WP-02] Persistent catalog administration and publication readiness
 
-Status: **PR #28 is merged with audited metadata, stale-form protection and permanent URLs. PR #29 adds operator/browser verification, visible publication blockers and modal focus recovery. The PRs record exact-head results; independent review and broader production/device acceptance remain open.** See [ordered development status](../development-order.md).
+Status: **Original metadata/URL and operator-browser increments are merged; named metadata presets are accepted in PR #95. Reviewed bulk metadata, protected operator review and reviewed manual publication guards form the current coherent candidate. Parent WP-02/T12 and broader production/device acceptance remain open.** See [ordered development status](../development-order.md).
 
 - Suggested issue title: `[WP-02] Persistent catalog administration and publication readiness`
 - Phase: 0
@@ -48,9 +48,11 @@ Read [architecture index](../architecture/README.md), [decision register](../arc
 
 ## Metadata and URL increment — 2026-09-09
 
-### Remaining authoring: metadata presets
+### Accepted presets and current staff-authoring candidate
 
-The [T12 named-preset increment](../verification/track-metadata-presets.md) adds persisted reusable noncommercial metadata, optimistic edits, archive and explicit copied-value review before private draft creation. Fresh staff/MFA locks, minimized transactional audits and ordinary `SaveTrackMetadata` creation retain the authorization/publication boundary. The integrating PR records actual database/native and independent review results; unexecuted definitions are not acceptance. This advances FP-031 without completing broader T12 roles/recovery, catalog/license bulk editing or track schedules/private review.
+The [T12 named-preset increment](../verification/track-metadata-presets.md) is accepted in PR #95 at merge `d57c3bb266890bc32adc1974fb84c050d848e90b`, tree `3561b2e416360e01eeb2340b0c8557a6df6dc785`, after all twelve applicable jobs of Foundation 36973007214 and independent tested-source review passed. Persisted reusable noncommercial metadata, optimistic edits, retained archive and copied-value private draft creation advance FP-031. Broader T12 roles/recovery, licensing/default parity and track scheduling remain open.
+
+The current coherent three-child T12 candidate combines [reviewed bulk metadata](../verification/bulk-track-metadata.md), [protected operator review](../verification/private-track-review.md) and [reviewed manual publication guards](../verification/track-publication-guards.md). Bulk Keep/Set/Clear before/after review advances FP033; protected metadata/readiness/media inspection grants no anonymous access; monotonic manual confirmation identity is the T12-PUBLICATION-GUARD-01 prerequisite for FP032 scheduling. These related Tracks workflows share one final integrating PR/full acceptance run. No schedule/window, broader license bulk operation, granular helper permission/recovery or production readiness is supplied by this candidate.
 
 `SaveTrackMetadata` owns Filament create/edit persistence: verified staff authorization, metadata allowlist, validation, a locked current row, expected revision and transactional minimized audit evidence. A failed audit or invalid published edit rolls back the mutation. `published_slug` reserves the URL through unpublish/republish, with model and MySQL/SQLite triggers blocking rewrites and deletion/reuse. Historical backfill preserves known slugs without inventing dates or edit events. See [catalog administration](../catalog-administration.md).
 
@@ -64,6 +66,12 @@ Next acceptance work: WP-01 clean boot/operator diagnostics and WP-02 real-brows
 
 The first candidate (`2c5279faa291443d3bec97e101fa51266fde1b74`) passed 205 MySQL tests, including the observed lock race, and failed two admin assertions: relative command errors did not render under Filament's mounted form path. The correction maps domain validation keys to the actual schema path; the assertions remain intact. This first run is diagnostic evidence, not final acceptance. Consult the PR's final verification table for the completed candidate and remaining review/browser gates.
 
+## Protected operator track review — 2026-10-02
+
+October 2 evidence: preceding two-child source `d970ce6`, tree `569ad68401bfef5f901947b08bc8f79b6dc27182`, passed eight targeted Chromium journeys. Publication-guard test source `2d3426c` executed 38 cases / 423 assertions with 14 exact MySQL-only skips (52 reported) and no failures/errors. These source-specific feedback runs are separate from final three-child integration acceptance. Full current-source MySQL/SQLite, frontend/audits, ordinary Chromium/mobile-WebKit, genuine media/retained-graph browsers, strict receipts/aggregate and independent review remain required. Strict reviewed publication APIs own their transaction; legacy immediate APIs deliberately retain caller nesting and can inherit an old MySQL Repeatable Read readiness snapshot. New interactive/scheduling callers must use the strict reviewed boundary.
+
 ## Browser/operator follow-up — 2026-09-09
 
 PR #28 is merged. [PR #29](https://github.com/VASEYDEV/VASEYAUDIO/pull/29) uses isolated Chromium and mobile-viewport WebKit to exercise actual login, CSRF, create/edit validation, keyboard modal focus, stale forms, retained URLs and named publication blockers over HTTP. The publish confirmation now renders domain blockers as a persistent notification because it has no metadata fields for validation messages. Metadata dialogs focus the modal window, recover initial focus after the opening transition when necessary, and preserve focus already inside the form. See [operator/browser verification](../operator-setup-and-verification.md) and the follow-up PR for actual results. This does not claim physical iPhone, production MFA/recovery or full media-to-publication browser acceptance. Continue WP-03 archive/stem safety after the foundation increment is verified and accepted.
+
+Current integrated local feedback at `a85bdc54d93cc47773ecbbbf7052917f7e393fa5`, tree `ee97955bb3e116134ac84329a0ca12ee69e62b9a`: 218 fixed operator cases reported, 189 executed / 2,117 assertions, 29 exact MySQL-only skips, zero failures/errors. TypeScript and applicable Python safeguards passed; all nine targeted Chromium journeys passed with zero skips/retries/flaky cases or test/runner errors (207,303.542 ms), including the new publication guard. Original report SHA-256 is `41d74cbc888996c7dec746e2fea24f5ebc062ac1ffe6e43bfb2e62f3f62d67ea`. This does not replace fresh full hosted source-bound acceptance.

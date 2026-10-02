@@ -3,7 +3,9 @@
 namespace App\Filament\Resources\TrackResource\Pages;
 
 use App\Domain\Catalog\BulkAddTrackTags;
+use App\Domain\Catalog\BulkUpdateTrackMetadata;
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Catalog\PublishTrack;
 use App\Domain\Catalog\TrackMetadataPresets;
 use App\Filament\Resources\TrackResource;
 use App\Models\User;
@@ -31,6 +33,21 @@ class ManageTracks extends ManageRecords
     #[Locked]
     public array $lastTagAdditions = [];
 
+    #[Locked]
+    public ?array $bulkMetadataReview = null;
+
+    #[Locked]
+    public array $lastMetadataChoices = [];
+
+    #[Locked]
+    public ?array $bulkMetadataTableContext = null;
+
+    #[Locked]
+    public ?array $publicationReview = null;
+
+    #[Locked]
+    public ?array $publicationTableContext = null;
+
     /** This is the copy shown in the draft form, never a live link to the preset. */
     #[Locked]
     public ?array $presetMetadataSnapshot = null;
@@ -40,6 +57,7 @@ class ManageTracks extends ManageRecords
 
     public function boot(): void
     {
+        request()->attributes->set('_track_private_review', true);
         $this->activeMetadataPresets = null;
         $actor = $this->actor();
         $panel = Filament::getCurrentOrDefaultPanel();
@@ -53,6 +71,49 @@ class ManageTracks extends ManageRecords
         Gate::forUser($actor)->authorize('administer-catalog');
 
         return $actor;
+    }
+
+    public function reviewPublication(Track $record, string $intent): void
+    {
+        $this->publicationReview = null;
+        $this->publicationTableContext = null;
+        $action = $this->getMountedAction();
+        if (! in_array($intent, ['publish', 'unpublish'], true) || $action?->getName() !== $intent
+            || ! ($action->getRecord() instanceof Track) || (int) $action->getRecord()->id !== (int) $record->id) {
+            throw ValidationException::withMessages(['publication' => 'Open the current track confirmation again.']);
+        }
+        // Filament invokes this mount callback before opening the confirmation. Never recreate it during submit.
+        $this->publicationReview = app(PublishTrack::class)->review($record, $this->actor(), $intent);
+        $this->publicationTableContext = $this->metadataTableContext();
+    }
+
+    public function applyReviewedPublication(Track $record, Action $action, string $intent): void
+    {
+        $review = $this->publicationReview;
+        $context = $this->publicationTableContext;
+        $this->publicationReview = null; // Consume before authority checks, validation or a possible uncertain result.
+        $this->publicationTableContext = null;
+        try {
+            $actor = $this->actor();
+            if ($review === null || $context !== $this->metadataTableContext()
+                || ! in_array($intent, ['publish', 'unpublish'], true) || $this->getMountedAction() !== $action
+                || $action->getName() !== $intent || ! ($action->getRecord() instanceof Track)
+                || (int) $action->getRecord()->id !== (int) $record->id
+                || ($review['actor_id'] ?? null) !== (int) $actor->id
+                || ($review['track_id'] ?? null) !== (int) $record->id || ($review['intent'] ?? null) !== $intent) {
+                throw ValidationException::withMessages(['publication' => 'The confirmation changed. Open the current track confirmation again.']);
+            }
+            if ($intent === 'publish') {
+                app(PublishTrack::class)->publishReviewed($review, $actor);
+            } else {
+                app(PublishTrack::class)->unpublishReviewed($review, $actor);
+            }
+        } catch (ValidationException $exception) {
+            // Confirmations have no metadata form fields in which to display domain errors.
+            Notification::make()->danger()->title('Publication blocked')
+                ->body(implode(' ', array_merge(...array_values($exception->errors()))))->persistent()->send();
+            $action->cancel();
+        }
     }
 
     public function reviewTagAdditions(array $data): void
@@ -144,6 +205,184 @@ class ManageTracks extends ManageRecords
         return $ids;
     }
 
+    public function reviewMetadataChanges(array $data): void
+    {
+        $this->bulkMetadataReview = null;
+        $this->bulkMetadataTableContext = null;
+        try {
+            if (array_diff(array_keys($data), ['changes']) || ! is_array($data['changes'] ?? null)) {
+                throw ValidationException::withMessages(['changes' => 'Choose the metadata changes to review.']);
+            }
+            // Pass the exact proposal. The domain rejects unexpected keys; hidden Keep/Clear values are not dehydrated by the form.
+            $review = app(BulkUpdateTrackMetadata::class)->review($this->selectedMetadataTrackIds(), $data['changes'], $this->actor());
+        } catch (ValidationException $exception) {
+            if ($this->getMountedAction() === null) {
+                throw $exception;
+            }
+            $path = $this->getSchema($this->getMountedActionSchemaName())->getStatePath();
+            $errors = [];
+            foreach ($exception->errors() as $field => $messages) {
+                $visible = preg_match('/\Achanges\.(artist|bpm|musical_key|genre|mood)\.(mode|value)\z/D', $field) ? $field : 'changes.artist.mode';
+                if (str_ends_with($visible, '.value') && data_get($data, str_replace('.value', '.mode', $visible)) !== 'set') {
+                    $visible = str_replace('.value', '.mode', $visible);
+                }
+                $errors[$path.'.'.$visible] = [...($errors[$path.'.'.$visible] ?? []), ...$messages];
+            }
+            throw ValidationException::withMessages($errors);
+        }
+        $this->lastMetadataChoices = ['changes' => $review['changes']];
+        $this->bulkMetadataReview = $review;
+        $this->bulkMetadataTableContext = $this->metadataTableContext();
+        $this->replaceMountedAction('reviewMetadataChanges');
+        $this->forceRender();
+    }
+
+    public function reviewMetadataChangesAction(): Action
+    {
+        return Action::make('reviewMetadataChanges')->modalHeading('Review metadata changes')
+            ->disabled(fn (): bool => $this->bulkMetadataReview === null)
+            ->extraModalWindowAttributes(TrackResource::metadataModalAttributes())
+            ->modalContent(fn () => view('filament.catalog.review-track-metadata', ['review' => $this->bulkMetadataReview]))
+            ->modalSubmitActionLabel('Save reviewed metadata')->modalCancelActionLabel('Cancel')
+            ->extraModalFooterActions([Action::make('backToMetadataChanges')->label('Back to metadata choices')->color('gray')
+                ->action(fn () => $this->backToMetadataChanges())])
+            ->action(fn () => $this->applyReviewedMetadataChanges());
+    }
+
+    public function backToMetadataChanges(): void
+    {
+        $this->bulkMetadataReview = null;
+        $this->bulkMetadataTableContext = null;
+        $this->replaceMountedAction('editMetadata', context: ['table' => true, 'bulk' => true]);
+        $this->forceRender();
+    }
+
+    public function applyReviewedMetadataChanges(): void
+    {
+        $review = $this->bulkMetadataReview;
+        $context = $this->bulkMetadataTableContext;
+        $this->bulkMetadataReview = null; // Consume once, even if the database outcome is unknown.
+        $this->bulkMetadataTableContext = null;
+        try {
+            if ($review === null || $context !== $this->metadataTableContext()
+                || $this->selectedMetadataTrackIds() !== array_column($review['tracks'], 'id')) {
+                throw ValidationException::withMessages(['changes' => 'The selection or table view changed. Select and review the current tracks again.']);
+            }
+            $result = app(BulkUpdateTrackMetadata::class)->apply($review, $this->actor());
+        } catch (AuthorizationException $exception) {
+            throw $exception;
+        } catch (ValidationException $exception) {
+            Notification::make()->danger()->title('No changes were saved by this attempt.')
+                ->body(implode(' ', array_merge(...array_values($exception->errors()))))->persistent()->send();
+            $this->backToMetadataChanges();
+
+            return;
+        } catch (Throwable $exception) {
+            report($exception);
+            Notification::make()->danger()->title('The save result could not be confirmed.')
+                ->body('Reload tracks and review current metadata before trying again.')->persistent()->send();
+            $this->lastMetadataChoices = [];
+
+            return;
+        }
+        $changed = count($result['changed_ids']);
+        $unchanged = count($result['unchanged_ids']);
+        Notification::make()->success()->title($changed === 0
+            ? "No metadata changed. All {$unchanged} reviewed tracks already matched these choices."
+            : "Metadata saved for {$changed} tracks. {$unchanged} tracks already matched these choices.")->send();
+        $this->lastMetadataChoices = [];
+        $this->deselectAllTableRecords();
+    }
+
+    private function selectedMetadataTrackIds(): array
+    {
+        if ($this->isTrackingDeselectedTableRecords || ! array_is_list($this->selectedTableRecords)
+            || count($this->selectedTableRecords) < 1 || count($this->selectedTableRecords) > 25) {
+            throw ValidationException::withMessages(['changes' => 'Select between 1 and 25 explicit tracks on the current page.']);
+        }
+        $ids = [];
+        foreach ($this->selectedTableRecords as $id) {
+            if ((! is_int($id) && ! is_string($id)) || ! preg_match('/\A[1-9][0-9]*\z/D', (string) $id)
+                || (string) (int) $id !== (string) $id) {
+                throw ValidationException::withMessages(['changes' => 'Select valid track IDs on the current page.']);
+            }
+            $ids[] = (int) $id;
+        }
+        if (count(array_unique($ids, SORT_NUMERIC)) !== count($ids)) {
+            throw ValidationException::withMessages(['changes' => 'Select distinct tracks on the current page.']);
+        }
+        if (! in_array((string) $this->getTableRecordsPerPage(), ['5', '10', '25', '50'], true)) {
+            throw ValidationException::withMessages(['changes' => 'Choose a supported table page size, then select the current tracks again.']);
+        }
+        $this->flushCachedTableRecords();
+        $visibleIds = [];
+        foreach ($this->getTableRecords() as $track) {
+            $visibleIds[] = (int) $track->id;
+        }
+        if (array_diff($ids, $visibleIds)) {
+            throw ValidationException::withMessages(['changes' => 'Select only tracks visible on the current filtered table page.']);
+        }
+        sort($ids, SORT_NUMERIC);
+
+        return $ids;
+    }
+
+    private function metadataTableContext(): array
+    {
+        return ['page' => (string) $this->getTablePage(), 'per_page' => (string) $this->getTableRecordsPerPage(),
+            'search' => $this->tableSearch, 'column_searches' => $this->tableColumnSearches,
+            'filters' => $this->tableFilters, 'deferred_filters' => $this->tableDeferredFilters, 'sort' => $this->tableSort];
+    }
+
+    public function updating(string $property, mixed $value): void
+    {
+        $root = explode('.', $property)[0];
+        if (in_array($root, ['selectedTableRecords', 'deselectedTableRecords', 'isTrackingDeselectedTableRecords', 'mountedActions',
+            'tableSearch', 'tableColumnSearches', 'tableFilters', 'tableDeferredFilters', 'tableSort', 'tableRecordsPerPage', 'paginators'], true)) {
+            $this->invalidatePublicationReview();
+            $this->invalidateMetadataReview();
+        }
+    }
+
+    public function updatingPaginators(mixed $page, string $pageName): void
+    {
+        if ($pageName === $this->getTablePaginationPageName()) {
+            $this->invalidatePublicationReview();
+            $this->invalidateMetadataReview();
+        }
+    }
+
+    public function mountAction(string $name, array $arguments = [], array $context = []): mixed
+    {
+        $this->publicationReview = null;
+        $this->publicationTableContext = null;
+        if (! in_array($name, ['reviewMetadataChanges', 'backToMetadataChanges'], true)) {
+            $this->invalidateMetadataReview();
+        }
+
+        return parent::mountAction($name, $arguments, $context);
+    }
+
+    private function invalidatePublicationReview(): void
+    {
+        $hadReview = $this->publicationReview !== null;
+        $this->publicationReview = null;
+        $this->publicationTableContext = null;
+        if ($hadReview) {
+            $this->unmountAction();
+        }
+    }
+
+    private function invalidateMetadataReview(): void
+    {
+        $hadReview = $this->bulkMetadataReview !== null;
+        $this->bulkMetadataReview = null;
+        $this->bulkMetadataTableContext = null;
+        if ($hadReview) {
+            $this->unmountAction();
+        }
+    }
+
     public function updatedSelectedTableRecords(): void
     {
         $this->invalidateTagReview();
@@ -161,6 +400,7 @@ class ManageTracks extends ManageRecords
 
     public function updatedMountedActions(): void
     {
+        $this->invalidatePublicationReview();
         $this->invalidateTagReview();
         if (($this->mountedActions[array_key_last($this->mountedActions)]['name'] ?? null) !== 'createPresetDraft') {
             $this->presetMetadataSnapshot = null;
@@ -178,6 +418,10 @@ class ManageTracks extends ManageRecords
     public function unmountAction(bool|string|null $cancelParentActions = null): void
     {
         $this->bulkTagReview = null;
+        $this->bulkMetadataReview = null;
+        $this->bulkMetadataTableContext = null;
+        $this->publicationReview = null;
+        $this->publicationTableContext = null;
         $this->presetMetadataSnapshot = null;
         parent::unmountAction($cancelParentActions);
     }

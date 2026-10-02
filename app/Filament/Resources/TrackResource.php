@@ -4,17 +4,21 @@ namespace App\Filament\Resources;
 
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublicationReadiness;
-use App\Domain\Catalog\PublishTrack;
+use App\Domain\Catalog\ReadPrivateTrackReview;
 use App\Domain\Catalog\SaveTrackMetadata;
 use App\Filament\Resources\TrackResource\Pages\ManageTracks;
+use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -77,26 +81,77 @@ class TrackResource extends OperatorResource
                     ->helperText('Add exact tags to up to 25 selected tracks. Existing tags stay in order; each track can contain at most 20 tags.')])
                 ->fillForm(fn (ManageTracks $livewire) => ['additions' => $livewire->lastTagAdditions])
                 ->action(fn (array $data, ManageTracks $livewire) => $livewire->reviewTagAdditions($data)),
+            BulkAction::make('editMetadata')->label('Edit metadata')->fetchSelectedRecords(false)
+                ->modalHeading('Edit metadata for selected tracks')->modalSubmitActionLabel('Review metadata changes')
+                ->extraModalWindowAttributes(static::metadataModalAttributes())
+                ->modalDescription('Choose what changes for up to 25 selected tracks on this page. Review every current and proposed value before saving.')
+                ->schema(static::bulkMetadataFields())
+                ->fillForm(fn (ManageTracks $livewire): array => $livewire->lastMetadataChoices === []
+                    ? ['changes' => array_fill_keys(array_keys(static::bulkMetadataLabels()), ['mode' => 'keep'])]
+                    : $livewire->lastMetadataChoices)
+                ->action(fn (array $data, ManageTracks $livewire) => $livewire->reviewMetadataChanges($data)),
         ])->recordActions([
+            Action::make('reviewTrack')->label('Review track')->modalHeading('Private track review')
+                ->extraModalWindowAttributes(static::metadataModalAttributes())
+                ->modalSubmitAction(false)->modalCancelActionLabel('Close')
+                ->modalContent(function (Track $record) {
+                    $actor = auth()->user();
+                    abort_unless($actor instanceof User, 403);
+
+                    // Read and authorize now, before returning the view. No projection is retained in Livewire state.
+                    $review = app(ReadPrivateTrackReview::class)->handle((int) $record->id, $actor);
+
+                    return view('filament.catalog.private-track-review', ['review' => $review]);
+                }),
             EditAction::make()->extraModalWindowAttributes(static::metadataModalAttributes())
                 ->using(fn (Track $record, array $data, ManageTracks $livewire) => static::saveMetadata($record, $data, $livewire)),
             Action::make('readiness')->label('Check readiness')->action(function (Track $record) {
                 $blockers = app(PublicationReadiness::class)->blockers($record);
                 Notification::make()->title($blockers === [] ? 'Ready to publish' : 'Publication blocked')->body(implode("\n", $blockers))->persistent()->send();
             }),
-            Action::make('publish')->visible(fn (Track $record) => $record->status !== 'published')->requiresConfirmation()->action(function (Track $record, Action $action) {
-                try {
-                    app(PublishTrack::class)->handle($record, auth()->user());
-                } catch (ValidationException $exception) {
-                    // A confirmation has no metadata form fields to display domain errors.
-                    Notification::make()->danger()->title('Publication blocked')
-                        ->body(implode(' ', array_merge(...array_values($exception->errors()))))->persistent()->send();
-                    $action->cancel();
-                }
-            }),
+            Action::make('publish')->visible(fn (Track $record) => $record->status !== 'published')->requiresConfirmation()->databaseTransaction(false)
+                ->mountUsing(function (Track $record, ManageTracks $livewire, ?Schema $schema = null): void {
+                    $livewire->reviewPublication($record, 'publish');
+                    $schema?->fill();
+                })
+                ->action(fn (Track $record, Action $action, ManageTracks $livewire) => $livewire->applyReviewedPublication($record, $action, 'publish')),
             Action::make('share')->visible(fn (Track $record) => $record->status === 'published')->url(fn (Track $record) => route('tracks.show', $record->slug))->openUrlInNewTab(),
-            Action::make('unpublish')->visible(fn (Track $record) => $record->status === 'published')->requiresConfirmation()->action(fn (Track $record) => app(PublishTrack::class)->unpublish($record, auth()->user())),
+            Action::make('unpublish')->visible(fn (Track $record) => $record->status === 'published')->requiresConfirmation()->databaseTransaction(false)
+                ->mountUsing(function (Track $record, ManageTracks $livewire, ?Schema $schema = null): void {
+                    $livewire->reviewPublication($record, 'unpublish');
+                    $schema?->fill();
+                })
+                ->action(fn (Track $record, Action $action, ManageTracks $livewire) => $livewire->applyReviewedPublication($record, $action, 'unpublish')),
         ]);
+    }
+
+    public static function bulkMetadataLabels(): array
+    {
+        return ['artist' => 'Artist', 'bpm' => 'BPM', 'musical_key' => 'Musical key', 'genre' => 'Genre', 'mood' => 'Mood'];
+    }
+
+    public static function bulkMetadataFields(): array
+    {
+        $fields = [];
+        foreach (static::bulkMetadataLabels() as $field => $label) {
+            $isSet = fn (Get $get): bool => $get('changes.'.$field.'.mode') === 'set';
+            $input = TextInput::make('changes.'.$field.'.value')->label($label.' value')
+                ->visible($isSet)->required($isSet)->dehydrated($isSet);
+            if ($field === 'bpm') {
+                $input->integer()->minValue(20)->maxValue(400);
+            } else {
+                $input->maxLength($field === 'musical_key' ? 24 : 255);
+            }
+            $fields[] = Section::make($label)->columns(2)->schema([
+                Select::make('changes.'.$field.'.mode')->label($label.' change')->native()->required()->live()
+                    ->options(['keep' => 'Keep', 'set' => 'Set', ...($field === 'artist' ? [] : ['clear' => 'Clear'])])
+                    ->default('keep')->selectablePlaceholder(false)
+                    ->helperText($field === 'artist' ? 'Keep the current artist or set a required artist value.' : 'Keep the current value, set a value, or clear it.'),
+                $input,
+            ]);
+        }
+
+        return $fields;
     }
 
     public static function saveMetadata(?Track $record, array $data, ManageTracks $livewire): Track

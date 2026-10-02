@@ -63,6 +63,21 @@ class SelectionTests(unittest.TestCase):
             self.assertIn(target, focused.PHP_TARGETS["operator"])
         self.assertIn("tests/browser/track-metadata-presets.spec.ts", focused.BROWSER_TARGETS)
 
+    def test_bulk_metadata_is_in_operator_and_browser_feedback(self):
+        for target in ("tests/Feature/BulkUpdateTrackMetadataTest.php", "tests/Feature/BulkUpdateTrackMetadataConcurrencyTest.php"):
+            self.assertIn(target, focused.PHP_TARGETS["operator"])
+        self.assertIn("tests/browser/bulk-track-metadata.spec.ts", focused.BROWSER_TARGETS)
+
+    def test_private_track_review_is_in_operator_and_browser_feedback(self):
+        for target in ("tests/Feature/PrivateTrackReviewTest.php", "tests/Feature/PrivateTrackReviewPrivacyTest.php"):
+            self.assertIn(target, focused.PHP_TARGETS["operator"])
+        self.assertIn("tests/browser/private-track-review.spec.ts", focused.BROWSER_TARGETS)
+
+    def test_reviewed_track_publication_is_in_operator_and_browser_feedback(self):
+        for target in ("tests/Feature/TrackPublicationGuardTest.php", "tests/Feature/TrackPublicationGuardMigrationTest.php", "tests/Feature/TrackPublicationGuardConcurrencyTest.php"):
+            self.assertIn(target, focused.PHP_TARGETS["operator"])
+        self.assertIn("tests/browser/track-publication-guard.spec.ts", focused.BROWSER_TARGETS)
+
     def test_mysql_only_reaches_php_modes_and_browser_reports_isolated_sqlite(self):
         for suite in focused.PHP_TARGETS:
             self.assertEqual(focused.selection({"FOCUSED_SUITE": suite, "FOCUSED_ENGINE": "mysql"}).engine, "mysql")

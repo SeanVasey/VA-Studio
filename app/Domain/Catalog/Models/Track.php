@@ -15,7 +15,7 @@ class Track extends Model
 
     protected function casts(): array
     {
-        return ['bpm' => 'integer', 'metadata_version' => 'integer', 'tags' => 'array', 'waveform' => 'array', 'published_at' => 'datetime'];
+        return ['bpm' => 'integer', 'metadata_version' => 'integer', 'publication_version' => 'integer', 'tags' => 'array', 'waveform' => 'array', 'published_at' => 'datetime'];
     }
 
     protected static function booted(): void

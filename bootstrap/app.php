@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\InquiryPrivacy;
+use App\Http\Middleware\PrivateTrackReviewPrivacy;
 use App\Http\Middleware\SitePreviewPrivacy;
 use App\Http\Middleware\StripeWebhookBodyLimit;
 use App\Http\Middleware\TestDeliveryPrivacy;
@@ -33,6 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(TestDeliveryPrivacy::class);
         $middleware->prepend(SitePreviewPrivacy::class);
         $middleware->prepend(InquiryPrivacy::class);
+        $middleware->prepend(PrivateTrackReviewPrivacy::class);
         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
         $middleware->web(append: [HandleInertiaRequests::class]);
     })
@@ -41,6 +43,14 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
         );
         $exceptions->report(function (Throwable $exception) {
+            if (PrivateTrackReviewPrivacy::matches(request())) {
+                try {
+                    Log::error('Private track review failed.', ['exception_class' => $exception::class]);
+                } catch (Throwable) { /* Keep private failures generic if reporting fails. */
+                }
+
+                return false;
+            }
             if (PublicTrackEmbedResponse::matches(request())) {
                 try { Log::error('Public track preview failed.', ['exception_class' => $exception::class]); }
                 catch (Throwable) { /* Preserve the generic public response if reporting fails. */ }
@@ -85,6 +95,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // Middleware failures occur before the controller. Keep those private and
         // generic too, including in debug mode, without changing other routes.
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request): Response {
+            if (PrivateTrackReviewPrivacy::matches($request)) {
+                $status = $exception instanceof ValidationException ? $exception->status : $response->getStatusCode();
+
+                return $status >= 400 ? PrivateTrackReviewPrivacy::error($status, $response) : PrivateTrackReviewPrivacy::protect($response);
+            }
             if (PublicTrackEmbedResponse::matches($request)) {
                 return PublicTrackEmbedResponse::error($response->getStatusCode(), $response);
             }

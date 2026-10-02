@@ -18,7 +18,23 @@ A slug remains editable until the track is first published. After that, its URL 
 
 In **Tracks → Create from preset**, choose an active preset, then review its copied values in the ordinary metadata form and supply the new title and URL. **Create private draft** invokes the existing metadata command under a fresh locked staff/MFA check. Values are copied once: changes or archival after the form opens do not silently replace the reviewed values, and later preset changes never mutate saved tracks. This is explicit reusable authoring, not automatic publication or a commercial license preset.
 
-See [the T12 preset evidence](verification/track-metadata-presets.md) for actual verification and remaining acceptance boundaries. Broader bulk metadata/licensing, track scheduling, private review, granular permissions and production recovery remain tracked work.
+The preset child is accepted in PR #95; [its evidence](verification/track-metadata-presets.md) records exact source and full verification. Reviewed bulk metadata, protected staff review and manual publication guards below form the next combined candidate. Broader license operations, track scheduling, granular permissions and production recovery remain tracked work.
+
+## Reviewed bulk metadata edits
+
+Tracks also offers **Edit metadata** for 1–25 explicit tracks on the current filtered page. Artist, BPM, musical key, genre and mood start at Keep; Set supplies an ordinary valid value and Clear is available for nullable fields. Review displays exact current/proposed values before **Save reviewed metadata**. A changed selection/table view or stale target requires a fresh review. The command checks current locked authority/MFA and applies the entire reviewed batch atomically through `SaveTrackMetadata`, retaining all other fields and per-track audit evidence. See [the bulk metadata evidence](verification/bulk-track-metadata.md) for actual checks, recovery and hosted acceptance gates.
+
+## Protected operator track review
+
+**Review track** opens a close-only private staff modal with current descriptive metadata, ordinary publication blockers and verified artwork/tagged preview or explicit unavailable states. It uses fresh persisted authority/MFA and exact protected derivative URLs; it cannot edit or publish a track and grants no anonymous access. Reopening reads current values. See [protected review evidence](verification/private-track-review.md) for privacy, read-only guarantees and actual acceptance gates.
+
+## Reviewed manual publication
+
+**Publish** and **Unpublish** confirmations capture the current track, intent, metadata revision and monotonic publication revision when opened. A metadata edit or intervening publication cycle rejects the old confirmation even if status and timestamps return to their previous values. Close and reopen to review current state; Cancel, another action or a changed table context consumes the confirmation. Publication still requires ordinary current readiness, and every supported publication command increments the counter with its audit in one transaction.
+
+Interactive actions use `PublishTrack::review`, `publishReviewed` and `unpublishReviewed`. These APIs require their own transaction, lock the current actor/Gate/MFA before the track and verify both revisions and state before writing. The retained immediate `handle`/`unpublish` compatibility commands use a supplied Track only as identity and retain caller transaction semantics; a caller's old MySQL Repeatable Read snapshot can still affect ordinary readiness children. They are trusted server compatibility APIs, not an interactive or future scheduling boundary. New such callers must use the strict reviewed APIs and their separate scheduling evidence contract.
+
+Migration `2026_10_02_000034_track_publication_version.php` adds a signed integer counter starting at zero for retained tracks without inventing history. Range/nondecrease triggers retain published URL and audit evidence; `down()` preserves the column, counter values and guards. For interface rollback, disable reviewed actions until compatible application code is restored; never reset counters or remove retained audits. Arbitrary privileged SQL that changes status without advancing the counter is outside the supported publication command contract. See [publication-guard evidence](verification/track-publication-guards.md) for schema recovery, executed development checks and full acceptance gates. No track schedule, publication window or production deployment is supplied by this child.
 
 ## Command and audit boundary
 
@@ -42,6 +58,6 @@ Apply migrations before deploying this code, with catalog writers paused during 
 
 `TrackMetadataConcurrencyTest` runs two independent PHP/MySQL workers. Both reach the lock boundary with the same expected revision; the winner holds its lock until an independent observer proves the loser is waiting on that exact primary-key row. One save commits and the other reports a revision conflict. SQLite intentionally skips this MySQL-only acceptance test.
 
-The PR must record completed PHP/MySQL, PHP/SQLite, frontend/build and dependency audit results. PHP/Composer and frontend dependencies are absent from the current editing workspace, so no local application execution is claimed. Real-browser modal/focus/error acceptance, operator boot/diagnostics and independent authorization/migration review remain open. Continue them in the [ordered handoff](development-order.md), then the retained Phase 1 media/rights work.
+The original metadata increment's PR records its accepted checks; the dated initial editing-runtime limitation is historical. New child evidence records actual local PHP/SQLite and Chromium feedback and the accepted preset run. The three-child authoring candidate still requires final current-source full MySQL/SQLite, frontend/build/audits, Chromium/mobile-WebKit, genuine media and independent review. Follow the [ordered record](development-order.md) for exact source/run acceptance; broader production/device acceptance remains open.
 
 Implementation references: [Filament custom edit persistence](https://filamentphp.com/docs/5.x/actions/edit), [Filament action testing](https://filamentphp.com/docs/5.x/testing/testing-actions), [Laravel validation](https://laravel.com/framework/docs/validation). Runtime tests against committed lockfiles provide compatibility evidence.
