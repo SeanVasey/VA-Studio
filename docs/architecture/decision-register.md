@@ -2,6 +2,38 @@
 
 As of 2026-09-04. This is the initial register; entry keys are local tracking keys, not claims of historic accepted ADRs. Append dated changes and evidence instead of rewriting decision history.
 
+## T12-RIGHTS-EVIDENCE-GUARD-01: retain verified rights evidence
+
+October 2, 2026. Planned bounded prerequisite for the existing T12 / WP-02 publication-evidence apply boundary, supporting WP-04's evidence-retention invariant. This is a design/acceptance brief, not an implemented guard or a new completed row in the 40-task register.
+
+### Existing rule and reproduced gap
+
+`RightsDeclaration` already requires verified evidence to be immutable and corrections to use a new declaration. Its updating hook checks the retained model's original status. A model loaded while pending can therefore update the row after a separate verifier has persisted verified status, without changing the original verifier/time or adding a new verification audit.
+
+An isolated source-bound probe on `81536814421b32f4235aa88b578d5e8e6c96b23b`, tree `9d74f3ebd276b32bfd86cf861d94cbaef55a6b8c`, executed nine cases / 48 assertions. It reproduced stale-model evidence changes and cross-track retargeting, raw SQL mutation and deletion of an unreferenced verified declaration. A fresh verified model refuses the update. A separately strengthened mounted-admin control passed one case / nine assertions: the pending edit actually mounted with exact data, then saving after verification left the verified row unchanged. No HTTP interleaving exploit or MySQL race was proved. The relevant source/vendor files remain byte-identical in accepted PR #104.
+
+The same probe separately demonstrates an unenrolled direct verifier under required panel MFA and a controlled gap between the pretransaction Gate read and the write. These require a later current-authority/MFA writer boundary; SQL evidence guards alone do not resolve them.
+
+### Bounded next implementation
+
+Add a forward rights-evidence guard migration, dedicated behavior/migration tests and exact fixture adaptations. Own the new migration after `000034`, new rights-immutability test/support files and the verification ledgers. Coordinate any existing-test edits by file; do not change commercial values, policy text or immutable snapshots.
+
+- Protect persisted verified declarations against ordinary updates, deletion and replacement/upsert bypasses. Exercise explicit-ID and engine-specific replacement behavior rather than assuming deletion triggers cover it.
+- Cover parent-track deletion/replacement and foreign-key cascades before claiming complete ordinary-DML retention. State any remaining boundary explicitly.
+- Keep pending edits, ordinary pending-to-verified service transitions and genuinely new declarations available. Historical rows and their original audits remain unchanged; no migration fabricates approval evidence.
+- Preflight the real schema, owned guard names/definitions and temporary/shadow ownership before DDL. Refuse foreign definitions, resume a recognized interrupted installation, and preserve evidence protection during operational rollback.
+- Preserve byte-exact retained offer revisions and original quote/order/grant/contract evidence. Newest pending declarations continue to block new readiness under existing semantics; they never rewrite an earlier verified row.
+
+Four existing tests intentionally downgrade verified declarations: `BulkTrackTagsTest`, `BulkUpdateTrackMetadataTest`, `TrackPublicationGuardTest` and `ExclusiveOfferTest`. Replace those synthetic setup mutations with a newer pending declaration while retaining every existing refusal, stale-review and whole-batch atomicity assertion.
+
+### Acceptance and following dependency
+
+Meaningful regression coverage must reproduce the stale model first, then prove current stored verified evidence is retained across model/query/raw SQL, replacement/upsert and indirect deletion paths on both supported engines. Include migration recovery/refusal cases and a genuine independent-process MySQL writer wait if concurrency protection is claimed. Any MySQL-only test must have its exact reviewed SQLite skip identity and actual positive MySQL execution; SQLite does not prove the lock contract.
+
+After the SQL retention floor, centralize supported rights writers with fresh transactional authority/MFA, compatible actor/track/rights locks and explicit reviewed identity. The subsequent manifest apply boundary also needs compatible exclusive-scope/currentness fencing and honest physical-byte proof. Existing exclusive writers and finalization have different cross-family lock orders; a static potential cycle is not an executed MySQL deadlock proof. Do not introduce a reverse lock order from the track reader without reviewing all participating writers.
+
+Enforcing the existing immutable-evidence rule needs no new legal or scheduling decision. Production clearance/reviewer policy, recovery roles, financial rights consequences or retention exemptions remain separate owner-policy work. Track lead time, horizon, precision, grace and pending-schedule disposition after manual publication remain undecided; site-release timing rules do not transfer to tracks. This prerequisite provides no schedule, retained publication approval, apply fence or production activation.
+
 ## D-07 confirmed — single-seller personal-use store (2026-09-30)
 
 **Explicit owner decision.** Sean clarified that the BeatStars replacement is for his personal business use: upload, publish, share, license and sell his own content to front-end listeners and customers. It is not a competing platform for multiple independent sellers. This confirms the existing first-party house-store direction.
