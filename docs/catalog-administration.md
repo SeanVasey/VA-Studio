@@ -12,6 +12,14 @@ The edit form carries the metadata revision loaded when it opened. If another sa
 
 A slug remains editable until the track is first published. After that, its URL stays reserved even when it is unpublished. The form explains the restriction, the command/model reject bypass attempts and the database blocks raw SQL rewrites, reservation clearing and deletion/reuse. Unpublishing removes the public page; republishing restores the same URL. Published track records must be retained. A future rename workflow must preserve redirects before this rule can be relaxed.
 
+## Reusable metadata presets
+
+**Admin → Track metadata presets** manages named artist, BPM, musical key, genre, mood, ordered tags and description defaults. Create/edit saves use an expected version and transactional minimized audit; unchanged saves are no-ops. Archive retains a preset and removes it from new-draft selection. Presets do not carry a title, URL, publication state, media, rights, offer or price.
+
+In **Tracks → Create from preset**, choose an active preset, then review its copied values in the ordinary metadata form and supply the new title and URL. **Create private draft** invokes the existing metadata command under a fresh locked staff/MFA check. Values are copied once: changes or archival after the form opens do not silently replace the reviewed values, and later preset changes never mutate saved tracks. This is explicit reusable authoring, not automatic publication or a commercial license preset.
+
+See [the T12 preset evidence](verification/track-metadata-presets.md) for actual verification and remaining acceptance boundaries. Broader bulk metadata/licensing, track scheduling, private review, granular permissions and production recovery remain tracked work.
+
 ## Command and audit boundary
 
 `SaveTrackMetadata::handle(?Track, array, User)` authorizes verified `is_admin` staff before reading or writing the target. Existing records require `metadata_version`; creation cannot supply one. Only the listed metadata plus that expected revision is accepted. The command reads/locks the current row before merging omitted fields and comparing the expected revision. The unique slug index arbitrates conflicting URL claims.

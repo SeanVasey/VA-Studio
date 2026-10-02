@@ -65,6 +65,8 @@ PHP_TARGETS = {
         "tests/Feature/FoundationTest.php", "tests/Feature/OperatorSetupTest.php",
         "tests/Feature/OperatorAuthorityTest.php", "tests/Feature/OperatorMfaTest.php",
         "tests/Feature/TrackMetadataTest.php", "tests/Feature/LicensingAdminTest.php",
+        "tests/Feature/TrackMetadataPresetsTest.php", "tests/Feature/TrackMetadataPresetsConcurrencyTest.php",
+        "tests/Feature/TrackMetadataPresetsMigrationTest.php",
         "tests/Feature/BulkTrackTagsTest.php", "tests/Feature/BulkTrackTagsConcurrencyTest.php",
     ),
 }
@@ -90,6 +92,7 @@ BROWSER_TARGETS = (
     "tests/browser/contact-inquiry.spec.ts", "tests/browser/contact-inquiry-persistence.spec.ts",
     "tests/browser/public-track-embed.spec.ts",
     "tests/browser/track-bulk-tags.spec.ts",
+    "tests/browser/track-metadata-presets.spec.ts",
     "tests/browser/editorial-content.spec.ts", "tests/browser/site-content.spec.ts", "tests/browser/site-schedule.spec.ts",
 )
 SUITES = (*PHP_TARGETS, "frontend", "browser")

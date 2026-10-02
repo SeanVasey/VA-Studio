@@ -253,6 +253,18 @@
     [
       "Tests\\Feature\\TrackMetadataConcurrencyTest",
       "test_overlapping_edits_wait_on_the_same_row_and_only_one_revision_is_saved"
+    ],
+    [
+      "Tests\\Feature\\TrackMetadataPresetsConcurrencyTest",
+      "test_every_domain_operation_rejects_revocation_hidden_by_an_old_repeatable_read_snapshot"
+    ],
+    [
+      "Tests\\Feature\\TrackMetadataPresetsConcurrencyTest",
+      "test_overlapping_edits_wait_on_the_exact_preset_row_and_only_one_revision_is_saved"
+    ],
+    [
+      "Tests\\Feature\\TrackMetadataPresetsConcurrencyTest",
+      "test_snapshot_and_archive_serialize_on_the_exact_preset_row"
     ]
   ]
 }
