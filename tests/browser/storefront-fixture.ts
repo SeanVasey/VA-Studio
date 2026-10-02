@@ -49,7 +49,7 @@ async function serveAudio(route: Route) {
 
 declare global { interface Window { __nativePreviews: HTMLAudioElement[] } }
 
-export async function storefrontFixture(page: Page, options: { failFirstTerms?: boolean; testOrderPreparationEnabled?: boolean } = {}) {
+export async function storefrontFixture(page: Page, options: { failFirstTerms?: boolean; testOrderPreparationEnabled?: boolean; tracks?: Track[] } = {}) {
   const shellResponse = await page.request.get('/');
   expect(shellResponse.ok()).toBe(true);
   const shell = await shellResponse.text();
@@ -67,13 +67,14 @@ export async function storefrontFixture(page: Page, options: { failFirstTerms?: 
       const element = new target(...args); window.__nativePreviews.push(element); return element;
     } });
   });
+  const tracks = options.tracks ?? [fixtureTrack];
   let termsRequests = 0;
   const navigation: string[] = [];
   await page.route('**/*', async route => {
     const request = route.request();
     const url = new URL(request.url());
-    if (url.pathname === '/media/synthetic-browser-preview') return serveAudio(route);
-    if (url.pathname === '/catalog/selections') return route.fulfill({ json: { tracks: [fixtureTrack], licenseTiers: tiers } });
+    if (tracks.some(track => track.previewUrl === url.pathname)) return serveAudio(route);
+    if (url.pathname === '/catalog/selections') return route.fulfill({ json: { tracks, licenseTiers: tiers } });
     const offerIndex = fixtureTrack.offers.findIndex(offer => offer.licenseUrl === url.pathname);
     if (offerIndex !== -1) {
       termsRequests++;
@@ -85,12 +86,13 @@ export async function storefrontFixture(page: Page, options: { failFirstTerms?: 
         deliverableRoles: offer.deliverableRoles, termsText: policyText(offerIndex),
       } });
     }
-    if (request.method() !== 'GET' || !['/', fixtureTrack.shareUrl].includes(url.pathname)) return route.continue();
-    const detail = url.pathname === fixtureTrack.shareUrl;
+    const detailTrack = tracks.find(track => track.shareUrl === url.pathname);
+    if (request.method() !== 'GET' || (url.pathname !== '/' && !detailTrack)) return route.continue();
+    const detail = detailTrack !== undefined;
     const currentUrl = '/' + url.search;
-    const metadata = { ...base.props.metadata, title: detail ? `${fixtureTrack.title} — VASEY.AUDIO` : base.props.metadata.title, canonicalUrl: url.origin + url.pathname, type: detail ? 'music.song' : 'website' };
-    const payload = { ...base, url: url.pathname + url.search, props: { ...base.props, tracks: [fixtureTrack], licenseTiers: tiers,
-      selectedTrack: detail ? fixtureTrack : null, selectedTrackSlug: detail ? fixtureTrack.slug : null, metadata,
+    const metadata = { ...base.props.metadata, title: detail ? `${detailTrack.title} — VASEY.AUDIO` : base.props.metadata.title, canonicalUrl: url.origin + url.pathname, type: detail ? 'music.song' : 'website' };
+    const payload = { ...base, url: url.pathname + url.search, props: { ...base.props, tracks, licenseTiers: tiers,
+      selectedTrack: detailTrack ?? null, selectedTrackSlug: detailTrack?.slug ?? null, metadata,
       testOrderPreparationEnabled: options.testOrderPreparationEnabled ?? base.props.testOrderPreparationEnabled,
       catalogPage: { filters: { q: url.searchParams.get('q') ?? '', genre: url.searchParams.get('genre') ?? '', sort: url.searchParams.get('sort') ?? 'featured' }, previousUrl: null, nextUrl: null, restartUrl: currentUrl, currentUrl, hasCursor: false },
     } };

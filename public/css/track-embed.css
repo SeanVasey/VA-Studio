@@ -1,0 +1,13 @@
+/* The public embed uses the approved local brand tokens and native audio controls. */
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--va-text); background: var(--va-canvas); font-family: var(--va-font-body); }
+main { max-width: 720px; margin: 0 auto; padding: 18px 20px; }
+p, h1 { margin: 0; }
+.brand { color: var(--va-link); font-size: 10px; font-weight: 700; letter-spacing: .08em; }
+h1 { margin-top: 9px; color: var(--va-text-strong); font-size: clamp(19px, 4vw, 27px); line-height: 1.2; overflow-wrap: anywhere; font-family: var(--va-font-impact); font-stretch: extra-condensed; font-weight: 900; font-synthesis: none; }
+.artist { margin-top: 5px; font-size: 13px; overflow-wrap: anywhere; }
+audio { display: block; width: 100%; margin: 14px 0 9px; }
+a { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px; min-height: 44px; color: var(--va-link); font-size: 13px; font-weight: 600; }
+a:focus-visible, audio:focus-visible { outline: 3px solid var(--va-focus); outline-offset: 3px; }
+.new-window { font-size: 11px; font-weight: 400; }
+@media (max-width: 360px) { main { padding: 16px 12px; } }

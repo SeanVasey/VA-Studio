@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\TestCheckoutController;
 use App\Http\Controllers\TestOwnerDeliveryController;
@@ -27,6 +28,7 @@ Route::get('/site-images/{file}', PublicSiteImageController::class)
 // JSON quote boundaries retain web sessions/CSRF but do not pass through Inertia,
 // whose response negotiation replaces the Cookie Vary header.
 Route::withoutMiddleware(HandleInertiaRequests::class)->group(function (): void {
+    Route::post('/contact/inquiries', InquiryController::class)->middleware('throttle:customer-inquiries')->block(20, 5)->name('contact.inquiries');
     Route::get('/tracks/{slug}/offers/{revision}/license', [StorefrontController::class, 'license'])->whereNumber('revision')->middleware('throttle:60,1')->name('tracks.license');
     Route::post('/catalog/selections', [StorefrontController::class, 'selections'])->middleware('throttle:60,1')->name('catalog.selections');
     Route::post('/quotes', [QuoteController::class, 'store'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('quotes.store');
@@ -37,6 +39,7 @@ Route::withoutMiddleware(HandleInertiaRequests::class)->group(function (): void 
     Route::get('/quotes/{quote}/pricing', [QuoteController::class, 'pricing'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('quotes.pricing');
     Route::get('/quotes/{quote}/order-review', [OrderController::class, 'review'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.review');
     Route::post('/orders', [OrderController::class, 'store'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.store');
+    Route::get('/orders/history', [OrderController::class, 'history'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.history');
     Route::get('/orders/{order}/status', [OrderController::class, 'status'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.status');
     Route::get('/quotes/{quote}/order', [OrderController::class, 'forQuote'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.for-quote');
     Route::post('/orders/{order}/checkout', [TestCheckoutController::class, 'start'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.checkout');

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { fileRoleLabels, formatMoney, type LicenseDisclosure } from '../lib/catalog';
 import { TestCheckout, validPaymentProgress, type PaymentProgress } from './TestCheckout';
+import { OwnedTestOrderHistory } from './OwnedTestOrderHistory';
 
 interface PricedLine {
   offerRevisionId: string; quantity: number; baseMinor: number; discountMinor: number;
@@ -18,10 +19,11 @@ interface OrderReview {
   items: Array<{ offerRevisionId: string; title: string; licenseName: string; disclosure: LicenseDisclosure }>;
   testOnly: true; payable: false; reviewHash: string;
 }
-interface PreparedOrder extends PaymentProgress {
-  orderSchema: 1; id: string; quoteId: string; pricingId: string; reviewHash: string; createdAt: string;
+export interface OrderSummary extends PaymentProgress {
+  id: string; createdAt: string;
   status: 'prepared' | 'paid' | 'paid_exception'; testOnly: true; payable: false; currency: 'USD'; totalMinor: number;
 }
+interface PreparedOrder extends OrderSummary { orderSchema: 1; quoteId: string; pricingId: string; reviewHash: string }
 interface Props { quoteId: string; expiresAt: string; offerRevisionIds: string[]; testCheckoutEnabled?: boolean }
 const recoveryStorageKey = 'vaseyaudio-order-recovery-v1';
 const recoveryChangedEvent = 'vaseyaudio-order-recovery-changed';
@@ -103,7 +105,7 @@ async function readPreparedOrder(quoteId: string): Promise<PreparedOrder | null>
   return body.order;
 }
 
-function OrderStatus({ order, testCheckoutEnabled = false }: { order: PreparedOrder; testCheckoutEnabled?: boolean }) {
+function OrderStatus({ order, testCheckoutEnabled = false }: { order: OrderSummary; testCheckoutEnabled?: boolean }) {
   return <div className="quote-review-result" role="status"><h3>{order.paymentStatus === 'verified' ? 'TEST ORDER STATUS' : 'TEST ORDER PREPARED'}</h3><p>Order {order.id}</p><p>Prepared total: {formatMoney(order.totalMinor, order.currency)} {order.currency}</p><p>This prepared record alone does not confirm payment or grant download access or usage rights.</p><TestCheckout orderId={order.id} expectedTotalMinor={order.totalMinor} enabled={testCheckoutEnabled} retainedProgress={order} /></div>;
 }
 
@@ -115,10 +117,12 @@ export function PreparedOrderRecovery({ testCheckoutEnabled = false }: { testChe
     window.addEventListener(recoveryChangedEvent, refresh);
     return () => window.removeEventListener(recoveryChangedEvent, refresh);
   }, []);
-  if (!quoteIds.length) return null;
   return <section className="quote-review" aria-label="Previous test order recovery"><h3>PREVIOUS TEST ORDERS</h3>
+    <OwnedTestOrderHistory renderOrder={order => <OrderStatus order={order} testCheckoutEnabled={testCheckoutEnabled} />} />
+    {quoteIds.length > 0 && <>
     <p className="fine-print">Read-only status for recent preparation attempts in this browser tab. No payment or license is issued.</p>
     {quoteIds.map(quoteId => <RecoveredOrder key={quoteId} quoteId={quoteId} testCheckoutEnabled={testCheckoutEnabled} />)}
+    </>}
   </section>;
 }
 

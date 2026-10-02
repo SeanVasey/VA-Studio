@@ -137,7 +137,7 @@ final class InstallationReport
         // A damaged stored file of an image in the active release is already missing from the live site; each file is hashed.
         $check('site_images', false, function (): bool {
             $release = SiteRelease::find(DB::table('site_publications')->where('id', 1)->value('active_release_id'));
-            if ($release?->schema_version === 3 && is_array($release->content)) {
+            if (in_array($release?->schema_version, [3, 4], true) && is_array($release->content)) {
                 app(SiteImageReferences::class)->verifyFiles($release->content);
             }
 

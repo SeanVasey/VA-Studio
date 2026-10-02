@@ -58,6 +58,36 @@ describe('editorial content and shared navigation', () => {
     expect(fetcher).not.toHaveBeenCalled();
   });
 
+  it('passes the displayed notice token into the enabled public contact form without changing the email fallback', async () => {
+    const token = 'a'.repeat(64);
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({ state: 'saved', receipt: 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee' }), { status: 201, headers: { 'Content-Type': 'application/json' } }));
+    render(<Editorial siteContent={chrome} editorial={{ ...about, section: 'contact', email: 'synthetic@example.test', contactHref: 'mailto:synthetic%40example.test' }} metadata={metadata} contactInquiryEnabled contactInquiryPrivacyNotice="Displayed synthetic notice." contactInquiryNoticeToken={token} />);
+    expect(screen.getByText('Displayed synthetic notice.')).toBeVisible();
+    expect(screen.getByRole('link', { name: /Open email/ })).toHaveAttribute('href', 'mailto:synthetic%40example.test');
+    for (const [name, value] of Object.entries({ name: 'Synthetic visitor', email: 'visitor@example.test', subject: 'Synthetic subject', message: 'Synthetic inquiry.' })) fireEvent.change(screen.getByLabelText(new RegExp(`^${name}`, 'i')), { target: { value } });
+    await userEvent.click(screen.getByRole('button', { name: 'Send inquiry' }));
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(fetcher.mock.calls[0][1]?.body as string)).toEqual(expect.objectContaining({ noticeToken: token, website: '', name: 'Synthetic visitor' }));
+  });
+
+  it.each([
+    { label: 'disabled intake', props: { contactInquiryEnabled: false } },
+    { label: 'private preview', props: { sitePreview: true } },
+    { label: 'missing notice', props: { contactInquiryPrivacyNotice: null } },
+    { label: 'missing token', props: { contactInquiryNoticeToken: null } },
+    { label: 'malformed token', props: { contactInquiryNoticeToken: 'malformed' } },
+  ])('does not collect on $label even when other public inquiry props are supplied', ({ props }) => {
+    const fetcher = vi.spyOn(globalThis, 'fetch');
+    render(<Editorial siteContent={chrome} editorial={{ ...about, section: 'contact' }} metadata={metadata} contactInquiryEnabled contactInquiryPrivacyNotice="Displayed synthetic notice." contactInquiryNoticeToken={'a'.repeat(64)} {...props} />);
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument(); expect(fetcher).not.toHaveBeenCalled();
+  });
+
+  it('does not collect on another editorial route with enabled contact notice and token props', () => {
+    const fetcher = vi.spyOn(globalThis, 'fetch');
+    render(<Editorial siteContent={chrome} editorial={about} metadata={metadata} contactInquiryEnabled contactInquiryPrivacyNotice="Displayed synthetic notice." contactInquiryNoticeToken={'a'.repeat(64)} />);
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument(); expect(fetcher).not.toHaveBeenCalled();
+  });
+
   it('loads no embedded provider and disables external actions in private previews', () => {
     const fetcher = vi.spyOn(globalThis, 'fetch');
     const read = vi.spyOn(Storage.prototype, 'getItem');

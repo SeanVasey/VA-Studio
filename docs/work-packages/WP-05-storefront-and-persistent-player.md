@@ -1,6 +1,6 @@
 # [WP-05] Branded catalog, track detail and persistent preview player
 
-Status: **Foundation, public-sharing metadata and pagination/reconciliation merged; dedicated track detail and full license disclosure implemented for candidate verification.** Physical-device playback, broader accessibility and production performance acceptance remain open.
+Status: **Catalog, public-sharing metadata, pagination/reconciliation and dedicated track detail/license disclosure are accepted through PR #40.** The [single-seller experience candidate](../verification/single-seller-experience-increment.md) adds reviewed queue/loop/speed/media-session and public-embed children. Native browser, physical-device playback, broader accessibility and production performance acceptance remain open.
 
 - Suggested issue title: `[WP-05] Branded catalog, track detail and persistent preview player`
 - Phase: 1

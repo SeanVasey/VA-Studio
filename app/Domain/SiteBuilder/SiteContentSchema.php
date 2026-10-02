@@ -44,7 +44,7 @@ final class SiteContentSchema
 
     public static function validate(array $content): array
     {
-        if (in_array($content['schema_version'] ?? null, [2, 3], true)) {
+        if (in_array($content['schema_version'] ?? null, [2, 3, 4], true)) {
             return self::validateEditorial($content);
         }
         $text = fn (int $max): array => ['required', 'string', 'max:'.$max, function (string $attribute, mixed $value, \Closure $fail): void {
@@ -106,8 +106,8 @@ final class SiteContentSchema
         }
         $version = $content['schema_version'];
         $rules = [
-            'content' => ['required', 'array:schema_version,hero,studio,footer,navigation,seo,about,contact,blog,videos'.($version === 3 ? ',images' : '')],
-            'content.schema_version' => ['required', 'integer', Rule::in([2, 3])],
+            'content' => ['required', 'array:schema_version,hero,studio,footer,navigation,seo,about,contact,blog,videos'.(in_array($version, [3, 4], true) ? ',images' : '')],
+            'content.schema_version' => ['required', 'integer', Rule::in([2, 3, 4])],
             'content.hero' => ['required', 'array:eyebrow,title,line_two,description'],
             'content.hero.eyebrow' => $text(120), 'content.hero.title' => $text(80),
             'content.hero.line_two' => $text(80), 'content.hero.description' => $text(600),
@@ -143,10 +143,23 @@ final class SiteContentSchema
             } else {
                 $rules[$prefix.'.entries'] = ['required', 'array', 'list', 'min:1', 'max:30'];
                 $rules[$prefix.'.entries.*'] = ['required', 'array:'.($section === 'blog'
-                    ? 'slug,title,description,paragraphs' : 'slug,title,description,provider,video_id')];
+                    ? 'slug,title,description,paragraphs' : 'slug,title,description,provider,video_id').($version === 4 ? ',related_track_ids' : '')];
                 $rules[$prefix.'.entries.*.slug'] = ['required', 'string', 'max:80', 'distinct:strict', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/D'];
                 $rules[$prefix.'.entries.*.title'] = $text(120);
                 $rules[$prefix.'.entries.*.description'] = $text(300);
+                if ($version === 4) {
+                    $rules[$prefix.'.entries.*.related_track_ids'] = ['present', 'array', 'list', 'max:6'];
+                    // Distinctness belongs to each entry, not to the entire wildcard expansion: an article and a video
+                    // may deliberately link the same track. Empty lists are valid; strings are never retained as IDs.
+                    foreach (is_array($content[$section]['entries'] ?? null) ? $content[$section]['entries'] : [] as $index => $entry) {
+                        $path = $prefix.'.entries.'.$index.'.related_track_ids';
+                        $rules[$path.'.*'] = ['required', 'distinct:strict', function (string $attribute, mixed $value, \Closure $fail): void {
+                            if (! is_int($value) || $value < 1) {
+                                $fail('Choose a positive integer track identifier.');
+                            }
+                        }];
+                    }
+                }
                 if ($section === 'blog') {
                     $rules[$prefix.'.entries.*.paragraphs'] = ['required', 'array', 'list', 'min:1', 'max:12'];
                     $rules[$prefix.'.entries.*.paragraphs.*'] = $text(1500);
@@ -162,7 +175,7 @@ final class SiteContentSchema
                 }
             }
         }
-        if ($version === 3) {
+        if (in_array($version, [3, 4], true)) {
             $rules += self::imageRules($content, $text);
         }
         if (($content['contact'] ?? null) !== null) {

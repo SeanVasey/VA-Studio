@@ -1,0 +1,5 @@
+/* Exact approved Latin fonts; root-relative URLs keep the isolated embed on its own origin. */
+@font-face { font-family: 'Bebas Neue'; font-style: normal; font-display: swap; font-weight: 400; src: url('/brand/fonts/bebas-neue-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Reddit Sans'; font-style: normal; font-weight: 200 900; font-display: swap; src: url('/brand/fonts/reddit-sans-latin-wght-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Noto Sans Display'; font-style: normal; font-weight: 100 900; font-stretch: 62.5% 100%; font-display: swap; src: url('/brand/fonts/noto-sans-display-latin-standard-normal.woff2') format('woff2'); }
+@font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 100 800; font-display: swap; src: url('/brand/fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2'); }

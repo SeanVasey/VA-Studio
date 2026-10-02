@@ -12,9 +12,11 @@ Once this workflow exists on the default branch, GitHub Actions → **Focused de
 | --- | --- | --- |
 | `unit` | All 15 currently reviewed unit files: money/discount/pricing/promotion, licensing terms, contract text/renderer, upload/media/image and whole-identifier evidence and Stripe gateway fixtures. | `sqlite` or `mysql`; pure cases do not establish database concurrency. |
 | `media` | 12 reviewed upload/evidence/diagnostics/scanner/master/budget/private-root/site-image/archive files. | `sqlite` or `mysql` |
-| `commerce` | 14 reviewed money/pricing/promotion/gateway/quote/hosted-checkout/webhook/hash-integrity files, including selected independent-process MySQL races. It excludes heavy finalization/delivery/membership coverage. | `sqlite` or `mysql`; MySQL-only cases are reported as skipped on SQLite. |
-| `frontend` | 17 reviewed frontend files, TypeScript/Vite production build and client-bundle secret scan. | Select `sqlite`; recorded engine is `none`. |
-| `browser` | Eight reviewed specs: storefront, operator, test checkout, owner-download, row-menu readiness and actual editorial/content/schedule journeys in both configured Chromium/WebKit projects, using the isolated fixture/server wrapper. | `sqlite` only |
+| `commerce` | 17 reviewed money/pricing/promotion/gateway/quote/hosted-checkout/webhook/hash/UUID/history/restore files, including selected independent-process MySQL races. It excludes heavy finalization/delivery/membership coverage. | `sqlite` or `mysql`; MySQL-only cases are reported as skipped on SQLite. |
+| `operator` | Eight reviewed foundation/setup, persisted-authority/MFA, track-metadata, bulk tag additions/concurrency and licensing-admin files. | `sqlite` or `mysql`; physical authenticator/device acceptance remains separate. |
+| `seller` | Ten reviewed inquiry HTTP/schema/admin/concurrency, public preview embed and fresh route-cache boots, editorial content/HTTP, license disclosure and unavailable-content files. | `sqlite` or `mysql` |
+| `frontend` | 20 reviewed frontend files, TypeScript/Vite production build and client-bundle secret scan. | Select `sqlite`; recorded engine is `none`. |
+| `browser` | Fifteen reviewed specs: storefront, operator, test checkout, owner-download/history, player controls, video consent, inquiry transport and real inquiry/inbox persistence, public preview embed, reviewed bulk tag additions, row-menu readiness and actual editorial/content/schedule journeys, in both configured Chromium/WebKit projects through the isolated fixture/server wrapper. | `sqlite` only |
 
 The exact paths live in `scripts/ci/focused-tests.py`, are printed before execution and retained in JSON evidence. Files are a bounded reviewed allowlist, not a changing-files heuristic or arbitrary user filter. Unknown/empty enums, invalid combinations, missing files, repository escapes and empty/duplicate/oversized lists fail closed. Add a new relevant test to that allowlist in a reviewed change, or run the necessary test separately and the full candidate gate; do not infer coverage for unselected features.
 
@@ -28,6 +30,8 @@ From a complete Git checkout with its dependencies/tools installed:
 FOCUSED_SUITE=media FOCUSED_ENGINE=sqlite python3 scripts/ci/focused-tests.py --plan
 FOCUSED_SUITE=unit FOCUSED_ENGINE=sqlite python3 scripts/ci/focused-tests.py
 FOCUSED_SUITE=commerce FOCUSED_ENGINE=mysql python3 scripts/ci/focused-tests.py
+FOCUSED_SUITE=operator FOCUSED_ENGINE=sqlite python3 scripts/ci/focused-tests.py
+FOCUSED_SUITE=seller FOCUSED_ENGINE=sqlite python3 scripts/ci/focused-tests.py
 FOCUSED_SUITE=frontend FOCUSED_ENGINE=sqlite python3 scripts/ci/focused-tests.py
 FOCUSED_SUITE=browser FOCUSED_ENGINE=sqlite python3 scripts/ci/focused-tests.py
 python3 scripts/ci/test-focused-tests.py
@@ -44,5 +48,3 @@ The runner removes stale result XML before execution and marks failure on missin
 This implementation was independently source-reviewed and all 20 Python safeguards passed locally. After recovering compatible PHP 8.4.26 and exact-lock dependencies, the actual local unit selection passed 330 tests / 1,269 assertions with zero errors, failures or skips on integration tree `537607cc0bdae289ab0367158e2b0341fa15b407` (before the final documentation clarification). Real GitHub workflow outcomes must still be recorded on the integrating tested head. This document does not claim cloud event eligibility, runtime suite success or full T01 completion from static validation.
 
 References: [planning strategy](../ci-development-strategy.md), [GitHub workflow syntax and input/service semantics](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax), [PHPUnit empty-suite/warning flags](https://docs.phpunit.de/en/12.5/textui.html), [Vitest reporters](https://vitest.dev/guide/reporters), [Playwright reporters](https://playwright.dev/docs/test-reporters).
-
-The integrating review added `CommerceGuardBytesTest` to unit feedback, `SiteImageHttpTest` to media feedback and `HashByteGuardMigrationTest` to commerce feedback, so the new safeguards receive focused coverage before the full gate. Current selections contain 15 unit, 12 media and 14 commerce files.

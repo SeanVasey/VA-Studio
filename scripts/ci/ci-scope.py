@@ -34,7 +34,7 @@ DOCUMENTS = frozenset({
     "docs/verification/ci-scope.md",
 })
 RUNTIME_JOBS = (
-    "frontend", "backend-quality", "backend-mysql", "backend-sqlite", "operator-browser",
+    "frontend", "backend-quality", "backend-mysql", "backend-sqlite", "operator-browser", "related-browser",
 )
 SHA = re.compile(r"[0-9a-f]{40}\Z")
 MAX_DIFF_BYTES = 4 * 1024 * 1024

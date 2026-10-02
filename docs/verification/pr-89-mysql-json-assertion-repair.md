@@ -1,0 +1,9 @@
+# PR #89 MySQL JSON assertion repair — October 1, 2026
+
+Foundation [run 36823137903](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36823137903) reported five failures in MySQL shard 4, one for each retained exception reason in `TestPaymentExceptionInspectionTest::test_inspection_verifies_each_retained_reason_without_changing_business_evidence`. The retained audit context had the expected fields and values; MySQL's JSON object member order differed from the insertion order used in the expected PHP array.
+
+The assertion now copies the decoded context and sorts its keys with `ksort(..., SORT_STRING)` before comparing the complete array with `assertSame`. This preserves strict value types and rejects missing or extra fields. The original privacy assertion still examines the result and the persisted context. No runtime, schema, audit contents, retained business evidence, or inspection behavior changed. Other assertions in the inspection test were checked: the projection key-order assertion concerns an in-memory service result, and the attention outcome reads a named audit field; neither requires database-order normalization.
+
+Local checks on the repair passed `git diff --check` and a Python source guard confirming the exact `ksort`, complete `assertSame`, original privacy assertion, and absence of loose equality replacements. PHP/Composer are unavailable in this execution environment; the previous PHP 8.4 executable is no longer present. No local PHPUnit or MySQL pass is claimed.
+
+The integrating candidate must run `php artisan test --filter=TestPaymentExceptionInspectionTest` against SQLite and MySQL 8.4, followed by its applicable acceptance gates. The parent task retains ownership of cloud execution, exact tested source, independent review, and merge disposition. This test repair does not complete payment-exception resolution or enable production payments.

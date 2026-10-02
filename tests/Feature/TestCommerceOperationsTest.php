@@ -218,6 +218,9 @@ class TestCommerceOperationsTest extends TestCase
         $component = Livewire::test(ListTestContractIssuance::class);
         $this->assertSame([], $component->instance()->getTable()->getFlatActions());
         $this->assertSame([], $component->instance()->getTable()->getFlatBulkActions());
+        $exceptions = Livewire::test(ListTestPaymentExceptions::class);
+        $this->assertSame(['inspectEvidence'], array_keys($exceptions->instance()->getTable()->getFlatActions()));
+        $this->assertSame([], $exceptions->instance()->getTable()->getFlatBulkActions());
     }
 
     public function test_filters_do_not_expand_scope_and_tampered_page_sizes_remain_bounded(): void

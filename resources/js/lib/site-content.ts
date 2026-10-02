@@ -1,5 +1,5 @@
 export interface SiteContent {
-  schema_version: 1 | 2 | 3;
+  schema_version: 1 | 2 | 3 | 4;
   hero: { eyebrow: string; title: string; line_two: string; description: string };
   studio: { eyebrow: string; title: string; line_two: string; lead: string; paragraphs: string[] };
   footer: { description: string };
@@ -64,6 +64,7 @@ export interface EditorialDescriptor {
   email: string | null;
   contactHref: string | null;
   video: { provider: 'youtube' | 'vimeo'; videoId: string; watchUrl: string } | null;
+  relatedTracks?: { title: string; artist: string; href?: string }[];
 }
 
 /** A private preview never sends an internal content link outside its saved release. */

@@ -1,0 +1,54 @@
+{
+  "purpose": "Same-origin standalone public preview font assets",
+  "source": "Exact Latin files from package-lock.json Fontsource packages; approved hashes from docs/brand/font-manifest.json.",
+  "files": [
+    {
+      "package": "@fontsource-variable/noto-sans-display",
+      "version": "5.3.0",
+      "package_url": "https://registry.npmjs.org/@fontsource-variable/noto-sans-display/-/noto-sans-display-5.3.0.tgz",
+      "package_integrity": "sha512-vtQ+HBQHqdaXpFL0tW6vvQUNNOVddgllnnlwS0NsPLsuXkw62xxICvgCcZ97nFKcmzbDGeXl7B57c53LrFFrQQ==",
+      "archive_sha256": "f1516083dd6c8cdf9270e335e64582c8055c06931fbeee9cf60042fafa74d135",
+      "font": "public/brand/fonts/noto-sans-display-latin-standard-normal.woff2",
+      "font_size_bytes": 69912,
+      "font_sha256": "b669ff51021c003e3c596d9e11671ba890f87e59c017b309e4633e699133759c",
+      "license": "public/brand/fonts/noto-sans-display.LICENSE.txt",
+      "license_sha256": "e5032c56c373f0875c879a24bd559e6df0eb04820f243daf73252a92127b0a3b"
+    },
+    {
+      "package": "@fontsource-variable/reddit-sans",
+      "version": "5.3.0",
+      "package_url": "https://registry.npmjs.org/@fontsource-variable/reddit-sans/-/reddit-sans-5.3.0.tgz",
+      "package_integrity": "sha512-naTNvstQ0DWDc05RhlLncHLavIYcSwQHQtb6y2CezNxHtlRAQ7+dVTcfHhHUPc409PJdPOewAhdevlsV78YOXg==",
+      "archive_sha256": "9ca6f15148cb50f8faa9b0f2fff1effc7a0bc752155e203b18e9ab30a82662a9",
+      "font": "public/brand/fonts/reddit-sans-latin-wght-normal.woff2",
+      "font_size_bytes": 41844,
+      "font_sha256": "3e3b66d208b63e175830ee0dedb631c5df11bd93d01e890e3692ecffab612262",
+      "license": "public/brand/fonts/reddit-sans.LICENSE.txt",
+      "license_sha256": "4d23a85506d013f1599d4aa29aa4ed60f75d3842c7aaa1bb83d3a3dace9032fc"
+    },
+    {
+      "package": "@fontsource-variable/jetbrains-mono",
+      "version": "5.3.0",
+      "package_url": "https://registry.npmjs.org/@fontsource-variable/jetbrains-mono/-/jetbrains-mono-5.3.0.tgz",
+      "package_integrity": "sha512-F32xpS2NsGYoQi2ADSkKTgpJj7ozajsGgDJ8woTnqjmIB+dxDIqImjl4pXZVEExu8UFZ2ndhmX18EBS/hdz3Lw==",
+      "archive_sha256": "996fe6368a480c9ce15d4de22a2682b7c40b403718fee2b15e7272f244fd993f",
+      "font": "public/brand/fonts/jetbrains-mono-latin-wght-normal.woff2",
+      "font_size_bytes": 40404,
+      "font_sha256": "18be452724bfdc236c074ca94a249a7f41a86752c7d04ab258ce9ed5651f6a7e",
+      "license": "public/brand/fonts/jetbrains-mono.LICENSE.txt",
+      "license_sha256": "403581b69dac5cff4079205e01c6b467e56af449ecbd7247693ddb1baafa005b"
+    },
+    {
+      "package": "@fontsource/bebas-neue",
+      "version": "5.3.0",
+      "package_url": "https://registry.npmjs.org/@fontsource/bebas-neue/-/bebas-neue-5.3.0.tgz",
+      "package_integrity": "sha512-nCxMEb9Bg9sjNWm9TIOsvHKDMLRUfEZPWpLgYu6m9KavZZVSA/WoHzI5wROwqA+eNwEi/PNBAcB5Co7HA3S0Cw==",
+      "archive_sha256": "57928e0ee30b9e8a99033cdd5dc74ad06761007b4ad8fc32173e5d9072ba91fa",
+      "font": "public/brand/fonts/bebas-neue-latin-400-normal.woff2",
+      "font_size_bytes": 13768,
+      "font_sha256": "a7c90c89240c134f7fdd33d40c000ec90b79d675ea53e8cc5a6d423c073de412",
+      "license": "public/brand/fonts/bebas-neue.LICENSE.txt",
+      "license_sha256": "66c436339f7490c1a99e4f6a7b8aef5c176676edfd071a31638e7d54c1b0aeda"
+    }
+  ]
+}

@@ -6,6 +6,22 @@ test('track navigation preserves filters, a single native audio owner and seekin
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/' + query);
+  const sort = page.getByRole('combobox', { name: 'Sort tracks', exact: true });
+  await sort.scrollIntoViewIfNeeded();
+  await expect(sort).toBeVisible();
+  await expect(sort).toHaveValue('title');
+  await expect(sort).not.toBeFocused();
+  const sortBox = await sort.boundingBox();
+  expect(sortBox).not.toBeNull();
+  expect(sortBox!.height).toBeGreaterThanOrEqual(44);
+  expect(sortBox!.width).toBeGreaterThanOrEqual(44);
+  // Native select paint is browser-owned: retain screenshots rather than treating computed CSS as contrast proof.
+  await page.screenshot({ path: testInfo.outputPath('catalog-sort-unfocused.png'), fullPage: false });
+  await page.getByRole('button', { name: 'Search', exact: true }).focus();
+  await page.keyboard.press('Tab');
+  await expect(sort).toBeFocused();
+  await expect(sort).toHaveValue('title');
+  await page.screenshot({ path: testInfo.outputPath('catalog-sort-focused.png'), fullPage: false });
   const row = page.getByRole('article', { name: fixtureTrack.title, exact: true });
   await row.getByRole('button', { name: `Play ${fixtureTrack.title}`, exact: true }).click();
   await expect(page.getByRole('button', { name: 'Pause preview', exact: true })).toBeVisible();

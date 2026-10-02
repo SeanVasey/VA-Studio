@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Domain\Catalog\Models\Track;
+use App\Domain\Catalog\PublicCatalog;
 use App\Domain\SiteBuilder\Models\SiteImage;
 use App\Domain\SiteBuilder\Models\SitePublication;
 use App\Domain\SiteBuilder\Models\SitePublicationRevision;
@@ -11,20 +13,22 @@ use App\Domain\SiteBuilder\SiteContent;
 use App\Domain\SiteBuilder\SiteContentSchema;
 use App\Domain\SiteBuilder\SiteContentUnavailable;
 use App\Domain\SiteBuilder\SiteImageContrast;
+use App\Domain\SiteBuilder\SiteRelatedTracks;
+use App\Filament\Forms\PreserveTrackIdState;
 use App\Filament\Resources\SiteReleaseResource\Pages\ListSiteReleases;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\IconPosition;
@@ -157,6 +161,17 @@ class SiteReleaseResource extends OperatorResource
                     $entryFields[] = TextInput::make('video_id')->label('Video ID')->required()->maxLength(12)
                         ->helperText('Use the 11-character YouTube ID or the numeric Vimeo ID. A watch link is created without loading an embedded player.');
                 }
+                $entryFields[] = Repeater::make('related_track_ids')->label('Related tracks')
+                    ->simple(Select::make('track')->label('Track')->searchable()->required()->stateCast(new PreserveTrackIdState)
+                        ->getSearchResultsUsing(function (string $search): array {
+                            static::actor();
+
+                            return app(PublicCatalog::class)->relatedChoices($search);
+                        })
+                        ->getOptionLabelUsing(fn (mixed $value): ?string => static::relatedTrackLabel($value))
+                        ->disableOptionsWhenSelectedInSiblingRepeaterItems())
+                    ->defaultItems(0)->maxItems(6)->reorderableWithButtons()
+                    ->helperText('Choose up to six tracks and arrange their order. Public pages show a link only while that track is currently available. Copied selections remain removable after withdrawal.');
                 $fields[] = Repeater::make("content.{$key}.entries")->label("{$label} entries")->schema($entryFields)
                     ->itemLabel(fn (array $state): string => ($state['title'] ?? '') ?: "New {$entryLabel}")->minItems(1)->maxItems(30)->defaultItems(1)->collapsible();
             }
@@ -167,6 +182,22 @@ class SiteReleaseResource extends OperatorResource
         }
 
         return $sections;
+    }
+
+    private static function relatedTrackLabel(mixed $value): ?string
+    {
+        static::actor();
+        $id = SiteRelatedTracks::formId($value);
+        if ($id === null) {
+            return null;
+        }
+        $track = Track::find($id);
+        if ($track === null || $track->published_slug === null || $track->published_slug !== $track->slug) {
+            return null;
+        }
+        $available = app(PublicCatalog::class)->relatedLinks([$id]) !== [];
+
+        return $track->title.' · '.$track->artist.($available ? '' : ' (not currently available)');
     }
 
     /** @return array<int, string> ready images uploaded for one slot, newest first */
@@ -244,6 +275,13 @@ class SiteReleaseResource extends OperatorResource
         foreach (['about', 'contact', 'blog', 'videos'] as $key) {
             $enabled[$key] = $content[$key] !== null;
             if ($enabled[$key]) {
+                if (in_array($key, ['blog', 'videos'], true)) {
+                    foreach ($content[$key]['entries'] as &$entry) {
+                        $entry['related_track_ids'] ??= [];
+                    }
+                    unset($entry);
+                }
+
                 continue;
             }
             $content[$key] = ['title' => '', 'description' => ''];
@@ -254,7 +292,7 @@ class SiteReleaseResource extends OperatorResource
                 $content[$key]['email'] = '';
             }
             if (in_array($key, ['blog', 'videos'], true)) {
-                $content[$key]['entries'] = [['slug' => '', 'title' => '', 'description' => ''] + ($key === 'blog'
+                $content[$key]['entries'] = [['slug' => '', 'title' => '', 'description' => '', 'related_track_ids' => []] + ($key === 'blog'
                     ? ['paragraphs' => ['']] : ['provider' => 'youtube', 'video_id' => ''])];
             }
         }
@@ -289,15 +327,25 @@ class SiteReleaseResource extends OperatorResource
             if ($imageErrors !== []) {
                 throw ValidationException::withMessages($imageErrors);
             }
-            // Schema version is a server contract, never an operator-editable field. Only a release that uses an image
-            // needs version 3, so an image-free release stays readable by code that predates site images.
-            $version = array_filter($images) === [] ? 2 : 3;
-            $content = ['schema_version' => $version] + $data['content'] + ($version === 3 ? ['images' => $images] : []);
+            $content = $data['content'];
             foreach (['about', 'contact', 'blog', 'videos'] as $key) {
                 if (($data['enabled'][$key] ?? false) !== true) {
                     $content[$key] = null;
                 }
             }
+            $content = SiteRelatedTracks::fromForm($content);
+            // Only enabled associations need v4. Clearing them restores the existing image-based v2/v3 choice without
+            // changing retained releases or losing an image. Empty new keys do not enter older schemas.
+            $version = SiteRelatedTracks::used($content) ? 4 : (array_filter($images) === [] ? 2 : 3);
+            if ($version !== 4) {
+                foreach (['blog', 'videos'] as $section) {
+                    foreach ($content[$section]['entries'] ?? [] as $index => $entry) {
+                        unset($content[$section]['entries'][$index]['related_track_ids']);
+                    }
+                }
+            }
+            unset($content['schema_version'], $content['images']);
+            $content = ['schema_version' => $version] + $content + (in_array($version, [3, 4], true) ? ['images' => $images] : []);
             app(SiteContent::class)->create($content, $data['label'], static::actor());
             Notification::make()->success()->title('Private draft saved')->body('Preview the release before publishing.')->send();
         } catch (ValidationException $exception) {

@@ -3,6 +3,8 @@
 namespace App\Domain\Catalog;
 
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Commerce\Inventory\SelectionInventory;
+use App\Domain\Media\Models\MediaAsset;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Cursor;
@@ -15,6 +17,7 @@ use Throwable;
 final class PublicCatalog
 {
     public const PAGE_SIZE = 12;
+
     public const SCAN_LIMIT = 48;
 
     public function page(Request $request): array
@@ -111,16 +114,31 @@ final class PublicCatalog
 
     public function track(string $slug): array
     {
+        return $this->project(collect([$this->publishedTrack($slug)]));
+    }
+
+    /** Internal model only. HTTP embeds must explicitly project public text and route IDs. */
+    public function preview(string $slug): MediaAsset
+    {
+        $track = $this->publishedTrack($slug);
+        $preview = $track->assets->where('status', 'ready')->where('role', 'preview_tagged')->sortByDesc('id')->first();
+        abort_unless($preview, 404);
+        $preview->setRelation('track', $track);
+
+        return $preview;
+    }
+
+    private function publishedTrack(string $slug): Track
+    {
         $track = $this->query()->where('slug', $slug)->first();
         abort_unless($track && $this->eligible($track), 404);
 
-        return $this->project(collect([$track]));
+        return $track;
     }
 
     public function license(string $slug, string $revisionId): array
     {
-        $track = $this->query()->where('slug', $slug)->first();
-        abort_unless($track && $this->eligible($track), 404);
+        $track = $this->publishedTrack($slug);
         $offer = $track->offers->first(fn ($offer) => $offer->is_active && (string) $offer->currentRevision?->id === $revisionId);
         abort_unless($offer, 404);
 
@@ -133,6 +151,52 @@ final class PublicCatalog
         return $this->project($this->query()->whereIn('id', $ids)->limit(10)->get()->filter(fn (Track $track) => $this->eligible($track)));
     }
 
+    /** Ordered editorial summaries only; private previews omit destinations at the server boundary. */
+    public function relatedLinks(array $ids, bool $includeHref = true): array
+    {
+        if (! array_is_list($ids) || count($ids) > 6) {
+            throw ValidationException::withMessages(['related_track_ids' => 'Choose up to six distinct tracks using positive integer IDs.']);
+        }
+        foreach ($ids as $id) {
+            if (! is_int($id) || $id < 1) {
+                throw ValidationException::withMessages(['related_track_ids' => 'Choose up to six distinct tracks using positive integer IDs.']);
+            }
+        }
+        if (count(array_unique($ids, SORT_STRING)) !== count($ids)) {
+            throw ValidationException::withMessages(['related_track_ids' => 'Choose up to six distinct tracks using positive integer IDs.']);
+        }
+        if ($ids === []) {
+            return [];
+        }
+        $tracks = $this->query()->whereIn('id', $ids)->get()->filter(fn (Track $track) => $this->eligible($track))->keyBy('id');
+        $links = [];
+        foreach ($ids as $id) {
+            if (($track = $tracks->get($id)) !== null) {
+                $links[] = ['title' => $track->title, 'artist' => $track->artist]
+                    + ($includeHref ? ['href' => route('tracks.show', $track->slug, false)] : []);
+            }
+        }
+
+        return $links;
+    }
+
+    /** Current eligible choices for the authorized staff editor; bound candidate hydration and evidence checks. */
+    public function relatedChoices(string $search = ''): array
+    {
+        validator(['search' => $search], ['search' => ['string', 'max:100']])->validate();
+        $query = $this->query();
+        if (($search = trim($search)) !== '') {
+            $pattern = '%'.str_replace(['!', '%', '_'], ['!!', '!%', '!_'], mb_strtolower($search)).'%';
+            $query->where(fn (Builder $match) => $match
+                ->whereRaw("LOWER(title) LIKE ? ESCAPE '!'", [$pattern])
+                ->orWhereRaw("LOWER(artist) LIKE ? ESCAPE '!'", [$pattern]));
+        }
+
+        return $query->orderBy('title')->orderBy('artist')->orderBy('id')->limit(self::SCAN_LIMIT)->get()
+            ->filter(fn (Track $track) => $this->eligible($track))
+            ->mapWithKeys(fn (Track $track): array => [$track->id => $track->title.' · '.$track->artist])->all();
+    }
+
     private function query(): Builder
     {
         return Track::query()->where('status', 'published')->with('assets');
@@ -140,9 +204,10 @@ final class PublicCatalog
 
     private function eligible(Track $track): bool
     {
-        if (app(PublicationReadiness::class)->blockers($track) !== []) { return false; }
-        $track->setRelation('offers', $track->offers->filter(fn ($offer) =>
-            app(\App\Domain\Commerce\Inventory\SelectionInventory::class)->available($offer->current_revision_id)));
+        if (app(PublicationReadiness::class)->blockers($track) !== []) {
+            return false;
+        }
+        $track->setRelation('offers', $track->offers->filter(fn ($offer) => app(SelectionInventory::class)->available($offer->current_revision_id)));
 
         return $track->offers->isNotEmpty();
     }

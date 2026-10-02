@@ -25,6 +25,7 @@ PHP_TARGETS = {
         "tests/Unit/AllocateDiscountTest.php", "tests/Unit/CommerceGuardBytesTest.php", "tests/Unit/ContractTextTest.php",
         "tests/Unit/EconomicLicenseTermsTest.php", "tests/Unit/FileUploadPathGuardTest.php",
         "tests/Unit/MediaEvidenceValuesTest.php", "tests/Unit/MinorUnitsTest.php",
+        "tests/Unit/RelatedTrackBrowserFixtureGuardTest.php",
         "tests/Unit/PricingPolicyTest.php", "tests/Unit/PromotionPolicyTest.php",
         "tests/Unit/ScopedLicenseTermsTest.php", "tests/Unit/SiteImageGuardBytesTest.php",
         "tests/Unit/StripeCheckoutGatewayTest.php", "tests/Unit/StripePaymentGatewayTest.php",
@@ -45,7 +46,26 @@ PHP_TARGETS = {
         "tests/Feature/QuoteHttpTest.php", "tests/Feature/QuotePricingHttpTest.php",
         "tests/Feature/QuotePricingConcurrencyTest.php", "tests/Feature/HostedCheckoutTest.php",
         "tests/Feature/HostedCheckoutConcurrencyTest.php", "tests/Feature/StripeWebhookTest.php",
-        "tests/Feature/StripeWebhookConcurrencyTest.php", "tests/Feature/HashByteGuardMigrationTest.php",
+        "tests/Feature/StripeWebhookConcurrencyTest.php",
+        "tests/Feature/HashByteGuardMigrationTest.php", "tests/Feature/UuidByteGuardMigrationTest.php",
+        "tests/Feature/OwnedTestOrderHistoryTest.php", "tests/Feature/SyntheticPrivateRestoreTest.php",
+    ),
+    "seller": (
+        "tests/Feature/CustomerInquiryHttpTest.php", "tests/Feature/CustomerInquiryMigrationTest.php",
+        "tests/Feature/CustomerInquiryAdminTest.php", "tests/Feature/CustomerInquiryConcurrencyTest.php",
+        "tests/Feature/PublicTrackEmbedTest.php", "tests/Feature/PublicTrackEmbedRouteCacheTest.php",
+        "tests/Feature/SiteEditorialHttpTest.php", "tests/Feature/SiteEditorialContentTest.php",
+        "tests/Feature/PublicLicenseDisclosureTest.php", "tests/Feature/SiteContentUnavailableHttpTest.php",
+        "tests/Feature/PublicCatalogRelatedLinksTest.php", "tests/Feature/SiteRelatedTrackContentTest.php",
+        "tests/Feature/SiteRelatedTrackDamageTest.php", "tests/Feature/SiteRelatedTrackEditorTest.php",
+        "tests/Feature/SiteRelatedTrackHttpTest.php", "tests/Feature/SiteRelatedTrackImageMigrationTest.php",
+        "tests/Feature/SiteContentConcurrencyTest.php",
+    ),
+    "operator": (
+        "tests/Feature/FoundationTest.php", "tests/Feature/OperatorSetupTest.php",
+        "tests/Feature/OperatorAuthorityTest.php", "tests/Feature/OperatorMfaTest.php",
+        "tests/Feature/TrackMetadataTest.php", "tests/Feature/LicensingAdminTest.php",
+        "tests/Feature/BulkTrackTagsTest.php", "tests/Feature/BulkTrackTagsConcurrencyTest.php",
     ),
 }
 FRONTEND_TARGETS = (
@@ -58,11 +78,18 @@ FRONTEND_TARGETS = (
     "tests/frontend/site-images.test.tsx", "tests/frontend/storefront.test.tsx",
     "tests/frontend/test-checkout.test.tsx", "tests/frontend/test-owner-delivery.test.tsx",
     "tests/frontend/track-detail.test.tsx",
+    "tests/frontend/editorial-video.test.tsx", "tests/frontend/owned-order-history.test.tsx",
+    "tests/frontend/contact-inquiry.test.tsx",
+    "tests/frontend/editorial-related-tracks.test.tsx",
 )
 BROWSER_TARGETS = (
     "tests/browser/storefront.spec.ts", "tests/browser/operator.spec.ts",
     "tests/browser/test-checkout.spec.ts", "tests/browser/test-owner-delivery.spec.ts",
-    "tests/browser/site-release-menu-readiness.spec.ts",
+    "tests/browser/player-controls.spec.ts", "tests/browser/owned-order-history.spec.ts",
+    "tests/browser/editorial-video-consent.spec.ts", "tests/browser/site-release-menu-readiness.spec.ts",
+    "tests/browser/contact-inquiry.spec.ts", "tests/browser/contact-inquiry-persistence.spec.ts",
+    "tests/browser/public-track-embed.spec.ts",
+    "tests/browser/track-bulk-tags.spec.ts",
     "tests/browser/editorial-content.spec.ts", "tests/browser/site-content.spec.ts", "tests/browser/site-schedule.spec.ts",
 )
 SUITES = (*PHP_TARGETS, "frontend", "browser")

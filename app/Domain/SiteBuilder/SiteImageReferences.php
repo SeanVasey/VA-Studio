@@ -29,7 +29,7 @@ final class SiteImageReferences
      */
     public static function of(array $content): array
     {
-        if (($content['schema_version'] ?? null) !== 3 || ! is_array($content['images'] ?? null)) {
+        if (! in_array($content['schema_version'] ?? null, [3, 4], true) || ! is_array($content['images'] ?? null)) {
             return [];
         }
         $references = [];
