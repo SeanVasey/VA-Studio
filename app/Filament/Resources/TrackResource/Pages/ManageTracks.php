@@ -50,6 +50,7 @@ class ManageTracks extends ManageRecords
 
     public function boot(): void
     {
+        request()->attributes->set('_track_private_review', true);
         $this->activeMetadataPresets = null;
         $actor = $this->actor();
         $panel = Filament::getCurrentOrDefaultPanel();

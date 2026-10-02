@@ -10,6 +10,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Added
 
+- Protected operator track review: a close-only staff modal shows current descriptive metadata, ordinary publication blockers and verified artwork/tagged audio. Fresh authority/MFA checks, exact protected derivative URLs and generic private errors preserve draft privacy and retained evidence.
+
 - Reviewed bulk catalog metadata edits: staff select current-page tracks, choose Keep/Set/Clear for artist, BPM, key, genre and mood, inspect exact before/after values and save one atomic optimistic batch. Current authority/MFA, whole-row stale checks, protected-field preservation and ordinary per-track audits apply.
 
 - Named catalog metadata presets: staff save, edit and archive reusable artist, BPM/key, genre/mood, ordered tags and descriptions, then review copied values before creating a private track draft. Presets have optimistic edit versions, fresh authority/MFA checks and transactional minimized audits; later edits never alter existing tracks.

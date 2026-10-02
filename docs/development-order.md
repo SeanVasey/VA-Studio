@@ -1,5 +1,11 @@
 # Ordered development status
 
+## Protected operator track review candidate — October 2, 2026
+
+The next bounded T12 child adds [protected operator track review](verification/private-track-review.md): current descriptive metadata, exact ordinary publication blockers and verified artwork/tagged audio in a close-only staff modal. Fresh actor/MFA and track locks protect the read; unavailable current media never falls back to older bytes. Protected responses/errors stay private and generic. Existing media-review URLs retain their historical exact-revision behavior, and reopening refreshes the projection.
+
+Local new projection/media/Filament plus privacy cases pass 23 / 339 assertions; existing authoring plus privacy cases pass 81 / 1,089 assertions on the integrated interface. Hosted full database/native/independent acceptance remains required. Genuine related-browser coverage extends the existing scanner-backed withdrawn-track journey without altering its fixtures or retained-graph verifier. This implements no anonymous unlisted sharing and does not close T12, track scheduling or production recovery.
+
 ## PR #95 verification and reviewed bulk metadata candidate — October 2, 2026
 
 [PR #95](https://github.com/VASEYDEV/VASEYAUDIO/pull/95) publishes reviewed preset head `903d89fa1b6f64c723751000fa1ab42ef0259107`, tree `3561b2e416360e01eeb2340b0c8557a6df6dc785`. [Foundation run `36973007214`](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36973007214) tests the exact same tree in merge `69f989ac`; final current-source database/native/outer-run acceptance remains pending at this checkpoint. Earlier native runs found test-only login/option formatting, paginated-row lookup and navigation before notification acknowledgement, now repaired. The latest repair waits for exact notification delivery and ID-bound native dismissal responses without suppressing errors; the expanded suite and its runner retain bounded aligned budgets. The published PR records actual outcomes, without treating earlier diagnostics as final acceptance.
