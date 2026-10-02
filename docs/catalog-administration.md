@@ -20,6 +20,10 @@ In **Tracks → Create from preset**, choose an active preset, then review its c
 
 See [the T12 preset evidence](verification/track-metadata-presets.md) for actual verification and remaining acceptance boundaries. Broader bulk metadata/licensing, track scheduling, private review, granular permissions and production recovery remain tracked work.
 
+## Reviewed bulk metadata edits
+
+Tracks also offers **Edit metadata** for 1–25 explicit tracks on the current filtered page. Artist, BPM, musical key, genre and mood start at Keep; Set supplies an ordinary valid value and Clear is available for nullable fields. Review displays exact current/proposed values before **Save reviewed metadata**. A changed selection/table view or stale target requires a fresh review. The command checks current locked authority/MFA and applies the entire reviewed batch atomically through `SaveTrackMetadata`, retaining all other fields and per-track audit evidence. See [the bulk metadata evidence](verification/bulk-track-metadata.md) for actual checks, recovery and hosted acceptance gates.
+
 ## Command and audit boundary
 
 `SaveTrackMetadata::handle(?Track, array, User)` authorizes verified `is_admin` staff before reading or writing the target. Existing records require `metadata_version`; creation cannot supply one. Only the listed metadata plus that expected revision is accepted. The command reads/locks the current row before merging omitted fields and comparing the expected revision. The unique slug index arbitrates conflicting URL claims.
