@@ -11,6 +11,18 @@
       "test_overlapping_batches_with_separate_actors_wait_on_the_shared_track_and_the_loser_has_no_partial_changes"
     ],
     [
+      "Tests\\Feature\\BulkUpdateTrackMetadataConcurrencyTest",
+      "test_authority_withdrawal_and_batch_serialize_on_the_exact_persisted_actor_row"
+    ],
+    [
+      "Tests\\Feature\\BulkUpdateTrackMetadataConcurrencyTest",
+      "test_overlapping_batches_with_distinct_actors_wait_on_the_exact_shared_row_and_the_loser_has_no_partial_changes"
+    ],
+    [
+      "Tests\\Feature\\BulkUpdateTrackMetadataConcurrencyTest",
+      "test_review_and_apply_reject_authority_revocation_hidden_by_an_old_repeatable_read_snapshot"
+    ],
+    [
       "Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest",
       "test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders"
     ],
@@ -265,6 +277,38 @@
     [
       "Tests\\Feature\\TrackMetadataPresetsConcurrencyTest",
       "test_snapshot_and_archive_serialize_on_the_exact_preset_row"
+    ],
+    [
+      "Tests\\Feature\\TrackPublicationGuardConcurrencyTest",
+      "test_authority_withdrawal_and_reviewed_publication_serialize_on_the_exact_actor_row"
+    ],
+    [
+      "Tests\\Feature\\TrackPublicationGuardConcurrencyTest",
+      "test_distinct_actors_serialize_on_the_exact_track_and_only_one_reviewed_revision_is_committed"
+    ],
+    [
+      "Tests\\Feature\\TrackPublicationGuardConcurrencyTest",
+      "test_metadata_edit_committed_first_invalidates_a_waiting_review_on_the_exact_track_row"
+    ],
+    [
+      "Tests\\Feature\\TrackPublicationGuardConcurrencyTest",
+      "test_old_repeatable_read_snapshots_are_refused_then_current_authority_is_rechecked_standalone"
+    ],
+    [
+      "Tests\\Feature\\TrackPublicationManifestConcurrencyTest",
+      "test_capture_and_authority_withdrawal_serialize_on_the_exact_actor_row"
+    ],
+    [
+      "Tests\\Feature\\TrackPublicationManifestConcurrencyTest",
+      "test_metadata_writer_committed_first_is_observed_after_the_exact_track_row_wait"
+    ],
+    [
+      "Tests\\Feature\\TrackPublicationManifestConcurrencyTest",
+      "test_old_repeatable_read_authority_snapshot_is_refused_then_standalone_capture_uses_current_authority"
+    ],
+    [
+      "Tests\\Feature\\TrackPublicationManifestConcurrencyTest",
+      "test_publication_writer_committed_first_is_observed_after_the_exact_track_row_wait"
     ]
   ]
 }

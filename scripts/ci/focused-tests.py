@@ -68,6 +68,11 @@ PHP_TARGETS = {
         "tests/Feature/TrackMetadataPresetsTest.php", "tests/Feature/TrackMetadataPresetsConcurrencyTest.php",
         "tests/Feature/TrackMetadataPresetsMigrationTest.php",
         "tests/Feature/BulkTrackTagsTest.php", "tests/Feature/BulkTrackTagsConcurrencyTest.php",
+        "tests/Feature/BulkUpdateTrackMetadataTest.php", "tests/Feature/BulkUpdateTrackMetadataConcurrencyTest.php",
+        "tests/Feature/PrivateTrackReviewTest.php", "tests/Feature/PrivateTrackReviewPrivacyTest.php",
+        "tests/Feature/TrackPublicationGuardTest.php", "tests/Feature/TrackPublicationGuardMigrationTest.php",
+        "tests/Feature/TrackPublicationGuardConcurrencyTest.php",
+        "tests/Feature/TrackPublicationManifestTest.php", "tests/Feature/TrackPublicationManifestConcurrencyTest.php",
     ),
 }
 FRONTEND_TARGETS = (
@@ -93,6 +98,9 @@ BROWSER_TARGETS = (
     "tests/browser/public-track-embed.spec.ts",
     "tests/browser/track-bulk-tags.spec.ts",
     "tests/browser/track-metadata-presets.spec.ts",
+    "tests/browser/bulk-track-metadata.spec.ts",
+    "tests/browser/private-track-review.spec.ts",
+    "tests/browser/track-publication-guard.spec.ts",
     "tests/browser/editorial-content.spec.ts", "tests/browser/site-content.spec.ts", "tests/browser/site-schedule.spec.ts",
 )
 SUITES = (*PHP_TARGETS, "frontend", "browser")

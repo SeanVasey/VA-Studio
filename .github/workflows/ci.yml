@@ -258,10 +258,18 @@ jobs:
   operator-browser:
     needs: scope
     if: needs.scope.outputs.mode != 'docs'
+    name: operator-browser (${{ matrix.project }})
     runs-on: ubuntu-latest
-    # Browser installation has taken 14 minutes. Allow the expanded 18-minute suite
-    # plus bounded fixture/build setup, teardown and artifact retention.
+    # Each engine runs every ordinary journey on its own fresh VM and isolated fixture.
+    # Browser installation has taken 14 minutes; retain the bounded 18-minute suite
+    # plus fixture/build setup, teardown and artifact retention for each engine.
     timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium-desktop, webkit-mobile]
+    env:
+      BROWSER_PROJECT: ${{ matrix.project }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -285,12 +293,12 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps chromium webkit
-      - run: npm run test:browser
+      - run: npm run test:browser -- --project="$BROWSER_PROJECT"
       - name: Retain synthetic browser evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: operator-browser-${{ github.run_id }}-${{ github.run_attempt }}
+          name: operator-browser-${{ matrix.project }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             playwright-report/
             test-results/

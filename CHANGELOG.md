@@ -10,6 +10,13 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Added
 
+- Read-only track publication manifest foundation: a standalone authorized capture returns immutable minimized identity for current ready metadata, rights, verified derivatives and active immutable offers/licenses at one recorded instant. It creates no retained approval, compare/apply boundary, publication fence, UI or schedule; existing media-integrity cache and mutable-scope limits remain explicit.
+
+- Reviewed manual track publication guards: publish/unpublish confirmations bind exact current metadata and monotonic publication revisions, use fresh persisted authority/MFA and consume stale confirmations before atomic publication/audit writes. The additive counter migration retains history and guards on rollback; scheduling remains separate.
+- Protected operator track review: a close-only staff modal shows current descriptive metadata, ordinary publication blockers and verified artwork/tagged audio. Fresh authority/MFA checks, exact protected derivative URLs and generic private errors preserve draft privacy and retained evidence.
+
+- Reviewed bulk catalog metadata edits: staff select current-page tracks, choose Keep/Set/Clear for artist, BPM, key, genre and mood, inspect exact before/after values and save one atomic optimistic batch. Current authority/MFA, whole-row stale checks, protected-field preservation and ordinary per-track audits apply.
+
 - Named catalog metadata presets: staff save, edit and archive reusable artist, BPM/key, genre/mood, ordered tags and descriptions, then review copied values before creating a private track draft. Presets have optimistic edit versions, fresh authority/MFA checks and transactional minimized audits; later edits never alter existing tracks.
 
 - `vasey:doctor` checks the configured FFmpeg's required audio and image encoders through the bounded media runner. Exact encoder rows are required; missing capabilities, command errors, output limits and timeouts produce a redacted optional warning without failing installation foundation readiness.
@@ -20,6 +27,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 - CI fails when the built client bundle contains a server secret name from `.env.example` or a Stripe secret, restricted or webhook key prefix.
 
 ### Changed
+
+- Foundation runs the complete ordinary Chromium and mobile-WebKit suites in separate fixed matrix jobs, each with fresh fixtures and distinct retained artifacts. All 90 case identities, the existing intentional keyboard skip, zero retries and bounded suite/job budgets remain. Fresh hosted acceptance of this repair is pending.
 
 - Every CI job has a time limit: 90 minutes for a MySQL shard, 60 for a SQLite shard, 15 for the frontend and quality jobs and 10 for the backend aggregate, so a hung test no longer holds a runner for GitHub's six-hour default. The shard timings are refreshed from PR #82's two CI runs, so 11 test files that had no timing, the site-image tests among them, are no longer costed at the suite's mean.
 - Track media failures name their cause more precisely. A scan that exits with an error, passes its output limits (256 KiB of standard output, or 4 MiB of warnings on standard error) or finishes without the exact clean line now reads `scanner_unavailable`; one that runs out of time reads `processor_timeout`; and a missing resource limiter reads `tool_unavailable`. All of these used to read `scan_not_clean`. A scanner that crashes also reads `scanner_unavailable`, where it used to read `processing_failed`, and one that is not ClamAV reads `scanner_unavailable`, where it usually read `scanner_signatures_stale`. Fewer warnings no longer count toward the output limit, so they cannot end a scan. A symbolically linked directory inside private storage reads `unsafe_storage`, like a served or public disk already did, instead of `unsafe_path`. A detection still reads `scan_not_clean`, and track processing retries as before.
@@ -33,6 +42,11 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 - When a scan does not finish, the worker log records why: the failure, the exit status (137 is SIGKILL, which is how the CPU limit ends a scan) and the first line the scanner wrote to standard error and to standard output, without the upload's directory and at most 200 characters. The same holds for a scanner whose signatures are refused (the version line, the time read from it, its age and what `--version` wrote to standard error, which tells a stopped daemon from one whose VERSION command is off and from one in the wrong time zone), for one that is not ClamAV, and for a scan that exits 0 without the clean line. The messages shown to administrators are unchanged.
 
 ### Fixed
+
+- Publication-guard tests compare complete audit contexts with strict canonical JSON while retaining typed values, and explicitly prove ordinary null-tag normalization before complete row comparisons. The separate synthetic quote publisher enrolls through the existing encrypted MFA helper when used by required-MFA inquiry fixtures; application authority and all race cases remain intact.
+
+- Private Tracks updates rejected before Livewire component boot now receive generic private errors and no-store/noindex protection when the actual server update route carries a valid signed Tracks snapshot. CSRF remains HTTP 419; forged names, signatures and client markers cannot opt unrelated requests into this scope.
+- The genuine related-media browser observer waits for completed native preview transport and exact full/range bytes, while retaining the narrowly identified opaque pre-gesture WebKit observations as diagnostics. A real post-gesture response and progressing playback remain required; repaired hosted execution is pending.
 
 - Track-media cleanup retains promoted private files once the completion transaction reaches its commit, including when a connection or listener error follows and later reads see no output rows. Failures inside the transaction still clean only that attempt's files. Existing revisions and retry behavior are preserved; uncertain orphan files require quiescent manual reconciliation.
 - Media and site-image worker attempts share an 840-second monotonic budget across every scanner and encoding subprocess. Each call keeps its smaller individual limit, no new call starts with less than one second left, and promotion checks the budget again. This closes the master/site-image gap beneath the existing 900-second queue timeout without changing its claim or retry settings.
