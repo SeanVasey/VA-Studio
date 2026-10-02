@@ -61,7 +61,7 @@ try {
         || getenv('STRIPE_TEST_FINALIZATION_ENABLED') !== 'false' || getenv('STRIPE_WEBHOOK_ENABLED') !== 'false'
         || ! is_string($marker) || preg_match('/\A[a-f0-9]{64}\z/D', $marker) !== 1 || ! is_string($password) || strlen($password) < 40
         || ! in_array($project, ['chromium-desktop', 'webkit-mobile'], true) || ! in_array($mode, ['prepare', 'verify', 'withdraw', 'restore'], true)
-        || count($argv) !== ($mode === 'verify' ? 4 : 3) || ($mode === 'verify' && ! in_array($phase, ['first', 'reopened', 'attention', 'withdrawn', 'restored'], true))) {
+        || count($argv) !== ($mode === 'verify' ? 4 : 3) || ($mode === 'verify' && ! in_array($phase, ['first', 'reopened', 'attention', 'disposition', 'operation_history', 'processing_unavailable', 'withdrawn', 'restored'], true))) {
         throw new RuntimeException('Not an isolated exception-inspection browser run.');
     }
     foreach (['framework/views', 'framework/sessions', 'framework/cache/data', 'logs', 'app/private'] as $child) {
@@ -175,7 +175,7 @@ try {
         assertEvidenceUnchanged($fixture);
         $counts = auditCounts($fixture);
         if ($mode === 'withdraw') {
-            if ($fixture['state'] !== 'attention' || $operator->is_admin !== true) {
+            if ($fixture['state'] !== 'processing_unavailable' || $operator->is_admin !== true) {
                 throw new RuntimeException('Unexpected withdrawal state.');
             }
             DB::transaction(function () use ($operator, $baseOperator): void {
@@ -201,13 +201,19 @@ try {
             assertEvidenceUnchanged($fixture);
             echo "{\"restored\":true,\"evidenceUnchanged\":true,\"guardsRestored\":true}\n";
         } else {
-            $expectedPrevious = ['first' => 'prepared', 'reopened' => 'first', 'attention' => 'reopened', 'withdrawn' => 'withdrawn', 'restored' => 'restored'][$phase];
+            $expectedPrevious = ['first' => 'prepared', 'reopened' => 'first', 'attention' => 'reopened', 'disposition' => 'attention', 'operation_history' => 'disposition', 'processing_unavailable' => 'operation_history', 'withdrawn' => 'withdrawn', 'restored' => 'restored'][$phase];
             if ($fixture['state'] !== $expectedPrevious || ($phase === 'withdrawn' ? $operator->is_admin !== false : $operator->is_admin !== true)
                 || ($phase === 'first' && $counts['verified'] < 1) || ($phase === 'reopened' && $counts['verified'] <= $fixture['auditCounts']['verified'])
                 || (in_array($phase, ['first', 'reopened'], true) && $counts['attention'] !== 0)
                 || ($phase === 'attention' && $counts['attention'] < 1) || ($phase === 'withdrawn' && $counts !== $fixture['auditCounts'])
                 || $counts['verified'] < $fixture['auditCounts']['verified'] || $counts['attention'] < $fixture['auditCounts']['attention']) {
                 throw new RuntimeException('Inspection/denial audit did not match the journey.');
+            }
+            if (in_array($phase, ['disposition', 'operation_history', 'processing_unavailable'], true)) {
+                assertOperationHistory($fixture);
+                if ($counts !== $fixture['auditCounts']) {
+                    throw new RuntimeException('Operational actions changed historical inspection audits.');
+                }
             }
             $fixture['state'] = $phase;
             $fixture['auditCounts'] = $counts;
@@ -378,6 +384,25 @@ function auditCounts(array $fixture): array
     }
 
     return $counts;
+}
+
+function assertOperationHistory(array $fixture): void
+{
+    $record = $fixture['records']['verified'];
+    $events = DB::table('test_payment_exception_events')->where('order_finalization_id', $record['id'])->get();
+    $work = DB::table('test_payment_exception_work')->where('order_finalization_id', $record['id'])->sole();
+    if ($events->count() !== 1 || $events[0]->kind !== 'disposition' || $events[0]->outcome !== 'acknowledged'
+        || (int) $events[0]->sequence !== 1 || (int) $events[0]->actor_id !== $fixture['operatorId'] || $events[0]->observed_at !== null
+        || (int) $work->sequence !== 1 || $work->request_id !== null || $work->claim_token !== null || $work->lease_expires_at !== null
+        || DB::table('test_payment_exception_events')->where('order_finalization_id', $fixture['records']['attention']['id'])->exists()) {
+        throw new RuntimeException('Operational action history does not match the native journey.');
+    }
+    $audits = AuditEvent::where('subject_type', OrderFinalization::class)->where('subject_id', $record['id'])
+        ->where('action', 'commerce.payment_exception.disposition')->get();
+    if ($audits->count() !== 1 || $audits[0]->actor_id !== $fixture['operatorId']
+        || $audits[0]->context !== ['finalization_id' => $record['publicId'], 'sequence' => 1, 'outcome' => 'acknowledged', 'test_only' => true]) {
+        throw new RuntimeException('Operational disposition audit does not match the native journey.');
+    }
 }
 
 function writeFixture(string $path, array $fixture, bool $exclusive = false): void

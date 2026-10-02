@@ -335,6 +335,10 @@
       "test_worker_whose_lease_was_reclaimed_cannot_commit_stale_payment_evidence"
     ],
     [
+      "Tests\\Feature\\TestPaymentExceptionOperationsConcurrencyTest",
+      "test_independent_operators_serialize_history_and_fence_provider_claims"
+    ],
+    [
       "Tests\\Feature\\TrackMetadataConcurrencyTest",
       "test_overlapping_edits_wait_on_the_same_row_and_only_one_revision_is_saved"
     ],

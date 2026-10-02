@@ -42,6 +42,7 @@ PHP_TARGETS = {
         "tests/Feature/StemsArchiveTest.php",
     ),
     "commerce": (
+        "tests/Feature/TestPaymentExceptionOperationsTest.php", "tests/Feature/TestPaymentExceptionOperationsConcurrencyTest.php",
         "tests/Feature/CommerceAuditActorTest.php", "tests/Feature/CommerceAuditActorConcurrencyTest.php",
         "tests/Unit/AllocateDiscountTest.php", "tests/Unit/MinorUnitsTest.php",
         "tests/Unit/PricingPolicyTest.php", "tests/Unit/PromotionPolicyTest.php",

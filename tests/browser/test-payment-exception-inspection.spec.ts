@@ -136,6 +136,32 @@ test('ordinary operator inspects retained synthetic exceptions and stale authori
     expect(verify(testInfo.project.name, 'attention').inspectionAudits.attention).toBeGreaterThanOrEqual(1);
     await captureInspection(page, dialog, 'Evidence needs attention', 'attention', testInfo);
     await close(page, attention);
+
+    const row = page.getByRole('row').filter({ has: page.getByText(fixture.verifiedId, { exact: true }) });
+    await operate(page, row.getByRole('button', { name: 'Record operational status', exact: true }));
+    await expect(dialog.getByRole('heading', { name: 'Record test exception review', exact: true })).toBeVisible();
+    await dialog.getByLabel('Operational status', { exact: false }).selectOption('acknowledged');
+    await operate(page, dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Submit', exact: true }));
+    await expect(page.getByText('Operational status recorded', { exact: true })).toBeVisible();
+    verify(testInfo.project.name, 'disposition');
+
+    await operate(page, row.getByRole('button', { name: 'Operational history', exact: true }));
+    await expect(dialog.getByRole('heading', { name: 'Test exception operational history', exact: true })).toBeVisible();
+    await expect(dialog).toContainText('acknowledged');
+    await expect(dialog).toContainText('Fulfillment remains blocked');
+    await assertPrivate(page, fixture);
+    verify(testInfo.project.name, 'operation_history');
+    await operate(page, dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Close', exact: true }));
+
+    // The browser fixture intentionally has no provider credential or enabled processing policy.
+    await operate(page, row.getByRole('button', { name: 'Check current test payment', exact: true }));
+    await expect(dialog.getByRole('heading', { name: 'Check current test payment', exact: true })).toBeVisible();
+    await operate(page, dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Submit', exact: true }));
+    await expect(page.getByText('Test payment check was not confirmed', { exact: true })).toBeVisible();
+    await expect(dialog.getByRole('heading', { name: 'Check current test payment', exact: true })).toBeVisible();
+    await assertPrivate(page, fixture);
+    verify(testInfo.project.name, 'processing_unavailable');
+    await operate(page, dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Cancel', exact: true }));
     expect(errors).toEqual([]);
 
     expect(fixtureOperation('withdraw', testInfo.project.name)).toEqual({ withdrawn: true });
