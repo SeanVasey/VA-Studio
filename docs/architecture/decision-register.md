@@ -4,7 +4,7 @@ As of 2026-09-04. This is the initial register; entry keys are local tracking ke
 
 ## T12-RIGHTS-EVIDENCE-GUARD-01: retain verified rights evidence
 
-October 2, 2026. Planned bounded prerequisite for the existing T12 / WP-02 publication-evidence apply boundary, supporting WP-04's evidence-retention invariant. This is a design/acceptance brief, not an implemented guard or a new completed row in the 40-task register.
+October 2, 2026. The SQL retention floor is an implemented PR #105 candidate supporting T12 / WP-02 and WP-04's existing evidence-retention invariant. Fresh full current-source SQLite/MySQL/native CI acceptance remains pending. [The implementation record](../verification/rights-evidence-guards.md) describes seven owned triggers and their bounded parent-retention protections. No parent is completed and no row is added to the 40-task register.
 
 ### Existing rule and reproduced gap
 
@@ -14,23 +14,23 @@ An isolated source-bound probe on `81536814421b32f4235aa88b578d5e8e6c96b23b`, tr
 
 The same probe separately demonstrates an unenrolled direct verifier under required panel MFA and a controlled gap between the pretransaction Gate read and the write. These require a later current-authority/MFA writer boundary; SQL evidence guards alone do not resolve them.
 
-### Bounded next implementation
+### Implemented SQL-floor candidate
 
-Add a forward rights-evidence guard migration, dedicated behavior/migration tests and exact fixture adaptations. Own the new migration after `000034`, new rights-immutability test/support files and the verification ledgers. Coordinate any existing-test edits by file; do not change commercial values, policy text or immutable snapshots.
+Forward migration `2026_10_02_000035_rights_evidence_guards.php`, dedicated behavior/migration/concurrency test sources and exact fixture adaptations are implemented in the candidate. Seven owned SQLite/MySQL triggers cover rights INSERT, AFTER INSERT, UPDATE and DELETE plus parent-track INSERT, UPDATE and DELETE. They do not rewrite rows, audits, verification identity or commercial snapshots. Their definitions and test registration do not establish hosted acceptance.
 
-- Protect persisted verified declarations against ordinary updates, deletion and replacement/upsert bypasses. Exercise explicit-ID and engine-specific replacement behavior rather than assuming deletion triggers cover it.
-- Cover parent-track deletion/replacement and foreign-key cascades before claiming complete ordinary-DML retention. State any remaining boundary explicitly.
+- Refuse stored verified-row changes/deletion, conflicting identity displacement and replacement/upsert collisions. Test explicit-ID and engine-specific replacement behavior; do not infer protection from deletion triggers alone.
+- Guard parent-track identity deletion/replacement and actual unique-key collisions. Concurrent parent retention also relies on validated RESTRICT/NO ACTION foreign keys; sequential foreign-key-disabled cases prove guard causality, not concurrent protection with disabled constraints or arbitrary cascades.
 - Keep pending edits, ordinary pending-to-verified service transitions and genuinely new declarations available. Historical rows and their original audits remain unchanged; no migration fabricates approval evidence.
-- Preflight the real schema, owned guard names/definitions and temporary/shadow ownership before DDL. Refuse foreign definitions, resume a recognized interrupted installation, and preserve evidence protection during operational rollback.
+- Preflight the real schema, owned guard names/definitions and temporary/shadow ownership before DDL. Refuse drift/foreign definitions, resume only an exact surviving creation prefix, and retain all seven guards during operational rollback. Ordinary-DML protection is not privileged-DDL protection.
 - Preserve byte-exact retained offer revisions and original quote/order/grant/contract evidence. Newest pending declarations continue to block new readiness under existing semantics; they never rewrite an earlier verified row.
 
-Four existing tests intentionally downgrade verified declarations: `BulkTrackTagsTest`, `BulkUpdateTrackMetadataTest`, `TrackPublicationGuardTest` and `ExclusiveOfferTest`. Replace those synthetic setup mutations with a newer pending declaration while retaining every existing refusal, stale-review and whole-batch atomicity assertion.
+Four existing tests formerly downgraded verified declarations: `BulkTrackTagsTest`, `BulkUpdateTrackMetadataTest`, `TrackPublicationGuardTest` and `ExclusiveOfferTest`. The candidate appends a newer pending declaration instead, retaining every existing refusal, stale-review and whole-batch atomicity assertion.
 
 ### Acceptance and following dependency
 
-Meaningful regression coverage must reproduce the stale model first, then prove current stored verified evidence is retained across model/query/raw SQL, replacement/upsert and indirect deletion paths on both supported engines. Include migration recovery/refusal cases and a genuine independent-process MySQL writer wait if concurrency protection is claimed. Any MySQL-only test must have its exact reviewed SQLite skip identity and actual positive MySQL execution; SQLite does not prove the lock contract.
+Acceptance must reproduce the stale model first, then prove current stored verified evidence is retained across model/query/raw SQL, replacement/upsert and bounded parent-deletion paths on both supported engines. Migration recovery/refusal cases and a genuine independent-process rights-row wait are registered. The MySQL race has two exact datasets, stale model update and stale model delete, with matching SQLite skip identities; positive actual hosted MySQL execution is still required. SQLite does not prove the lock contract.
 
-After the SQL retention floor, centralize supported rights writers with fresh transactional authority/MFA, compatible actor/track/rights locks and explicit reviewed identity. The subsequent manifest apply boundary also needs compatible exclusive-scope/currentness fencing and honest physical-byte proof. Existing exclusive writers and finalization have different cross-family lock orders; a static potential cycle is not an executed MySQL deadlock proof. Do not introduce a reverse lock order from the track reader without reviewing all participating writers.
+The SQL candidate introduces no fresh transactional actor/MFA checks, locking read or writer command; the direct-verifier authority/MFA gaps remain. After this floor is accepted, centralize supported rights writers with fresh transactional authority/MFA, compatible actor/track/rights locks and explicit reviewed identity. The subsequent manifest apply boundary also needs compatible exclusive-scope/currentness fencing and honest physical-byte proof. Existing exclusive writers and finalization have different cross-family lock orders; a static potential cycle is not an executed MySQL deadlock proof. Do not introduce a reverse lock order from the track reader without reviewing all participating writers.
 
 Enforcing the existing immutable-evidence rule needs no new legal or scheduling decision. Production clearance/reviewer policy, recovery roles, financial rights consequences or retention exemptions remain separate owner-policy work. Track lead time, horizon, precision, grace and pending-schedule disposition after manual publication remain undecided; site-release timing rules do not transfer to tracks. This prerequisite provides no schedule, retained publication approval, apply fence or production activation.
 

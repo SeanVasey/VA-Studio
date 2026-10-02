@@ -1,6 +1,6 @@
 # T12-PUBLICATION-EVIDENCE-01: read-only track publication evidence
 
-October 2, 2026. Implemented internal foundation with focused development feedback; full integrated acceptance remains pending. This is a partial T12 / WP-02 prerequisite for FP-032 track scheduling, not a scheduling policy or a completed parity requirement. [The verification record](../verification/track-publication-manifest-foundation.md) identifies the exact tested source and remaining gates.
+October 2, 2026. Internal read-only foundation accepted in PR #104 after full current-source hosted evidence and independent review. This is a partial T12 / WP-02 prerequisite for FP-032 track scheduling, not a scheduling policy or a completed parity requirement. [The verification record](../verification/track-publication-manifest-foundation.md) preserves source-specific development feedback; [canonical accepted evidence](../development-order.md#pr-104-staff-authoring-acceptance) binds PR head `0c7dbd8c7ddf41ea97fcae873d1587faec3b24a1`, tree `a3ed238f4c8dfc1a9b5759c419f02061349d6f58` and merge `23d1e5c85936ecf8b37e0f2cf7d7372d1b0303ec` to run 373 and distinct successful postmerge run 374.
 
 ## Capture boundary
 
@@ -30,6 +30,6 @@ File availability uses existing `VerifiedMedia` / `MediaIntegrity` behavior, inc
 
 ## Next dependency
 
-Retaining a reviewed manifest, comparing it with current dependencies and applying publication atomically remain separate work. That apply boundary needs a compatible lock/currentness contract for every mutable dependency, including exclusive-scope controls, and honest handling of physical media proof. This increment changes no manual publication API, counter, migration, UI, route, console command, queue or scheduler.
+The [seven-trigger SQL rights-evidence floor](../verification/rights-evidence-guards.md) is an implemented PR #105 candidate pending fresh full current-source SQLite/MySQL/native CI acceptance. It retains verified evidence without fresh transactional actor/MFA checks or a writer fence. Transactional rights authority and compatible writers remain the next dependency. Retaining a reviewed manifest, comparing it with current dependencies and applying publication atomically remain separate work. That apply boundary needs a compatible lock/currentness contract for every mutable dependency, including exclusive-scope controls, and honest handling of physical media proof. This increment changes no manual publication API, counter, migration, UI, route, console command, queue or scheduler.
 
 Track scheduling still needs explicit owner decisions for lead time, horizon, precision, grace and the disposition of a pending schedule after manual publication. The site-release limits and supersession choices in [D-24](D-24-scheduled-site-publication.md) are site-only and do not transfer to tracks. Those missing inputs do not prevent this policy-independent read-only foundation; they do prevent inventing a track scheduling contract from it.

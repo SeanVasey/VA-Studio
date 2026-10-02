@@ -432,7 +432,8 @@ class BulkUpdateTrackMetadataTest extends TestCase
         $this->rejects(fn () => $command->apply($review, $actor));
         $this->assertSame($before, $this->evidence());
         $review = $this->review([$draft, $track], $actor, $this->changes(['mood' => ['mode' => 'set', 'value' => 'Blocked addition']]));
-        DB::table('rights_declarations')->where('track_id', $track->id)->update(['status' => 'draft']);
+        $track->rightsDeclarations()->create(['provenance_reference' => 'SYNTHETIC-PENDING-REVIEW',
+            'sample_disclosure' => 'New synthetic declaration awaiting verification', 'status' => 'pending']);
         $before = $this->evidence();
         $this->rejects(fn () => $command->apply($review, $actor));
         $this->assertSame($before, $this->evidence());

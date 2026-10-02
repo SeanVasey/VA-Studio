@@ -1,5 +1,13 @@
 # Ordered development status
 
+## PR #105 SQL rights-evidence guard candidate
+
+October 2, 2026. The [verified-rights SQL floor](verification/rights-evidence-guards.md) is implemented in the PR #105 candidate; fresh full current-source SQLite/MySQL/native CI acceptance remains pending. Forward migration `2026_10_02_000035_rights_evidence_guards.php` adds seven owned triggers for rights-row INSERT/AFTER INSERT/UPDATE/DELETE and parent-track INSERT/UPDATE/DELETE, with behavior, installation/recovery and independent-process race sources. Existing retained rows, audits, verifier/time and commercial snapshots are not rewritten.
+
+This is ordinary-DML evidence retention with validated restrictive foreign keys for concurrent parent retention. Sequential foreign-key-disabled cases do not prove concurrent retention with disabled constraints, arbitrary cascades or privileged DDL safety. No fresh transactional actor/MFA checks, locking read or writer command is added. The next dependency is transactional rights authority and compatible writers, then reviewed manifest compare/apply. Scheduling policy, production readiness and T12/WP-02/WP-04 parent completion remain open. The 40-row task census is unchanged.
+
+The accepted PR #104 runs 373/374 below retain their original source/event/count/hash and screenshot provenance. They do not supply execution acceptance for this new runtime candidate; final composed source requires one fresh full run and independent review.
+
 ## PR #104 staff-authoring acceptance
 
 October 2, 2026. The four related T12 / WP-02 children are accepted in [PR #104](https://github.com/VASEYDEV/VASEYAUDIO/pull/104): reviewed bulk metadata, protected operator track review, reviewed manual publication guards and the internal read-only publication manifest. T12/WP-02, track scheduling and production/cutover readiness remain partial.
@@ -45,13 +53,23 @@ Both prior defects and the new route-boundary regression pass on both database e
 
 ### Separate postmerge verification
 
-The automatic main-push run [36997312878](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36997312878), run 374 / attempt 1, began at 10:46:19 UTC on merge `23d1e5c85936ecf8b37e0f2cf7d7372d1b0303ec`. It was still running at this ledger checkpoint. Its receipts have a distinct push/commit identity and cannot be inferred from the accepted PR receipts. Preserve its running jobs and verify its eventual originals separately.
+The automatic main-push run [36997312878](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36997312878), run 374 / attempt 1, began at 10:46:19 UTC on merge `23d1e5c85936ecf8b37e0f2cf7d7372d1b0303ec`. It completed success at 11:47:58 UTC, independently verified from its own six original database archives and three native archives. All thirteen applicable jobs passed; documentation was intentionally skipped. Its exact push checkout is merge `23d1e5c85936ecf8b37e0f2cf7d7372d1b0303ec`, tree `a3ed238f4c8dfc1a9b5759c419f02061349d6f58`, sole parent `d57c3bb266890bc32adc1974fb84c050d848e90b`. Its receipts retain a distinct push/commit identity; no PR receipt substitutes for this execution.
+
+| Postmerge originals | Verified result |
+| --- | --- |
+| MySQL | 2,523 executions / 42,271 assertions; zero skips, failures or errors |
+| SQLite | 2,338 executions / 28,764 assertions; 185 exact MySQL-only skips; zero failures or errors |
+| Skip counterparts and races | All 185 positive MySQL counterparts, all 144 child cases, all 27 new concurrency cases and all 36 inquiry authority races pass |
+| Native | 91 passes: Chromium 45, WebKit 44, genuine related two; one unchanged WebKit keyboard-focus skip; zero retries/flaky/test/runner errors |
+| Strict receipts | Six current source-bound originals; strict collector replay equals the actual current uploaded shadow receipt |
+
+Successful native raw response bodies remain unretained under tracing on failure; exact runtime byte/range assertions and current retained media receipts supply the stated proof. The screenshot package below remains bound to run 372.
 
 ### Screenshots and next dependency
 
 Sean's desktop/mobile storefront and administration deliverables are ten unchanged PNGs extracted from the original successful browser jobs in run 372, head `50497cedf2e296b7d74d1c57f541f8cd1d45951e`, tree `9d74f3ebd276b32bfd86cf861d94cbaef55a6b8c`. The saved package `VASEYAUDIO-storefront-admin-screenshots-PR104.zip` retains source/archive/PNG provenance, SHA-256 `bc5dab6c6a44cb425b7733210ee8e219fe812da2cd30b804da04b420a5931ddd`. They show synthetic fixtures; the ordinary storefront uses synthetic browser transport and supplies visual evidence rather than backend catalog proof. No screenshot was recaptured or rebound to run 373.
 
-The next bounded prerequisite is [verified-rights evidence protection](architecture/decision-register.md#t12-rights-evidence-guard-01-retain-verified-rights-evidence), followed by compatible current-authority/writer fencing before a reviewed manifest compare/apply command. The accepted manifest remains a point capture with the existing 60-second media-integrity cache and independently mutable scope limits. It supplies no retained approval, apply fence or scheduling policy. The 40-task census and parent completion criteria remain unchanged.
+The [SQL rights-evidence protection](verification/rights-evidence-guards.md) is now an implemented PR #105 candidate pending fresh full acceptance, as recorded above. Transactional rights authority and compatible writers remain necessary before a reviewed manifest compare/apply command. The accepted manifest remains a point capture with the existing 60-second media-integrity cache and independently mutable scope limits. It supplies no retained approval, apply fence or scheduling policy. The 40-task census and parent completion criteria remain unchanged.
 
 ## Four-child staff-authoring candidate — preceding composition, October 2, 2026
 

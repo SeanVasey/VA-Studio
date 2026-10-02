@@ -305,7 +305,8 @@ class TrackPublicationGuardTest extends TestCase
     {
         ['actor' => $actor, 'track' => $track] = $this->fixture('publish');
         $review = $this->review($track, $actor, 'publish');
-        DB::table('rights_declarations')->where('track_id', $track->id)->update(['status' => 'pending']);
+        $track->rightsDeclarations()->create(['provenance_reference' => 'SYNTHETIC-PENDING-REVIEW',
+            'sample_disclosure' => 'New synthetic declaration awaiting verification', 'status' => 'pending']);
         $this->assertNotSame([], app(PublicationReadiness::class)->blockers($track->fresh()));
         $before = $this->evidence();
         $this->invalid(fn () => $this->apply($review, $actor, 'publish'));

@@ -263,7 +263,8 @@ class BulkTrackTagsTest extends TestCase
         $this->get('/tracks/'.$track->slug)->assertOk();
         $draft = $this->drafts($actor, 1)[0];
         $review = $this->review([$draft, $track], $actor, ['Blocked addition']);
-        DB::table('rights_declarations')->where('track_id', $track->id)->update(['status' => 'draft']);
+        $track->rightsDeclarations()->create(['provenance_reference' => 'SYNTHETIC-PENDING-REVIEW',
+            'sample_disclosure' => 'New synthetic declaration awaiting verification', 'status' => 'pending']);
         $before = $this->evidence();
         try {
             app(BulkAddTrackTags::class)->apply($review, $actor);
