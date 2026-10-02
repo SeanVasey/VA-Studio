@@ -156,7 +156,7 @@ jobs:
         run: python3 scripts/ci/database-receipts.py finish --engine=mysql --shard=${{ matrix.shard }}
       - name: Retain partition and test evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: backend-mysql-${{ matrix.shard }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: phpunit-ci-mysql-*
@@ -214,7 +214,7 @@ jobs:
         run: python3 scripts/ci/database-receipts.py finish --engine=sqlite --shard=${{ matrix.shard }}
       - name: Retain partition and test evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: backend-sqlite-${{ matrix.shard }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: phpunit-ci-sqlite-*
@@ -247,7 +247,7 @@ jobs:
         run: python3 scripts/ci/database-receipts.py collect
       - name: Retain database collection and full-only shadow decision
         if: needs.scope.outputs.mode == 'full'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: database-shadow-${{ github.run_id }}-${{ github.run_attempt }}
           path: phpunit-ci-shadow-receipt.json
@@ -296,7 +296,7 @@ jobs:
       - run: npm run test:browser -- --project="$BROWSER_PROJECT"
       - name: Retain synthetic browser evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: operator-browser-${{ matrix.project }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
@@ -339,7 +339,7 @@ jobs:
         run: node tests/browser/run-related.mjs
       - name: Retain genuine related-track browser evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: related-browser-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
