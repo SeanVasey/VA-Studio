@@ -17,12 +17,12 @@ const original: Metadata = {
 
 const row = (page: Page, name: string) => page.getByRole('row').filter({ has: page.getByText(name, { exact: true }) });
 
-async function login(page: Page) {
+async function login(page: Page, expectedPath: '/admin' | '/admin/track-metadata-presets' = '/admin') {
   await page.goto('/admin/login');
   await page.getByLabel('Email address', { exact: false }).fill('browser-operator@example.test');
   await page.getByLabel('Password', { exact: false }).and(page.locator('input[type="password"]')).fill(process.env.VASEY_BROWSER_PASSWORD!);
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
-  await expect(page).toHaveURL(/\/admin$/);
+  await expect(page).toHaveURL(expectedPath);
 }
 
 async function searchTable(page: Page, query: string) {
@@ -141,12 +141,15 @@ async function copyPreset(page: Page, name: string, data: Metadata) {
   await page.goto('/admin/tracks');
   let dialog = await openDialog(page, page.getByRole('button', { name: 'Create from preset', exact: true }), 'Create from preset');
   const select = dialog.getByLabel('Metadata preset', { exact: false });
+  await expect(select).toBeVisible();
+  await expect(select).toBeEnabled();
   // Names are not unique. The visible option includes the persisted ID that disambiguates the copy.
+  // Native option markup pads its label; accept only that outer formatting whitespace.
   const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const option = select.locator('option').filter({ hasText: new RegExp(`^${escapedName} \\(#\\d+\\)$`) });
+  const option = select.locator('option').filter({ hasText: new RegExp(`^\\s*${escapedName} \\(#\\d+\\)\\s*$`) });
   await expect(option).toHaveCount(1);
   const id = await option.getAttribute('value');
-  const label = await option.textContent();
+  const label = (await option.textContent())?.trim();
   expect(id).toMatch(/^[1-9]\d*$/);
   expect(label).toBe(`${name} (#${id})`);
   await select.selectOption(id!);
@@ -182,7 +185,7 @@ test('preset authoring recovers from field errors and creates an independent pri
   const slug = `preset-draft-${testInfo.project.name}`;
   await page.goto('/admin/track-metadata-presets');
   await expect(page).toHaveURL(/\/admin\/login$/);
-  await login(page);
+  await login(page, '/admin/track-metadata-presets');
   await page.goto('/admin/track-metadata-presets');
   let dialog = await openDialog(page, page.getByRole('button', { name: 'Create preset', exact: true }), 'Create metadata preset');
   // Nonempty whitespace reaches the server's required-name validation rather than a native required-input bubble.
