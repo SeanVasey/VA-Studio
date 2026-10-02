@@ -1,14 +1,16 @@
 # Current development queue
 
-## GitLab continuation — October 2, 2026
+## Organized GitLab execution — October 2, 2026
 
-Development now continues in private [VA-Studio](https://gitlab.com/vaseydev/va-studio). All 96 preserved branch heads and the exact `8fdc341` candidate tree were verified. The [current correction and verification record](verification/gitlab-rights-writer-continuation.md) supersedes the historical active ownership and GitHub connection notes below. No earlier component agent is currently active.
+Sean requested organized agents, completed configuration and a concrete path to onboarding his content and selling. The [current agent and launch queue](development-agent-queue.md) owns the seven-slot assignment, all 40 group mappings, dependency stages, production inputs and first-sale versus full-replacement boundary. It supersedes historical active-agent tables below. Only T03–T08 are accepted parent groups; the other 34 retain their criteria and accepted children.
 
-1. Correct the remaining `SaveTrackMetadata`, `SaveOfferDraft` and `DeactivateOffer` actor/track inversion, retain authority and rollback coverage, and execute genuine MySQL races. The implementation and initial local checks are completed; final results belong in the GitLab merge request.
-2. Port GitLab verification. Initial source-bound SQLite/MySQL writer and quality feedback is configured. Full four-MySQL/two-SQLite partitions, frontend/native jobs and reviewed provider-specific artifact collection remain required before merge. No subset pipeline accepts the candidate.
-3. Obtain independent review of the actual composed candidate and full GitLab acceptance, merge with expected head, then continue reviewed publication-manifest compare/apply and track scheduling in that order.
+Development continues in private [VA-Studio](https://gitlab.com/vaseydev/va-studio), authoritative integration branch `codex/gitlab-catalog-writer-locks-20261002`, [draft MR !1](https://gitlab.com/vaseydev/va-studio/-/merge_requests/1). The original `8fdc341` branch is preserved. The initial candidate's 206 local MySQL tests passed, including 24 concurrency cases; initial subset CI is feedback only. Current participating-writer and full GitLab workflow edits compose a new candidate that is not frozen or fully accepted. Earlier green results cannot accept changed executable bytes.
 
-The historical 40-group register, single-seller scope, accepted increments, production boundaries and original evidence below remain unchanged. The Mac checkout still requires its own development dependency installation.
+1. Compose disjoint catalog/exclusive/license/scope corrections, review remaining source-traced media/inventory participants under their real authority semantics, and retain exact authority/rollback/real-race evidence. Static compatibility leads are not universal proved deadlocks.
+2. Complete GitLab's full database partitions, frontend/native/browser/audit gates and strict provider-native evidence collection. Freeze the composed source, obtain independent review and execute all applicable checks before expected-head merge.
+3. Continue reviewed publication-manifest compare/apply, then track scheduling; in parallel prepare source/policy/storage/worker/hosting and remaining journey contracts. Rotate completed contributors into dependency-ready commerce, recovery/library and migration work rather than creating competing integration queues.
+
+The Mac dependency bootstrap and documentation are prepared and tested; actual Mac installation remains unverified without a connected Mac execution surface. Live commerce, private-source continuity, physical-device acceptance, operational recovery and authorized cutover remain concrete launch gates. No domain or live-payment activation is implied by preparation.
 
 ## Historical GitHub execution record
 

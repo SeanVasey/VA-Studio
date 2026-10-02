@@ -6,14 +6,17 @@ use App\Domain\Catalog\Models\ExclusiveActivation;
 use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Commerce\Inventory\ExclusiveSelectionPolicy;
+use App\Domain\Commerce\Inventory\SelectionInventory;
 use App\Domain\Commerce\Models\ExclusiveSale;
 use App\Domain\Commerce\Models\InventoryReservation;
 use App\Domain\Commerce\Models\RightsScope;
 use App\Domain\Commerce\Models\RightsScopeOffer;
 use App\Domain\Commerce\QuoteException;
+use App\Domain\Rights\Models\LicenseVersion;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
@@ -22,10 +25,14 @@ final class ActivateExclusiveOffer
 {
     public function handle(Offer $offer, int $expectedRevisionId, User $actor): ExclusiveActivation
     {
-        Gate::forUser($actor)->authorize('administer-catalog');
-        $policy = app(ExclusiveSelectionPolicy::class)->current();
-
-        return DB::transaction(function () use ($offer, $expectedRevisionId, $actor, $policy) {
+        return DB::transaction(function () use ($offer, $expectedRevisionId, $actor) {
+            // Serialize current authority before catalog/scope locks and attributed foreign keys.
+            $currentActor = $actor->exists ? User::query()->lockForUpdate()->find($actor->getKey()) : null;
+            if ($currentActor === null) {
+                throw new AuthorizationException;
+            }
+            Gate::forUser($currentActor)->authorize('administer-catalog', [true]);
+            $policy = app(ExclusiveSelectionPolicy::class)->current();
             $track = Track::whereKey($offer->track_id)->lockForUpdate()->firstOrFail();
             $locked = Offer::whereKey($offer->id)->lockForUpdate()->firstOrFail();
             // Do not establish a REPEATABLE READ snapshot before the later control locks.
@@ -33,7 +40,7 @@ final class ActivateExclusiveOffer
             if ($locked->track_id !== $track->id || ! $revision || $revision->id !== $expectedRevisionId) {
                 throw new QuoteException('SELECTION_CHANGED', 409);
             }
-            \App\Domain\Rights\Models\LicenseVersion::whereKey($revision->license_version_id)->lockForUpdate()->first();
+            LicenseVersion::whereKey($revision->license_version_id)->lockForUpdate()->first();
             $track->rightsDeclarations()->latest('id')->lockForUpdate()->first();
             $scope = RightsScope::whereKey($revision->snapshot['inventory']['scope_id'] ?? 0)->lockForUpdate()->first();
             $readiness = app(PublicationReadiness::class);
@@ -42,7 +49,7 @@ final class ActivateExclusiveOffer
                 $readiness->preparedExclusiveBlockers($locked, $revision) !== []) {
                 throw new QuoteException('SELECTION_CHANGED', 409);
             }
-            if (array_diff(app(\App\Domain\Commerce\Inventory\SelectionInventory::class)->governedScopes($track->id), [$scope->id]) !== []) {
+            if (array_diff(app(SelectionInventory::class)->governedScopes($track->id), [$scope->id]) !== []) {
                 throw new QuoteException('INVENTORY_SCOPE_CONFLICT', 409);
             }
             // Every currently selectable sibling needs its own explicit exact-revision link.
@@ -69,15 +76,15 @@ final class ActivateExclusiveOffer
                 $activation = $evidence->current($revision);
             } else {
                 $at = now()->toImmutable()->utc()->startOfSecond();
-                $snapshot = $evidence->snapshot($revision, $policy, $actor->id, $at->toIso8601ZuluString());
+                $snapshot = $evidence->snapshot($revision, $policy, $currentActor->id, $at->toIso8601ZuluString());
                 $activation = ExclusiveActivation::create(['offer_revision_id' => $revision->id, 'rights_scope_id' => $scope->id,
-                    'activated_by' => $actor->id, 'snapshot' => $snapshot, 'snapshot_hash' => CanonicalJson::hash($snapshot),
+                    'activated_by' => $currentActor->id, 'snapshot' => $snapshot, 'snapshot_hash' => CanonicalJson::hash($snapshot),
                     'canonicalization_version' => CanonicalJson::VERSION, 'created_at' => $at]);
             }
             if (! $locked->is_active) {
                 $locked->update(['is_active' => true]);
                 AuditEvent::record('catalog.offer.exclusive_activated', $locked,
-                    ['revision_id' => $revision->id, 'activation_id' => $activation->id, 'snapshot_hash' => $activation->snapshot_hash], $actor->id);
+                    ['revision_id' => $revision->id, 'activation_id' => $activation->id, 'snapshot_hash' => $activation->snapshot_hash], $currentActor->id);
             }
 
             return $activation;

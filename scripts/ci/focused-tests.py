@@ -78,6 +78,8 @@ PHP_TARGETS = {
         "tests/Feature/RightsDeclarationWriterTest.php", "tests/Feature/RightsDeclarationWriterActionTest.php",
         "tests/Feature/RightsDeclarationWriterConcurrencyTest.php", "tests/Feature/OfferWriterAuthorityTest.php",
         "tests/Feature/CatalogWriterAuthorityTest.php",
+        "tests/Feature/ExclusiveWriterAuthorityTest.php",
+        "tests/Feature/LicenseWriterAuthorityTest.php", "tests/Feature/RightsScopeWriterAuthorityTest.php",
     ),
 }
 FRONTEND_TARGETS = (

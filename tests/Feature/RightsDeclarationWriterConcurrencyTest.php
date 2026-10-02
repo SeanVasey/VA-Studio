@@ -2,10 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Catalog\Models\ExclusiveActivation;
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Catalog\PrepareExclusiveOffer;
 use App\Domain\Catalog\PublishOffer;
 use App\Domain\Catalog\ReadTrackPublicationManifest;
 use App\Domain\Catalog\SaveOfferDraft;
+use App\Domain\Commerce\Inventory\ManageRightsScope;
 use App\Domain\Rights\Models\RightsDeclaration;
 use App\Domain\Rights\SaveRightsDeclaration;
 use App\Domain\Rights\VerifyRightsDeclaration;
@@ -18,6 +21,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\Process;
+use Tests\Support\ExclusiveOfferFixtures;
+use Tests\Support\ExclusiveSelectionFixtures;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\QuoteFixtures;
@@ -365,6 +370,69 @@ class RightsDeclarationWriterConcurrencyTest extends TestCase
         $this->assertSame($audits + 2, AuditEvent::count());
         $this->assertSame(1, AuditEvent::where('action', 'rights.declaration.created')->count());
         $this->assertSame('pending', $track->rightsDeclarations()->latest('id')->firstOrFail()->status);
+    }
+
+    public static function exclusiveWriterOrdering(): array
+    {
+        return ['prepare first' => ['prepare', 0], 'rights then prepare' => ['prepare', 1],
+            'activate first' => ['activate', 0], 'rights then activate' => ['activate', 1]];
+    }
+
+    #[DataProvider('exclusiveWriterOrdering')]
+    public function test_same_actor_exclusive_writers_and_rights_edit_complete_in_both_lock_orders(string $writer, int $first): void
+    {
+        ExclusiveSelectionFixtures::configure();
+        $fixture = ExclusiveOfferFixtures::draft();
+        $actor = $fixture['actor'];
+        $track = $fixture['track'];
+        $offer = $fixture['offer']->fresh();
+        $save = app(SaveRightsDeclaration::class);
+        $pending = $save->create(['track_id' => $track->id, 'provenance_reference' => 'SYNTHETIC-OLDER-PENDING',
+            'sample_disclosure' => 'Synthetic older pending evidence'], $actor);
+        $latest = $save->create(['track_id' => $track->id, 'provenance_reference' => 'SYNTHETIC-LATEST-VERIFIED',
+            'sample_disclosure' => 'Synthetic current cleared evidence'], $actor);
+        app(VerifyRightsDeclaration::class)->handle($latest, $actor);
+        $fixture['legacy']['revision'] = app(PublishOffer::class)->handle($fixture['legacy']['offer'], $actor);
+        app(ManageRightsScope::class)->link($fixture['scope']->id, $fixture['legacy']['revision']->id, 'SYNTHETIC-SIBLING-LINK', $actor);
+        if ($writer === 'activate') {
+            $fixture['revision'] = app(PrepareExclusiveOffer::class)->handle($offer, $fixture['scope']->id, 'SYNTHETIC-EXCLUSIVE-LINK', $actor);
+        }
+        $oldRevisions = DB::table('offer_revisions')->orderBy('id')->get()->toJson();
+        $oldRights = $latest->fresh()->getAttributes();
+        $audits = AuditEvent::count();
+        $data = $this->data($pending, ['sample_disclosure' => 'Synthetic concurrent older pending correction']);
+        $inputs = [$this->input('exclusive-writer', $actor, ['writer' => $writer, 'offer_id' => $offer->id,
+            'scope_id' => $fixture['scope']->id, 'revision_id' => $fixture['revision']->id ?? null]),
+            $this->input('edit', $actor, ['declaration_id' => $pending->id, 'review' => $save->review($pending, $actor), 'data' => $data])];
+        $inputs[$first] += $first === 0
+            ? ['pause_table' => 'tracks', 'pause_id' => $track->id]
+            : ['pause_table' => 'users', 'pause_id' => $actor->id];
+        $this->race($inputs, function ($directory, $processes, $connections) use ($first, $actor, $track, $offer, $writer, $latest, $pending, $data): void {
+            $second = 1 - $first;
+            touch($directory.'/start-'.$first);
+            $this->await(fn () => is_file($directory.'/locked-'.$first), $processes);
+            touch($directory.'/start-'.$second);
+            $this->observeWait($connections[$second], $connections[$first], 'users', $actor->id, $processes);
+            touch($directory.'/release-'.$first);
+            $results = $this->results($processes, $connections);
+            $this->assertSame('exclusive-saved', $results[0]['result'], json_encode($results[0], JSON_THROW_ON_ERROR));
+            $this->assertSame('saved', $results[1]['result'], json_encode($results[1], JSON_THROW_ON_ERROR));
+            foreach ($results as $result) {
+                $this->assertSame('users', $result['locks'][0]['table']);
+                $this->assertSame([$track->id], $this->trackLocks($result));
+            }
+            $saved = $writer === 'prepare' ? $offer->fresh()->currentRevision : ExclusiveActivation::where('offer_revision_id', $offer->fresh()->current_revision_id)->sole();
+            $this->assertSame($results[0]['row'], $saved->getAttributes());
+            $this->assertSame($results[1]['row'], $pending->fresh()->getAttributes());
+            $this->assertSame($data['sample_disclosure'], $pending->fresh()->sample_disclosure);
+            $this->assertSame($latest->id, $offer->fresh()->currentRevision->rights_declaration_id);
+            $this->assertSame($writer === 'activate', $offer->fresh()->is_active);
+        });
+        $oldIds = array_column(json_decode($oldRevisions, true, 32, JSON_THROW_ON_ERROR), 'id');
+        $this->assertSame($oldRevisions, DB::table('offer_revisions')->whereIn('id', $oldIds)->orderBy('id')->get()->toJson());
+        $this->assertSame($oldRights, $latest->fresh()->getAttributes());
+        $this->assertSame($audits + ($writer === 'prepare' ? 3 : 2), AuditEvent::count());
+        $this->assertSame(1, AuditEvent::where('action', 'rights.declaration.updated')->count());
     }
 
     private function trackLocks(array $result): array

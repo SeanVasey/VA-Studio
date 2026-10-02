@@ -30,7 +30,7 @@ class PublishOffer
             $locked = Offer::query()->lockForUpdate()->findOrFail($offer->id);
             $locked->licenseVersion()->lockForUpdate()->first();
             $track->rightsDeclarations()->latest('id')->lockForUpdate()->first();
-            $blockers = app(PublicationReadiness::class)->draftBlockers($locked);
+            $blockers = app(PublicationReadiness::class)->draftBlockersForPublication($locked);
             if ($blockers !== []) {
                 throw ValidationException::withMessages(['offer' => implode(' ', $blockers)]);
             }

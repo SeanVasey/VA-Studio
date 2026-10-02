@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
+if [[ $# != 0 || ${GITLAB_CI:-} != true || ${CI_DISPOSABLE_ENVIRONMENT:-} != true || $EUID != 0 ]]; then
+    echo 'PHP setup requires a disposable GitLab container running as root.' >&2
+    exit 1
+fi
+php -r 'exit(PHP_MAJOR_VERSION === 8 && PHP_MINOR_VERSION === 4 ? 0 : 1);'
 apt-get update
 apt-get install --yes --no-install-recommends git unzip python3 curl ca-certificates \
     libicu-dev libzip-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev libonig-dev \

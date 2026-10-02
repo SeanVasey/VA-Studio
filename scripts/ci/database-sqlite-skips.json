@@ -87,6 +87,14 @@
       "test_provider_create_observes_a_committed_intent_from_an_independent_mysql_connection"
     ],
     [
+      "Tests\\Feature\\LicenseWriterConcurrencyTest",
+      "test_all_license_mutations_serialize_current_role_withdrawal_before_resource_and_actor_fk_writes"
+    ],
+    [
+      "Tests\\Feature\\LicenseWriterConcurrencyTest",
+      "test_license_and_offer_publication_complete_in_both_orders_with_exact_user_or_license_fences"
+    ],
+    [
       "Tests\\Feature\\OrderPreparationConcurrencyTest",
       "test_price_expiry_during_owner_mutex_wait_cannot_create_an_order_or_extend_capacity"
     ],
@@ -152,15 +160,27 @@
     ],
     [
       "Tests\\Feature\\RightsDeclarationWriterConcurrencyTest",
-      "test_same_actor_legacy_offer_revision_and_rights_writer_complete_without_a_user_fk_track_cycle"
+      "test_same_actor_catalog_writers_and_rights_creation_complete_in_both_lock_orders"
     ],
     [
       "Tests\\Feature\\RightsDeclarationWriterConcurrencyTest",
-      "test_same_actor_catalog_writers_and_rights_creation_complete_in_both_lock_orders"
+      "test_same_actor_exclusive_writers_and_rights_edit_complete_in_both_lock_orders"
+    ],
+    [
+      "Tests\\Feature\\RightsDeclarationWriterConcurrencyTest",
+      "test_same_actor_legacy_offer_revision_and_rights_writer_complete_without_a_user_fk_track_cycle"
     ],
     [
       "Tests\\Feature\\RightsEvidenceGuardConcurrencyTest",
       "test_verification_winning_the_exact_rights_row_lock_refuses_the_stale_pending_writer"
+    ],
+    [
+      "Tests\\Feature\\RightsScopeWriterConcurrencyTest",
+      "test_nested_scope_writes_deny_authority_withdrawn_after_an_old_repeatable_read_snapshot"
+    ],
+    [
+      "Tests\\Feature\\RightsScopeWriterConcurrencyTest",
+      "test_scope_control_and_reviewed_rights_writers_serialize_on_the_exact_actor_row"
     ],
     [
       "Tests\\Feature\\SharedInventoryConcurrencyTest",
