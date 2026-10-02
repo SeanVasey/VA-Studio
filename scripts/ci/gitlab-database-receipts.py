@@ -78,7 +78,7 @@ def producer(env: dict) -> dict:
 
 def runtime(root: Path, engine: str, env: dict) -> dict:
     proof.require(env.get("DB_CONNECTION") == engine and env.get("APP_ENV") == "testing", "Explicit testing database required")
-    php = proof.json_data(proof.run(root, ["php", "-r", 'echo json_encode(["version"=>PHP_VERSION,"integer_size"=>PHP_INT_SIZE,"extensions"=>get_loaded_extensions(),"binary_sha256"=>hash_file("sha256",PHP_BINARY)],JSON_THROW_ON_ERROR);'], "PHP identity"))
+    php = proof.json_data(proof.run(root, ["php", "-r", 'echo json_encode(["version"=>PHP_VERSION,"integer_size"=>PHP_INT_SIZE,"memory_limit"=>ini_get("memory_limit"),"extensions"=>get_loaded_extensions(),"binary_sha256"=>hash_file("sha256",PHP_BINARY)],JSON_THROW_ON_ERROR);'], "PHP identity"))
     tools = {}
     for name, option in (("composer", "--version"), ("ffmpeg", "-version"), ("qpdf", "--version"), ("pdftocairo", "-v"), ("flock", "--version")):
         path = shutil.which(name)
@@ -108,9 +108,9 @@ def validate_runtime(value: dict, engine: str) -> None:
                   and value["engine"] == engine and isinstance(value["os_release_sha256"], str)
                   and proof.HASH.fullmatch(value["os_release_sha256"]) is not None, "Incomplete native runtime")
     php = value["php"]
-    proof.require(isinstance(php, dict) and set(php) == {"version", "integer_size", "extensions", "binary_sha256"}
+    proof.require(isinstance(php, dict) and set(php) == {"version", "integer_size", "memory_limit", "extensions", "binary_sha256"}
                   and isinstance(php["version"], str) and re.fullmatch(r"8\.4\.[0-9]+", php["version"]) is not None
-                  and type(php["integer_size"]) is int and php["integer_size"] == 8
+                  and type(php["integer_size"]) is int and php["integer_size"] == 8 and php["memory_limit"] == "512M"
                   and isinstance(php["binary_sha256"], str) and proof.HASH.fullmatch(php["binary_sha256"]) is not None
                   and isinstance(php["extensions"], list) and all(isinstance(x, str) for x in php["extensions"])
                   and {"fileinfo", "pdo_mysql", "pdo_sqlite", "mbstring", "intl", "bcmath", "gd", "zip", "curl", "dom", "xml", "xmlwriter", "posix"} <= set(php["extensions"]), "Unsupported PHP runtime")

@@ -5,6 +5,11 @@ if [[ $# != 0 || ${GITLAB_CI:-} != true || ${CI_DISPOSABLE_ENVIRONMENT:-} != tru
     exit 1
 fi
 php -r 'exit(PHP_MAJOR_VERSION === 8 && PHP_MINOR_VERSION === 4 ? 0 : 1);'
+# The official CLI image defaults to 128M, which cannot hold the full Laravel
+# test shards. Keep this disposable CI process bounded; application subprocess
+# limits in existing media/scanner commands remain explicit and unchanged.
+printf 'memory_limit=512M\n' > /usr/local/etc/php/conf.d/vasey-ci-memory.ini
+php -r 'if (ini_get("memory_limit") !== "512M") { fwrite(STDERR, "The bounded CI PHP memory limit was not loaded.\n"); exit(1); }'
 apt-get update
 apt-get install --yes --no-install-recommends git unzip python3 curl ca-certificates \
     libicu-dev libzip-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev libonig-dev \

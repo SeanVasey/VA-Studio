@@ -49,7 +49,7 @@ def runtime(engine):
         'version': '8.4.11', 'version_comment': 'MySQL Community', 'sql_mode': 'STRICT_TRANS_TABLES',
         'character_set_server': 'utf8mb4', 'collation_server': 'utf8mb4_0900_ai_ci', 'lower_case_table_names': 0, 'innodb_strict_mode': 1, 'performance_schema': 1, 'isolation': 'REPEATABLE-READ', 'storage_engine': 'InnoDB',
         'service_image_reference': 'mysql:8.4', 'service_image_digest': 'not exposed by GitLab service API; no reuse enabled'}
-    return {'engine': engine, 'php': {'version': '8.4.26', 'integer_size': 8, 'binary_sha256': H,
+    return {'engine': engine, 'php': {'version': '8.4.26', 'integer_size': 8, 'memory_limit': '512M', 'binary_sha256': H,
             'extensions': ['fileinfo', 'pdo_mysql', 'pdo_sqlite', 'mbstring', 'intl', 'bcmath', 'gd', 'zip', 'curl', 'dom', 'xml', 'xmlwriter', 'posix']},
             'tools': {key: {'binary_sha256': H, 'version_sha256': H} for key in ('composer', 'ffmpeg', 'qpdf', 'pdftocairo', 'flock')},
             'database': database, 'dependencies': fixtures.runtime(engine)['dependencies'], 'os_release_sha256': H}
@@ -330,13 +330,15 @@ class NativeApiTests(unittest.TestCase):
                 native.timestamp(value)
 
     def test_native_runtime_rejects_missing_fileinfo_nonstrict_mysql_or_fake_image_digest(self):
-        for mutation in ('extension', 'strict', 'charset', 'service_digest', 'shape'):
+        for mutation in ('extension', 'strict', 'charset', 'service_digest', 'shape', 'memory_default', 'memory_unbounded'):
             value=runtime('mysql')
             if mutation=='extension':value['php']['extensions'].remove('fileinfo')
             elif mutation=='strict':value['database']['sql_mode']='NO_ENGINE_SUBSTITUTION'
             elif mutation=='charset':value['database']['character_set_server']='latin1'
             elif mutation=='service_digest':value['database']['service_image_digest']='sha256:'+H
             elif mutation=='shape':del value['database']['innodb_strict_mode']
+            elif mutation=='memory_default':value['php']['memory_limit']='128M'
+            elif mutation=='memory_unbounded':value['php']['memory_limit']='-1'
             with self.subTest(mutation=mutation), self.assertRaises(proof.ReceiptError):
                 native.validate_runtime(value,'mysql')
 
