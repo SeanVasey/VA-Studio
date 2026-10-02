@@ -26,11 +26,13 @@ The store serves Sean's own catalog and customers. Tenant sellers, marketplace c
 
 | Agent | Owned files | Exit condition |
 | --- | --- | --- |
-| `rights_writer_boundary_plan` | Rights domain services only | Current actor/MFA, standalone transaction, sorted affected-track locks before rights, strict fields, reviewed commands and audit contract |
-| `inquiry_boundary_review` | Rights Filament resource/page and dedicated review view only | Services invoked from actual mounted create/edit/verify; captured review consumed once; stale/cancel/context changes fail closed |
+| `rights_writer_boundary_plan` | Rights domain services and narrow participating offer-publisher correction | Current actor/MFA, standalone transaction, sorted affected-track locks before rights, strict fields, reviewed commands and audit contract |
+| `inquiry_boundary_review` | Rights Filament resource/page and dedicated review view only | Services invoked from actual mounted create/edit/verify; captured review consumed on submit in the current component lifecycle; stale/cancel/context changes fail closed |
 | `inquiry_json_repair` | New rights writer domain/action/concurrency tests and worker only | Base authorization gaps reproduced; candidate regression checks; real MySQL interleavings registered exactly |
 | `rights_guard_sql_review` | Independent read-only source review | Review actual runtime and final composition; identify authorization/lock/evidence blockers |
 | Integration lead | Documentation, exact test registration, composition, GitHub and acceptance | One authoritative candidate, one final gate set, no overlapping owned edits |
+
+Domain and administration components are committed; the domain has independent source approval and the new domain suite passed 31 cases / 465 assertions. The administration smoke passed one actual mounted create/edit/verify flow / 28 assertions. A source review identified a participating offer-publisher actor/track lock cycle; the narrow actor-first correction and dedicated authority regression are being composed. The UI competing-verifier correction passed its two original failures; the participating offer correction passed nine new authority cases plus existing offer/quote/manifest feedback. The [composed writer contract](verification/rights-declaration-writers.md) and its adversarial action/eighteen MySQL concurrency definitions are ready for integrating checks; definitions and component feedback are not hosted acceptance.
 
 The inquiry-named agents are reused identities, not separate ongoing inquiry work. Other earlier agents were completed at this checkpoint. Contributors commit only their owned files; the lead integrates. Maximum three implementation contributors plus independent review. No duplicate implementation or unverified old branch is revived.
 
@@ -55,5 +57,7 @@ PR #105's slowest MySQL whole job took 49.63 minutes; the other MySQL jobs took 
 | #105 | Merged verified-rights SQL retention floor |
 
 There was no skipped feature sequence. GitHub allocates repository numbers as items are created; bot PRs consume numbers. Thirteen dependency PRs are open at this checkpoint, including #90–#94 for GitHub Actions. Track these in a separate maintenance lane. Review compatible updates as a coherent batch; major runtime/action changes need compatibility review. Preserve old evidence, and close superseded bot PRs only after a reviewed replacement exists. Do not merge their old candidates just to clear the queue.
+
+Current evidence equality does not detect an A→B→A history. Review consumption applies to current Livewire component state, not a durable nonce that revokes old authentic snapshots. Required MFA checks current enrollment, not a recent challenge proof. Source review identified the participating actor/track cycle: the old publisher held the track before inserting a user foreign key, while rights writers held that user before requesting the track. [MySQL documents shared record locks for foreign-key checks](https://dev.mysql.com/doc/refman/8.4/en/innodb-locks-set.html). This is source-based reasoning, not an executed race. The participating offer publisher must acquire current actor authority before its own track lock; its existing nested API remains compatible, with inherited caller lock/readiness limits. The corrected publisher/rights interaction requires its real MySQL completion case; no universal deadlock-freedom claim is made.
 
 Sean's ten storefront/admin screenshots and their archive remain preserved with their original PR #104/run-372 provenance. They are not relabeled as the new rights writer UI or current source. Fresh UI changes require their own relevant verification.

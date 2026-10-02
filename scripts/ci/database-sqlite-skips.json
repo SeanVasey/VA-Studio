@@ -135,6 +135,26 @@
       "test_both_resources_commit_or_rollback_under_shared_lock_contention"
     ],
     [
+      "Tests\\Feature\\RightsDeclarationWriterConcurrencyTest",
+      "test_current_authority_withdrawal_and_reviewed_verification_serialize_on_the_exact_actor_row"
+    ],
+    [
+      "Tests\\Feature\\RightsDeclarationWriterConcurrencyTest",
+      "test_manifest_capture_and_supported_rights_mutation_share_each_exact_affected_track_fence"
+    ],
+    [
+      "Tests\\Feature\\RightsDeclarationWriterConcurrencyTest",
+      "test_opposite_retargets_lock_tracks_in_numeric_order_and_preserve_both_current_pending_rows"
+    ],
+    [
+      "Tests\\Feature\\RightsDeclarationWriterConcurrencyTest",
+      "test_pending_identity_changed_while_verifier_waits_is_refused_without_acquiring_a_new_track_after_rights"
+    ],
+    [
+      "Tests\\Feature\\RightsDeclarationWriterConcurrencyTest",
+      "test_same_actor_legacy_offer_revision_and_rights_writer_complete_without_a_user_fk_track_cycle"
+    ],
+    [
       "Tests\\Feature\\RightsEvidenceGuardConcurrencyTest",
       "test_verification_winning_the_exact_rights_row_lock_refuses_the_stale_pending_writer"
     ],

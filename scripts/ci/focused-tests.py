@@ -73,6 +73,10 @@ PHP_TARGETS = {
         "tests/Feature/TrackPublicationGuardTest.php", "tests/Feature/TrackPublicationGuardMigrationTest.php",
         "tests/Feature/TrackPublicationGuardConcurrencyTest.php",
         "tests/Feature/TrackPublicationManifestTest.php", "tests/Feature/TrackPublicationManifestConcurrencyTest.php",
+        "tests/Feature/RightsEvidenceGuardTest.php", "tests/Feature/RightsEvidenceGuardMigrationTest.php",
+        "tests/Feature/RightsEvidenceGuardConcurrencyTest.php",
+        "tests/Feature/RightsDeclarationWriterTest.php", "tests/Feature/RightsDeclarationWriterActionTest.php",
+        "tests/Feature/RightsDeclarationWriterConcurrencyTest.php", "tests/Feature/OfferWriterAuthorityTest.php",
     ),
 }
 FRONTEND_TARGETS = (

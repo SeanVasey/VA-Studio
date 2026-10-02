@@ -50,7 +50,7 @@ Workstream numbers group related outcomes. Dependencies in the task register det
 | B9 — migration and experience acceptance | T33–T36 (4) | Complete responsive journeys, restartable import, reconciliation and SEO continuity | Design is implemented throughout B3–B8; T33 is final cross-site acceptance, not the start of design |
 | B10 — production and cutover | T37–T40 (4) | Operational hosting/recovery, exact-candidate validation, rehearsal, authorized launch | Hosting work starts early; release/cutover requires all applicable evidence and actual authorization |
 
-**Critical path:** B0 throughput → B1 safeguards → B3/B4 completion → B5 commerce and B6 access → applicable B7/B8 products → B9 reconciliation → T38 release validation → T39 rehearsal → T40 launch. B2 source/policy findings can extend or reorder that path; T37 hosting/storage/provider setup must not wait until feature completion.
+**Remaining critical path:** B3/B4 completion → B5 commerce and B6 access → applicable B7/B8 products → B9 reconciliation → T38 release validation → T39 rehearsal → T40 launch. B1 safeguards are accepted; remaining B0 throughput work continues alongside feature batches. B2 source/policy findings can extend or reorder that path; T37 hosting/storage/provider setup must not wait until feature completion.
 
 T34 import tooling starts early with synthetic fixtures after the source schema and storage contracts are known. Product-specific import adapters become accepted only as their target modules stabilize. A new source obligation receives a new stable child ID and dependencies; it cannot disappear inside an unchanged progress count.
 
