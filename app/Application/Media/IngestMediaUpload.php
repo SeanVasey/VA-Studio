@@ -3,6 +3,7 @@
 namespace App\Application\Media;
 
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Media\MediaWriterActor;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\PrivateMediaFiles;
 use App\Models\User;
@@ -71,6 +72,9 @@ final class IngestMediaUpload
             $name = Str::limit(preg_replace('/[\x00-\x1F\x7F]/', '', $name), 240, '');
 
             return DB::transaction(function () use ($track, $role, $path, $name, $mime, $size, $hash, $actor) {
+                // Upload copying stays outside our mutation locks; authority is current at commit.
+                $actor = app(MediaWriterActor::class)->authorize($actor);
+                $track = Track::query()->lockForUpdate()->findOrFail($track->id);
                 $asset = MediaAsset::create([
                     'track_id' => $track->id,
                     'role' => $role,
