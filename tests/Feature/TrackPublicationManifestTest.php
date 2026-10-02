@@ -430,7 +430,7 @@ class TrackPublicationManifestTest extends TestCase
         $this->assertTrue($entry['exclusive']['eligible']);
         $this->assertSame($fixture['activation']->id, $entry['exclusive']['activation']['id']);
         $this->assertSame($fixture['activation']->snapshot_hash, $entry['exclusive']['activation']['snapshot_hash']);
-        $this->assertSame(ExclusiveSelectionFixtures::policy(), $entry['exclusive']['policy']);
+        $this->assertSame(CanonicalJson::encode(ExclusiveSelectionFixtures::policy()), CanonicalJson::encode($entry['exclusive']['policy']));
         $this->assertSame(CanonicalJson::hash(ExclusiveSelectionFixtures::policy()), $entry['exclusive']['policy_hash']);
         $this->assertSame($fixture['scope']->id, $entry['exclusive']['scope']['scope_id']);
         $this->assertFalse($entry['exclusive']['scope']['blocked']);
