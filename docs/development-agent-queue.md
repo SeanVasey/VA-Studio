@@ -1,117 +1,95 @@
 # Development agents and launch queue
 
-October 2, 2026 (America/Chicago). This is the current assignment record for Sean's instruction to organize agents, complete configuration and finish his single-owner store so he can onboard content and sell. It supersedes historical active-agent tables in [development control](development-control.md), not their accepted evidence. Completion criteria remain in the [40-group register](remaining-development-tasks.csv); this queue does not accept a parent task or narrow parity.
+October 2, 2026 (America/Chicago). Sean authorized completion of his single-seller store, configuration, verified integration and eventual private-server migration. This is the current assignment record; older active-agent tables describe historical checkpoints. The [task register](remaining-development-tasks.csv) retains acceptance criteria and dependencies. The [content onboarding packet](content-onboarding-readiness.md) connects that work to Sean's actual files and the path to selling.
 
-## Integration and evidence boundary
+## Current integration boundary
 
-The authoritative integration branch is `codex/gitlab-catalog-writer-locks-20261002`, with [draft GitLab MR !1](https://gitlab.com/vaseydev/va-studio/-/merge_requests/1). The preserved branch `codex/rights-writers-20261002-08690e2` at `8fdc341` remains unchanged. The initial GitLab candidate is `495d3b1386880ad7cd98c79cbc95c6985eba5e2e`; its local equivalent tree is `6ddc03b10c72b57b9751c6ff42c468089febe3b1` at local commit `be5fb2fd2cf989f8fe51d2a77ef78a92fae9235c`. Current edits compose a subsequent candidate; it is not frozen or accepted by those earlier results. Runtime corrections need their own final source-bound evidence, independent review and full GitLab acceptance before expected-head merge.
+The frozen writer/configuration candidate is native GitLab `cd0cf7`, tree `fc61aabc`, equivalent to local `d953b93711f4093f5c033e3047972bff983888a5`, on `codex/gitlab-catalog-writer-locks-20261002`. [MR !1](https://gitlab.com/vaseydev/va-studio/-/merge_requests/1) has full acceptance [pipeline 2908229729](https://gitlab.com/vaseydev/va-studio/-/pipelines/2908229729) pending at this checkpoint. The new batch has not merged. Current results and any corrected successor belong in the MR, rather than a status-only commit that restarts its tests. The preserved branch `codex/rights-writers-20261002-08690e2` at `8fdc341` remains intact.
 
-The initial catalog correction passed 206 local MySQL cases, including 24 concurrency cases, with 3,286 assertions. The initial SQLite run executed 182 cases / 1,708 assertions and skipped those 24 exact MySQL-only cases. Initial subset CI cannot accept the composed candidate. Full four-MySQL/two-SQLite partitions, frontend/native/browser checks, audits and provider-native proof collection are being ported; configuration is not successful execution.
+The candidate contains participating rights/catalog/license/exclusive/media/customer writer fences, native GitLab acceptance, Mac bootstrap and private-server preparation, plus bounded fixture/environment corrections. [The correction record](verification/gitlab-acceptance-corrections.md) and [commerce attribution record](verification/commerce-audit-attribution.md) preserve actual focused results and predecessor failures. Local MySQL, SQLite, browser and independent source review are evidence for their stated scopes; they do not replace full native acceptance or separate post-merge verification.
 
-One lead integrates. Current bounded corrections share disjoint assigned files in this existing candidate; contributors must not change another owner's files. Subsequent parallel runtime packages use separate branches/worktrees under `AGENTS.md`. Shared service contracts and test registration are coordinated before edits. Only the lead publishes, freezes and merges the composed source; the reviewer reads the actual frozen head. Accepted evidence is retained separately from subsequent corrections.
+Publication compare/apply and payment-exception work below are **new work on isolated branches based on this candidate**. They are not included in the frozen candidate, accepted by its tests or merged merely because implementation is underway. The lead alone composes, publishes and merges with an expected head SHA after actual gates and review. No assignment changes production payment activation or cutover prerequisites.
 
-## Current agents and bounded exits
+## Assigned lanes and current execution
 
-Seven slots include the integration lead. Completed contributors remain available for a new bounded assignment; their names below are actual identities, not promises of unattended future execution.
+The team has seven concurrent slots including the lead. Eight named identities currently cover seven durable lanes: the independent reviewer is idle after its initial audit/lock-plan review while the publication browser sub-agent uses the available execution slot. A queued task has an accountable lane but no claim of a separate running agent. Reassign a slot after its current increment has a retained handoff; do not create overlapping implementations or 34 speculative branches.
 
-| Slot / identity | Current ownership | State and exit |
+| Lane / current identity | Active assignment and owned boundary | Exit and queued successor |
 | --- | --- | --- |
-| Lead — `/root` | Integration, shared test registration, durable status, publication and exact-head acceptance | Active; compose owned changes, freeze, obtain review, execute applicable full gates, merge only verified expected head |
-| CI — `gitlab_workflow` | `.gitlab-ci.yml`, GitLab setup/evidence helpers and dedicated safeguards | Active; port complete acceptance with native GitLab provenance, exact census and fail-closed collector tests; retain the predefined native disposable-runner guard |
-| Domain — `exclusive_lock_fix` | `PrepareExclusiveOffer`, `ActivateExclusiveOffer`, `ManageRightsScope`, exclusive/scope authority and concurrency tests/helpers | Exclusive correction and four scope races passed initially. Six nested repeatable-read authority cases then reproduced stale authority failures; the minimal locking Gate correction is under a fresh 31-case MySQL check. Earlier green results do not accept that subsequent change |
-| Domain — `license_lock_fix` | License writer commands/tests/helpers plus `PublishOffer`, `PublicationReadiness` and `VerifiedLicense` | Initial MySQL run passed 69 cases and failed one distinct-actor license publication case because readiness read old status. The correction passed 115 SQLite cases; the fresh 71-case MySQL check remains pending. Final composed review/acceptance is still required |
-| Operations — `mac_setup` | `scripts/dev/bootstrap-macos.sh`, its tests and `docs/development-macos.md` | Preparation completed; 13 safeguard tests passed. Actual Mac installation has not occurred: no connected Mac execution surface |
-| Source/plan — `launch_gap_review` | This file and current prepend sections of development control/remaining plan | Source review completed; current queue and production/obligation gaps documented without changing CSV completion criteria |
-| Review — `independent_review` | Read-only composed-source and participating-writer inventory | Initial review completed; identified further source-traced participants; final review waits for frozen corrected source |
+| Integration — `/root` | Shared integration, cross-lane contracts/test registration, exact source/tree identity, MR and durable status; two publication Filament UI files and editor feature tests | Review actual composed source, finish full acceptance, expected-head merge and main verification; select next dependency-ready batch |
+| CI acceptance — `/root/ci_acceptance` | Observe native jobs and investigate concrete failures; implement measured fixture teardown optimization on an isolated branch without changing the frozen candidate | Retain failures and narrow repair evidence; verify database census/provenance and same-source measurements for T01/T02 |
+| Publication — `/root/publication_development`; sub-agent `/root/publication_browser` | T12 reviewed publication-manifest compare/apply domain contract and adversarial tests in its isolated worktree; browser sub-agent owns assigned regression helper/spec; lead owns the specified Filament/editor files | Independent review and source-bound acceptance; then track scheduling with an explicit timing contract, followed by remaining authoring/experience children |
+| Commerce — `/root/commerce_operations` | T19 append-only retained-exception disposition and leased reconciliation in its isolated worktree | Audited, authorized, replay-safe operational outcomes; preserve paid-exception terminal evidence and no automatic grant/re-finalization; then T20 unpaid release and T21 refund/dispute contracts |
+| Hosting — `/root/hosting_configuration` | Private-server configuration and reproducible development/hosting preparation in its isolated worktree; candidate preflight has 16 safeguard passes | Reviewable configuration with observed local checks and explicit untested host boundaries; actual T13/T14/T25/T37 deployment/restore after host facts are available |
+| Launch/source — `/root/launch_plan` | This queue, task-register ownership and content onboarding packet; reconcile code, source obligations and feature-specific input needs | All 40 IDs have one accountable lane with exact dependencies; then private source/route/migration reconciliation once authorized evidence is available |
+| Independent review — `/root/independent_release_review` | Initial audit/lock-plan review complete; currently idle, then reassigned after a handoff to review actual implemented source | Findings tied to exact source and retested corrections; independent acceptance input for each sensitive batch and T38 |
 
-The lead owns UI integration and regression coordination until a current contributor is reassigned. Do not fabricate separate running UI/test agents. Reassign a completed slot when a dependency-ready package has named files, API/state contract, tests and exit criteria; do not create 34 simultaneous implementation branches.
+UI and tests travel with their feature lane; the publication browser sub-agent and lead's Filament/editor ownership are explicit exceptions to a single implementer. A reviewer does not accept their own implementation. The lead coordinates shared files before another lane edits them. Parent dependencies are acceptance prerequisites: a bounded preparatory child can proceed earlier, but cannot close its parent or enable dependent production behavior.
 
-### Source-reviewed participant backlog
-
-The exclusive/scope owner is correcting `ManageRightsScope::link/block`, with initial real races and a subsequently reproduced nested repeatable-read authority regression as recorded above. The license owner is correcting the separately executed distinct-actor old-status readiness failure. These executed cases are separate from the broader backlog: independent source review identified resource-to-actor ordering in `QueueMediaProcessing`, `BindStemsToRecording`, media completion in `MediaProcessor`, `IngestMediaUpload`, and `ReserveQuoteInventory`. The broader leads are source-traced compatibility risks, not executed reproductions or an executed universal deadlock claim. Some are pre-existing interactions with earlier actor-first publication services. Review each participant's actual caller/transaction/background-authority semantics, reproduce the relevant failure where feasible, then add bounded compatible corrections and both-order races. Do not treat a static ordering observation as proof of production exploitation, or impose staff authorization on a background job merely to make lock order uniform. The exclusive/scope and license owners retain their explicit files; the lead coordinates any further media/inventory assignment. This queue assigns no overlapping runtime edits.
+The CI lane measured 20.863 seconds of redundant teardown in nine real MySQL cases, 37.54% of that 55.578-second sample, and is testing a bounded correction. This is a measured local sample, not a prediction of full CI savings or permission to remove cases. The hosting lane's 16 passing preflight safeguards likewise do not prove that Sean's actual server is configured.
 
 ## All 40 completion groups
 
-Lane abbreviations: **L** integration lead, **C** CI, **D** domain/backend, **U** UI/design, **O** operations/source/policy, **Q** regression/security, **R** independent review. These are durable roles; current agent identities may rotate. L remains accountable for integration of every row. Sean supplies actual business decisions/access; a named role does not imply access to a provider or a qualified legal opinion.
+Dependencies below reproduce the CSV exactly. **I** = integration, **C** = CI acceptance, **P** = publication, **M** = commerce, **H** = hosting, **L** = launch/source. Independent review supports sensitive work across lanes. Sean supplies actual policy/content/account facts; assignment does not imply those facts or qualified legal review. Queued rows retain accepted children in the register even when no new implementation is active today.
 
-| Group | Delivery lanes | Canonical dependency | Current remaining scope |
+| Group | Accountable lane | Canonical dependencies | Current work / next retained scope |
 | --- | --- | --- | --- |
-| T01 | C, Q, R | BASE | Full GitLab acceptance/provenance port; accepted earlier focused receipts retained; reuse disabled |
-| T02 | C, Q | BASE | Further measured profiling retaining exact scenarios/census |
-| T03 | D, Q | BASE | Accepted whole-identifier guards; preserve evidence |
-| T04 | D, Q, R | BASE | Accepted byte-exact hash/UUID and ownership-safe migration safeguards |
-| T05 | U, D, Q | BASE | Accepted waiting-image diagnostics |
-| T06 | D, Q | BASE | Accepted stems pre-scan inspection |
-| T07 | D, Q | BASE | Accepted source-size bounds |
-| T08 | D, Q | BASE | Accepted stems deadline/recovery edges |
-| T09 | O, Q | BASE | Private source/obligation acquisition and parity reconciliation |
-| T10 | O, L; Sean | BASE | Concrete feature-specific policy decisions and production account configuration |
-| T11 | U, O, Q | BASE | Remaining journey/state contracts and exact asset provenance |
-| T12 | D, U, Q, R | T10 | Current rights/writer candidate; reviewed manifest apply; track scheduling; remaining roles/MFA/recovery/bulk licensing |
-| T13 | D, O, Q, R | T03 T04 T06 T07 T08 T10 | Private object storage/resumable intake, quotas/orphans and retained revision protection |
-| T14 | O, D, Q | T05 T06 T07 T08 T10 T13 | Deployed worker/scanner/isolation and real-media acceptance |
-| T15 | D, U, O, Q | T10 T11 | Production inquiry delivery/notice/retention and abuse/error paths |
-| T16 | U, D, O, Q | T10 T11 | Remaining consent/provider policy and related content acceptance |
-| T17 | U, D, Q, R | T10 T11 | Sharing/support, buyer context and scanned private attachments |
-| T18 | D, U, Q, R | T10 T11 | Approved free license/asset identity and purpose-specific consent |
-| T19 | D, U, Q, R | T10 T12 | Audited payment-exception transitions beyond accepted read-only inspection |
-| T20 | D, Q, R | T10 T19 | Verified unpaid release and late-payment/resource races |
-| T21 | D, U, Q, R | T10 T19 T20 | Partial/full refunds/disputes and inventory/access consequences |
-| T22 | D, O, U, Q, R | T10 T12 T13 T19 T20 T21 | Production-capable commerce/provider interoperability and required commercial-policy child workflows |
-| T23 | D, U, Q, R | T10 T11 T12 | Guest/account claim and recovery, anti-enumeration and takeover protection |
-| T24 | D, U, Q, R | T11 T13 T23 | Cross-order library/originals, large download/resume and ownership |
-| T25 | O, D, Q, R | T10 T13 | Production archival/retention/historical compatibility beyond synthetic restore |
-| T26 | D, U, Q, R | T10 T11 T15 T16 T17 T18 T22 T24 | Collections/albums with frozen composition/licensing/fulfillment |
-| T27 | D, U, Q, R | T10 T11 T13 T15 T16 T17 T18 T22 T24 | Sound kits/presets and safe exact purchased archives |
-| T28 | D, U, O, Q, R | T10 T11 T15 T17 T22 T23 | Services/deposits/milestones/revisions/private delivery |
-| T29 | D, U, O, Q, R | T10 T11 T17 T22 T23 | Merchandise/provider stock/shipping/fulfillment/returns |
-| T30 | D, U, Q, R | T09 T10 T11 T22 T24 | Membership plan versions and atomic append-only credits |
-| T31 | D, O, Q, R | T09 T10 T30 | Renewal/cancellation/rollover and legacy member continuity |
-| T32 | D, U, O, Q, R | T09 T10 T11 T17 T23 T24 | CRM/preferences/consent/outbox/support/data disposition and truthful reports |
-| T33 | U, D, O, Q | T11 T12 T14 T15 T16 T17 T18 T24 T26 T27 T28 T29 T30 T31 T32 | Complete player/PWA, responsive/accessibility/native-device/performance acceptance |
-| T34 | D, O, Q, R | T09 T13 T25 | Restartable source-mapped dry-run/import/conflict tooling |
-| T35 | O, D, Q, R; Sean | T09 T22 T24 T25 T26 T27 T28 T29 T30 T31 T32 T34 | Historical catalog/orders/contracts/grants/credits/consent/fulfillment reconciliation |
-| T36 | U, D, O, Q | T09 T16 T26 T27 T28 T29 T34 | Verified source routes, redirects/canonicals/metadata/sitemaps |
-| T37 | O, D, Q, R | T10 T12 T13 T14 T25 | Connected hosting/secrets/health/queue/payment alerts/backups/recovery/operator |
-| T38 | L, C, U, O, Q, R | T01–T37 | Frozen release; complete applicable parity/security/money/rights/device/performance evidence |
-| T39 | L, O, D, Q, R | T35 T36 T37 T38 | Concrete rehearsed cutover/rollback and in-flight webhook/sales-authority plan |
-| T40 | L, O, Q; Sean/operator | T39 | Authorized domain/payment activation and observed post-launch reconciliation |
+| T01 | C | BASE | Active acceptance: full native gates and source-bound receipts; reuse disabled |
+| T02 | C | BASE | Active investigation: profile actual native bottlenecks without removing cases |
+| T03 | H | BASE | Accepted; preserve whole-identifier evidence |
+| T04 | H | BASE | Accepted; preserve exact hashes/UUID and migration recovery |
+| T05 | H | BASE | Accepted; preserve waiting-image diagnostics |
+| T06 | H | BASE | Accepted; preserve stems pre-scan inspection |
+| T07 | H | BASE | Accepted; preserve source-size limits |
+| T08 | H | BASE | Accepted; preserve deadline/recovery edges |
+| T09 | L | BASE | Active preparation; private source acquisition/obligation audit still pending |
+| T10 | I | BASE | Active feature-specific decision preparation; real choices/evidence from Sean remain |
+| T11 | P | BASE | Queued: remaining journey/state contracts and exact asset provenance |
+| T12 | P | T10 | Active child: reviewed manifest compare/apply; then scheduling and remaining roles/MFA/recovery/bulk licensing |
+| T13 | H | T03 T04 T06 T07 T08 T10 | Active configuration preparation; adapter/resumable intake, quotas/orphans and retention implementation queued |
+| T14 | H | T05 T06 T07 T08 T10 T13 | Queued: actual deployed scanner/worker isolation and representative media proof |
+| T15 | P | T10 T11 | Queued: production inquiry delivery/notice/retention and abuse/error paths |
+| T16 | P | T10 T11 | Queued: remaining consent/provider and related-content acceptance |
+| T17 | P | T10 T11 | Queued: order-aware support and scanned private attachments |
+| T18 | P | T10 T11 | Queued: approved free-license/asset identity and purpose-specific consent |
+| T19 | M | T10 T12 | Active child: append-only operational disposition and leased reconciliation; broader resolution still open |
+| T20 | M | T10 T19 | Queued after T19: verified unpaid release and late-payment/resource races |
+| T21 | M | T10 T19 T20 | Queued after T20: refunds/disputes and explicit inventory/access effects |
+| T22 | M | T10 T12 T13 T19 T20 T21 | Queued: production policies/provider interoperability and commercial child workflows |
+| T23 | M | T10 T11 T12 | Queued: approved claim/recovery, anti-enumeration and takeover protection |
+| T24 | M | T11 T13 T23 | Queued: cross-order library/originals and large download/resume ownership |
+| T25 | H | T10 T13 | Queued: production archival/retention and hash-verified historical restore |
+| T26 | M | T10 T11 T15 T16 T17 T18 T22 T24 | Queued: collections/albums with frozen composition, license and fulfillment |
+| T27 | M | T10 T11 T13 T15 T16 T17 T18 T22 T24 | Queued: kits/presets and safe exact purchased archives |
+| T28 | M | T10 T11 T15 T17 T22 T23 | Queued: service briefs/deposits/milestones/revisions/private delivery |
+| T29 | M | T10 T11 T17 T22 T23 | Queued: merch stock/shipping/provider fulfillment and returns |
+| T30 | M | T09 T10 T11 T22 T24 | Queued: membership plan versions and atomic append-only credits |
+| T31 | M | T09 T10 T30 | Queued: renewal/cancellation/rollover and active-member continuity |
+| T32 | M | T09 T10 T11 T17 T23 T24 | Queued: CRM/preferences/consent/outbox/support/data disposition and reports |
+| T33 | P | T11 T12 T14 T15 T16 T17 T18 T24 T26 T27 T28 T29 T30 T31 T32 | Queued: remaining player/PWA and responsive/accessibility/physical-device acceptance |
+| T34 | L | T09 T13 T25 | Queued: restartable source-mapped dry-run/import/conflict tooling |
+| T35 | L | T09 T22 T24 T25 T26 T27 T28 T29 T30 T31 T32 T34 | Queued: historical orders/contracts/grants/credits/consent/fulfillment reconciliation |
+| T36 | L | T09 T16 T26 T27 T28 T29 T34 | Queued: verified source routes, redirects/canonicals/social metadata/sitemaps |
+| T37 | H | T10 T12 T13 T14 T25 | Active configuration preparation; actual hosting/alerts/backups/restore still pending |
+| T38 | I | T01 T02 T03 T04 T05 T06 T07 T08 T09 T10 T11 T12 T13 T14 T15 T16 T17 T18 T19 T20 T21 T22 T23 T24 T25 T26 T27 T28 T29 T30 T31 T32 T33 T34 T35 T36 T37 | Queued: exact integrated release, parity/security/money/rights/device/performance acceptance |
+| T39 | I | T35 T36 T37 T38 | Queued: rehearsed cutover/rollback, in-flight webhooks and one sales authority |
+| T40 | I | T39 | Queued release: authorized activation and observed post-launch reconciliation |
 
-T03–T08 are the six accepted groups. All other groups retain open parent criteria, even where accepted children exist. Neither 34 open groups nor PR numbering supplies an effort estimate. No launch date or percentage is asserted.
+T03–T08 are the six accepted parent groups. The other 34 retain open parent criteria, including substantial accepted children. These are differently sized deliverables, not 34 new features or a completion percentage. The 103-row [coverage map](remaining-parity-coverage.csv) still covers 92 required baseline capabilities and 11 optional/postlaunch capabilities; no scope is removed by this queue.
 
-## Dependency-ready stages and first sale
+## Path to content and selling
 
-1. **Finish current candidate:** compose compatible participating writers; prove relevant authority/rollback/races; port full GitLab acceptance; review the actual frozen source. Keep the preserved branch intact.
-2. **Catalog publication:** reviewed current-evidence manifest compare/apply, then track scheduling with its own timing decision. Preserve accepted metadata presets, bulk edits, private review, manual guards and whole-site scheduling.
-3. **Parallel readiness:** O gathers source/obligation and provider evidence for T09/T10/T13/T14/T37; U prepares T11/T33 customer/owner state contracts; Q develops adversarial acceptance for the selected ready increment. Synthetic work can continue without private exports.
-4. **Selling and access:** T19 → T20 → T21 → T22, alongside T23 → T24 and T25 after their storage/security contracts are ready. Actual provider test-account purchase/failure/refund/reconciliation and immutable payment-to-contract-to-download evidence are required.
-5. **Retained product families and continuity:** rotate D/U/Q into T26–T32; O/D into T34–T36; complete T33/T37 cross-site/operations acceptance. Actual source obligations can advance the necessary membership/service/merch slice.
-6. **Release:** T38 frozen acceptance → T39 rehearsed cutover → T40 authorized launch and observed reconciliation.
+1. **Integrate the current foundation:** resolve actual native failures, retain full census/provenance and independent review, merge the verified head and verify main. New feature work can continue on isolated branches while that run completes.
+2. **Prepare content now:** assemble originals, exact metadata, rights references, real license/price decisions and site copy in protected storage. Accepted draft/preset/bulk-edit/private-preview workflows can support an isolated, persistent authoring installation before public hosting. Real processing still needs configured workers, signatures and the approved tag; fixtures do not establish those conditions.
+3. **Finish publication and commerce in parallel:** P completes manifest compare/apply, then scheduling and remaining security/authoring children. M completes T19 → T20 → T21 → T22; customer claim/recovery T23 → T24 and retained originals T25 follow their own identity/storage prerequisites. H prepares and proves T13/T14/T37. L supplies applicable T09/T10 evidence while unrelated implementation continues.
+4. **Prove a real catalog purchase in a provider test account:** reviewed seller policies and actual content must survive upload → publication → immutable checkout → verified payment → original contract → authorized download, including failure/refund/reconciliation and exact-byte checks. This engineering milestone precedes live collection; credentials alone do not implement production checkout.
+5. **Finish replacement scope and obligations:** complete retained product families T26–T32, experience T33, restartable migration T34, historical reconciliation T35 and route continuity T36. Source findings can advance active membership/service/merch obligations; a first-track flow does not silently defer them.
+6. **Release:** T38 exact integrated acceptance → T39 rehearsed cutover/rollback → T40 authorized activation and observed reconciliation. Preserve one sales authority for exclusive inventory and rollback that retains new orders and existing customer rights.
 
-A production-capable first-track-sale journey is an engineering milestone, not automatic permission to replace BeatStars. The [103-row coverage map](remaining-parity-coverage.csv) retains 92 launch-required and 11 optional/postlaunch baseline requirements. Deferring an active membership, service, merch or historic purchase obligation requires verified absence or an expressly approved continuity plan; silent deferral cannot reduce the replacement scope. No independent seller onboarding, tenant stores, marketplace commissions or Stripe Connect platform are planned.
+The smallest implementation path toward a first sale is publication/security + durable media + commerce exceptions/unpaid/refunds/production provider integration + customer recovery/delivery. Full replacement additionally needs all applicable source/product/experience/operational gates. No launch date is inferred from task or PR counts.
 
-## Concrete readiness gaps
+## Concrete outside evidence
 
-The existing Filament track/media/rights/license/offer/preset/release resources already support substantial private authoring. Uploads become publishable only after configured scanner/tag/worker processing, verified deliverables, cleared rights and approved offers. [Media operations](media-processing.md) specifies the actual quarantine, limits, tool and isolation contracts.
+The [onboarding packet](content-onboarding-readiness.md) lists inputs tied to current validation and release dependencies. Prepare a representative content pack and approved preview tag first; relevant license/price/merchant decisions before production commerce; actual private-server facts before deployment; official source records before historical reconciliation. Missing evidence does not mean Sean lacks corresponding assets, accounts or rights.
 
-Selling still requires code, not merely live credentials: `routes/web.php` returns HTTP 503 at `/checkout`; `Orders/OrderPolicy`, `Checkout/CheckoutPolicy` and `Delivery/TestAccessPolicy` retain explicit local/testing/test-payment/private-local boundaries. Customer claim/recovery, cross-order library, production commerce, refund/dispute resolution and durable storage remain incomplete. Do not turn synthetic policies into production policies or enable live payments by bypassing their guards.
-
-Prepare a reviewable configuration/decision packet before requesting missing inputs:
-
-| Needed input/evidence | Canonical references | Delivery responsibility |
-| --- | --- | --- |
-| Host/region/topology, deployment, MySQL, queue/cache, private storage, email and monitoring accounts | Decision U-02/U-03; source unknown U-021; T13/T14/T37 | O prepares deployable secret-free configuration; Sean/operator selects and authorizes accounts; credentials installed outside Git |
-| Real scanner signatures/limits/isolation, ffmpeg tools, approved preview tag, master/stem provenance and alignment | Source U-003/U-006; T09/T14 | O/D/Q prove representative approved assets on production-like Linux worker |
-| Seller entity, exact licenses/rights/exclusive policy, currency/tax/capture/refund/dispute/late-payment/terms/privacy | Decision U-04/U-05/U-08/U-13; source U-004–009/U-023; T10/T19–T22 | L/O prepare concrete options from actual records; Sean and applicable qualified reviewers approve policy |
-| Stripe application configuration, deployed signed webhook, real test-account purchase/failure/refund/reconciliation | Existing payment account observation; T22 | D/O complete application interoperability. Existing Vasey Multimedia test/live account availability does not prove credentials, deployed webhook or charge readiness |
-| Account-first versus guest claim, recovery identity, admin/helper roles/MFA/recovery operator | Decision U-07; source U-022; T12/T23 | D/U/Q implement and prove approved security journey |
-| Private source inventory, originals/hashes, historic contracts/orders/assets, active credits/subscriptions/services/returns | Decision U-09/U-10/U-12; source U-002–017/U-024; T09/T25/T35 | O conducts authorized acquisition; D/Q reconcile private evidence without placing customer records in Git |
-| Transactional email, consent/suppression, retention/export/deletion and support/takedown policy | Decision U-13; source U-016/U-023; T15/T32 | O/D prepare provider integration and truthful retry/delivery states; purchases never imply marketing consent |
-| Backup retention, isolated restore, RPO/RTO, incident owner/deployment operator | Source U-027; T25/T37/T39 | O/Q demonstrate measured restore and operational ownership |
-| DNS/certificates/routes, source coexistence and exclusive-sales authority | Source U-018–020; T36/T39 | O prepares concrete rehearsal; one sales authority preserves in-flight payments and new paid records |
-| Physical iOS/Android playback/PWA/downloads, accessibility and performance | Source U-026; T33 | U/Q prepare exact-candidate cases; physical-device tester remains to be assigned |
-| Approved official identity master and content/copy provenance | Brand README/manifests; T11/T33 | U/O retain exact existing geometry; no tracing or invented logo replacement |
-
-The [unknown ledger](migration/known_unknowns_and_validation.csv) records 27 unresolved acquisition/validation facts and the [private audit checklist](migration/authenticated_studio_audit_checklist.csv) records unperformed audit areas. Missing evidence is not proof that Sean lacks the corresponding accounts, files or rights.
-
-[Mac setup](development-macos.md) and its bootstrap are prepared and safeguard-tested; installation on the actual Mac remains unverified because no Mac execution connection is available. Linux processing with `prlimit` remains a separate runtime requirement. Installing Mac development dependencies does not satisfy deployed scanner, production storage or launch evidence.
+The [private audit checklist](migration/authenticated_studio_audit_checklist.csv) still has 14 unperformed areas, and the [unknown ledger](migration/known_unknowns_and_validation.csv) retains 27 unresolved acquisition/validation facts. No private audit, customer import or obligation reconciliation is claimed. The [Mac bootstrap](development-macos.md) is prepared and safeguard-tested; installation on Sean's Mac is unverified. Private-server defaults are prepared; no actual server, production storage, real mail, signed deployed webhook or restore has been accepted. Physical-device testing and final deployment execution still need real access and an identified operator.

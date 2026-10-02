@@ -40,6 +40,8 @@ See [Mac development](development-macos.md) for dependency setup and the Mac/Lin
 
 Use [ops/private-server/env.example](../ops/private-server/env.example) to inventory required settings. It includes production application mode, debug off, MySQL, encrypted database sessions, secure/HttpOnly/SameSite cookies and an asynchronous database queue. These are intended controls, not observed deployed controls.
 
+The [read-only configuration preflight](private-server-preflight.md) validates that template separately from an actual protected installation file and can inspect local Linux/PHP/filesystem prerequisites. A blank installation file is blocked. Even a passing file check explicitly reports `deployment_ready: false`: it does not inspect effective cached/process configuration, connect to services or prove an operational deployment.
+
 Supply the real HTTPS `APP_URL`, retained `APP_KEY`, dedicated DB connection, media executable paths, private approved tag path/hash and selected mail transport through the host's protected configuration mechanism. Never put values into Git, chat, CI artifacts or general diagnostic transcripts. Choose trusted proxy handling from the actual ingress; do not blindly trust all forwarded headers. Verify private responses, CSRF and cookie security through the actual proxy.
 
 An existing installation keeps its encryption key. Back up the key with encrypted database/private-file backups; if rotation is chosen, rehearse `APP_PREVIOUS_KEYS` access before changing it. Cached configuration takes precedence over an edited template: rebuild it through the controlled release and restart workers. Do not clear a live installation's configuration to experiment.
