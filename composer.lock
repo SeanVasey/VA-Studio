@@ -8516,16 +8516,16 @@
         },
         {
             "name": "tecnickcom/tc-lib-pdf-font",
-            "version": "4.4.0",
+            "version": "4.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tecnickcom/tc-lib-pdf-font.git",
-                "reference": "658e04565534c0cdd3d8d7ff12f1c6ebeab5f7ce"
+                "reference": "a78b8e0ac9284d1594b6ba68488cf65c3e958f7b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tecnickcom/tc-lib-pdf-font/zipball/658e04565534c0cdd3d8d7ff12f1c6ebeab5f7ce",
-                "reference": "658e04565534c0cdd3d8d7ff12f1c6ebeab5f7ce",
+                "url": "https://api.github.com/repos/tecnickcom/tc-lib-pdf-font/zipball/a78b8e0ac9284d1594b6ba68488cf65c3e958f7b",
+                "reference": "a78b8e0ac9284d1594b6ba68488cf65c3e958f7b",
                 "shasum": ""
             },
             "require": {
@@ -8539,7 +8539,7 @@
                 "tecnickcom/tc-lib-unicode-data": "^3.0"
             },
             "require-dev": {
-                "carthage-software/mago": "1.49.0",
+                "carthage-software/mago": "1.50.0",
                 "pdepend/pdepend": "^2.16",
                 "phpunit/phpunit": "^11.5 || ^12.5 || ^13.3"
             },
@@ -8585,7 +8585,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-21T15:56:42+00:00"
+            "time": "2026-09-26T11:04:30+00:00"
         },
         {
             "name": "tecnickcom/tc-lib-pdf-graph",
