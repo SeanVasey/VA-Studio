@@ -77,6 +77,7 @@ PHP_TARGETS = {
         "tests/Feature/RightsEvidenceGuardConcurrencyTest.php",
         "tests/Feature/RightsDeclarationWriterTest.php", "tests/Feature/RightsDeclarationWriterActionTest.php",
         "tests/Feature/RightsDeclarationWriterConcurrencyTest.php", "tests/Feature/OfferWriterAuthorityTest.php",
+        "tests/Feature/CatalogWriterAuthorityTest.php",
     ),
 }
 FRONTEND_TARGETS = (

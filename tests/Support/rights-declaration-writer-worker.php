@@ -1,8 +1,12 @@
 <?php
 
+use App\Domain\Catalog\DeactivateOffer;
 use App\Domain\Catalog\Models\Offer;
+use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublishOffer;
 use App\Domain\Catalog\ReadTrackPublicationManifest;
+use App\Domain\Catalog\SaveOfferDraft;
+use App\Domain\Catalog\SaveTrackMetadata;
 use App\Domain\Rights\Models\RightsDeclaration;
 use App\Domain\Rights\SaveRightsDeclaration;
 use App\Domain\Rights\VerifyRightsDeclaration;
@@ -85,6 +89,14 @@ try {
     } elseif ($input['operation'] === 'legacy-offer') {
         $revision = app(PublishOffer::class)->handle($offer, $actor);
         $result = ['result' => 'published', 'revision_id' => $revision->id, 'rights_id' => $revision->rights_declaration_id];
+    } elseif ($input['operation'] === 'catalog-writer') {
+        $saved = match ($input['writer']) {
+            'metadata' => app(SaveTrackMetadata::class)->handle(Track::findOrFail($input['track_id']), $input['data'], $actor),
+            'draft' => app(SaveOfferDraft::class)->handle($offer, $input['data'], $actor),
+            'deactivate' => app(DeactivateOffer::class)->handle($offer, $actor),
+            default => throw new LogicException('Unknown participating catalog writer.'),
+        };
+        $result = ['result' => 'catalog-saved', 'row' => $saved->fresh()->getAttributes()];
     } else {
         $saved = match ($input['operation']) {
             'create' => app(SaveRightsDeclaration::class)->create($input['data'], $actor),
@@ -92,7 +104,7 @@ try {
             'verify' => app(VerifyRightsDeclaration::class)->verifyReviewed($input['review'], $actor),
             default => throw new LogicException('Unknown rights writer operation.'),
         };
-        $result = ['result' => 'saved', 'row' => $saved->getAttributes()];
+        $result = ['result' => 'saved', 'row' => $saved->fresh()->getAttributes()];
     }
 } catch (AuthorizationException) {
     $result = ['result' => 'denied'];

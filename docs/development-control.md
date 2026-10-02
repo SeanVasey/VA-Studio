@@ -1,5 +1,17 @@
 # Current development queue
 
+## GitLab continuation — October 2, 2026
+
+Development now continues in private [VA-Studio](https://gitlab.com/vaseydev/va-studio). All 96 preserved branch heads and the exact `8fdc341` candidate tree were verified. The [current correction and verification record](verification/gitlab-rights-writer-continuation.md) supersedes the historical active ownership and GitHub connection notes below. No earlier component agent is currently active.
+
+1. Correct the remaining `SaveTrackMetadata`, `SaveOfferDraft` and `DeactivateOffer` actor/track inversion, retain authority and rollback coverage, and execute genuine MySQL races. The implementation and initial local checks are completed; final results belong in the GitLab merge request.
+2. Port GitLab verification. Initial source-bound SQLite/MySQL writer and quality feedback is configured. Full four-MySQL/two-SQLite partitions, frontend/native jobs and reviewed provider-specific artifact collection remain required before merge. No subset pipeline accepts the candidate.
+3. Obtain independent review of the actual composed candidate and full GitLab acceptance, merge with expected head, then continue reviewed publication-manifest compare/apply and track scheduling in that order.
+
+The historical 40-group register, single-seller scope, accepted increments, production boundaries and original evidence below remain unchanged. The Mac checkout still requires its own development dependency installation.
+
+## Historical GitHub execution record
+
 October 2, 2026. This is the current execution checkpoint. The [40-group task register](remaining-development-tasks.csv) retains completion criteria; the [ordered record](development-order.md) retains historical source and verification evidence. Historical candidate notes do not reopen accepted work.
 
 ## Verified baseline and blocker

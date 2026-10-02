@@ -301,6 +301,72 @@ class RightsDeclarationWriterConcurrencyTest extends TestCase
         $this->assertSame(1, AuditEvent::where('action', 'rights.declaration.created')->count());
     }
 
+    public static function catalogWriterOrdering(): array
+    {
+        $cases = [];
+        foreach (['metadata', 'draft', 'deactivate'] as $writer) {
+            foreach (['catalog first' => 0, 'rights first' => 1] as $order => $first) {
+                $cases[$writer.' / '.$order] = [$writer, $first];
+            }
+        }
+
+        return $cases;
+    }
+
+    #[DataProvider('catalogWriterOrdering')]
+    public function test_same_actor_catalog_writers_and_rights_creation_complete_in_both_lock_orders(string $writer, int $first): void
+    {
+        $fixture = QuoteFixtures::selection();
+        $actor = $fixture['actor'];
+        $track = $fixture['track'];
+        $offer = $fixture['offer']->fresh();
+        $oldRevision = $fixture['revision']->fresh()->getAttributes();
+        $oldRights = $track->rightsDeclarations()->latest('id')->firstOrFail()->getAttributes();
+        $audits = AuditEvent::count();
+        $data = $writer === 'metadata'
+            ? ['title' => 'Synthetic catalog writer title', 'metadata_version' => $track->metadata_version]
+            : ['price_minor' => $offer->price_minor + 1];
+        $inputs = [$this->input('catalog-writer', $actor, ['writer' => $writer, 'track_id' => $track->id,
+            'offer_id' => $offer->id, 'data' => $data]),
+            $this->input('create', $actor, ['data' => ['track_id' => $track->id,
+                'provenance_reference' => 'SYNTHETIC-CATALOG-WRITER', 'sample_disclosure' => 'Synthetic concurrent append']])];
+        // A pending append blocks published metadata readiness. Use a private track for both orders.
+        $track->update(['status' => 'draft']);
+        $inputs[$first] += $first === 0
+            ? ['pause_table' => 'tracks', 'pause_id' => $track->id]
+            : ['pause_table' => 'users', 'pause_id' => $actor->id];
+        $this->race($inputs, function ($directory, $processes, $connections) use ($first, $actor, $track, $offer, $writer, $data): void {
+            $second = 1 - $first;
+            touch($directory.'/start-'.$first);
+            $this->await(fn () => is_file($directory.'/locked-'.$first), $processes);
+            touch($directory.'/start-'.$second);
+            $this->observeWait($connections[$second], $connections[$first], 'users', $actor->id, $processes);
+            touch($directory.'/release-'.$first);
+            $results = $this->results($processes, $connections);
+            $this->assertSame('catalog-saved', $results[0]['result'], json_encode($results[0], JSON_THROW_ON_ERROR));
+            $this->assertSame('saved', $results[1]['result'], json_encode($results[1], JSON_THROW_ON_ERROR));
+            foreach ($results as $result) {
+                $this->assertSame('users', $result['locks'][0]['table']);
+                $this->assertSame([$track->id], $this->trackLocks($result));
+            }
+            $this->assertSame($results[1]['row'], RightsDeclaration::findOrFail($results[1]['row']['id'])->getAttributes());
+            if ($writer === 'metadata') {
+                $this->assertSame($data['title'], $track->fresh()->title);
+                $this->assertSame($data['metadata_version'] + 1, $track->fresh()->metadata_version);
+                $this->assertSame($results[0]['row'], $track->fresh()->getAttributes());
+            } else {
+                $this->assertSame($results[0]['row'], $offer->fresh()->getAttributes());
+                $this->assertSame($writer === 'draft', $offer->fresh()->is_active);
+                $this->assertSame($writer === 'draft' ? $data['price_minor'] : $offer->price_minor, $offer->fresh()->price_minor);
+            }
+        });
+        $this->assertSame($oldRevision, $fixture['revision']->fresh()->getAttributes());
+        $this->assertSame($oldRights, RightsDeclaration::findOrFail($oldRights['id'])->getAttributes());
+        $this->assertSame($audits + 2, AuditEvent::count());
+        $this->assertSame(1, AuditEvent::where('action', 'rights.declaration.created')->count());
+        $this->assertSame('pending', $track->rightsDeclarations()->latest('id')->firstOrFail()->status);
+    }
+
     private function trackLocks(array $result): array
     {
         return array_values(array_merge(...array_column(array_filter($result['locks'], fn ($lock) => $lock['table'] === 'tracks'), 'ids')));

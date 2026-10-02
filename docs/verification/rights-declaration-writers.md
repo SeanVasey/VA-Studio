@@ -1,6 +1,6 @@
 # Transactional rights declaration writers
 
-October 2, 2026. T12 / WP-02 candidate following the verified PR #105 SQL evidence-retention floor. This increment composes current-authority rights services, captured administration review, the participating offer writer and adversarial coverage. Hosted MySQL/native/full acceptance remains required and is currently blocked by GitHub payment authorization. The [current queue](../development-control.md) records ownership and the next publication dependency; parent roles/recovery, scheduling and production acceptance remain open.
+October 2, 2026. T12 / WP-02 candidate following the verified PR #105 SQL evidence-retention floor. The preserved candidate `8fdc341` is now carried in private GitLab `vaseydev/va-studio`. This increment composes current-authority rights services, captured administration review, compatible catalog writers and adversarial coverage. The [GitLab continuation](gitlab-rights-writer-continuation.md) records the lock-order correction, disposable local MySQL and initial GitLab feedback pipeline. Full hosted acceptance and independent current-source review remain required. Parent roles/recovery, scheduling and production acceptance remain open.
 
 ## Supported command contract
 
@@ -21,6 +21,8 @@ Actual Filament create/edit/verify invoke the services with their outer action t
 The competing-verifier regression originally revealed Filament's silent hidden-action return. The correction checks current authorization and availability before that return: edit gives an actionable fresh-review error; verification notifies and unmounts. Evidence protection remains owned by the services and SQL floor.
 
 `PublishOffer::handle` now locks the fresh actor and locking catalog authority inside its existing transaction before its first offer/track read. This removes the source-identified actor/track inversion between supported rights writes and the publisher's user foreign-key writes. The existing nested API, subsequent track/offer/license/rights order and immutable revision/audit behavior remain. No new offer MFA policy or retry mechanism is introduced.
+
+The GitLab continuation applies that same actor-first order to `SaveTrackMetadata`, `SaveOfferDraft` and `DeactivateOffer`. Persisted actor availability and locking catalog authority are checked inside the mutation transaction before catalog reads, track locks and audit foreign-key writes. Audits use the locked current actor. Existing method signatures, caller transaction ownership, metadata revision checks and immutable commercial revisions remain. Six new genuine MySQL cases cover catalog-first and rights-first interleavings for those three commands; SQLite cannot prove their locking behavior.
 
 ## Boundaries and verification
 

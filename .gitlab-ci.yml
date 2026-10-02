@@ -1,0 +1,69 @@
+# Candidate feedback only. Full six-shard/native acceptance and its GitLab collector
+# remain a separate migration gate; a green result here cannot authorize merging.
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api"'
+    - when: never
+
+stages: [validate]
+
+default:
+  image: php:8.4-cli-bookworm
+  interruptible: true
+  before_script:
+    - bash scripts/ci/setup-gitlab-php.sh
+
+variables:
+  APP_ENV: testing
+  APP_DEBUG: 'false'
+  CACHE_STORE: array
+  SESSION_DRIVER: array
+  QUEUE_CONNECTION: sync
+  MAIL_MAILER: array
+  GIT_DEPTH: '0'
+
+quality-feedback:
+  stage: validate
+  timeout: 20m
+  script:
+    - composer validate --strict
+    - composer audit
+    - php vendor/bin/pint --test app/Domain/Catalog/SaveTrackMetadata.php app/Domain/Catalog/SaveOfferDraft.php app/Domain/Catalog/DeactivateOffer.php tests/Feature/CatalogWriterAuthorityTest.php tests/Feature/RightsDeclarationWriterConcurrencyTest.php tests/Support/rights-declaration-writer-worker.php
+    - python3 scripts/ci/test-phpunit-shards.py
+    - python3 scripts/ci/test-ci-scope.py
+    - python3 scripts/ci/test-focused-tests.py
+    - python3 scripts/ci/test-database-receipts.py
+    - python3 scripts/ci/test-gitlab-writer-feedback.py
+
+writer-feedback:
+  stage: validate
+  timeout: 35m
+  parallel:
+    matrix:
+      - DB_CONNECTION: [sqlite, mysql]
+  services:
+    - name: mysql:8.4
+      alias: mysql
+  variables:
+    MYSQL_DATABASE: vaseyaudio_test
+    MYSQL_ROOT_PASSWORD: disposable-gitlab-test-only
+    MYSQL_ROOT_HOST: '%'
+    DB_HOST: mysql
+    DB_PORT: '3306'
+    DB_DATABASE: vaseyaudio_test
+    DB_USERNAME: root
+    DB_PASSWORD: disposable-gitlab-test-only
+    DB_SOCKET: ''
+    DB_URL: ''
+  script:
+    - python3 scripts/ci/gitlab-writer-feedback.py
+  artifacts:
+    when: always
+    name: 'writer-feedback-$DB_CONNECTION-$CI_PIPELINE_ID-$CI_JOB_ID'
+    expire_in: 7 days
+    paths:
+      - gitlab-ci-evidence/
+    reports:
+      junit: gitlab-ci-evidence/results.xml

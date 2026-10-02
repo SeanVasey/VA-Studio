@@ -155,6 +155,10 @@
       "test_same_actor_legacy_offer_revision_and_rights_writer_complete_without_a_user_fk_track_cycle"
     ],
     [
+      "Tests\\Feature\\RightsDeclarationWriterConcurrencyTest",
+      "test_same_actor_catalog_writers_and_rights_creation_complete_in_both_lock_orders"
+    ],
+    [
       "Tests\\Feature\\RightsEvidenceGuardConcurrencyTest",
       "test_verification_winning_the_exact_rights_row_lock_refuses_the_stale_pending_writer"
     ],

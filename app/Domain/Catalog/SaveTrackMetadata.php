@@ -6,6 +6,7 @@ use App\Domain\Catalog\Models\Track;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -19,13 +20,17 @@ class SaveTrackMetadata
 
     public function handle(?Track $track, array $data, User $actor): Track
     {
-        Gate::forUser($actor)->authorize('administer-catalog');
-        if (array_diff(array_keys($data), [...self::FIELDS, 'metadata_version'])) {
-            throw ValidationException::withMessages(['title' => 'Only track metadata may be saved here. Use the publication and media actions for other changes.']);
-        }
-
         try {
             return DB::transaction(function () use ($track, $data, $actor) {
+                // Match rights writers before track locks and actor-attributed audit foreign keys.
+                $currentActor = $actor->exists ? User::query()->lockForUpdate()->find($actor->getKey()) : null;
+                if ($currentActor === null) {
+                    throw new AuthorizationException;
+                }
+                Gate::forUser($currentActor)->authorize('administer-catalog', [true]);
+                if (array_diff(array_keys($data), [...self::FIELDS, 'metadata_version'])) {
+                    throw ValidationException::withMessages(['title' => 'Only track metadata may be saved here. Use the publication and media actions for other changes.']);
+                }
                 // Omitted fields and revision checks must use the row acquired after the lock.
                 $locked = $track?->exists ? Track::query()->lockForUpdate()->findOrFail($track->id) : new Track;
                 if ($locked->exists) {
@@ -68,7 +73,7 @@ class SaveTrackMetadata
                     'canonicalization_version' => CanonicalJson::VERSION,
                     'before_hash' => $before === null ? null : CanonicalJson::hash($before),
                     'after_hash' => CanonicalJson::hash($after),
-                ], $actor->id);
+                ], $currentActor->id);
 
                 return $locked;
             });
