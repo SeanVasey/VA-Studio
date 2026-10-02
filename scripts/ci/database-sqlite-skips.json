@@ -135,6 +135,10 @@
       "test_both_resources_commit_or_rollback_under_shared_lock_contention"
     ],
     [
+      "Tests\\Feature\\RightsEvidenceGuardConcurrencyTest",
+      "test_verification_winning_the_exact_rights_row_lock_refuses_the_stale_pending_writer"
+    ],
+    [
       "Tests\\Feature\\SharedInventoryConcurrencyTest",
       "test_independent_connections_serialize_shared_inventory"
     ],

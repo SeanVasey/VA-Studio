@@ -2,6 +2,38 @@
 
 As of 2026-09-04. This is the initial register; entry keys are local tracking keys, not claims of historic accepted ADRs. Append dated changes and evidence instead of rewriting decision history.
 
+## T12-RIGHTS-EVIDENCE-GUARD-01: retain verified rights evidence
+
+October 2, 2026. The SQL retention floor is an implemented PR #105 candidate supporting T12 / WP-02 and WP-04's existing evidence-retention invariant. Fresh full current-source SQLite/MySQL/native CI acceptance remains pending. [The implementation record](../verification/rights-evidence-guards.md) describes seven owned triggers and their bounded parent-retention protections. No parent is completed and no row is added to the 40-task register.
+
+### Existing rule and reproduced gap
+
+`RightsDeclaration` already requires verified evidence to be immutable and corrections to use a new declaration. Its updating hook checks the retained model's original status. A model loaded while pending can therefore update the row after a separate verifier has persisted verified status, without changing the original verifier/time or adding a new verification audit.
+
+An isolated source-bound probe on `81536814421b32f4235aa88b578d5e8e6c96b23b`, tree `9d74f3ebd276b32bfd86cf861d94cbaef55a6b8c`, executed nine cases / 48 assertions. It reproduced stale-model evidence changes and cross-track retargeting, raw SQL mutation and deletion of an unreferenced verified declaration. A fresh verified model refuses the update. A separately strengthened mounted-admin control passed one case / nine assertions: the pending edit actually mounted with exact data, then saving after verification left the verified row unchanged. No HTTP interleaving exploit or MySQL race was proved. The relevant source/vendor files remain byte-identical in accepted PR #104.
+
+The same probe separately demonstrates an unenrolled direct verifier under required panel MFA and a controlled gap between the pretransaction Gate read and the write. These require a later current-authority/MFA writer boundary; SQL evidence guards alone do not resolve them.
+
+### Implemented SQL-floor candidate
+
+Forward migration `2026_10_02_000035_rights_evidence_guards.php`, dedicated behavior/migration/concurrency test sources and exact fixture adaptations are implemented in the candidate. Seven owned SQLite/MySQL triggers cover rights INSERT, AFTER INSERT, UPDATE and DELETE plus parent-track INSERT, UPDATE and DELETE. They do not rewrite rows, audits, verification identity or commercial snapshots. Their definitions and test registration do not establish hosted acceptance.
+
+- Refuse stored verified-row changes/deletion, conflicting identity displacement and replacement/upsert collisions. Test explicit-ID and engine-specific replacement behavior; do not infer protection from deletion triggers alone.
+- Guard parent-track identity deletion/replacement and actual unique-key collisions. Concurrent parent retention also relies on validated RESTRICT/NO ACTION foreign keys; sequential foreign-key-disabled cases prove guard causality, not concurrent protection with disabled constraints or arbitrary cascades.
+- Keep pending edits, ordinary pending-to-verified service transitions and genuinely new declarations available. Historical rows and their original audits remain unchanged; no migration fabricates approval evidence.
+- Preflight the real schema, owned guard names/definitions and temporary/shadow ownership before DDL. Refuse drift/foreign definitions, resume only an exact surviving creation prefix, and retain all seven guards during operational rollback. Ordinary-DML protection is not privileged-DDL protection.
+- Preserve byte-exact retained offer revisions and original quote/order/grant/contract evidence. Newest pending declarations continue to block new readiness under existing semantics; they never rewrite an earlier verified row.
+
+Four existing tests formerly downgraded verified declarations: `BulkTrackTagsTest`, `BulkUpdateTrackMetadataTest`, `TrackPublicationGuardTest` and `ExclusiveOfferTest`. The candidate appends a newer pending declaration instead, retaining every existing refusal, stale-review and whole-batch atomicity assertion.
+
+### Acceptance and following dependency
+
+Acceptance must reproduce the stale model first, then prove current stored verified evidence is retained across model/query/raw SQL, replacement/upsert and bounded parent-deletion paths on both supported engines. Migration recovery/refusal cases and a genuine independent-process rights-row wait are registered. The MySQL race has two exact datasets, stale model update and stale model delete, with matching SQLite skip identities; positive actual hosted MySQL execution is still required. SQLite does not prove the lock contract.
+
+The SQL candidate introduces no fresh transactional actor/MFA checks, locking read or writer command; the direct-verifier authority/MFA gaps remain. After this floor is accepted, centralize supported rights writers with fresh transactional authority/MFA, compatible actor/track/rights locks and explicit reviewed identity. The subsequent manifest apply boundary also needs compatible exclusive-scope/currentness fencing and honest physical-byte proof. Existing exclusive writers and finalization have different cross-family lock orders; a static potential cycle is not an executed MySQL deadlock proof. Do not introduce a reverse lock order from the track reader without reviewing all participating writers.
+
+Enforcing the existing immutable-evidence rule needs no new legal or scheduling decision. Production clearance/reviewer policy, recovery roles, financial rights consequences or retention exemptions remain separate owner-policy work. Track lead time, horizon, precision, grace and pending-schedule disposition after manual publication remain undecided; site-release timing rules do not transfer to tracks. This prerequisite provides no schedule, retained publication approval, apply fence or production activation.
+
 ## D-07 confirmed — single-seller personal-use store (2026-09-30)
 
 **Explicit owner decision.** Sean clarified that the BeatStars replacement is for his personal business use: upload, publish, share, license and sell his own content to front-end listeners and customers. It is not a competing platform for multiple independent sellers. This confirms the existing first-party house-store direction.

@@ -1,6 +1,77 @@
 # Ordered development status
 
-## Four-child staff-authoring candidate — October 2, 2026
+## PR #105 SQL rights-evidence guard candidate
+
+October 2, 2026. The [verified-rights SQL floor](verification/rights-evidence-guards.md) is implemented in the PR #105 candidate; fresh full current-source SQLite/MySQL/native CI acceptance remains pending. Forward migration `2026_10_02_000035_rights_evidence_guards.php` adds seven owned triggers for rights-row INSERT/AFTER INSERT/UPDATE/DELETE and parent-track INSERT/UPDATE/DELETE, with behavior, installation/recovery and independent-process race sources. Existing retained rows, audits, verifier/time and commercial snapshots are not rewritten.
+
+This is ordinary-DML evidence retention with validated restrictive foreign keys for concurrent parent retention. Sequential foreign-key-disabled cases do not prove concurrent retention with disabled constraints, arbitrary cascades or privileged DDL safety. No fresh transactional actor/MFA checks, locking read or writer command is added. The next dependency is transactional rights authority and compatible writers, then reviewed manifest compare/apply. Scheduling policy, production readiness and T12/WP-02/WP-04 parent completion remain open. The 40-row task census is unchanged.
+
+The accepted PR #104 runs 373/374 below retain their original source/event/count/hash and screenshot provenance. They do not supply execution acceptance for this new runtime candidate; final composed source requires one fresh full run and independent review.
+
+## PR #104 staff-authoring acceptance
+
+October 2, 2026. The four related T12 / WP-02 children are accepted in [PR #104](https://github.com/VASEYDEV/VASEYAUDIO/pull/104): reviewed bulk metadata, protected operator track review, reviewed manual publication guards and the internal read-only publication manifest. T12/WP-02, track scheduling and production/cutover readiness remain partial.
+
+### Exact accepted source
+
+| Identity | Value |
+| --- | --- |
+| Accepted PR head | `0c7dbd8c7ddf41ea97fcae873d1587faec3b24a1` |
+| Accepted tree | `a3ed238f4c8dfc1a9b5759c419f02061349d6f58` |
+| Actual PR test merge | `42cbbd8a649990995ef8e9a861dbdaadc1d3f5b5` |
+| Ordered test-merge parents | `d57c3bb266890bc32adc1974fb84c050d848e90b`, accepted PR head |
+| Equivalent frozen local source | `460a86a576ea6fbe41ad4cc30ec41c68478a66ff` |
+| Squash merge | `23d1e5c85936ecf8b37e0f2cf7d7372d1b0303ec` |
+| Merge parent | `d57c3bb266890bc32adc1974fb84c050d848e90b` |
+
+The expected-head merge completed at 10:46:16 UTC under the existing continuous-development authorization. A fresh authenticated commit read verified the exact accepted tree and sole merge parent. Independent source reviews cover the actual final executable bytes; the final composition review compares all 802 non-documentation blobs with its approved executable source. No unresolved review thread remained at acceptance.
+
+### Completed hosted evidence
+
+[Foundation 36991487546](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36991487546), run 373 / attempt 1, completed success at 10:31:00 UTC. All thirteen applicable jobs passed: scope, backend quality, frontend, two SQLite shards, four MySQL shards, both ordinary browser engines, genuine related browsers and the strict backend aggregate. The documentation-only job was intentionally skipped.
+
+| Evidence | Verified result |
+| --- | --- |
+| Source discovery | 2,523 cases / 159 files |
+| MySQL originals | 2,523 executions / 42,691 assertions; zero skips, failures or errors |
+| SQLite originals | 2,338 executions / 28,764 assertions; 185 exact MySQL-only skips; zero failures or errors |
+| Skip counterparts | All 185 execute with positive assertions and pass on actual MySQL |
+| Four children on MySQL | Bulk metadata 37; private review/privacy 27; guards 52; manifests 28; all 144 pass |
+| New MySQL concurrency | All 27 pass: six bulk, fourteen guard and seven manifest cases |
+| Inquiry authority races | All 36 pass on actual MySQL |
+| Ordinary Chromium | All 45 pass |
+| Ordinary WebKit | 44 pass; one unchanged keyboard-focus skip |
+| Genuine related browsers | Both cases pass |
+| Frontend | 364 tests / 22 files; typecheck, build, audit and client-secret scan pass |
+| Quality safeguards | 35 partition, 24 scope, 26 focused-selection and 24 receipt cases pass |
+
+All six original database ZIPs were independently checked for API digest/size/expiry, ZIP CRC, exact source/event/run/attempt, locked dependencies/runtime, file/group/case partitions and strict success receipts. The unchanged strict collector replay equals the actual uploaded shadow receipt from this same run. Shadow artifact `11221850340` has SHA-256 `7a9894c2eb11bdeceea2901a6171e1f8a7b02aee6e05a699acce30ab1fa97830`. No prior-run receipt supplies current acceptance; runtime proof reuse remains disabled.
+
+All three original browser archives match their exact 90 ordinary plus two genuine discovery identities, with zero retries, flaky cases, test errors or runner/report errors. Locked runtime proof includes PHP 8.4.26, Node 24.21.0, Playwright 1.63.0 and the installed Chromium/WebKit revisions. Genuine scanner-backed native playback executes exact private tagged-preview byte comparisons after gestures, with private/no-store responses and matching per-project media receipts. Successful raw trace response bodies are not retained for independent reconstruction; that limitation is preserved.
+
+Both prior defects and the new route-boundary regression pass on both database engines. The inquiry duplicate/extra-key case completes 137 assertions, the new privacy boundary case 63, and the schema-two policy/current-scope case all 21. All eleven privacy cases pass 263 assertions. The failed runs 371 and 372 and their original diagnostics remain separately recorded in [the repair guide](verification/private-track-review-repairs.md).
+
+### Separate postmerge verification
+
+The automatic main-push run [36997312878](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36997312878), run 374 / attempt 1, began at 10:46:19 UTC on merge `23d1e5c85936ecf8b37e0f2cf7d7372d1b0303ec`. It completed success at 11:47:58 UTC, independently verified from its own six original database archives and three native archives. All thirteen applicable jobs passed; documentation was intentionally skipped. Its exact push checkout is merge `23d1e5c85936ecf8b37e0f2cf7d7372d1b0303ec`, tree `a3ed238f4c8dfc1a9b5759c419f02061349d6f58`, sole parent `d57c3bb266890bc32adc1974fb84c050d848e90b`. Its receipts retain a distinct push/commit identity; no PR receipt substitutes for this execution.
+
+| Postmerge originals | Verified result |
+| --- | --- |
+| MySQL | 2,523 executions / 42,271 assertions; zero skips, failures or errors |
+| SQLite | 2,338 executions / 28,764 assertions; 185 exact MySQL-only skips; zero failures or errors |
+| Skip counterparts and races | All 185 positive MySQL counterparts, all 144 child cases, all 27 new concurrency cases and all 36 inquiry authority races pass |
+| Native | 91 passes: Chromium 45, WebKit 44, genuine related two; one unchanged WebKit keyboard-focus skip; zero retries/flaky/test/runner errors |
+| Strict receipts | Six current source-bound originals; strict collector replay equals the actual current uploaded shadow receipt |
+
+Successful native raw response bodies remain unretained under tracing on failure; exact runtime byte/range assertions and current retained media receipts supply the stated proof. The screenshot package below remains bound to run 372.
+
+### Screenshots and next dependency
+
+Sean's desktop/mobile storefront and administration deliverables are ten unchanged PNGs extracted from the original successful browser jobs in run 372, head `50497cedf2e296b7d74d1c57f541f8cd1d45951e`, tree `9d74f3ebd276b32bfd86cf861d94cbaef55a6b8c`. The saved package `VASEYAUDIO-storefront-admin-screenshots-PR104.zip` retains source/archive/PNG provenance, SHA-256 `bc5dab6c6a44cb425b7733210ee8e219fe812da2cd30b804da04b420a5931ddd`. They show synthetic fixtures; the ordinary storefront uses synthetic browser transport and supplies visual evidence rather than backend catalog proof. No screenshot was recaptured or rebound to run 373.
+
+The [SQL rights-evidence protection](verification/rights-evidence-guards.md) is now an implemented PR #105 candidate pending fresh full acceptance, as recorded above. Transactional rights authority and compatible writers remain necessary before a reviewed manifest compare/apply command. The accepted manifest remains a point capture with the existing 60-second media-integrity cache and independently mutable scope limits. It supplies no retained approval, apply fence or scheduling policy. The 40-task census and parent completion criteria remain unchanged.
+
+## Four-child staff-authoring candidate — preceding composition, October 2, 2026
 
 PR #104 now combines [reviewed bulk metadata](verification/bulk-track-metadata.md), [protected operator review](verification/private-track-review.md), [reviewed manual publication guards](verification/track-publication-guards.md) and the [read-only publication manifest foundation](verification/track-publication-manifest-foundation.md). These catalog-authoring children share current staff authority, track revisions and protected publication evidence. The policy-independent manifest foundation is included in the same coherent candidate because the repaired source already requires a fresh full run; this removes no acceptance gate and completes no parent task.
 
@@ -10,7 +81,7 @@ Source `349c0832cf64b1f5af66b1a9a19d341aaa473799`, tree `3bcf3e0f736650a55d81cad
 
 ## Initial three-child PR #104 diagnostics and tested repairs — historical October 2 checkpoint
 
-[PR #104](https://github.com/VASEYDEV/VASEYAUDIO/pull/104) remains unaccepted. [Foundation 36980956568](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36980956568), run 371 / attempt 1, tested head `c4ea9d38fe244691021eb24359e4a5663a7f68ca`, exact tree `8e3f8155245d99fe3bcedafc865c7a6624caa53a`. The ordinary suite reached its 18-minute budget with 85 passes, the unchanged one-engine keyboard skip and four of 90 case identities unproven; related-media WebKit failed its private-preview transport observer. At the repair checkpoint all four MySQL jobs remained pending.
+At this historical checkpoint, [PR #104](https://github.com/VASEYDEV/VASEYAUDIO/pull/104) was unaccepted. [Foundation 36980956568](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36980956568), run 371 / attempt 1, tested head `c4ea9d38fe244691021eb24359e4a5663a7f68ca`, exact tree `8e3f8155245d99fe3bcedafc865c7a6624caa53a`. The ordinary suite reached its 18-minute budget with 85 passes, the unchanged one-engine keyboard skip and four of 90 case identities unproven; related-media WebKit failed its private-preview transport observer. At the repair checkpoint all four MySQL jobs remained pending.
 
 MySQL shard 3 later failed at 08:30:22 UTC: 517 executed / 9,187 assertions, four publication-guard concurrency assertion failures, zero skips/errors. All fourteen genuine guard cases executed, but four did not pass. Two assertions differed only in MySQL JSON object-key order; two expected raw null tags after an ordinary metadata save that canonically stored an empty list. The corrected test sources preserve exact audit values/types and complete track comparisons; their committed source-bound local feedback and independent reviews are in the [repair record](verification/private-track-review-repairs.md). Fresh full acceptance on the final composition remains required.
 

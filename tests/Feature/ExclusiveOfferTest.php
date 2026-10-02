@@ -184,7 +184,8 @@ class ExclusiveOfferTest extends TestCase
             'long_reference' => $ref = str_repeat('x', 193), 'unknown_scope' => $scopeId = 999999,
             'non_exclusive_license' => $f['offer']->update(['license_version_id' => $f['legacy']['offer']->license_version_id]),
             'missing_deliverable' => $f['offer']->update(['deliverable_asset_ids' => []]),
-            'unverified_rights' => $f['track']->rightsDeclarations()->update(['status' => 'pending']),
+            'unverified_rights' => $f['track']->rightsDeclarations()->create(['provenance_reference' => 'SYNTHETIC-PENDING-REVIEW',
+                'sample_disclosure' => 'New synthetic declaration awaiting verification', 'status' => 'pending']),
             'zero_price' => $f['offer']->update(['price_minor' => 0]), 'currency' => $f['offer']->update(['currency' => 'EUR']),
             'blocked_scope' => app(ManageRightsScope::class)->block($scopeId, true, 0, 'TEST', $f['actor']),
         };
