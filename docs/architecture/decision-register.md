@@ -4,7 +4,7 @@ As of 2026-09-04. This is the initial register; entry keys are local tracking ke
 
 ## T12-RIGHTS-EVIDENCE-GUARD-01: retain verified rights evidence
 
-October 2, 2026. The SQL retention floor is an implemented PR #105 candidate supporting T12 / WP-02 and WP-04's existing evidence-retention invariant. Fresh full current-source SQLite/MySQL/native CI acceptance remains pending. [The implementation record](../verification/rights-evidence-guards.md) describes seven owned triggers and their bounded parent-retention protections. No parent is completed and no row is added to the 40-task register.
+October 2, 2026. The SQL retention floor is verified and merged in PR #105, supporting T12 / WP-02 and WP-04's existing evidence-retention invariant. All thirteen applicable PR jobs passed; separate main execution is blocked by GitHub payment authorization. The [current queue](../development-control.md) records the active transactional writer candidate. [The implementation record](../verification/rights-evidence-guards.md) describes seven owned triggers and their bounded parent-retention protections. No parent is completed and no row is added to the 40-task register.
 
 ### Existing rule and reproduced gap
 
@@ -14,7 +14,7 @@ An isolated source-bound probe on `81536814421b32f4235aa88b578d5e8e6c96b23b`, tr
 
 The same probe separately demonstrates an unenrolled direct verifier under required panel MFA and a controlled gap between the pretransaction Gate read and the write. These require a later current-authority/MFA writer boundary; SQL evidence guards alone do not resolve them.
 
-### Implemented SQL-floor candidate
+### Implemented SQL floor and historical preparation
 
 Forward migration `2026_10_02_000035_rights_evidence_guards.php`, dedicated behavior/migration/concurrency test sources and exact fixture adaptations are implemented in the candidate. Seven owned SQLite/MySQL triggers cover rights INSERT, AFTER INSERT, UPDATE and DELETE plus parent-track INSERT, UPDATE and DELETE. They do not rewrite rows, audits, verification identity or commercial snapshots. Their definitions and test registration do not establish hosted acceptance.
 

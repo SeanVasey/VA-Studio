@@ -1,6 +1,6 @@
 # Verified rights evidence guards
 
-October 2, 2026. This bounded T12 / WP-02 prerequisite supports WP-04's existing rule that verified rights evidence is immutable and corrections use a new declaration. It is an implemented [PR #105 candidate](https://github.com/VASEYDEV/VASEYAUDIO/pull/105), pending fresh full SQLite, MySQL and native browser acceptance. Parent requirements, reviewed publication apply, track scheduling and production acceptance remain open.
+October 2, 2026. This bounded T12 / WP-02 prerequisite supports WP-04's existing rule that verified rights evidence is immutable and corrections use a new declaration. It is verified and merged in [PR #105](https://github.com/VASEYDEV/VASEYAUDIO/pull/105) after all thirteen applicable hosted PR jobs passed. The [acceptance record](../development-order.md#pr-105-sql-rights-evidence-guard-acceptance) preserves exact source and results; separate main execution is blocked by failed GitHub payment authorization. Parent requirements, reviewed publication apply, track scheduling and production acceptance remain open.
 
 ## Reproduced problem
 
@@ -48,7 +48,7 @@ The dedicated MySQL race method has two exact datasets, stale model update and s
 
 The guards retain existing evidence. They do not supply fresh transactional actor/MFA checks, review identity, compatible exclusive-scope/writer fencing or fresh physical media proof. The direct-verifier current-authority/MFA gaps remain the next writer-boundary work before reviewed manifest comparison/apply. Track timing choices and production rights/reviewer/recovery policy remain separate decisions. The [accepted PR #104 record](../development-order.md#pr-104-staff-authoring-acceptance) and its separately verified postmerge run are preserved; neither supplies acceptance for this new runtime source.
 
-## Implementation feedback and acceptance gate
+## Historical implementation feedback and acceptance gate
 
 Local SQLite feedback uses PHP 8.4.26 and the locked dependencies, with an explicit synthetic testing key. The final assembled rights-family source is `fec38b27c665b1633ec55e4c2919d3fbd52bb4d5`, tree `90571adf5c0fa9ff912a007fd2c586a21ff74155`: 43 behavior cases, 33 migration cases and the two skipped MySQL race datasets. `php artisan test --filter=RightsEvidenceGuard` reports 76 executed cases / 348 assertions, zero failures or errors and exactly two skips. Independent review matched all 78 discovered identities with their original JUnit cases. The three mixed-statement rollback cases separately passed 12 assertions.
 
@@ -58,4 +58,4 @@ New migration/test/worker files and three adapted test files pass Pint. `Exclusi
 
 Fresh full discovery proves 2,601 cases in 162 files, retaining all 2,523 accepted source case/file/method identities and adding exactly the 78 rights cases. The reviewed SQLite policy grows from 77 methods / 185 expanded identities to 78 / 187, solely for the two new MySQL races. Measured partitioning retains every complete file and expanded case exactly once; missing timing samples use the existing fallback without losing coverage.
 
-These checks are implementation feedback. The published PR head and exact composed tree require fresh complete hosted SQLite/MySQL, dependency/frontend, native browser, independent source review and current-run receipt acceptance before merge. Positive execution of both new MySQL races is required. Earlier documentation-only PR #105 CI, accepted PR #104 originals and source-bound screenshots cannot accept this runtime change.
+At this historical preparation checkpoint these checks were implementation feedback; the completed acceptance above supersedes the pending gate. The published PR head and exact composed tree require fresh complete hosted SQLite/MySQL, dependency/frontend, native browser, independent source review and current-run receipt acceptance before merge. Positive execution of both new MySQL races is required. Earlier documentation-only PR #105 CI, accepted PR #104 originals and source-bound screenshots cannot accept this runtime change.

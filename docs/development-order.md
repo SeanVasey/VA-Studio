@@ -1,12 +1,18 @@
 # Ordered development status
 
-## PR #105 SQL rights-evidence guard candidate
+## Current execution checkpoint
 
-October 2, 2026. The [verified-rights SQL floor](verification/rights-evidence-guards.md) is implemented in the PR #105 candidate; fresh full current-source SQLite/MySQL/native CI acceptance remains pending. Forward migration `2026_10_02_000035_rights_evidence_guards.php` adds seven owned triggers for rights-row INSERT/AFTER INSERT/UPDATE/DELETE and parent-track INSERT/UPDATE/DELETE, with behavior, installation/recovery and independent-process race sources. Existing retained rows, audits, verifier/time and commercial snapshots are not rewritten.
+The [current queue](development-control.md) defines active component ownership, dependency order and the GitHub account blocker. Transactional rights create/edit/verify is the active implementation; its new runtime is not yet accepted. Historical sections below preserve their own source and results.
 
-This is ordinary-DML evidence retention with validated restrictive foreign keys for concurrent parent retention. Sequential foreign-key-disabled cases do not prove concurrent retention with disabled constraints, arbitrary cascades or privileged DDL safety. No fresh transactional actor/MFA checks, locking read or writer command is added. The next dependency is transactional rights authority and compatible writers, then reviewed manifest compare/apply. Scheduling policy, production readiness and T12/WP-02/WP-04 parent completion remain open. The 40-row task census is unchanged.
+## PR #105 SQL rights-evidence guard acceptance
 
-The accepted PR #104 runs 373/374 below retain their original source/event/count/hash and screenshot provenance. They do not supply execution acceptance for this new runtime candidate; final composed source requires one fresh full run and independent review.
+October 2, 2026. [PR #105](https://github.com/VASEYDEV/VASEYAUDIO/pull/105) passed its final source acceptance and was expected-head squash-merged at `cae053efbc2019c849269605df030a36a620484e`. Tested head `5a5ee9cf8e9fe26c4e05ceb7fcaa6cadd5986b88` and the merge share tree `7cbe30a0af24f59cc1dcd4d1fdfcdcc5da9700fb`; the merge's sole parent is accepted PR #104 main `23d1e5c85936ecf8b37e0f2cf7d7372d1b0303ec`.
+
+[Foundation 37009596349](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/37009596349), run 379 / attempt 2, completed at 14:20:05 UTC (9:20:05 a.m. CDT). All thirteen applicable jobs passed; documentation-only was intentionally skipped. Original receipts and collector replay bind the same source and attempt. MySQL executed all 2,601 cases / 42,338 assertions with no skips, failures or errors. SQLite executed 2,414 / 29,112 assertions with exactly 187 reviewed MySQL-only skips, each positively passed on genuine MySQL. The two new stale-model update/delete races each passed 73 assertions. Native suites passed 91 cases with one unchanged WebKit keyboard-focus skip, zero retries, flakes or errors. Frontend passed 364 tests in 22 files. Final-source reviews are complete; no unresolved review thread remained.
+
+Forward migration `2026_10_02_000035_rights_evidence_guards.php` supplies seven owned rights/parent triggers. It retains ordinary-DML verified evidence and validated restrictive foreign keys; it does not establish disabled-constraint concurrency, privileged-DDL safety or fresh transactional actor/MFA writer authority. Existing retained rows, audits, verifier/time and commercial snapshots are not rewritten. T12/WP-02/WP-04 parent criteria and track scheduling remain open.
+
+The separate main-push [run 37055208526](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/37055208526) reports startup failure at 19:36:24 UTC (2:36:24 p.m. CDT), with zero jobs executed. The observed account error is failed payment authorization. Postmerge execution remains pending; the passing PR evidence is not substituted for it. Preserve the completed PR acceptance and retry the blocked main gate only after the restriction is resolved.
 
 ## PR #104 staff-authoring acceptance
 
@@ -69,7 +75,7 @@ Successful native raw response bodies remain unretained under tracing on failure
 
 Sean's desktop/mobile storefront and administration deliverables are ten unchanged PNGs extracted from the original successful browser jobs in run 372, head `50497cedf2e296b7d74d1c57f541f8cd1d45951e`, tree `9d74f3ebd276b32bfd86cf861d94cbaef55a6b8c`. The saved package `VASEYAUDIO-storefront-admin-screenshots-PR104.zip` retains source/archive/PNG provenance, SHA-256 `bc5dab6c6a44cb425b7733210ee8e219fe812da2cd30b804da04b420a5931ddd`. They show synthetic fixtures; the ordinary storefront uses synthetic browser transport and supplies visual evidence rather than backend catalog proof. No screenshot was recaptured or rebound to run 373.
 
-The [SQL rights-evidence protection](verification/rights-evidence-guards.md) is now an implemented PR #105 candidate pending fresh full acceptance, as recorded above. Transactional rights authority and compatible writers remain necessary before a reviewed manifest compare/apply command. The accepted manifest remains a point capture with the existing 60-second media-integrity cache and independently mutable scope limits. It supplies no retained approval, apply fence or scheduling policy. The 40-task census and parent completion criteria remain unchanged.
+The [SQL rights-evidence protection](verification/rights-evidence-guards.md) is verified and merged in PR #105, with separate main execution externally blocked as recorded above. Transactional rights authority and compatible writers remain necessary before a reviewed manifest compare/apply command. The accepted manifest remains a point capture with the existing 60-second media-integrity cache and independently mutable scope limits. It supplies no retained approval, apply fence or scheduling policy. The 40-task census and parent completion criteria remain unchanged.
 
 ## Four-child staff-authoring candidate — preceding composition, October 2, 2026
 
@@ -405,7 +411,9 @@ An explicit GitHub `is:open` query exposed ten older Dependabot PRs omitted by t
 | WP-13 — validation | CI and domain regression tests accumulate throughout development | Exact release candidate security/accessibility/device/performance review, production scanner/worker/provider evidence, restore and recovery drills. |
 | WP-14 — cutover | Runbook and boundaries | Source obligations resolved, staging/rehearsal evidence, rollback and postlaunch reconciliation before authorized domain cutover. |
 
-## Next dependency-ready development slices
+## Historical next-slice queue before PR #87
+
+This historical queue is superseded by the [current execution checkpoint](development-control.md); encoder diagnostics and T03–T08 safeguards are already accepted.
 
 [D-20 owner HTTP/UI delivery](test-owner-delivery-http.md) in PR #71, [D-21 versioned site content](site-content-releases.md) in PR #72, [D-22 test promotion administration](architecture/D-22-promotion-administration.md) in PR #73, [D-23 editorial content](architecture/D-23-editorial-content.md) in PR #74, [D-24 scheduled publication](architecture/D-24-scheduled-site-publication.md) in PR #76, fail-closed public pages in PR #77, the Site Releases row menu in PR #78 and [D-25 editable site images](architecture/D-25-editable-site-images.md) in PRs #81 and #82, with their follow-ups in PR #83, are accepted. Subsequent scopes remain bounded development work, not production approvals:
 
