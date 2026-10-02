@@ -8,10 +8,27 @@ import io
 from unittest.mock import patch
 from pathlib import Path
 import subprocess
+import shutil
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = ('setup-gitlab-php.sh', 'setup-gitlab-node.sh', 'setup-gitlab-related-scanner.sh')
+
+
+class GitLabProcessControlBoundaries(unittest.TestCase):
+    def test_real_php_probe_rejects_disabled_signal_and_resource_limit_functions(self):
+        executable = shutil.which('php')
+        self.assertIsNotNone(executable, 'Native PHP setup verification requires PHP.')
+        command = 'php() { "$PHP_TEST_EXECUTABLE" -d "disable_functions=$DISABLED_PROCESS_FUNCTION" "$@"; }; source "$1"; verify_gitlab_process_control'
+        for disabled in ('', 'pcntl_signal', 'posix_setrlimit'):
+            environment = os.environ | {'PHP_TEST_EXECUTABLE': executable, 'DISABLED_PROCESS_FUNCTION': disabled}
+            result = subprocess.run(['bash', '-c', command, 'process-control-test', str(ROOT/'scripts/ci/setup-gitlab-php.sh')],
+                                    env=environment, capture_output=True, text=True, timeout=5)
+            with self.subTest(disabled=disabled):
+                self.assertEqual(1 if disabled else 0, result.returncode, result.stderr)
+                self.assertEqual('', result.stdout)
+                if disabled:
+                    self.assertIn('require POSIX resource limits and PCNTL signals', result.stderr)
 
 
 class GitLabSetupBoundaries(unittest.TestCase):

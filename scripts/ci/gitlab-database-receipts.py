@@ -113,7 +113,7 @@ def validate_runtime(value: dict, engine: str) -> None:
                   and type(php["integer_size"]) is int and php["integer_size"] == 8 and php["memory_limit"] == "512M"
                   and isinstance(php["binary_sha256"], str) and proof.HASH.fullmatch(php["binary_sha256"]) is not None
                   and isinstance(php["extensions"], list) and all(isinstance(x, str) for x in php["extensions"])
-                  and {"fileinfo", "pdo_mysql", "pdo_sqlite", "mbstring", "intl", "bcmath", "gd", "zip", "curl", "dom", "xml", "xmlwriter", "posix"} <= set(php["extensions"]), "Unsupported PHP runtime")
+                  and {"fileinfo", "pdo_mysql", "pdo_sqlite", "mbstring", "intl", "bcmath", "gd", "zip", "curl", "dom", "xml", "xmlwriter", "posix", "pcntl"} <= set(php["extensions"]), "Unsupported PHP runtime")
     proof.require(isinstance(value["tools"], dict) and set(value["tools"]) == {"composer", "ffmpeg", "qpdf", "pdftocairo", "flock"}
                   and all(isinstance(v, dict) and set(v) == {"binary_sha256", "version_sha256"}
                           and all(isinstance(x, str) and proof.HASH.fullmatch(x) for x in v.values()) for v in value["tools"].values()), "Incomplete tool identity")

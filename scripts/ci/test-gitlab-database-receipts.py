@@ -50,7 +50,7 @@ def runtime(engine):
         'character_set_server': 'utf8mb4', 'collation_server': 'utf8mb4_0900_ai_ci', 'lower_case_table_names': 0, 'innodb_strict_mode': 1, 'performance_schema': 1, 'isolation': 'REPEATABLE-READ', 'storage_engine': 'InnoDB',
         'service_image_reference': 'mysql:8.4', 'service_image_digest': 'not exposed by GitLab service API; no reuse enabled'}
     return {'engine': engine, 'php': {'version': '8.4.26', 'integer_size': 8, 'memory_limit': '512M', 'binary_sha256': H,
-            'extensions': ['fileinfo', 'pdo_mysql', 'pdo_sqlite', 'mbstring', 'intl', 'bcmath', 'gd', 'zip', 'curl', 'dom', 'xml', 'xmlwriter', 'posix']},
+            'extensions': ['fileinfo', 'pdo_mysql', 'pdo_sqlite', 'mbstring', 'intl', 'bcmath', 'gd', 'zip', 'curl', 'dom', 'xml', 'xmlwriter', 'posix', 'pcntl']},
             'tools': {key: {'binary_sha256': H, 'version_sha256': H} for key in ('composer', 'ffmpeg', 'qpdf', 'pdftocairo', 'flock')},
             'database': database, 'dependencies': fixtures.runtime(engine)['dependencies'], 'os_release_sha256': H}
 
@@ -113,6 +113,28 @@ class FakeGitlab:
 
 
 class NativeCollectorTests(unittest.TestCase):
+    def test_physical_write_process_control_is_required_by_both_engine_receipts(self):
+        for engine in ('sqlite', 'mysql'):
+            native.validate_runtime(runtime(engine), engine)
+            for extension in ('pcntl', 'posix'):
+                value = runtime(engine)
+                value['php']['extensions'].remove(extension)
+                with self.subTest(engine=engine, missing=extension), self.assertRaisesRegex(proof.ReceiptError, 'Unsupported PHP runtime'):
+                    native.validate_runtime(value, engine)
+                api = FakeGitlab()
+                job = next(row for row in api.rows if native.DATABASE_JOBS.get(row['name']) == (engine, 1))
+                files = evidence(engine, 1, job)
+                for kind in ('start', 'receipt'):
+                    key = f'phpunit-ci-{engine}-1-{kind}.json'
+                    document = proof.json_data(files[key])
+                    document['runtime'] = value
+                    if kind == 'receipt':
+                        document['runtime_sha256'] = proof.digest(proof.canonical(value))
+                    files[key] = proof.canonical(document)
+                api.replace(job['id'], files)
+                with self.subTest(engine=engine, forged_archive_missing=extension), self.assertRaisesRegex(proof.ReceiptError, 'Unsupported PHP runtime'):
+                    self.collect(api)
+
     def collect(self, api):
         with patch.object(native, 'source', return_value=identity()), patch.object(proof, 'sqlite_skip_pairs', return_value={fixtures.SKIP}), \
                 patch.object(proof, 'validate_discovered_files'), patch.object(proof, 'locked_dependencies', return_value=({}, runtime('mysql')['dependencies'])):
