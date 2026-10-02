@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { test, expect, type Page } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
 import { expectReleaseTableFits, openReleaseMenu, releaseMenuAction, releaseRow as row } from './site-release-row';
+import { syncSuccessNotification } from './notification-sync';
 
 test.beforeEach(() => resetBrowserLoginRateLimit());
 
@@ -25,9 +26,10 @@ async function schedule(page: Page, label: string, at: { input: string; display:
   const dialog = page.getByRole('dialog', { name: 'Schedule publication', exact: true });
   await expect(dialog.getByText(/Current time: \d{4}-\d{2}-\d{2} \d{2}:\d{2} UTC\./)).toBeVisible();
   await dialog.getByLabel('Publish at (UTC)', { exact: false }).fill(at.input);
-  await dialog.getByRole('button', { name: 'Schedule publication', exact: true }).click();
-  await expect(page.getByText('Publication scheduled', { exact: true })).toBeVisible();
-  await expect(page.getByText(`publishes at ${at.display}.`, { exact: false })).toBeVisible();
+  await syncSuccessNotification(page, 'Publication scheduled', () => dialog.getByRole('button', { name: 'Schedule publication', exact: true }).click(), async () => {
+    await expect(page.getByText('Publication scheduled', { exact: true })).toBeVisible();
+    await expect(page.getByText(`publishes at ${at.display}.`, { exact: false })).toBeVisible();
+  });
 }
 
 async function history(page: Page, label: string, outcome: string) {
@@ -69,7 +71,7 @@ test('a scheduled release waits, the scheduler publishes it, and a pending sched
     const editor = page.getByRole('dialog');
     await editor.getByLabel('Release label', { exact: false }).fill(label);
     await editor.getByLabel('Heading, first line', { exact: false }).first().fill(heading);
-    await editor.getByRole('button', { name: 'Save private draft', exact: true }).click();
+    await syncSuccessNotification(page, 'Private draft saved', () => editor.getByRole('button', { name: 'Save private draft', exact: true }).click());
     await expect(row(page, label).getByText('Private draft', { exact: true })).toBeVisible();
 
     const publishAt = futureMinute(3);
@@ -95,15 +97,16 @@ test('a scheduled release waits, the scheduler publishes it, and a pending sched
     await page.getByRole('button', { name: 'Cancel scheduled publication', exact: true }).click();
     const confirmation = page.getByRole('alertdialog', { name: 'Cancel scheduled publication', exact: true });
     await expect(confirmation).toContainText(`Cancel the scheduled publication of “Original site content” at ${cancelledAt.display}?`);
-    await confirmation.getByRole('button', { name: 'Confirm', exact: true }).click();
-    await expect(page.getByText('Scheduled publication cancelled', { exact: true })).toBeVisible();
+    await syncSuccessNotification(page, 'Scheduled publication cancelled', () => confirmation.getByRole('button', { name: 'Confirm', exact: true }).click(), async () => {
+      await expect(page.getByText('Scheduled publication cancelled', { exact: true })).toBeVisible();
+    });
     await expect(page.getByRole('button', { name: 'Cancel scheduled publication', exact: true })).toHaveCount(0);
     await history(page, 'Original site content', 'Cancelled by staff');
     expect(await (await visitor.get('/')).text()).toContain(heading);
 
     // Leave the public site on its original content, as the other content specs do.
     await (await releaseMenuAction(page, 'Original site content', 'Restore previous release')).click();
-    await page.getByRole('alertdialog', { name: 'Restore previous release', exact: true }).getByRole('button', { name: 'Confirm', exact: true }).click();
+    await syncSuccessNotification(page, 'Previous release restored', () => page.getByRole('alertdialog', { name: 'Restore previous release', exact: true }).getByRole('button', { name: 'Confirm', exact: true }).click());
     await expect(row(page, 'Original site content').getByText('Active', { exact: true })).toBeVisible();
     expect(await (await visitor.get('/')).text()).not.toContain(heading);
     expect((await (await visitor.get('/api/catalog')).json()).tracks).toEqual([]);

@@ -1,5 +1,6 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
+import { syncSuccessNotification } from './notification-sync';
 
 test.beforeEach(() => resetBrowserLoginRateLimit());
 
@@ -115,7 +116,7 @@ async function createPreset(page: Page, name: string, data: Metadata) {
   const dialog = await openDialog(page, page.getByRole('button', { name: 'Create preset', exact: true }), 'Create metadata preset');
   await dialog.getByLabel('Preset name', { exact: false }).fill(name);
   await fillMetadata(dialog, data);
-  await dialog.getByRole('button', { name: 'Save preset', exact: true }).click();
+  await syncSuccessNotification(page, 'Created', () => dialog.getByRole('button', { name: 'Save preset', exact: true }).click());
   await expect(dialog.getByRole('heading')).toBeHidden();
   await locatePreset(page, name);
   await expect(row(page, name).getByText('Active', { exact: true })).toBeVisible();
@@ -131,7 +132,7 @@ async function archivePreset(page: Page, name: string) {
   await row(page, name).getByRole('button', { name: 'Archive', exact: true }).click();
   const confirmation = page.getByRole('alertdialog', { name: 'Archive metadata preset', exact: true });
   await expect(confirmation.getByRole('heading', { name: 'Archive metadata preset', exact: true })).toBeVisible();
-  await confirmation.getByRole('button', { name: 'Archive preset', exact: true }).click();
+  await syncSuccessNotification(page, 'Metadata preset archived', () => confirmation.getByRole('button', { name: 'Archive preset', exact: true }).click());
   await expect(confirmation.getByRole('heading')).toBeHidden();
   await locatePreset(page, name);
   await expect(row(page, name).getByText('Archived', { exact: true })).toBeVisible();
@@ -202,7 +203,7 @@ test('preset authoring recovers from field errors and creates an independent pri
   await dialog.getByLabel('Preset name', { exact: false }).focus();
   await expect(dialog.getByLabel('Preset name', { exact: false })).toBeFocused();
   await dialog.getByLabel('Preset name', { exact: false }).fill(name);
-  await dialog.getByRole('button', { name: 'Save preset', exact: true }).click();
+  await syncSuccessNotification(page, 'Created', () => dialog.getByRole('button', { name: 'Save preset', exact: true }).click());
   await expect(dialog.getByRole('heading')).toBeHidden();
 
   dialog = await editPreset(page, name);
@@ -210,7 +211,7 @@ test('preset authoring recovers from field errors and creates an independent pri
   const reviewed = { ...original, genre: 'Synthetic reviewed genre', tags: [...original.tags, 'reviewed-third'] };
   await dialog.getByLabel('Genre', { exact: false }).fill(reviewed.genre);
   await addTags(dialog, ['reviewed-third']);
-  await dialog.getByRole('button', { name: 'Save changes', exact: true }).click();
+  await syncSuccessNotification(page, 'Saved', () => dialog.getByRole('button', { name: 'Save changes', exact: true }).click());
   await expect(dialog.getByRole('heading')).toBeHidden();
   dialog = await editPreset(page, name);
   await expectMetadata(dialog, reviewed);
@@ -222,7 +223,7 @@ test('preset authoring recovers from field errors and creates an independent pri
   await dialog.getByLabel('Slug', { exact: false }).fill(slug);
   await dialog.getByLabel('Artist', { exact: false }).fill(copied.artist);
   await page.screenshot({ path: testInfo.outputPath('preset-copied-draft.png'), fullPage: false });
-  await dialog.getByRole('button', { name: 'Create private draft', exact: true }).click();
+  await syncSuccessNotification(page, 'Created', () => dialog.getByRole('button', { name: 'Create private draft', exact: true }).click());
   await expect(dialog.getByRole('heading')).toBeHidden();
   await expectPrivateTrack(page, title, slug, copied);
 
@@ -269,7 +270,7 @@ test('stale preset edits preserve the winner and copied forms survive source edi
     const otherDialog = await editPreset(other, name);
     await otherDialog.getByLabel('Artist', { exact: false }).fill(winner.artist);
     await addTags(otherDialog, ['winner-tag']);
-    await otherDialog.getByRole('button', { name: 'Save changes', exact: true }).click();
+    await syncSuccessNotification(other, 'Saved', () => otherDialog.getByRole('button', { name: 'Save changes', exact: true }).click());
     await expect(otherDialog.getByRole('heading')).toBeHidden();
 
     await page.bringToFront();
@@ -297,7 +298,7 @@ test('stale preset edits preserve the winner and copied forms survive source edi
     const editedSource = await editPreset(other, name);
     await editedSource.getByLabel('Artist', { exact: false }).fill('SYNTHETIC LATER SOURCE');
     await editedSource.getByLabel('Genre', { exact: false }).fill('Synthetic later source genre');
-    await editedSource.getByRole('button', { name: 'Save changes', exact: true }).click();
+    await syncSuccessNotification(other, 'Saved', () => editedSource.getByRole('button', { name: 'Save changes', exact: true }).click());
     await expect(editedSource.getByRole('heading')).toBeHidden();
     await archivePreset(other, name);
 
@@ -305,7 +306,7 @@ test('stale preset edits preserve the winner and copied forms survive source edi
     await expectMetadata(dialog, copied);
     await expectModalFits(page, dialog);
     await page.screenshot({ path: testInfo.outputPath('preset-independent-copy.png'), fullPage: false });
-    await dialog.getByRole('button', { name: 'Create private draft', exact: true }).click();
+    await syncSuccessNotification(page, 'Created', () => dialog.getByRole('button', { name: 'Create private draft', exact: true }).click());
     await expect(dialog.getByRole('heading')).toBeHidden();
     await expectPrivateTrack(page, title, slug, copied);
     expect((await visitor.get(`/tracks/${slug}`)).status()).toBe(404);
