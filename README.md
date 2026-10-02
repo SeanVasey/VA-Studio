@@ -45,6 +45,7 @@ Recovery checkpoint, September 30: [PR #84](https://github.com/VASEYDEV/VASEYAUD
 - [Catalog administration](docs/catalog-administration.md): audited metadata saves, edit conflicts and stable published track URLs.
 - [Reusable metadata presets](docs/verification/track-metadata-presets.md): named descriptive defaults, stale-edit protection and explicit copied-value review before private draft creation.
 - [Reviewed bulk metadata edits](docs/verification/bulk-track-metadata.md): current-page Keep/Set/Clear choices, exact before/after review and atomic optimistic saves.
+- [Protected operator track review](docs/verification/private-track-review.md): current descriptive metadata, actual publication blockers and verified artwork/tagged audio in a close-only staff modal.
 - [Catalog pagination](docs/catalog-pagination.md): bounded server browsing and off-page saved-selection reconciliation.
 - [Public track sharing](docs/track-sharing.md): canonical URLs, server-rendered social metadata, Inertia navigation and publication privacy.
 - [Track details and full license terms](docs/track-detail-and-license-disclosure.md): published offer disclosure, resilient selection, persistent playback and browser verification scope.

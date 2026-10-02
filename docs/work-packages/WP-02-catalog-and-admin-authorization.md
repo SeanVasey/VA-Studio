@@ -66,6 +66,10 @@ Next acceptance work: WP-01 clean boot/operator diagnostics and WP-02 real-brows
 
 The first candidate (`2c5279faa291443d3bec97e101fa51266fde1b74`) passed 205 MySQL tests, including the observed lock race, and failed two admin assertions: relative command errors did not render under Filament's mounted form path. The correction maps domain validation keys to the actual schema path; the assertions remain intact. This first run is diagnostic evidence, not final acceptance. Consult the PR's final verification table for the completed candidate and remaining review/browser gates.
 
+## Protected operator track review — 2026-10-02
+
+October 2 authoring candidate: [protected operator track review](../verification/private-track-review.md) combines current descriptive metadata, actual ordinary readiness and verified public derivatives in one read-only staff modal. Fresh authority/MFA, exact protected media URLs and generic private failures preserve the existing catalog and purchased evidence. Its integrating PR must supply actual full current-source database/native and independent acceptance; anonymous unlisted sharing, scheduling and broader T12 roles/recovery remain open.
+
 ## Browser/operator follow-up — 2026-09-09
 
 PR #28 is merged. [PR #29](https://github.com/VASEYDEV/VASEYAUDIO/pull/29) uses isolated Chromium and mobile-viewport WebKit to exercise actual login, CSRF, create/edit validation, keyboard modal focus, stale forms, retained URLs and named publication blockers over HTTP. The publish confirmation now renders domain blockers as a persistent notification because it has no metadata fields for validation messages. Metadata dialogs focus the modal window, recover initial focus after the opening transition when necessary, and preserve focus already inside the form. See [operator/browser verification](../operator-setup-and-verification.md) and the follow-up PR for actual results. This does not claim physical iPhone, production MFA/recovery or full media-to-publication browser acceptance. Continue WP-03 archive/stem safety after the foundation increment is verified and accepted.

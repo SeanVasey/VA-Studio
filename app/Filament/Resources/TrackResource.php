@@ -5,8 +5,10 @@ namespace App\Filament\Resources;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublicationReadiness;
 use App\Domain\Catalog\PublishTrack;
+use App\Domain\Catalog\ReadPrivateTrackReview;
 use App\Domain\Catalog\SaveTrackMetadata;
 use App\Filament\Resources\TrackResource\Pages\ManageTracks;
+use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\EditAction;
@@ -90,6 +92,18 @@ class TrackResource extends OperatorResource
                     : $livewire->lastMetadataChoices)
                 ->action(fn (array $data, ManageTracks $livewire) => $livewire->reviewMetadataChanges($data)),
         ])->recordActions([
+            Action::make('reviewTrack')->label('Review track')->modalHeading('Private track review')
+                ->extraModalWindowAttributes(static::metadataModalAttributes())
+                ->modalSubmitAction(false)->modalCancelActionLabel('Close')
+                ->modalContent(function (Track $record) {
+                    $actor = auth()->user();
+                    abort_unless($actor instanceof User, 403);
+
+                    // Read and authorize now, before returning the view. No projection is retained in Livewire state.
+                    $review = app(ReadPrivateTrackReview::class)->handle((int) $record->id, $actor);
+
+                    return view('filament.catalog.private-track-review', ['review' => $review]);
+                }),
             EditAction::make()->extraModalWindowAttributes(static::metadataModalAttributes())
                 ->using(fn (Track $record, array $data, ManageTracks $livewire) => static::saveMetadata($record, $data, $livewire)),
             Action::make('readiness')->label('Check readiness')->action(function (Track $record) {

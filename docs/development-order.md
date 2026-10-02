@@ -1,5 +1,11 @@
 # Ordered development status
 
+## Protected operator track review candidate — October 2, 2026
+
+The next bounded T12 child adds [protected operator track review](verification/private-track-review.md): current descriptive metadata, exact ordinary publication blockers and verified artwork/tagged audio in a close-only staff modal. Fresh actor/MFA and track locks protect the read; unavailable current media never falls back to older bytes. Protected responses/errors stay private and generic. Existing media-review URLs retain their historical exact-revision behavior, and reopening refreshes the projection.
+
+Local new projection/media/Filament plus privacy cases pass 23 / 339 assertions; existing authoring plus privacy cases pass 81 / 1,089 assertions on the integrated interface. Hosted full database/native/independent acceptance remains required. Genuine related-browser coverage extends the existing scanner-backed withdrawn-track journey without altering its fixtures or retained-graph verifier. This implements no anonymous unlisted sharing and does not close T12, track scheduling or production recovery.
+
 ## PR #95 verification and reviewed bulk metadata candidate — October 2, 2026
 
 [PR #95](https://github.com/VASEYDEV/VASEYAUDIO/pull/95) publishes reviewed preset head `a7723d492fec25b81770397fc00fcecbe0a0e6e4`, tree `a5c25ce22a2d4727f7704134a0e65fe3c596f7a2`. [Foundation run `36971469443`](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36971469443) tests the exact same tree in merge `a07b6743`; final current-source database/native/outer-run acceptance remains pending at this checkpoint. Earlier native runs found test-only login/option formatting and paginated-row lookup assumptions, now repaired; the expanded suite and its runner have bounded aligned budgets. The published PR records actual outcomes, without treating earlier diagnostics as final acceptance.
