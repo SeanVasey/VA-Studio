@@ -48,6 +48,10 @@ Read [architecture index](../architecture/README.md), [decision register](../arc
 
 ## Metadata and URL increment — 2026-09-09
 
+### Remaining authoring: metadata presets
+
+The [T12 named-preset increment](../verification/track-metadata-presets.md) adds persisted reusable noncommercial metadata, optimistic edits, archive and explicit copied-value review before private draft creation. Fresh staff/MFA locks, minimized transactional audits and ordinary `SaveTrackMetadata` creation retain the authorization/publication boundary. The integrating PR records actual database/native and independent review results; unexecuted definitions are not acceptance. This advances FP-031 without completing broader T12 roles/recovery, catalog/license bulk editing or track schedules/private review.
+
 `SaveTrackMetadata` owns Filament create/edit persistence: verified staff authorization, metadata allowlist, validation, a locked current row, expected revision and transactional minimized audit evidence. A failed audit or invalid published edit rolls back the mutation. `published_slug` reserves the URL through unpublish/republish, with model and MySQL/SQLite triggers blocking rewrites and deletion/reuse. Historical backfill preserves known slugs without inventing dates or edit events. See [catalog administration](../catalog-administration.md).
 
 Targeted tests cover actual Filament create/edit/error actions, changed request actors, direct command denials, stale forms, malformed/extra fields, readiness rollback, public/draft privacy, historical migration and raw SQL URL attacks. The MySQL test requires independent processes and an observed wait on the exact track row; it intentionally skips on SQLite. Definitions are not test results: the PR must record completed CI evidence at its actual head.

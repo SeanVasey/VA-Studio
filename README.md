@@ -43,6 +43,7 @@ Recovery checkpoint, September 30: [PR #84](https://github.com/VASEYDEV/VASEYAUD
 - [Shared rights inventory](docs/shared-rights-inventory.md): internal scope/revision linkage, guarded test reservations and the boundary before exclusive sales.
 - [Promotion pricing](docs/promotion-pricing.md): versioned discount allocations, shared test campaign limits and guarded usage holds.
 - [Catalog administration](docs/catalog-administration.md): audited metadata saves, edit conflicts and stable published track URLs.
+- [Reusable metadata presets](docs/verification/track-metadata-presets.md): named descriptive defaults, stale-edit protection and explicit copied-value review before private draft creation.
 - [Catalog pagination](docs/catalog-pagination.md): bounded server browsing and off-page saved-selection reconciliation.
 - [Public track sharing](docs/track-sharing.md): canonical URLs, server-rendered social metadata, Inertia navigation and publication privacy.
 - [Track details and full license terms](docs/track-detail-and-license-disclosure.md): published offer disclosure, resilient selection, persistent playback and browser verification scope.

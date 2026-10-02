@@ -20,6 +20,19 @@ function row(page: Page, title: string) {
   return page.getByRole('row').filter({ has: page.getByText(title, { exact: true }) });
 }
 
+async function searchTracks(page: Page, title: string) {
+  const response = page.waitForResponse(response => {
+    if (!response.url().endsWith('/update') || response.request().method() !== 'POST') return false;
+    const payload = response.request().postDataJSON() as { components?: { updates?: Record<string, unknown> }[] };
+    return payload.components?.some(component => component.updates?.tableSearch === title) ?? false;
+  });
+  await page.getByRole('searchbox', { name: 'Search', exact: true }).fill(title);
+  const searched = await response;
+  expect(searched.status()).toBe(200);
+  expect(await searched.finished()).toBeNull();
+  await expect(page.getByText(`Search: ${title}`, { exact: true })).toBeVisible();
+}
+
 test('guest/customer denial and real CSRF protection', async ({ page }) => {
   await page.goto('/admin/tracks');
   await expect(page).toHaveURL(/\/admin\/login$/);
@@ -69,16 +82,21 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
   await dialog.getByLabel('Slug', { exact: false }).fill(slug);
   await dialog.getByRole('button', { name: 'Create', exact: true }).click();
   await expect(dialog.getByRole('heading')).not.toBeVisible();
+  // Prior journeys can fill the first page. Wait for the real debounced search before locating the persisted row.
+  await searchTracks(page, title);
   await expect(row(page, title)).toBeVisible();
   // A new document verifies persistence through a fresh server read, with no retained component state.
   const second = await context.newPage();
   watch(second);
   await second.goto('/admin/tracks');
+  await searchTracks(second, title);
   await expect(row(second, title)).toBeVisible();
   expect((await page.request.get(`/tracks/${slug}`)).status()).toBe(404);
 
   // Two real tabs load one revision. The second save must remain visible and preserve the winner.
   await page.bringToFront();
+  await searchTracks(page, fixture.editable.title);
+  await searchTracks(second, fixture.editable.title);
   await row(page, fixture.editable.title).getByRole('button', { name: 'Edit', exact: true }).click();
   await row(second, fixture.editable.title).getByRole('button', { name: 'Edit', exact: true }).click();
   dialog = page.getByRole('dialog');
@@ -104,20 +122,31 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
   const recovered = await context.newPage();
   watch(recovered);
   await recovered.goto('/admin/tracks');
+  await searchTracks(recovered, winner);
   await expect(row(recovered, winner)).toBeVisible();
   await page.bringToFront();
 
+  await searchTracks(page, fixture.retained.title);
   const editRetained = row(page, fixture.retained.title).getByRole('button', { name: 'Edit', exact: true });
   await editRetained.focus();
   await editRetained.press('Enter');
   dialog = page.getByRole('dialog');
   await expect(dialog.getByLabel('Slug', { exact: false })).toBeDisabled();
   await expect(dialog.getByText('This URL stays reserved, including after unpublishing.')).toBeVisible();
+  const retainedCancelResponse = page.waitForResponse(response => {
+    if (!response.url().endsWith('/update') || response.request().method() !== 'POST') return false;
+    const payload = response.request().postDataJSON() as { components?: { calls?: { method?: string }[] }[] };
+    return payload.components?.some(component => component.calls?.some(call => call.method === 'unmountAction')) ?? false;
+  });
   await dialog.getByRole('button', { name: 'Cancel', exact: true }).focus();
   await dialog.getByRole('button', { name: 'Cancel', exact: true }).press('Enter');
+  const retainedCancelled = await retainedCancelResponse;
+  expect(retainedCancelled.status()).toBe(200);
+  expect(await retainedCancelled.finished()).toBeNull();
   await expect(dialog.getByRole('heading')).not.toBeVisible();
   await expect(editRetained).toBeFocused();
 
+  await searchTracks(page, title);
   await row(page, title).getByRole('button', { name: 'Publish', exact: true }).click();
   dialog = page.getByRole('alertdialog', { name: 'Publish', exact: true });
   await dialog.getByRole('button', { name: 'Confirm', exact: true }).click();

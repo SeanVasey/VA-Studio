@@ -58,6 +58,11 @@ class SelectionTests(unittest.TestCase):
             with self.subTest(engine=engine), self.assertRaises(focused.FocusedError):
                 focused.selection({"FOCUSED_SUITE": "unit", "FOCUSED_ENGINE": engine})
 
+    def test_preset_authoring_is_in_operator_and_browser_feedback(self):
+        for target in ("tests/Feature/TrackMetadataPresetsTest.php", "tests/Feature/TrackMetadataPresetsConcurrencyTest.php", "tests/Feature/TrackMetadataPresetsMigrationTest.php"):
+            self.assertIn(target, focused.PHP_TARGETS["operator"])
+        self.assertIn("tests/browser/track-metadata-presets.spec.ts", focused.BROWSER_TARGETS)
+
     def test_mysql_only_reaches_php_modes_and_browser_reports_isolated_sqlite(self):
         for suite in focused.PHP_TARGETS:
             self.assertEqual(focused.selection({"FOCUSED_SUITE": suite, "FOCUSED_ENGINE": "mysql"}).engine, "mysql")

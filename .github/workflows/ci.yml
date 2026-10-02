@@ -259,8 +259,9 @@ jobs:
     needs: scope
     if: needs.scope.outputs.mode != 'docs'
     runs-on: ubuntu-latest
-    # Installing the browsers takes 1 to 4.5 minutes and has taken 14; the tests take 7 to 9.
-    timeout-minutes: 35
+    # Browser installation has taken 14 minutes. Allow the expanded 18-minute suite
+    # plus bounded fixture/build setup, teardown and artifact retention.
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4

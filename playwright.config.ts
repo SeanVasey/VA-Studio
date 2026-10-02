@@ -11,7 +11,7 @@ export default defineConfig({
   retries: 0,
   forbidOnly: !!process.env.CI,
   // Bound the full suite while allowing the wrapper a minute to retain final evidence.
-  globalTimeout: 14 * 60_000,
+  globalTimeout: 18 * 60_000,
   timeout: 60_000,
   expect: { timeout: 10_000 },
   reporter: [['list'], ['html', { open: 'never' }]],

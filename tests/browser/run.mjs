@@ -55,7 +55,7 @@ try {
   }), { mode: 0o600, flag: 'wx' });
   const result = spawnSync(process.execPath, ['node_modules/@playwright/test/cli.js', 'test', ...process.argv.slice(2)], {
     // Keep one minute beyond Playwright's suite ceiling for teardown and report writes.
-    cwd: root, env, stdio: 'inherit', timeout: 900000,
+    cwd: root, env, stdio: 'inherit', timeout: 1140000,
   });
   if (result.error) throw new Error('Browser verification did not finish.');
   process.exitCode = result.status ?? 1;
