@@ -78,6 +78,10 @@ class SelectionTests(unittest.TestCase):
             self.assertIn(target, focused.PHP_TARGETS["operator"])
         self.assertIn("tests/browser/track-publication-guard.spec.ts", focused.BROWSER_TARGETS)
 
+    def test_read_only_publication_manifests_are_in_operator_feedback(self):
+        for target in ("tests/Feature/TrackPublicationManifestTest.php", "tests/Feature/TrackPublicationManifestConcurrencyTest.php"):
+            self.assertIn(target, focused.PHP_TARGETS["operator"])
+
     def test_mysql_only_reaches_php_modes_and_browser_reports_isolated_sqlite(self):
         for suite in focused.PHP_TARGETS:
             self.assertEqual(focused.selection({"FOCUSED_SUITE": suite, "FOCUSED_ENGINE": "mysql"}).engine, "mysql")

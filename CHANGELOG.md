@@ -10,6 +10,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Added
 
+- Read-only track publication manifest foundation: a standalone authorized capture returns immutable minimized identity for current ready metadata, rights, verified derivatives and active immutable offers/licenses at one recorded instant. It creates no retained approval, compare/apply boundary, publication fence, UI or schedule; existing media-integrity cache and mutable-scope limits remain explicit.
+
 - Reviewed manual track publication guards: publish/unpublish confirmations bind exact current metadata and monotonic publication revisions, use fresh persisted authority/MFA and consume stale confirmations before atomic publication/audit writes. The additive counter migration retains history and guards on rollback; scheduling remains separate.
 - Protected operator track review: a close-only staff modal shows current descriptive metadata, ordinary publication blockers and verified artwork/tagged audio. Fresh authority/MFA checks, exact protected derivative URLs and generic private errors preserve draft privacy and retained evidence.
 
@@ -40,6 +42,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 - When a scan does not finish, the worker log records why: the failure, the exit status (137 is SIGKILL, which is how the CPU limit ends a scan) and the first line the scanner wrote to standard error and to standard output, without the upload's directory and at most 200 characters. The same holds for a scanner whose signatures are refused (the version line, the time read from it, its age and what `--version` wrote to standard error, which tells a stopped daemon from one whose VERSION command is off and from one in the wrong time zone), for one that is not ClamAV, and for a scan that exits 0 without the clean line. The messages shown to administrators are unchanged.
 
 ### Fixed
+
+- Publication-guard tests compare complete audit contexts with strict canonical JSON while retaining typed values, and explicitly prove ordinary null-tag normalization before complete row comparisons. The separate synthetic quote publisher enrolls through the existing encrypted MFA helper when used by required-MFA inquiry fixtures; application authority and all race cases remain intact.
 
 - Private Tracks updates rejected before Livewire component boot now receive generic private errors and no-store/noindex protection when the actual server update route carries a valid signed Tracks snapshot. CSRF remains HTTP 419; forged names, signatures and client markers cannot opt unrelated requests into this scope.
 - The genuine related-media browser observer waits for completed native preview transport and exact full/range bytes, while retaining the narrowly identified opaque pre-gesture WebKit observations as diagnostics. A real post-gesture response and progressing playback remain required; repaired hosted execution is pending.

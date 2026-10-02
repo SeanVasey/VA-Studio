@@ -9,6 +9,7 @@ use App\Domain\Catalog\SaveTrackMetadata;
 use App\Filament\Resources\TrackResource\Pages\ManageTracks;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
+use App\Support\CanonicalJson;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use Filament\Support\Exceptions\Cancel;
@@ -126,8 +127,8 @@ class TrackPublicationGuardTest extends TestCase
         $this->assertSame($actor->id, $audit->actor_id);
         $this->assertSame($track->id, $audit->subject_id);
         $this->assertSame(Track::class, $audit->subject_type);
-        $this->assertSame(['schema_version' => 1, 'metadata_version' => $review['metadata_version'],
-            'previous_publication_version' => $review['publication_version'], 'publication_version' => $review['publication_version'] + 1], $audit->context);
+        $this->assertSame(CanonicalJson::encode(['schema_version' => 1, 'metadata_version' => $review['metadata_version'],
+            'previous_publication_version' => $review['publication_version'], 'publication_version' => $review['publication_version'] + 1]), CanonicalJson::encode($audit->context));
         $after = $this->evidence();
         $this->assertSame(array_slice($before, 1, -1), array_slice($after, 1, -1), 'Publication must leave media, rights, licenses and commerce untouched.');
         $this->invalid(fn () => $this->apply($review, $actor, $intent));
@@ -339,8 +340,8 @@ class TrackPublicationGuardTest extends TestCase
         $audits = AuditEvent::whereIn('action', ['catalog.track.published', 'catalog.track.unpublished'])->orderBy('id')->get();
         $this->assertCount(4, $audits);
         foreach ($audits as $index => $audit) {
-            $this->assertSame(['schema_version' => 1, 'metadata_version' => $track->metadata_version,
-                'previous_publication_version' => $index, 'publication_version' => $index + 1], $audit->context);
+            $this->assertSame(CanonicalJson::encode(['schema_version' => 1, 'metadata_version' => $track->metadata_version,
+                'previous_publication_version' => $index, 'publication_version' => $index + 1]), CanonicalJson::encode($audit->context));
             $this->assertSame($actor->id, $audit->actor_id);
         }
     }

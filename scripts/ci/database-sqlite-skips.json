@@ -293,6 +293,22 @@
     [
       "Tests\\Feature\\TrackPublicationGuardConcurrencyTest",
       "test_old_repeatable_read_snapshots_are_refused_then_current_authority_is_rechecked_standalone"
+    ],
+    [
+      "Tests\\Feature\\TrackPublicationManifestConcurrencyTest",
+      "test_capture_and_authority_withdrawal_serialize_on_the_exact_actor_row"
+    ],
+    [
+      "Tests\\Feature\\TrackPublicationManifestConcurrencyTest",
+      "test_metadata_writer_committed_first_is_observed_after_the_exact_track_row_wait"
+    ],
+    [
+      "Tests\\Feature\\TrackPublicationManifestConcurrencyTest",
+      "test_old_repeatable_read_authority_snapshot_is_refused_then_standalone_capture_uses_current_authority"
+    ],
+    [
+      "Tests\\Feature\\TrackPublicationManifestConcurrencyTest",
+      "test_publication_writer_committed_first_is_observed_after_the_exact_track_row_wait"
     ]
   ]
 }

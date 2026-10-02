@@ -72,6 +72,7 @@ PHP_TARGETS = {
         "tests/Feature/PrivateTrackReviewTest.php", "tests/Feature/PrivateTrackReviewPrivacyTest.php",
         "tests/Feature/TrackPublicationGuardTest.php", "tests/Feature/TrackPublicationGuardMigrationTest.php",
         "tests/Feature/TrackPublicationGuardConcurrencyTest.php",
+        "tests/Feature/TrackPublicationManifestTest.php", "tests/Feature/TrackPublicationManifestConcurrencyTest.php",
     ),
 }
 FRONTEND_TARGETS = (

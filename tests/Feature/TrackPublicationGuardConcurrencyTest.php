@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Domain\Catalog\PublishTrack;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
+use App\Support\CanonicalJson;
 use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Filesystem\Filesystem;
@@ -94,8 +95,8 @@ class TrackPublicationGuardConcurrencyTest extends TestCase
             $this->assertSame($actors[$winner]->id, $audit->actor_id);
             $this->assertSame($track->id, $audit->subject_id);
             $this->assertSame('catalog.track.'.($intent === 'publish' ? 'published' : 'unpublished'), $audit->action);
-            $this->assertSame(['schema_version' => 1, 'metadata_version' => $reviews[$winner]['metadata_version'],
-                'previous_publication_version' => $reviews[$winner]['publication_version'], 'publication_version' => $current->publication_version], $audit->context);
+            $this->assertSame(CanonicalJson::encode(['schema_version' => 1, 'metadata_version' => $reviews[$winner]['metadata_version'],
+                'previous_publication_version' => $reviews[$winner]['publication_version'], 'publication_version' => $current->publication_version]), CanonicalJson::encode($audit->context));
         });
     }
 
@@ -215,6 +216,7 @@ class TrackPublicationGuardConcurrencyTest extends TestCase
         $editor = LicenseFixtures::admin();
         $review = app(PublishTrack::class)->review($track, $actor, $intent);
         $before = $track->fresh()->getAttributes();
+        $this->assertNull($before['tags']);
         $auditCount = AuditEvent::count();
         $inputs = [$this->input('metadata', $intent, $actor, $review), ['mode' => 'metadata', 'operation' => 'edit',
             'actor_id' => $editor->id, 'track_id' => $track->id, 'metadata_version' => $track->metadata_version, 'media_root' => Storage::disk('local')->path('')]];
@@ -233,6 +235,10 @@ class TrackPublicationGuardConcurrencyTest extends TestCase
             $this->assertSame($before['metadata_version'] + 1, $current->metadata_version);
             $this->assertSame($before['publication_version'], $current->publication_version);
             $this->assertSame($before['status'], $current->status);
+            $this->assertSame([], $current->tags);
+            $this->assertSame('[]', $current->getRawOriginal('tags'));
+            // The ordinary metadata command canonicalizes omitted nullable tags while saving the winning mood.
+            $before['tags'] = '[]';
             $after = $current->getAttributes();
             foreach (['mood', 'metadata_version', 'updated_at'] as $field) {
                 unset($before[$field], $after[$field]);
