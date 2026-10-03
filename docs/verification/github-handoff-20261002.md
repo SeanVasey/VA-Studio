@@ -42,3 +42,15 @@ The source PR records exact test commands/counts, independent integration review
 
 The old `contract-profile.yml` branch-specific workflow is a preserved one-off diagnostic, not a required handoff gate. Its historical repository guard is intentionally retained. No live payment or production credentials are introduced.
 
+## First native execution and reviewed recovery batch
+
+Inspection before the first full GitHub execution, [37086861886](https://github.com/SeanVasey/VA-Studio/actions/runs/37086861886), established that Actions had been disabled. The approved repository policy now permits account-owned actions and the four exact external action pins used by the workflows; default tokens remain read-only and fork workflows remain disabled. The run on `6c55b463` exposed a stale operator browser expectation: the unready-track guard rejects the action before opening confirmation. Both SQLite shards also exposed seven legacy migration tests whose manual rollback/restore chains omitted migration 36, leaving triggers that referenced tables already removed by those tests. The repair changes test dependency order and empty-table assertions only; runtime rollback guards and existing data/evidence assertions remain intact.
+
+| Isolated source | Added boundary | Acceptance required |
+| --- | --- | --- |
+| `33c8a2802b86f0f88c263eb601e01493da5feef5` | Correct the older operator journey to assert rejected mount, absent confirmation, cleared review, retained draft and public 404 | Independent patch review, focused browser proof and current full suite |
+| `7a0d11e456e185a4dc2c7a94532d9a319585893e` (includes contract `17471045`) | Source-backed content/publication journey plus truthful uncertain publish/unpublish recovery; authorization and known validation stay distinct | Independent source review, focused publication on SQLite/MySQL and current full suite |
+| `da712f632810f9ea49b71a42ba65ab57997a0cfd` | Retain quarantine bytes across uncertain commits, failed rollback and nested concurrency outcomes; keep confirmed precommit cleanup | Independent source review, six regression definitions, focused media on SQLite/MySQL and current full suite |
+| `f04d910928a47e6b39226c59921f7f6e9ec01a35` | Correct seven manual migration roundtrip chains and add them to the existing focused commerce selection | Independent source review, focused commerce on SQLite/MySQL and current full suite |
+
+The recovery lanes modify sixteen distinct files relative to the first integration candidate. Composition retains their parent histories and exact lane blobs, alongside the lead's four task/assignment records. The one shared-file reconciliation in this batch is `scripts/ci/focused-tests.py`: preserve the media recovery registration and all seven commerce migration registrations, with all prior suite membership and the existing 32-file ceiling unchanged. The PR records the final composed SHA, tree, review and actual run outcomes; the source record does not claim its own later CI result. No prior receipt is reused as acceptance of the composition. No parent task, production activation or historical-data migration is completed merely by these repairs.

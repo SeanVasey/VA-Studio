@@ -1,10 +1,24 @@
 # Development agents and launch queue
 
-## Current GitHub handoff — October 2, 2026
+## Current GitHub execution — October 2, 2026
 
-Sean directed development to continue in [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio). The active candidate is `codex/github-handoff-20261002`. It composes the shared writer foundation, browser/runtime repairs, publication compare/apply, payment-exception operations and launch preparation. [The handoff record](verification/github-handoff-20261002.md) lists immutable source identities and the acceptance boundary.
+Development continues in [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio), integration branch `codex/github-handoff-20261002`, [PR #4](https://github.com/SeanVasey/VA-Studio/pull/4). The preserved source map remains in [the handoff record](verification/github-handoff-20261002.md). Sean authorized the GitHub Actions enablement and parallel implementation; account-owned actions plus the four existing pinned external actions are allowed, while default workflow tokens remain read-only and fork workflows remain disabled.
 
-Current bounded assignments: `/root` owns integration and the PR; `/root/github_ci_review` owns repository/runtime CI portability; `/root/integration_review` independently reviews composition; `/root/verify_gitlab` audits source preservation. These replace active-agent claims in the historical GitLab checkpoint below. The seven durable lanes and all 40 parent criteria remain assigned; no parent closes from source transfer alone. Fresh GitHub acceptance and independent review must precede expected-head merge. Record run results on the GitHub PR without status-only source changes that restart CI.
+The first full GitHub run exposed an older operator browser assertion that expected a confirmation for an unready track. The existing guard correctly rejects that mount before confirmation. The isolated correction verifies the blocker, cleared review, absence of confirmation, retained draft after reload and public 404; existing domain no-publication/no-audit assertions stay intact. Seven legacy migration roundtrip tests also omitted the newly imported payment-exception migration from their manual dependency chains. Their correction removes that migration before its dependencies and restores it last, preserving the original evidence assertions and runtime rollback guards.
+
+Two policy-independent recovery children advanced while that candidate ran. Media intake retains private quarantine bytes when commit or nested rollback outcomes are uncertain. Publication now reports unexpected errors privately and directs the operator to reload current state and obtain fresh review, without converting authorization or known validation failures into uncertainty. The source-backed [content/publication journey](experience/content-publication-journey.md) specifies supported controls, recovery and remaining experience gaps.
+
+| Accountable identity | Owned boundary | Current handoff |
+| --- | --- | --- |
+| Integration — `/root` | Composition, shared task records, PR, CI acceptance and expected-head merge | Compose independently reviewed lane commits; require fresh full acceptance of the final source, then verify main |
+| CI — `/root/github_ci_review` | Native run diagnosis, operator browser correction and delegated seven-file migration-test repair | Browser repair `33c8a2802b86f0f88c263eb601e01493da5feef5`; independently review both repairs, register the seven migration files in focused commerce and retain the final full gate |
+| Publication — `/root/integration_review` | T11 journey; `ManageTracks`, editor regressions and uncertainty evidence | `7a0d11e456e185a4dc2c7a94532d9a319585893e`; own implementation cannot serve as its independent acceptance |
+| Media — `/root/verify_gitlab` | Intake service, dedicated recovery tests, one additive focused media registration and evidence | `da712f632810f9ea49b71a42ba65ab57997a0cfd`; runtime validation on both database engines remains explicit |
+| Independent review | Dedicated publication, intake and CI correction reviewers | Assess actual published bytes and final composition; source approval does not substitute for execution |
+
+These are bounded ownership records, not a claim that every historical agent is running. Their isolated branches retain history; the lead alone composes the coherent recovery batch after focused feedback. Put run IDs, failures and completed counts on PR #4 instead of making status-only source commits that restart CI. Earlier component or GitLab results retain only their stated scope. No parent group closes from these children: T03–T08 remain the six accepted groups, with 34 parent groups open.
+
+Next after acceptance: follow the [task register](remaining-development-tasks.csv) and [onboarding packet](content-onboarding-readiness.md). T13 still needs resumable intake, selected private storage, quotas/orphan lifecycle and retention acceptance. T11/T12 still need remaining journeys, granular roles/MFA recovery and track scheduling's explicit timing contract. T19's operational-history/provider-inspection child leaves broader financial resolution open. Production deployment, payments, content import and cutover retain their separate gates.
 
 ## Preserved GitLab checkpoint
 
@@ -120,4 +134,3 @@ The [onboarding packet](content-onboarding-readiness.md) lists inputs tied to cu
 Existing authorization covers preparation and reversible implementation. These are missing operational facts, material and access, not a request to repeat broad development approval. Missing evidence does not mean Sean lacks corresponding assets, accounts or rights.
 
 The [private audit checklist](migration/authenticated_studio_audit_checklist.csv) still has 14 unperformed areas, and the [unknown ledger](migration/known_unknowns_and_validation.csv) retains 27 unresolved acquisition/validation facts. No private audit, customer import or obligation reconciliation is claimed. The [Mac bootstrap](development-macos.md) is prepared and safeguard-tested; installation on Sean's Mac is unverified. Private-server defaults are prepared; no actual server, production storage, real mail, signed deployed webhook or restore has been accepted. Physical-device testing and final deployment execution still need real access and an identified operator.
-

@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test, expect, type Page } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
+import { actionResponse, publicationReview } from './publication-fixture';
+import { syncSuccessNotification } from './notification-sync';
 
 test.beforeEach(() => resetBrowserLoginRateLimit());
 
@@ -147,14 +149,25 @@ test('operator create, field errors, keyboard recovery, stale saves and retained
   await expect(editRetained).toBeFocused();
 
   await searchTracks(page, title);
-  await row(page, title).getByRole('button', { name: 'Publish', exact: true }).click();
-  dialog = page.getByRole('alertdialog', { name: 'Publish', exact: true });
-  await dialog.getByRole('button', { name: 'Confirm', exact: true }).click();
-  await expect(page.getByText('Publication blocked', { exact: true })).toBeVisible();
-  await expect(page.getByText(/The latest rights declaration must be verified/)).toBeVisible();
+  await expect(row(page, title).getByText('draft', { exact: true })).toBeVisible();
+  await syncSuccessNotification(page, 'Publication blocked', async () => {
+    const [mounted] = await Promise.all([
+      actionResponse(page, 'mountAction', 'publish'),
+      row(page, title).getByRole('button', { name: 'Publish', exact: true }).click(),
+    ]);
+    expect(mounted.status()).toBe(200);
+    expect(await mounted.finished()).toBeNull();
+    expect(await publicationReview(mounted)).toBeNull();
+    await expect(page.getByRole('alertdialog', { name: 'Publish', exact: true })).toHaveCount(0);
+  }, async () => {
+    await expect(page.getByText(/The latest rights declaration must be verified/)).toBeVisible();
+    await page.getByText('Publication blocked', { exact: true }).scrollIntoViewIfNeeded();
+    await expect(page.getByText('Publication blocked', { exact: true })).toBeInViewport();
+    await page.screenshot({ path: testInfo.outputPath('publication-blockers.png'), fullPage: false });
+  });
+  await page.goto('/admin/tracks');
+  await searchTracks(page, title);
+  await expect(row(page, title).getByText('draft', { exact: true })).toBeVisible();
   expect((await page.request.get(`/tracks/${slug}`)).status()).toBe(404);
-  await page.getByText('Publication blocked', { exact: true }).scrollIntoViewIfNeeded();
-  await expect(page.getByText('Publication blocked', { exact: true })).toBeInViewport();
-  await page.screenshot({ path: testInfo.outputPath('publication-blockers.png'), fullPage: false });
   expect(failures).toEqual([]);
 });

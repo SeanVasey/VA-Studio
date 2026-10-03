@@ -1,8 +1,15 @@
 # Current development queue
 
-## Current GitHub handoff — October 2, 2026
+## Current GitHub execution — October 2, 2026
 
-Development now targets [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio), on `codex/github-handoff-20261002`. The [handoff record](verification/github-handoff-20261002.md) supersedes historical repository/runner routing below. One composed candidate includes all four preserved follow-on lanes and the shared writer foundation. GitHub CI must validate this exact integrated source; earlier GitLab and component results retain only their original scope. Merge only after full checks and independent review; then verify main separately. Production activation remains outside this handoff.
+The active source is [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio), branch `codex/github-handoff-20261002`, [PR #4](https://github.com/SeanVasey/VA-Studio/pull/4). The [handoff record](verification/github-handoff-20261002.md) preserves all source identities; [agent assignments](development-agent-queue.md#current-github-execution--october-2-2026) define owned files and the current coherent batch.
+
+1. **Finish GitHub acceptance.** Repository Actions is enabled with the approved action allowlist. The initial full run identified the stale operator confirmation assertion and seven legacy migration tests missing the payment-exception dependency in their manual roundtrip chains. The isolated corrections preserve blocked-publication, draft and existing database-evidence checks; no runtime migration guard is relaxed. Compose these reviewed repairs with the independently reviewed media/publication recovery children and require one fresh full acceptance run on the final source. Preserve failures and exact run evidence in the PR.
+2. **Complete the active recovery children.** Intake must not delete private bytes after uncertain commit, failed rollback or Laravel's nested concurrency failure. Publication must distinguish unknown results from authorization/validation rejection and require current-state reload plus fresh review. Focused SQLite/MySQL feedback and browser verification precede the full integrated gate; no runtime success is inferred from local source inspection.
+3. **Merge only the verified current head, then verify main.** Use the expected SHA. Runtime receipt reuse and post-merge deduplication remain disabled. GitHub currently does not enforce required checks on main; repository instructions still require the complete acceptance and independent review.
+4. **Continue dependency-ready development.** T11's content/publication journey is now source-backed. Remaining storage/resume/orphan/retention, roles/recovery/scheduling, commerce resolution and customer-access criteria stay in the task register. Applicable policy/source/host decisions gate their dependent behavior, not unrelated reversible implementation.
+
+T03–T08 remain the six accepted parent groups; the other 34 groups retain their criteria. Source-reviewed recovery children do not close T11, T12 or T13. Historical repository and run references below remain evidence for their original source only. No production payments, private-source import, domain cutover or launch acceptance is implied.
 
 ## Historical execution record
 
@@ -81,4 +88,3 @@ There was no skipped feature sequence. GitHub allocates repository numbers as it
 Current evidence equality does not detect an A→B→A history. Review consumption applies to current Livewire component state, not a durable nonce that revokes old authentic snapshots. Required MFA checks current enrollment, not a recent challenge proof. Source review identified the participating actor/track cycle: the old publisher held the track before inserting a user foreign key, while rights writers held that user before requesting the track. [MySQL documents shared record locks for foreign-key checks](https://dev.mysql.com/doc/refman/8.4/en/innodb-locks-set.html). This is source-based reasoning, not an executed race. The participating offer publisher must acquire current actor authority before its own track lock; its existing nested API remains compatible, with inherited caller lock/readiness limits. The corrected publisher/rights interaction requires its real MySQL completion case; no universal deadlock-freedom claim is made.
 
 Sean's ten storefront/admin screenshots and their archive remain preserved with their original PR #104/run-372 provenance. They are not relabeled as the new rights writer UI or current source. Fresh UI changes require their own relevant verification.
-
