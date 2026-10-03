@@ -259,6 +259,14 @@
       "test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation"
     ],
     [
+      "Tests\\Feature\\StemsRecordingPreviewConcurrencyTest",
+      "test_preview_fence_does_not_lock_a_quarantined_processing_source"
+    ],
+    [
+      "Tests\\Feature\\StemsRecordingPreviewConcurrencyTest",
+      "test_processor_completion_rejects_an_obsolete_preview_after_the_track_wait"
+    ],
+    [
       "Tests\\Feature\\StripeWebhookConcurrencyTest",
       "test_simultaneous_conflicting_deliveries_retain_one_winner_and_reject_the_conflict"
     ],
