@@ -274,13 +274,27 @@ class ExecutionTests(unittest.TestCase):
 
 
 class WorkflowBoundaryTests(unittest.TestCase):
-    def test_workflow_has_no_secrets_privileged_event_or_mutation_permissions(self):
-        text = (ROOT / ".github/workflows/focused.yml").read_text()
-        for forbidden in ("secrets.", "pull_request_target", "write", "continue-on-error", "always() &&", "pull_request:"):
+    def assert_read_only_workflow(self, text):
+        for forbidden in ("secrets.", "pull_request_target", "continue-on-error", "always() &&", "pull_request:"):
             self.assertNotIn(forbidden, text)
+        # The required xmlwriter extension is not a mutation permission.
+        self.assertNotRegex(text, r"\bwrite(?:-all)?\b")
         self.assertIn("contents: read", text)
         self.assertEqual(text.count("persist-credentials: false"), 4)
         self.assertIn("branches-ignore: [main]", text)
+
+    def test_workflow_has_no_secrets_privileged_event_or_mutation_permissions(self):
+        self.assert_read_only_workflow((ROOT / ".github/workflows/focused.yml").read_text())
+
+    def test_xmlwriter_is_allowed_but_write_and_write_all_permissions_are_rejected(self):
+        text = (ROOT / ".github/workflows/focused.yml").read_text()
+        self.assertIn("xmlwriter", text)
+        self.assert_read_only_workflow(text)
+        for mutation in (text.replace("contents: read", "contents: write"),
+                         text.replace("permissions:\n  contents: read", "permissions: write-all")):
+            self.assertNotEqual(text, mutation)
+            with self.assertRaisesRegex(AssertionError, "Regex matched"):
+                self.assert_read_only_workflow(mutation)
 
     def test_workflow_never_interpolates_expressions_in_shell_steps(self):
         lines = (ROOT / ".github/workflows/focused.yml").read_text().splitlines()

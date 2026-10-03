@@ -68,11 +68,11 @@ def runtime(engine):
     database = {"version": "3.50.1"} if engine == "sqlite" else {
         "version": "8.4.11", "version_comment": "MySQL", "sql_mode": "STRICT_TRANS_TABLES",
         "character_set_server": "utf8mb4", "collation_server": "utf8mb4_0900_ai_ci", "transaction_isolation": "REPEATABLE-READ",
-        "default_storage_engine": "InnoDB", "lower_case_table_names": "0", "innodb_strict_mode": "1", "container_image_id": "sha256:" + H,
+        "default_storage_engine": "InnoDB", "lower_case_table_names": "0", "innodb_strict_mode": "1", "performance_schema": 1, "container_image_id": "sha256:" + H,
     }
     return {"engine": engine, "runner": {key: "synthetic" for key in ("RUNNER_OS", "RUNNER_ARCH", "ImageOS", "ImageVersion")},
-            "os_release_sha256": H, "php": {"version": "8.4.26", "integer_size": 8,
-                "extensions": {key: "8.4.26" for key in ("mbstring", "intl", "PDO", "pdo_" + engine, "bcmath", "gd", "zip", "curl", "posix")}},
+            "os_release_sha256": H, "php": {"version": "8.4.26", "integer_size": 8, "memory_limit": "512M",
+                "extensions": {key: "8.4.26" for key in ("fileinfo", "mbstring", "intl", "PDO", "pdo_mysql", "pdo_sqlite", "bcmath", "gd", "zip", "curl", "dom", "xml", "xmlwriter", "posix", "pcntl")}},
             "tools": {key: {"binary_sha256": H, "version_output_sha256": H} for key in ("php", "composer", "ffmpeg", "qpdf", "pdftocairo", "flock")},
             "database": database, "dependencies": {"package_count": 1, "installed_identity_sha256": H, "composer_lock_sha256": H}}
 
@@ -243,6 +243,68 @@ class CollectorTests(unittest.TestCase):
         self.assertIn("pending", value["outer_acceptance"])
         self.assertEqual("unknown", value["shadow"]["prior_full_acceptance"])
 
+    def reject_runtime(self, engine, observed, message):
+        # Keep the start/final receipts and all hashes consistent so rejection
+        # proves runtime validation, not an unrelated archive/hash mismatch.
+        api = FakeGithub()
+        files = evidence(engine, 1)
+        prefix = f"phpunit-ci-{engine}-1"
+        initial = json.loads(files[prefix + "-start.json"])
+        initial["runtime"] = observed
+        files[prefix + "-start.json"] = receipt.canonical(initial)
+        final_name = prefix + "-receipt.json"
+        value = json.loads(files.pop(final_name))
+        value["runtime"] = observed
+        value["runtime_sha256"] = receipt.digest(receipt.canonical(observed))
+        value["file_sha256"] = {name: receipt.digest(raw) for name, raw in files.items()}
+        files[final_name] = receipt.canonical(value)
+        api.replace(1 if engine == "mysql" else 5, files)
+        with self.assertRaisesRegex(receipt.ReceiptError, message):
+            self.collect(api)
+
+    def test_both_engine_collectors_reject_unbounded_or_incomplete_php_runtime(self):
+        for engine in ("mysql", "sqlite"):
+            for extension in runtime(engine)["php"]["extensions"]:
+                observed = runtime(engine)
+                del observed["php"]["extensions"][extension]
+                with self.subTest(engine=engine, missing_extension=extension):
+                    self.reject_runtime(engine, observed, "Incomplete PHP runtime receipt")
+            for field, invalid in (("memory_limit", "128M"), ("memory_limit", "-1"), ("memory_limit", None),
+                                   ("integer_size", "8"), ("integer_size", 8.0), ("integer_size", True)):
+                observed = runtime(engine)
+                observed["php"][field] = invalid
+                with self.subTest(engine=engine, field=field, invalid=invalid):
+                    self.reject_runtime(engine, observed, "Incomplete PHP runtime receipt")
+
+    def test_mysql_collector_requires_strict_genuine_service_capabilities(self):
+        for field, invalid in (
+                ("performance_schema", 0), ("performance_schema", True), ("performance_schema", "1"),
+                ("transaction_isolation", "READ-COMMITTED"), ("default_storage_engine", "MyISAM"),
+                ("sql_mode", "NO_ENGINE_SUBSTITUTION"), ("sql_mode", "STRICT_TRANS_TABLES_EXTRA"),
+                ("character_set_server", "latin1"), ("collation_server", "latin1_swedish_ci"),
+                ("lower_case_table_names", 1), ("lower_case_table_names", False), ("lower_case_table_names", 0.0),
+                ("lower_case_table_names", "00"), ("innodb_strict_mode", 0), ("innodb_strict_mode", True),
+                ("innodb_strict_mode", 1.0), ("innodb_strict_mode", "01"),
+                ("container_image_id", "mysql:8.4"), ("version", "10.11.0-MariaDB")):
+            observed = runtime("mysql")
+            observed["database"][field] = invalid
+            with self.subTest(field=field, invalid=invalid):
+                self.reject_runtime("mysql", observed, "Invalid MySQL service identity")
+        for field in ("performance_schema", "container_image_id"):
+            observed = runtime("mysql")
+            del observed["database"][field]
+            with self.subTest(missing=field):
+                self.reject_runtime("mysql", observed, "Invalid MySQL service identity")
+
+    def test_runtime_accepts_canonical_pdo_values_strict_modes_and_unversioned_extensions(self):
+        for numeric in (False, True):
+            for mode in ("STRICT_TRANS_TABLES", "STRICT_ALL_TABLES,NO_ENGINE_SUBSTITUTION"):
+                observed = runtime("mysql")
+                observed["database"].update(sql_mode=mode, lower_case_table_names=0 if numeric else "0",
+                                             innodb_strict_mode=1 if numeric else "1")
+                observed["php"]["extensions"]["PDO"] = None
+                receipt.validate_runtime(observed, "mysql")
+
     def test_missing_duplicate_failed_pending_skipped_and_mixed_attempt_jobs_reject(self):
         for mutation in ("missing", "duplicate", "failure", "pending", "skipped", "attempt", "head"):
             api = FakeGithub()
@@ -345,6 +407,28 @@ class CollectorTests(unittest.TestCase):
         with patch.object(api.opener, "open", return_value=Response(b"data")) as opened:
             api.request("https://productionresultssa1.blob.core.windows.net/file?sig=synthetic", False, 20)
         self.assertIsNone(opened.call_args.args[0].get_header("Authorization"))
+
+
+class SyntheticEnvironmentTests(unittest.TestCase):
+    def test_non_synthetic_database_target_rejects_before_any_probe(self):
+        baseline = {"APP_ENV": "testing", "DB_CONNECTION": "mysql", "DB_HOST": "127.0.0.1",
+                    "DB_PORT": "3306", "DB_DATABASE": "vaseyaudio_test", "DB_URL": "", "DB_SOCKET": ""}
+        receipt.validate_test_environment("mysql", baseline)
+        for change in ({"APP_ENV": "production"}, {"DB_CONNECTION": "sqlite"}, {"DB_HOST": "database.example.invalid"},
+                       {"DB_PORT": "3307"}, {"DB_DATABASE": "production"}, {"DB_URL": "mysql://synthetic.invalid"},
+                       {"DB_SOCKET": "/tmp/foreign.sock"}):
+            with self.subTest(change=change), patch.object(receipt, "run") as probe, self.assertRaises(receipt.ReceiptError):
+                try:
+                    receipt.runtime_identity(Path(ROOT), "mysql", baseline | change)
+                finally:
+                    probe.assert_not_called()
+        sqlite = baseline | {"DB_CONNECTION": "sqlite", "DB_DATABASE": ":memory:"}
+        receipt.validate_test_environment("sqlite", sqlite)
+        with patch.object(receipt, "run") as probe, self.assertRaises(receipt.ReceiptError):
+            try:
+                receipt.runtime_identity(Path(ROOT), "sqlite", sqlite | {"DB_DATABASE": "/tmp/foreign.sqlite"})
+            finally:
+                probe.assert_not_called()
 
 
 class WorkflowTests(unittest.TestCase):

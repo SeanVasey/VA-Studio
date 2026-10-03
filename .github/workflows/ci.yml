@@ -71,12 +71,17 @@ jobs:
       - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
         with:
           php-version: '8.4'
-          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, fileinfo, dom, xml, xmlwriter, posix, pcntl
+          ini-values: memory_limit=512M
           coverage: none
           tools: composer:v2
+      - name: Verify bounded PHP test capabilities
+        run: php scripts/ci/verify-php-test-runtime.php
       - run: composer install --no-interaction --prefer-dist
       - run: composer validate --strict
       - run: vendor/bin/pint --version
+      - name: Verify the current rights-writer formatting boundary
+        run: php vendor/bin/pint --test app/Domain/Catalog/SaveTrackMetadata.php app/Domain/Catalog/SaveOfferDraft.php app/Domain/Catalog/DeactivateOffer.php tests/Feature/CatalogWriterAuthorityTest.php tests/Feature/RightsDeclarationWriterConcurrencyTest.php tests/Support/rights-declaration-writer-worker.php app/Domain/Rights/CreateLicenseDraft.php app/Domain/Rights/UpdateLicenseDraft.php app/Domain/Rights/ReviewLicense.php app/Domain/Rights/PublishLicense.php app/Domain/Catalog/PrepareExclusiveOffer.php app/Domain/Catalog/ActivateExclusiveOffer.php app/Domain/Commerce/Inventory/ManageRightsScope.php tests/Feature/LicenseWriterAuthorityTest.php tests/Feature/ExclusiveWriterAuthorityTest.php tests/Feature/RightsScopeWriterAuthorityTest.php tests/Feature/RightsScopeWriterConcurrencyTest.php tests/Support/rights-scope-writer-worker.php
       - run: composer audit
       - name: Verify shard partition safeguards
         run: python3 scripts/ci/test-phpunit-shards.py
@@ -85,6 +90,10 @@ jobs:
           python3 scripts/ci/test-ci-scope.py
           python3 scripts/ci/test-focused-tests.py
           python3 scripts/ci/test-database-receipts.py
+          python3 scripts/ci/test-gitlab-database-receipts.py
+          python3 scripts/ci/test-gitlab-writer-feedback.py
+          python3 scripts/ci/test-php-test-runtime.py
+          python3 scripts/dev/test-bootstrap-macos.py
 
   backend-mysql:
     needs: scope
@@ -117,6 +126,8 @@ jobs:
       DB_HOST: 127.0.0.1
       DB_PORT: 3306
       DB_DATABASE: vaseyaudio_test
+      DB_URL: ''
+      DB_SOCKET: ''
       DB_USERNAME: root
       DB_PASSWORD: ci-only-password
       CACHE_STORE: array
@@ -129,9 +140,12 @@ jobs:
       - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
         with:
           php-version: '8.4'
-          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, fileinfo, dom, xml, xmlwriter, posix, pcntl
+          ini-values: memory_limit=512M
           coverage: none
           tools: composer:v2
+      - name: Verify bounded PHP test capabilities
+        run: php scripts/ci/verify-php-test-runtime.php
       - name: Install bounded media and PDF verification tools
         run: |
           sudo apt-get update
@@ -180,6 +194,8 @@ jobs:
       APP_DEBUG: 'false'
       DB_CONNECTION: sqlite
       DB_DATABASE: ':memory:'
+      DB_URL: ''
+      DB_SOCKET: ''
       CACHE_STORE: array
       SESSION_DRIVER: array
       QUEUE_CONNECTION: sync
@@ -190,9 +206,12 @@ jobs:
       - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
         with:
           php-version: '8.4'
-          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, fileinfo, dom, xml, xmlwriter, posix, pcntl
+          ini-values: memory_limit=512M
           coverage: none
           tools: composer:v2
+      - name: Verify bounded PHP test capabilities
+        run: php scripts/ci/verify-php-test-runtime.php
       - name: Install bounded media and PDF verification tools
         run: |
           sudo apt-get update
@@ -279,9 +298,12 @@ jobs:
       - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
         with:
           php-version: '8.4'
-          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, fileinfo, dom, xml, xmlwriter, posix, pcntl
+          ini-values: memory_limit=512M
           coverage: none
           tools: composer:v2
+      - name: Verify bounded PHP test capabilities
+        run: php scripts/ci/verify-php-test-runtime.php
       - name: Install application media fixture prerequisites
         run: |
           sudo apt-get update
@@ -324,9 +346,12 @@ jobs:
       - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
         with:
           php-version: '8.4'
-          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, fileinfo, dom, xml, xmlwriter, posix, pcntl
+          ini-values: memory_limit=512M
           coverage: none
           tools: composer:v2
+      - name: Verify bounded PHP test capabilities
+        run: php scripts/ci/verify-php-test-runtime.php
       - name: Install genuine scanner and current official signatures on this disposable runner
         run: bash tests/browser/install-related-scanner.sh
       - run: composer install --no-interaction --prefer-dist

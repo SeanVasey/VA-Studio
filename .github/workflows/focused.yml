@@ -99,9 +99,12 @@ jobs:
       - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
         with:
           php-version: '8.4'
-          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, fileinfo, dom, xml, xmlwriter, posix, pcntl
+          ini-values: memory_limit=512M
           coverage: none
           tools: composer:v2
+      - name: Verify bounded PHP test capabilities
+        run: php scripts/ci/verify-php-test-runtime.php
       - name: Install media and PDF tools for feature subsets
         if: needs.focused-selection.outputs.suite != 'unit'
         run: |
@@ -164,9 +167,12 @@ jobs:
       - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
         with:
           php-version: '8.4'
-          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, posix
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, fileinfo, dom, xml, xmlwriter, posix, pcntl
+          ini-values: memory_limit=512M
           coverage: none
           tools: composer:v2
+      - name: Verify bounded PHP test capabilities
+        run: php scripts/ci/verify-php-test-runtime.php
       - run: composer install --no-interaction --prefer-dist
       - run: npm ci
       - run: npm run build
