@@ -75,6 +75,10 @@ PHP_TARGETS = {
         "tests/Feature/TrackPublicationManifestTest.php", "tests/Feature/TrackPublicationManifestConcurrencyTest.php",
         "tests/Feature/TrackPublicationGuardTest.php", "tests/Feature/TrackPublicationGuardConcurrencyTest.php",
     ),
+    "track-concurrency": (
+        "tests/Feature/TrackMetadataConcurrencyTest.php",
+        "tests/Feature/StemsRecordingConcurrencyTest.php",
+    ),
     "operator": (
         "tests/Feature/FoundationTest.php", "tests/Feature/OperatorSetupTest.php",
         "tests/Feature/OperatorAuthorityTest.php", "tests/Feature/OperatorMfaTest.php",

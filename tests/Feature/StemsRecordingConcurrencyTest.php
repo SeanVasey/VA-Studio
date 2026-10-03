@@ -9,6 +9,7 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
+use Tests\Support\LicenseFixtures;
 use Tests\Support\RecordingFixtures;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -28,6 +29,9 @@ class StemsRecordingConcurrencyTest extends TestCase
     {
         $this->fakePrivateMediaStorage();
         ['actor' => $actor, 'track' => $track, 'stems' => $stems, 'data' => $data] = RecordingFixtures::draft();
+        // Distinct authorized actors let both workers reach the shared track fence.
+        $actors = [$actor, LicenseFixtures::admin()];
+        $this->assertNotSame($actors[0]->id, $actors[1]->id);
         $this->assertSame(0, DB::transactionLevel(), 'Fixtures must be committed before separate processes read them.');
         $directory = storage_path('framework/testing/stems-race-'.Str::uuid());
         $filesystem = new Filesystem;
@@ -44,7 +48,7 @@ class StemsRecordingConcurrencyTest extends TestCase
                     'DB_CHARSET' => (string) $database['charset'], 'DB_COLLATION' => (string) $database['collation'],
                     'CACHE_STORE' => 'array', 'SESSION_DRIVER' => 'array', 'QUEUE_CONNECTION' => 'sync',
                     'VASEY_STEMS_RACE_DIRECTORY' => $directory, 'VASEY_STEMS_RACE_WORKER' => (string) $worker,
-                ], json_encode(['stems_id' => $stems->id, 'actor_id' => $actor->id, 'data' => $data, 'media_root' => Storage::disk('local')->path('')], JSON_THROW_ON_ERROR), 40);
+                ], json_encode(['stems_id' => $stems->id, 'actor_id' => $actors[$worker]->id, 'data' => $data, 'media_root' => Storage::disk('local')->path('')], JSON_THROW_ON_ERROR), 40);
                 $process->start();
                 $processes[] = $process;
             }
@@ -85,7 +89,9 @@ SQL;
             $binding = StemsRecording::sole();
             $this->assertSame('SYNTHETIC EXPORT '.$winner, $binding->verification_reference);
             $this->assertSame($results[$winner]['binding_id'], $binding->id);
+            $this->assertSame($actors[$winner]->id, $binding->verified_by);
             $this->assertSame(1, AuditEvent::where('action', 'media.stems.recording_associated')->count());
+            $this->assertSame($actors[$winner]->id, AuditEvent::where('action', 'media.stems.recording_associated')->sole()->actor_id);
         } finally {
             foreach ($processes as $process) {
                 if ($process->isRunning()) {
