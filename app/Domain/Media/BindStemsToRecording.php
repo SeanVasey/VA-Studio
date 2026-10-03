@@ -37,9 +37,15 @@ class BindStemsToRecording
                 throw ValidationException::withMessages(['master_asset_id' => 'Unpublish the track before associating stems.']);
             }
             $stems = MediaAsset::findOrFail($stems->id);
-            $master = MediaAsset::find($data['master_asset_id']);
-            $preview = $track->assets()->where('role', 'preview_tagged')->where('status', 'ready')->latest('id')->first();
-            if ($stems->role !== 'stems_zip' || ! $master || $master->role !== 'master_wav' || $master->track_id !== $track->id
+            $master = $track->assets()->whereKey($data['master_asset_id'])->first();
+            $previews = $track->assets()->where('role', 'preview_tagged')->where('status', 'ready');
+            if (DB::getDriverName() === 'mysql') {
+                // Bound the locking scan to previews, away from sources a processor locks before the track.
+                $previews->forceIndex('media_assets_track_id_role_status_index');
+            }
+            // The routing read or an enclosing transaction may already hold an old consistent snapshot.
+            $preview = $previews->lockForUpdate()->latest('id')->first();
+            if ($stems->track_id !== $track->id || $stems->role !== 'stems_zip' || ! $master || $master->role !== 'master_wav' || $master->track_id !== $track->id
                 || ! $preview || $preview->id !== (int) $data['preview_asset_id'] || $master->parent_asset_id !== $preview->parent_asset_id
                 || $master->processing_run_id !== $preview->processing_run_id) {
                 throw ValidationException::withMessages(['master_asset_id' => 'Choose a verified master for this track’s current preview. Reopen the action if the recording changed.']);
