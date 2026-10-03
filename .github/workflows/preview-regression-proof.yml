@@ -1,0 +1,176 @@
+name: Current preview regression proof
+
+# Temporary isolated diagnostic workflow; Foundation CI remains the merge gate.
+on:
+  push:
+    branches: [codex/stems-preview-native-proof-20261003]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preview-proof-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FOCUSED_SUITE: track-concurrency
+  FOCUSED_ENGINE: mysql
+
+jobs:
+  focused-selection:
+    name: Focused selection (informative)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      suite: ${{ steps.selection.outputs.suite }}
+      engine: ${{ steps.selection.outputs.engine }}
+      kind: ${{ steps.selection.outputs.kind }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Verify focused selector safeguards
+        run: python3 scripts/ci/test-focused-tests.py
+      - name: Validate selection and record actual source
+        id: selection
+        run: python3 scripts/ci/focused-tests.py --plan
+      - name: Retain informative selection
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: focused-selection-${{ github.run_id }}-${{ github.run_attempt }}
+          path: focused-ci-evidence.json
+          retention-days: 7
+          if-no-files-found: ignore
+
+  focused-php:
+    name: Focused PHP feedback (informative)
+    needs: focused-selection
+    if: needs.focused-selection.outputs.kind == 'php'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      mysql:
+        # No MySQL container starts for SQLite. Only validated enum output selects it.
+        image: ${{ needs.focused-selection.outputs.engine == 'mysql' && 'mysql:8.4' || '' }}
+        env:
+          MYSQL_DATABASE: vaseyaudio_focused
+          MYSQL_ROOT_PASSWORD: ci-only-password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -pci-only-password"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      DB_CONNECTION: ${{ needs.focused-selection.outputs.engine }}
+      DB_DATABASE: ${{ needs.focused-selection.outputs.engine == 'mysql' && 'vaseyaudio_focused' || ':memory:' }}
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USERNAME: root
+      DB_PASSWORD: ci-only-password
+      DB_URL: ''
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, fileinfo, dom, xml, xmlwriter, posix, pcntl
+          ini-values: memory_limit=512M
+          coverage: none
+          tools: composer:v2
+      - name: Verify bounded PHP test capabilities
+        run: php scripts/ci/verify-php-test-runtime.php
+      - name: Install media and PDF tools for feature subsets
+        if: needs.focused-selection.outputs.suite != 'unit'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends ffmpeg util-linux qpdf poppler-utils
+      - run: composer install --no-interaction --prefer-dist
+      - run: cp .env.example .env
+      - run: php artisan key:generate
+      - name: Run the selected PHP files and record outcomes
+        run: python3 scripts/ci/focused-tests.py
+      - name: Retain focused PHP evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: focused-php-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            focused-ci-*
+            phpunit-focused.xml
+          retention-days: 7
+          if-no-files-found: ignore
+
+  focused-frontend:
+    name: Focused frontend feedback (informative)
+    needs: focused-selection
+    if: needs.focused-selection.outputs.kind == 'frontend'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - run: npm ci
+      - name: Run frontend targets, build and scan the client bundle
+        run: python3 scripts/ci/focused-tests.py
+      - name: Retain focused frontend evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: focused-frontend-${{ github.run_id }}-${{ github.run_attempt }}
+          path: focused-ci-*
+          retention-days: 7
+          if-no-files-found: ignore
+
+  focused-browser:
+    name: Focused browser feedback (informative)
+    needs: focused-selection
+    if: needs.focused-selection.outputs.kind == 'browser'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, fileinfo, dom, xml, xmlwriter, posix, pcntl
+          ini-values: memory_limit=512M
+          coverage: none
+          tools: composer:v2
+      - name: Verify bounded PHP test capabilities
+        run: php scripts/ci/verify-php-test-runtime.php
+      - run: composer install --no-interaction --prefer-dist
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Run core journey subset through the isolated browser wrapper
+        run: python3 scripts/ci/focused-tests.py
+      - name: Retain focused synthetic browser evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: focused-browser-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            focused-ci-*
+            test-results/
+          retention-days: 7
+          if-no-files-found: ignore
