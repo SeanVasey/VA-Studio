@@ -1,0 +1,429 @@
+{
+  "schema_version": 1,
+  "observed_at_utc": "2026-10-02T23:47:44.830Z",
+  "source": {
+    "provider": "gitlab",
+    "project_id": 87181037,
+    "path": "vaseydev/va-studio",
+    "default_branch": "main"
+  },
+  "requested_destination": "SeanVasey/VA-Studio",
+  "destination_verified": false,
+  "branch_count": 102,
+  "branches": [
+    {
+      "name": "build/stripe-sdk-lock",
+      "sha": "b9f0ecbec923d886d29b9c652b334001a5673ca3"
+    },
+    {
+      "name": "claude/website-dev-status-review-0sv213",
+      "sha": "e83860e771be52b36d316a49fff5d06f00cc18c0"
+    },
+    {
+      "name": "claude/website-dev-status-review-0sv213-stack",
+      "sha": "487f0b6c206f1fb0392ffe08629169bdbf8f401e"
+    },
+    {
+      "name": "codex/authoring-checkpoint-20261002",
+      "sha": "09d93bf66dfb94fb080ea799c87c829b860d7ad7"
+    },
+    {
+      "name": "codex/authoring-checkpoint-20261002-2",
+      "sha": "a4f8996ce4dfca281b0ec3e4ed101fcce59bf684"
+    },
+    {
+      "name": "codex/authoring-checkpoint-20261002-3",
+      "sha": "7637b20717ec7155ca4e4092b10a2d85617e83c1"
+    },
+    {
+      "name": "codex/browser-image-fixture-bootstrap-20261002",
+      "sha": "b5c0a40700777e0fdb608697dc4ddad10b3fbdb2"
+    },
+    {
+      "name": "codex/bulk-native-pagination-20261001",
+      "sha": "633fe79038ac0ac7ed687e1ef2caa8e566072bd8"
+    },
+    {
+      "name": "codex/byte-guard-format-proof-20261001",
+      "sha": "42906878075edc3a98ecd477124c11182d7c2eb2"
+    },
+    {
+      "name": "codex/byte-guard-rollback-proof-20261001",
+      "sha": "e291261f4fa298132155e0cfbea5600505826a1c"
+    },
+    {
+      "name": "codex/catalog-authoring-repair-checkpoint-20261002",
+      "sha": "0c7dbd8c7ddf41ea97fcae873d1587faec3b24a1"
+    },
+    {
+      "name": "codex/catalog-authoring-review-20261002",
+      "sha": "0c7dbd8c7ddf41ea97fcae873d1587faec3b24a1"
+    },
+    {
+      "name": "codex/catalog-metadata-presets-20261002",
+      "sha": "903d89fa1b6f64c723751000fa1ab42ef0259107"
+    },
+    {
+      "name": "codex/checkout-return-format-proof-20261001",
+      "sha": "1939e0de976e04b4718791fc1102ad71ca869e38"
+    },
+    {
+      "name": "codex/checkout-return-native-proof-20261001",
+      "sha": "e811b7d91ba4bdacfed5ad8cc5a4e8331ed68556"
+    },
+    {
+      "name": "codex/checkout-return-proof-20261001",
+      "sha": "9e32aaad9125acd5c0b54b9651d3423c7599ba82"
+    },
+    {
+      "name": "codex/ci-media-integrity-20261001",
+      "sha": "5e44354785c44e46a93dd97705ef050d62fc6ab5"
+    },
+    {
+      "name": "codex/ci-receipts-shadow-20261001",
+      "sha": "8a35c191817956e76f88289a6a24ec8578f380db"
+    },
+    {
+      "name": "codex/contact-inquiry-correction-proof-20261001",
+      "sha": "88bfb08b7158cc4abae3557429bdc157dc86e048"
+    },
+    {
+      "name": "codex/contact-inquiry-correction-retry-20261001",
+      "sha": "cad392dcff48219ae5468c1feb9f7e1028fe2d16"
+    },
+    {
+      "name": "codex/contact-inquiry-corrections-checkpoint-20261001",
+      "sha": "1872179f5455d819e471ca3f015bc859f8879012"
+    },
+    {
+      "name": "codex/durable-inquiry-alerts-20261001",
+      "sha": "f0d37831b8c2bb5b602db03d667d0f2aaa50175f"
+    },
+    {
+      "name": "codex/editorial-related-tracks-20261001",
+      "sha": "21a79dafda22d6ee2acd9e8f99f6df94f619c404"
+    },
+    {
+      "name": "codex/embed-cache-csp-proof",
+      "sha": "8ca349c011bb66193f99fef8f3c4617ca9fa8021"
+    },
+    {
+      "name": "codex/gitlab-catalog-writer-locks-20261002",
+      "sha": "cd0cf7d3a908c5c4fb21d571088af4bdfe6082f9"
+    },
+    {
+      "name": "codex/inquiry-followup-format-proof-20261001",
+      "sha": "c123af4e2fe42e266f96eb0ba6d2357bf9afdf94"
+    },
+    {
+      "name": "codex/inquiry-followup-integration-proof-20261001",
+      "sha": "b4e1cb3335a6527a98b9fe5b5f07bbc9523e244f"
+    },
+    {
+      "name": "codex/inquiry-format-proof-20261001",
+      "sha": "47604d8ca165343950fb5716e49b3f93cd01527e"
+    },
+    {
+      "name": "codex/inquiry-mysql-profile-20261001",
+      "sha": "03bb24be84bba49a1b4dee9d0ae5faa615ee3563"
+    },
+    {
+      "name": "codex/inquiry-notification-proof-20261001",
+      "sha": "9029439068d80e1b50682efaf066f053037a27d2"
+    },
+    {
+      "name": "codex/inquiry-operator-authority-proof",
+      "sha": "ff37f1463d2d79c4351556a6a668ac9e470d2bf6"
+    },
+    {
+      "name": "codex/inquiry-recovery-proof-20261001",
+      "sha": "6f499bdcec696320b2bef64f205c3a79c8fedf98"
+    },
+    {
+      "name": "codex/launch-readiness-configuration-20261002",
+      "sha": "67a75de75d422032e7fab30a87dd41fa8dee156f"
+    },
+    {
+      "name": "codex/measured-shard-weights-20261001",
+      "sha": "a37cc6abe362701f4a83ed3b4f0aee038afe40d8"
+    },
+    {
+      "name": "codex/media-commit-cleanup-recovery",
+      "sha": "9465f08dc7a566b53d151d6e5e24a2d7322efc67"
+    },
+    {
+      "name": "codex/media-encoder-diagnostics",
+      "sha": "e27001edde722815f65bc2f0588840078471bf2f"
+    },
+    {
+      "name": "codex/media-writer-fences-20261002",
+      "sha": "e77d673b15d1e6cbcf97ac870ab513a347c2e43a"
+    },
+    {
+      "name": "codex/migration-recovery-proof-20261001",
+      "sha": "a3329db2da2dcacaf73139b075181152e405a535"
+    },
+    {
+      "name": "codex/mysql-hash-diagnostic-20261001",
+      "sha": "b79b11f19b0b30e5bbe4a9bc2eeb68c3fb71ea32"
+    },
+    {
+      "name": "codex/operator-budget-proof-20261001",
+      "sha": "d1d4ec9e5485b4ac365d0b0a2e3370f92b51473d"
+    },
+    {
+      "name": "codex/operator-sharing-app-proof-20261001",
+      "sha": "5256e89cd6ca0ad6eb59ff103044b53e0f3436d1"
+    },
+    {
+      "name": "codex/operator-sharing-proof-20261001",
+      "sha": "14d0589da30be8a7a7edc28212846e5588d26a6a"
+    },
+    {
+      "name": "codex/operator-track-sharing-20261001",
+      "sha": "94b3d9a84ef15c34786e81ccee036ea5ab4611f3"
+    },
+    {
+      "name": "codex/payment-exception-operations-20261002",
+      "sha": "82552f05a47eedea624d99694fec7365d005aef3"
+    },
+    {
+      "name": "codex/pr104-acceptance-ledgers-20261002",
+      "sha": "5a5ee9cf8e9fe26c4e05ceb7fcaa6cadd5986b88"
+    },
+    {
+      "name": "codex/public-embed-font-proof-20261001",
+      "sha": "74822f1f36c79f76da3da04ac6359362e792f167"
+    },
+    {
+      "name": "codex/public-installation-checkpoint-20261001",
+      "sha": "ae8ca1d8a4c61f0edd207cdb63ae828c128d9e45"
+    },
+    {
+      "name": "codex/public-installation-fixture-proof-20261001",
+      "sha": "eba5488a757c4684d25340d881ff982cd99b9c30"
+    },
+    {
+      "name": "codex/public-installation-proof-20261001",
+      "sha": "e905f711fa308c99f86a1c037b7489819d63d989"
+    },
+    {
+      "name": "codex/public-installation-query-proof-20261001",
+      "sha": "52bfd403b95d0352610931b96a6a0e492214b691"
+    },
+    {
+      "name": "codex/related-stage-diagnostic-20261001",
+      "sha": "2ba995188dcbeb65ab85ff2c02cd344f75b0c53d"
+    },
+    {
+      "name": "codex/remaining-journey-contracts-20261001",
+      "sha": "3a91d3518256cf28b0ecbdd9062de483e3753e2e"
+    },
+    {
+      "name": "codex/reviewed-publication-apply-20261002",
+      "sha": "d58250a2c28a75a9b1a2e5be74f87947f0c930f2"
+    },
+    {
+      "name": "codex/rights-writers-20261002-08690e2",
+      "sha": "8fdc341ea639257318a87433b65830df0ab6b3eb"
+    },
+    {
+      "name": "codex/seller-customer-followup-20261001",
+      "sha": "1a597b3c2a9d5a6dde600b74bae4150736f8627b"
+    },
+    {
+      "name": "codex/single-seller-completion-plan-20260930",
+      "sha": "f9cd228896d339b872dbf2581927ab35bee73d01"
+    },
+    {
+      "name": "codex/single-seller-experience-20261001",
+      "sha": "532268657d1a0bdbbdac1a4bd70ceabf69536a86"
+    },
+    {
+      "name": "codex/site-experience-browser-20261001",
+      "sha": "9ffb901c00bb9d6cf49ea9b6849ffd9b15935ea7"
+    },
+    {
+      "name": "codex/test-exception-browser-20261001",
+      "sha": "6bf309d41fd71c2954545aaa07f1f95a8184dd82"
+    },
+    {
+      "name": "codex/test-payment-exception-inspection-20261001",
+      "sha": "318fc1f8ba19f4e045d454e1876199da1f3db67d"
+    },
+    {
+      "name": "dependabot/composer/filament/filament-5.9.0",
+      "sha": "6529605131ec53927f885f00503d3a613d09e088"
+    },
+    {
+      "name": "dependabot/composer/inertiajs/inertia-laravel-3.4.0",
+      "sha": "b6d4a8e291dfd0873672d3388df26b7fcdeaf071"
+    },
+    {
+      "name": "dependabot/composer/tecnickcom/tc-lib-pdf-font-4.4.1",
+      "sha": "5612c5bba725587b418c00e999f22869e610c682"
+    },
+    {
+      "name": "dependabot/github_actions/actions/checkout-7.0.1",
+      "sha": "d0fc253ddc3ffeaa36a94df0df4f4a6300a12f01"
+    },
+    {
+      "name": "dependabot/github_actions/actions/download-artifact-8.0.1",
+      "sha": "665a2293ce60505f2bc0b36738cb70e12bf3e340"
+    },
+    {
+      "name": "dependabot/github_actions/actions/setup-node-7.0.0",
+      "sha": "3e18c931dca1a426bcf7f92f3da5f4cf6c4aec82"
+    },
+    {
+      "name": "dependabot/github_actions/actions/upload-artifact-7.0.1",
+      "sha": "c9ea769f11809b05c99941b8f15e081877df0a9c"
+    },
+    {
+      "name": "dependabot/github_actions/shivammathur/setup-php-f3e473d116dcccaddc5834248c87452386958240",
+      "sha": "0e6e4b720dfd773830f17b6672ca269c396fcef7"
+    },
+    {
+      "name": "dependabot/npm_and_yarn/jsdom-30.1.1",
+      "sha": "5b1e912a195fa44e4d5104b37d5c93a62b534255"
+    },
+    {
+      "name": "dependabot/npm_and_yarn/types/node-26.6.3",
+      "sha": "ba77a594d502001f02477ea18d0450ec3e78a4a2"
+    },
+    {
+      "name": "dependabot/npm_and_yarn/types/react-dom-19.3.0",
+      "sha": "87459d825479b0dc97d3bc20fda817365524e00a"
+    },
+    {
+      "name": "dependabot/npm_and_yarn/vite-8.3.1",
+      "sha": "c1bc978eca6e98c232b74007d653f77661064775"
+    },
+    {
+      "name": "dependabot/npm_and_yarn/vitest-5.0.2",
+      "sha": "704f0533665c16d2d6c964426c6b047a075eef67"
+    },
+    {
+      "name": "feat/frozen-quote-disclosure",
+      "sha": "958d51f5907c6d7c5312c73e455643bb61cbed89"
+    },
+    {
+      "name": "feat/license-economic-policies",
+      "sha": "251ca1220a7a990026cdf4ab98b1cd57aaa15f9b"
+    },
+    {
+      "name": "feat/private-media-pipeline",
+      "sha": "b29bbf8a54972f6f719980064b6d84b24adae7e4"
+    },
+    {
+      "name": "feat/track-detail-and-license-disclosure",
+      "sha": "f6e85a15c899107ff653ad1c3be22311d54ecb71"
+    },
+    {
+      "name": "main",
+      "sha": "cae053efbc2019c849269605df030a36a620484e"
+    },
+    {
+      "name": "work/ci-resume-status",
+      "sha": "bfa19733fdd90769966af01175c8d2e66fc85c84"
+    },
+    {
+      "name": "work/ci-trigger-efficiency",
+      "sha": "9b75be3c8b53a4077ba2a37586289294df3da802"
+    },
+    {
+      "name": "work/dependencies-september-reconciled",
+      "sha": "4c9613f56b662ac2e48d9034861d36aa00f3a766"
+    },
+    {
+      "name": "work/dependency-pr-integration",
+      "sha": "787fb68cd2cd238866a2cf7eb5bc61bc405d5d4d"
+    },
+    {
+      "name": "work/dev-php-runtime",
+      "sha": "42d426b61f8fe49bb19c34cf62b0782203aa5ea2"
+    },
+    {
+      "name": "work/wp06-atomic-priced-inventory",
+      "sha": "84b6d9a6ce83d115161a91a953f19d1d7dc0f8e6"
+    },
+    {
+      "name": "work/wp06-exclusive-offer-preparation",
+      "sha": "06946b6d235140e3ab1a762720175f512488a064"
+    },
+    {
+      "name": "work/wp06-exclusive-selection",
+      "sha": "dfd70fc8f5bd2bcb33d80832bf46a241319fe454"
+    },
+    {
+      "name": "work/wp06-promotion-usage",
+      "sha": "cf940c5b0f306f60ca31d8f84749fd9c674d8d03"
+    },
+    {
+      "name": "work/wp06-shared-inventory",
+      "sha": "a9dc1704c45ce1e728269d5a6df145bd33b1eaeb"
+    },
+    {
+      "name": "work/wp07-hosted-test-checkout",
+      "sha": "90c72743acb113d7acada06c6db9cd763086726c"
+    },
+    {
+      "name": "work/wp07-payment-processing",
+      "sha": "4107d449ee67b1cb4690811647f704a4d014cd88"
+    },
+    {
+      "name": "work/wp07-private-order-preparation",
+      "sha": "61e2866b7f382784e8b8b4344a7ad1bca21ac4d4"
+    },
+    {
+      "name": "work/wp07-test-finalization",
+      "sha": "cf7657abe897d610a2cf995b7ae4437680717280"
+    },
+    {
+      "name": "work/wp08-contract-child-debug",
+      "sha": "fe1ed210f702da851e5c508d2145403c88188ccf"
+    },
+    {
+      "name": "work/wp08-contract-profile",
+      "sha": "d4f264ae523243f677c57f88d479da75dc4f18f6"
+    },
+    {
+      "name": "work/wp08-owner-http",
+      "sha": "be54c5d76c6a345e60a48a657553b75f3fb50d67"
+    },
+    {
+      "name": "work/wp08-test-commerce-operations",
+      "sha": "37793401b2f035fc9c84a41cf663727e049656da"
+    },
+    {
+      "name": "work/wp08-test-contract-issuance",
+      "sha": "2961ae5a087340460500322482080db294d7cbe0"
+    },
+    {
+      "name": "work/wp08-test-fulfillment-activation",
+      "sha": "7f3e0502f833674a7213f7ced0a83eff5d86ceec"
+    },
+    {
+      "name": "work/wp08-test-owner-delivery",
+      "sha": "35f9e805699bcf36ae5003ea66f124d2a7d94559"
+    },
+    {
+      "name": "work/wp09-editorial-content",
+      "sha": "03ed4438acb3969c87913d988eaa904ca04a5b96"
+    },
+    {
+      "name": "work/wp09-promotion-admin",
+      "sha": "5b2ba241e61db1bc4eaa84430071c3aac1855ace"
+    },
+    {
+      "name": "work/wp09-site-content",
+      "sha": "ea212f464bbe0795f4cc844a88e4c2994a584384"
+    }
+  ],
+  "tags": [],
+  "notes": [
+    "Snapshot of native source refs, not proof that a GitHub transfer succeeded.",
+    "Local checkout is shallow; a full native remote clone is required to preserve ancestry.",
+    "The source-ref snapshot precedes the separate GitHub CI compatibility preparation branch."
+  ]
+}

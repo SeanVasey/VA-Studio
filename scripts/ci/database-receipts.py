@@ -29,9 +29,9 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 
-REPOSITORY = "VASEYDEV/VASEYAUDIO"
-REPOSITORY_ID = 1357536326
-WORKFLOW_ID = 350477270
+# Bind source and artifact provenance to the verified GitHub destination.
+REPOSITORY = "SeanVasey/VA-Studio"
+REPOSITORY_ID = 1402461806
 WORKFLOW_PATH = ".github/workflows/ci.yml"
 NS = "{https://xml.phpunit.de/testSuite}"
 SHA = re.compile(r"[0-9a-f]{40}\Z")
@@ -45,6 +45,7 @@ MAX_XML_NODES = 50000
 POLICY_FILES = (
     WORKFLOW_PATH, "scripts/ci/database-receipts.py", "scripts/ci/test-database-receipts.py",
     "scripts/ci/ci-scope.py", "scripts/ci/phpunit-shards.py", "phpunit.xml",
+    "scripts/ci/verify-php-test-runtime.php", "scripts/ci/test-php-test-runtime.py",
     "scripts/ci/database-sqlite-skips.json",
     "composer.json", "composer.lock", "package.json", "package-lock.json",
     "scripts/ci/phpunit-timings-mysql.json", "scripts/ci/phpunit-timings-sqlite.json",
@@ -206,10 +207,23 @@ def validate_discovered_files(root: Path, files: set[str]) -> None:
             "Discovered tests include an untracked or non-ordinary source file")
 
 
+def validate_test_environment(engine: str, env: dict) -> None:
+    require(env.get("APP_ENV") == "testing" and env.get("DB_CONNECTION") == engine
+            and env.get("DB_URL", "") == env.get("DB_SOCKET", "") == "",
+            "Explicit synthetic testing database required")
+    if engine == "mysql":
+        require(env.get("DB_HOST") == "127.0.0.1" and str(env.get("DB_PORT")) == "3306"
+                and env.get("DB_DATABASE") == "vaseyaudio_test", "Unexpected synthetic MySQL target")
+    else:
+        require(engine == "sqlite" and env.get("DB_DATABASE") == ":memory:", "Only synthetic in-memory SQLite supported")
+
+
 def runtime_identity(root: Path, engine: str, env: dict) -> dict:
+    validate_test_environment(engine, env)
+    run(root, ["php", "scripts/ci/verify-php-test-runtime.php"], "bounded PHP test capabilities")
     # Print only selected public version/settings fields, never phpinfo or environment/DSN dumps.
     php_probe = r'''$e = []; foreach (get_loaded_extensions() as $x) { $e[$x] = phpversion($x) ?: null; } ksort($e);
-echo json_encode(['version'=>PHP_VERSION,'integer_size'=>PHP_INT_SIZE,'extensions'=>$e], JSON_THROW_ON_ERROR);'''
+echo json_encode(['version'=>PHP_VERSION,'integer_size'=>PHP_INT_SIZE,'memory_limit'=>ini_get('memory_limit'),'extensions'=>$e], JSON_THROW_ON_ERROR);'''
     php = json_data(run(root, ["php", "-r", php_probe], "PHP runtime"))
     require(isinstance(php, dict) and isinstance(php.get("extensions"), dict), "Invalid PHP runtime evidence")
     tools = {}
@@ -224,7 +238,7 @@ echo json_encode(['version'=>PHP_VERSION,'integer_size'=>PHP_INT_SIZE,'extension
     if engine == "mysql":
         require(env.get("DB_CONNECTION") == "mysql", "MySQL receipt uses the wrong configured driver")
         probe = r'''$p=new PDO('mysql:host='.getenv('DB_HOST').';port='.getenv('DB_PORT').';dbname='.getenv('DB_DATABASE'),getenv('DB_USERNAME'),getenv('DB_PASSWORD'),[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
-$r=$p->query("SELECT @@version AS version, @@version_comment AS version_comment, @@sql_mode AS sql_mode, @@character_set_server AS character_set_server, @@collation_server AS collation_server, @@transaction_isolation AS transaction_isolation, @@default_storage_engine AS default_storage_engine, @@lower_case_table_names AS lower_case_table_names, @@innodb_strict_mode AS innodb_strict_mode")->fetch(PDO::FETCH_ASSOC); echo json_encode($r,JSON_THROW_ON_ERROR);'''
+$r=$p->query("SELECT @@version AS version, @@version_comment AS version_comment, @@sql_mode AS sql_mode, @@character_set_server AS character_set_server, @@collation_server AS collation_server, @@transaction_isolation AS transaction_isolation, @@default_storage_engine AS default_storage_engine, @@lower_case_table_names AS lower_case_table_names, @@innodb_strict_mode AS innodb_strict_mode, @@performance_schema AS performance_schema")->fetch(PDO::FETCH_ASSOC); echo json_encode($r,JSON_THROW_ON_ERROR);'''
         database = json_data(run(root, ["php", "-r", probe], "MySQL settings"))
         container = env.get("MYSQL_CONTAINER_ID", "")
         require(re.fullmatch(r"[0-9a-f]{12,64}", container) is not None, "Missing MySQL service identity")
@@ -246,11 +260,13 @@ def validate_runtime(value: dict, engine: str) -> None:
             "Incomplete runtime receipt")
     require(set(value["runner"]) == {"RUNNER_OS", "RUNNER_ARCH", "ImageOS", "ImageVersion"}
             and all(isinstance(item, str) and 0 < len(item) <= 200 for item in value["runner"].values()), "Incomplete runner receipt")
-    require(set(value["php"]) == {"version", "integer_size", "extensions"} and value["php"]["integer_size"] == 8
+    require(set(value["php"]) == {"version", "integer_size", "memory_limit", "extensions"}
+            and type(value["php"]["integer_size"]) is int and value["php"]["integer_size"] == 8
+            and value["php"]["memory_limit"] == "512M"
             and isinstance(value["php"]["version"], str)
             and re.fullmatch(r"8\.4\.[0-9]+", value["php"]["version"]) is not None
             and isinstance(value["php"]["extensions"], dict)
-            and {"mbstring", "intl", "PDO", "pdo_" + engine, "bcmath", "gd", "zip", "curl", "posix"} <= set(value["php"]["extensions"]),
+            and {"fileinfo", "mbstring", "intl", "PDO", "pdo_mysql", "pdo_sqlite", "bcmath", "gd", "zip", "curl", "dom", "xml", "xmlwriter", "posix", "pcntl"} <= set(value["php"]["extensions"]),
             "Incomplete PHP runtime receipt")
     require(set(value["tools"]) == {"php", "composer", "ffmpeg", "qpdf", "pdftocairo", "flock"}, "Incomplete tool receipt")
     for tool in value["tools"].values():
@@ -267,8 +283,17 @@ def validate_runtime(value: dict, engine: str) -> None:
         require(set(database) == {"version"} and re.fullmatch(r"3\.[0-9]+\.[0-9]+", database["version"]) is not None, "Invalid SQLite identity")
     else:
         require(set(database) == {"version", "version_comment", "sql_mode", "character_set_server", "collation_server",
-                                  "transaction_isolation", "default_storage_engine", "lower_case_table_names", "innodb_strict_mode", "container_image_id"}
+                                  "transaction_isolation", "default_storage_engine", "lower_case_table_names", "innodb_strict_mode", "performance_schema", "container_image_id"}
                 and re.fullmatch(r"8\.4\.[0-9]+", database["version"]) is not None
+                and isinstance(database["version_comment"], str) and isinstance(database["sql_mode"], str)
+                and {"STRICT_TRANS_TABLES", "STRICT_ALL_TABLES"}.intersection(database["sql_mode"].split(","))
+                and database["character_set_server"] == "utf8mb4" and isinstance(database["collation_server"], str)
+                and database["collation_server"].startswith("utf8mb4_")
+                and type(database["lower_case_table_names"]) in (int, str) and str(database["lower_case_table_names"]) == "0"
+                and type(database["innodb_strict_mode"]) in (int, str) and str(database["innodb_strict_mode"]) == "1"
+                and type(database["performance_schema"]) is int and database["performance_schema"] == 1
+                and database["transaction_isolation"] == "REPEATABLE-READ" and database["default_storage_engine"] == "InnoDB"
+                and isinstance(database["container_image_id"], str)
                 and re.fullmatch(r"sha256:[0-9a-f]{64}", database["container_image_id"]) is not None, "Invalid MySQL service identity")
 
 
@@ -596,9 +621,15 @@ def collect(root: Path, env: dict, api: Github) -> dict:
     source = source_identity(root, env)
     run_id, attempt = source["run_id"], source["run_attempt"]
     run_path = f"/actions/runs/{run_id}"
+    # Resolve this repository's native workflow ID through its canonical path.
+    # Repository copies receive new numeric IDs; source SHA/ref proof remains exact.
+    workflow = api.get("/actions/workflows/ci.yml")
+    require(positive(workflow.get("id")) and workflow.get("path") == WORKFLOW_PATH
+            and workflow.get("name") == "Foundation CI" and workflow.get("state") == "active",
+            "Canonical Foundation workflow identity is unavailable")
     run_ = api.get(run_path)
     require(run_.get("id") == run_id and run_.get("run_attempt") == attempt
-            and run_.get("workflow_id") == WORKFLOW_ID and run_.get("path") == WORKFLOW_PATH
+            and run_.get("workflow_id") == workflow["id"] and run_.get("path") == WORKFLOW_PATH
             and run_.get("event") == source["event"]["name"] and run_.get("head_sha") == source["event"]["head"]
             and run_.get("repository", {}).get("id") == REPOSITORY_ID
             and run_.get("head_repository", {}).get("id") == source["event"]["head_repository_id"],

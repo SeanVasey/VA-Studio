@@ -8,16 +8,14 @@ use App\Jobs\ProcessMedia;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 
 class QueueMediaProcessing
 {
     public function handle(MediaAsset $source, User $actor): MediaProcessingRun
     {
-        Gate::forUser($actor)->authorize('administer-catalog');
-
         return DB::transaction(function () use ($source, $actor) {
+            $actor = app(MediaWriterActor::class)->authorize($actor);
             $source = MediaAsset::query()->lockForUpdate()->findOrFail($source->id);
             $track = $source->track()->lockForUpdate()->firstOrFail();
             if ($track->status === 'published') {

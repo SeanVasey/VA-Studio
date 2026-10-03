@@ -3,6 +3,7 @@
 namespace App\Domain\Commerce;
 
 use App\Domain\Commerce\Models\QuotePricing;
+use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
 use Illuminate\Database\QueryException;
@@ -12,24 +13,26 @@ use Throwable;
 
 final class PriceQuote
 {
-    public function create(string $quoteId, string $ownerKey): QuotePricing
+    public function create(string $quoteId, string $ownerKey, ?User $actor = null): QuotePricing
     {
-        return $this->handle($quoteId, $ownerKey, true);
+        return $this->handle($quoteId, $ownerKey, true, null, $actor);
     }
 
-    public function read(string $quoteId, string $ownerKey): QuotePricing
+    public function read(string $quoteId, string $ownerKey, ?User $actor = null): QuotePricing
     {
-        return $this->handle($quoteId, $ownerKey, false);
+        return $this->handle($quoteId, $ownerKey, false, null, $actor);
     }
 
-    public function createWithPromotion(string $quoteId, string $ownerKey, string $code): QuotePricing
+    public function createWithPromotion(string $quoteId, string $ownerKey, string $code, ?User $actor = null): QuotePricing
     {
-        return $this->handle($quoteId, $ownerKey, true, $code);
+        return $this->handle($quoteId, $ownerKey, true, $code, $actor);
     }
 
-    private function handle(string $quoteId, string $ownerKey, bool $create, ?string $code = null): QuotePricing
+    private function handle(string $quoteId, string $ownerKey, bool $create, ?string $code = null, ?User $actor = null): QuotePricing
     {
-        return DB::transaction(function () use ($quoteId, $ownerKey, $create, $code) {
+        return DB::transaction(function () use ($quoteId, $ownerKey, $create, $code, $actor) {
+            // Explicit customer identity precedes resource locks; null remains anonymous/system.
+            $actorId = app(CommerceAuditActor::class)->lock($actor);
             // The outer transaction retains ReadQuote's quote/track/offer locks until pricing commits.
             // One pricing per quote is the idempotency boundary, including concurrent first requests.
             $quote = app(ReadQuote::class)->handle($quoteId, $ownerKey);
@@ -63,7 +66,9 @@ final class PriceQuote
                 } catch (Throwable) {
                     throw new QuoteException('PRICING_CHANGED', 409);
                 }
-                if ($promotion !== null) { app(PromotionUsage::class)->currentUse($pricing); }
+                if ($promotion !== null) {
+                    app(PromotionUsage::class)->currentUse($pricing);
+                }
             } else {
                 $issuedAt = now()->toImmutable()->utc()->startOfSecond();
                 if ($quote->expires_at->lessThanOrEqualTo($issuedAt)) {
@@ -77,17 +82,19 @@ final class PriceQuote
                     'snapshot_hash' => CanonicalJson::hash($snapshot), 'canonicalization_version' => CanonicalJson::VERSION,
                     'created_at' => $issuedAt, 'expires_at' => $snapshot['expires_at'],
                 ]);
-                if ($promotion !== null) { app(PromotionUsage::class)->hold($pricing); }
-                AuditEvent::record('commerce.quote.priced', $pricing, [
+                if ($promotion !== null) {
+                    app(PromotionUsage::class)->hold($pricing, $actor);
+                }
+                AuditEvent::recordAttributed('commerce.quote.priced', $pricing, [
                     'public_id' => $id, 'quote_public_id' => $quote->public_id, 'snapshot_hash' => $pricing->snapshot_hash,
                     'tax_status' => $snapshot['tax_status'], 'policy_hash' => $snapshot['policy_hash'],
-                ]);
+                ], $actorId);
             }
             if ($quote->snapshot['schema_version'] === 2) {
                 // All pricing/campaign/use locks are already retained. A failed shared
                 // scope acquisition rolls back first pricing and promotion creation.
                 $inventory = app(Inventory\ReserveQuoteInventory::class);
-                $create ? $inventory->hold($quoteId, $ownerKey) : $inventory->read($quoteId, $ownerKey);
+                $create ? $inventory->hold($quoteId, $ownerKey, $actor) : $inventory->read($quoteId, $ownerKey, $actor);
             }
             // Policy validation/rendering must not extend a lifetime across a boundary.
             if ($pricing->expires_at->lessThanOrEqualTo(now())) {

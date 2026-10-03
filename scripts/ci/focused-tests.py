@@ -35,11 +35,15 @@ PHP_TARGETS = {
         "tests/Unit/FileUploadPathGuardTest.php", "tests/Unit/MediaEvidenceValuesTest.php",
         "tests/Unit/SiteImageGuardBytesTest.php", "tests/Feature/InstallationReportTest.php",
         "tests/Feature/MalwareScannerTest.php", "tests/Feature/MediaProcessingTest.php",
+        "tests/Feature/MediaWriterAuthorityTest.php", "tests/Feature/MediaWriterConcurrencyTest.php",
+        "tests/Feature/MediaWorkerIdentityTest.php", "tests/Feature/MediaUploadCommitRecoveryTest.php",
         "tests/Feature/MediaWorkflowBudgetTest.php", "tests/Feature/PrivateMediaRevisionRootsTest.php",
         "tests/Feature/SiteImageLibraryTest.php", "tests/Feature/SiteImageHttpTest.php", "tests/Feature/StemsArchivePolicyTest.php",
         "tests/Feature/StemsArchiveTest.php",
     ),
     "commerce": (
+        "tests/Feature/TestPaymentExceptionOperationsTest.php", "tests/Feature/TestPaymentExceptionOperationsConcurrencyTest.php",
+        "tests/Feature/CommerceAuditActorTest.php", "tests/Feature/CommerceAuditActorConcurrencyTest.php",
         "tests/Unit/AllocateDiscountTest.php", "tests/Unit/MinorUnitsTest.php",
         "tests/Unit/PricingPolicyTest.php", "tests/Unit/PromotionPolicyTest.php",
         "tests/Unit/StripeCheckoutGatewayTest.php", "tests/Unit/StripePaymentGatewayTest.php",
@@ -49,6 +53,10 @@ PHP_TARGETS = {
         "tests/Feature/StripeWebhookConcurrencyTest.php",
         "tests/Feature/HashByteGuardMigrationTest.php", "tests/Feature/UuidByteGuardMigrationTest.php",
         "tests/Feature/OwnedTestOrderHistoryTest.php", "tests/Feature/SyntheticPrivateRestoreTest.php",
+        "tests/Feature/HostedCheckoutMigrationTest.php", "tests/Feature/OrderPreparationMigrationTest.php",
+        "tests/Feature/PromotionMigrationTest.php", "tests/Feature/QuotePricingMigrationTest.php",
+        "tests/Feature/SharedInventoryMigrationTest.php", "tests/Feature/TestOrderFinalizationMigrationTest.php",
+        "tests/Feature/TestPaymentEvidenceMigrationTest.php",
     ),
     "seller": (
         "tests/Feature/CustomerInquiryHttpTest.php", "tests/Feature/CustomerInquiryMigrationTest.php",
@@ -60,6 +68,19 @@ PHP_TARGETS = {
         "tests/Feature/SiteRelatedTrackDamageTest.php", "tests/Feature/SiteRelatedTrackEditorTest.php",
         "tests/Feature/SiteRelatedTrackHttpTest.php", "tests/Feature/SiteRelatedTrackImageMigrationTest.php",
         "tests/Feature/SiteContentConcurrencyTest.php",
+    ),
+    "publication": (
+        "tests/Feature/TrackPublicationApplyTest.php", "tests/Feature/TrackPublicationApplyConcurrencyTest.php",
+        "tests/Feature/TrackPublicationManifestEditorTest.php",
+        "tests/Feature/TrackPublicationManifestTest.php", "tests/Feature/TrackPublicationManifestConcurrencyTest.php",
+        "tests/Feature/TrackPublicationGuardTest.php", "tests/Feature/TrackPublicationGuardConcurrencyTest.php",
+    ),
+    "track-concurrency": (
+        "tests/Feature/TrackMetadataConcurrencyTest.php",
+        "tests/Feature/StemsRecordingConcurrencyTest.php",
+        "tests/Feature/StemsRecordingPreviewConcurrencyTest.php",
+        "tests/Feature/StemsRecordingTest.php",
+        "tests/Feature/MediaWriterAuthorityTest.php",
     ),
     "operator": (
         "tests/Feature/FoundationTest.php", "tests/Feature/OperatorSetupTest.php",
@@ -73,6 +94,14 @@ PHP_TARGETS = {
         "tests/Feature/TrackPublicationGuardTest.php", "tests/Feature/TrackPublicationGuardMigrationTest.php",
         "tests/Feature/TrackPublicationGuardConcurrencyTest.php",
         "tests/Feature/TrackPublicationManifestTest.php", "tests/Feature/TrackPublicationManifestConcurrencyTest.php",
+        "tests/Feature/TrackPublicationManifestEditorTest.php",
+        "tests/Feature/RightsEvidenceGuardTest.php", "tests/Feature/RightsEvidenceGuardMigrationTest.php",
+        "tests/Feature/RightsEvidenceGuardConcurrencyTest.php",
+        "tests/Feature/RightsDeclarationWriterTest.php", "tests/Feature/RightsDeclarationWriterActionTest.php",
+        "tests/Feature/RightsDeclarationWriterConcurrencyTest.php", "tests/Feature/OfferWriterAuthorityTest.php",
+        "tests/Feature/CatalogWriterAuthorityTest.php",
+        "tests/Feature/ExclusiveWriterAuthorityTest.php",
+        "tests/Feature/LicenseWriterAuthorityTest.php", "tests/Feature/RightsScopeWriterAuthorityTest.php",
     ),
 }
 FRONTEND_TARGETS = (
@@ -307,3 +336,4 @@ if __name__ == "__main__":
     except (FocusedError, OSError, ET.ParseError) as error:
         print("Focused selection failed: " + str(error), file=sys.stderr)
         raise SystemExit(1)
+

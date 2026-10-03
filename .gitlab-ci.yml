@@ -1,0 +1,202 @@
+# Full native acceptance. No prior-run reuse or documentation-only shortcut.
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api"'
+    - when: never
+
+stages: [preflight, verify, accept]
+
+default:
+  image: php:8.4-cli-bookworm
+  interruptible: true
+
+variables:
+  APP_ENV: testing
+  APP_DEBUG: 'false'
+  CACHE_STORE: array
+  SESSION_DRIVER: array
+  QUEUE_CONNECTION: sync
+  MAIL_MAILER: array
+  GIT_DEPTH: '0'
+
+provenance-access:
+  stage: preflight
+  image: python:3.12-bookworm
+  timeout: 5m
+  before_script:
+    - apt-get update && apt-get install --yes --no-install-recommends git
+  script:
+    - python3 scripts/ci/gitlab-database-receipts.py probe
+
+frontend:
+  stage: verify
+  needs: [provenance-access]
+  timeout: 15m
+  before_script:
+    - bash scripts/ci/setup-gitlab-node.sh
+  script:
+    - npm ci
+    - npm test
+    - npm run build
+    - python3 scripts/ci/scan-client-bundle.py
+    - npm audit --audit-level=high
+
+backend-quality:
+  stage: verify
+  needs: [provenance-access]
+  timeout: 20m
+  before_script:
+    - bash scripts/ci/setup-gitlab-php.sh
+  script:
+    - composer validate --strict
+    - composer audit
+    - php vendor/bin/pint --version
+    - php vendor/bin/pint --test app/Domain/Catalog/SaveTrackMetadata.php app/Domain/Catalog/SaveOfferDraft.php app/Domain/Catalog/DeactivateOffer.php tests/Feature/CatalogWriterAuthorityTest.php tests/Feature/RightsDeclarationWriterConcurrencyTest.php tests/Support/rights-declaration-writer-worker.php app/Domain/Rights/CreateLicenseDraft.php app/Domain/Rights/UpdateLicenseDraft.php app/Domain/Rights/ReviewLicense.php app/Domain/Rights/PublishLicense.php app/Domain/Catalog/PrepareExclusiveOffer.php app/Domain/Catalog/ActivateExclusiveOffer.php app/Domain/Commerce/Inventory/ManageRightsScope.php tests/Feature/LicenseWriterAuthorityTest.php tests/Feature/ExclusiveWriterAuthorityTest.php tests/Feature/RightsScopeWriterAuthorityTest.php tests/Feature/RightsScopeWriterConcurrencyTest.php tests/Support/rights-scope-writer-worker.php
+    - python3 scripts/ci/test-phpunit-shards.py
+    - python3 scripts/ci/test-ci-scope.py
+    - python3 scripts/ci/test-focused-tests.py
+    - python3 scripts/ci/test-database-receipts.py
+    - python3 scripts/ci/test-gitlab-writer-feedback.py
+    - python3 scripts/ci/test-gitlab-database-receipts.py
+    - python3 scripts/ci/test-gitlab-setup.py
+    - python3 scripts/dev/test-bootstrap-macos.py
+
+.database:
+  stage: verify
+  needs: [provenance-access]
+  before_script:
+    - bash scripts/ci/setup-gitlab-php.sh
+  script:
+    - python3 scripts/ci/gitlab-database-receipts.py start --engine="$DB_CONNECTION" --shard="$SHARD"
+    - python3 scripts/ci/phpunit-shards.py --shards="$SHARD_COUNT" --prefix="phpunit-ci-$DB_CONNECTION" --timings="scripts/ci/phpunit-timings-$DB_CONNECTION.json"
+    - |
+      set +e
+      php vendor/bin/phpunit --configuration="phpunit-ci-$DB_CONNECTION-$SHARD.xml" --log-junit="phpunit-ci-$DB_CONNECTION-$SHARD-results.xml" --fail-on-phpunit-warning --display-warnings
+      database_status=$?
+      set -e
+      if [ "$database_status" -eq 0 ]; then
+        export DATABASE_TEST_OUTCOME=success
+      else
+        export DATABASE_TEST_OUTCOME=failure
+      fi
+      python3 scripts/ci/gitlab-database-receipts.py finish --engine="$DB_CONNECTION" --shard="$SHARD"
+      exit "$database_status"
+  artifacts:
+    when: always
+    name: 'database-$DB_CONNECTION-$SHARD-$CI_PIPELINE_ID-$CI_JOB_ID'
+    expire_in: 7 days
+    # Includes the full discovery, every shard config and discovery, manifest,
+    # plus only this job's start/result/receipt; collector requires exact names.
+    paths:
+      - phpunit-ci-*
+    reports:
+      junit: 'phpunit-ci-$DB_CONNECTION-$SHARD-results.xml'
+
+backend-mysql:
+  extends: .database
+  timeout: 90m
+  parallel:
+    matrix:
+      - SHARD: ['1', '2', '3', '4']
+  services:
+    - name: mysql:8.4
+      alias: mysql
+  variables:
+    SHARD_COUNT: '4'
+    DB_CONNECTION: mysql
+    MYSQL_DATABASE: vaseyaudio_test
+    MYSQL_ROOT_PASSWORD: disposable-gitlab-test-only
+    MYSQL_ROOT_HOST: '%'
+    DB_HOST: mysql
+    DB_PORT: '3306'
+    DB_DATABASE: vaseyaudio_test
+    DB_USERNAME: root
+    DB_PASSWORD: disposable-gitlab-test-only
+    DB_SOCKET: ''
+    DB_URL: ''
+
+backend-sqlite:
+  extends: .database
+  timeout: 60m
+  parallel:
+    matrix:
+      - SHARD: ['1', '2']
+  variables:
+    SHARD_COUNT: '2'
+    DB_CONNECTION: sqlite
+    DB_DATABASE: ':memory:'
+    DB_URL: ''
+
+operator-browser:
+  stage: verify
+  needs: [provenance-access]
+  timeout: 40m
+  parallel:
+    matrix:
+      - BROWSER_PROJECT: [chromium-desktop, webkit-mobile]
+  before_script:
+    - bash scripts/ci/setup-gitlab-php.sh
+    - bash scripts/ci/setup-gitlab-node.sh
+  script:
+    - npm ci
+    - npm run build
+    - npx playwright install --with-deps chromium webkit
+    - npm run test:browser -- --project="$BROWSER_PROJECT"
+  artifacts:
+    when: always
+    name: 'operator-browser-$BROWSER_PROJECT-$CI_PIPELINE_ID-$CI_JOB_ID'
+    expire_in: 7 days
+    paths: [playwright-report/, test-results/]
+
+related-browser:
+  stage: verify
+  needs: [provenance-access]
+  timeout: 50m
+  before_script:
+    - bash scripts/ci/setup-gitlab-php.sh
+    - bash scripts/ci/setup-gitlab-node.sh
+    - bash scripts/ci/setup-gitlab-related-scanner.sh
+  script:
+    - npm ci
+    - python3 scripts/ci/test-related-browser-stage.py
+    - npm run build
+    - npx playwright install --with-deps chromium webkit
+    - node tests/browser/run-related.mjs
+  artifacts:
+    when: always
+    name: 'related-browser-$CI_PIPELINE_ID-$CI_JOB_ID'
+    expire_in: 7 days
+    paths: [playwright-report-related/, test-results-related/]
+
+backend:
+  stage: accept
+  image: python:3.12-bookworm
+  timeout: 10m
+  needs:
+    - job: provenance-access
+      artifacts: false
+    - job: frontend
+      artifacts: false
+    - job: backend-quality
+      artifacts: false
+    - job: backend-mysql
+      artifacts: false
+    - job: backend-sqlite
+      artifacts: false
+    - job: operator-browser
+      artifacts: false
+    - job: related-browser
+      artifacts: false
+  before_script:
+    - apt-get update && apt-get install --yes --no-install-recommends git
+  script:
+    # Fetch each exact same-pipeline job archive natively. Do not merge matrix
+    # artifact directories, which contain overlapping full partition files.
+    - python3 scripts/ci/gitlab-database-receipts.py collect
+  artifacts:
+    when: always
+    name: 'database-acceptance-$CI_PIPELINE_ID-$CI_JOB_ID'
+    expire_in: 7 days
+    paths: [phpunit-ci-gitlab-collection.json]

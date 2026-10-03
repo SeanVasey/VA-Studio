@@ -203,7 +203,7 @@ class TestCommerceOperationsTest extends TestCase
         $this->assertState('attention');
     }
 
-    public function test_resources_have_no_mutation_or_detail_abilities_and_no_create_edit_routes(): void
+    public function test_resources_deny_model_mutation_and_detail_abilities_and_expose_only_named_operational_actions(): void
     {
         $paid = F::paid($this->gateway); $this->actingAs(LicenseFixtures::admin());
         foreach ([TestContractIssuanceResource::class, TestPaymentExceptionResource::class] as $resource) {
@@ -219,7 +219,7 @@ class TestCommerceOperationsTest extends TestCase
         $this->assertSame([], $component->instance()->getTable()->getFlatActions());
         $this->assertSame([], $component->instance()->getTable()->getFlatBulkActions());
         $exceptions = Livewire::test(ListTestPaymentExceptions::class);
-        $this->assertSame(['inspectEvidence'], array_keys($exceptions->instance()->getTable()->getFlatActions()));
+        $this->assertSame(['inspectEvidence', 'operationHistory', 'recordDisposition', 'reconcilePayment'], array_keys($exceptions->instance()->getTable()->getFlatActions()));
         $this->assertSame([], $exceptions->instance()->getTable()->getFlatBulkActions());
     }
 

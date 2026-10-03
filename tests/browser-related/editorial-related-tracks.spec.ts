@@ -2,14 +2,16 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { lstatSync, readFileSync, realpathSync } from 'node:fs';
 import { join } from 'node:path';
-import { test, expect, type APIRequestContext, type Locator, type Page, type Request, type Response, type TestInfo } from '@playwright/test';
+import { test, expect, type APIRequestContext, type Browser, type Locator, type Page, type Request, type Response, type TestInfo } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from '../browser/auth-fixture';
 import { releaseMenuAction, releaseRow } from '../browser/site-release-row';
+import { actionResponse, closeDialog, expectModalFits, login, openPublication, publicationReview, row, searchTracks } from '../browser/publication-fixture';
+import { syncSuccessNotification } from '../browser/notification-sync';
 
 type Track = { id: number; title: string; artist: string; slug: string; href: string };
 type MediaOutput = { id: number; role: string; sha256: string; sizeBytes: number };
 type Manifest = {
-  schemaVersion: 1; marker: string; origin: string; database: string; projects: Record<string, { tracks: [Track, Track] }>; evidenceHash: string;
+  schemaVersion: 2; marker: string; origin: string; database: string; projects: Record<string, { tracks: [Track, Track]; publicationTrack: Track }>; evidenceHash: string;
   evidence: { tracks: Array<{ trackId: number; sources: Array<{ outputs: MediaOutput[] }> }> };
 };
 function loadManifest(): Manifest {
@@ -20,7 +22,7 @@ function loadManifest(): Manifest {
     throw new Error('The related-track manifest is not the bounded private isolated fixture.');
   }
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as Manifest;
-  if (manifest.schemaVersion !== 1 || manifest.marker !== process.env.VASEY_BROWSER_RELATED_MARKER
+  if (manifest.schemaVersion !== 2 || manifest.marker !== process.env.VASEY_BROWSER_RELATED_MARKER
     || manifest.origin !== 'http://127.0.0.1:8173' || manifest.database !== join(directory, 'database.sqlite')
     || Object.keys(manifest.projects).join(',') !== 'chromium-desktop,webkit-mobile'
     || manifest.evidenceHash?.length !== 64 || !/^[a-f0-9]{64}$/.test(manifest.evidenceHash)) {
@@ -310,7 +312,123 @@ async function reviewVerifiedPrivateTrack(page: Page, visitor: APIRequestContext
   expect((await visitor.get(track.href)).status()).toBe(404);
 }
 
-test('ordinary editorial associations preserve private order, current eligibility and first-party destinations', async ({ page, context, playwright, browserName }, testInfo) => {
+/** Runs after every retained editorial/media assertion, on a separate genuinely scanned track. */
+async function reviewedPublication(page: Page, browser: Browser, visitor: APIRequestContext, testInfo: TestInfo, manifest: Manifest, track: Track) {
+  const proof = JSON.parse(execFileSync('php', ['tests/browser/prepare-related-tracks.php', 'verify-publication', testInfo.project.name], {
+    cwd: process.cwd(), env: process.env, timeout: 30000, maxBuffer: 65536, encoding: 'utf8', stdio: 'pipe',
+  })) as { verified: boolean; project: string; state: string; evidenceHash: string };
+  expect(proof).toMatchObject({ verified: true, project: testInfo.project.name, state: 'publication-ready', evidenceHash: manifest.evidenceHash });
+  await page.goto('/admin/tracks');
+  await searchTracks(page, track.title);
+  await row(page, track.title).getByRole('button', { name: 'Unpublish', exact: true }).click();
+  const withdrawal = page.getByRole('alertdialog', { name: 'Unpublish', exact: true });
+  const [withdrawn] = await Promise.all([actionResponse(page, 'callMountedAction'), withdrawal.getByRole('button', { name: 'Confirm', exact: true }).click()]);
+  expect(withdrawn.status()).toBe(200);
+  expect(await withdrawn.finished()).toBeNull();
+  await expect(withdrawal.getByRole('heading')).toBeHidden();
+  await expect(row(page, track.title).getByRole('button', { name: 'Publish', exact: true })).toBeVisible();
+  let publication = await openPublication(page, track.title);
+  expect(publication.review).toMatchObject({ track_id: track.id, metadata_version: 1, publication_version: 2 });
+  const initialHash = publication.review.manifest_hash;
+  expect(await publicationReview(await closeDialog(page, publication.dialog, 'Cancel'))).toBeNull();
+  await expect(publication.launch).toBeFocused();
+  expect((await visitor.get(track.href)).status()).toBe(404);
+  publication = await openPublication(page, track.title);
+  expect(publication.review.manifest_hash).toBe(initialHash);
+
+  const otherContext = await browser.newContext({ baseURL: manifest.origin, viewport: page.viewportSize() });
+  const failures: string[] = [];
+  try {
+    const other = await otherContext.newPage();
+    other.on('pageerror', error => failures.push(error.message));
+    await login(other);
+    await other.goto('/admin/tracks');
+    await searchTracks(other, track.title);
+    await row(other, track.title).getByRole('button', { name: 'Edit', exact: true }).click();
+    const editor = other.getByRole('dialog');
+    const mood = `Synthetic reviewed winner ${testInfo.project.name}`;
+    const description = `Synthetic private concurrent description ${testInfo.project.name}.`;
+    await editor.getByLabel('Mood', { exact: false }).fill(mood);
+    await editor.getByLabel('Description', { exact: false }).fill(description);
+    await syncSuccessNotification(other, 'Saved', () => editor.getByRole('button', { name: 'Save changes', exact: true }).click(),
+      async () => { await expect(editor.getByRole('heading')).toBeHidden(); });
+
+    const rejectHeldReview = async (message: string, label: string) => {
+      await page.bringToFront();
+      await publication.confirm.focus();
+      await expectModalFits(page, publication.dialog);
+      await syncSuccessNotification(page, 'Publication blocked', async () => {
+        const [submitted] = await Promise.all([actionResponse(page, 'callMountedAction'), publication.confirm.press('Enter')]);
+        expect(submitted.status()).toBe(200);
+        expect(await submitted.finished()).toBeNull();
+        expect(await publicationReview(submitted)).toBeNull();
+        await expect(publication.dialog.getByRole('heading')).toBeHidden();
+      }, async () => {
+        const notification = page.locator('.fi-no-notification').filter({ has: page.getByRole('heading', { name: 'Publication blocked', exact: true }) });
+        await expect(notification.getByText(message, { exact: true })).toBeVisible();
+        for (const privateValue of [description, mood, publication.review.manifest_hash as string]) await expect(notification).not.toContainText(privateValue);
+        await page.screenshot({ path: testInfo.outputPath(`${label}.png`), fullPage: false });
+        await testInfo.attach(`${label}-notification-dom`, { body: await notification.evaluate(element => element.outerHTML), contentType: 'text/html' });
+      });
+      expect((await visitor.get(track.href)).status()).toBe(404);
+      await expect(row(page, track.title).getByText('draft', { exact: true })).toBeVisible();
+    };
+    await rejectHeldReview('This track changed after publication review. Close and reopen the confirmation before trying again.', 'publication-stale-metadata');
+    publication = await openPublication(page, track.title);
+    expect(publication.review).toMatchObject({ track_id: track.id, metadata_version: 2, publication_version: 2 });
+    expect(publication.review.manifest_hash).not.toBe(initialHash);
+    const metadataHash = publication.review.manifest_hash;
+
+    // Publish a real successor offer through the ordinary second operator session; draft edits alone do not change the promise.
+    await other.bringToFront();
+    await other.goto('/admin/offers');
+    await searchTracks(other, track.title);
+    const offer = row(other, track.title);
+    await offer.getByRole('button', { name: 'Edit draft', exact: true }).click();
+    const offerEditor = other.getByRole('dialog');
+    await expect(offerEditor.getByLabel('Draft price in cents', { exact: false })).toHaveValue('1');
+    await offerEditor.getByLabel('Draft price in cents', { exact: false }).fill('2');
+    await syncSuccessNotification(other, 'Saved', () => offerEditor.getByRole('button', { name: 'Save changes', exact: true }).click(),
+      async () => { await expect(offerEditor.getByRole('heading')).toBeHidden(); });
+    await offer.getByRole('button', { name: 'Publish revision', exact: true }).click();
+    const offerConfirmation = other.getByRole('alertdialog', { name: 'Publish revision', exact: true });
+    const [revised] = await Promise.all([actionResponse(other, 'callMountedAction'), offerConfirmation.getByRole('button', { name: 'Confirm', exact: true }).click()]);
+    expect(revised.status()).toBe(200);
+    expect(await revised.finished()).toBeNull();
+    await expect(offerConfirmation.getByRole('heading')).toBeHidden();
+    await expect(offer.getByRole('cell', { name: '$0.02', exact: true })).toHaveCount(2);
+    await rejectHeldReview('Publication evidence changed after review. Close and reopen the confirmation before trying again.', 'publication-stale-offer');
+
+    publication = await openPublication(page, track.title);
+    expect(publication.review).toMatchObject({ track_id: track.id, metadata_version: 2, publication_version: 2 });
+    expect(publication.review.manifest_hash).not.toBe(metadataHash);
+    await publication.confirm.focus();
+    await expectModalFits(page, publication.dialog);
+    const [published] = await Promise.all([actionResponse(page, 'callMountedAction'), publication.confirm.press('Enter')]);
+    expect(published.status()).toBe(200);
+    expect(await published.finished()).toBeNull();
+    expect(await publicationReview(published)).toBeNull();
+    await expect(publication.dialog.getByRole('heading')).toBeHidden();
+    await expect(row(page, track.title).getByText('published', { exact: true })).toBeVisible();
+    await page.reload();
+    await expect(row(page, track.title).getByRole('button', { name: 'Unpublish', exact: true })).toBeVisible();
+    expect((await visitor.get(track.href)).status()).toBe(200);
+    await row(page, track.title).getByRole('button', { name: 'Edit', exact: true }).click();
+    const retained = page.getByRole('dialog');
+    await expect(retained.getByLabel('Mood', { exact: false })).toHaveValue(mood);
+    await expect(retained.getByLabel('Description', { exact: false })).toHaveValue(description);
+    await closeDialog(page, retained, 'Cancel');
+    await testInfo.attach('reviewed-publication-receipt', { body: Buffer.from(JSON.stringify({
+      fixtureEvidenceHash: manifest.evidenceHash, trackId: track.id, review: publication.review,
+      earlierReviewsConsumed: true, publicStatus: 200,
+    })), contentType: 'application/json' });
+    expect(failures).toEqual([]);
+  } finally {
+    await otherContext.close();
+  }
+}
+
+test('ordinary editorial associations and reviewed publication preserve current evidence and first-party destinations', async ({ page, context, playwright, browserName, browser }, testInfo) => {
   test.setTimeout(150_000);
   const manifest = loadManifest();
   const fixture = manifest.projects[testInfo.project.name];
@@ -468,6 +586,8 @@ test('ordinary editorial associations preserve private order, current eligibilit
     await activate(page, 'Original site content', 'Restore previous release');
     expect((await visitor.get(`/blog/${slug}`)).status()).toBe(404);
     expect((await visitor.get(`/videos/${slug}`)).status()).toBe(404);
+    await reviewedPublication(page, browser, visitor, testInfo, manifest, fixture.publicationTrack);
+    await persisted(testInfo, manifest, 'withdrawn', 'editorial-graphs-unchanged-after-reviewed-publication');
     expect(failures).toEqual([]);
     expect(externalRequests).toEqual([]);
   } finally {

@@ -1,8 +1,10 @@
-# GitHub work-package register
+# Historical GitHub work-package register
 
-The following issues were created in the private VASEYDEV/VASEYAUDIO repository during foundation development. All remain open until their acceptance evidence is complete; the first implementation PR covers parts of WP-01, WP-02, WP-04 and WP-05.
+The following issues were created in the private VASEYDEV/VASEYAUDIO repository during foundation development. Their URLs and initially recorded open states are preserved as historical evidence; this table is not a current issue-state audit or a claim that the issues were transferred. The first implementation PR covered parts of WP-01, WP-02, WP-04 and WP-05.
 
-| Package | Issue | State |
+Current development belongs in [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio). Use the [current development queue](../development-control.md), [agent assignments](../development-agent-queue.md) and [task register](../remaining-development-tasks.csv) for active work. Follow the [issue publication instructions](README.md#issue-publication) before creating or transferring issues; do not copy the historical issue numbers into current-repository links.
+
+| Package | Historical issue | Recorded initial state |
 | --- | --- | --- |
 | WP-01 | [Foundation, repository governance and reproducible CI](https://github.com/VASEYDEV/VASEYAUDIO/issues/1) | Open |
 | WP-02 | [Persistent catalog administration and publication readiness](https://github.com/VASEYDEV/VASEYAUDIO/issues/2) | Open |
@@ -19,4 +21,4 @@ The following issues were created in the private VASEYDEV/VASEYAUDIO repository 
 | WP-13 | [Security, reliability and exact-candidate release validation](https://github.com/VASEYDEV/VASEYAUDIO/issues/13) | Open |
 | WP-14 | [Rehearsed domain cutover and post-launch reconciliation](https://github.com/VASEYDEV/VASEYAUDIO/issues/14) | Open |
 
-Current implementation and subsequent dependency order: [ordered development status](../development-order.md). The earlier WP-03-only handoff was superseded by merged media, license, quote, sharing and Stripe receipt increments. Broad issues stay open until their remaining acceptance evidence exists.
+The [ordered development record](../development-order.md) retains subsequent implementation and acceptance evidence. The earlier WP-03-only handoff was superseded by merged media, license, quote, sharing and Stripe receipt increments. Broad work packages remain incomplete until their remaining acceptance evidence exists; this does not assert the present state of an external issue.

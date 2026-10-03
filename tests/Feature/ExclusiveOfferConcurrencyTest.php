@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\Process;
 use Tests\Support\ExclusiveOfferFixtures as F;
 use Tests\Support\InventoryFixtures;
+use Tests\Support\LicenseFixtures;
 use Tests\TestCase;
 
 class ExclusiveOfferConcurrencyTest extends TestCase
@@ -37,6 +38,8 @@ class ExclusiveOfferConcurrencyTest extends TestCase
     {
         $this->fakePrivateMediaStorage(); $this->travelTo(now()->startOfSecond());
         $a = F::draft(); $b = $scenario === 'shared_scope_variants' ? F::draft($a['scope']) : $a;
+        // Resource contention requires distinct actors now that authority is locked first.
+        $b['actor'] = LicenseFixtures::admin();
         $directory = storage_path('framework/testing/exclusive-offer-race-'.Str::uuid());
         $filesystem = new Filesystem; $filesystem->makeDirectory($directory, 0700, true); $processes = [];
         $this->assertSame(0, DB::transactionLevel());

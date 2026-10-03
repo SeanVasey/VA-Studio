@@ -4,6 +4,7 @@ namespace App\Domain\Commerce\Payments;
 
 use App\Domain\Commerce\Checkout\CheckoutEvidence;
 use App\Domain\Commerce\Checkout\HostedCheckout;
+use App\Domain\Commerce\Finalization\DispatchTestFinalization;
 use App\Domain\Commerce\Models\CheckoutIntent;
 use App\Domain\Commerce\Models\CheckoutSession;
 use App\Domain\Commerce\Models\Order;
@@ -27,7 +28,9 @@ final class VerifyTestPayment
             app(PaymentProcessingPolicy::class)->account();
             app(PaymentProcessingPolicy::class)->outsideTransactions();
             $session = CheckoutSession::where('checkout_intent_id', $intent->id)->first();
-            if (! $session) { return 'unmatched'; }
+            if (! $session) {
+                return 'unmatched';
+            }
 
             return $this->commit($this->inspect($session->provider_session_id, $intent), null);
         } catch (PaymentVerificationException $error) {
@@ -42,7 +45,9 @@ final class VerifyTestPayment
     /** GET-only, outside all transactions. The event supplies only this Session locator. */
     public function inspect(string $sessionId, ?CheckoutIntent $expected = null): array
     {
-        $policy = app(PaymentProcessingPolicy::class); $account = $policy->account(); $policy->outsideTransactions();
+        $policy = app(PaymentProcessingPolicy::class);
+        $account = $policy->account();
+        $policy->outsideTransactions();
         if (! preg_match('/\Acs_test_[A-Za-z0-9]{1,120}\z/', $sessionId)) {
             throw new PaymentVerificationException('payment_changed');
         }
@@ -53,25 +58,40 @@ final class VerifyTestPayment
                 throw new PaymentVerificationException('payment_changed');
             }
             $raw = $gateway->retrieve($sessionId);
-        } catch (PaymentVerificationException $error) { throw $error; }
-        catch (Throwable) { throw new PaymentVerificationException('retry'); }
-        if (($raw['id'] ?? null) !== $sessionId) { throw new PaymentVerificationException('payment_changed'); }
+        } catch (PaymentVerificationException $error) {
+            throw $error;
+        } catch (Throwable) {
+            throw new PaymentVerificationException('retry');
+        }
+        if (($raw['id'] ?? null) !== $sessionId) {
+            throw new PaymentVerificationException('payment_changed');
+        }
         $binding = CheckoutSession::where('account_id', $account)->where('mode', 'test')->where('provider_session_id', $sessionId)->first();
         $locator = $raw['metadata']['intent_id'] ?? null;
-        if (! OrderRequest::uuid($locator)) { throw new PaymentVerificationException('unmatched'); }
+        if (! OrderRequest::uuid($locator)) {
+            throw new PaymentVerificationException('unmatched');
+        }
         $intent = CheckoutIntent::where('public_id', $locator)->where('account_id', $account)->where('mode', 'test')->first();
-        if (! $intent) { throw new PaymentVerificationException('unmatched'); }
+        if (! $intent) {
+            throw new PaymentVerificationException('unmatched');
+        }
         if (($expected && $intent->id !== $expected->id) || ($binding && $binding->checkout_intent_id !== $intent->id)) {
             throw new PaymentVerificationException('payment_changed');
         }
         $order = Order::findOrFail($intent->order_id);
         $request = app(CheckoutEvidence::class)->verifyIntent($intent, $order);
         $observed = app(CheckoutEvidence::class)->session($raw, $request);
-        $paymentId = $raw['payment_intent'] ?? null; $payment = null;
+        $paymentId = $raw['payment_intent'] ?? null;
+        $payment = null;
         if ($paymentId !== null) {
-            if (! PaymentEvidence::paymentId($paymentId)) { throw new PaymentVerificationException('payment_changed'); }
-            try { $payment = $gateway->paymentIntent($paymentId); }
-            catch (Throwable) { throw new PaymentVerificationException('retry'); }
+            if (! PaymentEvidence::paymentId($paymentId)) {
+                throw new PaymentVerificationException('payment_changed');
+            }
+            try {
+                $payment = $gateway->paymentIntent($paymentId);
+            } catch (Throwable) {
+                throw new PaymentVerificationException('retry');
+            }
         }
         $evidence = app(PaymentEvidence::class)->capture($raw, $payment, $request, 'reconciliation', null);
 
@@ -87,7 +107,9 @@ final class VerifyTestPayment
             $order = Order::whereKey($inspection['order_id'])->lockForUpdate()->firstOrFail();
             $intent = CheckoutIntent::whereKey($inspection['intent_id'])->lockForUpdate()->firstOrFail();
             $work = $claim ? app(PaymentWork::class)->owns($claim) : null;
-            if ($claim && ! $work) { return 'stale'; }
+            if ($claim && ! $work) {
+                return 'stale';
+            }
             if ($intent->account_id !== app(PaymentProcessingPolicy::class)->account() || $intent->order_id !== $order->id) {
                 throw new PaymentVerificationException('payment_changed');
             }
@@ -120,8 +142,8 @@ final class VerifyTestPayment
                     'mode' => 'test', 'provider_payment_intent_id' => $evidence['payment']['id'], 'amount_minor' => $evidence['amount_minor'],
                     'currency' => 'USD', 'evidence_ciphertext' => $ciphertext, 'evidence_hash' => $hash,
                     'canonicalization_version' => CanonicalJson::VERSION, 'confirmed_at' => $at]);
-                AuditEvent::record('commerce.payment.test_verified', $existing, ['order_public_id' => $order->public_id,
-                    'intent_public_id' => $intent->public_id, 'test_only' => true, 'fulfillment' => 'awaiting_finalization']);
+                AuditEvent::recordAttributed('commerce.payment.test_verified', $existing, ['order_public_id' => $order->public_id,
+                    'intent_public_id' => $intent->public_id, 'test_only' => true, 'fulfillment' => 'awaiting_finalization'], null);
             }
             $outcome = $existing ? 'awaiting_finalization' : $evidence['outcome'];
             if ($work) {
@@ -134,7 +156,7 @@ final class VerifyTestPayment
         if ($outcome === 'awaiting_finalization') {
             $paymentId = VerifiedPayment::where('order_id', $inspection['order_id'])->value('id');
             if ($paymentId !== null) {
-                app(\App\Domain\Commerce\Finalization\DispatchTestFinalization::class)->handle((int) $paymentId);
+                app(DispatchTestFinalization::class)->handle((int) $paymentId);
             }
         }
 

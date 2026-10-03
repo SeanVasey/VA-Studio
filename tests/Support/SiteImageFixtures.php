@@ -7,9 +7,11 @@ use App\Domain\SiteBuilder\SiteImageProcessor;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Symfony\Component\Process\Process;
 
 /**
- * Synthetic site images for tests. JPEGs with a real test pattern come from GD; everything GD cannot write
+ * Synthetic site images for tests. Baseline JPEGs use an explicit FFmpeg sampling format; progressive JPEGs use GD.
+ * Everything GD cannot write
  * (CMYK, 12-bit and grayscale JPEGs, every PNG) is assembled byte by byte so each case is exact.
  */
 final class SiteImageFixtures
@@ -23,15 +25,14 @@ final class SiteImageFixtures
     public const BLOCK = [250, 250, 250];
 
     /**
-     * An RGB JPEG of the test pattern, optionally carrying metadata segments.
+     * A JPEG of the RGB test pattern, optionally carrying metadata segments.
      *
      * exif is the Orientation value, or one value per EXIF block; GPS data is always added with it. stray moves the metadata after
-     * GD's own first segment behind a stray byte, which decoders and getimagesize() skip. adobe_rgb adds an Adobe marker declaring
-     * the samples RGB (transform 0), which FFmpeg decodes as planar RGB (gbrp). hidden_exif places a sideways EXIF block where
+     * the encoder's first segment behind a stray byte, which decoders and getimagesize() skip. hidden_exif places a sideways EXIF block where
      * FFmpeg reads it but intake's header reader does not: after the scan data, inside a DNL segment, or behind "Exif\0\x01".
      * solid fills the whole image with one colour.
      *
-     * @param  array{exif?: int|list<int>, xmp?: bool, iptc?: bool, icc?: bool, comment?: bool, progressive?: bool, stray?: bool, adobe_rgb?: bool, hidden_exif?: 'after_scan'|'dnl'|'id', solid?: array{int, int, int}}  $options
+     * @param  array{exif?: int|list<int>, xmp?: bool, iptc?: bool, icc?: bool, comment?: bool, progressive?: bool, stray?: bool, hidden_exif?: 'after_scan'|'dnl'|'id', solid?: array{int, int, int}}  $options
      */
     public static function jpeg(int $width, int $height, array $options = []): string
     {
@@ -40,15 +41,20 @@ final class SiteImageFixtures
         if (! isset($options['solid'])) {
             imagefilledrectangle($image, 0, 0, intdiv($width, 3) - 1, intdiv($height, 3) - 1, imagecolorallocate($image, ...self::BLOCK));
         }
-        imageinterlace($image, $options['progressive'] ?? false);
-        ob_start();
-        imagejpeg($image, null, 92);
-        $jpeg = (string) ob_get_clean();
-        $segments = '';
-        if ($options['adobe_rgb'] ?? false) {
-            // APP14 "Adobe": version 100, flags 0 and 0, transform 0.
-            $segments .= self::segment(0xEE, 'Adobe'.pack('nnn', 100, 0, 0)."\0");
+        try {
+            if ($options['progressive'] ?? false) {
+                // Preserve actual SOF2/multiple-scan coverage; no sampling assumption is made for this branch.
+                imageinterlace($image, true);
+                ob_start();
+                imagejpeg($image, null, 92);
+                $jpeg = (string) ob_get_clean();
+            } else {
+                $jpeg = self::baselineJpeg($image);
+            }
+        } finally {
+            imagedestroy($image);
         }
+        $segments = '';
         foreach ((array) ($options['exif'] ?? []) as $orientation) {
             $segments .= self::segment(0xE1, "Exif\0\0".self::tiff($orientation));
         }
@@ -87,6 +93,47 @@ final class SiteImageFixtures
 
         // Cameras and editors put metadata straight after the start-of-image marker.
         return substr($jpeg, 0, 2).$segments.substr($jpeg, 2);
+    }
+
+    /** Encode the pattern with equal component sampling (4:4:4), independent of the GD/libjpeg build. */
+    private static function baselineJpeg(\GdImage $image): string
+    {
+        $directory = sys_get_temp_dir().'/site-image-fixture-'.Str::uuid();
+        if (! mkdir($directory, 0700)) {
+            throw new \RuntimeException('Could not create the private site image fixture directory.');
+        }
+        try {
+            $input = $directory.'/pattern.png';
+            $output = $directory.'/pattern.jpg';
+            touch($input);
+            chmod($input, 0600);
+            imagepng($image, $input);
+            (new Process([
+                config('media.prlimit'), '--cpu=30', '--as=536870912', '--fsize=33554432', '--nofile=64', '--',
+                config('media.ffmpeg'), '-nostdin', '-hide_banner', '-loglevel', 'error', '-xerror', '-n',
+                '-threads', '1', '-filter_threads', '1', '-protocol_whitelist', 'file,pipe', '-f', 'png_pipe', '-i', $input,
+                '-map', '0:v:0', '-map_metadata', '-1', '-frames:v', '1', '-c:v', 'mjpeg', '-threads:v', '1', '-q:v', '3', '-pix_fmt', 'yuvj444p',
+                '-flags:v', '+bitexact', '-fflags', '+bitexact', '-f', 'image2', '-update', '1', $output,
+            ], $directory, ['TMPDIR' => $directory, 'FFREPORT' => false, 'OMP_NUM_THREADS' => '1', 'OPENBLAS_NUM_THREADS' => '1']))
+                ->setTimeout(30)->mustRun();
+
+            return (string) file_get_contents($output);
+        } finally {
+            @unlink($directory.'/pattern.png');
+            @unlink($directory.'/pattern.jpg');
+            rmdir($directory);
+        }
+    }
+
+    /**
+     * Genuine baseline RGB: three unsampled components whose zero DC/AC coefficients each decode to 128.
+     * Adobe transform 0 truthfully declares those equal midgrey samples RGB, without relabelling coloured YCbCr data.
+     */
+    public static function rgbJpeg(int $width, int $height): string
+    {
+        $jpeg = self::flatJpeg($width, $height, 3);
+
+        return substr($jpeg, 0, 2).self::segment(0xEE, 'Adobe'.pack('nnn', 100, 0, 0)."\0").substr($jpeg, 2);
     }
 
     /**

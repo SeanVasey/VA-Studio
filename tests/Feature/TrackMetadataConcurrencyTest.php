@@ -25,8 +25,9 @@ class TrackMetadataConcurrencyTest extends TestCase
 
     public function test_overlapping_edits_wait_on_the_same_row_and_only_one_revision_is_saved(): void
     {
-        $actor = LicenseFixtures::admin();
-        $track = app(SaveTrackMetadata::class)->handle(null, ['title' => 'Synthetic original', 'slug' => 'race-fixture'], $actor);
+        // Distinct actors let both workers reach the shared track lock after their actor locks.
+        $actors = [LicenseFixtures::admin(), LicenseFixtures::admin()];
+        $track = app(SaveTrackMetadata::class)->handle(null, ['title' => 'Synthetic original', 'slug' => 'race-fixture'], $actors[0]);
         $this->assertSame(0, DB::transactionLevel(), 'Fixtures must be committed before separate processes read them.');
         $directory = storage_path('framework/testing/track-race-'.Str::uuid());
         $filesystem = new Filesystem;
@@ -43,7 +44,7 @@ class TrackMetadataConcurrencyTest extends TestCase
                     'DB_CHARSET' => (string) $database['charset'], 'DB_COLLATION' => (string) $database['collation'],
                     'CACHE_STORE' => 'array', 'SESSION_DRIVER' => 'array', 'QUEUE_CONNECTION' => 'sync',
                     'VASEY_TRACK_RACE_DIRECTORY' => $directory, 'VASEY_TRACK_RACE_WORKER' => (string) $worker,
-                ], json_encode(['track_id' => $track->id, 'actor_id' => $actor->id, 'metadata_version' => 1], JSON_THROW_ON_ERROR), 40);
+                ], json_encode(['track_id' => $track->id, 'actor_id' => $actors[$worker]->id, 'metadata_version' => 1], JSON_THROW_ON_ERROR), 40);
                 $process->start();
                 $processes[] = $process;
             }

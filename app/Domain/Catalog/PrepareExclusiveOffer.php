@@ -12,6 +12,7 @@ use App\Domain\Commerce\Models\RightsScopeOffer;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
@@ -21,14 +22,18 @@ final class PrepareExclusiveOffer
 {
     public function handle(Offer $offer, int $scopeId, string $reference, User $actor): OfferRevision
     {
-        Gate::forUser($actor)->authorize('administer-catalog');
-        InventoryPolicy::requireTestEnvironment();
-        if (! preg_match('/\A[A-Za-z0-9][A-Za-z0-9._:\/-]{0,191}\z/D', $reference)) {
-            throw ValidationException::withMessages(['inventory' => 'An explicit private scope-link evidence reference is required.']);
-        }
-
         return DB::transaction(function () use ($offer, $scopeId, $reference, $actor) {
-            // Same track -> offer -> license/rights -> scope order as existing publication/linkage.
+            // Serialize current authority before catalog/scope locks and attributed foreign keys.
+            $currentActor = $actor->exists ? User::query()->lockForUpdate()->find($actor->getKey()) : null;
+            if ($currentActor === null) {
+                throw new AuthorizationException;
+            }
+            Gate::forUser($currentActor)->authorize('administer-catalog', [true]);
+            InventoryPolicy::requireTestEnvironment();
+            if (! preg_match('/\A[A-Za-z0-9][A-Za-z0-9._:\/-]{0,191}\z/D', $reference)) {
+                throw ValidationException::withMessages(['inventory' => 'An explicit private scope-link evidence reference is required.']);
+            }
+            // Actor -> track -> offer -> license/rights -> scope, compatible with rights writers.
             // Offer track identity is immutable. Avoid a consistent read before these locks.
             $track = Track::whereKey($offer->track_id)->lockForUpdate()->firstOrFail();
             $locked = Offer::whereKey($offer->id)->lockForUpdate()->firstOrFail();
@@ -44,7 +49,9 @@ final class PrepareExclusiveOffer
             }
             $readiness = app(PublicationReadiness::class);
             $blockers = $readiness->exclusiveDraftBlockers($locked);
-            if ($blockers !== []) { throw ValidationException::withMessages(['offer' => implode(' ', $blockers)]); }
+            if ($blockers !== []) {
+                throw ValidationException::withMessages(['offer' => implode(' ', $blockers)]);
+            }
             $scope = RightsScope::whereKey($scopeId)->lockForUpdate()->firstOrFail();
             if ($scope->blocked || ExclusiveSale::where('rights_scope_id', $scope->id)->lockForUpdate()->first()) {
                 throw ValidationException::withMessages(['inventory' => 'The underlying rights scope is unavailable.']);
@@ -52,7 +59,9 @@ final class PrepareExclusiveOffer
             app(VerifyOfferFiles::class)->handle($locked, $track);
             // Hashing can span a license's effective boundary. Never freeze newly expired terms.
             $blockers = $readiness->exclusiveDraftBlockers($locked);
-            if ($blockers !== []) { throw ValidationException::withMessages(['offer' => implode(' ', $blockers)]); }
+            if ($blockers !== []) {
+                throw ValidationException::withMessages(['offer' => implode(' ', $blockers)]);
+            }
             $snapshot = app(OfferSnapshot::class)->capture($locked);
             $snapshot['schema_version'] = 2;
             $snapshot['purpose'] = 'test_exclusive_preparation';
@@ -61,7 +70,9 @@ final class PrepareExclusiveOffer
             $hash = CanonicalJson::hash($snapshot);
             if ($current && hash_equals($current->snapshot_hash, $hash)) {
                 $blockers = $readiness->preparedExclusiveBlockers($locked, $current);
-                if ($blockers !== []) { throw ValidationException::withMessages(['offer' => implode(' ', $blockers)]); }
+                if ($blockers !== []) {
+                    throw ValidationException::withMessages(['offer' => implode(' ', $blockers)]);
+                }
 
                 return $current;
             }
@@ -69,15 +80,15 @@ final class PrepareExclusiveOffer
                 'offer_id' => $locked->id, 'track_id' => $track->id, 'license_version_id' => $locked->license_version_id,
                 'rights_declaration_id' => $snapshot['rights']['id'], 'revision' => ($locked->revisions()->orderByDesc('revision')->lockForUpdate()->first()?->revision ?? 0) + 1,
                 'price_minor' => $locked->price_minor, 'currency' => $locked->currency, 'snapshot' => $snapshot, 'snapshot_hash' => $hash,
-                'canonicalization_version' => CanonicalJson::VERSION, 'published_by' => $actor->id, 'published_at' => now(),
+                'canonicalization_version' => CanonicalJson::VERSION, 'published_by' => $currentActor->id, 'published_at' => now(),
             ]);
             $link = RightsScopeOffer::create(['rights_scope_id' => $scope->id, 'offer_revision_id' => $revision->id,
-                'evidence_reference' => $reference, 'linked_by' => $actor->id, 'created_at' => now()->utc()->startOfSecond()]);
+                'evidence_reference' => $reference, 'linked_by' => $currentActor->id, 'created_at' => now()->utc()->startOfSecond()]);
             $locked->update(['current_revision_id' => $revision->id, 'is_active' => false]);
             AuditEvent::record('commerce.inventory.offer_linked', $link,
-                ['scope_id' => $scope->id, 'offer_revision_id' => $revision->id], $actor->id);
+                ['scope_id' => $scope->id, 'offer_revision_id' => $revision->id], $currentActor->id);
             AuditEvent::record('catalog.offer.exclusive_prepared', $locked,
-                ['revision_id' => $revision->id, 'revision' => $revision->revision, 'snapshot_hash' => $hash], $actor->id);
+                ['revision_id' => $revision->id, 'revision' => $revision->revision, 'snapshot_hash' => $hash], $currentActor->id);
 
             return $revision;
         }, 5);

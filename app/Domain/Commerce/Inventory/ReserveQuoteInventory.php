@@ -2,6 +2,7 @@
 
 namespace App\Domain\Commerce\Inventory;
 
+use App\Domain\Commerce\CommerceAuditActor;
 use App\Domain\Commerce\Models\ExclusiveSale;
 use App\Domain\Commerce\Models\InventoryReservation;
 use App\Domain\Commerce\Models\Quote;
@@ -9,41 +10,45 @@ use App\Domain\Commerce\Models\RightsScope;
 use App\Domain\Commerce\Models\RightsScopeOffer;
 use App\Domain\Commerce\QuoteException;
 use App\Domain\Commerce\ReadQuote;
+use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /** Test inventory exercise on verified provisional quotes. No exclusive offer, price, order or rights grant is created. */
 final class ReserveQuoteInventory
 {
-    public function hold(string $quoteId, string $ownerKey): InventoryReservation
+    public function hold(string $quoteId, string $ownerKey, ?User $actor = null): InventoryReservation
     {
-        return $this->handle($quoteId, $ownerKey, null);
+        return $this->handle($quoteId, $ownerKey, null, false, $actor);
     }
 
     /** Verify an existing hold without creating, expiring or transitioning any reservation. */
-    public function read(string $quoteId, string $ownerKey): InventoryReservation
+    public function read(string $quoteId, string $ownerKey, ?User $actor = null): InventoryReservation
     {
-        return $this->handle($quoteId, $ownerKey, null, true);
+        return $this->handle($quoteId, $ownerKey, null, true, $actor);
     }
 
     /** Future WP-07 must commit an order/intent binding in this transaction before any provider call. */
-    public function beginAttempt(string $quoteId, string $ownerKey, string $attemptId): InventoryReservation
+    public function beginAttempt(string $quoteId, string $ownerKey, string $attemptId, ?User $actor = null): InventoryReservation
     {
         if (! preg_match('/\A[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/D', $attemptId)) {
             throw new QuoteException('INVALID_QUOTE_REQUEST', 422);
         }
 
-        return $this->handle($quoteId, $ownerKey, $attemptId);
+        return $this->handle($quoteId, $ownerKey, $attemptId, false, $actor);
     }
 
-    private function handle(string $quoteId, string $ownerKey, ?string $attemptId, bool $readOnly = false): InventoryReservation
+    private function handle(string $quoteId, string $ownerKey, ?string $attemptId, bool $readOnly = false, ?User $actor = null): InventoryReservation
     {
         InventoryPolicy::requireTestEnvironment();
 
-        return DB::transaction(function () use ($quoteId, $ownerKey, $attemptId, $readOnly) {
+        return DB::transaction(function () use ($quoteId, $ownerKey, $attemptId, $readOnly, $actor) {
+            // Explicit customer identity precedes resource locks; null remains anonymous/system.
+            $actorId = app(CommerceAuditActor::class)->lock($actor);
             // Quote -> sorted tracks/offers -> sorted scopes -> reservations/claims.
             // Future combined checkout must acquire pricing/campaign locks BEFORE calling this command.
             $quote = app(ReadQuote::class)->handle($quoteId, $ownerKey);
@@ -64,12 +69,14 @@ final class ReserveQuoteInventory
                 throw new QuoteException('INVENTORY_UNAVAILABLE', 409);
             }
             $at = now()->toImmutable()->utc()->startOfSecond();
-            if ($quote->expires_at->lessThanOrEqualTo($at)) { throw new QuoteException('QUOTE_EXPIRED', 410); }
+            if ($quote->expires_at->lessThanOrEqualTo($at)) {
+                throw new QuoteException('QUOTE_EXPIRED', 410);
+            }
             $bindings = $links->map(fn ($link) => ['scope_id' => $link->rights_scope_id,
                 'scope_public_id' => $scopes->firstWhere('id', $link->rights_scope_id)->public_id,
                 'link_id' => $link->id, 'offer_revision_id' => $link->offer_revision_id])->all();
             if (($quote->snapshot['schema_version'] ?? null) === 2) {
-                $retained = array_map(fn ($binding) => \Illuminate\Support\Arr::except($binding, ['scope_public_id']), $bindings);
+                $retained = array_map(fn ($binding) => Arr::except($binding, ['scope_public_id']), $bindings);
                 if (CanonicalJson::hash($retained) !== CanonicalJson::hash($quote->snapshot['scope_bindings']) ||
                     CanonicalJson::hash($policy) !== CanonicalJson::hash($quote->snapshot['inventory_policy'])) {
                     throw new QuoteException('INVENTORY_CHANGED', 409);
@@ -99,7 +106,9 @@ final class ReserveQuoteInventory
 
                     return $reservation;
                 }
-                if ($reservation->state !== 'held') { throw new QuoteException('INVENTORY_CHANGED', 409); }
+                if ($reservation->state !== 'held') {
+                    throw new QuoteException('INVENTORY_CHANGED', 409);
+                }
             } elseif ($attemptId !== null || $readOnly) {
                 throw new QuoteException('INVENTORY_NOT_FOUND', 404);
             }
@@ -119,7 +128,7 @@ final class ReserveQuoteInventory
                 if (! $readOnly) {
                     DB::table('inventory_reservations')->where('id', $other->id)->where('state', 'held')
                         ->update(['state' => 'expired', 'expired_at' => $at]);
-                    AuditEvent::record('commerce.inventory.expired', $other, ['public_id' => $other->public_id]);
+                    AuditEvent::recordAttributed('commerce.inventory.expired', $other, ['public_id' => $other->public_id], $actorId);
                 }
             }
             if (! $reservation) {
@@ -132,8 +141,8 @@ final class ReserveQuoteInventory
                 foreach ($scopeIds as $scopeId) {
                     DB::table('inventory_claims')->insert(['rights_scope_id' => $scopeId, 'inventory_reservation_id' => $reservation->id]);
                 }
-                AuditEvent::record('commerce.inventory.held', $reservation,
-                    ['public_id' => $id, 'quote_public_id' => $quote->public_id, 'snapshot_hash' => $reservation->snapshot_hash]);
+                AuditEvent::recordAttributed('commerce.inventory.held', $reservation,
+                    ['public_id' => $id, 'quote_public_id' => $quote->public_id, 'snapshot_hash' => $reservation->snapshot_hash], $actorId);
             }
             if ($attemptId !== null) {
                 if ($reservation->expires_at->lessThanOrEqualTo($at) || $at->lessThan($reservation->created_at)) {
@@ -142,8 +151,10 @@ final class ReserveQuoteInventory
                 try {
                     DB::table('inventory_reservations')->where('id', $reservation->id)->where('state', 'held')
                         ->update(['state' => 'pending', 'attempt_id' => $attemptId, 'pending_at' => $at]);
-                } catch (UniqueConstraintViolationException) { throw new QuoteException('INVENTORY_ATTEMPT_CONFLICT', 409); }
-                AuditEvent::record('commerce.inventory.pending', $reservation, ['public_id' => $reservation->public_id, 'attempt_id' => $attemptId]);
+                } catch (UniqueConstraintViolationException) {
+                    throw new QuoteException('INVENTORY_ATTEMPT_CONFLICT', 409);
+                }
+                AuditEvent::recordAttributed('commerce.inventory.pending', $reservation, ['public_id' => $reservation->public_id, 'attempt_id' => $attemptId], $actorId);
                 $reservation->refresh();
             }
             if ($reservation->expires_at->lessThanOrEqualTo(now()) || $quote->expires_at->lessThanOrEqualTo(now())) {

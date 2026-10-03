@@ -35,6 +35,8 @@ class PromotionMigrationTest extends TestCase
         $fulfillmentActivations = require database_path('migrations/2026_09_26_000022_test_fulfillment_activation.php');
         $delivery = require database_path('migrations/2026_09_26_000023_test_owner_delivery.php');
         $administration = require database_path('migrations/2026_09_29_000025_promotion_administration.php');
+        $exceptionOperations = require database_path('migrations/2026_10_02_000036_test_payment_exception_operations.php');
+        foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }
         foreach (['stripe_receipt_work', 'payment_observations', 'verified_payments'] as $table) { $this->assertDatabaseCount($table, 0); }
         foreach (['checkout_intents', 'checkout_sessions', 'checkout_observations'] as $table) {
             $this->assertDatabaseCount($table, 0);
@@ -42,7 +44,8 @@ class PromotionMigrationTest extends TestCase
         foreach (['orders', 'order_lines', 'order_attempts'] as $table) {
             $this->assertDatabaseCount($table, 0);
         }
-        $administration->down(); $delivery->down(); $fulfillmentActivations->down(); $contracts->down(); $finalizations->down(); $payments->down(); $checkout->down(); $orders->down(); $migration->down(); $migration->up(); $orders->up(); $checkout->up(); $payments->up(); $finalizations->up(); $contracts->up(); $fulfillmentActivations->up(); $delivery->up(); $administration->up();
+        $exceptionOperations->down(); $administration->down(); $delivery->down(); $fulfillmentActivations->down(); $contracts->down(); $finalizations->down(); $payments->down(); $checkout->down(); $orders->down(); $migration->down(); $migration->up(); $orders->up(); $checkout->up(); $payments->up(); $finalizations->up(); $contracts->up(); $fulfillmentActivations->up(); $delivery->up(); $administration->up(); $exceptionOperations->up();
+        foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }
         $this->assertSame($hash, $pricing->refresh()->snapshot_hash);
         $this->assertSame($hash, CanonicalJson::hash(app(PricingSnapshot::class)->verify($pricing, $quote)));
         PromotionFixtures::configure([PromotionFixtures::policy()]);

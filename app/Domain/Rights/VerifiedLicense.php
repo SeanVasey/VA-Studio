@@ -6,6 +6,8 @@ use App\Domain\Rights\Models\LicenseReviewEvidence;
 use App\Domain\Rights\Models\LicenseVersion;
 use App\Support\CanonicalJson;
 use Carbon\CarbonInterface;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -14,18 +16,39 @@ final class VerifiedLicense
     public function available(LicenseVersion $version, ?CarbonInterface $at = null): bool
     {
         try {
-            $version = $version->fresh();
-            if (! $version || $version->status !== 'published' || ! $version->published_at) {
-                return false;
-            }
-            $this->assertReviewed($version);
-            $at ??= now();
-
-            return (! $version->effective_from || $at->greaterThanOrEqualTo($version->effective_from))
-                && (! $version->effective_until || $at->lessThan($version->effective_until));
+            return $this->availableVersion($version->fresh(), $at);
         } catch (Throwable) {
             return false;
         }
+    }
+
+    /** Publication callers already hold actor, track and offer locks before this license fence. */
+    public function availableForPublication(LicenseVersion $version, ?CarbonInterface $at = null): bool
+    {
+        if (DB::transactionLevel() === 0) {
+            return false;
+        }
+        try {
+            // A nonlocking fresh() would reuse an earlier REPEATABLE READ snapshot after a wait.
+            return $this->availableVersion(LicenseVersion::query()->lockForUpdate()->find($version->id), $at);
+        } catch (QueryException $error) {
+            // A lock failure must abort the caller transaction, not become an eligibility blocker.
+            throw $error;
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
+    private function availableVersion(?LicenseVersion $version, ?CarbonInterface $at): bool
+    {
+        if (! $version || $version->status !== 'published' || ! $version->published_at) {
+            return false;
+        }
+        $this->assertReviewed($version);
+        $at ??= now();
+
+        return (! $version->effective_from || $at->greaterThanOrEqualTo($version->effective_from))
+            && (! $version->effective_until || $at->lessThan($version->effective_until));
     }
 
     public function assertSubmitted(LicenseVersion $version): void

@@ -3,10 +3,12 @@
 namespace App\Application\Media;
 
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Media\MediaWriterActor;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\PrivateMediaFiles;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
+use Illuminate\Database\DeadlockException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -63,6 +65,8 @@ final class IngestMediaUpload
         } finally {
             fclose($stream);
         }
+        $transactionLevel = DB::transactionLevel();
+        $committing = false;
         try {
             if ($disk->size($path) !== $size || ! hash_equals($hash, hash_file('sha256', $disk->path($path)))) {
                 throw new RuntimeException('Upload integrity verification failed.');
@@ -70,7 +74,10 @@ final class IngestMediaUpload
             $name = basename(str_replace('\\', '/', $upload->getClientOriginalName()));
             $name = Str::limit(preg_replace('/[\x00-\x1F\x7F]/', '', $name), 240, '');
 
-            return DB::transaction(function () use ($track, $role, $path, $name, $mime, $size, $hash, $actor) {
+            return DB::transaction(function () use ($track, $role, $path, $name, $mime, $size, $hash, $actor, &$committing) {
+                // Upload copying stays outside our mutation locks; authority is current at commit.
+                $actor = app(MediaWriterActor::class)->authorize($actor);
+                $track = Track::query()->lockForUpdate()->findOrFail($track->id);
                 $asset = MediaAsset::create([
                     'track_id' => $track->id,
                     'role' => $role,
@@ -84,11 +91,16 @@ final class IngestMediaUpload
                     'technical_metadata' => ['acquired_by' => $actor->id],
                 ]);
                 AuditEvent::record('media.upload.quarantined', $asset, ['role' => $role, 'sha256' => $hash, 'size_bytes' => $size], $actor->id);
+                $committing = true;
 
                 return $asset;
             });
         } catch (Throwable $exception) {
-            $disk->delete($path);
+            // A commit error can follow a durable write. A failed rollback can leave rows
+            // pending, as can Laravel's nested DeadlockException path, which skips rollback.
+            if (! $committing && ! $exception instanceof DeadlockException && DB::transactionLevel() === $transactionLevel) {
+                $disk->delete($path);
+            }
             throw $exception;
         }
     }

@@ -2,6 +2,8 @@
 
 Status: **Stripe test-event receipts, private test orders, hosted test checkout and durable authoritative payment verification are merged. Local/testing finalization, grants, pending fulfillment and customer status merged in PR #64. The broader work package and issue #7 remain open.** Operator exception resolution, production payment policy and the acceptance evidence below remain required.
 
+T19-OPS-01 now has a bounded [operational history candidate](../test-payment-exception-operations.md): audited acknowledgment/review dispositions and leased own-account GET-only test-payment observations. It preserves terminal `paid_exception`, pending resources and blocked fulfillment. This is not financial resolution or completion of T19; the integrating merge request must bind its final tests, review and acceptance.
+
 - Suggested issue title: `[WP-07] Hosted checkout, durable payment inbox and idempotent finalization`
 - Phase: 2
 - Dependencies: WP-06; WP-04 grants schema and WP-08 render interface must agree. Live payments require U-04/U-05/U-08.

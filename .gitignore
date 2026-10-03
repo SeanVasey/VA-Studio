@@ -50,3 +50,4 @@ __pycache__/
 /focused-ci-*
 /phpunit-focused.xml
 /phpunit-ci-*
+/gitlab-ci-evidence/

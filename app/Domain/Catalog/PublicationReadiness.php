@@ -6,11 +6,12 @@ use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\Models\OfferRevision;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Media\Models\MediaAsset;
-use App\Domain\Media\VerifiedMedia;
 use App\Domain\Media\RecordingAssociation;
+use App\Domain\Media\VerifiedMedia;
 use App\Domain\Rights\Models\LicenseVersion;
 use App\Domain\Rights\VerifiedLicense;
 use App\Support\CanonicalJson;
+use Illuminate\Database\QueryException;
 use Throwable;
 
 class PublicationReadiness
@@ -20,17 +21,24 @@ class PublicationReadiness
         return $this->draftEvidenceBlockers($offer, 'non-exclusive');
     }
 
+    /** Caller holds actor, track and offer locks; eligibility must follow the current license fence. */
+    public function draftBlockersForPublication(Offer $offer): array
+    {
+        return $this->draftEvidenceBlockers($offer, 'non-exclusive', true);
+    }
+
     /** Internal preparation only. Public publication still requires a non-exclusive license. */
     public function exclusiveDraftBlockers(Offer $offer): array
     {
         return $this->draftEvidenceBlockers($offer, 'exclusive');
     }
 
-    private function draftEvidenceBlockers(Offer $offer, string $type): array
+    private function draftEvidenceBlockers(Offer $offer, string $type, bool $currentLicense = false): array
     {
         $blockers = [];
-        $license = $offer->licenseVersion()->first();
-        if (! $license || ! app(VerifiedLicense::class)->available($license)) {
+        $license = $currentLicense ? $offer->licenseVersion()->lockForUpdate()->first() : $offer->licenseVersion()->first();
+        $verifier = app(VerifiedLicense::class);
+        if (! $license || ! ($currentLicense ? $verifier->availableForPublication($license) : $verifier->available($license))) {
             return ['An offer needs a published, effective license with intact review evidence.'];
         }
         if ($offer->price_minor <= 0 || $offer->price_minor > 2147483647 || $offer->currency !== 'USD') {
@@ -97,7 +105,7 @@ class PublicationReadiness
         if (($revision->snapshot['schema_version'] ?? null) === 2) {
             try {
                 app(ExclusiveActivationEvidence::class)->current($revision);
-            } catch (\Illuminate\Database\QueryException $exception) {
+            } catch (QueryException $exception) {
                 throw $exception;
             } catch (Throwable) {
                 return ['An intact explicit test activation is required for this exclusive revision.'];

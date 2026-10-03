@@ -27,7 +27,7 @@ final class QuoteController
         }
 
         try {
-            return $this->present($create->handle($owner->forRequest($request), $key, $items));
+            return $this->present($create->handle($owner->forRequest($request), $key, $items, $request->user()));
         } catch (QuoteException $exception) {
             return $this->failure($exception);
         }
@@ -64,7 +64,7 @@ final class QuoteController
             return $this->failure(new QuoteException('INVALID_QUOTE_REQUEST', 422));
         }
         try {
-            return $this->response(['pricing' => app(PricingSnapshot::class)->present($pricing->create($quote, $owner->forRequest($request)))]);
+            return $this->response(['pricing' => app(PricingSnapshot::class)->present($pricing->create($quote, $owner->forRequest($request), $request->user()))]);
         } catch (QuoteException $exception) {
             return $this->failure($exception);
         }
@@ -73,7 +73,7 @@ final class QuoteController
     public function pricing(string $quote, Request $request, QuoteOwner $owner, PriceQuote $pricing): JsonResponse
     {
         try {
-            return $this->response(['pricing' => app(PricingSnapshot::class)->present($pricing->read($quote, $owner->forRequest($request)))]);
+            return $this->response(['pricing' => app(PricingSnapshot::class)->present($pricing->read($quote, $owner->forRequest($request), $request->user()))]);
         } catch (QuoteException $exception) {
             return $this->failure($exception);
         }
@@ -92,7 +92,7 @@ final class QuoteController
         }
         try {
             return $this->response(['pricing' => app(PricingSnapshot::class)->present(
-                $pricing->createWithPromotion($quote, $owner->forRequest($request), $body->promotionCode))]);
+                $pricing->createWithPromotion($quote, $owner->forRequest($request), $body->promotionCode, $request->user()))]);
         } catch (QuoteException $exception) {
             return $this->failure($exception);
         }
@@ -167,7 +167,7 @@ final class QuoteController
             'PRICING_NOT_FOUND' => 'This selection does not have a pricing review.',
             'PRICING_EXPIRED' => 'This pricing review has expired. Review your selection again.',
             'PRICING_CHANGED' => 'Pricing rules have changed. Start a new selection review.',
-            'PRICING_UNAVAILABLE' => 'Pricing is temporarily unavailable. Try again later.',
+            'COMMERCE_UNAVAILABLE', 'PRICING_UNAVAILABLE' => 'Pricing is temporarily unavailable. Try again later.',
             'PROMOTION_UNAVAILABLE' => 'This promotion is unavailable.',
             'PROMOTION_NOT_ELIGIBLE' => 'This selection does not qualify for that promotion.',
             'PROMOTION_LIMIT_REACHED' => 'This promotion has reached its usage limit.',

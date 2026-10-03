@@ -8,7 +8,9 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\Process;
+use Tests\Support\LicenseFixtures;
 use Tests\Support\RecordingFixtures;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -24,10 +26,24 @@ class StemsRecordingConcurrencyTest extends TestCase
         }
     }
 
-    public function test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation(): void
+    public static function confirmations(): array
+    {
+        return [
+            'conflicting / root transaction' => [false, false],
+            'identical / root transaction' => [true, false],
+            'conflicting / old caller snapshot' => [false, true],
+            'identical / old caller snapshot' => [true, true],
+        ];
+    }
+
+    #[DataProvider('confirmations')]
+    public function test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation(bool $identical, bool $callerTransaction): void
     {
         $this->fakePrivateMediaStorage();
         ['actor' => $actor, 'track' => $track, 'stems' => $stems, 'data' => $data] = RecordingFixtures::draft();
+        // Distinct authorized actors let both workers reach the shared track fence.
+        $actors = [$actor, LicenseFixtures::admin()];
+        $this->assertNotSame($actors[0]->id, $actors[1]->id);
         $this->assertSame(0, DB::transactionLevel(), 'Fixtures must be committed before separate processes read them.');
         $directory = storage_path('framework/testing/stems-race-'.Str::uuid());
         $filesystem = new Filesystem;
@@ -44,7 +60,9 @@ class StemsRecordingConcurrencyTest extends TestCase
                     'DB_CHARSET' => (string) $database['charset'], 'DB_COLLATION' => (string) $database['collation'],
                     'CACHE_STORE' => 'array', 'SESSION_DRIVER' => 'array', 'QUEUE_CONNECTION' => 'sync',
                     'VASEY_STEMS_RACE_DIRECTORY' => $directory, 'VASEY_STEMS_RACE_WORKER' => (string) $worker,
-                ], json_encode(['stems_id' => $stems->id, 'actor_id' => $actor->id, 'data' => $data, 'media_root' => Storage::disk('local')->path('')], JSON_THROW_ON_ERROR), 40);
+                ], json_encode(['stems_id' => $stems->id, 'actor_id' => $actors[$worker]->id, 'data' => $data,
+                    'verification_reference' => $identical ? 'SYNTHETIC SAME EXPORT' : 'SYNTHETIC EXPORT '.$worker,
+                    'caller_transaction' => $callerTransaction, 'media_root' => Storage::disk('local')->path('')], JSON_THROW_ON_ERROR), 40);
                 $process->start();
                 $processes[] = $process;
             }
@@ -76,16 +94,35 @@ SQL;
             foreach ($processes as $process) {
                 $process->wait();
                 $this->assertSame(0, $process->getExitCode(), 'Recording worker failed: '.$process->getOutput().$process->getErrorOutput());
-                $results[] = json_decode($process->getOutput(), true, 16, JSON_THROW_ON_ERROR);
+                $output = $process->getOutput();
+                $this->assertJson($output, 'Recording worker emitted invalid JSON: '.$output.$process->getErrorOutput());
+                $results[] = json_decode($output, true, 16, JSON_THROW_ON_ERROR);
             }
             $this->assertCount(3, array_unique([...array_column($results, 'pid'), getmypid()]));
             $this->assertSame('saved', $results[$winner]['result']);
-            $this->assertSame('rejected', $results[$loser]['result']);
-            $this->assertStringContainsString('already associated', $results[$loser]['errors']['master_asset_id'][0]);
+            if ($identical) {
+                $this->assertSame('saved', $results[$loser]['result']);
+                $this->assertSame($results[$winner]['binding_id'], $results[$loser]['binding_id']);
+            } else {
+                $this->assertSame('rejected', $results[$loser]['result']);
+                $this->assertStringContainsString('already associated', $results[$loser]['errors']['master_asset_id'][0]);
+            }
+            foreach ($results as $worker => $result) {
+                $this->assertSame($ids[$worker], $result['connection_id']);
+                $this->assertSame($callerTransaction ? 1 : 0, $result['caller_transaction_level']);
+                $this->assertSame(0, $result['transaction_level']);
+                if ($callerTransaction) {
+                    $this->assertSame(0, $result['snapshot_before']);
+                    // The loser still cannot see the winning row through its ordinary caller snapshot.
+                    $this->assertSame($worker === $winner ? 1 : 0, $result['snapshot_after']);
+                }
+            }
             $binding = StemsRecording::sole();
-            $this->assertSame('SYNTHETIC EXPORT '.$winner, $binding->verification_reference);
+            $this->assertSame($identical ? 'SYNTHETIC SAME EXPORT' : 'SYNTHETIC EXPORT '.$winner, $binding->verification_reference);
             $this->assertSame($results[$winner]['binding_id'], $binding->id);
+            $this->assertSame($actors[$winner]->id, $binding->verified_by);
             $this->assertSame(1, AuditEvent::where('action', 'media.stems.recording_associated')->count());
+            $this->assertSame($actors[$winner]->id, AuditEvent::where('action', 'media.stems.recording_associated')->sole()->actor_id);
         } finally {
             foreach ($processes as $process) {
                 if ($process->isRunning()) {

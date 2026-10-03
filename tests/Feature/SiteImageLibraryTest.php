@@ -253,10 +253,58 @@ class SiteImageLibraryTest extends TestCase
     public function test_an_rgb_jpeg_declared_by_an_adobe_marker_is_prepared(): void
     {
         // Three 8-bit components with Adobe transform 0 are RGB samples, which FFmpeg decodes as planar RGB.
-        $image = $this->process($this->ingest('studio', F::jpeg(1440, 630, ['adobe_rgb' => true])));
+        $image = $this->process($this->ingest('studio', F::rgbJpeg(1440, 630)));
 
         $this->assertSame(['ready', null, 'gbrp'], [$image->status, $image->failure_code, $image->evidence['pixel_format'] ?? null]);
         $this->assertSame(6, $image->variants()->count());
+    }
+
+    public function test_jpeg_fixtures_encode_explicit_sampling_progressive_scans_and_true_rgb_samples(): void
+    {
+        $frameHeader = function (string $jpeg): array {
+            for ($offset = 2; $offset < strlen($jpeg);) {
+                $this->assertSame("\xFF", $jpeg[$offset]);
+                $marker = ord($jpeg[$offset + 1]);
+                $length = unpack('n', $jpeg, $offset + 2)[1];
+                if (in_array($marker, [0xC0, 0xC2], true)) {
+                    return [$marker, substr($jpeg, $offset + 4, $length - 2)];
+                }
+                $this->assertNotSame(0xDA, $marker, 'The frame header must precede the scan.');
+                $offset += $length + 2;
+            }
+            $this->fail('The fixture must contain a real JPEG frame header.');
+        };
+        $baseline = F::jpeg(48, 24);
+        [$marker, $header] = $frameHeader($baseline);
+        $this->assertSame(0xC0, $marker);
+        $this->assertSame([8, 24, 48, 3], array_values(unpack('Cprecision/nheight/nwidth/Ccomponents', $header)));
+        // Equal sampling factors prove no chroma subsampling; FFmpeg may group two rows in each component's MCU.
+        $this->assertSame([$header[7], $header[7]], [$header[10], $header[13]]);
+        $pattern = imagecreatefromstring($baseline);
+        $this->assertInstanceOf(\GdImage::class, $pattern);
+        $this->assertColour(F::BLOCK, $pattern, 4, 4);
+        $this->assertColour(F::FIELD, $pattern, 40, 20);
+        imagedestroy($pattern);
+        $this->assertSame(0xC2, $frameHeader(F::jpeg(48, 24, ['progressive' => true]))[0]);
+
+        $rgb = F::rgbJpeg(48, 24);
+        [$marker, $header] = $frameHeader($rgb);
+        $this->assertSame(0xC0, $marker);
+        $this->assertSame([0x11, 0x11, 0x11], [ord($header[7]), ord($header[10]), ord($header[13])]);
+        $this->assertStringContainsString("\xFF\xEE\x00\x0EAdobe".pack('nnn', 100, 0, 0)."\0", $rgb);
+        $directory = sys_get_temp_dir().'/site-image-rgb-proof-'.Str::uuid();
+        mkdir($directory, 0700);
+        try {
+            file_put_contents($directory.'/rgb.jpg', $rgb);
+            $this->assertSame(['width' => 48, 'height' => 24, 'pix_fmt' => 'gbrp'],
+                app(SiteImageInspection::class)->inspect($directory.'/rgb.jpg', 'image/jpeg', $directory));
+            $decoded = (new Process([config('media.ffmpeg'), '-nostdin', '-hide_banner', '-loglevel', 'error',
+                '-threads', '1', '-filter_threads', '1', '-f', 'jpeg_pipe', '-i', $directory.'/rgb.jpg',
+                '-frames:v', '1', '-threads:v', '1', '-pix_fmt', 'rgb24', '-f', 'rawvideo', 'pipe:1']))->setTimeout(30)->mustRun()->getOutput();
+            $this->assertSame(str_repeat("\x80", 48 * 24 * 3), $decoded);
+        } finally {
+            (new Filesystem)->deleteDirectory($directory);
+        }
     }
 
     public function test_a_valid_upload_is_quarantined_with_its_provenance_and_queued(): void

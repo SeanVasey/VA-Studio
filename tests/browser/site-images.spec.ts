@@ -8,7 +8,10 @@ const password = process.env.VASEY_BROWSER_PASSWORD!;
 
 /** A 1440 x 630 test-pattern JPEG from the fixture the PHP tests use. */
 function studioJpeg(): Buffer {
-  return execFileSync('php', ['-r', 'require "vendor/autoload.php"; echo Tests\\Support\\SiteImageFixtures::jpeg(1440, 630);'], {
+  const fixture = 'require "vendor/autoload.php"; $app = require "bootstrap/app.php"; '
+    + '$app->make(Illuminate\\Contracts\\Console\\Kernel::class)->bootstrap(); '
+    + 'echo Tests\\Support\\SiteImageFixtures::jpeg(1440, 630);';
+  return execFileSync('php', ['-r', fixture], {
     cwd: process.cwd(), env: process.env, stdio: ['ignore', 'pipe', 'pipe'], timeout: 30_000, maxBuffer: 8 * 1024 * 1024,
   });
 }

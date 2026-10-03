@@ -1,14 +1,27 @@
 # Development CI strategy
 
-Status: T01/T02 implementation candidate, September 30, 2026 (America/Chicago). The integrating change adds informative focused feedback, conservative documentation routing, an explicit full-mode aggregate and refreshed timing weights. Full cloud acceptance is pending; branch protection is unchanged. Draft suppression and runtime post-merge deduplication remain proposed follow-ups.
+Status: October 2, 2026 (America/Chicago). Focused feedback, conservative documentation routing, full-mode aggregate, exact database receipts and timing increments are accepted and exercised by the completed PR #105 gate. T01/T02 parent criteria remain open. Draft suppression and runtime postmerge deduplication remain proposed; runtime proof reuse is disabled. The [current execution queue](development-control.md) records the hosted startup restriction and component cadence.
 
 ## Current increment
 
-The [focused feedback workflow](verification/focused-ci.md), [documentation routing](verification/ci-scope.md), and [timing refresh](verification/ci-throughput.md) are implemented in this candidate. Runtime PRs, runtime main pushes and full dispatch still execute the complete suite. The backend aggregate now also requires frontend/browser success. No runtime post-merge evidence reuse, schedule or draft suppression is introduced. Later sections distinguish the longer-term target from this bounded implementation.
+The [focused feedback workflow](verification/focused-ci.md), [documentation routing](verification/ci-scope.md), and [timing refresh](verification/ci-throughput.md) are implemented in the verified baseline. Runtime PRs, runtime main pushes and full dispatch still execute the complete suite. The backend aggregate now also requires frontend/browser success. No runtime post-merge evidence reuse, schedule or draft suppression is introduced. Later sections distinguish the longer-term target from this bounded implementation.
 
 ## Observed evidence
 
-Main: `8be3bd7271595f2c21a3c5017b3b19ceb821a842`. [Current workflow](../.github/workflows/ci.yml) runs ten jobs on PR events, main pushes and full manual dispatch. [PR #68's accepted trigger change](verification/ci-trigger-efficiency.md) already removed duplicate feature-branch push runs. A draft PR currently runs the same suite as a ready PR.
+Current main is `cae053efbc2019c849269605df030a36a620484e`. [PR #105 Foundation 37009596349, attempt 2](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/37009596349) passed all thirteen applicable full jobs. Its whole-job timings were:
+
+| Suite | Minutes |
+| --- | ---: |
+| MySQL shards 1–4 | 49.63 / 39.88 / 41.50 / 42.53 |
+| SQLite shards 1–2 | 13.75 / 13.33 |
+| Chromium / WebKit | 7.92 / 18.33 |
+| Genuine related browsers | 8.88 |
+
+These are measured job durations for this source, not same-source before/after proof of a speedup. The separate main run failed to start because of account payment authorization, executing zero jobs. Preserve passing PR evidence; do not retry hosted workflows until the account restriction is resolved.
+
+The [current workflow](../.github/workflows/ci.yml) retains complete runtime PR/main gates and full dispatch. Draft PRs still run full checks. [PR #68's trigger change](verification/ci-trigger-efficiency.md) removed duplicate feature-branch push runs. Frontend/browser success is required by the strict aggregate, and six actual current-source database receipts are required. Protection settings remain unverified; do not infer absence of enforcement or change repository settings.
+
+### Historical September 30 baseline
 
 [PR #87 run 36795680362](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36795680362) passed all ten jobs in 62m06s. Its actual test-step durations were:
 
@@ -26,19 +39,19 @@ MySQL containers took 33–42 seconds, media/PDF packages 20–44 seconds and Co
 
 The three largest files on shard 1 were `TestOrderFinalizationTest` (25m29s), `TestOwnerDeliveryProjectionTest` (11m52s) and `SiteScheduleRunnerTest` (5m09s). This is observed execution time, not proof of a database-setting or runner-hardware defect.
 
-Timing weights currently use PR #82 evidence: 121 files and 1,744 cases. The present suite has 123 files and 1,870 cases; newly untimed files receive fallback weights rather than being omitted. Current estimated weights are around 24m26s per MySQL shard. Retrospective whole-file balancing from the latest JUnit suggests approximately 35m30s per shard under identical timings. Runner variability and changed file placement make that an experiment, not a promised result.
+At this historical baseline, timing weights used PR #82 evidence: 121 files and 1,744 cases. The present suite has 123 files and 1,870 cases; newly untimed files receive fallback weights rather than being omitted. Current estimated weights are around 24m26s per MySQL shard. Retrospective whole-file balancing from the latest JUnit suggests approximately 35m30s per shard under identical timings. Runner variability and changed file placement make that an experiment, not a promised result.
 
-The existing `backend` aggregate uses `always()` and requires successful quality, MySQL and SQLite jobs. Preserve this fail-closed behavior. Frontend/browser are separate jobs. Classic branch-protection inspection returned 403 (integration lacks access); the readable rulesets list was empty. Actual enforced check names therefore remain unverified. Do not infer that protection is absent or change repository settings based on that result.
+At this historical baseline the `backend` aggregate used `always()` and requires successful quality, MySQL and SQLite jobs. Preserve this fail-closed behavior. Frontend/browser are separate jobs. Classic branch-protection inspection returned 403 (integration lacks access); the readable rulesets list was empty. Actual enforced check names therefore remain unverified. Do not infer that protection is absent or change repository settings based on that result.
 
-## Immediate process improvement
+## Current process
 
-Before T01 changes workflows, compose related work on a branch without a PR, run available focused checks, review the candidate, then open one ready PR. Branch pushes are durable without starting Foundation CI under current triggers. Continue existing full PR/main gates until the revised policy is actually accepted.
+Compose related work on a branch without a PR, run available focused checks, review the candidate, then open one ready PR. Branch pushes are durable without starting Foundation CI under current triggers. Continue existing full PR/main gates until the revised policy is actually accepted.
 
 Do not make tiny status-only commits after successful CI just to insert that run's result into the same source. Put exact run results in the PR body and update durable status in the next substantive batch. A changed runtime candidate always needs fresh acceptance.
 
-During preparation, a compatible PHP 8.4.26 runtime and exact-lock dependency caches were recovered from an earlier same-project workspace. A reconstructed checkout matches all 764 baseline Git blobs and actual PHPUnit discovery matches 123 files /1,870 cases. Focused local SQLite/PHP checks are now available; a Composer executable, local MySQL and qpdf remain unavailable at this checkpoint. Focused cloud execution supplies the database/tool environments that local checks lack. Record each actual test environment separately.
+At the earlier preparation checkpoint, a compatible PHP 8.4.26 runtime and exact-lock dependency caches were recovered from an earlier same-project workspace. A reconstructed checkout matches all 764 baseline Git blobs and actual PHPUnit discovery matches 123 files /1,870 cases. Focused local SQLite/PHP checks are now available; a Composer executable, local MySQL and qpdf remain unavailable at this checkpoint. Focused cloud execution supplies the database/tool environments that local checks lack. Record each actual test environment separately.
 
-## Target verification tiers
+## Target verification tiers and current limits
 
 | Situation | Required evidence | Full MySQL frequency |
 | --- | --- | --- |
@@ -49,7 +62,7 @@ During preparation, a compatible PHP 8.4.26 runtime and exact-lock dependency ca
 | Safety backstop / release | Full run on a new unverified integrated tree or changed runtime inputs; release always has current complete proof | At most one change-aware backstop per active day plus explicit release/manual runs; do not rerun an unchanged fully verified tree automatically |
 | Any unclear path, classification error or incomplete proof | Full checks or blocked acceptance | Full by default |
 
-These are target behaviors, not existing capabilities. A real scheduled workflow is not created by this plan. Choose its schedule and deduplication contract in T01; scheduled runs never substitute for pre-merge proof.
+Focused feedback and conservative documentation routing are implemented. Postmerge provenance reuse, draft suppression and the bounded backstop remain target behaviors, not existing capabilities; current runtime main checks remain full. A real scheduled workflow is not created by this plan. Choose its schedule and deduplication contract in T01; scheduled runs never substitute for pre-merge proof.
 
 A three-deliverable example: three separate PR/main pairs can cause six full runs before corrective pushes. One coherent batch with full pre-merge checks and a proven post-merge smoke path would need one full run plus focused checks. This illustrates reduced frequency, not measured savings or permission to omit new-source verification.
 
@@ -89,7 +102,7 @@ T01 is complete only when the intended event/aggregate behavior is observed, req
 
 ## References
 
-- [Current Foundation CI](https://github.com/VASEYDEV/VASEYAUDIO/blob/8be3bd7271595f2c21a3c5017b3b19ceb821a842/.github/workflows/ci.yml)
+- [Historical Foundation CI baseline](https://github.com/VASEYDEV/VASEYAUDIO/blob/8be3bd7271595f2c21a3c5017b3b19ceb821a842/.github/workflows/ci.yml)
 - [Accepted trigger policy](verification/ci-trigger-efficiency.md)
 - [Partitioner](../scripts/ci/phpunit-shards.py), [timing tool](../scripts/ci/phpunit-timings.py), [partition safeguards](../scripts/ci/test-phpunit-shards.py)
 - [GitHub required status checks](https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks): skipped workflows can leave checks pending; conditional jobs and dependent aggregates need explicit handling; manual dispatch checks are not a substitute for an eligible PR required-check event.

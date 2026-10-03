@@ -32,7 +32,7 @@ final class OrderController
 
     public function review(string $quote, Request $request, QuoteOwner $owner, ReviewOrder $review): JsonResponse
     {
-        return $this->run(fn () => ['review' => $review->handle($quote, $owner->forRequest($request))]);
+        return $this->run(fn () => ['review' => $review->handle($quote, $owner->forRequest($request), $request->user())]);
     }
 
     public function store(Request $request, QuoteOwner $owner, PrepareOrder $prepare, ReadOrder $read): JsonResponse
@@ -44,7 +44,7 @@ final class OrderController
                 throw new QuoteException('INVALID_ORDER_REQUEST', 422);
             }
 
-            return ['order' => $read->present($prepare->handle($owner->forRequest($request), $key, $body))];
+            return ['order' => $read->present($prepare->handle($owner->forRequest($request), $key, $body, $request->user()))];
         });
     }
 
@@ -88,7 +88,7 @@ final class OrderController
                 'ORDER_ALREADY_PREPARED' => 'This selection already has a prepared order. Reload to recover its status.',
                 'IDEMPOTENCY_CONFLICT' => 'This request key belongs to a different order request.',
                 'INVALID_ORDER_REQUEST', 'INVALID_QUOTE_REQUEST' => 'Enter your name and email and accept the displayed terms.',
-                'ORDER_POLICY_UNAVAILABLE', 'ORDER_PRICING_UNAVAILABLE' => 'Test order preparation is currently unavailable.',
+                'COMMERCE_UNAVAILABLE', 'ORDER_POLICY_UNAVAILABLE', 'ORDER_PRICING_UNAVAILABLE' => 'Test order preparation is currently unavailable.',
                 default => 'This order review is no longer available. Review your selection again.',
             }], $exception->status);
         } catch (Throwable) {

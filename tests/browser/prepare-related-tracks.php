@@ -30,12 +30,17 @@ use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Queue\SyncQueue;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Process\Exception\ExceptionInterface;
 use Symfony\Component\Process\Process;
 
 /** CLI-only disposable fixture orchestration. No application route or default browser wrapper invokes it. */
@@ -52,11 +57,11 @@ final class RelatedTrackBrowserFixture
     {
         $category = match (true) {
             $error instanceof MediaFailure => 'media',
-            $error instanceof \Illuminate\Validation\ValidationException => 'validation',
-            $error instanceof \Illuminate\Database\QueryException => 'database',
-            $error instanceof \Illuminate\Auth\Access\AuthorizationException => 'authorization',
-            $error instanceof \Illuminate\Database\Eloquent\ModelNotFoundException => 'missing-record',
-            $error instanceof \Symfony\Component\Process\Exception\ExceptionInterface => 'process',
+            $error instanceof ValidationException => 'validation',
+            $error instanceof QueryException => 'database',
+            $error instanceof AuthorizationException => 'authorization',
+            $error instanceof ModelNotFoundException => 'missing-record',
+            $error instanceof ExceptionInterface => 'process',
             $error instanceof TypeError => 'type',
             $error instanceof Error => 'php-error',
             $error instanceof RuntimeException => 'runtime',
@@ -71,7 +76,7 @@ final class RelatedTrackBrowserFixture
         $exitStatus = $error instanceof MediaFailure && is_int($error->exitCode) && $error->exitCode >= 0
             && $error->exitCode <= 255 ? $error->exitCode : null;
         $fields = [];
-        if ($error instanceof \Illuminate\Validation\ValidationException) {
+        if ($error instanceof ValidationException) {
             $allowed = ['authored_source', 'structured_terms', 'effective_from', 'effective_until', 'license', 'review_hash',
                 'title', 'slug', 'artist', 'bpm', 'musical_key', 'genre', 'mood', 'tags', 'description', 'upload', 'role',
                 'media', 'offer', 'deliverable_asset_ids', 'currency', 'price_minor', 'rights'];
@@ -96,7 +101,9 @@ final class RelatedTrackBrowserFixture
         $prepare = $arguments === ['prepare'];
         $verify = count($arguments) === 3 && $arguments[0] === 'verify'
             && in_array($arguments[1], self::PROJECTS, true) && in_array($arguments[2], ['published', 'withdrawn'], true);
-        self::require(PHP_SAPI === 'cli' && ($prepare || $verify) && is_string($directory) && ! is_link($directory)
+        $verifyPublication = count($arguments) === 2 && $arguments[0] === 'verify-publication'
+            && in_array($arguments[1], self::PROJECTS, true);
+        self::require(PHP_SAPI === 'cli' && ($prepare || $verify || $verifyPublication) && is_string($directory) && ! is_link($directory)
             && realpath($directory) === $directory && realpath(dirname($directory)) === realpath(sys_get_temp_dir())
             && preg_match('/\Avasey-browser-[A-Za-z0-9]+\z/D', basename($directory)) === 1
             && (fileperms($directory) & 0777) === 0700 && fileowner($directory) === posix_geteuid()
@@ -165,9 +172,13 @@ final class RelatedTrackBrowserFixture
             self::$phase = 'retained-evidence-verification';
             self::require(config('media.clamscan') === $directory.'/no-clamscan', 'unchanged HTTP scanner configuration');
             $manifest = self::json($directory.'/related-track-fixtures.json', 262144);
-            self::verify($manifest, $guard, $operator, $arguments[1], $arguments[2]);
+            $state = $arguments[0] === 'verify-publication' ? 'withdrawn' : $arguments[2];
+            self::verify($manifest, $guard, $operator, $arguments[1], $state);
+            if ($arguments[0] === 'verify-publication') {
+                self::verifyPublicationTrack($manifest, $arguments[1]);
+            }
 
-            return ['verified' => true, 'project' => $arguments[1], 'state' => $arguments[2], 'evidenceHash' => $manifest['evidenceHash'],
+            return ['verified' => true, 'project' => $arguments[1], 'state' => $arguments[0] === 'verify-publication' ? 'publication-ready' : $state, 'evidenceHash' => $manifest['evidenceHash'],
                 'retainedEvidence' => true, 'currentEligibility' => true];
         }
 
@@ -246,12 +257,13 @@ final class RelatedTrackBrowserFixture
         try {
             $projects = [];
             $records = [];
+            $publicationRecords = [];
             foreach (self::PROJECTS as $project) {
-                $projects[$project] = ['tracks' => []];
-                foreach ([0, 1] as $position) {
+                $projects[$project] = ['tracks' => [], 'publicationTrack' => null];
+                foreach ([0, 1, 2] as $position) {
                     self::$phase = 'track-metadata';
                     $title = $position === 0 ? str_pad('SyntheticRelated'.str_replace('-', '', $project), 255, 'W')
-                        : 'Synthetic related second track '.$project;
+                        : ($position === 1 ? 'Synthetic related second track ' : 'Synthetic reviewed publication track ').$project;
                     $track = app(SaveTrackMetadata::class)->handle(null, ['title' => $title, 'slug' => 'related-'.$project.'-'.($position + 1),
                         'artist' => 'Synthetic native fixture', 'genre' => 'Synthetic fixture', 'bpm' => 90, 'musical_key' => 'C minor'], $operator);
                     self::$phase = 'rights-declaration';
@@ -293,9 +305,14 @@ final class RelatedTrackBrowserFixture
                         'href' => route('tracks.show', $track->slug, false)];
                     self::require($track->published_slug === $track->slug && app(PublicCatalog::class)->relatedLinks([$track->id])
                         === [array_intersect_key($summary, array_flip(['title', 'artist', 'href']))], 'current eligible projection');
-                    $projects[$project]['tracks'][] = $summary;
                     self::$phase = 'retained-track-graph';
-                    $records[] = self::trackEvidence($track);
+                    if ($position === 2) {
+                        $projects[$project]['publicationTrack'] = $summary;
+                        $publicationRecords[] = self::trackEvidence($track);
+                    } else {
+                        $projects[$project]['tracks'][] = $summary;
+                        $records[] = self::trackEvidence($track);
+                    }
                 }
             }
             self::$phase = 'final-evidence-verification';
@@ -303,11 +320,12 @@ final class RelatedTrackBrowserFixture
             self::require(self::source() === $sourceIdentity, 'unchanged preparation source');
             $evidence = ['source' => $sourceIdentity, 'initialCounts' => $counts, 'operatorId' => $operator->id, 'reviewerId' => $reviewer->id,
                 'license' => self::licenseEvidence($license), 'scanner' => $scanner, 'tools' => $tools,
-                'detectionCanary' => 'scan_not_clean', 'tracks' => $records, 'audits' => self::audits(AuditEvent::where('id', '>', $auditStart)->orderBy('id')->get())];
-            $manifest = ['schemaVersion' => 1, 'marker' => $guard['marker'], 'origin' => 'http://127.0.0.1:8173',
+                'detectionCanary' => 'scan_not_clean', 'tracks' => $records, 'publicationTracks' => $publicationRecords, 'audits' => self::audits(AuditEvent::where('id', '>', $auditStart)->orderBy('id')->get())];
+            $manifest = ['schemaVersion' => 2, 'marker' => $guard['marker'], 'origin' => 'http://127.0.0.1:8173',
                 'database' => $directory.'/database.sqlite', 'projects' => $projects, 'evidence' => $evidence, 'evidenceHash' => CanonicalJson::hash($evidence)];
             foreach (self::PROJECTS as $project) {
                 self::verify($manifest, $guard, $operator, $project, 'published');
+                self::verifyPublicationTrack($manifest, $project);
             }
             $json = json_encode($manifest, self::JSON_FLAGS);
             self::require(strlen($json) <= 262144 && fwrite($stream, $json) === strlen($json) && fflush($stream), 'complete retained manifest');
@@ -315,13 +333,13 @@ final class RelatedTrackBrowserFixture
             fclose($stream); // Failed preparation retains only its own incomplete marker; it never resets evidence or retries.
         }
 
-        return ['state' => 'prepared', 'projects' => 2, 'tracks' => 4, 'evidenceHash' => $manifest['evidenceHash']];
+        return ['state' => 'prepared', 'projects' => 2, 'tracks' => 6, 'evidenceHash' => $manifest['evidenceHash']];
     }
 
     private static function verify(array $manifest, array $guard, User $operator, string $project, string $state): void
     {
         self::require(array_keys($manifest) === ['schemaVersion', 'marker', 'origin', 'database', 'projects', 'evidence', 'evidenceHash']
-            && $manifest['schemaVersion'] === 1 && $manifest['marker'] === $guard['marker'] && $manifest['origin'] === 'http://127.0.0.1:8173'
+            && $manifest['schemaVersion'] === 2 && $manifest['marker'] === $guard['marker'] && $manifest['origin'] === 'http://127.0.0.1:8173'
             && $manifest['database'] === $guard['directory'].'/database.sqlite' && array_keys($manifest['projects']) === self::PROJECTS
             && CanonicalJson::hash($manifest['evidence']) === $manifest['evidenceHash'], 'retained manifest identity');
         $evidence = $manifest['evidence'];
@@ -339,7 +357,7 @@ final class RelatedTrackBrowserFixture
         self::require(count($evidence['tracks']) === 4, 'four distinct track graphs');
         $projectIds = [];
         foreach ($manifest['projects'] as $fixture) {
-            self::require(is_array($fixture) && array_keys($fixture) === ['tracks'] && is_array($fixture['tracks'])
+            self::require(is_array($fixture) && array_keys($fixture) === ['tracks', 'publicationTrack'] && is_array($fixture['tracks'])
                 && array_is_list($fixture['tracks']) && count($fixture['tracks']) === 2, 'exact project graph shape');
             array_push($projectIds, ...array_column($fixture['tracks'], 'id'));
         }
@@ -348,6 +366,10 @@ final class RelatedTrackBrowserFixture
         foreach ($evidence['tracks'] as $record) {
             self::require(self::trackEvidence(Track::findOrFail($record['trackId'])) === $record, 'retained media rights and offer graph');
         }
+        $publicationIds = array_column(array_column($manifest['projects'], 'publicationTrack'), 'id');
+        self::require(count($evidence['publicationTracks']) === 2 && count($publicationIds) === 2
+            && count(array_unique([...$projectIds, ...$publicationIds], SORT_REGULAR)) === 6
+            && $publicationIds === array_column($evidence['publicationTracks'], 'trackId'), 'independent publication graph binding');
         $tracks = $manifest['projects'][$project]['tracks'];
         self::require(is_array($tracks) && array_is_list($tracks) && count($tracks) === 2 && $tracks[0]['id'] !== $tracks[1]['id'], 'ordered project track identities');
         $visible = [];
@@ -371,6 +393,25 @@ final class RelatedTrackBrowserFixture
         self::require(app(PublicCatalog::class)->relatedLinks(array_column($tracks, 'id')) === $visible, 'fresh current public projection');
         self::require(app(PublicCatalog::class)->relatedLinks(array_column($tracks, 'id'), false)
             === array_map(fn (array $entry): array => array_diff_key($entry, ['href' => true]), $visible), 'private nonactionable projection');
+    }
+
+    /** Verify this project's pristine ready track before its UI intentionally changes metadata and the active offer. */
+    private static function verifyPublicationTrack(array $manifest, string $project): void
+    {
+        $summary = $manifest['projects'][$project]['publicationTrack'];
+        $records = array_values(array_filter($manifest['evidence']['publicationTracks'],
+            fn (array $record): bool => $record['trackId'] === $summary['id']));
+        self::require(count($records) === 1, 'one independently verified publication graph');
+        $track = Track::findOrFail($summary['id']);
+        self::require(array_keys($summary) === ['id', 'title', 'artist', 'slug', 'href'] && is_int($summary['id'])
+            && $track->only(['id', 'title', 'artist', 'slug']) === array_diff_key($summary, ['href' => true])
+            && $track->published_slug === $summary['slug'] && route('tracks.show', $track->slug, false) === $summary['href']
+            && $track->status === 'published' && $track->metadata_version === 1 && $track->publication_version === 1,
+            'pristine publication track identity');
+        self::require(self::trackEvidence($track) === $records[0] && app(PublicationReadiness::class)->blockers($track) === [],
+            'genuine publication media rights and offer graph');
+        self::require(app(PublicCatalog::class)->relatedLinks([$track->id])
+            === [array_intersect_key($summary, array_flip(['title', 'artist', 'href']))], 'initial publication projection');
     }
 
     private static function trackEvidence(Track $track): array
@@ -453,7 +494,7 @@ final class RelatedTrackBrowserFixture
             $expected[] = ['rights.license.'.$operation, LicenseVersion::class, $evidence['license']['id'],
                 $operation === 'approved' ? $evidence['reviewerId'] : $evidence['operatorId']];
         }
-        foreach ($evidence['tracks'] as $record) {
+        foreach ([...$evidence['tracks'], ...$evidence['publicationTracks']] as $record) {
             foreach (['created', 'published'] as $operation) {
                 $expected[] = ['catalog.track.'.$operation, Track::class, $record['trackId'], $evidence['operatorId']];
             }
@@ -471,7 +512,7 @@ final class RelatedTrackBrowserFixture
         $actual = array_map(fn (array $audit): array => [$audit['action'], $audit['subjectType'], $audit['subjectId'], $audit['actorId']], $evidence['audits']);
         sort($expected);
         sort($actual);
-        self::require($actual === $expected && count($actual) === 49, 'complete command audit census');
+        self::require($actual === $expected && count($actual) === 71, 'complete command audit census');
     }
 
     private static function counts(): array

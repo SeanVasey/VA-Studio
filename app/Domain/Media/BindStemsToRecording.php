@@ -9,7 +9,6 @@ use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -17,33 +16,36 @@ class BindStemsToRecording
 {
     public function handle(MediaAsset $stems, array $data, User $actor): StemsRecording
     {
-        // Re-read role state for direct callers holding an older User instance.
-        $actor = User::findOrFail($actor->id);
-        Gate::forUser($actor)->authorize('administer-catalog');
-        if (array_diff(array_keys($data), ['master_asset_id', 'preview_asset_id', 'verification_reference', 'same_recording_confirmed'])) {
-            throw ValidationException::withMessages(['master_asset_id' => 'Only recording selection and confirmation fields may be submitted.']);
-        }
-        if (is_string($data['verification_reference'] ?? null)) {
-            $data['verification_reference'] = trim($data['verification_reference']);
-        }
-        $data = Validator::make($data, [
-            'master_asset_id' => ['required', 'integer', 'min:1'],
-            'preview_asset_id' => ['required', 'integer', 'min:1'],
-            'verification_reference' => ['required', 'string', 'max:240'],
-            'same_recording_confirmed' => ['required', 'accepted'],
-        ])->validate();
-        $stems = MediaAsset::findOrFail($stems->id);
-
         return DB::transaction(function () use ($stems, $data, $actor) {
+            $actor = app(MediaWriterActor::class)->authorize($actor);
+            if (array_diff(array_keys($data), ['master_asset_id', 'preview_asset_id', 'verification_reference', 'same_recording_confirmed'])) {
+                throw ValidationException::withMessages(['master_asset_id' => 'Only recording selection and confirmation fields may be submitted.']);
+            }
+            if (is_string($data['verification_reference'] ?? null)) {
+                $data['verification_reference'] = trim($data['verification_reference']);
+            }
+            $data = Validator::make($data, [
+                'master_asset_id' => ['required', 'integer', 'min:1'],
+                'preview_asset_id' => ['required', 'integer', 'min:1'],
+                'verification_reference' => ['required', 'string', 'max:240'],
+                'same_recording_confirmed' => ['required', 'accepted'],
+            ])->validate();
+            $stems = MediaAsset::findOrFail($stems->id);
             // This track lock serializes association with publication, quote selection and media completion.
             $track = Track::query()->lockForUpdate()->findOrFail($stems->track_id);
             if ($track->status !== 'draft') {
                 throw ValidationException::withMessages(['master_asset_id' => 'Unpublish the track before associating stems.']);
             }
             $stems = MediaAsset::findOrFail($stems->id);
-            $master = MediaAsset::find($data['master_asset_id']);
-            $preview = $track->assets()->where('role', 'preview_tagged')->where('status', 'ready')->latest('id')->first();
-            if ($stems->role !== 'stems_zip' || ! $master || $master->role !== 'master_wav' || $master->track_id !== $track->id
+            $master = $track->assets()->whereKey($data['master_asset_id'])->first();
+            $previews = $track->assets()->where('role', 'preview_tagged')->where('status', 'ready');
+            if (DB::getDriverName() === 'mysql') {
+                // Bound the locking scan to previews, away from sources a processor locks before the track.
+                $previews->forceIndex('media_assets_track_id_role_status_index');
+            }
+            // The routing read or an enclosing transaction may already hold an old consistent snapshot.
+            $preview = $previews->lockForUpdate()->latest('id')->first();
+            if ($stems->track_id !== $track->id || $stems->role !== 'stems_zip' || ! $master || $master->role !== 'master_wav' || $master->track_id !== $track->id
                 || ! $preview || $preview->id !== (int) $data['preview_asset_id'] || $master->parent_asset_id !== $preview->parent_asset_id
                 || $master->processing_run_id !== $preview->processing_run_id) {
                 throw ValidationException::withMessages(['master_asset_id' => 'Choose a verified master for this track’s current preview. Reopen the action if the recording changed.']);
@@ -54,10 +56,11 @@ class BindStemsToRecording
                     throw ValidationException::withMessages(['master_asset_id' => 'Stems, master and preview must have intact processing evidence and matching private bytes.']);
                 }
             }
-            $existing = StemsRecording::where('stems_asset_id', $stems->id)->first();
+            $inspection = $associations->inspectCurrentBinding($stems);
+            $existing = $inspection['binding'];
             if ($existing) {
                 if ($existing->master_asset_id === $master->id && $existing->preview_asset_id === $preview->id
-                    && $existing->verification_reference === $data['verification_reference'] && $associations->verified($stems)) {
+                    && $existing->verification_reference === $data['verification_reference'] && $inspection['verified']) {
                     return $existing;
                 }
                 throw ValidationException::withMessages(['master_asset_id' => 'This stems revision is already associated. Preserve its evidence and upload a new stems revision to make a correction.']);

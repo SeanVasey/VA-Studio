@@ -4,6 +4,7 @@ namespace App\Domain\Commerce;
 
 use App\Domain\Commerce\Models\Quote;
 use App\Domain\Commerce\Models\QuoteLine;
+use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +15,7 @@ final class CreateQuote
     /** Provisional selection-review lifetime only; no payment or reservation policy is established. */
     public const LIFETIME_MINUTES = 15;
 
-    public function handle(string $ownerKey, string $idempotencyKey, array $items): Quote
+    public function handle(string $ownerKey, string $idempotencyKey, array $items, ?User $actor = null): Quote
     {
         QuoteRequest::owner($ownerKey);
         QuoteRequest::key($idempotencyKey);
@@ -22,7 +23,9 @@ final class CreateQuote
         $requestHash = CanonicalJson::hash($items);
         $keyHash = hash('sha256', $idempotencyKey);
 
-        return DB::transaction(function () use ($ownerKey, $items, $requestHash, $keyHash) {
+        return DB::transaction(function () use ($ownerKey, $items, $requestHash, $keyHash, $actor) {
+            // Explicit customer identity precedes resource locks; null remains anonymous/system.
+            $actorId = app(CommerceAuditActor::class)->lock($actor);
             // INSERT IGNORE waits for a competing first insert. The subsequent row lock serializes absent-key creation too.
             DB::table('quote_owners')->insertOrIgnore(['owner_key' => $ownerKey]);
             DB::table('quote_owners')->where('owner_key', $ownerKey)->lockForUpdate()->firstOrFail();
@@ -50,7 +53,7 @@ final class CreateQuote
             foreach ($lines as $position => $line) {
                 QuoteLine::create(['quote_id' => $quote->id, 'offer_revision_id' => $line['offer_revision_id'], 'position' => $position, 'line_hash' => CanonicalJson::hash($line)]);
             }
-            AuditEvent::record('commerce.quote.created', $quote, ['public_id' => $quote->public_id, 'snapshot_hash' => $quote->snapshot_hash, 'line_count' => count($lines)]);
+            AuditEvent::recordAttributed('commerce.quote.created', $quote, ['public_id' => $quote->public_id, 'snapshot_hash' => $quote->snapshot_hash, 'line_count' => count($lines)], $actorId);
 
             return $quote;
         }, 5);

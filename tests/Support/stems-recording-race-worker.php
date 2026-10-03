@@ -1,6 +1,7 @@
 <?php
 
 use App\Domain\Media\Models\MediaAsset;
+use App\Domain\Media\Models\StemsRecording;
 use App\Domain\Media\BindStemsToRecording;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
@@ -17,6 +18,13 @@ Storage::forgetDisk('local');
 $directory = getenv('VASEY_STEMS_RACE_DIRECTORY');
 $worker = getenv('VASEY_STEMS_RACE_WORKER');
 $connection = (int) DB::selectOne('SELECT CONNECTION_ID() AS id')->id;
+DB::statement('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
+$callerTransaction = $input['caller_transaction'] ?? false;
+$snapshotBefore = null;
+if ($callerTransaction) {
+    DB::beginTransaction();
+    $snapshotBefore = StemsRecording::where('stems_asset_id', $input['stems_id'])->count();
+}
 $wait = function (string $path): void {
     $deadline = microtime(true) + 20;
     while (! is_file($path)) {
@@ -43,10 +51,18 @@ DB::listen(function ($query) use ($isTrackLock, $directory, $worker, $wait) {
 });
 try {
     $binding = app(BindStemsToRecording::class)->handle(MediaAsset::findOrFail($input['stems_id']), [
-        'verification_reference' => 'SYNTHETIC EXPORT '.$worker,
+        'verification_reference' => $input['verification_reference'],
     ] + $input['data'], User::findOrFail($input['actor_id']));
     $result = ['result' => 'saved', 'binding_id' => $binding->id];
 } catch (ValidationException $exception) {
     $result = ['result' => 'rejected', 'errors' => $exception->errors()];
 }
-echo json_encode($result + ['connection_id' => $connection, 'pid' => getmypid()], JSON_THROW_ON_ERROR);
+$callerTransactionLevel = DB::transactionLevel();
+$snapshotAfter = null;
+if ($callerTransaction) {
+    $snapshotAfter = StemsRecording::where('stems_asset_id', $input['stems_id'])->count();
+    DB::commit();
+}
+echo json_encode($result + ['connection_id' => $connection, 'pid' => getmypid(),
+    'caller_transaction_level' => $callerTransactionLevel, 'transaction_level' => DB::transactionLevel(),
+    'snapshot_before' => $snapshotBefore, 'snapshot_after' => $snapshotAfter], JSON_THROW_ON_ERROR);
