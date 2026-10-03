@@ -18,9 +18,11 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ManageRecords;
 use Filament\Schemas\Schema;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Locked;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
 class ManageTracks extends ManageRecords
@@ -117,10 +119,20 @@ class ManageTracks extends ManageRecords
             } else {
                 app(PublishTrack::class)->unpublishReviewed($review, $actor);
             }
+        } catch (AuthorizationException|ModelNotFoundException|HttpExceptionInterface $exception) {
+            // Keep explicit access and missing-resource responses outside uncertain-result recovery.
+            throw $exception;
         } catch (ValidationException $exception) {
             // Confirmations have no metadata form fields in which to display domain errors.
             Notification::make()->danger()->title('Publication blocked')
                 ->body(implode(' ', array_merge(...array_values($exception->errors()))))->persistent()->send();
+            $action->cancel();
+        } catch (Throwable $exception) {
+            report($exception);
+            Notification::make()->danger()->title('Publication result could not be confirmed.')
+                ->body('Reload tracks to check the current publication state, then open a new confirmation before trying again.')
+                ->persistent()->send();
+            // The command may already have committed. Never retry with this consumed review.
             $action->cancel();
         }
     }

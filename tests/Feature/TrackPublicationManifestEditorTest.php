@@ -11,10 +11,17 @@ use App\Filament\Resources\TrackResource\Pages\ManageTracks;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use Filament\Facades\Filament;
+use Filament\Notifications\Notification;
 use Filament\Support\Exceptions\Cancel;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Exceptions;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\QuoteFixtures;
 use Tests\TestCase;
@@ -110,35 +117,177 @@ class TrackPublicationManifestEditorTest extends TestCase
         $this->assertSame($before, AuditEvent::count());
     }
 
-    public function test_uncertain_success_consumes_review_before_the_domain_result_returns(): void
+    public static function uncertainOutcomes(): array
+    {
+        return [
+            'publish before commit' => ['publish', false],
+            'publish after commit' => ['publish', true],
+            'unpublish before commit' => ['unpublish', false],
+            'unpublish after commit' => ['unpublish', true],
+        ];
+    }
+
+    #[DataProvider('uncertainOutcomes')]
+    public function test_uncertain_outcome_is_reported_privately_and_requires_fresh_review(string $intent, bool $committed): void
+    {
+        $fixture = $this->draft();
+        $track = $fixture['track'];
+        if ($intent === 'unpublish') {
+            $track = app(PublishTrack::class)->handle($track, $fixture['actor']);
+        }
+        $page = Livewire::test(ManageTracks::class)->mountTableAction($intent, $track);
+        $before = $track->fresh()->getAttributes();
+        $audits = AuditEvent::count();
+        Exceptions::fake();
+        $failure = new RuntimeException('Synthetic private result: storage/app/private/synthetic-original.wav');
+        $command = new class($committed, $failure) extends PublishTrack
+        {
+            public int $calls = 0;
+
+            public function __construct(private bool $committed, private RuntimeException $failure) {}
+
+            public function publishManifestReviewed(array $review, User $actor): Track
+            {
+                $this->calls++;
+                if ($this->committed) {
+                    parent::publishManifestReviewed($review, $actor);
+                }
+                throw $this->failure;
+            }
+
+            public function unpublishReviewed(array $review, User $actor): Track
+            {
+                $this->calls++;
+                if ($this->committed) {
+                    parent::unpublishReviewed($review, $actor);
+                }
+                throw $this->failure;
+            }
+        };
+        $this->app->instance(PublishTrack::class, $command);
+        $page->callMountedTableAction()->assertSet('publicationReview', null)->assertSet('publicationTableContext', null)
+            ->assertSet('mountedActions', [])->assertNotified(Notification::make()->danger()
+                ->title('Publication result could not be confirmed.')
+                ->body('Reload tracks to check the current publication state, then open a new confirmation before trying again.')
+                ->persistent())
+            ->assertDontSee('synthetic-original.wav');
+        Exceptions::assertReported(fn (RuntimeException $exception): bool => $exception === $failure);
+        Exceptions::assertReportedCount(1);
+        $current = $track->fresh();
+        $this->assertSame($before['publication_version'] + (int) $committed, $current->publication_version);
+        $this->assertSame($committed ? ($intent === 'publish' ? 'published' : 'draft') : $before['status'], $current->status);
+        $this->assertSame($audits + (int) $committed, AuditEvent::count());
+        if (! $committed) {
+            $this->assertSame($before, $current->getAttributes());
+        }
+
+        // A repeated request has no mounted confirmation and must not call the command again.
+        $page->call('callMountedAction')->assertSet('publicationReview', null)->assertSet('publicationTableContext', null)
+            ->assertSet('mountedActions', []);
+        $this->assertSame(1, $command->calls);
+        $this->assertSame($current->getAttributes(), $track->fresh()->getAttributes());
+        $this->assertSame($audits + (int) $committed, AuditEvent::count());
+        Exceptions::assertReportedCount(1);
+
+        // After reloading authoritative state, only a newly mounted applicable action can proceed.
+        $this->app->instance(PublishTrack::class, new PublishTrack);
+        $nextIntent = $committed ? ($intent === 'publish' ? 'unpublish' : 'publish') : $intent;
+        $reopened = Livewire::test(ManageTracks::class)->mountTableAction($nextIntent, $current);
+        $this->assertSame($current->publication_version, $reopened->get('publicationReview.publication_version'));
+        $reopened->callMountedTableAction()->assertSet('publicationReview', null)->assertSet('publicationTableContext', null);
+        $this->assertSame($current->publication_version + 1, $track->fresh()->publication_version);
+        $this->assertSame($nextIntent === 'publish' ? 'published' : 'draft', $track->fresh()->status);
+        $this->assertSame($audits + (int) $committed + 1, AuditEvent::count());
+    }
+
+    public static function revocations(): array
+    {
+        return ['staff role' => ['is_admin', false], 'MFA enrollment' => ['app_authentication_secret', null]];
+    }
+
+    #[DataProvider('revocations')]
+    public function test_authorization_failure_propagates_after_consuming_the_review(string $field, mixed $value): void
+    {
+        $fixture = $this->draft();
+        $panel = Filament::getPanel('admin');
+        $required = $panel->isMultiFactorAuthenticationRequired();
+        $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: true);
+        try {
+            $fixture['actor']->saveAppAuthenticationSecret('JBSWY3DPEHPK3PXP');
+            $page = Livewire::test(ManageTracks::class)->mountTableAction('publish', $fixture['track']);
+            $component = $page->instance();
+            DB::table('users')->where('id', $fixture['actor']->id)->update([$field => $value]);
+            $before = $fixture['track']->fresh()->getAttributes();
+            $audits = AuditEvent::count();
+            Exceptions::fake();
+            try {
+                $component->applyReviewedPublication($fixture['track'], $component->getMountedAction(), 'publish');
+                $this->fail('Withdrawn authority was swallowed by uncertain-result handling.');
+            } catch (AuthorizationException) {
+            }
+            $this->assertNull($component->publicationReview);
+            $this->assertNull($component->publicationTableContext);
+            $this->assertSame($before, $fixture['track']->fresh()->getAttributes());
+            $this->assertSame($audits, AuditEvent::count());
+            Notification::assertNotNotified();
+            Exceptions::assertNothingReported();
+        } finally {
+            $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: $required);
+        }
+    }
+
+    public function test_missing_actor_keeps_its_forbidden_response_without_an_uncertainty_notification(): void
     {
         $fixture = $this->draft();
         $page = Livewire::test(ManageTracks::class)->mountTableAction('publish', $fixture['track']);
         $component = $page->instance();
-        $before = AuditEvent::where('action', 'catalog.track.published')->count();
-        $this->app->instance(PublishTrack::class, new class extends PublishTrack
+        $before = $fixture['track']->fresh()->getAttributes();
+        $audits = AuditEvent::count();
+        Exceptions::fake();
+        auth()->logout();
+        try {
+            $component->applyReviewedPublication($fixture['track'], $component->getMountedAction(), 'publish');
+            $this->fail('A missing actor lost its forbidden response.');
+        } catch (HttpExceptionInterface $exception) {
+            $this->assertSame(403, $exception->getStatusCode());
+        }
+        $this->assertNull($component->publicationReview);
+        $this->assertNull($component->publicationTableContext);
+        $this->assertSame($before, $fixture['track']->fresh()->getAttributes());
+        $this->assertSame($audits, AuditEvent::count());
+        Notification::assertNotNotified();
+        Exceptions::assertNothingReported();
+    }
+
+    public function test_missing_resource_exception_keeps_its_original_identity(): void
+    {
+        $fixture = $this->draft();
+        $page = Livewire::test(ManageTracks::class)->mountTableAction('publish', $fixture['track']);
+        $component = $page->instance();
+        $before = $fixture['track']->fresh()->getAttributes();
+        $audits = AuditEvent::count();
+        Exceptions::fake();
+        $failure = (new ModelNotFoundException)->setModel(Track::class, [$fixture['track']->id]);
+        $this->app->instance(PublishTrack::class, new class($failure) extends PublishTrack
         {
+            public function __construct(private ModelNotFoundException $failure) {}
+
             public function publishManifestReviewed(array $review, User $actor): Track
             {
-                parent::publishManifestReviewed($review, $actor);
-                throw new RuntimeException('Synthetic lost result after commit.');
+                throw $this->failure;
             }
         });
         try {
             $component->applyReviewedPublication($fixture['track'], $component->getMountedAction(), 'publish');
-            $this->fail('Expected the synthetic uncertain result.');
-        } catch (RuntimeException $exception) {
-            $this->assertSame('Synthetic lost result after commit.', $exception->getMessage());
+            $this->fail('A missing resource was changed into uncertain-result recovery.');
+        } catch (ModelNotFoundException $exception) {
+            $this->assertSame($failure, $exception);
         }
         $this->assertNull($component->publicationReview);
         $this->assertNull($component->publicationTableContext);
-        $this->assertSame('published', $fixture['track']->fresh()->status);
-        $this->assertSame($before + 1, AuditEvent::where('action', 'catalog.track.published')->count());
-        try {
-            $component->applyReviewedPublication($fixture['track'], $component->getMountedAction(), 'publish');
-            $this->fail('A consumed review was recaptured for retry.');
-        } catch (Cancel) {
-        }
-        $this->assertSame($before + 1, AuditEvent::where('action', 'catalog.track.published')->count());
+        $this->assertSame($before, $fixture['track']->fresh()->getAttributes());
+        $this->assertSame($audits, AuditEvent::count());
+        Notification::assertNotNotified();
+        Exceptions::assertNothingReported();
     }
 }
