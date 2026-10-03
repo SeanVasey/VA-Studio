@@ -36,6 +36,7 @@ PHP_TARGETS = {
         "tests/Unit/SiteImageGuardBytesTest.php", "tests/Feature/InstallationReportTest.php",
         "tests/Feature/MalwareScannerTest.php", "tests/Feature/MediaProcessingTest.php",
         "tests/Feature/MediaWriterAuthorityTest.php", "tests/Feature/MediaWriterConcurrencyTest.php",
+        "tests/Feature/MediaUploadCommitRecoveryTest.php",
         "tests/Feature/MediaWorkerIdentityTest.php",
         "tests/Feature/MediaWorkflowBudgetTest.php", "tests/Feature/PrivateMediaRevisionRootsTest.php",
         "tests/Feature/SiteImageLibraryTest.php", "tests/Feature/SiteImageHttpTest.php", "tests/Feature/StemsArchivePolicyTest.php",
@@ -325,4 +326,3 @@ if __name__ == "__main__":
     except (FocusedError, OSError, ET.ParseError) as error:
         print("Focused selection failed: " + str(error), file=sys.stderr)
         raise SystemExit(1)
-
