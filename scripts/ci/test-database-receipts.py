@@ -18,7 +18,7 @@ import zipfile
 spec = importlib.util.spec_from_file_location("database_receipts", Path(__file__).with_name("database-receipts.py"))
 receipt = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(receipt)
-ROOT = "/home/runner/work/VASEYAUDIO/VASEYAUDIO"
+ROOT = "/home/runner/work/VA-Studio/VA-Studio"
 H = "a" * 64
 SKIP = ("Tests\\Feature\\SyntheticMysqlTest", "test_mysql_only")
 
@@ -120,7 +120,8 @@ def zipped(files):
 
 class FakeGithub:
     def __init__(self):
-        self.run = {"id": 123, "run_attempt": 1, "workflow_id": receipt.WORKFLOW_ID, "path": receipt.WORKFLOW_PATH,
+        self.workflow = {"id": 456, "name": "Foundation CI", "path": receipt.WORKFLOW_PATH, "state": "active"}
+        self.run = {"id": 123, "run_attempt": 1, "workflow_id": self.workflow["id"], "path": receipt.WORKFLOW_PATH,
                     "event": "pull_request", "head_sha": "d" * 40, "repository": {"id": receipt.REPOSITORY_ID}, "head_repository": {"id": receipt.REPOSITORY_ID}}
         self.jobs, self.artifacts, self.archives = [], [], {}
         now = datetime.now(timezone.utc)
@@ -141,6 +142,10 @@ class FakeGithub:
                                        "workflow_run": {"id": 123, "repository_id": receipt.REPOSITORY_ID, "head_repository_id": receipt.REPOSITORY_ID, "head_sha": "d" * 40}})
 
     def get(self, path):
+        if path == "/actions/workflows/ci.yml":
+            return deepcopy(self.workflow)
+        if path != "/actions/runs/123":
+            raise AssertionError("Unexpected current-run API path: " + path)
         return deepcopy(self.run)
 
     def pages(self, path, key):
@@ -320,6 +325,12 @@ class CollectorTests(unittest.TestCase):
         for key, value in (("workflow_id", 1), ("event", "workflow_dispatch"), ("repository", {"id": 1}), ("run_attempt", 2), ("path", ".github/workflows/focused.yml")):
             api = FakeGithub(); api.run[key] = value
             with self.subTest(key=key), self.assertRaises(receipt.ReceiptError): self.collect(api)
+
+    def test_invalid_canonical_workflow_identity_rejects(self):
+        for key, value in (("id", None), ("id", False), ("id", 0), ("id", "456"), ("id", 789),
+                           ("name", "Focused Feedback"), ("path", ".github/workflows/focused.yml"), ("state", "disabled_manually")):
+            api = FakeGithub(); api.workflow[key] = value
+            with self.subTest(key=key, value=value), self.assertRaises(receipt.ReceiptError): self.collect(api)
 
     def test_missing_duplicate_expired_wrong_digest_and_wrong_run_artifacts_reject(self):
         for mutation in ("missing", "duplicate", "expired", "timestamp", "digest", "run"):

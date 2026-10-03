@@ -110,6 +110,7 @@ class TrackResource extends OperatorResource
                 Notification::make()->title($blockers === [] ? 'Ready to publish' : 'Publication blocked')->body(implode("\n", $blockers))->persistent()->send();
             }),
             Action::make('publish')->visible(fn (Track $record) => $record->status !== 'published')->requiresConfirmation()->databaseTransaction(false)
+                ->modalDescription('Publish the reviewed track, files and offers. If anything changes after this review, reopen the confirmation to review it again.')
                 ->mountUsing(function (Track $record, ManageTracks $livewire, ?Schema $schema = null): void {
                     $livewire->reviewPublication($record, 'publish');
                     $schema?->fill();

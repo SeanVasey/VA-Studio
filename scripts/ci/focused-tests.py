@@ -42,6 +42,7 @@ PHP_TARGETS = {
         "tests/Feature/StemsArchiveTest.php",
     ),
     "commerce": (
+        "tests/Feature/TestPaymentExceptionOperationsTest.php", "tests/Feature/TestPaymentExceptionOperationsConcurrencyTest.php",
         "tests/Feature/CommerceAuditActorTest.php", "tests/Feature/CommerceAuditActorConcurrencyTest.php",
         "tests/Unit/AllocateDiscountTest.php", "tests/Unit/MinorUnitsTest.php",
         "tests/Unit/PricingPolicyTest.php", "tests/Unit/PromotionPolicyTest.php",
@@ -64,6 +65,12 @@ PHP_TARGETS = {
         "tests/Feature/SiteRelatedTrackHttpTest.php", "tests/Feature/SiteRelatedTrackImageMigrationTest.php",
         "tests/Feature/SiteContentConcurrencyTest.php",
     ),
+    "publication": (
+        "tests/Feature/TrackPublicationApplyTest.php", "tests/Feature/TrackPublicationApplyConcurrencyTest.php",
+        "tests/Feature/TrackPublicationManifestEditorTest.php",
+        "tests/Feature/TrackPublicationManifestTest.php", "tests/Feature/TrackPublicationManifestConcurrencyTest.php",
+        "tests/Feature/TrackPublicationGuardTest.php", "tests/Feature/TrackPublicationGuardConcurrencyTest.php",
+    ),
     "operator": (
         "tests/Feature/FoundationTest.php", "tests/Feature/OperatorSetupTest.php",
         "tests/Feature/OperatorAuthorityTest.php", "tests/Feature/OperatorMfaTest.php",
@@ -76,6 +83,7 @@ PHP_TARGETS = {
         "tests/Feature/TrackPublicationGuardTest.php", "tests/Feature/TrackPublicationGuardMigrationTest.php",
         "tests/Feature/TrackPublicationGuardConcurrencyTest.php",
         "tests/Feature/TrackPublicationManifestTest.php", "tests/Feature/TrackPublicationManifestConcurrencyTest.php",
+        "tests/Feature/TrackPublicationManifestEditorTest.php",
         "tests/Feature/RightsEvidenceGuardTest.php", "tests/Feature/RightsEvidenceGuardMigrationTest.php",
         "tests/Feature/RightsEvidenceGuardConcurrencyTest.php",
         "tests/Feature/RightsDeclarationWriterTest.php", "tests/Feature/RightsDeclarationWriterActionTest.php",
@@ -317,3 +325,4 @@ if __name__ == "__main__":
     except (FocusedError, OSError, ET.ParseError) as error:
         print("Focused selection failed: " + str(error), file=sys.stderr)
         raise SystemExit(1)
+

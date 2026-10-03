@@ -1,5 +1,7 @@
 # GitHub migration verification checkpoint
 
+> Historical import checkpoint. The active GitHub handoff and exact compatibility commit mapping are in [github-handoff-20261002.md](github-handoff-20261002.md). Source preservation does not establish CI acceptance.
+
 October 2, 2026. Sean requested moving development to private `SeanVasey/VA-Studio` and reported readiness after receiving the migration commands. The destination has not yet been verified from this conversation: authenticated GitHub metadata still identifies `VASEYDEV`, exposes only that installation, and returns 404 for the requested repository. That response does not establish whether the private repository exists or whether the user's terminal copy succeeded.
 
 ## Preserved source

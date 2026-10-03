@@ -335,6 +335,10 @@
       "test_worker_whose_lease_was_reclaimed_cannot_commit_stale_payment_evidence"
     ],
     [
+      "Tests\\Feature\\TestPaymentExceptionOperationsConcurrencyTest",
+      "test_independent_operators_serialize_history_and_fence_provider_claims"
+    ],
+    [
       "Tests\\Feature\\TrackMetadataConcurrencyTest",
       "test_overlapping_edits_wait_on_the_same_row_and_only_one_revision_is_saved"
     ],
@@ -349,6 +353,14 @@
     [
       "Tests\\Feature\\TrackMetadataPresetsConcurrencyTest",
       "test_snapshot_and_archive_serialize_on_the_exact_preset_row"
+    ],
+    [
+      "Tests\\Feature\\TrackPublicationApplyConcurrencyTest",
+      "test_one_actor_cannot_apply_the_same_review_twice_concurrently"
+    ],
+    [
+      "Tests\\Feature\\TrackPublicationApplyConcurrencyTest",
+      "test_reviewed_publication_and_participating_writers_serialize_current_evidence"
     ],
     [
       "Tests\\Feature\\TrackPublicationGuardConcurrencyTest",
@@ -384,3 +396,4 @@
     ]
   ]
 }
+

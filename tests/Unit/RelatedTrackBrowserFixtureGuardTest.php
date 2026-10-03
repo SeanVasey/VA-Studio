@@ -51,7 +51,7 @@ class RelatedTrackBrowserFixtureGuardTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_valid_guard_preparation_is_read_only_and_accepts_only_the_two_explicit_project_states(): void
+    public function test_valid_guard_preparation_is_read_only_and_accepts_only_explicit_project_states_and_publication_check(): void
     {
         $before = $this->snapshot();
         $guard = \RelatedTrackBrowserFixture::guard($this->env, ['prepare']);
@@ -60,6 +60,7 @@ class RelatedTrackBrowserFixtureGuardTest extends TestCase
         $this->assertSame($before, $this->snapshot());
         $this->write('related-track-fixtures.json', '{}');
         foreach (['chromium-desktop', 'webkit-mobile'] as $project) {
+            $this->assertFalse(\RelatedTrackBrowserFixture::guard($this->env, ['verify-publication', $project])['prepare']);
             foreach (['published', 'withdrawn'] as $state) {
                 $this->assertFalse(\RelatedTrackBrowserFixture::guard($this->env, ['verify', $project, $state])['prepare']);
             }
@@ -76,7 +77,7 @@ class RelatedTrackBrowserFixtureGuardTest extends TestCase
             $this->refused(array_replace($this->env, [$key => $value]), ['prepare']);
         }
         foreach ([[], ['prepare', 'extra'], ['verify', 'other', 'published'], ['verify', 'chromium-desktop', 'ready'],
-            ['restore'], ['verify', 'chromium-desktop'], ['verify', 'webkit-mobile', 'withdrawn', 'extra']] as $arguments) {
+            ['restore'], ['verify-publication'], ['verify-publication', 'other'], ['verify-publication', 'webkit-mobile', 'published'], ['verify', 'chromium-desktop'], ['verify', 'webkit-mobile', 'withdrawn', 'extra']] as $arguments) {
             $this->refused($this->env, $arguments);
         }
         $missingStage = $this->env;
@@ -206,7 +207,7 @@ class RelatedTrackBrowserFixtureGuardTest extends TestCase
 
     public function test_missing_duplicated_foreign_subject_and_wrong_actor_audits_are_refused(): void
     {
-        $evidence = ['operatorId' => 1, 'reviewerId' => 3, 'license' => ['id' => 1], 'tracks' => [], 'audits' => []];
+        $evidence = ['operatorId' => 1, 'reviewerId' => 3, 'license' => ['id' => 1], 'tracks' => [], 'publicationTracks' => [], 'audits' => []];
         $add = function (string $action, string $type, int $id, ?int $actor) use (&$evidence): void {
             $evidence['audits'][] = ['action' => $action, 'subjectType' => $type, 'subjectId' => $id, 'actorId' => $actor];
         };
@@ -214,7 +215,7 @@ class RelatedTrackBrowserFixtureGuardTest extends TestCase
         foreach (['draft_created', 'review_requested', 'approved', 'published'] as $operation) {
             $add('rights.license.'.$operation, LicenseVersion::class, 1, $operation === 'approved' ? 3 : 1);
         }
-        foreach (range(5, 8) as $track) {
+        foreach (range(5, 10) as $track) {
             $sources = [];
             foreach (['created', 'published'] as $operation) {
                 $add('catalog.track.'.$operation, Track::class, $track, 1);
@@ -231,11 +232,11 @@ class RelatedTrackBrowserFixtureGuardTest extends TestCase
                     $add('media.processing.'.$operation, MediaProcessingRun::class, $id, 1);
                 }
             }
-            $evidence['tracks'][] = ['trackId' => $track, 'rightsId' => $track, 'offerId' => $track, 'sources' => $sources];
+            $evidence[$track < 9 ? 'tracks' : 'publicationTracks'][] = ['trackId' => $track, 'rightsId' => $track, 'offerId' => $track, 'sources' => $sources];
         }
         $method = new ReflectionMethod(\RelatedTrackBrowserFixture::class, 'auditCensus');
         $method->invoke(null, $evidence);
-        $this->assertCount(49, $evidence['audits']);
+        $this->assertCount(71, $evidence['audits']);
         $cases = [];
         $missing = $evidence;
         array_pop($missing['audits']);

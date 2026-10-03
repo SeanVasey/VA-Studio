@@ -1,5 +1,7 @@
 # GitHub CI compatibility preparation
 
+> Historical import checkpoint. The active GitHub handoff and exact compatibility commit mapping are in [github-handoff-20261002.md](github-handoff-20261002.md). Source preservation does not establish CI acceptance.
+
 Status: October 2, 2026. **Destination identity binding and activation remain pending.** This is a bounded local preparation on reviewed source `9df417c1a33cd777609ef7eacd5e4a2e237a207e`, alongside the separately recorded [migration status](github-migration-status.md). It is not a completed migration, a hosted CI pass or merge acceptance.
 
 The receipt allowlist still deliberately names `VASEYDEV/VASEYAUDIO`, repository ID `1357536326` and Foundation workflow ID `350477270`. Those three values must be replaced only after the actual destination repository and workflow are observed through its authenticated API. No destination identity is inferred from a user-supplied name or a workflow environment variable. The default branch remains `main`.

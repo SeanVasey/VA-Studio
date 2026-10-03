@@ -29,11 +29,9 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 
-# Migration binding remains pending: replace these three identities only after
-# observing the destination repository and Foundation workflow through its API.
-REPOSITORY = "VASEYDEV/VASEYAUDIO"
-REPOSITORY_ID = 1357536326
-WORKFLOW_ID = 350477270
+# Bind source and artifact provenance to the verified GitHub destination.
+REPOSITORY = "SeanVasey/VA-Studio"
+REPOSITORY_ID = 1402461806
 WORKFLOW_PATH = ".github/workflows/ci.yml"
 NS = "{https://xml.phpunit.de/testSuite}"
 SHA = re.compile(r"[0-9a-f]{40}\Z")
@@ -623,9 +621,15 @@ def collect(root: Path, env: dict, api: Github) -> dict:
     source = source_identity(root, env)
     run_id, attempt = source["run_id"], source["run_attempt"]
     run_path = f"/actions/runs/{run_id}"
+    # Resolve this repository's native workflow ID through its canonical path.
+    # Repository copies receive new numeric IDs; source SHA/ref proof remains exact.
+    workflow = api.get("/actions/workflows/ci.yml")
+    require(positive(workflow.get("id")) and workflow.get("path") == WORKFLOW_PATH
+            and workflow.get("name") == "Foundation CI" and workflow.get("state") == "active",
+            "Canonical Foundation workflow identity is unavailable")
     run_ = api.get(run_path)
     require(run_.get("id") == run_id and run_.get("run_attempt") == attempt
-            and run_.get("workflow_id") == WORKFLOW_ID and run_.get("path") == WORKFLOW_PATH
+            and run_.get("workflow_id") == workflow["id"] and run_.get("path") == WORKFLOW_PATH
             and run_.get("event") == source["event"]["name"] and run_.get("head_sha") == source["event"]["head"]
             and run_.get("repository", {}).get("id") == REPOSITORY_ID
             and run_.get("head_repository", {}).get("id") == source["event"]["head_repository_id"],
