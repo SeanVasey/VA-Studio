@@ -1,6 +1,6 @@
 # Agentic work-package index
 
-These issue bodies cover the complete replacement. All 14 have been published; see the [GitHub register](GITHUB.md) for their observed issue URLs. The first heading in each WP file is its suggested issue title.
+These issue bodies cover the complete replacement. All 14 were published in the earlier repository; the [historical GitHub register](GITHUB.md) preserves their observed issue URLs. Current development belongs in [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio), with active ownership and acceptance tracked by the [agent queue](../development-agent-queue.md) and [task register](../remaining-development-tasks.csv). The first heading in each WP file is its suggested issue title. Historical issue numbers do not establish corresponding issues in the current repository.
 
 Each package states dependencies, a first reviewable increment, implementation paths, acceptance criteria, verification, rollback and a copyable agent prompt. Packages with several product workflows explicitly split into dependent PRs; do not turn them into one oversized change or mark them done from a mockup.
 
@@ -35,10 +35,10 @@ Use a branch or isolated worktree per independent writer. One owner coordinates 
 
 ## Issue publication
 
-Once the exact VASEYAUDIO repository is available, publish each body intact with its title, then add dependency issue links and milestone/labels. A retry should detect already-published work-package IDs before creating duplicates. Record observed issue URLs rather than guessed URLs.
+For new authorized issue publication, use [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio). Inspect its existing issues and the historical register before creating or transferring a work-package issue, so the same work-package ID is not duplicated. Preserve the body and acceptance criteria, reconcile its actual current status with the task register, and link dependencies using observed current-repository issue URLs. The old repository's issue numbers and open-state snapshot are historical evidence, not proof of migrated issues or current status.
 
 The [roadmap](../architecture/roadmap.md) governs phase order. The parity/source ledger governs complete coverage: any verified feature not covered by an accepted issue becomes an explicit child issue, not an implicit omission. Active memberships, pending fulfillment and historical access can elevate later work into cutover blockers.
 
 ## Current execution order
 
-Read [ordered development status](../development-order.md) before choosing the next increment. It reconciles merged work, earlier acceptance gaps and the owner’s instruction to return to the pre-Stripe sequence.
+Read the [current development queue](../development-control.md) and [agent assignments](../development-agent-queue.md) before choosing the next increment. The [ordered development record](../development-order.md) preserves accepted work and earlier evidence; the task register retains the remaining completion criteria and dependencies.

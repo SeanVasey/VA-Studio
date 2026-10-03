@@ -1,6 +1,15 @@
 # VA-Studio development on macOS
 
-The development repository is [vaseydev/va-studio](https://gitlab.com/vaseydev/va-studio). The preserved handoff is branch `codex/rights-writers-20261002-08690e2` at `8fdc341`; the continuation is in [draft MR !1](https://gitlab.com/vaseydev/va-studio/-/merge_requests/1), initially published at `495d3b1386880ad7cd98c79cbc95c6985eba5e2e`. Check its current head before selecting a candidate. Do not switch an existing Mac checkout until its local changes and selected branch have been inspected.
+The development repository is [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio). Use the [current development queue](development-control.md) and its linked GitHub PR for the selected candidate, actual acceptance results and merge status. The [GitHub handoff record](verification/github-handoff-20261002.md) preserves the earlier GitLab branches, commits and MR evidence; those historical references do not select the current development source. Do not switch an existing Mac checkout until its local changes, remotes and selected branch have been inspected.
+
+For a new checkout, clone the current repository using your authorized GitHub access:
+
+```sh
+git clone https://github.com/SeanVasey/VA-Studio.git
+cd VA-Studio
+```
+
+A clone selects the repository's default branch; inspect the current development queue before choosing an unmerged candidate. An existing checkout should first use the inspection commands below; the bootstrap does not change its remote or branch.
 
 ## Install development dependencies
 
