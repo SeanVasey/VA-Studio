@@ -78,6 +78,8 @@ PHP_TARGETS = {
     "track-concurrency": (
         "tests/Feature/TrackMetadataConcurrencyTest.php",
         "tests/Feature/StemsRecordingConcurrencyTest.php",
+        "tests/Feature/StemsRecordingTest.php",
+        "tests/Feature/MediaWriterAuthorityTest.php",
     ),
     "operator": (
         "tests/Feature/FoundationTest.php", "tests/Feature/OperatorSetupTest.php",
