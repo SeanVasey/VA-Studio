@@ -53,6 +53,10 @@ PHP_TARGETS = {
         "tests/Feature/StripeWebhookConcurrencyTest.php",
         "tests/Feature/HashByteGuardMigrationTest.php", "tests/Feature/UuidByteGuardMigrationTest.php",
         "tests/Feature/OwnedTestOrderHistoryTest.php", "tests/Feature/SyntheticPrivateRestoreTest.php",
+        "tests/Feature/HostedCheckoutMigrationTest.php", "tests/Feature/OrderPreparationMigrationTest.php",
+        "tests/Feature/PromotionMigrationTest.php", "tests/Feature/QuotePricingMigrationTest.php",
+        "tests/Feature/SharedInventoryMigrationTest.php", "tests/Feature/TestOrderFinalizationMigrationTest.php",
+        "tests/Feature/TestPaymentEvidenceMigrationTest.php",
     ),
     "seller": (
         "tests/Feature/CustomerInquiryHttpTest.php", "tests/Feature/CustomerInquiryMigrationTest.php",
