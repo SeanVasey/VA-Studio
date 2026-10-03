@@ -50,10 +50,11 @@ class BindStemsToRecording
                     throw ValidationException::withMessages(['master_asset_id' => 'Stems, master and preview must have intact processing evidence and matching private bytes.']);
                 }
             }
-            $existing = StemsRecording::where('stems_asset_id', $stems->id)->first();
+            $inspection = $associations->inspectCurrentBinding($stems);
+            $existing = $inspection['binding'];
             if ($existing) {
                 if ($existing->master_asset_id === $master->id && $existing->preview_asset_id === $preview->id
-                    && $existing->verification_reference === $data['verification_reference'] && $associations->verified($stems)) {
+                    && $existing->verification_reference === $data['verification_reference'] && $inspection['verified']) {
                     return $existing;
                 }
                 throw ValidationException::withMessages(['master_asset_id' => 'This stems revision is already associated. Preserve its evidence and upload a new stems revision to make a correction.']);

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Application\Media\MediaIntegrity;
 use App\Domain\Catalog\Models\Offer;
+use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\OfferSnapshot;
 use App\Domain\Catalog\PublicationReadiness;
 use App\Domain\Catalog\PublishOffer;
@@ -206,6 +207,66 @@ class StemsRecordingTest extends TestCase
             }
         }
         $this->assertSame($binding->evidence_hash, $binding->fresh()->evidence_hash);
+    }
+
+    public function test_invalid_existing_binding_is_rejected_without_being_treated_as_absent(): void
+    {
+        ['actor' => $actor, 'track' => $track, 'stems' => $stems, 'media' => $media, 'data' => $data] = $this->fixture;
+        $binding = new StemsRecording([
+            'track_id' => $track->id, 'stems_asset_id' => $stems->id, 'master_asset_id' => $media['master_wav']->id,
+            'preview_asset_id' => $media['preview_tagged']->id, 'recording_source_id' => $media['master_wav']->parent_asset_id,
+            'verified_by' => $actor->id, 'verified_at' => now()->startOfSecond(),
+            'verification_reference' => $data['verification_reference'], 'canonicalization_version' => CanonicalJson::VERSION,
+        ]);
+        $associations = app(RecordingAssociation::class);
+        $binding->evidence = $associations->evidence($binding, $stems, $media['master_wav'], $media['preview_tagged']);
+        // Malformed initial evidence; never disable the immutable update/delete guards.
+        $binding->evidence_hash = str_repeat('0', 64);
+        $binding->save();
+        $before = $binding->fresh()->getAttributes();
+        $inspection = DB::transaction(function () use ($track, $stems, $associations): array {
+            Track::query()->lockForUpdate()->findOrFail($track->id);
+
+            return $associations->inspectCurrentBinding($stems);
+        });
+        $this->assertSame($binding->id, $inspection['binding']->id);
+        $this->assertFalse($inspection['verified']);
+        $this->assertNull($associations->retained($stems));
+        $this->assertNull($associations->verified($stems));
+        try {
+            $this->bind();
+            $this->fail('Invalid existing evidence was accepted or replaced.');
+        } catch (ValidationException $exception) {
+            $this->assertStringContainsString('already associated', $exception->errors()['master_asset_id'][0]);
+        }
+        $this->assertSame($before, $binding->fresh()->getAttributes());
+        $this->assertDatabaseCount('stems_recordings', 1);
+        $this->assertSame(0, AuditEvent::where('action', 'media.stems.recording_associated')->count());
+    }
+
+    public function test_current_binding_query_failure_propagates_without_creating_a_binding_or_audit(): void
+    {
+        $failure = new QueryException(DB::connection()->getName(), 'select synthetic recording binding', [],
+            new RuntimeException('Synthetic current-binding query failure.'));
+        $armed = true;
+        $raised = false;
+        DB::connection()->beforeExecuting(function ($query) use ($failure, &$armed, &$raised): void {
+            if ($armed && preg_match('/\Aselect\b/i', $query) && str_contains($query, 'stems_recordings')) {
+                $raised = true;
+                throw $failure;
+            }
+        });
+        try {
+            $this->bind();
+            $this->fail('A current-binding query failure was treated as absence.');
+        } catch (QueryException $exception) {
+            $this->assertSame($failure, $exception);
+        } finally {
+            $armed = false;
+        }
+        $this->assertTrue($raised);
+        $this->assertDatabaseCount('stems_recordings', 0);
+        $this->assertSame(0, AuditEvent::where('action', 'media.stems.recording_associated')->count());
     }
 
     public function test_tag_regeneration_preserves_recording_match_but_new_source_requires_new_stems_revision(): void

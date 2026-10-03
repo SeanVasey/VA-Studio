@@ -5,6 +5,8 @@ namespace App\Domain\Media;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\Models\StemsRecording;
 use App\Support\CanonicalJson;
+use Illuminate\Support\Facades\DB;
+use LogicException;
 use Throwable;
 
 /** Processing ancestry stays intact; stems use a separate immutable recording attestation. */
@@ -27,17 +29,8 @@ class RecordingAssociation
     {
         try {
             $binding = StemsRecording::where('stems_asset_id', $stems->id)->first();
-            $master = $binding?->master;
-            $preview = $binding?->preview;
-            if (! $binding || ! $master || ! $preview || $stems->role !== 'stems_zip' || $master->role !== 'master_wav' || $preview->role !== 'preview_tagged'
-                || $binding->track_id !== $stems->track_id || $master->track_id !== $stems->track_id || $preview->track_id !== $stems->track_id
-                || ! $master->parent_asset_id || $binding->recording_source_id !== $master->parent_asset_id || $preview->parent_asset_id !== $master->parent_asset_id
-                || $preview->processing_run_id !== $master->processing_run_id || ! $binding->verified_by || ! $binding->verified_at || trim($binding->verification_reference) === ''
-                || $binding->canonicalization_version !== CanonicalJson::VERSION || ! hash_equals($binding->evidence_hash, CanonicalJson::hash($binding->evidence))
-                || ! hash_equals($binding->evidence_hash, CanonicalJson::hash($this->evidence($binding, $stems, $master, $preview)))) {
-                return null;
-            }
-            return $binding;
+
+            return $this->retainedBinding($stems, $binding);
         } catch (Throwable) {
             return null;
         }
@@ -46,18 +39,60 @@ class RecordingAssociation
     public function verified(MediaAsset $stems): ?StemsRecording
     {
         try {
-            $binding = $this->retained($stems);
-            if (! $binding) { return null; }
-            foreach ([$stems, $binding->master, $binding->preview] as $asset) {
-                if (! app(VerifiedMedia::class)->available($asset)) {
-                    return null;
-                }
-            }
-
-            return $binding;
+            return $this->availableBinding($stems, $this->retained($stems));
         } catch (Throwable) {
             return null;
         }
+    }
+
+    /**
+     * Writer-only current binding read; the caller must already hold the stems track fence.
+     * Related media evidence keeps its existing read semantics; this does not refresh a caller's snapshot.
+     *
+     * @return array{binding: ?StemsRecording, verified: bool}
+     */
+    public function inspectCurrentBinding(MediaAsset $stems): array
+    {
+        if (DB::transactionLevel() === 0) {
+            throw new LogicException('Current recording binding inspection requires the writer transaction.');
+        }
+        // A failed lock/query must propagate, never masquerade as permission to insert a new binding.
+        $binding = StemsRecording::where('stems_asset_id', $stems->id)->lockForUpdate()->first();
+        try {
+            $verified = $this->availableBinding($stems, $this->retainedBinding($stems, $binding)) !== null;
+        } catch (Throwable) {
+            $verified = false;
+        }
+
+        return ['binding' => $binding, 'verified' => $verified];
+    }
+
+    private function retainedBinding(MediaAsset $stems, ?StemsRecording $binding): ?StemsRecording
+    {
+        $master = $binding?->master;
+        $preview = $binding?->preview;
+        if (! $binding || ! $master || ! $preview || $stems->role !== 'stems_zip' || $master->role !== 'master_wav' || $preview->role !== 'preview_tagged'
+            || $binding->track_id !== $stems->track_id || $master->track_id !== $stems->track_id || $preview->track_id !== $stems->track_id
+            || ! $master->parent_asset_id || $binding->recording_source_id !== $master->parent_asset_id || $preview->parent_asset_id !== $master->parent_asset_id
+            || $preview->processing_run_id !== $master->processing_run_id || ! $binding->verified_by || ! $binding->verified_at || trim($binding->verification_reference) === ''
+            || $binding->canonicalization_version !== CanonicalJson::VERSION || ! hash_equals($binding->evidence_hash, CanonicalJson::hash($binding->evidence))
+            || ! hash_equals($binding->evidence_hash, CanonicalJson::hash($this->evidence($binding, $stems, $master, $preview)))) {
+            return null;
+        }
+
+        return $binding;
+    }
+
+    private function availableBinding(MediaAsset $stems, ?StemsRecording $binding): ?StemsRecording
+    {
+        if (! $binding) { return null; }
+        foreach ([$stems, $binding->master, $binding->preview] as $asset) {
+            if (! app(VerifiedMedia::class)->available($asset)) {
+                return null;
+            }
+        }
+
+        return $binding;
     }
 
     public function evidence(StemsRecording $binding, MediaAsset $stems, MediaAsset $master, MediaAsset $preview): array
