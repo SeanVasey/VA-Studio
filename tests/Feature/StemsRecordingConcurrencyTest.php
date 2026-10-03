@@ -80,7 +80,9 @@ SQL;
             foreach ($processes as $process) {
                 $process->wait();
                 $this->assertSame(0, $process->getExitCode(), 'Recording worker failed: '.$process->getOutput().$process->getErrorOutput());
-                $results[] = json_decode($process->getOutput(), true, 16, JSON_THROW_ON_ERROR);
+                $output = $process->getOutput();
+                $this->assertJson($output, 'Recording worker emitted invalid JSON: '.$output.$process->getErrorOutput());
+                $results[] = json_decode($output, true, 16, JSON_THROW_ON_ERROR);
             }
             $this->assertCount(3, array_unique([...array_column($results, 'pid'), getmypid()]));
             $this->assertSame('saved', $results[$winner]['result']);
