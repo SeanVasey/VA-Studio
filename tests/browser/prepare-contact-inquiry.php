@@ -1,5 +1,7 @@
 <?php
 
+use App\Domain\Catalog\Models\Track;
+use App\Domain\Catalog\PublishTrack;
 use App\Domain\Commerce\Inventory\ManageRightsScope;
 use App\Domain\Commerce\Models\Order;
 use App\Domain\Commerce\Orders\ReadOrder;
@@ -129,7 +131,8 @@ try {
                     $rights = app(ManageRightsScope::class);
                     $scope = $rights->register('inquiry-'.$project, 'SYNTHETIC-INQUIRY-SCOPE', $selection['actor']);
                     $rights->link($scope->id, $selection['revision']->id, 'SYNTHETIC-INQUIRY-LINK', $selection['actor']);
-                    $fixture['orderSupport'] = ['capability' => bin2hex(random_bytes(32)), 'items' => $selection['items'], 'slug' => $selection['track']->slug];
+                    $fixture['orderSupport'] = ['capability' => bin2hex(random_bytes(32)), 'items' => $selection['items'],
+                        'slug' => $selection['track']->slug, 'publicationVersion' => $selection['track']->publication_version];
                 } finally {
                     config(['media.clamscan' => $scannerPath]);
                     app()->detectEnvironment(fn () => 'local');
@@ -266,16 +269,50 @@ try {
                 $expectedReleaseId = $rotation['releaseId'];
                 $rotations = 1;
             }
-            $current = SitePublication::findOrFail(1);
+            $conversationTrack = static function (bool $restored) use ($conversation, $fixture): ?Track {
+                if (! $conversation) {
+                    return null;
+                }
+                $support = $fixture['orderSupport'] ?? null;
+                if (! is_array($support) || count($support['items'] ?? []) !== 1
+                    || ! is_int($support['items'][0]['trackId'] ?? null) || ! is_int($support['publicationVersion'] ?? null)) {
+                    throw new RuntimeException('Missing exact conversation catalog identity.');
+                }
+                $track = Track::query()->lockForUpdate()->findOrFail($support['items'][0]['trackId']);
+                if ($track->slug !== $support['slug'] || $track->published_slug !== $support['slug']
+                    || $track->status !== ($restored ? 'draft' : 'published')
+                    || $track->publication_version !== $support['publicationVersion'] + ($restored ? 1 : 0)) {
+                    throw new RuntimeException('Conversation catalog identity or publication changed.');
+                }
+
+                return $track;
+            };
             if ($fixture['restored'] !== true) {
-                if ($current->active_release_id !== $expectedReleaseId) {
-                    throw new RuntimeException('Another publication replaced the fixture.');
-                }
-                $site->rollback($fixture['restoreReleaseId'], $current->revision, $operator);
-                $fixture['restored'] = true;
-                if (file_put_contents($path, json_encode($fixture, JSON_THROW_ON_ERROR), LOCK_EX) === false) {
-                    throw new RuntimeException('Unable to retain restoration evidence.');
-                }
+                DB::transaction(function () use ($site, &$fixture, $expectedReleaseId, $operator, $conversationTrack, $path, $inquiryGraph): void {
+                    $current = SitePublication::lockForUpdate()->findOrFail(1);
+                    if ($current->active_release_id !== $expectedReleaseId) {
+                        throw new RuntimeException('Another publication replaced the fixture.');
+                    }
+                    $track = $conversationTrack(false);
+                    if ($track !== null) {
+                        $originalsHash = CanonicalJson::hash(DeliveryFixtures::retained());
+                        $inquiriesHash = $inquiryGraph();
+                        // Withdraw only this journey's ready recording through the audited domain command.
+                        // Its order, contracts, entitlements and linked inquiry remain private retained history.
+                        app(PublishTrack::class)->unpublish($track, $operator);
+                        if (! hash_equals($originalsHash, CanonicalJson::hash(DeliveryFixtures::retained()))
+                            || ! hash_equals($inquiriesHash, $inquiryGraph())) {
+                            throw new RuntimeException('Conversation restoration changed original retained evidence.');
+                        }
+                    }
+                    $site->rollback($fixture['restoreReleaseId'], $current->revision, $operator);
+                    $fixture['restored'] = true;
+                    if (file_put_contents($path, json_encode($fixture, JSON_THROW_ON_ERROR), LOCK_EX) === false) {
+                        throw new RuntimeException('Unable to retain restoration evidence.');
+                    }
+                });
+            } else {
+                $conversationTrack(true); // A repeated restore verifies the retained identity without further writes.
             }
             if (SitePublication::findOrFail(1)->active_release_id !== $fixture['restoreReleaseId']) {
                 throw new RuntimeException('The prior publication was not restored.');
