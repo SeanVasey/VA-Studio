@@ -116,7 +116,7 @@ try {
         echo json_encode(['refundedId' => $records['refunded']['publicId'], 'partialId' => $records['partial']['publicId'],
             'operatorEmail' => 'browser-operator@example.test', 'capability' => $project.':'.$fixture['capability'],
             'privateMarkers' => [UnpaidReleaseBrowserFixture::ACCOUNT, 'Synthetic Buyer Privacy Marker', 'order-privacy-marker@example.invalid', 'private-financial@example.test',
-                ...array_merge(...array_map(fn ($record) => [$record['session']['id'], $record['payment']['id'], $record['payment']['latest_charge']], $records))]], JSON_THROW_ON_ERROR)."\n";
+                ...array_merge(...array_map(fn ($record) => [$record['session']['id'], $record['payment']['id'], $record['payment']['latest_charge']], array_values($records)))]], JSON_THROW_ON_ERROR)."\n";
     } else {
         $fixture = RefundResolutionBrowserFixture::manifest($directory, $project);
         RefundResolutionBrowserFixture::check(refundGuardHash() === $fixture['guardHash']
