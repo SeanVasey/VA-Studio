@@ -12,6 +12,8 @@ Open **Sound kit drafts** in the authenticated admin. Create a title, optional d
 
 **Retry verification** requests another attempt for a waiting revision or an expired processing lease. Scanner or tool outages remain retryable. A terminal file failure requires a new upload; a verified revision cannot be replaced. Queue dispatch failure leaves the durable waiting revision available. Refresh and inspect status after a request: a recorded retry request alone does not prove that a worker received it.
 
+The **200 MiB value is a technical/application ceiling, not demonstrated HTTP admission**. Livewire allows 204,800 KiB and 15 minutes, but the current guarded Playwright and private-alpha PHP servers use `upload_max_filesize=9M` and `post_max_size=9M` for the existing track uploader's 8 MiB chunks. This kit form currently sends a whole file, so its effective limit on those servers is **below 9 MiB once multipart overhead is included**. Small PHP/Livewire fixtures do not prove a rendered or native-browser 200 MiB upload. Production proxy/PHP limits have not been validated by this child. A typed resumable kit transport is the next development increment; the track resumable route cannot accept kit identities.
+
 ## Technical profile and private evidence
 
 The profile is `wav-sample-kit-zip-v1`, separate from the stems product role. The shared WAV ZIP engine preserves the existing archive safety mechanisms. It accepts unencrypted ZIP stored/deflated WAV members, rejects traversal, ambiguous/case-colliding names, links, special files, unsupported attributes, nested archives and auxiliary formats, and validates CRC/expanded bytes before trusting them.
@@ -42,4 +44,10 @@ Public kit listings, approved demo/artwork, product-specific rights approval, th
 
 The shared parser extraction passed the unchanged stems/archive/budget/private-root regressions: 58 tests, 589 assertions. Independent review approved its three-file commit `ad05d8cf32165cf200dc006e8842c41a4ae69e6a` before kit domain work.
 
-Final kit source, SQLite/native MySQL outcomes and independent review binding are recorded with the completed implementation checkpoint. Local synthetic scanning proves the service integration and refusal paths; it does not claim production ClamAV deployment or native browser acceptance.
+Runtime source frozen at `9cd5db9f30461821d52c2f869dcc0bcb931d377f` passed:
+
+- PHP 8.4.26/SQLite: `php vendor/bin/phpunit tests/Feature/SoundKitIntakeTest.php tests/Feature/SoundKitRecoveryTest.php tests/Feature/SoundKitMigrationTest.php tests/Feature/SoundKitDraftAdminTest.php --stop-on-error --stop-on-failure` — **41 tests, 298 assertions**, no failures/skips, 9.567 seconds.
+- Native MySQL 8.4.11 with the same four files plus `tests/Feature/SoundKitConcurrencyTest.php` — **50 tests, 660 assertions**, no failures/skips, 176.318 seconds. The isolated local wrapper retained normal durability; the nine concurrency cases used independent PHP processes and observed exact InnoDB `PRIMARY` record waits before release. They cover duplicate intake/processing, six current-MFA admission operations and MFA withdrawal at finalization after real audio work.
+- Pint passed for the 19 new PHP files; diff checks passed. Actual route discovery found only the authenticated, MFA-protected `admin/sound-kit-drafts` resource page.
+
+The eight Filament tests invoke real create/edit/upload/inspect/retry actions and domain processing. Archive tests use real bounded audio probing/decoding and deterministic repacking with an explicitly synthetic scanner; they do not claim production ClamAV deployment, native browser acceptance or full-size HTTP admission. Independent domain/migration/processing review resolved the MySQL collation gap with byte-sensitive immutable comparisons, and separate UI review assessed its author-owned files. Shared CI registration/integration remains the integrating agent's responsibility.
