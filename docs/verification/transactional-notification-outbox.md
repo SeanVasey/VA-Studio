@@ -1,0 +1,79 @@
+# Private test transactional notification foundation
+
+This T32 / FP-075 child prepares durable notification work. It does not send
+receipt email, wire an existing producer, enable a provider, infer consent or
+complete CRM parity. The existing identity proof capture and contract-render
+outbox remain separate and unchanged.
+
+The only notice type is `test_order_ready`. `enqueueOrderReady(orderId,
+CustomerPrincipal)` uses current customer access and purchase access, including
+the exact existing claimed-order proof, then reconstructs the retained activated
+test-order graph. Its event identity is the activation UUID plus account UUID.
+It privately encrypts a fixed canonical envelope: the verified canonical
+recipient, opaque account/order/activation references, fixed test template and
+test-only marker. No proof, password, original owner key, bearer link, private
+media path, order body, price or legal text is copied. Neither the event key nor
+notice UUID grants order or delivery access. A ready notice records the retained
+activation decision; it does not establish current private-file health or a
+fresh download authorization.
+
+Public domain methods are:
+
+| Method | Result / boundary |
+| --- | --- |
+| `enqueueOrderReady(string, CustomerPrincipal): array` | `notificationSchema`, `notificationId`, fixed `type`, `testOnly`, `replayed`; an exact replay changes no intent, time, attempt or audit. |
+| `claim(string, bool retryKnownFailure = false): ?NotificationLease` | Internal redacted, nonserializable lease; no replacement claim for an active, accepted or uncertain attempt. |
+| `dispatch(string, bool retryKnownFailure = false): array` | Private local capture only; reports `notificationSchema`, `notificationId`, `testOnly`, `state`. |
+| `complete(NotificationLease, string receiptHash): array` | Positive inspection of original canonical bytes and current claim/authority is required; a late or losing claim cannot override a winner. |
+| `reconcile(string): array` | Reads the exact original capture. It never invokes storage delivery or reserves another attempt. |
+| `status(string): array` | Internal operational projection, including positive original-byte verification for accepted capture. There is no HTTP/CLI entrypoint in this child. |
+
+All commands require their own transaction boundary. Lock order is user,
+account, order, existing immutable claim/activation evidence, notice, then
+attempt. A short lease commits before filesystem I/O. Final raw reads recheck
+authority, immutable intent and the complete expected attempt rows after
+application callbacks. Audit stores safe hashes, fixed state/reason and the
+test-only marker; unexpected capture logs only the exception class.
+
+The fixed local test policy allows 30-second leases and at most three attempts.
+Only a definite pre-message private-storage refusal permits an explicitly
+requested retry. Generic exceptions and expiration are uncertain. An uncertain
+capture is never automatically redelivered; a matching original file can move
+it to accepted through read-only reconciliation. Accepted means **private test
+capture accepted**, not an email sent or received. Missing or altered bytes do
+not establish acceptance or a safe resend.
+
+The capture adapter requires a private local disk, canonical fixed envelope,
+0700 owned directory and 0600 owned regular file. It rejects links and multiple
+hard links, opens new messages exclusively, fsyncs bytes and never overwrites
+an existing or partial crash file. There is no network, mail, notification or
+queue channel. Defaults are disabled; production and all other transports are
+refused even when configured enabled.
+
+The additive migration owns only `transactional_notices` and
+`transactional_notice_attempts`. Restrictive foreign keys retain the account,
+user, original order, activation and optional exact purchase claim. Database
+guards enforce byte-exact identities, insertion bounds, immutable intent and
+claims, legal attempt transitions and SQLite replacement denial. Unexpected,
+partial, temporary, modified or populated schema is not adopted or erased.
+Rollback verifies owned schema and guards and refuses external child references
+before any DDL.
+
+The integrating lane owns empty-child rollback setup in the existing parent
+migration tests: CustomerAccountMigrationTest, CustomerPurchaseClaimMigrationTest,
+TestFulfillmentActivationMigrationTest, TestContractIssuanceMigrationTest,
+TestOrderFinalizationMigrationTest, TestPaymentEvidenceMigrationTest,
+HostedCheckoutMigrationTest, OrderPreparationMigrationTest,
+SharedInventoryMigrationTest, PromotionMigrationTest and QuotePricingMigrationTest.
+This component preserves those files and does not claim their composed
+compatibility before the integration change is tested.
+
+The first source checkpoint fixes the domain API and schema for review and
+fixture integration. Focused working-source feedback passed four functional
+SQLite cases / 44 assertions; retained initial failures were fixture key/setup
+errors before the relevant notification assertion or enqueue. Full adversarial,
+migration and genuine native race evidence is still being developed. A source
+checkpoint or test definition is not final acceptance. Exact tested source,
+commands, failures and remaining conditions will be recorded in the final
+component packet. No hosted full matrix, provider action or production operation
+was performed.
