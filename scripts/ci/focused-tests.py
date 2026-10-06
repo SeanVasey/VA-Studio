@@ -34,6 +34,9 @@ PHP_TARGETS = {
         "tests/Unit/TcpdfContractRendererTest.php", "tests/Unit/TypedLicenseTermsTest.php",
     ),
     "media": (
+        "tests/Feature/SoundKitIntakeTest.php", "tests/Feature/SoundKitRecoveryTest.php",
+        "tests/Feature/SoundKitMigrationTest.php", "tests/Feature/SoundKitDraftAdminTest.php",
+        "tests/Feature/SoundKitConcurrencyTest.php",
         "tests/Unit/FileUploadPathGuardTest.php", "tests/Unit/MediaEvidenceValuesTest.php",
         "tests/Unit/SiteImageGuardBytesTest.php", "tests/Feature/InstallationReportTest.php",
         "tests/Feature/MalwareScannerTest.php", "tests/Feature/MediaProcessingTest.php",

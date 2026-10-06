@@ -283,6 +283,18 @@
       "test_scheduler_and_manual_publication_serialize_to_one_consistent_outcome"
     ],
     [
+      "Tests\\Feature\\SoundKitConcurrencyTest",
+      "test_mfa_withdrawal_committed_during_actor_wait_refuses_kit_operation"
+    ],
+    [
+      "Tests\\Feature\\SoundKitConcurrencyTest",
+      "test_mfa_withdrawal_during_final_actor_wait_prevents_verified_commit_after_real_scanning"
+    ],
+    [
+      "Tests\\Feature\\SoundKitConcurrencyTest",
+      "test_native_actor_wait_serializes_duplicate_upload_or_processing"
+    ],
+    [
       "Tests\\Feature\\StemsRecordingConcurrencyTest",
       "test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation"
     ],

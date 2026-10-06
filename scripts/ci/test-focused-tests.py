@@ -108,6 +108,18 @@ class SelectionTests(unittest.TestCase):
         self.assertIn("tests/frontend/customer-account.test.tsx", focused.FRONTEND_TARGETS)
         self.assertIn("tests/browser/customer-account.spec.ts", focused.BROWSER_TARGETS)
 
+    def test_kit_feedback_retains_intake_recovery_schema_admin_and_native_races(self):
+        for target in ("SoundKitIntakeTest", "SoundKitRecoveryTest", "SoundKitMigrationTest",
+                       "SoundKitDraftAdminTest", "SoundKitConcurrencyTest"):
+            self.assertIn("tests/Feature/" + target + ".php", focused.PHP_TARGETS["media"])
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        self.assertEqual({row[1] for row in policy["methods"]
+                          if row[0] == "Tests\\Feature\\SoundKitConcurrencyTest"}, {
+            "test_native_actor_wait_serializes_duplicate_upload_or_processing",
+            "test_mfa_withdrawal_committed_during_actor_wait_refuses_kit_operation",
+            "test_mfa_withdrawal_during_final_actor_wait_prevents_verified_commit_after_real_scanning",
+        })
+
     def test_workflow_dispatch_choices_exactly_match_reviewed_suite_enums(self):
         workflow = (ROOT / ".github/workflows/focused.yml").read_text()
         choices = workflow.split("options: [", 1)[1].split("]", 1)[0].split(", ")
