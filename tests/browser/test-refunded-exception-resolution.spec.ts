@@ -4,7 +4,7 @@ import { expect, test, type Locator, type Page, type Request, type Response } fr
 import { resetBrowserLoginRateLimit } from './auth-fixture';
 import { actionResponse } from './publication-fixture';
 
-type Fixture = { refundedId: string; partialId: string; operatorEmail: string; capability: string; privateMarkers: string[] };
+type Fixture = { refundedId: string; partialId: string; refundedOrderId: string; partialOrderId: string; operatorEmail: string; capability: string; privateMarkers: string[] };
 type Proof = {
   phase: string; resolutionId: string | null; historyCount: number; partialHistoryCount: number; providerReads: number;
   originalsUnchanged: boolean; noRightsOrMoneyEffects: boolean; guardsUnchanged: boolean;
@@ -12,9 +12,9 @@ type Proof = {
 const componentName = 'App\\Filament\\Resources\\TestPaymentExceptionResource\\Pages\\ListTestPaymentExceptions';
 const livewireUrl = /\/livewire(?:-[A-Za-z0-9]+)?\/update$/;
 
-function fixtureOperation(mode: 'prepare' | 'verify', project: string, phase?: string) {
+function fixtureOperation(mode: 'prepare' | 'verify', project: string, phase?: string, input?: unknown) {
   return JSON.parse(execFileSync('php', ['tests/browser/prepare-test-refund-resolution.php', mode, project, ...(phase ? [phase] : [])], {
-    cwd: process.cwd(), env: process.env, encoding: 'utf8', timeout: 90_000, stdio: 'pipe',
+    cwd: process.cwd(), env: process.env, encoding: 'utf8', timeout: 90_000, stdio: 'pipe', input: input ? JSON.stringify(input) : undefined,
   }));
 }
 
@@ -71,19 +71,62 @@ function requestReview(payload: { components?: { snapshot: string }[] }) {
   return data.mountedActions[0].data;
 }
 
-test('operator releases a fully refunded exception, retries a lost success and rejects a partial refund', async ({ page }, testInfo) => {
+type CustomerRead = { path: string; status: number; cache: string | null; body: string };
+async function captureCustomerReads(page: Page): Promise<CustomerRead[]> {
+  const reads: CustomerRead[] = [];
+  await page.exposeBinding('__vaseyResolutionResponse', (_source, value: CustomerRead) => { reads.push(value); });
+  await page.addInitScript(() => {
+    const native = window.fetch.bind(window);
+    window.fetch = async (input, init) => {
+      const url = new URL(input instanceof Request ? input.url : String(input), location.href);
+      const response = await native(input, init);
+      if ((init?.method ?? 'GET').toUpperCase() === 'GET' && url.origin === location.origin && url.pathname.endsWith('/exception-resolution')) {
+        await (window as unknown as { __vaseyResolutionResponse: (value: CustomerRead) => Promise<void> }).__vaseyResolutionResponse({
+          path: url.pathname, status: response.status, cache: response.headers.get('cache-control'), body: await response.clone().text(),
+        });
+      }
+      return response;
+    };
+  });
+  return reads;
+}
+
+test('operator releases a fully refunded exception, retries a lost success and rejects a partial refund', async ({ page, browser }, testInfo) => {
   test.setTimeout(180_000);
   resetBrowserLoginRateLimit();
-  const fixture = fixtureOperation('prepare', testInfo.project.name) as Fixture;
+  const guestContext = await browser.newContext({ ...testInfo.project.use, baseURL: 'http://127.0.0.1:8173' });
+  const foreignContext = await browser.newContext({ ...testInfo.project.use, baseURL: 'http://127.0.0.1:8173' });
+  try {
+  const guest = await guestContext.newPage();
+  const customerReads = await captureCustomerReads(guest);
   const errors: string[] = [];
   const externalRequests: string[] = [];
+  const customerOrderRequests: { path: string; method: string }[] = [];
   const failedRequests: { url: string; error: string | null; deliberatelyAborted: boolean }[] = [];
   let abortedRequest: Request | undefined;
-  page.on('pageerror', error => errors.push(error.message));
-  page.on('request', request => {
-    if (new URL(request.url()).origin !== 'http://127.0.0.1:8173') externalRequests.push(request.url());
-  });
-  page.on('requestfailed', request => failedRequests.push({ url: request.url(), error: request.failure()?.errorText ?? null, deliberatelyAborted: request === abortedRequest }));
+  for (const current of [page, guest]) {
+    current.on('pageerror', error => errors.push(error.message));
+    current.on('request', request => {
+      const url = new URL(request.url());
+      if (url.origin !== 'http://127.0.0.1:8173') externalRequests.push(request.url());
+      if (current === guest && url.pathname.startsWith('/orders/')) customerOrderRequests.push({ path: url.pathname, method: request.method() });
+    });
+    current.on('requestfailed', request => failedRequests.push({ url: request.url(), error: request.failure()?.errorText ?? null, deliberatelyAborted: request === abortedRequest }));
+  }
+  await guest.goto('/');
+  expect((await guest.request.get('/orders/history')).status()).toBe(200);
+  const cookie = (await guestContext.cookies()).find(value => value.name === process.env.SESSION_COOKIE);
+  expect(cookie).toBeTruthy();
+  const fixture = fixtureOperation('prepare', testInfo.project.name, undefined, { name: cookie!.name, value: cookie!.value }) as Fixture;
+  expect((await guest.goto(`/orders/${fixture.refundedOrderId}/checkout/return`))?.status()).toBe(200);
+  const customerPanel = guest.getByRole('region', { name: 'Recorded test-order resolution', exact: true });
+  await expect(customerPanel.getByRole('button', { name: 'View recorded test-order resolution', exact: true })).toBeVisible();
+  expect(customerReads).toHaveLength(0);
+  await customerPanel.getByRole('button', { name: 'View recorded test-order resolution', exact: true }).press('Enter');
+  await expect(customerPanel).toContainText('No retained full-refund resolution was found');
+  expect(customerReads).toHaveLength(1);
+  expect(JSON.parse(customerReads[0].body)).toEqual({ resolution: { exceptionResolutionSchema: 1, orderId: fixture.refundedOrderId, testOnly: true, record: null } });
+  await assertPrivate(guest, fixture, customerReads[0].body);
   await page.goto('/admin/test-payment-exceptions');
   await expect(page).toHaveURL(/\/admin\/login$/);
   await page.getByLabel('Email address', { exact: false }).fill(fixture.operatorEmail);
@@ -178,6 +221,34 @@ test('operator releases a fully refunded exception, retries a lost success and r
   await operate(page, partialRow.getByRole('button', { name: 'Refund resolution history', exact: true }), 'mountAction', 'refundResolutionHistory');
   await expect(dialog).toContainText('No verified resource resolution is recorded in this review');
   await operate(page, dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Close', exact: true }), 'unmountAction');
+
+  await customerPanel.getByRole('button', { name: 'Refresh recorded test-order resolution', exact: true }).press('Enter');
+  await expect(customerPanel).toContainText('A full test refund was verified and this order’s reservations were released.');
+  await expect(customerPanel).toContainText('does not confirm refund arrival or the current payment-provider state');
+  await expect(customerPanel).toContainText('not when a refund was sent');
+  await expect(guest.getByRole('region', { name: 'Stripe test checkout', exact: true })).toContainText('Contracts and download access are blocked');
+  await expect(guest.getByRole('region', { name: 'Test order downloads', exact: true })).toHaveCount(0);
+  expect(customerReads).toHaveLength(2);
+  const recorded = JSON.parse(customerReads[1].body);
+  expect(recorded).toEqual({ resolution: { exceptionResolutionSchema: 1, orderId: fixture.refundedOrderId, testOnly: true,
+    record: { kind: 'full_refund_verified_resources_released', observedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/), releasedAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/) } } });
+  expect(recorded.resolution.record.observedAt <= recorded.resolution.record.releasedAt).toBe(true);
+  await assertPrivate(guest, fixture, customerReads[1].body);
+  await customerPanel.getByRole('button', { name: 'Hide recorded test-order resolution', exact: true }).press('Enter');
+  await expect(customerPanel.getByRole('heading')).toHaveCount(0);
+  expect((await guest.goto(`/orders/${fixture.partialOrderId}/checkout/return`))?.status()).toBe(200);
+  await customerPanel.getByRole('button', { name: 'View recorded test-order resolution', exact: true }).press('Enter');
+  await expect(customerPanel).toContainText('This does not establish whether a refund was made.');
+  expect(customerReads).toHaveLength(3);
+  expect(JSON.parse(customerReads[2].body)).toEqual({ resolution: { exceptionResolutionSchema: 1, orderId: fixture.partialOrderId, testOnly: true, record: null } });
+  await assertPrivate(guest, fixture, customerReads[2].body);
+  for (const read of customerReads) { expect(read.status).toBe(200); expect(read.cache).toContain('no-store'); }
+  const foreign = await foreignContext.request.get(`/orders/${fixture.refundedOrderId}/exception-resolution`);
+  const unknown = await foreignContext.request.get('/orders/750000ab-0000-4000-8000-ffffffffffff/exception-resolution');
+  expect(foreign.status()).toBe(404); expect(unknown.status()).toBe(404); expect(await foreign.json()).toEqual(await unknown.json());
+  expect(foreign.headers()['cache-control']).toContain('no-store'); expect(unknown.headers()['cache-control']).toContain('no-store');
+  expect(verify(testInfo.project.name, 'partial')).toEqual(partialProof); // Customer reads add no provider calls or changes to the retained business rows.
+  expect(customerOrderRequests.length).toBeGreaterThan(0); expect(customerOrderRequests.every(request => request.method === 'GET')).toBe(true);
   expect(intercepted).toBe(1);
   expect(failedRequests).toHaveLength(1);
   expect(failedRequests[0].url).toMatch(livewireUrl);
@@ -189,6 +260,9 @@ test('operator releases a fully refunded exception, retries a lost success and r
   const proofPath = testInfo.outputPath('refunded-exception-resolution-proof.json');
   writeFileSync(proofPath, JSON.stringify({ schemaVersion: 1, prepared, released, replayed, partial: partialProof,
     sameRequestRetried: true, successfulResponseDeliberatelyDropped: true, expectedNetworkFailures: 1,
-    networkFailures: failedRequests, pageErrors: errors, externalRequests }, null, 2));
+    networkFailures: failedRequests, pageErrors: errors, externalRequests,
+    customerHistory: { explicitReads: customerReads.length, before: null, after: recorded.resolution.record,
+      partial: null, foreignAndUnknownDenied: true, originalsAndEffectsUnchanged: true, orderRequests: customerOrderRequests } }, null, 2));
   await testInfo.attach('refunded-exception-resolution-proof', { path: proofPath, contentType: 'application/json' });
+  } finally { await guestContext.close(); await foreignContext.close(); }
 });

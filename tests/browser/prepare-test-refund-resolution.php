@@ -1,22 +1,32 @@
 <?php
 
 use App\Domain\Commerce\Finalization\FinalizeTestPayment;
+use App\Domain\Commerce\Checkout\HostedCheckout;
+use App\Domain\Commerce\CreateQuote;
+use App\Domain\Commerce\Models\CheckoutIntent;
 use App\Domain\Commerce\Models\Order;
 use App\Domain\Commerce\Models\OrderFinalization;
 use App\Domain\Commerce\Models\TestPaymentExceptionEvent;
 use App\Domain\Commerce\Models\TestPaymentExceptionWork;
 use App\Domain\Commerce\Models\TestRefundResolution;
 use App\Domain\Commerce\Orders\ReadOrder;
+use App\Domain\Commerce\Orders\PrepareOrder;
+use App\Domain\Commerce\PriceQuote;
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use App\Domain\Commerce\Payments\StripePaymentGateway;
 use App\Support\CanonicalJson;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Cookie\CookieValuePrefix;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Str;
 use Tests\Support\CheckoutFixtures;
 use Tests\Support\FinalizationFixtures;
+use Tests\Support\InventoryFixtures;
+use Tests\Support\OrderFixtures;
 use Tests\Support\PaymentFinancialFixtures;
 use Tests\Support\PaymentFixtures;
 
@@ -41,6 +51,24 @@ try {
 
     if ($mode === 'prepare') {
         RefundResolutionBrowserFixture::check(! file_exists($path) && ! is_link($path) && ! file_exists($log) && ! is_link($log));
+        // Read real original guest possession before creating either order. Never seed or rewrite a session/owner.
+        $input = stream_get_contents(STDIN, 8193);
+        RefundResolutionBrowserFixture::check(is_string($input) && strlen($input) <= 8192);
+        $cookie = json_decode($input, true, 4, JSON_THROW_ON_ERROR);
+        RefundResolutionBrowserFixture::check(is_array($cookie) && array_keys($cookie) === ['name', 'value']
+            && $cookie['name'] === config('session.cookie') && is_string($cookie['value']));
+        $sessionId = CookieValuePrefix::validate($cookie['name'], Crypt::decrypt(rawurldecode($cookie['value']), false), app('encrypter')->getAllKeys());
+        RefundResolutionBrowserFixture::check(is_string($sessionId) && preg_match('/\A[A-Za-z0-9]{40}\z/D', $sessionId) === 1);
+        $sessionPath = $directory.'/framework/sessions/'.$sessionId;
+        RefundResolutionBrowserFixture::check(is_file($sessionPath) && ! is_link($sessionPath) && realpath($sessionPath) === $sessionPath
+            && is_readable($sessionPath) && filesize($sessionPath) > 0 && filesize($sessionPath) <= 65536
+            && fileowner($sessionPath) === posix_geteuid()); // Laravel's file is confined by the existing private 0700 fixture directory.
+        $session = app('session')->driver(); $session->setId($sessionId); $session->start();
+        $possession = $session->get('_quote_owner');
+        RefundResolutionBrowserFixture::check(! $session->has('_customer_access') && is_array($possession)
+            && ($possession['context'] ?? null) === 'guest' && is_string($possession['secret'] ?? null)
+            && preg_match('/\A[a-f0-9]{64}\z/D', $possession['secret']) === 1);
+        $owner = hash_hmac('sha256', "vasey-quote-owner-v1\0guest\0".$possession['secret'], config('app.key'));
         $before = refundBusinessRows();
         $guards = refundGuardHash();
         $records = [];
@@ -59,7 +87,14 @@ try {
                 $gateway->onCreate = fn (array $params) => CheckoutFixtures::session($params, 'cs_test_BROWSERREFUND'.$suffix);
                 $app->instance(StripeCheckoutGateway::class, $gateway);
                 $app->instance(StripePaymentGateway::class, $gateway);
-                $f = PaymentFixtures::started($gateway);
+                $selection = InventoryFixtures::selection();
+                $quote = app(CreateQuote::class)->handle($owner, (string) Str::uuid(), $selection['items']);
+                app(PriceQuote::class)->create($quote->public_id, $owner);
+                $order = app(PrepareOrder::class)->handle($owner, (string) Str::uuid(), OrderFixtures::request($quote, $owner));
+                app(HostedCheckout::class)->start($order->public_id, $owner);
+                $gateway->session['status'] = 'complete'; $gateway->session['payment_status'] = 'paid'; $gateway->session['url'] = null;
+                $gateway->payment = PaymentFixtures::payment($gateway->session);
+                $f = ['order' => $order, 'intent' => CheckoutIntent::where('order_id', $order->id)->sole()];
                 $gateway->session['payment_intent'] = 'pi_BROWSERREFUND'.$suffix;
                 $gateway->payment['id'] = $gateway->session['payment_intent'];
                 $gateway->payment['latest_charge'] = 'ch_BROWSERREFUND'.$suffix;
@@ -114,6 +149,7 @@ try {
         UnpaidReleaseBrowserFixture::write($log, '');
         UnpaidReleaseBrowserFixture::write($path, json_encode($fixture, JSON_THROW_ON_ERROR));
         echo json_encode(['refundedId' => $records['refunded']['publicId'], 'partialId' => $records['partial']['publicId'],
+            'refundedOrderId' => $records['refunded']['orderPublicId'], 'partialOrderId' => $records['partial']['orderPublicId'],
             'operatorEmail' => 'browser-operator@example.test', 'capability' => $project.':'.$fixture['capability'],
             'privateMarkers' => [UnpaidReleaseBrowserFixture::ACCOUNT, 'Synthetic Buyer Privacy Marker', 'order-privacy-marker@example.invalid', 'private-financial@example.test',
                 ...array_merge(...array_map(fn ($record) => [$record['session']['id'], $record['payment']['id'], $record['payment']['latest_charge']], array_values($records)))]], JSON_THROW_ON_ERROR)."\n";

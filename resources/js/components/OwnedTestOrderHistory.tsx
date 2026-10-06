@@ -7,7 +7,7 @@ export { validOrderHistory, validOrderSummary } from '../lib/owned-order-history
 function retainedStatus(order: OrderSummary): string {
   if (order.paymentStatus !== 'verified') return 'Payment has not been verified.';
   if (order.finalizationStatus === 'awaiting_finalization') return 'Test payment verified. Finalization is pending.';
-  if (order.finalizationStatus === 'paid_exception') return 'Test payment verified. This order needs review before fulfillment can continue.';
+  if (order.finalizationStatus === 'paid_exception') return 'Test payment verified. Fulfillment is blocked for this order.';
   if (order.contractStatus === 'attention') return 'Test payment verified. Contract preparation needs attention.';
   if (order.contractStatus === 'pending') return 'Test payment verified. Original contracts are pending.';
   return 'Original test contracts issued. Check the downloads panel for current availability.';

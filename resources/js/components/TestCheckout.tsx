@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { formatMoney } from '../lib/catalog';
 import { TestOwnerDelivery } from './TestOwnerDelivery';
+import { OrderExceptionResolution } from './OrderExceptionResolution';
 
 export interface PaymentProgress {
   paymentStatus: 'not_started' | 'not_verified' | 'verified';
@@ -65,7 +66,7 @@ const descriptions: Record<CheckoutStatus['status'], string> = {
 };
 const verifiedDescriptions = {
   awaiting_finalization: 'Test payment verified. Order finalization is pending. Contracts and download access are not available yet.',
-  paid_exception: 'Test payment verified. This order needs review before fulfillment can continue. Contracts and download access are blocked. Do not start another payment.',
+  paid_exception: 'Test payment verified. Fulfillment is blocked for this order. Contracts and download access are blocked. Do not start another payment.',
 };
 const contractDescriptions = {
   pending: 'Test payment verified and order finalized. Contracts are pending; download access is not available yet.',
@@ -182,6 +183,7 @@ function Checkout({ orderId, enabled = false, expectedTotalMinor, retainedProgre
     {!verified && (!status || message) && <button type="button" className="button button-outline full-width" disabled={busy} onClick={() => void request('read')}>{busy && !status ? 'Loading checkout status…' : 'Reload checkout status'}</button>}
     {!verified && status?.status === 'not_started' && !enabled && !uncertain && <p className="fine-print">Starting a new Stripe test checkout is currently unavailable.</p>}
   </section>
+    {verified && progress.finalizationStatus === 'paid_exception' && <OrderExceptionResolution orderId={orderId} />}
     {verified && progress.finalizationStatus === 'paid' && progress.contractStatus === 'issued' && <TestOwnerDelivery orderId={orderId} />}
   </>;
 }
