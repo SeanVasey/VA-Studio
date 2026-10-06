@@ -171,6 +171,10 @@
       "test_native_actor_wait_serializes_duplicate_and_competing_upload_operations"
     ],
     [
+      "Tests\\Feature\\ResumableMediaUploadsConcurrencyTest",
+      "test_required_mfa_withdrawn_during_native_actor_wait_refuses_upload_operation"
+    ],
+    [
       "Tests\\Feature\\RightsDeclarationWriterConcurrencyTest",
       "test_current_authority_withdrawal_and_reviewed_verification_serialize_on_the_exact_actor_row"
     ],
@@ -408,4 +412,3 @@
     ]
   ]
 }
-
