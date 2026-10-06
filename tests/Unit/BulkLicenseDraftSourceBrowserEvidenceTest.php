@@ -96,6 +96,26 @@ class BulkLicenseDraftSourceBrowserEvidenceTest extends TestCase
         $this->assertSame($before, hash_file('sha256', $this->directory.'/database.sqlite'));
     }
 
+    public function test_complete_selected_row_receipt_detects_a_timestamp_only_write_for_native_noop_and_replay_comparisons(): void
+    {
+        $this->worker('seed');
+        $this->helper('prepare');
+        foreach (['winner', 'recovered'] as $phase) {
+            $this->worker($phase);
+        }
+        $before = $this->helper('verify', 'recovered');
+        $this->assertCount(2, $before['rowHashes']);
+        foreach ($before['rowHashes'] as $hash) {
+            $this->assertMatchesRegularExpression('/\A[a-f0-9]{64}\z/D', $hash);
+        }
+        $this->worker('timestamp-canary');
+        $after = $this->helper('verify', 'recovered');
+        $this->assertNotSame($before['rowHashes'][0], $after['rowHashes'][0]);
+        $this->assertSame($before['rowHashes'][1], $after['rowHashes'][1]);
+        unset($before['rowHashes'], $after['rowHashes']);
+        $this->assertSame($before, $after);
+    }
+
     public function test_unsafe_selection_configuration_and_symlinks_refuse_without_effects_or_private_diagnostics(): void
     {
         $this->worker('seed');
@@ -182,6 +202,8 @@ if ($argv[1] === 'seed') {
         $review = $command->review($versions[0], $actor);
         $data = array_intersect_key($review['display'], array_flip(App\Domain\Rights\ReviewedLicenseDraft::FIELDS));
         $command->updateReviewed($review, [...$data, 'authored_source' => $evidence['sources']['winner']], $actor);
+    } elseif ($argv[1] === 'timestamp-canary') {
+        Illuminate\Support\Facades\DB::table('license_versions')->where('id', $evidence['versionIds'][0])->update(['updated_at' => '2040-01-02 03:04:05']);
     } elseif ($argv[1] === 'audit-canary') {
         $audit = App\Support\Audit\AuditEvent::where('action', 'rights.license.draft_source_bulk_updated')->firstOrFail();
         Illuminate\Support\Facades\DB::table('audit_events')->where('id', $audit->id)->update(['context' => json_encode([...$audit->context, 'private-canary' => 'PRIVATE-SOURCE-CANARY'], JSON_THROW_ON_ERROR)]);

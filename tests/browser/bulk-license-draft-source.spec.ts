@@ -13,7 +13,7 @@ type Fixture = {
 type Phase = 'prepared' | 'winner' | 'recovered' | 'uncertain';
 type Receipt = {
   verified: true; phase: Phase; versionIds: [number, number]; sources: [string, string];
-  updates: number; auditIds: number[]; batchHashes: string[]; originalsUnchanged: true; guardsUnchanged: true;
+  updates: number; rowHashes: [string, string]; auditIds: number[]; batchHashes: string[]; originalsUnchanged: true; guardsUnchanged: true;
 };
 type Payload = { components?: { snapshot: string; calls?: { method: string }[] }[] };
 const inputHeading = 'Replace source for selected license drafts';
@@ -117,6 +117,8 @@ test('operator reviews exact bulk draft text, rejects a competing edit and safel
     expect(receipt).toMatchObject({ verified: true, phase, versionIds: fixture.versionIds,
       originalsUnchanged: true, guardsUnchanged: true });
     expect(receipt.updates).toBe(({ prepared: 0, winner: 1, recovered: 3, uncertain: 5 })[phase]);
+    expect(receipt.rowHashes).toHaveLength(2);
+    for (const hash of receipt.rowHashes) expect(hash).toMatch(/^[a-f0-9]{64}$/);
     return receipt;
   };
   const failures: string[] = [];
@@ -243,4 +245,3 @@ test('operator reviews exact bulk draft text, rejects a competing edit and safel
   await testInfo.attach('bulk-license-source-retained-evidence', { body: JSON.stringify(receipts, null, 2), contentType: 'application/json' });
   expect(failures).toEqual([]);
 });
-

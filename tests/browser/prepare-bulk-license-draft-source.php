@@ -76,6 +76,7 @@ try {
         $expectedCount = ['prepared' => 0, 'winner' => 1, 'recovered' => 3, 'uncertain' => 5][$phase];
         $contents = [];
         $actualSources = [];
+        $rowHashes = [];
         foreach ($fixture['versionIds'] as $index => $id) {
             $version = LicenseVersion::findOrFail($id);
             $source = match ($phase) {
@@ -101,6 +102,7 @@ try {
                 'effective_from' => $version->effective_from?->utc()->format('Y-m-d H:i:s'),
                 'effective_until' => $version->effective_until?->utc()->format('Y-m-d H:i:s')];
             $actualSources[] = $source;
+            $rowHashes[] = hash('sha256', $actual['license_versions'][(string) $id]);
             unset($actual['license_versions'][(string) $id], $original['license_versions'][(string) $id]);
         }
         $added = array_diff_key($actual['audit_events'], $original['audit_events']);
@@ -158,7 +160,7 @@ try {
         }
         UnpaidReleaseBrowserFixture::check($actual === $original && bulkLicenseSourceGuards() === $fixture['guards']);
         echo json_encode(['verified' => true, 'phase' => $phase, 'versionIds' => $fixture['versionIds'],
-            'sources' => $actualSources, 'updates' => $expectedCount, 'auditIds' => $auditIds,
+            'sources' => $actualSources, 'rowHashes' => $rowHashes, 'updates' => $expectedCount, 'auditIds' => $auditIds,
             'batchHashes' => $batchHashes, 'originalsUnchanged' => true, 'guardsUnchanged' => true], JSON_THROW_ON_ERROR)."\n";
     }
 } catch (Throwable) {
