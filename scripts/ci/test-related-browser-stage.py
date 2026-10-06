@@ -7,9 +7,11 @@ import json
 import os
 from pathlib import Path
 import secrets
+import shlex
 import shutil
 import sqlite3
 import subprocess
+import tempfile
 import unittest
 
 
@@ -102,7 +104,7 @@ class RelatedBrowserStageSafeguards(unittest.TestCase):
 class BrowserBootstrapFixtures(unittest.TestCase):
     PROJECTS = {"chromium-desktop": "CHROMIUM", "webkit-mobile": "WEBKIT"}
 
-    def bootstrap(self, stage=None, marker=None, *, accounts=True):
+    def bootstrap(self, stage=None, marker=None, *, accounts=True, failure=None):
         # Match the real runner's guard: direct /tmp child, alphanumeric suffix,
         # new empty SQLite file and private storage. Never reuse a developer DB.
         directory = Path("/tmp") / ("vasey-browser-" + secrets.token_hex(12))
@@ -133,8 +135,29 @@ class BrowserBootstrapFixtures(unittest.TestCase):
             env.pop(name, None)
             if value is not None:
                 env[name] = value
+        php_arguments = []
+        if failure is not None:
+            # Exercise the installed bootstrap's actual catch through PHP's existing
+            # prepend option; production code has no fault-injection switch.
+            declarations, expression = {
+                "standard": ("", "new \\RuntimeException($private)"),
+                "namespaced": ("namespace FixtureDiagnostic; class ControlledFailure extends \\RuntimeException {}",
+                               "new ControlledFailure($private)"),
+                "anonymous": ("", "new class($private) extends \\RuntimeException {}"),
+                "overlong": ("class " + "PrivateFailure" * 15 + " extends \\RuntimeException {}",
+                             "new " + "PrivateFailure" * 15 + "($private)"),
+            }[failure]
+            prepend = directory / "private-fixture-diagnostic-canary.php"
+            prepend.write_text("<?php\n" + declarations + "\nrequire " + json.dumps(str(ROOT / "vendor/autoload.php")) + ";\n"
+                               "spl_autoload_register(static function (string $class): void {\n"
+                               "  if ($class === 'App\\\\Providers\\\\AppServiceProvider') {\n"
+                               "    $private = 'private-request-body private-token ' . getenv('VASEY_BROWSER_PASSWORD')"
+                               " . ' ' . getenv('APP_KEY') . ' ' . getenv('DB_DATABASE');\n"
+                               "    throw " + expression + ";\n  }\n}, true, true);\n")
+            prepend.chmod(0o600)
+            php_arguments = ["-d", "auto_prepend_file=" + str(prepend)]
         result = subprocess.run(
-            ["/usr/bin/timeout", "--signal=TERM", "--kill-after=15s", "600s", "php", "tests/browser/bootstrap.php"], cwd=ROOT, env=env,
+            ["/usr/bin/timeout", "--signal=TERM", "--kill-after=15s", "600s", "php", *php_arguments, "tests/browser/bootstrap.php"], cwd=ROOT, env=env,
             text=True, capture_output=True, timeout=620,
         )
         return directory, result
@@ -260,11 +283,64 @@ class BrowserBootstrapFixtures(unittest.TestCase):
                 directory, result = self.bootstrap(stage, value)
                 self.assertEqual(result.returncode, 1)
                 self.assertTrue(result.stdout == "", "Refused bootstrap emitted unexpected output.")
-                self.assertTrue(result.stderr == "Isolated browser fixture setup failed; no browser run was started.\n",
-                                "Refused bootstrap did not retain its fixed failure response.")
+                self.assertTrue(result.stderr == "Isolated browser fixture setup failed; no browser run was started.\n"
+                                '{"phase":"stage_identity","exception_class":"RuntimeException"}\n',
+                                "Refused bootstrap did not retain its fixed bounded failure response.")
                 self.assertEqual((directory / "database.sqlite").read_bytes(), b"")
                 self.assertFalse((directory / "fixtures.json").exists())
                 self.assertFalse((directory / "customer-fixtures.json").exists())
+
+    def test_bootstrap_failure_diagnostic_excludes_private_values_and_unsafe_class_names(self):
+        for failure, expected_class in [("standard", "RuntimeException"),
+                                        ("namespaced", "FixtureDiagnostic\\ControlledFailure"),
+                                        ("anonymous", "Throwable"), ("overlong", "Throwable")]:
+            with self.subTest(failure=failure):
+                directory, result = self.bootstrap("1", secrets.token_hex(32), accounts=False, failure=failure)
+                self.assertEqual(result.returncode, 1)
+                self.assertTrue(result.stdout == "", "Refused bootstrap emitted unexpected output.")
+                expected = "Isolated browser fixture setup failed; no browser run was started.\n" + json.dumps(
+                    {"phase": "application_boot", "exception_class": expected_class}, separators=(",", ":")) + "\n"
+                # Exact equality also excludes the private message, body/token canaries,
+                # generated credentials, temporary paths, stack and anonymous-class path.
+                self.assertTrue(result.stderr == expected, "Failure diagnosis exposed unexpected fields or values.")
+                self.assertLessEqual(len(result.stderr.encode()), 300)
+                self.assertEqual((directory / "database.sqlite").read_bytes(), b"")
+                self.assertFalse((directory / "fixtures.json").exists())
+                self.assertFalse((directory / "customer-fixtures.json").exists())
+
+    def test_ordinary_runner_keeps_safe_refusal_and_cleans_up_its_actual_directory(self):
+        with tempfile.TemporaryDirectory(prefix="vasey-runner-diagnostic-") as temporary:
+            directory = Path(temporary)
+            observed = directory / "private-directory.txt"
+            prepend = directory / "private-guard-canary.php"
+            prepend.write_text("<?php\nfile_put_contents(" + json.dumps(str(observed))
+                               + ", getenv('VASEY_BROWSER_DIRECTORY'));\n"
+                               "putenv('VASEY_BROWSER_DIRECTORY=private-isolation-canary');\n")
+            prepend.chmod(0o600)
+            installed_php = shutil.which("php")
+            self.assertIsNotNone(installed_php)
+            delegate = directory / "php"
+            # Delegate every argument to the actual installed PHP. An explicit -d
+            # also works when a local runtime wrapper pins its INI search directory.
+            delegate.write_text("#!/bin/sh\nexec " + shlex.quote(installed_php)
+                                + " -d " + shlex.quote("auto_prepend_file=" + str(prepend)) + ' "$@"\n')
+            delegate.chmod(0o700)
+            result = subprocess.run(
+                ["node", "tests/browser/run.mjs", "--project=chromium-desktop"], cwd=ROOT,
+                env={**os.environ, "PATH": str(directory) + os.pathsep + os.environ["PATH"]},
+                text=True, capture_output=True, timeout=10,
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertTrue(result.stdout == "", "Refused runner emitted unexpected output.")
+            self.assertTrue(result.stderr == "Isolated browser fixture setup failed; no browser run was started.\n"
+                            '{"phase":"isolation","exception_class":"RuntimeException"}\n'
+                            "Isolated browser fixture setup failed.\n",
+                            "Runner refusal exposed unexpected fields or values.")
+            self.assertTrue(observed.is_file(), "The actual runner did not reach its PHP setup process.")
+            private_directory = Path(observed.read_text())
+            self.assertEqual(private_directory.parent, Path("/tmp"))
+            self.assertRegex(private_directory.name, r"^vasey-browser-[A-Za-z0-9]+$")
+            self.assertFalse(private_directory.exists(), "The actual runner did not clean up its private installation.")
 
 
 if __name__ == "__main__":
