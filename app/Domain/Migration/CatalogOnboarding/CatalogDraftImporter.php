@@ -38,6 +38,9 @@ final class CatalogDraftImporter
             $review = $this->binding($source, $release, (int) $current->id, $authority['sha256']);
             $verifyExternal?->__invoke();
             (new PrivateSourceFiles)->unchanged($source);
+            $database = new CatalogDatabaseEvidence;
+            $this->require($database->schema() === $review['live_schema_sha256']
+                && $this->same($database->target(), $review['target_snapshot']));
             $this->authorityUnchanged($current->id, $authority);
 
             return $review + ['review_sha256' => CanonicalJson::hash($review)];
@@ -126,7 +129,8 @@ final class CatalogDraftImporter
                 $next['processed'] - $processed), static fn (array $entry): bool => $entry['result'] === 'create_draft'), 'record_key')];
             $expectedProcessed = $this->prefix($review, $plannedKeys);
             $this->require($this->prefix($review, $final['record_keys']) === $expectedProcessed
-                && $this->same((new CatalogDatabaseEvidence)->target(...$final['exclusions']), $review['target_snapshot']));
+                && $this->same((new CatalogDatabaseEvidence)->target(...$final['exclusions']), $review['target_snapshot'])
+                && (new CatalogDatabaseEvidence)->schema() === $review['live_schema_sha256']);
             $this->authorityUnchanged($current->id, $authority);
 
             return ['schema_version' => 1, 'review_sha256' => $review['review_sha256'], 'batch_id' => (int) $batch->id,
@@ -213,6 +217,7 @@ final class CatalogDraftImporter
             'canonicalization_version' => CanonicalJson::VERSION, 'transform_version' => NormalizedSourceSnapshot::TRANSFORM,
             'actor_id' => $actorId, 'actor_sha256' => $actorSha256,
             'source_sha256' => $source['source_sha256'], 'source_identity_sha256' => $this->sourceIdentity($source),
+            'live_schema_sha256' => (new CatalogDatabaseEvidence)->schema(),
             'target_release' => $release, 'target_snapshot' => (new CatalogDatabaseEvidence)->target(),
             'total' => count($plan['entries']), 'entries' => $plan['entries'], 'counts' => $plan['counts'], 'database_writes' => 0];
     }
@@ -418,6 +423,7 @@ final class CatalogDraftImporter
     private function standalone(): void
     {
         $this->require(DB::transactionLevel() === 0 && DB::getDriverName() === 'sqlite');
+        (new CatalogDatabaseEvidence)->schema();
     }
 
     private function require(bool $condition): void

@@ -157,7 +157,7 @@ native('an active installation OS lease refuses catalog operation without stoppi
   } finally { await lease.release(); }
 });
 
-for (const mutation of ['source', 'report', 'digest', 'target']) {
+for (const mutation of ['source', 'report', 'digest', 'target', 'schema']) {
   native(`a ${mutation} change after a native private review is refused without importing a segment`, async parent => {
     const input = await prepared(parent, 1); const reviewed = await consoleOperation(input); assert.equal(reviewed.status, 0, reviewed.output);
     let digest = reviewed.result.review_sha256;
@@ -166,6 +166,10 @@ for (const mutation of ['source', 'report', 'digest', 'target']) {
     if (mutation === 'digest') digest = '0'.repeat(64);
     if (mutation === 'target') {
       const result = spawnSync('php', ['-r', '$pdo=new PDO("sqlite:".getenv("DB_DATABASE"));$pdo->exec("INSERT INTO audit_events (actor_id,action,subject_type,subject_id,context,created_at) VALUES (1,\'SYNTHETIC target change\',\'SYNTHETIC\',1,\'{}\',\'2026-10-06 12:00:00\')");'],
+        { cwd: release.checkout, env: isolatedEnvironment(input.workspace), encoding: 'utf8' }); assert.equal(result.status, 0, result.stderr);
+    }
+    if (mutation === 'schema') {
+      const result = spawnSync('php', ['-r', '$pdo=new PDO("sqlite:".getenv("DB_DATABASE"));$pdo->exec("DROP TRIGGER catalog_import_mappings_immutable_delete");'],
         { cwd: release.checkout, env: isolatedEnvironment(input.workspace), encoding: 'utf8' }); assert.equal(result.status, 0, result.stderr);
     }
     const before = rows(input.workspace); const applied = await consoleOperation(input, 'apply', digest); assert.notEqual(applied.status, 0);

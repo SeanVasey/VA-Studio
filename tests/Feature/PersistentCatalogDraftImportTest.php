@@ -33,6 +33,11 @@ class PersistentCatalogDraftImportTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // This private retained-workspace surface has an explicit SQLite contract, even when
+        // the surrounding application suite selects MySQL. It is not MySQL lock evidence.
+        config(['database.connections.catalog_private_fixture' => array_replace(config('database.connections.sqlite'),
+            ['database' => ':memory:', 'url' => null])]);
+        DB::setDefaultConnection('catalog_private_fixture');
         // Each application owns an isolated in-memory database; no outer testing transaction masks standalone admission.
         $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0);
         config(['app.key' => 'base64:'.base64_encode(str_repeat('s', 32))]);
@@ -437,6 +442,177 @@ class PersistentCatalogDraftImportTest extends TestCase
         } catch (\LogicException) {
         }
         $this->assertSame($before, $this->evidence());
+    }
+
+    public static function schemaDrift(): array
+    {
+        return array_map(static fn (string $case): array => [$case], ['missing-trigger', 'foreign-trigger', 'missing-unique',
+            'foreign-key-cascade', 'nullable-column', 'extra-column', 'foreign-keys-disabled', 'writable-schema', 'ignored-checks']);
+    }
+
+    #[DataProvider('schemaDrift')]
+    public function test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs(string $case): void
+    {
+        $actor = LicenseFixtures::admin();
+        $source = $this->source(NormalizedCatalogFixtures::snapshot(1));
+        $importer = new CatalogDraftImporter;
+        $review = $importer->review($source, $this->release, $actor);
+        $this->changeSchema($case);
+        $before = $this->evidence();
+        foreach (['review', 'apply'] as $operation) {
+            try {
+                $operation === 'review' ? $importer->review($source, $this->release, $actor)
+                    : $importer->apply($source, $this->release, $review, $review['review_sha256'], 1, $actor);
+                $this->fail('Foreign installed schema admitted: '.$case.' '.$operation);
+            } catch (RuntimeException $error) {
+                $this->assertSame('catalog_target_schema_invalid', $error->getMessage());
+            }
+            $this->assertSame($before, $this->evidence());
+        }
+    }
+
+    public function test_schema_changes_after_review_or_final_mapping_callbacks_roll_back_without_any_missing_constraint(): void
+    {
+        $actor = LicenseFixtures::admin();
+        $source = $this->source(NormalizedCatalogFixtures::snapshot(1));
+        $importer = new CatalogDraftImporter;
+        $schema = (new CatalogDatabaseEvidence)->schema();
+        $before = $this->evidence();
+        try {
+            $importer->review($source, $this->release, $actor, fn () => $this->changeSchema('missing-trigger'));
+            $this->fail('Late dry-run schema change admitted.');
+        } catch (RuntimeException $error) {
+            $this->assertSame('catalog_target_schema_invalid', $error->getMessage());
+        }
+        $this->assertSame($schema, (new CatalogDatabaseEvidence)->schema());
+        $this->assertSame($before, $this->evidence());
+        $review = $importer->review($source, $this->release, $actor);
+        AuditEvent::created(function (AuditEvent $event): void {
+            if ($event->action === 'migration.catalog_draft.mapped') {
+                $this->changeSchema('missing-trigger');
+            }
+        });
+        try {
+            $importer->apply($source, $this->release, $review, $review['review_sha256'], 1, $actor);
+            $this->fail('Final mapping callback changed the installed schema.');
+        } catch (RuntimeException $error) {
+            $this->assertSame('catalog_target_schema_invalid', $error->getMessage());
+        }
+        $this->assertSame($schema, (new CatalogDatabaseEvidence)->schema());
+        $this->assertSame($before, $this->evidence());
+    }
+
+    public function test_final_direct_schema_proof_rejects_late_query_observer_and_target_mutations(): void
+    {
+        $actor = LicenseFixtures::admin();
+        $source = $this->source(NormalizedCatalogFixtures::snapshot(1));
+        $importer = new CatalogDraftImporter;
+        $schema = (new CatalogDatabaseEvidence)->schema();
+        $before = $this->evidence();
+        try {
+            $importer->review($source, $this->release, $actor, function () use ($actor): void {
+                AuditEvent::record('SYNTHETIC late dry-run write', $actor, ['synthetic' => true], $actor->id);
+            });
+            $this->fail('A late target write passed the read-only review proof.');
+        } catch (ValidationException) {
+        }
+        $this->assertSame($before, $this->evidence());
+        $review = $importer->review($source, $this->release, $actor);
+        DB::listen(function (QueryExecuted $query): void {
+            if (str_starts_with($query->sql, 'insert into "audit_events"') && in_array('migration.catalog_draft.mapped', $query->bindings, true)) {
+                $this->changeSchema('foreign-trigger');
+            }
+        });
+        try {
+            $importer->apply($source, $this->release, $review, $review['review_sha256'], 1, $actor);
+            $this->fail('A final query observer replaced the immutable trigger.');
+        } catch (RuntimeException $error) {
+            $this->assertSame('catalog_target_schema_invalid', $error->getMessage());
+        }
+        $this->assertSame($schema, (new CatalogDatabaseEvidence)->schema());
+        $this->assertSame($before, $this->evidence());
+    }
+
+    public static function replacementIdentity(): array
+    {
+        return array_map(static fn (string $case): array => [$case], ['batch-id', 'batch-digest', 'mapping-id', 'mapping-key', 'mapping-track']);
+    }
+
+    #[DataProvider('replacementIdentity')]
+    public function test_raw_replace_cannot_rewrite_retained_evidence_when_recursive_delete_triggers_are_disabled(string $case): void
+    {
+        $actor = LicenseFixtures::admin();
+        $source = $this->source(NormalizedCatalogFixtures::snapshot(1));
+        $importer = new CatalogDraftImporter;
+        $review = $importer->review($source, $this->release, $actor);
+        $importer->apply($source, $this->release, $review, $review['review_sha256'], 1, $actor);
+        $table = str_starts_with($case, 'batch') ? 'catalog_import_batches' : 'catalog_import_mappings';
+        $row = (new CatalogDatabaseEvidence)->rows($table)[1]['attributes'];
+        $pdo = DB::connection()->getPdo();
+        $pdo->exec('PRAGMA recursive_triggers=OFF');
+        $this->assertSame(0, $pdo->query('PRAGMA recursive_triggers')->fetchColumn());
+        if (! str_ends_with($case, '-id')) {
+            $row['id'] = 999;
+        }
+        if ($case === 'batch-id') {
+            $row['review_sha256'] = str_repeat('e', 64);
+        }
+        if ($case === 'mapping-id') {
+            $row['record_key'] = str_repeat('e', 64);
+            $row['track_id'] = 999;
+        }
+        if ($case === 'mapping-key') {
+            $row['track_id'] = 999;
+        }
+        if ($case === 'mapping-track') {
+            $row['record_key'] = str_repeat('e', 64);
+        }
+        $row[str_starts_with($case, 'batch') ? 'review_ciphertext' : 'evidence_ciphertext'] = 'SYNTHETIC attempted replacement';
+        $before = $this->evidence();
+        try {
+            $statement = $pdo->prepare('INSERT OR REPLACE INTO "'.$table.'" ("'.implode('", "', array_keys($row)).'") VALUES ('.implode(', ', array_fill(0, count($row), '?')).')');
+            $statement->execute(array_values($row));
+            $this->fail('Retained evidence replaced: '.$case);
+        } catch (\PDOException $error) {
+            $this->assertStringContainsString('Catalog import evidence is immutable', $error->getMessage());
+        }
+        $this->assertSame($before, $this->evidence());
+    }
+
+    private function changeSchema(string $case): void
+    {
+        $pdo = DB::connection()->getPdo();
+        switch ($case) {
+            case 'missing-trigger': $pdo->exec('DROP TRIGGER catalog_import_mappings_immutable_delete');
+                break;
+            case 'foreign-trigger':
+                $pdo->exec('DROP TRIGGER catalog_import_mappings_immutable_delete');
+                $pdo->exec('CREATE TRIGGER catalog_import_mappings_immutable_delete BEFORE DELETE ON catalog_import_mappings BEGIN SELECT 1; END');
+                break;
+            case 'missing-unique': $pdo->exec('DROP INDEX catalog_import_mappings_record_key_unique');
+                break;
+            case 'extra-column': $pdo->exec('ALTER TABLE catalog_import_mappings ADD COLUMN unreviewed TEXT');
+                break;
+            case 'foreign-keys-disabled': $pdo->exec('PRAGMA foreign_keys=OFF');
+                break;
+            case 'writable-schema': $pdo->exec('PRAGMA writable_schema=ON');
+                break;
+            case 'ignored-checks': $pdo->exec('PRAGMA ignore_check_constraints=ON');
+                break;
+            case 'foreign-key-cascade':
+            case 'nullable-column':
+                $rows = $pdo->query("SELECT type, sql FROM sqlite_master WHERE tbl_name='catalog_import_mappings' ORDER BY CASE type WHEN 'table' THEN 0 ELSE 1 END")->fetchAll(\PDO::FETCH_ASSOC);
+                $pdo->exec('DROP TABLE catalog_import_mappings');
+                foreach ($rows as $row) {
+                    $sql = $row['sql'];
+                    if ($row['type'] === 'table') {
+                        $sql = $case === 'foreign-key-cascade' ? str_replace('on delete restrict', 'on delete cascade', $sql)
+                            : str_replace('"actor_id" integer not null', '"actor_id" integer', $sql);
+                    }
+                    $pdo->exec($sql);
+                }
+                break;
+        }
     }
 
     private function source(array $snapshot): array
