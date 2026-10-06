@@ -136,6 +136,24 @@ class SelectionTests(unittest.TestCase):
         policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
         self.assertFalse(any(row[0] == "Tests\\Feature\\CustomerOrderReferenceTest" for row in policy["methods"]))
 
+    def test_product_member_refresh_keeps_shared_coverage_and_exact_native_exceptions(self):
+        self.assertEqual(focused.MAX_FILES, 32)
+        for engine in focused.ENGINES:
+            selected = focused.selection({"FOCUSED_SUITE": "seller", "FOCUSED_ENGINE": engine})
+            for name in ("ProductMemberRefreshTest", "ProductMemberRefreshEditorTest", "ProductMemberRefreshConcurrencyTest"):
+                self.assertIn("tests/Feature/" + name + ".php", selected.files)
+            focused.validate_files(ROOT, selected)
+        selected = focused.selection({"FOCUSED_SUITE": "browser", "FOCUSED_ENGINE": "sqlite"})
+        self.assertIn("tests/browser/product-member-refresh.spec.ts", selected.files)
+        focused.validate_files(ROOT, selected)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        entries = [row for row in policy["methods"] if row[0].startswith("Tests\\Feature\\ProductMemberRefresh")]
+        self.assertEqual(entries, [
+            ["Tests\\Feature\\ProductMemberRefreshConcurrencyTest", "test_native_actor_wait_observes_authority_withdrawal_despite_an_older_snapshot"],
+            ["Tests\\Feature\\ProductMemberRefreshConcurrencyTest", "test_native_draft_wait_allows_one_refresh_or_preserves_the_winning_edit"],
+            ["Tests\\Feature\\ProductMemberRefreshConcurrencyTest", "test_native_source_wait_rejects_a_review_changed_by_the_committing_source_writer"],
+        ])
+
     def test_identity_and_kit_transport_feedback_keep_native_races_and_client_journeys(self):
         self.assertEqual(focused.MAX_FILES, 32)
         for suite, targets in {
