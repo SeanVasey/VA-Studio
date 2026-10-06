@@ -1,14 +1,15 @@
 <?php
 
+use App\Http\Controllers\EditorialController;
 use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\TestCheckoutController;
-use App\Http\Controllers\TestOwnerDeliveryController;
 use App\Http\Controllers\PublicMediaController;
 use App\Http\Controllers\PublicSiteImageController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\StorefrontController;
-use App\Http\Controllers\EditorialController;
+use App\Http\Controllers\TestCheckoutController;
+use App\Http\Controllers\TestOwnerDeliveryController;
+use App\Http\Middleware\CustomerCommerceAccess;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Support\Facades\Route;
 
@@ -27,7 +28,7 @@ Route::get('/site-images/{file}', PublicSiteImageController::class)
     ->withoutMiddleware('web')->middleware('throttle:600,1,site-images')->name('site-images.show');
 // JSON quote boundaries retain web sessions/CSRF but do not pass through Inertia,
 // whose response negotiation replaces the Cookie Vary header.
-Route::withoutMiddleware(HandleInertiaRequests::class)->group(function (): void {
+Route::withoutMiddleware(HandleInertiaRequests::class)->middleware(CustomerCommerceAccess::class)->group(function (): void {
     Route::post('/contact/inquiries', InquiryController::class)->middleware('throttle:customer-inquiries')->block(20, 5)->name('contact.inquiries');
     Route::get('/tracks/{slug}/offers/{revision}/license', [StorefrontController::class, 'license'])->whereNumber('revision')->middleware('throttle:60,1')->name('tracks.license');
     Route::post('/catalog/selections', [StorefrontController::class, 'selections'])->middleware('throttle:60,1')->name('catalog.selections');
@@ -49,8 +50,10 @@ Route::withoutMiddleware(HandleInertiaRequests::class)->group(function (): void 
     Route::post('/orders/{order}/delivery/authorizations', [TestOwnerDeliveryController::class, 'issue'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.delivery-authorizations');
     Route::post('/orders/{order}/delivery/download', [TestOwnerDeliveryController::class, 'download'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.delivery-download');
 });
-Route::get('/orders/{order}/checkout/return', [TestCheckoutController::class, 'returned'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.checkout-return');
+Route::get('/orders/{order}/checkout/return', [TestCheckoutController::class, 'returned'])->middleware([CustomerCommerceAccess::class, 'throttle:60,1,quotes-read'])->block(120, 10)->name('orders.checkout-return');
 Route::post('/checkout', fn () => response()->json([
     'code' => 'COMMERCE_NOT_ENABLED',
     'message' => 'Checkout is being prepared. No payment has been taken.',
 ], 503))->middleware('throttle:10,1')->name('checkout.store');
+
+require __DIR__.'/customer.php';

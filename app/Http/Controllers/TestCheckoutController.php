@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Domain\Commerce\Checkout\HostedCheckout;
 use App\Domain\Commerce\QuoteException;
-use App\Support\QuoteOwner;
+use App\Support\CommerceRequestIdentity;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,30 +14,30 @@ use Throwable;
 
 final class TestCheckoutController
 {
-    public function start(string $order, Request $request, QuoteOwner $owner, HostedCheckout $checkout): JsonResponse
+    public function start(string $order, Request $request, CommerceRequestIdentity $owner, HostedCheckout $checkout): JsonResponse
     {
         return $this->run(function () use ($order, $request, $owner, $checkout): array {
             $this->emptyBody($request);
 
-            return $checkout->start($order, $owner->forRequest($request), $request->user());
+            return $checkout->start($order, $owner->forRequest($request), $owner->actor($request), $owner->principal($request));
         });
     }
 
-    public function reconcile(string $order, Request $request, QuoteOwner $owner, HostedCheckout $checkout): JsonResponse
+    public function reconcile(string $order, Request $request, CommerceRequestIdentity $owner, HostedCheckout $checkout): JsonResponse
     {
         return $this->run(function () use ($order, $request, $owner, $checkout): array {
             $this->emptyBody($request);
 
-            return $checkout->reconcile($order, $owner->forRequest($request));
+            return $checkout->reconcile($order, $owner->forRequest($request), $owner->actor($request), $owner->principal($request));
         });
     }
 
-    public function status(string $order, Request $request, QuoteOwner $owner, HostedCheckout $checkout): JsonResponse
+    public function status(string $order, Request $request, CommerceRequestIdentity $owner, HostedCheckout $checkout): JsonResponse
     {
         return $this->run(fn () => $checkout->status($order, $owner->forRequest($request)));
     }
 
-    public function returned(string $order, Request $request, QuoteOwner $owner, HostedCheckout $checkout): Response
+    public function returned(string $order, Request $request, CommerceRequestIdentity $owner, HostedCheckout $checkout): Response
     {
         // Ownership and retained evidence only. Query parameters and redirect arrival prove nothing.
         try {

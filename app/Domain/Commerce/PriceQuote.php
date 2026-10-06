@@ -3,6 +3,8 @@
 namespace App\Domain\Commerce;
 
 use App\Domain\Commerce\Models\QuotePricing;
+use App\Domain\Customers\CustomerAccess;
+use App\Domain\Customers\CustomerPrincipal;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
@@ -13,24 +15,25 @@ use Throwable;
 
 final class PriceQuote
 {
-    public function create(string $quoteId, string $ownerKey, ?User $actor = null): QuotePricing
+    public function create(string $quoteId, string $ownerKey, ?User $actor = null, ?CustomerPrincipal $principal = null): QuotePricing
     {
-        return $this->handle($quoteId, $ownerKey, true, null, $actor);
+        return $this->handle($quoteId, $ownerKey, true, null, $actor, $principal);
     }
 
-    public function read(string $quoteId, string $ownerKey, ?User $actor = null): QuotePricing
+    public function read(string $quoteId, string $ownerKey, ?User $actor = null, ?CustomerPrincipal $principal = null): QuotePricing
     {
-        return $this->handle($quoteId, $ownerKey, false, null, $actor);
+        return $this->handle($quoteId, $ownerKey, false, null, $actor, $principal);
     }
 
-    public function createWithPromotion(string $quoteId, string $ownerKey, string $code, ?User $actor = null): QuotePricing
+    public function createWithPromotion(string $quoteId, string $ownerKey, string $code, ?User $actor = null, ?CustomerPrincipal $principal = null): QuotePricing
     {
-        return $this->handle($quoteId, $ownerKey, true, $code, $actor);
+        return $this->handle($quoteId, $ownerKey, true, $code, $actor, $principal);
     }
 
-    private function handle(string $quoteId, string $ownerKey, bool $create, ?string $code = null, ?User $actor = null): QuotePricing
+    private function handle(string $quoteId, string $ownerKey, bool $create, ?string $code = null, ?User $actor = null, ?CustomerPrincipal $principal = null): QuotePricing
     {
-        return DB::transaction(function () use ($quoteId, $ownerKey, $create, $code, $actor) {
+        return DB::transaction(function () use ($quoteId, $ownerKey, $create, $code, $actor, $principal) {
+            app(CustomerAccess::class)->lock($principal, $ownerKey, $actor);
             // Explicit customer identity precedes resource locks; null remains anonymous/system.
             $actorId = app(CommerceAuditActor::class)->lock($actor);
             // The outer transaction retains ReadQuote's quote/track/offer locks until pricing commits.
@@ -100,6 +103,8 @@ final class PriceQuote
             if ($pricing->expires_at->lessThanOrEqualTo(now())) {
                 throw new QuoteException('PRICING_EXPIRED', 410);
             }
+
+            app(CustomerAccess::class)->lock($principal, $ownerKey, $actor);
 
             return $pricing;
         }, 5);

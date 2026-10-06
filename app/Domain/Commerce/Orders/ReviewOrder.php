@@ -10,6 +10,8 @@ use App\Domain\Commerce\PricingSnapshot;
 use App\Domain\Commerce\QuoteException;
 use App\Domain\Commerce\QuoteLicenseDisclosure;
 use App\Domain\Commerce\ReadQuote;
+use App\Domain\Customers\CustomerAccess;
+use App\Domain\Customers\CustomerPrincipal;
 use App\Models\User;
 use App\Support\CanonicalJson;
 use Illuminate\Support\Facades\DB;
@@ -17,17 +19,21 @@ use Illuminate\Support\Facades\DB;
 /** An owned, read-only presentation of existing pricing and exact frozen disclosures. */
 final class ReviewOrder
 {
-    public function handle(string $quoteId, string $ownerKey, ?User $actor = null): array
+    public function handle(string $quoteId, string $ownerKey, ?User $actor = null, ?CustomerPrincipal $principal = null): array
     {
         $policy = app(OrderPolicy::class)->current();
 
-        return DB::transaction(function () use ($quoteId, $ownerKey, $policy, $actor) {
+        return DB::transaction(function () use ($quoteId, $ownerKey, $policy, $actor, $principal) {
+            app(CustomerAccess::class)->lock($principal, $ownerKey, $actor);
             // Explicit customer identity precedes resource locks; null remains anonymous/system.
             $actorId = app(CommerceAuditActor::class)->lock($actor);
             $quote = app(ReadQuote::class)->handle($quoteId, $ownerKey);
             $pricing = app(PriceQuote::class)->read($quoteId, $ownerKey, $actor);
 
-            return $this->capture($quote, $pricing, $policy);
+            $result = $this->capture($quote, $pricing, $policy);
+            app(CustomerAccess::class)->lock($principal, $ownerKey, $actor);
+
+            return $result;
         }, 5);
     }
 

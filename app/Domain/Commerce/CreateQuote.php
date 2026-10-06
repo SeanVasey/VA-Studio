@@ -4,6 +4,8 @@ namespace App\Domain\Commerce;
 
 use App\Domain\Commerce\Models\Quote;
 use App\Domain\Commerce\Models\QuoteLine;
+use App\Domain\Customers\CustomerAccess;
+use App\Domain\Customers\CustomerPrincipal;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
@@ -15,7 +17,7 @@ final class CreateQuote
     /** Provisional selection-review lifetime only; no payment or reservation policy is established. */
     public const LIFETIME_MINUTES = 15;
 
-    public function handle(string $ownerKey, string $idempotencyKey, array $items, ?User $actor = null): Quote
+    public function handle(string $ownerKey, string $idempotencyKey, array $items, ?User $actor = null, ?CustomerPrincipal $principal = null): Quote
     {
         QuoteRequest::owner($ownerKey);
         QuoteRequest::key($idempotencyKey);
@@ -23,7 +25,8 @@ final class CreateQuote
         $requestHash = CanonicalJson::hash($items);
         $keyHash = hash('sha256', $idempotencyKey);
 
-        return DB::transaction(function () use ($ownerKey, $items, $requestHash, $keyHash, $actor) {
+        return DB::transaction(function () use ($ownerKey, $items, $requestHash, $keyHash, $actor, $principal) {
+            app(CustomerAccess::class)->lock($principal, $ownerKey, $actor);
             // Explicit customer identity precedes resource locks; null remains anonymous/system.
             $actorId = app(CommerceAuditActor::class)->lock($actor);
             // INSERT IGNORE waits for a competing first insert. The subsequent row lock serializes absent-key creation too.
@@ -54,6 +57,8 @@ final class CreateQuote
                 QuoteLine::create(['quote_id' => $quote->id, 'offer_revision_id' => $line['offer_revision_id'], 'position' => $position, 'line_hash' => CanonicalJson::hash($line)]);
             }
             AuditEvent::recordAttributed('commerce.quote.created', $quote, ['public_id' => $quote->public_id, 'snapshot_hash' => $quote->snapshot_hash, 'line_count' => count($lines)], $actorId);
+
+            app(CustomerAccess::class)->lock($principal, $ownerKey, $actor);
 
             return $quote;
         }, 5);

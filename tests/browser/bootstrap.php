@@ -1,11 +1,13 @@
 <?php
 
 use App\Domain\Catalog\SaveTrackMetadata;
+use App\Domain\Customers\CustomerAccounts;
 use App\Models\User;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\Console\Tester\CommandTester;
+use Tests\Support\CustomerFixtures;
 
 // This CLI-only fixture builder must never touch an existing installation or database.
 try {
@@ -37,7 +39,8 @@ try {
         throw new RuntimeException('Synthetic operator provisioning failed.');
     }
     $actor = User::where('email', 'browser-operator@example.test')->sole();
-    User::factory()->create(['name' => 'Synthetic Customer', 'email' => 'browser-customer@example.test', 'password' => $password]);
+    $customer = User::factory()->create(['name' => 'Synthetic Customer', 'email' => 'browser-customer@example.test', 'password' => $password, 'is_admin' => false, 'email_verified_at' => now()]);
+    app(CustomerAccounts::class)->provision($customer);
     $fixtures = [];
     foreach (['chromium-desktop', 'webkit-mobile'] as $project) {
         $editable = app(SaveTrackMetadata::class)->handle(null, ['title' => 'Synthetic editable '.$project, 'slug' => 'editable-'.$project], $actor);
@@ -52,6 +55,20 @@ try {
         fwrite(STDERR, Artisan::output()); // This report contains only fixed, redacted messages.
         throw new RuntimeException('The isolated installation did not pass its required diagnostics.');
     }
+    // The CLI guard above proves this is a new, disposable loopback installation.
+    // Use existing test transports only while creating real retained account purchases.
+    $customerFixtures = ['projects' => []];
+    $app->detectEnvironment(fn () => 'testing');
+    try {
+        foreach (['chromium-desktop' => 'CHROMIUM', 'webkit-mobile' => 'WEBKIT'] as $project => $suffix) {
+            $paid = CustomerFixtures::ready($customer, $suffix, true);
+            $customerFixtures['projects'][$project] = CustomerFixtures::browserManifest($paid);
+        }
+    } finally {
+        $app->detectEnvironment(fn () => 'local');
+    }
+    file_put_contents($directory.'/customer-fixtures.json', json_encode($customerFixtures, JSON_THROW_ON_ERROR));
+    chmod($directory.'/customer-fixtures.json', 0600);
     echo "Fresh SQLite migrations, interactive operator command and installation diagnostics passed.\n";
 } catch (Throwable) {
     // Laravel's plain-script exception renderer can finish with status 0. Fail explicitly.

@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Domain\Catalog\PublicCatalog;
 use App\Domain\Commerce\Checkout\CheckoutPolicy;
 use App\Domain\Commerce\Orders\OrderPolicy;
-use App\Domain\SiteBuilder\SiteContent;
+use App\Domain\Customers\CustomerAccessPolicy;
 use App\Domain\SiteBuilder\EditorialContent;
+use App\Domain\SiteBuilder\SiteContent;
 use App\Domain\SiteBuilder\SiteImagePresentation;
 use App\Support\StorefrontMetadata;
 use Illuminate\Http\JsonResponse;
@@ -30,6 +31,7 @@ class StorefrontController extends Controller
         return Inertia::render('Storefront', $catalog + ['siteContent' => app(EditorialContent::class)->chrome($siteContent), 'siteImages' => $images->storefront($siteContent),
             'selectedTrack' => $selectedTrack, 'selectedTrackSlug' => $slug, 'commerceEnabled' => false,
             'testOrderPreparationEnabled' => app(OrderPolicy::class)->enabled(),
+            'customerAccountEnabled' => app(CustomerAccessPolicy::class)->enabled(),
             'testCheckoutEnabled' => app(CheckoutPolicy::class)->enabled(), 'metadata' => $metadata])
             ->withViewData(['metadata' => $metadata]);
     }
