@@ -109,14 +109,14 @@ jobs:
   backend-mysql:
     needs: scope
     if: needs.scope.outputs.mode != 'docs'
-    name: backend-mysql (${{ matrix.shard }}/4)
+    name: backend-mysql (${{ matrix.shard }}/8)
     runs-on: ubuntu-latest
     # A shard takes 22 to 38 minutes and has taken 57 on a slow runner. A hung test must not hold a runner for the 6-hour default.
     timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
     services:
       mysql:
         image: mysql:8.4
@@ -169,7 +169,7 @@ jobs:
           MYSQL_CONTAINER_ID: ${{ job.services.mysql.id }}
         run: python3 scripts/ci/database-receipts.py start --engine=mysql --shard=${{ matrix.shard }}
       - name: Prove the complete MySQL test partition
-        run: python3 scripts/ci/phpunit-shards.py --shards=4 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json
+        run: python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json
       - name: Run all tests assigned to this MySQL shard
         id: database_tests
         run: php vendor/bin/phpunit --configuration=phpunit-ci-mysql-${{ matrix.shard }}.xml --log-junit=phpunit-ci-mysql-${{ matrix.shard }}-results.xml --fail-on-phpunit-warning --display-warnings
@@ -270,7 +270,7 @@ jobs:
         env:
           NEEDS_JSON: ${{ toJSON(needs) }}
         run: python3 scripts/ci/ci-scope.py gate
-      - name: Verify all six current-run database receipts without enabling reuse
+      - name: Verify all ten current-run database receipts without enabling reuse
         if: needs.scope.outputs.mode == 'full'
         env:
           RECEIPT_GITHUB_TOKEN: ${{ github.token }}

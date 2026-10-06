@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[2]
 spec = importlib.util.spec_from_file_location("database_proofs", ROOT / "scripts/ci/database-receipts.py")
 proof = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(proof)
+COUNTS = {"mysql": 4, "sqlite": 2}
 PROJECT = 87181037
 PATH = "vaseydev/va-studio"
 API = "https://gitlab.com/api/v4"
@@ -28,7 +29,7 @@ POLICY = tuple(dict.fromkeys((".gitlab-ci.yml", "scripts/ci/gitlab-database-rece
     "scripts/ci/setup-gitlab-node.sh", "scripts/ci/setup-gitlab-related-scanner.sh",
     "scripts/ci/test-gitlab-setup.py", "scripts/dev/test-bootstrap-macos.py", *proof.POLICY_FILES)))
 DATABASE_JOBS = {f"backend-{engine}: [{shard}]": (engine, shard)
-                 for engine, count in proof.COUNTS.items() for shard in range(1, count + 1)}
+                 for engine, count in COUNTS.items() for shard in range(1, count + 1)}
 UPSTREAM = {"provenance-access", "frontend", "backend-quality", "related-browser",
             "operator-browser: [chromium-desktop]", "operator-browser: [webkit-mobile]", *DATABASE_JOBS}
 
@@ -146,7 +147,7 @@ def start(root: Path, engine: str, shard: int, env: dict) -> None:
 
 
 def evidence(files: dict, identity: dict, checkout_root: str, engine: str, shard: int, root: Path) -> dict:
-    return proof.database_evidence(files, {"checkout_root": checkout_root, "policy_sha256": identity["policy_sha256"]}, engine, shard, proof.sqlite_skip_pairs(root))
+    return proof.database_evidence(files, {"checkout_root": checkout_root, "policy_sha256": identity["policy_sha256"]}, engine, shard, proof.sqlite_skip_pairs(root), shard_count=COUNTS[engine])
 
 
 def finish(root: Path, engine: str, shard: int, env: dict) -> None:
@@ -161,7 +162,7 @@ def finish(root: Path, engine: str, shard: int, env: dict) -> None:
                   and initial.get("source") == identity and initial.get("producer") == job and initial.get("runtime") == observed
                   and initial.get("engine") == engine and type(initial.get("shard")) is int and initial["shard"] == shard
                   and initial.get("checkout_root") == str(root.resolve()), "Source, producer, shard or runtime changed during execution")
-    files = {name: proof.read_file(root / name) for name in proof.evidence_names(engine, shard) - {prefix + "-receipt.json"}}
+    files = {name: proof.read_file(root / name) for name in proof.evidence_names(engine, shard, shard_count=COUNTS[engine]) - {prefix + "-receipt.json"}}
     proof.validate_discovered_files(root, set(proof.inventory(files[f"phpunit-ci-{engine}-source-tests.xml"], str(root.resolve()))["cases"].values()))
     value = initial | {"purpose": "gitlab-database-receipt-not-acceptance", "runtime_sha256": proof.digest(proof.canonical(observed)),
                        "test_step_outcome": "success", "finished_at": datetime.now(timezone.utc).isoformat(),
@@ -309,7 +310,7 @@ def archive_metadata(job: dict, identity: dict, engine: str, shard: int) -> dict
 
 
 def validate_receipt(root: Path, identity: dict, job: dict, engine: str, shard: int, raw: bytes) -> tuple[dict, dict]:
-    files = proof.archive(raw, proof.evidence_names(engine, shard))
+    files = proof.archive(raw, proof.evidence_names(engine, shard, shard_count=COUNTS[engine]))
     prefix = f"phpunit-ci-{engine}-{shard}"
     receipt = proof.json_data(files.pop(prefix + "-receipt.json"))
     keys = {"schema_version", "purpose", "engine", "shard", "source", "producer", "checkout_root", "runtime", "runtime_sha256", "test_step_outcome", "started_at", "finished_at", "source_census", "shard_census", "result_sha256", "file_sha256", "results"}
@@ -345,7 +346,7 @@ def collect(root: Path, env: dict, api: Gitlab) -> dict:
     pipeline_provenance(api, identity, env)
     jobs = accept_jobs(api.jobs(identity["pipeline_id"]), identity, number(env, "CI_JOB_ID"))
     receipts, artifacts = [], []
-    inventories = {engine: [] for engine in proof.COUNTS}
+    inventories = {engine: [] for engine in COUNTS}
     for name, (engine, shard) in DATABASE_JOBS.items():
         job = jobs[name]
         metadata = archive_metadata(job, identity, engine, shard)
@@ -383,7 +384,7 @@ def collect(root: Path, env: dict, api: Gitlab) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=("probe", "start", "finish", "collect"))
-    parser.add_argument("--engine", choices=tuple(proof.COUNTS))
+    parser.add_argument("--engine", choices=tuple(COUNTS))
     parser.add_argument("--shard", type=int)
     args = parser.parse_args()
     env = dict(os.environ)
@@ -400,7 +401,7 @@ def main() -> int:
                 proof.write_json(ROOT / "phpunit-ci-gitlab-collection.json", collect(ROOT, env, api))
                 print("All mandatory native upstream jobs and six complete database receipts verified; outer acceptance pending; reuse disabled.")
         else:
-            proof.require(args.engine in proof.COUNTS and args.shard is not None and 1 <= args.shard <= proof.COUNTS[args.engine], "Invalid database shard")
+            proof.require(args.engine in COUNTS and args.shard is not None and 1 <= args.shard <= COUNTS[args.engine], "Invalid database shard")
             (start if args.command == "start" else finish)(ROOT, args.engine, args.shard, env)
             print("Native database " + args.command + " evidence recorded; no acceptance or reuse claim.")
         return 0

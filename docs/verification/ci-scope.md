@@ -12,13 +12,13 @@ The stable `backend` aggregate always runs. It accepts exactly one complete mode
 
 | Mode | Required successful jobs | Expected nonexecuted jobs |
 | --- | --- | --- |
-| `full` | scope, backend quality, all four MySQL shards, both SQLite shards, frontend/build/audits and operator browser | documentation |
+| `full` | scope, backend quality, all eight MySQL shards, both SQLite shards, frontend/build/audits, both operator-browser projects and related-browser | documentation |
 | `docs` | scope and documentation | runtime quality, databases, frontend and browser |
 
-Missing, failed, cancelled, unknown or inconsistent results fail the aggregate. Runtime mode now includes frontend/browser success in the aggregate rather than relying solely on unknown repository protection settings. Existing full job names, matrices, commands, timeouts, audit settings and partition proof are retained. Matrix success remains GitHub's aggregate result of all its shards; a cancelled/failed/skipped matrix cannot satisfy full mode.
+Missing, failed, cancelled, unknown or inconsistent results fail the aggregate. Runtime mode now includes frontend/browser success in the aggregate rather than relying solely on unknown repository protection settings. The stable aggregate job name is retained. MySQL has eight whole-file shards; SQLite still has two. Existing test commands, timeouts, audit settings and exact partition proof are retained. Matrix success remains GitHub's aggregate result of all its shards; a cancelled/failed/skipped matrix cannot satisfy full mode.
 
 Full CI still runs for ready or draft runtime PRs, main runtime pushes and manual dispatch. This first efficiency increment does not introduce draft suppression or post-merge runtime proof reuse. Feature branches can use the separate [focused workflow](focused-ci.md) for informative feedback before a ready PR. Do not describe a focused pass as full acceptance.
 
 Local verification: `python3 scripts/ci/test-ci-scope.py` exercises real temporary Git histories for regular docs, mixed/unknown paths, rename/deletion, symlink/executable mode, missing/stale/unrelated identities, dispatch/main routing, bounded evidence, document links/CSV and acceptance failure states. The integrating PR records the executed test total, exact source and cloud results. Proposed behavior is not adopted until the CI implementation itself passes the full suite and independent review.
 
-Rollback: revert this workflow/routing increment to restore unconditional full PR/main/manual checks. Preserve accepted application changes and evidence. Actual classic branch-protection configuration was not readable by the integration at preparation time; no protection setting is changed by this commit.
+Rollback: revert this workflow/routing increment to restore unconditional full PR/main/manual checks. Preserve accepted application changes and evidence. Before the eight-shard job-name change on October 6, the successful main-branch metadata read explicitly reported protection disabled and empty required check names; the ruleset listing including parents was empty. The separate administrative protection endpoint returned 403. No protection setting is changed by this commit, and the source-defined full aggregate remains mandatory.
