@@ -36,6 +36,7 @@ const env = {
   VASEY_BROWSER_RELATED_STAGE: '', VASEY_BROWSER_RELATED_MARKER: '',
   // Synthetic inquiry setup belongs exclusively to this disposable loopback installation.
   CONTACT_INQUIRIES_ENABLED: 'true',
+  CONTACT_TEST_ORDER_INQUIRIES_ENABLED: 'true',
   VASEY_TEST_CUSTOMER_ACCOUNTS_ENABLED: 'true',
   // Explicit original-session claims are confined to this disposable test installation.
   VASEY_TEST_PURCHASE_CLAIMS_ENABLED: 'true',
