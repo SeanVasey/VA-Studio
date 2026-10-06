@@ -63,6 +63,13 @@ function rows(workspace) {
     .map(table => [table, query(workspace, `SELECT * FROM ${table} ORDER BY id`)]));
 }
 
+async function assertLeaseAvailable(workspace) {
+  // A leftover token is not ownership: the shared broker verifies a live OS lock.
+  const lease = await acquireLease(workspace, isolatedEnvironment(workspace));
+  await lease.release();
+  assert.ok(lease.child.exitCode !== null || lease.child.signalCode !== null);
+}
+
 async function prepared(parent, count = 2) {
   const directory = join(parent, 'installation');
   await initialize(directory, { checkout: release.checkout, output: { write() {} } });
@@ -129,7 +136,7 @@ native('real hidden-password review is read-only and bounded committed draft seg
   for (const track of complete.tracks) { assert.equal(track.status, 'draft'); assert.equal(track.published_at, null); assert.equal(track.published_slug, null); }
   const replay = await consoleOperation(input, 'apply', digest, { limit: 25 }); assert.equal(replay.status, 0, replay.output); assert.equal(replay.result.created, 0);
   assert.deepEqual(rows(input.workspace), complete); assert.deepEqual(readFileSync(join(input.sourceDirectory, 'catalog.json')), manifest); assert.deepEqual(readFileSync(join(input.sourceDirectory, 'raw/source.csv')), raw);
-  assert.equal(readFileSync(join(input.workspace.directory, 'lease')).length, 0);
+  await assertLeaseAvailable(input.workspace);
 });
 
 native('wrong password and nonterminal input refuse without a report or database mutation', async parent => {
@@ -162,14 +169,14 @@ for (const mutation of ['source', 'report', 'digest', 'target']) {
         { cwd: release.checkout, env: isolatedEnvironment(input.workspace), encoding: 'utf8' }); assert.equal(result.status, 0, result.stderr);
     }
     const before = rows(input.workspace); const applied = await consoleOperation(input, 'apply', digest); assert.notEqual(applied.status, 0);
-    assert.deepEqual(rows(input.workspace), before); assert.equal(readFileSync(join(input.workspace.directory, 'lease')).length, 0);
+    assert.deepEqual(rows(input.workspace), before); await assertLeaseAvailable(input.workspace);
   });
 }
 
 native('interrupting a hidden credential prompt stops its worker and releases the installation lease before another operation', async parent => {
   const input = await prepared(parent, 1); const before = rows(input.workspace);
   const cancelled = await consoleOperation(input, 'review', undefined, { interrupt: true }); assert.notEqual(cancelled.status, 0); assert.equal(cancelled.answered, true);
-  assert.equal(existsSync(input.report), false); assert.deepEqual(rows(input.workspace), before); assert.equal(readFileSync(join(input.workspace.directory, 'lease')).length, 0);
+  assert.equal(existsSync(input.report), false); assert.deepEqual(rows(input.workspace), before); await assertLeaseAvailable(input.workspace);
   const next = await consoleOperation(input); assert.equal(next.status, 0, next.output);
 });
 
