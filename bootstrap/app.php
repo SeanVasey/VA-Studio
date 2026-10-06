@@ -8,6 +8,8 @@ use App\Http\Middleware\ResumableUploadPrivacy;
 use App\Http\Middleware\SitePreviewPrivacy;
 use App\Http\Middleware\StripeWebhookBodyLimit;
 use App\Http\Middleware\TestDeliveryPrivacy;
+use App\Http\Middleware\TestExceptionResolutionPrivacy;
+use App\Http\Responses\TestExceptionResolutionResponse;
 use App\Http\Responses\InquiryResponse;
 use App\Http\Responses\PublicTrackEmbedResponse;
 use App\Http\Responses\TestDeliveryResponse;
@@ -34,6 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(StripeWebhookBodyLimit::class);
         $middleware->prepend(TestDeliveryPrivacy::class);
+        $middleware->prepend(TestExceptionResolutionPrivacy::class);
         $middleware->prepend(SitePreviewPrivacy::class);
         $middleware->prepend(InquiryPrivacy::class);
         $middleware->prepend(PrivateTrackReviewPrivacy::class);
@@ -47,6 +50,14 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => (CustomerPrivacy::matches($request) && $request->isMethod('POST')) || ResumableUploadPrivacy::endpoint($request) || $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
         );
         $exceptions->report(function (Throwable $exception) {
+            if (TestExceptionResolutionResponse::matches(request())) {
+                try {
+                    Log::error('Test resolution request failed.', ['exception_class' => $exception::class]);
+                } catch (Throwable) { /* Keep private failures generic if the logger fails. */
+                }
+
+                return false;
+            }
             if (CustomerPrivacy::matches(request())) {
                 try {
                     Log::error('Customer request failed.', ['exception_class' => $exception::class]);
@@ -118,6 +129,17 @@ return Application::configure(basePath: dirname(__DIR__))
         // Middleware failures occur before the controller. Keep those private and
         // generic too, including in debug mode, without changing other routes.
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request): Response {
+            if (TestExceptionResolutionResponse::matches($request)) {
+                $status = $exception instanceof LockTimeoutException ? 503 : $response->getStatusCode();
+                $headers = [];
+                foreach (['Allow', 'Retry-After', 'X-RateLimit-Limit', 'X-RateLimit-Remaining'] as $name) {
+                    if ($response->headers->has($name)) {
+                        $headers[$name] = $response->headers->get($name);
+                    }
+                }
+
+                return TestExceptionResolutionResponse::error($status, $headers);
+            }
             if (CustomerPrivacy::matches($request)) {
                 return $response->getStatusCode() >= 400 ? CustomerPrivacy::error($response->getStatusCode()) : CustomerPrivacy::protect($response);
             }
