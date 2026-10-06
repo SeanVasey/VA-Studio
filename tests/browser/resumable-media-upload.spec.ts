@@ -88,7 +88,14 @@ test('operator resumes real eight MiB transport after a lost response and saves 
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath('resumable-private-upload-completed.png'), fullPage: true });
   await page.getByRole('link', { name: 'Return to Media assets' }).click();
-  await page.getByRole('searchbox', { name: 'Search', exact: true }).fill(name);
+  const searched = page.waitForResponse(response => {
+    if (!response.url().endsWith('/update') || response.request().method() !== 'POST') return false;
+    const payload = response.request().postDataJSON() as { components?: { updates?: Record<string, unknown> }[] };
+    return payload.components?.some(component => component.updates?.tableSearch === name) ?? false;
+  });
+  // The main table search is distinct from the topbar's global search on mobile.
+  await page.getByRole('main').getByRole('searchbox', { name: 'Search', exact: true }).fill(name);
+  const search = await searched; expect(search.status()).toBe(200); expect(await search.finished()).toBeNull();
   const row = page.getByRole('row').filter({ has: page.getByText(name, { exact: true }) });
   await expect(row).toBeVisible();
   await expect(row.getByText('quarantined', { exact: true })).toBeVisible();
