@@ -45,11 +45,12 @@ test('visitor reads an in-app staff reply, retries one real follow-up and retain
     const bodies: string[] = []; const messageIds: number[] = [];
     await page.route('**' + endpoint, async route => {
       if (route.request().method() !== 'POST') { await route.continue(); return; }
-      const response = await route.fetch(); bodies.push(route.request().postData()!);
-      expect(response.status()).toBe(bodies.length === 1 ? 201 : 200);
+      bodies.push(route.request().postData()!);
+      if (bodies.length !== 1) { await route.continue(); return; }
+      const response = await route.fetch(); expect(response.status()).toBe(201);
+      expect(response.headers()['cache-control']).toContain('no-store');
       messageIds.push((await response.json()).messageId);
-      if (bodies.length === 1) await route.abort('failed'); // The real service committed; only acknowledgement is lost.
-      else await route.fulfill({ response });
+      await route.abort('failed'); // The real service committed; only its first acknowledgement is lost.
     });
     await page.getByLabel('Follow-up message', { exact: true }).fill(followUp);
     await page.getByRole('button', { name: 'Send follow-up', exact: true }).focus(); await page.keyboard.press('Enter');
@@ -58,8 +59,10 @@ test('visitor reads an in-app staff reply, retries one real follow-up and retain
     const replayed = page.waitForResponse(response => new URL(response.url()).pathname === endpoint && response.request().method() === 'POST');
     await page.getByRole('button', { name: 'Retry same follow-up', exact: true }).click();
     const replay = await replayed; expect(replay.status()).toBe(200); expect(await replay.finished()).toBeNull();
+    expect(replay.headers()['cache-control']).toContain('no-store');
     expect(replay.request().postData()).toBe(bodies[0]);
-    expect(await replay.json()).toEqual({ state: 'saved', messageId: messageIds[0] });
+    const replaySaved = await replay.json(); expect(replaySaved).toEqual({ state: 'saved', messageId: messageIds[0] });
+    messageIds.push(replaySaved.messageId);
     expect(bodies).toHaveLength(2); expect(bodies[1]).toBe(bodies[0]); expect(messageIds[1]).toBe(messageIds[0]);
     await expect(conversation.getByRole('status')).toHaveText('Your follow-up was saved. Replies appear here; no email is sent.');
     await expect(conversation.getByRole('list', { name: 'Conversation messages', exact: true }).getByText(followUp, { exact: true })).toBeVisible();
@@ -142,11 +145,12 @@ test('visitor reads an in-app staff reply, retries one real follow-up and retain
     const linkedBodies: string[] = []; const linkedReceipts: string[] = [];
     await page.route('**' + orderEndpoint, async route => {
       if (route.request().method() !== 'POST') { await route.continue(); return; }
-      const result = await route.fetch(); linkedBodies.push(route.request().postData()!);
-      expect(result.status()).toBe(linkedBodies.length === 1 ? 201 : 200);
+      linkedBodies.push(route.request().postData()!);
+      if (linkedBodies.length !== 1) { await route.continue(); return; }
+      const result = await route.fetch(); expect(result.status()).toBe(201);
       expect(result.headers()['cache-control']).toContain('no-store'); const saved = await result.json();
       expect(saved).toEqual({ state: 'saved', receipt: expect.stringMatching(/^[a-f0-9-]{36}$/) }); linkedReceipts.push(saved.receipt);
-      if (linkedBodies.length === 1) await route.abort('failed'); else await route.fulfill({ response: result });
+      await route.abort('failed'); // Retry uses the original browser/server transport after the lost acknowledgement.
     });
     await orderInquiry.getByRole('button', { name: 'Send inquiry', exact: true }).press('Enter');
     await expect(orderInquiry.getByRole('alert')).toContainText('could not confirm'); await expect(orderInquiry.getByRole('alert')).toBeFocused();
@@ -155,6 +159,9 @@ test('visitor reads an in-app staff reply, retries one real follow-up and retain
     const replayedInquiry = page.waitForResponse(result => new URL(result.url()).pathname === orderEndpoint && result.request().method() === 'POST');
     await orderInquiry.getByRole('button', { name: 'Retry same inquiry', exact: true }).click();
     const linkedReplay = await replayedInquiry; expect(linkedReplay.status()).toBe(200); expect(await linkedReplay.finished()).toBeNull();
+    expect(linkedReplay.headers()['cache-control']).toContain('no-store');
+    const linkedSaved = await linkedReplay.json(); expect(linkedSaved).toEqual({ state: 'saved', receipt: expect.stringMatching(/^[a-f0-9-]{36}$/) });
+    linkedReceipts.push(linkedSaved.receipt);
     await expect(orderInquiry.getByRole('heading', { name: 'Inquiry saved', exact: true })).toBeVisible();
     expect(linkedBodies).toHaveLength(2); expect(linkedBodies[1]).toBe(linkedBodies[0]); expect(linkedReceipts).toEqual([linkedReceipts[0], linkedReceipts[0]]);
     const linkedReceipt = linkedReceipts[0], contextEndpoint = `/contact/inquiries/${linkedReceipt}/order-context`;
