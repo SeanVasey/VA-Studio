@@ -1,6 +1,7 @@
 <?php
 
 use App\Domain\Commerce\Operations\TestPaymentExceptionOperations;
+use App\Domain\Commerce\Payments\StripeFinancialInspectionGateway;
 use App\Domain\Commerce\Payments\StripePaymentGateway;
 use App\Models\User;
 use Carbon\Carbon;
@@ -9,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Tests\Support\FinalizationFixtures;
+use Tests\Support\PaymentFinancialFixtures;
 use Tests\Support\PaymentFixtures;
 
 require __DIR__.'/../../vendor/autoload.php';
@@ -27,6 +29,8 @@ $gateway = PaymentFixtures::gateway();
 $gateway->session = $input['session'];
 $gateway->payment = $input['payment'];
 app()->instance(StripePaymentGateway::class, $gateway);
+$financial = PaymentFinancialFixtures::gateway($gateway);
+app()->instance(StripeFinancialInspectionGateway::class, $financial);
 $directory = getenv('VASEY_EXCEPTION_OPS_DIRECTORY');
 $worker = getenv('VASEY_EXCEPTION_OPS_WORKER');
 $connection = (int) DB::selectOne('SELECT CONNECTION_ID() AS id')->id;
@@ -72,5 +76,5 @@ try {
     $result = ['result' => 'blocked'];
 }
 echo json_encode($result + ['connection_id' => $connection, 'pid' => getmypid(),
-    'provider_calls' => $gateway->calls, 'transaction_level' => DB::transactionLevel(), 'jobs' => array_keys(Queue::pushedJobs())], JSON_THROW_ON_ERROR);
+    'provider_calls' => [...$gateway->calls, ...$financial->calls], 'transaction_level' => DB::transactionLevel(), 'jobs' => array_keys(Queue::pushedJobs())], JSON_THROW_ON_ERROR);
 file_put_contents($directory.'/finished-'.$worker, 'finished');
