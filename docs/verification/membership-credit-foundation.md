@@ -56,6 +56,8 @@ CreditLedger::grantSynthetic(planVersion, customerAccount, sourceEventId,
 operator) awards the frozen version's explicit allowance into one immutable
 source bucket. A globally unique source hash and exact account/version request
 hash prevent a duplicate source from minting again or moving to another owner.
+The UTC deadline derives from the exact retained creation instant; it does not
+read the clock again to compute expiry.
 No actual invoice or verified payment adapter is implemented.
 
 reserve(bucketId, integerAmount, syntheticResourceKey, key, principal, buyer),
@@ -146,15 +148,45 @@ hashes and raw JUnit/logs. No production key is used.
   committed. All four original failures and their executable source are
   retained. The final deadline guard made those four plus Unicode/nested
   regressions pass: 6/6, 16 assertions, 1.345 seconds.
-- Final scoped Pint and syntax checks passed on all 15 owned PHP files.
+- Checkpoint scoped Pint and syntax checks passed on all 15 owned PHP files.
   Actual discovery lists 134 new component cases, including the same 12 native
   race identities in two methods; listing is not execution.
-- Final focused SQLite source-bound compatibility selection: 136/136,
+- Checkpoint focused SQLite source-bound compatibility selection: 136/136,
   551 assertions, zero errors/failures/skips, 38.576 seconds. This consists of
   the new 122-case domain/migration selection (465 assertions) and unchanged
   CustomerAccountAccessTest/CustomerAccountCommerceTest (14 cases/86 assertions).
-  The new 134-case MySQL source-bound selection, including all 12 native races,
-  is running at this checkpoint; its final receipt follows.
+  The same frozen checkpoint's MySQL selection completed: 134/134, 1,306
+  assertions, zero errors/failures/skips, 683.726 seconds. All 12 native races
+  observed their exact InnoDB waits. Both selections bind checkpoint
+  5a2b054b38166dc0e367c935c6820c4844d76999 and its unchanged 15 PHP blobs.
+- Independent review then reproduced a valid grant refused at a second boundary:
+  a separate clock read computed expiry one second later than the retained
+  creation instant. The SQL guard prevented the inconsistent bucket from
+  committing. The reviewer's original one-error canary and the author's
+  one-error/zero-assertion regression are retained separately with raw logs,
+  JUnit and source. This is a grant availability correction, not evidence of
+  an invalid durable credit award.
+- The corrective child derives expiry from the captured UTC instant, adds
+  MembershipGrantClockBoundaryTest and preserves the other 14 checkpoint PHP
+  blobs. Corrected focused SQLite: 10/10, 71 assertions, zero
+  errors/failures/skips, 2.032 seconds. Corrected genuine MySQL 8.4.11:
+  11/11, 169 assertions, zero errors/failures/skips, 52.627 seconds. These
+  selections execute the new clock regression, lifecycle/source/replay/expiry
+  cases and four late audit-callback cases; MySQL also executes the unchanged
+  duplicate-award independent-process race and observes its exact PRIMARY wait.
+  Its normal durability remains flush-at-commit 1, sync-binlog 1 and doublewrite
+  ON. Final scoped Pint and syntax pass all 16 PHP files. Corrected
+  discovery lists 135 cases and preserves all 134 prior identities. Discovery
+  is not a full execution of the corrected 135-case component.
+
+The corrected commands, source-before/source-after hashes and raw outcomes are
+clock-followup-sqlite-command.json / clock-followup-sqlite.xml / .log and
+clock-followup-native-command.json / clock-followup-native.xml / .log in the
+evidence directory. final-native-frozen-receipt.json retains the earlier full
+checkpoint's exact source and 12 observed waits. tested-source-final.json binds
+the final corrective commit, all owned blobs, retained negative evidence and
+the limited affected selection. It does not relabel the checkpoint's full
+MySQL result as execution of later code.
 
 Earlier results apply only to their recorded bytes. They are not backdated to
 later source. Final sensitive independent review must assess the actual frozen

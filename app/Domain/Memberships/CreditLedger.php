@@ -52,7 +52,7 @@ final class CreditLedger
                 return $this->result($events[0]);
             }
             $at = $this->at();
-            $expiry = $policy['validity_seconds'] === null ? null : now()->utc()->startOfSecond()->addSeconds($policy['validity_seconds'])->format('Y-m-d H:i:s');
+            $expiry = $policy['validity_seconds'] === null ? null : CarbonImmutable::parse($at, 'UTC')->addSeconds($policy['validity_seconds'])->format('Y-m-d H:i:s');
             $id = DB::table('membership_credit_buckets')->insertGetId(['customer_account_id' => $accountId, 'membership_plan_version_id' => $versionId,
                 'source_event_hash' => $source, 'source_request_hash' => $request, 'allowance' => $policy['allowance'], 'expires_at' => $expiry,
                 'created_by' => $operator->getKey(), 'created_at' => $at]);
