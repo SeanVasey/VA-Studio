@@ -1,5 +1,21 @@
 # Development agents and launch queue
 
+## User-testing batch — October 6, 2026
+
+The GitHub handoff is complete: [PR #4](https://github.com/SeanVasey/VA-Studio/pull/4) merged as `1095dd5f8fd7d016bc08a55dfe2d264557dfce67`; all thirteen applicable PR gates and [post-merge run 37098953844](https://github.com/SeanVasey/VA-Studio/actions/runs/37098953844) passed. The October 2 tables below preserve earlier execution states and are not current blockers or running-agent claims.
+
+The current bounded batch on `codex/user-testing-20261006` provides a [protected storefront preview and disposable real-admin installation](user-testing.md). The preview has been deployed and exercised in desktop Chrome. The alpha uses real services in isolated temporary SQLite/storage, synthetic private drafts and per-run operator credentials. Neither enables production commerce. Final native checks, independent composition review and full CI are recorded on the integrating PR before expected-head merge; do not infer acceptance from the earlier component results.
+
+| Accountable identity | Owned work | Integration contract |
+| --- | --- | --- |
+| `/root` | Shared build/CI configuration, testing guide, source publication and final merge | Preserve the existing thirteen gates; bind published trees to tested source |
+| `/root/integration_review` and independent preview reviewer | Isolated preview navigator and frontend regressions | Reuse actual storefront components and exact approved assets; fixtures remain isolated |
+| `/root/verify_gitlab` and independent alpha reviewer | Disposable real-app launcher, bootstrap, safety/native tests and instructions | Loopback only, no checkout environment/database mutation, bounded cleanup, real readiness and disabled external commerce |
+| `/root/github_ci_review` | PHP runtime/dependency verification, existing operator regression checks and final CI | Actual locked dependencies and native execution; no skipped-case substitution |
+| `/root/workspace_restore` | Exact baseline restoration and independent build/composition review | Verify tree/modes and selected deployment assets; exclude unintended public files |
+
+The guide records actual checks and limitations. Six parent groups remain accepted and 34 open. Next dependency-ready work follows feedback on these real journeys, remaining T11/T12 authoring/security children, and selected-host T13/T14/T37 media/deployment proof. A usable visual preview is an early user-testing milestone, not full replacement or launch acceptance.
+
 ## Current GitHub execution — October 2, 2026
 
 Development continues in [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio), integration branch `codex/github-handoff-20261002`, [PR #4](https://github.com/SeanVasey/VA-Studio/pull/4). The preserved source map remains in [the handoff record](verification/github-handoff-20261002.md). Sean authorized the GitHub Actions enablement and parallel implementation; account-owned actions plus the four existing pinned external actions are allowed, while default workflow tokens remain read-only and fork workflows remain disabled.

@@ -1,6 +1,8 @@
 # VASEY.AUDIO
 
-> **Current development home:** [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio). The October 2 GitLab work is being integrated on `codex/github-handoff-20261002`; see [the handoff record](docs/verification/github-handoff-20261002.md). Older repository and MR links below preserve historical evidence. Imported source and earlier focused results are not fresh GitHub acceptance.
+> **Current development home:** [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio). The GitLab handoff merged in [PR #4](https://github.com/SeanVasey/VA-Studio/pull/4) as `1095dd5`, with all thirteen applicable PR and post-merge gates passing. See [the handoff record](docs/verification/github-handoff-20261002.md) for preserved source provenance. Older repository and MR links below are historical evidence.
+
+**Try the website:** the [protected storefront preview](https://va-studio-preview-4f5o99xb7-vaseydev.vercel.app/?fixtures) offers the real frontend with labeled sample tracks. For real administration, `npm run alpha:local` launches a disposable local Laravel installation after dependency installation and a frontend build. Start with the [user-testing guide](docs/user-testing.md) and [private alpha instructions](docs/private-alpha.md). These are early testing surfaces; audio/provider commerce and a persistent private deployment retain their separate gates.
 
 Bespoke web store development replacing older, service-based e-commerce offerings. Single-seller music storefront, publishing administration, licensing, and secure delivery for Sean Vasey. Sean uploads, shares and sells his own content to customers; this is not a platform for independent sellers. This project replaces the current BeatStars site through staged, verifiable implementation.
 
@@ -145,4 +147,3 @@ The merchant-of-record, tax, payment methods, storage/hosting, license terms, ex
 ## Ownership
 
 Project code and VASEY.AUDIO assets are proprietary unless a file states otherwise. Third-party dependencies and self-hosted fonts retain their upstream licenses. See the brand provenance records and lockfiles. Never commit secrets, private masters/stems, customer exports, generated contracts, or production databases.
-
