@@ -1,5 +1,38 @@
 # CI throughput timing refresh
 
+## October 6, 2026: measured payment-fixture teardown
+
+This follow-up starts from the timing-only commit `7735ccbcf175e6ba0c4c2b858ca5b72e10fb63f4`. It changes only the import and trait used by `TestPaymentProcessingTest`: the existing `FinalizationDatabaseMigrations` replaces Laravel's `DatabaseMigrations`. Every test body and data provider is byte-identical. Application code, migration code, test selection, deadlines, warnings and acceptance gates remain unchanged.
+
+The existing fixture trait still calls `migrate:fresh` before every case, preserves Laravel's before/after refresh hooks, and adds no wrapping transaction or cross-case data reuse. Its checked `db:wipe` removes the disposable schema at teardown instead of invoking operational migration rollback. The trait preserves the selected connection and view/type cleanup options, clears the Artisan instance and resets refresh state. Payment tests retain real root commits, after-commit work and provider calls outside database transactions. Dedicated migration rollback tests remain in full CI.
+
+### Native before/after evidence
+
+Both complete executions used the exact locked dependencies, PHP 8.4.26 and separate fresh MySQL 8.4.11 instances on the native `/tmp` filesystem. Both reported repeatable-read isolation, `innodb_flush_log_at_trx_commit=1` and enabled performance schema. The MySQL binary, PHP binary/configuration, disposable runner and measurement helper were unchanged between runs. Synthetic credentials and application keys were isolated to each disposable instance.
+
+| Measurement | PHP test-step elapsed | Expanded cases | Assertions | Errors / failures / skips |
+| --- | ---: | ---: | ---: | ---: |
+| Original `DatabaseMigrations` | 430.009 seconds | 75 | 520 | 0 / 0 / 0 |
+| Existing disposable cleanup trait | 368.288 seconds | 75 | 520 | 0 / 0 / 0 |
+
+The observed reduction is **61.722 seconds (14.35%) for this file**. Every expanded case identity and its assertion count agree across the pair. These are monotonic PHPUnit subprocess durations; server provisioning is excluded and was not separately timed. This single sequential pair shared its host with other development work. It establishes the recorded local outcome, not a guaranteed hosted speedup or final candidate acceptance. Earlier attempts that failed environment prerequisites were excluded entirely: trigger-creation privilege, a synthetic application key, and a temporary filesystem capable of repeated native MySQL DDL were required before the valid pair.
+
+The retained case-identity digest is `bcaf9fa7d47b10e6ee92910f39f9e3a3aaadb0f17aba9b300c7a87b5ef0737e1`. Original/candidate test-file SHA-256 values are `de5ec2f4ad01c36c269db4393caf53e5879572530fd5604d5e9327bbf6e84bca` and `f634f20fb827d630912ec2c9a3db6316ffa40b00c149f824755aa157ee77c455`; original/candidate JUnit SHA-256 values are `95f693e0c2a545c3e1195f858cce1a1bcecbd27aa5a6803851c2c3d2a9103793` and `dd4ec4494ddf18bb89d9c3a056059420e255d4b75164b31a3921d83b82c86f9d`.
+
+Reproduce the comparison on each exact test-file version with separately provisioned disposable databases and the same runtime, lockfile and settings:
+
+```bash
+php vendor/bin/phpunit tests/Feature/TestPaymentProcessingTest.php \
+  --log-junit=/tmp/payment-measurement.xml --fail-on-phpunit-warning \
+  --display-warnings --stop-on-error --stop-on-failure
+php vendor/bin/phpunit tests/Feature/FinalizationDatabaseLifecycleTest.php \
+  --fail-on-phpunit-warning --display-warnings
+```
+
+The initial pair's helper SHA-256 is `f5f84bec6013bd5f42234c936b133978bb2abf7a4a76edc51f8021a363eeab1b`; disposable runner SHA-256 is `a38352c6ab7dee73d738fbeb3579723da6a55463f73986f8a33116e3776438e6`. The helper verified the source file and native runtime before executing, used separate new JUnit paths, and retained the complete result and exit status. Independent comparison required all 75 identities, all 520 per-case assertions, no errors/failures/skips, successful exit and unchanged runtime files.
+
+Additional validation passed: candidate payment plus the four existing lifecycle datasets on SQLite, **79 tests / 590 assertions**, 90.115 seconds; the existing lifecycle datasets on native MySQL, **4 tests / 70 assertions**, 24.159 seconds. Both had zero errors, failures or skips and retained the PHPUnit-warning exit flag. The lifecycle cases verify successful and deliberately throwing child tests, selected connections, view cleanup policy, callbacks after cleanup and fresh next-test schema state. The accepted-main timing manifests below remain original hosted measurements; this local result is not mixed into their weights. The next composed source requires its own complete Foundation gates and six current-run receipts. No receipt reuse is activated.
+
 ## October 6, 2026: complete accepted-main timing refresh
 
 This bounded T02 candidate starts from `636bc94b5688267edef1d34d8d1726402606da32`, tree `15de3311f7ba345b1e6821aa46e341f0e9d934c1`, while the separate private-alpha/storefront PR #5 runs its own acceptance. It changes only the two timing manifests and this guide. It does not change tests, PHPUnit configuration, partitioning, shard counts, workflows, runtime settings, warnings, audits, deadlines, receipt validation or the full-only reuse policy.
