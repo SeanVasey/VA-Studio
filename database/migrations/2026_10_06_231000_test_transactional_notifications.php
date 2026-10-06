@@ -120,7 +120,7 @@ return new class extends Migration
             ." AND NOT EXISTS (SELECT 1 FROM transactional_notice_attempts WHERE notice_id=NEW.notice_id AND state<>'failed')"
             .' AND NOT EXISTS (SELECT 1 FROM transactional_notice_attempts WHERE notice_id=NEW.notice_id AND finished_at>NEW.started_at)'
             .' AND EXISTS (SELECT 1 FROM transactional_notices n JOIN customer_accounts a ON a.id=n.account_id JOIN users u ON u.id=n.user_id'
-            .' WHERE n.id=NEW.notice_id AND a.user_id=u.id AND a.active=1 AND a.access_version=n.access_version AND u.is_admin=0 AND u.email_verified_at IS NOT NULL)';
+            .' WHERE n.id=NEW.notice_id AND NEW.started_at>=n.created_at AND a.user_id=u.id AND a.active=1 AND a.access_version=n.access_version AND u.is_admin=0 AND u.email_verified_at IS NOT NULL)';
         $identity = implode(' AND ', array_map(fn ($field) => $same('NEW.'.$field, 'OLD.'.$field),
             ['id', 'public_id', 'notice_id', 'number', 'token_hash', 'started_at', 'lease_expires_at']));
         $finish = $date('finished_at').' AND NEW.finished_at>=OLD.started_at';

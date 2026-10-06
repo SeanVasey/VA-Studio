@@ -73,7 +73,27 @@ fixture integration. Focused working-source feedback passed four functional
 SQLite cases / 44 assertions; retained initial failures were fixture key/setup
 errors before the relevant notification assertion or enqueue. Full adversarial,
 migration and genuine native race evidence is still being developed. A source
-checkpoint or test definition is not final acceptance. Exact tested source,
+checkpoint or test definition is not final acceptance. Checkpoint `777225ea`
+also passed the same four cases / 44 assertions on genuine disposable MySQL
+8.4.11 with normal durability and clean shutdown. The extended first SQLite
+run retained one test setup failure: its audit baseline preceded creation of a
+second order. The comparison now begins after all fixtures exist. The first
+19 migration cases / 256 assertions passed on SQLite.
+
+The extended suite covers current recipient and access withdrawal, credential
+changes, callback mutations, missing/partial/linked/public captures, definite
+pre-message refusal versus unknown outcome, explicit retry bounds, expired
+leases and positive original-byte reconciliation. New migration tests exercise
+exact insert shape, immutable rows, replacement denial, legal transitions,
+temporary/aliased/foreign objects, changed schema/guards and external references.
+Six independent-process MySQL cases cover duplicate enqueue, competing dispatch,
+withdrawal at enqueue/dispatch/reconcile and late completion versus the
+reconciliation winner. Each requires an observed `performance_schema`
+`data_lock_waits` record on the exact `users` PRIMARY key, distinct process and
+connection identities, and the complete retained intent/attempt/audit result.
+SQLite discovery of those six cases is not execution; it skips them explicitly.
+
+Exact tested source,
 commands, failures and remaining conditions will be recorded in the final
 component packet. No hosted full matrix, provider action or production operation
 was performed.

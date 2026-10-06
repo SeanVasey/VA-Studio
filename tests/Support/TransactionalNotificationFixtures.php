@@ -20,11 +20,11 @@ final class TransactionalNotificationFixtures
             'transactional-notifications.policy_version' => TransactionalNotificationPolicy::VERSION]);
     }
 
-    public static function ready(bool $enqueue = true): array
+    public static function ready(bool $enqueue = true, string $suffix = 'ONE'): array
     {
         self::configure();
-        $customer = CustomerFixtures::account(['email' => 'notification-owner@example.invalid']);
-        $paid = CustomerFixtures::ready($customer['user'], 'NOTIFICATION');
+        $customer = CustomerFixtures::account(['email' => 'notification-'.strtolower($suffix).'@example.invalid']);
+        $paid = CustomerFixtures::ready($customer['user'], 'NOTIFICATION'.$suffix);
         $result = $customer + $paid;
         if ($enqueue) {
             $result['notice'] = app(TestTransactionalNotifications::class)->enqueueOrderReady($paid['order']->public_id, $customer['principal']);

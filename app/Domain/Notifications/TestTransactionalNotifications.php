@@ -412,7 +412,20 @@ final class TestTransactionalNotifications
         if (! OrderRequest::uuid($attempt->public_id) || ! preg_match('/\A[a-f0-9]{64}\z/D', $attempt->token_hash)
             || $attempt->number < 1 || $attempt->number > TransactionalNotificationPolicy::MAX_ATTEMPTS
             || $attempt->started_at->micro !== 0 || $attempt->started_at->isFuture()
-            || ! $attempt->lease_expires_at->equalTo($attempt->started_at->addSeconds(TransactionalNotificationPolicy::LEASE_SECONDS))) {
+            || ! $attempt->lease_expires_at->equalTo($attempt->started_at->addSeconds(TransactionalNotificationPolicy::LEASE_SECONDS))
+            || ! in_array($attempt->state, ['leased', 'accepted', 'failed', 'uncertain'], true)
+            || ($attempt->state === 'leased' && ($attempt->reason !== null || $attempt->receipt_hash !== null || $attempt->finished_at !== null))
+            || ($attempt->state !== 'leased' && ($attempt->finished_at === null || $attempt->finished_at->lessThan($attempt->started_at)
+                || $attempt->finished_at->isFuture() || $attempt->finished_at->micro !== 0))
+            || ($attempt->state === 'accepted' && (! is_string($attempt->receipt_hash)
+                || ! preg_match('/\A[a-f0-9]{64}\z/D', $attempt->receipt_hash)
+                || ! in_array($attempt->reason, [null, 'capture_reconciled'], true)
+                || ($attempt->reason === null && $attempt->finished_at->greaterThanOrEqualTo($attempt->lease_expires_at))))
+            || ($attempt->state === 'failed' && ($attempt->reason !== 'private_storage_refused' || $attempt->receipt_hash !== null
+                || $attempt->finished_at->greaterThanOrEqualTo($attempt->lease_expires_at)))
+            || ($attempt->state === 'uncertain' && ($attempt->receipt_hash !== null
+                || ! in_array($attempt->reason, ['capture_unknown', 'lease_expired'], true)
+                || ($attempt->reason === 'lease_expired' && $attempt->finished_at->lessThan($attempt->lease_expires_at))))) {
             throw new NotificationException;
         }
     }
@@ -451,7 +464,18 @@ final class TestTransactionalNotifications
 
     private function attemptRows(int $noticeId): array
     {
-        return DB::table('transactional_notice_attempts')->where('notice_id', $noticeId)->orderBy('number')->lockForUpdate()->get()->map(fn ($row) => (array) $row)->all();
+        $rows = DB::table('transactional_notice_attempts')->where('notice_id', $noticeId)->orderBy('number')->lockForUpdate()->get()->map(fn ($row) => (array) $row)->all();
+        foreach ($rows as $position => $row) {
+            $model = new TransactionalNoticeAttempt;
+            $model->setRawAttributes($row, sync: true);
+            $this->verifyAttempt($model);
+            if ($model->notice_id !== $noticeId || $model->number !== $position + 1
+                || ($position < count($rows) - 1 && $model->state !== 'failed')) {
+                throw new NotificationException;
+            }
+        }
+
+        return $rows;
     }
 
     private function replaceAttempt(array $rows, int $id, array $changed): array
