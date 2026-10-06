@@ -41,6 +41,7 @@ describe('strict order inquiry boundary', () => {
     { orderInquiry: { ...setup, testOnly: false } }, { orderInquiry: { ...setup, privacyNotice: ' ' } },
     { orderInquiry: { ...setup, noticeToken: `${noticeToken}\n` } }, { orderInquiry: { ...setup, privateEmail: 'private@example.test' } },
     { orderInquiry: setup, extra: 'private' }, { orderInquiry: { ...setup, privacyNotice: 'x'.repeat(3001) } },
+    { orderInquiry: { ...setup, privacyNotice: '\ud800' } },
   ])('rejects unsupported or mismatched setup data without rendering server detail %#', async data => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(response(data)); expect(await readSetup()).toEqual({ kind: 'unavailable' });
   });
@@ -63,6 +64,15 @@ describe('strict order inquiry boundary', () => {
       .mockResolvedValueOnce(new Response(JSON.stringify({ orderInquiry: setup }), { headers: { 'Content-Type': 'text/html' } }))
       .mockResolvedValueOnce(redirected).mockResolvedValueOnce(new Response(new Uint8Array([0xc3, 0x28]), { headers: { 'Content-Type': 'application/json' } }));
     for (let i = 0; i < 4; i++) expect(await readSetup()).toEqual({ kind: 'unavailable' }); expect(fetcher).toHaveBeenCalledTimes(4);
+  });
+  it('accepts the maximum approved notice under Laravel escaped Unicode encoding, but rejects one extra code point', async () => {
+    const maximum = { ...setup, privacyNotice: '🎧'.repeat(3000) };
+    const encoded = JSON.stringify({ orderInquiry: maximum }).replaceAll('🎧', '\\ud83c\\udfa7');
+    expect(new TextEncoder().encode(encoded).byteLength).toBeGreaterThan(32768);
+    const overPolicy = JSON.stringify({ orderInquiry: { ...maximum, privacyNotice: maximum.privacyNotice + '🎧' } }).replaceAll('🎧', '\\ud83c\\udfa7');
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(encoded, { headers: { 'Content-Type': 'application/json' } }))
+      .mockResolvedValueOnce(new Response(overPolicy, { headers: { 'Content-Type': 'application/json' } }));
+    expect(await readSetup()).toEqual({ kind: 'loaded', value: maximum }); expect(await readSetup()).toEqual({ kind: 'unavailable' });
   });
 });
 

@@ -1,7 +1,9 @@
 export interface OrderInquirySetup { orderInquirySchema: 1; orderId: string; testOnly: true; privacyNotice: string; noticeToken: string }
 export interface OrderInquiryContext { orderInquiryContextSchema: 1; order: null | { id: string; testOnly: true } }
 type Result<T> = { kind: 'loaded'; value: T } | { kind: 'unavailable' };
-export const ORDER_INQUIRY_MAX_BYTES = 32768;
+// Laravel's JSON encoding can use 12 ASCII bytes per astral code point:
+// 3000 notice code points need 36000 bytes, plus the fixed versioned envelope.
+export const ORDER_INQUIRY_MAX_BYTES = 40 * 1024;
 export const inquiryLocator = (value: string) => value.length === 36 && /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(value);
 const object = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
 const keys = (value: Record<string, unknown>, names: string[]) => Object.keys(value).length === names.length && names.every(name => Object.hasOwn(value, name));
@@ -10,7 +12,7 @@ export function validOrderInquirySetup(value: unknown, orderId: string): value i
   return inquiryLocator(orderId) && object(value) && keys(value, ['orderInquirySchema', 'orderId', 'testOnly', 'privacyNotice', 'noticeToken'])
     && value.orderInquirySchema === 1 && value.orderId === orderId && value.testOnly === true
     && typeof value.privacyNotice === 'string' && value.privacyNotice.trim().length > 0 && [...value.privacyNotice].length <= 3000
-    && !/[<>\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u.test(value.privacyNotice)
+    && !/[<>\x00-\x08\x0B\x0C\x0E-\x1F\x7F\uD800-\uDFFF]/u.test(value.privacyNotice)
     && typeof value.noticeToken === 'string' && value.noticeToken.length === 64 && /^[a-f0-9]{64}$/.test(value.noticeToken);
 }
 
