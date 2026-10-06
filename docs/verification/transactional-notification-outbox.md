@@ -146,3 +146,23 @@ unchanged, and that evidence remains bound to `f4c54f6`; it does not certify the
 later status correction. No new native run, hosted workflow, full matrix, producer wiring or
 real email delivery is authorized by this status correction. Shared test
 registrations and old parent-migration fixture ordering remain integration-owned.
+
+The correction's actual focused receipts are separate from that original native
+packet. Frozen `558244b000669bb3662754cdeb24d882defbf904` passed
+`php vendor/bin/phpunit tests/Feature/TransactionalNotificationTest.php --no-progress`
+on SQLite: 52 cases / 334 assertions, no skips, errors or failures. Source and
+HEAD were unchanged throughout that run. Its successor
+`4c0af1abdeca6c9c773c58fc92d26d1469204dde` only imports the existing exception
+type by name and records the preceding native result; all notification domain
+bytes are identical. The exact successor passed the four inspection cases /
+28 assertions using the same command with
+`--filter test_accepted_status_rechecks_current_authority_after_private_capture_inspection`.
+Both changed PHP files pass `php vendor/bin/pint --test`, and the owned delta
+passes `git diff --check`. Autoload reflection resolves the domain and test
+classes to their respective isolated checkout. Raw JUnit timings and source/
+dependency hashes are preserved in `status-corrected-functional.xml`,
+`status-final-inspection.xml` and their matching source receipts.
+
+These are focused development receipts. Independent review, integration-owned
+parent-migration compatibility and shared registrations remain separate steps;
+the modified status behavior has no fresh native or complete acceptance receipt.
