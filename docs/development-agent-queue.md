@@ -2,21 +2,21 @@
 
 ## Active continuation — October 6, 2026 UTC
 
-[PR #13](https://github.com/SeanVasey/VA-Studio/pull/13) consolidates the reviewed ancestry of PRs #7–#12 against `main`. Fresh full [run 37490570886](https://github.com/SeanVasey/VA-Studio/actions/runs/37490570886) owns its acceptance. Earlier source-bound results remain separate; earlier PRs must not be merged individually. The [inclusive record](verification/inclusive-commerce-authoring-acceptance.md) records exact composition, actual focused checks and remaining gates.
+[PR #13](https://github.com/SeanVasey/VA-Studio/pull/13) consolidates the reviewed ancestry of PRs #7–#12 against `main`. [Run 37490570886](https://github.com/SeanVasey/VA-Studio/actions/runs/37490570886) failed a related-browser notification/navigation assertion; its verified evidence remains scoped to that earlier head. The reviewed correction and completed order-linked inquiry child are being composed for one fresh full acceptance run. Earlier source-bound results remain separate; earlier PRs must not be merged individually. The [inclusive record](verification/inclusive-commerce-authoring-acceptance.md) records exact composition, actual focused checks and remaining gates.
 
-Development continues on a separate T17 order-linked support child while CI runs. Customers explicitly open an inquiry for an owned test order; staff and the original inquiry session may read only the retained test-order reference. New admissions fence current publication, staff and customer authority transactionally. Generic inquiry bodies, existing receipts and original commerce evidence remain unchanged. Production intake and broader support policy remain gated.
+The reviewed T17 order-linked support child joins that same corrected candidate. Customers explicitly open an inquiry for an owned test order; staff and the original inquiry session may read only the retained test-order reference. New admissions fence current publication, staff and customer authority transactionally. Generic inquiry bodies, existing receipts and original commerce evidence remain unchanged. Production intake and broader support policy remain gated.
 
 | Lane | Current work and boundary |
 | --- | --- |
 | Integration `/root` | Shared registrations, exact composition, status, publication and expected-head merge after full acceptance |
 | Acceptance `/root/followup_census` | Fresh PR #13 source binding, all ten database receipts, aggregate equality and complete hosted gates; earlier receipts remain separately bound |
-| Backend `/root/template_focus_recovery` | Order-linked domain/API, immutable association migration, authorization and real native concurrency coverage |
-| Backend review `/root/next_scope` | Independent exact-source ownership, transaction, migration and retry review |
-| UI and compatibility `/root/refund_journey_review` | Customer/staff inquiry UI, bounded private transport, native journey extension and affected legacy migration chains |
+| Domain review `/root/template_focus_recovery` | Order-linked domain complete; independently review the following license-draft edit command and native concurrency evidence |
+| Domain `/root/next_scope` | Order-linked backend review complete; implement reviewed license-draft edits with stale/ABA refusal |
+| Operator UI `/root/refund_journey_review` | Inquiry UI and migration compatibility complete; implement license-draft stale-edit recovery and native operator journey |
 | UI review `/root/prepared_review` | Independent exact-source frontend, staff projection and browser review; preserve earlier PR #12 evidence |
-| Earlier evidence `/root/runtime_restore` | Finish original PR #11 native receipts and terminal disposition without borrowing final-candidate acceptance |
+| Composition `/root/runtime_restore` | Original PR #11 evidence complete; verify final inquiry composition, exact discovery and coverage preservation |
 
-Order-linked inquiries remain a bounded default-off local/testing implementation. Private attachments, production notice/retention, recovery and notifications remain open. The tables below retain historical checkpoints, not additional running-agent claims. Six parent groups remain accepted and 34 open.
+License-draft editing is a separate following branch and is excluded from this acceptance batch. Order-linked inquiries remain a bounded default-off local/testing implementation. Private attachments, production notice/retention, recovery and notifications remain open. The tables below retain historical checkpoints, not additional running-agent claims. Six parent groups remain accepted and 34 open.
 
 ## Full completion priority — October 5, 2026 (America/Chicago)
 
@@ -123,7 +123,7 @@ Dependencies below reproduce the CSV exactly. **I** = integration, **C** = CI ac
 | T14 | H | T05 T06 T07 T08 T10 T13 | Queued: actual deployed scanner/worker isolation and representative media proof |
 | T15 | P | T10 T11 | Queued: production inquiry delivery/notice/retention and abuse/error paths |
 | T16 | P | T10 T11 | Queued: remaining consent/provider and related-content acceptance |
-| T17 | P | T10 T11 | Order-linked test inquiry child in implementation/review; private attachments and production support remain open |
+| T17 | P | T10 T11 | Order-linked test inquiry child reviewed for inclusive acceptance; private attachments and production support remain open |
 | T18 | P | T10 T11 | Queued: approved free-license/asset identity and purpose-specific consent |
 | T19 | M | T10 T12 | Operational history/provider-inspection child implemented/reviewed/published, acceptance pending; broader financial resolution still open |
 | T20 | M | T10 T19 | Queued after T19: verified unpaid release and late-payment/resource races |

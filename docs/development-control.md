@@ -4,7 +4,7 @@
 
 [PR #13](https://github.com/SeanVasey/VA-Studio/pull/13) is the inclusive `main`-targeted acceptance candidate, preserving reviewed ancestry from PRs #7–#12. Require its fresh complete checks, independent source review, ten same-attempt database receipts and exact successful aggregation before expected-head merge and fresh main verification. Earlier PRs retain their original evidence and must not be merged separately. The [ordered record](development-order.md#current-execution-checkpoint) pins the actual source and run.
 
-The next isolated T17 child adds order-linked test inquiries with immutable minimal context, current ownership and permission fences, and bounded private customer/staff views. Implementation, independent review and migration/concurrency checks continue during CI. See the [active agent queue](development-agent-queue.md#active-continuation--october-6-2026-utc). Six parent groups remain accepted and 34 open; the older execution sections below retain historical evidence.
+The reviewed T17 child joins that candidate with the bounded related-browser notification correction and adds order-linked test inquiries with immutable minimal context, current ownership and permission fences, and bounded private customer/staff views. Its focused source, migration and concurrency checks remain distinct from final hosted acceptance. The next isolated child protects license-draft edits from stale tabs. See the [active agent queue](development-agent-queue.md#active-continuation--october-6-2026-utc). Six parent groups remain accepted and 34 open; the older execution sections below retain historical evidence.
 
 ## Current GitHub execution — October 2, 2026
 
