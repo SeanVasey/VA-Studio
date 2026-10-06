@@ -23,7 +23,7 @@ use App\Domain\Commerce\Payments\StripePaymentGateway;
 use App\Domain\Commerce\Payments\VerifyTestPayment;
 use App\Domain\Commerce\QuoteException;
 use App\Jobs\ProcessStripeReceiptJob;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Crypt;
@@ -43,7 +43,7 @@ use Tests\TestCase;
 /** Actual domain/inbox calls with synthetic authoritative responses; no Stripe network traffic. */
 class TestPaymentProcessingTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     private StripePaymentGateway $gateway;
 
