@@ -47,18 +47,20 @@ final class ReadOwnedTestOrders
                 ->orWhere(fn ($tie) => $tie->where('created_at', $anchor->created_at)->where('id', '<', $anchor->id)));
         }
         $rows = $query->orderByDesc('created_at')->orderByDesc('id')->limit(self::LIMIT + 1)->get();
-        $orders = [];
+        $orders = []; $previews = [];
         foreach ($rows->take(self::LIMIT) as $order) {
             // Database collation alone must not decide ownership. Reconstruct each complete frozen effect graph.
             app(PurchaseAccess::class)->assertOrder($order, $ownerKey, $principal);
-            $orders[] = array_intersect_key(app(ReadOrder::class)->present($order), array_flip(self::FIELDS));
+            $entry = app(ReadOrder::class)->historyEntry($order);
+            $orders[] = array_intersect_key($entry['order'], array_flip(self::FIELDS));
+            $previews[] = $entry['preview'];
         }
 
         foreach ($rows->take(self::LIMIT) as $order) {
             app(PurchaseAccess::class)->assertOrder($order, $ownerKey, $principal);
         }
 
-        return ['orderHistorySchema' => 1, 'testOnly' => true, 'orders' => $orders, 'limit' => self::LIMIT,
+        return ['orderHistorySchema' => 2, 'testOnly' => true, 'orders' => $orders, 'previews' => $previews, 'limit' => self::LIMIT,
             'nextCursor' => $rows->count() > self::LIMIT ? $rows[self::LIMIT - 1]->public_id : null];
     }
 }

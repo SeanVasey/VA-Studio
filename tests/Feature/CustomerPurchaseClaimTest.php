@@ -494,6 +494,26 @@ class CustomerPurchaseClaimTest extends TestCase
         $this->assertDatabaseCount('customer_purchase_claims', 1);
     }
 
+
+    public function test_claim_withdrawal_during_history_entry_payment_projection_hides_original_preview(): void
+    {
+        $account = CustomerFixtures::account(); $paid = $this->ready(); $this->saved($account, $paid);
+        $before = DeliveryFixtures::retained(); $projected = 0;
+        DB::listen(function ($query) use (&$projected): void {
+            // The first outcome projection belongs to initial claim verification. The second is
+            // historyEntry's own summary, after its original title/license fields were verified.
+            if (preg_match('/\Aselect [`"]outcome[`"] from [`"]order_finalizations[`"]/i', $query->sql)) {
+                $projected++;
+                if ($projected === 2) config(['customer.test_purchase_claims_enabled' => false]);
+            }
+        });
+        $this->getJson('/orders/history')->assertForbidden()->assertHeader('Cache-Control', 'no-store, private')
+            ->assertDontSee($paid['order']->public_id)->assertDontSee('Synthetic quote recording');
+        $this->assertSame(2, $projected);
+        $this->assertSame($before, DeliveryFixtures::retained());
+        $this->assertDatabaseCount('customer_purchase_claims', 1);
+    }
+
     public function test_direct_sql_mutation_delete_and_replace_cannot_change_retained_claim_evidence(): void
     {
         $account = CustomerFixtures::account();

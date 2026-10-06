@@ -111,7 +111,7 @@ test('customer signs in with a fresh session, reads the account library and sign
   await region.getByRole('button', { name: 'Browse account orders', exact: true }).click();
   const history = await loaded;
   expect(history.status()).toBe(200); expect(history.headers()['cache-control']).toContain('no-store');
-  expect(await history.json()).toEqual({ history: { orderHistorySchema: 1, testOnly: true, orders: expect.arrayContaining([expect.objectContaining({ id: fixture.orderId, paymentStatus: 'verified', finalizationStatus: 'paid', contractStatus: 'issued' })]), limit: 20, nextCursor: null } });
+  expect(await history.json()).toEqual({ history: { orderHistorySchema: 2, testOnly: true, orders: expect.arrayContaining([expect.objectContaining({ id: fixture.orderId, paymentStatus: 'verified', finalizationStatus: 'paid', contractStatus: 'issued' })]), previews: expect.arrayContaining([expect.objectContaining({ orderId: fixture.orderId, itemCount: 1, firstItem: expect.objectContaining({ title: expect.any(String), licenseName: expect.any(String), licenseVersion: expect.any(Number) }) })]), limit: 20, nextCursor: null } });
   await expect(region.getByRole('heading', { name: 'Account orders', exact: true })).toBeFocused();
   await expect(region.getByRole('button', { name: `View test order status ${fixture.orderId}`, exact: true })).toBeVisible();
   const admin = await page.request.get('/admin', { maxRedirects: 0 });

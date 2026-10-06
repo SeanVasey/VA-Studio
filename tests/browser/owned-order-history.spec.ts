@@ -17,7 +17,7 @@ test('session order discovery survives cleared tab storage and status selection 
     const request = route.request(), path = new URL(request.url()).pathname;
     requests.push({ path, method: request.method() });
     if (path === '/orders/history') return route.fulfill({ json: { history: {
-      orderHistorySchema: 1, testOnly: true, orders: [summary], limit: 20, nextCursor: null,
+      orderHistorySchema: 2, testOnly: true, orders: [summary], previews: [{ orderId: summary.id, itemCount: 1, firstItem: { title: 'Original track', licenseName: 'Original license', licenseVersion: 1 } }], limit: 20, nextCursor: null,
     } } });
     if (path === `/orders/${orderId}/checkout`) return route.fulfill({ status: 503, json: { code: 'CHECKOUT_UNAVAILABLE' } });
     throw new Error('History browsing must not create checkout or delivery effects');
