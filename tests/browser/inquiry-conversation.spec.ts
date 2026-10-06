@@ -75,6 +75,30 @@ test('visitor reads an in-app staff reply, retries one real follow-up and retain
     await expect(conversation.getByText('Inquiry archived', { exact: true })).toBeVisible();
     await expect(conversation.getByText(staffReply, { exact: true })).toBeVisible(); await expect(conversation.getByText(followUp, { exact: true })).toBeVisible();
     await expect(page.getByLabel('Follow-up message', { exact: true })).toHaveCount(0);
+    const historyRequests: string[] = [];
+    page.on('request', request => { if (new URL(request.url()).pathname.startsWith('/contact/inquiries/history')) historyRequests.push(request.url()); });
+    await page.reload(); expect(historyRequests).toEqual([]);
+    const history = page.getByRole('region', { name: 'Inquiries from this browser session', exact: true });
+    await history.getByRole('button', { name: 'Show inquiries from this browser session', exact: true }).click();
+    await expect(history.getByText(fixture.values.subject, { exact: true })).toBeVisible();
+    await expect(history.getByRole('heading', { name: 'Saved inquiries', exact: true })).toBeFocused();
+    expect(historyRequests).toHaveLength(1); expect(new URL(historyRequests[0]).search).toBe('');
+    // A separate native request verifies the exact private DTO without relying on a renderer's response-body lifetime.
+    const historyRead = await page.request.get('/contact/inquiries/history'); expect(historyRead.status()).toBe(200);
+    expect(historyRead.headers()['cache-control']).toContain('no-store'); expect(historyRead.headers()['etag']).toBeUndefined();
+    expect(await historyRead.json()).toEqual({ history: { inquiryHistorySchema: 1, limit: 20, nextCursor: null, inquiries: [{
+      receipt, subject: fixture.values.subject, state: 'archived', createdAt: new Date(snapshot.original.createdAt).toISOString().replace('.000Z', 'Z'),
+    }] } });
+    const foreignHistory = await foreign.request.get('/contact/inquiries/history'); expect(foreignHistory.status()).toBe(200);
+    expect(await foreignHistory.json()).toEqual({ history: { inquiryHistorySchema: 1, limit: 20, nextCursor: null, inquiries: [] } });
+    const foreignCursor = await foreign.request.get('/contact/inquiries/history/before/' + receipt);
+    const unknownCursor = await foreign.request.get('/contact/inquiries/history/before/00000000-0000-4000-8000-000000000001');
+    expect(foreignCursor.status()).toBe(422); expect(unknownCursor.status()).toBe(422); expect(await foreignCursor.json()).toEqual(await unknownCursor.json());
+    await history.getByRole('button', { name: `Open inquiry ${receipt}`, exact: true }).click();
+    await expect(page.getByText('Inquiry archived', { exact: true })).toBeVisible();
+    await expect(page.getByText(staffReply, { exact: true })).toBeVisible(); await expect(page.getByText(followUp, { exact: true })).toBeVisible();
+    expect((await (await page.request.get(endpoint)).json()).messages).toEqual(snapshot.messages);
+    // The original receipt-only opener remains an independent supported route into the same conversation.
     await page.reload(); await page.getByLabel('Inquiry receipt', { exact: true }).fill(receipt);
     await page.getByRole('button', { name: 'Open conversation', exact: true }).click();
     await expect(page.getByText('Inquiry archived', { exact: true })).toBeVisible();
