@@ -22,11 +22,11 @@ use App\Support\CanonicalJson;
 use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\QueryException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\QuoteFixtures;
 use Tests\Support\TypedLicenseFixtures;
@@ -34,7 +34,7 @@ use Tests\TestCase;
 
 class TypedLicenseTest extends TestCase
 {
-    use RefreshDatabase;
+    use FinalizationDatabaseMigrations;
 
     protected function setUp(): void
     {

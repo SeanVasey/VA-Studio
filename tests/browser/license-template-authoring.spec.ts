@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
 import { actionResponse, closeDialog, expectModalFits, login, row } from './publication-fixture';
@@ -167,6 +168,164 @@ test('operator creates and edits template identity, rejects stale saves and pres
     await closeDialog(page, dialog, 'Cancel');
     await expect(row(page, recovered.name).getByRole('button', { name: 'Edit', exact: true })).toBeFocused();
     expect(await frozenTemplates(page)).toEqual(retained);
+  } finally {
+    await other.close();
+  }
+  expect(failures).toEqual([]);
+});
+
+
+type DraftFixture = { name: string; versionId: number; sources: Record<'prepared' | 'winner' | 'recovered' | 'uncertain', string> };
+type DraftReceipt = { verified: true; phase: string; versionId: number; source: string; updates: number; originalsUnchanged: true; guardsUnchanged: true };
+function draftFixture(mode: 'prepare' | 'verify', project: string, phase?: keyof DraftFixture['sources']) {
+  return JSON.parse(execFileSync('php', ['tests/browser/prepare-license-draft.php', mode, project, ...(phase ? [phase] : [])], {
+    cwd: process.cwd(), env: process.env, stdio: 'pipe', timeout: 30_000,
+  }).toString()) as DraftFixture | DraftReceipt;
+}
+
+async function editDraft(page: Page, name: string) {
+  await page.bringToFront();
+  await page.goto('/admin/license-versions');
+  await searchTemplates(page, name);
+  const launch = row(page, name).getByRole('button', { name: 'Edit', exact: true });
+  await launch.focus();
+  await expect(launch).toBeFocused();
+  const [opened] = await Promise.all([actionResponse(page, 'mountAction', 'edit'), launch.press('Enter')]);
+  expect(opened.status()).toBe(200);
+  expect(await opened.finished()).toBeNull();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByRole('heading', { name: 'Edit license version', exact: true })).toBeVisible();
+  await expectModalFits(page, dialog);
+  return dialog;
+}
+
+function submittedDraftReview(payload: { components?: { snapshot: string; calls?: { method: string }[] }[] }) {
+  const component = payload.components?.find(item => item.calls?.some(call => call.method === 'callMountedAction'));
+  expect(component).toBeDefined();
+  const snapshot = JSON.parse(component!.snapshot) as { data: Record<string, unknown> };
+  expect(snapshot.data.draftReview).not.toBeNull();
+  return snapshot.data.draftReview;
+}
+
+test('operator preserves stale draft input, reopens the current winner and recovers a lost save response', async ({ page, context }, testInfo) => {
+  test.setTimeout(120_000);
+  const fixture = draftFixture('prepare', testInfo.project.name) as DraftFixture;
+  const verify = (phase: keyof DraftFixture['sources']) => {
+    const receipt = draftFixture('verify', testInfo.project.name, phase) as DraftReceipt;
+    expect(receipt).toMatchObject({ verified: true, phase, versionId: fixture.versionId, source: fixture.sources[phase],
+      originalsUnchanged: true, guardsUnchanged: true });
+    return receipt;
+  };
+  expect(verify('prepared').updates).toBe(0);
+  const failures: string[] = [];
+  page.on('pageerror', error => failures.push(error.message));
+  await login(page);
+  let dialog = await editDraft(page, fixture.name);
+  const source = () => dialog.getByLabel('Authored source', { exact: false });
+  await expect(source()).toHaveValue(fixture.sources.prepared);
+  await expect(dialog.getByText(/keep a copy of your entered changes, then close and reopen/)).toBeVisible();
+  const other = await context.newPage();
+  other.on('pageerror', error => failures.push(error.message));
+  const receipts: DraftReceipt[] = [];
+  try {
+    const otherDialog = await editDraft(other, fixture.name);
+    await expect(otherDialog.getByLabel('Authored source', { exact: false })).toHaveValue(fixture.sources.prepared);
+    await otherDialog.getByLabel('Authored source', { exact: false }).fill(fixture.sources.winner);
+    await syncSuccessNotification(other, 'Saved', () => otherDialog.getByRole('button', { name: 'Save changes', exact: true }).click());
+    await expect(otherDialog.getByRole('heading')).toBeHidden();
+    receipts.push(verify('winner'));
+    expect(receipts.at(-1)!.updates).toBe(1);
+
+    await page.bringToFront();
+    const losing = `${fixture.sources.prepared} Unsaved first-tab text.`;
+    await source().fill(losing);
+    await syncSuccessNotification(page, 'Reopen draft to continue', async () => {
+      const [blocked] = await Promise.all([actionResponse(page, 'callMountedAction'),
+        dialog.getByRole('button', { name: 'Save changes', exact: true }).click()]);
+      expect(blocked.status()).toBe(200);
+      expect(await blocked.finished()).toBeNull();
+    }, async () => {
+      const error = dialog.getByText('This license draft changed or its edit review is no longer available. Close and reopen the editor, then review your changes.', { exact: true });
+      await expect(error).toBeVisible();
+      await expect(source()).toHaveValue(losing);
+      await error.scrollIntoViewIfNeeded();
+      await expect(error).toBeInViewport();
+      await expectModalFits(page, dialog);
+      await page.screenshot({ path: testInfo.outputPath('license-draft-stale-input.png'), fullPage: false });
+    });
+    expect(verify('winner')).toEqual(receipts.at(-1));
+    await syncSuccessNotification(page, 'Reopen draft to continue', () =>
+      dialog.getByRole('button', { name: 'Save changes', exact: true }).click(), async () => {
+      await expect(dialog.getByText('Close and reopen the current draft before saving.', { exact: true })).toBeVisible();
+      await expect(source()).toHaveValue(losing);
+    });
+    expect(verify('winner')).toEqual(receipts.at(-1));
+    await closeDialog(page, dialog, 'Cancel');
+    await expect(row(page, fixture.name).getByRole('button', { name: 'Edit', exact: true })).toBeFocused();
+    dialog = await editDraft(page, fixture.name);
+    await expect(source()).toHaveValue(fixture.sources.winner);
+    await source().fill(fixture.sources.recovered);
+    await syncSuccessNotification(page, 'Saved', () => dialog.getByRole('button', { name: 'Save changes', exact: true }).click());
+    await expect(dialog.getByRole('heading')).toBeHidden();
+    receipts.push(verify('recovered'));
+    expect(receipts.at(-1)!.updates).toBe(2);
+
+    dialog = await editDraft(page, fixture.name);
+    await expect(source()).toHaveValue(fixture.sources.recovered);
+    await source().fill(fixture.sources.uncertain);
+    const submit = dialog.getByRole('button', { name: 'Save changes', exact: true });
+    const livewireUrl = /\/livewire(?:-[A-Za-z0-9]+)?\/update$/;
+    let intercepted = 0;
+    let originalReview: unknown;
+    let committed: DraftReceipt | undefined;
+    // Execute the unchanged signed request, establish the actual durable save, then drop only its response.
+    await page.route(livewireUrl, async route => {
+      const payload = route.request().postDataJSON() as { components?: { snapshot: string; calls?: { method: string }[] }[] };
+      if (!payload.components?.some(component => component.calls?.some(call => call.method === 'callMountedAction'))) {
+        await route.continue();
+        return;
+      }
+      expect(++intercepted).toBe(1);
+      originalReview = submittedDraftReview(payload);
+      await expect(submit).toBeDisabled();
+      const actualResponse = await route.fetch();
+      expect(actualResponse.status()).toBe(200);
+      committed = verify('uncertain');
+      expect(committed.updates).toBe(3);
+      await actualResponse.dispose();
+      await route.abort('connectionreset');
+    });
+    const failed = page.waitForEvent('requestfailed', { predicate: request => livewireUrl.test(request.url()) });
+    await submit.focus();
+    await submit.press('Enter');
+    await failed;
+    await page.unroute(livewireUrl);
+    await expect(submit).toBeEnabled();
+    await expect(source()).toHaveValue(fixture.sources.uncertain);
+    await expect(dialog.getByRole('heading', { name: 'Edit license version', exact: true })).toBeVisible();
+    expect(verify('uncertain')).toEqual(committed);
+    await syncSuccessNotification(page, 'Reopen draft to continue', async () => {
+      const [retry] = await Promise.all([actionResponse(page, 'callMountedAction'), submit.click()]);
+      expect(retry.status()).toBe(200);
+      expect(await retry.finished()).toBeNull();
+      expect(submittedDraftReview(retry.request().postDataJSON())).toEqual(originalReview);
+    }, async () => {
+      await expect(dialog.getByText('This license draft changed or its edit review is no longer available. Close and reopen the editor, then review your changes.', { exact: true })).toBeVisible();
+      await expect(source()).toHaveValue(fixture.sources.uncertain);
+      await expectModalFits(page, dialog);
+      await page.screenshot({ path: testInfo.outputPath('license-draft-lost-response-recovery.png'), fullPage: false });
+    });
+    expect(verify('uncertain')).toEqual(committed);
+    receipts.push(committed!);
+    await closeDialog(page, dialog, 'Cancel');
+    dialog = await editDraft(page, fixture.name);
+    await expect(source()).toHaveValue(fixture.sources.uncertain);
+    await expectModalFits(page, dialog);
+    await page.screenshot({ path: testInfo.outputPath('license-draft-saved-reopen.png'), fullPage: false });
+    await closeDialog(page, dialog, 'Cancel');
+    await expect(row(page, fixture.name).getByRole('button', { name: 'Edit', exact: true })).toBeFocused();
+    expect(verify('uncertain')).toEqual(committed);
+    await testInfo.attach('license-draft-retained-evidence', { body: JSON.stringify(receipts, null, 2), contentType: 'application/json' });
   } finally {
     await other.close();
   }
