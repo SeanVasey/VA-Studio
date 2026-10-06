@@ -68,3 +68,7 @@ Do not add secrets, private masters, unredacted orders, customer PII or real con
 > Implement WP-05 from the existing frontend. Use docs/brand evidence and real typed catalog/preview data. Preserve the exact logo geometry and active theme, build an accessible persistent player, and never simulate actual audio or checkout availability.
 
 Read [architecture index](../architecture/README.md), [decision register](../architecture/decision-register.md) and relevant source/brand evidence. Complete the first increment in a small PR, then split any remaining implementation into explicitly dependent issues. Preserve prior approvals and invariants; report unresolved provider/policy decisions without blocking unrelated reversible work.
+
+## Public navigation recovery — October 6, 2026
+
+The independently reviewed [public offline-recovery child](../experience/public-offline-recovery.md) adds a branded retry page for failed public document navigation and a fixed anonymous asset cache. Current catalog/API/media/customer responses stay on the network; private routes, writes and embedded navigation bypass the public fallback. It joins captured licensing/customer recovery in the next coherent PR #13 candidate. The child passed 845 frontend cases, typecheck/build/client scans and real static HTTP checks. Native definitions, including successful offline screenshots, remain unexecuted locally; fresh full hosted and visual acceptance remain required. Installability, approved launcher assets, physical-device and broader WP-05/T33 acceptance remain open.

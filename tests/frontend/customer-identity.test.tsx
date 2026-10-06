@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createInertiaApp, router } from '@inertiajs/react';
@@ -213,7 +213,7 @@ describe('customer access completion', () => {
     const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValue(completed());
     finish(purpose); enterFinish(purpose); submit('Complete account request');
     expect(await screen.findByRole('status')).toHaveTextContent('Sign in with your new password');
-    expect(screen.getByRole('status')).toHaveFocus();
+    await waitFor(() => expect(screen.getByRole('status')).toHaveFocus());
     expect(fetcher.mock.calls[0][1]?.body).toBe(JSON.stringify({ purpose, id: challengeId, proof, name: purpose === 'enroll' ? 'Synthetic Customer' : '', password, requestKey }));
     expect(screen.queryByLabelText('New password')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Complete account request' })).not.toBeInTheDocument();

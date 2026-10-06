@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Commerce\QuoteException;
+use App\Domain\Customers\CustomerAccessException;
+use App\Domain\Customers\PurchaseAccess;
 use App\Domain\Delivery\DeliveryException;
 use App\Domain\Delivery\IssueTestDelivery;
 use App\Domain\Delivery\ReadTestDeliveryAuthorization;
@@ -20,7 +23,7 @@ final class TestOwnerDeliveryController
 {
     public function show(string $order, Request $request, CommerceRequestIdentity $owner, ReadTestOwnerDelivery $read): Response
     {
-        return $this->run(fn () => response()->json(['delivery' => $read->handle($order, $owner->forRequest($request))], 200, TestDeliveryResponse::headers()));
+        return $this->run(fn () => response()->json(['delivery' => app(PurchaseAccess::class)->read($order, $owner->forRequest($request), $owner->principal($request), fn ($original) => $read->handle($order, $original))], 200, TestDeliveryResponse::headers()));
     }
 
     public function issue(string $order, Request $request, CommerceRequestIdentity $owner, IssueTestDelivery $issue): Response
@@ -41,7 +44,7 @@ final class TestOwnerDeliveryController
     {
         return $this->run(function () use ($order, $request, $owner, $read, $redeem): Response {
             $body = TestDeliveryRequest::download($request);
-            $ownerKey = $owner->forRequest($request);
+            $ownerKey = app(PurchaseAccess::class)->owner($order, $owner->forRequest($request), $owner->principal($request));
             // The retained immutable target supplies attachment metadata; the command re-verifies it before consumption.
             $context = $read->forOwner($order, $ownerKey, $body['authorizationId'], $body['token']);
             $prepared = $redeem->handle($order, $ownerKey, $body['authorizationId'], $body['token'], $owner->actor($request), $owner->principal($request));
@@ -54,6 +57,10 @@ final class TestOwnerDeliveryController
     {
         try {
             return $operation();
+        } catch (CustomerAccessException $error) {
+            return TestDeliveryResponse::error(403);
+        } catch (QuoteException $error) {
+            return TestDeliveryResponse::error($error->status);
         } catch (DeliveryException $error) {
             return TestDeliveryResponse::domainError($error);
         } catch (HttpExceptionInterface $error) {

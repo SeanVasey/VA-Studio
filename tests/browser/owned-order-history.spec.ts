@@ -1,6 +1,10 @@
 import { test, expect } from '@playwright/test';
 import { query, storefrontFixture } from './storefront-fixture';
 
+// Preserve the synthetic document transport across reloads. A real worker fetch
+// bypasses page.route and refreshes server cookies; offline coverage owns that worker.
+test.use({ serviceWorkers: 'block' });
+
 /** Built React and native sessionStorage/keyboard behavior with synthetic HTTP responses.
  * PHP feature tests independently prove the real server's owner and frozen-evidence boundary.
  */
@@ -17,7 +21,7 @@ test('session order discovery survives cleared tab storage and status selection 
     const request = route.request(), path = new URL(request.url()).pathname;
     requests.push({ path, method: request.method() });
     if (path === '/orders/history') return route.fulfill({ json: { history: {
-      orderHistorySchema: 1, testOnly: true, orders: [summary], limit: 20, nextCursor: null,
+      orderHistorySchema: 2, testOnly: true, orders: [summary], previews: [{ orderId: summary.id, itemCount: 1, firstItem: { title: 'Original track', licenseName: 'Original license', licenseVersion: 1 } }], limit: 20, nextCursor: null,
     } } });
     if (path === `/orders/${orderId}/checkout`) return route.fulfill({ status: 503, json: { code: 'CHECKOUT_UNAVAILABLE' } });
     throw new Error('History browsing must not create checkout or delivery effects');
@@ -44,7 +48,7 @@ test('session order discovery survives cleared tab storage and status selection 
   await expect(history.getByRole('heading', { name: 'Available test orders' })).toBeFocused();
   expect(requests).toEqual([{ path: '/orders/history', method: 'GET' }]);
   await view.focus(); await view.press('Enter');
-  await expect(history).toContainText('This order needs review before fulfillment can continue.');
+  await expect(history).toContainText('Test payment verified. Fulfillment is blocked for this order.');
   await expect(history.getByRole('region', { name: 'Stripe test checkout', exact: true })).toContainText('previously verified test payment remains recorded');
   await expect(history.getByRole('button', { name: /Open Stripe|Retry Stripe|Check Stripe|Download/ })).toHaveCount(0);
   await expect(history.getByRole('region', { name: 'Test order downloads', exact: true })).toHaveCount(0);

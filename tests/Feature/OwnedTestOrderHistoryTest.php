@@ -4,6 +4,12 @@ namespace Tests\Feature;
 
 use App\Domain\Commerce\CreateQuote;
 use App\Domain\Commerce\Models\Order;
+use App\Domain\Commerce\Models\Quote;
+use App\Domain\Commerce\Orders\ReadOrder;
+use App\Domain\Catalog\PublishTrack;
+use App\Domain\Catalog\PublishOffer;
+use App\Domain\Commerce\Inventory\ManageRightsScope;
+use App\Domain\Catalog\SaveTrackMetadata;
 use App\Domain\Commerce\Orders\PrepareOrder;
 use App\Domain\Commerce\Orders\ReadOwnedTestOrders;
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
@@ -72,8 +78,8 @@ class OwnedTestOrderHistoryTest extends TestCase
             ->assertHeader('Cache-Control', 'no-store, private')->assertHeader('Vary', 'Cookie')
             ->assertHeader('X-Content-Type-Options', 'nosniff');
         $history = $response->json('history');
-        $this->assertSame(['orderHistorySchema', 'testOnly', 'orders', 'limit', 'nextCursor'], array_keys($history));
-        $this->assertSame(1, $history['orderHistorySchema']); $this->assertTrue($history['testOnly']);
+        $this->assertSame(['orderHistorySchema', 'testOnly', 'orders', 'previews', 'limit', 'nextCursor'], array_keys($history));
+        $this->assertSame(2, $history['orderHistorySchema']); $this->assertTrue($history['testOnly']);
         $this->assertSame(20, $history['limit']); $this->assertNull($history['nextCursor']); $this->assertCount(1, $history['orders']);
         $summary = $history['orders'][0];
         $this->assertSame(['id', 'createdAt', 'testOnly', 'payable', 'currency', 'totalMinor', 'status',
@@ -86,16 +92,55 @@ class OwnedTestOrderHistoryTest extends TestCase
         $this->assertSame($before, $this->retained());
     }
 
+
+    public function test_history_cards_keep_the_first_original_item_and_total_line_count_after_catalog_edits(): void
+    {
+        $owner = $this->sessionOwner();
+        $first = InventoryFixtures::selection(); $second = InventoryFixtures::selection();
+        $track = app(PublishTrack::class)->unpublish($first['track'], $first['actor']);
+        app(SaveTrackMetadata::class)->handle($track, ['title' => 'First original purchase', 'metadata_version' => $track->metadata_version], $first['actor']);
+        $revision = app(PublishOffer::class)->handle($first['offer'], $first['actor']);
+        $first['track'] = app(PublishTrack::class)->handle($track->fresh(), $first['actor']);
+        app(ManageRightsScope::class)->link($first['scope']->id, $revision->id, 'SYNTHETIC-HISTORY-REVISION', $first['actor']);
+        $first['items'][0]['offerRevisionId'] = $revision->id;
+        $quote = app(CreateQuote::class)->handle($owner, (string) Str::uuid(), [...$second['items'], ...$first['items']]);
+        app(PriceQuote::class)->create($quote->public_id, $owner);
+        $order = app(PrepareOrder::class)->handle($owner, (string) Str::uuid(), OrderFixtures::request($quote, $owner));
+        $items = app(ReadOrder::class)->items($order->public_id, $owner);
+        $firstLine = $items['lines'][0];
+        $this->assertNotSame($items['lines'][0]['title'], $items['lines'][1]['title']);
+        foreach ([$first, $second] as $selection) {
+            $track = app(PublishTrack::class)->unpublish($selection['track'], $selection['actor']);
+            app(SaveTrackMetadata::class)->handle($track, ['title' => 'NEW CATALOG NAME', 'metadata_version' => $track->metadata_version], $selection['actor']);
+        }
+        $before = $this->retained();
+        $reads = [];
+        DB::listen(function ($query) use (&$reads): void { $reads[] = strtolower($query->sql); });
+        $response = $this->getJson('/orders/history')->assertOk()->assertJsonPath('history.orderHistorySchema', 2)
+            ->assertJsonCount(1, 'history.previews')->assertJsonPath('history.previews.0', [
+                'orderId' => $order->public_id, 'itemCount' => 2,
+                'firstItem' => array_intersect_key($firstLine, array_flip(['title', 'licenseName', 'licenseVersion'])),
+            ])->assertDontSee('NEW CATALOG NAME');
+        $this->assertSame(['orderId', 'itemCount', 'firstItem'], array_keys($response->json('history.previews.0')));
+        foreach ($reads as $sql) {
+            $this->assertDoesNotMatchRegularExpression('/from [`"](?:tracks|offers|offer_revisions|license_templates)[`"]/', $sql);
+        }
+        $this->assertSame($before, $this->retained());
+    }
+
     public function test_pagination_uses_created_time_then_id_and_loads_at_most_twenty_one_order_rows(): void
     {
         $owner = $this->sessionOwner(); $older = [];
         for ($i = 0; $i < 21; $i++) { $older[] = $this->order($owner)->public_id; }
         $this->travel(1)->seconds(); $newest = $this->order($owner)->public_id;
+        $quotesRead = 0; Quote::retrieved(function () use (&$quotesRead): void { $quotesRead++; });
         $loaded = 0; Order::retrieved(function () use (&$loaded): void { $loaded++; });
         $page = $this->getJson('/orders/history')->assertOk()->json('history');
         $expected = [$newest, ...array_reverse($older)];
         $this->assertSame(array_slice($expected, 0, 20), array_column($page['orders'], 'id'));
         $this->assertSame($expected[19], $page['nextCursor']); $this->assertSame(21, $loaded);
+        $this->assertSame(20, $quotesRead, 'Each visible summary/preview pair reconstructs the original quote only once.');
+        $this->assertSame(array_slice($expected, 0, 20), array_column($page['previews'], 'orderId'));
         $newAfterPage = $this->order($owner)->public_id;
         $next = $this->getJson('/orders/history?before='.$page['nextCursor'])->assertOk()->json('history');
         $this->assertSame(array_slice($expected, 20), array_column($next['orders'], 'id'));

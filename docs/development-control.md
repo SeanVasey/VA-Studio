@@ -1,5 +1,13 @@
 # Current development queue
 
+## Current continuation — October 6, 2026
+
+[PR #13](https://github.com/SeanVasey/VA-Studio/pull/13) remains the one inclusive candidate against accepted `main`. Its next update integrates captured license-draft edits, explicit stale/uncertain-result recovery and effective download metadata/authorization deadlines with the reviewed preceding customer/support ancestry. A guarded inquiry-fixture correction restores the catalog after the real order-linked journey; the exact guest-claim focus assertion now waits for the existing React effect. See the [continuation record](verification/customer-operator-recovery-continuation.md) and [active agent queue](development-agent-queue.md#active-continuation--october-6-2026-utc).
+
+The preceding head `1de6b314` failed [Foundation 37494698386](https://github.com/SeanVasey/VA-Studio/actions/runs/37494698386), attempt 1. All ten database receipts, quality, frontend and related-browser evidence passed; both ordinary browser jobs failed the same three empty-catalog assertions after the inquiry fixture left its synthetic recording published. The backend aggregate correctly refused acceptance. None of those preceding receipts certify changed source.
+
+Freeze and independently review the complete correction before one fresh full run. Require every gate, both ordinary native browser projects, genuine related journeys and all eleven startup safeguards, ten same-run/same-attempt database receipts and exact successful aggregation before expected-head merge, followed by fresh main verification. Earlier PRs remain evidence records and must not merge separately. Six parent groups remain accepted and 34 open.
+
 ## Current GitHub execution — October 2, 2026
 
 The active source is [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio), branch `codex/github-handoff-20261002`, [PR #4](https://github.com/SeanVasey/VA-Studio/pull/4). The [handoff record](verification/github-handoff-20261002.md) preserves all source identities; [agent assignments](development-agent-queue.md#current-github-execution--october-2-2026) define owned files and the current coherent batch.

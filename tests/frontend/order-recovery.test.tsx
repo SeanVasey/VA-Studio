@@ -16,7 +16,7 @@ describe('storefront durable order recovery', () => {
     ['paid', 'paid', 'pending', 'pending_contracts', 'Contracts are pending;'],
     ['paid', 'paid', 'issued', 'pending_activation', 'Test contracts have been issued. Check the separate test downloads panel'],
     ['paid', 'paid', 'attention', 'blocked', 'Contract preparation needs attention.'],
-    ['paid_exception', 'paid_exception', 'blocked', 'blocked', 'This order needs review'],
+    ['paid_exception', 'paid_exception', 'blocked', 'blocked', 'Fulfillment is blocked for this order.'],
   ])('recovers a verified %s order despite an unavailable checkout read', async (status, finalizationStatus, contractStatus, fulfillmentStatus, copy) => {
     const user = userEvent.setup();
     sessionStorage.setItem(recoveryKey, JSON.stringify([quoteId]));

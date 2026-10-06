@@ -45,7 +45,8 @@ final class OrderEvidence
         // Only this historical path can reconstruct a proved consumed or released resource as its original pending state.
         $originalReservation = clone $reservation;
         $originalUse = $use === null ? null : clone $use;
-        if ($release || $finalization?->outcome === 'paid') {
+        if ($release || $finalization?->outcome === 'paid'
+            || ($finalization && \App\Domain\Commerce\Models\TestRefundResolution::where('order_finalization_id', $finalization->id)->exists())) {
             $originalReservation->state = 'pending';
             if ($originalUse) { $originalUse->state = 'pending'; }
         }

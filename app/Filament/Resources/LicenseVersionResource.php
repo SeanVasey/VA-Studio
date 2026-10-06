@@ -7,11 +7,12 @@ use App\Domain\Rights\LicenseDiff;
 use App\Domain\Rights\LicenseTerms;
 use App\Domain\Rights\Models\LicenseVersion;
 use App\Domain\Rights\PublishLicense;
+use App\Domain\Rights\ReviewedLicenseDraft;
 use App\Domain\Rights\ReviewLicense;
-use App\Domain\Rights\UpdateLicenseDraft;
-use App\Filament\Forms\TypedLicenseFields;
-use App\Filament\Forms\LicenseScopeFields;
 use App\Filament\Forms\LicenseEconomicFields;
+use App\Filament\Forms\LicenseScopeFields;
+use App\Filament\Forms\TypedLicenseFields;
+use App\Filament\Resources\LicenseVersionResource\Pages\ManageLicenseVersions;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Checkbox;
@@ -22,8 +23,8 @@ use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Arr;
@@ -60,7 +61,14 @@ class LicenseVersionResource extends OperatorResource
             TextColumn::make('template.name')->searchable(), TextColumn::make('version'), TextColumn::make('status')->badge(),
             TextColumn::make('effective_from')->label('Availability starts')->dateTime()->placeholder('On publication'), TextColumn::make('effective_until')->label('Availability ends')->dateTime()->placeholder('No scheduled end'),
         ])->recordActions([
-            EditAction::make()->visible(fn (LicenseVersion $record) => $record->status === 'draft')->using(fn (LicenseVersion $record, array $data, $livewire) => self::withFormErrors(fn () => app(UpdateLicenseDraft::class)->handle($record, Arr::only($data, ['authored_source', 'structured_terms', 'effective_from', 'effective_until']), auth()->user()), $livewire)),
+            EditAction::make()->visible(fn (LicenseVersion $record) => $record->status === 'draft')
+                ->databaseTransaction(false)
+                ->extraModalWindowAttributes(LicenseTemplateResource::authoringModalAttributes())
+                ->modalDescription('Edit this draft before requesting review. If saving is blocked or cannot be confirmed, keep a copy of your entered changes, then close and reopen to inspect the saved draft before trying again.')
+                // Native form disabling owns submission cleanup, including a lost response.
+                ->modalSubmitAction(fn (Action $action) => $action->extraAttributes(['wire:loading.attr' => null]))
+                ->mountUsing(fn (LicenseVersion $record, ManageLicenseVersions $livewire, Schema $schema) => $schema->fill($livewire->captureDraftReview($record)['display']))
+                ->using(fn (LicenseVersion $record, array $data, ManageLicenseVersions $livewire, Action $action) => $livewire->updateDraft($record, Arr::only($data, ReviewedLicenseDraft::FIELDS), $action)),
             Action::make('preview')->label('Preview')->url(fn (LicenseVersion $record) => route('filament.admin.licenses.preview', $record))->openUrlInNewTab(),
             Action::make('compare')->label('Compare changes')->visible(fn (LicenseVersion $record) => $record->predecessor_id !== null)->modalContent(fn (LicenseVersion $record) => view('admin.license-diff', ['changes' => app(LicenseDiff::class)->between(LicenseVersion::findOrFail($record->predecessor_id), $record)]))->modalSubmitAction(false)->modalCancelActionLabel('Close'),
             Action::make('successor')->label('New revision')->requiresConfirmation()->modalDescription('Create an editable successor draft. This version and its review evidence remain retained.')->action(function (LicenseVersion $record) {
@@ -116,7 +124,7 @@ class LicenseVersionResource extends OperatorResource
 
     public static function getPages(): array
     {
-        return ['index' => LicenseVersionResource\Pages\ManageLicenseVersions::route('/')];
+        return ['index' => ManageLicenseVersions::route('/')];
     }
 
     public static function withFormErrors(callable $command, $livewire): mixed

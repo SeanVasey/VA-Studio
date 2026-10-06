@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "driver": "mysql",
-  "source": "Verified database artifacts of GitHub run 37410220669 attempt 1; head 12a5c70bc4b9dbb94353c290e031975803d24fa7; tree 86584c422341d8f03ac885d59916aba8faf34521; overall run failed non-database gates",
+  "source": "Verified database artifacts of GitHub run 37410220669 attempt 1; head 12a5c70bc4b9dbb94353c290e031975803d24fa7; tree 86584c422341d8f03ac885d59916aba8faf34521; overall run failed non-database gates; four captured-offer files use focused component timing only from frozen core229/native087/UIe9ef, offer-editor-final-native.xml:f3b04776b8c8d0b7e272acb87e32ce33f702593b2571b95b2bd3d8f41ddfaeb4, domain-races-mysql-final.xml:1a3a026a8e6164fc0c4341e7a0c754b3aa7a5e3a0f07574c5427b6d4ac8722b6. Helper subprocesses intentionally use disposable SQLite. Timings are balance weights, not acceptance.",
   "fallback_ms_per_case": 3830,
   "files": {
     "tests/Feature/BulkTrackTagsConcurrencyTest.php": {"cases": 3, "ms": 20820},
@@ -61,6 +61,7 @@
     "tests/Feature/MediaWorkflowBudgetTest.php": {"cases": 4, "ms": 8630},
     "tests/Feature/MediaWriterAuthorityTest.php": {"cases": 29, "ms": 157257},
     "tests/Feature/MediaWriterConcurrencyTest.php": {"cases": 10, "ms": 83750},
+    "tests/Feature/OfferDraftAuthoringActionTest.php": {"cases": 13, "ms": 70798},
     "tests/Feature/OfferRevisionTest.php": {"cases": 22, "ms": 22105},
     "tests/Feature/OfferWriterAuthorityTest.php": {"cases": 9, "ms": 66126},
     "tests/Feature/OperatorAuthorityTest.php": {"cases": 9, "ms": 6187},
@@ -103,6 +104,8 @@
     "tests/Feature/ResumableMediaUploadHttpTest.php": {"cases": 12, "ms": 95248},
     "tests/Feature/ResumableMediaUploadsConcurrencyTest.php": {"cases": 9, "ms": 48751},
     "tests/Feature/ResumableMediaUploadsTest.php": {"cases": 25, "ms": 171073},
+    "tests/Feature/ReviewedOfferDraftConcurrencyTest.php": {"cases": 14, "ms": 77386},
+    "tests/Feature/ReviewedOfferDraftTest.php": {"cases": 64, "ms": 325929},
     "tests/Feature/RightsDeclarationWriterActionTest.php": {"cases": 25, "ms": 211185},
     "tests/Feature/RightsDeclarationWriterConcurrencyTest.php": {"cases": 28, "ms": 181220},
     "tests/Feature/RightsDeclarationWriterTest.php": {"cases": 33, "ms": 169045},
@@ -217,6 +220,7 @@
     "tests/Unit/FileUploadPathGuardTest.php": {"cases": 3, "ms": 245},
     "tests/Unit/MediaEvidenceValuesTest.php": {"cases": 4, "ms": 6},
     "tests/Unit/MinorUnitsTest.php": {"cases": 22, "ms": 2},
+    "tests/Unit/OfferDraftBrowserEvidenceTest.php": {"cases": 2, "ms": 7532},
     "tests/Unit/PricingPolicyTest.php": {"cases": 33, "ms": 365},
     "tests/Unit/PromotionPolicyTest.php": {"cases": 32, "ms": 6398},
     "tests/Unit/RelatedTrackBrowserFixtureGuardTest.php": {"cases": 9, "ms": 17},

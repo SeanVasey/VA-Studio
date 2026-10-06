@@ -12,18 +12,19 @@ use App\Domain\Rights\UpdateLicenseDraft;
 use App\Filament\Resources\LicenseVersionResource\Pages\ManageLicenseVersions;
 use App\Filament\Resources\OfferResource\Pages\ManageOffers;
 use App\Models\User;
+use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
 use Filament\Pages\Dashboard;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use Livewire\Livewire;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\MediaFixtures;
 use Tests\TestCase;
 
 class LicensingAdminTest extends TestCase
 {
-    use RefreshDatabase;
+    use FinalizationDatabaseMigrations;
 
     protected function setUp(): void
     {
@@ -59,10 +60,13 @@ class LicensingAdminTest extends TestCase
         $successor = LicenseVersion::where('predecessor_id', $draft->id)->sole();
         $this->assertSame(2, $successor->version);
         $this->assertSame('draft', $successor->status);
-        Livewire::test(ManageLicenseVersions::class)
-            ->callTableAction('edit', $successor, data: ['authored_source' => 'Changed synthetic text only.', 'structured_terms' => $successor->structured_terms])
-            ->assertHasNoTableActionErrors()
-            ->mountTableAction('compare', $successor)->assertMountedActionModalSee('Changed synthetic text only.');
+        $page = Livewire::test(ManageLicenseVersions::class)
+            ->mountTableAction('edit', $successor)->assertActionMounted(TestAction::make('edit')->table($successor))
+            ->assertSet('draftReview.version_id', $successor->id)
+            ->setTableActionData(['authored_source' => 'Changed synthetic text only.', 'structured_terms' => $successor->structured_terms])
+            ->callMountedTableAction()->assertHasNoTableActionErrors()->assertNotified('Saved');
+        $this->assertSame('Changed synthetic text only.', $successor->fresh()->authored_source);
+        $page->mountTableAction('compare', $successor)->assertMountedActionModalSee('Changed synthetic text only.');
         $this->assertSame($original, $draft->refresh()->toArray());
     }
 

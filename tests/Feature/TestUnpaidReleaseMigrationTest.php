@@ -20,6 +20,12 @@ class TestUnpaidReleaseMigrationTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        (require database_path('migrations/2026_10_06_000047_test_refund_resolutions.php'))->down();
+    }
+
     private function fixture(bool $release = true): array
     {
         $this->fakePrivateMediaStorage();

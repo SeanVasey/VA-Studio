@@ -5,9 +5,10 @@ namespace App\Filament\Resources;
 use App\Domain\Catalog\DeactivateOffer;
 use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\PublishOffer;
-use App\Domain\Catalog\SaveOfferDraft;
+use App\Domain\Catalog\ReviewedOfferDraft;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Rights\Models\LicenseVersion;
+use App\Filament\Resources\OfferResource\Pages\ManageOffers;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -16,6 +17,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Arr;
 
 class OfferResource extends OperatorResource
 {
@@ -42,7 +44,13 @@ class OfferResource extends OperatorResource
             TextColumn::make('currentRevision.revision')->label('Revision')->placeholder('Unpublished'),
             TextColumn::make('is_active')->label('Active')->badge(),
         ])->recordActions([
-            EditAction::make()->label('Edit draft')->using(fn (Offer $record, array $data) => app(SaveOfferDraft::class)->handle($record, $data, auth()->user())),
+            EditAction::make()->label('Edit draft')->databaseTransaction(false)
+                ->modalHeading('Edit offer draft')
+                ->extraModalWindowAttributes(LicenseTemplateResource::authoringModalAttributes())
+                ->modalDescription('Edit this captured draft without changing its published revision. If saving is blocked or cannot be confirmed, keep a copy of your entered changes, then close and reopen to inspect the saved draft before trying again.')
+                ->modalSubmitAction(fn (Action $action) => $action->extraAttributes(['wire:loading.attr' => null]))
+                ->mountUsing(fn (Offer $record, ManageOffers $livewire, Schema $schema) => $schema->fill($livewire->captureOfferReview($record)['display']))
+                ->using(fn (Offer $record, array $data, ManageOffers $livewire, Action $action) => $livewire->updateOfferDraft($record, Arr::only($data, ReviewedOfferDraft::FIELDS), $action)),
             Action::make('publish_revision')->label('Publish revision')->requiresConfirmation()->modalDescription('Publish the draft price, license and verified files as an immutable revision. Earlier revisions remain in history.')->action(fn (Offer $record) => app(PublishOffer::class)->handle($record, auth()->user())),
             Action::make('deactivate')->visible(fn (Offer $record) => $record->is_active)->requiresConfirmation()->action(fn (Offer $record) => app(DeactivateOffer::class)->handle($record, auth()->user())),
             Action::make('history')->modalHeading('Published offer history')->modalContent(fn (Offer $record) => view('admin.offer-history', ['revisions' => $record->revisions()->orderByDesc('revision')->get(), 'currentId' => $record->current_revision_id]))->modalSubmitAction(false)->modalCancelActionLabel('Close'),
@@ -51,6 +59,6 @@ class OfferResource extends OperatorResource
 
     public static function getPages(): array
     {
-        return ['index' => OfferResource\Pages\ManageOffers::route('/')];
+        return ['index' => ManageOffers::route('/')];
     }
 }

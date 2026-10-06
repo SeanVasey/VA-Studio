@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { fileRoleLabels, formatMoney, type LicenseDisclosure } from '../lib/catalog';
 import { TestCheckout, validPaymentProgress, type PaymentProgress } from './TestCheckout';
 import { OwnedTestOrderHistory } from './OwnedTestOrderHistory';
+import { OrderItems } from './OrderItems';
+import { OrderInquiry } from './OrderInquiry';
 
 interface PricedLine {
   offerRevisionId: string; quantity: number; baseMinor: number; discountMinor: number;
@@ -106,7 +108,7 @@ async function readPreparedOrder(quoteId: string): Promise<PreparedOrder | null>
 }
 
 export function OrderStatus({ order, testCheckoutEnabled = false }: { order: OrderSummary; testCheckoutEnabled?: boolean }) {
-  return <div className="quote-review-result" role="status"><h3>{order.paymentStatus === 'verified' ? 'TEST ORDER STATUS' : 'TEST ORDER PREPARED'}</h3><p>Order {order.id}</p><p>Prepared total: {formatMoney(order.totalMinor, order.currency)} {order.currency}</p><p>This prepared record alone does not confirm payment or grant download access or usage rights.</p><TestCheckout orderId={order.id} expectedTotalMinor={order.totalMinor} enabled={testCheckoutEnabled} retainedProgress={order} /></div>;
+  return <div className="quote-review-result" role="status"><h3>{order.paymentStatus === 'verified' ? 'TEST ORDER STATUS' : 'TEST ORDER PREPARED'}</h3><p>Order {order.id}</p><p>Prepared total: {formatMoney(order.totalMinor, order.currency)} {order.currency}</p><p>This prepared record alone does not confirm payment or grant download access or usage rights.</p><OrderItems orderId={order.id} expectedTotalMinor={order.totalMinor} /><TestCheckout orderId={order.id} expectedTotalMinor={order.totalMinor} enabled={testCheckoutEnabled} retainedProgress={order} /><OrderInquiry orderId={order.id} /></div>;
 }
 
 // Mount outside catalog and policy gates: an immutable order outlives its quote and the creation policy.

@@ -120,6 +120,45 @@ class SelectionTests(unittest.TestCase):
             "test_mfa_withdrawal_during_final_actor_wait_prevents_verified_commit_after_real_scanning",
         })
 
+    def test_reviewed_license_draft_feedback_preserves_native_fences_and_the_existing_browser_selection(self):
+        self.assertEqual(focused.MAX_FILES, 32)
+        for engine in focused.ENGINES:
+            selected = focused.selection({"FOCUSED_SUITE": "licensing", "FOCUSED_ENGINE": engine})
+            for target in ("ReviewedLicenseDraftTest", "ReviewedLicenseDraftConcurrencyTest", "LicenseDraftAuthoringActionTest",
+                           "ReviewedOfferDraftTest", "ReviewedOfferDraftConcurrencyTest", "OfferDraftAuthoringActionTest"):
+                self.assertEqual(selected.files.count("tests/Feature/" + target + ".php"), 1)
+            self.assertEqual(selected.files.count("tests/Unit/OfferDraftBrowserEvidenceTest.php"), 1)
+            focused.validate_files(ROOT, selected)
+        self.assertEqual(focused.BROWSER_TARGETS.count("tests/browser/license-template-authoring.spec.ts"), 1)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        self.assertEqual([row for row in policy["methods"] if row[0] == "Tests\\Feature\\ReviewedLicenseDraftConcurrencyTest"], [
+            ["Tests\\Feature\\ReviewedLicenseDraftConcurrencyTest", "test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders"],
+        ])
+        self.assertEqual([row for row in policy["methods"] if row[0] == "Tests\\Feature\\ReviewedOfferDraftConcurrencyTest"], [
+            ["Tests\\Feature\\ReviewedOfferDraftConcurrencyTest", "test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"],
+        ])
+        self.assertFalse(any(row[0] in ("Tests\\Feature\\ReviewedLicenseDraftTest", "Tests\\Feature\\LicenseDraftAuthoringActionTest",
+                                       "Tests\\Feature\\ReviewedOfferDraftTest", "Tests\\Feature\\OfferDraftAuthoringActionTest",
+                                       "Tests\\Unit\\OfferDraftBrowserEvidenceTest") for row in policy["methods"]))
+
+    def test_order_inquiry_feedback_preserves_native_fences_and_the_existing_browser_journey(self):
+        self.assertEqual(focused.MAX_FILES, 32)
+        for engine in focused.ENGINES:
+            selected = focused.selection({"FOCUSED_SUITE": "customer", "FOCUSED_ENGINE": engine})
+            self.assertEqual(selected.files.count("tests/Feature/InquiryBrowserCatalogCleanupTest.php"), 1)
+            for target in ("OrderInquiryTest", "OrderInquiryHttpTest", "OrderInquiryMigrationTest",
+                           "OrderInquiryConcurrencyTest", "OrderInquiryStaffContextTest"):
+                self.assertEqual(selected.files.count("tests/Feature/" + target + ".php"), 1)
+            focused.validate_files(ROOT, selected)
+        self.assertEqual(focused.PHP_TARGETS["seller"].count("tests/Feature/OrderInquiryStaffContextTest.php"), 1)
+        self.assertEqual(focused.FRONTEND_TARGETS.count("tests/frontend/order-inquiry.test.tsx"), 1)
+        self.assertEqual(focused.BROWSER_TARGETS.count("tests/browser/inquiry-conversation.spec.ts"), 1)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        self.assertFalse(any(row[0] == "Tests\\Feature\\InquiryBrowserCatalogCleanupTest" for row in policy["methods"]))
+        self.assertEqual([row for row in policy["methods"] if row[0].startswith("Tests\\Feature\\OrderInquiry")], [
+            ["Tests\\Feature\\OrderInquiryConcurrencyTest", "test_current_publication_operator_and_customer_fences_serialize_both_commit_orders"],
+        ])
+
     def test_order_reference_feedback_covers_both_databases_and_client_journeys_without_exclusions(self):
         self.assertEqual(focused.MAX_FILES, 32)
         for engine in focused.ENGINES:
@@ -135,6 +174,40 @@ class SelectionTests(unittest.TestCase):
             focused.validate_files(ROOT, selected)
         policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
         self.assertFalse(any(row[0] == "Tests\\Feature\\CustomerOrderReferenceTest" for row in policy["methods"]))
+
+    def test_product_member_refresh_keeps_shared_coverage_and_exact_native_exceptions(self):
+        self.assertEqual(focused.MAX_FILES, 32)
+        for engine in focused.ENGINES:
+            selected = focused.selection({"FOCUSED_SUITE": "seller", "FOCUSED_ENGINE": engine})
+            for name in ("ProductMemberRefreshTest", "ProductMemberRefreshEditorTest", "ProductMemberRefreshConcurrencyTest"):
+                self.assertIn("tests/Feature/" + name + ".php", selected.files)
+            focused.validate_files(ROOT, selected)
+        selected = focused.selection({"FOCUSED_SUITE": "browser", "FOCUSED_ENGINE": "sqlite"})
+        self.assertIn("tests/browser/product-member-refresh.spec.ts", selected.files)
+        focused.validate_files(ROOT, selected)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        entries = [row for row in policy["methods"] if row[0].startswith("Tests\\Feature\\ProductMemberRefresh")]
+        self.assertEqual(entries, [
+            ["Tests\\Feature\\ProductMemberRefreshConcurrencyTest", "test_native_actor_wait_observes_authority_withdrawal_despite_an_older_snapshot"],
+            ["Tests\\Feature\\ProductMemberRefreshConcurrencyTest", "test_native_draft_wait_allows_one_refresh_or_preserves_the_winning_edit"],
+            ["Tests\\Feature\\ProductMemberRefreshConcurrencyTest", "test_native_source_wait_rejects_a_review_changed_by_the_committing_source_writer"],
+        ])
+
+    def test_order_items_feedback_covers_both_databases_and_clients_without_native_exclusions(self):
+        self.assertEqual(focused.MAX_FILES, 32)
+        for engine in focused.ENGINES:
+            selected = focused.selection({"FOCUSED_SUITE": "customer", "FOCUSED_ENGINE": engine})
+            self.assertEqual(selected.files.count("tests/Feature/CustomerOrderItemsTest.php"), 1)
+            focused.validate_files(ROOT, selected)
+        for suite, target in {
+            "frontend": "tests/frontend/order-items.test.tsx",
+            "browser": "tests/browser/customer-order-items.spec.ts",
+        }.items():
+            selected = focused.selection({"FOCUSED_SUITE": suite, "FOCUSED_ENGINE": "sqlite"})
+            self.assertEqual(selected.files.count(target), 1)
+            focused.validate_files(ROOT, selected)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        self.assertFalse(any(row[0] == "Tests\\Feature\\CustomerOrderItemsTest" for row in policy["methods"]))
 
     def test_identity_and_kit_transport_feedback_keep_native_races_and_client_journeys(self):
         self.assertEqual(focused.MAX_FILES, 32)
@@ -187,6 +260,39 @@ class SelectionTests(unittest.TestCase):
             "test_exact_order_fence_preserves_money_and_the_winning_resource_disposition",
             "test_release_serializes_new_capacity_users_without_reviving_old_bindings",
         })
+
+    def test_purchase_claim_feedback_preserves_exact_native_boundaries_and_client_journey(self):
+        self.assertEqual(focused.MAX_FILES, 32)
+        for engine in focused.ENGINES:
+            selected = focused.selection({"FOCUSED_SUITE": "customer", "FOCUSED_ENGINE": engine})
+            for name in ("CustomerPurchaseClaimTest", "CustomerPurchaseClaimMigrationTest", "CustomerPurchaseClaimConcurrencyTest"):
+                self.assertEqual(selected.files.count("tests/Feature/" + name + ".php"), 1)
+            focused.validate_files(ROOT, selected)
+        self.assertEqual(focused.FRONTEND_TARGETS.count("tests/frontend/customer-purchase-claim.test.tsx"), 1)
+        self.assertEqual(focused.BROWSER_TARGETS.count("tests/browser/customer-purchase-claim.spec.ts"), 1)
+        self.assertIn("VASEY_TEST_PURCHASE_CLAIMS_ENABLED: 'true'", (ROOT / "tests/browser/run.mjs").read_text())
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        self.assertEqual([row for row in policy["methods"] if row[0].startswith("Tests\\Feature\\CustomerPurchaseClaim")], [
+            ["Tests\\Feature\\CustomerPurchaseClaimConcurrencyTest", "test_competing_accounts_serialize_at_the_exact_order_and_only_one_claim_wins"],
+            ["Tests\\Feature\\CustomerPurchaseClaimConcurrencyTest", "test_simultaneous_exact_retry_returns_one_immutable_claim_and_one_audit"],
+            ["Tests\\Feature\\CustomerPurchaseClaimConcurrencyTest", "test_withdrawal_at_the_exact_user_lock_prevents_claim_commit"],
+        ])
+
+    def test_refund_resolution_feedback_preserves_shared_and_native_coverage(self):
+        self.assertEqual(focused.MAX_FILES, 32)
+        for engine in focused.ENGINES:
+            selected = focused.selection({"FOCUSED_SUITE": "financial", "FOCUSED_ENGINE": engine})
+            for name in ("TestRefundResolutionTest", "TestRefundResolutionMigrationTest", "TestRefundResolutionConcurrencyTest", "TestRefundResolutionResourceTest"):
+                self.assertEqual(selected.files.count("tests/Feature/" + name + ".php"), 1)
+            focused.validate_files(ROOT, selected)
+        self.assertEqual(focused.BROWSER_TARGETS.count("tests/browser/test-refunded-exception-resolution.spec.ts"), 1)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        self.assertEqual([row for row in policy["methods"] if row[0].startswith("Tests\\Feature\\TestRefundResolution")], [
+            ["Tests\\Feature\\TestRefundResolutionConcurrencyTest", "test_committed_actor_withdrawal_fences_the_resolution_request_before_provider_io"],
+            ["Tests\\Feature\\TestRefundResolutionConcurrencyTest", "test_exact_authority_and_order_fences_keep_one_resolution_for_identical_or_competing_commands"],
+            ["Tests\\Feature\\TestRefundResolutionConcurrencyTest", "test_last_promotion_capacity_waits_for_the_same_atomic_refund_release"],
+            ["Tests\\Feature\\TestRefundResolutionConcurrencyTest", "test_new_scope_capacity_waits_for_the_refund_release_commit"],
+        ])
 
     def test_new_sqlite_exceptions_are_exact_native_method_identities(self):
         policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())

@@ -1,4 +1,6 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
+import { InquiryHistory } from './InquiryHistory';
+import { InquiryOrderContext } from './InquiryOrderContext';
 import '../../css/contact-inquiry.css';
 
 export const isInquiryReceipt = (value: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(value) && value.length === 36;
@@ -38,10 +40,15 @@ export function InquiryConversationEntry() {
   const [opened, setOpened] = useState<string | null>(null);
   const [error, setError] = useState(false);
   const input = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const clear = () => { setOpened(null); setValue(''); setError(false); };
+    window.addEventListener('pagehide', clear);
+    return () => window.removeEventListener('pagehide', clear);
+  }, []);
   if (opened) return <InquiryConversation key={opened} receipt={opened} onClose={() => {
     setOpened(null); window.requestAnimationFrame(() => input.current?.focus());
   }} />;
-  return <section className="contact-inquiry" aria-labelledby={`${prefix}-title`}>
+  return <><section className="contact-inquiry" aria-labelledby={`${prefix}-title`}>
     <h2 id={`${prefix}-title`}>Read an existing inquiry</h2>
     <p className="contact-inquiry-privacy" id={`${prefix}-help`}>Enter your saved receipt using the browser session that sent the inquiry. A receipt alone cannot recover access in another session. Replies stay here; no email is sent.</p>
     <form noValidate onSubmit={event => {
@@ -57,7 +64,7 @@ export function InquiryConversationEntry() {
       {error && <p className="contact-inquiry-field-error" id={`${prefix}-error`} role="alert">Enter the complete inquiry receipt.</p>}
       <div className="contact-inquiry-actions"><button className="button button-outline" type="submit">Open conversation</button></div>
     </form>
-  </section>;
+  </section><InquiryHistory onOpen={setOpened} /></>;
 }
 
 /** A receipt is a locator. The server still requires the original inquiry's current browser session. */
@@ -72,10 +79,12 @@ export function InquiryConversation({ receipt, onClose }: { receipt: string; onC
   const pending = useRef(false);
   const generation = useRef(0);
   const abort = useRef<AbortController | null>(null);
+  const deadline = useRef<number | null>(null);
   const summary = useRef<HTMLDivElement>(null);
   const replyInput = useRef<HTMLTextAreaElement>(null);
   const endpoint = '/contact/inquiries/' + receipt + '/conversation';
   const locked = attempt.current !== null;
+  function stopDeadline() { if (deadline.current !== null) window.clearTimeout(deadline.current); deadline.current = null; }
 
   async function read(signal: AbortSignal) {
     if (!isInquiryReceipt(receipt)) throw new ConversationError('Enter the complete inquiry receipt from your original browser session.');
@@ -93,6 +102,7 @@ export function InquiryConversation({ receipt, onClose }: { receipt: string; onC
     pending.current = true; setBusy(true); setConversation(null);
     const current = ++generation.current; const controller = new AbortController(); abort.current = controller;
     const timeout = window.setTimeout(() => controller.abort(), 20_000);
+    deadline.current = timeout;
     setNotice({ error: false, message: 'Loading private conversation…' });
     try {
       const result = await read(controller.signal);
@@ -102,14 +112,14 @@ export function InquiryConversation({ receipt, onClose }: { receipt: string; onC
     } catch (error) {
       if (current === generation.current) setNotice({ error: true, message: error instanceof ConversationError ? error.message : 'The conversation could not be loaded. Refresh it to try again.' });
     } finally {
-      window.clearTimeout(timeout);
+      if (deadline.current === timeout) stopDeadline();
       if (current === generation.current) { pending.current = false; setBusy(false); abort.current = null; }
     }
   }
 
   useEffect(() => {
     void refresh();
-    return () => { generation.current++; pending.current = false; abort.current?.abort(); };
+    return () => { generation.current++; pending.current = false; stopDeadline(); abort.current?.abort(); abort.current = null; };
     // The receipt is fixed for this mounted view; the parent keys each opened conversation.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receipt]);
@@ -133,6 +143,7 @@ export function InquiryConversation({ receipt, onClose }: { receipt: string; onC
     pending.current = true; setBusy(true); setSessionExpired(false); setNotice({ error: false, message: 'Saving your follow-up…' });
     const current = ++generation.current; const controller = new AbortController(); abort.current = controller;
     const timeout = window.setTimeout(() => controller.abort(), 20_000);
+    deadline.current = timeout;
     let acknowledged = false;
     try {
       const response = await fetch(endpoint, { method: 'POST', credentials: 'same-origin', cache: 'no-store', redirect: 'error', signal: controller.signal,
@@ -162,7 +173,7 @@ export function InquiryConversation({ receipt, onClose }: { receipt: string; onC
         setNotice({ error: true, message: acknowledged ? 'Your follow-up was saved, but the conversation could not be refreshed. Refresh it to read the current state.' : uncertain });
       }
     } finally {
-      window.clearTimeout(timeout);
+      if (deadline.current === timeout) stopDeadline();
       if (current === generation.current) { pending.current = false; setBusy(false); abort.current = null; }
     }
   }
@@ -176,6 +187,7 @@ export function InquiryConversation({ receipt, onClose }: { receipt: string; onC
     </div>
     <div className="contact-inquiry-actions"><button className="button button-outline" type="button" disabled={busy} onClick={() => void refresh()}>Refresh conversation</button></div>
     {conversation && <div>
+      <InquiryOrderContext receipt={receipt} />
       <h3>{conversation.subject}</h3>
       <p>Inquiry {conversation.state === 'new' ? 'saved' : conversation.state === 'read' ? 'read by staff' : 'archived'}</p>
       <ol aria-label="Conversation messages" style={{ paddingLeft: '1.5rem', overflowWrap: 'anywhere' }}>

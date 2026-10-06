@@ -219,7 +219,7 @@ class TestCommerceOperationsTest extends TestCase
         $this->assertSame([], $component->instance()->getTable()->getFlatActions());
         $this->assertSame([], $component->instance()->getTable()->getFlatBulkActions());
         $exceptions = Livewire::test(ListTestPaymentExceptions::class);
-        $this->assertSame(['inspectEvidence', 'operationHistory', 'recordDisposition', 'reconcilePayment'], array_keys($exceptions->instance()->getTable()->getFlatActions()));
+        $this->assertSame(['inspectEvidence', 'operationHistory', 'recordDisposition', 'reconcilePayment', 'refundResolutionHistory', 'resolveFullRefund'], array_keys($exceptions->instance()->getTable()->getFlatActions()));
         $this->assertSame([], $exceptions->instance()->getTable()->getFlatBulkActions());
     }
 

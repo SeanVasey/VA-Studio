@@ -2,17 +2,18 @@
 
 ## Active continuation — October 6, 2026 UTC
 
-The integrating [completion candidate](completion-execution.md#complete-related-journey-allowance--october-6-2026-utc) includes reviewed account/library and exact order-reference lookup, private test enrollment/recovery, collection/album drafts, inquiry conversations, verified unpaid release, WAV kit intake and resumable kit transport. Its next correction gives the complete genuine related journey a measured, bounded harness allowance while preserving every assertion, cleanup step and outer limit. Collection-member refresh and retained order-item details remain separate follow-up work. PR #6 remains the current combined acceptance boundary; PR #5 must close as superseded only after the combined merge is confirmed. A failed run does not certify its corrected successor.
+[PR #13](https://github.com/SeanVasey/VA-Studio/pull/13) preserves reviewed ancestry from PRs #7–#12 against accepted `main`. The current batch adds captured license-draft editing and bounded customer download recovery, then repairs the observed inquiry-fixture catalog leak and asynchronous guest-claim focus observation. The [continuation record](verification/customer-operator-recovery-continuation.md) records source, checks and remaining acceptance. Earlier PRs retain their evidence and must not merge independently.
 
-| Lane | Current work and boundary |
+| Lane | Ownership and retained handoff |
 | --- | --- |
-| Integration `/root` | Compose exact reviewed sources, preserve branch ancestry, run complete discovery/focused verification, publish one candidate and require full hosted acceptance before expected-head merge |
-| Customer `/root/customer_reconcile` | Reviewed self-service e664e22 is composed in the next branch; full native browser/CI acceptance and production email/guest claims remain separate |
-| Product `/root/product_reconcile` | Reviewed true-kit transport984a49f is composed in the next branch; full native browser/CI and product commerce remain separate |
-| CI review `/root/ci_reconcile` | Independently review composed source, exact census/skip registration and browser budget changes; no gate or receipt reuse relaxation |
-| Commerce review `/root/commerce_review` | Independently review unpaid resource effects and subsequent kit transport boundaries |
+| Integration `/root` | Compose exact reviewed commits, register new coverage, verify composed behavior, publish once and merge only after fresh complete acceptance |
+| Browser correction `/root/browser_failure` | Guarded withdrawal of the inquiry fixture's exact synthetic recording, atomic release rollback, repeat-safe cleanup and actual helper subprocess regressions; lead reviews before integration |
+| Source review `/root/composition_review` | Independent actual-source review of license/download composition and the unchanged guest-claim focus criterion |
+| Evidence `/root/acceptance_evidence` | Independently verified all ten preceding database receipts and both related native journeys; confirmed failed ordinary browsers and refused aggregate remain a merge blocker |
 
-The tables below retain prior checkpoints and do not imply additional running agents. Unfinished feature branches are not acceptance evidence or merged main state. No lane waits for unrelated database CI to begin its next dependency-ready child.
+Preceding [run 37494698386](https://github.com/SeanVasey/VA-Studio/actions/runs/37494698386), attempt 1, belongs to head `1de6b314`. Its complete database and related-browser evidence is preserved separately from its browser failures. A new candidate requires its own full acceptance; local regression checks and discovery do not replace it.
+
+The browser, source-review and evidence lanes above have completed their bounded handoffs. Integration remains active. Next dependency-ready development continues on isolated branches while final checks run. Production terms/identity/provider interoperability, hosting/storage/restore, wider product commerce, source migration and cutover retain their recorded dependencies. Six parent groups remain accepted and 34 open. Tables below preserve historical assignments and are not claims that those agents remain active.
 
 ## Full completion priority — October 5, 2026 (America/Chicago)
 
@@ -119,7 +120,7 @@ Dependencies below reproduce the CSV exactly. **I** = integration, **C** = CI ac
 | T14 | H | T05 T06 T07 T08 T10 T13 | Queued: actual deployed scanner/worker isolation and representative media proof |
 | T15 | P | T10 T11 | Queued: production inquiry delivery/notice/retention and abuse/error paths |
 | T16 | P | T10 T11 | Queued: remaining consent/provider and related-content acceptance |
-| T17 | P | T10 T11 | Queued: order-aware support and scanned private attachments |
+| T17 | P | T10 T11 | Order-linked test inquiry child reviewed for inclusive acceptance; private attachments and production support remain open |
 | T18 | P | T10 T11 | Queued: approved free-license/asset identity and purpose-specific consent |
 | T19 | M | T10 T12 | Operational history/provider-inspection child implemented/reviewed/published, acceptance pending; broader financial resolution still open |
 | T20 | M | T10 T19 | Queued after T19: verified unpaid release and late-payment/resource races |

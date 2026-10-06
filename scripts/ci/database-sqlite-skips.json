@@ -83,6 +83,18 @@
       "test_shortened_mysql_unique_index_prefix_is_refused_before_any_ddl"
     ],
     [
+      "Tests\\Feature\\CustomerPurchaseClaimConcurrencyTest",
+      "test_competing_accounts_serialize_at_the_exact_order_and_only_one_claim_wins"
+    ],
+    [
+      "Tests\\Feature\\CustomerPurchaseClaimConcurrencyTest",
+      "test_simultaneous_exact_retry_returns_one_immutable_claim_and_one_audit"
+    ],
+    [
+      "Tests\\Feature\\CustomerPurchaseClaimConcurrencyTest",
+      "test_withdrawal_at_the_exact_user_lock_prevents_claim_commit"
+    ],
+    [
       "Tests\\Feature\\ExclusiveOfferConcurrencyTest",
       "test_independent_connections_preserve_preparation_identity_and_scope_controls"
     ],
@@ -115,6 +127,18 @@
       "test_committed_inquiry_and_actor_fences_decide_waiting_conversation_operations"
     ],
     [
+      "Tests\\Feature\\LicenseTemplateAuthoringConcurrencyTest",
+      "test_competing_reviewed_template_edits_reject_the_stale_loser_after_an_exact_template_row_wait"
+    ],
+    [
+      "Tests\\Feature\\LicenseTemplateAuthoringConcurrencyTest",
+      "test_template_creation_and_reviewed_edit_serialize_role_withdrawal_on_the_exact_user_row"
+    ],
+    [
+      "Tests\\Feature\\LicenseTemplateAuthoringConcurrencyTest",
+      "test_template_edit_and_review_submission_serialize_on_the_exact_template_row_in_both_orders"
+    ],
+    [
       "Tests\\Feature\\LicenseWriterConcurrencyTest",
       "test_all_license_mutations_serialize_current_role_withdrawal_before_resource_and_actor_fk_writes"
     ],
@@ -133,6 +157,10 @@
     [
       "Tests\\Feature\\MediaWriterConcurrencyTest",
       "test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"
+    ],
+    [
+      "Tests\\Feature\\OrderInquiryConcurrencyTest",
+      "test_current_publication_operator_and_customer_fences_serialize_both_commit_orders"
     ],
     [
       "Tests\\Feature\\OrderPreparationConcurrencyTest",
@@ -157,6 +185,18 @@
     [
       "Tests\\Feature\\ProductDraftConcurrencyTest",
       "test_source_lock_captures_metadata_committed_while_creator_waits"
+    ],
+    [
+      "Tests\\Feature\\ProductMemberRefreshConcurrencyTest",
+      "test_native_actor_wait_observes_authority_withdrawal_despite_an_older_snapshot"
+    ],
+    [
+      "Tests\\Feature\\ProductMemberRefreshConcurrencyTest",
+      "test_native_draft_wait_allows_one_refresh_or_preserves_the_winning_edit"
+    ],
+    [
+      "Tests\\Feature\\ProductMemberRefreshConcurrencyTest",
+      "test_native_source_wait_rejects_a_review_changed_by_the_committing_source_writer"
     ],
     [
       "Tests\\Feature\\PromotionAdministrationMySqlConcurrencyTest",
@@ -201,6 +241,14 @@
     [
       "Tests\\Feature\\ResumableMediaUploadsConcurrencyTest",
       "test_required_mfa_withdrawn_during_native_actor_wait_refuses_upload_operation"
+    ],
+    [
+      "Tests\\Feature\\ReviewedLicenseDraftConcurrencyTest",
+      "test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders"
+    ],
+    [
+      "Tests\\Feature\\ReviewedOfferDraftConcurrencyTest",
+      "test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"
     ],
     [
       "Tests\\Feature\\RightsDeclarationWriterConcurrencyTest",
@@ -405,6 +453,22 @@
     [
       "Tests\\Feature\\TestPaymentExceptionOperationsConcurrencyTest",
       "test_independent_operators_serialize_history_and_fence_provider_claims"
+    ],
+    [
+      "Tests\\Feature\\TestRefundResolutionConcurrencyTest",
+      "test_committed_actor_withdrawal_fences_the_resolution_request_before_provider_io"
+    ],
+    [
+      "Tests\\Feature\\TestRefundResolutionConcurrencyTest",
+      "test_exact_authority_and_order_fences_keep_one_resolution_for_identical_or_competing_commands"
+    ],
+    [
+      "Tests\\Feature\\TestRefundResolutionConcurrencyTest",
+      "test_last_promotion_capacity_waits_for_the_same_atomic_refund_release"
+    ],
+    [
+      "Tests\\Feature\\TestRefundResolutionConcurrencyTest",
+      "test_new_scope_capacity_waits_for_the_refund_release_commit"
     ],
     [
       "Tests\\Feature\\TestUnpaidReleaseConcurrencyTest",

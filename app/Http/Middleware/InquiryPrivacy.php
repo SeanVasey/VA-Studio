@@ -12,9 +12,12 @@ final class InquiryPrivacy
     public function handle(Request $request, Closure $next): Response
     {
         if ($request->is('contact/inquiries', 'contact/inquiries/*')) {
+            $history = $request->is('contact/inquiries/history', 'contact/inquiries/history/*');
+            $context = $request->is('contact/inquiries/*/order-context');
             $conversation = $request->is('contact/inquiries/*');
-            if (! in_array($request->getRealMethod(), $conversation ? ['GET', 'POST'] : ['POST'], true)) {
-                return InquiryResponse::error(405, headers: ['Allow' => $conversation ? 'GET, POST' : 'POST']);
+            $allowed = ($history || $context) ? ['GET'] : ($conversation ? ['GET', 'POST'] : ['POST']);
+            if (! in_array($request->getRealMethod(), $allowed, true)) {
+                return InquiryResponse::error(405, headers: ['Allow' => implode(', ', $allowed)]);
             }
             if ($request->query->count() || $request->server->get('QUERY_STRING', '') !== '') {
                 return InquiryResponse::error(422);

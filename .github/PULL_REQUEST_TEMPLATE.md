@@ -21,7 +21,8 @@ For docs/tooling, describe the contributor benefit. Identify remaining scaffolds
 | --- | --- | --- |
 | <!-- Command, database/version, browser/device as applicable --> | <!-- Passed / failed / skipped counts; never treat a skip as a pass --> | <!-- CI run, report or screenshot link --> |
 
-<!-- Choose checks for the change from README.md and .github/workflows/ci.yml:
+<!-- Choose focused checks from README.md and the inexpensive .github/workflows/preflight.yml.
+Reserve .github/workflows/final-verification.yml for exact-SHA final acceptance under AGENTS.md:
 PHP/MySQL and SQLite; frontend tests and TypeScript/build; production dependency audits.
 For concurrency claims, include independent-process MySQL races. SQLite alone is insufficient.
 For UI changes, record mobile/desktop, keyboard/focus, playback and reduced-motion checks as relevant.

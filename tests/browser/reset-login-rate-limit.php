@@ -40,6 +40,9 @@ try {
     // Exact key from danharrin/livewire-rate-limiting WithRateLimiting::getRateLimitKey().
     // Filament Login::authenticate() uses this component/method and the loopback server sees this IP.
     RateLimiter::clear('livewire-rate-limiter:'.sha1(Login::class.'|authenticate|127.0.0.1'));
+    // The ordinary customer POST routes share this prefix and unauthenticated loopback signature.
+    // Customer sessions use their own principal, not the staff web guard used by ThrottleRequests.
+    RateLimiter::clear('customer-auth'.sha1('|127.0.0.1'));
 } catch (Throwable) {
     fwrite(STDERR, "Refusing login-counter reset outside the isolated browser fixture.\n");
     exit(1);

@@ -1,0 +1,5 @@
+.order-items { display: grid; gap: 12px; min-width: 0; overflow-wrap: anywhere; }
+.order-items .button { min-height: 44px; white-space: normal; }
+.order-items [role="alert"] a { display: block; min-height: 44px; padding-top: 12px; text-decoration: underline; }
+.order-items-amounts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px 16px; margin: 0; }
+.order-items-amounts dd { margin: 0; text-align: right; }

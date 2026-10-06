@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Head } from '@inertiajs/react';
+import { CustomerPurchaseClaim } from '../components/CustomerPurchaseClaim';
+import type { PendingPurchaseClaim } from '../lib/purchase-claim';
 import { SiteFooter, SiteHeader } from '../components/SiteChrome';
 import { CustomerOrderLookup } from '../components/CustomerOrderLookup';
 import { OwnedTestOrderHistory } from '../components/OwnedTestOrderHistory';
@@ -8,8 +10,8 @@ import type { SiteContent } from '../lib/site-content';
 import { changeCustomerSession, navigateCustomerSession } from '../lib/customer-session';
 import '../../css/customer-account.css';
 
-export default function CustomerLibrary({ siteContent, customer, testCheckoutEnabled = false }: {
-  testOnly: true; siteContent: SiteContent; customer: { name: string }; testCheckoutEnabled?: boolean;
+export default function CustomerLibrary({ siteContent, customer, testCheckoutEnabled = false, guestPurchaseClaim }: {
+  testOnly: true; siteContent: SiteContent; customer: { name: string }; testCheckoutEnabled?: boolean; guestPurchaseClaim?: PendingPurchaseClaim;
 }) {
   const [leaving, setLeaving] = useState(false), [message, setMessage] = useState('');
   const active = useRef(false), pending = useRef(false);
@@ -42,6 +44,7 @@ export default function CustomerLibrary({ siteContent, customer, testCheckoutEna
       </section> : <>
         <div className="customer-account-identity"><p>Signed in as <strong>{customer.name}</strong></p><button type="button" className="button button-outline" onClick={() => void signOut()}>Sign out</button></div>
         <p className="customer-account-note">Test mode only. Order status, contracts and downloads remain subject to their current availability checks.</p>
+        {guestPurchaseClaim && <CustomerPurchaseClaim key={guestPurchaseClaim.orderId} claim={guestPurchaseClaim} />}
         <CustomerOrderLookup renderOrder={order => <OrderStatus order={order} testCheckoutEnabled={testCheckoutEnabled} />} />
         <OwnedTestOrderHistory scope="account" renderOrder={order => <OrderStatus order={order} testCheckoutEnabled={testCheckoutEnabled} />} />
       </>}

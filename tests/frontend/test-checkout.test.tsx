@@ -34,7 +34,7 @@ describe('hosted Stripe test checkout', () => {
     ['paid', 'pending', 'pending_contracts', 'Contracts are pending;'],
     ['paid', 'issued', 'pending_activation', 'Test contracts have been issued. Check the separate test downloads panel'],
     ['paid', 'attention', 'blocked', 'Contract preparation needs attention.'],
-    ['paid_exception', 'blocked', 'blocked', 'This order needs review'],
+    ['paid_exception', 'blocked', 'blocked', 'Fulfillment is blocked for this order.'],
   ])('shows verified %s without payment actions, fulfillment claims or private evidence', async (finalizationStatus, contractStatus, fulfillmentStatus, copy) => {
     const user = userEvent.setup();
     const body = { ...fixture('complete'), paymentStatus: 'verified', finalizationStatus, contractStatus, fulfillmentStatus,

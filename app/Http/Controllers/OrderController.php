@@ -7,6 +7,9 @@ use App\Domain\Commerce\Orders\ReadOrder;
 use App\Domain\Commerce\Orders\ReadOwnedTestOrders;
 use App\Domain\Commerce\Orders\ReviewOrder;
 use App\Domain\Commerce\QuoteException;
+use App\Domain\Customers\CustomerAccessException;
+use App\Domain\Customers\PurchaseAccess;
+use App\Http\Middleware\CustomerPrivacy;
 use App\Support\CommerceRequestIdentity;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -26,7 +29,7 @@ final class OrderController
                 throw new QuoteException('ORDER_HISTORY_CURSOR_INVALID', 422);
             }
 
-            return ['history' => $read->handle($owner->forRequest($request), $raw === '' ? null : substr($raw, 7))];
+            return ['history' => $read->handle($owner->forRequest($request), $raw === '' ? null : substr($raw, 7), $owner->principal($request))];
         });
     }
 
@@ -50,7 +53,12 @@ final class OrderController
 
     public function status(string $order, Request $request, CommerceRequestIdentity $owner, ReadOrder $read): JsonResponse
     {
-        return $this->run(fn () => ['order' => $read->handle($order, $owner->forRequest($request))]);
+        return $this->run(fn () => ['order' => app(PurchaseAccess::class)->read($order, $owner->forRequest($request), $owner->principal($request), fn ($original) => $read->handle($order, $original))]);
+    }
+
+    public function items(string $order, Request $request, CommerceRequestIdentity $owner, ReadOrder $read): JsonResponse
+    {
+        return $this->run(fn () => ['items' => app(PurchaseAccess::class)->read($order, $owner->forRequest($request), $owner->principal($request), fn ($original) => $read->items($order, $original))]);
     }
 
     public function forQuote(string $quote, Request $request, CommerceRequestIdentity $owner, ReadOrder $read): JsonResponse
@@ -81,6 +89,8 @@ final class OrderController
     {
         try {
             return $this->response($operation());
+        } catch (CustomerAccessException) {
+            return CustomerPrivacy::error(403);
         } catch (QuoteException $exception) {
             return $this->response(['code' => $exception->errorCode, 'message' => match ($exception->errorCode) {
                 'ORDER_NOT_FOUND', 'QUOTE_NOT_FOUND' => 'This order review is unavailable.',

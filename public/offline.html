@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Connection unavailable — VASEY.AUDIO</title>
+  <link rel="stylesheet" href="/brand/theme.css">
+  <style>
+    @font-face { font-family: 'Reddit Sans'; font-style: normal; font-weight: 300 900; font-display: swap; src: url('/brand/fonts/reddit-sans-latin-wght-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Bebas Neue'; font-style: normal; font-weight: 400; font-display: swap; src: url('/brand/fonts/bebas-neue-latin-400-normal.woff2') format('woff2'); }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100svh; padding: 40px 20px; display: grid; place-items: center; color: var(--va-text); background: var(--va-canvas); font-family: var(--va-font-body); font-synthesis: none; }
+    main { width: 100%; max-width: 640px; }
+    .brand { display: block; width: min(100%, 300px); margin-bottom: 48px; }
+    img { display: block; width: 100%; height: auto; }
+    .eyebrow { margin: 0 0 12px; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; }
+    h1 { margin: 0; font-family: var(--va-font-section); font-size: clamp(44px, 9vw, 64px); font-weight: 400; line-height: 1.1; color: var(--va-text-strong); }
+    p { max-width: 500px; margin: 20px 0 28px; font-size: 16px; line-height: 1.65; }
+    .actions { display: flex; flex-wrap: wrap; gap: 16px; }
+    .action { min-height: 48px; padding: 12px 24px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid transparent; border-radius: var(--va-radius-control); font: 700 14px var(--va-font-body); text-decoration: none; cursor: pointer; color: var(--va-action-text); background: var(--va-action); }
+    .action:hover { color: var(--va-action-hover-text); background: var(--va-action-hover); }
+    .secondary { border-color: var(--va-border); color: var(--va-text); background: transparent; }
+    .secondary:hover { color: var(--va-text-strong); background: var(--va-surface); }
+    :focus-visible { outline: 3px solid var(--va-focus); outline-offset: 5px; }
+    @media (forced-colors: active) { .action { border-color: ButtonText; } }
+  </style>
+</head>
+<body>
+  <main aria-labelledby="connection-heading">
+    <a class="brand" href="/" aria-label="VASEY.AUDIO home"><img src="/brand/vasey-audio-logo.png" alt="VASEY.AUDIO" width="420" height="100"></a>
+    <p class="eyebrow">Connection unavailable</p>
+    <h1 id="connection-heading">We couldn’t reach the store</h1>
+    <p>Check your connection and try again. Reconnect to browse the current catalog, check purchases or download files.</p>
+    <div class="actions">
+      <button type="button" class="action" id="retry">Try again</button>
+      <a class="action secondary" href="/">Back to the store</a>
+    </div>
+    <noscript><p>Use your browser’s reload control to try this page again.</p></noscript>
+  </main>
+  <script>document.getElementById('retry').addEventListener('click', function () { window.location.reload(); });</script>
+</body>
+</html>

@@ -12,14 +12,14 @@ vi.mock('@inertiajs/react', async importOriginal => ({ ...await importOriginal<t
 vi.mock('../../resources/js/lib/customer-session', async importOriginal => ({
   ...await importOriginal<typeof import('../../resources/js/lib/customer-session')>(), navigateCustomerSession: vi.fn(),
 }));
-const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
+const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 const signIn = () => render(<CustomerSignIn testOnly siteContent={defaultSiteContent} />);
 const library = () => render(<CustomerLibrary testOnly siteContent={defaultSiteContent} customer={{ name: 'Synthetic Customer' }} />);
 const id = '730000ab-0000-4000-8000-000000000001';
 const summary = { id, createdAt: '2026-10-01T12:00:00.000000Z', testOnly: true, payable: false,
   currency: 'USD', totalMinor: 4999, status: 'paid_exception', paymentStatus: 'verified',
   finalizationStatus: 'paid_exception', contractStatus: 'blocked', fulfillmentStatus: 'blocked' };
-const history = { history: { orderHistorySchema: 1, testOnly: true, orders: [summary], limit: 20, nextCursor: null } };
+const history = { history: { orderHistorySchema: 2, testOnly: true, orders: [summary], previews: [{ orderId: summary.id, itemCount: 1, firstItem: { title: 'Original track', licenseName: 'Original license', licenseVersion: 1 } }], limit: 20, nextCursor: null } };
 async function enterCredentials() {
   const user = userEvent.setup();
   await user.type(screen.getByLabelText('Email address'), 'synthetic@example.test');
@@ -131,7 +131,7 @@ describe('customer sign-in', () => {
 });
 
 describe('customer library', () => {
-  it('reuses owner-scoped history and retained payment status without browser identity, payment writes or guest claims', async () => {
+  it('reuses owner-scoped history and retained payment status without browser identity, payment writes or automatic guest claims', async () => {
     const storage = vi.spyOn(Storage.prototype, 'setItem');
     const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(async input => String(input) === '/orders/history' ? json(history) : json({}, 503));
     library(); const user = userEvent.setup(); expect(fetcher).not.toHaveBeenCalled();
@@ -148,7 +148,7 @@ describe('customer library', () => {
   });
 
   it.each([true, false])('shows the account-specific empty or unavailable state: empty=%s', async empty => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(empty ? json({ history: { ...history.history, orders: [] } }) : json({ message: 'PRIVATE' }, 403));
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(empty ? json({ history: { ...history.history, orders: [], previews: [] } }) : json({ message: 'PRIVATE' }, 403));
     library(); await userEvent.setup().click(screen.getByRole('button', { name: 'Browse account orders' }));
     if (empty) expect(await screen.findByRole('status')).toHaveTextContent('No test orders belong to this account.');
     else expect(await screen.findByRole('alert')).toHaveTextContent('Your account’s test order history could not be loaded. Refresh the list or sign in again.');

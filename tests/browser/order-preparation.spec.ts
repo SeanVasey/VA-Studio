@@ -1,6 +1,9 @@
 import { test, expect, type Page } from '@playwright/test';
 import { fixtureTrack, policyText, query, storefrontFixture } from './storefront-fixture';
 
+// This file owns synthetic document/request transport; keep it authoritative across navigation/reload.
+test.use({ serviceWorkers: 'block' });
+
 /** Synthetic HTTP transport exercises the built React UI and native browser controls.
  * PHP feature/race tests, not these responses, prove order persistence and authorization.
  */

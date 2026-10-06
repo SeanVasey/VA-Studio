@@ -24,9 +24,10 @@ async function captureNavigatingResponses(page: Page) {
       const requestUrl = new URL(input instanceof Request ? input.url : String(input), window.location.href);
       const method = (init?.method ?? (input instanceof Request ? input.method : 'GET')).toUpperCase();
       const response = await nativeFetch(input, init);
-      if (method === 'POST' && requestUrl.origin === window.location.origin
-        && (/^\/account\/sign-(?:in|out)$/.test(requestUrl.pathname)
-          || /^\/orders\/[a-f0-9-]{36}\/delivery\/authorizations$/.test(requestUrl.pathname))) {
+      if (requestUrl.origin === window.location.origin
+        && ((method === 'POST' && (/^\/account\/sign-(?:in|out)$/.test(requestUrl.pathname)
+          || /^\/orders\/[a-f0-9-]{36}\/delivery\/authorizations$/.test(requestUrl.pathname)))
+          || (method === 'GET' && requestUrl.pathname === '/orders/history'))) {
         const body = await response.clone().text();
         await (window as unknown as { __vaseyCustomerResponseCaptured: (value: CapturedResponse) => Promise<void> }).__vaseyCustomerResponseCaptured({
           requestUrl: requestUrl.href, responseUrl: response.url, status: response.status,
@@ -36,11 +37,11 @@ async function captureNavigatingResponses(page: Page) {
       return response;
     };
   });
-  return async (path: string, action: () => Promise<void>) => {
+  return async (path: string, action: () => Promise<void>, method: 'GET' | 'POST' = 'POST') => {
     const url = new URL(path, page.url()).href;
     if (pending.has(url)) throw new Error('A customer response capture is already pending for this URL.');
     const captured = new Promise<CapturedResponse>(resolve => pending.set(url, resolve));
-    const observed = page.waitForResponse(response => response.url() === url && response.request().method() === 'POST');
+    const observed = page.waitForResponse(response => response.url() === url && response.request().method() === method);
     try {
       const [response, copy] = await Promise.all([observed, captured, action()]);
       expect(copy.responseUrl).toBe(response.url());
@@ -107,11 +108,10 @@ test('customer signs in with a fresh session, reads the account library and sign
   const currentToken = await page.locator('meta[name="csrf-token"]').getAttribute('content');
   expect(currentToken).toBeTruthy(); expect(currentToken).not.toBe(initialToken);
   const region = page.getByRole('region', { name: 'Your account test orders', exact: true });
-  const loaded = page.waitForResponse(response => response.url().endsWith('/orders/history') && response.request().method() === 'GET');
-  await region.getByRole('button', { name: 'Browse account orders', exact: true }).click();
-  const history = await loaded;
+  const { response: history, body: originalHistory } = await capture('/orders/history',
+    () => region.getByRole('button', { name: 'Browse account orders', exact: true }).click(), 'GET');
   expect(history.status()).toBe(200); expect(history.headers()['cache-control']).toContain('no-store');
-  expect(await history.json()).toEqual({ history: { orderHistorySchema: 1, testOnly: true, orders: expect.arrayContaining([expect.objectContaining({ id: fixture.orderId, paymentStatus: 'verified', finalizationStatus: 'paid', contractStatus: 'issued' })]), limit: 20, nextCursor: null } });
+  expect(originalHistory).toEqual({ history: { orderHistorySchema: 2, testOnly: true, orders: expect.arrayContaining([expect.objectContaining({ id: fixture.orderId, paymentStatus: 'verified', finalizationStatus: 'paid', contractStatus: 'issued' })]), previews: expect.arrayContaining([expect.objectContaining({ orderId: fixture.orderId, itemCount: 1, firstItem: expect.objectContaining({ title: expect.any(String), licenseName: expect.any(String), licenseVersion: expect.any(Number) }) })]), limit: 20, nextCursor: null } });
   await expect(region.getByRole('heading', { name: 'Account orders', exact: true })).toBeFocused();
   await expect(region.getByRole('button', { name: `View test order status ${fixture.orderId}`, exact: true })).toBeVisible();
   const admin = await page.request.get('/admin', { maxRedirects: 0 });

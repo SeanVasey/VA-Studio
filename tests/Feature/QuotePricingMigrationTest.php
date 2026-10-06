@@ -33,6 +33,12 @@ class QuotePricingMigrationTest extends TestCase
         $administration = require database_path('migrations/2026_09_29_000025_promotion_administration.php');
         $financialObservations = require database_path('migrations/2026_10_06_000039_test_payment_financial_observations.php');
         $unpaidRelease = require database_path('migrations/2026_10_06_000042_test_unpaid_releases.php');
+        $purchaseClaims = require database_path('migrations/2026_10_06_000048_customer_purchase_claims.php');
+        $refundResolution = require database_path('migrations/2026_10_06_000047_test_refund_resolutions.php');
+        $orderInquiries = require database_path('migrations/2026_10_06_000049_inquiry_order_contexts.php');
+        $orderInquiries->down();
+        $purchaseClaims->down();
+        $refundResolution->down();
         $unpaidRelease->down();
         $financialObservations->down();
         $exceptionOperations = require database_path('migrations/2026_10_02_000036_test_payment_exception_operations.php');
@@ -60,6 +66,9 @@ class QuotePricingMigrationTest extends TestCase
         $checkout->up(); $payments->up(); $finalizations->up(); $contracts->up(); $fulfillmentActivations->up(); $delivery->up(); $administration->up(); $exceptionOperations->up();
         $financialObservations->up();
         $unpaidRelease->up();
+        $refundResolution->up();
+        $purchaseClaims->up();
+        $orderInquiries->up();
         foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }
         $pricing = app(PriceQuote::class)->create($quote->public_id, str_repeat('a', 64));
         $this->assertSame($quote->snapshot_hash, $pricing->snapshot['quote_snapshot_hash']);

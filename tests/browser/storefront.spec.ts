@@ -1,6 +1,9 @@
 import { test, expect } from '@playwright/test';
 import { fixtureTrack, policyText, query, storefrontFixture } from './storefront-fixture';
 
+// This file owns synthetic document transport; keep it authoritative across navigation/reload.
+test.use({ serviceWorkers: 'block' });
+
 test('track navigation preserves filters, a single native audio owner and seeking', async ({ page }, testInfo) => {
   const fixture = await storefrontFixture(page);
   const errors: string[] = [];

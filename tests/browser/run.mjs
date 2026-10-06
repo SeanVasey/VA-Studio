@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { applyPinnedWebkitOfflineBackport } from '../../scripts/ci/apply-playwright-webkit-offline-backport.mjs';
 
 const root = resolve(import.meta.dirname, '../..');
 if (!existsSync(join(root, 'vendor/autoload.php')) || !existsSync(join(root, 'public/build/manifest.json'))) {
@@ -11,6 +12,7 @@ if (!existsSync(join(root, 'vendor/autoload.php')) || !existsSync(join(root, 'pu
 if (existsSync(join(root, 'public/hot')) || existsSync(join(root, 'storage/framework/maintenance.php'))) {
   throw new Error('Stop the Vite development server and use a checkout outside maintenance mode.');
 }
+const playwrightBackport = applyPinnedWebkitOfflineBackport(root);
 const directory = mkdtempSync(join(tmpdir(), 'vasey-browser-'));
 const env = {
   ...process.env,
@@ -27,6 +29,7 @@ const env = {
   // Only retained synthetic test evidence is readable; no HTTP payment initiation/processing is enabled.
   STRIPE_ACCOUNT_ID: 'acct_SYNTHETICONLY', STRIPE_MODE: 'test', STRIPE_TEST_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '',
   STRIPE_TEST_CHECKOUT_ENABLED: 'false', STRIPE_TEST_PAYMENT_PROCESSING_ENABLED: 'false', STRIPE_TEST_FINALIZATION_ENABLED: 'false',
+  VASEY_TEST_REFUND_RESOLUTION_ENABLED: 'false', VASEY_TEST_REFUND_RESOLUTION_POLICY: '',
   VASEY_BROWSER_EXCEPTION_MARKER: randomBytes(32).toString('hex'),
   // HTTP uploads deliberately retain quarantine behavior even when fixture preparation has a genuine scanner installed.
   MEDIA_CLAMSCAN: join(directory, 'no-clamscan'),
@@ -35,7 +38,10 @@ const env = {
   VASEY_BROWSER_RELATED_STAGE: '', VASEY_BROWSER_RELATED_MARKER: '',
   // Synthetic inquiry setup belongs exclusively to this disposable loopback installation.
   CONTACT_INQUIRIES_ENABLED: 'true',
+  CONTACT_TEST_ORDER_INQUIRIES_ENABLED: 'true',
   VASEY_TEST_CUSTOMER_ACCOUNTS_ENABLED: 'true',
+  // Explicit original-session claims are confined to this disposable test installation.
+  VASEY_TEST_PURCHASE_CLAIMS_ENABLED: 'true',
   // Only this disposable local application captures synthetic identity messages privately.
   VASEY_TEST_CUSTOMER_IDENTITY_ENABLED: 'true',
   VASEY_TEST_CUSTOMER_IDENTITY_TRANSPORT: 'private_capture',
@@ -57,21 +63,28 @@ try {
   writeFileSync(env.DB_DATABASE, '', { mode: 0o600, flag: 'wx' });
   // Genuine scans retain their application budgets; bound the whole fixture stage like related-track preparation.
   const setup = spawnSync('/usr/bin/timeout', ['--signal=TERM', '--kill-after=15s', '600s', 'php', 'tests/browser/bootstrap.php'], { cwd: root, env, stdio: 'inherit', timeout: 620000 });
-  if (setup.error || setup.status !== 0) throw new Error('Isolated browser fixture setup failed.');
-  writeFileSync(join(directory, 'inquiry-fixture-marker.json'), JSON.stringify({
-    marker: env.VASEY_BROWSER_INQUIRY_MARKER, database: env.DB_DATABASE,
-    origin: env.APP_URL, operatorId: 1,
-  }), { mode: 0o600, flag: 'wx' });
-  writeFileSync(join(directory, 'exception-inspection-fixture-marker.json'), JSON.stringify({
-    purpose: 'retained-exception-native', marker: env.VASEY_BROWSER_EXCEPTION_MARKER,
-    database: env.DB_DATABASE, origin: env.APP_URL, baseOperatorId: 1, account: env.STRIPE_ACCOUNT_ID,
-  }), { mode: 0o600, flag: 'wx' });
-  const result = spawnSync(process.execPath, ['node_modules/@playwright/test/cli.js', 'test', ...process.argv.slice(2)], {
-    // Keep one minute beyond Playwright's suite ceiling for teardown and report writes.
-    cwd: root, env, stdio: 'inherit', timeout: 1620000,
-  });
-  if (result.error) throw new Error('Browser verification did not finish.');
-  process.exitCode = result.status ?? 1;
+  if (setup.error || setup.status !== 0) {
+    // The bootstrap owns the bounded diagnosis. Do not add a stack or expose a
+    // spawn error while preserving failure and the unconditional private cleanup.
+    console.error('Isolated browser fixture setup failed.');
+    process.exitCode = 1;
+  } else {
+    console.log(JSON.stringify(playwrightBackport));
+    writeFileSync(join(directory, 'inquiry-fixture-marker.json'), JSON.stringify({
+      marker: env.VASEY_BROWSER_INQUIRY_MARKER, database: env.DB_DATABASE,
+      origin: env.APP_URL, operatorId: 1,
+    }), { mode: 0o600, flag: 'wx' });
+    writeFileSync(join(directory, 'exception-inspection-fixture-marker.json'), JSON.stringify({
+      purpose: 'retained-exception-native', marker: env.VASEY_BROWSER_EXCEPTION_MARKER,
+      database: env.DB_DATABASE, origin: env.APP_URL, baseOperatorId: 1, account: env.STRIPE_ACCOUNT_ID,
+    }), { mode: 0o600, flag: 'wx' });
+    const result = spawnSync(process.execPath, ['node_modules/@playwright/test/cli.js', 'test', ...process.argv.slice(2)], {
+      // Keep one minute beyond Playwright's suite ceiling for teardown and report writes.
+      cwd: root, env, stdio: 'inherit', timeout: 1620000,
+    });
+    if (result.error) throw new Error('Browser verification did not finish.');
+    process.exitCode = result.status ?? 1;
+  }
 } finally {
   rmSync(directory, { recursive: true, force: true });
 }

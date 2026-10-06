@@ -1,89 +1,102 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { OrderSummary } from './OrderPreparation';
-import { validPaymentProgress, type PaymentProgress } from './TestCheckout';
 import { formatMoney } from '../lib/catalog';
+import { readOwnedOrderHistory, type OwnedOrderHistory } from '../lib/owned-order-history';
+export { validOrderHistory, validOrderSummary } from '../lib/owned-order-history';
 
-interface History { orderHistorySchema: 1; testOnly: true; orders: OrderSummary[]; limit: 20; nextCursor: string | null }
-const uuid = (value: unknown): value is string => typeof value === 'string' && value.length === 36 && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(value);
-const record = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
-const keys = (value: Record<string, unknown>, expected: string[]) => Object.keys(value).length === expected.length && expected.every(key => Object.hasOwn(value, key));
-
-export function validOrderSummary(order: unknown): order is OrderSummary {
-  return record(order) && keys(order, ['id', 'createdAt', 'testOnly', 'payable', 'currency', 'totalMinor', 'status',
-    'paymentStatus', 'finalizationStatus', 'contractStatus', 'fulfillmentStatus'])
-    && uuid(order.id) && typeof order.createdAt === 'string' && Number.isFinite(Date.parse(order.createdAt))
-    && order.testOnly === true && order.payable === false && order.currency === 'USD'
-    && Number.isSafeInteger(order.totalMinor) && Number(order.totalMinor) >= 0 && validPaymentProgress(order as unknown as PaymentProgress)
-    && order.status === (order.finalizationStatus === 'paid' || order.finalizationStatus === 'paid_exception' ? order.finalizationStatus : 'prepared');
-}
-
-export function validOrderHistory(value: unknown): value is History {
-  if (!record(value) || !keys(value, ['orderHistorySchema', 'testOnly', 'orders', 'limit', 'nextCursor'])
-    || value.orderHistorySchema !== 1 || value.testOnly !== true || value.limit !== 20
-    || !Array.isArray(value.orders) || value.orders.length > 20 || (value.nextCursor !== null && !uuid(value.nextCursor))) return false;
-  const ids = new Set<string>();
-  for (const order of value.orders) {
-    if (!validOrderSummary(order) || ids.has(order.id)) return false;
-    ids.add(order.id);
-  }
-  return value.nextCursor === null || (value.orders.length === 20 && value.nextCursor === value.orders[19].id);
+function retainedStatus(order: OrderSummary): string {
+  if (order.paymentStatus !== 'verified') return 'Payment has not been verified.';
+  if (order.finalizationStatus === 'awaiting_finalization') return 'Test payment verified. Finalization is pending.';
+  if (order.finalizationStatus === 'paid_exception') return 'Test payment verified. Fulfillment is blocked for this order.';
+  if (order.contractStatus === 'attention') return 'Test payment verified. Contract preparation needs attention.';
+  if (order.contractStatus === 'pending') return 'Test payment verified. Original contracts are pending.';
+  return 'Original test contracts issued. Check the downloads panel for current availability.';
 }
 
 export function OwnedTestOrderHistory({ renderOrder, scope = 'session' }: { scope?: 'session' | 'account'; renderOrder: (order: OrderSummary) => ReactNode }) {
   const label = scope === 'account' ? 'account' : 'test';
-  const [history, setHistory] = useState<History | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState('');
+  const [history, setHistory] = useState<OwnedOrderHistory | null>(null);
+  const [anchors, setAnchors] = useState<Array<string | null>>([]);
+  const [busy, setBusy] = useState(false), [message, setMessage] = useState(''), [signIn, setSignIn] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
-  const heading = useRef<HTMLHeadingElement>(null);
-  const active = useRef(false);
-  const generation = useRef(0);
-  const pending = useRef(false);
-  useEffect(() => { active.current = true; return () => { active.current = false; ++generation.current; }; }, []);
-  useEffect(() => { if (history) heading.current?.focus(); }, [history]);
+  const heading = useRef<HTMLHeadingElement>(null), alert = useRef<HTMLParagraphElement>(null);
+  const active = useRef(false), generation = useRef(0);
+  const pending = useRef<AbortController | null>(null), deadline = useRef<number | null>(null);
+  const unavailable = scope === 'account' ? 'Your account’s test order history could not be loaded. Refresh the list or sign in again.' : 'Available test order history could not be loaded. Refresh the list to try again.';
 
-  async function load(before: string | null = null) {
-    if (pending.current) return;
-    pending.current = true;
-    const current = ++generation.current;
-    setBusy(true); setHistory(null); setSelected(null); setMessage('');
+  function stopDeadline() { if (deadline.current !== null) window.clearTimeout(deadline.current); deadline.current = null; }
+  function clear() {
+    stopDeadline();
+    ++generation.current; pending.current?.abort(); pending.current = null;
+    setHistory(null); setAnchors([]); setSelected(null); setBusy(false); setMessage(''); setSignIn(false);
+  }
+  useEffect(() => {
+    active.current = true;
+    window.addEventListener('pagehide', clear);
+    return () => { active.current = false; stopDeadline(); ++generation.current; pending.current?.abort(); pending.current = null; window.removeEventListener('pagehide', clear); };
+  }, []);
+  useEffect(() => { if (history) heading.current?.focus(); else if (message) alert.current?.focus(); }, [history, message]);
+
+  async function load(direction: 'newest' | 'older' | 'newer' = 'newest') {
+    if (pending.current || signIn) return;
+    let nextAnchors: Array<string | null> = [null];
+    if (direction === 'older') {
+      if (!history?.nextCursor || anchors.includes(history.nextCursor)) return;
+      nextAnchors = [...anchors, history.nextCursor];
+    } else if (direction === 'newer') {
+      if (anchors.length < 2) return;
+      nextAnchors = anchors.slice(0, -1);
+    }
+    const current = ++generation.current, abort = new AbortController(); pending.current = abort;
+    setBusy(true); setHistory(null); setSelected(null); setMessage(''); setSignIn(false);
+    const ownsRequest = () => active.current && generation.current === current && pending.current === abort;
+    const fail = (reload: boolean) => {
+      setHistory(null); setAnchors([]); setSelected(null); setMessage(unavailable); setSignIn(reload);
+    };
+    const timer = window.setTimeout(() => {
+      if (!ownsRequest()) return;
+      deadline.current = null; abort.abort(); ++generation.current; pending.current = null; setBusy(false); fail(false);
+    }, 20_000);
+    deadline.current = timer;
     try {
-      const response = await fetch(`/orders/history${before === null ? '' : `?before=${encodeURIComponent(before)}`}`, {
-        credentials: 'same-origin', headers: { Accept: 'application/json' }, cache: 'no-store',
-      });
-      if (!active.current || generation.current !== current) return;
-      if (!response.ok) throw new Error('History unavailable');
-      const bytes = await response.text();
-      if (!active.current || generation.current !== current) return;
-      if (bytes.length > 64 * 1024) throw new Error('History too large');
-      const body: unknown = JSON.parse(bytes);
-      if (!record(body) || !keys(body, ['history']) || !validOrderHistory(body.history)) throw new Error('Invalid history');
-      setHistory(body.history);
-    } catch {
-      if (active.current && generation.current === current) setMessage(scope === 'account' ? 'Your account’s test order history could not be loaded. Refresh the list or sign in again.' : 'Available test order history could not be loaded. Refresh the list to try again.');
+      const result = await readOwnedOrderHistory(nextAnchors[nextAnchors.length - 1], abort.signal);
+      if (!ownsRequest() || abort.signal.aborted) return;
+      if (result.kind === 'loaded' && (result.history.nextCursor === null || !nextAnchors.includes(result.history.nextCursor))) {
+        setHistory(result.history); setAnchors(nextAnchors);
+      } else fail(result.kind === 'reload');
     } finally {
-      pending.current = false;
-      if (active.current && generation.current === current) setBusy(false);
+      if (deadline.current === timer && pending.current === abort) stopDeadline();
+      if (ownsRequest()) { pending.current = null; setBusy(false); }
     }
   }
 
   return <section aria-label={scope === 'account' ? 'Your account test orders' : 'Available test orders'} aria-busy={busy}>
-    <p className="fine-print">{scope === 'account' ? 'Browse test orders prepared while signed in to this account. Earlier guest orders and purchases from other accounts are not linked here.' : 'Lists orders available to your current session or signed-in test account. Guest orders are not linked when you sign in.'}</p>
-    <button type="button" className="button button-outline full-width" disabled={busy} onClick={() => void load()}>
+    <p className="fine-print">{scope === 'account' ? 'Browse test orders prepared with this account. Earlier guest orders appear only after explicitly saving them to this account; signing in alone does not link them.' : 'Lists orders available to your current session or signed-in test account. Guest orders are not linked when you sign in.'}</p>
+    <button type="button" className="button button-outline full-width" disabled={busy || signIn} onClick={() => void load()}>
       {busy ? `Loading ${label} orders…` : history || message ? `Refresh ${label} orders` : `Browse ${label} orders`}
     </button>
-    {message && <p role="alert">{message}</p>}
+    {message && <p role="alert" tabIndex={-1} ref={alert}>{message}{signIn && <a href="/account/sign-in">Open a fresh sign-in page</a>}</p>}
     {history && <>
       <h4 ref={heading} tabIndex={-1}>{scope === 'account' ? 'Account orders' : 'Available test orders'}</h4>
       {history.orders.length === 0 ? <p role="status">{scope === 'account' ? 'No test orders belong to this account.' : 'No test orders are available.'}</p>
-        : <><p className="fine-print">Newest orders first. Read-only summaries do not confirm that a download completed.</p>
-          {history.orders.map(order => <div className="quote-review-item" key={order.id}>
-            <p>Order {order.id}</p><p>Prepared {new Date(order.createdAt).toISOString()} · {formatMoney(order.totalMinor, order.currency)} {order.currency}</p>
-            <button type="button" className="button button-outline" aria-expanded={selected === order.id}
-              onClick={() => setSelected(selected === order.id ? null : order.id)}>View test order status {order.id}</button>
-            {selected === order.id && renderOrder(order)}
-          </div>)}</>}
-      {history.nextCursor !== null && <button type="button" className="button button-outline full-width" onClick={() => void load(history.nextCursor)}>Older {label} orders</button>}
+        : <><p className="fine-print">Newest orders first. First-item labels are from the original order; open its details to see every item. Read-only summaries do not confirm that a download completed.</p>
+          {history.orders.map((order, index) => {
+            const preview = history.previews[index];
+            return <div className="quote-review-item" key={order.id}>
+              <p className="fine-print">First original item · {preview.itemCount} {preview.itemCount === 1 ? 'item' : 'items'} in this order</p>
+              <h5>{preview.firstItem.title}</h5><p>{preview.firstItem.licenseName} · Version {preview.firstItem.licenseVersion}</p>
+              <p>Order {order.id}</p><p>Prepared {new Date(order.createdAt).toISOString()} · {formatMoney(order.totalMinor, order.currency)} {order.currency}</p>
+              <p>{retainedStatus(order)}</p>
+              <button type="button" className="button button-outline" aria-expanded={selected === order.id}
+                onClick={() => setSelected(selected === order.id ? null : order.id)}>View test order status {order.id}</button>
+              {selected === order.id && renderOrder(order)}
+            </div>;
+          })}</>}
+      {anchors.length > 1 && <>
+        <button type="button" className="button button-outline full-width" onClick={() => void load('newer')}>Newer {label} orders</button>
+        <button type="button" className="button button-outline full-width" onClick={() => void load('newest')}>Newest {label} orders</button>
+      </>}
+      {history.nextCursor !== null && <button type="button" className="button button-outline full-width" onClick={() => void load('older')}>Older {label} orders</button>}
     </>}
   </section>;
 }
