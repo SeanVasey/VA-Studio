@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CustomerPrivacy;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\InquiryPrivacy;
 use App\Http\Middleware\PrivateTrackReviewPrivacy;
@@ -37,14 +38,23 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(InquiryPrivacy::class);
         $middleware->prepend(PrivateTrackReviewPrivacy::class);
         $middleware->prepend(ResumableUploadPrivacy::class);
+        $middleware->prepend(CustomerPrivacy::class);
         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
         $middleware->web(append: [HandleInertiaRequests::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => ResumableUploadPrivacy::endpoint($request) || $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
+            fn (Request $request) => (CustomerPrivacy::matches($request) && $request->isMethod('POST')) || ResumableUploadPrivacy::endpoint($request) || $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
         );
         $exceptions->report(function (Throwable $exception) {
+            if (CustomerPrivacy::matches(request())) {
+                try {
+                    Log::error('Customer request failed.', ['exception_class' => $exception::class]);
+                } catch (Throwable) { /* Preserve the private response. */
+                }
+
+                return false;
+            }
             if (ResumableUploadPrivacy::matches(request())) {
                 try {
                     Log::error('Resumable upload failed.', ['exception_class' => $exception::class]);
@@ -108,6 +118,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // Middleware failures occur before the controller. Keep those private and
         // generic too, including in debug mode, without changing other routes.
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request): Response {
+            if (CustomerPrivacy::matches($request)) {
+                return $response->getStatusCode() >= 400 ? CustomerPrivacy::error($response->getStatusCode()) : CustomerPrivacy::protect($response);
+            }
             if (ResumableUploadPrivacy::matches($request)) {
                 $status = $exception instanceof ValidationException ? $exception->status : $response->getStatusCode();
 

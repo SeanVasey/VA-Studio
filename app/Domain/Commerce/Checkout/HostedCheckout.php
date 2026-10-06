@@ -13,6 +13,8 @@ use App\Domain\Commerce\Orders\ReadOrder;
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use App\Domain\Commerce\QuoteException;
 use App\Domain\Commerce\QuoteRequest;
+use App\Domain\Customers\CustomerAccess;
+use App\Domain\Customers\CustomerPrincipal;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
@@ -24,10 +26,14 @@ final class HostedCheckout
 {
     public function __construct(private CheckoutEvidence $evidence, private CheckoutPolicy $policy) {}
 
-    public function start(string $id, string $ownerKey, ?User $actor = null): array
+    public function start(string $id, string $ownerKey, ?User $actor = null, ?CustomerPrincipal $principal = null): array
     {
+        if ($principal) {
+            app(CustomerAccess::class)->current($principal);
+        }
         $order = $this->owned($id, $ownerKey);
-        $intent = DB::transaction(function () use ($order, $actor): CheckoutIntent {
+        $intent = DB::transaction(function () use ($order, $actor, $principal, $ownerKey): CheckoutIntent {
+            app(CustomerAccess::class)->lock($principal, $ownerKey, $actor);
             $actorId = app(CommerceAuditActor::class)->lock($actor);
             // A short order lock serializes one durable provider intent; never includes provider I/O.
             $locked = Order::whereKey($order->id)->lockForUpdate()->firstOrFail();
@@ -58,10 +64,16 @@ final class HostedCheckout
                 throw new QuoteException('CHECKOUT_EXPIRED', 410);
             }
 
+            app(CustomerAccess::class)->lock($principal, $ownerKey, $actor);
+
             return $intent;
         }, 5);
         if (! CheckoutSession::where('checkout_intent_id', $intent->id)->exists()) {
-            $this->dispatch($intent);
+            $this->dispatch($intent, false, null, $principal);
+        }
+
+        if ($principal) {
+            app(CustomerAccess::class)->current($principal);
         }
 
         return $this->projection($order, $intent);
@@ -74,12 +86,19 @@ final class HostedCheckout
         return $this->projection($order, CheckoutIntent::where('order_id', $order->id)->first());
     }
 
-    public function reconcile(string $id, string $ownerKey): array
+    public function reconcile(string $id, string $ownerKey, ?User $actor = null, ?CustomerPrincipal $principal = null): array
     {
+        if ($principal) {
+            DB::transaction(fn () => app(CustomerAccess::class)->lock($principal, $ownerKey, $actor));
+        }
         $order = $this->owned($id, $ownerKey);
         $intent = CheckoutIntent::where('order_id', $order->id)->first();
         if ($intent) {
-            $this->dispatch($intent, true);
+            $this->dispatch($intent, true, null, $principal);
+        }
+
+        if ($principal) {
+            app(CustomerAccess::class)->current($principal);
         }
 
         return $this->projection($order, $intent);
@@ -108,7 +127,7 @@ final class HostedCheckout
         return $order;
     }
 
-    private function dispatch(CheckoutIntent $intent, bool $refresh = false, ?string $candidate = null): void
+    private function dispatch(CheckoutIntent $intent, bool $refresh = false, ?string $candidate = null, ?CustomerPrincipal $principal = null): void
     {
         if (DB::transactionLevel() !== 0) {
             throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);
@@ -130,6 +149,9 @@ final class HostedCheckout
             throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);
         }
         $gateway = app(StripeCheckoutGateway::class);
+        if ($principal) {
+            app(CustomerAccess::class)->current($principal);
+        }
         try {
             $account = $gateway->account();
         } catch (\Throwable) {
@@ -142,6 +164,9 @@ final class HostedCheckout
         if (! $session && $candidate === null && $intent->retry_before->lessThanOrEqualTo(now())) {
             return;
         }
+        if ($principal) {
+            app(CustomerAccess::class)->current($principal);
+        }
         try {
             $raw = $session || $candidate !== null ? $gateway->retrieve($session?->provider_session_id ?? $candidate) :
                 $gateway->create($request['params'], $intent->idempotency_key);
@@ -153,7 +178,13 @@ final class HostedCheckout
             throw new QuoteException('CHECKOUT_CHANGED', 409);
         }
         $at = now()->toImmutable()->utc()->startOfSecond();
+        // An in-flight provider operation cannot be recalled by account withdrawal.
+        // Retain its verified observation through the existing system evidence path,
+        // then deny the customer projection if their access changed during I/O.
         DB::transaction(fn () => $this->recordObservation($intent, $request, $observed, $at), 5);
+        if ($principal) {
+            app(CustomerAccess::class)->current($principal);
+        }
     }
 
     /** Internal persistence only. Caller must hold its transaction and any required work fence. */

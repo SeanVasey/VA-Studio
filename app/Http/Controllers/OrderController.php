@@ -7,7 +7,7 @@ use App\Domain\Commerce\Orders\ReadOrder;
 use App\Domain\Commerce\Orders\ReadOwnedTestOrders;
 use App\Domain\Commerce\Orders\ReviewOrder;
 use App\Domain\Commerce\QuoteException;
-use App\Support\QuoteOwner;
+use App\Support\CommerceRequestIdentity;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use JsonException;
@@ -16,7 +16,7 @@ use Throwable;
 
 final class OrderController
 {
-    public function history(Request $request, QuoteOwner $owner, ReadOwnedTestOrders $read): JsonResponse
+    public function history(Request $request, CommerceRequestIdentity $owner, ReadOwnedTestOrders $read): JsonResponse
     {
         return $this->run(function () use ($request, $owner, $read): array {
             $raw = $request->server->get('QUERY_STRING', '');
@@ -30,12 +30,12 @@ final class OrderController
         });
     }
 
-    public function review(string $quote, Request $request, QuoteOwner $owner, ReviewOrder $review): JsonResponse
+    public function review(string $quote, Request $request, CommerceRequestIdentity $owner, ReviewOrder $review): JsonResponse
     {
-        return $this->run(fn () => ['review' => $review->handle($quote, $owner->forRequest($request), $request->user())]);
+        return $this->run(fn () => ['review' => $review->handle($quote, $owner->forRequest($request), $owner->actor($request), $owner->principal($request))]);
     }
 
-    public function store(Request $request, QuoteOwner $owner, PrepareOrder $prepare, ReadOrder $read): JsonResponse
+    public function store(Request $request, CommerceRequestIdentity $owner, PrepareOrder $prepare, ReadOrder $read): JsonResponse
     {
         return $this->run(function () use ($request, $owner, $prepare, $read): array {
             $body = $this->body($request);
@@ -44,16 +44,16 @@ final class OrderController
                 throw new QuoteException('INVALID_ORDER_REQUEST', 422);
             }
 
-            return ['order' => $read->present($prepare->handle($owner->forRequest($request), $key, $body, $request->user()))];
+            return ['order' => $read->present($prepare->handle($owner->forRequest($request), $key, $body, $owner->actor($request), $owner->principal($request)))];
         });
     }
 
-    public function status(string $order, Request $request, QuoteOwner $owner, ReadOrder $read): JsonResponse
+    public function status(string $order, Request $request, CommerceRequestIdentity $owner, ReadOrder $read): JsonResponse
     {
         return $this->run(fn () => ['order' => $read->handle($order, $owner->forRequest($request))]);
     }
 
-    public function forQuote(string $quote, Request $request, QuoteOwner $owner, ReadOrder $read): JsonResponse
+    public function forQuote(string $quote, Request $request, CommerceRequestIdentity $owner, ReadOrder $read): JsonResponse
     {
         return $this->run(fn () => ['order' => $read->forQuote($quote, $owner->forRequest($request))]);
     }

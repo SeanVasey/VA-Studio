@@ -10,7 +10,7 @@ use App\Domain\Commerce\PromotionPolicy;
 use App\Domain\Commerce\QuoteException;
 use App\Domain\Commerce\ReadQuote;
 use App\Domain\Commerce\ReadQuoteDisclosure;
-use App\Support\QuoteOwner;
+use App\Support\CommerceRequestIdentity;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use JsonException;
@@ -18,7 +18,7 @@ use stdClass;
 
 final class QuoteController
 {
-    public function store(Request $request, QuoteOwner $owner, CreateQuote $create): JsonResponse
+    public function store(Request $request, CommerceRequestIdentity $owner, CreateQuote $create): JsonResponse
     {
         $items = $this->items($request);
         $key = $request->header('Idempotency-Key');
@@ -27,13 +27,13 @@ final class QuoteController
         }
 
         try {
-            return $this->present($create->handle($owner->forRequest($request), $key, $items, $request->user()));
+            return $this->present($create->handle($owner->forRequest($request), $key, $items, $owner->actor($request), $owner->principal($request)));
         } catch (QuoteException $exception) {
             return $this->failure($exception);
         }
     }
 
-    public function show(string $quote, Request $request, QuoteOwner $owner, ReadQuote $read): JsonResponse
+    public function show(string $quote, Request $request, CommerceRequestIdentity $owner, ReadQuote $read): JsonResponse
     {
         try {
             return $this->present($read->handle($quote, $owner->forRequest($request)));
@@ -42,7 +42,7 @@ final class QuoteController
         }
     }
 
-    public function license(string $quote, string $revision, Request $request, QuoteOwner $owner, ReadQuoteDisclosure $read): JsonResponse
+    public function license(string $quote, string $revision, Request $request, CommerceRequestIdentity $owner, ReadQuoteDisclosure $read): JsonResponse
     {
         try {
             return $this->response($read->handle($quote, $owner->forRequest($request), $revision));
@@ -51,7 +51,7 @@ final class QuoteController
         }
     }
 
-    public function price(string $quote, Request $request, QuoteOwner $owner, PriceQuote $pricing): JsonResponse
+    public function price(string $quote, Request $request, CommerceRequestIdentity $owner, PriceQuote $pricing): JsonResponse
     {
         // This operation accepts an empty JSON object only. Configuration owns all calculations.
         try {
@@ -64,22 +64,22 @@ final class QuoteController
             return $this->failure(new QuoteException('INVALID_QUOTE_REQUEST', 422));
         }
         try {
-            return $this->response(['pricing' => app(PricingSnapshot::class)->present($pricing->create($quote, $owner->forRequest($request), $request->user()))]);
+            return $this->response(['pricing' => app(PricingSnapshot::class)->present($pricing->create($quote, $owner->forRequest($request), $owner->actor($request), $owner->principal($request)))]);
         } catch (QuoteException $exception) {
             return $this->failure($exception);
         }
     }
 
-    public function pricing(string $quote, Request $request, QuoteOwner $owner, PriceQuote $pricing): JsonResponse
+    public function pricing(string $quote, Request $request, CommerceRequestIdentity $owner, PriceQuote $pricing): JsonResponse
     {
         try {
-            return $this->response(['pricing' => app(PricingSnapshot::class)->present($pricing->read($quote, $owner->forRequest($request), $request->user()))]);
+            return $this->response(['pricing' => app(PricingSnapshot::class)->present($pricing->read($quote, $owner->forRequest($request), $owner->actor($request), $owner->principal($request)))]);
         } catch (QuoteException $exception) {
             return $this->failure($exception);
         }
     }
 
-    public function promotionPrice(string $quote, Request $request, QuoteOwner $owner, PriceQuote $pricing): JsonResponse
+    public function promotionPrice(string $quote, Request $request, CommerceRequestIdentity $owner, PriceQuote $pricing): JsonResponse
     {
         try {
             $body = $request->isJson() && $request->query->count() === 0 && strlen($request->getContent()) <= 1024
@@ -92,7 +92,7 @@ final class QuoteController
         }
         try {
             return $this->response(['pricing' => app(PricingSnapshot::class)->present(
-                $pricing->createWithPromotion($quote, $owner->forRequest($request), $body->promotionCode, $request->user()))]);
+                $pricing->createWithPromotion($quote, $owner->forRequest($request), $body->promotionCode, $owner->actor($request), $owner->principal($request)))]);
         } catch (QuoteException $exception) {
             return $this->failure($exception);
         }

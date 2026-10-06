@@ -38,6 +38,8 @@ return [
     */
 
     'guards' => [
+        // Customer authentication never authenticates the Filament web guard.
+        'customer' => ['driver' => 'session', 'provider' => 'users'],
         'web' => [
             'driver' => 'session',
             'provider' => 'users',

@@ -33,6 +33,13 @@ const env = {
   VASEY_BROWSER_DIRECTORY: directory, VASEY_BROWSER_PASSWORD: `Browser-${randomBytes(24).toString('hex')}`,
   // Synthetic inquiry setup belongs exclusively to this disposable loopback installation.
   CONTACT_INQUIRIES_ENABLED: 'true',
+  VASEY_TEST_CUSTOMER_ACCOUNTS_ENABLED: 'true',
+  // Read/issue exact retained synthetic originals; HTTP checkout/payment processing stay disabled above.
+  VASEY_TEST_DELIVERY_ACCESS_ENABLED: 'true',
+  VASEY_TEST_DELIVERY_ACCESS_POLICY: JSON.stringify({ schema_version: 1, purpose: 'test_owner_delivery', version: 'test-owner-delivery-v1',
+    scope: 'activated_order_owner', storage: 'private_local', verification: 'fresh_sha256', token_bytes: 32,
+    authorization_ttl_seconds: 60, new_authorizations_per_order60_seconds: 3, stream_attempts: 1,
+    ranges: 'disabled', pending_entitlements: 'preserve', buyer_identity: 'unverified_guest' }),
   CONTACT_INQUIRIES_PRIVACY_NOTICE: 'Synthetic browser privacy notice. Inquiries are saved privately for verification.',
   CONTACT_INQUIRIES_RETENTION_REFERENCE: 'SYNTHETIC-BROWSER-ONLY',
   CONTACT_INQUIRIES_OPERATOR_ID: '1',

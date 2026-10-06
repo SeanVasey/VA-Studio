@@ -13,6 +13,8 @@ use App\Domain\Commerce\QuoteRequest;
 use App\Domain\Commerce\QuoteSelection;
 use App\Domain\Commerce\ReadQuote;
 use App\Domain\Commerce\ReservePricedQuote;
+use App\Domain\Customers\CustomerAccess;
+use App\Domain\Customers\CustomerPrincipal;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
@@ -23,14 +25,15 @@ use SensitiveParameter;
 
 final class PrepareOrder
 {
-    public function handle(string $ownerKey, string $idempotencyKey, #[SensitiveParameter] array $request, ?User $actor = null): Order
+    public function handle(string $ownerKey, string $idempotencyKey, #[SensitiveParameter] array $request, ?User $actor = null, ?CustomerPrincipal $principal = null): Order
     {
         QuoteRequest::owner($ownerKey);
         QuoteRequest::key($idempotencyKey);
         $request = OrderRequest::normalize($request);
         $keyHash = hash('sha256', $idempotencyKey);
 
-        return DB::transaction(function () use ($ownerKey, $keyHash, $request, $actor) {
+        return DB::transaction(function () use ($ownerKey, $keyHash, $request, $actor, $principal) {
+            app(CustomerAccess::class)->lock($principal, $ownerKey, $actor);
             // Explicit customer identity precedes resource locks; null remains anonymous/system.
             $actorId = app(CommerceAuditActor::class)->lock($actor);
             // Owner mutex also serializes the same key targeting different quotes.
@@ -99,6 +102,8 @@ final class PrepareOrder
                 $quote->expires_at->lessThanOrEqualTo(now())) {
                 throw new QuoteException('INVENTORY_EXPIRED', 410);
             }
+
+            app(CustomerAccess::class)->lock($principal, $ownerKey, $actor);
 
             return $order;
         }, 5);
