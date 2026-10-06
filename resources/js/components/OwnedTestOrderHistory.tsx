@@ -8,18 +8,22 @@ const uuid = (value: unknown): value is string => typeof value === 'string' && v
 const record = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
 const keys = (value: Record<string, unknown>, expected: string[]) => Object.keys(value).length === expected.length && expected.every(key => Object.hasOwn(value, key));
 
+export function validOrderSummary(order: unknown): order is OrderSummary {
+  return record(order) && keys(order, ['id', 'createdAt', 'testOnly', 'payable', 'currency', 'totalMinor', 'status',
+    'paymentStatus', 'finalizationStatus', 'contractStatus', 'fulfillmentStatus'])
+    && uuid(order.id) && typeof order.createdAt === 'string' && Number.isFinite(Date.parse(order.createdAt))
+    && order.testOnly === true && order.payable === false && order.currency === 'USD'
+    && Number.isSafeInteger(order.totalMinor) && Number(order.totalMinor) >= 0 && validPaymentProgress(order as unknown as PaymentProgress)
+    && order.status === (order.finalizationStatus === 'paid' || order.finalizationStatus === 'paid_exception' ? order.finalizationStatus : 'prepared');
+}
+
 export function validOrderHistory(value: unknown): value is History {
   if (!record(value) || !keys(value, ['orderHistorySchema', 'testOnly', 'orders', 'limit', 'nextCursor'])
     || value.orderHistorySchema !== 1 || value.testOnly !== true || value.limit !== 20
     || !Array.isArray(value.orders) || value.orders.length > 20 || (value.nextCursor !== null && !uuid(value.nextCursor))) return false;
   const ids = new Set<string>();
   for (const order of value.orders) {
-    if (!record(order) || !keys(order, ['id', 'createdAt', 'testOnly', 'payable', 'currency', 'totalMinor', 'status',
-      'paymentStatus', 'finalizationStatus', 'contractStatus', 'fulfillmentStatus'])
-      || !uuid(order.id) || ids.has(order.id) || typeof order.createdAt !== 'string' || !Number.isFinite(Date.parse(order.createdAt))
-      || order.testOnly !== true || order.payable !== false || order.currency !== 'USD'
-      || !Number.isSafeInteger(order.totalMinor) || Number(order.totalMinor) < 0 || !validPaymentProgress(order as unknown as PaymentProgress)
-      || order.status !== (order.finalizationStatus === 'paid' || order.finalizationStatus === 'paid_exception' ? order.finalizationStatus : 'prepared')) return false;
+    if (!validOrderSummary(order) || ids.has(order.id)) return false;
     ids.add(order.id);
   }
   return value.nextCursor === null || (value.orders.length === 20 && value.nextCursor === value.orders[19].id);
