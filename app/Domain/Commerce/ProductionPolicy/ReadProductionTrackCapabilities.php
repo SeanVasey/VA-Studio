@@ -14,8 +14,9 @@ final class ReadProductionTrackCapabilities
     }
 
     /**
-     * Trusted preparation receives projection and captured primary reader.
-     * Optional terminal verifier must throw on drift and return void, using only
+     * Trusted preparation receives one projection argument in legacy mode;
+     * supplying a terminal verifier opts into the captured reader as a second
+     * preparation argument. The verifier must throw on drift and return void, using only
      * fixed primary reads/pure checks. No callbacks, writes, file or provider I/O.
      */
     public function withLockedForAdapter(ProductionTrackCapabilityCandidate $candidate, array $expectedContext, User $actor, Closure $prepare, ?Closure $finalPrimaryProof = null): mixed
