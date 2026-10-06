@@ -1,11 +1,11 @@
 import test, { after, before } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash, createHmac } from 'node:crypto';
-import { chmodSync, cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { chmodSync, cpSync, existsSync, linkSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
-import { acquireLease, initialize, isolatedEnvironment, launch, readWorkspace, requireFreePort, root } from '../dev/persistent-content.mjs';
+import { acquireLease, initialize, isolatedEnvironment, launch, origin, readWorkspace, requireFreePort, root } from '../dev/persistent-content.mjs';
 import { reviewedCheckout, upgradeWorkspace } from './persistent-content-upgrade.mjs';
 
 const sha = value => createHash('sha256').update(value).digest('hex');
@@ -98,6 +98,60 @@ function args(workspace, parent, target = additiveRelease) {
   return { sourceCheckout: oldRelease.checkout, sourceDirectory: workspace.directory, directory: join(parent, 'destination'), expectedSourceSha: oldRelease.commit, expectedTargetSha: target.commit, checkout: target.checkout, output: { write() {} } };
 }
 
+async function withServer(workspace, fn) {
+  const controller = new AbortController();
+  let announce;
+  let fail;
+  const ready = new Promise((resolveReady, reject) => { announce = resolveReady; fail = reject; });
+  let output = '';
+  const running = launch(workspace.directory, { checkout: workspace.checkout, signal: controller.signal, output: { write(value) { output += value; announce(); } } });
+  running.catch(fail);
+  const deadline = setTimeout(() => fail(new Error('Real upgraded HTTP startup did not complete.')), 20000);
+  try {
+    await ready;
+    assert.match(output, /Payments, customer enrollment, mail, media processing, workers and scheduler are disabled/);
+    assert.doesNotMatch(output, /base64:|password:|[a-f0-9]{64}/i);
+    await fn();
+  } finally { clearTimeout(deadline); controller.abort(); await running; }
+  await requireFreePort();
+}
+
+function attribute(value) {
+  const named = { quot: '"', apos: "'", amp: '&', lt: '<', gt: '>' };
+  return value.replace(/&(?:#(\d+)|#x([\da-f]+)|(quot|apos|amp|lt|gt));/gi,
+    (_match, decimal, hex, name) => name ? named[name.toLowerCase()] : String.fromCodePoint(Number.parseInt(decimal ?? hex, decimal ? 10 : 16)));
+}
+
+function client() {
+  const cookies = new Map();
+  async function visit(path, options = {}) {
+    const response = await fetch(new URL(path, origin), { ...options, redirect: 'manual', signal: AbortSignal.timeout(10000), headers: {
+      Cookie: [...cookies].map(([name, value]) => `${name}=${value}`).join('; '), ...options.headers,
+    } });
+    for (const raw of response.headers.getSetCookie()) {
+      const first = raw.split(';')[0]; const at = first.indexOf('='); cookies.set(first.slice(0, at), first.slice(at + 1));
+      if (first.startsWith('vasey_content_')) assert.match(raw, /HttpOnly/i);
+      assert.match(raw, /SameSite=strict/i);
+    }
+    return response;
+  }
+  return {
+    visit,
+    async signIn() {
+      const response = await visit('/admin/login'); assert.equal(response.status, 200); const html = await response.text();
+      const snapshot = [...html.matchAll(/wire:snapshot="([^\"]+)"/g)].map(match => attribute(match[1])).find(raw => JSON.parse(raw).memo.name.includes('Login'));
+      const token = html.match(/<meta name="csrf-token" content="([^\"]+)"/); const endpoint = html.match(/data-update-uri="([^\"]+)"/);
+      assert.ok(snapshot); assert.ok(token); assert.ok(endpoint);
+      const authenticated = await visit(attribute(endpoint[1]), { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-Livewire': '' }, body: JSON.stringify({ _token: attribute(token[1]), components: [{ snapshot, updates: {
+        'data.email': 'private-upgrade-operator@example.test', 'data.password': 'NonbindingPrivateUpgrade987654321',
+      }, calls: [{ path: '', method: 'authenticate', params: [] }] }] }) });
+      assert.equal(authenticated.status, 200); const result = await authenticated.json();
+      assert.deepEqual(JSON.parse(result.components[0].snapshot).memo.errors, []);
+      assert.equal(result.components[0].effects.redirect, `${origin}/admin`);
+    },
+  };
+}
+
 native('a reviewed additive copy upgrade preserves original bytes, every old cell, key, session and business sequence', async parent => {
   const source = await sourceWorkspace(parent); const before = bytes(source.directory);
   const rows = query(source, 'SELECT * FROM tracks'); const audits = query(source, 'SELECT * FROM audit_events ORDER BY id'); const sequences = query(source, 'SELECT name,seq FROM sqlite_sequence WHERE name <> \'migrations\' ORDER BY name');
@@ -123,7 +177,12 @@ native('a genuine crash-retained WAL and SHM are captured without opening or che
   const code = 'umask(0077);$pdo=new PDO("sqlite:".getenv("DB_DATABASE"));$pdo->exec("PRAGMA journal_mode=WAL");$pdo->exec("PRAGMA wal_autocheckpoint=0");$pdo->exec("INSERT INTO private_upgrade_binary_fixture (note) VALUES (\'WAL-ONLY-RETAINED\')");echo "WAL-READY\\n";fflush(STDOUT);fgets(STDIN);';
   const writer = spawn('php', ['-r', code], { cwd: source.checkout, env, stdio: ['pipe', 'pipe', 'ignore'] });
   try {
-    await new Promise((resolveReady, reject) => { writer.once('error', reject); writer.once('exit', () => reject(new Error('Native WAL fixture stopped early.'))); writer.stdout.on('data', data => { if (String(data).includes('WAL-READY')) resolveReady(); }); });
+    await new Promise((resolveReady, reject) => {
+      const deadline = setTimeout(() => reject(new Error('Native WAL fixture did not become ready.')), 10000);
+      const finish = error => { clearTimeout(deadline); error ? reject(error) : resolveReady(); };
+      writer.once('error', finish); writer.once('exit', () => finish(new Error('Native WAL fixture stopped early.')));
+      writer.stdout.on('data', data => { if (String(data).includes('WAL-READY')) finish(); });
+    });
     writer.kill('SIGKILL'); await new Promise(resolveExit => writer.once('exit', resolveExit));
     assert.ok(lstatSync(join(source.directory, 'database.sqlite-wal')).size > 0); assert.ok(existsSync(join(source.directory, 'database.sqlite-shm')));
     const before = bytes(source.directory); const input = args(source, parent);
@@ -133,6 +192,30 @@ native('a genuine crash-retained WAL and SHM are captured without opening or che
     assert.equal(proof.source_database_capture.find(file => file.path === 'database.sqlite-wal').sha256, before['database.sqlite-wal']);
     assert.equal(proof.source_database_capture.find(file => file.path === 'database.sqlite-shm').sha256, before['database.sqlite-shm']);
   } finally { if (writer.exitCode === null && writer.signalCode === null) writer.kill('SIGKILL'); }
+});
+
+native('real authenticated HTTP sessions survive copy upgrade and restart while private paths and checkout remain blocked', async parent => {
+  const source = await sourceWorkspace(parent); const browser = client();
+  await withServer(source, async () => {
+    await browser.signIn(); const tracks = await browser.visit('/admin/tracks'); assert.equal(tracks.status, 200);
+    assert.match(await tracks.text(), /NONBINDING private retained track/);
+  });
+  const before = bytes(source.directory); const input = args(source, parent); await upgradeWorkspace(input);
+  assert.deepEqual(bytes(source.directory), before);
+  const target = readWorkspace(input.directory, input.checkout); const identity = sha(readFileSync(join(target.directory, 'identity.json')));
+  for (let restart = 0; restart < 2; restart++) {
+    await withServer(target, async () => {
+      const tracks = await browser.visit('/admin/tracks'); assert.equal(tracks.status, 200);
+      assert.match(await tracks.text(), /NONBINDING private retained track/);
+      for (const path of ['/identity.json', '/database.sqlite', '/upgrade-plan.json', '/upgrade-baseline.json', '/upgrade-provenance.json', '/app/private/retained-fixture-source.bin', '/.env', '/vendor/autoload.php']) {
+        const blocked = await browser.visit(path); assert.equal(blocked.status, 404, path); await blocked.body?.cancel();
+      }
+      const checkout = await browser.visit('/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+      assert.equal(checkout.status, 404); await checkout.body?.cancel();
+    });
+    assert.equal(sha(readFileSync(join(target.directory, 'identity.json'))), identity);
+  }
+  assert.deepEqual(bytes(source.directory), before);
 });
 
 native('unchanged row counts do not hide a rewritten old value or timestamp; only the unavailable copy is affected', async parent => {
@@ -209,4 +292,20 @@ native('tracked-source mutation, ignored executable migration and retrospective 
   const ignored = release(parent, 'ignored'); writeFileSync(join(ignored.checkout, '.git/info/exclude'), '\ndatabase/migrations/2099_ignored.php\n');
   writeFileSync(join(ignored.checkout, 'database/migrations/2099_ignored.php'), '<?php throw new RuntimeException("Must never execute");');
   assert.throws(() => reviewedCheckout(ignored.checkout, ignored.commit));
+});
+
+native('source descendant links and an unsafe target ancestor refuse without copying or mutating private bytes', async parent => {
+  const source = await sourceWorkspace(parent); const input = args(source, parent); const before = bytes(source.directory);
+  const retained = join(source.directory, 'app/private/retained-fixture-source.bin');
+  const link = join(source.directory, 'app/private/linked-fixture-source.bin');
+  linkSync(retained, link);
+  await assert.rejects(upgradeWorkspace(input)); assert.equal(existsSync(input.directory), false);
+  rmSync(link); assert.deepEqual(bytes(source.directory), before);
+  symlinkSync(retained, link);
+  await assert.rejects(upgradeWorkspace(input)); assert.equal(existsSync(input.directory), false);
+  rmSync(link); assert.deepEqual(bytes(source.directory), before);
+  const unsafe = join(parent, 'unsafe'); mkdirSync(unsafe, { mode: 0o777 }); chmodSync(unsafe, 0o777);
+  const owned = join(unsafe, 'owned'); mkdirSync(owned, { mode: 0o700 });
+  await assert.rejects(upgradeWorkspace({ ...input, directory: join(owned, 'destination') }));
+  assert.equal(existsSync(join(owned, 'destination')), false); assert.deepEqual(bytes(source.directory), before);
 });
