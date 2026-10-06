@@ -206,11 +206,12 @@ native('real authenticated HTTP sessions survive copy upgrade and restart while 
   for (let restart = 0; restart < 2; restart++) {
     await withServer(target, async () => {
       const tracks = await browser.visit('/admin/tracks'); assert.equal(tracks.status, 200);
-      assert.match(await tracks.text(), /NONBINDING private retained track/);
+      const html = await tracks.text(); assert.match(html, /NONBINDING private retained track/);
       for (const path of ['/identity.json', '/database.sqlite', '/upgrade-plan.json', '/upgrade-baseline.json', '/upgrade-provenance.json', '/app/private/retained-fixture-source.bin', '/.env', '/vendor/autoload.php']) {
         const blocked = await browser.visit(path); assert.equal(blocked.status, 404, path); await blocked.body?.cancel();
       }
-      const checkout = await browser.visit('/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+      const token = html.match(/<meta name="csrf-token" content="([^\"]+)"/); assert.ok(token);
+      const checkout = await browser.visit('/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ _token: attribute(token[1]) }) });
       assert.equal(checkout.status, 404); await checkout.body?.cancel();
     });
     assert.equal(sha(readFileSync(join(target.directory, 'identity.json'))), identity);
@@ -292,6 +293,20 @@ native('tracked-source mutation, ignored executable migration and retrospective 
   const ignored = release(parent, 'ignored'); writeFileSync(join(ignored.checkout, '.git/info/exclude'), '\ndatabase/migrations/2099_ignored.php\n');
   writeFileSync(join(ignored.checkout, 'database/migrations/2099_ignored.php'), '<?php throw new RuntimeException("Must never execute");');
   assert.throws(() => reviewedCheckout(ignored.checkout, ignored.commit));
+});
+
+native('Git replacement refs and executable-mode drift cannot redefine an exact reviewed checkout', async parent => {
+  const modified = release(parent, 'replaced');
+  const original = modified.commit;
+  writeFileSync(join(modified.checkout, 'README.md'), readFileSync(join(modified.checkout, 'README.md'), 'utf8') + '\nNONBINDING replacement tree mutation\n');
+  git(modified.checkout, ['add', 'README.md']); git(modified.checkout, ['-c', 'user.name=Private Upgrade Fixture', '-c', 'user.email=private-upgrade-fixture@example.test', 'commit', '-q', '-m', 'Nonbinding replacement tree']);
+  const replacement = git(modified.checkout, ['rev-parse', 'HEAD']);
+  git(modified.checkout, ['replace', original, replacement]);
+  git(modified.checkout, ['update-ref', 'HEAD', original]);
+  assert.equal(git(modified.checkout, ['rev-parse', 'HEAD']), original);
+  assert.throws(() => reviewedCheckout(modified.checkout, original));
+  const mode = release(parent, 'mode'); chmodSync(join(mode.checkout, 'app/Models/User.php'), 0o755);
+  assert.throws(() => reviewedCheckout(mode.checkout, mode.commit));
 });
 
 native('source descendant links and an unsafe target ancestor refuse without copying or mutating private bytes', async parent => {

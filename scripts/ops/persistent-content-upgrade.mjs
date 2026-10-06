@@ -15,9 +15,9 @@ function hash(value) { return createHash('sha256').update(value).digest('hex'); 
 function owned(stat) { return typeof process.getuid === 'function' && stat.uid === process.getuid(); }
 
 function git(checkout, args) {
-  return execFileSync('git', ['-c', 'core.fsmonitor=false', '--no-pager', ...args], {
+  return execFileSync('git', ['--no-replace-objects', '-c', 'core.fsmonitor=false', '--no-pager', ...args], {
     cwd: checkout, encoding: 'utf8', maxBuffer: 16 * 1024 ** 2,
-    env: { PATH: process.env.PATH, GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null', TZ: 'UTC' },
+    env: { PATH: process.env.PATH, GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null', GIT_NO_REPLACE_OBJECTS: '1', TZ: 'UTC' },
     stdio: ['ignore', 'pipe', 'ignore'],
   });
 }
@@ -34,7 +34,7 @@ export function reviewedCheckout(checkout, expectedSha) {
     const path = join(checkout, match[3]);
     canonicalPath(path);
     const stat = lstatSync(path);
-    requireSafe(stat.isFile() && stat.size <= 32 * 1024 ** 2);
+    requireSafe(stat.isFile() && stat.nlink === 1 && stat.size <= 32 * 1024 ** 2 && ((stat.mode & 0o111) !== 0) === (match[1] === '100755'));
     const data = readFileSync(path);
     requireSafe(createHash('sha1').update(`blob ${data.length}\0`).update(data).digest('hex') === match[2]);
     tracked.add(match[3]);

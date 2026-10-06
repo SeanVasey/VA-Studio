@@ -171,7 +171,7 @@ final class PrivateCopyUpgrade
 
     private static function columns(PDO $database, string $table): array
     {
-        return $database->query('PRAGMA table_info('.self::identifier($table).')')->fetchAll(PDO::FETCH_ASSOC);
+        return $database->query('PRAGMA table_xinfo('.self::identifier($table).')')->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public static function snapshot(): void
@@ -184,13 +184,14 @@ final class PrivateCopyUpgrade
         $tables = [];
         foreach ($database->query("SELECT name FROM sqlite_schema WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")->fetchAll(PDO::FETCH_COLUMN) as $name) {
             $columns = self::columns($database, $name);
-            $tables[] = ['name' => $name, 'columns' => $columns, 'rows' => self::rows($database, $name, array_column($columns, 'name'), $name === 'migrations' ? $maximum : null)];
+            $tables[] = ['name' => $name, 'columns' => $columns, 'foreign_keys' => $database->query('PRAGMA foreign_key_list('.self::identifier($name).')')->fetchAll(PDO::FETCH_ASSOC),
+                'rows' => self::rows($database, $name, array_column($columns, 'name'), $name === 'migrations' ? $maximum : null)];
         }
         $baseline = [
             'schema_version' => 1, 'operation_id' => $plan['operation_id'], 'tables' => $tables,
             'migrations' => $migrations, 'maximum_migration_id' => $maximum,
             'sequences' => $database->query('SELECT name,seq FROM sqlite_sequence ORDER BY name')->fetchAll(PDO::FETCH_ASSOC),
-            'guards' => $database->query("SELECT type,name,tbl_name,sql FROM sqlite_schema WHERE type IN ('trigger','index') ORDER BY type,name")->fetchAll(PDO::FETCH_ASSOC),
+            'guards' => $database->query("SELECT type,name,tbl_name,sql FROM sqlite_schema WHERE type IN ('trigger','index','view') ORDER BY type,name")->fetchAll(PDO::FETCH_ASSOC),
         ];
         self::require(! file_exists($directory.'/upgrade-baseline.json'));
         self::require(file_put_contents($directory.'/upgrade-baseline.json', json_encode($baseline, JSON_THROW_ON_ERROR), LOCK_EX) !== false);
@@ -248,6 +249,7 @@ final class PrivateCopyUpgrade
         foreach ($baseline['tables'] as $table) {
             $columns = self::columns($database, $table['name']);
             self::require(array_slice($columns, 0, count($table['columns'])) === $table['columns']);
+            self::require($database->query('PRAGMA foreign_key_list('.self::identifier($table['name']).')')->fetchAll(PDO::FETCH_ASSOC) === $table['foreign_keys']);
             self::require(self::rows($database, $table['name'], array_column($table['columns'], 'name'), $table['name'] === 'migrations' ? $baseline['maximum_migration_id'] : null) === $table['rows']);
         }
         $migrations = $database->query('SELECT id,migration,batch FROM migrations ORDER BY id')->fetchAll(PDO::FETCH_ASSOC);
@@ -264,7 +266,7 @@ final class PrivateCopyUpgrade
             }
             self::require(in_array($expected, $sequences, true));
         }
-        $guards = $database->query("SELECT type,name,tbl_name,sql FROM sqlite_schema WHERE type IN ('trigger','index') ORDER BY type,name")->fetchAll(PDO::FETCH_ASSOC);
+        $guards = $database->query("SELECT type,name,tbl_name,sql FROM sqlite_schema WHERE type IN ('trigger','index','view') ORDER BY type,name")->fetchAll(PDO::FETCH_ASSOC);
         foreach ($baseline['guards'] as $guard) {
             self::require(in_array($guard, $guards, true));
         }
@@ -282,7 +284,7 @@ final class PrivateCopyUpgrade
             if (is_dir($file)) {
                 self::copyBuild($file, $target.'/'.$name);
             } else {
-                self::require(is_file($file) && copy($file, $target.'/'.$name) && chmod($target.'/'.$name, 0600));
+                self::require(is_file($file) && lstat($file)['nlink'] === 1 && copy($file, $target.'/'.$name) && chmod($target.'/'.$name, 0600));
             }
         }
     }
