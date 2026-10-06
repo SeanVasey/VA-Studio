@@ -29,7 +29,9 @@ class SoundKitMigrationTest extends TestCase
 
     private function clearEmpty(): void
     {
-        foreach (['sound_kit_revisions', 'sound_kit_drafts'] as $table) {
+        // Disposable fixture reset: remove the transport child before its retained kit parents.
+        // Operational rollback still retains these tables and is exercised separately below.
+        foreach (['sound_kit_upload_sessions', 'sound_kit_revisions', 'sound_kit_drafts'] as $table) {
             $this->assertSame(0, DB::table($table)->count());
             Schema::drop($table);
         }
