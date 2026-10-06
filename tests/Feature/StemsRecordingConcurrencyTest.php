@@ -5,11 +5,11 @@ namespace Tests\Feature;
 use App\Domain\Media\Models\StemsRecording;
 use App\Support\Audit\AuditEvent;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\Process;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\RecordingFixtures;
 use Illuminate\Support\Facades\Storage;
@@ -17,7 +17,7 @@ use Tests\TestCase;
 
 class StemsRecordingConcurrencyTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     protected function beforeRefreshingDatabase(): void
     {

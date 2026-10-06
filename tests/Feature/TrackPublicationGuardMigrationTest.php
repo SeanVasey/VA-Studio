@@ -6,16 +6,16 @@ use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\SaveTrackMetadata;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use LogicException;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\TestCase;
 
 class TrackPublicationGuardMigrationTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     private const GUARDS = ['tracks_publication_version_insert', 'tracks_publication_version_update'];
 

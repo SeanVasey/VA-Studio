@@ -21,7 +21,6 @@ use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -29,6 +28,7 @@ use Illuminate\Validation\ValidationException;
 use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\ExclusiveSelectionFixtures;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\MediaFixtures;
@@ -38,7 +38,7 @@ use Tests\TestCase;
 
 class TrackPublicationApplyTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     protected function setUp(): void
     {

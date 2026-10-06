@@ -6,15 +6,15 @@ use App\Domain\Commerce\CreateQuote;
 use App\Domain\Commerce\PriceQuote;
 use App\Domain\Commerce\PricingSnapshot;
 use App\Support\CanonicalJson;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Str;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\PromotionFixtures;
 use Tests\Support\QuoteFixtures;
 use Tests\TestCase;
 
 class PromotionMigrationTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     public function test_empty_new_tables_can_roundtrip_without_rewriting_earlier_quote_or_pricing_evidence(): void
     {

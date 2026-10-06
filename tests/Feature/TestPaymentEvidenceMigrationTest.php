@@ -10,20 +10,20 @@ use App\Domain\Commerce\Models\StripeWebhookReceipt;
 use App\Domain\Commerce\Models\VerifiedPayment;
 use App\Support\CanonicalJson;
 use Illuminate\Database\QueryException;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\CheckoutFixtures as F;
 use Tests\TestCase;
 
 /** Synthetic storage fixtures prove database guards, not successful provider payment. */
 class TestPaymentEvidenceMigrationTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     protected function setUp(): void
     {

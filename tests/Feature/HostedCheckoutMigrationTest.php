@@ -10,13 +10,13 @@ use App\Domain\Commerce\Orders\PrepareOrder;
 use App\Domain\Commerce\Orders\ReadOrder;
 use App\Support\CanonicalJson;
 use Illuminate\Database\QueryException;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InventoryFixtures;
 use Tests\Support\OrderFixtures as F;
 use Tests\TestCase;
@@ -24,7 +24,7 @@ use Tests\TestCase;
 /** Schema fixtures are synthetic evidence only; no provider adapter or network call is used. */
 class HostedCheckoutMigrationTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     protected function setUp(): void
     {

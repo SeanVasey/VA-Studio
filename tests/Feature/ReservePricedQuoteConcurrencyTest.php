@@ -7,10 +7,10 @@ use App\Domain\Commerce\Models\PromotionUse;
 use App\Domain\Commerce\Models\PromotionCampaign;
 use App\Support\CanonicalJson;
 use App\Domain\Commerce\ReservePricedQuote;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InventoryFixtures as F;
 use Tests\Support\InventoryRace;
 use Tests\Support\PromotionFixtures;
@@ -18,7 +18,7 @@ use Tests\TestCase;
 
 class ReservePricedQuoteConcurrencyTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     protected function beforeRefreshingDatabase(): void
     {

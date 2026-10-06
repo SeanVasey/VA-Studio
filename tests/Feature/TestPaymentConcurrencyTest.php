@@ -7,16 +7,16 @@ use App\Domain\Commerce\Models\StripeReceiptWork;
 use App\Domain\Commerce\Models\VerifiedPayment;
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use App\Domain\Commerce\Payments\StripePaymentGateway;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\PaymentFixtures as F;
 use Tests\Support\PaymentRace;
 use Tests\TestCase;
 
 class TestPaymentConcurrencyTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     protected function beforeRefreshingDatabase(): void
     {

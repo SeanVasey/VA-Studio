@@ -5,15 +5,15 @@ namespace Tests\Feature;
 use App\Domain\Commerce\CreateQuote;
 use App\Domain\Commerce\PriceQuote;
 use App\Support\CanonicalJson;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Schema;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\PricingFixtures;
 use Tests\Support\QuoteFixtures;
 use Tests\TestCase;
 
 class QuotePricingMigrationTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     public function test_additive_migration_roundtrip_keeps_existing_quote_evidence(): void
     {

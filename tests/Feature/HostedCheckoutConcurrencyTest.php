@@ -9,9 +9,9 @@ use App\Domain\Commerce\Models\CheckoutSession;
 use App\Domain\Commerce\Models\InventoryReservation;
 use App\Domain\Commerce\Models\Order;
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\CheckoutFixtures as F;
 use Tests\Support\CheckoutRace;
 use Tests\Support\InventoryFixtures;
@@ -19,7 +19,7 @@ use Tests\TestCase;
 
 class HostedCheckoutConcurrencyTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     protected function beforeRefreshingDatabase(): void
     {

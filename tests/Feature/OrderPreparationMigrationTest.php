@@ -5,17 +5,17 @@ namespace Tests\Feature;
 use App\Domain\Commerce\Orders\PrepareOrder;
 use App\Domain\Commerce\ReservePricedQuote;
 use Illuminate\Database\QueryException;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InventoryFixtures;
 use Tests\Support\OrderFixtures as F;
 use Tests\TestCase;
 
 class OrderPreparationMigrationTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     public function test_empty_order_tables_roundtrip_without_changing_existing_pending_inventory_and_pricing(): void
     {
