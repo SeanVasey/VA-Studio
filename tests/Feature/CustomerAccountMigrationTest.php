@@ -15,6 +15,13 @@ class CustomerAccountMigrationTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Roll back the empty additive child before exercising the retained account parent.
+        (require database_path('migrations/2026_10_06_000045_customer_identity_challenges.php'))->down();
+    }
+
     public function test_every_unique_identity_collision_refuses_replace_even_without_recursive_delete_triggers(): void
     {
         $f = F::account();
