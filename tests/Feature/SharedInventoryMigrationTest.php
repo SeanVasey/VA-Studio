@@ -34,6 +34,11 @@ class SharedInventoryMigrationTest extends TestCase
         $refundResolution = require database_path('migrations/2026_10_06_000047_test_refund_resolutions.php');
         $orderInquiries = require database_path('migrations/2026_10_06_000049_inquiry_order_contexts.php');
         $orderInquiries->down();
+        // Remove the empty additive notification child before its retained parents.
+        $notices = require database_path('migrations/2026_10_06_231000_test_transactional_notifications.php');
+        $this->assertDatabaseCount('transactional_notices', 0);
+        $this->assertDatabaseCount('transactional_notice_attempts', 0);
+        $notices->down();
         $purchaseClaims->down();
         $refundResolution->down();
         $unpaidRelease->down();
@@ -53,6 +58,7 @@ class SharedInventoryMigrationTest extends TestCase
         $unpaidRelease->up();
         $refundResolution->up();
         $purchaseClaims->up();
+        $notices->up();
         $orderInquiries->up();
         foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }
         $this->assertSame($priorHash, $prior->refresh()->snapshot_hash);

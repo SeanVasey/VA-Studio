@@ -19,6 +19,14 @@ class CustomerAccountMigrationTest extends TestCase
     {
         parent::setUp();
         // Roll back the empty additive child before exercising the retained account parent.
+        $this->assertDatabaseCount('transactional_notices', 0);
+        $this->assertDatabaseCount('transactional_notice_attempts', 0);
+        (require database_path('migrations/2026_10_06_231000_test_transactional_notifications.php'))->down();
+        $this->assertDatabaseCount('membership_credit_buckets', 0);
+        $this->assertDatabaseCount('membership_credit_events', 0);
+        $this->assertDatabaseCount('membership_plans', 0);
+        $this->assertDatabaseCount('membership_plan_versions', 0);
+        (require database_path('migrations/2026_10_06_230000_membership_credit_foundation.php'))->down();
         (require database_path('migrations/2026_10_06_000048_customer_purchase_claims.php'))->down();
         (require database_path('migrations/2026_10_06_000045_customer_identity_challenges.php'))->down();
     }

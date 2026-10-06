@@ -1,0 +1,687 @@
+{
+  "schema_version": 1,
+  "purpose": "exact-tree-ordered-parent-publication",
+  "repository": "SeanVasey/VA-Studio",
+  "baseline": {
+    "local_commit": "e24d6e5251adc49d58c5dc01a958053fac86e573",
+    "native_commit": "4d39a7d02f9094085f9a74610ebdc42b42e8a059",
+    "tree": "41aa7cd6c0813966a04b6c15bf679014c8f679e7"
+  },
+  "tested_local_commit": "05c304a00977397f1f5d58c94afeec754975b694",
+  "tested_native_commit": "3e06f64e4b044dd1ea70aa06b208c81933254858",
+  "tested_tree": "030426558b8779db0b399be4d8c54e023171cdbe",
+  "published_commit_count": 46,
+  "publication_checks": {
+    "every_created_tree_matches_local_git_tree": true,
+    "every_commit_created_with_recorded_ordered_native_parents": true,
+    "native_readbacks_verified_for_composition_and_seven_reviewed_components": true,
+    "main_ref_unchanged_at_source_publication": true,
+    "branch_or_pr_created_at_this_checkpoint": false
+  },
+  "commits": [
+    {
+      "local_commit": "6f86b5b0f035d7fbf4f13f9deb067d5dc1f9b68f",
+      "native_commit": "b05134ad732b3db57400cb32bbd505bd6fbead13",
+      "tree": "af7829fed0b808063f7b1c33a0ff7b37f2420ac1",
+      "ordered_local_parents": [
+        "15862fa4f035dd1c8459e94fa96de06d69a7b314"
+      ],
+      "ordered_native_parents": [
+        "f215f77fa1bb36e47e1b792510a8b7104bbaccc1"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "b0be39fd9c10fd5470b94adec32cf809ebc86bbd",
+      "native_commit": "6aec99dbe686ed11135a3a5a1eeec4013e9598bc",
+      "tree": "009bf54fc48ba94aa487669360d36848fe56ae32",
+      "ordered_local_parents": [
+        "6f86b5b0f035d7fbf4f13f9deb067d5dc1f9b68f"
+      ],
+      "ordered_native_parents": [
+        "b05134ad732b3db57400cb32bbd505bd6fbead13"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "de34f8b92122a12c15853f57849af858d4ca8bdc",
+      "native_commit": "fa8f7bbd4b88c62017d11831f03b19fa582efda8",
+      "tree": "d5967ece51407031f5b93c5fa9596a9c468b646e",
+      "ordered_local_parents": [
+        "b0be39fd9c10fd5470b94adec32cf809ebc86bbd"
+      ],
+      "ordered_native_parents": [
+        "6aec99dbe686ed11135a3a5a1eeec4013e9598bc"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "39c1b9231ba3bc4b5ad518e87f7cf0efb937abc6",
+      "native_commit": "d9aa2ada176068af4e7cea29c68de5489511a13a",
+      "tree": "a306375639a71ecd424b04eddec43c92ea1bacfc",
+      "ordered_local_parents": [
+        "de34f8b92122a12c15853f57849af858d4ca8bdc"
+      ],
+      "ordered_native_parents": [
+        "fa8f7bbd4b88c62017d11831f03b19fa582efda8"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "d96852c0b3d0686eb364e11f3f3fc162b92ba3db",
+      "native_commit": "dcb7e445c66f5b13e71b36a0f4f19cc8592f2196",
+      "tree": "588607c8f51648eb83a79bcd309cf5e27a6b59e3",
+      "ordered_local_parents": [
+        "39c1b9231ba3bc4b5ad518e87f7cf0efb937abc6"
+      ],
+      "ordered_native_parents": [
+        "d9aa2ada176068af4e7cea29c68de5489511a13a"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "1f9a352abb2bf9c24207081ce15225bfc01af909",
+      "native_commit": "4a6a3e7c8cf978dac28d96d815ef044757bb1432",
+      "tree": "6b9121b90c70005155cf503d495c6e608c1a8696",
+      "ordered_local_parents": [
+        "d96852c0b3d0686eb364e11f3f3fc162b92ba3db"
+      ],
+      "ordered_native_parents": [
+        "dcb7e445c66f5b13e71b36a0f4f19cc8592f2196"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "8cca86129c320f562f10b991be4ab6af4307ad28",
+      "native_commit": "5c7421b58c1c7ed6cf9755502d4fabb8f019cd2d",
+      "tree": "93ea17e9fd77dff02b38a7b851c65bfe5534d600",
+      "ordered_local_parents": [
+        "1f9a352abb2bf9c24207081ce15225bfc01af909"
+      ],
+      "ordered_native_parents": [
+        "4a6a3e7c8cf978dac28d96d815ef044757bb1432"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "960458ea04d6778a397c57b5823e6bfbf0ffdb2a",
+      "native_commit": "4200e6b4fa14b675c91dff646bc4d5db4aab1655",
+      "tree": "dad49535e399de47d2cb5993599fa26452b12282",
+      "ordered_local_parents": [
+        "8cca86129c320f562f10b991be4ab6af4307ad28"
+      ],
+      "ordered_native_parents": [
+        "5c7421b58c1c7ed6cf9755502d4fabb8f019cd2d"
+      ],
+      "native_readback_verified": true
+    },
+    {
+      "local_commit": "d3ac4b79c5c841288094cbd4debc15318545da35",
+      "native_commit": "118e69f33cefafb486ca84186663d230e3477167",
+      "tree": "8505cad82dc45de86f0983e9b4e35f25fe263de6",
+      "ordered_local_parents": [
+        "e24d6e5251adc49d58c5dc01a958053fac86e573",
+        "960458ea04d6778a397c57b5823e6bfbf0ffdb2a"
+      ],
+      "ordered_native_parents": [
+        "4d39a7d02f9094085f9a74610ebdc42b42e8a059",
+        "4200e6b4fa14b675c91dff646bc4d5db4aab1655"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "ac1c914b35dcde9e68f4b5c0e089bda5220b5bc5",
+      "native_commit": "66ef60790031b662600c7c479c0c2c0470581604",
+      "tree": "fdd5dadbb8d631ba62e9d6ba41ff65f686599c8c",
+      "ordered_local_parents": [
+        "e236f0a0db3679dbf8891d15ff312763bfbfe013"
+      ],
+      "ordered_native_parents": [
+        "883307a877ee48fb30269bbeb2a74cd3ac04feed"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "18365c56d1854aea6bf7b09d2df5cc1695012d66",
+      "native_commit": "e8be5e4249c742f3c9e281cf832e995f6c7eed6b",
+      "tree": "d314e3401d075b31b8241ee482285def834429b2",
+      "ordered_local_parents": [
+        "ac1c914b35dcde9e68f4b5c0e089bda5220b5bc5"
+      ],
+      "ordered_native_parents": [
+        "66ef60790031b662600c7c479c0c2c0470581604"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "a631ebf39cda25736e313c1e4be3422219a9a8c7",
+      "native_commit": "474acee5e56e34cd143fb69ae79a04a84a8dccc3",
+      "tree": "1bb0de36847ec152688cce5d3e60941a3a96f27b",
+      "ordered_local_parents": [
+        "18365c56d1854aea6bf7b09d2df5cc1695012d66"
+      ],
+      "ordered_native_parents": [
+        "e8be5e4249c742f3c9e281cf832e995f6c7eed6b"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "cd3ee3e90d566f427b901b3b737efcbccff58211",
+      "native_commit": "6a56178e372bf574de0873a489fd4c16a656d78e",
+      "tree": "e4b68769311832c35f0bc71f582eb620345c87d9",
+      "ordered_local_parents": [
+        "a631ebf39cda25736e313c1e4be3422219a9a8c7"
+      ],
+      "ordered_native_parents": [
+        "474acee5e56e34cd143fb69ae79a04a84a8dccc3"
+      ],
+      "native_readback_verified": true
+    },
+    {
+      "local_commit": "0f89340a862be405d97e27e1593f9f78b44dd1e6",
+      "native_commit": "c65e3609f8e04b9d9ffc5ad450e40e036a959dac",
+      "tree": "ac7bf9ea2ebf3aaab1ff9472201790eca8686ede",
+      "ordered_local_parents": [
+        "d3ac4b79c5c841288094cbd4debc15318545da35",
+        "cd3ee3e90d566f427b901b3b737efcbccff58211"
+      ],
+      "ordered_native_parents": [
+        "118e69f33cefafb486ca84186663d230e3477167",
+        "6a56178e372bf574de0873a489fd4c16a656d78e"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "28d2e2f82b834ba88e906e015ed5df96757a912d",
+      "native_commit": "2f9561a92e01e0fb1f0ef82265f08871e087335f",
+      "tree": "e150f4753101328181b2ffb129ef4822e4ec13de",
+      "ordered_local_parents": [
+        "70d0317b5e414bd34071bcc19077e11375661b8f"
+      ],
+      "ordered_native_parents": [
+        "97e952b9e23cde88e4d4d0b753cb9747b67638b5"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "33cbe284ac37cecd9c9d8418519657407e8cb5fe",
+      "native_commit": "fb4dc2563c0fd0d68556664b2a1a0db78f64b29f",
+      "tree": "4241267e0f2156b5cb45f41a5d5957d5ed538763",
+      "ordered_local_parents": [
+        "28d2e2f82b834ba88e906e015ed5df96757a912d"
+      ],
+      "ordered_native_parents": [
+        "2f9561a92e01e0fb1f0ef82265f08871e087335f"
+      ],
+      "native_readback_verified": true
+    },
+    {
+      "local_commit": "a692c9efb1237f310cc3569eeed8560dad7edfee",
+      "native_commit": "726b5d081e38804bb2be1fd63587901b3538f407",
+      "tree": "d7f63b7558744824962ce761644212965075a901",
+      "ordered_local_parents": [
+        "0f89340a862be405d97e27e1593f9f78b44dd1e6",
+        "33cbe284ac37cecd9c9d8418519657407e8cb5fe"
+      ],
+      "ordered_native_parents": [
+        "c65e3609f8e04b9d9ffc5ad450e40e036a959dac",
+        "fb4dc2563c0fd0d68556664b2a1a0db78f64b29f"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "777225ea91398f54fd8dc197bc3d358dd6f68f30",
+      "native_commit": "4769cc00ed322ab4a24dde2d53dcd53634b928a2",
+      "tree": "7f433b475c23ffbcad3b536ab68120f3d4361806",
+      "ordered_local_parents": [
+        "72fc6d7fca9e8ed22e969bd9269ba775a02a48e6"
+      ],
+      "ordered_native_parents": [
+        "13d7474f2f843084f7c7ab94b4e5e8105d08bbce"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "03155268e5a2dc5216c651859437753803a6f52c",
+      "native_commit": "9292febd30e67bd16ff1cb0c437d92a826e7960e",
+      "tree": "cb71c27217976ebb57f1512760a9a8995c7b370c",
+      "ordered_local_parents": [
+        "777225ea91398f54fd8dc197bc3d358dd6f68f30"
+      ],
+      "ordered_native_parents": [
+        "4769cc00ed322ab4a24dde2d53dcd53634b928a2"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "779ffbce1bc61bfdd4c7401c9674aafe247fb2af",
+      "native_commit": "2fb572d2a8542492867fb17ebd4f6e0f7a34f950",
+      "tree": "7cbb2bae6c1f2aad18bc1e102c01db8c15fbc7de",
+      "ordered_local_parents": [
+        "03155268e5a2dc5216c651859437753803a6f52c"
+      ],
+      "ordered_native_parents": [
+        "9292febd30e67bd16ff1cb0c437d92a826e7960e"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "f4c54f61985fca73a30789927b6b5c49305cafe4",
+      "native_commit": "65ae25a8e1566095590cac5e7c38cd31b723ca75",
+      "tree": "56fd13807c31502a9feabe890a2793228335df15",
+      "ordered_local_parents": [
+        "779ffbce1bc61bfdd4c7401c9674aafe247fb2af"
+      ],
+      "ordered_native_parents": [
+        "2fb572d2a8542492867fb17ebd4f6e0f7a34f950"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "8701a275ab40dc74b1c6aaeb2f2c14dceda0e185",
+      "native_commit": "f0ce1f1549e9cbeb050a5aa271780aba07aecfde",
+      "tree": "c3d00814bc22c004c41503b144a9a04e366b0046",
+      "ordered_local_parents": [
+        "f4c54f61985fca73a30789927b6b5c49305cafe4"
+      ],
+      "ordered_native_parents": [
+        "65ae25a8e1566095590cac5e7c38cd31b723ca75"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "558244b000669bb3662754cdeb24d882defbf904",
+      "native_commit": "d23bed5cce090ac8f64e8d8fbb105d1387440e82",
+      "tree": "4e22713896237dfdaa5583b46b942ef4652e973a",
+      "ordered_local_parents": [
+        "8701a275ab40dc74b1c6aaeb2f2c14dceda0e185"
+      ],
+      "ordered_native_parents": [
+        "f0ce1f1549e9cbeb050a5aa271780aba07aecfde"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "4c0af1abdeca6c9c773c58fc92d26d1469204dde",
+      "native_commit": "98bd3205f8ffe70f98416dec9bd5d1be05b0eb08",
+      "tree": "5480a8489733b0b87567aff1113a17ee060cb539",
+      "ordered_local_parents": [
+        "558244b000669bb3662754cdeb24d882defbf904"
+      ],
+      "ordered_native_parents": [
+        "d23bed5cce090ac8f64e8d8fbb105d1387440e82"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "f1136abba75df46b507dd9644686f1291f96c4c6",
+      "native_commit": "2e27fb271cccdf35ce9e2f258ff00d643a213cf7",
+      "tree": "d699f3499c9d72e9ad46fcbe71fada9a38ec6f83",
+      "ordered_local_parents": [
+        "a692c9efb1237f310cc3569eeed8560dad7edfee",
+        "4c0af1abdeca6c9c773c58fc92d26d1469204dde"
+      ],
+      "ordered_native_parents": [
+        "726b5d081e38804bb2be1fd63587901b3538f407",
+        "98bd3205f8ffe70f98416dec9bd5d1be05b0eb08"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "6277e2714baaa860e0aa0810f35ff84f034eb150",
+      "native_commit": "39725a2b9fb54a0ab74706f2cd2594623aa1c1b3",
+      "tree": "1c1c6cfc05e944b3c4cc8494d6f6bf5797676df0",
+      "ordered_local_parents": [
+        "4c0af1abdeca6c9c773c58fc92d26d1469204dde"
+      ],
+      "ordered_native_parents": [
+        "98bd3205f8ffe70f98416dec9bd5d1be05b0eb08"
+      ],
+      "native_readback_verified": true
+    },
+    {
+      "local_commit": "32ae91e2286eb31e2d475e000b3d4f74d64d5978",
+      "native_commit": "758c8e14a97dc0b7a85977c5447d1ddd7b4139fe",
+      "tree": "f3aaa3e7946c82cd5c2862686d6627dc055934a1",
+      "ordered_local_parents": [
+        "f1136abba75df46b507dd9644686f1291f96c4c6",
+        "6277e2714baaa860e0aa0810f35ff84f034eb150"
+      ],
+      "ordered_native_parents": [
+        "2e27fb271cccdf35ce9e2f258ff00d643a213cf7",
+        "39725a2b9fb54a0ab74706f2cd2594623aa1c1b3"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "e51819d08d38b1340dac03c7850a6f78e5fb74f8",
+      "native_commit": "715d6d4bccb1a8a8cd825e1ed6bf993d5ac4cb52",
+      "tree": "99f86287e3b630dbfefbcb9aa8061f41b4869f45",
+      "ordered_local_parents": [
+        "0f89340a862be405d97e27e1593f9f78b44dd1e6"
+      ],
+      "ordered_native_parents": [
+        "c65e3609f8e04b9d9ffc5ad450e40e036a959dac"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "23590e0c9f24b0e449f9a0aa71064c149a68b7cf",
+      "native_commit": "a2204dc576504770d4e11d0304a154bd91e53588",
+      "tree": "4c5cd91847a751d04e1b631cf227c247cddeca30",
+      "ordered_local_parents": [
+        "e51819d08d38b1340dac03c7850a6f78e5fb74f8"
+      ],
+      "ordered_native_parents": [
+        "715d6d4bccb1a8a8cd825e1ed6bf993d5ac4cb52"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "71cb594cbb2e2a44b9f634a68b09879b815580e9",
+      "native_commit": "1729e2b441e720302736bc10025b0fcbc7f8fcf8",
+      "tree": "a6af61a4d6aa2eec2f08e9cc2ca630800a84cefb",
+      "ordered_local_parents": [
+        "23590e0c9f24b0e449f9a0aa71064c149a68b7cf"
+      ],
+      "ordered_native_parents": [
+        "a2204dc576504770d4e11d0304a154bd91e53588"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "06fcc139fe33776325dbd80e892452f246424da5",
+      "native_commit": "52e42a761f00221db0883a9fe745828109bfe783",
+      "tree": "b900446254c442c6c29c3205a556dd4b675e6c0b",
+      "ordered_local_parents": [
+        "71cb594cbb2e2a44b9f634a68b09879b815580e9"
+      ],
+      "ordered_native_parents": [
+        "1729e2b441e720302736bc10025b0fcbc7f8fcf8"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "a7dcb1e546a33e479bf1b16d81770f2a2cf5a268",
+      "native_commit": "4ac9eec9275590679e25c6600f9a4636538d935c",
+      "tree": "38d438e4a81897173b5b59e9f5e388e3f113fc91",
+      "ordered_local_parents": [
+        "06fcc139fe33776325dbd80e892452f246424da5"
+      ],
+      "ordered_native_parents": [
+        "52e42a761f00221db0883a9fe745828109bfe783"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "50075567e15109fd98a862638f6dbcec8dc42ef9",
+      "native_commit": "d17fd7c545c6faeabb04ef077efdbcf15c9bb6b2",
+      "tree": "ad78047adc02495efcee2a3a786dfaf64bdb2ba5",
+      "ordered_local_parents": [
+        "a7dcb1e546a33e479bf1b16d81770f2a2cf5a268"
+      ],
+      "ordered_native_parents": [
+        "4ac9eec9275590679e25c6600f9a4636538d935c"
+      ],
+      "native_readback_verified": true
+    },
+    {
+      "local_commit": "52ed759cda34b26da8f1a9e0cd463930b96fe810",
+      "native_commit": "0fabf2f4fd291e3bd6db62dc5274c8cf59076ffe",
+      "tree": "c99bd3ceb8d518de0aff9a7b49da4153292e1a62",
+      "ordered_local_parents": [
+        "32ae91e2286eb31e2d475e000b3d4f74d64d5978",
+        "50075567e15109fd98a862638f6dbcec8dc42ef9"
+      ],
+      "ordered_native_parents": [
+        "758c8e14a97dc0b7a85977c5447d1ddd7b4139fe",
+        "d17fd7c545c6faeabb04ef077efdbcf15c9bb6b2"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "39cd7173504c681df1d995ea3942df6af68469b1",
+      "native_commit": "17670ae029dea2ff6fa2912f615ee2344ace435f",
+      "tree": "dfeaae82b06a324306ed6024ccaa664f8eafbdad",
+      "ordered_local_parents": [
+        "0f89340a862be405d97e27e1593f9f78b44dd1e6"
+      ],
+      "ordered_native_parents": [
+        "c65e3609f8e04b9d9ffc5ad450e40e036a959dac"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "f7aa6da1f917cc225b94e7c6e3138739d68716fa",
+      "native_commit": "de5430406c8f62cdbd68540caee73e456e2be37d",
+      "tree": "19a42124770023efd9368b41515371addf3b5c9b",
+      "ordered_local_parents": [
+        "39cd7173504c681df1d995ea3942df6af68469b1"
+      ],
+      "ordered_native_parents": [
+        "17670ae029dea2ff6fa2912f615ee2344ace435f"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "d494b3ddc0185608f5712846885378c5319752e4",
+      "native_commit": "09e29d0bb3a215356564a1b1a08b9397c2ef977e",
+      "tree": "a3eb87183414ac1aef807aa305e0f7aaa881ad28",
+      "ordered_local_parents": [
+        "f7aa6da1f917cc225b94e7c6e3138739d68716fa"
+      ],
+      "ordered_native_parents": [
+        "de5430406c8f62cdbd68540caee73e456e2be37d"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "546475654af4d9de33498e59b4f2fe10b40a6853",
+      "native_commit": "d4e7f03c6fdb6fc46e9140b087624159c85cb7db",
+      "tree": "fe435dfe211dab994f1b1b2fe32ac397b415740c",
+      "ordered_local_parents": [
+        "d494b3ddc0185608f5712846885378c5319752e4"
+      ],
+      "ordered_native_parents": [
+        "09e29d0bb3a215356564a1b1a08b9397c2ef977e"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "eb4bd66e0dbe5ee9bb024b59c6228c24a4a79a17",
+      "native_commit": "e8ef70905dcc70a5449e7123e4b15e2c6bf18557",
+      "tree": "f651d67f7ccd2e5fa77b56f9268aa0bb578b20f1",
+      "ordered_local_parents": [
+        "52ed759cda34b26da8f1a9e0cd463930b96fe810",
+        "546475654af4d9de33498e59b4f2fe10b40a6853"
+      ],
+      "ordered_native_parents": [
+        "0fabf2f4fd291e3bd6db62dc5274c8cf59076ffe",
+        "d4e7f03c6fdb6fc46e9140b087624159c85cb7db"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "9ca43121087cde677c4ba600af43a560a5810e98",
+      "native_commit": "f56fde074e8284604ff331f6c218bfd7fc9bf724",
+      "tree": "ed4acc4157e14ad2d62a4b41dac874b98ee55517",
+      "ordered_local_parents": [
+        "546475654af4d9de33498e59b4f2fe10b40a6853"
+      ],
+      "ordered_native_parents": [
+        "d4e7f03c6fdb6fc46e9140b087624159c85cb7db"
+      ],
+      "native_readback_verified": true
+    },
+    {
+      "local_commit": "a94522a6982b84589a2a410ccf7076f5172c6c63",
+      "native_commit": "d4d8415e69d95ba7e073042c7fc909a60b41beea",
+      "tree": "828292bacc67c04d4ca35de6fd967719654e8edc",
+      "ordered_local_parents": [
+        "eb4bd66e0dbe5ee9bb024b59c6228c24a4a79a17",
+        "9ca43121087cde677c4ba600af43a560a5810e98"
+      ],
+      "ordered_native_parents": [
+        "e8ef70905dcc70a5449e7123e4b15e2c6bf18557",
+        "f56fde074e8284604ff331f6c218bfd7fc9bf724"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "72c1da84ad253d85203c1f757a8b73c3df1fa95e",
+      "native_commit": "f314980f2c44384b1c60a2805d2587dce0d7698b",
+      "tree": "b753903e37e1609bc0cea3798dc641348f75b730",
+      "ordered_local_parents": [
+        "cd3ee3e90d566f427b901b3b737efcbccff58211"
+      ],
+      "ordered_native_parents": [
+        "6a56178e372bf574de0873a489fd4c16a656d78e"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "da3b688cec53af2a8a10dc8e6822171512eb8829",
+      "native_commit": "268f5f6446b8ab73cc6faefe5f4cd04687893faf",
+      "tree": "efb26583d2e144aaac11c418bfc1ee5c99bb9f80",
+      "ordered_local_parents": [
+        "72c1da84ad253d85203c1f757a8b73c3df1fa95e"
+      ],
+      "ordered_native_parents": [
+        "f314980f2c44384b1c60a2805d2587dce0d7698b"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "e8c7b204696b93f867de246af2cb57004e7a2a6e",
+      "native_commit": "938ed83181ed5e7baf4dde0bbe3de636638696e1",
+      "tree": "165832727b03f8998d4305bdf5a78a9f3ceb77e7",
+      "ordered_local_parents": [
+        "da3b688cec53af2a8a10dc8e6822171512eb8829"
+      ],
+      "ordered_native_parents": [
+        "268f5f6446b8ab73cc6faefe5f4cd04687893faf"
+      ],
+      "native_readback_verified": true
+    },
+    {
+      "local_commit": "d979e6ad1939732aaa6c3f9153c1cb186d40d9a1",
+      "native_commit": "4a1eab84a17866927df9de65280cb544e07ae9bc",
+      "tree": "0df26105cad35160565aea22910000412cb432b7",
+      "ordered_local_parents": [
+        "a94522a6982b84589a2a410ccf7076f5172c6c63",
+        "e8c7b204696b93f867de246af2cb57004e7a2a6e"
+      ],
+      "ordered_native_parents": [
+        "d4d8415e69d95ba7e073042c7fc909a60b41beea",
+        "938ed83181ed5e7baf4dde0bbe3de636638696e1"
+      ],
+      "native_readback_verified": false
+    },
+    {
+      "local_commit": "05c304a00977397f1f5d58c94afeec754975b694",
+      "native_commit": "3e06f64e4b044dd1ea70aa06b208c81933254858",
+      "tree": "030426558b8779db0b399be4d8c54e023171cdbe",
+      "ordered_local_parents": [
+        "d979e6ad1939732aaa6c3f9153c1cb186d40d9a1"
+      ],
+      "ordered_native_parents": [
+        "4a1eab84a17866927df9de65280cb544e07ae9bc"
+      ],
+      "native_readback_verified": true
+    }
+  ],
+  "external_parent_bindings": [
+    {
+      "local_commit": "15862fa4f035dd1c8459e94fa96de06d69a7b314",
+      "native_commit": "f215f77fa1bb36e47e1b792510a8b7104bbaccc1",
+      "tree": "0473563757f9e712a1a0ff2e75e7e969f58682d1"
+    },
+    {
+      "local_commit": "70d0317b5e414bd34071bcc19077e11375661b8f",
+      "native_commit": "97e952b9e23cde88e4d4d0b753cb9747b67638b5",
+      "tree": "41aa7cd6c0813966a04b6c15bf679014c8f679e7"
+    },
+    {
+      "local_commit": "72fc6d7fca9e8ed22e969bd9269ba775a02a48e6",
+      "native_commit": "13d7474f2f843084f7c7ab94b4e5e8105d08bbce",
+      "tree": "7a5a17c8bcd363bb79b2267bfb7bbe06ee1b300a"
+    },
+    {
+      "local_commit": "e236f0a0db3679dbf8891d15ff312763bfbfe013",
+      "native_commit": "883307a877ee48fb30269bbeb2a74cd3ac04feed",
+      "tree": "d6bc6ba6e765e8c7a5663f465001117d085af438"
+    },
+    {
+      "local_commit": "e24d6e5251adc49d58c5dc01a958053fac86e573",
+      "native_commit": "4d39a7d02f9094085f9a74610ebdc42b42e8a059",
+      "tree": "41aa7cd6c0813966a04b6c15bf679014c8f679e7"
+    }
+  ],
+  "native_readbacks": [
+    {
+      "local": "05c304a00977397f1f5d58c94afeec754975b694",
+      "remote": "3e06f64e4b044dd1ea70aa06b208c81933254858",
+      "tree": "030426558b8779db0b399be4d8c54e023171cdbe",
+      "ordered_remote_parents": [
+        "4a1eab84a17866927df9de65280cb544e07ae9bc"
+      ]
+    },
+    {
+      "local": "960458ea04d6778a397c57b5823e6bfbf0ffdb2a",
+      "remote": "4200e6b4fa14b675c91dff646bc4d5db4aab1655",
+      "tree": "dad49535e399de47d2cb5993599fa26452b12282",
+      "ordered_remote_parents": [
+        "5c7421b58c1c7ed6cf9755502d4fabb8f019cd2d"
+      ]
+    },
+    {
+      "local": "cd3ee3e90d566f427b901b3b737efcbccff58211",
+      "remote": "6a56178e372bf574de0873a489fd4c16a656d78e",
+      "tree": "e4b68769311832c35f0bc71f582eb620345c87d9",
+      "ordered_remote_parents": [
+        "474acee5e56e34cd143fb69ae79a04a84a8dccc3"
+      ]
+    },
+    {
+      "local": "33cbe284ac37cecd9c9d8418519657407e8cb5fe",
+      "remote": "fb4dc2563c0fd0d68556664b2a1a0db78f64b29f",
+      "tree": "4241267e0f2156b5cb45f41a5d5957d5ed538763",
+      "ordered_remote_parents": [
+        "2f9561a92e01e0fb1f0ef82265f08871e087335f"
+      ]
+    },
+    {
+      "local": "50075567e15109fd98a862638f6dbcec8dc42ef9",
+      "remote": "d17fd7c545c6faeabb04ef077efdbcf15c9bb6b2",
+      "tree": "ad78047adc02495efcee2a3a786dfaf64bdb2ba5",
+      "ordered_remote_parents": [
+        "4ac9eec9275590679e25c6600f9a4636538d935c"
+      ]
+    },
+    {
+      "local": "6277e2714baaa860e0aa0810f35ff84f034eb150",
+      "remote": "39725a2b9fb54a0ab74706f2cd2594623aa1c1b3",
+      "tree": "1c1c6cfc05e944b3c4cc8494d6f6bf5797676df0",
+      "ordered_remote_parents": [
+        "98bd3205f8ffe70f98416dec9bd5d1be05b0eb08"
+      ]
+    },
+    {
+      "local": "9ca43121087cde677c4ba600af43a560a5810e98",
+      "remote": "f56fde074e8284604ff331f6c218bfd7fc9bf724",
+      "tree": "ed4acc4157e14ad2d62a4b41dac874b98ee55517",
+      "ordered_remote_parents": [
+        "d4e7f03c6fdb6fc46e9140b087624159c85cb7db"
+      ]
+    },
+    {
+      "local": "e8c7b204696b93f867de246af2cb57004e7a2a6e",
+      "remote": "938ed83181ed5e7baf4dde0bbe3de636638696e1",
+      "tree": "165832727b03f8998d4305bdf5a78a9f3ceb77e7",
+      "ordered_remote_parents": [
+        "268f5f6446b8ab73cc6faefe5f4cd04687893faf"
+      ]
+    }
+  ],
+  "final_evidence_successor": "The PR records the later evidence/timing-only successor; its identity is outside this file to avoid self-reference."
+}

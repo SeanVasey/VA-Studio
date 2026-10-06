@@ -72,3 +72,20 @@ Verified-unpaid release has a separate `financial` selection so commerce remains
 The five new order-inquiry PHP files join `customer` (24 files); the staff context projection also joins `seller` (32). The new private frontend transport/UI file brings `frontend` to 32. The existing inquiry conversation browser identity covers the order-linked extension; the browser selection stays at 32 files. Every previously selected file remains.
 
 Only the exact `OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders` method is newly eligible for a SQLite skip: its eleven cases require independent MySQL processes. New domain, HTTP, migration and staff cases execute on both engines. Timing files retain their measured source and fallback weights; no local timing is presented as a hosted measurement. These selectors supply focused feedback, not final candidate acceptance.
+
+## Private store foundations feedback — October 6, 2026
+
+`store-foundations` selects 28 fixed PHP files covering authored/typed production
+policy, service/merch draft authoring, membership plans/credits/administration,
+transactional capture/recovery and protected private catalog imports. Existing
+selections and the 32-file ceiling are preserved. The isolated catalog and
+migration ownership fixtures explicitly execute SQLite preparation; their presence
+in a MySQL selection does not prove MySQL DDL. No MySQL omission is added.
+
+Only 13 exact method identities are newly eligible for SQLite skips: two authored
+policy engine/wait methods, four private-product waits, four notification waits
+and three membership engine/wait methods. Expanded data cases remain discovered;
+functional methods receive no exemption. Existing retained source-bound native
+receipts are historical component evidence, not acceptance of a newer composed tree.
+The [composition record](store-foundations-integration-20261006.md) records
+actual focused results and deferred native/final acceptance.

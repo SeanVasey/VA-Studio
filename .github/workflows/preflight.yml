@@ -98,8 +98,20 @@ jobs:
         env:
           PERSISTENT_CONTENT_REQUIRE_PHP: '1'
         run: node --test scripts/dev/persistent-content.test.mjs
+      - name: Verify stopped private installation copy upgrades
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          PERSISTENT_UPGRADE_REQUIRE_PHP: '1'
+        run: node --test scripts/ops/persistent-content-upgrade.test.mjs
+      - name: Verify bounded private catalog import and restart
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          PERSISTENT_CATALOG_REQUIRE_PHP: '1'
+        run: node --test scripts/migration/persistent-catalog.test.mjs
       - run: composer validate --strict
       - run: vendor/bin/pint --version
+      - name: Verify private store foundations formatting
+        run: php vendor/bin/pint --test config/memberships.php app/Domain/Commerce/Policy app/Domain/Commerce/ProductionPolicy app/Domain/Memberships app/Domain/Notifications app/Domain/ProductAuthoring app/Domain/Services app/Domain/Merch app/Domain/Migration/CatalogOnboarding app/Filament/Resources/MembershipCreditResource.php app/Filament/Resources/MembershipCreditResource app/Filament/Resources/MembershipPlanResource.php app/Filament/Resources/MembershipPlanResource app/Filament/Resources/PrivateProductDraftResource.php app/Filament/Resources/PrivateProductDraftResource app/Filament/Resources/ServiceDraftResource.php app/Filament/Resources/ServiceDraftResource app/Filament/Resources/MerchDraftResource.php app/Filament/Resources/MerchDraftResource
       - name: Verify the current rights-writer formatting boundary
         run: php vendor/bin/pint --test app/Domain/Catalog/SaveTrackMetadata.php app/Domain/Catalog/SaveOfferDraft.php app/Domain/Catalog/DeactivateOffer.php tests/Feature/CatalogWriterAuthorityTest.php tests/Feature/RightsDeclarationWriterConcurrencyTest.php tests/Support/rights-declaration-writer-worker.php app/Domain/Rights/CreateLicenseDraft.php app/Domain/Rights/UpdateLicenseDraft.php app/Domain/Rights/ReviewLicense.php app/Domain/Rights/PublishLicense.php app/Domain/Catalog/PrepareExclusiveOffer.php app/Domain/Catalog/ActivateExclusiveOffer.php app/Domain/Commerce/Inventory/ManageRightsScope.php tests/Feature/LicenseWriterAuthorityTest.php tests/Feature/ExclusiveWriterAuthorityTest.php tests/Feature/RightsScopeWriterAuthorityTest.php tests/Feature/RightsScopeWriterConcurrencyTest.php tests/Support/rights-scope-writer-worker.php
       - name: Verify captured offer authoring formatting

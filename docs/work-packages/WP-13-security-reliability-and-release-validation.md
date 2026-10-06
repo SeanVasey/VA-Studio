@@ -51,3 +51,19 @@ Do not add secrets, private masters, unredacted orders, customer PII or real con
 > Implement WP-13 against a fixed candidate and the production-readiness skill. Verify actual controls and recovery, report test environment/commit/results, and distinguish unresolved launch gates from passing checks. Do not certify launch from a plan or local SQLite-only success.
 
 Read [architecture index](../architecture/README.md), [decision register](../architecture/decision-register.md) and relevant source/brand evidence. Complete the first increment in a small PR, then split any remaining implementation into explicitly dependent issues. Preserve prior approvals and invariants; report unresolved provider/policy decisions without blocking unrelated reversible work.
+
+## Retained-installation recovery preparation — October 6, 2026
+
+Reviewed stopped-copy upgrade `960458ea04d6778a397c57b5823e6bfbf0ffdb2a`
+retains the original installation, proves exact source/schema/lease ownership
+and verifies the copied candidate with genuine PHP/SQLite/HTTP checks. The
+14-case selection passed after genuine assets were built; the blocked CHECK/BLOB
+predecessor and independent canaries remain preserved in
+[upgrade evidence](../verification/persistent-content-copy-upgrade.md). The
+[composition record](../verification/store-foundations-integration-20261006.md)
+records the exact integrated focused checks and their limits.
+
+Actual host deployment, scanner/queue/mail, observed backup/restore objectives,
+private-device/accessibility/security and consolidated final acceptance remain open.
+Manual full verification is pinned to the final reviewed candidate; routine PRs
+use the preserved cheap preflight and independent sensitive source review.

@@ -1,6 +1,6 @@
 # [WP-12] BeatStars source audit, restartable migration and SEO continuity
 
-Status: **Planned work package**. Inspect the current implementation before starting; initial foundation code may already cover part of this scope. This issue is complete only when the acceptance evidence below exists.
+Status: **Implemented private SQLite draft-import child; actual source reconciliation and SEO acceptance remains open**. This issue is complete only when the acceptance evidence below exists.
 
 - Suggested issue title: `[WP-12] BeatStars source audit, restartable migration and SEO continuity`
 - Phase: Begin in 0; complete before replacement cutover
@@ -46,3 +46,21 @@ Do not add secrets, private masters, unredacted orders, customer PII or real con
 > Implement WP-12 using the migration skill and evidence ledger. Begin with source truth and a read-only audit, keep private data out of commits, and prove dry-run/idempotency before import. Pull active obligations forward in the roadmap and document exactly what remains unverified.
 
 Read [architecture index](../architecture/README.md), [decision register](../architecture/decision-register.md) and relevant source/brand evidence. Complete the first increment in a small PR, then split any remaining implementation into explicitly dependent issues. Preserve prior approvals and invariants; report unresolved provider/policy decisions without blocking unrelated reversible work.
+
+## Protected bounded draft import — October 6, 2026
+
+Reviewed runtime `546475654af4d9de33498e59b4f2fe10b40a6853` admits a closed
+normalized source, captures a private signed review, applies bounded private
+SQLite draft-metadata segments and preserves immutable source mappings/replay.
+Primary-PDO schema/guard proof runs at entry and after callbacks; conflicting
+SQLite replacement is refused. Author and independent PHP checks passed
+86 / 314; native CLI checks passed 10/10 and independent schema/replacement
+canaries passed 4 / 17. [Import evidence](../verification/persistent-catalog-draft-import.md)
+and the [composition record](../verification/store-foundations-integration-20261006.md)
+retain blocked predecessor and exact source limits.
+
+This is a reviewed private staging importer with an explicit isolated SQLite
+fixture in either full database matrix. It does not acquire actual account exports,
+import paid history, publish tracks, issue licenses/entitlements or prove MySQL DDL.
+T09/T34–T36 remain open for authorized actual source/count approval, media/history,
+all product/obligation adapters, URL redirects and rehearsal on the chosen host.

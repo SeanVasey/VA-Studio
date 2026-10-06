@@ -12,6 +12,15 @@ class CustomerPurchaseClaimMigrationTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // This suite exercises the claim parent with its new notification child empty.
+        $this->assertDatabaseCount('transactional_notices', 0);
+        $this->assertDatabaseCount('transactional_notice_attempts', 0);
+        (require database_path('migrations/2026_10_06_231000_test_transactional_notifications.php'))->down();
+    }
+
     private function migration(): object
     {
         return require database_path('migrations/2026_10_06_000048_customer_purchase_claims.php');

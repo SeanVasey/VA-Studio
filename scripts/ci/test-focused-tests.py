@@ -43,6 +43,35 @@ def junit(root, content='<testsuites><testsuite><testcase name="one" assertions=
 
 
 class SelectionTests(unittest.TestCase):
+    def test_store_foundations_feedback_is_bounded_and_has_only_declared_native_skips(self):
+        self.assertEqual(focused.MAX_FILES, 32)
+        for engine in focused.ENGINES:
+            selected = focused.selection({"FOCUSED_SUITE": "store-foundations", "FOCUSED_ENGINE": engine})
+            self.assertEqual(selected.kind, "php")
+            self.assertLessEqual(len(selected.files), focused.MAX_FILES)
+            self.assertEqual(len(selected.files), len(set(selected.files)))
+            focused.validate_files(ROOT, selected)
+            for prefix in ("ProductionTrackPolicy", "ProductionTrackCapabilities", "PrivateProductDraft",
+                           "TransactionalNotification", "Membership", "PersistentCatalog"):
+                self.assertTrue(any(Path(path).name.startswith(prefix) for path in selected.files))
+            for name in ("ProductionTrackMachinePolicyTest", "NormalizedCatalogSourceTest", "ProtectedCatalogReportTest"):
+                self.assertIn("tests/Unit/" + name + ".php", selected.files)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        counts = {"ProductionTrackPolicyConcurrencyTest": 1, "ProductionTrackPolicyEngineTest": 1,
+                  "PrivateProductDraftConcurrencyTest": 4, "TransactionalNotificationConcurrencyTest": 4,
+                  "MembershipCreditConcurrencyTest": 2, "MembershipCreditEngineTest": 1}
+        selected_classes = {"Tests\\" + path.removeprefix("tests/").removesuffix(".php").replace("/", "\\")
+                            for path in focused.PHP_TARGETS["store-foundations"]}
+        actual = [row for row in policy["methods"] if row[0] in selected_classes]
+        self.assertEqual(sum(counts.values()), len(actual))
+        for name, count in counts.items():
+            rows = [row for row in actual if row[0] == "Tests\\Feature\\" + name]
+            self.assertEqual(count, len(rows))
+            source = (ROOT / "tests/Feature" / (name + ".php")).read_text()
+            for row in rows:
+                self.assertIn("function " + row[1] + "(", source)
+                self.assertNotIn(" with data set ", row[1])
+
     def test_production_readiness_is_affected_commerce_feedback_without_native_exclusion(self):
         for engine in focused.ENGINES:
             selected = focused.selection({"FOCUSED_SUITE": "commerce", "FOCUSED_ENGINE": engine})

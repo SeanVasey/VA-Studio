@@ -65,6 +65,22 @@ class CadenceTests(unittest.TestCase):
         self.assertIn('cancel-in-progress: true', preflight)
         self.assertNotIn('pull_request_target', preflight)
 
+    def test_native_upgrade_and_import_checks_run_only_at_manual_final_acceptance(self):
+        targets = [('PERSISTENT_UPGRADE_REQUIRE_PHP', 'scripts/ops/persistent-content-upgrade.test.mjs'),
+                   ('PERSISTENT_CATALOG_REQUIRE_PHP', 'scripts/migration/persistent-catalog.test.mjs')]
+        for source in (CI, (ROOT / '.github/workflows/preflight.yml').read_text()):
+            job = block(source, 'backend-quality')
+            for capability, target in targets:
+                step = job[:job.index('run: node --test ' + target)].rsplit('      - name:', 1)[1]
+                self.assertIn("if: github.event_name == 'workflow_dispatch'", step)
+                self.assertIn(capability + ": '1'", step)
+                self.assertNotIn('continue-on-error', step)
+                self.assertLess(job.index('npm run build'), job.index(target))
+        gitlab = (ROOT / '.gitlab-ci.yml').read_text()
+        job = gitlab.split('backend-quality:\n', 1)[1].split('\n.database:', 1)[0]
+        for capability, target in targets:
+            self.assertIn(capability + '=1 node --test ' + target, job)
+
     def test_optional_feedback_has_no_automatic_push_or_pr_trigger(self):
         events = FOCUSED.split('on:\n', 1)[1].split('\npermissions:', 1)[0]
         self.assertEqual(['workflow_dispatch'], re.findall(r'^  ([a-z_]+):', events, re.M))

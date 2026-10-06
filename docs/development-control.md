@@ -1,6 +1,34 @@
 # Current development queue
 
-## Current integration and parallel execution — October 6, 2026 UTC
+## Resumed foundations integration — October 6, 2026 UTC
+
+The live GitHub main at continuation is `4d39a7d02f9094085f9a74610ebdc42b42e8a059`,
+tree `41aa7cd6c0813966a04b6c15bf679014c8f679e7`. PR #15 merged durable private
+onboarding, bulk source editing and the redacted readiness report. Local mirror
+`e24d6e5251adc49d58c5dc01a958053fac86e573` has that exact tree and the recorded
+ordered parent mapping. PR #14's CI policy remains incorporated. Dependency PRs
+#1–#3 remain preserved pending lockfile compatibility review.
+
+Branch `codex/continuation-foundations-20261006` composes all seven reviewed
+foundations: stopped copy-upgrade, authored/typed production policy, private
+service/merch drafts, synthetic membership administration, transactional
+notification authority/recovery and protected private SQLite catalog import.
+Tested freeze `05c304a` / tree `030426558b8779db0b399be4d8c54e023171cdbe`
+passed 777 PHP cases / 3,893 assertions, with 40 exact native-only SQLite skips,
+24 Node/PHP/SQLite CLI checks and 845 frontend cases. Independent shared review
+passed 19 / 253; all component approvals and corrected failures remain bound
+to actual source in the [composition record](verification/store-foundations-integration-20261006.md).
+Old worktrees, dirty source and negative evidence are preserved. One lead
+integrates and publishes; timed-out UI activity did not lose or duplicate work.
+
+The next dependency is production quote/order snapshots that consume the reviewed
+typed policy under the existing authority/source fence. Component and composed
+focused evidence and exact source identities are recorded in the verification file.
+Production sales, recurring benefits, delivered mail, public product fulfillment,
+actual export reconciliation and complete final acceptance remain open. No
+routine MySQL/full matrix or hosted manual workflow is requested by this batch.
+
+## Preserved integration and parallel execution — October 6, 2026 UTC
 
 Verified remote `main` is `13d7474f2f843084f7c7ab94b4e5e8105d08bbce`, tree
 `7a5a17c8bcd363bb79b2267bfb7bbe06ee1b300a`. PR #13 merged on October 6 at
