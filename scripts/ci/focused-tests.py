@@ -164,6 +164,7 @@ FRONTEND_TARGETS = (
     "tests/frontend/resumable-media-upload.test.ts",
 )
 BROWSER_TARGETS = (
+    "tests/browser/customer-library-browsing.spec.ts",
     "tests/browser/customer-purchase-claim.spec.ts", "tests/browser/test-refunded-exception-resolution.spec.ts",
     "tests/browser/customer-identity.spec.ts", "tests/browser/resumable-kit-upload.spec.ts",
     "tests/browser/test-unpaid-release.spec.ts",
