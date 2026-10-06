@@ -17,7 +17,7 @@ if (existsSync(join(root, 'public/hot')) || existsSync(join(root, 'storage/frame
 if (!existsSync('/usr/bin/clamscan') || realpathSync('/usr/bin/clamscan') !== '/usr/bin/clamscan') {
   throw new Error('The related-track stage requires the real supported /usr/bin/clamscan and current signatures.');
 }
-applyPinnedWebkitOfflineBackport(root);
+const playwrightBackport = applyPinnedWebkitOfflineBackport(root);
 
 const directory = mkdtempSync(join(tmpdir(), 'vasey-browser-'));
 const env = {
@@ -51,6 +51,7 @@ try {
   writeFileSync(env.DB_DATABASE, '', { mode: 0o600, flag: 'wx' });
   const setup = spawnSync('php', ['tests/browser/bootstrap.php'], { cwd: root, env, stdio: 'inherit', timeout: 60000 });
   if (setup.error || setup.status !== 0) throw new Error('Isolated related-track bootstrap failed.');
+  console.log(JSON.stringify(playwrightBackport));
   const fixturesBefore = readFileSync(join(directory, 'fixtures.json'));
   writeFileSync(join(directory, 'related-track-fixture-marker.json'), JSON.stringify({
     marker: env.VASEY_BROWSER_RELATED_MARKER, database: env.DB_DATABASE,

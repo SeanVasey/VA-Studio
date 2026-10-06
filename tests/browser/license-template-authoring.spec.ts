@@ -299,6 +299,7 @@ test('operator preserves stale draft input, reopens the current winner and recov
     await submit.focus();
     await submit.press('Enter');
     await failed;
+    await page.unrouteAll({ behavior: 'wait' });
     await page.unroute(livewireUrl);
     await expect(submit).toBeEnabled();
     await expect(source()).toHaveValue(fixture.sources.uncertain);
