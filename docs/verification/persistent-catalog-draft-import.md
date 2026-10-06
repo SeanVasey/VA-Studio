@@ -1,6 +1,6 @@
 # Private normalized catalog draft import
 
-Status: implemented private SQLite metadata staging with focused synthetic acceptance. No source acquisition, actual BeatStars export/schema/count verification, imported production catalog or cutover is reported by this document. Independent sensitive review applies to the exact child commit selected by integration.
+Status: implemented private SQLite metadata staging with focused synthetic acceptance. Independent sensitive review approved runtime child `546475654af4d9de33498e59b4f2fe10b40a6853`. No source acquisition, actual BeatStars export/schema/count verification, imported production catalog or cutover is reported by this document. Integration records the final composed source separately.
 
 The first actual adapter consumes an operator-prepared, canonical normalized catalog snapshot retained outside Git with protected raw artifacts, original identifiers, acquisition method/operator/time/watermark and SHA-256 bindings. It creates only private draft metadata through the existing `SaveTrackMetadata` command. It does not infer publication, rights, prices, customer identity, historical contracts, entitlements or consent. Original source visibility remains evidence; sold or unknown states conflict. Declared media is retained as an explicit dependent intake requirement; this batch does not promote or automatically accept it.
 
@@ -113,12 +113,13 @@ child on integration `0f89340`. The original unfinished workspace was not
 modified. Normalized admission prerequisite `773b971` is carried by child
 `39cd717`; implementation `f7aa6da` contains the completed adapter and CLI.
 Native assertion correction `d494b3d` changes only the lease test's ownership
-proof. The exact command source and assertions are retained in Git; final
+proof. Corrected runtime successor `5464756` adds installed-schema and immutable
+replacement guards. The exact command source and assertions are retained in Git; final
 integration/review records identify the chosen full SHA.
 
 On PHP 8.4.26 and the actual SQLite/POSIX runtime, the affected command passed
-**70 cases / 237 assertions**, zero failures/skips, in **5.178 seconds** after
-formatting:
+**86 cases / 314 assertions**, zero failures/skips, in **7.202 seconds** on
+`546475654af4d9de33498e59b4f2fe10b40a6853`:
 
 ```sh
 php vendor/bin/phpunit \
@@ -131,8 +132,8 @@ The feature suite explicitly chooses an isolated named in-memory SQLite
 connection, including under a surrounding MySQL suite. This verifies this
 private SQLite contract and never represents MySQL row-lock evidence.
 
-The actual Node/PHP/PTY/SQLite command suite passed **9/9 native cases**, zero
-skips/cancellations, in **31.632 seconds** on `d494b3d`:
+The actual Node/PHP/PTY/SQLite command suite passed **10/10 native cases**, zero
+failures/skips/cancellations, in **32.688 seconds** on that exact successor:
 
 ```sh
 PERSISTENT_CATALOG_REQUIRE_PHP=1 node --test \
@@ -144,7 +145,7 @@ the real hidden-password terminal, and runs actual reviewed catalog commands.
 Observed outcomes include a database-read-only review, committed one- and
 two-record segments, process restart, lost-success replay, private file
 preservation, wrong/nonterminal credentials, active OS lease refusal,
-source/report/digest/target drift, prompt interruption with worker cleanup and
+source/report/digest/target/schema drift, prompt interruption with worker cleanup and
 subsequent real lease reacquisition, and changed-release/unknown-switch refusal.
 The native fixture requires supported PHP/SQLite/POSIX, locked dependencies,
 built assets and util-linux `script`; setting the require flag makes unavailable
@@ -163,16 +164,23 @@ review, between review/apply and after the final mapping audit on predecessor
 `d494b3d`: each canary created one track, batch, mapping and three audits. That
 predecessor is blocked. The successor adds actual installed-schema admission,
 post-callback schema/target proofs and replacement-safe insert guards. Its
-expanded **86-case / 314-assertion** SQLite/source/report selection passed in
-**7.437 seconds**. Corrected native command and independent canary results are
-bound to the successor by integration's evidence record; predecessor passing
-cases do not approve the corrected candidate.
+expanded SQLite/source/report selection and corrected native command passed on
+the exact successor as recorded above. Independent review reran the affected
+selection (**86/314**, 7.118 seconds) and the retained external missing-trigger
+and replacement canaries (**4/17**, 0.775 seconds), inspected the exact native
+receipt/source binding, and approved
+`546475654af4d9de33498e59b4f2fe10b40a6853`, tree
+`fe435dfe211dab994f1b1b2fe32ac397b415740c`. No runtime source changed in the
+subsequent documentation-only evidence completion. Predecessor passing cases
+do not approve the corrected candidate.
 
 Pint passed all affected PHP source, fixture and test files; Node syntax checks
 passed for both command and native test. No routine MySQL/full-matrix runs or
 hosted CI dispatch were performed. Migration's explicit InnoDB DDL and triggers
 have not received new MySQL runtime verification; this command rejects non-SQLite
-targets. Source acquisition, real normalization approval/count reconciliation,
+targets. The conditional required-MFA/TOTP CLI branch was source-reviewed;
+the native local-workspace tests did not exercise a required authenticator-code
+operation. Source acquisition, real normalization approval/count reconciliation,
 private host/storage/scanner, restart/backup restore on the selected actual
 installation, real media intake, redirects and historical commercial/customer
 obligations remain outside this increment. Full acceptance belongs to the exact
