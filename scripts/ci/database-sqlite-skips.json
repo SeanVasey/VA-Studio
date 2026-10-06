@@ -247,6 +247,10 @@
       "test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders"
     ],
     [
+      "Tests\\Feature\\ReviewedOfferDraftConcurrencyTest",
+      "test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"
+    ],
+    [
       "Tests\\Feature\\RightsDeclarationWriterConcurrencyTest",
       "test_current_authority_withdrawal_and_reviewed_verification_serialize_on_the_exact_actor_row"
     ],

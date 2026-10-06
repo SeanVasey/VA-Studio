@@ -124,15 +124,22 @@ class SelectionTests(unittest.TestCase):
         self.assertEqual(focused.MAX_FILES, 32)
         for engine in focused.ENGINES:
             selected = focused.selection({"FOCUSED_SUITE": "licensing", "FOCUSED_ENGINE": engine})
-            for target in ("ReviewedLicenseDraftTest", "ReviewedLicenseDraftConcurrencyTest", "LicenseDraftAuthoringActionTest"):
+            for target in ("ReviewedLicenseDraftTest", "ReviewedLicenseDraftConcurrencyTest", "LicenseDraftAuthoringActionTest",
+                           "ReviewedOfferDraftTest", "ReviewedOfferDraftConcurrencyTest", "OfferDraftAuthoringActionTest"):
                 self.assertEqual(selected.files.count("tests/Feature/" + target + ".php"), 1)
+            self.assertEqual(selected.files.count("tests/Unit/OfferDraftBrowserEvidenceTest.php"), 1)
             focused.validate_files(ROOT, selected)
         self.assertEqual(focused.BROWSER_TARGETS.count("tests/browser/license-template-authoring.spec.ts"), 1)
         policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
         self.assertEqual([row for row in policy["methods"] if row[0] == "Tests\\Feature\\ReviewedLicenseDraftConcurrencyTest"], [
             ["Tests\\Feature\\ReviewedLicenseDraftConcurrencyTest", "test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders"],
         ])
-        self.assertFalse(any(row[0] in ("Tests\\Feature\\ReviewedLicenseDraftTest", "Tests\\Feature\\LicenseDraftAuthoringActionTest") for row in policy["methods"]))
+        self.assertEqual([row for row in policy["methods"] if row[0] == "Tests\\Feature\\ReviewedOfferDraftConcurrencyTest"], [
+            ["Tests\\Feature\\ReviewedOfferDraftConcurrencyTest", "test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"],
+        ])
+        self.assertFalse(any(row[0] in ("Tests\\Feature\\ReviewedLicenseDraftTest", "Tests\\Feature\\LicenseDraftAuthoringActionTest",
+                                       "Tests\\Feature\\ReviewedOfferDraftTest", "Tests\\Feature\\OfferDraftAuthoringActionTest",
+                                       "Tests\\Unit\\OfferDraftBrowserEvidenceTest") for row in policy["methods"]))
 
     def test_order_inquiry_feedback_preserves_native_fences_and_the_existing_browser_journey(self):
         self.assertEqual(focused.MAX_FILES, 32)
