@@ -20,11 +20,13 @@ return new class extends Migration
         $this->preflight();
         // Interrupted MySQL DDL prefixes are refused on retry, never silently adopted or removed.
         Schema::create('membership_plans', function (Blueprint $table): void {
+            $table->engine('InnoDB');
             $table->id();
             $table->foreignId('created_by')->constrained('users')->restrictOnDelete();
             $table->timestamp('created_at');
         });
         Schema::create('membership_plan_versions', function (Blueprint $table): void {
+            $table->engine('InnoDB');
             $table->id();
             $table->foreignId('membership_plan_id')->constrained('membership_plans')->restrictOnDelete();
             $table->unsignedInteger('number');
@@ -36,6 +38,7 @@ return new class extends Migration
             $table->unique(['membership_plan_id', 'number'], 'membership_plan_version_number_unique');
         });
         Schema::create('membership_credit_buckets', function (Blueprint $table): void {
+            $table->engine('InnoDB');
             $table->id();
             $table->foreignId('customer_account_id')->constrained('customer_accounts')->restrictOnDelete();
             $table->foreignId('membership_plan_version_id')->constrained('membership_plan_versions')->restrictOnDelete();
@@ -48,6 +51,7 @@ return new class extends Migration
             $table->unique('source_event_hash', 'membership_credit_source_unique');
         });
         Schema::create('membership_credit_events', function (Blueprint $table): void {
+            $table->engine('InnoDB');
             $table->id();
             $table->foreignId('membership_credit_bucket_id')->constrained('membership_credit_buckets')->restrictOnDelete();
             $table->unsignedInteger('sequence');
