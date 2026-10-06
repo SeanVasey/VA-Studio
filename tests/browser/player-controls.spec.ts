@@ -1,6 +1,9 @@
 import { test, expect } from '@playwright/test';
 import { fixtureTrack, query, storefrontFixture } from './storefront-fixture';
 
+// This file owns synthetic document transport; keep it authoritative across navigation/reload.
+test.use({ serviceWorkers: 'block' });
+
 const nextTrack = { ...fixtureTrack, id: '7002', title: 'Synthetic next preview', slug: 'synthetic-next-preview', previewUrl: '/media/synthetic-next-preview', shareUrl: '/tracks/synthetic-next-preview', offers: [] };
 
 test('listener-enabled automatic next and queue repeat reuse one real audio owner across navigation', async ({ page }) => {

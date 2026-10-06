@@ -19,6 +19,13 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class RelatedBrowserStageSafeguards(unittest.TestCase):
+    def test_pinned_webkit_backport_rejects_drift_without_touching_shared_sdk(self):
+        result = subprocess.run(
+            ["node", "--test", "scripts/ci/apply-playwright-webkit-offline-backport.test.mjs"],
+            cwd=ROOT, text=True, capture_output=True, timeout=30,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_source_renderer_uses_only_signed_official_ubuntu_origins(self):
         result = subprocess.run(
             ["bash", "-c", 'source "$1"; render_related_ubuntu_sources "$2"', "related-source-test",

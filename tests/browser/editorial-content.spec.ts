@@ -3,6 +3,9 @@ import { resetBrowserLoginRateLimit } from './auth-fixture';
 import { fixtureTrack, storefrontFixture } from './storefront-fixture';
 import { releaseMenuAction, releaseRow as row } from './site-release-row';
 
+// The public storefront document is synthetic; staff publication still uses the actual server.
+test.use({ serviceWorkers: 'block' });
+
 test.beforeEach(() => resetBrowserLoginRateLimit());
 
 async function activate(page: Page, label: string, action: 'Publish release' | 'Restore previous release') {

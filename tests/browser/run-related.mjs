@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync,
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { applyPinnedWebkitOfflineBackport } from '../../scripts/ci/apply-playwright-webkit-offline-backport.mjs';
 
 // Fixed dedicated selection: no caller can redirect the ready fixture into the default full set.
 if (process.argv.length !== 2) throw new Error('The isolated related-track runner accepts no selection or configuration arguments.');
@@ -16,6 +17,7 @@ if (existsSync(join(root, 'public/hot')) || existsSync(join(root, 'storage/frame
 if (!existsSync('/usr/bin/clamscan') || realpathSync('/usr/bin/clamscan') !== '/usr/bin/clamscan') {
   throw new Error('The related-track stage requires the real supported /usr/bin/clamscan and current signatures.');
 }
+applyPinnedWebkitOfflineBackport(root);
 
 const directory = mkdtempSync(join(tmpdir(), 'vasey-browser-'));
 const env = {

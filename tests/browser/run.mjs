@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { applyPinnedWebkitOfflineBackport } from '../../scripts/ci/apply-playwright-webkit-offline-backport.mjs';
 
 const root = resolve(import.meta.dirname, '../..');
 if (!existsSync(join(root, 'vendor/autoload.php')) || !existsSync(join(root, 'public/build/manifest.json'))) {
@@ -11,6 +12,7 @@ if (!existsSync(join(root, 'vendor/autoload.php')) || !existsSync(join(root, 'pu
 if (existsSync(join(root, 'public/hot')) || existsSync(join(root, 'storage/framework/maintenance.php'))) {
   throw new Error('Stop the Vite development server and use a checkout outside maintenance mode.');
 }
+applyPinnedWebkitOfflineBackport(root);
 const directory = mkdtempSync(join(tmpdir(), 'vasey-browser-'));
 const env = {
   ...process.env,

@@ -1,6 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
 import { fixtureOperation } from './contact-inquiry-fixture';
 
+// This file owns synthetic request transport; keep it authoritative across navigation/reload.
+test.use({ serviceWorkers: 'block' });
+
 const receipt = 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
 const privacyNotice = 'Synthetic browser privacy notice. Inquiries are saved privately for verification.';
 const values = { name: 'Synthetic inquiry visitor', email: 'inquiry-visitor@example.test', subject: 'Synthetic inquiry subject', message: 'Synthetic private message.\nKeep this exact draft.' };

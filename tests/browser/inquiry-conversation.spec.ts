@@ -4,6 +4,9 @@ import { expect, test, type BrowserContext } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
 import { fixtureOperation, type InquiryFixture, type OrderInquiryFixture } from './contact-inquiry-fixture';
 
+// This file intercepts a lost acknowledgement; retries and retained inquiry graphs use the actual server.
+test.use({ serviceWorkers: 'block' });
+
 test('visitor reads an in-app staff reply, retries one real follow-up and retains an archived conversation', async ({ page, browser }, testInfo) => {
   test.setTimeout(120_000); resetBrowserLoginRateLimit();
   const fixture: InquiryFixture = fixtureOperation('conversation-prepare', testInfo.project.name);
