@@ -243,6 +243,10 @@
       "test_required_mfa_withdrawn_during_native_actor_wait_refuses_upload_operation"
     ],
     [
+      "Tests\\Feature\\ReviewedLicenseDraftConcurrencyTest",
+      "test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders"
+    ],
+    [
       "Tests\\Feature\\RightsDeclarationWriterConcurrencyTest",
       "test_current_authority_withdrawal_and_reviewed_verification_serialize_on_the_exact_actor_row"
     ],

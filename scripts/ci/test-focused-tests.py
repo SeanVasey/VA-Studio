@@ -120,6 +120,20 @@ class SelectionTests(unittest.TestCase):
             "test_mfa_withdrawal_during_final_actor_wait_prevents_verified_commit_after_real_scanning",
         })
 
+    def test_reviewed_license_draft_feedback_preserves_native_fences_and_the_existing_browser_selection(self):
+        self.assertEqual(focused.MAX_FILES, 32)
+        for engine in focused.ENGINES:
+            selected = focused.selection({"FOCUSED_SUITE": "licensing", "FOCUSED_ENGINE": engine})
+            for target in ("ReviewedLicenseDraftTest", "ReviewedLicenseDraftConcurrencyTest", "LicenseDraftAuthoringActionTest"):
+                self.assertEqual(selected.files.count("tests/Feature/" + target + ".php"), 1)
+            focused.validate_files(ROOT, selected)
+        self.assertEqual(focused.BROWSER_TARGETS.count("tests/browser/license-template-authoring.spec.ts"), 1)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        self.assertEqual([row for row in policy["methods"] if row[0] == "Tests\\Feature\\ReviewedLicenseDraftConcurrencyTest"], [
+            ["Tests\\Feature\\ReviewedLicenseDraftConcurrencyTest", "test_current_draft_template_lifecycle_and_authority_fences_serialize_both_commit_orders"],
+        ])
+        self.assertFalse(any(row[0] in ("Tests\\Feature\\ReviewedLicenseDraftTest", "Tests\\Feature\\LicenseDraftAuthoringActionTest") for row in policy["methods"]))
+
     def test_order_inquiry_feedback_preserves_native_fences_and_the_existing_browser_journey(self):
         self.assertEqual(focused.MAX_FILES, 32)
         for engine in focused.ENGINES:

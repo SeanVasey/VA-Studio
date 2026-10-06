@@ -2,19 +2,19 @@
 
 ## Active continuation — October 6, 2026 UTC
 
-[PR #13](https://github.com/SeanVasey/VA-Studio/pull/13) consolidates the reviewed ancestry of PRs #7–#12 against `main`. [Run 37490570886](https://github.com/SeanVasey/VA-Studio/actions/runs/37490570886) failed a related-browser notification/navigation assertion; its verified evidence remains scoped to that earlier head. The reviewed correction and completed order-linked inquiry child are being composed for one fresh full acceptance run. Earlier source-bound results remain separate; earlier PRs must not be merged individually. The [inclusive record](verification/inclusive-commerce-authoring-acceptance.md) records exact composition, actual focused checks and remaining gates.
+[PR #13](https://github.com/SeanVasey/VA-Studio/pull/13) consolidates the reviewed ancestry of PRs #7–#12 against `main`. Its published head `1de6b314bd2c96323cd491733240a54ddf09bd42` contains the reviewed order-linked inquiry child and related-browser notification correction. [Run 37494698386](https://github.com/SeanVasey/VA-Studio/actions/runs/37494698386), attempt 1, supplies their fresh full acceptance boundary. Earlier source-bound results remain separate; earlier PRs must not be merged individually. The [composition record](verification/order-inquiry-inclusive-composition.md) records exact source, actual focused checks and remaining gates.
 
-The reviewed T17 order-linked support child joins that same corrected candidate. Customers explicitly open an inquiry for an owned test order; staff and the original inquiry session may read only the retained test-order reference. New admissions fence current publication, staff and customer authority transactionally. Generic inquiry bodies, existing receipts and original commerce evidence remain unchanged. Production intake and broader support policy remain gated.
+The following T12 child protects operator license-draft edits from stale or uncertain results. Its reviewed domain command captures the original draft and template and fences current authority, lifecycle and participating audit changes. The editor retains entered fields on rejection and requires explicit reopening for another save; exact nested policy-row actions retain the original review. This separate source includes native/domain checks, real mounted-action regressions and an additional journey in the existing license-authoring browser file. It is excluded from PR #13 head `1de6b314` and needs independent final composition and fresh hosted acceptance.
 
 | Lane | Current work and boundary |
 | --- | --- |
 | Integration `/root` | Shared registrations, exact composition, status, publication and expected-head merge after full acceptance |
 | Acceptance `/root/followup_census` | Fresh PR #13 source binding, all ten database receipts, aggregate equality and complete hosted gates; earlier receipts remain separately bound |
-| Domain review `/root/template_focus_recovery` | Order-linked domain complete; independently review the following license-draft edit command and native concurrency evidence |
-| Domain `/root/next_scope` | Order-linked backend review complete; implement reviewed license-draft edits with stale/ABA refusal |
-| Operator UI `/root/refund_journey_review` | Inquiry UI and migration compatibility complete; implement license-draft stale-edit recovery and native operator journey |
-| UI review `/root/prepared_review` | Independent exact-source frontend, staff projection and browser review; preserve earlier PR #12 evidence |
-| Composition `/root/runtime_restore` | Original PR #11 evidence complete; verify final inquiry composition, exact discovery and coverage preservation |
+| Domain review `/root/template_focus_recovery` | License-draft domain/editor approved; independently review the following bounded download-request recovery child |
+| Recovery `/root/next_scope` | License-draft command and twelve real native contention cases complete at `6dc137b`; implement bounded stalled download-status/issuance recovery on a separate branch |
+| Operator UI `/root/refund_journey_review` | License-draft action/recovery and compatibility checks complete at `f5f4b97`; native browser execution remains a hosted gate |
+| Browser review `/root/prepared_review` | Independent current-source ordinary/related native browser review; preserve earlier PR #12 evidence |
+| Composition `/root/runtime_restore` | Independently review current acceptance adapters, then verify the following draft-edit composition and exact coverage preservation |
 
 License-draft editing is a separate following branch and is excluded from this acceptance batch. Order-linked inquiries remain a bounded default-off local/testing implementation. Private attachments, production notice/retention, recovery and notifications remain open. The tables below retain historical checkpoints, not additional running-agent claims. Six parent groups remain accepted and 34 open.
 

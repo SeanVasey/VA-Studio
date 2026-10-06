@@ -115,6 +115,8 @@ PHP_TARGETS = {
         "tests/Feature/SiteContentConcurrencyTest.php",
     ),
     "licensing": (
+        "tests/Feature/ReviewedLicenseDraftTest.php", "tests/Feature/ReviewedLicenseDraftConcurrencyTest.php",
+        "tests/Feature/LicenseDraftAuthoringActionTest.php",
         "tests/Feature/LicenseTemplateAuthoringTest.php", "tests/Feature/LicenseTemplateAuthoringActionTest.php",
         "tests/Feature/LicenseTemplateAuthoringConcurrencyTest.php",
         "tests/Feature/LicensingAdminTest.php", "tests/Feature/LicenseWriterAuthorityTest.php",
