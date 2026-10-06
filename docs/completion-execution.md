@@ -2,6 +2,14 @@
 
 Checkpoint: October 5, 2026 (America/Chicago), following Sean's instruction to prioritize the finished website and eliminate serial development waits. This plan keeps all required scope in the [40-group register](remaining-development-tasks.csv) and [103-row coverage map](remaining-parity-coverage.csv). The protected preview is a testing aid, not the completion target.
 
+## Complete related journey allowance — October 6, 2026 UTC
+
+On published `5664c0a`, [run 37419522173](https://github.com/SeanVasey/VA-Studio/actions/runs/37419522173) passed frontend, quality and all 56 Chromium cases, including the corrected lookup document-continuity proof. Related scanner/build/startup safeguards and genuine preparation also passed, followed by the related Chromium journey. Related WebKit exceeded its whole-test 150-second harness limit while the complete journey's final evidence and awaited cleanup were finishing; this remains a failed gate.
+
+The [verified timing record](verification/related-journey-runtime-budget.md) distinguishes the actual 149,775 ms and 147,837 ms preceding passes from their rounded logs. The current trace completed final retained-graph/error/external-request assertions by 152,066.671 ms with no assertion error. The next correction changes only that complete case's harness allowance to 180 seconds, retaining all assertions, cleanup, 10-second expectation limits, zero retries, one worker, the 600-second outer runner and all application/scanner/workflow bounds. Independent source review and a fresh full native run are required; this is not a performance improvement or reuse of predecessor acceptance.
+
+The application, database inventory, native-only exclusions, partition weights and both separately reviewed feature branches remain outside this change. The remaining ordinary WebKit and database evidence belongs to its actual current run. Final run IDs and terminal results are recorded on PR #6 rather than adding status-only source commits that restart acceptance.
+
 ## Exact lookup document continuity — October 6, 2026 UTC
 
 The next bounded correction changes only the order-reference browser observation and its evidence. On published `3fd8b166`, [run 37416246767](https://github.com/SeanVasey/VA-Studio/actions/runs/37416246767) passed frontend, backend quality, all 56 Chromium cases, nine genuine related startup safeguards and both related native journeys. Both SQLite receipts independently account for 3,570 cases in 224 files, 3,199 executed cases, 35,931 assertions and exactly 371 native-only skips, with zero errors/failures. MySQL acceptance was still running when this correction was prepared.
