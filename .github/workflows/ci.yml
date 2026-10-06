@@ -105,6 +105,7 @@ jobs:
           python3 scripts/ci/test-gitlab-writer-feedback.py
           python3 scripts/ci/test-php-test-runtime.py
           python3 scripts/dev/test-bootstrap-macos.py
+          python3 scripts/test-publish-github.py
 
   backend-mysql:
     needs: scope
