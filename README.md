@@ -122,7 +122,21 @@ composer audit
 npm audit --audit-level=high
 ```
 
-GitHub CI runs the PHP suite against MySQL 8.4 and SQLite, frontend tests/build and dependency audits (including development tools), plus an isolated operator browser job using Chromium and WebKit. The complete workflow runs for runtime pull requests, runtime pushes to `main` and manual dispatch. A conservative [documentation mode](docs/verification/ci-scope.md) validates only explicitly allowlisted prose/ledger changes; all unknown or mixed changes use full checks. Feature-branch pushes provide distinct [focused feedback](docs/verification/focused-ci.md), while the ready PR remains the full runtime acceptance gate. See [CI trigger scope and verification](docs/verification/ci-trigger-efficiency.md). See [browser verification](docs/operator-setup-and-verification.md#browser-verification) for commands, fixture isolation and evidence boundaries. A workflow file is not evidence that GitHub has run it. MySQL concurrency, real providers, mobile Safari playback, restore drills, and production deployment remain separate acceptance gates until recorded in the verification report.
+Routine PRs run **Development preflight**: frontend tests/build, client secret
+scans, dependency audits and PHP/tooling quality checks. Pushes and merges do not
+start full database/browser matrices. Sean's October 6 policy in [AGENTS.md](AGENTS.md)
+allows development merges using meaningful focused evidence with untested
+conditions recorded. Prefer local affected checks; manually request
+[focused feedback](docs/verification/focused-ci.md) only when needed.
+
+**Foundation CI** is manual final verification through
+`.github/workflows/final-verification.yml`, requiring the exact reviewed
+`expected_sha`. It retains the complete MySQL/SQLite partitions and all browser
+checks. Do not re-enable the retired `ci.yml` or `focused.yml` workflows. See
+[CI cadence and coordination](docs/verification/ci-trigger-efficiency.md).
+A preflight or focused pass is not a full-suite pass or launch approval; real
+providers, device playback, restore drills and production deployment remain
+separate acceptance gates until actual evidence is recorded.
 
 ## GitHub publication and historical provenance
 

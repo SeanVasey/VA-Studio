@@ -48,7 +48,7 @@ class PhpTestRuntimeTests(unittest.TestCase):
         self.assertIn("required PHP test extension is unavailable", result.stderr)
 
     def test_every_actions_php_setup_is_bounded_and_preflighted(self):
-        for filename in ("ci.yml", "focused.yml"):
+        for filename in ("final-verification.yml", "focused-feedback.yml", "preflight.yml"):
             workflow = (ROOT / ".github/workflows" / filename).read_text()
             setups = re.findall(r"(?ms)^      - uses: shivammathur/setup-php@[^\n]+\n(.*?)(?=^      - uses:|\Z)", workflow)
             self.assertTrue(setups)

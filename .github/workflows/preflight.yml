@@ -1,0 +1,123 @@
+name: Development preflight
+
+# Cheap checks for coherent PR candidates; full database/browser proof is manual.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preflight-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  scope:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      mode: ${{ steps.classify.outputs.mode }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Prove the changed-file scope
+        id: classify
+        run: python3 scripts/ci/ci-scope.py classify
+
+  documentation:
+    needs: scope
+    if: needs.scope.outputs.mode == 'docs'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify documentation routing safeguards
+        run: python3 scripts/ci/test-ci-scope.py
+      - name: Validate the documentation-only candidate
+        run: python3 scripts/ci/ci-scope.py docs
+
+  frontend:
+    needs: scope
+    if: needs.scope.outputs.mode != 'docs'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - name: Scan the built client bundle for server secrets
+        run: python3 scripts/ci/scan-client-bundle.py
+      - name: Build the isolated storefront preview
+        run: npm run build:preview
+      - name: Scan the preview bundle for server secrets
+        run: python3 scripts/ci/scan-client-bundle.py dist/design-preview
+      - run: npm audit --audit-level=high
+
+  backend-quality:
+    needs: scope
+    if: needs.scope.outputs.mode != 'docs'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, pdo_sqlite, bcmath, gd, zip, curl, fileinfo, dom, xml, xmlwriter, posix, pcntl
+          ini-values: memory_limit=512M
+          coverage: none
+          tools: composer:v2
+      - name: Verify bounded PHP test capabilities
+        run: php scripts/ci/verify-php-test-runtime.php
+      - run: composer install --no-interaction --prefer-dist
+      - name: Verify isolated private alpha startup and recovery
+        env:
+          PRIVATE_ALPHA_REQUIRE_PHP: '1'
+        run: node --test scripts/dev/private-alpha.test.mjs
+      - run: composer validate --strict
+      - run: vendor/bin/pint --version
+      - name: Verify the current rights-writer formatting boundary
+        run: php vendor/bin/pint --test app/Domain/Catalog/SaveTrackMetadata.php app/Domain/Catalog/SaveOfferDraft.php app/Domain/Catalog/DeactivateOffer.php tests/Feature/CatalogWriterAuthorityTest.php tests/Feature/RightsDeclarationWriterConcurrencyTest.php tests/Support/rights-declaration-writer-worker.php app/Domain/Rights/CreateLicenseDraft.php app/Domain/Rights/UpdateLicenseDraft.php app/Domain/Rights/ReviewLicense.php app/Domain/Rights/PublishLicense.php app/Domain/Catalog/PrepareExclusiveOffer.php app/Domain/Catalog/ActivateExclusiveOffer.php app/Domain/Commerce/Inventory/ManageRightsScope.php tests/Feature/LicenseWriterAuthorityTest.php tests/Feature/ExclusiveWriterAuthorityTest.php tests/Feature/RightsScopeWriterAuthorityTest.php tests/Feature/RightsScopeWriterConcurrencyTest.php tests/Support/rights-scope-writer-worker.php
+      - run: composer audit
+      - name: Verify shard partition safeguards
+        run: python3 scripts/ci/test-phpunit-shards.py
+      - name: Verify CI routing and focused-selection safeguards
+        run: |
+          python3 scripts/ci/test-ci-scope.py
+          python3 scripts/ci/test-workflow-cadence.py
+          python3 scripts/ci/test-focused-tests.py
+          python3 scripts/ci/test-database-receipts.py
+          python3 scripts/ci/test-gitlab-database-receipts.py
+          python3 scripts/ci/test-gitlab-writer-feedback.py
+          python3 scripts/ci/test-php-test-runtime.py
+          python3 scripts/dev/test-bootstrap-macos.py
+          python3 scripts/test-publish-github.py
+
+  preflight:
+    name: Development preflight result
+    if: always()
+    needs: [scope, documentation, frontend, backend-quality]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Require actual preflight results without claiming full acceptance
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
+        run: python3 scripts/ci/preflight-gate.py

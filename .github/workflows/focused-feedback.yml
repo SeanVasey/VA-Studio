@@ -1,9 +1,7 @@
 name: Focused development feedback
 
-# These distinct checks are informative. Foundation CI remains the merge gate.
+# Deliberate focused feedback for development; success covers only the selected cases.
 on:
-  push:
-    branches-ignore: [main]
   workflow_dispatch:
     inputs:
       suite:
@@ -23,13 +21,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: focused-${{ github.ref }}-${{ github.event_name }}-${{ inputs.suite || 'unit' }}-${{ inputs.engine || 'sqlite' }}
+  group: focused-${{ github.ref }}-${{ inputs.suite }}-${{ inputs.engine }}
   cancel-in-progress: true
 
 env:
-  # Missing dispatch values remain empty and fail validation; only pushes get defaults.
-  FOCUSED_SUITE: ${{ github.event_name == 'push' && 'unit' || inputs.suite }}
-  FOCUSED_ENGINE: ${{ github.event_name == 'push' && 'sqlite' || inputs.engine }}
+  # Missing dispatch values remain empty and fail validation.
+  FOCUSED_SUITE: ${{ inputs.suite }}
+  FOCUSED_ENGINE: ${{ inputs.engine }}
 
 jobs:
   focused-selection:

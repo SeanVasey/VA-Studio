@@ -75,7 +75,7 @@ class HistoryTests(unittest.TestCase):
         self.assertEqual("full", self.decision(self.commit())["mode"])
 
     def test_workflow_classifier_and_lock_changes_require_full(self):
-        for name in (".github/workflows/ci.yml", "scripts/ci/ci-scope.py", "composer.lock", "AGENTS.md", "docs/brand/asset-manifest.json"):
+        for name in (".github/workflows/final-verification.yml", "scripts/ci/ci-scope.py", "composer.lock", "AGENTS.md", "docs/brand/asset-manifest.json"):
             with self.subTest(name=name):
                 self.run_git("reset", "--hard", self.base)
                 self.write(name, "changed\n")
@@ -235,7 +235,7 @@ class BrowserWorkflowTests(unittest.TestCase):
     root = Path(__file__).resolve().parents[2]
 
     def operator_job(self):
-        workflow = (self.root / ".github/workflows/ci.yml").read_text()
+        workflow = (self.root / ".github/workflows/final-verification.yml").read_text()
         match = re.search(r"(?ms)^  operator-browser:\n(.*?)(?=^  [\w-]+:\n|\Z)", workflow)
         self.assertIsNotNone(match)
         return match.group(1)
@@ -264,8 +264,8 @@ class BrowserWorkflowTests(unittest.TestCase):
 
     def test_every_ordinary_browser_job_installs_genuine_customer_delivery_prerequisites(self):
         for workflow, job_name, command in (
-            ("ci.yml", "operator-browser", 'npm run test:browser -- --project="$BROWSER_PROJECT"'),
-            ("focused.yml", "focused-browser", "python3 scripts/ci/focused-tests.py"),
+            ("final-verification.yml", "operator-browser", 'npm run test:browser -- --project="$BROWSER_PROJECT"'),
+            ("focused-feedback.yml", "focused-browser", "python3 scripts/ci/focused-tests.py"),
         ):
             with self.subTest(workflow=workflow):
                 source = (self.root / ".github/workflows" / workflow).read_text()
@@ -289,7 +289,7 @@ class BrowserWorkflowTests(unittest.TestCase):
 
     def test_related_browser_build_precedes_real_startup_and_browser_checks(self):
         for workflow, pattern in (
-            (".github/workflows/ci.yml", r"(?ms)^  related-browser:\n(.*?)(?=^  [\w-]+:\n|\Z)"),
+            (".github/workflows/final-verification.yml", r"(?ms)^  related-browser:\n(.*?)(?=^  [\w-]+:\n|\Z)"),
             (".gitlab-ci.yml", r"(?ms)^related-browser:\n(.*?)(?=^[\w-]+:\n|\Z)"),
         ):
             with self.subTest(workflow=workflow):
