@@ -5,7 +5,6 @@ namespace App\Filament\Resources\LicenseTemplateResource\Pages;
 use App\Domain\Rights\Models\LicenseTemplate;
 use App\Domain\Rights\SaveLicenseTemplate;
 use App\Filament\Resources\LicenseTemplateResource;
-use App\Filament\Resources\TrackResource;
 use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
 use Filament\Actions\Action;
@@ -183,6 +182,8 @@ class ManageLicenseTemplates extends ManageRecords
             $visible = in_array($field, SaveLicenseTemplate::FIELDS, true) ? $field : 'name';
             $errors[$path.'.'.$visible] = [...($errors[$path.'.'.$visible] ?? []), ...$messages];
         }
+        // Domain/review errors bypass the schema validator's normal event dispatch.
+        $this->dispatch('form-validation-error', livewireId: $this->getId());
         throw ValidationException::withMessages($errors);
     }
 
@@ -245,7 +246,7 @@ class ManageLicenseTemplates extends ManageRecords
     protected function getHeaderActions(): array
     {
         return [CreateAction::make()->databaseTransaction(false)->createAnother(false)
-            ->extraModalWindowAttributes(TrackResource::metadataModalAttributes())
+            ->extraModalWindowAttributes(LicenseTemplateResource::authoringModalAttributes())
             ->modalDescription('Create a template identity. Author and review its license versions separately; creating a template does not publish terms or offers.')
             ->using(fn (array $data, Action $action) => $this->createTemplate($data, $action))];
     }

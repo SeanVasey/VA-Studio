@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Domain\Rights\Models\LicenseTemplate;
 use App\Domain\Rights\ReviewLicense;
 use App\Domain\Rights\SaveLicenseTemplate;
+use App\Filament\Resources\LicenseTemplateResource;
 use App\Filament\Resources\LicenseTemplateResource\Pages\ManageLicenseTemplates;
 use App\Support\Audit\AuditEvent;
 use Filament\Facades\Filament;
@@ -53,6 +54,20 @@ class LicenseTemplateAuthoringActionTest extends TestCase
         $page->assertSet('templateReview', null)->assertSet('templateReviewContext', null);
     }
 
+    private function assertValidationFocusRecovery(mixed $page): void
+    {
+        $page->assertDispatched('form-validation-error', livewireId: $page->instance()->getId());
+        $this->assertArrayHasKey('action-modals.0', $page->effects['partials']);
+        $document = new \DOMDocument;
+        @$document->loadHTML($page->effects['partials']['action-modals.0']);
+        $modals = (new \DOMXPath($document))->query('//*[contains(concat(" ", normalize-space(@class), " "), " fi-modal-window ")][@*[name() = "x-on:form-validation-error.window"]]');
+        $this->assertCount(1, $modals);
+        $this->assertSame(LicenseTemplateResource::authoringModalAttributes()['x-on:form-validation-error.window'],
+            $modals->item(0)->getAttribute('x-on:form-validation-error.window'));
+        $this->assertStringContainsString('fi-modal-window', $modals->item(0)->getAttribute('class'));
+        $this->assertSame(1, (new \DOMXPath($document))->query('.//*[@data-validation-error]', $modals->item(0))->length);
+    }
+
     public function test_actual_create_and_edit_actions_use_captured_fields_and_atomic_actor_audits(): void
     {
         ['actor' => $actor, 'data' => $data] = $this->pending();
@@ -80,17 +95,26 @@ class LicenseTemplateAuthoringActionTest extends TestCase
     public function test_create_validation_can_be_corrected_but_invalid_edit_consumes_review_until_reopened(): void
     {
         ['template' => $template, 'data' => $data] = $this->pending();
+        $before = $this->evidence();
         $page = Livewire::test(ManageLicenseTemplates::class)->mountAction('create')
-            ->setActionData($data)->callMountedAction()->assertHasActionErrors(['slug']);
+            ->setActionData(array_replace($data, ['name' => '   ', 'slug' => 'synthetic-whitespace-create']))
+            ->callMountedAction()->assertHasActionErrors(['name']);
+        $this->assertValidationFocusRecovery($page);
+        $this->assertSame($before, $this->evidence());
+        $page->assertActionDataSet(['slug' => 'synthetic-whitespace-create', 'type' => $data['type']]);
+        $page->setActionData($data)->callMountedAction()->assertHasActionErrors(['slug']);
+        $this->assertValidationFocusRecovery($page);
         $page->setActionData(array_replace($data, ['slug' => 'synthetic-corrected-create']))
             ->callMountedAction()->assertHasNoActionErrors();
         $this->assertConsumed($page);
         $before = $this->evidence();
         $page = Livewire::test(ManageLicenseTemplates::class)->mountTableAction('edit', $template)
             ->setTableActionData(array_replace($data, ['name' => '']))->callMountedTableAction()->assertHasTableActionErrors(['name']);
+        $this->assertValidationFocusRecovery($page);
         $this->assertConsumed($page);
         $page->setTableActionData(array_replace($data, ['name' => 'Changed after invalid form']))
             ->callMountedTableAction()->assertHasTableActionErrors(['name'])->assertNotified('Reopen template to continue');
+        $this->assertValidationFocusRecovery($page);
         $this->assertSame($before, $this->evidence());
         $page->unmountAction()->mountTableAction('edit', $template)
             ->setTableActionData(array_replace($data, ['name' => 'Changed after reopen']))
@@ -108,6 +132,7 @@ class LicenseTemplateAuthoringActionTest extends TestCase
         $before = $this->evidence();
         $page->assertSet('templateReview', $review)->setTableActionData(array_replace($data, ['name' => 'Stale local identity']))
             ->callMountedTableAction()->assertHasTableActionErrors(['name'])->assertNotified('Reopen template to continue');
+        $this->assertValidationFocusRecovery($page);
         $this->assertConsumed($page);
         $this->assertSame($before, $this->evidence());
     }
