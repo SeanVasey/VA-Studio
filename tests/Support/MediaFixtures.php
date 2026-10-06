@@ -64,20 +64,32 @@ class MediaFixtures
     }
 
     /** Returns immutable outputs indexed by role; never creates offers or rights. */
-    public static function readyTrackMedia(Track $track, User $actor): array
+    public static function readyTrackMedia(Track $track, User $actor, ?MalwareScanner $scanner = null): array
     {
-        self::configure();
-        $outputs = [];
-        foreach (['master_wav', 'artwork'] as $role) {
-            $source = self::source($track, $role);
-            $run = app(QueueMediaProcessing::class)->handle($source, $actor);
-            app(MediaProcessor::class)->handle($run->id);
-            foreach ($run->outputs()->get() as $output) {
-                $outputs[$output->role] = $output;
-            }
+        $defaultScanner = self::configure();
+        // The native customer fixture opts into the genuine scanner before any immutable media evidence.
+        // Ordinary fixtures retain their explicit test-only engine, including after a failed native preparation.
+        if ($scanner !== null) {
+            app()->instance(MalwareScanner::class, $scanner);
         }
-        $track->refresh();
+        try {
+            $outputs = [];
+            foreach (['master_wav', 'artwork'] as $role) {
+                $source = self::source($track, $role);
+                $run = app(QueueMediaProcessing::class)->handle($source, $actor);
+                $processed = app(MediaProcessor::class)->handle($run->id);
+                if ($scanner !== null && $processed->status !== 'completed') {
+                    throw new \RuntimeException('Explicit fixture media scanning did not complete.');
+                }
+                foreach ($run->outputs()->get() as $output) {
+                    $outputs[$output->role] = $output;
+                }
+            }
+            $track->refresh();
 
-        return $outputs;
+            return $outputs;
+        } finally {
+            app()->instance(MalwareScanner::class, $defaultScanner);
+        }
     }
 }

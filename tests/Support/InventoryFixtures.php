@@ -5,6 +5,7 @@ namespace Tests\Support;
 use App\Domain\Commerce\CreateQuote;
 use App\Domain\Commerce\Inventory\ManageRightsScope;
 use App\Domain\Commerce\Models\RightsScope;
+use App\Domain\Media\MalwareScanner;
 use Illuminate\Support\Str;
 
 final class InventoryFixtures
@@ -22,9 +23,9 @@ final class InventoryFixtures
         config(['commerce.test_inventory_policy' => json_encode(self::policy($ttl), JSON_THROW_ON_ERROR)]);
     }
 
-    public static function selection(?RightsScope $scope = null): array
+    public static function selection(?RightsScope $scope = null, ?MalwareScanner $scanner = null): array
     {
-        $selection = QuoteFixtures::selection();
+        $selection = QuoteFixtures::selection(scanner: $scanner);
         $manage = app(ManageRightsScope::class);
         $scope ??= $manage->register('fixture-'.Str::uuid(), 'SYNTHETIC-SCOPE', $selection['actor']);
         $link = $manage->link($scope->id, $selection['revision']->id, 'SYNTHETIC-LINK', $selection['actor']);
