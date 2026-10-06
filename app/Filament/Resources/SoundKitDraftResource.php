@@ -104,6 +104,8 @@ class SoundKitDraftResource extends OperatorResource
 
                         return array_intersect_key($snapshot, array_flip(['title', 'description', 'provenance']));
                     })->using(fn (SoundKitDraft $record, array $data, ManageSoundKitDrafts $livewire): SoundKitDraft => static::saveDraft($record, $data, $livewire)),
+                Action::make('resumable_upload')->label('Resumable kit upload')
+                    ->url(fn (SoundKitDraft $record): string => static::getUrl('resumable-upload', ['record' => $record])),
                 Action::make('upload')->label('Upload kit ZIP')->modalHeading('Upload a private kit ZIP')->modalSubmitActionLabel('Upload privately')
                     ->extraModalWindowAttributes(TrackResource::metadataModalAttributes())
                     ->modalDescription('Upload a ZIP containing WAV samples. Each upload retains the current description and provenance as a new archive revision. Samples do not need to share a duration or recording alignment. Nothing is published.')
@@ -111,7 +113,7 @@ class SoundKitDraftResource extends OperatorResource
                         ->preventFilePathTampering()->getUploadedFileUsing(fn (): ?array => null)->maxSize(204800)
                         ->acceptedFileTypes(['application/zip', 'application/x-zip-compressed'])->required()
                         ->downloadable(false)->openable(false)->previewable(false)
-                        ->helperText('Up to 200 MiB, subject to the configured intake limit. WAV files only; MIDI and plugin presets are not accepted by this profile.')])
+                        ->helperText('For small files within the server request limit. Use Resumable kit upload for larger archives, up to 200 MiB. WAV files only; MIDI and plugin presets are not accepted by this profile.')])
                     ->mountUsing(function (SoundKitDraft $record, ManageSoundKitDrafts $livewire, ?Schema $schema = null): void {
                         static::capture($record, $livewire);
                         $schema?->fill(['upload' => null]);
@@ -250,6 +252,7 @@ class SoundKitDraftResource extends OperatorResource
 
     public static function getPages(): array
     {
-        return ['index' => ManageSoundKitDrafts::route('/')];
+        return ['index' => ManageSoundKitDrafts::route('/'),
+            'resumable-upload' => SoundKitDraftResource\Pages\UploadSoundKit::route('/{record}/resumable-upload')];
     }
 }
