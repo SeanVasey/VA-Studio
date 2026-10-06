@@ -14,6 +14,10 @@ The integrated selector adds customer feedback and product-draft coverage while 
 
 At the customer/product composition checkpoint, the seven new shared-engine test files passed together on SQLite: **73 cases / 522 assertions**, zero failures/skips, 24.988 seconds. The 31 focused-selector and 29 database-receipt safeguards passed, as did TypeScript, the production build and client scan. The actual guarded browser wrapper completed fresh migrations, interactive operator setup and installation diagnostics, then discovered all four customer journey cases across Chromium/WebKit. Discovery is not native browser execution or full combined CI acceptance.
 
+After merging corrected base `baf131cf` and the customer legacy-regression record, composition `e2147503` passed 31 selector, 34 GitHub receipt, 24 GitLab receipt and 36 partition safeguards. Actual complete PHPUnit discovery contains **3,306 cases in 201 files**, with **331** method-matched SQLite exceptions and no undiscovered policy method. Required receipt counts are eight MySQL and two SQLite. With the patched dependency tree, the customer/upload frontend selection passed 42 cases; TypeScript, production build and client scan passed. Fresh guarded fixture setup and discovery found six customer/upload cases across the two native browser projects. These are discovery counts; browser execution and full hosted acceptance remain required.
+
+The final native composition check ran `CustomerAccountConcurrencyTest`, `CustomerAccountMigrationTest`, `ProductDraftConcurrencyTest` and `ProductDraftMigrationTest` together through the isolated MySQL 8.4.11 wrapper: **30 tests / 721 assertions**, zero failures/skips, 120.617 seconds. It includes all 18 newly registered native race cases and both additive schema boundaries. This focused check does not substitute for the complete 3,306-case database gates.
+
 ## Baseline audited before this batch
 
 This inventory describes accepted main `1095dd5`, before the active resumable-upload and financial-observation changes below. Their final integrated acceptance is recorded separately.
