@@ -36,4 +36,20 @@ python3 /workspace/scratch/0c039e9e0645/mysql-runtime/run-tests.py -- php vendor
 php vendor/bin/pint --test app/Domain/Catalog/ReviewedOfferDraft.php app/Domain/Catalog/OfferDraftInput.php app/Domain/Catalog/SaveOfferDraft.php tests/Feature/ReviewedOfferDraftTest.php tests/Support/ReviewedOfferDraftFixtures.php
 ```
 
-Root owns shared registry/census and inclusive acceptance. Independent exact-source review, composed real editor/browser checks and complete hosted acceptance remain required.
+## Native lock evidence
+
+The native class has fourteen dataset-expanded cases: competing reviewed edits, legacy partial saves, publication, deactivation, operator role withdrawal, verified-email withdrawal and required-MFA withdrawal, each in both commit orders. Workers retain their actual actor and offer before starting, run in distinct processes/connections with repeatable-read isolation, and publish complete readiness JSON atomically. The parent observes an exact InnoDB PRIMARY record wait for the expected requester, blocker, schema, table and row before releasing the first worker. Authority cases wait on the operator's user row; distinct-operator cases wait on the track row and assert actor → track → offer lock order.
+
+The first fourteen-case native run reached each required barrier and asserted the expected worker result, winning price, publication state and audit counts. All fourteen then failed at the same original-revision retention assertion: the fixture baseline used the just-created model's JSON serialization rather than MySQL's persisted JSON. `races-mysql-first.{xml,log}` retains those fourteen failures and 1,100 assertions. The corrected baseline reads the actual persisted revision and license rows before either worker starts; final assertions still compare their raw database attributes exactly.
+
+The final native selection passed 78/78 cases with 1,358 assertions in 403.331 seconds, with zero errors, failures or skips (`domain-races-mysql-final.{xml,log}`). This includes all 64 domain cases and all fourteen independent-process races on the corrected source. No application change followed core commit `2293839c8ca9e6c96a7806df0e7a1979950fb8b5`. `reviewed-offer-evidence/tested-source-final.json` binds the tested source hashes, exact commands and original/final receipt hashes. It also records that the legacy handle and original validator body remain byte-identical to frozen parent.
+
+The unchanged accepted fixture budgets are a 15-second parent wait and InnoDB lock timeout, 20-second worker barrier and 40-second process limit. Disposable MySQL 8.4.11 uses private loopback transport and normal durability: `innodb_flush_log_at_trx_commit=1`, `sync_binlog=1`, doublewrite ON and binary logging ON. SQLite independently collects fourteen exclusions, executes zero cases and makes zero assertions (`races-sqlite-exclusion.{xml,log}`); its exact source reason is “Reviewed offer fences require independent MySQL sessions and exact record waits; SQLite is not concurrency evidence.”
+
+```sh
+python3 /workspace/scratch/0c039e9e0645/mysql-runtime/run-tests.py -- php vendor/bin/phpunit tests/Feature/ReviewedOfferDraftTest.php tests/Feature/ReviewedOfferDraftConcurrencyTest.php --log-junit /workspace/scratch/b527c7e94bd7/reviewed-offer-evidence/domain-races-mysql-final.xml
+php vendor/bin/phpunit tests/Feature/ReviewedOfferDraftConcurrencyTest.php --log-junit /workspace/scratch/b527c7e94bd7/reviewed-offer-evidence/races-sqlite-exclusion.xml
+php vendor/bin/pint --test app/Domain/Catalog/ReviewedOfferDraft.php app/Domain/Catalog/OfferDraftInput.php app/Domain/Catalog/SaveOfferDraft.php tests/Feature/ReviewedOfferDraftTest.php tests/Feature/ReviewedOfferDraftConcurrencyTest.php tests/Support/ReviewedOfferDraftFixtures.php tests/Support/reviewed-offer-draft-worker.php
+```
+
+Root owns shared registry/census and inclusive acceptance. The fourteen exclusions belong to `ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders`. Independent exact-source review, composed real editor/browser checks and complete hosted acceptance remain required.
