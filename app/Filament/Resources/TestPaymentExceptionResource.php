@@ -6,6 +6,7 @@ use App\Domain\Commerce\Models\OrderFinalization;
 use App\Domain\Commerce\Operations\InspectRetainedTestPaymentException;
 use App\Domain\Commerce\Operations\ReadTestCommerceOperations;
 use App\Domain\Commerce\Operations\TestPaymentExceptionOperations;
+use App\Domain\Commerce\RefundResolution\ResolveRefundedTestException;
 use App\Filament\Resources\TestPaymentExceptionResource\Pages\ListTestPaymentExceptions;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
@@ -34,7 +35,7 @@ final class TestPaymentExceptionResource extends ReadOnlyCommerceResource
 
     public static function table(Table $table): Table
     {
-        return $table->description('Retained test-payment exceptions. Operational acknowledgments and current payment checks preserve blocked fulfillment and the recorded resource disposition; they do not resolve or refund the payment.')
+        return $table->description('Retained test-payment exceptions. Operational acknowledgments and current payment checks preserve blocked fulfillment and the recorded resource disposition; they do not resolve or refund the payment. A separate full-refund review can release still-pending resources without sending a refund or changing grants or contracts.')
             ->columns([
                 TextColumn::make('order_public_id')->label('Order')->searchable(['o.public_id'])->copyable(),
                 TextColumn::make('public_id')->label('Finalization')->copyable(),
@@ -87,6 +88,52 @@ final class TestPaymentExceptionResource extends ReadOnlyCommerceResource
                             $action->halt();
                         }
                         Notification::make()->title('Test payment check')->body('Payment: '.($result['outcome'] ?? $result['status']).'. Refund/dispute observation: '.str_replace('_', ' ', $result['refundDisputeState'] ?? 'not_inspected').'. Fulfillment remains blocked.')->send();
+                    }),
+                Action::make('refundResolutionHistory')->label('Refund resolution history')->modalHeading('Test refund resolution history')
+                    ->modalContent(fn (OrderFinalization $record) => view('admin.test-refund-resolution-history', [
+                        'review' => app(ResolveRefundedTestException::class)->review($record->public_id, Filament::auth()->user()),
+                    ]))->modalSubmitAction(false)->modalCancelActionLabel('Close'),
+                Action::make('resolveFullRefund')->label('Verify full refund and release')->modalHeading('Verify full refund and release')
+                    ->modalDescription('Verify an already completed full refund before releasing this test order’s still-pending inventory and promotion resources. No refund is sent. Grants and original contracts are unchanged; fulfillment remains blocked. Unsupported or uncertain evidence cannot authorize release. Close and reopen this dialog to review a new history sequence.')
+                    ->fillForm(function (OrderFinalization $record): array {
+                        $review = app(ResolveRefundedTestException::class)->review($record->public_id, Filament::auth()->user());
+
+                        return ['sequence' => $review['sequence'], 'request_id' => (string) Str::uuid()];
+                    })
+                    ->schema([
+                        Hidden::make('sequence')->required()->rules(['integer', 'min:0']),
+                        Hidden::make('request_id')->required()->rules(['uuid']),
+                    ])
+                    ->action(function (OrderFinalization $record, array $data, Action $action): void {
+                        try {
+                            $result = app(ResolveRefundedTestException::class)->resolve($record->public_id, Filament::auth()->user(),
+                                $data['request_id'], (int) $data['sequence']);
+                        } catch (RuntimeException) {
+                            Notification::make()->title('Refund resolution was not confirmed')
+                                ->body('The outcome is uncertain. Retry this same request, or close the dialog and inspect refund resolution history before starting a new review.')
+                                ->danger()->send();
+                            $action->halt();
+                        }
+
+                        $status = ($result['testOnly'] ?? false) === true ? ($result['status'] ?? null) : null;
+                        if ($status === 'released') {
+                            Notification::make()->title('Refunded test resources released')
+                                ->body('The retained resolution records the original attempt. No refund was sent. Grants and original contracts are unchanged; fulfillment remains blocked.')
+                                ->success()->send();
+
+                            return;
+                        }
+
+                        [$title, $body] = match ($status) {
+                            'not_refunded' => ['Full refund was not established', 'This check did not establish an eligible completed full refund. Inspect refund resolution history before starting a new review.'],
+                            'attention' => ['Refund evidence needs attention', 'Unsupported, incomplete or conflicting evidence cannot authorize release. Inspect refund resolution history before starting a new review.'],
+                            'unavailable' => ['Refund verification is unavailable', 'This check did not confirm release. Inspect refund resolution history before starting a new review.'],
+                            'busy' => ['Refund check is in progress', 'Retry this same request or inspect refund resolution history. No release is confirmed by this response.'],
+                            'stale' => ['Refund review is out of date', 'Close this dialog and review current refund resolution history before submitting a new request. No release is confirmed by this response.'],
+                            default => ['Refund resolution was not confirmed', 'Inspect refund resolution history before starting a new review. No release is confirmed by this response.'],
+                        };
+                        Notification::make()->title($title)->body($body)->warning()->send();
+                        $action->halt();
                     }),
             ])->toolbarActions([])
             ->emptyStateHeading('No matching test payment exceptions')

@@ -27,6 +27,7 @@ const env = {
   // Only retained synthetic test evidence is readable; no HTTP payment initiation/processing is enabled.
   STRIPE_ACCOUNT_ID: 'acct_SYNTHETICONLY', STRIPE_MODE: 'test', STRIPE_TEST_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '',
   STRIPE_TEST_CHECKOUT_ENABLED: 'false', STRIPE_TEST_PAYMENT_PROCESSING_ENABLED: 'false', STRIPE_TEST_FINALIZATION_ENABLED: 'false',
+  VASEY_TEST_REFUND_RESOLUTION_ENABLED: 'false', VASEY_TEST_REFUND_RESOLUTION_POLICY: '',
   VASEY_BROWSER_EXCEPTION_MARKER: randomBytes(32).toString('hex'),
   // HTTP uploads deliberately retain quarantine behavior even when fixture preparation has a genuine scanner installed.
   MEDIA_CLAMSCAN: join(directory, 'no-clamscan'),

@@ -4,7 +4,9 @@ namespace App\Domain\Commerce\Operations;
 
 use App\Domain\Commerce\Finalization\FinalizationException;
 use App\Domain\Commerce\Finalization\ReadFinalization;
+use App\Domain\Commerce\Models\InventoryReservation;
 use App\Domain\Commerce\Models\OrderFinalization;
+use App\Domain\Commerce\Models\PromotionUse;
 use App\Domain\Commerce\Orders\OrderRequest;
 use App\Domain\Commerce\Orders\ReadOrder;
 use App\Domain\Commerce\QuoteException;
@@ -70,8 +72,10 @@ final class InspectRetainedTestPaymentException
                         'orderId' => $record->order->public_id, 'recordedReason' => $record->reason,
                         'confirmedAt' => $record->confirmed_at->toIso8601ZuluString(),
                         'eligibilityCutoff' => $record->eligibility_cutoff->toIso8601ZuluString(),
-                        'finalizedAt' => $record->finalized_at->toIso8601ZuluString(), 'inventoryState' => $record->reason === 'released_attempt' ? 'released' : 'pending',
-                        'promotionState' => $original['attempt']['promotion'] === null ? 'none' : ($record->reason === 'released_attempt' ? 'released' : 'pending'),
+                        'finalizedAt' => $record->finalized_at->toIso8601ZuluString(),
+                        'inventoryState' => InventoryReservation::findOrFail($original['attempt']['inventory']['id'])->state,
+                        'promotionState' => $original['attempt']['promotion'] === null ? 'none'
+                            : PromotionUse::findOrFail($original['attempt']['promotion']['id'])->state,
                         'grantCount' => 0, 'exclusiveSaleCount' => 0, 'outboxCount' => 1]);
                 } catch (QuoteException|FinalizationException) {
                     // Distinguish an unverified graph from an unknown/foreign record, without private diagnostics.
