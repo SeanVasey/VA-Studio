@@ -4,9 +4,11 @@ This successor prepares a production pricing/order interface. It does not activa
 the legacy local/testing commerce paths, change provider accounts, establish legal
 or tax facts, send messages, create orders or authorize payment collection.
 
-The first source checkpoint implements the strict machine-policy validator and
-adverse synthetic fixtures. The persistence and APIs below are the frozen next
-implementation contract, not functionality completed by that first checkpoint.
+The original checkpoint `72c1da8` supplies the strict machine-policy validator and
+adverse synthetic fixtures. The continuation implements the encrypted immutable
+candidate, software approval, irreversible closure and checked private projection
+contract described below. These are preparation APIs; production purchase,
+payment and delivery execution remain unfinished and disabled.
 
 ## Owned boundary and dependencies
 
@@ -93,9 +95,12 @@ activation exists.
 The source draft is the family fence. Locks follow actor, source draft, retained
 source versions/acknowledgments, immutable candidates/approvals/closures and audits.
 All historical payloads authenticate; every semantic read is current/locking,
-including no-ops. Signed captures bind exact raw source/family history, actor,
-intent and supplied choices. A source/candidate update, closure, historical row
-change or authority ABA invalidates a prepared write. No active mutable pointer is
+including no-ops. Signed captures bind exact raw source/family history, the actor's
+raw row and retained user audit history, intent and supplied choices. A
+source/candidate update, closure, historical row change or durably audited
+authority ABA invalidates a prepared write. Unrecorded out-of-band SQL that
+restores exactly the same authority row is not independently observable; the
+audited role-change contract remains required. No active mutable pointer is
 introduced. Immutable generation order selects the latest candidate.
 
 Candidate payloads, approval references and closure reasons are encrypted. Clear
@@ -103,8 +108,63 @@ metadata/audits contain bounded identities and ciphertext commitments rather tha
 merchant declarations. Version uniqueness uses a keyed version identity. INSERT
 triggers explicitly reject every primary/unique identity replacement, including
 SQLite REPLACE when recursive triggers are disabled. UPDATE/DELETE guards retain
-immutable history. All model and QueryExecuted callbacks finish before the final
-direct-primary-PDO actor and complete graph proof.
+immutable history. Retained source-prefix reconstruction authenticates the exact
+source graph each candidate committed even after later revisions append.
+Candidate/approval/closure timestamps and actor identities are encrypted into
+their records, and the complete minimized audit graph is checked against them.
+Authority, model, audit and QueryExecuted callbacks finish before the final
+direct-primary-PDO actor and complete graph proof. Transaction lifecycle
+callbacks and domain preparation callbacks are trusted application code; this
+contract does not sandbox arbitrary PHP or provider I/O performed by such code.
+
+`PreparationContextV1::forMachine` derives only the exact comparison vocabulary:
+purpose/schema, provider/account/mode/API/capture, currency/exponent, storage
+adapter/version/boundary, renderer profile, delivery transfer and assent version.
+The adapter must explicitly supply this full context. The private projection
+also retains exact source, candidate, approval and machine hashes with a purpose
+bound signature. Returning it does not grant activation, payment or delivery
+authority; consuming source must use the checked transaction API and implement
+its own future immutable snapshot schema. No consumer exists in this increment.
+
+After an uncertain response, staff may reload the retained immutable candidate
+and prepare a fresh authenticated no-op. Reusing the old pre-save capture fails
+against the moved family baseline. Approval and closure are irreversible
+single-record decisions and require a fresh review when their baseline changes.
+
+## Focused continuation evidence
+
+The isolated continuation source preserves `72c1da8` and underlying authored
+policy proof `cd3ee3e` without changing the original unfinished worktree. On the
+cached PHP 8.4 runtime, this exact selection passed 155 tests / 208 assertions:
+
+```sh
+php vendor/bin/phpunit tests/Feature/ProductionTrackCapabilitiesTest.php tests/Feature/ProductionTrackCapabilitiesGuardsTest.php tests/Unit/ProductionTrackMachinePolicyTest.php --colors=never
+php vendor/bin/pint --test app/Domain/Commerce/ProductionPolicy tests/Feature/ProductionTrackCapabilitiesTest.php tests/Feature/ProductionTrackCapabilitiesGuardsTest.php database/migrations/2026_10_06_236000_production_track_policy_capabilities.php
+git diff --check
+```
+
+Cases exercise exact no-op/successor behavior, explicit supported alternatives,
+every context binding, missing/unresolved source acknowledgment, family reviewer
+independence, source movement, stale competing captures, closure/version reuse,
+withdrawn role/MFA and durably audited authority ABA, callback-time rollback,
+retained prefix damage, audit damage, empty/populated rollback and all three
+tables' update/delete/primary-REPLACE/unique-REPLACE denial with recursive triggers
+disabled. The first run exposed an incorrect fixture table name and four fixture
+trigger names/expected failure types; those fixture corrections are retained.
+They were not compiler or commerce passes.
+
+The broader affected selection additionally included
+`ProductionTrackPolicyDraftTest`, `ProductionTrackPolicyFinalProofTest` and
+`ProductionTrackPolicyEngineTest`: 234 cases, 233 passed, 377 assertions and one
+explicit MySQL-only engine case skipped on SQLite. The upstream authored source
+remains unchanged.
+
+These are SQLite and unit checks. Actual MySQL record waits, engine-default
+execution, repeatable-read interleavings, provider interoperability, private
+host/runtime configuration, a consumer adapter and consolidated exact-source
+final acceptance remain deferred. No MySQL matrix or hosted CI was launched.
+Independent sensitive-domain review and integration disposition are recorded by
+the integration owner against the frozen continuation commit.
 
 ## Next consumer and remaining acceptance
 
