@@ -13,8 +13,9 @@ final class InquiryPrivacy
     {
         if ($request->is('contact/inquiries', 'contact/inquiries/*')) {
             $history = $request->is('contact/inquiries/history', 'contact/inquiries/history/*');
+            $context = $request->is('contact/inquiries/*/order-context');
             $conversation = $request->is('contact/inquiries/*');
-            $allowed = $history ? ['GET'] : ($conversation ? ['GET', 'POST'] : ['POST']);
+            $allowed = ($history || $context) ? ['GET'] : ($conversation ? ['GET', 'POST'] : ['POST']);
             if (! in_array($request->getRealMethod(), $allowed, true)) {
                 return InquiryResponse::error(405, headers: ['Allow' => implode(', ', $allowed)]);
             }

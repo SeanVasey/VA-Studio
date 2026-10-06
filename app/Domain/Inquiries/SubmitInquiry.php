@@ -3,6 +3,7 @@
 namespace App\Domain\Inquiries;
 
 use App\Domain\Inquiries\Models\CustomerInquiry;
+use App\Domain\Inquiries\Models\InquiryOrderContext;
 use App\Domain\SiteBuilder\Models\SitePublication;
 use App\Domain\SiteBuilder\Models\SiteRelease;
 use App\Domain\SiteBuilder\SiteContent;
@@ -64,7 +65,8 @@ final class SubmitInquiry
 
     private function replay(CustomerInquiry $existing, string $hash, string $ownerHash): array
     {
-        if (! hash_equals($existing->owner_hash, $ownerHash) || ! hash_equals($existing->payload_hash, $hash)) {
+        if (! hash_equals($existing->owner_hash, $ownerHash) || ! hash_equals($existing->payload_hash, $hash)
+            || InquiryOrderContext::where('inquiry_id', $existing->id)->exists()) {
             throw new InquiryException(409);
         }
 
