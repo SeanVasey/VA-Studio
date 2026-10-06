@@ -127,6 +127,18 @@
       "test_committed_inquiry_and_actor_fences_decide_waiting_conversation_operations"
     ],
     [
+      "Tests\\Feature\\LicenseTemplateAuthoringConcurrencyTest",
+      "test_competing_reviewed_template_edits_reject_the_stale_loser_after_an_exact_template_row_wait"
+    ],
+    [
+      "Tests\\Feature\\LicenseTemplateAuthoringConcurrencyTest",
+      "test_template_creation_and_reviewed_edit_serialize_role_withdrawal_on_the_exact_user_row"
+    ],
+    [
+      "Tests\\Feature\\LicenseTemplateAuthoringConcurrencyTest",
+      "test_template_edit_and_review_submission_serialize_on_the_exact_template_row_in_both_orders"
+    ],
+    [
       "Tests\\Feature\\LicenseWriterConcurrencyTest",
       "test_all_license_mutations_serialize_current_role_withdrawal_before_resource_and_actor_fk_writes"
     ],

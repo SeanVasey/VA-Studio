@@ -91,6 +91,7 @@ PHP_TARGETS = {
         "tests/Feature/TestOwnerDeliveryHttpTest.php", "tests/Feature/TestOwnerDeliveryProjectionTest.php",
     ),
     "seller": (
+        "tests/Feature/InquiryHistoryTest.php", "tests/Feature/InquiryHistoryHttpTest.php",
         "tests/Feature/InquiryConversationTest.php", "tests/Feature/InquiryConversationHttpTest.php",
         "tests/Feature/InquiryConversationAdminTest.php", "tests/Feature/InquiryConversationConcurrencyTest.php",
         "tests/Feature/InquiryMessageMigrationTest.php",
@@ -107,6 +108,13 @@ PHP_TARGETS = {
         "tests/Feature/SiteRelatedTrackDamageTest.php", "tests/Feature/SiteRelatedTrackEditorTest.php",
         "tests/Feature/SiteRelatedTrackHttpTest.php", "tests/Feature/SiteRelatedTrackImageMigrationTest.php",
         "tests/Feature/SiteContentConcurrencyTest.php",
+    ),
+    "licensing": (
+        "tests/Feature/LicenseTemplateAuthoringTest.php", "tests/Feature/LicenseTemplateAuthoringActionTest.php",
+        "tests/Feature/LicenseTemplateAuthoringConcurrencyTest.php",
+        "tests/Feature/LicensingAdminTest.php", "tests/Feature/LicenseWriterAuthorityTest.php",
+        "tests/Feature/LicenseWriterConcurrencyTest.php", "tests/Feature/LicenseEvidenceTest.php",
+        "tests/Feature/OfferRevisionTest.php",
     ),
     "publication": (
         "tests/Feature/TrackPublicationApplyTest.php", "tests/Feature/TrackPublicationApplyConcurrencyTest.php",
@@ -144,6 +152,7 @@ PHP_TARGETS = {
     ),
 }
 FRONTEND_TARGETS = (
+    "tests/frontend/inquiry-history.test.tsx",
     "tests/frontend/customer-purchase-claim.test.tsx",
     "tests/frontend/customer-identity.test.tsx", "tests/frontend/resumable-kit-upload.test.ts",
     "tests/frontend/inquiry-conversation.test.tsx",
@@ -165,6 +174,7 @@ FRONTEND_TARGETS = (
     "tests/frontend/resumable-media-upload.test.ts",
 )
 BROWSER_TARGETS = (
+    "tests/browser/license-template-authoring.spec.ts",
     "tests/browser/customer-library-browsing.spec.ts",
     "tests/browser/customer-purchase-claim.spec.ts", "tests/browser/test-refunded-exception-resolution.spec.ts",
     "tests/browser/customer-identity.spec.ts", "tests/browser/resumable-kit-upload.spec.ts",
