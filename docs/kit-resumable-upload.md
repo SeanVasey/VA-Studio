@@ -38,7 +38,7 @@ The following focused checks ran with the companion kit domain/migration present
 - Targeted Pint and `git diff --check`: passed.
 - `npm run test:browser -- tests/browser/resumable-kit-upload.spec.ts --list`: disposable SQLite fixture bootstrap passed; Chromium desktop and WebKit mobile tests were both discovered.
 
-The domain and migration source is commit `3bf4f06be51e1a90faf4391830109f35d52137ef`; the interface source `77ee359abf3160381dde4dd676a55b97abeade20` is composed as `09bb33b` on that ancestry. Independent source review covered the controller, private response boundary, locked admin context and receipt-driven client. Backend independent review and full composed CI remain required.
+The domain and migration source is commit `3bf4f06be51e1a90faf4391830109f35d52137ef`; the interface source `77ee359abf3160381dde4dd676a55b97abeade20` is composed as `09bb33b` on that ancestry. Independent source review covered the controller, private response boundary, locked admin context and receipt-driven client. Independent backend and separate schema review approved exact `3bf4f06` as composed in `09bb33b`; subsequent `984a49f` changed documentation only. Full composed CI remains required.
 
 - Domain/migration plus existing intake/recovery on SQLite: `php vendor/bin/phpunit tests/Feature/SoundKitUploadsTest.php tests/Feature/SoundKitUploadMigrationTest.php tests/Feature/SoundKitIntakeTest.php tests/Feature/SoundKitRecoveryTest.php --stop-on-error --stop-on-failure` — **50 tests / 278 assertions**, no failures/skips, 9.986 seconds.
 - Final composed SQLite domain/schema/HTTP/admin selection plus existing intake/recovery and track HTTP: **86 tests / 1,372 assertions**, no failures/skips, 18.670 seconds at `09bb33b`.

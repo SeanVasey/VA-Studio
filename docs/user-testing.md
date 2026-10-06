@@ -24,11 +24,13 @@ The [alpha launcher](private-alpha.md) starts the real app on loopback and print
 
 On the customer/product integration source, **Collections and albums** also lets you create a private draft from the synthetic tracks, arrange their order, save a new version, review history and use an earlier composition as a new draft version. The original versions stay retained. This authoring flow does not set prices/licenses or enable public collection purchases.
 
+**Sound kit drafts** lets you create a private kit with a provenance reference. On the resumable-kit branch, open **Resumable kit upload**, select a synthetic WAV ZIP, and inspect/resume its exact bytes after an interrupted request. Finish retains a private revision; inspect its processing result separately. The launcher has no accepted malware scanner, so retained input is not a verified or sellable product. Use only disposable synthetic test files.
+
 Stopping the launcher deletes that session's database, uploads, credentials and edits. Keep useful wording separately. This is a practice installation, not a place to begin uploading production originals or customer records. Its data and the static preview fixtures are separate.
 
 ## Customer account testing boundary
 
-The composed account-first test journey has real sign-in, private order history and authorized original downloads across fresh sessions. Its synthetic accounts and paid test orders are provisioned by the isolated browser-test fixture; the ordinary alpha launcher does not create a customer login, and the static preview has no account backend. See [customer setup and evidence](verification/customer-account-test-journey.md). Account UI/domain/HTTP tests and browser discovery are recorded separately from native Chromium/WebKit acceptance. Production registration, guest-order claims and account recovery remain pending.
+The composed account-first test journey has real sign-in, private order history and authorized original downloads across fresh sessions. Its synthetic accounts and paid test orders are provisioned by the isolated browser-test fixture; the ordinary alpha launcher does not create a customer login, and the static preview has no account backend. See [customer setup and evidence](verification/customer-account-test-journey.md). Account UI/domain/HTTP tests and browser discovery are recorded separately from native Chromium/WebKit acceptance. The next recovery branch adds [local test enrollment and recovery](customer-test-self-service.md) through private synthetic captures, enabled only in an explicitly configured local/testing installation and its guarded browser fixture. The ordinary alpha launcher does not enable that transport. Production registration/email delivery, guest-order claims and production recovery remain pending.
 
 ## October 6 verification checkpoint
 

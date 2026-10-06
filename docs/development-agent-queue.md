@@ -7,8 +7,8 @@ The integrating [completion candidate](completion-execution.md#continued-develop
 | Lane | Current work and boundary |
 | --- | --- |
 | Integration `/root` | Compose exact reviewed sources, preserve branch ancestry, run complete discovery/focused verification, publish one candidate and require full hosted acceptance before expected-head merge |
-| Customer `/root/customer_reconcile` | Complete test-only self-service enrollment/recovery, private capture, replay/ownership/migration/browser checks; production email and guest claims remain separate |
-| Product `/root/product_reconcile` | Complete true-kit resumable private transport above the development whole-file HTTP limit, with retained exact revisions and existing track transport regressions |
+| Customer `/root/customer_reconcile` | Reviewed self-service e664e22 is composed in the next branch; full native browser/CI acceptance and production email/guest claims remain separate |
+| Product `/root/product_reconcile` | Reviewed true-kit transport984a49f is composed in the next branch; full native browser/CI and product commerce remain separate |
 | CI review `/root/ci_reconcile` | Independently review composed source, exact census/skip registration and browser budget changes; no gate or receipt reuse relaxation |
 | Commerce review `/root/commerce_review` | Independently review unpaid resource effects and subsequent kit transport boundaries |
 
