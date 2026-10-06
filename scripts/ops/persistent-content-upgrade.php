@@ -155,12 +155,14 @@ final class PrivateCopyUpgrade
     private static function rows(PDO $database, string $table, array $columns, ?int $maximumMigrationId = null): array
     {
         $fields = implode(',', array_map(self::identifier(...), $columns));
+        $types = implode(',', array_map(static fn (string $column): string => 'typeof('.self::identifier($column).')', $columns));
         $where = $maximumMigrationId === null ? '' : ' WHERE id <= '.$maximumMigrationId;
-        $statement = $database->query('SELECT '.$fields.' FROM '.self::identifier($table).$where.' ORDER BY '.$fields);
+        $statement = $database->query('SELECT '.$fields.','.$types.' FROM '.self::identifier($table).$where.' ORDER BY '.$fields.','.$types);
         $digest = hash_init('sha256');
         $count = 0;
         while (($row = $statement->fetch(PDO::FETCH_NUM)) !== false) {
-            // PHP serialization retains scalar types and arbitrary BLOB bytes without publishing them.
+            // SQLite storage classes distinguish BLOB/TEXT even when PDO returns identical PHP strings.
+            // Serialization also retains scalar values and arbitrary bytes without publishing them.
             $encoded = serialize($row);
             hash_update($digest, strlen($encoded).':'.$encoded);
             $count++;
@@ -174,6 +176,75 @@ final class PrivateCopyUpgrade
         return $database->query('PRAGMA table_xinfo('.self::identifier($table).')')->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    private static function tableSql(PDO $database, string $table): string
+    {
+        $statement = $database->prepare("SELECT sql FROM sqlite_schema WHERE type='table' AND name=?");
+        $statement->execute([$table]);
+        $sql = $statement->fetchColumn();
+        self::require(is_string($sql));
+
+        return $sql;
+    }
+
+    /** Locate the outer table body without treating quoted/comment parentheses as schema structure. */
+    private static function tableBody(string $sql): array
+    {
+        self::require(preg_match('/\ACREATE\s+TABLE\s+/i', $sql) === 1);
+        $open = null;
+        $depth = 0;
+        $length = strlen($sql);
+        for ($index = 0; $index < $length; $index++) {
+            $character = $sql[$index];
+            if (in_array($character, ["'", '"', '`', '['], true)) {
+                $close = $character === '[' ? ']' : $character;
+                $closed = false;
+                while (++$index < $length) {
+                    if ($sql[$index] === $close) {
+                        if ($index + 1 < $length && $sql[$index + 1] === $close) {
+                            $index++;
+                        } else {
+                            $closed = true;
+                            break;
+                        }
+                    }
+                }
+                self::require($closed);
+            } elseif (substr($sql, $index, 2) === '--') {
+                $newline = strpos($sql, "\n", $index + 2);
+                self::require($newline !== false);
+                $index = $newline;
+            } elseif (substr($sql, $index, 2) === '/*') {
+                $close = strpos($sql, '*/', $index + 2);
+                self::require($close !== false);
+                $index = $close + 1;
+            } elseif ($character === '(') {
+                $open ??= $index;
+                $depth++;
+            } elseif ($character === ')') {
+                self::require($depth > 0);
+                if (--$depth === 0) {
+                    return [$open, $index];
+                }
+            }
+        }
+        throw new RuntimeException('Unsupported table definition.');
+    }
+
+    private static function retainedTableSql(string $before, string $after, int $oldColumns, int $newColumns): void
+    {
+        if ($before === $after) {
+            return;
+        }
+        self::require($newColumns > $oldColumns);
+        [$oldOpen, $oldClose] = self::tableBody($before);
+        [$newOpen, $newClose] = self::tableBody($after);
+        $oldBody = substr($before, $oldOpen + 1, $oldClose - $oldOpen - 1);
+        $newBody = substr($after, $newOpen + 1, $newClose - $newOpen - 1);
+        // Admit only literal append-only columns. All old definitions and table options remain byte-exact.
+        self::require(substr($before, 0, $oldOpen + 1) === substr($after, 0, $newOpen + 1)
+            && str_starts_with($newBody, $oldBody.',') && substr($before, $oldClose) === substr($after, $newClose));
+    }
+
     public static function snapshot(): void
     {
         [$directory, , $plan] = self::target();
@@ -184,7 +255,7 @@ final class PrivateCopyUpgrade
         $tables = [];
         foreach ($database->query("SELECT name FROM sqlite_schema WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")->fetchAll(PDO::FETCH_COLUMN) as $name) {
             $columns = self::columns($database, $name);
-            $tables[] = ['name' => $name, 'columns' => $columns, 'foreign_keys' => $database->query('PRAGMA foreign_key_list('.self::identifier($name).')')->fetchAll(PDO::FETCH_ASSOC),
+            $tables[] = ['name' => $name, 'sql' => self::tableSql($database, $name), 'columns' => $columns, 'foreign_keys' => $database->query('PRAGMA foreign_key_list('.self::identifier($name).')')->fetchAll(PDO::FETCH_ASSOC),
                 'rows' => self::rows($database, $name, array_column($columns, 'name'), $name === 'migrations' ? $maximum : null)];
         }
         $baseline = [
@@ -249,6 +320,7 @@ final class PrivateCopyUpgrade
         foreach ($baseline['tables'] as $table) {
             $columns = self::columns($database, $table['name']);
             self::require(array_slice($columns, 0, count($table['columns'])) === $table['columns']);
+            self::retainedTableSql($table['sql'], self::tableSql($database, $table['name']), count($table['columns']), count($columns));
             self::require($database->query('PRAGMA foreign_key_list('.self::identifier($table['name']).')')->fetchAll(PDO::FETCH_ASSOC) === $table['foreign_keys']);
             self::require(self::rows($database, $table['name'], array_column($table['columns'], 'name'), $table['name'] === 'migrations' ? $baseline['maximum_migration_id'] : null) === $table['rows']);
         }

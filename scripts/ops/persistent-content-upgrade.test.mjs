@@ -16,6 +16,8 @@ let destructiveRelease;
 let sequenceRelease;
 let failedRelease;
 let waitingRelease;
+let removedCheckRelease;
+let changedStorageRelease;
 const available = spawnSync('php', ['-r', 'exit(PHP_MAJOR_VERSION===8 && PHP_MINOR_VERSION>=4 && extension_loaded("pdo_sqlite") && function_exists("posix_geteuid") ? 0 : 1);']).status === 0 && existsSync(join(root, 'vendor/autoload.php')) && existsSync(join(root, 'public/build/manifest.json'));
 
 function git(checkout, args) {
@@ -50,6 +52,8 @@ before(() => {
   sequenceRelease = release(base, 'sequence', "DB::statement(\"UPDATE sqlite_sequence SET seq=seq+500 WHERE name='tracks'\");");
   failedRelease = release(base, 'failed', "throw new RuntimeException('NONBINDING secret-like fixture failure must not escape.');");
   waitingRelease = release(base, 'waiting', "file_put_contents(storage_path('fixture-migration-waiting'),'waiting');$deadline=microtime(true)+10;while(!file_exists(storage_path('fixture-migration-release'))){if(microtime(true)>$deadline)throw new RuntimeException('Fixture expired.');usleep(50000);}Schema::create('private_upgrade_waited',fn(Blueprint $table)=>$table->id());");
+  removedCheckRelease = release(base, 'removed-check', "DB::statement('ALTER TABLE private_upgrade_check_fixture RENAME TO private_upgrade_old_check');DB::statement('CREATE TABLE private_upgrade_check_fixture (id INTEGER PRIMARY KEY AUTOINCREMENT, value INTEGER NOT NULL)');DB::statement('INSERT INTO private_upgrade_check_fixture SELECT * FROM private_upgrade_old_check');DB::statement('DROP TABLE private_upgrade_old_check');");
+  changedStorageRelease = release(base, 'changed-storage', "DB::statement('UPDATE private_upgrade_binary_fixture SET payload=CAST(payload AS TEXT)');");
 });
 after(() => { if (base) rmSync(base, { recursive: true, force: true }); });
 
@@ -86,7 +90,7 @@ async function sourceWorkspace(parent) {
   try {
     const account = spawnSync('php', ['scripts/dev/persistent-content-bootstrap.php', 'operator'], { cwd: workspace.checkout, env, input: 'NONBINDING private upgrade operator\nprivate-upgrade-operator@example.test\nNonbindingPrivateUpgrade987654321\n', encoding: 'utf8' });
     assert.equal(account.status, 0, account.stderr); assert.doesNotMatch(account.stdout, /NonbindingPrivateUpgrade987654321/);
-    const program = 'umask(0077);require "vendor/autoload.php";$app=require "bootstrap/app.php";$dir=getenv("VASEY_CONTENT_DIRECTORY");$app->useEnvironmentPath($dir);$app->useStoragePath($dir);$app->usePublicPath($dir."/public");$app->make(Illuminate\\Contracts\\Console\\Kernel::class)->bootstrap();$actor=App\\Models\\User::sole();app(App\\Domain\\Catalog\\SaveTrackMetadata::class)->handle(null,["title"=>"NONBINDING private retained track","slug"=>"private-retained-track","artist"=>"Nonbinding fixture operator"],$actor);$pdo=new PDO("sqlite:".getenv("DB_DATABASE"));$pdo->exec("CREATE TABLE private_upgrade_binary_fixture (id INTEGER PRIMARY KEY AUTOINCREMENT,payload BLOB,note TEXT,measure REAL)");$statement=$pdo->prepare("INSERT INTO private_upgrade_binary_fixture (payload,note,measure) VALUES (?,?,?)");$statement->bindValue(1,chr(0).chr(255)."private",PDO::PARAM_LOB);$statement->bindValue(2,null,PDO::PARAM_NULL);$statement->bindValue(3,1.0000000000000002);$statement->execute();';
+    const program = 'umask(0077);require "vendor/autoload.php";$app=require "bootstrap/app.php";$dir=getenv("VASEY_CONTENT_DIRECTORY");$app->useEnvironmentPath($dir);$app->useStoragePath($dir);$app->usePublicPath($dir."/public");$app->make(Illuminate\\Contracts\\Console\\Kernel::class)->bootstrap();$actor=App\\Models\\User::sole();app(App\\Domain\\Catalog\\SaveTrackMetadata::class)->handle(null,["title"=>"NONBINDING private retained track","slug"=>"private-retained-track","artist"=>"Nonbinding fixture operator"],$actor);$pdo=new PDO("sqlite:".getenv("DB_DATABASE"));$pdo->exec("CREATE TABLE private_upgrade_binary_fixture (id INTEGER PRIMARY KEY AUTOINCREMENT,payload BLOB,note TEXT,measure REAL)");$statement=$pdo->prepare("INSERT INTO private_upgrade_binary_fixture (payload,note,measure) VALUES (?,?,?)");$statement->bindValue(1,chr(0).chr(255)."private",PDO::PARAM_LOB);$statement->bindValue(2,null,PDO::PARAM_NULL);$statement->bindValue(3,1.0000000000000002);$statement->execute();$pdo->exec("CREATE TABLE private_upgrade_check_fixture (id INTEGER PRIMARY KEY AUTOINCREMENT, value INTEGER NOT NULL CHECK(value >= 0))");$pdo->exec("INSERT INTO private_upgrade_check_fixture (value) VALUES (7)");';
     const created = spawnSync('php', ['-r', program], { cwd: workspace.checkout, env, encoding: 'utf8' }); assert.equal(created.status, 0, created.stderr);
   } finally { await lease.release(); }
   writeFileSync(join(directory, 'app/private/retained-fixture-source.bin'), Buffer.from([0, 255, 16, 32, 42]), { mode: 0o600 });
@@ -235,6 +239,32 @@ native('old SQLite business sequence changes refuse even when all table rows rem
   await assert.rejects(upgradeWorkspace(input)); assert.deepEqual(bytes(source.directory), before);
   assert.equal(JSON.parse(readFileSync(join(input.directory, 'identity.json'))).state, 'initializing');
   assert.equal(existsSync(join(input.directory, 'upgrade-result.json')), false);
+});
+
+native('removing an old CHECK refuses even when every column, row and business sequence remains identical', async parent => {
+  const source = await sourceWorkspace(parent); const before = bytes(source.directory); const input = args(source, parent, removedCheckRelease);
+  const rows = query(source, 'SELECT * FROM private_upgrade_check_fixture');
+  const sequence = query(source, "SELECT * FROM sqlite_sequence WHERE name='private_upgrade_check_fixture'");
+  await assert.rejects(upgradeWorkspace(input)); assert.deepEqual(bytes(source.directory), before);
+  const identity = JSON.parse(readFileSync(join(input.directory, 'identity.json'))); assert.equal(identity.state, 'initializing');
+  const target = { directory: input.directory, checkout: input.checkout, identity };
+  assert.deepEqual(query(target, 'SELECT * FROM private_upgrade_check_fixture'), rows);
+  assert.deepEqual(query(target, "SELECT * FROM sqlite_sequence WHERE name='private_upgrade_check_fixture'"), sequence);
+  assert.doesNotMatch(query(target, "SELECT sql FROM sqlite_schema WHERE name='private_upgrade_check_fixture'")[0].sql, /CHECK/i);
+  assert.equal(existsSync(join(input.directory, 'upgrade-result.json')), false);
+  assert.equal(existsSync(join(input.directory, 'upgrade-provenance.json')), false);
+});
+
+native('BLOB to TEXT storage-class rewriting refuses despite identical retained binary bytes and row counts', async parent => {
+  const source = await sourceWorkspace(parent); const before = bytes(source.directory); const input = args(source, parent, changedStorageRelease);
+  const original = query(source, 'SELECT typeof(payload) AS storage_type,hex(payload) AS payload_hex FROM private_upgrade_binary_fixture');
+  assert.equal(original[0].storage_type, 'blob');
+  await assert.rejects(upgradeWorkspace(input)); assert.deepEqual(bytes(source.directory), before);
+  const identity = JSON.parse(readFileSync(join(input.directory, 'identity.json'))); assert.equal(identity.state, 'initializing');
+  const target = { directory: input.directory, checkout: input.checkout, identity };
+  assert.deepEqual(query(target, 'SELECT typeof(payload) AS storage_type,hex(payload) AS payload_hex FROM private_upgrade_binary_fixture'), [{ storage_type: 'text', payload_hex: original[0].payload_hex }]);
+  assert.equal(existsSync(join(input.directory, 'upgrade-result.json')), false);
+  assert.equal(existsSync(join(input.directory, 'upgrade-provenance.json')), false);
 });
 
 native('migration failure retains an unavailable destination and hides its raw exception without touching the original', async parent => {
