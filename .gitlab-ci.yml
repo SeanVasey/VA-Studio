@@ -162,8 +162,8 @@ related-browser:
     - bash scripts/ci/setup-gitlab-related-scanner.sh
   script:
     - npm ci
-    - python3 scripts/ci/test-related-browser-stage.py
     - npm run build
+    - python3 scripts/ci/test-related-browser-stage.py
     - npx playwright install --with-deps chromium webkit
     - node tests/browser/run-related.mjs
   artifacts:

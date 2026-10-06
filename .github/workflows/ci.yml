@@ -368,9 +368,9 @@ jobs:
         run: bash tests/browser/install-related-scanner.sh
       - run: composer install --no-interaction --prefer-dist
       - run: npm ci
+      - run: npm run build
       - name: Verify isolated related-browser startup boundaries
         run: python3 scripts/ci/test-related-browser-stage.py
-      - run: npm run build
       - run: npx playwright install --with-deps chromium webkit
       - name: Prepare genuine media and run only the related-track native journeys
         run: node tests/browser/run-related.mjs
