@@ -4,8 +4,8 @@ namespace Tests\Feature;
 
 use App\Domain\Commerce\CreateQuote;
 use Illuminate\Support\Facades\Schema;
-use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\ExclusiveSelectionFixtures as F;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InventoryFixtures;
 use Tests\Support\QuoteFixtures;
 use Tests\TestCase;
