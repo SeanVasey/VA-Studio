@@ -39,6 +39,8 @@ class PromotionMigrationTest extends TestCase
         $unpaidRelease = require database_path('migrations/2026_10_06_000042_test_unpaid_releases.php');
         $purchaseClaims = require database_path('migrations/2026_10_06_000048_customer_purchase_claims.php');
         $refundResolution = require database_path('migrations/2026_10_06_000047_test_refund_resolutions.php');
+        $orderInquiries = require database_path('migrations/2026_10_06_000049_inquiry_order_contexts.php');
+        $orderInquiries->down();
         $purchaseClaims->down();
         $refundResolution->down();
         $unpaidRelease->down();
@@ -57,6 +59,7 @@ class PromotionMigrationTest extends TestCase
         $unpaidRelease->up();
         $refundResolution->up();
         $purchaseClaims->up();
+        $orderInquiries->up();
         foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }
         $this->assertSame($hash, $pricing->refresh()->snapshot_hash);
         $this->assertSame($hash, CanonicalJson::hash(app(PricingSnapshot::class)->verify($pricing, $quote)));
