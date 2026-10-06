@@ -41,7 +41,12 @@ $wait = function (string $path): void {
 $actor = User::findOrFail($input['actor_id']);
 $template = isset($input['template_id']) ? LicenseTemplate::findOrFail($input['template_id']) : null;
 $version = isset($input['version_id']) ? LicenseVersion::findOrFail($input['version_id']) : null;
-file_put_contents($directory.'/ready-'.$worker, json_encode(['connection_id' => $connection, 'pid' => getmypid(), 'retained_admin' => $actor->is_admin, 'retained_verified_email' => $actor->email_verified_at !== null], JSON_THROW_ON_ERROR));
+$ready = json_encode(['connection_id' => $connection, 'pid' => getmypid(), 'retained_admin' => $actor->is_admin, 'retained_verified_email' => $actor->email_verified_at !== null], JSON_THROW_ON_ERROR);
+$temporary = $directory.'/ready-'.$worker.'.tmp';
+// The parent decodes as soon as ready-N exists; publish only the complete payload.
+if (file_put_contents($temporary, $ready) !== strlen($ready) || ! rename($temporary, $directory.'/ready-'.$worker)) {
+    throw new RuntimeException('Cannot publish template authoring worker readiness.');
+}
 $wait($directory.'/start-'.$worker);
 $paused = false;
 $locks = [];

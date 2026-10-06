@@ -171,6 +171,7 @@ test('operator releases a fully refunded exception, retries a lost success and r
     expect(intercepted).toBe(1);
     originalReview = requestReview(payload);
     expect(originalReview.sequence).toBe(0);
+    await expect(submit).toBeDisabled();
     const actualResponse = await route.fetch();
     expect(actualResponse.status()).toBe(200);
     lostResponseBody = await actualResponse.text();

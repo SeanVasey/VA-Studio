@@ -10,6 +10,8 @@ use App\Domain\Commerce\RefundResolution\ResolveRefundedTestException;
 use App\Filament\Resources\TestPaymentExceptionResource;
 use App\Filament\Resources\TestPaymentExceptionResource\Pages\ListTestPaymentExceptions;
 use App\Models\User;
+use DOMDocument;
+use DOMXPath;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -157,6 +159,29 @@ class TestRefundResolutionResourceTest extends TestCase
             ->assertNotified(Notification::make()->title('Refunded test resources released')
                 ->body('The retained resolution records the original attempt. No refund was sent. Grants and original contracts are unchanged; fulfillment remains blocked.')->success());
         $this->assertSame([], $component->get('mountedActions'));
+    }
+
+    public function test_refund_submit_preserves_native_form_loading_without_a_second_disabled_attribute_owner(): void
+    {
+        $record = $this->record();
+        $this->actingAs(LicenseFixtures::admin());
+        $this->service()->shouldReceive('review')->once()->andReturn($this->review());
+        $component = Livewire::test(ListTestPaymentExceptions::class)->mountTableAction('resolveFullRefund', $record);
+        $document = new DOMDocument;
+        @$document->loadHTML($component->getMountedActionModalHtml());
+        $xpath = new DOMXPath($document);
+        $forms = $xpath->query('//form[@*[name()="wire:submit.prevent"]="callMountedAction"]');
+        $this->assertCount(1, $forms);
+        $buttons = $xpath->query('.//button[@type="submit"]', $forms->item(0));
+        $this->assertCount(1, $buttons);
+        $submit = $buttons->item(0);
+        $this->assertSame('Submit', trim($submit->textContent));
+        $this->assertFalse($submit->hasAttribute('disabled'));
+        $this->assertFalse($submit->hasAttribute('wire:loading.attr'));
+        $this->assertSame('callMountedAction', $submit->getAttribute('wire:target'));
+        $this->assertSame('isProcessing', $submit->getAttribute('x-bind:disabled'));
+        $this->assertSame('filamentFormButton', $submit->getAttribute('x-data'));
+        $this->assertCount(1, $xpath->query('.//*[name()="svg"][@*[name()="wire:loading.delay.default"]][@*[name()="wire:target"]="callMountedAction"]', $submit));
     }
 
     #[DataProvider('unconfirmedOutcomes')]
