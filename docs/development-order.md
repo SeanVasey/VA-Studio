@@ -2,9 +2,11 @@
 
 ## Current execution checkpoint
 
-October 6, 2026 UTC. The active repository is [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio). Main through PR #6 has fresh full acceptance. PR #7's original full checks passed; the inclusive PR #8 preserves its ancestry and owns current customer-library/test-commerce acceptance. Earlier cancelled or failed runs retain only their actual evidence.
+October 6, 2026 UTC. Main through PR #6 remains the accepted baseline in [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio). [PR #13](https://github.com/SeanVasey/VA-Studio/pull/13) now preserves all reviewed ancestry from PRs #7–#12 and is the inclusive acceptance candidate against `main`. Earlier PRs remain evidence records and must not be merged separately.
 
-The next [template-authoring and inquiry-history composition](verification/template-authoring-and-inquiry-history-composition.md) contains two independently approved children, exact shared registration and complete coverage-preservation proof. Focused integration evidence and unexecuted hosted gates are recorded there. The [agent queue](development-agent-queue.md) identifies current ownership and the following customer historical-resolution read. No parent or launch gate closes from these bounded children. Historical sections below preserve their original repositories, identities and results.
+Published head `5be12ac49f5afa21939c358fcd80e89f40fd9589` has tree `8c4c7b8b5aba03c86e8e3ce535d9a4d33fa0977d`. Its actual test merge `4365ff55ff8f5cad5cb7af35b86af4b0c1e45d53` has that exact tree and ordered parents `387fdeb95e72e96e5cd17c0b54f38c849fc37adb` (main), then the candidate head. Fresh [Foundation CI 37490570886](https://github.com/SeanVasey/VA-Studio/actions/runs/37490570886), attempt 1, must supply all full gates and ten same-attempt database receipts with exact successful aggregation. These source bindings and the [component record](verification/inclusive-commerce-authoring-acceptance.md) do not establish acceptance.
+
+The next isolated T17 child adds order-linked private inquiries. It preserves original order, payment, contract and delivery records, requires current owner/intake/staff authority for new writes and retains minimal historical context. Default-off local/testing scope, independent review and final hosted acceptance remain explicit. No parent or launch gate closes from these bounded children. Historical sections below preserve their original repositories, identities and results.
 
 ## PR #105 SQL rights-evidence guard acceptance
 

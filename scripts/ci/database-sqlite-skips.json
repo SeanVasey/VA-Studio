@@ -159,6 +159,10 @@
       "test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"
     ],
     [
+      "Tests\\Feature\\OrderInquiryConcurrencyTest",
+      "test_current_publication_operator_and_customer_fences_serialize_both_commit_orders"
+    ],
+    [
       "Tests\\Feature\\OrderPreparationConcurrencyTest",
       "test_price_expiry_during_owner_mutex_wait_cannot_create_an_order_or_extend_capacity"
     ],

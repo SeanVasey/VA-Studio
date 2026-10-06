@@ -108,3 +108,7 @@ The isolated candidate has focused schema/domain/editor/HTTP/migration and front
 ## Original-session inquiry history — October 6, 2026
 
 The independently reviewed [inquiry-history child](../verification/original-session-inquiry-history.md) lets visitors explicitly page through and reopen inquiries sent from their original browser session, including archived conversations. It preserves the manual receipt flow, owner isolation and current published contact entry point. Exact composition and remaining hosted acceptance are recorded in the [follow-up integration record](../verification/template-authoring-and-inquiry-history-composition.md). Account recovery, order-aware support, private attachments, delivery/retention policy and the broader WP-09/T17 criteria remain open.
+
+## Order-linked test support — October 6, 2026
+
+The next T17 child connects an owned test order to the existing private inquiry conversation through an immutable minimal association. It requires explicit local/testing enablement and current contact publication, eligible staff and customer authority. Generic inquiry payloads and commerce history remain unchanged; original-session context reads do not confer current order or download access. The backend and UI verification records retain component checks, independent findings and remaining composed gates. Private support attachments, production notice/retention/recovery policy and real notifications remain open, as does broader WP-09/T17 acceptance.

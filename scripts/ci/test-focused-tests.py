@@ -120,6 +120,22 @@ class SelectionTests(unittest.TestCase):
             "test_mfa_withdrawal_during_final_actor_wait_prevents_verified_commit_after_real_scanning",
         })
 
+    def test_order_inquiry_feedback_preserves_native_fences_and_the_existing_browser_journey(self):
+        self.assertEqual(focused.MAX_FILES, 32)
+        for engine in focused.ENGINES:
+            selected = focused.selection({"FOCUSED_SUITE": "customer", "FOCUSED_ENGINE": engine})
+            for target in ("OrderInquiryTest", "OrderInquiryHttpTest", "OrderInquiryMigrationTest",
+                           "OrderInquiryConcurrencyTest", "OrderInquiryStaffContextTest"):
+                self.assertEqual(selected.files.count("tests/Feature/" + target + ".php"), 1)
+            focused.validate_files(ROOT, selected)
+        self.assertEqual(focused.PHP_TARGETS["seller"].count("tests/Feature/OrderInquiryStaffContextTest.php"), 1)
+        self.assertEqual(focused.FRONTEND_TARGETS.count("tests/frontend/order-inquiry.test.tsx"), 1)
+        self.assertEqual(focused.BROWSER_TARGETS.count("tests/browser/inquiry-conversation.spec.ts"), 1)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        self.assertEqual([row for row in policy["methods"] if row[0].startswith("Tests\\Feature\\OrderInquiry")], [
+            ["Tests\\Feature\\OrderInquiryConcurrencyTest", "test_current_publication_operator_and_customer_fences_serialize_both_commit_orders"],
+        ])
+
     def test_order_reference_feedback_covers_both_databases_and_client_journeys_without_exclusions(self):
         self.assertEqual(focused.MAX_FILES, 32)
         for engine in focused.ENGINES:

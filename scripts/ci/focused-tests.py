@@ -79,6 +79,9 @@ PHP_TARGETS = {
         "tests/Feature/TestPaymentProcessingTest.php", "tests/Feature/TestOrderFinalizationTest.php",
     ),
     "customer": (
+        "tests/Feature/OrderInquiryTest.php", "tests/Feature/OrderInquiryHttpTest.php",
+        "tests/Feature/OrderInquiryMigrationTest.php", "tests/Feature/OrderInquiryConcurrencyTest.php",
+        "tests/Feature/OrderInquiryStaffContextTest.php",
         "tests/Feature/CustomerRefundResolutionTest.php", "tests/Feature/CustomerRefundResolutionHttpTest.php",
         "tests/Feature/CustomerPurchaseClaimTest.php", "tests/Feature/CustomerPurchaseClaimMigrationTest.php",
         "tests/Feature/CustomerPurchaseClaimConcurrencyTest.php",
@@ -92,6 +95,7 @@ PHP_TARGETS = {
         "tests/Feature/TestOwnerDeliveryHttpTest.php", "tests/Feature/TestOwnerDeliveryProjectionTest.php",
     ),
     "seller": (
+        "tests/Feature/OrderInquiryStaffContextTest.php",
         "tests/Feature/InquiryHistoryTest.php", "tests/Feature/InquiryHistoryHttpTest.php",
         "tests/Feature/InquiryConversationTest.php", "tests/Feature/InquiryConversationHttpTest.php",
         "tests/Feature/InquiryConversationAdminTest.php", "tests/Feature/InquiryConversationConcurrencyTest.php",
@@ -153,6 +157,7 @@ PHP_TARGETS = {
     ),
 }
 FRONTEND_TARGETS = (
+    "tests/frontend/order-inquiry.test.tsx",
     "tests/frontend/customer-exception-resolution.test.tsx",
     "tests/frontend/inquiry-history.test.tsx",
     "tests/frontend/customer-purchase-claim.test.tsx",

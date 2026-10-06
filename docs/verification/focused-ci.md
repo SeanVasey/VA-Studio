@@ -10,17 +10,18 @@ Once this workflow exists on the default branch, GitHub Actions → **Focused de
 
 | Suite enum | Fixed scope | Engine |
 | --- | --- | --- |
-| `unit` | 19 reviewed files: synthetic migration planning, money/pricing, licensing terms, contract rendering, media/identifier guards and Stripe gateways. | `sqlite` or `mysql`; pure cases do not establish database concurrency. |
-| `media` | 19 upload, resumable HTTP/session, evidence, diagnostics, scanner, budget, private-root, image and archive files. | `sqlite` or `mysql` |
+| `unit` | 20 reviewed files: synthetic migration planning, money/pricing, licensing terms, contract rendering, media/identifier guards and Stripe gateways. | `sqlite` or `mysql`; pure cases do not establish database concurrency. |
+| `media` | 28 upload, resumable HTTP/session, evidence, diagnostics, scanner, budget, private-root, image and archive files. | `sqlite` or `mysql` |
 | `commerce` | 30 pricing, gateway, quote, checkout, webhook, financial-observation, ownership, restore and migration files, including selected independent-process races. Heavy finalization/delivery/membership coverage remains separate. | `sqlite` or `mysql`; MySQL-only cases are reported as skipped on SQLite. |
-| `financial` | Nine fixed unpaid-release, retained financial-observation/exception, payment-processing and finalization files. | `sqlite` or `mysql` |
-| `customer` | Eight files: five account-access, session HTTP, ownership/commerce, migration and native-withdrawal files plus three existing owned-order history and owner-delivery HTTP/projection regression files. | `sqlite` or `mysql` |
+| `financial` | 13 refund-resolution, unpaid-release, retained financial-observation/exception, payment-processing and finalization files. | `sqlite` or `mysql` |
+| `customer` | 24 order-linked inquiry, resolution history, purchase claim, identity/account, original order and owner-delivery files, including native authority races. | `sqlite` or `mysql` |
 | `operator` | 32 foundation/setup, persisted-authority/MFA, licensing, metadata/presets/bulk edits, private review, publication and rights-writer files. | `sqlite` or `mysql`; physical authenticator/device acceptance remains separate. |
+| `licensing` | Eight template authoring, licensing administration, retained evidence and offer revision files, including native writer races. | `sqlite` or `mysql` |
 | `publication` | Seven reviewed publication apply, manifest/editor and guard files, including native concurrency. | `sqlite` or `mysql` |
 | `track-concurrency` | Five metadata, stems recording/preview and media-writer authority files. | `sqlite` or `mysql` |
-| `seller` | 26 inquiry, preview embed, editorial/related content, disclosure and private collection/album draft authoring/version/migration/concurrency files. | `sqlite` or `mysql` |
-| `frontend` | 24 reviewed frontend files including customer sign-in/library, TypeScript/Vite production build and client-bundle secret scan. | Select `sqlite`; recorded engine is `none`. |
-| `browser` | 23 reviewed specs including the fresh-session customer library and exact original downloads, plus existing storefront, operator, checkout/delivery/history, player, inquiry, metadata, publication, editorial and resumable-upload journeys. Both configured engines use the isolated fixture/server wrapper. | `sqlite` only |
+| `seller` | 32 inquiry, preview embed, editorial/related content, disclosure and private collection/album draft authoring/version/migration/concurrency files. | `sqlite` or `mysql` |
+| `frontend` | 32 reviewed frontend files including customer sign-in/library, TypeScript/Vite production build and client-bundle secret scan. | Select `sqlite`; recorded engine is `none`. |
+| `browser` | 32 reviewed specs including the fresh-session customer library and exact original downloads, plus existing storefront, operator, checkout/delivery/history, player, inquiry, metadata, publication, editorial and resumable-upload journeys. Both configured engines use the isolated fixture/server wrapper. | `sqlite` only |
 
 The exact paths live in `scripts/ci/focused-tests.py`, are printed before execution and retained in JSON evidence. Files are a bounded reviewed allowlist, not a changing-files heuristic or arbitrary user filter. Unknown/empty enums, invalid combinations, missing files, repository escapes and empty/duplicate/oversized lists fail closed. Add a new relevant test to that allowlist in a reviewed change, or run the necessary test separately and the full candidate gate; do not infer coverage for unselected features.
 
@@ -59,3 +60,9 @@ References: [planning strategy](../ci-development-strategy.md), [GitHub workflow
 Private inquiry conversations add five fixed seller PHP files plus the visitor frontend/browser journey. The seller selection remains within the unchanged 32-file ceiling. Only the eight exact MySQL inquiry/actor wait cases are allowed to skip on SQLite; MySQL must execute them.
 
 Verified-unpaid release has a separate `financial` selection so commerce remains below the unchanged 32-file ceiling. It adds the real operator browser journey and only two exact native method identities (four MySQL race cases) to the SQLite exception policy. No existing coverage or required acceptance gate is removed.
+
+## Order-linked inquiry feedback — October 6, 2026
+
+The five new order-inquiry PHP files join `customer` (24 files); the staff context projection also joins `seller` (32). The new private frontend transport/UI file brings `frontend` to 32. The existing inquiry conversation browser identity covers the order-linked extension; the browser selection stays at 32 files. Every previously selected file remains.
+
+Only the exact `OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders` method is newly eligible for a SQLite skip: its eleven cases require independent MySQL processes. New domain, HTTP, migration and staff cases execute on both engines. Timing files retain their measured source and fallback weights; no local timing is presented as a hosted measurement. These selectors supply focused feedback, not final candidate acceptance.
