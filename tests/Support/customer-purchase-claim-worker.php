@@ -27,7 +27,12 @@ $id = (int) DB::selectOne('SELECT CONNECTION_ID() AS id')->id;
 DB::statement('SET SESSION innodb_lock_wait_timeout=15');
 $directory = getenv('VASEY_PURCHASE_CLAIM_RACE');
 $index = getenv('VASEY_PURCHASE_CLAIM_WORKER');
-file_put_contents($directory.'/ready-'.$index, json_encode(['connection' => $id, 'pid' => getmypid()], JSON_THROW_ON_ERROR));
+$ready = json_encode(['connection' => $id, 'pid' => getmypid()], JSON_THROW_ON_ERROR);
+$temporary = $directory.'/ready-'.$index.'.tmp';
+// Expose the ready path only after its complete JSON is closed and readable.
+if (file_put_contents($temporary, $ready) !== strlen($ready) || ! rename($temporary, $directory.'/ready-'.$index)) {
+    throw new RuntimeException('Cannot publish purchase claim worker readiness.');
+}
 $deadline = microtime(true) + 20;
 while (! is_file($directory.'/start')) {
     if (microtime(true) > $deadline) {
