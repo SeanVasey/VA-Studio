@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\AvatarProviders\LocalAvatarProvider;
 use App\Http\Controllers\LicenseReviewController;
 use App\Http\Controllers\PublicMediaController;
 use App\Http\Controllers\ResumableMediaUploadController;
@@ -71,6 +72,7 @@ class AdminPanelProvider extends PanelProvider
             })
             ->login()
             ->brandName('VASEY.AUDIO / Studio')
+            ->defaultAvatarProvider(LocalAvatarProvider::class)
             ->profile()
             ->multiFactorAuthentication([AppAuthentication::make()->recoverable()], isRequired: fn () => app()->isProduction())
             ->colors([
