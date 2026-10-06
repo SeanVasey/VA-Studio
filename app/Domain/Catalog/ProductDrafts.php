@@ -52,17 +52,7 @@ class ProductDrafts
                 $this->reject('description', 'Enter plain descriptive text of up to 4,000 characters.');
             }
             $ids = $this->ids($data['track_ids'] ?? null);
-            $tracks = $this->sources($ids);
-            $members = [];
-            foreach ($ids as $id) {
-                $track = $tracks[$id];
-                if (! $format->text($track->title, 255, true) || $track->metadata_version < 0 || $track->publication_version < 0) {
-                    $this->reject('track_ids', 'A selected track has invalid metadata. Review it before adding it.');
-                }
-                $members[] = ['track_id' => $id, 'title' => $track->title, 'metadata_version' => $track->metadata_version,
-                    'publication_version' => $track->publication_version];
-            }
-            $manifest = $format->make($kind, $title, $description, $members);
+            $manifest = $format->make($kind, $title, $description, $this->memberSnapshots($ids));
             if ($before !== null && hash_equals($before->manifest_sha256, CanonicalJson::hash($manifest))) {
                 return $current;
             }
@@ -128,7 +118,84 @@ class ProductDrafts
         });
     }
 
-    private function append(ProductDraft $draft, array $manifest, User $actor, ?ProductDraftVersion $before, ?ProductDraftVersion $source = null): ProductDraft
+    /** Compare descriptive snapshots only. This does not evaluate product sale or publication readiness. */
+    public function reviewMembers(int $id, User $actor): array
+    {
+        return DB::transaction(function () use ($id, $actor) {
+            $currentActor = $this->actor($actor);
+            $draft = $this->draft($id);
+            [$review] = $this->memberReview($draft, $this->current($draft), $currentActor);
+
+            return $review;
+        });
+    }
+
+    /** Apply only the exact reviewed source state; previous manifests and the source tracks remain untouched. */
+    public function refreshMembers(ProductDraft $draft, int $expectedVersion, string $reviewHash, User $actor): ProductDraft
+    {
+        return DB::transaction(function () use ($draft, $expectedVersion, $reviewHash, $actor) {
+            $currentActor = $this->actor($actor);
+            $current = $this->draft((int) $draft->getKey());
+            $this->revision($current, $expectedVersion);
+            $before = $this->current($current);
+            [$review, $manifest] = $this->memberReview($current, $before, $currentActor);
+            if (! preg_match('/\A[a-f0-9]{64}\z/D', $reviewHash) || ! hash_equals($review['review_hash'], $reviewHash)) {
+                $this->reject('title', 'The reviewed track snapshots changed. Close and reopen the review before refreshing.');
+            }
+            if ($review['changed_count'] === 0) {
+                return $current;
+            }
+
+            return $this->append($current, $manifest, $currentActor, $before, reviewHash: $reviewHash);
+        });
+    }
+
+    private function memberReview(ProductDraft $draft, ProductDraftVersion $before, User $actor): array
+    {
+        $format = app(ProductDraftManifest::class);
+        $retained = $format->verified($before, $draft->kind);
+        $current = $this->memberSnapshots(array_column($retained['members'], 'track_id'));
+        $manifest = $format->make($draft->kind, $retained['title'], $retained['description'], $current);
+        $afterHash = CanonicalJson::hash($manifest);
+        $members = [];
+        foreach ($retained['members'] as $position => $saved) {
+            $latest = $current[$position];
+            $fields = ['title', 'metadata_version', 'publication_version'];
+            $changed = array_values(array_filter($fields, fn (string $field): bool => $saved[$field] !== $latest[$field]));
+            $members[] = ['position' => $position + 1, 'track_id' => $saved['track_id'],
+                'saved' => array_intersect_key($saved, array_flip($fields)),
+                'current' => array_intersect_key($latest, array_flip($fields)), 'changed_fields' => $changed];
+        }
+        $reviewHash = CanonicalJson::hash(['purpose' => 'collection-album-member-refresh-v1',
+            'canonicalization_version' => CanonicalJson::VERSION, 'actor_id' => (int) $actor->id,
+            'product_draft_id' => (int) $draft->id, 'version' => $draft->version, 'retained_version_id' => (int) $before->id,
+            'before_hash' => $before->manifest_sha256, 'after_hash' => $afterHash]);
+
+        return [['id' => (int) $draft->id, 'kind' => $draft->kind, 'version' => $draft->version,
+            'title' => $retained['title'], 'description' => $retained['description'],
+            'manifest_sha256' => $before->manifest_sha256, 'refreshed_manifest_sha256' => $afterHash,
+            'review_hash' => $reviewHash, 'changed_count' => count(array_filter($members, fn (array $member): bool => $member['changed_fields'] !== [])),
+            'members' => $members], $manifest];
+    }
+
+    private function memberSnapshots(array $ids): array
+    {
+        $tracks = $this->sources($ids);
+        $format = app(ProductDraftManifest::class);
+        $members = [];
+        foreach ($ids as $id) {
+            $track = $tracks[$id];
+            if (! $format->text($track->title, 255, true) || $track->metadata_version < 0 || $track->publication_version < 0) {
+                $this->reject('track_ids', 'A selected track has invalid metadata. Review it before adding it.');
+            }
+            $members[] = ['track_id' => $id, 'title' => $track->title, 'metadata_version' => $track->metadata_version,
+                'publication_version' => $track->publication_version];
+        }
+
+        return $members;
+    }
+
+    private function append(ProductDraft $draft, array $manifest, User $actor, ?ProductDraftVersion $before, ?ProductDraftVersion $source = null, ?string $reviewHash = null): ProductDraft
     {
         if ($draft->version < 0 || $draft->version >= self::MAX_VERSION) {
             $this->reject('title', 'This product draft cannot accept another version.');
@@ -140,12 +207,17 @@ class ProductDrafts
             ProductDraftMember::create(['product_draft_version_id' => $version->id, 'position' => $position + 1, ...$member]);
         }
         $draft->fill(['title' => $manifest['title'], 'version' => $version->number])->save();
-        AuditEvent::record('catalog.product_draft.'.($before === null ? 'created' : ($source === null ? 'version_saved' : 'version_selected')), $draft, [
+        $action = $reviewHash === null ? ($before === null ? 'created' : ($source === null ? 'version_saved' : 'version_selected')) : 'members_refreshed';
+        $context = [
             'schema_version' => 1, 'kind' => $draft->kind, 'version' => $version->number,
             'version_id' => (int) $version->id, 'source_version_id' => $source?->id, 'member_count' => count($manifest['members']),
             'canonicalization_version' => CanonicalJson::VERSION, 'before_hash' => $before?->manifest_sha256,
             'after_hash' => $version->manifest_sha256,
-        ], $actor->id);
+        ];
+        if ($reviewHash !== null) {
+            $context['member_review_hash'] = $reviewHash;
+        }
+        AuditEvent::record('catalog.product_draft.'.$action, $draft, $context, $actor->id);
 
         return $draft;
     }
