@@ -1,6 +1,44 @@
 # CI throughput timing refresh
 
-## Current integration boundary — October 1, 2026
+## October 6, 2026: complete accepted-main timing refresh
+
+This bounded T02 candidate starts from `636bc94b5688267edef1d34d8d1726402606da32`, tree `15de3311f7ba345b1e6821aa46e341f0e9d934c1`, while the separate private-alpha/storefront PR #5 runs its own acceptance. It changes only the two timing manifests and this guide. It does not change tests, PHPUnit configuration, partitioning, shard counts, workflows, runtime settings, warnings, audits, deadlines, receipt validation or the full-only reuse policy.
+
+The measurement source is [accepted main Foundation run 37098953844](https://github.com/SeanVasey/VA-Studio/actions/runs/37098953844), attempt 1, ordinary push of `1095dd5f8fd7d016bc08a55dfe2d264557dfce67`, tree `69c87c3c8924af6423de73ec21524c94cc051b12`. All 13 applicable jobs and the strict six-receipt collector passed. Each engine discovered **185 files / 3,042 expanded cases**. MySQL executed all 3,042 with 55,396 assertions and no failures, errors or skips; SQLite executed 2,738 with 31,247 assertions and the 304 existing MySQL-only skips. The candidate has no differences from that source in application PHP, migrations, Feature/Unit/Support tests, Composer lock/configuration, PHPUnit configuration or either timing/partition algorithm.
+
+### Measured bottleneck and bounded change
+
+The four MySQL test steps took **2,178 / 2,719 / 2,498 / 2,577 seconds**. The slowest whole job took 2,804 seconds; only 85 seconds were outside its test step. Installation and startup are therefore not the main delay in this observation. The previous timing weights omit 38 current files and mix older source measurements. This refresh replaces them with exactly one current accepted sample for each of the 185 files, separately for each engine.
+
+Both placements below sum the same per-file timing weights in seconds, with each file rounded to milliseconds by the existing generator. Refreshed figures are offline estimates, not measured execution of a changed assignment. Runner variability, execution order and fixture behavior can change actual durations.
+
+| Engine | Original placement, rounded file seconds | Refreshed placement, same rounded file seconds | Refreshed cases per shard | Estimated reduction of longest shard |
+| --- | --- | --- | --- | --- |
+| MySQL | 2,177.980 / 2,718.717 / 2,497.894 / 2,575.833 | 2,492.600 / 2,492.603 / 2,492.600 / 2,492.621 | 727 / 719 / 815 / 781 | 226.096 seconds (8.3%) |
+| SQLite | 841.090 / 881.397 | 861.243 / 861.244 | 1,398 / 1,644 | 20.153 seconds (2.3%) |
+
+This removes the observed avoidable shard imbalance, but does not eliminate the underlying test workload. The heaviest MySQL file is `TestPaymentProcessingTest.php`: 75 expanded cases and 478.407 seconds. Its per-case schema lifecycle is a separate optimization candidate requiring native before/after proof. Replacing root-commit tests with transaction-wrapped fixtures is not part of this change. Post-merge reuse also remains a separate provenance/runtime design and requires explicit verification before activation.
+
+### Evidence and reproduction
+
+All six downloaded ZIPs matched their GitHub API size and SHA-256 digest. Each receipt names the exact source/run/attempt above; every retained file hash was recomputed, and engine manifests agree. No missing or later test file was silently dropped by the unchanged generator.
+
+| Artifact | ID | Verified ZIP SHA-256 |
+| --- | --- | --- |
+| MySQL 1 | 11266415925 | `60175de9cfb21b8e521c81310b2eee26764bd9e7d700f40f4dbb1aa4fa72575e` |
+| MySQL 2 | 11265967234 | `e4c842810b442b4f9bccd2005215ca4a4011468ff1563ce657e1e9caf57ced87` |
+| MySQL 3 | 11266815760 | `72a7a44bc59fa18fcd1859469f8a4f97d9469a1ff73136de29cb68fa084a0bb1` |
+| MySQL 4 | 11266980474 | `10da35ec261589d9ca20b7b369b465a21c30960019f518df763b765db6fee565` |
+| SQLite 1 | 11265268735 | `a456ce4dc63559590eba9635a4392cbe24ba20f35f93ab4f921c51cd3377ca23` |
+| SQLite 2 | 11265762815 | `ef0d4f33e62bc242e791d988f05040eb67aa331640eda74ce90555ba5ffeb0ae` |
+
+Download these backend artifacts, then run the existing `scripts/ci/phpunit-timings.py` once per engine with `--driver`, the committed manifest's exact `source` string, `--output`, and that engine's four or two `phpunit-ci-*-results.xml` paths. Repeating generation produced byte-identical outputs: MySQL SHA-256 `79ba2e6e07cc1c02dcec8d42aa05a454c0c7c65f008cbf1def78520e27f47334`; SQLite `f4006db450f68309c63feb59653c40f719fe9c39c09f46838640bf8342cb41d9`.
+
+All 35 existing partition/timing safeguards pass. Fresh PHP 8.4.26 discovery on the candidate, using the exact locked dependencies, proves all 3,042 cases in 185 whole files and every group exactly once across both four-shard and two-shard configurations. There are no untimed files. The source case digest remains `034f0a9218c82042da6cde1509710da31eb6283bdabf6ed4066af9e8a0d6429d`; the group digest remains `851d7d3192a4c2772c4b92ac6b9d7802d018adbd66ae3a8a218714523e28c829`.
+
+This preparation does not report fresh application/MySQL execution, a demonstrated hosted speedup, reusable prior acceptance, or completion of T01/T02. Independent source review and the next composed candidate's complete Foundation gates remain required. The active PR #5 run is unchanged and continues independently.
+
+## Historical integration boundary — October 1, 2026
 
 The database-only T02 weighting candidate described below was prepared separately from active PR #89. Its two reviewed timing manifests are now composed, unchanged, with the inquiry/related-image migration recovery into checkpoint `b41f8f58845f25e686f8f11ca70b147a362af9ec`, tree `3b5aa741c0c9a1407514390ca7d740488704e814`. The historical measurement remains **146 files / 2,215 cases from run `36830305836`**, whose six database jobs passed but overall browser gates failed. Those measurements and offline redistribution estimates are not rewritten as current-source results or a demonstrated speedup.
 
