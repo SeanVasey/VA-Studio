@@ -60,21 +60,27 @@ try {
   writeFileSync(env.DB_DATABASE, '', { mode: 0o600, flag: 'wx' });
   // Genuine scans retain their application budgets; bound the whole fixture stage like related-track preparation.
   const setup = spawnSync('/usr/bin/timeout', ['--signal=TERM', '--kill-after=15s', '600s', 'php', 'tests/browser/bootstrap.php'], { cwd: root, env, stdio: 'inherit', timeout: 620000 });
-  if (setup.error || setup.status !== 0) throw new Error('Isolated browser fixture setup failed.');
-  writeFileSync(join(directory, 'inquiry-fixture-marker.json'), JSON.stringify({
-    marker: env.VASEY_BROWSER_INQUIRY_MARKER, database: env.DB_DATABASE,
-    origin: env.APP_URL, operatorId: 1,
-  }), { mode: 0o600, flag: 'wx' });
-  writeFileSync(join(directory, 'exception-inspection-fixture-marker.json'), JSON.stringify({
-    purpose: 'retained-exception-native', marker: env.VASEY_BROWSER_EXCEPTION_MARKER,
-    database: env.DB_DATABASE, origin: env.APP_URL, baseOperatorId: 1, account: env.STRIPE_ACCOUNT_ID,
-  }), { mode: 0o600, flag: 'wx' });
-  const result = spawnSync(process.execPath, ['node_modules/@playwright/test/cli.js', 'test', ...process.argv.slice(2)], {
-    // Keep one minute beyond Playwright's suite ceiling for teardown and report writes.
-    cwd: root, env, stdio: 'inherit', timeout: 1620000,
-  });
-  if (result.error) throw new Error('Browser verification did not finish.');
-  process.exitCode = result.status ?? 1;
+  if (setup.error || setup.status !== 0) {
+    // The bootstrap owns the bounded diagnosis. Do not add a stack or expose a
+    // spawn error while preserving failure and the unconditional private cleanup.
+    console.error('Isolated browser fixture setup failed.');
+    process.exitCode = 1;
+  } else {
+    writeFileSync(join(directory, 'inquiry-fixture-marker.json'), JSON.stringify({
+      marker: env.VASEY_BROWSER_INQUIRY_MARKER, database: env.DB_DATABASE,
+      origin: env.APP_URL, operatorId: 1,
+    }), { mode: 0o600, flag: 'wx' });
+    writeFileSync(join(directory, 'exception-inspection-fixture-marker.json'), JSON.stringify({
+      purpose: 'retained-exception-native', marker: env.VASEY_BROWSER_EXCEPTION_MARKER,
+      database: env.DB_DATABASE, origin: env.APP_URL, baseOperatorId: 1, account: env.STRIPE_ACCOUNT_ID,
+    }), { mode: 0o600, flag: 'wx' });
+    const result = spawnSync(process.execPath, ['node_modules/@playwright/test/cli.js', 'test', ...process.argv.slice(2)], {
+      // Keep one minute beyond Playwright's suite ceiling for teardown and report writes.
+      cwd: root, env, stdio: 'inherit', timeout: 1620000,
+    });
+    if (result.error) throw new Error('Browser verification did not finish.');
+    process.exitCode = result.status ?? 1;
+  }
 } finally {
   rmSync(directory, { recursive: true, force: true });
 }
