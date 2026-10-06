@@ -42,7 +42,7 @@ final class PersistentContentBootstrap
 
     private static function owned(string $path): bool
     {
-        return ! function_exists('posix_geteuid') || fileowner($path) === posix_geteuid();
+        return function_exists('posix_geteuid') && fileowner($path) === posix_geteuid();
     }
 
     private static function safeAncestors(string $directory): bool

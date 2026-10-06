@@ -27,7 +27,7 @@ function retained(workspace) {
   };
 }
 
-const phpAvailable = spawnSync('php', ['-r', 'exit(PHP_MAJOR_VERSION === 8 && PHP_MINOR_VERSION >= 4 && extension_loaded("pdo_sqlite") && extension_loaded("mbstring") && extension_loaded("intl") ? 0 : 1);'], { encoding: 'utf8' }).status === 0
+const phpAvailable = spawnSync('php', ['-r', 'exit(PHP_MAJOR_VERSION === 8 && PHP_MINOR_VERSION >= 4 && extension_loaded("pdo_sqlite") && extension_loaded("mbstring") && extension_loaded("intl") && function_exists("posix_geteuid") ? 0 : 1);'], { encoding: 'utf8' }).status === 0
   && existsSync(join(root, 'vendor/autoload.php')) && existsSync(join(root, 'public/build/manifest.json'));
 
 function native(name, fn) {
@@ -466,4 +466,21 @@ native('direct PHP refuses newly exposed parent and ancestor paths before boot a
       chmodSync(exposed, 0o700);
     }
   } finally { chmodSync(parent, 0o700); chmodSync(ownedParent, 0o700); await lease.release(); }
+});
+
+native('direct PHP fails closed when effective UID inspection is disabled without changing private data', async parent => {
+  const workspace = await readyWorkspace(parent);
+  writeFileSync(join(workspace.directory, 'app/private/retained-test-content'), 'NONBINDING retained ownership-canary bytes', { mode: 0o600 });
+  const before = retained(workspace);
+  const env = isolatedEnvironment(workspace);
+  const lease = await acquireLease(workspace, env);
+  try {
+    const result = spawnSync('php', ['-d', 'disable_functions=posix_geteuid', 'scripts/dev/persistent-content-bootstrap.php', 'verify'], {
+      cwd: root, env, encoding: 'utf8', timeout: 10000,
+    });
+    assert.equal(result.status, 1);
+    assert.equal(result.stdout, '');
+    assert.equal(result.stderr, 'Persistent workspace isolation or operation failed. Retained files were not reset or removed.\n');
+    assert.deepEqual(retained(workspace), before);
+  } finally { await lease.release(); }
 });
