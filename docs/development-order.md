@@ -2,7 +2,9 @@
 
 ## Current execution checkpoint
 
-The [current queue](development-control.md) defines active component ownership, dependency order and the GitHub account blocker. Transactional rights create/edit/verify is the active implementation; its new runtime is not yet accepted. Historical sections below preserve their own source and results.
+October 6, 2026 UTC. The active repository is [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio). Main through PR #6 has fresh full acceptance. PR #7's original full checks passed; the inclusive PR #8 preserves its ancestry and owns current customer-library/test-commerce acceptance. Earlier cancelled or failed runs retain only their actual evidence.
+
+The next [template-authoring and inquiry-history composition](verification/template-authoring-and-inquiry-history-composition.md) contains two independently approved children, exact shared registration and complete coverage-preservation proof. Focused integration evidence and unexecuted hosted gates are recorded there. The [agent queue](development-agent-queue.md) identifies current ownership and the following customer historical-resolution read. No parent or launch gate closes from these bounded children. Historical sections below preserve their original repositories, identities and results.
 
 ## PR #105 SQL rights-evidence guard acceptance
 

@@ -2,18 +2,20 @@
 
 ## Active continuation — October 6, 2026 UTC
 
-[PR #7](https://github.com/SeanVasey/VA-Studio/pull/7) is verifying collection-member refresh and original customer order details after accepted main `387fdeb`. Its browser, frontend, quality and SQLite evidence has passed; all native MySQL receipts and aggregation remain required. The [following reviewed composition](verification/purchase-claims-refund-resolution-composition.md) contains completed guest-purchase saving, recognizable original library browsing and refunded-exception features, with separate source-bound checks and full acceptance requirements.
+[PR #7](https://github.com/SeanVasey/VA-Studio/pull/7) passed its complete original full acceptance. Its source remains included through the inclusive [PR #8](https://github.com/SeanVasey/VA-Studio/pull/8); no separate merge is planned. PR #8 preserves every original failure and correction and requires fresh complete gates on its current head before expected-head merge and fresh main verification.
+
+The [next reviewed composition](verification/template-authoring-and-inquiry-history-composition.md) contains audited license-template create/edit and original-session inquiry history. Its two feature sources and shared registrations are independently reviewed, with exact source/coverage preservation and focused integration results. It is separate from PR #8 and still requires its own hosted acceptance.
 
 | Lane | Current work and boundary |
 | --- | --- |
-| Integration `/root` | Compose exact reviewed sources, preserve branch ancestry, finish focused integration evidence and publish coherent PRs; expected-head merge only after all required gates |
-| CI review `/root/runtime_restore` | Independently verify current hosted receipts and aggregation; complete actual dual-engine discovery and exact partition/skip coverage for the next composition |
-| Independent review `/root/prepared_review` | Guest claim and library UI/browser/evidence reviewed; exact feature and composed source approvals remain bound to their recorded commits |
-| Journey review `/root/refund_journey_review` | Refunded-exception operator/browser and shared migrations approved; final `9a9ac09` composition and complete discovery/partitions independently verified |
-| Customer `/root/guest_claim` | Explicit purchase saving and recognizable fresh library browsing complete and independently reviewed; native rendered integration remains a hosted gate |
-| Financial `/root/next_scope` | Test-only refunded-exception resource resolution complete and independently reviewed; maintain the original-request, observation and post-audit commit fences |
+| Integration `/root` | Publish exact reviewed trees and ordered ancestry; maintain shared registrations, source-bound evidence and expected-head acceptance |
+| CI review `/root/runtime_restore` | Verify all ten original database receipts and exact aggregation; preserve incomplete runs and investigate actual errors without inventing their causes |
+| Independent review `/root/prepared_review` | Verify template/inquiry composition and new customer-facing historical-resolution UI against exact source |
+| Journey review `/root/refund_journey_review` | Inspect genuine native browser artifacts; preserve actual responses, private downloaded bytes and verified durable effects |
+| Customer `/root/guest_claim` | Inquiry history complete; next isolated child displays retained test-exception resolution with private request cleanup |
+| Financial `/root/next_scope` | Original-session/customer ownership and exact retained proof for the next historical-resolution read; no provider/business writes or new access grants |
 
-The tables below preserve historical checkpoints and do not imply additional running agents. Full hosted acceptance, actual rendered browser journeys and fresh main verification remain separate from source review or focused tests. No parent group closes from these bounded children. Next work must follow a concrete dependency-ready scope and preserve the existing production and cutover boundaries.
+The next historical read is a separate dependency-ready child. It must preserve original paid-exception, payment and delivery states, verify the exact selected retained proof, and remain readable after write-policy withdrawal or elapsed admission deadlines. It does not assert refund arrival or authorize downloads. The tables below are historical checkpoints, not additional running-agent claims. Six parent groups remain accepted and 34 open.
 
 ## Full completion priority — October 5, 2026 (America/Chicago)
 
