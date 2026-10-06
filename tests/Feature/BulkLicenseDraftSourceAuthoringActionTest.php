@@ -78,6 +78,15 @@ class BulkLicenseDraftSourceAuthoringActionTest extends TestCase
             ->assertDispatched('form-validation-error', livewireId: $page->instance()->getId());
         if ($page->get('mountedActions.0.name') === 'reviewBulkSource') {
             $this->assertTrue($page->instance()->getMountedAction()->isDisabled());
+            $document = new \DOMDocument;
+            @$document->loadHTML($page->getMountedActionModalHtml());
+            $xpath = new \DOMXPath($document);
+            $copy = $xpath->query('//textarea[@readonly]');
+            $this->assertCount(1, $copy);
+            $this->assertFalse($copy->item(0)->hasAttribute('disabled'));
+            $submit = $xpath->query('//form[@*[name()="wire:submit.prevent"]="callMountedAction"]//button[@type="submit"]');
+            $this->assertCount(1, $submit);
+            $this->assertTrue($submit->item(0)->hasAttribute('disabled'));
         }
         $this->assertStringContainsString('Keep a copy', $page->getMountedActionModalHtml());
     }
@@ -183,6 +192,10 @@ class BulkLicenseDraftSourceAuthoringActionTest extends TestCase
         $page->callMountedAction()->assertHasActionErrors(['authored_source'])->assertNotified('Review current drafts to continue');
         $this->assertRetained($page, 'NONBINDING replacement source');
         $page->callMountedAction()->assertHasActionErrors(['authored_source']);
+        $this->assertSame($before, $this->evidence());
+        $page->mountAction('backToBulkSource')->assertSet('mountedActions.0.name', 'replaceDraftSource')
+            ->assertActionDataSet(['authored_source' => 'NONBINDING replacement source'])->callMountedAction()
+            ->assertHasNoActionErrors()->assertSee('2 drafts will change; 0 already match this source.');
         $this->assertSame($before, $this->evidence());
         $page->unmountAction()->mountTableBulkAction('replaceDraftSource', [$first, $second])->callMountedAction()
             ->assertHasNoActionErrors()->assertSee('Other editor won')->callMountedAction()->assertHasNoActionErrors();
@@ -372,6 +385,10 @@ class BulkLicenseDraftSourceAuthoringActionTest extends TestCase
         $this->assertStringNotContainsString('Source saved for', json_encode($sent, JSON_THROW_ON_ERROR));
         $page->callMountedAction()->assertHasActionErrors(['authored_source']);
         $this->assertSame($before, $this->evidence());
+        $page->mountAction('backToBulkSource')->assertSet('mountedActions.0.name', 'replaceDraftSource')
+            ->assertActionDataSet(['authored_source' => 'NONBINDING replacement source'])->callMountedAction()
+            ->assertHasNoActionErrors()->assertSee('2 drafts will change; 0 already match this source.');
+        $this->assertSame($before, $this->evidence());
     }
 
     public function test_exception_after_real_commit_cannot_retry_consumed_review_and_reopening_inspects_durable_drafts(): void
@@ -402,7 +419,8 @@ class BulkLicenseDraftSourceAuthoringActionTest extends TestCase
         $before = $this->evidence();
         $page->callMountedAction()->assertHasActionErrors(['authored_source']);
         $this->assertSame($before, $this->evidence());
-        $page->unmountAction()->mountTableBulkAction('replaceDraftSource', [$first, $second])->callMountedAction()
+        $page->mountAction('backToBulkSource')->assertSet('mountedActions.0.name', 'replaceDraftSource')
+            ->assertActionDataSet(['authored_source' => 'NONBINDING replacement source'])->callMountedAction()
             ->assertHasNoActionErrors()->assertSee('0 drafts will change; 2 already match this source.');
         $this->assertSame($before, $this->evidence());
     }
@@ -436,7 +454,8 @@ class BulkLicenseDraftSourceAuthoringActionTest extends TestCase
         $this->assertFalse($submit->item(0)->hasAttribute('wire:loading.attr'));
         $this->assertFalse($submit->item(0)->hasAttribute('disabled'));
         $this->assertStringContainsString('isProcessing', $submit->item(0)->getAttribute('x-bind:disabled'));
-        $modal = $xpath->query('//*[@*[name()="x-on:form-validation-error.window"]]');
+        $modal = $xpath->query('//*[contains(concat(" ", normalize-space(@class), " "), " fi-modal-window ")][@*[name()="x-on:form-validation-error.window"]]');
+        $this->assertCount(1, $modal);
         $this->assertSame(LicenseTemplateResource::authoringModalAttributes()['x-on:form-validation-error.window'], $modal->item(0)->getAttribute('x-on:form-validation-error.window'));
     }
 }

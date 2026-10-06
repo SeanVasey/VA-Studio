@@ -379,7 +379,8 @@ class ManageLicenseVersions extends ManageRecords
             ->disabled(fn (): bool => $this->bulkSourceReview === null && $this->submittingBulkSource !== 'reviewBulkSource')
             ->modalHeading('Review license draft source replacement')
             ->extraModalWindowAttributes(LicenseTemplateResource::authoringModalAttributes())
-            ->modalSubmitAction(fn (Action $action) => $action->extraAttributes(['wire:loading.attr' => null]))
+            ->modalSubmitAction(fn (Action $action) => $action->disabled(fn (): bool => $this->bulkSourceReview === null)
+                ->extraAttributes(['wire:loading.attr' => null]))
             ->modalDescription('Save only the source shown for these exact drafts. If the result cannot be confirmed, keep a copy, then close and reopen to inspect the saved drafts before trying again.')
             ->schema([Textarea::make('authored_source')->label('Replacement source to keep')->readOnly()->required()->rows(8)
                 ->helperText('Copy this entered text before closing. Use Back to source to change it and obtain a fresh comparison.')])
@@ -461,11 +462,13 @@ class ManageLicenseVersions extends ManageRecords
             throw $exception;
         } catch (ValidationException $exception) {
             $this->clearBulkSourceReview();
+            $this->submittingBulkSource = null;
             Notification::make()->danger()->title('Review current drafts to continue')
                 ->body('Keep a copy of your entered source, then close and reopen the selected drafts to inspect their saved state and review again.')->persistent()->send();
             $this->bulkSourceErrors(implode(' ', array_merge(...array_values($exception->errors()))));
         } catch (Throwable $exception) {
             $this->clearBulkSourceReview();
+            $this->submittingBulkSource = null;
             $this->bulkAuthoredSource = $retainedSource;
             try {
                 Log::warning('Bulk license draft UI could not confirm the result.', ['exception_class' => $exception::class]);
