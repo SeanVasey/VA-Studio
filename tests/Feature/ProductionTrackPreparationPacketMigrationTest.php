@@ -3,10 +3,13 @@
 namespace Tests\Feature;
 
 use App\Domain\Commerce\ProductionPreparation\PacketEvidence;
+use Illuminate\Database\MySqlConnection;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
+use ReflectionMethod;
 use RuntimeException;
 use Tests\Support\ProductionTrackPreparationFixtures as Fixture;
 use Tests\TestCase;
@@ -35,6 +38,68 @@ class ProductionTrackPreparationPacketMigrationTest extends TestCase
     private function migration(): object
     {
         return require database_path('migrations/2026_10_06_238000_production_track_preparation_packets.php');
+    }
+
+    public function test_sqlite_and_mysql_grammars_compile_exact_short_parent_identities_without_native_contact(): void
+    {
+        $sqlite = DB::getDefaultConnection();
+        $contacts = 0;
+        $mysql = new MySqlConnection(function () use (&$contacts): never {
+            $contacts++;
+            throw new LogicException('Grammar proof must never contact MySQL.');
+        }, 'synthetic_compile_only', '', ['driver' => 'mysql', 'charset' => 'utf8mb4', 'collation' => 'utf8mb4_unicode_ci']);
+        $mysql->useDefaultSchemaGrammar();
+        DB::extend('production_packet_mysql_grammar', fn () => $mysql);
+        config(['database.connections.production_packet_mysql_grammar' => ['driver' => 'production_packet_mysql_grammar']]);
+        try {
+            foreach ([$sqlite, 'production_packet_mysql_grammar'] as $name) {
+                DB::setDefaultConnection($name);
+                $connection = DB::connection();
+                $migration = $this->migration();
+                $definitions = (new ReflectionMethod($migration, 'definitions'))->invoke($migration);
+                $statements = [];
+                foreach ($definitions as $table => $definition) {
+                    $blueprint = new Blueprint($connection, $table);
+                    $blueprint->create();
+                    $definition($blueprint);
+                    $statements = [...$statements, ...$blueprint->toSql()];
+                    $foreign = [];
+                    foreach ($blueprint->getCommands() as $command) {
+                        if ($command->name === 'foreign') {
+                            $this->assertLessThanOrEqual(64, strlen($command->index));
+                            $foreign[$command->index] = [$command->columns, $command->on, (array) $command->references, $command->onDelete];
+                        }
+                    }
+                    if ($table === PacketEvidence::LINES) {
+                        $this->assertSame([
+                            'ptp_line_parent' => [['production_track_preparation_packet_id'], PacketEvidence::PACKETS, ['id'], 'restrict'],
+                            'ptp_line_track_parent' => [['track_id'], 'tracks', ['id'], 'restrict'],
+                            'ptp_line_offer_parent' => [['offer_id'], 'offers', ['id'], 'restrict'],
+                            'ptp_line_revision_parent' => [['offer_revision_id'], 'offer_revisions', ['id'], 'restrict'],
+                            'ptp_line_license_parent' => [['license_version_id'], 'license_versions', ['id'], 'restrict'],
+                        ], $foreign);
+                    }
+                }
+                $guards = (new ReflectionMethod($migration, 'guards'))->invoke($migration);
+                foreach ($guards as $guardName => $definition) {
+                    $this->assertLessThanOrEqual(64, strlen($guardName));
+                    $statements[] = $definition['statement'];
+                }
+                preg_match_all('/["`]([^"`]+)["`]/', implode("\n", $statements), $identities);
+                foreach (array_unique($identities[1]) as $identity) {
+                    $this->assertLessThanOrEqual(64, strlen($identity));
+                }
+                if ($connection->getDriverName() === 'mysql') {
+                    $this->assertStringContainsString('`ptp_line_revision_parent`', implode("\n", $statements));
+                    $this->assertStringContainsString('`ptp_line_license_parent`', implode("\n", $statements));
+                    $this->assertStringContainsString("SIGNAL SQLSTATE '45000'", implode("\n", $statements));
+                }
+            }
+            $this->assertSame(0, $contacts);
+        } finally {
+            DB::setDefaultConnection($sqlite);
+            DB::purge('production_packet_mysql_grammar');
+        }
     }
 
     private function metadata(): array

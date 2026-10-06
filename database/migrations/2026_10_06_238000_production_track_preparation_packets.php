@@ -50,10 +50,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('production_track_preparation_packet_id')->constrained(table: PacketEvidence::PACKETS, indexName: 'ptp_line_parent')->restrictOnDelete();
             $table->unsignedInteger('position');
-            $table->foreignId('track_id')->constrained('tracks')->restrictOnDelete();
-            $table->foreignId('offer_id')->constrained('offers')->restrictOnDelete();
-            $table->foreignId('offer_revision_id')->constrained('offer_revisions')->restrictOnDelete();
-            $table->foreignId('license_version_id')->constrained('license_versions')->restrictOnDelete();
+            $table->foreignId('track_id')->constrained(table: 'tracks', indexName: 'ptp_line_track_parent')->restrictOnDelete();
+            $table->foreignId('offer_id')->constrained(table: 'offers', indexName: 'ptp_line_offer_parent')->restrictOnDelete();
+            $table->foreignId('offer_revision_id')->constrained(table: 'offer_revisions', indexName: 'ptp_line_revision_parent')->restrictOnDelete();
+            $table->foreignId('license_version_id')->constrained(table: 'license_versions', indexName: 'ptp_line_license_parent')->restrictOnDelete();
             $table->unsignedInteger('price_minor');
             $this->identity($table, 'offer_snapshot_hash', 64);
             $table->unique(['production_track_preparation_packet_id', 'position'], 'ptp_line_position');
