@@ -1,5 +1,9 @@
 # Development agents and launch queue
 
+## Full completion priority — October 5, 2026 (America/Chicago)
+
+Follow the [completion execution plan](completion-execution.md) for current parallel ownership, actual missing capabilities and acceptance cadence. Resumable private media plus admin controls, retained refund/dispute inspection, and measured CI acceleration are developing together while [PR #5](https://github.com/SeanVasey/VA-Studio/pull/5) remains frozen for its own full acceptance. No author waits for unrelated MySQL checks before starting the next approved child. The earlier user-testing milestone below is bounded support work, not the completion target. Whole-parent acceptance counts remain six accepted and 34 open.
+
 ## User-testing batch — October 6, 2026
 
 The GitHub handoff is complete: [PR #4](https://github.com/SeanVasey/VA-Studio/pull/4) merged as `1095dd5f8fd7d016bc08a55dfe2d264557dfce67`; all thirteen applicable PR gates and [post-merge run 37098953844](https://github.com/SeanVasey/VA-Studio/actions/runs/37098953844) passed. The October 2 tables below preserve earlier execution states and are not current blockers or running-agent claims.
