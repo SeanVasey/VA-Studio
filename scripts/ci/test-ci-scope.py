@@ -277,6 +277,31 @@ class BrowserWorkflowTests(unittest.TestCase):
         self.assertIn("          path: |\n            playwright-report/\n            test-results/\n", upload.group(1))
         self.assertIn("          retention-days: 7\n", upload.group(1))
 
+    def test_browser_budgets_preserve_teardown_and_installation_headroom(self):
+        config = (self.root / "playwright.config.ts").read_text()
+        wrapper = (self.root / "tests/browser/run.mjs").read_text()
+        suite = re.search(r"(?m)^  globalTimeout: (\d+) \* 60_000,$", config)
+        process = re.search(r"cwd: root, env, stdio: 'inherit', timeout: (\d+),", wrapper)
+        self.assertIsNotNone(suite)
+        self.assertIsNotNone(process)
+        suite_ms, wrapper_ms = int(suite.group(1)) * 60_000, int(process.group(1))
+        self.assertEqual(26 * 60_000, suite_ms)
+        self.assertEqual(60_000, wrapper_ms - suite_ms)
+        for unchanged in ("  workers: 1,\n", "  retries: 0,\n", "  timeout: 60_000,\n", "  expect: { timeout: 10_000 },\n"):
+            self.assertIn(unchanged, config)
+        gitlab = (self.root / ".gitlab-ci.yml").read_text()
+        gitlab_job = re.search(r"(?ms)^operator-browser:\n(.*?)(?=^[\w-]+:\n|\Z)", gitlab)
+        self.assertIsNotNone(gitlab_job)
+        self.assertIn('    - npm run test:browser -- --project="$BROWSER_PROJECT"\n', gitlab_job.group(1))
+        github_limit = re.search(r"(?m)^    timeout-minutes: (\d+)$", self.operator_job())
+        gitlab_limit = re.search(r"(?m)^  timeout: (\d+)m$", gitlab_job.group(1))
+        for limit in (github_limit, gitlab_limit):
+            self.assertIsNotNone(limit)
+            self.assertEqual(50, int(limit.group(1)))
+            # The 14-minute observed install delay plus one-minute fixture ceiling must
+            # fit outside the wrapper, with time remaining for builds and artifacts.
+            self.assertGreater(int(limit.group(1)) * 60_000 - wrapper_ms, 15 * 60_000)
+
 
 if __name__ == "__main__":
     unittest.main()
