@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { expect, test, type Locator, type Page, type Response } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
+import { actionResponse } from './publication-fixture';
 
 type Fixture = { orderId: string; operatorEmail: string; capability: string; privateMarkers: string[] };
 type Proof = {
@@ -23,8 +24,8 @@ function verify(project: string, phase: 'prepared' | 'released' | 'replayed'): P
   return proof;
 }
 
-async function operate(page: Page, button: Locator): Promise<Response> {
-  const pending = page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/update') && response.request().method() === 'POST');
+async function operate(page: Page, button: Locator, method: Parameters<typeof actionResponse>[1], actionName?: string): Promise<Response> {
+  const pending = actionResponse(page, method, actionName);
   await button.scrollIntoViewIfNeeded();
   await button.focus();
   await button.press('Enter');
@@ -78,17 +79,17 @@ test('operator confirms a real terminal-unpaid release, reads retained history a
   const row = page.getByRole('row').filter({ has: page.getByText(fixture.orderId, { exact: true }) });
   const release = row.getByRole('button', { name: 'Verify unpaid status and release', exact: true });
   const dialog = page.getByRole('dialog');
-  await operate(page, release);
+  await operate(page, release, 'mountAction', 'releaseUnpaid');
   await expect(dialog.getByRole('heading', { name: 'Verify unpaid status and release', exact: true })).toBeVisible();
   await expect(dialog).toContainText('Expiry alone is not proof');
   verify(testInfo.project.name, 'prepared');
-  const submitted = await operate(page, dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Submit', exact: true }));
+  const submitted = await operate(page, dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Submit', exact: true }), 'callMountedAction');
   await expect(page.getByText('Test resources released', { exact: true })).toBeVisible();
   await expect(dialog.getByRole('heading', { name: 'Verify unpaid status and release', exact: true })).not.toBeVisible();
   await assertPrivate(page, fixture, submitted);
   const initial = verify(testInfo.project.name, 'released');
 
-  const history = await operate(page, row.getByRole('button', { name: 'Release history', exact: true }));
+  const history = await operate(page, row.getByRole('button', { name: 'Release history', exact: true }), 'mountAction', 'releaseHistory');
   await expect(dialog.getByRole('heading', { name: 'Test unpaid release history', exact: true })).toBeVisible();
   await expect(dialog).toContainText(initial.releaseId!);
   await expect(dialog).toContainText('Current history sequence: 2');
@@ -96,11 +97,11 @@ test('operator confirms a real terminal-unpaid release, reads retained history a
   await expect(dialog.locator('.fi-modal-window')).toHaveCSS('opacity', '1');
   await assertPrivate(page, fixture, history);
   await page.screenshot({ path: testInfo.outputPath('test-unpaid-release-history.png'), fullPage: false });
-  await operate(page, dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Close', exact: true }));
+  await operate(page, dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Close', exact: true }), 'unmountAction');
 
   // A newly reviewed repeat sees the same retained release and performs no new provider GET.
-  await operate(page, release);
-  const replay = await operate(page, dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Submit', exact: true }));
+  await operate(page, release, 'mountAction', 'releaseUnpaid');
+  const replay = await operate(page, dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Submit', exact: true }), 'callMountedAction');
   await expect(page.getByText('Test resources released', { exact: true }).last()).toBeVisible();
   await assertPrivate(page, fixture, replay);
   expect(verify(testInfo.project.name, 'replayed').releaseId).toBe(initial.releaseId);
