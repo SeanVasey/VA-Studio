@@ -1,6 +1,6 @@
 # Public navigation connection recovery
 
-Bounded T33/WP-05 child, October 6, 2026. Implementation begins from local `4a59cc3`, equivalent to PR #13 head `53efb369`; that candidate's acceptance remains separate.
+Bounded T33/WP-05 child, October 6, 2026. Implementation begins from local `4a59cc3`, equivalent to PR #13 head `53efb369`. The reviewed child is composed into the next coherent PR #13 update; the preceding candidate's receipts do not apply to this changed source.
 
 Owned files: `resources/js/lib/storefront-offline.ts`, its registration in `resources/js/app.tsx`, `public/storefront-worker.js`, `public/offline.html`, dedicated frontend/browser regressions and this record. Existing brand bytes, domain services, routes, private responses, player ownership and CI policy remain unchanged.
 
@@ -32,9 +32,9 @@ Implementation follows the platform's [fetch event contract](https://developer.m
 | `npm run build:preview` and preview scan at `dist/design-preview` | Passed; four output files scanned with no prohibited hits. Preview component bytes are unchanged by the final app-entry wiring. |
 | `node --check public/storefront-worker.js`; `git diff --check` | Passed. |
 | Self-contained loopback recovered PHP static-server probe | All five assets returned 200, expected MIME, exact source bytes and no Set-Cookie; 87,771 total bytes. It executes no Laravel or browser worker. |
-| Actual `playwright test --list --reporter=json` with discovery-only manifest | 128 identities / 37 files, 64 per engine; two new native definitions. This executes no browser journey. All existing spec bytes are unchanged. |
+| Actual `playwright test --list --reporter=json` with discovery-only manifest | 128 identities / 37 files, 64 per engine; two new native definitions. This executes no browser journey. At child `e92742b`, all preceding spec bytes are unchanged. The composed sibling corrects inquiry retry transport and the integration adds a successful offline screenshot definition without changing any identity or criterion. |
 | Original identity ledger | All six original image assets retain their approved hashes. No image is redrawn or altered. |
 
 The initial focused run passed 70/72 and exposed both registration and worker admission of the private `/contact/inquiries` path. The narrowed public route forms now refuse that overlap; original failure output is retained. An initial split-session HTTP probe could not reach its separate server; the corrected self-contained server/probe verified the actual bytes and MIME above. Neither harness issue is hidden as application acceptance. JSDOM retains its existing document-navigation warnings without suppression.
 
-Independent committed-source review and native hosted execution remain pending. Local browser engines and genuine ClamAV are unavailable. Existing full-CI autodiscovery includes the new files; focused-selector caps/choices and every prior exclusion, timeout, retry, workflow, dependency and PHP case are unchanged. This child is isolated from PR #13 and receives none of that candidate's receipts. Six parent groups remain accepted and 34 open.
+`/root/composition_review` independently approved committed child `e92742b5c7b77f475ab1fe375b414fa6f4a3d393`, tree `1b8754b717165c80dbc44b07b825dd96f56d2af2`, with no blocking cache/privacy/lifecycle findings. The final composition preserves its application, worker, asset and frontend regression bytes. Successful native execution and visual review of the newly defined screenshots remain required. Local browser engines and genuine ClamAV are unavailable. Existing full-CI autodiscovery includes the new files; focused-selector caps/choices and every prior exclusion, timeout, retry, workflow, dependency and PHP identity are unchanged. Broader update-lifecycle, target-host and physical-device acceptance remain open. Six parent groups remain accepted and 34 open.
