@@ -262,6 +262,31 @@ class BrowserWorkflowTests(unittest.TestCase):
         self.assertIn("  testDir: './tests/browser',\n", config)
         self.assertIn("  testMatch: '**/*.spec.ts',\n", config)
 
+    def test_every_ordinary_browser_job_installs_genuine_customer_delivery_prerequisites(self):
+        for workflow, job_name, command in (
+            ("ci.yml", "operator-browser", 'npm run test:browser -- --project="$BROWSER_PROJECT"'),
+            ("focused.yml", "focused-browser", "python3 scripts/ci/focused-tests.py"),
+        ):
+            with self.subTest(workflow=workflow):
+                source = (self.root / ".github/workflows" / workflow).read_text()
+                match = re.search(rf"(?ms)^  {job_name}:\n(.*?)(?=^  [\w-]+:\n|\Z)", source)
+                self.assertIsNotNone(match)
+                job = match.group(1)
+                # A required step with no conditional, fallback or ignored failure.
+                install = re.search(r"(?m)^      - name: [^\n]+\n        run: bash tests/browser/install-related-scanner.sh$", job)
+                self.assertIsNotNone(install)
+                self.assertLess(install.start(), job.index(command))
+                self.assertEqual(1, job.count("bash tests/browser/install-related-scanner.sh"))
+        source = (self.root / ".gitlab-ci.yml").read_text()
+        match = re.search(r"(?ms)^operator-browser:\n(.*?)(?=^[\w-]+:\n|\Z)", source)
+        self.assertIsNotNone(match)
+        job = match.group(1)
+        self.assertIn("    - bash scripts/ci/setup-gitlab-related-scanner.sh\n", job)
+        self.assertLess(job.index("bash scripts/ci/setup-gitlab-related-scanner.sh"), job.index("  script:\n"))
+        wrapper = (self.root / "tests/browser/run.mjs").read_text()
+        self.assertIn("APP_ENV: 'local'", wrapper)
+        self.assertIn("MEDIA_CLAMSCAN: join(directory, 'no-clamscan')", wrapper)
+
     def test_each_engine_retains_failure_evidence_without_run_or_attempt_collisions(self):
         job = self.operator_job()
         upload = re.search(r"(?ms)^      - name: [^\n]+\n        if: always\(\)\n        uses: actions/upload-artifact@[^\n]+\n        with:\n(.*?)(?=^      - |\Z)", job)
