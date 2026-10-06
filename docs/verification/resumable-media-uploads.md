@@ -25,9 +25,17 @@ Migration `000038` retains populated session evidence on rollback. Empty rollbac
 
 ## Verification checkpoint
 
-Focused SQLite execution with PHP 8.4.26 passes 26 cases / 319 assertions, including the existing whole-file commit-recovery suite. Cases cover exact start replay, interruption/resume, duplicate/corrupt offsets, foreign/revoked actors, existing limits, expiration/cancellation, final MIME/digest verification, lost committed-result acknowledgement, rolled-back finalization, bounded retained bytes, symlink refusal and migration preservation/refusal. The unchanged whole-file API retains its original recovery semantics.
+At source commit `6a70f13fba89de4dab5e37e5b96dad61b3541043`, focused SQLite execution with PHP 8.4.26 passes 26 cases / 319 assertions in 3.525 seconds, including the existing whole-file commit-recovery suite. Cases cover exact start replay, interruption/resume, duplicate/corrupt offsets, foreign/revoked actors, existing limits, expiration/cancellation, final MIME/digest verification, lost committed-result acknowledgement, rolled-back finalization, bounded retained bytes, symlink refusal and migration preservation/refusal. The unchanged whole-file API retains its original recovery semantics.
 
-The dedicated MySQL suite uses independent PHP/database processes and observes an exact `users` primary-record `WAITING` lock before releasing the first operation. Its four cases cover duplicate chunk admission, duplicate completion, cancellation before completion and completion before cancellation. SQLite skips these four cases explicitly and does not establish concurrency acceptance. Final native MySQL results, exact source and HTTP/admin composition acceptance belong to the integrating PR.
+```sh
+php vendor/bin/phpunit tests/Feature/ResumableMediaUploadsTest.php tests/Feature/MediaUploadCommitRecoveryTest.php
+```
+
+The same source passes native MySQL 8.4.11 execution: 30 cases / 568 assertions, zero skips or failures, in 99.013 seconds. The dedicated concurrency suite uses independent PHP/database processes and observes an exact `users` primary-record `WAITING` lock before releasing the first operation. Its four cases cover duplicate chunk admission, duplicate completion, cancellation before completion and completion before cancellation. SQLite skips these four cases explicitly and does not establish concurrency acceptance. Native execution used a disposable isolated database, a synthetic test application key and the server's default durability settings. HTTP/admin composition acceptance belongs to the integrating PR.
+
+```sh
+php vendor/bin/phpunit tests/Feature/ResumableMediaUploadsTest.php tests/Feature/ResumableMediaUploadsConcurrencyTest.php tests/Feature/MediaUploadCommitRecoveryTest.php
+```
 
 Native MySQL development exposed a real schema incompatibility that SQLite had tolerated: existing audit subjects are numeric. The session now keeps a numeric primary key with a separate unique public UUID. The audit schema and historical events are unchanged. An earlier disposable MySQL setup lacked trigger-creation privileges; that setup error was corrected in the test runner, without weakening application migrations or durability settings.
 
