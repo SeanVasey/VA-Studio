@@ -32,7 +32,7 @@ import zipfile
 # Bind source and artifact provenance to the verified GitHub destination.
 REPOSITORY = "SeanVasey/VA-Studio"
 REPOSITORY_ID = 1402461806
-WORKFLOW_PATH = ".github/workflows/ci.yml"
+WORKFLOW_PATH = ".github/workflows/final-verification.yml"
 NS = "{https://xml.phpunit.de/testSuite}"
 SHA = re.compile(r"[0-9a-f]{40}\Z")
 HASH = re.compile(r"[0-9a-f]{64}\Z")
@@ -627,7 +627,7 @@ def collect(root: Path, env: dict, api: Github) -> dict:
     run_path = f"/actions/runs/{run_id}"
     # Resolve this repository's native workflow ID through its canonical path.
     # Repository copies receive new numeric IDs; source SHA/ref proof remains exact.
-    workflow = api.get("/actions/workflows/ci.yml")
+    workflow = api.get("/actions/workflows/" + WORKFLOW_PATH.rsplit("/", 1)[1])
     require(positive(workflow.get("id")) and workflow.get("path") == WORKFLOW_PATH
             and workflow.get("name") == "Foundation CI" and workflow.get("state") == "active",
             "Canonical Foundation workflow identity is unavailable")

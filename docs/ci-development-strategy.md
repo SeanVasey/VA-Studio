@@ -1,10 +1,20 @@
 # Development CI strategy
 
-Status: October 2, 2026 (America/Chicago). Focused feedback, conservative documentation routing, full-mode aggregate, exact database receipts and timing increments are accepted and exercised by the completed PR #105 gate. T01/T02 parent criteria remain open. Draft suppression and runtime postmerge deduplication remain proposed; runtime proof reuse is disabled. The [current execution queue](development-control.md) records the hosted startup restriction and component cadence.
+Status: October 6, 2026. Sean explicitly authorized focused development merges
+and stopped routine complete matrices. [Current executable policy and coordination](verification/ci-trigger-efficiency.md)
+and [AGENTS.md](../AGENTS.md) supersede the older per-merge requirements below.
 
-## Current increment
+Routine PRs use cheap development preflight; local affected checks and deliberate
+manual focused feedback support development batches. Complete Foundation CI is
+manual final verification, pinned to a reviewed SHA. All eight MySQL/two SQLite
+partitions, browser coverage, audits and final acceptance remain intact. Expensive
+jobs wait for preflight success. The retired automatic workflow identities stay
+disabled to contain stale branches. No runtime proof reuse is enabled.
 
-The [focused feedback workflow](verification/focused-ci.md), [documentation routing](verification/ci-scope.md), and [timing refresh](verification/ci-throughput.md) are implemented in the verified baseline. Runtime PRs, runtime main pushes and full dispatch still execute the complete suite. The backend aggregate now also requires frontend/browser success. No runtime post-merge evidence reuse, schedule or draft suppression is introduced. Later sections distinguish the longer-term target from this bounded implementation.
+## Historical evidence and design proposals
+
+The remaining sections preserve earlier measurements and proposals. Statements
+requiring full CI on every merge are superseded by the October 6 policy above.
 
 ## Observed evidence
 
@@ -19,7 +29,7 @@ Current main is `cae053efbc2019c849269605df030a36a620484e`. [PR #105 Foundation 
 
 These are measured job durations for this source, not same-source before/after proof of a speedup. The separate main run failed to start because of account payment authorization, executing zero jobs. Preserve passing PR evidence; do not retry hosted workflows until the account restriction is resolved.
 
-The [current workflow](../.github/workflows/ci.yml) retains complete runtime PR/main gates and full dispatch. Draft PRs still run full checks. [PR #68's trigger change](verification/ci-trigger-efficiency.md) removed duplicate feature-branch push runs. Frontend/browser success is required by the strict aggregate, and six actual current-source database receipts are required. Protection settings remain unverified; do not infer absence of enforcement or change repository settings.
+The [historical workflow](https://github.com/SeanVasey/VA-Studio/blob/387fdeb95e72e96e5cd17c0b54f38c849fc37adb/.github/workflows/ci.yml) retained complete runtime PR/main gates and full dispatch at that checkpoint. Draft PRs still ran full checks then. [PR #68's trigger change](verification/ci-trigger-efficiency.md) removed duplicate feature-branch push runs. Frontend/browser success is required by the strict aggregate, and six actual current-source database receipts are required. Protection settings remain unverified; do not infer absence of enforcement or change repository settings.
 
 ### Historical September 30 baseline
 

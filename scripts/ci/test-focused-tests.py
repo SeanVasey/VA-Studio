@@ -87,7 +87,7 @@ class SelectionTests(unittest.TestCase):
                        "tests/Feature/TrackPublicationManifestEditorTest.php"):
             self.assertIn(target, focused.PHP_TARGETS["publication"])
         self.assertIn("tests/Feature/TrackPublicationManifestEditorTest.php", focused.PHP_TARGETS["operator"])
-        self.assertIn("publication", (ROOT / ".github/workflows/focused.yml").read_text())
+        self.assertIn("publication", (ROOT / ".github/workflows/focused-feedback.yml").read_text())
 
     def test_mysql_only_reaches_php_modes_and_browser_reports_isolated_sqlite(self):
         for suite in focused.PHP_TARGETS:
@@ -171,7 +171,7 @@ class SelectionTests(unittest.TestCase):
         self.assertIn("rmSync(directory, { recursive: true, force: true });", wrapper)
 
     def test_workflow_dispatch_choices_exactly_match_reviewed_suite_enums(self):
-        workflow = (ROOT / ".github/workflows/focused.yml").read_text()
+        workflow = (ROOT / ".github/workflows/focused-feedback.yml").read_text()
         choices = workflow.split("options: [", 1)[1].split("]", 1)[0].split(", ")
         self.assertEqual(set(focused.SUITES), set(choices))
         self.assertEqual(len(focused.SUITES), len(choices))
@@ -390,13 +390,14 @@ class WorkflowBoundaryTests(unittest.TestCase):
         self.assertNotRegex(text, r"\bwrite(?:-all)?\b")
         self.assertIn("contents: read", text)
         self.assertEqual(text.count("persist-credentials: false"), 4)
-        self.assertIn("branches-ignore: [main]", text)
+        self.assertIn("  workflow_dispatch:", text)
+        self.assertNotIn("  push:", text)
 
     def test_workflow_has_no_secrets_privileged_event_or_mutation_permissions(self):
-        self.assert_read_only_workflow((ROOT / ".github/workflows/focused.yml").read_text())
+        self.assert_read_only_workflow((ROOT / ".github/workflows/focused-feedback.yml").read_text())
 
     def test_xmlwriter_is_allowed_but_write_and_write_all_permissions_are_rejected(self):
-        text = (ROOT / ".github/workflows/focused.yml").read_text()
+        text = (ROOT / ".github/workflows/focused-feedback.yml").read_text()
         self.assertIn("xmlwriter", text)
         self.assert_read_only_workflow(text)
         for mutation in (text.replace("contents: read", "contents: write"),
@@ -406,7 +407,7 @@ class WorkflowBoundaryTests(unittest.TestCase):
                 self.assert_read_only_workflow(mutation)
 
     def test_workflow_never_interpolates_expressions_in_shell_steps(self):
-        lines = (ROOT / ".github/workflows/focused.yml").read_text().splitlines()
+        lines = (ROOT / ".github/workflows/focused-feedback.yml").read_text().splitlines()
         in_run, indent = False, 0
         for line in lines:
             stripped = line.lstrip()

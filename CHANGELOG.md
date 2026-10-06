@@ -28,6 +28,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Changed
 
+- Development PRs use cheap preflight and focused evidence under Sean's October 6 policy; full database/browser acceptance is an explicit exact-SHA final dispatch. Retired automatic workflows cannot be revived by stale branches, and final matrices wait for quality/frontend success.
+
 - Foundation runs the complete ordinary Chromium and mobile-WebKit suites in separate fixed matrix jobs, each with fresh fixtures and distinct retained artifacts. All 90 case identities, the existing intentional keyboard skip, zero retries and bounded suite/job budgets remain. Fresh hosted acceptance of this repair is pending.
 
 - Every CI job has a time limit: 90 minutes for a MySQL shard, 60 for a SQLite shard, 15 for the frontend and quality jobs and 10 for the backend aggregate, so a hung test no longer holds a runner for GitHub's six-hour default. The shard timings are refreshed from PR #82's two CI runs, so 11 test files that had no timing, the site-image tests among them, are no longer costed at the suite's mean.

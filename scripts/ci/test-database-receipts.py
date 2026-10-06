@@ -144,7 +144,7 @@ class FakeGithub:
                                        "workflow_run": {"id": 123, "repository_id": receipt.REPOSITORY_ID, "head_repository_id": receipt.REPOSITORY_ID, "head_sha": "d" * 40}})
 
     def get(self, path):
-        if path == "/actions/workflows/ci.yml":
+        if path == "/actions/workflows/final-verification.yml":
             return deepcopy(self.workflow)
         if path != "/actions/runs/123":
             raise AssertionError("Unexpected current-run API path: " + path)
@@ -382,13 +382,13 @@ class CollectorTests(unittest.TestCase):
             with self.subTest(mutation=mutation), self.assertRaises(receipt.ReceiptError): self.collect(api)
 
     def test_wrong_workflow_event_repository_attempt_or_path_rejects(self):
-        for key, value in (("workflow_id", 1), ("event", "workflow_dispatch"), ("repository", {"id": 1}), ("run_attempt", 2), ("path", ".github/workflows/focused.yml")):
+        for key, value in (("workflow_id", 1), ("event", "workflow_dispatch"), ("repository", {"id": 1}), ("run_attempt", 2), ("path", ".github/workflows/focused-feedback.yml")):
             api = FakeGithub(); api.run[key] = value
             with self.subTest(key=key), self.assertRaises(receipt.ReceiptError): self.collect(api)
 
     def test_invalid_canonical_workflow_identity_rejects(self):
         for key, value in (("id", None), ("id", False), ("id", 0), ("id", "456"), ("id", 789),
-                           ("name", "Focused Feedback"), ("path", ".github/workflows/focused.yml"), ("state", "disabled_manually")):
+                           ("name", "Focused Feedback"), ("path", ".github/workflows/focused-feedback.yml"), ("state", "disabled_manually")):
             api = FakeGithub(); api.workflow[key] = value
             with self.subTest(key=key, value=value), self.assertRaises(receipt.ReceiptError): self.collect(api)
 
@@ -504,7 +504,7 @@ class SyntheticEnvironmentTests(unittest.TestCase):
 
 class WorkflowTests(unittest.TestCase):
     def test_each_workflow_matrix_name_and_discovery_count_matches_committed_provider_policy(self):
-        workflow = (Path(__file__).parents[2] / ".github/workflows/ci.yml").read_text()
+        workflow = (Path(__file__).parents[2] / ".github/workflows/final-verification.yml").read_text()
         for engine, count in receipt.COUNTS.items():
             block = re.split(r"(?m)^  [a-z][a-z-]+:\n", workflow.split(f"  backend-{engine}:\n", 1)[1], maxsplit=1)[0]
             self.assertIn(f"name: backend-{engine} (${{{{ matrix.shard }}}}/{count})", block)
@@ -514,14 +514,14 @@ class WorkflowTests(unittest.TestCase):
         self.assertIn("Verify all ten current-run database receipts without enabling reuse", workflow)
 
     def test_workflow_preserves_runtime_conditions_matrices_events_and_no_reuse_output(self):
-        workflow = (Path(__file__).parents[2] / ".github/workflows/ci.yml").read_text()
+        workflow = (Path(__file__).parents[2] / ".github/workflows/final-verification.yml").read_text()
         self.assertEqual(6, workflow.count("if: needs.scope.outputs.mode != 'docs'"))
-        for retained in ("branches: [main]", "pull_request:", "workflow_dispatch:", "shard: [1, 2, 3, 4, 5, 6, 7, 8]", "shard: [1, 2]",
+        for retained in ("workflow_dispatch:", "expected_sha:", "shard: [1, 2, 3, 4, 5, 6, 7, 8]", "shard: [1, 2]",
                          "--fail-on-phpunit-warning --display-warnings", "npm audit --audit-level=high", "npm run test:browser",
                          "needs: [scope, documentation, backend-quality, backend-mysql, backend-sqlite, frontend, operator-browser, related-browser]",
                          "  related-browser:", "run: bash tests/browser/install-related-scanner.sh", "run: node tests/browser/run-related.mjs"):
             self.assertIn(retained, workflow)
-        for forbidden in ("pull_request_target", "workflow_run:", "continue-on-error", "reuse_enabled", "outputs.reuse", "contents: write", "actions: write", "secrets."):
+        for forbidden in ("  push:", "  pull_request:", "pull_request_target", "workflow_run:", "continue-on-error", "reuse_enabled", "outputs.reuse", "contents: write", "actions: write", "secrets."):
             self.assertNotIn(forbidden, workflow)
         self.assertEqual(1, workflow.count("RECEIPT_GITHUB_TOKEN:"))
         self.assertEqual("full", receipt.shadow_decision()["execution_mode"])

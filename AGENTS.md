@@ -19,6 +19,33 @@ The initial development lead is Astra as requested. These instructions are porta
 
 Sean authorized agents on 2026-09-12 to choose coherent PR boundaries, push related commits, merge verified work and continue the ordered plan without requesting approval at each task or commit. Batch related functionality and regression coverage into a reviewable feature PR. Use focused checks during implementation and the required CI/review gates for the final candidate; resolve concrete failures without weakening those gates. Merge with an expected head SHA when checks and required review are satisfied, then proceed to the next ready dependency. Ordinary commits do not need release tags. Preserve the release boundaries below and record the next task and actual evidence at meaningful checkpoints.
 
+## CI cost policy — Sean's instruction, October 6, 2026
+
+This policy supersedes the earlier requirement for complete hosted CI on every
+merge. Sean explicitly authorized development merges without full CI. Finish
+coherent batches using meaningful focused local checks and the cheap PR preflight;
+record the exact tested source, selected cases, failures and untested conditions.
+Preserve independent review for sensitive domain changes. Do not invent passing
+results or describe focused checks as full acceptance.
+
+- Do not launch routine full MySQL/SQLite/browser matrices on pushes, PR updates
+  or merges. Foundation CI is manual final verification only. Its dispatch must
+  include the exact reviewed 40-character `expected_sha`; a moved ref is rejected.
+- Use local affected tests while iterating. Use manual Focused development
+  feedback only for a necessary suite/environment unavailable locally; avoid
+  duplicate dispatches for the same source/selection. Batch repairs before pushes.
+- A focused, reviewed development candidate may merge without Foundation CI.
+  Keep genuine audits, secret scanning, security checks and repository protections.
+  If an enforced check blocks the merge, report it; do not bypass or change settings.
+- Run one complete Foundation CI for the final integrated candidate, or as few
+  additional runs as actual failures/new source require. Diagnose from existing
+  logs and focused reproduction before another full run. A full pass applies only
+  to its recorded commit; unresolved failures remain visible release blockers.
+- Main's workflow policy does not automatically update existing PR branches.
+  Before another product push, integrate this policy commit and its workflows;
+  do not let an older branch restore automatic matrices. Coordinate through the
+  CI efficiency PR and `docs/verification/ci-trigger-efficiency.md`.
+
 ## Invariants
 
 - Store money in integer minor units with explicit currency. Never trust client totals or payment success redirects.
@@ -41,4 +68,4 @@ Completing the first track-store slice is not complete feature parity. Existing 
 
 ## Validation
 
-Use the commands in `README.md` and `.github/workflows/ci.yml`. Keep dependency lockfiles committed. Record runtime/tool limitations honestly; do not weaken tests or audit settings to obtain green output.
+Use the focused commands and preflight checks in `README.md`; reserve `.github/workflows/final-verification.yml` for final verification under the cost policy above. Keep dependency lockfiles committed. Record runtime/tool limitations honestly; do not weaken tests or audit settings to obtain green output.

@@ -1,10 +1,13 @@
 name: Foundation CI
 
+# Full suites are an explicit final-verification action, not a per-merge gate.
 on:
-  push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: Exact 40-character commit SHA reviewed for final verification
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -24,6 +27,10 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Verify the exact final candidate before allocating suites
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: python3 scripts/ci/verify-final-candidate.py
       - name: Prove the changed-file scope
         id: classify
         run: python3 scripts/ci/ci-scope.py classify
@@ -99,6 +106,7 @@ jobs:
       - name: Verify CI routing and focused-selection safeguards
         run: |
           python3 scripts/ci/test-ci-scope.py
+          python3 scripts/ci/test-workflow-cadence.py
           python3 scripts/ci/test-focused-tests.py
           python3 scripts/ci/test-database-receipts.py
           python3 scripts/ci/test-gitlab-database-receipts.py
@@ -108,7 +116,8 @@ jobs:
           python3 scripts/test-publish-github.py
 
   backend-mysql:
-    needs: scope
+    # Do not start costly suites for a candidate that already fails preflight.
+    needs: [scope, backend-quality, frontend]
     if: needs.scope.outputs.mode != 'docs'
     name: backend-mysql (${{ matrix.shard }}/8)
     runs-on: ubuntu-latest
@@ -191,7 +200,8 @@ jobs:
           overwrite: false
 
   backend-sqlite:
-    needs: scope
+    # Do not start costly suites for a candidate that already fails preflight.
+    needs: [scope, backend-quality, frontend]
     if: needs.scope.outputs.mode != 'docs'
     name: backend-sqlite (${{ matrix.shard }}/2)
     runs-on: ubuntu-latest
@@ -287,7 +297,8 @@ jobs:
           overwrite: false
 
   operator-browser:
-    needs: scope
+    # Do not start costly suites for a candidate that already fails preflight.
+    needs: [scope, backend-quality, frontend]
     if: needs.scope.outputs.mode != 'docs'
     name: operator-browser (${{ matrix.project }})
     runs-on: ubuntu-latest
@@ -341,7 +352,8 @@ jobs:
 
   related-browser:
     # Keep genuinely ready catalog fixtures separate from the empty-catalog native suite.
-    needs: scope
+    # Do not start costly suites for a candidate that already fails preflight.
+    needs: [scope, backend-quality, frontend]
     if: needs.scope.outputs.mode != 'docs'
     runs-on: ubuntu-latest
     # Tool setup and fixture preparation each have their own ten-minute ceiling;
