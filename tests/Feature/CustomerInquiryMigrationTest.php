@@ -33,6 +33,7 @@ class CustomerInquiryMigrationTest extends TestCase
     {
         parent::setUp();
         // Reverse the additive child first, as a parent rollback must do on MySQL.
+        (require database_path('migrations/2026_10_06_000049_inquiry_order_contexts.php'))->down();
         (require database_path('migrations/2026_10_06_000043_inquiry_messages.php'))->down();
         $this->fakePrivateMediaStorage();
         $this->travelTo(now()->startOfSecond());

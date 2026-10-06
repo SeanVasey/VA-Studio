@@ -35,6 +35,8 @@ class QuotePricingMigrationTest extends TestCase
         $unpaidRelease = require database_path('migrations/2026_10_06_000042_test_unpaid_releases.php');
         $purchaseClaims = require database_path('migrations/2026_10_06_000048_customer_purchase_claims.php');
         $refundResolution = require database_path('migrations/2026_10_06_000047_test_refund_resolutions.php');
+        $orderInquiries = require database_path('migrations/2026_10_06_000049_inquiry_order_contexts.php');
+        $orderInquiries->down();
         $purchaseClaims->down();
         $refundResolution->down();
         $unpaidRelease->down();
@@ -66,6 +68,7 @@ class QuotePricingMigrationTest extends TestCase
         $unpaidRelease->up();
         $refundResolution->up();
         $purchaseClaims->up();
+        $orderInquiries->up();
         foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }
         $pricing = app(PriceQuote::class)->create($quote->public_id, str_repeat('a', 64));
         $this->assertSame($quote->snapshot_hash, $pricing->snapshot['quote_snapshot_hash']);
