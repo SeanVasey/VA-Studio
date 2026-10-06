@@ -159,6 +159,18 @@
       "test_source_lock_captures_metadata_committed_while_creator_waits"
     ],
     [
+      "Tests\\Feature\\ProductMemberRefreshConcurrencyTest",
+      "test_native_actor_wait_observes_authority_withdrawal_despite_an_older_snapshot"
+    ],
+    [
+      "Tests\\Feature\\ProductMemberRefreshConcurrencyTest",
+      "test_native_draft_wait_allows_one_refresh_or_preserves_the_winning_edit"
+    ],
+    [
+      "Tests\\Feature\\ProductMemberRefreshConcurrencyTest",
+      "test_native_source_wait_rejects_a_review_changed_by_the_committing_source_writer"
+    ],
+    [
       "Tests\\Feature\\PromotionAdministrationMySqlConcurrencyTest",
       "test_disabling_and_new_commerce_serialize_on_the_same_campaign_without_partial_effects"
     ],

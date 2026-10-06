@@ -48,4 +48,10 @@ Only these exact methods in `Tests\\Feature\\ProductMemberRefreshConcurrencyTest
 
 The child adds 45 expanded PHP cases in three feature classes, plus two configured browser cases. It does not justify any broader SQLite skip exception or increased feedback budget. The lead must update selector safeguards and regenerate the integrated census/timing evidence against the actual successor base.
 
+## Integration checkpoint
+
+The lead composed independently approved `4fb73dc9` onto the clean `310bf63b` successor in a separate next-batch branch. The nine child files retain their reviewed content before this evidence addition; the published PR6 source is unchanged. Focused registration now contains 29 seller files and 27 browser files, retaining the 32-file cap and all prior selections. Exactly the three reviewed native methods above were added to the SQLite policy; no prior exception changed and both shared-engine classes remain fully executable.
+
+Fresh complete PHPUnit discovery proves **3,615 unique cases in 227 files**, each exactly once across eight MySQL and two SQLite shards. The exact native policy resolves to **380 cases across 120 methods**, adding only this child's nine cases and three methods. The 37 focused-selector, 34 database-receipt and 36 partition safeguards passed, as did TypeScript and diff checks. These are source/discovery checks, not execution of the complete new suite. The existing timing estimates remain unchanged at this checkpoint; a separately verified measured refresh may join this later batch.
+
 T26 remains open for approved bundle/license/allocation/refund/exclusivity rules, publication/readiness, exact purchased compositions/assets and customer delivery. This authoring review chooses none of those policies and closes no parent completion or launch gate.
