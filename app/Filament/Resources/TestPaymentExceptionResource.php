@@ -95,6 +95,9 @@ final class TestPaymentExceptionResource extends ReadOnlyCommerceResource
                     ]))->modalSubmitAction(false)->modalCancelActionLabel('Close'),
                 Action::make('resolveFullRefund')->label('Verify full refund and release')->modalHeading('Verify full refund and release')
                     ->modalDescription('Verify an already completed full refund before releasing this test order’s still-pending inventory and promotion resources. No refund is sent. Grants and original contracts are unchanged; fulfillment remains blocked. Unsupported or uncertain evidence cannot authorize release. Close and reopen this dialog to review a new history sequence.')
+                    // The native submit form owns disabling. A second loading attribute restores
+                    // its captured disabled state after network failure and blocks an exact retry.
+                    ->modalSubmitAction(fn (Action $action): Action => $action->extraAttributes(['wire:loading.attr' => null]))
                     ->fillForm(function (OrderFinalization $record): array {
                         $review = app(ResolveRefundedTestException::class)->review($record->public_id, Filament::auth()->user());
 
