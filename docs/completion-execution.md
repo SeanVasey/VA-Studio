@@ -2,6 +2,14 @@
 
 Checkpoint: October 5, 2026 (America/Chicago), following Sean's instruction to prioritize the finished website and eliminate serial development waits. This plan keeps all required scope in the [40-group register](remaining-development-tasks.csv) and [103-row coverage map](remaining-parity-coverage.csv). The protected preview is a testing aid, not the completion target.
 
+## Exact lookup document continuity — October 6, 2026 UTC
+
+The next bounded correction changes only the order-reference browser observation and its evidence. On published `3fd8b166`, [run 37416246767](https://github.com/SeanVasey/VA-Studio/actions/runs/37416246767) passed frontend, backend quality, all 56 Chromium cases, nine genuine related startup safeguards and both related native journeys. Both SQLite receipts independently account for 3,570 cases in 224 files, 3,199 executed cases, 35,931 assertions and exactly 371 native-only skips, with zero errors/failures. MySQL acceptance was still running when this correction was prepared.
+
+WebKit passed 54 cases plus its one existing desktop-only skip and failed only the added frame-navigation count. The [verified trace and correction record](verification/customer-order-reference-document-continuity.md) establishes no extra HTTP document navigation, while the native response bodies and preceding UI/privacy checks passed. Frame-navigation events also include same-document history updates; the exact callback's origin is unrecorded. The replacement proof checks actual main-frame navigation requests and the identity of the retained account `Document`, preserving all prior lookup assertions and native byte capture. TypeScript and both-engine discovery pass; corrected native execution remains pending.
+
+No application, fixture, workflow, timeout, database or exclusion changes are included. Collection-member refresh and retained order-item details remain separately owned follow-up work. Require a fresh full successor run, all ten verified database receipts and independent source review before expected-head merge; this failed predecessor does not certify its successor.
+
 ## Native lookup capture and measured database assignment — October 6, 2026 UTC
 
 The next correction preserves the complete `310bf63b` source (published `5b5da8c2298a518e2d84256900fd35b7eb1da0e2`) and composes independently reviewed lookup observation repair `8d9f835` plus measured timing component `d023df2`. The collection-member refresh child remains on its separate next-batch branch and is absent from this acceptance candidate.
