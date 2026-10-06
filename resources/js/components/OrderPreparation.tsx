@@ -105,7 +105,7 @@ async function readPreparedOrder(quoteId: string): Promise<PreparedOrder | null>
   return body.order;
 }
 
-function OrderStatus({ order, testCheckoutEnabled = false }: { order: OrderSummary; testCheckoutEnabled?: boolean }) {
+export function OrderStatus({ order, testCheckoutEnabled = false }: { order: OrderSummary; testCheckoutEnabled?: boolean }) {
   return <div className="quote-review-result" role="status"><h3>{order.paymentStatus === 'verified' ? 'TEST ORDER STATUS' : 'TEST ORDER PREPARED'}</h3><p>Order {order.id}</p><p>Prepared total: {formatMoney(order.totalMinor, order.currency)} {order.currency}</p><p>This prepared record alone does not confirm payment or grant download access or usage rights.</p><TestCheckout orderId={order.id} expectedTotalMinor={order.totalMinor} enabled={testCheckoutEnabled} retainedProgress={order} /></div>;
 }
 

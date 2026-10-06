@@ -19,7 +19,7 @@ describe('current session owned test order history', () => {
     const storageRead = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('Unavailable'); });
     const storageWrite = vi.spyOn(Storage.prototype, 'setItem');
     render(element()); expect(fetcher).not.toHaveBeenCalled();
-    await user.click(screen.getByRole('button', { name: 'Browse session orders' }));
+    await user.click(screen.getByRole('button', { name: 'Browse test orders' }));
     await user.click(await screen.findByRole('button', { name: `View test order status ${id()}` }));
     expect(await screen.findByText(`Session order ${id()}`)).toBeInTheDocument();
     expect(fetcher).toHaveBeenCalledExactlyOnceWith('/orders/history', expect.objectContaining({
@@ -34,7 +34,7 @@ describe('current session owned test order history', () => {
     const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(async input => String(input) === '/orders/history'
       ? json(page()) : new Response('{}', { status: 503 }));
     render(<PreparedOrderRecovery />);
-    await user.click(screen.getByRole('button', { name: 'Browse session orders' }));
+    await user.click(screen.getByRole('button', { name: 'Browse test orders' }));
     await user.click(await screen.findByRole('button', { name: `View test order status ${id()}` }));
     expect(screen.getAllByText(`Order ${id()}`)).toHaveLength(2);
     expect(screen.getByText('Prepared total: $49.99 USD')).toBeInTheDocument();
@@ -46,26 +46,26 @@ describe('current session owned test order history', () => {
     const user = userEvent.setup(); const first = Array.from({ length: 20 }, (_, index) => order(index + 1));
     const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(json(page(first, id(20))))
       .mockResolvedValueOnce(json(page([order(21)]))).mockResolvedValueOnce(json(page(first, id(20))));
-    render(element()); await user.click(screen.getByRole('button', { name: 'Browse session orders' }));
-    await user.click(await screen.findByRole('button', { name: 'Older session orders' }));
+    render(element()); await user.click(screen.getByRole('button', { name: 'Browse test orders' }));
+    await user.click(await screen.findByRole('button', { name: 'Older test orders' }));
     expect(await screen.findByText(`Order ${id(21)}`)).toBeInTheDocument();
     expect(screen.queryByText(`Session order ${id()}`)).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Older session orders' })).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Refresh session orders' }));
+    expect(screen.queryByRole('button', { name: 'Older test orders' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Refresh test orders' }));
     expect(await screen.findByText(`Order ${id()}`)).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Session orders' })).toHaveFocus();
+    expect(screen.getByRole('heading', { name: 'Available test orders' })).toHaveFocus();
     expect(fetcher.mock.calls.map(([url]) => url)).toEqual(['/orders/history', `/orders/history?before=${id(20)}`, '/orders/history']);
   });
 
   it('shows empty and private retry states without reflecting failed responses or performing writes', async () => {
     const user = userEvent.setup(); const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(json(page([])))
       .mockResolvedValueOnce(new Response('PRIVATE_ERROR_BODY', { status: 503 })).mockResolvedValueOnce(json(page()));
-    render(element()); await user.click(screen.getByRole('button', { name: 'Browse session orders' }));
-    expect(await screen.findByRole('status')).toHaveTextContent('No test orders belong to this session.');
-    await user.click(screen.getByRole('button', { name: 'Refresh session orders' }));
+    render(element()); await user.click(screen.getByRole('button', { name: 'Browse test orders' }));
+    expect(await screen.findByRole('status')).toHaveTextContent('No test orders are available.');
+    await user.click(screen.getByRole('button', { name: 'Refresh test orders' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('history could not be loaded');
     expect(screen.queryByText(/PRIVATE_ERROR_BODY/)).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Refresh session orders' }));
+    await user.click(screen.getByRole('button', { name: 'Refresh test orders' }));
     expect(await screen.findByText(`Order ${id()}`)).toBeInTheDocument();
     expect(fetcher.mock.calls.every(([, init]) => (init?.method ?? 'GET') === 'GET')).toBe(true);
   });
@@ -74,16 +74,16 @@ describe('current session owned test order history', () => {
     const user = userEvent.setup(); let finish!: (response: Response) => void;
     vi.spyOn(globalThis, 'fetch').mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }))
       .mockResolvedValueOnce(json(page([])));
-    const first = render(element()); await user.click(screen.getByRole('button', { name: 'Browse session orders' }));
+    const first = render(element()); await user.click(screen.getByRole('button', { name: 'Browse test orders' }));
     first.unmount(); render(element()); await act(async () => finish(json(page())));
     expect(screen.queryByText(`Session order ${id()}`)).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Browse session orders' }));
-    expect(await screen.findByRole('status')).toHaveTextContent('No test orders belong to this session.');
+    await user.click(screen.getByRole('button', { name: 'Browse test orders' }));
+    expect(await screen.findByRole('status')).toHaveTextContent('No test orders are available.');
   });
 
   it('rejects an oversized history response before exposing any order', async () => {
     const user = userEvent.setup(); vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(' '.repeat(64 * 1024 + 1)));
-    render(element()); await user.click(screen.getByRole('button', { name: 'Browse session orders' }));
+    render(element()); await user.click(screen.getByRole('button', { name: 'Browse test orders' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('history could not be loaded');
     expect(screen.queryByText(`Session order ${id()}`)).not.toBeInTheDocument();
   });
