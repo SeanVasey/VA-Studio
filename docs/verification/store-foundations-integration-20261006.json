@@ -1,0 +1,327 @@
+{
+  "schema_version": 1,
+  "purpose": "focused-development-evidence-not-final-acceptance",
+  "tested_local_commit": "05c304a00977397f1f5d58c94afeec754975b694",
+  "tested_tree": "030426558b8779db0b399be4d8c54e023171cdbe",
+  "engine": "sqlite",
+  "selected_files": [
+    "tests/Feature/ProductionTrackPolicyDraftTest.php",
+    "tests/Feature/ProductionTrackPolicyConcurrencyTest.php",
+    "tests/Feature/ProductionTrackPolicyEngineTest.php",
+    "tests/Feature/ProductionTrackPolicyFinalProofTest.php",
+    "tests/Feature/ProductionTrackCapabilitiesTest.php",
+    "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php",
+    "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+    "tests/Unit/ProductionTrackMachinePolicyTest.php",
+    "tests/Feature/PrivateProductDraftTest.php",
+    "tests/Feature/PrivateProductDraftSchemaTest.php",
+    "tests/Feature/PrivateProductDraftAuthoringActionTest.php",
+    "tests/Feature/PrivateProductDraftConcurrencyTest.php",
+    "tests/Unit/PrivateProductDraftManifestTest.php",
+    "tests/Feature/TransactionalNotificationTest.php",
+    "tests/Feature/TransactionalNotificationMigrationTest.php",
+    "tests/Feature/TransactionalNotificationConcurrencyTest.php",
+    "tests/Feature/MembershipAdministrationTest.php",
+    "tests/Feature/MembershipAdministrationActionTest.php",
+    "tests/Feature/MembershipPlanTest.php",
+    "tests/Feature/MembershipCreditLedgerTest.php",
+    "tests/Feature/MembershipCreditMigrationTest.php",
+    "tests/Feature/MembershipCreditConcurrencyTest.php",
+    "tests/Feature/MembershipCreditEngineTest.php",
+    "tests/Feature/MembershipGrantClockBoundaryTest.php",
+    "tests/Feature/MembershipPrimaryProofTest.php",
+    "tests/Feature/PersistentCatalogDraftImportTest.php",
+    "tests/Unit/NormalizedCatalogSourceTest.php",
+    "tests/Unit/ProtectedCatalogReportTest.php",
+    "tests/Feature/CustomerAccountMigrationTest.php",
+    "tests/Feature/CustomerPurchaseClaimMigrationTest.php",
+    "tests/Feature/SharedInventoryMigrationTest.php",
+    "tests/Feature/QuotePricingMigrationTest.php",
+    "tests/Feature/PromotionMigrationTest.php",
+    "tests/Feature/OrderPreparationMigrationTest.php",
+    "tests/Feature/HostedCheckoutMigrationTest.php",
+    "tests/Feature/TestPaymentEvidenceMigrationTest.php",
+    "tests/Feature/TestOrderFinalizationMigrationTest.php",
+    "tests/Feature/TestContractIssuanceMigrationTest.php",
+    "tests/Feature/TestFulfillmentActivationMigrationTest.php"
+  ],
+  "discovered_cases": 817,
+  "passed_cases": 777,
+  "skipped_native_only_cases": 40,
+  "assertions": 3893,
+  "failures": 0,
+  "errors": 0,
+  "warnings_fail_command": true,
+  "junit_sha256": "7e380b65d31d9361dc784b9ec7030395766bc90d66aa3780a3bb0c4f96abcd86",
+  "case_totals": {
+    "Tests\\Feature\\ProductionTrackPolicyDraftTest": {
+      "discovered": 76,
+      "passed": 76,
+      "skipped": 0,
+      "assertions": 161
+    },
+    "Tests\\Feature\\ProductionTrackPolicyConcurrencyTest": {
+      "discovered": 10,
+      "passed": 0,
+      "skipped": 10,
+      "assertions": 0
+    },
+    "Tests\\Feature\\ProductionTrackPolicyEngineTest": {
+      "discovered": 1,
+      "passed": 0,
+      "skipped": 1,
+      "assertions": 0
+    },
+    "Tests\\Feature\\ProductionTrackPolicyFinalProofTest": {
+      "discovered": 2,
+      "passed": 2,
+      "skipped": 0,
+      "assertions": 8
+    },
+    "Tests\\Feature\\ProductionTrackCapabilitiesTest": {
+      "discovered": 36,
+      "passed": 36,
+      "skipped": 0,
+      "assertions": 77
+    },
+    "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest": {
+      "discovered": 26,
+      "passed": 26,
+      "skipped": 0,
+      "assertions": 34
+    },
+    "Tests\\Feature\\ProductionTrackCapabilitiesMigrationOwnershipTest": {
+      "discovered": 23,
+      "passed": 23,
+      "skipped": 0,
+      "assertions": 77
+    },
+    "Tests\\Unit\\ProductionTrackMachinePolicyTest": {
+      "discovered": 93,
+      "passed": 93,
+      "skipped": 0,
+      "assertions": 97
+    },
+    "Tests\\Feature\\PrivateProductDraftTest": {
+      "discovered": 24,
+      "passed": 24,
+      "skipped": 0,
+      "assertions": 114
+    },
+    "Tests\\Feature\\PrivateProductDraftSchemaTest": {
+      "discovered": 4,
+      "passed": 4,
+      "skipped": 0,
+      "assertions": 20
+    },
+    "Tests\\Feature\\PrivateProductDraftAuthoringActionTest": {
+      "discovered": 14,
+      "passed": 14,
+      "skipped": 0,
+      "assertions": 244
+    },
+    "Tests\\Feature\\PrivateProductDraftConcurrencyTest": {
+      "discovered": 10,
+      "passed": 0,
+      "skipped": 10,
+      "assertions": 0
+    },
+    "Tests\\Unit\\PrivateProductDraftManifestTest": {
+      "discovered": 44,
+      "passed": 44,
+      "skipped": 0,
+      "assertions": 57
+    },
+    "Tests\\Feature\\TransactionalNotificationTest": {
+      "discovered": 52,
+      "passed": 52,
+      "skipped": 0,
+      "assertions": 334
+    },
+    "Tests\\Feature\\TransactionalNotificationMigrationTest": {
+      "discovered": 20,
+      "passed": 20,
+      "skipped": 0,
+      "assertions": 270
+    },
+    "Tests\\Feature\\TransactionalNotificationConcurrencyTest": {
+      "discovered": 6,
+      "passed": 0,
+      "skipped": 6,
+      "assertions": 0
+    },
+    "Tests\\Feature\\MembershipAdministrationTest": {
+      "discovered": 20,
+      "passed": 20,
+      "skipped": 0,
+      "assertions": 73
+    },
+    "Tests\\Feature\\MembershipAdministrationActionTest": {
+      "discovered": 24,
+      "passed": 24,
+      "skipped": 0,
+      "assertions": 422
+    },
+    "Tests\\Feature\\MembershipPlanTest": {
+      "discovered": 44,
+      "passed": 44,
+      "skipped": 0,
+      "assertions": 170
+    },
+    "Tests\\Feature\\MembershipCreditLedgerTest": {
+      "discovered": 42,
+      "passed": 42,
+      "skipped": 0,
+      "assertions": 221
+    },
+    "Tests\\Feature\\MembershipCreditMigrationTest": {
+      "discovered": 36,
+      "passed": 36,
+      "skipped": 0,
+      "assertions": 74
+    },
+    "Tests\\Feature\\MembershipCreditConcurrencyTest": {
+      "discovered": 12,
+      "passed": 0,
+      "skipped": 12,
+      "assertions": 0
+    },
+    "Tests\\Feature\\MembershipCreditEngineTest": {
+      "discovered": 1,
+      "passed": 0,
+      "skipped": 1,
+      "assertions": 0
+    },
+    "Tests\\Feature\\MembershipGrantClockBoundaryTest": {
+      "discovered": 1,
+      "passed": 1,
+      "skipped": 0,
+      "assertions": 5
+    },
+    "Tests\\Feature\\MembershipPrimaryProofTest": {
+      "discovered": 26,
+      "passed": 26,
+      "skipped": 0,
+      "assertions": 104
+    },
+    "Tests\\Feature\\PersistentCatalogDraftImportTest": {
+      "discovered": 47,
+      "passed": 47,
+      "skipped": 0,
+      "assertions": 232
+    },
+    "Tests\\Unit\\NormalizedCatalogSourceTest": {
+      "discovered": 27,
+      "passed": 27,
+      "skipped": 0,
+      "assertions": 67
+    },
+    "Tests\\Unit\\ProtectedCatalogReportTest": {
+      "discovered": 12,
+      "passed": 12,
+      "skipped": 0,
+      "assertions": 15
+    },
+    "Tests\\Feature\\CustomerAccountMigrationTest": {
+      "discovered": 7,
+      "passed": 7,
+      "skipped": 0,
+      "assertions": 78
+    },
+    "Tests\\Feature\\CustomerPurchaseClaimMigrationTest": {
+      "discovered": 8,
+      "passed": 8,
+      "skipped": 0,
+      "assertions": 37
+    },
+    "Tests\\Feature\\SharedInventoryMigrationTest": {
+      "discovered": 1,
+      "passed": 1,
+      "skipped": 0,
+      "assertions": 19
+    },
+    "Tests\\Feature\\QuotePricingMigrationTest": {
+      "discovered": 1,
+      "passed": 1,
+      "skipped": 0,
+      "assertions": 23
+    },
+    "Tests\\Feature\\PromotionMigrationTest": {
+      "discovered": 1,
+      "passed": 1,
+      "skipped": 0,
+      "assertions": 21
+    },
+    "Tests\\Feature\\OrderPreparationMigrationTest": {
+      "discovered": 2,
+      "passed": 2,
+      "skipped": 0,
+      "assertions": 44
+    },
+    "Tests\\Feature\\HostedCheckoutMigrationTest": {
+      "discovered": 8,
+      "passed": 8,
+      "skipped": 0,
+      "assertions": 126
+    },
+    "Tests\\Feature\\TestPaymentEvidenceMigrationTest": {
+      "discovered": 20,
+      "passed": 20,
+      "skipped": 0,
+      "assertions": 193
+    },
+    "Tests\\Feature\\TestOrderFinalizationMigrationTest": {
+      "discovered": 15,
+      "passed": 15,
+      "skipped": 0,
+      "assertions": 225
+    },
+    "Tests\\Feature\\TestContractIssuanceMigrationTest": {
+      "discovered": 13,
+      "passed": 13,
+      "skipped": 0,
+      "assertions": 171
+    },
+    "Tests\\Feature\\TestFulfillmentActivationMigrationTest": {
+      "discovered": 8,
+      "passed": 8,
+      "skipped": 0,
+      "assertions": 80
+    }
+  },
+  "native_cli": {
+    "copy_upgrade": {
+      "passed_cases": 14,
+      "skipped_cases": 0,
+      "log_sha256": "6c769ee3835377ff54448c7cb20be92712c68d7a5e9685a493165fb33b0c5949",
+      "source": "05c304a00977397f1f5d58c94afeec754975b694",
+      "runtime": "actual Node/PHP/SQLite; upgrade also authenticated HTTP, catalog also hidden-password PTY"
+    },
+    "catalog_import": {
+      "passed_cases": 10,
+      "skipped_cases": 0,
+      "log_sha256": "d2656d279b20edd018834c2d3d35a5ddfb553625b961494d8f803142f9db7e26",
+      "source": "05c304a00977397f1f5d58c94afeec754975b694",
+      "runtime": "actual Node/PHP/SQLite; upgrade also authenticated HTTP, catalog also hidden-password PTY"
+    }
+  },
+  "frontend": {
+    "passed_cases": 845,
+    "code_unchanged_from_tested_composition": true
+  },
+  "deferred": [
+    "native MySQL on this integrated source",
+    "full exact-candidate matrices",
+    "chosen-host/provider/mail/device/source acceptance"
+  ],
+  "independent_review_receipts": {
+    "shared05c": "47f2789c364bcef1707095706a5868023d6619ec4df60f0dc29e32efc1bf274b",
+    "memberships500": "21d349d4dc5aedceee64a54bd06c7274491d787a1c90ea0bce11f840449f4cf8",
+    "notifications627": "1198079f03bf927374b9783e713200181e8d70239431bcb23b49aca45335579b",
+    "compiler_e8c": "b50ab389940292720911c933168512a66fded8d78988f02e030ecaeb95ea70a7",
+    "catalog9ca": "b715c228d4a2eee020546d687f5959239e79e0f67d63efed985742d05f7b1a5b",
+    "service33c": "042f116e41c9f9709fddc6858bb3027551029f077cb798b7256bf895cede64a2"
+  },
+  "tested_native_commit": "3e06f64e4b044dd1ea70aa06b208c81933254858",
+  "publication_map": "store-foundations-publication-map-20261006.json"
+}

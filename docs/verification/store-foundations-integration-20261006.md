@@ -17,7 +17,7 @@ predecessors and negative evidence are retained.
 
 | Component | Frozen reviewed source | Actual focused evidence and remaining scope |
 | --- | --- | --- |
-| Stopped installation copy upgrade | `960458ea04d6778a397c57b5823e6bfbf0ffdb2a` | Root reran14 actual Node/PHP/SQLite/HTTP cases successfully after building required assets. Exact source/schema and CHECK/BLOB admission canaries are reviewed; chosen-host recovery remains open. |
+| Stopped installation copy upgrade | `960458ea04d6778a397c57b5823e6bfbf0ffdb2a` | Root reran 14 actual Node/PHP/SQLite/HTTP cases successfully after building required assets. Exact source/schema and CHECK/BLOB admission canaries are reviewed; chosen-host recovery remains open. |
 | Authored production policy | `cd3ee3e90d566f427b901b3b737efcbccff58211` | Root functional selection78 /169 passed. Prior source-bound native86 /875 and later final-proof11 /185 are distinct component receipts; production consumers remain open. |
 | Private service/merch drafts | `33cbe284ac37cecd9c9d8418519657407e8cb5fe` | Independent86 SQLite cases /435 assertions and14 mounted cases /244 passed. Source-bound native waits and lost-response cases are retained; buyer/payment/fulfillment remains open. |
 | Membership administration | `50075567e15109fd98a862638f6dbcec8dc42ef9` | Author75 /643; independent44 administration cases /495 plus unchanged lost-response canary1 /39 passed. All18 original foundation PHP blobs remain unchanged; paid billing/redemption/continuity remains open. |
@@ -46,8 +46,8 @@ missing disposable test key, then a wrong newly entered migration filename in
 seven account fixture cases. Both setup defects were corrected; no failed run
 is relabeled as passing. Final composed results are recorded below after execution.
 
-`store-foundations` selects28 fixed PHP files without expanding the32-file cap
-or removing any older selection. Only13 exact reviewed native method identities
+`store-foundations` selects 28 fixed PHP files without expanding the 32-file cap
+or removing any older selection. Only 13 exact reviewed native method identities
 are added to SQLite exceptions; functional methods are not waived. Import and
 capability ownership fixtures deliberately use their own SQLite connection in
 either surrounding engine selection, so they do not claim native MySQL DDL.
@@ -56,18 +56,43 @@ CLI tests with required PHP flags and built assets. The matching GitHub PR
 quality block gates those two steps to manual dispatch, keeping routine preflight
 cheap. New domain/resource formatting checks execute in both workflows.
 
-Root pre-freeze frontend verification passed845 cases. Build/typecheck, client
+Root pre-freeze frontend verification passed 845 cases. Build/typecheck, client
 secret scan, scoped Pint and Composer strict validation passed. Selector45,
 cadence13, routing27, partition36, GitHub receipt34 and GitLab receipt24
 safeguards passed. These checks are focused evidence, not full acceptance.
 
 ## Final composed checkpoint
 
-The final source is frozen before the affected PHP, isolated native CLI and
-shared review checks. Their exact selected identities, outcomes and source
-binding are appended after completion. No passing final-source result is
-claimed while those checks are pending. Publication creates one coherent PR;
-its actual cheap preflight and expected-head merge are recorded in the PR.
+Tested local source `05c304a00977397f1f5d58c94afeec754975b694`, tree
+`030426558b8779db0b399be4d8c54e023171cdbe`, stayed clean throughout the final
+checks. Its native GitHub identity is
+`3e06f64e4b044dd1ea70aa06b208c81933254858`, with the same tree. The
+28-file foundations suite plus 11 affected retained migration suites
+discovered 817 cases: **777 passed, 3,893 assertions, zero errors or failures**.
+The 40 skips are exactly the 13 reviewed native-only methods; they assert no
+SQLite concurrency evidence. Warning failure remains enabled. Runtime was PHP
+8.4.26 with genuine isolated SQLite. The raw JUnit SHA256 is
+`7e380b65d31d9361dc784b9ec7030395766bc90d66aa3780a3bb0c4f96abcd86`.
+
+At that same freeze, actual native Node/PHP/SQLite checks passed **14/14 copy
+upgrades** (including authenticated HTTP) and **10/10 catalog CLI cases**
+(including hidden-password PTY and cancellation/lease recovery), with zero skips.
+All 134 changed PHP files passed syntax checks. Independent shared review passed
+19 affected migration/configuration/accepted-status cases / 253 assertions with
+zero skips, failures or errors. It verified 133 component path comparisons,
+56 class origins, all native exclusions and all preserved prior selections.
+
+The [focused receipt](store-foundations-integration-20261006.json) preserves
+exact selections, per-class counts, raw evidence digests and review bindings.
+SQLite timing records use only this measured 39-file selection; older unrelated
+weights and fallback are preserved. New MySQL weights are not fabricated.
+The [publication map](store-foundations-publication-map-20261006.json) records
+all 46 new commits with exact trees and ordered local/native parent identities.
+Native readbacks verify the final composition and seven reviewed component heads;
+main remained at the recorded baseline. Timing and result-record successors
+preserve tested executable code. Publication creates one coherent PR; actual cheap
+preflight and expected-head merge are recorded in that PR. Full integrated/native
+acceptance is still deferred.
 
 ## Next dependencies
 
@@ -83,4 +108,4 @@ source/media/history/obligation/redirect reconciliation remain named open work.
 Full native database/browser/security/restore/device and chosen-host acceptance
 is manual on the exact final reviewed candidate. No such matrix, provider action,
 actual-source import, deployment or DNS/cutover operation is performed by this
-development batch. Six accepted parent groups and34 open groups remain unchanged.
+development batch. Six accepted parent groups and 34 open groups remain unchanged.

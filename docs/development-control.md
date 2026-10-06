@@ -9,15 +9,21 @@ onboarding, bulk source editing and the redacted readiness report. Local mirror
 ordered parent mapping. PR #14's CI policy remains incorporated. Dependency PRs
 #1–#3 remain preserved pending lockfile compatibility review.
 
-The next branch `codex/continuation-foundations-20261006` retains the reviewed
-stopped copy-upgrade, authored production policy and private service/merchandise
-drafts. Separate continued lanes finish membership administration, transactional
-notification authority/recovery, normalized private catalog import and typed
-production capabilities. Old worktrees, dirty source and negative evidence are
-preserved; authors work in isolated children. One lead integrates and publishes.
+Branch `codex/continuation-foundations-20261006` composes all seven reviewed
+foundations: stopped copy-upgrade, authored/typed production policy, private
+service/merch drafts, synthetic membership administration, transactional
+notification authority/recovery and protected private SQLite catalog import.
+Tested freeze `05c304a` / tree `030426558b8779db0b399be4d8c54e023171cdbe`
+passed 777 PHP cases / 3,893 assertions, with 40 exact native-only SQLite skips,
+24 Node/PHP/SQLite CLI checks and 845 frontend cases. Independent shared review
+passed 19 / 253; all component approvals and corrected failures remain bound
+to actual source in the [composition record](verification/store-foundations-integration-20261006.md).
+Old worktrees, dirty source and negative evidence are preserved. One lead
+integrates and publishes; timed-out UI activity did not lose or duplicate work.
 
-Component and composed focused evidence, exact source identities and the next
-dependency are recorded in the foundations verification record when frozen.
+The next dependency is production quote/order snapshots that consume the reviewed
+typed policy under the existing authority/source fence. Component and composed
+focused evidence and exact source identities are recorded in the verification file.
 Production sales, recurring benefits, delivered mail, public product fulfillment,
 actual export reconciliation and complete final acceptance remain open. No
 routine MySQL/full matrix or hosted manual workflow is requested by this batch.
