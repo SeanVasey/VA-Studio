@@ -1,9 +1,12 @@
 {
   "schema_version": 1,
   "driver": "sqlite",
-  "source": "Verified database artifacts of GitHub run 37410220669 attempt 1; head 12a5c70bc4b9dbb94353c290e031975803d24fa7; tree 86584c422341d8f03ac885d59916aba8faf34521; overall run failed non-database gates; four captured-offer files use focused component timing only from frozen core229/native087/UIe9ef, offer-editor-final-composed-sqlite.xml:ed0ee07ed2055f95adc46dc82b0d4d4881ab343204b645dbfc15f72554e218f6, races-sqlite-exclusion.xml:ffbcac134c07fdef3470d5569f0294ebfd70366a9fdb43131b17f0f4d574f93b. Helper subprocesses intentionally use disposable SQLite. Timings are balance weights, not acceptance.",
+  "source": "Verified database artifacts of GitHub run 37410220669 attempt 1; head 12a5c70bc4b9dbb94353c290e031975803d24fa7; tree 86584c422341d8f03ac885d59916aba8faf34521; overall run failed non-database gates; four captured-offer files use focused component timing only from frozen core229/native087/UIe9ef, offer-editor-final-composed-sqlite.xml:ed0ee07ed2055f95adc46dc82b0d4d4881ab343204b645dbfc15f72554e218f6, races-sqlite-exclusion.xml:ffbcac134c07fdef3470d5569f0294ebfd70366a9fdb43131b17f0f4d574f93b. Helper subprocesses intentionally use disposable SQLite. Timings are balance weights, not acceptance.; bulk license files use source-bound focused component timing only from domainfec177/d79a, UI06ff9b2/2f980, native6fe2: final-sqlite-compatibility.xml:0370c1980fb0905571aeb7afdf1974b096fc756e15846ffbb6345a217f8fca2c; ui-and-editor-final-sqlite.xml:bd9bde74c00fe774a799e7a63ddc77909b453ddc7fe1b957fc7e15b6b4fdc751; bulk-native-helper-row-hash.xml:4836f525c584c32cb3a8b49484cf46fb2be4add1069ff91ace5a111b8bda6aaa. Browser helper intentionally executes disposable SQLite subprocesses for both balance tables. Old weights preserved; timings are not final acceptance.; the20new native-only SQLite exclusion records are measured separately in sqlite-native-only-exclusion.xml:eb74ba8416c7677bff133203f587bbd215fd3e89f5e5161e4eab875eff33d237; zero assertions/no concurrency execution.",
   "fallback_ms_per_case": 626,
   "files": {
+    "tests/Feature/BulkLicenseDraftSourceAuthoringActionTest.php": {"cases": 39, "ms": 16705},
+    "tests/Feature/BulkReplaceLicenseDraftSourceConcurrencyTest.php": {"cases": 20, "ms": 0},
+    "tests/Feature/BulkReplaceLicenseDraftSourceTest.php": {"cases": 85, "ms": 17306},
     "tests/Feature/BulkTrackTagsConcurrencyTest.php": {"cases": 3, "ms": 0},
     "tests/Feature/BulkTrackTagsTest.php": {"cases": 13, "ms": 5613},
     "tests/Feature/BulkUpdateTrackMetadataConcurrencyTest.php": {"cases": 6, "ms": 0},
@@ -212,6 +215,7 @@
     "tests/Feature/TypedLicenseTest.php": {"cases": 9, "ms": 2538},
     "tests/Feature/UuidByteGuardMigrationTest.php": {"cases": 11, "ms": 6899},
     "tests/Unit/AllocateDiscountTest.php": {"cases": 17, "ms": 4},
+    "tests/Unit/BulkLicenseDraftSourceBrowserEvidenceTest.php": {"cases": 4, "ms": 17979},
     "tests/Unit/CatalogDryRunCommandTest.php": {"cases": 11, "ms": 5616},
     "tests/Unit/CatalogDryRunTest.php": {"cases": 47, "ms": 21},
     "tests/Unit/CommerceGuardBytesTest.php": {"cases": 14, "ms": 379},

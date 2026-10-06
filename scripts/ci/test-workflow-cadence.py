@@ -3,6 +3,7 @@
 import importlib.util
 from pathlib import Path
 import re
+import subprocess
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -21,6 +22,15 @@ def block(source, name):
 
 
 class CadenceTests(unittest.TestCase):
+    def test_retired_workflow_paths_cannot_reenter_the_tracked_tree(self):
+        tracked = subprocess.run(["git", "ls-files", "-z", "--", ".github/workflows"],
+                                 cwd=ROOT, capture_output=True, check=True, timeout=10).stdout.split(b"\0")
+        for path in (b".github/workflows/ci.yml", b".github/workflows/focused.yml"):
+            self.assertNotIn(path, tracked)
+        for path in (b".github/workflows/final-verification.yml", b".github/workflows/focused-feedback.yml",
+                     b".github/workflows/preflight.yml"):
+            self.assertIn(path, tracked)
+
     def test_full_suite_is_only_explicit_dispatch_with_pinned_candidate(self):
         events = CI.split('on:\n', 1)[1].split('\npermissions:', 1)[0]
         self.assertEqual(['workflow_dispatch'], re.findall(r'^  ([a-z_]+):', events, re.M))
@@ -28,6 +38,19 @@ class CadenceTests(unittest.TestCase):
         self.assertIn('required: true', events)
         job = block(CI, 'scope')
         self.assertLess(job.index('verify-final-candidate.py'), job.index('ci-scope.py classify'))
+
+    def test_persistent_native_checks_have_fresh_locked_asset_prerequisites(self):
+        for source in (CI, (ROOT / '.github/workflows/preflight.yml').read_text()):
+            job = block(source, 'backend-quality')
+            self.assertLess(job.index('composer install'), job.index('npm ci'))
+            self.assertLess(job.index('npm ci'), job.index('npm run build'))
+            self.assertLess(job.index('npm run build'), job.index('node --test scripts/dev/persistent-content.test.mjs'))
+            self.assertIn("PERSISTENT_CONTENT_REQUIRE_PHP: '1'", job)
+        gitlab = (ROOT / '.gitlab-ci.yml').read_text()
+        job = gitlab.split('backend-quality:\n', 1)[1].split('\n.database:', 1)[0]
+        self.assertIn('bash scripts/ci/setup-gitlab-node.sh', job)
+        self.assertLess(job.index('npm ci'), job.index('npm run build'))
+        self.assertLess(job.index('npm run build'), job.index('PERSISTENT_CONTENT_REQUIRE_PHP=1 node --test'))
 
     def test_preflight_has_no_database_or_browser_jobs_and_keeps_security_checks(self):
         preflight = (ROOT / '.github/workflows/preflight.yml').read_text()
@@ -47,6 +70,17 @@ class CadenceTests(unittest.TestCase):
         self.assertEqual(['workflow_dispatch'], re.findall(r'^  ([a-z_]+):', events, re.M))
         self.assertIn('FOCUSED_SUITE: ${{ inputs.suite }}', FOCUSED)
         self.assertIn('FOCUSED_ENGINE: ${{ inputs.engine }}', FOCUSED)
+
+    def test_gitlab_full_pipeline_is_manual_and_exact_sha_guarded_before_provenance(self):
+        source = (ROOT / '.gitlab-ci.yml').read_text()
+        workflow = source.split('workflow:\n', 1)[1].split('\nstages:', 1)[0]
+        rules = re.findall(r"^    - if: '(.+)'$", workflow, re.M)
+        self.assertEqual(['($CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api") && $EXPECTED_SHA =~ /^[0-9a-f]{40}$/ && $EXPECTED_SHA == $CI_COMMIT_SHA'], rules)
+        self.assertIn('    - when: never', workflow)
+        self.assertIn("EXPECTED_SHA: ''", source)
+        job = source.split('provenance-access:\n', 1)[1].split('\nfrontend:', 1)[0]
+        self.assertLess(job.index('verify-final-candidate.py --gitlab'), job.index('gitlab-database-receipts.py probe'))
+        self.assertNotIn('allow_failure:', job)
 
     def test_every_expensive_job_requires_both_preflight_checks(self):
         for name in ('backend-mysql', 'backend-sqlite', 'operator-browser', 'related-browser'):
@@ -102,6 +136,19 @@ class GateTests(unittest.TestCase):
             self.assertFalse(gate.verify('workflow_dispatch', wrong, sha, sha))
             self.assertFalse(gate.verify('workflow_dispatch', sha, wrong, sha))
             self.assertFalse(gate.verify('workflow_dispatch', sha, sha, wrong))
+
+    def test_gitlab_dispatch_rejects_automatic_or_moved_or_missing_sha(self):
+        gate = self.load('verify-final-candidate')
+        sha = 'a' * 40
+        for event in ('web', 'api'):
+            self.assertTrue(gate.verify_gitlab('true', event, sha, sha, sha))
+            self.assertFalse(gate.verify_gitlab('false', event, sha, sha, sha))
+            for wrong in ('', 'main', 'a' * 7, 'a' * 39, 'A' * 40, 'g' * 40, 'b' * 40, sha + ' '):
+                self.assertFalse(gate.verify_gitlab('true', event, wrong, sha, sha))
+                self.assertFalse(gate.verify_gitlab('true', event, sha, wrong, sha))
+                self.assertFalse(gate.verify_gitlab('true', event, sha, sha, wrong))
+        for event in ('push', 'merge_request_event', 'schedule', 'pipeline', 'parent_pipeline', '', 'workflow_dispatch'):
+            self.assertFalse(gate.verify_gitlab('true', event, sha, sha, sha))
 
     def test_preflight_gate_requires_every_result_in_both_modes(self):
         gate = self.load('preflight-gate')

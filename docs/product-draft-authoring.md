@@ -1,5 +1,12 @@
 # Collection and album draft authoring
 
+Current main `13d7474f` includes immutable composition authoring and explicit
+reviewed member snapshot refresh from PRs #7–#13. The [remaining assessment](remaining-code-assessment-20261006.md)
+credits those children and retains public licensing/checkout/delivery as actual
+remaining code. This guide is private authoring, not evidence of a published
+collection or a completed T26. Current AGENTS.md governs focused development
+merges; complete manual verification belongs to the final integrated candidate.
+
 This is a T26 / WP-10 authoring increment. An authorized administrator can open **Collections and albums**, create a collection or album, choose existing tracks, arrange their order, edit the description, review retained versions and use a retained composition as a new current draft version.
 
 These are private drafts. This increment does not publish a collection, offer a bundle, set a price, assign a license, take payment or authorize delivery. T26 remains open for those integration requirements. Track storefront and checkout behavior remain unchanged.

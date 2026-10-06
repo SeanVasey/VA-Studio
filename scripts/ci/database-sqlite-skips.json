@@ -533,6 +533,14 @@
     [
       "Tests\\Feature\\TrackPublicationManifestConcurrencyTest",
       "test_publication_writer_committed_first_is_observed_after_the_exact_track_row_wait"
+    ],
+    [
+      "Tests\\Feature\\BulkReplaceLicenseDraftSourceConcurrencyTest",
+      "test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders"
+    ],
+    [
+      "Tests\\Feature\\BulkReplaceLicenseDraftSourceConcurrencyTest",
+      "test_explicit_capture_reads_only_the_after_fence_committed_state_and_later_apply_retains_that_exact_review"
     ]
   ]
 }

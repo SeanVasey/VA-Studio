@@ -24,7 +24,7 @@ COUNTS = {"mysql": 4, "sqlite": 2}
 PROJECT = 87181037
 PATH = "vaseydev/va-studio"
 API = "https://gitlab.com/api/v4"
-POLICY = tuple(dict.fromkeys((".gitlab-ci.yml", "scripts/ci/gitlab-database-receipts.py",
+POLICY = tuple(dict.fromkeys((".gitlab-ci.yml", "scripts/ci/verify-final-candidate.py", "scripts/ci/test-workflow-cadence.py", "scripts/ci/gitlab-database-receipts.py",
     "scripts/ci/test-gitlab-database-receipts.py", "scripts/ci/setup-gitlab-php.sh",
     "scripts/ci/setup-gitlab-node.sh", "scripts/ci/setup-gitlab-related-scanner.sh",
     "scripts/ci/test-gitlab-setup.py", "scripts/dev/test-bootstrap-macos.py", *proof.POLICY_FILES)))

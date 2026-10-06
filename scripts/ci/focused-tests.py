@@ -52,6 +52,7 @@ PHP_TARGETS = {
         "tests/Feature/StemsArchiveTest.php",
     ),
     "commerce": (
+        "tests/Feature/ProductionCommerceReadinessTest.php",
         "tests/Unit/StripeFinancialInspectionGatewayTest.php", "tests/Feature/TestPaymentFinancialObservationTest.php",
         "tests/Feature/TestPaymentExceptionOperationsTest.php", "tests/Feature/TestPaymentExceptionOperationsConcurrencyTest.php",
         "tests/Feature/CommerceAuditActorTest.php", "tests/Feature/CommerceAuditActorConcurrencyTest.php",
@@ -116,6 +117,10 @@ PHP_TARGETS = {
         "tests/Feature/SiteContentConcurrencyTest.php",
     ),
     "licensing": (
+        "tests/Feature/BulkReplaceLicenseDraftSourceTest.php",
+        "tests/Feature/BulkReplaceLicenseDraftSourceConcurrencyTest.php",
+        "tests/Feature/BulkLicenseDraftSourceAuthoringActionTest.php",
+        "tests/Unit/BulkLicenseDraftSourceBrowserEvidenceTest.php",
         "tests/Feature/ReviewedOfferDraftTest.php", "tests/Feature/ReviewedOfferDraftConcurrencyTest.php",
         "tests/Feature/OfferDraftAuthoringActionTest.php", "tests/Unit/OfferDraftBrowserEvidenceTest.php",
         "tests/Feature/ReviewedLicenseDraftTest.php", "tests/Feature/ReviewedLicenseDraftConcurrencyTest.php",
@@ -211,7 +216,11 @@ BROWSER_TARGETS = (
     "tests/browser/editorial-content.spec.ts", "tests/browser/site-content.spec.ts", "tests/browser/site-schedule.spec.ts",
     "tests/browser/resumable-media-upload.spec.ts",
 )
-SUITES = (*PHP_TARGETS, "frontend", "browser")
+BROWSER_SUBSETS = {
+    "browser": BROWSER_TARGETS,
+    "bulk-license-browser": ("tests/browser/bulk-license-draft-source.spec.ts",),
+}
+SUITES = (*PHP_TARGETS, "frontend", *BROWSER_SUBSETS)
 ENGINES = ("sqlite", "mysql")
 MAX_FILES = 32
 EVIDENCE = "focused-ci-evidence.json"
@@ -242,8 +251,9 @@ def selection(env: Mapping[str, str]) -> Selection:
         return Selection(suite, engine, "php", PHP_TARGETS[suite])
     if engine != "sqlite":
         raise FocusedError("Frontend/browser modes require engine=sqlite; frontend has no database and the browser wrapper isolates SQLite")
-    return Selection(suite, "none" if suite == "frontend" else "sqlite", suite,
-                     FRONTEND_TARGETS if suite == "frontend" else BROWSER_TARGETS)
+    if suite == "frontend":
+        return Selection(suite, "none", "frontend", FRONTEND_TARGETS)
+    return Selection(suite, "sqlite", "browser", BROWSER_SUBSETS[suite])
 
 
 def validate_files(root: Path, selected: Selection) -> None:

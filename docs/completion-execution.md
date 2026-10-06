@@ -1,5 +1,27 @@
 # Completion execution plan
 
+## Current execution — October 6, 2026 UTC
+
+Main `13d7474f` incorporates all product ancestry from PRs #7–#13 and the
+manual-only CI policy merged in PR #14 at `4abee918`. PR #13 is a completed,
+independently reviewed development merge after cheap preflight `37525484300`;
+full final acceptance remains outstanding. Historical source-bound failures,
+cancelled run `37521810874` and incomplete native evidence stay visible. The
+per-merge full-CI requirements and pending PR states in the dated records below
+are superseded by current [AGENTS.md](../AGENTS.md) and [development control](development-control.md).
+
+The [parallel execution record](parallel-execution-20261006.md) assigns actual
+workers, branches and files to bulk licensing, durable content onboarding,
+production commerce preparation, downstream membership/customer work and
+independent review. One owner composes reviewed batches with focused evidence
+and cheap preflight; no automatic matrices, retired workflow paths or routine
+full runs are permitted. The remaining assessment must preserve all requested
+personal-store capabilities and distinguish implemented code, configuration,
+and acceptance in three milestones. Six of 40 accepted parent groups is not a
+measurement of implemented code.
+
+## Historical execution checkpoints
+
 Checkpoint: October 5, 2026 (America/Chicago), following Sean's instruction to prioritize the finished website and eliminate serial development waits. This plan keeps all required scope in the [40-group register](remaining-development-tasks.csv) and [103-row coverage map](remaining-parity-coverage.csv). The protected preview is a testing aid, not the completion target.
 
 ## Guest purchase saving, library browsing and refunded test exceptions — October 6, 2026 UTC
