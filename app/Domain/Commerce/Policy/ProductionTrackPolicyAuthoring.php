@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use LogicException;
+use PDO;
 use Throwable;
 
 /** Staff-only encrypted preparation. No method activates a policy, contacts a provider or grants rights. */
@@ -29,14 +30,14 @@ final class ProductionTrackPolicyAuthoring
 
     public function prepareSave(?PolicyDraftModel $draft, array $authored, User $actor): array
     {
-        return $this->transaction($actor, function (User $current, array $actorRow) use ($draft, $authored): array {
+        return $this->transaction($actor, function (User $current, array $actorRow, PDO $primary, string $driver) use ($draft, $authored): array {
             $authored = ProductionTrackPolicyDraft::validateAuthored($authored);
             $snapshot = $draft === null ? null : $this->lockSnapshot($draft->getKey());
             $review = ['schema_version' => 1, 'intent' => 'save_production_track_policy_draft', 'actor_id' => (int) $current->id,
                 'public_id' => $snapshot['draft']['public_id'] ?? (string) Str::uuid(), 'draft_id' => $snapshot['draft']['id'] ?? null,
                 'baseline' => $snapshot === null ? null : $this->baseline($snapshot),
                 'before' => $snapshot === null ? null : $this->authored(end($snapshot['versions'])), 'after' => $authored];
-            $this->finish($current, $actorRow, $snapshot);
+            $this->finish($current, $actorRow, $snapshot, $primary, $driver);
 
             return $this->sign($review);
         });
@@ -44,7 +45,7 @@ final class ProductionTrackPolicyAuthoring
 
     public function applySave(array $review, User $actor): PolicyDraftModel
     {
-        return $this->transaction($actor, function (User $current, array $actorRow) use ($review): PolicyDraftModel {
+        return $this->transaction($actor, function (User $current, array $actorRow, PDO $primary, string $driver) use ($review): PolicyDraftModel {
             $this->verifyReview($review, $current, 'save_production_track_policy_draft');
             $after = ProductionTrackPolicyDraft::validateAuthored($review['after']);
             $snapshot = $review['draft_id'] === null ? null : $this->lockSnapshot($review['draft_id']);
@@ -58,7 +59,7 @@ final class ProductionTrackPolicyAuthoring
                 ProductionTrackPolicyDraft::reject();
             }
             if ($snapshot !== null && CanonicalJson::encode($review['before']) === CanonicalJson::encode($after)) {
-                $this->finish($current, $actorRow, $snapshot);
+                $this->finish($current, $actorRow, $snapshot, $primary, $driver);
 
                 return $this->draftModel($snapshot['draft']);
             }
@@ -87,7 +88,7 @@ final class ProductionTrackPolicyAuthoring
                 'schema_version' => 1, 'revision' => $number, 'version_id' => $version['id'], 'before_evidence_hash' => $beforeHash,
                 'after_evidence_hash' => $version['payload_hash'], 'activation_allowed' => false, 'external_facts_verified' => false,
             ], $current, $at);
-            $this->finish($current, $actorRow, $snapshot);
+            $this->finish($current, $actorRow, $snapshot, $primary, $driver);
 
             return $this->draftModel($snapshot['draft']);
         });
@@ -95,7 +96,7 @@ final class ProductionTrackPolicyAuthoring
 
     public function prepareSourceReview(ProductionTrackPolicyVersion $version, User $actor): array
     {
-        return $this->transaction($actor, function (User $current, array $actorRow) use ($version): array {
+        return $this->transaction($actor, function (User $current, array $actorRow, PDO $primary, string $driver) use ($version): array {
             // An immutable parent hint locates the fence; it is not trusted evidence.
             // Avoid establishing a repeatable-read snapshot before waiting on the parent.
             $parentId = $version->getAttribute('production_track_policy_draft_id');
@@ -114,7 +115,7 @@ final class ProductionTrackPolicyAuthoring
             $review = ['schema_version' => 1, 'intent' => 'review_production_track_policy_source', 'actor_id' => (int) $current->id,
                 'public_id' => $snapshot['draft']['public_id'], 'draft_id' => $snapshot['draft']['id'], 'baseline' => $this->baseline($snapshot),
                 'before' => $this->authored($latest), 'after' => null];
-            $this->finish($current, $actorRow, $snapshot);
+            $this->finish($current, $actorRow, $snapshot, $primary, $driver);
 
             return $this->sign($review);
         });
@@ -122,7 +123,7 @@ final class ProductionTrackPolicyAuthoring
 
     public function applySourceReview(array $review, array $reference, User $actor): ProductionTrackPolicySourceReview
     {
-        return $this->transaction($actor, function (User $current, array $actorRow) use ($review, $reference): ProductionTrackPolicySourceReview {
+        return $this->transaction($actor, function (User $current, array $actorRow, PDO $primary, string $driver) use ($review, $reference): ProductionTrackPolicySourceReview {
             $this->verifyReview($review, $current, 'review_production_track_policy_source');
             $this->validateReference($reference);
             if ($review['draft_id'] === null || $review['after'] !== null) {
@@ -150,7 +151,7 @@ final class ProductionTrackPolicyAuthoring
                 'version_evidence_hash' => $latest['payload_hash'], 'review_evidence_hash' => $ack['review_hash'],
                 'activation_allowed' => false, 'external_facts_verified' => false,
             ], $current, $at);
-            $this->finish($current, $actorRow, $snapshot);
+            $this->finish($current, $actorRow, $snapshot, $primary, $driver);
             $model = new ProductionTrackPolicySourceReview;
             $model->setRawAttributes($ack, true);
             $model->exists = true;
@@ -161,14 +162,17 @@ final class ProductionTrackPolicyAuthoring
 
     private function transaction(User $actor, Closure $command): mixed
     {
-        if (DB::transactionLevel() !== 0) {
+        $connection = DB::connection();
+        if ($connection->transactionLevel() !== 0) {
             throw new LogicException('Production policy preparation requires a standalone transaction.');
         }
+        $primary = $connection->getPdo();
+        $driver = $connection->getDriverName();
 
-        return DB::transaction(function () use ($actor, $command): mixed {
+        return $connection->transaction(function () use ($actor, $command, $primary, $driver): mixed {
             [$current, $row] = $this->authority($actor);
 
-            return $command($current, $row);
+            return $command($current, $row, $primary, $driver);
         });
     }
 
@@ -337,28 +341,40 @@ final class ProductionTrackPolicyAuthoring
         }
     }
 
-    private function finish(User $actor, array $actorRow, ?array $expected): void
+    private function finish(User $actor, array $actorRow, ?array $expected, PDO $primary, string $driver): void
     {
         [, $currentActor] = $this->authority($actor);
         if (CanonicalJson::encode($actorRow) !== CanonicalJson::encode($currentActor)) {
             throw new AuthorizationException;
         }
-        // The final proof uses raw queries only; no model retrieval/lifecycle callback runs after it.
+        // Laravel query listeners run after fetching, too. Once all authority/model
+        // callbacks finish, use the captured transaction's primary PDO exclusively.
         if ($expected !== null) {
             $id = $expected['draft']['id'];
+            $versionIds = array_column($expected['versions'], 'id');
             $actual = [
-                'draft' => (array) DB::table(self::DRAFTS)->where('id', $id)->lockForUpdate()->first(),
-                'versions' => DB::table(self::VERSIONS)->where('production_track_policy_draft_id', $id)->orderBy('id')->lockForUpdate()->get()->map(fn ($row): array => (array) $row)->all(),
-                'reviews' => DB::table(self::REVIEWS)->whereIn('production_track_policy_version_id', array_column($expected['versions'], 'id'))->orderBy('id')->lockForUpdate()->get()->map(fn ($row): array => (array) $row)->all(),
-                'audits' => DB::table('audit_events')->where('subject_type', PolicyDraftModel::class)->where('subject_id', $id)->orderBy('id')->lockForUpdate()->get()->map(fn ($row): array => $this->auditRow((array) $row))->all(),
+                'draft' => $this->primaryRows($primary, $driver, self::DRAFTS, 'id = ?', [$id])[0] ?? [],
+                'versions' => $this->primaryRows($primary, $driver, self::VERSIONS, 'production_track_policy_draft_id = ?', [$id]),
+                'reviews' => $versionIds === [] ? [] : $this->primaryRows($primary, $driver, self::REVIEWS,
+                    'production_track_policy_version_id IN ('.implode(', ', array_fill(0, count($versionIds), '?')).')', $versionIds),
+                'audits' => array_map(fn (array $row): array => $this->auditRow($row),
+                    $this->primaryRows($primary, $driver, 'audit_events', 'subject_type = ? AND subject_id = ?', [PolicyDraftModel::class, $id])),
             ];
             if (CanonicalJson::encode($actual) !== CanonicalJson::encode($expected)) {
                 ProductionTrackPolicyDraft::reject();
             }
         }
-        if (CanonicalJson::encode((array) DB::table('users')->where('id', $actor->id)->lockForUpdate()->first()) !== CanonicalJson::encode($actorRow)) {
+        if (CanonicalJson::encode($this->primaryRows($primary, $driver, 'users', 'id = ?', [$actor->id])[0] ?? []) !== CanonicalJson::encode($actorRow)) {
             throw new AuthorizationException;
         }
+    }
+
+    private function primaryRows(PDO $primary, string $driver, string $table, string $where, array $bindings): array
+    {
+        $statement = $primary->prepare('SELECT * FROM '.$table.' WHERE '.$where.' ORDER BY id'.($driver === 'mysql' ? ' FOR UPDATE' : ''));
+        $statement->execute($bindings);
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
     private function audit(array $draft, string $action, array $context, User $actor, string $at): array
