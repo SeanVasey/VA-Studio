@@ -2,16 +2,19 @@
 
 namespace App\Filament\Resources\LicenseVersionResource\Pages;
 
+use App\Domain\Rights\BulkReplaceLicenseDraftSource;
 use App\Domain\Rights\CreateLicenseDraft;
 use App\Domain\Rights\Models\LicenseTemplate;
 use App\Domain\Rights\Models\LicenseVersion;
 use App\Domain\Rights\ReviewedLicenseDraft;
+use App\Filament\Resources\LicenseTemplateResource;
 use App\Filament\Resources\LicenseVersionResource;
 use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ManageRecords;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -31,6 +34,26 @@ class ManageLicenseVersions extends ManageRecords
 
     #[Locked]
     public ?array $draftReviewContext = null;
+
+    #[Locked]
+    public ?array $bulkSourceReview = null;
+
+    #[Locked]
+    public ?array $bulkSourceContext = null;
+
+    #[Locked]
+    public ?array $bulkSourceInputContext = null;
+
+    #[Locked]
+    public string $bulkAuthoredSource = '';
+
+    private bool $mountingBulkSource = false;
+
+    private bool $transitioningBulkSource = false;
+
+    private ?string $submittingBulkSource = null;
+
+    private ?array $submittedBulkSourceReview = null;
 
     private ?array $submittedReview = null;
 
@@ -70,7 +93,21 @@ class ManageLicenseVersions extends ManageRecords
                 }
             }
         }
+        if (! ($this->transitioningBulkSource && $name === 'reviewBulkSource' && $arguments === [] && $context === [])) {
+            $this->clearBulkSourceReview();
+        }
         $this->clearDraftReview();
+        if ($name === 'reviewBulkSource') {
+            abort_unless($this->transitioningBulkSource && $arguments === [] && $context === [], 403);
+        }
+        if ($name === 'replaceDraftSource') {
+            $this->mountingBulkSource = true;
+            try {
+                return parent::mountAction($name, $arguments, $context);
+            } finally {
+                $this->mountingBulkSource = false;
+            }
+        }
         if ($name !== 'edit') {
             return parent::mountAction($name, $arguments, $context);
         }
@@ -113,10 +150,19 @@ class ManageLicenseVersions extends ManageRecords
         if ($this->editingPolicyAction !== null && $arguments === [] && $this->isMountedPolicyFieldAction()) {
             return parent::callMountedAction();
         }
+        $bulkReview = $this->bulkSourceReview;
+        $bulkContext = $this->bulkSourceContext;
+        $bulkInputContext = $this->bulkSourceInputContext;
         $review = $this->draftReview;
         $context = $this->draftReviewContext;
-        // Consume before framework validation or action visibility can return early.
+        // Bulk confirmation is single-use, including framework validation/visibility returns.
+        $this->clearBulkSourceReview();
+        // Preserve the single-editor consumption boundary before resolving the action.
         $this->clearDraftReview();
+        $bulkAction = $this->getMountedAction();
+        if (in_array($bulkAction?->getName(), ['replaceDraftSource', 'reviewBulkSource', 'backToBulkSource'], true)) {
+            return $this->callBulkSourceAction($bulkAction, $arguments, $bulkReview, $bulkContext, $bulkInputContext);
+        }
         $action = $this->getMountedAction();
         if ($action?->getName() !== 'edit') {
             return parent::callMountedAction($arguments);
@@ -245,6 +291,17 @@ class ManageLicenseVersions extends ManageRecords
     public function updating(string $property, mixed $value): void
     {
         $root = explode('.', $property)[0];
+        if (in_array($root, ['mountedActions', 'selectedTableRecords', 'deselectedTableRecords', 'isTrackingDeselectedTableRecords',
+            'tableSearch', 'tableColumnSearches', 'tableFilters', 'tableDeferredFilters', 'tableSort', 'tableRecordsPerPage', 'paginators'], true)) {
+            $allowedSourceInput = $this->getMountedAction()?->getName() === 'replaceDraftSource'
+                && preg_match('/\AmountedActions\.([0-9]+)\.data(?:\.(authored_source))?\z/D', $property, $bulkMatches)
+                && (int) $bulkMatches[1] === array_key_last($this->mountedActions)
+                && (isset($bulkMatches[2]) ? is_string($value)
+                    : (is_array($value) && array_keys($value) === ['authored_source'] && is_string($value['authored_source'])));
+            if (! $allowedSourceInput) {
+                $this->clearBulkSourceReview();
+            }
+        }
         if ($root === 'mountedActions' && preg_match('/\AmountedActions\.([0-9]+)\.data(?:\.(authored_source|structured_terms|effective_from|effective_until|license_template_id)(?:\..*)?)?\z/D', $property, $matches)
             && (int) $matches[1] === array_key_last($this->mountedActions)) {
             if (isset($matches[2]) ? ($matches[2] !== 'license_template_id' || (string) $value === (string) ($this->draftReview['template_id'] ?? null))
@@ -263,6 +320,7 @@ class ManageLicenseVersions extends ManageRecords
     {
         if ($pageName === $this->getTablePaginationPageName()) {
             $this->clearDraftReview();
+            $this->clearBulkSourceReview();
         }
     }
 
@@ -274,7 +332,205 @@ class ManageLicenseVersions extends ManageRecords
             return;
         }
         $this->clearDraftReview();
+        $this->clearBulkSourceReview();
         parent::unmountAction($cancelParentActions);
+    }
+
+    public function captureBulkSourceInput(): array
+    {
+        $action = $this->getMountedAction();
+        abort_unless($this->mountingBulkSource && $action?->getName() === 'replaceDraftSource'
+            && count($this->mountedActions) === 1 && $action->getArguments() === []
+            && $action->getContext() === ['table' => true, 'bulk' => true], 403);
+        $this->bulkSourceInputContext = $this->bulkSourceActionContext();
+
+        return ['authored_source' => $this->bulkAuthoredSource];
+    }
+
+    public function reviewBulkSource(array $data, Action $action): void
+    {
+        abort_unless($this->submittingBulkSource === 'replaceDraftSource' && $this->getMountedAction() === $action
+            && $action->getName() === 'replaceDraftSource', 403);
+        if (array_keys($data) !== ['authored_source'] || ! is_string($data['authored_source'])) {
+            $this->bulkSourceErrors('Enter the source to replace, then review the current selected drafts.');
+        }
+        $this->bulkAuthoredSource = $data['authored_source'];
+        $ids = $this->selectedBulkDraftIds();
+        $versions = LicenseVersion::query()->whereKey($ids)->orderBy('id')->get()->all();
+        if (array_map(fn (LicenseVersion $version): int => (int) $version->id, $versions) !== $ids) {
+            $this->bulkSourceErrors(BulkReplaceLicenseDraftSource::REOPEN_MESSAGE);
+        }
+        $this->bulkSourceReview = app(BulkReplaceLicenseDraftSource::class)->review($versions, $data['authored_source'], $this->draftActor());
+        $this->transitioningBulkSource = true;
+        try {
+            $this->replaceMountedAction('reviewBulkSource');
+            $this->bulkSourceContext = $this->bulkSourceActionContext();
+        } finally {
+            $this->transitioningBulkSource = false;
+        }
+        $this->forceRender();
+    }
+
+    public function reviewBulkSourceAction(): Action
+    {
+        return Action::make('reviewBulkSource')->databaseTransaction(false)
+            // The private submit lifecycle permits only its already-captured review.
+            // After that request ends, an exhausted comparison cannot offer another save.
+            ->disabled(fn (): bool => $this->bulkSourceReview === null && $this->submittingBulkSource !== 'reviewBulkSource')
+            ->modalHeading('Review license draft source replacement')
+            ->extraModalWindowAttributes(LicenseTemplateResource::authoringModalAttributes())
+            ->modalSubmitAction(fn (Action $action) => $action->disabled(fn (): bool => $this->bulkSourceReview === null)
+                ->extraAttributes(['wire:loading.attr' => null]))
+            ->modalDescription('Save only the source shown for these exact drafts. If the result cannot be confirmed, keep a copy, then close and reopen to inspect the saved drafts before trying again.')
+            ->schema([Textarea::make('authored_source')->label('Replacement source to keep')->readOnly()->required()->rows(8)
+                ->helperText('Copy this entered text before closing. Use Back to source to change it and obtain a fresh comparison.')])
+            ->fillForm(fn (): array => ['authored_source' => $this->bulkAuthoredSource])
+            ->modalContent(fn () => view('filament.rights.review-bulk-license-source', ['review' => $this->bulkSourceReview]))
+            ->modalSubmitActionLabel('Save reviewed source')->modalCancelActionLabel('Cancel')
+            ->extraModalFooterActions([Action::make('backToBulkSource')->label('Back to source')->color('gray')
+                ->action(fn () => $this->backToBulkSource())])
+            ->action(fn (Action $action) => $this->applyBulkSource($action));
+    }
+
+    public function backToBulkSource(): void
+    {
+        abort_unless($this->submittingBulkSource === 'backToBulkSource' && $this->getMountedAction()?->getName() === 'backToBulkSource', 403);
+        $this->replaceMountedAction('replaceDraftSource', context: ['table' => true, 'bulk' => true]);
+        $this->forceRender();
+    }
+
+    public function applyBulkSource(Action $action): void
+    {
+        $review = $this->submittedBulkSourceReview;
+        $this->submittedBulkSourceReview = null;
+        abort_unless($this->submittingBulkSource === 'reviewBulkSource' && $this->getMountedAction() === $action
+            && $action->getName() === 'reviewBulkSource' && $review !== null, 403);
+        $result = app(BulkReplaceLicenseDraftSource::class)->applyReviewed($review, $this->draftActor());
+        $changed = count($result['changed_ids']);
+        $unchanged = count($result['unchanged_ids']);
+        Notification::make()->success()->title($changed === 0
+            ? "No draft source changed. {$unchanged} reviewed drafts already matched."
+            : "Source saved for {$changed} drafts. {$unchanged} drafts already matched.")->send();
+        $this->bulkAuthoredSource = '';
+        $this->deselectAllTableRecords();
+    }
+
+    private function callBulkSourceAction(Action $action, array $arguments, ?array $review, ?array $context, ?array $inputContext): mixed
+    {
+        $name = $action->getName();
+        $retainedSource = $this->bulkAuthoredSource;
+        $this->submittingBulkSource = $name;
+        try {
+            $actor = $this->draftActor();
+            if (! $action->isAuthorized()) {
+                throw new AuthorizationException;
+            }
+            $raw = $this->mountedActions[array_key_last($this->mountedActions)]['data'] ?? [];
+            if (! is_array($raw)) {
+                $this->bulkSourceErrors(BulkReplaceLicenseDraftSource::REOPEN_MESSAGE);
+            }
+            if ($name === 'replaceDraftSource' && is_string($raw['authored_source'] ?? null)) {
+                $this->bulkAuthoredSource = $raw['authored_source'];
+                $retainedSource = $raw['authored_source'];
+            }
+            if ($arguments !== [] || $action->getArguments() !== [] || $action->isDisabled() || $action->isHidden()) {
+                $this->bulkSourceErrors(BulkReplaceLicenseDraftSource::REOPEN_MESSAGE);
+            }
+            if ($name === 'backToBulkSource') {
+                if (count($this->mountedActions) !== 2 || ($this->mountedActions[0]['name'] ?? null) !== 'reviewBulkSource'
+                    || $action->getContext() !== [] || $raw !== []) {
+                    $this->bulkSourceErrors(BulkReplaceLicenseDraftSource::REOPEN_MESSAGE);
+                }
+            } else {
+                if (count($this->mountedActions) !== 1 || array_keys($raw) !== ['authored_source'] || ! is_string($raw['authored_source'])
+                    || ($name === 'replaceDraftSource' ? $inputContext : $context) !== $this->bulkSourceActionContext()) {
+                    $this->bulkSourceErrors(BulkReplaceLicenseDraftSource::REOPEN_MESSAGE);
+                }
+                $ids = $this->selectedBulkDraftIds();
+                if ($name === 'reviewBulkSource') {
+                    if ($review === null || ($review['actor_id'] ?? null) !== (int) $actor->id
+                        || $ids !== array_column($review['drafts'] ?? [], 'version_id')
+                        || $raw['authored_source'] !== ($review['authored_source'] ?? null)) {
+                        $this->bulkSourceErrors(BulkReplaceLicenseDraftSource::REOPEN_MESSAGE);
+                    }
+                    $this->submittedBulkSourceReview = $review;
+                }
+            }
+
+            return parent::callMountedAction($arguments);
+        } catch (AuthorizationException $exception) {
+            throw $exception;
+        } catch (ValidationException $exception) {
+            $this->clearBulkSourceReview();
+            $this->submittingBulkSource = null;
+            Notification::make()->danger()->title('Review current drafts to continue')
+                ->body('Keep a copy of your entered source, then close and reopen the selected drafts to inspect their saved state and review again.')->persistent()->send();
+            $this->bulkSourceErrors(implode(' ', array_merge(...array_values($exception->errors()))));
+        } catch (Throwable $exception) {
+            $this->clearBulkSourceReview();
+            $this->submittingBulkSource = null;
+            $this->bulkAuthoredSource = $retainedSource;
+            try {
+                Log::warning('Bulk license draft UI could not confirm the result.', ['exception_class' => $exception::class]);
+            } catch (Throwable) {
+                // Logging must not expose source text or imply a known outcome.
+            }
+            Notification::make()->danger()->title('The bulk save result could not be confirmed.')
+                ->body('Keep a copy of your entered source, then close and reopen to inspect the saved drafts before trying again.')->persistent()->send();
+            $this->bulkSourceErrors('The result could not be confirmed. Keep a copy of your source, then close and reopen to inspect the saved drafts before trying again.');
+        } finally {
+            $this->submittingBulkSource = null;
+            $this->submittedBulkSourceReview = null;
+        }
+    }
+
+    private function selectedBulkDraftIds(): array
+    {
+        if ($this->isTrackingDeselectedTableRecords || $this->deselectedTableRecords !== []
+            || ! array_is_list($this->selectedTableRecords) || count($this->selectedTableRecords) < 1
+            || count($this->selectedTableRecords) > BulkReplaceLicenseDraftSource::MAX_DRAFTS) {
+            $this->bulkSourceErrors('Select 1 to 25 explicit editable drafts on the current page.');
+        }
+        $ids = [];
+        foreach ($this->selectedTableRecords as $id) {
+            if ((! is_int($id) && ! is_string($id)) || ! preg_match('/\A[1-9][0-9]*\z/D', (string) $id)
+                || (string) (int) $id !== (string) $id) {
+                $this->bulkSourceErrors('Select valid draft IDs on the current page.');
+            }
+            $ids[] = (int) $id;
+        }
+        if (count(array_unique($ids, SORT_NUMERIC)) !== count($ids)
+            || ! in_array((string) $this->getTableRecordsPerPage(), ['5', '10', '25', '50'], true)) {
+            $this->bulkSourceErrors('Select distinct drafts using a supported current page size.');
+        }
+        $this->flushCachedTableRecords();
+        $visible = array_map(fn (LicenseVersion $version): int => (int) $version->id, iterator_to_array($this->getTableRecords()));
+        if (array_diff($ids, $visible)) {
+            $this->bulkSourceErrors('Select only drafts visible on the current filtered page.');
+        }
+        sort($ids, SORT_NUMERIC);
+
+        return $ids;
+    }
+
+    private function bulkSourceActionContext(): array
+    {
+        return [...$this->reviewContext(), 'selection' => $this->selectedBulkDraftIds()];
+    }
+
+    private function clearBulkSourceReview(): void
+    {
+        $this->bulkSourceReview = null;
+        $this->bulkSourceContext = null;
+        $this->bulkSourceInputContext = null;
+        $this->submittedBulkSourceReview = null;
+    }
+
+    private function bulkSourceErrors(string $message): never
+    {
+        $this->dispatch('form-validation-error', livewireId: $this->getId());
+        $path = $this->getSchema($this->getMountedActionSchemaName())->getStatePath();
+        throw ValidationException::withMessages([$path.'.authored_source' => $message]);
     }
 
     private function clearDraftReview(): void

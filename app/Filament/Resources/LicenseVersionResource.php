@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Domain\Rights\BulkReplaceLicenseDraftSource;
 use App\Domain\Rights\CreateLicenseDraft;
 use App\Domain\Rights\LicenseDiff;
 use App\Domain\Rights\LicenseTerms;
@@ -14,6 +15,7 @@ use App\Filament\Forms\LicenseScopeFields;
 use App\Filament\Forms\TypedLicenseFields;
 use App\Filament\Resources\LicenseVersionResource\Pages\ManageLicenseVersions;
 use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DateTimePicker;
@@ -60,6 +62,17 @@ class LicenseVersionResource extends OperatorResource
         return $table->defaultSort('id', 'desc')->columns([
             TextColumn::make('template.name')->searchable(), TextColumn::make('version'), TextColumn::make('status')->badge(),
             TextColumn::make('effective_from')->label('Availability starts')->dateTime()->placeholder('On publication'), TextColumn::make('effective_until')->label('Availability ends')->dateTime()->placeholder('No scheduled end'),
+        ])->selectCurrentPageOnly()->maxSelectableRecords(BulkReplaceLicenseDraftSource::MAX_DRAFTS)->toolbarActions([
+            BulkAction::make('replaceDraftSource')->label('Replace draft source')->fetchSelectedRecords(false)
+                ->databaseTransaction(false)
+                ->modalHeading('Replace source for selected license drafts')->modalSubmitActionLabel('Review source replacement')
+                ->extraModalWindowAttributes(LicenseTemplateResource::authoringModalAttributes())
+                ->modalSubmitAction(fn (Action $action) => $action->extraAttributes(['wire:loading.attr' => null]))
+                ->modalDescription('Select 1 to 25 editable drafts on this page. Enter the intended source, then compare every draft before saving. Structured terms and availability dates stay unchanged.')
+                ->schema([Textarea::make('authored_source')->label('Replacement source')->required()->rows(12)
+                    ->helperText('The same source must be valid for the retained terms of every selected draft. This does not request license review or publish a version. Keep a copy of your entered source if review is blocked, then close and reopen the selected drafts before trying again.')])
+                ->mountUsing(fn (ManageLicenseVersions $livewire, Schema $schema) => $schema->fill($livewire->captureBulkSourceInput()))
+                ->action(fn (array $data, ManageLicenseVersions $livewire, Action $action) => $livewire->reviewBulkSource($data, $action)),
         ])->recordActions([
             EditAction::make()->visible(fn (LicenseVersion $record) => $record->status === 'draft')
                 ->databaseTransaction(false)
