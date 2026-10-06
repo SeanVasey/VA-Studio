@@ -1,11 +1,12 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { Head } from '@inertiajs/react';
+import { CustomerPurchaseClaim } from '../components/CustomerPurchaseClaim';
 import { SiteFooter, SiteHeader } from '../components/SiteChrome';
 import type { SiteContent } from '../lib/site-content';
 import { changeCustomerSession, navigateCustomerSession } from '../lib/customer-session';
 import '../../css/customer-account.css';
 
-export default function CustomerSignIn({ siteContent, selfServiceEnabled = false }: { testOnly: true; siteContent: SiteContent; selfServiceEnabled?: boolean }) {
+export default function CustomerSignIn({ siteContent, selfServiceEnabled = false, purchaseClaimsEnabled = false }: { testOnly: true; siteContent: SiteContent; selfServiceEnabled?: boolean; purchaseClaimsEnabled?: boolean }) {
   const id = useId();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -45,6 +46,7 @@ export default function CustomerSignIn({ siteContent, selfServiceEnabled = false
       <div className="editorial-heading"><p className="eyebrow">VASEY.AUDIO / TEST ACCOUNT</p><h1>Customer sign-in</h1>
         <p className="editorial-description">Open your test order library.</p></div>
       <p className="customer-account-note">For existing test accounts. Signing in does not link earlier guest orders or create download access.</p>
+      {purchaseClaimsEnabled && !busy && !reload && <CustomerPurchaseClaim />}
       <form className="customer-sign-in" onSubmit={event => void submit(event)} aria-busy={busy}>
         <div className="customer-account-field"><label htmlFor={`${id}-email`}>Email address</label>
           <input id={`${id}-email`} name="email" type="email" autoComplete="username" required maxLength={254} value={email} disabled={busy || reload} onChange={event => setEmail(event.target.value)} /></div>

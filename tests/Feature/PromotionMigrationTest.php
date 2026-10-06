@@ -36,8 +36,9 @@ class PromotionMigrationTest extends TestCase
         $delivery = require database_path('migrations/2026_09_26_000023_test_owner_delivery.php');
         $administration = require database_path('migrations/2026_09_29_000025_promotion_administration.php');
         $financialObservations = require database_path('migrations/2026_10_06_000039_test_payment_financial_observations.php');
+        $purchaseClaims = require database_path('migrations/2026_10_06_000048_customer_purchase_claims.php');
         $unpaidRelease = require database_path('migrations/2026_10_06_000042_test_unpaid_releases.php');
-        $unpaidRelease->down();
+        $purchaseClaims->down(); $unpaidRelease->down();
         $financialObservations->down();
         $exceptionOperations = require database_path('migrations/2026_10_02_000036_test_payment_exception_operations.php');
         foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }
@@ -50,7 +51,7 @@ class PromotionMigrationTest extends TestCase
         }
         $exceptionOperations->down(); $administration->down(); $delivery->down(); $fulfillmentActivations->down(); $contracts->down(); $finalizations->down(); $payments->down(); $checkout->down(); $orders->down(); $migration->down(); $migration->up(); $orders->up(); $checkout->up(); $payments->up(); $finalizations->up(); $contracts->up(); $fulfillmentActivations->up(); $delivery->up(); $administration->up(); $exceptionOperations->up();
         $financialObservations->up();
-        $unpaidRelease->up();
+        $unpaidRelease->up(); $purchaseClaims->up();
         foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }
         $this->assertSame($hash, $pricing->refresh()->snapshot_hash);
         $this->assertSame($hash, CanonicalJson::hash(app(PricingSnapshot::class)->verify($pricing, $quote)));

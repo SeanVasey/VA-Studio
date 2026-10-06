@@ -19,6 +19,7 @@ class CustomerAccountMigrationTest extends TestCase
     {
         parent::setUp();
         // Roll back the empty additive child before exercising the retained account parent.
+        (require database_path('migrations/2026_10_06_000048_customer_purchase_claims.php'))->down();
         (require database_path('migrations/2026_10_06_000045_customer_identity_challenges.php'))->down();
     }
 

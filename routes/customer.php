@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CustomerIdentityController;
+use App\Http\Controllers\CustomerPurchaseClaimController;
 use App\Http\Controllers\CustomerSessionController;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Support\Facades\Route;
@@ -13,6 +14,8 @@ foreach (['create', 'recover', 'access'] as $page) {
 Route::withoutMiddleware(HandleInertiaRequests::class)->group(function (): void {
     Route::post('/account/identity/request', [CustomerIdentityController::class, 'request'])->middleware('throttle:5,1,customer-identity')->block(20, 5)->name('customer.identity.request');
     Route::post('/account/identity/complete', [CustomerIdentityController::class, 'complete'])->middleware('throttle:10,1,customer-identity-complete')->block(20, 5)->name('customer.identity.complete');
+    Route::post('/account/purchase-claim/stage', [CustomerPurchaseClaimController::class, 'stage'])->middleware('throttle:5,1,customer-purchase-claim')->block(20, 5)->name('customer.purchase-claim.stage');
+    Route::post('/account/purchase-claim/complete', [CustomerPurchaseClaimController::class, 'complete'])->middleware('throttle:10,1,customer-purchase-claim-complete')->block(20, 5)->name('customer.purchase-claim.complete');
     Route::post('/account/sign-in', [CustomerSessionController::class, 'store'])->middleware('throttle:10,1,customer-auth')->block(20, 5)->name('customer.sign-in.store');
     Route::post('/account/sign-out', [CustomerSessionController::class, 'destroy'])->middleware('throttle:20,1,customer-auth')->block(20, 5)->name('customer.sign-out');
 });

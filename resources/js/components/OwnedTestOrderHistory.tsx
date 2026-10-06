@@ -68,7 +68,7 @@ export function OwnedTestOrderHistory({ renderOrder, scope = 'session' }: { scop
   }
 
   return <section aria-label={scope === 'account' ? 'Your account test orders' : 'Available test orders'} aria-busy={busy}>
-    <p className="fine-print">{scope === 'account' ? 'Browse test orders prepared while signed in to this account. Earlier guest orders and purchases from other accounts are not linked here.' : 'Lists orders available to your current session or signed-in test account. Guest orders are not linked when you sign in.'}</p>
+    <p className="fine-print">{scope === 'account' ? 'Browse test orders prepared with this account. Earlier guest orders appear only after explicitly saving them to this account; signing in alone does not link them.' : 'Lists orders available to your current session or signed-in test account. Guest orders are not linked when you sign in.'}</p>
     <button type="button" className="button button-outline full-width" disabled={busy} onClick={() => void load()}>
       {busy ? `Loading ${label} orders…` : history || message ? `Refresh ${label} orders` : `Browse ${label} orders`}
     </button>
