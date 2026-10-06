@@ -18,16 +18,21 @@ use App\Domain\Rights\ReviewLicense;
 use App\Filament\Resources\LicenseVersionResource\Pages\ManageLicenseVersions;
 use App\Filament\Resources\TrackResource\Pages\ManageTracks;
 use App\Models\User;
+use DOMDocument;
+use DOMXPath;
 use Filament\Facades\Filament;
 use Filament\Pages\Dashboard;
+use Filament\Widgets\AccountWidget;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\MediaFixtures;
 use Tests\TestCase;
@@ -98,6 +103,69 @@ class FoundationTest extends TestCase
         }
         Livewire::test(ManageTracks::class)->callAction('create', data: ['title' => 'Original recording', 'slug' => 'original-recording', 'artist' => 'VASEY.AUDIO', 'bpm' => 95, 'musical_key' => 'D minor', 'genre' => 'Hip-Hop', 'duration_seconds' => 150])->assertHasNoActionErrors();
         $this->assertDatabaseHas('tracks', ['slug' => 'original-recording', 'status' => 'draft']);
+    }
+
+    public function test_operator_page_and_account_widget_keep_avatar_requests_first_party(): void
+    {
+        $operator = $this->admin();
+        $operator->update(['name' => 'Synthetic Browser Operator']);
+        $this->actingAs($operator);
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+
+        $page = $this->get('/admin')->assertOk()->assertSee('VASEY.AUDIO / Studio');
+        $this->assertLocalOperatorAvatars($page->getContent(), 'SB');
+        $this->assertLocalOperatorAvatars(Livewire::test(AccountWidget::class)->html(), 'SB');
+    }
+
+    #[DataProvider('operatorAvatarNames')]
+    public function test_operator_avatar_names_render_as_bounded_safe_local_images(string $name, string $initials): void
+    {
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $user = new User(['name' => $name]);
+        $html = Blade::render('<x-filament-panels::avatar.user :user="$user" />', ['user' => $user]);
+        $this->assertLocalOperatorAvatars($html, $initials);
+
+        $document = new DOMDocument;
+        @$document->loadHTML('<?xml encoding="UTF-8">'.$html);
+        $this->assertSame(__('filament-panels::layout.avatar.alt', ['name' => $name]), $document->getElementsByTagName('img')->item(0)->getAttribute('alt'));
+    }
+
+    public static function operatorAvatarNames(): array
+    {
+        return [
+            'unicode letters' => ['Élodie 林', 'É林'],
+            'unicode whitespace' => ["  Sean\t\u{2003}Vasey  ", 'SV'],
+            'markup and quotes' => ['<script>alert(1)</script> " onerror="alert(2)', 'SO'],
+            'punctuation only' => ['<>&"\'!!!', '?'],
+            'empty name' => ['', '?'],
+            'bounded long name' => [str_repeat('Word ', 50), 'WW'],
+        ];
+    }
+
+    private function assertLocalOperatorAvatars(string $html, string $initials): void
+    {
+        $this->assertStringNotContainsString('ui-avatars.com', $html);
+        $document = new DOMDocument;
+        @$document->loadHTML('<?xml encoding="UTF-8">'.$html);
+        $images = (new DOMXPath($document))->query('//img[contains(concat(" ", normalize-space(@class), " "), " fi-user-avatar ")]');
+        $this->assertGreaterThan(0, $images->count());
+
+        foreach ($images as $image) {
+            $source = $image->getAttribute('src');
+            $prefix = 'data:image/svg+xml;base64,';
+            $this->assertStringStartsWith($prefix, $source);
+            $this->assertLessThan(2048, strlen($source));
+            $svg = base64_decode(substr($source, strlen($prefix)), true);
+            $this->assertIsString($svg);
+            $avatar = new DOMDocument;
+            $this->assertTrue($avatar->loadXML($svg, LIBXML_NONET));
+            $this->assertNull($avatar->doctype);
+            $this->assertSame(['svg', 'rect', 'text'], array_map(fn ($element) => $element->localName, iterator_to_array($avatar->getElementsByTagName('*'))));
+            $this->assertSame($initials, $avatar->getElementsByTagName('text')->item(0)->textContent);
+            $this->assertSame('#09090b', $avatar->getElementsByTagName('rect')->item(0)->getAttribute('fill'));
+            $this->assertSame('#FFFFFF', $avatar->getElementsByTagName('text')->item(0)->getAttribute('fill'));
+            $this->assertCount(0, (new DOMXPath($avatar))->query('//*[@*[starts-with(local-name(), "on") or local-name()="href"]]'));
+        }
     }
 
     public function test_license_author_is_derived_from_authenticated_operator(): void
