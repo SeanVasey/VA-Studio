@@ -48,6 +48,7 @@ test('operator resumes real eight MiB transport after a lost response and saves 
   await page.getByRole('button', { name: 'Start upload', exact: true }).focus();
   await page.keyboard.press('Enter');
   await expect(status).toContainText('could not be confirmed');
+  expect(parts, 'The real first chunk must commit before its acknowledgement is deliberately lost').toBe(1);
   const id = await page.getByLabel('Upload ID', { exact: true }).inputValue();
   expect(id).toMatch(/^[a-f0-9-]{36}$/);
   await page.reload();
