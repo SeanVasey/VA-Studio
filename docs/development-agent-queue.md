@@ -2,7 +2,7 @@
 
 ## Active continuation — October 6, 2026 UTC
 
-The integrating [completion candidate](completion-execution.md#exact-lookup-document-continuity--october-6-2026-utc) includes reviewed account/library and exact order-reference lookup, private test enrollment/recovery, collection/album drafts, inquiry conversations, verified unpaid release, WAV kit intake and resumable kit transport. Its next correction measures actual lookup document continuity while preserving native response evidence and all prior assertions. Collection-member refresh and retained order-item details remain separate follow-up work. PR #6 remains the current combined acceptance boundary; PR #5 must close as superseded only after the combined merge is confirmed. A failed run does not certify its corrected successor.
+The integrating [completion candidate](completion-execution.md#complete-related-journey-allowance--october-6-2026-utc) includes reviewed account/library and exact order-reference lookup, private test enrollment/recovery, collection/album drafts, inquiry conversations, verified unpaid release, WAV kit intake and resumable kit transport. Its next correction gives the complete genuine related journey a measured, bounded harness allowance while preserving every assertion, cleanup step and outer limit. Collection-member refresh and retained order-item details remain separate follow-up work. PR #6 remains the current combined acceptance boundary; PR #5 must close as superseded only after the combined merge is confirmed. A failed run does not certify its corrected successor.
 
 | Lane | Current work and boundary |
 | --- | --- |
