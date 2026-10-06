@@ -53,6 +53,11 @@ final class OrderController
         return $this->run(fn () => ['order' => $read->handle($order, $owner->forRequest($request))]);
     }
 
+    public function items(string $order, Request $request, CommerceRequestIdentity $owner, ReadOrder $read): JsonResponse
+    {
+        return $this->run(fn () => ['items' => $read->items($order, $owner->forRequest($request))]);
+    }
+
     public function forQuote(string $quote, Request $request, CommerceRequestIdentity $owner, ReadOrder $read): JsonResponse
     {
         return $this->run(fn () => ['order' => $read->forQuote($quote, $owner->forRequest($request))]);

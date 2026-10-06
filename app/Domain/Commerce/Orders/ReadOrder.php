@@ -15,6 +15,7 @@ use App\Domain\Commerce\QuoteRequest;
 use App\Support\CanonicalJson;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Crypt;
+use SensitiveParameter;
 use Throwable;
 
 /** Durable owned evidence. No hold, expiry transition, fresh offer check or provider request. */
@@ -39,6 +40,45 @@ final class ReadOrder
         if (! $order) { throw new QuoteException('ORDER_NOT_FOUND', 404); }
 
         return $this->present($order);
+    }
+
+    /** Original prepared prices only; this projection does not establish payment or delivery rights. */
+    public function items(string $id, #[SensitiveParameter] string $ownerKey): array
+    {
+        QuoteRequest::owner($ownerKey);
+        if (! OrderRequest::uuid($id)) { throw new QuoteException('ORDER_NOT_FOUND', 404); }
+        $order = Order::where('public_id', $id)->where('owner_key', $ownerKey)->first();
+        if (! $order || ! hash_equals($order->owner_key, $ownerKey)) { throw new QuoteException('ORDER_NOT_FOUND', 404); }
+        $payload = $this->verify($order);
+        $pricing = $payload['pricing']['snapshot'];
+        if (! in_array($pricing['schema_version'], [1, 2, 3], true) || $pricing['currency'] !== 'USD'
+            || ! array_is_list($payload['lines']) || count($payload['lines']) < 1 || count($payload['lines']) > 10) {
+            throw new QuoteException('ORDER_CHANGED', 409);
+        }
+
+        $lines = [];
+        foreach ($payload['lines'] as $position => $line) {
+            $title = $line['selection']['offer_snapshot']['product']['title'];
+            $name = $line['disclosure']['name'];
+            $version = $line['disclosure']['version'];
+            foreach ([$title, $name] as $text) {
+                if (! is_string($text) || $text === '' || ! mb_check_encoding($text, 'UTF-8') || mb_strlen($text, 'UTF-8') > 255) {
+                    throw new QuoteException('ORDER_CHANGED', 409);
+                }
+            }
+            if ($line['position'] !== $position || ! is_int($version) || $version < 1 || $line['pricing']['quantity'] !== 1) {
+                throw new QuoteException('ORDER_CHANGED', 409);
+            }
+            $lines[] = ['position' => $position, 'title' => $title, 'licenseName' => $name, 'licenseVersion' => $version,
+                'quantity' => $line['pricing']['quantity'], 'baseMinor' => $line['pricing']['base_minor'],
+                'discountMinor' => $line['pricing']['discount_minor'], 'taxBasisMinor' => $line['pricing']['tax_basis_minor'],
+                'taxMinor' => $line['pricing']['tax_minor'], 'totalMinor' => $line['pricing']['total_minor']];
+        }
+
+        return ['orderItemsSchema' => 1, 'orderId' => $order->public_id, 'testOnly' => true, 'currency' => $pricing['currency'],
+            'subtotalMinor' => $pricing['subtotal_minor'], 'discountMinor' => $pricing['discount_minor'],
+            'taxBasisMinor' => $pricing['tax_basis_minor'], 'taxMinor' => $pricing['tax_minor'], 'totalMinor' => $pricing['total_minor'],
+            'lines' => $lines];
     }
 
     /** Internal private evidence reader; HTTP callers must authorize before using this method. */

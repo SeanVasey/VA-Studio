@@ -154,6 +154,22 @@ class SelectionTests(unittest.TestCase):
             ["Tests\\Feature\\ProductMemberRefreshConcurrencyTest", "test_native_source_wait_rejects_a_review_changed_by_the_committing_source_writer"],
         ])
 
+    def test_order_items_feedback_covers_both_databases_and_clients_without_native_exclusions(self):
+        self.assertEqual(focused.MAX_FILES, 32)
+        for engine in focused.ENGINES:
+            selected = focused.selection({"FOCUSED_SUITE": "customer", "FOCUSED_ENGINE": engine})
+            self.assertEqual(selected.files.count("tests/Feature/CustomerOrderItemsTest.php"), 1)
+            focused.validate_files(ROOT, selected)
+        for suite, target in {
+            "frontend": "tests/frontend/order-items.test.tsx",
+            "browser": "tests/browser/customer-order-items.spec.ts",
+        }.items():
+            selected = focused.selection({"FOCUSED_SUITE": suite, "FOCUSED_ENGINE": "sqlite"})
+            self.assertEqual(selected.files.count(target), 1)
+            focused.validate_files(ROOT, selected)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        self.assertFalse(any(row[0] == "Tests\\Feature\\CustomerOrderItemsTest" for row in policy["methods"]))
+
     def test_identity_and_kit_transport_feedback_keep_native_races_and_client_journeys(self):
         self.assertEqual(focused.MAX_FILES, 32)
         for suite, targets in {
