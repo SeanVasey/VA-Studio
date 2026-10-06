@@ -69,8 +69,8 @@ class TransactionalNotificationConcurrencyTest extends TestCase
         touch($this->directory.'/follower-start');
         $this->waitProof($followerReady, $winnerReady, 'users', $f['user']->id, [$winner, $follower]);
         touch($this->directory.'/winner-release');
-        $a = $this->result($winner, $winnerReady);
-        $b = $this->result($follower, $followerReady);
+        $a = $this->workerResult($winner, $winnerReady);
+        $b = $this->workerResult($follower, $followerReady);
         $this->assertSame('saved', $a['outcome']);
         $this->assertSame('saved', $b['outcome']);
         $this->assertFalse($a['result']['replayed']);
@@ -99,13 +99,13 @@ class TransactionalNotificationConcurrencyTest extends TestCase
         $this->waitProof($bReady, $aReady, 'users', $f['user']->id, [$winner, $follower]);
         touch($this->directory.'/winner-release');
         $this->await(fn () => is_file($this->directory.'/winner-before-capture'), [$winner]);
-        $b = $this->result($follower, $bReady);
+        $b = $this->workerResult($follower, $bReady);
         $this->assertSame('saved', $b['outcome']);
         $this->assertSame('leased', $b['result']['state']);
         $this->assertSame(0, $b['capture_calls']);
         $this->assertSame([], Storage::disk('local')->allFiles('transactional-notification-capture'));
         touch($this->directory.'/winner-capture-release');
-        $a = $this->result($winner, $aReady);
+        $a = $this->workerResult($winner, $aReady);
         $this->assertSame('accepted', $a['result']['state']);
         $this->assertSame(1, $a['capture_calls']);
         $this->assertDatabaseCount('transactional_notice_attempts', 1);
@@ -143,7 +143,7 @@ class TransactionalNotificationConcurrencyTest extends TestCase
         $account = CustomerAccount::whereKey($f['account']->id)->lockForUpdate()->firstOrFail();
         $account->update(['active' => false, 'access_version' => $account->access_version + 1]);
         DB::commit();
-        $result = $this->result($worker, $ready);
+        $result = $this->workerResult($worker, $ready);
         $this->assertSame('denied', $result['outcome']);
         $this->assertSame(0, $result['capture_calls']);
         $this->assertSame($before, $this->graph());
@@ -174,8 +174,8 @@ class TransactionalNotificationConcurrencyTest extends TestCase
         touch($this->directory.'/follower-start');
         $this->waitProof($bReady, $aReady, 'users', $f['user']->id, [$winner, $follower]);
         touch($this->directory.'/winner-release');
-        $a = $this->result($winner, $aReady);
-        $b = $this->result($follower, $bReady);
+        $a = $this->workerResult($winner, $aReady);
+        $b = $this->workerResult($follower, $bReady);
         $this->assertSame('accepted', $a['result']['state']);
         $this->assertSame($a['result'], $b['result']);
         $this->assertSame(0, $a['capture_calls'] + $b['capture_calls']);
@@ -225,7 +225,7 @@ class TransactionalNotificationConcurrencyTest extends TestCase
         $this->assertNotSame($a['pid'], $b['pid']);
     }
 
-    private function result(Process $process, array $ready): array
+    private function workerResult(Process $process, array $ready): array
     {
         $process->wait();
         $this->assertSame(0, $process->getExitCode(), $process->getErrorOutput());
