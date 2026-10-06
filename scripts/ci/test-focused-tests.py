@@ -97,6 +97,34 @@ class SelectionTests(unittest.TestCase):
                 focused.selection({"FOCUSED_SUITE": suite, "FOCUSED_ENGINE": "mysql"})
         self.assertEqual(focused.selection({"FOCUSED_SUITE": "frontend", "FOCUSED_ENGINE": "sqlite"}).engine, "none")
 
+    def test_customer_and_product_feedback_preserve_the_fixed_cap_and_native_coverage(self):
+        self.assertEqual(focused.MAX_FILES, 32)
+        for target in ("CustomerAccountAccessTest", "CustomerAccountCommerceTest", "CustomerAccountConcurrencyTest",
+                       "CustomerAccountMigrationTest", "CustomerSessionHttpTest", "OwnedTestOrderHistoryTest",
+                       "TestOwnerDeliveryHttpTest", "TestOwnerDeliveryProjectionTest"):
+            self.assertIn("tests/Feature/" + target + ".php", focused.PHP_TARGETS["customer"])
+        for target in ("ProductDraftTest", "ProductDraftEditorTest", "ProductDraftMigrationTest", "ProductDraftConcurrencyTest"):
+            self.assertIn("tests/Feature/" + target + ".php", focused.PHP_TARGETS["seller"])
+        self.assertIn("tests/frontend/customer-account.test.tsx", focused.FRONTEND_TARGETS)
+        self.assertIn("tests/browser/customer-account.spec.ts", focused.BROWSER_TARGETS)
+
+    def test_workflow_dispatch_choices_exactly_match_reviewed_suite_enums(self):
+        workflow = (ROOT / ".github/workflows/focused.yml").read_text()
+        choices = workflow.split("options: [", 1)[1].split("]", 1)[0].split(", ")
+        self.assertEqual(set(focused.SUITES), set(choices))
+        self.assertEqual(len(focused.SUITES), len(choices))
+
+    def test_new_sqlite_exceptions_are_exact_native_method_identities(self):
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        new_classes = {"Tests\\Feature\\CustomerAccountConcurrencyTest", "Tests\\Feature\\ProductDraftConcurrencyTest"}
+        actual = {tuple(row) for row in policy["methods"] if row[0] in new_classes}
+        self.assertEqual(actual, {
+            ("Tests\\Feature\\CustomerAccountConcurrencyTest", "test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint"),
+            ("Tests\\Feature\\ProductDraftConcurrencyTest", "test_native_product_wait_serializes_competing_draft_changes"),
+            ("Tests\\Feature\\ProductDraftConcurrencyTest", "test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation"),
+            ("Tests\\Feature\\ProductDraftConcurrencyTest", "test_source_lock_captures_metadata_committed_while_creator_waits"),
+        })
+
     def test_related_source_is_covered_without_putting_ready_fixtures_in_the_default_browser_set(self):
         for target in ("tests/Feature/PublicCatalogRelatedLinksTest.php", "tests/Feature/SiteRelatedTrackContentTest.php",
                        "tests/Feature/SiteRelatedTrackDamageTest.php", "tests/Feature/SiteRelatedTrackEditorTest.php",

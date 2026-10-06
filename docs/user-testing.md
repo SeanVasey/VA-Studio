@@ -22,7 +22,13 @@ The hosted build lives in a separate `va-studio-preview` Vercel project in VASEY
 
 The [alpha launcher](private-alpha.md) starts the real app on loopback and prints per-run credentials after readiness. Edit a **SYNTHETIC ALPHA** draft, save and reload. Check publication blockers. Explore site-content drafts and private previews. The storefront is initially empty because these drafts are not publication-ready.
 
+On the customer/product integration source, **Collections and albums** also lets you create a private draft from the synthetic tracks, arrange their order, save a new version, review history and use an earlier composition as a new draft version. The original versions stay retained. This authoring flow does not set prices/licenses or enable public collection purchases.
+
 Stopping the launcher deletes that session's database, uploads, credentials and edits. Keep useful wording separately. This is a practice installation, not a place to begin uploading production originals or customer records. Its data and the static preview fixtures are separate.
+
+## Customer account testing boundary
+
+The composed account-first test journey has real sign-in, private order history and authorized original downloads across fresh sessions. Its synthetic accounts and paid test orders are provisioned by the isolated browser-test fixture; the ordinary alpha launcher does not create a customer login, and the static preview has no account backend. See [customer setup and evidence](verification/customer-account-test-journey.md). Account UI/domain/HTTP tests and browser discovery are recorded separately from native Chromium/WebKit acceptance. Production registration, guest-order claims and account recovery remain pending.
 
 ## October 6 verification checkpoint
 

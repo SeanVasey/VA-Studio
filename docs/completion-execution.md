@@ -2,6 +2,18 @@
 
 Checkpoint: October 5, 2026 (America/Chicago), following Sean's instruction to prioritize the finished website and eliminate serial development waits. This plan keeps all required scope in the [40-group register](remaining-development-tasks.csv) and [103-row coverage map](remaining-parity-coverage.csv). The protected preview is a testing aid, not the completion target.
 
+## Customer and product authoring composition — October 6, 2026
+
+The next reviewed source now combines account-first customer sign-in/library (`96fd8d0` backend with `2ea42ea` UI and `cd29d47` browser journeys) and collection/album draft authoring (`5a11a923`). Real merge ancestry retains the preceding completion candidate `404e48a`; component reviews and local results do not replace acceptance of the final combined source.
+
+The test customer journey uses a separately authenticated, explicitly provisioned nonstaff account and stable owner identity. Sign in, prepare an existing test purchase, return in a fresh session and use the account's retained order/original-delivery interfaces. Guest orders stay with their original guest identity. Registration, guest claims, recovery, production enrollment and live payments remain open. [Customer evidence](verification/customer-account-test-journey.md) distinguishes executed domain/HTTP/MySQL tests from browser fixture/discovery and pending native browser acceptance.
+
+Administrators can now create private collections/albums, order existing tracks, edit/review immutable descriptive versions and copy exact historical contents into a new current draft. [Product evidence](product-draft-authoring.md) records 45 SQLite cases and 54 native MySQL cases including actual editor and concurrency tests. Collection pricing, licensing, public storefront, purchase and delivery are still open. T27 kit intake/formats/rights/archives remain a distinct required increment; track masters and WAV stems are not relabeled as kits.
+
+The integrated selector adds customer feedback and product-draft coverage while retaining the 32-file cap. Exactly nine customer and nine product-draft native cases receive their method-specific SQLite exceptions; all must execute on MySQL. Shared dependency/CI corrections and any observed browser fixes are composed by the lead before the next frozen candidate. Full hosted acceptance, final review and expected-head merge remain required. Parent counts stay **six accepted and 34 open**; no product family is declared complete by its authoring child.
+
+At the customer/product composition checkpoint, the seven new shared-engine test files passed together on SQLite: **73 cases / 522 assertions**, zero failures/skips, 24.988 seconds. The 31 focused-selector and 29 database-receipt safeguards passed, as did TypeScript, the production build and client scan. The actual guarded browser wrapper completed fresh migrations, interactive operator setup and installation diagnostics, then discovered all four customer journey cases across Chromium/WebKit. Discovery is not native browser execution or full combined CI acceptance.
+
 ## Baseline audited before this batch
 
 This inventory describes accepted main `1095dd5`, before the active resumable-upload and financial-observation changes below. Their final integrated acceptance is recorded separately.
@@ -25,7 +37,7 @@ T03–T08 remain the six accepted parent groups. The remaining groups contain bo
 
 The media, financial-observation and synthetic migration increments form one integrated batch. Their source reviews and local checks are complete; hosted acceptance remains separate. The composed upload HTTP, financial-observation and existing payment-operation concurrency checks passed together on native MySQL: 30 cases / 769 assertions, no failures or skips. Frontend checks passed 378 cases across 24 files, production builds and client scans passed, and all 13 private-alpha checks executed successfully. The synthetic migration checks passed 58 cases / 537 assertions after composition. Component evidence lives with each feature. The browser upload journey still requires native hosted execution.
 
-The next account-first customer journey is already being implemented on separate branches: sign in, complete an existing test purchase, return in a new session, and use the purchase library and exact private originals. It preserves original guest ownership and legal evidence; guest claims, public registration and recovery are not silently inferred. Backend authority and UI work proceed concurrently with independent review. Eight-way MySQL CI is another separate next-batch change, with full source/receipt coverage retained. Neither changes this candidate while its acceptance runs.
+The account-first customer journey and collection/album draft child have since reached the reviewed composition checkpoint above. Their backend, UI and tests were developed concurrently with independent review. Eight-way MySQL CI proceeds as another separately reviewed change with full source/receipt coverage retained. Changes join the next frozen candidate together; an earlier candidate's results do not certify the new tree.
 
 CI changes join only after their own independent policy review; an unfinished optimization must not hold up a ready product batch. Reviewers inspect completed boundaries before the whole batch is finished. Native MySQL development feedback uses fresh isolated temporary databases with normal durability, so schema/environment failures are separated from application regressions before cloud acceptance.
 

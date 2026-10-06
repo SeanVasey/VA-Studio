@@ -63,7 +63,15 @@ PHP_TARGETS = {
         "tests/Feature/SharedInventoryMigrationTest.php", "tests/Feature/TestOrderFinalizationMigrationTest.php",
         "tests/Feature/TestPaymentEvidenceMigrationTest.php",
     ),
+    "customer": (
+        "tests/Feature/CustomerAccountAccessTest.php", "tests/Feature/CustomerAccountCommerceTest.php",
+        "tests/Feature/CustomerAccountConcurrencyTest.php", "tests/Feature/CustomerAccountMigrationTest.php",
+        "tests/Feature/CustomerSessionHttpTest.php", "tests/Feature/OwnedTestOrderHistoryTest.php",
+        "tests/Feature/TestOwnerDeliveryHttpTest.php", "tests/Feature/TestOwnerDeliveryProjectionTest.php",
+    ),
     "seller": (
+        "tests/Feature/ProductDraftTest.php", "tests/Feature/ProductDraftEditorTest.php",
+        "tests/Feature/ProductDraftMigrationTest.php", "tests/Feature/ProductDraftConcurrencyTest.php",
         "tests/Feature/CustomerInquiryHttpTest.php", "tests/Feature/CustomerInquiryMigrationTest.php",
         "tests/Feature/CustomerInquiryAdminTest.php", "tests/Feature/CustomerInquiryConcurrencyTest.php",
         "tests/Feature/PublicTrackEmbedTest.php", "tests/Feature/PublicTrackEmbedRouteCacheTest.php",
@@ -110,6 +118,7 @@ PHP_TARGETS = {
     ),
 }
 FRONTEND_TARGETS = (
+    "tests/frontend/customer-account.test.tsx",
     "tests/frontend/audio.test.tsx", "tests/frontend/catalog-pagination.test.tsx",
     "tests/frontend/catalog.test.ts", "tests/frontend/checkout-return.test.tsx",
     "tests/frontend/cms-navigation.test.tsx", "tests/frontend/editorial-content.test.tsx",
@@ -125,6 +134,7 @@ FRONTEND_TARGETS = (
     "tests/frontend/resumable-media-upload.test.ts",
 )
 BROWSER_TARGETS = (
+    "tests/browser/customer-account.spec.ts",
     "tests/browser/storefront.spec.ts", "tests/browser/operator.spec.ts",
     "tests/browser/test-checkout.spec.ts", "tests/browser/test-owner-delivery.spec.ts",
     "tests/browser/player-controls.spec.ts", "tests/browser/owned-order-history.spec.ts",

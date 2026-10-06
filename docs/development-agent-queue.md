@@ -2,7 +2,9 @@
 
 ## Full completion priority — October 5, 2026 (America/Chicago)
 
-Follow the [completion execution plan](completion-execution.md) for current parallel ownership, actual missing capabilities and acceptance cadence. Resumable private media plus admin controls, retained refund/dispute inspection, synthetic restartable catalog planning and measured CI acceleration are implemented together for integrated acceptance while [PR #5](https://github.com/SeanVasey/VA-Studio/pull/5) remains frozen for its own full acceptance. Account-first customer access/library and eight-way MySQL partitioning are already underway on separate branches. No author waits for unrelated MySQL checks before starting the next approved child. The earlier user-testing milestone below is bounded support work, not the completion target. Whole-parent acceptance counts remain six accepted and 34 open.
+Follow the [completion execution plan](completion-execution.md) for current parallel ownership, actual missing capabilities and acceptance cadence. Resumable private media plus admin controls, retained refund/dispute inspection and synthetic restartable catalog planning form the preceding completion batch. The next reviewed composition adds account-first test customer sign-in/library and private collection/album draft authoring with immutable versions. Measured CI/dependency corrections and observed browser fixes join through the lead's separate reviewed base. Full acceptance belongs to the resulting frozen candidate; [PR #5](https://github.com/SeanVasey/VA-Studio/pull/5) remains an earlier contained increment, not a separate completion target. No author waits for unrelated MySQL checks before starting the next approved child. Whole-parent counts remain six accepted and 34 open.
+
+Customer backend `96fd8d0`, interface `2ea42ea`, browser source `cd29d47` and collection/album source `5a11a923` have independent source reviews and focused local evidence. The [customer journey](verification/customer-account-test-journey.md) still needs native composed browser acceptance; production registration/claim/recovery is absent. The [product authoring journey](product-draft-authoring.md) is usable in Filament but does not implement public collection commerce. T27's private kit intake/profile and subsequent licensing/delivery remain required. Current integration owns exact method-level native registration, targeted composition checks and final source review; hosted acceptance is not inferred from these component results.
 
 ## User-testing batch — October 6, 2026
 
@@ -109,10 +111,10 @@ Dependencies below reproduce the CSV exactly. **I** = integration, **C** = CI ac
 | T20 | M | T10 T19 | Queued after T19: verified unpaid release and late-payment/resource races |
 | T21 | M | T10 T19 T20 | Queued after T20: refunds/disputes and explicit inventory/access effects |
 | T22 | M | T10 T12 T13 T19 T20 T21 | Queued: production policies/provider interoperability and commercial child workflows |
-| T23 | M | T10 T11 T12 | Queued: approved claim/recovery, anti-enumeration and takeover protection |
-| T24 | M | T11 T13 T23 | Queued: cross-order library/originals and large download/resume ownership |
+| T23 | M | T10 T11 T12 | Reviewed account-first test sign-in/current ownership implemented; production enrollment/claim/recovery remains open |
+| T24 | M | T11 T13 T23 | Reviewed cross-session test library and exact original-delivery journey composed; native browser and full library/recovery scope remain open |
 | T25 | H | T10 T13 | Queued: production archival/retention and hash-verified historical restore |
-| T26 | M | T10 T11 T15 T16 T17 T18 T22 T24 | Queued: collections/albums with frozen composition, license and fulfillment |
+| T26 | M | T10 T11 T15 T16 T17 T18 T22 T24 | Reviewed private collection/album authoring and immutable versions implemented; public licensing/checkout/delivery remains open |
 | T27 | M | T10 T11 T13 T15 T16 T17 T18 T22 T24 | Queued: kits/presets and safe exact purchased archives |
 | T28 | M | T10 T11 T15 T17 T22 T23 | Queued: service briefs/deposits/milestones/revisions/private delivery |
 | T29 | M | T10 T11 T17 T22 T23 | Queued: merch stock/shipping/provider fulfillment and returns |
