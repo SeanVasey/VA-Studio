@@ -22,6 +22,7 @@ import xml.etree.ElementTree as ET
 
 PHP_TARGETS = {
     "unit": (
+        "tests/Unit/CatalogDryRunTest.php", "tests/Unit/CatalogDryRunCommandTest.php",
         "tests/Unit/AllocateDiscountTest.php", "tests/Unit/CommerceGuardBytesTest.php", "tests/Unit/ContractTextTest.php",
         "tests/Unit/EconomicLicenseTermsTest.php", "tests/Unit/FileUploadPathGuardTest.php",
         "tests/Unit/MediaEvidenceValuesTest.php", "tests/Unit/MinorUnitsTest.php",
@@ -29,19 +30,28 @@ PHP_TARGETS = {
         "tests/Unit/PricingPolicyTest.php", "tests/Unit/PromotionPolicyTest.php",
         "tests/Unit/ScopedLicenseTermsTest.php", "tests/Unit/SiteImageGuardBytesTest.php",
         "tests/Unit/StripeCheckoutGatewayTest.php", "tests/Unit/StripePaymentGatewayTest.php",
+        "tests/Unit/StripeFinancialInspectionGatewayTest.php",
         "tests/Unit/TcpdfContractRendererTest.php", "tests/Unit/TypedLicenseTermsTest.php",
     ),
     "media": (
+        "tests/Feature/SoundKitUploadsTest.php", "tests/Feature/SoundKitUploadHttpTest.php",
+        "tests/Feature/SoundKitUploadMigrationTest.php", "tests/Feature/SoundKitUploadsConcurrencyTest.php",
+        "tests/Feature/SoundKitIntakeTest.php", "tests/Feature/SoundKitRecoveryTest.php",
+        "tests/Feature/SoundKitMigrationTest.php", "tests/Feature/SoundKitDraftAdminTest.php",
+        "tests/Feature/SoundKitConcurrencyTest.php",
         "tests/Unit/FileUploadPathGuardTest.php", "tests/Unit/MediaEvidenceValuesTest.php",
         "tests/Unit/SiteImageGuardBytesTest.php", "tests/Feature/InstallationReportTest.php",
         "tests/Feature/MalwareScannerTest.php", "tests/Feature/MediaProcessingTest.php",
         "tests/Feature/MediaWriterAuthorityTest.php", "tests/Feature/MediaWriterConcurrencyTest.php",
         "tests/Feature/MediaWorkerIdentityTest.php", "tests/Feature/MediaUploadCommitRecoveryTest.php",
+        "tests/Feature/ResumableMediaUploadsTest.php", "tests/Feature/ResumableMediaUploadsConcurrencyTest.php",
+        "tests/Feature/ResumableMediaUploadHttpTest.php",
         "tests/Feature/MediaWorkflowBudgetTest.php", "tests/Feature/PrivateMediaRevisionRootsTest.php",
         "tests/Feature/SiteImageLibraryTest.php", "tests/Feature/SiteImageHttpTest.php", "tests/Feature/StemsArchivePolicyTest.php",
         "tests/Feature/StemsArchiveTest.php",
     ),
     "commerce": (
+        "tests/Unit/StripeFinancialInspectionGatewayTest.php", "tests/Feature/TestPaymentFinancialObservationTest.php",
         "tests/Feature/TestPaymentExceptionOperationsTest.php", "tests/Feature/TestPaymentExceptionOperationsConcurrencyTest.php",
         "tests/Feature/CommerceAuditActorTest.php", "tests/Feature/CommerceAuditActorConcurrencyTest.php",
         "tests/Unit/AllocateDiscountTest.php", "tests/Unit/MinorUnitsTest.php",
@@ -58,7 +68,28 @@ PHP_TARGETS = {
         "tests/Feature/SharedInventoryMigrationTest.php", "tests/Feature/TestOrderFinalizationMigrationTest.php",
         "tests/Feature/TestPaymentEvidenceMigrationTest.php",
     ),
+    "financial": (
+        "tests/Feature/TestUnpaidReleaseTest.php", "tests/Feature/TestUnpaidReleaseMigrationTest.php",
+        "tests/Feature/TestUnpaidReleaseConcurrencyTest.php", "tests/Feature/TestUnpaidOrderResourceTest.php",
+        "tests/Feature/TestPaymentFinancialObservationTest.php", "tests/Feature/TestPaymentExceptionOperationsTest.php",
+        "tests/Feature/TestPaymentExceptionOperationsConcurrencyTest.php",
+        "tests/Feature/TestPaymentProcessingTest.php", "tests/Feature/TestOrderFinalizationTest.php",
+    ),
+    "customer": (
+        "tests/Feature/CustomerIdentityTest.php", "tests/Feature/CustomerIdentityHttpTest.php",
+        "tests/Feature/CustomerIdentityMigrationTest.php", "tests/Feature/CustomerIdentityConcurrencyTest.php",
+        "tests/Feature/CustomerAccountAccessTest.php", "tests/Feature/CustomerAccountCommerceTest.php",
+        "tests/Feature/CustomerAccountConcurrencyTest.php", "tests/Feature/CustomerAccountMigrationTest.php",
+        "tests/Feature/CustomerSessionHttpTest.php", "tests/Feature/OwnedTestOrderHistoryTest.php",
+        "tests/Feature/CustomerOrderReferenceTest.php",
+        "tests/Feature/TestOwnerDeliveryHttpTest.php", "tests/Feature/TestOwnerDeliveryProjectionTest.php",
+    ),
     "seller": (
+        "tests/Feature/InquiryConversationTest.php", "tests/Feature/InquiryConversationHttpTest.php",
+        "tests/Feature/InquiryConversationAdminTest.php", "tests/Feature/InquiryConversationConcurrencyTest.php",
+        "tests/Feature/InquiryMessageMigrationTest.php",
+        "tests/Feature/ProductDraftTest.php", "tests/Feature/ProductDraftEditorTest.php",
+        "tests/Feature/ProductDraftMigrationTest.php", "tests/Feature/ProductDraftConcurrencyTest.php",
         "tests/Feature/CustomerInquiryHttpTest.php", "tests/Feature/CustomerInquiryMigrationTest.php",
         "tests/Feature/CustomerInquiryAdminTest.php", "tests/Feature/CustomerInquiryConcurrencyTest.php",
         "tests/Feature/PublicTrackEmbedTest.php", "tests/Feature/PublicTrackEmbedRouteCacheTest.php",
@@ -105,6 +136,10 @@ PHP_TARGETS = {
     ),
 }
 FRONTEND_TARGETS = (
+    "tests/frontend/customer-identity.test.tsx", "tests/frontend/resumable-kit-upload.test.ts",
+    "tests/frontend/inquiry-conversation.test.tsx",
+    "tests/frontend/customer-account.test.tsx",
+    "tests/frontend/customer-order-reference.test.tsx",
     "tests/frontend/audio.test.tsx", "tests/frontend/catalog-pagination.test.tsx",
     "tests/frontend/catalog.test.ts", "tests/frontend/checkout-return.test.tsx",
     "tests/frontend/cms-navigation.test.tsx", "tests/frontend/editorial-content.test.tsx",
@@ -117,8 +152,14 @@ FRONTEND_TARGETS = (
     "tests/frontend/editorial-video.test.tsx", "tests/frontend/owned-order-history.test.tsx",
     "tests/frontend/contact-inquiry.test.tsx",
     "tests/frontend/editorial-related-tracks.test.tsx",
+    "tests/frontend/resumable-media-upload.test.ts",
 )
 BROWSER_TARGETS = (
+    "tests/browser/customer-identity.spec.ts", "tests/browser/resumable-kit-upload.spec.ts",
+    "tests/browser/test-unpaid-release.spec.ts",
+    "tests/browser/inquiry-conversation.spec.ts",
+    "tests/browser/customer-account.spec.ts",
+    "tests/browser/customer-order-reference.spec.ts",
     "tests/browser/storefront.spec.ts", "tests/browser/operator.spec.ts",
     "tests/browser/test-checkout.spec.ts", "tests/browser/test-owner-delivery.spec.ts",
     "tests/browser/player-controls.spec.ts", "tests/browser/owned-order-history.spec.ts",
@@ -131,6 +172,7 @@ BROWSER_TARGETS = (
     "tests/browser/private-track-review.spec.ts",
     "tests/browser/track-publication-guard.spec.ts",
     "tests/browser/editorial-content.spec.ts", "tests/browser/site-content.spec.ts", "tests/browser/site-schedule.spec.ts",
+    "tests/browser/resumable-media-upload.spec.ts",
 )
 SUITES = (*PHP_TARGETS, "frontend", "browser")
 ENGINES = ("sqlite", "mysql")
@@ -336,4 +378,3 @@ if __name__ == "__main__":
     except (FocusedError, OSError, ET.ParseError) as error:
         print("Focused selection failed: " + str(error), file=sys.stderr)
         raise SystemExit(1)
-

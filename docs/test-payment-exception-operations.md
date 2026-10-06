@@ -2,6 +2,8 @@
 
 T19-OPS-01 is a bounded continuation of [retained exception inspection](test-payment-exception-inspection.md). It adds operator acknowledgments and leased, own-account test-payment observations. **It does not resolve a financial exception. T19 and WP-07 remain open.** The original `paid_exception` record remains terminal, its inventory/promotion resources remain pending, and fulfillment remains blocked.
 
+Current extension: [T19-FINANCIAL-OBS-01](test-payment-financial-observation.md) adds bounded Charge/refund/dispute GET observations to newly confirmed checks. Its additional response contract, immutable sidecar and explicit incomplete/unavailable states supersede this original increment's `not_inspected` limit. Old history remains unchanged, and financial resolution and resource effects remain blocked.
+
 The protected test-payment exception list now exposes four named actions: the existing historical graph inspection, operational history, recording `acknowledged` or `needs_review`, and checking the original payment's current test status. It still denies ordinary model create/update/delete/detail abilities and every bulk action. An acknowledgment is not an approval to fulfill, refund or release resources.
 
 ## Review and append contract
@@ -14,11 +16,11 @@ The Filament modal captures its request UUID and expected sequence when opened. 
 
 ## Leased current observation
 
-The explicit check commits a `reconciliation_requested` event and a 120-second UUID claim before calling the existing `VerifyTestPayment::inspect` path. Account, Checkout Session and PaymentIntent retrieval happen outside all database transactions. It only uses the existing GET interface; it never calls `VerifyTestPayment::commit`, payment creation/capture/refund, finalization or fulfillment dispatch.
+The explicit check commits a `reconciliation_requested` event and a 120-second UUID claim before calling the existing `VerifyTestPayment::inspect` path. Account, Checkout Session and PaymentIntent retrieval happen outside all database transactions. The original increment uses the existing GET interface; the linked financial-observation extension adds a separate GET-only interface under the same claim. Neither calls `VerifyTestPayment::commit`, payment creation/capture/refund, finalization or fulfillment dispatch.
 
 The result transaction rechecks current operator authority, configured account/processing policy, immutable original intent/payment identity and exact claim token/expiry. A completed request replays its existing result without I/O. An active claim reports busy. An expired request may be reclaimed only while its request event remains the current sequence; a later disposition prevents it from returning to the front of the queue. A replaced or expired worker appends nothing.
 
-Only a minimized observation (`confirmed`, `pending`, `authorized`, `expired`, `canceled`, `attention` or `unavailable`) is appended. Even `confirmed` leaves the original exception and blocked fulfillment unchanged. Refund and dispute state explicitly remains `not_inspected`; the PaymentIntent's successful status is not proof that no refund or dispute exists. Corrupt or conflicting provider evidence cannot establish a financial resolution. Provider fixtures used in automated tests do not establish actual account interoperability.
+Only a minimized payment observation (`confirmed`, `pending`, `authorized`, `expired`, `canceled`, `attention` or `unavailable`) is appended. Even `confirmed` leaves the original exception and blocked fulfillment unchanged. In this original increment, refund and dispute state remains `not_inspected`; new checks follow the linked financial-observation contract. The PaymentIntent's successful status is not proof that no refund or dispute exists. Corrupt or conflicting provider evidence cannot establish a financial resolution. Provider fixtures used in automated tests do not establish actual account interoperability.
 
 ## Verification and limits
 

@@ -13,7 +13,6 @@ use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use App\Domain\Commerce\QuoteException;
 use App\Domain\Commerce\PriceQuote;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +23,7 @@ use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Tests\Support\CheckoutFixtures as F;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InventoryFixtures;
 use Tests\Support\OrderFixtures;
 use Tests\Support\PricingFixtures;
@@ -32,7 +32,7 @@ use Tests\TestCase;
 class HostedCheckoutTest extends TestCase
 {
     // Provider I/O must have no enclosing transaction, including one introduced by the test harness.
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     private StripeCheckoutGateway $gateway;
 

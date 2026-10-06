@@ -55,7 +55,7 @@ function TrackRow({ track, index, onLicense, onShare, designPreview, purchasingD
   </article>;
 }
 
-export default function Storefront({ tracks = EMPTY_TRACKS, licenseTiers = [], selectedTrackSlug, selectedTrack, catalogPage, designPreview = false, sitePreview = false, sitePreviewBase = null, siteContent = defaultSiteContent, siteImages = builtInSiteImages, testOrderPreparationEnabled = false, testCheckoutEnabled = false, metadata }: StorefrontProps) {
+export default function Storefront({ tracks = EMPTY_TRACKS, licenseTiers = [], selectedTrackSlug, selectedTrack, catalogPage, designPreview = false, sitePreview = false, sitePreviewBase = null, siteContent = defaultSiteContent, siteImages = builtInSiteImages, testOrderPreparationEnabled = false, testCheckoutEnabled = false, customerAccountEnabled = false, metadata }: StorefrontProps) {
   const [query, setQuery] = useState(catalogPage?.filters.q ?? '');
   const [genre, setGenre] = useState(catalogPage?.filters.genre || 'All sounds');
   const [sort, setSort] = useState<CatalogFilters['sort']>(catalogPage?.filters.sort ?? 'featured');
@@ -161,7 +161,7 @@ export default function Storefront({ tracks = EMPTY_TRACKS, licenseTiers = [], s
     <a className="skip-link" href="#main">Skip to content</a>
     {designPreview && <div className="preview-banner">DEVELOPMENT PREVIEW <span>Sample catalog for design review. No purchases or licenses are issued.</span></div>}
     {sitePreview && <div className="preview-banner">PRIVATE CONTENT PREVIEW <span>Visible only to staff. Purchasing is disabled.</span></div>}
-    <SiteHeader content={siteContent} homeHref={navigationHref('/')} href={navigationHref} onNavigate={navigateContent}>{!sitePreview && <button className="cart-toggle" aria-label={`Open cart, ${selections.length} ${selections.length === 1 ? 'item' : 'items'}`} onClick={() => { setCartOpen(true); setCheckoutStatus(''); }}><Icon name="bag" size={19} /><span className="cart-text">Cart</span><span className="cart-count">{String(selections.length).padStart(2, '0')}</span></button>}</SiteHeader>
+    <SiteHeader customerAccountEnabled={customerAccountEnabled && !designPreview && !sitePreview} content={siteContent} homeHref={navigationHref('/')} href={navigationHref} onNavigate={navigateContent}>{!sitePreview && <button className="cart-toggle" aria-label={`Open cart, ${selections.length} ${selections.length === 1 ? 'item' : 'items'}`} onClick={() => { setCartOpen(true); setCheckoutStatus(''); }}><Icon name="bag" size={19} /><span className="cart-text">Cart</span><span className="cart-count">{String(selections.length).padStart(2, '0')}</span></button>}</SiteHeader>
     <main id="main">
       {selectedTrack ? <TrackDetail track={selectedTrack} tiers={knownTiers} catalogUrl={"/" + querySuffix} onNavigate={event => navigate(event, designPreview || sitePreview)} onLicense={openLicense} onShare={share} /> : <>
       <section className="hero" aria-labelledby="hero-title">

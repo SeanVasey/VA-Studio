@@ -2,11 +2,13 @@
 """Adversarial tests for current-run database receipts and permanently full shadow mode."""
 
 from copy import deepcopy
+from contextlib import redirect_stderr
 from datetime import datetime, timedelta, timezone
 import importlib.util
 import io
 import json
 from pathlib import Path
+import re
 import subprocess
 import tempfile
 import unittest
@@ -35,7 +37,7 @@ def listing(rows):
     return ET.tostring(root)
 
 
-ROWS = [("Tests\\Feature\\Synthetic" + str(index) + "Test", f"tests/Feature/Synthetic{index}Test.php", "test_retained", None) for index in range(4)]
+ROWS = [("Tests\\Feature\\Synthetic" + str(index) + "Test", f"tests/Feature/Synthetic{index}Test.php", "test_retained", None) for index in range(8)]
 ROWS.append((SKIP[0], "tests/Feature/SyntheticMysqlTest.php", SKIP[1], "lock & \"quoted\"\nlabel"))
 
 
@@ -77,9 +79,9 @@ def runtime(engine):
             "database": database, "dependencies": {"package_count": 1, "installed_identity_sha256": H, "composer_lock_sha256": H}}
 
 
-def evidence(engine, shard, alternate=False):
+def evidence(engine, shard, alternate=False, *, count=None):
     prefix = "phpunit-ci-" + engine
-    count = receipt.COUNTS[engine]
+    count = receipt.COUNTS[engine] if count is None else count
     assignments = [ROWS[index::count] for index in range(count)]
     if alternate:
         assignments = assignments[1:] + assignments[:1]
@@ -105,7 +107,7 @@ def evidence(engine, shard, alternate=False):
     value = {"schema_version": 1, "purpose": "database-job-receipt-not-acceptance", "engine": engine, "shard": shard,
              "source": source(), "runtime": runtime(engine), "runtime_sha256": receipt.digest(receipt.canonical(runtime(engine))),
              "test_step_outcome": "success", "started_at": initial["started_at"], "finished_at": (now - timedelta(seconds=5)).isoformat(),
-             **receipt.database_evidence(files, source(), engine, shard, {SKIP})}
+             **receipt.database_evidence(files, source(), engine, shard, {SKIP}, shard_count=count)}
     files[f"{prefix}-{shard}-receipt.json"] = receipt.canonical(value)
     return files
 
@@ -197,7 +199,7 @@ class ParsingTests(unittest.TestCase):
         with self.assertRaises(receipt.ReceiptError):
             receipt.junit(results(ROWS), expected, ROOT, "sqlite", {SKIP})
         with self.assertRaises(receipt.ReceiptError):
-            receipt.database_evidence(evidence("mysql", 1), source(), "mysql", 1, {SKIP, ("RemovedTest", "test_removed")})
+            receipt.database_evidence(evidence("mysql", 1), source(), "mysql", 1, {SKIP, ("RemovedTest", "test_removed")}, shard_count=receipt.COUNTS["mysql"])
 
     def test_dtd_entities_duplicate_json_and_nonfinite_json_reject(self):
         for raw in (b'<!DOCTYPE a [<!ENTITY x "secret">]><a>&x;</a>', b'<!ENTITY x "secret"><a/>', '<!DOCTYPE a [<!ENTITY x "secret">]><a>&x;</a>'.encode('utf-16')):
@@ -240,13 +242,71 @@ class CollectorTests(unittest.TestCase):
                 patch.object(receipt, "validate_discovered_files"), patch.object(receipt, "locked_dependencies", return_value=({}, runtime("mysql")["dependencies"])):
             return receipt.collect(Path(ROOT), {}, api)
 
-    def test_six_complete_current_attempt_receipts_remain_full_and_outer_pending(self):
+    def test_ten_complete_current_attempt_receipts_remain_full_and_outer_pending(self):
         value = self.collect(FakeGithub())
-        self.assertEqual(6, len(value["database_receipts"]))
+        self.assertEqual(10, len(value["database_receipts"]))
+        self.assertEqual({"mysql": 8, "sqlite": 2}, receipt.COUNTS)
+        self.assertEqual(len(ROWS), sum(row["results"]["executed_cases"] for row in value["database_receipts"] if row["engine"] == "mysql"))
         self.assertEqual("full", value["shadow"]["execution_mode"])
         self.assertFalse(value["shadow"]["reuse_enabled"])
         self.assertIn("pending", value["outer_acceptance"])
         self.assertEqual("unknown", value["shadow"]["prior_full_acceptance"])
+
+    def test_four_shard_or_incomplete_eight_shard_jobs_cannot_satisfy_the_gate(self):
+        for mutation in ("only_four", "missing_five", "missing_eight", "duplicate_eight", "old_denominator"):
+            api = FakeGithub()
+            if mutation == "only_four":
+                api.jobs = [job for job in api.jobs if job["name"] not in {f"backend-mysql ({n}/8)" for n in range(5, 9)}]
+            elif mutation.startswith("missing_"):
+                missing = 5 if mutation == "missing_five" else 8
+                api.jobs = [job for job in api.jobs if job["name"] != f"backend-mysql ({missing}/8)"]
+            elif mutation == "duplicate_eight":
+                duplicate = deepcopy(next(job for job in api.jobs if job["name"] == "backend-mysql (8/8)"))
+                duplicate["id"] = 99
+                api.jobs.append(duplicate)
+            else:
+                for job in api.jobs:
+                    job["name"] = job["name"].replace("/8)", "/4)")
+            with self.subTest(mutation=mutation), self.assertRaisesRegex(receipt.ReceiptError, "required database job"):
+                self.collect(api)
+
+    def test_old_four_shard_archives_and_mixed_manifest_cardinality_reject(self):
+        for mutation in ("old_archive", "short_manifest"):
+            api = FakeGithub()
+            files = evidence("mysql", 1, count=4 if mutation == "old_archive" else 8)
+            if mutation == "short_manifest":
+                name = "phpunit-ci-mysql-manifest.json"
+                manifest = json.loads(files[name]); manifest["shards"] = manifest["shards"][:4]
+                files[name] = receipt.canonical(manifest)
+                final_name = "phpunit-ci-mysql-1-receipt.json"
+                final = json.loads(files.pop(final_name))
+                final["file_sha256"] = {name: receipt.digest(raw) for name, raw in files.items()}
+                files[final_name] = receipt.canonical(final)
+            api.replace(1, files)
+            with self.subTest(mutation=mutation), self.assertRaises(receipt.ReceiptError):
+                self.collect(api)
+
+    def test_successful_late_shard_jobs_still_require_one_exact_artifact_each(self):
+        for shard in (5, 8):
+            for mutation in ("missing", "duplicate"):
+                api = FakeGithub()
+                name = f"backend-mysql-{shard}-123-1"
+                artifact = next(row for row in api.artifacts if row["name"] == name)
+                if mutation == "missing":
+                    api.artifacts.remove(artifact)
+                else:
+                    api.artifacts.append(deepcopy(artifact) | {"id": 99})
+                with self.subTest(shard=shard, mutation=mutation), self.assertRaisesRegex(receipt.ReceiptError, "required database artifact"):
+                    self.collect(api)
+
+    def test_unknown_ninth_shard_rejects_before_any_source_or_runtime_probe(self):
+        with patch("sys.argv", ["database-receipts.py", "start", "--engine=mysql", "--shard=9"]), \
+                patch.object(receipt, "source_identity") as source_probe, patch.object(receipt, "runtime_identity") as runtime_probe, \
+                redirect_stderr(io.StringIO()) as output:
+            self.assertEqual(1, receipt.main())
+        source_probe.assert_not_called()
+        runtime_probe.assert_not_called()
+        self.assertIn("Unknown database shard", output.getvalue())
 
     def reject_runtime(self, engine, observed, message):
         # Keep the start/final receipts and all hashes consistent so rejection
@@ -263,7 +323,7 @@ class CollectorTests(unittest.TestCase):
         value["runtime_sha256"] = receipt.digest(receipt.canonical(observed))
         value["file_sha256"] = {name: receipt.digest(raw) for name, raw in files.items()}
         files[final_name] = receipt.canonical(value)
-        api.replace(1 if engine == "mysql" else 5, files)
+        api.replace(next(item["id"] for item in api.artifacts if item["name"] == f"backend-{engine}-1-123-1"), files)
         with self.assertRaisesRegex(receipt.ReceiptError, message):
             self.collect(api)
 
@@ -443,10 +503,20 @@ class SyntheticEnvironmentTests(unittest.TestCase):
 
 
 class WorkflowTests(unittest.TestCase):
+    def test_each_workflow_matrix_name_and_discovery_count_matches_committed_provider_policy(self):
+        workflow = (Path(__file__).parents[2] / ".github/workflows/ci.yml").read_text()
+        for engine, count in receipt.COUNTS.items():
+            block = re.split(r"(?m)^  [a-z][a-z-]+:\n", workflow.split(f"  backend-{engine}:\n", 1)[1], maxsplit=1)[0]
+            self.assertIn(f"name: backend-{engine} (${{{{ matrix.shard }}}}/{count})", block)
+            self.assertIn("shard: [" + ", ".join(map(str, range(1, count + 1))) + "]", block)
+            self.assertIn(f"--shards={count} --prefix=phpunit-ci-{engine}", block)
+            self.assertIn("fail-fast: false", block)
+        self.assertIn("Verify all ten current-run database receipts without enabling reuse", workflow)
+
     def test_workflow_preserves_runtime_conditions_matrices_events_and_no_reuse_output(self):
         workflow = (Path(__file__).parents[2] / ".github/workflows/ci.yml").read_text()
         self.assertEqual(6, workflow.count("if: needs.scope.outputs.mode != 'docs'"))
-        for retained in ("branches: [main]", "pull_request:", "workflow_dispatch:", "shard: [1, 2, 3, 4]", "shard: [1, 2]",
+        for retained in ("branches: [main]", "pull_request:", "workflow_dispatch:", "shard: [1, 2, 3, 4, 5, 6, 7, 8]", "shard: [1, 2]",
                          "--fail-on-phpunit-warning --display-warnings", "npm audit --audit-level=high", "npm run test:browser",
                          "needs: [scope, documentation, backend-quality, backend-mysql, backend-sqlite, frontend, operator-browser, related-browser]",
                          "  related-browser:", "run: bash tests/browser/install-related-scanner.sh", "run: node tests/browser/run-related.mjs"):

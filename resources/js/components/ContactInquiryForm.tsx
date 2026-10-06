@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
+import { InquiryConversation, InquiryConversationEntry } from './InquiryConversation';
 import '../../css/contact-inquiry.css';
 
 type Fields = { name: string; email: string; subject: string; message: string; website: string };
@@ -31,6 +32,7 @@ export function ContactInquiryForm({ privacyNotice, noticeToken }: { privacyNoti
   const [fields, setFields] = useState<Fields>({ ...empty });
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<Status>({ kind: 'editing' });
+  const [conversationReceipt, setConversationReceipt] = useState<string | null>(null);
   const [rejectedNoticeToken, setRejectedNoticeToken] = useState<string | null>(null);
   const attempt = useRef<Attempt | null>(null);
   const inFlight = useRef(false);
@@ -158,15 +160,20 @@ export function ContactInquiryForm({ privacyNotice, noticeToken }: { privacyNoti
 
   if (!attempt.current && (!privacyNotice.trim() || !isNoticeToken(noticeToken))) return null;
 
+  if (conversationReceipt) return <InquiryConversation key={conversationReceipt} receipt={conversationReceipt} onClose={() => {
+    setConversationReceipt(null); window.requestAnimationFrame(() => summary.current?.focus());
+  }} />;
+
   if (status.kind === 'saved') return <section className="contact-inquiry" aria-label="Contact inquiry">
     <div className="contact-inquiry-summary" role="status" tabIndex={-1} ref={summary}>
       <h2>Inquiry saved</h2><p>Your inquiry was saved privately for VASEY.AUDIO.</p>
       <p className="contact-inquiry-receipt">Receipt <code>{status.receipt}</code></p>
     </div>
-    <button type="button" className="button button-outline" onClick={() => { setStatus({ kind: 'editing' }); window.requestAnimationFrame(() => nameInput.current?.focus()); }}>Write another inquiry</button>
+    <div className="contact-inquiry-actions"><button type="button" className="button" onClick={() => setConversationReceipt(status.receipt)}>Read replies and follow up</button>
+      <button type="button" className="button button-outline" onClick={() => { setStatus({ kind: 'editing' }); window.requestAnimationFrame(() => nameInput.current?.focus()); }}>Write another inquiry</button></div>
   </section>;
 
-  return <section className="contact-inquiry" aria-labelledby={`${prefix}-title`}>
+  return <><section className="contact-inquiry" aria-labelledby={`${prefix}-title`}>
     <div className="contact-inquiry-heading"><h2 id={`${prefix}-title`}>Send an inquiry</h2><p>Your inquiry will be saved privately for VASEY.AUDIO.</p></div>
     <p className="contact-inquiry-privacy" id={`${prefix}-privacy`}>{displayedNotice}</p>
     <form noValidate onSubmit={submit} aria-describedby={`${prefix}-privacy`}>
@@ -196,5 +203,5 @@ export function ContactInquiryForm({ privacyNotice, noticeToken }: { privacyNoti
         {locked && !sending && <p>The original fields are read-only while this inquiry is unconfirmed.</p>}
       </div>
     </form>
-  </section>;
+  </section><InquiryConversationEntry /></>;
 }

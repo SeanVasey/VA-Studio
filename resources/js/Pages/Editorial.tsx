@@ -5,6 +5,7 @@ import { MetadataHead } from '../components/MetadataHead';
 import { PersistentPlayer } from '../components/PersistentPlayer';
 import { EditorialVideo } from '../components/EditorialVideo';
 import { ContactInquiryForm } from '../components/ContactInquiryForm';
+import { InquiryConversationEntry } from '../components/InquiryConversation';
 import { SiteFooter, SiteHeader } from '../components/SiteChrome';
 import { siteContentHref, type EditorialDescriptor, type SiteContent } from '../lib/site-content';
 import type { PageMetadata } from '../lib/catalog';
@@ -43,6 +44,7 @@ export default function Editorial({ siteContent, editorial, sitePreview = false,
         <span className="editorial-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><div><h2><a href={href(entry.path)} onClick={navigate}>{entry.title}</a></h2><p>{entry.description}</p><a className="text-link" href={href(entry.path)} onClick={navigate} aria-label={`${editorial.section === 'blog' ? 'Read' : 'View'} ${entry.title}`}>{editorial.section === 'blog' ? 'Read article' : 'View video'} <Icon name="arrow" size={16} /></a></div>
       </article>)}</div>}
       {!sitePreview && editorial.section === 'contact' && contactInquiryEnabled && contactInquiryPrivacyNotice && contactInquiryNoticeToken && <ContactInquiryForm privacyNotice={contactInquiryPrivacyNotice} noticeToken={contactInquiryNoticeToken} />}
+      {!sitePreview && editorial.section === 'contact' && !(contactInquiryEnabled && contactInquiryPrivacyNotice && contactInquiryNoticeToken) && <InquiryConversationEntry />}
       {editorial.email && <div className="editorial-contact"><p className="eyebrow">Email</p><p>{editorial.email}</p>{!sitePreview && editorial.contactHref ? <a className="button" href={editorial.contactHref}>Open email <Icon name="northeast" size={18} /></a> : <span className="fine-print">Email action disabled in private preview.</span>}</div>}
       {editorial.video && <EditorialVideo key={`${editorial.path}:${editorial.video.provider}:${editorial.video.videoId}:${sitePreview}`} video={editorial.video} title={editorial.title} privatePreview={sitePreview} />}
       {editorial.kind === 'entry' && editorial.relatedTracks && editorial.relatedTracks.length > 0 && <section aria-labelledby="related-tracks-title">

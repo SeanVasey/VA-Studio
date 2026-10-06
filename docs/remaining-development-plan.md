@@ -1,6 +1,10 @@
 # Remaining development and completion plan
 
-## Current GitHub execution — October 2, 2026
+## Completion priority — October 5, 2026
+
+Sean's current instruction prioritizes the complete website and reduced serial waiting. The [completion execution plan](completion-execution.md) reconciles actual code with remaining scope, assigns parallel media/admin/commerce/CI work and sets a continuous acceptance cadence. The GitHub handoff merged as `1095dd5` with all thirteen applicable PR and post-merge checks passing; the historical execution sections below retain their original context. PR #5 provides bounded user-testing entry points while the next product batch is developed. A preview is not the product completion target, and no remaining product family or migration obligation is removed.
+
+## Preserved GitHub execution — October 2, 2026
 
 Sean directed the GitLab-to-GitHub handoff to [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio). The integration branch is `codex/github-handoff-20261002`; [the handoff record](verification/github-handoff-20261002.md) preserves source identities, CI corrections and the acceptance boundary. The shared writer foundation and four follow-on lanes are composed for one full GitHub candidate. Fresh acceptance and independent integration review remain prerequisites for merge. All 40 completion groups and source obligations retain their criteria; migration of development hosting does not change launch readiness.
 
@@ -178,4 +182,3 @@ Top risks: unknown active obligations (high impact; resolve T09 early), policy/p
 - Historical baseline: [PR #87 main](https://github.com/VASEYDEV/VASEYAUDIO/commit/8be3bd7271595f2c21a3c5017b3b19ceb821a842), [PR #87](https://github.com/VASEYDEV/VASEYAUDIO/pull/87), [CI 36795680362](https://github.com/VASEYDEV/VASEYAUDIO/actions/runs/36795680362).
 - [Ordered record](development-order.md), [work packages](work-packages/README.md), [decision register](architecture/decision-register.md), [migration/parity controls](migration/README.md), [brand sources](brand/README.md).
 - This plan changes documentation only. Proposed automation behavior requires a tested implementation before adoption; no live migration, production payment activation or cutover is performed here.
-

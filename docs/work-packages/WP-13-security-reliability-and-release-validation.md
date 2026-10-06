@@ -34,6 +34,8 @@ Threat/control review plus actual admin MFA and customer isolation tests, follow
 
 ## Verification
 
+The October 6 [private alpha](../private-alpha.md) increment adds an isolated loopback installation for real admin practice: fresh temporary environment/cache/storage/database, random per-run credentials, synthetic private drafts, disabled external effects and bounded process cleanup. Required CI executes its native PHP/SQLite bootstrap and HTTP cases with `PRIVATE_ALPHA_REQUIRE_PHP=1`; missing prerequisites fail that check. This is a bounded setup/control child, not production MFA/recovery, deployment, backup-restore or provider acceptance. Actual counts, independent exact-source review and final integration disposition belong to the integrating PR.
+
 Run only meaningful required gates and tests resolving concrete risk. Include independent review of commerce/security changes and inspect actual staging flows. Record exact commit, environment and results. A checklist or unexecuted test definition is not completion evidence.
 
 ## Rollback and boundaries

@@ -51,6 +51,10 @@ The candidate adds desktop Chromium/mobile WebKit scenarios for real Inertia nav
 
 ## Verification approach
 
+### October 6 user-testing increment
+
+The [testing guide](../user-testing.md) exposes the existing real storefront through isolated empty/sample/detail views and a protected static deployment. It adds no production route, domain rule, media or license terms. The four-file preview increment passed focused tests and independent source review; the composed frontend passed 368 tests, both builds and client scans. Desktop deployed-browser checks cover navigation, search/genre filtering, license selection, cart and keyboard dialog dismissal. Mobile/physical-device playback and broader experience acceptance remain open. Final integration acceptance belongs to the exact integrating PR, not the deployment's availability.
+
 Frontend type/build checks plus browser scenarios for navigation/playback/error state at desktop and mobile widths; inspect active-theme token usage and accessibility. Record exact commit, environment and results. A checklist or unexecuted test definition is not completion evidence.
 
 ## Rollback and boundaries

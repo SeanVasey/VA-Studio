@@ -11,7 +11,7 @@ on:
         required: true
         type: choice
         default: unit
-        options: [unit, media, commerce, operator, publication, track-concurrency, seller, frontend, browser]
+        options: [unit, media, commerce, financial, customer, operator, publication, track-concurrency, seller, frontend, browser]
       engine:
         description: PHP database engine; frontend/browser require sqlite
         required: true
@@ -173,6 +173,8 @@ jobs:
           tools: composer:v2
       - name: Verify bounded PHP test capabilities
         run: php scripts/ci/verify-php-test-runtime.php
+      - name: Install genuine scanner and current official signatures for customer delivery fixtures
+        run: bash tests/browser/install-related-scanner.sh
       - run: composer install --no-interaction --prefer-dist
       - run: npm ci
       - run: npm run build

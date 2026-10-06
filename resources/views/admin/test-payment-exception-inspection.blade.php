@@ -8,8 +8,8 @@
             <div><dt class="font-semibold">Confirmation observed (UTC)</dt><dd>{{ $detail['confirmedAt'] }}</dd></div>
             <div><dt class="font-semibold">Original eligibility cutoff (UTC)</dt><dd>{{ $detail['eligibilityCutoff'] }}</dd></div>
             <div><dt class="font-semibold">Finalization recorded (UTC)</dt><dd>{{ $detail['finalizedAt'] }}</dd></div>
-            <div><dt class="font-semibold">Retained inventory</dt><dd>Pending</dd></div>
-            <div><dt class="font-semibold">Retained promotion</dt><dd>{{ $detail['promotionState'] === 'pending' ? 'Pending' : 'No promotion' }}</dd></div>
+            <div><dt class="font-semibold">Retained inventory</dt><dd>{{ $detail['inventoryState'] === 'released' ? 'Released' : 'Pending' }}</dd></div>
+            <div><dt class="font-semibold">Retained promotion</dt><dd>{{ match ($detail['promotionState']) { 'pending' => 'Pending', 'released' => 'Released', default => 'No promotion' } }}</dd></div>
             <div><dt class="font-semibold">Retained rights effects</dt><dd>{{ $detail['grantCount'] }} grants · {{ $detail['exclusiveSaleCount'] }} exclusive sales</dd></div>
             <div><dt class="font-semibold">Retained exception event</dt><dd>{{ $detail['outboxCount'] }} pending event</dd></div>
         </dl>

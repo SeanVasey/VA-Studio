@@ -34,7 +34,7 @@ final class TestPaymentExceptionResource extends ReadOnlyCommerceResource
 
     public static function table(Table $table): Table
     {
-        return $table->description('Retained test-payment exceptions. Operational acknowledgments and current payment checks preserve blocked fulfillment and pending resources; they do not resolve or refund the payment.')
+        return $table->description('Retained test-payment exceptions. Operational acknowledgments and current payment checks preserve blocked fulfillment and the recorded resource disposition; they do not resolve or refund the payment.')
             ->columns([
                 TextColumn::make('order_public_id')->label('Order')->searchable(['o.public_id'])->copyable(),
                 TextColumn::make('public_id')->label('Finalization')->copyable(),
@@ -74,7 +74,7 @@ final class TestPaymentExceptionResource extends ReadOnlyCommerceResource
                         Notification::make()->title('Operational status recorded')->body('Fulfillment remains blocked. History entry '.$result['sequence'].'.')->success()->send();
                     }),
                 Action::make('reconcilePayment')->label('Check current test payment')->modalHeading('Check current test payment')
-                    ->modalDescription('Retrieve this original payment from the configured test account. This does not inspect refunds or disputes, change the exception, release resources or issue rights.')
+                    ->modalDescription('Retrieve this original payment and bounded refund/dispute observations from the configured test account. Incomplete or unavailable observations remain unresolved. This does not change the exception, release resources, refund money or issue rights.')
                     ->fillForm(fn (OrderFinalization $record): array => self::reviewFields($record))
                     ->schema([Hidden::make('sequence')->required()->rules(['integer', 'min:0']),
                         Hidden::make('request_id')->required()->rules(['uuid'])])
@@ -86,7 +86,7 @@ final class TestPaymentExceptionResource extends ReadOnlyCommerceResource
                             Notification::make()->title('Test payment check was not confirmed')->body('Retry this request or close the dialog and review the current history before submitting again.')->danger()->send();
                             $action->halt();
                         }
-                        Notification::make()->title('Test payment check')->body('Result: '.($result['outcome'] ?? $result['status']).'. Fulfillment remains blocked.')->send();
+                        Notification::make()->title('Test payment check')->body('Payment: '.($result['outcome'] ?? $result['status']).'. Refund/dispute observation: '.str_replace('_', ' ', $result['refundDisputeState'] ?? 'not_inspected').'. Fulfillment remains blocked.')->send();
                     }),
             ])->toolbarActions([])
             ->emptyStateHeading('No matching test payment exceptions')

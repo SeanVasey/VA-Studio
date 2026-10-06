@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
+use App\Domain\Commerce\Payments\StripeFinancialInspectionGateway;
 use App\Domain\Commerce\Payments\StripePaymentGateway;
 use App\Domain\Commerce\Payments\StripeSdkCheckoutGateway;
 use App\Domain\Contracts\ContractRenderer;
@@ -29,6 +30,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(StripeCheckoutGateway::class,
             StripeSdkCheckoutGateway::class);
         $this->app->bind(StripePaymentGateway::class,
+            StripeSdkCheckoutGateway::class);
+        $this->app->bind(StripeFinancialInspectionGateway::class,
             StripeSdkCheckoutGateway::class);
     }
 

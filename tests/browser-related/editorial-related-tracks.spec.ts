@@ -429,7 +429,8 @@ async function reviewedPublication(page: Page, browser: Browser, visitor: APIReq
 }
 
 test('ordinary editorial associations and reviewed publication preserve current evidence and first-party destinations', async ({ page, context, playwright, browserName, browser }, testInfo) => {
-  test.setTimeout(150_000);
+  // The complete editorial/private-review/publication journey and awaited cleanup take about 152s on hosted WebKit.
+  test.setTimeout(180_000);
   const manifest = loadManifest();
   const fixture = manifest.projects[testInfo.project.name];
   expect(fixture.tracks).toHaveLength(2);

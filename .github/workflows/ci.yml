@@ -59,6 +59,10 @@ jobs:
       - run: npm run build
       - name: Scan the built client bundle for server secrets
         run: python3 scripts/ci/scan-client-bundle.py
+      - name: Build the isolated storefront preview
+        run: npm run build:preview
+      - name: Scan the preview bundle for server secrets
+        run: python3 scripts/ci/scan-client-bundle.py dist/design-preview
       - run: npm audit --audit-level=high
 
   backend-quality:
@@ -68,6 +72,9 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
       - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
         with:
           php-version: '8.4'
@@ -78,6 +85,10 @@ jobs:
       - name: Verify bounded PHP test capabilities
         run: php scripts/ci/verify-php-test-runtime.php
       - run: composer install --no-interaction --prefer-dist
+      - name: Verify isolated private alpha startup and recovery
+        env:
+          PRIVATE_ALPHA_REQUIRE_PHP: '1'
+        run: node --test scripts/dev/private-alpha.test.mjs
       - run: composer validate --strict
       - run: vendor/bin/pint --version
       - name: Verify the current rights-writer formatting boundary
@@ -94,18 +105,19 @@ jobs:
           python3 scripts/ci/test-gitlab-writer-feedback.py
           python3 scripts/ci/test-php-test-runtime.py
           python3 scripts/dev/test-bootstrap-macos.py
+          python3 scripts/test-publish-github.py
 
   backend-mysql:
     needs: scope
     if: needs.scope.outputs.mode != 'docs'
-    name: backend-mysql (${{ matrix.shard }}/4)
+    name: backend-mysql (${{ matrix.shard }}/8)
     runs-on: ubuntu-latest
     # A shard takes 22 to 38 minutes and has taken 57 on a slow runner. A hung test must not hold a runner for the 6-hour default.
     timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
     services:
       mysql:
         image: mysql:8.4
@@ -158,7 +170,7 @@ jobs:
           MYSQL_CONTAINER_ID: ${{ job.services.mysql.id }}
         run: python3 scripts/ci/database-receipts.py start --engine=mysql --shard=${{ matrix.shard }}
       - name: Prove the complete MySQL test partition
-        run: python3 scripts/ci/phpunit-shards.py --shards=4 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json
+        run: python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json
       - name: Run all tests assigned to this MySQL shard
         id: database_tests
         run: php vendor/bin/phpunit --configuration=phpunit-ci-mysql-${{ matrix.shard }}.xml --log-junit=phpunit-ci-mysql-${{ matrix.shard }}-results.xml --fail-on-phpunit-warning --display-warnings
@@ -259,7 +271,7 @@ jobs:
         env:
           NEEDS_JSON: ${{ toJSON(needs) }}
         run: python3 scripts/ci/ci-scope.py gate
-      - name: Verify all six current-run database receipts without enabling reuse
+      - name: Verify all ten current-run database receipts without enabling reuse
         if: needs.scope.outputs.mode == 'full'
         env:
           RECEIPT_GITHUB_TOKEN: ${{ github.token }}
@@ -280,9 +292,9 @@ jobs:
     name: operator-browser (${{ matrix.project }})
     runs-on: ubuntu-latest
     # Each engine runs every ordinary journey on its own fresh VM and isolated fixture.
-    # Browser installation has taken 14 minutes; retain the bounded 18-minute suite
+    # Browser installation has taken 14 minutes; retain the bounded 26-minute suite
     # plus fixture/build setup, teardown and artifact retention for each engine.
-    timeout-minutes: 40
+    timeout-minutes: 50
     strategy:
       fail-fast: false
       matrix:
@@ -304,10 +316,10 @@ jobs:
           tools: composer:v2
       - name: Verify bounded PHP test capabilities
         run: php scripts/ci/verify-php-test-runtime.php
-      - name: Install application media fixture prerequisites
+      - name: Install genuine scanner and current official signatures for customer delivery fixtures
+        run: bash tests/browser/install-related-scanner.sh
+      - name: Verify application media fixture executables
         run: |
-          sudo apt-get update
-          sudo apt-get install --yes --no-install-recommends ffmpeg util-linux
           test -x /usr/bin/ffmpeg
           test -x /usr/bin/ffprobe
           test -x /usr/bin/prlimit
@@ -356,9 +368,9 @@ jobs:
         run: bash tests/browser/install-related-scanner.sh
       - run: composer install --no-interaction --prefer-dist
       - run: npm ci
+      - run: npm run build
       - name: Verify isolated related-browser startup boundaries
         run: python3 scripts/ci/test-related-browser-stage.py
-      - run: npm run build
       - run: npx playwright install --with-deps chromium webkit
       - name: Prepare genuine media and run only the related-track native journeys
         run: node tests/browser/run-related.mjs

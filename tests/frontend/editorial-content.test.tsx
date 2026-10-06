@@ -54,7 +54,8 @@ describe('editorial content and shared navigation', () => {
     const fetcher = vi.spyOn(globalThis, 'fetch');
     render(<Editorial siteContent={chrome} editorial={{ ...about, section: 'contact', email: 'synthetic@example.test', contactHref: 'mailto:synthetic%40example.test' }} metadata={metadata} />);
     expect(screen.getByRole('link', { name: /Open email/ })).toHaveAttribute('href', 'mailto:synthetic%40example.test');
-    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('textbox')).toEqual([screen.getByLabelText('Inquiry receipt')]);
+    expect(screen.queryByRole('button', { name: 'Send inquiry' })).not.toBeInTheDocument();
     expect(fetcher).not.toHaveBeenCalled();
   });
 
@@ -79,7 +80,10 @@ describe('editorial content and shared navigation', () => {
   ])('does not collect on $label even when other public inquiry props are supplied', ({ props }) => {
     const fetcher = vi.spyOn(globalThis, 'fetch');
     render(<Editorial siteContent={chrome} editorial={{ ...about, section: 'contact' }} metadata={metadata} contactInquiryEnabled contactInquiryPrivacyNotice="Displayed synthetic notice." contactInquiryNoticeToken={'a'.repeat(64)} {...props} />);
-    expect(screen.queryByRole('textbox')).not.toBeInTheDocument(); expect(fetcher).not.toHaveBeenCalled();
+    if (props.sitePreview || props.contactInquiryNoticeToken === 'malformed') expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    else expect(screen.getAllByRole('textbox')).toEqual([screen.getByLabelText('Inquiry receipt')]);
+    for (const label of ['Name', 'Email', 'Subject', 'Message']) expect(screen.queryByLabelText(new RegExp(`^${label}`))).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Send inquiry' })).not.toBeInTheDocument(); expect(fetcher).not.toHaveBeenCalled();
   });
 
   it('does not collect on another editorial route with enabled contact notice and token props', () => {

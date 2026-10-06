@@ -5,7 +5,9 @@ namespace App\Application\Media;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Media\MediaWriterActor;
 use App\Domain\Media\Models\MediaAsset;
+use App\Domain\Media\Models\MediaUploadSession;
 use App\Domain\Media\PrivateMediaFiles;
+use App\Domain\Media\PrivateUploadParts;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use Illuminate\Database\DeadlockException;
@@ -15,6 +17,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use LogicException;
 use RuntimeException;
 use Throwable;
 
@@ -23,6 +26,30 @@ final class IngestMediaUpload
     public const ROLES = ['master_wav' => 'WAV master', 'artwork' => 'Artwork (PNG or JPEG)', 'stems_zip' => 'Stems (WAV-only ZIP)'];
 
     public function handle(Track $track, mixed $upload, string $role, User $actor): MediaAsset
+    {
+        return $this->ingest($track, $upload, $role, $actor);
+    }
+
+    /** Internal transport completion only: callers supply a retained session, never a destination path. */
+    public function handleResumable(Track $track, UploadedFile $upload, string $role, User $actor, MediaUploadSession $session): MediaAsset
+    {
+        if (DB::transactionLevel() === 0) {
+            throw new LogicException('Resumable intake requires its owning completion transaction.');
+        }
+        $actor = app(MediaWriterActor::class)->authorize($actor);
+        $track = Track::query()->lockForUpdate()->findOrFail($track->id);
+        $session = MediaUploadSession::query()->lockForUpdate()->findOrFail($session->id);
+        if ($session->actor_id !== $actor->id || $session->track_id !== $track->id || $session->role !== $role
+            || $session->status !== 'uploading' || $session->asset_id !== null || $session->expires_at->lte(now())
+            || $session->received_bytes !== $session->size_bytes || $upload->getSize() !== $session->size_bytes
+            || ! $upload->getRealPath() || ! hash_equals($session->sha256, hash_file('sha256', $upload->getRealPath()))) {
+            throw ValidationException::withMessages(['upload' => 'The retained upload is not ready for completion.']);
+        }
+
+        return $this->ingest($track, $upload, $role, $actor, $session->public_id);
+    }
+
+    private function ingest(Track $track, mixed $upload, string $role, User $actor, ?string $sessionId = null): MediaAsset
     {
         Gate::forUser($actor)->authorize('administer-catalog');
         if (! $track->exists || ! array_key_exists($role, self::ROLES)) {
@@ -52,18 +79,22 @@ final class IngestMediaUpload
         }
         app(PrivateMediaFiles::class)->root();
         $hash = hash_file('sha256', $source);
-        $path = 'quarantine/'.Str::uuid().'/source.upload';
+        $path = $sessionId === null ? 'quarantine/'.Str::uuid().'/source.upload' : 'quarantine/resumable/'.$sessionId.'/source.upload';
         $disk = Storage::disk('local');
-        $stream = fopen($source, 'rb');
-        if ($stream === false) {
-            throw new RuntimeException('Cannot read the temporary upload.');
-        }
-        try {
-            if (! $disk->put($path, $stream, ['visibility' => 'private'])) {
-                throw new RuntimeException('Cannot preserve the upload in private storage.');
+        if ($sessionId !== null) {
+            app(PrivateUploadParts::class)->quarantine($sessionId, $source, $size, $hash);
+        } else {
+            $stream = fopen($source, 'rb');
+            if ($stream === false) {
+                throw new RuntimeException('Cannot read the temporary upload.');
             }
-        } finally {
-            fclose($stream);
+            try {
+                if (! $disk->put($path, $stream, ['visibility' => 'private'])) {
+                    throw new RuntimeException('Cannot preserve the upload in private storage.');
+                }
+            } finally {
+                fclose($stream);
+            }
         }
         $transactionLevel = DB::transactionLevel();
         $committing = false;
@@ -75,7 +106,8 @@ final class IngestMediaUpload
             $name = Str::limit(preg_replace('/[\x00-\x1F\x7F]/', '', $name), 240, '');
 
             return DB::transaction(function () use ($track, $role, $path, $name, $mime, $size, $hash, $actor, &$committing) {
-                // Upload copying stays outside our mutation locks; authority is current at commit.
+                // Whole-file copying precedes these mutation locks. Resumable
+                // completion already owns its outer actor/track/session fences.
                 $actor = app(MediaWriterActor::class)->authorize($actor);
                 $track = Track::query()->lockForUpdate()->findOrFail($track->id);
                 $asset = MediaAsset::create([
@@ -98,7 +130,7 @@ final class IngestMediaUpload
         } catch (Throwable $exception) {
             // A commit error can follow a durable write. A failed rollback can leave rows
             // pending, as can Laravel's nested DeadlockException path, which skips rollback.
-            if (! $committing && ! $exception instanceof DeadlockException && DB::transactionLevel() === $transactionLevel) {
+            if ($sessionId === null && ! $committing && ! $exception instanceof DeadlockException && DB::transactionLevel() === $transactionLevel) {
                 $disk->delete($path);
             }
             throw $exception;

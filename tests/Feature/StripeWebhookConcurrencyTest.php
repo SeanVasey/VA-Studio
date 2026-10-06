@@ -4,18 +4,18 @@ namespace Tests\Feature;
 
 use App\Domain\Commerce\Models\StripeWebhookReceipt;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\StripeWebhookFixtures as Fixtures;
 use Tests\TestCase;
 
 /** Independent processes race the first insert; the parent reads only committed evidence. */
 class StripeWebhookConcurrencyTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     protected function beforeRefreshingDatabase(): void
     {

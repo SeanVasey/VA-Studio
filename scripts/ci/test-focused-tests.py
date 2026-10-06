@@ -97,6 +97,108 @@ class SelectionTests(unittest.TestCase):
                 focused.selection({"FOCUSED_SUITE": suite, "FOCUSED_ENGINE": "mysql"})
         self.assertEqual(focused.selection({"FOCUSED_SUITE": "frontend", "FOCUSED_ENGINE": "sqlite"}).engine, "none")
 
+    def test_customer_and_product_feedback_preserve_the_fixed_cap_and_native_coverage(self):
+        self.assertEqual(focused.MAX_FILES, 32)
+        for target in ("CustomerAccountAccessTest", "CustomerAccountCommerceTest", "CustomerAccountConcurrencyTest",
+                       "CustomerAccountMigrationTest", "CustomerSessionHttpTest", "OwnedTestOrderHistoryTest",
+                       "TestOwnerDeliveryHttpTest", "TestOwnerDeliveryProjectionTest"):
+            self.assertIn("tests/Feature/" + target + ".php", focused.PHP_TARGETS["customer"])
+        for target in ("ProductDraftTest", "ProductDraftEditorTest", "ProductDraftMigrationTest", "ProductDraftConcurrencyTest"):
+            self.assertIn("tests/Feature/" + target + ".php", focused.PHP_TARGETS["seller"])
+        self.assertIn("tests/frontend/customer-account.test.tsx", focused.FRONTEND_TARGETS)
+        self.assertIn("tests/browser/customer-account.spec.ts", focused.BROWSER_TARGETS)
+
+    def test_kit_feedback_retains_intake_recovery_schema_admin_and_native_races(self):
+        for target in ("SoundKitIntakeTest", "SoundKitRecoveryTest", "SoundKitMigrationTest",
+                       "SoundKitDraftAdminTest", "SoundKitConcurrencyTest"):
+            self.assertIn("tests/Feature/" + target + ".php", focused.PHP_TARGETS["media"])
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        self.assertEqual({row[1] for row in policy["methods"]
+                          if row[0] == "Tests\\Feature\\SoundKitConcurrencyTest"}, {
+            "test_native_actor_wait_serializes_duplicate_upload_or_processing",
+            "test_mfa_withdrawal_committed_during_actor_wait_refuses_kit_operation",
+            "test_mfa_withdrawal_during_final_actor_wait_prevents_verified_commit_after_real_scanning",
+        })
+
+    def test_order_reference_feedback_covers_both_databases_and_client_journeys_without_exclusions(self):
+        self.assertEqual(focused.MAX_FILES, 32)
+        for engine in focused.ENGINES:
+            selected = focused.selection({"FOCUSED_SUITE": "customer", "FOCUSED_ENGINE": engine})
+            self.assertIn("tests/Feature/CustomerOrderReferenceTest.php", selected.files)
+            focused.validate_files(ROOT, selected)
+        for suite, target in {
+            "frontend": "tests/frontend/customer-order-reference.test.tsx",
+            "browser": "tests/browser/customer-order-reference.spec.ts",
+        }.items():
+            selected = focused.selection({"FOCUSED_SUITE": suite, "FOCUSED_ENGINE": "sqlite"})
+            self.assertIn(target, selected.files)
+            focused.validate_files(ROOT, selected)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        self.assertFalse(any(row[0] == "Tests\\Feature\\CustomerOrderReferenceTest" for row in policy["methods"]))
+
+    def test_identity_and_kit_transport_feedback_keep_native_races_and_client_journeys(self):
+        self.assertEqual(focused.MAX_FILES, 32)
+        for suite, targets in {
+            "customer": ("CustomerIdentityTest", "CustomerIdentityHttpTest", "CustomerIdentityMigrationTest", "CustomerIdentityConcurrencyTest"),
+            "media": ("SoundKitUploadsTest", "SoundKitUploadHttpTest", "SoundKitUploadMigrationTest", "SoundKitUploadsConcurrencyTest"),
+        }.items():
+            for target in targets:
+                self.assertIn("tests/Feature/" + target + ".php", focused.PHP_TARGETS[suite])
+        for target in ("tests/frontend/customer-identity.test.tsx", "tests/frontend/resumable-kit-upload.test.ts"):
+            self.assertIn(target, focused.FRONTEND_TARGETS)
+        for target in ("tests/browser/customer-identity.spec.ts", "tests/browser/resumable-kit-upload.spec.ts"):
+            self.assertIn(target, focused.BROWSER_TARGETS)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        for class_name, methods in {
+            "CustomerIdentityConcurrencyTest": {
+                "test_competing_completions_wait_on_the_exact_address_and_write_one_credential",
+                "test_committed_withdrawal_wins_the_exact_user_fence_before_recovery",
+            },
+            "SoundKitUploadsConcurrencyTest": {
+                "test_native_actor_wait_serializes_duplicate_kit_transport_operations",
+                "test_required_mfa_withdrawal_during_native_actor_wait_refuses_each_transport_operation",
+                "test_native_draft_wait_observes_committed_version_change_before_completion",
+            },
+        }.items():
+            self.assertEqual({row[1] for row in policy["methods"] if row[0] == "Tests\\Feature\\" + class_name}, methods)
+
+    def test_native_identity_wrapper_enables_only_private_synthetic_capture(self):
+        wrapper = (ROOT / "tests/browser/run.mjs").read_text()
+        for setting in ("APP_ENV: 'local'", "MAIL_MAILER: 'array'", "VASEY_TEST_CUSTOMER_ACCOUNTS_ENABLED: 'true'",
+                        "VASEY_TEST_CUSTOMER_IDENTITY_ENABLED: 'true'", "VASEY_TEST_CUSTOMER_IDENTITY_TRANSPORT: 'private_capture'",
+                        "LARAVEL_STORAGE_PATH: directory", "DB_DATABASE: join(directory, 'database.sqlite')"):
+            self.assertIn(setting, wrapper)
+        self.assertIn("rmSync(directory, { recursive: true, force: true });", wrapper)
+
+    def test_workflow_dispatch_choices_exactly_match_reviewed_suite_enums(self):
+        workflow = (ROOT / ".github/workflows/focused.yml").read_text()
+        choices = workflow.split("options: [", 1)[1].split("]", 1)[0].split(", ")
+        self.assertEqual(set(focused.SUITES), set(choices))
+        self.assertEqual(len(focused.SUITES), len(choices))
+
+    def test_unpaid_release_feedback_keeps_native_races_and_browser_journey_selected(self):
+        for target in ("TestUnpaidReleaseTest", "TestUnpaidReleaseMigrationTest",
+                       "TestUnpaidReleaseConcurrencyTest", "TestUnpaidOrderResourceTest"):
+            self.assertIn("tests/Feature/" + target + ".php", focused.PHP_TARGETS["financial"])
+        self.assertIn("tests/browser/test-unpaid-release.spec.ts", focused.BROWSER_TARGETS)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        race_class = "Tests\\Feature\\TestUnpaidReleaseConcurrencyTest"
+        self.assertEqual({row[1] for row in policy["methods"] if row[0] == race_class}, {
+            "test_exact_order_fence_preserves_money_and_the_winning_resource_disposition",
+            "test_release_serializes_new_capacity_users_without_reviving_old_bindings",
+        })
+
+    def test_new_sqlite_exceptions_are_exact_native_method_identities(self):
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        new_classes = {"Tests\\Feature\\CustomerAccountConcurrencyTest", "Tests\\Feature\\ProductDraftConcurrencyTest"}
+        actual = {tuple(row) for row in policy["methods"] if row[0] in new_classes}
+        self.assertEqual(actual, {
+            ("Tests\\Feature\\CustomerAccountConcurrencyTest", "test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint"),
+            ("Tests\\Feature\\ProductDraftConcurrencyTest", "test_native_product_wait_serializes_competing_draft_changes"),
+            ("Tests\\Feature\\ProductDraftConcurrencyTest", "test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation"),
+            ("Tests\\Feature\\ProductDraftConcurrencyTest", "test_source_lock_captures_metadata_committed_while_creator_waits"),
+        })
+
     def test_related_source_is_covered_without_putting_ready_fixtures_in_the_default_browser_set(self):
         for target in ("tests/Feature/PublicCatalogRelatedLinksTest.php", "tests/Feature/SiteRelatedTrackContentTest.php",
                        "tests/Feature/SiteRelatedTrackDamageTest.php", "tests/Feature/SiteRelatedTrackEditorTest.php",

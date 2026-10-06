@@ -10,10 +10,10 @@ use App\Domain\Media\QueueMediaProcessing;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Events\QueryExecuted;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\MediaFixtures;
 use Tests\Support\StemsFixtures;
@@ -21,7 +21,7 @@ use Tests\TestCase;
 
 class MediaWriterAuthorityTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     protected function setUp(): void
     {

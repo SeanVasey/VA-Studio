@@ -85,6 +85,8 @@ final class ReadOrder
                 }
             }
 
+            $release = \App\Domain\Commerce\Models\TestUnpaidRelease::where('order_id', $order->id)->first();
+            if ($release) { app(\App\Domain\Commerce\UnpaidRelease\ReadUnpaidRelease::class)->verify($release, $order, $payload); }
             $finalization = OrderFinalization::where('order_id', $order->id)->first();
             if ($finalization) { app(ReadFinalization::class)->verify($finalization, $payload); }
 

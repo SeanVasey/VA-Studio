@@ -5,17 +5,17 @@ namespace Tests\Feature;
 use App\Domain\Commerce\Orders\PrepareOrder;
 use App\Domain\Commerce\ReservePricedQuote;
 use Illuminate\Database\QueryException;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InventoryFixtures;
 use Tests\Support\OrderFixtures as F;
 use Tests\TestCase;
 
 class OrderPreparationMigrationTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     public function test_empty_order_tables_roundtrip_without_changing_existing_pending_inventory_and_pricing(): void
     {
@@ -33,6 +33,10 @@ class OrderPreparationMigrationTest extends TestCase
         $contracts = require database_path('migrations/2026_09_26_000021_test_contract_issuance.php');
         $fulfillmentActivations = require database_path('migrations/2026_09_26_000022_test_fulfillment_activation.php');
         $delivery = require database_path('migrations/2026_09_26_000023_test_owner_delivery.php');
+        $financialObservations = require database_path('migrations/2026_10_06_000039_test_payment_financial_observations.php');
+        $unpaidRelease = require database_path('migrations/2026_10_06_000042_test_unpaid_releases.php');
+        $unpaidRelease->down();
+        $financialObservations->down();
         $exceptionOperations = require database_path('migrations/2026_10_02_000036_test_payment_exception_operations.php');
         foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }
         foreach (['stripe_receipt_work', 'payment_observations', 'verified_payments'] as $table) { $this->assertDatabaseCount($table, 0); }
@@ -43,6 +47,8 @@ class OrderPreparationMigrationTest extends TestCase
         foreach (['orders', 'order_lines', 'order_attempts'] as $table) { $this->assertFalse(Schema::hasTable($table)); }
         $migration->up();
         $checkout->up(); $payments->up(); $finalizations->up(); $contracts->up(); $fulfillmentActivations->up(); $delivery->up(); $exceptionOperations->up();
+        $financialObservations->up();
+        $unpaidRelease->up();
         foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }
         $this->assertSame($quote, $f['quote']->refresh()->getAttributes());
         $this->assertSame($price, $f['pricing']->refresh()->getAttributes());

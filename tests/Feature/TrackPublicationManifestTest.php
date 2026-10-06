@@ -30,7 +30,6 @@ use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -39,6 +38,7 @@ use JsonSerializable;
 use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\ExclusiveSelectionFixtures;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\MediaFixtures;
 use Tests\Support\QuoteFixtures;
@@ -47,7 +47,7 @@ use Tests\TestCase;
 
 class TrackPublicationManifestTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     protected function setUp(): void
     {

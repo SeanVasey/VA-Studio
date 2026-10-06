@@ -1,5 +1,41 @@
 # Development agents and launch queue
 
+## Active continuation — October 6, 2026 UTC
+
+The integrating [completion candidate](completion-execution.md#complete-related-journey-allowance--october-6-2026-utc) includes reviewed account/library and exact order-reference lookup, private test enrollment/recovery, collection/album drafts, inquiry conversations, verified unpaid release, WAV kit intake and resumable kit transport. Its next correction gives the complete genuine related journey a measured, bounded harness allowance while preserving every assertion, cleanup step and outer limit. Collection-member refresh and retained order-item details remain separate follow-up work. PR #6 remains the current combined acceptance boundary; PR #5 must close as superseded only after the combined merge is confirmed. A failed run does not certify its corrected successor.
+
+| Lane | Current work and boundary |
+| --- | --- |
+| Integration `/root` | Compose exact reviewed sources, preserve branch ancestry, run complete discovery/focused verification, publish one candidate and require full hosted acceptance before expected-head merge |
+| Customer `/root/customer_reconcile` | Reviewed self-service e664e22 is composed in the next branch; full native browser/CI acceptance and production email/guest claims remain separate |
+| Product `/root/product_reconcile` | Reviewed true-kit transport984a49f is composed in the next branch; full native browser/CI and product commerce remain separate |
+| CI review `/root/ci_reconcile` | Independently review composed source, exact census/skip registration and browser budget changes; no gate or receipt reuse relaxation |
+| Commerce review `/root/commerce_review` | Independently review unpaid resource effects and subsequent kit transport boundaries |
+
+The tables below retain prior checkpoints and do not imply additional running agents. Unfinished feature branches are not acceptance evidence or merged main state. No lane waits for unrelated database CI to begin its next dependency-ready child.
+
+## Full completion priority — October 5, 2026 (America/Chicago)
+
+Follow the [completion execution plan](completion-execution.md) for current parallel ownership, actual missing capabilities and acceptance cadence. Resumable private media plus admin controls, retained refund/dispute inspection and synthetic restartable catalog planning form the preceding completion batch. The next reviewed composition adds account-first test customer sign-in/library and private collection/album draft authoring with immutable versions. The lead's corrected base includes the reviewed dependency/upload fixes and eight-way MySQL policy, with ten database receipts and every full gate required. Full acceptance belongs to the resulting frozen candidate; [PR #5](https://github.com/SeanVasey/VA-Studio/pull/5) remains an earlier contained increment, not a separate completion target. No author waits for unrelated MySQL checks before starting the next approved child. Whole-parent counts remain six accepted and 34 open.
+
+Customer backend `96fd8d0`, interface `2ea42ea`, browser source `cd29d47` and collection/album source `5a11a923` have independent source reviews and focused local evidence. The [customer journey](verification/customer-account-test-journey.md) still needs native composed browser acceptance; production registration/claim/recovery is absent. The [product authoring journey](product-draft-authoring.md) is usable in Filament but does not implement public collection commerce. T27's private kit intake/profile and subsequent licensing/delivery remain required. Current integration owns exact method-level native registration, targeted composition checks and final source review; hosted acceptance is not inferred from these component results.
+
+## User-testing batch — October 6, 2026
+
+The GitHub handoff is complete: [PR #4](https://github.com/SeanVasey/VA-Studio/pull/4) merged as `1095dd5f8fd7d016bc08a55dfe2d264557dfce67`; all thirteen applicable PR gates and [post-merge run 37098953844](https://github.com/SeanVasey/VA-Studio/actions/runs/37098953844) passed. The October 2 tables below preserve earlier execution states and are not current blockers or running-agent claims.
+
+The current bounded batch on `codex/user-testing-20261006` provides a [protected storefront preview and disposable real-admin installation](user-testing.md). The preview has been deployed and exercised in desktop Chrome. The alpha uses real services in isolated temporary SQLite/storage, synthetic private drafts and per-run operator credentials. Neither enables production commerce. Final native checks, independent composition review and full CI are recorded on the integrating PR before expected-head merge; do not infer acceptance from the earlier component results.
+
+| Accountable identity | Owned work | Integration contract |
+| --- | --- | --- |
+| `/root` | Shared build/CI configuration, testing guide, source publication and final merge | Preserve the existing thirteen gates; bind published trees to tested source |
+| `/root/integration_review` and independent preview reviewer | Isolated preview navigator and frontend regressions | Reuse actual storefront components and exact approved assets; fixtures remain isolated |
+| `/root/verify_gitlab` and independent alpha reviewer | Disposable real-app launcher, bootstrap, safety/native tests and instructions | Loopback only, no checkout environment/database mutation, bounded cleanup, real readiness and disabled external commerce |
+| `/root/github_ci_review` | PHP runtime/dependency verification, existing operator regression checks and final CI | Actual locked dependencies and native execution; no skipped-case substitution |
+| `/root/workspace_restore` | Exact baseline restoration and independent build/composition review | Verify tree/modes and selected deployment assets; exclude unintended public files |
+
+The guide records actual checks and limitations. Six parent groups remain accepted and 34 open. Next dependency-ready work follows feedback on these real journeys, remaining T11/T12 authoring/security children, and selected-host T13/T14/T37 media/deployment proof. A usable visual preview is an early user-testing milestone, not full replacement or launch acceptance.
+
 ## Current GitHub execution — October 2, 2026
 
 Development continues in [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio), integration branch `codex/github-handoff-20261002`, [PR #4](https://github.com/SeanVasey/VA-Studio/pull/4). The preserved source map remains in [the handoff record](verification/github-handoff-20261002.md). Sean authorized the GitHub Actions enablement and parallel implementation; account-owned actions plus the four existing pinned external actions are allowed, while default workflow tokens remain read-only and fork workflows remain disabled.
@@ -89,10 +125,10 @@ Dependencies below reproduce the CSV exactly. **I** = integration, **C** = CI ac
 | T20 | M | T10 T19 | Queued after T19: verified unpaid release and late-payment/resource races |
 | T21 | M | T10 T19 T20 | Queued after T20: refunds/disputes and explicit inventory/access effects |
 | T22 | M | T10 T12 T13 T19 T20 T21 | Queued: production policies/provider interoperability and commercial child workflows |
-| T23 | M | T10 T11 T12 | Queued: approved claim/recovery, anti-enumeration and takeover protection |
-| T24 | M | T11 T13 T23 | Queued: cross-order library/originals and large download/resume ownership |
+| T23 | M | T10 T11 T12 | Reviewed account-first test sign-in/current ownership implemented; production enrollment/claim/recovery remains open |
+| T24 | M | T11 T13 T23 | Reviewed cross-session test library and exact original-delivery journey composed; native browser and full library/recovery scope remain open |
 | T25 | H | T10 T13 | Queued: production archival/retention and hash-verified historical restore |
-| T26 | M | T10 T11 T15 T16 T17 T18 T22 T24 | Queued: collections/albums with frozen composition, license and fulfillment |
+| T26 | M | T10 T11 T15 T16 T17 T18 T22 T24 | Reviewed private collection/album authoring and immutable versions implemented; public licensing/checkout/delivery remains open |
 | T27 | M | T10 T11 T13 T15 T16 T17 T18 T22 T24 | Queued: kits/presets and safe exact purchased archives |
 | T28 | M | T10 T11 T15 T17 T22 T23 | Queued: service briefs/deposits/milestones/revisions/private delivery |
 | T29 | M | T10 T11 T17 T22 T23 | Queued: merch stock/shipping/provider fulfillment and returns |

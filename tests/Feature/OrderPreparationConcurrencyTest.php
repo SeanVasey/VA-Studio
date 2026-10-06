@@ -10,11 +10,11 @@ use App\Domain\Commerce\Models\OrderAttempt;
 use App\Domain\Commerce\Models\PromotionUse;
 use App\Domain\Commerce\Orders\PrepareOrder;
 use App\Domain\Commerce\PriceQuote;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\ExclusiveSelectionFixtures;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InventoryFixtures;
 use Tests\Support\OrderFixtures as F;
 use Tests\Support\OrderRace;
@@ -23,7 +23,7 @@ use Tests\TestCase;
 
 class OrderPreparationConcurrencyTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     protected function beforeRefreshingDatabase(): void
     {

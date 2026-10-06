@@ -15,7 +15,6 @@ use Filament\Notifications\Notification;
 use Filament\Support\Exceptions\Cancel;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
@@ -23,6 +22,7 @@ use Livewire\Livewire;
 use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\QuoteFixtures;
 use Tests\TestCase;
@@ -30,7 +30,7 @@ use Tests\TestCase;
 class TrackPublicationGuardTest extends TestCase
 {
     // Reviewed commands must own their authority and publication transaction; fixtures are committed.
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     protected function setUp(): void
     {

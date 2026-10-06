@@ -60,7 +60,7 @@ def producer(job):
 
 
 def evidence(engine, shard, job, alternate=False):
-    files = fixtures.evidence(engine, shard, alternate)
+    files = fixtures.evidence(engine, shard, alternate, count=native.COUNTS[engine])
     prefix = f'phpunit-ci-{engine}-{shard}'
     del files[prefix + '-receipt.json']
     initial = {'schema_version': 1, 'purpose': 'gitlab-database-start-not-acceptance', 'engine': engine, 'shard': shard,
@@ -69,7 +69,7 @@ def evidence(engine, shard, job, alternate=False):
     files[prefix + '-start.json'] = proof.canonical(initial)
     value = initial | {'purpose': 'gitlab-database-receipt-not-acceptance', 'runtime_sha256': proof.digest(proof.canonical(runtime(engine))),
                        'test_step_outcome': 'success', 'finished_at': at(-30),
-                       **proof.database_evidence(files, {'checkout_root': str(ROOT), 'policy_sha256': identity()['policy_sha256']}, engine, shard, {fixtures.SKIP})}
+                       **proof.database_evidence(files, {'checkout_root': str(ROOT), 'policy_sha256': identity()['policy_sha256']}, engine, shard, {fixtures.SKIP}, shard_count=native.COUNTS[engine])}
     files[prefix + '-receipt.json'] = proof.canonical(value)
     return files
 
@@ -113,6 +113,16 @@ class FakeGitlab:
 
 
 class NativeCollectorTests(unittest.TestCase):
+    def test_native_policy_stays_four_plus_two_when_github_uses_eight_plus_two(self):
+        self.assertEqual({'mysql': 4, 'sqlite': 2}, native.COUNTS)
+        self.assertEqual({'mysql': 8, 'sqlite': 2}, proof.COUNTS)
+        self.assertEqual(6, len(native.DATABASE_JOBS))
+        workflow = (Path(__file__).parents[2] / '.gitlab-ci.yml').read_text()
+        for engine, count in native.COUNTS.items():
+            block = workflow.split(f'backend-{engine}:\n', 1)[1].split('\n\n', 1)[0]
+            self.assertIn('SHARD: [' + ', '.join(repr(str(n)) for n in range(1, count + 1)) + ']', block)
+            self.assertIn(f"SHARD_COUNT: '{count}'", block)
+
     def test_physical_write_process_control_is_required_by_both_engine_receipts(self):
         for engine in ('sqlite', 'mysql'):
             native.validate_runtime(runtime(engine), engine)
@@ -147,7 +157,7 @@ class NativeCollectorTests(unittest.TestCase):
         self.assertFalse(value['reuse_enabled'])
         self.assertIn('pending', value['outer_acceptance'])
         self.assertTrue(all('authenticated exact-job' in a['digest_origin'] for a in value['artifacts']))
-        self.assertEqual(5, sum(r['results']['executed_cases'] for r in value['database_receipts'] if r['engine'] == 'mysql'))
+        self.assertEqual(len(fixtures.ROWS), sum(r['results']['executed_cases'] for r in value['database_receipts'] if r['engine'] == 'mysql'))
 
     def test_wrong_pipeline_project_commit_source_ref_or_own_job_rejects(self):
         for field, bad in [('id',124), ('project_id',1), ('sha','c'*40), ('source','schedule'), ('ref','main'), ('status','success'), ('created_at',at(10))]:

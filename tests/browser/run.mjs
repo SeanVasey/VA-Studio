@@ -28,11 +28,23 @@ const env = {
   STRIPE_ACCOUNT_ID: 'acct_SYNTHETICONLY', STRIPE_MODE: 'test', STRIPE_TEST_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '',
   STRIPE_TEST_CHECKOUT_ENABLED: 'false', STRIPE_TEST_PAYMENT_PROCESSING_ENABLED: 'false', STRIPE_TEST_FINALIZATION_ENABLED: 'false',
   VASEY_BROWSER_EXCEPTION_MARKER: randomBytes(32).toString('hex'),
-  // No malware scanner, as in CI. A scanner installed on the host would otherwise run inside synchronous uploads.
+  // HTTP uploads deliberately retain quarantine behavior even when fixture preparation has a genuine scanner installed.
   MEDIA_CLAMSCAN: join(directory, 'no-clamscan'),
   VASEY_BROWSER_DIRECTORY: directory, VASEY_BROWSER_PASSWORD: `Browser-${randomBytes(24).toString('hex')}`,
+  // The ordinary suite always retains its customer fixtures, even with inherited stage variables.
+  VASEY_BROWSER_RELATED_STAGE: '', VASEY_BROWSER_RELATED_MARKER: '',
   // Synthetic inquiry setup belongs exclusively to this disposable loopback installation.
   CONTACT_INQUIRIES_ENABLED: 'true',
+  VASEY_TEST_CUSTOMER_ACCOUNTS_ENABLED: 'true',
+  // Only this disposable local application captures synthetic identity messages privately.
+  VASEY_TEST_CUSTOMER_IDENTITY_ENABLED: 'true',
+  VASEY_TEST_CUSTOMER_IDENTITY_TRANSPORT: 'private_capture',
+  // Read/issue exact retained synthetic originals; HTTP checkout/payment processing stay disabled above.
+  VASEY_TEST_DELIVERY_ACCESS_ENABLED: 'true',
+  VASEY_TEST_DELIVERY_ACCESS_POLICY: JSON.stringify({ schema_version: 1, purpose: 'test_owner_delivery', version: 'test-owner-delivery-v1',
+    scope: 'activated_order_owner', storage: 'private_local', verification: 'fresh_sha256', token_bytes: 32,
+    authorization_ttl_seconds: 60, new_authorizations_per_order60_seconds: 3, stream_attempts: 1,
+    ranges: 'disabled', pending_entitlements: 'preserve', buyer_identity: 'unverified_guest' }),
   CONTACT_INQUIRIES_PRIVACY_NOTICE: 'Synthetic browser privacy notice. Inquiries are saved privately for verification.',
   CONTACT_INQUIRIES_RETENTION_REFERENCE: 'SYNTHETIC-BROWSER-ONLY',
   CONTACT_INQUIRIES_OPERATOR_ID: '1',
@@ -43,7 +55,8 @@ try {
     mkdirSync(join(directory, child), { recursive: true, mode: 0o700 });
   }
   writeFileSync(env.DB_DATABASE, '', { mode: 0o600, flag: 'wx' });
-  const setup = spawnSync('php', ['tests/browser/bootstrap.php'], { cwd: root, env, stdio: 'inherit', timeout: 60000 });
+  // Genuine scans retain their application budgets; bound the whole fixture stage like related-track preparation.
+  const setup = spawnSync('/usr/bin/timeout', ['--signal=TERM', '--kill-after=15s', '600s', 'php', 'tests/browser/bootstrap.php'], { cwd: root, env, stdio: 'inherit', timeout: 620000 });
   if (setup.error || setup.status !== 0) throw new Error('Isolated browser fixture setup failed.');
   writeFileSync(join(directory, 'inquiry-fixture-marker.json'), JSON.stringify({
     marker: env.VASEY_BROWSER_INQUIRY_MARKER, database: env.DB_DATABASE,
@@ -55,7 +68,7 @@ try {
   }), { mode: 0o600, flag: 'wx' });
   const result = spawnSync(process.execPath, ['node_modules/@playwright/test/cli.js', 'test', ...process.argv.slice(2)], {
     // Keep one minute beyond Playwright's suite ceiling for teardown and report writes.
-    cwd: root, env, stdio: 'inherit', timeout: 1140000,
+    cwd: root, env, stdio: 'inherit', timeout: 1620000,
   });
   if (result.error) throw new Error('Browser verification did not finish.');
   process.exitCode = result.status ?? 1;

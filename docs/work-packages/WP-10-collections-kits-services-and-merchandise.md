@@ -46,3 +46,9 @@ Do not add secrets, private masters, unredacted orders, customer PII or real con
 > Implement WP-10 in its named small increments, starting with kits/collections. Reuse licensed digital delivery where valid; keep services and merchandise state machines distinct. Split follow-up PRs with explicit acceptance and do not claim a navigation card constitutes product parity.
 
 Read [architecture index](../architecture/README.md), [decision register](../architecture/decision-register.md) and relevant source/brand evidence. Complete the first increment in a small PR, then split any remaining implementation into explicitly dependent issues. Preserve prior approvals and invariants; report unresolved provider/policy decisions without blocking unrelated reversible work.
+
+## Private WAV kit intake composition — October 6, 2026
+
+Reviewed kit source `7e2d83d` joins the customer/collection/inquiry/unpaid-order candidate. Staff can create private WAV kit drafts, retain source provenance, upload exact ZIP revisions, inspect immutable technical manifests and retry processing. [Kit evidence](../sound-kit-intake.md) records 41 shared-engine cases / 298 assertions, 50 native MySQL cases / 660 assertions and unchanged 58-case / 589-assertion stems regressions. Independent review re-executed the shared-engine and stems selections. Full combined CI and native browser acceptance remain separate.
+
+The whole-file admin form is bounded below 9 MiB by the current development HTTP server; its 200 MiB application ceiling is not proof of upload admission. Typed resumable kit transport is being developed separately. This technical intake does not issue kit licenses, create prices, expose public archives, grant purchases or implement preset/MIDI formats. Those required product workflows remain open.

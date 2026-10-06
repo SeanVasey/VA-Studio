@@ -10,8 +10,10 @@ use App\Domain\Commerce\Models\TestPaymentExceptionEvent;
 use App\Domain\Commerce\Models\TestPaymentExceptionWork;
 use App\Domain\Commerce\Orders\OrderRequest;
 use App\Domain\Commerce\Orders\ReadOrder;
+use App\Domain\Commerce\Payments\PaymentFinancialEvidence;
 use App\Domain\Commerce\Payments\PaymentProcessingPolicy;
 use App\Domain\Commerce\Payments\PaymentVerificationException;
+use App\Domain\Commerce\Payments\StripeFinancialInspectionGateway;
 use App\Domain\Commerce\Payments\VerifyTestPayment;
 use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
@@ -110,6 +112,7 @@ final class TestPaymentExceptionOperations
         }
 
         $outcome = 'attention';
+        $financial = null;
         try {
             $intent = CheckoutIntent::findOrFail($claim['intent_id']);
             $inspection = app(VerifyTestPayment::class)->inspect($intent->session()->sole()->provider_session_id, $intent);
@@ -117,6 +120,18 @@ final class TestPaymentExceptionOperations
                 && ($inspection['evidence']['payment']['id'] ?? null) === $claim['payment_id']) {
                 $candidate = $inspection['evidence']['outcome'];
                 $outcome = in_array($candidate, ['confirmed', 'pending', 'authorized', 'expired', 'canceled'], true) ? $candidate : 'attention';
+                if ($outcome === 'confirmed') {
+                    try {
+                        $financial = app(PaymentFinancialEvidence::class)->capture(
+                            app(StripeFinancialInspectionGateway::class)->financialState($claim['payment_id']),
+                            ['account_id' => $inspection['evidence']['account_id'], 'payment' => $inspection['evidence']['payment'],
+                                'amount_minor' => $inspection['evidence']['amount_minor']]);
+                    } catch (PaymentVerificationException $error) {
+                        $financial = ['state' => $error->reason === 'financial_incomplete' ? 'incomplete' : 'attention'];
+                    } catch (Throwable) {
+                        $financial = ['state' => 'unavailable'];
+                    }
+                }
             }
         } catch (PaymentVerificationException $error) {
             $outcome = in_array($error->reason, ['retry', 'unavailable'], true) ? 'unavailable' : 'attention';
@@ -125,7 +140,7 @@ final class TestPaymentExceptionOperations
         }
         $observedAt = now()->toImmutable()->utc()->startOfSecond();
 
-        return $this->safe(fn (): array => DB::transaction(function () use ($publicId, $actor, $requestId, $claim, $outcome, $observedAt): array {
+        return $this->safe(fn (): array => DB::transaction(function () use ($publicId, $actor, $requestId, $claim, $outcome, $observedAt, $financial): array {
             [$record, $current, $work] = $this->locked($publicId, $actor);
             app(PaymentProcessingPolicy::class)->account();
             if ($work->request_id !== $requestId || $work->claim_token !== $claim['token']
@@ -136,6 +151,9 @@ final class TestPaymentExceptionOperations
                 throw new RuntimeException('Test exception evidence changed.');
             }
             $event = $this->append($record, $current, $work, $requestId, 'reconciliation_observed', $outcome, $observedAt);
+            if ($financial !== null) {
+                app(PaymentFinancialEvidence::class)->retain($event, $record, $financial);
+            }
             $work->fill(['request_id' => null, 'claim_token' => null, 'lease_expires_at' => null])->save();
 
             return $this->project($event);
@@ -199,8 +217,11 @@ final class TestPaymentExceptionOperations
 
     private function project(TestPaymentExceptionEvent $event): array
     {
+        $financial = app(PaymentFinancialEvidence::class)->project($event);
+
         return ['testOnly' => true, 'status' => $event->kind, 'outcome' => $event->outcome, 'sequence' => $event->sequence,
-            'observedAt' => $event->observed_at?->toIso8601ZuluString(), 'fulfillment' => 'blocked', 'refundDisputeState' => 'not_inspected'];
+            'observedAt' => $event->observed_at?->toIso8601ZuluString(), 'fulfillment' => 'blocked',
+            'refundDisputeState' => $financial['state'] ?? 'not_inspected'] + ($financial === null ? [] : ['financialObservation' => $financial]);
     }
 
     private function request(string $requestId, int $expected): void

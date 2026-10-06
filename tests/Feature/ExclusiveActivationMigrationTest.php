@@ -3,16 +3,16 @@
 namespace Tests\Feature;
 
 use App\Domain\Commerce\CreateQuote;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Schema;
 use Tests\Support\ExclusiveSelectionFixtures as F;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InventoryFixtures;
 use Tests\Support\QuoteFixtures;
 use Tests\TestCase;
 
 class ExclusiveActivationMigrationTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     public function test_disposable_empty_activation_migration_retains_prior_quotes_and_links(): void
     {

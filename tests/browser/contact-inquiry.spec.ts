@@ -84,7 +84,17 @@ for (const [description, options] of [
     await inquiryFixture(page, options); await page.goto('/contact');
     await expect(page.getByRole('heading', { name: 'Synthetic contact', exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Send inquiry', exact: true })).toHaveCount(0);
-    await expect(page.getByRole('textbox')).toHaveCount(0); expect(requests).toEqual([]);
+    for (const label of ['Name', 'Email', 'Subject', 'Message']) await expect(page.getByLabel(new RegExp(`^${label}`))).toHaveCount(0);
+    if (description === 'disabled contact') {
+      // Intake withdrawal preserves receipt-only access to an existing private conversation.
+      await expect(page.getByRole('textbox')).toHaveCount(1);
+      await expect(page.getByRole('textbox', { name: 'Inquiry receipt', exact: true })).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Open conversation', exact: true })).toBeVisible();
+    } else {
+      await expect(page.getByRole('textbox')).toHaveCount(0);
+      await expect(page.getByRole('button', { name: 'Open conversation', exact: true })).toHaveCount(0);
+    }
+    expect(requests).toEqual([]);
     if (!('preview' in options)) await expect(page.getByRole('link', { name: /Open email/ })).toHaveAttribute('href', 'mailto:synthetic%40example.test');
   });
 }

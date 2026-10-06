@@ -8,10 +8,10 @@ use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\Models\StemsRecording;
 use App\Domain\Media\QueueMediaProcessing;
 use Filament\Actions\Action;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
@@ -94,6 +94,9 @@ class MediaAssetResource extends OperatorResource
 
     public static function getPages(): array
     {
-        return ['index' => MediaAssetResource\Pages\ManageMediaAssets::route('/')];
+        return [
+            'index' => MediaAssetResource\Pages\ManageMediaAssets::route('/'),
+            'resumable-upload' => MediaAssetResource\Pages\UploadMedia::route('/resumable-upload'),
+        ];
     }
 }

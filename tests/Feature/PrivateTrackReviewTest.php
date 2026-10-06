@@ -17,13 +17,13 @@ use DOMXPath;
 use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\MediaFixtures;
 use Tests\Support\QuoteFixtures;
@@ -33,7 +33,7 @@ use Tests\TestCase;
 class PrivateTrackReviewTest extends TestCase
 {
     // The reader deliberately refuses caller-owned transactions. These fixtures are committed.
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     private const TRACK_FIELDS = ['id', 'metadata_version', 'status', 'title', 'slug', 'artist', 'bpm',
         'musical_key', 'genre', 'mood', 'tags', 'description'];

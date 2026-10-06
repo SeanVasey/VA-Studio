@@ -9,7 +9,7 @@ final class InquiryResponse
 {
     public static function matches(Request $request): bool
     {
-        return $request->is('contact/inquiries', 'admin/customer-inquiries', 'admin/customer-inquiries/*')
+        return $request->is('contact/inquiries', 'contact/inquiries/*', 'admin/customer-inquiries', 'admin/customer-inquiries/*')
             || $request->attributes->get('_inquiry_private_admin') === true;
     }
 

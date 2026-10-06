@@ -132,13 +132,15 @@ backend-sqlite:
 operator-browser:
   stage: verify
   needs: [provenance-access]
-  timeout: 40m
+  # Match the shared 27-minute wrapper plus browser installation and fixture setup.
+  timeout: 50m
   parallel:
     matrix:
       - BROWSER_PROJECT: [chromium-desktop, webkit-mobile]
   before_script:
     - bash scripts/ci/setup-gitlab-php.sh
     - bash scripts/ci/setup-gitlab-node.sh
+    - bash scripts/ci/setup-gitlab-related-scanner.sh
   script:
     - npm ci
     - npm run build
@@ -160,8 +162,8 @@ related-browser:
     - bash scripts/ci/setup-gitlab-related-scanner.sh
   script:
     - npm ci
-    - python3 scripts/ci/test-related-browser-stage.py
     - npm run build
+    - python3 scripts/ci/test-related-browser-stage.py
     - npx playwright install --with-deps chromium webkit
     - node tests/browser/run-related.mjs
   artifacts:

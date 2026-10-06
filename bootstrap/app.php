@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Middleware\CustomerPrivacy;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\InquiryPrivacy;
 use App\Http\Middleware\PrivateTrackReviewPrivacy;
+use App\Http\Middleware\ResumableUploadPrivacy;
 use App\Http\Middleware\SitePreviewPrivacy;
 use App\Http\Middleware\StripeWebhookBodyLimit;
 use App\Http\Middleware\TestDeliveryPrivacy;
@@ -35,14 +37,32 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(SitePreviewPrivacy::class);
         $middleware->prepend(InquiryPrivacy::class);
         $middleware->prepend(PrivateTrackReviewPrivacy::class);
+        $middleware->prepend(ResumableUploadPrivacy::class);
+        $middleware->prepend(CustomerPrivacy::class);
         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
         $middleware->web(append: [HandleInertiaRequests::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
+            fn (Request $request) => (CustomerPrivacy::matches($request) && $request->isMethod('POST')) || ResumableUploadPrivacy::endpoint($request) || $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
         );
         $exceptions->report(function (Throwable $exception) {
+            if (CustomerPrivacy::matches(request())) {
+                try {
+                    Log::error('Customer request failed.', ['exception_class' => $exception::class]);
+                } catch (Throwable) { /* Preserve the private response. */
+                }
+
+                return false;
+            }
+            if (ResumableUploadPrivacy::matches(request())) {
+                try {
+                    Log::error('Resumable upload failed.', ['exception_class' => $exception::class]);
+                } catch (Throwable) { /* Preserve the private response when reporting fails. */
+                }
+
+                return false;
+            }
             if (PrivateTrackReviewPrivacy::matches(request())) {
                 try {
                     Log::error('Private track review failed.', ['exception_class' => $exception::class]);
@@ -52,8 +72,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 return false;
             }
             if (PublicTrackEmbedResponse::matches(request())) {
-                try { Log::error('Public track preview failed.', ['exception_class' => $exception::class]); }
-                catch (Throwable) { /* Preserve the generic public response if reporting fails. */ }
+                try {
+                    Log::error('Public track preview failed.', ['exception_class' => $exception::class]);
+                } catch (Throwable) { /* Preserve the generic public response if reporting fails. */
+                }
+
                 return false;
             }
             if (InquiryResponse::matches(request())) {
@@ -95,6 +118,14 @@ return Application::configure(basePath: dirname(__DIR__))
         // Middleware failures occur before the controller. Keep those private and
         // generic too, including in debug mode, without changing other routes.
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request): Response {
+            if (CustomerPrivacy::matches($request)) {
+                return $response->getStatusCode() >= 400 ? CustomerPrivacy::error($response->getStatusCode()) : CustomerPrivacy::protect($response);
+            }
+            if (ResumableUploadPrivacy::matches($request)) {
+                $status = $exception instanceof ValidationException ? $exception->status : $response->getStatusCode();
+
+                return $status >= 400 ? ResumableUploadPrivacy::error($status, $response) : ResumableUploadPrivacy::protect($response);
+            }
             if (PrivateTrackReviewPrivacy::matches($request)) {
                 $status = $exception instanceof ValidationException ? $exception->status : $response->getStatusCode();
 
@@ -114,7 +145,7 @@ return Application::configure(basePath: dirname(__DIR__))
                         $headers[$name] = $response->headers->get($name);
                     }
                 }
-                if ($request->is('contact/inquiries')) {
+                if ($request->is('contact/inquiries', 'contact/inquiries/*')) {
                     return InquiryResponse::error($status, headers: $headers);
                 }
 

@@ -6,11 +6,11 @@ use App\Domain\Commerce\Models\InventoryReservation;
 use App\Domain\Commerce\Models\PromotionUse;
 use App\Domain\Commerce\QuoteException;
 use App\Domain\Commerce\ReservePricedQuote;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\ExclusiveSelectionFixtures as F;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InventoryFixtures;
 use Tests\Support\InventoryRace;
 use Tests\Support\LicenseFixtures;
@@ -19,7 +19,7 @@ use Tests\TestCase;
 
 class ExclusiveSelectionConcurrencyTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     protected function beforeRefreshingDatabase(): void
     {

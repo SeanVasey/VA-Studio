@@ -262,6 +262,49 @@ class BrowserWorkflowTests(unittest.TestCase):
         self.assertIn("  testDir: './tests/browser',\n", config)
         self.assertIn("  testMatch: '**/*.spec.ts',\n", config)
 
+    def test_every_ordinary_browser_job_installs_genuine_customer_delivery_prerequisites(self):
+        for workflow, job_name, command in (
+            ("ci.yml", "operator-browser", 'npm run test:browser -- --project="$BROWSER_PROJECT"'),
+            ("focused.yml", "focused-browser", "python3 scripts/ci/focused-tests.py"),
+        ):
+            with self.subTest(workflow=workflow):
+                source = (self.root / ".github/workflows" / workflow).read_text()
+                match = re.search(rf"(?ms)^  {job_name}:\n(.*?)(?=^  [\w-]+:\n|\Z)", source)
+                self.assertIsNotNone(match)
+                job = match.group(1)
+                # A required step with no conditional, fallback or ignored failure.
+                install = re.search(r"(?m)^      - name: [^\n]+\n        run: bash tests/browser/install-related-scanner.sh$", job)
+                self.assertIsNotNone(install)
+                self.assertLess(install.start(), job.index(command))
+                self.assertEqual(1, job.count("bash tests/browser/install-related-scanner.sh"))
+        source = (self.root / ".gitlab-ci.yml").read_text()
+        match = re.search(r"(?ms)^operator-browser:\n(.*?)(?=^[\w-]+:\n|\Z)", source)
+        self.assertIsNotNone(match)
+        job = match.group(1)
+        self.assertIn("    - bash scripts/ci/setup-gitlab-related-scanner.sh\n", job)
+        self.assertLess(job.index("bash scripts/ci/setup-gitlab-related-scanner.sh"), job.index("  script:\n"))
+        wrapper = (self.root / "tests/browser/run.mjs").read_text()
+        self.assertIn("APP_ENV: 'local'", wrapper)
+        self.assertIn("MEDIA_CLAMSCAN: join(directory, 'no-clamscan')", wrapper)
+
+    def test_related_browser_build_precedes_real_startup_and_browser_checks(self):
+        for workflow, pattern in (
+            (".github/workflows/ci.yml", r"(?ms)^  related-browser:\n(.*?)(?=^  [\w-]+:\n|\Z)"),
+            (".gitlab-ci.yml", r"(?ms)^related-browser:\n(.*?)(?=^[\w-]+:\n|\Z)"),
+        ):
+            with self.subTest(workflow=workflow):
+                job = re.search(pattern, (self.root / workflow).read_text())
+                self.assertIsNotNone(job)
+                source = job.group(1)
+                commands = ["npm ci", "npm run build", "python3 scripts/ci/test-related-browser-stage.py",
+                            "npx playwright install --with-deps chromium webkit", "node tests/browser/run-related.mjs"]
+                for command in commands:
+                    self.assertEqual(1, source.count(command))
+                # The real positive bootstrap invokes vasey:doctor, whose required
+                # frontend_build diagnostic validates the manifest and built files.
+                positions = [source.index(command) for command in commands]
+                self.assertEqual(sorted(positions), positions)
+
     def test_each_engine_retains_failure_evidence_without_run_or_attempt_collisions(self):
         job = self.operator_job()
         upload = re.search(r"(?ms)^      - name: [^\n]+\n        if: always\(\)\n        uses: actions/upload-artifact@[^\n]+\n        with:\n(.*?)(?=^      - |\Z)", job)
@@ -276,6 +319,31 @@ class BrowserWorkflowTests(unittest.TestCase):
         self.assertEqual(8, len(names))
         self.assertIn("          path: |\n            playwright-report/\n            test-results/\n", upload.group(1))
         self.assertIn("          retention-days: 7\n", upload.group(1))
+
+    def test_browser_budgets_preserve_teardown_and_installation_headroom(self):
+        config = (self.root / "playwright.config.ts").read_text()
+        wrapper = (self.root / "tests/browser/run.mjs").read_text()
+        suite = re.search(r"(?m)^  globalTimeout: (\d+) \* 60_000,$", config)
+        process = re.search(r"cwd: root, env, stdio: 'inherit', timeout: (\d+),", wrapper)
+        self.assertIsNotNone(suite)
+        self.assertIsNotNone(process)
+        suite_ms, wrapper_ms = int(suite.group(1)) * 60_000, int(process.group(1))
+        self.assertEqual(26 * 60_000, suite_ms)
+        self.assertEqual(60_000, wrapper_ms - suite_ms)
+        for unchanged in ("  workers: 1,\n", "  retries: 0,\n", "  timeout: 60_000,\n", "  expect: { timeout: 10_000 },\n"):
+            self.assertIn(unchanged, config)
+        gitlab = (self.root / ".gitlab-ci.yml").read_text()
+        gitlab_job = re.search(r"(?ms)^operator-browser:\n(.*?)(?=^[\w-]+:\n|\Z)", gitlab)
+        self.assertIsNotNone(gitlab_job)
+        self.assertIn('    - npm run test:browser -- --project="$BROWSER_PROJECT"\n', gitlab_job.group(1))
+        github_limit = re.search(r"(?m)^    timeout-minutes: (\d+)$", self.operator_job())
+        gitlab_limit = re.search(r"(?m)^  timeout: (\d+)m$", gitlab_job.group(1))
+        for limit in (github_limit, gitlab_limit):
+            self.assertIsNotNone(limit)
+            self.assertEqual(50, int(limit.group(1)))
+            # The 14-minute observed install delay plus one-minute fixture ceiling must
+            # fit outside the wrapper, with time remaining for builds and artifacts.
+            self.assertGreater(int(limit.group(1)) * 60_000 - wrapper_ms, 15 * 60_000)
 
 
 if __name__ == "__main__":

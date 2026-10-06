@@ -35,6 +35,18 @@
       "test_manifest_and_each_customer_entrypoint_serialize_exact_actor_before_resources_in_both_orders"
     ],
     [
+      "Tests\\Feature\\CustomerAccountConcurrencyTest",
+      "test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint"
+    ],
+    [
+      "Tests\\Feature\\CustomerIdentityConcurrencyTest",
+      "test_committed_withdrawal_wins_the_exact_user_fence_before_recovery"
+    ],
+    [
+      "Tests\\Feature\\CustomerIdentityConcurrencyTest",
+      "test_competing_completions_wait_on_the_exact_address_and_write_one_credential"
+    ],
+    [
       "Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest",
       "test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders"
     ],
@@ -99,6 +111,10 @@
       "test_provider_create_observes_a_committed_intent_from_an_independent_mysql_connection"
     ],
     [
+      "Tests\\Feature\\InquiryConversationConcurrencyTest",
+      "test_committed_inquiry_and_actor_fences_decide_waiting_conversation_operations"
+    ],
+    [
       "Tests\\Feature\\LicenseWriterConcurrencyTest",
       "test_all_license_mutations_serialize_current_role_withdrawal_before_resource_and_actor_fk_writes"
     ],
@@ -129,6 +145,18 @@
     [
       "Tests\\Feature\\OrderPreparationConcurrencyTest",
       "test_scope_block_committed_before_owner_mutex_acquisition_prevents_both_orders"
+    ],
+    [
+      "Tests\\Feature\\ProductDraftConcurrencyTest",
+      "test_native_product_wait_serializes_competing_draft_changes"
+    ],
+    [
+      "Tests\\Feature\\ProductDraftConcurrencyTest",
+      "test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation"
+    ],
+    [
+      "Tests\\Feature\\ProductDraftConcurrencyTest",
+      "test_source_lock_captures_metadata_committed_while_creator_waits"
     ],
     [
       "Tests\\Feature\\PromotionAdministrationMySqlConcurrencyTest",
@@ -165,6 +193,14 @@
     [
       "Tests\\Feature\\ReservePricedQuoteConcurrencyTest",
       "test_both_resources_commit_or_rollback_under_shared_lock_contention"
+    ],
+    [
+      "Tests\\Feature\\ResumableMediaUploadsConcurrencyTest",
+      "test_native_actor_wait_serializes_duplicate_and_competing_upload_operations"
+    ],
+    [
+      "Tests\\Feature\\ResumableMediaUploadsConcurrencyTest",
+      "test_required_mfa_withdrawn_during_native_actor_wait_refuses_upload_operation"
     ],
     [
       "Tests\\Feature\\RightsDeclarationWriterConcurrencyTest",
@@ -253,6 +289,30 @@
     [
       "Tests\\Feature\\SiteScheduleConcurrencyTest",
       "test_scheduler_and_manual_publication_serialize_to_one_consistent_outcome"
+    ],
+    [
+      "Tests\\Feature\\SoundKitConcurrencyTest",
+      "test_mfa_withdrawal_committed_during_actor_wait_refuses_kit_operation"
+    ],
+    [
+      "Tests\\Feature\\SoundKitConcurrencyTest",
+      "test_mfa_withdrawal_during_final_actor_wait_prevents_verified_commit_after_real_scanning"
+    ],
+    [
+      "Tests\\Feature\\SoundKitConcurrencyTest",
+      "test_native_actor_wait_serializes_duplicate_upload_or_processing"
+    ],
+    [
+      "Tests\\Feature\\SoundKitUploadsConcurrencyTest",
+      "test_native_actor_wait_serializes_duplicate_kit_transport_operations"
+    ],
+    [
+      "Tests\\Feature\\SoundKitUploadsConcurrencyTest",
+      "test_native_draft_wait_observes_committed_version_change_before_completion"
+    ],
+    [
+      "Tests\\Feature\\SoundKitUploadsConcurrencyTest",
+      "test_required_mfa_withdrawal_during_native_actor_wait_refuses_each_transport_operation"
     ],
     [
       "Tests\\Feature\\StemsRecordingConcurrencyTest",
@@ -347,6 +407,14 @@
       "test_independent_operators_serialize_history_and_fence_provider_claims"
     ],
     [
+      "Tests\\Feature\\TestUnpaidReleaseConcurrencyTest",
+      "test_exact_order_fence_preserves_money_and_the_winning_resource_disposition"
+    ],
+    [
+      "Tests\\Feature\\TestUnpaidReleaseConcurrencyTest",
+      "test_release_serializes_new_capacity_users_without_reviving_old_bindings"
+    ],
+    [
       "Tests\\Feature\\TrackMetadataConcurrencyTest",
       "test_overlapping_edits_wait_on_the_same_row_and_only_one_revision_is_saved"
     ],
@@ -404,4 +472,3 @@
     ]
   ]
 }
-

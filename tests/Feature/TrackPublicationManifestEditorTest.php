@@ -15,20 +15,20 @@ use Filament\Notifications\Notification;
 use Filament\Support\Exceptions\Cancel;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Exceptions;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\QuoteFixtures;
 use Tests\TestCase;
 
 class TrackPublicationManifestEditorTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     protected function setUp(): void
     {

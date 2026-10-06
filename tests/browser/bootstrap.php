@@ -1,11 +1,17 @@
 <?php
 
 use App\Domain\Catalog\SaveTrackMetadata;
+use App\Domain\Customers\CustomerAccounts;
+use App\Domain\Delivery\DeliveryAccessEvidence;
+use App\Domain\Delivery\PrepareTestDeliveryStream;
+use App\Domain\Delivery\ReadTestOwnerDelivery;
+use App\Domain\Media\MalwareScanner;
 use App\Models\User;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\Console\Tester\CommandTester;
+use Tests\Support\CustomerFixtures;
 
 // This CLI-only fixture builder must never touch an existing installation or database.
 try {
@@ -19,6 +25,18 @@ try {
         || ! is_string($password) || strlen($password) < 40 || getenv('APP_ENV') !== 'local' || getenv('DB_CONNECTION') !== 'sqlite'
         || getenv('APP_URL') !== 'http://127.0.0.1:8173') {
         throw new RuntimeException('Refusing browser fixtures outside a fresh isolated local run.');
+    }
+    // Only the dedicated runner's existing stage/marker pair selects its empty-commerce baseline.
+    // Malformed or partial stage identity must not silently omit ordinary customer coverage.
+    $stage = getenv('VASEY_BROWSER_RELATED_STAGE');
+    $marker = getenv('VASEY_BROWSER_RELATED_MARKER');
+    $relatedStage = $stage === '1' && is_string($marker) && preg_match('/\A[a-f0-9]{64}\z/D', $marker) === 1;
+    $ordinaryStage = in_array($stage, [false, ''], true) && in_array($marker, [false, ''], true);
+    if (! $relatedStage && ! $ordinaryStage) {
+        throw new RuntimeException('Refusing an incomplete browser fixture stage identity.');
+    }
+    if ($ordinaryStage && (! is_executable('/usr/bin/clamscan') || realpath('/usr/bin/clamscan') !== '/usr/bin/clamscan')) {
+        throw new RuntimeException('Native customer fixtures require the genuine scanner and current signatures.');
     }
     require __DIR__.'/../../vendor/autoload.php';
     $app = require __DIR__.'/../../bootstrap/app.php';
@@ -37,7 +55,10 @@ try {
         throw new RuntimeException('Synthetic operator provisioning failed.');
     }
     $actor = User::where('email', 'browser-operator@example.test')->sole();
-    User::factory()->create(['name' => 'Synthetic Customer', 'email' => 'browser-customer@example.test', 'password' => $password]);
+    $customer = User::factory()->create(['name' => 'Synthetic Customer', 'email' => 'browser-customer@example.test', 'password' => $password, 'is_admin' => false, 'email_verified_at' => now()]);
+    if ($ordinaryStage) {
+        app(CustomerAccounts::class)->provision($customer);
+    }
     $fixtures = [];
     foreach (['chromium-desktop', 'webkit-mobile'] as $project) {
         $editable = app(SaveTrackMetadata::class)->handle(null, ['title' => 'Synthetic editable '.$project, 'slug' => 'editable-'.$project], $actor);
@@ -51,6 +72,41 @@ try {
     if (Artisan::call('vasey:doctor', ['--json' => true]) !== 0) {
         fwrite(STDERR, Artisan::output()); // This report contains only fixed, redacted messages.
         throw new RuntimeException('The isolated installation did not pass its required diagnostics.');
+    }
+    if ($ordinaryStage) {
+        // The ordinary native suite needs retained customer purchases. Related-track preparation
+        // instead proves its original four-track, two-user, empty-commerce census independently.
+        $customerFixtures = ['projects' => []];
+        $paidFixtures = [];
+        $scanner = new MalwareScanner;
+        $ordinaryScannerPath = config('media.clamscan');
+        $app->detectEnvironment(fn () => 'testing');
+        config(['media.clamscan' => '/usr/bin/clamscan']);
+        try {
+            foreach (['chromium-desktop' => 'CHROMIUM', 'webkit-mobile' => 'WEBKIT'] as $project => $suffix) {
+                $paid = CustomerFixtures::ready($customer, $suffix, true, $scanner);
+                $customerFixtures['projects'][$project] = CustomerFixtures::browserManifest($paid);
+                $paidFixtures[] = $paid;
+            }
+        } finally {
+            config(['media.clamscan' => $ordinaryScannerPath]);
+            app()->instance(MalwareScanner::class, $scanner);
+            $app->detectEnvironment(fn () => 'local');
+        }
+        // Prove preparation in the same local environment used by the HTTP server.
+        // This reads private snapshots without issuing tokens, recording attempts or changing purchase evidence.
+        foreach ($paidFixtures as $paid) {
+            $evidence = app(DeliveryAccessEvidence::class);
+            $source = $evidence->source($paid['order'], config('payments.stripe.account_id'));
+            $items = app(ReadTestOwnerDelivery::class)->handle($paid['order']->public_id, $paid['principal']->ownerKey)['items'];
+            foreach ($items as $item) {
+                $target = $evidence->target($source, $item['grantId'], $item['kind']);
+                $prepared = app(PrepareTestDeliveryStream::class)->handle($target['file']);
+                $prepared->close();
+            }
+        }
+        file_put_contents($directory.'/customer-fixtures.json', json_encode($customerFixtures, JSON_THROW_ON_ERROR));
+        chmod($directory.'/customer-fixtures.json', 0600);
     }
     echo "Fresh SQLite migrations, interactive operator command and installation diagnostics passed.\n";
 } catch (Throwable) {
