@@ -29,12 +29,19 @@ class ProductionTrackPolicyEngineTest extends TestCase
     {
         config(['app.key' => 'base64:'.base64_encode(str_repeat('k', 32))]);
         $migration = require database_path('migrations/2026_10_06_233000_production_track_policy_drafts.php');
+        $capabilities = require database_path('migrations/2026_10_06_236000_production_track_policy_capabilities.php');
+        foreach (['production_track_capability_candidates', 'production_track_capability_approvals', 'production_track_capability_closures'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
+        // Remove the empty additive child before testing this retained parent's engine.
+        $capabilities->down();
         $migration->down();
         $original = DB::selectOne('SELECT @@SESSION.default_storage_engine AS engine')->engine;
         DB::statement("SET SESSION default_storage_engine = 'MyISAM'");
         try {
             $this->assertSame('MyISAM', DB::selectOne('SELECT @@SESSION.default_storage_engine AS engine')->engine);
             $migration->up();
+            $capabilities->up();
             $tables = ['production_track_policy_drafts', 'production_track_policy_versions', 'production_track_policy_source_reviews'];
             $engines = DB::table('information_schema.TABLES')->where('TABLE_SCHEMA', DB::connection()->getDatabaseName())
                 ->whereIn('TABLE_NAME', $tables)->orderBy('TABLE_NAME')->pluck('ENGINE', 'TABLE_NAME')->all();

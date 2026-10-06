@@ -1,6 +1,6 @@
 # [WP-10] Collections, sound kits, services and merchandise workflows
 
-Status: **Planned work package**. Inspect the current implementation before starting; initial foundation code may already cover part of this scope. This issue is complete only when the acceptance evidence below exists.
+Status: **Implemented private authoring children; sales and fulfillment acceptance remains open**. This issue is complete only when the acceptance evidence below exists.
 
 - Suggested issue title: `[WP-10] Collections, sound kits, services and merchandise workflows`
 - Phase: 3; elevate any active source obligation before cutover
@@ -52,3 +52,17 @@ Read [architecture index](../architecture/README.md), [decision register](../arc
 Reviewed kit source `7e2d83d` joins the customer/collection/inquiry/unpaid-order candidate. Staff can create private WAV kit drafts, retain source provenance, upload exact ZIP revisions, inspect immutable technical manifests and retry processing. [Kit evidence](../sound-kit-intake.md) records 41 shared-engine cases / 298 assertions, 50 native MySQL cases / 660 assertions and unchanged 58-case / 589-assertion stems regressions. Independent review re-executed the shared-engine and stems selections. Full combined CI and native browser acceptance remain separate.
 
 The whole-file admin form is bounded below 9 MiB by the current development HTTP server; its 200 MiB application ceiling is not proof of upload admission. Typed resumable kit transport is being developed separately. This technical intake does not issue kit licenses, create prices, expose public archives, grant purchases or implement preset/MIDI formats. Those required product workflows remain open.
+
+## Private service and merchandise authoring — October 6, 2026
+
+Reviewed source `33cbe284ac37cecd9c9d8418519657407e8cb5fe` supplies real staff
+create/review/apply pages, strict private service and merchandise manifests,
+immutable revisions/history and current actor/MFA proof. Independent SQLite
+checks passed 86 cases / 435 assertions; mounted authoring passed 14 / 244.
+[Source evidence](../verification/service-merch-private-drafts.md) and the
+[composed record](../verification/store-foundations-integration-20261006.md)
+retain native waits, lost-response correction and exact source limits.
+
+T28/T29 remain open for private buyer briefs, estimates/deposits/milestones,
+stock/shipping/tax/provider tracking/returns and approved actual-source obligations.
+The private definitions do not create public products or fulfill paid purchases.

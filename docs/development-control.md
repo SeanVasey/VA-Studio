@@ -1,6 +1,28 @@
 # Current development queue
 
-## Current integration and parallel execution — October 6, 2026 UTC
+## Resumed foundations integration — October 6, 2026 UTC
+
+The live GitHub main at continuation is `4d39a7d02f9094085f9a74610ebdc42b42e8a059`,
+tree `41aa7cd6c0813966a04b6c15bf679014c8f679e7`. PR #15 merged durable private
+onboarding, bulk source editing and the redacted readiness report. Local mirror
+`e24d6e5251adc49d58c5dc01a958053fac86e573` has that exact tree and the recorded
+ordered parent mapping. PR #14's CI policy remains incorporated. Dependency PRs
+#1–#3 remain preserved pending lockfile compatibility review.
+
+The next branch `codex/continuation-foundations-20261006` retains the reviewed
+stopped copy-upgrade, authored production policy and private service/merchandise
+drafts. Separate continued lanes finish membership administration, transactional
+notification authority/recovery, normalized private catalog import and typed
+production capabilities. Old worktrees, dirty source and negative evidence are
+preserved; authors work in isolated children. One lead integrates and publishes.
+
+Component and composed focused evidence, exact source identities and the next
+dependency are recorded in the foundations verification record when frozen.
+Production sales, recurring benefits, delivered mail, public product fulfillment,
+actual export reconciliation and complete final acceptance remain open. No
+routine MySQL/full matrix or hosted manual workflow is requested by this batch.
+
+## Preserved integration and parallel execution — October 6, 2026 UTC
 
 Verified remote `main` is `13d7474f2f843084f7c7ab94b4e5e8105d08bbce`, tree
 `7a5a17c8bcd363bb79b2267bfb7bbe06ee1b300a`. PR #13 merged on October 6 at

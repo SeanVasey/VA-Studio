@@ -1,5 +1,40 @@
 # Parallel development execution — October 6, 2026
 
+## Resumed foundations batch
+
+The continuation starts from verified GitHub main
+`4d39a7d02f9094085f9a74610ebdc42b42e8a059`, tree
+`41aa7cd6c0813966a04b6c15bf679014c8f679e7`, after development PR15.
+Root owns `codex/continuation-foundations-20261006`, shared registrations,
+configuration, migration-fixture dependency order and current status. Original
+workspaces and all negative evidence remain preserved.
+
+| Lane | Accepted component source | Review and dependency |
+| --- | --- | --- |
+| Stopped copy upgrade | `960458e` | Reviewed actual copy/schema/HTTP preparation; chosen-host recovery remains open |
+| Authored production policy | `cd3ee3e` | Reviewed immutable authored revisions and final primary-PDO proof; typed consumers follow |
+| Service and merchandise drafts | `33cbe28` | Reviewed actual mounted private authoring; sales and fulfillment remain open |
+| Membership administration | `5007556` | Reviewed plans/credits and corrected exhausted-save rendering; paid billing/redemption/continuity remain open |
+| Transactional capture | `6277e27` | Reviewed final recipient/current-authority status proof; delivered mail remains open |
+| Protected catalog import | `9ca4312` (runtime `5464756`) | Reviewed bounded SQLite draft import and schema/replacement canaries; actual source/history/media/redirects remain open |
+| Production capabilities | `e8c7b20` | Reviewed strict typed candidate/approval/closure and corrected rollback ownership; execution stays disabled |
+
+`service_merch_review` independently reviews service, membership, notification
+and frozen shared composition; `catalog_import_review` reviews actual import
+source and documentation carry; `notifications_continue` reviews typed compiler
+and rollback ownership. Component authors do not publish or edit shared files.
+[The composition record](verification/store-foundations-integration-20261006.md)
+binds final source, checks, review, limitations and next dependencies.
+
+The bounded `store-foundations` feedback selection is separate from already-full
+operator/seller suites. Exact reviewed native methods are registered for SQLite
+skips; no functional case is waived. Native copy-upgrade/import checks are added
+to manual final quality checks, while routine PR preflight skips those steps.
+No routine MySQL/full/browser matrix or final workflow is dispatched by this batch.
+
+## Original parallel planning checkpoint — preserved
+
+
 This is the active execution plan for Sean's 20:36 UTC instruction to prepare
 and implement independent work concurrently. The verified starting main is
 `13d7474f2f843084f7c7ab94b4e5e8105d08bbce`, tree
@@ -7,7 +42,7 @@ and implement independent work concurrently. The verified starting main is
 exact tree and preserves the mapped ordered ancestry. PR #13 is merged; the
 older queue entries claiming it is pending are historical.
 
-## Ownership and live assignments
+## Original ownership and assignments
 
 | Worker | Branch / owned files | Running work and handoff |
 | --- | --- | --- |

@@ -6,7 +6,7 @@ their retained history. Each family has its own concrete format, model and
 tables. Authored declarations record supplied private text; they do not approve
 a commercial policy. Explicitly unresolved declarations retain what is needed.
 
-This increment advances T28/WP-05 and T29/WP-06. Their public product, purchase
+This increment advances T28/WP-10 and T29/WP-10. Their public product, purchase
 and fulfillment criteria remain open.
 
 ## Supplied content

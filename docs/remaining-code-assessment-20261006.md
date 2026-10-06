@@ -1,5 +1,22 @@
 # VA-Studio remaining code assessment — October 6, 2026
 
+## Continuation delta
+
+The inspection below is a preserved baseline at PR13. Development PR15 has
+since incorporated durable private authoring, bulk license source editing and
+the redacted production readiness report. The reviewed foundations continuation
+adds stopped copy-upgrade preparation, authored/typed production policies,
+private service/merch and synthetic membership administration, transactional
+capture/recovery and protected SQLite draft imports. Use the updated
+[task register](remaining-development-tasks.csv),
+[active ownership](parallel-execution-20261006.md) and
+[composition evidence](verification/store-foundations-integration-20261006.md)
+for those deltas. The 40 parent groups and 103 parity requirements remain tracked;
+six accepted groups and 34 open groups are unchanged. No source-bound baseline
+test or estimate is relabeled as new integrated acceptance.
+
+## Preserved source inspection
+
 Frozen reviewed source: remote main `13d7474f2f843084f7c7ab94b4e5e8105d08bbce`, local exact-tree mirror `72fc6d7fca9e8ed22e969bd9269ba775a02a48e6`, tree `7a5a17c8bcd363bb79b2267bfb7bbe06ee1b300a`. CI policy `4abee91825adc23a0fb9e572531c4d65cbcfa998` is incorporated. This is a source inspection, not a new test run or authenticated BeatStars audit.
 
 The existing application contains real persistent catalog/license/offer/CMS administration, private media/resumable intake, track quotes/orders/Stripe inbox/finalization/contracts/delivery, customer enrollment/recovery/guest claims/library, in-app support, collection drafts and scanned WAV-kit drafts. Major production barriers are explicit test-only contracts, missing provider/policy adapters and missing public product workflows. The 6 accepted parent groups are not a 15% code-completion measure.

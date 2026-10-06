@@ -94,3 +94,13 @@ Historical October 2 development evidence before PR #104 acceptance: preceding t
 PR #28 is merged. [PR #29](https://github.com/VASEYDEV/VASEYAUDIO/pull/29) uses isolated Chromium and mobile-viewport WebKit to exercise actual login, CSRF, create/edit validation, keyboard modal focus, stale forms, retained URLs and named publication blockers over HTTP. The publish confirmation now renders domain blockers as a persistent notification because it has no metadata fields for validation messages. Metadata dialogs focus the modal window, recover initial focus after the opening transition when necessary, and preserve focus already inside the form. See [operator/browser verification](../operator-setup-and-verification.md) and the follow-up PR for actual results. This does not claim physical iPhone, production MFA/recovery or full media-to-publication browser acceptance. Continue WP-03 archive/stem safety after the foundation increment is verified and accepted.
 
 Historical integrated local feedback at `a85bdc54d93cc47773ecbbbf7052917f7e393fa5`, tree `ee97955bb3e116134ac84329a0ca12ee69e62b9a`: 218 fixed operator cases reported, 189 executed / 2,117 assertions, 29 exact MySQL-only skips, zero failures/errors. TypeScript and applicable Python safeguards passed; all nine targeted Chromium journeys passed with zero skips/retries/flaky cases or test/runner errors (207,303.542 ms), including the new publication guard. Original report SHA-256 is `41d74cbc888996c7dec746e2fea24f5ebc062ac1ffe6e43bfb2e62f3f62d67ea`. This does not replace fresh full hosted source-bound acceptance.
+
+## Private foundations composition — October 6, 2026
+
+PR15 incorporated durable private authoring, bounded bulk license source editing
+and redacted production readiness. The next reviewed foundations compose authored
+production policy and strict typed capability preparation, private service/merch
+and synthetic membership authoring, transactional capture and protected SQLite
+draft import. [The composed record](../verification/store-foundations-integration-20261006.md)
+binds sources, independent review and actual focused checks. Production execution,
+paid product workflows, native device and consolidated final acceptance remain open.
