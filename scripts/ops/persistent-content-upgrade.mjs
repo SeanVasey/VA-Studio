@@ -227,6 +227,8 @@ export async function upgradeWorkspace({ sourceCheckout, sourceDirectory, direct
     output.write('Stopped private database and files captured. Applying reviewed forward migrations to the new copy.\n');
     await operation(target, env, 'apply', signal);
     requireSafe(heldSource.child.exitCode === null && heldSource.child.signalCode === null && heldTarget.child.exitCode === null && heldTarget.child.signalCode === null);
+    requireSafe(JSON.stringify(reviewedCheckout(sourceCheckout, expectedSourceSha)) === JSON.stringify(sourceRelease)
+      && JSON.stringify(reviewedCheckout(checkout, expectedTargetSha)) === JSON.stringify(targetRelease));
     const finalSource = await inventory(sourceDirectory, maximumBytes);
     requireSafe(JSON.stringify(finalSource) === JSON.stringify(baseline));
     for (const file of plan.retained_files) requireSafe(await fileHash(join(directory, file.path)) === file.sha256);

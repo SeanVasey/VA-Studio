@@ -212,7 +212,7 @@ native('real authenticated HTTP sessions survive copy upgrade and restart while 
       }
       const token = html.match(/<meta name="csrf-token" content="([^\"]+)"/); assert.ok(token);
       const checkout = await browser.visit('/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ _token: attribute(token[1]) }) });
-      assert.equal(checkout.status, 404); await checkout.body?.cancel();
+      assert.equal(checkout.status, 503); assert.equal((await checkout.json()).code, 'COMMERCE_NOT_ENABLED');
     });
     assert.equal(sha(readFileSync(join(target.directory, 'identity.json'))), identity);
   }
