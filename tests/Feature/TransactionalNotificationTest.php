@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Domain\Customers\CustomerAccess;
 use App\Domain\Customers\CustomerAccessException;
+use App\Domain\Delivery\DeliveryException;
 use App\Domain\Delivery\Models\TestFulfillmentActivation;
 use App\Domain\Notifications\Models\TransactionalNotice;
 use App\Domain\Notifications\Models\TransactionalNoticeAttempt;
@@ -524,7 +525,7 @@ class TransactionalNotificationTest extends TestCase
         $denied = false;
         try {
             $service->status($id);
-        } catch (NotificationException|CustomerAccessException|\App\Domain\Delivery\DeliveryException) {
+        } catch (NotificationException|CustomerAccessException|DeliveryException) {
             $denied = true;
         }
         $this->assertSame(1, $capture->inspections);

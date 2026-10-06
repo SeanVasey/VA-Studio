@@ -139,7 +139,10 @@ or notification was sent.
 
 The continuation lane runs the affected functional class on the frozen
 correction and requests an independent review of that actual tested commit.
-The preceding component's native receipt, when complete, remains bound to
-`f4c54f6`; no new native run, hosted workflow, full matrix, producer wiring or
+The preceding component's completed native receipt passed 74 cases / 917
+assertions with no skips, failures or errors and retained six actual independent
+session waits on the exact `users` PRIMARY key. Its source and dependencies were
+unchanged, and that evidence remains bound to `f4c54f6`; it does not certify the
+later status correction. No new native run, hosted workflow, full matrix, producer wiring or
 real email delivery is authorized by this status correction. Shared test
 registrations and old parent-migration fixture ordering remain integration-owned.
