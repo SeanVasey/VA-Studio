@@ -1,12 +1,13 @@
 import { useEffect, useId, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { InquiryConversation, InquiryConversationEntry } from './InquiryConversation';
+import { inquiryLocator, privateInquiryJson } from '../lib/order-inquiry';
 import '../../css/contact-inquiry.css';
 
 type Fields = { name: string; email: string; subject: string; message: string; website: string };
 type VisibleField = Exclude<keyof Fields, 'website'>;
 type Errors = Partial<Record<VisibleField, string>>;
 type Status = { kind: 'editing' | 'sending' | 'error'; message?: string; sessionExpired?: boolean } | { kind: 'saved'; receipt: string };
-type Attempt = { body: string; privacyNotice: string; uncertain: boolean };
+type Attempt = { body: string; privacyNotice: string; endpoint: string; uncertain: boolean };
 
 const empty: Fields = { name: '', email: '', subject: '', message: '', website: '' };
 const limits = { name: 120, email: 254, subject: 160, message: 8000 };
@@ -26,8 +27,13 @@ function csrfHeaders(): Record<string, string> {
   return token ? { 'X-CSRF-TOKEN': token } : {};
 }
 
-/** Public contact only; the parent must gate this surface on the server's enabled projection. */
-export function ContactInquiryForm({ privacyNotice, noticeToken }: { privacyNotice: string; noticeToken: string }) {
+type Props = { privacyNotice: string; noticeToken: string; orderId?: string };
+/** Parent gates collection on a verified public or order-specific setup. Locator changes discard private state. */
+export function ContactInquiryForm(props: Props) {
+  return <InquiryForm key={props.orderId ?? 'contact'} {...props} />;
+}
+
+function InquiryForm({ privacyNotice, noticeToken, orderId }: Props) {
   const prefix = useId();
   const [fields, setFields] = useState<Fields>({ ...empty });
   const [errors, setErrors] = useState<Errors>({});
@@ -92,17 +98,18 @@ export function ContactInquiryForm({ privacyNotice, noticeToken }: { privacyNoti
       }
       let requestKey: string;
       try { requestKey = crypto.randomUUID(); } catch {
-        setStatus({ kind: 'error', message: 'This browser could not prepare a private inquiry. Use the email contact option below.' }); return;
+        setStatus({ kind: 'error', message: orderId ? 'This browser could not prepare a private inquiry. Visit contact if you need help.' : 'This browser could not prepare a private inquiry. Use the email contact option below.' }); return;
       }
       if (!isUuid(requestKey)) {
-        setStatus({ kind: 'error', message: 'This browser could not prepare a private inquiry. Use the email contact option below.' }); return;
+        setStatus({ kind: 'error', message: orderId ? 'This browser could not prepare a private inquiry. Visit contact if you need help.' : 'This browser could not prepare a private inquiry. Use the email contact option below.' }); return;
       }
       const body = JSON.stringify({ ...fields, noticeToken, requestKey });
       if (new TextEncoder().encode(body).byteLength > 16384) {
         setErrors({ message: 'This inquiry is too large to send. Shorten the message and try again.' });
         setStatus({ kind: 'error', message: 'Shorten your inquiry before sending.' }); return;
       }
-      attempt.current = { body, privacyNotice, uncertain: false };
+      if (orderId !== undefined && !inquiryLocator(orderId)) return;
+      attempt.current = { body, privacyNotice, endpoint: orderId ? `/contact/inquiries/for-order/${orderId}` : '/contact/inquiries', uncertain: false };
     }
 
     const current = attempt.current;
@@ -111,16 +118,17 @@ export function ContactInquiryForm({ privacyNotice, noticeToken }: { privacyNoti
     const abort = new AbortController(); controller.current = abort;
     const timeout = window.setTimeout(() => abort.abort(), 20_000);
     try {
-      const response = await fetch('/contact/inquiries', {
+      const response = await fetch(current.endpoint, {
         method: 'POST', credentials: 'same-origin', cache: 'no-store', redirect: 'error', signal: abort.signal,
         headers: { Accept: 'application/json', 'Content-Type': 'application/json', ...csrfHeaders() }, body: current.body,
       });
       if (!active.current) return;
       let result: unknown;
-      try { result = await response.json(); } catch { result = null; }
+      try { result = orderId ? await privateInquiryJson(response, abort.signal) : await response.json(); } catch { result = null; }
       if (!active.current) return;
       const data = result && typeof result === 'object' ? result as Record<string, unknown> : {};
-      if ((response.status === 200 || response.status === 201) && data.state === 'saved' && typeof data.receipt === 'string' && isUuid(data.receipt)) {
+      if (!response.redirected && (!orderId || response.headers.get('content-type')?.split(';')[0].trim().toLowerCase() === 'application/json')
+        && (response.status === 200 || response.status === 201) && Object.keys(data).length === 2 && data.state === 'saved' && typeof data.receipt === 'string' && isUuid(data.receipt)) {
         attempt.current = null; setFields({ ...empty }); setStatus({ kind: 'saved', receipt: data.receipt }); return;
       }
       // Only a definitive first validation/body rejection releases the editable draft.
@@ -134,7 +142,7 @@ export function ContactInquiryForm({ privacyNotice, noticeToken }: { privacyNoti
         attempt.current = null; setFields(value => ({ ...value, website: '' })); setErrors(invalid);
         if (Object.hasOwn(rejected, 'noticeToken')) {
           setRejectedNoticeToken(noticeToken);
-          setStatus({ kind: 'error', message: 'Your inquiry was not saved. Copy your draft before refreshing contact to review the current privacy notice.' }); return;
+          setStatus({ kind: 'error', message: orderId ? 'Your inquiry was not saved. Copy your draft, then close and reopen the order inquiry to review the current privacy notice.' : 'Your inquiry was not saved. Copy your draft before refreshing contact to review the current privacy notice.' }); return;
         }
         setStatus({ kind: 'error', message: Object.keys(invalid).length ? 'Check the highlighted fields before sending.' : 'Check your inquiry before sending again.' }); return;
       }
@@ -146,8 +154,8 @@ export function ContactInquiryForm({ privacyNotice, noticeToken }: { privacyNoti
         uncertain('Your session expired. Keep this page open. Open contact in a new tab to renew your session, then retry the same inquiry here.', true); return;
       }
       if (response.status === 429) { uncertain('Please wait a moment before retrying the same inquiry. Your original message is kept here.'); return; }
-      if (response.status === 404) { uncertain('This contact form is currently unavailable. Your inquiry has not been confirmed. Your original message is kept here; the email contact option remains available.'); return; }
-      if (response.status === 409) { uncertain('This inquiry could not be matched to its request. It has not been confirmed. Keep a copy of your message and use the email contact option if you need help.'); return; }
+      if (response.status === 404) { uncertain(orderId ? 'An inquiry for this order is currently unavailable. Your inquiry has not been confirmed. Your original message is kept here for the same-request retry.' : 'This contact form is currently unavailable. Your inquiry has not been confirmed. Your original message is kept here; the email contact option remains available.'); return; }
+      if (response.status === 409) { uncertain(orderId ? 'This inquiry could not be matched to its request. It has not been confirmed. Keep a copy of your message and visit contact if you need help.' : 'This inquiry could not be matched to its request. It has not been confirmed. Keep a copy of your message and use the email contact option if you need help.'); return; }
       uncertain();
     } catch {
       if (active.current) uncertain();
@@ -158,7 +166,7 @@ export function ContactInquiryForm({ privacyNotice, noticeToken }: { privacyNoti
     }
   }
 
-  if (!attempt.current && (!privacyNotice.trim() || !isNoticeToken(noticeToken))) return null;
+  if (!attempt.current && (!privacyNotice.trim() || !isNoticeToken(noticeToken) || (orderId !== undefined && !inquiryLocator(orderId)))) return null;
 
   if (conversationReceipt) return <InquiryConversation key={conversationReceipt} receipt={conversationReceipt} onClose={() => {
     setConversationReceipt(null); window.requestAnimationFrame(() => summary.current?.focus());
@@ -181,7 +189,7 @@ export function ContactInquiryForm({ privacyNotice, noticeToken }: { privacyNoti
         <p>{status.message}</p>
         {Object.keys(errors).length > 0 && <ul>{(Object.keys(errors) as VisibleField[]).map(field => <li key={field}><a href={`#${prefix}-${field}`} onClick={event => { event.preventDefault(); document.getElementById(`${prefix}-${field}`)?.focus(); }}>{errors[field]}</a></li>)}</ul>}
         {status.sessionExpired && <a href="/contact" target="_blank" rel="noopener noreferrer">Open contact in a new tab</a>}
-        {noticeRefreshRequired && <a href="/contact">Refresh contact to review the current privacy notice</a>}
+        {noticeRefreshRequired && !orderId && <a href="/contact">Refresh contact to review the current privacy notice</a>}
       </div>}
       <div className="contact-inquiry-fields">
         {(Object.keys(limits) as VisibleField[]).map(field => {
@@ -203,5 +211,5 @@ export function ContactInquiryForm({ privacyNotice, noticeToken }: { privacyNoti
         {locked && !sending && <p>The original fields are read-only while this inquiry is unconfirmed.</p>}
       </div>
     </form>
-  </section><InquiryConversationEntry /></>;
+  </section>{!orderId && <InquiryConversationEntry />}</>;
 }

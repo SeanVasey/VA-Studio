@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { InquiryHistory } from './InquiryHistory';
+import { InquiryOrderContext } from './InquiryOrderContext';
 import '../../css/contact-inquiry.css';
 
 export const isInquiryReceipt = (value: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(value) && value.length === 36;
@@ -186,6 +187,7 @@ export function InquiryConversation({ receipt, onClose }: { receipt: string; onC
     </div>
     <div className="contact-inquiry-actions"><button className="button button-outline" type="button" disabled={busy} onClick={() => void refresh()}>Refresh conversation</button></div>
     {conversation && <div>
+      <InquiryOrderContext receipt={receipt} />
       <h3>{conversation.subject}</h3>
       <p>Inquiry {conversation.state === 'new' ? 'saved' : conversation.state === 'read' ? 'read by staff' : 'archived'}</p>
       <ol aria-label="Conversation messages" style={{ paddingLeft: '1.5rem', overflowWrap: 'anywhere' }}>

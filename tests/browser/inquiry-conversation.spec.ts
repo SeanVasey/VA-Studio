@@ -1,6 +1,8 @@
+import { randomUUID } from 'node:crypto';
+import { writeFile } from 'node:fs/promises';
 import { expect, test, type BrowserContext } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
-import { fixtureOperation, type InquiryFixture } from './contact-inquiry-fixture';
+import { fixtureOperation, type InquiryFixture, type OrderInquiryFixture } from './contact-inquiry-fixture';
 
 test('visitor reads an in-app staff reply, retries one real follow-up and retains an archived conversation', async ({ page, browser }, testInfo) => {
   test.setTimeout(120_000); resetBrowserLoginRateLimit();
@@ -104,6 +106,81 @@ test('visitor reads an in-app staff reply, retries one real follow-up and retain
     await expect(page.getByText('Inquiry archived', { exact: true })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
     await page.screenshot({ path: testInfo.outputPath('private-inquiry-conversation-archived.png'), fullPage: true });
+    expect(errors).toEqual([]);
+
+    // Extend the same original session without changing the generic inquiry's history or retry proof above.
+    const linkedFixture = fixture as OrderInquiryFixture;
+    expect(linkedFixture.orderSupport.capability).toMatch(/^[a-f0-9]{64}$/);
+    await page.goto('/');
+    const csrfCookie = (await page.context().cookies()).find(cookie => cookie.name === 'XSRF-TOKEN'); expect(csrfCookie).toBeTruthy();
+    const headers = { Accept: 'application/json', 'Content-Type': 'application/json', Origin: 'http://127.0.0.1:8173',
+      'X-XSRF-TOKEN': decodeURIComponent(csrfCookie!.value), 'X-Vasey-Order-Inquiry-Fixture': linkedFixture.orderSupport.capability };
+    const quoted = await page.request.post('/quotes', { headers: { ...headers, 'Idempotency-Key': randomUUID() }, data: { items: linkedFixture.orderSupport.items } });
+    expect(quoted.status()).toBe(200); const quoteId = (await quoted.json()).quote.id;
+    const priced = await page.request.post(`/quotes/${quoteId}/pricing`, { headers, data: {} }); expect(priced.status()).toBe(200);
+    const reviewed = await page.request.get(`/quotes/${quoteId}/order-review`, { headers }); expect(reviewed.status()).toBe(200);
+    const review = (await reviewed.json()).review;
+    const prepared = await page.request.post('/orders', { headers: { ...headers, 'Idempotency-Key': randomUUID() }, data: {
+      quoteId, reviewHash: review.reviewHash, buyer: { legalName: 'Synthetic inquiry order buyer', email: 'inquiry-order@example.test' }, accepted: true,
+    } });
+    expect(prepared.status()).toBe(200); const orderId = (await prepared.json()).order.id;
+    expect(fixtureOperation('conversation-order-retain', testInfo.project.name, undefined, undefined, JSON.stringify(orderId))).toEqual({ orderId, originalsRetained: true });
+    const orderEndpoint = `/contact/inquiries/for-order/${orderId}`;
+    const deniedSetup = await foreign.request.get(orderEndpoint); expect(deniedSetup.status()).toBe(404);
+    expect(await deniedSetup.text()).not.toContain(orderId);
+    const deniedSubmit = await page.request.post(orderEndpoint, { data: {} }); expect(deniedSubmit.status()).toBe(419);
+    const setupRequests: string[] = [];
+    page.on('request', request => { if (new URL(request.url()).pathname === orderEndpoint && request.method() === 'GET') setupRequests.push(request.url()); });
+    await page.getByRole('button', { name: 'Open cart, 0 items', exact: true }).click();
+    const cart = page.getByRole('dialog', { name: 'YOUR SELECTIONS.', exact: true });
+    await cart.getByRole('button', { name: 'Browse test orders', exact: true }).click();
+    await cart.getByRole('button', { name: `View test order status ${orderId}`, exact: true }).click(); expect(setupRequests).toEqual([]);
+    const orderInquiry = cart.getByRole('region', { name: 'Test order inquiry', exact: true });
+    await orderInquiry.getByRole('button', { name: 'Ask about this test order', exact: true }).press('Enter');
+    await expect(orderInquiry.getByText(`Linked test order ${orderId}`, { exact: true })).toBeVisible(); expect(setupRequests).toHaveLength(1);
+    for (const label of ['Name', 'Email', 'Subject', 'Message'] as const) await orderInquiry.getByLabel(new RegExp(`^${label}`)).fill(fixture.values[label.toLowerCase() as keyof InquiryFixture['values']]);
+    const linkedBodies: string[] = []; const linkedReceipts: string[] = [];
+    await page.route('**' + orderEndpoint, async route => {
+      if (route.request().method() !== 'POST') { await route.continue(); return; }
+      const result = await route.fetch(); linkedBodies.push(route.request().postData()!);
+      expect(result.status()).toBe(linkedBodies.length === 1 ? 201 : 200);
+      expect(result.headers()['cache-control']).toContain('no-store'); const saved = await result.json();
+      expect(saved).toEqual({ state: 'saved', receipt: expect.stringMatching(/^[a-f0-9-]{36}$/) }); linkedReceipts.push(saved.receipt);
+      if (linkedBodies.length === 1) await route.abort('failed'); else await route.fulfill({ response: result });
+    });
+    await orderInquiry.getByRole('button', { name: 'Send inquiry', exact: true }).press('Enter');
+    await expect(orderInquiry.getByRole('alert')).toContainText('could not confirm'); await expect(orderInquiry.getByRole('alert')).toBeFocused();
+    await expect(orderInquiry.getByLabel(/^Message/)).toHaveAttribute('readonly', '');
+    expect(linkedBodies).toHaveLength(1); expect(Object.keys(JSON.parse(linkedBodies[0])).sort()).toEqual(['email', 'message', 'name', 'noticeToken', 'requestKey', 'subject', 'website']);
+    const replayedInquiry = page.waitForResponse(result => new URL(result.url()).pathname === orderEndpoint && result.request().method() === 'POST');
+    await orderInquiry.getByRole('button', { name: 'Retry same inquiry', exact: true }).click();
+    const linkedReplay = await replayedInquiry; expect(linkedReplay.status()).toBe(200); expect(await linkedReplay.finished()).toBeNull();
+    await expect(orderInquiry.getByRole('heading', { name: 'Inquiry saved', exact: true })).toBeVisible();
+    expect(linkedBodies).toHaveLength(2); expect(linkedBodies[1]).toBe(linkedBodies[0]); expect(linkedReceipts).toEqual([linkedReceipts[0], linkedReceipts[0]]);
+    const linkedReceipt = linkedReceipts[0], contextEndpoint = `/contact/inquiries/${linkedReceipt}/order-context`;
+    const proof = fixtureOperation('conversation-order-verify', testInfo.project.name, linkedReceipt, 'new', linkedBodies[0]);
+    expect(proof).toEqual({ orderId, receipt: linkedReceipt, singleInquiry: true, singleContext: true, originalsUnchanged: true, encryptedInput: true, rawNoticeTokenRetained: false });
+    const contextRead = await page.request.get(contextEndpoint); expect(contextRead.status()).toBe(200); expect(contextRead.headers()['cache-control']).toContain('no-store');
+    const expectedContext = { context: { orderInquiryContextSchema: 1, order: { id: orderId, testOnly: true } } }; expect(await contextRead.json()).toEqual(expectedContext);
+    const foreignContext = await foreign.request.get(contextEndpoint); expect(foreignContext.status()).toBe(404); expect(await foreignContext.text()).not.toContain(orderId);
+    expect(await (await page.request.get(`/contact/inquiries/${receipt}/order-context`)).json()).toEqual({ context: { orderInquiryContextSchema: 1, order: null } });
+    await operator.goto(`/admin/customer-inquiries/${linkedReceipt}`);
+    await expect(operator.getByText(`Linked test order ${orderId}. This retained reference does not confirm current payment, download access or usage rights.`, { exact: true })).toBeVisible();
+    await page.goto('/contact'); await page.getByLabel('Inquiry receipt', { exact: true }).fill(linkedReceipt);
+    await page.getByRole('button', { name: 'Open conversation', exact: true }).click();
+    await expect(page.getByText(fixture.values.message, { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Read inquiry order reference', exact: true }).press('Enter');
+    const reference = page.getByRole('region', { name: 'Inquiry order reference', exact: true });
+    await expect(reference.getByText(orderId, { exact: true })).toBeVisible();
+    await reference.getByRole('button', { name: 'Hide inquiry order reference', exact: true }).click();
+    await expect(reference.getByRole('button', { name: 'Read inquiry order reference', exact: true })).toBeFocused(); await expect(reference.getByText(orderId, { exact: true })).toHaveCount(0);
+    await reference.getByRole('button', { name: 'Read inquiry order reference', exact: true }).click(); await expect(reference.getByText(orderId, { exact: true })).toBeVisible();
+    const savedValues = await page.evaluate(() => [...Object.values(localStorage), ...Object.values(sessionStorage)].join('\n'));
+    for (const value of [orderId, fixture.values.message, fixture.values.email, JSON.parse(linkedBodies[0]).requestKey, JSON.parse(linkedBodies[0]).noticeToken]) expect(savedValues).not.toContain(value);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+    await page.screenshot({ path: testInfo.outputPath('private-order-inquiry-reference.png'), fullPage: true });
+    expect(fixtureOperation('conversation-order-verify', testInfo.project.name, linkedReceipt, 'new', linkedBodies[0])).toEqual(proof);
+    await writeFile(testInfo.outputPath('private-order-inquiry-proof.json'), JSON.stringify({ ...proof, exactRetry: true, foreignDenied: true, retainedContext: expectedContext, originalGenericJourneyPreserved: true }, null, 2));
     expect(errors).toEqual([]);
   } finally {
     try { await staff?.close(); await foreign?.close(); } finally { fixtureOperation('conversation-restore', testInfo.project.name); }
