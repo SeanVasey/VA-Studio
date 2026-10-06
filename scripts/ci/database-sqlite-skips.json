@@ -103,6 +103,10 @@
       "test_provider_create_observes_a_committed_intent_from_an_independent_mysql_connection"
     ],
     [
+      "Tests\\Feature\\InquiryConversationConcurrencyTest",
+      "test_committed_inquiry_and_actor_fences_decide_waiting_conversation_operations"
+    ],
+    [
       "Tests\\Feature\\LicenseWriterConcurrencyTest",
       "test_all_license_mutations_serialize_current_role_withdrawal_before_resource_and_actor_fk_writes"
     ],

@@ -2,6 +2,14 @@
 
 Checkpoint: October 5, 2026 (America/Chicago), following Sean's instruction to prioritize the finished website and eliminate serial development waits. This plan keeps all required scope in the [40-group register](remaining-development-tasks.csv) and [103-row coverage map](remaining-parity-coverage.csv). The protected preview is a testing aid, not the completion target.
 
+## Private inquiry conversation composition — October 6, 2026
+
+The next completion batch also includes reviewed private inquiry conversations (`b025ee26`): visitors submit, read staff replies, follow up with safe uncertain retries, and revisit retained messages after staff archive the thread. Original session ownership remains required; a receipt or later account sign-in does not recover a guest conversation. Staff replies run through fresh authority/MFA checks. The [feature record](inquiry-conversations.md) preserves component native 76/1,041 and frontend evidence; native browser execution remains a final hosted gate.
+
+The integration preserves both customer and conversation routes and registers all five new PHP classes, the frontend/browser journey, and only the eight exact native race cases as SQLite exceptions. No existing case or acceptance requirement is removed. The preceding 3,306-case census below describes the customer/product source before this addition; final combined discovery and execution are recorded separately. T15/T17 still require order-aware support, private attachments and applicable production notice/retention/provider acceptance.
+
+The composed customer/account and inquiry HTTP/schema selection passed 57 of 60 SQLite cases / 727 assertions, with only three existing native-schema skips. The new inquiry races and schema checks passed together on MySQL: 12 tests / 330 assertions, zero failures/skips. Customer/inquiry/editorial frontend checks passed 57 cases; TypeScript, production build and client scan passed. Complete discovery now contains 3,346 cases in 206 files, with 339 exact reviewed SQLite skips across 107 methods. Discovery does not establish full execution; the next frozen candidate requires all ten database receipts and every hosted gate.
+
 ## Customer and product authoring composition — October 6, 2026
 
 The next reviewed source now combines account-first customer sign-in/library (`96fd8d0` backend with `2ea42ea` UI and `cd29d47` browser journeys) and collection/album draft authoring (`5a11a923`). Real merge ancestry retains the preceding completion candidate `404e48a`; component reviews and local results do not replace acceptance of the final combined source.

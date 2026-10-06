@@ -70,6 +70,9 @@ PHP_TARGETS = {
         "tests/Feature/TestOwnerDeliveryHttpTest.php", "tests/Feature/TestOwnerDeliveryProjectionTest.php",
     ),
     "seller": (
+        "tests/Feature/InquiryConversationTest.php", "tests/Feature/InquiryConversationHttpTest.php",
+        "tests/Feature/InquiryConversationAdminTest.php", "tests/Feature/InquiryConversationConcurrencyTest.php",
+        "tests/Feature/InquiryMessageMigrationTest.php",
         "tests/Feature/ProductDraftTest.php", "tests/Feature/ProductDraftEditorTest.php",
         "tests/Feature/ProductDraftMigrationTest.php", "tests/Feature/ProductDraftConcurrencyTest.php",
         "tests/Feature/CustomerInquiryHttpTest.php", "tests/Feature/CustomerInquiryMigrationTest.php",
@@ -118,6 +121,7 @@ PHP_TARGETS = {
     ),
 }
 FRONTEND_TARGETS = (
+    "tests/frontend/inquiry-conversation.test.tsx",
     "tests/frontend/customer-account.test.tsx",
     "tests/frontend/audio.test.tsx", "tests/frontend/catalog-pagination.test.tsx",
     "tests/frontend/catalog.test.ts", "tests/frontend/checkout-return.test.tsx",
@@ -134,6 +138,7 @@ FRONTEND_TARGETS = (
     "tests/frontend/resumable-media-upload.test.ts",
 )
 BROWSER_TARGETS = (
+    "tests/browser/inquiry-conversation.spec.ts",
     "tests/browser/customer-account.spec.ts",
     "tests/browser/storefront.spec.ts", "tests/browser/operator.spec.ts",
     "tests/browser/test-checkout.spec.ts", "tests/browser/test-owner-delivery.spec.ts",
