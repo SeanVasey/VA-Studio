@@ -26,7 +26,7 @@ export default defineConfig({
   ],
   webServer: {
     // Laravel reads its storage override from superglobals; cli-server omits it under GPCS.
-    command: 'php -d variables_order=EGPCS -S 127.0.0.1:8173 -t public tests/browser/server.php',
+    command: 'php -d variables_order=EGPCS -d upload_max_filesize=9M -d post_max_size=9M -S 127.0.0.1:8173 -t public tests/browser/server.php',
     url: 'http://127.0.0.1:8173/up',
     reuseExistingServer: false,
     timeout: 30_000,
