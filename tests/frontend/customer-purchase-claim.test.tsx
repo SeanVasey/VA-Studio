@@ -16,7 +16,7 @@ describe('explicit guest purchase claim', () => {
     fireEvent.change(screen.getByLabelText('Guest test-order reference'), { target: { value: id } });
     fireEvent.click(screen.getByRole('button', { name: 'Select purchase before sign-in' }));
     expect(await screen.findByRole('status')).toHaveTextContent('Sign in below');
-    expect(screen.getByRole('status')).toHaveFocus();
+    await waitFor(() => expect(screen.getByRole('status')).toHaveFocus());
     expect(fetcher).toHaveBeenCalledTimes(1);
     expect(fetcher.mock.calls[0][0]).toBe('/account/purchase-claim/stage');
     expect(fetcher.mock.calls[0][1]).toMatchObject({ method: 'POST', body: JSON.stringify({ orderId: id }), credentials: 'same-origin', cache: 'no-store', redirect: 'error', headers: { 'X-CSRF-TOKEN': 'test-csrf' } });
