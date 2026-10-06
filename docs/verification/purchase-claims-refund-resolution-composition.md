@@ -17,7 +17,8 @@ Both features default off and are restricted to local/testing. Production identi
 | Preceding PR #7 source | `7067a95bbead0354d945994cbdc6a27a98ba101d` maps to published `f959635452f62e23617eadb83cabe0c984309a0b` | `b3919e551405dfb9103686c1f8e8518afad86327` |
 | Guest purchase claim | `fb4a93e441e3a795d1333fab274aceeeb242e218` | `486e5fc9953e3e13582765504d43c0827486c850` |
 | Refunded exception resolution | `820440b85cc539ac30ed30abf88fd948a61afcb2` | `8d55da482efc3821eb4db05ed836bca2dcd9aaef` |
-| Integrated application/tests before this ledger update | `80aa34faa0022d0cba44f8585c8b19181324acf8` | `7f74795edc5b9c400f68e94c0e59423e1bdeebef` |
+| Integrated features before ledger and observation repairs | `80aa34faa0022d0cba44f8585c8b19181324acf8` | `7f74795edc5b9c400f68e94c0e59423e1bdeebef` |
+| Existing focus-observation repair after the first ledger checkpoint | `0764b71fd7204b23671ea47cbd95893b4aedb5db` | `1dad4260b9fc55e72192e98a8f85c3c47e9e4990` |
 
 Local restored identities are not published Git identities. Publication verifies exact trees and preserves mapped ordered parents, including both independently reviewed feature branches and the preceding PR ancestry.
 
@@ -25,11 +26,11 @@ Independent composition review verified the exact 70-path union relative to the 
 
 ## Composed verification
 
-The checks below apply to the integrated application/test source above. This checkpoint's subsequent edits are documentation only.
+Database, build, discovery and safeguard checks below apply to feature composition `80aa34f`. The only later executable-source change is the isolated two-file frontend test observation repair `0764b71`; application code and all PHP/browser tests remain identical. Its complete frontend rerun is reported separately below. Subsequent edits are documentation only.
 
 | Check | Actual outcome |
 | --- | --- |
-| `npm test` | 618 tests passed in 31 files |
+| `npm test` | Feature composition: 618 tests passed in 31 files. Complete isolated focus-observation repair rerun: 618/618 in 31 files, 14.02 seconds, zero failures. |
 | `npx tsc --noEmit` | Passed |
 | Production/preview builds and both client scans | Both builds passed in a separate detached worktree; production scan covered six text files and preview four, with no secret-name/Stripe-prefix hits. Existing production chunk advisory: 505.07 kB. |
 | Both-project Playwright discovery | 120 cases in 34 files, 60 per configured browser, including both new journeys in both projects; discovery only, no rendering |
@@ -54,6 +55,12 @@ php vendor/bin/phpunit tests/Feature/CustomerAccountMigrationTest.php tests/Feat
 Build checks used `npm run build`, `python3 scripts/ci/scan-client-bundle.py`, `npm run build:preview` and `python3 scripts/ci/scan-client-bundle.py dist/design-preview`. Safeguards used `python3 scripts/ci/test-focused-tests.py`, `python3 scripts/ci/test-phpunit-shards.py` and `python3 scripts/ci/test-database-receipts.py`. Discovery used actual PHPUnit listings and the committed partition generator, plus `npx playwright test --list` for both configured projects with a disposable fixture-discovery directory.
 
 Component records retain the earlier actual failures and their corrections: the guest test's Inertia asset-version 409 was fixed by supplying the current protocol version without relaxing middleware or payload/privacy assertions; migration dependency ordering was repaired without weakening old assertions. A scratch-backed native datadir produced tablespace errors, while normal-durability `/tmp` runs passed; the underlying storage cause is unproven. The composed native wrapper uses a fresh process-local `/tmp` database, MySQL 8.4.11, actual PDO/process/row-lock waits and unchanged durability (`innodb_flush_log_at_trx_commit=1`, `sync_binlog=1`, doublewrite and binary logging enabled).
+
+## Existing focus observations
+
+Separate library-browsing development exposed two pre-existing frontend assertions that checked focus immediately after finding rendered content. Its first full run passed 639/640 and failed the customer credential-completion status focus; an isolated unchanged identity-file rerun passed 72/72. After repairing that observation and adding a library cleanup regression, the next full run passed 640/641 and failed the existing original-item lost-access alert focus. In both cases the correct status/alert had rendered while focus was still on the document body; the unchanged components transfer focus in a passive effect. These failures occurred in that separate development composition, not a reproduced failure of this frozen feature source, and are retained as such.
+
+The isolated `0764b71` commit imports the existing testing-library `waitFor` helper in each file and waits for the exact original focus target using its ordinary default limit. All surrounding assertions remain. It does not change application effects, suppress errors, relax accessibility criteria or increase a test/application/workflow budget. The separate library composition subsequently passed all 641 frontend cases; that result is not this batch's acceptance. This batch independently reran its complete frontend suite on the isolated repair: 618/618 cases across 31 files passed in 14.02 seconds. The library feature and its additional tests remain outside this candidate.
 
 ## Complete discovery and acceptance
 
