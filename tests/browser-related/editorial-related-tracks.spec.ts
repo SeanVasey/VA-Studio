@@ -71,9 +71,12 @@ async function activate(page: Page, label: string, action: 'Publish release' | '
     : await releaseMenuAction(page, label, action);
   await trigger.click();
   const dialog = page.getByRole('alertdialog', { name: action, exact: true });
-  await dialog.getByRole('button', { name: 'Confirm', exact: true }).click();
-  await expect(releaseRow(page, label).getByText('Active', { exact: true })).toBeVisible();
-  await expect(dialog.getByRole('heading')).not.toBeVisible();
+  const notification = action === 'Publish release' ? 'Site release published' : 'Previous release restored';
+  await syncSuccessNotification(page, notification,
+    () => dialog.getByRole('button', { name: 'Confirm', exact: true }).click(), async () => {
+      await expect(releaseRow(page, label).getByText('Active', { exact: true })).toBeVisible();
+      await expect(dialog.getByRole('heading')).not.toBeVisible();
+    });
 }
 
 async function addTrack(group: Locator, track: Track) {
