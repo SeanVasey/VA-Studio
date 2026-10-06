@@ -32,16 +32,20 @@ final class OrderEvidence
         InventoryReservation $reservation, ?PromotionUse $use, array $policy,
         #[SensitiveParameter] array $request): array
     {
+        $release = \App\Domain\Commerce\Models\TestUnpaidRelease::where('order_id', $order->id)->first();
+        if ($release) {
+            app(\App\Domain\Commerce\UnpaidRelease\ReadUnpaidRelease::class)->resourceDisposition($release, $order, $attempt, $reservation, $use);
+        }
         $finalization = OrderFinalization::where('order_id', $order->id)->first();
         if ($finalization) {
             app(FinalizationEvidence::class)->resourceDisposition($finalization, $order, $attempt, $reservation, $use);
         } elseif ($reservation->consumed_at !== null || $use?->consumed_at !== null) {
             throw new QuoteException('ORDER_CHANGED', 409);
         }
-        // Only this historical path can reconstruct a proved consumed resource as its original pending state.
+        // Only this historical path can reconstruct a proved consumed or released resource as its original pending state.
         $originalReservation = clone $reservation;
         $originalUse = $use === null ? null : clone $use;
-        if ($finalization?->outcome === 'paid') {
+        if ($release || $finalization?->outcome === 'paid') {
             $originalReservation->state = 'pending';
             if ($originalUse) { $originalUse->state = 'pending'; }
         }

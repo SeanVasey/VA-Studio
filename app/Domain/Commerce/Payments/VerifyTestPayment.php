@@ -119,12 +119,29 @@ final class VerifyTestPayment
                 throw new PaymentVerificationException('payment_changed');
             }
             $at = $inspection['observed_at'];
-            $session = app(HostedCheckout::class)->recordObservation($intent, $request, $inspection['observed'], $at);
+            $release = \App\Domain\Commerce\Models\TestUnpaidRelease::where('order_id', $order->id)->lockForUpdate()->first();
+            // A release never suppresses confirmed money. Preserve the old terminal checkout observation
+            // and validate a separate confirmation against the exact already-bound session.
+            $retainedConfirmation = $release && ($inspection['evidence']['outcome'] ?? null) === 'confirmed';
+            if ($retainedConfirmation) {
+                $original = app(\App\Domain\Commerce\Orders\ReadOrder::class)->verify($order);
+                app(\App\Domain\Commerce\UnpaidRelease\ReadUnpaidRelease::class)->verify($release, $order, $original);
+                $session = \App\Domain\Commerce\Models\CheckoutSession::whereKey($release->checkout_session_id)->lockForUpdate()->firstOrFail();
+            } else {
+                $session = app(HostedCheckout::class)->recordObservation($intent, $request, $inspection['observed'], $at);
+            }
             $evidence = $inspection['evidence'];
             $evidence['source'] = $work ? 'receipt' : 'reconciliation';
             $evidence['receipt_id'] = $work?->stripe_webhook_receipt_id;
             [$ciphertext, $hash] = $checkoutEvidence->encrypt($evidence);
-            $existing = VerifiedPayment::where('checkout_intent_id', $intent->id)->first();
+            if ($retainedConfirmation) {
+                $candidate = new VerifiedPayment(['checkout_intent_id' => $intent->id, 'checkout_session_id' => $session->id,
+                    'account_id' => $intent->account_id, 'mode' => 'test', 'provider_payment_intent_id' => $evidence['payment']['id'],
+                    'amount_minor' => $evidence['amount_minor'], 'currency' => 'USD', 'evidence_ciphertext' => $ciphertext,
+                    'evidence_hash' => $hash, 'canonicalization_version' => CanonicalJson::VERSION]);
+                app(PaymentEvidence::class)->verifyConfirmation($candidate, $request, $session);
+            }
+            $existing = VerifiedPayment::where('checkout_intent_id', $intent->id)->lockForUpdate()->first();
             if ($existing) {
                 app(PaymentEvidence::class)->verifyConfirmation($existing, $request, $session);
                 if ($existing->order_id !== $order->id || $existing->order_attempt_id !== $intent->order_attempt_id

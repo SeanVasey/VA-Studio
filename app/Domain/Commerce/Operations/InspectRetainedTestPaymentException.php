@@ -70,8 +70,8 @@ final class InspectRetainedTestPaymentException
                         'orderId' => $record->order->public_id, 'recordedReason' => $record->reason,
                         'confirmedAt' => $record->confirmed_at->toIso8601ZuluString(),
                         'eligibilityCutoff' => $record->eligibility_cutoff->toIso8601ZuluString(),
-                        'finalizedAt' => $record->finalized_at->toIso8601ZuluString(), 'inventoryState' => 'pending',
-                        'promotionState' => $original['attempt']['promotion'] === null ? 'none' : 'pending',
+                        'finalizedAt' => $record->finalized_at->toIso8601ZuluString(), 'inventoryState' => $record->reason === 'released_attempt' ? 'released' : 'pending',
+                        'promotionState' => $original['attempt']['promotion'] === null ? 'none' : ($record->reason === 'released_attempt' ? 'released' : 'pending'),
                         'grantCount' => 0, 'exclusiveSaleCount' => 0, 'outboxCount' => 1]);
                 } catch (QuoteException|FinalizationException) {
                     // Distinguish an unverified graph from an unknown/foreign record, without private diagnostics.

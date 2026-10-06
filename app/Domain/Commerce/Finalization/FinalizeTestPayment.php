@@ -53,7 +53,8 @@ final class FinalizeTestPayment
             }
             // A proved late confirmation cannot become eligible when storage recovers.
             // Timely file hashing stays outside every transaction and lock; null records no inspection.
-            $assetsAvailable = $payment->confirmed_at->lessThan($original['attempt']['expires_at'])
+            $released = \App\Domain\Commerce\Models\TestUnpaidRelease::where('order_id', $order->id)->exists();
+            $assetsAvailable = ! $released && $payment->confirmed_at->lessThan($original['attempt']['expires_at'])
                 ? app(FinalizationAssets::class)->inspect($original) : null;
 
             return DB::transaction(function () use ($paymentId, $order, $original, $assetsAvailable, $policy, $account): string {
@@ -72,6 +73,10 @@ final class FinalizeTestPayment
                     app(ReadFinalization::class)->verify($existing, $fresh);
 
                     return $existing->outcome;
+                }
+                $release = \App\Domain\Commerce\Models\TestUnpaidRelease::where('order_id', $locked->id)->lockForUpdate()->first();
+                if ($release) {
+                    return app(\App\Domain\Commerce\UnpaidRelease\ReleasedPaymentException::class)->retain($locked, $fresh, $payment, $release);
                 }
                 $attempt = $locked->attempt()->sole();
                 $use = null;

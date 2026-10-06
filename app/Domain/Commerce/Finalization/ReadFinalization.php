@@ -20,6 +20,9 @@ final class ReadFinalization
 {
     public function verify(OrderFinalization $finalization, array $original): array
     {
+        if ($finalization->policy_version === \App\Domain\Commerce\UnpaidRelease\UnpaidReleasePolicy::CONTRACT['version']) {
+            return app(\App\Domain\Commerce\UnpaidRelease\ReleasedPaymentException::class)->verify($finalization, $original);
+        }
         $order = Order::findOrFail($finalization->order_id);
         $attempt = $order->attempt()->sole();
         $payment = VerifiedPayment::findOrFail($finalization->verified_payment_id);

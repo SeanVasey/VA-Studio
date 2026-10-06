@@ -46,6 +46,8 @@ class TestOrderFinalizationMigrationTest extends TestCase
         $fulfillmentActivations = require database_path('migrations/2026_09_26_000022_test_fulfillment_activation.php');
         $delivery = require database_path('migrations/2026_09_26_000023_test_owner_delivery.php');
         $financialObservations = require database_path('migrations/2026_10_06_000039_test_payment_financial_observations.php');
+        $unpaidRelease = require database_path('migrations/2026_10_06_000042_test_unpaid_releases.php');
+        $unpaidRelease->down();
         $financialObservations->down();
         $exceptionOperations = require database_path('migrations/2026_10_02_000036_test_payment_exception_operations.php');
         foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }
@@ -54,6 +56,7 @@ class TestOrderFinalizationMigrationTest extends TestCase
         foreach (['inventory_reservations', 'promotion_uses'] as $table) { $this->assertFalse(Schema::hasColumn($table, 'consumed_at')); }
         $migration->up(); $contracts->up(); $fulfillmentActivations->up(); $delivery->up(); $exceptionOperations->up();
         $financialObservations->up();
+        $unpaidRelease->up();
         foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }
         $this->assertSame($before, $this->finalizationSchemaRows($tables));
         foreach ($this->finalizationSchemaTables() as $table) { $this->assertDatabaseCount($table, 0); }

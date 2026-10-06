@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Gate;
 final class ReadTestCommerceOperations
 {
     public const EXCEPTION_REASONS = [
+        'released_attempt' => 'Payment recorded for a released attempt',
         'late_confirmation' => 'Confirmation observed too late',
         'inventory_blocked' => 'Inventory blocked', 'inventory_unavailable' => 'Inventory unavailable',
         'asset_unavailable' => 'Purchased asset unavailable', 'rights_unavailable' => 'Rights unavailable',
@@ -42,7 +43,7 @@ final class ReadTestCommerceOperations
             ->select(['order_finalizations.id', 'order_finalizations.public_id', 'o.public_id as order_public_id',
                 'order_finalizations.confirmed_at', 'order_finalizations.finalized_at'])
             ->selectRaw("CASE WHEN order_finalizations.reason IN ('late_confirmation', 'inventory_blocked', 'inventory_unavailable',"
-                ." 'asset_unavailable', 'rights_unavailable') THEN order_finalizations.reason ELSE 'evidence_changed' END AS reason");
+                ." 'asset_unavailable', 'rights_unavailable', 'released_attempt') THEN order_finalizations.reason ELSE 'evidence_changed' END AS reason");
     }
 
     public function contracts(): Builder

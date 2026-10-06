@@ -62,6 +62,10 @@ final class FinalizationEvidence
      */
     public function resourceDisposition(OrderFinalization $finalization, Order $order, $attempt, $reservation, $use): void
     {
+        if ($finalization->policy_version === \App\Domain\Commerce\UnpaidRelease\UnpaidReleasePolicy::CONTRACT['version']) {
+            app(\App\Domain\Commerce\UnpaidRelease\ReleasedPaymentException::class)->resourceDisposition($finalization, $order, $attempt, $reservation, $use);
+            return;
+        }
         $proof = $this->decrypt($finalization->evidence_ciphertext, $finalization->evidence_hash, $finalization->canonicalization_version);
         $state = $finalization->outcome === 'paid' ? 'consumed' : 'pending';
         if ($finalization->order_id !== $order->id || $finalization->order_attempt_id !== $attempt->id

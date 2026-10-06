@@ -34,7 +34,7 @@ final class TestPaymentExceptionResource extends ReadOnlyCommerceResource
 
     public static function table(Table $table): Table
     {
-        return $table->description('Retained test-payment exceptions. Operational acknowledgments and current payment checks preserve blocked fulfillment and pending resources; they do not resolve or refund the payment.')
+        return $table->description('Retained test-payment exceptions. Operational acknowledgments and current payment checks preserve blocked fulfillment and the recorded resource disposition; they do not resolve or refund the payment.')
             ->columns([
                 TextColumn::make('order_public_id')->label('Order')->searchable(['o.public_id'])->copyable(),
                 TextColumn::make('public_id')->label('Finalization')->copyable(),

@@ -37,6 +37,9 @@ final class HostedCheckout
             $actorId = app(CommerceAuditActor::class)->lock($actor);
             // A short order lock serializes one durable provider intent; never includes provider I/O.
             $locked = Order::whereKey($order->id)->lockForUpdate()->firstOrFail();
+            if (\App\Domain\Commerce\Models\TestUnpaidRelease::where('order_id', $locked->id)->lockForUpdate()->exists()) {
+                throw new QuoteException('CHECKOUT_EXPIRED', 410);
+            }
             $existing = CheckoutIntent::where('order_id', $locked->id)->first();
             if ($existing) {
                 $this->evidence->verifyIntent($existing, $locked);
@@ -133,6 +136,7 @@ final class HostedCheckout
             throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);
         }
         $request = $this->evidence->verifyIntent($intent, Order::findOrFail($intent->order_id));
+        if (\App\Domain\Commerce\Models\TestUnpaidRelease::where('order_id', $intent->order_id)->exists()) { return; }
         $session = CheckoutSession::where('checkout_intent_id', $intent->id)->first();
         if ($candidate !== null && (! preg_match('/\Acs_test_[A-Za-z0-9]{1,120}\z/', $candidate) ||
             ($session && $session->provider_session_id !== $candidate))) {
@@ -233,6 +237,10 @@ final class HostedCheckout
         $data['finalizationStatus'] = $paymentState['finalizationStatus'];
         $data['contractStatus'] = $paymentState['contractStatus'];
         $data['fulfillmentStatus'] = $paymentState['fulfillmentStatus'];
+        if (\App\Domain\Commerce\Models\TestUnpaidRelease::where('order_id', $order->id)->exists()) {
+            $data['status'] = 'expired';
+            return $data;
+        }
         if (! $intent) {
             return $data;
         }
