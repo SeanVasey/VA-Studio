@@ -31,3 +31,23 @@ This workspace has no Chromium/WebKit executable or ClamAV. Discovery, component
 ## Integration handoff
 
 Shared CI registries and task ledgers are intentionally untouched. Add `tests/Feature/CustomerOrderItemsTest.php` to customer feedback for both engines, `tests/frontend/order-items.test.tsx` to frontend feedback and `tests/browser/customer-order-items.spec.ts` to ordinary browser feedback. The PHP class has ten methods / thirteen expanded cases and needs no native-only SQLite exclusion. On this base, expected full discovery is 3,583 cases in 225 files; the existing 371 exact exclusions remain unchanged. Focused customer/frontend/browser selections become 14/28/27, within the unchanged 32-file cap. These are proposed integration counts, not a completed partition proof for a future composition.
+
+## Isolated integration checkpoint
+
+Merge `e88dd9828b58ed7059a3cf0a16794167722758e5` preserves both reviewed parents: lookup-continuity correction `495cd85863f87f93b1196ed3f4e436f0fe6af4cb` and customer-items child `ae37217c8ae060f1d5e98484ae36f2ff5fe39bbd`. This is a separate integration branch; the current acceptance candidate and collection branch are unchanged. All ten implementation/test files from the customer child are byte-identical to that reviewed child, and the existing lookup browser guard is byte-identical to the correction parent.
+
+The handoff registrations above are now implemented: one PHP feature file in both customer database selections, one frontend file and one ordinary browser file. Focused customer/frontend/browser selections are **14/28/27 files**. The safeguard requires each exact target once, validates the selected files and forbids a SQLite exclusion for `CustomerOrderItemsTest`. The **32-file cap**, all prior selections, the entire SQLite skip policy and both timing registries are unchanged.
+
+Fresh PHP discovery and complete partition proofs establish **3,583 unique cases in 225 files**, each appearing exactly once across eight MySQL shards and separately across two SQLite shards. Both engine inventories have identical case/file and group identities. The unchanged native-only policy resolves to **371 cases across 117 exact methods**; all thirteen new item cases execute on both databases. The existing lookup class and new items class use the supported timing fallback; timing estimates were not refreshed.
+
+Executed integration checks:
+
+- `python3 scripts/ci/test-focused-tests.py`: **37 safeguards passed**, including the new exact selection check.
+- `python3 scripts/ci/test-phpunit-shards.py`: **36 safeguards passed**.
+- `python3 scripts/ci/test-database-receipts.py`: **34 safeguards passed**.
+- `python3 scripts/ci/phpunit-shards.py --shards 8 --prefix phpunit-ci-items-mysql --timings scripts/ci/phpunit-timings-mysql.json`: complete MySQL assignment proved.
+- `python3 scripts/ci/phpunit-shards.py --shards 2 --prefix phpunit-ci-items-sqlite --timings scripts/ci/phpunit-timings-sqlite.json`: complete SQLite assignment proved.
+- `npm run typecheck` and `git diff --check`: passed.
+- `VASEY_BROWSER_DIRECTORY=/tmp/vasey-customer-items-integration-discovery node node_modules/@playwright/test/cli.js test tests/browser/customer-order-items.spec.ts --list`: one journey discovered for each configured engine, **two browser cases**.
+
+The isolated worktree uses a physical vendor copy, and reflected PHP source paths resolve inside that worktree. No generated Vite manifest was copied into this backend discovery environment. These integration checks enumerate tests and validate their selection; they do not repeat the unchanged child backend executions or claim full-suite execution. The child evidence above, including its earlier manifest-related overlap failure and bounded recheck, remains unchanged. Local browser/scanner limitations still apply; rendered browser execution and complete current-source native/hosted acceptance remain pending. No production commerce or delivery activation is included.
