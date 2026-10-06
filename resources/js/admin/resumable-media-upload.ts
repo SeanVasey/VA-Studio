@@ -53,7 +53,8 @@ export class ResumableUploadClient {
   private readonly digest: (file: File) => Promise<string>;
 
   constructor(private readonly options: Options) {
-    this.fetcher = options.fetcher ?? fetch;
+    // Native browser fetch requires its global receiver when called through this client.
+    this.fetcher = options.fetcher ?? globalThis.fetch.bind(globalThis);
     this.digest = options.digest ?? fileDigest;
   }
   private update(changes: Partial<UploadState>) { this.state = { ...this.state, ...changes }; this.options.onChange(this.state); }

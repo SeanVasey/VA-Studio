@@ -18,6 +18,31 @@ function fixture() {
 }
 
 describe('resumable private upload client', () => {
+  it('preserves the native global fetch receiver and retains the upload ID after a lost chunk acknowledgement', async () => {
+    const requests: Array<[RequestInfo | URL, RequestInit | undefined]> = [];
+    const browserFetch = vi.fn(async function (this: unknown, input: RequestInfo | URL, init?: RequestInit) {
+      // Browser WebIDL fetch rejects a foreign receiver; Node fetch and injected mocks do not.
+      if (this !== globalThis) throw new TypeError('Illegal invocation');
+      requests.push([input, init]);
+      if (requests.length === 1) return reply(session());
+      throw new TypeError('Failed to fetch'); // The committed chunk acknowledgement is unavailable.
+    });
+    vi.stubGlobal('fetch', browserFetch);
+    try {
+      const remember = vi.fn();
+      const client = new ResumableUploadClient({ baseUrl: '/admin/resumable-uploads', csrfToken: 'test-csrf',
+        digest: async () => hash, remember, onChange: () => {} }); // Exercise the default transport.
+      await client.start(file(), 1, 'master_wav');
+      expect(requests.map(([url]) => url)).toEqual(['/admin/resumable-uploads', '/admin/resumable-uploads/' + id + '/chunks']);
+      expect(remember).toHaveBeenCalledWith(id);
+      expect(client.state.session?.id).toBe(id);
+      expect(client.state.session?.receivedBytes).toBe(0); // An unacknowledged offset is never presumed retained.
+      expect(client.state.needsInspection).toBe(true);
+      expect(client.state.message).toContain('could not be confirmed');
+      expect(requests[0][1]).toMatchObject({ method: 'POST', credentials: 'same-origin', headers: { 'X-CSRF-TOKEN': 'test-csrf' } });
+    } finally { vi.unstubAllGlobals(); }
+  });
+
   it('hashes the original then sends exact server-sized sequential chunks with CSRF', async () => {
     const f = fixture(); const size = 8 * 1024 * 1024 + 3;
     f.fetcher.mockResolvedValueOnce(reply(session({ sizeBytes: size })))
