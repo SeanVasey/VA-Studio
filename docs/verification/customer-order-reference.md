@@ -12,7 +12,7 @@ Unknown, foreign-account and guest-owned references have the same private failur
 - `php vendor/bin/phpunit tests/Feature/CustomerOrderReferenceTest.php`: SQLite 4 tests / 478 assertions / zero skips.
 - The same PHP suite on disposable MySQL 8.4.11: 4 tests / 478 assertions / zero skips. It proves lookup beyond the newest 20 orders, identical foreign/guest/unknown denials, withdrawal, no SQL/provider/renderer writes, and unchanged original private-file hashes/evidence.
 - TypeScript/Vite build, client-bundle secret scan, PHP formatting and diff checks passed.
-- Playwright discovered the new journey for Chromium desktop and WebKit mobile. Its native checks use real status/authorization/download HTTP, keyboard entry/focus, exact original contract bytes/hash, clear/sign-out cleanup and viewport bounds.
+- Playwright discovered the new journey for Chromium desktop and WebKit mobile. Its native checks use real status/delivery metadata HTTP, keyboard entry/focus, exact original contract metadata and download availability, clear/sign-out cleanup and viewport bounds. This new case makes no order POSTs, preserving fixture independence from the existing account download cases and their exact original-byte/hash and stream-attempt assertions.
 
 Native execution is pending because this workspace lacks ClamAV/signatures and browser engines. Discovery and component tests do not establish browser acceptance. Future composition must register `CustomerOrderReferenceTest` in CI's suite/timing census and route the new frontend/browser files; existing correction-candidate acceptance remains separate. Independent source review is requested on the committed child.
 
