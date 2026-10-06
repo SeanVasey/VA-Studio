@@ -31,6 +31,8 @@ const env = {
   // No malware scanner, as in CI. A scanner installed on the host would otherwise run inside synchronous uploads.
   MEDIA_CLAMSCAN: join(directory, 'no-clamscan'),
   VASEY_BROWSER_DIRECTORY: directory, VASEY_BROWSER_PASSWORD: `Browser-${randomBytes(24).toString('hex')}`,
+  // The ordinary suite always retains its customer fixtures, even with inherited stage variables.
+  VASEY_BROWSER_RELATED_STAGE: '', VASEY_BROWSER_RELATED_MARKER: '',
   // Synthetic inquiry setup belongs exclusively to this disposable loopback installation.
   CONTACT_INQUIRIES_ENABLED: 'true',
   VASEY_TEST_CUSTOMER_ACCOUNTS_ENABLED: 'true',

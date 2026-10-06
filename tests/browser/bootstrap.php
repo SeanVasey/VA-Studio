@@ -22,6 +22,15 @@ try {
         || getenv('APP_URL') !== 'http://127.0.0.1:8173') {
         throw new RuntimeException('Refusing browser fixtures outside a fresh isolated local run.');
     }
+    // Only the dedicated runner's existing stage/marker pair selects its empty-commerce baseline.
+    // Malformed or partial stage identity must not silently omit ordinary customer coverage.
+    $stage = getenv('VASEY_BROWSER_RELATED_STAGE');
+    $marker = getenv('VASEY_BROWSER_RELATED_MARKER');
+    $relatedStage = $stage === '1' && is_string($marker) && preg_match('/\A[a-f0-9]{64}\z/D', $marker) === 1;
+    $ordinaryStage = in_array($stage, [false, ''], true) && in_array($marker, [false, ''], true);
+    if (! $relatedStage && ! $ordinaryStage) {
+        throw new RuntimeException('Refusing an incomplete browser fixture stage identity.');
+    }
     require __DIR__.'/../../vendor/autoload.php';
     $app = require __DIR__.'/../../bootstrap/app.php';
     $kernel = $app->make(Kernel::class);
@@ -40,7 +49,9 @@ try {
     }
     $actor = User::where('email', 'browser-operator@example.test')->sole();
     $customer = User::factory()->create(['name' => 'Synthetic Customer', 'email' => 'browser-customer@example.test', 'password' => $password, 'is_admin' => false, 'email_verified_at' => now()]);
-    app(CustomerAccounts::class)->provision($customer);
+    if ($ordinaryStage) {
+        app(CustomerAccounts::class)->provision($customer);
+    }
     $fixtures = [];
     foreach (['chromium-desktop', 'webkit-mobile'] as $project) {
         $editable = app(SaveTrackMetadata::class)->handle(null, ['title' => 'Synthetic editable '.$project, 'slug' => 'editable-'.$project], $actor);
@@ -55,20 +66,22 @@ try {
         fwrite(STDERR, Artisan::output()); // This report contains only fixed, redacted messages.
         throw new RuntimeException('The isolated installation did not pass its required diagnostics.');
     }
-    // The CLI guard above proves this is a new, disposable loopback installation.
-    // Use existing test transports only while creating real retained account purchases.
-    $customerFixtures = ['projects' => []];
-    $app->detectEnvironment(fn () => 'testing');
-    try {
-        foreach (['chromium-desktop' => 'CHROMIUM', 'webkit-mobile' => 'WEBKIT'] as $project => $suffix) {
-            $paid = CustomerFixtures::ready($customer, $suffix, true);
-            $customerFixtures['projects'][$project] = CustomerFixtures::browserManifest($paid);
+    if ($ordinaryStage) {
+        // The ordinary native suite needs retained customer purchases. Related-track preparation
+        // instead proves its original four-track, two-user, empty-commerce census independently.
+        $customerFixtures = ['projects' => []];
+        $app->detectEnvironment(fn () => 'testing');
+        try {
+            foreach (['chromium-desktop' => 'CHROMIUM', 'webkit-mobile' => 'WEBKIT'] as $project => $suffix) {
+                $paid = CustomerFixtures::ready($customer, $suffix, true);
+                $customerFixtures['projects'][$project] = CustomerFixtures::browserManifest($paid);
+            }
+        } finally {
+            $app->detectEnvironment(fn () => 'local');
         }
-    } finally {
-        $app->detectEnvironment(fn () => 'local');
+        file_put_contents($directory.'/customer-fixtures.json', json_encode($customerFixtures, JSON_THROW_ON_ERROR));
+        chmod($directory.'/customer-fixtures.json', 0600);
     }
-    file_put_contents($directory.'/customer-fixtures.json', json_encode($customerFixtures, JSON_THROW_ON_ERROR));
-    chmod($directory.'/customer-fixtures.json', 0600);
     echo "Fresh SQLite migrations, interactive operator command and installation diagnostics passed.\n";
 } catch (Throwable) {
     // Laravel's plain-script exception renderer can finish with status 0. Fail explicitly.
