@@ -258,6 +258,20 @@ final class TestTransactionalNotifications
             if ($positive === null || ! hash_equals($snapshot['receipt'], $positive)) {
                 throw new NotificationException;
             }
+
+            // Inspection runs outside the database transaction. Its callbacks and concurrent
+            // authority changes must not leave the earlier accepted projection authoritative.
+            return $this->locked($notificationId, function (array $context, TransactionalNotice $notice) use ($snapshot, $positive): array {
+                $attempts = $this->attemptRows($notice->id);
+                $last = end($attempts);
+                if ($last === false || $last['state'] !== 'accepted' || ! hash_equals($last['receipt_hash'], $positive)
+                    || ! hash_equals($snapshot['capture'], $this->verifyNotice($notice, $context))) {
+                    throw new NotificationException;
+                }
+                $this->fence($context, $notice, $notice->getRawOriginal(), $attempts);
+
+                return $this->result($notice, 'accepted');
+            });
         }
 
         return $snapshot['result'];

@@ -112,3 +112,34 @@ Exact tested source,
 commands, failures and remaining conditions will be recorded in the final
 component packet. No hosted full matrix, provider action or production operation
 was performed.
+
+## Independent continuation review — October 6
+
+The preserved corrected component source `f4c54f61985fca73a30789927b6b5c49305cafe4`
+passed the focused SQLite functional/migration selection: 74 discovered cases,
+68 passing cases, 576 assertions and six explicitly skipped native races. An
+independent isolated rerun reproduced those same counts. The source-bound
+original receipt is `corrected-f4c54f6-sqlite.xml`; that evidence does not prove
+MySQL concurrency or acceptance of a later source change.
+
+Independent review found that accepted `status()` inspected the private capture
+after its last database authority fence. Exact negative test commit
+`8701a275ab40dc74b1c6aaeb2f2c14dceda0e185` retained four actual failures: account
+withdrawal, recipient change, notification-policy withdrawal and activation
+account change during a positive inspection all returned accepted status.
+
+Accepted status now follows positive original-byte inspection with a fresh
+locked authority, canonical capture, accepted receipt and complete primary-PDO
+proof. Inspection remains outside transactions. The final read creates no
+intent, attempt, audit, capture write or replacement delivery. Nonaccepted
+status retains its original read-only projection and lease-expiry semantics.
+The dedicated regression checks the actual adapter callback, retained notice/
+attempt/audit rows and unchanged original bytes; it also asserts that no mail
+or notification was sent.
+
+The continuation lane runs the affected functional class on the frozen
+correction and requests an independent review of that actual tested commit.
+The preceding component's native receipt, when complete, remains bound to
+`f4c54f6`; no new native run, hosted workflow, full matrix, producer wiring or
+real email delivery is authorized by this status correction. Shared test
+registrations and old parent-migration fixture ordering remain integration-owned.
