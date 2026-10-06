@@ -140,6 +140,8 @@ test('operator retains stale offer input, preserves purchased revisions and reco
     await submit.focus();
     await submit.press('Enter');
     await failed;
+    // Finish the owned abort callback before restoring the native retry transport.
+    await page.unrouteAll({ behavior: 'wait' });
     await page.unroute(livewireUrl);
     await expect(submit).toBeEnabled();
     await expect(price()).toHaveValue(String(fixture.prices.uncertain));
