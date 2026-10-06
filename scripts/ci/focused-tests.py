@@ -63,6 +63,13 @@ PHP_TARGETS = {
         "tests/Feature/SharedInventoryMigrationTest.php", "tests/Feature/TestOrderFinalizationMigrationTest.php",
         "tests/Feature/TestPaymentEvidenceMigrationTest.php",
     ),
+    "financial": (
+        "tests/Feature/TestUnpaidReleaseTest.php", "tests/Feature/TestUnpaidReleaseMigrationTest.php",
+        "tests/Feature/TestUnpaidReleaseConcurrencyTest.php", "tests/Feature/TestUnpaidOrderResourceTest.php",
+        "tests/Feature/TestPaymentFinancialObservationTest.php", "tests/Feature/TestPaymentExceptionOperationsTest.php",
+        "tests/Feature/TestPaymentExceptionOperationsConcurrencyTest.php",
+        "tests/Feature/TestPaymentProcessingTest.php", "tests/Feature/TestOrderFinalizationTest.php",
+    ),
     "customer": (
         "tests/Feature/CustomerAccountAccessTest.php", "tests/Feature/CustomerAccountCommerceTest.php",
         "tests/Feature/CustomerAccountConcurrencyTest.php", "tests/Feature/CustomerAccountMigrationTest.php",
@@ -138,6 +145,7 @@ FRONTEND_TARGETS = (
     "tests/frontend/resumable-media-upload.test.ts",
 )
 BROWSER_TARGETS = (
+    "tests/browser/test-unpaid-release.spec.ts",
     "tests/browser/inquiry-conversation.spec.ts",
     "tests/browser/customer-account.spec.ts",
     "tests/browser/storefront.spec.ts", "tests/browser/operator.spec.ts",

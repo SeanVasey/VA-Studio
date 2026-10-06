@@ -2,6 +2,12 @@
 
 Checkpoint: October 5, 2026 (America/Chicago), following Sean's instruction to prioritize the finished website and eliminate serial development waits. This plan keeps all required scope in the [40-group register](remaining-development-tasks.csv) and [103-row coverage map](remaining-parity-coverage.csv). The protected preview is a testing aid, not the completion target.
 
+## Verified unpaid release composition — October 6, 2026
+
+The next batch also composes the independently reviewed T20 release workflow: original operator/browser commits `60093cd`, `b744f0a` and exact action-response correction `781230b`, followed by core `a314a55` as `eb9fd8b` on the actual customer/inquiry ancestry. All 34 reviewed core files remain byte-identical. Operators can review a prepared test order, verify its bound terminal-unpaid provider evidence, release only pending resources, inspect immutable history and safely replay the request. Confirmed money arriving after release remains a distinct retained payment exception without restoring inventory or granting delivery.
+
+The [feature evidence](test-unpaid-release.md) records native MySQL 70/651, shared-engine 66/539, legacy 259 passes plus one existing skip/2,526 assertions, and two real HTTP Livewire journeys. These component checks do not establish rendered-browser or complete integration acceptance. The new fixed `financial` feedback group preserves the 32-file ceiling and adds only the two exact native race methods (four cases) to SQLite exceptions. Production policy, real provider acceptance and live activation remain open; T20 is not declared fully accepted by its local/testing workflow.
+
 ## Private inquiry conversation composition — October 6, 2026
 
 The next completion batch also includes reviewed private inquiry conversations (`b025ee26`): visitors submit, read staff replies, follow up with safe uncertain retries, and revisit retained messages after staff archive the thread. Original session ownership remains required; a receipt or later account sign-in does not recover a guest conversation. Staff replies run through fresh authority/MFA checks. The [feature record](inquiry-conversations.md) preserves component native 76/1,041 and frontend evidence; native browser execution remains a final hosted gate.

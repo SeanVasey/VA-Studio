@@ -375,6 +375,14 @@
       "test_independent_operators_serialize_history_and_fence_provider_claims"
     ],
     [
+      "Tests\\Feature\\TestUnpaidReleaseConcurrencyTest",
+      "test_exact_order_fence_preserves_money_and_the_winning_resource_disposition"
+    ],
+    [
+      "Tests\\Feature\\TestUnpaidReleaseConcurrencyTest",
+      "test_release_serializes_new_capacity_users_without_reviving_old_bindings"
+    ],
+    [
       "Tests\\Feature\\TrackMetadataConcurrencyTest",
       "test_overlapping_edits_wait_on_the_same_row_and_only_one_revision_is_saved"
     ],

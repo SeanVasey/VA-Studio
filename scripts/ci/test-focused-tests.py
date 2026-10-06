@@ -114,6 +114,18 @@ class SelectionTests(unittest.TestCase):
         self.assertEqual(set(focused.SUITES), set(choices))
         self.assertEqual(len(focused.SUITES), len(choices))
 
+    def test_unpaid_release_feedback_keeps_native_races_and_browser_journey_selected(self):
+        for target in ("TestUnpaidReleaseTest", "TestUnpaidReleaseMigrationTest",
+                       "TestUnpaidReleaseConcurrencyTest", "TestUnpaidOrderResourceTest"):
+            self.assertIn("tests/Feature/" + target + ".php", focused.PHP_TARGETS["financial"])
+        self.assertIn("tests/browser/test-unpaid-release.spec.ts", focused.BROWSER_TARGETS)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        race_class = "Tests\\Feature\\TestUnpaidReleaseConcurrencyTest"
+        self.assertEqual({row[1] for row in policy["methods"] if row[0] == race_class}, {
+            "test_exact_order_fence_preserves_money_and_the_winning_resource_disposition",
+            "test_release_serializes_new_capacity_users_without_reviving_old_bindings",
+        })
+
     def test_new_sqlite_exceptions_are_exact_native_method_identities(self):
         policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
         new_classes = {"Tests\\Feature\\CustomerAccountConcurrencyTest", "Tests\\Feature\\ProductDraftConcurrencyTest"}
