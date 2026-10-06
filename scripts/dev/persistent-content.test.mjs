@@ -221,6 +221,19 @@ test('a substituted directory inode and private child link cannot resume an inst
   assert.equal(readFileSync(join(outside, 'sentinel'), 'utf8'), 'KEEP');
 }));
 
+test('nonsticky writable ancestors and a newly exposed parent refuse init and resume without changing bytes', () => temporary(parent => {
+  const exposed = join(parent, 'exposed'); mkdirSync(exposed, { mode: 0o700 }); chmodSync(exposed, 0o777);
+  const ownedParent = join(exposed, 'owned'); mkdirSync(ownedParent, { mode: 0o700 });
+  assert.throws(() => createWorkspace(join(ownedParent, 'content')), /safety checks/);
+  assert.equal(existsSync(join(ownedParent, 'content')), false);
+  const protectedParent = join(parent, 'protected'); mkdirSync(protectedParent, { mode: 0o700 });
+  const workspace = createWorkspace(join(protectedParent, 'content'));
+  const before = retained(workspace);
+  chmodSync(protectedParent, 0o777);
+  assert.throws(() => readWorkspace(workspace.directory, root, { allowInitializing: true }), /safety checks/);
+  assert.deepEqual(retained(workspace), before);
+}));
+
 test('world access, hard links, poisoned environment/cache and changed schema identities refuse without reset', () => temporary(parent => {
   const workspace = createWorkspace(join(parent, 'content'));
   const before = retained(workspace);
@@ -436,4 +449,21 @@ native('tampered direct PHP configuration refuses before migrations or writes', 
       assert.deepEqual(retained(workspace), before, key);
     }
   } finally { await lease.release(); }
+});
+
+native('direct PHP refuses newly exposed parent and ancestor paths before boot and preserves all retained bytes', async parent => {
+  const ownedParent = join(parent, 'owned'); mkdirSync(ownedParent, { mode: 0o700 });
+  const workspace = await readyWorkspace(ownedParent);
+  const env = isolatedEnvironment(workspace);
+  const before = retained(workspace);
+  const lease = await acquireLease(workspace, env);
+  try {
+    for (const exposed of [ownedParent, parent]) {
+      chmodSync(exposed, 0o777);
+      const result = php(workspace, env, 'verify');
+      assert.equal(result.status, 1); assert.equal(result.stdout, ''); assert.match(result.stderr, /not reset or removed/);
+      assert.deepEqual(retained(workspace), before);
+      chmodSync(exposed, 0o700);
+    }
+  } finally { chmodSync(parent, 0o700); chmodSync(ownedParent, 0o700); await lease.release(); }
 });

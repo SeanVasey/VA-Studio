@@ -36,6 +36,18 @@ function owned(stat) {
   return typeof process.getuid !== 'function' || String(stat.uid) === String(process.getuid());
 }
 
+export function safeAncestors(directory) {
+  canonicalPath(directory);
+  let cursor = sep;
+  for (const part of ['', ...directory.slice(1).split(sep)]) {
+    if (part !== '') cursor = join(cursor, part);
+    const entry = lstatSync(cursor);
+    requireSafe(entry.isDirectory() && ((entry.mode & 0o022) === 0 || (entry.uid === 0 && (entry.mode & 0o1000) !== 0)));
+  }
+  const parent = statSync(directory);
+  requireSafe(owned(parent) && (parent.mode & 0o022) === 0);
+}
+
 function privateFile(path) {
   canonicalPath(path);
   const stat = lstatSync(path);
@@ -66,6 +78,7 @@ export function validateCheckout(checkout = root) {
 
 function directoryGuard(directory, checkout) {
   canonicalPath(directory);
+  safeAncestors(dirname(directory));
   const actualCheckout = realpathSync(checkout);
   requireSafe(directory !== actualCheckout && !directory.startsWith(`${actualCheckout}${sep}`) && !actualCheckout.startsWith(`${directory}${sep}`));
   const stat = statSync(directory, { bigint: true });
@@ -103,6 +116,7 @@ function directoryGuard(directory, checkout) {
 export function createWorkspace(directory, checkout = root) {
   validateCheckout(checkout);
   canonicalPath(directory, { missingLeaf: true });
+  safeAncestors(dirname(directory));
   requireSafe(!existsSync(directory));
   const parent = statSync(dirname(directory));
   requireSafe(parent.isDirectory() && owned(parent) && (parent.mode & 0o022) === 0);

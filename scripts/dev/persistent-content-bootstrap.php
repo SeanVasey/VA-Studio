@@ -45,6 +45,26 @@ final class PersistentContentBootstrap
         return ! function_exists('posix_geteuid') || fileowner($path) === posix_geteuid();
     }
 
+    private static function safeAncestors(string $directory): bool
+    {
+        $parent = dirname($directory);
+        if (! self::canonical($parent) || ! self::owned($parent) || (fileperms($parent) & 0022) !== 0) {
+            return false;
+        }
+        $cursor = '/';
+        foreach (['', ...explode('/', substr($parent, 1))] as $part) {
+            if ($part !== '') {
+                $cursor = rtrim($cursor, '/').'/'.$part;
+            }
+            if (! is_dir($cursor) || ((fileperms($cursor) & 0022) !== 0
+                && ! (fileowner($cursor) === 0 && (fileperms($cursor) & 01000) !== 0))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private static function file(string $path, int $maximum = 16384): void
     {
         self::require(self::canonical($path) && is_file($path) && self::owned($path));
@@ -75,6 +95,7 @@ final class PersistentContentBootstrap
         self::require(self::canonical($checkout.'/public/build') && self::canonical($checkout.'/public/build/manifest.json')
             && is_dir($checkout.'/public/build') && is_file($checkout.'/public/build/manifest.json'));
         self::require(is_string($directory) && self::canonical($directory) && is_dir($directory)
+            && self::safeAncestors($directory)
             && self::owned($directory) && (fileperms($directory) & 07777) === 0700
             && $directory !== $checkout && ! str_starts_with($directory, $checkout.'/') && ! str_starts_with($checkout, $directory.'/'));
         foreach (['app', 'app/private', 'framework', 'framework/views', 'framework/sessions', 'framework/cache', 'framework/cache/data', 'logs', 'public', 'tmp'] as $child) {
