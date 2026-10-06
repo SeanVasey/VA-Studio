@@ -43,6 +43,28 @@ def junit(root, content='<testsuites><testsuite><testcase name="one" assertions=
 
 
 class SelectionTests(unittest.TestCase):
+    def test_production_preparation_keeps_complete_adapter_fences_in_bounded_feedback(self):
+        required = {
+            "tests/Feature/ProductionTrackPreparationPacketTest.php",
+            "tests/Feature/ProductionTrackPreparationPacketGuardsTest.php",
+            "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+            "tests/Unit/ProductionTrackPreparationSnapshotTest.php",
+            "tests/Feature/ProductionTrackCapabilitiesTest.php",
+            "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php",
+            "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+            "tests/Unit/ProductionTrackMachinePolicyTest.php",
+            "tests/Feature/ProductionTrackPolicyFinalProofTest.php",
+        }
+        self.assertEqual(focused.MAX_FILES, 32)
+        for engine in focused.ENGINES:
+            selected = focused.selection({"FOCUSED_SUITE": "production-preparation", "FOCUSED_ENGINE": engine})
+            self.assertEqual(selected.kind, "php")
+            self.assertEqual(set(selected.files), required)
+            self.assertEqual(len(selected.files), len(required))
+            focused.validate_files(ROOT, selected)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        self.assertFalse(any("ProductionTrackPreparation" in row[0] for row in policy["methods"]))
+
     def test_store_foundations_feedback_is_bounded_and_has_only_declared_native_skips(self):
         self.assertEqual(focused.MAX_FILES, 32)
         for engine in focused.ENGINES:

@@ -1,6 +1,26 @@
 # Development agents and launch queue
 
-## Active parallel execution — October 6, 2026 UTC
+## Active production preparation — October 6, 2026 UTC
+
+Verified main `a348f67eff1fdd16b1945efd3b99aa27af3dd242` includes merged PR #16
+and the approved manual-matrix CI policy. The current isolated integration is
+`codex/production-consumers-20261006`; prior assignments below remain historical.
+
+| Worker | Owned boundary | Current handoff |
+| --- | --- | --- |
+| `/root` | Shared selection, workflow formatting, empty-child fixtures, status and publication | Compose the frozen implementation; run nine affected PHP files and genuine copy-upgrade checks, obtain review, then cheap preflight and expected-head merge |
+| `/root/production_capabilities_continue` | Preparation domain, additive adapter proof, migration `238000`, dedicated tests and verification record | Implement encrypted immutable packet/line evidence, exact replay/recovery and callback drift refusal; actual frozen-source verification is pending |
+| `/root/notifications_continue` | Independent sensitive source and regression review | Verify current-primary interpretation, license rendering, authority and terminal consumer proof against the tested commit |
+| `/root/service_merch_review` | Independent shared composition review | Provisional integration review passed; final clean-source disposition awaits the implementation and executed evidence |
+
+The read-only dependency review recommends a later selective #1/#2 compatibility
+batch and records #3's retained PDF-profile blocker. No installed dependency graph
+has changed. Execution/payable authority, authoritative tax/total, buyer assent,
+physical storage and operative provider/order/delivery consumers retain their
+separate dependencies. The full final matrix is manual on its exact reviewed
+candidate. Six parent groups remain accepted and 34 open.
+
+## Preserved foundations parallel execution — October 6, 2026 UTC
 
 Verified main `13d7474f` includes PR #13 and the merged PR #14 manual CI policy.
 The integration owner uses `codex/bulk-license-integration-20261006`. All seven

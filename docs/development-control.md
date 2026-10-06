@@ -1,5 +1,36 @@
 # Current development queue
 
+## Production preparation continuation — October 6, 2026 UTC
+
+PR #16 merged the seven-component private foundations batch at native main
+`a348f67eff1fdd16b1945efd3b99aa27af3dd242`, tree
+`9142a8d4436aea99bb0f8aba5570601587e0e5a9`. Required cheap preflight
+`37542249783`, attempt 1, passed on head `ea722029`; fresh main/PR/Git-data
+reads verified the merge and exact tree. The timeout lost no source or results.
+The original frozen worktree remains clean and its component evidence is retained.
+
+The isolated branch `codex/production-consumers-20261006` starts from local
+ordered-parent mirror `fde182b5`, with the exact merged tree. It is implementing
+[D-26 production preparation](architecture/D-26-production-track-preparation.md):
+current approved policy, immutable non-exclusive USD selection/line commitments,
+server-advertised subtotal and prospective order terms, with final composed
+primary-PDO proof. Tax/total stay unknown, buyer assent is not collected, and
+execution/payable authority stays false. Packet persistence, recovery and the
+additive proof hook have their own sensitive review; source and final results
+will be recorded after actual execution.
+
+Root owns bounded nine-file feedback, matching formatting guards, explicit
+empty-child parent migration fixtures and canonical status. The author and
+independent reviewers own separate source/evidence worktrees. No routine native
+MySQL/browser/full matrix is launched, no legacy workflow is restored and no
+production transport, sale or import is enabled. Production amounts/identity,
+assent, provider/inventory, original documents and delivery remain dependencies.
+
+[Dependency reconciliation](dependency-pr-integration.md) names a later fresh-main
+#1/#2 compatibility batch and the separate PDF-profile blocker for #3. These
+reviews change no installed graph and claim no unrun compatibility pass. All 40
+parent groups retain six accepted and 34 open outcomes.
+
 ## Resumed foundations integration — October 6, 2026 UTC
 
 The live GitHub main at continuation is `4d39a7d02f9094085f9a74610ebdc42b42e8a059`,

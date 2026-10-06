@@ -128,6 +128,11 @@ class ProductionTrackCapabilitiesGuardsTest extends TestCase
         } catch (LogicException) {
             $this->assertDatabaseCount(CapabilityHistory::CANDIDATES, 1);
         }
+        foreach (['production_track_preparation_packet_lines', 'production_track_preparation_packets'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
+        $preparation = require database_path('migrations/2026_10_06_238000_production_track_preparation_packets.php');
+        $preparation->down();
         $migration = require base_path('database/migrations/2026_10_06_236000_production_track_policy_capabilities.php');
         $this->expectException(\RuntimeException::class);
         $migration->down();
@@ -135,9 +140,15 @@ class ProductionTrackCapabilitiesGuardsTest extends TestCase
 
     public function test_empty_migration_can_rollback_and_recreate_all_three_tables(): void
     {
+        foreach (['production_track_preparation_packet_lines', 'production_track_preparation_packets'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
+        $preparation = require database_path('migrations/2026_10_06_238000_production_track_preparation_packets.php');
+        $preparation->down();
         $migration = require base_path('database/migrations/2026_10_06_236000_production_track_policy_capabilities.php');
         $migration->down();
         $migration->up();
+        $preparation->up();
         $this->assertDatabaseCount(CapabilityHistory::CANDIDATES, 0);
         $this->assertDatabaseCount(CapabilityHistory::APPROVALS, 0);
         $this->assertDatabaseCount(CapabilityHistory::CLOSURES, 0);

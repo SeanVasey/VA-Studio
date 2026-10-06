@@ -21,6 +21,17 @@ import xml.etree.ElementTree as ET
 
 
 PHP_TARGETS = {
+    "production-preparation": (
+        "tests/Feature/ProductionTrackPreparationPacketTest.php",
+        "tests/Feature/ProductionTrackPreparationPacketGuardsTest.php",
+        "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+        "tests/Unit/ProductionTrackPreparationSnapshotTest.php",
+        "tests/Feature/ProductionTrackCapabilitiesTest.php",
+        "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php",
+        "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+        "tests/Unit/ProductionTrackMachinePolicyTest.php",
+        "tests/Feature/ProductionTrackPolicyFinalProofTest.php",
+    ),
     "store-foundations": (
         "tests/Feature/ProductionTrackPolicyDraftTest.php",
         "tests/Feature/ProductionTrackPolicyConcurrencyTest.php",
