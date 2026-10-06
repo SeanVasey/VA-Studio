@@ -3,5 +3,5 @@ import laravel from 'laravel-vite-plugin';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [laravel({ input: ['resources/js/app.tsx', 'resources/css/fonts.css', 'resources/js/admin/resumable-media-upload.ts'], refresh: true }), react()],
+  plugins: [laravel({ input: ['resources/js/app.tsx', 'resources/css/fonts.css', 'resources/js/admin/resumable-media-upload.ts', 'resources/js/admin/resumable-kit-upload.ts'], refresh: true }), react()],
 });

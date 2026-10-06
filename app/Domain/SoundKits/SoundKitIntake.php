@@ -4,6 +4,7 @@ namespace App\Domain\SoundKits;
 
 use App\Domain\Media\MediaFailure;
 use App\Domain\SoundKits\Models\SoundKitRevision;
+use App\Domain\SoundKits\Models\SoundKitUploadSession;
 use App\Jobs\ProcessSoundKit;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
@@ -19,6 +20,37 @@ final class SoundKitIntake
     public function handle(int $draftId, UploadedFile $upload, mixed $expectedVersion, User $actor): SoundKitRevision
     {
         $this->root();
+
+        return $this->receive($draftId, $upload, $expectedVersion, $actor);
+    }
+
+    /** Only a server-owned exact assembled session may join the outer completion transaction. */
+    public function handleResumable(SoundKitUploadSession $hint, UploadedFile $upload, User $actor): SoundKitRevision
+    {
+        if (DB::transactionLevel() !== 1) {
+            throw new \LogicException('Kit transport intake requires its owning root completion transaction.');
+        }
+        $drafts = app(SoundKitDrafts::class);
+        $current = $drafts->actor($actor);
+        $draft = $drafts->lock($hint->sound_kit_draft_id);
+        $session = SoundKitUploadSession::query()->lockForUpdate()->findOrFail($hint->id);
+        if ($session->actor_id !== $current->id || $session->sound_kit_draft_id !== $draft->id
+            || $session->public_id !== $hint->public_id || $session->status !== 'uploading' || $session->expires_at->lte(now())
+            || $session->received_bytes !== $session->size_bytes || $upload->getSize() !== $session->size_bytes
+            || $upload->getClientOriginalName() !== $session->original_name || ! $upload->getRealPath()
+            || ! hash_equals($session->sha256, (string) hash_file('sha256', $upload->getRealPath()))
+            || ! hash_equals($session->profile_sha256, CanonicalJson::hash(app(SoundKitArchiveProfile::class)->current()))) {
+            throw ValidationException::withMessages(['upload' => 'The retained kit upload no longer matches these bytes and profile.']);
+        }
+        $revision = $this->receive($draft->id, $upload, $session->expected_version, $current, dispatch: false);
+        // The revision and transport outcome must commit together before processing may start.
+        DB::afterCommit(fn () => $this->dispatch($revision));
+
+        return $revision;
+    }
+
+    private function receive(int $draftId, UploadedFile $upload, mixed $expectedVersion, User $actor, bool $dispatch = true): SoundKitRevision
+    {
         if (! (is_int($expectedVersion) || (is_string($expectedVersion) && preg_match('/\A[1-9][0-9]*\z/D', $expectedVersion)))
             || (string) (int) $expectedVersion !== (string) $expectedVersion || (int) $expectedVersion < 1) {
             throw ValidationException::withMessages(['upload' => 'Reload this kit before uploading.']);
@@ -80,7 +112,9 @@ final class SoundKitIntake
             return $revision;
         });
         // Own root commit has completed. Unknown commit outcomes retain the canonical source for replay.
-        $this->dispatch($revision);
+        if ($dispatch) {
+            $this->dispatch($revision);
+        }
 
         return $revision->fresh();
     }

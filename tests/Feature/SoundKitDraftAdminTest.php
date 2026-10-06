@@ -65,7 +65,7 @@ class SoundKitDraftAdminTest extends TestCase
         $draft = $this->draft();
         $this->assertFalse(SoundKitDraftResource::canDelete($draft));
         $this->assertFalse(SoundKitDraftResource::canDeleteAny());
-        $this->assertSame(['index'], array_keys(SoundKitDraftResource::getPages()));
+        $this->assertSame(['index', 'resumable-upload'], array_keys(SoundKitDraftResource::getPages()));
         $page = Livewire::test(ManageSoundKitDrafts::class)->assertCanSeeTableRecords([$draft]);
         foreach (['publish', 'price', 'license', 'download', 'delete'] as $action) {
             $page->assertTableActionDoesNotExist($action);

@@ -7,6 +7,7 @@ use App\Http\Controllers\PublicMediaController;
 use App\Http\Controllers\ResumableMediaUploadController;
 use App\Http\Controllers\SiteImagePreviewController;
 use App\Http\Controllers\SiteReleasePreviewController;
+use App\Http\Controllers\SoundKitUploadController;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -41,6 +42,13 @@ class AdminPanelProvider extends PanelProvider
                     Route::post('/{upload}/chunks', [ResumableMediaUploadController::class, 'append'])->middleware('throttle:240,1,resumable-parts')->name('resumable-uploads.append');
                     Route::post('/{upload}/complete', [ResumableMediaUploadController::class, 'complete'])->middleware('throttle:30,1,resumable-finish')->name('resumable-uploads.complete');
                     Route::post('/{upload}/cancel', [ResumableMediaUploadController::class, 'cancel'])->middleware('throttle:30,1,resumable-finish')->name('resumable-uploads.cancel');
+                });
+                Route::prefix('sound-kit-uploads')->middleware(['can:administer-catalog', ...Dashboard::getRouteMiddleware($panel)])->group(function (): void {
+                    Route::post('/', [SoundKitUploadController::class, 'start'])->middleware('throttle:20,1,kit-upload-start')->name('sound-kit-uploads.start');
+                    Route::get('/{upload}', [SoundKitUploadController::class, 'inspect'])->middleware('throttle:120,1,kit-upload-read')->name('sound-kit-uploads.inspect');
+                    Route::post('/{upload}/chunks', [SoundKitUploadController::class, 'append'])->middleware('throttle:240,1,kit-upload-parts')->name('sound-kit-uploads.append');
+                    Route::post('/{upload}/complete', [SoundKitUploadController::class, 'complete'])->middleware('throttle:30,1,kit-upload-finish')->name('sound-kit-uploads.complete');
+                    Route::post('/{upload}/cancel', [SoundKitUploadController::class, 'cancel'])->middleware('throttle:30,1,kit-upload-finish')->name('sound-kit-uploads.cancel');
                 });
                 Route::get('/media/{asset}/preview', [PublicMediaController::class, 'operator'])
                     ->middleware(['can:administer-catalog', ...Dashboard::getRouteMiddleware($panel), 'throttle:240,1'])

@@ -2,21 +2,65 @@
 
 namespace App\Http\Middleware;
 
+use App\Filament\Resources\SoundKitDraftResource\Pages\UploadSoundKit;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
+use Livewire\Mechanisms\HandleComponents\Checksum;
+use Livewire\Mechanisms\HandleRequests\HandleRequests;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 /** Private admission and response boundary, including failures before controller execution. */
 final class ResumableUploadPrivacy
 {
     public static function endpoint(Request $request): bool
     {
-        return $request->is('admin/resumable-uploads', 'admin/resumable-uploads/*');
+        return $request->is('admin/resumable-uploads', 'admin/resumable-uploads/*', 'admin/sound-kit-uploads', 'admin/sound-kit-uploads/*');
     }
 
     public static function matches(Request $request): bool
     {
-        return self::endpoint($request) || $request->is('admin/media-assets/resumable-upload');
+        return self::endpoint($request) || $request->is('admin/media-assets/resumable-upload', 'admin/sound-kit-drafts/*/resumable-upload')
+            || $request->attributes->get('_kit_resumable_page') === true || self::signedKitPageUpdate($request);
+    }
+
+    /** Keep CSRF and hydration errors private before the kit page can recheck its actor. */
+    private static function signedKitPageUpdate(Request $request): bool
+    {
+        $route = $request->route();
+        if (! ($route instanceof Route) || ! $route->named('*livewire.update')
+            || $route->getActionName() !== HandleRequests::class.'@handleUpdate' || ! $request->isMethod('POST')) {
+            return false;
+        }
+        $components = $request->input('components');
+        if (! is_array($components)) {
+            return false;
+        }
+        foreach ($components as $component) {
+            if (! is_array($component) || ! is_string($component['snapshot'] ?? null)) {
+                continue;
+            }
+            try {
+                $snapshot = json_decode($component['snapshot'], associative: true, flags: JSON_THROW_ON_ERROR);
+                if (! is_array($snapshot) || ! is_array($snapshot['data'] ?? null) || ! is_array($snapshot['memo'] ?? null)
+                    || ! is_string($snapshot['memo']['name'] ?? null) || ! is_string($snapshot['checksum'] ?? null)) {
+                    continue;
+                }
+                $checksum = $snapshot['checksum'];
+                unset($snapshot['checksum']);
+                if ($snapshot['memo']['name'] === app('livewire.finder')->normalizeName(UploadSoundKit::class)
+                    && hash_equals($checksum, Checksum::generate($snapshot))) {
+                    $request->attributes->set('_kit_resumable_page', true);
+
+                    return true;
+                }
+            } catch (Throwable) {
+                // Client input alone cannot select this private response boundary.
+            }
+        }
+
+        return false;
     }
 
     public function handle(Request $request, Closure $next): Response
@@ -40,7 +84,7 @@ final class ResumableUploadPrivacy
                 return self::error(415);
             }
             if ($request->isMethod('POST')) {
-                $chunk = $request->is('admin/resumable-uploads/*/chunks');
+                $chunk = $request->is('admin/resumable-uploads/*/chunks', 'admin/sound-kit-uploads/*/chunks');
                 $type = $request->header('Content-Type', '');
                 if (($chunk && preg_match('~\Amultipart/form-data\s*;~i', $type) !== 1)
                     || (! $chunk && preg_match('~\Aapplication/json(?:\s*;\s*charset=(?:utf-8|"utf-8"))?\z~iD', $type) !== 1)) {
