@@ -32,6 +32,8 @@ class CustomerInquiryMigrationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // Reverse the additive child first, as a parent rollback must do on MySQL.
+        (require database_path('migrations/2026_10_06_000043_inquiry_messages.php'))->down();
         $this->fakePrivateMediaStorage();
         $this->travelTo(now()->startOfSecond());
         $this->operator = LicenseFixtures::admin();

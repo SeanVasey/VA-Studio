@@ -54,3 +54,5 @@ Route::post('/checkout', fn () => response()->json([
     'code' => 'COMMERCE_NOT_ENABLED',
     'message' => 'Checkout is being prepared. No payment has been taken.',
 ], 503))->middleware('throttle:10,1')->name('checkout.store');
+
+require __DIR__.'/inquiry-conversations.php';

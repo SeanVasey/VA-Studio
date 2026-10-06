@@ -132,7 +132,7 @@ return Application::configure(basePath: dirname(__DIR__))
                         $headers[$name] = $response->headers->get($name);
                     }
                 }
-                if ($request->is('contact/inquiries')) {
+                if ($request->is('contact/inquiries', 'contact/inquiries/*')) {
                     return InquiryResponse::error($status, headers: $headers);
                 }
 

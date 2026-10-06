@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Domain\Inquiries\InquiryAdministration;
+use App\Domain\Inquiries\InquiryConversation;
 use App\Domain\Inquiries\Models\CustomerInquiry;
 use App\Filament\Resources\CustomerInquiryResource\Components\InquiryTextColumn;
 use App\Filament\Resources\CustomerInquiryResource\Components\InquiryTextEntry;
@@ -56,7 +57,7 @@ final class CustomerInquiryResource extends OperatorResource
 
     public static function table(Table $table): Table
     {
-        return $table->description('Private inquiries saved in this store. No email or reply is sent by these actions.')
+        return $table->description('Private inquiries saved in this store. Open an inquiry to reply in app. No email is sent.')
             ->columns([
                 InquiryTextColumn::make('public_id')->label('Receipt')->copyable(),
                 InquiryTextColumn::make('payload.subject')->label('Subject')->limit(80),
@@ -75,13 +76,23 @@ final class CustomerInquiryResource extends OperatorResource
             InquiryTextEntry::make('payload.subject')->label('Subject'), InquiryTextEntry::make('payload.message')->label('Message')->columnSpanFull()->extraAttributes(['class' => 'whitespace-pre-wrap']),
             InquiryTextEntry::make('created_at')->label('Received (UTC)')->dateTime('Y-m-d H:i:s', 'UTC'),
             InquiryTextEntry::make('retention_policy_reference')->label('Retention policy reference'),
+            InquiryTextEntry::make('conversation')->label('In-app conversation')->columnSpanFull()
+                ->state(function (CustomerInquiry $record): string {
+                    $snapshot = app(InquiryConversation::class)->staff($record->id, Filament::auth()->user());
+                    $rows = array_map(fn (array $message): string => ($message['sender'] === 'you' ? 'Customer' : 'VASEY.AUDIO')
+                        .' · '.$message['createdAt']."\n".$message['message'], $snapshot['messages']);
+
+                    return ($rows === [] ? 'No replies yet.' : implode("\n\n", $rows))
+                        ."\n\nReplies stay in this store; no email is sent. Refresh to check for new messages."
+                        .($snapshot['canReply'] ? '' : ' This conversation is read-only.');
+                })->extraAttributes(['class' => 'whitespace-pre-wrap']),
         ]);
     }
 
     public static function stateAction(string $name, string $label, string $target): Action
     {
         return Action::make($name)->label($label)->visible(fn (CustomerInquiry $record): bool => $target === 'read' ? $record->state === 'new' : $record->state !== 'archived')
-            ->requiresConfirmation()->modalDescription($target === 'read' ? 'Mark this private inquiry as read. This does not send a reply.' : 'Move this inquiry out of the new inbox. Its original details remain retained; no reply is sent.')
+            ->requiresConfirmation()->modalDescription($target === 'read' ? 'Mark this private inquiry as read. This does not send a reply.' : 'Archive this inquiry and stop new replies. Its original details and conversation remain readable; no email is sent.')
             ->mountUsing(fn (HasActions $livewire, CustomerInquiry $record) => $livewire->mergeMountedActionArguments(['expectedVersion' => $record->version]))
             ->action(function (CustomerInquiry $record, array $arguments, Action $action) use ($target): void {
                 try {

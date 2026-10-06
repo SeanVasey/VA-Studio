@@ -23,7 +23,8 @@ try {
     $mode = $argv[1] ?? null;
     $project = $argv[2] ?? null;
     $transport = in_array($mode, ['transport-prepare', 'transport-rotate', 'transport-restore'], true);
-    $operation = $transport ? substr($mode, strlen('transport-')) : $mode;
+    $conversation = in_array($mode, ['conversation-prepare', 'conversation-restore'], true);
+    $operation = $transport ? substr($mode, strlen('transport-')) : ($conversation ? substr($mode, strlen('conversation-')) : $mode);
     if (PHP_SAPI !== 'cli' || ! is_string($directory) || is_link($directory) || realpath($directory) !== $directory
         || realpath(dirname($directory)) !== realpath(sys_get_temp_dir()) || ! preg_match('/\Avasey-browser-[A-Za-z0-9]+\z/D', basename($directory))
         || getenv('APP_ENV') !== 'local' || getenv('APP_URL') !== 'http://127.0.0.1:8173'
@@ -36,7 +37,7 @@ try {
         || file_exists($directory.'/routes.php') || file_exists($directory.'/events.php')
         || ! is_string($marker) || preg_match('/\A[a-f0-9]{64}\z/D', $marker) !== 1
         || ! in_array($project, ['chromium-desktop', 'webkit-mobile'], true)
-        || ! in_array($mode, ['prepare', 'verify', 'restore', 'transport-prepare', 'transport-rotate', 'transport-restore'], true)
+        || ! in_array($mode, ['prepare', 'verify', 'restore', 'transport-prepare', 'transport-rotate', 'transport-restore', 'conversation-prepare', 'conversation-restore'], true)
         || count($argv) !== ($operation === 'verify' ? 5 : 3)) {
         throw new RuntimeException('Not an isolated inquiry browser run.');
     }
@@ -66,7 +67,7 @@ try {
     if ($operator->email !== 'browser-operator@example.test' || ! Gate::forUser($operator)->allows('administer-catalog') || ! AdminMultiFactor::satisfiedBy($operator)) {
         throw new RuntimeException('Synthetic operator identity mismatch.');
     }
-    $path = $directory.'/inquiry-'.($transport ? 'transport-' : '').$project.'.json';
+    $path = $directory.'/inquiry-'.($transport ? 'transport-' : ($conversation ? 'conversation-' : '')).$project.'.json';
     $rotationPath = $path.'.rotation.json';
     if (is_link($path)) {
         throw new RuntimeException('Unsafe fixture record.');
@@ -74,6 +75,7 @@ try {
     $site = app(SiteContent::class);
     $inquiryGraph = static fn (): string => CanonicalJson::hash([
         'inquiries' => DB::table('customer_inquiries')->orderBy('id')->get()->map(fn ($row): array => (array) $row)->all(),
+        'messages' => DB::table('inquiry_messages')->orderBy('id')->get()->map(fn ($row): array => (array) $row)->all(),
         'audits' => DB::table('audit_events')->where('action', 'like', 'inquiry.%')->orderBy('id')->get()->map(fn ($row): array => (array) $row)->all(),
     ]);
     $retainedRows = static fn (int $auditEnd): string => CanonicalJson::hash([
