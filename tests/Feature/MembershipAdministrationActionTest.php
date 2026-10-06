@@ -109,6 +109,7 @@ class MembershipAdministrationActionTest extends TestCase
         $page->callMountedAction()->assertHasActionErrors(['entered_plan'])->assertNotified('Review the current private plan to continue');
         $this->assertConsumed($page);
         $page->assertSet('enteredPlan.allowance', 7);
+        $this->assertCopyableRecovery($page);
         $this->assertSame($before, $this->evidence());
         $page->callMountedAction()->assertHasActionErrors(['entered_plan']);
         $this->assertSame($before, $this->evidence());
@@ -271,11 +272,14 @@ class MembershipAdministrationActionTest extends TestCase
     private function assertCopyableRecovery(mixed $page): void
     {
         $document = new \DOMDocument;
-        @$document->loadHTML($page->getMountedActionModalHtml());
+        // Assert the returned page, including its footer, rather than a modal-only fragment.
+        @$document->loadHTML($page->html());
         $xpath = new \DOMXPath($document);
         $copy = $xpath->query('//textarea[@readonly]');
         $this->assertCount(1, $copy);
         $this->assertFalse($copy->item(0)->hasAttribute('disabled'));
+        $this->assertSame('state', $copy->item(0)->getAttribute('x-model'));
+        $page->assertActionDataSet(['entered_plan' => $page->get('enteredPlanText')]);
         $submit = $xpath->query('//form[@*[name()="wire:submit.prevent"]="callMountedAction"]//button[@type="submit"]');
         $this->assertCount(1, $submit);
         $this->assertTrue($submit->item(0)->hasAttribute('disabled'));

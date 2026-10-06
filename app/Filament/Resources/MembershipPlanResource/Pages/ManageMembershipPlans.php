@@ -185,6 +185,10 @@ final class ManageMembershipPlans extends ManageRecords
         } finally {
             $this->submitting = null;
             $this->submittedReview = null;
+            // The modal fragment may leave the existing footer in the returned page.
+            // Render it only after the submit flags clear, so an exhausted review's
+            // Apply control and the enabled copy field agree with retained state.
+            $this->forceRender();
         }
     }
 

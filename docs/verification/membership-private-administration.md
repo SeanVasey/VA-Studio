@@ -77,16 +77,41 @@ context without relying on associative insertion order; the two affected
 credit-scope cases then passed 16 assertions. All intermediate failures and
 JUnit/logs are preserved under `membership-admin-evidence/` outside Git.
 
+The first frozen child `a7dcb1e546a33e479bf1b16d81770f2a2cf5a268` passed the
+affected 75-case SQLite selection with 630 assertions and unchanged source
+hashes. Independent review then reproduced a blocking UI recovery flaw by
+asserting the actual returned page instead of the modal fragment: the original
+page footer could still present an enabled Apply control after server review
+state was exhausted. The unchanged external lost-response canary failed one
+case/20 assertions; the expanded authored actual-page stale, uncertain and
+committed-loss selection also failed all three cases/78 assertions. Those
+red sources, logs and JUnit remain preserved. Server replay was refused, but
+that did not establish correct client control state.
+
+The narrow corrective child forces complete authoring rendering after its
+submit flags clear. Recovery tests now inspect the actual returned page,
+including a disabled native Apply control and an enabled read-only, correctly
+bound copy field. Stale comparisons, exceptions before commit and real
+committed-response loss use these assertions. Original domain/ledger/migration
+bytes and the review-consumption rules remain unchanged. Original passing
+modal-fragment evidence is retained as earlier limited evidence, not presented
+as actual-page acceptance.
+The corrected complete mounted selection passed 24 SQLite cases/422 assertions,
+zero failures/errors/skips, in 10.07 seconds; scoped syntax/Pint passed for the
+two changed PHP files. The final receipt below binds the frozen corrective
+source rather than substituting the earlier child.
+
 The frozen affected command is:
 
 ```sh
 php vendor/bin/phpunit --colors=never \
   --filter '(MembershipAdministration|MembershipPrimaryProofTest|MembershipGrantClockBoundaryTest|MembershipPlanTest::test_private_plan_versions|MembershipCreditLedgerTest::test_full_synthetic_renewal|MembershipCreditMigrationTest::test_partial_existing_schema|MembershipCreditMigrationTest::test_temporary_shadow)' \
-  --log-junit=/workspace/scratch/2876616e88c3/membership-admin-evidence/admin-final.sqlite.xml \
+  --log-junit=/workspace/scratch/2876616e88c3/membership-admin-evidence/admin-corrective.sqlite.xml \
   tests/Feature
 ```
 
-`admin-final-receipt.json` records the exact executed commit/tree, command,
+`admin-final-receipt.json` retains the earlier child; the corrective source's
+`admin-corrective-receipt.json` records the exact executed commit/tree, command,
 sanitized isolated runtime, source hashes before/after, exit status and parsed
 JUnit totals. The disposable 32-byte test key is generated in memory and not
 retained. Scoped Pint and PHP syntax cover the seven owned PHP files. The
