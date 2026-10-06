@@ -2,17 +2,18 @@
 
 ## Active continuation — October 6, 2026 UTC
 
-The preceding [PR #6](https://github.com/SeanVasey/VA-Studio/pull/6) and incorporated PR #5 are merged. Full PR acceptance and fresh main verification passed on `387fdeb`, tree `63b832dd`. The [current candidate](verification/customer-product-followup-composition.md) combines independently reviewed collection-member snapshot refresh and original customer test-order item details. It requires its own full acceptance and ten database receipts. New guest-claim and refunded-exception children proceed independently while that candidate is verified.
+[PR #7](https://github.com/SeanVasey/VA-Studio/pull/7) is verifying collection-member refresh and original customer order details after accepted main `387fdeb`. Its browser, frontend, quality and SQLite evidence has passed; all native MySQL receipts and aggregation remain required. The [following reviewed composition](verification/purchase-claims-refund-resolution-composition.md) contains completed guest-purchase claim and refunded-exception features, with separate source-bound checks and full acceptance requirements.
 
 | Lane | Current work and boundary |
 | --- | --- |
-| Integration `/root` | Compose exact reviewed sources, preserve branch ancestry, run complete discovery/focused verification, publish one candidate and require full hosted acceptance before expected-head merge |
-| CI review `/root/runtime_restore` | Restore and verify native dependencies, prove exact discovery/partition/skip coverage, investigate execution failures and verify fresh hosted receipts |
-| Independent review `/root/prepared_review` | Review prepared composition and subsequent guest-claim authorization, migration and original-evidence boundaries |
-| Customer `/root/guest_claim` | Explicit, expiring original-session proof for one completed paid guest test order, account confirmation and immutable per-order access; no email inference or owner-key rewrite |
-| Financial `/root/next_scope` | Reviewed test-only release of pending resources for a fully refunded, unfulfilled paid exception; schema and operator children have separate ownership |
+| Integration `/root` | Compose exact reviewed sources, preserve branch ancestry, finish focused integration evidence and publish coherent PRs; expected-head merge only after all required gates |
+| CI review `/root/runtime_restore` | Independently verify current hosted receipts and aggregation; complete actual dual-engine discovery and exact partition/skip coverage for the next composition |
+| Independent review `/root/prepared_review` | Guest claim and exact composed source approved at `80aa34f`; review the final evidence checkpoint before publication |
+| Journey review `/root/refund_journey_review` | Refunded-exception operator/browser contract and seven shared migration resolutions approved; independently verify composed builds and browser discovery |
+| Customer `/root/guest_claim` | Explicit test-purchase claim implementation complete and independently reviewed; assess the next dependency-ready customer capability |
+| Financial `/root/next_scope` | Test-only refunded-exception resource resolution complete and independently reviewed; maintain the original-request, observation and post-audit commit fences |
 
-The tables below retain prior checkpoints and do not imply additional running agents. Unfinished feature branches are not acceptance evidence or merged main state. No lane waits for unrelated database CI to begin its next dependency-ready child.
+The tables below preserve historical checkpoints and do not imply additional running agents. Full hosted acceptance, actual rendered browser journeys and fresh main verification remain separate from source review or focused tests. No parent group closes from these two bounded children. Next work must follow a concrete dependency-ready scope and preserve the existing production and cutover boundaries.
 
 ## Full completion priority — October 5, 2026 (America/Chicago)
 
