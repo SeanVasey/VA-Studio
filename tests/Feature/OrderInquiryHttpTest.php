@@ -135,8 +135,10 @@ class OrderInquiryHttpTest extends TestCase
     {
         config(['app.debug' => true]);
         Log::spy();
-        DB::listen(function (QueryExecuted $query): void {
-            if (str_contains($query->sql, 'site_publications')) {
+        $armed = true;
+        DB::listen(function (QueryExecuted $query) use (&$armed): void {
+            if ($armed && str_contains($query->sql, 'site_publications')) {
+                $armed = false;
                 throw new RuntimeException('PRIVATE ORDER ID AND MESSAGE');
             }
         });
