@@ -21,7 +21,7 @@ The real storefront starts with its honest empty catalog. This launcher does not
 
 Press **Ctrl+C** to stop the server and delete that run's database, files, credentials and edits. Start again for a clean session. Save desired copy separately before stopping; there is no export or resume command. Normal shutdown, failed setup and early server exit clean up the owned temporary directory. A machine crash or forced kill can leave a private `vasey-alpha-*` directory in the operating system's temporary folder; do not reuse it as an installation.
 
-The launcher refuses an occupied port, an active Vite hot file or checkout maintenance mode. Stop that development server first. It never reuses or stops an unrelated listener, and offers no host/database/credential override. Do not expose this local development server through a tunnel or reverse proxy.
+The launcher refuses an occupied port, an active Vite hot file or checkout maintenance mode. Stop that development server first. It never reuses or stops an unrelated listener, and offers no host/database/credential override. Its PHP HTTP process permits 9 MiB upload requests so an 8 MiB resumable chunk plus multipart overhead can be admitted; application file and chunk limits remain enforced. Do not expose this local development server through a tunnel or reverse proxy.
 
 ## Preview the composed storefront
 

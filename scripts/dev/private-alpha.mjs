@@ -104,7 +104,7 @@ export async function launch({ checkout = root, output = process.stdout, signal 
       child.once('exit', code => { clearTimeout(timer); code === 0 ? resolveSetup() : reject(new Error('Private alpha preparation failed; no server was started.')); });
     });
     if (interrupted) return;
-    child = spawn('php', ['-S', '127.0.0.1:8174', '-t', 'public', 'scripts/dev/private-alpha-bootstrap.php'], {
+    child = spawn('php', ['-d', 'upload_max_filesize=9M', '-d', 'post_max_size=9M', '-S', '127.0.0.1:8174', '-t', 'public', 'scripts/dev/private-alpha-bootstrap.php'], {
       cwd: checkout, env: sandbox.env, stdio: 'ignore',
     });
     let spawnFailed = false;
