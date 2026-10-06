@@ -6,6 +6,29 @@ import { resetBrowserLoginRateLimit } from './auth-fixture';
 test.beforeEach(() => resetBrowserLoginRateLimit());
 
 test('operator resumes real eight MiB transport after a lost response and saves private media', async ({ page }, testInfo) => {
+  let parts = 0;
+  await page.exposeBinding('__vaseyLoseFirstChunkAcknowledgement', ({ frame }, status: number) => {
+    expect(frame).toBe(page.mainFrame());
+    expect(status).toBe(200); // Actual PHP multipart admission, CSRF, service and storage ran.
+    parts++;
+    return parts === 1;
+  });
+  await page.addInitScript(() => {
+    const nativeFetch = window.fetch.bind(window);
+    const harness = window as unknown as { __vaseyLoseFirstChunkAcknowledgement: (status: number) => Promise<boolean> };
+    window.fetch = async (input, init) => {
+      const url = new URL(typeof input === 'string' ? input : input instanceof URL ? input.href : input.url, location.href);
+      const method = (init?.method ?? (input instanceof Request ? input.method : 'GET')).toUpperCase();
+      // Preserve the browser's exact Request/FormData transport, including its multipart boundary.
+      const response = await nativeFetch(input, init);
+      if (url.origin === location.origin && /^\/admin\/resumable-uploads\/[a-f0-9-]{36}\/chunks$/.test(url.pathname)
+        && method === 'POST' && await harness.__vaseyLoseFirstChunkAcknowledgement(response.status)) {
+        // The real first chunk committed; only its acknowledgement is withheld from the client.
+        throw new TypeError('Synthetic lost chunk acknowledgement');
+      }
+      return response;
+    };
+  });
   if (testInfo.project.name === 'webkit-mobile') await page.setViewportSize({ width: 320, height: 900 });
   const fixtures = JSON.parse(readFileSync(join(process.env.VASEY_BROWSER_DIRECTORY!, 'fixtures.json'), 'utf8'));
   const trackTitle = fixtures[testInfo.project.name].retained.title;
@@ -36,14 +59,6 @@ test('operator resumes real eight MiB transport after a lost response and saves 
   const name = `synthetic-resumable-${testInfo.project.name}.png`;
   const file = { name, mimeType: 'image/png', buffer: bytes };
   await page.getByLabel('File from your device', { exact: true }).setInputFiles(file);
-  let parts = 0;
-  await page.route('**/admin/resumable-uploads/*/chunks', async route => {
-    const response = await route.fetch();
-    expect(response.status()).toBe(200); // Actual PHP multipart admission, CSRF, service and storage ran.
-    parts++;
-    if (parts === 1) await route.abort('failed'); // Commit happened; only its acknowledgement is lost.
-    else await route.fulfill({ response });
-  });
   const status = page.locator('[data-upload-status]');
   await page.getByRole('button', { name: 'Start upload', exact: true }).focus();
   await page.keyboard.press('Enter');
