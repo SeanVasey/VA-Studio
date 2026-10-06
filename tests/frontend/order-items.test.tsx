@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { OrderItems } from '../../resources/js/components/OrderItems';
@@ -139,7 +139,7 @@ describe('original test-order items panel', () => {
   });
   it('offers fresh sign-in after lost access and clears it on hide', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(json({ message: 'PRIVATE' }, 403)); panel(); fireEvent.click(view());
-    expect(await screen.findByRole('alert')).toHaveFocus(); expect(screen.getByRole('link', { name: 'Open a fresh sign-in page' })).toHaveAttribute('href', '/account/sign-in');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveFocus()); expect(screen.getByRole('link', { name: 'Open a fresh sign-in page' })).toHaveAttribute('href', '/account/sign-in');
     expect(screen.getByRole('button', { name: 'Refresh original test-order items' })).toBeDisabled();
     fireEvent.click(hide()); expect(screen.queryByRole('link')).not.toBeInTheDocument(); expect(view()).toHaveFocus();
   });
