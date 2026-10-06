@@ -39,6 +39,14 @@
       "test_current_withdrawal_wins_exact_user_fence_before_every_customer_entrypoint"
     ],
     [
+      "Tests\\Feature\\CustomerIdentityConcurrencyTest",
+      "test_committed_withdrawal_wins_the_exact_user_fence_before_recovery"
+    ],
+    [
+      "Tests\\Feature\\CustomerIdentityConcurrencyTest",
+      "test_competing_completions_wait_on_the_exact_address_and_write_one_credential"
+    ],
+    [
       "Tests\\Feature\\CustomerInquiryAdministrationConcurrencyTest",
       "test_administration_and_revocation_serialize_on_current_authority_in_both_lock_orders"
     ],
@@ -293,6 +301,18 @@
     [
       "Tests\\Feature\\SoundKitConcurrencyTest",
       "test_native_actor_wait_serializes_duplicate_upload_or_processing"
+    ],
+    [
+      "Tests\\Feature\\SoundKitUploadsConcurrencyTest",
+      "test_native_actor_wait_serializes_duplicate_kit_transport_operations"
+    ],
+    [
+      "Tests\\Feature\\SoundKitUploadsConcurrencyTest",
+      "test_native_draft_wait_observes_committed_version_change_before_completion"
+    ],
+    [
+      "Tests\\Feature\\SoundKitUploadsConcurrencyTest",
+      "test_required_mfa_withdrawal_during_native_actor_wait_refuses_each_transport_operation"
     ],
     [
       "Tests\\Feature\\StemsRecordingConcurrencyTest",

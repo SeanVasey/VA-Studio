@@ -34,6 +34,9 @@ const env = {
   // Synthetic inquiry setup belongs exclusively to this disposable loopback installation.
   CONTACT_INQUIRIES_ENABLED: 'true',
   VASEY_TEST_CUSTOMER_ACCOUNTS_ENABLED: 'true',
+  // Only this disposable local application captures synthetic identity messages privately.
+  VASEY_TEST_CUSTOMER_IDENTITY_ENABLED: 'true',
+  VASEY_TEST_CUSTOMER_IDENTITY_TRANSPORT: 'private_capture',
   // Read/issue exact retained synthetic originals; HTTP checkout/payment processing stay disabled above.
   VASEY_TEST_DELIVERY_ACCESS_ENABLED: 'true',
   VASEY_TEST_DELIVERY_ACCESS_POLICY: JSON.stringify({ schema_version: 1, purpose: 'test_owner_delivery', version: 'test-owner-delivery-v1',

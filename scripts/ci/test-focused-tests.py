@@ -120,6 +120,40 @@ class SelectionTests(unittest.TestCase):
             "test_mfa_withdrawal_during_final_actor_wait_prevents_verified_commit_after_real_scanning",
         })
 
+    def test_identity_and_kit_transport_feedback_keep_native_races_and_client_journeys(self):
+        self.assertEqual(focused.MAX_FILES, 32)
+        for suite, targets in {
+            "customer": ("CustomerIdentityTest", "CustomerIdentityHttpTest", "CustomerIdentityMigrationTest", "CustomerIdentityConcurrencyTest"),
+            "media": ("SoundKitUploadsTest", "SoundKitUploadHttpTest", "SoundKitUploadMigrationTest", "SoundKitUploadsConcurrencyTest"),
+        }.items():
+            for target in targets:
+                self.assertIn("tests/Feature/" + target + ".php", focused.PHP_TARGETS[suite])
+        for target in ("tests/frontend/customer-identity.test.tsx", "tests/frontend/resumable-kit-upload.test.ts"):
+            self.assertIn(target, focused.FRONTEND_TARGETS)
+        for target in ("tests/browser/customer-identity.spec.ts", "tests/browser/resumable-kit-upload.spec.ts"):
+            self.assertIn(target, focused.BROWSER_TARGETS)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        for class_name, methods in {
+            "CustomerIdentityConcurrencyTest": {
+                "test_competing_completions_wait_on_the_exact_address_and_write_one_credential",
+                "test_committed_withdrawal_wins_the_exact_user_fence_before_recovery",
+            },
+            "SoundKitUploadsConcurrencyTest": {
+                "test_native_actor_wait_serializes_duplicate_kit_transport_operations",
+                "test_required_mfa_withdrawal_during_native_actor_wait_refuses_each_transport_operation",
+                "test_native_draft_wait_observes_committed_version_change_before_completion",
+            },
+        }.items():
+            self.assertEqual({row[1] for row in policy["methods"] if row[0] == "Tests\\Feature\\" + class_name}, methods)
+
+    def test_native_identity_wrapper_enables_only_private_synthetic_capture(self):
+        wrapper = (ROOT / "tests/browser/run.mjs").read_text()
+        for setting in ("APP_ENV: 'local'", "MAIL_MAILER: 'array'", "VASEY_TEST_CUSTOMER_ACCOUNTS_ENABLED: 'true'",
+                        "VASEY_TEST_CUSTOMER_IDENTITY_ENABLED: 'true'", "VASEY_TEST_CUSTOMER_IDENTITY_TRANSPORT: 'private_capture'",
+                        "LARAVEL_STORAGE_PATH: directory", "DB_DATABASE: join(directory, 'database.sqlite')"):
+            self.assertIn(setting, wrapper)
+        self.assertIn("rmSync(directory, { recursive: true, force: true });", wrapper)
+
     def test_workflow_dispatch_choices_exactly_match_reviewed_suite_enums(self):
         workflow = (ROOT / ".github/workflows/focused.yml").read_text()
         choices = workflow.split("options: [", 1)[1].split("]", 1)[0].split(", ")

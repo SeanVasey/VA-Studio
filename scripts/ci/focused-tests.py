@@ -34,6 +34,8 @@ PHP_TARGETS = {
         "tests/Unit/TcpdfContractRendererTest.php", "tests/Unit/TypedLicenseTermsTest.php",
     ),
     "media": (
+        "tests/Feature/SoundKitUploadsTest.php", "tests/Feature/SoundKitUploadHttpTest.php",
+        "tests/Feature/SoundKitUploadMigrationTest.php", "tests/Feature/SoundKitUploadsConcurrencyTest.php",
         "tests/Feature/SoundKitIntakeTest.php", "tests/Feature/SoundKitRecoveryTest.php",
         "tests/Feature/SoundKitMigrationTest.php", "tests/Feature/SoundKitDraftAdminTest.php",
         "tests/Feature/SoundKitConcurrencyTest.php",
@@ -74,6 +76,8 @@ PHP_TARGETS = {
         "tests/Feature/TestPaymentProcessingTest.php", "tests/Feature/TestOrderFinalizationTest.php",
     ),
     "customer": (
+        "tests/Feature/CustomerIdentityTest.php", "tests/Feature/CustomerIdentityHttpTest.php",
+        "tests/Feature/CustomerIdentityMigrationTest.php", "tests/Feature/CustomerIdentityConcurrencyTest.php",
         "tests/Feature/CustomerAccountAccessTest.php", "tests/Feature/CustomerAccountCommerceTest.php",
         "tests/Feature/CustomerAccountConcurrencyTest.php", "tests/Feature/CustomerAccountMigrationTest.php",
         "tests/Feature/CustomerSessionHttpTest.php", "tests/Feature/OwnedTestOrderHistoryTest.php",
@@ -131,6 +135,7 @@ PHP_TARGETS = {
     ),
 }
 FRONTEND_TARGETS = (
+    "tests/frontend/customer-identity.test.tsx", "tests/frontend/resumable-kit-upload.test.ts",
     "tests/frontend/inquiry-conversation.test.tsx",
     "tests/frontend/customer-account.test.tsx",
     "tests/frontend/audio.test.tsx", "tests/frontend/catalog-pagination.test.tsx",
@@ -148,6 +153,7 @@ FRONTEND_TARGETS = (
     "tests/frontend/resumable-media-upload.test.ts",
 )
 BROWSER_TARGETS = (
+    "tests/browser/customer-identity.spec.ts", "tests/browser/resumable-kit-upload.spec.ts",
     "tests/browser/test-unpaid-release.spec.ts",
     "tests/browser/inquiry-conversation.spec.ts",
     "tests/browser/customer-account.spec.ts",
