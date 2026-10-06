@@ -68,6 +68,12 @@ final class FinalizationEvidence
         }
         $proof = $this->decrypt($finalization->evidence_ciphertext, $finalization->evidence_hash, $finalization->canonicalization_version);
         $state = $finalization->outcome === 'paid' ? 'consumed' : 'pending';
+        $resolution = \App\Domain\Commerce\Models\TestRefundResolution::where('order_finalization_id', $finalization->id)->first();
+        if ($resolution) {
+            app(\App\Domain\Commerce\RefundResolution\RefundResolutionEvidence::class)->resourceDisposition(
+                $resolution, $finalization, $order, $attempt, $reservation, $use);
+            $state = 'released';
+        }
         if ($finalization->order_id !== $order->id || $finalization->order_attempt_id !== $attempt->id
             || ! in_array($finalization->outcome, ['paid', 'paid_exception'], true)
             || ($proof['order_id'] ?? null) !== $order->public_id || ($proof['order_payload_hash'] ?? null) !== $order->payload_hash
@@ -77,7 +83,7 @@ final class FinalizationEvidence
             || $reservation->state !== $state || ($use !== null && $use->state !== $state)
             || ($state === 'consumed' && ($reservation->consumed_at === null || ! $reservation->consumed_at->equalTo($finalization->finalized_at)
                 || ($use !== null && ($use->consumed_at === null || ! $use->consumed_at->equalTo($finalization->finalized_at)))))
-            || ($state === 'pending' && ($reservation->consumed_at !== null || $use?->consumed_at !== null))) {
+            || (in_array($state, ['pending', 'released'], true) && ($reservation->consumed_at !== null || $use?->consumed_at !== null))) {
             throw new FinalizationException('changed');
         }
     }

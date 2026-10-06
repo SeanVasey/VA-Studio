@@ -57,6 +57,12 @@ if (isset($_SERVER['HTTP_X_VASEY_UNPAID_FIXTURE'])) {
     UnpaidReleaseBrowserFixture::serve();
 }
 
+// A separate private capability binds only the refund-resolution component's GET-only test transport.
+if (isset($_SERVER['HTTP_X_VASEY_REFUND_FIXTURE'])) {
+    require __DIR__.'/refund-resolution-fixture.php';
+    RefundResolutionBrowserFixture::serve();
+}
+
 // Reuse Laravel's ordinary static-file/front-controller routing for every application route.
 $testRoot = dirname(__DIR__, 2);
 chdir($testRoot.'/public');
