@@ -171,9 +171,9 @@ final class ProductionTrackCapabilities
         }
     }
 
-    public function withLockedForAdapter(ProductionTrackCapabilityCandidate $candidate, array $context, User $actor, Closure $prepare): mixed
+    public function withLockedForAdapter(ProductionTrackCapabilityCandidate $candidate, array $context, User $actor, Closure $prepare, ?Closure $finalPrimaryProof = null): mixed
     {
-        return $this->transaction($actor, function (User $current, array $authority, CurrentRows $reader) use ($candidate, $context, $prepare): mixed {
+        return $this->transaction($actor, function (User $current, array $authority, CurrentRows $reader) use ($candidate, $context, $prepare, $finalPrimaryProof): mixed {
             $snapshot = $this->forCandidate($reader, $candidate);
             $row = CapabilityHistory::find($snapshot['candidates'], $candidate->getKey());
             $source = CapabilityHistory::eligible($snapshot, $row);
@@ -187,8 +187,8 @@ final class ProductionTrackCapabilities
                 'approval_hash' => $approved[0]['approval_hash'], 'machine_hash' => CanonicalJson::hash($machine), 'machine' => $machine,
                 'external_facts_verified' => false, 'execution_allowed' => false];
             $projection['signature'] = $this->signature('production-preparation-projection-v1', $projection);
-            $result = $prepare($projection);
-            $this->finish($current, $authority, $snapshot, $reader);
+            $result = $finalPrimaryProof === null ? $prepare($projection) : $prepare($projection, $reader);
+            $this->finish($current, $authority, $snapshot, $reader, $finalPrimaryProof);
 
             return $result;
         });
@@ -287,11 +287,16 @@ final class ProductionTrackCapabilities
         return [$current, ['row' => $row, 'audits' => $audits]];
     }
 
-    private function finish(User $actor, array $expectedAuthority, array $snapshot, CurrentRows $reader): void
+    private function finish(User $actor, array $expectedAuthority, array $snapshot, CurrentRows $reader, ?Closure $finalPrimaryProof = null): void
     {
         [, $authority] = $this->authority($actor, $reader);
         if (CanonicalJson::encode($expectedAuthority) !== CanonicalJson::encode($authority)) {
             throw new AuthorizationException;
+        }
+        // Trusted fixed PDO reads and pure comparisons only, throwing on drift.
+        // A false return is a refusal, never a successful verification.
+        if ($finalPrimaryProof !== null) {
+            MachinePolicyV1::require($finalPrimaryProof($reader) === null);
         }
         // This last proof exposes no QueryExecuted or Eloquent callback. It uses
         // the captured primary PDO after the trusted adapter and all callbacks.

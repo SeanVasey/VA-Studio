@@ -13,9 +13,13 @@ final class ReadProductionTrackCapabilities
         return $this->withLockedForAdapter($candidate, $expectedContext, $actor, fn (array $projection): array => $projection);
     }
 
-    /** Trusted domain preparation callback only; no provider I/O or execution authority is supplied. */
-    public function withLockedForAdapter(ProductionTrackCapabilityCandidate $candidate, array $expectedContext, User $actor, Closure $prepare): mixed
+    /**
+     * Trusted preparation receives projection and captured primary reader.
+     * Optional terminal verifier must throw on drift and return void, using only
+     * fixed primary reads/pure checks. No callbacks, writes, file or provider I/O.
+     */
+    public function withLockedForAdapter(ProductionTrackCapabilityCandidate $candidate, array $expectedContext, User $actor, Closure $prepare, ?Closure $finalPrimaryProof = null): mixed
     {
-        return app(ProductionTrackCapabilities::class)->withLockedForAdapter($candidate, $expectedContext, $actor, $prepare);
+        return app(ProductionTrackCapabilities::class)->withLockedForAdapter($candidate, $expectedContext, $actor, $prepare, $finalPrimaryProof);
     }
 }
