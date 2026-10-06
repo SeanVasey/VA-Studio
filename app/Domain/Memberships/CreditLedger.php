@@ -3,6 +3,7 @@
 namespace App\Domain\Memberships;
 
 use App\Domain\Customers\CustomerAccess;
+use App\Domain\Customers\CustomerAccessPolicy;
 use App\Domain\Customers\CustomerPrincipal;
 use App\Domain\Customers\Models\CustomerAccount;
 use App\Domain\Memberships\Models\MembershipCreditBucket;
@@ -426,24 +427,33 @@ final class CreditLedger
             app(CustomerAccess::class)->lock($principal, $principal->ownerKey, $actor);
         }
         $this->proveDeadline($bucket, $events, $audit);
-        $this->evidence->prove($users, $account, [['membership_plans', (int) $parent['id'], $parent], ['membership_plan_versions', (int) $version['id'], $version],
-            ['membership_credit_buckets', (int) $bucket['id'], $bucket], ...array_map(fn ($event) => ['membership_credit_events', (int) $event['id'], $event], $events),
-            ...array_map(fn ($row) => ['audit_events', (int) $row['id'], $row], $auditRows)], $audit);
         if ($this->rawHistory((int) $bucket['id']) !== $events || $this->auditHistory($bucket, $events) !== $auditRows
             || ($audit === null && $this->evidence->cursor(MembershipCreditBucket::class, (int) $bucket['id']) !== $cursor)) {
             $this->unavailable();
         }
-        $this->proveDeadline($bucket, $events, $audit);
+        $finalAt = $this->at();
+        $this->evidence->prove($users, $account, [['membership_plans', (int) $parent['id'], $parent], ['membership_plan_versions', (int) $version['id'], $version],
+            ['membership_credit_buckets', (int) $bucket['id'], $bucket], ...array_map(fn ($event) => ['membership_credit_events', (int) $event['id'], $event], $events),
+            ...array_map(fn ($row) => ['audit_events', (int) $row['id'], $row], $auditRows)], $audit,
+            [['membership_credit_events', ['membership_credit_bucket_id' => (int) $bucket['id']], 'sequence', MembershipPolicy::MAX_EVENTS + 1, $events],
+                ['audit_events', ['subject_type' => MembershipCreditBucket::class, 'subject_id' => (int) $bucket['id']], 'id', MembershipPolicy::MAX_EVENTS + 1, $auditRows]],
+            [[MembershipCreditBucket::class, (int) $bucket['id'], $audit === null ? $cursor : (int) $audit['id']]]);
+        $this->policy->requireEnabled();
+        if ($principal !== null) {
+            app(CustomerAccessPolicy::class)->requireEnabled();
+        }
+        $this->proveDeadline($bucket, $events, $audit, $finalAt);
     }
 
-    private function proveDeadline(array $bucket, array $events, ?array $audit): void
+    private function proveDeadline(array $bucket, array $events, ?array $audit, ?string $at = null): void
     {
         if ($audit === null) {
             return; // Exact replays and reads never repeat the original movement.
         }
         $last = $events[array_key_last($events)];
-        if ($this->at() < $last['created_at'] || ($bucket['expires_at'] !== null
-            && (($last['created_at'] >= $bucket['expires_at']) !== ($this->at() >= $bucket['expires_at'])))) {
+        $at ??= $this->at();
+        if ($at < $last['created_at'] || ($bucket['expires_at'] !== null
+            && (($last['created_at'] >= $bucket['expires_at']) !== ($at >= $bucket['expires_at'])))) {
             $this->unavailable();
         }
     }

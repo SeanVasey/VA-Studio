@@ -148,12 +148,19 @@ final class MembershipPlans
 
     private function finish(User $actor, array $users, array $parent, array $versions, ?array $audit, ?int $cursor = null): void
     {
+        $auditRows = $this->evidence->auditRows(MembershipPlan::class, (int) $parent['id']);
         $this->evidence->recheckOperator($actor);
-        $this->evidence->prove($users, null, [['membership_plans', (int) $parent['id'], $parent],
-            ...array_map(fn ($row) => ['membership_plan_versions', (int) $row['id'], $row], $versions)], $audit);
-        if ($this->versions((int) $parent['id']) !== $versions || ($audit === null && $this->evidence->cursor(MembershipPlan::class, (int) $parent['id']) !== $cursor)) {
+        if ($this->versions((int) $parent['id']) !== $versions || $this->evidence->auditRows(MembershipPlan::class, (int) $parent['id']) !== $auditRows
+            || ($audit === null && $this->evidence->cursor(MembershipPlan::class, (int) $parent['id']) !== $cursor)) {
             $this->stale();
         }
+        $this->evidence->prove($users, null, [['membership_plans', (int) $parent['id'], $parent],
+            ...array_map(fn ($row) => ['membership_plan_versions', (int) $row['id'], $row], $versions),
+            ...array_map(fn ($row) => ['audit_events', (int) $row['id'], $row], $auditRows)], $audit,
+            [['membership_plan_versions', ['membership_plan_id' => (int) $parent['id']], 'number', MembershipPolicy::MAX_EVENTS + 1, $versions],
+                ['audit_events', ['subject_type' => MembershipPlan::class, 'subject_id' => (int) $parent['id']], 'id', MembershipPolicy::MAX_EVENTS * 2 + 1, $auditRows]],
+            [[MembershipPlan::class, (int) $parent['id'], $audit === null ? $cursor : (int) $audit['id']]]);
+        $this->policy->requireEnabled();
     }
 
     private function projection(array $row): array

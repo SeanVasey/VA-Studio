@@ -11,12 +11,19 @@ use App\Support\CanonicalJson;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use LogicException;
+use PDO;
 
 /** Internal current authority and raw evidence; no owner keys or credentials leave the module. */
 final class MembershipEvidence
 {
+    private ?PDO $primary = null;
+
+    private ?string $driver = null;
+
     public function operator(User $actor, ?int $customerUserId = null): array
     {
+        $this->capturePrimary();
         $ids = array_values(array_unique([$actor->exists ? (int) $actor->getKey() : 0, ...($customerUserId === null ? [] : [$customerUserId])]));
         sort($ids, SORT_NUMERIC);
         foreach ($ids as $id) {
@@ -33,6 +40,7 @@ final class MembershipEvidence
 
     public function buyer(CustomerPrincipal $principal, User $actor): array
     {
+        $this->capturePrimary();
         app(CustomerAccess::class)->lock($principal, $principal->ownerKey, $actor);
         $users = $this->users([$principal->userId]);
         $account = $this->account($principal->accountId);
@@ -129,21 +137,91 @@ final class MembershipEvidence
         return $row;
     }
 
-    public function prove(array $users, ?array $account, array $rows, ?array $audit): void
+    public function auditRows(string $type, int $id): array
     {
-        // All Eloquent authority/audit callbacks have completed. Only raw locking reads follow.
-        $this->sameUsers($users);
+        $rows = DB::table('audit_events')->where('subject_type', $type)->where('subject_id', $id)->orderBy('id')
+            ->limit(MembershipPolicy::MAX_EVENTS * 2 + 1)->lockForUpdate()->get()->map(fn ($row) => (array) $row)->all();
+        if (count($rows) > MembershipPolicy::MAX_EVENTS * 2) {
+            app(MembershipPolicy::class)->reject('membership', 'Retain this bounded audit history for separate review.');
+        }
+
+        return $rows;
+    }
+
+    public function prove(array $users, ?array $account, array $rows, ?array $audit, array $ranges = [], array $cursors = []): void
+    {
+        // Capture was before application callbacks. Reuse that primary transaction directly:
+        // QueryBuilder raw reads still dispatch QueryExecuted and are not a terminal proof.
+        if ($this->primary === null || ! $this->primary->inTransaction()) {
+            throw new LogicException('Membership final proof requires its captured primary transaction.');
+        }
+        foreach ($users as $id => $row) {
+            $this->primarySame('users', (int) $id, $row);
+        }
         if ($account !== null) {
-            $this->same('customer_accounts', (int) $account['id'], $account);
+            $this->primarySame('customer_accounts', (int) $account['id'], $account);
         }
         foreach ($rows as [$table, $id, $expected]) {
-            $this->same($table, $id, $expected);
+            $this->primarySame($table, $id, $expected);
         }
-        if ($audit !== null) {
-            $this->same('audit_events', (int) $audit['id'], $audit);
-            if ($this->cursor($audit['subject_type'], (int) $audit['subject_id']) !== (int) $audit['id']) {
+        foreach ($ranges as [$table, $where, $order, $limit, $expected]) {
+            if ($this->primaryRows($table, $where, $order, $limit) !== $expected) {
+                app(MembershipPolicy::class)->reject('membership', 'Unexpected membership evidence in the retained range.');
+            }
+        }
+        foreach ($cursors as [$type, $id, $expected]) {
+            $latest = $this->primaryRows('audit_events', ['subject_type' => $type, 'subject_id' => $id], 'id', 1, true);
+            if (($latest === [] ? null : (int) $latest[0]['id']) !== $expected) {
                 app(MembershipPolicy::class)->reject('membership', 'Unexpected extra membership audit evidence.');
             }
         }
+        if ($audit !== null) {
+            $this->primarySame('audit_events', (int) $audit['id'], $audit);
+            $latest = $this->primaryRows('audit_events', ['subject_type' => $audit['subject_type'], 'subject_id' => (int) $audit['subject_id']], 'id', 1, true);
+            if ($latest === [] || (int) $latest[0]['id'] !== (int) $audit['id']) {
+                app(MembershipPolicy::class)->reject('membership', 'Unexpected extra membership audit evidence.');
+            }
+        }
+    }
+
+    private function capturePrimary(): void
+    {
+        $connection = DB::connection();
+        if ($connection->transactionLevel() === 0 || ! in_array($connection->getDriverName(), ['mysql', 'sqlite'], true)) {
+            throw new LogicException('Membership authority requires its own supported transaction.');
+        }
+        $this->primary = $connection->getPdo();
+        $this->driver = $connection->getDriverName();
+    }
+
+    private function primarySame(string $table, int $id, array $expected): void
+    {
+        $actual = $this->primaryRows($table, ['id' => $id], 'id', 2);
+        if (count($actual) !== 1 || $actual[0] !== $expected) {
+            app(MembershipPolicy::class)->reject('membership', 'Membership evidence changed during the command.');
+        }
+    }
+
+    private function primaryRows(string $table, array $where, string $order, int $limit, bool $descending = false): array
+    {
+        $allowed = [
+            'users' => ['id'], 'customer_accounts' => ['id'], 'membership_plans' => ['id'],
+            'membership_plan_versions' => ['id', 'membership_plan_id', 'number'],
+            'membership_credit_buckets' => ['id'],
+            'membership_credit_events' => ['id', 'membership_credit_bucket_id', 'sequence'],
+            'audit_events' => ['id', 'subject_type', 'subject_id'],
+        ];
+        if (! isset($allowed[$table]) || $where === [] || array_diff(array_keys($where), $allowed[$table]) !== []
+            || ! in_array($order, $allowed[$table], true) || $limit < 1 || $limit > MembershipPolicy::MAX_EVENTS * 2 + 1) {
+            throw new LogicException('Unsupported membership primary proof selector.');
+        }
+        $quote = $this->driver === 'mysql' ? chr(96) : '"';
+        $identifier = fn ($name) => $quote.$name.$quote;
+        $sql = 'SELECT * FROM '.$identifier($table).' WHERE '.implode(' AND ', array_map(fn ($field) => $identifier($field).' = ?', array_keys($where)))
+            .' ORDER BY '.$identifier($order).($descending ? ' DESC' : ' ASC').' LIMIT '.$limit.($this->driver === 'mysql' ? ' FOR UPDATE' : '');
+        $statement = $this->primary->prepare($sql);
+        $statement->execute(array_values($where));
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 }
