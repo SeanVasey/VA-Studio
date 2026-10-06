@@ -6,6 +6,7 @@ use App\Domain\Commerce\Checkout\CheckoutPolicy;
 use App\Domain\Customers\CustomerAccess;
 use App\Domain\Customers\CustomerAccessException;
 use App\Domain\Customers\CustomerAccessPolicy;
+use App\Domain\Customers\CustomerIdentityPolicy;
 use App\Domain\Customers\CustomerSessions;
 use App\Domain\SiteBuilder\EditorialContent;
 use App\Domain\SiteBuilder\SiteContent;
@@ -22,7 +23,8 @@ final class CustomerSessionController
     {
         abort_unless(app(CustomerAccessPolicy::class)->enabled(), 404);
 
-        return Inertia::render('CustomerSignIn', ['testOnly' => true, 'siteContent' => $this->chrome()])->toResponse($request);
+        return Inertia::render('CustomerSignIn', ['testOnly' => true, 'siteContent' => $this->chrome(),
+            'selfServiceEnabled' => app(CustomerIdentityPolicy::class)->enabled()])->toResponse($request);
     }
 
     public function store(Request $request): Response

@@ -24,7 +24,8 @@ final class CustomerSessions
             $dummy = Hash::make('Synthetic invalid customer credential');
 
             return DB::transaction(function () use ($email, $password, $dummy): ?array {
-                $user = User::where('email', $email)->lockForUpdate()->first();
+                $users = User::whereRaw('LOWER(email) = ?', [strtolower(trim($email))])->lockForUpdate()->get();
+                $user = $users->count() === 1 && strtolower(trim($users->first()->email)) === strtolower(trim($email)) ? $users->first() : null;
                 $hash = $user?->getAuthPassword() ?? $dummy;
                 if (! Hash::check($password, $hash) || ! $user) {
                     return null;

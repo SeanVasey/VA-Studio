@@ -38,6 +38,11 @@ final class CustomerPrivacy
                 return self::error(413);
             }
             $request->attributes->set('_customer_body', $body);
+        } elseif ($request->is('account/create', 'account/recover', 'account/access', 'account/identity/*')) {
+            $stream = $request->getContent(true);
+            if (! $request->isMethod('GET') || ! is_resource($stream) || stream_get_contents($stream, 1) !== '') {
+                return self::error(422);
+            }
         }
 
         return self::protect($next($request));
@@ -56,6 +61,11 @@ final class CustomerPrivacy
 
     public static function error(int $status): Response
     {
+        if (request()->is('account/create', 'account/recover', 'account/access', 'account/identity/*')) {
+            return self::protect(response()->json(['code' => 'CUSTOMER_IDENTITY_UNAVAILABLE',
+                'message' => 'This account request could not be completed. Try the original request again or request a new message.'], $status >= 500 ? 503 : $status));
+        }
+
         return self::protect(response()->json(['code' => 'CUSTOMER_SIGN_IN_UNAVAILABLE',
             'message' => 'Sign-in could not be completed. Check your details and try again.'], $status >= 500 ? 503 : $status));
     }

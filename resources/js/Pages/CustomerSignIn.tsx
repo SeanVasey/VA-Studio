@@ -5,7 +5,7 @@ import type { SiteContent } from '../lib/site-content';
 import { changeCustomerSession, navigateCustomerSession } from '../lib/customer-session';
 import '../../css/customer-account.css';
 
-export default function CustomerSignIn({ siteContent }: { testOnly: true; siteContent: SiteContent }) {
+export default function CustomerSignIn({ siteContent, selfServiceEnabled = false }: { testOnly: true; siteContent: SiteContent; selfServiceEnabled?: boolean }) {
   const id = useId();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -54,6 +54,7 @@ export default function CustomerSignIn({ siteContent }: { testOnly: true; siteCo
           {reload && <a href="/account/sign-in">Open a fresh sign-in page</a>}</div>}
         <button type="submit" className="button full-width" disabled={busy || reload}>{busy ? 'Signing in…' : 'Sign in'}</button>
       </form>
+      {selfServiceEnabled && <div className="customer-account-note"><p><a className="text-link" href="/account/create">Create a test account</a></p><p><a className="text-link" href="/account/recover">Recover a test account</a></p></div>}
       <a className="text-link customer-account-back" href="/">Back to the catalog</a>
     </main>
     <SiteFooter {...chrome} />
