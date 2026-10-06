@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
+import { syncSuccessNotification } from './notification-sync';
 import { actionResponse, login, row } from './publication-fixture';
 
 test.beforeEach(() => resetBrowserLoginRateLimit());
@@ -74,8 +75,12 @@ test('operator resumes a native multipart WAV kit larger than the request ceilin
   await dialog.getByLabel('Title', { exact: false }).fill(title);
   await dialog.getByLabel('Description', { exact: false }).fill('Synthetic WAV archive for native transport verification.');
   await dialog.getByLabel('Source and provenance reference', { exact: false }).fill('Generated silence for tests only; no commercial rights approval.');
-  const [created] = await Promise.all([actionResponse(page, 'callMountedAction'), dialog.getByRole('button', { name: 'Save kit draft', exact: true }).click()]);
-  expect(created.status()).toBe(200);
+  // Creation dispatches a separate notification request; finish it before document navigation.
+  await syncSuccessNotification(page, 'Created', async () => {
+    const [created] = await Promise.all([actionResponse(page, 'callMountedAction'), dialog.getByRole('button', { name: 'Save kit draft', exact: true }).click()]);
+    expect(created.status()).toBe(200);
+    expect(await created.finished()).toBeNull();
+  });
   const kitRow = row(page, title);
   await expect(kitRow).toBeVisible();
   const link = kitRow.getByRole('link', { name: 'Resumable kit upload', exact: true });

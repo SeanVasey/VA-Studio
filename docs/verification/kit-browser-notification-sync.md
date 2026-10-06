@@ -1,0 +1,11 @@
+# Kit browser notification completion
+
+Foundation CI run `37410220669` at published head `12a5c70bc4b9dbb94353c290e031975803d24fa7` completed Chromium successfully. WebKit job `112096843720` recorded 53 passes, one existing skip and one failure in 18.4 minutes. The kit upload journey passed its transport, replay, wrong-file hash, private persistence and retained-manifest checks, then failed the final empty page-error assertion.
+
+Artifact `11388489783` was downloaded and its 20,460,011 bytes matched the job's SHA-256 receipt `bdcc0c3138eefd4bff48376a18d9759706e9937905f9bc934db832afb2225c6c`. Its archived kit test is byte-identical to reviewed local source `dcf26710347794e7bb14c020b32855c3a664b6f1`.
+
+The trace identifies the cancelled request as the `Filament\\Livewire\\Notifications` component's `__dispatch('notificationsSent', [])` POST, triggered by the successful kit draft creation. It began at monotonic 533193.653 ms. Keyboard activation of the upload link began at 533222.876 ms; the POST ended after 67.705 ms with `Load request cancelled`, and the destination document GET began at 533261.723 ms. WebKit recorded its sole access-control page error at 533276.920 ms. The later explicit reload did not begin until 533644.138 ms, so it was not the triggering navigation.
+
+The correction wraps the existing save action in the existing `syncSuccessNotification` helper. It registers the exact notification-component request before the save, requires its real 200 response and completed body, verifies the `Created` notification, and acknowledges its own dismissal request before activating the upload link. The save action's 200 assertion remains, with a body-completion assertion added. No network is mocked or replayed, and no error is filtered. Keyboard navigation, both reloads, real multipart transport, receipt counts, hash rejection, retained-state checks and the final empty page-error assertion remain.
+
+`npm run typecheck` and `git diff --check` passed. Direct Playwright discovery with a synthetic directory environment found both unchanged engine cases (two tests in one file); discovery does not start PHP, scan files or render a browser. Native Chromium/WebKit execution remains a hosted gate because pinned browser engines and ClamAV are unavailable locally.
