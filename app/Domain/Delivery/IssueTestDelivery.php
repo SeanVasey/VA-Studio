@@ -5,6 +5,7 @@ namespace App\Domain\Delivery;
 use App\Domain\Commerce\Models\Order;
 use App\Domain\Customers\CustomerAccess;
 use App\Domain\Customers\CustomerPrincipal;
+use App\Domain\Customers\PurchaseAccess;
 use App\Domain\Delivery\Models\TestDeliveryAuthorization;
 use App\Domain\Delivery\Models\TestDeliveryControl;
 use App\Models\User;
@@ -24,6 +25,7 @@ final class IssueTestDelivery
         if ($principal) {
             app(CustomerAccess::class)->current($principal);
         }
+        $ownerKey = app(PurchaseAccess::class)->deliveryOwner($orderPublicId, $ownerKey, $principal);
         $policies = app(TestAccessPolicy::class);
         $policy = $policies->current();
         $account = $policies->account();
@@ -55,12 +57,13 @@ final class IssueTestDelivery
 
         return DB::transaction(function () use ($order, $ownerKey, $source, $target, $control, $keyHash, $requestHash, $through,
             $policies, $policy, $account, $evidence, $actor, $principal): IssuedTestDelivery {
-            app(CustomerAccess::class)->lock($principal, $ownerKey, $actor);
+            app(CustomerAccess::class)->lock($principal, $principal?->ownerKey ?? $ownerKey, $actor);
             // The order mutex serializes every target and every idempotency key, including the last rolling-budget slot.
             $locked = Order::whereKey($order->id)->lockForUpdate()->first();
             if (! $locked || ! hash_equals($locked->owner_key, $ownerKey)) {
                 throw new DeliveryException('not_found');
             }
+            app(PurchaseAccess::class)->assertOrder($locked, $ownerKey, $principal);
             $currentControl = TestDeliveryControl::where('order_id', $locked->id)->lockForUpdate()->first();
             if ($policies->account() !== $account || CanonicalJson::encode($policies->current()) !== CanonicalJson::encode($policy)) {
                 throw new DeliveryException('unavailable');
@@ -107,7 +110,8 @@ final class IssueTestDelivery
             if ($policies->account() !== $account || CanonicalJson::encode($policies->current()) !== CanonicalJson::encode($policy)) {
                 throw new DeliveryException('unavailable');
             }
-            app(CustomerAccess::class)->lock($principal, $ownerKey, $actor);
+            app(CustomerAccess::class)->lock($principal, $principal?->ownerKey ?? $ownerKey, $actor);
+            app(PurchaseAccess::class)->assertOrder($locked, $ownerKey, $principal);
 
             return new IssuedTestDelivery($authorization->public_id, $token, $authorization->expires_at, $target['filename'], $target['mime_type']);
         }, 5);

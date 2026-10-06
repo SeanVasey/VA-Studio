@@ -48,7 +48,9 @@ class HostedCheckoutMigrationTest extends TestCase
         $delivery = require database_path('migrations/2026_09_26_000023_test_owner_delivery.php');
         $financialObservations = require database_path('migrations/2026_10_06_000039_test_payment_financial_observations.php');
         $unpaidRelease = require database_path('migrations/2026_10_06_000042_test_unpaid_releases.php');
+        $purchaseClaims = require database_path('migrations/2026_10_06_000048_customer_purchase_claims.php');
         $refundResolution = require database_path('migrations/2026_10_06_000047_test_refund_resolutions.php');
+        $purchaseClaims->down();
         $refundResolution->down();
         $unpaidRelease->down();
         $financialObservations->down();
@@ -62,6 +64,7 @@ class HostedCheckoutMigrationTest extends TestCase
         $financialObservations->up();
         $unpaidRelease->up();
         $refundResolution->up();
+        $purchaseClaims->up();
         foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }
         foreach ($tables as $table) {
             $this->assertSame($before[$table], DB::table($table)->orderBy('id')->get()->map(fn ($row) => (array) $row)->all());

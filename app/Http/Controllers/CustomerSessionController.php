@@ -7,6 +7,8 @@ use App\Domain\Customers\CustomerAccess;
 use App\Domain\Customers\CustomerAccessException;
 use App\Domain\Customers\CustomerAccessPolicy;
 use App\Domain\Customers\CustomerIdentityPolicy;
+use App\Domain\Customers\CustomerPurchaseClaimPolicy;
+use App\Domain\Customers\CustomerPurchaseClaims;
 use App\Domain\Customers\CustomerSessions;
 use App\Domain\SiteBuilder\EditorialContent;
 use App\Domain\SiteBuilder\SiteContent;
@@ -24,6 +26,7 @@ final class CustomerSessionController
         abort_unless(app(CustomerAccessPolicy::class)->enabled(), 404);
 
         return Inertia::render('CustomerSignIn', ['testOnly' => true, 'siteContent' => $this->chrome(),
+            'purchaseClaimsEnabled' => app(CustomerPurchaseClaimPolicy::class)->enabled(),
             'selfServiceEnabled' => app(CustomerIdentityPolicy::class)->enabled()])->toResponse($request);
     }
 
@@ -50,6 +53,14 @@ final class CustomerSessionController
 
             return CustomerPrivacy::error(422);
         }
+        $marker = $request->session()->get('_customer_purchase_claim');
+        if (is_array($marker)) {
+            try {
+                $request->session()->put('_customer_purchase_claim', app(CustomerPurchaseClaims::class)->bind($marker, $principal));
+            } catch (CustomerAccessException) {
+                $request->session()->forget('_customer_purchase_claim');
+            }
+        }
         $request->session()->forget('_quote_owner');
         $request->session()->put('_customer_access', ['account_id' => $principal->accountId,
             'access_version' => $principal->accessVersion, 'credential_stamp' => $principal->credentialStamp]);
@@ -70,6 +81,14 @@ final class CustomerSessionController
             $user = app(CustomerAccess::class)->current($principal);
             $props = ['testOnly' => true, 'customer' => ['name' => $user->name], 'siteContent' => $this->chrome(),
                 'testCheckoutEnabled' => app(CheckoutPolicy::class)->enabled()];
+            $marker = $request->session()->get('_customer_purchase_claim');
+            if (is_array($marker)) {
+                try {
+                    $props['guestPurchaseClaim'] = app(CustomerPurchaseClaims::class)->view($marker, $principal);
+                } catch (CustomerAccessException) {
+                    $request->session()->forget('_customer_purchase_claim');
+                }
+            }
             app(CustomerAccess::class)->current($principal);
 
             Inertia::encryptHistory();
@@ -85,7 +104,7 @@ final class CustomerSessionController
         $this->body($request, []);
         // Logout is still usable after feature/access withdrawal. It never logs into or out of the staff guard.
         Auth::guard('customer')->logoutCurrentDevice();
-        $request->session()->forget(['_customer_access', '_quote_owner']);
+        $request->session()->forget(['_customer_access', '_quote_owner', '_customer_purchase_claim']);
         $request->session()->migrate(true);
         $request->session()->regenerateToken();
         Inertia::clearHistory();

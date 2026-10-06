@@ -131,7 +131,7 @@ describe('customer sign-in', () => {
 });
 
 describe('customer library', () => {
-  it('reuses owner-scoped history and retained payment status without browser identity, payment writes or guest claims', async () => {
+  it('reuses owner-scoped history and retained payment status without browser identity, payment writes or automatic guest claims', async () => {
     const storage = vi.spyOn(Storage.prototype, 'setItem');
     const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(async input => String(input) === '/orders/history' ? json(history) : json({}, 503));
     library(); const user = userEvent.setup(); expect(fetcher).not.toHaveBeenCalled();
