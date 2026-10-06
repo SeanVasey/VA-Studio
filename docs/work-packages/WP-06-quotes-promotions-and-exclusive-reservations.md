@@ -8,8 +8,7 @@ retains encrypted immutable non-exclusive USD offer/license/media row commitment
 server-owned integer advertised subtotal and future-order policy commitments.
 Exact replay and current staff/MFA recovery preserve the original evidence after
 source closure or catalog movement. Tax and total remain unknown; payable,
-execution and physical-byte verification claims remain false. Final affected
-checks and independent review are pending actual source freeze.
+execution and physical-byte verification claims remain false. The composed source passed 255 affected PHP cases / 779 assertions and 14 actual copy-upgrade checks, with no failures or skips. Separate sensitive and shared reviews approve its exact source; [the integration record](../verification/production-preparation-integration-20261006.md) retains evidence and remaining acceptance limits.
 
 Authoritative production amounts, buyer identity and affirmative assent precede
 operative quote/order consumers. Inventory, promotions, exclusivity and provider

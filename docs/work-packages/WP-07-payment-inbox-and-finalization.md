@@ -8,7 +8,7 @@ selection/subtotal evidence for future production order consumers. It creates no
 buyer, assent, order, inventory hold, provider request, payment, grant or delivery
 authority. Tax and final total stay unknown. Historical preparation recovery is
 current-authority/MFA protected and does not restore current purchase eligibility.
-Final affected checks and independent review are pending actual source freeze.
+The composed source passed 255 affected PHP cases / 779 assertions and 14 actual copy-upgrade checks, with no failures or skips. Separate sensitive and shared reviews approve its exact source; [the integration record](../verification/production-preparation-integration-20261006.md) retains evidence and remaining acceptance limits.
 
 Explicit production identity/assent and authoritative amount observations must
 precede hosted/payment adaptation. Verified provider state, resource binding,

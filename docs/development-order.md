@@ -15,8 +15,10 @@ capabilities bind immutable non-exclusive USD offer/license/media row evidence,
 server-advertised subtotal and future order terms. Encrypted exact replay and
 staff recovery remain usable after source closure or catalog movement. Tax and
 total stay unknown; buyer identity and assent are uncollected, and execution,
-payable and private-byte verification claims remain false. Final source checks
-and independent sensitive review are pending actual execution.
+payable and private-byte verification claims remain false. The composed source passed 255 PHP cases / 779 assertions and 14 actual copy-upgrade
+checks without failures or skips. Sensitive and shared reviews approve its exact
+source; [the integration record](verification/production-preparation-integration-20261006.md)
+binds evidence and the corrected migration identifier boundary.
 
 Authoritative production amounts, buyer identity/assent, inventory/provider
 bindings, verified payment, original documents and private delivery follow this

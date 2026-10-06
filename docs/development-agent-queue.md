@@ -8,10 +8,10 @@ and the approved manual-matrix CI policy. The current isolated integration is
 
 | Worker | Owned boundary | Current handoff |
 | --- | --- | --- |
-| `/root` | Shared selection, workflow formatting, empty-child fixtures, status and publication | Compose the frozen implementation; run nine affected PHP files and genuine copy-upgrade checks, obtain review, then cheap preflight and expected-head merge |
-| `/root/production_capabilities_continue` | Preparation domain, additive adapter proof, migration `238000`, dedicated tests and verification record | Implement encrypted immutable packet/line evidence, exact replay/recovery and callback drift refusal; actual frozen-source verification is pending |
-| `/root/notifications_continue` | Independent sensitive source and regression review | Verify current-primary interpretation, license rendering, authority and terminal consumer proof against the tested commit |
-| `/root/service_merch_review` | Independent shared composition review | Provisional integration review passed; final clean-source disposition awaits the implementation and executed evidence |
+| `/root` | Shared selection, workflow formatting, empty-child fixtures, status and publication | Completed composed 255/779 and 14 actual copy-upgrade checks; source/review are frozen, evidence-only publication, cheap preflight and expected-head merge follow |
+| `/root/production_capabilities_continue` | Preparation domain, additive adapter proof, migration `238000`, dedicated tests and verification record | Completed encrypted immutable packet/line evidence, exact replay/recovery, callback drift refusal and the isolated short-FK repair; frozen source is independently reviewed |
+| `/root/notifications_continue` | Independent sensitive source and regression review | Approved exact corrected source after independent 23/100 functional and 23/303 migration/control checks; native/full limits remain explicit |
+| `/root/service_merch_review` | Independent shared composition review | Approved exact corrected composition, all 255/779 and 14 CLI receipts, preserved controls, origins and original criteria |
 
 The read-only dependency review recommends a later selective #1/#2 compatibility
 batch and records #3's retained PDF-profile blocker. No installed dependency graph

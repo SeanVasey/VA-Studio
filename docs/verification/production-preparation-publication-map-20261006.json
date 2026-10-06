@@ -1,0 +1,93 @@
+{
+  "base": {
+    "local_main_mirror": "fde182b5b65d419cd8d1215fc2144366c520ace6",
+    "native_main": "a348f67eff1fdd16b1945efd3b99aa27af3dd242",
+    "tree": "9142a8d4436aea99bb0f8aba5570601587e0e5a9",
+    "ordered_local_parents": [
+      "e24d6e5251adc49d58c5dc01a958053fac86e573",
+      "c0b7140a48d616c8dbad87953625e0c094b2fbb5"
+    ],
+    "ordered_native_parents": [
+      "4d39a7d02f9094085f9a74610ebdc42b42e8a059",
+      "ea722029b7c1963e325bb4dbd620b3d1fea85d96"
+    ],
+    "worktree": "/workspace/scratch/2876616e88c3/VA-Studio-production-consumers",
+    "branch": "codex/production-consumers-20261006",
+    "baseline_executable_source_unchanged": true
+  },
+  "commits": [
+    {
+      "local": "d720943e23cd9abdefa7924bace2a4e53742333c",
+      "sha": "aa6a4c49bd16df26a119d42a6bb4bfffae228d37",
+      "tree": "78c29cfa988db9c73d622588d06419d0235f6247",
+      "ordered_local_parents": [
+        "fde182b5b65d419cd8d1215fc2144366c520ace6"
+      ],
+      "ordered_remote_parents": [
+        "a348f67eff1fdd16b1945efd3b99aa27af3dd242"
+      ]
+    },
+    {
+      "local": "7ec29c661b709ea9602fddbf4dd1aa5015680e8c",
+      "sha": "c849a9526000f1017afc307df850ebdcca0c3177",
+      "tree": "e7b6790750ac3ad20417c5e2e00649993f33877e",
+      "ordered_local_parents": [
+        "fde182b5b65d419cd8d1215fc2144366c520ace6"
+      ],
+      "ordered_remote_parents": [
+        "a348f67eff1fdd16b1945efd3b99aa27af3dd242"
+      ]
+    },
+    {
+      "local": "f5bb1027a36ace0f7ed9f008b6914de73826b834",
+      "sha": "a968abe59e282d10f19dfa652459ecea30f7f0e3",
+      "tree": "4b82eb71f7de7985fc8c2ecd44d489645793a363",
+      "ordered_local_parents": [
+        "7ec29c661b709ea9602fddbf4dd1aa5015680e8c"
+      ],
+      "ordered_remote_parents": [
+        "c849a9526000f1017afc307df850ebdcca0c3177"
+      ]
+    },
+    {
+      "local": "d863598d71a6e623f125cf2af46df9b99d57a61b",
+      "sha": "52858baf69a399e4e44ef59e46b9910bd7dff28d",
+      "tree": "f4a47aac6829e898233ec42168625a044234ca1a",
+      "ordered_local_parents": [
+        "d720943e23cd9abdefa7924bace2a4e53742333c",
+        "f5bb1027a36ace0f7ed9f008b6914de73826b834"
+      ],
+      "ordered_remote_parents": [
+        "aa6a4c49bd16df26a119d42a6bb4bfffae228d37",
+        "a968abe59e282d10f19dfa652459ecea30f7f0e3"
+      ]
+    },
+    {
+      "local": "5d703d0e3ad425fc606a6395e9c6f4445c966cac",
+      "sha": "71cfe3fbd9cf9e9f48edb0fd0400acf191f47c47",
+      "tree": "2c81a2131a5c9a422811aaaf2c5fef8bc272af06",
+      "ordered_local_parents": [
+        "f5bb1027a36ace0f7ed9f008b6914de73826b834"
+      ],
+      "ordered_remote_parents": [
+        "a968abe59e282d10f19dfa652459ecea30f7f0e3"
+      ]
+    },
+    {
+      "local": "04f27462fee24103b554ca18aac17a4ce87308b8",
+      "sha": "c27d1f4d47c863f1a13364b4cf882141c8848993",
+      "tree": "c4a24f4bda577bff1d9348307dbe9781bde1d678",
+      "ordered_local_parents": [
+        "d863598d71a6e623f125cf2af46df9b99d57a61b",
+        "5d703d0e3ad425fc606a6395e9c6f4445c966cac"
+      ],
+      "ordered_remote_parents": [
+        "52858baf69a399e4e44ef59e46b9910bd7dff28d",
+        "71cfe3fbd9cf9e9f48edb0fd0400acf191f47c47"
+      ]
+    }
+  ],
+  "branch_created": false,
+  "pr_created": false,
+  "scope": "reviewed Git objects only; no ref or workflow action"
+}

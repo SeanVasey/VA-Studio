@@ -9,22 +9,32 @@ PR #16 merged the seven-component private foundations batch at native main
 reads verified the merge and exact tree. The timeout lost no source or results.
 The original frozen worktree remains clean and its component evidence is retained.
 
-The isolated branch `codex/production-consumers-20261006` starts from local
-ordered-parent mirror `fde182b5`, with the exact merged tree. It is implementing
-[D-26 production preparation](architecture/D-26-production-track-preparation.md):
-current approved policy, immutable non-exclusive USD selection/line commitments,
-server-advertised subtotal and prospective order terms, with final composed
-primary-PDO proof. Tax/total stay unknown, buyer assent is not collected, and
-execution/payable authority stays false. Packet persistence, recovery and the
-additive proof hook have their own sensitive review; source and final results
-will be recorded after actual execution.
+Branch `codex/production-consumers-20261006` composes the reviewed
+[D-26 production preparation](architecture/D-26-production-track-preparation.md).
+Clean executable local `04f27462fee24103b554ca18aac17a4ce87308b8` equals native
+`c27d1f4d47c863f1a13364b4cf882141c8848993`, tree
+`c4a24f4bda577bff1d9348307dbe9781bde1d678`. Nine affected PHP files passed
+255 cases / 779 assertions and actual copy-upgrade checks passed 14/14, with
+zero failures/errors/skips. Sensitive and shared review approve the exact source;
+[the integration receipt](verification/production-preparation-integration-20261006.md)
+retains original fixture/bootstrap/runtime failures and the separate FK-name
+portability correction. MySQL compilation makes no native-execution claim.
 
-Root owns bounded nine-file feedback, matching formatting guards, explicit
-empty-child parent migration fixtures and canonical status. The author and
-independent reviewers own separate source/evidence worktrees. No routine native
-MySQL/browser/full matrix is launched, no legacy workflow is restored and no
-production transport, sale or import is enabled. Production amounts/identity,
-assent, provider/inventory, original documents and delivery remain dependencies.
+The packet retains encrypted current approved policy, immutable non-exclusive USD
+selection/line evidence, server-advertised subtotal and future order commitments.
+Tax/total stay unknown; buyer identity/assent are uncollected, and execution,
+payable/external-fact/private-byte verification stays false. The trusted final
+consumer proof follows query/model authority callbacks; old adapter invocation
+remains compatible. Exact replay/recovery authenticates original staff evidence
+after closure or catalog movement without restoring purchase eligibility.
+
+Root preserves bounded selection, manual workflow/audit guards, all native
+exceptions and original parent fixture assertions. Only measured SQLite timing
+rows and evidence/status successors follow the executable freeze. The integrating
+PR records cheap preflight, expected-head merge and fresh main/tree readback;
+no routine MySQL/browser/full matrix, provider, sale or source import is performed.
+Authoritative amounts, identity/assent, inventory/provider/order consumers,
+original documents and private delivery remain next dependencies.
 
 [Dependency reconciliation](dependency-pr-integration.md) names a later fresh-main
 #1/#2 compatibility batch and the separate PDF-profile blocker for #3. These

@@ -1,6 +1,7 @@
 # D-26 — Retain policy-bound production track preparation
 
-Status: bounded implementation in progress, October 6, 2026. This records an
+Status: implemented and independently reviewed for focused development integration,
+October 6, 2026. This records an
 internal preparation interface; it establishes no merchant, tax or legal fact
 and grants no purchase, payment, reservation or delivery authority.
 
@@ -39,7 +40,9 @@ reconstructing a changed current selection.
 The capability adapter receives an optional trusted final consumer verifier.
 Authority, model and Laravel query callbacks finish before that verifier uses
 the captured primary PDO; the existing direct source/family and actor/audit
-proof follows it. The legacy four-argument adapter remains compatible. Final
+proof follows it. The legacy four-argument adapter passes exactly one projection
+argument; the composed proof path opts into the captured reader as a second
+preparation argument. Final
 consumer verification uses fixed internal SQL and bounded pure comparisons;
 this contract does not sandbox arbitrary PHP or transaction lifecycle callbacks.
 
@@ -61,8 +64,11 @@ Shared integration selects nine fixed affected PHP files, preserving the
 32-file limit and all earlier suites/exceptions. Three retained capability/policy
 fixtures remove only explicitly empty new children before testing their parent
 migrations. Routine PR preflight keeps the approved manual-matrix cost policy.
-Actual final-source results and independent sensitive review belong in the
-preparation verification record and its PR after execution.
+The clean composed selection passed 255 PHP cases / 779 assertions and all 14
+actual copy-upgrade checks, without errors, failures or skips. Separate sensitive
+and shared reviews approved the executable source. [The integration record](../verification/production-preparation-integration-20261006.md)
+binds source, raw receipts, the corrected FK-name compilation proof and remaining
+native/full acceptance limits; its integrating PR records actual preflight/merge.
 
 Next dependencies are authoritative production tax/amount observations, explicit
 buyer identity and affirmative assent, production inventory/provider bindings,

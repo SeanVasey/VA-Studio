@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "source": "04f27462fee24103b554ca18aac17a4ce87308b8",
+  "tree": "c4a24f4bda577bff1d9348307dbe9781bde1d678",
+  "ordered_parents": [
+    "d863598d71a6e623f125cf2af46df9b99d57a61b",
+    "5d703d0e3ad425fc606a6395e9c6f4445c966cac"
+  ],
+  "approved": true,
+  "disposition": "approved bounded shared development composition; no unresolved shared blocker",
+  "scope": "composition bytes, shared selectors/fixtures/manual policy/status, actual root evidence, corrected schema portability carry",
+  "sensitive_domain_disposition": "separate actual-source reviewer; final receipt binding pending",
+  "shared_source_blockers": [],
+  "resolved_blocker": "Explicit four short line foreign-key names replace generated names exceeding64.",
+  "root_affected_counts": {
+    "reported_cases": 255,
+    "executed_cases": 255,
+    "skipped_cases": 0,
+    "skipped_ids": [],
+    "assertions": 779,
+    "failures": 0,
+    "errors": 0,
+    "warning_evidence": "not represented by JUnit; existing PHPUnit-warning exit flag retained"
+  },
+  "root_actual_copy_upgrade": {
+    "tests": 14,
+    "suites": 0,
+    "pass": 14,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "independent_controls": {
+    "selector_cases_at_unchanged_predecessor": 46,
+    "fresh_corrected_affected_case_discovery": 255,
+    "actual_corrected_class_origins": 31,
+    "grammar_pdo_contacts": 0,
+    "sqlite_ddl_byte_identical": 12,
+    "mysql_compiled_statements": 21,
+    "only_mysql_constraint_names_changed": 4
+  },
+  "quality": {
+    "syntax_files": 20,
+    "pint": "pass",
+    "composer_validate": "pass",
+    "runtime_guard": "explicit512M pass; original1024M refusal retained",
+    "actual_affected_php_memory_limit": "1024M"
+  },
+  "native_mysql_execution": false,
+  "full_final_acceptance": false,
+  "production_payability_or_execution_enabled": false,
+  "all_original_task_criteria_preserved": 40,
+  "source_edits": false,
+  "publication_or_ref_mutations": false,
+  "hosted_ci_dispatch": false,
+  "artifacts": {
+    "composition-04f2746.json": "96f85fbc157a0a555b7c1cd11dccd814c6f66d50fa95d8be7aaefba6a3a8dee9",
+    "runtime-04f2746.json": "d8ba0b0aed999b4d36a2b2f6be36b04d4d665f91bbc5e9858b52bb70f504d700",
+    "grammar-04f2746.json": "3a92070f78ee6181f50a0be6db6e5479737c2a89b7101385101a83feab62e126",
+    "repair-04f2746-validation.json": "1699672d6acdde38cd6e1060c6a455dcf660ac3f2813d95c82801f3b4e104044",
+    "discovery-04f2746-config.xml": "abb06ce772af1795a7cb766883716c898669b764c02585b12b40784a41b5472c",
+    "discovered-04f2746.xml": "b913c99f813ea34abf8840e265fa29463d1e7766fa8aa9ee1af4df882ee12f9b",
+    "discovery-04f2746.log": "6c1f710c4896e5fd8c842eff21d516c64ec1b6b02f5281dee74b68b3c18a7ffe",
+    "evidence-04f2746-validation.json": "414acc21981c73614e3a7a429bb69583f6f754abf28eec0f02ebe152299f9bde",
+    "review-04f2746.md": "78c9c05ac4265fed42e54215f43e7c753688d0b991d57362663ec9e66e653a0f"
+  }
+}

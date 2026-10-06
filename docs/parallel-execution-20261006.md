@@ -13,8 +13,11 @@ remain preserved.
 selection/workflow formatting, three explicitly empty-child parent fixtures and
 status/publication. `notifications_continue` independently reviews the sensitive
 implementation; `service_merch_review` reviews the clean shared composition.
-Authors keep separate worktrees and do not publish. Final checks and review are
-pending actual source freeze; [D-26](architecture/D-26-production-track-preparation.md)
+Authors keep separate worktrees and do not publish. Final clean executable composition `04f27462` passed 255/779 affected PHP
+and 14/14 actual copy-upgrade checks; sensitive and shared reviews approve it.
+[The integration record](verification/production-preparation-integration-20261006.md)
+binds exact native identities and remaining acceptance. Evidence-only publication
+uses cheap preflight and expected-head merge; [D-26](architecture/D-26-production-track-preparation.md)
 keeps the bounded preparation and remaining operative consumers explicit.
 
 ## Preserved foundations batch

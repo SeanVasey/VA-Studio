@@ -1,0 +1,658 @@
+{
+  "schema_version": 1,
+  "purpose": "reviewed_focused_development_preparation_not_production_acceptance",
+  "baseline": {
+    "local_main_mirror": "fde182b5b65d419cd8d1215fc2144366c520ace6",
+    "native_main": "a348f67eff1fdd16b1945efd3b99aa27af3dd242",
+    "tree": "9142a8d4436aea99bb0f8aba5570601587e0e5a9",
+    "ordered_local_parents": [
+      "e24d6e5251adc49d58c5dc01a958053fac86e573",
+      "c0b7140a48d616c8dbad87953625e0c094b2fbb5"
+    ],
+    "ordered_native_parents": [
+      "4d39a7d02f9094085f9a74610ebdc42b42e8a059",
+      "ea722029b7c1963e325bb4dbd620b3d1fea85d96"
+    ],
+    "worktree": "/workspace/scratch/2876616e88c3/VA-Studio-production-consumers",
+    "branch": "codex/production-consumers-20261006",
+    "baseline_executable_source_unchanged": true
+  },
+  "tested_runtime": {
+    "local": "04f27462fee24103b554ca18aac17a4ce87308b8",
+    "native": "c27d1f4d47c863f1a13364b4cf882141c8848993",
+    "tree": "c4a24f4bda577bff1d9348307dbe9781bde1d678",
+    "ordered_local_parents": [
+      "d863598d71a6e623f125cf2af46df9b99d57a61b",
+      "5d703d0e3ad425fc606a6395e9c6f4445c966cac"
+    ],
+    "ordered_native_parents": [
+      "52858baf69a399e4e44ef59e46b9910bd7dff28d",
+      "71cfe3fbd9cf9e9f48edb0fd0400acf191f47c47"
+    ],
+    "clean_before_and_after": true
+  },
+  "affected": {
+    "checked_out_commit": "04f27462fee24103b554ca18aac17a4ce87308b8",
+    "checked_out_tree": "c4a24f4bda577bff1d9348307dbe9781bde1d678",
+    "command_results": [
+      {
+        "argv": [
+          "php",
+          "vendor/bin/phpunit",
+          "--configuration=phpunit-focused.xml",
+          "--log-junit=focused-ci-results.xml",
+          "--fail-on-empty-test-suite",
+          "--fail-on-phpunit-warning",
+          "--display-warnings"
+        ],
+        "exit_code": 0
+      }
+    ],
+    "commands": [
+      [
+        "php",
+        "vendor/bin/phpunit",
+        "--configuration=phpunit-focused.xml",
+        "--log-junit=focused-ci-results.xml",
+        "--fail-on-empty-test-suite",
+        "--fail-on-phpunit-warning",
+        "--display-warnings"
+      ]
+    ],
+    "engine": "sqlite",
+    "event": "local",
+    "purpose": "focused-feedback-not-merge-acceptance",
+    "schema_version": 1,
+    "selected_files": [
+      "tests/Feature/ProductionTrackPreparationPacketTest.php",
+      "tests/Feature/ProductionTrackPreparationPacketGuardsTest.php",
+      "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+      "tests/Unit/ProductionTrackPreparationSnapshotTest.php",
+      "tests/Feature/ProductionTrackCapabilitiesTest.php",
+      "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php",
+      "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+      "tests/Unit/ProductionTrackMachinePolicyTest.php",
+      "tests/Feature/ProductionTrackPolicyFinalProofTest.php"
+    ],
+    "status": "passed",
+    "suite": "production-preparation",
+    "test_counts": {
+      "assertions": 779,
+      "errors": 0,
+      "executed_cases": 255,
+      "failures": 0,
+      "reported_cases": 255,
+      "skipped_cases": 0
+    },
+    "tracked_worktree_clean": true
+  },
+  "affected_elapsed_seconds": 62.667,
+  "per_class": {
+    "Tests.Feature.ProductionTrackPreparationPacketTest": {
+      "cases": 16,
+      "assertions": 52,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    },
+    "Tests.Feature.ProductionTrackPreparationPacketGuardsTest": {
+      "cases": 26,
+      "assertions": 70,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    },
+    "Tests.Feature.ProductionTrackPreparationPacketMigrationTest": {
+      "cases": 23,
+      "assertions": 303,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    },
+    "Tests.Unit.ProductionTrackPreparationSnapshotTest": {
+      "cases": 10,
+      "assertions": 11,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    },
+    "Tests.Feature.ProductionTrackCapabilitiesTest": {
+      "cases": 36,
+      "assertions": 77,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    },
+    "Tests.Feature.ProductionTrackCapabilitiesGuardsTest": {
+      "cases": 26,
+      "assertions": 38,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    },
+    "Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest": {
+      "cases": 23,
+      "assertions": 123,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    },
+    "Tests.Unit.ProductionTrackMachinePolicyTest": {
+      "cases": 93,
+      "assertions": 97,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    },
+    "Tests.Feature.ProductionTrackPolicyFinalProofTest": {
+      "cases": 2,
+      "assertions": 8,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    }
+  },
+  "actual_copy_upgrade": {
+    "source": "04f27462fee24103b554ca18aac17a4ce87308b8",
+    "tree": "c4a24f4bda577bff1d9348307dbe9781bde1d678",
+    "elapsed_seconds": 44.413,
+    "exit_code": 0,
+    "required_actual_php": true,
+    "test_counts": {
+      "tests": 14,
+      "suites": 0,
+      "pass": 14,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "raw_sha256": "f2eb2fe644631dc9180c5b942d1bff28fcb0571b58f050611adc4b9249f82acf",
+    "tracked_worktree_clean_after": true
+  },
+  "quality": {
+    "source": "04f27462fee24103b554ca18aac17a4ce87308b8",
+    "tree": "c4a24f4bda577bff1d9348307dbe9781bde1d678",
+    "syntax_files": 20,
+    "reflected_classes": 19,
+    "pint": {
+      "exit_code": 0,
+      "raw_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    "composer_validate": {
+      "exit_code": 0,
+      "raw_sha256": "77d6be6b70166b4dbde764f7edd3f2f5795347af6bcbe78e30b8f313597da1e2"
+    },
+    "runtime_guard": {
+      "command": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "scripts/ci/verify-php-test-runtime.php"
+      ],
+      "exit_code": 0,
+      "original_configuration_refusal_preserved": true
+    },
+    "affected_test_runtime_memory_limit": "1024M",
+    "native_mysql_execution_claimed": false,
+    "tracked_worktree_clean_after": true
+  },
+  "unchanged_ci_control_evidence": {
+    "source": "d863598d71a6e623f125cf2af46df9b99d57a61b",
+    "checks": [
+      {
+        "script": "test-focused-tests.py",
+        "exit_code": 0,
+        "elapsed_seconds": 0.139,
+        "summary": [
+          "----------------------------------------------------------------------",
+          "Ran 46 tests in 0.057s",
+          "",
+          "OK"
+        ]
+      },
+      {
+        "script": "test-workflow-cadence.py",
+        "exit_code": 0,
+        "elapsed_seconds": 0.065,
+        "summary": [
+          "----------------------------------------------------------------------",
+          "Ran 14 tests in 0.008s",
+          "",
+          "OK"
+        ]
+      },
+      {
+        "script": "test-ci-scope.py",
+        "exit_code": 0,
+        "elapsed_seconds": 0.838,
+        "summary": [
+          "----------------------------------------------------------------------",
+          "Ran 27 tests in 0.787s",
+          "",
+          "OK"
+        ]
+      },
+      {
+        "script": "test-phpunit-shards.py",
+        "exit_code": 0,
+        "elapsed_seconds": 0.092,
+        "summary": [
+          "----------------------------------------------------------------------",
+          "Ran 36 tests in 0.027s",
+          "",
+          "OK"
+        ]
+      },
+      {
+        "script": "test-database-receipts.py",
+        "exit_code": 0,
+        "elapsed_seconds": 4.551,
+        "summary": [
+          "----------------------------------------------------------------------",
+          "Ran 34 tests in 4.450s",
+          "",
+          "OK"
+        ]
+      },
+      {
+        "script": "test-gitlab-database-receipts.py",
+        "exit_code": 0,
+        "elapsed_seconds": 2.135,
+        "summary": [
+          "----------------------------------------------------------------------",
+          "Ran 24 tests in 2.033s",
+          "",
+          "OK"
+        ]
+      }
+    ]
+  },
+  "raw_sha256": {
+    "corrected/affected-sqlite.xml": "7e178c092803b5400e8be2c3f8c6a1d7a18c6b0aec279f6235d88920ee04da24",
+    "corrected/affected-sqlite.log": "32ad4b8198f50115485ea311a22eee53b621332af8ca8ab9ad164935ba5c2015",
+    "corrected/copy-upgrade.log": "f2eb2fe644631dc9180c5b942d1bff28fcb0571b58f050611adc4b9249f82acf",
+    "corrected/syntax.json": "c89a9e671f57edd62504130883edb2d26106f26fbd4b816edf40eb25be45eb04",
+    "corrected/pint.log": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "corrected/composer-validate.log": "77d6be6b70166b4dbde764f7edd3f2f5795347af6bcbe78e30b8f313597da1e2",
+    "corrected/autoload-source.json": "c8aa86963c3b49dafa6ad671d6e1480b8c3d66827c2047201fa60d282db0df99",
+    "corrected/php-runtime-unmatched-setting.log": "f5ec7b018064107b6b04f26ef3f98b4c89853e2fa8aa405e3e6f7b996b2aec33",
+    "predecessor-source-receipt.json": "599da7de775e546e02d79564924a37a32d0d437b7d639f2e39de9aa7229c0346"
+  },
+  "reviews": {
+    "sensitive": {
+      "report": "production-preparation-sensitive-review-20261006.md",
+      "receipt": "production-preparation-sensitive-review-20261006.json",
+      "receipt_sha256": "3a3adba68ad5171a0970c410243fec994b64c4a1fb05913d7df57b9bdfd41c37",
+      "result": {
+        "disposition": "approved_for_focused_development_integration",
+        "blocking_findings": [],
+        "reviewer": "/root/notifications_continue",
+        "report": "/workspace/scratch/2876616e88c3/production-preparation-independent-review/review.md",
+        "approved_author_source": {
+          "worktree": "/workspace/scratch/2876616e88c3/VA-Studio-production-preparation-schema-independent",
+          "head": "5d703d0e3ad425fc606a6395e9c6f4445c966cac",
+          "tree": "2c81a2131a5c9a422811aaaf2c5fef8bc272af06",
+          "status": "",
+          "owned_paths": {
+            "app/Domain/Commerce/ProductionPolicy/ProductionTrackCapabilities.php": "510b5ade1cb84b0a475e258862c1448c6f9f9c8747a63796869dfb992fb50762",
+            "app/Domain/Commerce/ProductionPolicy/ReadProductionTrackCapabilities.php": "84219d870080b6d875653587fa80c3e0d66b4cba5517592927b65445804524d5",
+            "app/Domain/Commerce/ProductionPreparation/Models/ProductionTrackPreparationPacket.php": "c342068d63e37482084e004c666a18624a9d76b42196b9850f0476da617da70a",
+            "app/Domain/Commerce/ProductionPreparation/Models/ProductionTrackPreparationPacketLine.php": "61fddfa3f8ed50732cfbc1c652f0fdbea14fa9a4d4575bdbafc7de4e6caa5c15",
+            "app/Domain/Commerce/ProductionPreparation/PacketAuthority.php": "6bedd17a3a78274414d51fea648d4d4106247fcde488c16f0f38783a33cea361",
+            "app/Domain/Commerce/ProductionPreparation/PacketEvidence.php": "8b771f131a40dca96d0681ebaa5b41a8d76afb190dd2502542e4c1cf90bea53f",
+            "app/Domain/Commerce/ProductionPreparation/PreparationSelection.php": "49a2001d9927bb94f676a4551d771f60870ebb740a4594d3e33e79dc08e3421c",
+            "app/Domain/Commerce/ProductionPreparation/PrepareProductionTrackPreparationPacket.php": "7f4e76329e782e185875d575564a405f3f639e83e9b7872eeb3aa9a9ab45179e",
+            "app/Domain/Commerce/ProductionPreparation/ProductionTrackPreparationPackets.php": "2792dec369a2b232628ef0ffbafd5c0197f3248e1a38b14a63f7e870221a35f8",
+            "app/Domain/Commerce/ProductionPreparation/ReadProductionTrackPreparationPacket.php": "1c6b3dc877d04cd1164fd976af42dcb5565914abb8f9d5e843d4cd15760c77ba",
+            "app/Domain/Commerce/ProductionPreparation/SaveProductionTrackPreparationPacket.php": "df7ce8db69b2bf4d82417776e7d2a4831e84efd4deac1f453d4694593bdabb87",
+            "database/migrations/2026_10_06_238000_production_track_preparation_packets.php": "88c4c224a625656f2e20a4e1bfb7ac632292f9c60a327c920375d9f813ea394c",
+            "docs/verification/production-track-preparation-packets.md": "3cbedc038b0cbc9a8ddd7addd5c08ed0d73bfa813e32354248778206aac77ae3",
+            "tests/Feature/ProductionTrackPreparationPacketGuardsTest.php": "fa46831a526259a5caf1be9ee0b5ad7efac78f0226133792fe193b7e0303139a",
+            "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php": "3da6dc394b4e04615f22706bd3fa9db216557e1b194cd6b672bd02953da098ec",
+            "tests/Feature/ProductionTrackPreparationPacketTest.php": "51cb01fc9e6ac1b0f98fc99838f98925844e87fccfecd8b338de2d4e2745044c",
+            "tests/Support/ProductionTrackPreparationFixtures.php": "cd480582f53f12a68cfe1a364200836b5c57fa34958f88d102670831d7405004",
+            "tests/Unit/ProductionTrackPreparationSnapshotTest.php": "e52dff632967b8d1e7b0b954637688e75f3a3f2ccc452c81c6082fc2d89c8f1c"
+          },
+          "tracked_files_digest": "17c00031726e07c7d1a0ece46b129cb2b1ddd1152b45bf863ebc6fde444d07d0"
+        },
+        "functional_predecessor_source": {
+          "worktree": "/workspace/scratch/2876616e88c3/VA-Studio-production-preparation-independent",
+          "head": "f5bb1027a36ace0f7ed9f008b6914de73826b834",
+          "tree": "4b82eb71f7de7985fc8c2ecd44d489645793a363",
+          "status": "",
+          "tracked_files_digest": "18fcfe8a17f405b3cc2f22acbb0d76684aec2f48aac6686cc3066756cc45122c"
+        },
+        "source_equivalence": {
+          "only_changed_paths": [
+            "database/migrations/2026_10_06_238000_production_track_preparation_packets.php",
+            "docs/verification/production-track-preparation-packets.md",
+            "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php"
+          ],
+          "unchanged_owned_paths": 15,
+          "all_predecessor_and_successor_track_files_before_after_identical": 1598,
+          "composed_head": "04f27462fee24103b554ca18aac17a4ce87308b8",
+          "composed_tree": "c4a24f4bda577bff1d9348307dbe9781bde1d678",
+          "owned_paths_equal": 18
+        },
+        "independent_checks": {
+          "functional": {
+            "source": "f5bb1027a36ace0f7ed9f008b6914de73826b834",
+            "test_files": [
+              "tests/Feature/ProductionTrackPreparationPacketTest.php",
+              "tests/Feature/ProductionTrackPreparationPacketGuardsTest.php"
+            ],
+            "filter": "test_(core_post_prepare_user_query_drift_refuses_packet_and_audit_atomically|license_expiry_during_core_final_authority_refresh_refuses_all_writes|current_interpreted_primary_eligibility_refuses_unsupported_or_damaged_catalog|existing_four_argument_adapter_behavior_and_optional_captured_reader_void_proof|exact_response_replay_and_recovery_remain_historical_after_closure_source_and_catalog_movement|recovery_keys_are_actor_bound_and_current_staff_mfa_are_required|model_writes_and_damaged_retained_line_or_audit_are_refused|review_then_encrypted_packet_retains_exact_primary_catalog_subtotal_without_commerce_effects)",
+            "junit": "/workspace/scratch/2876616e88c3/production-preparation-independent-review/f5bb-functional.xml",
+            "log": "/workspace/scratch/2876616e88c3/production-preparation-independent-review/f5bb-functional.log",
+            "cases": 23,
+            "assertions": 100,
+            "errors": 0,
+            "failures": 0,
+            "skips": 0,
+            "junit_seconds": 21.544115,
+            "exit_code": 0
+          },
+          "migration": {
+            "source": "5d703d0e3ad425fc606a6395e9c6f4445c966cac",
+            "test_file": "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+            "junit": "/workspace/scratch/2876616e88c3/production-preparation-independent-review/5d703-migration.xml",
+            "log": "/workspace/scratch/2876616e88c3/production-preparation-independent-review/5d703-migration.log",
+            "cases": 23,
+            "assertions": 303,
+            "errors": 0,
+            "failures": 0,
+            "skips": 0,
+            "junit_seconds": 4.555644,
+            "exit_code": 0
+          },
+          "reflection": {
+            "origins_per_checkout": 28,
+            "all_inside_exact_checkout": true,
+            "all_hashes_match_tracked_source": true
+          },
+          "compile_only": {
+            "database_execution": false,
+            "pdo_contacts": 0,
+            "predecessor_overlong_mysql_names": [
+              67,
+              68
+            ],
+            "successor_longest_foreign_key": 55,
+            "identical_sqlite_statements": 12,
+            "mysql_statements": 21,
+            "only_mysql_changes": "four foreign-key identifiers",
+            "script": "/workspace/scratch/2876616e88c3/production-preparation-independent-review/compile-schema.php"
+          },
+          "negative_proof_canary": {
+            "source_base": "f5bb1027a36ace0f7ed9f008b6914de73826b834",
+            "worktree": "/workspace/scratch/2876616e88c3/VA-Studio-production-preparation-proof-canary",
+            "patch_equals_actual_diff": true,
+            "only_changed_source": "app/Domain/Commerce/ProductionPolicy/ProductionTrackCapabilities.php",
+            "omitted_behavior": "finalPrimaryProof invocation only",
+            "cases": 1,
+            "assertions": 1,
+            "failures": 1,
+            "observed_exit_code": 1,
+            "message": "Late consumer/authority/source drift was admitted",
+            "independent_execution_repeated": false,
+            "raw_junit_and_source_evidence_inspected": true
+          }
+        },
+        "inspected_author_receipts": {
+          "predecessor_affected": {
+            "source": "f5bb1027a36ace0f7ed9f008b6914de73826b834",
+            "cases": 205,
+            "assertions": 381,
+            "errors": 0,
+            "failures": 0,
+            "skips": 0
+          },
+          "successor_migration": {
+            "source": "5d703d0e3ad425fc606a6395e9c6f4445c966cac",
+            "cases": 23,
+            "assertions": 303,
+            "errors": 0,
+            "failures": 0,
+            "skips": 0
+          }
+        },
+        "inspected_root_receipts": {
+          "source": "04f27462fee24103b554ca18aac17a4ce87308b8",
+          "tree": "c4a24f4bda577bff1d9348307dbe9781bde1d678",
+          "affected_cases": 255,
+          "affected_assertions": 779,
+          "errors": 0,
+          "failures": 0,
+          "skips": 0,
+          "actual_copy_upgrade_cases": 14,
+          "actual_copy_upgrade_passed": 14,
+          "syntax_files": 20,
+          "pint_passed": true,
+          "composer_validation_passed": true,
+          "runtime_guard_first_1024M_refusal_preserved": true,
+          "runtime_guard_explicit_512M_passed": true,
+          "actual_affected_test_memory_limit": "1024M"
+        },
+        "trusted_boundary": "Fixed captured PDO reads plus the standard trusted Crypt implementation and pure authored/machine/canonical helpers; not a sandbox for arbitrary callbacks, app-bound encryptors or transaction lifecycle hooks.",
+        "native_mysql_execution": false,
+        "physical_media_bytes_verified": false,
+        "provider_operations_executed": false,
+        "full_matrix_executed": false,
+        "hosted_ci_dispatched": false,
+        "reviewer_source_edits": false,
+        "artifact_sha256": {
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/5d703-after.json": "8d215b0feccfec782e8023ac05334a175a8e49caaa376c6985ccdf456649f5de",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/5d703-autoload.json": "b87505b154465b7f458820a848a05dfd2915ef70e7ef3fb4df930f481a0951a4",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/5d703-before.json": "8d215b0feccfec782e8023ac05334a175a8e49caaa376c6985ccdf456649f5de",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/5d703-migration.log": "c9aae66e7017529d4b1d6750a9009f0f4eb75c634f6a02f1ae7c993799e5d8c7",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/5d703-migration.xml": "26bebb75b95d7477f54eec326846649fb44da163cb1aa906f6fe59404ec65373",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/5d703-mysql-grammar.json": "dfcad608cc74f8cbebcbe07bb4a0cf227dd12393a15d10e9ee71367df741eded",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/5d703-mysql-grammar.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/5d703-sqlite-grammar.json": "a1b5f33fb3f59eff3c13d695d9db93dd45a81f575d577d15893ef48aefd6d8cc",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/5d703-sqlite-grammar.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/autoload.php": "613ccdbb1a243e3df015d76d4e22d3d3ca935f5757523024e16ccbe5b971873f",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/capture-source.py": "10b8e19223bb106fa48a764a521728be2f1a24dea4d182ce946a2586c5200436",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/compile-schema.php": "04b99f280110cc7dd890032f6e4b1eb79af9807a7ed5083fa2957c9de87b3f12",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/f5bb-after.json": "91364830b9fa5eff65ca7c441ddbfbd3353f1d9cd217bbeb30baa0a33f583769",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/f5bb-autoload.json": "79b1afd77e3605b0b9fe9dfd72be946a11409590250644086de6c6f2a71253f9",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/f5bb-before.json": "91364830b9fa5eff65ca7c441ddbfbd3353f1d9cd217bbeb30baa0a33f583769",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/f5bb-functional-receipt.json": "b2902019ae35d319956c54a2760acd05ac8cf76a1c489df5bae08cd6674afb34",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/f5bb-functional.log": "5214fb5189ced0655017f7d510c1d6c94b054c57a3ef9c05c03959298eb3d193",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/f5bb-functional.xml": "7e3ef9d22aa3ab23ced5caa5baa95e732fe8da6ad0d6f47f8fc7b7d4f8fe985e",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/f5bb-mysql-grammar.json": "e68b80fb584608311debc4c9fdafb7c84b5d51a6b3f15eede5956a4a188118e1",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/f5bb-mysql-grammar.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/f5bb-sqlite-grammar.json": "7db952f82fe59d8e759bb63b2595651143f4b803e1547016398969aa254d218a",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/f5bb-sqlite-grammar.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/review.md": "41866dc76337d8d62618409447d117450b33a82656ab00e6ac9093920d7b6c1b",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/schema-independent-receipt.json": "d3dc97464386d7f34c97fa61cce94039e8380b347e80c05d9b4b27186555a672",
+          "/workspace/scratch/2876616e88c3/production-preparation-independent-review/schema-independent.patch": "84e2f04e05d03f443bc028762750e26d2f695591217abb0e9f2ba8f6382cb8f7",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/frozen-source.json": "4e5424218efd655bab33b01e5ecabae464d2209eff5cf427e547ac9116eb81dd",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/freeze-receipt.json": "d4ec29c9615065783dbf1a4d36c7206b58bfbd2b1e5b995a403e1aa553ed0b3b",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/frozen-affected.xml": "49c2bf51b1f44496f59762a4441877df9a0f029062ec57360bc2d376520823d7",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/frozen-affected.log": "b1820205edd3dda5e14963d4ca8863876aa5fe832e24a28fe6c3e64e4bc13215",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/frozen-syntax.json": "1faff15dcf87e79340c27a74e21ce21f2ab8281e778cb0d92859d040bde12dce",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/frozen-pint.log": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/autoload-source.json": "349b21726db5154edea62d99dd2648c778dd89b12c159df1180f47e2226cf82a",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/schema-successor-receipt.json": "ae855ef5525808aff84ff1e0aeba16a6585c18656f069e27d1428f14bdc62816",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/schema-successor.patch": "84e2f04e05d03f443bc028762750e26d2f695591217abb0e9f2ba8f6382cb8f7",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/schema-frozen.xml": "f5e7b84a2bccf57ee402a0d13c63b688975f7bdb1da650ff9221fecc15994ed7",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/schema-frozen.log": "f36391c68d10e5c9fd6f06eb6f7062027dcbd0078ef16e4faa739847d8c2c196",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/schema-syntax.log": "05070b9034f0105d3ca9eabb675d160c1005e530911bc995073218a4ace3c521",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/schema-pint.log": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/schema-grammar-predecessor.json": "ffdcbbef9a3aa407fbc4b5e8aab737a51bd5419e30caa54455ef8a380ed38502",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/schema-grammar-successor.json": "00e9179cf62d366ce0f2e22ad29d56fb9bb9d12db06bd11bf14c3b624fd57dc8",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/proof-omitted-canary.patch": "edaae6bba3544d03ed01e8564fe484b20708e5d7dacfd4467c49f8ed9ddc3dce",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/proof-omitted-red.xml": "52e0181ec66f12b846841ed337ff85688ee0278221f4724770c50eb5648f64b4",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/proof-omitted-red.log": "3c69a8712c9dde3ba2f8add4a5c35447472b3c7559d7d53596eefb8c21f5c20c",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/proof-omitted-autoload.json": "19aa46afb81e57cc804099aaaed86ed8f25db4b7e573d03446318552864fa06f",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/packet-initial-trigger-fixtures.xml": "fb607334cdcde374475f9135e9507f9a37588846d66d3344e20a25126fe9e2c1",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/packet-intermediate-bootstrap.xml": "381bd1cf97efbd49691ee6e213cf01f54aaa87fda49fc97915b009a4367ad7ae",
+          "/workspace/scratch/2876616e88c3/production-preparation-evidence/migration-initial.xml": "b944daf8a20f48d7ffc82c5fd6477a1be76f4efd664c3863e8198a41e2bffd4a",
+          "/workspace/scratch/2876616e88c3/production-preparation-integration-evidence/corrected/affected-run.json": "5fe8e9c52e996ed7845e7efe76ee2d6a78da520a38b39c5aeab8c0176e3114a0",
+          "/workspace/scratch/2876616e88c3/production-preparation-integration-evidence/corrected/affected-sqlite-source.json": "e426ebed52937d63483b4d1d606d9c2276892bd536eb1564bcd51e765bed54d7",
+          "/workspace/scratch/2876616e88c3/production-preparation-integration-evidence/corrected/affected-sqlite.xml": "7e178c092803b5400e8be2c3f8c6a1d7a18c6b0aec279f6235d88920ee04da24",
+          "/workspace/scratch/2876616e88c3/production-preparation-integration-evidence/corrected/copy-upgrade-run.json": "681876be4521d55db66bbd550716afc7401b8fd223b9ec2668d434db1e159e9e",
+          "/workspace/scratch/2876616e88c3/production-preparation-integration-evidence/corrected/quality.json": "5489e0f3c3a752ed9e6ac51df45b41dacda79df8748de4a98d62e593435164ef",
+          "/workspace/scratch/2876616e88c3/production-preparation-integration-evidence/corrected/quality-first-runtime-refusal.json": "27a6446ad38a627246cdd5ce279ea93d3bdc9d88e1ea8758080f6045444ad250",
+          "/workspace/scratch/2876616e88c3/production-preparation-integration-evidence/corrected/autoload-source.json": "c8aa86963c3b49dafa6ad671d6e1480b8c3d66827c2047201fa60d282db0df99",
+          "/workspace/scratch/2876616e88c3/production-preparation-integration-evidence/corrected/syntax.json": "c89a9e671f57edd62504130883edb2d26106f26fbd4b816edf40eb25be45eb04"
+        }
+      }
+    },
+    "shared": {
+      "report": "production-preparation-shared-review-20261006.md",
+      "receipt": "production-preparation-shared-review-20261006.json",
+      "receipt_sha256": "f908433587d4442f61c8076938f914f44ed0424b3e8a1776d8018ec0a0cebef3",
+      "result": {
+        "schema": 1,
+        "source": "04f27462fee24103b554ca18aac17a4ce87308b8",
+        "tree": "c4a24f4bda577bff1d9348307dbe9781bde1d678",
+        "ordered_parents": [
+          "d863598d71a6e623f125cf2af46df9b99d57a61b",
+          "5d703d0e3ad425fc606a6395e9c6f4445c966cac"
+        ],
+        "approved": true,
+        "disposition": "approved bounded shared development composition; no unresolved shared blocker",
+        "scope": "composition bytes, shared selectors/fixtures/manual policy/status, actual root evidence, corrected schema portability carry",
+        "sensitive_domain_disposition": "separate actual-source reviewer; final receipt binding pending",
+        "shared_source_blockers": [],
+        "resolved_blocker": "Explicit four short line foreign-key names replace generated names exceeding64.",
+        "root_affected_counts": {
+          "reported_cases": 255,
+          "executed_cases": 255,
+          "skipped_cases": 0,
+          "skipped_ids": [],
+          "assertions": 779,
+          "failures": 0,
+          "errors": 0,
+          "warning_evidence": "not represented by JUnit; existing PHPUnit-warning exit flag retained"
+        },
+        "root_actual_copy_upgrade": {
+          "tests": 14,
+          "suites": 0,
+          "pass": 14,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "independent_controls": {
+          "selector_cases_at_unchanged_predecessor": 46,
+          "fresh_corrected_affected_case_discovery": 255,
+          "actual_corrected_class_origins": 31,
+          "grammar_pdo_contacts": 0,
+          "sqlite_ddl_byte_identical": 12,
+          "mysql_compiled_statements": 21,
+          "only_mysql_constraint_names_changed": 4
+        },
+        "quality": {
+          "syntax_files": 20,
+          "pint": "pass",
+          "composer_validate": "pass",
+          "runtime_guard": "explicit512M pass; original1024M refusal retained",
+          "actual_affected_php_memory_limit": "1024M"
+        },
+        "native_mysql_execution": false,
+        "full_final_acceptance": false,
+        "production_payability_or_execution_enabled": false,
+        "all_original_task_criteria_preserved": 40,
+        "source_edits": false,
+        "publication_or_ref_mutations": false,
+        "hosted_ci_dispatch": false,
+        "artifacts": {
+          "composition-04f2746.json": "96f85fbc157a0a555b7c1cd11dccd814c6f66d50fa95d8be7aaefba6a3a8dee9",
+          "runtime-04f2746.json": "d8ba0b0aed999b4d36a2b2f6be36b04d4d665f91bbc5e9858b52bb70f504d700",
+          "grammar-04f2746.json": "3a92070f78ee6181f50a0be6db6e5479737c2a89b7101385101a83feab62e126",
+          "repair-04f2746-validation.json": "1699672d6acdde38cd6e1060c6a455dcf660ac3f2813d95c82801f3b4e104044",
+          "discovery-04f2746-config.xml": "abb06ce772af1795a7cb766883716c898669b764c02585b12b40784a41b5472c",
+          "discovered-04f2746.xml": "b913c99f813ea34abf8840e265fa29463d1e7766fa8aa9ee1af4df882ee12f9b",
+          "discovery-04f2746.log": "6c1f710c4896e5fd8c842eff21d516c64ec1b6b02f5281dee74b68b3c18a7ffe",
+          "evidence-04f2746-validation.json": "414acc21981c73614e3a7a429bb69583f6f754abf28eec0f02ebe152299f9bde",
+          "review-04f2746.md": "78c9c05ac4265fed42e54215f43e7c753688d0b991d57362663ec9e66e653a0f"
+        }
+      }
+    }
+  },
+  "resolved_identifier_blocker": {
+    "predecessor_author": "f5bb1027a36ace0f7ed9f008b6914de73826b834",
+    "corrected_author": "5d703d0e3ad425fc606a6395e9c6f4445c966cac",
+    "prior_fk_lengths": [
+      67,
+      68
+    ],
+    "maximum_corrected_fk_length": 55,
+    "pdo_contacts_in_compile_probes": 0,
+    "sqlite_statement_count_unchanged": 12,
+    "mysql_compiled_statement_count": 21,
+    "changed_mysql_fk_identifiers": 4,
+    "native_mysql_execution": false
+  },
+  "preserved_negative_evidence": {
+    "initial_fixture_setup_failures": true,
+    "initial_unit_validator_bootstrap_failures": true,
+    "proof_omitted_derivative_failure": "one case / one assertion fails when only final consumer proof invocation is removed",
+    "portable_grammar_predecessor_refusal": true,
+    "local_runtime_setting_refusal": "1024M differs from exact512M guard requirement; explicit512M guard subsequently passed without source change"
+  },
+  "measured_sqlite_timing_rows": {
+    "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php": {
+      "cases": 26,
+      "ms": 4708
+    },
+    "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php": {
+      "cases": 23,
+      "ms": 3844
+    },
+    "tests/Feature/ProductionTrackCapabilitiesTest.php": {
+      "cases": 36,
+      "ms": 6615
+    },
+    "tests/Feature/ProductionTrackPolicyFinalProofTest.php": {
+      "cases": 2,
+      "ms": 302
+    },
+    "tests/Feature/ProductionTrackPreparationPacketGuardsTest.php": {
+      "cases": 26,
+      "ms": 24766
+    },
+    "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php": {
+      "cases": 23,
+      "ms": 4214
+    },
+    "tests/Feature/ProductionTrackPreparationPacketTest.php": {
+      "cases": 16,
+      "ms": 16734
+    },
+    "tests/Unit/ProductionTrackMachinePolicyTest.php": {
+      "cases": 93,
+      "ms": 1128
+    },
+    "tests/Unit/ProductionTrackPreparationSnapshotTest.php": {
+      "cases": 10,
+      "ms": 115
+    }
+  },
+  "native_skip_policy_unchanged": true,
+  "all_40_original_task_criteria_preserved": true,
+  "unknown_amounts": [
+    "tax_minor",
+    "total_minor"
+  ],
+  "next_dependencies": [
+    "authoritative production amount observations",
+    "buyer identity and affirmative assent",
+    "operative inventory/provider/order consumers",
+    "verified payment, originals and private delivery",
+    "separate selective dependency #1/#2 compatibility; retained PDF-profile blocker #3"
+  ],
+  "full_final_acceptance_executed": false,
+  "routine_mysql_or_browser_matrix_dispatched": false,
+  "provider_or_deployment_action_executed": false,
+  "required_false_flags": [
+    "payable",
+    "execution_allowed",
+    "external_facts_verified",
+    "private_bytes_verified"
+  ]
+}
