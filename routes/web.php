@@ -42,6 +42,7 @@ Route::withoutMiddleware(HandleInertiaRequests::class)->middleware(CustomerComme
     Route::post('/orders', [OrderController::class, 'store'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.store');
     Route::get('/orders/history', [OrderController::class, 'history'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.history');
     Route::get('/orders/{order}/status', [OrderController::class, 'status'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.status');
+    Route::get('/orders/{order}/items', [OrderController::class, 'items'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.items');
     Route::get('/quotes/{quote}/order', [OrderController::class, 'forQuote'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.for-quote');
     Route::post('/orders/{order}/checkout', [TestCheckoutController::class, 'start'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.checkout');
     Route::get('/orders/{order}/checkout', [TestCheckoutController::class, 'status'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.checkout-status');
