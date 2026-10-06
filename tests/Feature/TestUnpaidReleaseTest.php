@@ -148,16 +148,17 @@ class TestUnpaidReleaseTest extends TestCase
 
     public static function nonProofs(): array
     {
-        return array_fill_keys(['open', 'complete', 'processing', 'requires_capture', 'succeeded', 'received', 'capturable',
+        $cases = ['open', 'complete', 'processing', 'requires_capture', 'succeeded', 'received', 'capturable',
             'missing_pi', 'missing_recovery', 'missing_recovered_from', 'recovery_enabled', 'recovered', 'foreign_session',
             'foreign_account', 'foreign_pi', 'foreign_metadata', 'amount', 'currency', 'livemode', 'incomplete_items',
-            'second_read_changed', 'provider_error', 'empty_provider_session'], []);
+            'second_read_changed', 'provider_error', 'empty_provider_session'];
+
+        return array_combine($cases, array_map(static fn (string $case): array => [$case], $cases));
     }
 
     #[DataProvider('nonProofs')]
-    public function test_nonterminal_incomplete_or_foreign_evidence_never_releases_resources(): void
+    public function test_nonterminal_incomplete_or_foreign_evidence_never_releases_resources(string $case): void
     {
-        $case = $this->dataName();
         $f = F::started($this->gateway);
         $before = PaymentFixtures::unchangedBusinessEvidence();
         if ($case === 'open') {

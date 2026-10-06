@@ -1,5 +1,19 @@
 # Development agents and launch queue
 
+## Active continuation — October 6, 2026 UTC
+
+The integrating [completion candidate](completion-execution.md#continued-development-candidate--october-6-2026-utc) now includes reviewed account/library, collection/album drafts, inquiry conversations, verified unpaid release and private WAV kit intake, plus corrected WebKit harnesses. PR #6 is the current combined acceptance boundary; PR #5 remains contained and must be closed as superseded only after the combined merge is confirmed. Keep candidate heads frozen during full acceptance.
+
+| Lane | Current work and boundary |
+| --- | --- |
+| Integration `/root` | Compose exact reviewed sources, preserve branch ancestry, run complete discovery/focused verification, publish one candidate and require full hosted acceptance before expected-head merge |
+| Customer `/root/customer_reconcile` | Complete test-only self-service enrollment/recovery, private capture, replay/ownership/migration/browser checks; production email and guest claims remain separate |
+| Product `/root/product_reconcile` | Complete true-kit resumable private transport above the development whole-file HTTP limit, with retained exact revisions and existing track transport regressions |
+| CI review `/root/ci_reconcile` | Independently review composed source, exact census/skip registration and browser budget changes; no gate or receipt reuse relaxation |
+| Commerce review `/root/commerce_review` | Independently review unpaid resource effects and subsequent kit transport boundaries |
+
+The tables below retain prior checkpoints and do not imply additional running agents. Unfinished feature branches are not acceptance evidence or merged main state. No lane waits for unrelated database CI to begin its next dependency-ready child.
+
 ## Full completion priority — October 5, 2026 (America/Chicago)
 
 Follow the [completion execution plan](completion-execution.md) for current parallel ownership, actual missing capabilities and acceptance cadence. Resumable private media plus admin controls, retained refund/dispute inspection and synthetic restartable catalog planning form the preceding completion batch. The next reviewed composition adds account-first test customer sign-in/library and private collection/album draft authoring with immutable versions. The lead's corrected base includes the reviewed dependency/upload fixes and eight-way MySQL policy, with ten database receipts and every full gate required. Full acceptance belongs to the resulting frozen candidate; [PR #5](https://github.com/SeanVasey/VA-Studio/pull/5) remains an earlier contained increment, not a separate completion target. No author waits for unrelated MySQL checks before starting the next approved child. Whole-parent counts remain six accepted and 34 open.
