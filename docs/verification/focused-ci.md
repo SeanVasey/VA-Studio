@@ -13,7 +13,7 @@ Once this workflow exists on the default branch, GitHub Actions → **Focused de
 | `unit` | 19 reviewed files: synthetic migration planning, money/pricing, licensing terms, contract rendering, media/identifier guards and Stripe gateways. | `sqlite` or `mysql`; pure cases do not establish database concurrency. |
 | `media` | 19 upload, resumable HTTP/session, evidence, diagnostics, scanner, budget, private-root, image and archive files. | `sqlite` or `mysql` |
 | `commerce` | 30 pricing, gateway, quote, checkout, webhook, financial-observation, ownership, restore and migration files, including selected independent-process races. Heavy finalization/delivery/membership coverage remains separate. | `sqlite` or `mysql`; MySQL-only cases are reported as skipped on SQLite. |
-| `customer` | Eight account-access, session HTTP, ownership/commerce, migration and native-withdrawal files, plus existing owned-order history and owner-delivery HTTP/projection regressions. | `sqlite` or `mysql` |
+| `customer` | Eight files: five account-access, session HTTP, ownership/commerce, migration and native-withdrawal files plus three existing owned-order history and owner-delivery HTTP/projection regression files. | `sqlite` or `mysql` |
 | `operator` | 32 foundation/setup, persisted-authority/MFA, licensing, metadata/presets/bulk edits, private review, publication and rights-writer files. | `sqlite` or `mysql`; physical authenticator/device acceptance remains separate. |
 | `publication` | Seven reviewed publication apply, manifest/editor and guard files, including native concurrency. | `sqlite` or `mysql` |
 | `track-concurrency` | Five metadata, stems recording/preview and media-writer authority files. | `sqlite` or `mysql` |
