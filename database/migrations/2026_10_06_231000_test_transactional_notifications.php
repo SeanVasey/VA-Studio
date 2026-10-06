@@ -27,9 +27,13 @@ return new class extends Migration
     private function statements(string $name): array
     {
         $table = new Blueprint(DB::connection(), $name);
+        if (DB::getDriverName() === 'mysql') {
+            $table->engine = 'InnoDB';
+        }
         $table->create();
         $table->id();
-        $this->identity($table, 'public_id', 36)->unique();
+        // Keep one excess character visible to guards instead of allowing MySQL to trim it first.
+        $this->identity($table, 'public_id', 37)->unique();
         if ($name === 'transactional_notices') {
             $this->identity($table, 'event_key', 128)->unique();
             $this->identity($table, 'notification_type', 32);
@@ -47,18 +51,18 @@ return new class extends Migration
             $this->identity($table, 'canonicalization_version', 32);
             $table->text('capture_ciphertext');
             foreach (['capture_hash', 'recipient_hmac', 'payload_hash', 'request_hmac'] as $field) {
-                $this->identity($table, $field, 64);
+                $this->identity($table, $field, 65);
             }
             $table->dateTime('created_at');
         } else {
             $table->foreignId('notice_id')->index()->constrained('transactional_notices')->restrictOnDelete();
             $table->unsignedInteger('number');
-            $this->identity($table, 'token_hash', 64)->unique();
+            $this->identity($table, 'token_hash', 65)->unique();
             $table->dateTime('started_at');
             $table->dateTime('lease_expires_at');
             $this->identity($table, 'state', 16);
             $this->identity($table, 'reason', 32)->nullable();
-            $this->identity($table, 'receipt_hash', 64)->nullable();
+            $this->identity($table, 'receipt_hash', 65)->nullable();
             $table->dateTime('finished_at')->nullable();
             $table->unique(['notice_id', 'number']);
         }
@@ -95,7 +99,7 @@ return new class extends Migration
             ? "length(NEW.public_id) = 36 AND length(CAST(NEW.public_id AS BLOB)) = 36 AND NEW.public_id NOT GLOB '*[^0-9a-f-]*'"
                 ." AND substr(NEW.public_id,9,1) = '-' AND substr(NEW.public_id,14,2) = '-4' AND substr(NEW.public_id,19,1) = '-'"
                 ." AND substr(NEW.public_id,20,1) IN ('8','9','a','b') AND substr(NEW.public_id,24,1) = '-' AND length(replace(NEW.public_id,'-','')) = 32"
-            : "REGEXP_LIKE(NEW.public_id, '^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$', 'c')";
+            : "OCTET_LENGTH(NEW.public_id) = 36 AND REGEXP_LIKE(NEW.public_id, '^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$', 'c')";
         $date = fn ($field) => $sqlite
             ? "NEW.{$field} IS NOT NULL AND NEW.{$field} = strftime('%Y-%m-%d %H:%M:%S', NEW.{$field}, '+0 seconds')"
             : "NEW.{$field} IS NOT NULL AND YEAR(NEW.{$field}) > 0 AND MONTH(NEW.{$field}) > 0 AND DAY(NEW.{$field}) > 0";
@@ -272,14 +276,14 @@ return new class extends Migration
     private function types(string $table): array
     {
         return $table === 'transactional_notices' ? [
-            'id' => 'bigint unsigned', 'public_id' => 'varchar(36)', 'event_key' => 'varchar(128)', 'notification_type' => 'varchar(32)',
+            'id' => 'bigint unsigned', 'public_id' => 'varchar(37)', 'event_key' => 'varchar(128)', 'notification_type' => 'varchar(32)',
             'account_id' => 'bigint unsigned', 'user_id' => 'bigint unsigned', 'access_version' => 'int unsigned',
             'order_id' => 'bigint unsigned', 'activation_id' => 'bigint unsigned', 'claim_id' => 'bigint unsigned',
             'policy_version' => 'varchar(64)', 'canonicalization_version' => 'varchar(32)', 'capture_ciphertext' => 'text',
-            'capture_hash' => 'varchar(64)', 'recipient_hmac' => 'varchar(64)', 'payload_hash' => 'varchar(64)', 'request_hmac' => 'varchar(64)', 'created_at' => 'datetime',
-        ] : ['id' => 'bigint unsigned', 'public_id' => 'varchar(36)', 'notice_id' => 'bigint unsigned', 'number' => 'int unsigned',
-            'token_hash' => 'varchar(64)', 'started_at' => 'datetime', 'lease_expires_at' => 'datetime', 'state' => 'varchar(16)',
-            'reason' => 'varchar(32)', 'receipt_hash' => 'varchar(64)', 'finished_at' => 'datetime'];
+            'capture_hash' => 'varchar(65)', 'recipient_hmac' => 'varchar(65)', 'payload_hash' => 'varchar(65)', 'request_hmac' => 'varchar(65)', 'created_at' => 'datetime',
+        ] : ['id' => 'bigint unsigned', 'public_id' => 'varchar(37)', 'notice_id' => 'bigint unsigned', 'number' => 'int unsigned',
+            'token_hash' => 'varchar(65)', 'started_at' => 'datetime', 'lease_expires_at' => 'datetime', 'state' => 'varchar(16)',
+            'reason' => 'varchar(32)', 'receipt_hash' => 'varchar(65)', 'finished_at' => 'datetime'];
     }
 
     /** Every table, column, key, trigger and option must be owned before any rollback DDL. */

@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use PDO;
 use Throwable;
 
 /** Test-only durable notification work; producers, live mail and marketing remain disabled. */
@@ -110,10 +111,11 @@ final class TestTransactionalNotifications
             $attempt = TransactionalNoticeAttempt::create($columns);
             $this->audit('lease_claimed', $attempt, ['attempt' => $attempt->number], null);
             $this->verifyAttempt($attempt);
+            $capture = $this->verifyNotice($notice, $context);
             $this->fence($context, $notice, $notice->getRawOriginal(), [...$before, $columns + ['id' => $attempt->id]]);
 
             return new NotificationLease($notice->public_id, $attempt->public_id, $attempt->lease_expires_at,
-                $token, $this->verifyNotice($notice, $context));
+                $token, $capture);
         });
     }
 
@@ -187,9 +189,10 @@ final class TestTransactionalNotifications
     public function reconcile(string $notificationId): array
     {
         $capture = $this->locked($notificationId, function (array $context, TransactionalNotice $notice): string {
+            $capture = $this->verifyNotice($notice, $context);
             $this->fence($context, $notice, $notice->getRawOriginal(), $this->attemptRows($notice->id));
 
-            return $this->verifyNotice($notice, $context);
+            return $capture;
         });
         $positive = app(PrivateNotificationCapture::class)->inspect($notificationId, $capture);
         if ($positive === null) {
@@ -244,9 +247,10 @@ final class TestTransactionalNotifications
             if ($state === 'leased' && $last['lease_expires_at'] <= now()->utc()->format('Y-m-d H:i:s')) {
                 $state = 'uncertain'; // Observation does not silently create a replacement claim.
             }
+            $capture = $this->verifyNotice($notice, $context);
             $this->fence($context, $notice, $notice->getRawOriginal(), $attempts);
 
-            return ['result' => $this->result($notice, $state), 'capture' => $this->verifyNotice($notice, $context),
+            return ['result' => $this->result($notice, $state), 'capture' => $capture,
                 'receipt' => $state === 'accepted' ? $last['receipt_hash'] : null];
         });
         if ($snapshot['result']['state'] === 'accepted') {
@@ -339,7 +343,8 @@ final class TestTransactionalNotifications
         if ($activation === null || $activation->activated_at->isFuture()) {
             throw new NotificationException;
         }
-        $source = app(DeliveryAccessEvidence::class)->source($order, app(ActivationPolicy::class)->account());
+        $activationAccount = app(ActivationPolicy::class)->account();
+        $source = app(DeliveryAccessEvidence::class)->source($order, $activationAccount);
         app(ActivationPolicy::class)->current();
         if ($source['activation']->id !== $activation->id || ! OrderRequest::uuid($account->public_id)) {
             throw new NotificationException;
@@ -356,7 +361,7 @@ final class TestTransactionalNotifications
             $proof['customer_purchase_claims'] = $this->critical($claim->getRawOriginal(), ['id', 'public_id', 'order_id', 'account_id', 'evidence_hash']);
         }
 
-        return compact('principal', 'user', 'account', 'order', 'claim', 'activation', 'email', 'proof');
+        return compact('principal', 'user', 'account', 'order', 'claim', 'activation', 'activationAccount', 'email', 'proof');
     }
 
     private function verifyNotice(TransactionalNotice $notice, array $context): string
@@ -442,7 +447,7 @@ final class TestTransactionalNotifications
         return $expected;
     }
 
-    /** Raw final reads avoid a later retrieved observer making an earlier authority check stale. */
+    /** Framework checks can invoke callbacks. The complete primary PDO proof must come after them. */
     private function fence(array $context, TransactionalNotice $notice, array $expectedNotice, array $attempts): void
     {
         $this->verifyNotice($notice, $context);
@@ -460,6 +465,45 @@ final class TestTransactionalNotifications
             || $this->stringsRows($this->attemptRows($notice->id)) !== $this->stringsRows($attempts)) {
             throw new NotificationException;
         }
+        // Recheck pure policy/capture data after the last framework QueryExecuted callback.
+        if (! hash_equals($context['activationAccount'], app(ActivationPolicy::class)->account())) {
+            throw new NotificationException;
+        }
+        app(ActivationPolicy::class)->current();
+        app(TransactionalNotificationPolicy::class)->requireEnabled();
+        $this->verifyNotice($notice, $context);
+
+        $connection = DB::connection();
+        $pdo = $connection->getPdo(); // Primary writer connection; never a replica or QueryExecuted dispatch.
+        $locking = $connection->getDriverName() === 'mysql' ? ' FOR UPDATE' : '';
+        foreach ($context['proof'] as $table => $expected) {
+            $actual = $this->primaryRows($pdo, $table, 'id', (int) $expected['id'], $locking);
+            if (count($actual) !== 1 || $this->critical($actual[0], array_keys($expected)) !== $expected) {
+                throw new NotificationException;
+            }
+        }
+        $actualNotice = $this->primaryRows($pdo, 'transactional_notices', 'id', $notice->id, $locking);
+        $actualAttempts = $this->primaryRows($pdo, 'transactional_notice_attempts', 'notice_id', $notice->id, $locking);
+        if (count($actualNotice) !== 1 || $this->strings($actualNotice[0]) !== $this->strings($expectedNotice)
+            || $this->stringsRows($actualAttempts) !== $this->stringsRows($attempts)) {
+            throw new NotificationException;
+        }
+        // Only pure return projections follow; no ORM/framework query runs after this complete proof.
+    }
+
+    private function primaryRows(PDO $pdo, string $table, string $column, int $id, string $locking): array
+    {
+        $allowed = ['users', 'customer_accounts', 'orders', 'test_fulfillment_activations',
+            'customer_purchase_claims', 'transactional_notices', 'transactional_notice_attempts'];
+        if (! in_array($table, $allowed, true) || ! in_array($column, ['id', 'notice_id'], true)) {
+            throw new NotificationException;
+        }
+        $order = $table === 'transactional_notice_attempts' ? ' ORDER BY `number` ASC' : '';
+        $statement = $pdo->prepare('SELECT * FROM `'.$table.'` WHERE `'.$column.'` = ?'.$order.$locking);
+        $statement->bindValue(1, $id, PDO::PARAM_INT);
+        $statement->execute();
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
     private function attemptRows(int $noticeId): array

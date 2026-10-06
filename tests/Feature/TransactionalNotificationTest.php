@@ -3,15 +3,18 @@
 namespace Tests\Feature;
 
 use App\Domain\Customers\CustomerAccess;
+use App\Domain\Customers\CustomerAccessException;
 use App\Domain\Delivery\Models\TestFulfillmentActivation;
 use App\Domain\Notifications\Models\TransactionalNotice;
 use App\Domain\Notifications\Models\TransactionalNoticeAttempt;
+use App\Domain\Notifications\NotificationException;
 use App\Domain\Notifications\NotificationLease;
 use App\Domain\Notifications\PrivateNotificationCapture;
 use App\Domain\Notifications\TestTransactionalNotifications;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -21,7 +24,6 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\CustomerFixtures;
 use Tests\Support\FinalizationDatabaseMigrations;
@@ -522,12 +524,136 @@ class TransactionalNotificationTest extends TestCase
     {
         try {
             $call();
-        } catch (\Throwable $error) {
-            $this->assertNotInstanceOf(AssertionFailedError::class, $error);
+        } catch (NotificationException|CustomerAccessException|\LogicException) {
+            $this->assertTrue(true);
 
             return;
         }
         $this->fail('Unsafe notification operation was accepted.');
+    }
+
+    public static function postQueryChanges(): array
+    {
+        return ['withdrawal after framework proof' => ['withdraw'], 'recipient after framework proof' => ['recipient'],
+            'attempt range after framework proof' => ['attempt'], 'policy after framework proof' => ['policy'],
+            'activation account after framework proof' => ['activation_account']];
+    }
+
+    #[DataProvider('postQueryChanges')]
+    public function test_query_callbacks_after_the_framework_range_proof_cannot_commit_an_intent_with_changed_authority_or_attempts(string $change): void
+    {
+        $f = F::ready(enqueue: false);
+        $before = $this->graph();
+        $connection = DB::connection();
+        $events = $connection->getEventDispatcher();
+        $connection->setEventDispatcher(clone $events);
+        $triggered = false;
+        $denied = null;
+        try {
+            $connection->listen(function (QueryExecuted $query) use ($f, $change, &$triggered): void {
+                if ($triggered || ! str_starts_with($query->sql, 'select ') || ! str_contains($query->sql, 'transactional_notice_attempts')) {
+                    return;
+                }
+                $triggered = true;
+                match ($change) {
+                    'withdraw' => CustomerFixtures::withdraw($f),
+                    'recipient' => DB::table('users')->where('id', $f['user']->id)->update(['email' => 'notification-mutated@example.invalid']),
+                    'policy' => config(['transactional-notifications.test_enabled' => false]),
+                    'activation_account' => config(['payments.stripe.account_id' => 'acct_NOTIFICATIONCHANGED']),
+                    'attempt' => DB::table('transactional_notice_attempts')->insert(['public_id' => (string) Str::uuid(),
+                        'notice_id' => DB::table('transactional_notices')->sole()->id, 'number' => 1, 'token_hash' => str_repeat('a', 64),
+                        'started_at' => now(), 'lease_expires_at' => now()->addSeconds(30), 'state' => 'leased',
+                        'reason' => null, 'receipt_hash' => null, 'finished_at' => null]),
+                };
+            });
+            try {
+                app(TestTransactionalNotifications::class)->enqueueOrderReady($f['order']->public_id, $f['principal']);
+            } catch (NotificationException|CustomerAccessException $error) {
+                $denied = $error::class;
+            }
+        } finally {
+            $connection->setEventDispatcher($events);
+        }
+        $this->assertTrue($triggered, 'The actual framework QueryExecuted mutation was never reached.');
+        if ($denied === null) {
+            echo json_encode(['post_framework_notification_probe' => ['mutation' => $change, 'triggered' => $triggered,
+                'committed_notices' => DB::table('transactional_notices')->count(),
+                'committed_attempts' => DB::table('transactional_notice_attempts')->count(),
+                'current_access_version' => $f['account']->fresh()->access_version]], JSON_THROW_ON_ERROR).PHP_EOL;
+        }
+        $this->assertNotNull($denied, 'Framework callback changes committed notification work after the preceding proof.');
+        $this->assertSame($before, $this->graph());
+        $this->assertSame($f['user']->email, $f['user']->fresh()->email);
+        $this->assertTrue($f['account']->fresh()->active);
+        $this->assertSame(1, $f['account']->fresh()->access_version);
+        $this->assertSame([], Storage::disk('local')->allFiles('transactional-notification-capture'));
+    }
+
+    public static function postQueryOperations(): array
+    {
+        return ['claim withdrawal' => ['claim', 'withdraw', 2], 'claim cursor transition' => ['claim', 'cursor', 2],
+            'completion withdrawal' => ['complete', 'withdraw', 2], 'reconciliation withdrawal' => ['reconcile', 'withdraw', 4],
+            'status withdrawal' => ['status', 'withdraw', 2]];
+    }
+
+    #[DataProvider('postQueryOperations')]
+    public function test_every_existing_intent_operation_ends_with_an_observer_free_authority_and_claim_proof(string $operation, string $change, int $targetRead): void
+    {
+        $f = F::ready();
+        $service = app(TestTransactionalNotifications::class);
+        $id = $f['notice']['notificationId'];
+        if (in_array($operation, ['complete', 'reconcile'], true)) {
+            $lease = $service->claim($id);
+            $stored = app(PrivateNotificationCapture::class)->store($id, $lease->capture());
+            if ($operation === 'reconcile') {
+                $this->travel(31)->seconds();
+            }
+        }
+        $before = $this->graph();
+        $files = Storage::disk('local')->allFiles('transactional-notification-capture');
+        $fileHashes = array_map(fn ($path) => hash_file('sha256', Storage::disk('local')->path($path)), $files);
+        $connection = DB::connection();
+        $events = $connection->getEventDispatcher();
+        $connection->setEventDispatcher(clone $events);
+        $reads = 0;
+        $triggered = false;
+        $denied = null;
+        try {
+            $connection->listen(function (QueryExecuted $query) use ($f, $change, $targetRead, &$reads, &$triggered): void {
+                if ($triggered || ! str_starts_with($query->sql, 'select ') || ! str_contains($query->sql, 'transactional_notice_attempts')
+                    || ! str_contains($query->sql, 'order by') || str_contains($query->sql, ' desc')) {
+                    return;
+                }
+                if (++$reads !== $targetRead) {
+                    return;
+                }
+                $triggered = true;
+                if ($change === 'cursor') {
+                    DB::table('transactional_notice_attempts')->update(['state' => 'uncertain', 'reason' => 'capture_unknown', 'finished_at' => now()]);
+                } else {
+                    CustomerFixtures::withdraw($f);
+                }
+            });
+            try {
+                match ($operation) {
+                    'claim' => $service->claim($id),
+                    'complete' => $service->complete($lease, $stored['receiptHash']),
+                    'reconcile' => $service->reconcile($id),
+                    'status' => $service->status($id),
+                };
+            } catch (NotificationException|CustomerAccessException $error) {
+                $denied = $error::class;
+            }
+        } finally {
+            $connection->setEventDispatcher($events);
+        }
+        $this->assertTrue($triggered, 'The actual final framework range/cursor callback was never reached.');
+        $this->assertNotNull($denied, 'An existing-intent operation returned after its framework callback changed the final proof.');
+        $this->assertSame($before, $this->graph());
+        $this->assertTrue($f['account']->fresh()->active);
+        $this->assertSame(1, $f['account']->fresh()->access_version);
+        $this->assertSame($files, Storage::disk('local')->allFiles('transactional-notification-capture'));
+        $this->assertSame($fileHashes, array_map(fn ($path) => hash_file('sha256', Storage::disk('local')->path($path)), $files));
     }
 
     private function withEvents(callable $call): void

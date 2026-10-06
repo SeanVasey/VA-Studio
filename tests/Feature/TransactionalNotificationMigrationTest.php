@@ -66,6 +66,35 @@ class TransactionalNotificationMigrationTest extends TestCase
         $this->queryRefused(fn () => DB::table(self::NOTICES)->delete());
     }
 
+    public function test_owned_tables_keep_restrictive_foreign_keys_with_a_different_mysql_default_engine(): void
+    {
+        $migration = $this->migration();
+        $migration->down();
+        $original = DB::getDriverName() === 'mysql' ? DB::selectOne('SELECT @@SESSION.default_storage_engine AS engine')->engine : null;
+        try {
+            if ($original !== null) {
+                DB::statement("SET SESSION default_storage_engine = 'MyISAM'");
+                $this->assertSame('MyISAM', DB::selectOne('SELECT @@SESSION.default_storage_engine AS engine')->engine);
+            }
+            $migration->up();
+            $this->assertCount(5, Schema::getForeignKeys(self::NOTICES));
+            $this->assertCount(1, Schema::getForeignKeys(self::ATTEMPTS));
+            foreach ([self::NOTICES, self::ATTEMPTS] as $table) {
+                $this->assertCount(3, array_filter($this->guards(), fn ($guard) => ($guard['tbl_name'] ?? $guard['EVENT_OBJECT_TABLE']) === $table));
+                if ($original !== null) {
+                    $this->assertSame('InnoDB', DB::table('information_schema.TABLES')->where('TABLE_SCHEMA', DB::getDatabaseName())->where('TABLE_NAME', $table)->sole()->ENGINE);
+                }
+            }
+            $migration->down();
+            $this->assertFalse(Schema::hasTable(self::NOTICES));
+            $this->assertFalse(Schema::hasTable(self::ATTEMPTS));
+        } finally {
+            if ($original !== null) {
+                DB::statement('SET SESSION default_storage_engine = ?', [$original]);
+            }
+        }
+    }
+
     public function test_every_notice_field_and_deletion_is_immutable_even_for_a_noop_raw_update(): void
     {
         F::ready();
@@ -110,7 +139,7 @@ class TransactionalNotificationMigrationTest extends TestCase
             'activation_id' => $other['fulfillment_activation']->id,
             'event_key' => 'test_order_ready:'.$other['fulfillment_activation']->public_id.':'.$other['account']->public_id]);
         $before = $this->rows();
-        foreach ([['public_id' => strtoupper($valid['public_id'])], ['public_id' => $valid['public_id'].' '],
+        foreach ([['public_id' => strtoupper($valid['public_id'])], ['public_id' => $valid['public_id'].' '], ['public_id' => $valid['public_id']."\n"],
             ['notification_type' => 'test_order_ready '], ['notification_type' => 'TEST_ORDER_READY'],
             ['policy_version' => 'test-transactional-notification-v1 '], ['canonicalization_version' => 'vasey-json-v1 '],
             ['capture_hash' => str_repeat('A', 64)], ['recipient_hmac' => str_repeat('a', 63)],
@@ -118,7 +147,8 @@ class TransactionalNotificationMigrationTest extends TestCase
             ['capture_ciphertext' => ''], ['capture_ciphertext' => str_repeat('x', 16385)],
             ['event_key' => $valid['event_key'].' '], ['access_version' => 2], ['user_id' => $f['user']->id],
             ['activation_id' => $f['fulfillment_activation']->id], ['created_at' => now()->subDay()->format('Y-m-d H:i:s')]] as $changes) {
-            $this->queryRefused(fn () => DB::table(self::NOTICES)->insert(array_replace($valid, $changes)));
+            $context = implode(',', array_keys($changes)).'/'.implode(',', array_map(fn ($value) => is_string($value) ? (string) strlen($value) : get_debug_type($value), $changes));
+            $this->queryRefused(fn () => DB::table(self::NOTICES)->insert(array_replace($valid, $changes)), $context);
             $this->assertSame($before, $this->rows());
         }
         DB::table(self::NOTICES)->insert($valid);
@@ -133,7 +163,8 @@ class TransactionalNotificationMigrationTest extends TestCase
         F::ready();
         $notice = DB::table(self::NOTICES)->sole();
         $valid = $this->attempt($notice->id);
-        foreach ([['public_id' => strtoupper($valid['public_id'])], ['token_hash' => str_repeat('A', 64)],
+        foreach ([['public_id' => strtoupper($valid['public_id'])], ['public_id' => $valid['public_id'].' '],
+            ['token_hash' => str_repeat('A', 64)], ['token_hash' => str_repeat('a', 64).' '],
             ['number' => 0], ['number' => 2], ['number' => 4], ['state' => 'leased '], ['state' => 'LEASED'],
             ['reason' => ''], ['receipt_hash' => str_repeat('a', 64)], ['finished_at' => $valid['started_at']],
             ['lease_expires_at' => now()->addSeconds(31)->format('Y-m-d H:i:s')],
@@ -159,7 +190,7 @@ class TransactionalNotificationMigrationTest extends TestCase
             $this->queryRefused(fn () => DB::table(self::ATTEMPTS)->update(array_replace($finish, [$field => $value])));
             $this->assertSame($row, (array) DB::table(self::ATTEMPTS)->sole());
         }
-        foreach ([['state' => 'accepted '], ['state' => 'ACCEPTED'], ['receipt_hash' => str_repeat('A', 64)],
+        foreach ([['state' => 'accepted '], ['state' => 'ACCEPTED'], ['receipt_hash' => str_repeat('A', 64)], ['receipt_hash' => str_repeat('a', 64).' '],
             ['reason' => 'capture_reconciled'], ['finished_at' => now()->subSecond()->format('Y-m-d H:i:s')],
             ['finished_at' => $row['lease_expires_at']],
             ['state' => 'failed', 'reason' => 'private_storage_refused ', 'receipt_hash' => null],
@@ -356,7 +387,7 @@ class TransactionalNotificationMigrationTest extends TestCase
         DB::statement('REPLACE INTO '.$table.' ('.implode(',', array_keys($row)).') VALUES ('.implode(',', array_fill(0, count($row), '?')).')', array_values($row));
     }
 
-    private function queryRefused(callable $operation): void
+    private function queryRefused(callable $operation, string $context = ''): void
     {
         try {
             $operation();
@@ -365,7 +396,13 @@ class TransactionalNotificationMigrationTest extends TestCase
 
             return;
         }
-        $this->fail('Raw mutation changed retained notification evidence.');
+        if ($context === 'public_id/37' && DB::getDriverName() === 'mysql') {
+            $warnings = DB::select('SHOW WARNINGS');
+            $stored = DB::table(self::NOTICES)->where('id', 100000)->value('public_id');
+            echo json_encode(['raw_alias_diagnostic' => ['submitted_public_id_bytes' => 37,
+                'stored_public_id_bytes' => strlen($stored), 'warning_codes' => array_map(fn ($warning) => $warning->Code, $warnings)]], JSON_THROW_ON_ERROR).PHP_EOL;
+        }
+        $this->fail('Raw mutation changed retained notification evidence: '.$context);
     }
 
     private function refused(callable $operation): void

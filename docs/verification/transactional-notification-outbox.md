@@ -32,7 +32,10 @@ All commands require their own transaction boundary. Lock order is user,
 account, order, existing immutable claim/activation evidence, notice, then
 attempt. A short lease commits before filesystem I/O. Final raw reads recheck
 authority, immutable intent and the complete expected attempt rows after
-application callbacks. Audit stores safe hashes, fixed state/reason and the
+application callbacks. The complete final state/authority/notice/attempt-range
+proof uses the primary PDO connection after all framework reads and their
+`QueryExecuted` callbacks. Pure policy/capture checks precede that final proof;
+no ORM/framework query follows it. Audit stores safe hashes, fixed state/reason and the
 test-only marker; unexpected capture logs only the exception class.
 
 The fixed local test policy allows 30-second leases and at most three attempts.
@@ -58,6 +61,18 @@ claims, legal attempt transitions and SQLite replacement denial. Unexpected,
 partial, temporary, modified or populated schema is not adopted or erased.
 Rollback verifies owned schema and guards and refuses external child references
 before any DDL.
+
+MySQL table creation explicitly selects InnoDB. SQL storage retains one extra
+character beyond a canonical UUID or hash, so padding cannot disappear before
+the guards check the exact 36-byte UUID or 64-byte lowercase hash. A native
+probe on checkpoint `779ffbce` observed a submitted 37-byte UUID with trailing
+space stored as 36 bytes; that candidate's raw-insert guard test failed. Its
+100-case native receipt retains 99 passing cases, the failure and all six actual
+PRIMARY waits. Four further actual SQLite `QueryExecuted` probes and one genuine
+MySQL withdrawal probe confirmed an earlier framework-only proof could commit
+an intent after its final range read changed account authority, recipient,
+attempt range or policy. These are retained negative source evidence; the
+corrective PDO proof and padding/engine checks require fresh positive receipts.
 
 The integrating lane owns empty-child rollback setup in the existing parent
 migration tests: CustomerAccountMigrationTest, CustomerPurchaseClaimMigrationTest,
