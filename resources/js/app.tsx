@@ -1,4 +1,4 @@
-import { createInertiaApp } from '@inertiajs/react';
+import { createInertiaApp, router } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
 import Storefront from './Pages/Storefront';
 import CheckoutReturn from './Pages/CheckoutReturn';
@@ -8,6 +8,7 @@ import CustomerLibrary from './Pages/CustomerLibrary';
 import CustomerAccessRequest from './Pages/CustomerAccessRequest';
 import CustomerAccessFinish from './Pages/CustomerAccessFinish';
 import { captureCustomerIdentityProof } from './lib/customer-identity';
+import { registerStorefrontOfflineRecovery } from './lib/storefront-offline';
 import '../css/app.css';
 
 captureCustomerIdentityProof();
@@ -25,3 +26,6 @@ createInertiaApp({
   },
   setup({ el, App, props }) { createRoot(el).render(<App {...props} />); },
 });
+
+void registerStorefrontOfflineRecovery();
+router.on('navigate', () => { void registerStorefrontOfflineRecovery(); });
