@@ -7,6 +7,7 @@ use App\Domain\Catalog\Models\Track;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\Models\MediaUploadSession;
 use App\Models\User;
+use App\Support\Access\AdminMultiFactor;
 use App\Support\Audit\AuditEvent;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\UploadedFile;
@@ -39,7 +40,7 @@ final class ResumableMediaUploads
         }
 
         return DB::transaction(function () use ($track, $role, $sizeBytes, $sha256, $name, $actor): array {
-            $actor = app(MediaWriterActor::class)->authorize($actor);
+            $actor = $this->currentActor($actor);
             $track = Track::query()->lockForUpdate()->findOrFail($track->id);
             $existing = MediaUploadSession::where('actor_id', $actor->id)->where('track_id', $track->id)
                 ->where('status', 'uploading')->orderBy('created_at')->lockForUpdate()->get();
@@ -188,7 +189,7 @@ final class ResumableMediaUploads
         $trackId = MediaUploadSession::where('public_id', $sessionId)->value('track_id');
 
         return DB::transaction(function () use ($sessionId, $trackId, $actor, $operation): mixed {
-            $current = app(MediaWriterActor::class)->authorize($actor);
+            $current = $this->currentActor($actor);
             $track = $trackId ? Track::query()->lockForUpdate()->find($trackId) : null;
             $session = MediaUploadSession::query()->where('public_id', $sessionId)->lockForUpdate()->first();
             if (! $track || ! $session || ! hash_equals($session->public_id, $sessionId)
@@ -205,6 +206,18 @@ final class ResumableMediaUploads
         if ($session->status !== 'uploading' || $session->expires_at->lte(now())) {
             $this->invalid('This upload is no longer active. Start a new upload or inspect its completed result.');
         }
+    }
+
+    private function currentActor(User $actor): User
+    {
+        $current = app(MediaWriterActor::class)->authorize($actor);
+        // HTTP admission may precede a lock wait. Re-read required enrollment
+        // under the actor fence, even if this transaction has an older snapshot.
+        if (! AdminMultiFactor::satisfiedBy($current, lockForUpdate: true)) {
+            throw new AuthorizationException('This upload session is unavailable.');
+        }
+
+        return $current;
     }
 
     private function present(MediaUploadSession $session): array

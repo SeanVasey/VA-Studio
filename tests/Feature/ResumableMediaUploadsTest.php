@@ -8,7 +8,9 @@ use App\Domain\Media\Models\MediaUploadSession;
 use App\Domain\Media\PrivateUploadParts;
 use App\Domain\Media\ResumableMediaUploads;
 use App\Models\User;
+use App\Support\Access\AdminMultiFactor;
 use App\Support\Audit\AuditEvent;
+use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Http\UploadedFile;
@@ -185,6 +187,49 @@ class ResumableMediaUploadsTest extends TestCase
         DB::table('users')->where('id', $this->actor->id)->update(['email_verified_at' => null]);
         $this->expectException(AuthorizationException::class);
         $this->uploads->complete($session['id'], $this->actor);
+    }
+
+    public static function mfaOperations(): array
+    {
+        return ['start' => ['start'], ...self::operations()];
+    }
+
+    #[DataProvider('mfaOperations')]
+    public function test_required_mfa_is_rechecked_after_admission_before_the_actor_read(string $method): void
+    {
+        $panel = Filament::getPanel('admin');
+        $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: true);
+        $this->actor->saveAppAuthenticationSecret($panel->getMultiFactorAuthenticationProviders()['app']->generateSecret());
+        $session = $this->begin();
+        $this->append($session['id'], MediaFixtures::png());
+        $before = MediaUploadSession::sole()->getAttributes();
+        $files = Storage::disk('local')->allFiles();
+        $audits = AuditEvent::count();
+        $this->assertTrue(AdminMultiFactor::satisfiedBy($this->actor));
+        $withdrawn = false;
+        DB::connection()->beforeExecuting(function (string $sql) use (&$withdrawn): void {
+            if (! $withdrawn && DB::transactionLevel() === 1
+                && preg_match('/\Aselect\b.*\bfrom ["`]users["`]/i', $sql)) {
+                $withdrawn = true;
+                DB::table('users')->where('id', $this->actor->id)->update(['app_authentication_secret' => null]);
+            }
+        });
+        try {
+            match ($method) {
+                'start' => $this->uploads->start($this->track, 'artwork', strlen(MediaFixtures::png()), hash('sha256', MediaFixtures::png()), 'new-synthetic.png', $this->actor),
+                'append' => $this->append($session['id'], MediaFixtures::png()),
+                default => $this->uploads->{$method}($session['id'], $this->actor),
+            };
+            $this->fail('A pre-admitted operator retained upload authority after required MFA withdrawal.');
+        } catch (AuthorizationException) {
+        }
+        $this->assertTrue($withdrawn);
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertSame($before, MediaUploadSession::sole()->getAttributes());
+        $this->assertSame($files, Storage::disk('local')->allFiles());
+        $this->assertSame($audits, AuditEvent::count());
+        $this->assertDatabaseCount('media_upload_sessions', 1);
+        $this->assertDatabaseCount('media_assets', 0);
     }
 
     public function test_existing_size_role_digest_and_concurrent_session_limits_remain_bounded(): void

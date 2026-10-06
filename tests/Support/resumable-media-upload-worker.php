@@ -1,7 +1,11 @@
 <?php
 
+use App\Domain\Catalog\Models\Track;
 use App\Domain\Media\ResumableMediaUploads;
 use App\Models\User;
+use App\Support\Access\AdminMultiFactor;
+use Filament\Facades\Filament;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -45,9 +49,20 @@ DB::listen(function ($query) use ($input, $directory, $wait, &$paused): void {
 file_put_contents($directory.'/ready-'.$name, json_encode(['connection_id' => $connection, 'pid' => getmypid()], JSON_THROW_ON_ERROR));
 $wait($directory.'/start-'.$name);
 $actor = User::findOrFail($input['actor_id']);
+$mfaPrecheck = null;
+if ($input['require_mfa'] ?? false) {
+    $panel = Filament::getPanel('admin');
+    $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: true);
+    $mfaPrecheck = AdminMultiFactor::satisfiedBy($actor);
+    if (! $mfaPrecheck) {
+        throw new LogicException('The native MFA withdrawal fixture did not pass initial admission.');
+    }
+}
 try {
     $service = app(ResumableMediaUploads::class);
     $value = match ($input['operation']) {
+        'start' => $service->start(Track::findOrFail($input['track_id']), 'artwork', filesize($directory.'/chunk.bin'), hash_file('sha256', $directory.'/chunk.bin'), 'new-synthetic.png', $actor),
+        'inspect' => $service->inspect($input['session_id'], $actor),
         'append' => $service->append($input['session_id'], 0, new UploadedFile($directory.'/chunk.bin', 'chunk.bin', null, UPLOAD_ERR_OK, true), $actor),
         'complete' => $service->complete($input['session_id'], $actor),
         'cancel' => $service->cancel($input['session_id'], $actor),
@@ -57,6 +72,8 @@ try {
         'status' => $input['operation'] === 'complete' ? 'completed' : $value['status']];
 } catch (ValidationException $error) {
     $result = ['result' => 'rejected', 'errors' => $error->errors()];
+} catch (AuthorizationException) {
+    $result = ['result' => 'unauthorized'];
 }
 echo json_encode($result + ['connection_id' => $connection, 'pid' => getmypid(),
-    'transaction_level' => DB::transactionLevel()], JSON_THROW_ON_ERROR);
+    'transaction_level' => DB::transactionLevel(), 'mfa_precheck' => $mfaPrecheck], JSON_THROW_ON_ERROR);
