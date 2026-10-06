@@ -292,9 +292,9 @@ jobs:
     name: operator-browser (${{ matrix.project }})
     runs-on: ubuntu-latest
     # Each engine runs every ordinary journey on its own fresh VM and isolated fixture.
-    # Browser installation has taken 14 minutes; retain the bounded 18-minute suite
+    # Browser installation has taken 14 minutes; retain the bounded 26-minute suite
     # plus fixture/build setup, teardown and artifact retention for each engine.
-    timeout-minutes: 40
+    timeout-minutes: 50
     strategy:
       fail-fast: false
       matrix:

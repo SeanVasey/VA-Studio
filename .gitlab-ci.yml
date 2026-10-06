@@ -132,7 +132,8 @@ backend-sqlite:
 operator-browser:
   stage: verify
   needs: [provenance-access]
-  timeout: 40m
+  # Match the shared 27-minute wrapper plus browser installation and fixture setup.
+  timeout: 50m
   parallel:
     matrix:
       - BROWSER_PROJECT: [chromium-desktop, webkit-mobile]
