@@ -83,6 +83,18 @@
       "test_shortened_mysql_unique_index_prefix_is_refused_before_any_ddl"
     ],
     [
+      "Tests\\Feature\\CustomerPurchaseClaimConcurrencyTest",
+      "test_competing_accounts_serialize_at_the_exact_order_and_only_one_claim_wins"
+    ],
+    [
+      "Tests\\Feature\\CustomerPurchaseClaimConcurrencyTest",
+      "test_simultaneous_exact_retry_returns_one_immutable_claim_and_one_audit"
+    ],
+    [
+      "Tests\\Feature\\CustomerPurchaseClaimConcurrencyTest",
+      "test_withdrawal_at_the_exact_user_lock_prevents_claim_commit"
+    ],
+    [
       "Tests\\Feature\\ExclusiveOfferConcurrencyTest",
       "test_independent_connections_preserve_preparation_identity_and_scope_controls"
     ],
@@ -417,6 +429,22 @@
     [
       "Tests\\Feature\\TestPaymentExceptionOperationsConcurrencyTest",
       "test_independent_operators_serialize_history_and_fence_provider_claims"
+    ],
+    [
+      "Tests\\Feature\\TestRefundResolutionConcurrencyTest",
+      "test_committed_actor_withdrawal_fences_the_resolution_request_before_provider_io"
+    ],
+    [
+      "Tests\\Feature\\TestRefundResolutionConcurrencyTest",
+      "test_exact_authority_and_order_fences_keep_one_resolution_for_identical_or_competing_commands"
+    ],
+    [
+      "Tests\\Feature\\TestRefundResolutionConcurrencyTest",
+      "test_last_promotion_capacity_waits_for_the_same_atomic_refund_release"
+    ],
+    [
+      "Tests\\Feature\\TestRefundResolutionConcurrencyTest",
+      "test_new_scope_capacity_waits_for_the_refund_release_commit"
     ],
     [
       "Tests\\Feature\\TestUnpaidReleaseConcurrencyTest",

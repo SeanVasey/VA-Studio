@@ -36,6 +36,8 @@ const env = {
   // Synthetic inquiry setup belongs exclusively to this disposable loopback installation.
   CONTACT_INQUIRIES_ENABLED: 'true',
   VASEY_TEST_CUSTOMER_ACCOUNTS_ENABLED: 'true',
+  // Explicit original-session claims are confined to this disposable test installation.
+  VASEY_TEST_PURCHASE_CLAIMS_ENABLED: 'true',
   // Only this disposable local application captures synthetic identity messages privately.
   VASEY_TEST_CUSTOMER_IDENTITY_ENABLED: 'true',
   VASEY_TEST_CUSTOMER_IDENTITY_TRANSPORT: 'private_capture',

@@ -69,6 +69,8 @@ PHP_TARGETS = {
         "tests/Feature/TestPaymentEvidenceMigrationTest.php",
     ),
     "financial": (
+        "tests/Feature/TestRefundResolutionTest.php", "tests/Feature/TestRefundResolutionMigrationTest.php",
+        "tests/Feature/TestRefundResolutionConcurrencyTest.php", "tests/Feature/TestRefundResolutionResourceTest.php",
         "tests/Feature/TestUnpaidReleaseTest.php", "tests/Feature/TestUnpaidReleaseMigrationTest.php",
         "tests/Feature/TestUnpaidReleaseConcurrencyTest.php", "tests/Feature/TestUnpaidOrderResourceTest.php",
         "tests/Feature/TestPaymentFinancialObservationTest.php", "tests/Feature/TestPaymentExceptionOperationsTest.php",
@@ -76,6 +78,8 @@ PHP_TARGETS = {
         "tests/Feature/TestPaymentProcessingTest.php", "tests/Feature/TestOrderFinalizationTest.php",
     ),
     "customer": (
+        "tests/Feature/CustomerPurchaseClaimTest.php", "tests/Feature/CustomerPurchaseClaimMigrationTest.php",
+        "tests/Feature/CustomerPurchaseClaimConcurrencyTest.php",
         "tests/Feature/CustomerIdentityTest.php", "tests/Feature/CustomerIdentityHttpTest.php",
         "tests/Feature/CustomerIdentityMigrationTest.php", "tests/Feature/CustomerIdentityConcurrencyTest.php",
         "tests/Feature/CustomerAccountAccessTest.php", "tests/Feature/CustomerAccountCommerceTest.php",
@@ -139,6 +143,7 @@ PHP_TARGETS = {
     ),
 }
 FRONTEND_TARGETS = (
+    "tests/frontend/customer-purchase-claim.test.tsx",
     "tests/frontend/customer-identity.test.tsx", "tests/frontend/resumable-kit-upload.test.ts",
     "tests/frontend/inquiry-conversation.test.tsx",
     "tests/frontend/customer-account.test.tsx",
@@ -159,6 +164,7 @@ FRONTEND_TARGETS = (
     "tests/frontend/resumable-media-upload.test.ts",
 )
 BROWSER_TARGETS = (
+    "tests/browser/customer-purchase-claim.spec.ts", "tests/browser/test-refunded-exception-resolution.spec.ts",
     "tests/browser/customer-identity.spec.ts", "tests/browser/resumable-kit-upload.spec.ts",
     "tests/browser/test-unpaid-release.spec.ts",
     "tests/browser/inquiry-conversation.spec.ts",
