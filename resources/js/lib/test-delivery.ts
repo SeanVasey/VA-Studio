@@ -59,13 +59,25 @@ export function validAuthorization(value: unknown, item: DeliveryItem): value is
 }
 
 /** Bound both the bytes read and the parsed shape; never display a response body. */
-export async function deliveryJson(response: Response): Promise<unknown> {
+export async function deliveryJson(response: Response, signal?: AbortSignal): Promise<unknown> {
   const reader = response.body?.getReader();
   if (!reader) throw new Error('Delivery response unavailable');
   const chunks: Uint8Array[] = []; let size = 0;
+  let cancelRequested = false;
+  const cancel = () => {
+    if (cancelRequested) return;
+    cancelRequested = true; void reader.cancel().catch(() => {});
+  };
+  let abort!: () => void;
+  const interrupted = signal ? new Promise<never>((_resolve, reject) => {
+    abort = () => { cancel(); reject(new Error('Delivery response interrupted')); };
+    signal.addEventListener('abort', abort, { once: true });
+  }) : null;
   try {
+    if (signal?.aborted) throw new Error('Delivery response interrupted');
     while (true) {
-      const result = await reader.read();
+      const result = await (interrupted ? Promise.race([reader.read(), interrupted]) : reader.read());
+      if (signal?.aborted) throw new Error('Delivery response interrupted');
       if (result.done) break;
       size += result.value.byteLength;
       if (size > 128 * 1024) throw new Error('Delivery response too large');
@@ -74,7 +86,13 @@ export async function deliveryJson(response: Response): Promise<unknown> {
     const bytes = new Uint8Array(size); let offset = 0;
     for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
     return JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes));
-  } finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
+  } finally {
+    if (signal) {
+      signal.removeEventListener('abort', abort);
+      // Cancel promptly, but an uncooperative source must not retain the UI or reader lock.
+      cancel(); reader.releaseLock();
+    } else { await reader.cancel().catch(() => {}); reader.releaseLock(); }
+  }
 }
 
 const failures = {

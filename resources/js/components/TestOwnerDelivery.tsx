@@ -17,24 +17,47 @@ function Delivery({ orderId }: Props) {
   const active = useRef(false), inFlight = useRef(false);
   const operation = useRef<Operation | null>(null);
   const requestController = useRef<AbortController | null>(null);
+  const requestGeneration = useRef(0), deadline = useRef<number | null>(null);
   const frames = useRef<HTMLIFrameElement[]>([]);
   const responseGeneration = useRef(0);
   const base = `/orders/${encodeURIComponent(orderId)}/delivery`;
 
+  function stopDeadline() { if (deadline.current !== null) window.clearTimeout(deadline.current); deadline.current = null; }
+  function cancelRequest() {
+    stopDeadline(); ++requestGeneration.current; requestController.current?.abort(); requestController.current = null; inFlight.current = false;
+  }
+  function beginRequest(onTimeout: () => void) {
+    const current = ++requestGeneration.current, controller = new AbortController(); requestController.current = controller;
+    inFlight.current = true; setBusy(true);
+    const ownsRequest = () => active.current && requestGeneration.current === current && requestController.current === controller;
+    const timer = window.setTimeout(() => {
+      if (!ownsRequest()) return;
+      cancelRequest(); setBusy(false); onTimeout();
+    }, 20_000);
+    deadline.current = timer;
+    const finish = () => {
+      if (!ownsRequest()) return;
+      if (deadline.current === timer) stopDeadline();
+      requestController.current = null; inFlight.current = false; setBusy(false);
+    };
+    return { controller, ownsRequest, finish };
+  }
+
   async function refresh() {
     if (inFlight.current) return;
-    inFlight.current = true; setBusy(true); setMessage('');
-    const controller = new AbortController(); requestController.current = controller;
+    setMessage('');
+    const failed = () => { setListing(null); setNotice(''); setMessage('The test download status could not be loaded. Refresh to try again.'); };
+    const { controller, ownsRequest, finish } = beginRequest(failed);
     try {
       const response = await fetch(base, { method: 'GET', credentials: 'same-origin', cache: 'no-store', signal: controller.signal, headers: { Accept: 'application/json' } });
-      const body = await deliveryJson(response);
-      if (!active.current || controller.signal.aborted) return;
+      const body = await deliveryJson(response, controller.signal);
+      if (!ownsRequest() || controller.signal.aborted) return;
       if (!response.ok) { setListing(null); setMessage(deliveryFailure(body, response.status) ?? 'The test download status could not be loaded. Refresh to try again.'); return; }
       if (!body || typeof body !== 'object' || !('delivery' in body) || !validDelivery(body.delivery, orderId)) throw new Error('Invalid delivery status');
       setListing(body.delivery);
     } catch {
-      if (active.current && !controller.signal.aborted) { setListing(null); setMessage('The test download status could not be loaded. Refresh to try again.'); }
-    } finally { if (requestController.current === controller) { inFlight.current = false; if (active.current) setBusy(false); } }
+      if (ownsRequest() && !controller.signal.aborted) failed();
+    } finally { finish(); }
   }
 
   function submitAttachment(authorizationId: string, token: string, csrf: string) {
@@ -75,15 +98,16 @@ function Delivery({ orderId }: Props) {
     if (!retry) operation.current = { key: crypto.randomUUID(), item };
     const current = operation.current;
     if (!current) return;
-    inFlight.current = true; responseGeneration.current += 1; setBusy(true); setMessage(''); setNotice('');
-    const controller = new AbortController(); requestController.current = controller;
+    responseGeneration.current += 1; setMessage(''); setNotice('');
+    const unconfirmed = () => { setUncertain(true); setMessage(unknownIssue); };
+    const { controller, ownsRequest, finish } = beginRequest(unconfirmed);
     try {
       const response = await fetch(`${base}/authorizations`, { method: 'POST', credentials: 'same-origin', cache: 'no-store', signal: controller.signal,
         headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Idempotency-Key': current.key },
         body: JSON.stringify({ grantId: current.item.grantId, kind: current.item.kind }),
       });
-      const body = await deliveryJson(response);
-      if (!active.current || controller.signal.aborted) return;
+      const body = await deliveryJson(response, controller.signal);
+      if (!ownsRequest() || controller.signal.aborted) return;
       if (response.status !== 201) {
         const failure = deliveryFailure(body, response.status);
         if (!failure || response.status === 503) throw new Error('Unconfirmed authorization');
@@ -95,15 +119,22 @@ function Delivery({ orderId }: Props) {
       submitAttachment(authorization.authorizationId, authorization.token, csrf);
       operation.current = null; setUncertain(false); setLastItem(current.item); setNotice(submitted);
     } catch {
-      if (active.current && !controller.signal.aborted) { setUncertain(true); setMessage(unknownIssue); }
-    } finally { if (requestController.current === controller) { inFlight.current = false; if (active.current) setBusy(false); } }
+      if (ownsRequest() && !controller.signal.aborted) unconfirmed();
+    } finally { finish(); }
   }
 
   useEffect(() => {
+    const dispose = () => {
+      cancelRequest(); ++responseGeneration.current; operation.current = null;
+      for (const frame of frames.current) frame.remove(); frames.current = [];
+    };
+    const depart = () => {
+      dispose(); setListing(null); setBusy(false); setMessage(''); setNotice(''); setUncertain(false); setLastItem(null);
+    };
+    window.addEventListener('pagehide', depart);
     active.current = true; void refresh();
     return () => {
-      active.current = false; requestController.current?.abort(); inFlight.current = false; operation.current = null;
-      for (const frame of frames.current) frame.remove(); frames.current = [];
+      active.current = false; dispose(); window.removeEventListener('pagehide', depart);
     };
   }, []);
 
