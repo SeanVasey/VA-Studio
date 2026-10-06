@@ -146,7 +146,7 @@ describe('original test-order items panel', () => {
   it.each(['history', 'reference'])('shares the lazy panel through the %s path and discards it immediately on sign-out', async path => {
     const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(async input => {
       const url = String(input);
-      if (url === '/orders/history') return json({ history: { orderHistorySchema: 1, testOnly: true, orders: [summary], limit: 20, nextCursor: null } });
+      if (url === '/orders/history') return json({ history: { orderHistorySchema: 2, testOnly: true, orders: [summary], previews: [{ orderId: summary.id, itemCount: 1, firstItem: { title: 'Original track', licenseName: 'Original license', licenseVersion: 1 } }], limit: 20, nextCursor: null } });
       if (url.endsWith('/status')) return json({ order: { ...summary, orderSchema: 1, quoteId: id(91), pricingId: id(92), reviewHash: 'a'.repeat(64) } });
       if (url.endsWith('/items')) return json({ items: items() });
       return json({}, 503);

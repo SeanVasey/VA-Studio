@@ -182,6 +182,8 @@ class CustomerOrderItemsTest extends TestCase
                 $this->assertSame(4294967294, $line['totalMinor']);
             }
             $this->assertLessThan(64 * 1024, strlen($response->getContent()));
+            $this->getJson('/orders/history')->assertOk()->assertJsonPath('history.previews.0.itemCount', 10)
+                ->assertJsonPath('history.previews.0.firstItem.title', $label)->assertJsonPath('history.previews.0.firstItem.licenseName', $label);
         });
     }
 
@@ -192,6 +194,7 @@ class CustomerOrderItemsTest extends TestCase
         $order = $this->prepareFor($customer, $selection['items']);
         $this->login($customer);
         $original = $this->getJson('/orders/'.$order->public_id.'/items')->assertOk()->json();
+        $history = $this->getJson('/orders/history')->assertOk()->json();
         $track = app(PublishTrack::class)->unpublish($selection['track'], $selection['actor']);
         app(SaveTrackMetadata::class)->handle($track, ['title' => 'LATER CATALOG TITLE', 'metadata_version' => $track->metadata_version], $selection['actor']);
         // Publish a different template at version 2 through the actual review lifecycle.
@@ -214,10 +217,12 @@ class CustomerOrderItemsTest extends TestCase
         $this->travelTo($order->attempt()->sole()->expires_at->addDay());
         config(['commerce.test_order_policy' => null, 'commerce.test_pricing_policy' => null, 'commerce.test_inventory_policy' => null]);
 
-        $this->assertReadOnly(function () use ($order, $original): void {
+        $this->assertReadOnly(function () use ($order, $original, $history): void {
             $this->getJson('/orders/'.$order->public_id.'/items')->assertOk()->assertExactJson($original)
                 ->assertDontSee('LATER CATALOG TITLE', false)->assertDontSee('LATER LICENSE NAME', false)
                 ->assertDontSee('LATER SYNTHETIC LICENSE TERMS.', false);
+            $this->getJson('/orders/history')->assertOk()->assertExactJson($history)
+                ->assertDontSee('LATER CATALOG TITLE', false)->assertDontSee('LATER LICENSE NAME', false);
         });
     }
 

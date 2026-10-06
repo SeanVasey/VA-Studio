@@ -142,7 +142,35 @@ final class ReadOrder
     /** Projection only, after the caller has checked ownership. */
     public function present(Order $order): array
     {
+        return $this->projection($order, $this->verify($order));
+    }
+
+    /** One authorized, verified original supplies both the summary and its first-line preview. */
+    public function historyEntry(Order $order): array
+    {
         $payload = $this->verify($order);
+        $lines = $payload['lines'];
+        if (! array_is_list($lines) || count($lines) < 1 || count($lines) > 10 || $lines[0]['position'] !== 0) {
+            throw new QuoteException('ORDER_CHANGED', 409);
+        }
+        $title = $lines[0]['selection']['offer_snapshot']['product']['title'];
+        $name = $lines[0]['disclosure']['name'];
+        $version = $lines[0]['disclosure']['version'];
+        foreach ([$title, $name] as $text) {
+            if (! is_string($text) || $text === '' || ! mb_check_encoding($text, 'UTF-8') || mb_strlen($text, 'UTF-8') > 255) {
+                throw new QuoteException('ORDER_CHANGED', 409);
+            }
+        }
+        if (! is_int($version) || $version < 1) { throw new QuoteException('ORDER_CHANGED', 409); }
+
+        return ['order' => $this->projection($order, $payload), 'preview' => [
+            'orderId' => $order->public_id, 'itemCount' => count($lines),
+            'firstItem' => ['title' => $title, 'licenseName' => $name, 'licenseVersion' => $version],
+        ]];
+    }
+
+    private function projection(Order $order, #[SensitiveParameter] array $payload): array
+    {
 
         return ['orderSchema' => 1, 'id' => $order->public_id, 'quoteId' => $payload['quote']['public_id'],
             'pricingId' => $payload['pricing']['public_id'], 'reviewHash' => $payload['review']['reviewHash'],
