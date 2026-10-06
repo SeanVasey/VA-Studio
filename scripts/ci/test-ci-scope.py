@@ -287,6 +287,24 @@ class BrowserWorkflowTests(unittest.TestCase):
         self.assertIn("APP_ENV: 'local'", wrapper)
         self.assertIn("MEDIA_CLAMSCAN: join(directory, 'no-clamscan')", wrapper)
 
+    def test_related_browser_build_precedes_real_startup_and_browser_checks(self):
+        for workflow, pattern in (
+            (".github/workflows/ci.yml", r"(?ms)^  related-browser:\n(.*?)(?=^  [\w-]+:\n|\Z)"),
+            (".gitlab-ci.yml", r"(?ms)^related-browser:\n(.*?)(?=^[\w-]+:\n|\Z)"),
+        ):
+            with self.subTest(workflow=workflow):
+                job = re.search(pattern, (self.root / workflow).read_text())
+                self.assertIsNotNone(job)
+                source = job.group(1)
+                commands = ["npm ci", "npm run build", "python3 scripts/ci/test-related-browser-stage.py",
+                            "npx playwright install --with-deps chromium webkit", "node tests/browser/run-related.mjs"]
+                for command in commands:
+                    self.assertEqual(1, source.count(command))
+                # The real positive bootstrap invokes vasey:doctor, whose required
+                # frontend_build diagnostic validates the manifest and built files.
+                positions = [source.index(command) for command in commands]
+                self.assertEqual(sorted(positions), positions)
+
     def test_each_engine_retains_failure_evidence_without_run_or_attempt_collisions(self):
         job = self.operator_job()
         upload = re.search(r"(?ms)^      - name: [^\n]+\n        if: always\(\)\n        uses: actions/upload-artifact@[^\n]+\n        with:\n(.*?)(?=^      - |\Z)", job)

@@ -1,0 +1,11 @@
+# Related startup build prerequisite
+
+Foundation CI run `37410220669`, related-browser job `112096843744`, failed the startup safeguard step after installing ClamAV 1.5.4 and current official signatures. Nine safeguards ran in 9.460 seconds; the ordinary absent-marker case, ordinary empty-marker case and valid related-stage case failed. Build, browser installation and native related journeys were not reached.
+
+Each positive case invokes the real shared bootstrap, which requires `vasey:doctor` to pass. Its `frontend_build` diagnostic validates the frontend manifest and every referenced built file. Both GitHub and GitLab had scheduled those checks before `npm run build`.
+
+An independent native PHP reproduction used a disposable archive of reviewed source `dcf26710347794e7bb14c020b32855c3a664b6f1` (tree `86584c422341d8f03ac885d59916aba8faf34521`), physical Composer dependencies and the exact `BrowserBootstrapFixtures.bootstrap('1', 'a' * 64, accounts=False)` helper. Without a frontend build, it exited 1 in 1.119 seconds; `frontend_build` was the only required diagnostic failure. After copying the actual built frontend, a second fresh guarded bootstrap exited 0 in 1.110 seconds with empty stderr, the fixed success receipt, four tracks, two users and zero customer accounts, orders, grants, media assets, license versions and rights declarations. No source or production diagnostic changed.
+
+The correction moves the existing build command before the existing startup safeguards in both related-browser jobs. Every command, browser selection, assertion, artifact setting and timeout remains. A CI ordering regression checks both providers' dependency sequence. This is startup prerequisite evidence, not genuine scanner or browser-render acceptance; those hosted gates remain required.
+
+Local verification: `python3 scripts/ci/test-ci-scope.py` passed all 27 cases, and `python3 scripts/ci/test-related-browser-stage.py RelatedBrowserStageSafeguards` passed all six existing safety cases. The new ordering regression rejects both original provider configurations with two expected failures and no errors or skips. `git diff --check` passed. The complete nine-case native startup suite requires hosted ClamAV; it is retained unchanged.
