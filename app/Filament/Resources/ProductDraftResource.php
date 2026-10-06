@@ -115,6 +115,46 @@ class ProductDraftResource extends OperatorResource
                         return array_intersect_key($snapshot, array_flip(['kind', 'title', 'description', 'track_ids', 'version']));
                     })
                     ->using(fn (ProductDraft $record, array $data, ManageProductDrafts $livewire): ProductDraft => static::saveDraft($record, $data, $livewire)),
+                Action::make('refreshMembers')->label('Refresh track snapshots')->modalHeading('Review descriptive track snapshots')
+                    ->extraModalWindowAttributes(TrackResource::metadataModalAttributes())
+                    ->modalDescription('Refresh descriptive track snapshots only. The draft title, description and track order stay as saved. This does not assess product readiness, set a price or license, or publish a product. Earlier versions remain unchanged.')
+                    ->modalSubmitActionLabel('Confirm reviewed snapshots')
+                    ->schema([
+                        Textarea::make('changes')->label('Changes in this review')->rows(5)->readOnly()->dehydrated(false),
+                        Textarea::make('saved_members')->label('Saved track snapshots')->rows(12)->readOnly()->dehydrated(false),
+                        Textarea::make('current_members')->label('Current track snapshots')->rows(12)->readOnly()->dehydrated(false)
+                            ->helperText('Revision numbers identify descriptive snapshots; they do not indicate publication readiness. If a track or draft changes, close and reopen this review.'),
+                    ])
+                    ->mountUsing(function (ProductDraft $record, ManageProductDrafts $livewire, ?Schema $schema = null): void {
+                        $review = app(ProductDrafts::class)->reviewMembers($record->id, static::actor());
+                        $schema?->fill([
+                            'changes' => static::memberChangesText($review),
+                            'saved_members' => static::memberSnapshotsText($review, 'saved'),
+                            'current_members' => static::memberSnapshotsText($review, 'current'),
+                        ]);
+                        $livewire->memberRefreshProductId = $review['id'];
+                        $livewire->memberRefreshVersion = $review['version'];
+                        $livewire->memberRefreshHash = $review['review_hash'];
+                    })
+                    ->action(function (ProductDraft $record, ManageProductDrafts $livewire, Action $action): void {
+                        try {
+                            $actor = static::actor();
+                            abort_unless($livewire->memberRefreshProductId === $record->id
+                                && $livewire->memberRefreshVersion !== null && $livewire->memberRefreshVersion > 0
+                                && is_string($livewire->memberRefreshHash)
+                                && preg_match('/\A[a-f0-9]{64}\z/D', $livewire->memberRefreshHash), 409);
+                            $refreshed = app(ProductDrafts::class)->refreshMembers($record, $livewire->memberRefreshVersion, $livewire->memberRefreshHash, $actor);
+                            Notification::make()->success()->title($refreshed->version === $livewire->memberRefreshVersion
+                                ? 'Track snapshots are already current'
+                                : 'Track snapshots saved as a new draft version')->send();
+                        } catch (ValidationException $exception) {
+                            Notification::make()->danger()->title('Track snapshots could not be refreshed')
+                                ->body(implode(' ', array_merge(...array_values($exception->errors()))))->persistent()->send();
+                            $action->cancel();
+                        } finally {
+                            $livewire->clearMemberRefresh();
+                        }
+                    }),
                 Action::make('history')->label('Version history')->modalHeading('Draft version history')
                     ->extraModalWindowAttributes(TrackResource::metadataModalAttributes())
                     ->schema([
@@ -182,6 +222,35 @@ class ProductDraftResource extends OperatorResource
         }
         if (isset($version['created_at'])) {
             $lines[] = 'Saved: '.$version['created_at'];
+        }
+
+        return implode("\n", $lines);
+    }
+
+    public static function memberSnapshotsText(array $review, string $side): string
+    {
+        $lines = ['Draft version '.$review['version'].' — '.$review['title'], $review['description'], 'Track order:'];
+        foreach ($review['members'] as $member) {
+            $snapshot = $member[$side];
+            $lines[] = $member['position'].'. '.$snapshot['title'].' (track #'.$member['track_id'].')';
+            $lines[] = 'Metadata revision '.$snapshot['metadata_version'].'; publication revision '.$snapshot['publication_version'];
+        }
+
+        return implode("\n", $lines);
+    }
+
+    public static function memberChangesText(array $review): string
+    {
+        if ($review['changed_count'] === 0) {
+            return 'All track snapshots are current. Confirming this review will not add a draft version.';
+        }
+        $labels = ['title' => 'title', 'metadata_version' => 'metadata revision', 'publication_version' => 'publication revision'];
+        $lines = [$review['changed_count'].' of '.count($review['members']).' track snapshots changed.'];
+        foreach ($review['members'] as $member) {
+            if ($member['changed_fields'] !== []) {
+                $lines[] = $member['position'].'. Track #'.$member['track_id'].': '
+                    .implode(', ', array_map(fn (string $field): string => $labels[$field], $member['changed_fields']));
+            }
         }
 
         return implode("\n", $lines);

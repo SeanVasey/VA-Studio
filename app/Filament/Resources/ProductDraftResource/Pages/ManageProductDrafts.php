@@ -21,6 +21,15 @@ class ManageProductDrafts extends ManageRecords
     #[Locked]
     public array $retainedVersions = [];
 
+    #[Locked]
+    public ?int $memberRefreshProductId = null;
+
+    #[Locked]
+    public ?int $memberRefreshVersion = null;
+
+    #[Locked]
+    public ?string $memberRefreshHash = null;
+
     public function boot(): void
     {
         ProductDraftResource::actor();
@@ -33,17 +42,49 @@ class ManageProductDrafts extends ManageRecords
         $this->retainedVersions = [];
     }
 
+    public function clearMemberRefresh(): void
+    {
+        $this->memberRefreshProductId = null;
+        $this->memberRefreshVersion = null;
+        $this->memberRefreshHash = null;
+    }
+
     public function mountAction(string $name, array $arguments = [], array $context = []): mixed
     {
         $this->clearVersionSelection();
+        $this->clearMemberRefresh();
 
-        return parent::mountAction($name, $arguments, $context);
+        try {
+            return parent::mountAction($name, $arguments, $context);
+        } catch (\Throwable $exception) {
+            $this->clearMemberRefresh();
+
+            throw $exception;
+        }
     }
 
     public function unmountAction(bool|string|null $cancelParentActions = null): void
     {
         $this->clearVersionSelection();
+        $this->clearMemberRefresh();
         parent::unmountAction($cancelParentActions);
+    }
+
+    public function updating(string $property, mixed $value): void
+    {
+        if (explode('.', $property)[0] === 'mountedActions'
+            && ! preg_match('/\AmountedActions\.[0-9]+\.data(?:\.|\z)/D', $property)) {
+            $this->clearMemberRefresh();
+        }
+    }
+
+    public function callMountedAction(array $arguments = []): mixed
+    {
+        try {
+            return parent::callMountedAction($arguments);
+        } finally {
+            $this->clearMemberRefresh();
+        }
     }
 
     protected function getHeaderActions(): array
