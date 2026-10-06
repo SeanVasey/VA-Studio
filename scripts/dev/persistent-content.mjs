@@ -33,7 +33,7 @@ export function canonicalPath(path, { missingLeaf = false } = {}) {
 }
 
 function owned(stat) {
-  return typeof process.getuid !== 'function' || String(stat.uid) === String(process.getuid());
+  return typeof process.getuid === 'function' && String(stat.uid) === String(process.getuid());
 }
 
 export function safeAncestors(directory) {
