@@ -1,5 +1,9 @@
 import { test, expect } from '@playwright/test';
 
+// page.route owns this synthetic transport; service-worker fetches bypass it.
+// The separate public-offline journey exercises the real worker in both engines.
+test.use({ serviceWorkers: 'block' });
+
 // Synthetic page/provider transport; native DOM, keyboard and iframe requests remain real.
 // This proves the consent boundary, not third-party playback availability or publication authorization.
 for (const provider of ['youtube', 'vimeo'] as const) {

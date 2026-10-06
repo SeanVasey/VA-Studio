@@ -1,6 +1,10 @@
 import { test, expect } from '@playwright/test';
 import { query, storefrontFixture } from './storefront-fixture';
 
+// Preserve the synthetic document transport across reloads. A real worker fetch
+// bypasses page.route and refreshes server cookies; offline coverage owns that worker.
+test.use({ serviceWorkers: 'block' });
+
 /** Built React and native sessionStorage/keyboard behavior with synthetic HTTP responses.
  * PHP feature tests independently prove the real server's owner and frozen-evidence boundary.
  */
