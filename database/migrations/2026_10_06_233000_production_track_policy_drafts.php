@@ -46,7 +46,8 @@ return new class extends Migration
 
         $revision = DB::getDriverName() === 'sqlite' ? "TYPEOF(NEW.revision) = 'integer' AND " : '';
         $this->guard('production_policy_draft_insert', 'production_track_policy_drafts', 'insert',
-            $revision.'NEW.revision = 0 AND LENGTH(NEW.public_id) = 36 AND NEW.created_at = NEW.updated_at');
+            $revision.'NEW.revision = 0 AND LENGTH(NEW.public_id) = 36 AND NEW.created_at = NEW.updated_at'
+            .' AND NOT EXISTS (SELECT 1 FROM production_track_policy_drafts d WHERE d.id = NEW.id OR d.public_id = NEW.public_id)');
         $same = implode(' AND ', array_map(fn (string $field): string => $this->same('NEW.'.$field, 'OLD.'.$field), ['id', 'public_id', 'created_by', 'created_at']));
         $this->guard('production_policy_draft_update', 'production_track_policy_drafts', 'update', $same.' AND '.$revision
             .'NEW.revision = OLD.revision + 1 AND NEW.revision <= 2147483647 AND NEW.updated_at >= OLD.updated_at'
@@ -56,11 +57,15 @@ return new class extends Migration
         $this->guard('production_policy_version_insert', 'production_track_policy_versions', 'insert', $number
             .'NEW.number > 0 AND NEW.number <= 2147483647 AND NEW.schema_version = 1 AND '.$this->hash('payload_hash')
             ." AND NEW.canonicalization_version = 'vasey-json-v1' AND LENGTH(NEW.payload_ciphertext) BETWEEN 1 AND 131072"
+            .' AND NOT EXISTS (SELECT 1 FROM production_track_policy_versions v WHERE v.id = NEW.id'
+            .' OR (v.production_track_policy_draft_id = NEW.production_track_policy_draft_id AND v.number = NEW.number))'
             .' AND EXISTS (SELECT 1 FROM production_track_policy_drafts d WHERE d.id = NEW.production_track_policy_draft_id'
             .' AND d.revision = NEW.number - 1 AND NEW.created_at >= d.created_at)');
         $this->guard('production_policy_source_review_insert', 'production_track_policy_source_reviews', 'insert',
             $this->hash('review_hash').' AND '.$this->hash('version_evidence_hash')
             ." AND NEW.canonicalization_version = 'vasey-json-v1' AND LENGTH(NEW.review_ciphertext) BETWEEN 1 AND 131072"
+            .' AND NOT EXISTS (SELECT 1 FROM production_track_policy_source_reviews r WHERE r.id = NEW.id'
+            .' OR r.production_track_policy_version_id = NEW.production_track_policy_version_id)'
             .' AND EXISTS (SELECT 1 FROM production_track_policy_versions v JOIN production_track_policy_drafts d ON d.id = v.production_track_policy_draft_id'
             .' WHERE v.id = NEW.production_track_policy_version_id AND d.revision = v.number AND v.payload_hash = NEW.version_evidence_hash'
             .' AND d.created_by <> NEW.reviewed_by AND NEW.created_at >= v.created_at'

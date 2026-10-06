@@ -96,11 +96,13 @@ final class ProductionTrackPolicyAuthoring
     public function prepareSourceReview(ProductionTrackPolicyVersion $version, User $actor): array
     {
         return $this->transaction($actor, function (User $current, array $actorRow) use ($version): array {
-            $row = DB::table(self::VERSIONS)->where('id', $version->getKey())->first();
-            if ($row === null) {
+            // An immutable parent hint locates the fence; it is not trusted evidence.
+            // Avoid establishing a repeatable-read snapshot before waiting on the parent.
+            $parentId = $version->getAttribute('production_track_policy_draft_id');
+            if (! is_int($parentId) || $parentId < 1) {
                 ProductionTrackPolicyDraft::reject();
             }
-            $snapshot = $this->lockSnapshot($row->production_track_policy_draft_id);
+            $snapshot = $this->lockSnapshot($parentId);
             $this->independent($snapshot, $current);
             $latest = end($snapshot['versions']);
             if ($latest['id'] !== $version->getKey() || $snapshot['reviews'] !== []) {
@@ -122,10 +124,8 @@ final class ProductionTrackPolicyAuthoring
     {
         return $this->transaction($actor, function (User $current, array $actorRow) use ($review, $reference): ProductionTrackPolicySourceReview {
             $this->verifyReview($review, $current, 'review_production_track_policy_source');
-            if (! ProductionTrackPolicyDraft::keys($reference, ['reference', 'source_sha256', 'authored_source_acknowledged'])
-                || ! ProductionTrackPolicyDraft::text($reference['reference'], 512) || ! is_string($reference['source_sha256'])
-                || preg_match('/\A[a-f0-9]{64}\z/D', $reference['source_sha256']) !== 1 || $reference['authored_source_acknowledged'] !== true
-                || $review['draft_id'] === null || $review['after'] !== null) {
+            $this->validateReference($reference);
+            if ($review['draft_id'] === null || $review['after'] !== null) {
                 ProductionTrackPolicyDraft::reject();
             }
             $snapshot = $this->lockSnapshot($review['draft_id']);
@@ -182,7 +182,8 @@ final class ProductionTrackPolicyAuthoring
         if (! AdminMultiFactor::satisfiedBy($current, lockForUpdate: true)) {
             throw new AuthorizationException;
         }
-        $raw = (array) DB::table('users')->where('id', $current->id)->first();
+        // Keep every authority read current and locking until resource fences are held.
+        $raw = (array) DB::table('users')->where('id', $current->id)->lockForUpdate()->first();
         if (CanonicalJson::encode($raw) !== CanonicalJson::encode($current->getAttributes())) {
             throw new AuthorizationException;
         }
@@ -195,19 +196,22 @@ final class ProductionTrackPolicyAuthoring
         if (! is_int($id) || $id < 1 || DB::table(self::DRAFTS)->where('id', $id)->lockForUpdate()->first() === null) {
             ProductionTrackPolicyDraft::reject();
         }
-        DB::table(self::VERSIONS)->where('production_track_policy_draft_id', $id)->orderBy('id')->lockForUpdate()->get();
+        DB::table(self::VERSIONS)->where('production_track_policy_draft_id', $id)->orderBy('id')->limit(257)->lockForUpdate()->get();
 
         return $this->snapshot($id);
     }
 
     private function snapshot(int $id): array
     {
-        $draft = (array) DB::table(self::DRAFTS)->where('id', $id)->first();
-        $versions = DB::table(self::VERSIONS)->where('production_track_policy_draft_id', $id)->orderBy('id')->limit(257)->get()->map(fn ($row): array => (array) $row)->all();
-        $reviews = DB::table(self::REVIEWS)->whereIn('production_track_policy_version_id', array_column($versions, 'id'))->orderBy('id')->limit(257)->get()->map(fn ($row): array => (array) $row)->all();
-        $audits = AuditEvent::query()->where('subject_type', PolicyDraftModel::class)->where('subject_id', $id)->orderBy('id')->limit(513)->get()
+        // A retrieval callback may already have opened a consistent snapshot before
+        // the parent fence. Every semantic read must therefore be a current read.
+        $draft = (array) DB::table(self::DRAFTS)->where('id', $id)->lockForUpdate()->first();
+        $versions = DB::table(self::VERSIONS)->where('production_track_policy_draft_id', $id)->orderBy('id')->limit(257)->lockForUpdate()->get()->map(fn ($row): array => (array) $row)->all();
+        $reviews = DB::table(self::REVIEWS)->whereIn('production_track_policy_version_id', array_column($versions, 'id'))->orderBy('id')->limit(257)->lockForUpdate()->get()->map(fn ($row): array => (array) $row)->all();
+        $audits = AuditEvent::query()->where('subject_type', PolicyDraftModel::class)->where('subject_id', $id)->orderBy('id')->limit(513)->lockForUpdate()->get()
             ->map(fn (AuditEvent $row): array => $this->auditRow($row->getAttributes()))->all();
-        if ($draft === [] || count($versions) !== $draft['revision'] || count($versions) > 256 || count($reviews) > 256 || count($audits) > 512) {
+        if ($draft === [] || ! is_int($draft['revision']) || $draft['revision'] < 1 || count($versions) !== $draft['revision']
+            || count($versions) > 256 || count($reviews) > 256 || count($audits) > 512) {
             ProductionTrackPolicyDraft::reject();
         }
         foreach ($versions as $position => $version) {
@@ -215,6 +219,9 @@ final class ProductionTrackPolicyAuthoring
                 ProductionTrackPolicyDraft::reject();
             }
             $this->authored($version);
+        }
+        foreach ($reviews as $review) {
+            $this->validateAcknowledgment($review, $versions, $draft);
         }
 
         return ['draft' => $draft, 'versions' => $versions, 'reviews' => $reviews, 'audits' => $audits];
@@ -253,6 +260,46 @@ final class ProductionTrackPolicyAuthoring
     {
         if ($snapshot['draft']['created_by'] === $actor->id || in_array($actor->id, array_column($snapshot['versions'], 'created_by'), true)) {
             throw new AuthorizationException;
+        }
+    }
+
+    private function validateReference(array $reference): void
+    {
+        if (! ProductionTrackPolicyDraft::keys($reference, ['reference', 'source_sha256', 'authored_source_acknowledged'])
+            || ! ProductionTrackPolicyDraft::text($reference['reference'], 512) || ! is_string($reference['source_sha256'])
+            || preg_match('/\A[a-f0-9]{64}\z/D', $reference['source_sha256']) !== 1 || $reference['authored_source_acknowledged'] !== true
+            || preg_match('/(?:sk|rk)_(?:test|live)_[A-Za-z0-9]|whsec_[A-Za-z0-9]/', $reference['reference'])) {
+            ProductionTrackPolicyDraft::reject();
+        }
+    }
+
+    private function validateAcknowledgment(array $review, array $versions, array $draft): void
+    {
+        try {
+            $matches = array_values(array_filter($versions, fn (array $version): bool => $version['id'] === $review['production_track_policy_version_id']));
+            if (count($matches) !== 1 || $review['canonicalization_version'] !== CanonicalJson::VERSION
+                || strlen($review['review_ciphertext']) > 131072 || ! hash_equals($review['review_hash'], hash('sha256', $review['review_ciphertext']))
+                || $review['version_evidence_hash'] !== $matches[0]['payload_hash'] || $review['reviewed_by'] === $draft['created_by']) {
+                ProductionTrackPolicyDraft::reject();
+            }
+            $version = $matches[0];
+            foreach ($versions as $authored) {
+                if ($authored['number'] <= $version['number'] && $authored['created_by'] === $review['reviewed_by']) {
+                    ProductionTrackPolicyDraft::reject();
+                }
+            }
+            $canonical = Crypt::decryptString($review['review_ciphertext']);
+            $value = strlen($canonical) <= 8192 ? json_decode($canonical, true, 8, JSON_THROW_ON_ERROR) : null;
+            if (! is_array($value) || CanonicalJson::encode($value) !== $canonical
+                || ! ProductionTrackPolicyDraft::keys($value, ['schema_version', 'purpose', 'reference', 'version_id', 'version_evidence_hash', 'external_facts_verified', 'activation_allowed'])
+                || $value['schema_version'] !== 1 || $value['purpose'] !== 'authored_production_policy_source_acknowledgment'
+                || $value['version_id'] !== $version['id'] || $value['version_evidence_hash'] !== $version['payload_hash']
+                || $value['external_facts_verified'] !== false || $value['activation_allowed'] !== false || ! is_array($value['reference'])) {
+                ProductionTrackPolicyDraft::reject();
+            }
+            $this->validateReference($value['reference']);
+        } catch (Throwable) {
+            ProductionTrackPolicyDraft::reject();
         }
     }
 
@@ -300,16 +347,16 @@ final class ProductionTrackPolicyAuthoring
         if ($expected !== null) {
             $id = $expected['draft']['id'];
             $actual = [
-                'draft' => (array) DB::table(self::DRAFTS)->where('id', $id)->first(),
-                'versions' => DB::table(self::VERSIONS)->where('production_track_policy_draft_id', $id)->orderBy('id')->get()->map(fn ($row): array => (array) $row)->all(),
-                'reviews' => DB::table(self::REVIEWS)->whereIn('production_track_policy_version_id', array_column($expected['versions'], 'id'))->orderBy('id')->get()->map(fn ($row): array => (array) $row)->all(),
-                'audits' => DB::table('audit_events')->where('subject_type', PolicyDraftModel::class)->where('subject_id', $id)->orderBy('id')->get()->map(fn ($row): array => $this->auditRow((array) $row))->all(),
+                'draft' => (array) DB::table(self::DRAFTS)->where('id', $id)->lockForUpdate()->first(),
+                'versions' => DB::table(self::VERSIONS)->where('production_track_policy_draft_id', $id)->orderBy('id')->lockForUpdate()->get()->map(fn ($row): array => (array) $row)->all(),
+                'reviews' => DB::table(self::REVIEWS)->whereIn('production_track_policy_version_id', array_column($expected['versions'], 'id'))->orderBy('id')->lockForUpdate()->get()->map(fn ($row): array => (array) $row)->all(),
+                'audits' => DB::table('audit_events')->where('subject_type', PolicyDraftModel::class)->where('subject_id', $id)->orderBy('id')->lockForUpdate()->get()->map(fn ($row): array => $this->auditRow((array) $row))->all(),
             ];
             if (CanonicalJson::encode($actual) !== CanonicalJson::encode($expected)) {
                 ProductionTrackPolicyDraft::reject();
             }
         }
-        if (CanonicalJson::encode((array) DB::table('users')->where('id', $actor->id)->first()) !== CanonicalJson::encode($actorRow)) {
+        if (CanonicalJson::encode((array) DB::table('users')->where('id', $actor->id)->lockForUpdate()->first()) !== CanonicalJson::encode($actorRow)) {
             throw new AuthorizationException;
         }
     }

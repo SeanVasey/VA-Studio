@@ -374,6 +374,101 @@ class ProductionTrackPolicyDraftTest extends TestCase
             ['production_track_policy_source_reviews', 'update'], ['production_track_policy_source_reviews', 'delete']];
     }
 
+    #[DataProvider('replacementCollisions')]
+    public function test_raw_sql_replace_cannot_substitute_retained_policy_identity(string $table, string $collision): void
+    {
+        $author = LicenseFixtures::admin();
+        $reviewer = LicenseFixtures::admin();
+        $draft = ProductionTrackPolicyFixtures::create($author);
+        $version = ProductionTrackPolicyVersion::where('production_track_policy_draft_id', $draft->id)->sole();
+        app(ReviewProductionTrackPolicy::class)->applyReviewed(app(ReviewProductionTrackPolicy::class)->review($version, $reviewer), $this->reference(), $reviewer);
+        $row = (array) DB::table($table)->first();
+        if ($collision === 'unique' && $table !== 'production_track_policy_source_reviews') {
+            // A raw insert can leave the command's revision-zero parent intermediate.
+            // Even then an already inserted identity must never be replaced.
+            $parent = ['public_id' => (string) Str::uuid(), 'revision' => 0, 'created_by' => $author->id,
+                'created_at' => now()->utc()->format('Y-m-d H:i:s'), 'updated_at' => now()->utc()->format('Y-m-d H:i:s')];
+            $parent['id'] = DB::table('production_track_policy_drafts')->insertGetId($parent);
+            if ($table === 'production_track_policy_drafts') {
+                $row = $parent;
+            } else {
+                unset($row['id']);
+                $row['production_track_policy_draft_id'] = $parent['id'];
+                $row['created_at'] = $parent['created_at'];
+                $row['id'] = DB::table($table)->insertGetId($row);
+            }
+        }
+        if ($collision === 'unique') {
+            $row['id'] += 1000;
+        } elseif ($table === 'production_track_policy_drafts') {
+            $row['public_id'] = (string) Str::uuid();
+            $row['revision'] = 0;
+            $row['updated_at'] = $row['created_at'];
+        } elseif ($table === 'production_track_policy_versions') {
+            $row['number'] = 2;
+        } else {
+            app(SaveProductionTrackPolicy::class)->applyReviewed(app(PrepareProductionTrackPolicy::class)->review($draft, ProductionTrackPolicyFixtures::authored(true), $author), $author);
+            $latest = ProductionTrackPolicyVersion::where('production_track_policy_draft_id', $draft->id)->orderByDesc('number')->firstOrFail();
+            $row['production_track_policy_version_id'] = $latest->id;
+            $row['version_evidence_hash'] = $latest->payload_hash;
+            $row['created_at'] = now()->utc()->format('Y-m-d H:i:s');
+        }
+        if ($table !== 'production_track_policy_drafts') {
+            $field = $table === 'production_track_policy_versions' ? 'payload' : 'review';
+            $row[$field.'_ciphertext'] = Crypt::encryptString(CanonicalJson::encode(['replacement' => 'NONBINDING PRIVATE TEST']));
+            $row[$field.'_hash'] = hash('sha256', $row[$field.'_ciphertext']);
+        } else {
+            $row['created_by'] = $reviewer->id;
+        }
+        $recursive = null;
+        if (DB::getDriverName() === 'sqlite') {
+            $recursive = (int) DB::selectOne('PRAGMA recursive_triggers')->recursive_triggers;
+            DB::statement('PRAGMA recursive_triggers = OFF');
+            $this->assertSame(0, (int) DB::selectOne('PRAGMA recursive_triggers')->recursive_triggers);
+        }
+        $before = $this->snapshot();
+        try {
+            $columns = implode(', ', array_map(fn (string $column): string => '`'.$column.'`', array_keys($row)));
+            DB::statement('REPLACE INTO `'.$table.'` ('.$columns.') VALUES ('.implode(', ', array_fill(0, count($row), '?')).')', array_values($row));
+            $this->fail('REPLACE substituted immutable production policy identity.');
+        } catch (QueryException) {
+            $this->assertSame($before, $this->snapshot());
+        } finally {
+            if ($recursive !== null) {
+                DB::statement('PRAGMA recursive_triggers = '.$recursive);
+            }
+        }
+    }
+
+    public static function replacementCollisions(): array
+    {
+        $cases = [];
+        foreach (['production_track_policy_drafts', 'production_track_policy_versions', 'production_track_policy_source_reviews'] as $table) {
+            foreach (['id', 'unique'] as $collision) {
+                $cases[$table.' '.$collision] = [$table, $collision];
+            }
+        }
+
+        return $cases;
+    }
+
+    public function test_retained_revision_zero_without_a_version_is_refused_without_partial_repair(): void
+    {
+        $actor = LicenseFixtures::admin();
+        $row = ['public_id' => (string) Str::uuid(), 'revision' => 0, 'created_by' => $actor->id,
+            'created_at' => now()->utc()->format('Y-m-d H:i:s'), 'updated_at' => now()->utc()->format('Y-m-d H:i:s')];
+        $id = DB::table('production_track_policy_drafts')->insertGetId($row);
+        $draft = ProductionTrackPolicyDraft::findOrFail($id);
+        $before = $this->snapshot();
+        try {
+            app(PrepareProductionTrackPolicy::class)->review($draft, ProductionTrackPolicyFixtures::authored(), $actor);
+            $this->fail('Malformed retained revision-zero source was accepted.');
+        } catch (ValidationException $exception) {
+            $this->assertSame(['policy'], array_keys($exception->errors()));
+            $this->assertSame($before, $this->snapshot());
+        }
+    }
+
     public function test_populated_rollback_refuses_before_removing_any_guard_or_table(): void
     {
         ProductionTrackPolicyFixtures::create();
@@ -384,6 +479,127 @@ class ProductionTrackPolicyDraftTest extends TestCase
             $this->fail('Populated policy preparation was removed.');
         } catch (\RuntimeException) {
             $this->assertSame($before, $this->snapshot());
+        }
+    }
+
+    public function test_canonical_byte_bound_applies_after_escaping_each_individually_valid_field(): void
+    {
+        $source = ProductionTrackPolicyFixtures::authored();
+        foreach ($source['declarations'] as &$declaration) {
+            $declaration['choice'] = str_repeat('"', 512);
+            $declaration['source_reference'] = str_repeat('"', 512);
+            $declaration['note'] = str_repeat('\\', 1024);
+        }
+        unset($declaration);
+        $this->assertGreaterThan(32768, strlen(CanonicalJson::encode($source)));
+        $this->expectException(ValidationException::class);
+        \App\Domain\Commerce\Policy\ProductionTrackPolicyDraft::validateAuthored($source);
+    }
+
+    #[DataProvider('invalidReviewReferences')]
+    public function test_source_acknowledgment_requires_an_explicit_bounded_nonsecret_reference(string $path, mixed $value): void
+    {
+        $author = LicenseFixtures::admin();
+        $reviewer = LicenseFixtures::admin();
+        $draft = ProductionTrackPolicyFixtures::create($author);
+        $version = ProductionTrackPolicyVersion::where('production_track_policy_draft_id', $draft->id)->sole();
+        $capture = app(ReviewProductionTrackPolicy::class)->review($version, $reviewer);
+        $reference = $this->reference();
+        Arr::set($reference, $path, $value);
+        $before = $this->snapshot();
+        try {
+            app(ReviewProductionTrackPolicy::class)->applyReviewed($capture, $reference, $reviewer);
+            $this->fail('Invalid source acknowledgment reference was accepted.');
+        } catch (ValidationException) {
+            $this->assertSame($before, $this->snapshot());
+        }
+    }
+
+    public static function invalidReviewReferences(): array
+    {
+        return [['reference', ''], ['reference', str_repeat('r', 513)], ['reference', 'whsec_SyntheticCredential'],
+            ['source_sha256', null], ['source_sha256', str_repeat('A', 64)], ['authored_source_acknowledged', 'true'],
+            ['authored_source_acknowledged', false], ['external_facts_verified', true]];
+    }
+
+    public function test_historical_acknowledgment_survives_reviewer_later_authoring_a_successor_but_blocks_self_review(): void
+    {
+        $author = LicenseFixtures::admin();
+        $reviewer = LicenseFixtures::admin();
+        $draft = ProductionTrackPolicyFixtures::create($author);
+        $version = ProductionTrackPolicyVersion::where('production_track_policy_draft_id', $draft->id)->sole();
+        $review = app(ReviewProductionTrackPolicy::class)->review($version, $reviewer);
+        $ack = app(ReviewProductionTrackPolicy::class)->applyReviewed($review, $this->reference(), $reviewer);
+        $original = $ack->getAttributes();
+        app(SaveProductionTrackPolicy::class)->applyReviewed(app(PrepareProductionTrackPolicy::class)->review($draft, ProductionTrackPolicyFixtures::authored(true), $reviewer), $reviewer);
+        $this->assertSame(CanonicalJson::encode($original), CanonicalJson::encode($ack->fresh()->getAttributes()));
+        $latest = ProductionTrackPolicyVersion::where('production_track_policy_draft_id', $draft->id)->orderByDesc('number')->firstOrFail();
+        $this->expectException(AuthorizationException::class);
+        app(ReviewProductionTrackPolicy::class)->review($latest, $reviewer);
+    }
+
+    public function test_raw_sql_cannot_insert_original_author_as_source_reviewer(): void
+    {
+        $author = LicenseFixtures::admin();
+        $draft = ProductionTrackPolicyFixtures::create($author);
+        $version = ProductionTrackPolicyVersion::where('production_track_policy_draft_id', $draft->id)->sole();
+        $ciphertext = Crypt::encryptString('{}');
+        try {
+            DB::table('production_track_policy_source_reviews')->insert([
+                'production_track_policy_version_id' => $version->id, 'reviewed_by' => $author->id, 'version_evidence_hash' => $version->payload_hash,
+                'review_ciphertext' => $ciphertext, 'review_hash' => hash('sha256', $ciphertext), 'canonicalization_version' => CanonicalJson::VERSION,
+                'created_at' => now()->utc()->format('Y-m-d H:i:s'),
+            ]);
+            $this->fail('SQL accepted self-review.');
+        } catch (QueryException) {
+            $this->assertDatabaseCount('production_track_policy_source_reviews', 0);
+        }
+    }
+
+    public function test_retained_malformed_source_acknowledgment_is_refused_without_repair_or_source_write(): void
+    {
+        $author = LicenseFixtures::admin();
+        $reviewer = LicenseFixtures::admin();
+        $draft = ProductionTrackPolicyFixtures::create($author);
+        $version = ProductionTrackPolicyVersion::where('production_track_policy_draft_id', $draft->id)->sole();
+        $ciphertext = Crypt::encryptString(CanonicalJson::encode(['activation_allowed' => true]));
+        DB::table('production_track_policy_source_reviews')->insert([
+            'production_track_policy_version_id' => $version->id, 'reviewed_by' => $reviewer->id, 'version_evidence_hash' => $version->payload_hash,
+            'review_ciphertext' => $ciphertext, 'review_hash' => hash('sha256', $ciphertext), 'canonicalization_version' => CanonicalJson::VERSION,
+            'created_at' => now()->utc()->format('Y-m-d H:i:s'),
+        ]);
+        $before = $this->snapshot();
+        try {
+            app(PrepareProductionTrackPolicy::class)->review($draft, ProductionTrackPolicyFixtures::authored(), $author);
+            $this->fail('Malformed retained acknowledgment was treated as verified source.');
+        } catch (ValidationException) {
+            $this->assertSame($before, $this->snapshot());
+        }
+    }
+
+    public function test_late_audit_callback_cannot_append_an_unreviewed_policy_successor(): void
+    {
+        $actor = LicenseFixtures::admin();
+        $draft = ProductionTrackPolicyFixtures::create($actor);
+        $capture = app(PrepareProductionTrackPolicy::class)->review($draft, ProductionTrackPolicyFixtures::authored(true), $actor);
+        $before = $this->snapshot();
+        AuditEvent::created(function () use ($draft, $actor): void {
+            $ciphertext = Crypt::encryptString(CanonicalJson::encode(ProductionTrackPolicyFixtures::authored()));
+            DB::table('production_track_policy_versions')->insert([
+                'production_track_policy_draft_id' => $draft->id, 'number' => 3, 'schema_version' => 1, 'payload_ciphertext' => $ciphertext,
+                'payload_hash' => hash('sha256', $ciphertext), 'canonicalization_version' => CanonicalJson::VERSION,
+                'created_by' => $actor->id, 'created_at' => now()->utc()->format('Y-m-d H:i:s'),
+            ]);
+            DB::table('production_track_policy_drafts')->where('id', $draft->id)->update(['revision' => 3]);
+        });
+        try {
+            app(SaveProductionTrackPolicy::class)->applyReviewed($capture, $actor);
+            $this->fail('An unreviewed late successor committed.');
+        } catch (ValidationException) {
+            $this->assertSame($before, $this->snapshot());
+        } finally {
+            AuditEvent::flushEventListeners();
+            AuditEvent::clearBootedModels();
         }
     }
 }
