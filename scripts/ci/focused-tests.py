@@ -81,6 +81,7 @@ PHP_TARGETS = {
         "tests/Feature/CustomerAccountAccessTest.php", "tests/Feature/CustomerAccountCommerceTest.php",
         "tests/Feature/CustomerAccountConcurrencyTest.php", "tests/Feature/CustomerAccountMigrationTest.php",
         "tests/Feature/CustomerSessionHttpTest.php", "tests/Feature/OwnedTestOrderHistoryTest.php",
+        "tests/Feature/CustomerOrderReferenceTest.php",
         "tests/Feature/TestOwnerDeliveryHttpTest.php", "tests/Feature/TestOwnerDeliveryProjectionTest.php",
     ),
     "seller": (
@@ -138,6 +139,7 @@ FRONTEND_TARGETS = (
     "tests/frontend/customer-identity.test.tsx", "tests/frontend/resumable-kit-upload.test.ts",
     "tests/frontend/inquiry-conversation.test.tsx",
     "tests/frontend/customer-account.test.tsx",
+    "tests/frontend/customer-order-reference.test.tsx",
     "tests/frontend/audio.test.tsx", "tests/frontend/catalog-pagination.test.tsx",
     "tests/frontend/catalog.test.ts", "tests/frontend/checkout-return.test.tsx",
     "tests/frontend/cms-navigation.test.tsx", "tests/frontend/editorial-content.test.tsx",
@@ -157,6 +159,7 @@ BROWSER_TARGETS = (
     "tests/browser/test-unpaid-release.spec.ts",
     "tests/browser/inquiry-conversation.spec.ts",
     "tests/browser/customer-account.spec.ts",
+    "tests/browser/customer-order-reference.spec.ts",
     "tests/browser/storefront.spec.ts", "tests/browser/operator.spec.ts",
     "tests/browser/test-checkout.spec.ts", "tests/browser/test-owner-delivery.spec.ts",
     "tests/browser/player-controls.spec.ts", "tests/browser/owned-order-history.spec.ts",
