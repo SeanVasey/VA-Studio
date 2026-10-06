@@ -1,8 +1,13 @@
 <?php
 
+use App\Domain\Commerce\Inventory\ManageRightsScope;
+use App\Domain\Commerce\Models\Order;
+use App\Domain\Commerce\Orders\ReadOrder;
 use App\Domain\Inquiries\InquiryInput;
 use App\Domain\Inquiries\InquiryPolicy;
 use App\Domain\Inquiries\Models\CustomerInquiry;
+use App\Domain\Inquiries\OrderInquiry;
+use App\Domain\Media\MalwareScanner;
 use App\Domain\SiteBuilder\Models\SitePublication;
 use App\Domain\SiteBuilder\Models\SitePublicationRevision;
 use App\Domain\SiteBuilder\SiteContent;
@@ -13,6 +18,9 @@ use App\Support\CanonicalJson;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Tests\Support\DeliveryFixtures;
+use Tests\Support\OrderFixtures;
+use Tests\Support\QuoteFixtures;
 use Tests\Support\SiteEditorialFixtures;
 
 // No web route invokes this helper. Every operation is restricted to the wrapper's disposable SQLite fixture.
@@ -23,7 +31,7 @@ try {
     $mode = $argv[1] ?? null;
     $project = $argv[2] ?? null;
     $transport = in_array($mode, ['transport-prepare', 'transport-rotate', 'transport-restore'], true);
-    $conversation = in_array($mode, ['conversation-prepare', 'conversation-restore'], true);
+    $conversation = in_array($mode, ['conversation-prepare', 'conversation-restore', 'conversation-order-retain', 'conversation-order-verify'], true);
     $operation = $transport ? substr($mode, strlen('transport-')) : ($conversation ? substr($mode, strlen('conversation-')) : $mode);
     if (PHP_SAPI !== 'cli' || ! is_string($directory) || is_link($directory) || realpath($directory) !== $directory
         || realpath(dirname($directory)) !== realpath(sys_get_temp_dir()) || ! preg_match('/\Avasey-browser-[A-Za-z0-9]+\z/D', basename($directory))
@@ -37,8 +45,8 @@ try {
         || file_exists($directory.'/routes.php') || file_exists($directory.'/events.php')
         || ! is_string($marker) || preg_match('/\A[a-f0-9]{64}\z/D', $marker) !== 1
         || ! in_array($project, ['chromium-desktop', 'webkit-mobile'], true)
-        || ! in_array($mode, ['prepare', 'verify', 'restore', 'transport-prepare', 'transport-rotate', 'transport-restore', 'conversation-prepare', 'conversation-restore'], true)
-        || count($argv) !== ($operation === 'verify' ? 5 : 3)) {
+        || ! in_array($mode, ['prepare', 'verify', 'restore', 'transport-prepare', 'transport-rotate', 'transport-restore', 'conversation-prepare', 'conversation-restore', 'conversation-order-retain', 'conversation-order-verify'], true)
+        || count($argv) !== (in_array($operation, ['verify', 'order-verify'], true) ? 5 : 3)) {
         throw new RuntimeException('Not an isolated inquiry browser run.');
     }
     foreach (['fixtures.json', 'inquiry-fixture-marker.json'] as $file) {
@@ -87,7 +95,7 @@ try {
         if (file_exists($path) || file_exists($rotationPath)) {
             throw new RuntimeException('Inquiry fixture already prepared.');
         }
-        $fixture = DB::transaction(function () use ($site, $path, $project, $operator, $marker, $inquiryGraph, $retainedRows, $transport, &$writtenPath): array {
+        $fixture = DB::transaction(function () use ($site, $path, $project, $operator, $marker, $inquiryGraph, $retainedRows, $transport, $conversation, &$writtenPath): array {
             $before = SitePublication::lockForUpdate()->findOrFail(1);
             $auditStartId = (int) (AuditEvent::max('id') ?? 0);
             $inquiryGraphHash = $transport ? $inquiryGraph() : null;
@@ -105,6 +113,27 @@ try {
             if ($transport) {
                 $fixture += ['inquiryGraphHash' => $inquiryGraphHash, 'retainedRowsHash' => $retainedRowsHash,
                     'auditStartId' => $auditStartId, 'baselineRetained' => $before->revision === 0];
+            }
+            if ($conversation) {
+                if (config('inquiries.test_order_inquiries_enabled') !== true
+                    || ! is_executable('/usr/bin/clamscan') || realpath('/usr/bin/clamscan') !== '/usr/bin/clamscan') {
+                    throw new RuntimeException('Order inquiry fixture requires its default-off flag and genuine scanner.');
+                }
+                // Only catalog preparation is synthetic; the native browser creates its own order through HTTP.
+                app()->detectEnvironment(fn () => 'testing');
+                $scannerPath = config('media.clamscan');
+                try {
+                    OrderFixtures::configure();
+                    config(['media.clamscan' => '/usr/bin/clamscan']);
+                    $selection = QuoteFixtures::selection(scanner: new MalwareScanner);
+                    $rights = app(ManageRightsScope::class);
+                    $scope = $rights->register('inquiry-'.$project, 'SYNTHETIC-INQUIRY-SCOPE', $selection['actor']);
+                    $rights->link($scope->id, $selection['revision']->id, 'SYNTHETIC-INQUIRY-LINK', $selection['actor']);
+                    $fixture['orderSupport'] = ['capability' => bin2hex(random_bytes(32)), 'items' => $selection['items'], 'slug' => $selection['track']->slug];
+                } finally {
+                    config(['media.clamscan' => $scannerPath]);
+                    app()->detectEnvironment(fn () => 'local');
+                }
             }
             if (app(InquiryPolicy::class)->publicSetup($site->current()) === null) {
                 throw new RuntimeException('Synthetic public intake did not become eligible.');
@@ -137,7 +166,63 @@ try {
         if (($fixture['marker'] ?? null) !== $marker || ($fixture['project'] ?? null) !== $project) {
             throw new RuntimeException('Prepared fixture identity mismatch.');
         }
-        if ($operation === 'rotate') {
+        if (in_array($operation, ['order-retain', 'order-verify'], true)) {
+            if (! $conversation || ($fixture['restored'] ?? null) !== false || ! isset($fixture['orderSupport'])) {
+                throw new RuntimeException('Missing active order inquiry fixture.');
+            }
+            $input = stream_get_contents(STDIN, 16385);
+            if (! is_string($input) || $input === '' || strlen($input) > 16384) {
+                throw new RuntimeException('Missing bounded order inquiry evidence.');
+            }
+            if ($operation === 'order-retain') {
+                $id = json_decode($input, true, 2, JSON_THROW_ON_ERROR);
+                if (isset($fixture['orderSupport']['orderId']) || ! is_string($id)
+                    || preg_match('/\A[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/D', $id) !== 1) {
+                    throw new RuntimeException('Invalid native order identity.');
+                }
+                $order = Order::where('public_id', $id)->sole();
+                app(ReadOrder::class)->verify($order);
+                if ($order->lines()->sole()->offer_revision_id !== $fixture['orderSupport']['items'][0]['offerRevisionId']) {
+                    throw new RuntimeException('Native order did not use the prepared selection.');
+                }
+                $fixture['orderSupport'] += ['orderId' => $id, 'originalsHash' => CanonicalJson::hash(DeliveryFixtures::retained()),
+                    'inquiryCount' => CustomerInquiry::count(), 'contextCount' => DB::table('inquiry_order_contexts')->count()];
+                if (file_put_contents($path, json_encode($fixture, JSON_THROW_ON_ERROR), LOCK_EX) === false) {
+                    throw new RuntimeException('Unable to retain original native order evidence.');
+                }
+                echo json_encode(['orderId' => $id, 'originalsRetained' => true], JSON_THROW_ON_ERROR)."\n";
+            } else {
+                $receipt = $argv[3];
+                if (($argv[4] ?? null) !== 'new' || preg_match('/\A[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/D', $receipt) !== 1) {
+                    throw new RuntimeException('Invalid linked inquiry verification identity.');
+                }
+                $body = InquiryInput::validate(json_decode($input, true, 3, JSON_THROW_ON_ERROR));
+                $inquiry = CustomerInquiry::where('public_id', $receipt)->sole();
+                $support = $fixture['orderSupport'];
+                $context = app(OrderInquiry::class)->ownerContext($receipt, $inquiry->owner_hash);
+                if ($context !== ['orderInquiryContextSchema' => 1, 'order' => ['id' => $support['orderId'], 'testOnly' => true]]
+                    || $inquiry->payload !== $fixture['values'] || $inquiry->request_key !== $body['requestKey']
+                    || $inquiry->payload_hash !== CanonicalJson::hash(array_diff_key($body, ['requestKey' => true]))
+                    || $inquiry->state !== 'new' || $inquiry->version !== 0
+                    || CustomerInquiry::count() !== $support['inquiryCount'] + 1 || DB::table('inquiry_order_contexts')->count() !== $support['contextCount'] + 1
+                    || ! hash_equals($support['originalsHash'], CanonicalJson::hash(DeliveryFixtures::retained()))
+                    || AuditEvent::where('subject_type', CustomerInquiry::class)->where('subject_id', $inquiry->id)->where('action', 'inquiry.received')->count() !== 1
+                    || AuditEvent::where('subject_type', CustomerInquiry::class)->where('subject_id', $inquiry->id)->where('action', 'inquiry.test_order_linked')->count() !== 1) {
+                    throw new RuntimeException('Linked inquiry changed original evidence or duplicated effects.');
+                }
+                $raw = (array) DB::table('customer_inquiries')->where('id', $inquiry->id)->sole();
+                foreach (array_filter($fixture['values']) as $value) {
+                    if (str_contains($raw['payload'], $value)) {
+                        throw new RuntimeException('Linked private input was retained as plaintext.');
+                    }
+                }
+                if (str_contains(json_encode($raw, JSON_THROW_ON_ERROR), $body['noticeToken']) || str_contains(file_get_contents($path), $body['noticeToken'])) {
+                    throw new RuntimeException('Raw notice token was retained.');
+                }
+                echo json_encode(['orderId' => $support['orderId'], 'receipt' => $receipt, 'singleInquiry' => true, 'singleContext' => true,
+                    'originalsUnchanged' => true, 'encryptedInput' => true, 'rawNoticeTokenRetained' => false], JSON_THROW_ON_ERROR)."\n";
+            }
+        } elseif ($operation === 'rotate') {
             if (! $transport || file_exists($rotationPath) || is_link($rotationPath)) {
                 throw new RuntimeException('This transport fixture cannot rotate again.');
             }

@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Domain\Inquiries\InquiryAdministration;
 use App\Domain\Inquiries\InquiryConversation;
 use App\Domain\Inquiries\Models\CustomerInquiry;
+use App\Domain\Inquiries\OrderInquiry;
 use App\Filament\Resources\CustomerInquiryResource\Components\InquiryTextColumn;
 use App\Filament\Resources\CustomerInquiryResource\Components\InquiryTextEntry;
 use App\Filament\Resources\CustomerInquiryResource\Pages\ListCustomerInquiries;
@@ -76,6 +77,13 @@ final class CustomerInquiryResource extends OperatorResource
             InquiryTextEntry::make('payload.subject')->label('Subject'), InquiryTextEntry::make('payload.message')->label('Message')->columnSpanFull()->extraAttributes(['class' => 'whitespace-pre-wrap']),
             InquiryTextEntry::make('created_at')->label('Received (UTC)')->dateTime('Y-m-d H:i:s', 'UTC'),
             InquiryTextEntry::make('retention_policy_reference')->label('Retention policy reference'),
+            InquiryTextEntry::make('order_context')->label('Retained test order reference')->columnSpanFull()
+                ->state(function (CustomerInquiry $record): string {
+                    $context = app(OrderInquiry::class)->staffContext($record->id, Filament::auth()->user());
+
+                    return $context['order'] === null ? 'This inquiry has no linked test order.'
+                        : 'Linked test order '.$context['order']['id'].'. This retained reference does not confirm current payment, download access or usage rights.';
+                }),
             InquiryTextEntry::make('conversation')->label('In-app conversation')->columnSpanFull()
                 ->state(function (CustomerInquiry $record): string {
                     $snapshot = app(InquiryConversation::class)->staff($record->id, Filament::auth()->user());

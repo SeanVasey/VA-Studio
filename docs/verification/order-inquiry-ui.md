@@ -1,0 +1,32 @@
+# Order-linked test inquiry UI
+
+This T17 UI child starts at `f480c19656dc68440d195779b869d47392f63246` and depends on the separately reviewed order-inquiry domain, routes, migration, default-off configuration and guarded browser capability. It does not enable production collection, send email, add attachments or transfer inquiry ownership to an account.
+
+## Customer and staff behavior
+
+An owned test-order status offers **Ask about this test order**. No inquiry setup request occurs before that explicit action. The strict private GET accepts only the agreed version-1 setup for that exact canonical order ID, the server's approved privacy notice and opaque notice token. The client mirrors the existing notice policy's 3,000-character/plain-text bounds and limits streamed JSON to 32 KiB before decoding. Failed, foreign, revoked, redirected, oversized or unsupported responses show fixed unavailable copy without rendering server details.
+
+The existing form sends the same seven fields to the route-bound order endpoint; the body contains no order ID or customer identity claim. A pending attempt retains its exact endpoint, serialized body, request key and original notice. Uncertain acknowledgements, including rejected retries, preserve that attempt. Order acknowledgements require the exact saved/receipt shape, JSON media type, bounded valid UTF-8 and a canonical receipt. A first definitive validation failure may release the editable draft; a stale notice requires copying the draft and explicitly reopening the order inquiry. Closing, changing the order, leaving the page or unmounting cancels reads and removes the private form state; late responses cannot reopen it. The existing 20-second request limit is unchanged.
+
+A freshly readable conversation offers a separate **Read inquiry order reference** action. Its exact version-1 projection is either no link or a test-only order ID. It makes no claim about current payment, downloads or rights and has no invented order-detail link. Refresh, hide, departure, receipt changes and loss of conversation access remove the reference. The original inquiry session remains the authority, even for an order associated with an account. Staff use the same minimal retained reference through `OrderInquiry::staffContext`, inside the existing freshly authorized text entry; no raw model relationship is exposed.
+
+All existing theme tokens and form styles are retained. New summaries receive keyboard focus, hiding restores the trigger, and error copy remains generic. No inquiry body, key, notice token, receipt or linked order reference is added to browser storage.
+
+## Verification
+
+- `npm run typecheck` passed on the final executable source.
+- `npx vitest run --reporter=json --outputFile=…/order-inquiry-ui-final-source.json` passed **752/752 cases in 34 files**, zero failures, 13.12 seconds. The new file contains **37 cases**; all 715 existing cases remain. Coverage includes strict schemas/locators, HTTP failures, byte and UTF-8 bounds, real order-render integration, deferred setup, lost acknowledgement and exact retry, stale notice handling, focus, timeout, route changes, departure cleanup and retained-context privacy.
+- Production build and client scan passed: **6 text bundle files**, no forbidden names or Stripe key-prefix hits. The existing Vite large-chunk advisory remains; the current application chunk is **528.33 kB** (153.76 kB gzip). No threshold changed.
+- Design-preview build and client scan passed: **4 text bundle files**, no hits. Preview application chunk: **491.48 kB** (144.00 kB gzip).
+- PHP syntax, Pint on the two changed PHP files and `git diff --check` passed. Actual staff-render behavior awaits composition with the backend child; this checkout alone does not contain its new domain class.
+- Actual Playwright `--list --reporter=json` discovered **124 cases across 36 files**, including the same existing inquiry-conversation journey once per engine. This is discovery only: no local native browser or genuine scanner is installed, and no native execution or screenshot acceptance is claimed here.
+
+Development receipts retain two initial focused failures caused by new test assumptions: an existing checkout GET was incorrectly counted as inquiry prefetch, then a mocked single Response was reused after that checkout consumed it. The assertions were scoped to inquiry requests and the mock now returns a fresh response. A first full run was **750/751** because a new focus assertion ran before React's effect; it now waits for the identical focus target under the normal default limit. A subsequent full run passed **752/752**, and the final full result above followed the final notice-bound refinement. No application failure was reclassified as an existing baseline failure, and no wait budget increased.
+
+## Native journey pending
+
+The existing inquiry-conversation journey preserves every original generic inquiry, follow-up replay, archive, history, foreign-session and receipt-opener assertion. Its bounded extension prepares only a genuine-scanned synthetic catalog selection in the guarded CLI helper. The browser's original session creates its own quote, pricing, reviewed order and order through actual HTTP with the separately owned private fixture capability. There is no owner rewrite, provider response stub, scanner substitute or production route.
+
+The order inquiry POST really commits before its first acknowledgement is deliberately dropped. The same browser retries the exact seven-field body and receives the same receipt with status 200. A guarded verifier checks one inquiry, one retained context, one received/link audit each, encrypted original input and unchanged immutable commerce evidence before and after the subsequent reads. The journey also checks foreign order/context denial, CSRF, the generic inquiry's null context, actual staff reference rendering, original-session reopening, keyboard hide/reopen, storage privacy and responsive overflow. It writes a bounded proof JSON and a new reference screenshot only after those assertions pass. Neither artifact exists as acceptance evidence until a fresh composed native run succeeds.
+
+No browser identity, retry count, timeout, global gate, selector cap or shared registration was changed in this UI child. Root owns final registration/composition and exact-source hosted acceptance.
