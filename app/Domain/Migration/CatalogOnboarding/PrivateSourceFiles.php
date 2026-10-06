@@ -10,6 +10,26 @@ use Throwable;
 /** Read-only private artifact admission. No source acquisition, mutation or application bootstrap. */
 final class PrivateSourceFiles
 {
+    public function privateDirectory(string $directory): array
+    {
+        try {
+            return $this->directory($directory);
+        } catch (Throwable) {
+            throw new InvalidArgumentException('catalog_source_files_invalid');
+        }
+    }
+
+    public function protectedFile(string $path, int $maximum = 33554432): array
+    {
+        try {
+            $parent = $this->directory(dirname($path));
+
+            return ['path' => $path, 'parent_identity' => $parent] + $this->read($path, $maximum, true);
+        } catch (Throwable) {
+            throw new InvalidArgumentException('catalog_source_files_invalid');
+        }
+    }
+
     public function snapshot(string $directory, string $manifestName = 'catalog.json'): array
     {
         try {
@@ -41,6 +61,26 @@ final class PrivateSourceFiles
     {
         $current = $this->snapshot($proof['directory'], $proof['manifest_name']);
         $this->require($current === $proof);
+    }
+
+    /** Exclusive read-only OS lease: two cooperating imports cannot consume this source concurrently. */
+    public function leased(array $proof, callable $operation): mixed
+    {
+        $this->unchanged($proof);
+        $path = $proof['directory'].'/'.$proof['manifest_name'];
+        $handle = @fopen($path, 'rb');
+        $this->require($handle !== false);
+        try {
+            $opened = fstat($handle);
+            $this->require($opened !== false && $this->same($opened, $proof['manifest_identity'])
+                && flock($handle, LOCK_EX | LOCK_NB));
+            $this->unchanged($proof);
+
+            return $operation();
+        } finally {
+            flock($handle, LOCK_UN);
+            fclose($handle);
+        }
     }
 
     private function directory(string $directory): array
