@@ -138,11 +138,45 @@ checks losing stale commands and the other bulk winner. No wait, timeout,
 assertion, lifecycle or authority criterion was removed. This retained run did
 not include the later raw final-proof correction or ten added cases.
 
-At this reversible local checkpoint the corrected 105-case native selection
-(85 domain and 20 races) is running against before/after recorded hashes of all
-five PHP files. Its outcome is pending. A documentation-only follow-up will bind
-its actual receipt to the unchanged committed PHP blobs; this checkpoint is not
-native acceptance or independently approved sensitive source.
+The reversible six-file source checkpoint is
+`fec177a765b4d25f343d2fe8cbdbbba98a210d43`, tree
+`0dcf4d4c79401468bc36f13a45d3864a92359a3e`, sole parent
+`9d39355424466a50f0982052898f0f681ab33117`. It was frozen while the native run
+was pending so the isolated UI lane could test an immutable command. This
+documentation-only follow-up records the now-completed result; all five PHP blobs
+remain identical to that checkpoint.
+
+The corrected 105-case native selection passed 105 / 105 cases and 2,531
+assertions, with zero errors, failures or skips, in 488.141 seconds. Actual JUnit
+contains 85 domain cases / 436 assertions and 20 race cases / 2,095 assertions.
+Every discovered case ID matches its executed native counterpart, and all 20
+exact required waits are retained in JUnit `system-out`. The runtime receipt
+reports MySQL 8.4.11, `innodb_flush_log_at_trx_commit=1`, `sync_binlog=1`,
+doublewrite ON and binary logging enabled over private loopback TCP to a fresh
+disposable database. The worker sessions retain repeatable-read isolation.
+
+The following actual commands used the recovered PHP runtime and the synthetic
+32-byte APP_KEY environment recorded in each command JSON. The MySQL command was
+wrapped by the existing normal-durability `mysql-runtime/run-tests.py` runner.
+
+```text
+php vendor/bin/phpunit tests/Feature/BulkReplaceLicenseDraftSourceTest.php tests/Feature/ReviewedLicenseDraftTest.php tests/Feature/LicenseTemplateAuthoringTest.php tests/Feature/LicenseWriterAuthorityTest.php tests/Feature/LicenseEvidenceTest.php --log-junit /workspace/scratch/b527c7e94bd7/bulk-license-domain-evidence/final-sqlite-compatibility.xml
+php vendor/bin/phpunit tests/Feature/BulkReplaceLicenseDraftSourceTest.php tests/Feature/BulkReplaceLicenseDraftSourceConcurrencyTest.php --log-junit /workspace/scratch/b527c7e94bd7/bulk-license-domain-evidence/final-native.xml
+```
+
+`tested-source-checkpoint.json` binds the checkpoint's exact six paths to focused
+SQLite, syntax, formatting and plain discovery outputs. Its SHA256 is
+`ef4f82c2814e7dab74bf551176aa409bd4fd61aec42d2cd6c377f9c5de88b51f`.
+`final-native-verified.json` parses the author's raw execution
+receipt, matches all 105 discovery IDs and extracts all 20 waits; its SHA256 is
+`49cd6700825285c8d238c93cb9acc5b2b2c7452434759e93ec93aaa3b0b145b6`.
+All five recorded PHP before/after working hashes equal the committed blobs. The
+command's SHA256 is
+`8c0b54b0f82b8cab66629d7fce368a487d5aa455b3b3b8b9202b9a64c7bead17`.
+`tested-source-final.json` binds this documentation follow-up and unchanged PHP
+source to those receipts and retained original failures. The author does not
+self-approve the licensing/authorization implementation; independent actual-source
+review is still required.
 
 ## Remaining acceptance
 
