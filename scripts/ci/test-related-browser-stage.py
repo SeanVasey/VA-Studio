@@ -134,8 +134,8 @@ class BrowserBootstrapFixtures(unittest.TestCase):
             if value is not None:
                 env[name] = value
         result = subprocess.run(
-            ["php", "tests/browser/bootstrap.php"], cwd=ROOT, env=env,
-            text=True, capture_output=True, timeout=60,
+            ["/usr/bin/timeout", "--signal=TERM", "--kill-after=15s", "600s", "php", "tests/browser/bootstrap.php"], cwd=ROOT, env=env,
+            text=True, capture_output=True, timeout=620,
         )
         return directory, result
 
@@ -203,7 +203,8 @@ class BrowserBootstrapFixtures(unittest.TestCase):
                                c.disk AS contract_disk, c.storage_path AS contract_path,
                                c.pdf_hash AS contract_hash, c.size_bytes AS contract_size,
                                m.disk AS asset_disk, m.storage_path AS asset_path,
-                               e.asset_hash, e.size_bytes AS asset_size, e.role
+                               e.asset_hash, e.size_bytes AS asset_size, e.role,
+                               s.sha256 AS source_hash, r.input_sha256, r.profile AS media_profile, r.evidence AS media_evidence
                         FROM orders o
                         JOIN customer_accounts a ON a.owner_key = o.owner_key
                         JOIN users u ON u.id = a.user_id
@@ -215,12 +216,24 @@ class BrowserBootstrapFixtures(unittest.TestCase):
                         JOIN grant_contracts c ON c.license_grant_id = g.id
                         JOIN pending_entitlements e ON e.license_grant_id = g.id AND e.state = 'pending'
                         JOIN media_assets m ON m.id = e.media_asset_id AND m.sha256 = e.asset_hash AND m.size_bytes = e.size_bytes AND m.status = 'ready'
+                        JOIN media_assets s ON s.id = m.parent_asset_id
+                        JOIN media_processing_runs r ON r.id = m.processing_run_id AND r.source_asset_id = s.id AND r.status = 'completed'
                         WHERE o.public_id = ? AND u.email = 'browser-customer@example.test'
                         """, (fixture["orderId"],)).fetchall()
                     self.assertEqual(len(rows), 1)
                     row = rows[0]
                     self.assertEqual(row["provider_payment_intent_id"], "pi_CUSTOMER" + suffix)
                     self.assertEqual(row["role"], "master_wav")
+                    self.assertEqual(row["asset_hash"], row["source_hash"])
+                    self.assertEqual(row["asset_hash"], row["input_sha256"])
+                    evidence = json.loads(row["media_evidence"])
+                    profile = json.loads(row["media_profile"])
+                    for name, sha256 in [("source_scan", row["asset_hash"]), ("tag_scan", profile["tag_sha256"])]:
+                        scan = evidence[name]
+                        self.assertEqual(scan["engine"], "clamav")
+                        self.assertEqual(scan["status"], "clean")
+                        self.assertEqual(scan["sha256"], sha256)
+                        self.assertRegex(scan["version"], r"^ClamAV [^/\r\n]+/[0-9]+/[^\r\n]+$")
                     for kind, extension in [("contract", "pdf"), ("asset", "wav")]:
                         role = "contract" if kind == "contract" else row["role"]
                         self.assertEqual(fixture[kind], {

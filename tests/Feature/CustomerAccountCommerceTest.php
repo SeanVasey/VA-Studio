@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use App\Domain\Delivery\PrepareTestDeliveryStream;
+use App\Domain\Media\MalwareScanner;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,7 @@ use Tests\Support\CustomerFixtures as F;
 use Tests\Support\DeliveryFixtures;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\PaymentFixtures;
+use Tests\Support\TestOnlyMediaScanner;
 use Tests\TestCase;
 
 class CustomerAccountCommerceTest extends TestCase
@@ -169,6 +171,55 @@ class CustomerAccountCommerceTest extends TestCase
             ->assertHeader('Cache-Control', 'no-store, private');
         $this->assertTrue($changed);
         $this->assertDatabaseCount('orders', 1);
+    }
+
+    public function test_customer_fixture_scanner_is_explicit_scoped_and_precedes_immutable_purchase(): void
+    {
+        $f = F::account();
+        $scanner = new class extends TestOnlyMediaScanner
+        {
+            public array $observations = [];
+
+            public function scan(string $path): array
+            {
+                $this->observations[] = ['sha256' => hash_file('sha256', $path),
+                    'offers' => DB::table('offer_revisions')->count(), 'orders' => DB::table('orders')->count()];
+
+                return parent::scan($path);
+            }
+        };
+        $paid = F::ready($f['user'], scanner: $scanner);
+        $manifest = F::browserManifest($paid);
+        // The immutable purchased master is byte-identical to the genuinely scanned source in the native fixture.
+        $this->assertCount(3, $scanner->observations); // Master source, approved tag, artwork source.
+        $this->assertContains($manifest['asset']['sha256'], array_column($scanner->observations, 'sha256'));
+        $this->assertSame([0, 0, 0], array_column($scanner->observations, 'offers'));
+        $this->assertSame([0, 0, 0], array_column($scanner->observations, 'orders'));
+        $this->assertInstanceOf(TestOnlyMediaScanner::class, app(MalwareScanner::class));
+        $this->assertNotSame($scanner, app(MalwareScanner::class));
+        F::ready($f['user'], 'DEFAULT');
+        $this->assertCount(3, $scanner->observations);
+        $this->assertDatabaseCount('orders', 2);
+        $this->assertDatabaseCount('test_fulfillment_activations', 2);
+    }
+
+    public function test_customer_fixture_scan_failure_restores_default_and_cannot_create_purchase(): void
+    {
+        $f = F::account();
+        $scanner = new TestOnlyMediaScanner;
+        $scanner->reject = true;
+        try {
+            F::ready($f['user'], scanner: $scanner);
+            $this->fail('Rejected fixture media reached a purchase.');
+        } catch (\RuntimeException $error) {
+            $this->assertSame('Synthetic scanner rejected this test fixture.', $error->getMessage());
+        }
+        $this->assertInstanceOf(TestOnlyMediaScanner::class, app(MalwareScanner::class));
+        $this->assertNotSame($scanner, app(MalwareScanner::class));
+        $this->assertDatabaseCount('offer_revisions', 0);
+        $this->assertDatabaseCount('orders', 0);
+        $this->assertDatabaseCount('test_fulfillment_activations', 0);
+        $this->assertDatabaseMissing('media_assets', ['status' => 'ready']);
     }
 
     private function login(array $fixture): void

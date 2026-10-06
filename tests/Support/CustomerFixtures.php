@@ -17,6 +17,7 @@ use App\Domain\Customers\CustomerAccess;
 use App\Domain\Customers\CustomerAccounts;
 use App\Domain\Delivery\DeliveryAccessEvidence;
 use App\Domain\Delivery\ReadTestOwnerDelivery;
+use App\Domain\Media\MalwareScanner;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -43,13 +44,13 @@ final class CustomerFixtures
         return compact('user', 'account', 'principal');
     }
 
-    public static function prepared(User $user, bool $hideCatalog = false, bool $configured = false): Order
+    public static function prepared(User $user, bool $hideCatalog = false, bool $configured = false, ?MalwareScanner $scanner = null): Order
     {
         if (! $configured) {
             OrderFixtures::configure();
         }
         $principal = app(CustomerAccess::class)->principal($user);
-        $selection = InventoryFixtures::selection();
+        $selection = InventoryFixtures::selection(scanner: $scanner);
         $quote = app(CreateQuote::class)->handle($principal->ownerKey, (string) Str::uuid(), $selection['items'], $user, $principal);
         app(PriceQuote::class)->create($quote->public_id, $principal->ownerKey, $user, $principal);
         $review = app(ReviewOrder::class)->handle($quote->public_id, $principal->ownerKey, $user, $principal);
@@ -65,7 +66,7 @@ final class CustomerFixtures
     }
 
     /** Real domain transitions and immutable private originals; external provider/renderer transports are synthetic. */
-    public static function ready(User $user, string $suffix = 'ONE', bool $hideCatalog = false): array
+    public static function ready(User $user, string $suffix = 'ONE', bool $hideCatalog = false, ?MalwareScanner $scanner = null): array
     {
         DeliveryFixtures::configure();
         $gateway = PaymentFixtures::gateway();
@@ -73,7 +74,7 @@ final class CustomerFixtures
         app()->instance(StripeCheckoutGateway::class, $gateway);
         app()->instance(StripePaymentGateway::class, $gateway);
         app()->instance(ContractRenderer::class, ContractFixtures::renderer());
-        $order = self::prepared($user, $hideCatalog, true);
+        $order = self::prepared($user, $hideCatalog, true, $scanner);
         $principal = app(CustomerAccess::class)->principal($user);
         app(HostedCheckout::class)->start($order->public_id, $principal->ownerKey, $user, $principal);
         $gateway->session['status'] = 'complete';

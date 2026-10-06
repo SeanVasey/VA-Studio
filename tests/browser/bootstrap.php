@@ -2,6 +2,10 @@
 
 use App\Domain\Catalog\SaveTrackMetadata;
 use App\Domain\Customers\CustomerAccounts;
+use App\Domain\Delivery\DeliveryAccessEvidence;
+use App\Domain\Delivery\PrepareTestDeliveryStream;
+use App\Domain\Delivery\ReadTestOwnerDelivery;
+use App\Domain\Media\MalwareScanner;
 use App\Models\User;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Artisan;
@@ -30,6 +34,9 @@ try {
     $ordinaryStage = in_array($stage, [false, ''], true) && in_array($marker, [false, ''], true);
     if (! $relatedStage && ! $ordinaryStage) {
         throw new RuntimeException('Refusing an incomplete browser fixture stage identity.');
+    }
+    if ($ordinaryStage && (! is_executable('/usr/bin/clamscan') || realpath('/usr/bin/clamscan') !== '/usr/bin/clamscan')) {
+        throw new RuntimeException('Native customer fixtures require the genuine scanner and current signatures.');
     }
     require __DIR__.'/../../vendor/autoload.php';
     $app = require __DIR__.'/../../bootstrap/app.php';
@@ -70,14 +77,33 @@ try {
         // The ordinary native suite needs retained customer purchases. Related-track preparation
         // instead proves its original four-track, two-user, empty-commerce census independently.
         $customerFixtures = ['projects' => []];
+        $paidFixtures = [];
+        $scanner = new MalwareScanner;
+        $ordinaryScannerPath = config('media.clamscan');
         $app->detectEnvironment(fn () => 'testing');
+        config(['media.clamscan' => '/usr/bin/clamscan']);
         try {
             foreach (['chromium-desktop' => 'CHROMIUM', 'webkit-mobile' => 'WEBKIT'] as $project => $suffix) {
-                $paid = CustomerFixtures::ready($customer, $suffix, true);
+                $paid = CustomerFixtures::ready($customer, $suffix, true, $scanner);
                 $customerFixtures['projects'][$project] = CustomerFixtures::browserManifest($paid);
+                $paidFixtures[] = $paid;
             }
         } finally {
+            config(['media.clamscan' => $ordinaryScannerPath]);
+            app()->instance(MalwareScanner::class, $scanner);
             $app->detectEnvironment(fn () => 'local');
+        }
+        // Prove preparation in the same local environment used by the HTTP server.
+        // This reads private snapshots without issuing tokens, recording attempts or changing purchase evidence.
+        foreach ($paidFixtures as $paid) {
+            $evidence = app(DeliveryAccessEvidence::class);
+            $source = $evidence->source($paid['order'], config('payments.stripe.account_id'));
+            $items = app(ReadTestOwnerDelivery::class)->handle($paid['order']->public_id, $paid['principal']->ownerKey)['items'];
+            foreach ($items as $item) {
+                $target = $evidence->target($source, $item['grantId'], $item['kind']);
+                $prepared = app(PrepareTestDeliveryStream::class)->handle($target['file']);
+                $prepared->close();
+            }
         }
         file_put_contents($directory.'/customer-fixtures.json', json_encode($customerFixtures, JSON_THROW_ON_ERROR));
         chmod($directory.'/customer-fixtures.json', 0600);

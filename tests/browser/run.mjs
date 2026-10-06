@@ -55,7 +55,8 @@ try {
     mkdirSync(join(directory, child), { recursive: true, mode: 0o700 });
   }
   writeFileSync(env.DB_DATABASE, '', { mode: 0o600, flag: 'wx' });
-  const setup = spawnSync('php', ['tests/browser/bootstrap.php'], { cwd: root, env, stdio: 'inherit', timeout: 60000 });
+  // Genuine scans retain their application budgets; bound the whole fixture stage like related-track preparation.
+  const setup = spawnSync('/usr/bin/timeout', ['--signal=TERM', '--kill-after=15s', '600s', 'php', 'tests/browser/bootstrap.php'], { cwd: root, env, stdio: 'inherit', timeout: 620000 });
   if (setup.error || setup.status !== 0) throw new Error('Isolated browser fixture setup failed.');
   writeFileSync(join(directory, 'inquiry-fixture-marker.json'), JSON.stringify({
     marker: env.VASEY_BROWSER_INQUIRY_MARKER, database: env.DB_DATABASE,
