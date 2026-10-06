@@ -28,7 +28,7 @@ const env = {
   STRIPE_ACCOUNT_ID: 'acct_SYNTHETICONLY', STRIPE_MODE: 'test', STRIPE_TEST_SECRET_KEY: '', STRIPE_WEBHOOK_SECRET: '',
   STRIPE_TEST_CHECKOUT_ENABLED: 'false', STRIPE_TEST_PAYMENT_PROCESSING_ENABLED: 'false', STRIPE_TEST_FINALIZATION_ENABLED: 'false',
   VASEY_BROWSER_EXCEPTION_MARKER: randomBytes(32).toString('hex'),
-  // No malware scanner, as in CI. A scanner installed on the host would otherwise run inside synchronous uploads.
+  // HTTP uploads deliberately retain quarantine behavior even when fixture preparation has a genuine scanner installed.
   MEDIA_CLAMSCAN: join(directory, 'no-clamscan'),
   VASEY_BROWSER_DIRECTORY: directory, VASEY_BROWSER_PASSWORD: `Browser-${randomBytes(24).toString('hex')}`,
   // The ordinary suite always retains its customer fixtures, even with inherited stage variables.
