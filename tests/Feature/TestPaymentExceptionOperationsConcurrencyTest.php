@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Domain\Commerce\Finalization\FinalizeTestPayment;
 use App\Domain\Commerce\Models\OrderFinalization;
 use App\Domain\Commerce\Models\TestPaymentExceptionEvent;
+use App\Domain\Commerce\Models\TestPaymentFinancialObservation;
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use App\Domain\Commerce\Payments\StripePaymentGateway;
 use Illuminate\Filesystem\Filesystem;
@@ -93,6 +94,10 @@ class TestPaymentExceptionOperationsConcurrencyTest extends TestCase
         });
         $this->assertSame($before, F::retained());
         $this->assertSame($scenario === 'competing dispositions' ? 1 : 2, TestPaymentExceptionEvent::count());
+        $this->assertSame($scenario === 'competing dispositions' ? 0 : 1, TestPaymentFinancialObservation::count());
+        if ($scenario !== 'competing dispositions') {
+            $this->assertSame('observed', TestPaymentFinancialObservation::sole()->state);
+        }
         Queue::assertNothingPushed();
     }
 

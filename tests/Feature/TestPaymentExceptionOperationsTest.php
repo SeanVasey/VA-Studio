@@ -8,6 +8,7 @@ use App\Domain\Commerce\Models\TestPaymentExceptionEvent;
 use App\Domain\Commerce\Models\TestPaymentExceptionWork;
 use App\Domain\Commerce\Operations\TestPaymentExceptionOperations;
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
+use App\Domain\Commerce\Payments\StripeFinancialInspectionGateway;
 use App\Domain\Commerce\Payments\StripePaymentGateway;
 use App\Filament\Resources\TestPaymentExceptionResource\Pages\ListTestPaymentExceptions;
 use App\Models\User;
@@ -26,6 +27,7 @@ use RuntimeException;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\FinalizationFixtures as F;
 use Tests\Support\LicenseFixtures;
+use Tests\Support\PaymentFinancialFixtures;
 use Tests\Support\PaymentFixtures;
 use Tests\TestCase;
 
@@ -46,6 +48,7 @@ class TestPaymentExceptionOperationsTest extends TestCase
         $this->gateway = PaymentFixtures::gateway();
         $this->app->instance(StripeCheckoutGateway::class, $this->gateway);
         $this->app->instance(StripePaymentGateway::class, $this->gateway);
+        $this->app->instance(StripeFinancialInspectionGateway::class, PaymentFinancialFixtures::gateway($this->gateway));
     }
 
     private function exception(): array
@@ -87,7 +90,9 @@ class TestPaymentExceptionOperationsTest extends TestCase
         $key = (string) Str::uuid();
         $result = app(TestPaymentExceptionOperations::class)->reconcile($f['record']->public_id, $f['admin'], $key, 0);
         $this->assertSame(['testOnly' => true, 'status' => 'reconciliation_observed', 'outcome' => 'confirmed', 'sequence' => 2,
-            'observedAt' => now()->toIso8601ZuluString(), 'fulfillment' => 'blocked', 'refundDisputeState' => 'not_inspected'], $result);
+            'observedAt' => now()->toIso8601ZuluString(), 'fulfillment' => 'blocked', 'refundDisputeState' => 'observed',
+            'financialObservation' => ['state' => 'observed', 'currency' => 'USD', 'refundedMinor' => 0,
+                'refundCount' => 0, 'refundStatuses' => [], 'disputeCount' => 0, 'disputeStatuses' => []]], $result);
         $calls = $this->gateway->calls;
         $this->assertSame(['account', 'retrieve', 'payment_intent'], array_column(array_slice($calls, $start), 'operation'));
         foreach (array_slice($calls, $start) as $call) {

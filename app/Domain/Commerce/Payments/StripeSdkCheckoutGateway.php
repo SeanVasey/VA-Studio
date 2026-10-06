@@ -14,7 +14,7 @@ use Stripe\Stripe;
 use Stripe\StripeClient;
 use Throwable;
 
-final class StripeSdkCheckoutGateway implements StripeCheckoutGateway, StripePaymentGateway
+final class StripeSdkCheckoutGateway implements StripeCheckoutGateway, StripeFinancialInspectionGateway, StripePaymentGateway
 {
     // Pin the retained request contract independently of mutable global SDK settings.
     public const API_VERSION = '2026-08-26.dahlia';
@@ -22,6 +22,8 @@ final class StripeSdkCheckoutGateway implements StripeCheckoutGateway, StripePay
     public const CONNECT_TIMEOUT_SECONDS = 3;
 
     public const REQUEST_TIMEOUT_SECONDS = 10;
+
+    public const FINANCIAL_REQUEST_TIMEOUT_SECONDS = 5;
 
     public function __construct(private readonly ?ClientInterface $httpClient = null) {}
 
@@ -93,7 +95,35 @@ final class StripeSdkCheckoutGateway implements StripeCheckoutGateway, StripePay
         });
     }
 
-    private function withClient(#[SensitiveParameter] Closure $operation): array
+    public function financialState(string $paymentIntentId): array
+    {
+        if (! PaymentEvidence::paymentId($paymentIntentId)) {
+            throw new RuntimeException('STRIPE_CHECKOUT_UNAVAILABLE');
+        }
+
+        return $this->withClient(function (StripeClient $client, string $account) use ($paymentIntentId): array {
+            $this->verifyAccount($client, $account);
+            $payment = $client->paymentIntents->retrieve($paymentIntentId, [])->toArray();
+            $chargeId = $payment['latest_charge'] ?? null;
+            if (($payment['object'] ?? null) !== 'payment_intent' || ($payment['id'] ?? null) !== $paymentIntentId
+                || ($payment['livemode'] ?? null) !== false || ! is_string($chargeId)
+                || preg_match('/\Ach_[A-Za-z0-9]{1,120}\z/D', $chargeId) !== 1) {
+                throw new RuntimeException('STRIPE_CHECKOUT_UNAVAILABLE');
+            }
+            $before = $client->charges->retrieve($chargeId, [])->toArray();
+            // Explicit bounded lists: embedded Charge.refunds contains only a first page.
+            // The domain must label has_more as incomplete, never as an empty/clear result.
+            $refunds = $client->refunds->all(['payment_intent' => $paymentIntentId, 'limit' => 100])->toArray();
+            $disputes = $client->disputes->all(['payment_intent' => $paymentIntentId, 'limit' => 100])->toArray();
+            $after = $client->charges->retrieve($chargeId, [])->toArray();
+            unset($payment['client_secret']);
+
+            return ['account_id' => $account, 'payment' => $payment, 'charge_before' => $before,
+                'charge_after' => $after, 'refunds' => $refunds, 'disputes' => $disputes];
+        }, self::FINANCIAL_REQUEST_TIMEOUT_SECONDS);
+    }
+
+    private function withClient(#[SensitiveParameter] Closure $operation, int $timeout = self::REQUEST_TIMEOUT_SECONDS): array
     {
         try {
             $account = config('payments.stripe.account_id');
@@ -121,9 +151,9 @@ final class StripeSdkCheckoutGateway implements StripeCheckoutGateway, StripePay
                 'stripe_context' => null,
                 'max_network_retries' => 0,
             ]);
-            $transport = $this->httpClient ?? (new CurlClient())
+            $transport = $this->httpClient ?? (new CurlClient)
                 ->setConnectTimeout(self::CONNECT_TIMEOUT_SECONDS)
-                ->setTimeout(self::REQUEST_TIMEOUT_SECONDS);
+                ->setTimeout($timeout);
             // stripe-php exposes transport only through ApiRequestor's static slot.
             // Scope it to this synchronous call and restore it even on malformed responses.
             $previous = ApiRequestor::httpClient();
