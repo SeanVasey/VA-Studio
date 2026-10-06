@@ -1,5 +1,24 @@
 # [WP-02] Persistent catalog administration and publication readiness
 
+## Current bounded authoring increment — October 6, 2026
+
+The reviewed [bulk license-source command](../verification/bulk-license-draft-source.md)
+and [mounted comparison/recovery editor](../verification/bulk-license-draft-source-ui.md)
+add explicit source replacement for 1–25 selected editable drafts. Each retained
+schema validates the authored source; exact captured actor/parent/version/audit
+identity fences the all-or-none save. Terms, dates, published versions and
+purchased graphs remain immutable; unchanged source produces no write/audit.
+Stale or uncertain results retain copyable input and require explicit fresh
+review. Actual focused domain MySQL 105/2,531 (20 exact record waits), SQLite
+compatibility 211/955 and both UI engines 61/1,079 are source-bound to their
+component commits. Independent sensitive/UI/native-helper reviews are complete.
+Native browser execution and consolidated final acceptance remain deferred;
+definitions and these selected passes do not complete WP-02/T12.
+
+Current AGENTS.md and PR #14 permit focused development merges with cheap
+preflight. Broader helper permissions/defaults, track scheduling and applicable
+production/source/device criteria remain on the [remaining register](../remaining-development-tasks.csv).
+
 Status: **Original metadata/URL and operator-browser increments are merged; named metadata presets are accepted in PR #95. Reviewed bulk metadata, protected operator review, reviewed manual publication guards and the read-only publication manifest foundation are accepted in PR #104. The seven-trigger SQL rights-evidence floor is verified and merged in PR #105; separate main verification is externally blocked. Transactional rights writers are the active candidate, tracked in the current execution queue. Parent WP-02/T12 and broader production/device acceptance remain open.** See [accepted PR #104 evidence](../development-order.md#pr-104-staff-authoring-acceptance) and the [SQL rights-evidence acceptance](../verification/rights-evidence-guards.md).
 
 - Suggested issue title: `[WP-02] Persistent catalog administration and publication readiness`

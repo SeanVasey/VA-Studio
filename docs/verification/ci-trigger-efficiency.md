@@ -27,6 +27,8 @@ build or audit failure therefore stops the matrix before runner allocation. This
 adds preflight latency to a successful final run but avoids paying for doomed
 candidates. Runtime proof reuse and post-merge provenance shortcuts remain off.
 
+GitLab final acceptance also uses manual web/API requests only. Supply `EXPECTED_SHA` equal to the exact reviewed native commit. Automatic merge-request, push, schedule and parent-pipeline sources are refused; the preflight candidate guard compares that value with both `CI_COMMIT_SHA` and actual checkout HEAD before any dependent verification jobs. Historical receipt validation remains available without restoring historical triggers.
+
 ### Working cadence and coordination
 
 1. Finish a coherent development batch with affected local checks. If an essential
@@ -35,9 +37,10 @@ candidates. Runtime proof reuse and post-merge provenance shortcuts remain off.
 2. Review and merge the development candidate with focused evidence under Sean's
    instruction. Report untested database/browser conditions explicitly. Existing
    protection requirements must be respected, never bypassed or changed.
-3. Product development remains owned by the existing developer on PR #13. Before
-   its next push/merge, integrate the CI policy commit from main, resolving only
-   CI/documentation differences while preserving product changes. The old workflow
+3. PR #13 is merged at `13d7474`; current development continues through the
+   [parallel plan](../parallel-execution-20261006.md). Before each product push or
+   merge, preserve main’s CI policy and reconcile workflow changes without losing
+   product-specific tests. The old workflow
    identities stay disabled even before branch integration. Inspect any stacked
    PRs before merging; do not revive superseded product candidates.
 4. At final integration, verify the desired ref still points to the reviewed SHA,

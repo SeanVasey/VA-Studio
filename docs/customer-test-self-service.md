@@ -14,7 +14,7 @@ VASEY_TEST_CUSTOMER_IDENTITY_TRANSPORT=private_capture
 
 The environment must be `local` or `testing`. Production rejects these pages and commands even when the flags are supplied. SMTP, the log mailer and any other transport are refused. No mail is sent. The renderer creates a synthetic notification in the private local disk at `customer-identity-capture/<challenge UUID>.json`. A tester with access to that disposable installation reads the capture directly; no HTTP route exposes captures. Its link uses the configured application origin and puts the proof in a URL fragment. It must be opened only against that test installation.
 
-Possession of a privately captured synthetic proof is not real mailbox verification, legal buyer verification or production enrollment acceptance. Production notice, retention, mail delivery and recovery policy remain open. Existing buyer evidence retains its `unverified_guest` policy. Guest-order claims remain absent.
+Possession of a privately captured synthetic proof is not real mailbox verification, legal buyer verification or production enrollment acceptance. Production notice, retention, mail delivery and recovery policy remain open. Existing buyer evidence retains its `unverified_guest` policy. Main `13d7474f` includes explicit per-order guest test-purchase claims: an authenticated active account proves the original owning session and confirms the retained paid purchase. Matching email alone still transfers nothing. See the [claim/refund composition](verification/purchase-claims-refund-resolution-composition.md) and [current source reconciliation](remaining-code-assessment-20261006.md); production claims and fresh native/final acceptance remain separate.
 
 ## Customer journey
 

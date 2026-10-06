@@ -43,6 +43,42 @@ def junit(root, content='<testsuites><testsuite><testcase name="one" assertions=
 
 
 class SelectionTests(unittest.TestCase):
+    def test_production_readiness_is_affected_commerce_feedback_without_native_exclusion(self):
+        for engine in focused.ENGINES:
+            selected = focused.selection({"FOCUSED_SUITE": "commerce", "FOCUSED_ENGINE": engine})
+            self.assertEqual(selected.files.count("tests/Feature/ProductionCommerceReadinessTest.php"), 1)
+            focused.validate_files(ROOT, selected)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        self.assertFalse(any(row[0] == "Tests\\Feature\\ProductionCommerceReadinessTest" for row in policy["methods"]))
+
+    def test_bulk_license_feedback_preserves_native_fences_and_adds_one_bounded_browser_subset(self):
+        self.assertEqual(focused.MAX_FILES, 32)
+        for engine in focused.ENGINES:
+            selected = focused.selection({"FOCUSED_SUITE": "licensing", "FOCUSED_ENGINE": engine})
+            for name in ("BulkReplaceLicenseDraftSourceTest", "BulkReplaceLicenseDraftSourceConcurrencyTest",
+                         "BulkLicenseDraftSourceAuthoringActionTest"):
+                self.assertEqual(selected.files.count("tests/Feature/" + name + ".php"), 1)
+            self.assertEqual(selected.files.count("tests/Unit/BulkLicenseDraftSourceBrowserEvidenceTest.php"), 1)
+            focused.validate_files(ROOT, selected)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        self.assertEqual([row for row in policy["methods"] if row[0] == "Tests\\Feature\\BulkReplaceLicenseDraftSourceConcurrencyTest"], [
+            ["Tests\\Feature\\BulkReplaceLicenseDraftSourceConcurrencyTest", "test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders"],
+            ["Tests\\Feature\\BulkReplaceLicenseDraftSourceConcurrencyTest", "test_explicit_capture_reads_only_the_after_fence_committed_state_and_later_apply_retains_that_exact_review"],
+        ])
+        self.assertFalse(any(row[0] in ("Tests\\Feature\\BulkReplaceLicenseDraftSourceTest",
+                                       "Tests\\Feature\\BulkLicenseDraftSourceAuthoringActionTest",
+                                       "Tests\\Unit\\BulkLicenseDraftSourceBrowserEvidenceTest") for row in policy["methods"]))
+        browser = focused.selection({"FOCUSED_SUITE": "bulk-license-browser", "FOCUSED_ENGINE": "sqlite"})
+        self.assertEqual(("tests/browser/bulk-license-draft-source.spec.ts",), browser.files)
+        self.assertEqual("browser", browser.kind)
+        self.assertEqual("sqlite", browser.engine)
+        focused.validate_files(ROOT, browser)
+        self.assertEqual(["npm", "run", "test:browser", "--", *browser.files, "--reporter=line,junit"], focused.commands(browser)[0])
+        self.assertEqual(focused.BROWSER_SUBSETS["browser"], focused.BROWSER_TARGETS)
+        self.assertEqual(len(focused.BROWSER_TARGETS), 32)
+        with self.assertRaises(focused.FocusedError):
+            focused.selection({"FOCUSED_SUITE": "bulk-license-browser", "FOCUSED_ENGINE": "mysql"})
+
     def test_every_enum_maps_to_nonempty_bounded_unique_fixed_files(self):
         for suite in focused.SUITES:
             selected = focused.selection({"FOCUSED_SUITE": suite, "FOCUSED_ENGINE": "sqlite"})

@@ -1,9 +1,7 @@
-# Full native acceptance. No prior-run reuse or documentation-only shortcut.
+# Manual exact-candidate native acceptance. No automatic matrices or prior-run reuse.
 workflow:
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
-    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api"'
+    - if: '($CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api") && $EXPECTED_SHA =~ /^[0-9a-f]{40}$/ && $EXPECTED_SHA == $CI_COMMIT_SHA'
     - when: never
 
 stages: [preflight, verify, accept]
@@ -13,6 +11,8 @@ default:
   interruptible: true
 
 variables:
+  # Supply the exact reviewed native GitLab commit when manually starting a pipeline.
+  EXPECTED_SHA: ''
   APP_ENV: testing
   APP_DEBUG: 'false'
   CACHE_STORE: array
@@ -28,6 +28,7 @@ provenance-access:
   before_script:
     - apt-get update && apt-get install --yes --no-install-recommends git
   script:
+    - python3 scripts/ci/verify-final-candidate.py --gitlab
     - python3 scripts/ci/gitlab-database-receipts.py probe
 
 frontend:
@@ -50,8 +51,13 @@ backend-quality:
   timeout: 20m
   before_script:
     - bash scripts/ci/setup-gitlab-php.sh
+    - bash scripts/ci/setup-gitlab-node.sh
   script:
+    - npm ci
+    - npm run build
+    - PERSISTENT_CONTENT_REQUIRE_PHP=1 node --test scripts/dev/persistent-content.test.mjs
     - composer validate --strict
+    - php vendor/bin/pint --test app/Domain/Rights/BulkReplaceLicenseDraftSource.php app/Filament/Resources/LicenseVersionResource.php app/Filament/Resources/LicenseVersionResource/Pages/ManageLicenseVersions.php tests/Feature/BulkReplaceLicenseDraftSourceTest.php tests/Feature/BulkReplaceLicenseDraftSourceConcurrencyTest.php tests/Feature/BulkLicenseDraftSourceAuthoringActionTest.php tests/Unit/BulkLicenseDraftSourceBrowserEvidenceTest.php tests/Support/BulkReplaceLicenseDraftSourceFixtures.php tests/Support/bulk-replace-license-draft-source-worker.php tests/browser/prepare-bulk-license-draft-source.php app/Domain/Commerce/Readiness/ProductionCommerceReadiness.php app/Console/Commands/CommerceReadiness.php tests/Feature/ProductionCommerceReadinessTest.php scripts/dev/persistent-content-bootstrap.php
     - composer audit
     - php vendor/bin/pint --version
     - php vendor/bin/pint --test app/Domain/Catalog/SaveTrackMetadata.php app/Domain/Catalog/SaveOfferDraft.php app/Domain/Catalog/DeactivateOffer.php tests/Feature/CatalogWriterAuthorityTest.php tests/Feature/RightsDeclarationWriterConcurrencyTest.php tests/Support/rights-declaration-writer-worker.php app/Domain/Rights/CreateLicenseDraft.php app/Domain/Rights/UpdateLicenseDraft.php app/Domain/Rights/ReviewLicense.php app/Domain/Rights/PublishLicense.php app/Domain/Catalog/PrepareExclusiveOffer.php app/Domain/Catalog/ActivateExclusiveOffer.php app/Domain/Commerce/Inventory/ManageRightsScope.php tests/Feature/LicenseWriterAuthorityTest.php tests/Feature/ExclusiveWriterAuthorityTest.php tests/Feature/RightsScopeWriterAuthorityTest.php tests/Feature/RightsScopeWriterConcurrencyTest.php tests/Support/rights-scope-writer-worker.php

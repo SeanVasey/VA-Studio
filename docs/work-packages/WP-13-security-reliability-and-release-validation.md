@@ -1,6 +1,6 @@
 # [WP-13] Security, reliability and exact-candidate release validation
 
-Status: **Planned work package**. Inspect the current implementation before starting; initial foundation code may already cover part of this scope. This issue is complete only when the acceptance evidence below exists.
+Status: **Implemented children; broader release/operations acceptance remains open**. [The current assessment](../remaining-code-assessment-20261006.md) credits existing operator MFA/recovery, customer isolation and retained test commerce. Inspect those implementations before adding work. This issue is complete only when the acceptance evidence below exists.
 
 - Suggested issue title: `[WP-13] Security, reliability and exact-candidate release validation`
 - Phase: 4; security controls start earlier
@@ -14,7 +14,7 @@ The store handles money, rights and private masters; release confidence must com
 
 ## First reviewable increment
 
-Threat/control review plus actual admin MFA and customer isolation tests, followed by staging commerce/restore and operational drills.
+Review and extend the existing admin MFA/recovery and customer isolation controls; execute production staging commerce/restore and operational drills when their dependencies are ready.
 
 ## Scope
 
@@ -35,6 +35,8 @@ Threat/control review plus actual admin MFA and customer isolation tests, follow
 ## Verification
 
 The October 6 [private alpha](../private-alpha.md) increment adds an isolated loopback installation for real admin practice: fresh temporary environment/cache/storage/database, random per-run credentials, synthetic private drafts, disabled external effects and bounded process cleanup. Required CI executes its native PHP/SQLite bootstrap and HTTP cases with `PRIVATE_ALPHA_REQUIRE_PHP=1`; missing prerequisites fail that check. This is a bounded setup/control child, not production MFA/recovery, deployment, backup-restore or provider acceptance. Actual counts, independent exact-source review and final integration disposition belong to the integrating PR.
+
+The October 6 [persistent onboarding child](../verification/persistent-content-onboarding.md) preserves an empty private authoring installation across stop/restart, with no fixtures/default credentials or external effects. Exact source `15862fa` passed 18 actual Node/PHP/SQLite/HTTP cases and independent review. It refuses unsafe ancestry, missing UID inspection and changed installation identity. Stopped copy-upgrade is a separate active child; host deployment, real scanner/mail, backup restore and consolidated release acceptance remain open.
 
 Run only meaningful required gates and tests resolving concrete risk. Include independent review of commerce/security changes and inspect actual staging flows. Record exact commit, environment and results. A checklist or unexecuted test definition is not completion evidence.
 

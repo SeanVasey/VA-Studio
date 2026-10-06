@@ -1,5 +1,18 @@
 # T09 bounded source and implementation reconciliation
 
+## Current reconciliation — October 6, 2026
+
+The [source-backed remaining assessment](../remaining-code-assessment-20261006.md)
+supersedes the missing-code statements below against verified main `13d7474f`.
+Real MFA enrollment/recovery, metadata presets/bulk edits, resumable media,
+inquiry/reply/history, public embeds/consent, customer accounts/identity/guest
+claims/library, verified test unpaid/full-refund resolution, collection versions
+and member refresh, and scanned WAV-kit intake now exist. Their remaining
+production/source/device/final-acceptance criteria are separate; they must not
+be estimated again as wholly missing code. No private account audit or live
+provider acceptance has been performed by this reconciliation. The October 1
+source and evidence below remain a historical checkpoint.
+
 Evidence captured October 1, 2026. Runtime reference: accepted main `8be3bd7271595f2c21a3c5017b3b19ceb821a842`. Current source inspected in the complete integration checkout at `df12ea64e1e05df7682cb5b62e3fa750134da552`, tree `38ef073721fb766e1875ba020f94f9d32c16e85b`; its tracked worktree was clean at the final identity check. This report is source review, not a new runtime/browser acceptance run. The [accompanying manifest](single-seller-source-evidence.json) hashes the concrete files used. Remote candidate `e08e90d69b8716b2641b6de603375358f6404176` has the identical inspected tree. Earlier samples included B1 media changes while those were being integrated; B1 does not establish deployed media/storage acceptance.
 
 Scope is Sean's single-seller VASEY.AUDIO store. Preserve the accepted catalog, licenses, test commerce/delivery, CMS, scheduling and exact theme. Do not introduce seller tenants, marketplace accounts, platform commissions or Stripe Connect.

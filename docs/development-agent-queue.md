@@ -1,6 +1,32 @@
 # Development agents and launch queue
 
-## Active continuation — October 6, 2026 UTC
+## Active parallel execution — October 6, 2026 UTC
+
+Verified main `13d7474f` includes PR #13 and the merged PR #14 manual CI policy.
+The integration owner uses `codex/bulk-license-integration-20261006`. All seven
+available workers are assigned; old agent tables below are historical.
+
+| Worker | Branch / owned files | Running work and handoff |
+| --- | --- | --- |
+| `/root` | `codex/bulk-license-integration-20261006`; shared registrations, workflows, README and control/register/work packages | Compose independently reviewed bulk, onboarding and readiness children; final focused checks, source freeze, shared review, cheap preflight and expected-head merge |
+| `/root/composition_review` | `codex/membership-credit-foundation-20261006`; new `Domain/Memberships`, models, migration `230000`, tests/worker and verification document | Membership policy revisions and append-only synthetic credit grants/reservations/consumption/reversal/expiry; actual SQLite 116/448 passed, 12 focused native races running. Bulk domain `d79a07e` is reviewed |
+| `/root/acceptance_evidence` | `codex/customer-notification-contract-20261006`; new `Domain/Notifications`, models, migration `231000`, tests/worker and verification document | Durable test order-ready intents, exact private capture, bounded leases and honest uncertainty/retry rules. Bulk UI `2f980cd` passes both SQLite and MySQL 61/1,079 and independent review |
+| `/root/browser_failure` | Isolated read-only source reviews and evidence | Bulk UI/native and onboarding `15862fa` approved; independently review the hardened production-policy child while its author finishes focused native cases |
+| `/root/persistent_onboarding` | `codex/persistent-upgrade-preparation-20261006`; new stopped copy-upgrade tooling/tests/document | Implement exact old-source identity checks, protected copy, forward-only migrations and full retained row/key/file/session preservation. Frozen onboarding `15862fa` passes 18/18 and independent review |
+| `/root/production_readiness` | `codex/production-track-policy-20261006`; new `Domain/Commerce/Policy`, models, migration `233000`, tests/worker and verification document | Immutable authored policy sources and separate exact-source acknowledgments; focused SQLite and native corrections/races. Read-only readiness `e236f0a` passed 66/334 and independent review |
+| `/root/remaining_scope` | Read-only actual-main inventory, estimates and shared CI/source review | All 40 groups and 103 parity rows reconciled; final frozen shared-registration review next. Service/merch contracts and downstream fixtures prepared before their implementation lane opens |
+
+The [parallel execution record](parallel-execution-20261006.md) records
+dependencies and integration order. Every handoff must bind evidence to the
+tested source, retain genuine failures, and verify that `ci.yml`/`focused.yml`
+are absent from the tracked tree, manual workflows remain manual and exact-SHA
+guards/provenance gates remain intact. No full hosted run has been started for
+this work. Full consolidated acceptance remains outstanding.
+
+## Preserved continuation before the development merge — October 6, 2026 UTC
+
+Pending states and per-merge full-CI instructions in dated sections below are
+historical and superseded by current AGENTS.md and the active queue above.
 
 [PR #13](https://github.com/SeanVasey/VA-Studio/pull/13) preserves reviewed ancestry from PRs #7–#12 against accepted `main`. The current batch adds captured license-draft editing and bounded customer download recovery, then repairs the observed inquiry-fixture catalog leak and asynchronous guest-claim focus observation. The [continuation record](verification/customer-operator-recovery-continuation.md) records source, checks and remaining acceptance. Earlier PRs retain their evidence and must not merge independently.
 

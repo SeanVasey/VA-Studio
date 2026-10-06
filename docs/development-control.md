@@ -1,6 +1,46 @@
 # Current development queue
 
-## Current continuation — October 6, 2026
+## Current integration and parallel execution — October 6, 2026 UTC
+
+Verified remote `main` is `13d7474f2f843084f7c7ab94b4e5e8105d08bbce`, tree
+`7a5a17c8bcd363bb79b2267bfb7bbe06ee1b300a`. PR #13 merged on October 6 at
+20:22:04 UTC with its reviewed head `58fff61e19f457631628a5c783bdc7234c36baa1`
+and successful cheap preflight `37525484300`. Exact ancestry includes every
+product head from PRs #7–#12. PRs #9, #10 and #12 were closed as superseded with
+their evidence and branches retained; #7, #8 and #11 report merged. Dependency
+PRs #1–#3 remain open for a coherent lockfile review and are not incorporated.
+
+PR #14's merged `4abee91825adc23a0fb9e572531c4d65cbcfa998` and the current
+[AGENTS.md](../AGENTS.md#ci-cost-policy--seans-instruction-october-6-2026)
+supersede every historical per-merge full-CI instruction below. Development
+batches use focused local evidence, independent sensitive review, cheap PR
+preflight and expected-head merge. Full verification is deferred to the exact
+reviewed final integrated candidate. Cancelled run `37521810874` remains a
+failed/incomplete acceptance record; it must not be restarted. No final full
+verification is claimed for the development merge.
+
+The active branch is `codex/bulk-license-integration-20261006`. It composes
+bounded bulk source replacement for 1–25 selected editable license drafts,
+captured comparison, all-or-none stale refusal, truthful uncertain-result
+recovery and native browser evidence definitions. Domain source has actual
+105-case focused MySQL evidence including 20 exact record waits. The 61-case
+UI selection passed on both SQLite and MySQL with independent source review. Durable onboarding `15862fa` passed 18/18 actual affected checks and independent review; the redacted readiness report passed 66/334. The composed application selection passed 216/1,963 without failures or skips. The [integration evidence](verification/private-authoring-integration-20261006.md) records exact component identities and limits.
+Complete native engine/scanner and consolidated database acceptance remain
+deferred; definitions and selected passes do not close them.
+
+Sean's 20:36 UTC direction is executing through separate membership-credit, notification-outbox, production-policy and stopped-workspace-upgrade branches while the reviewed private-authoring batch is integrated. The [parallel execution record](parallel-execution-20261006.md)
+names branches, file owners, dependencies and acceptance evidence. One lead
+integrates and publishes; authors do not modify shared registrations or restore
+retired workflows. The source-backed remaining register separates actual code,
+account/server configuration and final acceptance across all three milestones.
+Six accepted parent groups and 34 open groups are outcome status, not a code
+completion percentage.
+
+## Preserved continuation before the development merge — October 6, 2026
+
+The following dated sections preserve their original evidence. Their pending
+PR state and per-merge full-CI directions are superseded by the current record
+above and current AGENTS.md.
 
 [PR #13](https://github.com/SeanVasey/VA-Studio/pull/13) remains the one inclusive candidate against accepted `main`. Its next update integrates captured license-draft edits, explicit stale/uncertain-result recovery and effective download metadata/authorization deadlines with the reviewed preceding customer/support ancestry. A guarded inquiry-fixture correction restores the catalog after the real order-linked journey; the exact guest-claim focus assertion now waits for the existing React effect. See the [continuation record](verification/customer-operator-recovery-continuation.md) and [active agent queue](development-agent-queue.md#active-continuation--october-6-2026-utc).
 
@@ -8,7 +48,7 @@ The preceding head `1de6b314` failed [Foundation 37494698386](https://github.com
 
 Freeze and independently review the complete correction before one fresh full run. Require every gate, both ordinary native browser projects, genuine related journeys and all eleven startup safeguards, ten same-run/same-attempt database receipts and exact successful aggregation before expected-head merge, followed by fresh main verification. Earlier PRs remain evidence records and must not merge separately. Six parent groups remain accepted and 34 open.
 
-## Current GitHub execution — October 2, 2026
+## Preserved GitHub execution — October 2, 2026
 
 The active source is [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio), branch `codex/github-handoff-20261002`, [PR #4](https://github.com/SeanVasey/VA-Studio/pull/4). The [handoff record](verification/github-handoff-20261002.md) preserves all source identities; [agent assignments](development-agent-queue.md#current-github-execution--october-2-2026) define owned files and the current coherent batch.
 

@@ -1,5 +1,17 @@
 # Remaining development and completion plan
 
+## Current development policy and source — October 6, 2026 UTC
+
+Verified main `13d7474f` includes merged PR #13 and every preceding product
+branch from PRs #7–#12. PR #14 at `4abee918` and current AGENTS.md supersede
+the historical per-merge full-CI gates below: use reviewed focused development
+batches and cheap PR preflight, then reserve complete manual verification for
+the exact final integrated candidate. No final full pass is claimed for main.
+The [parallel execution record](parallel-execution-20261006.md) names active
+workers and dependencies. The remaining assessment separates code from
+account/server setup and final acceptance without reducing the agreed scope or
+treating six accepted parent groups as 15% code completion.
+
 ## Completion priority — October 5, 2026
 
 Sean's current instruction prioritizes the complete website and reduced serial waiting. The [completion execution plan](completion-execution.md) reconciles actual code with remaining scope, assigns parallel media/admin/commerce/CI work and sets a continuous acceptance cadence. The GitHub handoff merged as `1095dd5` with all thirteen applicable PR and post-merge checks passing; the historical execution sections below retain their original context. PR #5 provides bounded user-testing entry points while the next product batch is developed. A preview is not the product completion target, and no remaining product family or migration obligation is removed.
