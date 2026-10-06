@@ -20,3 +20,7 @@ After restoring `local`, bootstrap prepares and closes real private snapshots of
 - PHP formatting, JavaScript syntax, Python compilation and diff checks passed.
 
 The genuine ordinary positive startup case, ClamAV execution duration, and native Chromium/WebKit downloads require hosted execution with the real scanner/signatures and browser engines. Those tools are unavailable in this workspace; no native success is inferred from the focused checks. CI prerequisite installation is a separate coordinated change. External payment/contract-renderer inputs remain explicitly synthetic, and no production commerce or delivery enablement is claimed.
+
+## Hosted checkpoint
+
+Run `37410220669` on published head `12a5c70bc4b9dbb94353c290e031975803d24fa7` installed ClamAV 1.5.4 with official signature database 28144, dated October 5, 2026. Both ordinary browser jobs completed the genuine fixture bootstrap and passed the separate-login customer case, including original contract/asset byte and hash checks. Chromium passed all 55 cases; WebKit passed 53 with one existing intentional skip and an unrelated kit-navigation page error. The related startup job stopped before its native journeys because its frontend build prerequisite ran too late; that ordering receives a separate correction. These hosted results prove the ordinary fixture and customer-download behavior for this source, not acceptance of the complete run or any successor.

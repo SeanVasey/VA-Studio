@@ -2,7 +2,7 @@
 
 ## Active continuation — October 6, 2026 UTC
 
-The integrating [completion candidate](completion-execution.md#customer-recovery-and-large-kit-transport--october-6-2026-utc) now includes reviewed account/library, private test enrollment/recovery, collection/album drafts, inquiry conversations, verified unpaid release, WAV kit intake and resumable kit transport. Browser repairs preserve real response evidence and use genuine scans for original customer downloads. PR #6 is the current combined acceptance boundary; PR #5 remains contained and must be closed as superseded only after the combined merge is confirmed. Keep candidate heads frozen during full acceptance; a failed run does not certify its corrected successor.
+The integrating [completion candidate](completion-execution.md#order-lookup-and-final-acceptance-corrections--october-6-2026-utc) now includes reviewed account/library and exact order-reference lookup, private test enrollment/recovery, collection/album drafts, inquiry conversations, verified unpaid release, WAV kit intake and resumable kit transport. Browser repairs preserve real response evidence and use genuine scans for original customer downloads. PR #6 is the current combined acceptance boundary; PR #5 remains contained and must be closed as superseded only after the combined merge is confirmed. Keep candidate heads frozen during full acceptance; a failed run does not certify its corrected successor.
 
 | Lane | Current work and boundary |
 | --- | --- |
