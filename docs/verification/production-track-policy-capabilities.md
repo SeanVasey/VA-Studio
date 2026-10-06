@@ -166,6 +166,42 @@ final acceptance remain deferred. No MySQL matrix or hosted CI was launched.
 Independent sensitive-domain review and integration disposition are recorded by
 the integration owner against the frozen continuation commit.
 
+## Reviewed rollback ownership correction
+
+Independent review of `da3b688` reproduced a teardown defect: when all owned
+tables were absent, `down()` still dropped a same-named trigger attached to an
+unrelated table. That predecessor is preserved and its actual red canary returns
+exit 1 after deleting the foreign trigger. The successor compiles the original
+table and guard definitions once for both creation and read-only rollback
+admission. Before any teardown DDL it checks permanent exact table/index/guard
+identity and definition, complete installation, temporary shadows and external
+foreign keys, views and triggers; MySQL also checks storage, typed columns,
+constraints and visible routine dependencies. Ambiguous or unreadable dependency
+definitions fail closed. Foreign, partial and modified objects are retained.
+Populated evidence still prevents teardown; an entirely absent clean installation
+is a no-op, and an exact empty owned installation can be removed and recreated.
+
+The copied negative canary now refuses rollback and preserves the foreign trigger
+and table, returning exit 0. The dedicated
+`ProductionTrackCapabilitiesMigrationOwnershipTest` first passed 23 SQLite cases / 54
+assertions, including missing/modified/aliased guards, missing/modified/additional
+indexes and columns, partial objects, temporary shadows, external child/view/
+trigger dependencies, absent-schema foreign objects and successful empty control
+paths. Rejection cases observe zero teardown DDL and identical before/after
+catalogs. A preceding broader affected source/compiler/ownership/unit selection
+passed 257 cases: 256 passed / 431 assertions, with the same explicit MySQL-only
+engine case skipped. The final fixture isolates its intrinsically SQLite
+connection even when the surrounding suite selects MySQL, instead of introducing
+MySQL omissions. After that fixture refinement, the exact final ownership and
+guard-control selection passes 49 cases / 111 assertions with zero skips. It
+supersedes the earlier ownership receipts; the preceding broader result remains
+separate evidence for its recorded source. Pint, changed-file syntax and diff
+checks pass. Exact-source logs, JUnit receipts, the red/green canaries and
+application/test autoload bindings are
+retained in the review evidence directory. MySQL execution and final integrated
+acceptance remain deferred; this correction changes no policy record, execution
+flag, source commitment or commerce path.
+
 ## Next consumer and remaining acceptance
 
 The next production pricing/order adapter must freeze projection purpose/schema,
