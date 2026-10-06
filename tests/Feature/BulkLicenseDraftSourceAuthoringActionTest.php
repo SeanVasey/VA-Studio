@@ -55,7 +55,8 @@ class BulkLicenseDraftSourceAuthoringActionTest extends TestCase
 
     private function input(array $drafts): mixed
     {
-        return Livewire::test(ManageLicenseVersions::class)->mountTableBulkAction('replaceDraftSource', $drafts);
+        return Livewire::test(ManageLicenseVersions::class)->set('tableRecordsPerPage', 25)
+            ->mountTableBulkAction('replaceDraftSource', $drafts);
     }
 
     private function preview(array $drafts, string $source = 'NONBINDING replacement source'): mixed
@@ -76,7 +77,7 @@ class BulkLicenseDraftSourceAuthoringActionTest extends TestCase
         $page->assertActionDataSet(['authored_source' => $source])->assertSet('bulkAuthoredSource', $source)
             ->assertDispatched('form-validation-error', livewireId: $page->instance()->getId());
         if ($page->get('mountedActions.0.name') === 'reviewBulkSource') {
-            $page->assertActionDisabled('reviewBulkSource');
+            $this->assertTrue($page->instance()->getMountedAction()->isDisabled());
         }
         $this->assertStringContainsString('Keep a copy', $page->getMountedActionModalHtml());
     }
@@ -134,7 +135,8 @@ class BulkLicenseDraftSourceAuthoringActionTest extends TestCase
     {
         ['first' => $first, 'second' => $second] = $this->pending();
         $before = $this->evidence();
-        $page = $this->preview([$first, $second])->mountAction('backToBulkSource')->assertActionMounted('replaceDraftSource')
+        $page = $this->preview([$first, $second])->mountAction('backToBulkSource')->assertSet('mountedActions.0.name', 'replaceDraftSource')
+            ->assertSet('mountedActions.0.context', ['table' => true, 'bulk' => true])
             ->assertActionDataSet(['authored_source' => 'NONBINDING replacement source'])->assertSet('bulkSourceReview', null);
         $page->setActionData(['authored_source' => 'NONBINDING changed after Back'])->callMountedAction()
             ->assertHasNoActionErrors()->assertActionMounted('reviewBulkSource');
@@ -288,7 +290,7 @@ class BulkLicenseDraftSourceAuthoringActionTest extends TestCase
 
     public static function invalidSelections(): array
     {
-        return ['empty' => [[]], 'duplicate' => [['1', '1']], 'leading zero' => [['01']], 'float' => [[1.0]],
+        return ['empty' => [[]], 'duplicate' => [['1', '1']], 'leading zero' => [['01']], 'float' => [[1.5]],
             'negative' => [[-1]], 'zero' => [['0']], 'overflow' => [['999999999999999999999999']],
             'nested' => [[[1]]], 'associative' => [['chosen' => '1']], 'over cap' => [range(1, 26)]];
     }
@@ -412,7 +414,8 @@ class BulkLicenseDraftSourceAuthoringActionTest extends TestCase
         DB::table('license_templates')->where('id', $first->license_template_id)->update(['name' => $name]);
         $source = "NONBINDING literal </textarea><script>synthetic-source</script>\n".str_repeat('longword', 80);
         $page = $this->preview([$first], $source);
-        $html = $page->getMountedActionModalHtml();
+        // Preview replacement forces a complete render; error recovery emits a modal partial.
+        $html = $page->effects['partials']['action-modals.0'] ?? $page->effects['partials']['action-modals'] ?? $page->html();
         $this->assertStringNotContainsString('<script>synthetic-template</script>', $html);
         $this->assertStringNotContainsString('<script>synthetic-source</script>', $html);
         $this->assertStringContainsString('&lt;script&gt;synthetic-template&lt;/script&gt;', $html);

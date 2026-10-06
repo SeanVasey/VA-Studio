@@ -70,7 +70,7 @@ class LicenseVersionResource extends OperatorResource
                 ->modalSubmitAction(fn (Action $action) => $action->extraAttributes(['wire:loading.attr' => null]))
                 ->modalDescription('Select 1 to 25 editable drafts on this page. Enter the intended source, then compare every draft before saving. Structured terms and availability dates stay unchanged.')
                 ->schema([Textarea::make('authored_source')->label('Replacement source')->required()->rows(12)
-                    ->helperText('The same source must be valid for the retained terms of every selected draft. This does not request license review or publish a version.')])
+                    ->helperText('The same source must be valid for the retained terms of every selected draft. This does not request license review or publish a version. Keep a copy of your entered source if review is blocked, then close and reopen the selected drafts before trying again.')])
                 ->mountUsing(fn (ManageLicenseVersions $livewire, Schema $schema) => $schema->fill($livewire->captureBulkSourceInput()))
                 ->action(fn (array $data, ManageLicenseVersions $livewire, Action $action) => $livewire->reviewBulkSource($data, $action)),
         ])->recordActions([
