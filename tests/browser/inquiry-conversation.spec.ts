@@ -53,9 +53,14 @@ test('visitor reads an in-app staff reply, retries one real follow-up and retain
     await page.getByRole('button', { name: 'Send follow-up', exact: true }).focus(); await page.keyboard.press('Enter');
     await expect(conversation.getByRole('alert')).toContainText('could not confirm'); expect(bodies).toHaveLength(1);
     await expect(page.getByLabel('Follow-up message', { exact: true })).toHaveAttribute('readonly', '');
+    const replayed = page.waitForResponse(response => new URL(response.url()).pathname === endpoint && response.request().method() === 'POST');
     await page.getByRole('button', { name: 'Retry same follow-up', exact: true }).click();
-    await expect(conversation.getByText(followUp, { exact: true })).toBeVisible();
+    const replay = await replayed; expect(replay.status()).toBe(200); expect(await replay.finished()).toBeNull();
+    expect(replay.request().postData()).toBe(bodies[0]);
+    expect(await replay.json()).toEqual({ state: 'saved', messageId: messageIds[0] });
     expect(bodies).toHaveLength(2); expect(bodies[1]).toBe(bodies[0]); expect(messageIds[1]).toBe(messageIds[0]);
+    await expect(conversation.getByRole('status')).toHaveText('Your follow-up was saved. Replies appear here; no email is sent.');
+    await expect(conversation.getByRole('list', { name: 'Conversation messages', exact: true }).getByText(followUp, { exact: true })).toBeVisible();
     const snapshot = await (await page.request.get(endpoint)).json();
     expect(snapshot.messages.filter((message: { sender: string }) => message.sender === 'you')).toEqual([expect.objectContaining({ id: messageIds[0], message: followUp })]);
     const stored = await page.evaluate(() => [...Object.values(localStorage), ...Object.values(sessionStorage)].join('\n'));
