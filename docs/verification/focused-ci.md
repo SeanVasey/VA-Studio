@@ -1,12 +1,18 @@
 # Focused development feedback
 
-T01 first increment adds `.github/workflows/focused.yml` alongside Foundation CI. This focused workflow does not replace full required merge checks or production/release acceptance. Its job names explicitly say **informative**. A focused success means only the recorded selection passed. The integrating B0 candidate also contains separately reviewed Foundation CI documentation-scope classification and acceptance routing; those companion changes are outside this focused runner's scope.
+The manual `.github/workflows/focused-feedback.yml` workflow supplies bounded
+feedback when a needed environment is unavailable locally. A success covers only
+the recorded selection. Under Sean's October 6 instruction, focused evidence may
+support a development merge; complete final verification remains separate.
 
 ## Triggers and selections
 
-Every feature-branch push, excluding `main` and tag pushes, runs the fixed **unit / SQLite** selection. A PR still triggers Foundation CI with the integrating candidate's independently defined scope policy; a push to an open PR can therefore produce both workflows. Compose a coherent candidate before opening/updating a ready PR to limit full-run frequency. The focused workflow adds no draft suppression, post-merge deduplication or schedule.
-
-Once this workflow exists on the default branch, GitHub Actions → **Focused development feedback** → **Run workflow** can select a branch/ref, suite and engine. `workflow_dispatch` is also usable with a client that supports dispatch. This does not require the current connector to expose dispatch: feature pushes supply automatic unit feedback.
+There are no push, PR, schedule or bot-specific triggers. The former `focused.yml`
+identity is disabled so stale branches cannot launch redundant unit feedback.
+Select **Focused development feedback → Run workflow**, the reviewed branch/ref,
+suite and engine only when necessary. Avoid duplicate requests for the same source
+and selection; use local checks and batch changes while iterating. Routine PRs
+receive the distinct [development preflight](ci-trigger-efficiency.md).
 
 | Suite enum | Fixed scope | Engine |
 | --- | --- | --- |
