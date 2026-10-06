@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import { expect, test, type Locator, type Page, type Response, type TestInfo } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
+import { actionResponse } from './publication-fixture';
 
 type Fixture = { operatorEmail: string; verifiedId: string; attentionId: string; orderId: string; privateMarkers: string[] };
 type Proof = { phase: string; inspectionAudits: { verified: number; attention: number }; evidenceUnchanged: boolean; guardsRestored: boolean };
@@ -22,12 +23,22 @@ function inspectionButton(page: Page, id: string) {
   return page.getByRole('row').filter({ has: page.getByText(id, { exact: true }) }).getByRole('button', { name: 'Inspect retained evidence', exact: true });
 }
 
-async function operate(page: Page, button: Locator, expectedStatus = 200): Promise<Response> {
-  // Operate the ordinary action; capture its real Livewire response without intercepting or fabricating a request.
-  const pending = page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/update') && response.request().method() === 'POST');
+async function operate(page: Page, button: Locator, method: Parameters<typeof actionResponse>[1], actionName?: string, expectedStatus = 200): Promise<Response> {
+  // Retain the record context emitted by the real table button; never fabricate an action request.
+  const encodedContext = method === 'mountAction'
+    ? (await button.getAttribute('wire:click'))?.match(/JSON\.parse\('([^']+)'\)/)?.[1] : undefined;
+  if (method === 'mountAction') expect(encodedContext).toBeDefined();
+  const expectedContext = encodedContext === undefined ? undefined : JSON.parse(JSON.parse(`"${encodedContext}"`));
+  const pending = actionResponse(page, method, actionName);
   await button.focus();
   await button.press('Enter');
   const response = await pending;
+  if (expectedContext !== undefined) {
+    const payload = response.request().postDataJSON() as { components?: { calls?: { method: string; params: unknown[] }[] }[] };
+    const call = payload.components?.flatMap(component => component.calls ?? [])
+      .find(call => call.method === method && call.params[0] === actionName);
+    expect(call?.params[2]).toEqual(expectedContext);
+  }
   expect(response.status()).toBe(expectedStatus);
   await response.finished();
   return response;
@@ -42,7 +53,7 @@ async function close(page: Page, returnTo: Locator) {
   await expect(cancel).toBeEnabled();
   await cancel.scrollIntoViewIfNeeded();
   await expect(cancel).toBeInViewport({ ratio: 1 });
-  await operate(page, cancel);
+  await operate(page, cancel, 'unmountAction');
   await expect(dialog.getByRole('heading', { name: 'Retained test-payment evidence', exact: true })).not.toBeVisible();
   await expect(returnTo).toBeFocused();
 }
@@ -102,7 +113,7 @@ test('ordinary operator inspects retained synthetic exceptions and stale authori
     expect((await page.goto('/admin/test-payment-exceptions'))?.status()).toBe(200);
     await page.bringToFront();
     const verified = inspectionButton(page, fixture.verifiedId);
-    const first = await operate(page, verified);
+    const first = await operate(page, verified, 'mountAction', 'inspectEvidence');
     const dialog = page.getByRole('dialog');
     await expect(dialog.getByRole('heading', { name: 'Retained test-payment evidence', exact: true })).toBeVisible();
     await expect(dialog.getByText('Stored graph verified', { exact: true })).toBeVisible();
@@ -119,14 +130,14 @@ test('ordinary operator inspects retained synthetic exceptions and stale authori
     await captureInspection(page, dialog, 'Stored graph verified', 'verified', testInfo);
     await close(page, verified);
 
-    const reopened = await operate(page, verified);
+    const reopened = await operate(page, verified, 'mountAction', 'inspectEvidence');
     await expect(dialog.getByText('Stored graph verified', { exact: true })).toBeVisible();
     await assertPrivate(page, fixture, reopened);
     expect(verify(testInfo.project.name, 'reopened').inspectionAudits.verified).toBeGreaterThan(initial.inspectionAudits.verified);
     await close(page, verified);
 
     const attention = inspectionButton(page, fixture.attentionId);
-    const corrupt = await operate(page, attention);
+    const corrupt = await operate(page, attention, 'mountAction', 'inspectEvidence');
     await expect(dialog.getByText('Evidence needs attention', { exact: true })).toBeVisible();
     await expect(dialog.getByText('The complete retained evidence could not be verified. No financial or fulfillment change was made.', { exact: true })).toBeVisible();
     await expect(dialog.getByText('Stored graph verified', { exact: true })).toHaveCount(0);
@@ -138,34 +149,34 @@ test('ordinary operator inspects retained synthetic exceptions and stale authori
     await close(page, attention);
 
     const row = page.getByRole('row').filter({ has: page.getByText(fixture.verifiedId, { exact: true }) });
-    await operate(page, row.getByRole('button', { name: 'Record operational status', exact: true }));
+    await operate(page, row.getByRole('button', { name: 'Record operational status', exact: true }), 'mountAction', 'recordDisposition');
     await expect(dialog.getByRole('heading', { name: 'Record test exception review', exact: true })).toBeVisible();
     await dialog.getByLabel('Operational status', { exact: false }).selectOption('acknowledged');
-    await operate(page, dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Submit', exact: true }));
+    await operate(page, dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Submit', exact: true }), 'callMountedAction');
     await expect(page.getByText('Operational status recorded', { exact: true })).toBeVisible();
     verify(testInfo.project.name, 'disposition');
 
-    await operate(page, row.getByRole('button', { name: 'Operational history', exact: true }));
+    await operate(page, row.getByRole('button', { name: 'Operational history', exact: true }), 'mountAction', 'operationHistory');
     await expect(dialog.getByRole('heading', { name: 'Test exception operational history', exact: true })).toBeVisible();
     await expect(dialog).toContainText('acknowledged');
     await expect(dialog).toContainText('Fulfillment remains blocked');
     await assertPrivate(page, fixture);
     verify(testInfo.project.name, 'operation_history');
-    await operate(page, dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Close', exact: true }));
+    await operate(page, dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Close', exact: true }), 'unmountAction');
 
     // The browser fixture intentionally has no provider credential or enabled processing policy.
-    await operate(page, row.getByRole('button', { name: 'Check current test payment', exact: true }));
+    await operate(page, row.getByRole('button', { name: 'Check current test payment', exact: true }), 'mountAction', 'reconcilePayment');
     await expect(dialog.getByRole('heading', { name: 'Check current test payment', exact: true })).toBeVisible();
-    await operate(page, dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Submit', exact: true }));
+    await operate(page, dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Submit', exact: true }), 'callMountedAction');
     await expect(page.getByText('Test payment check was not confirmed', { exact: true })).toBeVisible();
     await expect(dialog.getByRole('heading', { name: 'Check current test payment', exact: true })).toBeVisible();
     await assertPrivate(page, fixture);
     verify(testInfo.project.name, 'processing_unavailable');
-    await operate(page, dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Cancel', exact: true }));
+    await operate(page, dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Cancel', exact: true }), 'unmountAction');
     expect(errors).toEqual([]);
 
     expect(fixtureOperation('withdraw', testInfo.project.name)).toEqual({ withdrawn: true });
-    const denied = await operate(page, verified, 403);
+    const denied = await operate(page, verified, 'mountAction', 'inspectEvidence', 403);
     await assertPrivate(page, fixture, denied);
     verify(testInfo.project.name, 'withdrawn');
     const deniedPage = await page.goto('/admin/test-payment-exceptions');
