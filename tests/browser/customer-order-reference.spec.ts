@@ -59,11 +59,18 @@ test('customer finds an original purchase by reference with keyboard controls an
   await page.getByLabel('Password', { exact: true }).fill(process.env.VASEY_BROWSER_PASSWORD!);
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
-  const navigations: string[] = [];
-  page.on('framenavigated', frame => { if (frame === page.mainFrame()) navigations.push(frame.url()); });
+  const documentNavigations: string[] = [];
   const requests: Array<{ path: string; method: string }> = [];
-  page.on('request', request => { const path = new URL(request.url()).pathname; if (path.startsWith('/orders/')) requests.push({ path, method: request.method() }); });
+  page.on('request', request => {
+    if (request.isNavigationRequest() && request.frame() === page.mainFrame()) documentNavigations.push(request.url());
+    const path = new URL(request.url()).pathname;
+    if (path.startsWith('/orders/')) requests.push({ path, method: request.method() });
+  });
   const lookup = page.getByRole('region', { name: 'Find an account order', exact: true });
+  await expect(lookup).toBeVisible();
+  // Frame events also include same-document history updates. Retain the actual Document
+  // and reject navigation requests so the lookup must keep this loaded account document.
+  const accountDocument = await page.evaluateHandle(() => document);
   const reference = lookup.getByRole('textbox', { name: 'Order reference', exact: true });
   await reference.fill(missing);
   const [denied] = await Promise.all([
@@ -96,7 +103,9 @@ test('customer finds an original purchase by reference with keyboard controls an
   expect(await reference.evaluate(element => element.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44);
   expect(await page.evaluate(() => JSON.stringify({ local: Object.entries(localStorage), session: Object.entries(sessionStorage) }))).not.toContain(fixture.orderId);
   await expect(page).toHaveURL(/\/account$/);
-  expect(navigations).toEqual([]);
+  expect(documentNavigations).toEqual([]);
+  expect(await accountDocument.evaluate(original => original === document)).toBe(true);
+  await accountDocument.dispose();
   await page.screenshot({ path: testInfo.outputPath('customer-order-reference-original.png'), fullPage: true });
   await lookup.getByRole('button', { name: 'Clear order lookup', exact: true }).click();
   await expect(reference).toHaveValue(''); await expect(reference).toBeFocused();
