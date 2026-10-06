@@ -7,6 +7,51 @@ import { deliveryRoles, type DeliveryKind } from '../../resources/js/lib/test-de
 
 type FileFixture = { filename: string; sha256: string; sizeBytes: number };
 interface CustomerFixture { orderId: string; contract: FileFixture; asset: FileFixture & { kind: Exclude<DeliveryKind, 'contract'> } }
+interface CapturedResponse { requestUrl: string; responseUrl: string; status: number; cacheControl: string | null; redirected: boolean; body: string }
+
+/** Observe the real native response before the app can navigate away from its CDP resource.
+ * No routes are intercepted, requests replayed, or response bytes/status replaced: native fetch
+ * runs once, a clone is copied through the binding, then the identical Response reaches the app.
+ */
+async function captureNavigatingResponses(page: Page) {
+  const pending = new Map<string, (response: CapturedResponse) => void>();
+  await page.exposeBinding('__vaseyCustomerResponseCaptured', (_source, response: CapturedResponse) => {
+    pending.get(response.requestUrl)?.(response);
+  });
+  await page.addInitScript(() => {
+    const nativeFetch = window.fetch.bind(window);
+    window.fetch = async (input, init) => {
+      const requestUrl = new URL(input instanceof Request ? input.url : String(input), window.location.href);
+      const method = (init?.method ?? (input instanceof Request ? input.method : 'GET')).toUpperCase();
+      const response = await nativeFetch(input, init);
+      if (method === 'POST' && requestUrl.origin === window.location.origin
+        && (/^\/account\/sign-(?:in|out)$/.test(requestUrl.pathname)
+          || /^\/orders\/[a-f0-9-]{36}\/delivery\/authorizations$/.test(requestUrl.pathname))) {
+        const body = await response.clone().text();
+        await (window as unknown as { __vaseyCustomerResponseCaptured: (value: CapturedResponse) => Promise<void> }).__vaseyCustomerResponseCaptured({
+          requestUrl: requestUrl.href, responseUrl: response.url, status: response.status,
+          cacheControl: response.headers.get('cache-control'), redirected: response.redirected, body,
+        });
+      }
+      return response;
+    };
+  });
+  return async (path: string, action: () => Promise<void>) => {
+    const url = new URL(path, page.url()).href;
+    if (pending.has(url)) throw new Error('A customer response capture is already pending for this URL.');
+    const captured = new Promise<CapturedResponse>(resolve => pending.set(url, resolve));
+    const observed = page.waitForResponse(response => response.url() === url && response.request().method() === 'POST');
+    try {
+      const [response, copy] = await Promise.all([observed, captured, action()]);
+      expect(copy.responseUrl).toBe(response.url());
+      expect(copy.status).toBe(response.status());
+      expect(copy.cacheControl).toBe(response.headers()['cache-control']);
+      expect(copy.redirected).toBe(false);
+      return { response, body: JSON.parse(copy.body) };
+    } finally { pending.delete(url); }
+  };
+}
+
 function customerFixture(project: string): CustomerFixture {
   return JSON.parse(readFileSync(join(process.env.VASEY_BROWSER_DIRECTORY!, 'customer-fixtures.json'), 'utf8')).projects[project];
 }
@@ -27,6 +72,7 @@ test('customer signs in with a fresh session, reads the account library and sign
   expect(password).toBeTruthy();
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
+  const capture = await captureNavigatingResponses(page);
   await page.goto('/');
   const navigation = page.getByRole('navigation', { name: 'Main navigation' });
   const menu = page.getByRole('button', { name: 'Menu', exact: true });
@@ -48,12 +94,12 @@ test('customer signs in with a fresh session, reads the account library and sign
   await expect(page.getByRole('alert')).toHaveText('Sign-in could not be completed. Check your details and try again.');
   await expect(page.getByLabel('Password', { exact: true })).toHaveValue('');
   await page.getByLabel('Password', { exact: true }).fill(password!);
-  const authenticated = page.waitForResponse(response => response.url().endsWith('/account/sign-in') && response.request().method() === 'POST');
-  await page.getByRole('button', { name: 'Sign in', exact: true }).focus();
-  await page.keyboard.press('Enter');
-  const saved = await authenticated;
+  const { response: saved, body: authenticated } = await capture('/account/sign-in', async () => {
+    await page.getByRole('button', { name: 'Sign in', exact: true }).focus();
+    await page.keyboard.press('Enter');
+  });
   expect(saved.status()).toBe(200);
-  expect(await saved.json()).toEqual({ authenticated: true, next: '/account' });
+  expect(authenticated).toEqual({ authenticated: true, next: '/account' });
   expect(saved.headers()['cache-control']).toContain('no-store');
   await expect(page).toHaveURL(/\/account$/);
   await expect(page.getByRole('heading', { name: 'Your test order library', exact: true })).toBeVisible();
@@ -78,10 +124,8 @@ test('customer signs in with a fresh session, reads the account library and sign
   for (const privateValue of [password!, 'browser-customer@example.test', 'Synthetic Customer', currentToken!]) expect(storage).not.toContain(privateValue);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath('customer-account-native-library.png'), fullPage: true });
-  const signedOut = page.waitForResponse(response => response.url().endsWith('/account/sign-out') && response.request().method() === 'POST');
-  await page.getByRole('button', { name: 'Sign out', exact: true }).click();
-  const ended = await signedOut;
-  expect(ended.status()).toBe(200); expect(await ended.json()).toEqual({ authenticated: false, next: '/account/sign-in' });
+  const { response: ended, body: signedOut } = await capture('/account/sign-out', () => page.getByRole('button', { name: 'Sign out', exact: true }).click());
+  expect(ended.status()).toBe(200); expect(signedOut).toEqual({ authenticated: false, next: '/account/sign-in' });
   await expect(page).toHaveURL(/\/account\/sign-in$/);
   await expect(page.getByText('Synthetic Customer', { exact: true })).toHaveCount(0);
   expect(await page.locator('meta[name="csrf-token"]').getAttribute('content')).not.toBe(currentToken);
@@ -114,6 +158,7 @@ test('a separate login session discovers the frozen test purchase and downloads 
     await first.close();
     fresh = await browser.newContext({ ...testInfo.project.use, baseURL: 'http://127.0.0.1:8173' });
     const page = await fresh.newPage(); page.on('pageerror', error => errors.push(error.message));
+    const capture = await captureNavigatingResponses(page);
     const denied = await page.request.get(`/orders/${fixture.orderId}/status`);
     expect(denied.status()).toBe(404);
     expect(await denied.text()).not.toContain(fixture.orderId);
@@ -138,14 +183,15 @@ test('a separate login session discovers the frozen test purchase and downloads 
       { kind: 'contract', expected: fixture.contract }, { kind: fixture.asset.kind, expected: fixture.asset },
     ];
     for (const { kind, expected } of files) {
-      const issued = page.waitForResponse(response => response.url().endsWith(`/orders/${fixture.orderId}/delivery/authorizations`) && response.request().method() === 'POST');
       const downloaded = page.waitForEvent('download');
       const button = panel.getByRole('button', { name: `Download ${deliveryRoles[kind].label}`, exact: true });
-      await button.focus(); await button.press('Enter');
-      const response = await issued; expect(response.status()).toBe(201);
+      const [{ response, body }, download] = await Promise.all([
+        capture(`/orders/${fixture.orderId}/delivery/authorizations`, async () => { await button.focus(); await button.press('Enter'); }),
+        downloaded,
+      ]);
+      expect(response.status()).toBe(201);
       expect(response.headers()['cache-control']).toContain('no-store');
-      const authorization = (await response.json()).authorization;
-      const download = await downloaded;
+      const authorization = body.authorization;
       expect(download.suggestedFilename()).toBe(expected.filename);
       const path = testInfo.outputPath(expected.filename); await download.saveAs(path);
       const bytes = await readFile(path);
