@@ -22,6 +22,7 @@ import xml.etree.ElementTree as ET
 
 PHP_TARGETS = {
     "unit": (
+        "tests/Unit/BrowserLoginRateLimitFixtureTest.php",
         "tests/Unit/CatalogDryRunTest.php", "tests/Unit/CatalogDryRunCommandTest.php",
         "tests/Unit/AllocateDiscountTest.php", "tests/Unit/CommerceGuardBytesTest.php", "tests/Unit/ContractTextTest.php",
         "tests/Unit/EconomicLicenseTermsTest.php", "tests/Unit/FileUploadPathGuardTest.php",
