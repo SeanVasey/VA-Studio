@@ -2,15 +2,15 @@
 
 ## Active continuation — October 6, 2026 UTC
 
-The integrating [completion candidate](completion-execution.md#complete-related-journey-allowance--october-6-2026-utc) includes reviewed account/library and exact order-reference lookup, private test enrollment/recovery, collection/album drafts, inquiry conversations, verified unpaid release, WAV kit intake and resumable kit transport. Its next correction gives the complete genuine related journey a measured, bounded harness allowance while preserving every assertion, cleanup step and outer limit. Collection-member refresh and retained order-item details remain separate follow-up work. PR #6 remains the current combined acceptance boundary; PR #5 must close as superseded only after the combined merge is confirmed. A failed run does not certify its corrected successor.
+The preceding [PR #6](https://github.com/SeanVasey/VA-Studio/pull/6) and incorporated PR #5 are merged. Full PR acceptance and fresh main verification passed on `387fdeb`, tree `63b832dd`. The [current candidate](verification/customer-product-followup-composition.md) combines independently reviewed collection-member snapshot refresh and original customer test-order item details. It requires its own full acceptance and ten database receipts. New guest-claim and refunded-exception children proceed independently while that candidate is verified.
 
 | Lane | Current work and boundary |
 | --- | --- |
 | Integration `/root` | Compose exact reviewed sources, preserve branch ancestry, run complete discovery/focused verification, publish one candidate and require full hosted acceptance before expected-head merge |
-| Customer `/root/customer_reconcile` | Reviewed self-service e664e22 is composed in the next branch; full native browser/CI acceptance and production email/guest claims remain separate |
-| Product `/root/product_reconcile` | Reviewed true-kit transport984a49f is composed in the next branch; full native browser/CI and product commerce remain separate |
-| CI review `/root/ci_reconcile` | Independently review composed source, exact census/skip registration and browser budget changes; no gate or receipt reuse relaxation |
-| Commerce review `/root/commerce_review` | Independently review unpaid resource effects and subsequent kit transport boundaries |
+| CI review `/root/runtime_restore` | Restore and verify native dependencies, prove exact discovery/partition/skip coverage, investigate execution failures and verify fresh hosted receipts |
+| Independent review `/root/prepared_review` | Review prepared composition and subsequent guest-claim authorization, migration and original-evidence boundaries |
+| Customer `/root/guest_claim` | Explicit, expiring original-session proof for one completed paid guest test order, account confirmation and immutable per-order access; no email inference or owner-key rewrite |
+| Financial `/root/next_scope` | Reviewed test-only release of pending resources for a fully refunded, unfulfilled paid exception; schema and operator children have separate ownership |
 
 The tables below retain prior checkpoints and do not imply additional running agents. Unfinished feature branches are not acceptance evidence or merged main state. No lane waits for unrelated database CI to begin its next dependency-ready child.
 
