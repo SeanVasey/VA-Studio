@@ -8,6 +8,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "preview:design": "vite --config vite.preview.config.ts --host 127.0.0.1",
+    "build:preview": "tsc --noEmit && vite build --config vite.preview.config.ts",
+    "alpha:local": "node scripts/dev/private-alpha.mjs",
+    "test:alpha": "node --test scripts/dev/private-alpha.test.mjs",
     "test:browser": "node tests/browser/run.mjs"
   },
   "dependencies": {

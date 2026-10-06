@@ -59,6 +59,10 @@ jobs:
       - run: npm run build
       - name: Scan the built client bundle for server secrets
         run: python3 scripts/ci/scan-client-bundle.py
+      - name: Build the isolated storefront preview
+        run: npm run build:preview
+      - name: Scan the preview bundle for server secrets
+        run: python3 scripts/ci/scan-client-bundle.py dist/design-preview
       - run: npm audit --audit-level=high
 
   backend-quality:
@@ -68,6 +72,9 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
       - uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45 # v2
         with:
           php-version: '8.4'
@@ -78,6 +85,10 @@ jobs:
       - name: Verify bounded PHP test capabilities
         run: php scripts/ci/verify-php-test-runtime.php
       - run: composer install --no-interaction --prefer-dist
+      - name: Verify isolated private alpha startup and recovery
+        env:
+          PRIVATE_ALPHA_REQUIRE_PHP: '1'
+        run: node --test scripts/dev/private-alpha.test.mjs
       - run: composer validate --strict
       - run: vendor/bin/pint --version
       - name: Verify the current rights-writer formatting boundary
