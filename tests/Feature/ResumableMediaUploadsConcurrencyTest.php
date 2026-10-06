@@ -7,6 +7,7 @@ use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\Models\MediaUploadSession;
 use App\Domain\Media\ResumableMediaUploads;
 use App\Support\Audit\AuditEvent;
+use Filament\Facades\Filament;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -34,6 +35,74 @@ class ResumableMediaUploadsConcurrencyTest extends TestCase
     {
         return ['duplicate chunk' => ['append', 'append'], 'duplicate completion' => ['complete', 'complete'],
             'cancellation wins' => ['cancel', 'complete'], 'completion wins' => ['complete', 'cancel']];
+    }
+
+    public static function mfaOperations(): array
+    {
+        return ['start' => ['start'], 'inspect' => ['inspect'], 'append' => ['append'], 'complete' => ['complete'], 'cancel' => ['cancel']];
+    }
+
+    #[DataProvider('mfaOperations')]
+    public function test_required_mfa_withdrawn_during_native_actor_wait_refuses_upload_operation(string $operation): void
+    {
+        $this->fakePrivateMediaStorage();
+        $panel = Filament::getPanel('admin');
+        $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: true);
+        $actor = LicenseFixtures::admin();
+        $actor->saveAppAuthenticationSecret($panel->getMultiFactorAuthenticationProviders()['app']->generateSecret());
+        $track = Track::create(['title' => 'SYNTHETIC MFA withdrawal', 'slug' => 'mfa-withdrawal']);
+        $bytes = MediaFixtures::png();
+        $service = app(ResumableMediaUploads::class);
+        $session = $service->start($track, 'artwork', strlen($bytes), hash('sha256', $bytes), 'synthetic.png', $actor);
+        $service->append($session['id'], 0, UploadedFile::fake()->createWithContent('chunk.bin', $bytes), $actor);
+        $before = MediaUploadSession::sole()->getAttributes();
+        $files = Storage::disk('local')->allFiles();
+        $audits = AuditEvent::count();
+        $directory = storage_path('framework/testing/resumable-mfa-'.Str::uuid());
+        (new Filesystem)->makeDirectory($directory, 0700, true);
+        file_put_contents($directory.'/chunk.bin', $bytes);
+        $processes = [];
+        try {
+            DB::beginTransaction();
+            DB::table('users')->where('id', $actor->id)->lockForUpdate()->first();
+            $blocker = (int) DB::selectOne('SELECT CONNECTION_ID() AS id')->id;
+            $processes['withdrawal'] = $this->worker($directory, ['name' => 'withdrawal', 'pause' => false,
+                'operation' => $operation, 'require_mfa' => true, 'actor_id' => $actor->id,
+                'session_id' => $session['id'], 'track_id' => $track->id]);
+            $this->await(fn () => is_file($directory.'/ready-withdrawal'), $processes);
+            $ready = json_decode(file_get_contents($directory.'/ready-withdrawal'), true, 16, JSON_THROW_ON_ERROR);
+            $this->assertNotSame($blocker, $ready['connection_id']);
+            $this->assertNotSame(getmypid(), $ready['pid']);
+            touch($directory.'/start-withdrawal');
+            // The child passed the same required-MFA admission as HTTP, then
+            // waits on this exact native actor record while removal commits.
+            $this->await(fn () => $this->actorWait($ready['connection_id'], $blocker, $actor->id), $processes);
+            DB::table('users')->where('id', $actor->id)->update(['app_authentication_secret' => null]);
+            DB::commit();
+            $process = $processes['withdrawal'];
+            $process->wait();
+            $this->assertSame(0, $process->getExitCode(), $process->getOutput().$process->getErrorOutput());
+            $result = json_decode($process->getOutput(), true, 32, JSON_THROW_ON_ERROR);
+            $this->assertTrue($result['mfa_precheck']);
+            $this->assertSame('unauthorized', $result['result']);
+            $this->assertSame(0, $result['transaction_level']);
+            $this->assertNull($actor->fresh()->getAppAuthenticationSecret());
+            $this->assertSame($before, MediaUploadSession::sole()->getAttributes());
+            $this->assertSame($files, Storage::disk('local')->allFiles());
+            $this->assertSame($audits, AuditEvent::count());
+            $this->assertDatabaseCount('media_upload_sessions', 1);
+            $this->assertDatabaseCount('media_assets', 0);
+        } finally {
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
+            foreach ($processes as $process) {
+                if ($process->isRunning()) {
+                    $process->stop(1);
+                }
+            }
+            (new Filesystem)->deleteDirectory($directory);
+        }
     }
 
     #[DataProvider('competingOperations')]
