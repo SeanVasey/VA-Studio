@@ -29,6 +29,7 @@ PHP_TARGETS = {
         "tests/Unit/PricingPolicyTest.php", "tests/Unit/PromotionPolicyTest.php",
         "tests/Unit/ScopedLicenseTermsTest.php", "tests/Unit/SiteImageGuardBytesTest.php",
         "tests/Unit/StripeCheckoutGatewayTest.php", "tests/Unit/StripePaymentGatewayTest.php",
+        "tests/Unit/StripeFinancialInspectionGatewayTest.php",
         "tests/Unit/TcpdfContractRendererTest.php", "tests/Unit/TypedLicenseTermsTest.php",
     ),
     "media": (
@@ -37,11 +38,14 @@ PHP_TARGETS = {
         "tests/Feature/MalwareScannerTest.php", "tests/Feature/MediaProcessingTest.php",
         "tests/Feature/MediaWriterAuthorityTest.php", "tests/Feature/MediaWriterConcurrencyTest.php",
         "tests/Feature/MediaWorkerIdentityTest.php", "tests/Feature/MediaUploadCommitRecoveryTest.php",
+        "tests/Feature/ResumableMediaUploadsTest.php", "tests/Feature/ResumableMediaUploadsConcurrencyTest.php",
+        "tests/Feature/ResumableMediaUploadHttpTest.php",
         "tests/Feature/MediaWorkflowBudgetTest.php", "tests/Feature/PrivateMediaRevisionRootsTest.php",
         "tests/Feature/SiteImageLibraryTest.php", "tests/Feature/SiteImageHttpTest.php", "tests/Feature/StemsArchivePolicyTest.php",
         "tests/Feature/StemsArchiveTest.php",
     ),
     "commerce": (
+        "tests/Unit/StripeFinancialInspectionGatewayTest.php", "tests/Feature/TestPaymentFinancialObservationTest.php",
         "tests/Feature/TestPaymentExceptionOperationsTest.php", "tests/Feature/TestPaymentExceptionOperationsConcurrencyTest.php",
         "tests/Feature/CommerceAuditActorTest.php", "tests/Feature/CommerceAuditActorConcurrencyTest.php",
         "tests/Unit/AllocateDiscountTest.php", "tests/Unit/MinorUnitsTest.php",
@@ -117,6 +121,7 @@ FRONTEND_TARGETS = (
     "tests/frontend/editorial-video.test.tsx", "tests/frontend/owned-order-history.test.tsx",
     "tests/frontend/contact-inquiry.test.tsx",
     "tests/frontend/editorial-related-tracks.test.tsx",
+    "tests/frontend/resumable-media-upload.test.ts",
 )
 BROWSER_TARGETS = (
     "tests/browser/storefront.spec.ts", "tests/browser/operator.spec.ts",
@@ -131,6 +136,7 @@ BROWSER_TARGETS = (
     "tests/browser/private-track-review.spec.ts",
     "tests/browser/track-publication-guard.spec.ts",
     "tests/browser/editorial-content.spec.ts", "tests/browser/site-content.spec.ts", "tests/browser/site-schedule.spec.ts",
+    "tests/browser/resumable-media-upload.spec.ts",
 )
 SUITES = (*PHP_TARGETS, "frontend", "browser")
 ENGINES = ("sqlite", "mysql")
@@ -336,4 +342,3 @@ if __name__ == "__main__":
     except (FocusedError, OSError, ET.ParseError) as error:
         print("Focused selection failed: " + str(error), file=sys.stderr)
         raise SystemExit(1)
-
