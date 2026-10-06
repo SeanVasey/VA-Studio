@@ -481,6 +481,60 @@ class TransactionalNotificationTest extends TestCase
         $this->assertFileDoesNotExist($path);
     }
 
+    public static function inspectionChanges(): array
+    {
+        return ['withdrawal during inspection' => ['withdraw'], 'recipient during inspection' => ['recipient'],
+            'policy during inspection' => ['policy'], 'activation account during inspection' => ['activation_account']];
+    }
+
+    #[DataProvider('inspectionChanges')]
+    public function test_accepted_status_rechecks_current_authority_after_private_capture_inspection(string $change): void
+    {
+        $f = F::ready();
+        $service = app(TestTransactionalNotifications::class);
+        $id = $f['notice']['notificationId'];
+        $this->assertSame('accepted', $service->dispatch($id)['state']);
+        $before = $this->graph();
+        $path = Storage::disk('local')->path('transactional-notification-capture/'.$id.'.json');
+        $bytes = file_get_contents($path);
+        $mutate = function () use ($f, $change): void {
+            match ($change) {
+                'withdraw' => CustomerFixtures::withdraw($f),
+                'recipient' => DB::table('users')->where('id', $f['user']->id)->update(['email' => 'inspection-mutated@example.invalid']),
+                'policy' => config(['transactional-notifications.test_enabled' => false]),
+                'activation_account' => config(['payments.stripe.account_id' => 'acct_NOTIFICATIONINSPECTION']),
+            };
+        };
+        $capture = new class($mutate) extends PrivateNotificationCapture
+        {
+            public int $inspections = 0;
+
+            public function __construct(private \Closure $mutate) {}
+
+            public function inspect(string $notificationId, string $capture): ?string
+            {
+                $positive = parent::inspect($notificationId, $capture);
+                $this->inspections++;
+                ($this->mutate)();
+
+                return $positive;
+            }
+        };
+        app()->instance(PrivateNotificationCapture::class, $capture);
+        $denied = false;
+        try {
+            $service->status($id);
+        } catch (NotificationException|CustomerAccessException|\App\Domain\Delivery\DeliveryException) {
+            $denied = true;
+        }
+        $this->assertSame(1, $capture->inspections);
+        $this->assertTrue($denied, 'Accepted status returned after private inspection changed its final authority.');
+        $this->assertSame($before, $this->graph());
+        $this->assertSame($bytes, file_get_contents($path));
+        Mail::assertNothingSent();
+        Notification::assertNothingSent();
+    }
+
     public function test_capture_schema_has_no_arbitrary_message_link_or_marketing_extension(): void
     {
         $f = F::ready();
