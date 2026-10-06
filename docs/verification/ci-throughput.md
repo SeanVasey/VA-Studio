@@ -1,5 +1,26 @@
 # CI throughput timing refresh
 
+## October 6, 2026: eight-shard GitHub candidate
+
+This separate follow-up starts after `ab3567c449ea9efe171cd2c7f0953411d04ddc3f` and expands GitHub MySQL from four to eight whole-file shards. SQLite remains two shards. All application cases, reviewed skips, test commands, deadlines, browser/quality jobs and the stable `backend` gate remain required; the strict aggregate now collects ten current-run database receipts. GitLab retains its independent four-plus-two policy. No receipt reuse is enabled. Independent review and final product discovery completed while the first PR #6 run required a dependency/browser correction, so this finished optimization joins that same necessary correction.
+
+Using the unchanged partitioner and exactly the same accepted-main measurements below gives this offline comparison:
+
+| MySQL assignment | Longest measured-weight estimate | Total rounded measured work | Expanded cases per shard |
+| --- | ---: | ---: | --- |
+| Four shards | 2,492.621 seconds | 9,970.424 seconds | 727 / 719 / 815 / 781 |
+| Eight shards | 1,246.341 seconds | 9,970.424 seconds | 345 / 455 / 371 / 320 / 371 / 446 / 303 / 431 |
+
+The estimated critical-path reduction is 1,246.280 seconds (20m46.280s), before provisioning, queueing and aggregation. This is a redistribution of recorded work, not an executed eight-shard speedup. It does not incorporate fabricated timings for later product features or the local payment cleanup change. Final-source discovery and the next ordinary hosted run remain authoritative.
+
+The accepted run's four MySQL jobs spent 80 / 85 / 81 / 72 seconds outside their test steps. At that observed mean, four extra runners add approximately 318 runner-seconds (5m18s), about 3.1% to the modeled database runner-time total. The first ordinary run must measure actual overhead rather than treating this projection as guaranteed cost.
+
+Accepted run `37098953844` and current PR #5 run `37397306676` both actually started eleven jobs concurrently; PR #5 reached eleven at 01:04:47 UTC on October 6. Eight MySQL plus two SQLite jobs require ten database slots. Total initial fanout with frontend, backend quality and three browser jobs rises to fifteen. Fifteen simultaneous slots have not been observed, and account capacity or competing work may cause queueing. No optional timing-only hosted run is introduced.
+
+Before changing the MySQL display names from `/4` to `/8`, successful read-only GitHub branch metadata explicitly reported `protected: false`, protection disabled, and empty required check contexts/checks; the repository ruleset listing including parents returned an empty list. The separate administrative protection endpoint returned 403 and was not used to infer policy. No setting or required check was removed. The stable source-defined `backend` gate remains mandatory.
+
+The fixed provider counts are enforced at every producer and collector call. Negative cases cover incomplete four-shard evidence, missing or duplicate late shards, old job denominators, mixed manifest cardinality, and unknown shard nine, alongside every existing provenance, runtime, skip, parser and no-reuse safeguard. Local verification passed 170 safeguards: 34 GitHub receipt, 24 GitLab receipt, 36 partition/timing, 24 scope, 28 focused, 12 GitLab setup, seven GitLab writer-feedback and five PHP-runtime tests. PHP 8.4.26 discovery independently proved all 3,042 cases in 185 files and every group exactly once across eight MySQL and two SQLite configurations; case/group digests remain those of the recorded source below. Generated discovery evidence totals 2,455,843 bytes for MySQL and 2,307,480 bytes for SQLite; the largest individual XML is 1,134,967 bytes, within the unchanged file/XML limits. Actual hosted JUnit, ten receipts and ZIP/collection bounds remain required from the next full run. Python compilation and whitespace checks pass. Independent source review is approved; fresh ten-receipt hosted acceptance is still pending.
+
 ## October 6, 2026: measured payment-fixture teardown
 
 This follow-up starts from the timing-only commit `7735ccbcf175e6ba0c4c2b858ca5b72e10fb63f4`. It changes only the import and trait used by `TestPaymentProcessingTest`: the existing `FinalizationDatabaseMigrations` replaces Laravel's `DatabaseMigrations`. Every test body and data provider is byte-identical. Application code, migration code, test selection, deadlines, warnings and acceptance gates remain unchanged.
@@ -31,7 +52,7 @@ php vendor/bin/phpunit tests/Feature/FinalizationDatabaseLifecycleTest.php \
 
 The initial pair's helper SHA-256 is `f5f84bec6013bd5f42234c936b133978bb2abf7a4a76edc51f8021a363eeab1b`; disposable runner SHA-256 is `a38352c6ab7dee73d738fbeb3579723da6a55463f73986f8a33116e3776438e6`. The helper verified the source file and native runtime before executing, used separate new JUnit paths, and retained the complete result and exit status. Independent comparison required all 75 identities, all 520 per-case assertions, no errors/failures/skips, successful exit and unchanged runtime files.
 
-Additional validation passed: candidate payment plus the four existing lifecycle datasets on SQLite, **79 tests / 590 assertions**, 90.115 seconds; the existing lifecycle datasets on native MySQL, **4 tests / 70 assertions**, 24.159 seconds. Both had zero errors, failures or skips and retained the PHPUnit-warning exit flag. The lifecycle cases verify successful and deliberately throwing child tests, selected connections, view cleanup policy, callbacks after cleanup and fresh next-test schema state. The accepted-main timing manifests below remain original hosted measurements; this local result is not mixed into their weights. The next composed source requires its own complete Foundation gates and six current-run receipts. No receipt reuse is activated.
+Additional validation passed: candidate payment plus the four existing lifecycle datasets on SQLite, **79 tests / 590 assertions**, 90.115 seconds; the existing lifecycle datasets on native MySQL, **4 tests / 70 assertions**, 24.159 seconds. Both had zero errors, failures or skips and retained the PHPUnit-warning exit flag. The lifecycle cases verify successful and deliberately throwing child tests, selected connections, view cleanup policy, callbacks after cleanup and fresh next-test schema state. The accepted-main timing manifests below remain original hosted measurements; this local result is not mixed into their weights. The next composed source requires its own complete Foundation gates and the committed provider policy's current-run receipts. No receipt reuse is activated.
 
 ## October 6, 2026: complete accepted-main timing refresh
 
@@ -278,3 +299,7 @@ The generated manifests have SHA-256 MySQL `7349629ce860c35fda2c44287804aae5295e
 | SQLite | 1,593.124s | 701 | 834.358 / 758.766s | 796.563 / 796.561s | 1,173 / 1,099 |
 
 The partitioner's unchanged one-millisecond minimum for 23 zero-time SQLite files makes its refreshed weight estimates 796.574 / 796.573s. The table retains their recorded zero times. These are offline redistribution estimates, not executed refreshed shards, guaranteed durations or a controlled speedup. Different sources and hosted runtimes also prevent causal comparison with the historical measurements above. PHP is unavailable locally; the font repair changes the candidate source, and the later five-file follow-up readiness data remain separate and unadopted. Independent source review and a fresh complete Foundation on the final composed candidate remain required.
+
+## Integrated product discovery before corrected PR #6
+
+The exact composition of `404e48a` and `f98c832` independently proved 3,215 expanded cases in 192 files across eight MySQL and two SQLite shards. MySQL case counts are 314 / 384 / 381 / 428 / 519 / 340 / 461 / 388; SQLite counts are 1,562 / 1,653. The same 313 reviewed SQLite skips imply 2,902 executed SQLite cases. All seven new untimed files retain the existing fallback weights. Census SHA-256 is `e9d5872b9754f80d6b0abd03c8a1225314f0fcde143ea0100213d4bec4d54755`; group SHA-256 is `9f5b662d817e90f3a4c244aa9cbd8e58588260cf88b59a9dd14e958d46dfdebf`. Generated evidence totals 2,592,437 bytes for MySQL and 2,438,662 bytes for SQLite; largest XML is 1,199,710 bytes, within unchanged parsing bounds. The composition passed 146 directly affected safeguards. Independent review approved the eight-shard source and sole source-map-js lockfile repair; these checks do not replace fresh hosted execution and ten actual receipts.

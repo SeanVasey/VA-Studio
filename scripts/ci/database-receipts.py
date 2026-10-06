@@ -50,7 +50,7 @@ POLICY_FILES = (
     "composer.json", "composer.lock", "package.json", "package-lock.json",
     "scripts/ci/phpunit-timings-mysql.json", "scripts/ci/phpunit-timings-sqlite.json",
 )
-COUNTS = {"mysql": 4, "sqlite": 2}
+COUNTS = {"mysql": 8, "sqlite": 2}
 
 
 class ReceiptError(Exception):
@@ -434,18 +434,22 @@ def junit(raw: bytes, expected: dict, checkout_root: str, engine: str, skip_pair
             "warning_evidence": "not represented by JUnit; existing PHPUnit-warning exit flag retained"}
 
 
-def evidence_names(engine: str, shard: int) -> set[str]:
+def evidence_names(engine: str, shard: int, *, shard_count: int) -> set[str]:
+    # The provider supplies its committed count; never trust an artifact or environment count.
+    require(engine in COUNTS and positive(shard_count) and positive(shard) and shard <= shard_count,
+            "Unknown database shard")
     prefix = "phpunit-ci-" + engine
     return {prefix + "-manifest.json", prefix + "-source-tests.xml",
-            *(f"{prefix}-{index}{suffix}" for index in range(1, COUNTS[engine] + 1) for suffix in (".xml", "-tests.xml")),
+            *(f"{prefix}-{index}{suffix}" for index in range(1, shard_count + 1) for suffix in (".xml", "-tests.xml")),
             f"{prefix}-{shard}-results.xml", f"{prefix}-{shard}-start.json", f"{prefix}-{shard}-receipt.json"}
 
 
-def database_evidence(files: dict[str, bytes], source: dict, engine: str, shard: int, skip_pairs: set[tuple[str, str]]) -> dict:
+def database_evidence(files: dict[str, bytes], source: dict, engine: str, shard: int, skip_pairs: set[tuple[str, str]], *, shard_count: int) -> dict:
+    evidence_names(engine, shard, shard_count=shard_count)
     prefix = "phpunit-ci-" + engine
     full = inventory(files[prefix + "-source-tests.xml"], source["checkout_root"])
     require(skip_pairs <= set(full["methods"].values()), "Reviewed SQLite skip policy contains an undiscovered method")
-    shards = [inventory(files[f"{prefix}-{index}-tests.xml"], source["checkout_root"]) for index in range(1, COUNTS[engine] + 1)]
+    shards = [inventory(files[f"{prefix}-{index}-tests.xml"], source["checkout_root"]) for index in range(1, shard_count + 1)]
     cases, groups, owners = Counter(), Counter(), Counter()
     for item in shards:
         require(all(full["cases"].get(identifier_) == owning_file for identifier_, owning_file in item["cases"].items()),
@@ -474,7 +478,7 @@ def database_evidence(files: dict[str, bytes], source: dict, engine: str, shard:
             and isinstance(weighting["untimed_files"], list) and len(set(weighting["untimed_files"])) == len(weighting["untimed_files"])
             and set(weighting["untimed_files"]) <= set(full["cases"].values()), "Partition weighting differs from the source policy")
     entries = manifest.get("shards")
-    require(isinstance(entries, list) and len(entries) == COUNTS[engine], "Missing partition entry")
+    require(isinstance(entries, list) and len(entries) == shard_count, "Missing partition entry")
     for index, item in enumerate(shards, 1):
         entry = entries[index - 1]
         require(isinstance(entry, dict) and set(entry) == {"index", "configuration", "files", "test_cases", "weight"}
@@ -511,13 +515,13 @@ def finish(root: Path, engine: str, shard: int, env: dict) -> None:
     require(type(initial.get("schema_version")) is int and initial["schema_version"] == 1 and initial.get("purpose") == "database-runtime-start-not-acceptance"
             and initial.get("engine") == engine and initial.get("shard") == shard
             and initial.get("source") == source and initial.get("runtime") == runtime, "Source or runtime changed during the database job")
-    names = evidence_names(engine, shard) - {prefix + "-receipt.json"}
+    names = evidence_names(engine, shard, shard_count=COUNTS[engine]) - {prefix + "-receipt.json"}
     files = {name: read_file(root / name) for name in names}
     validate_discovered_files(root, set(inventory(files[f"phpunit-ci-{engine}-source-tests.xml"], source["checkout_root"])["cases"].values()))
     value = {"schema_version": 1, "purpose": "database-job-receipt-not-acceptance", "engine": engine, "shard": shard,
              "source": source, "runtime": runtime, "runtime_sha256": digest(canonical(runtime)),
              "test_step_outcome": "success", "started_at": initial["started_at"],
-             "finished_at": datetime.now(timezone.utc).isoformat(), **database_evidence(files, source, engine, shard, sqlite_skip_pairs(root))}
+             "finished_at": datetime.now(timezone.utc).isoformat(), **database_evidence(files, source, engine, shard, sqlite_skip_pairs(root), shard_count=COUNTS[engine])}
     write_json(root / (prefix + "-receipt.json"), value)
 
 
@@ -669,7 +673,7 @@ def collect(root: Path, env: dict, api: Github) -> dict:
                     "Database artifact has expired")
             raw = api.artifact(metadata["id"])
             require(digest(raw) == metadata["digest"][7:], "Database artifact digest differs")
-            files = archive(raw, evidence_names(engine, shard))
+            files = archive(raw, evidence_names(engine, shard, shard_count=count))
             validate_discovered_files(root, set(inventory(files[f"phpunit-ci-{engine}-source-tests.xml"], source["checkout_root"])["cases"].values()))
             prefix = f"phpunit-ci-{engine}-{shard}"
             receipt = json_data(files.pop(prefix + "-receipt.json"))
@@ -686,7 +690,7 @@ def collect(root: Path, env: dict, api: Github) -> dict:
             require(receipt["runtime"]["dependencies"] == locked_dependencies(root)[1]
                     and receipt["runtime"]["dependencies"]["composer_lock_sha256"] == source["policy_sha256"]["composer.lock"],
                     "Runtime dependency references differ from the actual committed lock")
-            proof = database_evidence(files, source, engine, shard, sqlite_skip_pairs(root))
+            proof = database_evidence(files, source, engine, shard, sqlite_skip_pairs(root), shard_count=count)
             require(all(receipt.get(key) == value for key, value in proof.items()), "Database receipt does not match retained inventories and results")
             executed[engine].append(inventory(files[f"phpunit-ci-{engine}-{shard}-tests.xml"], source["checkout_root"]))
             initial = json_data(files[prefix + "-start.json"])
@@ -742,7 +746,7 @@ def main() -> int:
             require(args.engine is None and args.shard is None, "Collector has no shard arguments")
             value = collect(root, env, Github(env.get("RECEIPT_GITHUB_TOKEN", "")))
             write_json(root / "phpunit-ci-shadow-receipt.json", value)
-            print("Six current-run database receipts verified. Shadow decision: full; reuse disabled; outer acceptance pending.")
+            print(f"{sum(COUNTS.values())} current-run database receipts verified. Shadow decision: full; reuse disabled; outer acceptance pending.")
         else:
             require(args.engine in COUNTS and args.shard is not None and 1 <= args.shard <= COUNTS[args.engine], "Unknown database shard")
             (start if args.command == "start" else finish)(root, args.engine, args.shard, env)

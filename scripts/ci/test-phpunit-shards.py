@@ -61,6 +61,22 @@ class PartitionProofTest(unittest.TestCase):
         module.prove(self.source, assignments, observed)
         self.assertTrue(all(len(selected) == 1 for selected in assignments))
 
+    def test_eight_shards_preserve_whole_files_expanded_datasets_and_groups(self):
+        for name in "EFGHIJ":
+            for label in ("first", "second"):
+                identifier = f"{name}::test_dataset#{label}"
+                self.source.cases[identifier] = f"tests/{name}.php"
+                self.source.groups[("native-mysql", identifier)] = 1
+                self.source.groups[("payments", identifier)] = 1
+        assignments, observed = self.selections(8)
+        module.prove(self.source, assignments, observed)
+        self.assertEqual(8, len(assignments))
+        self.assertTrue(all(assignments))
+        self.assertEqual(10, sum(map(len, assignments)))
+        self.assertEqual(18, sum(len(shard.cases) for shard in observed))
+        for name in "EFGHIJ":
+            self.assertEqual(1, sum(f"tests/{name}.php" in selected for selected in assignments))
+
     def test_empty_shards_rejected(self):
         for count in [0, 5]:
             with self.assertRaises(PartitionError):
