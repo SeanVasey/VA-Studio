@@ -11,9 +11,9 @@ use App\Domain\Commerce\Models\Order;
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\CheckoutFixtures as F;
 use Tests\Support\CheckoutRace;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InventoryFixtures;
 use Tests\TestCase;
 

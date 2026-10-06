@@ -9,9 +9,9 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\ExclusiveOfferFixtures;
 use Tests\Support\ExclusiveSelectionFixtures;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\TestCase;
 

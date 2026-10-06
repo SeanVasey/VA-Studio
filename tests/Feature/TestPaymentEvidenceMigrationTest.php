@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\CheckoutFixtures as F;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\TestCase;
 
 /** Synthetic storage fixtures prove database guards, not successful provider payment. */
