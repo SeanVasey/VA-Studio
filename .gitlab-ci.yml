@@ -140,6 +140,7 @@ operator-browser:
   before_script:
     - bash scripts/ci/setup-gitlab-php.sh
     - bash scripts/ci/setup-gitlab-node.sh
+    - bash scripts/ci/setup-gitlab-related-scanner.sh
   script:
     - npm ci
     - npm run build

@@ -316,10 +316,10 @@ jobs:
           tools: composer:v2
       - name: Verify bounded PHP test capabilities
         run: php scripts/ci/verify-php-test-runtime.php
-      - name: Install application media fixture prerequisites
+      - name: Install genuine scanner and current official signatures for customer delivery fixtures
+        run: bash tests/browser/install-related-scanner.sh
+      - name: Verify application media fixture executables
         run: |
-          sudo apt-get update
-          sudo apt-get install --yes --no-install-recommends ffmpeg util-linux
           test -x /usr/bin/ffmpeg
           test -x /usr/bin/ffprobe
           test -x /usr/bin/prlimit
