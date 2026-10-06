@@ -79,6 +79,7 @@ PHP_TARGETS = {
         "tests/Feature/TestPaymentProcessingTest.php", "tests/Feature/TestOrderFinalizationTest.php",
     ),
     "customer": (
+        "tests/Feature/InquiryBrowserCatalogCleanupTest.php",
         "tests/Feature/OrderInquiryTest.php", "tests/Feature/OrderInquiryHttpTest.php",
         "tests/Feature/OrderInquiryMigrationTest.php", "tests/Feature/OrderInquiryConcurrencyTest.php",
         "tests/Feature/OrderInquiryStaffContextTest.php",

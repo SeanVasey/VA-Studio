@@ -138,6 +138,7 @@ class SelectionTests(unittest.TestCase):
         self.assertEqual(focused.MAX_FILES, 32)
         for engine in focused.ENGINES:
             selected = focused.selection({"FOCUSED_SUITE": "customer", "FOCUSED_ENGINE": engine})
+            self.assertEqual(selected.files.count("tests/Feature/InquiryBrowserCatalogCleanupTest.php"), 1)
             for target in ("OrderInquiryTest", "OrderInquiryHttpTest", "OrderInquiryMigrationTest",
                            "OrderInquiryConcurrencyTest", "OrderInquiryStaffContextTest"):
                 self.assertEqual(selected.files.count("tests/Feature/" + target + ".php"), 1)
@@ -146,6 +147,7 @@ class SelectionTests(unittest.TestCase):
         self.assertEqual(focused.FRONTEND_TARGETS.count("tests/frontend/order-inquiry.test.tsx"), 1)
         self.assertEqual(focused.BROWSER_TARGETS.count("tests/browser/inquiry-conversation.spec.ts"), 1)
         policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        self.assertFalse(any(row[0] == "Tests\\Feature\\InquiryBrowserCatalogCleanupTest" for row in policy["methods"]))
         self.assertEqual([row for row in policy["methods"] if row[0].startswith("Tests\\Feature\\OrderInquiry")], [
             ["Tests\\Feature\\OrderInquiryConcurrencyTest", "test_current_publication_operator_and_customer_fences_serialize_both_commit_orders"],
         ])
