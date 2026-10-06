@@ -250,7 +250,7 @@ native('removing an old CHECK refuses even when every column, row and business s
   const target = { directory: input.directory, checkout: input.checkout, identity };
   assert.deepEqual(query(target, 'SELECT * FROM private_upgrade_check_fixture'), rows);
   assert.deepEqual(query(target, "SELECT * FROM sqlite_sequence WHERE name='private_upgrade_check_fixture'"), sequence);
-  assert.doesNotMatch(query(target, "SELECT sql FROM sqlite_schema WHERE name='private_upgrade_check_fixture'")[0].sql, /CHECK/i);
+  assert.doesNotMatch(query(target, "SELECT sql FROM sqlite_schema WHERE name='private_upgrade_check_fixture'")[0].sql, /\bCHECK\s*\(/i);
   assert.equal(existsSync(join(input.directory, 'upgrade-result.json')), false);
   assert.equal(existsSync(join(input.directory, 'upgrade-provenance.json')), false);
 });
