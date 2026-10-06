@@ -174,6 +174,9 @@ abstract class ManagePrivateProductDrafts extends ManageRecords
         } finally {
             $this->submittedReview = null;
             $this->submitting = null;
+            // A form-only partial leaves the prior enabled modal footer in the client.
+            // Render the consumed capture and copy field together, including uncertainty.
+            $this->forceRender();
         }
     }
 

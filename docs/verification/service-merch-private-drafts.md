@@ -84,18 +84,31 @@ cannot manufacture a save.
 Stale and uncertain results keep a copyable description of the entered contents
 and require closing and reopening to inspect the saved state. The uncertainty
 case is exercised with a real committed save followed by a lost response; a
-second confirmation cannot replay effects. Rendered browser/device journeys
+second confirmation cannot replay effects. Exhausted confirmations force a
+complete modal render so the visible save button is disabled while the readonly
+copy field remains enabled and bound to the retained entered text. Rendered browser/device journeys
 remain for final acceptance; the focused UI evidence exercises actual Filament
 mount, form, compare and save requests.
 
 ## Focused evidence
 
-The affected SQLite selection passed all 86 cases with 393 assertions and no
-skips after scoped Pint. The affected native selection passed all 96 cases with
+The baseline affected SQLite selection passed all 86 cases with 393 assertions and no
+skips after scoped Pint. The baseline affected native selection passed all 96 cases with
 974 assertions and no skips on genuine MySQL 8.4.11, with normal durability in
 a fresh disposable database. Its independent-process concurrency cases observe
 exact `PRIMARY` record waits with requester, blocker, database, table and
 identity, rather than substituting sleeps or SQLite behavior.
+
+Independent review then found that a form-only render left the prior enabled
+footer visible after a real committed save with an uncertain response. Both
+actual rendered-footer failures were reproduced and retained. The narrow modal
+render correction passed all 14 affected UI cases with 244 assertions on each
+of SQLite and genuine MySQL, without skips. The tests check an enabled button
+before saving, a disabled button after uncertainty or staleness, an enabled
+readonly field with the actual wire-model binding, and refusal of a repeated
+confirmation. The domain, schema and native concurrency source are unchanged
+by that correction; its actual focused results are bound separately from the
+baseline execution.
 
 ```sh
 php vendor/bin/phpunit tests/Unit/PrivateProductDraftManifestTest.php \

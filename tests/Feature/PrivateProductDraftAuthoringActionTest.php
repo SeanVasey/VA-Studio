@@ -12,6 +12,8 @@ use App\Filament\Resources\MerchDraftResource\Pages\ManageMerchDrafts;
 use App\Filament\Resources\ServiceDraftResource;
 use App\Filament\Resources\ServiceDraftResource\Pages\ManageServiceDrafts;
 use App\Models\User;
+use DOMDocument;
+use DOMXPath;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Repeater;
 use Illuminate\Support\Facades\DB;
@@ -75,6 +77,32 @@ class PrivateProductDraftAuthoringActionTest extends TestCase
         return $data;
     }
 
+    private function assertConfirmationFooter(string $html, bool $disabled): void
+    {
+        $document = new DOMDocument;
+        $previous = libxml_use_internal_errors(true);
+        try {
+            $document->loadHTML($html);
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
+        }
+        $xpath = new DOMXPath($document);
+        $buttons = $xpath->query('//button[contains(normalize-space(.), "Save reviewed private version")]');
+        $this->assertSame(1, $buttons->length);
+        $this->assertSame($disabled, $buttons->item(0)->hasAttribute('disabled'));
+        $fields = $xpath->query('//textarea[@readonly]');
+        $boundCopyFields = [];
+        foreach ($fields as $field) {
+            if ($field->getAttribute('wire:model') === 'mountedActions.0.data.entered_summary') {
+                $boundCopyFields[] = $field;
+                $this->assertFalse($field->hasAttribute('disabled'));
+                $this->assertSame('state', $field->getAttribute('x-model'));
+            }
+        }
+        $this->assertCount(1, $boundCopyFields);
+    }
+
     #[DataProvider('families')]
     public function test_real_private_create_compare_and_save_retains_exact_content_and_escapes_authored_markup(string $kind): void
     {
@@ -133,6 +161,7 @@ class PrivateProductDraftAuthoringActionTest extends TestCase
         $page->callMountedAction()->assertHasActionErrors(['entered_summary'])->assertSet('draftReview', null)
             ->assertNotified('Review current draft to continue');
         $this->assertStringContainsString('My retained unsaved text', $page->get('enteredSummary'));
+        $this->assertConfirmationFooter($page->html(), true);
         $page->callMountedAction()->assertHasActionErrors(['entered_summary']);
         $this->assertSame($before, $this->evidence($kind));
     }
@@ -197,6 +226,7 @@ class PrivateProductDraftAuthoringActionTest extends TestCase
         [$class, $draftClass, $versionClass] = Fixtures::classes($kind);
         $page = Livewire::test($this->page($kind))->mountTableAction('editDraft', $draft)
             ->setTableActionData($this->uiPayload($kind, ['description' => 'Retained copy after lost response']))->callMountedAction();
+        $this->assertConfirmationFooter($page->html(), false);
         $proxy = new class($real, $kind, $draftClass, $versionClass) extends ReviewedPrivateDrafts
         {
             public function __construct(private ReviewedPrivateDrafts $real, private string $kind, private string $draftType, private string $versionType) {}
@@ -233,8 +263,11 @@ class PrivateProductDraftAuthoringActionTest extends TestCase
         $this->assertStringContainsString('Retained copy after lost response', $page->get('enteredSummary'));
         $this->assertStringNotContainsString('PRIVATE synthetic exception', $page->html());
         $this->assertTrue($page->instance()->getMountedAction()->isDisabled());
+        $this->assertConfirmationFooter($page->html(), true);
+        $this->assertSame($page->get('enteredSummary'), $page->get('mountedActions.0.data.entered_summary'));
         $before = $this->evidence($kind);
         $page->callMountedAction()->assertHasActionErrors(['entered_summary']);
+        $this->assertConfirmationFooter($page->html(), true);
         $this->assertSame($before, $this->evidence($kind));
         $this->assertSame(2, $real->snapshot($draft->id, $actor)['version']);
         $page->unmountAction()->mountTableAction('editDraft', $draft->fresh())
