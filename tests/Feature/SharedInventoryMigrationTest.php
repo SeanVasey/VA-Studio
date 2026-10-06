@@ -4,15 +4,15 @@ namespace Tests\Feature;
 
 use App\Domain\Commerce\Inventory\ReserveQuoteInventory;
 use App\Domain\Commerce\CreateQuote;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Str;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InventoryFixtures as F;
 use Tests\Support\QuoteFixtures;
 use Tests\TestCase;
 
 class SharedInventoryMigrationTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     public function test_empty_inventory_tables_roundtrip_without_changing_quotes(): void
     {

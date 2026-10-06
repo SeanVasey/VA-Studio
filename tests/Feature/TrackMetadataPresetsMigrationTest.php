@@ -4,16 +4,16 @@ namespace Tests\Feature;
 
 use App\Domain\Catalog\TrackMetadataPresets;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use LogicException;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\TestCase;
 
 class TrackMetadataPresetsMigrationTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     private const TABLE = 'track_metadata_presets';
 

@@ -7,13 +7,13 @@ use App\Domain\Catalog\PrepareExclusiveOffer;
 use App\Domain\Catalog\PublicationReadiness;
 use App\Domain\Commerce\Models\RightsScopeOffer;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\Process;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\ExclusiveOfferFixtures as F;
 use Tests\Support\InventoryFixtures;
 use Tests\Support\LicenseFixtures;
@@ -21,7 +21,7 @@ use Tests\TestCase;
 
 class ExclusiveOfferConcurrencyTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     protected function beforeRefreshingDatabase(): void
     {

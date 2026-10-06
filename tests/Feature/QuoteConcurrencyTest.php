@@ -9,18 +9,18 @@ use App\Domain\Commerce\Models\Quote;
 use App\Domain\Rights\Models\RightsDeclaration;
 use Closure;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\QuoteFixtures;
 use Tests\TestCase;
 
 /** Committed fixtures and independent PHP/MySQL connections; no enclosing test transaction. */
 class QuoteConcurrencyTest extends TestCase
 {
-    use DatabaseMigrations;
+    use FinalizationDatabaseMigrations;
 
     protected function beforeRefreshingDatabase(): void
     {
