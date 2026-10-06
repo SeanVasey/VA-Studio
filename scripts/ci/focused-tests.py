@@ -79,6 +79,7 @@ PHP_TARGETS = {
         "tests/Feature/TestPaymentProcessingTest.php", "tests/Feature/TestOrderFinalizationTest.php",
     ),
     "customer": (
+        "tests/Feature/CustomerRefundResolutionTest.php", "tests/Feature/CustomerRefundResolutionHttpTest.php",
         "tests/Feature/CustomerPurchaseClaimTest.php", "tests/Feature/CustomerPurchaseClaimMigrationTest.php",
         "tests/Feature/CustomerPurchaseClaimConcurrencyTest.php",
         "tests/Feature/CustomerIdentityTest.php", "tests/Feature/CustomerIdentityHttpTest.php",
@@ -152,6 +153,7 @@ PHP_TARGETS = {
     ),
 }
 FRONTEND_TARGETS = (
+    "tests/frontend/customer-exception-resolution.test.tsx",
     "tests/frontend/inquiry-history.test.tsx",
     "tests/frontend/customer-purchase-claim.test.tsx",
     "tests/frontend/customer-identity.test.tsx", "tests/frontend/resumable-kit-upload.test.ts",
