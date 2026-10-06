@@ -18,7 +18,7 @@ Continue actual kit/collection licensing and public commerce, remaining refund/d
 
 ### Acceptance repairs on the composed source
 
-The composed customer, inquiry, product, kit and upload migration selection initially exposed three manual-fixture teardown errors: the old kit fixture attempted to drop its parent before the new upload-session child. `ce4e55c` corrects only empty-fixture dependency order. The unchanged production migration guards and all assertions then passed together on native MySQL 8.4.11: **36 tests / 294 assertions**, no failures/skips, 145.331 seconds.
+The composed identity, account, kit-upload, kit and unpaid-release migration selection initially exposed three manual-fixture teardown errors: the old kit fixture attempted to drop its parent before the new upload-session child. `ce4e55c` corrects only empty-fixture dependency order. The unchanged production migration guards and all assertions then passed together on native MySQL 8.4.11: **36 tests / 294 assertions**, no failures/skips, 145.331 seconds.
 
 The dedicated related-browser startup must retain its four-track/two-user/empty-commerce census. `fc0f1f4` admits only its complete canonical stage/marker pair, rejects malformed pairs before migration, and creates customer purchases only in ordinary startup. The ordinary wrapper clears inherited related-stage variables. Nine native bootstrap safeguards passed; all six earlier safeguards remain intact. Guarded discovery of the new customer-identity and resumable-kit cases also passed for both projects; discovery is not rendered execution.
 
