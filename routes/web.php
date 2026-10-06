@@ -57,3 +57,4 @@ Route::post('/checkout', fn () => response()->json([
 ], 503))->middleware('throttle:10,1')->name('checkout.store');
 
 require __DIR__.'/customer.php';
+require __DIR__.'/inquiry-conversations.php';
