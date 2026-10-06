@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('public navigation offers branded offline retry without retaining catalog or customer responses', async ({ page, context }) => {
+test('public navigation offers branded offline retry without retaining catalog or customer responses', async ({ page, context }, testInfo) => {
   const pageErrors: string[] = [];
   page.on('pageerror', error => pageErrors.push(error.message));
   const address = '/?q=synthetic-offline-retry';
@@ -31,6 +31,7 @@ test('public navigation offers branded offline retry without retaining catalog o
   await page.evaluate(() => document.fonts.ready);
   expect(await page.evaluate(() => document.fonts.check('16px "Reddit Sans"') && document.fonts.check('44px "Bebas Neue"'))).toBe(true);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath('public-offline-recovery.png'), fullPage: true });
 
   // Keyboard retry remains at the original address while disconnected.
   await page.getByRole('button', { name: 'Try again' }).focus();
