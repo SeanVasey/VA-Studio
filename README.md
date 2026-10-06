@@ -130,13 +130,7 @@ Original repository: [VASEYDEV/VASEYAUDIO](https://github.com/VASEYDEV/VASEYAUDI
 
 Use the [PR template](.github/PULL_REQUEST_TEMPLATE.md) for each increment, including PR bodies supplied through CLI/API tools. Keep only applicable risks, record actual verification against the tested commit, and link the next work package. Use `Advances #issue` for partial delivery; close a work package only when its full acceptance criteria are met.
 
-The following legacy bootstrap helper targets the original VASEYDEV repository. It is preserved for provenance and must not be used to publish VA-Studio:
-
-```sh
-python3 scripts/publish-github.py --issues
-```
-
-This explicitly invoked script creates the private repository if absent, pushes `main` without force, and creates missing work-package issues. It refuses a public repository or an unrelated origin. It never runs during setup, CI, or site deployment. If starting from the source ZIP without `.git`, restore its accompanying Git bundle first using the package instructions.
+The legacy `scripts/publish-github.py` repository-creation helper is retired. Invoking it, including with the former `--issues` option, exits without running Git or GitHub commands and points to [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio). Use the existing checkout's normal feature-branch and pull-request workflow. The helper cannot recreate repositories, change authentication, push `main` or create issues. Historical repository links above remain provenance.
 
 ## Cutover rule
 
