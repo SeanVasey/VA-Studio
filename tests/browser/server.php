@@ -50,6 +50,13 @@ if ($path === '/orders/77000000-0000-4000-8000-000000000001/delivery/download') 
     exit;
 }
 
+// A private test capability may bind only the unpaid component's synthetic GET transport.
+// Login, other Livewire components and public/index.php retain the ordinary disabled providers.
+if (isset($_SERVER['HTTP_X_VASEY_UNPAID_FIXTURE'])) {
+    require __DIR__.'/unpaid-release-fixture.php';
+    UnpaidReleaseBrowserFixture::serve();
+}
+
 // Reuse Laravel's ordinary static-file/front-controller routing for every application route.
 $testRoot = dirname(__DIR__, 2);
 chdir($testRoot.'/public');
