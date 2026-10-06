@@ -120,6 +120,22 @@ class SelectionTests(unittest.TestCase):
             "test_mfa_withdrawal_during_final_actor_wait_prevents_verified_commit_after_real_scanning",
         })
 
+    def test_order_reference_feedback_covers_both_databases_and_client_journeys_without_exclusions(self):
+        self.assertEqual(focused.MAX_FILES, 32)
+        for engine in focused.ENGINES:
+            selected = focused.selection({"FOCUSED_SUITE": "customer", "FOCUSED_ENGINE": engine})
+            self.assertIn("tests/Feature/CustomerOrderReferenceTest.php", selected.files)
+            focused.validate_files(ROOT, selected)
+        for suite, target in {
+            "frontend": "tests/frontend/customer-order-reference.test.tsx",
+            "browser": "tests/browser/customer-order-reference.spec.ts",
+        }.items():
+            selected = focused.selection({"FOCUSED_SUITE": suite, "FOCUSED_ENGINE": "sqlite"})
+            self.assertIn(target, selected.files)
+            focused.validate_files(ROOT, selected)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        self.assertFalse(any(row[0] == "Tests\\Feature\\CustomerOrderReferenceTest" for row in policy["methods"]))
+
     def test_identity_and_kit_transport_feedback_keep_native_races_and_client_journeys(self):
         self.assertEqual(focused.MAX_FILES, 32)
         for suite, targets in {

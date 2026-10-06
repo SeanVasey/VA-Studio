@@ -12,3 +12,8 @@
 .customer-library .quote-review-item { overflow-wrap: anywhere; }
 .customer-library .quote-review-item .button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
 .customer-account-back { display: inline-flex; align-items: center; min-height: 44px; margin-top: 32px; }
+
+.customer-order-lookup { margin-bottom: 32px; }
+.customer-order-lookup-form { display: grid; gap: 16px; max-width: 640px; margin: 16px 0; }
+.customer-order-lookup-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.customer-order-lookup-result { overflow-wrap: anywhere; }

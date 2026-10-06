@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Head } from '@inertiajs/react';
 import { SiteFooter, SiteHeader } from '../components/SiteChrome';
+import { CustomerOrderLookup } from '../components/CustomerOrderLookup';
 import { OwnedTestOrderHistory } from '../components/OwnedTestOrderHistory';
 import { OrderStatus } from '../components/OrderPreparation';
 import type { SiteContent } from '../lib/site-content';
@@ -41,6 +42,7 @@ export default function CustomerLibrary({ siteContent, customer, testCheckoutEna
       </section> : <>
         <div className="customer-account-identity"><p>Signed in as <strong>{customer.name}</strong></p><button type="button" className="button button-outline" onClick={() => void signOut()}>Sign out</button></div>
         <p className="customer-account-note">Test mode only. Order status, contracts and downloads remain subject to their current availability checks.</p>
+        <CustomerOrderLookup renderOrder={order => <OrderStatus order={order} testCheckoutEnabled={testCheckoutEnabled} />} />
         <OwnedTestOrderHistory scope="account" renderOrder={order => <OrderStatus order={order} testCheckoutEnabled={testCheckoutEnabled} />} />
       </>}
       <a className="text-link customer-account-back" href="/">Back to the catalog</a>
