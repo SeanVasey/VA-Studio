@@ -44,7 +44,7 @@ test('session order discovery survives cleared tab storage and status selection 
   await expect(history.getByRole('heading', { name: 'Available test orders' })).toBeFocused();
   expect(requests).toEqual([{ path: '/orders/history', method: 'GET' }]);
   await view.focus(); await view.press('Enter');
-  await expect(history).toContainText('This order needs review before fulfillment can continue.');
+  await expect(history).toContainText('Test payment verified. Fulfillment is blocked for this order.');
   await expect(history.getByRole('region', { name: 'Stripe test checkout', exact: true })).toContainText('previously verified test payment remains recorded');
   await expect(history.getByRole('button', { name: /Open Stripe|Retry Stripe|Check Stripe|Download/ })).toHaveCount(0);
   await expect(history.getByRole('region', { name: 'Test order downloads', exact: true })).toHaveCount(0);
