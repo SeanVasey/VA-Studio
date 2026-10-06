@@ -14,6 +14,7 @@ return new class extends Migration
             throw new RuntimeException('Production policy preparation requires a supported database.');
         }
         Schema::create('production_track_policy_drafts', function (Blueprint $table): void {
+            $table->engine('InnoDB');
             $table->id();
             $this->identity($table, 'public_id', 36)->unique();
             $table->unsignedInteger('revision');
@@ -22,6 +23,7 @@ return new class extends Migration
             $table->dateTime('updated_at');
         });
         Schema::create('production_track_policy_versions', function (Blueprint $table): void {
+            $table->engine('InnoDB');
             $table->id();
             $table->foreignId('production_track_policy_draft_id')->constrained(table: 'production_track_policy_drafts', indexName: 'production_policy_version_parent')->restrictOnDelete();
             $table->unsignedInteger('number');
@@ -34,6 +36,7 @@ return new class extends Migration
             $table->unique(['production_track_policy_draft_id', 'number'], 'production_policy_version_number');
         });
         Schema::create('production_track_policy_source_reviews', function (Blueprint $table): void {
+            $table->engine('InnoDB');
             $table->id();
             $table->foreignId('production_track_policy_version_id')->unique('production_policy_source_review_unique')->constrained(table: 'production_track_policy_versions', indexName: 'production_policy_source_review_parent')->restrictOnDelete();
             $table->foreignId('reviewed_by')->constrained('users')->restrictOnDelete();
