@@ -113,6 +113,7 @@ test('operator releases a fully refunded exception, retries a lost success and r
   const prepared = verify(testInfo.project.name, 'prepared');
   const submit = dialog.locator('.fi-modal-footer-actions').getByRole('button', { name: 'Submit', exact: true });
   let originalReview: { sequence: number; request_id: string } | undefined;
+  let committedRelease: Proof | undefined;
   let lostResponseBody = '';
   let intercepted = 0;
   // The server executes the real signed Livewire request. Drop only its successful response,
@@ -130,7 +131,9 @@ test('operator releases a fully refunded exception, retries a lost success and r
     const actualResponse = await route.fetch();
     expect(actualResponse.status()).toBe(200);
     lostResponseBody = await actualResponse.text();
-    expect(lostResponseBody).toContain('Refunded test resources released');
+    // Filament delivers notifications through a separate component. Prove the actual
+    // committed release before dropping this response, rather than assuming toast serialization.
+    committedRelease = verify(testInfo.project.name, 'released');
     await actualResponse.dispose();
     abortedRequest = route.request();
     await route.abort('connectionreset');
@@ -144,6 +147,7 @@ test('operator releases a fully refunded exception, retries a lost success and r
   await expect(dialog.getByRole('heading', { name: 'Verify full refund and release', exact: true })).toBeVisible();
   await expect(page.getByText('Refunded test resources released', { exact: true })).toHaveCount(0);
   const released = verify(testInfo.project.name, 'released');
+  expect(released).toEqual(committedRelease);
   await assertPrivate(page, fixture, lostResponseBody);
   const replay = await operate(page, submit, 'callMountedAction');
   expect(requestReview(replay.request().postDataJSON())).toEqual(originalReview);
