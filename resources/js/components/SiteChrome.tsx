@@ -10,7 +10,7 @@ interface ChromeProps {
   currentPath?: string;
 }
 
-export function SiteHeader({ content, homeHref, href, onNavigate, currentPath, children }: ChromeProps & { children?: ReactNode }) {
+export function SiteHeader({ content, homeHref, href, onNavigate, currentPath, children, customerAccountEnabled = false }: ChromeProps & { children?: ReactNode; customerAccountEnabled?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
   function follow(event: MouseEvent<HTMLAnchorElement>) {
     setMenuOpen(false);
@@ -20,6 +20,7 @@ export function SiteHeader({ content, homeHref, href, onNavigate, currentPath, c
     <a className="brand-link" href={homeHref} onClick={follow} aria-label="VASEY.AUDIO home"><img src="/brand/vasey-audio-logo.png" alt="VASEY.AUDIO" width="420" height="100" /></a>
     <nav id="site-navigation" className={`site-navigation ${menuOpen ? 'is-open' : ''}`} aria-label="Main navigation" onKeyDown={event => { if (event.key === 'Escape') { setMenuOpen(false); document.getElementById('site-menu-toggle')?.focus(); } }}>
       {content.navigation.map(item => <a key={item.href} href={href(item.href)} onClick={follow} aria-current={item.href === currentPath ? 'page' : undefined}>{item.label}</a>)}
+      {customerAccountEnabled && <a href="/account" onClick={() => setMenuOpen(false)} aria-current={currentPath === '/account' ? 'page' : undefined}>Your library</a>}
     </nav>
     <div className="header-actions"><a className="admin-link" href="/admin">Artist admin <Icon name="northeast" size={13} /></a>{children}<button id="site-menu-toggle" className="mobile-nav-toggle" aria-controls="site-navigation" aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? 'Close menu' : 'Menu'}</button></div>
   </header>;

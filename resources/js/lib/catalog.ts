@@ -89,6 +89,7 @@ export interface StorefrontProps {
   siteImages?: SiteImages;
   testOrderPreparationEnabled?: boolean;
   testCheckoutEnabled?: boolean;
+  customerAccountEnabled?: boolean;
   metadata?: PageMetadata;
 }
 

@@ -35,13 +35,13 @@ test('session order discovery survives cleared tab storage and status selection 
   ));
   expect(storage).toEqual({ 'vaseyaudio-cart-v1': '[]' });
   await page.getByRole('button', { name: 'Open cart, 0 items' }).click();
-  const history = page.getByRole('region', { name: 'Current session test orders', exact: true });
+  const history = page.getByRole('region', { name: 'Available test orders', exact: true });
   expect(requests).toEqual([]);
-  const browse = history.getByRole('button', { name: 'Browse session orders' });
+  const browse = history.getByRole('button', { name: 'Browse test orders' });
   await browse.focus(); await browse.press('Enter');
   const view = history.getByRole('button', { name: `View test order status ${orderId}`, exact: true });
   await expect(view).toBeVisible();
-  await expect(history.getByRole('heading', { name: 'Session orders' })).toBeFocused();
+  await expect(history.getByRole('heading', { name: 'Available test orders' })).toBeFocused();
   expect(requests).toEqual([{ path: '/orders/history', method: 'GET' }]);
   await view.focus(); await view.press('Enter');
   await expect(history).toContainText('This order needs review before fulfillment can continue.');
