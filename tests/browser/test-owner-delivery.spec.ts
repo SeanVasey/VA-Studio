@@ -90,12 +90,25 @@ test('native attachment uses an exact CSRF-protected POST and reports attempts w
 
 test('uncertain issuance retries one key, replacement is explicit, and native expiry remains a private failure', async ({ page }) => {
   let issues = 0;
+  let stalledStarted = false;
+  let releaseStalled!: () => void, handledStalled!: () => void;
+  const stalled = new Promise<void>(resolve => { releaseStalled = resolve; });
+  const stalledHandled = new Promise<void>(resolve => { handledStalled = resolve; });
   const { requests, errors } = await install(page, async (route, request) => {
     if (request.path === path) return route.fulfill({ json: { delivery: delivery() } });
     if (request.path.endsWith('/authorizations')) {
       issues += 1;
       if (issues === 1) return route.abort('failed');
       if (issues === 2) return route.fulfill({ status: 409, json: { code: 'DELIVERY_ALREADY_ISSUED', message: 'PRIVATE_DIAGNOSTIC' } });
+      if (issues === 4) {
+        stalledStarted = true;
+        await stalled;
+        try { await route.fulfill({ status: 201, json: { authorization: authorization() } }); }
+        catch (error) { expect(String(error)).toMatch(/closed|aborted|handled|intercept/i); }
+        finally { handledStalled(); }
+        return;
+      }
+      if (issues === 5) return route.fulfill({ status: 409, json: { code: 'DELIVERY_ALREADY_ISSUED', message: 'PRIVATE_DIAGNOSTIC' } });
       return route.fulfill({ status: 201, json: { authorization: authorization() } });
     }
     return route.fulfill({ status: 410, json: { code: 'DELIVERY_EXPIRED', message: 'PRIVATE_DIAGNOSTIC' } });
@@ -115,6 +128,27 @@ test('uncertain issuance retries one key, replacement is explicit, and native ex
   expect(issued.every(request => request.body === JSON.stringify({ grantId, kind: 'contract' }))).toBe(true);
   expect(requests.filter(request => request.path.endsWith('/download'))).toHaveLength(1);
   await expect(panel).not.toContainText('PRIVATE_DIAGNOSTIC'); await expect(panel.getByRole('status')).toHaveCount(0);
+  await assertPrivate(page); expect(errors).toEqual([]);
+
+  // Keep the original immediate-failure/expiry proof above, then exercise the real 20-second deadline.
+  // The existing 60-second test and 10-second assertion budgets remain unchanged.
+  const aborted = page.waitForEvent('requestfailed', request => new URL(request.url()).pathname === `${path}/authorizations`);
+  try {
+    await panel.getByRole('button', { name: 'Request another Original contract', exact: true }).click();
+    await expect(panel.getByRole('button', { name: 'Refresh downloads and recent attempts' })).toBeDisabled();
+    await aborted;
+    await expect(panel.getByRole('alert')).toContainText('unconfirmed');
+    await expect(panel.getByRole('button', { name: 'Refresh downloads and recent attempts' })).toBeEnabled();
+    await panel.getByRole('button', { name: 'Retry the same authorization request' }).click();
+    await expect(panel.getByRole('alert')).toContainText('secret cannot be recovered');
+  } finally { releaseStalled(); if (stalledStarted) await stalledHandled; }
+  const recovered = requests.filter(request => request.path.endsWith('/authorizations'));
+  expect(recovered).toHaveLength(5);
+  expect(recovered[3].headers['idempotency-key']).toBe(recovered[4].headers['idempotency-key']);
+  expect(recovered[3].headers['idempotency-key']).not.toBe(recovered[2].headers['idempotency-key']);
+  expect(recovered[3].body).toBe(recovered[4].body);
+  expect(requests.filter(request => request.path.endsWith('/download'))).toHaveLength(1);
+  await expect(panel).not.toContainText('PRIVATE_DIAGNOSTIC');
   await assertPrivate(page); expect(errors).toEqual([]);
 });
 
