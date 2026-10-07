@@ -1,0 +1,34 @@
+{
+  "baseline_local": "a9ac24869b2efbbe0e3f7e29d800fc54aa70be4a",
+  "baseline_tree": "5835124c39fe3ecdee4b71c3c5a4b81a39e141a7",
+  "executable_local": "5b0dc7d452f564b7cae538fa3ee67d4aca4472c2",
+  "executable_tree": "6ba5518cf9ec845dd3788c0d3bf0f169981890c8",
+  "reviewed_source": "24e6ad3538abc0cfd1e21b7615a1e72d8020daac",
+  "source_sha256": {
+    "app/Domain/SiteBuilder/PublicPagesSitemap.php": "c1bded06e8edfbdc365239a681cd120ac862f1a6cd3e70a80b645cfeb9e6a12f",
+    "app/Http/Controllers/PublicPagesSitemapController.php": "ce67c8e9d3c3f1dbbec010ca174929b5584d257589c8f0fba22666b88c04fe5c",
+    "routes/public-discovery.php": "57543f33bf32f632b0fe48ce91a572a87bd1b543f5c0989d8a3da38f138f0fd1",
+    "routes/web.php": "3f2c2990adac53df1d2f68c8a0afda12fcf04e9354b803469451c38446ca696b",
+    "tests/Feature/PublicPagesSitemapTest.php": "32c2b9f68b2b982cb9237fbc78ff528394109d72f60375b2bfbc3d5ac699ff31"
+  },
+  "carry": "Exact five sourcepaths from independently approved24e6ad. Baselinea9ac248 preserves reviewedregistry/privateconsumers; onlyunrelatedContractsv1registrysource and metadata differ from sitemapexecutedparent9c0d7fa; site/editorial services,routes middleware andlockedgraph unchanged.",
+  "author": {
+    "tests": 18,
+    "assertions": 50,
+    "errors": 0,
+    "failures": 0,
+    "skips": 0
+  },
+  "independent": {
+    "tests": 23,
+    "assertions": 87,
+    "errors": 0,
+    "failures": 0,
+    "skips": 0
+  },
+  "limitations": [
+    "Root-levelpublicpagesonly; no catalogtracks,index,robots or legacyredirects",
+    "No deployedSEO/browser/provider/fullacceptance",
+    "Originalbodyacceptedfailure andreviewerfixtureerrors preserved"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "disposition": "approved focused development integration",
+  "reviewed_source": "24e6ad3538abc0cfd1e21b7615a1e72d8020daac",
+  "reviewed_tree": "ee92a437e45f5d6a14840b25c696bfcfb429a79d",
+  "fixed_finding": "Nonempty GET/HEAD body refusal before publication work",
+  "focused": {
+    "tests": 22,
+    "assertions": 79,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "separate_corruption_canary": {
+    "tests": 1,
+    "assertions": 8,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "installed_package_identities": 158,
+  "findings": [],
+  "native_concurrency": false,
+  "browser": false,
+  "full_acceptance": false,
+  "hosted_dispatch": false
+}

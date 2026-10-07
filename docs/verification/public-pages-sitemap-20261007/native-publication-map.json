@@ -1,0 +1,16 @@
+{
+  "repository": "SeanVasey/VA-Studio",
+  "baseline_native": "fc905fc7781ed618e6b86529bf372106de4ebd51",
+  "baseline_local": "a9ac24869b2efbbe0e3f7e29d800fc54aa70be4a",
+  "baseline_tree": "5835124c39fe3ecdee4b71c3c5a4b81a39e141a7",
+  "executable_native": "4094e8b8520c99318f29c97c3ada3af1a22589be",
+  "executable_local": "5b0dc7d452f564b7cae538fa3ee67d4aca4472c2",
+  "executable_tree": "6ba5518cf9ec845dd3788c0d3bf0f169981890c8",
+  "native_ordered_parents": [
+    "fc905fc7781ed618e6b86529bf372106de4ebd51"
+  ],
+  "reviewed_source": "24e6ad3538abc0cfd1e21b7615a1e72d8020daac",
+  "review": "../sitemap-independent-20261007/review-receipt.json",
+  "carry": "root-carry.json",
+  "limits": "Home and verified published editorial only; actual body refusal fixed; no catalog sitemap, robots, source redirects, deployed/browser SEO or final acceptance. Final metadata SHA, cheap preflight and merge recorded in integrating PR."
+}

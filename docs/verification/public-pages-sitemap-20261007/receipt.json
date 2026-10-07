@@ -1,0 +1,44 @@
+{
+  "source_commit": "0d2cb6ec67fdd785a67eee0360ea16ab7cdc1143",
+  "source_tree": "56d9a627d64398a3271fd6b47c8d7be513c0a1c1",
+  "parent": "9c0d7fa05b84ec874869b997ade16efb729c1c85",
+  "source_paths_sha256": {
+    "app/Domain/SiteBuilder/PublicPagesSitemap.php": "c1bded06e8edfbdc365239a681cd120ac862f1a6cd3e70a80b645cfeb9e6a12f",
+    "app/Http/Controllers/PublicPagesSitemapController.php": "3a24fd49adf111081255627153b3a765dc2b050c71caa9cf7413ce26e577f116",
+    "routes/public-discovery.php": "57543f33bf32f632b0fe48ce91a572a87bd1b543f5c0989d8a3da38f138f0fd1",
+    "routes/web.php": "3f2c2990adac53df1d2f68c8a0afda12fcf04e9354b803469451c38446ca696b",
+    "tests/Feature/PublicPagesSitemapTest.php": "4ab27dbd465c353ef83aa65d1eb80ee4d099ad87142286df607ce9f43bf98ab0"
+  },
+  "command": "PHPRC=/workspace/scratch/0c039e9e0645/runtime-recovery/php.ini PHP_INI_SCAN_DIR= LD_LIBRARY_PATH=/workspace/scratch/0c039e9e0645/runtime-recovery/root/usr/lib/x86_64-linux-gnu /workspace/scratch/0c039e9e0645/runtime-recovery/bin/php vendor/bin/phpunit tests/Feature/PublicPagesSitemapTest.php --log-junit /workspace/scratch/2876616e88c3/public-pages-sitemap-exact.xml",
+  "result": {
+    "cases": 13,
+    "assertions": 44,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "engine": "SQLite in-memory"
+  },
+  "protocol_source": "https://www.sitemaps.org/protocol.html",
+  "checks": [
+    "Pint passed on new service/controller/route/test paths",
+    "Fresh exact committed source focused HTTP tests passed"
+  ],
+  "earlier_checks": [
+    "Initial12cases39assertions passed",
+    "Expanded13cases44assertions passed before endpoint root placement correction; exact postcorrection run separately retained"
+  ],
+  "limitations": [
+    "Home and verified editorial URLs only. Track sitemap, index/robots linkage, legacy redirects and deployed crawl acceptance remain open.",
+    "No MySQL/browser/full acceptance or production execution.",
+    "Independent privacy/projection review pending.",
+    "No private account/source imports or live activation."
+  ],
+  "artifact_sha256": {
+    "public-pages-sitemap-exact.txt": "d30926d1137c64ae640db2d24a2d1b78ca43eb9d608888c342a5ac86344d9381",
+    "public-pages-sitemap-first.txt": "3552280861094772341f7e9a07414b5123be9cfff740948069fc9d69190db31a",
+    "public-pages-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "public-pages-sitemap-final.txt": "cf921856d015200d401d990809c01b1fc194f4f09723c647e05c2a205079f87d",
+    "public-pages-sitemap-final.xml": "a84b113a17c182d827c8ce26cbad234dbe32fa90f12a5d9853185b7b06f19eea",
+    "public-pages-sitemap-exact.xml": "73b9e4c2ecc7f3f4bcc7b694863c22a9bd6579c2776c340b9177e6f3c3809ab9"
+  }
+}

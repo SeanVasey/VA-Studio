@@ -1,0 +1,16 @@
+{
+  "source": "0d2cb6ec67fdd785a67eee0360ea16ab7cdc1143",
+  "command": [
+    "php",
+    "-d",
+    "memory_limit=512M",
+    "vendor/bin/phpunit",
+    "-c",
+    "sitemap-independent.phpunit.xml",
+    "--log-junit",
+    "docs/verification/sitemap-independent-20261007/focused.xml",
+    "--fail-on-warning",
+    "--fail-on-empty-test-suite"
+  ],
+  "exit_code": 2
+}

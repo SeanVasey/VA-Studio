@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PublicPagesSitemapTest" file="/workspace/scratch/2876616e88c3/VA-Studio-public-pages-sitemap/tests/Feature/PublicPagesSitemapTest.php" tests="5" assertions="6" errors="0" failures="4" skipped="0" time="0.431391">
+    <testsuite name="Tests\Feature\PublicPagesSitemapTest::test_nonempty_get_and_head_bodies_are_rejected_even_with_false_zero_content_length" tests="4" assertions="4" errors="0" failures="4" skipped="0" time="0.414157">
+      <testcase name="test_nonempty_get_and_head_bodies_are_rejected_even_with_false_zero_content_length with data set #0" file="/workspace/scratch/2876616e88c3/VA-Studio-public-pages-sitemap/tests/Feature/PublicPagesSitemapTest.php" line="77" class="Tests\Feature\PublicPagesSitemapTest" classname="Tests.Feature.PublicPagesSitemapTest" assertions="1" time="0.364346">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\PublicPagesSitemapTest::test_nonempty_get_and_head_bodies_are_rejected_even_with_false_zero_content_length with data set #0
+Expected response status code [404] but received 200.
+Failed asserting that 200 is identical to 404.
+
+/workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:151
+/workspace/scratch/2876616e88c3/VA-Studio-public-pages-sitemap/tests/Feature/PublicPagesSitemapTest.php:79</failure>
+      </testcase>
+      <testcase name="test_nonempty_get_and_head_bodies_are_rejected_even_with_false_zero_content_length with data set #1" file="/workspace/scratch/2876616e88c3/VA-Studio-public-pages-sitemap/tests/Feature/PublicPagesSitemapTest.php" line="77" class="Tests\Feature\PublicPagesSitemapTest" classname="Tests.Feature.PublicPagesSitemapTest" assertions="1" time="0.016320">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\PublicPagesSitemapTest::test_nonempty_get_and_head_bodies_are_rejected_even_with_false_zero_content_length with data set #1
+Expected response status code [404] but received 200.
+Failed asserting that 200 is identical to 404.
+
+/workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:151
+/workspace/scratch/2876616e88c3/VA-Studio-public-pages-sitemap/tests/Feature/PublicPagesSitemapTest.php:79</failure>
+      </testcase>
+      <testcase name="test_nonempty_get_and_head_bodies_are_rejected_even_with_false_zero_content_length with data set #2" file="/workspace/scratch/2876616e88c3/VA-Studio-public-pages-sitemap/tests/Feature/PublicPagesSitemapTest.php" line="77" class="Tests\Feature\PublicPagesSitemapTest" classname="Tests.Feature.PublicPagesSitemapTest" assertions="1" time="0.015491">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\PublicPagesSitemapTest::test_nonempty_get_and_head_bodies_are_rejected_even_with_false_zero_content_length with data set #2
+Expected response status code [404] but received 200.
+Failed asserting that 200 is identical to 404.
+
+/workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:151
+/workspace/scratch/2876616e88c3/VA-Studio-public-pages-sitemap/tests/Feature/PublicPagesSitemapTest.php:79</failure>
+      </testcase>
+      <testcase name="test_nonempty_get_and_head_bodies_are_rejected_even_with_false_zero_content_length with data set #3" file="/workspace/scratch/2876616e88c3/VA-Studio-public-pages-sitemap/tests/Feature/PublicPagesSitemapTest.php" line="77" class="Tests\Feature\PublicPagesSitemapTest" classname="Tests.Feature.PublicPagesSitemapTest" assertions="1" time="0.018000">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\PublicPagesSitemapTest::test_nonempty_get_and_head_bodies_are_rejected_even_with_false_zero_content_length with data set #3
+Expected response status code [404] but received 200.
+Failed asserting that 200 is identical to 404.
+
+/workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:151
+/workspace/scratch/2876616e88c3/VA-Studio-public-pages-sitemap/tests/Feature/PublicPagesSitemapTest.php:79</failure>
+      </testcase>
+    </testsuite>
+    <testcase name="test_empty_get_and_head_bodies_are_allowed" file="/workspace/scratch/2876616e88c3/VA-Studio-public-pages-sitemap/tests/Feature/PublicPagesSitemapTest.php" line="87" class="Tests\Feature\PublicPagesSitemapTest" classname="Tests.Feature.PublicPagesSitemapTest" assertions="2" time="0.017234"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,47 @@
+{
+  "source_commit": "24e6ad3538abc0cfd1e21b7615a1e72d8020daac",
+  "source_tree": "ee92a437e45f5d6a14840b25c696bfcfb429a79d",
+  "source_paths_sha256": {
+    "app/Http/Controllers/PublicPagesSitemapController.php": "ce67c8e9d3c3f1dbbec010ca174929b5584d257589c8f0fba22666b88c04fe5c",
+    "tests/Feature/PublicPagesSitemapTest.php": "32c2b9f68b2b982cb9237fbc78ff528394109d72f60375b2bfbc3d5ac699ff31"
+  },
+  "red_reproduction": {
+    "controller_commit": "6dcfb4359f31d4b9c98a9d4595b62691f994458a",
+    "controller_sha256": "3a24fd49adf111081255627153b3a765dc2b050c71caa9cf7413ce26e577f116",
+    "tests_sha256": "32c2b9f68b2b982cb9237fbc78ff528394109d72f60375b2bfbc3d5ac699ff31",
+    "filter": "request_bodies|bodies_",
+    "cases": 5,
+    "passed": 1,
+    "failed": 4,
+    "assertions": 6,
+    "failure": "Nonempty GET/HEAD bodies of1and65536bytes withfalseContentLength0 incorrectly returned200; emptyGET/HEADallowed."
+  },
+  "green_result": {
+    "cases": 18,
+    "passed": 18,
+    "assertions": 50,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "engine": "SQLite in-memory"
+  },
+  "command": "/workspace/scratch/0c039e9e0645/runtime-recovery/bin/php vendor/bin/phpunit tests/Feature/PublicPagesSitemapTest.php --log-junit /workspace/scratch/2876616e88c3/sitemap-body-green.xml",
+  "environment": {
+    "PHPRC": "/workspace/scratch/0c039e9e0645/runtime-recovery/php.ini",
+    "PHP_INI_SCAN_DIR": "",
+    "LD_LIBRARY_PATH": "/workspace/scratch/0c039e9e0645/runtime-recovery/root/usr/lib/x86_64-linux-gnu"
+  },
+  "change": "One byte actual request stream probe before sitemap work; no ContentLength trust or full body loading. Nonresource/readfailure/nonempty ->404; emptyGET/HEADallowed.",
+  "pint": "passed",
+  "artifact_sha256": {
+    "sitemap-body-green.xml": "5aba4049d60ab1f421a0f384e98c488831bd75effe68712197e1d59180bac3c7",
+    "sitemap-body-red.txt": "6ba0a9644f0caf0912c58ca713cf62a56e196d3d3ec49c551318e9f0f6aed47d",
+    "sitemap-body-green.txt": "ef2bb579a2d5c90b3ed1841eb80322a8cfb6b6a43fcfb26442d2e4cdf4325888",
+    "sitemap-body-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "sitemap-body-red.xml": "d585f37a2002f7d4b55f6968c08a31b30a7dfdb24efa7db9b01b44399078e480"
+  },
+  "limitations": [
+    "No full/native/browser execution; independently reviewed corrected source approval pending.",
+    "Unchanged sitemap scope home/verifiededitorial only; track/index/robots discovery remains open."
+  ]
+}
