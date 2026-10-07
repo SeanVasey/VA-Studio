@@ -27,6 +27,7 @@ PHP_TARGETS = {
     ),
     "production-preparation": (
         "tests/Feature/ProductionTrackPreparationPacketTest.php",
+        "tests/Feature/ProductionTrackPreparationReplayConcurrencyTest.php",
         "tests/Feature/ProductionTrackPreparationPacketGuardsTest.php",
         "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
         "tests/Unit/ProductionTrackPreparationSnapshotTest.php",

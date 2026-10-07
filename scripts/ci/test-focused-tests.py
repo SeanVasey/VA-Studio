@@ -63,6 +63,7 @@ class SelectionTests(unittest.TestCase):
     def test_production_preparation_keeps_complete_adapter_fences_in_bounded_feedback(self):
         required = {
             "tests/Feature/ProductionTrackPreparationPacketTest.php",
+            "tests/Feature/ProductionTrackPreparationReplayConcurrencyTest.php",
             "tests/Feature/ProductionTrackPreparationPacketGuardsTest.php",
             "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
             "tests/Unit/ProductionTrackPreparationSnapshotTest.php",
@@ -80,7 +81,18 @@ class SelectionTests(unittest.TestCase):
             self.assertEqual(len(selected.files), len(required))
             focused.validate_files(ROOT, selected)
         policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
-        self.assertFalse(any("ProductionTrackPreparation" in row[0] for row in policy["methods"]))
+        concurrency_class = "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest"
+        expected_native_methods = {
+            (concurrency_class, "test_same_capture_miss_gap_replays_exact_packet_in_both_commit_orders"),
+            (concurrency_class, "test_changed_capture_cannot_recover_winner_in_either_worker_order"),
+        }
+        actual_native_methods = [tuple(row) for row in policy["methods"]
+                                 if "ProductionTrackPreparation" in row[0]]
+        self.assertEqual(len(actual_native_methods), len(expected_native_methods))
+        self.assertEqual(set(actual_native_methods), expected_native_methods)
+        source = (ROOT / "tests/Feature/ProductionTrackPreparationReplayConcurrencyTest.php").read_text()
+        for _, method in expected_native_methods:
+            self.assertIn("function " + method + "(", source)
 
     def test_store_foundations_feedback_is_bounded_and_has_only_declared_native_skips(self):
         self.assertEqual(focused.MAX_FILES, 32)
