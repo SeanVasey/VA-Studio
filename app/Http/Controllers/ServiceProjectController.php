@@ -89,8 +89,8 @@ final class ServiceProjectController
             return ServiceProjectPrivacy::error(403);
         } catch (ValidationException) {
             return ServiceProjectPrivacy::error(422);
-        } catch (Throwable) {
-            return ServiceProjectPrivacy::error(503);
+        } catch (Throwable $error) {
+            return ServiceProjectPrivacy::failure($error);
         }
     }
 }

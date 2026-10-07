@@ -30,7 +30,7 @@ final class ServiceProjects
         return $this->transaction(function () use ($principal, $actor): array {
             $authority = $this->customer($principal, $actor);
             $services = [];
-            $drafts = $this->rows('service_drafts', [], 'id', 50);
+            $drafts = $this->rows('service_drafts', [], 'id', 50, true);
             foreach ($drafts as $draft) {
                 $version = $this->rows('service_draft_versions', ['draft_id' => (int) $draft['id'], 'number' => (int) $draft['version']])[0] ?? null;
                 if (! $version) {

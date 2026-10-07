@@ -94,6 +94,7 @@ export function ServiceProjectJourney({ initial }: { initial: ServiceProjectInde
     {message && <div role="alert" tabIndex={-1} ref={alert} className="customer-account-message">{message}{pending && <button type="button" className="button" disabled={busy} onClick={() => void save(pending)}>Retry exact saved contents</button>}</div>}
     {index && <>
       <section aria-label="Submit a private service brief"><h2>Start a service brief</h2>
+        {index.services.length === 50 && <p>Showing the 50 newest service definitions.</p>}
         <form onSubmit={submitBrief}>
           <label htmlFor="service-definition">Service definition</label><select id="service-definition" required value={selected} disabled={disabled} onChange={event => { setSelected(event.target.value); const next = index.services.find(item => String(item.versionId) === event.target.value); setAnswers(next?.questions.map(() => '') ?? []); }}>
             <option value="">Choose a private test service</option>{index.services.map(item => <option key={item.versionId} value={item.versionId}>{item.title} · revision {item.version}</option>)}

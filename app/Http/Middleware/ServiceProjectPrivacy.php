@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -64,8 +65,8 @@ final class ServiceProjectPrivacy
             return self::error(403);
         } catch (ValidationException) {
             return self::error(422);
-        } catch (Throwable) {
-            return self::error(503);
+        } catch (Throwable $error) {
+            return self::failure($error);
         }
     }
 
@@ -84,5 +85,16 @@ final class ServiceProjectPrivacy
     {
         return self::protect(response()->json(['code' => 'SERVICE_PROJECT_UNAVAILABLE',
             'message' => 'This service project is unavailable or changed. Refresh before trying again.'], $status));
+    }
+
+    public static function failure(Throwable $error): Response
+    {
+        try {
+            Log::error('Service project request failed.', ['exception_class' => $error::class]);
+        } catch (Throwable) {
+            // Logging failure must preserve the same private response.
+        }
+
+        return self::error(503);
     }
 }
