@@ -1,0 +1,20 @@
+{
+  "source": "192ec8d93f346ba59f07da428e50cbd04513878b",
+  "tree": "4b47a549775e1e2d8e62efb26902bbb98a7e0253",
+  "source_sha256": {
+    "tests/Feature/ProductionBuyerAssentObservationMigrationTest.php": "b33e93511d06200b54f9593ed0a7a67eba6e755257ec01bce9430c1f66f0c9f3",
+    "database/migrations/2026_10_07_239000_production_buyer_assent_observations.php": "defcef254a47d104510f7778102cf31edf02f203cd5a9f120b5db44cc0288b24",
+    "tests/Support/FinalizationDatabaseMigrations.php": "38d248d182fffb7aa6c0583ebb8235c5b60b03fe8865d679b9eb804728a792ff"
+  },
+  "independent_sqlite": {
+    "tests": 4,
+    "assertions": 24,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "inspected_native_evidence": "d5c6934d26c193b8ae53d4f1b4bd85b28228d324",
+  "native_four_buyer_cases_passed": true,
+  "whole_native_run_failed": true,
+  "final_composed_approval": "pending"
+}

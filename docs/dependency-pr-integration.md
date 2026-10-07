@@ -1,5 +1,17 @@
 # Dependency PR integration
 
+## Merged compatibility result — October 7, 2026 UTC
+
+[PR #18](https://github.com/SeanVasey/VA-Studio/pull/18) merged as
+`102afc9e264d703c52b03404c12bea7682db1fb8`, exact tree
+`2b0bce73c56bc3b29eb2479a6bfd3f7473102591`, after cheap preflight
+37570334414 passed on head `b4cbc483`. Fresh main/PR/Git-data reads verified
+ordered parents and the unchanged tree. PRs #1/#2 are closed as superseded;
+their original branches/evidence remain retained. No full matrix was dispatched.
+The candidate section below retains its source-bound checks. PR #3 remains open
+for a real trusted successor profile and pending-v1 continuity; the independently
+reviewed retained-v1 registry is a separate prerequisite, not PDF upgrade acceptance.
+
 ## Current-main compatibility candidate — October 7, 2026
 
 Merged PR #17 is native main `df7f12e24ef481cee020910c3764850761ae4596`,

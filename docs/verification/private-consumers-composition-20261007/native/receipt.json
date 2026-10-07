@@ -1,0 +1,271 @@
+{
+  "executed_source": "192ec8d93f346ba59f07da428e50cbd04513878b",
+  "executed_tree": "4b47a549775e1e2d8e62efb26902bbb98a7e0253",
+  "restoration": {
+    "old_source": "dd53733",
+    "root_reported_byte_exact_tree": "4b47a549775e1e2d8e62efb26902bbb98a7e0253"
+  },
+  "command": "VA_MYSQL_DIAGNOSTIC_LOG=$PWD/docs/verification/private-consumers-composition-20261007/native/mysql-server.txt python3 /workspace/scratch/0c039e9e0645/mysql-runtime/run-tests.py -- php -d memory_limit=512M vendor/bin/phpunit --configuration phpunit.private-continuation-mysql.xml --log-junit docs/verification/private-consumers-composition-20261007/native/junit.xml",
+  "scope": "Five selected native migration/policy/guard files; not whole suite, browser, provider interoperability, or final acceptance",
+  "runtime": {
+    "php": "8.4.26",
+    "mysql": "8.4.11",
+    "memory_limit": "512M",
+    "flush_at_commit": 1,
+    "sync_binlog": 1,
+    "doublewrite": "ON",
+    "log_bin": true,
+    "transport": "private loopback TCP",
+    "schema": "fresh disposable vaseyaudio_test",
+    "port": "runner allocated ephemeral; config env entries do not force overwrite"
+  },
+  "historical_interruption": "Previous killed execution and zero-byte JUnit remain incomplete; not claimed as passed",
+  "probe_correction": "First package metadata probe queried nonexistent tecnickcom/tcpdf; raw diagnostic retained, corrected to tc-lib-pdf; no PHPUnit/source mutation",
+  "installed_lock_references": 158,
+  "limitations": [
+    "No native concurrency selection in this five-file scope",
+    "No full acceptance",
+    "No hosted workflow dispatch"
+  ],
+  "fixture_boundary": {
+    "ProductionBuyerAssentObservationMigrationTest": "Current native MySQL connection: real Artisan rollback empty/populated with bookkeeping plus actual upsert and raw REPLACE refusal.",
+    "ProductionTrackPolicyEngineTest": "Current native MySQL: default MyISAM engine adversary, required owned InnoDB and parent foreign keys.",
+    "ProductionTrackCapabilitiesGuardsTest": "Current native MySQL guard and retained evidence checks.",
+    "ProductionTrackCapabilitiesMigrationOwnershipTest": "Deliberately isolated SQLite canaries; outer native migration setup does not make sqlite_master/TEMP tests native proof.",
+    "ProductionTrackPreparationPacketMigrationTest": "Deliberately isolated SQLite ownership canaries plus disconnected MySQL grammar compilation; not native contact/lock proof."
+  },
+  "exit_code": 2,
+  "result": "failed",
+  "suites": [
+    {
+      "name": "Tests\\Feature\\ProductionBuyerAssentObservationMigrationTest::test_real_rollback_retains_schema_guards_data_and_bookkeeping",
+      "tests": "2",
+      "assertions": "20",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "13.821736"
+    },
+    {
+      "name": "Tests\\Feature\\ProductionBuyerAssentObservationMigrationTest::test_each_actual_sql_replacement_refuses_without_changing_retained_evidence",
+      "tests": "2",
+      "assertions": "4",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "15.322842"
+    },
+    {
+      "name": "Tests\\Feature\\ProductionTrackPolicyEngineTest",
+      "tests": "1",
+      "assertions": "14",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "7.133492"
+    },
+    {
+      "name": "Tests\\Feature\\ProductionTrackCapabilitiesMigrationOwnershipTest",
+      "tests": "23",
+      "assertions": "146",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "4.251649"
+    },
+    {
+      "name": "Tests\\Feature\\ProductionTrackCapabilitiesMigrationOwnershipTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl",
+      "tests": "21",
+      "assertions": "126",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "3.848548"
+    },
+    {
+      "name": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+      "tests": "26",
+      "assertions": "23",
+      "errors": "17",
+      "failures": "2",
+      "skipped": "0",
+      "time": "166.718776"
+    },
+    {
+      "name": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest::test_sql_history_cannot_update_delete_or_replace_even_without_recursive_triggers",
+      "tests": "12",
+      "assertions": "0",
+      "errors": "12",
+      "failures": "0",
+      "skipped": "0",
+      "time": "77.071663"
+    },
+    {
+      "name": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest::test_authenticated_history_refuses_current_and_retained_raw_evidence_damage",
+      "tests": "5",
+      "assertions": "0",
+      "errors": "5",
+      "failures": "0",
+      "skipped": "0",
+      "time": "32.293499"
+    },
+    {
+      "name": "Tests\\Feature\\ProductionTrackPreparationPacketMigrationTest",
+      "tests": "23",
+      "assertions": "326",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "4.979226"
+    },
+    {
+      "name": "Tests\\Feature\\ProductionTrackPreparationPacketMigrationTest::test_foreign_modified_partial_temporary_and_external_objects_refuse_all_rollback_ddl",
+      "tests": "19",
+      "assertions": "76",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "3.442021"
+    }
+  ],
+  "failures": [
+    {
+      "class": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+      "name": "test_sql_history_cannot_update_delete_or_replace_even_without_recursive_triggers with data set \"production_track_capability_candidates update\"",
+      "type": "error",
+      "message": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+      "name": "test_sql_history_cannot_update_delete_or_replace_even_without_recursive_triggers with data set \"production_track_capability_candidates delete\"",
+      "type": "error",
+      "message": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+      "name": "test_sql_history_cannot_update_delete_or_replace_even_without_recursive_triggers with data set \"production_track_capability_candidates replace primary\"",
+      "type": "error",
+      "message": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+      "name": "test_sql_history_cannot_update_delete_or_replace_even_without_recursive_triggers with data set \"production_track_capability_candidates replace unique\"",
+      "type": "error",
+      "message": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+      "name": "test_sql_history_cannot_update_delete_or_replace_even_without_recursive_triggers with data set \"production_track_capability_approvals update\"",
+      "type": "error",
+      "message": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+      "name": "test_sql_history_cannot_update_delete_or_replace_even_without_recursive_triggers with data set \"production_track_capability_approvals delete\"",
+      "type": "error",
+      "message": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+      "name": "test_sql_history_cannot_update_delete_or_replace_even_without_recursive_triggers with data set \"production_track_capability_approvals replace primary\"",
+      "type": "error",
+      "message": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+      "name": "test_sql_history_cannot_update_delete_or_replace_even_without_recursive_triggers with data set \"production_track_capability_approvals replace unique\"",
+      "type": "error",
+      "message": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+      "name": "test_sql_history_cannot_update_delete_or_replace_even_without_recursive_triggers with data set \"production_track_capability_closures update\"",
+      "type": "error",
+      "message": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+      "name": "test_sql_history_cannot_update_delete_or_replace_even_without_recursive_triggers with data set \"production_track_capability_closures delete\"",
+      "type": "error",
+      "message": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+      "name": "test_sql_history_cannot_update_delete_or_replace_even_without_recursive_triggers with data set \"production_track_capability_closures replace primary\"",
+      "type": "error",
+      "message": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+      "name": "test_sql_history_cannot_update_delete_or_replace_even_without_recursive_triggers with data set \"production_track_capability_closures replace unique\"",
+      "type": "error",
+      "message": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+      "name": "test_adapter_source_edit_is_rolled_back_with_every_adapter_side_effect",
+      "type": "failure",
+      "message": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+      "name": "test_audit_created_callback_source_edit_cannot_escape_post_callback_graph_proof",
+      "type": "failure",
+      "message": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+      "name": "test_authenticated_history_refuses_current_and_retained_raw_evidence_damage with data set \"current candidate hash\"",
+      "type": "error",
+      "message": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+      "name": "test_authenticated_history_refuses_current_and_retained_raw_evidence_damage with data set \"current candidate author\"",
+      "type": "error",
+      "message": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+      "name": "test_authenticated_history_refuses_current_and_retained_raw_evidence_damage with data set \"current approval hash\"",
+      "type": "error",
+      "message": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+      "name": "test_authenticated_history_refuses_current_and_retained_raw_evidence_damage with data set \"current approval actor\"",
+      "type": "error",
+      "message": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+      "name": "test_authenticated_history_refuses_current_and_retained_raw_evidence_damage with data set \"retained source version actor\"",
+      "type": "error",
+      "message": ""
+    }
+  ],
+  "totals": {
+    "cases": 77,
+    "assertions": 533,
+    "failures": 2,
+    "errors": 17,
+    "skips": 0
+  },
+  "notes": [
+    "Two native functional callback rollback failures require correction; no success claim.",
+    "SQLite-only PRAGMA guard cases were not partition-excluded in this derived harness; these errors remain recorded and need existing explicit partition handling.",
+    "All four buyer migration cases passed in this actual native run."
+  ],
+  "artifact_sha256": {
+    "runtime-probe-wrong-package.txt": "d2c551293d9eb7a3d2b21da2410bb1e7b0d92e9135f908e0b49be89402b4ea8b",
+    "phpunit.txt": "4db327891092d1ef76ef19498d3eaf7e9a8d76ce56d56d8fdbf2bc0069435966",
+    "phpunit-selection.xml": "a9bce7ec80268b37ce4d2c13066378dac02662af96afdd4679884aee35016d41",
+    "junit.xml": "1b2043cb0f5562c7616012c920f51f763fdda01181556eb7b10f4dfb0a53dba7",
+    "installed-lock-check.txt": "e28f17d10b2a5c10eb03d7034a65ab85145355018ed10135c4a6cab3c09cc333",
+    "mysql-server.txt": "8cb697e81ff0ad8e3fb3fb918e867b6252622d8b58ac69c2e772cd3e6003c4cc",
+    "runtime-autoload.txt": "9f557d8130842796db1024fa65e30e7ade8f1a2cccfae1d61ad8e55d2c55419d",
+    "source-hashes.json": "45b86d94246f68a23b861fe4f1df3fb9a5934da6fa217a8e66b827568860d5d8",
+    "autoload.txt": "d04f812f5e8c2556fa4f1d012751392012295c6f88529fe45e86bfd968b7bbe3",
+    "run-tests.py": "35bdde4f03a9d7a23d90337a77a938c1044f297553e0afe38d13eaee73ac854a"
+  }
+}

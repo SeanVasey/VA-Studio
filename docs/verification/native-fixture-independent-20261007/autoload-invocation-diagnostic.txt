@@ -1,0 +1,1 @@
+exec "/workspace/scratch/0c039e9e0645/runtime-recovery/bin/php" "/workspace/scratch/0c039e9e0645/runtime-recovery/composer.phar" "$@"

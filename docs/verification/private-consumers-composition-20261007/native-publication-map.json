@@ -1,0 +1,19 @@
+{
+  "repository": "SeanVasey/VA-Studio",
+  "baseline_native": "102afc9e264d703c52b03404c12bea7682db1fb8",
+  "baseline_local": "c498006e780edb1494e55d3a9ea9bad5c38ffc93",
+  "baseline_tree": "2b0bce73c56bc3b29eb2479a6bfd3f7473102591",
+  "executable_local": "68f54eb253fd017c80c39cfe6b8693683e887a65",
+  "executable_native": "e50f4e66e1aa3a931303a62a005bc66c36ff4cab",
+  "executable_tree": "890d609bb54ee7c61f2a41ed6edda18f1f08e511",
+  "native_ordered_parents": [
+    "102afc9e264d703c52b03404c12bea7682db1fb8"
+  ],
+  "metadata_predecessor_local": "e076bc86fe5f3e4585be351ab15cc47d8e51136b",
+  "metadata_predecessor_tree": "2d32d4c281c9754086f6434b72fc752dcc14e17f",
+  "evidence_receipt": "root/receipt.json",
+  "sensitive_component_approvals": "../continuation-independent-20261007/",
+  "composition_review": "../private-final-independent-review-20261007/review-receipt.json",
+  "native_fixture_review": "../native-fixture-independent-20261007/receipt.json",
+  "limits": "Metadata successor retains failures and exact source carries. Final native metadata SHA and cheap preflight/merge appear in integrating PR and checkpoint; no full acceptance or native/browser matrix claimed."
+}

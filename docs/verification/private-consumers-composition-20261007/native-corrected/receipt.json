@@ -1,0 +1,78 @@
+{
+  "executed_source": "e9557569766cdbade50024868faef4d3187ba90e",
+  "executed_tree": "9588a17ab23c8cb017343fa5a910701c3c3998af",
+  "base_source": "192ec8d93f346ba59f07da428e50cbd04513878b",
+  "base_tree": "4b47a549775e1e2d8e62efb26902bbb98a7e0253",
+  "change": "Only ProductionTrackCapabilitiesGuardsTest.php; 19 SQLite PRAGMA/transactional DROP TRIGGER adversaries retain assertions on explicit isolated SQLite; two ordinary DML adapter/audit-callback rollback cases run on selected driver. No app/migration/policy/exception changes.",
+  "preceding_failed_native_evidence_commit": "d5c6934d26c193b8ae53d4f1b4bd85b28228d324",
+  "preceding_failed_run": {
+    "cases": 77,
+    "assertions": 533,
+    "passed": 58,
+    "failures": 2,
+    "errors": 17,
+    "reason": "SQLite PRAGMA dialect and MySQL implicit-commit DDL adversaries require explicit fixture boundary; failure retained."
+  },
+  "probe_failure": "Initial new ordinary-DML audit callback updated two candidate_saved rows because callback adds a second row; narrowed fixture attack to pre-captured original audit ID. Both preliminary logs retained.",
+  "interruption_reconciliation": "Aborted tool return during SQLite launch did not terminate either live process; inspected both processes and completed original executions without duplicate runs.",
+  "commands": {
+    "native": "VA_MYSQL_DIAGNOSTIC_LOG=$PWD/docs/verification/private-consumers-composition-20261007/native-corrected/mysql-server.txt python3 /workspace/scratch/0c039e9e0645/mysql-runtime/run-tests.py -- php -d memory_limit=512M vendor/bin/phpunit --configuration phpunit.native-corrected.xml --log-junit docs/verification/private-consumers-composition-20261007/native-corrected/junit.xml",
+    "sqlite": "PATH=/workspace/scratch/0c039e9e0645/runtime-recovery/bin:$PATH PHPRC=/workspace/scratch/0c039e9e0645/runtime-recovery/php.ini PHP_INI_SCAN_DIR= LD_LIBRARY_PATH=/workspace/scratch/0c039e9e0645/runtime-recovery/root/usr/lib/x86_64-linux-gnu php -d memory_limit=512M vendor/bin/phpunit --configuration phpunit.native-corrected.xml --log-junit docs/verification/private-consumers-composition-20261007/native-corrected/sqlite-junit.xml"
+  },
+  "native_boundary": "Buyer migration four cases, policy engine, nine ordinary capability guard cases use actual MySQL. 23 capability ownership, 23 packet ownership, and 19 SQLite guard adversary cases intentionally use SQLite fixtures; disconnected grammar compiler is not native proof.",
+  "limits": [
+    "No native concurrency check selected",
+    "No whole matrix/browser/final acceptance",
+    "No hosted CI dispatch",
+    "Callback DML rollback proof does not sandbox arbitrary DDL or application lifecycle/crypto callbacks"
+  ],
+  "results": {
+    "mysql_selection": {
+      "cases": 79,
+      "assertions": 596,
+      "failures": 0,
+      "errors": 0,
+      "skips": [],
+      "process_exit_code": 0,
+      "native_cases": 14,
+      "isolated_sqlite_cases": 65
+    },
+    "sqlite_selection": {
+      "cases": 79,
+      "assertions": 582,
+      "failures": 0,
+      "errors": 0,
+      "skips": [
+        "test_owned_policy_tables_require_innodb_when_session_defaults_to_myisam"
+      ],
+      "normal_completion_observed": true
+    },
+    "pint": "passed"
+  },
+  "runtime": {
+    "php": "8.4.26",
+    "mysql": "8.4.11",
+    "memory_limit": "512M",
+    "flush_at_commit": 1,
+    "sync_binlog": 1,
+    "doublewrite": "ON",
+    "log_bin": true,
+    "schema": "fresh disposable vaseyaudio_test",
+    "transport": "private loopback TCP ephemeral runner port",
+    "installed_lock_references": 158
+  },
+  "artifact_sha256": {
+    "predecessor-probe.txt": "1fe776fa3216733213648a4c854b5d0d8df6bc01bca15c4654eebf222b09f46c",
+    "sqlite-phpunit.txt": "e1b83d13e07b7778d478405c4be3e4335eefe3be536f04972d4d8e65e186e750",
+    "pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "phpunit.txt": "1df438c4df81d347156fae8d2064363751d3b96a38a48d97665d62516c032179",
+    "phpunit-selection.xml": "a9bce7ec80268b37ce4d2c13066378dac02662af96afdd4679884aee35016d41",
+    "junit.xml": "c7e0c3d35caa43b2344b6980badd69298bf2764e237393f0e553f28305faf533",
+    "mysql-server.txt": "e70277ef6a781f30ddf36a7fb844c05d4529b2b990978d513d0ed993791ee458",
+    "runtime-autoload.txt": "6f4cd1aad80b8087f7d913fa596b3f697441a40975ce9ef38a0cf78d52663c99",
+    "sqlite-junit.xml": "e63c42b470f01d3d9d9c26c0f4dddaf6d60376048cb752a27056705e90372358",
+    "source-hashes.json": "208c6745d24898d013cf800dfa8b37ce1560ce099d1e1ae19b1a09e202f42d3f",
+    "autoload.txt": "d04f812f5e8c2556fa4f1d012751392012295c6f88529fe45e86bfd968b7bbe3",
+    "corrected-probe.txt": "7fb1663dd9441776be46449fd2b9a2f2337a68a5b4bb539558543abf78c9a980"
+  }
+}

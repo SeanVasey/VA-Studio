@@ -1,0 +1,9 @@
+{
+  "checked_php_paths": 1026,
+  "changed_php_paths": [
+    "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php"
+  ],
+  "source": "68f54eb253fd017c80c39cfe6b8693683e887a65",
+  "predecessor": "192ec8d93f346ba59f07da428e50cbd04513878b",
+  "guard_successor": "e9557569766cdbade50024868faef4d3187ba90e"
+}

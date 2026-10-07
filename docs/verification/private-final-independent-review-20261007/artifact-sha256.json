@@ -1,0 +1,15 @@
+{
+  "README.md": "220f50f924af55c4f461afe35fc3e9aa440dd4290bc1b0fb528f23284e86842c",
+  "autoload.txt": "d04f812f5e8c2556fa4f1d012751392012295c6f88529fe45e86bfd968b7bbe3",
+  "baseline-focused-tests.py": "56bf06b0932d46f507eddc0e8c55bca3918337cc62c3928df20047e246414633",
+  "buyer-migration.txt": "1bbe91417d88a268193d67cb1291dc883628ea4b4f4876bdfcaf0b63ed4fbef3",
+  "buyer-migration.xml": "e9ff4dba1039caed5fb72f10b7b253431066d6cda668d9ba4dc729cc96b99206",
+  "buyer-selection.xml": "19bb5f9af9b6f5d4c437f8a9978698a17b74d38226bc77c92cd0af2fba7681f1",
+  "buyer-source-binding.json": "0aa625987c54f7bce330395bde364a4c3233aeb7f26e9ef9cb6ab8f76907c184",
+  "cadence-controls.txt": "416bf32537d4ffc17e47fc9001e09449b734d88682763b59741e1f5b52a25f02",
+  "execution.json": "f5e05e8070a560a7a5dee532a00636af22b3cf32d6d4356ea56195bf280a73b2",
+  "final-source-carry.json": "258f4b0c3496539286ab4422d773b039c7861b914c05b3dc0eeb671773e2ed6a",
+  "focused-controls.txt": "63fea9d7a0409a5f674c9ce61039b59c4aec3d50d9dc215d5880fa6d6d9429f5",
+  "review-receipt.json": "31a5161adda43ad39e57b961d1b6eaff6310683253b09c33e019f044e5facee1",
+  "scope-controls.txt": "b724daba74aa0a52c09e519bed86ec3f06ae4d76726c72edcea99cfb43a1f023"
+}
