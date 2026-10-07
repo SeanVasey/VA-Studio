@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"tests\/Feature\/PaidGrantDocumentJourneyTest.php","fixers":["unary_operator_spaces","not_operator_with_successor_space","ordered_imports"]},{"path":"tests\/Feature\/PaidGrantHttpJourneyTest.php","fixers":["class_definition","fully_qualified_strict_types","braces_position","ordered_imports"]}]}

@@ -1,0 +1,13 @@
+
+> test
+> vitest run tests/frontend/paid-grant-journey.test.tsx
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-paid-grants-commit-admission
+
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  11:14:29
+   Duration  1.60s (tests 47%, environment 42%, setup 6%, transform 5%, import 1%)
+

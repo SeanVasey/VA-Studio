@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="3" assertions="37" errors="0" failures="0" skipped="0" time="9.688301">
+    <testsuite name="Tests\Feature\PaidGrantSourceJourneyTest" file="/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantSourceJourneyTest.php" tests="1" assertions="17" errors="0" failures="0" skipped="0" time="4.029796">
+      <testcase name="test_actual_original_assent_and_paid_source_mint_one_distinct_immutable_origin_on_exact_replay" file="/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantSourceJourneyTest.php" line="92" class="Tests\Feature\PaidGrantSourceJourneyTest" classname="Tests.Feature.PaidGrantSourceJourneyTest" assertions="17" time="4.029796"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\PaidGrantCommittingAdmissionTest" file="/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantCommittingAdmissionTest.php" tests="2" assertions="20" errors="0" failures="0" skipped="0" time="5.658505">
+      <testsuite name="Tests\Feature\PaidGrantCommittingAdmissionTest::test_genuine_last_committing_callback_cannot_withdraw_current_consumer_authority_and_commit_new_origin" tests="2" assertions="20" errors="0" failures="0" skipped="0" time="5.658505">
+        <testcase name="test_genuine_last_committing_callback_cannot_withdraw_current_consumer_authority_and_commit_new_origin with data set #0" file="/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantCommittingAdmissionTest.php" line="86" class="Tests\Feature\PaidGrantCommittingAdmissionTest" classname="Tests.Feature.PaidGrantCommittingAdmissionTest" assertions="10" time="2.852467"/>
+        <testcase name="test_genuine_last_committing_callback_cannot_withdraw_current_consumer_authority_and_commit_new_origin with data set #1" file="/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantCommittingAdmissionTest.php" line="86" class="Tests\Feature\PaidGrantCommittingAdmissionTest" classname="Tests.Feature.PaidGrantCommittingAdmissionTest" assertions="10" time="2.806037"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

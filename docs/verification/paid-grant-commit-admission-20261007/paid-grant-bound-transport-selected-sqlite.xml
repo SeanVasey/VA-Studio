@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="3" assertions="119" errors="0" failures="0" skipped="0" time="24.217071">
+    <testsuite name="Tests\Feature\PaidGrantHttpJourneyTest" file="/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantHttpJourneyTest.php" tests="2" assertions="110" errors="0" failures="0" skipped="0" time="17.497688">
+      <testcase name="test_actual_typed_buyer_http_finalization_paid_pdf_and_native_file_delivery_preserve_originals" file="/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantHttpJourneyTest.php" line="105" class="Tests\Feature\PaidGrantHttpJourneyTest" classname="Tests.Feature.PaidGrantHttpJourneyTest" assertions="89" time="14.183794"/>
+      <testcase name="test_actual_private_json_body_seal_closes_policy_withdrawal_after_response_and_before_first_original_byte" file="/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantHttpJourneyTest.php" line="160" class="Tests\Feature\PaidGrantHttpJourneyTest" classname="Tests.Feature.PaidGrantHttpJourneyTest" assertions="21" time="3.313894"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\PaidGrantDownloadJourneyTest" file="/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantDownloadJourneyTest.php" tests="1" assertions="9" errors="0" failures="0" skipped="0" time="6.719383">
+      <testcase name="test_held_transfer_rechecks_original_owner_before_first_byte_without_new_transaction_or_principal" file="/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantDownloadJourneyTest.php" line="226" class="Tests\Feature\PaidGrantDownloadJourneyTest" classname="Tests.Feature.PaidGrantDownloadJourneyTest" assertions="9" time="6.719383"/>
+    </testsuite>
+  </testsuite>
+</testsuites>
