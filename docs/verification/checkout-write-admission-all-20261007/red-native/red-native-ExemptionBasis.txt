@@ -1,0 +1,25 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-admission-red/phpunit.xml
+
+[41;37mF[0m[41;37mF[0m                                                                  2 / 2 (100%)
+
+Time: 05:40.927, Memory: 96.00 MB
+
+There were 2 failures:
+
+1) Tests\Canary\ExemptionBasisCommitAdmissionCanaryTest::test_committing_qualifier_role_withdrawal_refuses_new_basis
+Failed asserting that false is true.
+
+/home/user/VA-Studio-admission-red/docs/verification/checkout-write-admission-all-20261007/canaries/ExemptionBasisCommitAdmissionCanaryTest.php:46
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Canary\ExemptionBasisCommitAdmissionCanaryTest::test_committing_qualifier_mfa_withdrawal_refuses_new_basis
+Failed asserting that false is true.
+
+/home/user/VA-Studio-admission-red/docs/verification/checkout-write-admission-all-20261007/canaries/ExemptionBasisCommitAdmissionCanaryTest.php:57
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 2[0m[37;41m, Assertions: 6[0m[37;41m, Failures: 2[0m[37;41m.[0m

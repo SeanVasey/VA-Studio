@@ -1,0 +1,37 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-admission4/phpunit.xml
+
+FFFF                                                                4 / 4 (100%)
+
+Time: 21:09.344, Memory: 100.00 MB
+
+There were 4 failures:
+
+1) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_admitted_reproof_is_the_terminal_commit_before_provider_create@offer, first initiate with data ('offer', false)
+Failed asserting that false is true.
+
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_admitted_reproof_is_the_terminal_commit_before_provider_create@capability, first initiate with data ('capability', false)
+Failed asserting that false is true.
+
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_admitted_reproof_is_the_terminal_commit_before_provider_create@offer, retry with data ('offer', true)
+Failed asserting that false is true.
+
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_admitted_reproof_is_the_terminal_commit_before_provider_create@capability, retry with data ('capability', true)
+Failed asserting that false is true.
+
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 4, Assertions: 16, Failures: 4.

@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php b/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php
+index af445be0..80fa589d 100644
+--- a/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php
++++ b/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php
+@@ -25,7 +25,7 @@ final class HostedCheckout
+         if ($prepared['intent']['session'] === null) {
+             // Final read-only re-proof immediately before the first provider create. Any change after
+             // this point crosses the external call and belongs to reconciliation/refund handling.
+-            $this->proveCreatable($principal, $buyer, $prepared);
++            // MUTATION M4: proveCreatable removed
+         }
+         try {
+             $sessionId = $prepared['intent']['session']['provider_session_id'] ?? null;

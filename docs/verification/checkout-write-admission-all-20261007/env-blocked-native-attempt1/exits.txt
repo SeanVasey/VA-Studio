@@ -1,0 +1,7 @@
+canary-HostedIntent 2
+canary-ExemptionBasis 2
+canary-ExemptionAuthority 2
+archived-c6-physical 2
+receipt-pair 2
+new-selected 2
+finished

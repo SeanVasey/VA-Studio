@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionCheckoutCommittedReceiptTest" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutCommittedReceiptTest.php" tests="2" assertions="0" errors="2" failures="0" skipped="0" time="0.000000">
+    <testcase name="test_typed_consumer_admission_runs_after_late_delegate_and_refuses_physical_commit_on_buyer_withdrawal" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutCommittedReceiptTest.php" line="129" class="Tests\Feature\ProductionCheckoutCommittedReceiptTest" classname="Tests.Feature.ProductionCheckoutCommittedReceiptTest" assertions="0" time="0.000000">
+      <error type="Illuminate\Database\QueryException">Tests\Feature\ProductionCheckoutCommittedReceiptTest::test_typed_consumer_admission_runs_after_late_delegate_and_refuses_physical_commit_on_buyer_withdrawal
+Illuminate\Database\QueryException: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3421, Database: vaseyaudio_admission, SQL: select exists (select 1 from information_schema.tables where table_schema = schema() and table_name = 'migrations' and table_type in ('BASE TABLE', 'SYSTEM VERSIONED')) as `exists`)
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:1038
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:1017
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:815
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:426
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:371
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:388
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:176
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/DatabaseMigrationRepository.php:185
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:797
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:166
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/helpers.php:328
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:166
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:142
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:112
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:672
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:111
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:90
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:68
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:29
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/FreshCommand.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/symfony/console/Application.php:1094
+/home/user/VA-Studio/vendor/symfony/console/Application.php:356
+/home/user/VA-Studio/vendor/symfony/console/Application.php:195
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithConsole.php:85
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/DatabaseMigrations.php:37
+/home/user/VA-Studio-admission/tests/Support/FinalizationDatabaseMigrations.php:22
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:239
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:106
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutCommittedReceiptTest.php:33
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_same_typed_admission_accepts_two_siblings_and_preserves_new_consumer_writes" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutCommittedReceiptTest.php" line="169" class="Tests\Feature\ProductionCheckoutCommittedReceiptTest" classname="Tests.Feature.ProductionCheckoutCommittedReceiptTest" assertions="0" time="0.000000">
+      <error type="Illuminate\Database\QueryException">Tests\Feature\ProductionCheckoutCommittedReceiptTest::test_same_typed_admission_accepts_two_siblings_and_preserves_new_consumer_writes
+Illuminate\Database\QueryException: SQLSTATE[HY000] [2002] Connection refused (Connection: mysql, Host: 127.0.0.1, Port: 3421, Database: vaseyaudio_admission, SQL: select exists (select 1 from information_schema.tables where table_schema = schema() and table_name = 'migrations' and table_type in ('BASE TABLE', 'SYSTEM VERSIONED')) as `exists`)
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:1038
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:1017
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:815
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:426
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:371
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:388
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:176
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/DatabaseMigrationRepository.php:185
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:797
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:166
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/helpers.php:328
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:166
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:142
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:112
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:672
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:111
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:90
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:68
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:29
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/FreshCommand.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/symfony/console/Application.php:1094
+/home/user/VA-Studio/vendor/symfony/console/Application.php:356
+/home/user/VA-Studio/vendor/symfony/console/Application.php:195
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithConsole.php:85
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/DatabaseMigrations.php:37
+/home/user/VA-Studio-admission/tests/Support/FinalizationDatabaseMigrations.php:22
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:239
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:106
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutCommittedReceiptTest.php:33
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+  </testsuite>
+</testsuites>

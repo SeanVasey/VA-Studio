@@ -1,0 +1,155 @@
+<?php
+
+namespace Tests\ReviewProbe4;
+
+use App\Domain\Commerce\ProductionCheckout\CheckoutCommandCommitDispatcher;
+use App\Domain\Commerce\ProductionCheckout\CheckoutException;
+use App\Domain\Commerce\ProductionCheckout\CheckoutSchema;
+use App\Domain\Commerce\ProductionCheckout\ExecutionContextV1;
+use App\Domain\Commerce\ProductionCheckout\HostedCheckout;
+use App\Domain\Commerce\ProductionCheckout\ProviderGateway;
+use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
+use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
+use Illuminate\Database\Events\TransactionCommitted;
+use Illuminate\Database\Events\TransactionCommitting;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\ProductionCheckoutGatewayFixture;
+use Tests\Support\ProductionCheckoutJourneyFixture;
+use Tests\TestCase;
+
+/**
+ * Review probe P4 (not part of the repo): a write made by a post-commit callback of the ADMITTED
+ * re-proof frame (its own afterCommit callback, or a TransactionCommitted listener), either as an
+ * autocommit statement or inside a new framework transaction, on a first initiate. Records the
+ * outcome; asserts only that the write ran.
+ */
+final class TerminalPostCommitProbeTest extends TestCase
+{
+    use FinalizationDatabaseMigrations;
+    use ProductionCheckoutJourneyFixture;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->fakePrivateMediaStorage();
+        config(['app.key' => 'base64:'.base64_encode(str_repeat('j', 32)),
+            'production-customer-identity.enabled' => true, 'production-customer-identity.provenance' => IdentityPolicy::REHEARSAL,
+            'production-customer-identity.public_origin' => 'http://localhost', 'production-customer-identity.notifications_enabled' => true,
+            'production-customer-identity.transport_capability' => LoopbackSmtp::CAPABILITY,
+            'production_checkout.fresh_checkout_enabled' => true, 'production_checkout.reconciliation_enabled' => true]);
+        Queue::fake();
+    }
+
+    public static function scenarios(): array
+    {
+        $out = [];
+        foreach (['aftercommit', 'committed'] as $where) {
+            foreach (['offer_autocommit', 'offer_framework_tx', 'credential_autocommit'] as $what) {
+                $out["$where/$what"] = [$where, $what];
+            }
+        }
+
+        return $out;
+    }
+
+    #[DataProvider('scenarios')]
+    public function test_probe(string $where, string $what): void
+    {
+        $f = $this->payable();
+        $trackId = $f['catalog']['items'][0]['trackId'];
+        $accountId = $f['buyer']['principal']->accountId;
+        $state = ['armed' => false, 'pending' => false, 'acted' => 0, 'write_error' => null, 'offer_active_at_create' => null, 'version_at_create' => null];
+        $write = function () use (&$state, $what, $trackId, $accountId): void {
+            $state['acted']++;
+            try {
+                match ($what) {
+                    'offer_autocommit' => DB::table('offers')->where('track_id', $trackId)->update(['is_active' => false]),
+                    'offer_framework_tx' => DB::transaction(fn () => DB::table('offers')->where('track_id', $trackId)->update(['is_active' => false])),
+                    'credential_autocommit' => DB::table('customer_accounts')->where('id', $accountId)->update(['active' => 0, 'access_version' => DB::raw('access_version + 1'), 'updated_at' => now()]),
+                };
+            } catch (\Throwable $e) {
+                $state['write_error'] = $e instanceof CheckoutException ? 'CheckoutException:'.$e->reason : get_class($e);
+                throw $e;
+            }
+        };
+        app('events')->listen(TransactionCommitting::class, function () use (&$state, $where, $write): void {
+            if ($state['armed'] && $state['acted'] === 0 && ! $state['pending']
+                && DB::connection()->getEventDispatcher() instanceof CheckoutCommandCommitDispatcher) {
+                $state['pending'] = true;
+                if ($where === 'aftercommit') {
+                    DB::afterCommit($write);
+                }
+            }
+        });
+        app('events')->listen(TransactionCommitted::class, function () use (&$state, $where, $write): void {
+            if ($where === 'committed' && $state['pending'] && $state['acted'] === 0) {
+                $write();
+            }
+        });
+        $f['hosted'] = new HostedCheckout($f['access'], new Probe4Gateway($f['gateway'], function () use (&$state): void {
+            $state['armed'] = true;
+        }, function () use (&$state, $trackId, $accountId): void {
+            if ($state['offer_active_at_create'] === null) {
+                $state['offer_active_at_create'] = DB::table('offers')->where('track_id', $trackId)->where('is_active', true)->count();
+                $state['version_at_create'] = (int) DB::table('customer_accounts')->where('id', $accountId)->value('access_version');
+            }
+        }));
+        $versionBefore = (int) DB::table('customer_accounts')->where('id', $accountId)->value('access_version');
+        $outcome = 'ok';
+        try {
+            $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        } catch (\Throwable $e) {
+            $outcome = $e instanceof CheckoutException ? 'refused:'.$e->reason : get_class($e);
+        }
+        $row = ['scenario' => "$where/$what", 'driver' => DB::getDriverName(), 'acted' => $state['acted'], 'write_error' => $state['write_error'],
+            'outcome' => $outcome, 'creates' => count($f['gateway']->creates),
+            'offer_active_at_create' => $state['offer_active_at_create'], 'access_version_before' => $versionBefore, 'access_version_at_create' => $state['version_at_create'],
+            'sessions' => DB::table(CheckoutSchema::TABLES['session'])->count(),
+            'inactive_offers_after' => DB::table('offers')->where('track_id', $trackId)->where('is_active', false)->count(),
+            'raw_pdo_in_transaction' => DB::connection()->getRawPdo()->inTransaction()];
+        file_put_contents(getenv('PROBE_OUT'), json_encode($row)."\n", FILE_APPEND);
+        $this->assertSame(1, $state['acted']);
+    }
+}
+
+final class Probe4Gateway implements ProviderGateway
+{
+    private bool $done = false;
+
+    public function __construct(private readonly ProductionCheckoutGatewayFixture $inner, private readonly \Closure $arm, private readonly \Closure $probe) {}
+
+    public function provenance(ExecutionContextV1 $context): string
+    {
+        if (! $this->done) {
+            $this->done = true;
+            ($this->arm)();
+        }
+
+        return $this->inner->provenance($context);
+    }
+
+    public function account(ExecutionContextV1 $context): array
+    {
+        return $this->inner->account($context);
+    }
+
+    public function create(ExecutionContextV1 $context, array $params, string $key): array
+    {
+        ($this->probe)();
+
+        return $this->inner->create($context, $params, $key);
+    }
+
+    public function retrieve(ExecutionContextV1 $context, string $sessionId): array
+    {
+        return $this->inner->retrieve($context, $sessionId);
+    }
+
+    public function paymentIntent(ExecutionContextV1 $context, string $paymentId): array
+    {
+        return $this->inner->paymentIntent($context, $paymentId);
+    }
+}

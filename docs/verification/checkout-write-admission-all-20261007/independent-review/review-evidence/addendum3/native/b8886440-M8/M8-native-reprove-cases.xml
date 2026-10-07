@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" file="/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" tests="4" assertions="12" errors="0" failures="4" skipped="0" time="1064.204101">
+    <testsuite name="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create" tests="4" assertions="12" errors="0" failures="4" skipped="0" time="1064.204101">
+      <testcase name="test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create with data set &quot;offer, first initiate&quot;" file="/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="112" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="2" time="282.466057">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create with data set "offer, first initiate"
+A withdrawn NEW checkout write was admitted.
+
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:475
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:139
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create with data set &quot;capability, first initiate&quot;" file="/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="112" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="2" time="227.012154">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create with data set "capability, first initiate"
+A withdrawn NEW checkout write was admitted.
+
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:475
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:139
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create with data set &quot;offer, retry&quot;" file="/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="112" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="4" time="331.776719">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create with data set "offer, retry"
+A withdrawn NEW checkout write was admitted.
+
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:475
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:139
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create with data set &quot;capability, retry&quot;" file="/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="112" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="4" time="222.949172">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create with data set "capability, retry"
+A withdrawn NEW checkout write was admitted.
+
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:475
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:139
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

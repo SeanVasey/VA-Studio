@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionCheckoutObserverExclusionTest" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutObserverExclusionTest.php" tests="2" assertions="18" errors="0" failures="0" skipped="0" time="8.997286">
+    <testcase name="test_receipt_observer_refuses_frame_already_holding_new_write_observer" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutObserverExclusionTest.php" line="47" class="Tests\Feature\ProductionCheckoutObserverExclusionTest" classname="Tests.Feature.ProductionCheckoutObserverExclusionTest" assertions="9" time="4.285427"/>
+    <testcase name="test_new_write_observer_refuses_frame_already_holding_receipt_observer" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutObserverExclusionTest.php" line="69" class="Tests\Feature\ProductionCheckoutObserverExclusionTest" classname="Tests.Feature.ProductionCheckoutObserverExclusionTest" assertions="9" time="4.711860"/>
+  </testsuite>
+</testsuites>

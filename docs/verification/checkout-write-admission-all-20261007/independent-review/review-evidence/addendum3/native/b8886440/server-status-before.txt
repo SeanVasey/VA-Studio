@@ -1,0 +1,4 @@
+Com_commit	0
+Com_create_table	35
+Questions	16
+Uptime	26

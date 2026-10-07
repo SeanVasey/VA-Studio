@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Canary\ExemptionBasisCommitAdmissionCanaryTest" file="/home/user/VA-Studio-admission/docs/verification/checkout-write-admission-all-20261007/canaries/ExemptionBasisCommitAdmissionCanaryTest.php" tests="2" assertions="10" errors="0" failures="0" skipped="0" time="299.312145">
+    <testcase name="test_committing_qualifier_role_withdrawal_refuses_new_basis" file="/home/user/VA-Studio-admission/docs/verification/checkout-write-admission-all-20261007/canaries/ExemptionBasisCommitAdmissionCanaryTest.php" line="42" class="Tests\Canary\ExemptionBasisCommitAdmissionCanaryTest" classname="Tests.Canary.ExemptionBasisCommitAdmissionCanaryTest" assertions="5" time="157.695184"/>
+    <testcase name="test_committing_qualifier_mfa_withdrawal_refuses_new_basis" file="/home/user/VA-Studio-admission/docs/verification/checkout-write-admission-all-20261007/canaries/ExemptionBasisCommitAdmissionCanaryTest.php" line="51" class="Tests\Canary\ExemptionBasisCommitAdmissionCanaryTest" classname="Tests.Canary.ExemptionBasisCommitAdmissionCanaryTest" assertions="5" time="141.616961"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,9 @@
+Aborted first native attempt (reviewer harness error, not a product result).
+Six PHPUnit processes ran concurrently against six databases (va_rev_a3_g1..g4, va_rev_a3_c1, va_rev_a3_c2) on ONE private mysqld (127.0.0.1:3471).
+The migrations' ownership guards scan information_schema.TRIGGERS server-wide and refuse foreign-schema guards that reference their tables
+(IdentityMigrationOwnership.php:179; the capability-table guard does the same), so concurrent schemas on one server refused each other:
+- native-terminal-canary: LogicException "Unexpected production identity schema or retained evidence; refused before DDL." (exit 2)
+- native-4d-canary: LogicException "Unexpected production capability external or additional table guard; rollback refused before schema changes." (exit 2)
+- native-g1..g4: killed by the reviewer (SIGTERM to pids 10511 10512 10513 10539, verified cwd=/home/user/VA-Studio-review-admission4) after the
+  background wrapper exited 144; their .raw/.xml are partial/empty.
+The databases were dropped. The rerun uses one database per private mysqld instance (see ../commands.txt).

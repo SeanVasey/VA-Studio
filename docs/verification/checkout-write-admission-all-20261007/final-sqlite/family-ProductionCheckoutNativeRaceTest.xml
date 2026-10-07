@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionCheckoutNativeRaceTest" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutNativeRaceTest.php" tests="2" assertions="0" errors="0" failures="0" skipped="2" time="0.000000">
+    <testsuite name="Tests\Feature\ProductionCheckoutNativeRaceTest::test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order" tests="2" assertions="0" errors="0" failures="0" skipped="2" time="0.000000">
+      <testcase name="test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order with data set #0" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutNativeRaceTest.php" line="59" class="Tests\Feature\ProductionCheckoutNativeRaceTest" classname="Tests.Feature.ProductionCheckoutNativeRaceTest" assertions="0" time="0.000000">
+        <skipped/>
+      </testcase>
+      <testcase name="test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order with data set #1" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutNativeRaceTest.php" line="59" class="Tests\Feature\ProductionCheckoutNativeRaceTest" classname="Tests.Feature.ProductionCheckoutNativeRaceTest" assertions="0" time="0.000000">
+        <skipped/>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

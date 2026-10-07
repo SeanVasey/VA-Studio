@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionCheckoutCommittedReceiptTest" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutCommittedReceiptTest.php" tests="2" assertions="12" errors="0" failures="0" skipped="0" time="436.091014">
+    <testcase name="test_typed_consumer_admission_runs_after_late_delegate_and_refuses_physical_commit_on_buyer_withdrawal" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutCommittedReceiptTest.php" line="129" class="Tests\Feature\ProductionCheckoutCommittedReceiptTest" classname="Tests.Feature.ProductionCheckoutCommittedReceiptTest" assertions="8" time="246.034829"/>
+    <testcase name="test_same_typed_admission_accepts_two_siblings_and_preserves_new_consumer_writes" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutCommittedReceiptTest.php" line="169" class="Tests\Feature\ProductionCheckoutCommittedReceiptTest" classname="Tests.Feature.ProductionCheckoutCommittedReceiptTest" assertions="4" time="190.056185"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,174 @@
+diff --git a/app/Domain/Commerce/ProductionCheckout/CheckoutIntentAdmission.php b/app/Domain/Commerce/ProductionCheckout/CheckoutIntentAdmission.php
+index 0e88edb7..c121dbc6 100644
+--- a/app/Domain/Commerce/ProductionCheckout/CheckoutIntentAdmission.php
++++ b/app/Domain/Commerce/ProductionCheckout/CheckoutIntentAdmission.php
+@@ -13,6 +13,12 @@ use Carbon\CarbonImmutable;
+  * session/observation/payment sets. An offer deactivated or a capability closed by a committing
+  * listener changes a fixed plan, so the whole original physical transaction rolls back and
+  * initiate() never reaches provider I/O.
++ *
++ * reprove() installs the same capsule on HostedCheckout::proveCreatable(), the one READ-ONLY frame
++ * that carries an observer (Codex P1 r4210033214). It is the last proof before the provider
++ * boundary: without commit admission, a committing listener on that frame could withdraw the offer
++ * or close the capability after its proofs ran, and initiate() would still call create. The retained
++ * intent there may already hold observations (an earlier uncertain create), which are planned exactly.
+  */
+ final class CheckoutIntentAdmission implements CheckoutCommitAdmission
+ {
+@@ -21,10 +27,23 @@ final class CheckoutIntentAdmission implements CheckoutCommitAdmission
+     /** Last step of prepare(create) after a NEW intent insert; every callback-capable proof has already completed. */
+     public static function capture(Records $rows, array $identity, User $buyer, FreshCheckoutPolicy $fresh,
+         array $order, array $intent, array $current, array $selection, array $basis): self
++    {
++        return self::admit($rows, $identity, $buyer, $fresh, $order, $intent, $current, $selection, $basis, true);
++    }
++
++    /** Last step of proveCreatable(): the retained, still sessionless intent immediately before the first create. */
++    public static function reprove(Records $rows, array $identity, User $buyer, FreshCheckoutPolicy $fresh,
++        array $order, array $intent, array $current, array $selection, array $basis): self
++    {
++        return self::admit($rows, $identity, $buyer, $fresh, $order, $intent, $current, $selection, $basis, false);
++    }
++
++    private static function admit(Records $rows, array $identity, User $buyer, FreshCheckoutPolicy $fresh,
++        array $order, array $intent, array $current, array $selection, array $basis, bool $new): self
+     {
+         $frame = $rows->commandFrame();
+         $frame->proveAnchor();
+-        CheckoutException::require($intent['session'] === null && $intent['observations'] === [] && $intent['payment'] === null
++        CheckoutException::require($intent['session'] === null && (! $new || $intent['observations'] === []) && $intent['payment'] === null
+             && $intent['row']['order_id'] === $order['row']['id'] && $basis['row']['id'] === $order['raw']['basis']['id'], 'write_frame');
+ 
+         // Authenticated temporal bounds are converted once against the ORIGINAL command budget, never at commit.
+@@ -59,7 +78,7 @@ final class CheckoutIntentAdmission implements CheckoutCommitAdmission
+         $plans->row('intent', $intent['row']);
+         $plans->selector('intent', 'order_id = ?', [$orderId], 2, [$intent['row']]);
+         $plans->selector('session', 'intent_id = ?', [$intent['row']['id']], 2, []);
+-        $plans->selector('observation', 'intent_id = ?', [$intent['row']['id']], 129, []);
++        $plans->selector('observation', 'intent_id = ?', [$intent['row']['id']], 129, $intent['observations']);
+         $plans->selector('payment', 'intent_id = ?', [$intent['row']['id']], 2, []);
+ 
+         $admission = new self($plans, $fresh);
+diff --git a/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php b/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php
+index f2ed3e3a..b13f2b48 100644
+--- a/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php
++++ b/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php
+@@ -149,13 +149,20 @@ final class HostedCheckout
+         });
+     }
+ 
+-    /** Read-only raw re-proof of the retained policy, selection, basis and request before the first create. */
++    /**
++     * Read-only raw re-proof of the retained policy, selection, basis and request before the first create.
++     *
++     * This is the one read frame that carries the commit observer: it is the last proof before the
++     * provider boundary, so a committing listener on this frame must not be able to withdraw the offer
++     * or close the capability after the proofs ran (Codex P1 r4210033214).
++     */
+     private function proveCreatable(ProductionCustomerPrincipal $principal, User $buyer, array $prepared): void
+     {
+         CheckoutException::require($prepared['current'] !== null && $prepared['selection'] !== null && $prepared['basis'] !== null);
+         CommandTransaction::run(function (Records $rows) use ($principal, $buyer, $prepared): void {
+             $access = $this->access->lock($principal, $buyer, $rows->current);
+             CheckoutException::require(config('production_checkout.fresh_checkout_enabled') === true, 'disabled', 503);
++            $fresh = FreshCheckoutPolicy::capture();
+             OrderEvidence::proveRetained($rows, $prepared['order']['raw']);
+             HostedEvidence::proveRetained($rows, $prepared['intent']['raw']);
+             TaxExemptions::proveRetained($rows, $prepared['basis']);
+@@ -163,6 +170,9 @@ final class HostedCheckout
+             CurrentPolicy::proveCurrent($rows->current, $prepared['current']);
+             $this->access->proveCurrent($principal, $buyer, $rows->current, $access);
+             CheckoutException::require(config('production_checkout.fresh_checkout_enabled') === true, 'disabled', 503);
++            $fresh->prove();
++            CheckoutIntentAdmission::reprove($rows, $access, $buyer, $fresh, $prepared['order'], $prepared['intent'],
++                $prepared['current'], $prepared['selection'], $prepared['basis']);
+         });
+         $this->access->current($principal, $buyer);
+     }
+diff --git a/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php b/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php
+index e3e099de..ff182581 100644
+--- a/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php
++++ b/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php
+@@ -73,7 +73,7 @@ class ProductionCheckoutWriteAdmissionAllTest extends TestCase
+         $this->assertDatabaseCount(CheckoutSchema::TABLES['intent'], 0);
+     }
+ 
+-    public function test_only_the_new_intent_frame_holds_the_observer_and_retry_record_status_reconcile_hold_none(): void
++    public function test_only_new_intent_and_pre_create_frames_hold_the_observer_and_record_status_reconcile_hold_none(): void
+     {
+         $f = $this->payable();
+         $f['gateway']->loseFirstResponse = true;
+@@ -82,21 +82,70 @@ class ProductionCheckoutWriteAdmissionAllTest extends TestCase
+             $observed[] = DB::connection()->getEventDispatcher() instanceof CheckoutCommandCommitDispatcher;
+         });
+         $this->assertRefused('provider_uncertain', fn () => $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']));
+-        // Only the NEW intent frame; the uncertain append and identity frames hold no observer.
++        // The NEW intent frame and the proveCreatable() frame before the create hold the observer;
++        // the uncertain append and identity frames hold none.
+         $this->assertTrue($observed[0]);
+-        $this->assertNotContains(true, array_slice($observed, 1));
++        $this->assertSame(2, count(array_filter($observed)));
+         $observed = [];
++        // A retry writes no intent, but its final pre-create re-proof is still admitted at commit.
+         $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
++        $this->assertSame(1, count(array_filter($observed)));
++        $observed = [];
+         $f['gateway']->paid = true;
+         $f['hosted']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+         $this->assertNotContains(true, $observed);
+-        $this->assertGreaterThan(3, count($observed));
++        $this->assertGreaterThan(1, count($observed));
+         $this->assertCount(2, $f['gateway']->creates);
+         $this->assertDatabaseCount(CheckoutSchema::TABLES['intent'], 1);
+         $this->assertDatabaseCount(CheckoutSchema::TABLES['payment'], 1);
+         $this->assertDatabaseCount('license_grants', 0);
+     }
+ 
++    public static function reproveWithdrawals(): array
++    {
++        return ['offer, first initiate' => ['offer', false], 'capability, first initiate' => ['capability', false],
++            'offer, retry' => ['offer', true], 'capability, retry' => ['capability', true]];
++    }
++
++    #[DataProvider('reproveWithdrawals')]
++    public function test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create(string $withdrawal, bool $retry): void
++    {
++        $f = $this->payable();
++        $creates = 0;
++        if ($retry) {
++            $f['gateway']->loseFirstResponse = true;
++            $this->assertRefused('provider_uncertain', fn () => $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']));
++            $creates = 1;
++        }
++        $trackId = $f['catalog']['items'][0]['trackId'];
++        $candidate = (array) DB::table(CapabilityHistory::CANDIDATES)->where('id', $f['catalog']['candidate']->id)->first();
++        $delegate = DB::connection()->getEventDispatcher();
++        $armed = false;
++        $acted = 0;
++        // The first commit after the gateway's provenance() is proveCreatable()'s own read-only frame.
++        app('events')->listen(TransactionCommitting::class, function () use (&$armed, &$acted, $withdrawal, $trackId, $candidate, $f): void {
++            if ($armed && $acted === 0) {
++                $acted++;
++                match ($withdrawal) {
++                    'offer' => DB::table('offers')->where('track_id', $trackId)->update(['is_active' => false]),
++                    'capability' => $this->closeCapability($candidate, $f['catalog']['actor']->id),
++                };
++            }
++        });
++        $f['hosted'] = new HostedCheckout($f['access'], new AdmissionRacingGateway($f['gateway'], function () use (&$armed): void {
++            $armed = true;
++        }));
++        $this->assertRefused('write_source_changed', fn () => $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']));
++        $this->assertSame(1, $acted);
++        $this->assertCount($creates, $f['gateway']->creates);
++        $this->assertDatabaseCount(CheckoutSchema::TABLES['intent'], 1);
++        $this->assertDatabaseCount(CheckoutSchema::TABLES['session'], 0);
++        $this->assertDatabaseCount(CapabilityHistory::CLOSURES, 0);
++        $this->assertSame(0, DB::table('offers')->where('track_id', $trackId)->where('is_active', false)->count());
++        $this->assertSame($delegate, DB::connection()->getEventDispatcher());
++        $this->assertFalse(DB::connection()->getRawPdo()->inTransaction());
++    }
++
+     public function test_capability_closed_after_intent_commit_refuses_before_first_create(): void
+     {
+         $f = $this->payable();

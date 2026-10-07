@@ -70,8 +70,8 @@ final class CheckoutCommandFrame
         return new self($connection, $primary, $driver, $container, $repository, $manager);
     }
 
-    /** Install only for NEW review/order writes. Replay/read/reconcile frames have no observer. */
-    public function register(CheckoutWriteAdmission $admission): void
+    /** Install only for NEW checkout writes. Replay/read/reconcile frames have no observer. */
+    public function register(CheckoutCommitAdmission $admission): void
     {
         CheckoutException::require($this->observer === null && $admission->belongsTo($this), 'write_frame');
         $this->proveAnchor();
