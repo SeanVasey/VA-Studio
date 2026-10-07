@@ -377,6 +377,15 @@ final class ServiceProjects
     {
         $expected = $authority['user'];
         $principal = $authority['principal'];
+        $servicePolicy = app(ServiceProjectPolicy::class);
+        $customerPolicy = $principal ? app(CustomerAccessPolicy::class) : null;
+        $stamp = null;
+        if ($principal) {
+            $hydrated = new User;
+            $hydrated->setRawAttributes($expected ?? [], true);
+            // Container resolution can run callbacks too; compare only this pure result after raw reads.
+            $stamp = app(CustomerAccess::class)->stamp($hydrated);
+        }
         $panel = null;
         $required = false;
         $providers = [];
@@ -390,9 +399,9 @@ final class ServiceProjects
             // Providers can run arbitrary framework callbacks. No provider follows the raw proof.
             $mfa = ! $required || collect($providers)->contains(fn ($provider): bool => $provider->isEnabled($hydrated));
         }
-        app(ServiceProjectPolicy::class)->requireEnabled();
+        $servicePolicy->requireEnabled();
         if ($principal) {
-            app(CustomerAccessPolicy::class)->requireEnabled();
+            $customerPolicy->requireEnabled();
         } elseif (! $panel || Filament::getPanel('admin') !== $panel || $panel->isMultiFactorAuthenticationRequired() !== $required
             || $panel->getMultiFactorAuthenticationProviders() !== $providers || ! $mfa) {
             throw new AuthorizationException;
@@ -406,11 +415,9 @@ final class ServiceProjects
         }
         if ($principal) {
             $account = $this->rows('customer_accounts', ['id' => $principal->accountId])[0] ?? null;
-            $hydrated = new User;
-            $hydrated->setRawAttributes($user, true);
             if ($user['is_admin'] || ! $account || $account !== $authority['account'] || ! $account['active']
                 || (int) $account['user_id'] !== $principal->userId || (int) $account['access_version'] !== $principal->accessVersion
-                || ! hash_equals($account['owner_key'], $principal->ownerKey) || ! hash_equals(app(CustomerAccess::class)->stamp($hydrated), $principal->credentialStamp)) {
+                || ! hash_equals($account['owner_key'], $principal->ownerKey) || ! hash_equals($stamp, $principal->credentialStamp)) {
                 throw new AuthorizationException;
             }
         } else {
