@@ -3,6 +3,7 @@
 namespace Tests\Feature\ProductionMembership;
 
 use App\Domain\Customers\ProductionIdentity\IdentityMigrationOwnership;
+use App\Domain\Grants\Member\MemberGrantSchema;
 use App\Domain\Memberships\Production\MemberGrantIntent;
 use App\Domain\Memberships\Production\MembershipException;
 use App\Domain\Memberships\Production\MembershipRows;
@@ -94,6 +95,7 @@ class MembershipSchemaPreparationTest extends TestCase
     {
         $plan = $this->plan();
         $pdo = DB::connection()->getPdo();
+        $this->dropEmptyDependentMemberOriginals();
         foreach (array_reverse(array_slice(MembershipSchema::TABLES, 1)) as $table) {
             $pdo->exec('DROP TABLE '.$table);
         }
@@ -286,8 +288,17 @@ class MembershipSchemaPreparationTest extends TestCase
 
     private function dropEmptyOwned(): void
     {
+        $this->dropEmptyDependentMemberOriginals();
         foreach (array_reverse(MembershipSchema::TABLES) as $table) {
             DB::connection()->getPdo()->exec('DROP TABLE '.$table);
+        }
+    }
+
+    /** Composed with empty schema 258, whose tables reference 257 parents; MySQL refuses parent drops first. */
+    private function dropEmptyDependentMemberOriginals(): void
+    {
+        foreach (array_reverse(MemberGrantSchema::TABLES) as $table) {
+            DB::connection()->getPdo()->exec('DROP TABLE IF EXISTS '.$table);
         }
     }
 }

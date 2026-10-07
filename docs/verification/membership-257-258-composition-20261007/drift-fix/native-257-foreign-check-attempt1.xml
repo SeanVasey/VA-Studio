@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" file="/home/user/VA-Studio-member257/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="166.794698">
+    <testcase name="test_native_foreign_check_reserves_actual_global_symbol_before_any_owned_ddl" file="/home/user/VA-Studio-member257/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="56" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="3" time="166.794698"/>
+  </testsuite>
+</testsuites>
