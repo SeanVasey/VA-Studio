@@ -329,6 +329,12 @@ the other flags still follow one at a time; the restore extracts as the applicat
 (`runuser -u <APP_USER>`) and step 4 refuses any restored entry not owned by that user and
 group (rehearsed: owned tree passes, a foreign-owned file is refused).
 
+Codex's eleventh pass (P2 ×2, docs): the S1 rollback now stops and verifies the workers and
+scheduler before the restore (as the backup procedure does) and switches the units to the
+previously built release directory instead of checking another SHA out inside the current
+one (which would have kept the newer `public/build`); it restarts and verifies the services
+before `php artisan up`.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex
