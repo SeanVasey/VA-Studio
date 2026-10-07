@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/recovery-mysql-selection.xml" tests="1" assertions="10" errors="0" failures="0" skipped="0" time="24.063952">
+    <testsuite name="Independent exact-owned service migration recovery" tests="1" assertions="10" errors="0" failures="0" skipped="0" time="24.063952">
+      <testsuite name="Tests\Feature\ServiceProjectRecoveryCanaryTest" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/ServiceProjectRecoveryCanaryTest.php" tests="1" assertions="10" errors="0" failures="0" skipped="0" time="24.063952">
+        <testcase name="test_exact_owned_partial_install_can_retry_without_erasing_prior_definitions_or_bookkeeping" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/ServiceProjectRecoveryCanaryTest.php" line="23" class="Tests\Feature\ServiceProjectRecoveryCanaryTest" classname="Tests.Feature.ServiceProjectRecoveryCanaryTest" assertions="10" time="24.063952"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,178 @@
+{
+  "runtime_author": "e561ce821feaa9d85c4a07b4bf6c882f8d989377",
+  "test_correction": "ea659b714e789a274f0c97542ee75522ff7707e0",
+  "migration_red_executable": "a03dec44dd2004963998fa648125e191f7dad269",
+  "frontend_red_and_authority_executable": "159f3e79949102bbc9b35ade940358382c18a3d3",
+  "composition_between_these_heads": "evidence-only5paths; no runtime/test diff",
+  "source": {
+    "app/Domain/Services/Projects/Models/ServiceProject.php": {
+      "git_blob": "eb33653676d77f132943bea4e0e097f01e588fc2",
+      "sha256": "e4ca06bc02739092c400e6c96f16d98a66d1d4562cf1a5822cc5e427c11a8388"
+    },
+    "app/Domain/Services/Projects/Models/ServiceProjectEvent.php": {
+      "git_blob": "7d14707eef0d703afa00780bb5d74798b01c7eab",
+      "sha256": "467e5bc3121564d3d670c94b54c7db79885712e7ad4af0435912698402136de4"
+    },
+    "app/Domain/Services/Projects/ServiceProjectException.php": {
+      "git_blob": "2078c7160edbe3967f6162218aa1a32a9b85f47b",
+      "sha256": "d800714ee47c88d580bd27ba850197371b4804a0e4c92c94e22ed1ddb055109e"
+    },
+    "app/Domain/Services/Projects/ServiceProjectInput.php": {
+      "git_blob": "4e3b1428854ac7185e29e7abdeecdb91f4ffaf88",
+      "sha256": "890c372f8f08b75570948fd7827caeb5f0d7ad52368aafe407d511c78f2b8a3d"
+    },
+    "app/Domain/Services/Projects/ServiceProjectJson.php": {
+      "git_blob": "cdd77ce54c7d9bee96f467491128b8dde4c34d64",
+      "sha256": "c69871f6a6a6524b81a7c8b7c1567ba822ce8fdf47d1fb0fcfb78bef99a5167c"
+    },
+    "app/Domain/Services/Projects/ServiceProjectPolicy.php": {
+      "git_blob": "d531e06712de758a66313ae6c6c444e2bcfe34b5",
+      "sha256": "6c63197b8f213277431cbba23cc04b27ee52713a9d31cc279fec61a3e065cea7"
+    },
+    "app/Domain/Services/Projects/ServiceProjectSchema.php": {
+      "git_blob": "11f54da88a9aad77eb92f03e2cd91bdd2f1df6db",
+      "sha256": "216b3c3fda553f01c92b0f0941237ffbe95580e0b57d90b639803236466d76b4"
+    },
+    "app/Domain/Services/Projects/ServiceProjects.php": {
+      "git_blob": "acd8d83e4bcca448cb129ff17d8b80a09c25040f",
+      "sha256": "6d02427b42626a34fd1eaf482de749401e7c7d5aeff808762ecd89649a6ed661"
+    },
+    "app/Filament/Resources/ServiceProjectResource.php": {
+      "git_blob": "38c3cf72b135fa2388ebbe1f21e38a7ce3e5c8d0",
+      "sha256": "4b10951723a3f82fc4c25e41ca108acde1536583cfc0be11792ec6e449ae9b8f"
+    },
+    "app/Filament/Resources/ServiceProjectResource/Pages/ListServiceProjects.php": {
+      "git_blob": "5a75955705790aa4492c00f8bd0b11b99123dcf1",
+      "sha256": "999aad3e70059a9f109e92f1cf80ccc63a5f1c45cc14185933586f2f0cfb0893"
+    },
+    "app/Filament/Resources/ServiceProjectResource/Pages/ViewServiceProject.php": {
+      "git_blob": "b71a7712409f99b38e312439bb4a12adc45779ce",
+      "sha256": "5fb720a6f100a4f0967abd6921dc39c29a7c6652baebde8a80d370389e1e18de"
+    },
+    "app/Http/Controllers/ServiceProjectController.php": {
+      "git_blob": "f407d43d3f4b6d7e19181a18574952e0aebeefd2",
+      "sha256": "62fab73ff79a9b7cabe426130540434d46c710b766c485c1561661c701668a31"
+    },
+    "app/Http/Middleware/ServiceProjectPrivacy.php": {
+      "git_blob": "d43f3bf9d8875297502d44bec7302732c2ebb39a",
+      "sha256": "b9ae76b084d02e0abd5cad305d0d0220e7aeae443373fce4ac03a9bceb9ee009"
+    },
+    "config/services-projects.php": {
+      "git_blob": "d693db9e2fc33a7f92c03b870cec6768feabd4d6",
+      "sha256": "9a7baad0eb1ca886742814b2002eafa898ee75a0595cba49cc2d3bbd036dc8cd"
+    },
+    "database/migrations/2026_10_07_244000_service_projects.php": {
+      "git_blob": "af9d99e0d8e6aa69cc29e7e33ab94c6fdfb449ad",
+      "sha256": "eb1a5beb518ae7c50c2f4f852231d6bb0c2b98cf80cb8ae8eb3d0d73b81757f8"
+    },
+    "docs/service-projects.md": {
+      "git_blob": "6b114d9da4cda2423739c86282356c01ff29baa1",
+      "sha256": "b440a81ef15502a1849a1d4b841effd64cfc178aa38f758c8bfb96322814990b"
+    },
+    "docs/verification/service-project-journey-20261007/README.md": {
+      "git_blob": "f933aa8e98572d692866bbbbae5c5d9857a56001",
+      "sha256": "acbc8002b834deb5f117b1771c2aef26b0a8630b0471be4d18928750f530c891"
+    },
+    "resources/css/service-projects.css": {
+      "git_blob": "20ed58dec8f1c0c8a1ff7d3a3e2d6b74df1c6a95",
+      "sha256": "4096911399c61810d8e0285dcf1cb2fde610f8b6fcdfec5766c2d9963946ba8e"
+    },
+    "resources/js/Pages/ServiceProjects.tsx": {
+      "git_blob": "36cc5168d35f3e6148a3f0ecb5bea75e6f0632b3",
+      "sha256": "736437af70a0c96ec539eff61172f618859acbaff915057757e71b89df9af901"
+    },
+    "resources/js/components/services/ServiceProjectJourney.tsx": {
+      "git_blob": "0a49e5c0ff7f02ad77a043e1c19d41b85724f5b5",
+      "sha256": "c6565123a651a1c88e5cec360b078ac359b81ef50d3d2130b61351f0d6822392"
+    },
+    "routes/services.php": {
+      "git_blob": "56d55ca9cf78c95dfa5ed5ff5a9c7be18fb1ac09",
+      "sha256": "352cb23995c513322dd61cd6990f222e31c5206ff6a821f9855e6512453525e8"
+    },
+    "tests/Feature/ServiceProjectConcurrencyTest.php": {
+      "git_blob": "b5fef44257424fd4b0f64deefd6613b9f6776abd",
+      "sha256": "4a1fefb59bdc97ff0e35fd83a53175dac071bd82517824793eced190091beaa6"
+    },
+    "tests/Feature/ServiceProjectHttpAndOperatorTest.php": {
+      "git_blob": "ae46b394a6d543f3acbe8267ed5d2724a5b5f0ed",
+      "sha256": "113f559c756a8302c62efa702adc9cfc0759b87d16303ffd8a737540f1b9cdfb"
+    },
+    "tests/Feature/ServiceProjectJourneyTest.php": {
+      "git_blob": "7208494f2b5514a3220b59024ff16324da25a41c",
+      "sha256": "4aea7ac96fb8c4c9ab52917d95125a62bfffe238ad7832a23a0b1048562b2406"
+    },
+    "tests/Feature/ServiceProjectSchemaTest.php": {
+      "git_blob": "e5e79c8a235305041bad4112b4befac56b9447c7",
+      "sha256": "aa1fec093b2753e0a626d0063e38ca89b07cc2546c46519a34a03f2cb6ccca3a"
+    },
+    "tests/Support/ServiceProjectFixtures.php": {
+      "git_blob": "b8d8e4a96e74104af9e9b6596934640c6e97ff33",
+      "sha256": "86b5ed7ab50a90a2c3b1c543f70167f6697cbaed810311ffdbe093c333da777f"
+    },
+    "tests/Support/service-project-worker.php": {
+      "git_blob": "77e7817e619683d1395547a7dbe99f9ae349fe7d",
+      "sha256": "e9ee562508a485d227a3779f81c7acb838daec63e5efb1100e7eefbc0357195d"
+    },
+    "tests/Unit/ServiceProjectInputTest.php": {
+      "git_blob": "bc6bf981bb2bd12b328f6eb9577a494152512c5f",
+      "sha256": "83de324407cd7f4dd5f05bee0e6f35dd39b415d12f68c50cc7728a66e775812a"
+    },
+    "tests/Unit/ServiceProjectJsonTest.php": {
+      "git_blob": "7e793f16f88e5ed88b2c878b733455de06e1f064",
+      "sha256": "42ed03954f579e3588da251b1bdccadf020e84d8de7bf700cff7e9a5fff34896"
+    },
+    "tests/frontend/service-project-journey.test.tsx": {
+      "git_blob": "7426a095f55a0f8ab199c421204efda349e17f3c",
+      "sha256": "4cc98a5d1ca1af2835346bf753091a7a64c3aab6ceee56e21a6d1f90435da3f4"
+    },
+    "bootstrap/app.php": {
+      "git_blob": "1559d683773aa5e8848641d67a22d5ea96173ae2",
+      "sha256": "e876c455c4ca2cf5133aed8451a84cc8852de4893405d2d53367467704a4edf7"
+    },
+    "routes/web.php": {
+      "git_blob": "2c79998fc79ed728428eb97b6b083d1f184d8753",
+      "sha256": "45e63382e8bb2c83abcf019e7390ad68419eb765ad3804d2b7de1adce26f1852"
+    },
+    "app/Http/Controllers/PublicDiscoveryController.php": {
+      "git_blob": "2e9f58e3c2918d088f4e914b9c876a851467f78f",
+      "sha256": "2ec78728ab767c5cc3c45c64d2ab84a02106f1d36a880af7af016596dde96e6d"
+    },
+    "resources/js/components/SiteChrome.tsx": {
+      "git_blob": "c4c692a2f87738bb0c59737b99432d9aa8805173",
+      "sha256": "d299b12b5ee5a638bac57130ca105b0e6a7dd1042ea88bb68d21ace1388d4e56"
+    },
+    "composer.lock": {
+      "git_blob": "9e58027dcd989282b026d56347e26ea867723db9",
+      "sha256": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9"
+    },
+    "package-lock.json": {
+      "git_blob": "614350366e7af397c14603dae9272082ecfae066",
+      "sha256": "6407d3a63e3b6e04f5824f53c41b8dc8a33581f987b21d780c795480122f93ea"
+    }
+  },
+  "deps": {
+    "locked_packages": 158,
+    "mismatches": [],
+    "own_autoload": "/workspace/VA-Studio-service-independent/vendor/autoload.php",
+    "read_only_package_symlinks": "/workspace/VA-Studio/vendor",
+    "node_modules": "/workspace/VA-Studio/node_modules"
+  },
+  "commands": {
+    "migration_red_sqlite": "source /workspace/.va-studio-toolchain/activate.sh; export APP_KEY=<synthetic-fixture-key>; php -r '$GLOBALS[\"_composer_autoload_path\"] = getcwd().\"/vendor/autoload.php\"; require \"vendor/phpunit/phpunit/phpunit\";' -- -c docs/verification/cloud-service-independent-20261007/recovery-sqlite-selection.xml --log-junit docs/verification/cloud-service-independent-20261007/recovery-sqlite-red.xml",
+    "migration_red_mysql": "Same PHPUnit argv with recovery-mysql-selection.xml/recovery-mysql-red.xml after privately sourcing service_review-task.env; shell loopback network permission enabled.",
+    "frontend_red": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "--maxWorkers=1",
+      "--config",
+      "docs/verification/cloud-service-independent-20261007/frontend-selection.config.ts"
+    ],
+    "authority_canaries": "Same native PHPUnit own-autoload argv -c authority-mysql-selection.xml --log-junit authority-mysql.xml"
+  },
+  "untested": [
+    "targetMySQL8.4",
+    "Foundation/browser release matrix",
+    "real customer/service production source or uploads/deposits/delivery"
+  ]
+}

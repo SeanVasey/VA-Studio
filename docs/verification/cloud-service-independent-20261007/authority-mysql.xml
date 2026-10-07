@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/authority-mysql-selection.xml" tests="2" assertions="21" errors="0" failures="0" skipped="0" time="8.214620">
+    <testsuite name="Independent actual service registration and terminal MFA" tests="2" assertions="21" errors="0" failures="0" skipped="0" time="8.214620">
+      <testsuite name="Tests\Feature\ServiceProjectAuthorityCanaryTest" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/ServiceProjectAuthorityCanaryTest.php" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="8.169023">
+        <testcase name="test_audit_callback_mfa_withdrawal_aborts_quote_and_preserves_all_retained_rows" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/ServiceProjectAuthorityCanaryTest.php" line="17" class="Tests\Feature\ServiceProjectAuthorityCanaryTest" classname="Tests.Feature.ServiceProjectAuthorityCanaryTest" assertions="2" time="8.169023"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\ServiceProjectRegistrationCanaryTest" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/ServiceProjectRegistrationCanaryTest.php" tests="1" assertions="19" errors="0" failures="0" skipped="0" time="0.045597">
+        <testcase name="test_actual_route_registry_and_unknown_private_descendant_are_bounded_and_private" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/ServiceProjectRegistrationCanaryTest.php" line="11" class="Tests\Feature\ServiceProjectRegistrationCanaryTest" classname="Tests.Feature.ServiceProjectRegistrationCanaryTest" assertions="19" time="0.045597"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

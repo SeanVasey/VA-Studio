@@ -1,0 +1,10 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/recovery-mysql-selection.xml
+
+.                                                                   1 / 1 (100%)
+
+Time: 00:24.065, Memory: 77.00 MB
+
+[30;42mOK (1 test, 10 assertions)[0m

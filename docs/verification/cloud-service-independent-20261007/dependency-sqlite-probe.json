@@ -1,0 +1,39 @@
+{
+    "source": "159f3e79949102bbc9b35ade940358382c18a3d3",
+    "dependency_key": [
+        {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 1,
+            "hidden": 0
+        },
+        {
+            "cid": 1,
+            "name": "tenant",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 2,
+            "hidden": 0
+        }
+    ],
+    "ddl_attempts": [
+        "create table \"service_projects\" (\"id\" integer primary key autoincrement not null, \"public_id\" varchar not null, \"customer_account_id\" integer not null, \"service_version_id\" integer not null, \"service_manifest\" text not null, \"service_hash\" varchar not null, \"brief\" text not null, \"brief_hash\" varchar not null, \"creation_key\" varchar not null, \"created_by\" integer not null, \"created_at\" datetime not null, foreign key(\"customer_account_id\") references \"customer_accounts\"(\"id\") on delete restrict, foreign key(\"service_version_id\") references \"service_draft_versions\"(\"id\") on delete restrict, foreign key(\"created_by\") references \"users\"(\"id\") on delete restrict)",
+        "create unique index \"service_projects_public\" on \"service_projects\" (\"public_id\")",
+        "create unique index \"service_projects_request\" on \"service_projects\" (\"customer_account_id\", \"creation_key\")",
+        "create table \"service_project_events\" (\"id\" integer primary key autoincrement not null, \"public_id\" varchar not null, \"project_id\" integer not null, \"number\" integer not null, \"operation\" varchar not null, \"actor_kind\" varchar not null, \"actor_id\" integer not null, \"request_key\" varchar not null, \"request_hash\" varchar not null, \"payload\" text not null, \"payload_hash\" varchar not null, \"created_at\" datetime not null, foreign key(\"project_id\") references \"service_projects\"(\"id\") on delete restrict, foreign key(\"actor_id\") references \"users\"(\"id\") on delete restrict)",
+        "create unique index \"service_project_events_public\" on \"service_project_events\" (\"public_id\")",
+        "create unique index \"service_project_events_number\" on \"service_project_events\" (\"project_id\", \"number\")",
+        "create unique index \"service_project_events_request\" on \"service_project_events\" (\"project_id\", \"request_key\")",
+        "CREATE TRIGGER \"service_projects_immutable\" BEFORE UPDATE ON \"service_projects\" BEGIN SELECT RAISE(ABORT, 'Retain service project evidence'); END",
+        "CREATE TRIGGER \"service_projects_retain\" BEFORE DELETE ON \"service_projects\" BEGIN SELECT RAISE(ABORT, 'Retain service project evidence'); END",
+        "CREATE TRIGGER \"service_project_events_immutable\" BEFORE UPDATE ON \"service_project_events\" BEGIN SELECT RAISE(ABORT, 'Retain service project evidence'); END",
+        "CREATE TRIGGER \"service_project_events_retain\" BEFORE DELETE ON \"service_project_events\" BEGIN SELECT RAISE(ABORT, 'Retain service project evidence'); END",
+        "CREATE TRIGGER \"service_projects_insert\" BEFORE INSERT ON \"service_projects\" WHEN NOT (length(NEW.service_hash) = 64 AND NEW.service_hash NOT GLOB '*[^a-f0-9]*') OR NOT (length(NEW.brief_hash) = 64 AND NEW.brief_hash NOT GLOB '*[^a-f0-9]*') OR EXISTS (SELECT 1 FROM \"service_projects\" WHERE id = NEW.id OR public_id = NEW.public_id OR (customer_account_id = NEW.customer_account_id AND creation_key = NEW.creation_key)) BEGIN SELECT RAISE(ABORT, 'Retain service project evidence'); END",
+        "CREATE TRIGGER \"service_project_events_insert\" BEFORE INSERT ON \"service_project_events\" WHEN NEW.number < 1 OR NEW.number > 1000 OR NEW.actor_kind NOT IN ('staff', 'buyer') OR NOT (length(NEW.request_hash) = 64 AND NEW.request_hash NOT GLOB '*[^a-f0-9]*') OR NOT (length(NEW.payload_hash) = 64 AND NEW.payload_hash NOT GLOB '*[^a-f0-9]*') OR EXISTS (SELECT 1 FROM \"service_project_events\" WHERE id = NEW.id OR public_id = NEW.public_id OR (project_id = NEW.project_id AND (number = NEW.number OR request_key = NEW.request_key))) BEGIN SELECT RAISE(ABORT, 'Retain service project evidence'); END"
+    ],
+    "refusal": null
+}
