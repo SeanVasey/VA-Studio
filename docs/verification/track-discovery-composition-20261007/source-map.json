@@ -1,0 +1,27 @@
+{
+  "local_executable": "9f1bda29a20a6f6936efa9b86e9731194bd3ccf7",
+  "native_executable": "7ecaa7e901f213b1735a9da1342fd670194b70f9",
+  "tree": "fe4be5659d1d769a0175e2a2c43da15cf1f7954d",
+  "native_ordered_parents": [
+    "717f0866444701637e7c396b4376891aa5dd995d"
+  ],
+  "approved_leaf": "10dcb64d9c30231bd6949fd4d00811a283e820b0",
+  "leaf_review_evidence": "03ecc0dc7f0c138b6412f5d02cd65c2529178feb",
+  "leaf_console_representation": "dcf736be0a5eddc12aa6be8783ed656c1bb71758",
+  "composed_review_evidence": "c61e5e2e9b5b10db9e1442f998cb096db0b6ce32",
+  "copy_evidence": [
+    "562315c49e64cd2074246777fb7450990bd53354",
+    "2396bc155cf3c0791d9319a90d631dec0dbb843b"
+  ],
+  "pre_epoch_copy_evidence": "839de004be55505eb83ef9e1ef56af05e2383e13",
+  "verified_artifact_digest_counts": {
+    "track-discovery-prerequisite-20261007": 50,
+    "discovery-independent-20261007": 40,
+    "discovery-composed-review-20261007": 29,
+    "discovery-stopped-copy-20261007": 10,
+    "discovery-pre-epoch-upgrade-20261007": 16
+  },
+  "native_tree_and_ordered_parent_readback": true,
+  "post_executable_scope": "documentation/evidence only",
+  "full_acceptance": false
+}

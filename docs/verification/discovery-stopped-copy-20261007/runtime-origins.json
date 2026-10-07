@@ -1,0 +1,11 @@
+{
+    "php": "8.4.26",
+    "sqlite": true,
+    "posix": true,
+    "origins": [
+        "\/workspace\/scratch\/2876616e88c3\/VA-Studio-discovery-stopped-copy-check\/app\/Domain\/Catalog\/Discovery\/DiscoveryEpoch.php",
+        "\/workspace\/scratch\/2876616e88c3\/VA-Studio-pdf-successor-activation\/vendor\/laravel\/framework\/src\/Illuminate\/Foundation\/Application.php",
+        "\/workspace\/scratch\/2876616e88c3\/VA-Studio-pdf-successor-activation\/vendor\/tecnickcom\/tc-lib-pdf\/src\/Tcpdf.php",
+        "\/workspace\/scratch\/2876616e88c3\/VA-Studio-pdf-successor-activation\/vendor\/tecnickcom\/tc-lib-pdf-font\/src\/Font.php"
+    ]
+}

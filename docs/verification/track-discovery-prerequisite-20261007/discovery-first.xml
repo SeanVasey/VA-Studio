@@ -1,0 +1,1213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="11" assertions="43" errors="1" failures="4" skipped="0" time="4.605925">
+    <testsuite name="Tests\Feature\DiscoveryEpochMigrationTest" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" tests="6" assertions="20" errors="0" failures="4" skipped="0" time="1.202561">
+      <testsuite name="Tests\Feature\DiscoveryEpochMigrationTest::test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate" tests="2" assertions="4" errors="0" failures="2" skipped="0" time="0.583697">
+        <testcase name="test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set &quot;empty&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="28" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="2" time="0.415535">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\DiscoveryEpochMigrationTest::test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set "empty"
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+     'migrations' =&gt; Array &amp;1 [
+-        0 =&gt; stdClass Object #5631 (
++        0 =&gt; stdClass Object #5378 (
+             'id' =&gt; 1,
+             'migration' =&gt; '0001_01_01_000000_create_users_table',
+             'batch' =&gt; 1,
+         ),
+-        1 =&gt; stdClass Object #5619 (
++        1 =&gt; stdClass Object #5385 (
+             'id' =&gt; 2,
+             'migration' =&gt; '0001_01_01_000001_create_cache_table',
+             'batch' =&gt; 1,
+         ),
+-        2 =&gt; stdClass Object #5620 (
++        2 =&gt; stdClass Object #5382 (
+             'id' =&gt; 3,
+             'migration' =&gt; '0001_01_01_000002_create_jobs_table',
+             'batch' =&gt; 1,
+         ),
+-        3 =&gt; stdClass Object #5629 (
++        3 =&gt; stdClass Object #5398 (
+             'id' =&gt; 4,
+             'migration' =&gt; '2026_09_04_000001_create_catalog_foundation',
+             'batch' =&gt; 1,
+         ),
+-        4 =&gt; stdClass Object #5633 (
++        4 =&gt; stdClass Object #5401 (
+             'id' =&gt; 5,
+             'migration' =&gt; '2026_09_04_000002_add_admin_mfa_and_immutable_evidence',
+             'batch' =&gt; 1,
+         ),
+-        5 =&gt; stdClass Object #5632 (
++        5 =&gt; stdClass Object #5387 (
+             'id' =&gt; 6,
+             'migration' =&gt; '2026_09_04_000003_media_processing',
+             'batch' =&gt; 1,
+         ),
+-        6 =&gt; stdClass Object #5628 (
++        6 =&gt; stdClass Object #5388 (
+             'id' =&gt; 7,
+             'migration' =&gt; '2026_09_04_000004_license_evidence',
+             'batch' =&gt; 1,
+         ),
+-        7 =&gt; stdClass Object #5621 (
++        7 =&gt; stdClass Object #5393 (
+             'id' =&gt; 8,
+             'migration' =&gt; '2026_09_04_000005_offer_revisions',
+             'batch' =&gt; 1,
+         ),
+-        8 =&gt; stdClass Object #5622 (
++        8 =&gt; stdClass Object #5392 (
+             'id' =&gt; 9,
+             'migration' =&gt; '2026_09_06_000006_provisional_quotes',
+             'batch' =&gt; 1,
+         ),
+-        9 =&gt; stdClass Object #5627 (
++        9 =&gt; stdClass Object #5399 (
+             'id' =&gt; 10,
+             'migration' =&gt; '2026_09_09_000007_stripe_webhook_receipts',
+             'batch' =&gt; 1,
+         ),
+-        10 =&gt; stdClass Object #5626 (
++        10 =&gt; stdClass Object #5397 (
+             'id' =&gt; 11,
+             'migration' =&gt; '2026_09_09_000008_track_metadata_and_public_urls',
+             'batch' =&gt; 1,
+         ),
+-        11 =&gt; stdClass Object #5625 (
++        11 =&gt; stdClass Object #5402 (
+             'id' =&gt; 12,
+             'migration' =&gt; '2026_09_09_000009_stems_recordings',
+             'batch' =&gt; 1,
+         ),
+-        12 =&gt; stdClass Object #5624 (
++        12 =&gt; stdClass Object #5400 (
+             'id' =&gt; 13,
+             'migration' =&gt; '2026_09_10_000010_typed_license_terms',
+             'batch' =&gt; 1,
+         ),
+-        13 =&gt; stdClass Object #5623 (
++        13 =&gt; stdClass Object #5404 (
+             'id' =&gt; 14,
+             'migration' =&gt; '2026_09_11_000011_license_scope_terms',
+             'batch' =&gt; 1,
+         ),
+-        14 =&gt; stdClass Object #5635 (
++        14 =&gt; stdClass Object #5403 (
+             'id' =&gt; 15,
+             'migration' =&gt; '2026_09_12_000012_license_economic_terms',
+             'batch' =&gt; 1,
+         ),
+-        15 =&gt; stdClass Object #5636 (
++        15 =&gt; stdClass Object #5405 (
+             'id' =&gt; 16,
+             'migration' =&gt; '2026_09_12_000013_quote_pricing',
+             'batch' =&gt; 1,
+         ),
+-        16 =&gt; stdClass Object #5637 (
++        16 =&gt; stdClass Object #5406 (
+             'id' =&gt; 17,
+             'migration' =&gt; '2026_09_14_000014_promotion_usage',
+             'batch' =&gt; 1,
+         ),
+-        17 =&gt; stdClass Object #5638 (
++        17 =&gt; stdClass Object #5407 (
+             'id' =&gt; 18,
+             'migration' =&gt; '2026_09_17_000015_shared_rights_inventory',
+             'batch' =&gt; 1,
+         ),
+-        18 =&gt; stdClass Object #5639 (
++        18 =&gt; stdClass Object #5408 (
+             'id' =&gt; 19,
+             'migration' =&gt; '2026_09_23_000016_exclusive_activations',
+             'batch' =&gt; 1,
+         ),
+-        19 =&gt; stdClass Object #5640 (
++        19 =&gt; stdClass Object #5409 (
+             'id' =&gt; 20,
+             'migration' =&gt; '2026_09_24_000017_order_preparation',
+             'batch' =&gt; 1,
+         ),
+-        20 =&gt; stdClass Object #5641 (
++        20 =&gt; stdClass Object #5410 (
+             'id' =&gt; 21,
+             'migration' =&gt; '2026_09_26_000018_hosted_test_checkout',
+             'batch' =&gt; 1,
+         ),
+-        21 =&gt; stdClass Object #5642 (
++        21 =&gt; stdClass Object #5411 (
+             'id' =&gt; 22,
+             'migration' =&gt; '2026_09_26_000019_test_payment_evidence',
+             'batch' =&gt; 1,
+         ),
+-        22 =&gt; stdClass Object #5643 (
++        22 =&gt; stdClass Object #5412 (
+             'id' =&gt; 23,
+             'migration' =&gt; '2026_09_26_000020_test_order_finalization',
+             'batch' =&gt; 1,
+         ),
+-        23 =&gt; stdClass Object #5644 (
++        23 =&gt; stdClass Object #5413 (
+             'id' =&gt; 24,
+             'migration' =&gt; '2026_09_26_000021_test_contract_issuance',
+             'batch' =&gt; 1,
+         ),
+-        24 =&gt; stdClass Object #5645 (
++        24 =&gt; stdClass Object #5414 (
+             'id' =&gt; 25,
+             'migration' =&gt; '2026_09_26_000022_test_fulfillment_activation',
+             'batch' =&gt; 1,
+         ),
+-        25 =&gt; stdClass Object #5646 (
++        25 =&gt; stdClass Object #5415 (
+             'id' =&gt; 26,
+             'migration' =&gt; '2026_09_26_000023_test_owner_delivery',
+             'batch' =&gt; 1,
+         ),
+-        26 =&gt; stdClass Object #5647 (
++        26 =&gt; stdClass Object #5416 (
+             'id' =&gt; 27,
+             'migration' =&gt; '2026_09_28_000024_site_content_releases',
+             'batch' =&gt; 1,
+         ),
+-        27 =&gt; stdClass Object #5648 (
++        27 =&gt; stdClass Object #5417 (
+             'id' =&gt; 28,
+             'migration' =&gt; '2026_09_29_000025_promotion_administration',
+             'batch' =&gt; 1,
+         ),
+-        28 =&gt; stdClass Object #5649 (
++        28 =&gt; stdClass Object #5418 (
+             'id' =&gt; 29,
+             'migration' =&gt; '2026_09_29_000026_site_publication_schedules',
+             'batch' =&gt; 1,
+         ),
+-        29 =&gt; stdClass Object #5650 (
++        29 =&gt; stdClass Object #5419 (
+             'id' =&gt; 30,
+             'migration' =&gt; '2026_09_30_000027_site_images',
+             'batch' =&gt; 1,
+         ),
+-        30 =&gt; stdClass Object #5651 (
++        30 =&gt; stdClass Object #5420 (
+             'id' =&gt; 31,
+             'migration' =&gt; '2026_09_30_000028_site_release_images',
+             'batch' =&gt; 1,
+         ),
+-        31 =&gt; stdClass Object #2525 (
++        31 =&gt; stdClass Object #5421 (
+             'id' =&gt; 32,
+             'migration' =&gt; '2026_10_01_000029_byte_exact_hash_guards',
+             'batch' =&gt; 1,
+         ),
+-        32 =&gt; stdClass Object #2809 (
++        32 =&gt; stdClass Object #5422 (
+             'id' =&gt; 33,
+             'migration' =&gt; '2026_10_01_000030_byte_exact_uuid_guards',
+             'batch' =&gt; 1,
+         ),
+-        33 =&gt; stdClass Object #2807 (
++        33 =&gt; stdClass Object #5423 (
+             'id' =&gt; 34,
+             'migration' =&gt; '2026_10_01_000031_customer_inquiries',
+             'batch' =&gt; 1,
+         ),
+-        34 =&gt; stdClass Object #2833 (
++        34 =&gt; stdClass Object #5424 (
+             'id' =&gt; 35,
+             'migration' =&gt; '2026_10_01_000032_editorial_related_tracks_images',
+             'batch' =&gt; 1,
+         ),
+-        35 =&gt; stdClass Object #2929 (
++        35 =&gt; stdClass Object #5425 (
+             'id' =&gt; 36,
+             'migration' =&gt; '2026_10_02_000033_track_metadata_presets',
+             'batch' =&gt; 1,
+         ),
+-        36 =&gt; stdClass Object #2928 (
++        36 =&gt; stdClass Object #5426 (
+             'id' =&gt; 37,
+             'migration' =&gt; '2026_10_02_000034_track_publication_version',
+             'batch' =&gt; 1,
+         ),
+-        37 =&gt; stdClass Object #5660 (
++        37 =&gt; stdClass Object #5427 (
+             'id' =&gt; 38,
+             'migration' =&gt; '2026_10_02_000035_rights_evidence_guards',
+             'batch' =&gt; 1,
+         ),
+-        38 =&gt; stdClass Object #5656 (
++        38 =&gt; stdClass Object #5428 (
+             'id' =&gt; 39,
+             'migration' =&gt; '2026_10_02_000036_test_payment_exception_operations',
+             'batch' =&gt; 1,
+         ),
+-        39 =&gt; stdClass Object #2949 (
++        39 =&gt; stdClass Object #5429 (
+             'id' =&gt; 40,
+             'migration' =&gt; '2026_10_06_000038_resumable_media_uploads',
+             'batch' =&gt; 1,
+         ),
+-        40 =&gt; stdClass Object #5655 (
++        40 =&gt; stdClass Object #5430 (
+             'id' =&gt; 41,
+             'migration' =&gt; '2026_10_06_000039_test_payment_financial_observations',
+             'batch' =&gt; 1,
+         ),
+-        41 =&gt; stdClass Object #5654 (
++        41 =&gt; stdClass Object #5431 (
+             'id' =&gt; 42,
+             'migration' =&gt; '2026_10_06_000040_customer_accounts',
+             'batch' =&gt; 1,
+         ),
+-        42 =&gt; stdClass Object #5653 (
++        42 =&gt; stdClass Object #5432 (
+             'id' =&gt; 43,
+             'migration' =&gt; '2026_10_06_000041_product_draft_versions',
+             'batch' =&gt; 1,
+         ),
+-        43 =&gt; stdClass Object #5652 (
++        43 =&gt; stdClass Object #5433 (
+             'id' =&gt; 44,
+             'migration' =&gt; '2026_10_06_000042_test_unpaid_releases',
+             'batch' =&gt; 1,
+         ),
+-        44 =&gt; stdClass Object #5616 (
++        44 =&gt; stdClass Object #5434 (
+             'id' =&gt; 45,
+             'migration' =&gt; '2026_10_06_000043_inquiry_messages',
+             'batch' =&gt; 1,
+         ),
+-        45 =&gt; stdClass Object #5615 (
++        45 =&gt; stdClass Object #5435 (
+             'id' =&gt; 46,
+             'migration' =&gt; '2026_10_06_000044_sound_kit_intake',
+             'batch' =&gt; 1,
+         ),
+-        46 =&gt; stdClass Object #5614 (
++        46 =&gt; stdClass Object #5436 (
+             'id' =&gt; 47,
+             'migration' =&gt; '2026_10_06_000045_customer_identity_challenges',
+             'batch' =&gt; 1,
+         ),
+-        47 =&gt; stdClass Object #5613 (
++        47 =&gt; stdClass Object #5437 (
+             'id' =&gt; 48,
+             'migration' =&gt; '2026_10_06_000046_sound_kit_upload_sessions',
+             'batch' =&gt; 1,
+         ),
+-        48 =&gt; stdClass Object #5605 (
++        48 =&gt; stdClass Object #5438 (
+             'id' =&gt; 49,
+             'migration' =&gt; '2026_10_06_000047_test_refund_resolutions',
+             'batch' =&gt; 1,
+         ),
+-        49 =&gt; stdClass Object #5604 (
++        49 =&gt; stdClass Object #5439 (
+             'id' =&gt; 50,
+             'migration' =&gt; '2026_10_06_000048_customer_purchase_claims',
+             'batch' =&gt; 1,
+         ),
+-        50 =&gt; stdClass Object #5217 (
++        50 =&gt; stdClass Object #5440 (
+             'id' =&gt; 51,
+             'migration' =&gt; '2026_10_06_000049_inquiry_order_contexts',
+             'batch' =&gt; 1,
+         ),
+-        51 =&gt; stdClass Object #5606 (
++        51 =&gt; stdClass Object #5441 (
+             'id' =&gt; 52,
+             'migration' =&gt; '2026_10_06_230000_membership_credit_foundation',
+             'batch' =&gt; 1,
+         ),
+-        52 =&gt; stdClass Object #5607 (
++        52 =&gt; stdClass Object #5442 (
+             'id' =&gt; 53,
+             'migration' =&gt; '2026_10_06_231000_test_transactional_notifications',
+             'batch' =&gt; 1,
+         ),
+-        53 =&gt; stdClass Object #5611 (
++        53 =&gt; stdClass Object #5443 (
+             'id' =&gt; 54,
+             'migration' =&gt; '2026_10_06_233000_production_track_policy_drafts',
+             'batch' =&gt; 1,
+         ),
+-        54 =&gt; stdClass Object #5610 (
++        54 =&gt; stdClass Object #5444 (
+             'id' =&gt; 55,
+             'migration' =&gt; '2026_10_06_234000_service_draft_versions',
+             'batch' =&gt; 1,
+         ),
+-        55 =&gt; stdClass Object #5221 (
++        55 =&gt; stdClass Object #5445 (
+             'id' =&gt; 56,
+             'migration' =&gt; '2026_10_06_235000_merch_draft_versions',
+             'batch' =&gt; 1,
+         ),
+-        56 =&gt; stdClass Object #5608 (
++        56 =&gt; stdClass Object #5446 (
+             'id' =&gt; 57,
+             'migration' =&gt; '2026_10_06_236000_production_track_policy_capabilities',
+             'batch' =&gt; 1,
+         ),
+-        57 =&gt; stdClass Object #5609 (
++        57 =&gt; stdClass Object #5447 (
+             'id' =&gt; 58,
+             'migration' =&gt; '2026_10_06_237000_catalog_import_progress',
+             'batch' =&gt; 1,
+         ),
+-        58 =&gt; stdClass Object #5220 (
++        58 =&gt; stdClass Object #5448 (
+             'id' =&gt; 59,
+             'migration' =&gt; '2026_10_06_238000_production_track_preparation_packets',
+             'batch' =&gt; 1,
+         ),
+-        59 =&gt; stdClass Object #5218 (
++        59 =&gt; stdClass Object #5449 (
+             'id' =&gt; 60,
+             'migration' =&gt; '2026_10_07_239000_production_buyer_assent_observations',
+             'batch' =&gt; 1,
+         ),
+-        60 =&gt; stdClass Object #5216 (
++        60 =&gt; stdClass Object #5450 (
+             'id' =&gt; 61,
+             'migration' =&gt; '2026_10_07_240000_catalog_discovery_epoch',
+             'batch' =&gt; 1,
+@@ @@
+         ),
+     ],
+     'epoch' =&gt; Array &amp;2 [
+-        0 =&gt; stdClass Object #5224 (
++        0 =&gt; stdClass Object #5452 (
+             'id' =&gt; 1,
+             'epoch' =&gt; 0,
+             'schema_version' =&gt; 1,
+
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php:41</failure>
+        </testcase>
+        <testcase name="test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set &quot;populated&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="28" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="2" time="0.168162">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\DiscoveryEpochMigrationTest::test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set "populated"
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+     'migrations' =&gt; Array &amp;1 [
+-        0 =&gt; stdClass Object #4040 (
++        0 =&gt; stdClass Object #3061 (
+             'id' =&gt; 1,
+             'migration' =&gt; '0001_01_01_000000_create_users_table',
+             'batch' =&gt; 1,
+         ),
+-        1 =&gt; stdClass Object #4139 (
++        1 =&gt; stdClass Object #3072 (
+             'id' =&gt; 2,
+             'migration' =&gt; '0001_01_01_000001_create_cache_table',
+             'batch' =&gt; 1,
+         ),
+-        2 =&gt; stdClass Object #4150 (
++        2 =&gt; stdClass Object #3067 (
+             'id' =&gt; 3,
+             'migration' =&gt; '0001_01_01_000002_create_jobs_table',
+             'batch' =&gt; 1,
+         ),
+-        3 =&gt; stdClass Object #4138 (
++        3 =&gt; stdClass Object #3087 (
+             'id' =&gt; 4,
+             'migration' =&gt; '2026_09_04_000001_create_catalog_foundation',
+             'batch' =&gt; 1,
+         ),
+-        4 =&gt; stdClass Object #4143 (
++        4 =&gt; stdClass Object #3091 (
+             'id' =&gt; 5,
+             'migration' =&gt; '2026_09_04_000002_add_admin_mfa_and_immutable_evidence',
+             'batch' =&gt; 1,
+         ),
+-        5 =&gt; stdClass Object #4142 (
++        5 =&gt; stdClass Object #3075 (
+             'id' =&gt; 6,
+             'migration' =&gt; '2026_09_04_000003_media_processing',
+             'batch' =&gt; 1,
+         ),
+-        6 =&gt; stdClass Object #4115 (
++        6 =&gt; stdClass Object #3056 (
+             'id' =&gt; 7,
+             'migration' =&gt; '2026_09_04_000004_license_evidence',
+             'batch' =&gt; 1,
+         ),
+-        7 =&gt; stdClass Object #4111 (
++        7 =&gt; stdClass Object #3083 (
+             'id' =&gt; 8,
+             'migration' =&gt; '2026_09_04_000005_offer_revisions',
+             'batch' =&gt; 1,
+         ),
+-        8 =&gt; stdClass Object #4110 (
++        8 =&gt; stdClass Object #3076 (
+             'id' =&gt; 9,
+             'migration' =&gt; '2026_09_06_000006_provisional_quotes',
+             'batch' =&gt; 1,
+         ),
+-        9 =&gt; stdClass Object #4114 (
++        9 =&gt; stdClass Object #3088 (
+             'id' =&gt; 10,
+             'migration' =&gt; '2026_09_09_000007_stripe_webhook_receipts',
+             'batch' =&gt; 1,
+         ),
+-        10 =&gt; stdClass Object #4038 (
++        10 =&gt; stdClass Object #3086 (
+             'id' =&gt; 11,
+             'migration' =&gt; '2026_09_09_000008_track_metadata_and_public_urls',
+             'batch' =&gt; 1,
+         ),
+-        11 =&gt; stdClass Object #4107 (
++        11 =&gt; stdClass Object #3092 (
+             'id' =&gt; 12,
+             'migration' =&gt; '2026_09_09_000009_stems_recordings',
+             'batch' =&gt; 1,
+         ),
+-        12 =&gt; stdClass Object #4039 (
++        12 =&gt; stdClass Object #3089 (
+             'id' =&gt; 13,
+             'migration' =&gt; '2026_09_10_000010_typed_license_terms',
+             'batch' =&gt; 1,
+         ),
+-        13 =&gt; stdClass Object #4109 (
++        13 =&gt; stdClass Object #3077 (
+             'id' =&gt; 14,
+             'migration' =&gt; '2026_09_11_000011_license_scope_terms',
+             'batch' =&gt; 1,
+         ),
+-        14 =&gt; stdClass Object #4105 (
++        14 =&gt; stdClass Object #3081 (
+             'id' =&gt; 15,
+             'migration' =&gt; '2026_09_12_000012_license_economic_terms',
+             'batch' =&gt; 1,
+         ),
+-        15 =&gt; stdClass Object #4106 (
++        15 =&gt; stdClass Object #3080 (
+             'id' =&gt; 16,
+             'migration' =&gt; '2026_09_12_000013_quote_pricing',
+             'batch' =&gt; 1,
+         ),
+-        16 =&gt; stdClass Object #4104 (
++        16 =&gt; stdClass Object #3093 (
+             'id' =&gt; 17,
+             'migration' =&gt; '2026_09_14_000014_promotion_usage',
+             'batch' =&gt; 1,
+         ),
+-        17 =&gt; stdClass Object #4094 (
++        17 =&gt; stdClass Object #3096 (
+             'id' =&gt; 18,
+             'migration' =&gt; '2026_09_17_000015_shared_rights_inventory',
+             'batch' =&gt; 1,
+         ),
+-        18 =&gt; stdClass Object #4102 (
++        18 =&gt; stdClass Object #3094 (
+             'id' =&gt; 19,
+             'migration' =&gt; '2026_09_23_000016_exclusive_activations',
+             'batch' =&gt; 1,
+         ),
+-        19 =&gt; stdClass Object #4148 (
++        19 =&gt; stdClass Object #3097 (
+             'id' =&gt; 20,
+             'migration' =&gt; '2026_09_24_000017_order_preparation',
+             'batch' =&gt; 1,
+         ),
+-        20 =&gt; stdClass Object #4088 (
++        20 =&gt; stdClass Object #3099 (
+             'id' =&gt; 21,
+             'migration' =&gt; '2026_09_26_000018_hosted_test_checkout',
+             'batch' =&gt; 1,
+         ),
+-        21 =&gt; stdClass Object #4089 (
++        21 =&gt; stdClass Object #3100 (
+             'id' =&gt; 22,
+             'migration' =&gt; '2026_09_26_000019_test_payment_evidence',
+             'batch' =&gt; 1,
+         ),
+-        22 =&gt; stdClass Object #4146 (
++        22 =&gt; stdClass Object #3103 (
+             'id' =&gt; 23,
+             'migration' =&gt; '2026_09_26_000020_test_order_finalization',
+             'batch' =&gt; 1,
+         ),
+-        23 =&gt; stdClass Object #4157 (
++        23 =&gt; stdClass Object #3101 (
+             'id' =&gt; 24,
+             'migration' =&gt; '2026_09_26_000021_test_contract_issuance',
+             'batch' =&gt; 1,
+         ),
+-        24 =&gt; stdClass Object #4147 (
++        24 =&gt; stdClass Object #3098 (
+             'id' =&gt; 25,
+             'migration' =&gt; '2026_09_26_000022_test_fulfillment_activation',
+             'batch' =&gt; 1,
+         ),
+-        25 =&gt; stdClass Object #4154 (
++        25 =&gt; stdClass Object #3090 (
+             'id' =&gt; 26,
+             'migration' =&gt; '2026_09_26_000023_test_owner_delivery',
+             'batch' =&gt; 1,
+         ),
+-        26 =&gt; stdClass Object #4171 (
++        26 =&gt; stdClass Object #3136 (
+             'id' =&gt; 27,
+             'migration' =&gt; '2026_09_28_000024_site_content_releases',
+             'batch' =&gt; 1,
+         ),
+-        27 =&gt; stdClass Object #4140 (
++        27 =&gt; stdClass Object #3122 (
+             'id' =&gt; 28,
+             'migration' =&gt; '2026_09_29_000025_promotion_administration',
+             'batch' =&gt; 1,
+         ),
+-        28 =&gt; stdClass Object #4168 (
++        28 =&gt; stdClass Object #3115 (
+             'id' =&gt; 29,
+             'migration' =&gt; '2026_09_29_000026_site_publication_schedules',
+             'batch' =&gt; 1,
+         ),
+-        29 =&gt; stdClass Object #4173 (
++        29 =&gt; stdClass Object #3109 (
+             'id' =&gt; 30,
+             'migration' =&gt; '2026_09_30_000027_site_images',
+             'batch' =&gt; 1,
+         ),
+-        30 =&gt; stdClass Object #4151 (
++        30 =&gt; stdClass Object #3119 (
+             'id' =&gt; 31,
+             'migration' =&gt; '2026_09_30_000028_site_release_images',
+             'batch' =&gt; 1,
+         ),
+-        31 =&gt; stdClass Object #4152 (
++        31 =&gt; stdClass Object #3134 (
+             'id' =&gt; 32,
+             'migration' =&gt; '2026_10_01_000029_byte_exact_hash_guards',
+             'batch' =&gt; 1,
+         ),
+-        32 =&gt; stdClass Object #4166 (
++        32 =&gt; stdClass Object #3116 (
+             'id' =&gt; 33,
+             'migration' =&gt; '2026_10_01_000030_byte_exact_uuid_guards',
+             'batch' =&gt; 1,
+         ),
+-        33 =&gt; stdClass Object #4176 (
++        33 =&gt; stdClass Object #4248 (
+             'id' =&gt; 34,
+             'migration' =&gt; '2026_10_01_000031_customer_inquiries',
+             'batch' =&gt; 1,
+         ),
+-        34 =&gt; stdClass Object #4161 (
++        34 =&gt; stdClass Object #3118 (
+             'id' =&gt; 35,
+             'migration' =&gt; '2026_10_01_000032_editorial_related_tracks_images',
+             'batch' =&gt; 1,
+         ),
+-        35 =&gt; stdClass Object #4156 (
++        35 =&gt; stdClass Object #3111 (
+             'id' =&gt; 36,
+             'migration' =&gt; '2026_10_02_000033_track_metadata_presets',
+             'batch' =&gt; 1,
+         ),
+-        36 =&gt; stdClass Object #4207 (
++        36 =&gt; stdClass Object #3120 (
+             'id' =&gt; 37,
+             'migration' =&gt; '2026_10_02_000034_track_publication_version',
+             'batch' =&gt; 1,
+         ),
+-        37 =&gt; stdClass Object #4208 (
++        37 =&gt; stdClass Object #3121 (
+             'id' =&gt; 38,
+             'migration' =&gt; '2026_10_02_000035_rights_evidence_guards',
+             'batch' =&gt; 1,
+         ),
+-        38 =&gt; stdClass Object #4212 (
++        38 =&gt; stdClass Object #3123 (
+             'id' =&gt; 39,
+             'migration' =&gt; '2026_10_02_000036_test_payment_exception_operations',
+             'batch' =&gt; 1,
+         ),
+-        39 =&gt; stdClass Object #4160 (
++        39 =&gt; stdClass Object #3124 (
+             'id' =&gt; 40,
+             'migration' =&gt; '2026_10_06_000038_resumable_media_uploads',
+             'batch' =&gt; 1,
+         ),
+-        40 =&gt; stdClass Object #4193 (
++        40 =&gt; stdClass Object #3125 (
+             'id' =&gt; 41,
+             'migration' =&gt; '2026_10_06_000039_test_payment_financial_observations',
+             'batch' =&gt; 1,
+         ),
+-        41 =&gt; stdClass Object #4234 (
++        41 =&gt; stdClass Object #3126 (
+             'id' =&gt; 42,
+             'migration' =&gt; '2026_10_06_000040_customer_accounts',
+             'batch' =&gt; 1,
+         ),
+-        42 =&gt; stdClass Object #4238 (
++        42 =&gt; stdClass Object #3127 (
+             'id' =&gt; 43,
+             'migration' =&gt; '2026_10_06_000041_product_draft_versions',
+             'batch' =&gt; 1,
+         ),
+-        43 =&gt; stdClass Object #4237 (
++        43 =&gt; stdClass Object #3128 (
+             'id' =&gt; 44,
+             'migration' =&gt; '2026_10_06_000042_test_unpaid_releases',
+             'batch' =&gt; 1,
+         ),
+-        44 =&gt; stdClass Object #4235 (
++        44 =&gt; stdClass Object #3129 (
+             'id' =&gt; 45,
+             'migration' =&gt; '2026_10_06_000043_inquiry_messages',
+             'batch' =&gt; 1,
+         ),
+-        45 =&gt; stdClass Object #4252 (
++        45 =&gt; stdClass Object #3130 (
+             'id' =&gt; 46,
+             'migration' =&gt; '2026_10_06_000044_sound_kit_intake',
+             'batch' =&gt; 1,
+         ),
+-        46 =&gt; stdClass Object #4258 (
++        46 =&gt; stdClass Object #3131 (
+             'id' =&gt; 47,
+             'migration' =&gt; '2026_10_06_000045_customer_identity_challenges',
+             'batch' =&gt; 1,
+         ),
+-        47 =&gt; stdClass Object #4253 (
++        47 =&gt; stdClass Object #3132 (
+             'id' =&gt; 48,
+             'migration' =&gt; '2026_10_06_000046_sound_kit_upload_sessions',
+             'batch' =&gt; 1,
+         ),
+-        48 =&gt; stdClass Object #4315 (
++        48 =&gt; stdClass Object #3133 (
+             'id' =&gt; 49,
+             'migration' =&gt; '2026_10_06_000047_test_refund_resolutions',
+             'batch' =&gt; 1,
+         ),
+-        49 =&gt; stdClass Object #4320 (
++        49 =&gt; stdClass Object #3135 (
+             'id' =&gt; 50,
+             'migration' =&gt; '2026_10_06_000048_customer_purchase_claims',
+             'batch' =&gt; 1,
+         ),
+-        50 =&gt; stdClass Object #4319 (
++        50 =&gt; stdClass Object #3117 (
+             'id' =&gt; 51,
+             'migration' =&gt; '2026_10_06_000049_inquiry_order_contexts',
+             'batch' =&gt; 1,
+         ),
+-        51 =&gt; stdClass Object #4273 (
++        51 =&gt; stdClass Object #3108 (
+             'id' =&gt; 52,
+             'migration' =&gt; '2026_10_06_230000_membership_credit_foundation',
+             'batch' =&gt; 1,
+         ),
+-        52 =&gt; stdClass Object #4271 (
++        52 =&gt; stdClass Object #4247 (
+             'id' =&gt; 53,
+             'migration' =&gt; '2026_10_06_231000_test_transactional_notifications',
+             'batch' =&gt; 1,
+         ),
+-        53 =&gt; stdClass Object #4313 (
++        53 =&gt; stdClass Object #4241 (
+             'id' =&gt; 54,
+             'migration' =&gt; '2026_10_06_233000_production_track_policy_drafts',
+             'batch' =&gt; 1,
+         ),
+-        54 =&gt; stdClass Object #4327 (
++        54 =&gt; stdClass Object #4240 (
+             'id' =&gt; 55,
+             'migration' =&gt; '2026_10_06_234000_service_draft_versions',
+             'batch' =&gt; 1,
+         ),
+-        55 =&gt; stdClass Object #4254 (
++        55 =&gt; stdClass Object #4245 (
+             'id' =&gt; 56,
+             'migration' =&gt; '2026_10_06_235000_merch_draft_versions',
+             'batch' =&gt; 1,
+         ),
+-        56 =&gt; stdClass Object #4303 (
++        56 =&gt; stdClass Object #4246 (
+             'id' =&gt; 57,
+             'migration' =&gt; '2026_10_06_236000_production_track_policy_capabilities',
+             'batch' =&gt; 1,
+         ),
+-        57 =&gt; stdClass Object #4277 (
++        57 =&gt; stdClass Object #4242 (
+             'id' =&gt; 58,
+             'migration' =&gt; '2026_10_06_237000_catalog_import_progress',
+             'batch' =&gt; 1,
+         ),
+-        58 =&gt; stdClass Object #4317 (
++        58 =&gt; stdClass Object #4239 (
+             'id' =&gt; 59,
+             'migration' =&gt; '2026_10_06_238000_production_track_preparation_packets',
+             'batch' =&gt; 1,
+         ),
+-        59 =&gt; stdClass Object #4324 (
++        59 =&gt; stdClass Object #4244 (
+             'id' =&gt; 60,
+             'migration' =&gt; '2026_10_07_239000_production_buyer_assent_observations',
+             'batch' =&gt; 1,
+         ),
+-        60 =&gt; stdClass Object #4316 (
++        60 =&gt; stdClass Object #3137 (
+             'id' =&gt; 61,
+             'migration' =&gt; '2026_10_07_240000_catalog_discovery_epoch',
+             'batch' =&gt; 1,
+@@ @@
+         ),
+     ],
+     'epoch' =&gt; Array &amp;2 [
+-        0 =&gt; stdClass Object #4322 (
++        0 =&gt; stdClass Object #3158 (
+             'id' =&gt; 1,
+             'epoch' =&gt; 1,
+             'schema_version' =&gt; 1,
+@@ @@
+         ),
+     ],
+     'tracks' =&gt; Array &amp;3 [
+-        0 =&gt; stdClass Object #5351 (
++        0 =&gt; stdClass Object #3011 (
+             'id' =&gt; 1,
+             'title' =&gt; 'Synthetic retained draft',
+             'slug' =&gt; 'retained-draft',
+
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php:41</failure>
+        </testcase>
+      </testsuite>
+      <testcase name="test_actual_insert_update_delete_upsert_replace_aba_and_rollback_invalidate_atomically" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="50" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="9" time="0.141610"/>
+      <testcase name="test_missing_changed_guard_and_modified_table_fail_closed" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="77" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="3" time="0.156841"/>
+      <testcase name="test_overflow_refuses_parent_write_and_preserves_epoch_and_data" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="103" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="3" time="0.149941">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\DiscoveryEpochMigrationTest::test_overflow_refuses_parent_write_and_preserves_epoch_and_data
+Failed asserting that exception of type "PDOException" matches expected exception "LogicException". Message was: "SQLSTATE[23000]: Integrity constraint violation: 19 Invalid discovery epoch" at
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/app/Domain/Catalog/Discovery/CurrentEligibleTrackSnapshot.php:77
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/app/Domain/Catalog/Discovery/CurrentEligibleTrackSnapshot.php:74
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/app/Domain/Catalog/Discovery/CurrentEligibleTrackSnapshot.php:31
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php:118
+.</failure>
+      </testcase>
+      <testcase name="test_new_installation_collision_refuses_before_ddl" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="121" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="1" time="0.170471">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\DiscoveryEpochMigrationTest::test_new_installation_collision_refuses_before_ddl
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+     'migrations' =&gt; Array &amp;1 [
+-        0 =&gt; stdClass Object #5240 (
++        0 =&gt; stdClass Object #5359 (
+             'id' =&gt; 1,
+             'migration' =&gt; '0001_01_01_000000_create_users_table',
+             'batch' =&gt; 1,
+         ),
+-        1 =&gt; stdClass Object #5495 (
++        1 =&gt; stdClass Object #6908 (
+             'id' =&gt; 2,
+             'migration' =&gt; '0001_01_01_000001_create_cache_table',
+             'batch' =&gt; 1,
+         ),
+-        2 =&gt; stdClass Object #5477 (
++        2 =&gt; stdClass Object #6918 (
+             'id' =&gt; 3,
+             'migration' =&gt; '0001_01_01_000002_create_jobs_table',
+             'batch' =&gt; 1,
+         ),
+-        3 =&gt; stdClass Object #5249 (
++        3 =&gt; stdClass Object #7394 (
+             'id' =&gt; 4,
+             'migration' =&gt; '2026_09_04_000001_create_catalog_foundation',
+             'batch' =&gt; 1,
+         ),
+-        4 =&gt; stdClass Object #5239 (
++        4 =&gt; stdClass Object #7408 (
+             'id' =&gt; 5,
+             'migration' =&gt; '2026_09_04_000002_add_admin_mfa_and_immutable_evidence',
+             'batch' =&gt; 1,
+         ),
+-        5 =&gt; stdClass Object #5360 (
++        5 =&gt; stdClass Object #7398 (
+             'id' =&gt; 6,
+             'migration' =&gt; '2026_09_04_000003_media_processing',
+             'batch' =&gt; 1,
+         ),
+-        6 =&gt; stdClass Object #5961 (
++        6 =&gt; stdClass Object #7396 (
+             'id' =&gt; 7,
+             'migration' =&gt; '2026_09_04_000004_license_evidence',
+             'batch' =&gt; 1,
+         ),
+-        7 =&gt; stdClass Object #5159 (
++        7 =&gt; stdClass Object #6924 (
+             'id' =&gt; 8,
+             'migration' =&gt; '2026_09_04_000005_offer_revisions',
+             'batch' =&gt; 1,
+         ),
+-        8 =&gt; stdClass Object #4729 (
++        8 =&gt; stdClass Object #6917 (
+             'id' =&gt; 9,
+             'migration' =&gt; '2026_09_06_000006_provisional_quotes',
+             'batch' =&gt; 1,
+         ),
+-        9 =&gt; stdClass Object #8415 (
++        9 =&gt; stdClass Object #6889 (
+             'id' =&gt; 10,
+             'migration' =&gt; '2026_09_09_000007_stripe_webhook_receipts',
+             'batch' =&gt; 1,
+         ),
+-        10 =&gt; stdClass Object #5544 (
++        10 =&gt; stdClass Object #6907 (
+             'id' =&gt; 11,
+             'migration' =&gt; '2026_09_09_000008_track_metadata_and_public_urls',
+             'batch' =&gt; 1,
+         ),
+-        11 =&gt; stdClass Object #5478 (
++        11 =&gt; stdClass Object #6909 (
+             'id' =&gt; 12,
+             'migration' =&gt; '2026_09_09_000009_stems_recordings',
+             'batch' =&gt; 1,
+         ),
+-        12 =&gt; stdClass Object #5391 (
++        12 =&gt; stdClass Object #6911 (
+             'id' =&gt; 13,
+             'migration' =&gt; '2026_09_10_000010_typed_license_terms',
+             'batch' =&gt; 1,
+         ),
+-        13 =&gt; stdClass Object #4752 (
++        13 =&gt; stdClass Object #6874 (
+             'id' =&gt; 14,
+             'migration' =&gt; '2026_09_11_000011_license_scope_terms',
+             'batch' =&gt; 1,
+         ),
+-        14 =&gt; stdClass Object #5257 (
++        14 =&gt; stdClass Object #6892 (
+             'id' =&gt; 15,
+             'migration' =&gt; '2026_09_12_000012_license_economic_terms',
+             'batch' =&gt; 1,
+         ),
+-        15 =&gt; stdClass Object #5315 (
++        15 =&gt; stdClass Object #6888 (
+             'id' =&gt; 16,
+             'migration' =&gt; '2026_09_12_000013_quote_pricing',
+             'batch' =&gt; 1,
+         ),
+-        16 =&gt; stdClass Object #5319 (
++        16 =&gt; stdClass Object #8402 (
+             'id' =&gt; 17,
+             'migration' =&gt; '2026_09_14_000014_promotion_usage',
+             'batch' =&gt; 1,
+         ),
+-        17 =&gt; stdClass Object #5318 (
++        17 =&gt; stdClass Object #8400 (
+             'id' =&gt; 18,
+             'migration' =&gt; '2026_09_17_000015_shared_rights_inventory',
+             'batch' =&gt; 1,
+         ),
+-        18 =&gt; stdClass Object #5270 (
++        18 =&gt; stdClass Object #3071 (
+             'id' =&gt; 19,
+             'migration' =&gt; '2026_09_23_000016_exclusive_activations',
+             'batch' =&gt; 1,
+         ),
+-        19 =&gt; stdClass Object #5998 (
++        19 =&gt; stdClass Object #6848 (
+             'id' =&gt; 20,
+             'migration' =&gt; '2026_09_24_000017_order_preparation',
+             'batch' =&gt; 1,
+         ),
+-        20 =&gt; stdClass Object #5244 (
++        20 =&gt; stdClass Object #6876 (
+             'id' =&gt; 21,
+             'migration' =&gt; '2026_09_26_000018_hosted_test_checkout',
+             'batch' =&gt; 1,
+         ),
+-        21 =&gt; stdClass Object #5321 (
++        21 =&gt; stdClass Object #6864 (
+             'id' =&gt; 22,
+             'migration' =&gt; '2026_09_26_000019_test_payment_evidence',
+             'batch' =&gt; 1,
+         ),
+-        22 =&gt; stdClass Object #1836 (
++        22 =&gt; stdClass Object #6875 (
+             'id' =&gt; 23,
+             'migration' =&gt; '2026_09_26_000020_test_order_finalization',
+             'batch' =&gt; 1,
+         ),
+-        23 =&gt; stdClass Object #6001 (
++        23 =&gt; stdClass Object #6865 (
+             'id' =&gt; 24,
+             'migration' =&gt; '2026_09_26_000021_test_contract_issuance',
+             'batch' =&gt; 1,
+         ),
+-        24 =&gt; stdClass Object #6090 (
++        24 =&gt; stdClass Object #6850 (
+             'id' =&gt; 25,
+             'migration' =&gt; '2026_09_26_000022_test_fulfillment_activation',
+             'batch' =&gt; 1,
+         ),
+-        25 =&gt; stdClass Object #6131 (
++        25 =&gt; stdClass Object #6863 (
+             'id' =&gt; 26,
+             'migration' =&gt; '2026_09_26_000023_test_owner_delivery',
+             'batch' =&gt; 1,
+         ),
+-        26 =&gt; stdClass Object #5272 (
++        26 =&gt; stdClass Object #6858 (
+             'id' =&gt; 27,
+             'migration' =&gt; '2026_09_28_000024_site_content_releases',
+             'batch' =&gt; 1,
+         ),
+-        27 =&gt; stdClass Object #5271 (
++        27 =&gt; stdClass Object #6861 (
+             'id' =&gt; 28,
+             'migration' =&gt; '2026_09_29_000025_promotion_administration',
+             'batch' =&gt; 1,
+         ),
+-        28 =&gt; stdClass Object #5248 (
++        28 =&gt; stdClass Object #6855 (
+             'id' =&gt; 29,
+             'migration' =&gt; '2026_09_29_000026_site_publication_schedules',
+             'batch' =&gt; 1,
+         ),
+-        29 =&gt; stdClass Object #6024 (
++        29 =&gt; stdClass Object #6856 (
+             'id' =&gt; 30,
+             'migration' =&gt; '2026_09_30_000027_site_images',
+             'batch' =&gt; 1,
+         ),
+-        30 =&gt; stdClass Object #5273 (
++        30 =&gt; stdClass Object #6835 (
+             'id' =&gt; 31,
+             'migration' =&gt; '2026_09_30_000028_site_release_images',
+             'batch' =&gt; 1,
+         ),
+-        31 =&gt; stdClass Object #8655 (
++        31 =&gt; stdClass Object #6828 (
+             'id' =&gt; 32,
+             'migration' =&gt; '2026_10_01_000029_byte_exact_hash_guards',
+             'batch' =&gt; 1,
+         ),
+-        32 =&gt; stdClass Object #3540 (
++        32 =&gt; stdClass Object #6841 (
+             'id' =&gt; 33,
+             'migration' =&gt; '2026_10_01_000030_byte_exact_uuid_guards',
+             'batch' =&gt; 1,
+         ),
+-        33 =&gt; stdClass Object #4223 (
++        33 =&gt; stdClass Object #6860 (
+             'id' =&gt; 34,
+             'migration' =&gt; '2026_10_01_000031_customer_inquiries',
+             'batch' =&gt; 1,
+         ),
+-        34 =&gt; stdClass Object #3498 (
++        34 =&gt; stdClass Object #6878 (
+             'id' =&gt; 35,
+             'migration' =&gt; '2026_10_01_000032_editorial_related_tracks_images',
+             'batch' =&gt; 1,
+         ),
+-        35 =&gt; stdClass Object #3587 (
++        35 =&gt; stdClass Object #6872 (
+             'id' =&gt; 36,
+             'migration' =&gt; '2026_10_02_000033_track_metadata_presets',
+             'batch' =&gt; 1,
+         ),
+-        36 =&gt; stdClass Object #3565 (
++        36 =&gt; stdClass Object #6852 (
+             'id' =&gt; 37,
+             'migration' =&gt; '2026_10_02_000034_track_publication_version',
+             'batch' =&gt; 1,
+         ),
+-        37 =&gt; stdClass Object #8711 (
++        37 =&gt; stdClass Object #6857 (
+             'id' =&gt; 38,
+             'migration' =&gt; '2026_10_02_000035_rights_evidence_guards',
+             'batch' =&gt; 1,
+         ),
+-        38 =&gt; stdClass Object #5232 (
++        38 =&gt; stdClass Object #6862 (
+             'id' =&gt; 39,
+             'migration' =&gt; '2026_10_02_000036_test_payment_exception_operations',
+             'batch' =&gt; 1,
+         ),
+-        39 =&gt; stdClass Object #6105 (
++        39 =&gt; stdClass Object #6859 (
+             'id' =&gt; 40,
+             'migration' =&gt; '2026_10_06_000038_resumable_media_uploads',
+             'batch' =&gt; 1,
+         ),
+-        40 =&gt; stdClass Object #6088 (
++        40 =&gt; stdClass Object #6823 (
+             'id' =&gt; 41,
+             'migration' =&gt; '2026_10_06_000039_test_payment_financial_observations',
+             'batch' =&gt; 1,
+         ),
+-        41 =&gt; stdClass Object #6093 (
++        41 =&gt; stdClass Object #6839 (
+             'id' =&gt; 42,
+             'migration' =&gt; '2026_10_06_000040_customer_accounts',
+             'batch' =&gt; 1,
+         ),
+-        42 =&gt; stdClass Object #5245 (
++        42 =&gt; stdClass Object #6851 (
+             'id' =&gt; 43,
+             'migration' =&gt; '2026_10_06_000041_product_draft_versions',
+             'batch' =&gt; 1,
+         ),
+-        43 =&gt; stdClass Object #5265 (
++        43 =&gt; stdClass Object #6837 (
+             'id' =&gt; 44,
+             'migration' =&gt; '2026_10_06_000042_test_unpaid_releases',
+             'batch' =&gt; 1,
+         ),
+-        44 =&gt; stdClass Object #5164 (
++        44 =&gt; stdClass Object #6854 (
+             'id' =&gt; 45,
+             'migration' =&gt; '2026_10_06_000043_inquiry_messages',
+             'batch' =&gt; 1,
+         ),
+-        45 =&gt; stdClass Object #5037 (
++        45 =&gt; stdClass Object #6853 (
+             'id' =&gt; 46,
+             'migration' =&gt; '2026_10_06_000044_sound_kit_intake',
+             'batch' =&gt; 1,
+         ),
+-        46 =&gt; stdClass Object #5162 (
++        46 =&gt; stdClass Object #6846 (
+             'id' =&gt; 47,
+             'migration' =&gt; '2026_10_06_000045_customer_identity_challenges',
+             'batch' =&gt; 1,
+         ),
+-        47 =&gt; stdClass Object #4904 (
++        47 =&gt; stdClass Object #6821 (
+             'id' =&gt; 48,
+             'migration' =&gt; '2026_10_06_000046_sound_kit_upload_sessions',
+             'batch' =&gt; 1,
+         ),
+-        48 =&gt; stdClass Object #4951 (
++        48 =&gt; stdClass Object #6820 (
+             'id' =&gt; 49,
+             'migration' =&gt; '2026_10_06_000047_test_refund_resolutions',
+             'batch' =&gt; 1,
+         ),
+-        49 =&gt; stdClass Object #5038 (
++        49 =&gt; stdClass Object #6840 (
+             'id' =&gt; 50,
+             'migration' =&gt; '2026_10_06_000048_customer_purchase_claims',
+             'batch' =&gt; 1,
+         ),
+-        50 =&gt; stdClass Object #6920 (
++        50 =&gt; stdClass Object #6819 (
+             'id' =&gt; 51,
+             'migration' =&gt; '2026_10_06_000049_inquiry_order_contexts',
+             'batch' =&gt; 1,
+         ),
+-        51 =&gt; stdClass Object #5041 (
++        51 =&gt; stdClass Object #6824 (
+             'id' =&gt; 52,
+             'migration' =&gt; '2026_10_06_230000_membership_credit_foundation',
+             'batch' =&gt; 1,
+         ),
+-        52 =&gt; stdClass Object #5043 (
++        52 =&gt; stdClass Object #6849 (
+             'id' =&gt; 53,
+             'migration' =&gt; '2026_10_06_231000_test_transactional_notifications',
+             'batch' =&gt; 1,
+         ),
+-        53 =&gt; stdClass Object #5667 (
++        53 =&gt; stdClass Object #6826 (
+             'id' =&gt; 54,
+             'migration' =&gt; '2026_10_06_233000_production_track_policy_drafts',
+             'batch' =&gt; 1,
+         ),
+-        54 =&gt; stdClass Object #5508 (
++        54 =&gt; stdClass Object #6834 (
+             'id' =&gt; 55,
+             'migration' =&gt; '2026_10_06_234000_service_draft_versions',
+             'batch' =&gt; 1,
+         ),
+-        55 =&gt; stdClass Object #6916 (
++        55 =&gt; stdClass Object #6833 (
+             'id' =&gt; 56,
+             'migration' =&gt; '2026_10_06_235000_merch_draft_versions',
+             'batch' =&gt; 1,
+         ),
+-        56 =&gt; stdClass Object #4959 (
++        56 =&gt; stdClass Object #6832 (
+             'id' =&gt; 57,
+             'migration' =&gt; '2026_10_06_236000_production_track_policy_capabilities',
+             'batch' =&gt; 1,
+         ),
+-        57 =&gt; stdClass Object #5505 (
++        57 =&gt; stdClass Object #6830 (
+             'id' =&gt; 58,
+             'migration' =&gt; '2026_10_06_237000_catalog_import_progress',
+             'batch' =&gt; 1,
+         ),
+-        58 =&gt; stdClass Object #6925 (
++        58 =&gt; stdClass Object #6831 (
+             'id' =&gt; 59,
+             'migration' =&gt; '2026_10_06_238000_production_track_preparation_packets',
+             'batch' =&gt; 1,
+         ),
+-        59 =&gt; stdClass Object #7393 (
++        59 =&gt; stdClass Object #6829 (
+             'id' =&gt; 60,
+             'migration' =&gt; '2026_10_07_239000_production_buyer_assent_observations',
+             'batch' =&gt; 1,
+         ),
+-        60 =&gt; stdClass Object #7391 (
++        60 =&gt; stdClass Object #6806 (
+             'id' =&gt; 61,
+             'migration' =&gt; '2026_10_07_240000_catalog_discovery_epoch',
+             'batch' =&gt; 1,
+@@ @@
+         ),
+     ],
+     'epoch' =&gt; Array &amp;2 [
+-        0 =&gt; stdClass Object #6914 (
++        0 =&gt; stdClass Object #6825 (
+             'id' =&gt; 1,
+             'epoch' =&gt; 0,
+             'schema_version' =&gt; 1,
+
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php:129</failure>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\CurrentEligibleTrackSnapshotTest" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/CurrentEligibleTrackSnapshotTest.php" tests="5" assertions="23" errors="1" failures="0" skipped="0" time="3.403365">
+      <testcase name="test_empty_and_49_candidate_pages_are_bounded_private_and_complete_by_continuation" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/CurrentEligibleTrackSnapshotTest.php" line="32" class="Tests\Feature\CurrentEligibleTrackSnapshotTest" classname="Tests.Feature.CurrentEligibleTrackSnapshotTest" assertions="9" time="0.197525"/>
+      <testcase name="test_current_paths_match_public_catalog_and_reject_unknown_or_changed_evidence" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/CurrentEligibleTrackSnapshotTest.php" line="59" class="Tests\Feature\CurrentEligibleTrackSnapshotTest" classname="Tests.Feature.CurrentEligibleTrackSnapshotTest" assertions="4" time="1.153808">
+        <error type="Illuminate\Database\QueryException">Tests\Feature\CurrentEligibleTrackSnapshotTest::test_current_paths_match_public_catalog_and_reject_unknown_or_changed_evidence
+Illuminate\Database\QueryException: SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: rights_declarations.sample_disclosure (Connection: sqlite, Database: :memory:, SQL: insert into "rights_declarations" ("track_id", "status", "provenance_reference", "updated_at", "created_at") values (1, pending, PRIVATE-NEW-HOLD, 2026-10-07 04:59:02, 2026-10-07 04:59:02))
+
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/vendor/laravel/framework/src/Illuminate/Database/Connection.php:554
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/Processor.php:32
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4320
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2346
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1713
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1625
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1427
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:1268
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:1267
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php:23
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2912
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2928
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/CurrentEligibleTrackSnapshotTest.php:74</error>
+      </testcase>
+      <testcase name="test_private_byte_loss_and_configuration_changes_refuse_retained_projection" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/CurrentEligibleTrackSnapshotTest.php" line="81" class="Tests\Feature\CurrentEligibleTrackSnapshotTest" classname="Tests.Feature.CurrentEligibleTrackSnapshotTest" assertions="2" time="0.975485"/>
+      <testcase name="test_caller_transaction_and_forged_continuation_are_refused" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/CurrentEligibleTrackSnapshotTest.php" line="98" class="Tests\Feature\CurrentEligibleTrackSnapshotTest" classname="Tests.Feature.CurrentEligibleTrackSnapshotTest" assertions="3" time="0.160768"/>
+      <testcase name="test_default_and_explicit_time_remain_equivalent_and_epoch_changes_during_read_fail_closed" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/CurrentEligibleTrackSnapshotTest.php" line="120" class="Tests\Feature\CurrentEligibleTrackSnapshotTest" classname="Tests.Feature.CurrentEligibleTrackSnapshotTest" assertions="5" time="0.915779"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

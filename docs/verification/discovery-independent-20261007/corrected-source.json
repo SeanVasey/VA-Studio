@@ -1,0 +1,26 @@
+{
+  "reviewed_executable": "10dcb64d9c30231bd6949fd4d00811a283e820b0",
+  "tree": "7e6ccdb4459775b67210c4d01c1413757946c418",
+  "original_red_evidence": "1edf61e2a80b67617fa6971c21e7df2634aa15c2",
+  "original_red_artifacts_unchanged": 9,
+  "correction_paths_only": [
+    "app/Domain/Catalog/Discovery/CurrentEligibleTrackSnapshot.php",
+    "docs/architecture/bounded-track-discovery-prerequisite.md",
+    "tests/Feature/CurrentEligibleTrackSnapshotTest.php",
+    "tests/Feature/DiscoverySnapshotConcurrencyTest.php"
+  ],
+  "migration_and_epoch_class_byte_unchanged": true,
+  "selected_native_files": [
+    "docs/verification/discovery-independent-20261007/NativeEpochCanaryTest.php",
+    "docs/verification/discovery-independent-20261007/RetainedDeadlineCanaryTest.php",
+    "tests/Feature/DiscoveryEpochMigrationTest.php",
+    "tests/Feature/DiscoverySnapshotConcurrencyTest.php"
+  ],
+  "selected_source_sha256": {
+    "docs/verification/discovery-independent-20261007/NativeEpochCanaryTest.php": "8be2626a3f3dba573b102f6b74281a9f9ff5a536e78c649f3b379b0cc9420d0a",
+    "docs/verification/discovery-independent-20261007/RetainedDeadlineCanaryTest.php": "83e6063734fd71b84d4d420c130d9a4090dad1c0f0eb5e635f88da0bf7651827",
+    "tests/Feature/DiscoveryEpochMigrationTest.php": "5433f46e193572fc76def633b1b4d1b4fc47fc87bfd088919b08b949e9a4439e",
+    "tests/Feature/DiscoverySnapshotConcurrencyTest.php": "bafda9296abd0eea20850a623f9c5e0141538858b7b0037b7441a9811825dbf5"
+  },
+  "service_sha256": "4292c66f41e05332dc3bb1dfe41b811496d4815beea70d866d3533d518d7d1f3"
+}

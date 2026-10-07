@@ -1,0 +1,151 @@
+{
+  "executed_executable": "9f1bda29a20a6f6936efa9b86e9731194bd3ccf7",
+  "executed_tree": "fe4be5659d1d769a0175e2a2c43da15cf1f7954d",
+  "current_merged_baseline": "5cba90191a21aca3acef7b9e01f65efecdbd0dcd",
+  "baseline_tree": "1c43bb29aefb56f3698ba734e756d685fd018245",
+  "composition_ancestry": [
+    "22646ff6cdca3446de0b272126fad215d0d283f2",
+    "9f1bda29a20a6f6936efa9b86e9731194bd3ccf7"
+  ],
+  "approved_leaf": "10dcb64d9c30231bd6949fd4d00811a283e820b0",
+  "approved_leaf_evidence": "03ecc0dc7f0c138b6412f5d02cd65c2529178feb",
+  "changed_15_exact_leaf_paths": {
+    ".github/workflows/focused-feedback.yml": {
+      "git": [
+        "100644",
+        "blob",
+        "96b964a88fa8f6e6d630eb6887d002a3845e2350"
+      ],
+      "sha256": "7736593ab9303763809e9856c613eecefb774d11bdc4f3e74125462459291be9"
+    },
+    "app/Domain/Catalog/Discovery/CurrentEligibleTrackSnapshot.php": {
+      "git": [
+        "100644",
+        "blob",
+        "6cabf00083fe154b30f3988ef830e20da84c03e0"
+      ],
+      "sha256": "4292c66f41e05332dc3bb1dfe41b811496d4815beea70d866d3533d518d7d1f3"
+    },
+    "app/Domain/Catalog/Discovery/DiscoveryEpoch.php": {
+      "git": [
+        "100644",
+        "blob",
+        "53a4355d7658d40901c901cf0ae3896952a17e09"
+      ],
+      "sha256": "540b5d43c02e0a100e39290598b96668a4bf6c30fd0813da6161f307bec801bf"
+    },
+    "app/Domain/Catalog/Discovery/EligibleTrackSnapshot.php": {
+      "git": [
+        "100644",
+        "blob",
+        "cb79642447104d9932daa580ef8891650eb66451"
+      ],
+      "sha256": "72f1d990e90be9b3153277892678eb34a77c97ab21e3f8ca29232686c86863b3"
+    },
+    "app/Domain/Catalog/PublicationReadiness.php": {
+      "git": [
+        "100644",
+        "blob",
+        "c20478a17f3748030218b8c585b8543f530de770"
+      ],
+      "sha256": "6ed1f8c2bd1f0dc4b5fea0608848cf0149c12569e29b680640fea801f6fb8c60"
+    },
+    "app/Domain/Commerce/Inventory/SelectionInventory.php": {
+      "git": [
+        "100644",
+        "blob",
+        "e89742f8fc5687a36f819182a40df1ba73f11fa3"
+      ],
+      "sha256": "e00a74fe35c8ab885034e49bfe38e4392174467d454740e4e6ad84b2dc078fd6"
+    },
+    "database/migrations/2026_10_07_240000_catalog_discovery_epoch.php": {
+      "git": [
+        "100644",
+        "blob",
+        "7e91110c78ae038fcc2c071da5a993830708ce58"
+      ],
+      "sha256": "90664cb7f077cd7ef0a8744e147a0344f13fcc17139edae6f29b7d6c50812313"
+    },
+    "docs/architecture/bounded-track-discovery-prerequisite.md": {
+      "git": [
+        "100644",
+        "blob",
+        "e9f6877032232e7214f8c441740f3d6c4d9ecbc1"
+      ],
+      "sha256": "cebb392e8a85d47e5726b758a6f67926e84b6024fffb9529523cf12445492ff8"
+    },
+    "scripts/ci/database-sqlite-skips.json": {
+      "git": [
+        "100644",
+        "blob",
+        "3674c470b02d43c1d2012b4911cf8054f613ac8b"
+      ],
+      "sha256": "095979aa14eb07f76b30fe9f607645b6cdfd3257db7079764032ff6ef997183d"
+    },
+    "scripts/ci/focused-tests.py": {
+      "git": [
+        "100644",
+        "blob",
+        "fe34f331a37b639047243f8cd09e87795025350f"
+      ],
+      "sha256": "be8d8a37656a0c0df0c4132ab954e8abbde1b802cfb0257d379904881cf09d82"
+    },
+    "scripts/ci/test-focused-tests.py": {
+      "git": [
+        "100644",
+        "blob",
+        "db861add808aa712b5f0820b59a2051c637d020b"
+      ],
+      "sha256": "0bbd612427a53113196aa3ba7a3cbfd6a42d49786d8cc8f486db422ea8eda0c6"
+    },
+    "tests/Feature/CurrentEligibleTrackSnapshotTest.php": {
+      "git": [
+        "100644",
+        "blob",
+        "6317dd6e11800511566388f9cc65fbdb88ba0bb9"
+      ],
+      "sha256": "cd046872eeddddac71c313f0b892f2dac533714b27d46d5db6cb1af4e27e2e15"
+    },
+    "tests/Feature/DiscoveryEpochMigrationTest.php": {
+      "git": [
+        "100644",
+        "blob",
+        "1d751fe6a007e3be71cfadedb12de6021f60972b"
+      ],
+      "sha256": "5433f46e193572fc76def633b1b4d1b4fc47fc87bfd088919b08b949e9a4439e"
+    },
+    "tests/Feature/DiscoverySnapshotConcurrencyTest.php": {
+      "git": [
+        "100644",
+        "blob",
+        "430835c2390bdba43de83b0644d9bc17e895517d"
+      ],
+      "sha256": "bafda9296abd0eea20850a623f9c5e0141538858b7b0037b7441a9811825dbf5"
+    },
+    "tests/Support/discovery-snapshot-worker.php": {
+      "git": [
+        "100644",
+        "blob",
+        "b1722bb4f842158f48b148f89fa94e84e3f96c11"
+      ],
+      "sha256": "570cacf72433c7753b8a4b8bc2ed8ee67d45d3d88a53715b77910bd5b2532afb"
+    }
+  },
+  "all_other_baseline_paths_preserved_exact": 2206,
+  "existing_migration_paths_preserved": 60,
+  "composition_metadata": "2b327e769767cdc80c3be94fc8269099be23c95e",
+  "composition_metadata_exact_author_paths": 61,
+  "current_installed_graph_required_packages": 158,
+  "only_leaf_to_current_lock_record_changes": {
+    "tecnickcom/tc-lib-pdf": {
+      "leaf": "8.76.2",
+      "current": "8.76.3"
+    },
+    "tecnickcom/tc-lib-pdf-font": {
+      "leaf": "4.4.0",
+      "current": "4.4.1"
+    }
+  },
+  "source_unchanged_metadata": true,
+  "full_or_hosted_matrix": false
+}

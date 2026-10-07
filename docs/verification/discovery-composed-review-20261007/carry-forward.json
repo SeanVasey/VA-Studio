@@ -1,0 +1,60 @@
+{
+  "carried_independent_evidence": "03ecc0dc7f0c138b6412f5d02cd65c2529178feb",
+  "carried_source": "10dcb64d9c30231bd6949fd4d00811a283e820b0",
+  "current_composed_source": "9f1bda29a20a6f6936efa9b86e9731194bd3ccf7",
+  "exact_source_carry_verified_in": "composition-integrity.json",
+  "independent_native_adversary_migration_and_races": {
+    "tests": "21",
+    "assertions": "416",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "123.246884"
+  },
+  "independent_active_transaction_isolation": {
+    "tests": "1",
+    "assertions": "8",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "6.534362"
+  },
+  "independent_deadline_sqlite": {
+    "tests": "1",
+    "assertions": "4",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "1.545567"
+  },
+  "author_evidence": "db29d0caf30298b6f1f1a278dc680e9c571f775e",
+  "author_unchanged_baseline_cases": {
+    "executed_source": "18c7d357acc74dbff1c2fb7ad149832873d76bc3",
+    "native_and_sqlite_migration": {
+      "tests": 9,
+      "assertions": 40
+    },
+    "native_and_sqlite_catalog_pagination": {
+      "tests": 7,
+      "assertions": 107
+    },
+    "native_and_sqlite_public_related_links": {
+      "tests": 32,
+      "assertions": 142
+    },
+    "carried_as_baseline_not_relabeled_current_suite": true
+  },
+  "author_corrected_affected_native": {
+    "tests": 14,
+    "assertions": 381
+  },
+  "author_corrected_affected_sqlite": {
+    "tests": 14,
+    "assertions": 41,
+    "native_skips": 7
+  },
+  "original_failed_deadline_evidence_preserved": "1edf61e2a80b67617fa6971c21e7df2634aa15c2",
+  "original_failed_media_fixture_preserved": true,
+  "no_repeat_schema_or_cross_runtime_pdf_canaries": "Approved discovery bytes identical, current graph changes only unused PDF/font records; current MySQL affected selection freshly exercises integration.",
+  "unclaimed": "Full suite, browser/hosted matrices, every writer-writer schedule, complete transitive cardinality bound, atomic filesystem freeze, live readiness."
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\SQLiteReservedIdentityCanaryTest" file="/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/SQLiteReservedIdentityCanaryTest.php" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="0.429368">
+    <testcase name="test_foreign_table_in_guard_namespace_cannot_hide_behind_exact_later_trigger" file="/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/SQLiteReservedIdentityCanaryTest.php" line="15" class="Tests\Feature\SQLiteReservedIdentityCanaryTest" classname="Tests.Feature.SQLiteReservedIdentityCanaryTest" assertions="2" time="0.429368">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\SQLiteReservedIdentityCanaryTest::test_foreign_table_in_guard_namespace_cannot_hide_behind_exact_later_trigger
+Foreign same-name table was adopted; recovery executed 53 writes.
+
+/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/SQLiteReservedIdentityCanaryTest.php:38
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

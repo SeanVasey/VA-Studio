@@ -11,6 +11,7 @@ use App\Domain\Media\VerifiedMedia;
 use App\Domain\Rights\Models\LicenseVersion;
 use App\Domain\Rights\VerifiedLicense;
 use App\Support\CanonicalJson;
+use Carbon\CarbonInterface;
 use Illuminate\Database\QueryException;
 use Throwable;
 
@@ -87,7 +88,7 @@ class PublicationReadiness
         return array_values(array_unique($blockers));
     }
 
-    public function offerBlockers(Offer $offer): array
+    public function offerBlockers(Offer $offer, ?CarbonInterface $at = null): array
     {
         $current = $offer->currentRevision()->first();
         if (! $offer->is_active || ! $current) {
@@ -96,11 +97,11 @@ class PublicationReadiness
 
         $offer->setRelation('currentRevision', $current);
 
-        return $this->revisionBlockers($offer, $current);
+        return $this->revisionBlockers($offer, $current, $at);
     }
 
     /** Validate frozen evidence against present eligibility; never read editable commercial fields. */
-    public function revisionBlockers(Offer $offer, OfferRevision $revision): array
+    public function revisionBlockers(Offer $offer, OfferRevision $revision, ?CarbonInterface $at = null): array
     {
         if (($revision->snapshot['schema_version'] ?? null) === 2) {
             try {
@@ -111,20 +112,20 @@ class PublicationReadiness
                 return ['An intact explicit test activation is required for this exclusive revision.'];
             }
 
-            return $this->preparedExclusiveBlockers($offer, $revision);
+            return $this->preparedExclusiveBlockers($offer, $revision, $at);
         }
 
-        return $this->revisionEvidenceBlockers($offer, $revision, 1, 'non-exclusive');
+        return $this->revisionEvidenceBlockers($offer, $revision, 1, 'non-exclusive', $at);
     }
 
     /** A valid prepared revision is still inactive and unsupported by public selection/pricing. */
-    public function preparedExclusiveBlockers(Offer $offer, OfferRevision $revision): array
+    public function preparedExclusiveBlockers(Offer $offer, OfferRevision $revision, ?CarbonInterface $at = null): array
     {
-        return array_merge($this->revisionEvidenceBlockers($offer, $revision, 2, 'exclusive'),
+        return array_merge($this->revisionEvidenceBlockers($offer, $revision, 2, 'exclusive', $at),
             app(ExclusiveOfferScope::class)->blockers($revision));
     }
 
-    private function revisionEvidenceBlockers(Offer $offer, OfferRevision $revision, int $schema, string $type): array
+    private function revisionEvidenceBlockers(Offer $offer, OfferRevision $revision, int $schema, string $type, ?CarbonInterface $at = null): array
     {
         try {
             $snapshot = $revision->snapshot;
@@ -134,7 +135,7 @@ class PublicationReadiness
             $blockers = [];
             $license = LicenseVersion::find($revision->license_version_id);
             $snapshots = app(OfferSnapshot::class);
-            if (! $license || ! app(VerifiedLicense::class)->available($license) || ! hash_equals(CanonicalJson::hash($snapshot['license']), CanonicalJson::hash($snapshots->license($license)))) {
+            if (! $license || ! app(VerifiedLicense::class)->available($license, $at) || ! hash_equals(CanonicalJson::hash($snapshot['license']), CanonicalJson::hash($snapshots->license($license)))) {
                 $blockers[] = 'The published offer license or review evidence is no longer valid or effective.';
             }
             $track = Track::find($revision->track_id);
@@ -164,7 +165,7 @@ class PublicationReadiness
         }
     }
 
-    public function blockers(Track $track): array
+    public function blockers(Track $track, ?CarbonInterface $at = null): array
     {
         $blockers = [];
         if (! $track->title || ! $track->slug || ! $track->artist || ! $track->genre || ! $track->musical_key || $track->bpm < 20 || $track->bpm > 400) {
@@ -190,7 +191,7 @@ class PublicationReadiness
             $blockers[] = 'At least one active license offer is required.';
         }
         foreach ($offers as $offer) {
-            $blockers = array_merge($blockers, $this->offerBlockers($offer));
+            $blockers = array_merge($blockers, $this->offerBlockers($offer, $at));
         }
 
         return array_values(array_unique($blockers));

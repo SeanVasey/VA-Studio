@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/native-alias-selection.xml" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="15.383175">
+    <testsuite name="Independent native epoch recovery boundaries" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="15.383175">
+      <testsuite name="Tests\Feature\NativeReservedAliasCanaryTest" file="/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/NativeReservedAliasCanaryTest.php" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="15.383175">
+        <testcase name="test_native_dictionary_alias_refuses_before_creating_epoch_table_or_seed" file="/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/NativeReservedAliasCanaryTest.php" line="15" class="Tests\Feature\NativeReservedAliasCanaryTest" classname="Tests.Feature.NativeReservedAliasCanaryTest" assertions="2" time="15.383175">
+          <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\NativeReservedAliasCanaryTest::test_native_dictionary_alias_refuses_before_creating_epoch_table_or_seed
+Native trigger alias reached DDL after 3 attempted writes: SQLSTATE[HY000]: General error: 1359 Trigger already exists
+
+/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/NativeReservedAliasCanaryTest.php:37
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

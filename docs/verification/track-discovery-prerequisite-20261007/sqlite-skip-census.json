@@ -1,0 +1,37 @@
+[
+  {
+    "class": "Tests\\Feature\\DiscoverySnapshotConcurrencyTest",
+    "name": "test_committed_writers_before_final_fence_refuse_prechange_capture with data set \"unpublish\"",
+    "reason": null
+  },
+  {
+    "class": "Tests\\Feature\\DiscoverySnapshotConcurrencyTest",
+    "name": "test_committed_writers_before_final_fence_refuse_prechange_capture with data set \"rights\"",
+    "reason": null
+  },
+  {
+    "class": "Tests\\Feature\\DiscoverySnapshotConcurrencyTest",
+    "name": "test_committed_writers_before_final_fence_refuse_prechange_capture with data set \"offer\"",
+    "reason": null
+  },
+  {
+    "class": "Tests\\Feature\\DiscoverySnapshotConcurrencyTest",
+    "name": "test_committed_writers_before_final_fence_refuse_prechange_capture with data set \"license\"",
+    "reason": null
+  },
+  {
+    "class": "Tests\\Feature\\DiscoverySnapshotConcurrencyTest",
+    "name": "test_committed_writers_before_final_fence_refuse_prechange_capture with data set \"media\"",
+    "reason": null
+  },
+  {
+    "class": "Tests\\Feature\\DiscoverySnapshotConcurrencyTest",
+    "name": "test_committed_writers_before_final_fence_refuse_prechange_capture with data set \"inventory\"",
+    "reason": null
+  },
+  {
+    "class": "Tests\\Feature\\DiscoverySnapshotConcurrencyTest",
+    "name": "test_writer_waits_on_actual_final_epoch_record_and_retained_capture_then_refuses_consumption",
+    "reason": null
+  }
+]

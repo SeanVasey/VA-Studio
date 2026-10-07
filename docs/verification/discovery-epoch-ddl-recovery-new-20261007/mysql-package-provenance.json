@@ -1,0 +1,55 @@
+{
+  "native_server_version": "8.0.46-0ubuntu0.24.04.4",
+  "retrieved_utc": "2026-10-07",
+  "distribution": "Ubuntu noble-security/noble-updates MySQL 8.0 with Debian trixie rootless libaio/libmecab",
+  "ubuntu_release_signing_fingerprint": "F6ECB3762474EDA9D21B7022871920D1991BC93C",
+  "official_oracle_host_blockers": [
+    "cdn.mysql.com HTTP 403 envoy",
+    "dev.mysql.com CONNECT HTTP 403 envoy",
+    "repo.mysql.com CONNECT HTTP 403 envoy"
+  ],
+  "packages": [
+    {
+      "Package": "ubuntu-keyring",
+      "Version": "2023.11.28.1-0.2",
+      "Architecture": "all",
+      "Filename": "pool/main/u/ubuntu-keyring/ubuntu-keyring_2023.11.28.1-0.2_all.deb",
+      "SHA256": "b2e7ed48431bf9e7978ae810bbdaf253093570d6e3f864e575b7c13554b81174"
+    },
+    {
+      "Package": "libaio1t64",
+      "Version": "0.3.113-8+b1",
+      "Architecture": "amd64",
+      "Filename": "pool/main/liba/libaio/libaio1t64_0.3.113-8+b1_amd64.deb",
+      "SHA256": "490c8a2d116001a5f3b0a6d7a7aabf6a7b629366590dc5c3f75b078e931dd129"
+    },
+    {
+      "Package": "libmecab2",
+      "Version": "0.996-15.1+b6",
+      "Architecture": "amd64",
+      "Filename": "pool/main/m/mecab/libmecab2_0.996-15.1+b6_amd64.deb",
+      "SHA256": "0e22fb786aed8866839bd618722ea5b94a9956ed9fd2eb35dcadd20950cc4417"
+    },
+    {
+      "Package": "mysql-server-core-8.0",
+      "Version": "8.0.46-0ubuntu0.24.04.4",
+      "Architecture": "amd64",
+      "Filename": "pool/main/m/mysql-8.0/mysql-server-core-8.0_8.0.46-0ubuntu0.24.04.4_amd64.deb",
+      "SHA256": "a12f80479f2ba37b88670ecff246584fa8d27251104d2e5066777c4ea73d8d32"
+    },
+    {
+      "Package": "mysql-client-core-8.0",
+      "Version": "8.0.46-0ubuntu0.24.04.4",
+      "Architecture": "amd64",
+      "Filename": "pool/main/m/mysql-8.0/mysql-client-core-8.0_8.0.46-0ubuntu0.24.04.4_amd64.deb",
+      "SHA256": "0a83b500effa91ce7f7eb3f2c9c8b6e284c51230850dc0dd3b2b25dd54d624a5"
+    },
+    {
+      "Package": "libicu74",
+      "Version": "74.2-1ubuntu3.1",
+      "Architecture": "amd64",
+      "Filename": "pool/main/i/icu/libicu74_74.2-1ubuntu3.1_amd64.deb",
+      "SHA256": "c9a70989678660eed9a1e904c74fa043da8bec8e2036856fc16e31ced79b04f8"
+    }
+  ]
+}

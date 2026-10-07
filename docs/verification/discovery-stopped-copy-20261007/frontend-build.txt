@@ -1,0 +1,28 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> build
+> tsc --noEmit && vite build
+
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 622 modules transformed.
+rendering chunks...
+computing gzip size...
+public/build/manifest.json                                                    3.22 kB │ gzip:   0.54 kB
+public/build/assets/bebas-neue-latin-400-normal-Bi-ndsyu.woff                11.18 kB
+public/build/assets/bebas-neue-latin-400-normal-9mHNbWWO.woff2               13.76 kB
+public/build/assets/jetbrains-mono-latin-wght-normal-B9CIFXIH.woff2          40.40 kB
+public/build/assets/reddit-sans-latin-wght-normal-BY_1BeEl.woff2             41.84 kB
+public/build/assets/noto-sans-display-latin-standard-normal-BzqLAgZu.woff2   69.91 kB
+public/build/assets/fonts-H3OJxVPC.css                                        0.81 kB │ gzip:   0.32 kB
+public/build/assets/app-Dome0nHH.css                                         42.41 kB │ gzip:   8.80 kB
+public/build/assets/resumable-media-upload-BIElYP0d.js                        9.51 kB │ gzip:   3.42 kB
+public/build/assets/resumable-kit-upload-DBC9c9xZ.js                         10.04 kB │ gzip:   3.53 kB
+public/build/assets/app-11RoTrR-.js                                         537.37 kB │ gzip: 156.35 kB
+
+✓ built in 415ms
+[plugin builtin:vite-reporter]
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.

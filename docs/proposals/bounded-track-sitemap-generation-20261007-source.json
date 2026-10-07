@@ -1,0 +1,30 @@
+{
+  "discovery_executable": "10dcb64d9c30231bd6949fd4d00811a283e820b0",
+  "discovery_tree": "7e6ccdb4459775b67210c4d01c1413757946c418",
+  "evidence_parent": "db29d0caf30298b6f1f1a278dc680e9c571f775e",
+  "source_files": {
+    "app/Domain/Catalog/Discovery/CurrentEligibleTrackSnapshot.php": "4292c66f41e05332dc3bb1dfe41b811496d4815beea70d866d3533d518d7d1f3",
+    "app/Domain/Catalog/Discovery/DiscoveryEpoch.php": "540b5d43c02e0a100e39290598b96668a4bf6c30fd0813da6161f307bec801bf",
+    "app/Domain/Catalog/Discovery/EligibleTrackSnapshot.php": "72f1d990e90be9b3153277892678eb34a77c97ab21e3f8ca29232686c86863b3",
+    "app/Domain/Catalog/PublicationReadiness.php": "6ed1f8c2bd1f0dc4b5fea0608848cf0149c12569e29b680640fea801f6fb8c60",
+    "app/Domain/Commerce/Inventory/SelectionInventory.php": "e00a74fe35c8ab885034e49bfe38e4392174467d454740e4e6ad84b2dc078fd6",
+    "app/Domain/SiteBuilder/PublicPagesSitemap.php": "c1bded06e8edfbdc365239a681cd120ac862f1a6cd3e70a80b645cfeb9e6a12f",
+    "routes/public-discovery.php": "57543f33bf32f632b0fe48ce91a572a87bd1b543f5c0989d8a3da38f138f0fd1",
+    "docs/remaining-development-tasks.csv": "869dfa4fcafcbcfa6a3b01ba6a241a0b40f1da733c5f81ab277d3554e25965c8",
+    "docs/remaining-parity-coverage.csv": "4186a55e710c3cdcc5bf298217fc5579591da2b95e7ee91be59920e2dea26cda"
+  },
+  "index_readonly_commit": "be217e4953b11771ee94bbf310d599c5199a2279",
+  "index_files": {
+    "app/Http/Controllers/PublicDiscoveryController.php": "ed15c74aeb7b2beb54ad331846ce74cf5b092c3b3dd481f37acdb64a03ef095d",
+    "app/Domain/SiteBuilder/PublicPagesSitemap.php": "524baebfd6037baffa8d34c4adf20ad1c4eca6b3df28e4e3e66396392ff8afda"
+  },
+  "primary_protocol_url": "https://www.sitemaps.org/protocol.html",
+  "protocol_limits": {
+    "urlset_urls": 50000,
+    "index_children": 50000,
+    "uncompressed_bytes": 52428800,
+    "loc_characters_exclusive": 2048
+  },
+  "product_files_edited": [],
+  "hosted_dispatches": 0
+}

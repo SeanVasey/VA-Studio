@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/native-extra-selection.xml" tests="2" assertions="9" errors="0" failures="0" skipped="0" time="33.946483">
+    <testsuite name="Independent native epoch recovery boundaries" tests="2" assertions="9" errors="0" failures="0" skipped="0" time="33.946483">
+      <testsuite name="Tests\Feature\DiscoveryRecoveryIndependentCanaryTest" file="/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/DiscoveryRecoveryIndependentCanaryTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="19.399343">
+        <testsuite name="Tests\Feature\DiscoveryRecoveryIndependentCanaryTest::test_native_extra_metadata_drift_refuses_before_any_ddl_and_preserves_permanent_rows" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="19.399343">
+          <testcase name="test_native_extra_metadata_drift_refuses_before_any_ddl_and_preserves_permanent_rows with data set &quot;foreign check identity&quot;" file="/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/DiscoveryRecoveryIndependentCanaryTest.php" line="30" class="Tests\Feature\DiscoveryRecoveryIndependentCanaryTest" classname="Tests.Feature.DiscoveryRecoveryIndependentCanaryTest" assertions="5" time="19.399343"/>
+        </testsuite>
+      </testsuite>
+      <testsuite name="Tests\Feature\NativeCheckGroupingCanaryTest" file="/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/NativeCheckGroupingCanaryTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="14.547141">
+        <testcase name="test_different_check_grouping_cannot_be_normalized_into_owned_constraint" file="/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/NativeCheckGroupingCanaryTest.php" line="15" class="Tests\Feature\NativeCheckGroupingCanaryTest" classname="Tests.Feature.NativeCheckGroupingCanaryTest" assertions="4" time="14.547141"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

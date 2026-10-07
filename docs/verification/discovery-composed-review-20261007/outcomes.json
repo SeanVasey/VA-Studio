@@ -1,0 +1,36 @@
+{
+  "approved_executable": "9f1bda29a20a6f6936efa9b86e9731194bd3ccf7",
+  "approved_tree": "fe4be5659d1d769a0175e2a2c43da15cf1f7954d",
+  "result": "approved_final_composed_bounded_discovery_prerequisite",
+  "unresolved_findings": [],
+  "actual_native_affected": {
+    "name": "/workspace/scratch/2876616e88c3/VA-Studio-discovery-composed-review/discovery-composed-review.phpunit.xml",
+    "tests": "14",
+    "assertions": "362",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "97.274134"
+  },
+  "actual_testcase_count": 14,
+  "actual_assertions": 362,
+  "assertion_count_variation": "Concurrency await() asserts process-isRunning on each actual readiness poll; all14 cases and7 witnesses executed. This fresh count is not relabeled as author381.",
+  "before_fence_genuine_refusals": 6,
+  "after_fence_actual_record_wait_and_capture": 1,
+  "current_installed_references_verified": 158,
+  "pdf_runtime": "8.76.3",
+  "font_runtime": "4.4.1",
+  "selector_cases": 50,
+  "cadence_cases": 14,
+  "dependency_exits": {
+    "strict_validate": 0,
+    "platform": 0,
+    "audit": 0
+  },
+  "audit_advisories": 0,
+  "audit_abandoned": 0,
+  "carried_leaf_evidence": "03ecc0dc7f0c138b6412f5d02cd65c2529178feb",
+  "full_or_hosted_browser_matrix": false,
+  "live_effect": false,
+  "fresh_runner_app_key_retained": false
+}

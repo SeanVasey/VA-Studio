@@ -1,0 +1,22 @@
+✔ a reviewed additive copy upgrade preserves original bytes, every old cell, key, session and business sequence (3003.80097ms)
+✔ a genuine crash-retained WAL and SHM are captured without opening or checkpointing the original database (2643.756387ms)
+✔ real authenticated HTTP sessions survive copy upgrade and restart while private paths and checkout remain blocked (6761.994837ms)
+✔ unchanged row counts do not hide a rewritten old value or timestamp; only the unavailable copy is affected (2835.79398ms)
+✔ old SQLite business sequence changes refuse even when all table rows remain identical (2504.301966ms)
+✔ removing an old CHECK refuses even when every column, row and business sequence remains identical (2576.895209ms)
+✔ BLOB to TEXT storage-class rewriting refuses despite identical retained binary bytes and row counts (2303.687227ms)
+✔ migration failure retains an unavailable destination and hides its raw exception without touching the original (2620.839801ms)
+✔ locked source, overlapping destination and explicit copy budget refuse before destination creation (2543.399799ms)
+✔ in-flight destination never starts and another copy operation cannot reuse the same source (4518.428875ms)
+✔ a moved, tampered or unreviewed source refuses without exposing or overwriting existing content (2814.186384ms)
+✔ tracked-source mutation, ignored executable migration and retrospective migration rewriting refuse (4627.719791ms)
+✔ Git replacement refs and executable-mode drift cannot redefine an exact reviewed checkout (2730.15771ms)
+✔ source descendant links and an unsafe target ancestor refuse without copying or mutating private bytes (2303.259855ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 53362.272619

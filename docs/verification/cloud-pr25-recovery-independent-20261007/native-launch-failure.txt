@@ -1,0 +1,3 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Cannot open bootstrap script "/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/vendor/autoload.php"

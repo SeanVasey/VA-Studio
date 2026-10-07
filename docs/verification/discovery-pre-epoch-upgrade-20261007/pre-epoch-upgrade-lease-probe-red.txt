@@ -1,0 +1,31 @@
+✖ exact historical pre-epoch installation upgrades through genuine stopped-copy CLI without rewriting old evidence (1273.27798ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1365.478251
+
+✖ failing tests:
+
+test at docs/verification/discovery-pre-epoch-upgrade-20261007/pre-epoch-upgrade-canary.mjs:28:1
+✖ exact historical pre-epoch installation upgrades through genuine stopped-copy CLI without rewriting old evidence (1273.27798ms)
+  AssertionError [ERR_ASSERTION]: Persistent workspace isolation or operation failed. Retained files were not reset or removed.
+
+
+  1 !== 0
+
+      at php (file:///workspace/scratch/2876616e88c3/VA-Studio-pre-epoch-upgrade-new/docs/verification/discovery-pre-epoch-upgrade-20261007/pre-epoch-upgrade-canary.mjs:18:9)
+      at TestContext.<anonymous> (file:///workspace/scratch/2876616e88c3/VA-Studio-pre-epoch-upgrade-new/docs/verification/discovery-pre-epoch-upgrade-20261007/pre-epoch-upgrade-canary.mjs:35:4)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

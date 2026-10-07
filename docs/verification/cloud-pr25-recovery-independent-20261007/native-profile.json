@@ -1,0 +1,11 @@
+{
+    "version": "8.0.46-0ubuntu0.24.04.4",
+    "owned_database": "vaseyaudio_pr25_review",
+    "flush_at_commit": 1,
+    "sync_binlog": 1,
+    "doublewrite": "ON",
+    "log_bin": 0,
+    "case_mode": 0,
+    "epoch_origin": "\/workspace\/VA-Studio-pr25-recovery-review\/app\/Domain\/Catalog\/Discovery\/DiscoveryEpoch.php",
+    "recovery_test_origin": "\/workspace\/VA-Studio-pr25-recovery-review\/tests\/Feature\/DiscoveryEpochRecoveryTest.php"
+}
