@@ -151,8 +151,8 @@ final class WorkIdentityNotice
         if ($selector['purpose'] === 'recover') {
             $account = $database->rows->one('customer_accounts', (int) $selector['bound_account_id']);
             $origin = $database->rows->one('production_identity_origins', (int) $selector['bound_origin_id']);
-            if ($requireEligible && ($user === [] || $account === [] || $origin === [] || (int) $user['is_admin'] !== 0 || $user['email_verified_at'] === null
-                || (int) $account['active'] !== 1 || (int) $account['user_id'] !== (int) $user['id']
+            if ($requireEligible && ($user === [] || $account === [] || $origin === [] || (string) $user['is_admin'] !== '0' || $user['email_verified_at'] === null
+                || (string) $account['active'] !== '1' || (int) $account['user_id'] !== (int) $user['id']
                 || (int) $account['access_version'] !== (int) $selector['bound_access_version'] || (int) $origin['account_id'] !== (int) $account['id']
                 || (int) $origin['user_id'] !== (int) $user['id'] || $origin['provenance'] !== $selector['provenance']
                 || ! hash_equals($selector['bound_credential_binding'], IdentityPolicy::digest('credential', $user['password']))

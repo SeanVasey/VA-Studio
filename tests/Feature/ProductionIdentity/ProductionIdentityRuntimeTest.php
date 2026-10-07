@@ -143,6 +143,21 @@ class ProductionIdentityRuntimeTest extends TestCase
         $this->assertSame(0, DB::table('production_identity_verifications')->count());
     }
 
+    public function test_unknown_permanent_role_flag_never_counts_as_nonstaff_customer_authority(): void
+    {
+        $identity = $this->enrollThroughLocalSmtp();
+        try {
+            DB::connection()->getPdo()->exec("UPDATE users SET is_admin='withdrawn'");
+        } catch (\PDOException) {
+            $this->assertSame('mysql', DB::getDriverName());
+            $this->assertSame(0, (int) DB::table('users')->value('is_admin'));
+
+            return;
+        }
+        $this->assertTrue($identity['user']->fresh()->is_admin);
+        $this->assertNull((new ProductionCustomerSessions)->authenticate('buyer@example.test', 'MailboxPassword123'));
+    }
+
     public function test_caller_owned_foreign_pdo_reader_is_never_used_for_current_or_historical_identity(): void
     {
         $identity = $this->enrollThroughLocalSmtp();
