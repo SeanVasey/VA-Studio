@@ -1,0 +1,27 @@
+{
+  "origin": "https://github.com/SeanVasey/VA-Studio.git",
+  "observed_at_utc": "2026-10-07T12:03:00.269164+00:00",
+  "verified_by": "git ls-remote --heads origin (all14 owned exact refs)",
+  "observed_remote_heads_at_first_publication": {
+    "codex/cloud-listening-independent-composed-20261007": "32e33ef957074d2da68c8b774603e338d9cbbcc1",
+    "codex/cloud-recovery-inventory-20261007": "147affc207c14baa7d4a96f9ef605e19868b34bd",
+    "codex/discovery-schema-namespace-repair-20261007": "8cf82db12086d2579390882ccbc6a24eaf63a9c6",
+    "codex/membership-billing-operations-handoff-20261007": "12182fcb237dd4b6b738a04d58933747ef0150d0",
+    "codex/new-discovery-sitemap-worker-20261007": "1b7625b07200f2c2e8c4856409aae56cebd3b2dd",
+    "codex/private-support-attachments-20261007": "419627bb4e72a18ce7fd724860667cd0e063f574",
+    "codex/production-free-identity-independent-20261007": "fbd3d56bba11f187c528018c5b0bf51e89a4eb4f",
+    "codex/production-member-original-preparation-20261007": "fb573a410cda76dd97884e81bc8e15437831a9ae",
+    "codex/production-membership-preparation-20261007": "7fa3c62e61fae6e98e61e75eb0451edd588683d0",
+    "codex/recovered-install-checkout-ui-20261007": "ddd7c58d9914aeaeb1da782cfee8dc3dfffb8dfd",
+    "codex/support-committed-read-closure-20261007": "db62b00a20b3a8a547194d211ebdd53484a32a70",
+    "codex/support-pr35-composition-independent-20261007": "de314e2fb6fec289ae2a349867f7a7218d2f0827",
+    "codex/support-session-independent-20261007": "15c9e34630966243ce92783dbacf167f908262ee",
+    "codex/support-test-lifecycle-independent-20261007": "662d5baec69a7f98b5fee5722df0d2819712b3e4"
+  },
+  "no_force_push": true,
+  "no_main_merge_or_PR_or_hosted_dispatch": true,
+  "handoff_branch_note": "This receipt is a docs-only descendant of initially published12182fcb. Its final branch head is independently checked after receipt commit and reported to root; earlier14-head observation remains an immutable point-in-time receipt.",
+  "new_rows_source": "3cd105667a76bb15443a9fd0119065effda8bb34",
+  "new_rows_independent_review": "pending",
+  "billing_259_and_host_ops": "queued plans only; no new operative implementation"
+}
