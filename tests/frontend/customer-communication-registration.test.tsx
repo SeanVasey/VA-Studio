@@ -8,7 +8,7 @@ vi.mock('../../resources/js/components/OwnedTestOrderHistory', () => ({ OwnedTes
 vi.mock('../../resources/js/components/CustomerOrderLookup', () => ({ CustomerOrderLookup: () => null }));
 const props = { testOnly: true as const, siteContent: defaultSiteContent, customer: { name: 'Synthetic account' } };
 const scope = 'a'.repeat(32);
-const preferences = { schema: 1, purposes: [{ purpose: 'email_marketing', version: 0, status: 'unknown', canGrant: true,
+const preferences = { schema: 1, purposes: [{ purpose: 'email_marketing', version: 0, status: 'unknown', canGrant: true, suppression: { status: 'not_requested' },
   notice: { version: 'synthetic-v1', hash: 'b'.repeat(64), text: 'PRIVATE synthetic notice for the current account.' } }] };
 const json = (value: unknown) => new Response(JSON.stringify(value), { status: 200, headers: { 'Content-Type': 'application/json' } });
 afterEach(() => { vi.restoreAllMocks(); document.cookie = 'XSRF-TOKEN=; Max-Age=0; path=/'; });

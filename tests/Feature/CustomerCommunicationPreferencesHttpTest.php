@@ -28,12 +28,16 @@ final class CustomerCommunicationPreferencesHttpTest extends TestCase
         $this->login($fixture);
         $this->get(self::PATH)->assertOk()->assertJsonPath('preferences.purposes.0.status', 'unknown')
             ->assertJsonPath('preferences.purposes.0.version', 0)->assertJsonPath('preferences.purposes.0.canGrant', true)
+            ->assertJsonPath('preferences.purposes.0.suppression.status', 'not_requested')
             ->assertDontSee($fixture['user']->email, false)->assertDontSee($fixture['account']->owner_key, false);
         $this->postJson(self::PATH, ConsentFixtures::grant())->assertOk()->assertJsonPath('preferences.purposes.0.status', 'granted')
             ->assertJsonPath('preferences.purposes.0.version', 1);
         config(['customer-preferences.test_grants_enabled' => false, 'customer-preferences.email_marketing' => null]);
         $this->postJson(self::PATH, ConsentFixtures::withdraw(1))->assertOk()->assertJsonPath('preferences.purposes.0.status', 'withdrawn')
-            ->assertJsonPath('preferences.purposes.0.version', 2)->assertJsonPath('preferences.purposes.0.canGrant', false);
+            ->assertJsonPath('preferences.purposes.0.version', 2)->assertJsonPath('preferences.purposes.0.canGrant', false)
+            ->assertJsonPath('preferences.purposes.0.suppression.status', 'pending');
+        $this->assertSame(1, DB::table('customer_suppression_intents')->count());
+        $this->assertSame(0, DB::table('customer_suppression_attempts')->count());
         ConsentFixtures::configure();
         $this->postJson(self::PATH, ConsentFixtures::grant(1))->assertStatus(409)->assertJsonPath('code', 'CUSTOMER_PREFERENCES_UNAVAILABLE');
         $this->assertSame(2, DB::table('customer_consent_events')->count());
