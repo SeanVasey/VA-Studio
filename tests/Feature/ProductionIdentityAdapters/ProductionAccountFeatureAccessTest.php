@@ -137,6 +137,60 @@ final class ProductionAccountFeatureAccessTest extends TestCase
         }
     }
 
+    public static function terminalConnections(): array
+    {
+        return [['lazy', false], ['unresolved', false], ['resolved', true]];
+    }
+
+    #[DataProvider('terminalConnections')]
+    public function test_ordinary_terminal_connection_admission_precedes_policy_and_preserves_normal_rollback(string $mode, bool $expectedCommit): void
+    {
+        $identity = $this->enrollThroughLocalSmtp();
+        $this->enable();
+        $access = new ProductionAccountFeatureAccess;
+        $owner = $access->forRequest($this->requestFor($identity), 'listening_library');
+        $primary = DB::connection()->getPdo();
+        $name = 'feature_ordinary_terminal';
+        config(['database.connections.'.$name => config('database.connections.'.DB::getDefaultConnection())]);
+        DB::unprepared('CREATE TABLE feature_ordinary_fixture (id INTEGER PRIMARY KEY)');
+        $callbacks = 0;
+        $committed = false;
+        try {
+            try {
+                DB::transaction(function () use ($access, $owner, $name, $mode, &$callbacks): void {
+                    $reader = $this->reader();
+                    $raw = $access->lock($owner, $reader);
+                    DB::table('feature_ordinary_fixture')->insert(['id' => 1]);
+                    $secondary = DB::connection($name);
+                    $secondaryPdo = $secondary->getPdo();
+                    if ($mode === 'lazy') {
+                        $secondary->setPdo(function () use ($secondaryPdo, &$callbacks) {
+                            $callbacks++;
+                            config(['production-account-features.enabled' => false]);
+
+                            return $secondaryPdo;
+                        });
+                    } elseif ($mode === 'unresolved') {
+                        $secondary->setPdo(null);
+                    }
+                    $access->proveCurrent($owner, $reader, $raw);
+                });
+                $committed = true;
+            } catch (IdentityException) {
+                $this->assertFalse($expectedCommit, 'An already resolved idle connection must remain compatible.');
+            }
+            $this->assertSame($expectedCommit, $committed);
+            $this->assertSame(0, $callbacks, 'Terminal admission must not execute a lazy secondary resolver.');
+            $this->assertTrue(config('production-account-features.enabled'));
+            $this->assertSame($expectedCommit ? 1 : 0, DB::table('feature_ordinary_fixture')->count());
+            $this->assertSame(0, DB::transactionLevel());
+            $this->assertFalse($primary->inTransaction());
+        } finally {
+            DB::purge($name);
+            DB::unprepared('DROP TABLE feature_ordinary_fixture');
+        }
+    }
+
     public function test_default_off_missing_marker_unknown_feature_and_serialization_are_refused(): void
     {
         $identity = $this->enrollThroughLocalSmtp();
