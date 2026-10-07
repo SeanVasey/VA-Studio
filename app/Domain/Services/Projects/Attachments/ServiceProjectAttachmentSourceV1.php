@@ -147,6 +147,14 @@ final class ServiceProjectAttachmentSourceV1 implements AttachmentSourceToken, J
         $database = $driver === 'mysql' ? $this->primary->query('SELECT DATABASE()')->fetchColumn() : 'main';
         $environment = $application->environment();
         $flags = [$config->get('services-projects.test_enabled'), $config->get('customer.test_accounts_enabled')];
+        $credentialKey = $config->get('app.key');
+        AttachmentException::require(is_string($credentialKey) && $credentialKey !== '', 403);
+        $credentialKeyHash = hash('sha256', $credentialKey);
+        $keyMatches = static function () use ($config, $credentialKeyHash): bool {
+            $key = $config->get('app.key');
+
+            return is_string($key) && $key !== '' && hash_equals($credentialKeyHash, hash('sha256', $key));
+        };
         $panel = $this->actor->audience === 'operator' ? Filament::getPanel('admin') : null;
         $gate = $this->actor->audience === 'operator' ? Gate::getFacadeRoot() : null;
         $panelPolicy = $panel === null ? null : [$panel->isMultiFactorAuthenticationRequired(), $panel->getMultiFactorAuthenticationProviders()];
@@ -156,8 +164,9 @@ final class ServiceProjectAttachmentSourceV1 implements AttachmentSourceToken, J
         }
         $this->proveCurrent($rows);
         AttachmentException::require([$config->get('services-projects.test_enabled'), $config->get('customer.test_accounts_enabled')] === $flags, 404);
+        AttachmentException::require($keyMatches(), 403);
 
-        return function () use ($application, $config, $manager, $connection, $driver, $prefix, $name, $database, $environment, $flags, $panel, $gate, $panelPolicy, $tables): void {
+        return function () use ($application, $config, $manager, $connection, $driver, $prefix, $name, $database, $environment, $flags, $panel, $gate, $panelPolicy, $tables, $keyMatches): void {
             AttachmentException::require($this->committed && ! $this->valid, 503);
             // These getters and Gate/MFA providers can evaluate arbitrary closures. All run
             // before the final permanent actor/source reads; this phase is callback-capable.
@@ -216,6 +225,7 @@ final class ServiceProjectAttachmentSourceV1 implements AttachmentSourceToken, J
             usort($events, fn (array $first, array $second): int => (int) $first['number'] <=> (int) $second['number']);
             AttachmentException::require($projects === [$this->graph['project']] && $events === $this->graph['events'], 409);
             // No service/container/model/provider resolution follows these raw evidence reads.
+            AttachmentException::require($keyMatches(), 403);
             AttachmentException::require($currentEnvironment === $environment && in_array($currentEnvironment, ['local', 'testing'], true)
                 && $config->get('services-projects.test_enabled') === true
                 && [$config->get('services-projects.test_enabled'), $config->get('customer.test_accounts_enabled')] === $flags
