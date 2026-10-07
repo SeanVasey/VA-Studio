@@ -1,0 +1,10 @@
+{
+  "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies",
+  "node": "v24.19.0",
+  "sqlite": "3.46.1",
+  "autoloadOrigins": [
+    "App\\Domain\\Customers\\Preferences\\Suppression\\SuppressionDelivery=/workspace/VA-Studio-customer-suppression/app/Domain/Customers/Preferences/Suppression/SuppressionDelivery.php",
+    "App\\Domain\\Customers\\Preferences\\Suppression\\SuppressionSchema=/workspace/VA-Studio-customer-suppression/app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php",
+    "Tests\\Feature\\CustomerSuppressionTest=/workspace/VA-Studio-customer-suppression/tests/Feature/CustomerSuppressionTest.php"
+  ]
+}

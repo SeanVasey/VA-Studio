@@ -1,0 +1,33 @@
+[
+  {
+    "name": "php-focused",
+    "command": [
+      "/workspace/.va-studio-toolchain/bin/php",
+      "vendor/bin/phpunit",
+      "tests/Feature/CustomerSuppressionTest.php",
+      "tests/Feature/CustomerSuppressionMigrationTest.php",
+      "tests/Feature/CustomerConsentPreferencesTest.php",
+      "tests/Feature/CustomerConsentBoundaryTest.php",
+      "--log-junit",
+      "docs/verification/customer-suppression-20261007/php-focused-junit.xml"
+    ],
+    "exitCode": 0
+  },
+  {
+    "name": "pint",
+    "command": [
+      "/workspace/.va-studio-toolchain/bin/php",
+      "vendor/bin/pint",
+      "--test",
+      "app/Domain/Customers/Preferences/Suppression",
+      "app/Domain/Customers/Preferences/CustomerConsentPreferences.php",
+      "config/customer-suppression.php",
+      "database/migrations/2026_10_07_251000_customer_suppression.php",
+      "tests/Support/SuppressionFixtures.php",
+      "tests/Feature/CustomerSuppressionTest.php",
+      "tests/Feature/CustomerSuppressionMigrationTest.php",
+      "tests/Feature/CustomerConsentPreferencesTest.php"
+    ],
+    "exitCode": 0
+  }
+]
