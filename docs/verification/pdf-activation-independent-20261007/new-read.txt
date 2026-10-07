@@ -1,0 +1,1 @@
+{"phase":"new-read","result":"passed","actual_old_pdf_read_under_new_runtime":true,"missing_original_restore_only":true,"exact_backup_restore":true,"all_retained_schema_rows_migrations_unchanged":true,"pdf_sha256":"c5761ca32f0aeb87b2571a0521cf947b29d3aefa2ee279be6d3ffaceb600ffbf","bytes":842536,"new_provider_calls":0}

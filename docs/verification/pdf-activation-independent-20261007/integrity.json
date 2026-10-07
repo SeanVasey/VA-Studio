@@ -1,0 +1,58 @@
+{
+  "reviewed_executable": "fab8677007aa3ae8f9639673d7eafcd22428eff2",
+  "author_evidence_commit": "9cb38f3916ce6e61cc28f95b42bdfe64a452e1eb",
+  "author_artifact_digests_verified": 33,
+  "author_artifact_manifest_sha256": "715f1597f4aacf9c474fc9f72415ab5b85c2f112c8ac1f2686abfdcad58f765b",
+  "own_new_runtime_expected_package_references_verified": 158,
+  "own_old_runtime_expected_predecessor_package_references_verified": 158,
+  "intentional_old_installed_runtime_candidate_lock_differences": [
+    "tecnickcom/tc-lib-pdf",
+    "tecnickcom/tc-lib-pdf-font"
+  ],
+  "actual_graph_identities": {
+    "tecnickcom/tc-lib-pdf": {
+      "old": {
+        "version": "8.76.2",
+        "reference": "c383bd3ac09164c3fd1a6ac7da8f5460d19e47e3"
+      },
+      "new": {
+        "version": "8.76.3",
+        "reference": "d417129fad37d49dc9fc0d1e229e9740e1c774a3"
+      }
+    },
+    "tecnickcom/tc-lib-pdf-font": {
+      "old": {
+        "version": "4.4.0",
+        "reference": "658e04565534c0cdd3d8d7ff12f1c6ebeab5f7ce"
+      },
+      "new": {
+        "version": "4.4.1",
+        "reference": "a78b8e0ac9284d1594b6ba68488cf65c3e958f7b"
+      }
+    }
+  },
+  "protected_source_paths_unchanged": [
+    ".github",
+    "AGENTS.md",
+    "composer.json",
+    "package.json",
+    "package-lock.json",
+    "database/migrations",
+    "resources/contracts/test-v1",
+    "resources/contracts/test-v2",
+    "app/Domain/Contracts/ContractText.php",
+    "app/Domain/Contracts/TcpdfContractRenderer.php",
+    "app/Domain/Contracts/TcpdfV2ContractRenderer.php",
+    "app/Domain/Contracts/VersionedContractRenderer.php",
+    "app/Domain/Contracts/ReadGrantContract.php",
+    "app/Domain/Contracts/RequestTestContract.php",
+    "app/Domain/Contracts/RenderTestContract.php",
+    "app/Domain/Contracts/ContractWork.php",
+    "scripts/ops"
+  ],
+  "stopped_copy_test_source": "7e8aee0cb3099507c9856bd753b540db5d203f1b",
+  "stopped_copy_to_final_only_test_fixture_changes": [
+    "tests/Feature/TestContractSuccessorActivationTest.php"
+  ],
+  "no_application_config_lock_ops_build_delta_from_stopped_copy_source": true
+}

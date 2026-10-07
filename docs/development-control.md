@@ -1,5 +1,41 @@
 # Current development queue
 
+## Atomic PDF adoption and ongoing independent prerequisites — October 7 UTC
+
+PR #23 merged at `43b919c4f5cef9bb259515904333a7aa20dcb6fb`, tree
+`29ee4d19462651fe758f10fa3894f52e5677720b`, after exact-head cheap preflight
+37574089517 attempt 1 passed. Fresh main/PR/tree and ordered-parent readbacks
+verified the reviewed canonical root sitemap index and environment-aware robots.
+
+The [atomic PDF adoption](verification/pdf-activation-composition-20261007/README.md)
+selects `test-buyer-pdf-v2` / `test-contract-issuance-v2` with exactly PDF 8.76.3
+and font 4.4.1. Local executable `254c488` equals native `727de5fb`, tree
+`715f8c6d`, with PR #23 as parent; nine paths match approved `fab8677`. Fresh
+independent composed seven-file checks passed 144/820 without errors/failures/skips
+on all 158 installed references; strict/platform/audit passed. Independent actual
+old-worker creation and new-runtime recovery preserve the same 842,536-byte v1
+original and all 59 migration records through missing-original/backup restoration.
+Historical pending-v1 work retains its request and quarantines absent runtime
+without v2 substitution; completed originals remain restore-only. Issuance stays
+default-off/test-only and old configuration refuses new capture. Exact 22 changed
+lock lines equal current PR #3. Close that bot PR only after the reviewed atomic
+replacement passes cheap preflight and expected-head merge. No old bot CI is copied.
+
+Two independent implementation lanes continue: bounded current eligible-track
+capture with a transactional invalidation epoch and real rollback/native race
+proof; and authenticated read-only amount requirements from immutable D26 packets.
+The latter keeps tax/total unknown and every buyer/provider/payable/purchase flag
+false; D27 staff reports never establish buyer action. Neither exposes a new
+public provider/sitemap endpoint. Exact source/evidence and independent sensitive
+review precede publication. Track manifest consumption follows its prerequisite.
+
+The corrected low-cost policy remains focused local checks, one cheap preflight
+per coherent final batch and expected-head development merges. Full final native/
+browser/Foundation acceptance is manual exact expected_sha. Production commerce,
+actual provider/tax/buyer facts, legacy provenance, deployment and cutover remain
+separate gates. Dated prior current-v1/pending states are superseded by this record
+only for the candidate adoption; they retain their original source-bound evidence.
+
 ## Merged PDF seam and bounded index/robots — October 7 UTC
 
 PR #22 merged at `e4cf4c164ed28890af560c00e19a3cdda76f0240`, tree

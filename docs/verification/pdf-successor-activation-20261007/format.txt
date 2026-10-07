@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"tests\/Support\/ContractFixtures.php","fixers":["class_attributes_separation","fully_qualified_strict_types","braces_position","statement_indentation","ordered_imports"]},{"path":"tests\/Unit\/ContractRenderProfileRegistryTest.php","fixers":["fully_qualified_strict_types","ordered_imports"]}]}

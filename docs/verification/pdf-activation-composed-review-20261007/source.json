@@ -1,0 +1,106 @@
+{
+  "reviewed_executable": "254c488247206ddf95f3be2943b2064601f3b97d",
+  "reviewed_tree": "715f8c6d131faf7c7e084ba6e98e6552d5a07bcd",
+  "preserved_integrated_baseline": "be217e4953b11771ee94bbf310d599c5199a2279",
+  "approved_leaf": "fab8677007aa3ae8f9639673d7eafcd22428eff2",
+  "carried_review_commit": "560904c76be66ef45a2966df9888f60eef6395cb",
+  "baseline_paths": 2127,
+  "unchanged_baseline_paths": 2119,
+  "modified_baseline_paths": [
+    "app/Domain/Contracts/ContractIssuancePolicy.php",
+    "app/Domain/Contracts/ContractRenderProfileRegistry.php",
+    "composer.lock",
+    "config/contracts.php",
+    "tests/Feature/TestContractProfileSuccessorTest.php",
+    "tests/Support/ContractFixtures.php",
+    "tests/Unit/ContractRenderProfileRegistryTest.php",
+    "tests/Unit/TcpdfContractRendererTest.php"
+  ],
+  "added_paths": [
+    "tests/Feature/TestContractSuccessorActivationTest.php"
+  ],
+  "removed_paths": [],
+  "all_nine_git_entries_and_sha256_exact_approved_leaf": true,
+  "exact_carry": {
+    "app/Domain/Contracts/ContractIssuancePolicy.php": {
+      "mode": "100644",
+      "type": "blob",
+      "object": "0f8718a227fe937bb77f2aa0def013c4cbe8f452",
+      "sha256": "9f0de213790e3ae91141aa8b866750f24c7dc3198671db2ec56b7f5f1795e01d"
+    },
+    "app/Domain/Contracts/ContractRenderProfileRegistry.php": {
+      "mode": "100644",
+      "type": "blob",
+      "object": "4299671f8dbb7a62440286b774744f624e8171f2",
+      "sha256": "d6718f8f0d962679da3b6429c0edcfba76db223df216c03c99d0710f03e272e7"
+    },
+    "composer.lock": {
+      "mode": "100644",
+      "type": "blob",
+      "object": "9e58027dcd989282b026d56347e26ea867723db9",
+      "sha256": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9"
+    },
+    "config/contracts.php": {
+      "mode": "100644",
+      "type": "blob",
+      "object": "715f55ad100b3a110bbaa6eeecdd16bd7692ad9c",
+      "sha256": "6058568761d4abfa275155937a7467cbb25125f1cd5081f912d55a69359a93b4"
+    },
+    "tests/Feature/TestContractProfileSuccessorTest.php": {
+      "mode": "100644",
+      "type": "blob",
+      "object": "8f40658619b6b1b3913aefdca6e2c8809810ea75",
+      "sha256": "332d18918e5f754554792bb6eef61f4c03302c7456e39747f35a674a368ce82c"
+    },
+    "tests/Feature/TestContractSuccessorActivationTest.php": {
+      "mode": "100644",
+      "type": "blob",
+      "object": "de0f3956d5b8a588526eabc8e2faf0e5e28901f6",
+      "sha256": "b6ef4e964d21d39713e6ec661c26f19796ee5481ed55bff8c79ce033d1a6eb2a"
+    },
+    "tests/Support/ContractFixtures.php": {
+      "mode": "100644",
+      "type": "blob",
+      "object": "ec6959ea57fb99266826e968b0ddd7ddafc7db32",
+      "sha256": "b41f45ee4fef2969e4cb3292d2d810902c13be7b140da85201ea7950f634ad62"
+    },
+    "tests/Unit/ContractRenderProfileRegistryTest.php": {
+      "mode": "100644",
+      "type": "blob",
+      "object": "24fb991c8582d30aff4e176f6edfb1f1b262bd01",
+      "sha256": "8e75f10452d963e98bcb19e03609154e6bfdea7084e1491abc4146d888544391"
+    },
+    "tests/Unit/TcpdfContractRendererTest.php": {
+      "mode": "100644",
+      "type": "blob",
+      "object": "f2e9b5bf58a6ea96d08e37b4b5db0deb1bf03617",
+      "sha256": "f22eee839d724021594d35f6e966d53196d10824d09541cdadf0679a2b18cd12"
+    }
+  },
+  "preserved_path_map_sha256": "a55b6b121d6457542e81eab5f25e6e7e1d27f139297903e1f6c935dc2b87b1b7",
+  "lock_package_records_only": [
+    "tecnickcom/tc-lib-pdf",
+    "tecnickcom/tc-lib-pdf-font"
+  ],
+  "non_package_lock_fields_unchanged": true,
+  "candidate_lock_byte_exact_approved_leaf": true,
+  "protected_baseline_paths_unchanged": [
+    ".github",
+    "AGENTS.md",
+    "composer.json",
+    "package.json",
+    "package-lock.json",
+    "database/migrations",
+    "resources/contracts/test-v1",
+    "resources/contracts/test-v2",
+    "app/Domain/Contracts/TcpdfContractRenderer.php",
+    "app/Domain/Contracts/TcpdfV2ContractRenderer.php",
+    "app/Domain/Contracts/VersionedContractRenderer.php",
+    "app/Domain/Contracts/ReadGrantContract.php",
+    "app/Domain/Contracts/RequestTestContract.php",
+    "app/Domain/Contracts/RenderTestContract.php",
+    "app/Domain/Contracts/ContractWork.php",
+    "scripts/ops"
+  ],
+  "cross_runtime_canaries_carried_without_rerun": true
+}

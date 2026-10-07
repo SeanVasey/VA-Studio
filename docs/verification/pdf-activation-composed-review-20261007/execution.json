@@ -1,0 +1,20 @@
+{
+  "executed_source": "254c488247206ddf95f3be2943b2064601f3b97d",
+  "executed_tree": "715f8c6d131faf7c7e084ba6e98e6552d5a07bcd",
+  "command": [
+    "/workspace/scratch/0c039e9e0645/runtime-recovery/bin/php",
+    "-d",
+    "memory_limit=512M",
+    "vendor/bin/phpunit",
+    "-c",
+    "activation-composed-focused.phpunit.xml",
+    "--fail-on-empty-test-suite",
+    "--fail-on-warning",
+    "--log-junit",
+    "docs/verification/pdf-activation-composed-review-20261007/tests.xml"
+  ],
+  "fresh_ephemeral_app_key": true,
+  "issuance_environment_variables_removed": true,
+  "exit_code": 0,
+  "private_key_retained": false
+}

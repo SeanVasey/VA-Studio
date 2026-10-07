@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\TestContractSuccessorActivationTest" file="/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/tests/Feature/TestContractSuccessorActivationTest.php" tests="4" assertions="36" errors="0" failures="1" skipped="0" time="7.909129">
+    <testcase name="test_explicit_legacy_policy_is_refused_before_current_request_capture" file="/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/tests/Feature/TestContractSuccessorActivationTest.php" line="75" class="Tests\Feature\TestContractSuccessorActivationTest" classname="Tests.Feature.TestContractSuccessorActivationTest" assertions="3" time="2.235210"/>
+    <testcase name="test_exact_v2_policy_captures_real_request_and_worker_preserves_one_original" file="/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/tests/Feature/TestContractSuccessorActivationTest.php" line="90" class="Tests\Feature\TestContractSuccessorActivationTest" classname="Tests.Feature.TestContractSuccessorActivationTest" assertions="15" time="2.227116"/>
+    <testcase name="test_pending_v1_preserves_request_and_never_substitutes_current_v2_on_absent_runtime" file="/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/tests/Feature/TestContractSuccessorActivationTest.php" line="128" class="Tests\Feature\TestContractSuccessorActivationTest" classname="Tests.Feature.TestContractSuccessorActivationTest" assertions="8" time="1.659363">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\TestContractSuccessorActivationTest::test_pending_v1_preserves_request_and_never_substitutes_current_v2_on_absent_runtime
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
++    'id' =&gt; 1,
+     'public_id' =&gt; 'c4364abf-aa3f-4e1d-82a2-fd8218138c32',
+     'license_grant_id' =&gt; 1,
+     'fulfillment_outbox_id' =&gt; 1,
+@@ @@
+     'canonicalization_version' =&gt; 'vasey-json-v1',
+     'document_public_id' =&gt; '7294fc58-a0a0-493c-83bb-a325b12fa28a',
+     'created_at' =&gt; '2026-10-07 04:49:32',
+-    'id' =&gt; 1,
+ ]
+
+/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/tests/Feature/TestContractSuccessorActivationTest.php:148</failure>
+    </testcase>
+    <testcase name="test_retained_v1_original_reads_remain_available_and_missing_bytes_are_restore_only" file="/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/tests/Feature/TestContractSuccessorActivationTest.php" line="154" class="Tests\Feature\TestContractSuccessorActivationTest" classname="Tests.Feature.TestContractSuccessorActivationTest" assertions="10" time="1.787440"/>
+  </testsuite>
+</testsuites>

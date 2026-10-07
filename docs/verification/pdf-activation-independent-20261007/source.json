@@ -1,0 +1,22 @@
+{
+  "reviewed_executable": "fab8677007aa3ae8f9639673d7eafcd22428eff2",
+  "tree": "2f11621d51784d525a1f14e130c7f6d8c3719189",
+  "base": "e7c5a389ebf655fb0d62d1ed3b4e3e750b46c177",
+  "changed_package_records_only": [
+    "tecnickcom/tc-lib-pdf",
+    "tecnickcom/tc-lib-pdf-font"
+  ],
+  "full_candidate_lock_exact_experimental_projection": true,
+  "changed_path_sha256": {
+    "app/Domain/Contracts/ContractIssuancePolicy.php": "9f0de213790e3ae91141aa8b866750f24c7dc3198671db2ec56b7f5f1795e01d",
+    "app/Domain/Contracts/ContractRenderProfileRegistry.php": "d6718f8f0d962679da3b6429c0edcfba76db223df216c03c99d0710f03e272e7",
+    "composer.lock": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9",
+    "config/contracts.php": "6058568761d4abfa275155937a7467cbb25125f1cd5081f912d55a69359a93b4",
+    "tests/Feature/TestContractProfileSuccessorTest.php": "332d18918e5f754554792bb6eef61f4c03302c7456e39747f35a674a368ce82c",
+    "tests/Feature/TestContractSuccessorActivationTest.php": "b6ef4e964d21d39713e6ec661c26f19796ee5481ed55bff8c79ce033d1a6eb2a",
+    "tests/Support/ContractFixtures.php": "b41f45ee4fef2969e4cb3292d2d810902c13be7b140da85201ea7950f634ad62",
+    "tests/Unit/ContractRenderProfileRegistryTest.php": "8e75f10452d963e98bcb19e03609154e6bfdea7084e1491abc4146d888544391",
+    "tests/Unit/TcpdfContractRendererTest.php": "f22eee839d724021594d35f6e966d53196d10824d09541cdadf0679a2b18cd12"
+  },
+  "migrations_unchanged": true
+}

@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"tests\/Feature\/TestContractSuccessorActivationTest.php","fixers":["unary_operator_spaces","not_operator_with_successor_space","ordered_imports"]}]}

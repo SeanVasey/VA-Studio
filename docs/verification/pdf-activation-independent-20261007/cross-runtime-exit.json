@@ -1,0 +1,10 @@
+[
+  {
+    "phase": "old-create",
+    "exit_code": 0
+  },
+  {
+    "phase": "new-read",
+    "exit_code": 0
+  }
+]

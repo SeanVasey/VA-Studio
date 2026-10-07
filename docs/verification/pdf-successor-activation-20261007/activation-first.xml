@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\TestContractSuccessorActivationTest" file="/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/tests/Feature/TestContractSuccessorActivationTest.php" tests="4" assertions="18" errors="2" failures="0" skipped="0" time="7.195143">
+    <testcase name="test_explicit_legacy_policy_is_refused_before_current_request_capture" file="/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/tests/Feature/TestContractSuccessorActivationTest.php" line="74" class="Tests\Feature\TestContractSuccessorActivationTest" classname="Tests.Feature.TestContractSuccessorActivationTest" assertions="3" time="1.952891"/>
+    <testcase name="test_exact_v2_policy_captures_real_request_and_worker_preserves_one_original" file="/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/tests/Feature/TestContractSuccessorActivationTest.php" line="89" class="Tests\Feature\TestContractSuccessorActivationTest" classname="Tests.Feature.TestContractSuccessorActivationTest" assertions="15" time="2.176145"/>
+    <testcase name="test_pending_v1_preserves_request_and_never_substitutes_current_v2_on_absent_runtime" file="/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/tests/Feature/TestContractSuccessorActivationTest.php" line="127" class="Tests\Feature\TestContractSuccessorActivationTest" classname="Tests.Feature.TestContractSuccessorActivationTest" assertions="0" time="1.532704">
+      <error type="BadMethodCallException">Tests\Feature\TestContractSuccessorActivationTest::test_pending_v1_preserves_request_and_never_substitutes_current_v2_on_absent_runtime
+BadMethodCallException: Call to undefined method App\Domain\Commerce\Models\LicenseGrant::outbox()
+
+/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php:67
+/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php:36
+/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2912
+/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/tests/Feature/TestContractSuccessorActivationTest.php:63
+/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/tests/Feature/TestContractSuccessorActivationTest.php:130</error>
+    </testcase>
+    <testcase name="test_retained_v1_original_reads_remain_available_and_missing_bytes_are_restore_only" file="/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/tests/Feature/TestContractSuccessorActivationTest.php" line="153" class="Tests\Feature\TestContractSuccessorActivationTest" classname="Tests.Feature.TestContractSuccessorActivationTest" assertions="0" time="1.533402">
+      <error type="BadMethodCallException">Tests\Feature\TestContractSuccessorActivationTest::test_retained_v1_original_reads_remain_available_and_missing_bytes_are_restore_only
+BadMethodCallException: Call to undefined method App\Domain\Commerce\Models\LicenseGrant::outbox()
+
+/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php:67
+/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php:36
+/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2912
+/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/tests/Feature/TestContractSuccessorActivationTest.php:63
+/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation/tests/Feature/TestContractSuccessorActivationTest.php:156</error>
+    </testcase>
+  </testsuite>
+</testsuites>

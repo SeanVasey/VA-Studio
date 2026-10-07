@@ -12,8 +12,8 @@ The increment turns one retained paid grant into one private original test PDF. 
 {
   "schema_version": 1,
   "purpose": "test_contract_issuance",
-  "version": "test-contract-issuance-v1",
-  "profile": "test-buyer-pdf-v1",
+  "version": "test-contract-issuance-v2",
+  "profile": "test-buyer-pdf-v2",
   "originals": "preserve_first_committed",
   "missing_original": "restore_only",
   "buyer_identity": "unverified_guest",
@@ -23,6 +23,8 @@ The increment turns one retained paid grant into one private original test PDF. 
   "retry_seconds": 60
 }
 ```
+
+The current development runtime selects v2. Existing explicit v1 configuration is refused; upgrading package files does not convert its meaning to v2. Issuance stays disabled by default and requires deliberately supplying the exact v2 policy above. This is local/testing enablement only.
 
 The policy envelope is bounded to 4 KiB and must match `ContractIssuancePolicy::CONTRACT`; additional or changed values are rejected. It is a nonbinding development policy. Buyer identity remains an unverified guest, marketing consent remains unknown, and existing license `renderer_version` remains historical review-HTML provenance rather than approval of this buyer PDF profile.
 
@@ -66,7 +68,9 @@ The optional grant argument performs a targeted attempt or verifies the retained
 
 ## Pinned renderer and profile provenance
 
-The candidate uses `tecnickcom/tc-lib-pdf` **8.76.2**, source reference `c383bd3ac09164c3fd1a6ac7da8f5460d19e47e3`, and the real Composer-resolved package graph. The font importer is `tecnickcom/tc-lib-pdf-font` **4.4.0**, reference `658e04565534c0cdd3d8d7ff12f1c6ebeab5f7ce`. Exact installed package references and asset hashes form part of `test-buyer-pdf-v1`; the committed lockfile and generated manifest remain authoritative if a candidate correction changes this graph.
+The retained v1 profile uses `tecnickcom/tc-lib-pdf` **8.76.2**, source reference `c383bd3ac09164c3fd1a6ac7da8f5460d19e47e3`, and the real Composer-resolved package graph. The font importer is `tecnickcom/tc-lib-pdf-font` **4.4.0**, reference `658e04565534c0cdd3d8d7ff12f1c6ebeab5f7ce`. Exact installed package references and asset hashes form part of `test-buyer-pdf-v1`; its manifest and pinned implementation remain immutable.
+
+Current `test-buyer-pdf-v2` uses PDF **8.76.3**, reference `d417129fad37d49dc9fc0d1e229e9740e1c774a3`, and font importer **4.4.1**, reference `a78b8e0ac9284d1594b6ba68488cf65c3e958f7b`. Its [separate provenance and actual converted manifest](../resources/contracts/test-v2/PROVENANCE.md) retain the complete resolved graph and implementation/font identities. `scripts/build-contract-profile-v2.php` applies its explicit pins; it must not rebuild or overwrite v1. Direct and isolated dispatch require the exact profile version. Upgraded package bytes cannot render a retained v1 request as v2.
 
 Unmodified DejaVu Sans regular/bold source fonts and their original license come from `tecnickcom/tc-font-mirror` **2.4.0**, commit `3251310e5f8e92659ac3ef1133e591ed681ef95d`. [The profile provenance](../resources/contracts/test-v1/PROVENANCE.md) records source Git blob identities and SHA-256 hashes. `scripts/build-contract-profile.php` verifies source hashes and uses the locked importer to generate the six local font assets and their manifest. It does not run a nested Composer installation or an upstream bulk font download. This profile is document-specific and does not alter the storefront's [approved brand theme](brand/README.md).
 
@@ -83,7 +87,7 @@ The input policy admits bounded Latin, Greek, Cyrillic and Common-script text, t
 | PHP child memory | 128 MiB |
 | Processing claim | 300 seconds, five attempts, retry no earlier than 60 seconds |
 
-New rendering verifies the installed runtime, pinned packages and physical asset hashes. Retained profile validation uses the trusted manifest and immutable metadata, so ordinary historical status reads do not load the renderer or need the font files. An immutable request keeps its original profile. A future successor profile must preserve this profile's retained manifest/validation rather than replacing it or rebuilding historical documents.
+New rendering verifies the installed runtime, pinned packages and physical asset hashes. Retained profile validation uses the trusted manifest and immutable metadata, so ordinary historical status reads do not load the renderer or need the font files. An immutable request keeps its original profile. Existing v1 requests and originals remain readable through retained v1 validation independently of current selection. A pending v1 request whose exact runtime is absent is quarantined with `profile_changed` after its owned attempt; automatic retry does not substitute v2 or alter the request. Existing completed originals remain exact and restore-only: a missing original reports `original_unavailable` without regenerating bytes or rewriting completion. An archived v1 worker/runtime route is not implemented by this upgrade.
 
 ## Isolation and private storage boundaries
 

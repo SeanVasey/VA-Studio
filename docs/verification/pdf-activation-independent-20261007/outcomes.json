@@ -1,0 +1,90 @@
+{
+  "approved_executable": "fab8677007aa3ae8f9639673d7eafcd22428eff2",
+  "approved_tree": "2f11621d51784d525a1f14e130c7f6d8c3719189",
+  "author_evidence": "9cb38f3916ce6e61cc28f95b42bdfe64a452e1eb",
+  "review_result": "approved_for_bounded_test_only_development_activation",
+  "unresolved_findings": [],
+  "independent_phpunit": {
+    "new-runtime": {
+      "activation": {
+        "tests": "4",
+        "assertions": "39",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "time": "8.092155"
+      },
+      "canaries": {
+        "tests": "6",
+        "assertions": "8",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "time": "0.217469"
+      }
+    },
+    "old-runtime": {
+      "activation": {
+        "tests": "4",
+        "assertions": "25",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "time": "7.903084"
+      },
+      "canaries": {
+        "tests": "6",
+        "assertions": "8",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "time": "0.212744"
+      }
+    }
+  },
+  "genuine_cross_runtime_original": {
+    "phases": [
+      {
+        "phase": "old-create",
+        "exit_code": 0
+      },
+      {
+        "phase": "new-read",
+        "exit_code": 0
+      }
+    ],
+    "old": {
+      "phase": "old-create",
+      "result": "passed",
+      "real_isolated_v1_render": true,
+      "pdf_sha256": "c5761ca32f0aeb87b2571a0521cf947b29d3aefa2ee279be6d3ffaceb600ffbf",
+      "bytes": 842536,
+      "profile_hash": "ff46257d40e36ea4efc8a42a9df0d823141d13a586d0a416fdde5178dcf12621",
+      "state": "completed",
+      "migrations": 59
+    },
+    "new": {
+      "phase": "new-read",
+      "result": "passed",
+      "actual_old_pdf_read_under_new_runtime": true,
+      "missing_original_restore_only": true,
+      "exact_backup_restore": true,
+      "all_retained_schema_rows_migrations_unchanged": true,
+      "pdf_sha256": "c5761ca32f0aeb87b2571a0521cf947b29d3aefa2ee279be6d3ffaceb600ffbf",
+      "bytes": 842536,
+      "new_provider_calls": 0
+    },
+    "scope": "actual isolated V1 rendering from synthetic paid fixture; original continuity under actual V2 runtime; not customer data or production archive"
+  },
+  "own_composer": {
+    "validate_strict_exit": 0,
+    "platform_exit": 0,
+    "audit_exit": 0,
+    "advisories": 0,
+    "abandoned": 0
+  },
+  "hosted_workflows_dispatched": false,
+  "full_native_browser_foundation_acceptance": false,
+  "live_provider_or_production_effect": false,
+  "private_db_pdf_key_retained": false
+}

@@ -1,0 +1,50 @@
+{
+  "executable_new_graph": "fab8677007aa3ae8f9639673d7eafcd22428eff2",
+  "executable_new_tree": "2f11621d51784d525a1f14e130c7f6d8c3719189",
+  "executable_old_graph": "93b881645adea524853e06f0669288119bcf3226",
+  "old_same_tree": true,
+  "new_graph": {
+    "name": "Retained contract profile affected consumers",
+    "tests": "144",
+    "assertions": "820",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "108.150076"
+  },
+  "old_graph": {
+    "tool": "phpunit",
+    "result": "passed",
+    "tests": 37,
+    "passed": 37,
+    "assertions": 72,
+    "duration_ms": 9248
+  },
+  "copy": {
+    "executed_source": "7e8aee0cb3099507c9856bd753b540db5d203f1b",
+    "cases": 14,
+    "failures": 0,
+    "skips": 0,
+    "carried_application_config_lock_ops_unchanged": true
+  },
+  "commands": {
+    "new_graph": "php vendor/bin/phpunit -c activation-focused.phpunit.xml --log-junit <evidence>/activation-seven-files-final.xml",
+    "old_graph": "php vendor/bin/phpunit tests/Unit/ContractRenderProfileRegistryTest.php tests/Feature/TestContractProfileSuccessorTest.php tests/Feature/TestContractSuccessorActivationTest.php --log-junit <evidence>/old-runtime-refusal-complete.xml",
+    "copy": "PERSISTENT_UPGRADE_REQUIRE_PHP=1 node --test scripts/ops/persistent-content-upgrade.test.mjs",
+    "autoload": "composer dump-autoload --no-scripts",
+    "validate": "composer validate --strict",
+    "platform": "composer check-platform-reqs",
+    "audit": "composer audit --format=json"
+  },
+  "audit": {
+    "advisories": 0,
+    "abandoned": 0
+  },
+  "test_only": true,
+  "live_activation": false,
+  "old_pending_runtime_absent_actual_quarantine_tested": true,
+  "archived_old_runtime_worker_implemented": false,
+  "synthetic_historical_original_fixture": true,
+  "keys_and_pdf_bytes_retained": false,
+  "hosted_or_native_full_acceptance_run": false
+}

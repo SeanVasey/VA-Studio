@@ -1,0 +1,6 @@
+Observed preliminary inventory diagnostic (before creating the composed review checkout):
+
+Command in VA-Studio-pdf-activation-independent queried rg --files under docs/verification/pdf-successor-activation-20261007. That leaf-only checkout does not contain the author metadata directory. The rg call exited 2:
+rg: docs/verification/pdf-successor-activation-20261007: IO error for operation on docs/verification/pdf-successor-activation-20261007: No such file or directory (os error 2)
+
+Resolution: obtain the exact seven-file selection directly from frozen author commit 9cb38f3916ce6e61cc28f95b42bdfe64a452e1eb and retain its bytes as selection.xml. No test was launched by the inventory command, and no application/lock/source changed.
