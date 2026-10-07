@@ -58,7 +58,8 @@
     "tests/Feature/FreeGrantSchemaRecoveryTest.php": "ff467ad93eaf53f272014b815491469279d97ec3d9a1e039650ef1a5aabf6c89",
     "tests/Support/FreeGrantFixtures.php": "edeb790c79f3991e1eea3adad5e6282108a0e24b70fe0f3a9f71b7485138aa11",
     "tests/Support/free-grant-race-worker.php": "2b7e87af2c1b1651b16dd555b52efa2c2ace64b3415943d357cd2a20a29a29a1",
-    "tests/frontend/free-grant-journey.test.tsx": "47b091bbf4a93f1f1df02e4153a2af5dd1933e09db35c69b6654d363c970e869"
+    "tests/frontend/free-grant-journey.test.tsx": "47b091bbf4a93f1f1df02e4153a2af5dd1933e09db35c69b6654d363c970e869",
+    "tests/Feature/PublicDiscoveryIndexTest.php": "73f8278b77946f69c9f3430cf2a9291e1d257bef23af6f6fda8feb0aac2017c7"
   },
   "artifacts": {
     "docs/verification/cloud-free-registration-20261007/va-free-registration-http.txt": "df8ef34f27f4743362c261a5c39d712e1dcf766f2492e72898a04bd99ca3c444",
@@ -66,6 +67,11 @@
     "docs/verification/cloud-free-registration-20261007/va-free-registration-frontend.txt": "77ce2bcf38a366a350e1c65868df2feb64d1d5d85ab3d4d7b995b05301e18e14",
     "docs/verification/cloud-free-registration-20261007/va-free-registration-typecheck.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "docs/verification/cloud-free-registration-20261007/va-free-registration-final-pint.txt": "b05d8da93c526eaa6e3ae52c10e0ba7c59d7030b0606400b5176bd677cba08c9",
-    "docs/verification/cloud-free-registration-20261007/va-free-registration-autoload.txt": "389ad7986ccce4d942d317446c7e4ca47f59d1bb1b566d99cee7fce320e6038f"
-  }
+    "docs/verification/cloud-free-registration-20261007/va-free-registration-autoload.txt": "389ad7986ccce4d942d317446c7e4ca47f59d1bb1b566d99cee7fce320e6038f",
+    "docs/verification/cloud-free-registration-20261007/va-free-registration-native.txt": "ab5624c359241cde4e8c0727d121172920200d8f3863f548bb812888e94d3b77",
+    "docs/verification/cloud-free-registration-20261007/va-free-registration-native.xml": "74f25c3043f73f46633a767810ce89273bd1f38b89b9b91105008c38fe7640ff",
+    "docs/verification/cloud-free-registration-20261007/va-free-registration-public-crawler.txt": "9b6d7ce680eab52a2ed53a7084980b05949672fae7157dc1a4758efa5e632bdb",
+    "docs/verification/cloud-free-registration-20261007/va-free-registration-public-crawler.xml": "e8273903cfad8988b2f36f81b95d28fa12072075d9246cb5bc104ac807931936"
+  },
+  "final_executable": "cf20c05808c612825fc0cb5626231cceb6e48375"
 }
