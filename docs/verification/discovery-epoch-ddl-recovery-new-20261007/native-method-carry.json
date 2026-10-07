@@ -1,0 +1,43 @@
+{
+  "base_source": "6a5da20d9cd2ab078d79b05288d583436cc731a0",
+  "corrected_source": "ed285b6a2b34bc1a2a2c91c42b64d68f317965af",
+  "proof": {
+    "up": {
+      "identical": true,
+      "sha256": "a59619f6c57e95e3e725ee5dbde21f1c2b0cccafd3b33f229a800eddd870cebf"
+    },
+    "refuseMysqlShadow": {
+      "identical": true,
+      "sha256": "7b95d92fe80f6970c987aa8e6a46d28a738e19a7b529f77b82b007f268e5fdae"
+    },
+    "mysqlTablePreflight": {
+      "identical": true,
+      "sha256": "f34fe89276d4c1496841ab5bda86ca71c0258f71a5e319fac30ff2cf953dc3d2"
+    },
+    "down": {
+      "identical": true,
+      "sha256": "7951d807afd967eb58acfda439bd9d09d529e30dcb07cd161ce68d6b40ee3d44"
+    },
+    "mysqlPreflight": {
+      "original_body_preserved_after_removing_exact_added_preflight_call": true,
+      "added_statement": "$this->refuseMysqlTriggerAliases($pdo, [DiscoveryEpoch::TABLE, ...array_keys($guards)]);",
+      "new_helper": "refuseMysqlTriggerAliases",
+      "fresh_native_lookup_verification": "pr25-final-corrected-mysql.xml"
+    },
+    "native_112_boundary_test_and_helpers": {
+      "test_every_creation_statement_failure_resumes_only_missing_parts_and_preserves_surviving_guards": "065a1a0d2464b0e9794cac10aabf1326c8469d221207df98ce823e7c0a78ea68",
+      "faultPdo": "775c8cce576a5b52bbdc52c40c56b26718eea12b02d1db582cd7dd49e002176f",
+      "removeFixtureEpoch": "38e8ac8b18711ccbedfe563bb85630ce3128ecd1a5fb8683e218b358e28f2fbf",
+      "parentRows": "ed0e2c2284fcc94e0387df5fca165e97a5b6c536a63247caf15dcf47d6e36444",
+      "ownedGuards": "37703c4e82d48e2a2736c79dd43a50728211f810216525daeb707cdff27d832d",
+      "originalGuards": "26832a9fe9cc3212c875852b928e16eb192f8f6a4c41475670d01055dba65b29",
+      "assertInvalidEpochWrites": "472688ddff27a984e679e32a53b20e8f62238605d48990101c59febc7343b7e7"
+    },
+    "original_epoch_table_and_all_guard_sql_preserved": {
+      "path": "app/Domain/Catalog/Discovery/DiscoveryEpoch.php",
+      "sha256": "540b5d43c02e0a100e39290598b96668a4bf6c30fd0813da6161f307bec801bf",
+      "whole_file_identical": true
+    }
+  },
+  "limit": "Carries the unchanged112-boundary creation/execution proof only. New SQLite object validation and MySQL dictionary lookup require their own fresh evidence; predecessor green receipts are not approval of corrected source."
+}
