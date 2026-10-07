@@ -88,6 +88,15 @@ final class FreeGrantController
         });
     }
 
+    public function downloads(string $origin, Request $request): Response
+    {
+        return $this->run(function () use ($origin, $request): Response {
+            [$principal, $actor] = $this->identity($request);
+
+            return response()->json(['status' => (new FreeGrantDownloads)->status($origin, $principal, $actor)]);
+        });
+    }
+
     public function authorize(string $origin, Request $request): Response
     {
         return $this->run(function () use ($origin, $request): Response {

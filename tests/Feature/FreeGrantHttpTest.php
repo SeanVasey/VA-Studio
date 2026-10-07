@@ -3,12 +3,15 @@
 namespace Tests\Feature;
 
 use App\Domain\Customers\CustomerAccess;
+use App\Domain\Grants\Free\FreeGrantHttpIdentity;
 use App\Domain\Grants\Free\FreeGrantRecords;
 use App\Http\Middleware\FreeGrantPrivacy;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -87,6 +90,9 @@ final class FreeGrantHttpTest extends TestCase
         }
         $this->assertSame($originBefore, (array) DB::table('free_origins')->sole());
         $this->assertSame($originalBefore, (array) DB::table('free_originals')->sole());
+        $status = $this->get('/free-grants/origins/'.$accepted['id'].'/downloads')->assertOk();
+        $this->assertPrivate($status);
+        $status->assertJsonPath('status.attemptCount', 2)->assertJsonCount(2, 'status.history')->assertDontSee($auth['token'], false);
         $this->assertDatabaseCount('free_redemptions', 2);
         $this->assertDatabaseCount('orders', 0);
         $this->assertDatabaseCount('license_grants', 0);
@@ -94,6 +100,25 @@ final class FreeGrantHttpTest extends TestCase
         $response = $this->get('/free-grants/origins/'.$accepted['id'])->assertNotFound();
         $this->assertPrivate($response);
         $response->assertDontSee($name, false);
+    }
+
+    public function test_unexpected_controller_failure_reports_only_the_fixed_exception_class_without_private_request_or_message(): void
+    {
+        CustomerFixtures::configure();
+        config(['free-grants.test_enabled' => true]);
+        $f = CustomerFixtures::account();
+        $this->login($f);
+        app()->instance(FreeGrantHttpIdentity::class, new class implements FreeGrantHttpIdentity
+        {
+            public function forRequest(Request $request): array
+            {
+                throw new \RuntimeException('PRIVATE-EXCEPTION-SENTINEL '.$request->getContent());
+            }
+        });
+        Log::shouldReceive('error')->once()->with('Free grant request failed.', ['exception_class' => \RuntimeException::class]);
+        $response = $this->postJson('/free-grants/definitions/'.Str::uuid().'/review', ['declaredName' => 'PRIVATE-REQUEST-SENTINEL'])->assertStatus(503)
+            ->assertDontSee('PRIVATE-REQUEST-SENTINEL', false)->assertDontSee('PRIVATE-EXCEPTION-SENTINEL', false);
+        $this->assertPrivate($response);
     }
 
     public static function boundaries(): array

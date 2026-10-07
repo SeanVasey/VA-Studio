@@ -59,7 +59,8 @@ final class FreeGrantAuthorityTest extends TestCase
             if ($kind === 'shadow') {
                 $pdo = DB::connection()->getPdo();
                 if (DB::getDriverName() === 'mysql') {
-                    $pdo->exec('CREATE TEMPORARY TABLE users LIKE users');
+                    $definition = $pdo->query('SHOW CREATE TABLE users')->fetch(\PDO::FETCH_NUM)[1];
+                    $pdo->exec(preg_replace('/\ACREATE TABLE /', 'CREATE TEMPORARY TABLE ', $definition));
                     $columns = array_keys($f['customer']['user']->getAttributes());
                     $statement = $pdo->prepare('INSERT INTO users ('.implode(',', array_map(fn ($c) => '`'.$c.'`', $columns)).') VALUES ('.implode(',', array_fill(0, count($columns), '?')).')');
                     $statement->execute(array_values($f['customer']['user']->getAttributes()));

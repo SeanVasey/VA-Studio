@@ -10,6 +10,55 @@ use Illuminate\Support\Str;
 
 final class FreeGrantDownloads
 {
+    /** Current owner and DB-only preparation/attempt status; no token, path or physical availability claim. */
+    public function status(string $originId, object $principal, User $actor): array
+    {
+        FreeGrantInput::uuid($originId);
+
+        return DB::transaction(function () use ($originId, $principal, $actor): array {
+            $rows = new FreeGrantRows;
+            $identity = (new FreeGrantPolicy)->identity();
+            $authority = $identity->lock($principal, $actor, $rows);
+            $accountId = (int) $identity->durableBinding($principal)['account_id'];
+            $grants = new FreeGrants;
+            $graph = $grants->originGraph($originId, $accountId, $rows);
+            $read = function () use ($rows, $graph, $accountId): array {
+                $sql = 'SELECT * FROM '.$rows->table('free_authorizations').' WHERE origin_id = ? ORDER BY id DESC LIMIT 20'
+                    .($rows->identity()->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'mysql' ? ' FOR UPDATE' : '');
+                $statement = $rows->identity()->prepare($sql);
+                $statement->execute([(int) $graph['origin']['id']]);
+                $auths = $statement->fetchAll(\PDO::FETCH_ASSOC);
+                $redemptions = [];
+                foreach ($auths as $auth) {
+                    FreeGrantException::require((int) $auth['account_id'] === $accountId && in_array($auth['target'], ['contract', 'master_wav', 'download_mp3'], true));
+                    $redemptions[$auth['id']] = $rows->one('free_redemptions', 'authorization_id = ?', [(int) $auth['id']]);
+                }
+
+                return ['authorizations' => $auths, 'redemptions' => $redemptions, 'count' => $this->count((int) $graph['origin']['id'], $rows)];
+            };
+            $at = now()->utc();
+            $expected = $read();
+            $grants->customerFence($principal, $actor, $identity, $authority, $graph, $rows, false);
+            FreeGrantException::require($read() === $expected, 409);
+            $work = $graph['work'];
+            $history = array_map(function (array $auth) use ($expected, $at): array {
+                $attempt = $expected['redemptions'][$auth['id']];
+
+                return ['id' => $auth['public_id'], 'kind' => $auth['target'], 'issuedAt' => $auth['created_at'], 'expiresAt' => $auth['expires_at'],
+                    'status' => $attempt !== [] ? 'attempted' : ($at->lessThan($auth['expires_at']) ? 'unused' : 'expired'), 'attemptedAt' => $attempt['created_at'] ?? null];
+            }, $expected['authorizations']);
+            $result = ['schemaVersion' => 1, 'originId' => $originId, 'attemptCount' => $expected['count'], 'maxDownloads' => $graph['payload']['definition']['max_downloads'],
+                'historyLimit' => 20, 'history' => $history, 'renderRetryAllowed' => (int) $work['attempts'] < 5
+                    && ($work['state'] === 'pending' || $work['state'] === 'failed' || $work['state'] === 'claimed' && $at->greaterThanOrEqualTo($work['expires_at'])),
+                'renderRetryAfter' => $work['state'] === 'claimed' ? $work['expires_at'] : null];
+            $identity->provePrimary($principal, $actor, $rows, $authority);
+            (new FreeGrantPolicy)->requireEnabled();
+            $rows->assertCurrent();
+
+            return $result;
+        });
+    }
+
     public function authorize(string $originId, array $input, object $principal, User $actor): array
     {
         FreeGrantInput::uuid($originId);

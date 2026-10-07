@@ -64,6 +64,17 @@ describe('mounted explicit free purpose journey', () => {
     await act(async () => { window.dispatchEvent(new Event('pagehide')); finish(response({ authorization: { token: 'LATE_PRIVATE_TOKEN' } })); });
     expect(screen.queryByLabelText('Retained free grant')).not.toBeInTheDocument(); expect(screen.queryByRole('button', { name: 'Download authorized file' })).not.toBeInTheDocument(); expect(submit).not.toHaveBeenCalled();
   });
+  it('uses fresh server retry admission for an expired claimed preparation and displays token-free consumed attempt status', async () => {
+    const claimed = { ...origin, documentStatus: 'claimed', renderAttempts: 1 };
+    const status = { schemaVersion: 1, originId, attemptCount: 1, maxDownloads: 3, historyLimit: 20, history: [{ id: authorizationId, kind: 'contract', issuedAt: '2026-10-07 01:02:03', expiresAt: '2026-10-07 01:03:03', status: 'attempted', attemptedAt: '2026-10-07 01:02:05' }], renderRetryAllowed: true, renderRetryAfter: '2026-10-07 01:07:03' };
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing([claimed as FreeOrigin]))).mockResolvedValueOnce(response({ origin: claimed })).mockResolvedValueOnce(response({ status })).mockResolvedValueOnce(response({ origin: complete }));
+    render(<FreeGrantJourney />); fireEvent.click(screen.getByRole('button', { name: 'Open free grants' })); await screen.findByRole('button', { name: `Open saved grant ${origin.title}` });
+    fireEvent.click(screen.getByRole('button', { name: `Open saved grant ${origin.title}` })); await screen.findByRole('button', { name: 'Prepare original PDF' });
+    expect(screen.getByRole('button', { name: 'Prepare original PDF' })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh preparation and download status' })); await screen.findByLabelText('Preparation and download status');
+    expect(screen.getByText(/1\/3 committed download attempts/)).toBeInTheDocument(); expect(screen.getByText(/contract \/ attempted/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Prepare original PDF' })).toBeEnabled(); fireEvent.click(screen.getByRole('button', { name: 'Prepare original PDF' })); await screen.findByRole('button', { name: 'Authorize contract download' });
+  });
   it('rejects malformed private extensions and paid provenance in free projections', () => {
     expect(validFreeDefinition(definition)).toBe(true); expect(validFreeOrigin(complete)).toBe(true);
     expect(validFreeDefinition({ ...definition, ownerKey: 'PRIVATE' })).toBe(false); expect(validFreeDefinition({ ...definition, testOnly: false })).toBe(false);

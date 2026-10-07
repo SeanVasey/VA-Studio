@@ -11,6 +11,7 @@ Route::withoutMiddleware(HandleInertiaRequests::class)->group(function (): void 
     Route::post('/free-grants/definitions/{definition}/review', [FreeGrantController::class, 'review'])->where('definition', $uuid)->middleware('throttle:30,1,free-grants')->block(20, 5)->name('free-grants.review');
     Route::post('/free-grants/definitions/{definition}/accept', [FreeGrantController::class, 'accept'])->where('definition', $uuid)->middleware('throttle:20,1,free-grants')->block(20, 5)->name('free-grants.accept');
     Route::get('/free-grants/origins/{origin}', [FreeGrantController::class, 'show'])->where('origin', $uuid)->middleware('throttle:60,1,free-grants')->block(20, 5)->name('free-grants.show');
+    Route::get('/free-grants/origins/{origin}/downloads', [FreeGrantController::class, 'downloads'])->where('origin', $uuid)->middleware('throttle:60,1,free-grants')->block(20, 5)->name('free-grants.downloads');
     Route::post('/free-grants/origins/{origin}/document', [FreeGrantController::class, 'document'])->where('origin', $uuid)->middleware('throttle:6,1,free-render')->block(20, 5)->name('free-grants.document');
     Route::post('/free-grants/origins/{origin}/authorize', [FreeGrantController::class, 'authorize'])->where('origin', $uuid)->middleware('throttle:20,1,free-grants')->block(20, 5)->name('free-grants.authorize');
     Route::post('/free-grants/authorizations/{authorization}/redeem', [FreeGrantController::class, 'redeem'])->where('authorization', $uuid)->middleware('throttle:20,1,free-grants')->block(20, 5)->name('free-grants.redeem');
