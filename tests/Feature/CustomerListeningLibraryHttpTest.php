@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Domain\Customers\CustomerAccess;
-use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\CustomerFixtures;
@@ -105,14 +105,16 @@ class CustomerListeningLibraryHttpTest extends TestCase
 
     private function inProduction(array $body)
     {
+        $this->get('/account/listening-library')->assertOk();
+        $csrf = session()->token();
         $this->app->detectEnvironment(fn () => 'production');
 
-        return $this->postJson('/account/listening-library', $body);
+        return $this->postJson('/account/listening-library', $body, ['X-CSRF-TOKEN' => $csrf]);
     }
 
     private function withoutCsrf(array $body)
     {
-        $this->app->instance(ValidateCsrfToken::class, new class($this->app, $this->app['encrypter']) extends ValidateCsrfToken
+        $this->app->bind(PreventRequestForgery::class, fn ($app) => new class($app, $app['encrypter']) extends PreventRequestForgery
         {
             protected function runningUnitTests(): bool
             {
