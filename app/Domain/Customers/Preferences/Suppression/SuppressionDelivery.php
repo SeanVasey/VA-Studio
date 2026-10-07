@@ -14,6 +14,7 @@ use App\Domain\Customers\Preferences\Suppression\Models\SuppressionAttempt;
 use App\Domain\Customers\Preferences\Suppression\Models\SuppressionConfirmation;
 use App\Models\User;
 use App\Support\CanonicalJson;
+use Closure;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -36,7 +37,7 @@ final class SuppressionDelivery
     {
         $this->topLevel($expectedVersion);
         // This durable commit must precede the only possible transport invocation.
-        $claim = DB::transaction(function () use ($principal, $actor, $expectedVersion): array {
+        $claim = $this->transaction(function () use ($principal, $actor, $expectedVersion): array {
             $context = $this->context($principal, $actor, $expectedVersion);
             $graph = $context['graph'];
             $claim = null;
@@ -77,7 +78,7 @@ final class SuppressionDelivery
 
     private function receipt(CustomerPrincipal $principal, User $actor, int $version, ?array $claim, bool $inspect): array
     {
-        return DB::transaction(function () use ($principal, $actor, $version, $claim, $inspect): array {
+        return $this->transaction(function () use ($principal, $actor, $version, $claim, $inspect): array {
             $context = $this->context($principal, $actor, $version);
             $graph = $context['graph'];
             if ($claim !== null && ($graph['target'] === null || $graph['attempt'] === null
@@ -160,6 +161,9 @@ final class SuppressionDelivery
         app(CustomerAccess::class)->current($principal);
         $accessPolicy = app(CustomerAccessPolicy::class);
         $binding = $this->binding();
+        // All resolver/adapter hooks precede cached-source admission, then pure policy/row proof.
+        $context['proof']->admit();
+        $context['outboxProof']->admit();
         // No extensible/model/query callbacks after these pure checks and primary row closure.
         if ($binding !== $context['binding'] || config('customer-preferences') !== $context['configuration']) {
             throw new ConsentException(503);
@@ -185,9 +189,25 @@ final class SuppressionDelivery
         if ($version < 0 || $version > ConsentPolicy::MAX_REVISION) {
             throw new ConsentException;
         }
-        if (DB::connection()->transactionLevel() !== 0) {
+        if (DB::connection()->transactionLevel() !== 0 || DB::connection()->getPdo()->inTransaction()) {
             throw new ConsentException(503);
         }
+    }
+
+    private function transaction(Closure $callback): array
+    {
+        return DB::transaction(function () use ($callback): array {
+            $frame = new SuppressionEvidence(true);
+            try {
+                $result = $callback();
+                $frame->admit();
+
+                return $result;
+            } catch (Throwable $exception) {
+                $frame->cleanupInterrupted();
+                throw $exception;
+            }
+        });
     }
 
     private function at(string $previous): string
