@@ -36,6 +36,16 @@ final class IdentityHistoricalCommittedReceiptTest extends TestCase
     protected function tearDown(): void
     {
         $this->frame?->restore();
+        // The hostile raw reopen belongs to this synthetic test, not to the runtime receipt.
+        // Explicit cleanup prevents an abandoned PDO frame retained by witness cycles from holding DDL locks.
+        $connection = DB::connection();
+        if ($connection->transactionLevel() > 0) {
+            $connection->rollBack(0);
+        }
+        $raw = $connection->getRawPdo();
+        if ($raw instanceof PDO && $raw->inTransaction()) {
+            $raw->rollBack();
+        }
         parent::tearDown();
     }
 
@@ -201,6 +211,10 @@ final class IdentityHistoricalCommittedReceiptTest extends TestCase
             $this->fail('A different physical frame cannot inherit the original commit.');
         } catch (\Throwable $error) {
             $this->assertInstanceOf(\PDOException::class, $error);
+        } finally {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
         }
     }
 
