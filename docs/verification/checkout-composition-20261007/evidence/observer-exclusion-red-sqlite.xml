@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionCheckoutObserverExclusionTest" file="/home/user/VA-Studio/tests/Feature/ProductionCheckoutObserverExclusionTest.php" tests="2" assertions="11" errors="0" failures="1" skipped="0" time="7.156714">
+    <testcase name="test_receipt_observer_refuses_frame_already_holding_new_write_observer" file="/home/user/VA-Studio/tests/Feature/ProductionCheckoutObserverExclusionTest.php" line="47" class="Tests\Feature\ProductionCheckoutObserverExclusionTest" classname="Tests.Feature.ProductionCheckoutObserverExclusionTest" assertions="2" time="3.872719">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionCheckoutObserverExclusionTest::test_receipt_observer_refuses_frame_already_holding_new_write_observer
+A paid receipt observer was stacked on the NEW-write command frame.
+
+/home/user/VA-Studio/tests/Feature/ProductionCheckoutObserverExclusionTest.php:59
+/home/user/VA-Studio/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:24
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:21
+/home/user/VA-Studio/tests/Feature/ProductionCheckoutObserverExclusionTest.php:53</failure>
+    </testcase>
+    <testcase name="test_new_write_observer_refuses_frame_already_holding_receipt_observer" file="/home/user/VA-Studio/tests/Feature/ProductionCheckoutObserverExclusionTest.php" line="69" class="Tests\Feature\ProductionCheckoutObserverExclusionTest" classname="Tests.Feature.ProductionCheckoutObserverExclusionTest" assertions="9" time="3.283995"/>
+  </testsuite>
+</testsuites>
