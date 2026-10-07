@@ -1,0 +1,51 @@
+{
+    "version": "8.0.46-0ubuntu0.24.04.4",
+    "defaults": {
+        "isolation_level": "REPEATABLE-READ",
+        "read_only": 0
+    },
+    "active_author_connections": [
+        {
+            "ID": 1336,
+            "TIME": 22,
+            "STATE": "",
+            "COMMAND": "Sleep"
+        },
+        {
+            "ID": 1305,
+            "TIME": 113,
+            "STATE": "",
+            "COMMAND": "Sleep"
+        },
+        {
+            "ID": 1330,
+            "TIME": 45,
+            "STATE": "",
+            "COMMAND": "Sleep"
+        },
+        {
+            "ID": 1324,
+            "TIME": 67,
+            "STATE": "",
+            "COMMAND": "Sleep"
+        },
+        {
+            "ID": 1292,
+            "TIME": 161,
+            "STATE": "",
+            "COMMAND": "Sleep"
+        },
+        {
+            "ID": 1343,
+            "TIME": 0,
+            "STATE": "committing alter table to storage engine",
+            "COMMAND": "Execute"
+        },
+        {
+            "ID": 1319,
+            "TIME": 91,
+            "STATE": "",
+            "COMMAND": "Sleep"
+        }
+    ]
+}
