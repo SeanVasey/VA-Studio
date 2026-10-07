@@ -420,6 +420,10 @@ upgrade requires the backup's isolated restore proof (steps 3-4) to pass before
 staging schema (the dump has no `--add-drop-database`) before loading the dump, then
 re-dumps and diffs it.
 
+Codex's twenty-first pass (P2 ×1, docs): every maintenance proof in S1 and its rollback now
+captures the HTTP status and requires exactly 503 (and exactly 200 after `artisan up`), since
+a failed `curl -f` from the host is also what a DNS, egress or TLS failure produces.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex

@@ -146,7 +146,9 @@ install -m 0600 -o <APP_USER> -g <APP_GROUP> <RUNTIME_ENV> .env && cmp -s <RUNTI
 # this block is skipped.
 if [ -e <RELEASES_DIR>/current ]; then
   (cd "$(readlink -f <RELEASES_DIR>/current)" && php artisan down) || exit 1
-  curl -fsS -o /dev/null https://<STAGING_ORIGIN>/ && { echo 'served release still answers 200'; exit 1; }
+  # Require the actual 503, not merely a failed request: a DNS, egress or TLS failure from this
+  # host also makes curl exit nonzero while external clients still reach the application.
+  [ "$(curl -s -o /dev/null -w '%{http_code}' https://<STAGING_ORIGIN>/)" = 503 ] || { echo 'served release is not in maintenance (expected 503)'; exit 1; }
   systemctl stop <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> || exit 1
   systemctl is-active --quiet <QUEUE_WORKER_SERVICE> && exit 1; systemctl is-active --quiet <SCHEDULER_SERVICE> && exit 1
 fi
@@ -182,14 +184,14 @@ php artisan vasey:stripe-preflight --json     # still no provider I/O
 ln -sfn <RELEASES_DIR>/<SHA> <RELEASES_DIR>/current.next && mv -T <RELEASES_DIR>/current.next <RELEASES_DIR>/current || exit 1
 test "$(readlink -f <RELEASES_DIR>/current)" = "<RELEASES_DIR>/<SHA>" || { echo 'current does not point at <SHA>'; exit 1; }
 systemctl reload-or-restart <WEB_SERVICE> && systemctl is-active --quiet <WEB_SERVICE> || exit 1
-curl -fsS -o /dev/null https://<STAGING_ORIGIN>/ && { echo 'new release answers 200 while down'; exit 1; }   # still 503: the switch kept the marker
+[ "$(curl -s -o /dev/null -w '%{http_code}' https://<STAGING_ORIGIN>/)" = 503 ] || { echo 'new release is not in maintenance after the switch (expected 503)'; exit 1; }
 systemctl start <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> && systemctl is-active --quiet <QUEUE_WORKER_SERVICE> && systemctl is-active --quiet <SCHEDULER_SERVICE> || exit 1
 # The worker really runs this SHA: its main process's working directory is the new release.
 test "$(readlink -f /proc/$(systemctl show -p MainPID --value <QUEUE_WORKER_SERVICE>)/cwd)" = "<RELEASES_DIR>/<SHA>" || { echo 'worker not on <SHA>'; exit 1; }
 # Leave maintenance last, in this release only; the superseded release stays down. A service
 # that fails above keeps the host in maintenance (fail safe): fix it, then `php artisan up` by hand.
 php artisan up || exit 1
-curl -fsS -o /dev/null https://<STAGING_ORIGIN>/ || { echo 'staging still unavailable after artisan up'; exit 1; }
+[ "$(curl -s -o /dev/null -w '%{http_code}' https://<STAGING_ORIGIN>/)" = 200 ] || { echo 'staging does not answer 200 after artisan up'; exit 1; }
 ```
 
 **Expected:**
@@ -212,8 +214,9 @@ curl -fsS -o /dev/null https://<STAGING_ORIGIN>/ || { echo 'staging still unavai
 
 **Rollback:**
 1. `php artisan down || exit 1` in the current release, then confirm the site answers 503
-   (`curl -fsS -o /dev/null https://<STAGING_ORIGIN>/ && exit 1` must fail, or with the `file`
-   driver `[ -f storage/framework/maintenance.php ] || exit 1`): a `down` that fails (release
+   (`[ "$(curl -s -o /dev/null -w '%{http_code}' https://<STAGING_ORIGIN>/)" = 503 ] || exit 1`;
+   a merely failed request is not proof, since a DNS, egress or TLS failure from the host
+   looks the same; with the `file` driver also `[ -f storage/framework/maintenance.php ] || exit 1`): a `down` that fails (release
    storage not writable, for example) leaves HTTP writers live, so nothing below runs until
    maintenance mode is proven. Then stop the queue worker and scheduler services and confirm
    `systemctl is-active` reports them inactive: an in-flight media, contract, payment or
