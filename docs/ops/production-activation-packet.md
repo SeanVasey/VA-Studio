@@ -265,16 +265,18 @@ retrieval-only design); the cutover runbook's launch packet. None of this exists
 
 ```sh
 # Same deployment steps as S1 on the production host at the authorized SHA, then:
-php artisan vasey:stripe-preflight --json                                          # shape: funds_mode=live, sk_live_ present
-php artisan vasey:stripe-preflight --json --probe --i-understand-this-calls-stripe # needs charges_enabled and card_payments=active
-php artisan vasey:commerce-readiness --json
-
-# Enable one flag at a time in this order, each followed by config:cache and an observation window
-# whose length Sean sets (none is invented here):
-#   PRODUCTION_CHECKOUT_PROVIDER_IO_ENABLED → PRODUCTION_CHECKOUT_RECONCILIATION_ENABLED
+php artisan vasey:stripe-preflight --json                                          # shape: funds_mode=live, sk_live_ present; probe not_requested
+# The live probe is refused (provider_io_disabled) while every flag is still false, so the
+# first authorized flag change comes before it. Enable one flag at a time, each followed by
+# config:cache and an observation window whose length Sean sets (none is invented here):
+#   PRODUCTION_CHECKOUT_PROVIDER_IO_ENABLED (now, for the probe) → PRODUCTION_CHECKOUT_RECONCILIATION_ENABLED
 #   → PRODUCTION_CHECKOUT_COMMITTED_READ_RECEIPTS_ENABLED → PRODUCTION_CHECKOUT_HTTP_ENABLED
 #   → PRODUCTION_CHECKOUT_ENABLED (new orders) last.
+# Set PRODUCTION_CHECKOUT_PROVIDER_IO_ENABLED=true in <RUNTIME_ENV> (Sean's live authorization names it), reinstall .env as in S1, then:
 php artisan config:cache
+php artisan vasey:stripe-preflight --json --probe --i-understand-this-calls-stripe # needs charges_enabled and card_payments=active
+php artisan vasey:commerce-readiness --json
+# Remaining flags follow in the order above, each with its own config:cache and window.
 ```
 
 **Expected:**

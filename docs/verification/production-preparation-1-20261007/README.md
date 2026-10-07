@@ -322,6 +322,13 @@ preflight's `canonical()` rejects symlinks and requires mode 0700) and installs 
 Rehearsed: the inode check passes on a bind mount and fails on a symlink; `install` + `cmp`
 pass on a synthetic file. Still documented, not executed.
 
+Codex's tenth pass (P2 ×2, docs): the S3 live probe was ordered before the first flag change,
+so `provider_io_disabled` would have refused it — the authorized
+`PRODUCTION_CHECKOUT_PROVIDER_IO_ENABLED` change plus `config:cache` now precede the probe,
+the other flags still follow one at a time; the restore extracts as the application user
+(`runuser -u <APP_USER>`) and step 4 refuses any restored entry not owned by that user and
+group (rehearsed: owned tree passes, a foreign-owned file is refused).
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex

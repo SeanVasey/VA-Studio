@@ -100,8 +100,10 @@ systemctl start <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> && systemctl is-activ
 sha256sum --check <BACKUP_DIR>/database.sql.sha256 || exit 1
 mysql --defaults-extra-file=<RESTORE_OPTION_FILE> < <BACKUP_DIR>/database.sql
 sha256sum --check <BACKUP_DIR>/private.tar.sha256 || exit 1   # the archive itself, not only its members, must be the one step 2 wrote
-mkdir -m 700 <RESTORE_PRIVATE_ROOT>
-tar --extract --file=<BACKUP_DIR>/private.tar --directory=<RESTORE_PRIVATE_ROOT> --no-same-owner
+#    Extract as the application user, never as root: --no-same-owner creates files as the
+#    invoking user, and the application must be able to read its restored masters and contracts.
+runuser -u <APP_USER> -- mkdir -m 700 <RESTORE_PRIVATE_ROOT>
+runuser -u <APP_USER> -- tar --extract --file=<BACKUP_DIR>/private.tar --directory=<RESTORE_PRIVATE_ROOT> --no-same-owner
 
 # 4. Verify. The restored tree must hold exactly the manifest's files and nothing else.
 #    --strict rejects an empty manifest, so an empty private store is proven by the name diff alone.
@@ -117,6 +119,9 @@ diff <(cd <RESTORE_PRIVATE_ROOT> && find . ! -type d | LC_ALL=C sort) \
 #    a .gitignore anywhere deeper is not exempt.
 (cd <RESTORE_PRIVATE_ROOT> && ! find . \( -type f ! -path ./.gitignore ! -perm 0600 ! -perm 0400 \) -o \( -type d ! -perm 0700 \) | grep -q .) \
   || { echo 'restored entry outside owner-only modes (0600/0400 files, 0700 directories)'; exit 1; }
+#    Every restored entry must belong to the application user and group.
+(cd <RESTORE_PRIVATE_ROOT> && ! find . \( ! -user <APP_USER> -o ! -group <APP_USER> \) | grep -q .) \
+  || { echo 'restored entry not owned by <APP_USER>'; exit 1; }
 #    The exempted root .gitignore must itself be exactly 0644 when present.
 (cd <RESTORE_PRIVATE_ROOT> && { [ ! -e .gitignore ] || [ "$(stat -c %a .gitignore)" = 644 ]; }) \
   || { echo 'root .gitignore is not 0644'; exit 1; }
