@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="3" assertions="21" errors="0" failures="0" skipped="0" time="169.264210">
+    <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest" file="/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php" tests="2" assertions="16" errors="0" failures="0" skipped="0" time="96.627205">
+      <testcase name="test_actual_smtp_current_owner_has_sealed_request_binding_without_public_or_cached_remint" file="/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php" line="33" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest" assertions="10" time="75.203874"/>
+      <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest::test_actual_source_commit_withdrawal_cannot_return_http_authority" tests="1" assertions="6" errors="0" failures="0" skipped="0" time="21.423331">
+        <testcase name="test_actual_source_commit_withdrawal_cannot_return_http_authority with data set &quot;marker_forget&quot;" file="/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php" line="81" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest" assertions="6" time="21.423331"/>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpNestedConfigurationCanaryTest" file="/workspace/VA-Studio-production-free-http-parent-guard/docs/verification/production-free-http-parent-guard-20261007/ProductionFreeHttpNestedConfigurationCanaryTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="72.637005">
+      <testcase name="test_retained_http_closure_cannot_resolve_a_nested_configuration_callback_after_marker_proof" file="/workspace/VA-Studio-production-free-http-parent-guard/docs/verification/production-free-http-parent-guard-20261007/ProductionFreeHttpNestedConfigurationCanaryTest.php" line="21" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpNestedConfigurationCanaryTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpNestedConfigurationCanaryTest" assertions="5" time="72.637005"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

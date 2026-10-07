@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="13" assertions="31" errors="10" failures="2" skipped="0" time="12.302563">
+    <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpConfigurationAdmissionTest" file="/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php" tests="9" assertions="18" errors="8" failures="1" skipped="0" time="8.382969">
+      <testcase name="test_unconfigured_default_off_request_keeps_its_existing_not_found_boundary" file="/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php" line="30" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpConfigurationAdmissionTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpConfigurationAdmissionTest" assertions="2" time="0.755914">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpConfigurationAdmissionTest::test_unconfigured_default_off_request_keeps_its_existing_not_found_boundary
+Failed asserting that 403 is identical to 404.
+
+/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php:37</failure>
+      </testcase>
+      <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpConfigurationAdmissionTest::test_retained_request_refuses_callback_parents_and_leaves_before_any_offset_or_string_conversion" tests="8" assertions="16" errors="8" failures="0" skipped="0" time="7.627056">
+        <testcase name="test_retained_request_refuses_callback_parents_and_leaves_before_any_offset_or_string_conversion with data set #0" file="/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php" line="42" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpConfigurationAdmissionTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpConfigurationAdmissionTest" assertions="2" time="1.143538">
+          <error type="App\Domain\Grants\Free\FreeGrantException">Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpConfigurationAdmissionTest::test_retained_request_refuses_callback_parents_and_leaves_before_any_offset_or_string_conversion with data set #0
+App\Domain\Grants\Free\FreeGrantException: Free grant preparation is unavailable.
+
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/FreeGrantException.php:17
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php:159
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php:65
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpIdentity.php:21
+/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php:56</error>
+        </testcase>
+        <testcase name="test_retained_request_refuses_callback_parents_and_leaves_before_any_offset_or_string_conversion with data set #1" file="/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php" line="42" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpConfigurationAdmissionTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpConfigurationAdmissionTest" assertions="2" time="0.897195">
+          <error type="App\Domain\Grants\Free\FreeGrantException">Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpConfigurationAdmissionTest::test_retained_request_refuses_callback_parents_and_leaves_before_any_offset_or_string_conversion with data set #1
+App\Domain\Grants\Free\FreeGrantException: Free grant preparation is unavailable.
+
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/FreeGrantException.php:17
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php:159
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php:65
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpIdentity.php:21
+/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php:56</error>
+        </testcase>
+        <testcase name="test_retained_request_refuses_callback_parents_and_leaves_before_any_offset_or_string_conversion with data set #2" file="/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php" line="42" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpConfigurationAdmissionTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpConfigurationAdmissionTest" assertions="2" time="0.908989">
+          <error type="App\Domain\Grants\Free\FreeGrantException">Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpConfigurationAdmissionTest::test_retained_request_refuses_callback_parents_and_leaves_before_any_offset_or_string_conversion with data set #2
+App\Domain\Grants\Free\FreeGrantException: Free grant preparation is unavailable.
+
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/FreeGrantException.php:17
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php:159
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php:65
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpIdentity.php:21
+/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php:56</error>
+        </testcase>
+        <testcase name="test_retained_request_refuses_callback_parents_and_leaves_before_any_offset_or_string_conversion with data set #3" file="/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php" line="42" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpConfigurationAdmissionTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpConfigurationAdmissionTest" assertions="2" time="0.888413">
+          <error type="App\Domain\Grants\Free\FreeGrantException">Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpConfigurationAdmissionTest::test_retained_request_refuses_callback_parents_and_leaves_before_any_offset_or_string_conversion with data set #3
+App\Domain\Grants\Free\FreeGrantException: Free grant preparation is unavailable.
+
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/FreeGrantException.php:17
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php:159
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php:65
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpIdentity.php:21
+/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php:56</error>
+        </testcase>
+        <testcase name="test_retained_request_refuses_callback_parents_and_leaves_before_any_offset_or_string_conversion with data set #4" file="/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php" line="42" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpConfigurationAdmissionTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpConfigurationAdmissionTest" assertions="2" time="0.967847">
+          <error type="App\Domain\Grants\Free\FreeGrantException">Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpConfigurationAdmissionTest::test_retained_request_refuses_callback_parents_and_leaves_before_any_offset_or_string_conversion with data set #4
+App\Domain\Grants\Free\FreeGrantException: Free grant preparation is unavailable.
+
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/FreeGrantException.php:17
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php:159
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php:65
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpIdentity.php:21
+/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php:56</error>
+        </testcase>
+        <testcase name="test_retained_request_refuses_callback_parents_and_leaves_before_any_offset_or_string_conversion with data set #5" file="/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php" line="42" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpConfigurationAdmissionTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpConfigurationAdmissionTest" assertions="2" time="0.865797">
+          <error type="App\Domain\Grants\Free\FreeGrantException">Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpConfigurationAdmissionTest::test_retained_request_refuses_callback_parents_and_leaves_before_any_offset_or_string_conversion with data set #5
+App\Domain\Grants\Free\FreeGrantException: Free grant preparation is unavailable.
+
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/FreeGrantException.php:17
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php:159
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php:65
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpIdentity.php:21
+/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php:56</error>
+        </testcase>
+        <testcase name="test_retained_request_refuses_callback_parents_and_leaves_before_any_offset_or_string_conversion with data set #6" file="/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php" line="42" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpConfigurationAdmissionTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpConfigurationAdmissionTest" assertions="2" time="1.017486">
+          <error type="App\Domain\Grants\Free\FreeGrantException">Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpConfigurationAdmissionTest::test_retained_request_refuses_callback_parents_and_leaves_before_any_offset_or_string_conversion with data set #6
+App\Domain\Grants\Free\FreeGrantException: Free grant preparation is unavailable.
+
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/FreeGrantException.php:17
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php:159
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php:65
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpIdentity.php:21
+/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php:56</error>
+        </testcase>
+        <testcase name="test_retained_request_refuses_callback_parents_and_leaves_before_any_offset_or_string_conversion with data set #7" file="/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php" line="42" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpConfigurationAdmissionTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpConfigurationAdmissionTest" assertions="2" time="0.937791">
+          <error type="App\Domain\Grants\Free\FreeGrantException">Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpConfigurationAdmissionTest::test_retained_request_refuses_callback_parents_and_leaves_before_any_offset_or_string_conversion with data set #7
+App\Domain\Grants\Free\FreeGrantException: Free grant preparation is unavailable.
+
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/FreeGrantException.php:17
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php:159
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php:65
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpIdentity.php:21
+/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php:56</error>
+        </testcase>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest" file="/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php" tests="3" assertions="8" errors="2" failures="1" skipped="0" time="2.987293">
+      <testcase name="test_actual_smtp_current_owner_has_sealed_request_binding_without_public_or_cached_remint" file="/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php" line="33" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest" assertions="2" time="1.006721">
+        <error type="App\Domain\Grants\Free\FreeGrantException">Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest::test_actual_smtp_current_owner_has_sealed_request_binding_without_public_or_cached_remint
+App\Domain\Grants\Free\FreeGrantException: Free grant preparation is unavailable.
+
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/FreeGrantException.php:17
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php:159
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php:65
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpIdentity.php:21
+/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php:37</error>
+      </testcase>
+      <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest::test_actual_source_commit_withdrawal_cannot_return_http_authority" tests="1" assertions="4" errors="0" failures="1" skipped="0" time="0.967378">
+        <testcase name="test_actual_source_commit_withdrawal_cannot_return_http_authority with data set &quot;marker_forget&quot;" file="/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php" line="81" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest" assertions="4" time="0.967378">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest::test_actual_source_commit_withdrawal_cannot_return_http_authority with data set "marker_forget"
+Failed asserting that 0 is equal to 1 or is greater than 1.
+
+/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php:98</failure>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest::test_retained_same_request_binding_refuses_later_consumer_withdrawal_without_callbacks" tests="1" assertions="2" errors="1" failures="0" skipped="0" time="1.013195">
+        <testcase name="test_retained_same_request_binding_refuses_later_consumer_withdrawal_without_callbacks with data set &quot;marker_forget&quot;" file="/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php" line="105" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest" assertions="2" time="1.013195">
+          <error type="App\Domain\Grants\Free\FreeGrantException">Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest::test_retained_same_request_binding_refuses_later_consumer_withdrawal_without_callbacks with data set "marker_forget"
+App\Domain\Grants\Free\FreeGrantException: Free grant preparation is unavailable.
+
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/FreeGrantException.php:17
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php:159
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php:65
+/workspace/VA-Studio-production-free-http-parent-guard/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpIdentity.php:21
+/workspace/VA-Studio-production-free-http-parent-guard/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php:109</error>
+        </testcase>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpNestedConfigurationCanaryTest" file="/workspace/VA-Studio-production-free-http-parent-guard/docs/verification/production-free-http-parent-guard-20261007/ProductionFreeHttpNestedConfigurationCanaryTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="0.932300">
+      <testcase name="test_retained_http_closure_cannot_resolve_a_nested_configuration_callback_after_marker_proof" file="/workspace/VA-Studio-production-free-http-parent-guard/docs/verification/production-free-http-parent-guard-20261007/ProductionFreeHttpNestedConfigurationCanaryTest.php" line="21" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpNestedConfigurationCanaryTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpNestedConfigurationCanaryTest" assertions="5" time="0.932300"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

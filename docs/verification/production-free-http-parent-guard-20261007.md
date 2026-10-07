@@ -1,0 +1,22 @@
+# Original free HTTP authority — nested configuration repair
+
+Executable source `ff0f7a85be397f017a227967058f745ceea3da28` changes only the owned `ProductionFreeGrantHttpBinding` and a dedicated admission test. Its original actual failure is frozen in docs-only `c0029cdee5d5445a7c801ce89ae3b3e09df2420c` on unchanged `233f0864028156faeb70c63259910214e47762cb` bytes. Earlier `233` approval remains historical; this successor needs its own independent assessment.
+
+The genuine canary uses actual loopback SMTP enrollment, a typed T23 principal and the real customer request/session marker. It installs an unarmed ArrayObject as the raw app configuration parent before binding and arms it afterward. On the original source, the final marker comparison passes, then the nested app-key lookup invokes one callback that forgets the marker; authority still returns. Actual SQLite: one failure, three assertions, zero errors/skips; released true, refused false, marker absent and no transaction.
+
+The successor admits plain raw configuration parents before policy/guard lookup and at every retained terminal configuration proof. It checks top-level items and cached container instances before any offset, then app/auth/identity/free-identity/free parents before nested lookups. Key must be a nonempty string. The existing cached environment may legitimately be null or a nonempty string; an ArrayAccess/Stringable leaf refuses without conversion. Missing optional namespaces retain the existing default-off 404 response. The principal/actor tuple, sealed binding API, same-request requirement, old test adapter and core identity source are unchanged.
+
+Current source checks:
+
+- SQLite affected selection: 13 tests / 76 assertions, zero failures/errors/skips. Eight cases exercise top-level/parent/key/environment callback extensions after actual owner binding; the remaining cases exercise default-off, actual current owner, committing marker withdrawal, retained marker withdrawal and unchanged nested probe `112bc4275e272dc9bd5bac83a0128e66fa16662496f4cc7ec3c2ac6a9d65fea6`.
+- Original marker-withdrawal probe `44f495bbc052587020f65bcf4c71685d360a84ef412075eb85078136ce988424`: SQLite one test / seven assertions, zero failures/errors/skips, byte unchanged.
+- Native MySQL `8.0.46-0ubuntu0.24.04.4`: three tests / 21 assertions, zero failures/errors/skips. Selected actual SMTP current owner, actual source-commit marker withdrawal and the unchanged nested probe. This is a focused current-source run, not a full free-grant/identity matrix.
+- Pint passes both changed paths. All eleven recorded carried dependencies match exact `233` bytes, including TestFreeGrantIdentity, the original-grant service, identity adapter/domain and parent identity/floor/fixture sources.
+
+The first `1969bbad` successor incorrectly required a populated cached environment string. Actual Laravel keeps that cached container slot null here, so valid owner/default-off cases failed: 13 recorded, 31 assertions, two failures and ten errors. Those receipts remain intact. The narrow follow-up restores the original nullable cached value while still refusing callback objects; the valid current-owner checks above prevent an always-refuse result from counting as acceptance.
+
+The unchanged nested probe writes a historical `233` source label into its snapshot. Original red bytes are restored and preserved; new raw snapshots and their actual successor source bindings are separate in `final/source-receipt.json`. That receipt binds two owned source paths, eleven unchanged dependencies and actual XML counters. `artifact-sha256.json` binds the durable artifacts, including original failures and the legitimate-positive admission failure.
+
+Commands used the locked PHP toolchain and explicit synthetic APP_KEY. Native execution sourced the private author-only environment with `VA_IDENTITY_ISOLATED_NATIVE=1` against `vaseyaudio_production_identity`; no credential value was printed or committed. Network permission covered only loopback SMTP/MySQL. No shared configuration/mount, external delivery, payment API, migration, old free family or production activation changed.
+
+The next dependency is the separately authored production-free family: independent commercial definition review, distinct legal purpose/profile/storage, exact typed current/original identity, commit admission, private PDF/assets and recovery. This adapter repair alone does not provide production free fulfillment or approve commercial/host facts.

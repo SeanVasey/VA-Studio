@@ -1,0 +1,23 @@
+{
+  "docs/verification/production-free-http-parent-guard-20261007/ProductionFreeHttpNestedConfigurationCanaryTest.php": "112bc4275e272dc9bd5bac83a0128e66fa16662496f4cc7ec3c2ac6a9d65fea6",
+  "docs/verification/production-free-http-parent-guard-20261007/final/free-http-parent-original-marker-successor.txt": "d849d00d66038713820f8ae43eca34263bedf04f146a1bfd59b9437f4105fb3e",
+  "docs/verification/production-free-http-parent-guard-20261007/final/free-http-parent-original-marker-successor.xml": "f76cfd00491c697d47bef159e1938799cf85c4959bf50d34b5e89fd58e6532da",
+  "docs/verification/production-free-http-parent-guard-20261007/final/free-http-parent-successor-native-final.txt": "a58a6954d94ef297e194a7b0baaa219f48515a30b26e94fb12904ee49a5c17c2",
+  "docs/verification/production-free-http-parent-guard-20261007/final/free-http-parent-successor-native-final.xml": "7c961eb87e670df446d16322ccf007b69866c03743057f14299506672824f5b5",
+  "docs/verification/production-free-http-parent-guard-20261007/final/free-http-parent-successor-pint-final.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+  "docs/verification/production-free-http-parent-guard-20261007/final/free-http-parent-successor-pint-final2.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+  "docs/verification/production-free-http-parent-guard-20261007/final/free-http-parent-successor-sqlite-final.txt": "f503c62eab7a84c3e3951cf4d821a286a7d756e15dcded3b0666b521242a7d87",
+  "docs/verification/production-free-http-parent-guard-20261007/final/free-http-parent-successor-sqlite-final.xml": "839f8f95ea7c105105d470c9646dbe53c89798389d2268ef38149c25b7ed6078",
+  "docs/verification/production-free-http-parent-guard-20261007/final/free-http-parent-successor-sqlite.txt": "9d23c642fabeefac1f670a46653d1032cfc4fb0da7eaeba0d550551afcd0340f",
+  "docs/verification/production-free-http-parent-guard-20261007/final/free-http-parent-successor-sqlite.xml": "3ddfd161d69a943e63b5f2148e6143e73a78405d490cef2b2e903babd41f36ef",
+  "docs/verification/production-free-http-parent-guard-20261007/final/native-nested-snapshot.raw.json": "253444050b2244bc9bc5ae051add78ad83ee121d934749e30496ad36e2144c83",
+  "docs/verification/production-free-http-parent-guard-20261007/final/source-receipt.json": "4d600837b011455a761a12606c0802a968f502af21063b169d71b3533ea66dfa",
+  "docs/verification/production-free-http-parent-guard-20261007/final/sqlite-nested-snapshot.raw.json": "253444050b2244bc9bc5ae051add78ad83ee121d934749e30496ad36e2144c83",
+  "docs/verification/production-free-http-parent-guard-20261007/nested-snapshot.json": "c7a4cd6fb65c92244b513df0268ce6e196236c7cc9143c662293ec17b77f0c89",
+  "docs/verification/production-free-http-parent-guard-20261007/original-artifact-sha256.json": "1dc4f5a015de16ec602765a99c9458d69c799862db6f19f6a8ffbd96bfdb3d16",
+  "docs/verification/production-free-http-parent-guard-20261007/original-probe-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+  "docs/verification/production-free-http-parent-guard-20261007/original-red.txt": "b72f7c6e5e0c20a232043e2bba5c18fb6fe4ec26743f7b755ec12badb2b6a491",
+  "docs/verification/production-free-http-parent-guard-20261007/original-red.xml": "1d9bea045037c4e6ed70fbdd9aa23435359e6e0e919ced1cdae75cbe7c584645",
+  "docs/verification/production-free-http-parent-guard-20261007/original-source-map.json": "c10c7698956518468889fd269cc8bb3f5d67428acaf943ad293f424661fa6e39",
+  "docs/verification/production-free-http-parent-guard-20261007.md": "883bd1947f2ed79944ad29055c2e6143dd8cb1bc250bdfba953589bca56b9eea"
+}

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpCurrentMarkerIndependentTest" file="/workspace/VA-Studio-production-free-http-parent-guard/docs/verification/production-free-http-marker-repair-20261007/ProductionFreeHttpCurrentMarkerIndependentTest.php" tests="1" assertions="7" errors="0" failures="0" skipped="0" time="1.462897">
+    <testcase name="test_actual_current_source_commit_cannot_revoke_marker_and_return_http_authority" file="/workspace/VA-Studio-production-free-http-parent-guard/docs/verification/production-free-http-marker-repair-20261007/ProductionFreeHttpCurrentMarkerIndependentTest.php" line="20" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpCurrentMarkerIndependentTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpCurrentMarkerIndependentTest" assertions="7" time="1.462897"/>
+  </testsuite>
+</testsuites>
