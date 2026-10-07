@@ -1,0 +1,79 @@
+{
+  "reviewed_commit": "821772ce9f86a706a711b4ed1a3889f1dac19899",
+  "tree": "4cc1392cc847a415f6ab7c171925d24d7b68d959",
+  "decision": "approve bounded default-off free-grant preparation source; final root registration and operative identity/terms remain separate prerequisites",
+  "independent_runs": [
+    {
+      "stdout": "final-sqlite-adverse.txt",
+      "junit": "final-sqlite-adverse-junit.xml",
+      "scope": "exact assent, renderer retry, owner/download/descriptor/restore/SQL immutability, actual DI and audit closure withdrawal, lease and token-free latest20 status",
+      "tests": 14,
+      "assertions": 143,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "stdout": "final-native-adverse.txt",
+      "junit": "final-native-adverse-junit.xml",
+      "scope": "actual native HTTP PDF/WAV/status and permanent credential withdrawal hidden by temporary old users",
+      "tests": 2,
+      "assertions": 103,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "stdout": "final-frontend.txt",
+      "junit": "final-frontend-junit.xml",
+      "scope": "mounted private free journey, denial/lifecycle/native attachment state",
+      "tests": 8,
+      "assertions": 0,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "stdout": "purpose-profile.txt",
+      "junit": "purpose-profile-junit.xml",
+      "scope": "real original free assent rejects purchase/relabelled profiles before child creation and subsequently issues one exact free original",
+      "tests": 1,
+      "assertions": 8,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    }
+  ],
+  "original_source_bindings": 50,
+  "original_new_files": 49,
+  "successor_new_preparation_status_test": 1,
+  "existing_product_files_changed": 0,
+  "PR24_paid_contract_paths_byte_exact": 47,
+  "author_evidence_commit": "821772ce9f86a706a711b4ed1a3889f1dac19899",
+  "author_executable_commit": "28ae480b05f34d295720d2ac816e92e9d9039742",
+  "author_committed_artifacts_bound": 35,
+  "locked_php_package_identity_match": 158,
+  "carry": {
+    "native_schema": "8 recorded,7 executed,768 assertions; one named SQLite-only case. Five native statement fault boundaries, not all statements. Runtime schema and recovery test byte-exact predecessor ebf6298.",
+    "native_capacity": "actual independent two-buyer exact rights_scopes record wait1/68, all domain/schema/raceworker bytes exact predecessor; no repeat of unchanged native race.",
+    "native_lease": "one1/10 passing case in retained mixed d8 native run; lease/status sources unchanged at reviewed executable.",
+    "native_fixture_history": "1066 and1366 errors remain explicit red/mixed evidence. Corrected exact persisted-row shadow has1/4 own author proof; independent exact final native2/103 also passes actual shadow.",
+    "source_scope": "isolated author HTTP test explicitly installs routes/global privacy/error hook; no claim actual parent boot registration already reviewed"
+  },
+  "renderer": {
+    "profile": "test-free-grant-pdf-v1",
+    "purpose": "free-license-grant",
+    "manifest_sha256": "570f6a023927228e0ac6def670df603b5b595ffd916acf69bf569fecaeab74c8",
+    "five_profile_files_exact": true,
+    "known_purchase_profile_rejected_before_child": true,
+    "real_pdf_issue_after_profile_refusal_keeps_original_assent": true,
+    "env": "cleared inherited env; fixed rootless sibling libraries and non-database extensions; no framework bootstrap/database/provider in child"
+  },
+  "limits": [
+    "No production T23 identity or approved free terms adapter is implemented or enabled.",
+    "Shared registration, complete storefront journey, scope accounting before exclusive activation and retention/storage/backup acceptance remain open.",
+    "No MySQL8.4, full Foundation, real browser/BFCache or launch readiness claim.",
+    "Native DB status/committed attempt does not assert physical health or successful browser receipt."
+  ],
+  "reviewer_actions": "Own new docs/evidence and one bounded test canary only. No author/root/shared product edits, publication, push, hosted CI or external provider call."
+}

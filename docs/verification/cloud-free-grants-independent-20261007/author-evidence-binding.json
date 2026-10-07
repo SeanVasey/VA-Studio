@@ -1,0 +1,401 @@
+{
+  "author_evidence_commit": "821772ce9f86a706a711b4ed1a3889f1dac19899",
+  "durable_committed_evidence_paths": 35,
+  "artifact_bindings": [
+    {
+      "path": "docs/verification/free-grant-origins-20261007/README.md",
+      "git_blob": "774d18b601059d43f91630ae0ebfb0451ae8c32a",
+      "sha256": "62ff305dd3e023dc46f82ec89df3fb2a5c925aebfefb0b8403370205c6e9ba3e",
+      "bytes": 7781
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/frontend-successor.txt",
+      "git_blob": "a003af982c0e081d8a6254a636aba5bf1ac6ed40",
+      "sha256": "4d94aeceffc708c0a796e2526d11adc0453f785eb65e61ad5e276d09baaaabdb",
+      "bytes": 272
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/native-capacity.txt",
+      "git_blob": "e921aa9a442cf3b6c24222648e0f276dc3db7891",
+      "sha256": "bf0a16a9bf1ede6965d92309c7755ec1cc4f7a7c87ed69d3ec701dd8fb26766b",
+      "bytes": 94
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/native-capacity.xml",
+      "git_blob": "b5bd70091495724e8e6eeb1206218ea95e3fe295",
+      "sha256": "19474be4ea085125ef97ad479d8e87787574046d34052f36367628257d200cab",
+      "bytes": 635
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/native-schema.txt",
+      "git_blob": "431f46313ea28bc872647e7850593aeec4420eb3",
+      "sha256": "3dd03656af858a23ae6995992c4de99a3872be308c9b1e327b8662a6587ad82b",
+      "bytes": 107
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/native-schema.xml",
+      "git_blob": "79add31bdb55c81ea86c9b2e219c15bbc9e8d667",
+      "sha256": "c89e6f7c7e1809e975eb2d7f8f191ff3681e4bf61757562191c5bde0ca64919d",
+      "bytes": 3427
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/native-shadow-final.txt",
+      "git_blob": "a3f19531f65e663db41750a953c359bf2c580b9c",
+      "sha256": "d6e67bd7f1d5d793af055e2eebc0f3b2ba4af9dc4f576f8ec6e34fc7ddf5f110",
+      "bytes": 93
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/native-shadow-final.xml",
+      "git_blob": "a6e978a6e33631473e6d721abbad9b9dff58b99a",
+      "sha256": "7e90bf92db1d147c41dc0d2cc2e86d12d3a3b49955e18b2a001d8b4c1deb020f",
+      "bytes": 923
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/original-failures/authority-first.txt",
+      "git_blob": "cad15cc1c8bc66a242b4089c9c3ed4d2881a993e",
+      "sha256": "bd47c4e6d4891a6d1e566b0705b620e0cc2179806c24b8eb093b188e91e89688",
+      "bytes": 2573
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/original-failures/authority-first.xml",
+      "git_blob": "d19afa93f73805ded4271f7cdfbd2ea7b74d9566",
+      "sha256": "a7ba106a5bef0f65f5d8fea11f557e8e08c679c0dbe5313796bd6f3372f99e65",
+      "bytes": 6544
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/original-failures/bounded-adversarial-first.txt",
+      "git_blob": "dd8f9de1a2533bc50cfe6f08c0c24a376f92a279",
+      "sha256": "2c9d46281c1f052815a48e3c11800d1a1c417acb6871b59487534813e2ee9ed8",
+      "bytes": 2277
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/original-failures/bounded-adversarial-first.xml",
+      "git_blob": "cd9e14ae81a72855cd11d6d555b4064fe5c328eb",
+      "sha256": "2a33a6266254fd8ec65719ec8aa5f5358598279368c73bd2c0709f6500ef9a0a",
+      "bytes": 11322
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/original-failures/definitions-initial.txt",
+      "git_blob": "353a8d0cb3606de54b00cfb16c1ecd0db07a8839",
+      "sha256": "073c6d6aa8c542cf2cd9f95d274abf6d79e111f08e06f1c725d3d42377aec92e",
+      "bytes": 863
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/original-failures/http-first.txt",
+      "git_blob": "4cecd5ab8e7515bc91f192bea196fca9eb3441b4",
+      "sha256": "fa7096e9c06183b59a23516501c2a810ef5c5b15b53503041eec8e4b4c63efa7",
+      "bytes": 1152
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/original-failures/http-first.xml",
+      "git_blob": "014e95973c70272a5c1ef6ee3bcb2045ce958f85",
+      "sha256": "7be0ccb1b3aa63511f584c2b46c4b018f293d67b7a9e5bdae74b9e36ef9255e3",
+      "bytes": 5934
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/original-failures/journey-first.txt",
+      "git_blob": "2b67bcbe10243d3e6cf3cb4de385d674edaeea03",
+      "sha256": "0e556773d0b1a891a105eec9b18567c3e236de8e94266473d452c3c4b5c1a15d",
+      "bytes": 672
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/original-failures/native-affected-final.txt",
+      "git_blob": "8a88163bfe9b66c6921555de6c60b8a5576120b4",
+      "sha256": "361e20cf0569d9d75df6ccd3c46f1746d6e1f4247435a05680d9e9c22b09372f",
+      "bytes": 896
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/original-failures/native-affected-final.xml",
+      "git_blob": "4c7d94b33f4d943d981fd83558f85248cecd1f5e",
+      "sha256": "09cbc514ebb7f343b88f03f950cf83f1bd7986895766c323d4ea9dfcf99e81ff",
+      "bytes": 5763
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/original-failures/native-status-successor.txt",
+      "git_blob": "9eaf684812de1b53854170bd84c454e1c60a5a15",
+      "sha256": "344df96de19f4fdd7c4733119dc94c3174b5d4eb3e659baea8b048d9f22badbd",
+      "bytes": 903
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/original-failures/native-status-successor.xml",
+      "git_blob": "26a56d2c2f6fac2a068cd0ac52d9a37e8bfd8e5b",
+      "sha256": "094c73275c7ea1e4e8f6bf2e415ad9bd2945b7f319f14ad69abc0d8c1a8dfd16",
+      "bytes": 4049
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/original-failures/schema-first.txt",
+      "git_blob": "efca4001630f04d6ff9f0be50ae64410afd3dc62",
+      "sha256": "514057bd04e117381fbd844100c1179a59d1c9b1a6f515257222cf3dc41bd45e",
+      "bytes": 955
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/original-failures/schema-first.xml",
+      "git_blob": "e297c09bc0f6c641110ccb54c21c147f588264a0",
+      "sha256": "aabde4dd6b69e9e7af527d174d9205cf0ca44bce41a806b9872fc18548a1b885",
+      "bytes": 4341
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/original-failures/schema-mysql-first.txt",
+      "git_blob": "fc4ae49f5a6159e6658925f9383e91f4af2be073",
+      "sha256": "50fd5562e7a6cd4d11a9f3d849ecf6811124d616f773bd9fc6fd345ad8885b9c",
+      "bytes": 1673
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/original-failures/schema-mysql-first.xml",
+      "git_blob": "e2a95d1aa114be8d19bb72e665cde3a02651f6ca",
+      "sha256": "cc03c94ec4f9ba609729b4352547a9b3db0643a5a5810260bb79e5c0387e6b2c",
+      "bytes": 4903
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/original-failures/staff-original-stamp.txt",
+      "git_blob": "53d38d088bf1e7dfd73eae55441e697ee6f4a59b",
+      "sha256": "333a57ccfeb13f5c2209c2f4711546b0aa551368f074f66fce11527f81023f26",
+      "bytes": 2167
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/original-failures/staff-original-stamp.xml",
+      "git_blob": "a1e99323a42037b6dba652b37879b1120363e7af",
+      "sha256": "f0c5d1db08ebe7e8c9b1db43ee016307832e0e4bcf21055d78c8458110bf6711",
+      "bytes": 7858
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/results.json",
+      "git_blob": "0f1300947a815357df8365d64b67079ea88d130d",
+      "sha256": "16ef4504e455cf6f44db2ce89340ac03a92ef92940d1f72fd01f6cfc15b81076",
+      "bytes": 1956
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/source-map.json",
+      "git_blob": "de95b62b045c290e2f2ff187cd80b3bf66a48a2a",
+      "sha256": "67714fe9f138a4c16e029b0df553a049c38b9e7d8423aa4166b1d4c6cd01e3d3",
+      "bytes": 6247
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/sqlite-core.txt",
+      "git_blob": "d26e2b69293b1d65b35e0ab438800870210a71f0",
+      "sha256": "e3c8e5bc7b377ccacbf707b3b4f7b8135a21d23ea5bcbd894f8a9273039071a0",
+      "bytes": 110
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/sqlite-core.xml",
+      "git_blob": "77accf120fbfe68b8dc9bc9b3b9ddc68cccb1001",
+      "sha256": "cc94bcd6751d8b482274f0dcc0879810149cbf04be04a73549479f8f554b52de",
+      "bytes": 15570
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/sqlite-shadow-final.txt",
+      "git_blob": "050db1596cd49476e473de31c380720d08ee0bf4",
+      "sha256": "039628ea32cacc8cdceddc1e9bc93d830493a1d9095fef7f55559e0792b25e68",
+      "bytes": 92
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/sqlite-shadow-final.xml",
+      "git_blob": "86f3dcd7620de78034bcaa484e61599915618c51",
+      "sha256": "53a7129c07704728e678d8436534c0ae6d87a3c341e151e0ddbd16e226d882c3",
+      "bytes": 920
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/sqlite-status-successor.txt",
+      "git_blob": "4aa7eab37b441258b7dd401319c67050babf26eb",
+      "sha256": "4fda97fef24e3b1104830c1cfa10ba764c5c0c63e485b6673a16e0383a6c9b02",
+      "bytes": 97
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/sqlite-status-successor.xml",
+      "git_blob": "e3d4e17df4cf5d5cc4ce1f5e05554396c3fcbf3d",
+      "sha256": "2ab99a3685b5d4d9891aaae631cf0b5986c956f43c8d9dc322a2907ed0109281",
+      "bytes": 8912
+    },
+    {
+      "path": "docs/verification/free-grant-origins-20261007/typecheck-successor.txt",
+      "git_blob": "5bc5d6094e6b222bd8f2aa24891f11cc86cf33bc",
+      "sha256": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f",
+      "bytes": 29
+    }
+  ],
+  "all_retained_junit_outcomes": [
+    {
+      "artifact": "docs/verification/free-grant-origins-20261007/native-capacity.xml",
+      "tests": 1,
+      "assertions": 68,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "artifact": "docs/verification/free-grant-origins-20261007/native-schema.xml",
+      "tests": 8,
+      "assertions": 768,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 1
+    },
+    {
+      "artifact": "docs/verification/free-grant-origins-20261007/native-shadow-final.xml",
+      "tests": 1,
+      "assertions": 4,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "artifact": "docs/verification/free-grant-origins-20261007/original-failures/authority-first.xml",
+      "tests": 6,
+      "assertions": 11,
+      "errors": 4,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "artifact": "docs/verification/free-grant-origins-20261007/original-failures/bounded-adversarial-first.xml",
+      "tests": 18,
+      "assertions": 2010,
+      "errors": 3,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "artifact": "docs/verification/free-grant-origins-20261007/original-failures/http-first.xml",
+      "tests": 13,
+      "assertions": 239,
+      "errors": 0,
+      "failures": 2,
+      "skipped": 0
+    },
+    {
+      "artifact": "docs/verification/free-grant-origins-20261007/original-failures/native-affected-final.xml",
+      "tests": 8,
+      "assertions": 140,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "artifact": "docs/verification/free-grant-origins-20261007/original-failures/native-status-successor.xml",
+      "tests": 3,
+      "assertions": 109,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "artifact": "docs/verification/free-grant-origins-20261007/original-failures/schema-first.xml",
+      "tests": 8,
+      "assertions": 1881,
+      "errors": 0,
+      "failures": 2,
+      "skipped": 0
+    },
+    {
+      "artifact": "docs/verification/free-grant-origins-20261007/original-failures/schema-mysql-first.xml",
+      "tests": 8,
+      "assertions": 79,
+      "errors": 0,
+      "failures": 1,
+      "skipped": 1
+    },
+    {
+      "artifact": "docs/verification/free-grant-origins-20261007/original-failures/staff-original-stamp.xml",
+      "tests": 3,
+      "assertions": 0,
+      "errors": 3,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "artifact": "docs/verification/free-grant-origins-20261007/sqlite-core.xml",
+      "tests": 37,
+      "assertions": 2352,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 1
+    },
+    {
+      "artifact": "docs/verification/free-grant-origins-20261007/sqlite-shadow-final.xml",
+      "tests": 1,
+      "assertions": 4,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "artifact": "docs/verification/free-grant-origins-20261007/sqlite-status-successor.xml",
+      "tests": 22,
+      "assertions": 357,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    }
+  ],
+  "valid_carry": "unchangedpredecessor schema7executed/768,actualcapacity1/68; native lease1/10 on unchangedd8; mixednative1066/1366 fixtureerrors remainexplicit; correctedshadow1/4; no claim authorfullfinalmatrix ornewnative schema rerun",
+  "author_results": {
+    "candidate": "28ae480b05f34d295720d2ac816e92e9d9039742",
+    "native_server": "8.0.46-0ubuntu0.24.04.4",
+    "server_comment": "(Ubuntu)",
+    "database": "vaseyaudio_free_grants",
+    "sqlite_core": {
+      "recorded": 37,
+      "executed": 36,
+      "assertions": 2352,
+      "native_only_skips": 1,
+      "source": "ebf6298633870a0f1c7b431f8aa4bb25c26e94a9"
+    },
+    "native_schema": {
+      "recorded": 8,
+      "executed": 7,
+      "assertions": 768,
+      "sqlite_only_skips": 1,
+      "source": "ebf6298633870a0f1c7b431f8aa4bb25c26e94a9"
+    },
+    "native_capacity": {
+      "recorded": 1,
+      "executed": 1,
+      "assertions": 68,
+      "source": "ebf6298633870a0f1c7b431f8aa4bb25c26e94a9"
+    },
+    "sqlite_status_successor": {
+      "recorded": 22,
+      "executed": 22,
+      "assertions": 357,
+      "source": "d8e57770aa54cf62d9ba35800cc16447c4e16727"
+    },
+    "sqlite_shadow_final": {
+      "recorded": 1,
+      "executed": 1,
+      "assertions": 4,
+      "source": "28ae480b05f34d295720d2ac816e92e9d9039742"
+    },
+    "frontend": {
+      "recorded": 8,
+      "passed": 8,
+      "source": "d8e57770aa54cf62d9ba35800cc16447c4e16727"
+    },
+    "typecheck": "passed",
+    "independent_review": "pending",
+    "shared_registration": "parent-owned, pending actual composed proof",
+    "native_status_successor": {
+      "recorded": 3,
+      "passed": 2,
+      "errors": 1,
+      "assertions": 109,
+      "source": "d8e57770aa54cf62d9ba35800cc16447c4e16727",
+      "error": "Native fixture1366 before masking assertion; retained",
+      "passing_cases": [
+        {
+          "test": "test_abandoned_live_claim_is_closed_then_exact_deadline_status_admits_retry_under_the_original_assent",
+          "assertions": 10
+        },
+        {
+          "test": "test_actual_customer_page_review_assent_real_pdf_and_native_attachment_preserve_exact_free_origin",
+          "assertions": 99
+        }
+      ]
+    },
+    "native_shadow_final": {
+      "recorded": 1,
+      "passed": 1,
+      "assertions": 4,
+      "source": "28ae480b05f34d295720d2ac816e92e9d9039742"
+    }
+  }
+}
