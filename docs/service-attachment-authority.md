@@ -17,7 +17,11 @@ Laravel transaction. Lock order is current User,CustomerAccount for a buyer,
 project,then events; staff use current administer-catalog and MFA policy. Qualified
 primary reads reject temporary shadows. Gate/MFA framework queries precede the
 terminal raw authority/source fence, so their stale returned models cannot
-survive a role/account withdrawal. The adapter reuses the service domain's sole
+survive a role/account withdrawal. The MFA provider is evaluated only in that
+callback-capable policy phase; the raw authority phase does not invoke it again.
+Service and customer preparation flags are rechecked after the terminal graph
+read, so the last staff query or provider cannot withdraw admission and still
+return a source proof. The adapter reuses the service domain's sole
 projection/transition verifier, including encrypted original brief/service
 snapshot and every quote/decision/milestone event. No adapter row mutation occurs.
 

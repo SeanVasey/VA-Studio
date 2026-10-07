@@ -15,7 +15,6 @@ use App\Domain\SupportAttachments\AttachmentSourceToken;
 use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
 use App\Support\CanonicalJson;
-use Filament\Facades\Filament;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionRolledBack;
 use Illuminate\Support\Facades\DB;
@@ -91,7 +90,6 @@ final class ServiceProjectAttachmentSourceV1 implements AttachmentSourceToken, J
     {
         $rows->assertCurrent();
         AttachmentException::require($this->valid && $rows->identity() === $this->primary && DB::transactionLevel() === 1, 503);
-        app(ServiceProjectPolicy::class)->requireEnabled();
         // Gate/MFA may query framework models. Their callbacks precede the terminal raw fence.
         self::staffPolicy($this->actor, $this->authority['user']);
         // A private savepoint disappears even on a direct PDO commit/reopen that bypasses
@@ -101,6 +99,12 @@ final class ServiceProjectAttachmentSourceV1 implements AttachmentSourceToken, J
         $current = self::authority($this->actor, $rows, false);
         AttachmentException::require($current === $this->authority, 403);
         AttachmentException::require(self::graph($this->sourceId, $rows) === $this->graph, 409);
+        // Admission may be withdrawn by the last framework query or MFA provider.
+        // Recheck after every callback-capable policy operation and raw evidence read.
+        app(ServiceProjectPolicy::class)->requireEnabled();
+        if ($this->actor->audience === 'customer') {
+            app(CustomerAccessPolicy::class)->requireEnabled();
+        }
         $rows->assertCurrent();
     }
 
@@ -136,9 +140,6 @@ final class ServiceProjectAttachmentSourceV1 implements AttachmentSourceToken, J
             if ($frameworkPolicy) {
                 self::staffPolicy($actor, $user);
             }
-            $panel = Filament::getPanel('admin');
-            AttachmentException::require($panel !== null && (! $panel->isMultiFactorAuthenticationRequired()
-                || collect($panel->getMultiFactorAuthenticationProviders())->contains(fn ($provider): bool => $provider->isEnabled(self::hydrate($user)))), 403);
         }
 
         return compact('user', 'account');

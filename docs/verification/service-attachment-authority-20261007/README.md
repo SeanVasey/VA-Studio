@@ -1,6 +1,7 @@
 # Focused service attachment authority evidence
 
-Runtime/test source:e765e9b2dad565097d8124ec86e4c3470ead8818.
+Corrected runtime/test source: b209b850166998967a76edb873a5dfcdd18bfbce.
+Predecessor runtime/test source: e765e9b2dad565097d8124ec86e4c3470ead8818.
 Parent source:38105a6d1cd8c5c8f2654fd81e28bff3d6ca2acb,reviewed service correction.
 
 The isolated worktree borrows cached dependency packages through private vendor
@@ -29,7 +30,7 @@ No global install,hosted CI,push,merge,production configuration,external send,
 payment or historical paid graph mutation occurred in this child.
 
 
-Final e765e9b selection:SQLite **11cases/54assertions**,native MySQL
+Predecessor e765e9b selection:SQLite **11cases/54assertions**,native MySQL
 `8.0.46-0ubuntu0.24.04.4` **11cases/54assertions**,all passed. All primary source
 fixtures in the native selection use MySQL; the connection-replacement canary
 constructs an unrelated in-memory SQLite PDO and rejects it before any source
@@ -44,3 +45,31 @@ the new marker/same-proof regression cases and is not final-source acceptance.
 No independent composed approval or actual attachment upload/scan/download UI
 acceptance is claimed by these source-adapter receipts. The peer owns those
 consumer tests,and root owns provider/registry integration and independent review.
+
+Independent review then found a terminal admission defect on composed
+5c99b8145ad965201504a4ab578e522946b7c495: the fourth staff framework user query
+withdrew the service flag after its prior check, but a source proof still escaped.
+The original independent SQLite canary failed 1/1 with no errors; root retained
+the raw red evidence. Earlier passing selections do not certify that boundary.
+
+b209b85 removes the duplicate callback-capable MFA provider invocation from the
+raw authority phase and checks current service/customer preparation flags after
+all policy callbacks and terminal raw source reads. Three new regressions cover
+the original fourth-query flag withdrawal, provider flag withdrawal, and provider
+staff-role withdrawal. The author's successor SQLite selection passes
+**14 cases/72 assertions**. The unchanged independent original canary run against
+this successor passes **1 case/8 assertions**. These author runs are affected
+verification, not independent approval of root's eventual composition. Adjacent
+receipts retain exact source and commands; the original red is unchanged.
+
+The same corrected b209b85 author selection on the isolated native MySQL
+`8.0.46-0ubuntu0.24.04.4` primary passes **14 cases/72 assertions**. The only
+separate SQLite descriptor is the deliberately displaced connection identity
+canary described above; all source fixtures and late callback refusals in this
+selection use MySQL. Scoped Pint passed on both changed PHP paths.
+
+A later independent service-command canary found a temporary-users-shadow MFA
+withdrawal in the predecessor service domain. Root owns that separate repair;
+its prior service approval is held pending successor review. The adapter itself
+uses qualified AttachmentRows reads with temporary-shadow refusal. These child
+receipts do not approve the uncorrected broader service composition.
