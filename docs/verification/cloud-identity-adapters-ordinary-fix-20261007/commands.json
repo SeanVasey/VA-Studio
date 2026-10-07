@@ -1,0 +1,16 @@
+{
+  "source": "101e3832e8e5637cab784eb2a800d60642a746b4",
+  "setup": "own copied composer metadata/autoload + shared locked package content; composer dump-autoload --no-scripts --no-interaction; 158 locked packages verified",
+  "runner": "php -r '$GLOBALS[\"_composer_autoload_path\"]=getcwd().\"/vendor/autoload.php\"; require \"vendor/phpunit/phpunit/phpunit\";' --",
+  "synthetic_environment": {
+    "APP_ENV": "testing",
+    "APP_KEY": "base64:SUlJSUlJSUlJSUlJSUlJSUlJSUlJSUlJSUlJSUlJSUk="
+  },
+  "sqlite_filter": "test_ordinary_terminal_connection_admission_precedes_policy_and_preserves_normal_rollback|test_lazy_secondary_connection",
+  "native_filter": "test_ordinary_terminal_connection_admission_precedes_policy_and_preserves_normal_rollback|test_lazy_secondary_connection_cannot_withdraw_feature_after_normal_transaction_fence",
+  "native_environment": "privately source /workspace/.va-studio-toolchain/mysql/service_review-task.env; distinct limited schema/account; with_additional_permissions network enabled for loopback MySQL and synthetic SMTP",
+  "xml": "own sqlite-selection.xml/native-selection.xml, own absolute bootstrap/test paths; native removes DB overrides",
+  "snapshots": "probes write their original path into an initially empty scratch folder; each exact-source snapshot copied to NEW corrected-<driver>-<kind>-snapshot.json; scratch output removed; no historical red artifact overwritten",
+  "pint": "--test two actual changed PHP paths; separate diagnostic including original archival probes retained without changing their bytes",
+  "full_suites": "no full hosted/native matrix repeated"
+}

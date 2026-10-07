@@ -1,0 +1,99 @@
+{
+  "source": "101e3832e8e5637cab784eb2a800d60642a746b4",
+  "author_evidence": "9c1b1354c3b0ae7ed3c31d77838ee9887cbb437a",
+  "verified_source_bindings": 17,
+  "verified_durable_author_artifacts": 43,
+  "source_tree": "a66af50cf2fa5133e4df641c91fcf60fd95c07b1",
+  "actual_source_delta_vs_cdc": [
+    "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureAccess.php",
+    "tests/Feature/ProductionIdentityAdapters/ProductionAccountFeatureAccessTest.php"
+  ],
+  "author_checks_verified_against_committed_junit": {
+    "final-sqlite.xml": {
+      "tests": 28,
+      "assertions": 184,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "final-native.xml": {
+      "tests": 5,
+      "assertions": 34,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "unchanged-native.xml": {
+      "tests": 1,
+      "assertions": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "unchanged-sqlite.xml": {
+      "tests": 1,
+      "assertions": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "unchanged-runtime.xml": {
+      "tests": 2,
+      "assertions": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "ordinary-original-red.xml": {
+      "tests": 1,
+      "assertions": 3,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "historical-7cc/committed-feature-callback.xml": {
+      "tests": 1,
+      "assertions": 3,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "successor-101e/sqlite-adapters.xml": {
+      "tests": 31,
+      "assertions": 210,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "successor-101e/sqlite-original-probes.xml": {
+      "tests": 2,
+      "assertions": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "successor-101e/native-affected.xml": {
+      "tests": 4,
+      "assertions": 35,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "successor-101e/native-original-probes.xml": {
+      "tests": 2,
+      "assertions": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "successor-101e/native-current-visibility.xml": {
+      "tests": 1,
+      "assertions": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "locked_packages": 158,
+  "failures": []
+}

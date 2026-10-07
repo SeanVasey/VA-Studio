@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\IndependentIdentityAdapters\FeatureOrdinaryCallbackCanaryTest" file="/workspace/VA-Studio-production-identity-adapters-repair/docs/verification/production-identity-adapters-callback-repair-20261007/probes/FeatureOrdinaryCallbackCanaryTest.php" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="0.884624">
+    <testcase name="test_lazy_secondary_connection_cannot_withdraw_feature_after_normal_transaction_fence" file="/workspace/VA-Studio-production-identity-adapters-repair/docs/verification/production-identity-adapters-callback-repair-20261007/probes/FeatureOrdinaryCallbackCanaryTest.php" line="21" class="Tests\IndependentIdentityAdapters\FeatureOrdinaryCallbackCanaryTest" classname="Tests.IndependentIdentityAdapters.FeatureOrdinaryCallbackCanaryTest" assertions="3" time="0.884624">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\IndependentIdentityAdapters\FeatureOrdinaryCallbackCanaryTest::test_lazy_secondary_connection_cannot_withdraw_feature_after_normal_transaction_fence
+A real lazy secondary connection callback withdrew feature authority after the policy check.
+Failed asserting that true is false.
+
+/workspace/VA-Studio-production-identity-adapters-repair/docs/verification/production-identity-adapters-callback-repair-20261007/probes/FeatureOrdinaryCallbackCanaryTest.php:76</failure>
+    </testcase>
+  </testsuite>
+</testsuites>
