@@ -6,6 +6,7 @@ use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
 use App\Domain\Customers\ProductionIdentity\IdentityEvidence;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
+use App\Domain\Customers\ProductionIdentity\IdentityHistoricalPlainRows;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\IdentityRows;
 use App\Models\User;
@@ -116,7 +117,20 @@ final class ProductionCustomerAccess
         }
     }
 
-    private function historical(array $binding, IdentityRows $reader): array
+    /** Original historical facts using the receipt's fixed permanent nonlocking reader only. */
+    public function verifyHistoricalBindingPlain(array $binding, IdentityHistoricalPlainRows $reader): array
+    {
+        return $this->historical($binding, $reader);
+    }
+
+    public function proveHistoricalBindingPlain(array $binding, IdentityHistoricalPlainRows $reader, array $expectedRaw): void
+    {
+        if ($this->strings($this->verifyHistoricalBindingPlain($binding, $reader)) !== $this->strings($expectedRaw)) {
+            throw new IdentityException;
+        }
+    }
+
+    private function historical(array $binding, IdentityRows|IdentityHistoricalPlainRows $reader): array
     {
         $keys = ['schema_version', 'origin_id', 'provenance', 'account_id', 'account_public_id', 'user_id', 'verification_observation_id', 'verification_observation_hash', 'identity_policy_version', 'identity_policy_hash'];
         $actual = array_keys($binding);

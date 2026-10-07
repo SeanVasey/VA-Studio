@@ -1,0 +1,24 @@
+{
+  "executable_source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+  "probe_sha256": "7d88a4a133952595c60234b53ebdfe7650381e0dbde5f40ae85510029cd46d34",
+  "files": {
+    "app/Domain/Customers/ProductionCustomerAccess.php": "7dbaeed358ab1051dd34608fbf966645ae7756f163700733bf9708f1233aba42",
+    "app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommittedReceipt.php": "3cd04111ec02a7017ec96f9a1bd5bc25f1c200115a925e5570d7002c2858cd0f",
+    "app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommitSeal.php": "3a0686a3f04bf3679d384ce06a33bdfa0c6599a593d7f0cc59476f3cf4937b97",
+    "app/Domain/Customers/ProductionIdentity/IdentityHistoricalPlainRows.php": "2117a278b26b7b643429f460e549adcbe0b499efdfca8ee14ab8939c4a048769",
+    "app/Domain/Customers/ProductionIdentity/IdentityOriginalCommitWitness.php": "237209e42fe54ba2557ee97b27fa8d826ab104ad3f08c6b81e8ddc7fa01061ba",
+    "tests/Support/IdentityHistoricalCommitFixture.php": "c36d6def466cb27d742c1b9596177a295d9d3f0820a7b51314a0b43425c450a2"
+  },
+  "red": {
+    "tests": 1,
+    "assertions": 3,
+    "failures": 1,
+    "errors": 0,
+    "callbacks": 5
+  },
+  "artifacts": {
+    "original-configuration-callback-red.xml": "f581a84b259f1810140210ecc34d8f7f33caa2c1e116305b51d17b87bf39894f",
+    "HistoricalCommittedConfigurationCallbackCanaryTest.php": "7d88a4a133952595c60234b53ebdfe7650381e0dbde5f40ae85510029cd46d34",
+    "original-configuration-callback-red.txt": "a0c2b603770fdf8707040b4b3699d13650150b99fde3e64cddf72172402d15b5"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "decision": "BLOCKED pending raw-parent admission repair",
+  "tested_final_executable": "dc17abcd3a60a0c47bd1247b52f239caede912c4",
+  "runtime_source": "e6c02b90719923bc4ba435f86399b077980c1ddc",
+  "tree": "0a9825ffe22adcefd134634b04fc11a542239ce3",
+  "prior_sqlite_result": {
+    "source": "e6c02b90719923bc4ba435f86399b077980c1ddc",
+    "tests": 11,
+    "assertions": 50,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "nested_original_result": {
+    "source": "dc17abcd3a60a0c47bd1247b52f239caede912c4",
+    "tests": 1,
+    "assertions": 3,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0
+  },
+  "nested_probe_sha256": "c02f3d96d679793ff37cdf5588023a6744e05c2643ba59f90a8e3525d7cbb7fa",
+  "snapshot": {
+    "source": "dc17abcd3a60a0c47bd1247b52f239caede912c4",
+    "callbacks": 60,
+    "fixture_value": 9723,
+    "receipt_closed": true,
+    "refusal": null,
+    "active_transaction": false
+  },
+  "native_execution": "Not dispatched for held source; author historical/partial native evidence is separate and no passing count inferred.",
+  "floor_carry": "IdentityMigrationOwnership exact approved 3c helper inherited by 101; ordinary PCR existing method bodies, IdentityRows/CommittedFrame/FeatureAccess101 are unchanged."
+}
