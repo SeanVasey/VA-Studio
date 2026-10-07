@@ -84,9 +84,13 @@ function proof_relative(string $path): bool
 /** @return array{files: array<string, array{bytes: int, sha256: string}>, directories: list<string>, safe: bool} */
 function proof_tree(string $root): array
 {
+    // The root's own mode and type are proven before anything beneath it: a 0777 root lets other
+    // users list and replace children whose own modes are still owner-only.
+    $rootStat = lstat($root);
+    $rootSafe = is_array($rootStat) && ($rootStat['mode'] & 0170000) === 0040000 && ($rootStat['mode'] & 07777) === 0700;
     $files = [];
     $directories = [];
-    $safe = true;
+    $safe = $rootSafe;
     $walk = static function (string $directory, string $prefix) use (&$walk, &$files, &$directories, &$safe): void {
         $entries = scandir($directory);
         sort($entries, SORT_STRING);

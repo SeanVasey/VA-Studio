@@ -335,6 +335,14 @@ previously built release directory instead of checking another SHA out inside th
 one (which would have kept the newer `public/build`); it restarts and verifies the services
 before `php artisan up`.
 
+Codex's twelfth pass (P2 ×2): `proof_tree()` checked only the children's modes, so a restored
+private root widened to 0777 still verified. The root's own type and mode (directory, 0700)
+are now proven before the walk, with a ninth tampering case in `BackupRestoreProofTest`
+(`restored private root widened` → `restored_private_tree_safe` false, result `BLOCKED`; red
+on the old script, green after). The documented restore's `tar --extract` is now fatal on a
+nonzero exit (a partial extraction can omit an empty trailing directory the file checks
+cannot see). The script change falls under the review's condition 3.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex

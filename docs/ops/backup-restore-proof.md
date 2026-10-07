@@ -103,7 +103,9 @@ sha256sum --check <BACKUP_DIR>/private.tar.sha256 || exit 1   # the archive itse
 #    Extract as the application user, never as root: --no-same-owner creates files as the
 #    invoking user, and the application must be able to read its restored masters and contracts.
 runuser -u <APP_USER> -- mkdir -m 700 <RESTORE_PRIVATE_ROOT>
-runuser -u <APP_USER> -- tar --extract --file=<BACKUP_DIR>/private.tar --directory=<RESTORE_PRIVATE_ROOT> --no-same-owner
+runuser -u <APP_USER> -- tar --extract --file=<BACKUP_DIR>/private.tar --directory=<RESTORE_PRIVATE_ROOT> --no-same-owner || exit 1
+#    A partial extraction can omit an empty trailing directory that the step 4 file checks
+#    cannot see, so a nonzero tar stops the procedure here.
 
 # 4. Verify. The restored tree must hold exactly the manifest's files and nothing else.
 #    --strict rejects an empty manifest, so an empty private store is proven by the name diff alone.
