@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/scratch/2876616e88c3/VA-Studio-amount-requirements-independent-review/amount-independent.phpunit.xml" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="1.405707">
+    <testsuite name="Independent authenticated amount requirements" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="1.405707">
+      <testsuite name="Tests\Feature\AmountRequirementsIndependentCanaryTest" file="/workspace/scratch/2876616e88c3/VA-Studio-amount-requirements-independent-review/docs/verification/amount-requirements-independent-20261007/AmountRequirementsIndependentCanaryTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="1.405707">
+        <testcase name="test_late_primary_audit_drift_cannot_be_hidden_by_default_connection_swap" file="/workspace/scratch/2876616e88c3/VA-Studio-amount-requirements-independent-review/docs/verification/amount-requirements-independent-20261007/AmountRequirementsIndependentCanaryTest.php" line="57" class="Tests\Feature\AmountRequirementsIndependentCanaryTest" classname="Tests.Feature.AmountRequirementsIndependentCanaryTest" assertions="4" time="1.405707"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,77 @@
+[
+  {
+    "path": "README.md",
+    "bytes": 3654,
+    "sha256": "062910190357e25bd48d6774db9d7ce046137bc4dab6595782bbda7883fb15bb"
+  },
+  {
+    "path": "affected-policy.txt",
+    "bytes": 95,
+    "sha256": "998c72f3f5ff45d201a7e158569603454d661842d7f5942200af299dc36c9e4e"
+  },
+  {
+    "path": "affected-policy.xml",
+    "bytes": 38696,
+    "sha256": "82b05705541063624043c5e3786d931c907f9d4f513f0bad3e9d939920f78b25"
+  },
+  {
+    "path": "affected-reader.txt",
+    "bytes": 97,
+    "sha256": "1a9bf090ed649a601394aed937e6dd880f4a4ba53f8e056ec3a5991397a99bbe"
+  },
+  {
+    "path": "affected-reader.xml",
+    "bytes": 18183,
+    "sha256": "de83db4cb14a8a26de3c7f785b890e1cf70ac0e4413052381f7126f3447247c8"
+  },
+  {
+    "path": "autoload-origin.txt",
+    "bytes": 285,
+    "sha256": "ffdb5d3d57a4ffdc76031688eb8ff35dbe403b5d425795f85479cd70ff65dbfb"
+  },
+  {
+    "path": "diff-check.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "focused.txt",
+    "bytes": 97,
+    "sha256": "4199b6149f9d75615c654e484f18a5ac86968324e8600972791323aaa032b315"
+  },
+  {
+    "path": "focused.xml",
+    "bytes": 22665,
+    "sha256": "d8dea57a85874654e37aae91b9559ca88309ed4a59801b133a8d3cba7b77fdf6"
+  },
+  {
+    "path": "initial.txt",
+    "bytes": 97,
+    "sha256": "8a949bccd56018e58427c5b2604447d7d09d02f0faeaacd5a2701833e0397c6a"
+  },
+  {
+    "path": "initial.xml",
+    "bytes": 19091,
+    "sha256": "c37e5a9a7e61d20754f7c58991c11d5820feb6b7ad058568e49bedfea49cf6cf"
+  },
+  {
+    "path": "pint-final.txt",
+    "bytes": 33,
+    "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+  },
+  {
+    "path": "pint.txt",
+    "bytes": 198,
+    "sha256": "d838e169f705e011d9cff4c9c185fb4f8eb74d3dd2215c1c5f17517e3d1e4615"
+  },
+  {
+    "path": "runtime-graph.json",
+    "bytes": 16516,
+    "sha256": "cf7df02942e97ba9b12a0a9bf41b297847d6679030285acb0d6f4a309dad7990"
+  },
+  {
+    "path": "source-and-outcomes.json",
+    "bytes": 3020,
+    "sha256": "79eab5c520e7461671939cebb2de92c2089004a653fa0e3c2ed6b51cf5eebb11"
+  }
+]

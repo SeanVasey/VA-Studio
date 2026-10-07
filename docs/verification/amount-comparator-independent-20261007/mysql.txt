@@ -1,0 +1,11 @@
+{"mysql": "8.4.11", "innodb_flush_log_at_trx_commit": 1, "sync_binlog": 1, "innodb_doublewrite": "ON", "log_bin": true, "transport": "private loopback TCP", "database": "fresh disposable"}
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/scratch/2876616e88c3/VA-Studio-amount-comparator-independent/comparator-mysql.phpunit.xml
+
+...............                                                   15 / 15 (100%)
+
+Time: 01:44.821, Memory: 94.00 MB
+
+[30;42mOK (15 tests, 112 assertions)[0m

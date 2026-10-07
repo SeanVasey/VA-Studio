@@ -1,0 +1,14 @@
+{
+  "source": "eab36455dff392e429d751488ae4c17f076e6296",
+  "tree": "5f6281c0be8a8243ef8f49c7681912be95d40d0c",
+  "parent": "bd97f170a3822d19f01d0bcf916c5ee33d04215b",
+  "source_sha256": {
+    "app/Domain/Commerce/ProductionPreparation/AmountRequirementsV1.php": "505502b7b03667041e2c3e37633b6eea9fab23bce15cf64930ad063cc163bd80",
+    "app/Domain/Commerce/ProductionPreparation/ProductionAmountRequirements.php": "1deab826a0bb416b57e78245ce6112d3bcaf3d49c9c67d8ee5ccd72b9449e3e5",
+    "docs/architecture/D-28-production-amount-evidence-requirements.md": "dd826ff7fa2a42d53bc549f839eb75b2df5168a8634fee2e3bc958ec63800bec",
+    "tests/Feature/ProductionAmountRequirementsAccessTest.php": "49ac0f9b8d1f2826ddfd355dc75f4811c097179f134d037ffa5ac32bb850da78",
+    "tests/Unit/ProductionAmountRequirementsTest.php": "01db646d46c9a280721728fbbcc735eb4e2e65783b4b4ca16407c7e136cd349b"
+  },
+  "reviewer_canary_sha256": "69baff993c5fbfd28ba7431587af4ccba441e940909fad807ddb9def3784042a",
+  "unchanged_manifests_locks_exception_policy": true
+}

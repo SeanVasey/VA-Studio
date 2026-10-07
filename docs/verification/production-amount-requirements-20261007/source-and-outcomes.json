@@ -1,0 +1,84 @@
+{
+  "tested_source": "eab36455dff392e429d751488ae4c17f076e6296",
+  "tree": "5f6281c0be8a8243ef8f49c7681912be95d40d0c",
+  "base": "bd97f170a3822d19f01d0bcf916c5ee33d04215b",
+  "owned": [
+    {
+      "path": "app/Domain/Commerce/ProductionPreparation/AmountRequirementsV1.php",
+      "sha256": "505502b7b03667041e2c3e37633b6eea9fab23bce15cf64930ad063cc163bd80",
+      "git_blob": "64b4478f16f7b2defeb22519400c82bdac20c905"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPreparation/ProductionAmountRequirements.php",
+      "sha256": "1deab826a0bb416b57e78245ce6112d3bcaf3d49c9c67d8ee5ccd72b9449e3e5",
+      "git_blob": "295fbff3b156f57cecc483223be0b018ec46c2e4"
+    },
+    {
+      "path": "docs/architecture/D-28-production-amount-evidence-requirements.md",
+      "sha256": "dd826ff7fa2a42d53bc549f839eb75b2df5168a8634fee2e3bc958ec63800bec",
+      "git_blob": "8d17cdc47a2b78b83da20e22f48e52938b6faf5d"
+    },
+    {
+      "path": "tests/Feature/ProductionAmountRequirementsAccessTest.php",
+      "sha256": "49ac0f9b8d1f2826ddfd355dc75f4811c097179f134d037ffa5ac32bb850da78",
+      "git_blob": "27a0e0c7c33d5d4c73bafadcbd3fdbce93da6e2c"
+    },
+    {
+      "path": "tests/Unit/ProductionAmountRequirementsTest.php",
+      "sha256": "01db646d46c9a280721728fbbcc735eb4e2e65783b4b4ca16407c7e136cd349b",
+      "git_blob": "709ac59efe25b9eb4cc2f961f7b8c3ccc9d44d09"
+    }
+  ],
+  "protected_unchanged": [
+    "composer.json",
+    "composer.lock",
+    "app/Domain/Commerce/ProductionPreparation/ProductionTrackPreparationPackets.php",
+    "app/Domain/Commerce/ProductionPreparation/PacketAuthority.php",
+    "app/Domain/Commerce/ProductionPreparation/PacketEvidence.php",
+    "app/Domain/Commerce/ProductionPreparation/ProductionBuyerAssentObservations.php",
+    "app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php",
+    "app/Domain/Commerce/ProductionPolicy/PreparationContextV1.php"
+  ],
+  "database_routes_workflows_contracts_discovery_unchanged": true,
+  "selections": [
+    {
+      "selection": "focused",
+      "cases": 52,
+      "assertions": 151,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "raw": "focused.txt",
+      "junit": "focused.xml"
+    },
+    {
+      "selection": "affected-reader",
+      "cases": 40,
+      "assertions": 107,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "raw": "affected-reader.txt",
+      "junit": "affected-reader.xml"
+    },
+    {
+      "selection": "affected-policy",
+      "cases": 93,
+      "assertions": 97,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "raw": "affected-policy.txt",
+      "junit": "affected-policy.xml"
+    }
+  ],
+  "failures": [],
+  "limits": [
+    "SQLite proofs do not establish MySQL concurrency.",
+    "No external provider/tax/buyer/assent facts verified.",
+    "Pure synthetic unit packet is shape evidence only.",
+    "Earlier initial iteration is not final-source acceptance.",
+    "No hosted/full/browser/native matrix or publication.",
+    "Independent authority review pending."
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "source": "eab36455dff392e429d751488ae4c17f076e6296",
+  "command": [
+    "php",
+    "-d",
+    "memory_limit=512M",
+    "vendor/bin/phpunit",
+    "-c",
+    "amount-independent.phpunit.xml",
+    "--log-junit",
+    "docs/verification/amount-requirements-independent-20261007/focused.xml",
+    "--fail-on-warning",
+    "--fail-on-empty-test-suite"
+  ],
+  "exit_code": 2
+}

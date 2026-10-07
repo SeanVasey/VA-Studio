@@ -1,5 +1,55 @@
 # Current development queue
 
+## Amount preparation batch and discovery recovery — October 7 UTC
+
+PR #24 merged at `717f0866444701637e7c396b4376891aa5dd995d`, tree
+`1c43bb29aefb56f3698ba734e756d685fd018245`, after exact cheap preflight
+37574833236 attempt 1 passed. Actual main/tree/ordered parents were verified.
+PDF v2 defaults remain off/test-only; original v1 recovery/bookkeeping persists.
+Dependency PRs #1–#3 are reconciled; PR #3 auto-closure/replacement receipt was
+verified without moving its historical head.
+
+[Amount preparation composition](verification/amount-preparation-composition-20261007/README.md)
+batches D28 historical requirements with D29 untrusted arithmetic comparison.
+Local approved executable `4eb0ebe` equals native `3398299c`, tree `a5e7fe3d`,
+with PR #24 as sole native parent. All ten source paths and 2,212 baseline
+paths are independently verified. D28 corrected author MySQL 52/182 and
+SQLite 52/183, independent actual MySQL 12/81 plus two explicit SQLite canaries,
+and final V2-graph SQLite 52/183 passed. D29 author SQLite 66/661 and MySQL
+selection 66/660 passed (51 pure and 15 actual access cases); independent
+SQLite 70/698 and genuine MySQL access 15/112 passed. Selections overlap.
+All 158 current package references and exact own autoload are bound.
+
+Tax/total/amount observations remain unknown/null and all authority flags false,
+even for coherent fabricated input. Staff/MFA/terminal captured-primary proofs,
+full selected-driver row/schema/guard/audit/migration invariance and D27 absence
+canaries passed. No route/writer/migration/provider/receipt/activation is added.
+The original 150 native-only SQLite method tuples, CI and lockfiles remain exact.
+Cheap preflight/expected-head merge remain publication gates for this candidate.
+
+PR #25 retains the corrected bounded discovery prerequisite and successful
+source-bound MySQL 14/362, actual stopped-copy 14/14 and historical pre-epoch
+60-to-61 migration copy proof. Cheap preflight 37577265103 attempt 1 passed
+on head `f713ce64`; no merge occurred. Fresh P1 review4203470722 found
+MySQL partial trigger DDL could leave unrecorded objects with no safe retry.
+A separate author repairs exact owned-prefix forward recovery, preserves
+unconditional down/data/bookkeeping, and adds actual fault-injection regressions.
+Independent sensitive review and corrected composition are required before
+that publication. Original passing/failing evidence remains source-bound.
+
+Private identity generation/store/staff one-step command continues in a separate
+lane, including its own partial-DDL recovery proof; no public selection pointer
+or index/child XML integration is claimed. Public consumption follows reviewed
+private API/native proofs and an explicitly guarded selected-generation pointer.
+After amount comparison, trusted server-observed provenance and actual buyer/
+location/order/provider facts remain separate engineering/external gates.
+
+The corrected cost policy remains focused local checks, one cheap preflight
+per coherent batch and expected-head merges; full Foundation/native/browser
+acceptance is manual final exact expected_sha. Parent T22/T36 and launch
+criteria remain open; no deployment, DNS, customer import or provider operation.
+
+
 ## Atomic PDF adoption and ongoing independent prerequisites — October 7 UTC
 
 PR #23 merged at `43b919c4f5cef9bb259515904333a7aa20dcb6fb`, tree

@@ -1,0 +1,89 @@
+{
+  "corrected_source": "20c85aa185503e0543e02567c28bad6799988aac",
+  "tree": "3d1cb5442978c992b194bac816aaca406cbeabf8",
+  "parent": "eb8273923dd6dbfaa4b4ae57961828d97b6fc340",
+  "changed_fixture": {
+    "path": "tests/Feature/ProductionAmountRequirementsAccessTest.php",
+    "sha256": "7e26e01f9b43c37984964618139a9939f7acb558a2be23bd70ccff9433c3ccef",
+    "git_blob": "2e7cf5a83621043ba106a16252974cdf9adbfca4"
+  },
+  "protected_unchanged": [
+    "app/Domain/Commerce/ProductionPreparation/ProductionAmountRequirements.php",
+    "app/Domain/Commerce/ProductionPreparation/AmountRequirementsV1.php",
+    "tests/Unit/ProductionAmountRequirementsTest.php",
+    "docs/architecture/D-28-production-amount-evidence-requirements.md",
+    "composer.json",
+    "composer.lock"
+  ],
+  "installed_lock_packages": 158,
+  "runtime_graph_mismatches": [],
+  "selections": [
+    {
+      "name": "eab-red-mysql",
+      "tested_source": "eab36455dff392e429d751488ae4c17f076e6296",
+      "cases": 1,
+      "assertions": 0,
+      "errors": 1,
+      "failures": 0,
+      "skips": 0,
+      "by_class": {
+        "Tests\\Feature\\ProductionAmountRequirementsAccessTest": {
+          "cases": 1,
+          "assertions": 0
+        }
+      }
+    },
+    {
+      "name": "sqlite",
+      "tested_source": "20c85aa185503e0543e02567c28bad6799988aac",
+      "cases": 52,
+      "assertions": 183,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0,
+      "by_class": {
+        "Tests\\Unit\\ProductionAmountRequirementsTest": {
+          "cases": 40,
+          "assertions": 101
+        },
+        "Tests\\Feature\\ProductionAmountRequirementsAccessTest": {
+          "cases": 12,
+          "assertions": 82
+        }
+      }
+    },
+    {
+      "name": "mysql",
+      "tested_source": "20c85aa185503e0543e02567c28bad6799988aac",
+      "cases": 52,
+      "assertions": 182,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0,
+      "by_class": {
+        "Tests\\Unit\\ProductionAmountRequirementsTest": {
+          "cases": 40,
+          "assertions": 101
+        },
+        "Tests\\Feature\\ProductionAmountRequirementsAccessTest": {
+          "cases": 12,
+          "assertions": 81
+        }
+      }
+    }
+  ],
+  "mysql_runtime": {
+    "version": "8.4.11",
+    "innodb_flush_log_at_trx_commit": 1,
+    "sync_binlog": 1,
+    "innodb_doublewrite": "ON",
+    "log_bin": true,
+    "transport": "private fresh loopback TCP",
+    "server": "fresh disposable per invocation"
+  },
+  "limits": [
+    "Both selected-driver access selections passed; this is not a MySQL concurrency proof or full Foundation run.",
+    "Original eab/eb827 evidence remains historical; native red demonstrates original fixture portability defect.",
+    "App classes and D28 unchanged. Independent corrected-source authority review pending."
+  ]
+}

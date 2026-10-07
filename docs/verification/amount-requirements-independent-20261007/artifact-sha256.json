@@ -1,0 +1,20 @@
+{
+  "AmountRequirementsIndependentCanaryTest.php": "69baff993c5fbfd28ba7431587af4ccba441e940909fad807ddb9def3784042a",
+  "README.md": "786770ccac8216676108af170ef2df94414af0cc4f796bbaad3e966ed2461b12",
+  "autoload.txt": "9805fa21bf7acf0832481c9b0cc8b7db0f6f512a309ee521ab1cd5b04f88c0c4",
+  "execution.json": "a5bda46e1b127e45aa780779b27102869c7169ee2630a72b43eb0be47340148f",
+  "focused.txt": "ac4cd20601dccdbc95938d33b3aa9f763cc947b0854c26c39feace6227d01da4",
+  "focused.xml": "67972649db150d63f4e63ba021b5389e880a4edc2c65a0d27203482d0cc600ba",
+  "initial-canary.php.txt": "ae9d73abb21f38b9f0efd3a027759709c5aaa2e6a815c8acc1af2a787e1bf94f",
+  "initial-execution.json": "a5bda46e1b127e45aa780779b27102869c7169ee2630a72b43eb0be47340148f",
+  "initial-focused.txt": "ac4cd20601dccdbc95938d33b3aa9f763cc947b0854c26c39feace6227d01da4",
+  "initial-focused.xml": "67972649db150d63f4e63ba021b5389e880a4edc2c65a0d27203482d0cc600ba",
+  "installed-graph.json": "472168afe296f499f52d4cb5a67c57d445b2eb519880e156773c734f9c311e71",
+  "late-primary-execution.json": "b26015958e154ff562bd75eb1df236dd1feaa679b16d3587633423be0493a623",
+  "late-primary.txt": "08ef409a50b30e8fd9b1c6c429e5fc5d0a419defa1123781ff7d66bff8b6a0d0",
+  "late-primary.xml": "850b2385c7b8b4e01e25aabd5268f8bcb4c52b15353d206c8dce4579640fc4a4",
+  "review-receipt.json": "f60a51e48e323311aec8d74397a1527de84484a4185e2457633c89869d1689ea",
+  "selection.xml": "a3a86c17e56c3ac8c7518f13c63d37770212b2b1ecdfeaa1f0c38333442e89b5",
+  "setup-failure.txt": "859e6b4ad3c62c59a11b512fb0295155188abe48a6754bf01db4dafd41572cf5",
+  "source-binding.json": "a005888745842e46aa9e3e137c6378a159f21256d03fdb1f0043e55ffc734b86"
+}

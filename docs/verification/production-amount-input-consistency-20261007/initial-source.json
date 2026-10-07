@@ -1,0 +1,18 @@
+[
+  {
+    "path": "app/Domain/Commerce/ProductionPreparation/CompareProductionAmountInputs.php",
+    "sha256": "d7df4de70b438b561852df96406526a1d80c2392caca5d01766cabd6d2706418"
+  },
+  {
+    "path": "app/Domain/Commerce/ProductionPreparation/AmountInputConsistencyV1.php",
+    "sha256": "120db902eb06b7a65cc10f213731d6177d81fddb4a3defbc5f3d8c589fd020f4"
+  },
+  {
+    "path": "tests/Unit/ProductionAmountInputConsistencyTest.php",
+    "sha256": "4a5c4cb6d573a11f720bb233976537ec0bd7dc3df4976f10ecfa66cd317ad33a"
+  },
+  {
+    "path": "tests/Feature/ProductionAmountInputConsistencyAccessTest.php",
+    "sha256": "1d9a5ef3468e0baf68d54a120c8e7739482b63c9afaa294b9f46f8fd6ff6d749"
+  }
+]

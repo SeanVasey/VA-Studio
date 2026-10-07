@@ -1,0 +1,19 @@
+{
+  "source": "20c85aa185503e0543e02567c28bad6799988aac",
+  "command": [
+    "python",
+    "/workspace/scratch/0c039e9e0645/mysql-runtime/run-tests.py",
+    "--",
+    "/workspace/scratch/0c039e9e0645/runtime-recovery/bin/php",
+    "-d",
+    "memory_limit=512M",
+    "vendor/bin/phpunit",
+    "-c",
+    "amount-portability-mysql.phpunit.xml",
+    "--log-junit",
+    "docs/verification/amount-portability-independent-20261007/mysql.xml",
+    "--fail-on-warning",
+    "--fail-on-empty-test-suite"
+  ],
+  "exit_code": 0
+}

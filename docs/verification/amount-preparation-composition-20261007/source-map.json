@@ -1,0 +1,28 @@
+{
+  "local_executable": "4eb0ebe90de695aad5a2851022de185881424e9a",
+  "native_executable": "3398299cd72139b37a64f84a8ec91ce43cbeeefd",
+  "tree": "a5e7fe3d890c6a68790d8cee6fdc32397f5ade56",
+  "native_ordered_parents": [
+    "717f0866444701637e7c396b4376891aa5dd995d"
+  ],
+  "approved_d28_source": "20c85aa185503e0543e02567c28bad6799988aac",
+  "approved_d29_source": "4eb0ebe90de695aad5a2851022de185881424e9a",
+  "d29_review_evidence": "da77053573db60d92e4d295e062a0327f3cd3524",
+  "combined_review_evidence": "8da820e41cac12c3c5728717c941b1c730320d4c",
+  "native_tree_and_ordered_parent_readback": true,
+  "all_ten_source_paths_exact": true,
+  "unchanged_baseline_paths": 2212,
+  "new_migrations": 0,
+  "post_executable_scope": "documentation/evidence only",
+  "discovery_pr25_included": false,
+  "verified_artifact_digest_counts": {
+    "docs/verification/amount-comparator-independent-20261007/evidence-sha256.json": 19,
+    "docs/verification/amount-portability-independent-20261007/artifact-sha256.json": 15,
+    "docs/verification/amount-requirements-independent-20261007/artifact-sha256.json": 18,
+    "docs/verification/production-amount-driver-portability-20261007/artifact-sha256.json": 12,
+    "docs/verification/production-amount-input-consistency-20261007/artifact-sha256.json": 25,
+    "docs/verification/production-amount-requirements-20261007/artifact-sha256.json": 15,
+    "docs/verification/amount-final-independent-20261007/original-artifact-digests.json": 20
+  },
+  "full_acceptance": false
+}

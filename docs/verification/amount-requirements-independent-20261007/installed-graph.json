@@ -1,0 +1,6 @@
+{
+    "packages_matched": 158,
+    "php": "8.4.26",
+    "amount_service_origin": "\/workspace\/scratch\/2876616e88c3\/VA-Studio-amount-requirements-independent-review\/app\/Domain\/Commerce\/ProductionPreparation\/ProductionAmountRequirements.php",
+    "amount_projection_origin": "\/workspace\/scratch\/2876616e88c3\/VA-Studio-amount-requirements-independent-review\/app\/Domain\/Commerce\/ProductionPreparation\/AmountRequirementsV1.php"
+}
