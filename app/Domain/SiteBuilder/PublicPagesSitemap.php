@@ -7,14 +7,7 @@ final class PublicPagesSitemap
 {
     public function xml(): string
     {
-        $origin = config('app.url');
-        $parts = is_string($origin) ? parse_url($origin) : false;
-        abort_unless(is_array($parts) && in_array($parts['scheme'] ?? null, ['http', 'https'], true)
-            && isset($parts['host'])
-            && ! isset($parts['user']) && ! isset($parts['pass']) && ! isset($parts['query']) && ! isset($parts['fragment'])
-            && in_array($parts['path'] ?? '', ['', '/'], true)
-            && preg_match('/^[a-zA-Z0-9.-]+$/D', $parts['host']) === 1
-            && filter_var($origin, FILTER_VALIDATE_URL) !== false, 503);
+        $origin = $this->canonicalOrigin();
         $urls = [];
         if (app()->environment('production')) {
             $content = app(SiteContent::class)->current();
@@ -40,5 +33,19 @@ final class PublicPagesSitemap
         }
 
         return $xml.'</urlset>'."\n";
+    }
+
+    public function canonicalOrigin(): string
+    {
+        $origin = config('app.url');
+        $parts = is_string($origin) ? parse_url($origin) : false;
+        abort_unless(is_array($parts) && in_array($parts['scheme'] ?? null, ['http', 'https'], true)
+            && isset($parts['host'])
+            && ! isset($parts['user']) && ! isset($parts['pass']) && ! isset($parts['query']) && ! isset($parts['fragment'])
+            && in_array($parts['path'] ?? '', ['', '/'], true)
+            && preg_match('/^[a-zA-Z0-9.-]+$/D', $parts['host']) === 1
+            && filter_var($origin, FILTER_VALIDATE_URL) !== false, 503);
+
+        return rtrim($origin, '/');
     }
 }
