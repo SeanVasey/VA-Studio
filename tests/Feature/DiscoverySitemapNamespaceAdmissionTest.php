@@ -121,11 +121,17 @@ final class DiscoverySitemapNamespaceAdmissionTest extends TestCase
     public function test_native_foreign_table_local_unique_names_do_not_reserve_owned_constraint_names(): void
     {
         $pdo = $this->native();
-        $pdo->exec('CREATE TABLE '.self::PREFIX.'foreign_parent (id INTEGER PRIMARY KEY, marker INTEGER NOT NULL, UNIQUE KEY `'.$this->symbol('_bounds').'` (marker), KEY `'.$this->symbol('_owner').'` (marker)) ENGINE=InnoDB');
+        $pdo->exec('CREATE TABLE '.self::PREFIX.'foreign_parent (id INTEGER PRIMARY KEY, marker INTEGER NOT NULL, UNIQUE KEY `'.$this->symbol('_bounds').'` (marker), UNIQUE KEY `'.$this->symbol('_owner').'` (marker)) ENGINE=InnoDB');
         $pdo->exec('INSERT INTO '.self::PREFIX.'foreign_parent VALUES (1,9123)');
         $before = $pdo->query('SHOW CREATE TABLE '.self::PREFIX.'foreign_parent')->fetchAll(PDO::FETCH_ASSOC);
         $schema = new SitemapSchema;
-        $schema->up();
+        $failure = null;
+        try {
+            $schema->up();
+        } catch (\Throwable $error) {
+            $failure = $error::class;
+        }
+        $this->assertNull($failure, 'A foreign table-local UNIQUE symbol must not contaminate an owned FK column proof after DDL.');
         $schema->assertOwned($pdo);
         $this->assertSame($before, $pdo->query('SHOW CREATE TABLE '.self::PREFIX.'foreign_parent')->fetchAll(PDO::FETCH_ASSOC));
         $this->assertSame([['id' => 1, 'marker' => 9123]], $pdo->query('SELECT * FROM '.self::PREFIX.'foreign_parent')->fetchAll(PDO::FETCH_ASSOC));
