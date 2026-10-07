@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-membership-preparation-independent/docs/verification/cloud-membership-preparation-independent-20261007/native-selection.xml" tests="1" assertions="6" errors="0" failures="1" skipped="0" time="37.501691">
+    <testsuite name="Independent native exact referenced schema admission" tests="1" assertions="6" errors="0" failures="1" skipped="0" time="37.501691">
+      <testsuite name="Tests\Feature\MembershipForeignSchemaCanaryTest" file="/workspace/VA-Studio-membership-preparation-independent/docs/verification/cloud-membership-preparation-independent-20261007/MembershipForeignSchemaCanaryTest.php" tests="1" assertions="6" errors="0" failures="1" skipped="0" time="37.501691">
+        <testcase name="test_foreign_schema_user_reference_is_refused_before_missing_suffix_ddl" file="/workspace/VA-Studio-membership-preparation-independent/docs/verification/cloud-membership-preparation-independent-20261007/MembershipForeignSchemaCanaryTest.php" line="17" class="Tests\Feature\MembershipForeignSchemaCanaryTest" classname="Tests.Feature.MembershipForeignSchemaCanaryTest" assertions="6" time="37.501691">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\MembershipForeignSchemaCanaryTest::test_foreign_schema_user_reference_is_refused_before_missing_suffix_ddl
+A foreign-database users reference must be refused before any owned suffix DDL.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-membership-preparation-independent/docs/verification/cloud-membership-preparation-independent-20261007/MembershipForeignSchemaCanaryTest.php:67
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

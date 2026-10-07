@@ -1,0 +1,30 @@
+{
+  "executable_source": "b635e12992dc91f5131f35e5c46b8dab6ff30eee",
+  "probe_frozen_commit": "7443754",
+  "probe_sha256": "72648803519da41d025222e000ecfeceef051ca3e0cdcd0dd01c4dbdbcdaca8a",
+  "schema_binding": {
+    "path": "app/Domain/Memberships/Production/MembershipSchema.php",
+    "git_blob": "e2af862545b78776df6c67f72337a4ad36be0a08",
+    "sha256": "1c2ab1009acc8c5c007bf259f286bd38ad993f95fd860221a0dd98015a22b468"
+  },
+  "native_actual_version": "8.0.46-0ubuntu0.24.04.4",
+  "test_result": {
+    "cases": 1,
+    "assertions": 6,
+    "failures": 1,
+    "errors": 0,
+    "skips": 0,
+    "seconds": 37.503
+  },
+  "actual_effect": {
+    "foreign_reference_accepted": true,
+    "added_guard": [
+      "production_membership_credit_events_delete"
+    ],
+    "all_retained_rows_preserved": true,
+    "owned_tables_unchanged": true
+  },
+  "executed_by": "native_mysql isolated fixture coordinator; this reviewer authored and froze unchanged canary, inspected raw result and snapshot",
+  "scope": "Preparation held; no operative award, invoice payment, provider binding, race or launch acceptance",
+  "cleanup": "Coordinator confirmation archived separately when available; probe finally restores local FK, then disposable-current-schema test lifecycle wipes current schema."
+}
