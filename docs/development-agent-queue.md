@@ -5,6 +5,12 @@
 One integration owner `/root`; verified main `ef444949bd694b841112695c90b7d27c2f698ead` includes PRs25–36.
 Historical owner tables below describe earlier source, not active workers.
 
+Sean's October 7 follow-up assigns all six current workers concrete downstream
+payment, content and production operations preparation. The
+[durable preparation queue](live-payment-and-production-preparation-queue.md)
+records owners, dependencies, development deliverables and the later activation
+boundary. Membership test setup is explicitly approved.
+
 | Worker | Isolated boundary | Current handoff |
 | --- | --- | --- |
 | `/root` | Primary/shared registration/evidence/publication | PR36 bounded full sitemap crawl merged; Support sharedde314/runtime15c/lifecycle662 publication; SMTPf5/suppression983; final test census |
