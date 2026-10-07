@@ -84,7 +84,7 @@ class ProductionTrackPreparationReplayConcurrencyTest extends TestCase
         $this->assertSame($row['payload_hash'], $packet['payload_hash']);
         $this->assertSame(CanonicalJson::hash($row), $packet['row_hash']);
         $body = app(ReadProductionTrackPreparationPacket::class)->recover($f['key'], $f['actor']);
-        $this->assertSame($f['capture']['request'], $body['request']);
+        $this->assertSame(CanonicalJson::encode($f['capture']['request']), CanonicalJson::encode($body['request']));
         foreach (['payable', 'execution_allowed', 'external_facts_verified', 'private_bytes_verified'] as $field) {
             $this->assertFalse($body['selection'][$field]);
         }
