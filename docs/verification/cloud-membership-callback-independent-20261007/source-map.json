@@ -1,0 +1,37 @@
+{
+  "executable": "d6933489ae701c5b45192fc3f368a225d41a9185",
+  "documentation_base": "79cb18bcaec91ad611d7de59a32ae2ebe622e078",
+  "changed_or_regression_bindings": [
+    {
+      "path": "app/Domain/Memberships/Production/MembershipPolicy.php",
+      "source": "d6933489ae701c5b45192fc3f368a225d41a9185",
+      "git_blob": "f145cffb89b36722ff32dd863a01c0ce0778e3ea",
+      "sha256": "816f79d6487343a5bd7f3d2bdc25c28f57a4becccf6debfafd0c6b88c503af16"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipRows.php",
+      "source": "d6933489ae701c5b45192fc3f368a225d41a9185",
+      "git_blob": "f5341aa8423acaa8783c80356719fe468c98e4cb",
+      "sha256": "a62d9848a193f78358d2ec6538d35f2d3871a5973d36c4d660d1ae8f7e93783c"
+    },
+    {
+      "path": "tests/Feature/ProductionMembership/MembershipPreparationTest.php",
+      "source": "d6933489ae701c5b45192fc3f368a225d41a9185",
+      "git_blob": "87720bd4259cd49bbd3becd6abdb34686174c3b9",
+      "sha256": "5ec07be316eb1bdfc0a5110d2a62717a098887cbbfbfb557097d3427fcee77b4"
+    },
+    {
+      "path": "tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php",
+      "source": "d6933489ae701c5b45192fc3f368a225d41a9185",
+      "git_blob": "981b26bf2c7548073cf0c0558e029f03ecc840a5",
+      "sha256": "42c9a1fe718de819a5d17fd38cb4d09f04e5519f8d3c731be437b3c91fd722b0"
+    }
+  ],
+  "carried_verified_counts": {
+    "owned": 21,
+    "registered_dependencies": 12,
+    "unchanged_synthetic": 24,
+    "repair_artifacts": 10
+  },
+  "original_probe_sha256": "42c9a1fe718de819a5d17fd38cb4d09f04e5519f8d3c731be437b3c91fd722b0"
+}

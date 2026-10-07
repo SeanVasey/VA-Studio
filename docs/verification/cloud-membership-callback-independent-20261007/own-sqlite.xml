@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembership\MembershipRawConfigurationClosureTest" file="/workspace/VA-Studio-membership-callback-independent/tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php" tests="2" assertions="6" errors="0" failures="0" skipped="0" time="1.294674">
+    <testcase name="test_captured_reader_refuses_overloaded_database_parent_before_late_policy_callback" file="/workspace/VA-Studio-membership-callback-independent/tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php" line="21" class="Tests\Feature\ProductionMembership\MembershipRawConfigurationClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRawConfigurationClosureTest" assertions="3" time="0.739781"/>
+    <testcase name="test_captured_policy_baseline_refuses_overloaded_parent_before_identity_policy_callback" file="/workspace/VA-Studio-membership-callback-independent/tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php" line="44" class="Tests\Feature\ProductionMembership\MembershipRawConfigurationClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRawConfigurationClosureTest" assertions="3" time="0.554893"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,11 @@
+Generating optimized autoload files
+Warning: Ambiguous class resolution, "League\Flysystem\Local\FallbackMimeTypeDetector" was found in both "/workspace/VA-Studio-membership-callback-independent/vendor/league/flysystem-local/FallbackMimeTypeDetector.php" and "/workspace/VA-Studio-membership-callback-independent/vendor/league/flysystem/src/Local/FallbackMimeTypeDetector.php", the first will be used.
+Warning: Ambiguous class resolution, "League\Flysystem\Local\LocalFilesystemAdapter" was found in both "/workspace/VA-Studio-membership-callback-independent/vendor/league/flysystem-local/LocalFilesystemAdapter.php" and "/workspace/VA-Studio-membership-callback-independent/vendor/league/flysystem/src/Local/LocalFilesystemAdapter.php", the first will be used.
+Warning: Ambiguous class resolution, "League\Flysystem\Local\LocalFilesystemAdapterTest" was found in both "/workspace/VA-Studio-membership-callback-independent/vendor/league/flysystem-local/LocalFilesystemAdapterTest.php" and "/workspace/VA-Studio-membership-callback-independent/vendor/league/flysystem/src/Local/LocalFilesystemAdapterTest.php", the first will be used.
+Warning: Ambiguous class resolution, "App\Providers\AppServiceProvider" was found in both "/workspace/VA-Studio-membership-callback-independent/app/Providers/AppServiceProvider.php" and "/workspace/VA-Studio-membership-callback-independent/vendor/laravel/pint/app/Providers/AppServiceProvider.php", the first will be used.
+To resolve ambiguity in classes not under your control you can ignore them by path using exclude-files-from-classmap
+Class RelatedTrackBrowserFixture located in ./tests/browser/prepare-related-tracks.php does not comply with psr-4 autoloading standard (rule: Tests\ => ./tests). Skipping.
+Class RefundResolutionBrowserFixture located in ./tests/browser/refund-resolution-fixture.php does not comply with psr-4 autoloading standard (rule: Tests\ => ./tests). Skipping.
+Class OrderInquiryBrowserFixture located in ./tests/browser/order-inquiry-fixture.php does not comply with psr-4 autoloading standard (rule: Tests\ => ./tests). Skipping.
+Class UnpaidReleaseBrowserFixture located in ./tests/browser/unpaid-release-fixture.php does not comply with psr-4 autoloading standard (rule: Tests\ => ./tests). Skipping.
+Generated optimized autoload files containing 11133 classes
