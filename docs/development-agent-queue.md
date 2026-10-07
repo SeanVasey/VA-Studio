@@ -1,5 +1,30 @@
 # Development agents and launch queue
 
+## Active cloud ownership — October 7, 2026 UTC
+
+The prior development chat is idle/interrupted. `/root` is the sole integration
+owner in the selected published `/workspace` environment; no Mac or additional
+environment is used. Verified main `22d340bd0a19cfb025b0f2b48171283f4b61d156`
+includes PR26 and PR27. Older owner tables below are historical.
+
+| Worker | Isolated owned boundary | Current handoff |
+| --- | --- | --- |
+| `/root` | Primary integration; shared routes/privacy/page registration, status and publication | Independently approved installation/private-checkout recovery composed; listening account API/page composed for review; focused preflight and expected-head merges |
+| `/root/pr25_recovery` | PR25 epoch migration and fault-injection regressions | Exact owned-prefix recovery with SQLite/MySQL preservation; reserved-name SQLite preflight repair after independent reproduction |
+| `/root/pr26_review` | Independent PR25 review and canaries | Actual native failure/retry/bookkeeping/shadow checks and extra schema canaries; approve only the repaired tested source |
+| `/root/crawler_routes` | New customer listening domain/migration/component/tests | Durable private favorites/playlists; terminal primary-connection authority and retained-row fences, atomic creation and rollback retention repairs |
+| `/root/recovery_inventory` | Independent listening review and additive evidence | Actual account-page cases, terminal drift probes and two-process native contention; recovered UI authorship is frozen |
+| `/root/completion_audit` | Recovered inquiry-notification domain/worker/migration/tests | Default-off unbound transport, claim/uncertain handoff/recovery and foreign-reference rollback protection; native tests before review |
+| `/root/native_mysql` | New service project journey/migration/Filament/customer UI/tests; disposable local database allocation | Buyer brief, explicit staff quote, exact accept/decline, milestones/revision/status; no payment or delivery authority |
+
+All use isolated worktrees and the retained locked toolchain. Root owns shared
+registration and allocated additive migration timestamps (242000 listening,
+243000 inquiry notifications, 244000 service projects). Private fixture databases
+are separate. No worker owns production credentials, transport binding or hosted
+workflow dispatch. The [checkpoint](verification/cloud-primary-checkpoint-20261007.md)
+and [audit](verification/cloud-completion-audit-20261007.md) preserve remaining
+dependencies and source-backed acceptance limits.
+
 ## Active production preparation — October 6, 2026 UTC
 
 Verified main `a348f67eff1fdd16b1945efd3b99aa27af3dd242` includes merged PR #16

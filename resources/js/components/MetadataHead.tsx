@@ -2,8 +2,10 @@ import { Head } from '@inertiajs/react';
 import type { PageMetadata } from '../lib/catalog';
 
 /** Matches the server fallback keys so Inertia adopts, replaces and removes tags on navigation. */
-export function MetadataHead({ metadata }: { metadata: PageMetadata }) {
+export function MetadataHead({ metadata, publicInstallation = false }: { metadata: PageMetadata; publicInstallation?: boolean }) {
   return <Head title={metadata.title}>
+    {publicInstallation && <link head-key="install:manifest" rel="manifest" href="/manifest.webmanifest" />}
+    {publicInstallation && <link head-key="install:touch-icon" rel="apple-touch-icon" sizes="180x180" href="/brand/apple-touch-icon.png" />}
     <meta head-key="description" name="description" content={metadata.description} />
     <meta head-key="robots" name="robots" content={metadata.robots} />
     <link head-key="canonical" rel="canonical" href={metadata.canonicalUrl} />

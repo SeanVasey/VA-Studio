@@ -26,10 +26,10 @@ export function SiteHeader({ content, homeHref, href, onNavigate, currentPath, c
   </header>;
 }
 
-export function SiteFooter({ content, homeHref, href, onNavigate }: ChromeProps) {
+export function SiteFooter({ content, homeHref, href, onNavigate, children }: ChromeProps & { children?: ReactNode }) {
   return <footer className="site-footer"><div className="footer-top">
     <a href={homeHref} onClick={onNavigate} aria-label="VASEY.AUDIO home"><img className="footer-logo" src="/brand/vasey-audio-logo.png" alt="VASEY.AUDIO" width="420" height="100" /></a>
     <p style={{ whiteSpace: 'pre-line' }}>{content.footer.description}</p>
     <nav aria-label="Footer navigation">{content.navigation.map(item => <a key={item.href} href={href(item.href)} onClick={onNavigate}>{item.label}</a>)}<a href="/admin">Artist admin <Icon name="northeast" size={14} /></a></nav>
-  </div><div className="footer-bottom"><span>© {new Date().getFullYear()} VASEY.AUDIO</span><span>COMPOSED WITH INTENT.</span></div></footer>;
+  </div>{children}<div className="footer-bottom"><span>© {new Date().getFullYear()} VASEY.AUDIO</span><span>COMPOSED WITH INTENT.</span></div></footer>;
 }

@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "php": [
+    {
+      "file": "php-fixture-key-failure.xml",
+      "sha256": "0bd8619cd5561f92a0ac0375172296faf8459aea25faae5402bd4a6f7576d99b",
+      "bytes": 32532,
+      "source": "pre-snapshot-strengthening working source",
+      "cases": 12,
+      "errors": 10,
+      "failures": 0,
+      "skips": 0,
+      "assertions": 45
+    },
+    {
+      "file": "php-dedicated-first-pass.xml",
+      "sha256": "b0489b011f3ac3eab7d99623b54b62f52f37e358e755483e9bdb5512fdb66fb5",
+      "bytes": 5287,
+      "source": "pre-snapshot-strengthening working source",
+      "cases": 12,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0,
+      "assertions": 772
+    },
+    {
+      "file": "php-affected-built-assets-failure.xml",
+      "sha256": "22ac60a06116ae524673c526843b0c7fff190aa360ab2c7d65fe404bedb0889c",
+      "bytes": 32790,
+      "source": "working source byte-identical to executable 26700f9",
+      "cases": 77,
+      "errors": 0,
+      "failures": 5,
+      "skips": 1,
+      "assertions": 2090
+    },
+    {
+      "file": "php-metadata-corrected.xml",
+      "sha256": "c393ff9b981cad709ee577a1ea8bc8f212b494ab9b2a1eae5d8c65f296f086a2",
+      "bytes": 2550,
+      "source": "26700f9",
+      "cases": 7,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0,
+      "assertions": 150
+    }
+  ],
+  "frontend": {
+    "command": "npm test -- tests/frontend/install-app.test.tsx tests/frontend/checkout-return.test.tsx tests/frontend/metadata.test.tsx tests/frontend/catalog-pagination.test.tsx tests/frontend/cms-navigation.test.tsx tests/frontend/customer-account.test.tsx tests/frontend/editorial-content.test.tsx tests/frontend/editorial-related-tracks.test.tsx tests/frontend/editorial-video.test.tsx tests/frontend/inquiry-conversation.test.tsx tests/frontend/order-recovery.test.tsx tests/frontend/site-content.test.tsx tests/frontend/site-images.test.tsx tests/frontend/storefront.test.tsx tests/frontend/track-detail.test.tsx",
+    "source": "working source byte-identical to executable 26700f9",
+    "passed_cases": 158,
+    "passed_files": 15,
+    "duration_seconds": 12.39
+  },
+  "native_listing": {
+    "command": "VASEY_BROWSER_DIRECTORY=/tmp/recovered-install-checkout-list npx playwright test --list tests/browser/public-install.spec.ts tests/browser/test-checkout.spec.ts",
+    "defined_cases": 8,
+    "executed": false,
+    "reason": "Chromium and WebKit executable paths were absent locally."
+  },
+  "checks": {
+    "typecheck": "passed",
+    "production_build": "passed; existing >500kB bundle advisory remains",
+    "client_bundle_scan": "passed, six bundles and eight secret names/Stripe key prefixes, zero hits",
+    "php_style": "Pint passed affected controller and three PHP test/helper files",
+    "php_helper_syntax": "passed",
+    "cached_diff_check": "passed"
+  },
+  "graph": {
+    "dependency_changes": false,
+    "composer_autoload": "own composer/bin/autoload metadata retained with original locked package directory symlinks; dump-autoload --no-scripts --no-plugins completed with inherited ambiguous Flysystem/Pint and browser-fixture PSR warnings",
+    "own_source_reflection": "controller and both recovered PHP test classes resolve to /workspace/VA-Studio-install-checkout"
+  }
+}
