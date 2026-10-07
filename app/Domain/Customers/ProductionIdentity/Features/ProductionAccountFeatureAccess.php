@@ -4,6 +4,7 @@ namespace App\Domain\Customers\ProductionIdentity\Features;
 
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Customers\ProductionCustomerAccess;
+use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
 use Illuminate\Http\Request;
 
@@ -39,6 +40,23 @@ final class ProductionAccountFeatureAccess
         (new ProductionCustomerAccess)->proveCurrent($identity->principal(), $identity->actor(), $reader, $expectedRaw['identity']);
     }
 
+    /** Read-only admission before module validation; deliberately no FOR UPDATE or new identity. */
+    public function lockCommitted(ProductionAccountFeatureIdentity $identity, IdentityCommittedFrame $frame, array $expectedRaw): void
+    {
+        if (array_keys($expectedRaw) !== ['configuration', 'identity'] || ! is_array($expectedRaw['identity'])
+            || $this->policy($identity)->current() !== $expectedRaw['configuration']) {
+            throw new IdentityException;
+        }
+        (new ProductionCustomerAccess)->proveCommitted($identity->principal(), $identity->actor(), $frame, $expectedRaw['identity']);
+    }
+
+    /** Last consumer fence: original evidence/config proof then one-use physical close, without commit callbacks. */
+    public function proveCommitted(ProductionAccountFeatureIdentity $identity, IdentityCommittedFrame $frame, array $expectedRaw): void
+    {
+        $this->lockCommitted($identity, $frame, $expectedRaw);
+        $frame->finish();
+    }
+
     /** Nonsecret creation identity. It does not itself authorize a write; lock/proveCurrent must surround it. */
     public function durableBinding(ProductionAccountFeatureIdentity $identity): array
     {
@@ -60,6 +78,16 @@ final class ProductionAccountFeatureAccess
     {
         $buyer = $this->original($identity, $binding);
         (new ProductionCustomerAccess)->proveHistoricalBindingCurrent($buyer, $reader, $expectedRaw);
+    }
+
+    public function verifyOriginalBindingCommitted(ProductionAccountFeatureIdentity $identity, array $binding, IdentityCommittedFrame $frame): array
+    {
+        return (new ProductionCustomerAccess)->verifyHistoricalBindingCommitted($this->original($identity, $binding), $frame);
+    }
+
+    public function proveOriginalBindingCommitted(ProductionAccountFeatureIdentity $identity, array $binding, IdentityCommittedFrame $frame, array $expectedRaw): void
+    {
+        (new ProductionCustomerAccess)->proveHistoricalBindingCommitted($this->original($identity, $binding), $frame, $expectedRaw);
     }
 
     private function original(ProductionAccountFeatureIdentity $identity, array $binding): array

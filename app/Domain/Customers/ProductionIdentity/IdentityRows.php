@@ -15,7 +15,7 @@ final readonly class IdentityRows
 
     private string $schema;
 
-    public function __construct(private PDO $primary, private string $driver)
+    public function __construct(private PDO $primary, private string $driver, private ?IdentityCommittedFrame $committedFrame = null)
     {
         $this->connection = DB::connection();
         $this->schema = $driver === 'sqlite' ? 'main' : $this->connection->getDatabaseName();
@@ -27,6 +27,13 @@ final readonly class IdentityRows
         return new self($reader->identityPrimary(), $reader->identityDriver());
     }
 
+    public static function committed(IdentityCommittedFrame $frame): self
+    {
+        $reader = $frame->reader();
+
+        return new self($reader->identityPrimary(), $reader->identityDriver(), $frame);
+    }
+
     public function assertPermanent(): void
     {
         try {
@@ -35,7 +42,9 @@ final readonly class IdentityRows
                 || $this->primary->getAttribute(PDO::ATTR_DRIVER_NAME) !== $this->driver) {
                 throw new IdentityException;
             }
-            if ($this->connection->transactionLevel() > 1 || $this->primary->inTransaction() !== ($this->connection->transactionLevel() === 1)) {
+            if ($this->committedFrame !== null) {
+                $this->committedFrame->assertActive();
+            } elseif ($this->connection->transactionLevel() > 1 || $this->primary->inTransaction() !== ($this->connection->transactionLevel() === 1)) {
                 throw new IdentityException;
             }
             foreach (DB::getConnections() as $connection) {
@@ -74,6 +83,7 @@ final readonly class IdentityRows
     public function assertTable(string $table): void
     {
         try {
+            $this->committedFrame?->assertActive();
             $qualified = $this->table($table);
             if (DB::connection() !== $this->connection || $this->connection->getPdo() !== $this->primary
                 || $this->connection->getDriverName() !== $this->driver || $this->primary->getAttribute(PDO::ATTR_DRIVER_NAME) !== $this->driver) {
@@ -120,7 +130,7 @@ final readonly class IdentityRows
     {
         $this->assertTable($table);
         $statement = $this->primary->prepare('SELECT * FROM '.$this->table($table).' WHERE '.$where.' ORDER BY id'.($limit === null ? '' : ' LIMIT '.$limit)
-            .($this->driver === 'mysql' ? ' FOR UPDATE' : ''));
+            .($this->driver === 'mysql' && $this->committedFrame === null ? ' FOR UPDATE' : ''));
         $statement->execute($bindings);
 
         return $statement->fetchAll(PDO::FETCH_ASSOC);
