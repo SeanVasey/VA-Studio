@@ -363,14 +363,21 @@ final class ProductionSuppressionSchema
         $hex = fn ($c) => $driver === 'sqlite' ? "length(NEW.$c)=64 AND NEW.$c NOT GLOB '*[^a-f0-9]*'" : "CHAR_LENGTH(NEW.$c)=64 AND NEW.$c REGEXP '^[a-f0-9]{64}$'";
         $bytes = fn ($c) => $driver === 'sqlite' ? 'length(CAST(NEW.'.$c.' AS BLOB))' : 'LENGTH(NEW.'.$c.')';
         $length = fn ($c) => ($driver === 'sqlite' ? 'length' : 'CHAR_LENGTH').'(NEW.'.$c.')';
-        $target = "NEW.purpose='email_marketing' AND ".$length('public_id').'=36 AND '.$hex('recipient_hmac').' AND '.$bytes('recipient_ciphertext').' BETWEEN 1 AND 8192'
+        // Exactly Str::isUuid(): 8-4-4-4-12 hex digits of either case, no version or variant constraint, nothing before or after.
+        // SQLite GLOB and MySQL REGEXP both match the whole value here because the length is also pinned to 36 characters.
+        $uuid = function ($c) use ($driver, $length): string {
+            $pattern = implode('-', array_map(fn ($n) => str_repeat('[0-9A-Fa-f]', $n), [8, 4, 4, 4, 12]));
+
+            return $length($c).'=36 AND NEW.'.$c.($driver === 'sqlite' ? " GLOB '$pattern'" : " REGEXP '^$pattern\$'");
+        };
+        $target = "NEW.purpose='email_marketing' AND ".$uuid('public_id').' AND '.$hex('recipient_hmac').' AND '.$bytes('recipient_ciphertext').' BETWEEN 1 AND 8192'
             ." AND EXISTS (SELECT 1 FROM production_account_feature_bindings b WHERE b.id=NEW.binding_id AND b.feature='consent_preferences')"
             ." AND EXISTS (SELECT 1 FROM production_consent_events e WHERE e.id=NEW.withdrawal_event_id AND e.binding_id=NEW.binding_id AND e.purpose=NEW.purpose AND e.status='withdrawn' AND e.affirmative=0 AND e.recipient_hmac=NEW.recipient_hmac AND e.created_at<=NEW.created_at)"
             .' AND NOT EXISTS (SELECT 1 FROM production_suppression_targets WHERE id=NEW.id OR public_id=NEW.public_id OR (binding_id=NEW.binding_id AND purpose=NEW.purpose AND recipient_hmac=NEW.recipient_hmac))';
-        $intent = $length('public_id').'=36'
+        $intent = $uuid('public_id')
             ." AND EXISTS (SELECT 1 FROM production_suppression_targets t JOIN production_consent_events e ON e.binding_id=t.binding_id AND e.purpose=t.purpose AND e.recipient_hmac=t.recipient_hmac WHERE t.id=NEW.target_id AND e.id=NEW.withdrawal_event_id AND e.status='withdrawn' AND e.affirmative=0 AND t.created_at<=NEW.created_at AND e.created_at<=NEW.created_at)"
             .' AND NOT EXISTS (SELECT 1 FROM production_suppression_intents WHERE id=NEW.id OR public_id=NEW.public_id OR withdrawal_event_id=NEW.withdrawal_event_id)';
-        $attempt = $length('public_id').'=36 AND '.$hex('provider_hash').' AND '.$hex('request_hash').' AND '.$bytes('provider_ciphertext').' BETWEEN 1 AND 8192'
+        $attempt = $uuid('public_id').' AND '.$hex('provider_hash').' AND '.$hex('request_hash').' AND '.$bytes('provider_ciphertext').' BETWEEN 1 AND 8192'
             .' AND EXISTS (SELECT 1 FROM production_suppression_intents i WHERE i.id=NEW.intent_id AND i.target_id=NEW.target_id AND i.created_at<=NEW.created_at)'
             .' AND NOT EXISTS (SELECT 1 FROM production_suppression_attempts WHERE id=NEW.id OR public_id=NEW.public_id OR target_id=NEW.target_id OR intent_id=NEW.intent_id)';
         $confirmation = $hex('request_hash').' AND '.$hex('receipt_hash').' AND '.$bytes('receipt_ciphertext').' BETWEEN 1 AND 8192'
