@@ -129,4 +129,33 @@ class CustomerListeningFreshnessTest extends TestCase
             $this->assertDatabaseCount('customer_saved_tracks', 0);
         }
     }
+
+    public function test_framework_reads_cannot_use_a_temporary_catalog_shadow_while_proof_reads_main(): void
+    {
+        if (DB::getDriverName() !== 'sqlite') {
+            $this->markTestSkipped('SQLite main/temp resolution; MySQL native shadow refusal is independently reviewed.');
+        }
+        $this->fakePrivateMediaStorage();
+        $customer = CustomerFixtures::account();
+        $selection = QuoteFixtures::selection();
+        $library = app(ListeningLibrary::class);
+        $library->change($customer['principal'], $customer['user'], ['action' => 'save-track', 'version' => 0, 'trackId' => (string) $selection['track']->id]);
+        $pdo = DB::connection()->getPdo();
+        $before = $pdo->query('SELECT * FROM main.customer_saved_tracks')->fetchAll(PDO::FETCH_ASSOC);
+        $pdo->exec('CREATE TEMP TABLE tracks AS SELECT * FROM main.tracks');
+        $pdo->exec("UPDATE temp.tracks SET title='PRIVATE temporary catalog metadata'");
+        try {
+            try {
+                $library->read($customer['principal'], $customer['user']);
+                $this->fail('A framework/catalog shadow was treated as captured primary evidence.');
+            } catch (ListeningException $error) {
+                $this->assertSame(503, $error->status);
+                $this->assertSame($before, $pdo->query('SELECT * FROM main.customer_saved_tracks')->fetchAll(PDO::FETCH_ASSOC));
+                $this->assertSame('PRIVATE temporary catalog metadata', $pdo->query('SELECT title FROM temp.tracks')->fetchColumn());
+            }
+        } finally {
+            $pdo->exec('DROP TABLE temp.tracks');
+        }
+        $this->assertSame($selection['track']->title, $pdo->query('SELECT title FROM main.tracks')->fetchColumn());
+    }
 }
