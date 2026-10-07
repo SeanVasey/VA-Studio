@@ -9,7 +9,7 @@ try {
     $payload = json_decode($raw, true, 128, JSON_THROW_ON_ERROR);
     if (! is_array($payload) || array_diff(array_keys($payload), ['input', 'profile']) !== []
         || ! is_array($payload['input'] ?? null) || ! is_array($payload['profile'] ?? null)) { throw new RuntimeException; }
-    $rendered = (new App\Domain\Contracts\TcpdfContractRenderer(dirname(__DIR__)))->render($payload['input'], $payload['profile']);
+    $rendered = (new App\Domain\Contracts\VersionedContractRenderer(dirname(__DIR__)))->render($payload['input'], $payload['profile']);
     if ($rendered->sizeBytes > 16777216 || $rendered->pageCount > 100) { throw new RuntimeException; }
     $encoded = json_encode(['pdf_base64' => base64_encode($rendered->pdfBytes), 'sha256' => $rendered->sha256,
         'size_bytes' => $rendered->sizeBytes, 'page_count' => $rendered->pageCount,

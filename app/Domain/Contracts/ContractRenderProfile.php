@@ -16,7 +16,7 @@ final class ContractRenderProfile
     public static function current(?string $projectRoot = null): array
     {
         $profile = ContractRenderProfileRegistry::metadata(self::VERSION, $projectRoot);
-        self::verifyRuntime($profile, $projectRoot);
+        self::verifyVersionRuntime($profile, self::VERSION, $projectRoot);
 
         return $profile;
     }
@@ -42,8 +42,17 @@ final class ContractRenderProfile
         return CanonicalJson::hash(self::validate($profile));
     }
 
+    /** Legacy v1 renderer entry: its immutable implementation must never receive another profile. */
     public static function verifyRuntime(array $profile, ?string $projectRoot = null): void
     {
+        self::verifyVersionRuntime($profile, 'test-buyer-pdf-v1', $projectRoot);
+    }
+
+    public static function verifyVersionRuntime(array $profile, string $requiredVersion, ?string $projectRoot = null): void
+    {
+        if (($profile['version'] ?? null) !== $requiredVersion) {
+            throw new ContractIssuanceException('profile_changed');
+        }
         self::validate($profile);
         $root = $projectRoot ?? dirname(__DIR__, 3);
         if (PHP_MAJOR_VERSION !== 8 || PHP_MINOR_VERSION !== 4) {

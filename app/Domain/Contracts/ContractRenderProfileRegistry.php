@@ -27,6 +27,18 @@ final class ContractRenderProfileRegistry
                 'remote_resources' => false, 'markup_resources' => false,
                 'limits' => self::V1_LIMITS],
         ],
+        'test-buyer-pdf-v2' => [
+            'assets_directory' => 'resources/contracts/test-v2',
+            'manifest_sha256' => '29e0b1b33abc78ab48c6669579dbb3296eb9e282f2a16b0fb337db8417b68dac',
+            'metadata' => ['schema_version' => 1, 'version' => 'test-buyer-pdf-v2', 'test_only' => true,
+                'issuance_policy' => ContractIssuancePolicy::V2_CONTRACT, 'renderer' => 'tecnickcom/tc-lib-pdf', 'template' => 'frozen-grant-sections-v1',
+                'php_runtime' => '8.4', 'timezone' => 'UTC', 'pdf_conformance' => 'plain-pdf',
+                'page' => ['format' => 'A4', 'orientation' => 'P', 'margin_mm' => 15, 'font_size_pt' => 10],
+                'font_family' => 'dejavusans', 'font_subset' => false, 'compression' => false,
+                'allowed_scripts' => ['Latin', 'Greek', 'Cyrillic', 'Common'], 'combining_marks' => false,
+                'remote_resources' => false, 'markup_resources' => false,
+                'limits' => self::V1_LIMITS],
+        ],
     ];
 
     public static function assetsDirectory(string $version): string
@@ -45,6 +57,10 @@ final class ContractRenderProfileRegistry
         $root = $projectRoot ?? dirname(__DIR__, 3);
         $path = $root.'/'.$definition['assets_directory'].'/profile-assets.json';
         if (! is_file($path) || is_link($path) || filesize($path) > 65536) {
+            throw new ContractIssuanceException('profile_changed');
+        }
+        if (isset($definition['manifest_sha256'])
+            && ! hash_equals($definition['manifest_sha256'], hash_file('sha256', $path))) {
             throw new ContractIssuanceException('profile_changed');
         }
         try {

@@ -1,0 +1,22 @@
+{
+  "README.md": "24c6252a2b7591226d19d81a8963b7887af2c9b73fd2d612f40c58d419395f56",
+  "actual-conversion.txt": "3c93fcc5e132efb9cf79ad126759988b4d10504545e7f0508a51798e04e8de53",
+  "actual-v2-render.json": "3c9132ae0e3d618e47c2f6e048813710519ad1ce7907e97a67db217a0f1dd37d",
+  "autoload-syntax.txt": "470551cef3e0efc2643c0160e5f6b8f3ecb979bb88878658fbcfc246a275159c",
+  "child-syntax.txt": "b31d56507ac2be74aa29b8e010bc5f811e31b586b4cecfc1a22519f1dc56a8e0",
+  "commands.json": "469457328081219527123aa72731898a344dc1e5638d9c4e4070c89ee0ff78e9",
+  "outcomes.json": "6b6834907304add6f08831de1d3b8d42c9faf44bf2492163dfb8f40233c49d79",
+  "pint-check.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+  "raw-output-bytes.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+  "red-direct-v1-v2-probe.txt": "35bf98c7ae05c0314d8a52f885001dd69e5026f559480d01f344e8e0bb514d4a",
+  "red-direct-v2-v1-probe.txt": "8510dac99ca8f68dcfc0f28a4de6744a22c0c818807f292f283362ccabc1e89b",
+  "red-original-canaries.txt": "6d2ecde8548d61b813d2106c9e261b5577931f191af3fde51d3142d836ba718f",
+  "red-original-canaries.xml": "ac9150f6617de30e53c742f8d91f7d108868aacd9816caa4817941d871b8de18",
+  "retained-selection.xml": "cb587335d58653659528e856aa3c0aaec4a9093551ed49a0de059224d07d5170",
+  "retained-six-files.txt": "6b3f240f8b33f769bb575c0e311fd81ec391ebdc3bfcf85ef407e74f2128c05f",
+  "retained-six-files.xml": "4ce28bcd82036b07263a05ca3838fa04a09b48353233bd2f50af4063d9d5c7ae",
+  "reviewer-predecessor-canaries.php": "b4e0230c42b5de19c19418594705687efc3f07419535076644f36e91abd79d0a",
+  "source-binding.json": "f3c04c3db79063d07a9603f7212a44f4ac121255c1d9700ac74cb5ed9c6fab2d",
+  "successor-final.txt": "3b1cb0805172f803e9214a08c4f612644f2d396c0575922427630c0075fac48e",
+  "successor-final.xml": "9a6aaf1ef7643096ec4cd1315a4b068ee55856a71f9b272975e06dc5b43ee983"
+}

@@ -1,0 +1,18 @@
+{
+  "corrected_source_only": "7501ef9f2f1245493a9ca5a584da8be849dd3d12",
+  "source_tree": "781a07940729df3b0f361f7cca452f978c55f5a8",
+  "source_parent": "46f57568960268ae6a2c90b72db38793ecb45dc7",
+  "experimental_only": "a8f57946bf1c6599f19e3c52d71a6564f45fc768",
+  "experimental_tree": "4b6524f657150d52b6d0cad6bebee198d9d7390e",
+  "experimental_parent": "ebadd5d0f36e2a9d068c32dd7d4e7d43c230c959",
+  "two_graphs_actual_installed_all_158_refs_match": true,
+  "v1_unchanged_sha256": {
+    "app/Domain/Contracts/TcpdfContractRenderer.php": "620b66766143ab72532e8fa3a161d3eb1012368bbf195cea70b9b8907cdd763a",
+    "app/Domain/Contracts/ContractText.php": "46d145c921ff5a94b3d2928c9b7d9caf0697d33f8ba5c5c30ca65598e1d68a08",
+    "resources/contracts/test-v1/profile-assets.json": "44533c186a3b1350163025256a9ced519a6395ba8001541193d1d51b51688e50",
+    "composer.lock": "996bc7f800d5cc6b4312f5303fbd67a5cadd17e0eb640f3e2e94035e713289aa"
+  },
+  "regenerated_actual_v2_manifest_sha256": "29e0b1b33abc78ab48c6669579dbb3296eb9e282f2a16b0fb337db8417b68dac",
+  "current_v1_preserved": true,
+  "experimental_lock_excluded_from_candidate": true
+}

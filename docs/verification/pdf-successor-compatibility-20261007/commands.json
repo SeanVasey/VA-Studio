@@ -1,0 +1,15 @@
+{
+  "source_only": "4f1c5b0fb4a3765a63f85ae58682987deb7f077c",
+  "experimental_graph": "ebadd5d0f36e2a9d068c32dd7d4e7d43c230c959",
+  "runtime": "PHP 8.4.26",
+  "environment": "recovered PHP ini/library path; own regenerated autoload in each isolated checkout; ephemeral APP_KEY not retained; unchanged raw scrubbed child default runtime",
+  "commands": {
+    "install": "composer install --no-interaction --no-scripts --no-plugins --prefer-dist",
+    "conversion": "php scripts/build-contract-profile-v2.php",
+    "new_graph_tests": "php vendor/bin/phpunit tests/Feature/TestContractProfileSuccessorTest.php --log-junit <evidence>/successor-final.xml",
+    "old_graph_tests": "php vendor/bin/phpunit -c registry-focused.phpunit.xml --log-junit <evidence>/retained-six-files.xml",
+    "validation": "composer validate --strict",
+    "platform": "composer check-platform-reqs",
+    "audit": "composer audit --format=json"
+  }
+}

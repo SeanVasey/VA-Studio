@@ -1,0 +1,84 @@
+{
+  "disposition": "approved for focused development integration",
+  "executed_source": "83fe24882d0d1f85e9452ae07dbcd19288cb74c3",
+  "executed_tree": "23edc8f9008d4f7fa03e92d802c8337f0a0ac02b",
+  "baseline": "7827a86d405167c15b5c6a04970a74d49111b36a",
+  "reviewed_leaf": "7501ef9f2f1245493a9ca5a584da8be849dd3d12",
+  "selection": [
+    "tests/Unit/ContractRenderProfileRegistryTest.php",
+    "tests/Unit/TcpdfContractRendererTest.php",
+    "tests/Feature/TestContractIssuanceTest.php",
+    "tests/Feature/TestContractStorageTest.php",
+    "tests/Feature/TestIsolatedContractRendererTest.php",
+    "tests/Feature/TestContractProfileSuccessorTest.php"
+  ],
+  "result": {
+    "tests": "140",
+    "assertions": "774",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "101.823575"
+  },
+  "exit_code": 0,
+  "own_autoload_verified": true,
+  "installed_locked_versions_references": 158,
+  "baseline_paths": 1988,
+  "unchanged_baseline_paths": 1983,
+  "approved_existing_changed_paths": [
+    "app/Domain/Contracts/ContractIssuancePolicy.php",
+    "app/Domain/Contracts/ContractRenderProfile.php",
+    "app/Domain/Contracts/ContractRenderProfileRegistry.php",
+    "scripts/contract-renderer-autoload.php",
+    "scripts/render-test-contract.php"
+  ],
+  "approved_new_source_asset_paths": [
+    "app/Domain/Contracts/TcpdfV2ContractRenderer.php",
+    "app/Domain/Contracts/VersionedContractRenderer.php",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.ctg.z",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.json",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.z",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.ctg.z",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.json",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.z",
+    "resources/contracts/test-v2/fonts/source/DejaVuSans-Bold.ttf",
+    "resources/contracts/test-v2/fonts/source/DejaVuSans.ttf",
+    "resources/contracts/test-v2/fonts/source/LICENSE",
+    "resources/contracts/test-v2/profile-assets.json",
+    "scripts/build-contract-profile-v2.php",
+    "tests/Feature/TestContractProfileSuccessorTest.php"
+  ],
+  "unapproved_changed_missing_or_added_paths": [],
+  "19_leaf_git_modes_types_blobs_and_sha256_matched": true,
+  "unchanged_ci_scripts_workflows_count": 33,
+  "unchanged_v1_asset_paths": 11,
+  "unchanged_locks_policy_exceptions": true,
+  "runtime": "PHP8.4.26; actual retained locked PDF8.76.2/font4.4.0; Laravel13.34.0; SQLite isolated fixtures; ephemeral APP_KEY not retained",
+  "commands": [
+    "composer dump-autoload --no-scripts --optimize",
+    "php runtime-probe.php",
+    "python3 docs/verification/pdf-seam-composed-review-20261007/run-composed.py"
+  ],
+  "carried_actual_two_graph_review": "d8b39981aa05de5e7172047453b514701975c16f; all19runtime/source/assets match; no experimental rerun because source/locked graph no new relevant code",
+  "findings": [],
+  "limitations": [
+    "No experimental graph, native matrix, browser, provider or full acceptance rerun.",
+    "No automatic/default V2 activation or updated dependency lock approved.",
+    "PR3 actual activation/pendingV1/original continuity remains separate review.",
+    "PROVENANCE and additional author/reviewer logs arrive in later metadata; no extra path in executable83fe."
+  ],
+  "setup_diagnostics": "Two provenance-only setup/review errors preserved in setup-diagnostic.txt; no PHPunit/source/runtime repair or duplicate execution.",
+  "artifact_sha256": {
+    "autoload.txt": "02acb332ce6bb4c1f2f4029adf50dfbb80fce26724c9a3293219e5727c77b1bd",
+    "composition-review.json": "4f6088d56ca2625ee2dbd7f63052f486e00184d78b3b2d1452a8537b5ad2c63e",
+    "exit.json": "5962250106cb86cee9d83f6cd40cebcc5be9e6fbcfb73acade95214349a07996",
+    "junit.xml": "33e4fb659ebbd8002595d9a22c16c14ac75782dd7ae5d5575bcec4743ea8fdf4",
+    "phpunit-selection.xml": "cb587335d58653659528e856aa3c0aaec4a9093551ed49a0de059224d07d5170",
+    "phpunit.txt": "5b24f006be51aac495ce4166df964a37f439d5de940189e0119247dc880ca74f",
+    "run-composed.py": "6e6d3839dc7c38a017e8414a42b6f554a65e87a5c823b06f1d0b10910ae3461d",
+    "runtime-graph.json": "98d6f9b78f91768e70ff4871f15d221673837200832fc1a6c56e881a3a35005d",
+    "runtime-probe.php": "f5d6367a2048b079a8964049c8de57058a27a199f3155d4128fc9aba52e6d68f",
+    "setup-diagnostic.txt": "ed83c80b7a36a3fae3d55c57c7b095e7ed79f43ace021e6b22a1aef0a0d252f1",
+    "source.json": "456ac507eebd46785c7753dba3560d6002e0d526a7c3e14b8c705a0b5ce07846"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "packages": 158,
+  "changed_packages_only": [
+    "tecnickcom/tc-lib-pdf",
+    "tecnickcom/tc-lib-pdf-font"
+  ],
+  "actual_installed_graph_matches_all_locked_versions_references": true,
+  "v1_unchanged_sha256": {
+    "resources/contracts/test-v1/profile-assets.json": "44533c186a3b1350163025256a9ced519a6395ba8001541193d1d51b51688e50",
+    "app/Domain/Contracts/TcpdfContractRenderer.php": "620b66766143ab72532e8fa3a161d3eb1012368bbf195cea70b9b8907cdd763a",
+    "app/Domain/Contracts/ContractText.php": "46d145c921ff5a94b3d2928c9b7d9caf0697d33f8ba5c5c30ca65598e1d68a08",
+    "app/Domain/Contracts/ContractRenderProfile.php": "fd93746b674e335ddb4998abdfd9765efff734a235398fd2bd2a4d757770770b"
+  },
+  "v2_assets_sha256": {
+    "profile-assets.json": "f56e466e6a335df772519a2725562e75596e85d1877676da6745d8c7157c623e",
+    "fonts/source/LICENSE": "7a083b136e64d064794c3419751e5c7dd10d2f64c108fe5ba161eae5e5958a93",
+    "fonts/source/DejaVuSans-Bold.ttf": "e6476c1b80502924294eed40894c5b18e06c181444ca953e5334262df9c27724",
+    "fonts/source/DejaVuSans.ttf": "7da195a74c55bef988d0d48f9508bd5d849425c1770dba5d7bfc6ce9ed848954",
+    "fonts/generated/dejavusansb.z": "34fa710f984b43306f89abd2458a213a63ecfecd59976154a03183b65a8f1554",
+    "fonts/generated/dejavusansb.json": "5128b3fcdd515b6fc80cceca16f0b0118be333aa1558cf193c487c4ad3144a10",
+    "fonts/generated/dejavusans.json": "4912381c5c0baccdca18246cb5ffb8d234fae48de71d002a523d082859bbfde4",
+    "fonts/generated/dejavusans.z": "bf01c0d0a4d745951b355b0d253b4076d5e0da2aef8114d42c0f2ab83ec257fe",
+    "fonts/generated/dejavusans.ctg.z": "e32a1fea0a049ccf1c687eba84f804339c4599eba4eedb1ff4ee4427aee34b93",
+    "fonts/generated/dejavusansb.ctg.z": "e59d2256ed0a75d999d124c994c42bb025efa782c3e77e251f7497f4f539e089"
+  },
+  "v2_asset_bytes_same_as_v1": {
+    "profile-assets.json": false,
+    "fonts/source/LICENSE": true,
+    "fonts/source/DejaVuSans-Bold.ttf": true,
+    "fonts/source/DejaVuSans.ttf": true,
+    "fonts/generated/dejavusansb.z": true,
+    "fonts/generated/dejavusansb.json": true,
+    "fonts/generated/dejavusans.json": true,
+    "fonts/generated/dejavusans.z": true,
+    "fonts/generated/dejavusans.ctg.z": true,
+    "fonts/generated/dejavusansb.ctg.z": true
+  }
+}

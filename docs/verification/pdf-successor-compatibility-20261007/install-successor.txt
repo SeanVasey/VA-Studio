@@ -1,0 +1,20 @@
+Do not run Composer as root/super user! See https://getcomposer.org/root for details
+Installing dependencies from lock file (including require-dev)
+Verifying lock file contents can be installed on current platform.
+Package operations: 0 installs, 2 updates, 0 removals
+  - Downloading tecnickcom/tc-lib-pdf-font (4.4.1)
+  - Downloading tecnickcom/tc-lib-pdf (8.76.3)
+ 0/2 [>---------------------------]   0%
+ 1/2 [==============>-------------]  50%
+ 2/2 [============================] 100%
+  - Upgrading tecnickcom/tc-lib-pdf-font (4.4.0 => 4.4.1): Extracting archive
+  - Upgrading tecnickcom/tc-lib-pdf (8.76.2 => 8.76.3): Extracting archive
+ 0/2 [>---------------------------]   0%
+ 2/2 [============================] 100%
+Generating optimized autoload files
+Class OrderInquiryBrowserFixture located in ./tests/browser/order-inquiry-fixture.php does not comply with psr-4 autoloading standard (rule: Tests\ => ./tests). Skipping.
+Class UnpaidReleaseBrowserFixture located in ./tests/browser/unpaid-release-fixture.php does not comply with psr-4 autoloading standard (rule: Tests\ => ./tests). Skipping.
+Class RefundResolutionBrowserFixture located in ./tests/browser/refund-resolution-fixture.php does not comply with psr-4 autoloading standard (rule: Tests\ => ./tests). Skipping.
+Class RelatedTrackBrowserFixture located in ./tests/browser/prepare-related-tracks.php does not comply with psr-4 autoloading standard (rule: Tests\ => ./tests). Skipping.
+110 packages you are using are looking for funding.
+Use the `composer fund` command to find out more!

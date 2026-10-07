@@ -1,0 +1,10 @@
+{
+    "requested_version": "test-buyer-pdf-v1",
+    "returned_profile_hash": "ff46257d40e36ea4efc8a42a9df0d823141d13a586d0a416fdde5178dcf12621",
+    "original_v1_profile_hash": "ff46257d40e36ea4efc8a42a9df0d823141d13a586d0a416fdde5178dcf12621",
+    "returned_pdf_hash": "cf7703861c79d7c583a62633c9181519b8d8c4f29c5fe1137c49a060ab7732f4",
+    "original_v1_pdf_hash": "37c92cb5c0d09923b5a75ef8fedf6a60491653c6485cf2cd90302fa53139c495",
+    "returned_v2_creator": true,
+    "bytes_differ_from_v1": true,
+    "size_bytes": 751516
+}
