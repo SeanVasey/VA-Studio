@@ -1,0 +1,24 @@
+{
+  "source": "3c2158e726a3bd3fdd57597adcb5756c49dff2ce",
+  "parent": "0638b7026b018762430e39602b62125f600a9854",
+  "files": [
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php",
+      "git_blob": "193215351accc8f6d053a1bb2257e0de6e6d58dc",
+      "sha256": "6058e3e4ced2900e1ccc93bd9110691c041ad0c4ecafe2f0373d323ceb17cb90",
+      "changed_in_repair": true
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php",
+      "git_blob": "75947ba8a625fcbdf9df0f63de13f568d9e4dc59",
+      "sha256": "a2a1d7608e9c47d07c9456b8828a0c83141b4a7f078e7e3b01019598d285e0d0",
+      "changed_in_repair": true
+    },
+    {
+      "path": "database/migrations/2026_10_07_247000_production_customer_identity.php",
+      "git_blob": "f82b5334e2d582ea63f91674b835f43f5bd28815",
+      "sha256": "a2cfa089ea5452aec894f24f6779f5deee63fb3a2453fd6c12d4a5d8b1273166",
+      "changed_in_repair": false
+    }
+  ]
+}

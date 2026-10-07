@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\IndependentIdentityRegistration\IdentityDependencyAdmissionCanaryTest" file="/workspace/VA-Studio-production-identity/docs/verification/production-identity-dependency-floor-20261007/probes/IdentityDependencyAdmissionCanaryTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="0.465405">
+    <testcase name="test_incompatible_actual_dependency_is_refused_before_owned_ddl" file="/workspace/VA-Studio-production-identity/docs/verification/production-identity-dependency-floor-20261007/probes/IdentityDependencyAdmissionCanaryTest.php" line="15" class="Tests\IndependentIdentityRegistration\IdentityDependencyAdmissionCanaryTest" classname="Tests.IndependentIdentityRegistration.IdentityDependencyAdmissionCanaryTest" assertions="4" time="0.465405"/>
+  </testsuite>
+</testsuites>

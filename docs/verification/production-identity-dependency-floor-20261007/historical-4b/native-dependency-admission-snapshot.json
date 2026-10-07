@@ -1,0 +1,1178 @@
+{
+    "source": "4b3d47860373aad181c382899b9ab9677023eca0",
+    "server_version": "8.0.46-0ubuntu0.24.04.4",
+    "refused": false,
+    "foreign_key_checks": 1,
+    "parent_create": {
+        "Table": "users",
+        "Create Table": "CREATE TABLE `users` (\n  `id` bigint unsigned NOT NULL AUTO_INCREMENT,\n  PRIMARY KEY (`id`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    },
+    "owned_tables_created": [
+        "production_identity_addresses",
+        "production_identity_attempts",
+        "production_identity_challenges",
+        "production_identity_notices",
+        "production_identity_origins",
+        "production_identity_outcomes",
+        "production_identity_verifications"
+    ],
+    "before": [
+        {
+            "TABLE_NAME": "audit_events",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "cache",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "cache_locks",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "catalog_discovery_epoch",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "catalog_import_batches",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "catalog_import_mappings",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "checkout_intents",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "checkout_observations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "checkout_sessions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "contract_render_requests",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "contract_render_work",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "customer_accounts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "customer_identity_addresses",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "customer_identity_challenges",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "customer_inquiries",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "customer_purchase_challenges",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "customer_purchase_claims",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "customer_saved_tracks",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "exclusive_activations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "exclusive_sales",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "failed_jobs",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "fulfillment_outbox",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "grant_contracts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "inquiry_messages",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "inquiry_notification_intents",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "inquiry_order_contexts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "inventory_claims",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "inventory_reservations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "job_batches",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "jobs",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "license_grants",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "license_review_evidence",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "license_templates",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "license_versions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "media_assets",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "media_processing_runs",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "media_upload_sessions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "membership_credit_buckets",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "membership_credit_events",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "membership_plan_versions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "membership_plans",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "merch_draft_versions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "merch_drafts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "migrations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "offer_revisions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "offers",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "order_attempts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "order_finalizations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "order_lines",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "orders",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "password_reset_tokens",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "payment_observations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "pending_entitlements",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "product_draft_members",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "product_draft_versions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "product_drafts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_buyer_assent_observations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_track_capability_approvals",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_track_capability_candidates",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_track_capability_closures",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_track_policy_drafts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_track_policy_source_reviews",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_track_policy_versions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_track_preparation_packet_lines",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_track_preparation_packets",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "promotion_availabilities",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "promotion_availability_revisions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "promotion_campaigns",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "promotion_uses",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "quote_lines",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "quote_owners",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "quote_pricings",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "quotes",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "rights_declarations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "rights_scope_offers",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "rights_scopes",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "service_draft_versions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "service_drafts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "service_project_events",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "service_projects",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "sessions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "site_image_variants",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "site_images",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "site_publication_revisions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "site_publication_schedules",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "site_publications",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "site_release_images",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "site_releases",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "sound_kit_drafts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "sound_kit_revisions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "sound_kit_upload_sessions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "stems_recordings",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "stripe_receipt_work",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "stripe_webhook_receipts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_delivery_authorizations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_delivery_controls",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_delivery_redemptions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_fulfillment_activations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_payment_exception_events",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_payment_exception_work",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_payment_financial_observations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_refund_resolution_requests",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_refund_resolutions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_unpaid_release_events",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_unpaid_release_work",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_unpaid_releases",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "track_metadata_presets",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "tracks",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "transactional_notice_attempts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "transactional_notices",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "users",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "verified_payments",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        }
+    ],
+    "after": [
+        {
+            "TABLE_NAME": "audit_events",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "cache",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "cache_locks",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "catalog_discovery_epoch",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "catalog_import_batches",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "catalog_import_mappings",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "checkout_intents",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "checkout_observations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "checkout_sessions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "contract_render_requests",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "contract_render_work",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "customer_accounts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "customer_identity_addresses",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "customer_identity_challenges",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "customer_inquiries",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "customer_purchase_challenges",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "customer_purchase_claims",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "customer_saved_tracks",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "exclusive_activations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "exclusive_sales",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "failed_jobs",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "fulfillment_outbox",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "grant_contracts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "inquiry_messages",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "inquiry_notification_intents",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "inquiry_order_contexts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "inventory_claims",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "inventory_reservations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "job_batches",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "jobs",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "license_grants",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "license_review_evidence",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "license_templates",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "license_versions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "media_assets",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "media_processing_runs",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "media_upload_sessions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "membership_credit_buckets",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "membership_credit_events",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "membership_plan_versions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "membership_plans",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "merch_draft_versions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "merch_drafts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "migrations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "offer_revisions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "offers",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "order_attempts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "order_finalizations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "order_lines",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "orders",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "password_reset_tokens",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "payment_observations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "pending_entitlements",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "product_draft_members",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "product_draft_versions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "product_drafts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_buyer_assent_observations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_identity_addresses",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_identity_attempts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_identity_challenges",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_identity_notices",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_identity_origins",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_identity_outcomes",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_identity_verifications",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_track_capability_approvals",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_track_capability_candidates",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_track_capability_closures",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_track_policy_drafts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_track_policy_source_reviews",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_track_policy_versions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_track_preparation_packet_lines",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "production_track_preparation_packets",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "promotion_availabilities",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "promotion_availability_revisions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "promotion_campaigns",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "promotion_uses",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "quote_lines",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "quote_owners",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "quote_pricings",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "quotes",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "rights_declarations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "rights_scope_offers",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "rights_scopes",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "service_draft_versions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "service_drafts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "service_project_events",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "service_projects",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "sessions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "site_image_variants",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "site_images",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "site_publication_revisions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "site_publication_schedules",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "site_publications",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "site_release_images",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "site_releases",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "sound_kit_drafts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "sound_kit_revisions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "sound_kit_upload_sessions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "stems_recordings",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "stripe_receipt_work",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "stripe_webhook_receipts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_delivery_authorizations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_delivery_controls",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_delivery_redemptions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_fulfillment_activations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_payment_exception_events",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_payment_exception_work",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_payment_financial_observations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_refund_resolution_requests",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_refund_resolutions",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_unpaid_release_events",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_unpaid_release_work",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "test_unpaid_releases",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "track_metadata_presets",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "tracks",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "transactional_notice_attempts",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "transactional_notices",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "users",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        },
+        {
+            "TABLE_NAME": "verified_payments",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        }
+    ]
+}
