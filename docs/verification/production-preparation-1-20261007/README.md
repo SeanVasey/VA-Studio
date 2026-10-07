@@ -232,6 +232,13 @@ PHP proof script already refused symlinks, hard links and special files (its tes
 planted symlink); only the MySQL procedure text changed. The procedure is still documented,
 not executed.
 
+Codex's second pass on `f4c55acf` added two P2 findings, both documentation:
+`xargs` without `-r` hashes stdin for an empty private tree (fixed with `-r`; an empty tree
+now yields an empty manifest, rehearsed), and the packet's staging deploy step accepted a
+dirty reused checkout (it now refuses any tracked edit, untracked or ignored file, and
+requires `HEAD^{tree}` to equal `git write-tree`; rehearsed in a throwaway repository:
+clean accepted, tracked edit refused, untracked/ignored file refused).
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings are accepted for merge and must be fixed or explicitly

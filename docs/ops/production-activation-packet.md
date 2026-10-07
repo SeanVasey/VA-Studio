@@ -100,6 +100,10 @@ host; mail stays `log`.
 ```sh
 # On the staging host, as the unprivileged application user.
 git fetch origin && git checkout --detach <SHA> && test "$(git rev-parse HEAD)" = "<SHA>"
+# Authorization is bound to the commit, so the worktree must be exactly its tree: no tracked
+# edits, no untracked or ignored files left from an earlier build.
+test -z "$(git status --porcelain --untracked-files=all --ignored)" || { echo 'dirty worktree'; exit 1; }
+test "$(git rev-parse HEAD^{tree})" = "$(git write-tree)" || { echo 'worktree differs from <SHA>'; exit 1; }
 composer install --no-dev --no-interaction --classmap-authoritative   # composer.lock is frozen
 npm ci && npm run build
 

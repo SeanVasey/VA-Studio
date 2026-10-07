@@ -45,7 +45,7 @@ after the manifest was written, and an edited manifest.
 
 ## Equivalent MySQL 8.4 procedure (documented, not executed)
 
-Use this only on the host Sean selects, against the reviewed release, with credentials from
+Run these fragments in bash (step 4 uses process substitution). Use this only on the host Sean selects, against the reviewed release, with credentials from
 the host secret store. Each `<...>` value is an input the operator supplies; none is known
 here. Pass credentials through a mode-0600 option file, never on the command line.
 
@@ -73,7 +73,7 @@ sha256sum <BACKUP_DIR>/database.sql > <BACKUP_DIR>/database.sql.sha256
 #    symlink can point outside the restored root.
 (cd <PRIVATE_ROOT> && ! find . \( ! -type f ! -type d \) -o \( -type f -links +1 \) | grep -q .) \
   || { echo 'unmanifested entry in <PRIVATE_ROOT>'; exit 1; }
-(cd <PRIVATE_ROOT> && find . -type f -print0 | sort -z | xargs -0 sha256sum) > <BACKUP_DIR>/private.sha256
+(cd <PRIVATE_ROOT> && find . -type f -print0 | sort -z | xargs -0 -r sha256sum) > <BACKUP_DIR>/private.sha256   # -r: an empty tree gives an empty manifest, not a hash of stdin
 tar --create --file=<BACKUP_DIR>/private.tar --directory=<PRIVATE_ROOT> --numeric-owner .
 sha256sum <BACKUP_DIR>/private.tar > <BACKUP_DIR>/private.tar.sha256
 
