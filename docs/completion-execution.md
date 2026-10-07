@@ -2,7 +2,7 @@
 
 ## Current cloud execution — October 7, 2026 UTC
 
-Verified main2cdd3da includes PRs25–33. The [current ownership/checkpoint](verification/cloud-primary-checkpoint-20261007.md) records merged identity247, approved default-off free245 registration, held attachment249 and discovery248 native/request repairs, suppression251 admission correction, checkout246 callback/committed-receipt work and new paid252/production feature253/production suppression254/automatic-tax255 work. The full personal-store objective continues through memberships, other product fulfillment, migration, content/payment/hosting preparation and one consolidated final exact-SHA Foundation run. Six accepted parent groups and34 open remain unchanged; focused development merges do not establish full acceptance.
+Verified main760da5a includes PRs25–34. The [current ownership/checkpoint](verification/cloud-primary-checkpoint-20261007.md) records merged identity247 and default-off free245 registration, reviewed attachment249, corrected discovery248/suppression251, genuinely held SMTP and production-free session repairs, checkout246 committed receipts and NEW paid252/account features253/suppression254/automatic-tax255/free256/membership257/member-grant258 work. Final CI test-lifecycle and exact SQLite skip-census normalization are implementation work; no CI control is relaxed. The full personal-store objective continues through other product fulfillment, administration, migration, content/payment/hosting preparation and one consolidated final exact-SHA Foundation run. Six accepted parent groups and34 open remain unchanged; focused development merges do not establish full acceptance.
 
 ## Historical October6 execution
 
