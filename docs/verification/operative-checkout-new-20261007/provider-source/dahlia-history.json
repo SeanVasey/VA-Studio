@@ -1,0 +1,412 @@
+[
+  {
+    "sha": "30d3391cc09a0f67ad29bee002f570811b19e1da",
+    "node_id": "C_kwDOBRETN9oAKDMwZDMzOTFjYzA5YTBmNjdhZDI5YmVlMDAyZjU3MDgxMWIxOWUxZGE",
+    "commit": {
+      "author": {
+        "name": "Stripe OpenAPI",
+        "email": "105521251+stripe-openapi[bot]@users.noreply.github.com",
+        "date": "2026-08-26T17:57:44Z"
+      },
+      "committer": {
+        "name": "Stripe OpenAPI",
+        "email": "105521251+stripe-openapi[bot]@users.noreply.github.com",
+        "date": "2026-08-26T17:57:44Z"
+      },
+      "message": "Update OpenAPI specification for GA and public preview",
+      "tree": {
+        "sha": "7ab311b30ee737fc3a5fcbe16fce91e2edbda215",
+        "url": "https://api.github.com/repos/stripe/openapi/git/trees/7ab311b30ee737fc3a5fcbe16fce91e2edbda215"
+      },
+      "url": "https://api.github.com/repos/stripe/openapi/git/commits/30d3391cc09a0f67ad29bee002f570811b19e1da",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/stripe/openapi/commits/30d3391cc09a0f67ad29bee002f570811b19e1da",
+    "html_url": "https://github.com/stripe/openapi/commit/30d3391cc09a0f67ad29bee002f570811b19e1da",
+    "comments_url": "https://api.github.com/repos/stripe/openapi/commits/30d3391cc09a0f67ad29bee002f570811b19e1da/comments",
+    "author": {
+      "login": "stripe-openapi[bot]",
+      "id": 105521251,
+      "node_id": "BOT_kgDOBkogYw",
+      "avatar_url": "https://avatars.githubusercontent.com/in/200680?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/stripe-openapi%5Bbot%5D",
+      "html_url": "https://github.com/apps/stripe-openapi",
+      "followers_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "stripe-openapi[bot]",
+      "id": 105521251,
+      "node_id": "BOT_kgDOBkogYw",
+      "avatar_url": "https://avatars.githubusercontent.com/in/200680?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/stripe-openapi%5Bbot%5D",
+      "html_url": "https://github.com/apps/stripe-openapi",
+      "followers_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "47cab7e567956ec6853c6940968cbedc7bc356b1",
+        "url": "https://api.github.com/repos/stripe/openapi/commits/47cab7e567956ec6853c6940968cbedc7bc356b1",
+        "html_url": "https://github.com/stripe/openapi/commit/47cab7e567956ec6853c6940968cbedc7bc356b1"
+      }
+    ]
+  },
+  {
+    "sha": "af5309cae53e5f666f9686dfed306d6d3b5fdc67",
+    "node_id": "C_kwDOBRETN9oAKGFmNTMwOWNhZTUzZTVmNjY2Zjk2ODZkZmVkMzA2ZDZkM2I1ZmRjNjc",
+    "commit": {
+      "author": {
+        "name": "Stripe OpenAPI",
+        "email": "105521251+stripe-openapi[bot]@users.noreply.github.com",
+        "date": "2026-07-29T18:38:34Z"
+      },
+      "committer": {
+        "name": "Stripe OpenAPI",
+        "email": "105521251+stripe-openapi[bot]@users.noreply.github.com",
+        "date": "2026-07-29T18:38:34Z"
+      },
+      "message": "Update OpenAPI specification for GA and public preview",
+      "tree": {
+        "sha": "3717b90342338e79212715c7ced361f069f3169c",
+        "url": "https://api.github.com/repos/stripe/openapi/git/trees/3717b90342338e79212715c7ced361f069f3169c"
+      },
+      "url": "https://api.github.com/repos/stripe/openapi/git/commits/af5309cae53e5f666f9686dfed306d6d3b5fdc67",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/stripe/openapi/commits/af5309cae53e5f666f9686dfed306d6d3b5fdc67",
+    "html_url": "https://github.com/stripe/openapi/commit/af5309cae53e5f666f9686dfed306d6d3b5fdc67",
+    "comments_url": "https://api.github.com/repos/stripe/openapi/commits/af5309cae53e5f666f9686dfed306d6d3b5fdc67/comments",
+    "author": {
+      "login": "stripe-openapi[bot]",
+      "id": 105521251,
+      "node_id": "BOT_kgDOBkogYw",
+      "avatar_url": "https://avatars.githubusercontent.com/in/200680?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/stripe-openapi%5Bbot%5D",
+      "html_url": "https://github.com/apps/stripe-openapi",
+      "followers_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "stripe-openapi[bot]",
+      "id": 105521251,
+      "node_id": "BOT_kgDOBkogYw",
+      "avatar_url": "https://avatars.githubusercontent.com/in/200680?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/stripe-openapi%5Bbot%5D",
+      "html_url": "https://github.com/apps/stripe-openapi",
+      "followers_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "f0758b15a2cf53779d699452f4ab07d11076af0f",
+        "url": "https://api.github.com/repos/stripe/openapi/commits/f0758b15a2cf53779d699452f4ab07d11076af0f",
+        "html_url": "https://github.com/stripe/openapi/commit/f0758b15a2cf53779d699452f4ab07d11076af0f"
+      }
+    ]
+  },
+  {
+    "sha": "d5d11f661d1180a847d6e26774517756e6a493a1",
+    "node_id": "C_kwDOBRETN9oAKGQ1ZDExZjY2MWQxMTgwYTg0N2Q2ZTI2Nzc0NTE3NzU2ZTZhNDkzYTE",
+    "commit": {
+      "author": {
+        "name": "Stripe OpenAPI",
+        "email": "105521251+stripe-openapi[bot]@users.noreply.github.com",
+        "date": "2026-07-01T21:08:47Z"
+      },
+      "committer": {
+        "name": "Stripe OpenAPI",
+        "email": "105521251+stripe-openapi[bot]@users.noreply.github.com",
+        "date": "2026-07-01T21:08:47Z"
+      },
+      "message": "Update OpenAPI specification for GA and public preview",
+      "tree": {
+        "sha": "04d972a3f117313f201428b8b23210d376ab7b64",
+        "url": "https://api.github.com/repos/stripe/openapi/git/trees/04d972a3f117313f201428b8b23210d376ab7b64"
+      },
+      "url": "https://api.github.com/repos/stripe/openapi/git/commits/d5d11f661d1180a847d6e26774517756e6a493a1",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/stripe/openapi/commits/d5d11f661d1180a847d6e26774517756e6a493a1",
+    "html_url": "https://github.com/stripe/openapi/commit/d5d11f661d1180a847d6e26774517756e6a493a1",
+    "comments_url": "https://api.github.com/repos/stripe/openapi/commits/d5d11f661d1180a847d6e26774517756e6a493a1/comments",
+    "author": {
+      "login": "stripe-openapi[bot]",
+      "id": 105521251,
+      "node_id": "BOT_kgDOBkogYw",
+      "avatar_url": "https://avatars.githubusercontent.com/in/200680?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/stripe-openapi%5Bbot%5D",
+      "html_url": "https://github.com/apps/stripe-openapi",
+      "followers_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "stripe-openapi[bot]",
+      "id": 105521251,
+      "node_id": "BOT_kgDOBkogYw",
+      "avatar_url": "https://avatars.githubusercontent.com/in/200680?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/stripe-openapi%5Bbot%5D",
+      "html_url": "https://github.com/apps/stripe-openapi",
+      "followers_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "a85f2b0fb782a18af61c8fc7d470fec74bbb7f89",
+        "url": "https://api.github.com/repos/stripe/openapi/commits/a85f2b0fb782a18af61c8fc7d470fec74bbb7f89",
+        "html_url": "https://github.com/stripe/openapi/commit/a85f2b0fb782a18af61c8fc7d470fec74bbb7f89"
+      }
+    ]
+  },
+  {
+    "sha": "7061322ce765ba59b40b704e7d8198d6bb24955c",
+    "node_id": "C_kwDOBRETN9oAKDcwNjEzMjJjZTc2NWJhNTliNDBiNzA0ZTdkODE5OGQ2YmIyNDk1NWM",
+    "commit": {
+      "author": {
+        "name": "Stripe OpenAPI",
+        "email": "105521251+stripe-openapi[bot]@users.noreply.github.com",
+        "date": "2026-07-01T20:55:58Z"
+      },
+      "committer": {
+        "name": "Stripe OpenAPI",
+        "email": "105521251+stripe-openapi[bot]@users.noreply.github.com",
+        "date": "2026-07-01T20:55:58Z"
+      },
+      "message": "Update OpenAPI specification for GA and public preview",
+      "tree": {
+        "sha": "b7e770d103af4dad7a651b9cb81f4b29d86b6cb5",
+        "url": "https://api.github.com/repos/stripe/openapi/git/trees/b7e770d103af4dad7a651b9cb81f4b29d86b6cb5"
+      },
+      "url": "https://api.github.com/repos/stripe/openapi/git/commits/7061322ce765ba59b40b704e7d8198d6bb24955c",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/stripe/openapi/commits/7061322ce765ba59b40b704e7d8198d6bb24955c",
+    "html_url": "https://github.com/stripe/openapi/commit/7061322ce765ba59b40b704e7d8198d6bb24955c",
+    "comments_url": "https://api.github.com/repos/stripe/openapi/commits/7061322ce765ba59b40b704e7d8198d6bb24955c/comments",
+    "author": {
+      "login": "stripe-openapi[bot]",
+      "id": 105521251,
+      "node_id": "BOT_kgDOBkogYw",
+      "avatar_url": "https://avatars.githubusercontent.com/in/200680?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/stripe-openapi%5Bbot%5D",
+      "html_url": "https://github.com/apps/stripe-openapi",
+      "followers_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "stripe-openapi[bot]",
+      "id": 105521251,
+      "node_id": "BOT_kgDOBkogYw",
+      "avatar_url": "https://avatars.githubusercontent.com/in/200680?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/stripe-openapi%5Bbot%5D",
+      "html_url": "https://github.com/apps/stripe-openapi",
+      "followers_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "f1d4dc872ffe40706cd8d7e76a7e23a99569cd0d",
+        "url": "https://api.github.com/repos/stripe/openapi/commits/f1d4dc872ffe40706cd8d7e76a7e23a99569cd0d",
+        "html_url": "https://github.com/stripe/openapi/commit/f1d4dc872ffe40706cd8d7e76a7e23a99569cd0d"
+      }
+    ]
+  },
+  {
+    "sha": "f4ac6d9a7f40730f7f50c8c1d76c27f80178e4f5",
+    "node_id": "C_kwDOBRETN9oAKGY0YWM2ZDlhN2Y0MDczMGY3ZjUwYzhjMWQ3NmMyN2Y4MDE3OGU0ZjU",
+    "commit": {
+      "author": {
+        "name": "Stripe OpenAPI",
+        "email": "105521251+stripe-openapi[bot]@users.noreply.github.com",
+        "date": "2026-06-23T22:37:50Z"
+      },
+      "committer": {
+        "name": "Stripe OpenAPI",
+        "email": "105521251+stripe-openapi[bot]@users.noreply.github.com",
+        "date": "2026-06-23T22:37:50Z"
+      },
+      "message": "Update OpenAPI specification for GA and public preview",
+      "tree": {
+        "sha": "b1cf1aadbaac18878d52bf3019e7e483bd51bbb0",
+        "url": "https://api.github.com/repos/stripe/openapi/git/trees/b1cf1aadbaac18878d52bf3019e7e483bd51bbb0"
+      },
+      "url": "https://api.github.com/repos/stripe/openapi/git/commits/f4ac6d9a7f40730f7f50c8c1d76c27f80178e4f5",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/stripe/openapi/commits/f4ac6d9a7f40730f7f50c8c1d76c27f80178e4f5",
+    "html_url": "https://github.com/stripe/openapi/commit/f4ac6d9a7f40730f7f50c8c1d76c27f80178e4f5",
+    "comments_url": "https://api.github.com/repos/stripe/openapi/commits/f4ac6d9a7f40730f7f50c8c1d76c27f80178e4f5/comments",
+    "author": {
+      "login": "stripe-openapi[bot]",
+      "id": 105521251,
+      "node_id": "BOT_kgDOBkogYw",
+      "avatar_url": "https://avatars.githubusercontent.com/in/200680?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/stripe-openapi%5Bbot%5D",
+      "html_url": "https://github.com/apps/stripe-openapi",
+      "followers_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "stripe-openapi[bot]",
+      "id": 105521251,
+      "node_id": "BOT_kgDOBkogYw",
+      "avatar_url": "https://avatars.githubusercontent.com/in/200680?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/stripe-openapi%5Bbot%5D",
+      "html_url": "https://github.com/apps/stripe-openapi",
+      "followers_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/stripe-openapi%5Bbot%5D/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "63fcf17ef34b026cb3c46b9f350849c1b7bb5560",
+        "url": "https://api.github.com/repos/stripe/openapi/commits/63fcf17ef34b026cb3c46b9f350849c1b7bb5560",
+        "html_url": "https://github.com/stripe/openapi/commit/63fcf17ef34b026cb3c46b9f350849c1b7bb5560"
+      }
+    ]
+  }
+]

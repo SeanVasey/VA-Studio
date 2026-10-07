@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionCheckoutWriteCommitTest" file="/workspace/VA-Studio-checkout-write-admission/docs/verification/checkout-write-commit-admission-20261007/ProductionCheckoutWriteCommitTest.php" tests="2" assertions="16" errors="0" failures="0" skipped="0" time="4.404405">
+    <testcase name="test_committing_persisted_password_withdrawal_rolls_back_order_and_original_password" file="/workspace/VA-Studio-checkout-write-admission/docs/verification/checkout-write-commit-admission-20261007/ProductionCheckoutWriteCommitTest.php" line="39" class="Tests\Feature\ProductionCheckoutWriteCommitTest" classname="Tests.Feature.ProductionCheckoutWriteCommitTest" assertions="8" time="2.372399"/>
+    <testcase name="test_committing_identity_module_withdrawal_rolls_back_order" file="/workspace/VA-Studio-checkout-write-admission/docs/verification/checkout-write-commit-admission-20261007/ProductionCheckoutWriteCommitTest.php" line="50" class="Tests\Feature\ProductionCheckoutWriteCommitTest" classname="Tests.Feature.ProductionCheckoutWriteCommitTest" assertions="8" time="2.032005"/>
+  </testsuite>
+</testsuites>

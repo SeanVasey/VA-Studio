@@ -1,0 +1,245 @@
+{
+  "original_executable_sha": "ff4c6749692cc474fb81202b9554993f510350a9",
+  "successor_executable_sha": "9f948b4eca4fe0ce0e91221afff920652fe3a21a",
+  "successor_tree": "7370c4c6cf274d0cffc3326a9ec28d2c684b78a4",
+  "owned_changed_files": [
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CheckoutSchemaInstaller.php",
+      "old_sha256": "773775e2fdfea5c874d76862dfa0e8a60f87c6753e489bc02d760b066eec58bf",
+      "new_sha256": "c04dbc3b448272290ec9e818ccc4e8b87139d9d20db1cf5aeb0932da015389d8"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/StaffProof.php",
+      "old_sha256": "5c033d937337cd8ca482e2a4f51499672f8b0cfc8b4c46d5f672e6bd36ab7d7d",
+      "new_sha256": "479ebb9617d26d554ab66b8bc6f7cb028d2c899eae56cd30bb7ec404f00c8d0a"
+    },
+    {
+      "path": "tests/Feature/ProductionCheckoutExemptionAuthorityTest.php",
+      "old_sha256": "351b7e7b40567b59299baccf58fd41b69a889ae7bf70eca78ffcfdb1d9c6927f",
+      "new_sha256": "70d28810bcdb1273777a05e782abfdc03cedb694660cb97c33ab4d8113db3e25"
+    },
+    {
+      "path": "tests/Feature/ProductionCheckoutMigrationTest.php",
+      "old_sha256": "bde4c00e3bea04a5a9a6733397af3462437fa23100226840e7cebdda68cf0e0e",
+      "new_sha256": "cded09c047fb663ad0b210530fabb8bcfd445e808b22eeb74591219ba5df1867"
+    }
+  ],
+  "owned_byte_exact_files": [
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ApproveExemptionAuthority.php",
+      "old_sha256": "2e96884a8bfc6737de5a7a5f57b50cec9b514f5a3133280de9720c411b090ae6",
+      "new_sha256": "2e96884a8bfc6737de5a7a5f57b50cec9b514f5a3133280de9720c411b090ae6"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CheckoutException.php",
+      "old_sha256": "271e6eaf728665edf521b64daadbdcf00b5c2f432c344138b648bc9f61140241",
+      "new_sha256": "271e6eaf728665edf521b64daadbdcf00b5c2f432c344138b648bc9f61140241"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CheckoutSchema.php",
+      "old_sha256": "f5ae038aac1aab1aa30e56fada96fdb6855c5bc585829745a16e3cac18afa770",
+      "new_sha256": "f5ae038aac1aab1aa30e56fada96fdb6855c5bc585829745a16e3cac18afa770"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CommandTransaction.php",
+      "old_sha256": "8f4e3482031e1747a0b6e7fc94007c62e732fec05a076a741a928229913296f1",
+      "new_sha256": "8f4e3482031e1747a0b6e7fc94007c62e732fec05a076a741a928229913296f1"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CurrentPolicy.php",
+      "old_sha256": "b151c733ad31dc67e57e2c3a33b98791130f07160b976de114b5a0ba5467c532",
+      "new_sha256": "b151c733ad31dc67e57e2c3a33b98791130f07160b976de114b5a0ba5467c532"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CurrentSelection.php",
+      "old_sha256": "b0c47f1fd18059acfbe57ed2d27527a90e1a958baeef47899b14f39da303a584",
+      "new_sha256": "b0c47f1fd18059acfbe57ed2d27527a90e1a958baeef47899b14f39da303a584"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/Evidence.php",
+      "old_sha256": "e557b6a0b904cbcfa2e0c7325302e60e9ec5189814c1af79a2be2e0c590a5847",
+      "new_sha256": "e557b6a0b904cbcfa2e0c7325302e60e9ec5189814c1af79a2be2e0c590a5847"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ExecutionContextV1.php",
+      "old_sha256": "ac908ae218e7988ef5cef50eaeed808a4838c57422e99a1694fff6ecd4c4436c",
+      "new_sha256": "ac908ae218e7988ef5cef50eaeed808a4838c57422e99a1694fff6ecd4c4436c"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ExemptionPolicyV1.php",
+      "old_sha256": "971377ae3cc85145da1f47490569aaecdf1b85c9961089114a4a20dd7eaa04b7",
+      "new_sha256": "971377ae3cc85145da1f47490569aaecdf1b85c9961089114a4a20dd7eaa04b7"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/HostedCheckout.php",
+      "old_sha256": "b95de60fd827eefdb557b9762e3a2d2f628139b3fd7a52b89401c524c4e0f8ee",
+      "new_sha256": "b95de60fd827eefdb557b9762e3a2d2f628139b3fd7a52b89401c524c4e0f8ee"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/HostedEvidence.php",
+      "old_sha256": "13eb973ddd2ea872c788f18d7258aff30b1b73c21923d1ad2a2d05e4272e2024",
+      "new_sha256": "13eb973ddd2ea872c788f18d7258aff30b1b73c21923d1ad2a2d05e4272e2024"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/OrderEvidence.php",
+      "old_sha256": "4b7864a88b3f0bd4fcdc21169f8d36fc5243b484f3eb88cb2b8bb270ede2a8b0",
+      "new_sha256": "4b7864a88b3f0bd4fcdc21169f8d36fc5243b484f3eb88cb2b8bb270ede2a8b0"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/OwnAccountStripeGateway.php",
+      "old_sha256": "7b08341640033b05df0d4318653e68c348ad1a62ee59c97dbc01a36af722785b",
+      "new_sha256": "7b08341640033b05df0d4318653e68c348ad1a62ee59c97dbc01a36af722785b"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/PrimaryBoundary.php",
+      "old_sha256": "47eeda8eebcf03f9e4e794368276220f1165108e138f1237792ddd9f200ac29a",
+      "new_sha256": "47eeda8eebcf03f9e4e794368276220f1165108e138f1237792ddd9f200ac29a"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionCheckout.php",
+      "old_sha256": "eff295bb191cbc748fd0bb9cfd6c94bc7060ad70e148a712d08d7c3bae6ccca9",
+      "new_sha256": "eff295bb191cbc748fd0bb9cfd6c94bc7060ad70e148a712d08d7c3bae6ccca9"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderLocatorV1.php",
+      "old_sha256": "c881ad5238322ebe3c14f161c225ae518ad6c4255ab978cb60f551c8747fff11",
+      "new_sha256": "c881ad5238322ebe3c14f161c225ae518ad6c4255ab978cb60f551c8747fff11"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderSourceV1.php",
+      "old_sha256": "af9e70fbb424dec52a518664bd7b442c5fbe5b5a3c84e31575d20cfcbd025ecb",
+      "new_sha256": "af9e70fbb424dec52a518664bd7b442c5fbe5b5a3c84e31575d20cfcbd025ecb"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProviderGateway.php",
+      "old_sha256": "8b6fa1fa41b62bbc454b8a06edd02d37bfb73dba29fc33a245a69572640ccc46",
+      "new_sha256": "8b6fa1fa41b62bbc454b8a06edd02d37bfb73dba29fc33a245a69572640ccc46"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/Records.php",
+      "old_sha256": "81e7e0ec3a7b4eb6a36a28c3b6626b3728f1e04e6ee35f146b526df3e29bbb16",
+      "new_sha256": "81e7e0ec3a7b4eb6a36a28c3b6626b3728f1e04e6ee35f146b526df3e29bbb16"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/TaxExemptions.php",
+      "old_sha256": "1560cfbb7f2c20afc3c873f79e240995a9181bbe2329f5f9088b78ba737ea95d",
+      "new_sha256": "1560cfbb7f2c20afc3c873f79e240995a9181bbe2329f5f9088b78ba737ea95d"
+    },
+    {
+      "path": "app/Http/Controllers/ProductionCheckoutController.php",
+      "old_sha256": "f381efa18dee75f79ac92afa84ded819cc7db118393716e76dbc6dc621279eb1",
+      "new_sha256": "f381efa18dee75f79ac92afa84ded819cc7db118393716e76dbc6dc621279eb1"
+    },
+    {
+      "path": "app/Http/Middleware/ProductionCheckoutPrivacy.php",
+      "old_sha256": "2ce2682247473ff39455f192095796d5c351c548ad541a7c296dc1c7eddf5dea",
+      "new_sha256": "2ce2682247473ff39455f192095796d5c351c548ad541a7c296dc1c7eddf5dea"
+    },
+    {
+      "path": "app/Http/Responses/ProductionCheckoutResponse.php",
+      "old_sha256": "1e27372c1dba3fdfb7ecfc5b40739a094b06a25a3d7728666adac235ba7947f4",
+      "new_sha256": "1e27372c1dba3fdfb7ecfc5b40739a094b06a25a3d7728666adac235ba7947f4"
+    },
+    {
+      "path": "app/Providers/ProductionCheckoutServiceProvider.php",
+      "old_sha256": "e228541e68867a3a7d3edc5e390e7474d2f0a9ad923a6f7e27b95870835bfd83",
+      "new_sha256": "e228541e68867a3a7d3edc5e390e7474d2f0a9ad923a6f7e27b95870835bfd83"
+    },
+    {
+      "path": "config/production_checkout.php",
+      "old_sha256": "2039927afa1113af4470c9961456ecbe66c8872005e775d5e48fa19e1d03a34a",
+      "new_sha256": "2039927afa1113af4470c9961456ecbe66c8872005e775d5e48fa19e1d03a34a"
+    },
+    {
+      "path": "database/migrations/2026_10_07_246000_production_checkout.php",
+      "old_sha256": "e834a67c3ffeeb26a9dc11a5701eb5e4d30f332421395b3e682e773996dec615",
+      "new_sha256": "e834a67c3ffeeb26a9dc11a5701eb5e4d30f332421395b3e682e773996dec615"
+    },
+    {
+      "path": "docs/verification/operative-checkout-new-20261007/README.md",
+      "old_sha256": "5ea4dc2787d8f1f19decb5b6505cda77b90a19086b09ed62c30d29e25b2967a8",
+      "new_sha256": "5ea4dc2787d8f1f19decb5b6505cda77b90a19086b09ed62c30d29e25b2967a8"
+    },
+    {
+      "path": "docs/verification/operative-checkout-new-20261007/provider-source/checkout-create-properties.json",
+      "old_sha256": "374de301a562efd659491d828b1b9a18b51fd14dc576f4fa556047963f6d636d",
+      "new_sha256": "374de301a562efd659491d828b1b9a18b51fd14dc576f4fa556047963f6d636d"
+    },
+    {
+      "path": "docs/verification/operative-checkout-new-20261007/provider-source/receipt.json",
+      "old_sha256": "ce41f4135cb1a922ec16ef1f262fb79635d5b15c7e333f6feb15a670255d7464",
+      "new_sha256": "ce41f4135cb1a922ec16ef1f262fb79635d5b15c7e333f6feb15a670255d7464"
+    },
+    {
+      "path": "docs/verification/operative-checkout-new-20261007/provider-source/stripe-openapi-bcfd59f4.json.gz",
+      "old_sha256": "00ee065b56734b028cdadabfa7b67264caecb306eeb2d698e56942d21169721b",
+      "new_sha256": "00ee065b56734b028cdadabfa7b67264caecb306eeb2d698e56942d21169721b"
+    },
+    {
+      "path": "routes/production-checkout.php",
+      "old_sha256": "415b6c42a8381f5d62519d1f0b108538e6ed86ccf19d85e267dc3e2f1c2ac496",
+      "new_sha256": "415b6c42a8381f5d62519d1f0b108538e6ed86ccf19d85e267dc3e2f1c2ac496"
+    },
+    {
+      "path": "tests/Feature/ProductionCheckoutHttpBoundaryTest.php",
+      "old_sha256": "6ce27486d70cd28cf5b4c78dae2c1b51db9845faa20947fd0dfbc677528a04cc",
+      "new_sha256": "6ce27486d70cd28cf5b4c78dae2c1b51db9845faa20947fd0dfbc677528a04cc"
+    },
+    {
+      "path": "tests/Feature/ProductionCheckoutJourneyTest.php",
+      "old_sha256": "2c596361740004a9587b42e413c11c7966c59fbc3839eb536ff341064ac33172",
+      "new_sha256": "2c596361740004a9587b42e413c11c7966c59fbc3839eb536ff341064ac33172"
+    },
+    {
+      "path": "tests/Feature/ProductionCheckoutNativeRaceTest.php",
+      "old_sha256": "e449bd92ac4555009779265d271c61bc9ea7088c5ec507b52b3c6c01ddb11392",
+      "new_sha256": "e449bd92ac4555009779265d271c61bc9ea7088c5ec507b52b3c6c01ddb11392"
+    },
+    {
+      "path": "tests/Feature/ProductionCheckoutPrimaryBoundaryTest.php",
+      "old_sha256": "19cf210b1a3053f9c5e6557c39acdd8de047bc72c5a9239f7cb9f57d6f3e4149",
+      "new_sha256": "19cf210b1a3053f9c5e6557c39acdd8de047bc72c5a9239f7cb9f57d6f3e4149"
+    },
+    {
+      "path": "tests/Support/ProductionCheckoutFixtures.php",
+      "old_sha256": "31eea4cd98f80f4e2d90c987657f0d22264d355a16078107a5b33884f42c7558",
+      "new_sha256": "31eea4cd98f80f4e2d90c987657f0d22264d355a16078107a5b33884f42c7558"
+    },
+    {
+      "path": "tests/Support/ProductionCheckoutGatewayFixture.php",
+      "old_sha256": "b91274f94105fd49bb8aa5a555c2987e3306624063f2ddc37dd511116d6e4130",
+      "new_sha256": "b91274f94105fd49bb8aa5a555c2987e3306624063f2ddc37dd511116d6e4130"
+    },
+    {
+      "path": "tests/Support/ProductionCheckoutJourneyFixture.php",
+      "old_sha256": "b3c3a32f284066d1c78132841facbfa86bcf162cd7f835c743df1a40e0bf24b4",
+      "new_sha256": "b3c3a32f284066d1c78132841facbfa86bcf162cd7f835c743df1a40e0bf24b4"
+    },
+    {
+      "path": "tests/Support/ProductionCheckoutProviderFixtures.php",
+      "old_sha256": "edb2774496bfad0825d42f29b4c7d5d9c55692e7a1afd4bfb5010318b02a60d6",
+      "new_sha256": "edb2774496bfad0825d42f29b4c7d5d9c55692e7a1afd4bfb5010318b02a60d6"
+    },
+    {
+      "path": "tests/Support/production-checkout-race-worker.php",
+      "old_sha256": "f0974f25d5ee0ffe696edf3c4ebec19f3ab0cb636b459458af44d96f400d4e00",
+      "new_sha256": "f0974f25d5ee0ffe696edf3c4ebec19f3ab0cb636b459458af44d96f400d4e00"
+    },
+    {
+      "path": "tests/Unit/ProductionCheckoutProviderTest.php",
+      "old_sha256": "d29a941d7f8c5ecbb66e3251c06c70144ac9b529ee62b5d57263e5ed968fe36a",
+      "new_sha256": "d29a941d7f8c5ecbb66e3251c06c70144ac9b529ee62b5d57263e5ed968fe36a"
+    },
+    {
+      "path": "tests/Unit/ProductionHostedEvidenceTest.php",
+      "old_sha256": "ca63ae8463338554de3703c233810a3af2287649a98aaa1fef6dfb82c2706281",
+      "new_sha256": "ca63ae8463338554de3703c233810a3af2287649a98aaa1fef6dfb82c2706281"
+    }
+  ],
+  "scope_attribution": "Owned path counts include four original verification documentation/provider-source files. Runtime/test-only counts are reported separately; evidence-only README updates do not alter executable source.",
+  "runtime_and_registered_test_counts": {
+    "owned_byte_exact_files": 38,
+    "owned_changed_files": 4,
+    "owned_added_files": 0
+  }
+}

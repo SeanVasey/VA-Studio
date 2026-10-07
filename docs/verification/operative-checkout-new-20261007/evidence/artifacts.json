@@ -1,0 +1,382 @@
+{
+  "schema_version": 1,
+  "executable_sha": "f0a1615be0833804959662fad5d7a7a8e1389ee0",
+  "coverage": "Every retained file under this verification folder except this self-referential digest manifest.",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 14752,
+      "sha256": "4535b0e920f1d85fe118f4fd74cafd4a062514911958ad5282adbbbc9d2ae0e1"
+    },
+    {
+      "path": "canaries/IdentityUnknownRoleCanaryTest.php",
+      "bytes": 782,
+      "sha256": "0341c4a89c96bc78e9d66a3ffb05c3688d85a80f72ba955b51ff5c12ecfdff1b"
+    },
+    {
+      "path": "canaries/ProductionCheckoutForeignConstraintCanaryTest.php",
+      "bytes": 1839,
+      "sha256": "6d28b3a9cd8bb1d3c9b55f2a34f904ea2aa22262ddd8e0131f66cd5fe81f9bb3"
+    },
+    {
+      "path": "canaries/ProductionCheckoutForeignRoutineCanaryTest.php",
+      "bytes": 2168,
+      "sha256": "096c6e15cecead410a0e6539534fba706fdb0c3c5a78b2cc5e18a780fe0e7a97"
+    },
+    {
+      "path": "canaries/ProductionCheckoutSourceTransactionCanaryTest.php",
+      "bytes": 1401,
+      "sha256": "72fe349e05793935b640425b31b2752d47e180f4279e313c909e19026c2d4002"
+    },
+    {
+      "path": "canaries/ProductionCheckoutUnknownStaffCanaryTest.php",
+      "bytes": 1525,
+      "sha256": "b833004d873dab04d1fcad29ef2dc93dc622e82f5425c61d61ef215d8d3686c8"
+    },
+    {
+      "path": "evidence/9f-to-final-source-map.json",
+      "bytes": 13108,
+      "sha256": "b8abf304e25b6da7a30edb13bf7a8f90ace6f40bb0f79cf7877f7504811d992f"
+    },
+    {
+      "path": "evidence/checks.json",
+      "bytes": 139973,
+      "sha256": "61948a37e3f260de2cfbf28c1e57534971d9cebbbafe7420d9ce2ec24d30d3e2"
+    },
+    {
+      "path": "evidence/environment.json",
+      "bytes": 838,
+      "sha256": "a18df08a39cf54b83e820cb878e629f6aebd4f76683369d03b6a3b6c206eaec1"
+    },
+    {
+      "path": "evidence/final-source-manifest.json",
+      "bytes": 23034,
+      "sha256": "b7d586e5471c31ae9628739f6dcfcd7d164ded73673b53ef15a8dd04974a69e7"
+    },
+    {
+      "path": "evidence/held-frozen-canary-native.command.json",
+      "bytes": 664,
+      "sha256": "413ae4955cd6b6a83f9adf64454c06f1d00da1c45c7947f8e74661c69c625288"
+    },
+    {
+      "path": "evidence/held-frozen-canary-native.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/held-frozen-canary-native.txt",
+      "bytes": 93,
+      "sha256": "f30499e8e661e7ffa1a060229c2fc1a44fe46af15c611204db8072738879615c"
+    },
+    {
+      "path": "evidence/held-frozen-canary-native.xml",
+      "bytes": 828,
+      "sha256": "c0962af66ce5fb1058287909a1ec532db883242dd780e3861bcf3ecc184bbe95"
+    },
+    {
+      "path": "evidence/held-frozen-canary-sqlite.command.json",
+      "bytes": 504,
+      "sha256": "3fa32c891e81b65ae337507c2d3c2b891245d25925418b864de9a661011980ee"
+    },
+    {
+      "path": "evidence/held-frozen-canary-sqlite.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/held-frozen-canary-sqlite.txt",
+      "bytes": 92,
+      "sha256": "ee34ee3c299d4234cf75d863677acaa70c75f2056de7dfdf9952a17e82a25776"
+    },
+    {
+      "path": "evidence/held-frozen-canary-sqlite.xml",
+      "bytes": 826,
+      "sha256": "9e137d65757dd728ce1174ce704fc4af0f8cc145f0a3f5b8ebed8456d489266a"
+    },
+    {
+      "path": "evidence/held-frozen-native.command.json",
+      "bytes": 662,
+      "sha256": "5c912cefc1876cccd6c3aee0eb733c3fac028042e37556c8c0257b94273f2d07"
+    },
+    {
+      "path": "evidence/held-frozen-native.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/held-frozen-native.txt",
+      "bytes": 97,
+      "sha256": "cac05a7ba8f9b9bdd33bc57f24609d5b8ea5b2afc0e16b9cf2d095cab6d4c468"
+    },
+    {
+      "path": "evidence/held-frozen-native.xml",
+      "bytes": 5103,
+      "sha256": "a70510beaf35ffb76d8d47a6c33c285fd1ed281d7a4c1408b3fc18091e156959"
+    },
+    {
+      "path": "evidence/held-frozen-pint.command.json",
+      "bytes": 389,
+      "sha256": "1f18f217ffd2d32c658036f62c99d47d24df3c1a0776cd725a87e2583da74f44"
+    },
+    {
+      "path": "evidence/held-frozen-pint.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/held-frozen-pint.txt",
+      "bytes": 33,
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "path": "evidence/held-frozen-sqlite.command.json",
+      "bytes": 1232,
+      "sha256": "4609ecd9ff45ed6bb107f1f30c0d4eeac402ca1246830f8011599e9ce1d47e11"
+    },
+    {
+      "path": "evidence/held-frozen-sqlite.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/held-frozen-sqlite.txt",
+      "bytes": 111,
+      "sha256": "6a903999f67425389e7d7f44853662deb5fa19e762d17c3055ee8180bc7cb93f"
+    },
+    {
+      "path": "evidence/held-frozen-sqlite.xml",
+      "bytes": 52919,
+      "sha256": "f7f8352c7fb2c5d063ddf93d9a49ca16a2e50f992ec06f099fbddbc2dd90ff8f"
+    },
+    {
+      "path": "evidence/historical/9f-native.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/historical/9f-native.txt",
+      "bytes": 111,
+      "sha256": "b64543c9c04f49232ed6209d954fa1063003f82995c735100a89fd77e9bfa989"
+    },
+    {
+      "path": "evidence/historical/9f-native.xml",
+      "bytes": 21723,
+      "sha256": "8cc051fb91984bcd392e2eeda62f938e0ffa68cabe8efe7f86e734610c5f1845"
+    },
+    {
+      "path": "evidence/historical/9f-sqlite.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/historical/9f-sqlite.txt",
+      "bytes": 111,
+      "sha256": "2d99f0d7e8d76e237b056b6e4690f960b3d0f52783fd3d3643d67723cbb6ded3"
+    },
+    {
+      "path": "evidence/historical/9f-sqlite.xml",
+      "bytes": 49200,
+      "sha256": "9bfa0949064d2cc434f51c636233275a129b19cd14bbb4538cad32a39f36b02a"
+    },
+    {
+      "path": "evidence/historical/equivalent-reproduction-selections.json",
+      "bytes": 3160,
+      "sha256": "82ca57b9f381f43cc099324ee8ae574ce28aff2bfbf862fbff3a4ad2447e43d6"
+    },
+    {
+      "path": "evidence/historical/f0-README.md",
+      "bytes": 9199,
+      "sha256": "5ea4dc2787d8f1f19decb5b6505cda77b90a19086b09ed62c30d29e25b2967a8"
+    },
+    {
+      "path": "evidence/historical/ff4-environment.json",
+      "bytes": 660,
+      "sha256": "ec02074bf5bd6edea64408a4f125c52e8e2acdce867b05631fcc08224ed82ed0"
+    },
+    {
+      "path": "evidence/historical/ff4-manifest.json",
+      "bytes": 21086,
+      "sha256": "b892faa4363a095ddef17dedf092cf43118dbf3be06cdee7c7b6647927a36c96"
+    },
+    {
+      "path": "evidence/historical/ff4-native.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/historical/ff4-native.txt",
+      "bytes": 113,
+      "sha256": "e8e57e35ccacf254b01822f4e6dbe0f59ea6babc795f3c61bd7a0ae5359cbf1d"
+    },
+    {
+      "path": "evidence/historical/ff4-native.xml",
+      "bytes": 45008,
+      "sha256": "b2417d57cc6a9cff704e69d35bcb540700c2f0ac4bfa8b03e16569711ffa7c2f"
+    },
+    {
+      "path": "evidence/historical/ff4-to-9f-source-map.json",
+      "bytes": 12730,
+      "sha256": "733d8c23268090d81d345e87e88ff5bfcb548c6232bc92a2fe0495f24d626da9"
+    },
+    {
+      "path": "evidence/historical/held-pilot-identity-harness-error.exit",
+      "bytes": 2,
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    {
+      "path": "evidence/historical/held-pilot-identity-harness-error.txt",
+      "bytes": 970,
+      "sha256": "a056612fb876e5bf66ddf4c648a0ed7d866411701d45f263dc184a8af8efa655"
+    },
+    {
+      "path": "evidence/historical/held-pilot-identity-harness-error.xml",
+      "bytes": 5679,
+      "sha256": "13152ae0f3f9ede274930d1487657384af196224c21edc3be336b88fdf375619"
+    },
+    {
+      "path": "evidence/historical/held-pilot-sqlite-fixed.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/historical/held-pilot-sqlite-fixed.txt",
+      "bytes": 96,
+      "sha256": "4687fa196039e806d3d8d4fd27a82cecf31dcf5c7958f62ce1de575c124d21f1"
+    },
+    {
+      "path": "evidence/historical/held-pilot-sqlite-fixed.xml",
+      "bytes": 4729,
+      "sha256": "760d7304cf25a3b7bc60fb3369a2f93550cf02b6eddbe317c916a0ea756e2860"
+    },
+    {
+      "path": "evidence/historical/native-fk-dictionary-probe.json",
+      "bytes": 1124,
+      "sha256": "dded554576a893e9faab3a4be15f30719213c17d072df6318ad8f90aa11908e1"
+    },
+    {
+      "path": "evidence/historical/native-fk-red.exit",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "evidence/historical/native-fk-red.txt",
+      "bytes": 4548,
+      "sha256": "422471f7c689cbde07c449de51e44a1e6431cc86c93f03279b7b2d1b8cefb833"
+    },
+    {
+      "path": "evidence/historical/native-fk-red.xml",
+      "bytes": 5130,
+      "sha256": "fbc5cec8d2bed9f6f80c4cd81e44d84436a6102b2b73a275413bcc8ae09a5f6c"
+    },
+    {
+      "path": "evidence/historical/native-routine-red.exit",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "evidence/historical/native-routine-red.txt",
+      "bytes": 430,
+      "sha256": "d3c3b36171034e46e1eeead7ce6023e7c6f3c95c42457b19780a97acbc32833b"
+    },
+    {
+      "path": "evidence/historical/native-routine-red.xml",
+      "bytes": 988,
+      "sha256": "a87a80b3b6cc49384e51da92269859c5bff4efcca8f4c5370f4b7b4270f6d47f"
+    },
+    {
+      "path": "evidence/historical/repair-sqlite-fixed.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/historical/repair-sqlite-fixed.txt",
+      "bytes": 109,
+      "sha256": "51965bd3bcfe18e9931186b0f226f5ffa04501a7faaf068ab9f55c996632956b"
+    },
+    {
+      "path": "evidence/historical/repair-sqlite-fixed.xml",
+      "bytes": 13964,
+      "sha256": "50e2af0b7a2663e561f60451aba6ca7be3f8266c2e2a8ca9f687c3f9294d72a5"
+    },
+    {
+      "path": "evidence/historical/repair-sqlite-missing-key-harness-error.exit",
+      "bytes": 2,
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    {
+      "path": "evidence/historical/repair-sqlite-missing-key-harness-error.txt",
+      "bytes": 1043,
+      "sha256": "94113d135c73372030cd274c0bd2eb7847c26d88dbf142926428f1fe9904bd7e"
+    },
+    {
+      "path": "evidence/historical/repair-sqlite-missing-key-harness-error.xml",
+      "bytes": 14838,
+      "sha256": "40c57613f2398dbc33ae0ac2d28a552d637a8c0b00937158e1dc9a6a29042e08"
+    },
+    {
+      "path": "evidence/historical/source-transaction-red.exit",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "evidence/historical/source-transaction-red.txt",
+      "bytes": 463,
+      "sha256": "9b377337f3f257a0a1a94acdd3f9f98c191ce052faeb6bc5608f909350b344fe"
+    },
+    {
+      "path": "evidence/historical/source-transaction-red.xml",
+      "bytes": 970,
+      "sha256": "0a40f22667d6439698eb3e51813002a84dd7ee7752b443efb659b6a38659ee8e"
+    },
+    {
+      "path": "evidence/historical/unknown-staff-red.exit",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "path": "evidence/historical/unknown-staff-red.txt",
+      "bytes": 399,
+      "sha256": "f0200b709badcbc790647578124a698109d5226a4f6b9acdd673e9600757cfa0"
+    },
+    {
+      "path": "evidence/historical/unknown-staff-red.xml",
+      "bytes": 936,
+      "sha256": "d6ec26b654d27e1e3a7796f10466fe6363dbb04d88584778285b93de44494b6f"
+    },
+    {
+      "path": "evidence/paid-public-seam-map.json",
+      "bytes": 1718,
+      "sha256": "5d27b8d30462684fde4408e4050eefb881d6c69f56aa7cd770d236fd27e22f17"
+    },
+    {
+      "path": "provider-source/checkout-create-properties.json",
+      "bytes": 10123,
+      "sha256": "374de301a562efd659491d828b1b9a18b51fd14dc576f4fa556047963f6d636d"
+    },
+    {
+      "path": "provider-source/dahlia-history.json",
+      "bytes": 21493,
+      "sha256": "cdc749506eba0214d624ad50cddcf26b79a0112516fed396ee8c162a76ce6d27"
+    },
+    {
+      "path": "provider-source/dahlia-receipt.json",
+      "bytes": 1475,
+      "sha256": "3099e6c6c5475359d94018422f42ad31f02cc0d9ba3caf2f1aed678586ab58d1"
+    },
+    {
+      "path": "provider-source/receipt.json",
+      "bytes": 1415,
+      "sha256": "ce41f4135cb1a922ec16ef1f262fb79635d5b15c7e333f6feb15a670255d7464"
+    },
+    {
+      "path": "provider-source/stripe-openapi-bcfd59f4.json.gz",
+      "bytes": 702524,
+      "sha256": "00ee065b56734b028cdadabfa7b67264caecb306eeb2d698e56942d21169721b"
+    },
+    {
+      "path": "provider-source/stripe-openapi-dahlia-30d3391c.json.gz",
+      "bytes": 677517,
+      "sha256": "b1397cbd2a6c58d8f646101dbe5d87895f3402ce2859f8bfca3bb2182fdb0c13"
+    }
+  ]
+}

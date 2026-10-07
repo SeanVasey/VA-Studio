@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "vendor/bin/phpunit",
+    "docs/verification/operative-checkout-new-20261007/canaries/ProductionCheckoutSourceTransactionCanaryTest.php",
+    "--filter",
+    "paid_locked_source_never_mints_without_a_held_consumer_transaction",
+    "--log-junit",
+    "/tmp/va-production-checkout-held-frozen-canary-sqlite.xml",
+    "--colors=never"
+  ],
+  "source_sha": "f0a1615be0833804959662fad5d7a7a8e1389ee0",
+  "canary_sha256": "72fe349e05793935b640425b31b2752d47e180f4279e313c909e19026c2d4002"
+}

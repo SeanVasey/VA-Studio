@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "source_repository": "https://github.com/stripe/openapi",
+  "source_commit": "30d3391cc09a0f67ad29bee002f570811b19e1da",
+  "source_committer_date": "2026-08-26T17:57:44Z",
+  "source_url": "https://raw.githubusercontent.com/stripe/openapi/30d3391cc09a0f67ad29bee002f570811b19e1da/openapi/spec3.json",
+  "uncompressed_bytes": 8028700,
+  "uncompressed_sha256": "f0e0fc8fffbffda45bf5f3df59846443c1d47a3cfcbfae232eedf4743124ebee",
+  "gzip_sha256": "b1397cbd2a6c58d8f646101dbe5d87895f3402ce2859f8bfca3bb2182fdb0c13",
+  "spec_api_version": "2026-08-26.dahlia",
+  "implemented_pinned_api_version": "2026-08-26.dahlia",
+  "locked_sdk_version": "21.3.2",
+  "source_limitations": [
+    "Public schema research only; no actual merchant account, network session, tax registration, address, provider calculation or payment compatibility was verified.",
+    "The original Endive snapshot and its precise version limitations remain retained unchanged.",
+    "Matching pinned schema still exposes no payment_intent_data tax/calculation linkage; supported provider-calculated Checkout automatic_tax remains separate required child."
+  ],
+  "checkout_payment_intent_data_properties": [
+    "application_fee_amount",
+    "capture_method",
+    "description",
+    "metadata",
+    "on_behalf_of",
+    "receipt_email",
+    "setup_future_usage",
+    "shipping",
+    "statement_descriptor",
+    "statement_descriptor_suffix",
+    "transfer_data",
+    "transfer_group"
+  ]
+}

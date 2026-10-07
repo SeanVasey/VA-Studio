@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Canary\CheckoutPhysicalCommitFreshPolicyCanaryTest" file="/workspace/VA-Studio-checkout-write-admission/docs/verification/checkout-write-commit-admission-20261007/CheckoutPhysicalCommitFreshPolicyCanaryTest.php" tests="1" assertions="4" errors="0" failures="1" skipped="0" time="2.147815">
+    <testcase name="test_physical_committing_policy_withdrawal_prevents_new_order_rows" file="/workspace/VA-Studio-checkout-write-admission/docs/verification/checkout-write-commit-admission-20261007/CheckoutPhysicalCommitFreshPolicyCanaryTest.php" line="10" class="Tests\Canary\CheckoutPhysicalCommitFreshPolicyCanaryTest" classname="Tests.Canary.CheckoutPhysicalCommitFreshPolicyCanaryTest" assertions="4" time="2.147815">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Canary\CheckoutPhysicalCommitFreshPolicyCanaryTest::test_physical_committing_policy_withdrawal_prevents_new_order_rows
+Failed asserting that false is true.
+
+/workspace/VA-Studio-checkout-write-admission/docs/verification/checkout-write-commit-admission-20261007/CheckoutPhysicalCommitFreshPolicyCanaryTest.php:31</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

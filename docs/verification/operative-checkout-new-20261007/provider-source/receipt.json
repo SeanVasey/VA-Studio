@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "source_repository": "https://github.com/stripe/openapi",
+  "source_commit": "bcfd59f49dcac84a84d63d304c62793dff6e5916",
+  "source_committer_date": "2026-09-29T22:06:08Z",
+  "source_url": "https://raw.githubusercontent.com/stripe/openapi/bcfd59f49dcac84a84d63d304c62793dff6e5916/openapi/spec3.json",
+  "uncompressed_bytes": 8317513,
+  "uncompressed_sha256": "7cff4cc46d0654101a36a3302f7544640f5f73e4f3cad6f264f0e23c19fa1776",
+  "gzip_sha256": "00ee065b56734b028cdadabfa7b67264caecb306eeb2d698e56942d21169721b",
+  "spec_api_version": "2026-09-30.endive",
+  "implemented_pinned_api_version": "2026-08-26.dahlia",
+  "locked_sdk_version": "21.3.2",
+  "source_limitations": [
+    "docs.stripe.com narrative/API pages returned HTTP403 in this environment",
+    "retrieved spec is a different API version from the pinned runtime",
+    "no actual merchant account, network session, tax jurisdiction, or payment was verified",
+    "latest spec payment_intent_data does not expose tax/calculation linkage; no inferred attachment or tax-line workaround implemented"
+  ],
+  "checkout_payment_intent_data_properties": [
+    "application_fee_amount",
+    "capture_method",
+    "description",
+    "metadata",
+    "on_behalf_of",
+    "receipt_email",
+    "setup_future_usage",
+    "shipping",
+    "statement_descriptor",
+    "statement_descriptor_suffix",
+    "transfer_data",
+    "transfer_group"
+  ]
+}
