@@ -364,6 +364,33 @@ class DiscoveryEpochRecoveryTest extends TestCase
                 $pdo->exec('DROP '.strtoupper($type).' '.$name);
             }
         }
+
+        if ($driver === 'mysql') {
+            $aliases = [];
+            foreach (['cde_own_insért', 'cde_own_ínsert', 'cde_own_úpdate', 'catalog_discovery_époch'] as $name) {
+                $aliases[] = [$name, null];
+                $aliases[] = [$name, 0];
+            }
+            $aliases[] = ['cde_own_úpdate', 1];
+            $aliases[] = ['cde_1_updaté', 7];
+            $aliases[] = ['catalog_discovery_époch', 7];
+            foreach ($aliases as [$name, $prefix]) {
+                $this->removeFixtureEpoch($pdo);
+                if ($prefix !== null) {
+                    $pdo->exec(DiscoveryEpoch::tableSql($driver));
+                    $pdo->exec('INSERT INTO '.DiscoveryEpoch::TABLE.' (id, epoch, schema_version) VALUES (1, 0, 1)');
+                    foreach (array_slice(DiscoveryEpoch::guards($driver), 0, $prefix) as $guard) {
+                        $pdo->exec($guard['sql']);
+                    }
+                }
+                $pdo->exec('CREATE TRIGGER '.$name.' BEFORE INSERT ON tracks FOR EACH ROW SET @discovery_foreign_canary = 1');
+                try {
+                    $this->assertRecoveryRefusedWithSnapshot($pdo, fn () => $migration->up());
+                } finally {
+                    $pdo->exec('DROP TRIGGER '.$name);
+                }
+            }
+        }
     }
 
     private function assertRecoveryRefusedWithSnapshot(PDO $pdo, callable $operation): void

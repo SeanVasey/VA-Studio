@@ -128,6 +128,7 @@ return new class extends Migration
         if ($exists) {
             $this->mysqlTablePreflight($pdo);
         }
+        $this->refuseMysqlTriggerAliases($pdo, [DiscoveryEpoch::TABLE, ...array_keys($guards)]);
         $rows = $pdo->query('SELECT TRIGGER_NAME, EVENT_OBJECT_TABLE, EVENT_MANIPULATION, ACTION_TIMING, ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE()')->fetchAll(PDO::FETCH_ASSOC);
         $installed = array_fill_keys(array_keys($guards), false);
         foreach ($rows as $row) {
@@ -147,6 +148,22 @@ return new class extends Migration
         }
 
         return [$exists, $installed];
+    }
+
+    private function refuseMysqlTriggerAliases(PDO $pdo, array $names): void
+    {
+        // The native trigger dictionary uses utf8mb3_general_ci, including accent aliases.
+        // SQL must discover those aliases before exact raw-name ownership is checked.
+        $reserved = implode(' UNION ALL ', array_fill(0, count($names), 'SELECT CAST(? AS CHAR CHARACTER SET utf8mb3) AS reserved_name'));
+        $statement = $pdo->prepare('SELECT t.TRIGGER_NAME, r.reserved_name AS RESERVED_NAME FROM ('.$reserved.') r'
+            .' JOIN information_schema.TRIGGERS t ON CONVERT(t.TRIGGER_NAME USING utf8mb3) COLLATE utf8mb3_general_ci = r.reserved_name COLLATE utf8mb3_general_ci'
+            .' WHERE t.TRIGGER_SCHEMA = DATABASE()');
+        $statement->execute($names);
+        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            if ($row['TRIGGER_NAME'] !== $row['RESERVED_NAME']) {
+                throw new LogicException('Discovery trigger dictionary identity collision; recovery refused before DDL.');
+            }
+        }
     }
 
     private function refuseMysqlShadow(PDO $pdo, string $table): void
