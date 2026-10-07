@@ -62,7 +62,7 @@ final class ProductionCommerceReadiness
         $configuration = [
             'production_environment' => [app()->environment('production'), 'Run the future production candidate in the production environment.'],
             'debug_disabled' => [config('app.debug') === false, 'Disable application debug output.'],
-            'https_origin' => [$this->httpsOrigin(config('app.url')), 'Configure a bounded HTTPS origin without credentials, path, query or fragment.'],
+            'https_origin' => [self::httpsOrigin(config('app.url')), 'Configure a bounded HTTPS origin without credentials, path, query or fragment.'],
             'application_key' => [$this->encryptionKey(), 'Configure a supported retained encryption key; format does not prove backup or rotation readiness.'],
             'mysql_driver_selected' => [config('database.default') === 'mysql' && config('database.connections.mysql.driver') === 'mysql', 'Select the documented MySQL driver; no database connection, version or grants are checked.'],
             'session_controls' => [config('session.driver') === 'database' && config('session.encrypt') === true && config('session.secure') === true
@@ -124,7 +124,8 @@ final class ProductionCommerceReadiness
         return is_string($decoded) && Encrypter::supported($decoded, $cipher);
     }
 
-    private function httpsOrigin(mixed $value): bool
+    /** Shared bounded HTTPS-origin shape check; reused by the Stripe capability preflight. */
+    public static function httpsOrigin(mixed $value): bool
     {
         if (! is_string($value) || strlen($value) > 255 || preg_match('/[\x00-\x20\x7f\\\\]/', $value)) {
             return false;
