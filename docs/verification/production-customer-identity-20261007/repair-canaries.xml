@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="2" assertions="9" errors="0" failures="0" skipped="0" time="1.986038">
+    <testsuite name="Tests\AuthorIdentityCanaries\IdentityUnknownRoleCanaryTest" file="/workspace/VA-Studio-production-identity/docs/verification/production-customer-identity-20261007/IdentityUnknownRoleCanaryTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="1.101917">
+      <testcase name="test_unknown_permanent_role_flag_never_counts_as_nonstaff_customer_authority" file="/workspace/VA-Studio-production-identity/docs/verification/production-customer-identity-20261007/IdentityUnknownRoleCanaryTest.php" line="10" class="Tests\AuthorIdentityCanaries\IdentityUnknownRoleCanaryTest" classname="Tests.AuthorIdentityCanaries.IdentityUnknownRoleCanaryTest" assertions="4" time="1.101917"/>
+    </testsuite>
+    <testsuite name="Tests\IndependentIdentity\ProductionIdentityPermanentUserCanaryTest" file="/workspace/VA-Studio-identity-independent/docs/verification/cloud-identity-independent-20261007/ProductionIdentityPermanentUserCanaryTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="0.884121">
+      <testcase name="test_sign_in_observes_permanent_credential_withdrawal_and_refuses_a_temporary_old_user_copy" file="/workspace/VA-Studio-identity-independent/docs/verification/cloud-identity-independent-20261007/ProductionIdentityPermanentUserCanaryTest.php" line="15" class="Tests\IndependentIdentity\ProductionIdentityPermanentUserCanaryTest" classname="Tests.IndependentIdentity.ProductionIdentityPermanentUserCanaryTest" assertions="5" time="0.884121"/>
+    </testsuite>
+  </testsuite>
+</testsuites>
