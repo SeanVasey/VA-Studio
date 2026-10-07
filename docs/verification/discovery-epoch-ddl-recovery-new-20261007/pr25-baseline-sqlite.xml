@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\DiscoveryEpochRecoveryTest" file="/workspace/VA-Studio-pr25-recovery/tests/Feature/DiscoveryEpochRecoveryTest.php" tests="1" assertions="3" errors="1" failures="0" skipped="0" time="0.395105">
+    <testcase name="test_failed_trigger_creation_retries_through_real_migrator_without_erasing_prior_data" file="/workspace/VA-Studio-pr25-recovery/tests/Feature/DiscoveryEpochRecoveryTest.php" line="20" class="Tests\Feature\DiscoveryEpochRecoveryTest" classname="Tests.Feature.DiscoveryEpochRecoveryTest" assertions="3" time="0.395105">
+      <error type="LogicException">Tests\Feature\DiscoveryEpochRecoveryTest::test_failed_trigger_creation_retries_through_real_migrator_without_erasing_prior_data
+LogicException: Discovery identity collision; installation refused before DDL.
+
+/workspace/VA-Studio-pr25-recovery/database/migrations/2026_10_07_240000_catalog_discovery_epoch.php:27
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:517
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:442
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:451
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Task.php:43
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:853
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:138
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:118
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:672
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:111
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:90
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/workspace/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/workspace/VA-Studio/vendor/symfony/console/Application.php:1094
+/workspace/VA-Studio/vendor/symfony/console/Application.php:356
+/workspace/VA-Studio/vendor/symfony/console/Application.php:195
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-pr25-recovery/tests/Feature/DiscoveryEpochRecoveryTest.php:51
+/workspace/VA-Studio-pr25-recovery/tests/Feature/DiscoveryEpochRecoveryTest.php:43</error>
+    </testcase>
+  </testsuite>
+</testsuites>

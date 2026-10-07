@@ -1,0 +1,287 @@
+{
+  "kind": "new_replacement_repair",
+  "published_base": "f713ce641cb043c9171c4a3b35c2e666d2bf146e",
+  "corrected_source_sha": "ed285b6a2b34bc1a2a2c91c42b64d68f317965af",
+  "corrected_source_tree": "0d22cdda957ab72b4430c7029c2f2b8a1fd990c8",
+  "source": {
+    "database/migrations/2026_10_07_240000_catalog_discovery_epoch.php": {
+      "git_blob": "8429ab5aef283bddfa4d5a6071724f9983a8aad3",
+      "sha256": "93d8155e864ad96917f5a0d60804102cd4c40ecba961f50542d74afd5b9a80ce"
+    },
+    "tests/Feature/DiscoveryEpochMigrationTest.php": {
+      "git_blob": "5ca094d427faa8d23ab3861370544c677fd156a8",
+      "sha256": "5756e7b7f9e3316c1aabf60034050fbf5de9e2717d7da274b8a00e59c70c2d40"
+    },
+    "tests/Feature/DiscoveryEpochRecoveryTest.php": {
+      "git_blob": "5e69d9eb7f3f57b7e979350737867b7e4a1ce5fd",
+      "sha256": "38a2f77c55a1763105323ac7f047c5f63b1599e26c560ccd715a7d069b2201e1"
+    }
+  },
+  "actual_results": {
+    "sqlite": {
+      "source_sha": "ed285b6a2b34bc1a2a2c91c42b64d68f317965af",
+      "console": {
+        "tool": "phpunit",
+        "result": "passed",
+        "tests": 28,
+        "passed": 28,
+        "assertions": 4008,
+        "duration_ms": 9678
+      },
+      "junit_cases": [
+        {
+          "name": "test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set \"empty\"",
+          "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+          "assertions": 10
+        },
+        {
+          "name": "test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set \"populated\"",
+          "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+          "assertions": 10
+        },
+        {
+          "name": "test_down_refuses_before_any_database_read_or_write",
+          "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+          "assertions": 1
+        },
+        {
+          "name": "test_actual_insert_update_delete_upsert_replace_aba_and_rollback_invalidate_atomically",
+          "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+          "assertions": 9
+        },
+        {
+          "name": "test_missing_changed_guard_and_modified_table_fail_closed",
+          "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+          "assertions": 3
+        },
+        {
+          "name": "test_overflow_refuses_parent_write_and_preserves_epoch_and_data",
+          "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+          "assertions": 3
+        },
+        {
+          "name": "test_exact_installed_migration_is_idempotent_and_preserves_retained_data",
+          "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+          "assertions": 1
+        },
+        {
+          "name": "test_foreign_guard_on_absent_installation_is_not_adopted_or_replaced",
+          "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+          "assertions": 2
+        },
+        {
+          "name": "test_connection_local_dependency_shadow_refuses_capture",
+          "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+          "assertions": 1
+        },
+        {
+          "name": "test_failed_trigger_creation_retries_through_real_migrator_without_erasing_prior_data",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 6
+        },
+        {
+          "name": "test_every_creation_statement_failure_resumes_only_missing_parts_and_preserves_surviving_guards",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 3812
+        },
+        {
+          "name": "test_final_assertion_failure_resumes_without_replacing_any_object_or_seed",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 28
+        },
+        {
+          "name": "test_real_final_assertion_drift_preserves_unlogged_objects_and_retry_refuses_before_ddl",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 7
+        },
+        {
+          "name": "test_real_migrator_resumes_before_repository_log_and_uncertain_completed_log_is_not_duplicated",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 30
+        },
+        {
+          "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"column\"",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 4
+        },
+        {
+          "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"extra index\"",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 4
+        },
+        {
+          "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"changed guard\"",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 4
+        },
+        {
+          "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"foreign guard\"",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 4
+        },
+        {
+          "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"case guard\"",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 4
+        },
+        {
+          "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"extra epoch guard\"",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 4
+        },
+        {
+          "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"guard gap\"",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 4
+        },
+        {
+          "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"missing seed\"",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 4
+        },
+        {
+          "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"advanced partial epoch\"",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 4
+        },
+        {
+          "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"temporary epoch\"",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 5
+        },
+        {
+          "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"temporary dependency\"",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 5
+        },
+        {
+          "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"case table\"",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 4
+        },
+        {
+          "name": "test_reserved_objects_cannot_hide_across_table_index_view_and_trigger_namespaces",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 32
+        },
+        {
+          "name": "test_foreign_table_in_guard_namespace_cannot_hide_behind_exact_later_trigger",
+          "class": "Tests\\Feature\\SQLiteReservedIdentityCanaryTest",
+          "assertions": 3
+        }
+      ],
+      "zero_failures_errors_skips": true
+    },
+    "mysql": {
+      "source_sha": "ed285b6a2b34bc1a2a2c91c42b64d68f317965af",
+      "console": {
+        "tool": "phpunit",
+        "result": "passed",
+        "tests": 8,
+        "passed": 8,
+        "assertions": 118,
+        "duration_ms": 97856
+      },
+      "junit_cases": [
+        {
+          "name": "test_exact_installed_migration_is_idempotent_and_preserves_retained_data",
+          "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+          "assertions": 1
+        },
+        {
+          "name": "test_failed_trigger_creation_retries_through_real_migrator_without_erasing_prior_data",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 6
+        },
+        {
+          "name": "test_final_assertion_failure_resumes_without_replacing_any_object_or_seed",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 28
+        },
+        {
+          "name": "test_real_final_assertion_drift_preserves_unlogged_objects_and_retry_refuses_before_ddl",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 7
+        },
+        {
+          "name": "test_real_migrator_resumes_before_repository_log_and_uncertain_completed_log_is_not_duplicated",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 30
+        },
+        {
+          "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"missing seed\"",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 4
+        },
+        {
+          "name": "test_reserved_objects_cannot_hide_across_table_index_view_and_trigger_namespaces",
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "assertions": 38
+        },
+        {
+          "name": "test_native_dictionary_alias_refuses_before_creating_epoch_table_or_seed",
+          "class": "Tests\\Feature\\NativeReservedAliasCanaryTest",
+          "assertions": 4
+        }
+      ],
+      "zero_failures_errors_skips": true
+    }
+  },
+  "runtime_mysql": {
+    "php": "8.4.26",
+    "driver": "mysql",
+    "server": "8.0.46-0ubuntu0.24.04.4",
+    "mysql": {
+      "version": "8.0.46-0ubuntu0.24.04.4",
+      "version_comment": "(Ubuntu)",
+      "lower_case_table_names": 0,
+      "flush_at_commit": 1,
+      "doublewrite": "ON",
+      "log_bin": 0
+    }
+  },
+  "installed_graph": {
+    "packages": 158,
+    "mismatches": [],
+    "origins": [
+      "/workspace/VA-Studio-pr25-recovery/app/Domain/Catalog/Discovery/DiscoveryEpoch.php",
+      "/workspace/VA-Studio-pr25-recovery/tests/TestCase.php",
+      "/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php"
+    ]
+  },
+  "carried_source": "6a5da20d9cd2ab078d79b05288d583436cc731a0",
+  "carried_result": {
+    "native_complete_selection_tests": 26,
+    "assertions": 3973,
+    "duration_ms": 423062,
+    "proof": "native-method-carry.json",
+    "boundary_census": 112
+  },
+  "independent_review_report": {
+    "source_sha": "ed285b6a2b34bc1a2a2c91c42b64d68f317965af",
+    "sqlite_tests": 4,
+    "sqlite_assertions": 40,
+    "native_tests": 5,
+    "native_assertions": 82,
+    "remaining_blockers": 0,
+    "limits": "Independent receipt/source artifacts belong to root reviewer; this is an attributed report, not author rerun."
+  },
+  "checks": {
+    "pint": "passed",
+    "git_diff_check": "passed"
+  },
+  "untested": [
+    "MySQL8.4 current-source execution",
+    "complete release/Foundation matrix",
+    "production or actual historical installation recovery",
+    "online competing writers/migrators",
+    "new full112-boundary native sweep after additive alias preflight"
+  ],
+  "no_external_effects": [
+    "no hosted CI",
+    "no dependency upgrades",
+    "no push or merge",
+    "no live configuration activation",
+    "no real credentials or network payments"
+  ]
+}
