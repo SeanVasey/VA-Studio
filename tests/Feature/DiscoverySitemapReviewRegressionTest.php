@@ -17,8 +17,10 @@ function fopen(string $filename, string $mode): mixed
 
 namespace Tests\Feature;
 
+use App\Domain\Catalog\Discovery\DiscoveryEpoch;
 use App\Domain\Catalog\DiscoverySitemap\SitemapStore;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\TestCase;
 
@@ -61,6 +63,22 @@ class DiscoverySitemapReviewRegressionTest extends TestCase
         $this->publish();
         $this->travel(3600)->seconds();
         config(['app.url' => 'https://changed.synthetic.example']);
+        $this->get('/sitemap.xml')->assertStatus(503)->assertDontSee('site-pages-sitemap', false)->assertDontSee('track-sitemaps', false);
+    }
+
+    public function test_expiry_cannot_hide_a_changed_source_epoch(): void
+    {
+        $this->publish();
+        $this->travel(3600)->seconds();
+        DB::connection()->getPdo()->exec('UPDATE '.DiscoveryEpoch::TABLE.' SET epoch = epoch + 1 WHERE id = 1');
+        $this->get('/sitemap.xml')->assertStatus(503)->assertDontSee('site-pages-sitemap', false)->assertDontSee('track-sitemaps', false);
+    }
+
+    public function test_expiry_cannot_hide_a_corrupt_current_pointer(): void
+    {
+        $this->publish();
+        $this->travel(3600)->seconds();
+        DB::table('discovery_sitemap_current')->where('id', 1)->update(['revision' => 2, 'certificate' => '{}', 'seal' => str_repeat('0', 64)]);
         $this->get('/sitemap.xml')->assertStatus(503)->assertDontSee('site-pages-sitemap', false)->assertDontSee('track-sitemaps', false);
     }
 
