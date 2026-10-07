@@ -165,6 +165,11 @@
       "path": "original-red.xml",
       "bytes": 1872,
       "sha256": "b01d731e6c936ae9deaa732f9c72e7ab4ddaa8a3a1c3e45954ae8e1d86a70f61"
+    },
+    {
+      "path": "snapshot.json",
+      "bytes": 351,
+      "sha256": "27f2245d30a2613df3a6175d5017a49efa95365b8aa94e29abb61c4c2335152b"
     }
   ]
 }
