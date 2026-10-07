@@ -1,0 +1,10 @@
+{
+    "source": "f5c7144ffc03859017335d696ce7322de3274247",
+    "callback_count": 0,
+    "raw_credentials_withdrawn": false,
+    "refused": true,
+    "smtp_acceptance_returned": false,
+    "actual_tls": false,
+    "actual_authenticated": false,
+    "actual_smtp_data_received": false
+}
