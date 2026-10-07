@@ -1,0 +1,5 @@
+Verified installed refs:158
+App\Domain\Contracts\VersionedContractRenderer /workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-independent/app/Domain/Contracts/VersionedContractRenderer.php
+Tests\Feature\TestContractProfileSuccessorTest /workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-independent/tests/Feature/TestContractProfileSuccessorTest.php
+tecnickcom/tc-lib-pdf 8.76.2 c383bd3ac09164c3fd1a6ac7da8f5460d19e47e3
+tecnickcom/tc-lib-pdf-font 4.4.0 658e04565534c0cdd3d8d7ff12f1c6ebeab5f7ce

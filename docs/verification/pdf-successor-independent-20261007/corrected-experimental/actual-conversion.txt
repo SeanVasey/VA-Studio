@@ -1,0 +1,8 @@
+
+>>> Converting fonts:
+*** Output directory set to /workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-independent-experimental/resources/contracts/test-v2/fonts/generated/
+[32m+++ OK   : /workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-independent-experimental/resources/contracts/test-v2/fonts/source/DejaVuSans.ttf added as dejavusans[m
+[32m+++ OK   : /workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-independent-experimental/resources/contracts/test-v2/fonts/source/DejaVuSans-Bold.ttf added as dejavusansb[m
+[32m>>> PROCESS COMPLETED: 2 CONVERTED FONT(S), 0 ERROR(S)!
+
+[mPinned font and package manifest complete.

@@ -1,0 +1,11 @@
+Do not run Composer as root/super user! See https://getcomposer.org/root for details
+Installing dependencies from lock file (including require-dev)
+Verifying lock file contents can be installed on current platform.
+Nothing to install, update or remove
+Generating optimized autoload files
+Class OrderInquiryBrowserFixture located in ./tests/browser/order-inquiry-fixture.php does not comply with psr-4 autoloading standard (rule: Tests\ => ./tests). Skipping.
+Class UnpaidReleaseBrowserFixture located in ./tests/browser/unpaid-release-fixture.php does not comply with psr-4 autoloading standard (rule: Tests\ => ./tests). Skipping.
+Class RefundResolutionBrowserFixture located in ./tests/browser/refund-resolution-fixture.php does not comply with psr-4 autoloading standard (rule: Tests\ => ./tests). Skipping.
+Class RelatedTrackBrowserFixture located in ./tests/browser/prepare-related-tracks.php does not comply with psr-4 autoloading standard (rule: Tests\ => ./tests). Skipping.
+110 packages you are using are looking for funding.
+Use the `composer fund` command to find out more!

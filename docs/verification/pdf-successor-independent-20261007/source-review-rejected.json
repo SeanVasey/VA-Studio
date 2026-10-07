@@ -1,0 +1,109 @@
+{
+  "disposition": "changes required; new direct renderer admits mismatched trusted v1 profile",
+  "reviewed_source": "4f1c5b0fb4a3765a63f85ae58682987deb7f077c",
+  "source_tree": "66fbd3f05245eacc895cfff541ecd27ef61efc45",
+  "candidate": "46f57568960268ae6a2c90b72db38793ecb45dc7",
+  "experimental_graph_only": "ebadd5d0f36e2a9d068c32dd7d4e7d43c230c959",
+  "source_asset_paths": {
+    "app/Domain/Contracts/ContractIssuancePolicy.php": "a45a46c040d7c7d6040120ce03970ed8eb0aece5633c92be63c28d9e9e88726d",
+    "app/Domain/Contracts/ContractRenderProfileRegistry.php": "c9c4554d3c161f30afc5759f1e1b2c9278343ac0bf5afc1a798730baf1441dfd",
+    "app/Domain/Contracts/TcpdfV2ContractRenderer.php": "a5661e1c2e91a5da182ea7d4006b10569de471e2c870b27f88728474a92d2291",
+    "app/Domain/Contracts/VersionedContractRenderer.php": "837d59e1fd09440cb93f5f2e2eff0f9b9d3d5326666d4f289477d3f6cc98c732",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.ctg.z": "e32a1fea0a049ccf1c687eba84f804339c4599eba4eedb1ff4ee4427aee34b93",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.json": "4912381c5c0baccdca18246cb5ffb8d234fae48de71d002a523d082859bbfde4",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.z": "bf01c0d0a4d745951b355b0d253b4076d5e0da2aef8114d42c0f2ab83ec257fe",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.ctg.z": "e59d2256ed0a75d999d124c994c42bb025efa782c3e77e251f7497f4f539e089",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.json": "5128b3fcdd515b6fc80cceca16f0b0118be333aa1558cf193c487c4ad3144a10",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.z": "34fa710f984b43306f89abd2458a213a63ecfecd59976154a03183b65a8f1554",
+    "resources/contracts/test-v2/fonts/source/DejaVuSans-Bold.ttf": "e6476c1b80502924294eed40894c5b18e06c181444ca953e5334262df9c27724",
+    "resources/contracts/test-v2/fonts/source/DejaVuSans.ttf": "7da195a74c55bef988d0d48f9508bd5d849425c1770dba5d7bfc6ce9ed848954",
+    "resources/contracts/test-v2/fonts/source/LICENSE": "7a083b136e64d064794c3419751e5c7dd10d2f64c108fe5ba161eae5e5958a93",
+    "resources/contracts/test-v2/profile-assets.json": "f56e466e6a335df772519a2725562e75596e85d1877676da6745d8c7157c623e",
+    "scripts/build-contract-profile-v2.php": "38bcb532f4fdb302301c3427b65482a84fd60abe47c63bb0f5129166af5875a0",
+    "scripts/contract-renderer-autoload.php": "09a810e87b0f499bcf738dd35c1ebc60b27eeab2c5b6499be102c133bd72be01",
+    "scripts/render-test-contract.php": "905a83282e740711e318224076c3188abc556f625e1edb481981e04f550799f0",
+    "tests/Feature/TestContractProfileSuccessorTest.php": "f27246a35eea2af8d4135fccf321672e00c0ae596dda4132c7a0166aea9c5370"
+  },
+  "original_graph_lock_sha256": "996bc7f800d5cc6b4312f5303fbd67a5cadd17e0eb640f3e2e94035e713289aa",
+  "experimental_graph_lock_sha256": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9",
+  "changed_package_records_only": [
+    "tecnickcom/tc-lib-pdf",
+    "tecnickcom/tc-lib-pdf-font"
+  ],
+  "both_graph_installed_versions_refs": 158,
+  "separate_regenerated_own_autoload": true,
+  "all_9_asset_bytes_match_v1_and_v2_manifest_hashes": true,
+  "all_3_source_git_blobs_match": true,
+  "actual_v2_font_conversion_repeated_without_asset_manifest_diff": true,
+  "fixed_child_dispatch_reviewed": "Canonical trusted version -> fixed v1 or v2 implementation; child whitelist only adds2fixedclasses; no Laravel/bootstrap/globalautoload/DB/provider path added; original process/environment/network/resource bounds unchanged.",
+  "finding": {
+    "repro": "Direct new TcpdfV2ContractRenderer with valid retained v1 profile on original locked runtime returns bytes tagged as v1.",
+    "profile_hash": "ff46257d40e36ea4efc8a42a9df0d823141d13a586d0a416fdde5178dcf12621",
+    "v1_original_pdf": "37c92cb5c0d09923b5a75ef8fedf6a60491653c6485cf2cd90302fa53139c495",
+    "altered_pdf": "cf7703861c79d7c583a62633c9181519b8d8c4f29c5fe1137c49a060ab7732f4",
+    "size_bytes": 751516,
+    "scope": "Operational fixed child dispatch is safe; new implementation contract lets caller bypass implementation identity through cross-version profile.",
+    "repair": "Each implementation must reject other trusted profile versions before runtime/bytes; keep pinned historical v1 implementation unchanged, regenerate successor pinned implementation manifest and actual output evidence."
+  },
+  "independent_results": {
+    "original": {
+      "author-selection": {
+        "tests": "14",
+        "assertions": "19",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "time": "0.647576"
+      },
+      "canaries": {
+        "tests": "4",
+        "assertions": "21",
+        "errors": "0",
+        "failures": "1",
+        "skipped": "0",
+        "time": "0.957983"
+      }
+    },
+    "experimental": {
+      "author-selection": {
+        "tests": "14",
+        "assertions": "27",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "time": "0.904045"
+      },
+      "canaries": {
+        "tests": "4",
+        "assertions": "34",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "time": "0.847083"
+      }
+    }
+  },
+  "limitations": [
+    "No production/default activation or dependency update published.",
+    "No full CI, native matrix, browser, provider or archival conformance executed.",
+    "Poppler pdftotext proves complete normalized frozen text; qpdf unavailable, no syntax-validation claim."
+  ],
+  "artifact_sha256": {
+    "PdfSuccessorReviewCanaryTest.php": "b4e0230c42b5de19c19418594705687efc3f07419535076644f36e91abd79d0a",
+    "experimental/actual-conversion.txt": "b025e814daf3a9b7e15392bc7b0bf35631f248831bcf4ebb25f347d9b7aef4d6",
+    "experimental/author-selection.txt": "d9280265fa45f74f8ed7042f1237ea4980d3ed8da9d1ce40bb62215376eea238",
+    "experimental/author-selection.xml": "50ca4d67b9b570e9df7e42234c125f7210bfd127e84f4d29eca649690a81250a",
+    "experimental/autoload.txt": "f852cbaf5aeb28abfda4183a61602e5e8267146b5158a6a4c286f809370d87bf",
+    "experimental/canaries.txt": "c87f8feffb16bbbb63c597dee8f9998e87cb2154741007df1c60ee86377a01ae",
+    "experimental/canaries.xml": "084a7c7c9d45a13fc851378be6d40c774e0ed3603ee1c03877fe0a6ee85f4198",
+    "experimental/conversion-diff.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "experimental/runtime-autoload.txt": "c274dd732df5c8852a8c2abdfbe5351c5b2999fc592df4af148d6ba093619259",
+    "original/author-selection.txt": "16cb77753c7d8ae3e4961c2d8ac36ac2cc4e6dba863af297c5a7bc35ce7c7695",
+    "original/author-selection.xml": "4c15b838999d8c48eee842f2fd95a42f5903103c058b3731b345ac0448d829ca",
+    "original/autoload.txt": "f852cbaf5aeb28abfda4183a61602e5e8267146b5158a6a4c286f809370d87bf",
+    "original/canaries.txt": "6d2ecde8548d61b813d2106c9e261b5577931f191af3fde51d3142d836ba718f",
+    "original/canaries.xml": "ac9150f6617de30e53c742f8d91f7d108868aacd9816caa4817941d871b8de18",
+    "original/direct-v2-v1-probe.txt": "8510dac99ca8f68dcfc0f28a4de6744a22c0c818807f292f283362ccabc1e89b",
+    "original/runtime-autoload.txt": "6cf2b742715a4015842c8dec2c45953c347d9244385626b9e59ecabfc70f1cb7"
+  }
+}

@@ -1,0 +1,9 @@
+# Test buyer PDF v2 candidate provenance
+
+This separately versioned candidate uses actual locked PDF **8.76.3**, reference `d417129fad37d49dc9fc0d1e229e9740e1c774a3`, and font importer **4.4.1**, reference `a78b8e0ac9284d1594b6ba68488cf65c3e958f7b`. The complete TecNick graph and generated asset identities are retained in `profile-assets.json`; its exact digest is bound by the explicit registry entry. Actual conversion used `scripts/build-contract-profile-v2.php`, with two successful fonts and zero converter errors.
+
+Source DejaVu Sans regular/bold and license are identical to retained v1: font mirror 2.4.0, commit `3251310e5f8e92659ac3ef1133e591ed681ef95d`, with the original hashes and license preserved. These are document fonts and do not change the storefront identity. Generated assets were produced with the same TrueTypeUnicode / flags 32 / platform 3 / encoding 10 options. The original v1 source, generated assets, manifest and pinned renderer implementation remain unchanged.
+
+V2 uses a separate pinned `TcpdfV2ContractRenderer`, preserves escaped frozen grant sections, changes its creator to profile v2 and uses the separately versioned font directory. The actual deterministic synthetic PDF differs from v1; it must never replace a retained original. Ordinary PDF only: archival conformance, universal text support, production buyer identity and live delivery are not asserted.
+
+Registration provides explicit retained metadata and isolated dispatch for this candidate; current issuance profile and policy still select v1. Installing the experimental new global graph therefore deliberately refuses current v1 rendering. Production/default activation, old pending-v1 disposition and upgrade acceptance remain separate release gates. Do not merge the experimental lock with unchanged current-v1 defaults.

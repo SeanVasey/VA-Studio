@@ -1,0 +1,49 @@
+{
+  "executed_source": "83fe24882d0d1f85e9452ae07dbcd19288cb74c3",
+  "executed_tree": "23edc8f9008d4f7fa03e92d802c8337f0a0ac02b",
+  "baseline": "7827a86d405167c15b5c6a04970a74d49111b36a",
+  "approved_leaf": "7501ef9f2f1245493a9ca5a584da8be849dd3d12",
+  "approved_leaf_source_sha256": {
+    "app/Domain/Contracts/ContractIssuancePolicy.php": "a45a46c040d7c7d6040120ce03970ed8eb0aece5633c92be63c28d9e9e88726d",
+    "app/Domain/Contracts/ContractRenderProfile.php": "8b51ac91c35e9809a6040d32519a166d4652a759e265b97c32d205c865e95d40",
+    "app/Domain/Contracts/ContractRenderProfileRegistry.php": "b5223a6ae6ea709e195d7504999f90f725478e9e7217606dad9a7bc7d18e2f40",
+    "app/Domain/Contracts/TcpdfV2ContractRenderer.php": "36f8454d055bae4b20f9eb67a861d4a4709fc1708acb4a47d353c4ba061e70d2",
+    "app/Domain/Contracts/VersionedContractRenderer.php": "837d59e1fd09440cb93f5f2e2eff0f9b9d3d5326666d4f289477d3f6cc98c732",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.ctg.z": "e32a1fea0a049ccf1c687eba84f804339c4599eba4eedb1ff4ee4427aee34b93",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.json": "4912381c5c0baccdca18246cb5ffb8d234fae48de71d002a523d082859bbfde4",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.z": "bf01c0d0a4d745951b355b0d253b4076d5e0da2aef8114d42c0f2ab83ec257fe",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.ctg.z": "e59d2256ed0a75d999d124c994c42bb025efa782c3e77e251f7497f4f539e089",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.json": "5128b3fcdd515b6fc80cceca16f0b0118be333aa1558cf193c487c4ad3144a10",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.z": "34fa710f984b43306f89abd2458a213a63ecfecd59976154a03183b65a8f1554",
+    "resources/contracts/test-v2/fonts/source/DejaVuSans-Bold.ttf": "e6476c1b80502924294eed40894c5b18e06c181444ca953e5334262df9c27724",
+    "resources/contracts/test-v2/fonts/source/DejaVuSans.ttf": "7da195a74c55bef988d0d48f9508bd5d849425c1770dba5d7bfc6ce9ed848954",
+    "resources/contracts/test-v2/fonts/source/LICENSE": "7a083b136e64d064794c3419751e5c7dd10d2f64c108fe5ba161eae5e5958a93",
+    "resources/contracts/test-v2/profile-assets.json": "29e0b1b33abc78ab48c6669579dbb3296eb9e282f2a16b0fb337db8417b68dac",
+    "scripts/build-contract-profile-v2.php": "38bcb532f4fdb302301c3427b65482a84fd60abe47c63bb0f5129166af5875a0",
+    "scripts/contract-renderer-autoload.php": "09a810e87b0f499bcf738dd35c1ebc60b27eeab2c5b6499be102c133bd72be01",
+    "scripts/render-test-contract.php": "905a83282e740711e318224076c3188abc556f625e1edb481981e04f550799f0",
+    "tests/Feature/TestContractProfileSuccessorTest.php": "b88294b89f3873e1bbedc1cc8262b99ac753d7629079f09ba7b0d3728adc3440"
+  },
+  "baseline_paths": 1988,
+  "unchanged_baseline_paths": 1983,
+  "modified_baseline_paths": [
+    "app/Domain/Contracts/ContractIssuancePolicy.php",
+    "app/Domain/Contracts/ContractRenderProfile.php",
+    "app/Domain/Contracts/ContractRenderProfileRegistry.php",
+    "scripts/contract-renderer-autoload.php",
+    "scripts/render-test-contract.php"
+  ],
+  "unapproved_modified_or_missing_baseline_paths": [],
+  "unchanged_ci_paths": 33,
+  "unchanged_v1_assets": 11,
+  "locks_policy_exceptions_v1_pins_preserved": true,
+  "selection": [
+    "tests/Unit/ContractRenderProfileRegistryTest.php",
+    "tests/Unit/TcpdfContractRendererTest.php",
+    "tests/Feature/TestContractIssuanceTest.php",
+    "tests/Feature/TestContractStorageTest.php",
+    "tests/Feature/TestIsolatedContractRendererTest.php",
+    "tests/Feature/TestContractProfileSuccessorTest.php"
+  ],
+  "started_at": "2026-10-07T04:47:57.881836+00:00"
+}

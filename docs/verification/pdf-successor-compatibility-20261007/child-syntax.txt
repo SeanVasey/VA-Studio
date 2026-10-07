@@ -1,0 +1,1 @@
+No syntax errors detected in scripts/render-test-contract.php

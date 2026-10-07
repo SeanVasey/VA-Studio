@@ -1,0 +1,9 @@
+Composer plugins have been disabled for safety in this non-interactive session.
+Set COMPOSER_ALLOW_SUPERUSER=1 if you want to allow plugins to run as root/super user.
+Do not run Composer as root/super user! See https://getcomposer.org/root for details
+Generating optimized autoload files
+Class OrderInquiryBrowserFixture located in ./tests/browser/order-inquiry-fixture.php does not comply with psr-4 autoloading standard (rule: Tests\ => ./tests). Skipping.
+Class UnpaidReleaseBrowserFixture located in ./tests/browser/unpaid-release-fixture.php does not comply with psr-4 autoloading standard (rule: Tests\ => ./tests). Skipping.
+Class RefundResolutionBrowserFixture located in ./tests/browser/refund-resolution-fixture.php does not comply with psr-4 autoloading standard (rule: Tests\ => ./tests). Skipping.
+Class RelatedTrackBrowserFixture located in ./tests/browser/prepare-related-tracks.php does not comply with psr-4 autoloading standard (rule: Tests\ => ./tests). Skipping.
+Generated optimized autoload files containing 10467 classes

@@ -1,0 +1,12 @@
+{
+  "reviewed_source": "4f1c5b0fb4a3765a63f85ae58682987deb7f077c",
+  "experimental_graph_only": "ebadd5d0f36e2a9d068c32dd7d4e7d43c230c959",
+  "finding": "Legacy direct renderer accepts successor profile on actual new runtime, returning v2 profile hash with v1 implementation bytes. Fixed operational version dispatcher avoids the call, but profile runtime entry must reject cross-version implementation identity.",
+  "source_file_unchanged": "app/Domain/Contracts/TcpdfContractRenderer.php",
+  "raw_probe_sha256": "35bf98c7ae05c0314d8a52f885001dd69e5026f559480d01f344e8e0bb514d4a",
+  "requested_version": "test-buyer-pdf-v2",
+  "returned_profile_hash": "7cc7ef60fb864c404dd71f21b622c06b519596bd26ec062a77276cc33b2c7aea",
+  "altered_pdf_sha256": "8833213a6054e3d778a72a4274fb8c483e901ea8abc1ae90e275616e3cba9ea4",
+  "expected_v2_pdf_sha256": "a8fcab1613f866621c1bd1edca6c9da8d3315bacfd735fa751edbbf8cd90cc95",
+  "repair_underway": "Preserve pinned V1 renderer bytes; make its legacy verifyRuntime entry v1-only, add explicit version-specific runtime check for the fixed V2 implementation."
+}

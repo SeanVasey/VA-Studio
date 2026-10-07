@@ -1,0 +1,35 @@
+{
+  "source_only": {
+    "sha": "4f1c5b0fb4a3765a63f85ae58682987deb7f077c",
+    "tree": "66fbd3f05245eacc895cfff541ecd27ef61efc45",
+    "retained_graph": {
+      "name": "Retained contract profile affected consumers",
+      "tests": "138",
+      "assertions": "772",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "99.181308"
+    }
+  },
+  "experimental_only": {
+    "sha": "ebadd5d0f36e2a9d068c32dd7d4e7d43c230c959",
+    "tree": "829ff8c64f5e6d75255b9cf3853762066d8dc987",
+    "successor_graph": {
+      "tests": 14,
+      "assertions": 27,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    }
+  },
+  "audit": {
+    "advisories": 0,
+    "abandoned": 0
+  },
+  "current_v1_unmodified": true,
+  "operative_v2_activation": false,
+  "pending_v1_actual_changed_graph_worker_disposition_tested": false,
+  "native_matrix_run": false,
+  "hosted_workflow_run": false
+}

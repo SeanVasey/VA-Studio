@@ -1,0 +1,11 @@
+# Composed corrected PDF successor seam
+
+This source-only batch registers trusted test-v2 metadata, pins and generated assets and fixes the two direct renderer cross-version refusals. Each fixed renderer accepts only its exact trusted version. The current selector and issuance policy remain test-v1, and the global candidate lock remains PDF 8.76.2 / font 4.4.0. V1 manifests, assets, limits, renderer text and the actual original PDF bytes remain unchanged.
+
+Local executable `83fe24882d0d1f85e9452ae07dbcd19288cb74c3`, tree `23edc8f9008d4f7fa03e92d802c8337f0a0ac02b`, equals native `001f99b51853cf9b4476d2add52fb482757b1ed9` with sole parent merged PR #21 `c8ecc0baf90e2b91112d12129e24a3dcd164c105`. All nineteen source/assets match independently approved corrected leaf `7501ef9f2f1245493a9ca5a584da8be849dd3d12` by Git mode/type/blob and SHA256. Nine font/source/license blobs reuse the already published exact V1 byte sequences. Native tree and ordered-parent readbacks passed.
+
+Fresh independent six-file composition on its own installed 158-reference retained graph passed 140 cases / 774 assertions, no failures/errors/skips. The prior actual two-graph approval ran 21 / 43 on the retained graph and 21 / 64 on the experimental successor graph. Real isolated children preserve every frozen section and literal text in multipage PDFs; timestamps and bytes are deterministic. Newer font conversion reran two fonts with no errors or asset/manifest diff. Both original direct mismatch probes and setup/fixture errors remain visible. These overlapping selections are not summed as unique cases.
+
+Root rechecked all approved executable blobs, the metadata-only carry and every composed reviewer artifact digest. Cheap preflight and expected-head development merge apply to the exact final metadata candidate; no full/native/browser matrix was dispatched. Experimental lock commits are excluded from this candidate ancestry. PR #3 stays open until separately reviewed atomic V2 defaults/lock and actual pending-V1/original continuity. Production issuance, archival and full final acceptance remain open.
+
+The dated prior records retain their original pending statuses and failed predecessors; this record supersedes their current-state wording.

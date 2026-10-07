@@ -1,5 +1,37 @@
 # Current development queue
 
+## Corrected PDF seam and merged page discovery — October 7 UTC
+
+PR #21 merged at `c8ecc0baf90e2b91112d12129e24a3dcd164c105`, tree
+`cb26c6534c44f4d4ef764d448f60bd3faeab6db4`, after exact-head cheap preflight
+37572857551 attempt 1 succeeded. Fresh PR/main/tree and ordered parents verified
+the reviewed bodyless production page sitemap. Its author 18/50 and independent
+23/87 evidence are preserved with the original body-admission failures.
+
+The [PDF seam composition](verification/pdf-seam-composition-20261007/README.md)
+corrects both direct renderer version mismatches. All nineteen executable/asset
+paths match approved `7501ef9`; local `83fe248` equals native `001f99b`, tree
+`23edc8f9`, with PR #21 as its parent. Fresh independent composed six-file checks
+passed 140 cases / 774 assertions without errors/failures/skips, with its own
+158-reference installed graph. Prior real retained/successor graph canaries and
+conversion evidence remain source-bound; original red probes are retained.
+Current profile/policy and global locks remain v1. Metadata-only evidence follows
+the executable before one cheap preflight and expected-head development merge.
+
+The next separate atomic candidate adopts exactly PDF 8.76.3 / font 4.4.1 and
+explicit V2 test defaults together. Independent review must prove actual new
+request/worker/original/replay behavior, pending-v1 quarantine without replacement
+and retained original read/restore-only continuity. PR #3 stays open until that
+reviewed replacement merges. Issuance remains default-off and test-only.
+
+The root sitemap index and environment-aware robots child passed independent
+43/225 focused checks, including zero SQL reads, and is queued separately. Track
+discovery requires a bounded authoritative eligible-track snapshot/index; the
+prerequisite is being planned from actual writer/readiness contracts. T36/FP-014,
+redirects and deployed SEO acceptance stay open. The low-cost policy remains
+focused local checks, cheap preflight and expected-head development merges; full
+final acceptance remains manual. Dated pending states below are superseded here.
+
 ## Public discovery and renderer successor continuation — October 7 UTC
 
 PR #20 merged the retained-v1 registry at native

@@ -1,0 +1,38 @@
+{
+  "local_executable": "83fe24882d0d1f85e9452ae07dbcd19288cb74c3",
+  "tree": "23edc8f9008d4f7fa03e92d802c8337f0a0ac02b",
+  "native_executable": "001f99b51853cf9b4476d2add52fb482757b1ed9",
+  "ordered_native_parents": [
+    "c8ecc0baf90e2b91112d12129e24a3dcd164c105"
+  ],
+  "approved_leaf": "7501ef9f2f1245493a9ca5a584da8be849dd3d12",
+  "independent_composition_evidence": "7f16eb091c1fe9ce68ef19e0a615e2407553f69b",
+  "exact_source_paths": [
+    "app/Domain/Contracts/ContractIssuancePolicy.php",
+    "app/Domain/Contracts/ContractRenderProfile.php",
+    "app/Domain/Contracts/ContractRenderProfileRegistry.php",
+    "app/Domain/Contracts/TcpdfV2ContractRenderer.php",
+    "app/Domain/Contracts/VersionedContractRenderer.php",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.ctg.z",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.json",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.z",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.ctg.z",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.json",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.z",
+    "resources/contracts/test-v2/fonts/source/DejaVuSans-Bold.ttf",
+    "resources/contracts/test-v2/fonts/source/DejaVuSans.ttf",
+    "resources/contracts/test-v2/fonts/source/LICENSE",
+    "resources/contracts/test-v2/profile-assets.json",
+    "scripts/build-contract-profile-v2.php",
+    "scripts/contract-renderer-autoload.php",
+    "scripts/render-test-contract.php",
+    "tests/Feature/TestContractProfileSuccessorTest.php"
+  ],
+  "19_exact_approved_blobs": true,
+  "all_metadata_paths_only": true,
+  "current_profile": "test-v1",
+  "lockfiles_unchanged": true,
+  "experimental_lock_excluded": true,
+  "preflight": "pending exact final metadata head",
+  "limits": "Source-only seam. V2 activation, global PDF/font adoption, pending V1 continuity and full final acceptance remain separately gated."
+}

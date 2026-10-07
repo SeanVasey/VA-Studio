@@ -1,0 +1,15 @@
+{
+  "source_only": "7501ef9f2f1245493a9ca5a584da8be849dd3d12",
+  "experimental_only": "a8f57946bf1c6599f19e3c52d71a6564f45fc768",
+  "commands": {
+    "actual_conversion": "php scripts/build-contract-profile-v2.php (actual upgraded graph)",
+    "new_graph_selection": "php vendor/bin/phpunit tests/Feature/TestContractProfileSuccessorTest.php --log-junit <new-evidence>/successor-final.xml",
+    "old_graph_selection": "php vendor/bin/phpunit -c registry-focused.phpunit.xml --log-junit <new-evidence>/retained-six-files.xml",
+    "formatting": "php vendor/bin/pint --test app/Domain/Contracts/ContractRenderProfile.php app/Domain/Contracts/TcpdfV2ContractRenderer.php app/Domain/Contracts/ContractRenderProfileRegistry.php tests/Feature/TestContractProfileSuccessorTest.php",
+    "syntax": "php -l scripts/contract-renderer-autoload.php; php -l scripts/render-test-contract.php"
+  },
+  "parent_php": "8.4.26 recovered own config",
+  "child": "unchanged scrubbed environment, original 128M/60s/open_basedir/disabled-function bounds",
+  "ephemeral_key_retained": false,
+  "both_graphs_own_autoload": true
+}

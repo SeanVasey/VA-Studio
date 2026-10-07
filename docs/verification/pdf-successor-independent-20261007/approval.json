@@ -1,0 +1,156 @@
+{
+  "disposition": "approved for source-only focused development integration",
+  "reviewed_executable": "7501ef9f2f1245493a9ca5a584da8be849dd3d12",
+  "reviewed_tree": "781a07940729df3b0f361f7cca452f978c55f5a8",
+  "author_metadata_head": "e7c5a389ebf655fb0d62d1ed3b4e3e750b46c177",
+  "experimental_executable_only": "a8f57946bf1c6599f19e3c52d71a6564f45fc768",
+  "experimental_tree": "4b6524f657150d52b6d0cad6bebee198d9d7390e",
+  "installed_refs_each_graph": 158,
+  "changed_package_identities_only": [
+    "tecnickcom/tc-lib-pdf",
+    "tecnickcom/tc-lib-pdf-font"
+  ],
+  "source_asset_sha256": {
+    "app/Domain/Contracts/ContractIssuancePolicy.php": "a45a46c040d7c7d6040120ce03970ed8eb0aece5633c92be63c28d9e9e88726d",
+    "app/Domain/Contracts/ContractRenderProfile.php": "8b51ac91c35e9809a6040d32519a166d4652a759e265b97c32d205c865e95d40",
+    "app/Domain/Contracts/ContractRenderProfileRegistry.php": "b5223a6ae6ea709e195d7504999f90f725478e9e7217606dad9a7bc7d18e2f40",
+    "app/Domain/Contracts/TcpdfV2ContractRenderer.php": "36f8454d055bae4b20f9eb67a861d4a4709fc1708acb4a47d353c4ba061e70d2",
+    "app/Domain/Contracts/VersionedContractRenderer.php": "837d59e1fd09440cb93f5f2e2eff0f9b9d3d5326666d4f289477d3f6cc98c732",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.ctg.z": "e32a1fea0a049ccf1c687eba84f804339c4599eba4eedb1ff4ee4427aee34b93",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.json": "4912381c5c0baccdca18246cb5ffb8d234fae48de71d002a523d082859bbfde4",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.z": "bf01c0d0a4d745951b355b0d253b4076d5e0da2aef8114d42c0f2ab83ec257fe",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.ctg.z": "e59d2256ed0a75d999d124c994c42bb025efa782c3e77e251f7497f4f539e089",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.json": "5128b3fcdd515b6fc80cceca16f0b0118be333aa1558cf193c487c4ad3144a10",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.z": "34fa710f984b43306f89abd2458a213a63ecfecd59976154a03183b65a8f1554",
+    "resources/contracts/test-v2/fonts/source/DejaVuSans-Bold.ttf": "e6476c1b80502924294eed40894c5b18e06c181444ca953e5334262df9c27724",
+    "resources/contracts/test-v2/fonts/source/DejaVuSans.ttf": "7da195a74c55bef988d0d48f9508bd5d849425c1770dba5d7bfc6ce9ed848954",
+    "resources/contracts/test-v2/fonts/source/LICENSE": "7a083b136e64d064794c3419751e5c7dd10d2f64c108fe5ba161eae5e5958a93",
+    "resources/contracts/test-v2/profile-assets.json": "29e0b1b33abc78ab48c6669579dbb3296eb9e282f2a16b0fb337db8417b68dac",
+    "scripts/build-contract-profile-v2.php": "38bcb532f4fdb302301c3427b65482a84fd60abe47c63bb0f5129166af5875a0",
+    "scripts/contract-renderer-autoload.php": "09a810e87b0f499bcf738dd35c1ebc60b27eeab2c5b6499be102c133bd72be01",
+    "scripts/render-test-contract.php": "905a83282e740711e318224076c3188abc556f625e1edb481981e04f550799f0",
+    "tests/Feature/TestContractProfileSuccessorTest.php": "b88294b89f3873e1bbedc1cc8262b99ac753d7629079f09ba7b0d3728adc3440"
+  },
+  "corrected_manifest_sha256": "29e0b1b33abc78ab48c6669579dbb3296eb9e282f2a16b0fb337db8417b68dac",
+  "actual_v2_profile_hash": "c7bf3a77a1f35391a53f23364f0db2c6b30d2ff8fe1d383c894963d9f74ad692",
+  "actual_v2_pdf_sha256": "790fd79695a52b8578305c0cbd2c44c9e776c723200db59536f6394653ed1daf",
+  "actual_v2_pdf_size_bytes": 751516,
+  "actual_v1_pdf_sha256_unchanged": "37c92cb5c0d09923b5a75ef8fedf6a60491653c6485cf2cd90302fa53139c495",
+  "independent_results": {
+    "corrected-original": {
+      "author-selection": {
+        "tests": "16",
+        "assertions": "21",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "time": "0.760610"
+      },
+      "canaries": {
+        "tests": "5",
+        "assertions": "22",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "time": "0.602588"
+      }
+    },
+    "corrected-experimental": {
+      "author-selection": {
+        "tests": "16",
+        "assertions": "29",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "time": "0.899136"
+      },
+      "canaries": {
+        "tests": "5",
+        "assertions": "35",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "time": "0.604833"
+      }
+    }
+  },
+  "independent_command_template": "PHP8.4.26 -d memory_limit=512M vendor/bin/phpunit TEST_FILE --log-junit EVIDENCE_XML --fail-on-empty-test-suite --fail-on-warning",
+  "independent_files": [
+    "tests/Feature/TestContractProfileSuccessorTest.php",
+    "docs/verification/pdf-successor-independent-20261007/PdfSuccessorCorrectedReviewCanaryTest.php"
+  ],
+  "new_font_importer_rerun": "2 actual conversions,0errors; complete asset/manifest diff empty",
+  "author_correction_artifact_digests_verified": 20,
+  "author_retained_six_file_result_read_back": {
+    "name": "Retained contract profile affected consumers",
+    "tests": "140",
+    "assertions": "774",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "101.807416"
+  },
+  "resolved_findings": [
+    "Direct V2 with trusted retained V1 now refuses before runtime/rendering.",
+    "Direct immutable V1 with trusted successor V2 now refuses via explicitly V1-only legacy runtime entry; pinned V1 renderer remains unchanged."
+  ],
+  "reviewed_boundaries": [
+    "Required implementation version precedes canonical trusted metadata and physical checks; V2 uses fixed literal v2.",
+    "Current profile and current policy remain exact V1; successor config cannot activate issuance.",
+    "Operational child matches validated trusted version to exactly two fixed renderer classes; restricted loader adds only those fixed classes, with no app/global bootstrap.",
+    "Existing process/env/IO/resource restrictions unchanged; markup-looking frozen strings remain literal in independently extracted complete multipage text.",
+    "All nine source/license/generated asset bytes match V1 and exact V2 manifest; V2 implementation hash/manifest/profile/PDF identities regenerated honestly.",
+    "Candidate original composer.lock and immutable V1 profile fixture, manifest, text/renderer remain byte exact."
+  ],
+  "unresolved_blockers_for_this_source_only_seam": [],
+  "remaining_dependency_activation_gates": [
+    "PR3/global upgraded dependency graph still cannot merge with currentV1 defaults.",
+    "Current V2 activation and genuine pendingV1 work/quarantine/original continuity need separately reviewed end-to-end evidence.",
+    "No current live/production issuance or automatic V1-to-V2 replacement."
+  ],
+  "limitations": [
+    "No full hosted/native/browser/provider/archival acceptance executed.",
+    "Poppler pdftotext validates complete normalized literal text; qpdf unavailable, no structural syntax-validator claim.",
+    "Author140consumer selection read back separately; reviewer ran21cases/43assertions original and21cases/64assertions experimental."
+  ],
+  "historical_red_evidence": [
+    "d381a7f1abddb666980c0f3c5739e3bc3cb25439",
+    "9f30cee7ee3e58c04c709ad971c295ee799064f8"
+  ],
+  "artifact_sha256": {
+    "PdfSuccessorCorrectedReviewCanaryTest.php": "fc95ba656f2adcfb0c485493d40ca7bc0844fc99312fb52332f5770edbbe02b0",
+    "PdfSuccessorReviewCanaryTest.php": "b4e0230c42b5de19c19418594705687efc3f07419535076644f36e91abd79d0a",
+    "corrected-experimental/actual-conversion.txt": "b025e814daf3a9b7e15392bc7b0bf35631f248831bcf4ebb25f347d9b7aef4d6",
+    "corrected-experimental/author-selection.txt": "9196d26369ab7fbf6044a7f861f49f015311dd2ce7527c035b71ccdf8bfb6e63",
+    "corrected-experimental/author-selection.xml": "f0b95c64f430540ef3e787a8b24452467315f94854c4076ba0408e3e965dbb8f",
+    "corrected-experimental/canaries.txt": "5a854f50e82653f611c6425e3cc2ba2c144321d13689775f2787c1b52389bd79",
+    "corrected-experimental/canaries.xml": "f55a1488387358c60ffb7dbc76239c1609e0614b2e64b17e8f602a23ef631f1c",
+    "corrected-experimental/conversion-diff.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "corrected-experimental/runtime-graph.json": "ee7f67bfe1c997644d98ab7e36a662c60e88b55307061aaaf2591e528f319549",
+    "corrected-original/author-selection.txt": "2e34d9bbbdeb74656e7be2250201ab0d00161acb606482afce3e393fd96564ef",
+    "corrected-original/author-selection.xml": "92ee27a102dd25ed5e2d2f7253a6865f025869ac27e3e9a558232b1accb0c7c3",
+    "corrected-original/canaries.txt": "164f717e9c5d1373c46324fcbbac1bf3cc8bd7ff3005553102bc5deb2acb2f7c",
+    "corrected-original/canaries.xml": "c8dab4fb315dc791b7aa962aa11be2a3ff017f8dfc28ecedca890113c97b8f4b",
+    "corrected-original/runtime-graph.json": "e0cc7414885c96c7ecc1ae2fc2b9c6f37ffcee9c7644b2384f2c63e55e25bb91",
+    "experimental/actual-conversion.txt": "b025e814daf3a9b7e15392bc7b0bf35631f248831bcf4ebb25f347d9b7aef4d6",
+    "experimental/author-selection.txt": "d9280265fa45f74f8ed7042f1237ea4980d3ed8da9d1ce40bb62215376eea238",
+    "experimental/author-selection.xml": "50ca4d67b9b570e9df7e42234c125f7210bfd127e84f4d29eca649690a81250a",
+    "experimental/autoload.txt": "f852cbaf5aeb28abfda4183a61602e5e8267146b5158a6a4c286f809370d87bf",
+    "experimental/canaries.txt": "c87f8feffb16bbbb63c597dee8f9998e87cb2154741007df1c60ee86377a01ae",
+    "experimental/canaries.xml": "084a7c7c9d45a13fc851378be6d40c774e0ed3603ee1c03877fe0a6ee85f4198",
+    "experimental/conversion-diff.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "experimental/direct-v1-v2-probe.txt": "35bf98c7ae05c0314d8a52f885001dd69e5026f559480d01f344e8e0bb514d4a",
+    "experimental/runtime-autoload.txt": "c274dd732df5c8852a8c2abdfbe5351c5b2999fc592df4af148d6ba093619259",
+    "original/author-selection.txt": "16cb77753c7d8ae3e4961c2d8ac36ac2cc4e6dba863af297c5a7bc35ce7c7695",
+    "original/author-selection.xml": "4c15b838999d8c48eee842f2fd95a42f5903103c058b3731b345ac0448d829ca",
+    "original/autoload.txt": "f852cbaf5aeb28abfda4183a61602e5e8267146b5158a6a4c286f809370d87bf",
+    "original/canaries.txt": "6d2ecde8548d61b813d2106c9e261b5577931f191af3fde51d3142d836ba718f",
+    "original/canaries.xml": "ac9150f6617de30e53c742f8d91f7d108868aacd9816caa4817941d871b8de18",
+    "original/direct-v2-v1-probe.txt": "8510dac99ca8f68dcfc0f28a4de6744a22c0c818807f292f283362ccabc1e89b",
+    "original/runtime-autoload.txt": "6cf2b742715a4015842c8dec2c45953c347d9244385626b9e59ecabfc70f1cb7",
+    "reverse-mismatch.json": "6a100caa0051f3ca76d69f1972f32f5610dbc18fb93e4f67bbedb276da7d53fb",
+    "review-rejected.md": "b11b28bac9be2d8eb88bb807f1fefc6613162fdc5040fbcd7c3c014dda7036d6",
+    "runtime-probe.php": "f5d6367a2048b079a8964049c8de57058a27a199f3155d4128fc9aba52e6d68f",
+    "source-review-rejected.json": "1f7743a6df9cc5a366557eed59840f304d82d57263932b433afd6f8cc9e74a57"
+  }
+}
