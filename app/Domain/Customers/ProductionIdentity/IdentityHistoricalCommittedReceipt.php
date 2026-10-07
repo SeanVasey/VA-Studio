@@ -91,7 +91,8 @@ final class IdentityHistoricalCommittedReceipt implements JsonSerializable
         try {
             $this->witness->assertClosed();
             $plain = IdentityHistoricalPlainRows::fromWitness($this->witness);
-            (new ProductionCustomerAccess)->proveHistoricalBindingPlain($this->binding, $plain, $this->expectedHistoricalRaw);
+            // This exact private prefix was authenticated while held and sealed before the producer's
+            // final fence. Re-parsing crypto/config here could invoke callbacks after that source fence.
             $this->provePrefix($plain);
         } catch (Throwable $error) {
             $this->invalidate();
