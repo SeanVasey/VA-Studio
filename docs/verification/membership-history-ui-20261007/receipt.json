@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "source_commit": "ca7cb13d107a0395e93b6c1ab333bfac668713ec",
+  "source_tree": "e96442fafde96a821cab05d9fa898ab675e81ca4",
+  "parent": "6a1aed576160a349a0e0320d2636a9ca64235c7f",
+  "runtime": {
+    "node": "24.19.0",
+    "npm": "11.9.0",
+    "vitest": "5.0.1",
+    "vite": "8.3.0"
+  },
+  "dependency_source": "immutable recovery frontend node_modules; own worktree configs/source roots",
+  "checks": [
+    {
+      "command": "npm run typecheck",
+      "result": "passed"
+    },
+    {
+      "command": "npm test -- tests/frontend/membership-history.test.tsx tests/frontend/customer-account.test.tsx",
+      "result": "passed",
+      "files": 2,
+      "cases": 62,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "npm run build",
+      "result": "passed",
+      "warning": "Existing app chunk exceeds 500kB; measured537.37kB minified"
+    }
+  ],
+  "artifacts_sha256": {
+    "docs/verification/membership-history-ui-20261007/typecheck.txt": "ae791f9f57ffbb3c0a592b6a34e25250c1f7f6f13fde4d05f77a0d4e7681f89a",
+    "docs/verification/membership-history-ui-20261007/tests.txt": "dc3b92abd3515c359a18c9f74b36fc6ad47ea501ae42e66d0dd98d976ad6b499",
+    "docs/verification/membership-history-ui-20261007/build.txt": "90c85b03cdc88808bed1ccc4056a6e37750dd98ad3208991d2feeac15a0376a2"
+  },
+  "limitations": [
+    "No actual browser, PHP, MySQL or production customer execution",
+    "Client fails closed on integer identities outside JavaScript safe integer range; never constructs rounded identity requests",
+    "Synthetic membership server capability and per-render opaque scope depend on separate serverprop source69fce09d7b73f4675ff4a7b73422d55451c17385",
+    "No whole-matrix acceptance claim"
+  ],
+  "failed_predecessors": [
+    {
+      "result": "initial test harness row-shape failed (it.each array expansion); corrected named row objects and reran full affected selection",
+      "cases": 56,
+      "passed": 55,
+      "failed": 1
+    },
+    {
+      "result": "initial typecheck caught callback narrowing for unknown fields; fixed stable narrowed aliases before final source"
+    }
+  ]
+}

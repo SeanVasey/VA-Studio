@@ -1,0 +1,30 @@
+{
+  "source_commit": "77d661bacb3debbb93db959bf8cc9de1a04172a3",
+  "source_tree": "cab2efe14e7ddf699c88feb051a23110e72b2153",
+  "source_paths": {
+    "app/Domain/Commerce/ProductionPreparation/Models/ProductionBuyerAssentObservation.php": "8d350a09900e3e0a8673991690d350d3988deddd49e82a1ab8a69c6eda563cfd",
+    "app/Domain/Commerce/ProductionPreparation/ProductionBuyerAssentObservations.php": "c0ec62635af45cda1499652739be15065aa71857eb4a2102dcd8c4ba4d2ab4d6",
+    "database/migrations/2026_10_07_239000_production_buyer_assent_observations.php": "defcef254a47d104510f7778102cf31edf02f203cd5a9f120b5db44cc0288b24",
+    "docs/architecture/D-27-production-buyer-assent-reports.md": "588721848be2df0644fba372eddfb3324e55d5c6003205b57e9612d2f27b1693",
+    "tests/Feature/ProductionBuyerAssentObservationsTest.php": "13661ade24fe43cf94db045492acac589d8de8db2b128676fb66838ac88b3b0b",
+    "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php": "e7798b5c0576bb56b6dbb44dd9f14ac771cfbf572640c877a9927ea70d1157e6",
+    "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php": "b4388c4c37adeee5da0bb25f16a46b4c5cb4d1a8e20cad3eb251b44b8af6fdd0",
+    "tests/Feature/ProductionTrackPolicyEngineTest.php": "a2fac268b141f9bb7477069c79ac25fb27993ea01f1c047dd43d2d497915ce96",
+    "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php": "4b245c4907b8b27596fc13fc28bb91480187254ee186a5eef1e61ebc67047484"
+  },
+  "baseline_local": "27d229912d4c728f4c53549f6ed98fe1e993b434",
+  "baseline_native_main": "df7f12e24ef481cee020910c3764850761ae4596",
+  "baseline_tree": "56a3f0c58af0176b8a9a19414fffed80b9285fcf",
+  "limits": [
+    "Staff report only: actual buyer act/identity/purchase binding unverified.",
+    "No public buyer route, operative order, provider payment, entitlement or delivery.",
+    "Ordinary native MySQL cases do not prove independent-process concurrency.",
+    "No whole Foundation/native/browser acceptance."
+  ],
+  "failures_preserved": [
+    "Initial18SQLite4failures canonical-order identity assertions.",
+    "Second18SQLite1failure missing explicit requiredMFA fixture setup.",
+    "Self-review found encrypted body missing request-key digest; fixed in77d successor.",
+    "Predecessor native21/81 result is mutable diagnostic because source was edited while run active; not final source-bound evidence."
+  ]
+}

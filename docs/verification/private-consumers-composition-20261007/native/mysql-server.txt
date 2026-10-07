@@ -1,0 +1,22 @@
+2026-10-07T04:17:21.422812Z 0 [System] [MY-015017] [Server] MySQL Server Initialization - start.
+2026-10-07T04:17:21.424866Z 0 [System] [MY-013169] [Server] /workspace/scratch/0c039e9e0645/runtime-recovery/root/usr/sbin/mysqld (mysqld 8.4.11) initializing of server in progress as process 7
+2026-10-07T04:17:21.433554Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-10-07T04:17:21.762982Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-10-07T04:17:22.830657Z 5 [Warning] [MY-010453] [Server] root@localhost is created with an empty password ! Please consider switching off the --initialize-insecure option.
+2026-10-07T04:17:24.384406Z 0 [System] [MY-015018] [Server] MySQL Server Initialization - end.
+2026-10-07T04:17:24.555559Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+2026-10-07T04:17:24.946052Z 0 [System] [MY-010116] [Server] /workspace/scratch/0c039e9e0645/runtime-recovery/root/usr/sbin/mysqld (mysqld 8.4.11) starting as process 46
+2026-10-07T04:17:24.957067Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-10-07T04:17:25.299745Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-10-07T04:17:25.560282Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2026-10-07T04:17:25.560308Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2026-10-07T04:17:25.562058Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/tmp' in the path is accessible to all OS users. Consider choosing a different directory.
+2026-10-07T04:17:25.581710Z 0 [System] [MY-010931] [Server] /workspace/scratch/0c039e9e0645/runtime-recovery/root/usr/sbin/mysqld: ready for connections. Version: '8.4.11'  socket: ''  port: 53311  MySQL Community Server - GPL.
+2026-10-07T04:17:41.120092Z 0 [Warning] [MY-014089] [InnoDB] Redo log writer is waiting for a new redo log file. Consider increasing innodb_redo_log_capacity. The current log capacity is 104857600 bytes. The log capacity used is 104857600 bytes.
+2026-10-07T04:18:20.263067Z 0 [Warning] [MY-014089] [InnoDB] Redo log writer is waiting for a new redo log file. Consider increasing innodb_redo_log_capacity. The current log capacity is 104857600 bytes. The log capacity used is 104857600 bytes.
+2026-10-07T04:19:31.237649Z 0 [Warning] [MY-014089] [InnoDB] Redo log writer is waiting for a new redo log file. Consider increasing innodb_redo_log_capacity. The current log capacity is 104857600 bytes. The log capacity used is 104857600 bytes.
+2026-10-07T04:19:38.756969Z 0 [Warning] [MY-014089] [InnoDB] Redo log writer is waiting for a new redo log file. Consider increasing innodb_redo_log_capacity. The current log capacity is 104857600 bytes. The log capacity used is 104857600 bytes.
+2026-10-07T04:20:43.159176Z 0 [Warning] [MY-014089] [InnoDB] Redo log writer is waiting for a new redo log file. Consider increasing innodb_redo_log_capacity. The current log capacity is 104857600 bytes. The log capacity used is 104857600 bytes.
+2026-10-07T04:20:58.069270Z 40 [System] [MY-013172] [Server] Received SHUTDOWN from user root. Shutting down mysqld (Version: 8.4.11).
+2026-10-07T04:20:59.234793Z 0 [System] [MY-010910] [Server] /workspace/scratch/0c039e9e0645/runtime-recovery/root/usr/sbin/mysqld: Shutdown complete (mysqld 8.4.11)  MySQL Community Server - GPL.
+2026-10-07T04:20:59.234810Z 0 [System] [MY-015016] [Server] MySQL Server - end.

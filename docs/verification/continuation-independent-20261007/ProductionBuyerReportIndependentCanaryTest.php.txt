@@ -1,0 +1,34 @@
+<?php
+namespace Tests\Feature;
+use App\Domain\Commerce\ProductionPreparation\ProductionBuyerAssentObservations as Reports;
+use App\Support\Audit\AuditEvent;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Auth\Access\AuthorizationException;
+use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\ProductionTrackPreparationFixtures as F;
+use Tests\TestCase;
+use Mockery;
+class ProductionBuyerReportIndependentCanaryTest extends TestCase {
+ use FinalizationDatabaseMigrations;
+ protected function setUp(): void { parent::setUp(); config(['app.key'=>'base64:'.base64_encode(str_repeat('k',32))]); $this->fakePrivateMediaStorage(); }
+ private function input(): array { return ['buyer'=>['legal_name'=>'Synthetic Buyer','email'=>'buyer@example.test'],'reported_accepted'=>true,'observation_reference'=>'synthetic-report-v1']; }
+ public function test_extra_late_observation_audit_causes_whole_write_rollback(): void {
+  $f=F::prepared(true); $s=app(Reports::class); $review=$s->review($f['packet']->public_id,$f['actor']); $before=F::rows(); $fired=false;
+  AuditEvent::created(function($audit) use (&$fired): void {
+   if ($audit->subject_type !== Reports::class || $fired) return;
+   $fired=true; $row=$audit->getAttributes(); unset($row['id']); DB::table('audit_events')->insert($row);
+  });
+  try {$s->retain($review,$this->input(),'independent-audit',$f['actor']);$this->fail('Extra audit accepted.');}
+  catch(ValidationException){$this->assertTrue($fired);$this->assertSame($before,F::rows());$this->assertDatabaseCount(Reports::TABLE,0);$this->assertSame(0,DB::transactionLevel());}
+ }
+ public function test_recovery_decrypt_callback_withdraws_actor_without_exposing_plaintext(): void {
+  $f=F::prepared(true);$s=app(Reports::class);$s->retain($s->review($f['packet']->public_id,$f['actor']),$this->input(),'independent-decrypt',$f['actor']);$before=F::rows();$actor=(array)DB::table('users')->where('id',$f['actor']->id)->first();$fired=false;
+  $real=Crypt::getFacadeRoot();$mock=Mockery::mock($real)->makePartial();
+  $mock->shouldReceive('decryptString')->andReturnUsing(function($cipher) use ($real,$f,&$fired){$plain=$real->decryptString($cipher);if(!$fired){$fired=true;DB::table('users')->where('id',$f['actor']->id)->update(['is_admin'=>false]);}return $plain;});Crypt::swap($mock);
+  try {$s->recover($f['packet']->public_id,'independent-decrypt',$f['actor']);$this->fail('Revoked actor recovered identity.');}
+  catch(AuthorizationException){$this->assertTrue($fired);$this->assertSame($before,F::rows());$this->assertSame($actor,(array)DB::table('users')->where('id',$f['actor']->id)->first());$this->assertDatabaseCount(Reports::TABLE,1);$this->assertSame(0,DB::transactionLevel());}
+  finally{Crypt::swap($real);}
+ }
+}

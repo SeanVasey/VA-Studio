@@ -1,0 +1,57 @@
+{
+  "reviewer": "continuation_security_review",
+  "source_commit": "77d661bacb3debbb93db959bf8cc9de1a04172a3",
+  "source_tree": "cab2efe14e7ddf699c88feb051a23110e72b2153",
+  "disposition": "approved for focused internal staff-report development",
+  "command": "php vendor/bin/phpunit tests/Feature/ProductionBuyerAssentObservationsTest.php /workspace/scratch/2876616e88c3/ProductionBuyerReportIndependentCanaryTest.php --log-junit /workspace/scratch/2876616e88c3/continuation-commerce-final-independent.xml",
+  "runtime": "PHP 8.4.26; SQLite in-memory; own matching-lock vendor autoload source origin",
+  "results": {
+    "tests": 24,
+    "assertions": 91,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "independent_overlay": {
+    "file": "ProductionBuyerReportIndependentCanaryTest.php.txt",
+    "sha256": "fdb8e54f48f4eb0fddec25b7d7270ecf81ca3607e0aa5448dd3af92b5f763893",
+    "cases": [
+      "Late duplicate observation audit in AuditEvent::created refuses and rolls back full write",
+      "Recovery decrypt callback withdrawing actor is_admin refuses with original retained graph untouched"
+    ]
+  },
+  "superseded_source": {
+    "commit": "baa4d8a052b36ca54fd51c6fb7b1c1d01c01b987",
+    "tree": "01f9a2553c4483dd97bfc228ea6ef27f3361194a",
+    "author_cases": 21,
+    "author_assertions": 81,
+    "independent_cases": 2,
+    "independent_assertions": 9,
+    "approved_as_final": false,
+    "reason": "Author self-review identified encrypted recovery-key binding omission; successor authenticates key digest in closed encrypted body and rejects deliberately damaged restore substitution"
+  },
+  "review_findings": [],
+  "reviewed_boundaries": [
+    "Current actor authorization and MFA for every review/retain/recover",
+    "Exact retained packet/full seller/license/assent selection disclosure authenticated",
+    "Buyer name/email retained only encrypted; private model fields hidden; safe audit context",
+    "Immutable request/observation/exact audit and retained source selectors proved through captured fixed primary after callbacks",
+    "Rollback unconditionally refuses before DDL/data changes; real Migrator repository row retained",
+    "All verified buyer identity/act/purchase/payable/execution/external-fact flags false"
+  ],
+  "limits": [
+    "Supporting staff report only; cannot satisfy independent actual buyer action or verified identity",
+    "No public buyer HTTP admission, operative amount/provider/order/payment/license-grant/delivery consumer",
+    "Native concurrency not demonstrated by SQLite or ordinary native sequential execution",
+    "Independent receipt does not replace author native source-bound results or whole integrated acceptance"
+  ],
+  "artifacts": {
+    "continuation-commerce-independent.txt": "b2290b0f074d5544559595d77ec851368e1f4df4d3ffc33f5f465a647f5140a5",
+    "continuation-commerce-independent.xml": "a4495d5a1f65db64bcf6f141893496d9f5049cda0bc67d47e3cb6c472ac3c229",
+    "continuation-commerce-canary.txt": "be1c7afd54f6f9d473d1ee02add5fa936b1ea3ffa6dd82dc9150441cf0b5cd89",
+    "continuation-commerce-canary.xml": "99dc7004340706e9932a1b2c21666eeda5e84b78376a7776ae9a5797559e2658",
+    "continuation-commerce-final-independent.txt": "d1c9cd9929fceb1ec462662610d2da0a28b2ef812f8355c9c1d29b943386b0b7",
+    "continuation-commerce-final-independent.xml": "1def76d96e0940234a99c3664c2f2697a43a928d73c84c7da4ab0dee02c5352e",
+    "ProductionBuyerReportIndependentCanaryTest.php.txt": "fdb8e54f48f4eb0fddec25b7d7270ecf81ca3607e0aa5448dd3af92b5f763893"
+  }
+}

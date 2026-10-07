@@ -1,0 +1,24 @@
+{
+  "reviewed_executable": "e9557569766cdbade50024868faef4d3187ba90e",
+  "reviewed_tree": "9588a17ab23c8cb017343fa5a910701c3c3998af",
+  "baseline": "192ec8d93f346ba59f07da428e50cbd04513878b",
+  "changed_paths": [
+    "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php"
+  ],
+  "all_original_test_bytes_restored_by_removing_only_new_helper_calls_and_new_cases": true,
+  "retained_sqlite_case_partition": {
+    "recursive_triggers_off_update_delete_primary_replace_unique_replace": 12,
+    "transactional_ddl_callback_rollback": 2,
+    "pragma_foreign_keys_damaged_history": 5
+  },
+  "new_selected_database_dml_callback_cases": 2,
+  "sha256": {
+    "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php": "53bb16d3b94cab6689f8ef403471766623776cffa89b110f22a193429b482c00",
+    "composer.json": "132cb2a16c6ce2960d059cfddecae8e1accf6138a258dd8bab2c0c7b822f5607",
+    "composer.lock": "996bc7f800d5cc6b4312f5303fbd67a5cadd17e0eb640f3e2e94035e713289aa",
+    "scripts/ci/phpunit-shards.py": "fd222be6281b211fe523c2d258916c383d231c5b650ad2f9e0a0ad3016309616",
+    "scripts/ci/focused-tests.py": "6ef3c7850818c8381845d0805c9a754da8a603e73c059e11787863600acfc87c",
+    ".github/workflows/focused-feedback.yml": "f8b99a14faaf03f0e38f898b215fc75a5757ee307c933a10abff4d04e78f72a2",
+    ".github/workflows/preflight.yml": "5becf1c2d93254048668287b4a3beb49b0dd7d1d845360cd4b8d05df08ab770d"
+  }
+}

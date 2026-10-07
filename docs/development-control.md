@@ -1,5 +1,36 @@
 # Current development queue
 
+## Current resumed private consumers — October 7, 2026 UTC
+
+PR #17 merged at `df7f12e24ef481cee020910c3764850761ae4596`; its membership
+rollback retains data, guards and the real Migrator repository row. PR #18 is
+merged at `102afc9e264d703c52b03404c12bea7682db1fb8` after cheap preflight
+37570334414 passed; fresh reads verified tree `2b0bce73` and ordered parents.
+PRs #1/#2 are closed as superseded. PR #3 remains a PDF-profile compatibility task.
+
+The [private consumer composition](verification/private-consumers-composition-20261007/README.md)
+is frozen at local `68f54eb` / tree `890d609b`: protected synthetic membership
+history plus private library UI, bounded local notification recovery and encrypted
+unverified staff-reported buyer observations. Actual focused SQLite composition
+passed 548/2,464 with six declared skips. The additive guard fixture correction
+passed 79/596 without skips in its native selection: fourteen actual MySQL cases
+plus 65 explicit SQLite canaries; separate affected SQLite passed 79/582 with one
+native-engine skip. Original failed and interrupted runs remain visible.
+
+All accepted dependency records and lock identities are preserved. Sensitive
+component approvals, independent UI canaries and final shared/fixture reviews
+bind exact source. One cheap preflight and expected-head development merge follow;
+manual full final acceptance remains open. No routine full/native/browser matrix,
+live provider, email, customer import or launch activation is implied.
+
+The following ready batch is the retained-v1 renderer registry, independently
+reviewed with actual identical historical metadata and PDF bytes. Its successor
+PDF/font lane is active separately; pending-v1 continuity and production buyer,
+amount/provider/order/delivery consumers remain concrete dependencies. Historical
+pending states and full-per-merge requirements below are superseded by this
+record and current AGENTS.md. The 40 parent-group outcomes remain six accepted
+and 34 open; they are not a measurement of implemented code.
+
 ## Production preparation continuation — October 6, 2026 UTC
 
 PR #16 merged the seven-component private foundations batch at native main

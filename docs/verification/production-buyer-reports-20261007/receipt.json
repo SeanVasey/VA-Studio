@@ -1,0 +1,158 @@
+{
+  "source_commit": "77d661bacb3debbb93db959bf8cc9de1a04172a3",
+  "source_tree": "cab2efe14e7ddf699c88feb051a23110e72b2153",
+  "source_paths": {
+    "app/Domain/Commerce/ProductionPreparation/Models/ProductionBuyerAssentObservation.php": "8d350a09900e3e0a8673991690d350d3988deddd49e82a1ab8a69c6eda563cfd",
+    "app/Domain/Commerce/ProductionPreparation/ProductionBuyerAssentObservations.php": "c0ec62635af45cda1499652739be15065aa71857eb4a2102dcd8c4ba4d2ab4d6",
+    "database/migrations/2026_10_07_239000_production_buyer_assent_observations.php": "defcef254a47d104510f7778102cf31edf02f203cd5a9f120b5db44cc0288b24",
+    "docs/architecture/D-27-production-buyer-assent-reports.md": "588721848be2df0644fba372eddfb3324e55d5c6003205b57e9612d2f27b1693",
+    "tests/Feature/ProductionBuyerAssentObservationsTest.php": "13661ade24fe43cf94db045492acac589d8de8db2b128676fb66838ac88b3b0b",
+    "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php": "e7798b5c0576bb56b6dbb44dd9f14ac771cfbf572640c877a9927ea70d1157e6",
+    "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php": "b4388c4c37adeee5da0bb25f16a46b4c5cb4d1a8e20cad3eb251b44b8af6fdd0",
+    "tests/Feature/ProductionTrackPolicyEngineTest.php": "a2fac268b141f9bb7477069c79ac25fb27993ea01f1c047dd43d2d497915ce96",
+    "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php": "4b245c4907b8b27596fc13fc28bb91480187254ee186a5eef1e61ebc67047484"
+  },
+  "baseline_local": "27d229912d4c728f4c53549f6ed98fe1e993b434",
+  "baseline_native_main": "df7f12e24ef481cee020910c3764850761ae4596",
+  "baseline_tree": "56a3f0c58af0176b8a9a19414fffed80b9285fcf",
+  "limits": [
+    "Staff report only: actual buyer act/identity/purchase binding unverified.",
+    "No public buyer route, operative order, provider payment, entitlement or delivery.",
+    "Ordinary native MySQL cases do not prove independent-process concurrency.",
+    "No whole Foundation/native/browser acceptance."
+  ],
+  "failures_preserved": [
+    "Initial18SQLite4failures canonical-order identity assertions.",
+    "Second18SQLite1failure missing explicit requiredMFA fixture setup.",
+    "Self-review found encrypted body missing request-key digest; fixed in77d successor.",
+    "Predecessor native21/81 result is mutable diagnostic because source was edited while run active; not final source-bound evidence."
+  ],
+  "status": "focused_author_checks_complete_sensitive_review_approved_composition_pending",
+  "checks": [
+    {
+      "source": "77d661bacb3debbb93db959bf8cc9de1a04172a3",
+      "tree": "cab2efe14e7ddf699c88feb051a23110e72b2153",
+      "driver": "sqlite",
+      "files": [
+        "tests/Feature/ProductionBuyerAssentObservationsTest.php"
+      ],
+      "command": "Recovered PHP8.4.26 -d memory_limit=512M vendor/bin/phpunit tests/Feature/ProductionBuyerAssentObservationsTest.php --log-junit /tmp/va-assent-sqlite-77d.xml",
+      "tests": 22,
+      "passed": 22,
+      "assertions": 82,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "raw": [
+        "77d-sqlite.txt",
+        "77d-sqlite.xml"
+      ]
+    },
+    {
+      "source": "77d661bacb3debbb93db959bf8cc9de1a04172a3",
+      "tree": "cab2efe14e7ddf699c88feb051a23110e72b2153",
+      "driver": "native_mysql_8.4.11",
+      "files": [
+        "tests/Feature/ProductionBuyerAssentObservationsTest.php",
+        "tests/Feature/ProductionTrackPolicyEngineTest.php"
+      ],
+      "command": "python3 /workspace/scratch/0c039e9e0645/mysql-runtime/run-tests.py -- php -d memory_limit=512M vendor/bin/phpunit tests/Feature/ProductionBuyerAssentObservationsTest.php tests/Feature/ProductionTrackPolicyEngineTest.php --log-junit /tmp/va-assent-mysql-77d.xml",
+      "tests": 23,
+      "passed": 23,
+      "assertions": 96,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "raw": [
+        "77d-mysql.txt",
+        "77d-mysql.xml"
+      ],
+      "durability": {
+        "innodb_flush_log_at_trx_commit": 1,
+        "sync_binlog": 1,
+        "innodb_doublewrite": "ON",
+        "log_bin": true,
+        "transport": "private loopback TCP",
+        "database": "fresh disposable",
+        "cleanup": "runner completed0 with finally shutdown/datadir cleanup"
+      }
+    },
+    {
+      "source": "baa4d8a052b36ca54fd51c6fb7b1c1d01c01b987",
+      "driver": "sqlite",
+      "files": [
+        "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php",
+        "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+        "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+        "tests/Feature/ProductionTrackPolicyEngineTest.php"
+      ],
+      "tests": 73,
+      "passed": 72,
+      "assertions": 512,
+      "failures": 0,
+      "errors": 0,
+      "skips": 1,
+      "skip": "Existing test_owned_policy_tables_require_innodb_when_session_defaults_to_myisam,0assertions; actual native case separately passed in final23 selection.",
+      "carry": "Four fixture files and owned migration unchanged in77d; service key-binding fix does not change their invoked parent migration behavior. Root independently reruns affected parent fixtures on composed graph.",
+      "raw": [
+        "baa4-parent-sqlite.txt",
+        "baa4-parent-sqlite.xml"
+      ]
+    }
+  ],
+  "independent_review_reported": {
+    "source": "77d661bacb3debbb93db959bf8cc9de1a04172a3",
+    "tests": 24,
+    "assertions": 91,
+    "errors": 0,
+    "failures": 0,
+    "skips": 0,
+    "includes": "22 author cases plus external duplicate-audit rollback and decrypt callback actor-withdrawal canaries. Root owns durable review receipt."
+  },
+  "check_limits": [
+    "Authored overwrite case insertOrIgnore may short-circuit before upsert. Root new independent composed test separates actual REPLACE and upsert operations.",
+    "Authored rollback uses real Migrator; root separately adds actual Artisan guard/schema/data/bookkeeping coverage.",
+    "Full/native independent-process race and production identity/transport acceptance remain open.",
+    "Reports can be retained against historical packets after closure; this is supporting staff assertion, never current eligibility or verified buyer act."
+  ],
+  "runtime": {
+    "php": "8.4.26",
+    "service_origin": "/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/app/Domain/Commerce/ProductionPreparation/ProductionBuyerAssentObservations.php",
+    "fixture_origin": "/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Support/ProductionTrackPreparationFixtures.php"
+  },
+  "installed_graph": {
+    "locked_packages": 158,
+    "installed_packages": 158,
+    "version_and_source_ref_mismatches": [],
+    "laravel": "v13.33.0",
+    "phpunit": "12.5.34",
+    "composer_lock_sha256": "51e9c3cc1073e96a1c130376e1ab9980765a5c441c0dcd2a5454fd0909406962"
+  },
+  "pint": {
+    "source": "77d661bacb3debbb93db959bf8cc9de1a04172a3",
+    "eight_changed_php_files": "passed",
+    "raw": "77d-pint.txt"
+  },
+  "git_after_checks": {
+    "head": "77d661bacb3debbb93db959bf8cc9de1a04172a3",
+    "tree": "cab2efe14e7ddf699c88feb051a23110e72b2153",
+    "status": ""
+  },
+  "artifact_sha256": {
+    "77d-installed-graph.json": "b2c1f3fafecee0aef79d27b9b5352e53a47854e8b20d35f9a233c421bcb0c373",
+    "77d-mysql.txt": "3247443c71e34bde537043d2b5af5d7a7247fbc9720522d3013dc30c3607b3dd",
+    "77d-mysql.xml": "89786528ba8dd8840606a8fb17713e2487622bfeecb549f0754987e1dde1b787",
+    "77d-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "77d-runtime.json": "ba778b924b48ca8ce7682b5f5ac3d5741d5f84ba7d356e044fb0c42d7bc8952a",
+    "77d-sqlite.txt": "d54d4c2b0ebdafefe9d749d45ec79dc8c7935307da8058059c6100ea5fb4b84a",
+    "77d-sqlite.xml": "b3789412ece120183070cdfb8d1381d1de6b642930bd9f10714fe9b9e9f95fbd",
+    "baa4-parent-sqlite.txt": "48bfcf1ed2819aaa8f38b44014bbcff077066d78502258a6b6124ad60ddda9b5",
+    "baa4-parent-sqlite.xml": "63f5de0f37e9a9039acca7b9dc7bbb3082783780174303da64c03b4b1a1da513",
+    "baa4-sqlite-21-passed.xml": "729528c05ea1a3874178d6ab98400a68aa0c196d30324aed01b1755d5b5aa7ac",
+    "initial-sqlite-failed.xml": "408ab1547ab53133e9bbb1fb4c711451424c5744e10bc815ec34f24d6ab503ed",
+    "mutable-native-predecessor.txt": "fd13ae150aea67c36d39819098d124de07aaa8a7ac6d26389b938d133520195f",
+    "mutable-native-predecessor.xml": "731dc2c6735e780359f849722b8b1297adbac352b4279be7bb4036c2d851c037",
+    "second-sqlite-failed.xml": "9e23655967c9e78c7e67810dc27739ec1cd38f399174f8c900e6eba5e7d41f4e",
+    "source-receipt-draft.json": "329594ee960bc7b115532d8f8f1c10837bfbc9ed7ccfbc854b0eba005ef4e7f2"
+  }
+}

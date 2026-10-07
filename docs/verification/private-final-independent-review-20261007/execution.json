@@ -1,0 +1,16 @@
+{
+  "source": "192ec8d93f346ba59f07da428e50cbd04513878b",
+  "command": [
+    "php",
+    "-d",
+    "memory_limit=512M",
+    "vendor/bin/phpunit",
+    "-c",
+    "private-review.phpunit.xml",
+    "--log-junit",
+    "docs/verification/private-final-independent-review-20261007/buyer-migration.xml",
+    "--fail-on-warning",
+    "--fail-on-empty-test-suite"
+  ],
+  "exit_code": 0
+}

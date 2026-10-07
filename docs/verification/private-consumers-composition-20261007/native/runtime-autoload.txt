@@ -1,0 +1,7 @@
+Illuminate\Foundation\Application /workspace/scratch/2876616e88c3/VA-Studio-restored-native-checks/vendor/laravel/framework/src/Illuminate/Foundation/Application.php
+Tests\Feature\ProductionBuyerAssentObservationMigrationTest /workspace/scratch/2876616e88c3/VA-Studio-restored-native-checks/tests/Feature/ProductionBuyerAssentObservationMigrationTest.php
+laravel/framework v13.34.0 c829b4982d29344cbcf1d7ad78eb5d2bb8ae66c4
+phpunit/phpunit 12.5.34 6cbff63d670de92cb1cb3d2ff9f40327e9da9c7f
+tecnickcom/tc-lib-pdf 8.76.2 c383bd3ac09164c3fd1a6ac7da8f5460d19e47e3
+tecnickcom/tc-lib-pdf-font 4.4.0 658e04565534c0cdd3d8d7ff12f1c6ebeab5f7ce
+8.4.26

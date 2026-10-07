@@ -1,0 +1,7 @@
+{
+  "former_source": "dd53733d00edcf8efb30d3dc88e205fe5753712e",
+  "retained_source_tree": "4b47a549775e1e2d8e62efb26902bbb98a7e0253",
+  "tests": "interrupted; no completed reports or pass claim",
+  "runtime": "PHP8.4.26 retained; local Git metadata/processe lost on refresh",
+  "pr18": "b4cbc483c3ed11a0041bcf07462e1f8999332bb5 published verified tree2b0"
+}

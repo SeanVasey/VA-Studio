@@ -32,6 +32,8 @@ class ProductionTrackPreparationPacketMigrationTest extends TestCase
             Schema::clearResolvedInstance('db.schema');
         });
         $this->artisan('migrate:fresh', ['--database' => 'production_packet_migration_fixture', '--force' => true])->assertExitCode(0);
+        $this->assertDatabaseCount('production_buyer_assent_observations', 0);
+        Schema::drop('production_buyer_assent_observations');
         $this->fakePrivateMediaStorage();
     }
 

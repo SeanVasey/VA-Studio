@@ -7,6 +7,7 @@ use App\Domain\Commerce\Policy\ReviewProductionTrackPolicy;
 use App\Support\Audit\AuditEvent;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use RuntimeException;
 use Tests\Support\FinalizationDatabaseMigrations;
@@ -31,6 +32,9 @@ class ProductionTrackPolicyEngineTest extends TestCase
         $migration = require database_path('migrations/2026_10_06_233000_production_track_policy_drafts.php');
         $capabilities = require database_path('migrations/2026_10_06_236000_production_track_policy_capabilities.php');
         $preparation = require database_path('migrations/2026_10_06_238000_production_track_preparation_packets.php');
+        // Explicit disposable-fixture cleanup, with FK enforcement unchanged.
+        $this->assertDatabaseCount('production_buyer_assent_observations', 0);
+        Schema::drop('production_buyer_assent_observations');
         foreach (['production_track_preparation_packet_lines', 'production_track_preparation_packets'] as $table) {
             $this->assertDatabaseCount($table, 0);
         }

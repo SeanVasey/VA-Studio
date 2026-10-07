@@ -1,0 +1,51 @@
+{
+  "reviewer": "continuation_security_review",
+  "disposition": "approved for focused internal and local/testing console development",
+  "review_findings": [],
+  "sources": [
+    {
+      "commit": "5e0b55847a958161de030b3cbd4baf491d335285",
+      "tree": "1bee6f4a93bd11ebe478435eb677c1e5be866d33",
+      "command": "php vendor/bin/phpunit tests/Feature/TransactionalNotificationRecoveryTest.php tests/Feature/TransactionalNotificationTest.php --log-junit /workspace/scratch/2876616e88c3/continuation-notification-independent.xml",
+      "results": {
+        "tests": 62,
+        "assertions": 380,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "commit": "9ca32a4b2a90f3cacfeba1ad61c90c7a61add40e",
+      "tree": "79c8f0651798345669a63619d1190f18f22284e3",
+      "command": "php vendor/bin/phpunit tests/Feature/TransactionalNotificationRecoveryCommandTest.php --log-junit /workspace/scratch/2876616e88c3/continuation-notification-command-independent.xml",
+      "results": {
+        "tests": 11,
+        "assertions": 46,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    }
+  ],
+  "runtime": "PHP 8.4.26; own matching-lock vendor regenerated autoload; SQLite in-memory",
+  "reviewed_boundaries": [
+    "Internal scanner invokes retained current-authority services per notice",
+    "Uncertain lease recovery only inspects original bytes; never reserves/replaces or resends",
+    "Known refusal retries remain capped at original 3 attempts",
+    "Strict bounded decimal CLI options; constant refusal output; private recipient/ciphertext/receipt omitted",
+    "Console execution trusts local installation operator; no HTTP access or scheduler introduced"
+  ],
+  "limits": [
+    "No delivered email, production transport or production operation enabled",
+    "No new native concurrent scanner-worker claim; existing lease serialisation remains prerequisite",
+    "Cursor progresses over unavailable records; operator must retain and revisit those recorded IDs/scan from prior cursor",
+    "Full acceptance not executed"
+  ],
+  "artifacts": {
+    "continuation-notification-independent.txt": "05082fc2dbb91d1a6d8efbe01757388b424e14380f5761890a2135cff3d47f29",
+    "continuation-notification-independent.xml": "e0d911561d3f88585ca31e9ef3f1b8fb311e9ecadb172f3be79f694c322b7eeb",
+    "continuation-notification-command-independent.txt": "d39c95c364057375ce6717b713e4683008a02b50367a0e3fc3e5f6bec36a20c2",
+    "continuation-notification-command-independent.xml": "80751d8a7e36087619232ac312af22d949f4637b4ddfd3f927763d42ba28da20"
+  }
+}

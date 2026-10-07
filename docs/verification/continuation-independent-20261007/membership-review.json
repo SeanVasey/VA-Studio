@@ -1,0 +1,29 @@
+{
+  "reviewer": "continuation_security_review",
+  "source_commit": "8ea44c0a2bd3b0bb2bbc61da268478b028e1d052",
+  "source_tree": "1011d423df354183779a9bc2bacabe9a02a0542e",
+  "disposition": "approved for focused internal development",
+  "reviewed_paths": [
+    "app/Domain/Memberships/CreditLedger.php",
+    "tests/Feature/MembershipCustomerHistoryTest.php"
+  ],
+  "actual_command": "php vendor/bin/phpunit tests/Feature/MembershipCustomerHistoryTest.php --log-junit /workspace/scratch/2876616e88c3/continuation-membership-independent.xml",
+  "runtime": "PHP 8.4.26; SQLite in-memory; own matching-lock vendor and regenerated autoload",
+  "results": {
+    "tests": 14,
+    "assertions": 58,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "review_findings": [],
+  "limits": [
+    "Internal trusted-principal service only; no customer HTTP route/UI review",
+    "Synthetic test credits only; no paid subscription or entitlement acceptance",
+    "Native concurrency and full acceptance not inferred from SQLite"
+  ],
+  "artifacts": {
+    "continuation-membership-independent.txt": "cc592fd70007cba58b2afc5a00e6d8ed2cfc892ab90b4443e4de64bd66df8b0c",
+    "continuation-membership-independent.xml": "29015ba5412872a41bc70dd6a0995bfbb2b0ffebe95abeb7d7467b1afe2e84c5"
+  }
+}

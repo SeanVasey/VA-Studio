@@ -1,0 +1,34 @@
+{
+  "reviewer": "continuation_security_review",
+  "source_commit": "6a1aed576160a349a0e0320d2636a9ca64235c7f",
+  "source_tree": "fa1fd18d5149368e12f6d485717cf060b1756797",
+  "disposition": "approved for focused synthetic customer read-only HTTP development",
+  "command": "php vendor/bin/phpunit tests/Feature/MembershipCustomerHistoryHttpTest.php --log-junit /workspace/scratch/2876616e88c3/continuation-membership-http-independent.xml",
+  "runtime": "PHP 8.4.26; SQLite in-memory; own matching-lock regenerated autoload",
+  "results": {
+    "tests": 18,
+    "assertions": 134,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "review_findings": [],
+  "reviewed_boundaries": [
+    "Credential-bound current principal derived from customer session; browser supplies no account/user/owner identity",
+    "Discovery returns owned selection hints only and refuses 101st bucket rather than silently omitting results",
+    "Captured primary proof includes owned bucket range and absence/additions plus current account/user rows",
+    "History retains original full bounded ledger/version evidence; existing internal CreditLedger implementation unchanged",
+    "Bodyless GET, bounded canonical numeric bucket route, account privacy middleware and generic foreign/unknown failure",
+    "No-store/referrer/nosniff/robots protections on success and failure; no email/owner/resource/audit/request credentials exposed"
+  ],
+  "limits": [
+    "Local/testing synthetic credits only; production disabled",
+    "No customer page UI, paid subscription or license/entitlement assertion",
+    "Bucket IDs are internal selection hints and not benefit proof",
+    "Native concurrency/full acceptance not inferred from focused SQLite"
+  ],
+  "artifacts": {
+    "continuation-membership-http-independent.txt": "3f4d977e4f734ea5921c897365bd6ae9a7526d838e352b2143297b2dcc0b4d1b",
+    "continuation-membership-http-independent.xml": "438acccf8fcb92650447639bb2ccc259e0e077c8a1f08ebf0cdadabb2cd94b3b"
+  }
+}

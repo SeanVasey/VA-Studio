@@ -1,0 +1,83 @@
+{
+  "disposition": "approved for focused development integration",
+  "reviewed_executable": "e9557569766cdbade50024868faef4d3187ba90e",
+  "reviewed_tree": "9588a17ab23c8cb017343fa5a910701c3c3998af",
+  "changed_source_sha256": "53bb16d3b94cab6689f8ef403471766623776cffa89b110f22a193429b482c00",
+  "worktree": "/workspace/scratch/2876616e88c3/VA-Studio-native-fixture-independent",
+  "independent_executed_tests": 3,
+  "assertions": 31,
+  "errors": 0,
+  "failures": 0,
+  "skips": 0,
+  "exit_code": 0,
+  "runtime": {
+    "php": "8.4.26",
+    "mysql": "8.4.11",
+    "flush_at_commit": 1,
+    "sync_binlog": 1,
+    "doublewrite": "ON",
+    "binary_logging": true,
+    "transport": "private loopback TCP",
+    "database": "fresh isolated disposable"
+  },
+  "command": "VA_MYSQL_DIAGNOSTIC_LOG=$PWD/docs/verification/native-fixture-independent-20261007/canaries-mysql-server.txt python3 /workspace/scratch/0c039e9e0645/mysql-runtime/run-tests.py -- php -d memory_limit=512M vendor/bin/phpunit --configuration phpunit.native-canaries.xml --filter test_review_ --log-junit docs/verification/native-fixture-independent-20261007/canaries-junit.xml --fail-on-empty-test-suite --fail-on-warning",
+  "installed_lock_references_verified": 158,
+  "own_autoload_origins_verified": true,
+  "author_source_hashes_matched": 1124,
+  "findings": [],
+  "coverage": [
+    "Original19SQLiteadversarycases retained byte-for-byte except explicit fixture call; no skips introduced.",
+    "Native ordinary DML adapter and audit-created callbacks actually fire inside transaction level1; post-callback graph proof refuses damage and restores every history/audit/user row.",
+    "Actual native migration rows and complete trigger definitions unchanged after both rollback paths; same primary PDO and transaction level0.",
+    "SQLite fixture has separate PDO and empty own audit table; original MySQL marker, migration rows and guards preserved; cleanup restores exact original primary PDO/default connection."
+  ],
+  "diagnostics": [
+    "Initial Composer invocation mistakenly passed its shell wrapper to PHP and printed wrapper text without generating autoload; retained, fixed before any PHPUnit execution.",
+    "Initial reviewer isolation marker used null subject_id, violating existing nonnull schema before fixture helper; that one canary failed while both native rollback canaries passed. Raw source/JUnit/text/server log retained. Corrected reviewer marker only; final three-case run passed. Author source unchanged."
+  ],
+  "author_results_verified_by_artifact_readback": {
+    "native_outer_harness": {
+      "cases": 79,
+      "assertions": 596,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0,
+      "partition": {
+        "actual_native_mysql_cases": 14,
+        "explicit_sqlite_adversary_cases": 65
+      }
+    },
+    "sqlite": {
+      "cases": 79,
+      "assertions": 582,
+      "errors": 0,
+      "failures": 0,
+      "skips": 1,
+      "skip": "existing MySQL-owned engine case"
+    }
+  },
+  "limitations": [
+    "Independent reviewer executed three focused canaries, not author79 selection.",
+    "Isolation canary deliberately switches to SQLite then proves untouched and restored native primary; no SQLite assertion is native trigger/concurrency proof.",
+    "No native concurrency race, hosted CI, browser/provider or complete final acceptance claimed.",
+    "Original failed77-case run remains preserved in d5c6934d26c193b8ae53d4f1b4bd85b28228d324; correction does not relabel it as passed."
+  ],
+  "artifact_sha256": {
+    "NativeFixtureReviewCanaryTest.php": "7df2728f4a433798c6e9b04c7ff5f2a03ebf539777aa3c9d1e8fff25674ab5d3",
+    "autoload-invocation-diagnostic.txt": "bc39df64c657e6f273aa339ddb029fcde781452a7ef584117c585910c47c7ad6",
+    "autoload.txt": "d04f812f5e8c2556fa4f1d012751392012295c6f88529fe45e86bfd968b7bbe3",
+    "canaries-junit.xml": "f705ec95754381fd29de522bb6cd982e3c5f81203bb7448e5d53781103296611",
+    "canaries-mysql-server.txt": "6edcc56433ce250acacb9501da30ca100ed28c4f103e9406c99f38454b0d51a2",
+    "canaries.txt": "ce4e837ea20c1d3d1742b66817034e6c94e614799f11ab642ee755febc723d08",
+    "marker-diagnostic/NativeFixtureReviewCanaryTest.php": "f37407492637dd01ecdc2c98ec10309ac853399ec97078c0eb02226695e57106",
+    "marker-diagnostic/canaries-junit.xml": "d6cf1ccdcbfffc1964372a260a6ab894964b9d94edbebeb38f6539a848b52972",
+    "marker-diagnostic/canaries-mysql-server.txt": "b2f8ea6c4c4a65238d7415006601cc5de684761dc4c51601b69235664498ed28",
+    "marker-diagnostic/canaries.txt": "61c01429f321ecb9560618ca0df9d9f860dcef011e11af250a0fd24e54c00e26",
+    "phpunit-canaries.xml": "532417c9411acc37b709bed9d25bef12a63a90dbef2dccc3cff8905ecd9e578f",
+    "phpunit-guards.xml": "12c0b5d5527e9311dee4412c2de98ef0920f32fc0ae3a91e1dd652596c626edc",
+    "reviewed-source-hashes.json": "208c6745d24898d013cf800dfa8b37ce1560ce099d1e1ae19b1a09e202f42d3f",
+    "run-tests.py": "35bdde4f03a9d7a23d90337a77a938c1044f297553e0afe38d13eaee73ac854a",
+    "runtime-autoload.txt": "7adf20a8b0cf0b63b02cf46507478d494d52657d50e1a1e6736869ef599d07fa",
+    "source-review.json": "71995fd78403084f7ea7d26f642521b125bf899f8462246d94ed793e367a70dd"
+  }
+}

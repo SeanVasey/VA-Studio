@@ -1,0 +1,24 @@
+{
+  "disposition": "approved source composition and CI safeguards; separate guard fixture/native gate required",
+  "source": "68f54eb253fd017c80c39cfe6b8693683e887a65",
+  "tree": "890d609bb54ee7c61f2a41ed6edda18f1f08e511",
+  "private_manifest_paths": 99,
+  "accepted_dependency_evidence_paths_preserved": 51,
+  "unchanged_ui_paths": 4,
+  "unchanged_sqlite_exceptions": 150,
+  "focused_selector_checks": 49,
+  "workflow_cadence_checks": 14,
+  "scope_checks": 27,
+  "own_buyer_migration_sqlite": {
+    "source": "192ec8d93f346ba59f07da428e50cbd04513878b",
+    "tests": 4,
+    "assertions": 24,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "whole_prior_native_run_failed": true,
+  "full_acceptance": false,
+  "hosted_dispatch": false,
+  "findings": []
+}

@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "executed_commit": "69fce09d7b73f4675ff4a7b73422d55451c17385",
+  "executed_tree": "7d56567acc179860be2514df04a7c87a8861be9a",
+  "runtime": {
+    "php": "8.4.26",
+    "database": "SQLite disposable :memory:",
+    "installed_dependency_graph": "unchanged lock and worktree-origin autoload"
+  },
+  "source_sha256": {
+    "app/Domain/Memberships/MembershipPolicy.php": "6676a5db75015a0b3bcea89566447f93eed114c560b1fee635b74d7462caa36e",
+    "app/Http/Controllers/CustomerSessionController.php": "98696c67b1d30b4d0d392d46071d2d4a319905032c6c9215724b31cbfd228baf",
+    "tests/Feature/MembershipCustomerLibraryCapabilityTest.php": "655c9f161f9e2e4d46deb14a0a85459a574cac8142af98218a60e58e75c8564f",
+    "composer.lock": "51e9c3cc1073e96a1c130376e1ab9980765a5c441c0dcd2a5454fd0909406962",
+    "phpunit.xml": "493369cfb7feea104da4bec214c2cc6526ca2f1b9d937c50a2961fc59cb61aaf"
+  },
+  "result": {
+    "tests": "49",
+    "assertions": "358",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "22.666541"
+  },
+  "command": "/workspace/scratch/0c039e9e0645/runtime-recovery/bin/php vendor/bin/phpunit tests/Feature/MembershipCustomerLibraryCapabilityTest.php tests/Feature/MembershipCustomerHistoryHttpTest.php tests/Feature/MembershipCustomerHistoryTest.php tests/Feature/CustomerSessionHttpTest.php --log-junit /workspace/scratch/2876616e88c3/membership-props-final-sqlite.xml",
+  "checks": [
+    "Scoped syntax pass3 PHP files",
+    "Scoped Pint pass3 PHP files",
+    "git diff --check pass"
+  ],
+  "untested": [
+    "New native run (pure predicate/props change; previous native evidence unchanged/source-bound)",
+    "CustomerLibrary UI and browser/device acceptance",
+    "Full matrix/live continuity/renewal/billing"
+  ],
+  "CI_migration_credit_guards": "unchanged",
+  "artifact_sha256": {
+    "README.md": "e6396b10c2533bca40b33437a0403e63afd820caa6b0d15e059dca439b30f12c",
+    "membership-props-final-sqlite.txt": "1f84d0acf1b561a8f12579eee2d8292331fc82c6c7e483dc7dae9b98de27907e",
+    "membership-props-final-sqlite.xml": "8c3fa7e359284d3defe0d5b6d334dff02a89bb9b5039f517a223336481c63d55",
+    "membership-props-first.txt": "23a638d74038eb884e29829a5eed5023f236fd6c8fa17ea1c29e7d7cc78639b2",
+    "membership-props-first.xml": "042921447e8eac64f71d502d2e4cc52ac8400efa1bf0e31ddeb0c1520a279763"
+  }
+}

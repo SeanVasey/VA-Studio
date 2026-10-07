@@ -1,0 +1,3 @@
+Tests\Feature\ProductionTrackCapabilitiesGuardsTest /workspace/scratch/2876616e88c3/VA-Studio-native-fixture-independent/tests/Feature/ProductionTrackCapabilitiesGuardsTest.php
+App\Domain\Commerce\ProductionPolicy\ProductionTrackCapabilities /workspace/scratch/2876616e88c3/VA-Studio-native-fixture-independent/app/Domain/Commerce/ProductionPolicy/ProductionTrackCapabilities.php
+Verified installed references: 158

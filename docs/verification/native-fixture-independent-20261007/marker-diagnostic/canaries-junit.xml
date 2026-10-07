@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/scratch/2876616e88c3/VA-Studio-native-fixture-independent/phpunit.native-canaries.xml" tests="3" assertions="19" errors="1" failures="0" skipped="0" time="19.054758">
+    <testsuite name="Independent native fixture canaries" tests="3" assertions="19" errors="1" failures="0" skipped="0" time="19.054758">
+      <testsuite name="Tests\Review\NativeFixtureReviewCanaryTest" file="/workspace/scratch/2876616e88c3/VA-Studio-native-fixture-independent/docs/verification/native-fixture-independent-20261007/NativeFixtureReviewCanaryTest.php" tests="3" assertions="19" errors="1" failures="0" skipped="0" time="19.054758">
+        <testcase name="test_review_sqlite_fixture_isolation_preserves_and_restores_primary" file="/workspace/scratch/2876616e88c3/VA-Studio-native-fixture-independent/docs/verification/native-fixture-independent-20261007/NativeFixtureReviewCanaryTest.php" line="33" class="Tests\Review\NativeFixtureReviewCanaryTest" classname="Tests.Review.NativeFixtureReviewCanaryTest" assertions="1" time="6.842884">
+          <error type="Illuminate\Database\QueryException">Tests\Review\NativeFixtureReviewCanaryTest::test_review_sqlite_fixture_isolation_preserves_and_restores_primary
+Illuminate\Database\QueryException: SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'subject_id' cannot be null (Connection: mysql, Host: 127.0.0.1, Port: 47551, Database: vaseyaudio_test, SQL: insert into `audit_events` (`actor_id`, `action`, `subject_type`, `subject_id`, `context`, `created_at`) values (?, synthetic.review.primary.marker, synthetic.review, ?, {}, 2026-10-07 04:27:53))
+
+/workspace/scratch/2876616e88c3/VA-Studio-native-fixture-independent/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/workspace/scratch/2876616e88c3/VA-Studio-native-fixture-independent/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/workspace/scratch/2876616e88c3/VA-Studio-native-fixture-independent/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php:42
+/workspace/scratch/2876616e88c3/VA-Studio-native-fixture-independent/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/MySqlProcessor.php:35
+/workspace/scratch/2876616e88c3/VA-Studio-native-fixture-independent/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4320
+/workspace/scratch/2876616e88c3/VA-Studio-native-fixture-independent/docs/verification/native-fixture-independent-20261007/NativeFixtureReviewCanaryTest.php:39</error>
+        </testcase>
+        <testsuite name="Tests\Review\NativeFixtureReviewCanaryTest::test_review_native_callback_rollback_keeps_metadata_and_primary" tests="2" assertions="18" errors="0" failures="0" skipped="0" time="12.211873">
+          <testcase name="test_review_native_callback_rollback_keeps_metadata_and_primary with data set &quot;adapter&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-native-fixture-independent/docs/verification/native-fixture-independent-20261007/NativeFixtureReviewCanaryTest.php" line="61" class="Tests\Review\NativeFixtureReviewCanaryTest" classname="Tests.Review.NativeFixtureReviewCanaryTest" assertions="9" time="6.310734"/>
+          <testcase name="test_review_native_callback_rollback_keeps_metadata_and_primary with data set &quot;audit created&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-native-fixture-independent/docs/verification/native-fixture-independent-20261007/NativeFixtureReviewCanaryTest.php" line="61" class="Tests\Review\NativeFixtureReviewCanaryTest" classname="Tests.Review.NativeFixtureReviewCanaryTest" assertions="9" time="5.901139"/>
+        </testsuite>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

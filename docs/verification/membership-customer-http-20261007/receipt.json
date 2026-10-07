@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "executed_commit": "6a1aed576160a349a0e0320d2636a9ca64235c7f",
+  "executed_tree": "fa1fd18d5149368e12f6d485717cf060b1756797",
+  "source_sha256": {
+    "app/Domain/Memberships/MembershipEvidence.php": "efa3205598a107798c974ba3e2bce801423d71b62879dc96f1b981a822bb2532",
+    "app/Domain/Memberships/MembershipCustomerHistory.php": "e80d3069501883ccbcc6bef8adad91b60a04c93747bb91a5af7068fc633604de",
+    "app/Http/Controllers/CustomerMembershipHistoryController.php": "2e49381825db82d993e1fed344a19716a8f4144f3d05320ba5ff4511215ec43d",
+    "routes/customer.php": "e0bd543ae73e62df12fc07265e845fa070b897dece15a57bf6cd122c32336246",
+    "tests/Feature/MembershipCustomerHistoryHttpTest.php": "a0d95ed53c18293d917c1a30abd92fbf151fba0b82b8df6d3792d4be9a5d45a7",
+    "app/Domain/Memberships/CreditLedger.php": "da00984fc8dfb9e610d19c18d63ed91520efe6d846cc879010ae67156ef139ac",
+    "composer.lock": "51e9c3cc1073e96a1c130376e1ab9980765a5c441c0dcd2a5454fd0909406962",
+    "phpunit.xml": "493369cfb7feea104da4bec214c2cc6526ca2f1b9d937c50a2961fc59cb61aaf"
+  },
+  "runtime": {
+    "php": "8.4.26",
+    "mysql": "8.4.11",
+    "mysql_runner_sha256": "35bdde4f03a9d7a23d90337a77a938c1044f297553e0afe38d13eaee73ac854a",
+    "database": "fresh disposable vaseyaudio_test private loopback TCP",
+    "durability": {
+      "innodb_flush_log_at_trx_commit": 1,
+      "sync_binlog": 1,
+      "innodb_doublewrite": "ON",
+      "log_bin": true
+    }
+  },
+  "results": {
+    "sqlite": {
+      "tests": "67",
+      "assertions": "414",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "26.777593"
+    },
+    "mysql": {
+      "tests": "5",
+      "assertions": "41",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "46.363957"
+    }
+  },
+  "commands": {
+    "sqlite": "/workspace/scratch/0c039e9e0645/runtime-recovery/bin/php vendor/bin/phpunit tests/Feature/MembershipCustomerHistoryHttpTest.php tests/Feature/MembershipCustomerHistoryTest.php tests/Feature/MembershipPrimaryProofTest.php tests/Feature/CustomerSessionHttpTest.php --log-junit /workspace/scratch/2876616e88c3/membership-http-final-sqlite.xml",
+    "mysql": "python3 /workspace/scratch/0c039e9e0645/mysql-runtime/run-tests.py -- php vendor/bin/phpunit tests/Feature/MembershipCustomerHistoryHttpTest.php --filter '(test_real_customer_session|test_discovery_refuses_extra|test_discovery_withdrawal|test_max_plus_one|test_http_history_rejects)' --log-junit /workspace/scratch/2876616e88c3/membership-http-final-mysql.xml"
+  },
+  "failed_predecessor": {
+    "tests": 16,
+    "passed": 5,
+    "failures": 11,
+    "assertions": 58,
+    "cause": "getJson helper sends [] nonempty GET body; use genuine bodyless GET fixtures, preserve explicit body refusal"
+  },
+  "untested": [
+    "Full native HTTP18 case suite",
+    "Cross-process concurrency",
+    "Customer UI and browser/device acceptance",
+    "Live payments/renewal/cancellation/source continuity",
+    "Full matrix"
+  ],
+  "rollback_migration_and_CI": "unchanged",
+  "artifact_sha256": {
+    "README.md": "bace2c4a9f976ba02251363d7d2c2b7212365da6e354df42b51a673e009cc574",
+    "membership-http-corrected.txt": "b25208f38554b3395c8f4e52ffabc0c0a7b80db4c4cf7edb0b7924f9fddb116c",
+    "membership-http-corrected.xml": "b41b25d91a3e6f11d1eac7429d6e04a80736f79de4411235c0399bf0158d9871",
+    "membership-http-final-mysql.txt": "69a3d778375fcbc8483a24bf9254be3e7f50a2326f5ae547449a8ccba7b42f7c",
+    "membership-http-final-mysql.xml": "28d43f525d37c1673ae18c08b96376f70683fbbf1f10bba7d1acda77185e529e",
+    "membership-http-final-sqlite.txt": "b6ddb2762522a4db526759fffaa1a7a932d0140f39b793ca401a70114be776aa",
+    "membership-http-final-sqlite.xml": "26d3bc65c88324b02aa336ea0a1a32f2228bf6340eb050809607a31d91b2f0a7",
+    "membership-http-first.txt": "58b1e7cfb8d4fee375825ca927dcbfdd157e94f582abd9ea1ca759196f1a902a",
+    "membership-http-first.xml": "431232745050e8b01c3e929be80d8b174383c259152c988673a163e1f03b0ef7"
+  }
+}

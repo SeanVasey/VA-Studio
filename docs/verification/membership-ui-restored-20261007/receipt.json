@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "tested_commit": "29af96ef491c9f56b8e152b7b9ae751577b95767",
+  "tested_tree": "294734aeacc003351fb1478202507becf112d287",
+  "parent": "192ec8d93f346ba59f07da428e50cbd04513878b",
+  "restored_source_commit": "ca7cb13d107a0395e93b6c1ab333bfac668713ec",
+  "restored_source_tree": "e96442fafde96a821cab05d9fa898ab675e81ca4",
+  "source_paths_sha256": {
+    "resources/js/Pages/CustomerLibrary.tsx": "5a8a5b32ad25ce71ed76892f92e8841e1a75a4cb17e0863e962b35748145b382",
+    "resources/js/components/OwnedMembershipHistory.tsx": "c066d7251b50a46630b1333df0a1ed0c35309a013e74fd38b1faecf11df32523",
+    "resources/js/lib/membership-history.ts": "63916b77722643c9aba5ed281c0697b07879feabf37871d9d124124d92c4a607",
+    "tests/frontend/membership-history.test.tsx": "bfd57fb41a7a06e6a879380af5b8f8287c53363c0209afd32930aa71583d242c",
+    "vitest.config.ts": "5c3bf6c180bea188e98e69de7fa39e5e6ffde84adbee58e51017d6028d18923a",
+    "resources/js/test/setup.ts": "7af65bf74e01119f207abca6af1eae00aef2bfdb18226a2e273e0b3cd69fea55"
+  },
+  "independent_historical_review_sha256": "76de634bd4a8d35209313683b8c11fac1cd94a3a85adbf041159e20c469a9127",
+  "runtime": {
+    "node": "v24.19.0",
+    "npm": "11.9.0",
+    "dom": "10.4.2"
+  },
+  "installation": "fresh npm ci --ignore-scripts from unchanged current package-lock.json",
+  "package_lock_sha256": "6407d3a63e3b6e04f5824f53c41b8dc8a33581f987b21d780c795480122f93ea",
+  "checks": [
+    {
+      "command": "npm run typecheck",
+      "exit_code": 0
+    },
+    {
+      "command": "npm test -- tests/frontend/membership-history.test.tsx tests/frontend/customer-account.test.tsx",
+      "exit_code": 0,
+      "files": 2,
+      "passed": 62,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "npm run build",
+      "exit_code": 0,
+      "warning": "Existing app chunk above 500 kB advisory"
+    },
+    {
+      "command": "python3 scripts/ci/scan-client-bundle.py",
+      "exit_code": 0
+    }
+  ],
+  "limitations": [
+    "Historical 34-case independent review ran DOM 10.4.1; unchanged exact source digests carried. Fresh affected 62 cases ran current DOM 10.4.2.",
+    "No actual browser, MySQL, production customer or full acceptance execution.",
+    "UI is default-off synthetic membership history, with server capability and opaque scope already present in restored parent. No live subscription or payment functionality."
+  ],
+  "artifact_sha256": {
+    "installed-graph.json": "c0cdc92902cc37212c7d59b43c2db0980f3b2efaf1bc5d340b604ab3b8092730",
+    "typecheck.txt": "ae791f9f57ffbb3c0a592b6a34e25250c1f7f6f13fde4d05f77a0d4e7681f89a",
+    "client-secret-scan.txt": "0bc3ed853e3a83eaae0571838f401e3f4864497a9a4629f421daf6fbd490ae64",
+    "npm-ci.txt": "da5243c109ba608190c9dac91f1e6f7ea0697e60916afbea4b0a61e3fd3478b4",
+    "tests.txt": "6dfcf72cabf2e5f7ab1000136d328d6722b87ffdb6a36619f5fb5de2927d33c0",
+    "build.txt": "1746b4af21e2fdf9e251036f5fa9b593db84f8208799abf744e84f60b0e989ac"
+  }
+}

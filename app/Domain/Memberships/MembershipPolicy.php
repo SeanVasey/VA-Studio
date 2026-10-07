@@ -22,9 +22,14 @@ final class MembershipPolicy
         }
     }
 
+    public function enabled(): bool
+    {
+        return app()->environment('local', 'testing') && config('memberships.test_mode_enabled') === true;
+    }
+
     public function requireEnabled(): void
     {
-        if (! app()->environment('local', 'testing') || config('memberships.test_mode_enabled') !== true) {
+        if (! $this->enabled()) {
             throw new AuthorizationException('Synthetic memberships are unavailable.');
         }
     }

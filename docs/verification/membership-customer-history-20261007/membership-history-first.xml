@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\MembershipCustomerHistoryTest" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-history/tests/Feature/MembershipCustomerHistoryTest.php" tests="13" assertions="49" errors="2" failures="0" skipped="0" time="2.966726">
+    <testcase name="test_customer_history_preserves_original_policy_and_each_credit_balance_without_private_identifiers_or_writes" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-history/tests/Feature/MembershipCustomerHistoryTest.php" line="21" class="Tests\Feature\MembershipCustomerHistoryTest" classname="Tests.Feature.MembershipCustomerHistoryTest" assertions="19" time="0.877785"/>
+    <testcase name="test_expired_history_retains_balance_without_writing_expiry" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-history/tests/Feature/MembershipCustomerHistoryTest.php" line="50" class="Tests\Feature\MembershipCustomerHistoryTest" classname="Tests.Feature.MembershipCustomerHistoryTest" assertions="4" time="0.167566"/>
+    <testcase name="test_different_customer_cannot_read_bucket_history" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-history/tests/Feature/MembershipCustomerHistoryTest.php" line="63" class="Tests\Feature\MembershipCustomerHistoryTest" classname="Tests.Feature.MembershipCustomerHistoryTest" assertions="2" time="0.149788"/>
+    <testsuite name="Tests\Feature\MembershipCustomerHistoryTest::test_current_customer_and_synthetic_boundaries_are_required" tests="5" assertions="8" errors="1" failures="0" skipped="0" time="0.868766">
+      <testcase name="test_current_customer_and_synthetic_boundaries_are_required with data set &quot;production&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-history/tests/Feature/MembershipCustomerHistoryTest.php" line="78" class="Tests\Feature\MembershipCustomerHistoryTest" classname="Tests.Feature.MembershipCustomerHistoryTest" assertions="2" time="0.151288"/>
+      <testcase name="test_current_customer_and_synthetic_boundaries_are_required with data set &quot;disabled&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-history/tests/Feature/MembershipCustomerHistoryTest.php" line="78" class="Tests\Feature\MembershipCustomerHistoryTest" classname="Tests.Feature.MembershipCustomerHistoryTest" assertions="2" time="0.151695"/>
+      <testcase name="test_current_customer_and_synthetic_boundaries_are_required with data set &quot;customer-disabled&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-history/tests/Feature/MembershipCustomerHistoryTest.php" line="78" class="Tests\Feature\MembershipCustomerHistoryTest" classname="Tests.Feature.MembershipCustomerHistoryTest" assertions="2" time="0.181784"/>
+      <testcase name="test_current_customer_and_synthetic_boundaries_are_required with data set &quot;stale&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-history/tests/Feature/MembershipCustomerHistoryTest.php" line="78" class="Tests\Feature\MembershipCustomerHistoryTest" classname="Tests.Feature.MembershipCustomerHistoryTest" assertions="0" time="0.190137">
+        <error type="Illuminate\Database\QueryException">Tests\Feature\MembershipCustomerHistoryTest::test_current_customer_and_synthetic_boundaries_are_required with data set "stale"
+Illuminate\Database\QueryException: SQLSTATE[23000]: Integrity constraint violation: 19 Customer identity is retained (Connection: sqlite, Database: :memory:, SQL: update "customer_accounts" set "access_version" = 2 where "id" = 1)
+
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/vendor/laravel/framework/src/Illuminate/Database/Connection.php:614
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/vendor/laravel/framework/src/Illuminate/Database/Connection.php:566
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4379
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/tests/Feature/MembershipCustomerHistoryTest.php:85</error>
+      </testcase>
+      <testcase name="test_current_customer_and_synthetic_boundaries_are_required with data set &quot;unverified&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-history/tests/Feature/MembershipCustomerHistoryTest.php" line="78" class="Tests\Feature\MembershipCustomerHistoryTest" classname="Tests.Feature.MembershipCustomerHistoryTest" assertions="2" time="0.193862"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\MembershipCustomerHistoryTest::test_authority_withdrawal_at_final_history_query_cannot_escape_primary_proof" tests="4" assertions="12" errors="1" failures="0" skipped="0" time="0.726886">
+      <testcase name="test_authority_withdrawal_at_final_history_query_cannot_escape_primary_proof with data set &quot;account&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-history/tests/Feature/MembershipCustomerHistoryTest.php" line="100" class="Tests\Feature\MembershipCustomerHistoryTest" classname="Tests.Feature.MembershipCustomerHistoryTest" assertions="0" time="0.170530">
+        <error type="PDOException">Tests\Feature\MembershipCustomerHistoryTest::test_authority_withdrawal_at_final_history_query_cannot_escape_primary_proof with data set "account"
+PDOException: SQLSTATE[23000]: Integrity constraint violation: 19 Customer identity is retained
+
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/tests/Feature/MembershipCustomerHistoryTest.php:112
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php:496
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php:326
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php:306
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/vendor/laravel/framework/src/Illuminate/Database/Connection.php:1146
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/vendor/laravel/framework/src/Illuminate/Database/Connection.php:913
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/vendor/laravel/framework/src/Illuminate/Database/Connection.php:823
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/vendor/laravel/framework/src/Illuminate/Database/Connection.php:426
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3631
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3615
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/app/Domain/Memberships/CreditLedger.php:287
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/app/Domain/Memberships/CreditLedger.php:455
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/app/Domain/Memberships/CreditLedger.php:142
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/app/Domain/Memberships/CreditLedger.php:124
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/app/Domain/Memberships/CreditLedger.php:117
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/tests/Feature/MembershipCustomerHistoryTest.php:146
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/tests/Feature/MembershipCustomerHistoryTest.php:118
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/tests/Feature/MembershipCustomerHistoryTest.php:152
+/workspace/scratch/2876616e88c3/VA-Studio-membership-history/tests/Feature/MembershipCustomerHistoryTest.php:118</error>
+      </testcase>
+      <testcase name="test_authority_withdrawal_at_final_history_query_cannot_escape_primary_proof with data set &quot;credentials&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-history/tests/Feature/MembershipCustomerHistoryTest.php" line="100" class="Tests\Feature\MembershipCustomerHistoryTest" classname="Tests.Feature.MembershipCustomerHistoryTest" assertions="4" time="0.173695"/>
+      <testcase name="test_authority_withdrawal_at_final_history_query_cannot_escape_primary_proof with data set &quot;membership switch&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-history/tests/Feature/MembershipCustomerHistoryTest.php" line="100" class="Tests\Feature\MembershipCustomerHistoryTest" classname="Tests.Feature.MembershipCustomerHistoryTest" assertions="4" time="0.196979"/>
+      <testcase name="test_authority_withdrawal_at_final_history_query_cannot_escape_primary_proof with data set &quot;customer switch&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-history/tests/Feature/MembershipCustomerHistoryTest.php" line="100" class="Tests\Feature\MembershipCustomerHistoryTest" classname="Tests.Feature.MembershipCustomerHistoryTest" assertions="4" time="0.185681"/>
+    </testsuite>
+    <testcase name="test_history_clock_crossing_refuses_stale_spendability_and_read_keeps_original_shape" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-history/tests/Feature/MembershipCustomerHistoryTest.php" line="124" class="Tests\Feature\MembershipCustomerHistoryTest" classname="Tests.Feature.MembershipCustomerHistoryTest" assertions="4" time="0.175935"/>
+  </testsuite>
+</testsuites>

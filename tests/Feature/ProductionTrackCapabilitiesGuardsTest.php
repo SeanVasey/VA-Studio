@@ -21,6 +21,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -39,6 +40,25 @@ class ProductionTrackCapabilitiesGuardsTest extends TestCase
         parent::setUp();
         config(['app.key' => 'base64:'.base64_encode(str_repeat('k', 32))]);
         Http::preventStrayRequests();
+    }
+
+    private function useSqliteAdversaryFixture(): void
+    {
+        // PRAGMA and transactional trigger removal are SQLite mechanisms. MySQL
+        // DROP TRIGGER implicitly commits; these adversaries never prove native
+        // rollback. Keep their full assertions on an isolated SQLite connection.
+        $original = DB::getDefaultConnection();
+        config(['database.connections.production_capability_sqlite_adversary' => array_replace(config('database.connections.sqlite'),
+            ['database' => ':memory:', 'url' => null])]);
+        DB::setDefaultConnection('production_capability_sqlite_adversary');
+        Schema::clearResolvedInstance('db.schema');
+        $this->beforeApplicationDestroyed(function () use ($original): void {
+            DB::purge('production_capability_sqlite_adversary');
+            DB::setDefaultConnection($original);
+            Schema::clearResolvedInstance('db.schema');
+        });
+        $this->artisan('migrate:fresh', ['--database' => 'production_capability_sqlite_adversary', '--force' => true])->assertExitCode(0);
+        $this->assertSame('sqlite', DB::getDriverName());
     }
 
     private function reference(string $affirmation): array
@@ -91,6 +111,7 @@ class ProductionTrackCapabilitiesGuardsTest extends TestCase
     #[DataProvider('immutableOperations')]
     public function test_sql_history_cannot_update_delete_or_replace_even_without_recursive_triggers(string $table, string $prefix, string $operation): void
     {
+        $this->useSqliteAdversaryFixture();
         $this->prepared(true, true);
         DB::statement('PRAGMA recursive_triggers = OFF');
         $before = $this->rows();
@@ -128,6 +149,9 @@ class ProductionTrackCapabilitiesGuardsTest extends TestCase
         } catch (LogicException) {
             $this->assertDatabaseCount(CapabilityHistory::CANDIDATES, 1);
         }
+        // Explicit disposable-fixture cleanup, with FK enforcement unchanged.
+        $this->assertDatabaseCount('production_buyer_assent_observations', 0);
+        Schema::drop('production_buyer_assent_observations');
         foreach (['production_track_preparation_packet_lines', 'production_track_preparation_packets'] as $table) {
             $this->assertDatabaseCount($table, 0);
         }
@@ -140,6 +164,9 @@ class ProductionTrackCapabilitiesGuardsTest extends TestCase
 
     public function test_empty_migration_can_rollback_and_recreate_all_three_tables(): void
     {
+        // Explicit disposable-fixture cleanup, with FK enforcement unchanged.
+        $this->assertDatabaseCount('production_buyer_assent_observations', 0);
+        Schema::drop('production_buyer_assent_observations');
         foreach (['production_track_preparation_packet_lines', 'production_track_preparation_packets'] as $table) {
             $this->assertDatabaseCount($table, 0);
         }
@@ -156,6 +183,7 @@ class ProductionTrackCapabilitiesGuardsTest extends TestCase
 
     public function test_adapter_source_edit_is_rolled_back_with_every_adapter_side_effect(): void
     {
+        $this->useSqliteAdversaryFixture();
         [$candidate, $source, $author, , $machine] = $this->prepared(true);
         $before = $this->rows();
         try {
@@ -227,6 +255,7 @@ class ProductionTrackCapabilitiesGuardsTest extends TestCase
 
     public function test_audit_created_callback_source_edit_cannot_escape_post_callback_graph_proof(): void
     {
+        $this->useSqliteAdversaryFixture();
         [$candidate, $source, $author, , $machine] = $this->prepared();
         $machine['version'] = 'synthetic-machine-v2';
         $capture = app(PrepareProductionTrackCapabilities::class)->review($candidate, $source, $machine, $author);
@@ -248,6 +277,48 @@ class ProductionTrackCapabilitiesGuardsTest extends TestCase
         }
     }
 
+    public static function ordinaryDmlCallbacks(): array
+    {
+        return ['adapter' => [false], 'audit created' => [true]];
+    }
+
+    #[DataProvider('ordinaryDmlCallbacks')]
+    public function test_ordinary_dml_callback_evidence_edit_rolls_back_on_the_selected_database(bool $auditCallback): void
+    {
+        [$candidate, $source, $author, , $machine] = $this->prepared(! $auditCallback);
+        $before = $this->rows();
+        $fired = false;
+        $auditId = DB::table('audit_events')->where('subject_type', ProductionTrackCapabilities::class)
+            ->where('action', 'commerce.production_capability.candidate_saved')->sole()->id;
+        $edit = function () use ($auditId, &$fired): void {
+            $changed = DB::table('audit_events')->where('id', $auditId)->update(['action' => 'synthetic.evidence.damage']);
+            $this->assertSame(1, $changed);
+            $fired = true;
+        };
+        try {
+            if ($auditCallback) {
+                $machine['version'] = 'synthetic-machine-v2';
+                $capture = app(PrepareProductionTrackCapabilities::class)->review($candidate, $source, $machine, $author);
+                AuditEvent::created(function (AuditEvent $event) use ($edit): void {
+                    if ($event->subject_type === ProductionTrackCapabilities::class) {
+                        $edit();
+                    }
+                });
+                app(SaveProductionTrackCapabilities::class)->applyReviewed($capture, $author);
+            } else {
+                app(ReadProductionTrackCapabilities::class)->withLockedForAdapter($candidate, PreparationContextV1::forMachine($machine), $author, $edit);
+            }
+            $this->fail('Ordinary DML evidence edit committed.');
+        } catch (ValidationException) {
+            $this->assertTrue($fired);
+            $this->assertSame($before, $this->rows());
+            $this->assertSame(0, DB::transactionLevel());
+        } finally {
+            AuditEvent::flushEventListeners();
+            AuditEvent::clearBootedModels();
+        }
+    }
+
     public static function damagedHistory(): array
     {
         return [
@@ -262,6 +333,7 @@ class ProductionTrackCapabilitiesGuardsTest extends TestCase
     #[DataProvider('damagedHistory')]
     public function test_authenticated_history_refuses_current_and_retained_raw_evidence_damage(string $table, string $trigger, string $field, mixed $value): void
     {
+        $this->useSqliteAdversaryFixture();
         [$candidate, , $author, , $machine] = $this->prepared(true);
         // Simulated broken restore in the disposable fixture only. Operational
         // SQL/model guards remain installed in shipped source.

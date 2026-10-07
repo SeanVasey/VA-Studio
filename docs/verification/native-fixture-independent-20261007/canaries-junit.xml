@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/scratch/2876616e88c3/VA-Studio-native-fixture-independent/phpunit.native-canaries.xml" tests="3" assertions="31" errors="0" failures="0" skipped="0" time="18.700026">
+    <testsuite name="Independent native fixture canaries" tests="3" assertions="31" errors="0" failures="0" skipped="0" time="18.700026">
+      <testsuite name="Tests\Review\NativeFixtureReviewCanaryTest" file="/workspace/scratch/2876616e88c3/VA-Studio-native-fixture-independent/docs/verification/native-fixture-independent-20261007/NativeFixtureReviewCanaryTest.php" tests="3" assertions="31" errors="0" failures="0" skipped="0" time="18.700026">
+        <testcase name="test_review_sqlite_fixture_isolation_preserves_and_restores_primary" file="/workspace/scratch/2876616e88c3/VA-Studio-native-fixture-independent/docs/verification/native-fixture-independent-20261007/NativeFixtureReviewCanaryTest.php" line="33" class="Tests\Review\NativeFixtureReviewCanaryTest" classname="Tests.Review.NativeFixtureReviewCanaryTest" assertions="13" time="7.539214"/>
+        <testsuite name="Tests\Review\NativeFixtureReviewCanaryTest::test_review_native_callback_rollback_keeps_metadata_and_primary" tests="2" assertions="18" errors="0" failures="0" skipped="0" time="11.160812">
+          <testcase name="test_review_native_callback_rollback_keeps_metadata_and_primary with data set &quot;adapter&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-native-fixture-independent/docs/verification/native-fixture-independent-20261007/NativeFixtureReviewCanaryTest.php" line="61" class="Tests\Review\NativeFixtureReviewCanaryTest" classname="Tests.Review.NativeFixtureReviewCanaryTest" assertions="9" time="5.678447"/>
+          <testcase name="test_review_native_callback_rollback_keeps_metadata_and_primary with data set &quot;audit created&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-native-fixture-independent/docs/verification/native-fixture-independent-20261007/NativeFixtureReviewCanaryTest.php" line="61" class="Tests\Review\NativeFixtureReviewCanaryTest" classname="Tests.Review.NativeFixtureReviewCanaryTest" assertions="9" time="5.482365"/>
+        </testsuite>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>
