@@ -213,15 +213,21 @@ class ProductionFeaturePlainConfigurationTest extends TestCase
         }
     }
 
-    public function test_late_environment_resolver_refuses_without_invoking_its_callback(): void
+    public static function resolutions(): array
+    {
+        return [['env'], ['config']];
+    }
+
+    #[DataProvider('resolutions')]
+    public function test_late_configuration_or_environment_resolver_refuses_without_invoking_its_callback(string $target): void
     {
         $owner = $this->featureIdentity('consent_preferences');
         $preferences = new ProductionConsentPreferences;
         $preferences->initialize($owner);
         $command = $this->productionGrant();
         $fired = false;
-        ProductionConsentState::saved(function () use (&$fired): void {
-            app()->beforeResolving('env', function () use (&$fired): void {
+        ProductionConsentState::saved(function () use (&$fired, $target): void {
+            app()->beforeResolving($target, function () use (&$fired): void {
                 $fired = true;
                 config(['production-customer-preferences.grants_enabled' => false]);
             });

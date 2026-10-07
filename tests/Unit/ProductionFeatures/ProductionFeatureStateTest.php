@@ -6,6 +6,7 @@ use App\Domain\Customers\Listening\ListeningException;
 use App\Domain\Customers\ProductionFeatures\Listening\ProductionListeningRollout;
 use App\Domain\Customers\ProductionFeatures\Listening\ProductionListeningState;
 use App\Domain\Customers\ProductionFeatures\Preferences\ProductionConsentPurposePolicy;
+use App\Domain\Customers\ProductionFeatures\ProductionFeatureConfiguration;
 use Tests\Support\ConsentFixtures;
 use Tests\TestCase;
 
@@ -32,7 +33,8 @@ final class ProductionFeatureStateTest extends TestCase
     public function test_production_note_gate_is_distinct_from_any_enabled_test_rollout(): void
     {
         config(['customer-listening.v2_promotion_enabled' => true, 'customer-listening.v2_rollout_review_reference' => 'SYNTHETIC test-only review']);
-        $this->assertFalse(ProductionListeningRollout::capture()['promotionEnabled']);
+        $source = new ProductionFeatureConfiguration;
+        $this->assertFalse(ProductionListeningRollout::capture($source)['promotionEnabled']);
         $rules = new ProductionListeningState;
         $state = $rules->empty(17);
         $state['favorites'] = ['12'];
@@ -44,7 +46,7 @@ final class ProductionFeatureStateTest extends TestCase
             $this->assertSame(503, $e->status);
         }
         config(['production-customer-listening.v2_promotion_enabled' => true, 'production-customer-listening.v2_rollout_review_reference' => 'SYNTHETIC separate stopped production rollout']);
-        $this->assertTrue(ProductionListeningRollout::capture()['promotionEnabled']);
+        $this->assertTrue(ProductionListeningRollout::capture($source)['promotionEnabled']);
         $notes = $rules->apply($state, ['action' => 'set-track-note', 'version' => 1, 'trackId' => '12', 'body' => 'SYNTHETIC private note'], fn () => false, true);
         $this->assertSame(2, $notes['schema']);
         $this->assertSame($notes, $rules->apply($notes, ['action' => 'set-track-note', 'version' => 1, 'trackId' => '12', 'body' => 'SYNTHETIC private note'], fn () => false, false));
@@ -72,16 +74,17 @@ final class ProductionFeatureStateTest extends TestCase
     public function test_production_purpose_starts_unknown_and_cannot_inherit_test_consent_policy(): void
     {
         ConsentFixtures::configure();
-        $policy = ProductionConsentPurposePolicy::capture();
+        $source = new ProductionFeatureConfiguration;
+        $policy = ProductionConsentPurposePolicy::capture($source);
         $this->assertFalse($policy['grantsEnabled']);
         $this->assertNull($policy['configured']);
         config(['production-customer-preferences' => ['grants_enabled' => 'true', 'email_marketing' => ConsentFixtures::policy()]]);
-        $this->assertFalse(ProductionConsentPurposePolicy::capture()['grantsEnabled']);
+        $this->assertFalse(ProductionConsentPurposePolicy::capture($source)['grantsEnabled']);
         config(['production-customer-preferences.grants_enabled' => true]);
-        $configured = ProductionConsentPurposePolicy::capture();
+        $configured = ProductionConsentPurposePolicy::capture($source);
         $this->assertTrue($configured['grantsEnabled']);
         $this->assertSame(ConsentFixtures::policy()['notice'], $configured['configured']['notice']);
         config(['production-customer-preferences.email_marketing.review_reference' => '']);
-        $this->assertFalse(ProductionConsentPurposePolicy::capture()['grantsEnabled']);
+        $this->assertFalse(ProductionConsentPurposePolicy::capture($source)['grantsEnabled']);
     }
 }

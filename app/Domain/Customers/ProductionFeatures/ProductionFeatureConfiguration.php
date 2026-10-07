@@ -96,7 +96,7 @@ final readonly class ProductionFeatureConfiguration
         }
         foreach (['aliases', 'beforeResolvingCallbacks', 'resolvingCallbacks', 'afterResolvingCallbacks', 'extenders'] as $property) {
             $values = (new ReflectionProperty(Container::class, $property))->getValue($this->application);
-            if (! is_array($values) || isset($values['env'])) {
+            if (! is_array($values) || isset($values['env']) || isset($values['config'])) {
                 throw new ProductionFeatureException;
             }
         }

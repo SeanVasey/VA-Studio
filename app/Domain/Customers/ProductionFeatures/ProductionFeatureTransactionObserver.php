@@ -67,10 +67,12 @@ final class ProductionFeatureTransactionObserver implements Dispatcher
 
     public function dispatch($event, $payload = [], $halt = false)
     {
-        $outerBeginning = $event instanceof TransactionBeginning && $event->connection === $this->connection
+        $outerBeginning = ! $this->proved && $event instanceof TransactionBeginning && $event->connection === $this->connection
             && $this->connection->transactionLevel() === 1;
-        $outerCommitting = $event instanceof TransactionCommitting && $event->connection === $this->connection
+        $outerCommitting = ! $this->proved && $event instanceof TransactionCommitting && $event->connection === $this->connection
             && $this->connection->transactionLevel() === 1;
+        // Later regular afterCommit/committed delegates may open their own transactions.
+        // They are not our original frame; the subsequent read-only proof assesses their effects.
         if ($outerBeginning) {
             $this->admitBinding();
             if ($this->frame !== null || $this->connection->getRawPdo() !== $this->primary) {
