@@ -72,7 +72,9 @@ php artisan down   # then stop the queue workers and the scheduler; confirm no p
 #    version and date header so the step 4 diff compares content only. Keep binary data exact.
 mysqldump --defaults-extra-file=<OPTION_FILE> --single-transaction --quick \
   --routines --triggers --events --hex-blob --no-tablespaces --set-gtid-purged=OFF \
-  --skip-dump-date --skip-comments --databases <DATABASE> > <BACKUP_DIR>/database.sql
+  --skip-dump-date --skip-comments --databases <DATABASE> > <BACKUP_DIR>/database.sql || exit 1
+#    A nonzero mysqldump (for example an unreadable routine or event) leaves a partial file;
+#    it must never become the baseline that step 4 compares against.
 sha256sum <BACKUP_DIR>/database.sql > <BACKUP_DIR>/database.sql.sha256
 
 # 2. Private files with a manifest, taken while the application is still down (step 0b).
@@ -86,7 +88,12 @@ sha256sum <BACKUP_DIR>/database.sql > <BACKUP_DIR>/database.sql.sha256
 (cd <PRIVATE_ROOT> && find . -type f -print0 | sort -z | xargs -0 -r sha256sum) > <BACKUP_DIR>/private.sha256   # -r: an empty tree gives an empty manifest, not a hash of stdin
 tar --create --file=<BACKUP_DIR>/private.tar --directory=<PRIVATE_ROOT> --numeric-owner .
 sha256sum <BACKUP_DIR>/private.tar > <BACKUP_DIR>/private.tar.sha256
-php artisan up   # the live application resumes; everything below touches only the isolated targets
+php artisan up   # lifts maintenance mode only; it does not restart anything stopped in step 0b
+# Restart every writer stopped in step 0b and verify it is back before treating the live
+# installation as resumed (the queue workers carry payment, contract and media work; the
+# scheduler carries recovery jobs). Service names are the host's; the private-server
+# runbook names them. Everything below touches only the isolated targets.
+systemctl start <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> && systemctl is-active <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> || exit 1
 
 # 3. Restore into the isolated targets only. The dump is loaded unchanged (its CREATE DATABASE
 #    and USE name <DATABASE>), so no stored value can be rewritten by a rename.

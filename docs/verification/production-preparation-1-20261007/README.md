@@ -314,6 +314,14 @@ persistent private storage attached afterwards from `<PERSISTENT_ROOT>` — the 
 clean-tree check had rejected every reused checkout holding `vendor/`, `public/build/` or
 real private assets.
 
+Codex's ninth pass (P2 ×4, docs): the backup procedure now fails on a nonzero `mysqldump`
+and restarts (and verifies) the workers and scheduler after `php artisan up`; the packet
+attaches persistent private storage as a bind mount instead of a symlink (the runtime
+preflight's `canonical()` rejects symlinks and requires mode 0700) and installs the validated
+`<RUNTIME_ENV>` as the release's `.env` (0600) before any Artisan, web or worker process.
+Rehearsed: the inode check passes on a bind mount and fails on a symlink; `install` + `cmp`
+pass on a synthetic file. Still documented, not executed.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex

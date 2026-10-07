@@ -113,16 +113,26 @@ test "$(git rev-parse HEAD^{tree})" = "$(git write-tree)" || { echo 'checkout di
 composer install --no-dev --no-interaction --classmap-authoritative   # composer.lock is frozen
 npm ci && npm run build
 # Persistent private storage is attached after the source checks, never copied into the
-# release. The checkout's storage/app/private holds only the tracked .gitignore; it is
-# replaced by a link to the persistent root (the disk root is storage_path('app/private'),
-# config/filesystems.php, and has no environment override).
-rm -r storage/app/private && ln -s <PERSISTENT_ROOT>/private storage/app/private
-test "$(readlink storage/app/private)" = "<PERSISTENT_ROOT>/private" || { echo 'private storage not attached'; exit 1; }
+# release. The disk root is storage_path('app/private') (config/filesystems.php, no
+# environment override). It is attached as a bind mount, not a symlink: the runtime
+# preflight's canonical-path check rejects a symlink at any component. The persistent
+# directory is owned by the application user at mode 0700, which the preflight also checks.
+# As root, once per release (and persisted in /etc/fstab so it survives a reboot):
+#   mount --bind <PERSISTENT_ROOT>/private <RELEASES_DIR>/<SHA>/storage/app/private
+#   echo '<PERSISTENT_ROOT>/private <RELEASES_DIR>/<SHA>/storage/app/private none bind 0 0' >> /etc/fstab
+test "$(stat -c %d:%i storage/app/private)" = "$(stat -c %d:%i <PERSISTENT_ROOT>/private)" \
+  && [ ! -L storage/app/private ] || { echo 'private storage not attached'; exit 1; }
 
 # Configuration lives outside the repository, mode 0600, assembled from the two templates:
 #   ops/private-server/env.example       (host baseline; fill host inputs only)
 #   ops/production/env.production.example (payment families; leave every flag false, every secret blank)
 php scripts/ops/private-server-preflight.php --env-file <RUNTIME_ENV> --runtime
+# The preflight only parses <RUNTIME_ENV>; nothing has loaded it yet. Laravel reads .env from
+# the release root, which is gitignored and outside the tree checks above, so install the
+# validated file there (0600, application user) before any Artisan, web or worker process runs.
+# The web and worker units run from <RELEASES_DIR>/<SHA> and therefore read the same file;
+# a unit may instead carry EnvironmentFile=<RUNTIME_ENV>, but never both.
+install -m 0600 -o <APP_USER> -g <APP_USER> <RUNTIME_ENV> .env && cmp -s <RUNTIME_ENV> .env || { echo '.env not installed'; exit 1; }
 
 # Back up first (docs/ops/backup-restore-proof.md, MySQL procedure), then migrate.
 php artisan migrate:status
