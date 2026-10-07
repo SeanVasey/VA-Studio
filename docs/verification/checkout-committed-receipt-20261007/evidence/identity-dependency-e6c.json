@@ -1,0 +1,11 @@
+{
+  "upstream_commit": "e6c02b90719923bc4ba435f86399b077980c1ddc",
+  "replaces": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+  "status": "unreviewed narrow historical receipt successor; no financial acceptance",
+  "files": [
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommittedReceipt.php",
+      "sha256": "82a2b5217f57da35eb90e099b4d26240c4c40082fa18977356de25b4c862cd78"
+    }
+  ]
+}

@@ -3,13 +3,30 @@
 namespace App\Domain\Commerce\ProductionPolicy;
 
 use App\Support\CanonicalJson;
+use LogicException;
 use PDO;
+use Pdo\Mysql;
+use Pdo\Sqlite;
+use PDOStatement;
+use ReflectionClass;
 use Throwable;
 
 /** Fixed internal SQL, bound values, current primary reads and no Laravel query callbacks. */
 final class CurrentRows
 {
+    private bool $committedReadOnly = false;
+
     public function __construct(private PDO $primary, private string $driver) {}
+
+    /** Internal frozen-receipt reads only; this mode never opens a transaction or acquires row locks. */
+    public static function committedReadOnly(PDO $primary, string $driver): self
+    {
+        self::requirePlainCommitted($primary, $driver);
+        $reader = new self($primary, $driver);
+        $reader->committedReadOnly = true;
+
+        return $reader;
+    }
 
     public function identityPrimary(): PDO
     {
@@ -23,12 +40,43 @@ final class CurrentRows
 
     public function rows(string $table, string $where, array $bindings, ?int $limit = null): array
     {
+        if ($this->committedReadOnly) {
+            return $this->nonlockingRows($table, $where, $bindings, $limit);
+        }
+
         $sql = 'SELECT * FROM '.$table.' WHERE '.$where.' ORDER BY id'.($limit === null ? '' : ' LIMIT '.$limit)
             .($this->driver === 'mysql' ? ' FOR UPDATE' : '');
         $statement = $this->primary->prepare($sql);
         $statement->execute($bindings);
 
         return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    private function nonlockingRows(string $table, string $where, array $bindings, ?int $limit): array
+    {
+        self::requirePlainCommitted($this->primary, $this->driver);
+        $sql = 'SELECT * FROM '.$table.' WHERE '.$where.' ORDER BY id'.($limit === null ? '' : ' LIMIT '.$limit);
+        $statement = $this->primary->prepare($sql);
+        $statement->execute($bindings);
+        self::requirePlainCommitted($this->primary, $this->driver);
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+        self::requirePlainCommitted($this->primary, $this->driver);
+
+        return $rows;
+    }
+
+    private static function requirePlainCommitted(PDO $primary, string $driver): void
+    {
+        $classes = match ($driver) {
+            'sqlite' => [PDO::class, Sqlite::class],
+            'mysql' => [PDO::class, Mysql::class],
+            default => [],
+        };
+        if (! in_array($primary::class, $classes, true) || ! (new ReflectionClass($primary))->isInternal()
+            || $primary->getAttribute(PDO::ATTR_DRIVER_NAME) !== $driver || $primary->inTransaction()
+            || $primary->getAttribute(PDO::ATTR_STATEMENT_CLASS) !== [PDOStatement::class]) {
+            throw new LogicException('committed_read_frame');
+        }
     }
 
     public function one(string $table, int $id): array

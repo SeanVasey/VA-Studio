@@ -1,0 +1,41 @@
+{
+  "source_sha": "2ec1854c2b3606250e59b157f06703151318af0a",
+  "source_tree": "02ca17f1207f52f4b04f16f4e2b11fc0a0663ad9",
+  "base_sha": "90d09a5363c78eb54531526916008f197d4dcb8d",
+  "identity_witness": "e8f744163600bb394e3f09c8c7f838f9fc62c885",
+  "files": [
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CommittedReadContext.php",
+      "sha256": "99f00ee5251072fa9c257e96bb65e2370e40806f85dc7885523e1f4e9e99aabd"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityOriginalCommitWitness.php",
+      "sha256": "1bc64f515cd6707b5e3dd9577aa98ac3aa32fc8b731d87654eb484caf1dc65fc"
+    },
+    {
+      "path": "tests/Feature/ProductionCheckoutReceiptParentTest.php",
+      "sha256": "b92baf4a4a254efd0581067cf02844e91fa9c4745dcd3b7e661d67375191fbe4"
+    }
+  ],
+  "environment": "SQLite locked local dependencies",
+  "selections": [
+    [
+      "vendor/bin/phpunit",
+      "tests/Feature/ProductionCheckoutReceiptParentTest.php",
+      "tests/Feature/ProductionCheckoutCommittedReceiptTest.php",
+      "tests/Feature/ProductionCheckoutSourceTransactionTest.php",
+      "--colors=never",
+      "--log-junit",
+      "docs/verification/checkout-receipt-parent-repair-20261007/evidence/frozen-sqlite-affected.xml"
+    ],
+    [
+      "vendor/bin/phpunit",
+      "docs/verification/checkout-receipt-parent-repair-20261007/CheckoutReceiptArrayParentCanaryTest.php",
+      "--filter",
+      "test_plain_receipt_rejects_late_app_arrayobject_parent",
+      "--colors=never",
+      "--log-junit",
+      "docs/verification/checkout-receipt-parent-repair-20261007/evidence/frozen-sqlite-unchanged-canary.xml"
+    ]
+  ]
+}

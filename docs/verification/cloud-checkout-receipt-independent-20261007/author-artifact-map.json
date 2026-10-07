@@ -1,0 +1,155 @@
+{
+  "source_sha": "2ec1854c2b3606250e59b157f06703151318af0a",
+  "files": [
+    {
+      "path": "CheckoutReceiptArrayParentCanaryTest.php",
+      "bytes": 3792,
+      "sha256": "db34517b2eb744aa74abcc77bb288a3e75c40b2edc9edfee9db6aee3cc553472"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2980,
+      "sha256": "1597c12280aeee16be3e149a78822b701c43d74a646afc7aeecf83b2a0d6d66b"
+    },
+    {
+      "path": "evidence/checkout-receipt-parent-affected-pilot.txt",
+      "bytes": 97,
+      "sha256": "002c5e5c704d2c25ffe95294227095bdfaec8627cd69d18880ad26eab84844cf"
+    },
+    {
+      "path": "evidence/checkout-receipt-parent-affected-pilot.xml",
+      "bytes": 12422,
+      "sha256": "ca0b8325411f8b3d8682cfa42aece1b5cc7c5656e57767293f514356b5807326"
+    },
+    {
+      "path": "evidence/checkout-receipt-parent-original-red.txt",
+      "bytes": 553,
+      "sha256": "34fbbb7c2a789d26ebfef96ba1ca3ace845e7c9badc4ef6aff778cbe053d47a3"
+    },
+    {
+      "path": "evidence/checkout-receipt-parent-original-red.xml",
+      "bytes": 1298,
+      "sha256": "0839d62410cbf60b5dca519df2089538d0b3983d308916d0bbea8044bd09a451"
+    },
+    {
+      "path": "evidence/checkout-receipt-parent-repaired-canary.txt",
+      "bytes": 92,
+      "sha256": "b7450d40feecd1a1ee264c33317cd853e843b23b4ce8e08da1de54837186b524"
+    },
+    {
+      "path": "evidence/checkout-receipt-parent-repaired-canary.xml",
+      "bytes": 810,
+      "sha256": "298d5561afc968f4ea0e245a68a119c0b0b7e96d45327db01e769dbac203c9ed"
+    },
+    {
+      "path": "evidence/frozen-native-affected.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/frozen-native-affected.txt",
+      "bytes": 95,
+      "sha256": "47b084be72586215291b55d0e35371e9d3dc9de223269a101a627a53f97e168b"
+    },
+    {
+      "path": "evidence/frozen-native-affected.xml",
+      "bytes": 3794,
+      "sha256": "ab44776ccb4c39827ae17a86257c4af6e0f4b376058eb92ca982544c8ae2763f"
+    },
+    {
+      "path": "evidence/frozen-native-unchanged-canary.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/frozen-native-unchanged-canary.txt",
+      "bytes": 93,
+      "sha256": "fff8dccb8260c4a76f4b27969936658aff04e0ca88f8bb7b90aa9134ffe9598b"
+    },
+    {
+      "path": "evidence/frozen-native-unchanged-canary.xml",
+      "bytes": 812,
+      "sha256": "0bf50477733602b4b20085885661a014fb55e6a8a08925246c72fdeab7a7e1e0"
+    },
+    {
+      "path": "evidence/frozen-native.command.json",
+      "bytes": 1917,
+      "sha256": "e5008f9642f77be41dc9b2527290a0af30bdfb749811f4d6cbfbfa9739507305"
+    },
+    {
+      "path": "evidence/frozen-source-manifest.json",
+      "bytes": 796,
+      "sha256": "12e771584bbfa2f7772dbd445b6477cc5747a9b8e2fa676ec8b6b08bfd7a7c6f"
+    },
+    {
+      "path": "evidence/frozen-sqlite-affected.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/frozen-sqlite-affected.txt",
+      "bytes": 97,
+      "sha256": "5204f2bb11bbfcb7c92497a084a21f1b930468bcfd35c08a16cbfa3f9c57f479"
+    },
+    {
+      "path": "evidence/frozen-sqlite-affected.xml",
+      "bytes": 12424,
+      "sha256": "34d6901dbabed9c1a9f384f71a475b58d57568867cfed0c50a05565acecedfa4"
+    },
+    {
+      "path": "evidence/frozen-sqlite-unchanged-canary.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/frozen-sqlite-unchanged-canary.txt",
+      "bytes": 92,
+      "sha256": "1ed96c5dd7f8d184aaf987b34b82df2c93ef3674752c826452952d05bd6f5a4d"
+    },
+    {
+      "path": "evidence/frozen-sqlite-unchanged-canary.xml",
+      "bytes": 810,
+      "sha256": "60f591a39ac1cb4f9a9744564210e2075f61017b3844378eef3cbf95a19ba3dd"
+    },
+    {
+      "path": "evidence/frozen-sqlite.command.json",
+      "bytes": 1641,
+      "sha256": "5f2314ed9e61df7d81123d88a9a94a22ca7e4cd312880d069f6837b3c38200c2"
+    },
+    {
+      "path": "evidence/full-runtime-source-map.json",
+      "bytes": 15203,
+      "sha256": "91a2329dfc04b32f6b50e8a81e6e932343f3b8d19440a89723872a701283735c"
+    },
+    {
+      "path": "evidence/identity-dependency-e8f.json",
+      "bytes": 340,
+      "sha256": "583063df26168ee2334c7daccad32afbfc6a7318a5a9f00516a0e341895e18e6"
+    },
+    {
+      "path": "evidence/junit-reconciliation.json",
+      "bytes": 855,
+      "sha256": "c2daf07bd6a932639f661f41d8b38164ab70f91c1490e4cf5df3f040b2915417"
+    },
+    {
+      "path": "evidence/original-observed-parent.json",
+      "bytes": 101,
+      "sha256": "faad0b10607281ccfef00c391bcf265468c7b3a0e31fcbb031c009eb9e55768c"
+    },
+    {
+      "path": "evidence/original-red.command.json",
+      "bytes": 805,
+      "sha256": "9b32027c2ea98faa93745af6a03db8777121db3a0bc2dbd72c69f87e9871bfee"
+    },
+    {
+      "path": "evidence/repaired-observed-parent-pilot.json",
+      "bytes": 117,
+      "sha256": "45b9e1df5af3b473c46222dc9421511fcd2b37f05e7823b9f482a2a83b105a3d"
+    },
+    {
+      "path": "observed-parent.json",
+      "bytes": 117,
+      "sha256": "45b9e1df5af3b473c46222dc9421511fcd2b37f05e7823b9f482a2a83b105a3d"
+    }
+  ]
+}

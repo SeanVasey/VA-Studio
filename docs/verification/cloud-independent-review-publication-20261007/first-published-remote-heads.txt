@@ -1,0 +1,9 @@
+f4d32cdd8d7e3d3cea08e2d422cc204ef29acc33	refs/heads/codex/checkout-receipt-independent-20261007
+209eaf438e1cc7c3ccd9a84b2ad4048aa86b9fe6	refs/heads/codex/checkout-terminal-policy-independent-20261007
+34cd180037874a21a1a4b511f0d9b038511493ed	refs/heads/codex/identity-smtp-historical-composition-independent-20261007
+8d3207a042babc90048e49c671d3f57358dbc863	refs/heads/codex/membership-callback-independent-20261007
+8fdacaf255caf50f1433eb21f88d1d0aa0d8df3f	refs/heads/codex/membership-preparation-independent-20261007
+5d53585fb3ea65c8a6f4162d8e71bd043caea538	refs/heads/codex/review-recovery-identity-adapters-5d53585f-20261007
+b24ed8142248d6794858b4a3619c43178dfe098b	refs/heads/codex/review-recovery-identity-historical-b24ed814-20261007
+5b1a4abeba878723e180a516b3a68cde46141754	refs/heads/codex/review-recovery-smtp-binding-5b1a4abe-20261007
+67c0f68f3862c79be1753ceae16399a1708fd434	refs/heads/codex/support-retry-header-independent-20261007

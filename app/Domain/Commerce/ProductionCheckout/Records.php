@@ -33,6 +33,13 @@ final readonly class Records
         return new self(null, $reader->identityDriver(), $reader);
     }
 
+    /** Plain postcommit comparison; caller's opaque receipt supplies original commit/frame admission. */
+    public static function committed(CurrentRows $reader): self
+    {
+        return new self(null, $reader->identityDriver(),
+            CurrentRows::committedReadOnly($reader->identityPrimary(), $reader->identityDriver()));
+    }
+
     public function provePrimary(): void
     {
         PrimaryBoundary::prove($this->primary ?? $this->current->identityPrimary(), $this->driver);

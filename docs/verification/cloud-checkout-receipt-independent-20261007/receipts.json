@@ -1,0 +1,105 @@
+{
+  "executable": "2ec1854c2b3606250e59b157f06703151318af0a",
+  "tree": "02ca17f1207f52f4b04f16f4e2b11fc0a0663ad9",
+  "documentation_base": "6d4736b685a69916cde87cfc8d7d4617a8073fce",
+  "source_scope": "Whole NEW original producer90 receipt/observer/context/admission/committed-reader contract; not only the2ec parent guard delta",
+  "own_results": {
+    "sqlite": {
+      "testsuites": [
+        {
+          "name": "/workspace/VA-Studio-checkout-receipt-independent/docs/verification/cloud-checkout-receipt-independent-20261007/sqlite-selection.xml",
+          "tests": "11",
+          "assertions": "57",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "time": "31.045920"
+        }
+      ],
+      "testcases": [
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutCommittedReceiptTest",
+          "name": "test_two_one_use_siblings_close_same_original_commit_and_preserve_callback_consumer_writes"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutCommittedReceiptTest",
+          "name": "test_disabled_receipt_capability_refuses_before_identity_receipt_mint"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutCommittedReceiptTest",
+          "name": "test_typed_consumer_admission_runs_after_late_delegate_and_refuses_physical_commit_on_buyer_withdrawal"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutCommittedReceiptTest",
+          "name": "test_same_typed_admission_accepts_two_siblings_and_preserves_new_consumer_writes"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutCommittedReceiptTest",
+          "name": "test_sibling_cannot_remove_original_typed_consumer_admission"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutCommittedReceiptTest",
+          "name": "test_late_committing_direct_commit_reopen_cannot_rebind_original_receipt"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutReceiptParentTest",
+          "name": "test_plain_receipt_refuses_late_configuration_parent_before_application_offsets with data set #0"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutReceiptParentTest",
+          "name": "test_plain_receipt_refuses_late_configuration_parent_before_application_offsets with data set #1"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutReceiptParentTest",
+          "name": "test_plain_receipt_refuses_late_configuration_parent_before_application_offsets with data set #2"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutReceiptParentTest",
+          "name": "test_plain_receipt_refuses_late_configuration_parent_before_application_offsets with data set #3"
+        },
+        {
+          "class": "Tests\\Canary\\CheckoutReceiptArrayParentCanaryTest",
+          "name": "test_plain_receipt_rejects_late_app_arrayobject_parent_without_executing_offsets"
+        }
+      ]
+    },
+    "native": {
+      "testsuites": [
+        {
+          "name": "/workspace/VA-Studio-checkout-receipt-independent/docs/verification/cloud-checkout-receipt-independent-20261007/native-selection.xml",
+          "tests": "2",
+          "assertions": "12",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "time": "130.786206"
+        }
+      ],
+      "testcases": [
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutCommittedReceiptTest",
+          "name": "test_typed_consumer_admission_runs_after_late_delegate_and_refuses_physical_commit_on_buyer_withdrawal"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutCommittedReceiptTest",
+          "name": "test_same_typed_admission_accepts_two_siblings_and_preserves_new_consumer_writes"
+        }
+      ]
+    }
+  },
+  "own_native_environment": "Existing isolated service_review Oracle MySQL8.0.46-0ubuntu0.24.04.4 daemon; private environment file and loopback TLS SMTP fixture only",
+  "author_current_scope": {
+    "sqlite": "27/145 plus unchanged original1/5",
+    "native": "7/38 plus unchanged original1/5",
+    "historical_native90": "33/157 belongs old90 and unchanged paths only; not current2ec receiptContext acceptance"
+  },
+  "original_parent_canary_sha256": "db34517b2eb744aa74abcc77bb288a3e75c40b2edc9edfee9db6aee3cc553472",
+  "verified_author_counts": {
+    "runtime": 75,
+    "repair_artifacts": 30
+  },
+  "separate_holds": [
+    "Fresh checkout terminal/physical write admission defect on6e/4cf remains held; receipt proof does not approve NEW command writes",
+    "No downstream paid/member grant capsule, actual authority facts, tax/provider readiness, shared registration, real payment/mail or release acceptance"
+  ]
+}
