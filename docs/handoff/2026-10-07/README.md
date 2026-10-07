@@ -8,6 +8,24 @@ full final verification is not implied.
 
 ## Start here
 
+The [ready-to-use continuation prompt](CLAUDE-RESUME.md) can be pasted into Claude
+Code. The [branch inventory](BRANCHES.md) and [machine ledger](remote-branches.json)
+pin the published source. The owner packets below are byte-identical snapshots;
+their [source map](owners/source-map.json) records original commits and hashes.
+
+- [Checkout, source receipts and tax/payment preparation](owners/checkout.md)
+- [Paid delivery, native operations and reconciliation](owners/paid-delivery-native-operations.md)
+- [Account features, production suppression and email](owners/account-features-email.md)
+- [Memberships, member originals, billing and host operations](owners/memberships-operations.md)
+- [Free identity, free256 and content migration](owners/free-content.md)
+- [Independent source-review decisions](owners/independent-review.md)
+
+Read the latest central branch/review ledger for later approvals; original owner
+packets retain their point-in-time wording. In particular, the Source2ec contract
+has independent approvalc0cc, while fresh checkoutc6 and paid252 do not. The late
+identity-frame cleanup correction5053 is a separately reviewed derivative of
+main38. Preserve it when composing older dependency snapshots.
+
 1. Read root `AGENTS.md`, this handoff and its final branch inventory. Fetch
    origin without pruning, inspect local changes and reconcile active owners
    before editing. Preserve unrelated files and historical branches.

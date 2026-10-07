@@ -1,0 +1,38 @@
+{
+  "repository": "https://github.com/SeanVasey/VA-Studio",
+  "final_exact_remote_heads": {
+    "refs/heads/codex/checkout-receipt-independent-20261007": "b76f77526956747696b649c4be511ff9cd6e5859",
+    "refs/heads/codex/checkout-terminal-policy-independent-20261007": "209eaf438e1cc7c3ccd9a84b2ad4048aa86b9fe6",
+    "refs/heads/codex/identity-frame-cleanup-independent-20261007": "09c576977784ca8450fd4a8acac9d7c7c4f38ea6",
+    "refs/heads/codex/identity-smtp-historical-composition-independent-20261007": "34cd180037874a21a1a4b511f0d9b038511493ed",
+    "refs/heads/codex/membership-callback-independent-20261007": "8d3207a042babc90048e49c671d3f57358dbc863",
+    "refs/heads/codex/membership-preparation-independent-20261007": "8fdacaf255caf50f1433eb21f88d1d0aa0d8df3f",
+    "refs/heads/codex/review-recovery-identity-adapters-5d53585f-20261007": "5d53585fb3ea65c8a6f4162d8e71bd043caea538",
+    "refs/heads/codex/review-recovery-identity-historical-b24ed814-20261007": "b24ed8142248d6794858b4a3619c43178dfe098b",
+    "refs/heads/codex/review-recovery-smtp-binding-5b1a4abe-20261007": "5b1a4abeba878723e180a516b3a68cde46141754",
+    "refs/heads/codex/support-retry-header-independent-20261007": "67c0f68f3862c79be1753ceae16399a1708fd434"
+  },
+  "decision_commits": {
+    "source_contract": "c0cc80f79a3b2ef57bfff6829cc7743bb382feb4",
+    "membership_preparation": "8fdacaf255caf50f1433eb21f88d1d0aa0d8df3f",
+    "membership_callback": "8d3207a042babc90048e49c671d3f57358dbc863",
+    "support_projection": "67c0f68f3862c79be1753ceae16399a1708fd434",
+    "smtp_historical_composition": "34cd180037874a21a1a4b511f0d9b038511493ed",
+    "original_checkout_policy_hold": "209eaf438e1cc7c3ccd9a84b2ad4048aa86b9fe6",
+    "identity_frame_cleanup": "09c576977784ca8450fd4a8acac9d7c7c4f38ea6"
+  },
+  "handoff_commit": "b76f77526956747696b649c4be511ff9cd6e5859",
+  "publication_receipt_commit": "0b64682f02ca7651c326893a630a6cd92d161a85",
+  "handoff_path": "docs/verification/cloud-independent-review-handoff-20261007.md",
+  "handoff_sha256": "695b9450e999b8ecca26a778d34d0d4f83ab4ff7fbfcc6a326cd6d0dc220de1d",
+  "scope": "Finished critical PR38 cleanup followup and prior current batches; all 10 own remote heads exact-verified. Updated handoff is documentation only on the original Source review branch; no root product head merged into it. No more implementation; root owns final composition/publication. Unresolved commerce/readiness handed off.",
+  "prior_handoff_commit": "f4d32cdd8d7e3d3cea08e2d422cc204ef29acc33",
+  "prior_handoff_sha256": "4a48b6e4ea5558aa50527b0a99b4de5449832522fb89fc46bb71a1c9d59a586b",
+  "frame_cleanup_executable": "5053af53e85ab49aea2a2a6eb85d66d821f49e95",
+  "frame_cleanup_artifacts": 28,
+  "frame_cleanup_own_results": [
+    "SQLite final1/6 zero failures/errors/skips",
+    "SQLite unchanged archived original1/5 zero failures/errors/skips",
+    "Pint2 pass"
+  ]
+}

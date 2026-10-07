@@ -1,8 +1,23 @@
 # Completion execution plan
 
-## Current cloud execution — October 7, 2026 UTC
+## Current cloud handoff — October 7, 2026 UTC
 
-Verified mainef44494 includes PRs25–36. The [current checkpoint](verification/cloud-primary-checkpoint-20261007.md) records merged bounded Discovery crawl, reviewed Support runtime/test lifecycle/shared composition, reviewed SMTP/suppression and independently approved historical identitye8. The new free capsule, Checkout physical write authority and Paid source/consumer successors remain held until their concrete callback/commit repairs pass review. NEW253/254/255/256/257/258 must continue through operative consumer/fulfilment paths, followed by all other agreed personal-store requirements. Final test lifecycle/engine coverage and exact native-only SQLite census are implementation work with unchanged CI/security/protection controls. Reserve consolidated exact-SHA Foundation for the full integrated candidate; six accepted/34 open groups and103 mappings remain unchanged.
+Sean requested completion/publication of current development batches and handoff of
+remaining implementation to Claude Code. The [detailed handoff](handoff/2026-10-07/README.md)
+and frozen agent queue record exact source, remote branches, approvals, genuine
+failures, commands and downstream work. Main through38 isaff987410d8a843c0b6fa336e5edcbc61e0911b5;
+current final publication composes approved legacy251 suppression and the narrow
+identity foreign-transaction cleanup correction. Earlier dated counts/statuses
+below retain their original source and are not current worker claims.
+
+Source2ec producer and historicale8/freeff0 identity components have independent
+approval; fresh checkout, paid252, account features253, suppression254, tax255,
+operativefree256/membership257/member258/Billing259 and all other agreed products,
+content, administration, migration and host preparation retain explicit work.
+Six accepted/34 open groups and103 mappings are unchanged. Final test fixture/
+dual-engine/native-only SQLite census normalization and one complete exact-SHA
+Foundation/native8.4/browser acceptance are future implementation/verification,
+with unchanged CI/security/protection controls. No live activation is claimed.
 
 ## Historical October6 execution
 
