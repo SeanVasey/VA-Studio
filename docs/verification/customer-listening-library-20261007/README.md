@@ -1,5 +1,9 @@
 # Private customer saved tracks and playlists
 
+Historical leaf evidence: the callback proof and migration behavior below are
+superseded by [the primary-evidence repair](../customer-listening-repair-20261007/README.md).
+The 66-test result applies only to `d540f60a...`, not the repaired source.
+
 This T32/WP-11 child persists favorites and named ordered playlists for an
 authorized synthetic customer account. Customers can create, rename and delete
 playlists, add/remove tracks, and move tracks earlier/later. Saved references
