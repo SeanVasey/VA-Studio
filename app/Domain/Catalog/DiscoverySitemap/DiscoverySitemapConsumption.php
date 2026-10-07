@@ -14,18 +14,35 @@ final class DiscoverySitemapConsumption
     private ?string $marker = null;
 
     private function __construct(private readonly SitemapStore $store, private readonly array $records,
-        private readonly ?CandidateWindow $window, private readonly string $origin) {}
+        private readonly ?CandidateWindow $window, private readonly string $origin, private readonly PDO $preparedPrimary) {}
 
     public static function prepare(SitemapStore $store, string $publicId, int $slot): self
     {
+        $primary = DB::connection()->getPdo();
         $records = $store->readForConsumption($publicId, $slot);
+        SitemapException::require(DB::connection()->getPdo() === $primary && DB::transactionLevel() === 0 && ! $primary->inTransaction(), 'changed_transaction');
 
-        return new self($store, $records, $records['candidate'], $records['origin']);
+        return new self($store, $records, $records['candidate'], $records['origin'], $primary);
+    }
+
+    /** Bounded locator only; authority is freshly captured and closed against these immutable records later. */
+    public function idsForFreshCapture(): array
+    {
+        SitemapException::require(DB::connection()->getPdo() === $this->preparedPrimary && DB::transactionLevel() === 0 && ! $this->preparedPrimary->inTransaction(), 'changed_connection');
+
+        return $this->window?->ids() ?? [];
+    }
+
+    public function assertAfterCommit(PDO $primary): void
+    {
+        SitemapException::require($this->primary === $primary && $this->marker !== null && DB::transactionLevel() === 0
+            && DB::connection()->getPdo() === $primary && ! $primary->inTransaction(), 'changed_transaction');
+        $this->store->assertConsumptionCurrent($primary, $this->records);
     }
 
     public function candidateIds(PDO $primary): array
     {
-        SitemapException::require($this->primary === null && DB::transactionLevel() === 1 && DB::connection()->getPdo() === $primary && $primary->inTransaction(), 'changed_transaction');
+        SitemapException::require($this->primary === null && $this->preparedPrimary === $primary && DB::transactionLevel() === 1 && DB::connection()->getPdo() === $primary && $primary->inTransaction(), 'changed_transaction');
         $this->primary = $primary;
         $this->marker = 'dsm_consume_'.bin2hex(random_bytes(12));
         $primary->exec('SAVEPOINT '.$this->marker);

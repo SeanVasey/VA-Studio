@@ -2,6 +2,11 @@
 
 namespace App\Domain\Catalog\Discovery;
 
+use App\Domain\Catalog\DiscoverySitemap\CandidateBuildRequest;
+use App\Domain\Catalog\DiscoverySitemap\CandidateWindow;
+use App\Domain\Catalog\DiscoverySitemap\DiscoverySitemapConsumption;
+use App\Domain\Catalog\DiscoverySitemap\SitemapConfiguration;
+use App\Domain\Catalog\DiscoverySitemap\SitemapException;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublicationReadiness;
 use App\Domain\Commerce\Inventory\SelectionInventory;
@@ -54,6 +59,99 @@ final class CurrentEligibleTrackSnapshot
         }
 
         return $current->paths();
+    }
+
+    /** Structural, complete next candidate partition; no publication eligibility or retained page decision. */
+    public function captureIdentities(CandidateBuildRequest $request): CandidateWindow
+    {
+        SitemapConfiguration::assertEnabled();
+        $connection = DB::connection();
+        SitemapException::require($connection->transactionLevel() === 0 && $connection->getTablePrefix() === '', 'changed_transaction');
+        $pdo = $connection->getPdo();
+        $driver = $connection->getDriverName();
+        $epochs = new DiscoveryEpoch;
+        $epochs->assertInstalled($pdo, $driver);
+        if ($driver === 'mysql') {
+            $pdo->exec('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
+        }
+
+        return $connection->transaction(function () use ($request, $connection, $pdo, $driver, $epochs): CandidateWindow {
+            if ($driver === 'sqlite') {
+                $pdo->exec('UPDATE '.DiscoveryEpoch::TABLE.' SET epoch = epoch WHERE id = 1');
+            }
+            $marker = 'dsm_candidates_'.bin2hex(random_bytes(12));
+            $pdo->exec('SAVEPOINT '.$marker);
+            SitemapException::require($epochs->current($pdo) === $request->epoch() && hash_equals($request->configurationHash(), SitemapConfiguration::hash()), 'changed_epoch');
+            $table = $driver === 'sqlite' ? 'main."tracks"' : '`tracks`';
+            $statement = $pdo->prepare("SELECT id FROM {$table} WHERE status = 'published' AND id > ? ORDER BY id LIMIT 49");
+            $statement->execute([$request->after()]);
+            $ids = array_map(intval(...), $statement->fetchAll(PDO::FETCH_COLUMN));
+            $window = CandidateWindow::captured($request, array_slice($ids, 0, self::LIMIT), count($ids) > self::LIMIT);
+            SitemapException::require(DB::connection() === $connection && $connection->getPdo() === $pdo && $connection->transactionLevel() === 1 && $pdo->inTransaction(), 'changed_transaction');
+            try {
+                $pdo->exec('RELEASE SAVEPOINT '.$marker);
+            } catch (Throwable) {
+                throw new SitemapException('changed_transaction');
+            }
+            $epochs->assertInstalled($pdo, $driver);
+            SitemapException::require($epochs->current($pdo, true) === $request->epoch() && hash_equals($request->configurationHash(), SitemapConfiguration::hash()), 'changed_epoch');
+            SitemapConfiguration::assertEnabled();
+
+            return $window;
+        });
+    }
+
+    /** Fresh shared eligibility once; a graph-free second transaction closes serialized XML and original deadlines. */
+    public function consumeIdentities(DiscoverySitemapConsumption $consumption): string
+    {
+        SitemapConfiguration::assertEnabled();
+        SitemapException::require(DB::transactionLevel() === 0 && DB::connection()->getTablePrefix() === ''
+            && hash_equals($consumption->configurationHash(), SitemapConfiguration::hash()), 'changed_configuration');
+        $initialConnection = DB::connection();
+        $initialPrimary = $initialConnection->getPdo();
+        $ids = $consumption->idsForFreshCapture();
+        $snapshot = $this->captureCurrent(['version' => 1, 'epoch' => $consumption->epoch(), 'after' => 0], $ids, $consumption->generationDeadline());
+        $evidence = $this->decode($snapshot->evidence());
+        SitemapException::require(DB::connection() === $initialConnection && $initialConnection->getPdo() === $initialPrimary
+            && $initialConnection->transactionLevel() === 0 && ! $initialPrimary->inTransaction(), 'changed_connection');
+        SitemapException::require(array_keys($evidence) === ['version', 'epoch', 'ids', 'paths', 'expires_at', 'configuration']
+            && $evidence['version'] === 1 && $evidence['epoch'] === $consumption->epoch() && $evidence['ids'] === $ids
+            && $evidence['paths'] === $snapshot->paths() && is_string($evidence['expires_at']) && is_string($evidence['configuration'])
+            && hash_equals($this->configuration(), $evidence['configuration']), 'changed_candidate_partition');
+        $deadline = CarbonImmutable::parse($evidence['expires_at'])->utc();
+        SitemapException::require($deadline->lessThanOrEqualTo($consumption->generationDeadline()), 'changed_deadline');
+        $connection = DB::connection();
+        $pdo = $connection->getPdo();
+        $driver = $connection->getDriverName();
+        $epochs = new DiscoveryEpoch;
+        if ($driver === 'mysql') {
+            $pdo->exec('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
+        }
+        $xml = $connection->transaction(function () use ($consumption, $ids, $snapshot, $evidence, $deadline, $connection, $pdo, $driver, $epochs): string {
+            if ($driver === 'sqlite') {
+                $pdo->exec('UPDATE '.DiscoveryEpoch::TABLE.' SET epoch = epoch WHERE id = 1');
+            }
+            SitemapException::require($consumption->candidateIds($pdo) === $ids, 'changed_candidate_partition');
+            $xml = $consumption->xml($snapshot->paths());
+            // Serialization, decryption, ORM, container/storage providers and callbacks all precede this proof.
+            $consumption->assertCurrent($pdo);
+            SitemapException::require(DB::connection() === $connection && $connection->getPdo() === $pdo && $connection->transactionLevel() === 1 && $pdo->inTransaction(), 'changed_transaction');
+            $epochs->assertInstalled($pdo, $driver);
+            SitemapException::require($epochs->current($pdo, true) === $consumption->epoch()
+                && hash_equals($evidence['configuration'], $this->configuration()) && hash_equals($consumption->configurationHash(), SitemapConfiguration::hash())
+                && CarbonImmutable::instance(now())->utc()->lessThan($deadline), 'changed_source');
+            SitemapConfiguration::assertEnabled();
+
+            return $xml;
+        });
+        // Preserve Laravel commit events; they cannot withdraw source/config/pointer and still release old XML.
+        $consumption->assertAfterCommit($pdo);
+        $epochs->assertInstalled($pdo, $driver);
+        SitemapException::require($epochs->current($pdo) === $consumption->epoch() && hash_equals($evidence['configuration'], $this->configuration())
+            && hash_equals($consumption->configurationHash(), SitemapConfiguration::hash()) && CarbonImmutable::instance(now())->utc()->lessThan($deadline), 'changed_source');
+        SitemapConfiguration::assertEnabled();
+
+        return $xml;
     }
 
     private function captureCurrent(?array $cursor, ?array $ids, ?CarbonImmutable $retainedDeadline = null): EligibleTrackSnapshot
