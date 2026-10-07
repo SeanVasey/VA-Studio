@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\Customers\Preferences\ConsentMigrationAdmission;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 
@@ -24,6 +25,16 @@ return new class extends Migration
         foreach ($this->triggers($driver) as $name => $trigger) {
             $steps[] = ['trigger', $name, $trigger['sql']];
         }
+        $namespace = [];
+        foreach (self::TABLES as $table) {
+            $namespace[$table] = ['table', $table];
+        }
+        foreach ($this->triggers($driver) as $name => $trigger) {
+            $namespace[$name] = ['trigger', $trigger['table']];
+        }
+        $admission = new ConsentMigrationAdmission($pdo, $driver, $database);
+        $admission->namespace($namespace);
+        $admission->dependencies();
         $known = array_keys($this->triggers($driver));
         foreach (self::TABLES as $table) {
             $statement = $pdo->prepare($driver === 'sqlite' ? "SELECT name FROM main.sqlite_master WHERE type='trigger' AND tbl_name=?" : 'SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND EVENT_OBJECT_TABLE=?');
@@ -67,6 +78,13 @@ return new class extends Migration
             foreach (self::TABLES as $table) {
                 $this->refuseShadow($pdo, $driver, $table);
             }
+            $this->owned($pdo, $driver, $type, $name, $sql);
+        }
+        // The last framework DDL callback can alter an earlier object or dependency.
+        // Reassert the complete captured schema with raw PDO before allowing bookkeeping.
+        $admission->namespace($namespace);
+        $admission->dependencies();
+        foreach ($steps as [$type, $name, $sql]) {
             $this->owned($pdo, $driver, $type, $name, $sql);
         }
     }
@@ -184,8 +202,8 @@ return new class extends Migration
 
     private function exists(PDO $pdo, string $driver, string $type, string $name): bool
     {
-        $sql = $driver === 'sqlite' ? 'SELECT COUNT(*) FROM main.sqlite_master WHERE lower(name)=?'
-            : ($type === 'table' ? 'SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND LOWER(TABLE_NAME)=?' : 'SELECT COUNT(*) FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND LOWER(TRIGGER_NAME)=?');
+        $sql = $driver === 'sqlite' ? 'SELECT COUNT(*) FROM main.sqlite_master WHERE type=\''.$type.'\' AND name COLLATE NOCASE=?'
+            : ($type === 'table' ? 'SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?' : 'SELECT COUNT(*) FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND TRIGGER_NAME=?');
         $statement = $pdo->prepare($sql);
         $statement->execute([$name]);
 
@@ -195,9 +213,9 @@ return new class extends Migration
     private function owned(PDO $pdo, string $driver, string $type, string $name, string $sql): void
     {
         if ($driver === 'sqlite') {
-            $statement = $pdo->prepare('SELECT type,sql FROM main.sqlite_master WHERE name=?');
+            $statement = $pdo->prepare('SELECT type,sql FROM main.sqlite_master WHERE name COLLATE NOCASE=?');
             $statement->execute([$name]);
-            if ($statement->fetch(PDO::FETCH_ASSOC) !== ['type' => $type, 'sql' => $sql]) {
+            if ($statement->fetchAll(PDO::FETCH_ASSOC) !== [['type' => $type, 'sql' => $sql]]) {
                 throw new LogicException('Unowned or drifted consent object requires inspection; nothing was changed.');
             }
             if ($type === 'table') {

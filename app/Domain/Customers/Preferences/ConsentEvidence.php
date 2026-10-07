@@ -3,7 +3,6 @@
 namespace App\Domain\Customers\Preferences;
 
 use App\Domain\Customers\CustomerAccessException;
-use App\Domain\Customers\CustomerAccessPolicy;
 use App\Domain\Customers\CustomerPrincipal;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\DB;
@@ -33,7 +32,6 @@ final class ConsentEvidence
 
     public function prove(CustomerPrincipal $principal, string $email, array $states, array $events, array $policies, ?array $configuredRange): void
     {
-        app(CustomerAccessPolicy::class)->requireEnabled();
         if (DB::connection() !== $this->connection || $this->connection->getPdo() !== $this->primary
             || $this->connection->getDatabaseName() !== $this->database || ! $this->primary->inTransaction()) {
             throw new ConsentException(503);

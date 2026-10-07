@@ -1,0 +1,103 @@
+{
+  "source": "0143f4b6bb7c529aed003fdfc741bf93f2e3a9ed",
+  "tree": "1379247a58593c145d27f951a4020fab57294663",
+  "base": "ebb096eee0fbdfabe81a6d7eb622f50d342e9477",
+  "worktree": "/workspace/VA-Studio-customer-consent",
+  "branch": "customer-consent-preferences-t32",
+  "php_runtime": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+  "node_runtime": "v24.19.0",
+  "database": "SQLite :memory:",
+  "php": {
+    "tests": 101,
+    "assertions": 486,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "new_tests": 66,
+    "new_assertions": 351,
+    "classes": {
+      "Tests\\Feature\\CustomerConsentPreferencesTest": {
+        "tests": 29,
+        "assertions": 147
+      },
+      "Tests\\Feature\\CustomerConsentBoundaryTest": {
+        "tests": 17,
+        "assertions": 42
+      },
+      "Tests\\Feature\\CustomerConsentMigrationTest": {
+        "tests": 20,
+        "assertions": 162
+      },
+      "Tests\\Feature\\CustomerAccountAccessTest": {
+        "tests": 6,
+        "assertions": 21
+      },
+      "Tests\\Feature\\CustomerListeningNotesBoundaryTest": {
+        "tests": 11,
+        "assertions": 42
+      },
+      "Tests\\Feature\\CustomerListeningPrimaryProofTest": {
+        "tests": 18,
+        "assertions": 72
+      }
+    }
+  },
+  "frontend": {
+    "tests": 27,
+    "result": "passed",
+    "source": "0143f4b6bb7c529aed003fdfc741bf93f2e3a9ed"
+  },
+  "typecheck": {
+    "result": "passed",
+    "source": "0143f4b6bb7c529aed003fdfc741bf93f2e3a9ed"
+  },
+  "pint": {
+    "result": "passed",
+    "source": "0143f4b6bb7c529aed003fdfc741bf93f2e3a9ed"
+  },
+  "owned_paths": [
+    "app/Domain/Customers/Preferences/ConsentEvidence.php",
+    "app/Domain/Customers/Preferences/ConsentException.php",
+    "app/Domain/Customers/Preferences/ConsentPolicy.php",
+    "app/Domain/Customers/Preferences/ConsentRuntime.php",
+    "app/Domain/Customers/Preferences/CustomerConsentPreferences.php",
+    "app/Domain/Customers/Preferences/LocalConsentRuntime.php",
+    "app/Domain/Customers/Preferences/Models/ConsentEvent.php",
+    "app/Domain/Customers/Preferences/Models/ConsentPolicySnapshot.php",
+    "app/Domain/Customers/Preferences/Models/ConsentState.php",
+    "config/customer-preferences.php",
+    "database/migrations/2026_10_07_250000_customer_consent.php",
+    "resources/js/components/CustomerCommunicationPreferences.tsx",
+    "tests/Feature/CustomerConsentBoundaryTest.php",
+    "tests/Feature/CustomerConsentMigrationTest.php",
+    "tests/Feature/CustomerConsentPreferencesTest.php",
+    "tests/Support/ConsentFixtures.php",
+    "tests/frontend/customer-communication-preferences.test.tsx"
+  ],
+  "limits": [
+    "Independent native MySQL migration/prefix/optimistic contention verification is not author-run.",
+    "Root routes/request grammar/capability/privacy/CSRF/mount integration belongs to root composed successor.",
+    "Production identity247 and owner-reviewed production purpose/notice/processor/retention policy remain absent.",
+    "Dependent suppression251 is mandatory next child; no downstream suppression/send/unsuppress claim.",
+    "No full Foundation/browser/device/hosted CI/activation/push/merge."
+  ],
+  "receipt_sha256": {
+    "autoload-reflection.txt": "d754aef17eb720c8b535f1beddd6a64e3950eafca4eef86921d80aacc79d475f",
+    "boundary-focused.txt": "50f549f7905f62567c9ec0d816b51e6b8cfb8dc5be4fd8ccbe4e743641bc2cb6",
+    "boundary-focused.xml": "58adb93cf4936aeab8445883f422cb463e91178b36c1a08882cf03887aa97e6e",
+    "focused-before-production-test-refinement.txt": "583ef799d2be77bb31c21a32296310d9ca67928d8edb871fe399833b7c44976b",
+    "focused-before-production-test-refinement.xml": "56aa2855e6bb918fe2d7b2b786a90aa73f2ae5c72bec5a924b45bd46b1915767",
+    "frozen-frontend.txt": "337beb65e73b5fa240ffcf98357a14511878bb01bdb139327720eb6d774ea6b6",
+    "frozen-frontend.txt.gz": "78c83f6e751a01fb6b19da7076b93cfa94975fbf17c7cb4173dff605499d0929",
+    "frozen-php.txt": "0d090aa363c255af02922dec3469d6a1c49dbacad14553c67e8c451284428873",
+    "frozen-php.xml": "cd1b6f9f0c1fd975d5c673acdb64c016adab096cf40219b1b8e2af17e84e47dd",
+    "frozen-pint.txt": "9fa3c401d4d7dcf9d616a4e847f09d73bafe2397e5f1b5b77531e2516436ed5a",
+    "frozen-pint.txt.gz": "efdc4d1c88ec838ecb0ae513f94edb8121388680be4acc3c464b7f3b49f55cac",
+    "frozen-typecheck.txt": "dac125c794db702133345f3a0d33f3193f975fddc564ca4f1498b0d4132ed500",
+    "frozen-typecheck.txt.gz": "2fe7ab713d79076a320d54898138afd6a9af703dd6ca183fe18fd31669373051",
+    "initial-purpose-field-harness-failure.txt": "83ffc36b82c7fe8b548839b9afdfa75024982bd8ab2858c0c854ebccae8857ab",
+    "initial-purpose-field-harness-failure.xml": "b1f5001c89813efa5d7b8f5a533be6412a4313f3b9514f250ae467c3071c96c0",
+    "migration-focused-before-recorded-tail-case.txt": "ab2befb2f511bd28b423678fc6c4a1a57bdb368201b2bed3499cf956532f330c",
+    "migration-focused-before-recorded-tail-case.xml": "00cbb8e77cd76fb38377dc4e754d866e98036c9ee1e17fa900329abdc839c6b8"
+  }
+}

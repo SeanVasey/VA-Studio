@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\CustomerConsentAdmissionTest" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" tests="4" assertions="4" errors="0" failures="4" skipped="0" time="1.253957">
+    <testsuite name="Tests\Feature\CustomerConsentAdmissionTest::test_final_framework_ddl_callback_cannot_record_a_missing_earlier_guard" tests="2" assertions="2" errors="0" failures="2" skipped="0" time="0.718449">
+      <testcase name="test_final_framework_ddl_callback_cannot_record_a_missing_earlier_guard with data set &quot;earlier own guard&quot;" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="161" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="1" time="0.503074">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerConsentAdmissionTest::test_final_framework_ddl_callback_cannot_record_a_missing_earlier_guard with data set "earlier own guard"
+Incomplete schema was recorded by the actual migrator.
+
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:173</failure>
+      </testcase>
+      <testcase name="test_final_framework_ddl_callback_cannot_record_a_missing_earlier_guard with data set &quot;retained account dependency guard&quot;" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="161" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="1" time="0.215376">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerConsentAdmissionTest::test_final_framework_ddl_callback_cannot_record_a_missing_earlier_guard with data set "retained account dependency guard"
+Incomplete schema was recorded by the actual migrator.
+
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:173</failure>
+      </testcase>
+    </testsuite>
+    <testcase name="test_terminal_container_policy_resolution_cannot_commit_outdated_grant" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="181" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="1" time="0.262526">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerConsentAdmissionTest::test_terminal_container_policy_resolution_cannot_commit_outdated_grant
+Terminal policy callback escaped.
+
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:196</failure>
+    </testcase>
+    <testcase name="test_terminal_runtime_callback_cannot_change_notice_after_configuration_check" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="204" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="1" time="0.272981">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerConsentAdmissionTest::test_terminal_runtime_callback_cannot_change_notice_after_configuration_check
+Terminal runtime callback escaped.
+
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:224</failure>
+    </testcase>
+  </testsuite>
+</testsuites>
