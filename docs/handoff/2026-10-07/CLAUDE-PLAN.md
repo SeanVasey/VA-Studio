@@ -71,7 +71,7 @@ sensitive, flags still default-off unless Sean activates.
 | --- | --- | --- |
 | B1 | Account features 253 reviewed + composed + canonical default-off `production-account-features` config | **merged** PR #45 → `1462e822` (dev merge; C1 activation blocker → `harness/native-schema-isolation`; C2/C3 → 254 lane) |
 | B2 | PR39 late P2 findings: SuppressionDelivery old-recipient target; IdentityCommittedFrame single-close restoration | identity fix APPROVED; C-A1 + Low fixed in `f65d921d`; independent **APPROVE** at exact `f65d921d` (re-review addendum, reviewer's own red/green on SQLite and private MySQL 8.4.11); draft PR #47 at `b69eae25` awaiting preflight + Codex, then merge |
-| B3 | Suppression254 (distinct family from 251; built on 253 withdrawal reader; provider contract default-off) | after B1 |
+| B3 | Suppression254 (distinct family from 251; built on 253 withdrawal reader; provider contract default-off) | built on `harness/suppression-254` (pushed, code head `452cdab1`, docs `2de41664`): C2 + C3 closed with red receipts; four `production_suppression_*` tables, sealed request/attempt/reconcile runtime, refusing default provider, config `enabled=false`; SQLite 138/1539 + 303/1738 green (MySQL-only skips), native 8.4.11: 6 guard + 3 admission cases; 254 runtime not yet run natively. Independent review running. Open: stuck-attempt operator procedure; no background reconciliation path; C1 deadline still applies |
 | B4 | Root HTTP mount for 253 (session-bound routes, privacy middleware, body caps) + frontend | after B1 |
 | B5 | Email operations preflight: sender/origin/TLS/provider scope, queue/scheduler/retention facts | after B3 |
 
