@@ -6,6 +6,7 @@ use App\Domain\Customers\Preferences\ConsentException;
 use App\Domain\Customers\Preferences\ConsentPolicy;
 use App\Domain\Customers\ProductionFeatures\ProductionFeatureContext;
 use App\Domain\Customers\ProductionFeatures\ProductionFeatureException;
+use App\Domain\Customers\ProductionFeatures\ProductionFeatureOperation;
 use App\Domain\Customers\ProductionFeatures\ProductionFeatureShape;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
@@ -19,6 +20,8 @@ final readonly class ProductionConsentWithdrawal implements JsonSerializable
 
     public static function capture(ProductionFeatureContext $context, int $expectedVersion): ?self
     {
+        // A public mint path or leaked context must not skip run()'s committing/postcommit proofs.
+        ProductionFeatureOperation::assertLive($context);
         if ($context->identity->feature !== 'consent_preferences') {
             throw new IdentityException;
         }
