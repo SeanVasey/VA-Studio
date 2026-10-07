@@ -146,3 +146,15 @@ feature recomposition from reviewed published source. None authorizes a claim
 that inaccessible cloud work has been recovered. Main incorporates later repair
 and source-map equivalents, while absent published children remain a concrete
 backlog that can now be assigned without duplicate implementation.
+
+## Inventory validation
+
+The final frozen-source verifier passed: all 142 ref names and frozen source
+identities, 798 reachable/654 main/144 non-main commit census, every recorded
+commit tree, all 504 source object references, and all 32 recovered-path byte
+counts and SHA-256 hashes agree with Git. All 102 original mapping rows retain
+the historical tip, including 101 exact current-tip mappings. `git diff --cached
+--check` passed. The first live-ref comparison correctly refused a concurrently
+advanced `origin/main`; the corrected verifier uses the recorded frozen heads and
+keeps that subsequent integration outside this inventory's claims. No application
+or historical CI tests were executed for this documentation-only change.
