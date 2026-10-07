@@ -58,10 +58,13 @@ final class ProductionFreeGrantHttpBinding implements JsonSerializable
     /** Only an actual request can capture authority; callers cannot submit a principal, marker or proof. */
     public static function forRequest(Request $request): self
     {
-        $policy = (new ProductionFreeGrantIdentityPolicy)->current();
-        $auth = Auth::getFacadeRoot();
         $container = app();
         $config = config();
+        FreeGrantException::require($container instanceof Container && $config instanceof Repository, 403);
+        // Admit raw parents before policy/guard configuration may traverse them.
+        self::configurationFrom($container, $config);
+        $policy = (new ProductionFreeGrantIdentityPolicy)->current();
+        $auth = Auth::getFacadeRoot();
         $decorator = (new ReflectionProperty(BaseRequest::class, 'session'))->getValue($request);
         FreeGrantException::require($auth instanceof AuthManager && $container instanceof Container
             && $config instanceof Repository && $decorator instanceof SymfonySessionDecorator
@@ -141,8 +144,20 @@ final class ProductionFreeGrantHttpBinding implements JsonSerializable
 
     private function configuration(): array
     {
-        $items = $this->property(Repository::class, 'items', $this->config);
-        $instances = $this->property(Container::class, 'instances', $this->container);
+        return self::configurationFrom($this->container, $this->config);
+    }
+
+    private static function configurationFrom(Container $container, Repository $config): array
+    {
+        $items = (new ReflectionProperty(Repository::class, 'items'))->getValue($config);
+        $instances = (new ReflectionProperty(Container::class, 'instances'))->getValue($container);
+        FreeGrantException::require(is_array($items) && is_array($instances), 403);
+        foreach (['app', 'auth', 'production-customer-identity', 'production-free-grant-identity', 'free-grants'] as $parent) {
+            // ArrayAccess parents can execute after the preceding fixed marker/actor proof.
+            FreeGrantException::require(is_array($items[$parent] ?? []), 403);
+        }
+        FreeGrantException::require(is_string($items['app']['key'] ?? null) && $items['app']['key'] !== ''
+            && is_string($instances['env'] ?? null) && $instances['env'] !== '', 403);
 
         return ['key' => $items['app']['key'] ?? null, 'environment' => $instances['env'] ?? null,
             'auth' => $items['auth'] ?? null, 'identity' => $items['production-customer-identity'] ?? null,
