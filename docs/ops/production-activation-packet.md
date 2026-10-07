@@ -25,7 +25,7 @@ lands, the stage that depends on it stays blocked whatever the environment conta
 | --- | --- | --- |
 | A1b: frame admission for intent/basis/authority writes and `initiate()` re-proof | S2b, S3 | CLAUDE-PLAN §3 A1b (release blocker) |
 | A2: Paid252 consumer and whole-order delivery | S3 | `docs/handoff/2026-10-07/owners/paid-delivery-native-operations.md` |
-| A3: Tax255 (`automatic_tax`, SourceV2, V2 consumer) | S3 unless every order qualifies for declared exemption | CLAUDE-PLAN §3 A3 |
+| A3: Tax255 (`automatic_tax`, SourceV2, V2 consumer) | S3 unless every order qualifies for declared exemption; that alternative itself needs the exemption-authoring step in §6 (a reviewed owner allowlist commit plus `PRODUCTION_CHECKOUT_EXEMPTION_AUTHORING_ENABLED`), because every new order's review requires a `basis_public_id` | CLAUDE-PLAN §3 A3; `HostedCheckout::prepare()`, `TaxExemptions::basis()` |
 | No live webhook receiver. `VerifyStripeWebhook` refuses production environments and any mode other than test; production checkout reconciles only by authoritative retrieval | S3 webhook drills | `app/Domain/Commerce/Payments/VerifyStripeWebhook.php`; `vasey:stripe-preflight` check `production_webhook_receiver` |
 | Production checkout isn't registered: `ProductionCheckoutServiceProvider` isn't in `bootstrap/providers.php` and `routes/production-checkout.php` isn't mounted, so the env flags have no HTTP effect yet | S2b, S3 | root composition step |
 | `ExecutionContextV1` refuses `funds_mode=test` outside `local`/`testing`, and the test checkout/processing policies require `local`/`testing` | Hosted test-mode payments on a staging host (S2) | `ExecutionContextV1::make`, `CheckoutPolicy`, `PaymentProcessingPolicy` |
@@ -95,7 +95,9 @@ and a staging hostname that doesn't touch the apex or `www` records.
 **Inputs:** the host and TLS origin; MySQL 8.4 endpoint and a least-privilege runtime
 account; a separate backup-only account; the private storage root; the ffmpeg, ffprobe,
 prlimit and clamscan paths; the approved tag WAV and its hash; an `APP_KEY` generated on the
-host; mail stays `log`.
+host; mail stays `log`. `<APP_USER>` is the account the web and worker units run as and
+`<APP_GROUP>` its primary group, named separately (an account such as `nobody` has no group
+of its own name).
 
 ```sh
 # On the staging host, as the unprivileged application user. Every release is a fresh,
@@ -132,7 +134,7 @@ php scripts/ops/private-server-preflight.php --env-file <RUNTIME_ENV> --runtime
 # validated file there (0600, application user) before any Artisan, web or worker process runs.
 # The web and worker units run from <RELEASES_DIR>/<SHA> and therefore read the same file;
 # a unit may instead carry EnvironmentFile=<RUNTIME_ENV>, but never both.
-install -m 0600 -o <APP_USER> -g <APP_USER> <RUNTIME_ENV> .env && cmp -s <RUNTIME_ENV> .env || { echo '.env not installed'; exit 1; }
+install -m 0600 -o <APP_USER> -g <APP_GROUP> <RUNTIME_ENV> .env && cmp -s <RUNTIME_ENV> .env || { echo '.env not installed'; exit 1; }
 
 # Back up first (docs/ops/backup-restore-proof.md, MySQL procedure), then migrate.
 php artisan migrate:status
@@ -280,13 +282,33 @@ php artisan vasey:stripe-preflight --json                                       
 # first authorized flag change comes before it. Enable one flag at a time, each followed by
 # config:cache and an observation window whose length Sean sets (none is invented here):
 #   PRODUCTION_CHECKOUT_PROVIDER_IO_ENABLED (now, for the probe) → PRODUCTION_CHECKOUT_RECONCILIATION_ENABLED
-#   → PRODUCTION_CHECKOUT_COMMITTED_READ_RECEIPTS_ENABLED → PRODUCTION_CHECKOUT_HTTP_ENABLED
+#   → PRODUCTION_CHECKOUT_COMMITTED_READ_RECEIPTS_ENABLED → exemption authoring (below, only on the
+#   declared-exemption alternative to A3) → PRODUCTION_CHECKOUT_HTTP_ENABLED
 #   → PRODUCTION_CHECKOUT_ENABLED (new orders) last.
 # Set PRODUCTION_CHECKOUT_PROVIDER_IO_ENABLED=true in <RUNTIME_ENV> (Sean's live authorization names it), reinstall .env as in S1, then:
 php artisan config:cache
 php artisan vasey:stripe-preflight --json --probe --i-understand-this-calls-stripe # needs charges_enabled and card_payments=active
 php artisan vasey:commerce-readiness --json
 # Remaining flags follow in the order above, each with its own config:cache and window.
+#
+# Exemption authoring (declared-exemption alternative to A3 only). Every new order's review
+# carries a basis_public_id (HostedCheckout::prepare → TaxExemptions::basis), and a basis
+# exists only after ApproveExemptionAuthority::approve() and TaxExemptions::qualify(), which
+# both refuse with 'authority' unless PRODUCTION_CHECKOUT_EXEMPTION_AUTHORING_ENABLED is true
+# and the approving owner is listed in config('production_checkout.exemption_policy_owner_ids').
+# That list is a deployment-owned array in config/production_checkout.php with no env
+# override and ships empty, so with HTTP and new orders enabled but no authority, no order can
+# be placed. Before PRODUCTION_CHECKOUT_HTTP_ENABLED:
+#   1. a reviewed commit on the authorized SHA sets exemption_policy_owner_ids to Sean's
+#      owner user IDs (the config comment: delegation of a scoped qualification policy, not
+#      evidence of an exemption);
+#   2. set PRODUCTION_CHECKOUT_EXEMPTION_AUTHORING_ENABLED=true in <RUNTIME_ENV> under its
+#      own authorization line, reinstall .env, php artisan config:cache;
+#   3. the owner approves the reviewed ExemptionPolicyV1 and a listed qualifier records each
+#      buyer's qualified basis, each under the policy's effective interval;
+#   4. retain the authority and basis public IDs as evidence (vasey:commerce-readiness does
+#      not inventory them; count the production_checkout_exemption_authority and basis rows).
+# Until Tax255 lands, an order whose buyer has no qualified basis cannot be placed at all.
 ```
 
 **Expected:**

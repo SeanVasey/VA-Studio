@@ -68,7 +68,8 @@ here. Pass credentials through a mode-0600 option file, never on the command lin
 #    updates upload/media rows) would land between steps 1 and 2. Maintenance mode plus stopped
 #    workers and scheduler, or a coordinated database/storage snapshot, is the only way both
 #    halves describe the same moment.
-php artisan down   # then stop the queue workers and the scheduler; confirm no php process is serving requests
+php artisan down || exit 1   # a failed maintenance-mode entry (e.g. its store unavailable) must not start a snapshot
+# then stop the queue workers and the scheduler; confirm no php process is serving requests
 
 # 1. Consistent logical dump. InnoDB only; --single-transaction gives one snapshot without
 #    locking writers. --no-tablespaces avoids needing PROCESS. --skip-comments drops the host,

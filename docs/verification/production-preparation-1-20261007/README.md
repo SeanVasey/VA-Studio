@@ -368,6 +368,15 @@ the restart and `is-active` check now come first and a successful `php artisan u
 final step (a failed start keeps maintenance mode on). The step 2 `tar --create` is fatal on
 a nonzero exit, as extraction already was.
 
+Codex's fourteenth pass (P2 ×3, docs): the S3 declared-exemption alternative to Tax255 could
+not place any order, because every new order's review needs a `basis_public_id` and both
+`ApproveExemptionAuthority::approve()` and `TaxExemptions::qualify()` refuse unless the
+authoring flag is on and the owner is in the config-only `exemption_policy_owner_ids` list,
+which ships empty; the packet now orders an exemption-authoring step (reviewed owner
+allowlist commit, flag under its own authorization line, policy approval and bases) before
+`PRODUCTION_CHECKOUT_HTTP_ENABLED`, and the gate table says so. The S1 `.env` install uses a
+separate `<APP_GROUP>` input. The backup's `php artisan down` is fatal on failure.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex
