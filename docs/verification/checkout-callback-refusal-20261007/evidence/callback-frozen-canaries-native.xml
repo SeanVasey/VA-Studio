@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="3" assertions="10" errors="0" failures="0" skipped="0" time="160.634313">
+    <testsuite name="Tests\Canary\ProductionCheckoutLazyCommandCanaryTest" file="/workspace/VA-Studio-checkout-callback-repair/docs/verification/checkout-callback-refusal-20261007/canaries/ProductionCheckoutLazyCommandCanaryTest.php" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="37.303012">
+      <testcase name="test_postcommit_lazy_primary_withdrawal_never_runs_or_returns_prepared_result" file="/workspace/VA-Studio-checkout-callback-repair/docs/verification/checkout-callback-refusal-20261007/canaries/ProductionCheckoutLazyCommandCanaryTest.php" line="10" class="Tests\Canary\ProductionCheckoutLazyCommandCanaryTest" classname="Tests.Canary.ProductionCheckoutLazyCommandCanaryTest" assertions="3" time="37.303012"/>
+    </testsuite>
+    <testsuite name="Tests\Canary\ProductionCheckoutLazyPrimaryCanaryTest" file="/workspace/VA-Studio-checkout-callback-repair/docs/verification/checkout-callback-refusal-20261007/canaries/ProductionCheckoutLazyPrimaryCanaryTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="61.824507">
+      <testcase name="test_expired_source_refusal_never_resolves_lazy_primary_or_withdraws_original_buyer" file="/workspace/VA-Studio-checkout-callback-repair/docs/verification/checkout-callback-refusal-20261007/canaries/ProductionCheckoutLazyPrimaryCanaryTest.php" line="11" class="Tests\Canary\ProductionCheckoutLazyPrimaryCanaryTest" classname="Tests.Canary.ProductionCheckoutLazyPrimaryCanaryTest" assertions="4" time="61.824507"/>
+    </testsuite>
+    <testsuite name="Tests\Canary\ProductionCheckoutUnresolvedConnectionCanaryTest" file="/workspace/VA-Studio-checkout-callback-repair/docs/verification/checkout-callback-refusal-20261007/canaries/ProductionCheckoutUnresolvedConnectionCanaryTest.php" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="61.506794">
+      <testcase name="test_expired_source_never_resolves_uncached_connection_that_withdraws_buyer" file="/workspace/VA-Studio-checkout-callback-repair/docs/verification/checkout-callback-refusal-20261007/canaries/ProductionCheckoutUnresolvedConnectionCanaryTest.php" line="11" class="Tests\Canary\ProductionCheckoutUnresolvedConnectionCanaryTest" classname="Tests.Canary.ProductionCheckoutUnresolvedConnectionCanaryTest" assertions="3" time="61.506794"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

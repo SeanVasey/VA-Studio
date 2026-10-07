@@ -1,0 +1,101 @@
+[
+  {
+    "artifact": "evidence/callback-frozen-canaries-native.xml",
+    "source": "b6f1dfbb7b92cee5319eac79443b88bf24178ab2",
+    "exit": 0,
+    "tests": 3,
+    "assertions": 10,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "passed": 3
+  },
+  {
+    "artifact": "evidence/callback-frozen-canaries-sqlite.xml",
+    "source": "b6f1dfbb7b92cee5319eac79443b88bf24178ab2",
+    "exit": 0,
+    "tests": 3,
+    "assertions": 10,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "passed": 3
+  },
+  {
+    "artifact": "evidence/callback-frozen-native.xml",
+    "source": "b6f1dfbb7b92cee5319eac79443b88bf24178ab2",
+    "exit": 0,
+    "tests": 11,
+    "assertions": 82,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "passed": 11
+  },
+  {
+    "artifact": "evidence/callback-frozen-sqlite.xml",
+    "source": "b6f1dfbb7b92cee5319eac79443b88bf24178ab2",
+    "exit": 0,
+    "tests": 133,
+    "assertions": 625,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 7,
+    "passed": 126
+  },
+  {
+    "artifact": "evidence/callback-pilot-all-sqlite.xml",
+    "source": "uncommitted intermediate development source",
+    "exit": 0,
+    "tests": 33,
+    "assertions": 240,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "passed": 33
+  },
+  {
+    "artifact": "evidence/callback-pilot-sqlite.xml",
+    "source": "uncommitted intermediate development source",
+    "exit": 0,
+    "tests": 4,
+    "assertions": 15,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "passed": 4
+  },
+  {
+    "artifact": "evidence/lazy-command-red.xml",
+    "source": "f0a1615be0833804959662fad5d7a7a8e1389ee0",
+    "exit": 1,
+    "tests": 1,
+    "assertions": 2,
+    "errors": 0,
+    "failures": 1,
+    "skipped": 0,
+    "passed": 0
+  },
+  {
+    "artifact": "evidence/lazy-primary-red.xml",
+    "source": "f0a1615be0833804959662fad5d7a7a8e1389ee0",
+    "exit": 1,
+    "tests": 1,
+    "assertions": 3,
+    "errors": 0,
+    "failures": 1,
+    "skipped": 0,
+    "passed": 0
+  },
+  {
+    "artifact": "evidence/uncached-connection-red.xml",
+    "source": "uncommitted intermediate development source",
+    "exit": 1,
+    "tests": 1,
+    "assertions": 3,
+    "errors": 0,
+    "failures": 1,
+    "skipped": 0,
+    "passed": 0
+  }
+]

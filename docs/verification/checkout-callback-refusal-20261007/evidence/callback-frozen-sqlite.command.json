@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "vendor/bin/phpunit",
+    "tests/Unit/ProductionCheckoutProviderTest.php",
+    "tests/Unit/ProductionHostedEvidenceTest.php",
+    "tests/Feature/ProductionCheckoutExemptionAuthorityTest.php",
+    "tests/Feature/ProductionCheckoutHttpBoundaryTest.php",
+    "tests/Feature/ProductionCheckoutJourneyTest.php",
+    "tests/Feature/ProductionCheckoutMigrationTest.php",
+    "tests/Feature/ProductionCheckoutNativeRaceTest.php",
+    "tests/Feature/ProductionCheckoutPrimaryBoundaryTest.php",
+    "tests/Feature/ProductionCheckoutSourceTransactionTest.php",
+    "docs/verification/operative-checkout-new-20261007/canaries/ProductionCheckoutUnknownStaffCanaryTest.php",
+    "docs/verification/operative-checkout-new-20261007/canaries/IdentityUnknownRoleCanaryTest.php",
+    "--filter",
+    "ProductionCheckout|ProductionHostedEvidence|unknown_permanent_role_flag_never_counts_as_nonstaff_customer_authority",
+    "--log-junit",
+    "/tmp/va-production-checkout-callback-frozen-sqlite.xml",
+    "--colors=never"
+  ],
+  "source_sha": "b6f1dfbb7b92cee5319eac79443b88bf24178ab2",
+  "environment": "SQLite in-memory; explicit synthetic APP_KEY; actual local synthetic SMTP"
+}
