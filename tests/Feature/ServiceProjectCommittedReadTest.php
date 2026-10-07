@@ -79,7 +79,7 @@ final class ServiceProjectCommittedReadTest extends TestCase
 
     public static function customerChanges(): array
     {
-        return [['service-flag', 404], ['customer-flag', 404], ['credential', 403], ['account', 403], ['source', 409]];
+        return [['service-flag', 404], ['customer-flag', 404], ['credential', 403], ['account', 403], ['source', 409], ['credential-key', 403]];
     }
 
     #[DataProvider('customerChanges')]
@@ -99,6 +99,7 @@ final class ServiceProjectCommittedReadTest extends TestCase
                 'credential' => DB::table('users')->where('id', $f['customer']['user']->id)->update(['password' => 'POST-COMMIT-WITHDRAWN-CREDENTIAL']),
                 'account' => DB::table('customer_accounts')->where('id', $f['customer']['account']->id)->update(['active' => false, 'access_version' => 2]),
                 'source' => $f['journey']->customerCommand($f['project']['id'], F::command($f['project'], 'withdraw', ['reason' => 'Actual post-commit source withdrawal']), $f['customer']['principal'], $f['customer']['user']),
+                'credential-key' => config(['app.key' => 'base64:'.base64_encode(random_bytes(32))]),
             };
         });
         $current = $this->read($f);
