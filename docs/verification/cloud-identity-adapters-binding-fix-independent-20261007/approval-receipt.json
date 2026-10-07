@@ -1,0 +1,194 @@
+{
+  "decision": "APPROVED focused development source; no activation or full acceptance claim",
+  "executable": "f5c7144ffc03859017335d696ce7322de3274247",
+  "tree": "ae5af354ebe210b0bd36954bc0365b5900de47f8",
+  "docs_only_successor": "912c85dbaa7611f7155c3922e7396f828d42d533",
+  "prior_source": "5d035ff62a2cf3c885678cb0a9c459cee821e78a",
+  "immutable_original_review": "5c2289ab1e7341a4b75d297b05e5c1f6f8e532f9",
+  "original_probe_sha256": "e9ddc3ea6eb47d64605a767abe8a0fd67e25ed3ec6048c28828bcdf6bcbdd07d",
+  "changed_runtime_and_test_paths": [
+    "app/Domain/Customers/ProductionIdentity/Notifications/ConfigurationBoundIdentityTransport.php",
+    "tests/Feature/ProductionIdentitySmtpBindingTest.php"
+  ],
+  "source_bindings": [
+    {
+      "path": "app/Domain/Customers/ProductionCustomerAccess.php",
+      "git_blob": "29f1a222dffd3ac09bb88fa3fa4f34e39af221ac",
+      "sha256": "6e640d8873ecc1b351f470c0b8bf05452e2085513e5b6d08f653a891dc13e25e",
+      "bytes": 16937
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureAccess.php",
+      "git_blob": "0d2f25151a74c80a22466fa9c7a6f6310c75278c",
+      "sha256": "7b47e7ae6617581d18d25687e35ea28d6804394ead13550555b81b7a91f02fd6",
+      "bytes": 6948
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureIdentity.php",
+      "git_blob": "8641a127a4207c717005a632f0b4c46fe4740c13",
+      "sha256": "940a64d2f0bc9f0f60719a38fa4436fcfcca5ecbc81e059f4b5130e37c5a2ad7",
+      "bytes": 2172
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeaturePolicy.php",
+      "git_blob": "9ab0a87bb547950566818b5da88a17ddd6354dae",
+      "sha256": "6438997b0e13e2b8e7b39b43ab983ace8151bf2bd3d08164e78ed0a32213001e",
+      "bytes": 1341
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php",
+      "git_blob": "0257be0616210353bed42d40c36c228d79eda6b6",
+      "sha256": "623e31f469a0a1779e3f992f5d1c48b0aaa2382d308109bc33cc78f70a7c821b",
+      "bytes": 7044
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php",
+      "git_blob": "193215351accc8f6d053a1bb2257e0de6e6d58dc",
+      "sha256": "6058e3e4ced2900e1ccc93bd9110691c041ad0c4ecafe2f0373d323ceb17cb90",
+      "bytes": 32645
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityRows.php",
+      "git_blob": "c823a792d9087bf19c920daa96917a1acc00ef25",
+      "sha256": "470a2a4816739aef151ad429f9b8b6c359a0eba0b8068a60d1f215b6547794a4",
+      "bytes": 7538
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/ConfigurationBoundIdentityTransport.php",
+      "git_blob": "8e033454705343e72374b9156eb212e93c18450b",
+      "sha256": "4c369241dde1ff5d4214434f284745b8d7ed53fb9488a03c8b72b397083dd454",
+      "bytes": 2262
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/ConfiguredSmtpIdentityTransport.php",
+      "git_blob": "ea770377eb44bc89f8d5a02fc47e3f28f1ef5717",
+      "sha256": "75068247694ea5024387ac66b97698aeafd3c5993ac34442f85f72d4c3f316f0",
+      "bytes": 3506
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentityEsmtpClient.php",
+      "git_blob": "4c3433e7085376660365784dd353a14b086c0a24",
+      "sha256": "88877b44bfb1f6901aced5a31249637b2a18b9164fda9a750374272d2e421374",
+      "bytes": 1418
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentitySmtpFactory.php",
+      "git_blob": "190a9460d7774cc787526d89eb1901fa88bb1099",
+      "sha256": "a294f78b62fa353eb1a80e1adacac8b93acae14aba0e7b5b5b8b6fd5db0e41b9",
+      "bytes": 2001
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php",
+      "git_blob": "347645f485d3bcd4cdc075ffe181a30789f66c30",
+      "sha256": "99916a84234471ca95c8ec6c8b6b57324321e0132b38197c42f6c43b66eaf8d5",
+      "bytes": 7085
+    },
+    {
+      "path": "app/Providers/AppServiceProvider.php",
+      "git_blob": "2e2f22c3425b84cfe7cb6ddb5ebaf0c2d98f8d63",
+      "sha256": "3af097c9efcf180e0540fc3d62053fab23f426dd765282e29a2209571819d4d0",
+      "bytes": 3407
+    },
+    {
+      "path": "config/production-identity-smtp.php",
+      "git_blob": "dc5838b87a3127d998ac8b972b666e723c9c991f",
+      "sha256": "75413404f81d57f54eb4c4d838c795c50a18a0b44cbb50e0d3363961df75b3f9",
+      "bytes": 220
+    },
+    {
+      "path": "database/migrations/2026_10_07_247000_production_customer_identity.php",
+      "git_blob": "f82b5334e2d582ea63f91674b835f43f5bd28815",
+      "sha256": "a2cfa089ea5452aec894f24f6779f5deee63fb3a2453fd6c12d4a5d8b1273166",
+      "bytes": 1913
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php",
+      "git_blob": "75947ba8a625fcbdf9df0f63de13f568d9e4dc59",
+      "sha256": "a2a1d7608e9c47d07c9456b8828a0c83141b4a7f078e7e3b01019598d285e0d0",
+      "bytes": 11505
+    },
+    {
+      "path": "tests/Feature/ProductionIdentityAdapters/ConfiguredIdentitySmtpTest.php",
+      "git_blob": "1c184c7b5770a63260eeda0171f48549dcad955f",
+      "sha256": "f211b7e48c31a6f4771ed9f3e02932c23938456264fe96d9095f46dddb4fafe9",
+      "bytes": 7300
+    },
+    {
+      "path": "tests/Feature/ProductionIdentityAdapters/ProductionAccountFeatureAccessTest.php",
+      "git_blob": "e2921a774916b757f9d62d51da18918c7444bef5",
+      "sha256": "53cd630a1828bcf636000bb51dcfc606be4ce1dd7d8fac0929387671555d9be6",
+      "bytes": 11826
+    },
+    {
+      "path": "tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php",
+      "git_blob": "65d7f1a8f596210251976add77d8e846952369a6",
+      "sha256": "9ca308545605e95affd0e2feef88d91296e42dc5971b8a49356bfcf1ef348392",
+      "bytes": 15890
+    },
+    {
+      "path": "tests/Feature/ProductionIdentitySmtpBindingTest.php",
+      "git_blob": "ce33745ee305b9e72f001e4f3f0f2a92150ec364",
+      "sha256": "e359ebcacd4da09b3ec10def4310455952d494c97a41ddb2da6fd792f0e6d3cf",
+      "bytes": 9572
+    },
+    {
+      "path": "tests/Support/ProductionIdentityTlsSmtpFixture.php",
+      "git_blob": "db78ae36010a7a1309045dadf351148ade743295",
+      "sha256": "03d5ddb1d3ecf63ce908e04d32e856e4b1a68f657578cbe20418adfaeb0241a6",
+      "bytes": 2584
+    },
+    {
+      "path": "tests/Support/production_identity_tls_smtp_sink.py",
+      "git_blob": "438c80bc75cb1c1e36334b3315ddf6d8dae33a0a",
+      "sha256": "48f953c5df3643bbcbc660f70fd258b7059207304876b04d318b1590409a5c51",
+      "bytes": 4023
+    }
+  ],
+  "owned_source_17_exact_to": "101e3832e8e5637cab784eb2a800d60642a746b4",
+  "prior_owned_independent_approval": "5d53585fb3ea65c8a6f4162d8e71bd043caea538",
+  "original_artifact_count_verified": 15,
+  "root_artifact_count_verified": 13,
+  "checks": {
+    "own_exact_successor": {
+      "tests": 15,
+      "assertions": 64,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    "root_exact_successor": {
+      "tests": 22,
+      "assertions": 182,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    "root_predecessor_native": {
+      "source": "5d035ff62a2cf3c885678cb0a9c459cee821e78a",
+      "tests": 1,
+      "assertions": 18,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    }
+  },
+  "fresh_corrected_snapshot": {
+    "source": "f5c7144ffc03859017335d696ce7322de3274247",
+    "callback_count": 0,
+    "raw_credentials_withdrawn": false,
+    "refused": true,
+    "smtp_acceptance_returned": false,
+    "actual_tls": false,
+    "actual_authenticated": false,
+    "actual_smtp_data_received": false
+  },
+  "test_selection": "all14 actual registered binding cases incl2 actual local TLS journeys and2 parent-type refusals; unchanged original callback test",
+  "native_statement": "Existing root positive1/18 is predecessor5d carry only; unchanged owned17 native proof is bound to prior approved101e. No fresh f5 native execution is claimed. The repair changes only pure parent admission and tests, with unchanged SQL/SMTP/client/source graph.",
+  "constraints": [
+    "null default server-only settings; identity enrollment and notifications remain off",
+    "no external delivery or production endpoint configured; actual loopback TLS only",
+    "no hosted CI/full Foundation/MySQL8.4/browser claim",
+    "ordinary/committed physical feature proof/identity floor unchanged and independently approved"
+  ],
+  "source_review": "raw exact repository instance/array parents checked before nested lookup; wrong SMTP or app parent refuses without ArrayAccess getter; factory construction callbacks precede bound terminal current proof; no socket opens on refusal"
+}

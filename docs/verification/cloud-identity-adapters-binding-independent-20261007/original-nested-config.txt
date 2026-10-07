@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-identity-adapters-binding-independent/docs/verification/cloud-identity-adapters-binding-independent-20261007/sqlite-canary.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:00.376, Memory: 59.00 MB
+
+There was 1 failure:
+
+1) Tests\IndependentIdentityBinding\NestedConfigurationCallbackCanaryTest::test_nested_raw_configuration_parent_cannot_run_a_callback_at_the_final_smtp_handoff
+A nested configuration callback withdrew credentials at the final SMTP guard but submission was accepted.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-identity-adapters-binding-independent/docs/verification/cloud-identity-adapters-binding-independent-20261007/NestedConfigurationCallbackCanaryTest.php:90
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 1[0m[37;41m, Failures: 1[0m[37;41m.[0m

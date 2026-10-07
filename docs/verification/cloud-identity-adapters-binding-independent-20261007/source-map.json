@@ -1,0 +1,39 @@
+{
+  "source": "5d035ff62a2cf3c885678cb0a9c459cee821e78a",
+  "tree": "99da75afac7a47ed1ad1539a490598120158e955",
+  "registered_base": "e114973d2e4c41e510a746485bac2920796e35d1",
+  "actual_main_base": "760da5ac70a1082f13d87351a4446459e19947bb",
+  "owned101_paths_byte_exact": 17,
+  "root_bindings": [
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/ConfigurationBoundIdentityTransport.php",
+      "git_blob": "a253937a52b46e54ea8cdea09eb09769aa5c5912",
+      "sha256": "e9b0b78899c2992c0ed6aac4aa1ef5f06301bce84d6ce6c8fca8690799299f3c",
+      "bytes": 2147
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentitySmtpFactory.php",
+      "git_blob": "190a9460d7774cc787526d89eb1901fa88bb1099",
+      "sha256": "a294f78b62fa353eb1a80e1adacac8b93acae14aba0e7b5b5b8b6fd5db0e41b9",
+      "bytes": 2001
+    },
+    {
+      "path": "app/Providers/AppServiceProvider.php",
+      "git_blob": "2e2f22c3425b84cfe7cb6ddb5ebaf0c2d98f8d63",
+      "sha256": "3af097c9efcf180e0540fc3d62053fab23f426dd765282e29a2209571819d4d0",
+      "bytes": 3407
+    },
+    {
+      "path": "config/production-identity-smtp.php",
+      "git_blob": "dc5838b87a3127d998ac8b972b666e723c9c991f",
+      "sha256": "75413404f81d57f54eb4c4d838c795c50a18a0b44cbb50e0d3363961df75b3f9",
+      "bytes": 220
+    },
+    {
+      "path": "tests/Feature/ProductionIdentitySmtpBindingTest.php",
+      "git_blob": "aa21f9533d0b900efe0cc15a9a2e3d89937f034a",
+      "sha256": "b6dbae102be20af440738771cc395ed1bbe3bf1a942c8a8ab7d72ec2e7673651",
+      "bytes": 8032
+    }
+  ]
+}

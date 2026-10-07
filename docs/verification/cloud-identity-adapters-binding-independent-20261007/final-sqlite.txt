@@ -1,0 +1,10 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-identity-adapters-binding-independent/docs/verification/cloud-identity-adapters-binding-independent-20261007/sqlite-selection.xml
+
+............                                                      12 / 12 (100%)
+
+Time: 00:02.989, Memory: 83.00 MB
+
+[30;42mOK (12 tests, 57 assertions)[0m
