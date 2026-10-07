@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PaidGrantCommittingAdmissionTest" file="/workspace/VA-Studio-paid-grants/tests/Feature/PaidGrantCommittingAdmissionTest.php" tests="2" assertions="12" errors="2" failures="0" skipped="0" time="5.801079">
+    <testsuite name="Tests\Feature\PaidGrantCommittingAdmissionTest::test_genuine_last_committing_callback_cannot_withdraw_current_consumer_authority_and_commit_new_origin" tests="2" assertions="12" errors="2" failures="0" skipped="0" time="5.801079">
+      <testcase name="test_genuine_last_committing_callback_cannot_withdraw_current_consumer_authority_and_commit_new_origin with data set #0" file="/workspace/VA-Studio-paid-grants/tests/Feature/PaidGrantCommittingAdmissionTest.php" line="82" class="Tests\Feature\PaidGrantCommittingAdmissionTest" classname="Tests.Feature.PaidGrantCommittingAdmissionTest" assertions="6" time="3.176198">
+        <error type="InvalidArgumentException">Tests\Feature\PaidGrantCommittingAdmissionTest::test_genuine_last_committing_callback_cannot_withdraw_current_consumer_authority_and_commit_new_origin with data set #0
+InvalidArgumentException: Database connection [Postcommit output denial does not close unauthorized write admission.] not configured.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:226
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:192
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:103
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithDatabase.php:345
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithDatabase.php:119
+/workspace/VA-Studio-paid-grants/tests/Feature/PaidGrantCommittingAdmissionTest.php:106</error>
+      </testcase>
+      <testcase name="test_genuine_last_committing_callback_cannot_withdraw_current_consumer_authority_and_commit_new_origin with data set #1" file="/workspace/VA-Studio-paid-grants/tests/Feature/PaidGrantCommittingAdmissionTest.php" line="82" class="Tests\Feature\PaidGrantCommittingAdmissionTest" classname="Tests.Feature.PaidGrantCommittingAdmissionTest" assertions="6" time="2.624881">
+        <error type="InvalidArgumentException">Tests\Feature\PaidGrantCommittingAdmissionTest::test_genuine_last_committing_callback_cannot_withdraw_current_consumer_authority_and_commit_new_origin with data set #1
+InvalidArgumentException: Database connection [Postcommit output denial does not close unauthorized write admission.] not configured.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:226
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:192
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:103
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithDatabase.php:345
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithDatabase.php:119
+/workspace/VA-Studio-paid-grants/tests/Feature/PaidGrantCommittingAdmissionTest.php:106</error>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

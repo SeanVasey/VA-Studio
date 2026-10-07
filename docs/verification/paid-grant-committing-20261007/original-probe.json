@@ -1,0 +1,12 @@
+{
+  "runtime_source": "def14003fd50e6e7a3aa69ddc84b1e7ebfafd59c",
+  "borrowed_unapproved_producer": "f0a1615be0833804959662fad5d7a7a8e1389ee0",
+  "engine": "SQLite in-memory; actual loopback SMTP and synthetic paid provider graph",
+  "tests": 2,
+  "assertions": 14,
+  "failures": 2,
+  "errors": 0,
+  "canary_sha256": "ff6485059a61cb780b67ff2e24c0f91806b9e2f697b72a6a9436854b523294f6",
+  "observed": "Both genuine framework TransactionCommitting callbacks fire, response refuses403, newly owned order origin commits1 instead of expected0. Policy and persisted credential withdrawals are distinct cases.",
+  "scope": "Current consumer write admission; not a producer source defect or final acceptance. Initial fixture argument error retained separately; final canary has no errors."
+}
