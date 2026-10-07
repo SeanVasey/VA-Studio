@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\SupportAttachmentRegistrationTest" file="/workspace/VA-Studio-support-read-closure/tests/Feature/SupportAttachmentRegistrationTest.php" tests="1" assertions="20" errors="0" failures="0" skipped="0" time="0.545016">
+    <testcase name="test_final_download_commit_callback_cannot_withdraw_policy_and_still_return_original_bytes" file="/workspace/VA-Studio-support-read-closure/tests/Feature/SupportAttachmentRegistrationTest.php" line="130" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="20" time="0.545016"/>
+  </testsuite>
+</testsuites>

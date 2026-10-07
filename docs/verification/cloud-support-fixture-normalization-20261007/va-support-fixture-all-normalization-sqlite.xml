@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="28" assertions="562" errors="1" failures="0" skipped="1" time="18.614684">
+    <testsuite name="Tests\Feature\SupportAttachmentRegistrationTest" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" tests="9" assertions="264" errors="0" failures="0" skipped="0" time="5.873062">
+      <testcase name="test_visitor_page_has_fresh_scope_and_executable_page_csp_but_json_and_original_are_sandboxed" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="34" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="53" time="0.874146"/>
+      <testcase name="test_registered_project_provider_admits_only_current_owner_or_current_mfa_operator" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="58" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="58" time="1.115171"/>
+      <testcase name="test_visitor_rotation_and_default_off_disable_page_and_api_without_disclosing_source" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="78" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="41" time="0.592893"/>
+      <testcase name="test_real_csrf_precedes_upload_and_private_errors_never_echo_filename_or_file" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="90" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="18" time="0.656475"/>
+      <testcase name="test_unknown_routes_methods_query_and_foreign_origin_are_private_before_controller" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="108" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="55" time="0.498804"/>
+      <testcase name="test_precontroller_failure_logs_only_exception_class_and_sandboxes_debug_response" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="117" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="16" time="0.606649"/>
+      <testcase name="test_final_download_commit_callback_cannot_withdraw_policy_and_still_return_original_bytes" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="125" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="19" time="0.556981"/>
+      <testcase name="test_empty_migration_hole_before_a_retained_later_guard_is_not_an_owned_prefix" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="144" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="2" time="0.523795"/>
+      <testcase name="test_reserved_guard_name_cannot_mask_a_second_foreign_table" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="157" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="2" time="0.448149"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\SupportAttachmentHttpTest" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentHttpTest.php" tests="5" assertions="248" errors="1" failures="0" skipped="0" time="3.050681">
+      <testcase name="test_real_private_routes_intake_quarantine_scan_and_download_exact_original" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentHttpTest.php" line="42" class="Tests\Feature\SupportAttachmentHttpTest" classname="Tests.Feature.SupportAttachmentHttpTest" assertions="60" time="0.504648"/>
+      <testcase name="test_duplicate_escaped_command_keys_and_unrecognized_fields_are_rejected" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentHttpTest.php" line="59" class="Tests\Feature\SupportAttachmentHttpTest" classname="Tests.Feature.SupportAttachmentHttpTest" assertions="41" time="0.591155"/>
+      <testcase name="test_queries_ranges_foreign_origins_method_override_and_encoded_bytes_fail_closed" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentHttpTest.php" line="70" class="Tests\Feature\SupportAttachmentHttpTest" classname="Tests.Feature.SupportAttachmentHttpTest" assertions="66" time="0.677620"/>
+      <testcase name="test_missing_body_oversized_body_duplicate_upload_headers_and_invalid_name_refuse_before_manifest" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentHttpTest.php" line="80" class="Tests\Feature\SupportAttachmentHttpTest" classname="Tests.Feature.SupportAttachmentHttpTest" assertions="53" time="0.657631"/>
+      <testcase name="test_session_rotation_denies_retained_read_and_csrf_is_enforced_outside_testing" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentHttpTest.php" line="89" class="Tests\Feature\SupportAttachmentHttpTest" classname="Tests.Feature.SupportAttachmentHttpTest" assertions="28" time="0.619627">
+        <error type="Mockery\Exception\BadMethodCallException">Tests\Feature\SupportAttachmentHttpTest::test_session_rotation_denies_retained_read_and_csrf_is_enforced_outside_testing
+Mockery\Exception\BadMethodCallException: Received Mockery_1_Illuminate_Console_OutputStyle::askQuestion(), but no expectations were specified
+
+/workspace/VA-Studio/vendor/symfony/console/Style/SymfonyStyle.php:234
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Confirm.php:17
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Component.php:117
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Confirm.php:16
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Factory.php:61
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/ConfiguresPrompts.php:78
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/ConfiguresPrompts.php:141
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/ConfiguresPrompts.php:77
+/workspace/VA-Studio/vendor/laravel/prompts/src/Concerns/Fallback.php:59
+/workspace/VA-Studio/vendor/laravel/prompts/src/Prompt.php:108
+/workspace/VA-Studio/vendor/laravel/prompts/src/helpers.php:149
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/ConfirmableTrait.php:33
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/WipeCommand.php:41
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/workspace/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/workspace/VA-Studio/vendor/symfony/console/Application.php:1094
+/workspace/VA-Studio/vendor/symfony/console/Application.php:356
+/workspace/VA-Studio/vendor/symfony/console/Application.php:195
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+/workspace/VA-Studio-support-registration/tests/Support/FinalizationDatabaseMigrations.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:333
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:129
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:101</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\SupportAttachmentCommittedClosureTest" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentCommittedClosureTest.php" tests="8" assertions="21" errors="0" failures="0" skipped="0" time="5.817460">
+      <testcase name="test_final_inquiry_source_change_refuses_without_touching_original_or_manifest" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentCommittedClosureTest.php" line="91" class="Tests\Feature\SupportAttachmentCommittedClosureTest" classname="Tests.Feature.SupportAttachmentCommittedClosureTest" assertions="3" time="0.629651"/>
+      <testcase name="test_final_exact_attachment_row_change_refuses_prepared_original" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentCommittedClosureTest.php" line="101" class="Tests\Feature\SupportAttachmentCommittedClosureTest" classname="Tests.Feature.SupportAttachmentCommittedClosureTest" assertions="3" time="0.721111"/>
+      <testcase name="test_final_filesystem_configuration_withdrawal_refuses_prepared_original" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentCommittedClosureTest.php" line="110" class="Tests\Feature\SupportAttachmentCommittedClosureTest" classname="Tests.Feature.SupportAttachmentCommittedClosureTest" assertions="3" time="0.897654"/>
+      <testcase name="test_final_original_expiry_crossing_refuses_prepared_original" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentCommittedClosureTest.php" line="120" class="Tests\Feature\SupportAttachmentCommittedClosureTest" classname="Tests.Feature.SupportAttachmentCommittedClosureTest" assertions="3" time="0.711551"/>
+      <testcase name="test_second_authentic_scan_decrypt_cannot_move_original_deadline_before_receipt_creation" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentCommittedClosureTest.php" line="130" class="Tests\Feature\SupportAttachmentCommittedClosureTest" classname="Tests.Feature.SupportAttachmentCommittedClosureTest" assertions="3" time="0.758196"/>
+      <testcase name="test_list_final_commit_policy_and_range_changes_cannot_release_old_private_projection" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentCommittedClosureTest.php" line="159" class="Tests\Feature\SupportAttachmentCommittedClosureTest" classname="Tests.Feature.SupportAttachmentCommittedClosureTest" assertions="3" time="0.734369"/>
+      <testcase name="test_rollback_receipt_cannot_be_adopted_after_an_unrelated_later_commit" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentCommittedClosureTest.php" line="173" class="Tests\Feature\SupportAttachmentCommittedClosureTest" classname="Tests.Feature.SupportAttachmentCommittedClosureTest" assertions="2" time="0.590432"/>
+      <testcase name="test_source_receipt_mint_after_direct_commit_reopen_is_not_a_new_transaction_grant" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentCommittedClosureTest.php" line="186" class="Tests\Feature\SupportAttachmentCommittedClosureTest" classname="Tests.Feature.SupportAttachmentCommittedClosureTest" assertions="1" time="0.774495"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\SupportAttachmentSessionIndependentTest" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentSessionIndependentTest.php" tests="4" assertions="24" errors="0" failures="0" skipped="0" time="3.129904">
+      <testcase name="test_context_provider_callback_cannot_adopt_a_changed_owner_after_actor_was_minted" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentSessionIndependentTest.php" line="32" class="Tests\Feature\SupportAttachmentSessionIndependentTest" classname="Tests.Feature.SupportAttachmentSessionIndependentTest" assertions="6" time="0.779087"/>
+      <testcase name="test_final_auth_manager_user_resolver_change_cannot_release_old_request_owner_bytes" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentSessionIndependentTest.php" line="59" class="Tests\Feature\SupportAttachmentSessionIndependentTest" classname="Tests.Feature.SupportAttachmentSessionIndependentTest" assertions="6" time="0.762135"/>
+      <testcase name="test_final_auth_manager_replacement_cannot_release_old_request_owner_bytes" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentSessionIndependentTest.php" line="64" class="Tests\Feature\SupportAttachmentSessionIndependentTest" classname="Tests.Feature.SupportAttachmentSessionIndependentTest" assertions="6" time="0.727298"/>
+      <testcase name="test_final_default_guard_change_cannot_release_old_request_owner_bytes" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentSessionIndependentTest.php" line="69" class="Tests\Feature\SupportAttachmentSessionIndependentTest" classname="Tests.Feature.SupportAttachmentSessionIndependentTest" assertions="6" time="0.861384"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\SupportAttachmentKeyCaptureIndependentTest" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentKeyCaptureIndependentTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="0.743577">
+      <testcase name="test_service_resolution_key_rotation_cannot_adopt_a_previously_minted_visitor_actor" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentKeyCaptureIndependentTest.php" line="15" class="Tests\Feature\SupportAttachmentKeyCaptureIndependentTest" classname="Tests.Feature.SupportAttachmentKeyCaptureIndependentTest" assertions="5" time="0.743577"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ServiceProjectCommittedSchemaIndependentTest" file="/workspace/VA-Studio-support-registration/tests/Feature/ServiceProjectCommittedSchemaIndependentTest.php" tests="1" assertions="0" errors="0" failures="0" skipped="1" time="0.000000">
+      <testcase name="test_permanent_view_cannot_replace_the_captured_source_event_table_after_commit" file="/workspace/VA-Studio-support-registration/tests/Feature/ServiceProjectCommittedSchemaIndependentTest.php" line="29" class="Tests\Feature\ServiceProjectCommittedSchemaIndependentTest" classname="Tests.Feature.ServiceProjectCommittedSchemaIndependentTest" assertions="0" time="0.000000">
+        <skipped/>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

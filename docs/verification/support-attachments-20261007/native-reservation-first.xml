@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\SupportAttachmentNativeConcurrencyTest" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentNativeConcurrencyTest.php" tests="1" assertions="20" errors="0" failures="0" skipped="0" time="13.018094">
+    <testcase name="test_native_last_file_reservation_serializes_real_contenders_and_retains_exact_originals" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentNativeConcurrencyTest.php" line="20" class="Tests\Feature\SupportAttachmentNativeConcurrencyTest" classname="Tests.Feature.SupportAttachmentNativeConcurrencyTest" assertions="20" time="13.018094"/>
+  </testsuite>
+</testsuites>

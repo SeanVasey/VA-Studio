@@ -1,0 +1,12 @@
+{
+  "published_head": "6a1c727339f4b6377285e831add6f8a01bc07b00",
+  "regression_test_sha256": "07b5129de89f2ae46058a877e73409fe78f56093f0b5c7bd84e3903a537bec15",
+  "source_sha256": {
+    "app/Http/Responses/SupportAttachmentResponse.php": "81e4e4929df004a8b50ae4afb2dc700fde0f5c24b9a320b84401df309196f57b",
+    "app/Http/Middleware/SupportAttachmentPrivacy.php": "c5cdd553f0aa8a7d44744fc4ed546abcf26cf4e86f4fed2557c1a181f57f2fae",
+    "bootstrap/app.php": "324778666edbbee394b1496cd61601a5347f83cc57f6b3c2bb0ca7e541dc2709",
+    "tests/Feature/SupportAttachmentRegistrationTest.php": "07b5129de89f2ae46058a877e73409fe78f56093f0b5c7bd84e3903a537bec15"
+  },
+  "result": "2 tests, 88 assertions, 2 actual missing-header failures; zero errors",
+  "selection": "test_actual_page_and_action_throttles_keep_safe_retry_headers_on_private_errors|test_private_http_exception_headers_cannot_disclose_arbitrary_values_or_redirect"
+}

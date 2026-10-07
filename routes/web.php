@@ -15,6 +15,8 @@ use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Support\Facades\Route;
 
 require __DIR__.'/production-customer-identity.php';
+require __DIR__.'/support-attachments.php';
+require __DIR__.'/support-attachment-pages.php';
 
 Route::get('/', [StorefrontController::class, 'index'])->middleware('throttle:120,1')->name('home');
 Route::get('/{section}/{slug?}', EditorialController::class)

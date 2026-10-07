@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="4" assertions="132" errors="0" failures="0" skipped="0" time="141.232120">
+    <testsuite name="Tests\Feature\SupportAttachmentRegistrationTest" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" tests="3" assertions="113" errors="0" failures="0" skipped="0" time="105.884184">
+      <testcase name="test_visitor_page_has_fresh_scope_and_executable_page_csp_but_json_and_original_are_sandboxed" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="34" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="53" time="38.645015"/>
+      <testcase name="test_registered_project_provider_admits_only_current_owner_or_current_mfa_operator" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="58" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="58" time="31.737601"/>
+      <testcase name="test_reserved_guard_name_cannot_mask_a_second_foreign_table" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="157" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="2" time="35.501568"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\SupportAttachmentNativeConcurrencyTest" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentNativeConcurrencyTest.php" tests="1" assertions="19" errors="0" failures="0" skipped="0" time="35.347936">
+      <testcase name="test_native_last_file_reservation_serializes_real_contenders_and_retains_exact_originals" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentNativeConcurrencyTest.php" line="23" class="Tests\Feature\SupportAttachmentNativeConcurrencyTest" classname="Tests.Feature.SupportAttachmentNativeConcurrencyTest" assertions="19" time="35.347936"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

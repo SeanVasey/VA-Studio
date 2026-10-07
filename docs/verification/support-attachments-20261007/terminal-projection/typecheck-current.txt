@@ -1,0 +1,5 @@
+
+> typecheck
+> tsc --noEmit
+
+tests/browser/support-attachments.spec.ts(51,46): error TS2345: Argument of type '"conversation-cleanup"' is not assignable to parameter of type 'Mode'.

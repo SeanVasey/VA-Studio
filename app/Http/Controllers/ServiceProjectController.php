@@ -8,6 +8,7 @@ use App\Domain\Services\Projects\ServiceProjectJson;
 use App\Domain\Services\Projects\ServiceProjects;
 use App\Http\Middleware\ServiceProjectPrivacy;
 use App\Support\CommerceRequestIdentity;
+use App\Support\SupportAttachmentUi;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -19,7 +20,7 @@ final class ServiceProjectController
 {
     public function page(Request $request): Response
     {
-        return $this->run(fn (): Response => Inertia::render('ServiceProjects', ['initial' => $this->indexData($request)])->toResponse($request));
+        return $this->run(fn (): Response => Inertia::render('ServiceProjects', ['initial' => $this->indexData($request), 'attachmentsEnabled' => SupportAttachmentUi::enabled()])->toResponse($request));
     }
 
     public function index(Request $request): Response

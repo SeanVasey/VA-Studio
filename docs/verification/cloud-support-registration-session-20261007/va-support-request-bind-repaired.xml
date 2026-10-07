@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="18" assertions="123" errors="0" failures="14" skipped="0" time="5.950739">
+    <testsuite name="Tests\Feature\SupportAttachmentRegistrationTest" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" tests="9" assertions="105" errors="0" failures="5" skipped="0" time="2.959202">
+      <testcase name="test_visitor_page_has_fresh_scope_and_executable_page_csp_but_json_and_original_are_sandboxed" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="39" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="2" time="0.537573">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentRegistrationTest::test_visitor_page_has_fresh_scope_and_executable_page_csp_but_json_and_original_are_sandboxed
+Expected response status code [200] but received 503.
+Failed asserting that 503 is identical to 200.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php:42</failure>
+      </testcase>
+      <testcase name="test_registered_project_provider_admits_only_current_owner_or_current_mfa_operator" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="63" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="3" time="0.464558">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentRegistrationTest::test_registered_project_provider_admits_only_current_owner_or_current_mfa_operator
+Expected response status code [200] but received 503.
+Failed asserting that 503 is identical to 200.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php:69</failure>
+      </testcase>
+      <testcase name="test_visitor_rotation_and_default_off_disable_page_and_api_without_disclosing_source" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="83" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="2" time="0.329810">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentRegistrationTest::test_visitor_rotation_and_default_off_disable_page_and_api_without_disclosing_source
+Expected response status code [404] but received 503.
+Failed asserting that 503 is identical to 404.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:151
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php:87</failure>
+      </testcase>
+      <testcase name="test_real_csrf_precedes_upload_and_private_errors_never_echo_filename_or_file" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="95" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="17" time="0.262868">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentRegistrationTest::test_real_csrf_precedes_upload_and_private_errors_never_echo_filename_or_file
+Expected response status code [201] but received 503.
+Failed asserting that 503 is identical to 201.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:26
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php:108</failure>
+      </testcase>
+      <testcase name="test_unknown_routes_methods_query_and_foreign_origin_are_private_before_controller" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="113" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="56" time="0.300913"/>
+      <testcase name="test_precontroller_failure_logs_only_exception_class_and_sandboxes_debug_response" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="122" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="17" time="0.351564"/>
+      <testcase name="test_final_download_commit_callback_cannot_withdraw_policy_and_still_return_original_bytes" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="130" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="2" time="0.275248">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentRegistrationTest::test_final_download_commit_callback_cannot_withdraw_policy_and_still_return_original_bytes
+Expected response status code [201] but received 503.
+Failed asserting that 503 is identical to 201.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:26
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php:133</failure>
+      </testcase>
+      <testcase name="test_empty_migration_hole_before_a_retained_later_guard_is_not_an_owned_prefix" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="149" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="3" time="0.212539"/>
+      <testcase name="test_sqlite_reserved_guard_name_cannot_mask_a_second_foreign_table" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="162" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="3" time="0.224130"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\SupportAttachmentSessionBindingTest" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentSessionBindingTest.php" tests="6" assertions="12" errors="0" failures="6" skipped="0" time="1.966098">
+      <testsuite name="Tests\Feature\SupportAttachmentSessionBindingTest::test_actual_final_download_request_revocation_cannot_release_old_bytes" tests="6" assertions="12" errors="0" failures="6" skipped="0" time="1.966098">
+        <testcase name="test_actual_final_download_request_revocation_cannot_release_old_bytes with data set #0" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentSessionBindingTest.php" line="29" class="Tests\Feature\SupportAttachmentSessionBindingTest" classname="Tests.Feature.SupportAttachmentSessionBindingTest" assertions="2" time="0.276818">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentSessionBindingTest::test_actual_final_download_request_revocation_cannot_release_old_bytes with data set #0
+Expected response status code [201] but received 503.
+Failed asserting that 503 is identical to 201.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:26
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentSessionBindingTest.php:36</failure>
+        </testcase>
+        <testcase name="test_actual_final_download_request_revocation_cannot_release_old_bytes with data set #1" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentSessionBindingTest.php" line="29" class="Tests\Feature\SupportAttachmentSessionBindingTest" classname="Tests.Feature.SupportAttachmentSessionBindingTest" assertions="2" time="0.352277">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentSessionBindingTest::test_actual_final_download_request_revocation_cannot_release_old_bytes with data set #1
+Expected response status code [201] but received 503.
+Failed asserting that 503 is identical to 201.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:26
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentSessionBindingTest.php:36</failure>
+        </testcase>
+        <testcase name="test_actual_final_download_request_revocation_cannot_release_old_bytes with data set #2" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentSessionBindingTest.php" line="29" class="Tests\Feature\SupportAttachmentSessionBindingTest" classname="Tests.Feature.SupportAttachmentSessionBindingTest" assertions="2" time="0.268566">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentSessionBindingTest::test_actual_final_download_request_revocation_cannot_release_old_bytes with data set #2
+Expected response status code [201] but received 503.
+Failed asserting that 503 is identical to 201.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:26
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentSessionBindingTest.php:36</failure>
+        </testcase>
+        <testcase name="test_actual_final_download_request_revocation_cannot_release_old_bytes with data set #3" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentSessionBindingTest.php" line="29" class="Tests\Feature\SupportAttachmentSessionBindingTest" classname="Tests.Feature.SupportAttachmentSessionBindingTest" assertions="2" time="0.324232">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentSessionBindingTest::test_actual_final_download_request_revocation_cannot_release_old_bytes with data set #3
+Expected response status code [201] but received 503.
+Failed asserting that 503 is identical to 201.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:26
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentSessionBindingTest.php:36</failure>
+        </testcase>
+        <testcase name="test_actual_final_download_request_revocation_cannot_release_old_bytes with data set #4" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentSessionBindingTest.php" line="29" class="Tests\Feature\SupportAttachmentSessionBindingTest" classname="Tests.Feature.SupportAttachmentSessionBindingTest" assertions="2" time="0.340797">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentSessionBindingTest::test_actual_final_download_request_revocation_cannot_release_old_bytes with data set #4
+Expected response status code [201] but received 503.
+Failed asserting that 503 is identical to 201.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:26
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentSessionBindingTest.php:36</failure>
+        </testcase>
+        <testcase name="test_actual_final_download_request_revocation_cannot_release_old_bytes with data set #5" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentSessionBindingTest.php" line="29" class="Tests\Feature\SupportAttachmentSessionBindingTest" classname="Tests.Feature.SupportAttachmentSessionBindingTest" assertions="2" time="0.403410">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentSessionBindingTest::test_actual_final_download_request_revocation_cannot_release_old_bytes with data set #5
+Expected response status code [201] but received 503.
+Failed asserting that 503 is identical to 201.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:26
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentSessionBindingTest.php:36</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\SupportAttachmentSessionIndependentTest" file="/workspace/VA-Studio-support-session-independent/tests/Feature/SupportAttachmentSessionIndependentTest.php" tests="3" assertions="6" errors="0" failures="3" skipped="0" time="1.025439">
+      <testcase name="test_context_provider_callback_cannot_adopt_a_changed_owner_after_actor_was_minted" file="/workspace/VA-Studio-support-session-independent/tests/Feature/SupportAttachmentSessionIndependentTest.php" line="30" class="Tests\Feature\SupportAttachmentSessionIndependentTest" classname="Tests.Feature.SupportAttachmentSessionIndependentTest" assertions="2" time="0.423429">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentSessionIndependentTest::test_context_provider_callback_cannot_adopt_a_changed_owner_after_actor_was_minted
+Expected response status code [201] but received 503.
+Failed asserting that 503 is identical to 201.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:26
+/workspace/VA-Studio-support-session-independent/tests/Feature/SupportAttachmentSessionIndependentTest.php:37</failure>
+      </testcase>
+      <testcase name="test_final_auth_manager_user_resolver_change_cannot_release_old_request_owner_bytes" file="/workspace/VA-Studio-support-session-independent/tests/Feature/SupportAttachmentSessionIndependentTest.php" line="57" class="Tests\Feature\SupportAttachmentSessionIndependentTest" classname="Tests.Feature.SupportAttachmentSessionIndependentTest" assertions="2" time="0.341650">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentSessionIndependentTest::test_final_auth_manager_user_resolver_change_cannot_release_old_request_owner_bytes
+Expected response status code [201] but received 503.
+Failed asserting that 503 is identical to 201.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:26
+/workspace/VA-Studio-support-session-independent/tests/Feature/SupportAttachmentSessionIndependentTest.php:74
+/workspace/VA-Studio-support-session-independent/tests/Feature/SupportAttachmentSessionIndependentTest.php:59</failure>
+      </testcase>
+      <testcase name="test_final_auth_manager_replacement_cannot_release_old_request_owner_bytes" file="/workspace/VA-Studio-support-session-independent/tests/Feature/SupportAttachmentSessionIndependentTest.php" line="62" class="Tests\Feature\SupportAttachmentSessionIndependentTest" classname="Tests.Feature.SupportAttachmentSessionIndependentTest" assertions="2" time="0.260360">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentSessionIndependentTest::test_final_auth_manager_replacement_cannot_release_old_request_owner_bytes
+Expected response status code [201] but received 503.
+Failed asserting that 503 is identical to 201.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:26
+/workspace/VA-Studio-support-session-independent/tests/Feature/SupportAttachmentSessionIndependentTest.php:74
+/workspace/VA-Studio-support-session-independent/tests/Feature/SupportAttachmentSessionIndependentTest.php:64</failure>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

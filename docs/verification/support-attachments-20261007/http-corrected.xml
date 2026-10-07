@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\SupportAttachmentHttpTest" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentHttpTest.php" tests="5" assertions="253" errors="0" failures="0" skipped="0" time="1.592459">
+    <testcase name="test_real_private_routes_intake_quarantine_scan_and_download_exact_original" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentHttpTest.php" line="37" class="Tests\Feature\SupportAttachmentHttpTest" classname="Tests.Feature.SupportAttachmentHttpTest" assertions="61" time="0.588503"/>
+    <testcase name="test_duplicate_escaped_command_keys_and_unrecognized_fields_are_rejected" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentHttpTest.php" line="47" class="Tests\Feature\SupportAttachmentHttpTest" classname="Tests.Feature.SupportAttachmentHttpTest" assertions="42" time="0.248964"/>
+    <testcase name="test_queries_ranges_foreign_origins_method_override_and_encoded_bytes_fail_closed" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentHttpTest.php" line="55" class="Tests\Feature\SupportAttachmentHttpTest" classname="Tests.Feature.SupportAttachmentHttpTest" assertions="67" time="0.243887"/>
+    <testcase name="test_missing_body_oversized_body_duplicate_upload_headers_and_invalid_name_refuse_before_manifest" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentHttpTest.php" line="64" class="Tests\Feature\SupportAttachmentHttpTest" classname="Tests.Feature.SupportAttachmentHttpTest" assertions="54" time="0.246525"/>
+    <testcase name="test_session_rotation_denies_retained_read_and_csrf_is_enforced_outside_testing" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentHttpTest.php" line="72" class="Tests\Feature\SupportAttachmentHttpTest" classname="Tests.Feature.SupportAttachmentHttpTest" assertions="29" time="0.264580"/>
+  </testsuite>
+</testsuites>

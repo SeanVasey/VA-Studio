@@ -34,7 +34,7 @@ const uncertain = 'We could not confirm whether your follow-up was saved. Its or
 const readable = (at: string) => new Date(at).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 
 /** Reopening never creates a new inquiry or changes the server's intake availability. */
-export function InquiryConversationEntry() {
+export function InquiryConversationEntry({ attachmentsEnabled = false }: { attachmentsEnabled?: boolean } = {}) {
   const prefix = useId();
   const [value, setValue] = useState('');
   const [opened, setOpened] = useState<string | null>(null);
@@ -45,7 +45,7 @@ export function InquiryConversationEntry() {
     window.addEventListener('pagehide', clear);
     return () => window.removeEventListener('pagehide', clear);
   }, []);
-  if (opened) return <InquiryConversation key={opened} receipt={opened} onClose={() => {
+  if (opened) return <InquiryConversation key={opened} receipt={opened} attachmentsEnabled={attachmentsEnabled} onClose={() => {
     setOpened(null); window.requestAnimationFrame(() => input.current?.focus());
   }} />;
   return <><section className="contact-inquiry" aria-labelledby={`${prefix}-title`}>
@@ -68,7 +68,7 @@ export function InquiryConversationEntry() {
 }
 
 /** A receipt is a locator. The server still requires the original inquiry's current browser session. */
-export function InquiryConversation({ receipt, onClose }: { receipt: string; onClose: () => void }) {
+export function InquiryConversation({ receipt, onClose, attachmentsEnabled = false }: { receipt: string; onClose: () => void; attachmentsEnabled?: boolean }) {
   const prefix = useId();
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [draft, setDraft] = useState('');
@@ -187,6 +187,7 @@ export function InquiryConversation({ receipt, onClose }: { receipt: string; onC
     </div>
     <div className="contact-inquiry-actions"><button className="button button-outline" type="button" disabled={busy} onClick={() => void refresh()}>Refresh conversation</button></div>
     {conversation && <div>
+      {attachmentsEnabled === true && <a className="text-link" href={`/private-support/inquiries/${encodeURIComponent(receipt)}/attachments/view`}>Open private attachment files</a>}
       <InquiryOrderContext receipt={receipt} />
       <h3>{conversation.subject}</h3>
       <p>Inquiry {conversation.state === 'new' ? 'saved' : conversation.state === 'read' ? 'read by staff' : 'archived'}</p>

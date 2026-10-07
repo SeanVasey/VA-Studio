@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ServiceSupportAttachmentsTest" file="/workspace/VA-Studio-support-attachments/tests/Feature/ServiceSupportAttachmentsTest.php" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="0.577775">
+    <testcase name="test_terminal_customer_stamp_resolution_cannot_withdraw_credential_and_return_private_projection" file="/workspace/VA-Studio-support-attachments/tests/Feature/ServiceSupportAttachmentsTest.php" line="172" class="Tests\Feature\ServiceSupportAttachmentsTest" classname="Tests.Feature.ServiceSupportAttachmentsTest" assertions="2" time="0.577775">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ServiceSupportAttachmentsTest::test_terminal_customer_stamp_resolution_cannot_withdraw_credential_and_return_private_projection
+Current source authority must refuse the attachment operation.
+
+/workspace/VA-Studio-support-attachments/tests/Feature/ServiceSupportAttachmentsTest.php:210
+/workspace/VA-Studio-support-attachments/tests/Feature/ServiceSupportAttachmentsTest.php:181</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

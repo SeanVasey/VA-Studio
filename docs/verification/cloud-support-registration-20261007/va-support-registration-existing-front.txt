@@ -1,0 +1,17 @@
+
+> test
+> vitest run tests/frontend/support-attachments.test.tsx tests/frontend/service-project-journey.test.tsx tests/frontend/contact-inquiry.test.tsx tests/frontend/inquiry-conversation.test.tsx
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-support-registration
+
+
+ Test Files  4 passed (4)
+      Tests  73 passed (73)
+   Start at  09:04:00
+   Duration  6.31s (tests 54%, environment 31%, transform 6%, setup 5%, import 3%)
+
+Environment  jsdom was created 4 times · 4.39s total, 31% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+

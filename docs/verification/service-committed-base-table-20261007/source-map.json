@@ -1,0 +1,9 @@
+{
+  "source": "9ce31963abc3ba89f22ed9b39c009023cedef77d",
+  "base_runtime": "8444f15ea3f5f3c74994fef48705b2a193de7cba",
+  "files": {
+    "app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentSourceV1.php": "26beec4c34440038fd8c15f3af3906bb2520f336c60ec76a656d60ecb9921943",
+    "tests/Feature/ServiceProjectCommittedReadTest.php": "fae7094cde465d09586c1160b9bcbd10a0e139a206d7cbc49a8c4cde3857306a"
+  },
+  "original_runtime_sha256": "e80403e222d62ba849e8e4922697e70786eaa9323a5509f03f19141eb10ca304"
+}

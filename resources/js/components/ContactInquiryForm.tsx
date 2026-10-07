@@ -27,13 +27,13 @@ function csrfHeaders(): Record<string, string> {
   return token ? { 'X-CSRF-TOKEN': token } : {};
 }
 
-type Props = { privacyNotice: string; noticeToken: string; orderId?: string };
+type Props = { privacyNotice: string; noticeToken: string; orderId?: string; attachmentsEnabled?: boolean };
 /** Parent gates collection on a verified public or order-specific setup. Locator changes discard private state. */
 export function ContactInquiryForm(props: Props) {
   return <InquiryForm key={props.orderId ?? 'contact'} {...props} />;
 }
 
-function InquiryForm({ privacyNotice, noticeToken, orderId }: Props) {
+function InquiryForm({ privacyNotice, noticeToken, orderId, attachmentsEnabled = false }: Props) {
   const prefix = useId();
   const [fields, setFields] = useState<Fields>({ ...empty });
   const [errors, setErrors] = useState<Errors>({});
@@ -168,7 +168,7 @@ function InquiryForm({ privacyNotice, noticeToken, orderId }: Props) {
 
   if (!attempt.current && (!privacyNotice.trim() || !isNoticeToken(noticeToken) || (orderId !== undefined && !inquiryLocator(orderId)))) return null;
 
-  if (conversationReceipt) return <InquiryConversation key={conversationReceipt} receipt={conversationReceipt} onClose={() => {
+  if (conversationReceipt) return <InquiryConversation key={conversationReceipt} receipt={conversationReceipt} attachmentsEnabled={attachmentsEnabled} onClose={() => {
     setConversationReceipt(null); window.requestAnimationFrame(() => summary.current?.focus());
   }} />;
 
@@ -211,5 +211,5 @@ function InquiryForm({ privacyNotice, noticeToken, orderId }: Props) {
         {locked && !sending && <p>The original fields are read-only while this inquiry is unconfirmed.</p>}
       </div>
     </form>
-  </section>{!orderId && <InquiryConversationEntry />}</>;
+  </section>{!orderId && <InquiryConversationEntry attachmentsEnabled={attachmentsEnabled} />}</>;
 }

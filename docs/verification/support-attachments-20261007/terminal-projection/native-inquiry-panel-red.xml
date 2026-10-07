@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\SupportAttachmentsTest" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="27.173406">
+    <testcase name="test_terminal_inquiry_panel_callback_cannot_withdraw_intake_and_finish_scan" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="543" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="3" time="27.173406">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\SupportAttachmentsTest::test_terminal_inquiry_panel_callback_cannot_withdraw_intake_and_finish_scan
+Refused attachment operation completed.
+
+/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php:616
+/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php:561</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

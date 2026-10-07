@@ -1,0 +1,93 @@
+{
+  "executable": "20c6f87a8d11946ab6593461ce31821eabbcd9e0",
+  "docs_only_checkpoint_merge": "4e103201c04033e8a777f5a9891715e29b530f1e",
+  "runtime_approval": "15c9e34630966243ce92783dbacf167f908262ee",
+  "unchanged_independent_bindings": [
+    "app/Support/SupportAttachmentRequestContext.php",
+    "app/Http/Controllers/SupportAttachmentController.php",
+    "app/Http/Controllers/SupportAttachmentPageController.php",
+    "app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentSourceV1.php",
+    "tests/Feature/ServiceProjectCommittedReadTest.php",
+    "app/Domain/SupportAttachments/AttachmentActor.php",
+    "app/Domain/SupportAttachments/AttachmentActorResolver.php",
+    "app/Domain/SupportAttachments/AttachmentCommittedProjection.php",
+    "app/Domain/SupportAttachments/AttachmentCommittedReadAuthority.php",
+    "app/Domain/SupportAttachments/AttachmentCommittedReadReceipt.php",
+    "app/Domain/SupportAttachments/AttachmentCommittedRows.php",
+    "app/Domain/SupportAttachments/AttachmentException.php",
+    "app/Domain/SupportAttachments/AttachmentFiles.php",
+    "app/Domain/SupportAttachments/AttachmentMutationAuthority.php",
+    "app/Domain/SupportAttachments/AttachmentPolicy.php",
+    "app/Domain/SupportAttachments/AttachmentRegistry.php",
+    "app/Domain/SupportAttachments/AttachmentRemoval.php",
+    "app/Domain/SupportAttachments/AttachmentRows.php",
+    "app/Domain/SupportAttachments/AttachmentSchema.php",
+    "app/Domain/SupportAttachments/AttachmentSnapshot.php",
+    "app/Domain/SupportAttachments/AttachmentSourceAuthority.php",
+    "app/Domain/SupportAttachments/AttachmentSourceProof.php",
+    "app/Domain/SupportAttachments/AttachmentSourceToken.php",
+    "app/Domain/SupportAttachments/DBOutside.php",
+    "app/Domain/SupportAttachments/FixtureAttachmentPolicy.php",
+    "app/Domain/SupportAttachments/InquiryAttachmentAuthority.php",
+    "app/Domain/SupportAttachments/InquiryAttachmentToken.php",
+    "app/Domain/SupportAttachments/InquiryCommittedReadReceipt.php",
+    "app/Domain/SupportAttachments/RehearsalAttachmentActors.php",
+    "app/Domain/SupportAttachments/SupportAttachments.php",
+    "app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentAuthority.php",
+    "app/Domain/Services/Projects/Attachments/ServiceProjectCommittedReadReceipt.php"
+  ],
+  "changed_active_peer_test_setups": [
+    "tests/Feature/SupportAttachmentSessionIndependentTest.php",
+    "tests/Feature/SupportAttachmentKeyCaptureIndependentTest.php"
+  ],
+  "test_files_sha256": {
+    "tests/Feature/SupportAttachmentSessionIndependentTest.php": "b6263200dc3e42be60cf6eb6fffbe9a54a6e26f995d1d18f6edc4008205cbbad",
+    "tests/Feature/SupportAttachmentKeyCaptureIndependentTest.php": "869c3f1f879ec02294335c28fd21af74eac2332402f5edac4b5f4269af344e2b",
+    "tests/Feature/ServiceProjectCommittedSchemaIndependentTest.php": "e826569a8efbb433274e3e56ebf134f114e5b48c84533e323df9fd3dcb39a00b",
+    "tests/Feature/SupportAttachmentRegistrationTest.php": "a19e6ab988d390f7cf3ee9a9b97992439f4f2b817700135951050b6caa87198f",
+    "tests/Feature/SupportAttachmentNativeConcurrencyTest.php": "c31eecf01bb9b85392c2f6e4387596a63fe72360c285ebef655f22d9484d47c8",
+    "tests/Feature/SupportAttachmentHttpTest.php": "2146e29f3d29db3f5d28efdec9e8cb6a2a27ece85a2aca4db25dce0449f018f6",
+    "tests/Feature/SupportAttachmentCommittedClosureTest.php": "cc7eba397ca8db7a9f48741bd04124555e06ca47f69bfe0280c4d25509b8149f"
+  },
+  "original_archives_and_independent_artifacts_verified": 41,
+  "receipts": [
+    {
+      "source": "7c8372bd0723447c03c3b671fa456fc79ce5fbaa",
+      "sqlite": "6recorded5exec29assertions1nativeVIEWskip",
+      "native": "6/33zeroF/E/S",
+      "purpose": "unchanged5 request canaries and permanentVIEW on standard testing/disposable lifecycle"
+    },
+    {
+      "source": "a566292f5651470407dd4ce1240107ef1de12a4f",
+      "sqlite": "28recorded26exec562assertions1nativeVIEWskip1cleanupharnesserror",
+      "native": "4/132zeroF/E/S",
+      "purpose": "realvisitorbytes/operatorMFAcurrentowner, sameTABLE/TRIGGERname nativecounterpart and observednativecontention"
+    },
+    {
+      "source": "20c6f87a8d11946ab6593461ce31821eabbcd9e0",
+      "sqlite": "affected1/28zeroF/E/S",
+      "purpose": "finally restores testing after authentic production-env CSRF case; same production419/assertions unchanged"
+    }
+  ],
+  "harness_error": "The new disposable cleanup correctly encountered production environment left by existing CSRF test and requested confirmation. Own test finally restores testing; no helper/CI/operationaldown/protection relaxation. Raw failure preserved.",
+  "limitations": [
+    "Runtime remains defaultoff fixture family with original binding approval carried32/34 exactly",
+    "Twoactivepeer tests differ only standardized fixture setup; archived originals remain byteexact",
+    "Finalglobalnewtestcensus/native8.4/browser/Foundation outstanding"
+  ],
+  "artifacts_sha256": {
+    "va-support-fixture-normalization-sqlite.xml": "fdfdddfdfa889a5ad7186710b43f52b4961061d3d27295399efec3d1446ec8d0",
+    "va-support-fixture-normalization-sqlite.txt": "d590644b60d2509547499db88d446eceee8df8fbbbc4b6a2662bb3a86a668589",
+    "va-support-fixture-all-normalization-sqlite.txt": "960dc6e3cc6eac7ca0d563504ca13c14d94bc37c8b1399da01e06c89702a4e81",
+    "va-support-fixture-all-normalization-sqlite.xml": "e5d014bad9050e7cdd1dd41fd5435478b434972e99976d4da29e39504ab8802a",
+    "va-support-fixture-all-normalization-pint.txt": "d43cd4b14c8b0866ffd5be27e83cbc6df04659c6e0283522f5ab6afc496aff7c",
+    "va-support-fixture-all-normalization-native.txt": "1ab65b66dd871ea4a2989cb5a362998a4a485250cb4649bb38a4c0f9565adc3e",
+    "va-support-fixture-env-corrected.txt": "2a8f21b517d54ebefee2cdffe918e66bc601bedf9fbc23657de5ceacc8476d89",
+    "va-support-fixture-normalization-native.txt": "f2ff25b38ac508cd3597811a127d112faab27c26f8e035aef0eb90fd801343dd",
+    "va-support-fixture-env-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "va-support-fixture-env-corrected.xml": "d9b37f4c65d7a019c24ea750705630099afb474c54b3c44a38e5e06df8ac26d6",
+    "va-support-fixture-all-normalization-native.xml": "df272503156483eef98983fa5ddbb65c49cfc00c9c601dee7892a4d22f0ae972",
+    "va-support-fixture-normalization-native.xml": "5bea2b9a2d0ac7209e571986ba7e85a6a484871358a7105064e20054e6e66cb2",
+    "va-support-fixture-normalization-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+  }
+}
