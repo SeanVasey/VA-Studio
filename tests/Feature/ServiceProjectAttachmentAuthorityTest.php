@@ -6,6 +6,8 @@ use App\Domain\Services\Projects\Attachments\ServiceProjectAttachmentAuthority;
 use App\Domain\SupportAttachments\AttachmentActor;
 use App\Domain\SupportAttachments\AttachmentException;
 use App\Domain\SupportAttachments\AttachmentRows;
+use Filament\Auth\MultiFactor\Contracts\MultiFactorAuthenticationProvider;
+use Filament\Facades\Filament;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -161,6 +163,86 @@ final class ServiceProjectAttachmentAuthorityTest extends TestCase
             $this->assertGreaterThanOrEqual(4, $reads);
         });
         $this->assertDatabaseCount('service_project_events', 0);
+    }
+
+    public function test_service_withdrawal_at_final_staff_framework_query_refuses_without_changing_source_rows(): void
+    {
+        $f = F::setup();
+        $pdo = DB::connection()->getPdo();
+        $before = [];
+        foreach (['users', 'customer_accounts', 'service_projects', 'service_project_events'] as $table) {
+            $before[$table] = $pdo->query('SELECT * FROM '.$table.' ORDER BY id')->fetchAll(PDO::FETCH_ASSOC);
+        }
+        $reads = 0;
+        DB::listen(function (QueryExecuted $query) use (&$reads): void {
+            if (str_starts_with(strtolower($query->sql), 'select') && str_contains($query->sql, DB::connection()->getQueryGrammar()->wrapTable('users')) && ++$reads === 4) {
+                config(['services-projects.test_enabled' => false]);
+            }
+        });
+        $this->refused(fn () => DB::transaction(fn () => (new ServiceProjectAttachmentAuthority)->lock(
+            $f['project']['id'], 0, 'intake', AttachmentActor::operator($f['operator']), new AttachmentRows)), 404);
+        $this->assertGreaterThanOrEqual(4, $reads);
+        $this->assertFalse(config('services-projects.test_enabled'));
+        foreach ($before as $table => $expected) {
+            $this->assertSame($expected, $pdo->query('SELECT * FROM '.$table.' ORDER BY id')->fetchAll(PDO::FETCH_ASSOC));
+        }
+    }
+
+    public function test_mfa_provider_service_withdrawal_after_last_framework_query_cannot_mint_proof(): void
+    {
+        $f = F::setup();
+        $calls = 0;
+        $this->withProvider(function () use (&$calls): bool {
+            if (++$calls === 2) {
+                config(['services-projects.test_enabled' => false]);
+            }
+
+            return true;
+        }, function () use ($f): void {
+            $this->refused(fn () => DB::transaction(fn () => (new ServiceProjectAttachmentAuthority)->lock(
+                $f['project']['id'], 0, 'intake', AttachmentActor::operator($f['operator']), new AttachmentRows)), 404);
+        });
+        $this->assertSame(2, $calls);
+        $this->assertFalse(config('services-projects.test_enabled'));
+        $this->assertDatabaseCount('service_projects', 1);
+        $this->assertDatabaseCount('service_project_events', 0);
+    }
+
+    public function test_mfa_provider_actor_withdrawal_cannot_follow_the_terminal_raw_user_snapshot(): void
+    {
+        $f = F::setup();
+        $calls = 0;
+        $this->withProvider(function () use (&$calls, $f): bool {
+            if (++$calls === 2) {
+                DB::table('users')->where('id', $f['operator']->id)->update(['is_admin' => false]);
+            }
+
+            return true;
+        }, function () use ($f): void {
+            $this->refused(fn () => DB::transaction(fn () => (new ServiceProjectAttachmentAuthority)->lock(
+                $f['project']['id'], 0, 'intake', AttachmentActor::operator($f['operator']), new AttachmentRows)), 403);
+        });
+        $this->assertSame(2, $calls);
+        // The refused consumer transaction preserves the actor and retained graph.
+        $this->assertTrue($f['operator']->fresh()->is_admin);
+        $this->assertDatabaseCount('service_projects', 1);
+        $this->assertDatabaseCount('service_project_events', 0);
+    }
+
+    private function withProvider(callable $enabled, callable $test): void
+    {
+        $panel = Filament::getPanel('admin');
+        $providers = $panel->getMultiFactorAuthenticationProviders();
+        $required = $panel->isMultiFactorAuthenticationRequired();
+        $provider = \Mockery::mock(MultiFactorAuthenticationProvider::class);
+        $provider->shouldReceive('getId')->andReturn('terminal-probe');
+        $provider->shouldReceive('isEnabled')->andReturnUsing($enabled);
+        $panel->multiFactorAuthentication([$provider], isRequired: true);
+        try {
+            $test();
+        } finally {
+            $panel->multiFactorAuthentication($providers, isRequired: $required);
+        }
     }
 
     public function test_current_account_withdrawal_and_connection_replacement_are_refused_at_terminal_proof(): void
