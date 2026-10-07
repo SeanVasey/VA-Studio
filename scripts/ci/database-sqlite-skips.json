@@ -645,6 +645,10 @@
     [
       "Tests\\Feature\\NativeSchemaIsolationTest",
       "test_same_named_objects_in_a_parallel_schema_do_not_block_a_fresh_migration"
+    ],
+    [
+      "Tests\\Feature\\ProductionIdentity\\IdentityInspectionCostTest",
+      "test_one_native_inspection_issues_a_small_fixed_number_of_statements"
     ]
   ]
 }

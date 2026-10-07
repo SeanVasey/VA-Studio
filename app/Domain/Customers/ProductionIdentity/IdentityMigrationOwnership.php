@@ -10,8 +10,11 @@ use PDOException;
 /** Exact empty DDL-prefix recovery; ownership admission performs no application/query callbacks. */
 final class IdentityMigrationOwnership
 {
+    private ?string $database = null;
+
     public function inspect(PDO $pdo, string $driver): array
     {
+        $this->database = null;
         if (! in_array($driver, ['sqlite', 'mysql'], true) || $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) !== $driver) {
             $this->reject();
         }
@@ -103,8 +106,12 @@ final class IdentityMigrationOwnership
                 }
             }
         } else {
+            $namedTables = $this->lookups($pdo, 'SELECT TABLE_NAME,TABLE_TYPE,ENGINE,CREATE_OPTIONS,TABLE_COMMENT,TABLE_COLLATION FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND LOWER(TABLE_NAME)=?',
+                [...$parents, ...$tables, ...array_keys($guards), ...$reserved]);
+            $namedTriggers = $this->lookups($pdo, 'SELECT TRIGGER_NAME,EVENT_OBJECT_TABLE,EVENT_MANIPULATION,ACTION_TIMING,ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND LOWER(TRIGGER_NAME)=?',
+                [...$reserved, ...array_keys($guards), ...$tables]);
             foreach ([...$parents, ...$tables] as $table) {
-                $rows = $this->query($pdo, 'SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND LOWER(TABLE_NAME)=?', [$table]);
+                $rows = $namedTables[$table];
                 if (count($rows) > 1 || ($rows !== [] && ($rows[0]['TABLE_NAME'] !== $table || $rows[0]['TABLE_TYPE'] !== 'BASE TABLE'
                     || $rows[0]['ENGINE'] !== 'InnoDB' || $rows[0]['CREATE_OPTIONS'] !== '' || $rows[0]['TABLE_COMMENT'] !== ''))) {
                     $this->reject();
@@ -130,7 +137,7 @@ final class IdentityMigrationOwnership
                 }
             }
             foreach ([...array_keys($guards), ...$reserved] as $reservedName) {
-                if ($this->query($pdo, 'SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND LOWER(TABLE_NAME)=?', [$reservedName]) !== []) {
+                if ($namedTables[$reservedName] !== []) {
                     $this->reject();
                 }
                 try {
@@ -141,42 +148,44 @@ final class IdentityMigrationOwnership
                         throw $exception;
                     }
                 }
-                if (in_array($reservedName, $reserved, true) && $this->query($pdo, 'SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND LOWER(TRIGGER_NAME)=?', [$reservedName]) !== []) {
+                if (in_array($reservedName, $reserved, true) && $namedTriggers[$reservedName] !== []) {
                     $this->reject();
                 }
             }
             foreach ($guards as $name => $guard) {
-                $rows = $this->query($pdo, 'SELECT * FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND LOWER(TRIGGER_NAME)=?', [$name]);
+                $rows = $namedTriggers[$name];
                 if (count($rows) > 1 || ($rows !== [] && (! $present[$guard['table']] || $rows[0]['TRIGGER_NAME'] !== $name
                     || $rows[0]['EVENT_OBJECT_TABLE'] !== $guard['table'] || $rows[0]['EVENT_MANIPULATION'] !== $guard['operation']
                     || $rows[0]['ACTION_TIMING'] !== 'BEFORE' || $rows[0]['ACTION_STATEMENT'] !== $guard['body']))) {
                     $this->reject();
                 }
-                if ($this->query($pdo, 'SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND LOWER(TABLE_NAME)=?', [$name]) !== []) {
+                if ($namedTables[$name] !== []) {
                     $this->reject();
                 }
                 $present[$name] = $rows !== [];
             }
             foreach ($tables as $table) {
-                if ($this->query($pdo, 'SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND LOWER(TRIGGER_NAME)=?', [$table]) !== []) {
+                if ($namedTriggers[$table] !== []) {
                     $this->reject();
                 }
             }
+            $namedIndexes = $this->lookups($pdo, 'SELECT TABLE_NAME,INDEX_NAME FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND LOWER(INDEX_NAME)=?', $reserved);
+            $namedConstraints = $this->lookups($pdo, 'SELECT TABLE_NAME,CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=DATABASE() AND LOWER(CONSTRAINT_NAME)=?', $reserved);
             foreach ($definitions as $table => $definition) {
                 foreach ([...array_keys($definition['unique']), ...array_keys($definition['foreign'])] as $name) {
-                    foreach ($this->query($pdo, 'SELECT TABLE_NAME,INDEX_NAME FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND LOWER(INDEX_NAME)=?', [$name]) as $index) {
+                    foreach ($namedIndexes[$name] as $index) {
                         if ($index['TABLE_NAME'] !== $table || $index['INDEX_NAME'] !== $name || ! $present[$table]) {
                             $this->reject();
                         }
                     }
-                    foreach ($this->query($pdo, 'SELECT TABLE_NAME,CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=DATABASE() AND LOWER(CONSTRAINT_NAME)=?', [$name]) as $constraint) {
+                    foreach ($namedConstraints[$name] as $constraint) {
                         if ($constraint['TABLE_NAME'] !== $table || $constraint['CONSTRAINT_NAME'] !== $name || ! $present[$table]) {
                             $this->reject();
                         }
                     }
                 }
             }
-            foreach ($pdo->query('SELECT * FROM information_schema.TRIGGERS')->fetchAll(PDO::FETCH_ASSOC) as $object) {
+            foreach ($pdo->query('SELECT TRIGGER_SCHEMA,TRIGGER_NAME,EVENT_OBJECT_TABLE,ACTION_STATEMENT FROM information_schema.TRIGGERS')->fetchAll(PDO::FETCH_ASSOC) as $object) {
                 if (isset($guards[$object['TRIGGER_NAME']]) && $object['TRIGGER_SCHEMA'] === $this->database($pdo)) {
                     continue;
                 }
@@ -185,7 +194,7 @@ final class IdentityMigrationOwnership
                     $this->reject();
                 }
             }
-            foreach ($pdo->query('SELECT * FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA=DATABASE()')->fetchAll(PDO::FETCH_ASSOC) as $key) {
+            foreach ($pdo->query('SELECT TABLE_SCHEMA,TABLE_NAME,REFERENCED_TABLE_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA=DATABASE()')->fetchAll(PDO::FETCH_ASSOC) as $key) {
                 if (in_array(strtolower((string) $key['REFERENCED_TABLE_NAME']), $tables, true)
                     && ($key['TABLE_SCHEMA'] !== $this->database($pdo) || ! in_array($key['TABLE_NAME'], $tables, true))) {
                     $this->reject();
@@ -230,6 +239,15 @@ final class IdentityMigrationOwnership
         foreach ($guards as $name => $guard) {
             $namespace[$name] = ['trigger', $guard['table']];
         }
+        if ($driver === 'mysql') {
+            $names = array_keys($namespace);
+            $exact = ['tables' => $this->lookups($pdo, "SELECT TABLE_NAME name,'table' type,TABLE_NAME tbl_name FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?", $names),
+                'triggers' => $this->lookups($pdo, "SELECT TRIGGER_NAME name,'trigger' type,EVENT_OBJECT_TABLE tbl_name FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND TRIGGER_NAME=?", $names)];
+            foreach ([['ROUTINES', 'ROUTINE_SCHEMA', 'ROUTINE_NAME'], ['EVENTS', 'EVENT_SCHEMA', 'EVENT_NAME'],
+                ['STATISTICS', 'TABLE_SCHEMA', 'INDEX_NAME'], ['TABLE_CONSTRAINTS', 'CONSTRAINT_SCHEMA', 'CONSTRAINT_NAME']] as [$dictionary, $schema, $column]) {
+                $exact[$dictionary] = $this->lookups($pdo, "SELECT $column FROM information_schema.$dictionary WHERE $schema=DATABASE() AND $column=?", $names);
+            }
+        }
         foreach ($namespace as $name => [$kind, $owner]) {
             if ($driver === 'sqlite') {
                 if ($this->query($pdo, 'SELECT name FROM sqlite_temp_master WHERE name COLLATE NOCASE=? OR tbl_name COLLATE NOCASE=?', [$name, $name]) !== []
@@ -237,14 +255,12 @@ final class IdentityMigrationOwnership
                     $this->reject();
                 }
             } else {
-                $objects = [...$this->query($pdo, "SELECT TABLE_NAME name,'table' type,TABLE_NAME tbl_name FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?", [$name]),
-                    ...$this->query($pdo, "SELECT TRIGGER_NAME name,'trigger' type,EVENT_OBJECT_TABLE tbl_name FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND TRIGGER_NAME=?", [$name])];
+                $objects = [...$exact['tables'][$name], ...$exact['triggers'][$name]];
                 if ($objects !== [['name' => $name, 'type' => $kind, 'tbl_name' => $owner]]) {
                     $this->reject();
                 }
-                foreach ([['ROUTINES', 'ROUTINE_SCHEMA', 'ROUTINE_NAME'], ['EVENTS', 'EVENT_SCHEMA', 'EVENT_NAME'],
-                    ['STATISTICS', 'TABLE_SCHEMA', 'INDEX_NAME'], ['TABLE_CONSTRAINTS', 'CONSTRAINT_SCHEMA', 'CONSTRAINT_NAME']] as [$dictionary, $schema, $column]) {
-                    if ($this->query($pdo, "SELECT $column FROM information_schema.$dictionary WHERE $schema=DATABASE() AND $column=?", [$name]) !== []) {
+                foreach (['ROUTINES', 'EVENTS', 'STATISTICS', 'TABLE_CONSTRAINTS'] as $dictionary) {
+                    if ($exact[$dictionary][$name] !== []) {
                         $this->reject();
                     }
                 }
@@ -338,10 +354,11 @@ final class IdentityMigrationOwnership
                 }
             }
         }
+        $bodies = $driver === 'sqlite' ? [] : $this->lookups($pdo, 'SELECT EVENT_OBJECT_TABLE,EVENT_MANIPULATION,ACTION_TIMING,ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND TRIGGER_NAME=?', array_keys($guards));
         foreach ($guards as $name => $guard) {
             $expected = $driver === 'sqlite' ? [['sql' => $guard['sql']]] : [['EVENT_OBJECT_TABLE' => $guard['table'], 'EVENT_MANIPULATION' => $guard['event'], 'ACTION_TIMING' => $guard['timing'] ?? 'BEFORE', 'ACTION_STATEMENT' => $guard['body']]];
             $actual = $driver === 'sqlite' ? $this->query($pdo, "SELECT sql FROM main.sqlite_master WHERE type='trigger' AND name=?", [$name])
-                : $this->query($pdo, 'SELECT EVENT_OBJECT_TABLE,EVENT_MANIPULATION,ACTION_TIMING,ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND TRIGGER_NAME=?', [$name]);
+                : $bodies[$name];
             if ($actual !== $expected) {
                 $this->reject();
             }
@@ -516,9 +533,42 @@ final class IdentityMigrationOwnership
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * One statement for many per-name dictionary lookups. The schema's catalog rows are
+     * materialized once as a CTE (NO_MERGE, otherwise every branch rescans the dictionary);
+     * each UNION ALL branch then applies the unchanged single-name predicate, parameter and
+     * column collation to those rows.
+     *
+     * @return array<string, list<array<string, mixed>>> rows per requested name
+     */
+    private function lookups(PDO $pdo, string $sql, array $names): array
+    {
+        if (preg_match('/\ASELECT (.+) FROM (information_schema\.[A-Z_]+) WHERE ([A-Z_]+=DATABASE\(\)) AND (LOWER\()?([A-Z_]+)(\)?)=\?\z/', $sql, $part) !== 1
+            || $part[4] !== ($part[6] === '' ? '' : 'LOWER(')) {
+            throw new LogicException('Unsupported identity dictionary lookup.');
+        }
+        $names = array_values(array_unique($names));
+        $result = array_fill_keys($names, []);
+        if ($names === []) {
+            return $result;
+        }
+        // Only the selected columns plus the unchanged lookup column are materialized.
+        $predicate = $part[4].'identity_key'.$part[6].'=?';
+        $branches = array_map(fn (int $position): string => 'SELECT /*+ NO_MERGE(lookup) */ '.$position.' AS identity_lookup, lookup.* FROM lookup WHERE '.$predicate, array_keys($names));
+        $statement = 'WITH lookup AS (SELECT '.$part[1].', '.$part[5].' AS identity_key FROM '.$part[2].' WHERE '.$part[3].') '.implode(' UNION ALL ', $branches);
+        foreach ($this->query($pdo, $statement, $names) as $row) {
+            $name = $names[(int) $row['identity_lookup']];
+            unset($row['identity_lookup'], $row['identity_key']);
+            $result[$name][] = $row;
+        }
+
+        return $result;
+    }
+
+    /** Read once per inspection; the per-row comparisons below previously re-queried it. */
     private function database(PDO $pdo): string
     {
-        return $pdo->query('SELECT DATABASE()')->fetchColumn();
+        return $this->database ??= $pdo->query('SELECT DATABASE()')->fetchColumn();
     }
 
     private function reject(): never
