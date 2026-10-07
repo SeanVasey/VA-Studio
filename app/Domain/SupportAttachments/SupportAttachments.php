@@ -21,9 +21,10 @@ final class SupportAttachments
             AttachmentException::require(count($attachments) <= $policy->maxFiles());
             $items = array_map(fn ($row) => array_replace($this->dto($this->retained($row, $proof, $policy)),
                 ['canRetry' => ($proof->token->binding()['intake_open'] ?? false) === true && $this->dto($row)['canRetry']]), $attachments);
-            $this->terminal($authority, $proof, $policy, $rows);
+            $result = ['sourceVersion' => $proof->token->version(), 'canIntake' => ($proof->token->binding()['intake_open'] ?? false) === true && count($attachments) < $policy->maxFiles(), 'attachments' => $items, 'policy' => ['maxBytes' => $policy->maxBytes(), 'maxFiles' => $policy->maxFiles(), 'retentionSeconds' => $policy->lifetimeSeconds(), 'provenance' => $policy->commitment()['provenance'] ?? 'unavailable']];
+            $this->terminal($authority, $proof, $policy, $rows, $attachments, [$kind, $sourceId, $attachments]);
 
-            return ['sourceVersion' => $proof->token->version(), 'canIntake' => ($proof->token->binding()['intake_open'] ?? false) === true && count($attachments) < $policy->maxFiles(), 'attachments' => $items, 'policy' => ['maxBytes' => $policy->maxBytes(), 'maxFiles' => $policy->maxFiles(), 'retentionSeconds' => $policy->lifetimeSeconds(), 'provenance' => $policy->commitment()['provenance'] ?? 'unavailable']];
+            return $result;
         });
     }
 
@@ -61,7 +62,7 @@ final class SupportAttachments
                     $authority->authorizeMutation($proof, $sourceVersion, 'intake', $rows);
                     AttachmentException::require((int) $existing['expires_at'] > $this->now(), 409, 'expired');
                 }
-                $this->terminal($authority, $proof, $policy, $rows);
+                $this->terminal($authority, $proof, $policy, $rows, [$existing]);
 
                 return ['replayed' => true, 'row' => $existing];
             }
@@ -78,14 +79,21 @@ final class SupportAttachments
             $rows->execute('INSERT INTO '.$rows->table('support_attachments').' ('.implode(', ', array_keys($row)).') VALUES ('.implode(', ', array_fill(0, count($row), '?')).')', array_values($row));
             $saved = $rows->one('support_attachments', 'public_id = ?', [$row['public_id']]);
             AttachmentException::require($saved !== [] && $this->sameRow($saved, $row));
-            $this->terminal($authority, $proof, $policy, $rows);
+            $this->terminal($authority, $proof, $policy, $rows, [$saved]);
 
             return ['replayed' => false, 'row' => $saved];
         });
         $row = $reservation['row'];
         if ($row['state'] !== 'receiving') {
             // A retained or deleted exact replay never creates or restores private bytes.
-            return ['replayed' => true, 'attachment' => $this->dto($row)];
+            return $this->transaction(function (AttachmentRows $rows) use ($kind, $sourceId, $actor, $row): array {
+                [$authority, $proof, $policy] = $this->source($kind, $sourceId, null, 'list', $actor, $rows);
+                $current = $this->attachment($rows, $kind, $sourceId, $row['public_id'], $proof, $policy);
+                $result = ['replayed' => true, 'attachment' => $this->dto($current)];
+                $this->terminal($authority, $proof, $policy, $rows, [$current]);
+
+                return $result;
+            });
         }
         // A positively acknowledged, bounded reservation precedes the file effect. Unknown acknowledgements stop here.
         $this->files->preserve($row['public_id'], $trustedUploadPath, $bounds['maxBytes'], $file);
@@ -100,9 +108,10 @@ final class SupportAttachments
             } else {
                 AttachmentException::require(! in_array($current['state'], ['deleted', 'expired'], true), 409, 'reload');
             }
-            $this->terminal($authority, $proof, $policy, $rows);
+            $result = ['replayed' => $reservation['replayed'], 'attachment' => $this->dto($current)];
+            $this->terminal($authority, $proof, $policy, $rows, [$current]);
 
-            return ['replayed' => $reservation['replayed'], 'attachment' => $this->dto($current)];
+            return $result;
         });
     }
 
@@ -116,9 +125,10 @@ final class SupportAttachments
             [$authority, $proof, $policy] = $this->source($kind, $sourceId, null, 'list', $actor, $rows);
             $row = $this->attachment($rows, $kind, $sourceId, $id, $proof, $policy);
             if ($row['state'] === 'ready') {
-                $this->terminal($authority, $proof, $policy, $rows);
+                $result = ['finished' => $this->dto($row)];
+                $this->terminal($authority, $proof, $policy, $rows, [$row]);
 
-                return ['finished' => $this->dto($row)];
+                return $result;
             }
             AttachmentException::require($authority instanceof AttachmentMutationAuthority);
             $authority->authorizeMutation($proof, $sourceVersion, 'process', $rows);
@@ -127,9 +137,10 @@ final class SupportAttachments
             AttachmentException::require($row['state'] !== 'scanning' || (int) $row['lease_until'] <= $this->now(), 409, 'scan_pending');
             $changes = ['state' => 'scanning', 'attempt' => $expectedAttempt + 1, 'lease_token' => hash('sha256', $token), 'lease_until' => $this->now() + 60, 'failure_code' => null, 'scan_evidence' => null, 'updated_at' => $this->now()];
             $updated = $this->update($rows, $row, $changes);
-            $this->terminal($authority, $proof, $policy, $rows);
+            $result = ['row' => $updated, 'file' => $this->manifest($row), 'policyHash' => $row['policy_hash']];
+            $this->terminal($authority, $proof, $policy, $rows, [$updated]);
 
-            return ['row' => $updated, 'file' => $this->manifest($row), 'policyHash' => $row['policy_hash']];
+            return $result;
         });
         if (isset($claimed['finished'])) {
             return $claimed['finished'];
@@ -161,9 +172,10 @@ final class SupportAttachments
             $scan = $clean ? ['engine' => $evidence['engine'], 'version' => $evidence['version'], 'status' => 'clean', 'sha256' => $evidence['sha256'], 'manifest_hash' => $row['manifest_hash'], 'policy_hash' => $row['policy_hash'], 'attempt' => (int) $row['attempt']] : null;
             $updated = $this->update($rows, $row, ['state' => $clean ? 'ready' : 'failed', 'lease_token' => null, 'lease_until' => null,
                 'scan_evidence' => $scan === null ? null : $this->encrypt($scan), 'failure_code' => $clean ? null : 'scan_unavailable_or_unsafe', 'updated_at' => $this->now()]);
-            $this->terminal($authority, $proof, $policy, $rows);
+            $result = $this->dto($updated);
+            $this->terminal($authority, $proof, $policy, $rows, [$updated]);
 
-            return $this->dto($updated);
+            return $result;
         });
     }
 
@@ -185,28 +197,43 @@ final class SupportAttachments
         }
     }
 
-    /** Tombstone first, then exact physical erasure. Original manifest and source history remain. */
+    /** Prepare file work, freshly authorize a tombstone, then erase only positively committed exact bytes. */
     public function delete(string $kind, string $sourceId, string $id, AttachmentActor $actor): array
     {
         $this->uuid($id);
-        $terminal = $this->transaction(function (AttachmentRows $rows) use ($kind, $sourceId, $id, $actor): array {
+        $first = $this->transaction(function (AttachmentRows $rows) use ($kind, $sourceId, $id, $actor): array {
             [$authority, $proof, $policy] = $this->source($kind, $sourceId, null, 'delete', $actor, $rows);
             $row = $this->attachment($rows, $kind, $sourceId, $id, $proof, $policy);
             $file = $this->manifest($row);
-            if (! in_array($row['state'], ['deleted', 'expired'], true)) {
-                $row = $this->update($rows, $row, ['state' => (int) $row['expires_at'] <= $this->now() ? 'expired' : 'deleted', 'lease_token' => null, 'lease_until' => null, 'updated_at' => $this->now()]);
-            }
-            $this->terminal($authority, $proof, $policy, $rows);
+            $this->terminal($authority, $proof, $policy, $rows, [$row]);
 
-            return ['dto' => $this->dto($row), 'file' => $file];
+            return ['row' => $row, 'file' => $file];
         });
-        // A failed/unknown transaction never reaches this erasure. Explicit retry may finish an already committed tombstone.
+        // Storage adapters and directory/root verification can call framework code; do all of them before fresh authorization.
+        $prepared = $this->files->prepareRemoval($id, $first['file']);
         try {
-            $this->files->remove($id, $terminal['file']);
+            $terminal = $this->transaction(function (AttachmentRows $rows) use ($kind, $sourceId, $id, $actor, $first): array {
+                [$authority, $proof, $policy] = $this->source($kind, $sourceId, null, 'delete', $actor, $rows);
+                $row = $this->attachment($rows, $kind, $sourceId, $id, $proof, $policy);
+                AttachmentException::require($row === $first['row'], 409, 'reload');
+                if (! in_array($row['state'], ['deleted', 'expired'], true)) {
+                    $row = $this->update($rows, $row, ['state' => (int) $row['expires_at'] <= $this->now() ? 'expired' : 'deleted', 'lease_token' => null, 'lease_until' => null, 'updated_at' => $this->now()]);
+                }
+                $result = $this->dto($row);
+                $this->terminal($authority, $proof, $policy, $rows, [$row]);
 
-            return $terminal['dto'] + ['cleanup' => 'complete'];
-        } catch (Throwable) {
-            return $terminal['dto'] + ['cleanup' => 'pending'];
+                return $result;
+            });
+            // A failed or unknown commit never reaches this native effect. Retry can finish a retained tombstone.
+            try {
+                $prepared->erase();
+
+                return $terminal + ['cleanup' => 'complete'];
+            } catch (Throwable) {
+                return $terminal + ['cleanup' => 'pending'];
+            }
+        } finally {
+            $prepared->close();
         }
     }
 
@@ -220,7 +247,7 @@ final class SupportAttachments
         AttachmentException::require(($scan['status'] ?? null) === 'clean' && $policy->allowsScanEngine($scan['engine'] ?? '')
             && ($scan['sha256'] ?? null) === $file['sha256'] && ($scan['manifest_hash'] ?? null) === $row['manifest_hash']
             && ($scan['policy_hash'] ?? null) === $row['policy_hash'] && ($scan['attempt'] ?? null) === (int) $row['attempt']);
-        $this->terminal($authority, $proof, $policy, $rows);
+        $this->terminal($authority, $proof, $policy, $rows, [$row]);
 
         return ['row' => $row, 'file' => $file];
     }
@@ -236,13 +263,20 @@ final class SupportAttachments
         return [$authority, $proof, $this->registry->policy($binding)];
     }
 
-    private function terminal(AttachmentSourceAuthority $authority, AttachmentSourceProof $proof, AttachmentPolicy $policy, AttachmentRows $rows): void
+    private function terminal(AttachmentSourceAuthority $authority, AttachmentSourceProof $proof, AttachmentPolicy $policy, AttachmentRows $rows, array $retained = [], ?array $range = null): void
     {
         $hash = AttachmentRegistry::hash($policy->commitment());
         AttachmentException::require($this->registry->policy($proof->token->binding(), $hash) === $policy);
         $authority->proveCurrent($proof, $rows);
         // Concrete policy checks are callback-free; repeat AFTER the adapter's last framework callback.
         AttachmentException::require($this->registry->policy($proof->token->binding(), $hash) === $policy);
+        foreach ($retained as $row) {
+            AttachmentException::require($rows->one('support_attachments', 'id = ?', [$row['id']]) === $row, 409, 'reload');
+        }
+        if ($range !== null) {
+            [$kind, $sourceId, $expected] = $range;
+            AttachmentException::require($rows->rows('support_attachments', 'source_kind = ? AND source_id = ?', [$kind, $sourceId], 11) === $expected, 409, 'reload');
+        }
         $rows->assertCurrent();
     }
 
@@ -303,7 +337,7 @@ final class SupportAttachments
             }
         }
 
-return true;
+        return true;
     }
 
     private function transaction(callable $operation): mixed

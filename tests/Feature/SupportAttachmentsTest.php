@@ -8,11 +8,14 @@ use App\Domain\SupportAttachments\AttachmentActor;
 use App\Domain\SupportAttachments\AttachmentException;
 use App\Domain\SupportAttachments\AttachmentFiles;
 use App\Domain\SupportAttachments\AttachmentRegistry;
+use App\Domain\SupportAttachments\AttachmentRemoval;
 use App\Domain\SupportAttachments\FixtureAttachmentPolicy;
 use App\Domain\SupportAttachments\InquiryAttachmentAuthority;
 use App\Domain\SupportAttachments\SupportAttachments;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\QueryException;
+use Illuminate\Encryption\Encrypter;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -411,6 +414,155 @@ class SupportAttachmentsTest extends TestCase
         }
         $this->assertDatabaseCount('support_attachments', 1);
         $this->assertSame('deleted', DB::table('support_attachments')->first()->state);
+    }
+
+    public function test_terminal_dto_encrypter_policy_withdrawal_cannot_commit_or_remove_original(): void
+    {
+        $id = $this->intake()['attachment']['attachmentId'];
+        $this->cryptoCallback(8, fn () => config(['support-attachments.fixture_enabled' => false]));
+        $this->refused(fn () => $this->service->delete('inquiry', $this->source(), $id, $this->owner()), 503);
+        $this->assertSame('quarantined', DB::table('support_attachments')->first()->state);
+        $this->assertFileExists(Storage::disk('local')->path('support-attachments/originals/'.$id.'/original.bin'));
+    }
+
+    public function test_terminal_dto_encrypter_row_mutation_cannot_return_stale_ready_state(): void
+    {
+        $id = $this->intake()['attachment']['attachmentId'];
+        $this->process($id, 0);
+        $this->cryptoCallback(4, fn () => DB::table('support_attachments')->where('public_id', $id)->update(['state' => 'failed']));
+        $this->refused(fn () => $this->process($id, 1), 409);
+        $this->assertSame('ready', DB::table('support_attachments')->first()->state);
+    }
+
+    public function test_storage_preparation_revoking_operator_cannot_authorize_a_tombstone(): void
+    {
+        $id = $this->intake()['attachment']['attachmentId'];
+        $files = new class extends AttachmentFiles
+        {
+            public $callback;
+
+            public function prepareRemoval(string $id, array $entry): AttachmentRemoval
+            {
+                $prepared = parent::prepareRemoval($id, $entry);
+                ($this->callback)();
+
+                return $prepared;
+            }
+        };
+        $files->callback = fn () => $this->fixture['actor']->fresh()->forceFill(['is_admin' => false])->save();
+        $service = new SupportAttachments(new AttachmentRegistry(['inquiry' => new InquiryAttachmentAuthority], ['original_inquiry_session_v1' => new FixtureAttachmentPolicy]), $files, $this->scanner);
+        $this->refused(fn () => $service->delete('inquiry', $this->source(), $id, AttachmentActor::operator($this->fixture['actor'])), 403);
+        $this->assertSame('quarantined', DB::table('support_attachments')->first()->state);
+        $this->assertFileExists(Storage::disk('local')->path('support-attachments/originals/'.$id.'/original.bin'));
+    }
+
+    public function test_positive_tombstone_authorizes_exact_cleanup_after_commit_callback_revokes_actor(): void
+    {
+        $id = $this->intake()['attachment']['attachmentId'];
+        $events = clone DB::connection()->getEventDispatcher();
+        DB::connection()->setEventDispatcher($events);
+        $revoked = false;
+        $events->listen(TransactionCommitted::class, function () use (&$revoked): void {
+            if (! $revoked && DB::table('support_attachments')->first()->state === 'deleted') {
+                $revoked = true;
+                $this->fixture['actor']->fresh()->forceFill(['is_admin' => false])->save();
+            }
+        });
+        $deleted = $this->service->delete('inquiry', $this->source(), $id, AttachmentActor::operator($this->fixture['actor']));
+        $this->assertTrue($revoked);
+        $this->assertSame('deleted', $deleted['state']);
+        $this->assertSame('complete', $deleted['cleanup']);
+        $this->assertFalse($this->fixture['actor']->fresh()->is_admin);
+        $this->assertFileDoesNotExist(Storage::disk('local')->path('support-attachments/originals/'.$id.'/original.bin'));
+        $this->refused(fn () => $this->service->list('inquiry', $this->source(), AttachmentActor::operator($this->fixture['actor'])), 403);
+    }
+
+    public function test_unknown_tombstone_commit_never_erases_before_explicit_current_authorized_retry(): void
+    {
+        $id = $this->intake()['attachment']['attachmentId'];
+        $events = clone DB::connection()->getEventDispatcher();
+        DB::connection()->setEventDispatcher($events);
+        $interrupted = false;
+        $events->listen(TransactionCommitted::class, function () use (&$interrupted): void {
+            if (! $interrupted && DB::table('support_attachments')->first()->state === 'deleted') {
+                $interrupted = true;
+                throw new \RuntimeException('Synthetic unknown tombstone acknowledgement');
+            }
+        });
+        try {
+            $this->service->delete('inquiry', $this->source(), $id, $this->owner());
+            $this->fail('Unknown tombstone acknowledgement must stop native erasure.');
+        } catch (\RuntimeException $error) {
+            $this->assertSame('Synthetic unknown tombstone acknowledgement', $error->getMessage());
+        }
+        $this->assertSame('deleted', DB::table('support_attachments')->first()->state);
+        $this->assertFileExists(Storage::disk('local')->path('support-attachments/originals/'.$id.'/original.bin'));
+        $this->assertSame('complete', $this->service->delete('inquiry', $this->source(), $id, $this->owner())['cleanup']);
+        $this->assertFileDoesNotExist(Storage::disk('local')->path('support-attachments/originals/'.$id.'/original.bin'));
+    }
+
+    public function test_changed_bytes_after_tombstone_commit_leave_truthful_pending_cleanup_and_never_erase_unknown_content(): void
+    {
+        $id = $this->intake()['attachment']['attachmentId'];
+        $path = Storage::disk('local')->path('support-attachments/originals/'.$id.'/original.bin');
+        $events = clone DB::connection()->getEventDispatcher();
+        DB::connection()->setEventDispatcher($events);
+        $events->listen(TransactionCommitted::class, function () use ($path): void {
+            if (DB::table('support_attachments')->first()->state === 'deleted') {
+                chmod($path, 0600);
+                file_put_contents($path, str_repeat('X', filesize($path)));
+                chmod($path, 0400);
+            }
+        });
+        $result = $this->service->delete('inquiry', $this->source(), $id, $this->owner());
+        $this->assertSame('deleted', $result['state']);
+        $this->assertSame('pending', $result['cleanup']);
+        $this->assertFileExists($path);
+        $this->assertNotSame(hash_file('sha256', $this->input), hash_file('sha256', $path));
+        $this->assertSame('deleted', DB::table('support_attachments')->first()->state);
+    }
+
+    public function test_storage_configuration_change_after_tombstone_commit_preserves_exact_original_pending_cleanup(): void
+    {
+        $id = $this->intake()['attachment']['attachmentId'];
+        $path = Storage::disk('local')->path('support-attachments/originals/'.$id.'/original.bin');
+        $events = clone DB::connection()->getEventDispatcher();
+        DB::connection()->setEventDispatcher($events);
+        $events->listen(TransactionCommitted::class, function (): void {
+            if (DB::table('support_attachments')->first()->state === 'deleted') {
+                config(['filesystems.disks.local.root' => config('filesystems.disks.local.root').'/synthetic-alternate']);
+            }
+        });
+        $result = $this->service->delete('inquiry', $this->source(), $id, $this->owner());
+        $this->assertSame('deleted', $result['state']);
+        $this->assertSame('pending', $result['cleanup']);
+        $this->assertFileExists($path);
+        $this->assertSame(hash_file('sha256', $this->input), hash_file('sha256', $path));
+    }
+
+    private function cryptoCallback(int $target, callable $callback): void
+    {
+        $spy = new class(Crypt::getKey(), config('app.cipher')) extends Encrypter
+        {
+            public int $calls = 0;
+
+            public int $target;
+
+            public $callback;
+
+            public function decryptString($payload)
+            {
+                $this->calls++;
+                if ($this->calls === $this->target) {
+                    ($this->callback)();
+                }
+
+                return parent::decryptString($payload);
+            }
+        };
+        $spy->target = $target;
+        $spy->callback = $callback;
+        Crypt::swap($spy);
     }
 
     private function source(): string

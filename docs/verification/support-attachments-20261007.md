@@ -136,8 +136,14 @@ no-store/noindex/no-referrer/nosniff, with same-origin resource policy and sandb
 CSP. No capability or filename is persisted in browser storage.
 
 Expiry cuts download/scan access at the immutable deadline. Explicit owner/operator
-deletion positively commits a terminal tombstone first, then removes only the
-exact original. Unknown commits never cause physical deletion. Failed cleanup
+deletion prepares a private leased descriptor outside database locks, then freshly
+proves source, actor, policy and exact retained row before positively committing a
+terminal tombstone. All decryption and response projection precede the final raw
+source and attachment-row fence. Callback-free native cleanup uses that durable
+tombstone authorization and rechecks the prepared inode, exact digest and storage
+configuration. A subsequent actor withdrawal cannot undo a positively committed
+deletion decision; it denies future reads. Changed bytes or storage policy leave
+cleanup pending. Unknown commits never cause physical deletion. Failed cleanup
 reports `pending`; explicit deletion retry can finish it. Encrypted original
 manifest and source history remain. This is not automatic deletion after 24 hours
 and is not a production-approved legal retention policy.
@@ -152,6 +158,28 @@ refuses; source history and tombstones are not dropped. Runtime performs the sam
 read-only ownership proof, and never repairs missing guards.
 
 ## Evidence and remaining acceptance
+
+The initial pipeline `1914aa415ec1d1db04085bb062ef6eec92250feb` is superseded and
+must not receive approval. Exact Git-blob preload produced two failures and zero
+errors: late DTO decryption could withdraw policy after the source proof and
+delete an original, or mutate the mutable ledger and return a stale ready state.
+The repaired consumer projects before the final fence, proves retained rows and
+the complete bounded list range, and reauthorizes retained intake replay. It also
+prepares deletion storage before fresh authorization. Original red receipts and
+subsequent green results are preserved in `terminal-projection/`; the deletion
+probe moves from decrypt ordinal5 to ordinal8 because preparation now requires a
+second authorized read. This change in probe position is recorded explicitly.
+
+The ordinary service consumer uses the approved corrected adapter `b209b850...`
+in root composition `409d3c468966d21ea2f72968befa06239aa2ede7`. Six concrete
+consumer cases passed along with the SQLite domain/schema/HTTP/adapter selection
+(56 tests, 536 assertions); frontend17 and typecheck passed. That evidence does
+not approve the final composed service path: additional consumer canaries confirm
+late `CustomerAccess` or source-policy container resolution can withdraw current
+authority after the adapter's raw snapshot. Those failures are retained and sent
+to the adapter owner. Its repaired successor must be composed and independently
+reviewed before service attachment acceptance. Exact frozen source maps and fresh
+native selections follow in the evidence child.
 
 Development receipts preserve the initial missing-test-key fixture errors,
 MySQL CHECK-literal canonicalization mismatch, and GET/empty-JSON test harness

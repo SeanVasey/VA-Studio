@@ -193,17 +193,43 @@ class AttachmentFiles
     /** Called only after a positively committed terminal tombstone. Exact old bytes are never replaced. */
     public function remove(string $id, array $entry): void
     {
+        $prepared = $this->prepareRemoval($id, $entry);
+        try {
+            $prepared->erase();
+        } finally {
+            $prepared->close();
+        }
+    }
+
+    public function prepareRemoval(string $id, array $entry): AttachmentRemoval
+    {
+        $configuration = AttachmentRemoval::configuration();
         $directory = $this->directory($id);
         $path = $directory.'/original.bin';
         $lock = $this->lock($directory.'/intake.lock');
+        $original = null;
         try {
             if (file_exists($path) || is_link($path)) {
                 $this->verify($id, $entry);
-                AttachmentException::require(unlink($path));
+                $original = fopen($path, 'rb');
+                AttachmentException::require(is_resource($original));
+                clearstatcache(true, $path);
+                $stat = lstat($path);
+                AttachmentException::require($this->identity(fstat($original)) === $this->identity($stat));
+            } else {
+                $stat = [];
             }
-        } finally {
+
+            AttachmentException::require($configuration === AttachmentRemoval::configuration());
+
+            return new AttachmentRemoval($path, $lock, $original, AttachmentRemoval::identity($stat), $configuration, $entry);
+        } catch (Throwable $error) {
+            if (is_resource($original)) {
+                fclose($original);
+            }
             flock($lock, LOCK_UN);
             fclose($lock);
+            throw $error;
         }
     }
 
