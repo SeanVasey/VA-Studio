@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "final_executable_local": "0916f78f843626eac2b9126504d9773c02d21e5e",
+  "final_executable_native": "7ad1394b0232cfa820e992cd53ec7551db4e70dc",
+  "final_executable_tree": "6712ec499f84393e1c32fb2cfe0c4db0b782e60d",
+  "focused_membership": {
+    "mysql": {
+      "source": "211577eece5c4f9a3c708db25e4ad67d4462721e",
+      "cases": 45,
+      "assertions": 218,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    "sqlite": {
+      "source": "211577eece5c4f9a3c708db25e4ad67d4462721e",
+      "cases": 45,
+      "assertions": 221,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    }
+  },
+  "focused_preparation": {
+    "sqlite": {
+      "source": "a1a835ac7e3b9cd16f337bacbacf20bb28643a53",
+      "cases": 273,
+      "passed": 269,
+      "assertions": 823,
+      "failures": 0,
+      "errors": 0,
+      "native_only_skips": 4
+    },
+    "native_races": {
+      "source": "7a202e98296d10ec96dee11803433dd8f5391cab",
+      "cases": 4,
+      "assertions": 412,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    }
+  },
+  "independent_sensitive_and_shared_source_reviews": "approved",
+  "timing_control": {
+    "cases": 36,
+    "passed": true,
+    "actual_context": "metadata worktree at parent0916f78 with exactly the final timing inputs applied",
+    "timing_input_sha256": {
+      "phpunit-timings-mysql.json": "8997319d5371187eb386fe17f5b3bf29a70ed6dda641f1b790c80d0ebaba1d81",
+      "phpunit-timings-sqlite.json": "6616b98235bf29ffbf0fef0e24ccd8d2ec1d26a6eb4dfc9616ffd0a6444e4593"
+    }
+  },
+  "artifacts_sha256": {
+    "membership-integration.json": "0566560170143a2afea0b442343a2cfb406cec36275ba4ffac725fffe672e11b",
+    "membership-mysql-run.txt": "4fa2d730d5d6029c4ff561be553a75ccd24c4a9712b44700626d08fa2f873dbf",
+    "membership-mysql.xml": "1aa4f1bd3fb2cefa609c148548911bb7de5fc7ae0bc875ee69b1055010d010cd",
+    "membership-sensitive-review.json": "4c0904e3d1ba255a2c3b7339dad910f904a3b98ec1cfe8766d0115842747a553",
+    "membership-sensitive-review.md": "4b1e41d40e6c182019d7189ab63321e9606540c65b006de58d0c46efde72c517",
+    "membership-shared-review.json": "807317e033c490e64f09a64a203e64b9121120a0c54ae5f2f7908146e739ba04",
+    "membership-shared-review.md": "cd9c6a19bca2ba69a234d4247d952395c467f04243b985c1d7e51af9a84a62de",
+    "membership-source-carry.json": "31e2e15e272aac20ca20da18c850c960fb6e15da63010fa06c60ae6f8db99707",
+    "membership-sqlite-run.txt": "3908e749f95ea918c259cf504c4058c4ae76aaebf2a635ae138ecff52f674450",
+    "membership-sqlite.xml": "d0eb232f84f731becac79d0690840ce1ae4e3c464818d371f227a2c18dce2387",
+    "packet-author.json": "391049718959b184da02d207adba18c1163f387d6d76ec2000bff8ffc64b5c83",
+    "packet-autoload-origins.json": "d94913aef2ffb6e8c2a6895cdc2772b13341323f3f4e46fe2fcf30fa7ee9dad7",
+    "packet-controls.json": "3a200c1163f29bea79d159171587797154d1bd0c51b132aeea44df355e6f275b",
+    "packet-integration.json": "52f36a03d95cb1df4819ed78b4cbf9fa942725fdfe425227fb64e40412ea5870",
+    "packet-native-run.txt": "09606f930dbe30378f3fba203b0f4178aae6ed1497f999c7c670b6af3dbfc96d",
+    "packet-native.xml": "19355c612ec4893b7ee26021f113ec45080c5f12cbb35773faa4475f8a9b64e6",
+    "packet-sensitive-review.json": "f3b69e7025c2d71b5dc0931667bd05ef06a0a0e66a85ce02676d2f2f1732c1ea",
+    "packet-sensitive-review.md": "49ecb2e89d94036aebe34d0db4fc7ba9f4e07105c4730866410135b4aab9a797",
+    "packet-shared-review.json": "0545a1f5271f6d5020933ed0bdb46e0d70913c1f22592d34fade4f2a6c1c92c5",
+    "packet-shared-review.md": "b4a6de6044eb03b195c12fc149a8a42eb73dcc00447a379f48e2a547f565d6f3",
+    "packet-sqlite-source-carry.json": "579fd884da69062ee90a9b8acd5a7bafe9399b15ab73b0c4056dd67f4f35fa05",
+    "packet-sqlite.xml": "75ecdd694e368888df2b8a0ba30d646120da2701b5814d38ee026c8033a01196",
+    "packet-worker-witnesses.json": "b3fa2da8ead13345c66d81848048d62195944fa859f20b053fffa94076dde90d",
+    "publication-map.json": "43855974c8a063e903c406999b4133bc5eba86b566acce43c08f335e9708af91",
+    "reconciliation.md": "f2ed3be52c1572bbab58e95c806f7cecc8b8bf6c541c5a40ad266bca78515574",
+    "timing-partition-control.txt": "a62288ab4d59a4f5864feb812ad909d93ff0c7bd75eb513a17c5bbf466ca1b86",
+    "timing-provenance.json": "cce1fda46e899262674b184d86b001807f50d6ed71996f4035296b2dd5c4b5e1"
+  },
+  "full_matrix_run": false,
+  "hosted_focused_dispatch": false,
+  "live_deployment_or_provider_activation": false,
+  "branch_updated_at_receipt_capture": false,
+  "final_head_preflight_and_expected_head_merge": {
+    "status": "pending at metadata receipt capture",
+    "branch_head_at_capture": "956ab3ec55d0d77ab8c7734882be72723b5728b3",
+    "actual_outcomes": "to be recorded on PR17 and final completion checkpoint after actions complete"
+  }
+}

@@ -1,0 +1,537 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/notifications_continue",
+  "disposition": "approved for focused development integration; no remaining sensitive source blocker for the reviewed replay correction",
+  "approved_author_source": "7a202e98296d10ec96dee11803433dd8f5391cab",
+  "approved_author_tree": "8cdfdfa110b52ff0d5056de7c01420e6cd6ae854",
+  "approved_composed_source": "0916f78f843626eac2b9126504d9773c02d21e5e",
+  "approved_composed_tree": "6712ec499f84393e1c32fb2cfe0c4db0b782e60d",
+  "runtime_actual_source": "f5fa20b9f5554a85435e8e992c9e583f268d55b3",
+  "baseline_dependency_source": "211577eece5c4f9a3c708db25e4ad67d4462721e",
+  "only_runtime_path_changed": "app/Domain/Commerce/ProductionPreparation/ProductionTrackPreparationPackets.php",
+  "author_owned_paths": [
+    "app/Domain/Commerce/ProductionPreparation/ProductionTrackPreparationPackets.php",
+    "docs/verification/production-track-preparation-packets.md",
+    "tests/Feature/ProductionTrackPreparationPacketTest.php",
+    "tests/Feature/ProductionTrackPreparationReplayConcurrencyTest.php",
+    "tests/Support/ProductionTrackPreparationReplayRace.php",
+    "tests/Support/production-track-preparation-replay-worker.php"
+  ],
+  "all_author_owned_composed_bytes_equal": true,
+  "independent_actual_positive": {
+    "source": "f5fa20b9f5554a85435e8e992c9e583f268d55b3",
+    "tree": "5698fcdd31340f179ededdd345f4b0a7bac2806c",
+    "engine": "sqlite",
+    "result": {
+      "tests": 18,
+      "assertions": 77,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 17.27403
+    },
+    "all_1610_tracked_hashes_stable": true,
+    "actual_local_class_origins": 17
+  },
+  "independent_actual_predecessor_negative": {
+    "source": "27f0689b14a687f20bcdbf221e5b187139fcb9f7",
+    "engine": "sqlite",
+    "result": {
+      "tests": 1,
+      "assertions": 3,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 1.298254
+    }
+  },
+  "independent_actual_proof_omission_canary": {
+    "base": "f5fa20b9f5554a85435e8e992c9e583f268d55b3",
+    "sole_patch": "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/fence-omitted.patch",
+    "engine": "sqlite",
+    "result": {
+      "tests": 1,
+      "assertions": 2,
+      "errors": 0,
+      "failures": 1,
+      "skipped": 0,
+      "seconds": 1.325581
+    },
+    "expected_failure": "Late replay drift was admitted.",
+    "author_and_integration_unmodified": true
+  },
+  "initial_canary_filter_selected_no_cases_not_behavior_evidence": true,
+  "author_phase_receipts_independently_validated": {
+    "red-native": {
+      "source": "27f0689b14a687f20bcdbf221e5b187139fcb9f7",
+      "purpose": "native expected-failing two-order replay predecessor",
+      "raw_actual": {
+        "tests": 2,
+        "assertions": 134,
+        "errors": 0,
+        "failures": 2,
+        "skipped": 0,
+        "seconds": 13.472346
+      },
+      "author_component_seconds": 13.472346
+    },
+    "red-interleaving": {
+      "source": "27f0689b14a687f20bcdbf221e5b187139fcb9f7",
+      "purpose": "SQLite predecessor canary run before committing identical engine/PacketTest source",
+      "raw_actual": {
+        "tests": 1,
+        "assertions": 3,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "seconds": 1.353112
+      },
+      "author_component_seconds": 1.353112
+    },
+    "fix-first-interleaving": {
+      "source": "working f5fa runtime with pre-canonical-assertion PacketTest",
+      "purpose": "initial repaired behavior: 2 pass, one model array key-order fixture failure",
+      "raw_actual": {
+        "tests": 3,
+        "assertions": 10,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "seconds": 3.586684
+      },
+      "author_component_seconds": 3.586683
+    },
+    "frozen-behavior-sqlite": {
+      "source": "f5fa20b9f5554a85435e8e992c9e583f268d55b3",
+      "purpose": "PacketTest plus PacketGuards",
+      "raw_actual": {
+        "tests": 56,
+        "assertions": 166,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "seconds": 59.270146
+      },
+      "author_component_seconds": 59.270149
+    },
+    "frozen-native": {
+      "source": "f5fa20b9f5554a85435e8e992c9e583f268d55b3",
+      "purpose": "first native repaired run: four request-array key-order fixture failures",
+      "raw_actual": {
+        "tests": 4,
+        "assertions": 398,
+        "errors": 0,
+        "failures": 4,
+        "skipped": 0,
+        "seconds": 28.059994
+      },
+      "author_component_seconds": 28.059995
+    },
+    "final-native": {
+      "source": "de9f77ed33f3a8e73e6c5a479df726026bfc1a9c",
+      "purpose": "canonical native fixture successor",
+      "raw_actual": {
+        "tests": 4,
+        "assertions": 360,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "seconds": 25.67608
+      },
+      "author_component_seconds": 25.67608
+    },
+    "witness-native": {
+      "source": "7a202e98296d10ec96dee11803433dd8f5391cab",
+      "purpose": "final native successor with explicit raw worker result witnesses",
+      "raw_actual": {
+        "tests": 4,
+        "assertions": 412,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "seconds": 26.058492
+      },
+      "author_component_seconds": 26.058493
+    }
+  },
+  "final_native_source": "7a202e98296d10ec96dee11803433dd8f5391cab",
+  "final_native_result": {
+    "tests": 4,
+    "assertions": 412,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "seconds": 26.058492
+  },
+  "native_profile": {
+    "mysql": "8.4.11",
+    "innodb_flush_log_at_trx_commit": 1,
+    "sync_binlog": 1,
+    "innodb_doublewrite": "ON",
+    "log_bin": true,
+    "transport": "private loopback TCP",
+    "database": "fresh disposable"
+  },
+  "four_raw_actual_wait_and_worker_result_witnesses": [
+    {
+      "case": "test_same_capture_miss_gap_replays_exact_packet_in_both_commit_orders with data set \"worker zero first\"",
+      "wait": {
+        "packet_replay_record_wait": {
+          "lock_status": "WAITING",
+          "lock_type": "RECORD",
+          "index_name": "PRIMARY",
+          "object_name": "users",
+          "lock_data": "1"
+        },
+        "first": 0,
+        "historical_misses": [
+          {
+            "connection_id": 10,
+            "pid": 836,
+            "transaction_level": 0,
+            "packet_count": 0
+          },
+          {
+            "connection_id": 11,
+            "pid": 837,
+            "transaction_level": 0,
+            "packet_count": 0
+          }
+        ]
+      },
+      "results": {
+        "packet_replay_results": [
+          {
+            "status": "saved",
+            "packet": {
+              "id": 1,
+              "public_id": "127a51d4-d71d-4265-9f33-4b1d66b56044",
+              "payload_hash": "fcd261d96364eb25126671cfd1d43f72bbac1419b0796b35227da9fc7294a334",
+              "row_hash": "48115e4977f36c49a1859008d98162af7d7771e3f915b149b6a89ef560a7b06c"
+            },
+            "connection_id": 10,
+            "pid": 836,
+            "paused": true,
+            "transaction_level": 0,
+            "encryptions": 1
+          },
+          {
+            "status": "saved",
+            "packet": {
+              "id": 1,
+              "public_id": "127a51d4-d71d-4265-9f33-4b1d66b56044",
+              "payload_hash": "fcd261d96364eb25126671cfd1d43f72bbac1419b0796b35227da9fc7294a334",
+              "row_hash": "48115e4977f36c49a1859008d98162af7d7771e3f915b149b6a89ef560a7b06c"
+            },
+            "connection_id": 11,
+            "pid": 837,
+            "paused": false,
+            "transaction_level": 0,
+            "encryptions": 0
+          }
+        ],
+        "first": 0
+      }
+    },
+    {
+      "case": "test_same_capture_miss_gap_replays_exact_packet_in_both_commit_orders with data set \"worker one first\"",
+      "wait": {
+        "packet_replay_record_wait": {
+          "lock_status": "WAITING",
+          "lock_type": "RECORD",
+          "index_name": "PRIMARY",
+          "object_name": "users",
+          "lock_data": "1"
+        },
+        "first": 1,
+        "historical_misses": [
+          {
+            "connection_id": 13,
+            "pid": 1554,
+            "transaction_level": 0,
+            "packet_count": 0
+          },
+          {
+            "connection_id": 14,
+            "pid": 1555,
+            "transaction_level": 0,
+            "packet_count": 0
+          }
+        ]
+      },
+      "results": {
+        "packet_replay_results": [
+          {
+            "status": "saved",
+            "packet": {
+              "id": 1,
+              "public_id": "21ec76d9-c9bf-4208-a4e7-8e2e56c50d9a",
+              "payload_hash": "31ef99a57c400cbbacd02e50a7edf6f19bb418ee3d90a8ea9c5f8fb6ea688428",
+              "row_hash": "97981753d67c045e82729b53b394757cfe881433fd7c53a26caac544e8aa76e5"
+            },
+            "connection_id": 13,
+            "pid": 1554,
+            "paused": false,
+            "transaction_level": 0,
+            "encryptions": 0
+          },
+          {
+            "status": "saved",
+            "packet": {
+              "id": 1,
+              "public_id": "21ec76d9-c9bf-4208-a4e7-8e2e56c50d9a",
+              "payload_hash": "31ef99a57c400cbbacd02e50a7edf6f19bb418ee3d90a8ea9c5f8fb6ea688428",
+              "row_hash": "97981753d67c045e82729b53b394757cfe881433fd7c53a26caac544e8aa76e5"
+            },
+            "connection_id": 14,
+            "pid": 1555,
+            "paused": true,
+            "transaction_level": 0,
+            "encryptions": 1
+          }
+        ],
+        "first": 1
+      }
+    },
+    {
+      "case": "test_changed_capture_cannot_recover_winner_in_either_worker_order with data set \"worker zero first\"",
+      "wait": {
+        "packet_replay_record_wait": {
+          "lock_status": "WAITING",
+          "lock_type": "RECORD",
+          "index_name": "PRIMARY",
+          "object_name": "users",
+          "lock_data": "1"
+        },
+        "first": 0,
+        "historical_misses": [
+          {
+            "connection_id": 16,
+            "pid": 2270,
+            "transaction_level": 0,
+            "packet_count": 0
+          },
+          {
+            "connection_id": 17,
+            "pid": 2271,
+            "transaction_level": 0,
+            "packet_count": 0
+          }
+        ]
+      },
+      "results": {
+        "packet_replay_results": [
+          {
+            "status": "saved",
+            "packet": {
+              "id": 1,
+              "public_id": "9b9d3218-cb62-4c05-a11c-bf77a3cb989e",
+              "payload_hash": "4c1a3cf39a8cc82907a13afd51734856b973b44ed4387e2bb9dacec29e133bb6",
+              "row_hash": "d28a9e682d6bb1067ae1caadbeb8e41c5eb100edb508700a1ea68c4d712b5c78"
+            },
+            "connection_id": 16,
+            "pid": 2270,
+            "paused": true,
+            "transaction_level": 0,
+            "encryptions": 1
+          },
+          {
+            "status": "blocked",
+            "packet": null,
+            "connection_id": 17,
+            "pid": 2271,
+            "paused": false,
+            "transaction_level": 0,
+            "encryptions": 0
+          }
+        ],
+        "first": 0
+      }
+    },
+    {
+      "case": "test_changed_capture_cannot_recover_winner_in_either_worker_order with data set \"worker one first\"",
+      "wait": {
+        "packet_replay_record_wait": {
+          "lock_status": "WAITING",
+          "lock_type": "RECORD",
+          "index_name": "PRIMARY",
+          "object_name": "users",
+          "lock_data": "1"
+        },
+        "first": 1,
+        "historical_misses": [
+          {
+            "connection_id": 20,
+            "pid": 2986,
+            "transaction_level": 0,
+            "packet_count": 0
+          },
+          {
+            "connection_id": 19,
+            "pid": 2987,
+            "transaction_level": 0,
+            "packet_count": 0
+          }
+        ]
+      },
+      "results": {
+        "packet_replay_results": [
+          {
+            "status": "blocked",
+            "packet": null,
+            "connection_id": 20,
+            "pid": 2986,
+            "paused": false,
+            "transaction_level": 0,
+            "encryptions": 0
+          },
+          {
+            "status": "saved",
+            "packet": {
+              "id": 1,
+              "public_id": "ea964873-6f43-46ce-87c5-9ccf261fc213",
+              "payload_hash": "a77cefa0ed1df0132beaa11e85c7bec8be6630dce87192542e7597c32eea01a3",
+              "row_hash": "8a2d2f7704d5e87f4335723c12b3c10ec6416ea0c356b51c8a628752339396eb"
+            },
+            "connection_id": 19,
+            "pid": 2987,
+            "paused": true,
+            "transaction_level": 0,
+            "encryptions": 1
+          }
+        ],
+        "first": 1
+      }
+    }
+  ],
+  "author_actual_local_origins": 25,
+  "lead_sqlite_actual_source": "a1a835ac7e3b9cd16f337bacbacf20bb28643a53",
+  "lead_sqlite_actual_result": {
+    "tests": 273,
+    "assertions": 823,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 4,
+    "seconds": 76.633625
+  },
+  "lead_sqlite_executed_cases": 269,
+  "lead_native_only_skip_cases": 4,
+  "lead_native_skip_assertions": 0,
+  "sqlite_source_carry": {
+    "executed_sqlite_source": "a1a835ac7e3b9cd16f337bacbacf20bb28643a53",
+    "final_executable_source": "0916f78f843626eac2b9126504d9773c02d21e5e",
+    "final_executable_tree": "6712ec499f84393e1c32fb2cfe0c4db0b782e60d",
+    "changed_path": "tests/Support/ProductionTrackPreparationReplayRace.php",
+    "sole_change": "one bounded JSON diagnostic after already-asserted native worker results",
+    "sqlite_native_cases": 4,
+    "sqlite_native_case_assertions": 0,
+    "native_helper_executed_in_sqlite": false,
+    "product_and_other_test_bytes_unchanged": true,
+    "sqlite_rerun": false,
+    "membership_executed_source": "211577eece5c4f9a3c708db25e4ad67d4462721e"
+  },
+  "no_execution_relabeled_as_successor": true,
+  "membership_dependency_bytes_unchanged_no_rerun": true,
+  "runtime_fresh_body_and_proveCurrent_unchanged": {
+    "base": "211577eece5c4f9a3c708db25e4ad67d4462721e",
+    "successor": "f5fa20b9f5554a85435e8e992c9e583f268d55b3",
+    "owned_paths": [
+      "app/Domain/Commerce/ProductionPreparation/ProductionTrackPreparationPackets.php",
+      "docs/verification/production-track-preparation-packets.md",
+      "tests/Feature/ProductionTrackPreparationPacketTest.php",
+      "tests/Feature/ProductionTrackPreparationReplayConcurrencyTest.php",
+      "tests/Support/ProductionTrackPreparationReplayRace.php",
+      "tests/Support/production-track-preparation-replay-worker.php"
+    ],
+    "fresh_body_byte_identical": true,
+    "fresh_body_sha256": "2710fc9f6f6d9d1eebf60d13d0429f942ea38124c4a1079e34baa09068d31f02",
+    "proveCurrent_byte_identical": true,
+    "proveCurrent_sha256": "cf367dba3c55d35263f7b0afdaf58caf9dda80002c68a15737ad3288fffe31b5",
+    "all_other_tracked_dependency_paths_unchanged": true
+  },
+  "admission_limit": "Existing current core candidate/context admission precedes the miss-gap replay callback; closure/source movement preventing that admission can still refuse",
+  "terminal_trust_limit": "Captured fixed PDO/pure consumer proof plus trusted standard crypto/pure existing core helpers and trusted transaction lifecycle callbacks; no arbitrary-PHP sandbox",
+  "remaining_outside_scope": [
+    "Full matrix and browser",
+    "Hosted CI in author lane",
+    "Production/live/provider execution",
+    "Closure or source movement preventing core adapter admission during the miss gap",
+    "Native staff/MFA withdrawal races beyond the existing unchanged authority contract"
+  ],
+  "reviewer_native_runs": 0,
+  "reviewer_membership_runs": 0,
+  "full_matrix_or_hosted_dispatch_or_external_publication": false,
+  "artifact_sha256": {
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/autoload-origins.json": "d94913aef2ffb6e8c2a6895cdc2772b13341323f3f4e46fe2fcf30fa7ee9dad7",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/config.xml": "a7998cb2923d9e250c05e5c565ad5710454622fc8151d88e2a27ec40b380fda7",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/controls.json": "3a200c1163f29bea79d159171587797154d1bd0c51b132aeea44df355e6f275b",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/final-source-carry.json": "579fd884da69062ee90a9b8acd5a7bafe9399b15ab73b0c4056dd67f4f35fa05",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/results.xml": "75ecdd694e368888df2b8a0ba30d646120da2701b5814d38ee026c8033a01196",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/run.json": "bffd8bdcab04acd83bb5865e4f0419c91e54e9a1e4041484524f98d09d2598d1",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/run.log": "a0fbe72985dc41833c4a14bf0cf39544a5d89a0b5caf45ee2b19dd85d54c948e",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/source-carry.json": "31e2e15e272aac20ca20da18c850c960fb6e15da63010fa06c60ae6f8db99707",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/source.json": "c52722a6865af9868ef658da0bd1bbdae482093a90259c86457816587d21a8bd",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/test-database-receipts.py.log": "3fe172511e7f58a261d29bf9bf43743a0e269ec3e26be9b82e0235f96ed98800",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/test-focused-tests.py.log": "9403d468ceb6470edfbd67a5be26f16a19d0cbffe62193f461e20aa4717365de",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/test-phpunit-shards.py.log": "0bc266e3409a4509828639c370e8f289ea0a36c540427cf868cf2ecfa35acfdf",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/test-workflow-cadence.py.log": "c9811dcd7d51683ba5e61910b5aa26e91e8766a287b6a6f52a04bac8ac9f3a3d",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/verified-receipt.json": "52f36a03d95cb1df4819ed78b4cbf9fa942725fdfe425227fb64e40412ea5870",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/final-autoload.json": "8501361bdd9fbe8656f0b23b83701dfea57952a6b161c342d7c55ba6002b00c1",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/final-native.log": "bf800a32e7bd6ec07459123b623fcb75218fc07cbebef86defb52beffb442730",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/final-native.xml": "3eab265743e86e9e982a6e95936e7967e1ba19fe23d56347895b0747f5fdd913",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/final-pint.log": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/final-source-after.json": "d8f14d3d394b661343f81a903f3474ac969b2f2e3fa76e9e2369a7b828b63b2b",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/final-source-before.json": "d8f14d3d394b661343f81a903f3474ac969b2f2e3fa76e9e2369a7b828b63b2b",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/final-syntax.log": "1c63bff0fea9d304a846dbcc1b215ba8ac8df791f95ddcd2c221c033a728d222",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/fix-first-interleaving.log": "34e2c9da71b9280adcca9fe727f77ef8395a422d839807f331a1502463da5335",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/fix-first-interleaving.xml": "1ac4f256585e9f2ecf9811ec0374fcdeb84ca876594bd25e56c6de14d4314a92",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/freeze-receipt.json": "391049718959b184da02d207adba18c1163f387d6d76ec2000bff8ffc64b5c83",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/frozen-behavior-sqlite.log": "3fb05e1ebf63ed1562681f4ea4bb7890bb9f15d13d27c70cd86dceb8f9953b27",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/frozen-behavior-sqlite.xml": "d2c695239537e88df0b22d6c3d0334e615864c0f6a028e63eed82df350f03217",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/frozen-native.log": "6babd78e99eaf8d517d7e69bc2086e78e161955833c215fc0510b758ad52374d",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/frozen-native.xml": "5cb477ba7acc6b6a24baa141da0ae7f99e168f8de00323f0959041352e6f2b51",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/native-fixture-successor.patch": "b93de1e3a7a5e5f082c75eea79d905e0331f0a58adf403a10e67e26026cff43c",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/native-worker-witnesses.json": "b3fa2da8ead13345c66d81848048d62195944fa859f20b053fffa94076dde90d",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/red-interleaving.log": "cdf33978ccb10bf8f963d627f77f352d26f7989a0642c56551e8a0523f63580a",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/red-interleaving.xml": "3a68dee5eabf2380244c250f8ae16768ff86bd4ec032e07135748f6ca756abfb",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/red-native.log": "7d61fb035a58e7c9d45674cff5894f4d102c796f79ba59b465136eeaffa483dc",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/red-native.xml": "630794da681f24f54e3a7f9ab1c0876120933c1ec5a50dfe7d41780801770c43",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/red-source-after.json": "4cfa6708ee2ff649e4134f69ece02bef63000131c8535da4484c5213c7d72dfa",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/red-source-before.json": "4cfa6708ee2ff649e4134f69ece02bef63000131c8535da4484c5213c7d72dfa",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/runtime-equivalence.json": "eda6163be8f972dad82194791234210672aa00cc3032271987c1e63dd13f007a",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/successor-source-after.json": "0947c1588f41edf494deefe8d3c22a8df5628f12caf4b1c9f59667d2fd73f8c5",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/successor-source-before.json": "0947c1588f41edf494deefe8d3c22a8df5628f12caf4b1c9f59667d2fd73f8c5",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/successor.patch": "cf686f512e9ce01739364f3c8cfc00aa862c9a88479b060e2b520921aa3cce1d",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/witness-autoload.json": "78548e7b7049befa3427e140f5f27434347a0608a922222236b1657a775f4fa6",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/witness-native.log": "09606f930dbe30378f3fba203b0f4178aae6ed1497f999c7c670b6af3dbfc96d",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/witness-native.xml": "19355c612ec4893b7ee26021f113ec45080c5f12cbb35773faa4475f8a9b64e6",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/witness-pint.log": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/witness-source-after.json": "c556725a97c4a924bb5350d7dda94f88d41f5bf71c334c029fb8dd24f82bd6a6",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/witness-source-before.json": "c556725a97c4a924bb5350d7dda94f88d41f5bf71c334c029fb8dd24f82bd6a6",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/witness-successor.patch": "a7d491afb05a2977b1406e2c34cdd8c263e86a4ce983856fb69fcfd0ee2a2dde",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/witness-syntax.log": "1c63bff0fea9d304a846dbcc1b215ba8ac8df791f95ddcd2c221c033a728d222",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/autoload.json": "c4deaddde46646dc3044b307f1a4790062c504c66abc5a8c80cfbfc8540498df",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/autoload.php": "1a1d81528cc60189afc00e377ee84afea6e1db118f4bf0aea369288f7a3aa988",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/build-receipt.py": "c43d7fc01df75e3e754fa5247fd048029bbfc3010b13cea0751bbaaed1c3b8f7",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/capture-source.py": "8d87b098c3d42ecd471fbfa1a586255b68199c8c26780fdde6f96740e1caa4f4",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/fence-canary-after.json": "ef6e0e417e3b06b56d20f127218f3799c8a554e69211a4a0a46e73264e918caf",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/fence-canary-autoload.json": "a12ea825f91f0b33436d74469e79a99b73941151dd775d49bba94d120d927a1f",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/fence-canary-before.json": "ef6e0e417e3b06b56d20f127218f3799c8a554e69211a4a0a46e73264e918caf",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/fence-first-empty-selection.log": "2994c6167297fb4657cd6c764bb189883fd33890020967d0d351b33da8a882e2",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/fence-first-empty-selection.xml": "d57c299e3639972fcf7a3e0783a1fd0976458a8bb6f392a175e30a5556e64210",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/fence-omitted-red.log": "66b2715d32de59b19e812579577ebef7438573c21cbc0d067721c13cfcb1a450",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/fence-omitted-red.xml": "b7c17af3808d4ffb1b7243a12cd036d235abd7d33f1b9ddc45e836a0ac30a0da",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/fence-omitted.patch": "10d7aac2a7b071672b35489b308cb9b0dbfbdca91723ddacdddda9653b5492ae",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/final-source-snapshot.json": "10f7cb609b6368e6fef28bc3095196c89c589e71d03c4fa50b5942098b71c550",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/frozen-functional.log": "7c41ace0443f0bc729a765df8bc4a856aab6467f55ef38711197e787fc6431bf",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/frozen-functional.xml": "d821393e0c338b5cf14da632914a1348d1cf19e1e315d5038b2134262a265623",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/red-autoload.json": "d029635c1e106790c2644a9fd079d6acdf82f242d274d867bfa40ef7e1e6a927",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/red-interleaving.log": "7ee1165a1aaaa24bdecb72dbfc9d92a891dacd000f5f8019da064b795e610f8a",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/red-interleaving.xml": "af90c5f35db89a7f39970d29bb92bf0b503a44dd2cbaf86166a93446b177ab8e",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/red-source-after.json": "c2c8d9043d743782d3f5213a4c91602e5d1ba4a76f31c2c0d69020c278b97ae7",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/red-source-before.json": "c2c8d9043d743782d3f5213a4c91602e5d1ba4a76f31c2c0d69020c278b97ae7",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/review.md": "49ecb2e89d94036aebe34d0db4fc7ba9f4e07105c4730866410135b4aab9a797",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/source-after.json": "3b4678154f9136aee1ae648cf7bf6139c20246b279147faa576cd2a5200de121",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-independent-review/source-before.json": "3b4678154f9136aee1ae648cf7bf6139c20246b279147faa576cd2a5200de121"
+  }
+}

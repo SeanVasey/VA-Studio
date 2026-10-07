@@ -1,0 +1,483 @@
+{
+  "schema_version": 1,
+  "reviewer": "/root/notifications_continue",
+  "disposition": "approved for focused development integration of membership rollback correction",
+  "approved_author_head": "62998cf19662cfd1c17330cf9ff9b9c3630e1b04",
+  "approved_author_tree": "e570d6bfcabecd93b3b8e362796881dd8b2b6431",
+  "approved_composed_head": "211577eece5c4f9a3c708db25e4ad67d4462721e",
+  "approved_composed_tree": "e129b27ad12311c9f02924f93162779c813e427d",
+  "baseline": "9a5feca718b91df6df8e77b0deabde11c56b6257",
+  "changed_paths": [
+    ".github/workflows/focused-feedback.yml",
+    "database/migrations/2026_10_06_230000_membership_credit_foundation.php",
+    "docs/verification/membership-migration-rollback.md",
+    "scripts/ci/focused-tests.py",
+    "scripts/ci/test-focused-tests.py",
+    "tests/Feature/CustomerAccountMigrationTest.php",
+    "tests/Feature/MembershipCreditMigrationTest.php"
+  ],
+  "source_equivalence": {
+    "final_head": "211577eece5c4f9a3c708db25e4ad67d4462721e",
+    "final_tree": "e129b27ad12311c9f02924f93162779c813e427d",
+    "executed_composed_head": "e96dc3dcfc18979cbf6eda1fee47e23c327f7a80",
+    "only_changed_since_actual_native_execution": [
+      "scripts/ci/focused-tests.py",
+      "scripts/ci/test-focused-tests.py"
+    ],
+    "unchanged_tracked_files": 1605,
+    "all_php_config_database_dependencies_unchanged": true,
+    "author_owned_paths_equal": {
+      "database/migrations/2026_10_06_230000_membership_credit_foundation.php": "6402db1b8412d8b01738edd270ec8ad899f1aed3a13369f167b408551df43a70",
+      "docs/verification/membership-migration-rollback.md": "415e7590281565ae028ab4311979cc709613e719790f98c3d7003b49e58700c3",
+      "tests/Feature/MembershipCreditMigrationTest.php": "2634eb594674af98be59a6e9e3d901ab9dbdb8f3e0e6fb80eb496f6bb2fd2511"
+    },
+    "new_manual_selector_exact": [
+      "tests/Feature/MembershipCreditMigrationTest.php",
+      "tests/Feature/CustomerAccountMigrationTest.php"
+    ],
+    "all_original_selectors_equal": true,
+    "max_files": 32,
+    "native_skip_policy_unchanged": true,
+    "selected_classes_have_no_native_skip_policy_rows": true,
+    "namespace_test_canonical": true
+  },
+  "migration_up_schema_and_guard_prefix_sha256": "80b6f50a0e0f55a593238cadc12527fb63561678bfc4d2dad001da6d4476acd7",
+  "independent_executions": {
+    "sqlite": {
+      "source": "62998cf19662cfd1c17330cf9ff9b9c3630e1b04",
+      "tree": "e570d6bfcabecd93b3b8e362796881dd8b2b6431",
+      "result": {
+        "tests": 3,
+        "assertions": 44,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "junit_seconds": 0.863282,
+        "classes": {
+          "Tests\\Feature\\MembershipCreditMigrationTest": {
+            "cases": 3,
+            "assertions": 44
+          }
+        }
+      }
+    },
+    "mysql": {
+      "source": "e96dc3dcfc18979cbf6eda1fee47e23c327f7a80",
+      "tree": "fa8d75f2198ce29386326743c0d20aff1db1844e",
+      "result": {
+        "tests": 2,
+        "assertions": 40,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "junit_seconds": 12.024189,
+        "classes": {
+          "Tests\\Feature\\MembershipCreditMigrationTest": {
+            "cases": 2,
+            "assertions": 40
+          }
+        }
+      },
+      "native_profile": {
+        "mysql": "8.4.11",
+        "innodb_flush_log_at_trx_commit": 1,
+        "sync_binlog": 1,
+        "innodb_doublewrite": "ON",
+        "log_bin": true,
+        "transport": "private loopback TCP",
+        "database": "fresh disposable"
+      }
+    }
+  },
+  "author_executions_inspected": {
+    "sqlite": {
+      "source": "62998cf19662cfd1c17330cf9ff9b9c3630e1b04",
+      "attribution": "author execution; independently inspected raw receipt",
+      "result": {
+        "tests": 38,
+        "assertions": 115,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "junit_seconds": 7.161998,
+        "classes": {
+          "Tests\\Feature\\MembershipCreditMigrationTest": {
+            "cases": 38,
+            "assertions": 115
+          }
+        }
+      },
+      "elapsed_seconds": 7.303667513995606,
+      "command": [
+        "php",
+        "vendor/bin/phpunit",
+        "tests/Feature/MembershipCreditMigrationTest.php",
+        "--colors=never",
+        "--log-junit=/workspace/scratch/2876616e88c3/membership-rollback-evidence/rollback-sqlite-green.xml"
+      ]
+    },
+    "mysql": {
+      "source": "62998cf19662cfd1c17330cf9ff9b9c3630e1b04",
+      "attribution": "author execution; independently inspected raw receipt",
+      "result": {
+        "tests": 38,
+        "assertions": 115,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "junit_seconds": 206.708983,
+        "classes": {
+          "Tests\\Feature\\MembershipCreditMigrationTest": {
+            "cases": 38,
+            "assertions": 115
+          }
+        }
+      },
+      "elapsed_seconds": 213.3098381000018,
+      "command": [
+        "python3",
+        "/workspace/scratch/0c039e9e0645/mysql-runtime/run-tests.py",
+        "--",
+        "php",
+        "vendor/bin/phpunit",
+        "tests/Feature/MembershipCreditMigrationTest.php",
+        "--colors=never",
+        "--log-junit=/workspace/scratch/2876616e88c3/membership-rollback-evidence/rollback-mysql-green.xml"
+      ]
+    }
+  },
+  "lead_executions_inspected": {
+    "sqlite": {
+      "source": "211577eece5c4f9a3c708db25e4ad67d4462721e",
+      "tree": "e129b27ad12311c9f02924f93162779c813e427d",
+      "attribution": "lead execution; independently inspected raw receipts",
+      "source_before_after_equal": true,
+      "result": {
+        "tests": 45,
+        "assertions": 221,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "junit_seconds": 8.445255,
+        "classes": {
+          "Tests\\Feature\\MembershipCreditMigrationTest": {
+            "cases": 38,
+            "assertions": 115
+          },
+          "Tests\\Feature\\CustomerAccountMigrationTest": {
+            "cases": 7,
+            "assertions": 106
+          }
+        }
+      },
+      "exit": 0,
+      "command": [
+        "/workspace/scratch/0c039e9e0645/runtime-recovery/bin/php",
+        "vendor/bin/phpunit",
+        "--configuration=phpunit-membership-regression-sqlite.xml",
+        "--log-junit=/workspace/scratch/2876616e88c3/membership-rollback-composed-corrected-evidence/sqlite/results.xml",
+        "--fail-on-empty-test-suite",
+        "--fail-on-phpunit-warning",
+        "--colors=never"
+      ]
+    },
+    "mysql": {
+      "source": "211577eece5c4f9a3c708db25e4ad67d4462721e",
+      "tree": "e129b27ad12311c9f02924f93162779c813e427d",
+      "attribution": "lead execution; independently inspected raw receipts",
+      "source_before_after_equal": true,
+      "result": {
+        "tests": 45,
+        "assertions": 218,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "junit_seconds": 230.725532,
+        "classes": {
+          "Tests\\Feature\\MembershipCreditMigrationTest": {
+            "cases": 38,
+            "assertions": 115
+          },
+          "Tests\\Feature\\CustomerAccountMigrationTest": {
+            "cases": 7,
+            "assertions": 103
+          }
+        }
+      },
+      "exit": 0,
+      "command": [
+        "/workspace/scratch/0c039e9e0645/runtime-recovery/bin/php",
+        "vendor/bin/phpunit",
+        "--configuration=phpunit-membership-regression-mysql.xml",
+        "--log-junit=/workspace/scratch/2876616e88c3/membership-rollback-composed-corrected-evidence/mysql/results.xml",
+        "--fail-on-empty-test-suite",
+        "--fail-on-phpunit-warning",
+        "--colors=never"
+      ],
+      "native_profile": {
+        "mysql": "8.4.11",
+        "innodb_flush_log_at_trx_commit": 1,
+        "sync_binlog": 1,
+        "innodb_doublewrite": "ON",
+        "log_bin": true,
+        "transport": "private loopback TCP",
+        "database": "fresh disposable"
+      }
+    }
+  },
+  "predecessor_actual_migrator_negatives": {
+    "sqlite": {
+      "base_application_source": "9a5feca718b91df6df8e77b0deabde11c56b6257",
+      "new_working_tests": true,
+      "result": {
+        "tests": 2,
+        "assertions": 18,
+        "errors": 0,
+        "failures": 2,
+        "skipped": 0,
+        "junit_seconds": 0.61025,
+        "classes": {
+          "Tests\\Feature\\MembershipCreditMigrationTest": {
+            "cases": 2,
+            "assertions": 18
+          }
+        }
+      },
+      "no_retroactive_reflection_claim": true
+    },
+    "mysql": {
+      "base_application_source": "9a5feca718b91df6df8e77b0deabde11c56b6257",
+      "new_working_tests": true,
+      "result": {
+        "tests": 2,
+        "assertions": 18,
+        "errors": 0,
+        "failures": 2,
+        "skipped": 0,
+        "junit_seconds": 10.603973,
+        "classes": {
+          "Tests\\Feature\\MembershipCreditMigrationTest": {
+            "cases": 2,
+            "assertions": 18
+          }
+        }
+      },
+      "no_retroactive_reflection_claim": true
+    }
+  },
+  "parent_fixture_native_negative": {
+    "source": "9a5feca718b91df6df8e77b0deabde11c56b6257",
+    "result": {
+      "tests": 2,
+      "assertions": 12,
+      "errors": 2,
+      "failures": 0,
+      "skipped": 0,
+      "junit_seconds": 12.924605,
+      "classes": {
+        "Tests\\Feature\\CustomerAccountMigrationTest": {
+          "cases": 2,
+          "assertions": 12
+        }
+      }
+    },
+    "native_profile": {
+      "mysql": "8.4.11",
+      "innodb_flush_log_at_trx_commit": 1,
+      "sync_binlog": 1,
+      "innodb_doublewrite": "ON",
+      "log_bin": true,
+      "transport": "private loopback TCP",
+      "database": "fresh disposable"
+    }
+  },
+  "first_composed_harness_negatives": {
+    "mysql": {
+      "result": {
+        "tests": 113,
+        "assertions": 0,
+        "errors": 113,
+        "failures": 0,
+        "skipped": 0,
+        "junit_seconds": 0.0,
+        "classes": {
+          "Tests\\Feature\\MembershipCreditMigrationTest": {
+            "cases": 38,
+            "assertions": 0
+          },
+          "Tests\\Feature\\CustomerAccountMigrationTest": {
+            "cases": 7,
+            "assertions": 0
+          },
+          "Tests\\Feature\\CustomerPurchaseClaimMigrationTest": {
+            "cases": 8,
+            "assertions": 0
+          },
+          "Tests\\Feature\\OrderPreparationMigrationTest": {
+            "cases": 2,
+            "assertions": 0
+          },
+          "Tests\\Feature\\QuotePricingMigrationTest": {
+            "cases": 1,
+            "assertions": 0
+          },
+          "Tests\\Feature\\SharedInventoryMigrationTest": {
+            "cases": 1,
+            "assertions": 0
+          },
+          "Tests\\Feature\\TestPaymentEvidenceMigrationTest": {
+            "cases": 20,
+            "assertions": 0
+          },
+          "Tests\\Feature\\TestOrderFinalizationMigrationTest": {
+            "cases": 15,
+            "assertions": 0
+          },
+          "Tests\\Feature\\TestContractIssuanceMigrationTest": {
+            "cases": 13,
+            "assertions": 0
+          },
+          "Tests\\Feature\\TestFulfillmentActivationMigrationTest": {
+            "cases": 8,
+            "assertions": 0
+          }
+        }
+      },
+      "reason": "hosted reset overwrote dynamic local port with 3306"
+    },
+    "sqlite": {
+      "result": {
+        "tests": 113,
+        "assertions": 314,
+        "errors": 58,
+        "failures": 0,
+        "skipped": 0,
+        "junit_seconds": 20.324773,
+        "classes": {
+          "Tests\\Feature\\MembershipCreditMigrationTest": {
+            "cases": 38,
+            "assertions": 115
+          },
+          "Tests\\Feature\\CustomerAccountMigrationTest": {
+            "cases": 7,
+            "assertions": 106
+          },
+          "Tests\\Feature\\CustomerPurchaseClaimMigrationTest": {
+            "cases": 8,
+            "assertions": 37
+          },
+          "Tests\\Feature\\OrderPreparationMigrationTest": {
+            "cases": 2,
+            "assertions": 0
+          },
+          "Tests\\Feature\\QuotePricingMigrationTest": {
+            "cases": 1,
+            "assertions": 0
+          },
+          "Tests\\Feature\\SharedInventoryMigrationTest": {
+            "cases": 1,
+            "assertions": 0
+          },
+          "Tests\\Feature\\TestPaymentEvidenceMigrationTest": {
+            "cases": 20,
+            "assertions": 0
+          },
+          "Tests\\Feature\\TestOrderFinalizationMigrationTest": {
+            "cases": 15,
+            "assertions": 33
+          },
+          "Tests\\Feature\\TestContractIssuanceMigrationTest": {
+            "cases": 13,
+            "assertions": 17
+          },
+          "Tests\\Feature\\TestFulfillmentActivationMigrationTest": {
+            "cases": 8,
+            "assertions": 6
+          }
+        }
+      },
+      "reason": "missing test application encryption key"
+    },
+    "not_positive_runtime_evidence": true
+  },
+  "reflection_origins_each_independent_checkout": 10,
+  "all_1607_tracked_files_equal_before_after_independent_executions": true,
+  "final_tracked_source_snapshot": "/workspace/scratch/2876616e88c3/membership-rollback-independent-review/final-source-snapshot.json",
+  "selected_migration_record_data_schema_guards_accounts_users_audits_preserved": true,
+  "ordinary_and_actual_new_forward_migration_proven": true,
+  "limits": [
+    "Only selected 230000 rollback refusal; no whole-batch atomicity claim",
+    "No direct arbitrary out-of-order parent rollback acceptance",
+    "Selected native bookkeeping/constraints checks, not full matrix or record-wait concurrency acceptance",
+    "Membership dependency bytes may carry only under exact source equivalence",
+    "Publication held for separate PR17 preparation-packet concurrent exact-apply finding 4201460899"
+  ],
+  "no_reviewer_source_edits_external_actions_or_ci_dispatch": true,
+  "artifact_sha256": {
+    "/workspace/scratch/2876616e88c3/membership-rollback-composed-corrected-evidence/mysql/config.xml": "7546236bc3c659aa24c18e39c61e1ca2c5988d4072334e7ae3cb48d760c1c7ed",
+    "/workspace/scratch/2876616e88c3/membership-rollback-composed-corrected-evidence/mysql/results.xml": "1aa4f1bd3fb2cefa609c148548911bb7de5fc7ae0bc875ee69b1055010d010cd",
+    "/workspace/scratch/2876616e88c3/membership-rollback-composed-corrected-evidence/mysql/run.json": "137e7111c8ab0c2441f8c06d980ac9cd2dc2ed951aa9f95afbdaf8d67cfb6f08",
+    "/workspace/scratch/2876616e88c3/membership-rollback-composed-corrected-evidence/mysql/source.json": "763ab10e6bb4b67c44b84ab82d7132a52eb03de55a379d496e6d0d0b2b3ef01a",
+    "/workspace/scratch/2876616e88c3/membership-rollback-composed-corrected-evidence/mysql/verified-receipt.json": "e1554eb1a95e08b10b02b4e24f622c654680c49097be863c04e5d6ad991a1002",
+    "/workspace/scratch/2876616e88c3/membership-rollback-composed-corrected-evidence/sqlite/config.xml": "b8083968ccc72cab38005b585d3df3008358c60660a993aac93bba45060b0744",
+    "/workspace/scratch/2876616e88c3/membership-rollback-composed-corrected-evidence/sqlite/results.xml": "d0eb232f84f731becac79d0690840ce1ae4e3c464818d371f227a2c18dce2387",
+    "/workspace/scratch/2876616e88c3/membership-rollback-composed-corrected-evidence/sqlite/run.json": "e4e9dff2e900ae09f298bcbcddce2873317bf5592ad9949f0fd9a62fdee2a2fb",
+    "/workspace/scratch/2876616e88c3/membership-rollback-composed-corrected-evidence/sqlite/source.json": "28b6fb222def55a01cb3a659b34d8dc344d072158df91ac819982b41973527bd",
+    "/workspace/scratch/2876616e88c3/membership-rollback-composed-corrected-evidence/sqlite/verified-receipt.json": "7f79a10163847323fc061d5da5d63df067b89206bf4e74f7f7a601af94543504",
+    "/workspace/scratch/2876616e88c3/membership-rollback-composed-corrected-evidence/unused-local-mysql-config.xml": "7546236bc3c659aa24c18e39c61e1ca2c5988d4072334e7ae3cb48d760c1c7ed",
+    "/workspace/scratch/2876616e88c3/membership-rollback-composed-corrected-evidence/unused-local-sqlite-config.xml": "b8083968ccc72cab38005b585d3df3008358c60660a993aac93bba45060b0744",
+    "/workspace/scratch/2876616e88c3/membership-rollback-composed-corrected-mysql.log": "4fa2d730d5d6029c4ff561be553a75ccd24c4a9712b44700626d08fa2f873dbf",
+    "/workspace/scratch/2876616e88c3/membership-rollback-composed-corrected-sqlite.log": "3908e749f95ea918c259cf504c4058c4ae76aaebf2a635ae138ecff52f674450",
+    "/workspace/scratch/2876616e88c3/membership-rollback-evidence/autoload-identity.json": "047f5869554616042f460673c9bc121e6c620cf9ce9682a78192892b4cdc6904",
+    "/workspace/scratch/2876616e88c3/membership-rollback-evidence/predecessor-red-source/database/migrations/2026_10_06_230000_membership_credit_foundation.php": "d3ffb670055c6bd62baf74da3eca9e6ba0502028e694e76f89c1519754170c91",
+    "/workspace/scratch/2876616e88c3/membership-rollback-evidence/predecessor-red-source/tests/Feature/MembershipCreditMigrationTest.php": "5fd46fe0b88d44571fce0fcc1f2241d4ee928bb0eefdf8a7ca90b7c01e8d5cf3",
+    "/workspace/scratch/2876616e88c3/membership-rollback-evidence/rollback-final-handoff.json": "778af02ca7319e84df592958c63a186448b70001bf5bb3d21400f5528218cde7",
+    "/workspace/scratch/2876616e88c3/membership-rollback-evidence/rollback-mysql-green-receipt.json": "0414bde164e40b675b85ee6b3227fead35b4fd92fc4b5c56fd12e1e08338a480",
+    "/workspace/scratch/2876616e88c3/membership-rollback-evidence/rollback-mysql-green.log": "4f8684cf0520c600cb15472f95ba9a6b11d45e135150ef43b0708729615c70d6",
+    "/workspace/scratch/2876616e88c3/membership-rollback-evidence/rollback-mysql-green.xml": "d7a1231f42efd803467de469ed8ed5f52dc2ad5fdd92e8c22e3ec25d12f9a9ca",
+    "/workspace/scratch/2876616e88c3/membership-rollback-evidence/rollback-mysql-red-native-identity.json": "8f1e43a519417d3625ea7184c26f7cb31da10eae69be494e4113744f0d4e3194",
+    "/workspace/scratch/2876616e88c3/membership-rollback-evidence/rollback-mysql-red-receipt.json": "6e4b0af104a7cf079f8ddd4d79ee680039856c2481db1cd0aea55e804d9924a3",
+    "/workspace/scratch/2876616e88c3/membership-rollback-evidence/rollback-mysql-red.log": "cbb24fe6760208814310c26d31a5518354bc3f59dea87b38e000e14b687f4355",
+    "/workspace/scratch/2876616e88c3/membership-rollback-evidence/rollback-mysql-red.xml": "427eb86fb470d20d291754bb88f09d3e3c6b29b6662ba92b33b5aa6a3e38878a",
+    "/workspace/scratch/2876616e88c3/membership-rollback-evidence/rollback-sqlite-green-receipt.json": "02f028932566e65e8fe2f35bf8d7d27df6cd658837482d6b65b10e7f3ca82b72",
+    "/workspace/scratch/2876616e88c3/membership-rollback-evidence/rollback-sqlite-green.log": "ac1ce5a9371c86968d3a8f149a35ce119a0214cb5627198a65065a6d70f92b10",
+    "/workspace/scratch/2876616e88c3/membership-rollback-evidence/rollback-sqlite-green.xml": "95f204e0ef120135015a84cc4c4c6c614818db676c2f611201309ca1194d4878",
+    "/workspace/scratch/2876616e88c3/membership-rollback-evidence/rollback-sqlite-red-receipt.json": "691c6ce7a54deefecc46e1a5743244721bb8094e7b97586cc38bfb8103a28151",
+    "/workspace/scratch/2876616e88c3/membership-rollback-evidence/rollback-sqlite-red.log": "28071b598453396d40abdd34e2f0db9e96286e78c82ffcc8766a2e919be24671",
+    "/workspace/scratch/2876616e88c3/membership-rollback-evidence/rollback-sqlite-red.xml": "a79db920189f759239a20e4611e2a642c0627ecfd75d225cf5a06a57a77e0329",
+    "/workspace/scratch/2876616e88c3/membership-rollback-evidence/run-regression.py": "05ac48418b20669b0ce67d37c95123f4df7d643ef576ad8420abf83eba41484c",
+    "/workspace/scratch/2876616e88c3/membership-rollback-evidence/source-preservation.json": "19be466c217be0198def5aadb01d5f8b0895de01c3a90464f23eba7c6a840749",
+    "/workspace/scratch/2876616e88c3/membership-rollback-first-composed-evidence/focused-ci-evidence.json": "226be4286c262a5e111082f75ab7406b4527441a520fc79336435a4e311720fd",
+    "/workspace/scratch/2876616e88c3/membership-rollback-first-composed-evidence/focused-ci-results.xml": "e7131c38b6800f1a51d4ac2e2bf60df0fa0c577cbf36ac44acbc3baa950e5bc4",
+    "/workspace/scratch/2876616e88c3/membership-rollback-first-composed-evidence/membership-rollback-composed-mysql.log": "794a8212cc34dceb44ddba45b6a9547742b9f5f06b7dce4775648be954586101",
+    "/workspace/scratch/2876616e88c3/membership-rollback-first-composed-evidence/membership-rollback-composed-sqlite.log": "5c366825d8ed57649ee9d8811a2ebaa4fa135dd9882b11c231565071359a9554",
+    "/workspace/scratch/2876616e88c3/membership-rollback-first-composed-evidence/membership-rollback-composed-sqlite.xml": "d869a7415efe49047d7c556e6f370f00c7821b4bfeee62b23ed6a3f4d3c48385",
+    "/workspace/scratch/2876616e88c3/membership-rollback-first-composed-evidence/phpunit-focused.xml": "6fbf81fba0d1d314577ecca79dab73bb00d454651e290f9d57e12c0aca125026",
+    "/workspace/scratch/2876616e88c3/membership-rollback-first-composed-evidence/phpunit-membership-regression-sqlite.xml": "9042b78a07867aa57a8d0be9bdaf7f0d6ae38cf6f3cc84381aceb2c8af8ba42c",
+    "/workspace/scratch/2876616e88c3/membership-rollback-independent-review/autoload.json": "93a3fbd9479792753e9a99a26c7df8587ccd87196096a298fd4a7c3b8a019b42",
+    "/workspace/scratch/2876616e88c3/membership-rollback-independent-review/autoload.php": "80c1dc5715f52c0b582cddd093832b2b3b2cfb9a2817e098084858af266a5cfd",
+    "/workspace/scratch/2876616e88c3/membership-rollback-independent-review/build-final-receipt.py": "de1e29191e7211210e6f0aa20412cadfdcdb47a1ee3b7d6dc2bd5ff37987f2f2",
+    "/workspace/scratch/2876616e88c3/membership-rollback-independent-review/capture-source.py": "549e5f0f28e26703298e6dfeb97519f2ba5d44770f1f85a78313c5c8638cea2f",
+    "/workspace/scratch/2876616e88c3/membership-rollback-independent-review/composed-after.json": "1a5b301cc9312aae983db34f171bc99137001dc4a930b718b89c575c47b37b13",
+    "/workspace/scratch/2876616e88c3/membership-rollback-independent-review/composed-autoload.json": "ced5700cc76d617e0f3f8f6868ffc443b6e65912e9e4a0682fc600f2ab7236eb",
+    "/workspace/scratch/2876616e88c3/membership-rollback-independent-review/composed-before.json": "1a5b301cc9312aae983db34f171bc99137001dc4a930b718b89c575c47b37b13",
+    "/workspace/scratch/2876616e88c3/membership-rollback-independent-review/composed-native-receipt.json": "6c60e6c9d5999e11aef27f853d00c116f16557e91bb0cd69c46c534b66d7adfe",
+    "/workspace/scratch/2876616e88c3/membership-rollback-independent-review/composed-native-rollback.log": "e8662f2b2cbb787bd8bbcec5aeac493468e6eacb1d4be1f093a5e8229ee7e3ab",
+    "/workspace/scratch/2876616e88c3/membership-rollback-independent-review/composed-native-rollback.xml": "4189cf9ced9ab6bdbfba3ad9d07e8a747eb5fe00b929fb814129bd3b43bb6df3",
+    "/workspace/scratch/2876616e88c3/membership-rollback-independent-review/final-source-equivalence.json": "0ef073436ea6532de174b963ef16a340d90786f1160edfad5e7fa1f4eb340164",
+    "/workspace/scratch/2876616e88c3/membership-rollback-independent-review/final-source-snapshot.json": "8381a99e57b7eac158796da5f5219919d1aea2b72087c696aa6ccb880edf4d85",
+    "/workspace/scratch/2876616e88c3/membership-rollback-independent-review/functional-receipt.json": "59470b289b9affe6133cf3ef6c422fb99741d2596b8e8c28050beab9e3f9dfd4",
+    "/workspace/scratch/2876616e88c3/membership-rollback-independent-review/review.md": "4b1e41d40e6c182019d7189ab63321e9606540c65b006de58d0c46efde72c517",
+    "/workspace/scratch/2876616e88c3/membership-rollback-independent-review/rollback-functional.log": "c4a7d8df3528aba9ba39f3ccbab049cf223f140e28d815e4da1de1650ab7c499",
+    "/workspace/scratch/2876616e88c3/membership-rollback-independent-review/rollback-functional.xml": "ef4d867582b194f56af953a48ae1cfec927b41751e196e341a27fadfc0d5e3d6",
+    "/workspace/scratch/2876616e88c3/membership-rollback-independent-review/source-after.json": "3a605ae07e369c970492c46b8e0192fb20a1cbceb3678df9a50308f1fe460b11",
+    "/workspace/scratch/2876616e88c3/membership-rollback-independent-review/source-before.json": "3a605ae07e369c970492c46b8e0192fb20a1cbceb3678df9a50308f1fe460b11",
+    "/workspace/scratch/2876616e88c3/membership-rollback-parent-predecessor-mysql.json": "6717bfa0abf6516518d2178f537289c72f13c89481dcd9b00efa047d524496be",
+    "/workspace/scratch/2876616e88c3/membership-rollback-parent-predecessor-mysql.log": "e597a245b42acdece9933b24bf6649d59489dc1b1884cbc05b20919b9eb3894f",
+    "/workspace/scratch/2876616e88c3/membership-rollback-parent-predecessor-mysql.xml": "8fdf308a91124d058f841a29ba0899f1ca84bd0dd196795b71692cb0c3d18e31",
+    "/workspace/scratch/2876616e88c3/membership-rollback-run-selected.py": "59f3e7b77062f453db41f6e71c35df660a44eb54d6ef3c371279f6c5d6f9db29",
+    "/workspace/scratch/2876616e88c3/membership-rollback-shared-review/focused-evidence-validation-211577.json": "d293ef27595c91a640e74a742f6e12d44d7bd1c676e4cd59a7b656d517503fc9",
+    "/workspace/scratch/2876616e88c3/membership-rollback-shared-review/native-policy-guard-canary-211577.json": "8c853d77ec9bf6bfe3debe06b00c6fcbd460ef43a6feed8c514185fb5bf03910",
+    "/workspace/scratch/2876616e88c3/membership-rollback-shared-review/native-policy-guard-canary-e96.json": "fd9f8ad6f8aee8476dcac705904ac8e595180843f45e663e22abb5421882b9c0"
+  }
+}

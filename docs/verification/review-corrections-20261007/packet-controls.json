@@ -1,0 +1,18 @@
+[
+  {
+    "script": "test-focused-tests.py",
+    "exit": 0
+  },
+  {
+    "script": "test-workflow-cadence.py",
+    "exit": 0
+  },
+  {
+    "script": "test-phpunit-shards.py",
+    "exit": 0
+  },
+  {
+    "script": "test-database-receipts.py",
+    "exit": 0
+  }
+]

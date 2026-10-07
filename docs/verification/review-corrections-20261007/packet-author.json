@@ -1,0 +1,166 @@
+{
+  "source": {
+    "head": "7a202e98296d10ec96dee11803433dd8f5391cab",
+    "tree": "8cdfdfa110b52ff0d5056de7c01420e6cd6ae854",
+    "worktree": "/workspace/scratch/2876616e88c3/VA-Studio-production-preparation-replay-evidence-author",
+    "clean": true,
+    "tracked_source_count": 1610,
+    "all_tracked_hashes_stable": true,
+    "autoload_origins": 25
+  },
+  "runtime_source": "f5fa20b9f5554a85435e8e992c9e583f268d55b3",
+  "baseline": "211577eece5c4f9a3c708db25e4ad67d4462721e",
+  "owned_paths": [
+    "app/Domain/Commerce/ProductionPreparation/ProductionTrackPreparationPackets.php",
+    "docs/verification/production-track-preparation-packets.md",
+    "tests/Feature/ProductionTrackPreparationPacketTest.php",
+    "tests/Feature/ProductionTrackPreparationReplayConcurrencyTest.php",
+    "tests/Support/ProductionTrackPreparationReplayRace.php",
+    "tests/Support/production-track-preparation-replay-worker.php"
+  ],
+  "fresh_body_and_proveCurrent_byte_equal_to_baseline": true,
+  "untested": [
+    "Full matrix and browser",
+    "Hosted CI in author lane",
+    "Production/live/provider execution",
+    "Closure or source movement preventing core adapter admission during the miss gap",
+    "Native staff/MFA withdrawal races beyond the existing unchanged authority contract"
+  ],
+  "evidence": {
+    "red-native": {
+      "source": "27f0689b14a687f20bcdbf221e5b187139fcb9f7",
+      "purpose": "native expected-failing two-order replay predecessor",
+      "cases": 2,
+      "assertions": 134,
+      "errors": 0,
+      "failures": 2,
+      "skips": 0,
+      "seconds": 13.472346,
+      "xml": {
+        "path": "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/red-native.xml",
+        "sha256": "630794da681f24f54e3a7f9ab1c0876120933c1ec5a50dfe7d41780801770c43"
+      },
+      "log": {
+        "path": "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/red-native.log",
+        "sha256": "7d61fb035a58e7c9d45674cff5894f4d102c796f79ba59b465136eeaffa483dc"
+      }
+    },
+    "red-interleaving": {
+      "source": "27f0689b14a687f20bcdbf221e5b187139fcb9f7",
+      "purpose": "SQLite predecessor canary run before committing identical engine/PacketTest source",
+      "cases": 1,
+      "assertions": 3,
+      "errors": 1,
+      "failures": 0,
+      "skips": 0,
+      "seconds": 1.353112,
+      "xml": {
+        "path": "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/red-interleaving.xml",
+        "sha256": "3a68dee5eabf2380244c250f8ae16768ff86bd4ec032e07135748f6ca756abfb"
+      },
+      "log": {
+        "path": "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/red-interleaving.log",
+        "sha256": "cdf33978ccb10bf8f963d627f77f352d26f7989a0642c56551e8a0523f63580a"
+      }
+    },
+    "fix-first-interleaving": {
+      "source": "working f5fa runtime with pre-canonical-assertion PacketTest",
+      "purpose": "initial repaired behavior: 2 pass, one model array key-order fixture failure",
+      "cases": 3,
+      "assertions": 10,
+      "errors": 0,
+      "failures": 1,
+      "skips": 0,
+      "seconds": 3.586683,
+      "xml": {
+        "path": "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/fix-first-interleaving.xml",
+        "sha256": "1ac4f256585e9f2ecf9811ec0374fcdeb84ca876594bd25e56c6de14d4314a92"
+      },
+      "log": {
+        "path": "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/fix-first-interleaving.log",
+        "sha256": "34e2c9da71b9280adcca9fe727f77ef8395a422d839807f331a1502463da5335"
+      }
+    },
+    "frozen-behavior-sqlite": {
+      "source": "f5fa20b9f5554a85435e8e992c9e583f268d55b3",
+      "purpose": "PacketTest plus PacketGuards",
+      "cases": 56,
+      "assertions": 166,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0,
+      "seconds": 59.270149,
+      "xml": {
+        "path": "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/frozen-behavior-sqlite.xml",
+        "sha256": "d2c695239537e88df0b22d6c3d0334e615864c0f6a028e63eed82df350f03217"
+      },
+      "log": {
+        "path": "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/frozen-behavior-sqlite.log",
+        "sha256": "3fb05e1ebf63ed1562681f4ea4bb7890bb9f15d13d27c70cd86dceb8f9953b27"
+      }
+    },
+    "frozen-native": {
+      "source": "f5fa20b9f5554a85435e8e992c9e583f268d55b3",
+      "purpose": "first native repaired run: four request-array key-order fixture failures",
+      "cases": 4,
+      "assertions": 398,
+      "errors": 0,
+      "failures": 4,
+      "skips": 0,
+      "seconds": 28.059995,
+      "xml": {
+        "path": "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/frozen-native.xml",
+        "sha256": "5cb477ba7acc6b6a24baa141da0ae7f99e168f8de00323f0959041352e6f2b51"
+      },
+      "log": {
+        "path": "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/frozen-native.log",
+        "sha256": "6babd78e99eaf8d517d7e69bc2086e78e161955833c215fc0510b758ad52374d"
+      }
+    },
+    "final-native": {
+      "source": "de9f77ed33f3a8e73e6c5a479df726026bfc1a9c",
+      "purpose": "canonical native fixture successor",
+      "cases": 4,
+      "assertions": 360,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0,
+      "seconds": 25.67608,
+      "xml": {
+        "path": "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/final-native.xml",
+        "sha256": "3eab265743e86e9e982a6e95936e7967e1ba19fe23d56347895b0747f5fdd913"
+      },
+      "log": {
+        "path": "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/final-native.log",
+        "sha256": "bf800a32e7bd6ec07459123b623fcb75218fc07cbebef86defb52beffb442730"
+      }
+    },
+    "witness-native": {
+      "source": "7a202e98296d10ec96dee11803433dd8f5391cab",
+      "purpose": "final native successor with explicit raw worker result witnesses",
+      "cases": 4,
+      "assertions": 412,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0,
+      "seconds": 26.058493,
+      "xml": {
+        "path": "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/witness-native.xml",
+        "sha256": "19355c612ec4893b7ee26021f113ec45080c5f12cbb35773faa4475f8a9b64e6"
+      },
+      "log": {
+        "path": "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/witness-native.log",
+        "sha256": "09606f930dbe30378f3fba203b0f4178aae6ed1497f999c7c670b6af3dbfc96d"
+      }
+    }
+  },
+  "syntax": {
+    "cases": 5,
+    "path": "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/witness-syntax.log",
+    "sha256": "1c63bff0fea9d304a846dbcc1b215ba8ac8df791f95ddcd2c221c033a728d222"
+  },
+  "pint": {
+    "path": "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/witness-pint.log",
+    "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+  }
+}

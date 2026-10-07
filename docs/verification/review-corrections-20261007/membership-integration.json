@@ -1,0 +1,162 @@
+{
+  "runtime_source": "211577eece5c4f9a3c708db25e4ad67d4462721e",
+  "runtime_tree": "e129b27ad12311c9f02924f93162779c813e427d",
+  "engines": {
+    "sqlite": {
+      "checked_out_commit": "211577eece5c4f9a3c708db25e4ad67d4462721e",
+      "checked_out_tree": "e129b27ad12311c9f02924f93162779c813e427d",
+      "tracked_worktree_clean": true,
+      "engine": "sqlite",
+      "selected_files": [
+        "tests/Feature/MembershipCreditMigrationTest.php",
+        "tests/Feature/CustomerAccountMigrationTest.php"
+      ],
+      "command": [
+        "/workspace/scratch/0c039e9e0645/runtime-recovery/bin/php",
+        "vendor/bin/phpunit",
+        "--configuration=phpunit-membership-regression-sqlite.xml",
+        "--log-junit=/workspace/scratch/2876616e88c3/membership-rollback-composed-corrected-evidence/sqlite/results.xml",
+        "--fail-on-empty-test-suite",
+        "--fail-on-phpunit-warning",
+        "--colors=never"
+      ],
+      "environment": "isolated runner connection for MySQL; in-memory SQLite; ephemeral test key not retained",
+      "exit": 0,
+      "source_after": {
+        "checked_out_commit": "211577eece5c4f9a3c708db25e4ad67d4462721e",
+        "checked_out_tree": "e129b27ad12311c9f02924f93162779c813e427d",
+        "tracked_worktree_clean": true
+      },
+      "counts": {
+        "cases": 45,
+        "assertions": 221,
+        "errors": 0,
+        "failures": 0,
+        "skips": 0
+      },
+      "classes": {
+        "Tests\\Feature\\MembershipCreditMigrationTest": {
+          "cases": 38,
+          "assertions": 115
+        },
+        "Tests\\Feature\\CustomerAccountMigrationTest": {
+          "cases": 7,
+          "assertions": 106
+        }
+      },
+      "junit_sha256": "d0eb232f84f731becac79d0690840ce1ae4e3c464818d371f227a2c18dce2387",
+      "raw_log_sha256": "3908e749f95ea918c259cf504c4058c4ae76aaebf2a635ae138ecff52f674450",
+      "derived_configuration_sha256": "b8083968ccc72cab38005b585d3df3008358c60660a993aac93bba45060b0744"
+    },
+    "mysql": {
+      "checked_out_commit": "211577eece5c4f9a3c708db25e4ad67d4462721e",
+      "checked_out_tree": "e129b27ad12311c9f02924f93162779c813e427d",
+      "tracked_worktree_clean": true,
+      "engine": "mysql",
+      "selected_files": [
+        "tests/Feature/MembershipCreditMigrationTest.php",
+        "tests/Feature/CustomerAccountMigrationTest.php"
+      ],
+      "command": [
+        "/workspace/scratch/0c039e9e0645/runtime-recovery/bin/php",
+        "vendor/bin/phpunit",
+        "--configuration=phpunit-membership-regression-mysql.xml",
+        "--log-junit=/workspace/scratch/2876616e88c3/membership-rollback-composed-corrected-evidence/mysql/results.xml",
+        "--fail-on-empty-test-suite",
+        "--fail-on-phpunit-warning",
+        "--colors=never"
+      ],
+      "environment": "isolated runner connection for MySQL; in-memory SQLite; ephemeral test key not retained",
+      "exit": 0,
+      "source_after": {
+        "checked_out_commit": "211577eece5c4f9a3c708db25e4ad67d4462721e",
+        "checked_out_tree": "e129b27ad12311c9f02924f93162779c813e427d",
+        "tracked_worktree_clean": true
+      },
+      "counts": {
+        "cases": 45,
+        "assertions": 218,
+        "errors": 0,
+        "failures": 0,
+        "skips": 0
+      },
+      "classes": {
+        "Tests\\Feature\\MembershipCreditMigrationTest": {
+          "cases": 38,
+          "assertions": 115
+        },
+        "Tests\\Feature\\CustomerAccountMigrationTest": {
+          "cases": 7,
+          "assertions": 103
+        }
+      },
+      "junit_sha256": "1aa4f1bd3fb2cefa609c148548911bb7de5fc7ae0bc875ee69b1055010d010cd",
+      "raw_log_sha256": "4fa2d730d5d6029c4ff561be553a75ccd24c4a9712b44700626d08fa2f873dbf",
+      "derived_configuration_sha256": "7546236bc3c659aa24c18e39c61e1ca2c5988d4072334e7ae3cb48d760c1c7ed",
+      "runtime_probe": {
+        "mysql": "8.4.11",
+        "innodb_flush_log_at_trx_commit": 1,
+        "sync_binlog": 1,
+        "innodb_doublewrite": "ON",
+        "log_bin": true,
+        "transport": "private loopback TCP",
+        "database": "fresh disposable"
+      }
+    }
+  },
+  "mysql_runner_sha256": "35bdde4f03a9d7a23d90337a77a938c1044f297553e0afe38d13eaee73ac854a",
+  "selection_helper_sha256": "59f3e7b77062f453db41f6e71c35df660a44eb54d6ef3c371279f6c5d6f9db29",
+  "predecessor_parent_mysql": {
+    "source": "9a5feca718b91df6df8e77b0deabde11c56b6257",
+    "tree": "72394289e71845b84aaa8a3976ceb1c21dd70699",
+    "engine": "mysql",
+    "runtime_probe": {
+      "mysql": "8.4.11",
+      "innodb_flush_log_at_trx_commit": 1,
+      "sync_binlog": 1,
+      "innodb_doublewrite": "ON",
+      "log_bin": true,
+      "transport": "private loopback TCP",
+      "database": "fresh disposable"
+    },
+    "exit": 2,
+    "cases": 2,
+    "assertions": 12,
+    "failures": 0,
+    "errors": 2,
+    "skips": 0,
+    "junit_sha256": "8fdf308a91124d058f841a29ba0899f1ca84bd0dd196795b71692cb0c3d18e31",
+    "log_sha256": "e597a245b42acdece9933b24bf6649d59489dc1b1884cbc05b20919b9eb3894f",
+    "problems": [
+      {
+        "test": "test_empty_owned_rollback_and_reinstallation_preserve_the_expected_guard_set",
+        "type": "error",
+        "text": "Tests\\Feature\\CustomerAccountMigrationTest::test_empty_owned_rollback_and_reinstallation_preserve_the_expected_guard_set\nIlluminate\\Database\\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_accounts' referenced by a foreign key constraint 'membership_credit_buckets_customer_account_id_foreign' on table 'membership_credit_buckets'. (Connection: mysql, Host: 127.0.0.1, Port: 41581, Database: vaseyaudio_test, SQL: drop table `customer_accounts`)\n\n/workspace/scratch/2876616e88c3/VA-Studio-production-consumers/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857\n/workspace/scratch/2876616e88c3/VA-Studio-production-consumers/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813\n/workspace/scratch/2876616e88c3/VA-Studio-production-consumers/vendor/laravel/framework/src/Illuminate/Database/Connection.php:590\n/workspace/scratch/2876616e88c3/VA-Studio-production-consumers/vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php:122\n/workspace/scratch/2876616e88c3/VA-Studio-production-consumers/vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:704\n/workspace/scratch/2876616e88c3/VA-Studio-production-consumers/vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:537\n/workspace/scratch/2876616e88c3/VA-Studio-production-consumers/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364\n/workspace/scratch/2876616e88c3/VA-Studio-production-consumers/database/migrations/2026_10_06_000040_customer_accounts.php:79\n/workspace/scratch/2876616e88c3/VA-Studio-production-consume"
+      },
+      {
+        "test": "test_foreign_guard_name_is_preserved_before_creation_and_when_owned_table_is_absent",
+        "type": "error",
+        "text": "Tests\\Feature\\CustomerAccountMigrationTest::test_foreign_guard_name_is_preserved_before_creation_and_when_owned_table_is_absent\nIlluminate\\Database\\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_accounts' referenced by a foreign key constraint 'membership_credit_buckets_customer_account_id_foreign' on table 'membership_credit_buckets'. (Connection: mysql, Host: 127.0.0.1, Port: 41581, Database: vaseyaudio_test, SQL: drop table `customer_accounts`)\n\n/workspace/scratch/2876616e88c3/VA-Studio-production-consumers/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857\n/workspace/scratch/2876616e88c3/VA-Studio-production-consumers/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813\n/workspace/scratch/2876616e88c3/VA-Studio-production-consumers/vendor/laravel/framework/src/Illuminate/Database/Connection.php:590\n/workspace/scratch/2876616e88c3/VA-Studio-production-consumers/vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php:122\n/workspace/scratch/2876616e88c3/VA-Studio-production-consumers/vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:704\n/workspace/scratch/2876616e88c3/VA-Studio-production-consumers/vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:537\n/workspace/scratch/2876616e88c3/VA-Studio-production-consumers/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364\n/workspace/scratch/2876616e88c3/VA-Studio-production-consumers/database/migrations/2026_10_06_000040_customer_accounts.php:79\n/workspace/scratch/2876616e88c3/VA-Studio-production-"
+      }
+    ]
+  },
+  "initial_harness_failures": {
+    "mysql": {
+      "cases": 113,
+      "errors": 113,
+      "assertions": 0,
+      "reason": "hosted selector environment replaced local dynamic connection with3306/vaseyaudio_focused"
+    },
+    "sqlite": {
+      "cases": 113,
+      "passed": 55,
+      "errors": 58,
+      "assertions": 314,
+      "reason": "missing disposable test encryption key"
+    }
+  },
+  "root_porcelain_after": [],
+  "native_policy_pairs": 148,
+  "full_matrix_run": false,
+  "hosted_mysql_dispatch": false
+}

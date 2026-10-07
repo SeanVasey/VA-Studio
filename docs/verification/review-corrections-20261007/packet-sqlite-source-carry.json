@@ -1,0 +1,13 @@
+{
+  "executed_sqlite_source": "a1a835ac7e3b9cd16f337bacbacf20bb28643a53",
+  "final_executable_source": "0916f78f843626eac2b9126504d9773c02d21e5e",
+  "final_executable_tree": "6712ec499f84393e1c32fb2cfe0c4db0b782e60d",
+  "changed_path": "tests/Support/ProductionTrackPreparationReplayRace.php",
+  "sole_change": "one bounded JSON diagnostic after already-asserted native worker results",
+  "sqlite_native_cases": 4,
+  "sqlite_native_case_assertions": 0,
+  "native_helper_executed_in_sqlite": false,
+  "product_and_other_test_bytes_unchanged": true,
+  "sqlite_rerun": false,
+  "membership_executed_source": "211577eece5c4f9a3c708db25e4ad67d4462721e"
+}
