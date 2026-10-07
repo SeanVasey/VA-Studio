@@ -6,13 +6,16 @@ use App\Domain\Inquiries\InquiryAdministration;
 use Filament\Facades\Filament;
 use WeakMap;
 
-final class InquiryAttachmentAuthority implements AttachmentMutationAuthority
+final class InquiryAttachmentAuthority implements AttachmentCommittedReadAuthority, AttachmentMutationAuthority
 {
     private WeakMap $issued;
+
+    private WeakMap $committed;
 
     public function __construct()
     {
         $this->issued = new WeakMap;
+        $this->committed = new WeakMap;
     }
 
     public function lock(string $sourceId, ?int $expectedVersion, string $purpose, AttachmentActor $actor, AttachmentRows $rows): AttachmentSourceProof
@@ -90,6 +93,47 @@ final class InquiryAttachmentAuthority implements AttachmentMutationAuthority
         AttachmentException::require($user === [] || $rows->one('users', 'id = ?', [$user['id']]) === $user, 403);
         AttachmentException::require($rows->one('customer_inquiries', 'id = ?', [$inquiry['id']]) === $inquiry, 409, 'reload');
         $rows->assertCurrent();
+    }
+
+    public function committedReadReceipt(AttachmentSourceProof $proof, AttachmentRows $rows): AttachmentCommittedReadReceipt
+    {
+        AttachmentException::require(isset($this->issued[$proof]));
+        $context = $this->issued[$proof];
+        AttachmentException::require($context[6] === $rows && in_array($context[3], ['list', 'download'], true));
+        $rows->assertCurrent();
+        // Minting cannot adopt a token whose original transaction already ended, including direct PDO reopen.
+        $rows->identity()->exec('RELEASE SAVEPOINT '.$context[7]);
+        $rows->identity()->exec('SAVEPOINT '.$context[7]);
+        $receipt = InquiryCommittedReadReceipt::issued($this);
+        $this->committed[$receipt] = [$context, new AttachmentCommittedRows($rows)];
+
+        return $receipt;
+    }
+
+    public function proveCommittedRead(InquiryCommittedReadReceipt $receipt): void
+    {
+        AttachmentException::require(isset($this->committed[$receipt]));
+        $receipt->assertCommitted();
+        [$context, $reads] = $this->committed[$receipt];
+        [$inquiry, $user, $actor, , $key, $enabled, , , $staffPolicy] = $context;
+        $reads->assertIdle();
+        if ($actor->audience === 'operator') {
+            try {
+                // Provider callbacks are evaluated, without a new transaction, before the final raw proof.
+                app(InquiryAdministration::class)->actor($actor->user, false);
+            } catch (\Throwable) {
+                throw new AttachmentException(403);
+            }
+        }
+        $currentStaffPolicy = $this->staffPolicy($actor);
+        AttachmentException::require($currentStaffPolicy === $staffPolicy, 403);
+        AttachmentException::require($user === [] || ($actor->user !== null && $actor->user->exists && (int) $actor->user->getKey() === (int) $user['id']
+            && $actor->user->getRawOriginal('password') === $user['password'] && $actor->user->getRawOriginal('email') === $user['email']
+            && $actor->user->getRawOriginal('email_verified_at') === $user['email_verified_at']), 403);
+        AttachmentException::require($user === [] || $reads->one('users', 'id = ?', [$user['id']]) === $user, 403);
+        AttachmentException::require($reads->one('customer_inquiries', 'id = ?', [$inquiry['id']]) === $inquiry, 409, 'reload');
+        AttachmentException::require(config('app.key') === $key && config('inquiries.enabled') === $enabled);
+        $reads->assertIdle();
     }
 
     public function authorizeMutation(AttachmentSourceProof $proof, int $expectedVersion, string $purpose, AttachmentRows $rows): void
