@@ -313,3 +313,80 @@ e2f17573fed420d9db009126dddb6afce40a3f50bc3f8cd0ce02bc9539ca51e7  docs/live-paym
 78606749d1e6941a6d844a695d53f6f1c2b704a1c4905c064be008701bed9216  docs/verification/production-preparation-1-20261007/independent-review/DECISION.md (original decision, pre-addendum)
 d12ccee5c25cf9c407428b0f441e856872218d4a4b15b7d71a3e040636e66610  review-evidence/ReviewerProbeBuilderAddendumTest.php.txt
 ```
+
+---
+
+## Addendum 2: condition-3 re-review of `f4c55acf` (2026-10-07)
+
+**Result: APPROVE WITH CONDITIONS carries to `f4c55acf375f552aacd301d693bef6d7da83dfc0`.** Conditions 1 and 3 still apply. The two new Low findings below don't block merge. They should be fixed, or explicitly accepted, before the first real probe.
+
+### Delta `e8d84306..f4c55acf`
+
+- **Code.** `StripeCapabilityPreflight::openTransaction()` (`:190`) and `StripeCapabilityProbe::observe()` (`:52`) now also refuse when `$connection->getPdo()->inTransaction()`. Each change is one line.
+- **Test.** 18 lines are appended to `test_testing_environment_refuses_the_real_transport_and_open_transactions`.
+- **Docs.** Steps 2 and 4 of `docs/ops/backup-restore-proof.md` change, and the lane README and DECISION copy are updated.
+- **Nothing else.** No other code or test changed (`git diff --stat e8d84306..f4c55acf -- app tests`).
+
+### Red before, green after
+
+| Source | Result |
+| --- | --- |
+| Both app files at `e8d84306` | Fails at "null is identical to 'open_database_transaction'". 36 of 37 tests pass. |
+| Only the preflight reverted | Fails at line 273, the `collect()` reason. |
+| Only the probe reverted | Fails at line 283: `observe()` ran and made fixture calls. |
+| `f4c55acf` | Passes: 37 tests, 322 assertions. |
+
+Each guard is therefore independently covered.
+
+My earlier throwaway tests re-pass at `f4c55acf`: the gating test (23 tests, 143 assertions) and the builder test (12 tests, 75 assertions).
+
+### Does `getPdo()` over `DB::getConnections()` open connections or leak?
+
+- **Connection objects: no.** `DatabaseManager::getConnections()` returns only already-resolved connections. A throwaway test confirmed the set of connection names is unchanged after `collect(true, true)`.
+- **N-1 (Low): physical connections, yes.** `Connection::getPdo()` (`vendor/laravel/framework/src/Illuminate/Database/Connection.php:1293-1301`) invokes the lazy PDO resolver. A connection that was resolved but never queried is therefore connected by the probe gate. Throwaway evidence:
+  - a lazy SQLite connection went from a closure to a `PDO`;
+  - an unreachable resolved connection made `collect()` throw `SQLiteDatabaseDoesNotExistException` uncaught. That throw is outside `observe()`'s `try`, so the command crashes instead of reporting `refused`.
+
+  It is fail-closed: there were no fixture calls and no transport. The exception text can name the DB path or host, but never a Stripe secret.
+- **N-2 (Low): crash on a disconnected connection.** After `DB::disconnect()`, the connection stays in the manager with a `null` PDO, so `getPdo()->inTransaction()` raises `Error: Call to a member function inTransaction() on null`.
+  - In `collect()` the error is uncaught, so the command crashes.
+  - In `observe()` it is caught and reported as `failed`.
+
+  This is fail-closed too.
+- **Recommendation for N-1 and N-2.** Use `($pdo = $connection->getRawPdo()) instanceof \PDO && $pdo->inTransaction()` (`getRawPdo()` exists at `Connection.php:1309`). A connection that was never opened, or was disconnected, can't hold a transaction, and that check needs no reconnect.
+- **Exposure is narrow.** `openTransaction()` is the last arm of the `match` (`StripeCapabilityPreflight.php:95`). It runs only after the confirmation flag, the provider I/O flag, the shape checks, the key check and the testing/fixture checks have all passed. Runs without `--probe` are unchanged.
+
+### Shell fragments in the backup document
+
+I rehearsed them in bash on a synthetic tree. The script is `review-evidence/backup-doc-rehearsal.sh.txt`, with the fragments copied verbatim and placeholders substituted.
+
+| Case | Result |
+| --- | --- |
+| Clean tree | Step 2 passes; step 4's `sha256sum --check` and the name `diff` are clean |
+| Step 2 with a symlink, dangling symlink, symlinked directory, hard link or FIFO | Each refused, exit 1, before any manifest or tar is written |
+| Step 4 with an extra restored file | Name `diff` fails |
+| Step 4 with a planted restored symlink | Name `diff` fails |
+| Step 4 with a missing restored file | Checksum check and name `diff` both fail |
+| Step 4 with a flipped restored byte | Checksum check fails |
+
+The `!`-negated pipeline and the `find` precedence are correct, and so is `cut -c67-`: 64 hex characters, a space, then a mode character, so the name starts at column 67.
+
+**Info:**
+
+- Names containing a backslash or newline are escaped by `sha256sum` (a leading `\`), so the name `diff` reports a false mismatch. This fails closed.
+- The step 4 process substitution (`<(...)`) is bash-only, and the code fence says `sh`: `dash` gives `Syntax error: "(" unexpected`. State that bash is required.
+- The `exit 1` in step 2 closes an interactive shell.
+
+R-4 (dump-header noise in the MySQL `diff`) remains accepted and open.
+
+### SHA-256 (at `f4c55acf`)
+
+```
+d7fff6c43b1f080c0779f08c00f3f5ac8174128f25157c0d39b6256214ce4055  app/Domain/Commerce/Readiness/StripeCapabilityPreflight.php
+2b0165b3da5903655bbf29310c6bb4e824e0a7f5cf44498b46b31b2aca3551fd  app/Domain/Commerce/Readiness/StripeCapabilityProbe.php
+6e3e775e63de3ec100b67d6c56cfa45d09cb25f628932ee377ef5d1059a0cd41  tests/Feature/StripeCapabilityPreflightTest.php
+ea700b3c225b64fb8ad0b94ef9122fb72e6de98eade793a52141dba214753c5b  docs/ops/backup-restore-proof.md
+3591bb9c0311e1d4eaceb6096f860b4aa605de438b3126e06f7fb817fcbf9754  independent-review/DECISION.md as committed at f4c55acf (before this addendum)
+37a3c9d2b1aedf1e022c257de9d3dce920633c3747f8d55c2c50abcccfd154ff  review-evidence/ReviewerPdoProbeAddendumTest.php.txt (VA-Studio-review-prep)
+9718c7538207dad88d7308b043747dfcad5fe484255732c434cb1b3aaa9f4b3a  review-evidence/backup-doc-rehearsal.sh.txt (VA-Studio-review-prep)
+```

@@ -232,7 +232,16 @@ PHP proof script already refused symlinks, hard links and special files (its tes
 planted symlink); only the MySQL procedure text changed. The procedure is still documented,
 not executed.
 
-Under the review's condition 3, the preflight and probe change needs re-review.
+Under the review's condition 3, the preflight and probe change was re-reviewed
+(`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
+`f4c55acf`. Two Low findings are accepted for merge and must be fixed or explicitly
+accepted before the first real probe: N-1, `getPdo()` physically opens a configured but
+unused connection, so an unreachable database crashes `collect()` instead of refusing; N-2,
+after `DB::disconnect()` the guard fails with `inTransaction()` on null. Both fail closed
+(no transport built, no secret in the error). Suggested fix: `getRawPdo() instanceof \PDO
+&& ->inTransaction()`. Info from the backup-doc rehearsal: names containing a backslash or
+newline give a false mismatch (fails safe); the `<(...)` verify step is bash-only; the
+`exit 1` in step 2 closes an interactive shell.
 
 ## Still unknown or untested
 
@@ -252,8 +261,10 @@ Under the review's condition 3, the preflight and probe change needs re-review.
 
 1. Re-review the R-1 and R-2 delta (`a2b56002..3d615162`) — done, see the DECISION.md
    addendum — and the Codex transaction-guard delta after `e8d84306`.
-2. Root composition then decides whether to ship this with A4 or after A3 (Tax255).
-3. Sean decides between S2a and S2b.
+2. Fix or accept N-1 and N-2 (transaction guard on a configured-but-unopened or
+   disconnected connection) before the first real probe.
+3. Root composition then decides whether to ship this with A4 or after A3 (Tax255).
+4. Sean decides between S2a and S2b.
 
 Plan references are to `docs/handoff/2026-10-07/CLAUDE-PLAN.md`: §3 A4 and F1, and the §4
 list of inputs only Sean can supply.
