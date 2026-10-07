@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest" file="/workspace/VA-Studio-production-free-identity-independent/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php" tests="1" assertions="10" errors="0" failures="0" skipped="0" time="60.478908">
+    <testcase name="test_actual_smtp_current_owner_has_sealed_request_binding_without_public_or_cached_remint" file="/workspace/VA-Studio-production-free-identity-independent/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php" line="33" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest" assertions="10" time="60.478908"/>
+  </testsuite>
+</testsuites>

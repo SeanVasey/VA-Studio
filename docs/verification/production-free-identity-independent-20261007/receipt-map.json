@@ -504,7 +504,7 @@
     "new_original_MySQL8.0.46_probe": "1failure/7assertions/0errors; dedicated reviewer vaseyaudio_support_closure only"
   },
   "finding": "Actual current-source TransactionCommitted callback withdraws original production session marker; new unbound HTTP adapter still returns authority. No downstream operative HTTP registration or fulfillment claim.",
-  "disposition": "held for author source successor; no runtime source mutation in independent review",
+  "disposition": "Exact source233 and original3f49 identity/lineage source approved as bounded unregistered default-off preparation. No operative grant/endpoint/fulfillment approval.",
   "artifacts": [
     {
       "path": "docs/verification/production-free-identity-independent-20261007/exact-customer-fence-diff.patch.txt",
@@ -552,9 +552,117 @@
       "bytes": 1450
     },
     {
+      "path": "docs/verification/production-free-identity-independent-20261007/production-free-identity-independent-marker-successor-native.txt",
+      "sha256": "0b30d167ecf9b79762caadd645bf03be3bb923b0685adbcff5a4126578026574",
+      "bytes": 93
+    },
+    {
+      "path": "docs/verification/production-free-identity-independent-20261007/production-free-identity-independent-marker-successor-native.xml",
+      "sha256": "f87d6588e3a5452b2d7280f1fa0a687eb863efaf2bdeac14c181d06370266f0c",
+      "bytes": 904
+    },
+    {
       "path": "docs/verification/production-free-identity-independent-20261007/production-free-identity-independent-pint.txt",
       "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
       "bytes": 33
+    },
+    {
+      "path": "docs/verification/production-free-identity-independent-20261007/production-free-identity-independent-positive-successor-native.txt",
+      "sha256": "1ebb6c0804ceff8845248de8bb3637533b93d9a8e54fb1a8fed5559e26bd945c",
+      "bytes": 94
+    },
+    {
+      "path": "docs/verification/production-free-identity-independent-20261007/production-free-identity-independent-positive-successor-native.xml",
+      "sha256": "bddbf0b290166a197e4b24da1db9b784f59731a726dc1439fdace1a72a3c89be",
+      "bytes": 830
+    },
+    {
+      "path": "docs/verification/production-free-identity-independent-20261007/production-free-identity-independent-successor-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "path": "docs/verification/production-free-identity-independent-20261007/production-free-identity-independent-successor-sqlite.txt",
+      "sha256": "a4c0f42941a194fab91f36746fbe1de4b4e71a21f2d89879294627aa8921312f",
+      "bytes": 97
+    },
+    {
+      "path": "docs/verification/production-free-identity-independent-20261007/production-free-identity-independent-successor-sqlite.xml",
+      "sha256": "1140c1f9bb37be39af1607f56c9f0371138fac708c9f7700f96b5777b8939798",
+      "bytes": 19319
     }
-  ]
+  ],
+  "repaired_source": "233f0864028156faeb70c63259910214e47762cb",
+  "repaired_author_evidence": "a0d4afe2e19acd999be749021b39482c65c31d1c",
+  "review_composition": "e84161364c44c313ffd79a73969e621bb47d1f2f",
+  "review_composition_tree": "46f2ad4f2012858f82459380d2cc725ec5bae114",
+  "repair_source_bindings": [
+    {
+      "path": "app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php",
+      "source": "233f0864028156faeb70c63259910214e47762cb",
+      "git_blob": "5732d2c247b78c33877f26f8b49cf8fef00b404d",
+      "sha256": "94e0c8467a91e9edc0ab0786d4e70a1df08ecc459deaa5d57e7008ed112b1f64"
+    },
+    {
+      "path": "app/Domain/Grants/Free/Production/ProductionFreeGrantHttpIdentity.php",
+      "source": "233f0864028156faeb70c63259910214e47762cb",
+      "git_blob": "a0a787a8c3445b384c12859017c942aa0a343d0e",
+      "sha256": "cd394c089390021a46b34a7bf489a8a7f976b12ebd6fe84001f53ac57edd7217"
+    },
+    {
+      "path": "tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+      "source": "233f0864028156faeb70c63259910214e47762cb",
+      "git_blob": "724a3dc8cc50d0e7b868db061d81f16cc2798cb0",
+      "sha256": "ffc5ddd8b44b03880db590d0d7d48a80167f8c2c63f030e7db9ed3192776977a"
+    }
+  ],
+  "repair_author_receipt_map_sha256": "8d746c560dcc0c777248067c4e3814d1c32c7de1be72bd68e51b6a1767ea15f9",
+  "repair_author_artifacts_verified": [
+    {
+      "path": "docs/verification/production-free-http-marker-repair-20261007/pint-final.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "path": "docs/verification/production-free-http-marker-repair-20261007/original-native-red.txt",
+      "sha256": "822956dac1521276cbb1e7bf2258159b7f73cac778f5ee07e76623162f7775bf"
+    },
+    {
+      "path": "docs/verification/production-free-http-marker-repair-20261007/sqlite-final.txt",
+      "sha256": "31976b524c3796441635047d4ea27cff573ef87a1ffd308e9a175e118e66eaae"
+    },
+    {
+      "path": "docs/verification/production-free-http-marker-repair-20261007/original-native-red.xml",
+      "sha256": "2870b33bcbb3d319998812a1413d434f3b560517785eb640c0379f29029663db"
+    },
+    {
+      "path": "docs/verification/production-free-http-marker-repair-20261007/native-final.xml",
+      "sha256": "79d3e85bb2f04ad1b2654cc4dbf83dc5d76487635744aa284f8b55c229584c91"
+    },
+    {
+      "path": "docs/verification/production-free-http-marker-repair-20261007/sqlite-final.xml",
+      "sha256": "0314aa2da3978d8b9747e9d73560bdb594fbbdebca91089223c8b207e03b6bc8"
+    },
+    {
+      "path": "docs/verification/production-free-http-marker-repair-20261007/ProductionFreeHttpCurrentMarkerIndependentTest.php",
+      "sha256": "44f495bbc052587020f65bcf4c71685d360a84ef412075eb85078136ce988424"
+    },
+    {
+      "path": "docs/verification/production-free-http-marker-repair-20261007/native-final.txt",
+      "sha256": "f0e1eb961fa92fb007fd22ce49c29fe078aed93dc0d5e7d5c89cd816f0413af6"
+    },
+    {
+      "path": "docs/verification/production-free-http-marker-repair-20261007/original-red.txt",
+      "sha256": "e7bb9d3fb4ffb22535800c9a86560f1da1edea3b6eed72b763110c60f631d06c"
+    },
+    {
+      "path": "docs/verification/production-free-http-marker-repair-20261007/original-red.xml",
+      "sha256": "da8e11f12ed71ddf3acb52cf69bd6d9b0dc1c8c04e09d6abba0fdbeeca437755"
+    }
+  ],
+  "repair_checks": {
+    "SQLite_affected": "36passed/216assertions/0errors/0failures/0skips",
+    "unchanged_original_MySQL8.0.46": "1passed/7assertions/0errors/0failures/0skips",
+    "actual_SMTP_current_owner_MySQL8.0.46": "1passed/10assertions/0errors/0failures/0skips",
+    "scoped_Pint": "pass"
+  }
 }
