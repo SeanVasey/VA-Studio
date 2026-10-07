@@ -10,11 +10,18 @@ final readonly class Records
 {
     public CurrentRows $current;
 
-    public function __construct(private ?PDO $primary, private string $driver, ?CurrentRows $retained = null)
+    public function __construct(private ?PDO $primary, private string $driver, ?CurrentRows $retained = null, private ?CheckoutCommandFrame $frame = null)
     {
         CheckoutException::require($retained !== null || $primary !== null);
         $this->current = $retained ?? new CurrentRows($primary, $driver);
         $this->provePrimary();
+    }
+
+    public function commandFrame(): CheckoutCommandFrame
+    {
+        CheckoutException::require($this->frame !== null, 'write_frame');
+
+        return $this->frame;
     }
 
     /** Read-only producer adapter using the consumer's already captured primary transaction. */

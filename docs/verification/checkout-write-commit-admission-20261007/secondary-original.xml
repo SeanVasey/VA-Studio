@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionCheckoutWriteCommitTest" file="/workspace/VA-Studio-checkout-write-admission/tests/Feature/ProductionCheckoutWriteCommitTest.php" tests="2" assertions="6" errors="0" failures="2" skipped="0" time="3.685158">
+    <testcase name="test_committing_persisted_password_withdrawal_rolls_back_order_and_original_password" file="/workspace/VA-Studio-checkout-write-admission/tests/Feature/ProductionCheckoutWriteCommitTest.php" line="39" class="Tests\Feature\ProductionCheckoutWriteCommitTest" classname="Tests.Feature.ProductionCheckoutWriteCommitTest" assertions="3" time="2.004777">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionCheckoutWriteCommitTest::test_committing_persisted_password_withdrawal_rolls_back_order_and_original_password
+Failed asserting that table [production_checkout_orders] matches expected entries count of 0. Entries found: 1.
+.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithDatabase.php:118
+/workspace/VA-Studio-checkout-write-admission/tests/Feature/ProductionCheckoutWriteCommitTest.php:223
+/workspace/VA-Studio-checkout-write-admission/tests/Feature/ProductionCheckoutWriteCommitTest.php:215
+/workspace/VA-Studio-checkout-write-admission/tests/Feature/ProductionCheckoutWriteCommitTest.php:46</failure>
+    </testcase>
+    <testcase name="test_committing_identity_module_withdrawal_rolls_back_order" file="/workspace/VA-Studio-checkout-write-admission/tests/Feature/ProductionCheckoutWriteCommitTest.php" line="50" class="Tests\Feature\ProductionCheckoutWriteCommitTest" classname="Tests.Feature.ProductionCheckoutWriteCommitTest" assertions="3" time="1.680381">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionCheckoutWriteCommitTest::test_committing_identity_module_withdrawal_rolls_back_order
+Failed asserting that table [production_checkout_orders] matches expected entries count of 0. Entries found: 1.
+.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithDatabase.php:118
+/workspace/VA-Studio-checkout-write-admission/tests/Feature/ProductionCheckoutWriteCommitTest.php:223
+/workspace/VA-Studio-checkout-write-admission/tests/Feature/ProductionCheckoutWriteCommitTest.php:215
+/workspace/VA-Studio-checkout-write-admission/tests/Feature/ProductionCheckoutWriteCommitTest.php:56</failure>
+    </testcase>
+  </testsuite>
+</testsuites>
