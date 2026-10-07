@@ -1,0 +1,22 @@
+{
+  "commit": "919e64f81c5d3c628a6809365b6dfc07bdedd50e",
+  "executable_source": "b635e12992dc91f5131f35e5c46b8dab6ff30eee",
+  "files": {
+    "app/Domain/Memberships/Production/MembershipPolicy.php": "ca9e9ae460123ea8306917c5ad6e82419b0695dfd160723bf02d0ead5bcd4cdd",
+    "app/Domain/Memberships/Production/MembershipRows.php": "03fb9e552991c81a71445432bb9046640710cb20699ac0c05fb31e2c98e94272",
+    "tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php": "42c9a1fe718de819a5d17fd38cb4d09f04e5519f8d3c731be437b3c91fd722b0"
+  },
+  "result": {
+    "recorded": 2,
+    "executed": 2,
+    "failures": 2,
+    "errors": 0,
+    "assertions": 2
+  },
+  "artifacts": {
+    "docs/verification/production-membership-raw-parent-20261007/MembershipRawConfigurationClosureTest.php": "42c9a1fe718de819a5d17fd38cb4d09f04e5519f8d3c731be437b3c91fd722b0",
+    "docs/verification/production-membership-raw-parent-20261007/original-probe-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "docs/verification/production-membership-raw-parent-20261007/original-red.txt": "1bc2768d978ceb3e7f06bb38138694047bad968464f927c2c6cf54e8dd8bcc6a",
+    "docs/verification/production-membership-raw-parent-20261007/original-red.xml": "825e94632ffb64fcd886dd06f74dba23921f45c9d3dc2acca9fa11c2d89ea852"
+  }
+}

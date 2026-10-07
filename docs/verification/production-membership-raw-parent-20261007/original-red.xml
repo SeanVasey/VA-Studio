@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembership\MembershipRawConfigurationClosureTest" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php" tests="2" assertions="2" errors="0" failures="2" skipped="0" time="1.361223">
+    <testcase name="test_captured_reader_refuses_overloaded_database_parent_before_late_policy_callback" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php" line="21" class="Tests\Feature\ProductionMembership\MembershipRawConfigurationClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRawConfigurationClosureTest" assertions="1" time="0.784476">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembership\MembershipRawConfigurationClosureTest::test_captured_reader_refuses_overloaded_database_parent_before_late_policy_callback
+A claimed pure captured-reader fence must refuse a callback-capable raw parent.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php:24</failure>
+    </testcase>
+    <testcase name="test_captured_policy_baseline_refuses_overloaded_parent_before_identity_policy_callback" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php" line="44" class="Tests\Feature\ProductionMembership\MembershipRawConfigurationClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRawConfigurationClosureTest" assertions="1" time="0.576747">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembership\MembershipRawConfigurationClosureTest::test_captured_policy_baseline_refuses_overloaded_parent_before_identity_policy_callback
+Pure policy comparison cannot execute a getter that withdraws another held authority.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php:59</failure>
+    </testcase>
+  </testsuite>
+</testsuites>
