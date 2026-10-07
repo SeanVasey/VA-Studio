@@ -1,0 +1,21 @@
+{
+  "executable_source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+  "review_composition": "d05abc70b9101a7eb8f40aa3d819e4090ca02d5d",
+  "snapshot_constant_note": "Original source label b635 retained because byte-identical original canary; this receipt binds actual tested successor16e.",
+  "actual_native_version": "8.0.46-0ubuntu0.24.04.4",
+  "result": {
+    "cases": 1,
+    "assertions": 7,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "seconds": 39.478
+  },
+  "observed": {
+    "refused": true,
+    "reason": "Production membership preparation unavailable.",
+    "whole_owned_catalog_and_rows_preserved": true,
+    "guards_before_and_after": 11
+  },
+  "execution": "native_mysql fixture coordinator, same unchanged reviewer canary, separate existing service_review schema and one-process temporary foreign fixture"
+}

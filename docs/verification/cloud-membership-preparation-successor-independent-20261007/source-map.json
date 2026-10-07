@@ -1,0 +1,342 @@
+{
+  "executable": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+  "review_composition": "d05abc70b9101a7eb8f40aa3d819e4090ca02d5d",
+  "owned": [
+    {
+      "path": "app/Domain/Memberships/Production/MemberGrantAuthority.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "0fea34c57468045f814733d97c64821c9e29a77a",
+      "sha256": "02b32f1aa885dc9b6272d7b6643493131bc447c7a7d6ba7d77b45965abb4177e"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MemberGrantBinding.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "ccd8ab83550b7aef0f3ece48b01a8098a1f69508",
+      "sha256": "e8ec6951a419ed46ecffb537aca2ac323367b2b346efe1ca939c8585a0a3bc61"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MemberGrantIntent.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "6fc6964a130c41b730a7d52b2a0fc92f7f2ecb0e",
+      "sha256": "8e01856e4928e5252b5b3e500dd4038936a285decc9f77ff19a4f8f137c8294c"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MemberGrantReceipt.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "7842b0e8a2b417908d89edf73d6470a990682f81",
+      "sha256": "ee87a595896faba469ef06f563e39c79f68248bbbb7c53c64aa6c684baa37926"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipEligibleLicenseAuthority.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "6328c756341d9af490bc0d63eae0e4d591c24395",
+      "sha256": "601c8df8a23eadb2c902c459e18a61f10ead9ddfc4527a59d6a73b848ebbcce6"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipEligibleLicenseProof.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "c562602e43f151bc1801684886a9a00b68e285f5",
+      "sha256": "9475b15707b6a66d9a9e8e6847d2c29504cb8baa0b16bb46cef8dd3582a72f8b"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipException.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "00c62223dab3241c8ea96af7867ca0065da82798",
+      "sha256": "c04533684f2981ecfb21423a7987f4c4ee5d59e146325fad37a3fa68f1fb2070"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipInvoiceBinding.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "e6ebb020f4a6d30484c11424e81bf5a3063531a7",
+      "sha256": "2da632846a139b2b4ea75d991daa234659d1c013c5c121489cf1486bd26bff95"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipLicenseBinding.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "8bd242acaa16900ad48e427e80942baf4fe3a0f0",
+      "sha256": "367efc2212c55fd2164f64eb89d69b3b636d242bd26d310d463d55a51397bc54"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipPaidInvoiceAuthority.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "f0b867ec64fb5a728fb64941a4ceb301482dd62b",
+      "sha256": "a68625cee763c934fe74234fd98d9756dbdc10fe905f00b0b3551b0875380628"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipPaidInvoiceProof.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "51315048bdaac4a6c0fc0605741720254bfdc305",
+      "sha256": "e471af3bcbff4bf6855a0a0eafa4459222fd8f69d8deacd79af493171ef818cc"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipPolicy.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "f145cffb89b36722ff32dd863a01c0ce0778e3ea",
+      "sha256": "816f79d6487343a5bd7f3d2bdc25c28f57a4becccf6debfafd0c6b88c503af16"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipPolicyBinding.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "ddb6cdc387be16d87405f73018c25cd8cf8230bd",
+      "sha256": "492ed8b1c017c2ed6c8b785fb66de3bf0348fd28b8af8f244a8da6678f800b48"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipPolicyFactsAuthority.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "c8b492b8259e4a2cf3b3d4ce533c628a75b5c508",
+      "sha256": "918cc499531858932dd3a91c54910f41640ff5fde7f0b9dfaa40fd3cd5b466a3"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipPolicyFactsProof.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "af7c9caf1b81932b87c0a268ce64defb8aceb1ef",
+      "sha256": "0485a7c18f1bc1aa53d9396119ef05fc557bfc45a646c245048cc4e12e32847b"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipReservationBinding.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "f8ed267ea781a93e6d57e2625696956a323bb3a2",
+      "sha256": "b4ac92ebe404ba4974c00ac06485d3a30a5cbf7e6dd5e9e50110d68fd9bd1268"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipReservationProof.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "ba45d4bce9b6c24a80b622eeaf181cb43641dac0",
+      "sha256": "71068504f41cf95cb11d9e9f5d9be93082a72ae9b6c71c446cee3fbc47b2c540"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipRows.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "f5341aa8423acaa8783c80356719fe468c98e4cb",
+      "sha256": "a62d9848a193f78358d2ec6538d35f2d3871a5973d36c4d660d1ae8f7e93783c"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipSchema.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "e34204464823eddee80a88e3745c9ca06e67c79c",
+      "sha256": "93898457684c9005853e539d344142b1c8bc1141a0554e1e76466bc378ced799"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipValues.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "5550908539752412663e7166ec43f68838aa95a3",
+      "sha256": "0a6f2279012adbfbe11cfa3bfb4e55b13bd17715b270bb7aeef5310656d2fe65"
+    },
+    {
+      "path": "config/production-memberships.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "8d895285d5eb335177997a9e4953788560513b74",
+      "sha256": "7c76febcb5b56c82e56f7c069e48b6417b2ee1316f4a8dfb1dd982519ece2d96"
+    },
+    {
+      "path": "database/migrations/2026_10_07_257000_production_membership_periods.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "37a311acb28f0ea13b93934f807b69a9b64ad982",
+      "sha256": "d30af452a097a647cd67f49e2e8cdac7b25e3e98f710529dab0a1c360a28549e"
+    },
+    {
+      "path": "tests/Feature/ProductionMembership/MembershipPreparationTest.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "87720bd4259cd49bbd3becd6abdb34686174c3b9",
+      "sha256": "5ec07be316eb1bdfc0a5110d2a62717a098887cbbfbfb557097d3427fcee77b4"
+    },
+    {
+      "path": "tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "6bb25a8bdb22e06f2db33448e044cc54c984810f",
+      "sha256": "fb0e0f8197b7e28993cccc96be89435c5a6fd213ef64930b4e280e62738ba39b"
+    },
+    {
+      "path": "tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php",
+      "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+      "git_blob": "981b26bf2c7548073cf0c0558e029f03ecc840a5",
+      "sha256": "42c9a1fe718de819a5d17fd38cb4d09f04e5519f8d3c731be437b3c91fd722b0"
+    }
+  ],
+  "registered_dependencies": [
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "6058e3e4ced2900e1ccc93bd9110691c041ad0c4ecafe2f0373d323ceb17cb90"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentitySchema.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "6ca4d4ca4260e13b8a26752ebd8466f3c3edd7047c9ddc71004e45f242e619dc"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityPolicy.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "445a001b81c7125b4c87188a3515406424ce2d89bb97cb3d3edc02f1dc12298f"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityRows.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "deb303101abe98ca505c43e34ab49cc636b56fed42e5b808044380108fdb42bd"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionCustomerAccess.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "4f013b5114b8b8ee8cd53d42277368a215861b8c48a07672fd2337e4fc483eb4"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionCustomerPrincipal.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "ab0ddc7dcabb41fd8d003582c9a78814a90f5cd4fa80be4bc2c5208192306b0c"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/CurrentRows.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "02421b3afb5911bab22bec749c3c691f45379aab4f48c3522831be051235e428"
+    },
+    {
+      "path": "app/Support/CanonicalJson.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "6e8f14f950bbb7ed3c4a8162ecf7c2fd2752031d1679285cea8bb0a5f5f82d89"
+    },
+    {
+      "path": "tests/Support/CustomerFixtures.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "7eb6b9ff2154a17f847b4b131e0f9bd3eb1df1e12096026ca858739ce4f56ec8"
+    },
+    {
+      "path": "tests/Support/FinalizationDatabaseMigrations.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "38d248d182fffb7aa6c0583ebb8235c5b60b03fe8865d679b9eb804728a792ff"
+    },
+    {
+      "path": "composer.json",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "132cb2a16c6ce2960d059cfddecae8e1accf6138a258dd8bab2c0c7b822f5607"
+    },
+    {
+      "path": "composer.lock",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9"
+    }
+  ],
+  "unchanged_synthetic_bindings": [
+    {
+      "path": "app/Domain/Memberships/CreditLedger.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "da00984fc8dfb9e610d19c18d63ed91520efe6d846cc879010ae67156ef139ac"
+    },
+    {
+      "path": "app/Domain/Memberships/MembershipAdministration.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "c482b725adb55b280ffe1f97a78be1913ed6443969522afb9db71f5ad526e43c"
+    },
+    {
+      "path": "app/Domain/Memberships/MembershipCustomerHistory.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "e80d3069501883ccbcc6bef8adad91b60a04c93747bb91a5af7068fc633604de"
+    },
+    {
+      "path": "app/Domain/Memberships/MembershipEvidence.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "efa3205598a107798c974ba3e2bce801423d71b62879dc96f1b981a822bb2532"
+    },
+    {
+      "path": "app/Domain/Memberships/MembershipPlans.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "dee36cc481d80e47bc08d9d8ba0b61d9128719fda628c4c3f0be7d5ffff71b5d"
+    },
+    {
+      "path": "app/Domain/Memberships/MembershipPolicy.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "6676a5db75015a0b3bcea89566447f93eed114c560b1fee635b74d7462caa36e"
+    },
+    {
+      "path": "app/Domain/Memberships/Models/MembershipCreditBucket.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "27e3c5994baa3e7b7283ccb3f4549f8a9b1626383b2aaf4f038ea6d49b42e2b6"
+    },
+    {
+      "path": "app/Domain/Memberships/Models/MembershipCreditEvent.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "51d0b2003f7650b2ba230210c28491039453be2e2b371eebaf4e20ae601244bc"
+    },
+    {
+      "path": "app/Domain/Memberships/Models/MembershipPlan.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "50244578407b5a9c51390621c07878aad065e1aa3992efd2ad86f03b68b85410"
+    },
+    {
+      "path": "app/Domain/Memberships/Models/MembershipPlanVersion.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "15710d8bdca1954f33eafcb5108ad6f42729d61db10bcdb7b2cab459aac547c1"
+    },
+    {
+      "path": "config/memberships.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "ac22a093065fce3e15d8312f398c85d5f6c234f87d6b981c8d6445a72cfdd5cb"
+    },
+    {
+      "path": "database/migrations/2026_10_06_230000_membership_credit_foundation.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "6402db1b8412d8b01738edd270ec8ad899f1aed3a13369f167b408551df43a70"
+    },
+    {
+      "path": "tests/Feature/MembershipAdministrationActionTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "bfda00f60d31df41f3f1a7bd37d2459a1cbdd97d94e92b72f54c21dad2707613"
+    },
+    {
+      "path": "tests/Feature/MembershipAdministrationTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "f7491430e6894768f163702f52baf8adbff49b1459f2a91935f5c32017fe6bf7"
+    },
+    {
+      "path": "tests/Feature/MembershipCreditConcurrencyTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "2c0b4d1432159513c3c1ca6de9656bc3c35a7b8964d5c34ec26a6bf442e7b924"
+    },
+    {
+      "path": "tests/Feature/MembershipCreditEngineTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "6d6ebc8bcc76fc8fd9d2d85fa33de24df61835b6960e5919c360b4673ea119ed"
+    },
+    {
+      "path": "tests/Feature/MembershipCreditLedgerTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "81d0d118da86f9fd2fe7c3bcbb6d5e1a60864ca9c14b970b42bb28cb280f1760"
+    },
+    {
+      "path": "tests/Feature/MembershipCreditMigrationTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "2634eb594674af98be59a6e9e3d901ab9dbdb8f3e0e6fb80eb496f6bb2fd2511"
+    },
+    {
+      "path": "tests/Feature/MembershipCustomerHistoryHttpTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "a0d95ed53c18293d917c1a30abd92fbf151fba0b82b8df6d3792d4be9a5d45a7"
+    },
+    {
+      "path": "tests/Feature/MembershipCustomerHistoryTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "4e197932a1a23781dcd1c8611d1b6dc099d3c5e2974c53fc14a8ff1555bb36ed"
+    },
+    {
+      "path": "tests/Feature/MembershipCustomerLibraryCapabilityTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "655c9f161f9e2e4d46deb14a0a85459a574cac8142af98218a60e58e75c8564f"
+    },
+    {
+      "path": "tests/Feature/MembershipGrantClockBoundaryTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "70aa442635c7247bca326585babdfe1871935280b6acda3c3bcb0186b9fb8d53"
+    },
+    {
+      "path": "tests/Feature/MembershipPlanTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "a7ca86d70a43998f5d974c34bbd1e5239b2cc17d0dfa8311ba8333b18e1322ce"
+    },
+    {
+      "path": "tests/Feature/MembershipPrimaryProofTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "885f435888e6995d6e25757319e2988a75f25904eff01b38e132657e1ea7e074"
+    }
+  ],
+  "unchanged_original_native_probe_sha256": "72648803519da41d025222e000ecfeceef051ca3e0cdcd0dd01c4dbdbcdaca8a",
+  "unchanged_original_callback_probe_sha256": "42c9a1fe718de819a5d17fd38cb4d09f04e5519f8d3c731be437b3c91fd722b0"
+}

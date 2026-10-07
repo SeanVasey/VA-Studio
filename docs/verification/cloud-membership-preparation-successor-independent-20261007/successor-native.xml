@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-membership-preparation-independent/docs/verification/cloud-membership-preparation-independent-20261007/native-selection.xml" tests="1" assertions="7" errors="0" failures="0" skipped="0" time="39.477308">
+    <testsuite name="Independent native exact referenced schema admission" tests="1" assertions="7" errors="0" failures="0" skipped="0" time="39.477308">
+      <testsuite name="Tests\Feature\MembershipForeignSchemaCanaryTest" file="/workspace/VA-Studio-membership-preparation-independent/docs/verification/cloud-membership-preparation-independent-20261007/MembershipForeignSchemaCanaryTest.php" tests="1" assertions="7" errors="0" failures="0" skipped="0" time="39.477308">
+        <testcase name="test_foreign_schema_user_reference_is_refused_before_missing_suffix_ddl" file="/workspace/VA-Studio-membership-preparation-independent/docs/verification/cloud-membership-preparation-independent-20261007/MembershipForeignSchemaCanaryTest.php" line="17" class="Tests\Feature\MembershipForeignSchemaCanaryTest" classname="Tests.Feature.MembershipForeignSchemaCanaryTest" assertions="7" time="39.477308"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>
