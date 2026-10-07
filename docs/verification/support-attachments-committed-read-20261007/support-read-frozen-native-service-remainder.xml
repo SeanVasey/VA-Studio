@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ServiceSupportAttachmentsTest" file="/workspace/VA-Studio-support-read-closure/tests/Feature/ServiceSupportAttachmentsTest.php" tests="4" assertions="21" errors="0" failures="0" skipped="0" time="93.646358">
+    <testcase name="test_account_withdrawal_during_scanner_work_cannot_complete_or_read_claim" file="/workspace/VA-Studio-support-read-closure/tests/Feature/ServiceSupportAttachmentsTest.php" line="101" class="Tests\Feature\ServiceSupportAttachmentsTest" classname="Tests.Feature.ServiceSupportAttachmentsTest" assertions="5" time="23.570188"/>
+    <testcase name="test_credential_change_during_storage_preparation_cannot_delete_retained_original" file="/workspace/VA-Studio-support-read-closure/tests/Feature/ServiceSupportAttachmentsTest.php" line="123" class="Tests\Feature\ServiceSupportAttachmentsTest" classname="Tests.Feature.ServiceSupportAttachmentsTest" assertions="4" time="20.798899"/>
+    <testcase name="test_final_staff_source_query_cannot_withdraw_fixture_policy_and_return_private_projection" file="/workspace/VA-Studio-support-read-closure/tests/Feature/ServiceSupportAttachmentsTest.php" line="145" class="Tests\Feature\ServiceSupportAttachmentsTest" classname="Tests.Feature.ServiceSupportAttachmentsTest" assertions="5" time="22.032990"/>
+    <testcase name="test_changed_graph_requires_current_version_for_new_intake_but_retains_old_manifest" file="/workspace/VA-Studio-support-read-closure/tests/Feature/ServiceSupportAttachmentsTest.php" line="160" class="Tests\Feature\ServiceSupportAttachmentsTest" classname="Tests.Feature.ServiceSupportAttachmentsTest" assertions="7" time="27.244281"/>
+  </testsuite>
+</testsuites>
