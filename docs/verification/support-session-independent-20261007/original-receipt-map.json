@@ -1,0 +1,246 @@
+{
+  "original_runtime": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+  "original_tree": "1b8b26ad57711191339b44bdfb8b9e2d7f614db0",
+  "original_root_child": "a942e728479b6bd0f5d25742cdb30e61a9816ec7",
+  "producer_source": "8444f15ea3f5f3c74994fef48705b2a193de7cba",
+  "original_runtime_bindings": [
+    {
+      "path": "app/Support/SupportAttachmentRequestContext.php",
+      "source_sha": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "git_blob": "f6c3a90db0a4cf824b6ead51e5a0a2e52ac01f4f",
+      "sha256": "9a38af3e0bc7318caa7fceefcb6bb55044d255d23799fdc42e16d03953eff183"
+    },
+    {
+      "path": "app/Http/Controllers/SupportAttachmentController.php",
+      "source_sha": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "git_blob": "397824c77a2a7f15ed0b6f75dfda5b7dbcde7cce",
+      "sha256": "d56985565edbee4c1131c3aabeabd2ed6dd5d3dc500c51462721e6e8329a49bf"
+    },
+    {
+      "path": "app/Http/Controllers/SupportAttachmentPageController.php",
+      "source_sha": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "git_blob": "8d6e8a185082e33c8a2d56febd0e3c57ec409dde",
+      "sha256": "ad50ba12f89c4c039331861c862dba3768c2250602dab0a70cc906171144cad8"
+    },
+    {
+      "path": "app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentSourceV1.php",
+      "source_sha": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "git_blob": "5adc84107e458f47ae68ca485f65378512cd544a",
+      "sha256": "e80403e222d62ba849e8e4922697e70786eaa9323a5509f03f19141eb10ca304"
+    },
+    {
+      "path": "app/Domain/Services/Projects/Attachments/ServiceProjectCommittedReadReceipt.php",
+      "source_sha": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "git_blob": "b3d9d61f1056b295bb5ae446620c94f96d265fe1",
+      "sha256": "61b0430c83ffc4a275b3ae152335241128d23fa8a755472a2f9aa6c93c5d6035"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/verification/support-session-independent-20261007/ServiceProjectCommittedSchemaIndependentTest.original.php.txt",
+      "sha256": "6beb2f0bf0d08b5b97b4182a9e918528e4d8a4fe24792381c54c0d5f43632a5e",
+      "bytes": 2931
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/SupportAttachmentKeyCaptureIndependentTest.original.php.txt",
+      "sha256": "c7c23fcbd259c2ac421f593f016b456dc33a05b0a0a13b7c6fa05ed4df1203b0",
+      "bytes": 2153
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/SupportAttachmentSessionIndependentTest.original.php.txt",
+      "sha256": "73a9a6c59af97b8c63a56f1fd159e6d058b7ab176b7539e1ffa7d87e05500e31",
+      "bytes": 6279
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-autoload.txt",
+      "sha256": "24c0fd59bb8ee73fad2708a4f9cb96b2b8cfe4adc76de1ca193fa5bdb0b77c48",
+      "bytes": 2297
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-canary-pint.txt",
+      "sha256": "a4cc14d83aed17d31ff91b83d5ca6a46e66ceccea141a3b734aaaf12647ebc34",
+      "bytes": 142
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-capture-original.txt",
+      "sha256": "6133c7ee129d666d05cf15ec63f987436aaa3909225dfbdb0ad5c05ed07e5e0f",
+      "bytes": 449
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-capture-original.xml",
+      "sha256": "45b9f2241c42abb2d00a0ed05bf6a853c5662b860dce6cda5753c321a2ea7f44",
+      "bytes": 1122
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-default-original-native.txt",
+      "sha256": "c7bc4ea4c5145ce983b869e1070eabceb4f636ff101a2c02ed8b8e7d3919b110",
+      "bytes": 829
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-default-original-native.xml",
+      "sha256": "3e083710f575003ec636775233a0f5a8b3fcfadc514220ac7c96c38838858375",
+      "bytes": 1452
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-default-original.txt",
+      "sha256": "27a9e80b9917eed182256aa03048febced530c4a43440a01c3b6267dc1af5b59",
+      "bytes": 827
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-default-original.xml",
+      "sha256": "d9641ae690b38a0ad0a64b0821d62b3d3dc6128cc0813a41f08f1836404fc36e",
+      "bytes": 1450
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-existing-original.txt",
+      "sha256": "7ac790489f7b32f0060336dd2d55c07390d7a7e7f0f56dea950eff3454e86bd3",
+      "bytes": 96
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-existing-original.xml",
+      "sha256": "937285fc8ba52ca94bc5c69f82201cde306f637b14aab5b95f9e20c7e03734a9",
+      "bytes": 7159
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-final-canary-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-key-corrected-original.txt",
+      "sha256": "ed8712433e3eafdac839740d1e4bd1749d066695c767cd0e9a1500f1ae7458c6",
+      "bytes": 456
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-key-corrected-original.xml",
+      "sha256": "972a5797d8bbb1260f18e3048368c4e0a84ff7ee0f60a35dc9904b6ce8cf3fca",
+      "bytes": 1145
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-key-original-native.txt",
+      "sha256": "ccb5dd76b734b9aa1c04ef06c8257798ad90cc8bef8c4041808fa36f4c30499e",
+      "bytes": 458
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-key-original-native.xml",
+      "sha256": "2120e93c3ee880343907aa8ad1b609d5b46109b1ecd9d2be231431d1d833566c",
+      "bytes": 1147
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-key-original.txt",
+      "sha256": "bcb203c2a048bf1940646df0ed5d44550a2a74eac0989668018de7940422438e",
+      "bytes": 454
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-key-original.xml",
+      "sha256": "22bf2e9b34f0537b0998202daad35a74a0dcb9052d50bea1a33644460a2eb5cc",
+      "bytes": 1143
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-key-pint.txt",
+      "sha256": "65cbf44e19ec06bd015a92f6b29acea15e59aa2806265c218309d100f192757a",
+      "bytes": 145
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-producer-original.txt",
+      "sha256": "cefb1cecd3b55c2beb6b1b368f2cb8b1667f75108152614eea6de50b145e040b",
+      "bytes": 95
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-producer-original.xml",
+      "sha256": "7980fbaf6ad2a1dc7637f66cb66c13512baa903165ae855fa97cc237ebab9b34",
+      "bytes": 6646
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-producer-view-original-native.txt",
+      "sha256": "f514206039979627af7d62327879b6657977a0dfc295a00292eb25cf83e09b4a",
+      "bytes": 493
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-producer-view-original-native.xml",
+      "sha256": "ae4858350cfd1e2e9ffe7357779e6cb61ff2972ce49129c477531127069313a3",
+      "bytes": 1182
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-three-canary-pint.txt",
+      "sha256": "d672d485420a9d7250a81527a5c2ea07816fed96647391321c08fbacc68096ff",
+      "bytes": 173
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-three-original-native.txt",
+      "sha256": "c30b347eaf312ef44a95219c55257d00a79daf43e87f050ee4294267a79a63dd",
+      "bytes": 1893
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-three-original-native.xml",
+      "sha256": "51c7ae35ba1cc87c61ddc50f8ff14a0133c6cdf8381d3d9f84f605ab953c1fec",
+      "bytes": 3367
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-three-original.txt",
+      "sha256": "81eb1b0943c6d04952f24346b26ce0fed615c1285d1ab36ae888bf2b1d921086",
+      "bytes": 1888
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-three-original.xml",
+      "sha256": "f0df782a7485586908c359f35b542c79ad10029b929b0ae8abdc5a4ba6fb60ee",
+      "bytes": 3361
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-view-canary-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/three-original-sqlite-canaries.php.txt",
+      "sha256": "f47e4301bba07e4a9146fcab56ac6e36a71e3312e532ddd134fe12a3f44b0bab",
+      "bytes": 5482
+    }
+  ],
+  "findings": [
+    {
+      "id": "actor-context-provider-adoption",
+      "original": "actual customer provider SELECT changes owner marker after actor mint; current HTTP200",
+      "SQLite": "1failure/7assertions",
+      "MySQL": "1failure/7assertions"
+    },
+    {
+      "id": "manager-user-resolver-change",
+      "original": "actual Auth::resolveUsersUsing changes request user after final commit; current HTTP200",
+      "SQLite": "1failure/7assertions",
+      "MySQL": "1failure/7assertions"
+    },
+    {
+      "id": "manager-replacement",
+      "original": "actual Auth::swap replaces current manager, old retained manager unchanged; current HTTP200",
+      "SQLite": "1failure/7assertions",
+      "MySQL": "1failure/7assertions"
+    },
+    {
+      "id": "early-owner-key-rotation",
+      "original": "actual service resolving callback rotates app.key; unchanged marker now has different HMAC but empty list HTTP200",
+      "SQLite": "1failure/6assertions",
+      "MySQL": "1failure/6assertions"
+    },
+    {
+      "id": "default-guard-change",
+      "original": "final commit changes concrete auth.defaults.guard; cached resolver and guards unchanged but actual request user different, HTTP200",
+      "SQLite": "1failure/7assertions",
+      "MySQL": "1failure/7assertions"
+    },
+    {
+      "id": "producer-permanent-view-drift",
+      "original": "native actual permanent canonical service_project_events view replaces captured base table; proveClosed passes",
+      "MySQL": "1failure/4assertions; zeroerrors; original base restored before synthetic cleanup"
+    }
+  ],
+  "coexisting_original_greens": {
+    "existing_registration_Sqlite": "16/315",
+    "producer_receipt_Sqlite": "15/55"
+  },
+  "harness_diagnostics": [
+    "Initial extra key case used getJson, which correctly failed precontroller GET-body admission; callback count0. Corrected to actual bodyless GET; corrected genuine source failure retained.",
+    "Metadata carry script first looked for a receipt not present on3eb; corrected to read its actual owned frozen location, confirming29 core/service source paths unchanged."
+  ],
+  "status": "original findings frozen; root shared966 and producer9ce successors require independent affected rerun; whole attachment approval held"
+}
