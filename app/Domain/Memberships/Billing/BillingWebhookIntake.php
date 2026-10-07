@@ -47,6 +47,9 @@ final class BillingWebhookIntake
         BillingException::require(($event['object'] ?? null) === 'event' && BillingValues::is('event', $event['id'] ?? null)
             && is_string($event['type'] ?? null) && preg_match('/\A[a-z_.]{1,64}\z/D', $event['type']) === 1
             && ($event['livemode'] ?? null) === ($mode === 'live') && ($event['account'] ?? null) === null, 'event_scope');
+        // The hint parser reads the pinned object shape (for example parent.subscription_details), so an event emitted under another
+        // API version would be stored yet never scheduled. A mis-versioned endpoint is a configuration error and must be loud.
+        BillingException::require(($event['api_version'] ?? null) === BillingProviderPin::API_VERSION, 'api_version');
         $object = is_array($event['data']['object'] ?? null) ? $event['data']['object'] : [];
         $type = $event['type'];
         $invoiceRef = null;

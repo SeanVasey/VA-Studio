@@ -123,6 +123,37 @@ class BillingWebhookIntakeTest extends TestCase
         $this->assertNothingObservedOrAwarded();
     }
 
+    /** Codex P2 (intake-3): the parser assumes the pinned object shape, so any other (or no) event API version fails closed before a row. */
+    public function test_events_from_any_api_version_other_than_the_pin_are_refused_before_a_row_or_dispatch(): void
+    {
+        F::binding();
+        $accepted = $this->receive($this->event('evt_SYNTHETICV0', 'invoice.paid'));
+        $this->assertFalse($accepted['duplicate']);
+        $this->assertSame(1, DB::table('production_membership_billing_events')->count());
+        $this->assertSame(BillingProviderPin::API_VERSION, BillingValues::decrypt($accepted['event']['payload_ciphertext'])['api_version']);
+        Queue::assertPushed(RetrieveMembershipInvoice::class, 1);
+        $older = json_decode($this->event('evt_SYNTHETICV1', 'invoice.paid'), true, flags: JSON_THROW_ON_ERROR);
+        $older['api_version'] = '2025-01-27.acacia';
+        unset($older['data']['object']['parent']);
+        $older['data']['object']['subscription'] = F::SUBSCRIPTION;
+        $missing = json_decode($this->event('evt_SYNTHETICV2', 'invoice.paid'), true, flags: JSON_THROW_ON_ERROR);
+        unset($missing['api_version']);
+        $invalid = json_decode($this->event('evt_SYNTHETICV3', 'invoice.paid'), true, flags: JSON_THROW_ON_ERROR);
+        $invalid['api_version'] = [BillingProviderPin::API_VERSION];
+        $near = json_decode($this->event('evt_SYNTHETICV4', 'invoice.paid'), true, flags: JSON_THROW_ON_ERROR);
+        $near['api_version'] = BillingProviderPin::API_VERSION.' ';
+        foreach ([$older, $missing, $invalid, $near] as $event) {
+            try {
+                $this->receive(json_encode($event, JSON_THROW_ON_ERROR));
+                $this->fail('An event from an unpinned API version must refuse.');
+            } catch (BillingException $error) {
+                $this->assertSame('api_version', $error->reason);
+            }
+        }
+        $this->assertSame(1, DB::table('production_membership_billing_events')->count());
+        Queue::assertPushed(RetrieveMembershipInvoice::class, 1);
+    }
+
     private function receive(string $payload): array
     {
         return (new BillingWebhookIntake)->receive($payload, WebhookSignature::generateSignatureHeader($payload, self::SECRET));
