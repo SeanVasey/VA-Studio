@@ -307,6 +307,13 @@ covered on its own (reverting either makes the new test fail). New B-3 (Low, doc
 step 4 name `diff` lacked `|| exit 1`, fixed in the next docs commit together with the
 reviewer's note that a step 2 refusal leaves the application down until `php artisan up`.
 
+Codex's eighth pass (P2 ×2, docs): the exempted root `.gitignore` is now required to be
+exactly 0644 (rehearsed: 0644 passes, 0666 refused, absent passes), and the staging deploy
+step became a fresh immutable checkout per authorized SHA under `<RELEASES_DIR>/<SHA>` with
+persistent private storage attached afterwards from `<PERSISTENT_ROOT>` — the `--ignored`
+clean-tree check had rejected every reused checkout holding `vendor/`, `public/build/` or
+real private assets.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex

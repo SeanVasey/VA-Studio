@@ -98,14 +98,22 @@ prlimit and clamscan paths; the approved tag WAV and its hash; an `APP_KEY` gene
 host; mail stays `log`.
 
 ```sh
-# On the staging host, as the unprivileged application user.
-git fetch origin && git checkout --detach <SHA> && test "$(git rev-parse HEAD)" = "<SHA>"
-# Authorization is bound to the commit, so the worktree must be exactly its tree: no tracked
-# edits, no untracked or ignored files left from an earlier build.
-test -z "$(git status --porcelain --untracked-files=all --ignored)" || { echo 'dirty worktree'; exit 1; }
-test "$(git rev-parse HEAD^{tree})" = "$(git write-tree)" || { echo 'worktree differs from <SHA>'; exit 1; }
+# On the staging host, as the unprivileged application user. Every release is a fresh,
+# immutable checkout in its own directory; nothing is reused, and persistent data never
+# lives inside it. <RELEASES_DIR> holds one directory per authorized SHA; <PERSISTENT_ROOT>
+# holds storage/app/private (masters, contracts, originals) and survives releases.
+git clone --no-checkout <REPO_URL> <RELEASES_DIR>/<SHA> && cd <RELEASES_DIR>/<SHA>
+git checkout --detach <SHA> && test "$(git rev-parse HEAD)" = "<SHA>"
+# Authorization is bound to the commit, so the fresh checkout must be exactly its tree
+# before anything is generated into it: no tracked edits, no untracked files. (Ignored
+# paths are checked here too, which only works because the directory is new; vendor,
+# public/build and storage/app/private do not exist yet.)
+test -z "$(git status --porcelain --untracked-files=all --ignored)" || { echo 'dirty checkout'; exit 1; }
+test "$(git rev-parse HEAD^{tree})" = "$(git write-tree)" || { echo 'checkout differs from <SHA>'; exit 1; }
 composer install --no-dev --no-interaction --classmap-authoritative   # composer.lock is frozen
 npm ci && npm run build
+# Persistent private storage is attached after the source checks, never copied into the release.
+rmdir storage/app/private && ln -s <PERSISTENT_ROOT>/private storage/app/private
 
 # Configuration lives outside the repository, mode 0600, assembled from the two templates:
 #   ops/private-server/env.example       (host baseline; fill host inputs only)

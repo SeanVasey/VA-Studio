@@ -110,6 +110,9 @@ diff <(cd <RESTORE_PRIVATE_ROOT> && find . ! -type d | LC_ALL=C sort) \
 #    a .gitignore anywhere deeper is not exempt.
 (cd <RESTORE_PRIVATE_ROOT> && ! find . \( -type f ! -path ./.gitignore ! -perm 0600 ! -perm 0400 \) -o \( -type d ! -perm 0700 \) | grep -q .) \
   || { echo 'restored entry outside owner-only modes (0600/0400 files, 0700 directories)'; exit 1; }
+#    The exempted root .gitignore must itself be exactly 0644 when present.
+(cd <RESTORE_PRIVATE_ROOT> && { [ ! -e .gitignore ] || [ "$(stat -c %a .gitignore)" = 644 ]; }) \
+  || { echo 'root .gitignore is not 0644'; exit 1; }
 mysqldump --defaults-extra-file=<RESTORE_OPTION_FILE> --single-transaction --quick \
   --routines --triggers --events --hex-blob --no-tablespaces --set-gtid-purged=OFF \
   --skip-dump-date --skip-comments --databases <DATABASE> | diff - <BACKUP_DIR>/database.sql || exit 1
