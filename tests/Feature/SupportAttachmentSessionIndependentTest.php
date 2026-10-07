@@ -10,6 +10,7 @@ use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InquiryConversationFixtures;
 use Tests\Support\TestOnlyMediaScanner;
 use Tests\TestCase;
@@ -17,18 +18,12 @@ use Tests\TestCase;
 /** Actual registered HTTP and actual provider query; no fabricated actor or context. */
 class SupportAttachmentSessionIndependentTest extends TestCase
 {
+    use FinalizationDatabaseMigrations;
+
     protected function setUp(): void
     {
         parent::setUp();
         config(['app.key' => 'base64:'.base64_encode(str_repeat('S', 32)), 'support-attachments.fixture_enabled' => true]);
-        if (DB::getDriverName() === 'mysql') {
-            if (getenv('ATTACHMENT_NATIVE_ISOLATED') !== '1' || DB::getDatabaseName() !== 'vaseyaudio_support_closure') {
-                $this->markTestSkipped('Explicit dedicated synthetic reviewer database required.');
-            }
-            $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0);
-        } else {
-            $this->artisan('migrate', ['--force' => true])->assertExitCode(0);
-        }
         $this->fakePrivateMediaStorage();
         $this->withoutVite();
         $this->app->bind(MalwareScanner::class, TestOnlyMediaScanner::class);

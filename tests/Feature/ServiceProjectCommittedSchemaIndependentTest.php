@@ -20,8 +20,8 @@ class ServiceProjectCommittedSchemaIndependentTest extends TestCase
 
     public function runDatabaseMigrations()
     {
-        if (DB::getDriverName() !== 'mysql' || getenv('ATTACHMENT_NATIVE_ISOLATED') !== '1' || DB::getDatabaseName() !== 'vaseyaudio_support_closure') {
-            $this->markTestSkipped('Actual dedicated synthetic native reviewer database required.');
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native MySQL permanent table/view dictionary required.');
         }
         $this->runDisposableMigrations();
     }

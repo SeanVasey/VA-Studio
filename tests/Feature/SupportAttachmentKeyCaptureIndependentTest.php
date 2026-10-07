@@ -3,24 +3,18 @@
 namespace Tests\Feature;
 
 use App\Domain\SupportAttachments\SupportAttachments;
-use Illuminate\Support\Facades\DB;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InquiryConversationFixtures;
 use Tests\TestCase;
 
 /** Actor ownership derives from app.key as well as the captured session marker. */
 class SupportAttachmentKeyCaptureIndependentTest extends TestCase
 {
+    use FinalizationDatabaseMigrations;
+
     public function test_service_resolution_key_rotation_cannot_adopt_a_previously_minted_visitor_actor(): void
     {
         config(['app.key' => 'base64:'.base64_encode(str_repeat('S', 32)), 'support-attachments.fixture_enabled' => true]);
-        if (DB::getDriverName() === 'mysql') {
-            if (getenv('ATTACHMENT_NATIVE_ISOLATED') !== '1' || DB::getDatabaseName() !== 'vaseyaudio_support_closure') {
-                $this->markTestSkipped('Explicit dedicated synthetic reviewer database required.');
-            }
-            $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0);
-        } else {
-            $this->artisan('migrate', ['--force' => true])->assertExitCode(0);
-        }
         $secret = str_repeat('b', 64);
         $this->withSession(['_inquiry_owner' => ['context' => 'guest', 'secret' => $secret]]);
         $owner = hash_hmac('sha256', "vasey-inquiry-owner-v1\0guest\0".$secret, (string) config('app.key'));
