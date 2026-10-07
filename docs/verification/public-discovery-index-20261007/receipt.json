@@ -1,0 +1,46 @@
+{
+  "source_commit": "5452c595b933fc673caa1c719ab3882daf55c26e",
+  "source_tree": "10f7cd9694b453b903b115dc6e39600ff71948f5",
+  "parent": "7827a86d405167c15b5c6a04970a74d49111b36a",
+  "source_paths_sha256": {
+    "app/Domain/SiteBuilder/PublicPagesSitemap.php": "524baebfd6037baffa8d34c4adf20ad1c4eca6b3df28e4e3e66396392ff8afda",
+    "app/Http/Controllers/PublicDiscoveryController.php": "ed15c74aeb7b2beb54ad331846ce74cf5b092c3b3dd481f37acdb64a03ef095d",
+    "routes/public-discovery.php": "5c2ab822fd9ba99a6a59d125f139b6c0c00daabdc2d535a934bd8273bf464c61",
+    "tests/Feature/PublicDiscoveryIndexTest.php": "438820a73bc99b32cb5cf7f6c5bbafe655a8858744c5edd2279e6c6f5d138bfc"
+  },
+  "execution_binding": "Checks executed immediately before freezing identical working bytes in source commit; no executable edits after test.",
+  "checks": {
+    "tests": 40,
+    "existing_public_pages_cases": 18,
+    "new_index_robots_cases": 22,
+    "assertions": 140,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "database": "SQLite in-memory",
+    "pint": "passed after applying import/spacing formatting, before focused test"
+  },
+  "command": "/workspace/scratch/0c039e9e0645/runtime-recovery/bin/php vendor/bin/phpunit tests/Feature/PublicPagesSitemapTest.php tests/Feature/PublicDiscoveryIndexTest.php --log-junit /workspace/scratch/2876616e88c3/public-discovery-index-first.xml",
+  "environment": {
+    "PHPRC": "/workspace/scratch/0c039e9e0645/runtime-recovery/php.ini",
+    "PHP_INI_SCAN_DIR": "",
+    "LD_LIBRARY_PATH": "/workspace/scratch/0c039e9e0645/runtime-recovery/root/usr/lib/x86_64-linux-gnu"
+  },
+  "graph": "Preserved composer/npm manifests/locks; isolated copy of current recovered vendor, own application origin. No fresh graph/audit claim.",
+  "protocol_sources": [
+    "https://www.sitemaps.org/protocol.html",
+    "https://www.rfc-editor.org/rfc/rfc9309"
+  ],
+  "artifact_sha256": {
+    "public-discovery-index-first.xml": "03d233d4b1f8fb7a8b5b10dcdd99993fd9cb8e253354bd6127988f6090512147",
+    "public-discovery-index-first.txt": "5b1ebec99b311db64156779699458e74d05051e5acbcfba0e03d6c47d90dd133",
+    "public-discovery-index-pint.txt": "56845a3fa72564ac841e1d761c5b46313a13737b70230fec1268a959431a5250"
+  },
+  "limitations": [
+    "No track sitemap. PublicCatalog has perrecord current blockers/inventory checks and no bounded authoritative eligible snapshot/counter; complete shard enumeration requires such an index contract.",
+    "No robots authorization claim; server permissions/noindex controls remain independent.",
+    "No source redirect/deployed crawl/browser/MySQL/full acceptance.",
+    "Independent privacy/projection review pending.",
+    "No parentT36/FP014completion or productionactivation."
+  ]
+}

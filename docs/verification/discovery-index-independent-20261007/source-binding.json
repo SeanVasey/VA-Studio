@@ -1,0 +1,16 @@
+{
+  "executed_source": "6aa74559dda0af17d7eb29ed69eb0dee9e404aa2",
+  "executed_tree": "60687df43d122eea2e5ea5e994b0df2164e43ad8",
+  "reviewed_executable": "5452c595b933fc673caa1c719ab3882daf55c26e",
+  "reviewed_tree": "10f7cd9694b453b903b115dc6e39600ff71948f5",
+  "parent": "7827a86d405167c15b5c6a04970a74d49111b36a",
+  "source_sha256": {
+    "app/Domain/SiteBuilder/PublicPagesSitemap.php": "524baebfd6037baffa8d34c4adf20ad1c4eca6b3df28e4e3e66396392ff8afda",
+    "app/Http/Controllers/PublicDiscoveryController.php": "ed15c74aeb7b2beb54ad331846ce74cf5b092c3b3dd481f37acdb64a03ef095d",
+    "routes/public-discovery.php": "5c2ab822fd9ba99a6a59d125f139b6c0c00daabdc2d535a934bd8273bf464c61",
+    "tests/Feature/PublicDiscoveryIndexTest.php": "438820a73bc99b32cb5cf7f6c5bbafe655a8858744c5edd2279e6c6f5d138bfc"
+  },
+  "strict_origin_predicate_exactly_preserved": true,
+  "manifests_locks_exception_policy_unchanged": true,
+  "reviewer_canary_sha256": "144d9a9244e846c87c7b4aee410dc8b750043617d95cbb30ed0b9a79723e131f"
+}

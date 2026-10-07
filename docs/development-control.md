@@ -1,5 +1,36 @@
 # Current development queue
 
+## Merged PDF seam and bounded index/robots — October 7 UTC
+
+PR #22 merged at `e4cf4c164ed28890af560c00e19a3cdda76f0240`, tree
+`15952c8b9afbcfbb05914d7c40ea60f1e5f597d3`, after exact-head cheap preflight
+37573688164 attempt 1 passed. Fresh main/PR/tree and ordered parents verified
+the corrected nineteen-path source-only successor seam. Current selector/policy
+and global lock remain v1; both direct cross-version mismatches are corrected.
+
+The [index/robots composition](verification/discovery-index-composition-20261007/README.md)
+adds canonical root `/sitemap.xml` and environment-aware `/robots.txt`. It advertises
+only the accepted public-pages sitemap; no track or private/customer URLs enter.
+Author 40/140 and independent own-autoload 43/225 focused checks passed, including
+zero SQL reads and actual hostile-header/body/query/origin refusals. Four source
+paths equal approved `5452c595`; local `700735d` equals native `a762ea2`, tree
+`02f6a70f`, with PR #22 as sole parent. Metadata-only carry precedes exact-head
+cheap preflight and development merge.
+
+Atomic test-only V2 defaults/lock adoption has author 144/820 new-graph and 37/72
+old-runtime checks. Independent two-runtime review is green, including an actual
+old-worker-generated V1 original read/restored byte-for-byte on the new graph;
+its durable approval is being finalized before publication. Default issuance
+remains disabled, and old V1 policy configuration refuses new V2 capture. PR #3
+stays open until a verified atomic replacement merges.
+
+Internal bounded track eligibility capture with transactional invalidation is
+now an authorized implementation lane. Current publication/readiness/inventory
+rules remain authoritative; public manifests/sitemap consumption follow later.
+Legacy provenance, redirects, deployed SEO, production commerce and full final
+acceptance remain open. Focused local evidence, cheap preflight and expected-head
+merges preserve the low-cost CI policy. Dated prior pending states are superseded.
+
 ## Corrected PDF seam and merged page discovery — October 7 UTC
 
 PR #21 merged at `c8ecc0baf90e2b91112d12129e24a3dcd164c105`, tree
