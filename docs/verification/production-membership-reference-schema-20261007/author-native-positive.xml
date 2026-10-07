@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="35.419624">
+    <testcase name="test_fresh_schema_owned_retry_preserves_t23_and_has_no_incoming_child_dependencies" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="24" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="2" time="35.419624"/>
+  </testsuite>
+</testsuites>

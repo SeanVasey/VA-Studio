@@ -1,0 +1,42 @@
+{
+  "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+  "approved_preparation": "8fdacaf255caf50f1433eb21f88d1d0aa0d8df3f",
+  "original_evidence": "2040c221e653210aa51fde4e1f7e64b54441c062",
+  "later_lifecycle_record_source": "8fdacaf255caf50f1433eb21f88d1d0aa0d8df3f",
+  "original_probe_sha256": "72648803519da41d025222e000ecfeceef051ca3e0cdcd0dd01c4dbdbcdaca8a",
+  "author_current_schema_native": {
+    "executed": 1,
+    "assertions": 2,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0
+  },
+  "independent_original_native": {
+    "executed": 1,
+    "assertions": 6,
+    "failures": 1,
+    "errors": 0,
+    "skips": 0
+  },
+  "independent_successor_native": {
+    "executed": 1,
+    "assertions": 7,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0
+  },
+  "fixture_lifecycle": "native_mysql coordinated same-process REVOKE/drop; no remaining fixture schemas/table privilege/cross-FKs/reviewer sessions",
+  "artifacts": {
+    "docs/verification/production-membership-reference-schema-20261007/MembershipForeignSchemaCanaryTest.php": "72648803519da41d025222e000ecfeceef051ca3e0cdcd0dd01c4dbdbcdaca8a",
+    "docs/verification/production-membership-reference-schema-20261007/author-native-positive.txt": "82e1d10b0e443656d1f59bc2f6da74d21a086da2d91593f42d68aaef8167bc00",
+    "docs/verification/production-membership-reference-schema-20261007/author-native-positive.xml": "ae3517b119491b2c737b912f84d8714d7ed8341a8f54300c46377b48164b9755",
+    "docs/verification/production-membership-reference-schema-20261007/author-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "docs/verification/production-membership-reference-schema-20261007/foreign-schema-snapshot.json": "5e8238e891eae1c8de3116e03f9165deeff26a75ee824246ed0139225b04a9b7",
+    "docs/verification/production-membership-reference-schema-20261007/original-boot-failure.json": "82690231b0f673b55e63464d47f5b8159d96337d0a6855fe2b0f18dd21e99e19",
+    "docs/verification/production-membership-reference-schema-20261007/original-boot-failure.txt": "4a22e0dff63a34e41faa0976ea00583c18ecbe5cd1ce95d8cbd02d3b8db67b98",
+    "docs/verification/production-membership-reference-schema-20261007/original-native-lifecycle.json": "b987ee148b36bac1021eee425b3853ef8fe5ae20e3e65eb0be4a224fa092dea1",
+    "docs/verification/production-membership-reference-schema-20261007/original-native-receipt.json": "0e7017109472f65fa322582405dfae35d37c7ad4398f46fc43bba24a0203801c",
+    "docs/verification/production-membership-reference-schema-20261007/original-native.txt": "172c01b25ef747352fd687b674ce0583d17c8b3de0f874d774aeaeb1b9351d44",
+    "docs/verification/production-membership-reference-schema-20261007/original-native.xml": "a6d1fa8fcd18c001a8229e17631f4971e923ac8f53d7b06d5d1e405933d81e58"
+  }
+}
