@@ -144,9 +144,12 @@ final class PaidGrants
                 && ($work['state'] === 'complete') === ($original !== []));
             $manifest = $original === [] ? null : PaidGrantRecords::decode($original);
             if ($manifest !== null) {
+                $text = (new PaidGrantText)->build(PaidGrantRenderInput::fromOrigin($body));
                 PaidGrantException::require($manifest['schema_version'] === 'paid-first-original-v1' && $manifest['origin_hash'] === $origin['payload_hash']
-                    && $original['claim_id'] === $work['claim_id'] && $manifest['profile_hash'] === CanonicalJson::hash($body['profile'])
-                    && $manifest['input_hash'] === CanonicalJson::hash(PaidGrantRenderInput::fromOrigin($body))
+                    && $original['claim_id'] === $work['claim_id'] && $manifest['claim_id'] === $work['claim_id']
+                    && $manifest['profile_hash'] === CanonicalJson::hash($body['profile'])
+                    && $manifest['input_hash'] === $text['input_hash'] && $manifest['text_digest'] === $text['text_digest']
+                    && $manifest['asset_manifest_hash'] === CanonicalJson::hash($body['assets'])
                     && $manifest['artifact']['profile_hash'] === $manifest['profile_hash']
                     && $manifest['artifact']['purpose'] === 'paid-license-grant' && $manifest['artifact']['provenance'] === $source['provenance']
                     && $manifest['artifact']['storage_path'] === 'contracts/paid/'.$source['provenance'].'/'.$origin['public_id'].'/'.$work['claim_id'].'/original.pdf');
@@ -159,6 +162,8 @@ final class PaidGrants
             PaidGrantException::require($complete['schema_version'] === 'paid-complete-order-v1' && $complete['batch_hash'] === $batch['payload_hash']
                 && $complete['origin_hashes'] === array_column(array_column($lines, 'origin'), 'payload_hash')
                 && $complete['original_hashes'] === array_column(array_column($lines, 'original'), 'payload_hash')
+                && $complete['asset_manifest_hashes'] === array_map(fn (array $line): string => CanonicalJson::hash($line['body']['assets']), $lines)
+                && $complete['physical_observation'] === 'exact_private_bytes_all_original_lines'
                 && count(array_filter($lines, fn (array $line): bool => $line['work']['state'] === 'complete')) === count($lines));
         }
 

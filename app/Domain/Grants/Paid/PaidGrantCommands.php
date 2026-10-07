@@ -1,0 +1,105 @@
+<?php
+
+namespace App\Domain\Grants\Paid;
+
+use App\Domain\Commerce\ProductionCheckout\CheckoutException;
+use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderLocatorV1;
+use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderSourceV1;
+use App\Domain\Customers\ProductionCustomerAccess;
+use App\Domain\Customers\ProductionCustomerPrincipal;
+use App\Domain\Customers\ProductionIdentity\IdentityException;
+use App\Models\User;
+use App\Support\CanonicalJson;
+use Closure;
+use Illuminate\Support\Facades\DB;
+use PDO;
+use Throwable;
+
+/** Trusted owned commands share one current-buyer -> original-buyer -> producer -> owned-graph lock order. */
+final class PaidGrantCommands
+{
+    public function run(string $batchId, ProductionCustomerPrincipal $principal, User $actor, Closure $operation, ?int $observationDeadline = null): array
+    {
+        PaidGrantInput::uuid($batchId);
+        $grants = new PaidGrants;
+        $grants->outsideTransactions();
+        $heldRows = null;
+        $receipt = null;
+        try {
+            app(PaidGrantPolicy::class)->capture();
+            app(ProductionCustomerAccess::class)->current($principal, $actor);
+            $orderId = $this->locate($batchId, $principal->accountId);
+            $locator = ProductionPaidOrderLocatorV1::locate($orderId);
+            $result = DB::transaction(function () use ($batchId, $principal, $actor, $operation, $locator, $grants, &$heldRows, &$receipt): array {
+                $rows = new PaidGrantRows;
+                $heldRows = $rows;
+                $policy = app(PaidGrantPolicy::class)->capture();
+                $access = app(ProductionCustomerAccess::class);
+                $authority = $access->lock($principal, $actor, $rows->current());
+                $binding = $access->durableBinding($principal);
+                $original = $locator->historicalBuyerBinding();
+                $grants->sameOwner($binding, $original);
+                $historical = $access->verifyHistoricalBinding($original, $rows->current());
+                $source = ProductionPaidOrderSourceV1::lockedRead($locator, $rows->current(), $historical);
+                $sources = [];
+                for ($position = 1; $position <= $source->lineCount(); $position++) {
+                    $sources[] = $source->line($position);
+                }
+                $graph = $grants->graph($batchId, $binding['account_id'], $rows);
+                PaidGrantException::require(CanonicalJson::encode($graph['payload']['original_buyer']) === CanonicalJson::encode($original)
+                    && CanonicalJson::encode($graph['payload']['delivery_policy']) === CanonicalJson::encode($policy)
+                    && CanonicalJson::encode(array_column(array_column($graph['lines'], 'body'), 'source')) === CanonicalJson::encode($sources), 409);
+                $result = $operation($graph, $rows);
+                PaidGrantException::require(is_array($result));
+                $expected = $grants->graph($batchId, $binding['account_id'], $rows);
+                $receipt = PaidGrantReadReceipt::capture($rows, $principal, $actor, $authority, $policy, $grants->snapshots($expected, $rows));
+                $grants->fence($principal, $actor, $access, $authority, $source, $policy, $expected, $rows, $receipt);
+
+                return $result;
+            });
+            PaidGrantException::require($receipt instanceof PaidGrantReadReceipt);
+            $receipt->proveClosed();
+            PaidGrantException::require($observationDeadline === null || hrtime(true) <= $observationDeadline);
+
+            return $result;
+        } catch (IdentityException) {
+            $heldRows?->abort();
+            throw new PaidGrantException(403);
+        } catch (CheckoutException $error) {
+            $heldRows?->abort();
+            throw new PaidGrantException(in_array($error->status, [403, 404, 409, 422, 503], true) ? $error->status : 503);
+        } catch (Throwable $error) {
+            $heldRows?->abort();
+            throw $error;
+        }
+    }
+
+    /** Private metadata locator only; current authority was independently proved before this read. */
+    private function locate(string $id, int $accountId): string
+    {
+        $connection = DB::connection();
+        $pdo = $connection->getPdo();
+        $driver = $connection->getDriverName();
+        PaidGrantException::require($connection->transactionLevel() === 0 && ! $pdo->inTransaction() && $connection->getTablePrefix() === '');
+        if ($driver === 'sqlite') {
+            $temporary = $pdo->query("SELECT 1 FROM sqlite_temp_master WHERE name = 'paid_order_origins' COLLATE NOCASE LIMIT 1")->fetchColumn();
+            PaidGrantException::require($temporary === false);
+            $table = 'main."paid_order_origins"';
+        } else {
+            PaidGrantException::require($driver === 'mysql');
+            $database = $pdo->query('SELECT DATABASE()')->fetchColumn();
+            PaidGrantException::require(is_string($database) && preg_match('/\A[a-zA-Z0-9_]+\z/D', $database) === 1);
+            $table = '`'.$database.'`.`paid_order_origins`';
+            $definition = $pdo->query('SHOW CREATE TABLE '.$table)->fetch(PDO::FETCH_NUM);
+            PaidGrantException::require(is_array($definition) && str_starts_with((string) $definition[1], 'CREATE TABLE '));
+        }
+        $query = $pdo->prepare('SELECT order_public_id FROM '.$table.' WHERE public_id = ? AND account_id = ? LIMIT 2');
+        $query->execute([$id, $accountId]);
+        $orders = $query->fetchAll(PDO::FETCH_COLUMN);
+        PaidGrantException::require(count($orders) === 1, 404);
+        PaidGrantException::require(DB::connection() === $connection && $connection->getRawPdo() === $pdo
+            && $connection->transactionLevel() === 0 && ! $pdo->inTransaction() && $connection->getTablePrefix() === '');
+
+        return PaidGrantInput::uuid($orders[0]);
+    }
+}
