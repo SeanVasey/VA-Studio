@@ -28,7 +28,7 @@ export function ServiceProjectJourney({ initial }: { initial: ServiceProjectInde
 
   useEffect(() => {
     active.current = true;
-    const clear = () => { requestController.current?.abort(); setIndex(null); setProject(null); setSummary(''); setAnswers([]); setReason(''); setPending(null); };
+    const clear = () => { requestController.current?.abort(); setIndex(null); setProject(null); setSelected(''); setSummary(''); setAnswers([]); setReason(''); setPending(null); };
     const restore = (event: PageTransitionEvent) => { if (event.persisted) { clear(); setMessage('Refresh this page to check your current account access.'); } };
     window.addEventListener('pagehide', clear); window.addEventListener('pageshow', restore);
     return () => { active.current = false; requestController.current?.abort(); window.removeEventListener('pagehide', clear); window.removeEventListener('pageshow', restore); };
@@ -45,7 +45,7 @@ export function ServiceProjectJourney({ initial }: { initial: ServiceProjectInde
       const response = await fetch(path, { credentials: 'same-origin', cache: 'no-store', redirect: 'error', signal: controller.signal, headers: { Accept: 'application/json' } });
       if (!active.current) return;
       if (!response.ok || response.redirected) {
-        if ([403, 404, 419].includes(response.status)) { setIndex(null); setPending(null); }
+        if ([403, 404, 419].includes(response.status)) { setIndex(null); setProject(null); setPending(null); setSelected(''); setSummary(''); setAnswers([]); setReason(''); }
         setMessage('This project is unavailable or changed. Refresh to check your current access.'); return;
       }
       const result = await response.json() as { project?: ServiceProject } & ServiceProjectIndex;
@@ -66,7 +66,7 @@ export function ServiceProjectJourney({ initial }: { initial: ServiceProjectInde
         headers: { Accept: 'application/json', 'Content-Type': 'application/json', ...csrf() }, body: JSON.stringify(command.body) });
       if (!active.current) return;
       if (!response.ok || response.redirected) {
-        if ([403, 404, 419].includes(response.status)) { setIndex(null); setProject(null); setPending(null); setSummary(''); setAnswers([]); setReason(''); }
+        if ([403, 404, 419].includes(response.status)) { setIndex(null); setProject(null); setPending(null); setSelected(''); setSummary(''); setAnswers([]); setReason(''); }
         setMessage(response.status === 409 ? 'The project changed. Refresh to inspect the saved journey before starting another action.' : 'Saving was not confirmed. Retry these exact contents or refresh to inspect the saved journey.'); return;
       }
       const result = await response.json() as { project: ServiceProject };

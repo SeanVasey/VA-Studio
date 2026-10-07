@@ -69,4 +69,21 @@ describe('mounted service buyer journey', () => {
     fireEvent(window, new Event('pagehide'));
     expect(screen.queryByText('Private answer')).not.toBeInTheDocument();
   });
+  it.each([403, 404, 419])('clears unsaved private input and selection after read denial %s before a new account refresh', async status => {
+    render(<ServiceProjectJourney initial={{ ...initial, projects: [] }} />);
+    fireEvent.change(screen.getByLabelText('Service definition'), { target: { value: '7' } });
+    fireEvent.change(screen.getByLabelText('Your project brief'), { target: { value: 'First account private unsaved brief' } });
+    fireEvent.change(screen.getByLabelText('What is your project?'), { target: { value: 'First account private unsaved answer' } });
+    fetcher.mockResolvedValueOnce(response({}, status));
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh projects' }));
+    await waitFor(() => expect(screen.queryByLabelText('Submit a private service brief')).not.toBeInTheDocument());
+    fetcher.mockResolvedValueOnce(response(initial));
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh projects' }));
+    await screen.findByLabelText('Submit a private service brief');
+    expect(screen.getByLabelText('Service definition')).toHaveValue('');
+    fireEvent.change(screen.getByLabelText('Service definition'), { target: { value: '7' } });
+    expect(screen.getByLabelText('Your project brief')).toHaveValue('');
+    expect(screen.getByLabelText('What is your project?')).toHaveValue('');
+  });
+
 });
