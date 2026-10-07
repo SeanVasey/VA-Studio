@@ -171,19 +171,29 @@ php artisan queue:work database --queue=payments,inquiry-alerts,default --tries=
 - Confirmation that the private root isn't served.
 
 **Rollback:**
-1. `php artisan down`, then stop the queue worker and scheduler services and confirm
+1. `php artisan down || exit 1` in the current release, then confirm the site answers 503
+   (`curl -fsS -o /dev/null https://<STAGING_ORIGIN>/ && exit 1` must fail, or with the `file`
+   driver `[ -f storage/framework/maintenance.php ] || exit 1`): a `down` that fails (release
+   storage not writable, for example) leaves HTTP writers live, so nothing below runs until
+   maintenance mode is proven. Then stop the queue worker and scheduler services and confirm
    `systemctl is-active` reports them inactive: an in-flight media, contract, payment or
    scheduled-publication job must not write to the database or private storage while the
    restore runs (the backup procedure quiesces the same way).
 2. Restore the pre-migration backup into the **staging** schema only.
-3. Switch the web and worker units to the previous release directory
-   `<RELEASES_DIR>/<PREVIOUS_SHA>`, which was built and attached by its own S1 run and still
-   holds its `vendor/`, `public/build/`, `.env` and bind-mounted private storage. Never check
-   another SHA out inside the current release directory: it would keep the newer `public/build`
-   and serve an incompatible Vite manifest. If no built previous release exists, repeat the
-   complete S1 checkout, build and attachment for `<PREVIOUS_SHA>` first.
+3. Enter maintenance in the previous release before switching: `APP_MAINTENANCE_DRIVER=file`
+   writes a release-local `storage/framework/maintenance.php`, and S1 shares only
+   `storage/app/private` between releases, so switching the web unit to a release without
+   its own marker would reopen HTTP traffic at once. Run `php artisan down || exit 1` inside
+   `<RELEASES_DIR>/<PREVIOUS_SHA>`, then switch the web and worker units to that directory,
+   which was built and attached by its own S1 run and still holds its `vendor/`,
+   `public/build/`, `.env` and bind-mounted private storage, and confirm the site still
+   answers 503 after the switch. Never check another SHA out inside the current release
+   directory: it would keep the newer `public/build` and serve an incompatible Vite manifest.
+   If no built previous release exists, repeat the complete S1 checkout, build and attachment
+   for `<PREVIOUS_SHA>` first (its S1 run ends in maintenance mode until this step lifts it).
 4. `php artisan config:cache` in the previous release, start the worker and scheduler
-   services, verify `is-active`, then `php artisan up`.
+   services, verify `is-active`, then `php artisan up` in the previous release only; the
+   superseded release stays down.
 5. Remove the staging DNS record if Sean asks.
 6. Rotate any staging secret that may have been exposed.
 

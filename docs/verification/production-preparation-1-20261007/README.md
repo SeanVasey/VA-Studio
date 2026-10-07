@@ -377,6 +377,13 @@ allowlist commit, flag under its own authorization line, policy approval and bas
 `PRODUCTION_CHECKOUT_HTTP_ENABLED`, and the gate table says so. The S1 `.env` install uses a
 separate `<APP_GROUP>` input. The backup's `php artisan down` is fatal on failure.
 
+Codex's fifteenth pass (P2 ×2, docs): the S1 rollback's `php artisan down` was unchecked and,
+with the `file` maintenance driver, its marker is release-local, so switching the web unit to
+the previous release reopened HTTP before the worker checks. The rollback now proves
+maintenance mode (fatal `down`, 503 or marker check) before quiescing, enters maintenance
+inside the previous release before switching units and confirms 503 after the switch, and
+lifts it only there after the services are verified.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex
