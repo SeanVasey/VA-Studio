@@ -229,6 +229,41 @@ class InquiryNotificationMigrationTest extends TestCase
         return ['extra column' => ['column'], 'wrong unique index' => ['index'], 'wrong guard body' => ['guard'], 'additional table trigger' => ['extra trigger']];
     }
 
+    #[DataProvider('externalReferences')]
+    public function test_external_dependencies_are_refused_before_adoption_or_empty_rollback(string $kind): void
+    {
+        if ($kind === 'foreign key') {
+            Schema::create('synthetic_notification_dependency', function ($table): void {
+                $table->id();
+                $table->foreignId('intent_id')->nullable()->constrained('inquiry_notification_intents')->restrictOnDelete();
+                $table->string('retained_note');
+            });
+            DB::table('synthetic_notification_dependency')->insert(['intent_id' => null, 'retained_note' => 'Synthetic retained foreign dependency']);
+        } elseif ($kind === 'view') {
+            DB::unprepared('CREATE VIEW synthetic_notification_dependency AS SELECT id FROM inquiry_notification_intents');
+        } else {
+            DB::unprepared(DB::getDriverName() === 'sqlite'
+                ? 'CREATE TRIGGER synthetic_notification_dependency BEFORE UPDATE ON users BEGIN SELECT COUNT(*) FROM inquiry_notification_intents; END'
+                : 'CREATE TRIGGER synthetic_notification_dependency BEFORE UPDATE ON users FOR EACH ROW BEGIN SET @synthetic_notification_reference = (SELECT COUNT(*) FROM inquiry_notification_intents); END');
+        }
+        $before = $this->schemaRows();
+        $migration = require database_path('migrations/2026_10_07_243000_inquiry_notification_intents.php');
+        foreach (['up', 'down'] as $method) {
+            $this->migrationRefused(fn () => $migration->$method());
+            $this->assertSame($before, $this->schemaRows());
+            $this->assertCount(3, $this->triggers());
+            $this->assertDatabaseCount('inquiry_notification_intents', 0);
+            if ($kind === 'foreign key') {
+                $this->assertSame('Synthetic retained foreign dependency', DB::table('synthetic_notification_dependency')->sole()->retained_note);
+            }
+        }
+    }
+
+    public static function externalReferences(): array
+    {
+        return ['foreign key' => ['foreign key'], 'view' => ['view'], 'external trigger' => ['trigger']];
+    }
+
     public function test_changed_mysql_notification_foreign_key_is_refused_before_any_ddl(): void
     {
         $this->recoveryInquiry = $this->inquiry();

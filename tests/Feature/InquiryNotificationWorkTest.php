@@ -373,4 +373,38 @@ class InquiryNotificationWorkTest extends TestCase
         $this->assertCount(2, $sink->alerts);
         Mail::assertNothingSent();
     }
+
+    public function test_an_authority_read_observer_cannot_leave_a_secondary_transaction_around_transport_io(): void
+    {
+        $intent = $this->save();
+        $sink = $this->adapter();
+        config(['database.connections.inquiry_secondary' => config('database.connections.'.config('database.default'))]);
+        $secondary = DB::connection('inquiry_secondary');
+        $armed = true;
+        DB::listen(function ($query) use (&$armed, $secondary): void {
+            if ($armed && DB::transactionLevel() === 0 && str_contains(strtolower($query->sql), 'users')) {
+                $armed = false;
+                $secondary->beginTransaction();
+            }
+        });
+        try {
+            app(InquiryNotificationWork::class)->process($intent->id);
+            $this->fail('Authority callback left a transaction around transport I/O.');
+        } catch (LogicException) {
+            $this->assertFalse($armed);
+            $this->assertSame([], $sink->alerts);
+            $this->assertSame('processing', $intent->fresh()->state);
+            $this->assertSame(1, $intent->fresh()->attempts);
+        } finally {
+            if ($secondary->transactionLevel() !== 0) {
+                $secondary->rollBack();
+            }
+            DB::purge('inquiry_secondary');
+        }
+        $this->travel(InquiryNotificationWork::LEASE_SECONDS)->seconds();
+        $this->artisan('vasey:process-inquiry-alerts')->assertSuccessful();
+        $this->assertSame('unknown', $intent->fresh()->state);
+        $this->assertSame('lease_expired', $intent->fresh()->outcome);
+        $this->assertSame([], $sink->alerts);
+    }
 }

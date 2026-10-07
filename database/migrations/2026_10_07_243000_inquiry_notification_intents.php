@@ -17,6 +17,7 @@ return new class extends Migration
         $missing = $exists ? $this->preflightTable($statements) : $statements;
         $guards = $this->guards();
         $installed = $this->preflightGuards($guards);
+        $this->preflightExternalDependencies();
         if (! $exists) {
             $this->preflightAbsentTableNames($statements);
         } elseif (($missing !== [] || in_array(false, $installed, true)) && DB::table('inquiry_notification_intents')->exists()) {
@@ -393,6 +394,68 @@ return new class extends Migration
         throw new LogicException("Unexpected inquiry notification {$part}; existing schema, guards and evidence are unchanged. Investigate before retrying.");
     }
 
+    /** Match the shared ownership floor while retaining this migration's interrupted-DDL recovery. */
+    private function preflightExternalDependencies(): void
+    {
+        $table = 'inquiry_notification_intents';
+        $ownedGuards = array_keys($this->guards());
+        if (DB::getDriverName() === 'sqlite') {
+            foreach (['main' => 'sqlite_master', 'temp' => 'sqlite_temp_master'] as $schema => $catalog) {
+                foreach (DB::table($catalog)->whereIn('type', ['table', 'view', 'trigger'])->get() as $object) {
+                    if ($schema === 'main' && ($object->name === $table || in_array($object->name, $ownedGuards, true))) {
+                        continue;
+                    }
+                    if ($object->type === 'table') {
+                        $name = str_replace('"', '""', $object->name);
+                        foreach (DB::select('PRAGMA '.$schema.'.foreign_key_list("'.$name.'")') as $key) {
+                            if (strtolower($key->table) === $table) {
+                                $this->unexpected('external foreign key reference');
+                            }
+                        }
+                    } elseif ($this->referencesTable($object->sql)) {
+                        $this->unexpected('external view or trigger reference');
+                    }
+                }
+            }
+
+            return;
+        }
+        $database = DB::getDatabaseName();
+        foreach (DB::table('information_schema.KEY_COLUMN_USAGE')->where('REFERENCED_TABLE_SCHEMA', $database)
+            ->whereRaw('LOWER(REFERENCED_TABLE_NAME) = ?', [$table])->get() as $key) {
+            if ($key->TABLE_SCHEMA !== $database || $key->TABLE_NAME !== $table) {
+                $this->unexpected('external foreign key reference');
+            }
+        }
+        foreach (DB::table('information_schema.TRIGGERS')->get() as $guard) {
+            if ($guard->TRIGGER_SCHEMA === $database && in_array($guard->TRIGGER_NAME, $ownedGuards, true)) {
+                continue;
+            }
+            if ($this->referencesTable($guard->ACTION_STATEMENT)) {
+                $this->unexpected('external trigger reference');
+            }
+        }
+        foreach (DB::table('information_schema.VIEWS')->get() as $view) {
+            if ($this->referencesTable($view->VIEW_DEFINITION)) {
+                $this->unexpected('external view reference');
+            }
+        }
+        foreach (DB::table('information_schema.ROUTINES')->get() as $routine) {
+            if ($this->referencesTable($routine->ROUTINE_DEFINITION)) {
+                $this->unexpected('external routine reference');
+            }
+        }
+    }
+
+    private function referencesTable(mixed $sql): bool
+    {
+        if (! is_string($sql)) {
+            $this->unexpected('unreadable dependency definition');
+        }
+
+        return preg_match('/(?<![a-z0-9_])inquiry_notification_intents(?![a-z0-9_])/i', $sql) === 1;
+    }
+
     public function down(): void
     {
         $this->requireDriver();
@@ -405,6 +468,7 @@ return new class extends Migration
             $this->preflightTable($this->tableStatements());
         }
         $installed = $this->preflightGuards($this->guards());
+        $this->preflightExternalDependencies();
         foreach (['insert', 'update', 'delete'] as $operation) {
             if ($installed['inquiry_notification_intents_'.$operation]) {
                 DB::unprepared('DROP TRIGGER inquiry_notification_intents_'.$operation);
