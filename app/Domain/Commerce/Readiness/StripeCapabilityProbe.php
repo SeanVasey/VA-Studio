@@ -48,7 +48,8 @@ final class StripeCapabilityProbe
                 && ($this->fixtureTransport === null) !== app()->environment('testing')
                 && Stripe::$accountId === null && Stripe::$verifySslCerts === true && Stripe::$logger === null);
             foreach (DB::getConnections() as $connection) {
-                self::require($connection->transactionLevel() === 0);
+                // Framework depth and the raw PDO both: a caller's own beginTransaction() is invisible to the first.
+                self::require($connection->transactionLevel() === 0 && ! $connection->getPdo()->inTransaction());
             }
             $client = new StripeClient(['api_key' => $secret, 'api_base' => BaseStripeClient::DEFAULT_API_BASE,
                 'stripe_version' => ExecutionContextV1::API_VERSION, 'stripe_account' => null, 'stripe_context' => null,

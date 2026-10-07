@@ -68,6 +68,11 @@ sha256sum <BACKUP_DIR>/database.sql > <BACKUP_DIR>/database.sql.sha256
 # 2. Private files with a manifest taken in the same maintenance window as step 1.
 #    Workers that write private files must be paused (or the snapshot taken at the storage
 #    layer) so the database and file manifests describe the same moment.
+#    The manifest lists regular files only, so refuse any entry it would not cover (symlinks,
+#    hard links, devices, sockets): tar would archive and restore them unverified, and a
+#    symlink can point outside the restored root.
+(cd <PRIVATE_ROOT> && ! find . \( ! -type f ! -type d \) -o \( -type f -links +1 \) | grep -q .) \
+  || { echo 'unmanifested entry in <PRIVATE_ROOT>'; exit 1; }
 (cd <PRIVATE_ROOT> && find . -type f -print0 | sort -z | xargs -0 sha256sum) > <BACKUP_DIR>/private.sha256
 tar --create --file=<BACKUP_DIR>/private.tar --directory=<PRIVATE_ROOT> --numeric-owner .
 sha256sum <BACKUP_DIR>/private.tar > <BACKUP_DIR>/private.tar.sha256
@@ -79,8 +84,10 @@ sed 's/`<DATABASE>`/`<RESTORE_DATABASE>`/g' <BACKUP_DIR>/database.sql \
 mkdir -m 700 <RESTORE_PRIVATE_ROOT>
 tar --extract --file=<BACKUP_DIR>/private.tar --directory=<RESTORE_PRIVATE_ROOT> --no-same-owner
 
-# 4. Verify.
+# 4. Verify. The restored tree must hold exactly the manifest's files and nothing else.
 (cd <RESTORE_PRIVATE_ROOT> && sha256sum --check --strict <BACKUP_DIR>/private.sha256)
+diff <(cd <RESTORE_PRIVATE_ROOT> && find . ! -type d | LC_ALL=C sort) \
+     <(cut -c67- <BACKUP_DIR>/private.sha256 | LC_ALL=C sort)
 mysqldump --defaults-extra-file=<RESTORE_OPTION_FILE> --single-transaction --quick \
   --routines --triggers --events --hex-blob --no-tablespaces --set-gtid-purged=OFF \
   --skip-dump-date --databases <RESTORE_DATABASE> \

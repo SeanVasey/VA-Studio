@@ -23,7 +23,8 @@ It used no native MySQL: every PHP test ran on the SQLite default from `phpunit.
 | `01a2590d` | 5: staged activation packet (prepared, not executed) |
 | `a2b56002` | 6: this receipt (first version) |
 | `3d615162` | Review R-1 and R-2 fixes (probe class guard; funds mode bound to `APP_ENV`) |
-| the commit after `3d615162` | Review R-6: this README, the packet's plan path and R-3 note, the queue row, and `independent-review/DECISION.md` |
+| `e8d84306` | Review R-6: this README, the packet's plan path and R-3 note, the queue row, and `independent-review/DECISION.md` |
+| the commit after `e8d84306` | Codex P2 ×2 on PR #46: raw-PDO transaction guard in the preflight and probe (with regression test); documented MySQL backup refuses unmanifested entries and verifies the exact restored tree |
 
 The first tested source was `01a2590d29ea27ebe5bb10df78c1ef5bb5f0ece6`, and the reviewer
 assessed exactly that. The review follow-up was tested at
@@ -196,6 +197,43 @@ them.
    Billing259 has no source. Activating any of them is a reviewed code change, not a
    variable.
 
+## Codex follow-up on PR #46 (2026-10-07)
+
+Codex (non-gating, P0 threshold) posted two P2 findings on `e8d84306`. Both traced to real
+paths and were fixed in the next commit.
+
+**P2, `StripeCapabilityPreflight.php:190` (and `StripeCapabilityProbe::observe()`).** A
+transaction begun on the raw PDO (`$connection->getPdo()->beginTransaction()`) leaves
+Laravel's `transactionLevel()` at zero, so the `open_database_transaction` refusal and the
+probe's own guard both admitted a probe inside an open transaction. Both now also require
+`! $connection->getPdo()->inTransaction()`, the same pair `CommandTransaction` and
+`ProductionPaidOrderLocatorV1` check. The regression is appended to
+`test_testing_environment_refuses_the_real_transport_and_open_transactions`: a raw PDO
+transaction with `transactionLevel() === 0` must make `collect()` report
+`open_database_transaction` and `observe()` throw without the secret in its message, with no
+fixture call.
+
+| Run | Source | Tests | Assertions | Failures |
+| --- | --- | ---: | ---: | ---: |
+| Red: that test with the guard change stashed (`app/` at `e8d84306`) | `e8d84306` | 1 | 10 | 1 (`null` instead of `open_database_transaction`) |
+| Green: the full file | fixed | 37 | 322 | 0 |
+
+Pint `--test` passes on the three changed PHP files; `git diff --check` is clean.
+
+**P2, `docs/ops/backup-restore-proof.md` step 2.** `find . -type f` omitted symlinks from
+`private.sha256` while `tar` still archived and restored them, so `sha256sum --check` could
+accept a restored tree holding an unverified symlink (possibly pointing outside the root).
+The documented procedure now refuses any entry the manifest would not cover (symlinks,
+hard links, special files) before the backup, and step 4 diffs the restored tree's
+non-directory entries against the manifest's names so an extra restored entry fails. The
+fragments were rehearsed on a synthetic tree: clean tree accepted; a planted symlink and a
+hard link each refused; a planted symlink in the restored tree detected by the diff. The
+PHP proof script already refused symlinks, hard links and special files (its tests cover a
+planted symlink); only the MySQL procedure text changed. The procedure is still documented,
+not executed.
+
+Under the review's condition 3, the preflight and probe change needs re-review.
+
 ## Still unknown or untested
 
 - Any real Stripe account's capabilities. The probe has only run against a synthetic
@@ -212,7 +250,8 @@ them.
 
 ## Next dependency
 
-1. Re-review the R-1 and R-2 delta (`a2b56002..3d615162`).
+1. Re-review the R-1 and R-2 delta (`a2b56002..3d615162`) — done, see the DECISION.md
+   addendum — and the Codex transaction-guard delta after `e8d84306`.
 2. Root composition then decides whether to ship this with A4 or after A3 (Tax255).
 3. Sean decides between S2a and S2b.
 

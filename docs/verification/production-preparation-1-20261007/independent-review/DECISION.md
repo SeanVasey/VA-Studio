@@ -236,3 +236,80 @@ e9c8878cc59a7cb7990d0ba626e9bd7af84f5a159f408fcc110190c60304991a  review-evidenc
 ```
 
 `StripePreflight.php` and `StripeCapabilityPreflight.php`, re-hashed from `git cat-file -p 01a2590d:<path>`, match the hashes above.
+
+---
+
+## Addendum: narrow re-review of `3d615162` (docs head `e8d84306`), 2026-10-07
+
+**Result: APPROVE WITH CONDITIONS carries to `3d6151624c063c98075eef3414114ee7afe06c5f`, and to the docs-only head `e8d84306642a40177df100a67caed3c66b31a521`.** R-1 and R-2 are resolved. Conditions 1 (scope: no activation) and 3 (re-review if these files change again) still apply.
+
+### Scope of the change
+
+- `git diff --stat a2b56002..3d615162` shows exactly three files: `StripeCapabilityProbe.php` (+11/−3), `StripeCapabilityPreflight.php` (+5/−2) and `tests/Feature/StripeCapabilityPreflightTest.php` (+47).
+- `git diff 01a2590d..3d615162` also includes the receipt README, but only because `a2b56002` (docs) lies between the two.
+- `git diff --stat 3d615162..e8d84306` is documentation only: the queue row, the packet's plan path and R-3 note, the lane README, and `independent-review/DECISION.md`. That copy is byte-identical to the original decision (SHA-256 `78606749…9216` for both).
+
+### R-1: resolved
+
+- The guard is now `($this->fixtureTransport === null) !== app()->environment('testing')` (`StripeCapabilityProbe.php`). It is an exact XOR: a fixture only in `testing`, and in `testing` only a fixture.
+- The optional `?Closure $realTransport` builder (default: the same `CurlClient` with a 3 s connect and 10 s total timeout) is invoked only after every precondition. Its result must be a `ClientInterface`.
+- The container autowires `null` for the builder, because a non-instantiable `Closure` with a default falls back to that default. The lane tests resolve the probe through `app()`. Nothing in `app/`, `bootstrap/` or `config/` binds `Closure::class`.
+
+**Reviewer throwaway test** `review-evidence/ReviewerProbeBuilderAddendumTest.php.txt` (12 tests, 75 assertions, all passing, since deleted). With a counting builder bound, the builder count stayed 0 and `ApiRequestor::httpClient()` was unchanged in every case:
+
+- through Artisan: no confirmation; `provider_io_enabled` set to `'true'` or `1`; no key; `sk_live_` in test mode; `rk_test_`; a bad origin; a fully valid configuration in `testing` without a fixture;
+- inside `DB::transaction`;
+- direct `observe()` in `testing`, for both test and live modes. The exception had no previous exception and no secret marker.
+
+Under a simulated `production` environment, the builder is likewise not invoked for:
+
+- test funds (refused by R-2 as `configuration_shape_invalid`);
+- a non-null `Stripe::$logger` (precondition failure);
+- a fixture outside `testing`.
+
+With every gate satisfied, it is invoked exactly once, `evidence_origin` is `provider_observed`, and the previous HTTP client is restored. The original 23-case adversarial test also re-passed at `3d615162` (23 tests, 143 assertions).
+
+**Mutation check.** Restoring the old guard makes `test_direct_observe_in_testing_never_builds` and the lane's `test_probe_class_itself_never_builds_the_real_transport_in_testing` fail. Reverted.
+
+### R-2: resolved, and it matches checkout exactly
+
+- **Same expression.** The preflight uses `$modeValid && ($mode !== 'test' || app()->environment(['local', 'testing']))`. That is the same predicate as `ExecutionContextV1.php:59` (`$mode !== 'test' || app()->environment(['local', 'testing'])`), plus the mode-shape conjunct.
+- **Gates the probe.** It feeds `configuration_shape_valid`, so it also blocks the probe.
+- **Environment matrix.** My test covered local, testing, staging, production and development, each with test and live funds: `funds_mode_environment` and `configuration_shape_valid` equal the checkout rule in all 10 cases.
+- **Mutation check.** Removing the environment conjunct fails two of my tests and two lane data sets (test funds on production and on staging). Reverted.
+- **Live outside production.** I agree with not adopting "live only in production". The preflight now mirrors checkout, which admits live funds in `testing` (`ProductionCheckoutProviderTest`). The remaining operational risk is a live key used for a read-only probe from a non-production host. That is a procedural matter for the activation packet, not a code defect.
+
+### Commands (worktree at `e8d84306`; `$P` as above)
+
+| Command | Result |
+| --- | --- |
+| `git fetch origin harness/production-preparation-1`; `git checkout --detach e8d84306` | HEAD `e8d84306` |
+| `$P tests/Feature/StripeCapabilityPreflightTest.php` | passed, 37 tests / 318 assertions |
+| `$P tests/Feature/ReviewerProbeGatingAdversarialTest.php` (original throwaway) | passed, 23 / 143 |
+| `$P tests/Feature/ReviewerProbeBuilderAddendumTest.php` (new throwaway) | passed, 12 / 75 |
+| R-1 guard reverted (temporary) | 1 reviewer test and 1 lane test fail; restored |
+| R-2 conjunct removed (temporary) | 2 reviewer tests and 2 lane data sets fail; restored |
+| `php artisan vasey:stripe-preflight --json` (local `.env`) | blocked 6 / absent 2 / pass 5 / not_requested 1, `pins_valid: true`, `provider_io_performed: false`; `funds_mode_environment` blocked (no mode set) |
+| `git status --short` (final) | only `?? review-evidence/` |
+
+### What remains before any real probe (`--probe --i-understand-this-calls-stripe` against Stripe)
+
+1. Sean's explicit written authorization, naming the stage (S2a or S3), the Stripe account, the key mode and the exact 40-character SHA.
+2. For S2a (test mode): a dedicated `APP_ENV=local` machine with no customer data. Since R-2, test funds are refused anywhere else.
+3. For live mode: the S3 prerequisites in the packet, or a separately authorized read-only live probe. Prefer running it from the production host, given the residual risk above.
+4. Keys stay in the host secret store. Set `PRODUCTION_CHECKOUT_PROVIDER_IO_ENABLED=true` only for the probe window and turn it off afterwards (R-3). Until checkout is composed it has no other effect.
+5. Keep the probe JSON as evidence. Only `evidence_origin: provider_observed` counts as observation; fixture results never do.
+6. Still accepted and open: R-4. Fix the dump-header noise in the MySQL `diff` before executing that procedure, which is separate from the probe. R-5 and R-7 are Info.
+
+### SHA-256 (at `e8d84306`)
+
+```
+54eb7833eee32119d20dbc0ca823e770f52d57a69de191b9c5deb76a3add8e83  app/Domain/Commerce/Readiness/StripeCapabilityProbe.php
+5df786d2749e76f6d55257e142bdaa443025239aa853f9a4dcafd2fd40090549  app/Domain/Commerce/Readiness/StripeCapabilityPreflight.php
+50f4beb2344b8e876d8398fee2867786357465409a3f5681d592208fec5a9f9d  tests/Feature/StripeCapabilityPreflightTest.php
+01a979c1417563f0ca15c235faca6622c143631a11bd251ee972925b1f34c47b  docs/ops/production-activation-packet.md
+0d5628326c3b4022d3e6d987c10d4ea0a9a986f29a5823d2d14c1d247116fba6  docs/verification/production-preparation-1-20261007/README.md
+e2f17573fed420d9db009126dddb6afce40a3f50bc3f8cd0ce02bc9539ca51e7  docs/live-payment-and-production-preparation-queue.md
+78606749d1e6941a6d844a695d53f6f1c2b704a1c4905c064be008701bed9216  docs/verification/production-preparation-1-20261007/independent-review/DECISION.md (original decision, pre-addendum)
+d12ccee5c25cf9c407428b0f441e856872218d4a4b15b7d71a3e040636e66610  review-evidence/ReviewerProbeBuilderAddendumTest.php.txt
+```

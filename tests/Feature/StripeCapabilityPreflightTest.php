@@ -263,6 +263,24 @@ class StripeCapabilityPreflightTest extends TestCase
         }
         $this->assertSame('open_database_transaction', $report['probe']['reason']);
         $this->assertSame([], $fixture->calls);
+
+        // A transaction opened on the raw PDO is invisible to transactionLevel(); it must still refuse.
+        $pdo = DB::connection()->getPdo();
+        $pdo->beginTransaction();
+        try {
+            $this->assertSame(0, DB::connection()->transactionLevel());
+            $report = app(StripeCapabilityPreflight::class)->collect(true, true);
+            $this->assertSame('open_database_transaction', $report['probe']['reason']);
+            try {
+                app(StripeCapabilityProbe::class)->observe('test', self::ACCOUNT, self::SECRET);
+                $this->fail('observe() ran inside a raw PDO transaction');
+            } catch (RuntimeException $error) {
+                $this->assertStringNotContainsString(self::SECRET, $error->getMessage());
+            }
+        } finally {
+            $pdo->rollBack();
+        }
+        $this->assertSame([], $fixture->calls);
     }
 
     public function test_confirmed_probe_reads_only_own_account_and_capabilities_with_pinned_headers(): void

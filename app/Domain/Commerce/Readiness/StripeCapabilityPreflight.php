@@ -186,7 +186,8 @@ final class StripeCapabilityPreflight
     private function openTransaction(): bool
     {
         foreach (DB::getConnections() as $connection) {
-            if ($connection->transactionLevel() !== 0) {
+            // A transaction begun on the raw PDO leaves the framework depth at zero, so ask both.
+            if ($connection->transactionLevel() !== 0 || $connection->getPdo()->inTransaction()) {
                 return true;
             }
         }
