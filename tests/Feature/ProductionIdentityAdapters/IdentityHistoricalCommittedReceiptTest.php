@@ -220,6 +220,103 @@ final class IdentityHistoricalCommittedReceiptTest extends TestCase
         }
     }
 
+    public static function interruptedOriginalCommits(): array
+    {
+        return [['rollback'], ['nested']];
+    }
+
+    #[DataProvider('interruptedOriginalCommits')]
+    public function test_rollback_or_nested_event_cannot_be_observed_as_original_positive_commit(string $mode): void
+    {
+        $owner = $this->enrollThroughLocalSmtp();
+        $calls = 0;
+        $this->app['events']->listen(TransactionCommitting::class, function () use ($mode, &$calls): void {
+            if (++$calls === 1) {
+                if ($mode === 'rollback') {
+                    DB::rollBack();
+                } else {
+                    DB::beginTransaction();
+                    DB::commit();
+                }
+            }
+        });
+        try {
+            $this->capture($owner['binding']);
+            $this->fail('An interrupted original commit cannot return identity closure authority.');
+        } catch (IdentityException) {
+            $this->addToAssertionCount(1);
+        } finally {
+            while (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
+        }
+        $this->assertNotNull($this->frame);
+        foreach ([0, 1] as $index) {
+            try {
+                $this->frame->receipt($index)->proveClosed();
+                $this->fail('An interrupted sibling cannot be renewed after cleanup.');
+            } catch (IdentityException) {
+                $this->addToAssertionCount(1);
+            }
+        }
+    }
+
+    public function test_foreign_sibling_seal_is_refused_after_real_original_commit(): void
+    {
+        $owner = $this->enrollThroughLocalSmtp();
+        try {
+            $this->capture($owner['binding'], null, true);
+            $this->fail('An opaque seal is bound to its own original receipt, not its sibling.');
+        } catch (IdentityException) {
+            $this->assertSame(0, DB::transactionLevel());
+            $this->assertFalse(DB::connection()->getPdo()->inTransaction());
+        }
+    }
+
+    public function test_application_pdo_override_is_refused_before_any_statement_callback(): void
+    {
+        $owner = $this->enrollThroughLocalSmtp();
+        $foreign = new HistoricalApplicationPdo('sqlite::memory:');
+        HistoricalApplicationPdo::$calls = 0;
+        try {
+            DB::transaction(fn () => IdentityOriginalCommitWitness::capture(new CurrentRows($foreign, 'sqlite'), hrtime(true) + 30_000_000_000));
+            $this->fail('Application PDO overrides are not fixed raw historical reads.');
+        } catch (IdentityException) {
+            $this->assertSame(0, HistoricalApplicationPdo::$calls);
+            $this->assertSame(1, DB::table('production_identity_origins')->where('public_id', $owner['binding']['origin_id'])->count());
+        }
+    }
+
+    public function test_native_plain_closed_prefix_does_not_wait_for_or_acquire_mutable_identity_row_locks(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Plain original identity closure without locking requires native MySQL.');
+        }
+        $owner = $this->enrollThroughLocalSmtp();
+        $frame = $this->capture($owner['binding']);
+        $primary = DB::connection()->getPdo();
+        $settings = DB::connection()->getConfig();
+        $external = new PDO('mysql:host='.$settings['host'].';port='.$settings['port'].';dbname='.$settings['database'].';charset=utf8mb4',
+            $settings['username'], $settings['password'], [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        $previousTimeout = (int) $primary->query('SELECT @@SESSION.innodb_lock_wait_timeout')->fetchColumn();
+        try {
+            $primary->exec('SET SESSION innodb_lock_wait_timeout=1');
+            $external->beginTransaction();
+            $statement = $external->prepare('UPDATE users SET name=? WHERE id=?');
+            $statement->execute(['Uncommitted synthetic declared name', $owner['user']->id]);
+            // A FOR UPDATE identity read would now wait and fail. Plain permanent SELECT must succeed.
+            $frame->receipt(0)->proveClosed();
+            $this->assertTrue($external->inTransaction());
+            $this->assertFalse($primary->inTransaction());
+            $this->assertSame(0, DB::transactionLevel());
+        } finally {
+            if ($external->inTransaction()) {
+                $external->rollBack();
+            }
+            $primary->exec('SET SESSION innodb_lock_wait_timeout='.$previousTimeout);
+        }
+    }
+
     public function test_plain_reader_has_no_write_api_and_refuses_unbounded_or_foreign_sql(): void
     {
         $owner = $this->enrollThroughLocalSmtp();
@@ -237,16 +334,28 @@ final class IdentityHistoricalCommittedReceiptTest extends TestCase
         }
     }
 
-    private function capture(array $binding, ?\Closure $mutation = null): IdentityHistoricalCommitFixture
+    private function capture(array $binding, ?\Closure $mutation = null, bool $swapSiblingSeals = false): IdentityHistoricalCommitFixture
     {
-        return DB::transaction(function () use ($binding, $mutation): IdentityHistoricalCommitFixture {
+        return DB::transaction(function () use ($binding, $mutation, $swapSiblingSeals): IdentityHistoricalCommitFixture {
             $reader = new CurrentRows(DB::connection()->getPdo(), DB::getDriverName());
             $expected = (new ProductionCustomerAccess)->verifyHistoricalBinding($binding, $reader);
             $mutation?->__invoke();
-            $this->frame = IdentityHistoricalCommitFixture::capture($binding, $reader, $expected, hrtime(true) + 180_000_000_000);
+            $this->frame = IdentityHistoricalCommitFixture::capture($binding, $reader, $expected, hrtime(true) + 300_000_000_000, 2, $swapSiblingSeals);
 
             return $this->frame;
         });
+    }
+}
+
+final class HistoricalApplicationPdo extends PDO
+{
+    public static int $calls = 0;
+
+    public function prepare(string $query, array $options = []): PDOStatement|false
+    {
+        self::$calls++;
+
+        return parent::prepare($query, $options);
     }
 }
 

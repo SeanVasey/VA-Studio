@@ -28,18 +28,18 @@ final class IdentityHistoricalCommitFixture extends Dispatcher
     private string $anchor;
 
     private function __construct(private readonly Connection $connection, private readonly DispatcherContract $delegate,
-        private readonly IdentityOriginalCommitWitness $witness)
+        private readonly IdentityOriginalCommitWitness $witness, private readonly bool $swapSiblingSeals)
     {
         parent::__construct();
         $this->anchor = 'identity_producer_fixture_'.bin2hex(random_bytes(16));
         $connection->getRawPdo()->exec('SAVEPOINT '.$this->anchor);
     }
 
-    public static function capture(array $binding, CurrentRows $reader, array $expected, int $deadline, int $count = 2): self
+    public static function capture(array $binding, CurrentRows $reader, array $expected, int $deadline, int $count = 2, bool $swapSiblingSeals = false): self
     {
         $connection = DB::connection();
         $witness = IdentityOriginalCommitWitness::capture($reader, $deadline);
-        $frame = new self($connection, $connection->getEventDispatcher(), $witness);
+        $frame = new self($connection, $connection->getEventDispatcher(), $witness, $swapSiblingSeals);
         for ($index = 0; $index < $count; $index++) {
             $frame->receipts[] = IdentityHistoricalCommittedReceipt::capture($binding, $reader, $expected, $deadline, $witness);
         }
@@ -87,7 +87,7 @@ final class IdentityHistoricalCommitFixture extends Dispatcher
                 }
                 $this->witness->observeOriginalPositiveCommit();
                 foreach ($this->receipts as $index => $receipt) {
-                    $receipt->observeOriginalCommitted($this->seals[$index]);
+                    $receipt->observeOriginalCommitted($this->seals[$this->swapSiblingSeals ? 1 - $index : $index]);
                 }
                 $this->phase = 'committed';
             }
