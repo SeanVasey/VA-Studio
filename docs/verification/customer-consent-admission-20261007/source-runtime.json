@@ -1,0 +1,22 @@
+{
+  "source": "fa06b77aeae756949888fa968de42a90b0ff124b",
+  "tree": "735cfdb7950995c03b483949f78b24ee88af7719",
+  "base_executable": "0143f4b6bb7c529aed003fdfc741bf93f2e3a9ed",
+  "runtime": "PHP 8.4.26; SQLite in-memory; Node 24.19.0; locked dependencies and synthetic test key only",
+  "native_author_execution": false,
+  "source_blobs": {
+    "app/Domain/Customers/Preferences/ConsentEvidence.php": "bfd36e625dfe0a422dab48d5b02efb3a2de2853e",
+    "app/Domain/Customers/Preferences/ConsentMigrationAdmission.php": "12a0d2ee252b233ebcc0919aefd5c25607a196cd",
+    "app/Domain/Customers/Preferences/CustomerConsentPreferences.php": "495b4782e7f951321f93eb0c20a2fd8d01da5cd2",
+    "database/migrations/2026_10_07_250000_customer_consent.php": "2d2f75ab7d3c5b0bf4867666571a1097a63546f1",
+    "tests/Feature/CustomerConsentAdmissionTest.php": "0d33d43e3ef6302206c8c3db0b47ed8549597255"
+  },
+  "source_sha256": {
+    "app/Domain/Customers/Preferences/ConsentEvidence.php": "af03ae8feab2a85cf592fe9414b9425389a60286553080288b9bc115b223b96a",
+    "app/Domain/Customers/Preferences/ConsentMigrationAdmission.php": "d5d6c464c2d28e32ef65f1d801aa98eaa59f28b45658af19a753ebf46a0f6f03",
+    "app/Domain/Customers/Preferences/CustomerConsentPreferences.php": "faef7e43aa94b2c10c50fbede77fed90d0208a31e354f26214bc5a2a22b44716",
+    "database/migrations/2026_10_07_250000_customer_consent.php": "9de1cc2783fd73eacdd84eea80445b8d573d53b0e73d4a0bae8cbd2a5e73ae12",
+    "tests/Feature/CustomerConsentAdmissionTest.php": "11d3e542e64e74e4c0558c76f24333b7b925df2c52d495d8f2f36a4ba7413c05"
+  },
+  "unchanged_frontend_blob": "c3f449c633e85f56a2f3560a4e46e42bbe2d8b97"
+}

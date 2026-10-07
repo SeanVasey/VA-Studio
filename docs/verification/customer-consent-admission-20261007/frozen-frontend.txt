@@ -1,0 +1,12 @@
+
+> test
+> vitest run tests/frontend/customer-communication-preferences.test.tsx
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-customer-consent
+
+
+ Test Files  1 passed (1)
+      Tests  27 passed (27)
+   Start at  08:41:58
+   Duration  2.45s (tests 51%, environment 35%, setup 8%, transform 5%, import 1%)
