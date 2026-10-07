@@ -465,3 +465,85 @@ a9af2b53ae75e0b4c450d897f35520d19249270650c7cb594b6bb7fc1c938247  independent-re
 27954a6988c9315d05eb666c5501f6fa9b03204e21f63c44f4f9d4ba230e7ca9  review-evidence/ReviewerCapabilitiesHashAddendumTest.php.txt (VA-Studio-review-prep)
 e6e062128306a50d2f55bbe8297be56e6d36360035375c11d2953b7544ddd983  review-evidence/backup-doc-rehearsal-83a891bc.sh.txt (VA-Studio-review-prep)
 ```
+
+---
+
+## Addendum 4: condition-3 re-review of `9b6b48be` (2026-10-07)
+
+**Result: APPROVE WITH CONDITIONS carries to `9b6b48be62a99e3fc9785356956b54ec2c488866`.** Conditions 1 and 3 still apply.
+
+- **N-1 and N-2: CLOSED.**
+- **B-1 and B-2: CLOSED.** The step-3 checksums now use `|| exit 1`, and the root-only `.gitignore` is exempt.
+- **R-4: closed by the procedure change.** The restore now goes to an isolated server under the same schema name, and both dumps use `--skip-comments`. This was not rehearsed, because there is no local MySQL.
+- **B-3: new, Low, documentation only.** Details below.
+
+### Delta `83a891bc..9b6b48be`, code and tests
+
+- **Code.** Both guards keep `transactionLevel()` and now inspect `$connection->getRawPdo()` only when it is a `PDO`:
+  - `StripeCapabilityPreflight.php:193`;
+  - `StripeCapabilityProbe.php:55`.
+  The only other change is `use PDO;`. Nothing outside the two guards changed.
+- **New lane test:** `test_guard_never_opens_an_unopened_connection`.
+- **Frontend test.** `tests/frontend/customer-order-reference.test.tsx` (`c49c3b3b`) is test-only: `findByRole(...).toHaveFocus()` becomes `waitFor(() => expect(getByRole(...)).toHaveFocus())`. It still asserts focus, so it is not weakened. It is outside this review's scope and was not run.
+
+### Red before, green after
+
+| Source | Result |
+| --- | --- |
+| `9b6b48be` (all 42 tests) | pass, 342 assertions |
+| `9b6b48be`, the raw-PDO transaction test and the new test only | pass, 2 tests, 18 assertions |
+| Both guards at `83a891bc` | 41/42; the new test errors with `SQLSTATE[HY000] [2002] Connection refused` (loopback port 1, no external network) |
+| Preflight guard only reverted | the new test errors with the same connection refusal |
+| Probe guard only reverted | the new test fails: exit/status is not `[0, 'pass']` |
+
+Each guard is therefore covered independently. The raw-PDO transaction case from `f4c55acf` still refuses, both through `collect()` and through direct `observe()`.
+
+### Evidence that N-1 and N-2 are closed
+
+My Addendum 2 throwaway, `ReviewerPdoProbeAddendumTest`, re-run at `9b6b48be`:
+
+- **Lazy connection:** it stays a resolver closure after a probe (it was a `PDO` before).
+- **Unreachable resolved connection:** `collect()` no longer throws; the probe passes.
+- **Disconnected connection:** `collect()` no longer throws `inTransaction() on null`; the probe passes.
+
+The two "failures" in that throwaway are its own observational assertions of zero fixture calls. They now fail because the probe correctly proceeds; they are not regressions.
+
+The other throwaways also re-pass at `9b6b48be`:
+
+- builder test: 12/12;
+- capabilities-hash test: 18/18;
+- gating test: 22/23. The single failure is the known two-request count from before `83a891bc`.
+
+### Rehearsal of the backup procedure
+
+I rehearsed the procedure's private-file fragments in bash on synthetic trees (`review-evidence/backup-doc-rehearsal-9b6b48be.sh.txt`).
+
+**Works as documented:**
+
+- A clean tree passes, including a 0400 sealed original and the root `.gitignore` at 0644.
+- A deeper `.gitignore` at 0644 is refused.
+- A tampered `private.tar` now stops step 3 with exit 1 before extraction (B-1 closed).
+- An empty store passes, using the name diff only.
+
+**B-3 (Low, documented procedure only).** The step-4 private-file name check, `diff <(cd <RESTORE_PRIVATE_ROOT> && find …) <(cut -c67- …)` (`backup-restore-proof.md:102`), still has no `|| exit 1`. Rehearsal:
+
+- an extra unlisted 0600 file in the restore printed `< ./extra.bin`, but the block continued to completion with exit 0;
+- a planted symlink did the same.
+
+The mode check covers only `-type f` and `-type d`, and the checksum check doesn't detect extra entries, so this diff is the only detector for unlisted entries. Add `|| exit 1`, as was done for the dump diff.
+
+**Info:**
+
+- If the step-2 refusal fires after `php artisan down`, the application stays down until an operator intervenes. That fails safe, but say so.
+- The MySQL lines (`--skip-comments`, an isolated-server restore without a rename, the dump `diff … || exit 1`) were reviewed by reading only.
+
+### SHA-256 (at `9b6b48be`)
+
+```
+3ce4bf85455f83123408b6bee1e79d1af4ae9f86d01c7ef11068c27607e8ae0f  app/Domain/Commerce/Readiness/StripeCapabilityPreflight.php
+66b41bc43daf8fb93a76f3bfea5d925d0225d6e3840380904fcb75ef6db49cf5  app/Domain/Commerce/Readiness/StripeCapabilityProbe.php
+f594d3d5ec4ace820cdcd03d80670f1c82fea17bd620a39a92e51db30e19b387  tests/Feature/StripeCapabilityPreflightTest.php
+033fb89337930fc049bc9cb1b74d656d0cb9b4f04ff33e8465a04645bbe74903  docs/ops/backup-restore-proof.md
+7262a4d48525a02ff119c4490c40633b3aa5c2a684df92c0fb1bb2ea55082745  independent-review/DECISION.md as committed at 9b6b48be (before this addendum)
+72df619802841c22e700aa5390aace4462932d7fad3e46c5ef7f016d5bde85a0  review-evidence/backup-doc-rehearsal-9b6b48be.sh.txt (VA-Studio-review-prep)
+```

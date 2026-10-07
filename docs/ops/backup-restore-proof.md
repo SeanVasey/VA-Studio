@@ -79,6 +79,8 @@ sha256sum <BACKUP_DIR>/database.sql > <BACKUP_DIR>/database.sql.sha256
 #    The manifest lists regular files only, so refuse any entry it would not cover (symlinks,
 #    hard links, devices, sockets): tar would archive and restore them unverified, and a
 #    symlink can point outside the restored root.
+#    If this refusal fires the application stays down (fail safe): investigate the entry,
+#    then run `php artisan up` by hand before resuming service.
 (cd <PRIVATE_ROOT> && ! find . \( ! -type f ! -type d \) -o \( -type f -links +1 \) | grep -q .) \
   || { echo 'unmanifested entry in <PRIVATE_ROOT>'; exit 1; }
 (cd <PRIVATE_ROOT> && find . -type f -print0 | sort -z | xargs -0 -r sha256sum) > <BACKUP_DIR>/private.sha256   # -r: an empty tree gives an empty manifest, not a hash of stdin
@@ -100,7 +102,7 @@ if [ -s <BACKUP_DIR>/private.sha256 ]; then
   (cd <RESTORE_PRIVATE_ROOT> && sha256sum --check --strict <BACKUP_DIR>/private.sha256) || exit 1
 fi
 diff <(cd <RESTORE_PRIVATE_ROOT> && find . ! -type d | LC_ALL=C sort) \
-     <(cut -c67- <BACKUP_DIR>/private.sha256 | LC_ALL=C sort)
+     <(cut -c67- <BACKUP_DIR>/private.sha256 | LC_ALL=C sort) || exit 1
 #    Hashes and names say nothing about modes: masters and contracts must stay owner-only.
 #    Owner-only means 0600, or 0400 for sealed originals (issued contracts, immutable media
 #    revisions and sound-kit originals are written as 0400). The tracked root

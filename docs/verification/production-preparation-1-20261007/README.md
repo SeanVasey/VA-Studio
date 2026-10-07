@@ -300,6 +300,13 @@ mismatch instead of letting the following `CHECKSUM TABLE` mask it.
 | --- | ---: | ---: | ---: |
 | `StripeCapabilityPreflightTest` after the guard change | 42 | 342 | 0 |
 
+Addendum 4 (re-review of `9b6b48be`) carries APPROVE WITH CONDITIONS and closes N-1, N-2,
+B-1 and B-2 (reviewer re-ran the doc fragments: tampered tar stops step 3; 0400 and the root
+`.gitignore` pass; a deeper `.gitignore` is refused; empty store passes); each guard is
+covered on its own (reverting either makes the new test fail). New B-3 (Low, docs): the
+step 4 name `diff` lacked `|| exit 1`, fixed in the next docs commit together with the
+reviewer's note that a step 2 refusal leaves the application down until `php artisan up`.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex
