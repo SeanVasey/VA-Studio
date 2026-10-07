@@ -225,3 +225,42 @@ type/size/retention/terms, production identity provenance, transport/session/MFA
 acceptance and host ClamAV/storage/worker evidence. No full hosted matrix, push,
 merge, configured production write, network scanner or real customer file occurs
 in this author lane.
+
+## Frozen handoff and exact checks
+
+Final executable author composition:
+`dd18d343d3cedd11fd1ca598362e602ccea05cd9`, tree
+`6a264f6bdd0b2c9236a4a7a18c5488d46aab3493`. Root selectively composes owned
+`1914aa415ec1d1db04085bb062ef6eec92250feb`,
+`5a402b14de86311892af07db3d7bdf7853b6078e`, then `dd18d343...`, with the
+service owner's exact `c7bc8946...` correction. The local integration merges
+are not a request to merge old branch trees. `source-map-final.json` binds249
+owned/dependency paths by Git blob and SHA-256; `receipt-map.json` hashes every
+retained artifact and identifies the actual source of each frozen selection.
+
+- Exact final source: selected SQLite62 tests /568 assertions; native3 /96
+  (inquiry terminal panel withdrawal, real quarantine→scan→exact stream, session
+  rotation and production CSRF); zero errors, failures or skips. Pint passes.
+- `5a402...`: selected SQLite56/536 and native16/97, including strict schema
+  restart/prefix/drift/retention and real two-process native last-file contention.
+  The b209 resolver probes are deliberately red SQLite/native2/6, zero errors.
+- `2841ddd...` with c7: selected SQLite61/562 and all native service consumers8/56;
+  original resolver probes green SQLite/native2/10. Service inputs are unchanged
+  in the final source; mapped changes are only the inquiry adapter and its test.
+- Frontend17 and typecheck pass on the unchanged frontend/browser source inputs.
+  Failed test-selection and browser fixture-mode setup receipts are retained.
+
+Commands source `/workspace/.va-studio-toolchain/activate.sh`; native commands
+also privately source the existing dedicated `support_attachments-task.env` and
+set `ATTACHMENT_NATIVE_ISOLATED=1`. No environment values are printed or committed.
+The SQLite selection is `php vendor/bin/phpunit` with
+`SupportAttachmentsTest`, `SupportAttachmentSchemaTest`,
+`SupportAttachmentHttpTest`, `ServiceSupportAttachmentsTest`, and
+`ServiceProjectAttachmentAuthorityTest`. Final native selection runs the first
+and third files with filter
+`terminal_inquiry_panel|real_private_routes|session_rotation_denies`; the separate
+native service selection runs the complete `ServiceSupportAttachmentsTest`.
+Frontend: `npm test -- tests/frontend/support-attachments.test.tsx`;
+`npm run typecheck`. Exact JUnit case names/counts and raw command outputs are
+retained beside the source maps. Historical development passes are not combined
+into a fictional final full-suite or hosted-matrix result.

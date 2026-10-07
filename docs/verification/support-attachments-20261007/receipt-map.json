@@ -1,0 +1,766 @@
+{
+  "heads": {
+    "own_pipeline": "1914aa415ec1d1db04085bb062ef6eec92250feb",
+    "owned_projection_cleanup": "5a402b14de86311892af07db3d7bdf7853b6078e",
+    "repaired_service_composition": "2841ddd846c66c5c23d077ae49bf5ef6b559639b",
+    "final_source": "dd18d343d3cedd11fd1ca598362e602ccea05cd9",
+    "independently_assessed_service_adapter": "c7bc89460ab10f2ea2317dd63909cc4499179d65"
+  },
+  "runtimes": {
+    "php": "8.4.26",
+    "node": "24.19.0",
+    "native_mysql": "8.0.46-0ubuntu0.24.04.4",
+    "native_isolation": "REPEATABLE-READ"
+  },
+  "final_source_tree": "6a264f6bdd0b2c9236a4a7a18c5488d46aab3493",
+  "carry_2841_to_final": {
+    "changed_mapped_paths": [
+      "app/Domain/SupportAttachments/InquiryAttachmentAuthority.php",
+      "tests/Feature/SupportAttachmentsTest.php"
+    ],
+    "service_consumer_carry": "All service consumer/adapter/runtime/fixture inputs are byte-identical; changed inquiry adapter is not loaded by the project source registry. Native8/56 may carry with this exact mapping.",
+    "native_5a_affected_carry": "DDL/files/rows/ledger/projection remain byte-identical; inquiry tail orders its framework policy evaluation before pure key/admission comparisons. Native fresh final inquiry probe verifies that successor; native visitor race remains the same branch and unchanged lock closure."
+  },
+  "limitations": [
+    "Independent root review and actual root route/config/page mounts pending",
+    "Browser definition not executed in isolated unregistered child; skip is not acceptance",
+    "No successful real ClamAV, host scanner/storage/worker, production attachment policy/terms/identity/session/transport acceptance",
+    "No inaccessible prior work recovered, no production writes/files/PII, no hosted matrix/push/merge/live effects"
+  ],
+  "receipts": [
+    {
+      "path": "domain-markers.txt",
+      "sha256": "cda7551d368ddce9c8659db93c13e17c8f093b47d07b724b72a753012225c029",
+      "bytes": 93
+    },
+    {
+      "path": "domain-markers.xml",
+      "sha256": "4dbac951266b03425e93d04b29f4ff38e9608dc2640ac55f7d13b747379ef107",
+      "bytes": 3167,
+      "junit": {
+        "tests": 9,
+        "assertions": 62,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "domain-reservation-final.txt",
+      "sha256": "9236b020280eccea029f4e91db4cf4dbbb727dc51595e4e9abf39a7855f79dc7",
+      "bytes": 93
+    },
+    {
+      "path": "domain-reservation-final.xml",
+      "sha256": "bed724472eb6b7e9a8b0857afb80f8bba530bbef6f835957b48a9b1d17603e38",
+      "bytes": 3167,
+      "junit": {
+        "tests": 9,
+        "assertions": 62,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "domain-reservation.txt",
+      "sha256": "d3dda12df663f32212518fa09a72b7b466af62217e535849e86b2ca4e84696e4",
+      "bytes": 93
+    },
+    {
+      "path": "domain-reservation.xml",
+      "sha256": "756c37dcc3bb4c251fa433243f824632502233f118c60c86e5a22a372ae59eb8",
+      "bytes": 3167,
+      "junit": {
+        "tests": 9,
+        "assertions": 62,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "domain-schema-current.txt",
+      "sha256": "d3cc1524466d1be1b064e40cb62b1b0e1feff8d72a888cb0dc59476921728815",
+      "bytes": 95
+    },
+    {
+      "path": "domain-schema-current.xml",
+      "sha256": "e11e7576c2e281989cf93d74f72e25c6dd3c3cae7ab97dc8b3acda0b89a43086",
+      "bytes": 4882,
+      "junit": {
+        "tests": 13,
+        "assertions": 74,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "domain-second.txt",
+      "sha256": "58e4d013bbc19e3ecc7d737fd7e1c9007d1a9ffdac3b3107bb5cf3c9c5781c6e",
+      "bytes": 93
+    },
+    {
+      "path": "domain-second.xml",
+      "sha256": "e28776fbf8827b17b350f7c2590aef61cdc1f8108cd02ec243e0c89bfbd468b7",
+      "bytes": 3167,
+      "junit": {
+        "tests": 9,
+        "assertions": 62,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "expanded-domain-schema.txt",
+      "sha256": "426ed8230dccf36e40925393a737a14064622b9a873659c98d0cfcf0305c8882",
+      "bytes": 96
+    },
+    {
+      "path": "expanded-domain-schema.xml",
+      "sha256": "646502932fb14d16777b30539e47f451ff8b6d6053ce194aac8069fbacc75cbd",
+      "bytes": 7468,
+      "junit": {
+        "tests": 21,
+        "assertions": 118,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "frontend-first.txt",
+      "sha256": "5379fef76ebf3bd78b70ba82d57b0b8a46a63e252aa1562ff3b5b4a467bcb752",
+      "bytes": 289
+    },
+    {
+      "path": "http-corrected.txt",
+      "sha256": "7752c57885a2a54a0ec53fb7d65f445f07fb7c05387fbc9b2e4c3d1d12db83d0",
+      "bytes": 94
+    },
+    {
+      "path": "http-corrected.xml",
+      "sha256": "ea7065ffe8f1f428f8286f68cdff27b8ddd2ae2733c116524a849f0306fbbafa",
+      "bytes": 2007,
+      "junit": {
+        "tests": 5,
+        "assertions": 253,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "http-first.txt",
+      "sha256": "a04a0f328c51102c5fee532f2711b7830f257f2bbc94723001eaf73ee6170750",
+      "bytes": 1212
+    },
+    {
+      "path": "http-first.xml",
+      "sha256": "272d97eaf188155b079d147f73486501c26ef12bbad15933b09f5bd2db49b7a0",
+      "bytes": 3281,
+      "junit": {
+        "tests": 5,
+        "assertions": 168,
+        "errors": 0,
+        "failures": 2,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "initial-domain.txt",
+      "sha256": "d38e7d90a7e0546b20bc368d338ea445cf68e8ab167d90d167699066f26f155b",
+      "bytes": 5254
+    },
+    {
+      "path": "initial-domain.xml",
+      "sha256": "c9a9a202df15b5490e526a436fa03dd4eac17d3a726906e7e82eb5d2bed5adec",
+      "bytes": 7695,
+      "junit": {
+        "tests": 9,
+        "assertions": 0,
+        "errors": 9,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "native-consumer-first.txt",
+      "sha256": "3dcca8f52a16e1b7388120048d86e46b643a07df3d28135b26bf6e84e65c3122",
+      "bytes": 1216
+    },
+    {
+      "path": "native-consumer-first.xml",
+      "sha256": "3b925a66e6f498fe228cdee7e86dce0ddc6c0f3cdf8ee53630a36f08aafe1345",
+      "bytes": 10726,
+      "junit": {
+        "tests": 26,
+        "assertions": 286,
+        "errors": 0,
+        "failures": 2,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "native-reservation-first.txt",
+      "sha256": "9cea6b46d9d0d440cf1485eebd5f0ad013900b0956195d61c0678acd790fee2f",
+      "bytes": 94
+    },
+    {
+      "path": "native-reservation-first.xml",
+      "sha256": "1359ab040f008f5cec089ec3a5ac19b380a69c0ecdca5e452a3fda68ec91f538",
+      "bytes": 725,
+      "junit": {
+        "tests": 1,
+        "assertions": 20,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "native-reservation-receipt.json",
+      "sha256": "edbb203266e4b8fc34b9253400d45ec0dca09816e403e816a012f9e3e125d7c1",
+      "bytes": 336
+    },
+    {
+      "path": "pint-format.txt",
+      "sha256": "24db8aeed3db292cf1e1b584c6181dbd823761a586d824b90f35ba7728f89a57",
+      "bytes": 5990
+    },
+    {
+      "path": "schema-mysql-corrected.txt",
+      "sha256": "ebe8a2a56c39d538ef315624a7c19c493de079a1f58f6454d4c33f84782455e4",
+      "bytes": 92
+    },
+    {
+      "path": "schema-mysql-corrected.xml",
+      "sha256": "bb9f0f5185ca82950a6afb48d306074619b6a04aea84f577dba32aa76bc4b1e3",
+      "bytes": 1618,
+      "junit": {
+        "tests": 4,
+        "assertions": 12,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "schema-mysql-first.txt",
+      "sha256": "29e3425af0ca9114b13972d68e725fa2db4b86361e6cd0e14e8635a55a32a57f",
+      "bytes": 1504
+    },
+    {
+      "path": "schema-mysql-first.xml",
+      "sha256": "bb1f038790744823cab8f887c13f31ab8a5e45ae8ebefb6a0a9d2c66504d3089",
+      "bytes": 2853,
+      "junit": {
+        "tests": 4,
+        "assertions": 8,
+        "errors": 2,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "schema-sqlite-first.txt",
+      "sha256": "f4691738c9834e3a2b8da8deb6e502b24eb51a22a31687e7d67622b407219713",
+      "bytes": 92
+    },
+    {
+      "path": "schema-sqlite-first.xml",
+      "sha256": "57aff5d1432aa4e4ff5afdb62f7b688a59ff41c1926ffca29ee585f00c2d5648",
+      "bytes": 1618,
+      "junit": {
+        "tests": 4,
+        "assertions": 12,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "source-map-2841ddd.json",
+      "sha256": "670b1545c370654447761afe4ca760de775b67168787a982de53803140ffc101",
+      "bytes": 65091
+    },
+    {
+      "path": "source-map-5a402.json",
+      "sha256": "641229ae4d4ff44a348095752bff37fbbbcc8ab222df258ef193d868de2fa55a",
+      "bytes": 65112
+    },
+    {
+      "path": "source-map-final.json",
+      "sha256": "6c7898bdc4ab45605f42efd55db2d4cb23afd8e03fda531ee9045f56d2f1ab19",
+      "bytes": 65491
+    },
+    {
+      "path": "sqlite-expanded-current.txt",
+      "sha256": "1407cf296c1900b5782a877ce1f606c26c39db779e00751d908a423c3f48dc64",
+      "bytes": 96
+    },
+    {
+      "path": "sqlite-expanded-current.xml",
+      "sha256": "e2d9e043ee0e4eb088ca34b4b9daba68c127b180c8bff47feefb01e3b9115e7e",
+      "bytes": 9423,
+      "junit": {
+        "tests": 26,
+        "assertions": 371,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "sqlite-freshness-current.txt",
+      "sha256": "2733f13a03b5f9bd82d5bf5c441e3c042ce56b1893e37a8f869958f8688ad2e4",
+      "bytes": 96
+    },
+    {
+      "path": "sqlite-freshness-current.xml",
+      "sha256": "196de1d2700b90907e8d9fb6dcbad6d349582689411d94609b2aef5c638bb8b0",
+      "bytes": 10390,
+      "junit": {
+        "tests": 29,
+        "assertions": 383,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "terminal-projection/cleanup-successor.txt",
+      "sha256": "74d7368f9c5feaf16e97a336916bd1dc6443fcd222947853caec4437f488d743",
+      "bytes": 587
+    },
+    {
+      "path": "terminal-projection/cleanup-successor.xml",
+      "sha256": "da27c5c999e573c8323435b92d605946274cf512d000f0499080337141558bd9",
+      "bytes": 2355,
+      "junit": {
+        "tests": 5,
+        "assertions": 22,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "terminal-projection/current-consumer.txt",
+      "sha256": "c5a4a140d6c9f70bcf21deae6b5518dc31eceefc96b22bf56ca720598721bcd0",
+      "bytes": 654
+    },
+    {
+      "path": "terminal-projection/current-consumer.xml",
+      "sha256": "7af43ab5c1430b26cf05d7813cfa61fa2c071f78f3549adb8d903411c787fac6",
+      "bytes": 11390,
+      "junit": {
+        "tests": 31,
+        "assertions": 185,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "terminal-projection/current-corrected.txt",
+      "sha256": "ef244c17a175c0d131b0029121f9e84a544412ad79b3a9a0f5cc9dc84a555ba8",
+      "bytes": 97
+    },
+    {
+      "path": "terminal-projection/current-corrected.xml",
+      "sha256": "3e9f3b48c8a1405a4e01eb986e95ed074334ed7363cf9746e7389b64ce30b67e",
+      "bytes": 20020,
+      "junit": {
+        "tests": 54,
+        "assertions": 525,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "terminal-projection/final-composition-native.txt",
+      "sha256": "1905eb3faaf0b20ae95b21b048c50b5e2248d5450c889f83af884b4748c19309",
+      "bytes": 94
+    },
+    {
+      "path": "terminal-projection/final-composition-native.xml",
+      "sha256": "2c9524f89677b0c8caa03125465d81012b4d8bd7b7969739a9af4a957706600a",
+      "bytes": 1693,
+      "junit": {
+        "tests": 3,
+        "assertions": 96,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "frozen_named_selection",
+      "source_sha": "dd18d343d3cedd11fd1ca598362e602ccea05cd9"
+    },
+    {
+      "path": "terminal-projection/final-composition-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "path": "terminal-projection/final-composition-sqlite.txt",
+      "sha256": "65736570b12dd6edf7b456381e9056c3d72fc804441827ff3a3aaedd8c526262",
+      "bytes": 97
+    },
+    {
+      "path": "terminal-projection/final-composition-sqlite.xml",
+      "sha256": "d50d55e6ae2994c2ce9a418c918d344404c856da888d0bf4af146e150ddac897",
+      "bytes": 23241,
+      "junit": {
+        "tests": 62,
+        "assertions": 568,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "frozen_named_selection",
+      "source_sha": "dd18d343d3cedd11fd1ca598362e602ccea05cd9"
+    },
+    {
+      "path": "terminal-projection/final-sqlite.txt",
+      "sha256": "d5bc26849b7feac7e3186018e2c8cbc12334c36694b235b023f383c66c02e559",
+      "bytes": 97
+    },
+    {
+      "path": "terminal-projection/final-sqlite.xml",
+      "sha256": "29f6d7d3b10f7dda07a4b5e0befa1b5e0c871af5d1901a8b7790f8bfcc63339b",
+      "bytes": 20724,
+      "junit": {
+        "tests": 56,
+        "assertions": 536,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "terminal-projection/frontend-corrected.txt",
+      "sha256": "c2feb62b27611068cdf64f1e5c5865c10af4b663e814d6db179fecf2cae0e2d9",
+      "bytes": 283
+    },
+    {
+      "path": "terminal-projection/frontend-current.txt",
+      "sha256": "bcc44b58bbaaf7256acc60dbc1d93a7688140d16203b7b03aef494f2a9d229d7",
+      "bytes": 317
+    },
+    {
+      "path": "terminal-projection/frozen-5a-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "path": "terminal-projection/frozen-5a-sqlite.txt",
+      "sha256": "6b145ba1d105bef43df2601540dd1a9d7dff7ef4f5ac651316c9f6f017d47b0d",
+      "bytes": 97
+    },
+    {
+      "path": "terminal-projection/frozen-5a-sqlite.xml",
+      "sha256": "caba8c0c43d40a6837e11efe60033386812c7a12d306144a91930a0ac44ef8c8",
+      "bytes": 20724,
+      "junit": {
+        "tests": 56,
+        "assertions": 536,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "frozen_named_selection",
+      "source_sha": "5a402b14de86311892af07db3d7bdf7853b6078e"
+    },
+    {
+      "path": "terminal-projection/inquiry-authority-before.php.txt",
+      "sha256": "5fe1bee87906f6076d8de4fabd76e7cfa9182f8b28917efb2d6385c9a4f58ef9",
+      "bytes": 6358
+    },
+    {
+      "path": "terminal-projection/inquiry-panel-corrected-red.txt",
+      "sha256": "29837854e829e9105a551d3f22f4c9eb2c2c87ceefe0e69052ee2edfecab852b",
+      "bytes": 582
+    },
+    {
+      "path": "terminal-projection/inquiry-panel-corrected-red.xml",
+      "sha256": "316dfe1866b0b7c98263c45823a43a0b82af6509c4a8e5c3306d1b9244122a7d",
+      "bytes": 1042,
+      "junit": {
+        "tests": 1,
+        "assertions": 3,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "terminal-projection/inquiry-panel-red.txt",
+      "sha256": "09326e120849cd794182de5e5ede55bb89eb9d0ae5d877acc94b5c5345e0054d",
+      "bytes": 589
+    },
+    {
+      "path": "terminal-projection/inquiry-panel-red.xml",
+      "sha256": "eea277eb8e496a8d07c7dc2c95b8f625da3aa3c0154b5cf654cae124191a5836",
+      "bytes": 1055,
+      "junit": {
+        "tests": 1,
+        "assertions": 2,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "terminal-projection/legacy-red.txt",
+      "sha256": "f2a8f278fbe25b6de31fc653b6d20839a63f0f8affab672bf6d575fcc69d522d",
+      "bytes": 1049
+    },
+    {
+      "path": "terminal-projection/legacy-red.xml",
+      "sha256": "b43722a4557ba8c693b5163055e2eac43ac545133aae73ffc3f97d67233509e0",
+      "bytes": 1779,
+      "junit": {
+        "tests": 2,
+        "assertions": 4,
+        "errors": 0,
+        "failures": 2,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "terminal-projection/legacy-source.php.txt",
+      "sha256": "8f9044206ca00dd4412125bb62b003023debb1c2bffcbe546d2519bd3b5156c6",
+      "bytes": 22934
+    },
+    {
+      "path": "terminal-projection/native-frozen-affected.txt",
+      "sha256": "64c7b79e068f85517c809538cf7cc8dd9691e8d68fcd5aa9e4207895c65d142a",
+      "bytes": 97
+    },
+    {
+      "path": "terminal-projection/native-frozen-affected.xml",
+      "sha256": "5497d7d166fe54c76cb408a85a7bf4483fa003adf161bd6af1272d427c7dd129",
+      "bytes": 6707,
+      "junit": {
+        "tests": 16,
+        "assertions": 97,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "frozen_named_selection",
+      "source_sha": "5a402b14de86311892af07db3d7bdf7853b6078e"
+    },
+    {
+      "path": "terminal-projection/native-inquiry-panel-red.txt",
+      "sha256": "95e4aa37b3f94575beb2c4ca349b34a99f32284bee7aefe6c41db9265472c7ae",
+      "bytes": 584
+    },
+    {
+      "path": "terminal-projection/native-inquiry-panel-red.xml",
+      "sha256": "4693852121bd813a359b0157a14a378cc60328d7171286a5105ac380f39be40f",
+      "bytes": 1044,
+      "junit": {
+        "tests": 1,
+        "assertions": 3,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "terminal-projection/native-service-resolution-red.txt",
+      "sha256": "78dde1690304c5bfcfe598dadd7813a5cf0964e81a9024fe048717a92886cd05",
+      "bytes": 1192
+    },
+    {
+      "path": "terminal-projection/native-service-resolution-red.xml",
+      "sha256": "76e270cbb526b7cf6728b34c3a9694eda2f71ecd347a853caeac828faf3ea473",
+      "bytes": 2004,
+      "junit": {
+        "tests": 2,
+        "assertions": 6,
+        "errors": 0,
+        "failures": 2,
+        "skipped": 0
+      },
+      "scope": "frozen_named_selection",
+      "source_sha": "5a402b14de86311892af07db3d7bdf7853b6078e"
+    },
+    {
+      "path": "terminal-projection/pint-check.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "path": "terminal-projection/pint-cleanup-tests.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "path": "terminal-projection/pint-inquiry-probe.txt",
+      "sha256": "eaf165544dbd14606aad49a5da6ef9af4a422ac86aaf8b8d72c45f58a5863026",
+      "bytes": 371
+    },
+    {
+      "path": "terminal-projection/pint-removal.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "path": "terminal-projection/pint-service-consumer.txt",
+      "sha256": "fec32f25649aacad6d49bb825724ce4cd186c01981102a070a393ddfcde90f3f",
+      "bytes": 200
+    },
+    {
+      "path": "terminal-projection/pint-successor.txt",
+      "sha256": "d663a5c03da7840f60735ac1358a2d65a0a6e336deffcc16b01033d642405066",
+      "bytes": 1508
+    },
+    {
+      "path": "terminal-projection/repaired-composition-native-consumer.txt",
+      "sha256": "1381af3df2363379fb95716ea30bfbdf331f15125308a0bbef1152f7884f4288",
+      "bytes": 95
+    },
+    {
+      "path": "terminal-projection/repaired-composition-native-consumer.xml",
+      "sha256": "d8c3aced7bc26674e01257e7a04c61874fb709f2db9f7d9d199c1ecda997d588",
+      "bytes": 3186,
+      "junit": {
+        "tests": 8,
+        "assertions": 56,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "frozen_named_selection",
+      "source_sha": "2841ddd846c66c5c23d077ae49bf5ef6b559639b"
+    },
+    {
+      "path": "terminal-projection/repaired-composition-sqlite.txt",
+      "sha256": "4c15c597231b0643e9bcd98ed6aafe30a5f3765630a0de86e746c9d20213e6eb",
+      "bytes": 97
+    },
+    {
+      "path": "terminal-projection/repaired-composition-sqlite.xml",
+      "sha256": "bfcc24553aec6275357d74c8e31ce5f3ad903a0eef77f3f8ed81a1be4d204192",
+      "bytes": 22915,
+      "junit": {
+        "tests": 61,
+        "assertions": 562,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "frozen_named_selection",
+      "source_sha": "2841ddd846c66c5c23d077ae49bf5ef6b559639b"
+    },
+    {
+      "path": "terminal-projection/service-resolution-red.txt",
+      "sha256": "979ada3f900886c0ce316bfbfc3fffce6d4b1df7ed4cbb9dada5b2b0e302db14",
+      "bytes": 1190
+    },
+    {
+      "path": "terminal-projection/service-resolution-red.xml",
+      "sha256": "4a1454fec64268dd6a6f3b143b14de435bd3ece4fd95a1855007c4bad779919f",
+      "bytes": 2001,
+      "junit": {
+        "tests": 2,
+        "assertions": 6,
+        "errors": 0,
+        "failures": 2,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "terminal-projection/service-stamp.txt",
+      "sha256": "ea5539a2da4e2e982876ff324e11bc6f87bd6c9ef0307598bca05668c3e6cd7f",
+      "bytes": 654
+    },
+    {
+      "path": "terminal-projection/service-stamp.xml",
+      "sha256": "0477ec1ea4e525920dfbcedbbf8cc0a0a4496c00851b62b7ddb20c81637276f1",
+      "bytes": 1163,
+      "junit": {
+        "tests": 1,
+        "assertions": 2,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "terminal-projection/successor-green.txt",
+      "sha256": "8739cd6292645faea0d680dd9609bbe20142aed3de2bea0ce0d356aeac5f1a58",
+      "bytes": 91
+    },
+    {
+      "path": "terminal-projection/successor-green.xml",
+      "sha256": "2ccb101bf71211862fed5df115739fc60d816f78936e79a0f243c9f872187f10",
+      "bytes": 953,
+      "junit": {
+        "tests": 2,
+        "assertions": 7,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "scope": "historical_development_or_confirmed_probe; not promoted to final source"
+    },
+    {
+      "path": "terminal-projection/support-attachments-1914-bootstrap.php.txt",
+      "sha256": "69e5b1f2d2f87b5e9af90678a66e3bbde254749723e00222bfdbee191a87b741",
+      "bytes": 130
+    },
+    {
+      "path": "terminal-projection/support-attachments-1914-legacy.php.txt",
+      "sha256": "8f9044206ca00dd4412125bb62b003023debb1c2bffcbe546d2519bd3b5156c6",
+      "bytes": 22934
+    },
+    {
+      "path": "terminal-projection/typecheck-corrected.txt",
+      "sha256": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f",
+      "bytes": 29
+    },
+    {
+      "path": "terminal-projection/typecheck-current.txt",
+      "sha256": "2148e601dbef0f2567cf94d859dafd2528387f157424f52e0ce3ffcfd06cd7c1",
+      "bytes": 182
+    },
+    {
+      "path": "typecheck-first.txt",
+      "sha256": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f",
+      "bytes": 29
+    }
+  ]
+}

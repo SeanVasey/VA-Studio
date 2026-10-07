@@ -1,0 +1,1 @@
+<?php require '/workspace/VA-Studio-support-attachments/vendor/autoload.php'; require '/tmp/support-attachments-1914-legacy.php';
