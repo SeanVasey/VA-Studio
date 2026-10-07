@@ -1,0 +1,15 @@
+{
+  "schema": "vaseyaudio_member_fk_review_b4a239cfae",
+  "probe_sha256": "72648803519da41d025222e000ecfeceef051ca3e0cdcd0dd01c4dbdbcdaca8a",
+  "probe_source": "7443754",
+  "membership_source": "b635e12992dc91f5131f35e5c46b8dab6ff30eee",
+  "datadir_in_workspace": true,
+  "privileges": [
+    "SELECT",
+    "REFERENCES"
+  ],
+  "scope": "one temporary users(id) fixture only; existing reviewer; no credentials changed",
+  "probe_exit_code": 127,
+  "schema_absent_after_cleanup": true,
+  "table_privileges_absent_after_cleanup": true
+}
