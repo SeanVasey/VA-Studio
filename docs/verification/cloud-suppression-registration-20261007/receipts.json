@@ -1,0 +1,80 @@
+{
+  "root_source": "df0f77eee08417137a828047fa495860f499115c",
+  "main_base": "2cdd3da12261d27479955722952123d3a21ecc49",
+  "narrow_schema_source": "aedab416a5099f958c11a5398870cfe4173241e5",
+  "schema_independent_root_result": "unchanged foreign-FK probe1/9 green, including after current main identity247 composition; source runtime23/24 previousmapped paths byteexact",
+  "registration_results": {
+    "http": "16/175 green",
+    "frontend": "39/3files green; rejected --files CLI invocation preserved",
+    "native_original_runtime": "6/48 green on preceding50fb runtime; exact runtime bytes carry, no final integrated claim",
+    "native_schema": "original1/7 failure preserved then aed1/9 green; exactrootcurrent1/9 green"
+  },
+  "new_runtime_blocker": {
+    "source": "df0f77eee08417137a828047fa495860f499115c",
+    "sqlite": "1FAIL/2assertions zeroerrors",
+    "native_8.0.46": "1FAIL/2assertions zeroerrors",
+    "observed": "late adapter-boundTo-installed raw primary resolver invoked once after policy check; enabledfalse, returnsconfirmed, frameworkdepth0, physicaltransactiontrue",
+    "independent_probe_sha256": "85ac73175f4d2e6cef62c7311cd52fb0c27a2520d6d34cba3be44a372f480e78",
+    "correction": "assigned crawler_routes owned runtime successor; no root runtime mutation",
+    "publication": "HELD"
+  },
+  "files": {
+    "app/Domain/Customers/Preferences/CustomerConsentPreferences.php": "f6b069fbbef8849a9539af1b20b8684266a0c93a24148b8a03284698377e0546",
+    "app/Domain/Customers/Preferences/Suppression/Models/SuppressionAttempt.php": "70974f48d0f621a222af38ac855eb3088299e4e65e18238e31e5ed9195244810",
+    "app/Domain/Customers/Preferences/Suppression/Models/SuppressionConfirmation.php": "6748f0ad19e6c670d0e775160fd7847c348200aa189fd8c923c5ecf19d573927",
+    "app/Domain/Customers/Preferences/Suppression/Models/SuppressionIntent.php": "21647934f9c2179fc7cff20dcf0a1a874696eb08c4f32d7190805868bc6dc3c5",
+    "app/Domain/Customers/Preferences/Suppression/Models/SuppressionTarget.php": "1430ea2f99824fce33ebda712ebca40be1ffecb1a7818be5638fad63a6905e6a",
+    "app/Domain/Customers/Preferences/Suppression/SuppressionAdapter.php": "f0010a502909978510e31e53cf6a67a5b35fd25dfeca46e0890e9553ce026796",
+    "app/Domain/Customers/Preferences/Suppression/SuppressionDelivery.php": "1c668cddd3f500cdd665f0ab7372ab0860dcd58d5a72dee2d2bae623dd01e2ef",
+    "app/Domain/Customers/Preferences/Suppression/SuppressionEvidence.php": "b9065ca87ba90adf63341f8fa8350c87c6a721c9c197d004a66ae590071b027e",
+    "app/Domain/Customers/Preferences/Suppression/SuppressionOutbox.php": "091053b773eedc329e3652891ae0a6de46bd61d748346c415b7740aa382623f6",
+    "app/Domain/Customers/Preferences/Suppression/SuppressionPolicy.php": "9f9197694aa138f65f6d3bb2f6e3bbd73414d2d13461928e35285d7af60d0595",
+    "app/Domain/Customers/Preferences/Suppression/SuppressionReceipt.php": "9b572aa14ea9818c03173482d22fd71689c293534e349fc6503fb52d556cc113",
+    "app/Domain/Customers/Preferences/Suppression/SuppressionRequest.php": "fcd19c6f1af35ebd9ca6ec7a7c26ec737eac222a890c54e57a9a82c0ae3fc5e1",
+    "app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php": "6dfc9d878ae2adb56812fcfd8997f5be4abf7fa7d5daa54848dca4d4b7eb36d2",
+    "app/Domain/Customers/Preferences/Suppression/UnboundSuppressionAdapter.php": "b7bc628e61b57b11d65fa7537ddea20c1f5854d7fb5ac30840f25827c722e644",
+    "config/customer-suppression.php": "53765051cc3449827c087a39aa96f22b04178f30761423ca770b8eeee2e534b9",
+    "database/migrations/2026_10_07_251000_customer_suppression.php": "5c7a4ed4ea2baac94ea0ff34dc331d62e53c1790dfe72da47e42e6347a2a0a43",
+    "docs/verification/customer-suppression-20261007/README.md": "9cef8b0813e01a37ace969f999e3f81fd60a2346f51b1a50a77430cd291d85f8",
+    "resources/js/components/CustomerCommunicationPreferences.tsx": "426fc857ff87c1b8d85b3a1ab54ef2eb2cc0223cad9a14fdf514a9693f53324f",
+    "tests/Feature/CustomerConsentPreferencesTest.php": "736653799e984221c6bb8658ccf0f6e0550e4b64d5175f0ad056fb85cbbf8727",
+    "tests/Feature/CustomerSuppressionMigrationTest.php": "c24dfcb30c0e5d82df201097acbac24b96d39f56dbf7019d7f620331afaa18b2",
+    "tests/Feature/CustomerSuppressionTest.php": "fb063e07b037cc0554d9566c8de8c0f765bc9872fca69f8cd51d72f5de7d2a8b",
+    "tests/Support/SuppressionFixtures.php": "35cb972ffa1d2dedb2d4be9870a4327198e79abf7304fece3028504273e03f60",
+    "tests/frontend/customer-communication-preferences.test.tsx": "6d3d33a95567ccec2ab30deff4b729a81dcbfbc9fa0c1907d35c65ffa001a32c",
+    "tests/frontend/customer-suppression-status.test.tsx": "ff585fa75d439bed68711933b009c21af5d1174dcb86352f595f524d46197c8b"
+  },
+  "narrow_owned_files": {
+    "app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php": "6dfc9d878ae2adb56812fcfd8997f5be4abf7fa7d5daa54848dca4d4b7eb36d2",
+    "tests/Feature/CustomerSuppressionKeyAdmissionTest.php": "e5c88a64837df3167105ddce93dd62897d155abc836f8989e0a7ee6300603ed7"
+  },
+  "root_owned_files": {
+    "tests/Feature/CustomerCommunicationPreferencesHttpTest.php": "3cbef1324ec370092531728e0f203ef74ca55bf8dbcb8b4263886ee8fc92d075",
+    "tests/frontend/customer-communication-registration.test.tsx": "76bc4d0f3021c7df9432c12438ec58011b47dda7bd3315293cccdacac2801c88",
+    "tests/Feature/CustomerSuppressionNativeAdmissionTest.php": "e8cb8638616ac4f96a34319c9a236b041b29344681d75621f1e5126aab36eb5f"
+  },
+  "artifacts_sha256": {
+    "va-suppression-native-focused-original.txt": "5f451e123b379d64eb889c5505aceeeb67595a70e103f1d8cd4b357490f3011d",
+    "corrected-va-suppression-native-constraint-snapshot.json": "c0f4ba0e3cfb728f024814bad5b8cfb1ef501c295b36f6ab947a83139a33d258",
+    "va-suppression-registered-final.txt": "97ea364ad64595a6ef2d33673b04f49e7580588da00408733d719ac86e6d368e",
+    "va-suppression-native-integrated.txt": "21209cb0d36d52cb44cf305eb3a74ac14a5484f3bcbfcfe6b50110b6d39adb71",
+    "CustomerSuppressionLazyBoundaryCanaryTest.php.txt": "85ac73175f4d2e6cef62c7311cd52fb0c27a2520d6d34cba3be44a372f480e78",
+    "va-suppression-native-constraint-corrected.txt": "0a755e1bada8f4f2368fa29c44ce49b95ac08aaf8095f8560cd77c5de8d6b3fa",
+    "va-suppression-native-integrated.xml": "da1c513b188edb99518ea38ae0cf6a02427dc854785ed71437e9bf31cb520a23",
+    "va-suppression-lazy-primary-native-original.txt": "5419afefef479c8ae58fb6aade0ff4ecb1a024240649a823dabddb948ed0316f",
+    "original-native-admission-canary.php.txt": "e8cb8638616ac4f96a34319c9a236b041b29344681d75621f1e5126aab36eb5f",
+    "va-suppression-native-focused-original.xml": "904f53f6fe85413fe9592f9b3dd1721f8f226299e96e9ef28d6fc9ff99d33087",
+    "va-suppression-lazy-primary-original.xml": "900b5c4f81d52f5ac9a4bad74c3cf8d978d319ff47971d765402522c0aca1aed",
+    "va-suppression-lazy-primary-native-original.xml": "8f24134f0dae3093879e7fe3ff51aaa96dc10da618606a52eca9c27d23375b4b",
+    "va-suppression-registered-final.xml": "60618ca81a8342c728a746de1ecbe5bde361729f796a123bd84d747df81b4d0f",
+    "va-suppression-lazy-primary-original.txt": "85779b6bcb1efa8e23133c8e83f63a5a09e15dc75364954011147899a38a5085",
+    "va-suppression-native-constraint-original.xml": "38d71e437ee8a7a4c3a6ad7addfd0204b9fba208697b4a17067d3abd30fa4b74",
+    "va-suppression-native-constraint-snapshot.json": "0f94ac2d7884dfb8fd11cd6fd45fffce00d04a309f086db8a474fc91f2cadab3",
+    "va-suppression-native-constraint-original.txt": "7ba31183f35bff3657d4e12b39d8df5a60545d973b94121aa978f1231f20014d",
+    "va-suppression-lazy-primary-native-snapshot.json": "55b6f188e9809297745dc98a17a51022d6bab1a350baddefb0d55296fc9c92d4",
+    "va-suppression-native-constraint-corrected.xml": "065aecfab25acf0e3ef398e6056ce942aa01d95ac40579706de90b148f2c58f8",
+    "va-suppression-registration-final-frontend-corrected.txt": "1f1e0efdaac2a06ec1ee9cb66bebfce13cc83065a863ec8ff3c0141e819f3a26",
+    "va-suppression-registration-final-frontend.txt": "f37525027a7d94b7941a5f38c8510cfb37bc9ad7202ddec40abeaba15979e124",
+    "va-suppression-registration-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+  }
+}
