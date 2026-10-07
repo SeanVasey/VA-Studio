@@ -1,0 +1,81 @@
+{
+  "source": "aedab416a5099f958c11a5398870cfe4173241e5",
+  "parent": "904cdad33f70ee5a92d29f0b79db62a4acb24f44",
+  "predecessorRuntime": "50fb8d0442a4f53632e1f25785b49d3148161d20",
+  "originalRootSource": "dd85898ef84e116341377a3f96d9f93c44630ade",
+  "sourceFiles": [
+    {
+      "path": "app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php",
+      "sha256": "6dfc9d878ae2adb56812fcfd8997f5be4abf7fa7d5daa54848dca4d4b7eb36d2"
+    },
+    {
+      "path": "tests/Feature/CustomerSuppressionKeyAdmissionTest.php",
+      "sha256": "e5c88a64837df3167105ddce93dd62897d155abc836f8989e0a7ee6300603ed7"
+    }
+  ],
+  "unchangedDependencies": [
+    {
+      "path": "app/Domain/Customers/Preferences/ConsentMigrationAdmission.php",
+      "sha256": "d5d6c464c2d28e32ef65f1d801aa98eaa59f28b45658af19a753ebf46a0f6f03",
+      "byteExactParent": true
+    },
+    {
+      "path": "database/migrations/2026_10_07_250000_customer_consent.php",
+      "sha256": "9de1cc2783fd73eacdd84eea80445b8d573d53b0e73d4a0bae8cbd2a5e73ae12",
+      "byteExactParent": true
+    },
+    {
+      "path": "app/Domain/Customers/Preferences/ConsentEvidence.php",
+      "sha256": "af03ae8feab2a85cf592fe9414b9425389a60286553080288b9bc115b223b96a",
+      "byteExactParent": true
+    },
+    {
+      "path": "app/Domain/Customers/Preferences/CustomerConsentPreferences.php",
+      "sha256": "f6b069fbbef8849a9539af1b20b8684266a0c93a24148b8a03284698377e0546",
+      "byteExactParent": true
+    },
+    {
+      "path": "resources/js/components/CustomerCommunicationPreferences.tsx",
+      "sha256": "426fc857ff87c1b8d85b3a1ab54ef2eb2cc0223cad9a14fdf514a9693f53324f",
+      "byteExactParent": true
+    }
+  ],
+  "nativeServer": "8.0.46-0ubuntu0.24.04.4",
+  "nativeDatabase": "vaseyaudio_suppress_fix",
+  "originalCanarySha256": "e8cb8638616ac4f96a34319c9a236b041b29344681d75621f1e5126aab36eb5f",
+  "nativeAssertions": {
+    "originalFailure": 1,
+    "initialProductCasesPassed": 18,
+    "initialProductAssertions": 140,
+    "fixtureFailure": "TABLE_CONSTRAINTS native collation does not match the accent used by the first fixture; corrected to verified uppercase alias. Application source unchanged.",
+    "correctedAlias": {
+      "tests": 1,
+      "assertions": 9
+    },
+    "prefixAndRealMigratorRestart": {
+      "tests": 2,
+      "assertions": 13
+    },
+    "byteExactOriginalCanary": {
+      "tests": 1,
+      "assertions": 9
+    }
+  },
+  "sqlite": {
+    "carried": {
+      "tests": 105,
+      "assertions": 553
+    },
+    "keys": {
+      "tests": 19,
+      "passed": 17,
+      "assertions": 133,
+      "nativeOnlySkips": 2
+    }
+  },
+  "limitations": [
+    "No MySQL8.4 acceptance",
+    "No production data/provider I/O",
+    "Independent exact-root composed review still required"
+  ]
+}

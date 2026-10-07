@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="3" assertions="22" errors="0" failures="0" skipped="0" time="59.373266">
+    <testsuite name="Tests\Feature\CustomerSuppressionKeyAdmissionTest" file="/workspace/VA-Studio-suppression-native-admission/tests/Feature/CustomerSuppressionKeyAdmissionTest.php" tests="1" assertions="9" errors="0" failures="0" skipped="0" time="23.301425">
+      <testcase name="test_native_dictionary_collation_alias_of_reserved_constraint_refuses_before_ddl" file="/workspace/VA-Studio-suppression-native-admission/tests/Feature/CustomerSuppressionKeyAdmissionTest.php" line="68" class="Tests\Feature\CustomerSuppressionKeyAdmissionTest" classname="Tests.Feature.CustomerSuppressionKeyAdmissionTest" assertions="9" time="23.301425"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\CustomerSuppressionMigrationTest" file="/workspace/VA-Studio-suppression-native-admission/tests/Feature/CustomerSuppressionMigrationTest.php" tests="2" assertions="13" errors="0" failures="0" skipped="0" time="36.071841">
+      <testsuite name="Tests\Feature\CustomerSuppressionMigrationTest::test_every_known_installation_prefix_resumes_without_changing_prior_customer_history" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="19.183499">
+        <testcase name="test_every_known_installation_prefix_resumes_without_changing_prior_customer_history with data set #4" file="/workspace/VA-Studio-suppression-native-admission/tests/Feature/CustomerSuppressionMigrationTest.php" line="29" class="Tests\Feature\CustomerSuppressionMigrationTest" classname="Tests.Feature.CustomerSuppressionMigrationTest" assertions="4" time="19.183499"/>
+      </testsuite>
+      <testcase name="test_real_migrator_retries_complete_unlogged_create_interruption" file="/workspace/VA-Studio-suppression-native-admission/tests/Feature/CustomerSuppressionMigrationTest.php" line="55" class="Tests\Feature\CustomerSuppressionMigrationTest" classname="Tests.Feature.CustomerSuppressionMigrationTest" assertions="9" time="16.888342"/>
+    </testsuite>
+  </testsuite>
+</testsuites>
