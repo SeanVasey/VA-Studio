@@ -13,6 +13,7 @@ use App\Domain\Memberships\Production\MembershipException;
 use App\Domain\Memberships\Production\MembershipPaidInvoiceAuthority;
 use App\Domain\Memberships\Production\MembershipPaidInvoiceProof;
 use App\Domain\Memberships\Production\MembershipPolicy;
+use App\Domain\Memberships\Production\MembershipPolicyBinding;
 use App\Domain\Memberships\Production\MembershipPolicyFactsAuthority;
 use App\Domain\Memberships\Production\MembershipPolicyFactsProof;
 use App\Domain\Memberships\Production\MembershipRows;
@@ -112,6 +113,18 @@ class MembershipPreparationTest extends TestCase
     {
         $this->expectException(MembershipException::class);
         MembershipValues::utc('2026-02-30 00:00:00');
+    }
+
+    public function test_policy_value_requires_actual_bounded_allowance_and_explicit_billing_currency(): void
+    {
+        foreach ([[0, 'USD'], [MembershipPolicy::MAX_CREDITS + 1, 'USD'], [1, 'usd']] as [$allowance, $currency]) {
+            try {
+                new MembershipPolicyBinding('11111111-1111-4111-8111-111111111111', ...[str_repeat('a', 64), str_repeat('a', 64), str_repeat('a', 64), str_repeat('a', 64), str_repeat('a', 64), str_repeat('a', 64), str_repeat('a', 64), str_repeat('a', 64), IdentityPolicy::REHEARSAL, $allowance, 0, $currency, str_repeat('a', 64), str_repeat('a', 64)]);
+                $this->fail('Technical value validation must reject an unusable benefit declaration.');
+            } catch (MembershipException) {
+                $this->assertTrue(true);
+            }
+        }
     }
 
     private function configuration(): void

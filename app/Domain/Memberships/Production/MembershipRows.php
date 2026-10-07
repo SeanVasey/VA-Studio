@@ -130,7 +130,7 @@ final class MembershipRows
             && ($items['database']['default'] ?? null) === $this->connectionName
             && self::property($this->connection, Connection::class, 'pdo') === $this->primary
             && self::property($this->connection, Connection::class, 'transactions') === 1
-            && $this->connection->getTablePrefix() === $this->prefix && $this->primary->inTransaction()
+            && self::property($this->connection, Connection::class, 'tablePrefix') === $this->prefix && $this->primary->inTransaction()
             && $this->primary->getAttribute(PDO::ATTR_DRIVER_NAME) === $this->driver, 'changed_connection');
         if ($this->driver === 'mysql') {
             MembershipException::require($this->primary->query('SELECT DATABASE()')->fetchColumn() === $this->schema, 'changed_schema');

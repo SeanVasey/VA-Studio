@@ -20,6 +20,6 @@ final readonly class MembershipReservationBinding
         MembershipValues::hash($intentHash);
         MembershipValues::utc($honorDeadline);
         MembershipValues::buyer($originalBuyerBinding);
-        MembershipException::require($creditAmount > 0, 'invalid_credit_amount');
+        MembershipException::require($creditAmount > 0 && $creditAmount <= MembershipPolicy::MAX_CREDITS, 'invalid_credit_amount');
     }
 }

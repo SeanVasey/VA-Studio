@@ -79,6 +79,17 @@ class MembershipSchemaPreparationTest extends TestCase
         $this->assertNotNull($pdo->query('SHOW CREATE TABLE production_membership_paid_periods')->fetchColumn(1));
     }
 
+    public function test_native_changed_enum_check_is_not_normalized_into_owned_provenance(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native enum dictionary validation required.');
+        }
+        $pdo = DB::connection()->getPdo();
+        $pdo->exec("ALTER TABLE production_membership_plan_versions DROP CHECK production_membership_plan_versions_bounds, ADD CONSTRAINT production_membership_plan_versions_bounds CHECK (length(id)=36 AND length(seal)=64 AND length(policy_hash)=64 AND length(original_terms_hash)=64 AND provenance IN ('synthetic_rehearsal','unverified_claim'))");
+        $this->refuses(fn () => (new MembershipSchema)->assertOwned($pdo));
+        $this->assertSame(0, (int) $pdo->query('SELECT COUNT(*) FROM production_membership_plan_versions')->fetchColumn());
+    }
+
     public function test_data_bearing_partial_guard_prefix_refuses_and_retains_original_plan(): void
     {
         $plan = $this->plan();
@@ -234,7 +245,7 @@ class MembershipSchemaPreparationTest extends TestCase
             $e['after_'.$b] = $after[$b];
         }
 
-return $e;
+        return $e;
     }
 
     private function insert(string $table, array $row): void

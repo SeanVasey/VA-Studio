@@ -414,6 +414,12 @@ final class MembershipSchema
 
     private function check(string $sql): string
     {
+        // Native8.0 dictionaries introduce/escape these exact ASCII enum literals.
+        // Admit only the owned literal spellings, never arbitrary charset or SQL rewriting.
+        foreach (['synthetic_rehearsal', 'verified_production', 'award', 'reserve', 'consume', 'release', 'expire'] as $literal) {
+            $sql = str_replace("_utf8mb4\\'".$literal."\\'", "'".$literal."'", $sql);
+        }
+
         return strtolower(preg_replace('/[\s`()]+/', '', $sql));
     }
 }
