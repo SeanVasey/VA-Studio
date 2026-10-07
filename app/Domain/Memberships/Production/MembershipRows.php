@@ -10,6 +10,9 @@ use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Facade;
 use PDO;
+use Pdo\Mysql;
+use Pdo\Sqlite;
+use PDOStatement;
 use ReflectionProperty;
 use Throwable;
 
@@ -43,6 +46,7 @@ final class MembershipRows
         $this->configuration = $this->container->make('config');
         $this->connection = $this->manager->connection();
         $this->primary = $this->connection->getPdo();
+        $this->nativeStatements();
         $this->driver = $this->connection->getDriverName();
         $this->prefix = $this->connection->getTablePrefix();
         $this->connectionName = $this->connection->getName();
@@ -119,6 +123,7 @@ final class MembershipRows
     /** Reflection and captured PDO only. No facade/container resolution after terminal raw proof. */
     private function context(): void
     {
+        $this->nativeStatements();
         $instances = self::property($this->container, Container::class, 'instances');
         $resolved = (new ReflectionProperty(Facade::class, 'resolvedInstance'))->getValue();
         $connections = self::property($this->manager, DatabaseManager::class, 'connections');
@@ -143,5 +148,12 @@ final class MembershipRows
     private static function property(object $object, string $class, string $name): mixed
     {
         return (new ReflectionProperty($class, $name))->getValue($object);
+    }
+
+    /** Raw metadata/authority SQL cannot execute an application statement subclass. */
+    private function nativeStatements(): void
+    {
+        MembershipException::require(in_array(get_class($this->primary), [PDO::class, Sqlite::class, Mysql::class], true)
+            && $this->primary->getAttribute(PDO::ATTR_STATEMENT_CLASS) === [PDOStatement::class], 'changed_primary');
     }
 }
