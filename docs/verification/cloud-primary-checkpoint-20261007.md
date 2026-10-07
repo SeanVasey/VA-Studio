@@ -77,3 +77,32 @@ No live payment activation, real transaction, production credentials, services
 purchase, budget/protection change, DNS cutover, active entitlement import or
 source retirement is authorized by this checkpoint. Content, actual provider/legal
 facts and hosting acceptance retain their concrete preparation/launch gates.
+
+## First integration milestone
+
+PR26 merged with expected head `10a6dabe6dd4938680656acf08be8d1aa2a98085`
+as `5b58e2e4805ed5a30cf3071457cbc8e526c1425a` at 02:07 America/Chicago.
+Fresh GitHub PR and Git reads verified merged state, tree
+`49aee6e0d3a9605a7fe755cf774012dbc99e1b93` and both ordered parents. The
+independent cloud review retains unchanged source-bound native/SQLite evidence;
+no duplicate matrix ran. The collider/migration finding remains isolated in PR25.
+
+Fresh restored HTTP smoke passes storefront HTML, empty catalog JSON, current
+Inertia version, protected admin login and compiled JavaScript. Commerce remains
+disabled. Disposable native MySQL8.0.46 is now prepared from authenticated Ubuntu
+packages under the rootless workspace toolchain; PR25's actual failure/retry
+proof uses an isolated database and does not change the retained SQLite install.
+
+Crawler composition `6b11c9ff916d9be1ee0a470e384bb05a9ef8435e` received
+independent exact-source approval with all eight routes and all twelve evidence
+digests reconciled. Its source preserves the author185/4218 valid focused cases.
+Publication/preflight/expected-head merge follows; this approval is not full
+integrated acceptance.
+
+The [recovery census](cloud-recovery-inventory-20261007.md) retains every published
+ref and identifies reusable missing inquiry-notification, public-installation,
+private-checkout and stronger operator sharing children. They are being recomposed
+against current source rather than importing obsolete workflows. The
+[all-scope audit](cloud-completion-audit-20261007.md) retains40 groups/103 mappings
+and concrete authorized code gaps. Customer favorites/playlists, recovered inquiry
+work and public installation/private checkout now advance in isolated branches.
