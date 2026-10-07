@@ -7,11 +7,11 @@ Historical owner tables below describe earlier source, not active workers.
 
 | Worker | Isolated boundary | Current handoff |
 | --- | --- | --- |
-| `/root` | Primary/shared registration/evidence/publication | PR29 merged; service62de352 authority/P2 repairs await independent successor review; notes capacity approved; mount next identity, checkout and attachments after review |
+| `/root` | Primary/shared registration/evidence/publication | PR29 merged; service7dc8bd8 authority/P2 repairs independently approved; freshpreflight next; notes capacity approved; mount next identity, checkout and attachments after review |
 | `/root/pr25_recovery` | New ProductionCheckout246000/provider adapter/private routes/tests | Immutable review→assent→payable order→provider initiation/reconciliation; qualified exemption first, provider-calculated tax next |
 | `/root/completion_audit` | ProductionIdentity247000/routes/UI/local SMTP proof | Immutable origin, mailbox challenge, recovery/credential fencing, typed principal; no synthetic-account adoption by email |
-| `/root/native_mysql` | ServiceProjects244000; source adapter then free origins245000 | Service approval superseded; corrected attachment sourceb209b85 passes author14/72 each driver; free245 implementation active |
-| `/root/pr26_review` | Independent service composition/canaries | Service actual native shadow/provider successor review; notes/export/clear approved in fbe178ea with native overflow proof |
+| `/root/native_mysql` | ServiceProjects244000; source adapter then free origins245000 | Service7dc independently approved; adapterb209b85 has root actualSQLite/native1/8 approval; free245 implementation active |
+| `/root/pr26_review` | Independent service composition/canaries | Service follow-up approved in2ddb; native consent250/source review next; notes approved in fbe178ea |
 | `/root/crawler_routes` | Listening notes/export/clear domain/UI/tests | Notes capacity handoff complete; consent250 domain/schema/UI active, suppression251 follows |
 | `/root/recovery_inventory` | Private attachments249000/scanner/routes/UI/tests | Quarantine→scan→immutable manifest, owner/source current proof, download/retry/retention; approved listening review carry complete |
 
