@@ -365,3 +365,39 @@ successor, paid grants/product/member fulfillment remain open. Its borrowed iden
 8e is historical pending correcteaaa composition. Free245 and suppression251
 advance in owned branches. No whole-parent acceptance, final Foundation dispatch,
 external transport/payment, production credential, deployment or cutover is claimed.
+
+## Tenth checkpoint: notes compatibility approved for publication
+
+Corrected PR31 executabled412759ab193f7c7a5cbd2de91eb83320cbc9618 contains
+author49b9154 and one explicit synthetic rollout opt-in in the root HTTP fixture.
+Independentf18a3cf approves that actual source after SQLite34/207 executing the
+exact pinned prior reader and native8.0.46 capacity3/111. Root53/464, frontend82,
+TypeScript/scopedPint pass. All runtime/test source bindings match the publication
+descendant; raw receipts and originalff4602/SQL1406 failures stay retained.
+Ordinary V1 writes stay V1; note promotion defaults off and requires a reviewed
+stopped/backup rollout reference. Existing V2 is never silently downgraded or
+claimed readable by old code. One batched PR update/fresh preflight follows;
+main remainsda70eba until freshly verified merge.
+
+Consentd22 approval3cc687f is preserved as rootf7f3f26, with native7pass/one
+SQLite-only skip31 and actual stale-grant record wait; root16/171 passes again
+on the corrected composition. Identityeaaa runtime has author native46/1464,
+SQLite39executed/209 plus7 precise native skips; root original actualSMTP
+temporary-user canary1/5 passes. Root registration's genuine pagehide failure
+is corrected by UI-onlyaf4870b; identical canary plus author cases14 pass.
+Root actual registered API→SMTP→completion→sign-in→recovery flow and global
+CSRF/private failure cases7/118 pass. An initial incorrect assertion expected
+account access_version to increment; the contract correctly preserves the account
+row and invalidates access through credential/immutable observation binding.
+Original assertion/harness failures remain retained, not reported as source bugs.
+
+Attachments own finaldd18d34 plus servicec7 are selectively composed on actual
+main. Root25/144 adapter/consumer checks pass; private registry/routes/pages,
+customer/inquiry/operator mounts and fixed diagnostics are under affected checks.
+Free245 sourceebf6298 is frozen awaiting final author/source review; checkoutff4
+is superseded by actual staff-role/foreign-FK/routine canaries under repair.
+Suppression251 resumes on approved250. New T36 worker replacement uses sealed
+candidate completeness and fresh eligibility, explicitly not recovered old work.
+Only two new snapshot seams/imports are coordinated to its author; original
+snapshot methods must remain exact before independent review. Full personal-store
+implementation and final exact-SHA acceptance continue; no external activation.

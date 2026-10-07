@@ -7,7 +7,7 @@ Historical owner tables below describe earlier source, not active workers.
 
 | Worker | Isolated boundary | Current handoff |
 | --- | --- | --- |
-| `/root` | Primary/shared registration/evidence/publication | PR30 merged; PR31 preflight passes but V1/V2 compatibility finding held; compose corrected consent/identity/attachment sources and own shared routes/privacy/mounts |
+| `/root` | Primary/shared registration/evidence/publication | PR30 merged; PR31 compatibility repair independently approved d412, one update/preflight/merge next; consent approved d22, identity departure fixed, attachments registration active |
 | `/root/pr25_recovery` | New ProductionCheckout246000/provider adapter/private routes/tests | Immutable review→assent→payable order→provider initiation/reconciliation; qualified exemption first, provider-calculated tax next |
 | `/root/completion_audit` | ProductionIdentity247000/routes/UI/local SMTP proof | Immutable origin, mailbox challenge, recovery/credential fencing, typed principal; no synthetic-account adoption by email |
 | `/root/native_mysql` | ServiceProjects244000; source adapter then free origins245000 | Service7dc approved; adapterb209 approval superseded by actual resolver failure, corrected c7 passes peer SQLite/native consumers; free245 active |
