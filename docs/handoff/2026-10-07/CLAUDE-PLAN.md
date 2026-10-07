@@ -117,4 +117,4 @@ geometry (not to be recreated). Each is listed again in the activation packets
 
 | Date (UTC) | Batch | SHA / PR | Evidence | Decision |
 | --- | --- | --- | --- | --- |
-| 2026-10-07 | A1 compose c6+2ec+guard | `d20d4394`, PR #41 draft | `docs/verification/checkout-composition-20261007/` — SQLite 170/162/8 native-only skips (pre-guard), red regression retained, canaries 5/5, affected 38/37/1 skip, native 8.4 exclusion 2/2 + rows 1/1 | independent review pending |
+| 2026-10-07 | A1 compose c6+2ec+guard | `d20d4394`, PR #41 draft | `docs/verification/checkout-composition-20261007/` — SQLite 170/162/8 native-only skips (pre-guard), red regression retained, canaries 5/5, affected 38/37/1 skip, native 8.4.11: exclusion 2/2, rows native 1/1, reviewer receipt pair 2/2, c6 physical canary 1/1 (0 fail/err/skip) | independent review pending; preflight run on d20d4394 was cancelled by the concurrency group (superseded push), live run on aa514349 pending |
