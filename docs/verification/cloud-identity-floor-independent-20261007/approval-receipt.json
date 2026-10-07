@@ -1,0 +1,79 @@
+{
+  "decision": "APPROVED for focused development integration",
+  "reviewed_and_executed_source": "e48e539c63ff9febe53248940fadf420cd330255",
+  "tree": "3f9f9bd8b1c103846761a8c4f5a563b1416e32e4",
+  "docs_only_carry": "91b51fcbd1c5b2ef578df32fb3de709406886833",
+  "previous_held_source": "4b3d47860373aad181c382899b9ab9677023eca0",
+  "original_held_review": "d7631a43ba608d0cce384b1af015b87f6ffffdde",
+  "repaired_author_source": "3c2158e726a3bd3fdd57597adcb5756c49dff2ce",
+  "author_evidence": "aa0eb63c8e7a6d4fad07fed6e6c868765b851298",
+  "runtime": {
+    "php": "8.4.26",
+    "phpunit": "12.5.34",
+    "native_mysql": "8.0.46-0ubuntu0.24.04.4",
+    "database": "isolated reviewer schema/account; no author database",
+    "mail": "actual synthetic loopback SMTP DATA only",
+    "locked_php_identities": 158
+  },
+  "independent_checks": {
+    "sqlite": {
+      "tests": 10,
+      "assertions": 52,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "native": {
+      "tests": 2,
+      "assertions": 42,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "root_checks_raw_independently_reconciled": {
+    "va-identity-e48-registered-floor-corrected.xml": {
+      "tests": 24,
+      "assertions": 230,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "va-identity-e48-original-probe.xml": {
+      "tests": 1,
+      "assertions": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "va-identity-e48-registered-floor.xml": {
+      "tests": 24,
+      "assertions": 154,
+      "failures": 0,
+      "errors": 6,
+      "skipped": 0
+    }
+  },
+  "native_selection_methods": [
+    "test_missing_native_parent_columns_are_refused_before_owned_ddl",
+    "test_registered_http_uses_actual_smtp_proof_and_recovery_preserves_owner_but_invalidates_old_session"
+  ],
+  "sqlite_selection": "unchanged original SQLite probe and all nine new DependencyAdmission cases",
+  "source_pint": "two changed PHP paths passed; original diagnostic probe style failure remains preserved",
+  "original_26_artifacts_restored_byte_exact": true,
+  "source_edit_count": 0,
+  "known_blockers_in_reviewed_scope": [],
+  "historical_carry": {
+    "unchanged_identity_native": "original author 46/1464 on 8.0.46 is historical coverage; new helper separately covered by author 22/97 and current independent selection",
+    "unchanged_registered_http": "prior own 4b SQLite16/187, root current e48 SQLite24/230",
+    "unchanged_ui": "prior actual registered14 cases; three active UI source bytes exact af4870b757393faa4fc03e3a5701086f6627ff83",
+    "author_floor": "23 authored artifact hashes and all 5 check JUnit summaries reconciled from committed91 docs-only evidence"
+  },
+  "limitations": [
+    "focused development approval, not full acceptance or production activation",
+    "MySQL8.4/hosted CI/full46 repeat not run",
+    "external mail/provider and production transport activation not performed",
+    "mounted frontend historical jsdom lifecycle checks are not hosted BFCache evidence"
+  ],
+  "harness_failures": "Root original registered-floor run retained 6 errors from missing synthetic APP_KEY/loopback permission; corrected environment on same source 24/230 has zero failures/errors/skips. Not product-red evidence."
+}

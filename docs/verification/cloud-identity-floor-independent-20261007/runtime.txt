@@ -1,0 +1,5 @@
+PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)
+Copyright (c) The PHP Group
+Built by Debian
+Zend Engine v4.4.26, Copyright (c) Zend Technologies
+v24.19.0
