@@ -51,8 +51,10 @@ SQLite skips that case explicitly and is not presented as concurrency evidence.
 
 The schema cases execute SQL update/delete/IGNORE/REPLACE refusal, actual migration
 rollback with preserved ledger, and interrupted DDL through the actual migrator.
-Partial installation remains unlogged and cannot be adopted on retry; existing
-service revision bytes remain unchanged. No assertion, dependency or hosted CI
+The original handoff deliberately refused partial installation retry. Independent
+review found that behavior to be a development blocker; the correction below
+supersedes that behavior. Earlier receipts remain evidence of their original
+source, rather than acceptance of recovery. No assertion, dependency or hosted CI
 policy was weakened. No workflow dispatch, push, merge, new environment, real
 message, payment, supplier action or production configuration occurred.
 
@@ -87,3 +89,46 @@ only receipts and documentation.
 These focused receipts do not claim a fully passing final composed MySQL matrix,
 rendered browser/device acceptance, independent approval, full service parity or
 production readiness. Root owns shared integration and exact composed review.
+
+
+## Reviewed recovery and private-input correction
+
+Runtime/test correction: `38105a6d1cd8c5c8f2654fd81e28bff3d6ca2acb`.
+Parent's independently reviewed composition: `dccd15e` (correction runtime/test
+blobs exact). This evidence commit changes documentation/receipts only.
+
+The installation now recognizes only an exact contiguous owned prefix across
+all generated table, foreign-key, index and trigger statements. Full metadata,
+namespace/alias, dependency and temporary-shadow checks precede writes; partial
+schemas with rows, changed metadata or gaps remain untouched. A retry appends
+only the missing suffix. Exact complete retained history can be readmitted after
+final-guard/log uncertainty; operational rollback still refuses. Every generated
+statement is interrupted through the real Migrator (13 SQLite /18 MySQL),
+including MySQL's independently committed foreign-key/index statements.
+
+Read/save authority denial and departure now erase private selection, brief,
+answers and reason, preventing a later account refresh from reviving withdrawn
+account input. The reviewer retained its original red receipts separately.
+
+- Final SQLite schema/recovery: **10 cases,122 assertions,all passed**.
+- Final MySQL-connected selection: **10 cases,156 assertions,all passed** on
+  native MySQL `8.0.46-0ubuntu0.24.04.4`. **9 cases use MySQL; one explicit case
+  creates a separate in-memory SQLite composite dependency-key probe.** It is not
+  presented as a MySQL dependency-key case.
+- Mounted frontend: **7 cases,all passed**, including403/404/419 denial followed
+  by another account refresh. TypeScript and scoped Pint passed.
+- Initial correction MySQL attempt: **7 of8 passed,139 assertions**; the failing
+  test used native-invalid `CREATE TEMPORARY TABLE users LIKE users` (1066). It
+  was corrected to an explicit synthetic temp schema; raw red receipt is retained.
+- Independent exact composed review: SQLite **2 cases/19 assertions** (recovery
+  and composite PK), native MySQL **1case/10 assertions** (actual retry with exact
+  retained table/guard definitions,old rows and ledger), mounted React **1/1**.
+  Reviewer reported no remaining runtime blocker in this bounded correction.
+
+Commands: `php vendor/bin/phpunit tests/Feature/ServiceProjectRecoveryTest.php
+ tests/Feature/ServiceProjectSchemaTest.php`; native invocation additionally
+sources the private isolated task env and command loopback network permission.
+Frontend: `npm test -- tests/frontend/service-project-journey.test.tsx`.
+TypeScript: `npm run typecheck`; scoped `vendor/bin/pint --test` on changed PHP.
+No full matrix, rendered browser/device, full service parity or production
+readiness is claimed. Shared integration and independent receipts belong to root.
