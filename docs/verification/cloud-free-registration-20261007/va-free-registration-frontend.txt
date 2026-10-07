@@ -1,0 +1,13 @@
+
+> test
+> vitest run tests/frontend/free-grant-journey.test.tsx tests/frontend/customer-communication-registration.test.tsx
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-free-registration
+
+
+ Test Files  2 passed (2)
+      Tests  13 passed (13)
+   Start at  09:47:33
+   Duration  3.19s (environment 36%, tests 32%, transform 17%, import 8%, setup 7%, worker 1%)
+

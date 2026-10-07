@@ -1,0 +1,99 @@
+{
+  "executable": "c59e739baa0e997a3bb08a1d6cb27fe271d32b32",
+  "tree": "135a338efa1fe522caaadadeffd76ac0a4d62928",
+  "root_evidence_head": "c7ab41b8d283b9fcd348735eadb03001dd4fb1a9",
+  "reviewed_paths": {
+    "app/Http/Controllers/CustomerSessionController.php": {
+      "git_blob": "d8c9ee04169c6bf76feddf0853a075094f35f3f1",
+      "sha256": "3c01dda7450514472a21d273be2836dfdfe3d5485d61cda8b3cf10e16a8d9755"
+    },
+    "app/Http/Controllers/FreeGrantController.php": {
+      "git_blob": "fc4dc234ccddaa9a623f83e016267035cbccb5e5",
+      "sha256": "862627c39baf55f5584c256f4121b9ceec247d61adba1a9e99a00256421d95a6"
+    },
+    "app/Http/Controllers/PublicDiscoveryController.php": {
+      "git_blob": "bfa099f0830aa62d31277a72cff052384c17d5e0",
+      "sha256": "72c5c2541b051be7104577ed624bc00fedddc357eba79075224140795d755eef"
+    },
+    "bootstrap/app.php": {
+      "git_blob": "5a7827804b4e118c04f0a555cd2178e643f2c365",
+      "sha256": "985592c95416e3e8a489e7de6e54fc29e5ccb5556fbee26623bb62104ceb2a21"
+    },
+    "resources/js/Pages/CustomerLibrary.tsx": {
+      "git_blob": "c1f3dbdbaea24a850db7e190a42a9564e705c039",
+      "sha256": "0ba313ecddb2dbdb2d9384e95b18a4baf751f9e41043b0f70af838fb8636d1f3"
+    },
+    "resources/js/Pages/FreeGrants.tsx": {
+      "git_blob": "e11f86042dab92572e85349b7b9e9190525651c2",
+      "sha256": "7d7333e28270eb7abb917232b1ee57422335e6dc9c0d8c59b1d3fcf2d88d79a0"
+    },
+    "resources/js/app.tsx": {
+      "git_blob": "bb935eaf977f918f6d88c1c7a677e29f5f24895a",
+      "sha256": "de30c64288b47aff4569981a943cc6d62016b1d4ebd2c2816814c7746aac1b32"
+    },
+    "routes/web.php": {
+      "git_blob": "f80d13f09973af6e1f3318d2de7ae9b5aa30a89c",
+      "sha256": "97d0c2121269f962c8a9f5bd046f721d7a63b1fe328f7769dcb19a2ab3a8bfeb"
+    },
+    "tests/Feature/FreeGrantRegistrationTest.php": {
+      "git_blob": "9c9cf679ca657bee6bfe00fd6d7cd36af6a18eed",
+      "sha256": "5a82b2c562139ae2caed47f44643f33e47c36b3276d3a972536336bec87ff821"
+    }
+  },
+  "prior_free_approval": "2b52f07bc4a7ded5e7e58de989bcd6f597014655",
+  "prior_free_paths_reconciled": 50,
+  "prior_free_unchanged_paths": [
+    "app/Domain/Grants/Free/FreeGrantDefinitions.php",
+    "app/Domain/Grants/Free/FreeGrantDocuments.php",
+    "app/Domain/Grants/Free/FreeGrantDownloads.php",
+    "app/Domain/Grants/Free/FreeGrantException.php",
+    "app/Domain/Grants/Free/FreeGrantForm.php",
+    "app/Domain/Grants/Free/FreeGrantHttpIdentity.php",
+    "app/Domain/Grants/Free/FreeGrantIdentity.php",
+    "app/Domain/Grants/Free/FreeGrantInput.php",
+    "app/Domain/Grants/Free/FreeGrantJson.php",
+    "app/Domain/Grants/Free/FreeGrantPdfRenderer.php",
+    "app/Domain/Grants/Free/FreeGrantPolicy.php",
+    "app/Domain/Grants/Free/FreeGrantReads.php",
+    "app/Domain/Grants/Free/FreeGrantRecords.php",
+    "app/Domain/Grants/Free/FreeGrantRenderInput.php",
+    "app/Domain/Grants/Free/FreeGrantRenderProfile.php",
+    "app/Domain/Grants/Free/FreeGrantRendererProcess.php",
+    "app/Domain/Grants/Free/FreeGrantRows.php",
+    "app/Domain/Grants/Free/FreeGrantSchema.php",
+    "app/Domain/Grants/Free/FreeGrantSources.php",
+    "app/Domain/Grants/Free/FreeGrantStaff.php",
+    "app/Domain/Grants/Free/FreeGrantText.php",
+    "app/Domain/Grants/Free/FreeGrantTransfer.php",
+    "app/Domain/Grants/Free/FreeGrants.php",
+    "app/Domain/Grants/Free/Models/FreeDefinition.php",
+    "app/Domain/Grants/Free/TestFreeGrantIdentity.php",
+    "app/Filament/Resources/FreeDefinitionResource.php",
+    "app/Filament/Resources/FreeDefinitionResource/Pages/ManageFreeDefinitions.php",
+    "app/Http/Middleware/FreeGrantPrivacy.php",
+    "config/free-grants.php",
+    "database/migrations/2026_10_07_245000_free_grant_origins.php",
+    "resources/contracts/free-v1/profile-assets.json",
+    "resources/css/free-grants.css",
+    "resources/js/components/FreeGrantJourney.tsx",
+    "resources/views/admin/free-grant-definition.blade.php",
+    "routes/free-grants.php",
+    "scripts/render-free-grant.php",
+    "tests/Feature/FreeGrantAdministrationTest.php",
+    "tests/Feature/FreeGrantAuthorityTest.php",
+    "tests/Feature/FreeGrantConcurrencyTest.php",
+    "tests/Feature/FreeGrantDefinitionsTest.php",
+    "tests/Feature/FreeGrantDownloadsTest.php",
+    "tests/Feature/FreeGrantHttpTest.php",
+    "tests/Feature/FreeGrantJourneyTest.php",
+    "tests/Feature/FreeGrantPreparationStatusTest.php",
+    "tests/Feature/FreeGrantSchemaRecoveryTest.php",
+    "tests/Support/FreeGrantFixtures.php",
+    "tests/Support/free-grant-race-worker.php",
+    "tests/frontend/free-grant-journey.test.tsx"
+  ],
+  "prior_free_changed_paths": [
+    "app/Http/Controllers/FreeGrantController.php",
+    "resources/js/Pages/FreeGrants.tsx"
+  ]
+}

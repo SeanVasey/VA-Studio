@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"tests\/Feature\/FreeGrantRegistrationTest.php","fixers":["class_attributes_separation"]}]}

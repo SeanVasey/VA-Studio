@@ -2,7 +2,7 @@
 
 ## Current cloud execution — October 7, 2026 UTC
 
-Verified main9f805b8 includes PRs25–32. The [current ownership/checkpoint](verification/cloud-primary-checkpoint-20261007.md) records approved identity247, held attachment249 integration, checkout246 held-frame/tax repair, approved free245 and discovery248, suppression251 native admission repair and new paid252/production feature253 work. The full personal-store objective continues through memberships, other product fulfillment, migration, content/payment/hosting preparation and one consolidated final exact-SHA Foundation run. Six accepted parent groups and34 open remain unchanged; focused development merges do not establish full acceptance.
+Verified main2cdd3da includes PRs25–33. The [current ownership/checkpoint](verification/cloud-primary-checkpoint-20261007.md) records merged identity247, approved default-off free245 registration, held attachment249 and discovery248 native/request repairs, suppression251 admission correction, checkout246 callback/committed-receipt work and new paid252/production feature253/production suppression254/automatic-tax255 work. The full personal-store objective continues through memberships, other product fulfillment, migration, content/payment/hosting preparation and one consolidated final exact-SHA Foundation run. Six accepted parent groups and34 open remain unchanged; focused development merges do not establish full acceptance.
 
 ## Historical October6 execution
 

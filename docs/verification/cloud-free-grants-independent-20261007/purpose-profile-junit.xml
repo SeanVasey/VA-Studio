@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\IndependentFreeGrants\FreeGrantPurposeProfileCanaryTest" file="/workspace/VA-Studio-free-grants-independent/docs/verification/cloud-free-grants-independent-20261007/FreeGrantPurposeProfileCanaryTest.php" tests="1" assertions="8" errors="0" failures="0" skipped="0" time="2.212239">
+    <testcase name="test_purchase_profile_and_relabelled_free_profile_cannot_render_an_original_free_assent" file="/workspace/VA-Studio-free-grants-independent/docs/verification/cloud-free-grants-independent-20261007/FreeGrantPurposeProfileCanaryTest.php" line="20" class="Tests\IndependentFreeGrants\FreeGrantPurposeProfileCanaryTest" classname="Tests.IndependentFreeGrants.FreeGrantPurposeProfileCanaryTest" assertions="8" time="2.212239"/>
+  </testsuite>
+</testsuites>
