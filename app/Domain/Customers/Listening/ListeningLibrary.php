@@ -19,6 +19,12 @@ final class ListeningLibrary
 
     public const PLAYLIST_TRACKS = 25;
 
+    public const NOTES = 25;
+
+    public const NOTE_CHARACTERS = 2000;
+
+    public const NOTE_BYTES = 4000;
+
     public function read(CustomerPrincipal $principal, User $actor): array
     {
         return DB::transaction(function () use ($principal, $actor): array {
@@ -45,15 +51,41 @@ final class ListeningLibrary
                 throw new ListeningException(409);
             }
             $state = $this->state($row, $principal->accountId);
-            $next = $this->apply($state, $command, $evidence);
-            if ($next !== $state) {
+            $next = $this->pruneNotes($this->apply($state, $command, $evidence));
+            if ($next !== $state || $command['action'] === 'clear-library') {
                 $row ??= new SavedListeningLibrary(['customer_account_id' => $principal->accountId]);
+                $next = $this->v2($next);
                 $next['version'] = ++$version;
                 $row->fill(['version' => $version, 'payload' => $next])->save();
             }
 
             return $this->project($principal, $next, $version, $evidence, $this->expected($row, $next, $version, $principal->accountId));
         }, 3);
+    }
+
+    /** Own feature inputs only: never include catalog, account or purchased-rights data. */
+    public function export(CustomerPrincipal $principal, User $actor, int $expectedVersion): array
+    {
+        return DB::transaction(function () use ($principal, $actor, $expectedVersion): array {
+            $evidence = new ListeningEvidence;
+            app(CustomerAccess::class)->lock($principal, $principal->ownerKey, $actor);
+            if ($expectedVersion < 0 || $expectedVersion > 2147483646) {
+                throw new ListeningException;
+            }
+            $row = SavedListeningLibrary::where('customer_account_id', $principal->accountId)->lockForUpdate()->first();
+            $version = $row?->version ?? 0;
+            if ($expectedVersion !== $version) {
+                throw new ListeningException(409);
+            }
+            $state = $this->state($row, $principal->accountId);
+            $expected = $this->expected($row, $state, $version, $principal->accountId);
+            $result = ['exportSchema' => 1, 'feature' => 'customer-listening-library', 'version' => $version,
+                'favorites' => $state['favorites'], 'playlists' => $state['playlists'], 'notes' => $state['notes'] ?? []];
+            app(CustomerAccess::class)->current($principal);
+            $evidence->prove($principal, $expected);
+
+            return $result;
+        });
     }
 
     private function validateCommand(array $command): void
@@ -65,6 +97,9 @@ final class ListeningLibrary
             'delete-playlist' => ['playlistId'],
             'add-playlist-track', 'remove-playlist-track' => ['playlistId', 'trackId'],
             'reorder-playlist' => ['playlistId', 'trackIds'],
+            'set-track-note' => ['trackId', 'body'],
+            'delete-track-note' => ['trackId'],
+            'clear-library' => [],
             default => throw new ListeningException,
         };
         if (count($command) !== count($fields) + 2 || array_diff(array_keys($command), ['action', 'version', ...$fields])
@@ -84,6 +119,8 @@ final class ListeningLibrary
                     || mb_strlen($value) < 1 || mb_strlen($value) > 80 || preg_match('/[\p{Cc}\p{Cf}]/u', $value)) {
                     throw new ListeningException;
                 }
+            } elseif ($field === 'body') {
+                $this->note($value);
             } else {
                 $this->ids($value, self::PLAYLIST_TRACKS);
             }
@@ -93,6 +130,36 @@ final class ListeningLibrary
     private function apply(array $state, array $command, ListeningEvidence $evidence): array
     {
         $action = $command['action'];
+        if ($action === 'clear-library') {
+            return [...$state, 'schema' => 2, 'favorites' => [], 'playlists' => [], 'notes' => []];
+        }
+        if ($action === 'set-track-note' || $action === 'delete-track-note') {
+            if (! in_array($command['trackId'], $this->references($state), true)) {
+                throw new ListeningException(404);
+            }
+            $notes = $state['notes'] ?? [];
+            $index = array_search($command['trackId'], array_column($notes, 'trackId'), true);
+            if ($action === 'delete-track-note') {
+                if ($index === false) {
+                    return $state;
+                }
+                array_splice($notes, $index, 1);
+            } else {
+                if ($index !== false && $notes[$index]['body'] === $command['body']) {
+                    return $state;
+                }
+                if ($index === false) {
+                    if (count($notes) >= self::NOTES) {
+                        throw new ListeningException;
+                    }
+                    $notes[] = ['trackId' => $command['trackId'], 'body' => $command['body']];
+                } else {
+                    $notes[$index]['body'] = $command['body'];
+                }
+            }
+
+            return [...$this->v2($state), 'notes' => $notes];
+        }
         if ($action === 'save-track' || $action === 'remove-saved-track') {
             if ($action === 'save-track') {
                 $this->requirePublic($command['trackId'], $evidence);
@@ -165,7 +232,11 @@ final class ListeningLibrary
         }
         try {
             $state = $row->payload;
-            if (! is_array($state) || array_keys($state) !== ['schema', 'accountId', 'version', 'favorites', 'playlists'] || $state['schema'] !== 1
+            $keys = ['schema', 'accountId', 'version', 'favorites', 'playlists'];
+            if (is_array($state) && ($state['schema'] ?? null) === 2) {
+                $keys[] = 'notes';
+            }
+            if (! is_array($state) || array_keys($state) !== $keys || ! in_array($state['schema'], [1, 2], true)
                 || $state['accountId'] !== $accountId || $row->customer_account_id !== $accountId || $state['version'] !== $row->version
                 || $row->version < 1 || $row->version > 2147483646) {
                 throw new ListeningException;
@@ -183,6 +254,23 @@ final class ListeningLibrary
                 $this->ids($playlist['trackIds'], self::PLAYLIST_TRACKS);
                 $ids[] = $playlist['id'];
             }
+            if ($state['schema'] === 2) {
+                $notes = $state['notes'];
+                if (! is_array($notes) || ! array_is_list($notes) || count($notes) > self::NOTES) {
+                    throw new ListeningException;
+                }
+                $seen = [];
+                $references = $this->references($state);
+                foreach ($notes as $note) {
+                    if (! is_array($note) || array_keys($note) !== ['trackId', 'body'] || in_array($note['trackId'], $seen, true)
+                        || ! in_array($note['trackId'], $references, true)) {
+                        throw new ListeningException;
+                    }
+                    $this->id($note['trackId']);
+                    $this->note($note['body']);
+                    $seen[] = $note['trackId'];
+                }
+            }
 
             return $state;
         } catch (Throwable) {
@@ -199,6 +287,35 @@ final class ListeningLibrary
         }
 
         return $row?->getRawOriginal();
+    }
+
+    private function v2(array $state): array
+    {
+        return [...$state, 'schema' => 2, 'notes' => $state['notes'] ?? []];
+    }
+
+    private function references(array $state): array
+    {
+        return array_values(array_unique([...$state['favorites'], ...array_merge([], ...array_column($state['playlists'], 'trackIds'))]));
+    }
+
+    private function pruneNotes(array $state): array
+    {
+        if ($state['schema'] === 2) {
+            $references = $this->references($state);
+            $state['notes'] = array_values(array_filter($state['notes'], fn ($note) => in_array($note['trackId'], $references, true)));
+        }
+
+        return $state;
+    }
+
+    private function note(mixed $body): void
+    {
+        if (! is_string($body) || ! mb_check_encoding($body, 'UTF-8') || trim($body) === '' || strlen($body) > self::NOTE_BYTES
+            || mb_strlen($body) > self::NOTE_CHARACTERS || preg_match('/[\p{Cf}\x00-\x08\x0B-\x1F\x7F-\x9F]/u', $body)
+            || preg_match('/[^\p{Z}\x09\x0A]/u', $body) !== 1) {
+            throw new ListeningException;
+        }
     }
 
     private function id(mixed $id): void
@@ -234,10 +351,12 @@ final class ListeningLibrary
         }
         $item = fn (string $id): array => ['trackId' => $id, 'available' => isset($tracks[$id])]
             + (isset($tracks[$id]) ? ['track' => $tracks[$id]] : []);
-        $result = ['listeningSchema' => 1, 'version' => $version,
+        $result = ['listeningSchema' => 2, 'version' => $version,
             'favorites' => array_map($item, $state['favorites']),
             'playlists' => array_map(fn ($playlist) => ['id' => $playlist['id'], 'name' => $playlist['name'], 'tracks' => array_map($item, $playlist['trackIds'])], $state['playlists']),
-            'limits' => ['favorites' => self::FAVORITES, 'playlists' => self::PLAYLISTS, 'playlistTracks' => self::PLAYLIST_TRACKS]];
+            'notes' => $state['notes'] ?? [],
+            'limits' => ['favorites' => self::FAVORITES, 'playlists' => self::PLAYLISTS, 'playlistTracks' => self::PLAYLIST_TRACKS,
+                'notes' => self::NOTES, 'noteCharacters' => self::NOTE_CHARACTERS, 'noteBytes' => self::NOTE_BYTES]];
         // Media/readiness callbacks may withdraw access; never release a stale projection or commit.
         app(CustomerAccess::class)->current($principal);
         $evidence->prove($principal, $expectedRow);
