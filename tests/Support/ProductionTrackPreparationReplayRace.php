@@ -67,6 +67,7 @@ final class ProductionTrackPreparationReplayRace
                 $results[] = $result;
             }
             $test->assertTrue($results[$first]['paused']);
+            echo json_encode(['packet_replay_results' => $results, 'first' => $first], JSON_THROW_ON_ERROR)."\n";
 
             return $results;
         } finally {
