@@ -397,6 +397,16 @@ the templates are now comments (unit/cron lines) followed by a required `systemc
 plus `is-active`, a fatal `php artisan up` and a reachability check. The backup procedure's
 `php artisan up` is fatal too, so a host left in maintenance never continues into the restore.
 
+Codex's eighteenth pass (P1 ×4, docs): the S1 upgrade sequence was restructured. The runtime
+preflight is fatal; maintenance is entered and proven in the release actually being served
+(`<RELEASES_DIR>/current`, skipped on a first install) and the services stopped and verified
+inactive before the backup; the new checkout enters maintenance itself before `migrate
+--force || exit 1` (and `config:cache`, `doctor` are fatal); the units are then switched by
+repointing the `current` symlink atomically, reloading the web service and proving
+`readlink -f current` and the worker's `/proc/<MainPID>/cwd` equal the new release while the
+site still answers 503, before the final `php artisan up`. The rollback's release switch now
+uses the same mechanism. Documentation only; not executed.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex

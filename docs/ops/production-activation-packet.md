@@ -97,7 +97,9 @@ account; a separate backup-only account; the private storage root; the ffmpeg, f
 prlimit and clamscan paths; the approved tag WAV and its hash; an `APP_KEY` generated on the
 host; mail stays `log`. `<APP_USER>` is the account the web and worker units run as and
 `<APP_GROUP>` its primary group, named separately (an account such as `nobody` has no group
-of its own name).
+of its own name). `<WEB_SERVICE>`, `<QUEUE_WORKER_SERVICE>` and `<SCHEDULER_SERVICE>` are the
+host's unit names; the web unit serves `<RELEASES_DIR>/current/public` and the other two run
+`<RELEASES_DIR>/current/artisan`.
 
 ```sh
 # On the staging host, as the unprivileged application user. Every release is a fresh,
@@ -128,40 +130,59 @@ test "$(stat -c %d:%i storage/app/private)" = "$(stat -c %d:%i <PERSISTENT_ROOT>
 # Configuration lives outside the repository, mode 0600, assembled from the two templates:
 #   ops/private-server/env.example       (host baseline; fill host inputs only)
 #   ops/production/env.production.example (payment families; leave every flag false, every secret blank)
-php scripts/ops/private-server-preflight.php --env-file <RUNTIME_ENV> --runtime
+php scripts/ops/private-server-preflight.php --env-file <RUNTIME_ENV> --runtime || exit 1   # a blocked host never gets its environment installed
 # The preflight only parses <RUNTIME_ENV>; nothing has loaded it yet. Laravel reads .env from
 # the release root, which is gitignored and outside the tree checks above, so install the
 # validated file there (0600, application user) before any Artisan, web or worker process runs.
-# The web and worker units run from <RELEASES_DIR>/<SHA> and therefore read the same file;
-# a unit may instead carry EnvironmentFile=<RUNTIME_ENV>, but never both.
+# The web and worker units run from <RELEASES_DIR>/current (a symlink the switch below
+# repoints; the web unit serves current/public and the worker and scheduler units run
+# current/artisan) and therefore read the release's own .env; a unit may instead carry
+# EnvironmentFile=<RUNTIME_ENV>, but never both.
 install -m 0600 -o <APP_USER> -g <APP_GROUP> <RUNTIME_ENV> .env && cmp -s <RUNTIME_ENV> .env || { echo '.env not installed'; exit 1; }
 
-# Back up first (docs/ops/backup-restore-proof.md, MySQL procedure) and stay quiesced: on a
-# host that already serves traffic, skip that procedure's resume step (its `systemctl start`
-# and `php artisan up` after step 2) and keep maintenance mode and the stopped workers and
-# scheduler in effect through the migration and until this release is activated below, so
-# no request or job meets a partially migrated schema. The resume happens once, at the end
-# of this stage, in the new release.
+# Quiesce the release that is actually serving traffic, not this checkout: with the file
+# maintenance driver `artisan down` marks only the release it runs in. On an existing host
+# <RELEASES_DIR>/current points at the served release; on a first install there is none and
+# this block is skipped.
+if [ -e <RELEASES_DIR>/current ]; then
+  (cd "$(readlink -f <RELEASES_DIR>/current)" && php artisan down) || exit 1
+  curl -fsS -o /dev/null https://<STAGING_ORIGIN>/ && { echo 'served release still answers 200'; exit 1; }
+  systemctl stop <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> || exit 1
+  systemctl is-active --quiet <QUEUE_WORKER_SERVICE> && exit 1; systemctl is-active --quiet <SCHEDULER_SERVICE> && exit 1
+fi
+# Back up now (docs/ops/backup-restore-proof.md, MySQL procedure, steps 1-2 only): the host
+# is already quiesced, so skip that procedure's own `artisan down` and its resume step and
+# stay in maintenance with the services stopped through the migration and the switch, so no
+# request or job meets a partially migrated schema. The resume happens once, at the end.
+
+# Migrate from the new release; this checkout enters maintenance too, so the switch below
+# never exposes a release without a marker.
+php artisan down || exit 1
 php artisan migrate:status
 php artisan migrate --pretend      # review the SQL
-php artisan migrate --force
-php artisan config:cache
-php artisan vasey:doctor
+php artisan migrate --force || { echo 'migration failed: host stays in maintenance; restore from the backup before retrying'; exit 1; }
+php artisan config:cache || exit 1
+php artisan vasey:doctor || exit 1
 php artisan vasey:commerce-readiness --json   # effective cached configuration
 php artisan vasey:stripe-preflight --json     # still no provider I/O
 
-# Supervised workers and the scheduler (host supervisor and cron, as U-02 decides). These are
-# the unit/cron command lines, not commands to run in this shell: a foreground queue:work
-# would block here.
-#   php artisan queue:work database --queue=media --timeout=900 --tries=3 --sleep=1    # docs/media-processing.md
-#   php artisan queue:work database --queue=contracts --tries=1 --timeout=90            # docs/test-contract-issuance.md
-#   php artisan queue:work database --queue=payments,inquiry-alerts,default --tries=1   # per-queue flags: confirm in each feature doc
-#   * * * * * php <APP_ROOT>/artisan schedule:run
-# Resume, in this release only, once the migration and checks above have passed: start the
-# supervised services, verify them, then leave maintenance mode as the last required step.
-# A service that fails to start keeps the host in maintenance (fail safe): fix it, then run
-# `php artisan up` by hand.
-systemctl start <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> && systemctl is-active <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> || exit 1
+# Switch the units to this release: repoint the `current` symlink atomically, reload the web
+# service so it serves <SHA>/public, and prove the served and worked release before leaving
+# maintenance. Unit/cron command lines (host supervisor and cron, as U-02 decides; not shell
+# steps, a foreground queue:work would block here):
+#   php <RELEASES_DIR>/current/artisan queue:work database --queue=media --timeout=900 --tries=3 --sleep=1    # docs/media-processing.md
+#   php <RELEASES_DIR>/current/artisan queue:work database --queue=contracts --tries=1 --timeout=90            # docs/test-contract-issuance.md
+#   php <RELEASES_DIR>/current/artisan queue:work database --queue=payments,inquiry-alerts,default --tries=1   # per-queue flags: confirm in each feature doc
+#   * * * * * php <RELEASES_DIR>/current/artisan schedule:run
+ln -sfn <RELEASES_DIR>/<SHA> <RELEASES_DIR>/current.next && mv -T <RELEASES_DIR>/current.next <RELEASES_DIR>/current || exit 1
+test "$(readlink -f <RELEASES_DIR>/current)" = "<RELEASES_DIR>/<SHA>" || { echo 'current does not point at <SHA>'; exit 1; }
+systemctl reload-or-restart <WEB_SERVICE> && systemctl is-active --quiet <WEB_SERVICE> || exit 1
+curl -fsS -o /dev/null https://<STAGING_ORIGIN>/ && { echo 'new release answers 200 while down'; exit 1; }   # still 503: the switch kept the marker
+systemctl start <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> && systemctl is-active --quiet <QUEUE_WORKER_SERVICE> && systemctl is-active --quiet <SCHEDULER_SERVICE> || exit 1
+# The worker really runs this SHA: its main process's working directory is the new release.
+test "$(readlink -f /proc/$(systemctl show -p MainPID --value <QUEUE_WORKER_SERVICE>)/cwd)" = "<RELEASES_DIR>/<SHA>" || { echo 'worker not on <SHA>'; exit 1; }
+# Leave maintenance last, in this release only; the superseded release stays down. A service
+# that fails above keeps the host in maintenance (fail safe): fix it, then `php artisan up` by hand.
 php artisan up || exit 1
 curl -fsS -o /dev/null https://<STAGING_ORIGIN>/ || { echo 'staging still unavailable after artisan up'; exit 1; }
 ```
@@ -206,10 +227,11 @@ curl -fsS -o /dev/null https://<STAGING_ORIGIN>/ || { echo 'staging still unavai
    writes a release-local `storage/framework/maintenance.php`, and S1 shares only
    `storage/app/private` between releases, so switching the web unit to a release without
    its own marker would reopen HTTP traffic at once. Run `php artisan down || exit 1` inside
-   `<RELEASES_DIR>/<PREVIOUS_SHA>`, then switch the web and worker units to that directory,
-   which was built and attached by its own S1 run and still holds its `vendor/`,
-   `public/build/`, `.env` and bind-mounted private storage, and confirm the site still
-   answers 503 after the switch. Never check another SHA out inside the current release
+   `<RELEASES_DIR>/<PREVIOUS_SHA>`, then switch the units to that directory the way S1 does
+   (repoint `<RELEASES_DIR>/current` atomically, `reload-or-restart <WEB_SERVICE>`, verify
+   `readlink -f current` and the worker's `/proc/<MainPID>/cwd`); it was built and attached
+   by its own S1 run and still holds its `vendor/`, `public/build/`, `.env` and bind-mounted
+   private storage. Confirm the site still answers 503 after the switch. Never check another SHA out inside the current release
    directory: it would keep the newer `public/build` and serve an incompatible Vite manifest.
    If no built previous release exists, repeat the complete S1 checkout, build and attachment
    for `<PREVIOUS_SHA>` first (its S1 run ends in maintenance mode until this step lifts it).
