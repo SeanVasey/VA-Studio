@@ -1,38 +1,31 @@
 # Current development queue
 
-## Cloud recovery and continued implementation — October 7 UTC
+## Current cloud integration — October 7, 2026 UTC
 
-The sole current integration owner is `/root` in the published cloud workspace
-`/workspace/VA-Studio`, branch `codex/cloud-primary-development-20261007`.
-Verified main is `22d340bd0a19cfb025b0f2b48171283f4b61d156`: PR26 merged
-at `5b58e2e4805ed5a30cf3071457cbc8e526c1425a`, then PR27 corrected actual
-private inquiry crawler routes and retained the source census/completion audit.
-Expected-head merges, independent reviews and cheap preflights passed. No final
-Foundation acceptance has been dispatched or claimed.
+Verified main is `cad70a7dffb3e20049564fd9d543185c9c0fa9ec`, with PR26
+amount preparation, PR27 crawler/source recovery, PR28 installation/private
+checkout presentation and corrected PR25 epoch recovery merged. Immediate
+review threads are resolved after exact-source independent review and focused
+SQLite/native proof; cheap preflights and expected-head merges passed. No full
+Foundation acceptance has run.
 
-Recovered installation/checkout executable `26700f97268a29209718ffc2fac534deb5259c2d`
-is independently approved, composed as `d6324f9808fba13346aaf2b628df83b62c192208`
-with evidence `ddd7c58d9914aeaeb1da782cfee8dc3dfffb8dfd`. All24 source paths,
-19 exact recovered blobs and current focused receipts are reconciled. Native
-browser definitions remain unexecuted locally. This coherent UI recovery proceeds
-to its own cheap preflight while sensitive lanes repair concrete findings.
+Private saved favorites/playlists and recovered inquiry alerts are composed at
+`3ccd2af747f476c28ccd021e1dd2f580d1813325`, with independent review,
+actual107 PHP passes/987 assertions/four native-only skips,65 mounted frontend
+passes, TypeScript/Pint and50 selector checks. See the
+[shared evidence](verification/cloud-listening-registration-20261007/README.md).
+Publication/preflight remain pending here. No external transport is bound.
+Service projects have corrected exact-prefix migration and private-input denial
+source; actual native and independent final evidence reconciliation is active.
 
-PR25 remains open at published `f713ce64`; its original green preflight does
-not validate the new migration repair. Author/reviewer are completing actual
-112 boundary MySQL failure/retry proof and repairing a reproduced SQLite
-reserved table/trigger name collision. Listening author/reviewer are repairing
-terminal account/password/policy/retained-row drift and migration ownership
-findings before root publishes its account route/page composition. Recovered
-inquiry notifications and a real synthetic service brief/immutable quote/project
-journey advance independently. The [current agent table](development-agent-queue.md)
-and [checkpoint](verification/cloud-primary-checkpoint-20261007.md) bind ownership.
-
-The [all-scope audit](verification/cloud-completion-audit-20261007.md) supersedes
-old active assignments below, preserving their historical proof. Operative
-production commerce, free/member grant origins, remaining product fulfillment,
-CRM, source reconciliation and hosting acceptance still require code or actual
-prerequisites. Source exports, prices/terms and production facts are not invented.
-October6 CI controls and PR24 original/PDF safeguards remain intact.
+Operative checkout246000 and additive identity/local-SMTP247000, listening
+notes/export/clear and scanned attachments249000 are actively authored in
+isolated worktrees. Distinct free-origin grants245000 follow reviewed service/
+source-adapter work, then membership and remaining product fulfillment. The
+all-scope audit retains40 groups/103 mappings, six accepted parent groups and34
+open; focused child merges do not close those criteria. Actual legal/source/
+provider/hosting facts and final exact-SHA verification retain concrete gates.
+`/root` remains the sole integration owner.
 
 ## Amount preparation batch and discovery recovery — October 7 UTC
 

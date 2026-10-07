@@ -1,0 +1,15 @@
+{
+    "source": "1be99f0fa37cc7e120d427dd4494708300bf7d5a",
+    "mysql": "8.0.46-0ubuntu0.24.04.4",
+    "isolation": "REPEATABLE-READ",
+    "observed_waits": 1,
+    "winner": {
+        "status": 200,
+        "version": 1
+    },
+    "contender": {
+        "status": 409
+    },
+    "retained_rows": 1,
+    "retained_version": 1
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ListeningIndependentBoundaryTest" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="0.466380">
+    <testcase name="test_saved_model_callback_cannot_rebind_expected_row_to_a_different_committed_revision" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" line="138" class="Tests\Feature\ListeningIndependentBoundaryTest" classname="Tests.Feature.ListeningIndependentBoundaryTest" assertions="2" time="0.466380">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ListeningIndependentBoundaryTest::test_saved_model_callback_cannot_rebind_expected_row_to_a_different_committed_revision
+Saved-model callback advanced the same instance to revision 2 but revision 1 was released: {"listeningSchema":1,"version":1,"favorites":[],"playlists":[{"id":"2186a184-fb6b-4a4f-b905-90605c31d653","name":"Independent intended private name","tracks":[]}],"limits":{"favorites":50,"playlists":10,"playlistTracks":25}}
+Failed asserting that false is true.
+
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:161</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

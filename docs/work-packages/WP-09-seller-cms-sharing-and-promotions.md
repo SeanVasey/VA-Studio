@@ -112,3 +112,8 @@ The independently reviewed [inquiry-history child](../verification/original-sess
 ## Order-linked test support — October 6, 2026
 
 The independently reviewed T17 child connects an owned test order to the existing private inquiry conversation through an immutable minimal association. It requires explicit local/testing enablement and current contact publication, eligible staff and customer authority. Generic inquiry payloads and commerce history remain unchanged; original-session context reads do not confer current order or download access. The backend and UI verification records retain component checks, independent findings and remaining composed gates. Private support attachments, production notice/retention/recovery policy and real notifications remain open, as does broader WP-09/T17 acceptance.
+
+
+## Cloud focused development child — October 7, 2026
+
+Recovered inquiry-alert intents/workers are independently reviewed at e290 and composed over correctedmain. Bounded retry/current authority/ambiguous handoff and migration ownership have SQLite/native evidence; default-off unbound transport sends no mail. Actual delivery, customer notices, attachments and full WP-09 criteria remain open. See [shared source-bound evidence](../verification/cloud-listening-registration-20261007/README.md) and current checkpoint for publication/preflight.

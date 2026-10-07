@@ -5,6 +5,12 @@ selected published cloud workspace `/workspace/VA-Studio`. No second environment
 or Mac execution was used. The current branch is
 `codex/cloud-primary-development-20261007`.
 
+## Current recovery state
+
+Verified maincad70a7 includes the immediate PR25/26/23 repairs. Starting-state
+sections below are historical. Current owned work and source receipts are in
+the newest milestone and current agent queue.
+
 ## Verified starting source and recovery limits
 
 - Clean restored source and freshly read remote main:
@@ -185,3 +191,34 @@ owned-schema retry/rollback retention. Root service registration is retained at
 and composition checks. Next code lanes are operative track checkout, additive
 SMTP/identity, distinct free/member grant origins and remaining CRM children;
 their authors retain explicit namespace/migration ownership before editing.
+
+## Fourth milestone and listening/inquiry publication candidate
+
+PR25 merged expected head `0547d2fcee574015a58d0c76e270d5c974339989`
+as `cad70a7dffb3e20049564fd9d543185c9c0fa9ec` at02:45 America/Chicago,
+tree `0ef9c94a3d7a0308b0d35c58b6c56c58f2bde0a5`. Fresh merged-state,
+ordered-parent/tree readbacks passed. Cheap preflight37588637907 passed;
+new-head automatic code review completed without findings. Original-head
+security review is not claimed as new-head automatic security review; actual
+independent migration/source review approved the repaired composition. PR25
+4203470722 and PR23 4203228092 now resolve true after verified thread mutations.
+No protection, dependency, budget or automatic matrix policy changed.
+
+Listening/inquiry composition `3ccd2af747f476c28ccd021e1dd2f580d1813325`
+has actual focused proof and independent domain approval. Its root receipt
+directory binds all runtime paths, four native-only skips and seven precise
+registry additions beyond original150, plus unchanged native/source carry.
+107 PHP passes/987 assertions,65 mounted frontend cases, TypeScript, scoped
+Pint and50 selector checks pass. Original fixture/setup/domain failures remain.
+Publication/preflight and expected-head merge are pending at this checkpoint.
+
+Service composition `dccd15e202827d22ac19bd0d0f12ce60a43f73d8` includes
+currentmain and author38105 exact-prefix recovery, composite SQLite dependency
+PK refusal and private-input clearing. Independent original red-now-green
+SQLite2/19, native1/10 and mounted denial1/1 pass; final author evidence and
+replacement of historical retry-refusal documentation are still being reconciled.
+ProductionCheckout246, ProductionIdentity247/local SMTP, listeningV2 notes/
+export/clear and attachments249 advance independently. Service source adapter
+precedes distinct free-grant245, then membership/product delivery. No external
+message, live payment, entitlement import, deploy or full verification is claimed.
+Work continues without a new user prompt.

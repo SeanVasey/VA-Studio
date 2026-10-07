@@ -1,0 +1,126 @@
+{
+  "executed_composition": "3ccd2af747f476c28ccd021e1dd2f580d1813325",
+  "tree": "d5f8bc1ceab4397b4f9e988648c350a3397ca112",
+  "base_main": "cad70a7dffb3e20049564fd9d543185c9c0fa9ec",
+  "listening_independent_approved": "ca3b1fa7eb60edd2228b73742da33179228a277e",
+  "inquiry_independent_approved": "e2900e800d375e6956a0948aecb50cb323009d7d",
+  "listening_identical_paths": [
+    "app/Domain/Customers/Listening/ListeningEvidence.php",
+    "app/Domain/Customers/Listening/ListeningException.php",
+    "app/Domain/Customers/Listening/ListeningLibrary.php",
+    "app/Domain/Customers/Listening/SavedListeningLibrary.php",
+    "app/Http/Controllers/CustomerListeningLibraryController.php",
+    "app/Http/Controllers/CustomerSessionController.php",
+    "app/Http/Middleware/CustomerPrivacy.php",
+    "app/Http/Requests/CustomerListeningRequest.php",
+    "resources/js/Pages/CustomerLibrary.tsx",
+    "resources/js/components/CustomerListeningLibrary.tsx",
+    "routes/customer.php",
+    "tests/Feature/CustomerListeningFreshnessTest.php",
+    "tests/Feature/CustomerListeningLibraryHttpTest.php",
+    "tests/Feature/CustomerListeningLibraryTest.php",
+    "tests/Feature/CustomerListeningMigrationTest.php",
+    "tests/Feature/CustomerListeningPrimaryProofTest.php",
+    "tests/Unit/CustomerListeningRequestTest.php",
+    "tests/frontend/customer-listening-library.test.tsx"
+  ],
+  "inquiry_identical_paths": [
+    "app/Console/Commands/ProcessInquiryAlerts.php",
+    "app/Domain/Inquiries/Models/InquiryNotificationIntent.php",
+    "app/Domain/Inquiries/Notifications/InquiryAlertNotSubmitted.php",
+    "app/Domain/Inquiries/Notifications/InquiryAlertTransport.php",
+    "app/Domain/Inquiries/Notifications/InquiryNotificationWork.php",
+    "app/Domain/Inquiries/Notifications/OperatorInquiryAlert.php",
+    "app/Domain/Inquiries/SubmitInquiry.php",
+    "app/Jobs/NotifyInquiryOperatorJob.php",
+    "config/inquiries.php",
+    "database/migrations/2026_10_07_243000_inquiry_notification_intents.php",
+    "tests/Feature/InquiryNotificationConcurrencyTest.php",
+    "tests/Feature/InquiryNotificationMigrationTest.php",
+    "tests/Feature/InquiryNotificationWorkTest.php",
+    "tests/Support/InquiryNotificationRace.php",
+    "tests/Support/inquiry-notification-race-worker.php"
+  ],
+  "source_sha256": {
+    "app/Console/Commands/ProcessInquiryAlerts.php": "aedf1527ecc91cb458e9da681e3a2d08f4cee65d355efe6782e1a8eb93ea8920",
+    "app/Domain/Customers/Listening/ListeningEvidence.php": "4b22665239f1df455b29c41b91196b6c910822105b72168a1dca4ed677e807c3",
+    "app/Domain/Customers/Listening/ListeningException.php": "753bceac6616693eeba91a160640ff554dc81d5ba1db41e714731af95daed03c",
+    "app/Domain/Customers/Listening/ListeningLibrary.php": "30aca52bd3d15e314bdfa6bad146870991a1269a4178cd64d9c27b7e376aa2a7",
+    "app/Domain/Customers/Listening/SavedListeningLibrary.php": "a16d0d1fc1095563ffee8409633ea1a53a1f2dc34718f5ef0fba0cd4706d863c",
+    "app/Domain/Inquiries/Models/InquiryNotificationIntent.php": "dc6c6cf9ba5995cc33f7ce92ae0670e746a77b8a066efc1036f7c9457a0ea0f8",
+    "app/Domain/Inquiries/Notifications/InquiryAlertNotSubmitted.php": "ab392132f117e3ae9f051c582f3c15cac27808a9c7fc4119415a78506c91c7d2",
+    "app/Domain/Inquiries/Notifications/InquiryAlertTransport.php": "2d4c04fe70a4b34882bc9a429bc3d480cbca008ea3db8fb04ad2022044fdfb29",
+    "app/Domain/Inquiries/Notifications/InquiryNotificationWork.php": "499b425fd73ab67facc57fb3443b562c2a3ebb63b624ce29f097cc5ea8db147d",
+    "app/Domain/Inquiries/Notifications/OperatorInquiryAlert.php": "2dbda5cbf9dd976e533be2215b9e069f46bbaf88b11ba475c3ea5df748aa8ec0",
+    "app/Domain/Inquiries/SubmitInquiry.php": "17a8db1d96ecffe7d660dd156d86b7752878324d453ed306b66725df728d0bd4",
+    "app/Http/Controllers/CustomerListeningLibraryController.php": "c41c3c80ed5d53354be1fe5986b37435fa72eedda0273abf0fc02e468c801614",
+    "app/Http/Controllers/CustomerSessionController.php": "4ecfbce20c6a60698663964d2373f512292ac0b7170b29dfddcdbc39178e4ab8",
+    "app/Http/Middleware/CustomerPrivacy.php": "4b496116012bcaa9961b23bae13b611191355ee92cf425b08e0c28e412454883",
+    "app/Http/Requests/CustomerListeningRequest.php": "5fd9d9b9b4d878a76ecf8092119a26963e163e025c6434a4c4b9e7ba10301eaf",
+    "app/Jobs/NotifyInquiryOperatorJob.php": "07a340798444c64adca47ce828291ef924ad88d465df9a55d89c62039711f20a",
+    "config/inquiries.php": "96d84c151a2336b919a5bca08c3cd4173ab7b1ebdf6a21efdc51a9e66731e011",
+    "database/migrations/2026_10_07_242000_customer_saved_tracks.php": "1202c18366e67012224745a12e06b2ef46d654725f2eeb48e779cf9569cd7392",
+    "database/migrations/2026_10_07_243000_inquiry_notification_intents.php": "afd182c082171b62036aa839d5a3757cd2f3a16ec16c986def5abeb0ff8503c5",
+    "resources/js/Pages/CustomerLibrary.tsx": "3d7efeeb1382a902882765e857262df02a9fa6c3c263291b19f97d781d2478cb",
+    "resources/js/components/CustomerListeningLibrary.tsx": "6ede69f0214f4aee801b2d8ec9733c8725da22354c3c464599fea48ed82bcc06",
+    "routes/customer.php": "4473538e56cb1cae5e73482a50ab2743d1227a1610cc5bdbd9db0664ce31db46",
+    "scripts/ci/database-sqlite-skips.json": "ec0989c575cc73a3392ef86c37f3a1581dc194dd9735d8055601f0f5356d37d5",
+    "tests/Feature/CustomerListeningFreshnessTest.php": "d516f0c80d3ed1b8ff9450be215793fe842c17e5e88c58c61ca886ea855f6187",
+    "tests/Feature/CustomerListeningLibraryHttpTest.php": "c187afec5b4ba4a673e25c9ed0ec06f744b262e46553f27fe5c7444178b9fd0f",
+    "tests/Feature/CustomerListeningLibraryTest.php": "3e93f9d627d65a5168dca0a84f42d5268a59812607b893a2e9deaa1ddff742ad",
+    "tests/Feature/CustomerListeningMigrationTest.php": "2b087b916f09212126e88d08dbd6f194f9a2d7d403497b63deb8b71f7b402a5f",
+    "tests/Feature/CustomerListeningPrimaryProofTest.php": "abc09341e028ca92ae8a91c676d3bbf879a354432f5a286dff6267786dc5bd78",
+    "tests/Feature/InquiryNotificationConcurrencyTest.php": "004d7b8448150f1ac9233f1dfcce6ee8b910ebc5bfba14a314550c0999075274",
+    "tests/Feature/InquiryNotificationMigrationTest.php": "d6e700ee3ea659ec108d91cb5beb13c807d96aae2d74b593fc7cc9bdd4f70493",
+    "tests/Feature/InquiryNotificationWorkTest.php": "63a46e154496d2ae75a109cf2ea2c8a807ba2b9f0dd45d605f13b35a33fb0386",
+    "tests/Support/InquiryNotificationRace.php": "50be75435d2db84a432b5fb043b83512b09d954e8dc6378fb63545ccfa0f5d3d",
+    "tests/Support/inquiry-notification-race-worker.php": "a4f4028019e668d087cd9c00df25bce283ff7835598bc94169e730aeee968cba",
+    "tests/Unit/CustomerListeningRequestTest.php": "055c3f05e1b281c574644194df083784a90e4fd3107bdaab3a52f7cd4303987a",
+    "tests/frontend/cloud-listening-independent.test.tsx": "d1eeb67da3de042afe1517a43c0e1ecd8c364bc097591b2e356b239d4cf2a2d3",
+    "tests/frontend/customer-listening-library.test.tsx": "c3bb1ba05c1f2485296923237b5d4728efa21e3cfac4d726b0ba9b9dcb44bee3"
+  },
+  "sqlite_registry": {
+    "original_method_count": 150,
+    "current_method_count": 157,
+    "original_sha256": "db31e36320ac3ab57905d9d964fe61da1c2cb68bc1466e0877387ccaf147faa1",
+    "added_methods": [
+      [
+        "Tests\\Feature\\DiscoverySnapshotConcurrencyTest",
+        "test_committed_writers_before_final_fence_refuse_prechange_capture"
+      ],
+      [
+        "Tests\\Feature\\DiscoverySnapshotConcurrencyTest",
+        "test_writer_waits_on_actual_final_epoch_record_and_retained_capture_then_refuses_consumption"
+      ],
+      [
+        "Tests\\Feature\\InquiryNotificationConcurrencyTest",
+        "test_independent_workers_serialize_one_handoff_without_duplicate_attempt_or_submission"
+      ],
+      [
+        "Tests\\Feature\\InquiryNotificationMigrationTest",
+        "test_changed_mysql_notification_fk_support_index_in_a_partial_installation_is_refused_before_any_ddl"
+      ],
+      [
+        "Tests\\Feature\\InquiryNotificationMigrationTest",
+        "test_changed_mysql_notification_foreign_key_is_refused_before_any_ddl"
+      ],
+      [
+        "Tests\\Feature\\InquiryNotificationMigrationTest",
+        "test_nonempty_notification_table_with_a_missing_mysql_foreign_key_is_never_retroactively_adopted"
+      ],
+      [
+        "Tests\\Feature\\InquiryNotificationMigrationTest",
+        "test_shortened_mysql_notification_due_index_prefix_is_refused_before_any_ddl"
+      ]
+    ]
+  },
+  "final_php_junit": {
+    "name": "/workspace/VA-Studio-listening-registration/.phpunit-root-listening-inquiry.xml",
+    "tests": "111",
+    "assertions": "987",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "4",
+    "time": "46.040446"
+  }
+}

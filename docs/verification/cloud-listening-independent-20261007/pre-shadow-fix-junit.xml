@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ListeningIndependentBoundaryTest" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="1.629674">
+    <testcase name="test_public_query_callback_temporary_track_shadow_cannot_be_treated_as_captured_main_evidence" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" line="175" class="Tests\Feature\ListeningIndependentBoundaryTest" classname="Tests.Feature.ListeningIndependentBoundaryTest" assertions="2" time="1.629674">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ListeningIndependentBoundaryTest::test_public_query_callback_temporary_track_shadow_cannot_be_treated_as_captured_main_evidence
+Framework public reads resolved a temporary tracks table while the proof accepted main evidence: {"listeningSchema":1,"version":1,"favorites":[{"trackId":"1","available":true,"track":{"title":"Synthetic quote recording","artist":"Test only","href":"\/tracks\/quote-fixture-822c7c8b-704f-4f96-a8e0-a3963994407a"}}],"playlists":[],"limits":{"favorites":50,"playlists":10,"playlistTracks":25}}
+Failed asserting that false is true.
+
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:197</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

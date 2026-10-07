@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ListeningIndependentBoundaryTest" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="1.686673">
+    <testcase name="test_terminal_account_query_callback_cannot_release_a_now_unpublished_track_link" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" line="110" class="Tests\Feature\ListeningIndependentBoundaryTest" classname="Tests.Feature.ListeningIndependentBoundaryTest" assertions="3" time="1.686673">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ListeningIndependentBoundaryTest::test_terminal_account_query_callback_cannot_release_a_now_unpublished_track_link
+Final query unpublished the saved track but old public title and URL escaped.
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+     0 =&gt; Array &amp;1 [
+         'trackId' =&gt; '1',
+-        'available' =&gt; false,
++        'available' =&gt; true,
++        'track' =&gt; Array &amp;2 [
++            'title' =&gt; 'Synthetic quote recording',
++            'artist' =&gt; 'Test only',
++            'href' =&gt; '/tracks/quote-fixture-faaa79f4-8cd3-4028-8927-2bddc66b2116',
++        ],
+     ],
+ ]
+
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:131</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

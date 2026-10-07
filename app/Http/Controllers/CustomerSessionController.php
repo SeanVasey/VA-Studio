@@ -96,6 +96,8 @@ final class CustomerSessionController
             $props['serviceProjectsEnabled'] = app(ServiceProjectPolicy::class)->enabled();
             // Transient UI invalidation only; never customer identity or request authority.
             $props['membershipHistoryScope'] = $props['testMembershipsEnabled'] ? bin2hex(random_bytes(16)) : null;
+            $props['testListeningLibraryEnabled'] = true;
+            $props['listeningLibraryScope'] = bin2hex(random_bytes(16));
 
             Inertia::encryptHistory();
 

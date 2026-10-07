@@ -1,0 +1,137 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Domain\Catalog\PublishTrack;
+use App\Domain\Customers\CustomerAccessException;
+use App\Domain\Customers\Listening\ListeningException;
+use App\Domain\Customers\Listening\ListeningLibrary;
+use App\Domain\Customers\Listening\SavedListeningLibrary;
+use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Support\CustomerFixtures;
+use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\QuoteFixtures;
+use Tests\TestCase;
+
+/** Independent review canaries; no application code or acceptance assertions changed. */
+class ListeningIndependentBoundaryTest extends TestCase
+{
+    use FinalizationDatabaseMigrations;
+
+    #[DataProvider('lateWithdrawals')]
+    public function test_terminal_authority_query_callback_cannot_release_or_commit_stale_state(string $operation, string $withdrawal): void
+    {
+        $customer = CustomerFixtures::account();
+        if ($operation === 'read') {
+            app(ListeningLibrary::class)->change($customer['principal'], $customer['user'], ['action' => 'create-playlist', 'version' => 0, 'name' => 'Independent retained private list']);
+        }
+        $retained = DB::table('customer_saved_tracks')->orderBy('id')->get()->toJson();
+        $accountReads = 0;
+        $fired = false;
+        DB::listen(function (QueryExecuted $query) use (&$accountReads, &$fired, $customer, $withdrawal): void {
+            if (! $fired && preg_match('/\bfrom ["`]customer_accounts["`]/i', $query->sql) && ++$accountReads === 2) {
+                $fired = true;
+                if ($withdrawal === 'credentials') {
+                    DB::table('users')->where('id', $customer['user']->id)->update(['password' => 'Synthetic terminal changed credential']);
+                } elseif ($withdrawal === 'policy') {
+                    config(['customer.test_accounts_enabled' => false]);
+                } else {
+                    DB::table('customer_accounts')->where('id', $customer['account']->id)->update(['active' => false, 'access_version' => $customer['account']->access_version + 1]);
+                }
+            }
+        });
+        $rejected = false;
+        try {
+            $service = app(ListeningLibrary::class);
+            $result = $operation === 'read'
+                ? $service->read($customer['principal'], $customer['user'])
+                : $service->change($customer['principal'], $customer['user'], ['action' => 'create-playlist', 'version' => 0, 'name' => 'Independent private list']);
+        } catch (CustomerAccessException) {
+            $rejected = true;
+        }
+        $this->assertTrue($fired, 'Probe did not reach the final account ORM query callback.');
+        $this->assertTrue($rejected, 'Final-query '.$withdrawal.' callback released stale '.$operation.' result: '.json_encode($result ?? null));
+        $this->assertSame($retained, DB::table('customer_saved_tracks')->orderBy('id')->get()->toJson());
+    }
+
+    public static function lateWithdrawals(): array
+    {
+        $cases = [];
+        foreach (['read', 'change'] as $operation) {
+            foreach (['account', 'credentials', 'policy'] as $withdrawal) {
+                $cases[$operation.' '.$withdrawal] = [$operation, $withdrawal];
+            }
+        }
+
+        return $cases;
+    }
+
+    public function test_public_query_callback_cannot_release_a_superseded_retained_library(): void
+    {
+        $customer = CustomerFixtures::account();
+        $selection = QuoteFixtures::selection();
+        app(ListeningLibrary::class)->change($customer['principal'], $customer['user'], ['action' => 'save-track', 'version' => 0, 'trackId' => (string) $selection['track']->id]);
+        $row = SavedListeningLibrary::sole();
+        $payload = $row->payload;
+        $payload['version'] = 2;
+        $payload['playlists'] = [['id' => 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'name' => 'Callback retained private list', 'trackIds' => []]];
+        $fired = false;
+        DB::listen(function (QueryExecuted $query) use (&$fired, $row, $payload): void {
+            if (! $fired && preg_match('/\bfrom ["`]tracks["`]/i', $query->sql)) {
+                $fired = true;
+                $row->fill(['version' => 2, 'payload' => $payload])->save();
+            }
+        });
+        $rejected = false;
+        try {
+            $result = app(ListeningLibrary::class)->read($customer['principal'], $customer['user']);
+        } catch (ListeningException) {
+            $rejected = true;
+        }
+        $this->assertTrue($fired, 'Probe did not reach the public catalog projection query callback.');
+        $this->assertTrue($rejected, 'Public query callback superseded encrypted retained revision but stale result escaped: '.json_encode($result ?? null));
+    }
+
+    public function test_empty_storage_with_drifted_index_is_retained_on_rollback(): void
+    {
+        $this->assertSame('sqlite', DB::getDriverName());
+        DB::statement('CREATE INDEX independent_drift_sentinel ON customer_saved_tracks (version)');
+        $before = DB::table('sqlite_master')->where('tbl_name', 'customer_saved_tracks')->orderBy('name')->get()->toJson();
+        $rejected = false;
+        try {
+            (require database_path('migrations/2026_10_07_242000_customer_saved_tracks.php'))->down();
+        } catch (\LogicException) {
+            $rejected = true;
+        }
+        $this->assertTrue($rejected, 'Rollback accepted same-name empty storage after an extra index was added; table retained='.json_encode(Schema::hasTable('customer_saved_tracks')));
+        $this->assertSame($before, DB::table('sqlite_master')->where('tbl_name', 'customer_saved_tracks')->orderBy('name')->get()->toJson());
+    }
+
+    public function test_terminal_account_query_callback_cannot_release_a_now_unpublished_track_link(): void
+    {
+        $customer = CustomerFixtures::account();
+        $selection = QuoteFixtures::selection();
+        app(ListeningLibrary::class)->change($customer['principal'], $customer['user'], ['action' => 'save-track', 'version' => 0, 'trackId' => (string) $selection['track']->id]);
+        $accountReads = 0;
+        $fired = false;
+        DB::listen(function (QueryExecuted $query) use (&$accountReads, &$fired, $selection): void {
+            if (! $fired && preg_match('/\bfrom ["`]customer_accounts["`]/i', $query->sql) && ++$accountReads === 2) {
+                $fired = true;
+                app(PublishTrack::class)->unpublish($selection['track'], $selection['actor']);
+            }
+        });
+        try {
+            $result = app(ListeningLibrary::class)->read($customer['principal'], $customer['user']);
+        } catch (ListeningException) {
+            $result = null;
+        }
+        $this->assertTrue($fired, 'Probe did not reach the final account ORM query callback.');
+        $this->assertSame('draft', $selection['track']->fresh()->status);
+        if ($result !== null) {
+            $this->assertSame([['trackId' => (string) $selection['track']->id, 'available' => false]], $result['favorites'], 'Final query unpublished the saved track but old public title and URL escaped.');
+        }
+    }
+}

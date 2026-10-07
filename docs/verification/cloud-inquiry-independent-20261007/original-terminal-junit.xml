@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\InquiryTerminalHandoffCanaryTest" file="/workspace/VA-Studio-inquiry-independent/docs/verification/cloud-inquiry-independent-20261007/InquiryTerminalHandoffCanaryTest.php" tests="3" assertions="6" errors="0" failures="3" skipped="0" time="0.927982">
+    <testsuite name="Tests\Feature\InquiryTerminalHandoffCanaryTest::test_final_authority_callback_cannot_leave_an_invalid_external_handoff" tests="3" assertions="6" errors="0" failures="3" skipped="0" time="0.927982">
+      <testcase name="test_final_authority_callback_cannot_leave_an_invalid_external_handoff with data set #0" file="/workspace/VA-Studio-inquiry-independent/docs/verification/cloud-inquiry-independent-20261007/InquiryTerminalHandoffCanaryTest.php" line="33" class="Tests\Feature\InquiryTerminalHandoffCanaryTest" classname="Tests.Feature.InquiryTerminalHandoffCanaryTest" assertions="2" time="0.456782">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\InquiryTerminalHandoffCanaryTest::test_final_authority_callback_cannot_leave_an_invalid_external_handoff with data set #0
+A withdrawn authority/configuration/claim must not cross external I/O.
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &amp;0 []
++Array &amp;0 [
++    0 =&gt; App\Domain\Inquiries\Notifications\OperatorInquiryAlert Object #6161 (
++        'operatorId' =&gt; 1,
++        'receipt' =&gt; 'dbd91043-e196-417d-b46d-1badd5f0c581',
++    ),
++]
+
+/workspace/VA-Studio-inquiry-independent/docs/verification/cloud-inquiry-independent-20261007/InquiryTerminalHandoffCanaryTest.php:84</failure>
+      </testcase>
+      <testcase name="test_final_authority_callback_cannot_leave_an_invalid_external_handoff with data set #1" file="/workspace/VA-Studio-inquiry-independent/docs/verification/cloud-inquiry-independent-20261007/InquiryTerminalHandoffCanaryTest.php" line="33" class="Tests\Feature\InquiryTerminalHandoffCanaryTest" classname="Tests.Feature.InquiryTerminalHandoffCanaryTest" assertions="2" time="0.269420">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\InquiryTerminalHandoffCanaryTest::test_final_authority_callback_cannot_leave_an_invalid_external_handoff with data set #1
+A withdrawn authority/configuration/claim must not cross external I/O.
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &amp;0 []
++Array &amp;0 [
++    0 =&gt; App\Domain\Inquiries\Notifications\OperatorInquiryAlert Object #5273 (
++        'operatorId' =&gt; 1,
++        'receipt' =&gt; '877e15e5-3c54-41e1-b1a1-272220701d57',
++    ),
++]
+
+/workspace/VA-Studio-inquiry-independent/docs/verification/cloud-inquiry-independent-20261007/InquiryTerminalHandoffCanaryTest.php:84</failure>
+      </testcase>
+      <testcase name="test_final_authority_callback_cannot_leave_an_invalid_external_handoff with data set #2" file="/workspace/VA-Studio-inquiry-independent/docs/verification/cloud-inquiry-independent-20261007/InquiryTerminalHandoffCanaryTest.php" line="33" class="Tests\Feature\InquiryTerminalHandoffCanaryTest" classname="Tests.Feature.InquiryTerminalHandoffCanaryTest" assertions="2" time="0.201780">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\InquiryTerminalHandoffCanaryTest::test_final_authority_callback_cannot_leave_an_invalid_external_handoff with data set #2
+A withdrawn authority/configuration/claim must not cross external I/O.
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &amp;0 []
++Array &amp;0 [
++    0 =&gt; App\Domain\Inquiries\Notifications\OperatorInquiryAlert Object #7235 (
++        'operatorId' =&gt; 1,
++        'receipt' =&gt; '2752d1ee-7dd5-4aff-83b0-94522c6b2f51',
++    ),
++]
+
+/workspace/VA-Studio-inquiry-independent/docs/verification/cloud-inquiry-independent-20261007/InquiryTerminalHandoffCanaryTest.php:84</failure>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>
