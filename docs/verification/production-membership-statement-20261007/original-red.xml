@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembership\MembershipNativeStatementClosureTest" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipNativeStatementClosureTest.php" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="0.680736">
+    <testcase name="test_captured_reader_refuses_application_statement_callbacks_before_any_metadata_sql" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipNativeStatementClosureTest.php" line="17" class="Tests\Feature\ProductionMembership\MembershipNativeStatementClosureTest" classname="Tests.Feature.ProductionMembership.MembershipNativeStatementClosureTest" assertions="1" time="0.680736">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembership\MembershipNativeStatementClosureTest::test_captured_reader_refuses_application_statement_callbacks_before_any_metadata_sql
+A retained reader must reject a callback-capable native statement factory.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipNativeStatementClosureTest.php:33
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipNativeStatementClosureTest.php:20</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

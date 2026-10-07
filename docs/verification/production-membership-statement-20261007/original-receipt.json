@@ -1,0 +1,19 @@
+{
+  "source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+  "files": {
+    "app/Domain/Memberships/Production/MembershipRows.php": "a62d9848a193f78358d2ec6538d35f2d3871a5973d36c4d660d1ae8f7e93783c",
+    "tests/Feature/ProductionMembership/MembershipNativeStatementClosureTest.php": "1b1bd944129a527e16cb11962a24f7acc4d40a2244b7216580dfad20a2c7965e"
+  },
+  "result": {
+    "executed": 1,
+    "failures": 1,
+    "errors": 0,
+    "assertions": 1
+  },
+  "artifacts": {
+    "docs/verification/production-membership-statement-20261007/original-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "docs/verification/production-membership-statement-20261007/MembershipNativeStatementClosureTest.php": "1b1bd944129a527e16cb11962a24f7acc4d40a2244b7216580dfad20a2c7965e",
+    "docs/verification/production-membership-statement-20261007/original-red.txt": "f01be0fa60b9bc210c02c597812c1c5e5f75aa654b7edeeb363ac6a9659f5d0e",
+    "docs/verification/production-membership-statement-20261007/original-red.xml": "02ae61422f17c4071f536f94803d6b71586a49311a5e9c0a2f060184637af92e"
+  }
+}
