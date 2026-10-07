@@ -70,7 +70,7 @@ class ProductionConsentWithdrawalReaderTest extends TestCase
                 $this->assertStringNotContainsString($snapshot['recipient'], $error->getMessage());
             }
         }
-        $this->assertSame(['purpose' => 'email_marketing', 'version' => 1], $first->__debugInfo());
+        $this->assertSame(['production_consent_withdrawal' => true], $first->__debugInfo());
         $this->assertSame(3, DB::table('production_consent_events')->count());
     }
 
