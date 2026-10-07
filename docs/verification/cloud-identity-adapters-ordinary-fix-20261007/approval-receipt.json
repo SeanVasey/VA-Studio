@@ -1,0 +1,99 @@
+{
+  "decision": "APPROVED owned source for focused development integration",
+  "actual_tested_executable": "101e3832e8e5637cab784eb2a800d60642a746b4",
+  "tree": "a66af50cf2fa5133e4df641c91fcf60fd95c07b1",
+  "author_evidence": "9c1b1354c3b0ae7ed3c31d77838ee9887cbb437a",
+  "parent_cdc_approval": "historical committed-boundary only; subsequent ordinary defect explicitly superseded",
+  "independent_actual": {
+    "sqlite": {
+      "tests": 5,
+      "assertions": 34,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 3.829056,
+      "methods": [
+        {
+          "class": "Tests.Feature.ProductionIdentityAdapters.ProductionAccountFeatureAccessTest",
+          "method": "test_ordinary_terminal_connection_admission_precedes_policy_and_preserves_normal_rollback with data set #0",
+          "assertions": 9
+        },
+        {
+          "class": "Tests.Feature.ProductionIdentityAdapters.ProductionAccountFeatureAccessTest",
+          "method": "test_ordinary_terminal_connection_admission_precedes_policy_and_preserves_normal_rollback with data set #1",
+          "assertions": 9
+        },
+        {
+          "class": "Tests.Feature.ProductionIdentityAdapters.ProductionAccountFeatureAccessTest",
+          "method": "test_ordinary_terminal_connection_admission_precedes_policy_and_preserves_normal_rollback with data set #2",
+          "assertions": 8
+        },
+        {
+          "class": "Tests.IndependentIdentityAdapters.CommittedFeatureCallbackCanaryTest",
+          "method": "test_lazy_secondary_connection_withdrawal_cannot_follow_terminal_feature_policy",
+          "assertions": 4
+        },
+        {
+          "class": "Tests.IndependentIdentityAdapters.FeatureOrdinaryCallbackCanaryTest",
+          "method": "test_lazy_secondary_connection_cannot_withdraw_feature_after_normal_transaction_fence",
+          "assertions": 4
+        }
+      ]
+    },
+    "native": {
+      "tests": 4,
+      "assertions": 30,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 151.144814,
+      "methods": [
+        {
+          "class": "Tests.Feature.ProductionIdentityAdapters.ProductionAccountFeatureAccessTest",
+          "method": "test_ordinary_terminal_connection_admission_precedes_policy_and_preserves_normal_rollback with data set #0",
+          "assertions": 9
+        },
+        {
+          "class": "Tests.Feature.ProductionIdentityAdapters.ProductionAccountFeatureAccessTest",
+          "method": "test_ordinary_terminal_connection_admission_precedes_policy_and_preserves_normal_rollback with data set #1",
+          "assertions": 9
+        },
+        {
+          "class": "Tests.Feature.ProductionIdentityAdapters.ProductionAccountFeatureAccessTest",
+          "method": "test_ordinary_terminal_connection_admission_precedes_policy_and_preserves_normal_rollback with data set #2",
+          "assertions": 8
+        },
+        {
+          "class": "Tests.IndependentIdentityAdapters.FeatureOrdinaryCallbackCanaryTest",
+          "method": "test_lazy_secondary_connection_cannot_withdraw_feature_after_normal_transaction_fence",
+          "assertions": 4
+        }
+      ]
+    }
+  },
+  "remaining_blockers_in_owned_source": [],
+  "source_scope": "Configured SMTP + account-feature adapter child; root shared bindings and actual consumers separately reviewed",
+  "source_changed_vs_cdc": [
+    "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureAccess.php",
+    "tests/Feature/ProductionIdentityAdapters/ProductionAccountFeatureAccessTest.php"
+  ],
+  "original_probes_sha256": {
+    "committed": "443444572e6540a6994c0dfd2be339ea9d523ea5fdf9688d5aedacb57ab3521f",
+    "ordinary": "b60e892c2a2703932d54a08293f30daecde55a559cdf83793118da8d2e6e5719"
+  },
+  "source_and_evidence_reconciliation": {
+    "author_source_bindings": 17,
+    "author_durable_artifacts": 43,
+    "locked_packages": 158
+  },
+  "pint_product_paths": "passed",
+  "archival_probe_pint": "retained diagnostic reports unused import; unchanged historical probe bytes retained",
+  "runtime": {
+    "php": "8.4.26",
+    "mysql": "8.0.46-0ubuntu0.24.04.4",
+    "database_scope": "separate limited reviewer schema/account",
+    "transaction_isolation": "REPEATABLE-READ"
+  },
+  "no_full_suite_repeat_or_external_delivery": true,
+  "no_shared_edits_or_publication": true
+}

@@ -1,0 +1,10 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-identity-adapters-ordinary-independent/docs/verification/cloud-identity-adapters-ordinary-fix-20261007/native-selection.xml
+
+....                                                                4 / 4 (100%)
+
+Time: 02:31.151, Memory: 79.00 MB
+
+[30;42mOK (4 tests, 30 assertions)[0m

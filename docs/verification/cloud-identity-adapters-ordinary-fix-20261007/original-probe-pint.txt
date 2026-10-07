@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fail","files":[{"path":"docs\/verification\/cloud-identity-adapters-ordinary-fix-20261007\/probes\/FeatureOrdinaryCallbackCanaryTest.php","fixers":["no_unused_imports"]}]}
