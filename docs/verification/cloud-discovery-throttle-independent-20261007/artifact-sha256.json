@@ -1,0 +1,16 @@
+{
+  "docs/verification/cloud-discovery-throttle-independent-20261007.md": "a8eebfd6336f35b134eaa489b8bd9009cf0929dcfa4171ff4f93ae0d1e24ef99",
+  "docs/verification/cloud-discovery-throttle-independent-20261007/approval-receipt.json": "90aea394c9e227e603c984d59fa839a3f48e7ee9b5f4ad4b5fa9e1463ef26776",
+  "docs/verification/cloud-discovery-throttle-independent-20261007/final-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+  "docs/verification/cloud-discovery-throttle-independent-20261007/final-sqlite.txt": "2ac915adcd595a0864a3edd63f110c2fa823c0cc55dec4d76954e4059cc2d17c",
+  "docs/verification/cloud-discovery-throttle-independent-20261007/final-sqlite.xml": "4dadeba42e5999161037f3eea60b19ea742a5f8f6164ed08bfa42ec7d62207ff",
+  "docs/verification/cloud-discovery-throttle-independent-20261007/own-autoload.txt": "b970fbc6071018a1756cbadc40ceff4566a2be1c3d7ac6a771794c321c51fa66",
+  "docs/verification/cloud-discovery-throttle-independent-20261007/root-receipts.json": "041ab8fda890bb0b90e81b032e5d1800ac3d18459f78f64851b573cb4f783e95",
+  "docs/verification/cloud-discovery-throttle-independent-20261007/root-va-discovery-throttle-corrected.txt": "ac317125ea4cec592004ba91cc6c699956a72eb89f379135651437c8d00b58ca",
+  "docs/verification/cloud-discovery-throttle-independent-20261007/root-va-discovery-throttle-corrected.xml": "ade32b750e6d7c32bfaaf9ae8aa7f3e58fb0e2a01fe5535ba6ef2dfd4f8a41ae",
+  "docs/verification/cloud-discovery-throttle-independent-20261007/root-va-discovery-throttle-original.txt": "bed975fe0ec0ffbcb932062a846d86972c03db4b674e4e3f60f16873ebe80c1b",
+  "docs/verification/cloud-discovery-throttle-independent-20261007/root-va-discovery-throttle-original.xml": "e707052f34dda3856ef3d32d3d6ebda7ad5481bce5b321bb716e09d91c0a2963",
+  "docs/verification/cloud-discovery-throttle-independent-20261007/runtime.patch.txt": "9ac426114f7ae27987502ca8331b76d8c1b2c10abb96bb3e416f389bd322620f",
+  "docs/verification/cloud-discovery-throttle-independent-20261007/source-and-carry.json": "e08a3aa846e4b1d8a6463f4270da87906abd8bdc0f3eadfa6c2363d514083369",
+  "docs/verification/cloud-discovery-throttle-independent-20261007/sqlite-selection.xml": "f29763ddb58274151899b340f3d69f10b1c3d64652a4655f4f89b3eec0845fbd"
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-discovery-throttle-independent/docs/verification/cloud-discovery-throttle-independent-20261007/sqlite-selection.xml" tests="1" assertions="193" errors="0" failures="0" skipped="0" time="3.172249">
+    <testsuite name="Independent advertised family actual HTTP limiter" tests="1" assertions="193" errors="0" failures="0" skipped="0" time="3.172249">
+      <testsuite name="Tests\Feature\DiscoverySitemapRegistrationTest" file="/workspace/VA-Studio-discovery-throttle-independent/tests/Feature/DiscoverySitemapRegistrationTest.php" tests="1" assertions="193" errors="0" failures="0" skipped="0" time="3.172249">
+        <testcase name="test_complete_advertised_sitemap_family_fits_an_independent_bounded_track_budget" file="/workspace/VA-Studio-discovery-throttle-independent/tests/Feature/DiscoverySitemapRegistrationTest.php" line="82" class="Tests\Feature\DiscoverySitemapRegistrationTest" classname="Tests.Feature.DiscoverySitemapRegistrationTest" assertions="193" time="3.172249"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>
