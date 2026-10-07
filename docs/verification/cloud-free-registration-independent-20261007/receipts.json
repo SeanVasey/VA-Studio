@@ -1,0 +1,47 @@
+{
+  "executable": "c59e739baa0e997a3bb08a1d6cb27fe271d32b32",
+  "status": "approve bounded root free registration; operative identity/terms/fulfillment remains deferred",
+  "checks": {
+    "registered-sqlite.xml": {
+      "tests": 5,
+      "assertions": 191,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "source": "c59e739baa0e997a3bb08a1d6cb27fe271d32b32",
+      "role": "independently executed actual registration + private canaries"
+    },
+    "author-native-carry/va-free-registration-native.xml": {
+      "tests": 1,
+      "assertions": 99,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "source": "c59e739baa0e997a3bb08a1d6cb27fe271d32b32",
+      "role": "author exact native registration carry; not an independent native run"
+    }
+  },
+  "root_original_evidence_verified": {
+    "docs/verification/cloud-free-registration-20261007/va-free-registration-http.txt": "df8ef34f27f4743362c261a5c39d712e1dcf766f2492e72898a04bd99ca3c444",
+    "docs/verification/cloud-free-registration-20261007/va-free-registration-http.xml": "b52da14067c4a4ed7612a4385984cea7c83268626f2c49f0f726a4511b08766d",
+    "docs/verification/cloud-free-registration-20261007/va-free-registration-frontend.txt": "77ce2bcf38a366a350e1c65868df2feb64d1d5d85ab3d4d7b995b05301e18e14",
+    "docs/verification/cloud-free-registration-20261007/va-free-registration-typecheck.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/verification/cloud-free-registration-20261007/va-free-registration-final-pint.txt": "b05d8da93c526eaa6e3ae52c10e0ba7c59d7030b0606400b5176bd677cba08c9",
+    "docs/verification/cloud-free-registration-20261007/va-free-registration-autoload.txt": "389ad7986ccce4d942d317446c7e4ca47f59d1bb1b566d99cee7fce320e6038f",
+    "docs/verification/cloud-free-registration-20261007/va-free-registration-native.txt": "ab5624c359241cde4e8c0727d121172920200d8f3863f548bb812888e94d3b77",
+    "docs/verification/cloud-free-registration-20261007/va-free-registration-native.xml": "74f25c3043f73f46633a767810ce89273bd1f38b89b9b91105008c38fe7640ff",
+    "docs/verification/cloud-free-registration-20261007/va-free-registration-public-crawler.txt": "9b6d7ce680eab52a2ed53a7084980b05949672fae7157dc1a4758efa5e632bdb",
+    "docs/verification/cloud-free-registration-20261007/va-free-registration-public-crawler.xml": "e8273903cfad8988b2f36f81b95d28fa12072075d9246cb5bc104ac807931936"
+  },
+  "artifacts_sha256": {
+    "FreeRegistrationBoundaryCanaryTest.php": "580f23ef756a92eb7bbd1ca4bd3e297b7acf9856bd712cd3d4a3bdaa78adb792",
+    "author-native-carry/va-free-registration-native.txt": "ab5624c359241cde4e8c0727d121172920200d8f3863f548bb812888e94d3b77",
+    "author-native-carry/va-free-registration-native.xml": "74f25c3043f73f46633a767810ce89273bd1f38b89b9b91105008c38fe7640ff",
+    "frontend.txt": "43dc6f8aceccc09bd6b0522080c4a71d5a1251eea6ebffeb90f0e50b923df24c",
+    "pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "registered-sqlite.txt": "65fe0334c7a75f9dbc3f5e08e51ba10ece3c968a95c18d7582d2b9ba47d9fad6",
+    "registered-sqlite.xml": "c278e43cc4a19bd76c988c60e4e3786a82fed64ee482bf9a0deeb32664fa2235",
+    "source-binding.json": "39a8b7d2acbcf1424d43e064a39e0f8d25d77a4d1f4aa1b6a19ee2b3b31ce738",
+    "typecheck.txt": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f"
+  }
+}

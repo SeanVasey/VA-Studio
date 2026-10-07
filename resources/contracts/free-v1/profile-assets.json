@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "version": "test-free-grant-pdf-v1",
+  "files": {
+    "app/Domain/Grants/Free/FreeGrantText.php": "ef6f23c3d65039fd138a6a459bfe448624e391997af69d3637eb88d132ebe883",
+    "app/Domain/Grants/Free/FreeGrantPdfRenderer.php": "2ca8a4fd59b2934d3ea0fa06aae8337339fe7adbc6ff42a57b01e07e5e0fef63",
+    "app/Domain/Grants/Free/FreeGrantRendererProcess.php": "af3031bf9c37f6c528d7dcb48b1a347708520aab038b8a27e21a33d10ef31732",
+    "app/Domain/Grants/Free/FreeGrantRenderInput.php": "efd1b3dae37efdeaf91d61fc96216532fa92ea43ea08fbbac1e524e3635a9060",
+    "scripts/render-free-grant.php": "c8c39861757f565242b375149acde5ee906996b45078aec8d6d7842f59eb4c2f"
+  }
+}

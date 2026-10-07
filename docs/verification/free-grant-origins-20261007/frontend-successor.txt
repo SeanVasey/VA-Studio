@@ -1,0 +1,13 @@
+
+> test
+> vitest run tests/frontend/free-grant-journey.test.tsx
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-free-grants
+
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  09:13:45
+   Duration  1.39s (tests 47%, environment 41%, setup 6%, transform 5%, import 1%)
+

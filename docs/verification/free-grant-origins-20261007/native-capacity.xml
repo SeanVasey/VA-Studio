@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\FreeGrantConcurrencyTest" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantConcurrencyTest.php" tests="1" assertions="68" errors="0" failures="0" skipped="0" time="29.721405">
+    <testcase name="test_observed_two_buyer_scope_wait_cannot_overfill_one_explicit_free_origin_capacity" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantConcurrencyTest.php" line="26" class="Tests\Feature\FreeGrantConcurrencyTest" classname="Tests.Feature.FreeGrantConcurrencyTest" assertions="68" time="29.721405"/>
+  </testsuite>
+</testsuites>

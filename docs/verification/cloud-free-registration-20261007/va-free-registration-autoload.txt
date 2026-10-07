@@ -1,0 +1,2 @@
+Generating optimized autoload files
+Generated optimized autoload files containing 11109 classes
