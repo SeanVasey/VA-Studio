@@ -1,0 +1,71 @@
+{
+    "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+    "server_version": "8.0.46-0ubuntu0.24.04.4",
+    "foreign_constraint": "dss_indep_discovery_sitemap_windows_bounds",
+    "caught": {
+        "class": "PDOException",
+        "code": "HY000",
+        "mysql_code": 3822
+    },
+    "owned_tables_created": [
+        {
+            "TABLE_NAME": "dss_indep_discovery_sitemap_generations",
+            "TABLE_TYPE": "BASE TABLE",
+            "ENGINE": "InnoDB"
+        }
+    ],
+    "foreign_before": {
+        "Table": "dss_indep_foreign",
+        "Create Table": "CREATE TABLE `dss_indep_foreign` (\n  `id` int NOT NULL,\n  PRIMARY KEY (`id`),\n  CONSTRAINT `dss_indep_discovery_sitemap_windows_bounds` CHECK ((`id` >= 0))\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    },
+    "foreign_after": {
+        "Table": "dss_indep_foreign",
+        "Create Table": "CREATE TABLE `dss_indep_foreign` (\n  `id` int NOT NULL,\n  PRIMARY KEY (`id`),\n  CONSTRAINT `dss_indep_discovery_sitemap_windows_bounds` CHECK ((`id` >= 0))\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    },
+    "foreign_rows": [
+        {
+            "id": 5
+        }
+    ],
+    "before": {
+        "tables": [
+            {
+                "TABLE_NAME": "dss_indep_foreign",
+                "TABLE_TYPE": "BASE TABLE",
+                "ENGINE": "InnoDB"
+            }
+        ],
+        "guards": []
+    },
+    "after": {
+        "tables": [
+            {
+                "TABLE_NAME": "dss_indep_discovery_sitemap_generations",
+                "TABLE_TYPE": "BASE TABLE",
+                "ENGINE": "InnoDB"
+            },
+            {
+                "TABLE_NAME": "dss_indep_foreign",
+                "TABLE_TYPE": "BASE TABLE",
+                "ENGINE": "InnoDB"
+            }
+        ],
+        "guards": [
+            {
+                "TRIGGER_NAME": "dss_indep_discovery_sitemap_generations_delete",
+                "EVENT_OBJECT_TABLE": "dss_indep_discovery_sitemap_generations",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Immutable discovery sitemap evidence'; END IF; END"
+            },
+            {
+                "TRIGGER_NAME": "dss_indep_discovery_sitemap_generations_insert",
+                "EVENT_OBJECT_TABLE": "dss_indep_discovery_sitemap_generations",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `dss_indep_discovery_sitemap_generations` WHERE id = NEW.id)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Immutable discovery sitemap evidence'; END IF; END"
+            },
+            {
+                "TRIGGER_NAME": "dss_indep_discovery_sitemap_generations_update",
+                "EVENT_OBJECT_TABLE": "dss_indep_discovery_sitemap_generations",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Immutable discovery sitemap evidence'; END IF; END"
+            }
+        ]
+    }
+}

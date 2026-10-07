@@ -1,0 +1,75 @@
+{
+  "decision": "APPROVED owned Schema correction for focused development integration",
+  "actual_tested_executable": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+  "tree": "fcd8bcd7076dfcd3f8a5c559b97475e642e7c19e",
+  "author_evidence": "8cf82db12086d2579390882ccbc6a24eaf63a9c6",
+  "independent_actual": {
+    "native": {
+      "tests": 4,
+      "assertions": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "methods": [
+        {
+          "class": "Tests.IndependentDiscovery.DiscoveryNativeNamespaceCanaryTest",
+          "method": "test_foreign_reserved_check_name_is_refused_before_any_owned_ddl",
+          "assertions": 5
+        },
+        {
+          "class": "Tests.Feature.DiscoverySitemapNamespaceAdmissionTest",
+          "method": "test_native_fk_collision_preserves_complete_existing_prefix_and_retry_after_foreign_removal",
+          "assertions": 7
+        },
+        {
+          "class": "Tests.Feature.DiscoverySitemapNamespaceAdmissionTest",
+          "method": "test_native_foreign_table_local_unique_names_do_not_reserve_owned_constraint_names",
+          "assertions": 3
+        },
+        {
+          "class": "Tests.Feature.DiscoverySitemapNamespaceAdmissionTest",
+          "method": "test_native_check_and_fk_names_have_separate_constraint_namespaces",
+          "assertions": 2
+        }
+      ]
+    },
+    "sqlite": {
+      "tests": 2,
+      "assertions": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "methods": [
+        {
+          "class": "Tests.Feature.DiscoverySitemapSchemaTest",
+          "method": "test_reserved_guard_name_cannot_mask_second_dictionary_object",
+          "assertions": 2
+        },
+        {
+          "class": "Tests.Feature.DiscoverySitemapNamespaceAdmissionTest",
+          "method": "test_sqlite_named_inline_check_and_fk_clauses_do_not_reserve_foreign_index_names",
+          "assertions": 3
+        }
+      ]
+    }
+  },
+  "unchanged_original_probe_sha256": "ccdb1487b0970d0935ebfe505cf01690c2065c1611b624f560cf644ccab70da1",
+  "original_red_artifacts_restored": 8,
+  "source_carry": {
+    "changed": 2,
+    "worker_byte_exact": 18,
+    "dependencies_byte_exact": 7
+  },
+  "author_durable_artifacts_verified": 29,
+  "pint": "passed",
+  "scope_limit": "Owned new-worker Schema correction; final current-main public registration source separately reviewed",
+  "no_full_native_repeat": true,
+  "no_source_edits_or_publication": true,
+  "commands": {
+    "runner": "own copied metadata/autoload and shared locked package content, rootless activation; direct PHPunit entrypoint with own _composer_autoload_path",
+    "native": "privately source service_review-task.env; network permission for loopback only; -c native-selection.xml; filter exact original CHECK, foreign UNIQUE, separate CHECK/FK namespace and retained-prefix FK retry methods; --log-junit final-native.xml",
+    "sqlite": "-c sqlite-selection.xml; filter generated-index coexistence and cross-kind reserved-name refusal; --log-junit final-sqlite.xml",
+    "snapshots": "copy fresh exact07 snapshot to new corrected-native-namespace-snapshot.json, then restore original0e snapshot byte exact before any commit",
+    "pint": "--test two changed PHP paths and unchanged original canary"
+  }
+}

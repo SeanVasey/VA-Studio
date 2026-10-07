@@ -1,0 +1,63 @@
+{
+  "decision": "APPROVED for focused development source",
+  "reviewed_executable": "4fe8274204d70aa9ed371ba98e7e434c53c104b5",
+  "reviewed_tree": "72775d530d6b3e3deef44c79121296ed02f4af43",
+  "runtime_correction": "59b407d2ec1ff054a83c5e9476adc1ebcfc728f3",
+  "root_evidence_only_successor": "f7e56238499d5a695ef9d45abcd37bf740ff46ed",
+  "independent_sqlite": {
+    "tests": 10,
+    "assertions": 88,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "root_result_source_ledger": {
+    "original": "3f18bc99a0d5c1cea6028760af6510e21ab32189",
+    "corrected": "59b407d2ec1ff054a83c5e9476adc1ebcfc728f3",
+    "final-regressions": "4fe8274204d70aa9ed371ba98e7e434c53c104b5",
+    "final-native": "4fe8274204d70aa9ed371ba98e7e434c53c104b5"
+  },
+  "root_junit_counts": {
+    "original": {
+      "tests": "4",
+      "assertions": "7",
+      "failures": "3",
+      "errors": "0",
+      "skipped": "0",
+      "time": "3.063343"
+    },
+    "corrected": {
+      "tests": "51",
+      "assertions": "338",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "28.449583"
+    },
+    "final-regressions": {
+      "tests": "6",
+      "assertions": "20",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "3.470320"
+    },
+    "final-native": {
+      "tests": "6",
+      "assertions": "20",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "245.286258"
+    }
+  },
+  "root_native_attribution": "Executed by root on distinct discovery_review schema, MySQL 8.0.46; independently reconciled unchanged durable source and artifact hashes, not an independent native execution here.",
+  "root_artifact_digests_verified": 12,
+  "source_hashes_verified": 4,
+  "prior_unchanged_bindings": 28,
+  "carry": "Prior independent 07bf schema/native4/17 and byte-exact snapshot/worker evidence retained for unchanged bytes only.",
+  "limitations": [
+    "Focused development/source review; wholeFoundation/native8.4/browser pending",
+    "Production routes/content/credentials/provideractivation remain separate"
+  ]
+}

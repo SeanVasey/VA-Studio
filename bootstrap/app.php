@@ -36,6 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
         then: function (): void {
             Route::group([], base_path('routes/webhooks.php'));
             Route::group([], base_path('routes/embeds.php'));
+            Route::group([], base_path('routes/discovery-track-sitemaps.php'));
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {

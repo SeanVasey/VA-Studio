@@ -1,0 +1,26 @@
+[
+  {
+    "path": "app/Console/Commands/DiscoverySitemapBuild.php",
+    "git_blob": "5eff913b9735b43336d928b03e2a820c52bb87a7",
+    "sha256": "1d5611412373b1796dc8c7d2e2a9a3882d52e7b7bb637507c0e47d832de700d9",
+    "bytes": 3551
+  },
+  {
+    "path": "app/Domain/Catalog/DiscoverySitemap/SitemapStore.php",
+    "git_blob": "372721a7c8b112b6ba42835fac379f7c19c62404",
+    "sha256": "001a1e18cd64605522479fddade10cafb80ab8d3389a0a52e5d3d8dff626953b",
+    "bytes": 26940
+  },
+  {
+    "path": "app/Http/Controllers/PublicDiscoveryController.php",
+    "git_blob": "6bfedeffea25ccc7be3fe9d6a88a13eae9d6565d",
+    "sha256": "78a33252d59db9f4f72ded60908e699c8a472d89758ab7215bab99d997f0c50a",
+    "bytes": 3081
+  },
+  {
+    "path": "tests/Feature/DiscoverySitemapReviewRegressionTest.php",
+    "git_blob": "a01fbc21909c72367a6c55e74159c8e33e3cbb44",
+    "sha256": "bbdbaf681b1de8c242555957ead4c3f43ae523e1f6f8b496243cc86691e127fd",
+    "bytes": 4476
+  }
+]

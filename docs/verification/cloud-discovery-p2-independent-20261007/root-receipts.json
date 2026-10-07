@@ -1,0 +1,56 @@
+{
+  "predecessor_pr_head": "f2961ffa149a7b9b08b728d0770ae38e23739144",
+  "original_probe_source": "3f18bc99a0d5c1cea6028760af6510e21ab32189",
+  "runtime_correction": "59b407d2ec1ff054a83c5e9476adc1ebcfc728f3",
+  "final_test_successor": "4fe8274204d70aa9ed371ba98e7e434c53c104b5",
+  "review_findings": [
+    "https://github.com/SeanVasey/VA-Studio/pull/35#discussion_r4205976056",
+    "https://github.com/SeanVasey/VA-Studio/pull/35#discussion_r4205976068"
+  ],
+  "original_result": "4recorded1passed7assertions3genuinefailures0errors: missing404, authenticexpiry503, initialcreate0644",
+  "corrected_results": [
+    {
+      "source": "59b407d2ec1ff054a83c5e9476adc1ebcfc728f3",
+      "engine": "SQLite",
+      "selection": "original4+registered4+worker20+public23",
+      "result": "51/338zeroF/E/S"
+    },
+    {
+      "source": "4fe8274204d70aa9ed371ba98e7e434c53c104b5",
+      "engine": "SQLite",
+      "result": "new6/20zeroF/E/S"
+    },
+    {
+      "source": "4fe8274204d70aa9ed371ba98e7e434c53c104b5",
+      "engine": "MySQL8.0.46",
+      "result": "same6/20zeroF/E/S",
+      "schema": "separate root-owned discovery_review"
+    }
+  ],
+  "changes": "Only3 runtime paths: privateexclusivecreate0077andfinallyrestore; distinctmissing/expiredreason; configandepochproofbeforeexpiry; editorialfallbackonlyabsent/authenticexpiry. New6testsobserveactualcreatebeforechmod, callerumaskrestored, and changedconfig/epoch/corruptpointerstill503.",
+  "source_sha256": {
+    "app/Console/Commands/DiscoverySitemapBuild.php": "1d5611412373b1796dc8c7d2e2a9a3882d52e7b7bb637507c0e47d832de700d9",
+    "app/Domain/Catalog/DiscoverySitemap/SitemapStore.php": "001a1e18cd64605522479fddade10cafb80ab8d3389a0a52e5d3d8dff626953b",
+    "app/Http/Controllers/PublicDiscoveryController.php": "78a33252d59db9f4f72ded60908e699c8a472d89758ab7215bab99d997f0c50a",
+    "tests/Feature/DiscoverySitemapReviewRegressionTest.php": "bbdbaf681b1de8c242555957ead4c3f43ae523e1f6f8b496243cc86691e127fd"
+  },
+  "carry": "Schema07 and entire oldCurrentEligibleTrackSnapshot remain byteexact. Prior31sourcebinding approval appliesonlyunchanged28;3runtimepath changes coveredhere, future independentP2review required. FiveoriginalSnapshotmethodbodies unchanged.",
+  "limitations": [
+    "Focused development/source review; wholeFoundation/native8.4/browser pending",
+    "Production routes/content/credentials/provideractivation remain separate"
+  ],
+  "artifacts_sha256": {
+    "va-discovery-review-regression-pint.txt": "21ded0a9fe8f1456001a0025be7d655d68bd44c18dcbb68d634cd7192a3a4bbb",
+    "va-discovery-review-final-native.txt": "dbe78c887fac076a59ecddab289a49f4444a09e700bfef875dc8187ccb22e004",
+    "va-discovery-review-final-native.xml": "e0169402424def2a8af02ef4368d75e2263ff5dd33c62fa25dc3008cdac689cc",
+    "original-regression-test.php.txt": "1c15dfd3d8710de192bee03ead6288300d8f4f0c63b57bf9e65e98da9ca25353",
+    "va-discovery-review-original.xml": "2217172ca73300d7fa900d0567a3cac9d65a0d0451acb323933c87097027e612",
+    "va-discovery-review-adverse-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "va-discovery-review-corrected.txt": "9c780a90b597ac872c2c1729edead9092fa8917440f7c2cec74a3d2f020f188a",
+    "va-discovery-review-corrected-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "va-discovery-review-final-regressions.xml": "f183caba0eb2c601a833fb77ee89feef5c480b698ef05eeafdd4b10a43e71cf7",
+    "va-discovery-review-original.txt": "e62670a11f0d68242927505bd6120094a5265ff40c98b470ed527273aab1fd43",
+    "va-discovery-review-final-regressions.txt": "855ed29d89411cd7833e2fce9d3e43e85003c8b110a46bd84fc6a0f58b8e33e6",
+    "va-discovery-review-corrected.xml": "3d801b04e9ceae166ea5a6baca1902c687e5e3aff721dfbb3091690c7620cf6c"
+  }
+}

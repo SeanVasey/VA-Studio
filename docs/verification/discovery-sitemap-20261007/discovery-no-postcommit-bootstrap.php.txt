@@ -1,0 +1,3 @@
+<?php
+require '/workspace/VA-Studio-discovery-sitemap/vendor/autoload.php';
+require '/tmp/discovery-no-postcommit-source.php.txt';

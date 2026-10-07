@@ -1,0 +1,535 @@
+{
+  "kind": "new-worker-schema-only-correction; prior unpublished worker not recovered",
+  "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+  "tree": "fcd8bcd7076dfcd3f8a5c559b97475e642e7c19e",
+  "source_commits": [
+    "326e48d23635d198705fc0f8e1ba36a2b7d8396f",
+    "07bfbe9a9a8867df875bb99973b724bc67316eae"
+  ],
+  "parent_runtime": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+  "original_reviewer": "0e528a4f7cbe7d80eb6188193115e68358ba77e1",
+  "changed_source": [
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/SitemapSchema.php",
+      "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+      "git_blob": "c9d16b0b58db2ce88b6c83d6ecfff590582dc556",
+      "sha256": "2f8100ff89111a7632b62386e05e0210727c5e84be8b58ebbbf0f10d3cc513a6",
+      "byte_exact": true
+    },
+    {
+      "path": "tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php",
+      "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+      "git_blob": "b7f5be62d71824153b217989f4f75008298f1b8d",
+      "sha256": "15e5cc88f0b7cc464d35ec760dd9873a46912507d227ad3347d959cd253783c3",
+      "byte_exact": true
+    }
+  ],
+  "carried_worker_source": [
+    {
+      "path": "app/Console/Commands/DiscoverySitemapBuild.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "3b6275947c0398665e4228939d8d093ed75b4982",
+      "sha256": "b95c6d28dd9e1817a3582208bd6b4304fb96acd76a63e0dd7d08262fa3a5b146",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Catalog/Discovery/CurrentEligibleTrackSnapshot.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "d625c22bdbd76521a939f68cfb69464464f1cb7c",
+      "sha256": "ae98d542c70383d30656164a03c212a859dec1ab583780a68ec705c27f6bd12e",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/CandidateBuildRequest.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "0de79f24baaeb68a7cc9de5fcbf97de2f56542c3",
+      "sha256": "1471bcfbc5494008ffe8c0871678c24dacf5d8915ded514d4e9a47a10272d033",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/CandidateWindow.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "76f055e40b2a2928563afb2ef72221eb3867e2f8",
+      "sha256": "66a244c1cdc0c49875997395b7d08574f7776818bf9d743481bd8d00f7263a5d",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/DiscoverySitemapConsumption.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "34c0fb17d32a7c65aaa313367733a93c516541ab",
+      "sha256": "607f97510d834361d7fb4e2154d0280839360741dfc15565f8a72e3227d0c03b",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/SitemapConfiguration.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "e4ccbfeb612663182a098177bf4112ebd7e88724",
+      "sha256": "4f17e9a6addd9afb3618755cc2ccd11a0c0a240bff718cff73b67d85fa8c92de",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/SitemapException.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "81aa6001eef5785713d4f27a7c933755421ccdce",
+      "sha256": "b2ddf632f1e724145f358ab31a30e7a8d08463dcb638a61d9f7504d39d7c34c7",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/SitemapProjection.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "fcacfe23bf74c35a6def8f1d13f8922f9773ae80",
+      "sha256": "b9c056c2cf1606daa02bd75800a4279418ea2e952a0210ffab2bb9312dd45a55",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/SitemapStore.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "6e4389a10f57f0363203bc9f9a45f930744b215f",
+      "sha256": "31306070f3fe14aba8f39105d9ff66e506a3ba92e8d4a58297f3aa6035aaba14",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Http/Controllers/DiscoveryTrackSitemapController.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "defeb65eab2fbaaa505be1aea04f9d18a34d2720",
+      "sha256": "a8d3b73c219dcbf5f89970b093dbae0903cd3e406953ff4208b527871f9f7dd9",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Jobs/BuildDiscoverySitemapWindow.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "53f2322d92d8ff3b5372c184eecad99a4db16e9e",
+      "sha256": "7339216badac201037011ac8540007bb5b064d13a4a3f781bbf37cf7866d7045",
+      "byte_exact": true
+    },
+    {
+      "path": "config/discovery-sitemap.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "047e6abc71fc05b12aa691833848a7d4fd4a6b54",
+      "sha256": "931fc2ea665e020d5269c576d35ae485a231df92034f59a4c22b759a180ae579",
+      "byte_exact": true
+    },
+    {
+      "path": "database/migrations/2026_10_07_248000_create_discovery_sitemap_evidence.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "0f1fe242d7ad26057f766266d85538ba7e5418da",
+      "sha256": "540b1d539a4859b3a0c641636f9395b80d448d78486975a58c94f96a1720f913",
+      "byte_exact": true
+    },
+    {
+      "path": "routes/discovery-track-sitemaps.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "2f8706811bf4435bce25cc29deecc5450482aaf1",
+      "sha256": "567d817b2d17581bc2026d55ab28ebd9fd79c6ecc953d4b1bca180b004e62d62",
+      "byte_exact": true
+    },
+    {
+      "path": "tests/Feature/DiscoverySitemapConcurrencyTest.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "a963e5b61b22ac3e427e28ddb37b22bfc205044c",
+      "sha256": "6cb52fea4ed98473c9cf69d8ea1a5b5e5136e6d18db788c441c1343cc0a223d2",
+      "byte_exact": true
+    },
+    {
+      "path": "tests/Feature/DiscoverySitemapSchemaTest.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "041d030ae29fa0b5da17c084457cf63b2590abb5",
+      "sha256": "494928d8bfc90fbff7f45d2f5294880c11b2f62bd823e6d26484189aac5fbbe3",
+      "byte_exact": true
+    },
+    {
+      "path": "tests/Feature/DiscoverySitemapWorkerTest.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "8e9d79536a2b79c741a3308b774d615e921a4f1f",
+      "sha256": "fae2ac3de93066d8cb7b9ba1b4ffce8494d71127bfe47b38c0878d898b264c01",
+      "byte_exact": true
+    },
+    {
+      "path": "tests/Support/discovery-sitemap-native-worker.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "a1bb99cb8dd5941fabc2ad43c9c2eb857e5d92cf",
+      "sha256": "54ff572d98e4529b72dffd5350d43ba6d360147720d3c253bd869720bfba112b",
+      "byte_exact": true
+    }
+  ],
+  "unchanged_dependencies": [
+    {
+      "path": "app/Domain/Catalog/Discovery/DiscoveryEpoch.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "53a4355d7658d40901c901cf0ae3896952a17e09",
+      "sha256": "540b5d43c02e0a100e39290598b96668a4bf6c30fd0813da6161f307bec801bf",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Catalog/Discovery/EligibleTrackSnapshot.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "cb79642447104d9932daa580ef8891650eb66451",
+      "sha256": "72f1d990e90be9b3153277892678eb34a77c97ab21e3f8ca29232686c86863b3",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Catalog/PublicationReadiness.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "c20478a17f3748030218b8c585b8543f530de770",
+      "sha256": "6ed1f8c2bd1f0dc4b5fea0608848cf0149c12569e29b680640fea801f6fb8c60",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Commerce/Inventory/SelectionInventory.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "e89742f8fc5687a36f819182a40df1ba73f11fa3",
+      "sha256": "e00a74fe35c8ab885034e49bfe38e4392174467d454740e4e6ad84b2dc078fd6",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Support/CanonicalJson.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "4450b0c4f0a147f49db4732ea4d34c0804c54a25",
+      "sha256": "6e8f14f950bbb7ed3c4a8162ecf7c2fd2752031d1679285cea8bb0a5f5f82d89",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SiteBuilder/PublicPagesSitemap.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "8a4b1d3c62106236fb9b5860101da7e55744aae5",
+      "sha256": "524baebfd6037baffa8d34c4adf20ad1c4eca6b3df28e4e3e66396392ff8afda",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Application/Media/MediaIntegrity.php",
+      "source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "git_blob": "f148e184c1488e8f462105a5896acb43ac703265",
+      "sha256": "3fa401b5c08b274154f734191dfc2d23467637aba0079ee602f6f34cedcd89ea",
+      "byte_exact": true
+    }
+  ],
+  "snapshot_carry": {
+    "entire_file_byte_exact": true,
+    "existing_method_source_evidence": {
+      "capture": {
+        "unchanged": true,
+        "sha256": "dd914b1e9c97e81312a7b099af2a76d9c3c2e94508bd8b04079af0e8530aa6e3"
+      },
+      "currentPaths": {
+        "unchanged": true,
+        "sha256": "b9c94c5e1a5b4e7bce94e3bdfac043e544c9dd055e815698bc73072a253f0490"
+      },
+      "captureCurrent": {
+        "unchanged": true,
+        "sha256": "79d90e66af7832e4757b5d8ac83eefe467eeec2d1690ce3b35949e22a31c96fd"
+      },
+      "configuration": {
+        "unchanged": true,
+        "sha256": "769c25e6f670e0a94d61907322dc029f68f32fe9af652ebcf7c731de09628bea"
+      },
+      "decode": {
+        "unchanged": true,
+        "sha256": "c8f30e553d1a4a336b9da9bcc72bafb332c535e62ce5cec0729c6e094a3c2229"
+      }
+    }
+  },
+  "original_probe_sha256": "ccdb1487b0970d0935ebfe505cf01690c2065c1611b624f560cf644ccab70da1",
+  "second_actual_original": {
+    "runtime_source": "326e48d23635d198705fc0f8e1ba36a2b7d8396f",
+    "case": "foreign table-local UNIQUE owner symbol contaminates unqualified owned FK column proof after DDL",
+    "result": "1failure/1assertion/0errors",
+    "unchanged_final_test_sha256": "15e5cc88f0b7cc464d35ec760dd9873a46912507d227ad3347d959cd253783c3"
+  },
+  "checks": {
+    "native": "16executed/54assertions/1namedSQLite-onlyskip/0errors/0failures",
+    "SQLite": "10executed/27assertions/6namednative-onlyskips/0errors/0failures",
+    "Pint": "passed",
+    "whitespace": "passed"
+  },
+  "artifacts": [
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/DiscoveryNativeNamespaceCanaryTest.php.txt",
+      "bytes": 3682,
+      "sha256": "ccdb1487b0970d0935ebfe505cf01690c2065c1611b624f560cf644ccab70da1"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-autoload.txt",
+      "bytes": 2265,
+      "sha256": "8a92b0efd5bb9222a2725f0ad3713fd15ed504d7cac7e3ca5698cf5f4f6ea708"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-final-native.txt",
+      "bytes": 107,
+      "sha256": "8ad3d1e30622a854711bd957aa5f34f51ea9020e35869dd953b656746b3e3a48"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-final-native.xml",
+      "bytes": 6924,
+      "sha256": "9395b4bc864811884f8c84fe7419552ce1c1dd4cf29908ade3981050141d2b44"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-final-sqlite.txt",
+      "bytes": 106,
+      "sha256": "254220d7e830575a577280d667258e54d49fdc785b0711ae7eda05373dd4ffbb"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-final-sqlite.xml",
+      "bytes": 6547,
+      "sha256": "ce567273172a737bfc520ace8d934cad096efa04c89a1de3361dcb4f3a32ed18"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-frozen-native.txt",
+      "bytes": 107,
+      "sha256": "24cfbaad43219e3f71ff116c7bc93e3b059e8d810e46b2857c600302b630e82d"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-frozen-native.xml",
+      "bytes": 6924,
+      "sha256": "8e2efe0481bb17ba645319bd4806701400221d0bf1f16591cbbeeba70e770f22"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-frozen-sqlite.txt",
+      "bytes": 106,
+      "sha256": "8065f1b690b65d62b320aa0bc66c3be4eb5916d3d7cb48badf9bf352ad570323"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-frozen-sqlite.xml",
+      "bytes": 6547,
+      "sha256": "aa6ca0be1d645f785e8d6f9d5878f533889d1a4dc17ba50a626bf9bc69d31ced"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-native-namespaces.txt",
+      "bytes": 91,
+      "sha256": "531b38410ef3ed141d4885bd016c314462a3a4ac20fed3f8ceaf88aedbf6af23"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-native-namespaces.xml",
+      "bytes": 708,
+      "sha256": "2d0b66eaa675edcec8a9843f4b26e5e628c0c361cb8706070913f023c81a420f"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-native.txt",
+      "bytes": 107,
+      "sha256": "5baf8ea0b1ba274bf78678140f5d1320bd1c4456a0dc21c8ffaa52d4494a7b00"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-native.xml",
+      "bytes": 6555,
+      "sha256": "27264a45cbfb7914d9fac8d6a241faca0f5581a02c094b790f34bd7712e85d4c"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-original-native.txt",
+      "bytes": 2293,
+      "sha256": "1e03374d6ec98e32aabb7853b8e87ddc0b7be495b418ed93fcec4d8fbd28507c"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-original-native.xml",
+      "bytes": 3105,
+      "sha256": "01b4af6a5ce1702fb103e1569accc94be093177c6fc2ed7e4a264ae4a9a60362"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-pint.txt",
+      "bytes": 33,
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-sqlite.txt",
+      "bytes": 106,
+      "sha256": "8108feec32b37f870080b2355a7d8126bd3d880b03512a12c10e1ff2bf5a6f75"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-sqlite.xml",
+      "bytes": 6142,
+      "sha256": "36f12fe8c977e5d797481917375fac60503c86d8f2878960dee5f0dc25c9ddbe"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-successor-pint.txt",
+      "bytes": 33,
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-unique-original-native.txt",
+      "bytes": 583,
+      "sha256": "156f778db1676c883105d810f7fc0c6104074e9801c92998d2706cea14847602"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-unique-original-native.xml",
+      "bytes": 1239,
+      "sha256": "6c8445de87cf4d892543b586bc97dde74a4fbd1161174ace95e9060b1ee42ff4"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-unique-successor-native.txt",
+      "bytes": 91,
+      "sha256": "7a18c18b84c23f0975a4256d6f01fa5acdd540e3c2fa523f8d3fc028dcac0a43"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/discovery-schema-repair-unique-successor-native.xml",
+      "bytes": 724,
+      "sha256": "cb260cb435adaa40de87db47119ae0d5422640f9d4901935ca7622365bad9934"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/exact-sitemap-schema-diff.patch.txt",
+      "bytes": 6693,
+      "sha256": "1f28d85834aa7aa0d75b0519b87236b7f7568e04bf4e2b356a342f8a6ea2b0a7"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/final-native-namespace-snapshot.json",
+      "bytes": 1539,
+      "sha256": "6227d298811db3699aed75941ae7f4a69e4b26fdc44ec34b1fb41657fd67c3c7"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/original-native-namespace-snapshot.json",
+      "bytes": 3026,
+      "sha256": "cb6b390f53d1ad727e94d1c20d59c244baea9c25ce2b8b1828053606234a2654"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/DiscoverySitemapNamespaceAdmissionTest.php.txt",
+      "bytes": 10439,
+      "sha256": "15e5cc88f0b7cc464d35ec760dd9873a46912507d227ad3347d959cd253783c3"
+    },
+    {
+      "path": "docs/verification/discovery-schema-namespace-20261007/source-reflection.txt",
+      "bytes": 110,
+      "sha256": "30bc9e5caea2c3be51afe38e01515738acd6f9f2ed611a6e36d9f1ee50edf7ee"
+    }
+  ],
+  "status": "frozen source; independent successor review required; no publication/activation/wholeT36 closure",
+  "receipt_source_attribution": {
+    "discovery-schema-repair-frozen-native.xml": {
+      "runtime": {
+        "source": "326e48d23635d198705fc0f8e1ba36a2b7d8396f",
+        "path": "app/Domain/Catalog/DiscoverySitemap/SitemapSchema.php",
+        "git_blob": "4c3f15110d73e030bbf2902306e1b6e019a289b9",
+        "sha256": "4200ae9f9de74eb1a41a4b410bd872fbe6265f04d9ef5a7fbbc42f27e2f933c5"
+      },
+      "test_definition": {
+        "source": "326e48d23635d198705fc0f8e1ba36a2b7d8396f",
+        "path": "tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php",
+        "git_blob": "3eef0f85d39452ef9c48ad9dd84fdc77103ce292",
+        "sha256": "43ac98175b4e928f9bdfacccb1781ea60ae68ebb21aa624184e06d8ae4e738ec"
+      },
+      "junit": {
+        "name": "CLI Arguments",
+        "tests": "17",
+        "assertions": "53",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "1",
+        "time": "3.990688"
+      }
+    },
+    "discovery-schema-repair-frozen-sqlite.xml": {
+      "runtime": {
+        "source": "326e48d23635d198705fc0f8e1ba36a2b7d8396f",
+        "path": "app/Domain/Catalog/DiscoverySitemap/SitemapSchema.php",
+        "git_blob": "4c3f15110d73e030bbf2902306e1b6e019a289b9",
+        "sha256": "4200ae9f9de74eb1a41a4b410bd872fbe6265f04d9ef5a7fbbc42f27e2f933c5"
+      },
+      "test_definition": {
+        "source": "326e48d23635d198705fc0f8e1ba36a2b7d8396f",
+        "path": "tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php",
+        "git_blob": "3eef0f85d39452ef9c48ad9dd84fdc77103ce292",
+        "sha256": "43ac98175b4e928f9bdfacccb1781ea60ae68ebb21aa624184e06d8ae4e738ec"
+      },
+      "junit": {
+        "name": "CLI Arguments",
+        "tests": "16",
+        "assertions": "27",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "6",
+        "time": "0.382846"
+      }
+    },
+    "discovery-schema-repair-final-native.xml": {
+      "runtime": {
+        "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+        "path": "app/Domain/Catalog/DiscoverySitemap/SitemapSchema.php",
+        "git_blob": "c9d16b0b58db2ce88b6c83d6ecfff590582dc556",
+        "sha256": "2f8100ff89111a7632b62386e05e0210727c5e84be8b58ebbbf0f10d3cc513a6"
+      },
+      "test_definition": {
+        "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+        "path": "tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php",
+        "git_blob": "b7f5be62d71824153b217989f4f75008298f1b8d",
+        "sha256": "15e5cc88f0b7cc464d35ec760dd9873a46912507d227ad3347d959cd253783c3"
+      },
+      "junit": {
+        "name": "CLI Arguments",
+        "tests": "17",
+        "assertions": "54",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "1",
+        "time": "2.571500"
+      }
+    },
+    "discovery-schema-repair-final-sqlite.xml": {
+      "runtime": {
+        "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+        "path": "app/Domain/Catalog/DiscoverySitemap/SitemapSchema.php",
+        "git_blob": "c9d16b0b58db2ce88b6c83d6ecfff590582dc556",
+        "sha256": "2f8100ff89111a7632b62386e05e0210727c5e84be8b58ebbbf0f10d3cc513a6"
+      },
+      "test_definition": {
+        "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+        "path": "tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php",
+        "git_blob": "b7f5be62d71824153b217989f4f75008298f1b8d",
+        "sha256": "15e5cc88f0b7cc464d35ec760dd9873a46912507d227ad3347d959cd253783c3"
+      },
+      "junit": {
+        "name": "CLI Arguments",
+        "tests": "16",
+        "assertions": "27",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "6",
+        "time": "0.409030"
+      }
+    },
+    "discovery-schema-repair-unique-original-native.xml": {
+      "runtime": {
+        "source": "326e48d23635d198705fc0f8e1ba36a2b7d8396f",
+        "path": "app/Domain/Catalog/DiscoverySitemap/SitemapSchema.php",
+        "git_blob": "4c3f15110d73e030bbf2902306e1b6e019a289b9",
+        "sha256": "4200ae9f9de74eb1a41a4b410bd872fbe6265f04d9ef5a7fbbc42f27e2f933c5"
+      },
+      "test_definition": {
+        "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+        "path": "tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php",
+        "git_blob": "b7f5be62d71824153b217989f4f75008298f1b8d",
+        "sha256": "15e5cc88f0b7cc464d35ec760dd9873a46912507d227ad3347d959cd253783c3"
+      },
+      "junit": {
+        "name": "Tests\\Feature\\DiscoverySitemapNamespaceAdmissionTest",
+        "file": "/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php",
+        "tests": "1",
+        "assertions": "1",
+        "errors": "0",
+        "failures": "1",
+        "skipped": "0",
+        "time": "0.304724"
+      }
+    },
+    "discovery-schema-repair-unique-successor-native.xml": {
+      "runtime": {
+        "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+        "path": "app/Domain/Catalog/DiscoverySitemap/SitemapSchema.php",
+        "git_blob": "c9d16b0b58db2ce88b6c83d6ecfff590582dc556",
+        "sha256": "2f8100ff89111a7632b62386e05e0210727c5e84be8b58ebbbf0f10d3cc513a6"
+      },
+      "test_definition": {
+        "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+        "path": "tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php",
+        "git_blob": "b7f5be62d71824153b217989f4f75008298f1b8d",
+        "sha256": "15e5cc88f0b7cc464d35ec760dd9873a46912507d227ad3347d959cd253783c3"
+      },
+      "junit": {
+        "name": "Tests\\Feature\\DiscoverySitemapNamespaceAdmissionTest",
+        "file": "/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php",
+        "tests": "1",
+        "assertions": "3",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "time": "0.391132"
+      }
+    }
+  },
+  "counter_distinction": "frozen-native is exact326: foreign owner NONUNIQUE KEY and two assertions in coexistence tuple (53 total). final-native is exact07: foreign owner UNIQUE KEY plus assertNull, three assertions in that tuple (54 total). The earlier 53 receipt is not final07 acceptance. Strengthened unchanged07 test against326 Schema produced the preserved UNIQUE source failure before repair."
+}

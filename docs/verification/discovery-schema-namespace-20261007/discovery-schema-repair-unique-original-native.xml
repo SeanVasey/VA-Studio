@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\DiscoverySitemapNamespaceAdmissionTest" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="0.304724">
+    <testcase name="test_native_foreign_table_local_unique_names_do_not_reserve_owned_constraint_names" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php" line="121" class="Tests\Feature\DiscoverySitemapNamespaceAdmissionTest" classname="Tests.Feature.DiscoverySitemapNamespaceAdmissionTest" assertions="1" time="0.304724">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\DiscoverySitemapNamespaceAdmissionTest::test_native_foreign_table_local_unique_names_do_not_reserve_owned_constraint_names
+A foreign table-local UNIQUE symbol must not contaminate an owned FK column proof after DDL.
+Failed asserting that 'App\Domain\Catalog\DiscoverySitemap\SitemapException' is null.
+
+/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php:134</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

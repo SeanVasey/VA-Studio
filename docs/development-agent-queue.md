@@ -2,18 +2,18 @@
 
 ## Active cloud ownership — October 7, 2026 UTC
 
-One integration owner `/root`; verified main `760da5ac70a1082f13d87351a4446459e19947bb` includes PRs25–34.
+One integration owner `/root`; verified main `cd83b0cf4bddaeac9b113fabe7a918e37bfd2901` includes PRs25–35.
 Historical owner tables below describe earlier source, not active workers.
 
 | Worker | Isolated boundary | Current handoff |
 | --- | --- | --- |
-| `/root` | Primary/shared registration/evidence/publication | Free245 merged; reviewed support registration and final test fixtures; discovery/suppression publication; final source and CI census coordination |
-| `/root/pr25_recovery` | ProductionCheckout246/provider/tax | Frozenb6 callback repair; root selected5/38; NEW producer committed receipt and cached plain-read CurrentRows1fdd; then supported automatic-tax255 |
-| `/root/completion_audit` | Typed identity producer; operative free256 | Adapter101 independently approved; NEW historical committed identity receipt; repair actual3f revoked-session marker before distinct production free family256 |
-| `/root/native_mysql` | Paid252 consumers; service source repair | Service permanent-view correction9ce independently approved; paid whole-order original fulfilment/PDF proof; producer receipt and HTTP/UI/delivery completion remain dependencies |
-| `/root/pr26_review` | Independent discovery and SMTP review | Discovery07 native4/17 and all source/receipt bindings verified; final registereddc0 review, then unchanged actual SMTP parent callback probe on repairedf5 |
-| `/root/crawler_routes` | Production feature253 and suppression254 | Suppression983 root original native2/13 green;253 native consent boundary diagnosis and source freeze; NEW distinct production suppression254 follows |
-| `/root/recovery_inventory` | Independent free review; membership257/member258 | Genuine free marker1/7 fails SQLite/native; frozen c28 evidence; NEW real invoice/period/benefit membership schema/contracts with separate member-purpose grant258 |
+| `/root` | Primary/shared registration/evidence/publication | PR35 merged; actual new sitemap throttle repair; approved support fixtures662, suppression4f9 and SMTPf5 publication; final test census |
+| `/root/pr25_recovery` | ProductionCheckout246/provider/tax | b6 whole review is held by actual terminal media-policy withdrawal; narrow6e repair under checks. Producer90 is held by actual nested-parent postcommit write; owned repair then automatic-tax255 |
+| `/root/completion_audit` | Typed identity producer; operative free256 | Production-free233 independently approveda82; historical witness e8 corrects actual nested-parent callback, independent native3/19 passes pending map/freeze; next operativefree256 |
+| `/root/native_mysql` | Paid252 consumers | def native4/118 is component proof; actual precommit policy/password changes left durable origins2FAIL14. NEW same-observer consumer capsule closes original SQLite probes; source/HTTP/native review pending |
+| `/root/pr26_review` | Independent historical and public boundary review | SMTPf5 independently approved5b; Discovery P2 approvaleb2; e8 historical review/native3/19 green pending author map, then narrow sitemap throttle follow-up |
+| `/root/crawler_routes` | Production feature253 and suppression254 | 253 native boundary/config parent and server-only withdrawal reader repairs before freeze; NEW254 immutable suppression follows distinct production withdrawal lineage |
+| `/root/recovery_inventory` | Membership257/member258; free/support independent review | Free233 approveda82; support lifecycle approved662. Membership preparationb635 native9/30 green, docs919; NEW258 preparation followed by operative257 invoice/award/reservation and member fulfilment |
 
 
 Each worker has an isolated branch, independent autoload over unchanged locked

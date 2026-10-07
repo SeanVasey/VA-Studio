@@ -1,0 +1,17 @@
+{
+  "docs/verification/cloud-discovery-registration-independent-20261007.md": "a0022ac16039972360e157ab3f495568f4f7a5b24bfba3b4148101a2725fac27",
+  "docs/verification/cloud-discovery-registration-independent-20261007/approval-receipt.json": "30d347587ee942f6bf5c1ecaee5ec523a4382648a746787d92c6fbb6f7e9bc21",
+  "docs/verification/cloud-discovery-registration-independent-20261007/current-source-bindings.json": "9124c4eec5e7cfb73d6adf1187eaf52441c9501f4ec7859492a611c4a06d118a",
+  "docs/verification/cloud-discovery-registration-independent-20261007/final-composed-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+  "docs/verification/cloud-discovery-registration-independent-20261007/final-composed-sqlite-http.txt": "e06967f814815762c6f5747529bc2d0151b684c4e7869ac2c4abedcc21bd54b9",
+  "docs/verification/cloud-discovery-registration-independent-20261007/final-composed-sqlite-http.xml": "7f5f74f8dd28ea7fb665b25dc3bc1813f2465e85271ed34f4536984806c30903",
+  "docs/verification/cloud-discovery-registration-independent-20261007/final-sqlite-http.txt": "d2e9a2c34e428d4418e375063e706a844f2001a48d09e83ee95e035e6448eb8c",
+  "docs/verification/cloud-discovery-registration-independent-20261007/final-sqlite-http.xml": "67cc9588c4b48fb69397280c3954627b831217a67897a9cb07ed62a0e9fd19e7",
+  "docs/verification/cloud-discovery-registration-independent-20261007/old-method-byte-comparison.json": "f94c2477fcd6eb156e07ccd1f7eb010f0146d8e2d4b4dda9b859b701a28ecf8c",
+  "docs/verification/cloud-discovery-registration-independent-20261007/old-method-current-hashes.txt": "4f7255313e8076506f4df340e134223cf39625fc4d115f2310797b6ef8d96d01",
+  "docs/verification/cloud-discovery-registration-independent-20261007/own-autoload.txt": "641a30d163262b3742cbc0e6132de9d1e0a4a5322575793e444c28c8752f98f9",
+  "docs/verification/cloud-discovery-registration-independent-20261007/root-final-composed-27.txt": "c3f96e41b7d9e76d2a99999d202b6cc47536a424d639356082baa11d277a5886",
+  "docs/verification/cloud-discovery-registration-independent-20261007/root-final-composed-27.xml": "8f45cdd4bae18f88ad5ac1ed412008b2f79eeed64c8b2348ff10824cc92dd93f",
+  "docs/verification/cloud-discovery-registration-independent-20261007/source-evidence-reconciliation.json": "78b5b72968738873a398cd13abaf2622ee3be07f9471899b5b5653ea4fe68349",
+  "docs/verification/cloud-discovery-registration-independent-20261007/sqlite-http-selection.xml": "2252f5fbbe0611cd024c76cef0e3ab729cdebec32174e260b52461a3ac0306c8"
+}

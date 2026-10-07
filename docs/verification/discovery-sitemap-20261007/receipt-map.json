@@ -1,0 +1,566 @@
+{
+  "kind": "NEW implementation; unpublished predecessor was not recovered",
+  "base": "da70eba95c46522cd4084db4e79f764ba401fd7c",
+  "contracts": "bc4ef6ffff624a7e2e964a4d972edbda0aa54662",
+  "runtime": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+  "tree": "f2e24738de8e76cd606db75b5dd657f912fefc6c",
+  "owned_source": [
+    {
+      "path": "app/Console/Commands/DiscoverySitemapBuild.php",
+      "sha256": "b95c6d28dd9e1817a3582208bd6b4304fb96acd76a63e0dd7d08262fa3a5b146",
+      "bytes": 3392
+    },
+    {
+      "path": "app/Domain/Catalog/Discovery/CurrentEligibleTrackSnapshot.php",
+      "sha256": "ae98d542c70383d30656164a03c212a859dec1ab583780a68ec705c27f6bd12e",
+      "bytes": 16506
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/CandidateBuildRequest.php",
+      "sha256": "1471bcfbc5494008ffe8c0871678c24dacf5d8915ded514d4e9a47a10272d033",
+      "bytes": 1613
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/CandidateWindow.php",
+      "sha256": "66a244c1cdc0c49875997395b7d08574f7776818bf9d743481bd8d00f7263a5d",
+      "bytes": 3721
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/DiscoverySitemapConsumption.php",
+      "sha256": "607f97510d834361d7fb4e2154d0280839360741dfc15565f8a72e3227d0c03b",
+      "bytes": 3882
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/SitemapConfiguration.php",
+      "sha256": "4f17e9a6addd9afb3618755cc2ccd11a0c0a240bff718cff73b67d85fa8c92de",
+      "bytes": 1466
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/SitemapException.php",
+      "sha256": "b2ddf632f1e724145f358ab31a30e7a8d08463dcb638a61d9f7504d39d7c34c7",
+      "bytes": 606
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/SitemapProjection.php",
+      "sha256": "b9c056c2cf1606daa02bd75800a4279418ea2e952a0210ffab2bb9312dd45a55",
+      "bytes": 1054
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/SitemapSchema.php",
+      "sha256": "1ef4b5b6ba1d048f3a045b22362c5786e1ba3d55da167fe68a0bbc78be705af1",
+      "bytes": 19881
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/SitemapStore.php",
+      "sha256": "31306070f3fe14aba8f39105d9ff66e506a3ba92e8d4a58297f3aa6035aaba14",
+      "bytes": 26745
+    },
+    {
+      "path": "app/Http/Controllers/DiscoveryTrackSitemapController.php",
+      "sha256": "a8d3b73c219dcbf5f89970b093dbae0903cd3e406953ff4208b527871f9f7dd9",
+      "bytes": 1838
+    },
+    {
+      "path": "app/Jobs/BuildDiscoverySitemapWindow.php",
+      "sha256": "7339216badac201037011ac8540007bb5b064d13a4a3f781bbf37cf7866d7045",
+      "bytes": 1220
+    },
+    {
+      "path": "config/discovery-sitemap.php",
+      "sha256": "931fc2ea665e020d5269c576d35ae485a231df92034f59a4c22b759a180ae579",
+      "bytes": 172
+    },
+    {
+      "path": "database/migrations/2026_10_07_248000_create_discovery_sitemap_evidence.php",
+      "sha256": "540b1d539a4859b3a0c641636f9395b80d448d78486975a58c94f96a1720f913",
+      "bytes": 310
+    },
+    {
+      "path": "routes/discovery-track-sitemaps.php",
+      "sha256": "567d817b2d17581bc2026d55ab28ebd9fd79c6ecc953d4b1bca180b004e62d62",
+      "bytes": 392
+    },
+    {
+      "path": "tests/Feature/DiscoverySitemapConcurrencyTest.php",
+      "sha256": "6cb52fea4ed98473c9cf69d8ea1a5b5e5136e6d18db788c441c1343cc0a223d2",
+      "bytes": 5266
+    },
+    {
+      "path": "tests/Feature/DiscoverySitemapSchemaTest.php",
+      "sha256": "494928d8bfc90fbff7f45d2f5294880c11b2f62bd823e6d26484189aac5fbbe3",
+      "bytes": 8962
+    },
+    {
+      "path": "tests/Feature/DiscoverySitemapWorkerTest.php",
+      "sha256": "fae2ac3de93066d8cb7b9ba1b4ffce8494d71127bfe47b38c0878d898b264c01",
+      "bytes": 21124
+    },
+    {
+      "path": "tests/Support/discovery-sitemap-native-worker.php",
+      "sha256": "54ff572d98e4529b72dffd5350d43ba6d360147720d3c253bd869720bfba112b",
+      "bytes": 1373
+    }
+  ],
+  "unchanged_dependencies": [
+    {
+      "path": "app/Domain/Catalog/Discovery/DiscoveryEpoch.php",
+      "sha256": "540b5d43c02e0a100e39290598b96668a4bf6c30fd0813da6161f307bec801bf",
+      "unchanged_from_base": true
+    },
+    {
+      "path": "app/Domain/Catalog/Discovery/EligibleTrackSnapshot.php",
+      "sha256": "72f1d990e90be9b3153277892678eb34a77c97ab21e3f8ca29232686c86863b3",
+      "unchanged_from_base": true
+    },
+    {
+      "path": "app/Domain/Catalog/PublicationReadiness.php",
+      "sha256": "6ed1f8c2bd1f0dc4b5fea0608848cf0149c12569e29b680640fea801f6fb8c60",
+      "unchanged_from_base": true
+    },
+    {
+      "path": "app/Domain/Commerce/Inventory/SelectionInventory.php",
+      "sha256": "e00a74fe35c8ab885034e49bfe38e4392174467d454740e4e6ad84b2dc078fd6",
+      "unchanged_from_base": true
+    },
+    {
+      "path": "app/Support/CanonicalJson.php",
+      "sha256": "6e8f14f950bbb7ed3c4a8162ecf7c2fd2752031d1679285cea8bb0a5f5f82d89",
+      "unchanged_from_base": true
+    },
+    {
+      "path": "app/Domain/SiteBuilder/PublicPagesSitemap.php",
+      "sha256": "524baebfd6037baffa8d34c4adf20ad1c4eca6b3df28e4e3e66396392ff8afda",
+      "unchanged_from_base": true
+    },
+    {
+      "path": "app/Application/Media/MediaIntegrity.php",
+      "sha256": "3fa401b5c08b274154f734191dfc2d23467637aba0079ee602f6f34cedcd89ea",
+      "unchanged_from_base": true
+    }
+  ],
+  "existing_snapshot_method_carry": {
+    "capture": {
+      "unchanged": true,
+      "sha256": "dd914b1e9c97e81312a7b099af2a76d9c3c2e94508bd8b04079af0e8530aa6e3"
+    },
+    "currentPaths": {
+      "unchanged": true,
+      "sha256": "b9c94c5e1a5b4e7bce94e3bdfac043e544c9dd055e815698bc73072a253f0490"
+    },
+    "captureCurrent": {
+      "unchanged": true,
+      "sha256": "79d90e66af7832e4757b5d8ac83eefe467eeec2d1690ce3b35949e22a31c96fd"
+    },
+    "configuration": {
+      "unchanged": true,
+      "sha256": "769c25e6f670e0a94d61907322dc029f68f32fe9af652ebcf7c731de09628bea"
+    },
+    "decode": {
+      "unchanged": true,
+      "sha256": "c8f30e553d1a4a336b9da9bcc72bafb332c535e62ce5cec0729c6e094a3c2229"
+    }
+  },
+  "receipts": [
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-command-first.txt",
+      "sha256": "08f0cc5ee6902c830938451928f55abdd76d58e9831fdba3a3f4b44924623de3",
+      "bytes": 421,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-command-first.xml",
+      "sha256": "ada9a68f86783b21835060105a02a4f87249630401e4d341e2e202bbd6d09f4c",
+      "bytes": 968,
+      "scope": "interim unfrozen diagnostic; not final acceptance",
+      "junit": {
+        "tests": 1,
+        "assertions": 0,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-command-repair-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-command-repair.txt",
+      "sha256": "38ca0f6de58864a6b42f21cfd3685b86312eaaabfa2f44e5051acb141009fc6f",
+      "bytes": 92,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-command-repair.xml",
+      "sha256": "bedeb7a32d9d0c29e3c5c5c50f35dc022f795393c237d0e992f9831fc05ed7d9",
+      "bytes": 657,
+      "scope": "interim unfrozen diagnostic; not final acceptance",
+      "junit": {
+        "tests": 1,
+        "assertions": 15,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-existing-method-carry.json",
+      "sha256": "aa9f4a4fd4c8247d560f924fa7872ee95cfd5baa6cad67212e2600b3bbf652c4",
+      "bytes": 640,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-final-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-first-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-frozen-native-version.txt",
+      "sha256": "8190f04420569cb60dc4f6bdbed5368fdfd20d27429d1c76cea57c143c9418f5",
+      "bytes": 24,
+      "scope": "frozen runtime 97d5db7895bfdb56e9de3d77cce36b6c9156902d"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-frozen-native.txt",
+      "sha256": "68a3755c558c59705e54bd2de53ef4625a90bb3cb416c5112dc9302ccc0eed3f",
+      "bytes": 97,
+      "scope": "frozen runtime 97d5db7895bfdb56e9de3d77cce36b6c9156902d"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-frozen-native.xml",
+      "sha256": "0d8040d5482adf811403a2aaece0c22bf28b7a30e0f6182858e58636cdadfe97",
+      "bytes": 6302,
+      "scope": "frozen runtime 97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "junit": {
+        "tests": 16,
+        "assertions": 68,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-frozen-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33,
+      "scope": "frozen runtime 97d5db7895bfdb56e9de3d77cce36b6c9156902d"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-frozen-sqlite.txt",
+      "sha256": "f406fe88926dd7c4f6e3b00fbc6f14f24f8f3c683d19bd1581e5f4ed2cdc5588",
+      "bytes": 109,
+      "scope": "frozen runtime 97d5db7895bfdb56e9de3d77cce36b6c9156902d"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-frozen-sqlite.xml",
+      "sha256": "306e585af12fa0e97b0039ede21ae962160ca1f0fce1d6d472377c3f0bae5516",
+      "bytes": 13530,
+      "scope": "frozen runtime 97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+      "junit": {
+        "tests": 37,
+        "assertions": 218,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 1
+      }
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-full-affected-first.txt",
+      "sha256": "e602ea2623fdf2180047add6c5e72cb8633219eb771159659861628f97146b33",
+      "bytes": 97,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-full-affected-first.xml",
+      "sha256": "ee2bc7213a88c5389d311acaabfd34ace2ca63bf2d7674b5c92154b30b832e14",
+      "bytes": 12178,
+      "scope": "interim unfrozen diagnostic; not final acceptance",
+      "junit": {
+        "tests": 33,
+        "assertions": 199,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-native-contention-first.txt",
+      "sha256": "da4dc7fc904b52c59d40451dfe4c4bc3d916bf8410b93b96e4be50d0c03bcbcf",
+      "bytes": 94,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-native-contention-first.xml",
+      "sha256": "02bdd74d3b3f132bf1d551765b5809e90de735e341563589271839361b001d73",
+      "bytes": 690,
+      "scope": "interim unfrozen diagnostic; not final acceptance",
+      "junit": {
+        "tests": 1,
+        "assertions": 17,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-native-focused-first.txt",
+      "sha256": "eac13bb1247e699c76e34acb869f04b63d6594dc72d94dfbd36933ae49af8cba",
+      "bytes": 96,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-native-focused-first.xml",
+      "sha256": "20d959625a90fca6b74f95c91452cec6776f9a697d3366e8d6d56bf5ecf46166",
+      "bytes": 4697,
+      "scope": "interim unfrozen diagnostic; not final acceptance",
+      "junit": {
+        "tests": 12,
+        "assertions": 46,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-native-harness-pint.txt",
+      "sha256": "1c613f204a290e9005a93afffe19469ea3cf4c93a502a3b2684f753d2a3a48d2",
+      "bytes": 329,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-native-schema-repair.txt",
+      "sha256": "04471fdea08209823d135412b6234e2df2bf6f8812389447545604202a25ebda",
+      "bytes": 94,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-native-schema-repair.xml",
+      "sha256": "c94c6f73e5a25bbdd7e544a37e3fb41d8549cdbef30f5deaec1ec65ba817b9ee",
+      "bytes": 648,
+      "scope": "interim unfrozen diagnostic; not final acceptance",
+      "junit": {
+        "tests": 1,
+        "assertions": 15,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-native-schema-smoke.txt",
+      "sha256": "82ef4479e6131cbc3f597bca88fc769085dce8a8d1075ee0e7b0377d92f3a094",
+      "bytes": 926,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-native-schema-smoke.xml",
+      "sha256": "6765fa38e25d1eb7c701a698b7c375f70e36d96fea8efa9a56d0fa5332620bd4",
+      "bytes": 5746,
+      "scope": "interim unfrozen diagnostic; not final acceptance",
+      "junit": {
+        "tests": 1,
+        "assertions": 0,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-no-postcommit-bootstrap.php.txt",
+      "sha256": "710acafd434ab9a5a3ecd3e686107c6f918694d5dd09cd2c3a941be337038170",
+      "bytes": 131,
+      "scope": "controlled fault injection of frozen97d5; not historical recovered source"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-no-postcommit-red.txt",
+      "sha256": "ed1b7b9377b988d500b373c8a81e861cf2dda41cd9eec04a546e7972a2ce1011",
+      "bytes": 1543,
+      "scope": "controlled fault injection of frozen97d5; not historical recovered source"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-no-postcommit-red.xml",
+      "sha256": "b1a8e1d1850ce8970c8ab1347f5eefd889e402c3520b15861967aef6f20d6a7b",
+      "bytes": 2592,
+      "scope": "controlled fault injection of frozen97d5; not historical recovered source",
+      "junit": {
+        "tests": 3,
+        "assertions": 9,
+        "errors": 0,
+        "failures": 3,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-no-postcommit-source.php.txt",
+      "sha256": "c6bc3b06ad8342b24880fc36da35d52d233a4334c8399fd2e6ffb8cabaea1409",
+      "bytes": 15923,
+      "scope": "controlled fault injection of frozen97d5; not historical recovered source"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-old-method-smoke.txt",
+      "sha256": "c7115a3b27e3c4f2c8de29600374bbf25f7fabd10de63ffbf94ab8180fdc678c",
+      "bytes": 91,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-old-method-smoke.xml",
+      "sha256": "766a8ca605d71a13e7b81fa5416229c7faaacc4f95f82790906e384cd3190c55",
+      "bytes": 681,
+      "scope": "interim unfrozen diagnostic; not final acceptance",
+      "junit": {
+        "tests": 1,
+        "assertions": 9,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-original-snapshot.php.txt",
+      "sha256": "4292c66f41e05332dc3bb1dfe41b811496d4815beea70d866d3533d518d7d1f3",
+      "bytes": 9714,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-schema-first.txt",
+      "sha256": "c1c1d5fdf03efce0dc9d44faec8c09b6dbab569d5ff432d767e788a89960cd4f",
+      "bytes": 92,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-schema-first.xml",
+      "sha256": "f1870768a04d275df1725b89922cdae1120201b0870f718839b515c445ed2322",
+      "bytes": 2593,
+      "scope": "interim unfrozen diagnostic; not final acceptance",
+      "junit": {
+        "tests": 7,
+        "assertions": 20,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-schema-namespace-final.txt",
+      "sha256": "51ef97e5079a1b0ee3e52b82206ffd976a9faad2e901c9b8ac653dc790ad3ff8",
+      "bytes": 105,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-schema-namespace-final.xml",
+      "sha256": "0feb74810bbaf6bbf4c0ad11776ec435b179f49be9e5d660834274cbf7922b45",
+      "bytes": 3587,
+      "scope": "interim unfrozen diagnostic; not final acceptance",
+      "junit": {
+        "tests": 10,
+        "assertions": 24,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 1
+      }
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-schema-namespace-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-schema-prefix-final.txt",
+      "sha256": "cb7acee05ce78645ca006e4bebc6f17412f6aef22df10f34b8b143402d9a5a23",
+      "bytes": 92,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-schema-prefix-final.xml",
+      "sha256": "1d0a31f39c11d74b991fb0b0385908a3c7606fe49d3cec2a2e484f3b8f80c98a",
+      "bytes": 3239,
+      "scope": "interim unfrozen diagnostic; not final acceptance",
+      "junit": {
+        "tests": 9,
+        "assertions": 24,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-schema-prefix-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-second-pint.txt",
+      "sha256": "35dee880a6e26a8b89f8f164d24ee6e079775883aeba685e52643e4949956639",
+      "bytes": 131,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-sitemap-autoload.txt",
+      "sha256": "419735495f03bdeefb00ddee2d26ba2f6759b70ff26d0e74154fb69d88058ca0",
+      "bytes": 2217,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-sitemap-contract-pint.txt",
+      "sha256": "4717c6fb2c9d0e065b2ec1b058869f34c6cbfe2ccf3e37f5a38cd0a9e0b88806",
+      "bytes": 263,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-third-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-worker-first.txt",
+      "sha256": "1de21efa34acb2ee8557e4d1d8ed98e830ea2367909d174303eb862d874b5658",
+      "bytes": 97,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-worker-first.xml",
+      "sha256": "1cec66ba80b7e2ffc8c264321b773ef60543c63a545bdf0d0fd8c9708357517f",
+      "bytes": 5723,
+      "scope": "interim unfrozen diagnostic; not final acceptance",
+      "junit": {
+        "tests": 16,
+        "assertions": 122,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-worker-repair.txt",
+      "sha256": "ab2baebd17345cac40cba2203ec2f3ac31bed5388c15410da7c0b25fdb9c4940",
+      "bytes": 93,
+      "scope": "interim unfrozen diagnostic; not final acceptance"
+    },
+    {
+      "path": "docs/verification/discovery-sitemap-20261007/discovery-worker-repair.xml",
+      "sha256": "9e2f380f7d238d46cd1ac32f97bf1d3307c8234c2129a0ef1d0ed8a35ad64f12",
+      "bytes": 2667,
+      "scope": "interim unfrozen diagnostic; not final acceptance",
+      "junit": {
+        "tests": 7,
+        "assertions": 40,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    }
+  ],
+  "activation": "default false; root public registration/independent review and host/content/DNS gates outstanding"
+}

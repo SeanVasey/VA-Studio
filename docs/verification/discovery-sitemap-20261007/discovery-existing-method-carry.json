@@ -1,0 +1,22 @@
+{
+  "capture": {
+    "unchanged": true,
+    "sha256": "dd914b1e9c97e81312a7b099af2a76d9c3c2e94508bd8b04079af0e8530aa6e3"
+  },
+  "currentPaths": {
+    "unchanged": true,
+    "sha256": "b9c94c5e1a5b4e7bce94e3bdfac043e544c9dd055e815698bc73072a253f0490"
+  },
+  "captureCurrent": {
+    "unchanged": true,
+    "sha256": "79d90e66af7832e4757b5d8ac83eefe467eeec2d1690ce3b35949e22a31c96fd"
+  },
+  "configuration": {
+    "unchanged": true,
+    "sha256": "769c25e6f670e0a94d61907322dc029f68f32fe9af652ebcf7c731de09628bea"
+  },
+  "decode": {
+    "unchanged": true,
+    "sha256": "c8f30e553d1a4a336b9da9bcc72bafb332c535e62ce5cec0729c6e094a3c2229"
+  }
+}
