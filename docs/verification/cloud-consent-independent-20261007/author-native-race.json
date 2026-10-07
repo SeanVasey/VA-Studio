@@ -1,0 +1,29 @@
+{
+    "source": "0143f4b6bb7c529aed003fdfc741bf93f2e3a9ed",
+    "mysql": "8.0.46-0ubuntu0.24.04.4",
+    "exact_users_record_wait": {
+        "index_name": "PRIMARY",
+        "lock_type": "RECORD",
+        "lock_status": "WAITING"
+    },
+    "workers": {
+        "first": {
+            "result": "saved",
+            "status": null,
+            "snapshot_revision": null,
+            "transaction_level": 0,
+            "isolation": "REPEATABLE-READ"
+        },
+        "second": {
+            "result": "rejected",
+            "status": 409,
+            "snapshot_revision": 0,
+            "transaction_level": 0,
+            "isolation": "REPEATABLE-READ"
+        }
+    },
+    "final_revision": 1,
+    "final_status": "withdrawn",
+    "events": 1,
+    "policies": 0
+}

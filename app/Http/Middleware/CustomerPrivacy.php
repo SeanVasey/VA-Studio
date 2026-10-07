@@ -64,6 +64,10 @@ final class CustomerPrivacy
 
     public static function error(int $status): Response
     {
+        if (request()->is('account/communication-preferences', 'account/communication-preferences/*')) {
+            return self::protect(response()->json(['code' => 'CUSTOMER_PREFERENCES_UNAVAILABLE',
+                'message' => 'Communication preferences could not be confirmed. Reload before another choice.'], $status >= 500 ? 503 : $status));
+        }
         if (request()->is('account/listening-library', 'account/listening-library/*')) {
             return self::protect(response()->json(['code' => 'CUSTOMER_LISTENING_UNAVAILABLE',
                 'message' => 'Saved tracks and playlists could not be confirmed. Reload your library before making another change.'], $status >= 500 ? 503 : $status));

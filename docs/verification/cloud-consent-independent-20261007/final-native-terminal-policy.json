@@ -1,0 +1,11 @@
+{
+    "source": "d22e1ddc9f01089dec15c2eca0519c2bc5424876",
+    "driver": "mysql",
+    "policy_resolution_count": 3,
+    "actual_terminal_policy_resolver_fired": true,
+    "notice_disabled": true,
+    "command_refused": true,
+    "status": 503,
+    "retained_rows_exact": true,
+    "event_count": 0
+}

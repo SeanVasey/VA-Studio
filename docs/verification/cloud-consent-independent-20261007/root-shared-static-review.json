@@ -1,0 +1,89 @@
+{
+  "root_source": "719b0bde69523367cfb28f323356242789457826",
+  "root_tree": "b0a05e985e1e6f72b9d758ff81b3b1b4817ac78d",
+  "all17authorpaths_exact": {
+    "app/Domain/Customers/Preferences/ConsentEvidence.php": "b76164e3388abf131f8262bed976c33ecfeb6a08",
+    "app/Domain/Customers/Preferences/ConsentException.php": "9ac4bdea57424de3cfbdac5b58ad9eea194cf1b9",
+    "app/Domain/Customers/Preferences/ConsentPolicy.php": "0da507e0811d9cb0f1df2e01a0c716ea5aef7bc6",
+    "app/Domain/Customers/Preferences/ConsentRuntime.php": "3aad7d30abfec79aa2f40fec8bcb46eca82edbbc",
+    "app/Domain/Customers/Preferences/CustomerConsentPreferences.php": "65c75ef4ef151f03d61d0692d12080c72b40ba43",
+    "app/Domain/Customers/Preferences/LocalConsentRuntime.php": "83371168323a3c89aa1a9dbd024912e2b3e2fa98",
+    "app/Domain/Customers/Preferences/Models/ConsentEvent.php": "c35611aeaa798693b529ab45f38cfbc0be0715bd",
+    "app/Domain/Customers/Preferences/Models/ConsentPolicySnapshot.php": "464334388b931028854a2b026a045bb2380b75b9",
+    "app/Domain/Customers/Preferences/Models/ConsentState.php": "c977bbe246f6852725011515a4366733b54dafe2",
+    "config/customer-preferences.php": "f657798850583428af51d7479f3a3d3aeab1844d",
+    "database/migrations/2026_10_07_250000_customer_consent.php": "b894d3feb300676eb771a5a32a7b95724cba88f2",
+    "resources/js/components/CustomerCommunicationPreferences.tsx": "c3f449c633e85f56a2f3560a4e46e42bbe2d8b97",
+    "tests/Feature/CustomerConsentBoundaryTest.php": "b1bb91ce3e9fb7557c52caa71707d99dc86fa9dc",
+    "tests/Feature/CustomerConsentMigrationTest.php": "68ad89ffdc5175f5bbe3e6cb6748fa93307463c3",
+    "tests/Feature/CustomerConsentPreferencesTest.php": "664f12b271bc56c5fd6180de862dc8ec86b86e8f",
+    "tests/Support/ConsentFixtures.php": "9d0a6847e0f3ca14fb3c06815cf5fd455ddf4d6c",
+    "tests/frontend/customer-communication-preferences.test.tsx": "effa3db8440da9195e3bbd48b26d115d03087bf8"
+  },
+  "shared_source_bindings": {
+    "app/Http/Controllers/CustomerCommunicationPreferencesController.php": {
+      "blob": "6fb7396943400727953e6f50fd1819023e7dc129",
+      "sha256": "65c6abfab2a221169442bf4a7d3079b3abf250eb00589e5906b7fdf7288206d6"
+    },
+    "app/Http/Controllers/CustomerSessionController.php": {
+      "blob": "bf55ccaf3a8fba6b793a3a21a509699e72a50a32",
+      "sha256": "b51e73ac36c2e6ff352cbd18db89ac12834eaede4c3faf15635ca935b3fe2582"
+    },
+    "app/Http/Middleware/CustomerPrivacy.php": {
+      "blob": "c09b2b197b5c8fe88e419a33ba830447077af3ea",
+      "sha256": "a718aaa54bba4559de97cae1894f591af77306760176b2e1659cbc8250c634f9"
+    },
+    "app/Http/Requests/CustomerCommunicationPreferencesRequest.php": {
+      "blob": "b1c0fe774cafacf4c6f9b0c93357368208156f97",
+      "sha256": "483918eb02c2ea8c293389fa4f533886bfa49ff9ba2185ea2af0b9adfa3a266e"
+    },
+    "resources/js/Pages/CustomerLibrary.tsx": {
+      "blob": "d0fa69585b36299dd89774737662d18bb5b7ab6c",
+      "sha256": "e304d4ebdf57382c6aee52d833edf1bcdb8b6261c50cbb4cd5b08feef697965a"
+    },
+    "routes/customer.php": {
+      "blob": "90e18e649ef726ece6ddd1e14faf8c58fb3efa99",
+      "sha256": "b722e67cf67950da760edeebc29768d961ed8b48eac576001b57927059dcab09"
+    },
+    "tests/Feature/CustomerCommunicationPreferencesHttpTest.php": {
+      "blob": "dca2564757ba051f367b7c2b5edc488a42ae3049",
+      "sha256": "f5e445569cec71bc7ec87ab86648e380810caecbc19956308a27749acee0c41d"
+    },
+    "tests/frontend/customer-communication-registration.test.tsx": {
+      "blob": "92809c8e1b9785b86c7a1e77a67dafd477d9e51e",
+      "sha256": "03ce9e608fb962fd521211e8f5e356226fb622c7d97609e135bb68e23790b1e2"
+    },
+    "bootstrap/app.php": {
+      "blob": "ad1074da34581130a90c7ca61b528c29c6c5b42a",
+      "sha256": "e9fcaa1432324ca8cc7e3edab0c5ae978a75ba1aed5683f1a3230196c2fd4ce5"
+    },
+    "app/Domain/Customers/CustomerAccess.php": {
+      "blob": "310bb10219405110a3db5a5844132c42d0291887",
+      "sha256": "cb59745ecbdea2a9cedce51be535d428f2e1a3613829547716e9633fbff061bd"
+    },
+    "app/Domain/Customers/CustomerAccessPolicy.php": {
+      "blob": "ceccc3a417413dec27b855d465d30349cef20fa3",
+      "sha256": "2a144608b6988d0cd96a1f2eb9b7164c226b3fa60e822496bda8fe3f2099fd40"
+    },
+    "app/Support/CommerceRequestIdentity.php": {
+      "blob": "21c8de9947441cf8ecd0b17d48daf530117959c5",
+      "sha256": "848c758e0dbdb56b80884e3f91e6fd2946c005717d8805ebba9a7ec21871de1a"
+    },
+    "composer.lock": {
+      "blob": "9e58027dcd989282b026d56347e26ea867723db9",
+      "sha256": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9"
+    },
+    "package-lock.json": {
+      "blob": "614350366e7af397c14603dae9272082ecfae066",
+      "sha256": "6407d3a63e3b6e04f5824f53c41b8dc8a33581f987b21d780c795480122f93ea"
+    }
+  },
+  "root_reported": {
+    "HTTP_cases": 16,
+    "HTTP_assertions": 171,
+    "frontend_cases": 63,
+    "TypeScript": "passed",
+    "attribution": "Root supplied actual execution; independent reviewer source review only on these unchanged seams"
+  },
+  "shared_review": "Closed scalar-only bounded4096raw request and duplicate decoded keys; CustomerPrivacy generic private responses plus global exceptions; current request identity and same-origin web/CSRF session; unknown/granted/withdrawn minimization; freshopaque32hex mountedscope/remount; no browser persistence/replay. Leaf4confirmedblockers stillholdcomposition."
+}

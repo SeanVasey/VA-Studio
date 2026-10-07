@@ -1,5 +1,7 @@
 # Remaining development and completion plan
 
+Current overlay: verified main4150b858 includes PR31 after fresh preflight37598818397 and exact independent review. Consent250 is approved on d22 and composed as e319 with all38 source bindings unchanged, actual HTTP16/171, frontend63 and TypeScript. Production identity is held by an actual incompatible-parent migration canary; its shared HTTP/UI/SMTP journey passes remain precise component evidence. Attachment root HTTP6/247 and mounted5 pass with private page/stream policy; original root harness mistakes are retained. Checkout9f, free retry/status, paid252, suppression251 and private discovery248 remain active. Six accepted/34 open parent groups and all103 parity rows remain; no final acceptance or external activation.
+
 ## Current cloud execution — October 7, 2026 UTC
 
 Verified main `da70eba95c46522cd4084db4e79f764ba401fd7c` includes PRs25–30:

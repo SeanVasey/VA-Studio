@@ -1,0 +1,37 @@
+{
+    "source": "0143f4b6bb7c529aed003fdfc741bf93f2e3a9ed",
+    "driver": "mysql",
+    "refused": false,
+    "error": "Illuminate\\Database\\QueryException: SQLSTATE[HY000]: General error: 1824 Failed to open the referenced table 'customer_accounts' (Connection: mysql, Host: 127.0.0.1, Port: 33067, Database: vaseyaudio_service_review, SQL: CREATE TABLE `customer_consent_events` (`id` bigint unsigned NOT NULL AUTO_INCREMENT, `public_id` char(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL, `customer_account_id` bigint unsigned NOT NULL, `purpose` varchar(40) CHARACTER SET ascii COLLATE ascii_bin NOT NULL, `revision` int unsigned NOT NULL, `status` varchar(16) CHARACTER SET ascii COLLATE ascii_bin NOT NULL, `policy_id` bigint unsigned NULL DEFAULT NULL, `source` varchar(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL, `affirmative` tinyint unsigned NOT NULL, `recipient_hmac` char(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL, `recipient_ciphertext` text CHARACTER SET ascii COLLATE ascii_bin NOT NULL, `created_at` timestamp NOT NULL, PRIMARY KEY (`id`), UNIQUE KEY `customer_consent_events_public_unique` (`public_id`), UNIQUE KEY `customer_consent_events_account_revision_unique` (`customer_account_id`, `purpose`, `revision`), KEY `customer_consent_events_policy_index` (`policy_id`), CONSTRAINT `customer_consent_events_customer_account_id_fk` FOREIGN KEY (`customer_account_id`) REFERENCES `customer_accounts` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT, CONSTRAINT `customer_consent_events_policy_id_fk` FOREIGN KEY (`policy_id`) REFERENCES `customer_consent_policies` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='VA retained customer consent v1')",
+    "objects_unchanged": false,
+    "before": [
+        [
+            {
+                "TABLE_NAME": "review_sentinel",
+                "TABLE_TYPE": "BASE TABLE"
+            },
+            {
+                "TABLE_NAME": "users",
+                "TABLE_TYPE": "BASE TABLE"
+            }
+        ],
+        []
+    ],
+    "after": [
+        [
+            {
+                "TABLE_NAME": "customer_consent_policies",
+                "TABLE_TYPE": "BASE TABLE"
+            },
+            {
+                "TABLE_NAME": "review_sentinel",
+                "TABLE_TYPE": "BASE TABLE"
+            },
+            {
+                "TABLE_NAME": "users",
+                "TABLE_TYPE": "BASE TABLE"
+            }
+        ],
+        []
+    ]
+}

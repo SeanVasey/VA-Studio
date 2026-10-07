@@ -1,0 +1,135 @@
+<?php
+
+namespace Tests\Feature;
+
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use LogicException;
+use PDO;
+use Tests\TestCase;
+
+class ConsentMigrationProbeTest extends TestCase
+{
+    private function migration(): object
+    {
+        return require database_path('migrations/2026_10_07_250000_customer_consent.php');
+    }
+
+    private function reset(): PDO
+    {
+        Schema::dropAllTables();
+        $this->artisan('migrate', ['--force' => true])->assertExitCode(0);
+        $pdo = DB::connection()->getPdo();
+        // Actual dependency schema is installed by the real prior migrations.
+        // Only these empty consent objects/record are the disposable new prefix.
+        foreach (['customer_consent_states', 'customer_consent_events', 'customer_consent_policies'] as $table) {
+            Schema::drop($table);
+        }
+        DB::table('migrations')->where('migration', '2026_10_07_250000_customer_consent')->delete();
+        $pdo->exec('CREATE TABLE review_sentinel (id INTEGER PRIMARY KEY, value VARCHAR(80))');
+        $pdo->exec("INSERT INTO review_sentinel VALUES (1,'SYNTHETIC retained migration canary')");
+
+        return $pdo;
+    }
+
+    private function objects(PDO $pdo): array
+    {
+        if (DB::getDriverName() === 'sqlite') {
+            return $pdo->query('SELECT type,name,tbl_name,sql FROM main.sqlite_master ORDER BY type,name,tbl_name')->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        return [$pdo->query('SELECT TABLE_NAME,TABLE_TYPE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() ORDER BY TABLE_NAME')->fetchAll(PDO::FETCH_ASSOC), $pdo->query('SELECT TRIGGER_NAME,EVENT_OBJECT_TABLE,ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() ORDER BY TRIGGER_NAME')->fetchAll(PDO::FETCH_ASSOC)];
+    }
+
+    private function prove(string $name, array $values): void
+    {
+        file_put_contents(__DIR__.'/'.getenv('CONSENT_PROBE_PREFIX').'-'.$name.'.json', json_encode(['source' => getenv('CONSENT_REVIEW_SOURCE'), 'driver' => DB::getDriverName()] + $values, JSON_PRETTY_PRINT)."\n");
+    }
+
+    public function test_reserved_table_name_as_foreign_trigger_is_refused_before_any_ddl(): void
+    {
+        $pdo = $this->reset();
+        $pdo->exec(DB::getDriverName() === 'sqlite' ? 'CREATE TRIGGER customer_consent_policies BEFORE DELETE ON review_sentinel BEGIN SELECT 1; END' : 'CREATE TRIGGER customer_consent_policies BEFORE DELETE ON review_sentinel FOR EACH ROW SET @consent_probe=1');
+        $before = $this->objects($pdo);
+        $refused = false;
+        $error = null;
+        try {
+            $this->migration()->up();
+        } catch (\Throwable $e) {
+            $refused = $e instanceof LogicException;
+            $error = get_class($e).': '.$e->getMessage();
+        }
+        $after = $this->objects($pdo);
+        $this->prove('namespace', ['refused' => $refused, 'error' => $error, 'objects_unchanged' => $before === $after, 'before' => $before, 'after' => $after]);
+        $this->assertTrue($refused, 'Reserved table identity collides with a foreign trigger and must refuse before any DDL.');
+        $this->assertSame($before, $after);
+    }
+
+    public function test_reserved_table_and_foreign_trigger_coexistence_is_refused_before_adoption(): void
+    {
+        if (DB::getDriverName() !== 'sqlite') {
+            $this->markTestSkipped('SQLite namespace coexistence probe.');
+        }
+        $pdo = $this->reset();
+        $this->migration()->up();
+        $pdo->exec('CREATE TRIGGER customer_consent_policies BEFORE DELETE ON review_sentinel BEGIN SELECT 1; END');
+        $before = $this->objects($pdo);
+        $refused = false;
+        try {
+            $this->migration()->up();
+        } catch (LogicException) {
+            $refused = true;
+        }
+        $this->prove('coexist', ['refused' => $refused, 'objects_unchanged' => $before === $this->objects($pdo)]);
+        $this->assertTrue($refused, 'Exact table plus an incompatible reserved trigger must not be adopted.');
+        $this->assertSame($before, $this->objects($pdo));
+    }
+
+    public function test_final_ddl_callback_cannot_remove_an_earlier_guard_and_record_completed_installation(): void
+    {
+        $pdo = $this->reset();
+        $fired = false;
+        DB::listen(function ($query) use ($pdo, &$fired): void {
+            if (! $fired && str_starts_with($query->sql, 'CREATE TRIGGER `customer_consent_states_retain_delete`')) {
+                $fired = true;
+                $pdo->exec('DROP TRIGGER customer_consent_policies_retain_insert');
+            }
+        });
+        $refused = false;
+        $status = null;
+        try {
+            $status = $this->artisan('migrate', ['--path' => 'database/migrations/2026_10_07_250000_customer_consent.php', '--force' => true])->run();
+        } catch (LogicException) {
+            $refused = true;
+        }
+        $recorded = (int) $pdo->query("SELECT COUNT(*) FROM migrations WHERE migration='2026_10_07_250000_customer_consent'")->fetchColumn();
+        $this->prove('terminal-ddl', ['last_actual_ddl_callback_fired' => $fired, 'migration_refused' => $refused, 'status' => $status, 'recorded' => $recorded]);
+        $this->assertTrue($fired);
+        $this->assertTrue($refused, 'Final full-graph assertion must detect an earlier dropped guard before migrator bookkeeping.');
+        $this->assertSame(0, $recorded);
+    }
+
+    public function test_missing_required_dependency_is_refused_before_owned_table_creation(): void
+    {
+        $pdo = $this->reset();
+        Schema::disableForeignKeyConstraints();
+        try {
+            $pdo->exec('DROP TABLE customer_accounts');
+        } finally {
+            Schema::enableForeignKeyConstraints();
+        }
+        $before = $this->objects($pdo);
+        $refused = false;
+        $error = null;
+        try {
+            $this->migration()->up();
+        } catch (\Throwable $e) {
+            $refused = $e instanceof LogicException;
+            $error = get_class($e).': '.$e->getMessage();
+        }
+        $after = $this->objects($pdo);
+        $this->prove('dependency', ['refused' => $refused, 'error' => $error, 'objects_unchanged' => $before === $after, 'before' => $before, 'after' => $after]);
+        $this->assertTrue($refused, 'Missing required dependency must be refused before any owned DDL.');
+        $this->assertSame($before,$after);
+    }
+}

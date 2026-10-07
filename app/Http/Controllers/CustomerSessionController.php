@@ -98,6 +98,8 @@ final class CustomerSessionController
             $props['membershipHistoryScope'] = $props['testMembershipsEnabled'] ? bin2hex(random_bytes(16)) : null;
             $props['testListeningLibraryEnabled'] = true;
             $props['listeningLibraryScope'] = bin2hex(random_bytes(16));
+            $props['communicationPreferencesAvailable'] = true;
+            $props['communicationPreferencesScope'] = bin2hex(random_bytes(16));
 
             Inertia::encryptHistory();
 
