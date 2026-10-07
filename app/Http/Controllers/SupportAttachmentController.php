@@ -23,8 +23,8 @@ final class SupportAttachmentController
         try {
             $kind = $request->route('support_kind');
             $action = $request->route('support_action');
-            $actor = app(SupportAttachmentRequestIdentity::class)->actor($request);
-            $context = SupportAttachmentRequestContext::capture($request);
+            [$actor, $context] = SupportAttachmentRequestContext::resolve($request,
+                fn () => app(SupportAttachmentRequestIdentity::class)->actor($request));
             $service = app(SupportAttachments::class);
             if ($action === 'list') {
                 $response = new JsonResponse($service->list($kind, $source, $actor));

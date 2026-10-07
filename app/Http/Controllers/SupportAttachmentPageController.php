@@ -16,8 +16,8 @@ final class SupportAttachmentPageController
     public function __invoke(Request $request, string $source): Response
     {
         try {
-            $actor = app(SupportAttachmentRequestIdentity::class)->actor($request);
-            $context = SupportAttachmentRequestContext::capture($request);
+            [$actor, $context] = SupportAttachmentRequestContext::resolve($request,
+                fn () => app(SupportAttachmentRequestIdentity::class)->actor($request));
             $kind = $request->route('support_kind');
             $service = app(SupportAttachments::class);
             Inertia::encryptHistory();
