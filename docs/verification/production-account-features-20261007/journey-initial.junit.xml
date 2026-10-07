@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureJourneyTest" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureJourneyTest.php" tests="2" assertions="2" errors="2" failures="0" skipped="0" time="1.052394">
+    <testcase name="test_explicit_library_initializer_and_monotonic_clear_do_not_adopt_or_rewrite_v1" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureJourneyTest.php" line="23" class="Tests\Feature\ProductionFeatures\ProductionFeatureJourneyTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureJourneyTest" assertions="1" time="0.668123">
+      <error type="App\Domain\Customers\ProductionIdentity\IdentityException">Tests\Feature\ProductionFeatures\ProductionFeatureJourneyTest::test_explicit_library_initializer_and_monotonic_clear_do_not_adopt_or_rewrite_v1
+App\Domain\Customers\ProductionIdentity\IdentityException: This customer identity request could not be confirmed.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionIdentity/IdentityPolicy.php:85
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionIdentity/IdentityRequests.php:26
+/workspace/VA-Studio-production-account-features/tests/Support/ProductionIdentityFixture.php:68
+/workspace/VA-Studio-production-account-features/tests/Support/ProductionFeatureFixtures.php:28
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureJourneyTest.php:25</error>
+    </testcase>
+    <testcase name="test_unknown_initialize_grant_withdraw_and_repeated_withdraw_retain_production_pointer" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureJourneyTest.php" line="54" class="Tests\Feature\ProductionFeatures\ProductionFeatureJourneyTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureJourneyTest" assertions="1" time="0.384271">
+      <error type="App\Domain\Customers\ProductionIdentity\IdentityException">Tests\Feature\ProductionFeatures\ProductionFeatureJourneyTest::test_unknown_initialize_grant_withdraw_and_repeated_withdraw_retain_production_pointer
+App\Domain\Customers\ProductionIdentity\IdentityException: This customer identity request could not be confirmed.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionIdentity/IdentityPolicy.php:85
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionIdentity/IdentityRequests.php:26
+/workspace/VA-Studio-production-account-features/tests/Support/ProductionIdentityFixture.php:68
+/workspace/VA-Studio-production-account-features/tests/Support/ProductionFeatureFixtures.php:28
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureJourneyTest.php:56</error>
+    </testcase>
+  </testsuite>
+</testsuites>

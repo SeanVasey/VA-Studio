@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="18" assertions="37" errors="17" failures="1" skipped="0" time="12.782554">
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php" tests="4" assertions="8" errors="4" failures="0" skipped="0" time="2.914560">
+      <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest::test_late_app_arrayaccess_parent_cannot_withdraw_purpose_inside_final_identity_proof" tests="2" assertions="4" errors="2" failures="0" skipped="0" time="1.569758">
+        <testcase name="test_late_app_arrayaccess_parent_cannot_withdraw_purpose_inside_final_identity_proof with data set #0" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php" line="38" class="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest" classname="Tests.Feature.ProductionFeatures.ProductionFeaturePlainConfigurationTest" assertions="2" time="0.871132">
+          <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest::test_late_app_arrayaccess_parent_cannot_withdraw_purpose_inside_final_identity_proof with data set #0
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:45
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:36
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:25
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php:42</error>
+        </testcase>
+        <testcase name="test_late_app_arrayaccess_parent_cannot_withdraw_purpose_inside_final_identity_proof with data set #1" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php" line="38" class="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest" classname="Tests.Feature.ProductionFeatures.ProductionFeaturePlainConfigurationTest" assertions="2" time="0.698626">
+          <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest::test_late_app_arrayaccess_parent_cannot_withdraw_purpose_inside_final_identity_proof with data set #1
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:45
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:36
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:25
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php:42</error>
+        </testcase>
+      </testsuite>
+      <testcase name="test_late_custom_statement_class_refuses_before_any_terminal_statement_callback" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php" line="106" class="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest" classname="Tests.Feature.ProductionFeatures.ProductionFeaturePlainConfigurationTest" assertions="2" time="0.685089">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest::test_late_custom_statement_class_refuses_before_any_terminal_statement_callback
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:45
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:36
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:25
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php:110</error>
+      </testcase>
+      <testcase name="test_plain_scalar_reference_cannot_mutate_the_captured_purpose_snapshot_in_place" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php" line="145" class="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest" classname="Tests.Feature.ProductionFeatures.ProductionFeaturePlainConfigurationTest" assertions="2" time="0.659713">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest::test_plain_scalar_reference_cannot_mutate_the_captured_purpose_snapshot_in_place
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:45
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:36
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:25
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php:149</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" tests="8" assertions="16" errors="8" failures="0" skipped="0" time="5.556831">
+      <testcase name="test_beginning_listener_cannot_make_the_feature_adopt_or_commit_a_foreign_transaction" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" line="33" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionEventsTest" assertions="2" time="0.676592">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_beginning_listener_cannot_make_the_feature_adopt_or_commit_a_foreign_transaction
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:45
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:36
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:25
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:54
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:29
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:37</error>
+      </testcase>
+      <testcase name="test_committing_listener_purpose_withdrawal_prevents_a_durable_grant" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" line="77" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionEventsTest" assertions="2" time="0.727995">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_committing_listener_purpose_withdrawal_prevents_a_durable_grant
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:45
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:36
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:25
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:81</error>
+      </testcase>
+      <testcase name="test_regular_begin_commit_and_aftercommit_callback_order_is_preserved" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" line="105" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionEventsTest" assertions="2" time="0.674825">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_regular_begin_commit_and_aftercommit_callback_order_is_preserved
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:45
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:36
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:25
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:54
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:29
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:109</error>
+      </testcase>
+      <testcase name="test_pre_start_foreign_transaction_is_refused_without_rollback_or_source_adoption" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" line="130" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionEventsTest" assertions="2" time="0.672502">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_pre_start_foreign_transaction_is_refused_without_rollback_or_source_adoption
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:45
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:36
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:25
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:54
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:29
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:134</error>
+      </testcase>
+      <testcase name="test_committing_replacement_preserves_foreign_transaction_and_discards_its_unacknowledged_callbacks" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" line="169" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionEventsTest" assertions="2" time="0.709227">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_committing_replacement_preserves_foreign_transaction_and_discards_its_unacknowledged_callbacks
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:45
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:36
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:25
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:54
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:29
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:173</error>
+      </testcase>
+      <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_committing_manager_or_dispatcher_drift_refuses_and_restores_original_bindings" tests="2" assertions="4" errors="2" failures="0" skipped="0" time="1.341402">
+        <testcase name="test_committing_manager_or_dispatcher_drift_refuses_and_restores_original_bindings with data set #0" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" line="223" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionEventsTest" assertions="2" time="0.689897">
+          <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_committing_manager_or_dispatcher_drift_refuses_and_restores_original_bindings with data set #0
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:45
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:36
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:25
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:54
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:29
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:227</error>
+        </testcase>
+        <testcase name="test_committing_manager_or_dispatcher_drift_refuses_and_restores_original_bindings with data set #1" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" line="223" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionEventsTest" assertions="2" time="0.651505">
+          <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_committing_manager_or_dispatcher_drift_refuses_and_restores_original_bindings with data set #1
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:45
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:36
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:25
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:54
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:29
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:227</error>
+        </testcase>
+      </testsuite>
+      <testcase name="test_original_managers_other_pending_callbacks_are_preserved_byte_for_byte_and_still_execute_once" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" line="254" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionEventsTest" assertions="2" time="0.754289">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_original_managers_other_pending_callbacks_are_preserved_byte_for_byte_and_still_execute_once
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:45
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:36
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:25
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:54
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:29
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:258</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureJourneyTest" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureJourneyTest.php" tests="2" assertions="4" errors="2" failures="0" skipped="0" time="1.464546">
+      <testcase name="test_explicit_library_initializer_and_monotonic_clear_do_not_adopt_or_rewrite_v1" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureJourneyTest.php" line="23" class="Tests\Feature\ProductionFeatures\ProductionFeatureJourneyTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureJourneyTest" assertions="2" time="0.778386">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureJourneyTest::test_explicit_library_initializer_and_monotonic_clear_do_not_adopt_or_rewrite_v1
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:45
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:36
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:25
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:54
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:23
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureJourneyTest.php:27</error>
+      </testcase>
+      <testcase name="test_unknown_initialize_grant_withdraw_and_repeated_withdraw_retain_production_pointer" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureJourneyTest.php" line="54" class="Tests\Feature\ProductionFeatures\ProductionFeatureJourneyTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureJourneyTest" assertions="2" time="0.686160">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureJourneyTest::test_unknown_initialize_grant_withdraw_and_repeated_withdraw_retain_production_pointer
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:45
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:36
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:25
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:26
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureJourneyTest.php:58</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionConsentWithdrawalReaderTest" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionConsentWithdrawalReaderTest.php" tests="4" assertions="9" errors="3" failures="1" skipped="0" time="2.846616">
+      <testcase name="test_reader_keeps_unknown_null_and_retained_withdrawal_after_grants_without_serializing_recipient" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionConsentWithdrawalReaderTest.php" line="33" class="Tests\Feature\ProductionFeatures\ProductionConsentWithdrawalReaderTest" classname="Tests.Feature.ProductionFeatures.ProductionConsentWithdrawalReaderTest" assertions="3" time="0.663046">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionFeatures\ProductionConsentWithdrawalReaderTest::test_reader_keeps_unknown_null_and_retained_withdrawal_after_grants_without_serializing_recipient
+Failed asserting that 503 is identical to 409.
+
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionConsentWithdrawalReaderTest.php:41</failure>
+      </testcase>
+      <testcase name="test_two_real_origins_cannot_read_anothers_withdrawal_or_forge_its_actor" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionConsentWithdrawalReaderTest.php" line="77" class="Tests\Feature\ProductionFeatures\ProductionConsentWithdrawalReaderTest" classname="Tests.Feature.ProductionFeatures.ProductionConsentWithdrawalReaderTest" assertions="2" time="0.704881">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionConsentWithdrawalReaderTest::test_two_real_origins_cannot_read_anothers_withdrawal_or_forge_its_actor
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:45
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:36
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:25
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionConsentWithdrawalReaderTest.php:81</error>
+      </testcase>
+      <testcase name="test_recovery_preserves_signed_original_withdrawal_and_refuses_old_session" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionConsentWithdrawalReaderTest.php" line="101" class="Tests\Feature\ProductionFeatures\ProductionConsentWithdrawalReaderTest" classname="Tests.Feature.ProductionFeatures.ProductionConsentWithdrawalReaderTest" assertions="2" time="0.678646">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionConsentWithdrawalReaderTest::test_recovery_preserves_signed_original_withdrawal_and_refuses_old_session
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:45
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:36
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:25
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionConsentWithdrawalReaderTest.php:105</error>
+      </testcase>
+      <testcase name="test_postcommit_credential_withdrawal_cannot_release_the_private_server_capture" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionConsentWithdrawalReaderTest.php" line="123" class="Tests\Feature\ProductionFeatures\ProductionConsentWithdrawalReaderTest" classname="Tests.Feature.ProductionFeatures.ProductionConsentWithdrawalReaderTest" assertions="2" time="0.800043">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionConsentWithdrawalReaderTest::test_postcommit_credential_withdrawal_cannot_release_the_private_server_capture
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:45
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:36
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:25
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionConsentWithdrawalReaderTest.php:127</error>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

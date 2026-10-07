@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="11" assertions="68" errors="2" failures="0" skipped="0" time="7.663293">
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php" tests="7" assertions="58" errors="0" failures="0" skipped="0" time="7.615207">
+      <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest::test_late_app_arrayaccess_parent_cannot_withdraw_purpose_inside_final_identity_proof" tests="2" assertions="22" errors="0" failures="0" skipped="0" time="1.975722">
+        <testcase name="test_late_app_arrayaccess_parent_cannot_withdraw_purpose_inside_final_identity_proof with data set #0" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php" line="44" class="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest" classname="Tests.Feature.ProductionFeatures.ProductionFeaturePlainConfigurationTest" assertions="11" time="1.086246"/>
+        <testcase name="test_late_app_arrayaccess_parent_cannot_withdraw_purpose_inside_final_identity_proof with data set #1" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php" line="44" class="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest" classname="Tests.Feature.ProductionFeatures.ProductionFeaturePlainConfigurationTest" assertions="11" time="0.889476"/>
+      </testsuite>
+      <testcase name="test_late_custom_statement_class_refuses_before_any_terminal_statement_callback" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php" line="112" class="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest" classname="Tests.Feature.ProductionFeatures.ProductionFeaturePlainConfigurationTest" assertions="9" time="0.815497"/>
+      <testcase name="test_plain_scalar_reference_cannot_mutate_the_captured_purpose_snapshot_in_place" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php" line="151" class="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest" classname="Tests.Feature.ProductionFeatures.ProductionFeaturePlainConfigurationTest" assertions="9" time="0.789004"/>
+      <testcase name="test_live_rollout_reference_withdrawal_cannot_commit_a_v1_promotion" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php" line="185" class="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest" classname="Tests.Feature.ProductionFeatures.ProductionFeaturePlainConfigurationTest" assertions="6" time="2.131621"/>
+      <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest::test_late_configuration_or_environment_resolver_refuses_without_invoking_its_callback" tests="2" assertions="12" errors="0" failures="0" skipped="0" time="1.903364">
+        <testcase name="test_late_configuration_or_environment_resolver_refuses_without_invoking_its_callback with data set #0" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php" line="224" class="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest" classname="Tests.Feature.ProductionFeatures.ProductionFeaturePlainConfigurationTest" assertions="6" time="0.885699"/>
+        <testcase name="test_late_configuration_or_environment_resolver_refuses_without_invoking_its_callback with data set #1" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php" line="224" class="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest" classname="Tests.Feature.ProductionFeatures.ProductionFeaturePlainConfigurationTest" assertions="6" time="1.017664"/>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Unit\ProductionFeatures\ProductionFeatureStateTest" file="/workspace/VA-Studio-production-account-features/tests/Unit/ProductionFeatures/ProductionFeatureStateTest.php" tests="4" assertions="10" errors="2" failures="0" skipped="0" time="0.048086">
+      <testcase name="test_ordinary_production_state_remains_v1_and_repeated_intent_preserves_state" file="/workspace/VA-Studio-production-account-features/tests/Unit/ProductionFeatures/ProductionFeatureStateTest.php" line="15" class="Tests\Unit\ProductionFeatures\ProductionFeatureStateTest" classname="Tests.Unit.ProductionFeatures.ProductionFeatureStateTest" assertions="7" time="0.013726"/>
+      <testcase name="test_production_note_gate_is_distinct_from_any_enabled_test_rollout" file="/workspace/VA-Studio-production-account-features/tests/Unit/ProductionFeatures/ProductionFeatureStateTest.php" line="33" class="Tests\Unit\ProductionFeatures\ProductionFeatureStateTest" classname="Tests.Unit.ProductionFeatures.ProductionFeatureStateTest" assertions="0" time="0.012751">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Unit\ProductionFeatures\ProductionFeatureStateTest::test_production_note_gate_is_distinct_from_any_enabled_test_rollout
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:57
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:39
+/workspace/VA-Studio-production-account-features/tests/Unit/ProductionFeatures/ProductionFeatureStateTest.php:36</error>
+      </testcase>
+      <testcase name="test_unavailable_tracks_and_forged_tenant_or_version_state_refuse" file="/workspace/VA-Studio-production-account-features/tests/Unit/ProductionFeatures/ProductionFeatureStateTest.php" line="55" class="Tests\Unit\ProductionFeatures\ProductionFeatureStateTest" classname="Tests.Unit.ProductionFeatures.ProductionFeatureStateTest" assertions="3" time="0.010700"/>
+      <testcase name="test_production_purpose_starts_unknown_and_cannot_inherit_test_consent_policy" file="/workspace/VA-Studio-production-account-features/tests/Unit/ProductionFeatures/ProductionFeatureStateTest.php" line="74" class="Tests\Unit\ProductionFeatures\ProductionFeatureStateTest" classname="Tests.Unit.ProductionFeatures.ProductionFeatureStateTest" assertions="0" time="0.010909">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Unit\ProductionFeatures\ProductionFeatureStateTest::test_production_purpose_starts_unknown_and_cannot_inherit_test_consent_policy
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:57
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:39
+/workspace/VA-Studio-production-account-features/tests/Unit/ProductionFeatures/ProductionFeatureStateTest.php:77</error>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="4" assertions="21" errors="0" failures="0" skipped="0" time="0.213937">
+    <testsuite name="Tests\Unit\ProductionFeatures\ProductionFeatureStateTest" file="/workspace/VA-Studio-production-account-features/tests/Unit/ProductionFeatures/ProductionFeatureStateTest.php" tests="4" assertions="21" errors="0" failures="0" skipped="0" time="0.213937">
+      <testcase name="test_ordinary_production_state_remains_v1_and_repeated_intent_preserves_state" file="/workspace/VA-Studio-production-account-features/tests/Unit/ProductionFeatures/ProductionFeatureStateTest.php" line="26" class="Tests\Unit\ProductionFeatures\ProductionFeatureStateTest" classname="Tests.Unit.ProductionFeatures.ProductionFeatureStateTest" assertions="7" time="0.157877"/>
+      <testcase name="test_production_note_gate_is_distinct_from_any_enabled_test_rollout" file="/workspace/VA-Studio-production-account-features/tests/Unit/ProductionFeatures/ProductionFeatureStateTest.php" line="44" class="Tests\Unit\ProductionFeatures\ProductionFeatureStateTest" classname="Tests.Unit.ProductionFeatures.ProductionFeatureStateTest" assertions="5" time="0.013386"/>
+      <testcase name="test_unavailable_tracks_and_forged_tenant_or_version_state_refuse" file="/workspace/VA-Studio-production-account-features/tests/Unit/ProductionFeatures/ProductionFeatureStateTest.php" line="66" class="Tests\Unit\ProductionFeatures\ProductionFeatureStateTest" classname="Tests.Unit.ProductionFeatures.ProductionFeatureStateTest" assertions="3" time="0.011993"/>
+      <testcase name="test_production_purpose_starts_unknown_and_cannot_inherit_test_consent_policy" file="/workspace/VA-Studio-production-account-features/tests/Unit/ProductionFeatures/ProductionFeatureStateTest.php" line="85" class="Tests\Unit\ProductionFeatures\ProductionFeatureStateTest" classname="Tests.Unit.ProductionFeatures.ProductionFeatureStateTest" assertions="6" time="0.030680"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

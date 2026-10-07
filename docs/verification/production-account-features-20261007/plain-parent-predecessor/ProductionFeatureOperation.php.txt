@@ -1,0 +1,66 @@
+<?php
+
+namespace App\Domain\Customers\ProductionFeatures;
+
+use App\Domain\Commerce\ProductionPolicy\CurrentRows;
+use App\Domain\Customers\Listening\ListeningException;
+use App\Domain\Customers\Preferences\ConsentException;
+use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeatureAccess;
+use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeatureIdentity;
+use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
+use App\Domain\Customers\ProductionIdentity\IdentityException;
+use Illuminate\Support\Facades\DB;
+use Throwable;
+
+/** A regular durable transaction followed by read-only validation of its original authority. */
+final class ProductionFeatureOperation
+{
+    public function run(ProductionAccountFeatureIdentity $identity, callable $operation): array
+    {
+        // One operation budget includes source callbacks, commit events and validation; never renewed.
+        $deadline = hrtime(true) + 10_000_000_000;
+        foreach (DB::getConnections() as $connection) {
+            if ($connection->transactionLevel() !== 0 || $connection->getPdo()->inTransaction()) {
+                throw new ProductionFeatureException;
+            }
+        }
+        $access = new ProductionAccountFeatureAccess;
+        [$projection, $context] = DB::transaction(function () use ($identity, $operation, $access, $deadline): array {
+            $frame = new ProductionFeatureTransaction(DB::connection());
+            try {
+                $reader = new CurrentRows(DB::connection()->getPdo(), DB::connection()->getDriverName());
+                $authority = $access->lock($identity, $reader);
+                $frame->admit();
+                $context = new ProductionFeatureContext($identity, $access, $reader, $authority, $deadline);
+                $projection = $operation($context);
+                $context->proveCurrent();
+                $frame->admit();
+
+                return [$projection, $context];
+            } catch (Throwable $error) {
+                $frame->protectFailure();
+                if ($error instanceof ProductionFeatureException || $error instanceof IdentityException
+                    || $error instanceof ListeningException || $error instanceof ConsentException) {
+                    throw $error;
+                }
+                throw new ProductionFeatureException;
+            }
+        }, 1);
+        try {
+            $frame = IdentityCommittedFrame::begin($context->reader(), $deadline);
+            try {
+                $access->lockCommitted($identity, $frame, $context->authority());
+                $context->proveCommitted($frame);
+                // Consumes/closes the read-only physical frame. Only prebuilt plain output follows.
+                $access->proveCommitted($identity, $frame, $context->authority());
+
+                return $projection;
+            } finally {
+                $frame->close();
+            }
+        } catch (Throwable) {
+            // The regular write may already be durable. Never turn this into a retry/reset.
+            throw new ProductionFeatureException;
+        }
+    }
+}

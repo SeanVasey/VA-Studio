@@ -1,0 +1,6 @@
+
+Fatal error: Uncaught Error: Class "Illuminate\Foundation\Application" not found in /workspace/VA-Studio-production-account-features/bootstrap/app.php:28
+Stack trace:
+#0 Command line code(1): require()
+#1 {main}
+  thrown in /workspace/VA-Studio-production-account-features/bootstrap/app.php on line 28

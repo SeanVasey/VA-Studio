@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Domain\Customers\ProductionFeatures\Preferences;
+
+use App\Domain\Customers\Preferences\ConsentException;
+use App\Domain\Customers\Preferences\ConsentPolicy;
+use App\Support\CanonicalJson;
+
+/** Separately authored purpose configuration. This validates shape, not historical legal consent. */
+final class ProductionConsentPurposePolicy
+{
+    public static function capture(): array
+    {
+        $configuration = config('production-customer-preferences');
+        $closed = is_array($configuration) && ConsentPolicy::keys($configuration, ['grants_enabled', 'email_marketing']);
+        $notice = $closed ? $configuration['email_marketing'] : null;
+        $valid = is_array($notice) && ConsentPolicy::keys($notice, ['purpose', 'version', 'notice', 'review_reference'])
+            && $notice['purpose'] === ConsentPolicy::PURPOSE && ConsentPolicy::version($notice['version'])
+            && ConsentPolicy::text($notice['notice'], 2000, 8000) && ConsentPolicy::text($notice['review_reference'], 200, 800);
+        $configured = $valid ? $notice + ['notice_hash' => hash('sha256', $notice['notice']), 'policy_hash' => CanonicalJson::hash($notice)] : null;
+
+        return ['configuration' => $configuration, 'configured' => $configured,
+            'grantsEnabled' => $closed && $configuration['grants_enabled'] === true && $configured !== null];
+    }
+
+    public static function requireCurrent(array $captured): void
+    {
+        if (config('production-customer-preferences') !== $captured['configuration']) {
+            throw new ConsentException(503);
+        }
+    }
+}

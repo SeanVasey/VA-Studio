@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" tests="3" assertions="15" errors="0" failures="2" skipped="0" time="3.135006">
+    <testcase name="test_beginning_listener_cannot_make_the_feature_adopt_or_commit_a_foreign_transaction" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" line="28" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionEventsTest" assertions="4" time="1.217015">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_beginning_listener_cannot_make_the_feature_adopt_or_commit_a_foreign_transaction
+An operation cannot adopt the physical transaction opened by its beginning listener.
+Failed asserting that Array &amp;0 [
+    'initialized' =&gt; true,
+    'library' =&gt; Array &amp;1 [
+        'listeningSchema' =&gt; 1,
+        'version' =&gt; 1,
+        'favorites' =&gt; Array &amp;2 [],
+        'playlists' =&gt; Array &amp;3 [
+            0 =&gt; Array &amp;4 [
+                'id' =&gt; '845bcd8d-642b-4e03-9104-be7dd384d81a',
+                'name' =&gt; 'SYNTHETIC refused foreign begin',
+                'tracks' =&gt; Array &amp;5 [],
+            ],
+        ],
+        'limits' =&gt; Array &amp;6 [
+            'favorites' =&gt; 50,
+            'playlists' =&gt; 10,
+            'playlistTracks' =&gt; 25,
+        ],
+    ],
+] is null.
+
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:54</failure>
+    </testcase>
+    <testcase name="test_committing_listener_purpose_withdrawal_prevents_a_durable_grant" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" line="72" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionEventsTest" assertions="5" time="0.983604">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_committing_listener_purpose_withdrawal_prevents_a_durable_grant
+Failed asserting that an instance of class App\Domain\Customers\ProductionFeatures\ProductionFeatureException is an instance of class App\Domain\Customers\Preferences\ConsentException.
+
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:92</failure>
+    </testcase>
+    <testcase name="test_regular_begin_commit_and_aftercommit_callback_order_is_preserved" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" line="100" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionEventsTest" assertions="6" time="0.934386"/>
+  </testsuite>
+</testsuites>

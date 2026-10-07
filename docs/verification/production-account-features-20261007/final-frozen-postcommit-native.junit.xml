@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" tests="1" assertions="6" errors="0" failures="0" skipped="0" time="58.145516">
+    <testcase name="test_postcommit_public_withdrawal_cannot_release_old_public_link_and_reload_is_fresh" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" line="232" class="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureBoundaryTest" assertions="6" time="58.145516"/>
+  </testsuite>
+</testsuites>

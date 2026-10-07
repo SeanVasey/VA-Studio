@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="6" assertions="32" errors="3" failures="0" skipped="0" time="73.619697">
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureNativeAdmissionTest" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureNativeAdmissionTest.php" tests="3" assertions="0" errors="3" failures="0" skipped="0" time="0.000000">
+      <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureNativeAdmissionTest::test_schemawide_foreign_constraint_and_dictionary_alias_refuse_before_ddl" tests="2" assertions="0" errors="2" failures="0" skipped="0" time="0.000000">
+        <testcase name="test_schemawide_foreign_constraint_and_dictionary_alias_refuse_before_ddl with data set &quot;exact&quot;" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureNativeAdmissionTest.php" line="42" class="Tests\Feature\ProductionFeatures\ProductionFeatureNativeAdmissionTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureNativeAdmissionTest" assertions="0" time="0.000000">
+          <error type="Illuminate\Database\QueryException">Tests\Feature\ProductionFeatures\ProductionFeatureNativeAdmissionTest::test_schemawide_foreign_constraint_and_dictionary_alias_refuse_before_ddl with data set "exact"
+Illuminate\Database\QueryException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vaseyaudio_feature_consumer.customer_suppression_targets' doesn't exist (Connection: mysql, Host: 127.0.0.1, Port: 33067, Database: vaseyaudio_feature_consumer, SQL: select * from `customer_suppression_targets` order by `id` asc)
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:426
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3636
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3620
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureNativeAdmissionTest.php:102
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureNativeAdmissionTest.php:29</error>
+        </testcase>
+        <testcase name="test_schemawide_foreign_constraint_and_dictionary_alias_refuse_before_ddl with data set &quot;native uppercase alias&quot;" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureNativeAdmissionTest.php" line="42" class="Tests\Feature\ProductionFeatures\ProductionFeatureNativeAdmissionTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureNativeAdmissionTest" assertions="0" time="0.000000">
+          <error type="Illuminate\Database\QueryException">Tests\Feature\ProductionFeatures\ProductionFeatureNativeAdmissionTest::test_schemawide_foreign_constraint_and_dictionary_alias_refuse_before_ddl with data set "native uppercase alias"
+Illuminate\Database\QueryException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vaseyaudio_feature_consumer.customer_suppression_targets' doesn't exist (Connection: mysql, Host: 127.0.0.1, Port: 33067, Database: vaseyaudio_feature_consumer, SQL: select * from `customer_suppression_targets` order by `id` asc)
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:426
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3636
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3620
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureNativeAdmissionTest.php:102
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureNativeAdmissionTest.php:29</error>
+        </testcase>
+      </testsuite>
+      <testcase name="test_temporary_table_using_an_owned_guard_name_refuses_before_ddl" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureNativeAdmissionTest.php" line="55" class="Tests\Feature\ProductionFeatures\ProductionFeatureNativeAdmissionTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureNativeAdmissionTest" assertions="0" time="0.000000">
+        <error type="Illuminate\Database\QueryException">Tests\Feature\ProductionFeatures\ProductionFeatureNativeAdmissionTest::test_temporary_table_using_an_owned_guard_name_refuses_before_ddl
+Illuminate\Database\QueryException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vaseyaudio_feature_consumer.customer_suppression_targets' doesn't exist (Connection: mysql, Host: 127.0.0.1, Port: 33067, Database: vaseyaudio_feature_consumer, SQL: select * from `customer_suppression_targets` order by `id` asc)
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:426
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3636
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3620
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureNativeAdmissionTest.php:102
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureNativeAdmissionTest.php:29</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureMigrationTest.php" tests="3" assertions="32" errors="0" failures="0" skipped="0" time="73.619697">
+      <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history" tests="1" assertions="12" errors="0" failures="0" skipped="0" time="29.024382">
+        <testcase name="test_every_prefix_resumes_without_adopting_or_changing_private_legacy_history with data set #4" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureMigrationTest.php" line="25" class="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureMigrationTest" assertions="12" time="29.024382"/>
+      </testsuite>
+      <testcase name="test_real_migrator_can_resume_an_exact_unlogged_post_create_interruption" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureMigrationTest.php" line="108" class="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureMigrationTest" assertions="12" time="21.814668"/>
+      <testcase name="test_last_framework_ddl_callback_cannot_record_a_graph_with_an_earlier_guard_missing" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureMigrationTest.php" line="133" class="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureMigrationTest" assertions="8" time="22.780647"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

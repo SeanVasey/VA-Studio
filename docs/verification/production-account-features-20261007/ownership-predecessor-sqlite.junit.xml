@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionOwnershipTest" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php" tests="2" assertions="10" errors="0" failures="2" skipped="0" time="2.151299">
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionOwnershipTest::test_saved_callback_commit_reopen_cannot_make_cleanup_rollback_a_foreign_transaction" tests="2" assertions="10" errors="0" failures="2" skipped="0" time="2.151299">
+      <testcase name="test_saved_callback_commit_reopen_cannot_make_cleanup_rollback_a_foreign_transaction with data set #0" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php" line="26" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionOwnershipTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionOwnershipTest" assertions="5" time="1.223036">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionOwnershipTest::test_saved_callback_commit_reopen_cannot_make_cleanup_rollback_a_foreign_transaction with data set #0
+Failure cleanup must leave the replacement transaction active.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php:53</failure>
+      </testcase>
+      <testcase name="test_saved_callback_commit_reopen_cannot_make_cleanup_rollback_a_foreign_transaction with data set #1" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php" line="26" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionOwnershipTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionOwnershipTest" assertions="5" time="0.928264">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionOwnershipTest::test_saved_callback_commit_reopen_cannot_make_cleanup_rollback_a_foreign_transaction with data set #1
+Failure cleanup must leave the replacement transaction active.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php:53</failure>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

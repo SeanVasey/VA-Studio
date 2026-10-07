@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php" tests="1" assertions="5" errors="0" failures="1" skipped="0" time="1.191056">
+    <testcase name="test_plain_scalar_reference_cannot_mutate_the_captured_purpose_snapshot_in_place" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php" line="145" class="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest" classname="Tests.Feature.ProductionFeatures.ProductionFeaturePlainConfigurationTest" assertions="5" time="1.191056">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest::test_plain_scalar_reference_cannot_mutate_the_captured_purpose_snapshot_in_place
+A scalar reference must not update the historical captured configuration along with current policy.
+Failed asserting that Array &amp;0 [
+    'initialized' =&gt; true,
+    'preferences' =&gt; Array &amp;1 [
+        'schema' =&gt; 1,
+        'purposes' =&gt; Array &amp;2 [
+            0 =&gt; Array &amp;3 [
+                'purpose' =&gt; 'email_marketing',
+                'version' =&gt; 1,
+                'status' =&gt; 'granted',
+                'notice' =&gt; Array &amp;4 [
+                    'version' =&gt; 'synthetic-production-purpose-v1',
+                    'hash' =&gt; 'ee658aa747d7c435f863bb88e3c73ad778985bc3b12d8c17e39a80112b13c956',
+                    'text' =&gt; 'SYNTHETIC choice fixture. No marketing messages are sent.',
+                ],
+                'canGrant' =&gt; true,
+                'suppression' =&gt; Array &amp;5 [
+                    'status' =&gt; 'not_requested',
+                ],
+            ],
+        ],
+    ],
+] is null.
+
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php:169</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

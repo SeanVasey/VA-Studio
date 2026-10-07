@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" tests="13" assertions="99" errors="0" failures="1" skipped="0" time="18.829348">
+    <testcase name="test_unbound_legacy_private_library_is_refused_and_preserved_by_every_entrypoint" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" line="40" class="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureBoundaryTest" assertions="7" time="0.991093">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest::test_unbound_legacy_private_library_is_refused_and_preserved_by_every_entrypoint
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
++    'id' =&gt; 1,
+     'customer_account_id' =&gt; 1,
+     'version' =&gt; 1,
+     'payload' =&gt; 'eyJpdiI6InFLaVZadTBUczlTQTVNbmhnQktCc2c9PSIsInZhbHVlIjoiTjhPNUNlaEUwVVFmYXBHS2N0VW1iNjM3QmpDQitkcG9YRzRtSnFRY1FCY29GbGJlNDFQcXpUU29hODZCd2hjVGxGZEtzMHNBL243eWN1aU5rM1JTcWxuSGlCakVFVVFHVlVTeXlwNm1LQ3BoQnRIdkw4LzkyRjdCVHZnWTVIR3c1MGhadFV0WlcwRFBlTXQ5WlpuZll1R2FjNHFkYlJVaTFMUnJ0cHJTcnRSMVJqblVPWlFXZjJlVmtTYzNPOEp4STVhRjdITGdMMmdPUkwzdmlnV29tWk1IVUxrR1NTMWhmSFpQdTE0RFM0a1dXd292VDJGTDcvdVNkU3ZPK0xvbiIsIm1hYyI6ImJiZmRjZWRhODA1NDdjMmU5ZjY5MmVmYjIyZTUwNGZmYzRjZjg3YmIwMjFkZmRkYzZjZTdjNmZjMTFiNjE3NzAiLCJ0YWciOiIifQ==',
++    'created_at' =&gt; '2026-10-07 10:02:45',
+     'updated_at' =&gt; '2026-10-07 10:02:45',
+-    'created_at' =&gt; '2026-10-07 10:02:45',
+-    'id' =&gt; 1,
+ ]
+
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php:52</failure>
+    </testcase>
+    <testcase name="test_two_actual_origins_cannot_read_rename_or_rebind_each_others_library" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" line="56" class="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureBoundaryTest" assertions="7" time="1.665156"/>
+    <testcase name="test_real_recovery_keeps_original_binding_and_refuses_pre_recovery_identity" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" line="78" class="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureBoundaryTest" assertions="6" time="1.594660"/>
+    <testcase name="test_actual_public_catalog_projection_and_all_ordinary_writes_keep_pinned_v1_readable" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" line="100" class="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureBoundaryTest" assertions="32" time="4.149927"/>
+    <testcase name="test_private_track_cannot_be_discovered_or_saved_and_stale_clear_cannot_resurrect" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" line="138" class="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureBoundaryTest" assertions="6" time="1.261888"/>
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest::test_saved_callback_withdrawal_rolls_back_private_library_write" tests="3" assertions="9" errors="0" failures="0" skipped="0" time="2.718851">
+      <testcase name="test_saved_callback_withdrawal_rolls_back_private_library_write with data set #0" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" line="167" class="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureBoundaryTest" assertions="3" time="0.897604"/>
+      <testcase name="test_saved_callback_withdrawal_rolls_back_private_library_write with data set #1" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" line="167" class="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureBoundaryTest" assertions="3" time="0.881404"/>
+      <testcase name="test_saved_callback_withdrawal_rolls_back_private_library_write with data set #2" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" line="167" class="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureBoundaryTest" assertions="3" time="0.939844"/>
+    </testsuite>
+    <testcase name="test_same_saved_model_cannot_rebind_intended_revision_to_another_valid_state" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" line="192" class="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureBoundaryTest" assertions="4" time="0.938799"/>
+    <testcase name="test_commit_event_withdrawal_returns_unknown_with_original_write_retained" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" line="213" class="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureBoundaryTest" assertions="6" time="1.005337"/>
+    <testcase name="test_postcommit_public_withdrawal_cannot_release_old_public_link_and_reload_is_fresh" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" line="232" class="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureBoundaryTest" assertions="6" time="2.142585"/>
+    <testcase name="test_disabled_production_purpose_stays_unknown_but_explicit_withdrawal_remains_monotonic" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" line="253" class="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureBoundaryTest" assertions="10" time="1.443017"/>
+    <testcase name="test_consent_saved_callback_cannot_commit_after_current_purpose_disables_grants" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" line="284" class="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureBoundaryTest" assertions="6" time="0.918036"/>
+  </testsuite>
+</testsuites>

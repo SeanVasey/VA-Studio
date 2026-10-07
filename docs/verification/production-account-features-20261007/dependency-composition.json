@@ -1,0 +1,24 @@
+{
+  "root": "40150b20595d31704ac4fface6e467683ee5cd5e",
+  "adapterOriginal": "d9b393762562b654b526b37651ed5cb05fd08bfe",
+  "committedOriginal": "7ccf880d5af1e61b604c9dd9e27743fc7b1e5238",
+  "authorComposedHead": "75626795130a4be15d6bd70f71412cbff7411597",
+  "floor": [
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php",
+      "sha256": "6058e3e4ced2900e1ccc93bd9110691c041ad0c4ecafe2f0373d323ceb17cb90",
+      "byteExactRoot401": true
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php",
+      "sha256": "a2a1d7608e9c47d07c9456b8828a0c83141b4a7f078e7e3b01019598d285e0d0",
+      "byteExactRoot401": true
+    }
+  ],
+  "developmentRepairs": [
+    "cdc99263b8fd9b624cce326519545e0fe5f18d05",
+    "101e3832e8e5637cab784eb2a800d60642a746b4"
+  ],
+  "dependencyApproval": "Current feature identity101 separately approved by root/completion_audit. Entire new253 consumer composition still requires independent approval; no production activation.",
+  "unrelatedHistoricalAndSMTPComposition": "519170f9e5541602577381f17fa39c366b8e608b; queued email preparation only, not borrowed into253"
+}

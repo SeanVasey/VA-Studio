@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureJourneyTest" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureJourneyTest.php" tests="1" assertions="3" errors="1" failures="0" skipped="0" time="49.176801">
+    <testcase name="test_unknown_initialize_grant_withdraw_and_repeated_withdraw_retain_production_pointer" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureJourneyTest.php" line="54" class="Tests\Feature\ProductionFeatures\ProductionFeatureJourneyTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureJourneyTest" assertions="3" time="49.176801">
+      <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureJourneyTest::test_unknown_initialize_grant_withdraw_and_repeated_withdraw_retain_production_pointer
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:64
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:48
+/workspace/VA-Studio-production-account-features/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:32
+/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureJourneyTest.php:59</error>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureMigrationTest.php" tests="2" assertions="9" errors="0" failures="0" skipped="0" time="0.825266">
+    <testcase name="test_exact_complete_graph_can_be_revalidated_without_ddl" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureMigrationTest.php" line="13" class="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureMigrationTest" assertions="7" time="0.554613"/>
+    <testcase name="test_private_runtime_admission_cannot_install_missing_storage" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureMigrationTest.php" line="31" class="Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureMigrationTest" assertions="2" time="0.270653"/>
+  </testsuite>
+</testsuites>

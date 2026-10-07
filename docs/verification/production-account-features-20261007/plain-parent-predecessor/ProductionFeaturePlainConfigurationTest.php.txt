@@ -1,0 +1,101 @@
+<?php
+
+namespace Tests\Feature\ProductionFeatures;
+
+use App\Domain\Customers\ProductionFeatures\Models\ProductionConsentState;
+use App\Domain\Customers\ProductionFeatures\Preferences\ProductionConsentPreferences;
+use App\Domain\Customers\ProductionFeatures\ProductionFeatureException;
+use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeatureAccess;
+use ArrayObject;
+use Closure;
+use Illuminate\Database\Events\TransactionCommitted;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Support\ProductionFeatureFixtures;
+use Tests\TestCase;
+use Throwable;
+
+class ProductionFeaturePlainConfigurationTest extends TestCase
+{
+    use ProductionFeatureFixtures;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->featureSetup();
+    }
+
+    public static function phases(): array
+    {
+        return [['ordinary'], ['committed']];
+    }
+
+    #[DataProvider('phases')]
+    public function test_late_app_arrayaccess_parent_cannot_withdraw_purpose_inside_final_identity_proof(string $phase): void
+    {
+        $owner = $this->featureIdentity('consent_preferences');
+        $preferences = new ProductionConsentPreferences;
+        $preferences->initialize($owner);
+        $command = $this->productionGrant();
+        $original = config('app');
+        $fired = false;
+        $install = function () use ($phase, $original, &$fired): void {
+            config(['app' => new class($original, function () use ($phase, &$fired): void {
+                foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
+                    if (($frame['class'] ?? null) === ProductionAccountFeatureAccess::class
+                        && ($frame['function'] ?? null) === ($phase === 'ordinary' ? 'proveCurrent' : 'proveCommitted')) {
+                        $fired = true;
+                        config(['production-customer-preferences.grants_enabled' => false]);
+                    }
+                }
+            }) extends ArrayObject
+            {
+                public function __construct(array $values, private readonly Closure $callback)
+                {
+                    parent::__construct($values);
+                }
+
+                public function offsetExists(mixed $key): bool
+                {
+                    ($this->callback)();
+
+                    return parent::offsetExists($key);
+                }
+
+                public function offsetGet(mixed $key): mixed
+                {
+                    ($this->callback)();
+
+                    return parent::offsetGet($key);
+                }
+            }]);
+        };
+        if ($phase === 'ordinary') {
+            ProductionConsentState::saved($install);
+        } else {
+            Event::listen(TransactionCommitted::class, $install);
+        }
+        $projection = null;
+        $refusal = null;
+        try {
+            try {
+                $projection = $preferences->change($owner, $command);
+            } catch (Throwable $error) {
+                $refusal = $error;
+            }
+            $this->assertNull($projection, 'Do not release a grant projection after the final callback withdraws its purpose.');
+            $this->assertInstanceOf(ProductionFeatureException::class, $refusal);
+            $this->assertSame(503, $refusal->status);
+            $this->assertFalse($fired, 'Raw parent admission must refuse before invoking ArrayAccess at all.');
+            $this->assertTrue(config('production-customer-preferences.grants_enabled'));
+            $this->assertSame($phase === 'ordinary' ? 0 : 1, DB::table('production_consent_events')->count());
+            $this->assertSame($phase === 'ordinary' ? 0 : 1, DB::table('production_consent_states')->count());
+            $this->assertSame(0, DB::transactionLevel());
+            $this->assertFalse(DB::connection()->getRawPdo()->inTransaction());
+        } finally {
+            config(['app' => $original]);
+            ProductionConsentState::flushEventListeners();
+        }
+    }
+}

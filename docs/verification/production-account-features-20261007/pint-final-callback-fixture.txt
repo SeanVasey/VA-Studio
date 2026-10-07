@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"tests\/Feature\/ProductionFeatures\/ProductionFeaturePlainConfigurationTest.php","fixers":["braces_position","single_line_empty_body","ordered_imports"]}]}

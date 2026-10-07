@@ -1,0 +1,124 @@
+<?php
+
+namespace Tests\Feature\ProductionFeatures;
+
+use App\Domain\Customers\Preferences\ConsentException;
+use App\Domain\Customers\ProductionFeatures\Listening\ProductionListeningLibrary;
+use App\Domain\Customers\ProductionFeatures\Preferences\ProductionConsentPreferences;
+use App\Domain\Customers\ProductionFeatures\ProductionFeatureException;
+use Illuminate\Database\Events\TransactionBeginning;
+use Illuminate\Database\Events\TransactionCommitted;
+use Illuminate\Database\Events\TransactionCommitting;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Tests\Support\ProductionFeatureFixtures;
+use Tests\TestCase;
+use Throwable;
+
+class ProductionFeatureTransactionEventsTest extends TestCase
+{
+    use ProductionFeatureFixtures;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->featureSetup();
+    }
+
+    public function test_beginning_listener_cannot_make_the_feature_adopt_or_commit_a_foreign_transaction(): void
+    {
+        $owner = $this->featureIdentity();
+        $library = new ProductionListeningLibrary;
+        $library->initialize($owner);
+        $connection = DB::connection();
+        $primary = $connection->getRawPdo();
+        $primary->exec('CREATE '.(DB::getDriverName() === 'mysql' ? 'TEMPORARY ' : '').'TABLE feature_begin_foreign (marker INTEGER PRIMARY KEY)');
+        $fired = false;
+        Event::listen(TransactionBeginning::class, function () use ($primary, &$fired): void {
+            if (! $fired) {
+                $fired = true;
+                $primary->commit();
+                $primary->beginTransaction();
+                $primary->exec('INSERT INTO feature_begin_foreign VALUES (1)');
+            }
+        });
+        $projection = null;
+        $refusal = null;
+        try {
+            try {
+                $projection = $library->change($owner, ['action' => 'create-playlist', 'version' => 0, 'name' => 'SYNTHETIC refused foreign begin']);
+            } catch (Throwable $error) {
+                $refusal = $error;
+            }
+            $this->assertTrue($fired);
+            $this->assertNull($projection, 'An operation cannot adopt the physical transaction opened by its beginning listener.');
+            $this->assertInstanceOf(ProductionFeatureException::class, $refusal);
+            $this->assertSame(503, $refusal->status);
+            $this->assertTrue($primary->inTransaction());
+            $this->assertSame(1, (int) $primary->query('SELECT COUNT(*) FROM feature_begin_foreign')->fetchColumn());
+            $this->assertSame(0, $connection->transactionLevel());
+            $primary->rollBack();
+            $this->assertSame(0, (int) $primary->query('SELECT COUNT(*) FROM feature_begin_foreign')->fetchColumn());
+            $this->assertSame(0, (int) DB::table('production_listening_libraries')->value('version'));
+        } finally {
+            if ($primary->inTransaction()) {
+                $primary->rollBack();
+            }
+            $connection->setPdo($primary);
+            $primary->exec('DROP TABLE feature_begin_foreign');
+        }
+    }
+
+    public function test_committing_listener_purpose_withdrawal_prevents_a_durable_grant(): void
+    {
+        $owner = $this->featureIdentity('consent_preferences');
+        $preferences = new ProductionConsentPreferences;
+        $preferences->initialize($owner);
+        $command = $this->productionGrant();
+        $fired = false;
+        Event::listen(TransactionCommitting::class, function () use (&$fired): void {
+            $fired = true;
+            config(['production-customer-preferences.grants_enabled' => false]);
+        });
+        $projection = null;
+        $refusal = null;
+        try {
+            $projection = $preferences->change($owner, $command);
+        } catch (Throwable $error) {
+            $refusal = $error;
+        }
+        $this->assertTrue($fired);
+        $this->assertNull($projection);
+        $this->assertInstanceOf(ConsentException::class, $refusal);
+        $this->assertSame(503, $refusal->status);
+        $this->assertSame(0, DB::table('production_consent_events')->count(), 'Purpose withdrawal before physical commit must roll back the grant.');
+        $this->assertSame(0, DB::table('production_consent_states')->count());
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse(DB::connection()->getRawPdo()->inTransaction());
+    }
+
+    public function test_regular_begin_commit_and_aftercommit_callback_order_is_preserved(): void
+    {
+        $owner = $this->featureIdentity();
+        $library = new ProductionListeningLibrary;
+        $library->initialize($owner);
+        $events = [];
+        Event::listen(TransactionBeginning::class, function () use (&$events): void {
+            $events[] = 'began';
+            DB::connection()->afterCommit(function () use (&$events): void {
+                $this->assertFalse(DB::connection()->getRawPdo()->inTransaction());
+                $this->assertSame(1, (int) DB::table('production_listening_libraries')->value('version'));
+                $events[] = 'after_commit';
+            });
+        });
+        Event::listen(TransactionCommitting::class, function () use (&$events): void {
+            $events[] = 'committing';
+        });
+        Event::listen(TransactionCommitted::class, function () use (&$events): void {
+            $events[] = 'committed';
+        });
+        $result = $library->change($owner, ['action' => 'create-playlist', 'version' => 0, 'name' => 'SYNTHETIC normal events']);
+        $this->assertSame(1, $result['library']['version']);
+        $this->assertSame(['began', 'committing', 'after_commit', 'committed'], $events);
+    }
+}

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureJourneyTest" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureJourneyTest.php" tests="1" assertions="14" errors="0" failures="0" skipped="0" time="83.601318">
+    <testcase name="test_unknown_initialize_grant_withdraw_and_repeated_withdraw_retain_production_pointer" file="/workspace/VA-Studio-production-account-features/tests/Feature/ProductionFeatures/ProductionFeatureJourneyTest.php" line="54" class="Tests\Feature\ProductionFeatures\ProductionFeatureJourneyTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureJourneyTest" assertions="14" time="83.601318"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,14 @@
+{
+  "source": "9d0a5a27a20869c8a845e86461e64f34af669c6b",
+  "selection": [
+    "postcommit public withdrawal",
+    "ordinary callback order",
+    "late env resolver refusal",
+    "late config resolver refusal"
+  ],
+  "status": "author terminated after associated SQLite fixture recursion fatal",
+  "exit": 143,
+  "productFailureClaim": false,
+  "passingResultClaim": false,
+  "reason": "The test beforeResolving(config) callback recursively called global config() in teardown. Stop prevented the companion native attempt reaching the same fixture; actual source/receipts remain preserved."
+}

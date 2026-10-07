@@ -1,0 +1,203 @@
+{
+  "source": "b6cf98ed330e1cf4e192d54554468445e21e439d",
+  "borrowedBase": "75626795130a4be15d6bd70f71412cbff7411597",
+  "sourcePaths": [
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php",
+      "sha256": "cc097ab23f579485661260fed613b1f57edd83c000e538b6a36cec7acdffb716",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningPublicEvidence.php",
+      "sha256": "3e61ae3de6ea4d4188da42d976a250277f026c2be758c5d1ac4386a08c3cb2fa",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningRollout.php",
+      "sha256": "6713d276073fd810f3bf3e7122445537d0884674c4fc6f1e6e736a3275121091",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningState.php",
+      "sha256": "9a8c40add57a47a680e702365e6147c7c0ce448e5dc28c9bdd608077ef727aea",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Models/ProductionConsentEvent.php",
+      "sha256": "4d0098581374f9911055211340d23611cfccd6def0c512ea4f83e98bdd9d05be",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Models/ProductionConsentPolicySnapshot.php",
+      "sha256": "53ac2f046fb371f58f1cd6e51c73907a9db24b24de6879a32a4d920ec6444c07",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Models/ProductionConsentState.php",
+      "sha256": "c1de4609ae53d40814aa914f437f2ea1cd12cbcf7cb072f9ab81b5d9e3435480",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Models/ProductionFeatureBinding.php",
+      "sha256": "b56d04afd981af3818ab8e35061ef2fe91dbf5ee253b8ffd5660bbea905eef5c",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Models/ProductionListeningLibrary.php",
+      "sha256": "060d7134c87da475dcfcdcd729436b8d5eef454b4310fd0e8cefa40f9117b171",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php",
+      "sha256": "268ab449cb3dc6927ca51bee915cfcdc7af6b82d6a6dcebcb184d9fdc1bbdbeb",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPurposePolicy.php",
+      "sha256": "f1201242871add11aed82bd3b75b203def72e24dd1a1b6419d16d8aa5af9c4a9",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentRecords.php",
+      "sha256": "23f1f225dd5db107591653e83ddb418e7d702dafc9cc57197a1f622e34c2f4c6",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentWithdrawal.php",
+      "sha256": "2f3b2b78fb64175fb6175a6cf8ec2e8fc9f66070c0b82603736a087382ca0006",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentWithdrawalReader.php",
+      "sha256": "9156530ed4cb7f64674f36269d1a6475d2950ab8bd59e5b73fd96095be3eeb13",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php",
+      "sha256": "f6e5be9e93468ecf54ee81040e2338ba1ea8a3849955a00c8e93a58c1619f75e",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php",
+      "sha256": "aacbf0c04bb6b55704a0772927e3c88f2fe36389e2a3d8ff790c12da9f186db9",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/ProductionFeatureException.php",
+      "sha256": "a9a387a8066f575db4375d36a383d4aa6048c36845ed7de1e06fdca77c23cd59",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php",
+      "sha256": "2306cab0c9375d42a9482b4068b4052d88322ccc783544d9735af3d0cc23c74c",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php",
+      "sha256": "2aebacd13ce80b7bcc118dc21d524a7537ec1b354f5ca55ed89578ce14d481ea",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/ProductionFeatureShape.php",
+      "sha256": "f309456d487db802ccd3f9a8f6364385efc9cefb724d9ef495b619dfe61d9c15",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransaction.php",
+      "sha256": "c20a3cc8c7c2e0ad681d2a4eb01efcfe30f4ec3711fc502a9751fe6fd3cc9797",
+      "status": "new-only"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php",
+      "sha256": "04bf7cce7ebdf86528e6843ab593f5892dddf95a94a967b19ef750389c0f0f0b",
+      "status": "new-only"
+    },
+    {
+      "path": "config/production-customer-listening.php",
+      "sha256": "2ceb79c5f6ed3411a7eb5411680b55a6fcde98f968182138afa309089b945826",
+      "status": "new-only"
+    },
+    {
+      "path": "config/production-customer-preferences.php",
+      "sha256": "ecc9017cb2265f5e7d7ddab5c8e45ca664964270f5a2c97c917628e7b143a582",
+      "status": "new-only"
+    },
+    {
+      "path": "database/migrations/2026_10_07_253000_production_account_features.php",
+      "sha256": "6a2f3396d3f085f0f1355f409ded0df3cb6a4aad7a27c2c3bfd7fd82e1dd663a",
+      "status": "new-only"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionConsentGraphTest.php",
+      "sha256": "affb45f9e769d638ac0d79e10b65d2b9c6863beeb4931f75267b8f757ebcaa12",
+      "status": "new-only"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionConsentWithdrawalReaderTest.php",
+      "sha256": "eb3d4917b6a8c4a3dfeee631520b65d8aadf51cf391488e5135facc55cb7a493",
+      "status": "new-only"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php",
+      "sha256": "1e3d642be46a97de08e1f294094d3ecf23952f175a2d275dd1c2f38d44c02594",
+      "status": "new-only"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionFeatureHeldFloorTest.php",
+      "sha256": "f2da994ee393057dd3b7f431c744262b6fca8945ce760195a538e2ca4b7fa289",
+      "status": "new-only"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionFeatureJourneyTest.php",
+      "sha256": "be447283abe8c84d6ab369fe880fad4d448052aa5e2197b7e78217d1492bd768",
+      "status": "new-only"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionFeatureMigrationTest.php",
+      "sha256": "9379c1c1b81471db4b8bb0caf3547b39b8f6447905c7fcc978ed900778aff2b6",
+      "status": "new-only"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionFeatureNativeAdmissionTest.php",
+      "sha256": "2ce6fed4eddf1c0f2aed48434a5f223f9e58a9ec96c5d666d6a15f3362d75f4b",
+      "status": "new-only"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php",
+      "sha256": "3fd6477a90ece59314e3f9ec51dfcbde8767c604a1af993037a4b980a7af2828",
+      "status": "new-only"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionFeatureSourceClosureTest.php",
+      "sha256": "fdafd98c363ba756c571ce587d908a5403a473a47b103c721528f2f43938bfea",
+      "status": "new-only"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php",
+      "sha256": "ef1d95d9eaf2d944dbec07d0ff6c7751a25105206938e36440da9e49bc23661a",
+      "status": "new-only"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php",
+      "sha256": "8d96f3ca3e80e2b33fb95d41c63f86283d6d17502dc1cb412f1bf61eabd1d08a",
+      "status": "new-only"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionListeningNotesCapacityTest.php",
+      "sha256": "aeb341fece93e01bc3391532dc7ea5decc6a717fc6714f482678b724784f862d",
+      "status": "new-only"
+    },
+    {
+      "path": "tests/Support/ProductionFeatureFixtures.php",
+      "sha256": "6a93e458d0a275f81043984f844552c07fcce64d0a21020b8f86967a44ffccc6",
+      "status": "new-only"
+    },
+    {
+      "path": "tests/Unit/ProductionFeatures/ProductionFeatureStateTest.php",
+      "sha256": "d6132d53e44183ac2d28d5cb0d2e1496d27f10d947ec3c6796f6a7dcd0cced53",
+      "status": "new-only"
+    }
+  ],
+  "independentApproval": "pending",
+  "runtimeChangedFromFirstCheckpoint": false
+}
