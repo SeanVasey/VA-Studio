@@ -37,14 +37,14 @@ final readonly class IdentityRows
     public function assertPermanent(): void
     {
         try {
+            // Resolve/refuse all connection callbacks before any ordinary getPdo() in this explicit mode.
+            $this->committedFrame?->assertActive();
             if (! in_array($this->driver, ['sqlite', 'mysql'], true) || DB::connection() !== $this->connection
                 || $this->connection->getPdo() !== $this->primary || $this->connection->getDriverName() !== $this->driver
                 || $this->primary->getAttribute(PDO::ATTR_DRIVER_NAME) !== $this->driver) {
                 throw new IdentityException;
             }
-            if ($this->committedFrame !== null) {
-                $this->committedFrame->assertActive();
-            } elseif ($this->connection->transactionLevel() > 1 || $this->primary->inTransaction() !== ($this->connection->transactionLevel() === 1)) {
+            if ($this->committedFrame === null && ($this->connection->transactionLevel() > 1 || $this->primary->inTransaction() !== ($this->connection->transactionLevel() === 1))) {
                 throw new IdentityException;
             }
             foreach (DB::getConnections() as $connection) {

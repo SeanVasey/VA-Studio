@@ -143,14 +143,16 @@ final class IdentityCommittedFrame
     private function connectionCurrent(): void
     {
         if (! in_array($this->driver, ['sqlite', 'mysql'], true) || $this->primary->getAttribute(PDO::ATTR_DRIVER_NAME) !== $this->driver
-            || DB::connection() !== $this->connection || $this->connection->getPdo() !== $this->primary
+            || DB::connection() !== $this->connection || $this->connection->getRawPdo() !== $this->primary
             || $this->connection->getDriverName() !== $this->driver || $this->connection->transactionLevel() !== 0
             || ($this->driver === 'mysql' && ($this->connection->getDatabaseName() !== $this->schema
                 || $this->primary->query('SELECT DATABASE()')->fetchColumn() !== $this->schema))) {
             throw new IdentityException('committed_frame_required');
         }
         foreach (DB::getConnections() as $connection) {
-            if ($connection !== $this->connection && ($connection->transactionLevel() !== 0 || $connection->getPdo()->inTransaction())) {
+            // getPdo() may execute a public lazy resolver. Never run one inside a final authority fence.
+            $raw = $connection->getRawPdo();
+            if (! $raw instanceof PDO || ($connection !== $this->connection && ($connection->transactionLevel() !== 0 || $raw->inTransaction()))) {
                 throw new IdentityException('committed_frame_required');
             }
         }
