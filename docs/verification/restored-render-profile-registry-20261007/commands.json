@@ -1,0 +1,13 @@
+{
+  "runtime": "PHP 8.4.26",
+  "setup": "PHPRC=recovered php.ini; PHP_INI_SCAN_DIR empty; LD_LIBRARY_PATH recovered runtime libraries; own real copied vendor and Composer autoload; raw child existing standard ini/libgd lookup from predecessor repair retained",
+  "commands": {
+    "autoload": "composer dump-autoload --no-scripts",
+    "focused_first": "php vendor/bin/phpunit -c registry-focused.phpunit.xml --log-junit <evidence>/focused-first.xml (no APP_KEY)",
+    "focused_final": "APP_KEY=ephemeral in-memory php vendor/bin/phpunit -c registry-focused.phpunit.xml --log-junit <evidence>/focused-final.xml",
+    "formatting": "php vendor/bin/pint --test app/Domain/Contracts/ContractRenderProfile.php app/Domain/Contracts/ContractRenderProfileRegistry.php app/Domain/Contracts/ContractIssuancePolicy.php tests/Unit/ContractRenderProfileRegistryTest.php",
+    "syntax": "php -l scripts/contract-renderer-autoload.php",
+    "capture_baseline": "php capture-retained-profile.php <restored-checkout> <c498-checkout>",
+    "capture_restored": "php capture-retained-profile.php <restored-checkout>"
+  }
+}

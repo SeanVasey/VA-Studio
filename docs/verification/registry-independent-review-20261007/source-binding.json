@@ -1,0 +1,17 @@
+{
+  "reviewed_executable": "f4ec4b7367e04d41fe8ebb2bbf3839642f6d1c50",
+  "reviewed_tree": "07a726a1ca712a6cb87a6fc747f6a391602103e4",
+  "evidence_parent": "7cba260e4bdc1b6c59cd4ee4586a9c52d435f868",
+  "source_sha256": {
+    "app/Domain/Contracts/ContractIssuancePolicy.php": "0f1497082901c02d3773a5f205cd814f8f906f3359b7939421f3a8023c3ada6e",
+    "app/Domain/Contracts/ContractRenderProfile.php": "fd93746b674e335ddb4998abdfd9765efff734a235398fd2bd2a4d757770770b",
+    "app/Domain/Contracts/ContractRenderProfileRegistry.php": "9e47f1265236938702704ab3e24060661c1a21c4adfb22ac08fcb49001e14da3",
+    "scripts/contract-renderer-autoload.php": "ca34585be3a2501c3912df0f4e7fd8bb3ef1a9bf99c728d1ec13af25ed6dbbb0",
+    "tests/Unit/ContractRenderProfileRegistryTest.php": "e5060bed8f3785b54b352a5f726bfc6c06677b3e58ab5d39b967863e910a1ac8",
+    "tests/fixtures/contracts/retained-render-profile-v1.json": "6a91f1e7ae1fb3443bf2db24a8bd64561495cadb87eb2cd8316242626c2f3556"
+  },
+  "lock_sha256": {
+    "composer.lock": "996bc7f800d5cc6b4312f5303fbd67a5cadd17e0eb640f3e2e94035e713289aa",
+    "package-lock.json": "6407d3a63e3b6e04f5824f53c41b8dc8a33581f987b21d780c795480122f93ea"
+  }
+}

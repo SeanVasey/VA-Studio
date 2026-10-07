@@ -1,0 +1,41 @@
+{
+  "exit_code": 0,
+  "output_keys": [
+    "pdf_base64",
+    "sha256",
+    "size_bytes",
+    "page_count",
+    "text_digest",
+    "profile_hash"
+  ],
+  "sha256": "37c92cb5c0d09923b5a75ef8fedf6a60491653c6485cf2cd90302fa53139c495",
+  "size_bytes": 751516,
+  "profile_hash": "ff46257d40e36ea4efc8a42a9df0d823141d13a586d0a416fdde5178dcf12621",
+  "stderr": "",
+  "exact_predecessor_pdf_hash": true,
+  "actual_bounded_command": [
+    "/workspace/scratch/0c039e9e0645/runtime-recovery/root/usr/bin/php8.4",
+    "-d",
+    "memory_limit=128M",
+    "-d",
+    "max_execution_time=60",
+    "-d",
+    "display_errors=stderr",
+    "-d",
+    "log_errors=0",
+    "-d",
+    "allow_url_fopen=0",
+    "-d",
+    "allow_url_include=0",
+    "-d",
+    "open_basedir=/workspace/scratch/2876616e88c3/VA-Studio-render-profile-registry:/workspace/scratch/2876616e88c3/VA-Studio-render-profile-registry/storage/framework/testing/profile-runtime-probe-h300jbpm",
+    "-d",
+    "upload_tmp_dir=/workspace/scratch/2876616e88c3/VA-Studio-render-profile-registry/storage/framework/testing/profile-runtime-probe-h300jbpm",
+    "-d",
+    "sys_temp_dir=/workspace/scratch/2876616e88c3/VA-Studio-render-profile-registry/storage/framework/testing/profile-runtime-probe-h300jbpm",
+    "-d",
+    "disable_functions=curl_init,curl_exec,curl_multi_exec,fsockopen,pfsockopen,stream_socket_client,stream_socket_server,socket_create,exec,passthru,shell_exec,system,popen,proc_open",
+    "scripts/render-test-contract.php"
+  ],
+  "secrets_inherited": false
+}

@@ -1,5 +1,29 @@
 # Current development queue
 
+## Merged private consumers and retained-profile continuation — October 7 UTC
+
+PR #19 is merged at `a1d74ca5250a62d77f9888405c748194ca3dc2c7`, tree
+`83be75788cf3e7987f6fab1204b0c33ad0d3c903`, after exact-head cheap preflight
+37572018441 attempt 1 passed. Fresh main/PR/Git-data reads verified tree and
+ordered parents. Original failed native/interruptions and corrected focused
+results remain under the [private consumer evidence](verification/private-consumers-composition-20261007/README.md).
+
+The next retained-v1 registry candidate makes historical profile and issuance
+policy lookup explicitly version-specific without activating a new renderer.
+Actual original metadata/profilehash and PDF bytes remain identical. Independent
+37/110 plus 25 adversarial assertions passed, and fresh five-file composition
+124/753 passed without failures/errors/skips. Current policy/profile and all
+PDF/font dependency records remain v1. Root source `953bdf2` carries the exact
+six approved sourcepaths and preserves PR #19's publication map.
+
+Genuine successor PDF/font compatibility continues separately. Independent
+review reproduced a direct-renderer cross-version defect in its first source;
+that source is held for correction and fresh exact-source review. PR #3 remains
+open; upgraded global packages cannot process pending v1 work under different
+pins. The public-pages sitemap is another separately owned, focused-verified
+child awaiting independent projection/privacy review. No routine full matrix,
+production activation or launch acceptance has occurred.
+
 ## Current resumed private consumers — October 7, 2026 UTC
 
 PR #17 merged at `df7f12e24ef481cee020910c3764850761ae4596`; its membership

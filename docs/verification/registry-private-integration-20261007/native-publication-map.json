@@ -1,0 +1,16 @@
+{
+  "repository": "SeanVasey/VA-Studio",
+  "baseline_native": "a1d74ca5250a62d77f9888405c748194ca3dc2c7",
+  "baseline_local": "9c0d7fa05b84ec874869b997ade16efb729c1c85",
+  "baseline_tree": "83be75788cf3e7987f6fab1204b0c33ad0d3c903",
+  "executable_local": "953bdf2366d630d2356ce341c388696ed4877fe1",
+  "executable_native": "913020ce298a5fb42777cf3019542b46fd128185",
+  "executable_tree": "0b895f40243ce739b81f33a5e3e0c1ce5b684b79",
+  "native_ordered_parents": [
+    "a1d74ca5250a62d77f9888405c748194ca3dc2c7"
+  ],
+  "source_carry": "root-carry.json",
+  "sensitive_review": "../registry-independent-review-20261007/review-receipt.json",
+  "actual_composed_execution": "receipt.json",
+  "limits": "Only retained v1 registry prerequisite. Current profile/policy, original render bytes and locked PDF/font unchanged; successor compatibility, activation and final acceptance remain open. Final metadata SHA/preflight/merge recorded in integrating PR."
+}

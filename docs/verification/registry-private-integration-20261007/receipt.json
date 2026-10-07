@@ -1,0 +1,21 @@
+{
+  "executed_source": "6597e8bdc21b8c8c9e35aaa562d20d68f37f5833",
+  "executed_tree": "fb92f01c7c5d04947bc264fbd7f6615d5e52d5d7",
+  "executable": "5c46ad09e3d273fc6b977cc2b5cf2167b976d9d5",
+  "baseline": "e076bc86fe5f3e4585be351ab15cc47d8e51136b",
+  "focused": {
+    "tests": 124,
+    "assertions": 753,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "installed_package_identities": 158,
+  "preserved_baseline_paths": 1872,
+  "sensitive_source_carry": "six source paths byte-exact f4ec; original independent approval f77677 retained",
+  "production_or_successor_activation": false,
+  "mysql_run": false,
+  "full_acceptance": false,
+  "hosted_dispatch": false,
+  "next_dependency": "Actual PDF/font successor version-specific renderer/runtime/profile; preserve retained v1 originals and unavailable runtime refusal"
+}

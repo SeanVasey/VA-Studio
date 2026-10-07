@@ -1,0 +1,25 @@
+{
+  "source": "f4ec4b7367e04d41fe8ebb2bbf3839642f6d1c50",
+  "tree": "07a726a1ca712a6cb87a6fc747f6a391602103e4",
+  "focused_final": {
+    "name": "Retained contract profile affected consumers",
+    "tests": "124",
+    "assertions": "753",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "120.000849"
+  },
+  "first_failed_environment": {
+    "tests": 124,
+    "passed": 72,
+    "assertions": 255,
+    "errors": 52,
+    "reason": "missing ephemeral APP_KEY"
+  },
+  "formatting": "passed",
+  "child_autoload_syntax": "passed",
+  "metadata_profile_hash_real_pdf_digest_size_exact_unchanged": true,
+  "native_mysql_run": false,
+  "full_acceptance_run": false
+}

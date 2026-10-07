@@ -1,0 +1,11 @@
+{
+  "exit_code": 0,
+  "runtime": [
+    "8.4.26",
+    "/etc/php/8.4/cli/php.ini",
+    true,
+    true,
+    true
+  ],
+  "stderr": ""
+}

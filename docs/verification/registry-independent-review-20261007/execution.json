@@ -1,0 +1,45 @@
+[
+  {
+    "name": "canaries",
+    "command": [
+      "php",
+      "docs/verification/registry-independent-review-20261007/canaries.php"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "baseline",
+    "command": [
+      "php",
+      "docs/verification/restored-render-profile-registry-20261007/capture-retained-profile.php",
+      "/workspace/scratch/2876616e88c3/VA-Studio-registry-independent-review",
+      "/workspace/scratch/2876616e88c3/VA-Studio-continuation-20261007"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "reviewed",
+    "command": [
+      "php",
+      "docs/verification/restored-render-profile-registry-20261007/capture-retained-profile.php",
+      "/workspace/scratch/2876616e88c3/VA-Studio-registry-independent-review"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "focused",
+    "command": [
+      "php",
+      "-d",
+      "memory_limit=512M",
+      "vendor/bin/phpunit",
+      "-c",
+      "registry-independent.phpunit.xml",
+      "--log-junit",
+      "docs/verification/registry-independent-review-20261007/focused.xml",
+      "--fail-on-empty-test-suite",
+      "--fail-on-warning"
+    ],
+    "exit_code": 0
+  }
+]

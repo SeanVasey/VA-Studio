@@ -1,0 +1,24 @@
+{
+  "baseline_native": "a1d74ca5250a62d77f9888405c748194ca3dc2c7",
+  "baseline_local": "9c0d7fa05b84ec874869b997ade16efb729c1c85",
+  "baseline_tree": "83be75788cf3e7987f6fab1204b0c33ad0d3c903",
+  "executable_local": "953bdf2366d630d2356ce341c388696ed4877fe1",
+  "executable_tree": "0b895f40243ce739b81f33a5e3e0c1ce5b684b79",
+  "sensitive_review_source": "f4ec4b7367e04d41fe8ebb2bbf3839642f6d1c50",
+  "tested_composition": "6597e8bdc21b8c8c9e35aaa562d20d68f37f5833",
+  "carry": "All six sourcepaths identical to actual independently reviewedf4ec. Relative to independently executedcomposition5c46ad, rootexecutable953bdf adds only prior privatebatch native-publication-map metadata. Existing privatefeatures/dependencylocks/evidence remain unchanged.",
+  "source_sha256": {
+    "app/Domain/Contracts/ContractIssuancePolicy.php": "0f1497082901c02d3773a5f205cd814f8f906f3359b7939421f3a8023c3ada6e",
+    "app/Domain/Contracts/ContractRenderProfile.php": "fd93746b674e335ddb4998abdfd9765efff734a235398fd2bd2a4d757770770b",
+    "app/Domain/Contracts/ContractRenderProfileRegistry.php": "9e47f1265236938702704ab3e24060661c1a21c4adfb22ac08fcb49001e14da3",
+    "scripts/contract-renderer-autoload.php": "ca34585be3a2501c3912df0f4e7fd8bb3ef1a9bf99c728d1ec13af25ed6dbbb0",
+    "tests/Unit/ContractRenderProfileRegistryTest.php": "e5060bed8f3785b54b352a5f726bfc6c06677b3e58ab5d39b967863e910a1ac8",
+    "tests/fixtures/contracts/retained-render-profile-v1.json": "6a91f1e7ae1fb3443bf2db24a8bd64561495cadb87eb2cd8316242626c2f3556"
+  },
+  "actual_focused_tests": 124,
+  "assertions": 753,
+  "errors": 0,
+  "failures": 0,
+  "skips": 0,
+  "full_acceptance": false
+}

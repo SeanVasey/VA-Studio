@@ -1,0 +1,27 @@
+{
+  "source_changed": false,
+  "existing_default_ini": "absent",
+  "created_default_ini": "/etc/php/8.4/cli/php.ini",
+  "ini_sha256": "85edb6f6e317c715e1a5499ae2c331cdc95c1042636f319b637da908ae83e34b",
+  "extension_configuration_source": "/workspace/scratch/0c039e9e0645/runtime-recovery/php.ini",
+  "tecnickcom_symlinks_replaced": "real unchanged locked package bytes inside worktree for original open_basedir",
+  "environment_scrubbing_unchanged": true,
+  "local_libgd_lookup": {
+    "prior": "absent",
+    "symlink": "/usr/lib/x86_64-linux-gnu/libgd.so.3",
+    "target": "/workspace/scratch/0c039e9e0645/runtime-recovery/root/usr/lib/x86_64-linux-gnu/libgd.so.3.0.11"
+  },
+  "observed_raw_runtime_before": {
+    "php": "8.4.26",
+    "loaded_ini": false,
+    "mbstring": false,
+    "intl": false,
+    "observation": "original tool diagnostic, beforelocal defaultini creation"
+  },
+  "observed_intermediate_runtime": {
+    "mbstring": true,
+    "intl": true,
+    "gd_warning": "libgd.so.3 not found under scrubbed child dynamic-library lookup",
+    "observation": "original tool diagnostic + retained one-case real-child-missing-libgd log"
+  }
+}
