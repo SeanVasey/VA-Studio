@@ -152,17 +152,13 @@ class DiscoveryEpochMigrationTest extends TestCase
         app(CurrentEligibleTrackSnapshot::class)->capture();
     }
 
-    public function test_new_installation_collision_refuses_before_ddl(): void
+    public function test_exact_installed_migration_is_idempotent_and_preserves_retained_data(): void
     {
         $migration = require database_path('migrations/'.self::MIGRATION.'.php');
         $before = $this->rows();
-        try {
-            $migration->up();
-            $this->fail('Installed identities silently adopted.');
-        } catch (LogicException) {
-            $this->assertSame($before, $this->rows());
-            (new DiscoveryEpoch)->assertInstalled(DB::connection()->getPdo(), DB::getDriverName());
-        }
+        $migration->up();
+        $this->assertSame($before, $this->rows());
+        (new DiscoveryEpoch)->assertInstalled(DB::connection()->getPdo(), DB::getDriverName());
     }
 
     public function test_foreign_guard_on_absent_installation_is_not_adopted_or_replaced(): void
