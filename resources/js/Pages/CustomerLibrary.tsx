@@ -11,8 +11,8 @@ import type { SiteContent } from '../lib/site-content';
 import { changeCustomerSession, navigateCustomerSession } from '../lib/customer-session';
 import '../../css/customer-account.css';
 
-export default function CustomerLibrary({ siteContent, customer, testCheckoutEnabled = false, testMembershipsEnabled = false, membershipHistoryScope, guestPurchaseClaim }: {
-  testOnly: true; siteContent: SiteContent; customer: { name: string }; testCheckoutEnabled?: boolean; testMembershipsEnabled?: boolean; membershipHistoryScope?: string | null; guestPurchaseClaim?: PendingPurchaseClaim;
+export default function CustomerLibrary({ siteContent, customer, testCheckoutEnabled = false, testMembershipsEnabled = false, membershipHistoryScope, guestPurchaseClaim, serviceProjectsEnabled = false }: {
+  testOnly: true; siteContent: SiteContent; customer: { name: string }; testCheckoutEnabled?: boolean; testMembershipsEnabled?: boolean; membershipHistoryScope?: string | null; guestPurchaseClaim?: PendingPurchaseClaim; serviceProjectsEnabled?: boolean;
 }) {
   const [leaving, setLeaving] = useState(false), [message, setMessage] = useState('');
   const active = useRef(false), pending = useRef(false);
@@ -45,6 +45,7 @@ export default function CustomerLibrary({ siteContent, customer, testCheckoutEna
       </section> : <>
         <div className="customer-account-identity"><p>Signed in as <strong>{customer.name}</strong></p><button type="button" className="button button-outline" onClick={() => void signOut()}>Sign out</button></div>
         <p className="customer-account-note">Test mode only. Order status, contracts and downloads remain subject to their current availability checks.</p>
+        {serviceProjectsEnabled === true && <a className="text-link" href="/services/projects">Your service projects</a>}
         {guestPurchaseClaim && <CustomerPurchaseClaim key={guestPurchaseClaim.orderId} claim={guestPurchaseClaim} />}
         <CustomerOrderLookup renderOrder={order => <OrderStatus order={order} testCheckoutEnabled={testCheckoutEnabled} />} />
         {testMembershipsEnabled === true && typeof membershipHistoryScope === 'string' && /^[0-9a-f]{32}$/.test(membershipHistoryScope) && <OwnedMembershipHistory key={membershipHistoryScope} />}
