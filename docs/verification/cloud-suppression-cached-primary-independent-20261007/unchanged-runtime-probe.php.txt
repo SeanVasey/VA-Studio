@@ -1,0 +1,57 @@
+<?php
+namespace Tests\Feature;
+use App\Domain\Customers\Preferences\CustomerConsentPreferences;
+use App\Domain\Customers\Preferences\ConsentException;
+use App\Domain\Customers\Preferences\Suppression\SuppressionDelivery;
+use App\Domain\Customers\Preferences\Suppression\SuppressionRequest;
+use Illuminate\Support\Facades\DB;
+use Tests\Support\CustomerFixtures;
+use Tests\Support\ConsentFixtures;
+use Tests\Support\SuppressionFixtures;
+use Tests\TestCase;
+class CustomerSuppressionLazyBoundaryCanaryTest extends TestCase
+{
+    public function test_late_primary_resolver_cannot_release_confirmation_after_policy_withdrawal(): void
+    {
+        $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0);
+        $c = CustomerFixtures::account();
+        (new CustomerConsentPreferences)->change($c['principal'], $c['user'], ConsentFixtures::withdraw());
+        $adapter = new SuppressionFixtures;
+        $connection = DB::connection();
+        $primary = $connection->getPdo();
+        $after = false;
+        $installed = false;
+        $callbacks = 0;
+        $refused = false;
+        $result = null;
+        $adapter->onSuppress = function (SuppressionRequest $request) use (&$after) {
+            $after = true;
+            return SuppressionFixtures::positive($request);
+        };
+        $adapter->onBinding = function () use (&$after, &$installed, &$callbacks, $connection, $primary) {
+            if ($after && ! $installed) {
+                $installed = true;
+                $connection->setPdo(function () use (&$callbacks, $primary) {
+                    $callbacks++;
+                    config(['customer-suppression.enabled' => false]);
+                    return $primary;
+                });
+            }
+        };
+        try {
+            try {
+                $result = (new SuppressionDelivery($adapter))->process($c['principal'], $c['user'], 1);
+            } catch (ConsentException) {
+                $refused = true;
+            }
+            $snapshot = ['source' => 'df0f77eee08417137a828047fa495860f499115c', 'callbacks' => $callbacks, 'enabled' => config('customer-suppression.enabled'), 'result' => $result, 'refused' => $refused, 'sent' => $adapter->sent, 'frameworkDepth' => $connection->transactionLevel(), 'physicalTransaction' => $primary->inTransaction()];
+            file_put_contents('/tmp/va-suppression-lazy-primary-snapshot.json', json_encode($snapshot, JSON_PRETTY_PRINT)."\n");
+            $this->assertSame(0, $callbacks, 'A terminal fence must refuse unresolved primary without invoking its resolver.');
+            $this->assertTrue($refused);
+            $this->assertNull($result);
+        } finally {
+            if ($primary->inTransaction()) $primary->rollBack();
+            $connection->setPdo($primary);
+        }
+    }
+}
