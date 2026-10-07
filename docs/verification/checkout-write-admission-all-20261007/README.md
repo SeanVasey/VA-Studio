@@ -76,7 +76,7 @@ c6's rules are kept: ONE command observer per frame; ordinary committing delegat
 
   `proveFresh()` reads the retained `Repository` items directly: `exemption_authoring_enabled === true` and the owner still delegated. The deadline is capped by the policy and attestation `effective_until`.
 - **Replays install nothing.** An exact authority/basis replay, the retry's `prepare()` (an intent already exists), `reconcile()`, `status()`, `record()` and `uncertain()` install no observer. A test asserts the dispatcher class seen inside every commit.
-- **Exception (§4d, Codex P1 r4210033214): `proveCreatable()`.** This is the one read-only frame that installs an observer, `CheckoutIntentAdmission::reprove()`. It is the last proof before the provider boundary, so a committing listener on its own frame must not be able to withdraw the offer or close the capability after the proofs ran.
+- **Exception (§4d, Codex P1 r4210033214): `proveCreatable()`.** This is the one read-only frame that installs an observer, `CheckoutIntentAdmission::reprove()`. It is the last proof before the provider boundary, so a committing listener on its own frame must not be able to withdraw the offer or close the capability after the proofs ran. Since §4e this admitted frame is also the **terminal** commit before `gateway->create()`: the current-credential check runs before it, and no framework transaction commits between the two.
 - **Belt-and-braces (reviewer condition 6):** `initiate()` now calls `proveCreatable()` after `requireGateway()` and immediately before the first `gateway->create` whenever no session exists yet. This covers both the first call and retries. `proveCreatable()` is a read-only `CommandTransaction`. Since §4d its own commit is admitted by the same raw plans as the NEW intent. It re-proves the following with the existing reason codes (`changed`, `disabled`/503), and it runs outside the provider `try`, so a refusal records no false `uncertain` observation:
   - buyer access;
   - the fresh flag (before and after);
@@ -87,7 +87,7 @@ c6's rules are kept: ONE command observer per frame; ordinary committing delegat
 
 ### Residual: not closed
 
-1. **Withdrawal after the final re-proof.** A withdrawal inside `proveCreatable()`'s own commit is refused (§4d). A withdrawal that commits after that frame has committed and before or during the external `create` call still crosses the provider boundary. No database transaction can be held across that I/O. Such a session belongs to reconciliation and refund handling, and this change does not claim it is closed.
+1. **Withdrawal after the final re-proof.** A withdrawal inside `proveCreatable()`'s own commit is refused (§4d), and no other framework transaction commits between that admitted frame and `create` (§4e). A concurrent writer, or a post-commit `TransactionCommitted` callback, that lands after the admitted commit and before or during the external `create` call still crosses the provider boundary. No database transaction can be held across that I/O. Such a session belongs to reconciliation and refund handling, and this change does not claim it is closed.
 2. **A privileged listener that commits PDO directly.** It can still make rows durable before detection (c6 F-5, unchanged).
 3. **Staff evidence outside the `users` row.** The MFA *requirement* is not re-evaluated at commit. The admin panel decides it with `isRequired: fn () => app()->isProduction()`, which reads the container's `env` instance (`$app['env']`). The frame does not track that instance: it compares only the `config` and `db` instances, the container aliases and the plain config parents, `app.env` among them. So a change to `$app['env']` alone is not compared at commit. What IS compared is the raw MFA enrollment columns (`app_authentication_secret`, `app_authentication_recovery_codes`) in the staff `users` row. Gate and Filament panel objects are also not re-evaluated. *(Wording corrected for review finding F-4; an earlier version wrongly said `app.env` covered the requirement.)*
 
@@ -285,5 +285,60 @@ Pint passes on the three changed PHP files. No native run was made for this item
 - 2 observed frames on the first initiate (the NEW intent and the re-proof);
 - 1 on the retry (the re-proof);
 - 0 on reconcile.
+
+Pint passes on the changed files. No native run was made for this item.
+
+## 4e. Codex P1 r4210180698: the admitted re-proof was not terminal before the provider call
+
+**Finding.**
+
+- After `proveCreatable()`'s admitted frame committed, the trailing `$this->access->current($principal, $buyer)` opened an ordinary framework transaction with no observer.
+- `ProductionCustomerAccess::current()` calls `source()`, which runs `$connection->transaction(read)` and then a raw terminal read outside any transaction.
+- A `TransactionCommitting` listener on that transaction could therefore deactivate the offer, close the capability or flip a flag, and `initiate()` then called `gateway->create()`.
+
+**Design choice: move `current()` before the admitted frame; do not remove it.**
+
+- `proveCreatable()` now calls `$this->access->current()` first and then runs its `CommandTransaction`. Nothing runs between that frame's commit and `create` except the pure retry-window clock comparison.
+- `current()` itself is unchanged. It still proves the same things, now immediately before the frame instead of after it:
+  - `source()`'s own transaction and outside-transaction terminal read;
+  - `outsideTransactions()`;
+  - `requireEnabled()`;
+  - the principal match.
+- The admitted frame then re-locks the same credential rows (`access->lock()` + `proveCurrent()`, which repeat `read()` + `match()` with `requireEnabled()`) and admits those raw identity rows at commit.
+- So a credential withdrawn during or after the leading `current()` is refused by the frame. One withdrawn during the frame's commit is refused by the commit admission. The identity module flag is part of the frame's config snapshot.
+- I did not delete the call outright. Removing it would also drop its outside-transaction terminal read. Moving it keeps everything it proves and makes the admitted frame terminal.
+- `initiate()` still makes its own earlier `current()` call after `prepare()`; that call is unchanged.
+
+**`record()` / `uncertain()` assessed: no change.** Their trailing `current()` calls run after the provider create/retrieve, so they are not before create. `record()` deliberately persists provider evidence that must survive identity or source withdrawal (money observations are retained). A listener on those transactions cannot cause a payable session to be created, because it already exists. The same applies to `initiate()`'s final `current()` + `status()` and to `reconcile()`.
+
+**Effect on the archived §4d canary (unchanged file, recorded honestly).**
+
+- That canary acts on "the first commit after `provenance()`". Since this change, that commit is the leading `current()` transaction, not the admitted frame.
+- Its offer deactivation therefore commits durably before the frame, and the frame's raw proofs refuse with `changed`. The safe outcome holds: `provider_creates: 0`, `sessions: 0` (`green/archived-4d-reprove-offer.json`).
+- Its pinned `write_source_changed` / `inactive_offers: 0` assertions now fail: 1 test, 4 assertions, 1 failure (`green/archived-4d-reprove-canary.*`).
+- The permanent §4d regression now targets the admitted frame explicitly (the first commit with the checkout observer installed after `provenance()`), and still expects `write_source_changed`.
+
+**Red evidence** (`conditions/codex-terminal-reproof/red/`, SQLite; `43ae65e6`'s app tree, identical to `019bc37d`):
+
+- **Canary** `canary/TerminalReproofCanaryTest.php`: exit 1, 1 test, 3 assertions, **1 failure**. The message is "A framework transaction committed between the admitted re-proof and create". The snapshot shows `after: 1`, `acted: 1`, `at_create: 0` (offer inactive when create ran) and `provider_creates: 1`.
+- **Permanent regression** `test_admitted_reproof_is_the_terminal_commit_before_provider_create`, run with the app reverted: exit 2, 4 tests, 14 assertions, **2 failures** (offer: first initiate and retry) and **2 errors** (capability: first initiate and retry).
+
+**Green** (`green/`, SQLite, the fix):
+
+| Run | Tests | Assertions |
+| --- | --- | --- |
+| canary | 1 | 5 (`after: 0`, `acted: 0`, offer active at create) |
+| `ProductionCheckoutWriteAdmissionAllTest` | 26 | 187 |
+| `ProductionCheckoutJourneyTest` | 7 | 81 |
+| `ProductionCheckoutExemptionAuthorityTest` | 11 | 50 |
+| archived c6 physical canary | 1 | 5 |
+| full SQLite checkout family (`green/sqlite-family/`) | 204 | 1038 (0 failures/errors; the same 8 named native-only skips) |
+
+`ProductionCheckoutWriteAdmissionAllTest` gains 4 terminal cases: {offer, capability} × {first initiate, retry}. A listener withdraws on any non-admitted commit after the admitted frame. Each case asserts:
+
+- no `TransactionCommitted` between the admitted commit and the fixture's `create`;
+- the listener never acted;
+- the offer is active and there are 0 closures at create;
+- initiate succeeds with one session.
 
 Pint passes on the changed files. No native run was made for this item.

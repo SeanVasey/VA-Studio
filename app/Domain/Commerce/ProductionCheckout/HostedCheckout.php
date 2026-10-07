@@ -155,10 +155,16 @@ final class HostedCheckout
      * This is the one read frame that carries the commit observer: it is the last proof before the
      * provider boundary, so a committing listener on this frame must not be able to withdraw the offer
      * or close the capability after the proofs ran (Codex P1 r4210033214).
+     *
+     * The admitted frame is the TERMINAL step before gateway->create() (Codex P1 r4210180698): the
+     * current-credential check runs before it, never after, because its own ordinary framework
+     * transaction would otherwise commit unobserved between the admitted re-proof and the provider
+     * call. The frame then re-locks and re-proves the same credential rows and admits them at commit.
      */
     private function proveCreatable(ProductionCustomerPrincipal $principal, User $buyer, array $prepared): void
     {
         CheckoutException::require($prepared['current'] !== null && $prepared['selection'] !== null && $prepared['basis'] !== null);
+        $this->access->current($principal, $buyer);
         CommandTransaction::run(function (Records $rows) use ($principal, $buyer, $prepared): void {
             $access = $this->access->lock($principal, $buyer, $rows->current);
             CheckoutException::require(config('production_checkout.fresh_checkout_enabled') === true, 'disabled', 503);
@@ -174,7 +180,6 @@ final class HostedCheckout
             CheckoutIntentAdmission::reprove($rows, $access, $buyer, $fresh, $prepared['order'], $prepared['intent'],
                 $prepared['current'], $prepared['selection'], $prepared['basis']);
         });
-        $this->access->current($principal, $buyer);
     }
 
     /** Internal system persistence after provider reads; current buyer credentials are deliberately checked afterward. */

@@ -16,6 +16,7 @@ use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
@@ -122,9 +123,9 @@ class ProductionCheckoutWriteAdmissionAllTest extends TestCase
         $delegate = DB::connection()->getEventDispatcher();
         $armed = false;
         $acted = 0;
-        // The first commit after the gateway's provenance() is proveCreatable()'s own read-only frame.
+        // Act on proveCreatable()'s own admitted read-only frame: the first observed commit after provenance().
         app('events')->listen(TransactionCommitting::class, function () use (&$armed, &$acted, $withdrawal, $trackId, $candidate, $f): void {
-            if ($armed && $acted === 0) {
+            if ($armed && $acted === 0 && DB::connection()->getEventDispatcher() instanceof CheckoutCommandCommitDispatcher) {
                 $acted++;
                 match ($withdrawal) {
                     'offer' => DB::table('offers')->where('track_id', $trackId)->update(['is_active' => false]),
@@ -144,6 +145,56 @@ class ProductionCheckoutWriteAdmissionAllTest extends TestCase
         $this->assertSame(0, DB::table('offers')->where('track_id', $trackId)->where('is_active', false)->count());
         $this->assertSame($delegate, DB::connection()->getEventDispatcher());
         $this->assertFalse(DB::connection()->getRawPdo()->inTransaction());
+    }
+
+    #[DataProvider('reproveWithdrawals')]
+    public function test_admitted_reproof_is_the_terminal_commit_before_provider_create(string $withdrawal, bool $retry): void
+    {
+        $f = $this->payable();
+        $creates = 1;
+        if ($retry) {
+            $f['gateway']->loseFirstResponse = true;
+            $this->assertRefused('provider_uncertain', fn () => $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']));
+            $creates = 2;
+        }
+        $trackId = $f['catalog']['items'][0]['trackId'];
+        $candidate = (array) DB::table(CapabilityHistory::CANDIDATES)->where('id', $f['catalog']['candidate']->id)->first();
+        $state = ['armed' => false, 'observed' => false, 'admitted' => false, 'after' => 0, 'acted' => 0, 'at_create' => null];
+        // Any framework transaction committing after the admitted re-proof and before create withdraws the selection.
+        app('events')->listen(TransactionCommitting::class, function () use (&$state, $withdrawal, $trackId, $candidate, $f): void {
+            $state['observed'] = DB::connection()->getEventDispatcher() instanceof CheckoutCommandCommitDispatcher;
+            if ($state['admitted'] && ! $state['observed'] && $state['at_create'] === null) {
+                $state['acted']++;
+                match ($withdrawal) {
+                    'offer' => DB::table('offers')->where('track_id', $trackId)->update(['is_active' => false]),
+                    'capability' => $this->closeCapability($candidate, $f['catalog']['actor']->id),
+                };
+            }
+        });
+        app('events')->listen(TransactionCommitted::class, function () use (&$state): void {
+            if ($state['armed'] && $state['at_create'] === null) {
+                if ($state['observed']) {
+                    $state['admitted'] = true;
+                    $state['after'] = 0;
+                } elseif ($state['admitted']) {
+                    $state['after']++;
+                }
+            }
+        });
+        $f['hosted'] = new HostedCheckout($f['access'], new AdmissionTerminalProbeGateway($f['gateway'], function () use (&$state): void {
+            $state['armed'] = true;
+        }, function () use (&$state, $trackId): void {
+            $state['at_create'] = [DB::table('offers')->where('track_id', $trackId)->where('is_active', true)->count(),
+                DB::table(CapabilityHistory::CLOSURES)->count()];
+        }));
+        $result = $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $this->assertSame('unverified', $result['paymentStatus']);
+        $this->assertTrue($state['admitted']);
+        $this->assertSame(0, $state['after'], 'A framework transaction committed between the admitted re-proof and create.');
+        $this->assertSame(0, $state['acted']);
+        $this->assertSame([1, 0], $state['at_create']);
+        $this->assertCount($creates, $f['gateway']->creates);
+        $this->assertDatabaseCount(CheckoutSchema::TABLES['session'], 1);
     }
 
     public function test_capability_closed_after_intent_commit_refuses_before_first_create(): void
@@ -453,6 +504,46 @@ final class AdmissionRacingGateway implements ProviderGateway
 
     public function create(ExecutionContextV1 $context, array $params, string $key): array
     {
+        return $this->inner->create($context, $params, $key);
+    }
+
+    public function retrieve(ExecutionContextV1 $context, string $sessionId): array
+    {
+        return $this->inner->retrieve($context, $sessionId);
+    }
+
+    public function paymentIntent(ExecutionContextV1 $context, string $paymentId): array
+    {
+        return $this->inner->paymentIntent($context, $paymentId);
+    }
+}
+
+/** Synthetic fixture delegate; arms at provenance() and probes the database immediately before create(). */
+final class AdmissionTerminalProbeGateway implements ProviderGateway
+{
+    private bool $armed = false;
+
+    public function __construct(private readonly ProductionCheckoutGatewayFixture $inner, private readonly \Closure $arm, private readonly \Closure $probe) {}
+
+    public function provenance(ExecutionContextV1 $context): string
+    {
+        if (! $this->armed) {
+            $this->armed = true;
+            ($this->arm)();
+        }
+
+        return $this->inner->provenance($context);
+    }
+
+    public function account(ExecutionContextV1 $context): array
+    {
+        return $this->inner->account($context);
+    }
+
+    public function create(ExecutionContextV1 $context, array $params, string $key): array
+    {
+        ($this->probe)();
+
         return $this->inner->create($context, $params, $key);
     }
 
