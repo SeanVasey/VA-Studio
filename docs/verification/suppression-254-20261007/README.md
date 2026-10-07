@@ -39,6 +39,7 @@ Schema (`app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressi
 
 - No `customer_*` (250/251) reference exists.
 - INSERT guards require a `consent_preferences` binding and an explicit withdrawn, non-affirmative event for the same recipient HMAC.
+- The intents INSERT guard also requires the intent not to predate its withdrawal event (`e.created_at<=NEW.created_at`), the comparison `ProductionSuppressionRecords::intent()` applies at read time. Without it, a raw writer could commit an intent that every graph read then refuses and that the append-only guards leave unrepairable (Codex P2 on PR #49). The trigger text is built once for both drivers, so SQLite and MySQL stay equivalent. The migration `2026_10_07_254000_production_suppression` only delegates to the installer and carries no SQL of its own. It has never been applied anywhere (it is new in this PR), so no completion migration is needed. Evidence: `conditions/codex-intent-timestamp/` (SQLite only; the changed trigger text has not been run on MySQL).
 - UPDATE and DELETE always refuse.
 - The installer follows the 253 pattern:
   - Before any DDL, it admits the owned namespace and reserved keys, then the complete 253 floor through `ProductionFeatureSchema::assertComplete`.

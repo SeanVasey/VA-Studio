@@ -1,0 +1,19 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-supp254/phpunit.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:02.493, Memory: 81.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionSuppression\ProductionSuppressionIntentGuardTest::test_intent_is_refused_before_its_withdrawal_event_and_accepted_at_the_same_instant
+An intent timestamped before its withdrawal event was accepted.
+
+/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionIntentGuardTest.php:59
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 10[0m[37;41m, Failures: 1[0m[37;41m.[0m
