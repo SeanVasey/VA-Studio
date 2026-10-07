@@ -21,6 +21,7 @@ final readonly class Records
     public static function retained(CurrentRows $reader): self
     {
         CheckoutException::require(method_exists($reader, 'identityPrimary') && method_exists($reader, 'identityDriver'), 'reader_contract');
+        HeldSourceTransaction::requireCurrent($reader);
 
         return new self(null, $reader->identityDriver(), $reader);
     }

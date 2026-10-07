@@ -15,11 +15,13 @@ final readonly class ProductionPaidOrderSourceV1 implements \JsonSerializable
         private array $order,
         private array $intent,
         private array $historicalIdentity,
+        private HeldSourceTransaction $transaction,
     ) {}
 
     /** Consumer must prelock T23 historical identity before calling this under its captured transaction. */
     public static function lockedRead(ProductionPaidOrderLocatorV1 $locator, CurrentRows $reader, array $prelockedIdentityRaw): self
     {
+        $transaction = HeldSourceTransaction::capture($reader);
         $access = new ProductionCustomerAccess;
         $identity = $access->verifyHistoricalBinding($locator->historicalBuyerBinding(), $reader);
         Evidence::same($prelockedIdentityRaw, $identity);
@@ -31,7 +33,7 @@ final readonly class ProductionPaidOrderSourceV1 implements \JsonSerializable
         CheckoutException::require(count($intents) === 1);
         $intent = HostedEvidence::intent($rows, $order, $intents[0]);
         CheckoutException::require($intent['payment'] !== null && $intent['payment']['outcome'] === 'on_time', 'payment_required');
-        $source = new self($locator, $order, $intent, $identity);
+        $source = new self($locator, $order, $intent, $identity, $transaction);
         $source->proveRetainedCurrent($reader);
 
         return $source;
@@ -40,11 +42,13 @@ final readonly class ProductionPaidOrderSourceV1 implements \JsonSerializable
     /** Exact original order/payment/line and identity-prefix fence; grants still need their own final authority. */
     public function proveRetainedCurrent(CurrentRows $reader): void
     {
+        $this->transaction->prove($reader);
         $rows = Records::retained($reader);
         OrderEvidence::proveRetained($rows, $this->order['raw']);
         HostedEvidence::proveRetained($rows, $this->intent['raw']);
         (new ProductionCustomerAccess)->proveHistoricalBindingCurrent($this->locator->historicalBuyerBinding(), $reader, $this->historicalIdentity);
         $rows->provePrimary();
+        $this->transaction->prove($reader);
     }
 
     /** Safe immutable producer evidence. No credential stamp, identity token or private storage path. */
