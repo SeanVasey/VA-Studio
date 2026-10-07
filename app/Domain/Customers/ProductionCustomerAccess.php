@@ -6,6 +6,7 @@ use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Customers\ProductionIdentity\IdentityEvidence;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
+use App\Domain\Customers\ProductionIdentity\IdentityRows;
 use App\Models\User;
 use App\Support\CanonicalJson;
 use Illuminate\Support\Facades\DB;
@@ -83,6 +84,11 @@ final class ProductionCustomerAccess
     /** Original authenticated act, including its immutable prefix; this confers no current access. */
     public function verifyHistoricalBinding(array $binding, CurrentRows $reader): array
     {
+        return $this->historical($binding, IdentityRows::from($reader));
+    }
+
+    private function historical(array $binding, IdentityRows $reader): array
+    {
         $keys = ['schema_version', 'origin_id', 'provenance', 'account_id', 'account_public_id', 'user_id', 'verification_observation_id', 'verification_observation_hash', 'identity_policy_version', 'identity_policy_hash'];
         $actual = array_keys($binding);
         sort($actual);
@@ -147,6 +153,8 @@ final class ProductionCustomerAccess
             throw new IdentityException;
         }
 
+        $reader->assertPermanent();
+
         return ['user_id' => (int) $user['id'], 'account' => ['id' => (int) $account['id'], 'public_id' => $account['public_id'],
             'user_id' => (int) $account['user_id'], 'owner_digest' => IdentityPolicy::digest('owner', $account['owner_key'])],
             'origin' => $origin, 'verification_prefix' => $prefix, 'challenges' => $challenges];
@@ -159,8 +167,9 @@ final class ProductionCustomerAccess
         }
     }
 
-    private function read(User $actor, CurrentRows $reader): array
+    private function read(User $actor, CurrentRows $sourceReader): array
     {
+        $reader = IdentityRows::from($sourceReader);
         $policy = new IdentityPolicy;
         $policy->requireEnabled();
         if ($actor::class !== User::class || ! $actor->exists || ! is_int($actor->getKey()) || $actor->id < 1) {
@@ -222,7 +231,8 @@ final class ProductionCustomerAccess
             'verification_observation_id' => $observation['public_id'], 'verification_observation_hash' => $observation['observation_hash'],
             'identity_policy_version' => IdentityPolicy::VERSION, 'identity_policy_hash' => $policy->hash()];
 
-        $this->verifyHistoricalBinding($binding, $reader);
+        $this->historical($binding, $reader);
+        $reader->assertPermanent();
 
         return ['user' => $user, 'account' => $account, 'origin' => $origin, 'observation' => $observation, 'challenge' => $challenge,
             'verification_history' => $observations, 'owner_digest' => IdentityPolicy::digest('owner', $account['owner_key']),

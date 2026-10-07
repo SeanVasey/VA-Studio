@@ -2,7 +2,6 @@
 
 namespace App\Domain\Customers\ProductionIdentity;
 
-use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\DB;
 use PDO;
@@ -16,7 +15,7 @@ final readonly class IdentityDatabase
 
     public string $driver;
 
-    public CurrentRows $rows;
+    public IdentityRows $rows;
 
     public function __construct()
     {
@@ -26,7 +25,7 @@ final readonly class IdentityDatabase
         if (! in_array($this->driver, ['sqlite', 'mysql'], true)) {
             throw new IdentityException;
         }
-        $this->rows = new CurrentRows($this->primary, $this->driver);
+        $this->rows = new IdentityRows($this->primary, $this->driver);
     }
 
     public function close(bool $transaction): void
@@ -41,12 +40,14 @@ final readonly class IdentityDatabase
                 throw new IdentityException;
             }
         }
+        $this->rows->assertPermanent();
     }
 
     public function insert(string $table, array $values): int
     {
+        $this->rows->assertTable($table);
         $columns = array_keys($values);
-        $statement = $this->primary->prepare('INSERT INTO `'.$table.'` (`'.implode('`,`', $columns).'`) VALUES ('.implode(',', array_fill(0, count($columns), '?')).')');
+        $statement = $this->primary->prepare('INSERT INTO '.$this->rows->table($table).' (`'.implode('`,`', $columns).'`) VALUES ('.implode(',', array_fill(0, count($columns), '?')).')');
         $statement->execute(array_values($values));
 
         return (int) $this->primary->lastInsertId();
