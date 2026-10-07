@@ -44,7 +44,7 @@ final class ProductionCheckout
 
                 return self::reviewProjection($retained['body']);
             }
-            self::fresh();
+            $fresh = FreshCheckoutPolicy::capture();
             $current = CurrentPolicy::load($rows->current, $candidateId);
             $context = $current['context'];
             $context->requireBuyer($binding);
@@ -68,7 +68,6 @@ final class ProductionCheckout
                 'candidate_id' => $candidateId, 'buyer_origin_id' => $binding['origin_id'], 'request_key' => $digest, 'request_hash' => $hash]);
             $retained = OrderEvidence::review($rows, $record);
             $projection = self::reviewProjection($body);
-            self::fresh();
             CheckoutException::require(CarbonImmutable::now('UTC')->format('Y-m-d\TH:i:s\Z') < $body['expires_at'], 'expired');
             CurrentSelection::proveBytes($selection);
             OrderEvidence::proveRetained($rows, $retained['raw']);
@@ -76,6 +75,7 @@ final class ProductionCheckout
             CurrentSelection::proveCurrent($rows->current, $selection, CarbonImmutable::now('UTC'));
             CurrentPolicy::proveCurrent($rows->current, $current);
             $this->access->proveCurrent($principal, $buyer, $rows->current, $access);
+            $fresh->prove();
 
             return $projection;
         });
@@ -106,7 +106,7 @@ final class ProductionCheckout
 
                 return $projection;
             }
-            self::fresh();
+            $fresh = FreshCheckoutPolicy::capture();
             $review = OrderEvidence::review($rows, $rows->one('review', $reviewId));
             Evidence::same($binding, $review['body']['buyer']);
             CheckoutException::require($review['body']['review_hash'] === $reviewHash);
@@ -148,7 +148,6 @@ final class ProductionCheckout
             $rows->insert('attempt', ['public_id' => $attemptId, 'created_at' => $created, ...Evidence::seal($attemptBody), 'order_id' => $record['id'], 'expires_at' => $expires]);
             $order = OrderEvidence::order($rows, $record);
             $projection = self::orderProjection($order);
-            self::fresh();
             CheckoutException::require(CarbonImmutable::now('UTC')->format('Y-m-d\TH:i:s\Z') < $review['body']['expires_at'], 'expired');
             CurrentSelection::proveBytes($selection);
             TaxExemptions::proveRetained($rows, $basis);
@@ -156,6 +155,7 @@ final class ProductionCheckout
             CurrentSelection::proveCurrent($rows->current, $selection, CarbonImmutable::now('UTC'));
             CurrentPolicy::proveCurrent($rows->current, $current);
             $this->access->proveCurrent($principal, $buyer, $rows->current, $access);
+            $fresh->prove();
 
             return $projection;
         });
@@ -186,11 +186,6 @@ final class ProductionCheckout
         foreach (['origin_id', 'account_id', 'account_public_id', 'user_id', 'provenance'] as $field) {
             CheckoutException::require(($current[$field] ?? null) === ($retained[$field] ?? null), 'ownership', 403);
         }
-    }
-
-    private static function fresh(): void
-    {
-        CheckoutException::require(config('production_checkout.fresh_checkout_enabled') === true, 'disabled', 503);
     }
 
     private static function reviewProjection(array $body): array
