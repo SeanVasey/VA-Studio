@@ -14,6 +14,8 @@ use App\Http\Middleware\CustomerCommerceAccess;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Support\Facades\Route;
 
+require __DIR__.'/production-customer-identity.php';
+
 Route::get('/', [StorefrontController::class, 'index'])->middleware('throttle:120,1')->name('home');
 Route::get('/{section}/{slug?}', EditorialController::class)
     ->where('section', 'about|contact|blog|videos')->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
