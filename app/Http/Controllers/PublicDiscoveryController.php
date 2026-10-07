@@ -57,7 +57,7 @@ final class PublicDiscoveryController extends Controller
 
     private function response(string $content, string $type, int $status = 200): Response
     {
-        return response($content, $status, [
+        return new Response($content, $status, [
             'Content-Type' => $type,
             'Cache-Control' => 'no-store, private',
             'X-Content-Type-Options' => 'nosniff',

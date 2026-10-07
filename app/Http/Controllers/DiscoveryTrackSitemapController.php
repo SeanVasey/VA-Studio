@@ -17,7 +17,7 @@ final class DiscoveryTrackSitemapController
         $headers = ['Content-Type' => 'application/xml; charset=UTF-8', 'Cache-Control' => 'no-store, private',
             'X-Content-Type-Options' => 'nosniff', 'X-Robots-Tag' => 'noindex, follow'];
         if (! app()->environment('production')) {
-            return response('', 404, $headers);
+            return new Response('', 404, $headers);
         }
         try {
             SitemapConfiguration::assertEnabled();
@@ -28,11 +28,11 @@ final class DiscoveryTrackSitemapController
             $consumption = DiscoverySitemapConsumption::prepare(app(SitemapStore::class), $generation, (int) $slot);
             $xml = app(CurrentEligibleTrackSnapshot::class)->consumeIdentities($consumption);
 
-            return response($xml, 200, $headers);
+            return new Response($xml, 200, $headers);
         } catch (SitemapException $error) {
-            return response('', $error->status, $headers);
+            return new Response('', $error->status, $headers);
         } catch (\Throwable) {
-            return response('', 503, $headers);
+            return new Response('', 503, $headers);
         }
     }
 }

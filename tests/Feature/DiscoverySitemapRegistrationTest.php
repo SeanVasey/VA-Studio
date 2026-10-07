@@ -22,6 +22,12 @@ final class DiscoverySitemapRegistrationTest extends TestCase
         config(['app.key' => 'base64:'.base64_encode(str_repeat('s', 32)), 'app.url' => 'https://synthetic.example', 'discovery-sitemap.enabled' => false]);
     }
 
+    protected function tearDown(): void
+    {
+        $this->app?->instance('env', 'testing');
+        parent::tearDown();
+    }
+
     private function publish(): string
     {
         $this->app->instance('env', 'production');
@@ -41,11 +47,11 @@ final class DiscoverySitemapRegistrationTest extends TestCase
         $this->get('/sitemap.xml')->assertOk()->assertSee('https://synthetic.example/site-pages-sitemap.xml', false)->assertDontSee('track-sitemaps', false);
         $this->get('/track-sitemaps/'.str_repeat('a', 32).'/1.xml')->assertNotFound();
         $route = Route::getRoutes()->getByName('discovery.tracks');
-        $this->assertSame(['throttle:public-discovery'], $route->gatherMiddleware());
+        $this->assertSame(['throttle:120,1,public-discovery'], $route->gatherMiddleware());
         $this->assertFalse(in_array('web', $route->gatherMiddleware(), true));
     }
 
-    public function test_registered_complete_generation_is_canonical_and_fresh_eligibility_refuses_removed_asset(): void
+    public function test_registered_complete_generation_is_canonical_and_respects_production_evidence_and_epoch(): void
     {
         $fixture = QuoteFixtures::selection();
         $id = $this->publish();
@@ -53,7 +59,8 @@ final class DiscoverySitemapRegistrationTest extends TestCase
         $index = $this->withHeaders($headers)->get('/sitemap.xml')->assertOk();
         $this->assertSame(129, substr_count($index->getContent(), '<sitemap>'));
         $child = $this->get('/track-sitemaps/'.$id.'/1.xml')->assertOk();
-        $child->assertSee('https://synthetic.example/tracks/'.$fixture['track']->slug, false);
+        // Synthetic scanner evidence remains inadmissible in production. Never advertise fixture tracks.
+        $child->assertDontSee('<url>', false);
         foreach ([$index, $child] as $response) {
             $response->assertHeader('Cache-Control', 'no-store, private')->assertHeader('Content-Type', 'application/xml; charset=UTF-8')->assertHeader('X-Content-Type-Options', 'nosniff')->assertHeader('X-Robots-Tag', 'noindex, follow');
             $this->assertSame([], $response->headers->getCookies());
@@ -67,6 +74,9 @@ final class DiscoverySitemapRegistrationTest extends TestCase
         $this->call('GET', '/track-sitemaps/'.$id.'/1.xml', [], [], [], ['CONTENT_LENGTH' => '0'], ' ')->assertNotFound();
         $this->get('/track-sitemaps/'.$id.'/01.xml')->assertNotFound();
         $this->get('/track-sitemaps/'.$id.'/1.xml?private=sentinel')->assertNotFound()->assertDontSee('sentinel', false);
+        $fixture['track']->update(['status' => 'draft']);
+        $this->get('/track-sitemaps/'.$id.'/1.xml')->assertStatus(503)->assertDontSee('<url>', false);
+        $this->get('/sitemap.xml')->assertStatus(503)->assertDontSee('<sitemap>', false);
     }
 
     #[DataProvider('publicPaths')]
