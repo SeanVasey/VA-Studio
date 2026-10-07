@@ -15,6 +15,8 @@ use App\Domain\SupportAttachments\AttachmentSourceToken;
 use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
 use App\Support\CanonicalJson;
+use Closure;
+use Filament\Facades\Filament;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionRolledBack;
 use Illuminate\Support\Facades\DB;
@@ -34,6 +36,10 @@ final class ServiceProjectAttachmentSourceV1 implements AttachmentSourceToken, J
 
     private bool $valid = true;
 
+    private bool $committed = false;
+
+    private bool $transactionEnded = false;
+
     private readonly string $transactionMarker;
 
     private function __construct(private readonly PDO $primary, private readonly string $sourceId,
@@ -48,6 +54,11 @@ final class ServiceProjectAttachmentSourceV1 implements AttachmentSourceToken, J
             Event::listen($event, static function ($event) use ($weak, $connection): void {
                 if ($event->connection === $connection && ($token = $weak->get())) {
                     $token->valid = false;
+                    if (! $token->transactionEnded) {
+                        $token->transactionEnded = true;
+                        $token->committed = $event instanceof TransactionCommitted
+                            && $connection->transactionLevel() === 0 && ! $token->primary->inTransaction();
+                    }
                 }
             });
         }
@@ -117,6 +128,100 @@ final class ServiceProjectAttachmentSourceV1 implements AttachmentSourceToken, J
         AttachmentException::require($expectedVersion >= 0 && $expectedVersion <= 1000
             && $this->version() === $expectedVersion && $this->binding['intake_open'] === true, 409);
         $this->proveCurrent($rows);
+    }
+
+    /** Mint only during the original live proof. The returned closure cannot renew that token. */
+    public function captureCommittedRead(AttachmentRows $rows): Closure
+    {
+        AttachmentException::require(in_array($this->purpose, ['list', 'download'], true), 403);
+        $rows->assertCurrent();
+        AttachmentException::require($this->valid && $rows->identity() === $this->primary && DB::transactionLevel() === 1);
+        // Resolve every framework/container dependency before the existing terminal proof.
+        $application = app();
+        $config = app('config');
+        $manager = DB::getFacadeRoot();
+        $connection = DB::connection();
+        $driver = $connection->getDriverName();
+        $prefix = $connection->getTablePrefix();
+        $name = $connection->getName();
+        $database = $driver === 'mysql' ? $this->primary->query('SELECT DATABASE()')->fetchColumn() : 'main';
+        $environment = $application->environment();
+        $flags = [$config->get('services-projects.test_enabled'), $config->get('customer.test_accounts_enabled')];
+        $panel = $this->actor->audience === 'operator' ? Filament::getPanel('admin') : null;
+        $gate = $this->actor->audience === 'operator' ? Gate::getFacadeRoot() : null;
+        $panelPolicy = $panel === null ? null : [$panel->isMultiFactorAuthenticationRequired(), $panel->getMultiFactorAuthenticationProviders()];
+        $tables = [];
+        foreach (['users', 'customer_accounts', 'service_projects', 'service_project_events'] as $table) {
+            $tables[$table] = $rows->table($table);
+        }
+        $this->proveCurrent($rows);
+        AttachmentException::require([$config->get('services-projects.test_enabled'), $config->get('customer.test_accounts_enabled')] === $flags, 404);
+
+        return function () use ($application, $config, $manager, $connection, $driver, $prefix, $name, $database, $environment, $flags, $panel, $gate, $panelPolicy, $tables): void {
+            AttachmentException::require($this->committed && ! $this->valid, 503);
+            // These getters and Gate/MFA providers can evaluate arbitrary closures. All run
+            // before the final permanent actor/source reads; this phase is callback-capable.
+            AttachmentException::require(app() === $application && app('config') === $config && DB::getFacadeRoot() === $manager
+                && DB::connection() === $connection, 503);
+            AttachmentException::require($connection->transactionLevel() === 0 && ! $this->primary->inTransaction(), 503);
+            if ($this->actor->audience === 'operator') {
+                AttachmentException::require(Gate::getFacadeRoot() === $gate && Filament::getPanel('admin') === $panel, 403);
+                $user = self::hydrate($this->authority['user']);
+                AttachmentException::require($gate->forUser($user)->allows('administer-catalog', [false])
+                    && AdminMultiFactor::satisfiedBy($user, $panel, lockForUpdate: false), 403);
+                AttachmentException::require([$panel->isMultiFactorAuthenticationRequired(), $panel->getMultiFactorAuthenticationProviders()] === $panelPolicy, 403);
+            }
+            $currentEnvironment = $application->environment();
+            AttachmentException::require($this->actor->user?->exists === true
+                && (int) $this->actor->user->getKey() === (int) $this->authority['user']['id'], 403);
+            AttachmentException::require(app('config') === $config && DB::getFacadeRoot() === $manager && DB::connection() === $connection, 503);
+            $assertClosed = function () use ($manager, $connection, $driver, $prefix, $name, $database): void {
+                // Pure cached framework/primary identity checks, with no connection resolver.
+                AttachmentException::require($manager->getDefaultConnection() === $name
+                    && ($manager->getConnections()[$name] ?? null) === $connection
+                    && $connection->getRawPdo() === $this->primary && $connection->getDriverName() === $driver
+                    && $connection->getTablePrefix() === $prefix && $connection->transactionLevel() === 0
+                    && ! $this->primary->inTransaction(), 503);
+                if ($driver === 'mysql') {
+                    AttachmentException::require($this->primary->query('SELECT DATABASE()')->fetchColumn() === $database, 503);
+                }
+            };
+            $assertClosed();
+            foreach (array_keys($tables) as $logical) {
+                $physical = $prefix.$logical;
+                if ($driver === 'sqlite') {
+                    $query = $this->primary->prepare('SELECT 1 FROM sqlite_temp_master WHERE name = ? COLLATE NOCASE LIMIT 1');
+                    $query->execute([$physical]);
+                    AttachmentException::require($query->fetchColumn() === false, 503);
+                    $query = $this->primary->prepare('SELECT type, name FROM main.sqlite_master WHERE name = ? COLLATE NOCASE');
+                    $query->execute([$physical]);
+                    AttachmentException::require($query->fetchAll(PDO::FETCH_NUM) === [['table', $physical]], 503);
+                } else {
+                    $definition = $this->primary->query('SHOW CREATE TABLE '.$tables[$logical])->fetch(PDO::FETCH_NUM);
+                    AttachmentException::require(is_array($definition) && ! str_contains(strtoupper($definition[1]), 'CREATE TEMPORARY TABLE'), 503);
+                }
+            }
+            $read = function (string $table, string $where, array $bindings, int $limit) use ($tables): array {
+                $statement = $this->primary->prepare('SELECT * FROM '.$tables[$table].' WHERE '.$where.' ORDER BY id LIMIT '.$limit);
+                $statement->execute($bindings);
+
+                return $statement->fetchAll(PDO::FETCH_ASSOC);
+            };
+            $users = $read('users', 'id = ?', [(int) $this->authority['user']['id']], 2);
+            $account = $this->authority['account'];
+            $accounts = $account === null ? [] : $read('customer_accounts', 'id = ?', [(int) $account['id']], 2);
+            AttachmentException::require($users === [$this->authority['user']] && $accounts === ($account === null ? [] : [$account]), 403);
+            $projects = $read('service_projects', 'public_id = ?', [$this->sourceId], 2);
+            $events = $read('service_project_events', 'project_id = ?', [(int) $this->graph['project']['id']], 1001);
+            usort($events, fn (array $first, array $second): int => (int) $first['number'] <=> (int) $second['number']);
+            AttachmentException::require($projects === [$this->graph['project']] && $events === $this->graph['events'], 409);
+            // No service/container/model/provider resolution follows these raw evidence reads.
+            AttachmentException::require($currentEnvironment === $environment && in_array($currentEnvironment, ['local', 'testing'], true)
+                && $config->get('services-projects.test_enabled') === true
+                && [$config->get('services-projects.test_enabled'), $config->get('customer.test_accounts_enabled')] === $flags
+                && ($this->actor->audience !== 'customer' || $config->get('customer.test_accounts_enabled') === true), 404);
+            $assertClosed();
+        };
     }
 
     private static function authority(AttachmentActor $actor, AttachmentRows $rows, bool $frameworkPolicy = true, ?CustomerAccessPolicy $customerPolicy = null): array
