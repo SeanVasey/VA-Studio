@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\DiscoverySitemapRegistrationTest" file="/workspace/VA-Studio-discovery-registration/tests/Feature/DiscoverySitemapRegistrationTest.php" tests="4" assertions="15" errors="0" failures="4" skipped="0" time="2.552994">
+    <testcase name="test_default_off_keeps_existing_site_index_and_public_routes_have_no_session_stack" file="/workspace/VA-Studio-discovery-registration/tests/Feature/DiscoverySitemapRegistrationTest.php" line="38" class="Tests\Feature\DiscoverySitemapRegistrationTest" classname="Tests.Feature.DiscoverySitemapRegistrationTest" assertions="4" time="0.502093">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\DiscoverySitemapRegistrationTest::test_default_off_keeps_existing_site_index_and_public_routes_have_no_session_stack
+Expected response status code [404] but received 500.
+Failed asserting that 500 is identical to 404.
+
+The following exception occurred during the last request:
+
+Illuminate\Routing\Exceptions\MissingRateLimiterException: Rate limiter [public-discovery] is not defined. in /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Exceptions/MissingRateLimiterException.php:17
+Stack trace:
+#0 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(209): Illuminate\Routing\Exceptions\MissingRateLimiterException::forLimiter('public-discover...')
+#1 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(99): Illuminate\Routing\Middleware\ThrottleRequests-&gt;resolveMaxAttempts(Object(Illuminate\Http\Request), 'public-discover...')
+#2 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\ThrottleRequests-&gt;handle(Object(Illuminate\Http\Request), Object(Closure), 'public-discover...')
+#3 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#4 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\Pipeline\Pipeline-&gt;then(Object(Closure))
+#5 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\Routing\Router-&gt;runRouteWithinStack(Object(Illuminate\Routing\Route), Object(Illuminate\Http\Request))
+#6 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\Routing\Router-&gt;runRoute(Object(Illuminate\Http\Request), Object(Illuminate\Routing\Route))
+#7 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\Routing\Router-&gt;dispatchToRoute(Object(Illuminate\Http\Request))
+#8 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\Routing\Router-&gt;dispatch(Object(Illuminate\Http\Request))
+#9 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Foundation\Http\Kernel-&gt;{closure:Illuminate\Foundation\Http\Kernel::dispatchToRouter():197}(Object(Illuminate\Http\Request))
+#10 /workspace/VA-Studio/vendor/livewire/livewire/src/Features/SupportDisablingBackButtonCache/DisableBackButtonCacheMiddleware.php(19): Illuminate\Pipeline\Pipeline-&gt;{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}(Object(Illuminate\Http\Request))
+#11 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Livewire\Features\SupportDisablingBackButtonCache\DisableBackButtonCacheMiddleware-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#12 /workspace/VA-Studio/vendor/inertiajs/inertia-laravel/src/Middleware/EnsureGetOnRedirect.php(19): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#13 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Inertia\Middleware\EnsureGetOnRedirect-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#14 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#15 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#16 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#17 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#18 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#19 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#20 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#21 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#22 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(110): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#23 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#24 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(61): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#25 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\HandleCors-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#26 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#27 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#28 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#29 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#30 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(28): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#31 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#32 /workspace/VA-Studio-discovery-registration/app/Http/Middleware/StripeWebhookBodyLimit.php(16): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#33 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\StripeWebhookBodyLimit-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#34 /workspace/VA-Studio-discovery-registration/app/Http/Middleware/TestDeliveryPrivacy.php(15): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#35 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\TestDeliveryPrivacy-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#36 /workspace/VA-Studio-discovery-registration/app/Http/Middleware/TestExceptionResolutionPrivacy.php(16): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#37 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\TestExceptionResolutionPrivacy-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#38 /workspace/VA-Studio-discovery-registration/app/Http/Middleware/SitePreviewPrivacy.php(19): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#39 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\SitePreviewPrivacy-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#40 /workspace/VA-Studio-discovery-registration/app/Http/Middleware/InquiryPrivacy.php(67): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#41 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\InquiryPrivacy-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#42 /workspace/VA-Studio-discovery-registration/app/Http/Middleware/PrivateTrackReviewPrivacy.php(70): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#43 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\PrivateTrackReviewPrivacy-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#44 /workspace/VA-Studio-discovery-registration/app/Http/Middleware/ResumableUploadPrivacy.php(113): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#45 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\ResumableUploadPrivacy-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#46 /workspace/VA-Studio-discovery-registration/app/Http/Middleware/CustomerPrivacy.php(20): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#47 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\CustomerPrivacy-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#48 /workspace/VA-Studio-discovery-registration/app/Http/Middleware/ServiceProjectPrivacy.php(26): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#49 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\ServiceProjectPrivacy-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#50 /workspace/VA-Studio-discovery-registration/app/Http/Middleware/ProductionIdentity/IdentityPrivacy.php(19): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#51 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\ProductionIdentity\IdentityPrivacy-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#52 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#53 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\Pipeline\Pipeline-&gt;then(Object(Closure))
+#54 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\Foundation\Http\Kernel-&gt;sendRequestThroughRouter(Object(Illuminate\Http\Request))
+#55 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(638): Illuminate\Foundation\Http\Kernel-&gt;handle(Object(Illuminate\Http\Request))
+#56 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(368): Illuminate\Foundation\Testing\TestCase-&gt;call('GET', '/track-sitemaps...', Array, Array, Array, Array)
+#57 /workspace/VA-Studio-discovery-registration/tests/Feature/DiscoverySitemapRegistrationTest.php(42): Illuminate\Foundation\Testing\TestCase-&gt;get('/track-sitemaps...')
+#58 /workspace/VA-Studio/vendor/phpunit/phpunit/src/Framework/TestCase.php(1318): Tests\Feature\DiscoverySitemapRegistrationTest-&gt;test_default_off_keeps_existing_site_index_and_public_routes_have_no_session_stack()
+#59 /workspace/VA-Studio/vendor/phpunit/phpunit/src/Framework/TestCase.php(1355): PHPUnit\Framework\TestCase-&gt;invokeTestMethod('test_default_of...', Array)
+#60 /workspace/VA-Studio/vendor/phpunit/phpunit/src/Framework/TestCase.php(521): PHPUnit\Framework\TestCase-&gt;runTest()
+#61 /workspace/VA-Studio/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(99): PHPUnit\Framework\TestCase-&gt;runBare()
+#62 /workspace/VA-Studio/vendor/phpunit/phpunit/src/Framework/TestCase.php(361): PHPUnit\Framework\TestRunner-&gt;run(Object(Tests\Feature\DiscoverySitemapRegistrationTest))
+#63 /workspace/VA-Studio/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\Framework\TestCase-&gt;run()
+#64 /workspace/VA-Studio/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\Framework\TestSuite-&gt;run()
+#65 /workspace/VA-Studio/vendor/phpunit/phpunit/src/TextUI/Application.php(229): PHPUnit\TextUI\TestRunner-&gt;run(Object(PHPUnit\TextUI\Configuration\Configuration), Object(PHPUnit\Runner\ResultCache\DefaultResultCache), Object(PHPUnit\Framework\TestSuite))
+#66 /workspace/VA-Studio/vendor/phpunit/phpunit/phpunit(104): PHPUnit\TextUI\Application-&gt;run(Array)
+#67 /workspace/VA-Studio-discovery-registration/vendor/bin/phpunit(122): include('/workspace/VA-S...')
+#68 {main}
+
+----------------------------------------------------------------------------------
+
+Rate limiter [public-discovery] is not defined.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:151
+/workspace/VA-Studio-discovery-registration/tests/Feature/DiscoverySitemapRegistrationTest.php:42</failure>
+    </testcase>
+    <testcase name="test_registered_complete_generation_is_canonical_and_fresh_eligibility_refuses_removed_asset" file="/workspace/VA-Studio-discovery-registration/tests/Feature/DiscoverySitemapRegistrationTest.php" line="48" class="Tests\Feature\DiscoverySitemapRegistrationTest" classname="Tests.Feature.DiscoverySitemapRegistrationTest" assertions="5" time="1.446598">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\DiscoverySitemapRegistrationTest::test_registered_complete_generation_is_canonical_and_fresh_eligibility_refuses_removed_asset
+Expected response status code [200] but received 500.
+Failed asserting that 500 is identical to 200.
+
+The following exception occurred during the last request:
+
+Illuminate\Routing\Exceptions\MissingRateLimiterException: Rate limiter [public-discovery] is not defined. in /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Exceptions/MissingRateLimiterException.php:17
+Stack trace:
+#0 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(209): Illuminate\Routing\Exceptions\MissingRateLimiterException::forLimiter('public-discover...')
+#1 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(99): Illuminate\Routing\Middleware\ThrottleRequests-&gt;resolveMaxAttempts(Object(Illuminate\Http\Request), 'public-discover...')
+#2 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\ThrottleRequests-&gt;handle(Object(Illuminate\Http\Request), Object(Closure), 'public-discover...')
+#3 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#4 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\Pipeline\Pipeline-&gt;then(Object(Closure))
+#5 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\Routing\Router-&gt;runRouteWithinStack(Object(Illuminate\Routing\Route), Object(Illuminate\Http\Request))
+#6 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\Routing\Router-&gt;runRoute(Object(Illuminate\Http\Request), Object(Illuminate\Routing\Route))
+#7 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\Routing\Router-&gt;dispatchToRoute(Object(Illuminate\Http\Request))
+#8 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\Routing\Router-&gt;dispatch(Object(Illuminate\Http\Request))
+#9 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Foundation\Http\Kernel-&gt;{closure:Illuminate\Foundation\Http\Kernel::dispatchToRouter():197}(Object(Illuminate\Http\Request))
+#10 /workspace/VA-Studio/vendor/livewire/livewire/src/Features/SupportDisablingBackButtonCache/DisableBackButtonCacheMiddleware.php(19): Illuminate\Pipeline\Pipeline-&gt;{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}(Object(Illuminate\Http\Request))
+#11 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Livewire\Features\SupportDisablingBackButtonCache\DisableBackButtonCacheMiddleware-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#12 /workspace/VA-Studio/vendor/inertiajs/inertia-laravel/src/Middleware/EnsureGetOnRedirect.php(19): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#13 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Inertia\Middleware\EnsureGetOnRedirect-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#14 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#15 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#16 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#17 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#18 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#19 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#20 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#21 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#22 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(110): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#23 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#24 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(61): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#25 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\HandleCors-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#26 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#27 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#28 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#29 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#30 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(28): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#31 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#32 /workspace/VA-Studio-discovery-registration/app/Http/Middleware/StripeWebhookBodyLimit.php(16): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#33 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\StripeWebhookBodyLimit-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#34 /workspace/VA-Studio-discovery-registration/app/Http/Middleware/TestDeliveryPrivacy.php(15): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#35 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\TestDeliveryPrivacy-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#36 /workspace/VA-Studio-discovery-registration/app/Http/Middleware/TestExceptionResolutionPrivacy.php(16): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#37 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\TestExceptionResolutionPrivacy-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#38 /workspace/VA-Studio-discovery-registration/app/Http/Middleware/SitePreviewPrivacy.php(19): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#39 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\SitePreviewPrivacy-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#40 /workspace/VA-Studio-discovery-registration/app/Http/Middleware/InquiryPrivacy.php(67): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#41 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\InquiryPrivacy-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#42 /workspace/VA-Studio-discovery-registration/app/Http/Middleware/PrivateTrackReviewPrivacy.php(70): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#43 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\PrivateTrackReviewPrivacy-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#44 /workspace/VA-Studio-discovery-registration/app/Http/Middleware/ResumableUploadPrivacy.php(113): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#45 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\ResumableUploadPrivacy-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#46 /workspace/VA-Studio-discovery-registration/app/Http/Middleware/CustomerPrivacy.php(20): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#47 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\CustomerPrivacy-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#48 /workspace/VA-Studio-discovery-registration/app/Http/Middleware/ServiceProjectPrivacy.php(26): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#49 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\ServiceProjectPrivacy-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#50 /workspace/VA-Studio-discovery-registration/app/Http/Middleware/ProductionIdentity/IdentityPrivacy.php(19): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#51 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\ProductionIdentity\IdentityPrivacy-&gt;handle(Object(Illuminate\Http\Request), Object(Closure))
+#52 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline-&gt;{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#53 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\Pipeline\Pipeline-&gt;then(Object(Closure))
+#54 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\Foundation\Http\Kernel-&gt;sendRequestThroughRouter(Object(Illuminate\Http\Request))
+#55 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(638): Illuminate\Foundation\Http\Kernel-&gt;handle(Object(Illuminate\Http\Request))
+#56 /workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(368): Illuminate\Foundation\Testing\TestCase-&gt;call('GET', '/track-sitemaps...', Array, Array, Array, Array)
+#57 /workspace/VA-Studio-discovery-registration/tests/Feature/DiscoverySitemapRegistrationTest.php(55): Illuminate\Foundation\Testing\TestCase-&gt;get('/track-sitemaps...')
+#58 /workspace/VA-Studio/vendor/phpunit/phpunit/src/Framework/TestCase.php(1318): Tests\Feature\DiscoverySitemapRegistrationTest-&gt;test_registered_complete_generation_is_canonical_and_fresh_eligibility_refuses_removed_asset()
+#59 /workspace/VA-Studio/vendor/phpunit/phpunit/src/Framework/TestCase.php(1355): PHPUnit\Framework\TestCase-&gt;invokeTestMethod('test_registered...', Array)
+#60 /workspace/VA-Studio/vendor/phpunit/phpunit/src/Framework/TestCase.php(521): PHPUnit\Framework\TestCase-&gt;runTest()
+#61 /workspace/VA-Studio/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(99): PHPUnit\Framework\TestCase-&gt;runBare()
+#62 /workspace/VA-Studio/vendor/phpunit/phpunit/src/Framework/TestCase.php(361): PHPUnit\Framework\TestRunner-&gt;run(Object(Tests\Feature\DiscoverySitemapRegistrationTest))
+#63 /workspace/VA-Studio/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\Framework\TestCase-&gt;run()
+#64 /workspace/VA-Studio/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\Framework\TestSuite-&gt;run()
+#65 /workspace/VA-Studio/vendor/phpunit/phpunit/src/TextUI/Application.php(229): PHPUnit\TextUI\TestRunner-&gt;run(Object(PHPUnit\TextUI\Configuration\Configuration), Object(PHPUnit\Runner\ResultCache\DefaultResultCache), Object(PHPUnit\Framework\TestSuite))
+#66 /workspace/VA-Studio/vendor/phpunit/phpunit/phpunit(104): PHPUnit\TextUI\Application-&gt;run(Array)
+#67 /workspace/VA-Studio-discovery-registration/vendor/bin/phpunit(122): include('/workspace/VA-S...')
+#68 {main}
+
+----------------------------------------------------------------------------------
+
+Rate limiter [public-discovery] is not defined.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/workspace/VA-Studio-discovery-registration/tests/Feature/DiscoverySitemapRegistrationTest.php:55</failure>
+    </testcase>
+    <testsuite name="Tests\Feature\DiscoverySitemapRegistrationTest::test_response_creation_cannot_resolve_callbacks_after_terminal_source_proof" tests="2" assertions="6" errors="0" failures="2" skipped="0" time="0.604303">
+      <testcase name="test_response_creation_cannot_resolve_callbacks_after_terminal_source_proof with data set #0" file="/workspace/VA-Studio-discovery-registration/tests/Feature/DiscoverySitemapRegistrationTest.php" line="73" class="Tests\Feature\DiscoverySitemapRegistrationTest" classname="Tests.Feature.DiscoverySitemapRegistrationTest" assertions="3" time="0.306767">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\DiscoverySitemapRegistrationTest::test_response_creation_cannot_resolve_callbacks_after_terminal_source_proof with data set #0
+No response-factory callback after terminal source proof.
+Failed asserting that 1 is identical to 0.
+
+/workspace/VA-Studio-discovery-registration/tests/Feature/DiscoverySitemapRegistrationTest.php:84</failure>
+      </testcase>
+      <testcase name="test_response_creation_cannot_resolve_callbacks_after_terminal_source_proof with data set #1" file="/workspace/VA-Studio-discovery-registration/tests/Feature/DiscoverySitemapRegistrationTest.php" line="73" class="Tests\Feature\DiscoverySitemapRegistrationTest" classname="Tests.Feature.DiscoverySitemapRegistrationTest" assertions="3" time="0.297536">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\DiscoverySitemapRegistrationTest::test_response_creation_cannot_resolve_callbacks_after_terminal_source_proof with data set #1
+No response-factory callback after terminal source proof.
+Failed asserting that 1 is identical to 0.
+
+/workspace/VA-Studio-discovery-registration/tests/Feature/DiscoverySitemapRegistrationTest.php:84</failure>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

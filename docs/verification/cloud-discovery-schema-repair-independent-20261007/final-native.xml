@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-discovery-schema-independent/docs/verification/cloud-discovery-schema-repair-independent-20261007/native-selection.xml" tests="4" assertions="17" errors="0" failures="0" skipped="0" time="1.768843">
+    <testsuite name="Independent frozen native Schema repair" tests="4" assertions="17" errors="0" failures="0" skipped="0" time="1.768843">
+      <testsuite name="Tests\IndependentDiscovery\DiscoveryNativeNamespaceCanaryTest" file="/workspace/VA-Studio-discovery-schema-independent/docs/verification/cloud-discovery-independent-20261007/DiscoveryNativeNamespaceCanaryTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="0.369114">
+        <testcase name="test_foreign_reserved_check_name_is_refused_before_any_owned_ddl" file="/workspace/VA-Studio-discovery-schema-independent/docs/verification/cloud-discovery-independent-20261007/DiscoveryNativeNamespaceCanaryTest.php" line="13" class="Tests\IndependentDiscovery\DiscoveryNativeNamespaceCanaryTest" classname="Tests.IndependentDiscovery.DiscoveryNativeNamespaceCanaryTest" assertions="5" time="0.369114"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\DiscoverySitemapNamespaceAdmissionTest" file="/workspace/VA-Studio-discovery-schema-independent/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php" tests="3" assertions="12" errors="0" failures="0" skipped="0" time="1.399729">
+        <testcase name="test_native_fk_collision_preserves_complete_existing_prefix_and_retry_after_foreign_removal" file="/workspace/VA-Studio-discovery-schema-independent/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php" line="97" class="Tests\Feature\DiscoverySitemapNamespaceAdmissionTest" classname="Tests.Feature.DiscoverySitemapNamespaceAdmissionTest" assertions="7" time="0.561138"/>
+        <testcase name="test_native_foreign_table_local_unique_names_do_not_reserve_owned_constraint_names" file="/workspace/VA-Studio-discovery-schema-independent/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php" line="121" class="Tests\Feature\DiscoverySitemapNamespaceAdmissionTest" classname="Tests.Feature.DiscoverySitemapNamespaceAdmissionTest" assertions="3" time="0.375473"/>
+        <testcase name="test_native_check_and_fk_names_have_separate_constraint_namespaces" file="/workspace/VA-Studio-discovery-schema-independent/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php" line="140" class="Tests\Feature\DiscoverySitemapNamespaceAdmissionTest" classname="Tests.Feature.DiscoverySitemapNamespaceAdmissionTest" assertions="2" time="0.463117"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

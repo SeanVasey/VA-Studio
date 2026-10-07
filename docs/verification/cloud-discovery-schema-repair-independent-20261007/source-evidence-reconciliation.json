@@ -1,0 +1,56 @@
+{
+  "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+  "tree": "fcd8bcd7076dfcd3f8a5c559b97475e642e7c19e",
+  "author_evidence": "8cf82db12086d2579390882ccbc6a24eaf63a9c6",
+  "source_bindings": {
+    "changed_source": 2,
+    "carried_worker_source": 18,
+    "unchanged_dependencies": 7
+  },
+  "author_artifacts_verified": 29,
+  "original_red_artifacts_restored": 8,
+  "original_probe_byte_exact": true,
+  "own_actual_native": {
+    "tests": 4,
+    "assertions": 17,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "corrected_namespace_catalog_and_retained_foreign_rows_exact": true,
+  "failures": [],
+  "author_actual_source_attributed_junit": {
+    "final-native": {
+      "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+      "tests": 17,
+      "assertions": 54,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "final-sqlite": {
+      "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+      "tests": 16,
+      "assertions": 27,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6
+    },
+    "frozen-native": {
+      "source": "326e48d23635d198705fc0f8e1ba36a2b7d8396f",
+      "tests": 17,
+      "assertions": 53,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "frozen-sqlite": {
+      "source": "326e48d23635d198705fc0f8e1ba36a2b7d8396f",
+      "tests": 16,
+      "assertions": 27,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6
+    }
+  }
+}

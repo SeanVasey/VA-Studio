@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\DiscoverySitemapConcurrencyTest" file="/workspace/VA-Studio-discovery-sitemap/tests/Feature/DiscoverySitemapConcurrencyTest.php" tests="1" assertions="17" errors="0" failures="0" skipped="0" time="17.215607">
+    <testcase name="test_native_same_ordinal_retry_and_different_completion_pointer_cas_have_observed_contention" file="/workspace/VA-Studio-discovery-sitemap/tests/Feature/DiscoverySitemapConcurrencyTest.php" line="16" class="Tests\Feature\DiscoverySitemapConcurrencyTest" classname="Tests.Feature.DiscoverySitemapConcurrencyTest" assertions="17" time="17.215607"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="16" assertions="27" errors="0" failures="0" skipped="6" time="0.382846">
+    <testsuite name="Tests\Feature\DiscoverySitemapSchemaTest" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapSchemaTest.php" tests="10" assertions="24" errors="0" failures="0" skipped="1" time="0.288952">
+      <testcase name="test_fresh_schema_and_exact_complete_unlogged_retry_preserve_singleton" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapSchemaTest.php" line="50" class="Tests\Feature\DiscoverySitemapSchemaTest" classname="Tests.Feature.DiscoverySitemapSchemaTest" assertions="1" time="0.174712"/>
+      <testcase name="test_atomic_first_table_partial_ddl_and_exact_trailing_guard_retry_are_owned" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapSchemaTest.php" line="59" class="Tests\Feature\DiscoverySitemapSchemaTest" classname="Tests.Feature.DiscoverySitemapSchemaTest" assertions="1" time="0.014160"/>
+      <testcase name="test_all_existing_prefix_is_preflighted_before_any_earlier_ddl_mutation" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapSchemaTest.php" line="71" class="Tests\Feature\DiscoverySitemapSchemaTest" classname="Tests.Feature.DiscoverySitemapSchemaTest" assertions="2" time="0.011641"/>
+      <testcase name="test_retained_missing_guard_is_refused_and_original_rows_remain" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapSchemaTest.php" line="85" class="Tests\Feature\DiscoverySitemapSchemaTest" classname="Tests.Feature.DiscoverySitemapSchemaTest" assertions="2" time="0.012511"/>
+      <testcase name="test_raw_updates_deletes_replace_and_pointer_revision_rollback_are_guarded" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapSchemaTest.php" line="97" class="Tests\Feature\DiscoverySitemapSchemaTest" classname="Tests.Feature.DiscoverySitemapSchemaTest" assertions="11" time="0.013330"/>
+      <testcase name="test_empty_hole_before_later_guard_is_not_an_owned_creation_prefix" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapSchemaTest.php" line="121" class="Tests\Feature\DiscoverySitemapSchemaTest" classname="Tests.Feature.DiscoverySitemapSchemaTest" assertions="2" time="0.012755"/>
+      <testcase name="test_reserved_guard_name_cannot_mask_second_dictionary_object" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapSchemaTest.php" line="131" class="Tests\Feature\DiscoverySitemapSchemaTest" classname="Tests.Feature.DiscoverySitemapSchemaTest" assertions="2" time="0.013289"/>
+      <testcase name="test_connection_local_shadow_is_refused_before_schema_adoption" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapSchemaTest.php" line="148" class="Tests\Feature\DiscoverySitemapSchemaTest" classname="Tests.Feature.DiscoverySitemapSchemaTest" assertions="2" time="0.012312"/>
+      <testcase name="test_native_case_variant_reserved_name_refuses_admission" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapSchemaTest.php" line="162" class="Tests\Feature\DiscoverySitemapSchemaTest" classname="Tests.Feature.DiscoverySitemapSchemaTest" assertions="0" time="0.011137">
+        <skipped/>
+      </testcase>
+      <testcase name="test_down_refuses_before_any_schema_or_singleton_mutation" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapSchemaTest.php" line="179" class="Tests\Feature\DiscoverySitemapSchemaTest" classname="Tests.Feature.DiscoverySitemapSchemaTest" assertions="1" time="0.013104"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\DiscoverySitemapNamespaceAdmissionTest" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php" tests="6" assertions="3" errors="0" failures="0" skipped="5" time="0.093894">
+      <testcase name="test_native_foreign_case_variant_check_is_refused_without_any_ddl" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php" line="74" class="Tests\Feature\DiscoverySitemapNamespaceAdmissionTest" classname="Tests.Feature.DiscoverySitemapNamespaceAdmissionTest" assertions="0" time="0.012174">
+        <skipped/>
+      </testcase>
+      <testcase name="test_native_foreign_fk_reserved_symbol_is_refused_before_owned_tables_or_guards" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php" line="86" class="Tests\Feature\DiscoverySitemapNamespaceAdmissionTest" classname="Tests.Feature.DiscoverySitemapNamespaceAdmissionTest" assertions="0" time="0.014090">
+        <skipped/>
+      </testcase>
+      <testcase name="test_native_fk_collision_preserves_complete_existing_prefix_and_retry_after_foreign_removal" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php" line="97" class="Tests\Feature\DiscoverySitemapNamespaceAdmissionTest" classname="Tests.Feature.DiscoverySitemapNamespaceAdmissionTest" assertions="0" time="0.018397">
+        <skipped/>
+      </testcase>
+      <testcase name="test_native_foreign_table_local_unique_names_do_not_reserve_owned_constraint_names" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php" line="121" class="Tests\Feature\DiscoverySitemapNamespaceAdmissionTest" classname="Tests.Feature.DiscoverySitemapNamespaceAdmissionTest" assertions="0" time="0.020035">
+        <skipped/>
+      </testcase>
+      <testcase name="test_native_check_and_fk_names_have_separate_constraint_namespaces" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php" line="134" class="Tests\Feature\DiscoverySitemapNamespaceAdmissionTest" classname="Tests.Feature.DiscoverySitemapNamespaceAdmissionTest" assertions="0" time="0.012193">
+        <skipped/>
+      </testcase>
+      <testcase name="test_sqlite_named_inline_check_and_fk_clauses_do_not_reserve_foreign_index_names" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php" line="149" class="Tests\Feature\DiscoverySitemapNamespaceAdmissionTest" classname="Tests.Feature.DiscoverySitemapNamespaceAdmissionTest" assertions="3" time="0.017005"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,2 @@
+PHP 8.4.26
+/workspace/VA-Studio-discovery-schema-repair/app/Domain/Catalog/DiscoverySitemap/SitemapSchema.php

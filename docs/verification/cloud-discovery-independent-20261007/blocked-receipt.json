@@ -1,0 +1,21 @@
+{
+  "decision": "WITHHELD",
+  "actual_tested_source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+  "actual_root_composition_with_identical_schema": "bfb7bd0aeafa198415c94b720d116955373be934",
+  "schema_git_blob": "6c0ab7f92d05811466cf7ae32654373f46d284fb",
+  "schema_sha256": "1ef4b5b6ba1d048f3a045b22362c5786e1ba3d55da167fe68a0bbc78be705af1",
+  "probe_sha256": "ccdb1487b0970d0935ebfe505cf01690c2065c1611b624f560cf644ccab70da1",
+  "actual_native": {
+    "tests": 1,
+    "assertions": 4,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0
+  },
+  "native_version": "8.0.46-0ubuntu0.24.04.4",
+  "finding": "foreign reserved windows_bounds CHECK ignored before DDL; generations table plus three guards are created before native duplicate CHECK3822 on later windows table",
+  "foreign_data_preserved": true,
+  "own_synthetic_prefix_removed_after_probe": true,
+  "database": "distinct limited reviewer database/account, never author schema",
+  "root_http_review": "continues separately on frozenroot; positive HTTP cannot close this DDL blocker"
+}

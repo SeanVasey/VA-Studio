@@ -1,0 +1,29 @@
+{
+  "source": "bfb7bd0aeafa198415c94b720d116955373be934",
+  "root_evidence": "fef0f7a42b82bd6c543ddb977ae0f9dc1353ea99",
+  "author_source": "97d5db7895bfdb56e9de3d77cce36b6c9156902d",
+  "author_evidence": "1b7625b07200f2c2e8c4856409aae56cebd3b2dd",
+  "root_source_bindings_verified": 23,
+  "root_artifacts_verified": 14,
+  "author_source_bindings_verified": 19,
+  "author_unchanged_dependencies_verified": 7,
+  "author_artifacts_verified": 48,
+  "five_prior_snapshot_methods_byte_exact": true,
+  "schema_status": "HELD: own exact native CHECK namespace before-DDL canary failure on byte-exact author/root schema; 0e528a4f7cbe7d80eb6188193115e68358ba77e1",
+  "failures": [],
+  "expected_owned_registration_deltas": [
+    {
+      "path": "app/Http/Controllers/DiscoveryTrackSitemapController.php",
+      "author_sha256": "a8d3b73c219dcbf5f89970b093dbae0903cd3e406953ff4208b527871f9f7dd9",
+      "root_sha256": "7bdea01c6f5df898e980059b36df2fe1f1b0b2a86ec19e711e187d98a4a393c1",
+      "reviewed_change": "Direct Response constructors following terminal proof"
+    },
+    {
+      "path": "routes/discovery-track-sitemaps.php",
+      "author_sha256": "567d817b2d17581bc2026d55ab28ebd9fd79c6ecc953d4b1bca180b004e62d62",
+      "root_sha256": "55f196571caf7c8b8441080349527adc4d9ef2e57afcb369082e6be7671cb12e",
+      "reviewed_change": "Explicit 120/minute limiter avoids absent named limiter; route remains outside web/session group"
+    }
+  ],
+  "author_bindings_byte_exact_in_root": 24
+}

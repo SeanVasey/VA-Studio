@@ -1,0 +1,10 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-discovery-registration-independent/docs/verification/cloud-discovery-registration-independent-20261007/sqlite-http-selection.xml
+
+....                                                                4 / 4 (100%)
+
+Time: 00:02.590, Memory: 85.00 MB
+
+[30;42mOK (4 tests, 68 assertions)[0m
