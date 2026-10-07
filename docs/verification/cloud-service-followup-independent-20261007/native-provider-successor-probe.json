@@ -1,0 +1,9 @@
+{
+    "tested_source": "62de352163c25630530cd2467f1cef1461f8b56f",
+    "driver": "mysql",
+    "genuine_provider_callback_fired": true,
+    "quote_audit_was_created": true,
+    "command_refused": true,
+    "retained_rows_exact": true,
+    "service_event_count": 0
+}

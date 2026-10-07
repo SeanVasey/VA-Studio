@@ -1,0 +1,10 @@
+{
+    "tested_source": "e9cae388dae632b235c1f05870fd9930a12f56aa",
+    "driver": "mysql",
+    "genuine_customer_access_resolver_fired": true,
+    "acceptance_audit_created": true,
+    "command_refused": true,
+    "retained_rows_exact": true,
+    "prior_service_event_count": 1,
+    "final_service_event_count": 1
+}
