@@ -181,6 +181,24 @@ to the adapter owner. Its repaired successor must be composed and independently
 reviewed before service attachment acceptance. Exact frozen source maps and fresh
 native selections follow in the evidence child.
 
+Independent adapter assessment approves the exact corrected service adapter
+`c7bc89460ab10f2ea2317dd63909cc4499179d65` for its existing rehearsal family and
+unchanged support contracts: captured policy/stamp dependencies resolve before
+the final raw actor/account/source snapshots, and pure flag checks follow those
+snapshots. Actual consumer composition `2841ddd846c66c5c23d077ae49bf5ef6b559639b`
+passed selected SQLite61/562 and native8/56. The two original unchanged resolver
+canaries pass SQLite2/10 and native2/10. This is an adapter/consumer assessment,
+not approval of superseded broader service source or root's future registration.
+
+A final inquiry-specific probe found a separate panel-policy evaluation closure
+after admission/key comparison. That closure could disable inquiry intake and
+still finish a scan. It is confirmed red on SQLite and native, each one failure
+and zero errors; the source ordering is repaired so panel evaluation precedes
+admission/key comparison and raw retained rows. Fresh successor receipts cover
+that exact boundary. The initial probe accidentally changed MFA required=false
+to true and got403; that invalid setup receipt is preserved, then corrected to
+retain the existing false MFA policy while withdrawing only inquiry intake.
+
 Development receipts preserve the initial missing-test-key fixture errors,
 MySQL CHECK-literal canonicalization mismatch, and GET/empty-JSON test harness
 errors. The corrected source has fresh SQLite domain/schema/actual HTTP checks,

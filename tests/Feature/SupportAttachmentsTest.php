@@ -12,6 +12,7 @@ use App\Domain\SupportAttachments\AttachmentRemoval;
 use App\Domain\SupportAttachments\FixtureAttachmentPolicy;
 use App\Domain\SupportAttachments\InquiryAttachmentAuthority;
 use App\Domain\SupportAttachments\SupportAttachments;
+use Filament\Facades\Filament;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\QueryException;
 use Illuminate\Encryption\Encrypter;
@@ -538,6 +539,38 @@ class SupportAttachmentsTest extends TestCase
         $this->assertSame('pending', $result['cleanup']);
         $this->assertFileExists($path);
         $this->assertSame(hash_file('sha256', $this->input), hash_file('sha256', $path));
+    }
+
+    public function test_terminal_inquiry_panel_callback_cannot_withdraw_intake_and_finish_scan(): void
+    {
+        $id = $this->intake()['attachment']['attachmentId'];
+        $calls = 0;
+        $scanner = new class extends TestOnlyMediaScanner
+        {
+            public $callback;
+
+            public function scan(string $path): array
+            {
+                ($this->callback)();
+
+                return parent::scan($path);
+            }
+        };
+        $scanner->callback = function () use (&$calls): void {
+            Filament::getPanel('admin')->requiresMultiFactorAuthentication(function () use (&$calls): bool {
+                if (++$calls === 6) {
+                    $this->assertSame(6, $calls);
+                    config(['inquiries.enabled' => false]);
+                }
+
+                return false;
+            });
+        };
+        $consumer = new SupportAttachments(new AttachmentRegistry(['inquiry' => new InquiryAttachmentAuthority], ['original_inquiry_session_v1' => new FixtureAttachmentPolicy]), new AttachmentFiles, $scanner);
+        $this->refused(fn () => $consumer->process('inquiry', $this->source(), 0, $id, 0, AttachmentActor::operator($this->fixture['actor'])), 503);
+        $this->assertSame(6, $calls);
+        $this->assertFalse(config('inquiries.enabled'));
+        $this->assertSame('scanning', DB::table('support_attachments')->first()->state);
     }
 
     private function cryptoCallback(int $target, callable $callback): void
