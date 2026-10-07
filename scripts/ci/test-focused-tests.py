@@ -62,8 +62,9 @@ class SelectionTests(unittest.TestCase):
             self.assertEqual(selected.kind, "php")
             self.assertEqual(selected.files, required)
             focused.validate_files(ROOT, selected)
-        selected_classes = {"Tests\\\\" + path.removeprefix("tests/").removesuffix(".php").replace("/", "\\\\")
+        selected_classes = {"Tests\\" + path.removeprefix("tests/").removesuffix(".php").replace("/", "\\")
                             for path in required}
+        self.assertIn("Tests\\Feature\\MembershipCreditMigrationTest", selected_classes)
         policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
         self.assertFalse(any(row[0] in selected_classes for row in policy["methods"]))
 
