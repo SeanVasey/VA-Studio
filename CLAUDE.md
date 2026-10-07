@@ -144,6 +144,14 @@ Repo-specific facts and invariants. §1–§12 stay byte-identical across repos;
 - **Deploy:** none configured; the production host is undecided (U-02 in `docs/architecture/decision-register.md`).
 - **Invariants** (§1.8 rules land here): none yet.
 
+### Current user-authorized handoff — October 7, 2026
+
+Read `docs/handoff/2026-10-07/README.md` and its final branch inventory before continuation. Sean requested completion/push of current development batches and handoff of remaining implementation to another harness. Preserve reviewed main, unfinished branches, original failures and immutable originals as separately attributed source.
+
+Sean's current `AGENTS.md` CI cost policy supersedes earlier gate adaptations here: focused affected checks, independent sensitive review and cheap preflight authorize development merges. Foundation remains one manual final integrated exact-SHA verification; do not restore automatic database/browser matrices or weaken security/protections. Current partitioning uses eight MySQL/two SQLite shards with an exact native-only SQLite method census, which still needs normalization after new families. No final handoff acceptance is claimed.
+
+Synthetic membership test setup is explicitly approved. Live credentials/payments, real money, purchased services, production deployment and DNS/cutover still require separate authorization. The production preparation queue records developed versus queued work. Direct PHPUnit with worktree-specific Composer autoload avoids the restored Artisan Collision issue; see the handoff for exact source-bound commands and engine limitations.
+
 ### Adaptations of §1–§12 (pending Sean's confirmation)
 
 - **§3 gate:** no linter is enforced yet. SQLite runs skip MySQL-only race tests by design; the four MySQL CI shards run them with zero skips.
