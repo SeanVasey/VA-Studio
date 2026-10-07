@@ -252,3 +252,108 @@ cc74fa1fb9816b1c1fa1fb3e2214648263672401a9433af9ed32d19daeba38ee  review-evidenc
 ```
 
 `review-evidence/evidence-sha256.txt` hashes every evidence artifact in this folder.
+
+---
+
+## Addendum: re-review of `e86381bf139b4351bba534f3fe0b26f4f8efbdd0` (2026-10-07)
+
+The original decision for `d20d4394` above is unchanged. This addendum covers only commit `e86381bf139b4351bba534f3fe0b26f4f8efbdd0` (branch `claude/stoic-archimedes-xza96q`). I checked it out detached in the same worktree. Its evidence is in `review-evidence/e86381bf/`.
+
+**Decision for `e86381bf`: APPROVE.** The scope and exclusions in §1 still apply. Both conditions from the original decision are resolved. Nothing remains open on this commit. Some requirements carry forward to downstream work and to release; they are listed in part (d).
+
+### (a) Diff `d20d4394..e86381bf`: confirmed
+
+`git log d20d4394..e86381bf` lists four commits: `4d147c29`, `aa514349`, `4a8cec40` and `e86381bf`.
+
+`git diff --name-only d20d4394 e86381bf | grep -v '^docs/'` returns exactly four paths. `git diff --stat ... -- app tests routes config database` reports 2 files, +93 lines.
+
+| Path | Change |
+| --- | --- |
+| `app/Domain/Commerce/ProductionCheckout/CommandTransaction.php` | +14: the cleanup in the catch block, plus three `use` lines |
+| `tests/Feature/ProductionCheckoutRefusedFrameCallbackTest.php` | new, 79 lines; my probe B |
+| `scripts/dev/mkworktree.sh` | new; links `vendor/bin` and copies `InstalledVersions.php` |
+| `CLAUDE.md` | one line in Project Notes, pointing to `CLAUDE-PLAN.md`; outside §1–§12, no runtime effect |
+
+Everything else is under `docs/`. Within that:
+
+- Condition 1 is resolved. `docs/verification/checkout-composition-20261007/` is committed, including the original red `observer-exclusion-red-sqlite.xml`.
+- My `review-evidence/` was copied to `independent-review/`. A `cmp` of all 16 files against my originals found every one byte-identical.
+- The 209 canary snapshot is archived under a new name. The tracked originals in `cloud-checkout-terminal-policy-independent-20261007/` are unchanged (`git diff --quiet` succeeds).
+- `OriginalCommitDispatcher.php` is unchanged; its SHA256 is still `ed529e8f…aabd`.
+
+The retained red `evidence/refused-frame-callback-red-sqlite-4a8cec40.xml` records 1 test, 10 assertions and 1 failure ("leaked into a later unrelated commit"). It ran against `CommandTransaction.php` with SHA256 `e2172b0f…da5d69` at `4a8cec40`, which is identical to the file at `d20d4394`. So the red was produced on the unfixed code.
+
+### (b) Runs on `e86381bf`
+
+| Driver | Selection | JUnit | Tests | Assertions | Failures | Errors | Skips |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| SQLite | `review-evidence/ReviewAdversarialCompositionTest.php` (probe A + probe B) | `e86381bf/sqlite-adversarial.xml` | 2 | 23 | **0** | 0 | 0 |
+| SQLite | `tests/Feature/ProductionCheckoutWriteCommitTest.php` | `e86381bf/sqlite-write-commit.xml` | 12 | 90 | 0 | 0 | 0 |
+| SQLite | `ProductionCheckoutRefusedFrameCallbackTest.php` + `ProductionCheckoutObserverExclusionTest.php` | `e86381bf/sqlite-refused-frame-and-exclusion.xml` | 3 | 29 | 0 | 0 | 0 |
+| SQLite | c6 physical canary (`--filter test_physical_committing_policy_withdrawal_prevents_new_order_rows`) | `e86381bf/sqlite-canary-c6-physical.xml` | 1 | 5 | 0 | 0 | 0 |
+| MySQL 8.4.11 (`vaseyaudio_review`) | Probe A + probe B | `e86381bf/native-adversarial.xml` | 2 | 23 | **0** | 0 | 0 (269.5 s) |
+
+- Probe B went from **red** at `d20d4394` (on both drivers) to **green** at `e86381bf` (on both drivers). Probe A stays green.
+- The native run started only after 60 s of server quiet (`e86381bf/native-wait.log`).
+- `e86381bf/native-server.txt` records `8.4.11 MySQL Community Server - GPL`.
+- The schema had 0 tables after the run.
+- The runner is `review-evidence/run-phpunit.sh`, unchanged. The native script is `e86381bf/run-native-e86.sh`.
+
+### (c) Can `rollback(name, 0)` at depth 0 discard someone else's record, and is the Reflection read acceptable?
+
+**Precondition argument: sound.**
+
+`CommandTransaction::run` refuses to start unless `transactionLevel() === 0` and `! $primary->inTransaction()`. At entry, then, no live Laravel or PDO transaction exists on this connection.
+
+The cleanup runs only when both of the following hold:
+
+- `$frame !== null`, so the command opened its own frame;
+- after `abort()`, `transactionLevel() === 0` on the captured connection object.
+
+At that point every `DatabaseTransactionRecord` for this connection name falls into one of two groups:
+
+1. Records created inside the refused command: its own level-1 record, plus any nested records from inside the closure.
+2. Stale records left over before entry. These have no live owner, because the connection was idle at entry.
+
+Discarding both groups is correct. Two specific cases:
+
+- **A listener reopened a transaction through Laravel.** If a committing listener opened a transaction with `DB::beginTransaction()`, Laravel's depth stays at or above 1, so the cleanup is skipped and that record is left untouched. This fails safe: the leak could remain in that privileged case, but nothing belonging to another owner is discarded.
+- **A listener reopened a transaction with raw PDO.** A raw-PDO replacement transaction has no manager record, so there is nothing to discard.
+
+`rollback(name, 0)` runs `removeAllTransactionsForConnection`. That fires the refused frame's after-rollback callbacks (the correct semantics) and clears its pending and staged records.
+
+**Normal closure-exception path.** When the closure itself throws, Laravel's `rollBack()` has already cleared the manager. The second call then finds `currentTransaction` null and nothing pending, so no callback runs twice.
+
+**Precedent.** Laravel's own `Connection::disconnect()` (`Connection.php:1079`) makes the same call, `transactionsManager?->rollback($this->getName(), 0)`.
+
+**Residual (Info).** Two cases remain, neither of which can make a refused order commit:
+
+- The manager is keyed by connection **name**. If a privileged listener replaced the named connection during the command, the frame already refuses. The cleanup could then drop manager bookkeeping (not PDO state) belonging to a replacement `Connection` object of the same name. This needs privileged connection replacement mid-command.
+- An after-rollback callback that throws would replace the original exception. The command is still refused and `restore()` still runs.
+
+**Reflection versus `app('db.transactions')`: acceptable, and preferable.**
+
+- Reading the connection's own `transactionsManager` targets exactly the manager that holds this connection's records. The container binding could in principle differ from the instance set on the connection.
+- `Connection` has no public getter. The property is protected (`Connection.php:155`) in the locked Laravel v13.34.0, and the checkout code already reflects on Container and Repository internals.
+- The `instanceof DatabaseTransactionsManager` check also admits Laravel's testing subclass.
+- If a future Laravel version renamed the property, `ReflectionProperty` would throw inside the catch. The command would still be refused and the code would fail closed, not open. Pin this coupling with the regression test when upgrading Laravel.
+
+### (d) Status and carry-forward
+
+Both conditions are met. Condition 1 (F-2): the evidence is committed and the snapshot was kept out. Condition 2 (F-1): the fix is in, with the regression test and a retained red. **`e86381bf` is approved without conditions**, within the original §1 scope. Paid252, grants, tax, live payments and release are still not approved.
+
+These requirements are not conditions on this commit. They carry forward:
+
+1. **Receipt-lane consumers.** The receipt observer owns no transaction, so a consumer that runs its own transaction around a receipt (Paid252 and future grant consumers) must perform the same manager cleanup after its physical abort. This fix covers only `CommandTransaction`. Each consumer's review should include a probe-B-style regression on both drivers.
+2. **Release gates.** Final integrated exact-SHA Foundation CI, and independent review of downstream consumers, remain release gates.
+3. **Worktree helper (Info).** `scripts/dev/mkworktree.sh` defaults `main` to `git rev-parse --show-toplevel`. Run from inside a linked worktree, it chains symlinks through that worktree's vendor directory. Set `VA_STUDIO_MAIN` to avoid this.
+
+Source digests for this addendum are in `review-evidence/e86381bf/source-sha256.txt`:
+
+```
+fd8fccde5538dd316bb1d799e91e0a718fd6289cf7a793fc898e6eaaba394be8  app/Domain/Commerce/ProductionCheckout/CommandTransaction.php
+a07f2765b7f1a4b7e7a45a9b92418f2d304efd4f829f98a68d23e89259f8c980  tests/Feature/ProductionCheckoutRefusedFrameCallbackTest.php
+bdb6fd945cea8265d5534f544ef56214e2bb1796a763efe67112787ec5fde471  scripts/dev/mkworktree.sh
+6bbd5bae16d62eee805b444f28d7cd735b38844afbf3eea07cafb4a2f3566a20  CLAUDE.md
+ed529e8f69b2ae6733d767aeae6bebd693faa114c55cd1c5c3a3a5824ddcd372  app/Domain/Commerce/ProductionCheckout/OriginalCommitDispatcher.php
+```
