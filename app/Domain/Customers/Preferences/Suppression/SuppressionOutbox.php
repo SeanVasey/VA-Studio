@@ -101,6 +101,43 @@ final class SuppressionOutbox
         }
     }
 
+    /**
+     * Recipient captured by this account's oldest retained target that still needs this
+     * operation: a claimed target, else (send) one without an attempt, else (inspect) one
+     * whose attempt under the current binding has no confirmation. Selection never uses
+     * the current account email; graph() then re-proves the target, HMAC and withdrawal.
+     */
+    public function retained(CustomerPrincipal $principal, SuppressionEvidence $proof, array $policy, ?string $claimed, bool $inspect): ?string
+    {
+        try {
+            $values = [$principal->accountId, ConsentPolicy::PURPOSE];
+            $where = 'customer_account_id=? AND purpose=? AND ';
+            if ($claimed !== null) {
+                [$where, $values] = [$where.'public_id=?', [...$values, $claimed]];
+            } elseif (! $inspect) {
+                $where .= 'NOT EXISTS (SELECT 1 FROM customer_suppression_attempts WHERE customer_suppression_attempts.target_id=customer_suppression_targets.id)';
+            } elseif ($policy['hash'] !== null) {
+                [$where, $values] = [$where.'EXISTS (SELECT 1 FROM customer_suppression_attempts WHERE customer_suppression_attempts.target_id=customer_suppression_targets.id'
+                    .' AND customer_suppression_attempts.binding_hash=? AND NOT EXISTS (SELECT 1 FROM customer_suppression_confirmations'
+                    .' WHERE customer_suppression_confirmations.attempt_id=customer_suppression_attempts.id))', [...$values, $policy['hash']]];
+            } else {
+                return null;
+            }
+            $targets = $proof->capture('customer_suppression_targets', $where, $values, 1, 'id ASC');
+            if ($targets === []) {
+                return null;
+            }
+            $capture = self::plain($targets[0]['recipient_ciphertext']);
+            if (! is_string($capture['email'] ?? null)) {
+                throw new ConsentException(503);
+            }
+
+            return $capture['email'];
+        } catch (Throwable) {
+            throw new ConsentException(503);
+        }
+    }
+
     private function event(array $event, int $account, string $recipient): void
     {
         $capture = self::plain($event['recipient_ciphertext']);

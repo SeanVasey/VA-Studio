@@ -1,0 +1,57 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-p2/phpunit.xml
+
+EEEE                                                                4 / 4 (100%)
+
+Time: 00:04.431, Memory: 79.00 MB
+
+There were 4 errors:
+
+1) Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close@rollback then statement with data ('rollBack', 'statement')
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 8 attempt to write a readonly database (Connection: sqlite, Database: :memory:, SQL: insert into "committed_frame_fixture" ("id") values (7))
+
+/home/user/VA-Studio-p2/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php:298
+
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 8 attempt to write a readonly database
+
+/home/user/VA-Studio-p2/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php:298
+
+2) Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close@rollback then transaction with data ('rollBack', 'transaction')
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 8 attempt to write a readonly database (Connection: sqlite, Database: :memory:, SQL: insert into "committed_frame_fixture" ("id") values (7))
+
+/home/user/VA-Studio-p2/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php:300
+/home/user/VA-Studio-p2/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php:300
+
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 8 attempt to write a readonly database
+
+/home/user/VA-Studio-p2/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php:300
+/home/user/VA-Studio-p2/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php:300
+
+3) Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close@commit then statement with data ('commit', 'statement')
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 8 attempt to write a readonly database (Connection: sqlite, Database: :memory:, SQL: insert into "committed_frame_fixture" ("id") values (7))
+
+/home/user/VA-Studio-p2/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php:298
+
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 8 attempt to write a readonly database
+
+/home/user/VA-Studio-p2/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php:298
+
+4) Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest::test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close@commit then transaction with data ('commit', 'transaction')
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 8 attempt to write a readonly database (Connection: sqlite, Database: :memory:, SQL: insert into "committed_frame_fixture" ("id") values (7))
+
+/home/user/VA-Studio-p2/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php:300
+/home/user/VA-Studio-p2/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php:300
+
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 8 attempt to write a readonly database
+
+/home/user/VA-Studio-p2/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php:300
+/home/user/VA-Studio-p2/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php:300
+
+ERRORS!
+Tests: 4, Assertions: 16, Errors: 4.
