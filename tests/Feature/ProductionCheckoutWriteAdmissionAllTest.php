@@ -6,6 +6,7 @@ use App\Domain\Commerce\ProductionCheckout\ApproveExemptionAuthority;
 use App\Domain\Commerce\ProductionCheckout\CheckoutCommandCommitDispatcher;
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use App\Domain\Commerce\ProductionCheckout\CheckoutSchema;
+use App\Domain\Commerce\ProductionCheckout\CheckoutStaffWriteAdmission;
 use App\Domain\Commerce\ProductionCheckout\ExecutionContextV1;
 use App\Domain\Commerce\ProductionCheckout\HostedCheckout;
 use App\Domain\Commerce\ProductionCheckout\ProviderGateway;
@@ -66,7 +67,8 @@ class ProductionCheckoutWriteAdmissionAllTest extends TestCase
         app('events')->listen(TransactionCommitting::class, function (): void {
             config(['production_checkout.fresh_checkout_enabled' => false]);
         });
-        $this->assertRefused(null, fn () => $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']));
+        // The frame's retained config snapshot refuses before the capsule's own fresh admission.
+        $this->assertRefused('write_frame', fn () => $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']));
         $this->assertSame([], $f['gateway']->creates);
         $this->assertDatabaseCount(CheckoutSchema::TABLES['intent'], 0);
     }
@@ -105,7 +107,8 @@ class ProductionCheckoutWriteAdmissionAllTest extends TestCase
                 'closure_ciphertext' => 'SYNTHETIC CLOSURE AFTER THE INTENT COMMIT', 'closure_hash' => hash('sha256', 'synthetic-closure'),
                 'canonicalization_version' => 'vasey-json-v1', 'created_at' => $candidate['created_at']]);
         }));
-        $this->assertRefused(null, fn () => $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']));
+        // proveCreatable()'s retained raw history comparison refuses with the existing reason code.
+        $this->assertRefused('changed', fn () => $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']));
         $this->assertSame([], $f['gateway']->creates);
         $this->assertDatabaseCount(CheckoutSchema::TABLES['intent'], 1);
         $this->assertDatabaseCount(CheckoutSchema::TABLES['observation'], 0);
@@ -142,7 +145,8 @@ class ProductionCheckoutWriteAdmissionAllTest extends TestCase
         app('events')->listen(TransactionCommitting::class, function (): void {
             config(['production_checkout.exemption_authoring_enabled' => false]);
         });
-        $this->assertRefused(null, fn () => app(ApproveExemptionAuthority::class)->approve($f['candidate']->id, F::exemptionPolicy($f), 'synthetic-owner-policy', $f['actor']));
+        // The frame's retained config snapshot refuses first; the capsule's own check is proven separately below.
+        $this->assertRefused('write_frame', fn () => app(ApproveExemptionAuthority::class)->approve($f['candidate']->id, F::exemptionPolicy($f), 'synthetic-owner-policy', $f['actor']));
         $this->assertDatabaseCount(CheckoutSchema::TABLES['authority'], 0);
         $this->assertFalse(DB::connection()->getRawPdo()->inTransaction());
     }
@@ -162,29 +166,58 @@ class ProductionCheckoutWriteAdmissionAllTest extends TestCase
         $this->assertDatabaseCount(CapabilityHistory::CLOSURES, 0);
     }
 
-    public function test_committing_owner_delegation_and_offer_withdrawals_refuse_new_basis(): void
+    public static function basisWithdrawals(): array
+    {
+        return ['owner delegation' => ['owner', 'write_frame'], 'offer' => ['offer', 'write_source_changed']];
+    }
+
+    #[DataProvider('basisWithdrawals')]
+    public function test_committing_owner_delegation_or_offer_withdrawal_refuses_new_basis(string $withdrawal, string $reason): void
     {
         $catalog = F::catalog();
         $buyer = $this->enrollThroughLocalSmtp();
         $authority = app(ApproveExemptionAuthority::class)->approve($catalog['candidate']->id, F::exemptionPolicy($catalog), 'synthetic-owner-policy', $catalog['actor']);
         $trackId = $catalog['items'][0]['trackId'];
-        $withdrawals = [
-            fn () => config(['production_checkout.exemption_policy_owner_ids' => []]),
-            fn () => DB::table('offers')->where('track_id', $trackId)->update(['is_active' => false]),
-        ];
-        foreach ($withdrawals as $i => $withdraw) {
-            $active = true;
-            app('events')->listen(TransactionCommitting::class, function () use ($withdraw, &$active): void {
-                if ($active) {
-                    $withdraw();
+        app('events')->listen(TransactionCommitting::class, function () use ($withdrawal, $trackId): void {
+            match ($withdrawal) {
+                'owner' => config(['production_checkout.exemption_policy_owner_ids' => []]),
+                'offer' => DB::table('offers')->where('track_id', $trackId)->update(['is_active' => false]),
+            };
+        });
+        $this->assertRefused($reason, fn () => $this->qualify($catalog, $buyer, $authority, 'synthetic-qualified-buyer'));
+        $this->assertDatabaseCount(CheckoutSchema::TABLES['basis'], 0);
+        $this->assertSame(0, DB::table('offers')->where('track_id', $trackId)->where('is_active', false)->count());
+    }
+
+    public function test_staff_capsule_fresh_admission_itself_refuses_authoring_and_owner_withdrawal(): void
+    {
+        $f = F::catalog();
+        $refusals = [];
+        app('events')->listen(TransactionCommitting::class, function () use (&$refusals): void {
+            $observer = DB::connection()->getEventDispatcher();
+            if (! $observer instanceof CheckoutCommandCommitDispatcher) {
+                return;
+            }
+            // Test-only reach into the sealed observer: prove the capsule's own pure config check, which the
+            // frame's config snapshot otherwise pre-empts during an ordinary commit.
+            $admission = (new \ReflectionProperty(CheckoutCommandCommitDispatcher::class, 'admission'))->getValue($observer);
+            $this->assertInstanceOf(CheckoutStaffWriteAdmission::class, $admission);
+            $original = config('production_checkout');
+            foreach ([['exemption_authoring_enabled' => false], ['exemption_policy_owner_ids' => []]] as $withdrawal) {
+                config(['production_checkout' => [...$original, ...$withdrawal]]);
+                try {
+                    $admission->proveFresh();
+                    $refusals[] = 'admitted';
+                } catch (CheckoutException $error) {
+                    $refusals[] = $error->reason;
                 }
-            });
-            $this->assertRefused(null, fn () => $this->qualify($catalog, $buyer, $authority, 'synthetic-qualified-buyer-'.$i));
-            $active = false;
-            config(['production_checkout.exemption_policy_owner_ids' => [$catalog['actor']->id]]);
-            $this->assertDatabaseCount(CheckoutSchema::TABLES['basis'], 0);
-            $this->assertSame(0, DB::table('offers')->where('track_id', $trackId)->where('is_active', false)->count());
-        }
+                config(['production_checkout' => $original]);
+            }
+            $admission->proveFresh();
+        });
+        app(ApproveExemptionAuthority::class)->approve($f['candidate']->id, F::exemptionPolicy($f), 'synthetic-owner-policy', $f['actor']);
+        $this->assertSame(['authority', 'authority'], $refusals);
+        $this->assertDatabaseCount(CheckoutSchema::TABLES['authority'], 1);
     }
 
     public function test_committing_capability_closure_refuses_new_intent_and_provider_io(): void
@@ -308,15 +341,13 @@ class ProductionCheckoutWriteAdmissionAllTest extends TestCase
             $catalog['items'], $this->attestation, $key, $catalog['actor']);
     }
 
-    private function assertRefused(?string $reason, \Closure $command): void
+    private function assertRefused(string $reason, \Closure $command): void
     {
         try {
             $command();
             $this->fail('A withdrawn NEW checkout write was admitted.');
         } catch (CheckoutException $error) {
-            if ($reason !== null) {
-                $this->assertSame($reason, $error->reason);
-            }
+            $this->assertSame($reason, $error->reason);
         }
         $this->assertSame(0, DB::transactionLevel());
     }
