@@ -61,9 +61,9 @@ sensitive, flags still default-off unless Sean activates.
 | --- | --- | --- |
 | A1 | Checkout physical-write c6 + receipt 2ec composed, observer guard, refused-frame record fix, config int fix | **merged** PR #41 → `37653bf1`; release blocker A1b below |
 | A1b | Frame admission for intent/basis/authority writes + initiate() re-proof (Codex P1/P2 ×2) | lane `harness/checkout-write-admission-all` running; RELEASE BLOCKER |
-| A2 | Paid252 consumer on composed producer; native 409 root cause; whole-order delivery; root route mount | lane `harness/paid252-composition` running |
+| A2 | Paid252 consumer on composed producer; native 409 root cause; whole-order delivery; root route mount | composed + diagnosed on `harness/paid252-composition` (pushed): root cause is identity `IdentityMigrationOwnership::inspect()` cost (~470 metadata statements per identity assertion on MySQL) exhausting the 60 s authorization budget; fix routed to `harness/native-schema-isolation`; HTTP whole-order and root mount still open |
 | A3 | Tax255: `ProductionTaxCheckout`, Stripe Checkout `automatic_tax`, SourceV2 + V2 consumer adapter, migration 255000, default off | queued after A1 |
-| A4 | Live-payment preparation packet: SDK/API/mode preflight, webhook signature+dedup checks, unknown-outcome reconciliation, dry-run commands, activation checklist with Sean's inputs | queued after A3 |
+| A4 | Live-payment preparation packet: SDK/API/mode preflight, webhook signature+dedup checks, unknown-outcome reconciliation, dry-run commands, activation checklist with Sean's inputs | lane `harness/production-preparation-1` running (with F1 backup/restore + config templates) |
 | A5 | Refund/dispute lifecycle (T21) on top of A2 provider-authoritative state | after A4 |
 
 ### Phase B — Customer identity, features, mail (T23/T32)
