@@ -1,0 +1,8 @@
+{
+    "source": "0143f4b6bb7c529aed003fdfc741bf93f2e3a9ed",
+    "driver": "mysql",
+    "last_actual_ddl_callback_fired": true,
+    "migration_refused": false,
+    "status": 0,
+    "recorded": 1
+}

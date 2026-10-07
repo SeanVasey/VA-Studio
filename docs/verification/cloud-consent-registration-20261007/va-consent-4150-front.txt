@@ -1,0 +1,13 @@
+
+> test
+> vitest run tests/frontend/customer-communication-preferences.test.tsx tests/frontend/customer-communication-registration.test.tsx tests/frontend/customer-account.test.tsx
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-consent-registration
+
+
+ Test Files  3 passed (3)
+      Tests  63 passed (63)
+   Start at  09:16:11
+   Duration  3.67s (tests 44%, environment 27%, transform 16%, import 9%, setup 4%)
+

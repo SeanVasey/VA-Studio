@@ -1,0 +1,248 @@
+{
+  "approved_source": "7e80766c7b0142039b4c2a0b239bf372ab6be1d9",
+  "approved_tree": "b57321f9d91494ce05d8072b3b9620b95c598fdc",
+  "prior_notes_approval": "af87b702c09d40a23ff78e29e3a9ef282b59e1bc",
+  "independent_service_approval": "7dc8bd8028d6b4eb4a73cbc9b10e9b9402cec63e",
+  "decision": "approve bounded notes composition; original focused native proof carried only by exact unchanged source",
+  "reviewed_source_bindings": 31,
+  "unchanged_bindings": 28,
+  "changed_base_paths": [
+    "app/Http/Controllers/CustomerSessionController.php",
+    "bootstrap/app.php",
+    "resources/js/Pages/CustomerLibrary.tsx"
+  ],
+  "source": {
+    "app/Domain/Customers/CustomerAccess.php": {
+      "previous_blob": "310bb10219405110a3db5a5844132c42d0291887",
+      "final_blob": "310bb10219405110a3db5a5844132c42d0291887",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "cb59745ecbdea2a9cedce51be535d428f2e1a3613829547716e9633fbff061bd"
+    },
+    "app/Domain/Customers/CustomerAccessPolicy.php": {
+      "previous_blob": "ceccc3a417413dec27b855d465d30349cef20fa3",
+      "final_blob": "ceccc3a417413dec27b855d465d30349cef20fa3",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "2a144608b6988d0cd96a1f2eb9b7164c226b3fa60e822496bda8fe3f2099fd40"
+    },
+    "app/Domain/Customers/CustomerPrincipal.php": {
+      "previous_blob": "5fea086aee4cb54b1aa51deb16028fd78c66a5b2",
+      "final_blob": "5fea086aee4cb54b1aa51deb16028fd78c66a5b2",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "e7407ed4c9aa90f8bb9850d4d91f2d7dc5aa650a12c767e529db44c08cf63e10"
+    },
+    "app/Domain/Customers/Listening/ListeningEvidence.php": {
+      "previous_blob": "35629fc027f6ebacf6ed427635b9e13869caeb07",
+      "final_blob": "35629fc027f6ebacf6ed427635b9e13869caeb07",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "4b22665239f1df455b29c41b91196b6c910822105b72168a1dca4ed677e807c3"
+    },
+    "app/Domain/Customers/Listening/ListeningLibrary.php": {
+      "previous_blob": "7600e870f510a868f09fbf66fd348f52cadeb285",
+      "final_blob": "7600e870f510a868f09fbf66fd348f52cadeb285",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "9823cc3eed3253c1fd3f1a6da6b4c86f69ca4563ff2a9d3ff918bb75437f0c75"
+    },
+    "app/Domain/Customers/Listening/SavedListeningLibrary.php": {
+      "previous_blob": "4f2cba6a93cb3430890cba7f676195bfe2cb3528",
+      "final_blob": "4f2cba6a93cb3430890cba7f676195bfe2cb3528",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "a16d0d1fc1095563ffee8409633ea1a53a1f2dc34718f5ef0fba0cd4706d863c"
+    },
+    "app/Http/Controllers/CustomerListeningLibraryController.php": {
+      "previous_blob": "947b940daffcbf766e5334bea767917b0f02d770",
+      "final_blob": "947b940daffcbf766e5334bea767917b0f02d770",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "5be8b7f9e5ee70ccb11f8c8dc1f0b03667cfa868cbe1f1594941c20d48a06d40"
+    },
+    "app/Http/Controllers/CustomerSessionController.php": {
+      "previous_blob": "64e402217b9d2da6f31e44980620786275e68e72",
+      "final_blob": "6b82e0e070815eb8d36f4f44a4d0fe3ca2ed5def",
+      "unchanged_from_approved_notes": false,
+      "matches_approved_service": true,
+      "sha256": "9063fc5e3a44e43606d2c907a9fcfd39566ec1ae5c6a1bf3bb45fce899985dfc"
+    },
+    "app/Http/Middleware/CustomerPrivacy.php": {
+      "previous_blob": "581c64d83facfd10643a51a8ecc37be6e1662e61",
+      "final_blob": "581c64d83facfd10643a51a8ecc37be6e1662e61",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "d8ed53a590baade9670b8c87d0ce2d05526b104ad2b8121bd038cd65e5e976e8"
+    },
+    "app/Http/Requests/CustomerListeningRequest.php": {
+      "previous_blob": "818e4f79c0402e766410c9162a5941d6c39ed713",
+      "final_blob": "818e4f79c0402e766410c9162a5941d6c39ed713",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "570a20e18e45ddc630bc19612d1f8f68ea06dbe0ae039dc797d3ed9986713048"
+    },
+    "bootstrap/app.php": {
+      "previous_blob": "3f7490431123668efc6a76fd8dc78ad29d985c2c",
+      "final_blob": "ad1074da34581130a90c7ca61b528c29c6c5b42a",
+      "unchanged_from_approved_notes": false,
+      "matches_approved_service": true,
+      "sha256": "e9fcaa1432324ca8cc7e3edab0c5ae978a75ba1aed5683f1a3230196c2fd4ce5"
+    },
+    "composer.json": {
+      "previous_blob": "cbb669c31bb1610a4b9cd93b2762905a82a7312c",
+      "final_blob": "cbb669c31bb1610a4b9cd93b2762905a82a7312c",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "132cb2a16c6ce2960d059cfddecae8e1accf6138a258dd8bab2c0c7b822f5607"
+    },
+    "composer.lock": {
+      "previous_blob": "9e58027dcd989282b026d56347e26ea867723db9",
+      "final_blob": "9e58027dcd989282b026d56347e26ea867723db9",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9"
+    },
+    "database/migrations/2026_10_07_242000_customer_saved_tracks.php": {
+      "previous_blob": "1c26493419f561e32fa9aaadfdba232b1eb2e04d",
+      "final_blob": "1c26493419f561e32fa9aaadfdba232b1eb2e04d",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "1202c18366e67012224745a12e06b2ef46d654725f2eeb48e779cf9569cd7392"
+    },
+    "package-lock.json": {
+      "previous_blob": "614350366e7af397c14603dae9272082ecfae066",
+      "final_blob": "614350366e7af397c14603dae9272082ecfae066",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "6407d3a63e3b6e04f5824f53c41b8dc8a33581f987b21d780c795480122f93ea"
+    },
+    "package.json": {
+      "previous_blob": "1c5a39755658dde7d625498391b4acf640994b5a",
+      "final_blob": "1c5a39755658dde7d625498391b4acf640994b5a",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "65db43e1b171566d2d89e075bc4a29af75a82a6782a3313751bb4d7e832a7ae0"
+    },
+    "resources/js/Pages/CustomerLibrary.tsx": {
+      "previous_blob": "0be66fb7450985512f342facb1dc021663bbec14",
+      "final_blob": "9e058aabcc7520d3f7771cb6911898efc7c9df31",
+      "unchanged_from_approved_notes": false,
+      "matches_approved_service": true,
+      "sha256": "fe19c03c50d1d3d413b252ecfd3e37a2eca847c0cb20700963204c7758f31ba7"
+    },
+    "resources/js/components/CustomerListeningLibrary.tsx": {
+      "previous_blob": "6e248d2d4897cd2d60a542908a2faff196248c4a",
+      "final_blob": "6e248d2d4897cd2d60a542908a2faff196248c4a",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "b220f5d3243fc22595a9bcd84543ae19f5f7bd026b406691c3790b6065261781"
+    },
+    "routes/customer.php": {
+      "previous_blob": "5ae1a0bb58d8cfa6abcf72bc8039a7c9a76f3f51",
+      "final_blob": "5ae1a0bb58d8cfa6abcf72bc8039a7c9a76f3f51",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "93ce38519eb528696e871b5a3e97a9d46f8009b1d8527d7a871b282cf111f44c"
+    },
+    "tests/Feature/CustomerListeningExportHttpTest.php": {
+      "previous_blob": "023f677aaf530e8f4ef0b7a404109dd3bd332177",
+      "final_blob": "023f677aaf530e8f4ef0b7a404109dd3bd332177",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "744954b3d6d360a6541b916b2e2e382b72f010ea918a5c264fd1da1f93cc3cf3"
+    },
+    "tests/Feature/CustomerListeningLibraryHttpTest.php": {
+      "previous_blob": "a865bad42082b0c026259c3c0ecad1dd10a28578",
+      "final_blob": "a865bad42082b0c026259c3c0ecad1dd10a28578",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "39efe2eec8b5ec7361b82815a48eaff40f1a4e12237d3d985ac9d73b4fd5c29b"
+    },
+    "tests/Feature/CustomerListeningNotesBoundaryTest.php": {
+      "previous_blob": "c421292f6a80839f4f36fc2d5bda07deba3d4d0a",
+      "final_blob": "c421292f6a80839f4f36fc2d5bda07deba3d4d0a",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "fd326e2f62eb731de8263d147c7f1fec2b46af408d8af7904103bbb86f2a2f0c"
+    },
+    "tests/Feature/CustomerListeningNotesCapacityTest.php": {
+      "previous_blob": "19e46b57c5148319de16655064cf1e344c556044",
+      "final_blob": "19e46b57c5148319de16655064cf1e344c556044",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "10518a05eedc81c84404c4db4db4c3adc409f12185df4fddb3c8ee659eaa03e0"
+    },
+    "tests/Feature/CustomerListeningNotesTest.php": {
+      "previous_blob": "c97ec46269c8d3e33f346ca19c7a7b6fba0243f9",
+      "final_blob": "c97ec46269c8d3e33f346ca19c7a7b6fba0243f9",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "6b0203731a7f304dc2c017bf3b05d0aad526ad3db8a5e23592bb540855090484"
+    },
+    "tests/Support/CustomerFixtures.php": {
+      "previous_blob": "df16f365a826300c14f8b3c6effdd4ac6479faf9",
+      "final_blob": "df16f365a826300c14f8b3c6effdd4ac6479faf9",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "7eb6b9ff2154a17f847b4b131e0f9bd3eb1df1e12096026ca858739ce4f56ec8"
+    },
+    "tests/TestCase.php": {
+      "previous_blob": "5f56769b8f2f608a753e30d8e342944560a655a3",
+      "final_blob": "5f56769b8f2f608a753e30d8e342944560a655a3",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "c1ab95960b6a3c234c48773131990da48f7fc7d3b901cb66a40af0dafa41df40"
+    },
+    "tests/frontend/customer-listening-library.test.tsx": {
+      "previous_blob": "fdf2e5b02cf248132a83af4599baeec438f5c9ea",
+      "final_blob": "fdf2e5b02cf248132a83af4599baeec438f5c9ea",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "228de8783f715ad12872f8ef19a8e996a8d72ba266a700d52f16dc8677d1922d"
+    },
+    "tests/frontend/customer-listening-notes.test.tsx": {
+      "previous_blob": "15f5473fb0e4b1c4d31eff99efc162724579856b",
+      "final_blob": "15f5473fb0e4b1c4d31eff99efc162724579856b",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "b50352d4813fbc977a8031a92e660a6637cdec28194035441fb346516eccdc0f"
+    },
+    "tsconfig.json": {
+      "previous_blob": "ec130eb7d02b818d63c93e4795dfca81d5ec93a3",
+      "final_blob": "ec130eb7d02b818d63c93e4795dfca81d5ec93a3",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "d0f84c4a7045f0fee81b3b22085a5aa8af65ba0a06777db9f10f9a85bd3f2c4d"
+    },
+    "vite.config.ts": {
+      "previous_blob": "98a7a8b3d50ea501270481d9731b8ed721de10ed",
+      "final_blob": "98a7a8b3d50ea501270481d9731b8ed721de10ed",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "24bc71759b96f1e48d3bf83ce4ece65ef5848f7fd40b477f475d7e930d6f66d3"
+    },
+    "vitest.config.ts": {
+      "previous_blob": "f7d3a59c9f5e1d73e42c47a22c2402037a3d509f",
+      "final_blob": "f7d3a59c9f5e1d73e42c47a22c2402037a3d509f",
+      "unchanged_from_approved_notes": true,
+      "matches_approved_service": false,
+      "sha256": "5c3bf6c180bea188e98e69de7fa39e5e6ffde84adbee58e51017d6028d18923a"
+    }
+  },
+  "root_reported_final_affected_selection": {
+    "source": "4d36 executable predecessor, code exact7e",
+    "php_cases": 21,
+    "php_assertions": 289,
+    "frontend_cases": 98,
+    "frontend_files": 5,
+    "typecheck": "passed",
+    "attribution": "Parent supplied actual execution; reviewer independently verified exact code, no new execution claimed"
+  },
+  "no_native_repeat_reason": "All consent-independent notes domain/request/privacy/controller/component/capacity/export test bytes and migration inputs remain unchanged; changed base paths exactly match approved7dc service registration. Existing real TEXT overflow and repaired422/no-write plus terminalexport proof remain valid within recorded8.0.46 limits.",
+  "limits": [
+    "Focused development approval only",
+    "No Foundation/browser/native8.4/production acceptance",
+    "This carry record does not approve pending consent250 or identity repair"
+  ]
+}

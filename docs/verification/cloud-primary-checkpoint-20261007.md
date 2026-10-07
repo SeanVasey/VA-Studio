@@ -7,7 +7,7 @@ or Mac execution was used. The current branch is
 
 ## Current recovery state
 
-Verified main3fb7dd0 includes the immediate PR25/26/23 repairs. Starting-state
+Verified mainda70eba includes the immediate PR25/26/23 repairs and PRs27–30. Starting-state
 sections below are historical. Current owned work and source receipts are in
 the newest milestone and current agent queue.
 
@@ -304,3 +304,110 @@ repairs captured permanent read/write/reader identity before review. Attachments
 failures; successor work is underway. Serviceadapterroot approvalbe8a494 binds
 originalSQLite/native red-now-green1/8 each and15exactsourcebindings. Checkout,
 free,consent/suppression and remaining personal-store scope continue separately.
+
+## Eighth milestone: service corrections merged; notes final-main composition
+
+PR30 expectedhead00705ad3d3c7b5455bf2197579c84bc18dc1fb6e merged
+asda70eba95c46522cd4084db4e79f764ba401fd7c at08:35:51UTC,
+tree34449b797650c78ffc72eacd26cbb11dcd2ca7d4. Fresh preflight37594438072
+passed scope/frontend/backend/aggregate with docs appropriatelyskipped. Actual
+mergeparents3fb7dd0/00705ad andtree match publishedcandidate. Automatic reviews
+were on old9d968 and their two threads now resolve true after meaningful source
+fixes; final actual independent review7dc supersedes13d. No claim that oldauto
+reviews certify updatedsource. PrimaryFFmainclean; no fullFoundation dispatch.
+
+Notes current7e80766 containsactualmain ancestry; all13notes sources exactaf87.
+Three onlybasechanges CustomerSessionController/bootstrap/CustomerLibrary are
+reviewedservice registration; no executablechange from tested4d36. Actual
+PHP21/289 and mounted98/TypeScript pass; bounded final-basereview precedesPR31.
+Consent rootHTTP16/171 and mounted63/TS pass, but250held for actual reservedname,
+missingdependency andlatepolicycallback defects; author repairs before251.
+T23 successor8e551ca fixes root-confirmed old-temp-user sign-in defect; identical
+independentcanary now1/5green. Remaining identity review/nativefinals are active.
+Attachments1914held for actualterminaldecrypt/stalereplay defects; corrected
+source/cleanupauthorization tests are active. T22 actualSMTP buyer/order/provider
+journeys are provisional onunapprovedidentity; its own shadowfences/races underway.
+Free245 continues. Fullpersonalstore/member/products/migration/host preparation
+and finalFoundation/native8.4/browser remain open. No external production action.
+
+## Ninth checkpoint: published notes held; corrected authority compositions
+
+PR31 publishedff4602cc849577232a6ab532d96edd772cc1b428 has successful
+cheap preflight37595386546 and completed automatic reviews on that exact source.
+Code finding4204862600 correctly identifies ordinary V1 favorite/playlist writes
+promoting to V2, unreadable by the previous reader during rollback/rolling deploy.
+Merge remains held. Crawler owns V1-safe ordinary writes and default-off promotion
+requiring an explicit stopped-upgrade rollout review reference; existing V2 reads
+must remain supported. Earlier capacity approval remains valid for unchanged code,
+but does not resolve this new compatibility finding. Main remainsda70eba.
+
+Consent correctedfa06b77/evidencef7afbc55 is composed with root719b0bd as
+d22e1ddc9f01089dec15c2eca0519c2bc5424876. The four real admission/callback
+failures remain retained; exact independent SQLite/native verification is active.
+Identity finalflag correctioneaaa55be atop8e is composed asd8d4cec: the unchanged
+root temporary-user/actualSMTP canary passes1/5. One initial invocation omitted
+the required synthetic APP_KEY and errored before enrollment; the corrected run
+uses an explicit synthetic key without source/test changes. The author's genuine
+unknown-role failure on8e is retained. Final source/native review precedes approval.
+
+Service attachmentb209 approval is superseded after actual customer/policy resolver
+withdrawal escaped the raw snapshot. Correctedc7bc894 resolves dependencies before
+the terminal raw proof; independent actual consumer probes pass SQLite2/10 and
+native2/10, all8 native consumers8/56. Root selectively composes contract1a,
+adaptere765/b209/c7 and consumer1914/5a on reviewed mainda70 as eaf550a in
+/workspace/VA-Studio-support-registration, without importing old unsafe service
+ancestry. The consumer is still held for a reproduced inquiry-panel callback gap;
+root shared registration/mounts are pending. Original projection/cleanup failures
+and native final-slot lock-wait proof remain preserved, not replaced by this hold.
+
+Checkout ownff4c674 is frozen; qualified-exemption flow and provider-calculated-tax
+successor, paid grants/product/member fulfillment remain open. Its borrowed identity
+8e is historical pending correcteaaa composition. Free245 and suppression251
+advance in owned branches. No whole-parent acceptance, final Foundation dispatch,
+external transport/payment, production credential, deployment or cutover is claimed.
+
+## Tenth checkpoint: notes compatibility approved for publication
+
+Corrected PR31 executabled412759ab193f7c7a5cbd2de91eb83320cbc9618 contains
+author49b9154 and one explicit synthetic rollout opt-in in the root HTTP fixture.
+Independentf18a3cf approves that actual source after SQLite34/207 executing the
+exact pinned prior reader and native8.0.46 capacity3/111. Root53/464, frontend82,
+TypeScript/scopedPint pass. All runtime/test source bindings match the publication
+descendant; raw receipts and originalff4602/SQL1406 failures stay retained.
+Ordinary V1 writes stay V1; note promotion defaults off and requires a reviewed
+stopped/backup rollout reference. Existing V2 is never silently downgraded or
+claimed readable by old code. One batched PR update/fresh preflight follows;
+main remainsda70eba until freshly verified merge.
+
+Consentd22 approval3cc687f is preserved as rootf7f3f26, with native7pass/one
+SQLite-only skip31 and actual stale-grant record wait; root16/171 passes again
+on the corrected composition. Identityeaaa runtime has author native46/1464,
+SQLite39executed/209 plus7 precise native skips; root original actualSMTP
+temporary-user canary1/5 passes. Root registration's genuine pagehide failure
+is corrected by UI-onlyaf4870b; identical canary plus author cases14 pass.
+Root actual registered API→SMTP→completion→sign-in→recovery flow and global
+CSRF/private failure cases7/118 pass. An initial incorrect assertion expected
+account access_version to increment; the contract correctly preserves the account
+row and invalidates access through credential/immutable observation binding.
+Original assertion/harness failures remain retained, not reported as source bugs.
+
+Attachments own finaldd18d34 plus servicec7 are selectively composed on actual
+main. Root25/144 adapter/consumer checks pass; private registry/routes/pages,
+customer/inquiry/operator mounts and fixed diagnostics are under affected checks.
+Free245 sourceebf6298 is frozen awaiting final author/source review; checkoutff4
+is superseded by actual staff-role/foreign-FK/routine canaries under repair.
+Suppression251 resumes on approved250. New T36 worker replacement uses sealed
+candidate completeness and fresh eligibility, explicitly not recovered old work.
+Only two new snapshot seams/imports are coordinated to its author; original
+snapshot methods must remain exact before independent review. Full personal-store
+implementation and final exact-SHA acceptance continue; no external activation.
+
+## Eleventh checkpoint — PR31 merged and consent registration ready
+
+PR31 expected head933134c merged as4150b858d05c837cf85801cf0ee1537a3c98464f, tree64ef3f3b9e80b02cf81d2d686ef9329c37e4d619, parentsda70eba/933134c. Fresh preflight37598818397 succeeded and actual thread4204862600 resolved after published correction. Primary checkout fast-forwarded without discarding its checkpoint ancestry.
+
+Consent independently approved d22 source is composed onto that main as e319; all38 review bindings remain byte exact. Root actual registered16/171, mounted63 and TypeScript pass. Evidence-only publication follows with one cheap preflight and expected-head merge. Production account adapter and suppression251 remain separate unfinished scope.
+
+Identity registration4b3 passed root15/182 and frontend14. Independent source review found actual247 installer accepts an incompatible users idTEXT-only table; the original1failure/3assertions is retained and approval withheld pending narrow owned repair. Reviewer shared16/187/nativeSMTP journey1/38 are green component checks. New default-off configured TLS SMTP/account adaptersd9b3937 remain provisional and unbound.
+
+Attachment root registered six checks/247 assertions and mounted five pass; prior accidental getJson GET bodies, incomplete frontend Link mock and wrong default-off status expectations are retained as harness errors. Actual HTML pages allow same-origin UI assets; API/stream/error responses keep sandbox. Whole source/independent review remains pending. Checkout9f narrow successor repairs actual three admission/authority defects and awaits native/independent proof; freeebf remains provisional during retry/status correction. New paid252, suppression251 and discovery248 replacement continue. No user-content, credentials, external messages, money or deployment actions occurred.

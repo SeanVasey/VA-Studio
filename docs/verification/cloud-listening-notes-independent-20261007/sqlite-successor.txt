@@ -1,0 +1,10 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-notes-independent/docs/verification/cloud-listening-notes-independent-20261007/sqlite-selection.xml
+
+...                                                                 3 / 3 (100%)
+
+Time: 00:00.520, Memory: 77.00 MB
+
+[30;42mOK (3 tests, 29 assertions)[0m

@@ -41,7 +41,7 @@ final class ListeningEvidence
         }
     }
 
-    public function prove(CustomerPrincipal $principal, ?array $expected): void
+    public function prove(CustomerPrincipal $principal, ?array $expected, ?array $rollout = null): void
     {
         $this->assertCaptured();
         // Storage/configuration probes precede the final callback-free primary proof.
@@ -52,6 +52,9 @@ final class ListeningEvidence
         }
         // Policy is pure and checked after the last framework callback, not before its queries.
         app(CustomerAccessPolicy::class)->requireEnabled();
+        if ($rollout !== null) {
+            ListeningRollout::requireCurrent($rollout);
+        }
         $this->assertCaptured();
         $user = $this->rows('users', 'id', $principal->userId);
         $account = $this->rows('customer_accounts', 'id', $principal->accountId);

@@ -1,0 +1,365 @@
+{
+    "source": "0143f4b6bb7c529aed003fdfc741bf93f2e3a9ed",
+    "version": "8.0.46-0ubuntu0.24.04.4",
+    "tables": {
+        "users": {
+            "ddl": {
+                "Table": "users",
+                "Create Table": "CREATE TABLE `users` (\n  `id` bigint unsigned NOT NULL AUTO_INCREMENT,\n  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `email_verified_at` timestamp NULL DEFAULT NULL,\n  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `created_at` timestamp NULL DEFAULT NULL,\n  `updated_at` timestamp NULL DEFAULT NULL,\n  `is_admin` tinyint(1) NOT NULL DEFAULT '0',\n  `app_authentication_secret` text COLLATE utf8mb4_unicode_ci,\n  `app_authentication_recovery_codes` text COLLATE utf8mb4_unicode_ci,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `users_email_unique` (`email`)\n) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+            },
+            "metadata": [
+                {
+                    "ENGINE": "InnoDB",
+                    "TABLE_TYPE": "BASE TABLE",
+                    "TABLE_COMMENT": "",
+                    "TABLE_COLLATION": "utf8mb4_unicode_ci"
+                }
+            ],
+            "columns": [
+                {
+                    "COLUMN_NAME": "id",
+                    "COLUMN_TYPE": "bigint unsigned",
+                    "IS_NULLABLE": "NO",
+                    "COLUMN_DEFAULT": null,
+                    "EXTRA": "auto_increment",
+                    "COLLATION_NAME": null
+                },
+                {
+                    "COLUMN_NAME": "name",
+                    "COLUMN_TYPE": "varchar(255)",
+                    "IS_NULLABLE": "NO",
+                    "COLUMN_DEFAULT": null,
+                    "EXTRA": "",
+                    "COLLATION_NAME": "utf8mb4_unicode_ci"
+                },
+                {
+                    "COLUMN_NAME": "email",
+                    "COLUMN_TYPE": "varchar(255)",
+                    "IS_NULLABLE": "NO",
+                    "COLUMN_DEFAULT": null,
+                    "EXTRA": "",
+                    "COLLATION_NAME": "utf8mb4_unicode_ci"
+                },
+                {
+                    "COLUMN_NAME": "email_verified_at",
+                    "COLUMN_TYPE": "timestamp",
+                    "IS_NULLABLE": "YES",
+                    "COLUMN_DEFAULT": null,
+                    "EXTRA": "",
+                    "COLLATION_NAME": null
+                },
+                {
+                    "COLUMN_NAME": "password",
+                    "COLUMN_TYPE": "varchar(255)",
+                    "IS_NULLABLE": "NO",
+                    "COLUMN_DEFAULT": null,
+                    "EXTRA": "",
+                    "COLLATION_NAME": "utf8mb4_unicode_ci"
+                },
+                {
+                    "COLUMN_NAME": "remember_token",
+                    "COLUMN_TYPE": "varchar(100)",
+                    "IS_NULLABLE": "YES",
+                    "COLUMN_DEFAULT": null,
+                    "EXTRA": "",
+                    "COLLATION_NAME": "utf8mb4_unicode_ci"
+                },
+                {
+                    "COLUMN_NAME": "created_at",
+                    "COLUMN_TYPE": "timestamp",
+                    "IS_NULLABLE": "YES",
+                    "COLUMN_DEFAULT": null,
+                    "EXTRA": "",
+                    "COLLATION_NAME": null
+                },
+                {
+                    "COLUMN_NAME": "updated_at",
+                    "COLUMN_TYPE": "timestamp",
+                    "IS_NULLABLE": "YES",
+                    "COLUMN_DEFAULT": null,
+                    "EXTRA": "",
+                    "COLLATION_NAME": null
+                },
+                {
+                    "COLUMN_NAME": "is_admin",
+                    "COLUMN_TYPE": "tinyint(1)",
+                    "IS_NULLABLE": "NO",
+                    "COLUMN_DEFAULT": "0",
+                    "EXTRA": "",
+                    "COLLATION_NAME": null
+                },
+                {
+                    "COLUMN_NAME": "app_authentication_secret",
+                    "COLUMN_TYPE": "text",
+                    "IS_NULLABLE": "YES",
+                    "COLUMN_DEFAULT": null,
+                    "EXTRA": "",
+                    "COLLATION_NAME": "utf8mb4_unicode_ci"
+                },
+                {
+                    "COLUMN_NAME": "app_authentication_recovery_codes",
+                    "COLUMN_TYPE": "text",
+                    "IS_NULLABLE": "YES",
+                    "COLUMN_DEFAULT": null,
+                    "EXTRA": "",
+                    "COLLATION_NAME": "utf8mb4_unicode_ci"
+                }
+            ],
+            "indexes": [
+                {
+                    "INDEX_NAME": "PRIMARY",
+                    "COLUMN_NAME": "id",
+                    "NON_UNIQUE": 0,
+                    "SEQ_IN_INDEX": 1,
+                    "INDEX_TYPE": "BTREE",
+                    "SUB_PART": null,
+                    "IS_VISIBLE": "YES"
+                },
+                {
+                    "INDEX_NAME": "users_email_unique",
+                    "COLUMN_NAME": "email",
+                    "NON_UNIQUE": 0,
+                    "SEQ_IN_INDEX": 1,
+                    "INDEX_TYPE": "BTREE",
+                    "SUB_PART": null,
+                    "IS_VISIBLE": "YES"
+                }
+            ],
+            "foreign": [],
+            "guards": [
+                {
+                    "TRIGGER_NAME": "cde_0_delete",
+                    "EVENT_OBJECT_TABLE": "users",
+                    "EVENT_MANIPULATION": "DELETE",
+                    "ACTION_TIMING": "AFTER",
+                    "ACTION_STATEMENT": "BEGIN UPDATE catalog_discovery_epoch SET epoch = epoch + 1 WHERE id = 1; IF ROW_COUNT() <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Missing discovery epoch'; END IF; END"
+                },
+                {
+                    "TRIGGER_NAME": "cde_0_insert",
+                    "EVENT_OBJECT_TABLE": "users",
+                    "EVENT_MANIPULATION": "INSERT",
+                    "ACTION_TIMING": "AFTER",
+                    "ACTION_STATEMENT": "BEGIN UPDATE catalog_discovery_epoch SET epoch = epoch + 1 WHERE id = 1; IF ROW_COUNT() <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Missing discovery epoch'; END IF; END"
+                },
+                {
+                    "TRIGGER_NAME": "cde_0_update",
+                    "EVENT_OBJECT_TABLE": "users",
+                    "EVENT_MANIPULATION": "UPDATE",
+                    "ACTION_TIMING": "AFTER",
+                    "ACTION_STATEMENT": "BEGIN UPDATE catalog_discovery_epoch SET epoch = epoch + 1 WHERE id = 1; IF ROW_COUNT() <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Missing discovery epoch'; END IF; END"
+                }
+            ]
+        },
+        "customer_accounts": {
+            "ddl": {
+                "Table": "customer_accounts",
+                "Create Table": "CREATE TABLE `customer_accounts` (\n  `id` bigint unsigned NOT NULL AUTO_INCREMENT,\n  `public_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `user_id` bigint unsigned NOT NULL,\n  `owner_key` char(64) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `active` tinyint(1) NOT NULL,\n  `access_version` int unsigned NOT NULL,\n  `created_at` timestamp NULL DEFAULT NULL,\n  `updated_at` timestamp NULL DEFAULT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `customer_accounts_public_id_unique` (`public_id`),\n  UNIQUE KEY `customer_accounts_user_id_unique` (`user_id`),\n  UNIQUE KEY `customer_accounts_owner_key_unique` (`owner_key`),\n  CONSTRAINT `customer_accounts_owner_key_foreign` FOREIGN KEY (`owner_key`) REFERENCES `quote_owners` (`owner_key`) ON DELETE RESTRICT,\n  CONSTRAINT `customer_accounts_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT\n) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+            },
+            "metadata": [
+                {
+                    "ENGINE": "InnoDB",
+                    "TABLE_TYPE": "BASE TABLE",
+                    "TABLE_COMMENT": "",
+                    "TABLE_COLLATION": "utf8mb4_unicode_ci"
+                }
+            ],
+            "columns": [
+                {
+                    "COLUMN_NAME": "id",
+                    "COLUMN_TYPE": "bigint unsigned",
+                    "IS_NULLABLE": "NO",
+                    "COLUMN_DEFAULT": null,
+                    "EXTRA": "auto_increment",
+                    "COLLATION_NAME": null
+                },
+                {
+                    "COLUMN_NAME": "public_id",
+                    "COLUMN_TYPE": "char(36)",
+                    "IS_NULLABLE": "NO",
+                    "COLUMN_DEFAULT": null,
+                    "EXTRA": "",
+                    "COLLATION_NAME": "utf8mb4_unicode_ci"
+                },
+                {
+                    "COLUMN_NAME": "user_id",
+                    "COLUMN_TYPE": "bigint unsigned",
+                    "IS_NULLABLE": "NO",
+                    "COLUMN_DEFAULT": null,
+                    "EXTRA": "",
+                    "COLLATION_NAME": null
+                },
+                {
+                    "COLUMN_NAME": "owner_key",
+                    "COLUMN_TYPE": "char(64)",
+                    "IS_NULLABLE": "NO",
+                    "COLUMN_DEFAULT": null,
+                    "EXTRA": "",
+                    "COLLATION_NAME": "utf8mb4_unicode_ci"
+                },
+                {
+                    "COLUMN_NAME": "active",
+                    "COLUMN_TYPE": "tinyint(1)",
+                    "IS_NULLABLE": "NO",
+                    "COLUMN_DEFAULT": null,
+                    "EXTRA": "",
+                    "COLLATION_NAME": null
+                },
+                {
+                    "COLUMN_NAME": "access_version",
+                    "COLUMN_TYPE": "int unsigned",
+                    "IS_NULLABLE": "NO",
+                    "COLUMN_DEFAULT": null,
+                    "EXTRA": "",
+                    "COLLATION_NAME": null
+                },
+                {
+                    "COLUMN_NAME": "created_at",
+                    "COLUMN_TYPE": "timestamp",
+                    "IS_NULLABLE": "YES",
+                    "COLUMN_DEFAULT": null,
+                    "EXTRA": "",
+                    "COLLATION_NAME": null
+                },
+                {
+                    "COLUMN_NAME": "updated_at",
+                    "COLUMN_TYPE": "timestamp",
+                    "IS_NULLABLE": "YES",
+                    "COLUMN_DEFAULT": null,
+                    "EXTRA": "",
+                    "COLLATION_NAME": null
+                }
+            ],
+            "indexes": [
+                {
+                    "INDEX_NAME": "customer_accounts_owner_key_unique",
+                    "COLUMN_NAME": "owner_key",
+                    "NON_UNIQUE": 0,
+                    "SEQ_IN_INDEX": 1,
+                    "INDEX_TYPE": "BTREE",
+                    "SUB_PART": null,
+                    "IS_VISIBLE": "YES"
+                },
+                {
+                    "INDEX_NAME": "customer_accounts_public_id_unique",
+                    "COLUMN_NAME": "public_id",
+                    "NON_UNIQUE": 0,
+                    "SEQ_IN_INDEX": 1,
+                    "INDEX_TYPE": "BTREE",
+                    "SUB_PART": null,
+                    "IS_VISIBLE": "YES"
+                },
+                {
+                    "INDEX_NAME": "customer_accounts_user_id_unique",
+                    "COLUMN_NAME": "user_id",
+                    "NON_UNIQUE": 0,
+                    "SEQ_IN_INDEX": 1,
+                    "INDEX_TYPE": "BTREE",
+                    "SUB_PART": null,
+                    "IS_VISIBLE": "YES"
+                },
+                {
+                    "INDEX_NAME": "PRIMARY",
+                    "COLUMN_NAME": "id",
+                    "NON_UNIQUE": 0,
+                    "SEQ_IN_INDEX": 1,
+                    "INDEX_TYPE": "BTREE",
+                    "SUB_PART": null,
+                    "IS_VISIBLE": "YES"
+                }
+            ],
+            "foreign": [
+                {
+                    "CONSTRAINT_NAME": "customer_accounts_owner_key_foreign",
+                    "COLUMN_NAME": "owner_key",
+                    "REFERENCED_TABLE_NAME": "quote_owners",
+                    "REFERENCED_COLUMN_NAME": "owner_key",
+                    "UPDATE_RULE": "NO ACTION",
+                    "DELETE_RULE": "RESTRICT"
+                },
+                {
+                    "CONSTRAINT_NAME": "customer_accounts_user_id_foreign",
+                    "COLUMN_NAME": "user_id",
+                    "REFERENCED_TABLE_NAME": "users",
+                    "REFERENCED_COLUMN_NAME": "id",
+                    "UPDATE_RULE": "NO ACTION",
+                    "DELETE_RULE": "RESTRICT"
+                }
+            ],
+            "guards": [
+                {
+                    "TRIGGER_NAME": "customer_accounts_delete",
+                    "EVENT_OBJECT_TABLE": "customer_accounts",
+                    "EVENT_MANIPULATION": "DELETE",
+                    "ACTION_TIMING": "BEFORE",
+                    "ACTION_STATEMENT": "BEGIN IF 1=1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Customer identity is retained'; END IF; END"
+                },
+                {
+                    "TRIGGER_NAME": "customer_accounts_insert",
+                    "EVENT_OBJECT_TABLE": "customer_accounts",
+                    "EVENT_MANIPULATION": "INSERT",
+                    "ACTION_TIMING": "BEFORE",
+                    "ACTION_STATEMENT": "BEGIN IF NOT REGEXP_LIKE(NEW.owner_key, '^[0-9a-f]{64}$', 'c') OR NOT REGEXP_LIKE(NEW.public_id, '^[0-9a-f-]{36}$', 'c') OR EXISTS (SELECT 1 FROM customer_accounts WHERE id=NEW.id OR public_id=NEW.public_id OR user_id=NEW.user_id OR owner_key=NEW.owner_key) OR NEW.active != 1 OR NEW.access_version != 1 OR NEW.created_at IS NULL OR NEW.updated_at IS NULL OR NOT EXISTS (SELECT 1 FROM users WHERE id=NEW.user_id AND is_admin=0 AND email_verified_at IS NOT NULL) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Customer identity is retained'; END IF; END"
+                },
+                {
+                    "TRIGGER_NAME": "customer_accounts_update",
+                    "EVENT_OBJECT_TABLE": "customer_accounts",
+                    "EVENT_MANIPULATION": "UPDATE",
+                    "ACTION_TIMING": "BEFORE",
+                    "ACTION_STATEMENT": "BEGIN IF NOT (NEW.id <=> OLD.id) OR NOT (BINARY NEW.public_id <=> BINARY OLD.public_id) OR NOT (NEW.user_id <=> OLD.user_id) OR NOT (BINARY NEW.owner_key <=> BINARY OLD.owner_key) OR NOT (NEW.created_at <=> OLD.created_at) OR NEW.active NOT IN (0,1) OR NEW.active=OLD.active OR OLD.access_version >= 4294967294 OR NEW.access_version != OLD.access_version+1 OR NEW.updated_at IS NULL OR NEW.updated_at < OLD.updated_at THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Customer identity is retained'; END IF; END"
+                }
+            ]
+        },
+        "quote_owners": {
+            "ddl": {
+                "Table": "quote_owners",
+                "Create Table": "CREATE TABLE `quote_owners` (\n  `owner_key` char(64) COLLATE utf8mb4_unicode_ci NOT NULL,\n  PRIMARY KEY (`owner_key`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+            },
+            "metadata": [
+                {
+                    "ENGINE": "InnoDB",
+                    "TABLE_TYPE": "BASE TABLE",
+                    "TABLE_COMMENT": "",
+                    "TABLE_COLLATION": "utf8mb4_unicode_ci"
+                }
+            ],
+            "columns": [
+                {
+                    "COLUMN_NAME": "owner_key",
+                    "COLUMN_TYPE": "char(64)",
+                    "IS_NULLABLE": "NO",
+                    "COLUMN_DEFAULT": null,
+                    "EXTRA": "",
+                    "COLLATION_NAME": "utf8mb4_unicode_ci"
+                }
+            ],
+            "indexes": [
+                {
+                    "INDEX_NAME": "PRIMARY",
+                    "COLUMN_NAME": "owner_key",
+                    "NON_UNIQUE": 0,
+                    "SEQ_IN_INDEX": 1,
+                    "INDEX_TYPE": "BTREE",
+                    "SUB_PART": null,
+                    "IS_VISIBLE": "YES"
+                }
+            ],
+            "foreign": [],
+            "guards": [
+                {
+                    "TRIGGER_NAME": "quote_owners_immutable_delete",
+                    "EVENT_OBJECT_TABLE": "quote_owners",
+                    "EVENT_MANIPULATION": "DELETE",
+                    "ACTION_TIMING": "BEFORE",
+                    "ACTION_STATEMENT": "SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Quote evidence is immutable'"
+                },
+                {
+                    "TRIGGER_NAME": "quote_owners_immutable_update",
+                    "EVENT_OBJECT_TABLE": "quote_owners",
+                    "EVENT_MANIPULATION": "UPDATE",
+                    "ACTION_TIMING": "BEFORE",
+                    "ACTION_STATEMENT": "SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Quote evidence is immutable'"
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,59 @@
+{
+    "source": "0143f4b6bb7c529aed003fdfc741bf93f2e3a9ed",
+    "driver": "sqlite",
+    "refused": true,
+    "error": "LogicException: Unowned or drifted consent object requires inspection; nothing was changed.",
+    "objects_unchanged": true,
+    "before": [
+        {
+            "type": "table",
+            "name": "customer_accounts",
+            "tbl_name": "customer_accounts",
+            "sql": "CREATE TABLE customer_accounts (id INTEGER PRIMARY KEY)"
+        },
+        {
+            "type": "table",
+            "name": "review_sentinel",
+            "tbl_name": "review_sentinel",
+            "sql": "CREATE TABLE review_sentinel (id INTEGER PRIMARY KEY, value VARCHAR(80))"
+        },
+        {
+            "type": "table",
+            "name": "users",
+            "tbl_name": "users",
+            "sql": "CREATE TABLE users (id INTEGER PRIMARY KEY)"
+        },
+        {
+            "type": "trigger",
+            "name": "customer_consent_policies",
+            "tbl_name": "review_sentinel",
+            "sql": "CREATE TRIGGER customer_consent_policies BEFORE DELETE ON review_sentinel BEGIN SELECT 1; END"
+        }
+    ],
+    "after": [
+        {
+            "type": "table",
+            "name": "customer_accounts",
+            "tbl_name": "customer_accounts",
+            "sql": "CREATE TABLE customer_accounts (id INTEGER PRIMARY KEY)"
+        },
+        {
+            "type": "table",
+            "name": "review_sentinel",
+            "tbl_name": "review_sentinel",
+            "sql": "CREATE TABLE review_sentinel (id INTEGER PRIMARY KEY, value VARCHAR(80))"
+        },
+        {
+            "type": "table",
+            "name": "users",
+            "tbl_name": "users",
+            "sql": "CREATE TABLE users (id INTEGER PRIMARY KEY)"
+        },
+        {
+            "type": "trigger",
+            "name": "customer_consent_policies",
+            "tbl_name": "review_sentinel",
+            "sql": "CREATE TRIGGER customer_consent_policies BEFORE DELETE ON review_sentinel BEGIN SELECT 1; END"
+        }
+    ]
+}

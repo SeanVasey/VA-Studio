@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\CustomerConsentAdmissionTest" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" tests="18" assertions="22" errors="0" failures="14" skipped="0" time="3.831236">
+    <testsuite name="Tests\Feature\CustomerConsentAdmissionTest::test_reserved_identity_across_object_kinds_is_refused_on_full_valid_dependencies" tests="5" assertions="9" errors="0" failures="1" skipped="0" time="1.156439">
+      <testcase name="test_reserved_identity_across_object_kinds_is_refused_on_full_valid_dependencies with data set &quot;table name as trigger&quot;" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="94" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="2" time="0.429464"/>
+      <testcase name="test_reserved_identity_across_object_kinds_is_refused_on_full_valid_dependencies with data set &quot;complete table and same-name foreign trigger&quot;" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="94" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="1" time="0.191325">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerConsentAdmissionTest::test_reserved_identity_across_object_kinds_is_refused_on_full_valid_dependencies with data set "complete table and same-name foreign trigger"
+Unowned namespace or dependency was accepted.
+
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:80
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:107</failure>
+      </testcase>
+      <testcase name="test_reserved_identity_across_object_kinds_is_refused_on_full_valid_dependencies with data set &quot;guard name as table&quot;" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="94" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="2" time="0.176482"/>
+      <testcase name="test_reserved_identity_across_object_kinds_is_refused_on_full_valid_dependencies with data set &quot;guard name as index&quot;" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="94" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="2" time="0.182754"/>
+      <testcase name="test_reserved_identity_across_object_kinds_is_refused_on_full_valid_dependencies with data set &quot;dictionary case/accent alias&quot;" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="94" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="2" time="0.176413"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\CustomerConsentAdmissionTest::test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation" tests="13" assertions="13" errors="0" failures="13" skipped="0" time="2.674797">
+      <testcase name="test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set &quot;missing users&quot;" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="118" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="1" time="0.250385">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerConsentAdmissionTest::test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set "missing users"
+Unowned namespace or dependency was accepted.
+
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:80
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:144</failure>
+      </testcase>
+      <testcase name="test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set &quot;missing accounts&quot;" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="118" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="1" time="0.178380">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerConsentAdmissionTest::test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set "missing accounts"
+Unowned namespace or dependency was accepted.
+
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:80
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:144</failure>
+      </testcase>
+      <testcase name="test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set &quot;missing owners&quot;" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="118" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="1" time="0.233302">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerConsentAdmissionTest::test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set "missing owners"
+Unowned namespace or dependency was accepted.
+
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:80
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:144</failure>
+      </testcase>
+      <testcase name="test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set &quot;account column drift&quot;" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="118" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="1" time="0.238865">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerConsentAdmissionTest::test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set "account column drift"
+Unowned namespace or dependency was accepted.
+
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:80
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:144</failure>
+      </testcase>
+      <testcase name="test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set &quot;missing account identity key&quot;" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="118" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="1" time="0.217417">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerConsentAdmissionTest::test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set "missing account identity key"
+Unowned namespace or dependency was accepted.
+
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:80
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:144</failure>
+      </testcase>
+      <testcase name="test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set &quot;missing user email key&quot;" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="118" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="1" time="0.207177">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerConsentAdmissionTest::test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set "missing user email key"
+Unowned namespace or dependency was accepted.
+
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:80
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:144</failure>
+      </testcase>
+      <testcase name="test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set &quot;missing account retention guard&quot;" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="118" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="1" time="0.212711">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerConsentAdmissionTest::test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set "missing account retention guard"
+Unowned namespace or dependency was accepted.
+
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:80
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:144</failure>
+      </testcase>
+      <testcase name="test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set &quot;missing user discovery guard&quot;" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="118" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="1" time="0.226144">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerConsentAdmissionTest::test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set "missing user discovery guard"
+Unowned namespace or dependency was accepted.
+
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:80
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:144</failure>
+      </testcase>
+      <testcase name="test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set &quot;missing owner retention guard&quot;" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="118" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="1" time="0.187833">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerConsentAdmissionTest::test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set "missing owner retention guard"
+Unowned namespace or dependency was accepted.
+
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:80
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:144</failure>
+      </testcase>
+      <testcase name="test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set &quot;foreign-key enforcement disabled&quot;" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="118" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="1" time="0.180906">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerConsentAdmissionTest::test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set "foreign-key enforcement disabled"
+Unowned namespace or dependency was accepted.
+
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:80
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:144</failure>
+      </testcase>
+      <testcase name="test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set &quot;temporary users&quot;" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="118" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="1" time="0.176540">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerConsentAdmissionTest::test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set "temporary users"
+Unowned namespace or dependency was accepted.
+
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:80
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:144</failure>
+      </testcase>
+      <testcase name="test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set &quot;temporary accounts&quot;" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="118" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="1" time="0.183386">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerConsentAdmissionTest::test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set "temporary accounts"
+Unowned namespace or dependency was accepted.
+
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:80
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:144</failure>
+      </testcase>
+      <testcase name="test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set &quot;temporary owners&quot;" file="/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php" line="118" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="1" time="0.181751">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerConsentAdmissionTest::test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set "temporary owners"
+Unowned namespace or dependency was accepted.
+
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:80
+/workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentAdmissionTest.php:144</failure>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\CustomerListeningCompatibilityTest" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" tests="34" assertions="62" errors="1" failures="31" skipped="0" time="22.651084">
+    <testsuite name="Tests\Feature\CustomerListeningCompatibilityTest::test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader" tests="18" assertions="36" errors="0" failures="18" skipped="0" time="22.237654">
+      <testcase name="test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set &quot;save-track default-off&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="68" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="2" time="2.063030">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningCompatibilityTest::test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set "save-track default-off"
+Failed asserting that 2 is identical to 1.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:86</failure>
+      </testcase>
+      <testcase name="test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set &quot;save-track safe promotion configured&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="68" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="2" time="1.298758">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningCompatibilityTest::test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set "save-track safe promotion configured"
+Failed asserting that 2 is identical to 1.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:86</failure>
+      </testcase>
+      <testcase name="test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set &quot;remove-saved-track default-off&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="68" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="2" time="1.188200">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningCompatibilityTest::test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set "remove-saved-track default-off"
+Failed asserting that 2 is identical to 1.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:86</failure>
+      </testcase>
+      <testcase name="test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set &quot;remove-saved-track safe promotion configured&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="68" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="2" time="1.205335">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningCompatibilityTest::test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set "remove-saved-track safe promotion configured"
+Failed asserting that 2 is identical to 1.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:86</failure>
+      </testcase>
+      <testcase name="test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set &quot;create-playlist default-off&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="68" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="2" time="1.128735">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningCompatibilityTest::test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set "create-playlist default-off"
+Failed asserting that 2 is identical to 1.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:86</failure>
+      </testcase>
+      <testcase name="test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set &quot;create-playlist safe promotion configured&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="68" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="2" time="1.252830">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningCompatibilityTest::test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set "create-playlist safe promotion configured"
+Failed asserting that 2 is identical to 1.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:86</failure>
+      </testcase>
+      <testcase name="test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set &quot;rename-playlist default-off&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="68" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="2" time="1.256849">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningCompatibilityTest::test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set "rename-playlist default-off"
+Failed asserting that 2 is identical to 1.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:86</failure>
+      </testcase>
+      <testcase name="test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set &quot;rename-playlist safe promotion configured&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="68" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="2" time="1.128827">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningCompatibilityTest::test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set "rename-playlist safe promotion configured"
+Failed asserting that 2 is identical to 1.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:86</failure>
+      </testcase>
+      <testcase name="test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set &quot;delete-playlist default-off&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="68" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="2" time="1.068944">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningCompatibilityTest::test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set "delete-playlist default-off"
+Failed asserting that 2 is identical to 1.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:86</failure>
+      </testcase>
+      <testcase name="test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set &quot;delete-playlist safe promotion configured&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="68" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="2" time="1.235941">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningCompatibilityTest::test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set "delete-playlist safe promotion configured"
+Failed asserting that 2 is identical to 1.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:86</failure>
+      </testcase>
+      <testcase name="test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set &quot;add-playlist-track default-off&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="68" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="2" time="1.176369">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningCompatibilityTest::test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set "add-playlist-track default-off"
+Failed asserting that 2 is identical to 1.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:86</failure>
+      </testcase>
+      <testcase name="test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set &quot;add-playlist-track safe promotion configured&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="68" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="2" time="1.146025">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningCompatibilityTest::test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set "add-playlist-track safe promotion configured"
+Failed asserting that 2 is identical to 1.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:86</failure>
+      </testcase>
+      <testcase name="test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set &quot;remove-playlist-track default-off&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="68" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="2" time="1.193821">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningCompatibilityTest::test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set "remove-playlist-track default-off"
+Failed asserting that 2 is identical to 1.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:86</failure>
+      </testcase>
+      <testcase name="test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set &quot;remove-playlist-track safe promotion configured&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="68" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="2" time="1.168655">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningCompatibilityTest::test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set "remove-playlist-track safe promotion configured"
+Failed asserting that 2 is identical to 1.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:86</failure>
+      </testcase>
+      <testcase name="test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set &quot;reorder-playlist default-off&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="68" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="2" time="1.172515">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningCompatibilityTest::test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set "reorder-playlist default-off"
+Failed asserting that 2 is identical to 1.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:86</failure>
+      </testcase>
+      <testcase name="test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set &quot;reorder-playlist safe promotion configured&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="68" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="2" time="1.175764">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningCompatibilityTest::test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set "reorder-playlist safe promotion configured"
+Failed asserting that 2 is identical to 1.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:86</failure>
+      </testcase>
+      <testcase name="test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set &quot;clear-library default-off&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="68" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="2" time="1.185002">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningCompatibilityTest::test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set "clear-library default-off"
+Failed asserting that 2 is identical to 1.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:86</failure>
+      </testcase>
+      <testcase name="test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set &quot;clear-library safe promotion configured&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="68" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="2" time="1.192054">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningCompatibilityTest::test_all_effective_ordinary_v1_writes_remain_readable_by_actual_prior_reader with data set "clear-library safe promotion configured"
+Failed asserting that 2 is identical to 1.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:86</failure>
+      </testcase>
+    </testsuite>
+    <testcase name="test_new_rows_and_empty_clear_stay_v1_and_stale_old_writer_cannot_resurrect_contents" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="98" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="1" time="0.021155">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningCompatibilityTest::test_new_rows_and_empty_clear_stay_v1_and_stale_old_writer_cannot_resurrect_contents
+Failed asserting that 2 is identical to 1.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:101</failure>
+    </testcase>
+    <testcase name="test_old_and_new_ordinary_writers_can_alternate_against_retained_v1_ciphertext" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="117" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="0" time="0.022707">
+      <error type="App\Domain\Customers\Listening\ListeningException">Tests\Feature\CustomerListeningCompatibilityTest::test_old_and_new_ordinary_writers_can_alternate_against_retained_v1_ciphertext
+App\Domain\Customers\Listening\ListeningException: Saved listening library is unavailable.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:46
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:122</error>
+    </testcase>
+    <testcase name="test_v1_read_export_and_noops_preserve_exact_encrypted_row_bytes_with_promotion_enabled_or_disabled" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="128" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="4" time="0.042360"/>
+    <testsuite name="Tests\Feature\CustomerListeningCompatibilityTest::test_v1_note_promotion_requires_strict_flag_and_explicit_safe_rollout_reference" tests="8" assertions="8" errors="0" failures="8" skipped="0" time="0.185196">
+      <testcase name="test_v1_note_promotion_requires_strict_flag_and_explicit_safe_rollout_reference with data set &quot;default-off&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="153" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="1" time="0.023069">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerListeningCompatibilityTest::test_v1_note_promotion_requires_strict_flag_and_explicit_safe_rollout_reference with data set "default-off"
+V2 promotion escaped its stopped-upgrade gate.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:166</failure>
+      </testcase>
+      <testcase name="test_v1_note_promotion_requires_strict_flag_and_explicit_safe_rollout_reference with data set &quot;flag without review&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="153" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="1" time="0.024382">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerListeningCompatibilityTest::test_v1_note_promotion_requires_strict_flag_and_explicit_safe_rollout_reference with data set "flag without review"
+V2 promotion escaped its stopped-upgrade gate.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:166</failure>
+      </testcase>
+      <testcase name="test_v1_note_promotion_requires_strict_flag_and_explicit_safe_rollout_reference with data set &quot;string flag&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="153" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="1" time="0.022734">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerListeningCompatibilityTest::test_v1_note_promotion_requires_strict_flag_and_explicit_safe_rollout_reference with data set "string flag"
+V2 promotion escaped its stopped-upgrade gate.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:166</failure>
+      </testcase>
+      <testcase name="test_v1_note_promotion_requires_strict_flag_and_explicit_safe_rollout_reference with data set &quot;blank review&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="153" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="1" time="0.022771">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerListeningCompatibilityTest::test_v1_note_promotion_requires_strict_flag_and_explicit_safe_rollout_reference with data set "blank review"
+V2 promotion escaped its stopped-upgrade gate.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:166</failure>
+      </testcase>
+      <testcase name="test_v1_note_promotion_requires_strict_flag_and_explicit_safe_rollout_reference with data set &quot;unicode blank review&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="153" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="1" time="0.023946">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerListeningCompatibilityTest::test_v1_note_promotion_requires_strict_flag_and_explicit_safe_rollout_reference with data set "unicode blank review"
+V2 promotion escaped its stopped-upgrade gate.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:166</failure>
+      </testcase>
+      <testcase name="test_v1_note_promotion_requires_strict_flag_and_explicit_safe_rollout_reference with data set &quot;oversize review&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="153" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="1" time="0.023938">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerListeningCompatibilityTest::test_v1_note_promotion_requires_strict_flag_and_explicit_safe_rollout_reference with data set "oversize review"
+V2 promotion escaped its stopped-upgrade gate.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:166</failure>
+      </testcase>
+      <testcase name="test_v1_note_promotion_requires_strict_flag_and_explicit_safe_rollout_reference with data set &quot;control review&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="153" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="1" time="0.023297">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerListeningCompatibilityTest::test_v1_note_promotion_requires_strict_flag_and_explicit_safe_rollout_reference with data set "control review"
+V2 promotion escaped its stopped-upgrade gate.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:166</failure>
+      </testcase>
+      <testcase name="test_v1_note_promotion_requires_strict_flag_and_explicit_safe_rollout_reference with data set &quot;invalid UTF8 review&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="153" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="1" time="0.021059">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerListeningCompatibilityTest::test_v1_note_promotion_requires_strict_flag_and_explicit_safe_rollout_reference with data set "invalid UTF8 review"
+V2 promotion escaped its stopped-upgrade gate.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:166</failure>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\CustomerListeningCompatibilityTest::test_terminal_callbacks_cannot_commit_promotion_under_a_changed_rollout" tests="4" assertions="4" errors="0" failures="4" skipped="0" time="0.102023">
+      <testcase name="test_terminal_callbacks_cannot_commit_promotion_under_a_changed_rollout with data set &quot;terminal query disables flag&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="182" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="1" time="0.022167">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerListeningCompatibilityTest::test_terminal_callbacks_cannot_commit_promotion_under_a_changed_rollout with data set "terminal query disables flag"
+Late rollout withdrawal committed V2.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:209</failure>
+      </testcase>
+      <testcase name="test_terminal_callbacks_cannot_commit_promotion_under_a_changed_rollout with data set &quot;terminal query changes review&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="182" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="1" time="0.021642">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerListeningCompatibilityTest::test_terminal_callbacks_cannot_commit_promotion_under_a_changed_rollout with data set "terminal query changes review"
+Late rollout withdrawal committed V2.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:209</failure>
+      </testcase>
+      <testcase name="test_terminal_callbacks_cannot_commit_promotion_under_a_changed_rollout with data set &quot;terminal container disables flag&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="182" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="1" time="0.022991">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerListeningCompatibilityTest::test_terminal_callbacks_cannot_commit_promotion_under_a_changed_rollout with data set "terminal container disables flag"
+Late rollout withdrawal committed V2.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:209</failure>
+      </testcase>
+      <testcase name="test_terminal_callbacks_cannot_commit_promotion_under_a_changed_rollout with data set &quot;terminal container changes review&quot;" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="182" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="1" time="0.035223">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\CustomerListeningCompatibilityTest::test_terminal_callbacks_cannot_commit_promotion_under_a_changed_rollout with data set "terminal container changes review"
+Late rollout withdrawal committed V2.
+
+/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php:209</failure>
+      </testcase>
+    </testsuite>
+    <testcase name="test_explicit_promotion_and_retained_v2_notes_work_after_disable_but_actual_old_reader_refuses_v2" file="/workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php" line="218" class="Tests\Feature\CustomerListeningCompatibilityTest" classname="Tests.Feature.CustomerListeningCompatibilityTest" assertions="9" time="0.039989"/>
+  </testsuite>
+</testsuites>

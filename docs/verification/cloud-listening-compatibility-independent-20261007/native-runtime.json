@@ -1,0 +1,9 @@
+{
+    "server_version": "8.0.46-0ubuntu0.24.04.4",
+    "server_distribution": "(Ubuntu)",
+    "transaction_isolation": "REPEATABLE-READ",
+    "sql_mode": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+    "php": "8.4.26",
+    "pdo_driver": "mysql",
+    "scope": "dedicated independent service_review schema, reused only after consent review; no author database used"
+}

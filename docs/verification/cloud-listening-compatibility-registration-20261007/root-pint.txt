@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fail","files":[{"path":"tests\/Feature\/CustomerListeningExportHttpTest.php","fixers":["class_definition","fully_qualified_strict_types","braces_position","ordered_imports"]}]}

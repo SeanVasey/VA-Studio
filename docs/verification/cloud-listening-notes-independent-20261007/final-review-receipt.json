@@ -1,0 +1,620 @@
+{
+  "approved_composition": "af87b702c09d40a23ff78e29e3a9ef282b59e1bc",
+  "approved_tree": "361a7c28bc8f987c21053f88eb9fe2e6827c05b5",
+  "tested_composition": "041453f928ed914151342b3468e1b7690cb3c4e4",
+  "author_evidence_source": "dbd90be9ac498e77d9afae2e05da82cb39462b03",
+  "source": {
+    "app/Domain/Customers/CustomerAccess.php": {
+      "git_blob": "310bb10219405110a3db5a5844132c42d0291887",
+      "sha256": "cb59745ecbdea2a9cedce51be535d428f2e1a3613829547716e9633fbff061bd",
+      "byte_exact_tested_source": true
+    },
+    "app/Domain/Customers/CustomerAccessPolicy.php": {
+      "git_blob": "ceccc3a417413dec27b855d465d30349cef20fa3",
+      "sha256": "2a144608b6988d0cd96a1f2eb9b7164c226b3fa60e822496bda8fe3f2099fd40",
+      "byte_exact_tested_source": true
+    },
+    "app/Domain/Customers/CustomerPrincipal.php": {
+      "git_blob": "5fea086aee4cb54b1aa51deb16028fd78c66a5b2",
+      "sha256": "e7407ed4c9aa90f8bb9850d4d91f2d7dc5aa650a12c767e529db44c08cf63e10",
+      "byte_exact_tested_source": true
+    },
+    "app/Domain/Customers/Listening/ListeningEvidence.php": {
+      "git_blob": "35629fc027f6ebacf6ed427635b9e13869caeb07",
+      "sha256": "4b22665239f1df455b29c41b91196b6c910822105b72168a1dca4ed677e807c3",
+      "byte_exact_tested_source": true
+    },
+    "app/Domain/Customers/Listening/ListeningLibrary.php": {
+      "git_blob": "7600e870f510a868f09fbf66fd348f52cadeb285",
+      "sha256": "9823cc3eed3253c1fd3f1a6da6b4c86f69ca4563ff2a9d3ff918bb75437f0c75",
+      "byte_exact_tested_source": true
+    },
+    "app/Domain/Customers/Listening/SavedListeningLibrary.php": {
+      "git_blob": "4f2cba6a93cb3430890cba7f676195bfe2cb3528",
+      "sha256": "a16d0d1fc1095563ffee8409633ea1a53a1f2dc34718f5ef0fba0cd4706d863c",
+      "byte_exact_tested_source": true
+    },
+    "app/Http/Controllers/CustomerListeningLibraryController.php": {
+      "git_blob": "947b940daffcbf766e5334bea767917b0f02d770",
+      "sha256": "5be8b7f9e5ee70ccb11f8c8dc1f0b03667cfa868cbe1f1594941c20d48a06d40",
+      "byte_exact_tested_source": true
+    },
+    "app/Http/Controllers/CustomerSessionController.php": {
+      "git_blob": "64e402217b9d2da6f31e44980620786275e68e72",
+      "sha256": "4ecfbce20c6a60698663964d2373f512292ac0b7170b29dfddcdbc39178e4ab8",
+      "byte_exact_tested_source": true
+    },
+    "app/Http/Middleware/CustomerPrivacy.php": {
+      "git_blob": "581c64d83facfd10643a51a8ecc37be6e1662e61",
+      "sha256": "d8ed53a590baade9670b8c87d0ce2d05526b104ad2b8121bd038cd65e5e976e8",
+      "byte_exact_tested_source": true
+    },
+    "app/Http/Requests/CustomerListeningRequest.php": {
+      "git_blob": "818e4f79c0402e766410c9162a5941d6c39ed713",
+      "sha256": "570a20e18e45ddc630bc19612d1f8f68ea06dbe0ae039dc797d3ed9986713048",
+      "byte_exact_tested_source": true
+    },
+    "bootstrap/app.php": {
+      "git_blob": "3f7490431123668efc6a76fd8dc78ad29d985c2c",
+      "sha256": "480ced5ffb27979021d2aa7be036d268eb68df6b5895d61458535ace3c007470",
+      "byte_exact_tested_source": true
+    },
+    "composer.json": {
+      "git_blob": "cbb669c31bb1610a4b9cd93b2762905a82a7312c",
+      "sha256": "132cb2a16c6ce2960d059cfddecae8e1accf6138a258dd8bab2c0c7b822f5607",
+      "byte_exact_tested_source": true
+    },
+    "composer.lock": {
+      "git_blob": "9e58027dcd989282b026d56347e26ea867723db9",
+      "sha256": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9",
+      "byte_exact_tested_source": true
+    },
+    "database/migrations/2026_10_07_242000_customer_saved_tracks.php": {
+      "git_blob": "1c26493419f561e32fa9aaadfdba232b1eb2e04d",
+      "sha256": "1202c18366e67012224745a12e06b2ef46d654725f2eeb48e779cf9569cd7392",
+      "byte_exact_tested_source": true
+    },
+    "package-lock.json": {
+      "git_blob": "614350366e7af397c14603dae9272082ecfae066",
+      "sha256": "6407d3a63e3b6e04f5824f53c41b8dc8a33581f987b21d780c795480122f93ea",
+      "byte_exact_tested_source": true
+    },
+    "package.json": {
+      "git_blob": "1c5a39755658dde7d625498391b4acf640994b5a",
+      "sha256": "65db43e1b171566d2d89e075bc4a29af75a82a6782a3313751bb4d7e832a7ae0",
+      "byte_exact_tested_source": true
+    },
+    "resources/js/Pages/CustomerLibrary.tsx": {
+      "git_blob": "0be66fb7450985512f342facb1dc021663bbec14",
+      "sha256": "3d7efeeb1382a902882765e857262df02a9fa6c3c263291b19f97d781d2478cb",
+      "byte_exact_tested_source": true
+    },
+    "resources/js/components/CustomerListeningLibrary.tsx": {
+      "git_blob": "6e248d2d4897cd2d60a542908a2faff196248c4a",
+      "sha256": "b220f5d3243fc22595a9bcd84543ae19f5f7bd026b406691c3790b6065261781",
+      "byte_exact_tested_source": true
+    },
+    "routes/customer.php": {
+      "git_blob": "5ae1a0bb58d8cfa6abcf72bc8039a7c9a76f3f51",
+      "sha256": "93ce38519eb528696e871b5a3e97a9d46f8009b1d8527d7a871b282cf111f44c",
+      "byte_exact_tested_source": true
+    },
+    "tests/Feature/CustomerListeningExportHttpTest.php": {
+      "git_blob": "023f677aaf530e8f4ef0b7a404109dd3bd332177",
+      "sha256": "744954b3d6d360a6541b916b2e2e382b72f010ea918a5c264fd1da1f93cc3cf3",
+      "byte_exact_tested_source": true
+    },
+    "tests/Feature/CustomerListeningLibraryHttpTest.php": {
+      "git_blob": "a865bad42082b0c026259c3c0ecad1dd10a28578",
+      "sha256": "39efe2eec8b5ec7361b82815a48eaff40f1a4e12237d3d985ac9d73b4fd5c29b",
+      "byte_exact_tested_source": true
+    },
+    "tests/Feature/CustomerListeningNotesBoundaryTest.php": {
+      "git_blob": "c421292f6a80839f4f36fc2d5bda07deba3d4d0a",
+      "sha256": "fd326e2f62eb731de8263d147c7f1fec2b46af408d8af7904103bbb86f2a2f0c",
+      "byte_exact_tested_source": true
+    },
+    "tests/Feature/CustomerListeningNotesCapacityTest.php": {
+      "git_blob": "19e46b57c5148319de16655064cf1e344c556044",
+      "sha256": "10518a05eedc81c84404c4db4db4c3adc409f12185df4fddb3c8ee659eaa03e0",
+      "byte_exact_tested_source": true
+    },
+    "tests/Feature/CustomerListeningNotesTest.php": {
+      "git_blob": "c97ec46269c8d3e33f346ca19c7a7b6fba0243f9",
+      "sha256": "6b0203731a7f304dc2c017bf3b05d0aad526ad3db8a5e23592bb540855090484",
+      "byte_exact_tested_source": true
+    },
+    "tests/Support/CustomerFixtures.php": {
+      "git_blob": "df16f365a826300c14f8b3c6effdd4ac6479faf9",
+      "sha256": "7eb6b9ff2154a17f847b4b131e0f9bd3eb1df1e12096026ca858739ce4f56ec8",
+      "byte_exact_tested_source": true
+    },
+    "tests/TestCase.php": {
+      "git_blob": "5f56769b8f2f608a753e30d8e342944560a655a3",
+      "sha256": "c1ab95960b6a3c234c48773131990da48f7fc7d3b901cb66a40af0dafa41df40",
+      "byte_exact_tested_source": true
+    },
+    "tests/frontend/customer-listening-library.test.tsx": {
+      "git_blob": "fdf2e5b02cf248132a83af4599baeec438f5c9ea",
+      "sha256": "228de8783f715ad12872f8ef19a8e996a8d72ba266a700d52f16dc8677d1922d",
+      "byte_exact_tested_source": true
+    },
+    "tests/frontend/customer-listening-notes.test.tsx": {
+      "git_blob": "15f5473fb0e4b1c4d31eff99efc162724579856b",
+      "sha256": "b50352d4813fbc977a8031a92e660a6637cdec28194035441fb346516eccdc0f",
+      "byte_exact_tested_source": true
+    },
+    "tsconfig.json": {
+      "git_blob": "ec130eb7d02b818d63c93e4795dfca81d5ec93a3",
+      "sha256": "d0f84c4a7045f0fee81b3b22085a5aa8af65ba0a06777db9f10f9a85bd3f2c4d",
+      "byte_exact_tested_source": true
+    },
+    "vite.config.ts": {
+      "git_blob": "98a7a8b3d50ea501270481d9731b8ed721de10ed",
+      "sha256": "24bc71759b96f1e48d3bf83ce4ece65ef5848f7fd40b477f475d7e930d6f66d3",
+      "byte_exact_tested_source": true
+    },
+    "vitest.config.ts": {
+      "git_blob": "f7d3a59c9f5e1d73e42c47a22c2402037a3d509f",
+      "sha256": "5c3bf6c180bea188e98e69de7fa39e5e6ffde84adbee58e51017d6028d18923a",
+      "byte_exact_tested_source": true
+    }
+  },
+  "author_evidence_digests": {
+    "README.md": "d93eb611b51dde6b369bfad52a5bc4ba805faa76c751ebf53df207d3cb4de45c",
+    "autoload-reflection.txt": "85d031ec0e9fc81f2f48cc691ded02d6377cb3e4691747427d318f1e05ed634e",
+    "capacity-focused-green.txt": "c410bf6abf593616f866c5450c4291056ba3916c7469a44bb8f3fb5e051a4f27",
+    "capacity-focused-green.xml": "ee0c290e0583158f1931803eac1a3cee4a77481c591394c57759e37bf919e3c9",
+    "capacity-invalid-test-key-failure-v2.txt": "84608d85e6d2f8b3227a7455240a5c6e62b96d965434f50c6ac42b28675afbda",
+    "capacity-invalid-test-key-failure.txt": "e5dff23ebd8d45fcaf2d0aaa9651fb159234cf5f653c7c0c554a1b1735109e02",
+    "capacity-source-18a6-php.txt": "93b460f444da65b491f74ee2a233c8a12cd86982fc5b4f2478e6faaf5b0aed38",
+    "capacity-source-18a6-php.xml": "2f4b8355bba91c4fb5ba3a4b4f2fa66259f2317558d30a9aa7920e2fd68e1715",
+    "frontend-carry-identity.json": "99bbeb48545a0b8326b94f175150dde697ac159b7a26a0eac01ddaf1c0238117",
+    "frozen-frontend.txt": "d2ba4caccd6df0ba1b5e0d40159f1deaf70e67b53173800e70685a83e5a06b61",
+    "frozen-frontend.txt.gz": "d5a3d148c1fee81c52a1ac96a715c20c0826ce7c7fe10e11747a17e283f2a4b5",
+    "frozen-php.txt": "71288e50df54598f101ab71028cf561344b9493195ba126cd59dcf7422e09272",
+    "frozen-php.xml": "0a8a84647a8d154aaeec53e50d0d4df214ed65a92abbff347119edd106be7310",
+    "frozen-pint.txt": "9fa3c401d4d7dcf9d616a4e847f09d73bafe2397e5f1b5b77531e2516436ed5a",
+    "frozen-pint.txt.gz": "efdc4d1c88ec838ecb0ae513f94edb8121388680be4acc3c464b7f3b49f55cac",
+    "frozen-typecheck.txt": "dac125c794db702133345f3a0d33f3193f975fddc564ca4f1498b0d4132ed500",
+    "frozen-typecheck.txt.gz": "2fe7ab713d79076a320d54898138afd6a9af703dd6ca183fe18fd31669373051",
+    "invalid-test-key-failure.txt": "e813e3941491ddf0149043cfb2f73f24f73f282489acd082b26ed2eaa40038bd",
+    "invalid-test-key-failure.xml": "734e92a33a2349c2dfd123635315f154e99f28f79d398e58579bc9a554ebe1a0",
+    "missing-test-key-failure.txt": "9e9109d11dbbf4ce00aa7349f500e5e817a683a24e21e678c35b95a3ebde524f",
+    "missing-test-key-failure.xml": "6915df12c9832aabd9da0676a312a72607c6d017f6189e8f6c12ae853ca78f8d",
+    "notes-focused.txt": "d0326762e7598122b269246e5427fee77dfafb447efcc76465e5139fcbeeb9a6",
+    "original-capacity-red.txt": "27bd722fe5405b8c6881b3acbe1d255e140557c71623227dd88762712704994d",
+    "original-capacity-red.xml": "8acf2012d14f511b2400b500b2a6768357b9afe716a864dff4e841ea6d59cd44",
+    "pint.txt": "9fa3c401d4d7dcf9d616a4e847f09d73bafe2397e5f1b5b77531e2516436ed5a",
+    "pint.txt.gz": "efdc4d1c88ec838ecb0ae513f94edb8121388680be4acc3c464b7f3b49f55cac",
+    "row-order-harness-failure.txt": "17bd68b0b93e2b47e40098849676ae313d8932003a220f6666a3391f7f94d4cb",
+    "row-order-harness-failure.xml": "16480cfd5fcf853cad00b8e3f6c808f8df7df1c2bafaef7c3621a86a435759fa",
+    "row-order-repair.txt": "b290d6ad83742d82aaea9e9be61235e053c8c19584c2d0411a62e1687feb022f",
+    "source-runtime.json": "e9601ef5b4646254614fb198ab409c89632a1bcb0da0a3f315181d472c497be9",
+    "typecheck-parameter-failure.txt": "feb2809cb4a45134233e4aa6ffc935a9bdf4810fc769df55b80949d32d1663de",
+    "typecheck-test-this-failure.txt": "2909301d8793899701c63a5a260f886860f193aeb4d59acd0f6dc769cfbce418",
+    "typecheck.txt": "dac125c794db702133345f3a0d33f3193f975fddc564ca4f1498b0d4132ed500",
+    "typecheck.txt.gz": "2fe7ab713d79076a320d54898138afd6a9af703dd6ca183fe18fd31669373051"
+  },
+  "author_runtime_receipt": {
+    "source": "ebb096eee0fbdfabe81a6d7eb622f50d342e9477",
+    "tree": "71804c50e260d1aeba108290634cfc533518fa07",
+    "base": "ca3b1fa7eb60edd2228b73742da33179228a277e",
+    "initial_source": "0ed11a25ed6a0129f09c088ecb2763222289841c",
+    "capacity_source": "18a6cc934b6a08e55eec9e8bb353b523919ec4a4",
+    "source_worktree": "/workspace/VA-Studio-customer-listening-notes",
+    "php_runtime": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+    "node_runtime": "v24.19.0",
+    "database": "SQLite :memory:",
+    "final_php": {
+      "tests": 147,
+      "assertions": 872,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "receipt": "frozen-php.xml"
+    },
+    "capacity": {
+      "tests": 3,
+      "assertions": 108,
+      "receipt": "capacity-focused-green.xml"
+    },
+    "frontend": {
+      "tests": 50,
+      "executed_source": "18a6cc934b6a08e55eec9e8bb353b523919ec4a4",
+      "byte_identity_to_final": "frontend-carry-identity.json",
+      "receipt": "frozen-frontend.txt"
+    },
+    "typecheck": {
+      "result": "passed",
+      "executed_source": "18a6cc934b6a08e55eec9e8bb353b523919ec4a4",
+      "byte_identity_to_final": "frontend-carry-identity.json"
+    },
+    "pint": {
+      "result": "passed",
+      "executed_source": "ebb096eee0fbdfabe81a6d7eb622f50d342e9477"
+    },
+    "original_capacity_red": {
+      "domain_source": "0ed11a25ed6a0129f09c088ecb2763222289841c",
+      "test_source": "ebb096eee0fbdfabe81a6d7eb622f50d342e9477",
+      "method": "Original ListeningLibrary blob injected using PHP auto_prepend_file before class autoload; untouched final source checkout and same synthetic key.",
+      "tests": 3,
+      "failures": 3,
+      "assertions": 84,
+      "native_overflow_proof": false
+    },
+    "scope_limits": [
+      "Native MySQL SQL1406/corrected original TEXT write proof belongs to independent reviewer on exact composed root successor.",
+      "Root HTTP grammar/export/privacy integration not exercised by this author leaf.",
+      "No full Foundation/browser/device/production acceptance, hosted CI or activation.",
+      "No production identity/consent/migration data acquired."
+    ],
+    "receipt_sha256": {
+      "autoload-reflection.txt": "85d031ec0e9fc81f2f48cc691ded02d6377cb3e4691747427d318f1e05ed634e",
+      "capacity-focused-green.txt": "c410bf6abf593616f866c5450c4291056ba3916c7469a44bb8f3fb5e051a4f27",
+      "capacity-focused-green.xml": "ee0c290e0583158f1931803eac1a3cee4a77481c591394c57759e37bf919e3c9",
+      "capacity-invalid-test-key-failure-v2.txt": "84608d85e6d2f8b3227a7455240a5c6e62b96d965434f50c6ac42b28675afbda",
+      "capacity-invalid-test-key-failure.txt": "e5dff23ebd8d45fcaf2d0aaa9651fb159234cf5f653c7c0c554a1b1735109e02",
+      "capacity-source-18a6-php.txt": "93b460f444da65b491f74ee2a233c8a12cd86982fc5b4f2478e6faaf5b0aed38",
+      "capacity-source-18a6-php.xml": "2f4b8355bba91c4fb5ba3a4b4f2fa66259f2317558d30a9aa7920e2fd68e1715",
+      "frontend-carry-identity.json": "99bbeb48545a0b8326b94f175150dde697ac159b7a26a0eac01ddaf1c0238117",
+      "frozen-frontend.txt": "d2ba4caccd6df0ba1b5e0d40159f1deaf70e67b53173800e70685a83e5a06b61",
+      "frozen-frontend.txt.gz": "d5a3d148c1fee81c52a1ac96a715c20c0826ce7c7fe10e11747a17e283f2a4b5",
+      "frozen-php.txt": "71288e50df54598f101ab71028cf561344b9493195ba126cd59dcf7422e09272",
+      "frozen-php.xml": "0a8a84647a8d154aaeec53e50d0d4df214ed65a92abbff347119edd106be7310",
+      "frozen-pint.txt": "9fa3c401d4d7dcf9d616a4e847f09d73bafe2397e5f1b5b77531e2516436ed5a",
+      "frozen-pint.txt.gz": "efdc4d1c88ec838ecb0ae513f94edb8121388680be4acc3c464b7f3b49f55cac",
+      "frozen-typecheck.txt": "dac125c794db702133345f3a0d33f3193f975fddc564ca4f1498b0d4132ed500",
+      "frozen-typecheck.txt.gz": "2fe7ab713d79076a320d54898138afd6a9af703dd6ca183fe18fd31669373051",
+      "invalid-test-key-failure.txt": "e813e3941491ddf0149043cfb2f73f24f73f282489acd082b26ed2eaa40038bd",
+      "invalid-test-key-failure.xml": "734e92a33a2349c2dfd123635315f154e99f28f79d398e58579bc9a554ebe1a0",
+      "missing-test-key-failure.txt": "9e9109d11dbbf4ce00aa7349f500e5e817a683a24e21e678c35b95a3ebde524f",
+      "missing-test-key-failure.xml": "6915df12c9832aabd9da0676a312a72607c6d017f6189e8f6c12ae853ca78f8d",
+      "notes-focused.txt": "d0326762e7598122b269246e5427fee77dfafb447efcc76465e5139fcbeeb9a6",
+      "original-capacity-red.txt": "27bd722fe5405b8c6881b3acbe1d255e140557c71623227dd88762712704994d",
+      "original-capacity-red.xml": "8acf2012d14f511b2400b500b2a6768357b9afe716a864dff4e841ea6d59cd44",
+      "pint.txt": "9fa3c401d4d7dcf9d616a4e847f09d73bafe2397e5f1b5b77531e2516436ed5a",
+      "pint.txt.gz": "efdc4d1c88ec838ecb0ae513f94edb8121388680be4acc3c464b7f3b49f55cac",
+      "row-order-harness-failure.txt": "17bd68b0b93e2b47e40098849676ae313d8932003a220f6666a3391f7f94d4cb",
+      "row-order-harness-failure.xml": "16480cfd5fcf853cad00b8e3f6c808f8df7df1c2bafaef7c3621a86a435759fa",
+      "row-order-repair.txt": "b290d6ad83742d82aaea9e9be61235e053c8c19584c2d0411a62e1687feb022f",
+      "typecheck-parameter-failure.txt": "feb2809cb4a45134233e4aa6ffc935a9bdf4810fc769df55b80949d32d1663de",
+      "typecheck-test-this-failure.txt": "2909301d8793899701c63a5a260f886860f193aeb4d59acd0f6dc769cfbce418",
+      "typecheck.txt": "dac125c794db702133345f3a0d33f3193f975fddc564ca4f1498b0d4132ed500",
+      "typecheck.txt.gz": "2fe7ab713d79076a320d54898138afd6a9af703dd6ca183fe18fd31669373051"
+    }
+  },
+  "docs_only_post_test_paths": [
+    "docs/verification/customer-listening-notes-export-20261007/README.md",
+    "docs/verification/customer-listening-notes-export-20261007/SHA256SUMS",
+    "docs/verification/customer-listening-notes-export-20261007/autoload-reflection.txt",
+    "docs/verification/customer-listening-notes-export-20261007/capacity-focused-green.txt",
+    "docs/verification/customer-listening-notes-export-20261007/capacity-focused-green.xml",
+    "docs/verification/customer-listening-notes-export-20261007/capacity-invalid-test-key-failure-v2.txt",
+    "docs/verification/customer-listening-notes-export-20261007/capacity-invalid-test-key-failure.txt",
+    "docs/verification/customer-listening-notes-export-20261007/capacity-source-18a6-php.txt",
+    "docs/verification/customer-listening-notes-export-20261007/capacity-source-18a6-php.xml",
+    "docs/verification/customer-listening-notes-export-20261007/frontend-carry-identity.json",
+    "docs/verification/customer-listening-notes-export-20261007/frozen-frontend.txt",
+    "docs/verification/customer-listening-notes-export-20261007/frozen-frontend.txt.gz",
+    "docs/verification/customer-listening-notes-export-20261007/frozen-php.txt",
+    "docs/verification/customer-listening-notes-export-20261007/frozen-php.xml",
+    "docs/verification/customer-listening-notes-export-20261007/frozen-pint.txt",
+    "docs/verification/customer-listening-notes-export-20261007/frozen-pint.txt.gz",
+    "docs/verification/customer-listening-notes-export-20261007/frozen-typecheck.txt",
+    "docs/verification/customer-listening-notes-export-20261007/frozen-typecheck.txt.gz",
+    "docs/verification/customer-listening-notes-export-20261007/invalid-test-key-failure.txt",
+    "docs/verification/customer-listening-notes-export-20261007/invalid-test-key-failure.xml",
+    "docs/verification/customer-listening-notes-export-20261007/missing-test-key-failure.txt",
+    "docs/verification/customer-listening-notes-export-20261007/missing-test-key-failure.xml",
+    "docs/verification/customer-listening-notes-export-20261007/notes-focused.txt",
+    "docs/verification/customer-listening-notes-export-20261007/original-capacity-red.txt",
+    "docs/verification/customer-listening-notes-export-20261007/original-capacity-red.xml",
+    "docs/verification/customer-listening-notes-export-20261007/pint.txt",
+    "docs/verification/customer-listening-notes-export-20261007/pint.txt.gz",
+    "docs/verification/customer-listening-notes-export-20261007/row-order-harness-failure.txt",
+    "docs/verification/customer-listening-notes-export-20261007/row-order-harness-failure.xml",
+    "docs/verification/customer-listening-notes-export-20261007/row-order-repair.txt",
+    "docs/verification/customer-listening-notes-export-20261007/source-runtime.json",
+    "docs/verification/customer-listening-notes-export-20261007/typecheck-parameter-failure.txt",
+    "docs/verification/customer-listening-notes-export-20261007/typecheck-test-this-failure.txt",
+    "docs/verification/customer-listening-notes-export-20261007/typecheck.txt",
+    "docs/verification/customer-listening-notes-export-20261007/typecheck.txt.gz"
+  ],
+  "frontend_carry_verified_paths": 109,
+  "frontend_current_source_checks": [
+    {
+      "path": "composer.json",
+      "same_current_source": true
+    },
+    {
+      "path": "composer.lock",
+      "same_current_source": true
+    },
+    {
+      "path": "package-lock.json",
+      "same_current_source": true
+    },
+    {
+      "path": "package.json",
+      "same_current_source": true
+    },
+    {
+      "path": "resources/js/Pages/CustomerLibrary.tsx",
+      "same_current_source": true
+    },
+    {
+      "path": "resources/js/components/CustomerListeningLibrary.tsx",
+      "same_current_source": true
+    },
+    {
+      "path": "tests/frontend/customer-listening-library.test.tsx",
+      "same_current_source": true
+    },
+    {
+      "path": "tests/frontend/customer-listening-notes.test.tsx",
+      "same_current_source": true
+    },
+    {
+      "path": "tsconfig.json",
+      "same_current_source": true
+    },
+    {
+      "path": "vite.config.ts",
+      "same_current_source": true
+    },
+    {
+      "path": "vitest.config.ts",
+      "same_current_source": true
+    }
+  ],
+  "decision": "approved for focused development integration; no remaining blockers",
+  "independent_case_census": {
+    "initial-key-harness-error.xml": {
+      "tests": "1",
+      "assertions": "0",
+      "errors": "1",
+      "failures": "0",
+      "skipped": "0",
+      "time": "8.003932"
+    },
+    "native-text-predecessor.xml": {
+      "tests": "1",
+      "assertions": "4",
+      "errors": "1",
+      "failures": "0",
+      "skipped": "0",
+      "time": "8.778028"
+    },
+    "native-successor.xml": {
+      "tests": "3",
+      "assertions": "30",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "9.175249"
+    },
+    "sqlite-successor.xml": {
+      "tests": "3",
+      "assertions": "29",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "0.518907"
+    }
+  },
+  "raw_native_red_probe": {
+    "capacity": 65535,
+    "retained_bytes": 64800,
+    "intent_bytes": 86184,
+    "sql_attempts": 1,
+    "driver_error": [
+      "22001",
+      1406,
+      "Data too long for column 'payload' at row 1"
+    ],
+    "prior_rows_exact": true,
+    "actual_source": "7b340ae172597d0311c5c8441ac93dacf206a2be",
+    "actual_driver": "mysql",
+    "native_version": "8.0.46-0ubuntu0.24.04.4"
+  },
+  "raw_native_successor_probe": {
+    "capacity": 65535,
+    "retained_bytes": 64800,
+    "intent_bytes": 86184,
+    "sql_attempts": 0,
+    "status": 422,
+    "prior_rows_exact": true,
+    "actual_source": "041453f928ed914151342b3468e1b7690cb3c4e4",
+    "actual_driver": "mysql",
+    "native_version": "8.0.46-0ubuntu0.24.04.4"
+  },
+  "raw_sqlite_successor_probe": {
+    "capacity": null,
+    "retained_bytes": 64800,
+    "intent_bytes": 86184,
+    "sql_attempts": 0,
+    "status": 422,
+    "prior_rows_exact": true,
+    "actual_source": "041453f928ed914151342b3468e1b7690cb3c4e4",
+    "actual_driver": "sqlite",
+    "native_version": null
+  },
+  "native_runtime_profile": "native-runtime-profile.json",
+  "canary_sha256": "582d38c0d90ae61cef97f24dc81c84b7cc6c3ec2975f034faafbecbea04004a4",
+  "dependency_identity": {
+    "composer_packages": 158,
+    "every_version_source_dist_matches_lock": true,
+    "composer_metadata_own": true,
+    "package_directories_shared_read_only": true,
+    "composer_and_node_lock_unchanged": true,
+    "node_modules_shared_read_only": true,
+    "node_package_install_not_reverified": true
+  },
+  "commands": {
+    "phpunit_runner": [
+      "php",
+      "-r",
+      "$GLOBALS[\"_composer_autoload_path\"] = getcwd().\"/vendor/autoload.php\"; require \"vendor/phpunit/phpunit/phpunit\";",
+      "--"
+    ],
+    "predecessor_suffix": [
+      "-c",
+      "docs/verification/cloud-listening-notes-independent-20261007/mysql-selection.xml",
+      "--filter",
+      "test_real_oversized",
+      "--log-junit",
+      "docs/verification/cloud-listening-notes-independent-20261007/native-text-predecessor.xml"
+    ],
+    "native_final_suffix": [
+      "-c",
+      "docs/verification/cloud-listening-notes-independent-20261007/mysql-selection.xml",
+      "--log-junit",
+      "docs/verification/cloud-listening-notes-independent-20261007/native-successor.xml"
+    ],
+    "sqlite_final_suffix": [
+      "-c",
+      "docs/verification/cloud-listening-notes-independent-20261007/sqlite-selection.xml",
+      "--log-junit",
+      "docs/verification/cloud-listening-notes-independent-20261007/sqlite-successor.xml"
+    ],
+    "source_environment": "NOTES_SOURCE_SHA binds each exact executable, NOTES_PROBE_PATH selects its durable JSON. Rootless activate.sh plus private isolated service_review-task.env, per native shell additional loopback network permission. XML supplies generated 32-byte synthetic test APP_KEY."
+  },
+  "parent_check_attribution": {
+    "attribution": "Root observations; raw final JUnit independently inspected, not repeated",
+    "final_source": "041453f928ed914151342b3468e1b7690cb3c4e4",
+    "final_php": {
+      "tests": 19,
+      "assertions": 257,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "export_http_tests": 16,
+      "export_http_assertions": 149,
+      "capacity_tests": 3,
+      "capacity_assertions": 108
+    },
+    "earlier_source": "7b340ae172597d0311c5c8441ac93dacf206a2be",
+    "earlier_php": {
+      "tests": 40,
+      "assertions": 272,
+      "passed": true
+    },
+    "earlier_frontend": {
+      "existing_cases": 65,
+      "new_note_cases": 26,
+      "passed": true
+    },
+    "final_shared_pint_typecheck": "Passed at12738218; raw frozen root receipts verified and source byte-exact final"
+  },
+  "prior_sensitive_evidence_carry": {
+    "original_approved_source": "ca3b1fa7eb60edd2228b73742da33179228a277e",
+    "listening_evidence_and_migration_no_new_hunks": true,
+    "no_new_ddl": true,
+    "actual_native_concurrency_not_repeated": true,
+    "actual_source_blobs": {
+      "app/Domain/Customers/Listening/ListeningEvidence.php": {
+        "prior_blob": "35629fc027f6ebacf6ed427635b9e13869caeb07",
+        "approved_blob": "35629fc027f6ebacf6ed427635b9e13869caeb07",
+        "byte_exact": true
+      },
+      "database/migrations/2026_10_07_242000_customer_saved_tracks.php": {
+        "prior_blob": "1c26493419f561e32fa9aaadfdba232b1eb2e04d",
+        "approved_blob": "1c26493419f561e32fa9aaadfdba232b1eb2e04d",
+        "byte_exact": true
+      },
+      "app/Domain/Customers/CustomerAccess.php": {
+        "prior_blob": "310bb10219405110a3db5a5844132c42d0291887",
+        "approved_blob": "310bb10219405110a3db5a5844132c42d0291887",
+        "byte_exact": true
+      },
+      "app/Domain/Customers/CustomerAccessPolicy.php": {
+        "prior_blob": "ceccc3a417413dec27b855d465d30349cef20fa3",
+        "approved_blob": "ceccc3a417413dec27b855d465d30349cef20fa3",
+        "byte_exact": true
+      },
+      "app/Domain/Customers/CustomerPrincipal.php": {
+        "prior_blob": "5fea086aee4cb54b1aa51deb16028fd78c66a5b2",
+        "approved_blob": "5fea086aee4cb54b1aa51deb16028fd78c66a5b2",
+        "byte_exact": true
+      },
+      "app/Domain/Customers/Listening/SavedListeningLibrary.php": {
+        "prior_blob": "4f2cba6a93cb3430890cba7f676195bfe2cb3528",
+        "approved_blob": "4f2cba6a93cb3430890cba7f676195bfe2cb3528",
+        "byte_exact": true
+      }
+    }
+  },
+  "scope_limits": [
+    "Actual native8.0.46; target8.4 unexecuted",
+    "Focused local independent/author/root selections, overlapping and not a complete acceptance matrix",
+    "No actual browser/device/download/Foundation/production/source-import/consent/cutover acceptance",
+    "No reviewer source/shareddoc/dependency/CI edits, push, merge, hostedCI, external provider action"
+  ],
+  "root_docs_only_successor_from": "12738218c9e47074cae6bbfba88f93141799dec4",
+  "root_docs_only_successor_paths": [
+    "docs/verification/cloud-listening-notes-registration-20261007/README.md",
+    "docs/verification/cloud-listening-notes-registration-20261007/artifact-sha256.json",
+    "docs/verification/cloud-listening-notes-registration-20261007/final-capacity-http-041453f.txt",
+    "docs/verification/cloud-listening-notes-registration-20261007/final-capacity-http-041453f.xml",
+    "docs/verification/cloud-listening-notes-registration-20261007/final-capacity-http-selection.phpunit.xml.txt",
+    "docs/verification/cloud-listening-notes-registration-20261007/final-shared-pint-1273821.txt",
+    "docs/verification/cloud-listening-notes-registration-20261007/final-typecheck-1273821.txt",
+    "docs/verification/cloud-listening-notes-registration-20261007/initial-shared-junit-7b340ae.xml",
+    "docs/verification/cloud-listening-notes-registration-20261007/initial-shared-php-7b340ae.txt",
+    "docs/verification/cloud-listening-notes-registration-20261007/initial-shared-selection.phpunit.xml.txt",
+    "docs/verification/cloud-listening-notes-registration-20261007/mounted-65-7b340ae.txt",
+    "docs/verification/cloud-listening-notes-registration-20261007/mounted-new26-7b340ae.txt",
+    "docs/verification/cloud-listening-notes-registration-20261007/source-map.json"
+  ],
+  "root_artifact_digests": {
+    "README.md": "3df6197784b879c31ec7e1301e170ae41393c368ba85d60a01ff37bcd7f0bbf3",
+    "final-capacity-http-041453f.txt": "b7f06cf1f03548a68000a226e9196479538e093550aad5d94e890e1970e5ae0e",
+    "final-capacity-http-041453f.xml": "e636c55487915d6f4b15ad39ccee854e310f2b40027eff492e4b8d6f11b15c73",
+    "final-capacity-http-selection.phpunit.xml.txt": "2de15b25d262dab8f80d96491afb6e7c5facf787b005cf551f13b20006569828",
+    "final-shared-pint-1273821.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "final-typecheck-1273821.txt": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f",
+    "initial-shared-junit-7b340ae.xml": "a6b36180d16e329dc18d80f1c853d02abed6cae8485267956ca25bd8287482c7",
+    "initial-shared-php-7b340ae.txt": "8f63dfa38dd687390596a83de78bf3290874059340c37e395dcc1e1d3becf99d",
+    "initial-shared-selection.phpunit.xml.txt": "bf8ca8b38300fbb48445425c5bea6fb26e0d33265ce1af8642699e2b2fe38226",
+    "mounted-65-7b340ae.txt": "054de464f0dd254dd559a463a2bd2e4d172d1b97985ab183fb9a8f37ef0193b6",
+    "mounted-new26-7b340ae.txt": "fbab2eaff764c3f69c0180c21d95887f30e426fc8ceddfeb9d857d7b7dd9e103",
+    "source-map.json": "fa5933c518607ce76f029d195b9301803d144a9098d1b5dcfa73f1d1a864247d"
+  },
+  "root_source_map": {
+    "reviewed_runtime": "041453f928ed914151342b3468e1b7690cb3c4e4",
+    "current_evidence_composition": "12738218c9e47074cae6bbfba88f93141799dec4",
+    "author_runtime": "ebb096eee0fbdfabe81a6d7eb622f50d342e9477",
+    "exact_owned_paths": [
+      "app/Domain/Customers/Listening/ListeningLibrary.php",
+      "resources/js/components/CustomerListeningLibrary.tsx",
+      "tests/Feature/CustomerListeningNotesBoundaryTest.php",
+      "tests/Feature/CustomerListeningNotesCapacityTest.php",
+      "tests/Feature/CustomerListeningNotesTest.php",
+      "tests/frontend/customer-listening-library.test.tsx",
+      "tests/frontend/customer-listening-notes.test.tsx"
+    ],
+    "source_sha256": {
+      "app/Domain/Customers/Listening/ListeningLibrary.php": "9823cc3eed3253c1fd3f1a6da6b4c86f69ca4563ff2a9d3ff918bb75437f0c75",
+      "app/Http/Controllers/CustomerListeningLibraryController.php": "5be8b7f9e5ee70ccb11f8c8dc1f0b03667cfa868cbe1f1594941c20d48a06d40",
+      "app/Http/Middleware/CustomerPrivacy.php": "d8ed53a590baade9670b8c87d0ce2d05526b104ad2b8121bd038cd65e5e976e8",
+      "app/Http/Requests/CustomerListeningRequest.php": "570a20e18e45ddc630bc19612d1f8f68ea06dbe0ae039dc797d3ed9986713048",
+      "resources/js/components/CustomerListeningLibrary.tsx": "b220f5d3243fc22595a9bcd84543ae19f5f7bd026b406691c3790b6065261781",
+      "routes/customer.php": "93ce38519eb528696e871b5a3e97a9d46f8009b1d8527d7a871b282cf111f44c",
+      "tests/Feature/CustomerListeningExportHttpTest.php": "744954b3d6d360a6541b916b2e2e382b72f010ea918a5c264fd1da1f93cc3cf3",
+      "tests/Feature/CustomerListeningLibraryHttpTest.php": "39efe2eec8b5ec7361b82815a48eaff40f1a4e12237d3d985ac9d73b4fd5c29b",
+      "tests/Feature/CustomerListeningNotesBoundaryTest.php": "fd326e2f62eb731de8263d147c7f1fec2b46af408d8af7904103bbb86f2a2f0c",
+      "tests/Feature/CustomerListeningNotesCapacityTest.php": "10518a05eedc81c84404c4db4db4c3adc409f12185df4fddb3c8ee659eaa03e0",
+      "tests/Feature/CustomerListeningNotesTest.php": "6b0203731a7f304dc2c017bf3b05d0aad526ad3db8a5e23592bb540855090484",
+      "tests/frontend/customer-listening-library.test.tsx": "228de8783f715ad12872f8ef19a8e996a8d72ba266a700d52f16dc8677d1922d",
+      "tests/frontend/customer-listening-notes.test.tsx": "b50352d4813fbc977a8031a92e660a6637cdec28194035441fb346516eccdc0f"
+    },
+    "shared_initial_executed": "7b340ae172597d0311c5c8441ac93dacf206a2be",
+    "shared_final_capacity_executed": "041453f928ed914151342b3468e1b7690cb3c4e4",
+    "typecheck_pint_executed": "12738218c9e47074cae6bbfba88f93141799dec4"
+  },
+  "root_source_mapping_verified": {
+    "hashes": 13,
+    "owned_paths_byte_exact_author_executable": 7
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "reviewed_runtime": "041453f928ed914151342b3468e1b7690cb3c4e4",
+  "current_evidence_composition": "12738218c9e47074cae6bbfba88f93141799dec4",
+  "author_runtime": "ebb096eee0fbdfabe81a6d7eb622f50d342e9477",
+  "exact_owned_paths": [
+    "app/Domain/Customers/Listening/ListeningLibrary.php",
+    "resources/js/components/CustomerListeningLibrary.tsx",
+    "tests/Feature/CustomerListeningNotesBoundaryTest.php",
+    "tests/Feature/CustomerListeningNotesCapacityTest.php",
+    "tests/Feature/CustomerListeningNotesTest.php",
+    "tests/frontend/customer-listening-library.test.tsx",
+    "tests/frontend/customer-listening-notes.test.tsx"
+  ],
+  "source_sha256": {
+    "app/Domain/Customers/Listening/ListeningLibrary.php": "9823cc3eed3253c1fd3f1a6da6b4c86f69ca4563ff2a9d3ff918bb75437f0c75",
+    "app/Http/Controllers/CustomerListeningLibraryController.php": "5be8b7f9e5ee70ccb11f8c8dc1f0b03667cfa868cbe1f1594941c20d48a06d40",
+    "app/Http/Middleware/CustomerPrivacy.php": "d8ed53a590baade9670b8c87d0ce2d05526b104ad2b8121bd038cd65e5e976e8",
+    "app/Http/Requests/CustomerListeningRequest.php": "570a20e18e45ddc630bc19612d1f8f68ea06dbe0ae039dc797d3ed9986713048",
+    "resources/js/components/CustomerListeningLibrary.tsx": "b220f5d3243fc22595a9bcd84543ae19f5f7bd026b406691c3790b6065261781",
+    "routes/customer.php": "93ce38519eb528696e871b5a3e97a9d46f8009b1d8527d7a871b282cf111f44c",
+    "tests/Feature/CustomerListeningExportHttpTest.php": "744954b3d6d360a6541b916b2e2e382b72f010ea918a5c264fd1da1f93cc3cf3",
+    "tests/Feature/CustomerListeningLibraryHttpTest.php": "39efe2eec8b5ec7361b82815a48eaff40f1a4e12237d3d985ac9d73b4fd5c29b",
+    "tests/Feature/CustomerListeningNotesBoundaryTest.php": "fd326e2f62eb731de8263d147c7f1fec2b46af408d8af7904103bbb86f2a2f0c",
+    "tests/Feature/CustomerListeningNotesCapacityTest.php": "10518a05eedc81c84404c4db4db4c3adc409f12185df4fddb3c8ee659eaa03e0",
+    "tests/Feature/CustomerListeningNotesTest.php": "6b0203731a7f304dc2c017bf3b05d0aad526ad3db8a5e23592bb540855090484",
+    "tests/frontend/customer-listening-library.test.tsx": "228de8783f715ad12872f8ef19a8e996a8d72ba266a700d52f16dc8677d1922d",
+    "tests/frontend/customer-listening-notes.test.tsx": "b50352d4813fbc977a8031a92e660a6637cdec28194035441fb346516eccdc0f"
+  },
+  "shared_initial_executed": "7b340ae172597d0311c5c8441ac93dacf206a2be",
+  "shared_final_capacity_executed": "041453f928ed914151342b3468e1b7690cb3c4e4",
+  "typecheck_pint_executed": "12738218c9e47074cae6bbfba88f93141799dec4"
+}
