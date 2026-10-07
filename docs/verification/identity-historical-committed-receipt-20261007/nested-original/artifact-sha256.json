@@ -1,0 +1,16 @@
+{
+  "docs/verification/cloud-identity-historical-independent-20261007.md": "4602a9f723129cd711d01135195a628852e6db6da1fe7409578e7db0e32c5388",
+  "docs/verification/cloud-identity-historical-independent-20261007/HistoricalNestedConfigurationCanaryTest.php": "c02f3d96d679793ff37cdf5588023a6744e05c2643ba59f90a8e3525d7cbb7fa",
+  "docs/verification/cloud-identity-historical-independent-20261007/current-source-bindings.json": "5ec75693c05148b5478dac250cd9f7cbf686e2a67ed98eecf50e1e118a2cff21",
+  "docs/verification/cloud-identity-historical-independent-20261007/held-receipt.json": "74359e24c3f89a990de32ecd252e04eeb0fdf3d87e69285971c32f677a292f4a",
+  "docs/verification/cloud-identity-historical-independent-20261007/initial-sqlite.txt": "949d761cad3dc825bf3e799edea35fad13e247cc2722117dbde9617eafd3dc15",
+  "docs/verification/cloud-identity-historical-independent-20261007/initial-sqlite.xml": "fba2c6d780bbec53f0e930ee930ca3f0af6d2ff4b89bbb2a8737eb0b055a7cb1",
+  "docs/verification/cloud-identity-historical-independent-20261007/native-selection.xml": "7afe7f1f8c1d23a4815c01c3722c9e616b81996113cc6b52dfcb8478567f6f9e",
+  "docs/verification/cloud-identity-historical-independent-20261007/nested-original.txt": "5283d94245ff084002008fadf25cfcf83580a2ce4277a90aadce23e5fd2f1957",
+  "docs/verification/cloud-identity-historical-independent-20261007/nested-original.xml": "591290ef2c9122fc68e64b20a3863adbdb809b73751615d5508bdd07f2f3877f",
+  "docs/verification/cloud-identity-historical-independent-20261007/nested-snapshot.json": "08dea67ed9ad7af047a7961539b16841a05618114607f6f07a78723a4c13e02f",
+  "docs/verification/cloud-identity-historical-independent-20261007/nested-sqlite-selection.xml": "7cf643b172c34b0152cbc1cb74123a9faa9b089cd0219befcad1821e845d8221",
+  "docs/verification/cloud-identity-historical-independent-20261007/original-getter-source-ledger.json": "4baaf671636de467b6e5aced75528b0975df19fd2ce027f9bed9efd446e13243",
+  "docs/verification/cloud-identity-historical-independent-20261007/own-autoload.txt": "f6662834198c8864b951c6317cf39b408d8672aa8810af127338701e4125f001",
+  "docs/verification/cloud-identity-historical-independent-20261007/sqlite-selection.xml": "b49fc5d6aeee1b8fb426680f17e5a2eb17acaeb6dd7982434d146e034f70056f"
+}
