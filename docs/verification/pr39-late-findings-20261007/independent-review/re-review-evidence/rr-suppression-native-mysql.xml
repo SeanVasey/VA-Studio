@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\CustomerSuppressionTest" file="/home/user/VA-Studio-review-p2/tests/Feature/CustomerSuppressionTest.php" tests="5" assertions="78" errors="0" failures="0" skipped="0" time="628.981393">
+    <testcase name="test_single_positive_attempt_is_committed_before_adapter_and_is_never_sent_again" file="/home/user/VA-Studio-review-p2/tests/Feature/CustomerSuppressionTest.php" line="67" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="12" time="142.814563"/>
+    <testsuite name="Tests\Feature\CustomerSuppressionTest::test_email_change_after_withdrawal_delivers_retained_captured_target_exactly_once" tests="3" assertions="58" errors="0" failures="0" skipped="0" time="299.628690">
+      <testcase name="test_email_change_after_withdrawal_delivers_retained_captured_target_exactly_once with data set &quot;positive&quot;" file="/home/user/VA-Studio-review-p2/tests/Feature/CustomerSuppressionTest.php" line="274" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="16" time="50.027908"/>
+      <testcase name="test_email_change_after_withdrawal_delivers_retained_captured_target_exactly_once with data set &quot;null receipt&quot;" file="/home/user/VA-Studio-review-p2/tests/Feature/CustomerSuppressionTest.php" line="274" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="21" time="97.009971"/>
+      <testcase name="test_email_change_after_withdrawal_delivers_retained_captured_target_exactly_once with data set &quot;transport throws&quot;" file="/home/user/VA-Studio-review-p2/tests/Feature/CustomerSuppressionTest.php" line="274" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="21" time="152.590812"/>
+    </testsuite>
+    <testcase name="test_retained_and_current_pending_targets_are_each_sent_once_oldest_first" file="/home/user/VA-Studio-review-p2/tests/Feature/CustomerSuppressionTest.php" line="323" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="8" time="186.538140"/>
+  </testsuite>
+</testsuites>
