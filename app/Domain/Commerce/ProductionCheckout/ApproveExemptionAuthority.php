@@ -23,8 +23,8 @@ final class ApproveExemptionAuthority
             $requestHash = CanonicalJson::hash(['candidate' => $current['binding'], 'policy' => $policy]);
             $existing = $rows->selector('authority', 'owner_user_id = ? AND request_key = ?', [$owner->id, $digest]);
             CheckoutException::require(count($existing) <= 1);
-            $created = $existing === [];
-            if (! $created) {
+            $inserted = $existing === [];
+            if (! $inserted) {
                 $record = $existing[0];
                 $body = Evidence::open($record, 'production_checkout_exemption_authority');
                 CheckoutException::require($record['request_hash'] === $requestHash);
@@ -47,7 +47,7 @@ final class ApproveExemptionAuthority
             CheckoutException::require(config('production_checkout.exemption_authoring_enabled') === true, 'authority', 403);
             CurrentPolicy::proveCurrent($rows->current, $current);
             StaffProof::proveCurrent($owner, $rows->current, $staff);
-            if ($created) {
+            if ($inserted === true) {
                 // Only a NEW authority installs the one commit observer; an exact replay writes nothing.
                 CheckoutStaffWriteAdmission::authority($rows, $owner, $staff, $current, $policy, $record, $digest);
             }

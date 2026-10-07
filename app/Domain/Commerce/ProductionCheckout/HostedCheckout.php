@@ -94,7 +94,7 @@ final class HostedCheckout
             $selection = null;
             $basis = null;
             $fresh = null;
-            $created = false;
+            $inserted = false;
             if ($create) {
                 CheckoutException::require(config('production_checkout.fresh_checkout_enabled') === true, 'disabled', 503);
                 $fresh = FreshCheckoutPolicy::capture();
@@ -119,7 +119,7 @@ final class HostedCheckout
                     'order_id' => $order['row']['id'], 'attempt_id' => $order['attempt']['id'], 'account_id' => $context->accountId, 'funds_mode' => $context->fundsMode,
                     'idempotency_key' => $request['idempotency_key'], 'retry_before' => $at->addSeconds($context->retrySeconds)->format('Y-m-d\TH:i:s\Z'),
                     'provider_expires_at' => $at->addSeconds($context->providerLifetimeSeconds)->format('Y-m-d\TH:i:s\Z')]);
-                $created = true;
+                $inserted = true;
             } else {
                 $record = $intents[0];
             }
@@ -139,7 +139,7 @@ final class HostedCheckout
             OrderEvidence::proveRetained($rows, $order['raw']);
             HostedEvidence::proveRetained($rows, $intent['raw']);
             $this->access->proveCurrent($principal, $buyer, $rows->current, $access);
-            if ($created) {
+            if ($inserted === true) {
                 $fresh->prove();
                 // Only a NEW intent installs the one commit observer; retries, reads and reconciliation do not.
                 CheckoutIntentAdmission::capture($rows, $access, $buyer, $fresh, $order, $intent, $current, $selection, $basis);
