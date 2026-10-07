@@ -36,9 +36,12 @@ async function mount(siteContent = defaultSiteContent) {
   });
 }
 
-afterEach(() => {
+afterEach(async () => {
   document.head.querySelectorAll('[data-inertia]').forEach(node => node.remove());
   window.history.replaceState({}, '', '/');
+  // Inertia schedules a zero-delay scroll-to-anchor timer at visit completion; let it run
+  // while the jsdom document still exists instead of after teardown.
+  await new Promise(resolve => setTimeout(resolve, 0));
 });
 
 describe('read-only checkout return', () => {
