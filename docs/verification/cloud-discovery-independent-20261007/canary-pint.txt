@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"docs\/verification\/cloud-discovery-independent-20261007\/DiscoveryNativeNamespaceCanaryTest.php","fixers":["ordered_imports"]}]}

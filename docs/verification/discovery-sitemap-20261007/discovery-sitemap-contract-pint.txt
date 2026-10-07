@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"app\/Domain\/Catalog\/DiscoverySitemap\/DiscoverySitemapConsumption.php","fixers":["class_attributes_separation","braces_position","statement_indentation","single_line_empty_body","blank_line_before_statement"]}]}

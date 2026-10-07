@@ -1,0 +1,27 @@
+{
+    "capture": {
+        "byte_exact": true,
+        "sha256": "cc692c4177d2320aeb0ff77c8dbd48a2be59f6555336033f84d76148b4b33466",
+        "bytes": 513
+    },
+    "currentPaths": {
+        "byte_exact": true,
+        "sha256": "95f23790298173f3ba8efe94fccc02aa49d1a8f2da247c39ae518dd4e6629807",
+        "bytes": 1428
+    },
+    "captureCurrent": {
+        "byte_exact": true,
+        "sha256": "dd41b9aee12a01e757d1c911fb1f718f02163cd1e6bc17478fdac064c778e4b3",
+        "bytes": 6236
+    },
+    "configuration": {
+        "byte_exact": true,
+        "sha256": "6c29e6edbc3e2e83450bfaa59feceae335ba48e57409b3ff44802160088dcef8",
+        "bytes": 288
+    },
+    "decode": {
+        "byte_exact": true,
+        "sha256": "6f157b2a2a7c155f8ae13e1add593187089893e0ae912eafdfa325c3b5e96df0",
+        "bytes": 515
+    }
+}
