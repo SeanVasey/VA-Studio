@@ -1,0 +1,11 @@
+# Support test lifecycle independent review
+
+Exact source `4e103201c04033e8a777f5a9891715e29b530f1e` is approved for the seven active test changes in `7c8372bd0723447c03c3b671fa456fc79ce5fbaa`, `a566292f5651470407dd4ce1240107ef1de12a4f` and `20c6f87a8d11946ab6593461ce31821eabbcd9e0`. The review is source-only; no runtime file changed in this delta.
+
+The tests use the existing testing-only disposable `FinalizationDatabaseMigrations` lifecycle instead of private reviewer schema names and environment flags. The trait checks the testing environment, rebuilds disposable fixtures and wipes them at teardown without invoking the guarded operational rollback. It is byte-exact to the pre-change source. The permanent VIEW canary and process-contention case still require MySQL. Test bodies and assertions for the session/key/native-view original failures remain intact; the original archival definitions and negative receipts are byte-exact.
+
+The reserved TABLE/TRIGGER-name collision now executes on both supported drivers. It still requires refusal and preservation of foreign marker9123, with only qualified table syntax adjusted for SQLite. The real CSRF test restores the testing environment in `finally`, including assertion failure, so disposable cleanup no longer runs under its temporary production setting. No fixture helper, operational rollback, CI control or production binding changed.
+
+All32 carried independent runtime/test bindings, seven changed test hashes and41 original artifacts reconcile. Root source-bound receipts are carried rather than replayed: native original6/33 and registered/source-name/contention4/132 passed; SQLite28 recorded/26 passed/562 assertions included one named native VIEW skip and one cleanup harness error before the `finally` repair, followed by the affected unchanged test1/28 green. Both historical outputs remain visible. PHP parsing and whitespace pass. The exact diff, source map and root durable artifact hashes are recorded alongside this report.
+
+The prior exact966+9ce runtime approval carries across this test-only delta. Final integrated source census, host scanner/storage/transport facts, approved production attachment policy and release acceptance remain separate gates.

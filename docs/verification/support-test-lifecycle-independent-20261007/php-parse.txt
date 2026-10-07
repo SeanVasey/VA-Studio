@@ -1,0 +1,7 @@
+No syntax errors detected in tests/Feature/ServiceProjectCommittedSchemaIndependentTest.php
+No syntax errors detected in tests/Feature/SupportAttachmentKeyCaptureIndependentTest.php
+No syntax errors detected in tests/Feature/SupportAttachmentSessionIndependentTest.php
+No syntax errors detected in tests/Feature/SupportAttachmentCommittedClosureTest.php
+No syntax errors detected in tests/Feature/SupportAttachmentHttpTest.php
+No syntax errors detected in tests/Feature/SupportAttachmentNativeConcurrencyTest.php
+No syntax errors detected in tests/Feature/SupportAttachmentRegistrationTest.php
