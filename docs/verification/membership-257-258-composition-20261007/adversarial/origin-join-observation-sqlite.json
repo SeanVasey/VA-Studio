@@ -1,0 +1,11 @@
+{
+    "identity_origin_mismatch_refused": true,
+    "period_account_other_user_refused": true,
+    "other_account_period_user_refused": true,
+    "unverified_exact_owner_refused": true,
+    "changed_honor_deadline_refused": true,
+    "exact_graph_admitted": true,
+    "activation_without_reserve_event_admitted": true,
+    "credit_events_present": 0,
+    "driver": "sqlite"
+}

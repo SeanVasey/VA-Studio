@@ -1,0 +1,36 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member257/phpunit.xml
+
+[31;1mE[0m                                                                   1 / 1 (100%)
+
+Time: 00:02.071, Memory: 79.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\MembershipReview\MemberOriginalRedemptionJoinReviewTest::test_origin_join_refuses_uncovered_owner_variants_and_characterizes_reserve_coupling
+Illuminate\Database\QueryException: SQLSTATE[23000]: Integrity constraint violation: 19 Customer identity is retained (Connection: sqlite, Database: :memory:, SQL: update "customer_accounts" set "active" = 0 where "id" = 1)
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:614
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:566
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4384
+/home/user/VA-Studio-member257/docs/verification/membership-257-258-composition-20261007/adversarial/MemberOriginalRedemptionJoinReviewTest.php:37
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+Caused by
+PDOException: SQLSTATE[23000]: Integrity constraint violation: 19 Customer identity is retained
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:626
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:846
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:614
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:566
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4384
+/home/user/VA-Studio-member257/docs/verification/membership-257-258-composition-20261007/adversarial/MemberOriginalRedemptionJoinReviewTest.php:37
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 0[0m[37;41m, Errors: 1[0m[37;41m.[0m

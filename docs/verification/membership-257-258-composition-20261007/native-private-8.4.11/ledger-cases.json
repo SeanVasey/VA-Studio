@@ -1,0 +1,152 @@
+{
+  "257-statement-closure": [
+    {
+      "attempt": 1,
+      "exit": 0,
+      "counts": {
+        "tests": "1",
+        "assertions": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      "env_interference": false,
+      "waited_s": 0
+    }
+  ],
+  "257-foreign-check": [
+    {
+      "attempt": 1,
+      "exit": 2,
+      "counts": {
+        "tests": "1",
+        "assertions": "0",
+        "failures": "0",
+        "errors": "1",
+        "skipped": "0"
+      },
+      "env_interference": false,
+      "waited_s": 0
+    }
+  ],
+  "257-foreign-unique": [
+    {
+      "attempt": 1,
+      "exit": 0,
+      "counts": {
+        "tests": "1",
+        "assertions": "2",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      "env_interference": false,
+      "waited_s": 0
+    }
+  ],
+  "257-changed-enum": [
+    {
+      "attempt": 1,
+      "exit": 0,
+      "counts": {
+        "tests": "1",
+        "assertions": "2",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      "env_interference": false,
+      "waited_s": 0
+    }
+  ],
+  "258-owned-retry": [
+    {
+      "attempt": 1,
+      "exit": 0,
+      "counts": {
+        "tests": "1",
+        "assertions": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      "env_interference": false,
+      "waited_s": 0
+    }
+  ],
+  "258-pending-original": [
+    {
+      "attempt": 1,
+      "exit": 0,
+      "counts": {
+        "tests": "1",
+        "assertions": "7",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      "env_interference": false,
+      "waited_s": 0
+    }
+  ],
+  "258-global-check": [
+    {
+      "attempt": 1,
+      "exit": 0,
+      "counts": {
+        "tests": "1",
+        "assertions": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      "env_interference": false,
+      "waited_s": 0
+    }
+  ],
+  "258-other-account": [
+    {
+      "attempt": 1,
+      "exit": 0,
+      "counts": {
+        "tests": "1",
+        "assertions": "2",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      "env_interference": false,
+      "waited_s": 0
+    }
+  ],
+  "258-other-invoice": [
+    {
+      "attempt": 1,
+      "exit": 0,
+      "counts": {
+        "tests": "1",
+        "assertions": "2",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      "env_interference": false,
+      "waited_s": 0
+    }
+  ],
+  "review-origin-join-native": [
+    {
+      "attempt": 1,
+      "exit": 0,
+      "counts": {
+        "tests": "1",
+        "assertions": "8",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      "env_interference": false,
+      "waited_s": 0
+    }
+  ]
+}
