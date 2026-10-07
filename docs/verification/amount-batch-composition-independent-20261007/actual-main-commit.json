@@ -1,0 +1,40 @@
+{
+  "sha": "717f0866444701637e7c396b4376891aa5dd995d",
+  "node_id": "C_kwDOU5febtoAKDcxN2YwODY2NDQ0NzAxNjM3ZTdjMzk2YjQzNzY4OTFhYTVkZDk5NWQ",
+  "url": "https://api.github.com/repos/SeanVasey/VA-Studio/git/commits/717f0866444701637e7c396b4376891aa5dd995d",
+  "html_url": "https://github.com/SeanVasey/VA-Studio/commit/717f0866444701637e7c396b4376891aa5dd995d",
+  "author": {
+    "name": "Sean Vasey",
+    "email": "sean@vasey.audio",
+    "date": "2026-10-07T05:10:33Z"
+  },
+  "committer": {
+    "name": "GitHub",
+    "email": "noreply@github.com",
+    "date": "2026-10-07T05:10:33Z"
+  },
+  "tree": {
+    "sha": "1c43bb29aefb56f3698ba734e756d685fd018245",
+    "url": "https://api.github.com/repos/SeanVasey/VA-Studio/git/trees/1c43bb29aefb56f3698ba734e756d685fd018245"
+  },
+  "message": "Merge pull request #24 from SeanVasey/codex/atomic-test-pdf-v2-adoption-20261007\n\nAdopt test-only PDF v2 atomically and preserve historical originals",
+  "parents": [
+    {
+      "sha": "43b919c4f5cef9bb259515904333a7aa20dcb6fb",
+      "url": "https://api.github.com/repos/SeanVasey/VA-Studio/git/commits/43b919c4f5cef9bb259515904333a7aa20dcb6fb",
+      "html_url": "https://github.com/SeanVasey/VA-Studio/commit/43b919c4f5cef9bb259515904333a7aa20dcb6fb"
+    },
+    {
+      "sha": "0b0db4e181c0254d30f45beeaf8cbc373782e6cd",
+      "url": "https://api.github.com/repos/SeanVasey/VA-Studio/git/commits/0b0db4e181c0254d30f45beeaf8cbc373782e6cd",
+      "html_url": "https://github.com/SeanVasey/VA-Studio/commit/0b0db4e181c0254d30f45beeaf8cbc373782e6cd"
+    }
+  ],
+  "verification": {
+    "verified": true,
+    "reason": "valid",
+    "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqxdRJCRC1aQ7uu5UhlAAAzGwQAHSst78dijJJqpJacdm3taoS\nZfKhavLn9iosYepTpVTK4rNXQz2+w3W5gDaZzc3Y0dLVnxJAwx4CYy+ZyDFHCh0V\n4281Gfdra0wWK59A35deacVhF0bOya/coa5iKUefpq9/KT6M8KRd/UFY8HPiVnQx\n9eo6zBat2BO1lAMpENGHw1ypmxMoHHFIFhCM0edeRzxW4Ky5YB+H0kCaxDfqHeuT\nUDWFOoJSRdwsBIs9AGNqEJzhErCknvivdHsg+1fvykOYkDmc5Vr0QN+Cy+3eJGos\nIV8GWzO6VhuFZlcLXfBBf6EIJ40DmfgM5FaiIidkYmA0PWVeDryWNrs/+aiayYDM\nJ/PfPo7LQqD1NE5yQlfgxMTsQTYXO4ZTkCEkLvcyiQFx1/ATxWBkvxAShXUhB5kC\nrSswJedbNXbS1bXb/AJwdneS1wExQowrf7pyV7RTYYXWIjzjkP6htPm8FcNQGF2n\nsB2yBik9/s3cTyXkK9MfHrD2hz2r7p7cUwxv1Dx+JJWJaVOQ3lElqgotpUfgFZOv\nmlNDLkvY+DqDPgDozSGwTZfvJSQ5QGpxZ4tYROJMvs2KpLiVVp+ilCs3KZtwGorX\nL8nP5PJPSxPnsFCdV1bDGcWKz0Q3lGFHbfHL2DTJMtraHJUV03qRgtc9W1G/PwPl\nDInjSBjeQqQH5ATeoeJd\n=g0LZ\n-----END PGP SIGNATURE-----\n",
+    "payload": "tree 1c43bb29aefb56f3698ba734e756d685fd018245\nparent 43b919c4f5cef9bb259515904333a7aa20dcb6fb\nparent 0b0db4e181c0254d30f45beeaf8cbc373782e6cd\nauthor Sean Vasey <sean@vasey.audio> 1791349833 -0500\ncommitter GitHub <noreply@github.com> 1791349833 -0500\n\nMerge pull request #24 from SeanVasey/codex/atomic-test-pdf-v2-adoption-20261007\n\nAdopt test-only PDF v2 atomically and preserve historical originals",
+    "verified_at": "2026-10-07T05:10:33Z"
+  }
+}

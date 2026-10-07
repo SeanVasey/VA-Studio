@@ -1,0 +1,11 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/scratch/2876616e88c3/VA-Studio-amount-comparator-independent/comparator-sqlite.phpunit.xml
+
+................................................................. 65 / 70 ( 92%)
+.....                                                             70 / 70 (100%)
+
+Time: 00:22.066, Memory: 87.00 MB
+
+[30;42mOK (70 tests, 698 assertions)[0m

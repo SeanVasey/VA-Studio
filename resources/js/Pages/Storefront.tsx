@@ -15,6 +15,7 @@ import { useCart } from '../lib/useCart';
 import { builtInSiteImages, defaultSiteContent, siteContentHref } from '../lib/site-content';
 import { HeroPicture, StudioPicture } from '../components/SiteImagery';
 import { SiteFooter, SiteHeader } from '../components/SiteChrome';
+import { InstallApp } from '../components/InstallApp';
 
 const EMPTY_TRACKS: Track[] = [];
 
@@ -157,7 +158,7 @@ export default function Storefront({ tracks = EMPTY_TRACKS, licenseTiers = [], s
   }, [selectedTrackSlug]);
 
   return <>
-    {metadata && !designPreview && <MetadataHead metadata={metadata} />}
+    {metadata && !designPreview && <MetadataHead metadata={metadata} publicInstallation={!sitePreview} />}
     <a className="skip-link" href="#main">Skip to content</a>
     {designPreview && <div className="preview-banner">DEVELOPMENT PREVIEW <span>Sample catalog for design review. No purchases or licenses are issued.</span></div>}
     {sitePreview && <div className="preview-banner">PRIVATE CONTENT PREVIEW <span>Visible only to staff. Purchasing is disabled.</span></div>}
@@ -192,7 +193,7 @@ export default function Storefront({ tracks = EMPTY_TRACKS, licenseTiers = [], s
       <section id="studio" className="studio-section section-pad" aria-labelledby="studio-title"><div className="studio-visual"><StudioPicture image={siteImages.studio} /><span className="studio-caption">SEAN VASEY PRODUCTIONS / VASEY.AUDIO</span></div><div className="studio-copy"><p className="eyebrow">{siteContent.studio.eyebrow}</p><h2 id="studio-title">{siteContent.studio.title}<br />{siteContent.studio.line_two}</h2><p className="studio-lead">{siteContent.studio.lead}</p>{siteContent.studio.paragraphs.map((paragraph, index) => <p key={index} style={{ whiteSpace: 'pre-line' }}>{paragraph}</p>)}<div className="studio-disciplines"><span>MUSIC PRODUCTION</span><span>COMPOSITION</span><span>SOUND DESIGN</span></div></div></section>
       <section className="closing-statement"><span className="eyebrow">VASEY.AUDIO</span><p>MAKE SOMETHING<br /><span>ONLY YOU CAN.</span></p><a className="button button-outline" href="#catalog">Start with a sound <Icon name="northeast" /></a></section>
     </main>
-    <SiteFooter content={siteContent} homeHref={navigationHref('/')} href={navigationHref} onNavigate={navigateContent} />
+    <SiteFooter content={siteContent} homeHref={navigationHref('/')} href={navigationHref} onNavigate={navigateContent}>{!sitePreview && !designPreview && <InstallApp />}</SiteFooter>
     <PersistentPlayer tracks={pageTracks} onLicense={openLicense} purchasingDisabled={sitePreview} catalogUrl={sitePreviewBase ? siteContentHref('/#catalog', sitePreviewBase) : '#catalog'} onNavigate={navigateContent} />
     <div className={`toast ${notice ? 'toast-visible' : ''}`} role="status">{notice && <><span>{notice}{shareFallback && <a className="text-link" href={shareFallback} onClick={event => navigate(event, designPreview || sitePreview)}>Open track link <Icon name="northeast" size={14} /></a>}</span><button className="icon-button" aria-label="Dismiss notification" onClick={() => { setNotice(''); setShareFallback(null); }}><Icon name="close" size={17} /></button></>}</div>
     {!sitePreview && licenseTrack && <Modal title="CHOOSE YOUR LICENSE." eyebrow={licenseTrack.title} onClose={() => setLicenseTrack(null)}><p className="modal-description">Select the published offer for this track. Review its files and version before adding it to your cart.</p><fieldset className="offer-options"><legend className="sr-only">Available licenses for {licenseTrack.title}</legend>{licenseTrack.offers.filter(availableOffer).map(offer => { const tier = knownTiers.find(tier => tier.id === offer.licenseVersionId); return <label className={`offer-option ${selectedOfferId === offer.id ? 'selected' : ''}`} key={offer.id}><input type="radio" name="license" value={offer.id} checked={selectedOfferId === offer.id} onChange={() => setSelectedOfferId(offer.id)} /><span className="offer-content"><span className="offer-heading"><strong>{offer.licenseName}</strong><strong>{formatMoney(offer.priceMinor, offer.currency)}</strong></span><span className="offer-files">{offer.deliverableRoles.map(role => fileRoleLabels[role] ?? role).join(' + ')}</span>{tier && <span className="offer-terms">{tier.features.join(' · ')}</span>}<span className="fine-print">{tier ? `Published terms version ${tier.version}` : 'Published license offer'}</span></span></label>; })}</fieldset>{selectedOffer && <LicenseDisclosure offer={selectedOffer} defaultOpen={showFullTerms} />}<p className="checkout-advisory">{testCheckoutEnabled ? 'Stripe checkout is available only for prepared test orders. Adding a license saves a selection only.' : 'Checkout and contract delivery are not available yet. Adding a license saves a selection only.'}</p><button className="button full-width" disabled={!selectedOffer || pending || cartError} onClick={addLicense}>{selectedOffer ? `Add license · ${formatMoney(selectedOffer.priceMinor, selectedOffer.currency)}` : 'No license available'}<Icon name="bag" size={18} /></button></Modal>}

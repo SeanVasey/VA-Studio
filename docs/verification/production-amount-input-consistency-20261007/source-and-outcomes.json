@@ -1,0 +1,121 @@
+{
+  "tested_source": "4eb0ebe90de695aad5a2851022de185881424e9a",
+  "tree": "a5e7fe3d890c6a68790d8cee6fdc32397f5ade56",
+  "base": "a86a7e2e8b72495dc35ba053dd01467702d88b8a",
+  "owned": [
+    {
+      "path": "app/Domain/Commerce/ProductionPreparation/AmountInputConsistencyV1.php",
+      "sha256": "120db902eb06b7a65cc10f213731d6177d81fddb4a3defbc5f3d8c589fd020f4",
+      "git_blob": "d8c3bd78d60e46a245b451b32b4c4037dc6a9506"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPreparation/CompareProductionAmountInputs.php",
+      "sha256": "d7df4de70b438b561852df96406526a1d80c2392caca5d01766cabd6d2706418",
+      "git_blob": "94811ee9eb59ea4f4de18ed338d2c5e08422dc49"
+    },
+    {
+      "path": "docs/architecture/D-29-untrusted-production-amount-consistency.md",
+      "sha256": "c2fe3c18ba4f7ba77d41e5276724c6bd83dd12bb29d07ca3441cd22f9d5cbe49",
+      "git_blob": "7a7884a1b5590d8518327b7ef639c491c8780796"
+    },
+    {
+      "path": "tests/Feature/ProductionAmountInputConsistencyAccessTest.php",
+      "sha256": "d4c686b96c69552e4bde37f726b4213762ff36943fa9b6e9a68fd17793cb0e10",
+      "git_blob": "7da1b058e2b23d67341da96095c8c248b1354073"
+    },
+    {
+      "path": "tests/Unit/ProductionAmountInputConsistencyTest.php",
+      "sha256": "58c5a591fabc01c063c920aefb1832ebcc5630ab1ac6fe53a1fb04e1bb9cb404",
+      "git_blob": "dbc6bf09457b94be1efdcf2c2051af2d29e44721"
+    }
+  ],
+  "protected_unchanged": [
+    "composer.json",
+    "composer.lock",
+    "app/Domain/Commerce/ProductionPreparation/ProductionTrackPreparationPackets.php",
+    "app/Domain/Commerce/ProductionPreparation/PacketAuthority.php",
+    "app/Domain/Commerce/ProductionPreparation/PacketEvidence.php",
+    "app/Domain/Commerce/ProductionPreparation/PreparationSelection.php",
+    "app/Domain/Commerce/ProductionPreparation/ProductionBuyerAssentObservations.php",
+    "app/Domain/Commerce/ProductionPreparation/ProductionAmountRequirements.php",
+    "app/Domain/Commerce/ProductionPreparation/AmountRequirementsV1.php",
+    "app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php",
+    "app/Domain/Commerce/ProductionPolicy/PreparationContextV1.php",
+    "tests/Unit/ProductionAmountRequirementsTest.php",
+    "tests/Feature/ProductionAmountRequirementsAccessTest.php",
+    "docs/architecture/D-28-production-amount-evidence-requirements.md"
+  ],
+  "database_routes_workflows_contracts_discovery_unchanged": true,
+  "selections": [
+    {
+      "selection": "sqlite",
+      "cases": 66,
+      "assertions": 661,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0,
+      "by_class": {
+        "Tests\\Unit\\ProductionAmountInputConsistencyTest": {
+          "cases": 51,
+          "assertions": 548
+        },
+        "Tests\\Feature\\ProductionAmountInputConsistencyAccessTest": {
+          "cases": 15,
+          "assertions": 113
+        }
+      }
+    },
+    {
+      "selection": "mysql",
+      "cases": 66,
+      "assertions": 660,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0,
+      "by_class": {
+        "Tests\\Unit\\ProductionAmountInputConsistencyTest": {
+          "cases": 51,
+          "assertions": 548
+        },
+        "Tests\\Feature\\ProductionAmountInputConsistencyAccessTest": {
+          "cases": 15,
+          "assertions": 112
+        }
+      }
+    },
+    {
+      "selection": "affected-d28",
+      "cases": 52,
+      "assertions": 183,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0,
+      "by_class": {
+        "Tests\\Unit\\ProductionAmountRequirementsTest": {
+          "cases": 40,
+          "assertions": 101
+        },
+        "Tests\\Feature\\ProductionAmountRequirementsAccessTest": {
+          "cases": 12,
+          "assertions": 82
+        }
+      }
+    }
+  ],
+  "failures": [],
+  "mysql_runtime": {
+    "version": "8.4.11",
+    "innodb_flush_log_at_trx_commit": 1,
+    "sync_binlog": 1,
+    "innodb_doublewrite": "ON",
+    "log_bin": true,
+    "transport": "private fresh loopback TCP",
+    "database": "fresh disposable"
+  },
+  "limits": [
+    "Focused access and late-DML proofs are not MySQL concurrency or full Foundation acceptance.",
+    "Pure supplied arithmetic is not authoritative provider/tax/buyer/exemption/payment/rights/consent/execution proof.",
+    "Initial iteration raw/source artifacts remain historical, not final-source acceptance.",
+    "Independent exact-source review/fresh-main composition/cheap preflight pending."
+  ]
+}

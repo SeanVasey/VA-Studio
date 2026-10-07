@@ -1,0 +1,2 @@
+App\Domain\Commerce\ProductionPreparation\AmountInputConsistencyV1 /workspace/scratch/2876616e88c3/VA-Studio-amount-comparator-independent/app/Domain/Commerce/ProductionPreparation/AmountInputConsistencyV1.php
+App\Domain\Commerce\ProductionPreparation\CompareProductionAmountInputs /workspace/scratch/2876616e88c3/VA-Studio-amount-comparator-independent/app/Domain/Commerce/ProductionPreparation/CompareProductionAmountInputs.php

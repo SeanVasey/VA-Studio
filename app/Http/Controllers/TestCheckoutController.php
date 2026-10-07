@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Domain\Commerce\Checkout\HostedCheckout;
 use App\Domain\Commerce\QuoteException;
+use App\Domain\SiteBuilder\EditorialContent;
+use App\Domain\SiteBuilder\SiteContent;
+use App\Domain\SiteBuilder\SiteContentSchema;
+use App\Domain\SiteBuilder\SiteContentUnavailable;
 use App\Support\CommerceRequestIdentity;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -46,7 +50,18 @@ final class TestCheckoutController
             return response()->json(['code' => 'ORDER_NOT_FOUND'], 404, $this->headers());
         }
 
-        return Inertia::render('CheckoutReturn', ['orderId' => $order])->toResponse($request)->withHeaders($this->headers());
+        try {
+            $content = app(SiteContent::class)->current();
+        } catch (SiteContentUnavailable) {
+            // A private saved-order read stays available during a public CMS integrity outage.
+            // These approved code defaults neither adopt damaged content nor recover publication.
+            $content = SiteContentSchema::defaults();
+        }
+        $chrome = app(EditorialContent::class)->chrome($content);
+        $privateMetadata = ['title' => 'Checkout status — VASEY.AUDIO', 'description' => 'View the saved test order status for this session. A browser return does not verify payment.', 'robots' => 'noindex, nofollow'];
+
+        return Inertia::render('CheckoutReturn', ['orderId' => $order, 'siteContent' => $chrome])
+            ->withViewData(['privateMetadata' => $privateMetadata])->toResponse($request)->withHeaders($this->headers());
     }
 
     private function emptyBody(Request $request): void

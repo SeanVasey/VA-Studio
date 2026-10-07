@@ -1,0 +1,14 @@
+{
+  "tecnickcom/tc-lib-pdf": {
+    "old_version": "8.76.2",
+    "new_version": "8.76.3",
+    "old_source_reference": "c383bd3ac09164c3fd1a6ac7da8f5460d19e47e3",
+    "new_source_reference": "d417129fad37d49dc9fc0d1e229e9740e1c774a3"
+  },
+  "tecnickcom/tc-lib-pdf-font": {
+    "old_version": "4.4.0",
+    "new_version": "4.4.1",
+    "old_source_reference": "658e04565534c0cdd3d8d7ff12f1c6ebeab5f7ce",
+    "new_source_reference": "a78b8e0ac9284d1594b6ba68488cf65c3e958f7b"
+  }
+}

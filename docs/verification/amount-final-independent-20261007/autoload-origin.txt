@@ -1,0 +1,2 @@
+App\Domain\Commerce\ProductionPreparation\ProductionAmountRequirements /workspace/scratch/2876616e88c3/VA-Studio-amount-final-independent/app/Domain/Commerce/ProductionPreparation/ProductionAmountRequirements.php
+App\Domain\Commerce\ProductionPreparation\AmountRequirementsV1 /workspace/scratch/2876616e88c3/VA-Studio-amount-final-independent/app/Domain/Commerce/ProductionPreparation/AmountRequirementsV1.php

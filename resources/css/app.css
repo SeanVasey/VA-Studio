@@ -543,3 +543,13 @@ ol.editorial-list { list-style: none; margin: 0; padding: 0; }
 .queue-order { display: flex; flex-shrink: 0; }
 .queue-order .icon-button { width: 44px; min-width: 44px; min-height: 44px; }
 @media (max-width: 480px) { .queue-panel { padding: 12px 16px; } .queue-row { flex-wrap: wrap; } .queue-order { margin-left: auto; } .queue-row .queue-track { padding-bottom: 0; } }
+
+/* Public installation guidance uses the current theme and stays clear of the persistent player. */
+.install-help { max-width: 72ch; margin: 24px 0; border-top: 1px solid var(--va-rule); color: var(--va-text); }
+.install-help summary { min-height: 44px; padding: 12px 0; cursor: pointer; font-weight: 600; }
+.install-help-content { padding: 8px 0 16px; line-height: 1.5; }
+.install-help-content p { margin: 0 0 16px; }
+.install-help-content ul { padding-left: 24px; margin: 16px 0; }
+.install-help-content li { margin-bottom: 12px; }
+.install-help-content a { display: inline-block; min-height: 44px; padding: 12px 0; }
+.install-help-content button { max-width: 100%; white-space: normal; }

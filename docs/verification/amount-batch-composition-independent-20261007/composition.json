@@ -1,0 +1,300 @@
+{
+  "executable": "4eb0ebe90de695aad5a2851022de185881424e9a",
+  "executable_tree": "a5e7fe3d890c6a68790d8cee6fdc32397f5ade56",
+  "reviewed_metadata_head": "f5b80c9ee3dc28745b27d17ea4a23a235697e187",
+  "reviewed_metadata_tree": "845eaffaaaf7db2bdc36c2a7004ff901f4880f58",
+  "protected_baseline": "5cba90191a21aca3acef7b9e01f65efecdbd0dcd",
+  "protected_baseline_tree": "1c43bb29aefb56f3698ba734e756d685fd018245",
+  "protected_baseline_paths": 2212,
+  "source_exact_paths": {
+    "app/Domain/Commerce/ProductionPreparation/AmountInputConsistencyV1.php": "d8c3bd78d60e46a245b451b32b4c4037dc6a9506",
+    "app/Domain/Commerce/ProductionPreparation/AmountRequirementsV1.php": "64b4478f16f7b2defeb22519400c82bdac20c905",
+    "app/Domain/Commerce/ProductionPreparation/CompareProductionAmountInputs.php": "94811ee9eb59ea4f4de18ed338d2c5e08422dc49",
+    "app/Domain/Commerce/ProductionPreparation/ProductionAmountRequirements.php": "295fbff3b156f57cecc483223be0b018ec46c2e4",
+    "docs/architecture/D-28-production-amount-evidence-requirements.md": "8d17cdc47a2b78b83da20e22f48e52938b6faf5d",
+    "docs/architecture/D-29-untrusted-production-amount-consistency.md": "7a7884a1b5590d8518327b7ef639c491c8780796",
+    "tests/Feature/ProductionAmountInputConsistencyAccessTest.php": "7da1b058e2b23d67341da96095c8c248b1354073",
+    "tests/Feature/ProductionAmountRequirementsAccessTest.php": "2e7cf5a83621043ba106a16252974cdf9adbfca4",
+    "tests/Unit/ProductionAmountInputConsistencyTest.php": "dbc6bf09457b94be1efdcf2c2051af2d29e44721",
+    "tests/Unit/ProductionAmountRequirementsTest.php": "709ac59efe25b9eb4cc2f961f7b8c3ccc9d44d09"
+  },
+  "post_executable_metadata_only_paths": [
+    "docs/verification/amount-comparator-independent-20261007/source-bound.json",
+    "docs/verification/production-amount-driver-portability-20261007/pint-final.txt",
+    "docs/verification/amount-portability-independent-20261007/mysql.txt",
+    "docs/verification/production-amount-driver-portability-20261007/eab-access-source.php",
+    "docs/verification/amount-portability-independent-20261007/sqlite.xml",
+    "docs/verification/amount-portability-independent-20261007/artifact-sha256.json",
+    "docs/verification/production-amount-requirements-20261007/initial.xml",
+    "docs/verification/production-amount-requirements-20261007/affected-policy.xml",
+    "docs/verification/amount-portability-independent-20261007/sqlite-selection.xml",
+    "docs/verification/amount-requirements-independent-20261007/execution.json",
+    "docs/verification/amount-portability-independent-20261007/README.md",
+    "docs/verification/amount-portability-independent-20261007/mysql.xml",
+    "docs/verification/production-amount-requirements-20261007/pint-final.txt",
+    "docs/verification/amount-final-independent-20261007/original-artifact-digests.json",
+    "docs/verification/production-amount-requirements-20261007/source-and-outcomes.json",
+    "docs/verification/production-amount-input-consistency-20261007/affected-d28.xml",
+    "docs/verification/amount-comparator-independent-20261007/outcomes.json",
+    "docs/verification/production-amount-driver-portability-20261007/source-and-outcomes.json",
+    "docs/verification/amount-final-independent-20261007/composer-validate.txt",
+    "docs/verification/amount-comparator-independent-20261007/evidence-sha256.json",
+    "docs/verification/amount-requirements-independent-20261007/installed-graph.json",
+    "docs/verification/production-amount-input-consistency-20261007/unit-initial.txt",
+    "docs/verification/production-amount-input-consistency-20261007/artifact-sha256.json",
+    "docs/verification/amount-comparator-independent-20261007/graph.json",
+    "docs/verification/amount-comparator-independent-20261007/sqlite.xml",
+    "docs/verification/production-amount-input-consistency-20261007/sqlite-initial.txt",
+    "docs/verification/amount-requirements-independent-20261007/late-primary-execution.json",
+    "docs/verification/amount-comparator-independent-20261007/mysql.xml",
+    "docs/verification/production-amount-driver-portability-20261007/eab-red-mysql.txt",
+    "docs/verification/production-amount-requirements-20261007/runtime-graph.json",
+    "docs/verification/production-amount-requirements-20261007/autoload-origin.txt",
+    "docs/verification/amount-final-independent-20261007/audit.exit",
+    "docs/verification/production-amount-requirements-20261007/focused.txt",
+    "docs/verification/amount-final-independent-20261007/sqlite-launch-failure.txt",
+    "docs/verification/production-amount-requirements-20261007/affected-policy.txt",
+    "docs/verification/production-amount-input-consistency-20261007/autoload-final.txt",
+    "docs/verification/amount-requirements-independent-20261007/initial-execution.json",
+    "docs/verification/amount-comparator-independent-20261007/raw-output-companions.json",
+    "docs/verification/production-amount-input-consistency-20261007/sqlite.xml",
+    "docs/verification/amount-requirements-independent-20261007/focused.xml",
+    "docs/verification/production-amount-input-consistency-20261007/source-and-outcomes.json",
+    "docs/verification/amount-portability-independent-20261007/installed-graph.json",
+    "docs/verification/production-amount-input-consistency-20261007/unit-initial.xml",
+    "docs/verification/amount-final-independent-20261007/sqlite.txt",
+    "docs/verification/production-amount-input-consistency-20261007/pint-test.txt",
+    "docs/verification/production-amount-driver-portability-20261007/run-mysql.py",
+    "docs/verification/production-amount-input-consistency-20261007/sqlite.txt",
+    "docs/verification/amount-final-independent-20261007/REVIEW.md",
+    "docs/verification/amount-final-independent-20261007/audit.json",
+    "docs/verification/production-amount-driver-portability-20261007/sqlite.xml",
+    "docs/verification/production-amount-input-consistency-20261007/autoload-origin.txt",
+    "docs/verification/production-amount-input-consistency-20261007/runtime-graph.json",
+    "docs/verification/amount-final-independent-20261007/v2-graph-delta.json",
+    "docs/verification/production-amount-input-consistency-20261007/affected-d28.txt",
+    "docs/verification/production-amount-input-consistency-20261007/pint-final.txt",
+    "docs/verification/amount-requirements-independent-20261007/late-primary.txt",
+    "docs/verification/amount-portability-independent-20261007/review-receipt.json",
+    "docs/verification/amount-requirements-independent-20261007/selection.xml",
+    "docs/verification/amount-comparator-independent-20261007/mysql-config.xml",
+    "docs/verification/amount-portability-independent-20261007/source-binding.json",
+    "docs/verification/amount-comparator-independent-20261007/mysql-server.txt",
+    "docs/verification/production-amount-requirements-20261007/affected-reader.txt",
+    "docs/proposals/untrusted-production-amount-consistency-20261007.md",
+    "docs/verification/production-amount-input-consistency-20261007/sqlite-initial.xml",
+    "docs/verification/amount-portability-independent-20261007/mysql-server.txt",
+    "docs/verification/amount-comparator-independent-20261007/ComparatorPrimitiveCanaryTest.php",
+    "docs/verification/amount-comparator-independent-20261007/REVIEW.md",
+    "docs/verification/production-amount-requirements-20261007/affected-reader.xml",
+    "docs/verification/amount-final-independent-20261007/audit.stderr",
+    "docs/verification/production-amount-requirements-20261007/focused.xml",
+    "docs/verification/production-amount-input-consistency-20261007/README.md",
+    "docs/verification/amount-final-independent-20261007/platform.txt.original.base64",
+    "docs/verification/amount-final-independent-20261007/composer-validate.exit",
+    "docs/verification/amount-comparator-independent-20261007/mysql-harness.sha256",
+    "docs/verification/production-amount-input-consistency-20261007/pint-initial.txt",
+    "docs/verification/production-amount-input-consistency-20261007/mysql.xml",
+    "docs/verification/production-amount-requirements-20261007/artifact-sha256.json",
+    "docs/verification/production-amount-driver-portability-20261007/sqlite.txt",
+    "docs/verification/amount-portability-independent-20261007/AmountRequirementsIsolatedSQLiteCanaryTest.php",
+    "docs/verification/amount-final-independent-20261007/package-borrowing.json",
+    "docs/verification/amount-requirements-independent-20261007/artifact-sha256.json",
+    "docs/verification/amount-requirements-independent-20261007/late-primary.xml",
+    "docs/verification/amount-comparator-independent-20261007/SOURCE-REVIEW.md",
+    "docs/verification/amount-final-independent-20261007/native-source-carry.json",
+    "docs/verification/amount-final-independent-20261007/source-carry.json",
+    "docs/verification/production-amount-input-consistency-20261007/autoload.txt",
+    "docs/verification/amount-requirements-independent-20261007/initial-focused.txt",
+    "docs/verification/production-amount-input-consistency-20261007/setup-limit.txt",
+    "docs/verification/amount-final-independent-20261007/outcomes.json",
+    "docs/verification/amount-comparator-independent-20261007/autoload.txt",
+    "docs/verification/amount-requirements-independent-20261007/initial-focused.xml",
+    "docs/verification/amount-comparator-independent-20261007/sqlite.txt",
+    "docs/verification/production-amount-requirements-20261007/initial.txt",
+    "docs/verification/amount-requirements-independent-20261007/autoload.txt",
+    "docs/verification/amount-final-independent-20261007/platform.exit",
+    "docs/verification/amount-final-independent-20261007/autoload-origin.txt",
+    "docs/verification/amount-comparator-independent-20261007/mysql-harness.py",
+    "docs/verification/amount-portability-independent-20261007/mysql-execution.json",
+    "docs/verification/amount-comparator-independent-20261007/mysql.txt",
+    "docs/verification/amount-final-independent-20261007/autoload.txt",
+    "docs/verification/amount-comparator-independent-20261007/sqlite-config.xml",
+    "docs/verification/amount-final-independent-20261007/sqlite.xml",
+    "docs/verification/amount-final-independent-20261007/platform.txt",
+    "docs/verification/production-amount-driver-portability-20261007/pint.txt",
+    "docs/verification/production-amount-driver-portability-20261007/mysql.txt",
+    "docs/verification/production-amount-input-consistency-20261007/initial-CompareProductionAmountInputs.php.txt",
+    "docs/verification/production-amount-input-consistency-20261007/mysql.txt",
+    "docs/verification/amount-final-independent-20261007/console-representation.json",
+    "docs/verification/amount-requirements-independent-20261007/README.md",
+    "docs/verification/amount-comparator-independent-20261007/ComparatorIsolatedSQLiteCanaryTest.php",
+    "docs/verification/amount-final-independent-20261007/current-package-references.json",
+    "docs/verification/production-amount-driver-portability-20261007/mysql.xml",
+    "docs/proposals/untrusted-production-amount-consistency-20261007-source.json",
+    "docs/verification/amount-requirements-independent-20261007/source-binding.json",
+    "docs/verification/amount-requirements-independent-20261007/setup-failure.txt",
+    "docs/verification/production-amount-requirements-20261007/pint.txt",
+    "docs/verification/amount-requirements-independent-20261007/AmountRequirementsIndependentCanaryTest.php",
+    "docs/verification/production-amount-input-consistency-20261007/initial-ProductionAmountInputConsistencyAccessTest.php.txt",
+    "docs/verification/amount-final-independent-20261007/focused.phpunit.xml",
+    "docs/verification/production-amount-driver-portability-20261007/artifact-sha256.json",
+    "docs/verification/amount-requirements-independent-20261007/review-receipt.json",
+    "docs/verification/production-amount-driver-portability-20261007/eab-red-mysql.xml",
+    "docs/verification/amount-portability-independent-20261007/mysql-selection.xml",
+    "docs/verification/production-amount-input-consistency-20261007/initial-AmountInputConsistencyV1.php.txt",
+    "docs/verification/amount-portability-independent-20261007/sqlite.txt",
+    "docs/verification/amount-portability-independent-20261007/sqlite-execution.json",
+    "docs/verification/amount-requirements-independent-20261007/initial-canary.php.txt",
+    "docs/verification/production-amount-requirements-20261007/README.md",
+    "docs/verification/amount-portability-independent-20261007/native-harness.py",
+    "docs/verification/production-amount-requirements-20261007/diff-check.txt",
+    "docs/verification/production-amount-input-consistency-20261007/initial-source.json",
+    "docs/verification/amount-comparator-independent-20261007/autoload-origin.txt",
+    "docs/verification/production-amount-input-consistency-20261007/initial-ProductionAmountInputConsistencyTest.php.txt",
+    "docs/verification/production-amount-driver-portability-20261007/README.md",
+    "docs/verification/amount-requirements-independent-20261007/focused.txt"
+  ],
+  "all_baseline_migrations_CI_Contracts_manifest_locks_unchanged": true,
+  "baseline_exception_tuples_count": 150,
+  "prior_original_artifact_checks": {
+    "REVIEW.md": {
+      "raw_sha256": "c30c8ddaa510032c2983c2b827ee3688d0cf3d89112d6da937af036d024d5f9f",
+      "representation": "original unchanged"
+    },
+    "audit.exit": {
+      "raw_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "representation": "original unchanged"
+    },
+    "audit.json": {
+      "raw_sha256": "3d68c4566587606c21e4bcd82b55d322ddb79158f657d9fb90bf0d24ab5bccdf",
+      "representation": "original unchanged"
+    },
+    "audit.stderr": {
+      "raw_sha256": "dca257f696c35ff66f2907c8824e6b00ddc5865ad907a67a21238aa5d729545d",
+      "representation": "original unchanged"
+    },
+    "autoload-origin.txt": {
+      "raw_sha256": "4ad037e765236fc93602a0a06496be3a3a1699b93e56f83cb738fb7ecd468b35",
+      "representation": "original unchanged"
+    },
+    "autoload.txt": {
+      "raw_sha256": "6d62643abe4a101c3df6d50cfd537e8c9804fe290800e46a3564a2a5c63393bb",
+      "representation": "original unchanged"
+    },
+    "composer-validate.exit": {
+      "raw_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "representation": "original unchanged"
+    },
+    "composer-validate.txt": {
+      "raw_sha256": "16305168e7087ff29b5ee1f3fbe9b9bc8c5f90c84440cdfe79a97c6e4cb7c651",
+      "representation": "original unchanged"
+    },
+    "current-package-references.json": {
+      "raw_sha256": "fa925dbee3d34306d58b187e308dc99e133bdc5946343da4f015e2ac1517a890",
+      "representation": "original unchanged"
+    },
+    "focused.phpunit.xml": {
+      "raw_sha256": "84e36573f6a018080ab0d2ffb3b1cf72733cfa7dbefad48b0fff15197c31fd97",
+      "representation": "original unchanged"
+    },
+    "native-source-carry.json": {
+      "raw_sha256": "c937011f99d94fd7acbf0bbc7dd81d2032fe578c5e36842ec05f56de445da665",
+      "representation": "original unchanged"
+    },
+    "outcomes.json": {
+      "raw_sha256": "87e1b50e83540913eeb9d83d6c692b25149f3d9d44d2ed11099f3788a02d2bdd",
+      "representation": "original unchanged"
+    },
+    "package-borrowing.json": {
+      "raw_sha256": "25842d893fdded8145efd797b2ab1662d18164b34f761e6478868f25c50076a6",
+      "representation": "original unchanged"
+    },
+    "platform.exit": {
+      "raw_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "representation": "original unchanged"
+    },
+    "platform.txt": {
+      "raw_sha256": "ce0b72bfb8101c604fdde9ee721dcd7fb97ccee9662f30c13e213adf6b319a03",
+      "representation": "exact raw base64 + normalized display"
+    },
+    "source-carry.json": {
+      "raw_sha256": "d1387c50aa5155c5f2880bada219b931a922774323d529883d11f146f8fc4d1f",
+      "representation": "original unchanged"
+    },
+    "sqlite-launch-failure.txt": {
+      "raw_sha256": "51bb39392842f16a301e8ef28aa94c960b607cdb2756dd0490cc130870c1a0d8",
+      "representation": "original unchanged"
+    },
+    "sqlite.txt": {
+      "raw_sha256": "559f74f5242d866d4aeda5ca0012cd9341e22fd3613eb1c5b2543647e5a5d4a3",
+      "representation": "original unchanged"
+    },
+    "sqlite.xml": {
+      "raw_sha256": "fdfc508c4e60aac2eb30fc6d0481e18d197488bc442dabd703ca8b74972d17c5",
+      "representation": "original unchanged"
+    },
+    "v2-graph-delta.json": {
+      "raw_sha256": "65a743469fe9ddc09a1049754241713be5fdaff34af182a7b58881b9bb234c59",
+      "representation": "original unchanged"
+    }
+  },
+  "source_bound_carried_results": {
+    "own_d29_sqlite": {
+      "name": "/workspace/scratch/2876616e88c3/VA-Studio-amount-comparator-independent/comparator-sqlite.phpunit.xml",
+      "tests": "70",
+      "assertions": "698",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "22.053607"
+    },
+    "own_d29_native": {
+      "name": "/workspace/scratch/2876616e88c3/VA-Studio-amount-comparator-independent/comparator-mysql.phpunit.xml",
+      "tests": "15",
+      "assertions": "112",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "104.817885"
+    },
+    "author_d29_sqlite": {
+      "name": "CLI Arguments",
+      "tests": "66",
+      "assertions": "661",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "16.710408"
+    },
+    "author_d29_native": {
+      "name": "CLI Arguments",
+      "tests": "66",
+      "assertions": "660",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "100.771522"
+    },
+    "own_d28_v2_sqlite": {
+      "name": "/workspace/scratch/2876616e88c3/VA-Studio-amount-final-independent/amount-final.phpunit.xml",
+      "tests": "52",
+      "assertions": "183",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "13.348547"
+    }
+  },
+  "no_tests_repeated": "Complete source and graph unchanged since exact4eb focused runs; this is static composition only.",
+  "independently_fetched_actual_main": "717f0866444701637e7c396b4376891aa5dd995d",
+  "actual_main_tree": "1c43bb29aefb56f3698ba734e756d685fd018245",
+  "actual_main_ordered_parents": [
+    "43b919c4f5cef9bb259515904333a7aa20dcb6fb",
+    "0b0db4e181c0254d30f45beeaf8cbc373782e6cd"
+  ],
+  "actual_native_executable": "3398299cd72139b37a64f84a8ec91ce43cbeeefd",
+  "actual_native_tree": "a5e7fe3d890c6a68790d8cee6fdc32397f5ade56",
+  "actual_native_sole_parent": "717f0866444701637e7c396b4376891aa5dd995d",
+  "native_proof": "Fresh independent github_fetch reads of actual main commit/ref and native executable; native objects are not manufactured in recovered local Git. Both native trees exactly equal the proven recovered trees."
+}

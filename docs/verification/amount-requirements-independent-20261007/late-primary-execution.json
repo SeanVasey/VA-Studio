@@ -1,0 +1,18 @@
+{
+  "source": "eab36455dff392e429d751488ae4c17f076e6296",
+  "command": [
+    "php",
+    "-d",
+    "memory_limit=512M",
+    "vendor/bin/phpunit",
+    "-c",
+    "amount-independent.phpunit.xml",
+    "--filter",
+    "test_late_primary_audit_drift_cannot_be_hidden_by_default_connection_swap",
+    "--log-junit",
+    "docs/verification/amount-requirements-independent-20261007/late-primary.xml",
+    "--fail-on-warning",
+    "--fail-on-empty-test-suite"
+  ],
+  "exit_code": 0
+}

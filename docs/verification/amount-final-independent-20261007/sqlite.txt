@@ -1,0 +1,10 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/scratch/2876616e88c3/VA-Studio-amount-final-independent/amount-final.phpunit.xml
+
+....................................................              52 / 52 (100%)
+
+Time: 00:13.358, Memory: 87.00 MB
+
+[30;42mOK (52 tests, 183 assertions)[0m
