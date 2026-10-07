@@ -1,0 +1,23 @@
+{
+  "review_status": "approved for focused development integration",
+  "reviewed_executable": "f4ec4b7367e04d41fe8ebb2bbf3839642f6d1c50",
+  "reviewed_tree": "07a726a1ca712a6cb87a6fc747f6a391602103e4",
+  "reviewed_author_evidence": "7cba260e4bdc1b6c59cd4ee4586a9c52d435f868",
+  "focused": {
+    "tests": 37,
+    "assertions": 110,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "independent_canary_assertions": 25,
+  "direct_baseline_reviewed_fixture_pdf_identity": true,
+  "installed_locked_packages_verified": 158,
+  "runtime": "PHP 8.4.26",
+  "blockers": [],
+  "limits": [
+    "Only v1 registered; no PDF/font successor compatibility established",
+    "No MySQL or full Foundation acceptance run; this leaf changes no SQL",
+    "No browser, launch, live payment or production activation"
+  ]
+}

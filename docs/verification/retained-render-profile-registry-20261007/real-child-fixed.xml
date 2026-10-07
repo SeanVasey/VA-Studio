@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/scratch/2876616e88c3/VA-Studio-render-profile-registry/registry-focused.phpunit.xml" tests="1" assertions="9" errors="0" failures="0" skipped="0" time="2.476219">
+    <testsuite name="Retained contract profile affected consumers" tests="1" assertions="9" errors="0" failures="0" skipped="0" time="2.476219">
+      <testsuite name="Tests\Feature\TestContractIssuanceTest" file="/workspace/scratch/2876616e88c3/VA-Studio-render-profile-registry/tests/Feature/TestContractIssuanceTest.php" tests="1" assertions="9" errors="0" failures="0" skipped="0" time="2.476219">
+        <testcase name="test_real_isolated_renderer_can_issue_one_private_pdf_from_an_actual_paid_grant" file="/workspace/scratch/2876616e88c3/VA-Studio-render-profile-registry/tests/Feature/TestContractIssuanceTest.php" line="113" class="Tests\Feature\TestContractIssuanceTest" classname="Tests.Feature.TestContractIssuanceTest" assertions="9" time="2.476219"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

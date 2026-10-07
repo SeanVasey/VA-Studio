@@ -1,0 +1,19 @@
+{
+  "source": "ae0f980d054001fa1dddf22c32843c93697a935c",
+  "tree": "ff6415c5c98f1cb89c193cf8020811015072f131",
+  "predecessor": "1d497337721f013dd594e15f2da7595be362974e",
+  "registered_profile": "test-buyer-pdf-v1",
+  "profile_hash": "ff46257d40e36ea4efc8a42a9df0d823141d13a586d0a416fdde5178dcf12621",
+  "pdf_sha256": "37c92cb5c0d09923b5a75ef8fedf6a60491653c6485cf2cd90302fa53139c495",
+  "pdf_size_bytes": 751516,
+  "before_after_exact_equal": true,
+  "unchanged_inputs": {
+    "composer.lock": "996bc7f800d5cc6b4312f5303fbd67a5cadd17e0eb640f3e2e94035e713289aa",
+    "package.json": "65db43e1b171566d2d89e075bc4a29af75a82a6782a3313751bb4d7e832a7ae0",
+    "package-lock.json": "6407d3a63e3b6e04f5824f53c41b8dc8a33581f987b21d780c795480122f93ea",
+    "resources/contracts/test-v1/profile-assets.json": "44533c186a3b1350163025256a9ced519a6395ba8001541193d1d51b51688e50",
+    "app/Domain/Contracts/ContractText.php": "46d145c921ff5a94b3d2928c9b7d9caf0697d33f8ba5c5c30ca65598e1d68a08",
+    "app/Domain/Contracts/TcpdfContractRenderer.php": "620b66766143ab72532e8fa3a161d3eb1012368bbf195cea70b9b8907cdd763a"
+  },
+  "policy_no_successor_registered": true
+}

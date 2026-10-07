@@ -1,0 +1,16 @@
+{
+  "README.md": "4630c57f2270edef3ce91ad6101fb1037c49570c0db3562f7c421a04bc7e10e6",
+  "autoload.txt": "23a50bc0ed3841b5accd582d9262ac0f440d62fd824ac812cddeb231fd78778a",
+  "baseline.txt": "6a91f1e7ae1fb3443bf2db24a8bd64561495cadb87eb2cd8316242626c2f3556",
+  "canaries.php": "1024d0a33445a30e67fee8b3c12931311ed0b7fd0caffa8b7ec7cc323ce81de0",
+  "canaries.txt": "1a3700f4dda9b4ba026f9e9f3efd7be289b7d5ed4186ad8e04201c4d6efa1706",
+  "execution.json": "a890df90809272adc84973b25ff5cad0bde74a5f4dc7c8ac34357271b889cc66",
+  "focused.txt": "e4d9a7071ef8f6452cfb9f441fc923678d0e4cdb5958f61ec7923623d64b332c",
+  "focused.xml": "199a16aede5158e93aefa9684cfccbcce9324f232eb69356f6a19f230916bcbc",
+  "installed-graph.json": "871ea4ba6359fe97ba60aa932bf6e7393daf24fcfd41f9b441e731dbfd69d093",
+  "pure-whitelist.json": "370bfef5730f78c32b2928adaae63bcadcf5aadd959de06dad7f901ae8d810ac",
+  "review-receipt.json": "4c9836875a625a3f6e4d7738d166b03df57d02488a0e05308d880f9863c5155e",
+  "reviewed.txt": "6a91f1e7ae1fb3443bf2db24a8bd64561495cadb87eb2cd8316242626c2f3556",
+  "selection.xml": "7c54c95192a52747fca943e8db8f7f4b9ae9ef6c2578182d4d04305095947184",
+  "source-binding.json": "eefc1d35473883b63bc400a0c1e888fe0e19ea4afd4be09b91c4d9eb740c3b8c"
+}

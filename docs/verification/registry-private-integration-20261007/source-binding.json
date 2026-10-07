@@ -1,0 +1,18 @@
+{
+  "source": "6597e8bdc21b8c8c9e35aaa562d20d68f37f5833",
+  "tree": "fb92f01c7c5d04947bc264fbd7f6615d5e52d5d7",
+  "executable": "5c46ad09e3d273fc6b977cc2b5cf2167b976d9d5",
+  "baseline": "e076bc86fe5f3e4585be351ab15cc47d8e51136b",
+  "reviewed_source": "f4ec4b7367e04d41fe8ebb2bbf3839642f6d1c50",
+  "review_evidence": "f77677d9c3746c7acf23b2b952f03cd6f6366bd4",
+  "owned_source_sha256": {
+    "app/Domain/Contracts/ContractIssuancePolicy.php": "0f1497082901c02d3773a5f205cd814f8f906f3359b7939421f3a8023c3ada6e",
+    "app/Domain/Contracts/ContractRenderProfile.php": "fd93746b674e335ddb4998abdfd9765efff734a235398fd2bd2a4d757770770b",
+    "app/Domain/Contracts/ContractRenderProfileRegistry.php": "9e47f1265236938702704ab3e24060661c1a21c4adfb22ac08fcb49001e14da3",
+    "scripts/contract-renderer-autoload.php": "ca34585be3a2501c3912df0f4e7fd8bb3ef1a9bf99c728d1ec13af25ed6dbbb0",
+    "tests/Unit/ContractRenderProfileRegistryTest.php": "e5060bed8f3785b54b352a5f726bfc6c06677b3e58ab5d39b967863e910a1ac8",
+    "tests/fixtures/contracts/retained-render-profile-v1.json": "6a91f1e7ae1fb3443bf2db24a8bd64561495cadb87eb2cd8316242626c2f3556"
+  },
+  "all_other_baseline_paths_preserved": 1872,
+  "executable_tree": "03bfec729dbc1123ec45bbc01ebc40a0ba98a164"
+}

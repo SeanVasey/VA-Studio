@@ -1,0 +1,26 @@
+{
+  "tests": "124",
+  "assertions": "753",
+  "errors": "0",
+  "failures": "0",
+  "skipped": "0",
+  "time": "94.055832",
+  "source": "ae0f980d054001fa1dddf22c32843c93697a935c",
+  "tree": "ff6415c5c98f1cb89c193cf8020811015072f131",
+  "native_mysql": "not run;no migration/transaction/query source changes",
+  "full_acceptance": "not run",
+  "independent_review": "pending parentintegration",
+  "failures_retained": [
+    "duplicateComposerautoload bootstrap beforecases",
+    "first124selection:123pass/1unsupportedrawchildruntimefailure",
+    "onecaseafterdefaultini:gdlookup warning causedretry"
+  ],
+  "corrected_real_paid_grant_case": {
+    "tests": 1,
+    "assertions": 9,
+    "passed": 1
+  },
+  "registered_versions": [
+    "test-buyer-pdf-v1"
+  ]
+}

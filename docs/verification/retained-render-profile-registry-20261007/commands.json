@@ -1,0 +1,15 @@
+{
+  "PHP": "8.4.26",
+  "executable_source": "ae0f980d054001fa1dddf22c32843c93697a935c",
+  "commands": {
+    "focused": "php vendor/bin/phpunit -c registry-focused.phpunit.xml --log-junit <evidence>/php-sqlite-final.xml",
+    "reproduction": "php vendor/bin/phpunit -c registry-focused.phpunit.xml --filter test_real_isolated_renderer_can_issue_one_private_pdf_from_an_actual_paid_grant --log-junit <evidence>/real-child-fixed.xml",
+    "formatting": "php vendor/bin/pint --test app/Domain/Contracts/ContractRenderProfile.php app/Domain/Contracts/ContractRenderProfileRegistry.php app/Domain/Contracts/ContractIssuancePolicy.php tests/Unit/ContractRenderProfileRegistryTest.php",
+    "syntax": "php -l scripts/contract-renderer-autoload.php"
+  },
+  "environment": {
+    "parent": "recoveredPHPini/LD_LIBRARY_PATH, fresh ephemeral APP_KEY notretained",
+    "child": "originalscrubbedenvironment,standardlocaldefaultPHPini,original128M/60s/open_basedir/disabledfunctions bounds",
+    "vendor": "owncomposerautoloadandbin;unchangedlockgraph libraries;TecNickpackagesrealcopiedinsideworktree"
+  }
+}

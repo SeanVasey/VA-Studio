@@ -1,0 +1,16 @@
+{
+  "all_packages_exact_match_lock": true,
+  "package_count": 158,
+  "renderer": [
+    "8.76.2",
+    "c383bd3ac09164c3fd1a6ac7da8f5460d19e47e3"
+  ],
+  "font": [
+    "4.4.0",
+    "658e04565534c0cdd3d8d7ff12f1c6ebeab5f7ce"
+  ],
+  "laravel": [
+    "v13.34.0",
+    "c829b4982d29344cbcf1d7ad78eb5d2bb8ae66c4"
+  ]
+}

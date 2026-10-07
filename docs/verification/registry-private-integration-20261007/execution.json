@@ -1,0 +1,16 @@
+{
+  "source": "6597e8bdc21b8c8c9e35aaa562d20d68f37f5833",
+  "command": [
+    "php",
+    "-d",
+    "memory_limit=512M",
+    "vendor/bin/phpunit",
+    "-c",
+    "registry-private-focused.phpunit.xml",
+    "--log-junit",
+    "docs/verification/registry-private-integration-20261007/focused.xml",
+    "--fail-on-warning",
+    "--fail-on-empty-test-suite"
+  ],
+  "exit_code": 0
+}
