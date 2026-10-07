@@ -1,0 +1,122 @@
+[
+  {
+    "path": "app/Domain/Memberships/CreditLedger.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "da00984fc8dfb9e610d19c18d63ed91520efe6d846cc879010ae67156ef139ac"
+  },
+  {
+    "path": "app/Domain/Memberships/MembershipAdministration.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "c482b725adb55b280ffe1f97a78be1913ed6443969522afb9db71f5ad526e43c"
+  },
+  {
+    "path": "app/Domain/Memberships/MembershipCustomerHistory.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "e80d3069501883ccbcc6bef8adad91b60a04c93747bb91a5af7068fc633604de"
+  },
+  {
+    "path": "app/Domain/Memberships/MembershipEvidence.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "efa3205598a107798c974ba3e2bce801423d71b62879dc96f1b981a822bb2532"
+  },
+  {
+    "path": "app/Domain/Memberships/MembershipPlans.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "dee36cc481d80e47bc08d9d8ba0b61d9128719fda628c4c3f0be7d5ffff71b5d"
+  },
+  {
+    "path": "app/Domain/Memberships/MembershipPolicy.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "6676a5db75015a0b3bcea89566447f93eed114c560b1fee635b74d7462caa36e"
+  },
+  {
+    "path": "app/Domain/Memberships/Models/MembershipCreditBucket.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "27e3c5994baa3e7b7283ccb3f4549f8a9b1626383b2aaf4f038ea6d49b42e2b6"
+  },
+  {
+    "path": "app/Domain/Memberships/Models/MembershipCreditEvent.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "51d0b2003f7650b2ba230210c28491039453be2e2b371eebaf4e20ae601244bc"
+  },
+  {
+    "path": "app/Domain/Memberships/Models/MembershipPlan.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "50244578407b5a9c51390621c07878aad065e1aa3992efd2ad86f03b68b85410"
+  },
+  {
+    "path": "app/Domain/Memberships/Models/MembershipPlanVersion.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "15710d8bdca1954f33eafcb5108ad6f42729d61db10bcdb7b2cab459aac547c1"
+  },
+  {
+    "path": "config/memberships.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "ac22a093065fce3e15d8312f398c85d5f6c234f87d6b981c8d6445a72cfdd5cb"
+  },
+  {
+    "path": "database/migrations/2026_10_06_230000_membership_credit_foundation.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "6402db1b8412d8b01738edd270ec8ad899f1aed3a13369f167b408551df43a70"
+  },
+  {
+    "path": "tests/Feature/MembershipAdministrationActionTest.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "bfda00f60d31df41f3f1a7bd37d2459a1cbdd97d94e92b72f54c21dad2707613"
+  },
+  {
+    "path": "tests/Feature/MembershipAdministrationTest.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "f7491430e6894768f163702f52baf8adbff49b1459f2a91935f5c32017fe6bf7"
+  },
+  {
+    "path": "tests/Feature/MembershipCreditConcurrencyTest.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "2c0b4d1432159513c3c1ca6de9656bc3c35a7b8964d5c34ec26a6bf442e7b924"
+  },
+  {
+    "path": "tests/Feature/MembershipCreditEngineTest.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "6d6ebc8bcc76fc8fd9d2d85fa33de24df61835b6960e5919c360b4673ea119ed"
+  },
+  {
+    "path": "tests/Feature/MembershipCreditLedgerTest.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "81d0d118da86f9fd2fe7c3bcbb6d5e1a60864ca9c14b970b42bb28cb280f1760"
+  },
+  {
+    "path": "tests/Feature/MembershipCreditMigrationTest.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "2634eb594674af98be59a6e9e3d901ab9dbdb8f3e0e6fb80eb496f6bb2fd2511"
+  },
+  {
+    "path": "tests/Feature/MembershipCustomerHistoryHttpTest.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "a0d95ed53c18293d917c1a30abd92fbf151fba0b82b8df6d3792d4be9a5d45a7"
+  },
+  {
+    "path": "tests/Feature/MembershipCustomerHistoryTest.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "4e197932a1a23781dcd1c8611d1b6dc099d3c5e2974c53fc14a8ff1555bb36ed"
+  },
+  {
+    "path": "tests/Feature/MembershipCustomerLibraryCapabilityTest.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "655c9f161f9e2e4d46deb14a0a85459a574cac8142af98218a60e58e75c8564f"
+  },
+  {
+    "path": "tests/Feature/MembershipGrantClockBoundaryTest.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "70aa442635c7247bca326585babdfe1871935280b6acda3c3bcb0186b9fb8d53"
+  },
+  {
+    "path": "tests/Feature/MembershipPlanTest.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "a7ca86d70a43998f5d974c34bbd1e5239b2cc17d0dfa8311ba8333b18e1322ce"
+  },
+  {
+    "path": "tests/Feature/MembershipPrimaryProofTest.php",
+    "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+    "sha256": "885f435888e6995d6e25757319e2988a75f25904eff01b38e132657e1ea7e074"
+  }
+]

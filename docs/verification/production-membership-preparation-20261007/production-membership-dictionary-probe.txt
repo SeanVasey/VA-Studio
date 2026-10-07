@@ -1,0 +1,280 @@
+Array
+(
+    [0] => Array
+        (
+            [CONSTRAINT_NAME] => PRIMARY
+            [CONSTRAINT_TYPE] => PRIMARY KEY
+        )
+
+    [1] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_plan_versions_u0
+            [CONSTRAINT_TYPE] => UNIQUE
+        )
+
+    [2] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_plan_versions_bounds
+            [CONSTRAINT_TYPE] => CHECK
+        )
+
+)
+Array
+(
+)
+Array
+(
+)
+Array
+(
+    [0] => Array
+        (
+            [CONSTRAINT_NAME] => PRIMARY
+            [CONSTRAINT_TYPE] => PRIMARY KEY
+        )
+
+    [1] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_paid_periods_u0
+            [CONSTRAINT_TYPE] => UNIQUE
+        )
+
+    [2] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_paid_periods_f0
+            [CONSTRAINT_TYPE] => FOREIGN KEY
+        )
+
+    [3] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_paid_periods_f1
+            [CONSTRAINT_TYPE] => FOREIGN KEY
+        )
+
+    [4] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_paid_periods_f2
+            [CONSTRAINT_TYPE] => FOREIGN KEY
+        )
+
+    [5] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_paid_periods_bounds
+            [CONSTRAINT_TYPE] => CHECK
+        )
+
+)
+Array
+(
+    [0] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_paid_periods_f0
+            [COLUMN_NAME] => account_id
+            [REFERENCED_TABLE_NAME] => customer_accounts
+            [REFERENCED_COLUMN_NAME] => id
+            [ORDINAL_POSITION] => 1
+        )
+
+    [1] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_paid_periods_f1
+            [COLUMN_NAME] => user_id
+            [REFERENCED_TABLE_NAME] => users
+            [REFERENCED_COLUMN_NAME] => id
+            [ORDINAL_POSITION] => 1
+        )
+
+    [2] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_paid_periods_f2
+            [COLUMN_NAME] => plan_version_id
+            [REFERENCED_TABLE_NAME] => production_membership_plan_versions
+            [REFERENCED_COLUMN_NAME] => id
+            [ORDINAL_POSITION] => 1
+        )
+
+)
+Array
+(
+    [0] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_paid_periods_f0
+            [UPDATE_RULE] => RESTRICT
+            [DELETE_RULE] => RESTRICT
+        )
+
+    [1] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_paid_periods_f1
+            [UPDATE_RULE] => RESTRICT
+            [DELETE_RULE] => RESTRICT
+        )
+
+    [2] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_paid_periods_f2
+            [UPDATE_RULE] => RESTRICT
+            [DELETE_RULE] => RESTRICT
+        )
+
+)
+Array
+(
+    [0] => Array
+        (
+            [CONSTRAINT_NAME] => PRIMARY
+            [CONSTRAINT_TYPE] => PRIMARY KEY
+        )
+
+    [1] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_redemptions_u0
+            [CONSTRAINT_TYPE] => UNIQUE
+        )
+
+    [2] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_redemptions_f0
+            [CONSTRAINT_TYPE] => FOREIGN KEY
+        )
+
+    [3] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_redemptions_bounds
+            [CONSTRAINT_TYPE] => CHECK
+        )
+
+)
+Array
+(
+    [0] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_redemptions_f0
+            [COLUMN_NAME] => period_id
+            [REFERENCED_TABLE_NAME] => production_membership_paid_periods
+            [REFERENCED_COLUMN_NAME] => id
+            [ORDINAL_POSITION] => 1
+        )
+
+)
+Array
+(
+    [0] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_redemptions_f0
+            [UPDATE_RULE] => RESTRICT
+            [DELETE_RULE] => RESTRICT
+        )
+
+)
+Array
+(
+    [0] => Array
+        (
+            [CONSTRAINT_NAME] => PRIMARY
+            [CONSTRAINT_TYPE] => PRIMARY KEY
+        )
+
+    [1] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_credit_events_u0
+            [CONSTRAINT_TYPE] => UNIQUE
+        )
+
+    [2] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_credit_events_u1
+            [CONSTRAINT_TYPE] => UNIQUE
+        )
+
+    [3] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_credit_events_u2
+            [CONSTRAINT_TYPE] => UNIQUE
+        )
+
+    [4] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_credit_events_u3
+            [CONSTRAINT_TYPE] => UNIQUE
+        )
+
+    [5] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_credit_events_f0
+            [CONSTRAINT_TYPE] => FOREIGN KEY
+        )
+
+    [6] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_credit_events_f1
+            [CONSTRAINT_TYPE] => FOREIGN KEY
+        )
+
+    [7] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_credit_events_f2
+            [CONSTRAINT_TYPE] => FOREIGN KEY
+        )
+
+    [8] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_credit_events_bounds
+            [CONSTRAINT_TYPE] => CHECK
+        )
+
+)
+Array
+(
+    [0] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_credit_events_f0
+            [COLUMN_NAME] => period_id
+            [REFERENCED_TABLE_NAME] => production_membership_paid_periods
+            [REFERENCED_COLUMN_NAME] => id
+            [ORDINAL_POSITION] => 1
+        )
+
+    [1] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_credit_events_f1
+            [COLUMN_NAME] => redemption_id
+            [REFERENCED_TABLE_NAME] => production_membership_redemptions
+            [REFERENCED_COLUMN_NAME] => id
+            [ORDINAL_POSITION] => 1
+        )
+
+    [2] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_credit_events_f2
+            [COLUMN_NAME] => reservation_event_id
+            [REFERENCED_TABLE_NAME] => production_membership_credit_events
+            [REFERENCED_COLUMN_NAME] => id
+            [ORDINAL_POSITION] => 1
+        )
+
+)
+Array
+(
+    [0] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_credit_events_f0
+            [UPDATE_RULE] => RESTRICT
+            [DELETE_RULE] => RESTRICT
+        )
+
+    [1] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_credit_events_f1
+            [UPDATE_RULE] => RESTRICT
+            [DELETE_RULE] => RESTRICT
+        )
+
+    [2] => Array
+        (
+            [CONSTRAINT_NAME] => production_membership_credit_events_f2
+            [UPDATE_RULE] => RESTRICT
+            [DELETE_RULE] => RESTRICT
+        )
+
+)
