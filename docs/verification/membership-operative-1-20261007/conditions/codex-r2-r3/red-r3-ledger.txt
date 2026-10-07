@@ -1,0 +1,32 @@
+# Red: new R-3 tests against unmodified source at 3092880bc9a216ec095975a3ae15dfa07fee68b3
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops/phpunit.xml
+
+...FFF.....                                                       11 / 11 (100%)
+
+Time: 00:16.996, Memory: 89.00 MB
+
+There were 3 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingObservationLedgerTest::test_wrong_binding_retrieved_first_claims_no_invoice_identity_and_the_right_binding_still_succeeds@subscription with data (['sub_WRONGSYNTHETIC'], [], 'subscription')
+A retrieval that contradicts its binding is refused, not recorded under that binding.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php:112
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingObservationLedgerTest::test_wrong_binding_retrieved_first_claims_no_invoice_identity_and_the_right_binding_still_succeeds@customer with data ([], [['cus_FOREIGNSYNTHETIC']], 'customer')
+A retrieval that contradicts its binding is refused, not recorded under that binding.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php:112
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingObservationLedgerTest::test_wrong_binding_retrieved_first_claims_no_invoice_identity_and_the_right_binding_still_succeeds@account with data ([], ['acct_FOREIGNSYNTHETIC'], 'account')
+A retrieval that contradicts its binding is refused, not recorded under that binding.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php:112
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 11, Assertions: 26, Failures: 3.

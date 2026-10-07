@@ -4,15 +4,18 @@ namespace Tests\Feature\ProductionMembershipBilling;
 
 use App\Domain\Memberships\Billing\BillingException;
 use App\Domain\Memberships\Billing\BillingProviderPin;
+use App\Domain\Memberships\Billing\BillingReconciliation;
 use App\Domain\Memberships\Billing\BillingValues;
 use App\Domain\Memberships\Billing\BillingWebhookIntake;
 use App\Jobs\RetrieveMembershipInvoice;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Stripe\Event;
 use Stripe\WebhookSignature;
 use Tests\Support\BillingStripeFixtures as F;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\RehearsalBillingGateway;
 use Tests\TestCase;
 
 /** A valid signature is not proof of payment: intake records a deduplicated hint and never observes or awards. */
@@ -66,17 +69,26 @@ class BillingWebhookIntakeTest extends TestCase
 
     public function test_replayed_event_id_is_deduplicated_without_a_second_row_or_retrieval(): void
     {
-        F::binding();
-        $payload = $this->event('evt_SYNTHETIC1', 'invoice.paid');
-        $first = $this->receive($payload);
-        $replay = $this->receive($payload);
-        $this->assertTrue($replay['duplicate']);
-        $this->assertNull($replay['scheduled']);
-        $this->assertSame($first['event']['id'], $replay['event']['id']);
-        // A re-signed body with the same event id is still the same provider event.
-        $this->assertTrue($this->receive($this->event('evt_SYNTHETIC1', 'invoice.payment_failed'))['duplicate']);
-        $this->assertSame(1, DB::table('production_membership_billing_events')->count());
-        Queue::assertPushed(RetrieveMembershipInvoice::class, 1);
+        $binding = F::binding();
+        CarbonImmutable::setTestNow(CarbonImmutable::createFromTimestampUTC(F::PERIOD_START + 3600));
+        try {
+            $payload = $this->event('evt_SYNTHETIC1', 'invoice.paid');
+            $first = $this->receive($payload);
+            // The scheduled retrieval ran and observed the invoice after the hint, so a redelivery has nothing left to recover.
+            CarbonImmutable::setTestNow(CarbonImmutable::createFromTimestampUTC(F::PERIOD_START + 3610));
+            (new RetrieveMembershipInvoice($binding['id'], F::INVOICE))->handle(new BillingReconciliation(new RehearsalBillingGateway(F::graph())));
+            CarbonImmutable::setTestNow(CarbonImmutable::createFromTimestampUTC(F::PERIOD_START + 3620));
+            $replay = $this->receive($payload);
+            $this->assertTrue($replay['duplicate']);
+            $this->assertNull($replay['scheduled']);
+            $this->assertSame($first['event']['id'], $replay['event']['id']);
+            // A re-signed body with the same event id is still the same provider event.
+            $this->assertTrue($this->receive($this->event('evt_SYNTHETIC1', 'invoice.payment_failed'))['duplicate']);
+            $this->assertSame(1, DB::table('production_membership_billing_events')->count());
+            Queue::assertPushed(RetrieveMembershipInvoice::class, 1);
+        } finally {
+            CarbonImmutable::setTestNow();
+        }
     }
 
     public function test_out_of_order_events_are_hints_only_and_each_schedules_a_current_retrieval(): void

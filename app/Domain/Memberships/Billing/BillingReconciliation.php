@@ -15,6 +15,9 @@ final class BillingReconciliation
 {
     private const UNKNOWN = ['provider_unavailable', 'provider_inconsistent'];
 
+    /** Verdict reasons meaning the provider's account, customer or subscription contradicts the binding. */
+    private const BINDING_REFUSALS = ['account', 'customer', 'subscription'];
+
     public function __construct(private readonly BillingProviderGateway $gateway, private readonly BillingLedger $ledger = new BillingLedger) {}
 
     public function retrieve(string $bindingId, string $invoiceRef): array
@@ -28,7 +31,8 @@ final class BillingReconciliation
         $provenance = $this->gateway->provenance();
         BillingException::require($provenance === $configuration['provenance'], 'provenance');
         $binding = $this->ledger->binding($bindingId, $configuration);
-        $invoice = $this->ledger->invoice($binding, $invoiceRef);
+        // An identity this binding already owns is reused; a new one is claimed only after the verdict (see below).
+        $invoice = $this->ledger->existingInvoice($binding, $invoiceRef);
         $attemptedAt = CarbonImmutable::now('UTC')->timestamp;
         try {
             $snapshots = $this->snapshots($invoiceRef, $provenance);
@@ -46,6 +50,15 @@ final class BillingReconciliation
         }
         // Configuration withdrawn during provider I/O records nothing.
         $policy->proveConfiguration($configuration);
+        // The invoice-identity row is immutable and its unique hash can never move to another binding. A retrieved account,
+        // customer or parent subscription that contradicts this binding proves nothing about ownership, so it claims no
+        // identity (and, with no identity, has no observation chain to hold a refusal): it fails closed instead (review R-3).
+        // Unknown and provider-incomplete outcomes carry no retrieved graph to validate, so they still claim the identity.
+        if ($invoice === null) {
+            BillingException::require(! ($verdict->outcome === 'refused' && in_array($verdict->reason, self::BINDING_REFUSALS, true)),
+                'binding_refused_'.$verdict->reason);
+            $invoice = $this->ledger->invoice($binding, $invoiceRef);
+        }
 
         return $this->ledger->append($invoice, $verdict, $retrievedAt, $provenance);
     }

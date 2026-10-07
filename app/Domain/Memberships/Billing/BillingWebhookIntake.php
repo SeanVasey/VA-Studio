@@ -73,7 +73,7 @@ final class BillingWebhookIntake
         $row['seal'] = BillingValues::seal($row);
         $existing = $this->event($eventHash);
         if ($existing !== null) {
-            return ['event' => $existing, 'duplicate' => true, 'scheduled' => null];
+            return ['event' => $existing, 'duplicate' => true, 'scheduled' => $this->recoverLostDispatch($existing, $configuration, $policy)];
         }
         try {
             DB::transaction(function () use ($row) {
@@ -97,6 +97,49 @@ final class BillingWebhookIntake
         }
 
         return ['event' => $row, 'duplicate' => false, 'scheduled' => $scheduled];
+    }
+
+    /**
+     * A hint is committed before its retrieval is dispatched, so a failed dispatch leaves a hint the provider will redeliver.
+     * A duplicate delivery therefore dispatches that retrieval again unless the hint is already covered. "Covered" means the
+     * invoice's identity row has an observation row (any outcome, including unknown or refused) created strictly after the
+     * hint's received_at; an older observation, or an identity row with no observation, does not cover it. Only the observation
+     * table is consulted because an observation is the one row appended after a retrieval completes. The dispatch is read-only
+     * against the provider and each retrieval appends one chained observation, so a redundant dispatch is harmless and the
+     * stored event row is never touched. A hint that names no bound subscription, and every non-hint event, stays unscheduled.
+     *
+     * @return array{binding_id: string, invoice_ref: string}|null
+     */
+    private function recoverLostDispatch(array $event, array $configuration, BillingPolicy $policy): ?array
+    {
+        if ($event['disposition'] !== 'retrieval_hint') {
+            return null;
+        }
+        $hint = BillingValues::decrypt($event['payload_ciphertext']);
+        $invoiceRef = $hint['invoice_ref'] ?? null;
+        $subscriptionRef = $hint['subscription_ref'] ?? null;
+        if (! BillingValues::is('invoice', $invoiceRef) || ! BillingValues::is('subscription', $subscriptionRef)
+            || ! hash_equals(BillingValues::hash('invoice', $configuration['account_ref'], $configuration['mode'], $invoiceRef), (string) $event['invoice_ref_hash'])) {
+            return null;
+        }
+        $binding = $this->bindingFor(BillingValues::hash('subscription', $configuration['account_ref'], $configuration['mode'], $subscriptionRef));
+        if ($binding === null || $this->observedAfter($event['invoice_ref_hash'], $event['received_at'])) {
+            return null;
+        }
+        $policy->proveConfiguration($configuration);
+        RetrieveMembershipInvoice::dispatch($binding, $invoiceRef);
+
+        return ['binding_id' => $binding, 'invoice_ref' => $invoiceRef];
+    }
+
+    private function observedAfter(string $invoiceRefHash, string $receivedAt): bool
+    {
+        $schema = new BillingSchema;
+        $statement = DB::connection()->getPdo()->prepare('SELECT 1 FROM '.$schema->table(BillingSchema::TABLES[2]).' o JOIN '.$schema->table(BillingSchema::TABLES[1])
+            .' i ON i.id = o.invoice_id WHERE i.invoice_ref_hash = ? AND o.created_at > ? LIMIT 1');
+        $statement->execute([$invoiceRefHash, $receivedAt]);
+
+        return $statement->fetchColumn() !== false;
     }
 
     private function event(string $eventHash): ?array

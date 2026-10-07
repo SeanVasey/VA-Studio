@@ -11,6 +11,7 @@ use App\Domain\Memberships\Billing\BillingVerdict;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\BillingStripeFixtures as F;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\RehearsalBillingGateway;
@@ -83,6 +84,57 @@ class BillingObservationLedgerTest extends TestCase
         } catch (BillingException $error) {
             $this->assertSame('conflicting_invoice', $error->reason);
         }
+        $this->assertSame(1, DB::table('production_membership_billing_invoices')->count());
+    }
+
+    /**
+     * Review R-3 (Codex P2): the immutable invoice-identity row is claimed only after the retrieved account, customer and
+     * parent subscription match the binding, so a mistaken first dispatch cannot pin a real invoice to the wrong binding.
+     *
+     * @return array<string, array{0: array, 1: array, 2: string}> binding payload change, graph overrides, expected reason
+     */
+    public static function wrongBindingFirst(): array
+    {
+        return [
+            'subscription' => [['subscription_ref' => 'sub_WRONGSYNTHETIC'], [], 'subscription'],
+            'customer' => [[], ['invoice' => ['customer' => 'cus_FOREIGNSYNTHETIC']], 'customer'],
+            'account' => [[], ['account' => 'acct_FOREIGNSYNTHETIC'], 'account'],
+        ];
+    }
+
+    #[DataProvider('wrongBindingFirst')]
+    public function test_wrong_binding_retrieved_first_claims_no_invoice_identity_and_the_right_binding_still_succeeds(array $bindingChange, array $graphChange, string $reason): void
+    {
+        $wrong = F::binding($bindingChange);
+        $right = $bindingChange === [] ? $wrong : F::binding();
+        try {
+            (new BillingReconciliation(new RehearsalBillingGateway(F::graph($graphChange))))->retrieve($wrong['id'], F::INVOICE);
+            $this->fail('A retrieval that contradicts its binding is refused, not recorded under that binding.');
+        } catch (BillingException $error) {
+            $this->assertSame('binding_refused_'.$reason, $error->reason);
+        }
+        $this->assertSame([0, 0], [DB::table('production_membership_billing_invoices')->count(), DB::table('production_membership_billing_observations')->count()]);
+        $settled = (new BillingReconciliation(new RehearsalBillingGateway(F::graph())))->retrieve($right['id'], F::INVOICE);
+        $this->assertSame(['settled', 1], [$settled['outcome'], $settled['sequence']]);
+        $this->assertSame([1, 1], [DB::table('production_membership_billing_invoices')->count(), DB::table('production_membership_billing_observations')->count()]);
+        $this->assertSame(0, DB::table('production_membership_credit_events')->count());
+    }
+
+    public function test_a_binding_refusal_under_an_identity_the_binding_already_owns_is_still_appended(): void
+    {
+        $binding = F::binding();
+        $first = (new BillingReconciliation(new RehearsalBillingGateway(F::graph())))->retrieve($binding['id'], F::INVOICE);
+        CarbonImmutable::setTestNow(CarbonImmutable::createFromTimestampUTC(self::AT + 5));
+        $refused = (new BillingReconciliation(new RehearsalBillingGateway(F::graph(['invoice' => ['customer' => 'cus_FOREIGNSYNTHETIC']]))))->retrieve($binding['id'], F::INVOICE);
+        $this->assertSame(['refused', 2, $first['seal'], $first['invoice_id']], [$refused['outcome'], $refused['sequence'], $refused['prior_seal'], $refused['invoice_id']]);
+        $this->assertSame(1, DB::table('production_membership_billing_invoices')->count());
+    }
+
+    public function test_a_refusal_unrelated_to_the_binding_graph_still_claims_the_identity_and_is_recorded(): void
+    {
+        $binding = F::binding();
+        $refused = (new BillingReconciliation(new RehearsalBillingGateway(F::graph(['invoice' => ['currency' => 'usd']]))))->retrieve($binding['id'], F::INVOICE);
+        $this->assertSame(['refused', 1], [$refused['outcome'], $refused['sequence']]);
         $this->assertSame(1, DB::table('production_membership_billing_invoices')->count());
     }
 

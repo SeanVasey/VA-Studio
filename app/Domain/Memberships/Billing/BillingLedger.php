@@ -48,6 +48,15 @@ final class BillingLedger
         return ['row' => $row, 'payload' => $payload, 'expectation' => $expectation];
     }
 
+    /** The identity row this binding already owns for the invoice, or null. Never inserts; another binding's row conflicts. */
+    public function existingInvoice(array $binding, string $invoiceRef): ?array
+    {
+        BillingException::require(BillingValues::is('invoice', $invoiceRef), 'invalid_value');
+        $expectation = $binding['expectation'];
+
+        return $this->invoiceIdentity(BillingValues::hash('invoice', $expectation->accountRef, $expectation->mode, $invoiceRef), $binding);
+    }
+
     /** The same provider invoice always resolves to the same identity row; another binding conflicts. */
     public function invoice(array $binding, string $invoiceRef): array
     {
