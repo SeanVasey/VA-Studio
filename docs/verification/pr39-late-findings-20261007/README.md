@@ -10,7 +10,7 @@ acceptance.
 | --- | --- | --- |
 | B — identity frame SQLite `query_only` | [r4206829231](https://github.com/SeanVasey/VA-Studio/pull/39#discussion_r4206829231) | `1d41bedf` `fix(identity): restore SQLite query_only after a caller replacement ends` |
 | A — suppression target after email change | [r4206829225](https://github.com/SeanVasey/VA-Studio/pull/39#discussion_r4206829225) | `bf6e5937` `fix(suppression): deliver the retained captured target after an email change` |
-| A follow-up — independent review C-A1 (Medium) and the Low | review of `bf6e5937` | the `fix(suppression): refuse an unauthentic selected target ...` commit that updates this file |
+| A follow-up — independent review C-A1 (Medium) and the Low | review of `bf6e5937` | `f65d921d` `fix(suppression): refuse an unauthentic selected target instead of skipping it` |
 
 ## Finding A — `SuppressionDelivery` misses the retained target after an email change
 
@@ -218,7 +218,12 @@ Foundation CI and browser specs.
    check that the settle closure can't run inside the frame's own active transaction: it
    is registered only from `close()`, after `used=true`. Review the limit described
    above.
-5. Previous approvals stay bound to their recorded commits. As relayed by the
-   coordinator, the independent review approved `1d41bedf` and approved `bf6e5937` on
-   condition C-A1. The follow-up commit fixes C-A1 and the Low, and it needs its own
-   review of the exact follow-up SHA.
+5. Previous approvals stay bound to their recorded commits. The independent review
+   approved `1d41bedf`, approved `bf6e5937` on condition C-A1, and on re-review
+   **approved exact `f65d921d`** with C-A1 met and the Low closed
+   ([`independent-review/DECISION.md`](independent-review/DECISION.md), addendum; the
+   reviewer's own red/green runs on SQLite and a private MySQL 8.4.11 are in
+   `independent-review/re-review-evidence/`). The reviewer notes one consequence: while
+   an unauthentic older row exists, every delivery call for that account fails with 503
+   instead of silently reporting `not_requested`; clearing such a row is an operator job,
+   since the triggers forbid deleting or editing rows.
