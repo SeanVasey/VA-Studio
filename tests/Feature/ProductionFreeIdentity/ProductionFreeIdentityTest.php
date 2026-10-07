@@ -34,6 +34,7 @@ final class ProductionFreeIdentityTest extends TestCase
         $principal = $identity->principal($owner['user']);
         $binding = $identity->durableBinding($principal);
         $this->assertSame($owner['binding'], $binding['buyer_binding']);
+        $this->assertSame('production-free-origin-v1', $binding['family']);
         $this->assertSame('production-free-origin-v1', $binding['purpose']);
         $this->assertSame('synthetic_rehearsal', $binding['provenance']);
         $this->assertFalse($binding['legal_identity_verified']);

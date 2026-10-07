@@ -10,7 +10,7 @@ final class ProductionFreeGrantIdentityPolicy
 {
     public const VERSION = 'production-free-grant-identity-v1';
 
-    public const FAMILY = 'production_customer_origin_v1';
+    public const FAMILY = 'production-free-origin-v1';
 
     public const PURPOSE = 'production-free-origin-v1';
 
