@@ -1,0 +1,314 @@
+{
+  "executable_commit": "4b3d47860373aad181c382899b9ab9677023eca0",
+  "author_runtime_commit": "eaaa55be3bf35193e68a3ad8cac3cc99eec85e5e",
+  "author_ui_commit": "af4870b757393faa4fc03e3a5701086f6627ff83",
+  "source_bindings": [
+    {
+      "path": "app/Console/Commands/ProcessProductionIdentityNotices.php",
+      "git_blob": "a1edbed5480e85674ba96a1484aa25f36d0fb0ef",
+      "sha256": "1d7cdcd3cd5facc769df0f69e0c87997cb7753f06cbe92837648e164da6dcdb7"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/CurrentRows.php",
+      "git_blob": "eb357333f427bea8e124818564c6b083e7c75d31",
+      "sha256": "02421b3afb5911bab22bec749c3c691f45379aab4f48c3522831be051235e428"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionCustomerAccess.php",
+      "git_blob": "c922cc3dd6cc21dabf3316328680df6091331591",
+      "sha256": "4f013b5114b8b8ee8cd53d42277368a215861b8c48a07672fd2337e4fc483eb4"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionCustomerPrincipal.php",
+      "git_blob": "abf7273087e9308a26df98759d695cb8788c8840",
+      "sha256": "ab0ddc7dcabb41fd8d003582c9a78814a90f5cd4fa80be4bc2c5208192306b0c"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/CompleteIdentity.php",
+      "git_blob": "b8e35a04fe164affd445ee401eaff2b606432039",
+      "sha256": "b8820fa80d7ab8bf588d443dfdf31dc80617e289b54c3116a8b3a8f685cf8546"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityDatabase.php",
+      "git_blob": "15bee82c4a0f655970e70b7dc56d34169153d598",
+      "sha256": "03a9411dc14cf1883226ae552a3333c74a349a8d5c6a6fea588a9544d5dfc732"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityEvidence.php",
+      "git_blob": "88850d925ec4d163b3368481942203f7ac938592",
+      "sha256": "23f855f53a01e5df3a4dab630e9fc8e2d513f23bf56de391f2380d41d29ee9a8"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityException.php",
+      "git_blob": "7d0cc1adebf3237f6949a3c3a01e7b75e5ee61c9",
+      "sha256": "91259fe2f5e59549b8f385edc2194b51ea70266fbe2a8992fce3615696661563"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php",
+      "git_blob": "7515ddbae114b41948c9c5d05e4cf2b5bda7d0f2",
+      "sha256": "c294948fc459e9f202fcd1194e3ae5cc2a3e9a0b4500e8359d54613f27e675f1"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityPolicy.php",
+      "git_blob": "00d1d575b626b9dbadac71a99860d28c1cf3e959",
+      "sha256": "445a001b81c7125b4c87188a3515406424ce2d89bb97cb3d3edc02f1dc12298f"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityRequests.php",
+      "git_blob": "6398ff07cdb72cc5467fbe078019480a6408d5a5",
+      "sha256": "5b4b0a0b90b252589794de84f34d44a12a9c9cdf39613521a13cffcedcae9dc9"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityRows.php",
+      "git_blob": "a9b7cba29c07d879020d3affe910e66aca5efe91",
+      "sha256": "deb303101abe98ca505c43e34ab49cc636b56fed42e5b808044380108fdb42bd"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentitySchema.php",
+      "git_blob": "55f4ef40660051ef924018b013fc173bfb6f9ccc",
+      "sha256": "6ca4d4ca4260e13b8a26752ebd8466f3c3edd7047c9ddc71004e45f242e619dc"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/DefinitelyNotSubmitted.php",
+      "git_blob": "3acd5f0237eda2db881b18e50fe440dca1644734",
+      "sha256": "042cb2c999c0b275083ad0df6dba31a19a682dafcc666911eafaebd554089ee4"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentityAcceptance.php",
+      "git_blob": "53900b095aa873af42dbede4bf1b2af96dba684a",
+      "sha256": "65d588591c45e30b6511f2c3a175418f90df0df97f60391199a97823a6b1d30a"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentityMail.php",
+      "git_blob": "5661025016b847a00de0bbe9e6b0a2afbdcf7a9f",
+      "sha256": "7c2aae31553bf34f9ea33f57fa350976e1ab91e93e9333061504c3f9b488b715"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentityNoticeTransport.php",
+      "git_blob": "4c504ac765267916cfb1527ea701677f83d7b64d",
+      "sha256": "9877286016507f010adcd7b3bae0d95071fb2fdf91a519d5df74b4f3424ba3e1"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/LoopbackSmtp.php",
+      "git_blob": "298f922517c4ef7f3c2a254cb1159ff7fb4c8d30",
+      "sha256": "8569b270d19b981334ee506db4046c74bf2d80b143712506adbea6307b38c682"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/WorkIdentityNotice.php",
+      "git_blob": "63f49f136dc5bb29d762c79f39d6b888bf3eef50",
+      "sha256": "bc32bdaba43bf9ad0956121da38820eb9adf5da5f421ba160140f0606d224c93"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/ProductionCustomerSessions.php",
+      "git_blob": "e2ee7dc46eb6d5e8f1afde877f2751aa9096c14c",
+      "sha256": "73efe65ab06626178fc1aa6ecd6ff426b30a04d58acd68b164acaa31c9a5d1d6"
+    },
+    {
+      "path": "app/Http/Controllers/ProductionIdentity/CustomerIdentityController.php",
+      "git_blob": "f48c80440eb3e4310dfc0c6256921c6da03a9f90",
+      "sha256": "5c260d6ef4edbe9e72065cb4e9379375239ba706c7a4a71eb322d7d6c965eb37"
+    },
+    {
+      "path": "app/Http/Controllers/PublicDiscoveryController.php",
+      "git_blob": "9b4945f8f86c16a05900471e8d1f54dcd5b7febd",
+      "sha256": "5e344be355cef201083cdf02d685cc13ad9f3cffdfbc6d4c6df0af26c9ce5f55"
+    },
+    {
+      "path": "app/Http/Middleware/ProductionIdentity/IdentityPrivacy.php",
+      "git_blob": "76241e9afbc8eac92c4dbe247fa9da5cb2e652fc",
+      "sha256": "4c4d7a232282d9edd621ffff6b129b53468a8263e84d853b0077e4766bc307f6"
+    },
+    {
+      "path": "app/Http/Requests/ProductionIdentity/IdentityBody.php",
+      "git_blob": "fcbe2dbf31edc11d3ac1b4983054d2bc233a2223",
+      "sha256": "09c14e6ccd9edf02d413cdad03238b5d82dbf704a22fb8bbb0638f81846575e1"
+    },
+    {
+      "path": "app/Jobs/DeliverProductionIdentityNotice.php",
+      "git_blob": "b57f6eb902104974b858fc4f044988163ca8ef02",
+      "sha256": "061de336297e398ded168dad925457b69dbf4c05242bde6f9591e7837280e539"
+    },
+    {
+      "path": "bootstrap/app.php",
+      "git_blob": "23149997a0c043072ffe2ecfa506fe7b51c9213d",
+      "sha256": "98e7dd237b917c08cb23d2ca40021b01ca9adcb090f2eaebd051f61dac104a6e"
+    },
+    {
+      "path": "config/production-customer-identity.php",
+      "git_blob": "5832ea430ca56a532abb5d1bae15a7c9df9078c4",
+      "sha256": "5e4bf0c3b2505a735c833a195e441d67913e71a62438f083a30c353f73c34188"
+    },
+    {
+      "path": "database/migrations/2026_10_07_247000_production_customer_identity.php",
+      "git_blob": "f82b5334e2d582ea63f91674b835f43f5bd28815",
+      "sha256": "a2cfa089ea5452aec894f24f6779f5deee63fb3a2453fd6c12d4a5d8b1273166"
+    },
+    {
+      "path": "resources/js/Pages/ProductionCustomerIdentity.tsx",
+      "git_blob": "47ef9453242bd3005955a061365c49079d307a8c",
+      "sha256": "52b5ce92536e539e457463fde5ebc4b7087e6b8596d0a9cf81b44ee42b839c28"
+    },
+    {
+      "path": "resources/js/app.tsx",
+      "git_blob": "e29d138382dfd84cc0c0eca22a3fc77ee2a21635",
+      "sha256": "cf826c343865eb2bfba5b94a972d59357da2a7a06619f9eadcc16d3dbae1e02f"
+    },
+    {
+      "path": "resources/js/lib/production-customer-identity.ts",
+      "git_blob": "51328605b458cf534245f317193300bfbbacc2c4",
+      "sha256": "76e725ca9709e78b96989e667686563e2f1040c579a2cac6b70d389ad7942a65"
+    },
+    {
+      "path": "routes/production-customer-identity.php",
+      "git_blob": "e0e1c8fe62ee26f0d7b94ab635e9d56d8e049518",
+      "sha256": "2f9b3f7f03d50a3c8930f52a6d8187e533ead4d1c0acb1c156b2c8c161abca43"
+    },
+    {
+      "path": "routes/web.php",
+      "git_blob": "f6a6431e32814aa99421443136cd836662f6812e",
+      "sha256": "f486df21f6bc2511a487967a796b550930c9acb80bb29a5ca532cc76dee90cfb"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityHttpTest.php",
+      "git_blob": "feefa1e63a5553723f3d83813e001159ad8fdee6",
+      "sha256": "db494d78a1710827df7c8dd407771c14dfa699e6224353d0f89e38973e07006c"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityJourneyTest.php",
+      "git_blob": "0771d846f66f99e09a24806851b005ceba788360",
+      "sha256": "72bc446efba9065be3d3b4ddc2725516449b54a53752aa59329a82d1df36e4bc"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityMigrationTest.php",
+      "git_blob": "ce95a30e5d2dd51749e1de356e3fd1596a4819f9",
+      "sha256": "7a7997f60d985e5d303b3bf58128d5fd00ff476a4873897337f196c4b67c0098"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityNativeRaceTest.php",
+      "git_blob": "6fe9cbeb99c5747a727ed8350d52d25831e43962",
+      "sha256": "602c72b951f3a8464e610338274d1b0698325e2be26843a29cfa84199053372f"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityNoticeTest.php",
+      "git_blob": "6575474d73a734edbbb476b63f9f01934c76e152",
+      "sha256": "7167840fc7eb738b5ccd6397d877542d0246c41af67e5d205d341a87299d2fc8"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityRuntimeTest.php",
+      "git_blob": "97230fd61d225833144d4135ad5714e1e4a7f9c9",
+      "sha256": "b1ab853981c69c12209b551991b1a9df7171f68f3ded9701aab574ac6f40b995"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentityRegistrationTest.php",
+      "git_blob": "ab958ec0ede0b80620a736863df20cb50aa16634",
+      "sha256": "1773d77cbdf06ac2d806b6b5abff9002b96e7df2f81e7f3a96d77cfb1eb62364"
+    },
+    {
+      "path": "tests/Support/ProductionIdentityFixture.php",
+      "git_blob": "1ab9e07719ae248173ac5c766dbc4257a62076ab",
+      "sha256": "558b6269d305b7b213e4b8c102c7e9e117dfb8cce30c4c76a7520482609391b7"
+    },
+    {
+      "path": "tests/Support/production-identity-race-worker.php",
+      "git_blob": "b7432df17d7243786ea605fb7217f992d6a96392",
+      "sha256": "67a526ef790be061f0661d58a8b19a0069e3a3972d74d591df0c80dfe2cd1a33"
+    },
+    {
+      "path": "tests/Support/production_identity_smtp_sink.py",
+      "git_blob": "ad852c9ddfc2b039306abf7cd5c9be61a997a647",
+      "sha256": "d0291a72f85013c9ae994dd4a391404645c6e6e535961339a539b44ae9fd44c6"
+    },
+    {
+      "path": "tests/frontend/production-customer-identity.test.tsx",
+      "git_blob": "afd87830179614d0bd8bc997f9458edccecea697",
+      "sha256": "f04717fb863642fbf2605e6aeb6fe0cc4ea41821b02d506b571c9212bcb84074"
+    },
+    {
+      "path": "tests/frontend/production-identity-registration.test.tsx",
+      "git_blob": "3764d5fa2ce771bcb93911a643c26397a86d619c",
+      "sha256": "b1856e9c1993d790128cf00dced3e036dae9abafaa93646607848b2f11068a74"
+    }
+  ],
+  "verified_unchanged_runtime_count": 35,
+  "artifacts": [
+    {
+      "path": "docs/verification/cloud-identity-registration-20261007/va-identity-registration-root-http.txt",
+      "sha256": "60fd611bb993055fbc822af2561cc8d39f87a9f8a4fd652aaa57a0380b8246e4"
+    },
+    {
+      "path": "docs/verification/cloud-identity-registration-20261007/va-identity-registration-root-http.xml",
+      "sha256": "cef4bdb7bf74c2bed564f25968341e6986b6a94e0a8d15815d94d9664cc1a345"
+    },
+    {
+      "path": "docs/verification/cloud-identity-registration-20261007/va-identity-registration-root-http-corrected.txt",
+      "sha256": "7b789f38434eef7382b30f7dcc2ad332e24d784d2da45387cc06b8885dc88052"
+    },
+    {
+      "path": "docs/verification/cloud-identity-registration-20261007/va-identity-registration-root-http-corrected.xml",
+      "sha256": "0514fdce8910031a40d35f1c8d3a5380cfbc2f15194122bbfd12393d4ccb5e05"
+    },
+    {
+      "path": "docs/verification/cloud-identity-registration-20261007/va-identity-registration-pagehide-original.txt",
+      "sha256": "4000b63c5155f3fb0fca68ac82ccdf4842c7625f6ffd2ff091bd5ce07fd26ff9"
+    },
+    {
+      "path": "docs/verification/cloud-identity-registration-20261007/va-identity-registration-final-http.txt",
+      "sha256": "6f80019fe98fa8825b3dff826a6b04c507653322bf6b1d83efd8c4919c542649"
+    },
+    {
+      "path": "docs/verification/cloud-identity-registration-20261007/va-identity-registration-final-http.xml",
+      "sha256": "8d4d5a6ca6bd4486cd2cbe357d98e7a5b459d5fe6e0fae6579056801e6b61227"
+    },
+    {
+      "path": "docs/verification/cloud-identity-registration-20261007/va-identity-registration-final-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "path": "docs/verification/cloud-identity-registration-20261007/va-identity-registration-ui-successor.txt",
+      "sha256": "7ff01790083537ff244c819afe9d8e5439a90c631fbda0ee1fd1ab902ce46eab"
+    },
+    {
+      "path": "docs/verification/cloud-identity-registration-20261007/va-identity-registration-typecheck.txt",
+      "sha256": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f"
+    },
+    {
+      "path": "docs/verification/cloud-identity-registration-20261007/va-identity-eaaa-original.txt",
+      "sha256": "c78bcda2bceae270203087ff582be55bcf7e3e1260502acea6cc9a0147a025ad"
+    },
+    {
+      "path": "docs/verification/cloud-identity-registration-20261007/va-identity-eaaa-original.xml",
+      "sha256": "ca8076c7944564b17dcdbb058a5e08a7b8faee2af9fd5b2023b604039d6a0a18"
+    },
+    {
+      "path": "docs/verification/cloud-identity-registration-20261007/va-identity-eaaa-original-corrected.txt",
+      "sha256": "afb5802a44dd19af7734c9c49c631ca9b01d845b9aaea399990f16f4605a3c87"
+    },
+    {
+      "path": "docs/verification/cloud-identity-registration-20261007/va-identity-eaaa-original-corrected.xml",
+      "sha256": "85e26c2b315777c609926d5b95e1581c8cebeb129be0de31c92b9f5e3877d2b8"
+    },
+    {
+      "path": "docs/verification/cloud-identity-registration-20261007/va-identity-registration-author-http.txt",
+      "sha256": "97c2f0c8e27348fa9548f2584e89ac9e0d4b52e653500f9ca3ba0bfa6721e8f3"
+    },
+    {
+      "path": "docs/verification/cloud-identity-registration-20261007/va-identity-registration-author-http.xml",
+      "sha256": "384224a89df1b3cb4f1491ae7b50cdf27163d2dc443b9c8a94586311743dc9a9"
+    }
+  ],
+  "results": {
+    "registered_http": "15/182 passed, no errors/failures/skips",
+    "frontend": "2 files/14 passed, TypeScript passed",
+    "format": "scoped Pint passed",
+    "original_root_canary": "same permanent-password/TEMP-user canary passes eaaa1/5; initial missing synthetic APP_KEY is retained as a harness error",
+    "original_incorrect_assertion": "root initially expected an account version increment; source explicitly preserves the entire original account row. Original failed assertion preserved; corrected whole-row assertion passes7/118",
+    "actual_ui_defect": "pagehide retained credentials on eaaa; unchanged canary passes af4870b. Exact author duplicate archived once, not discovered or counted twice"
+  },
+  "review": "independent registered-source review pending",
+  "limits": [
+    "Synthetic rehearsal only; production identity and transport default off/unbound",
+    "Author native8.0.46 exact46/1464 evidence carries only unchanged runtime/fixtures; source maps verified byte exact",
+    "No native8.4, browser or final exact-SHA Foundation claim",
+    "No production credentials, external SMTP or live activation"
+  ]
+}

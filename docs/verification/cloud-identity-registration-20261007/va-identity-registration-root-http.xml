@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionIdentityRegistrationTest" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentityRegistrationTest.php" tests="7" assertions="110" errors="0" failures="1" skipped="0" time="2.828883">
+    <testcase name="test_registered_http_uses_actual_smtp_proof_and_recovery_preserves_owner_but_invalidates_old_session" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentityRegistrationTest.php" line="26" class="Tests\Feature\ProductionIdentityRegistrationTest" classname="Tests.Feature.ProductionIdentityRegistrationTest" assertions="30" time="1.260000">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionIdentityRegistrationTest::test_registered_http_uses_actual_smtp_proof_and_recovery_preserves_owner_but_invalidates_old_session
+Failed asserting that 1 is identical to 2.
+
+/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentityRegistrationTest.php:44</failure>
+    </testcase>
+    <testcase name="test_real_csrf_fails_with_private_generic_response_before_any_writer" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentityRegistrationTest.php" line="55" class="Tests\Feature\ProductionIdentityRegistrationTest" classname="Tests.Feature.ProductionIdentityRegistrationTest" assertions="15" time="0.266241"/>
+    <testsuite name="Tests\Feature\ProductionIdentityRegistrationTest::test_global_private_boundary_covers_unregistered_paths_methods_and_disabled_identity" tests="4" assertions="52" errors="0" failures="0" skipped="0" time="1.057636">
+      <testcase name="test_global_private_boundary_covers_unregistered_paths_methods_and_disabled_identity with data set #0" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentityRegistrationTest.php" line="75" class="Tests\Feature\ProductionIdentityRegistrationTest" classname="Tests.Feature.ProductionIdentityRegistrationTest" assertions="13" time="0.223065"/>
+      <testcase name="test_global_private_boundary_covers_unregistered_paths_methods_and_disabled_identity with data set #1" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentityRegistrationTest.php" line="75" class="Tests\Feature\ProductionIdentityRegistrationTest" classname="Tests.Feature.ProductionIdentityRegistrationTest" assertions="13" time="0.228458"/>
+      <testcase name="test_global_private_boundary_covers_unregistered_paths_methods_and_disabled_identity with data set #2" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentityRegistrationTest.php" line="75" class="Tests\Feature\ProductionIdentityRegistrationTest" classname="Tests.Feature.ProductionIdentityRegistrationTest" assertions="13" time="0.256546"/>
+      <testcase name="test_global_private_boundary_covers_unregistered_paths_methods_and_disabled_identity with data set #3" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentityRegistrationTest.php" line="75" class="Tests\Feature\ProductionIdentityRegistrationTest" classname="Tests.Feature.ProductionIdentityRegistrationTest" assertions="13" time="0.349567"/>
+    </testsuite>
+    <testcase name="test_precontroller_exception_is_sanitized_and_logged_without_private_message_or_trace" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentityRegistrationTest.php" line="88" class="Tests\Feature\ProductionIdentityRegistrationTest" classname="Tests.Feature.ProductionIdentityRegistrationTest" assertions="13" time="0.245006"/>
+  </testsuite>
+</testsuites>
