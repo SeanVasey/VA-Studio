@@ -21,7 +21,9 @@ export async function productionIdentityRequest(action: IdentityAction, body: st
     if (cookie) headers['X-XSRF-TOKEN'] = decodeURIComponent(cookie.slice(11));
     else { const csrf = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content; if (csrf) headers['X-CSRF-TOKEN'] = csrf; }
     const endpoint = action === 'request' || action === 'complete' ? '/customer/identity/' + action : '/customer/' + action;
-    const response = await fetch(endpoint, { method: 'POST', credentials: 'same-origin', cache: 'no-store', redirect: 'error', headers, body, signal });
+    const pending = fetch(endpoint, { method: 'POST', credentials: 'same-origin', cache: 'no-store', redirect: 'error', headers, body, signal });
+    body = ''; // The helper does not retain a second private body while awaiting the network.
+    const response = await pending;
     if (response.redirected) return 'uncertain';
     if (response.status === 419) return 'expired';
     if (response.status === 422) return 'invalid';
