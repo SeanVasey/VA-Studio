@@ -282,9 +282,14 @@
       "bytes": 4944
     },
     {
-      "path": "held-raw-parent.diff",
-      "sha256": "a1e708ba7421992028112758deaf5d045b009c10ce249d62984146bcfdd7a35c",
-      "bytes": 10118
+      "path": "held-raw-parent-archive.json",
+      "sha256": "c6dd6e0727897f5ec204ed2b7cb5e5f923ed0a8e482eef134db579115e27a845",
+      "bytes": 401
+    },
+    {
+      "path": "held-raw-parent.diff.gz",
+      "sha256": "e50b7f8da5ddff73fd2627ec71f1e843dc9730604e4950baa5877f61f61fd2e9",
+      "bytes": 2629
     },
     {
       "path": "held-reader-owned-sqlite.junit.xml",

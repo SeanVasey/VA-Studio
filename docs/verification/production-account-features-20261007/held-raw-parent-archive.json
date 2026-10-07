@@ -1,0 +1,6 @@
+{
+  "original": "held-raw-parent.diff",
+  "archive": "held-raw-parent.diff.gz",
+  "originalSha256": "a1e708ba7421992028112758deaf5d045b009c10ce249d62984146bcfdd7a35c",
+  "reason": "Verbatim reviewed unified-diff context prefixes retained in gzip; avoids raw diff context blank lines appearing as trailing whitespace in the outer git diff. Original contents are byte exact after gzip decompression."
+}
