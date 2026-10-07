@@ -147,10 +147,10 @@ final class MemberGrantSchema
 
     private function physical(string $logical): string
     {
-        if (in_array($logical, [...self::TABLES, 'production_membership_redemptions'], true)) {
+        if (in_array($logical, [...self::TABLES, 'production_membership_redemptions', 'production_membership_paid_periods'], true)) {
             return DB::connection()->getTablePrefix().$logical;
         }
-        MemberGrantException::require(in_array($logical, ['users', 'customer_accounts', 'production_membership_redemptions'], true), 'schema');
+        MemberGrantException::require(in_array($logical, ['users', 'customer_accounts'], true), 'schema');
 
         return $logical;
     }
@@ -237,7 +237,7 @@ final class MemberGrantSchema
         } elseif ($logical === self::TABLES[2]) {
             $insert .= ' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE redemption_id = NEW.redemption_id)'
                 .' AND EXISTS (SELECT 1 FROM '.$definitions.' WHERE id = NEW.definition_id AND profile_id = NEW.profile_id AND original_terms_hash = NEW.original_terms_hash AND license_manifest_hash = NEW.license_manifest_hash AND asset_manifest_hash = NEW.asset_manifest_hash AND provenance = NEW.provenance)'
-                .' AND EXISTS (SELECT 1 FROM '.$this->physical('production_membership_redemptions').' WHERE id = NEW.redemption_id AND owner_binding_hash = NEW.owner_binding_hash AND intent_hash = NEW.intent_hash AND license_manifest_hash = NEW.license_manifest_hash AND asset_manifest_hash = NEW.asset_manifest_hash AND original_terms_hash = NEW.original_terms_hash AND honor_deadline = NEW.honor_deadline)'
+                .' AND EXISTS (SELECT 1 FROM '.$this->physical('production_membership_redemptions').' r JOIN '.$this->physical('production_membership_paid_periods').' p ON p.id = r.period_id WHERE r.id = NEW.redemption_id AND r.owner_binding_hash = NEW.owner_binding_hash AND r.intent_hash = NEW.intent_hash AND r.license_manifest_hash = NEW.license_manifest_hash AND r.asset_manifest_hash = NEW.asset_manifest_hash AND r.original_terms_hash = NEW.original_terms_hash AND r.honor_deadline = NEW.honor_deadline AND p.account_id = NEW.account_id AND p.user_id = NEW.user_id AND p.identity_origin_id = NEW.identity_origin_id AND p.source_invoice_hash = NEW.invoice_identity_hash)'
                 .' AND EXISTS (SELECT 1 FROM customer_accounts a JOIN users u ON u.id = a.user_id WHERE a.id = NEW.account_id AND u.id = NEW.user_id AND a.active = 1 AND u.is_admin = 0 AND u.email_verified_at IS NOT NULL)';
         } elseif ($logical === self::TABLES[3]) {
             $insert .= ' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE origin_id = NEW.origin_id AND (ordinal = NEW.ordinal OR role = NEW.role))'
@@ -379,9 +379,9 @@ final class MemberGrantSchema
             $s = $pdo->prepare('SELECT COLUMN_NAME, REFERENCED_TABLE_SCHEMA, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, ORDINAL_POSITION FROM information_schema.KEY_COLUMN_USAGE WHERE BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND BINARY TABLE_NAME = BINARY ? AND CONSTRAINT_NAME = ?');
             $s->execute([$name, $name.'_f'.$index]);
             MemberGrantException::require($s->fetchAll(PDO::FETCH_ASSOC) === [['COLUMN_NAME' => $column, 'REFERENCED_TABLE_SCHEMA' => $pdo->query('SELECT DATABASE()')->fetchColumn(), 'REFERENCED_TABLE_NAME' => $this->physical($target), 'REFERENCED_COLUMN_NAME' => 'id', 'ORDINAL_POSITION' => 1]], 'schema');
-            $s = $pdo->prepare('SELECT UNIQUE_CONSTRAINT_SCHEMA, UPDATE_RULE, DELETE_RULE FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND BINARY TABLE_NAME = BINARY ? AND CONSTRAINT_NAME = ?');
+            $s = $pdo->prepare('SELECT UNIQUE_CONSTRAINT_SCHEMA, UNIQUE_CONSTRAINT_NAME, REFERENCED_TABLE_NAME, MATCH_OPTION, UPDATE_RULE, DELETE_RULE FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND BINARY TABLE_NAME = BINARY ? AND CONSTRAINT_NAME = ?');
             $s->execute([$name, $name.'_f'.$index]);
-            MemberGrantException::require($s->fetchAll(PDO::FETCH_ASSOC) === [['UNIQUE_CONSTRAINT_SCHEMA' => $pdo->query('SELECT DATABASE()')->fetchColumn(), 'UPDATE_RULE' => 'RESTRICT', 'DELETE_RULE' => 'RESTRICT']], 'schema');
+            MemberGrantException::require($s->fetchAll(PDO::FETCH_ASSOC) === [['UNIQUE_CONSTRAINT_SCHEMA' => $pdo->query('SELECT DATABASE()')->fetchColumn(), 'UNIQUE_CONSTRAINT_NAME' => 'PRIMARY', 'REFERENCED_TABLE_NAME' => $this->physical($target), 'MATCH_OPTION' => 'NONE', 'UPDATE_RULE' => 'RESTRICT', 'DELETE_RULE' => 'RESTRICT']], 'schema');
         }
         ksort($actual);
         ksort($wanted);
