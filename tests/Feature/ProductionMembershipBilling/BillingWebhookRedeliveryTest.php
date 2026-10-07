@@ -142,6 +142,105 @@ class BillingWebhookRedeliveryTest extends TestCase
         Queue::assertNothingPushed();
     }
 
+    /** Codex P2 (intake-2, line 56): an InvoicePayment carries no invoice parent, so the binding comes from the invoice's existing identity. */
+    public function test_invoice_payment_paid_dispatches_for_the_binding_that_owns_the_invoice_identity(): void
+    {
+        $binding = F::binding();
+        $this->runRetrieval($binding['id'], 0);
+        $this->at(60);
+        Queue::fake();
+        $result = $this->receive($this->paymentEvent('evt_SYNTHETICPAY1'));
+        $this->assertFalse($result['duplicate']);
+        $this->assertSame('retrieval_hint', $result['event']['disposition']);
+        $this->assertSame(['binding_id' => $binding['id'], 'invoice_ref' => F::INVOICE], $result['scheduled']);
+        Queue::assertPushed(RetrieveMembershipInvoice::class, fn ($job) => $job->bindingId === $binding['id'] && $job->invoiceRef === F::INVOICE);
+        Queue::assertPushed(RetrieveMembershipInvoice::class, 1);
+    }
+
+    public function test_invoice_payment_paid_for_an_unknown_invoice_keeps_the_hint_and_dispatches_nothing(): void
+    {
+        F::binding();
+        Queue::fake();
+        $result = $this->receive($this->paymentEvent('evt_SYNTHETICPAY2'));
+        $this->assertSame(['retrieval_hint', null], [$result['event']['disposition'], $result['scheduled']]);
+        $this->assertNotNull($result['event']['invoice_ref_hash']);
+        $this->assertSame(1, DB::table('production_membership_billing_events')->count());
+        $this->assertSame(0, DB::table('production_membership_billing_invoices')->count());
+        $this->at(30);
+        $this->assertNull($this->receive($this->paymentEvent('evt_SYNTHETICPAY2'))['scheduled']);
+        Queue::assertNothingPushed();
+    }
+
+    public function test_a_lost_invoice_payment_dispatch_is_recovered_by_redelivery_through_the_same_identity(): void
+    {
+        $binding = F::binding();
+        $this->runRetrieval($binding['id'], 0);
+        $this->at(60);
+        $payload = $this->paymentEvent('evt_SYNTHETICPAY3');
+        $this->loseFirstDispatch($payload);
+        $this->at(70);
+        Queue::fake();
+        $this->assertSame(['binding_id' => $binding['id'], 'invoice_ref' => F::INVOICE], $this->receive($payload)['scheduled']);
+        Queue::assertPushed(RetrieveMembershipInvoice::class, 1);
+    }
+
+    /** Codex P2 (intake-2, line 86): the loser of a concurrent first delivery runs the same recovery against the winner's stored event. */
+    public function test_concurrent_loser_recovers_a_winner_whose_dispatch_was_lost(): void
+    {
+        $binding = F::binding();
+        $payload = $this->event('evt_SYNTHETICRACE1');
+        $this->raceWinner($payload, lost: true);
+        $this->at(30);
+        $loser = $this->receive($payload);
+        $this->assertTrue($loser['duplicate']);
+        $this->assertSame(['binding_id' => $binding['id'], 'invoice_ref' => F::INVOICE], $loser['scheduled']);
+        Queue::assertPushed(RetrieveMembershipInvoice::class, 1);
+        $this->assertSame([1, 0], [DB::table('production_membership_billing_events')->count(), DB::table('production_membership_billing_observations')->count()]);
+    }
+
+    public function test_concurrent_loser_dispatches_nothing_when_the_winner_was_already_observed(): void
+    {
+        $binding = F::binding();
+        $payload = $this->event('evt_SYNTHETICRACE2');
+        $this->raceWinner($payload, lost: false, bindingId: $binding['id']);
+        $loser = $this->receive($payload);
+        $this->assertTrue($loser['duplicate']);
+        $this->assertNull($loser['scheduled']);
+        Queue::assertPushed(RetrieveMembershipInvoice::class, 1);
+        $this->assertSame([1, 1], [DB::table('production_membership_billing_events')->count(), DB::table('production_membership_billing_observations')->count()]);
+    }
+
+    /**
+     * Makes the next event insert lose: just before intake opens its insert transaction (after its own lookup found nothing), a
+     * winning delivery of the same event id commits. A lost winner dispatch throws on the sync queue and is swallowed; a kept one
+     * is retrieved at once. Either way the queue is faked afterwards so only the loser's dispatch is counted (the kept winner's
+     * single push is the fake's first).
+     */
+    private function raceWinner(string $payload, bool $lost, ?string $bindingId = null): void
+    {
+        $armed = true;
+        DB::connection()->beforeStartingTransaction(function () use (&$armed, $payload, $lost, $bindingId): void {
+            if (! $armed) {
+                return;
+            }
+            $armed = false;
+            if ($lost) {
+                try {
+                    $this->receive($payload);
+                } catch (BindingResolutionException) {
+                    // The winner's post-commit dispatch failed.
+                }
+                Queue::fake();
+
+                return;
+            }
+            Queue::fake();
+            $this->receive($payload);
+            $this->runRetrieval($bindingId, 10);
+            $this->at(20);
+        });
+    }
+
     /** The first delivery commits the hint, then the dispatch fails: the sync queue runs the job, which has no bound gateway. */
     private function loseFirstDispatch(string $payload): void
     {
@@ -168,6 +267,15 @@ class BillingWebhookRedeliveryTest extends TestCase
     private function receive(string $payload): array
     {
         return (new BillingWebhookIntake)->receive($payload, WebhookSignature::generateSignatureHeader($payload, self::SECRET));
+    }
+
+    private function paymentEvent(string $id): string
+    {
+        $values = ['id' => $id, 'object' => 'event', 'api_version' => BillingProviderPin::API_VERSION, 'created' => F::PERIOD_START,
+            'livemode' => false, 'pending_webhooks' => 1, 'request' => ['id' => null, 'idempotency_key' => null], 'type' => 'invoice_payment.paid',
+            'data' => ['object' => F::graph()['payments'][0]]];
+
+        return json_encode(F::sdk(Event::class, $values), JSON_THROW_ON_ERROR);
     }
 
     private function event(string $id, string $type = 'invoice.paid', array $object = []): string

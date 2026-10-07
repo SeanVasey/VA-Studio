@@ -1,0 +1,39 @@
+# Red: new intake-2 tests against the unmodified intake at 9c2f99289da36a17f405e68ab7396fa2d7d6a9d9
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops/phpunit.xml
+
+......F.FF.                                                       11 / 11 (100%)
+
+Time: 00:19.101, Memory: 89.00 MB
+
+There were 3 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest::test_invoice_payment_paid_dispatches_for_the_binding_that_owns_the_invoice_identity
+Failed asserting that null is identical to Array &0 [
+    'binding_id' => '8db45f3c-1d56-4624-8be2-0e5788bcd637',
+    'invoice_ref' => 'in_SYNTHETIC',
+].
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php:155
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest::test_a_lost_invoice_payment_dispatch_is_recovered_by_redelivery_through_the_same_identity
+The unbound gateway must make the first dispatch fail after the hint committed.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php:249
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php:180
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest::test_concurrent_loser_recovers_a_winner_whose_dispatch_was_lost
+Failed asserting that null is identical to Array &0 [
+    'binding_id' => '050a7d4e-4bca-4708-81fc-cc9fc390c8d7',
+    'invoice_ref' => 'in_SYNTHETIC',
+].
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php:196
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 11, Assertions: 50, Failures: 3.

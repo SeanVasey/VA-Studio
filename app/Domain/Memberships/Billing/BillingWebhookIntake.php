@@ -83,13 +83,15 @@ final class BillingWebhookIntake
             });
         } catch (PDOException) {
             // A concurrent delivery of the same event id won; this one is the replay.
-            return ['event' => $this->event($eventHash) ?? throw new BillingException('event_identity'), 'duplicate' => true, 'scheduled' => null];
+            // The winner's post-commit dispatch may still fail, and this success would stop the provider's retries: recover it too.
+            $winner = $this->event($eventHash) ?? throw new BillingException('event_identity');
+
+            return ['event' => $winner, 'duplicate' => true, 'scheduled' => $this->recoverLostDispatch($winner, $configuration, $policy)];
         }
         $policy->proveConfiguration($configuration);
         $scheduled = null;
-        if ($invoiceRef !== null && BillingValues::is('subscription', $subscriptionRef)) {
-            // The hinted subscription only selects which approved binding to retrieve against; retrieval proves it.
-            $binding = $this->bindingFor(BillingValues::hash('subscription', $account, $mode, $subscriptionRef));
+        if ($invoiceRef !== null) {
+            $binding = $this->bindingForHint($type, $invoiceRef, $subscriptionRef, $account, $mode);
             if ($binding !== null) {
                 $scheduled = ['binding_id' => $binding, 'invoice_ref' => $invoiceRef];
                 RetrieveMembershipInvoice::dispatch($binding, $invoiceRef);
@@ -118,11 +120,11 @@ final class BillingWebhookIntake
         $hint = BillingValues::decrypt($event['payload_ciphertext']);
         $invoiceRef = $hint['invoice_ref'] ?? null;
         $subscriptionRef = $hint['subscription_ref'] ?? null;
-        if (! BillingValues::is('invoice', $invoiceRef) || ! BillingValues::is('subscription', $subscriptionRef)
+        if (! BillingValues::is('invoice', $invoiceRef)
             || ! hash_equals(BillingValues::hash('invoice', $configuration['account_ref'], $configuration['mode'], $invoiceRef), (string) $event['invoice_ref_hash'])) {
             return null;
         }
-        $binding = $this->bindingFor(BillingValues::hash('subscription', $configuration['account_ref'], $configuration['mode'], $subscriptionRef));
+        $binding = $this->bindingForHint($event['type'], $invoiceRef, $subscriptionRef, $configuration['account_ref'], $configuration['mode']);
         if ($binding === null || $this->observedAfter($event['invoice_ref_hash'], $event['received_at'])) {
             return null;
         }
@@ -152,6 +154,28 @@ final class BillingWebhookIntake
         BillingException::require(count($rows) <= 1 && ($rows === [] || hash_equals(BillingValues::seal($rows[0]), $rows[0]['seal'])), 'tampered_ledger');
 
         return $rows[0] ?? null;
+    }
+
+    /**
+     * Which approved binding a hint selects (retrieval proves it). An invoice event names its subscription. An InvoicePayment
+     * (`invoice_payment.*`) has no invoice parent, so it takes the binding of the identity row the invoice already has; with
+     * no identity row the hint is only retained and nothing is dispatched.
+     */
+    private function bindingForHint(string $type, string $invoiceRef, mixed $subscriptionRef, string $account, string $mode): ?string
+    {
+        if (BillingValues::is('subscription', $subscriptionRef)) {
+            return $this->bindingFor(BillingValues::hash('subscription', $account, $mode, $subscriptionRef));
+        }
+        if (! str_starts_with($type, 'invoice_payment.')) {
+            return null;
+        }
+        $schema = new BillingSchema;
+        $statement = DB::connection()->getPdo()->prepare('SELECT subscription_binding_id FROM '.$schema->table(BillingSchema::TABLES[1]).' WHERE invoice_ref_hash = ? LIMIT 2');
+        $statement->execute([BillingValues::hash('invoice', $account, $mode, $invoiceRef)]);
+        $ids = $statement->fetchAll(PDO::FETCH_COLUMN);
+        BillingException::require(count($ids) <= 1, 'ambiguous_source');
+
+        return isset($ids[0]) && is_string($ids[0]) ? $ids[0] : null;
     }
 
     private function bindingFor(string $subscriptionHash): ?string

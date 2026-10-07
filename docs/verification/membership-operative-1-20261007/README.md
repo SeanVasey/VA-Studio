@@ -132,6 +132,10 @@ Residual R1: SQLite does not show a built-in collation (`BINARY`, `NOCASE`, `RTR
   - R-2: a duplicate webhook delivery of a `retrieval_hint` event dispatches `RetrieveMembershipInvoice` again when the invoice has no observation row (any outcome) created strictly after the hint's `received_at`; the result's `scheduled` is then non-null. The event row is untouched and no table was added. A redundant dispatch appends one more chained observation, because the job itself is not unique-guarded.
   - Red before the fix: 3 failures in the R-3 cases, 4 failures in the R-2 cases. After: `ProductionMembershipBilling` directory 99 tests, 429 assertions, 0 failures on SQLite. Native MySQL was not re-run.
 
+- **Codex P2 round 2 on `BillingWebhookIntake` (addressed in the working tree on top of `9c2f9928`, pending re-review; not committed here):** evidence is in `conditions/codex-intake-2/`.
+  - `invoice_payment.*` hints: an InvoicePayment has no invoice parent, so the binding is now taken from the invoice's existing identity row (`subscription_binding_id`, looked up by invoice hash). With no identity row the hint is retained and nothing is dispatched. The same resolution is used by the lost-dispatch recovery.
+  - Concurrent first delivery: the loser of the unique-insert race now loads the winner's stored event and runs the same `recoverLostDispatch()` as the early duplicate branch. This supersedes the R-2 note above that left that branch untouched.
+  - Red before the fix: 3 failures of 11 in `BillingWebhookRedeliveryTest`. After: that class 11 tests, 56 assertions; `ProductionMembershipBilling` directory 104 tests, 451 assertions, 0 failures. The race is simulated on SQLite by committing the winning delivery from a `beforeStartingTransaction` callback, so it is not a two-process MySQL race.
 ## Section 0.3 facts that remain Sean's
 
 Every item 1 to 16 in `IMPLEMENTATION-PLAN.md` §0.3 remains unsupplied:
