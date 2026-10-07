@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ListeningIndependentContentionTest" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentContentionTest.php" tests="1" assertions="10" errors="0" failures="0" skipped="0" time="19.516460">
+    <testcase name="test_native_last_version_contender_waits_and_cannot_overwrite_committed_private_list" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentContentionTest.php" line="16" class="Tests\Feature\ListeningIndependentContentionTest" classname="Tests.Feature.ListeningIndependentContentionTest" assertions="10" time="19.516460"/>
+  </testsuite>
+</testsuites>

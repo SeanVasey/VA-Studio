@@ -609,6 +609,30 @@
     [
       "Tests\\Feature\\DiscoverySnapshotConcurrencyTest",
       "test_writer_waits_on_actual_final_epoch_record_and_retained_capture_then_refuses_consumption"
+    ],
+    [
+      "Tests\\Feature\\InquiryNotificationMigrationTest",
+      "test_nonempty_notification_table_with_a_missing_mysql_foreign_key_is_never_retroactively_adopted"
+    ],
+    [
+      "Tests\\Feature\\InquiryNotificationMigrationTest",
+      "test_changed_mysql_notification_foreign_key_is_refused_before_any_ddl"
+    ],
+    [
+      "Tests\\Feature\\InquiryNotificationMigrationTest",
+      "test_shortened_mysql_notification_due_index_prefix_is_refused_before_any_ddl"
+    ],
+    [
+      "Tests\\Feature\\InquiryNotificationMigrationTest",
+      "test_changed_mysql_notification_fk_support_index_in_a_partial_installation_is_refused_before_any_ddl"
+    ],
+    [
+      "Tests\\Feature\\InquiryNotificationConcurrencyTest",
+      "test_independent_workers_serialize_one_handoff_without_duplicate_attempt_or_submission"
+    ],
+    [
+      "Tests\\Feature\\ServiceProjectConcurrencyTest",
+      "test_two_staff_quotes_wait_on_the_exact_project_and_current_reads_reject_old_mvcc_state"
     ]
   ]
 }

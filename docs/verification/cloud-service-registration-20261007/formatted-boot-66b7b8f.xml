@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ServiceProjectRegistrationTest" file="/workspace/VA-Studio-service-registration/tests/Feature/ServiceProjectRegistrationTest.php" tests="2" assertions="32" errors="0" failures="0" skipped="0" time="0.257252">
+    <testcase name="test_actual_application_registers_each_private_service_route_and_crawler_prefix" file="/workspace/VA-Studio-service-registration/tests/Feature/ServiceProjectRegistrationTest.php" line="9" class="Tests\Feature\ServiceProjectRegistrationTest" classname="Tests.Feature.ServiceProjectRegistrationTest" assertions="19" time="0.239254"/>
+    <testcase name="test_actual_outer_privacy_rejects_unrecognized_private_paths_without_debug_or_referrer_leaks" file="/workspace/VA-Studio-service-registration/tests/Feature/ServiceProjectRegistrationTest.php" line="31" class="Tests\Feature\ServiceProjectRegistrationTest" classname="Tests.Feature.ServiceProjectRegistrationTest" assertions="13" time="0.017998"/>
+  </testsuite>
+</testsuites>

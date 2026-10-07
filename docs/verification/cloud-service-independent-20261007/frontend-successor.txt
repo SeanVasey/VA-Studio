@@ -1,0 +1,9 @@
+
+ RUN  v5.0.1 /workspace/VA-Studio-service-independent
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  07:53:09
+   Duration  1.15s (environment 65%, tests 18%, setup 9%, transform 7%, import 1%)
+

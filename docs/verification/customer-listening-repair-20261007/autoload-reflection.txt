@@ -1,0 +1,6 @@
+App\Domain\Customers\Listening\ListeningLibrary /workspace/VA-Studio-customer-listening/app/Domain/Customers/Listening/ListeningLibrary.php
+App\Domain\Customers\Listening\ListeningEvidence /workspace/VA-Studio-customer-listening/app/Domain/Customers/Listening/ListeningEvidence.php
+Tests\Feature\CustomerListeningPrimaryProofTest /workspace/VA-Studio-customer-listening/tests/Feature/CustomerListeningPrimaryProofTest.php
+Tests\Feature\CustomerListeningFreshnessTest /workspace/VA-Studio-customer-listening/tests/Feature/CustomerListeningFreshnessTest.php
+8.4.26
+v24.19.0

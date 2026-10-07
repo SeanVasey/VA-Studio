@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/dependency-sqlite-selection.xml" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="0.187769">
+    <testsuite name="Independent exact-owned service migration recovery" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="0.187769">
+      <testsuite name="Tests\Feature\ServiceProjectDependencyCanaryTest" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/ServiceProjectDependencyCanaryTest.php" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="0.187769">
+        <testcase name="test_nonunique_dependency_id_is_refused_before_service_ddl" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/ServiceProjectDependencyCanaryTest.php" line="13" class="Tests\Feature\ServiceProjectDependencyCanaryTest" classname="Tests.Feature.ServiceProjectDependencyCanaryTest" assertions="2" time="0.187769">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ServiceProjectDependencyCanaryTest::test_nonunique_dependency_id_is_refused_before_service_ddl
+Composite (id, tenant) does not make id a valid single-column foreign key target.
+Failed asserting that null is not null.
+
+/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/ServiceProjectDependencyCanaryTest.php:34
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -4,6 +4,7 @@ namespace App\Domain\Inquiries;
 
 use App\Domain\Inquiries\Models\CustomerInquiry;
 use App\Domain\Inquiries\Models\InquiryOrderContext;
+use App\Domain\Inquiries\Notifications\InquiryNotificationWork;
 use App\Domain\SiteBuilder\Models\SitePublication;
 use App\Domain\SiteBuilder\Models\SiteRelease;
 use App\Domain\SiteBuilder\SiteContent;
@@ -50,6 +51,7 @@ final class SubmitInquiry
                     'state' => 'new', 'version' => 0, 'created_at' => now(), 'updated_at' => now(),
                 ]);
                 AuditEvent::record('inquiry.received', $inquiry, ['receipt' => $inquiry->public_id, 'site_release_id' => $release->id, 'privacy_notice_hash' => $setup['privacyHash']]);
+                app(InquiryNotificationWork::class)->retain($inquiry);
 
                 return ['state' => 'saved', 'receipt' => $inquiry->public_id, 'replayed' => false];
             });

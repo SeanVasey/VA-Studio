@@ -1,38 +1,25 @@
 # Current development queue
 
-## Cloud recovery and continued implementation — October 7 UTC
+## Current cloud integration — October 7, 2026 UTC
 
-The sole current integration owner is `/root` in the published cloud workspace
-`/workspace/VA-Studio`, branch `codex/cloud-primary-development-20261007`.
-Verified main is `22d340bd0a19cfb025b0f2b48171283f4b61d156`: PR26 merged
-at `5b58e2e4805ed5a30cf3071457cbc8e526c1425a`, then PR27 corrected actual
-private inquiry crawler routes and retained the source census/completion audit.
-Expected-head merges, independent reviews and cheap preflights passed. No final
-Foundation acceptance has been dispatched or claimed.
+Verified main `3fb7dd05142e4539e2f0af17831d66a1544d0cb0` includes PRs25–29:
+epoch recovery, amount preparation, actual crawler correction, installation/
+private checkout and private listening/inquiry alerts. Exact-source independent
+review, cheap preflight and expected-head merges pass; complete Foundation
+verification remains reserved for the final integrated candidate.
 
-Recovered installation/checkout executable `26700f97268a29209718ffc2fac534deb5259c2d`
-is independently approved, composed as `d6324f9808fba13346aaf2b628df83b62c192208`
-with evidence `ddd7c58d9914aeaeb1da782cfee8dc3dfffb8dfd`. All24 source paths,
-19 exact recovered blobs and current focused receipts are reconciled. Native
-browser definitions remain unexecuted locally. This coherent UI recovery proceeds
-to its own cheap preflight while sensitive lanes repair concrete findings.
+Service executable13d7ae is independently approved with fresh original red-now-
+green SQLite/native/UI canaries and root shared50/422, mounted48, TypeScript/
+Pint/selector checks. See [source-bound registration evidence](verification/cloud-service-registration-20261007/README.md).
+Publication/preflight are pending here. Listening notes/export/clear7b→18a→ebb
+is HTTP/UI-tested but held for actual aggregateTEXT capacity/overflow review.
 
-PR25 remains open at published `f713ce64`; its original green preflight does
-not validate the new migration repair. Author/reviewer are completing actual
-112 boundary MySQL failure/retry proof and repairing a reproduced SQLite
-reserved table/trigger name collision. Listening author/reviewer are repairing
-terminal account/password/policy/retained-row drift and migration ownership
-findings before root publishes its account route/page composition. Recovered
-inquiry notifications and a real synthetic service brief/immutable quote/project
-journey advance independently. The [current agent table](development-agent-queue.md)
-and [checkpoint](verification/cloud-primary-checkpoint-20261007.md) bind ownership.
-
-The [all-scope audit](verification/cloud-completion-audit-20261007.md) supersedes
-old active assignments below, preserving their historical proof. Operative
-production commerce, free/member grant origins, remaining product fulfillment,
-CRM, source reconciliation and hosting acceptance still require code or actual
-prerequisites. Source exports, prices/terms and production facts are not invented.
-October6 CI controls and PR24 original/PDF safeguards remain intact.
+ProductionCheckout246, ProductionIdentity247/localSMTP, attachments249 and
+preferences/consent250 are active isolated code lanes. Service source adapter
+precedes free245, then membership and remaining product fulfillment. All40
+criteria/103 parity mappings remain; six parents accepted/34 open is not a code
+percentage. Actual legal/source/provider/hosting facts and final exact-SHA
+acceptance retain concrete gates. `/root` is the sole integration owner.
 
 ## Amount preparation batch and discovery recovery — October 7 UTC
 

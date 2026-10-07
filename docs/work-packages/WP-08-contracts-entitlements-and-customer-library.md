@@ -88,3 +88,8 @@ The separately gated [test enrollment and recovery child](../customer-test-self-
 ## Bounded download-request recovery — October 6, 2026
 
 The [reviewed recovery child](../verification/download-request-recovery.md) bounds metadata and authorization fetch/body reads, preserves the exact uncertain request key through retries and read-only refresh, and prevents late results from submitting an attachment. Native attachment POST streaming and server entitlement/lifetime rules remain unchanged. The [combined continuation](../verification/customer-operator-recovery-continuation.md) records actual composition checks; full native/browser acceptance and production delivery remain required. This child does not close WP-08 or T24.
+
+
+## Cloud focused development child — October 7, 2026
+
+Private saved favorites/playlists are composed and independently reviewed;107 affected PHP passes/987 assertions and65 mounted frontend cases pass. Notes/export/clear and production identity adapter remain active children. This does not close delivery, library, privacy or full WP-08 criteria. See [shared source-bound evidence](../verification/cloud-listening-registration-20261007/README.md) and current checkpoint for publication/preflight.

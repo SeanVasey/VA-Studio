@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ListeningIndependentBoundaryTest" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" tests="9" assertions="14" errors="2" failures="7" skipped="0" time="2.131264">
+    <testsuite name="Tests\Feature\ListeningIndependentBoundaryTest::test_terminal_authority_query_callback_cannot_release_or_commit_stale_state" tests="8" assertions="12" errors="2" failures="6" skipped="0" time="1.904179">
+      <testcase name="test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set &quot;read account&quot;" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" line="21" class="Tests\Feature\ListeningIndependentBoundaryTest" classname="Tests.Feature.ListeningIndependentBoundaryTest" assertions="2" time="0.461008">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ListeningIndependentBoundaryTest::test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set "read account"
+Final-query account callback released stale read result: {"listeningSchema":1,"version":0,"favorites":[],"playlists":[],"limits":{"favorites":50,"playlists":10,"playlistTracks":25}}
+Failed asserting that false is true.
+
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:50</failure>
+      </testcase>
+      <testcase name="test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set &quot;read credentials&quot;" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" line="21" class="Tests\Feature\ListeningIndependentBoundaryTest" classname="Tests.Feature.ListeningIndependentBoundaryTest" assertions="2" time="0.249923">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ListeningIndependentBoundaryTest::test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set "read credentials"
+Final-query credentials callback released stale read result: {"listeningSchema":1,"version":0,"favorites":[],"playlists":[],"limits":{"favorites":50,"playlists":10,"playlistTracks":25}}
+Failed asserting that false is true.
+
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:50</failure>
+      </testcase>
+      <testcase name="test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set &quot;read policy&quot;" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" line="21" class="Tests\Feature\ListeningIndependentBoundaryTest" classname="Tests.Feature.ListeningIndependentBoundaryTest" assertions="2" time="0.236596">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ListeningIndependentBoundaryTest::test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set "read policy"
+Final-query policy callback released stale read result: {"listeningSchema":1,"version":0,"favorites":[],"playlists":[],"limits":{"favorites":50,"playlists":10,"playlistTracks":25}}
+Failed asserting that false is true.
+
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:50</failure>
+      </testcase>
+      <testcase name="test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set &quot;read owner&quot;" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" line="21" class="Tests\Feature\ListeningIndependentBoundaryTest" classname="Tests.Feature.ListeningIndependentBoundaryTest" assertions="0" time="0.195848">
+        <error type="Illuminate\Database\QueryException">Tests\Feature\ListeningIndependentBoundaryTest::test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set "read owner"
+Illuminate\Database\QueryException: SQLSTATE[23000]: Integrity constraint violation: 19 Customer identity is retained (Connection: sqlite, Database: :memory:, SQL: update "customer_accounts" set "owner_key" = aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa where "id" = 1)
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:614
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:566
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4384
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:34
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php:496
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php:326
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php:306
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:1146
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:913
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:823
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:426
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3636
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3620
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:941
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:923
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/BuildsQueries.php:408
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:603
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php:23
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2912
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2928
+/workspace/VA-Studio-listening-independent/app/Domain/Customers/CustomerAccess.php:27
+/workspace/VA-Studio-listening-independent/app/Domain/Customers/Listening/ListeningLibrary.php:225
+/workspace/VA-Studio-listening-independent/app/Domain/Customers/Listening/ListeningLibrary.php:28
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-listening-independent/app/Domain/Customers/Listening/ListeningLibrary.php:24
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:44</error>
+      </testcase>
+      <testcase name="test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set &quot;change account&quot;" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" line="21" class="Tests\Feature\ListeningIndependentBoundaryTest" classname="Tests.Feature.ListeningIndependentBoundaryTest" assertions="2" time="0.171265">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ListeningIndependentBoundaryTest::test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set "change account"
+Final-query account callback released stale change result: {"listeningSchema":1,"version":1,"favorites":[],"playlists":[{"id":"a023a14b-f963-48c6-812f-f9339dab6b6d","name":"Independent private list","tracks":[]}],"limits":{"favorites":50,"playlists":10,"playlistTracks":25}}
+Failed asserting that false is true.
+
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:50</failure>
+      </testcase>
+      <testcase name="test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set &quot;change credentials&quot;" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" line="21" class="Tests\Feature\ListeningIndependentBoundaryTest" classname="Tests.Feature.ListeningIndependentBoundaryTest" assertions="2" time="0.176402">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ListeningIndependentBoundaryTest::test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set "change credentials"
+Final-query credentials callback released stale change result: {"listeningSchema":1,"version":1,"favorites":[],"playlists":[{"id":"e959be2f-f9f2-40d0-8484-e80e1191a4fc","name":"Independent private list","tracks":[]}],"limits":{"favorites":50,"playlists":10,"playlistTracks":25}}
+Failed asserting that false is true.
+
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:50</failure>
+      </testcase>
+      <testcase name="test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set &quot;change policy&quot;" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" line="21" class="Tests\Feature\ListeningIndependentBoundaryTest" classname="Tests.Feature.ListeningIndependentBoundaryTest" assertions="2" time="0.168127">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ListeningIndependentBoundaryTest::test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set "change policy"
+Final-query policy callback released stale change result: {"listeningSchema":1,"version":1,"favorites":[],"playlists":[{"id":"d2829ece-5137-477e-9b36-e9a96ca655b1","name":"Independent private list","tracks":[]}],"limits":{"favorites":50,"playlists":10,"playlistTracks":25}}
+Failed asserting that false is true.
+
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:50</failure>
+      </testcase>
+      <testcase name="test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set &quot;change owner&quot;" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" line="21" class="Tests\Feature\ListeningIndependentBoundaryTest" classname="Tests.Feature.ListeningIndependentBoundaryTest" assertions="0" time="0.245009">
+        <error type="Illuminate\Database\QueryException">Tests\Feature\ListeningIndependentBoundaryTest::test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set "change owner"
+Illuminate\Database\QueryException: SQLSTATE[23000]: Integrity constraint violation: 19 Customer identity is retained (Connection: sqlite, Database: :memory:, SQL: update "customer_accounts" set "owner_key" = aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa where "id" = 1)
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:614
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:566
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4384
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:34
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php:496
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php:326
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php:306
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:1146
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:913
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:823
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:426
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3636
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3620
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:941
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:923
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/BuildsQueries.php:408
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:603
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php:23
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2912
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2928
+/workspace/VA-Studio-listening-independent/app/Domain/Customers/CustomerAccess.php:27
+/workspace/VA-Studio-listening-independent/app/Domain/Customers/Listening/ListeningLibrary.php:225
+/workspace/VA-Studio-listening-independent/app/Domain/Customers/Listening/ListeningLibrary.php:51
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-listening-independent/app/Domain/Customers/Listening/ListeningLibrary.php:34
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:45</error>
+      </testcase>
+    </testsuite>
+    <testcase name="test_empty_storage_with_drifted_unique_index_is_retained_on_rollback" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" line="65" class="Tests\Feature\ListeningIndependentBoundaryTest" classname="Tests.Feature.ListeningIndependentBoundaryTest" assertions="2" time="0.227084">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ListeningIndependentBoundaryTest::test_empty_storage_with_drifted_unique_index_is_retained_on_rollback
+Rollback accepted same-name empty storage after the unique index was removed; table retained=false
+Failed asserting that false is true.
+
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:76</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

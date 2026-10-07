@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/csrf-sqlite-selection.xml" tests="1" assertions="6" errors="0" failures="0" skipped="0" time="0.182755">
+    <testsuite name="Independent exact-owned service migration recovery" tests="1" assertions="6" errors="0" failures="0" skipped="0" time="0.182755">
+      <testsuite name="Tests\Feature\ServiceProjectRegistrationCanaryTest" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/ServiceProjectRegistrationCanaryTest.php" tests="1" assertions="6" errors="0" failures="0" skipped="0" time="0.182755">
+        <testcase name="test_actual_web_csrf_refuses_a_tokenless_post_with_a_private_response" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/ServiceProjectRegistrationCanaryTest.php" line="11" class="Tests\Feature\ServiceProjectRegistrationCanaryTest" classname="Tests.Feature.ServiceProjectRegistrationCanaryTest" assertions="6" time="0.182755"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,14 @@
+{
+  "integration": "5c99b8145ad965201504a4ab578e522946b7c495",
+  "tree": "a936f36616d1ca2e3553c89cab420d0df7fe4b2f",
+  "author_runtime": "e765e9b2dad565097d8124ec86e4c3470ead8818",
+  "sqlite": {
+    "tests": 1,
+    "failures": 1
+  },
+  "mysql_8_0_46": {
+    "tests": 1,
+    "failures": 1
+  },
+  "result": "Blocked: last genuine staff query can disable service policy before valid source token escapes."
+}

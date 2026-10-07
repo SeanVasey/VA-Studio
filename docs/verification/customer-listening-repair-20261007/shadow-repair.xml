@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\CustomerListeningFreshnessTest" file="/workspace/VA-Studio-customer-listening/tests/Feature/CustomerListeningFreshnessTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="1.899086">
+    <testcase name="test_framework_reads_cannot_use_a_temporary_catalog_shadow_while_proof_reads_main" file="/workspace/VA-Studio-customer-listening/tests/Feature/CustomerListeningFreshnessTest.php" line="133" class="Tests\Feature\CustomerListeningFreshnessTest" classname="Tests.Feature.CustomerListeningFreshnessTest" assertions="4" time="1.899086"/>
+  </testsuite>
+</testsuites>

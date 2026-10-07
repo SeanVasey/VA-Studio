@@ -1,0 +1,5 @@
+
+> test
+> vitest run tests/frontend/customer-account.test.tsx tests/frontend/customer-listening-library.test.tsx
+
+sh: 1: vitest: not found

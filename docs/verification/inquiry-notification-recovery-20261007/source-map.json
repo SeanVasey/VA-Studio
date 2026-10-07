@@ -1,0 +1,148 @@
+{
+  "recovered_ancestor": "ae8ca1d8a4c61f0edd207cdb63ae828c128d9e45",
+  "current_base": "5b58e2e4805ed5a30cf3071457cbc8e526c1425a",
+  "code_source": "e2900e800d375e6956a0948aecb50cb323009d7d",
+  "code_tree": "6da96085d7cc20d7f463787df19bb559b7dfd0a3",
+  "exact_recovered_blobs": 9,
+  "recovery_mapping": [
+    {
+      "current_path": "app/Domain/Inquiries/Models/InquiryNotificationIntent.php",
+      "source_path": "app/Domain/Inquiries/Models/InquiryNotificationIntent.php",
+      "source_git_blob": "2da7738ae4a3bc9fd3a1c4b13ec5f437ef1fba30",
+      "recovery_git_blob": "2da7738ae4a3bc9fd3a1c4b13ec5f437ef1fba30",
+      "unchanged_bytes": true,
+      "source_sha256": "dc6c6cf9ba5995cc33f7ce92ae0670e746a77b8a066efc1036f7c9457a0ea0f8",
+      "recovery_sha256": "dc6c6cf9ba5995cc33f7ce92ae0670e746a77b8a066efc1036f7c9457a0ea0f8"
+    },
+    {
+      "current_path": "app/Domain/Inquiries/Notifications/InquiryAlertNotSubmitted.php",
+      "source_path": "app/Domain/Inquiries/Notifications/InquiryAlertNotSubmitted.php",
+      "source_git_blob": "90a90c8188ddb5eac730cb8f05495f6a8195a223",
+      "recovery_git_blob": "90a90c8188ddb5eac730cb8f05495f6a8195a223",
+      "unchanged_bytes": true,
+      "source_sha256": "ab392132f117e3ae9f051c582f3c15cac27808a9c7fc4119415a78506c91c7d2",
+      "recovery_sha256": "ab392132f117e3ae9f051c582f3c15cac27808a9c7fc4119415a78506c91c7d2"
+    },
+    {
+      "current_path": "app/Domain/Inquiries/Notifications/InquiryAlertTransport.php",
+      "source_path": "app/Domain/Inquiries/Notifications/InquiryAlertTransport.php",
+      "source_git_blob": "0fb13572bf7db36271089f5335e9a7f51a5a63bc",
+      "recovery_git_blob": "0fb13572bf7db36271089f5335e9a7f51a5a63bc",
+      "unchanged_bytes": true,
+      "source_sha256": "2d4c04fe70a4b34882bc9a429bc3d480cbca008ea3db8fb04ad2022044fdfb29",
+      "recovery_sha256": "2d4c04fe70a4b34882bc9a429bc3d480cbca008ea3db8fb04ad2022044fdfb29"
+    },
+    {
+      "current_path": "app/Domain/Inquiries/Notifications/InquiryNotificationWork.php",
+      "source_path": "app/Domain/Inquiries/Notifications/InquiryNotificationWork.php",
+      "source_git_blob": "5033fc963e7da84d43ac70c8a9de59c23e3877c1",
+      "recovery_git_blob": "5b854774ef5f3d6443f8193e4dc33763d0c487ca",
+      "unchanged_bytes": false,
+      "source_sha256": "f9d851ef49e29a3b5199cfe381b08e45b01e25287ca9f1d308731eab3d4d0665",
+      "recovery_sha256": "499b425fd73ab67facc57fb3443b562c2a3ebb63b624ce29f097cc5ea8db147d"
+    },
+    {
+      "current_path": "app/Domain/Inquiries/Notifications/OperatorInquiryAlert.php",
+      "source_path": "app/Domain/Inquiries/Notifications/OperatorInquiryAlert.php",
+      "source_git_blob": "d71e633a59d35335cf1ea6852cbe9499a580b435",
+      "recovery_git_blob": "d71e633a59d35335cf1ea6852cbe9499a580b435",
+      "unchanged_bytes": true,
+      "source_sha256": "2dbda5cbf9dd976e533be2215b9e069f46bbaf88b11ba475c3ea5df748aa8ec0",
+      "recovery_sha256": "2dbda5cbf9dd976e533be2215b9e069f46bbaf88b11ba475c3ea5df748aa8ec0"
+    },
+    {
+      "current_path": "app/Jobs/NotifyInquiryOperatorJob.php",
+      "source_path": "app/Jobs/NotifyInquiryOperatorJob.php",
+      "source_git_blob": "7ed87c937b8134ab159c4612733eef7016721c9f",
+      "recovery_git_blob": "7ed87c937b8134ab159c4612733eef7016721c9f",
+      "unchanged_bytes": true,
+      "source_sha256": "07a340798444c64adca47ce828291ef924ad88d465df9a55d89c62039711f20a",
+      "recovery_sha256": "07a340798444c64adca47ce828291ef924ad88d465df9a55d89c62039711f20a"
+    },
+    {
+      "current_path": "app/Console/Commands/ProcessInquiryAlerts.php",
+      "source_path": "app/Console/Commands/ProcessInquiryAlerts.php",
+      "source_git_blob": "666c924d63f9bc8a1454e69a88c91c021a756a0e",
+      "recovery_git_blob": "666c924d63f9bc8a1454e69a88c91c021a756a0e",
+      "unchanged_bytes": true,
+      "source_sha256": "aedf1527ecc91cb458e9da681e3a2d08f4cee65d355efe6782e1a8eb93ea8920",
+      "recovery_sha256": "aedf1527ecc91cb458e9da681e3a2d08f4cee65d355efe6782e1a8eb93ea8920"
+    },
+    {
+      "current_path": "tests/Feature/InquiryNotificationWorkTest.php",
+      "source_path": "tests/Feature/InquiryNotificationWorkTest.php",
+      "source_git_blob": "dc0c3025c4f500dcd8bf15e1b5b49a319112802f",
+      "recovery_git_blob": "7ee83d54f6676999401213e33fd4999a44d137ed",
+      "unchanged_bytes": false,
+      "source_sha256": "49f613129d2cb473861e78c6148864ccc57296deb182ce655956e8a92bc56e5b",
+      "recovery_sha256": "63a46e154496d2ae75a109cf2ea2c8a807ba2b9f0dd45d605f13b35a33fb0386"
+    },
+    {
+      "current_path": "tests/Feature/InquiryNotificationMigrationTest.php",
+      "source_path": "tests/Feature/InquiryNotificationMigrationTest.php",
+      "source_git_blob": "510ec455c8e22361cde08a7cb2691ccbb608695a",
+      "recovery_git_blob": "fcffb55e853077d3e1bee62924a42174c661faad",
+      "unchanged_bytes": false,
+      "source_sha256": "e15ebee61277883fb76294e747d15c206d155a6ad04c89ea29f0a36965f651a3",
+      "recovery_sha256": "d6e700ee3ea659ec108d91cb5beb13c807d96aae2d74b593fc7cc9bdd4f70493"
+    },
+    {
+      "current_path": "tests/Feature/InquiryNotificationConcurrencyTest.php",
+      "source_path": "tests/Feature/InquiryNotificationConcurrencyTest.php",
+      "source_git_blob": "aa79aa9dfdf4186fcc93fe1aa51c1f5a6fd98d26",
+      "recovery_git_blob": "aa79aa9dfdf4186fcc93fe1aa51c1f5a6fd98d26",
+      "unchanged_bytes": true,
+      "source_sha256": "004d7b8448150f1ac9233f1dfcce6ee8b910ebc5bfba14a314550c0999075274",
+      "recovery_sha256": "004d7b8448150f1ac9233f1dfcce6ee8b910ebc5bfba14a314550c0999075274"
+    },
+    {
+      "current_path": "tests/Support/InquiryNotificationRace.php",
+      "source_path": "tests/Support/InquiryNotificationRace.php",
+      "source_git_blob": "c45ea241f93b89ecbf071ddf699ba6d89e16ca84",
+      "recovery_git_blob": "c45ea241f93b89ecbf071ddf699ba6d89e16ca84",
+      "unchanged_bytes": true,
+      "source_sha256": "50be75435d2db84a432b5fb043b83512b09d954e8dc6378fb63545ccfa0f5d3d",
+      "recovery_sha256": "50be75435d2db84a432b5fb043b83512b09d954e8dc6378fb63545ccfa0f5d3d"
+    },
+    {
+      "current_path": "tests/Support/inquiry-notification-race-worker.php",
+      "source_path": "tests/Support/inquiry-notification-race-worker.php",
+      "source_git_blob": "1511bec59daf0e666931e9796ab0d625510ed3c1",
+      "recovery_git_blob": "1511bec59daf0e666931e9796ab0d625510ed3c1",
+      "unchanged_bytes": true,
+      "source_sha256": "a4f4028019e668d087cd9c00df25bce283ff7835598bc94169e730aeee968cba",
+      "recovery_sha256": "a4f4028019e668d087cd9c00df25bce283ff7835598bc94169e730aeee968cba"
+    },
+    {
+      "current_path": "database/migrations/2026_10_07_243000_inquiry_notification_intents.php",
+      "source_path": "database/migrations/2026_10_01_000033_inquiry_notification_intents.php",
+      "source_git_blob": "7da2280b0d4650aeed7ea97e5f74f6caea5d840d",
+      "recovery_git_blob": "4ef91d9ebb9c0ec1446c8fb13ea038eddb7aa8cb",
+      "unchanged_bytes": false,
+      "source_sha256": "97a532a0c3b9113d6d7a44d24674231649f877e4346ade999546c2c31b0f4db7",
+      "recovery_sha256": "afd182c082171b62036aa839d5a3757cd2f3a16ec16c986def5abeb0ff8503c5"
+    }
+  ],
+  "owned_php_sha256": {
+    "app/Domain/Inquiries/Models/InquiryNotificationIntent.php": "dc6c6cf9ba5995cc33f7ce92ae0670e746a77b8a066efc1036f7c9457a0ea0f8",
+    "app/Domain/Inquiries/Notifications/InquiryAlertNotSubmitted.php": "ab392132f117e3ae9f051c582f3c15cac27808a9c7fc4119415a78506c91c7d2",
+    "app/Domain/Inquiries/Notifications/InquiryAlertTransport.php": "2d4c04fe70a4b34882bc9a429bc3d480cbca008ea3db8fb04ad2022044fdfb29",
+    "app/Domain/Inquiries/Notifications/InquiryNotificationWork.php": "499b425fd73ab67facc57fb3443b562c2a3ebb63b624ce29f097cc5ea8db147d",
+    "app/Domain/Inquiries/Notifications/OperatorInquiryAlert.php": "2dbda5cbf9dd976e533be2215b9e069f46bbaf88b11ba475c3ea5df748aa8ec0",
+    "app/Jobs/NotifyInquiryOperatorJob.php": "07a340798444c64adca47ce828291ef924ad88d465df9a55d89c62039711f20a",
+    "app/Console/Commands/ProcessInquiryAlerts.php": "aedf1527ecc91cb458e9da681e3a2d08f4cee65d355efe6782e1a8eb93ea8920",
+    "tests/Feature/InquiryNotificationWorkTest.php": "63a46e154496d2ae75a109cf2ea2c8a807ba2b9f0dd45d605f13b35a33fb0386",
+    "tests/Feature/InquiryNotificationMigrationTest.php": "d6e700ee3ea659ec108d91cb5beb13c807d96aae2d74b593fc7cc9bdd4f70493",
+    "tests/Feature/InquiryNotificationConcurrencyTest.php": "004d7b8448150f1ac9233f1dfcce6ee8b910ebc5bfba14a314550c0999075274",
+    "tests/Support/InquiryNotificationRace.php": "50be75435d2db84a432b5fb043b83512b09d954e8dc6378fb63545ccfa0f5d3d",
+    "tests/Support/inquiry-notification-race-worker.php": "a4f4028019e668d087cd9c00df25bce283ff7835598bc94169e730aeee968cba",
+    "database/migrations/2026_10_07_243000_inquiry_notification_intents.php": "afd182c082171b62036aa839d5a3757cd2f3a16ec16c986def5abeb0ff8503c5",
+    "app/Domain/Inquiries/SubmitInquiry.php": "17a8db1d96ecffe7d660dd156d86b7752878324d453ed306b66725df728d0bd4",
+    "config/inquiries.php": "96d84c151a2336b919a5bca08c3cd4173ab7b1ebdf6a21efdc51a9e66731e011"
+  },
+  "coordinated_existing_paths": [
+    "app/Domain/Inquiries/SubmitInquiry.php",
+    "config/inquiries.php"
+  ],
+  "migration_source_predicates": "Retained original schema/state/identity/UUID/date/retry/terminal predicates; additive external dependency preflight on up and down."
+}

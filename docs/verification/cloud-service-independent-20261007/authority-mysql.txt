@@ -1,0 +1,10 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/authority-mysql-selection.xml
+
+..                                                                  2 / 2 (100%)
+
+Time: 00:08.216, Memory: 79.00 MB
+
+[30;42mOK (2 tests, 21 assertions)[0m

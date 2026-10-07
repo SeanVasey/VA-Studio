@@ -2,28 +2,25 @@
 
 ## Active cloud ownership — October 7, 2026 UTC
 
-The prior development chat is idle/interrupted. `/root` is the sole integration
-owner in the selected published `/workspace` environment; no Mac or additional
-environment is used. Verified main `22d340bd0a19cfb025b0f2b48171283f4b61d156`
-includes PR26 and PR27. Older owner tables below are historical.
+One integration owner `/root`; verified main3fb7dd0 includes PRs25–29.
+Historical owner tables below describe earlier source, not active workers.
 
-| Worker | Isolated owned boundary | Current handoff |
+| Worker | Isolated boundary | Current handoff |
 | --- | --- | --- |
-| `/root` | Primary integration; shared routes/privacy/page registration, status and publication | Independently approved installation/private-checkout recovery composed; listening account API/page composed for review; focused preflight and expected-head merges |
-| `/root/pr25_recovery` | PR25 epoch migration and fault-injection regressions | Exact owned-prefix recovery with SQLite/MySQL preservation; reserved-name SQLite preflight repair after independent reproduction |
-| `/root/pr26_review` | Independent PR25 review and canaries | Actual native failure/retry/bookkeeping/shadow checks and extra schema canaries; approve only the repaired tested source |
-| `/root/crawler_routes` | New customer listening domain/migration/component/tests | Durable private favorites/playlists; terminal primary-connection authority and retained-row fences, atomic creation and rollback retention repairs |
-| `/root/recovery_inventory` | Independent listening review and additive evidence | Actual account-page cases, terminal drift probes and two-process native contention; recovered UI authorship is frozen |
-| `/root/completion_audit` | Recovered inquiry-notification domain/worker/migration/tests | Default-off unbound transport, claim/uncertain handoff/recovery and foreign-reference rollback protection; native tests before review |
-| `/root/native_mysql` | New service project journey/migration/Filament/customer UI/tests; disposable local database allocation | Buyer brief, explicit staff quote, exact accept/decline, milestones/revision/status; no payment or delivery authority |
+| `/root` | Primary/shared registration/evidence/publication | PR29 merged; publish reviewed service13d7ae; mount next export, identity, checkout and attachments after exact source review |
+| `/root/pr25_recovery` | New ProductionCheckout246000/provider adapter/private routes/tests | Immutable review→assent→payable order→provider initiation/reconciliation; qualified exemption first, provider-calculated tax next |
+| `/root/completion_audit` | ProductionIdentity247000/routes/UI/local SMTP proof | Immutable origin, mailbox challenge, recovery/credential fencing, typed principal; no synthetic-account adoption by email |
+| `/root/native_mysql` | ServiceProjects244000; source adapter then free origins245000 | Service13d7ae independently approved; attachment source adaptere765 frozen/native checks; then explicit free-purpose assent/document/download |
+| `/root/pr26_review` | Independent service composition/canaries | Service13d7ae approved in7769db3; independent notes/export/clear and real nativeTEXT overflow review |
+| `/root/crawler_routes` | Listening notes/export/clear domain/UI/tests | Notes041→18a→ebb capacity repair/final evidence; next concrete consent/preferences/suppression design250 |
+| `/root/recovery_inventory` | Private attachments249000/scanner/routes/UI/tests | Quarantine→scan→immutable manifest, owner/source current proof, download/retry/retention; approved listening review carry complete |
 
-All use isolated worktrees and the retained locked toolchain. Root owns shared
-registration and allocated additive migration timestamps (242000 listening,
-243000 inquiry notifications, 244000 service projects). Private fixture databases
-are separate. No worker owns production credentials, transport binding or hosted
-workflow dispatch. The [checkpoint](verification/cloud-primary-checkpoint-20261007.md)
-and [audit](verification/cloud-completion-audit-20261007.md) preserve remaining
-dependencies and source-backed acceptance limits.
+Each worker has an isolated branch, independent autoload over unchanged locked
+packages and separate synthetic native databases where needed. Root owns shared
+files/publication. No worker dispatches hosted CI, binds external transport,
+configures production secrets or transacts real money. The
+[checkpoint](verification/cloud-primary-checkpoint-20261007.md) and
+[audit](verification/cloud-completion-audit-20261007.md) retain full dependencies.
 
 ## Active production preparation — October 6, 2026 UTC
 

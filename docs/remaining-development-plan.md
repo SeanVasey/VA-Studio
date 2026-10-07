@@ -2,17 +2,24 @@
 
 ## Current cloud execution — October 7, 2026 UTC
 
-PR26 and PR27 are merged at verified main
-`22d340bd0a19cfb025b0f2b48171283f4b61d156`. The
-[source-backed completion audit](verification/cloud-completion-audit-20261007.md)
-reconciles all40 groups and103 parity mappings against actual source; counts
-are outcome tracking, not a completion percentage. The
-[current agent queue](development-agent-queue.md) replaces stale active owner
-tables below. Reviewed installation/checkout recovery is composed; PR25
-migration recovery, private listening, inquiry notifications and service
-projects continue with independent sensitive review and focused local checks.
-The full personal-store scope and existing obligations remain required. No
-final acceptance or production readiness follows from these development passes.
+Verified main `3fb7dd05142e4539e2f0af17831d66a1544d0cb0` includes PRs25–29:
+epoch recovery, amount preparation, actual crawler correction, installation/
+private checkout and private listening/inquiry alerts. Exact-source independent
+review, cheap preflight and expected-head merges pass; complete Foundation
+verification remains reserved for the final integrated candidate.
+
+Service executable13d7ae is independently approved with fresh original red-now-
+green SQLite/native/UI canaries and root shared50/422, mounted48, TypeScript/
+Pint/selector checks. See [source-bound registration evidence](verification/cloud-service-registration-20261007/README.md).
+Publication/preflight are pending here. Listening notes/export/clear7b→18a→ebb
+is HTTP/UI-tested but held for actual aggregateTEXT capacity/overflow review.
+
+ProductionCheckout246, ProductionIdentity247/localSMTP, attachments249 and
+preferences/consent250 are active isolated code lanes. Service source adapter
+precedes free245, then membership and remaining product fulfillment. All40
+criteria/103 parity mappings remain; six parents accepted/34 open is not a code
+percentage. Actual legal/source/provider/hosting facts and final exact-SHA
+acceptance retain concrete gates. `/root` is the sole integration owner.
 
 ## Reviewed corrective development candidate — October 7, 2026 UTC
 

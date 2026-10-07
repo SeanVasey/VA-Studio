@@ -1,0 +1,14 @@
+{
+  "source": "b209b850166998967a76edb873a5dfcdd18bfbce",
+  "engine": "native MySQL",
+  "server_version": "8.0.46-0ubuntu0.24.04.4",
+  "command": "source <private-service-author-env>; php -d auto_prepend_file=<external-local-shim> vendor/bin/phpunit tests/Feature/ServiceProjectAttachmentAuthorityTest.php",
+  "result": {
+    "tool": "phpunit",
+    "result": "passed",
+    "tests": 14,
+    "passed": 14,
+    "assertions": 72,
+    "duration_ms": 257285
+  }
+}

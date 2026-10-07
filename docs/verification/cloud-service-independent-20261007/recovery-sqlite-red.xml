@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/recovery-sqlite-selection.xml" tests="1" assertions="7" errors="0" failures="1" skipped="0" time="0.393641">
+    <testsuite name="Independent exact-owned service migration recovery" tests="1" assertions="7" errors="0" failures="1" skipped="0" time="0.393641">
+      <testsuite name="Tests\Feature\ServiceProjectRecoveryCanaryTest" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/ServiceProjectRecoveryCanaryTest.php" tests="1" assertions="7" errors="0" failures="1" skipped="0" time="0.393641">
+        <testcase name="test_exact_owned_partial_install_can_retry_without_erasing_prior_definitions_or_bookkeeping" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/ServiceProjectRecoveryCanaryTest.php" line="23" class="Tests\Feature\ServiceProjectRecoveryCanaryTest" classname="Tests.Feature.ServiceProjectRecoveryCanaryTest" assertions="7" time="0.393641">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ServiceProjectRecoveryCanaryTest::test_exact_owned_partial_install_can_retry_without_erasing_prior_definitions_or_bookkeeping
+An exact owned installation prefix remains permanently unlogged and cannot resume.
+Failed asserting that 'Retain existing or partial service project schema for inspection.' is null.
+
+/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/ServiceProjectRecoveryCanaryTest.php:71
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>
