@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="3" assertions="0" errors="3" failures="0" skipped="0" time="4.971922">
+    <testsuite name="Tests\Feature\FreeGrantDefinitionsTest" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantDefinitionsTest.php" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="1.945961">
+      <testcase name="test_explicit_source_separate_review_and_versioned_availability_preserve_full_license_and_asset_commitments" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantDefinitionsTest.php" line="17" class="Tests\Feature\FreeGrantDefinitionsTest" classname="Tests.Feature.FreeGrantDefinitionsTest" assertions="0" time="1.945961">
+        <error type="App\Domain\Grants\Free\FreeGrantException">Tests\Feature\FreeGrantDefinitionsTest::test_explicit_source_separate_review_and_versioned_availability_preserve_full_license_and_asset_commitments
+App\Domain\Grants\Free\FreeGrantException: Free grant preparation is unavailable.
+
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrantException.php:17
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrantStaff.php:17
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrantDefinitions.php:38
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrantDefinitions.php:36
+/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantDefinitionsTest.php:22</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\FreeGrantAdministrationTest" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAdministrationTest.php" tests="2" assertions="0" errors="2" failures="0" skipped="0" time="3.025961">
+      <testcase name="test_mounted_operator_actions_author_separately_review_and_version_admission_without_client_supplied_authority" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAdministrationTest.php" line="28" class="Tests\Feature\FreeGrantAdministrationTest" classname="Tests.Feature.FreeGrantAdministrationTest" assertions="0" time="1.550656">
+        <error type="Illuminate\View\ViewException">Tests\Feature\FreeGrantAdministrationTest::test_mounted_operator_actions_author_separately_review_and_version_admission_without_client_supplied_authority
+Illuminate\View\ViewException: Free grant preparation is unavailable. (View: /workspace/VA-Studio-free-grants/storage/framework/views/a168b0ebcff266df6b662fc4b6d06e88.blade.php)
+
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrantException.php:17
+/workspace/VA-Studio/vendor/livewire/livewire/src/Mechanisms/ExtendBlade/ExtendedCompilerEngine.php:58
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php:59
+/workspace/VA-Studio/vendor/livewire/livewire/src/Mechanisms/ExtendBlade/ExtendedCompilerEngine.php:22
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php:76
+/workspace/VA-Studio/vendor/livewire/livewire/src/Mechanisms/ExtendBlade/ExtendedCompilerEngine.php:10
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/View/View.php:208
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/View/View.php:191
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/View/View.php:160
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/View/Compilers/BladeCompiler.php:361
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio/vendor/livewire/livewire/src/Features/SupportTesting/InitialRender.php:25
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/CallableDispatcher.php:39
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Route.php:254
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Route.php:219
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Router.php:822
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Router.php:821
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Router.php:800
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Router.php:764
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Routing/Router.php:753
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:200
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:175
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:144
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php:638
+/workspace/VA-Studio/vendor/livewire/livewire/src/Features/SupportTesting/InitialRender.php:33
+/workspace/VA-Studio/vendor/livewire/livewire/src/Features/SupportTesting/RequestBroker.php:34
+/workspace/VA-Studio/vendor/livewire/livewire/src/Mechanisms/HandleRequests/HandleRequests.php:147
+/workspace/VA-Studio/vendor/livewire/livewire/src/Features/SupportTesting/RequestBroker.php:33
+/workspace/VA-Studio/vendor/livewire/livewire/src/Features/SupportTesting/InitialRender.php:32
+/workspace/VA-Studio/vendor/livewire/livewire/src/Features/SupportTesting/Render.php:24
+/workspace/VA-Studio/vendor/livewire/livewire/src/Features/SupportTesting/InitialRender.php:31
+/workspace/VA-Studio/vendor/livewire/livewire/src/Features/SupportTesting/InitialRender.php:17
+/workspace/VA-Studio/vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:54
+/workspace/VA-Studio/vendor/livewire/livewire/src/LivewireManager.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAdministrationTest.php:34</error>
+      </testcase>
+      <testcase name="test_mounted_server_capture_is_locked_against_forged_definition_or_request_authority" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAdministrationTest.php" line="57" class="Tests\Feature\FreeGrantAdministrationTest" classname="Tests.Feature.FreeGrantAdministrationTest" assertions="0" time="1.475305">
+        <error type="App\Domain\Grants\Free\FreeGrantException">Tests\Feature\FreeGrantAdministrationTest::test_mounted_server_capture_is_locked_against_forged_definition_or_request_authority
+App\Domain\Grants\Free\FreeGrantException: Free grant preparation is unavailable.
+
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrantException.php:17
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrantStaff.php:17
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrantDefinitions.php:38
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrantDefinitions.php:36
+/workspace/VA-Studio-free-grants/tests/Support/FreeGrantFixtures.php:43
+/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAdministrationTest.php:60</error>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

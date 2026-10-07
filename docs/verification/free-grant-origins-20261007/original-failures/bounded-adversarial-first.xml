@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="18" assertions="2010" errors="3" failures="0" skipped="0" time="19.412141">
+    <testsuite name="Tests\Feature\FreeGrantDownloadsTest" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantDownloadsTest.php" tests="4" assertions="55" errors="0" failures="0" skipped="0" time="7.890731">
+      <testcase name="test_exact_authorization_expiry_cross_owner_replay_and_total_attempt_cap_preserve_same_original" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantDownloadsTest.php" line="54" class="Tests\Feature\FreeGrantDownloadsTest" classname="Tests.Feature.FreeGrantDownloadsTest" assertions="13" time="2.245560"/>
+      <testcase name="test_actual_descriptor_preparation_credential_withdrawal_closes_held_stream_without_committed_attempt" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantDownloadsTest.php" line="88" class="Tests\Feature\FreeGrantDownloadsTest" classname="Tests.Feature.FreeGrantDownloadsTest" assertions="4" time="1.769627"/>
+      <testcase name="test_missing_completed_original_is_restore_only_never_recreated_or_overwritten" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantDownloadsTest.php" line="123" class="Tests\Feature\FreeGrantDownloadsTest" classname="Tests.Feature.FreeGrantDownloadsTest" assertions="6" time="1.834774"/>
+      <testcase name="test_every_original_sql_row_refuses_update_delete_ignore_and_replace_without_losing_originals" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantDownloadsTest.php" line="152" class="Tests\Feature\FreeGrantDownloadsTest" classname="Tests.Feature.FreeGrantDownloadsTest" assertions="32" time="2.040769"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\FreeGrantAuthorityTest" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" tests="6" assertions="14" errors="3" failures="0" skipped="0" time="9.793418">
+      <testsuite name="Tests\Feature\FreeGrantAuthorityTest::test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph" tests="4" assertions="4" errors="3" failures="0" skipped="0" time="6.632045">
+        <testcase name="test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #0" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" line="34" class="Tests\Feature\FreeGrantAuthorityTest" classname="Tests.Feature.FreeGrantAuthorityTest" assertions="0" time="1.718209">
+          <error type="App\Domain\Customers\CustomerAccessException">Tests\Feature\FreeGrantAuthorityTest::test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #0
+App\Domain\Customers\CustomerAccessException: Customer access is unavailable.
+
+/workspace/VA-Studio-free-grants/app/Domain/Customers/CustomerAccess.php:67
+/workspace/VA-Studio-free-grants/app/Domain/Customers/CustomerAccess.php:45
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/TestFreeGrantIdentity.php:33
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:140
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:71
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:28
+/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php:72</error>
+        </testcase>
+        <testcase name="test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #1" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" line="34" class="Tests\Feature\FreeGrantAuthorityTest" classname="Tests.Feature.FreeGrantAuthorityTest" assertions="0" time="1.680625">
+          <error type="App\Domain\Customers\CustomerAccessException">Tests\Feature\FreeGrantAuthorityTest::test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #1
+App\Domain\Customers\CustomerAccessException: Customer access is unavailable.
+
+/workspace/VA-Studio-free-grants/app/Domain/Customers/CustomerAccess.php:75
+/workspace/VA-Studio-free-grants/app/Domain/Customers/CustomerAccess.php:63
+/workspace/VA-Studio-free-grants/app/Domain/Customers/CustomerAccess.php:45
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/TestFreeGrantIdentity.php:33
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:140
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:71
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:28
+/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php:72</error>
+        </testcase>
+        <testcase name="test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #2" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" line="34" class="Tests\Feature\FreeGrantAuthorityTest" classname="Tests.Feature.FreeGrantAuthorityTest" assertions="4" time="1.666738"/>
+        <testcase name="test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #3" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" line="34" class="Tests\Feature\FreeGrantAuthorityTest" classname="Tests.Feature.FreeGrantAuthorityTest" assertions="0" time="1.566474">
+          <error type="App\Domain\Customers\CustomerAccessException">Tests\Feature\FreeGrantAuthorityTest::test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #3
+App\Domain\Customers\CustomerAccessException: Customer access is unavailable.
+
+/workspace/VA-Studio-free-grants/app/Domain/Customers/CustomerAccess.php:67
+/workspace/VA-Studio-free-grants/app/Domain/Customers/CustomerAccess.php:45
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/TestFreeGrantIdentity.php:33
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:140
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:71
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:28
+/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php:72</error>
+        </testcase>
+      </testsuite>
+      <testcase name="test_audit_callback_closure_refuses_assent_preserving_authored_terms_prior_events_and_original_actor" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" line="89" class="Tests\Feature\FreeGrantAuthorityTest" classname="Tests.Feature.FreeGrantAuthorityTest" assertions="3" time="1.441154"/>
+      <testcase name="test_forged_principal_unverified_staff_buyer_and_stale_assent_have_no_free_authority" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" line="113" class="Tests\Feature\FreeGrantAuthorityTest" classname="Tests.Feature.FreeGrantAuthorityTest" assertions="7" time="1.720219"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\FreeGrantSchemaRecoveryTest" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantSchemaRecoveryTest.php" tests="8" assertions="1941" errors="0" failures="0" skipped="0" time="1.727992">
+      <testcase name="test_every_sqlite_statement_and_selected_native_create_fk_index_guard_boundaries_retry_exactly" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantSchemaRecoveryTest.php" line="104" class="Tests\Feature\FreeGrantSchemaRecoveryTest" classname="Tests.Feature.FreeGrantSchemaRecoveryTest" assertions="1851" time="1.523930"/>
+      <testcase name="test_completed_installation_with_retained_rows_survives_log_uncertainty_idempotently_and_refuses_down" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantSchemaRecoveryTest.php" line="149" class="Tests\Feature\FreeGrantSchemaRecoveryTest" classname="Tests.Feature.FreeGrantSchemaRecoveryTest" assertions="61" time="0.048580"/>
+      <testsuite name="Tests\Feature\FreeGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write" tests="5" assertions="25" errors="0" failures="0" skipped="0" time="0.134230">
+        <testcase name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #0" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantSchemaRecoveryTest.php" line="179" class="Tests\Feature\FreeGrantSchemaRecoveryTest" classname="Tests.Feature.FreeGrantSchemaRecoveryTest" assertions="5" time="0.025681"/>
+        <testcase name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #1" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantSchemaRecoveryTest.php" line="179" class="Tests\Feature\FreeGrantSchemaRecoveryTest" classname="Tests.Feature.FreeGrantSchemaRecoveryTest" assertions="5" time="0.030949"/>
+        <testcase name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #2" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantSchemaRecoveryTest.php" line="179" class="Tests\Feature\FreeGrantSchemaRecoveryTest" classname="Tests.Feature.FreeGrantSchemaRecoveryTest" assertions="5" time="0.026109"/>
+        <testcase name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #3" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantSchemaRecoveryTest.php" line="179" class="Tests\Feature\FreeGrantSchemaRecoveryTest" classname="Tests.Feature.FreeGrantSchemaRecoveryTest" assertions="5" time="0.026239"/>
+        <testcase name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #4" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantSchemaRecoveryTest.php" line="179" class="Tests\Feature\FreeGrantSchemaRecoveryTest" classname="Tests.Feature.FreeGrantSchemaRecoveryTest" assertions="5" time="0.025253"/>
+      </testsuite>
+      <testcase name="test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantSchemaRecoveryTest.php" line="212" class="Tests\Feature\FreeGrantSchemaRecoveryTest" classname="Tests.Feature.FreeGrantSchemaRecoveryTest" assertions="4" time="0.021251"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

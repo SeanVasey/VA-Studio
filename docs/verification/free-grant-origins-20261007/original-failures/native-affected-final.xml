@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="8" assertions="140" errors="1" failures="0" skipped="0" time="224.109960">
+    <testsuite name="Tests\Feature\FreeGrantAuthorityTest" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" tests="4" assertions="12" errors="1" failures="0" skipped="0" time="108.998662">
+      <testsuite name="Tests\Feature\FreeGrantAuthorityTest::test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph" tests="4" assertions="12" errors="1" failures="0" skipped="0" time="108.998662">
+        <testcase name="test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #0" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" line="34" class="Tests\Feature\FreeGrantAuthorityTest" classname="Tests.Feature.FreeGrantAuthorityTest" assertions="4" time="23.799256"/>
+        <testcase name="test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #1" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" line="34" class="Tests\Feature\FreeGrantAuthorityTest" classname="Tests.Feature.FreeGrantAuthorityTest" assertions="4" time="28.211037"/>
+        <testcase name="test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #2" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" line="34" class="Tests\Feature\FreeGrantAuthorityTest" classname="Tests.Feature.FreeGrantAuthorityTest" assertions="4" time="29.528980"/>
+        <testcase name="test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #3" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" line="34" class="Tests\Feature\FreeGrantAuthorityTest" classname="Tests.Feature.FreeGrantAuthorityTest" assertions="0" time="27.459388">
+          <error type="PDOException">Tests\Feature\FreeGrantAuthorityTest::test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #3
+PDOException: SQLSTATE[42000]: Syntax error or access violation: 1066 Not unique table/alias: 'users'
+
+/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php:62
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1647
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1585
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1571
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:957
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/helpers.php:138
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/TestFreeGrantIdentity.php:35
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:141
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:71
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:28
+/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php:72</error>
+        </testcase>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\FreeGrantDownloadsTest" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantDownloadsTest.php" tests="3" assertions="42" errors="0" failures="0" skipped="0" time="85.938738">
+      <testcase name="test_actual_descriptor_preparation_credential_withdrawal_closes_held_stream_without_committed_attempt" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantDownloadsTest.php" line="88" class="Tests\Feature\FreeGrantDownloadsTest" classname="Tests.Feature.FreeGrantDownloadsTest" assertions="4" time="28.352428"/>
+      <testcase name="test_missing_completed_original_is_restore_only_never_recreated_or_overwritten" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantDownloadsTest.php" line="123" class="Tests\Feature\FreeGrantDownloadsTest" classname="Tests.Feature.FreeGrantDownloadsTest" assertions="6" time="29.306204"/>
+      <testcase name="test_every_original_sql_row_refuses_update_delete_ignore_and_replace_without_losing_originals" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantDownloadsTest.php" line="152" class="Tests\Feature\FreeGrantDownloadsTest" classname="Tests.Feature.FreeGrantDownloadsTest" assertions="32" time="28.280106"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\FreeGrantHttpTest" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantHttpTest.php" tests="1" assertions="86" errors="0" failures="0" skipped="0" time="29.172560">
+      <testcase name="test_actual_customer_page_review_assent_real_pdf_and_native_attachment_preserve_exact_free_origin" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantHttpTest.php" line="53" class="Tests\Feature\FreeGrantHttpTest" classname="Tests.Feature.FreeGrantHttpTest" assertions="86" time="29.172560"/>
+    </testsuite>
+  </testsuite>
+</testsuites>
