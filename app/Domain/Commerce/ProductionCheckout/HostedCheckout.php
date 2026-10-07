@@ -149,13 +149,20 @@ final class HostedCheckout
         });
     }
 
-    /** Read-only raw re-proof of the retained policy, selection, basis and request before the first create. */
+    /**
+     * Read-only raw re-proof of the retained policy, selection, basis and request before the first create.
+     *
+     * This is the one read frame that carries the commit observer: it is the last proof before the
+     * provider boundary, so a committing listener on this frame must not be able to withdraw the offer
+     * or close the capability after the proofs ran (Codex P1 r4210033214).
+     */
     private function proveCreatable(ProductionCustomerPrincipal $principal, User $buyer, array $prepared): void
     {
         CheckoutException::require($prepared['current'] !== null && $prepared['selection'] !== null && $prepared['basis'] !== null);
         CommandTransaction::run(function (Records $rows) use ($principal, $buyer, $prepared): void {
             $access = $this->access->lock($principal, $buyer, $rows->current);
             CheckoutException::require(config('production_checkout.fresh_checkout_enabled') === true, 'disabled', 503);
+            $fresh = FreshCheckoutPolicy::capture();
             OrderEvidence::proveRetained($rows, $prepared['order']['raw']);
             HostedEvidence::proveRetained($rows, $prepared['intent']['raw']);
             TaxExemptions::proveRetained($rows, $prepared['basis']);
@@ -163,6 +170,9 @@ final class HostedCheckout
             CurrentPolicy::proveCurrent($rows->current, $prepared['current']);
             $this->access->proveCurrent($principal, $buyer, $rows->current, $access);
             CheckoutException::require(config('production_checkout.fresh_checkout_enabled') === true, 'disabled', 503);
+            $fresh->prove();
+            CheckoutIntentAdmission::reprove($rows, $access, $buyer, $fresh, $prepared['order'], $prepared['intent'],
+                $prepared['current'], $prepared['selection'], $prepared['basis']);
         });
         $this->access->current($principal, $buyer);
     }

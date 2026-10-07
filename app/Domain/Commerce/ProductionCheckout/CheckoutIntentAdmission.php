@@ -13,6 +13,12 @@ use Carbon\CarbonImmutable;
  * session/observation/payment sets. An offer deactivated or a capability closed by a committing
  * listener changes a fixed plan, so the whole original physical transaction rolls back and
  * initiate() never reaches provider I/O.
+ *
+ * reprove() installs the same capsule on HostedCheckout::proveCreatable(), the one READ-ONLY frame
+ * that carries an observer (Codex P1 r4210033214). It is the last proof before the provider
+ * boundary: without commit admission, a committing listener on that frame could withdraw the offer
+ * or close the capability after its proofs ran, and initiate() would still call create. The retained
+ * intent there may already hold observations (an earlier uncertain create), which are planned exactly.
  */
 final class CheckoutIntentAdmission implements CheckoutCommitAdmission
 {
@@ -22,9 +28,22 @@ final class CheckoutIntentAdmission implements CheckoutCommitAdmission
     public static function capture(Records $rows, array $identity, User $buyer, FreshCheckoutPolicy $fresh,
         array $order, array $intent, array $current, array $selection, array $basis): self
     {
+        return self::admit($rows, $identity, $buyer, $fresh, $order, $intent, $current, $selection, $basis, true);
+    }
+
+    /** Last step of proveCreatable(): the retained, still sessionless intent immediately before the first create. */
+    public static function reprove(Records $rows, array $identity, User $buyer, FreshCheckoutPolicy $fresh,
+        array $order, array $intent, array $current, array $selection, array $basis): self
+    {
+        return self::admit($rows, $identity, $buyer, $fresh, $order, $intent, $current, $selection, $basis, false);
+    }
+
+    private static function admit(Records $rows, array $identity, User $buyer, FreshCheckoutPolicy $fresh,
+        array $order, array $intent, array $current, array $selection, array $basis, bool $new): self
+    {
         $frame = $rows->commandFrame();
         $frame->proveAnchor();
-        CheckoutException::require($intent['session'] === null && $intent['observations'] === [] && $intent['payment'] === null
+        CheckoutException::require($intent['session'] === null && (! $new || $intent['observations'] === []) && $intent['payment'] === null
             && $intent['row']['order_id'] === $order['row']['id'] && $basis['row']['id'] === $order['raw']['basis']['id'], 'write_frame');
 
         // Authenticated temporal bounds are converted once against the ORIGINAL command budget, never at commit.
@@ -59,7 +78,7 @@ final class CheckoutIntentAdmission implements CheckoutCommitAdmission
         $plans->row('intent', $intent['row']);
         $plans->selector('intent', 'order_id = ?', [$orderId], 2, [$intent['row']]);
         $plans->selector('session', 'intent_id = ?', [$intent['row']['id']], 2, []);
-        $plans->selector('observation', 'intent_id = ?', [$intent['row']['id']], 129, []);
+        $plans->selector('observation', 'intent_id = ?', [$intent['row']['id']], 129, $intent['observations']);
         $plans->selector('payment', 'intent_id = ?', [$intent['row']['id']], 2, []);
 
         $admission = new self($plans, $fresh);

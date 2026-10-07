@@ -73,7 +73,7 @@ class ProductionCheckoutWriteAdmissionAllTest extends TestCase
         $this->assertDatabaseCount(CheckoutSchema::TABLES['intent'], 0);
     }
 
-    public function test_only_the_new_intent_frame_holds_the_observer_and_retry_record_status_reconcile_hold_none(): void
+    public function test_only_new_intent_and_pre_create_frames_hold_the_observer_and_record_status_reconcile_hold_none(): void
     {
         $f = $this->payable();
         $f['gateway']->loseFirstResponse = true;
@@ -82,19 +82,68 @@ class ProductionCheckoutWriteAdmissionAllTest extends TestCase
             $observed[] = DB::connection()->getEventDispatcher() instanceof CheckoutCommandCommitDispatcher;
         });
         $this->assertRefused('provider_uncertain', fn () => $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']));
-        // Only the NEW intent frame; the uncertain append and identity frames hold no observer.
+        // The NEW intent frame and the proveCreatable() frame before the create hold the observer;
+        // the uncertain append and identity frames hold none.
         $this->assertTrue($observed[0]);
-        $this->assertNotContains(true, array_slice($observed, 1));
+        $this->assertSame(2, count(array_filter($observed)));
         $observed = [];
+        // A retry writes no intent, but its final pre-create re-proof is still admitted at commit.
         $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $this->assertSame(1, count(array_filter($observed)));
+        $observed = [];
         $f['gateway']->paid = true;
         $f['hosted']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
         $this->assertNotContains(true, $observed);
-        $this->assertGreaterThan(3, count($observed));
+        $this->assertGreaterThan(1, count($observed));
         $this->assertCount(2, $f['gateway']->creates);
         $this->assertDatabaseCount(CheckoutSchema::TABLES['intent'], 1);
         $this->assertDatabaseCount(CheckoutSchema::TABLES['payment'], 1);
         $this->assertDatabaseCount('license_grants', 0);
+    }
+
+    public static function reproveWithdrawals(): array
+    {
+        return ['offer, first initiate' => ['offer', false], 'capability, first initiate' => ['capability', false],
+            'offer, retry' => ['offer', true], 'capability, retry' => ['capability', true]];
+    }
+
+    #[DataProvider('reproveWithdrawals')]
+    public function test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create(string $withdrawal, bool $retry): void
+    {
+        $f = $this->payable();
+        $creates = 0;
+        if ($retry) {
+            $f['gateway']->loseFirstResponse = true;
+            $this->assertRefused('provider_uncertain', fn () => $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']));
+            $creates = 1;
+        }
+        $trackId = $f['catalog']['items'][0]['trackId'];
+        $candidate = (array) DB::table(CapabilityHistory::CANDIDATES)->where('id', $f['catalog']['candidate']->id)->first();
+        $delegate = DB::connection()->getEventDispatcher();
+        $armed = false;
+        $acted = 0;
+        // The first commit after the gateway's provenance() is proveCreatable()'s own read-only frame.
+        app('events')->listen(TransactionCommitting::class, function () use (&$armed, &$acted, $withdrawal, $trackId, $candidate, $f): void {
+            if ($armed && $acted === 0) {
+                $acted++;
+                match ($withdrawal) {
+                    'offer' => DB::table('offers')->where('track_id', $trackId)->update(['is_active' => false]),
+                    'capability' => $this->closeCapability($candidate, $f['catalog']['actor']->id),
+                };
+            }
+        });
+        $f['hosted'] = new HostedCheckout($f['access'], new AdmissionRacingGateway($f['gateway'], function () use (&$armed): void {
+            $armed = true;
+        }));
+        $this->assertRefused('write_source_changed', fn () => $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']));
+        $this->assertSame(1, $acted);
+        $this->assertCount($creates, $f['gateway']->creates);
+        $this->assertDatabaseCount(CheckoutSchema::TABLES['intent'], 1);
+        $this->assertDatabaseCount(CheckoutSchema::TABLES['session'], 0);
+        $this->assertDatabaseCount(CapabilityHistory::CLOSURES, 0);
+        $this->assertSame(0, DB::table('offers')->where('track_id', $trackId)->where('is_active', false)->count());
+        $this->assertSame($delegate, DB::connection()->getEventDispatcher());
+        $this->assertFalse(DB::connection()->getRawPdo()->inTransaction());
     }
 
     public function test_capability_closed_after_intent_commit_refuses_before_first_create(): void

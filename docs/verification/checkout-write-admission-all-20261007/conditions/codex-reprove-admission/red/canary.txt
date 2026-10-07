@@ -1,0 +1,88 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-admission/phpunit.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:03.494, Memory: 87.00 MB
+
+There was 1 failure:
+
+1) Tests\Canary\ReproveCommitAdmissionCanaryTest::test_offer_withdrawn_in_the_reprove_commit_refuses_before_provider_create
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &0 []
++Array &0 [
++    0 => Array &1 [
++        'params' => Array &2 [
++            'adaptive_pricing' => Array &3 [
++                'enabled' => false,
++            ],
++            'allow_promotion_codes' => false,
++            'automatic_tax' => Array &4 [
++                'enabled' => false,
++            ],
++            'cancel_url' => 'https://review.invalid/production/checkout/orders/5074cb6e-8fcc-4937-9a77-efec5dba220b/return',
++            'client_reference_id' => '5074cb6e-8fcc-4937-9a77-efec5dba220b',
++            'customer_creation' => 'if_required',
++            'expand' => Array &5 [
++                0 => 'line_items.data.price.product',
++            ],
++            'expires_at' => 1791398450,
++            'line_items' => Array &6 [
++                0 => Array &7 [
++                    'price_data' => Array &8 [
++                        'currency' => 'usd',
++                        'product_data' => Array &9 [
++                            'metadata' => Array &10 [
++                                'line_hash' => '6037ae1e89e6ea56b93fb633f104d10f05f77cfdcff015ff07ca37846a578f0d',
++                                'line_id' => 'b10c09a7-9134-4542-87f6-60226662766d',
++                            ],
++                            'name' => 'Synthetic quote recording — NONBINDING TEST FIXTURE',
++                        ],
++                        'unit_amount' => 4999,
++                    ],
++                    'quantity' => 1,
++                ],
++            ],
++            'metadata' => Array &11 [
++                'attempt_id' => '759c552d-ea89-42bd-a239-b1ab63bdde01',
++                'buyer_origin_id' => 'e37bcc9b-4ec8-4e41-8945-77f69c0b4bb3',
++                'funds_mode' => 'test',
++                'intent_id' => '329ff809-819f-4723-8f43-5acb4200953e',
++                'order_hash' => 'f51079a2a3c757b600f7fcf2abfd7acc8e0bb4945a628557f1f090d67766d1eb',
++                'order_id' => '5074cb6e-8fcc-4937-9a77-efec5dba220b',
++                'producer' => 'production_checkout_v1',
++                'schema_version' => '1',
++            ],
++            'mode' => 'payment',
++            'payment_intent_data' => Array &12 [
++                'capture_method' => 'automatic',
++                'metadata' => Array &13 [
++                    'attempt_id' => '759c552d-ea89-42bd-a239-b1ab63bdde01',
++                    'buyer_origin_id' => 'e37bcc9b-4ec8-4e41-8945-77f69c0b4bb3',
++                    'funds_mode' => 'test',
++                    'intent_id' => '329ff809-819f-4723-8f43-5acb4200953e',
++                    'order_hash' => 'f51079a2a3c757b600f7fcf2abfd7acc8e0bb4945a628557f1f090d67766d1eb',
++                    'order_id' => '5074cb6e-8fcc-4937-9a77-efec5dba220b',
++                    'producer' => 'production_checkout_v1',
++                    'schema_version' => '1',
++                ],
++            ],
++            'payment_method_types' => Array &14 [
++                0 => 'card',
++            ],
++            'success_url' => 'https://review.invalid/production/checkout/orders/5074cb6e-8fcc-4937-9a77-efec5dba220b/return',
++        ],
++        'key' => 'va-production-checkout-v1-329ff809-819f-4723-8f43-5acb4200953e',
++    ],
++]
+
+/home/user/VA-Studio-admission/docs/verification/checkout-write-admission-all-20261007/conditions/codex-reprove-admission/canary/ReproveCommitAdmissionCanaryTest.php:71
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 3[0m[37;41m, Failures: 1[0m[37;41m.[0m

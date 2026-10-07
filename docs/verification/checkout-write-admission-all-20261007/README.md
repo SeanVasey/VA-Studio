@@ -75,8 +75,9 @@ c6's rules are kept: ONE command observer per frame; ordinary committing delegat
   - for qualify, also the buyer identity, the selection graph and the authority row.
 
   `proveFresh()` reads the retained `Repository` items directly: `exemption_authoring_enabled === true` and the owner still delegated. The deadline is capped by the policy and attestation `effective_until`.
-- **Replays install nothing.** An exact authority/basis replay, an intent retry (an intent already exists), `reconcile()`, `status()`, `record()` and `uncertain()` install no observer. A test asserts the dispatcher class seen inside every commit.
-- **Belt-and-braces (reviewer condition 6):** `initiate()` now calls `proveCreatable()` after `requireGateway()` and immediately before the first `gateway->create` whenever no session exists yet. This covers both the first call and retries. `proveCreatable()` is a read-only `CommandTransaction` with no observer. It re-proves the following with the existing reason codes (`changed`, `disabled`/503), and it runs outside the provider `try`, so a refusal records no false `uncertain` observation:
+- **Replays install nothing.** An exact authority/basis replay, the retry's `prepare()` (an intent already exists), `reconcile()`, `status()`, `record()` and `uncertain()` install no observer. A test asserts the dispatcher class seen inside every commit.
+- **Exception (§4d, Codex P1 r4210033214): `proveCreatable()`.** This is the one read-only frame that installs an observer, `CheckoutIntentAdmission::reprove()`. It is the last proof before the provider boundary, so a committing listener on its own frame must not be able to withdraw the offer or close the capability after the proofs ran.
+- **Belt-and-braces (reviewer condition 6):** `initiate()` now calls `proveCreatable()` after `requireGateway()` and immediately before the first `gateway->create` whenever no session exists yet. This covers both the first call and retries. `proveCreatable()` is a read-only `CommandTransaction`. Since §4d its own commit is admitted by the same raw plans as the NEW intent. It re-proves the following with the existing reason codes (`changed`, `disabled`/503), and it runs outside the provider `try`, so a refusal records no false `uncertain` observation:
   - buyer access;
   - the fresh flag (before and after);
   - the retained order/intent rows;
@@ -86,7 +87,7 @@ c6's rules are kept: ONE command observer per frame; ordinary committing delegat
 
 ### Residual: not closed
 
-1. **Withdrawal after the final re-proof.** A withdrawal that commits after `proveCreatable()` returns and before or during the external `create` call crosses the provider boundary. No database transaction can be held across that I/O. Such a session belongs to reconciliation and refund handling, and this change does not claim it is closed.
+1. **Withdrawal after the final re-proof.** A withdrawal inside `proveCreatable()`'s own commit is refused (§4d). A withdrawal that commits after that frame has committed and before or during the external `create` call still crosses the provider boundary. No database transaction can be held across that I/O. Such a session belongs to reconciliation and refund handling, and this change does not claim it is closed.
 2. **A privileged listener that commits PDO directly.** It can still make rows durable before detection (c6 F-5, unchanged).
 3. **Staff evidence outside the `users` row.** The MFA *requirement* is not re-evaluated at commit. The admin panel decides it with `isRequired: fn () => app()->isProduction()`, which reads the container's `env` instance (`$app['env']`). The frame does not track that instance: it compares only the `config` and `db` instances, the container aliases and the plain config parents, `app.env` among them. So a change to `$app['env']` alone is not compared at commit. What IS compared is the raw MFA enrollment columns (`app_authentication_secret`, `app_authentication_recovery_codes`) in the staff `users` row. Gate and Filament panel objects are also not re-evaluated. *(Wording corrected for review finding F-4; an earlier version wrongly said `app.env` covered the requirement.)*
 
@@ -238,3 +239,51 @@ The test requires a `CheckoutException` with reason `write_frame` (`CheckoutComm
 | `green/ProductionCheckoutJourneyTest` | the fix | 7 tests, 81 assertions, green |
 
 Pint passes on the three changed PHP files. No native run was made for this item.
+
+## 4d. Codex P1 r4210033214: the final pre-create re-proof's own commit was not admitted
+
+**Finding.**
+
+- `proveCreatable()` re-proved policy, selection, basis and request inside its own `CommandTransaction`, but that frame had no commit observer.
+- A `TransactionCommitting` listener on that frame could deactivate the offer, or insert a capability closure, after the proofs ran. The frame then committed the change, and `initiate()` called `gateway->create`.
+- This is a withdrawal *inside* the re-proof's commit. That is distinct from the provider-boundary residual, which covers a withdrawal after the commit, during the external call.
+
+**Design.**
+
+- `CheckoutIntentAdmission` gains a second static constructor, `reprove()`. Together with `capture()` it shares one private `admit()`, so the raw plans, the frame-deadline cap and the fresh admission are identical to the NEW-intent capsule. There are two differences:
+  - `reprove()` admits a retained intent that already has observations, for example an earlier uncertain create. It plans those rows exactly. `capture()` still requires them to be empty.
+  - Both constructors still require no session and no payment.
+- `proveCreatable()` captures `FreshCheckoutPolicy` after its lock. After all its existing proofs, it calls `reprove()` with the frame's own identity lock and the retained `$prepared` order, intent, policy, selection and basis.
+- The frame still holds one observer, through the existing single-observer refusal in `CheckoutCommandFrame::register()`.
+- `CommandTransaction`, `OriginalCommitDispatcher`, `CheckoutWriteAdmission`, the c6 frame/dispatcher and `CheckoutStaffWriteAdmission` are unchanged. The class docblocks of `CheckoutIntentAdmission` and `proveCreatable()` explain why this read frame carries an observer.
+- On refusal, the frame rolls back (including the listener's own write), `proveCreatable()` throws `write_source_changed`, and `initiate()` never calls create. No `uncertain` observation is recorded, because the re-proof runs before the provider `try`.
+
+**Red evidence** (`conditions/codex-reprove-admission/red/`, SQLite, app tree of `0cb13ca5`):
+
+- **Canary** `canary/ReproveCommitAdmissionCanaryTest.php` (offer withdrawn on the re-proof commit, first initiate): exit 1, 1 test, 3 assertions, **1 failure**. The snapshot `reprove-offer.json` shows:
+  - `refused: null`;
+  - `provider_creates: 1`;
+  - `sessions: 1`;
+  - the inactive offer durably committed.
+- **Permanent regression** `test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create`, run with the app reverted to `0cb13ca5`: exit 2, 4 tests, 10 assertions.
+  - **2 failures:** the offer cases on the first initiate and on a retry.
+  - **2 errors:** the capability cases. In each, the closure committed, create ran, and a later history load threw `ValidationException`.
+
+**Green** (`green/`, SQLite, the fix):
+
+| Run | Tests | Assertions |
+| --- | --- | --- |
+| canary | 1 | 6 (`refused: CheckoutException:write_source_changed`, `provider_creates: 0`, `sessions: 0`, offer still active) |
+| `ProductionCheckoutWriteAdmissionAllTest` | 22 | 151 |
+| `ProductionCheckoutJourneyTest` | 7 | 81 |
+| `ProductionCheckoutExemptionAuthorityTest` | 11 | 50 |
+| archived c6 physical canary (unchanged, `ce114992…`) | 1 | 5 |
+| SQLite checkout family (`green/sqlite-family/`) | 200 | 1002 (0 failures/errors; the same 8 named native-only skips) |
+
+`ProductionCheckoutWriteAdmissionAllTest` covers four new cases: {offer, capability} × {first initiate, retry}. Each requires `write_source_changed`, no new provider create, no session, no closure, the offer still active, the dispatcher restored and no open transaction. The observer-presence test now expects:
+
+- 2 observed frames on the first initiate (the NEW intent and the re-proof);
+- 1 on the retry (the re-proof);
+- 0 on reconcile.
+
+Pint passes on the changed files. No native run was made for this item.
