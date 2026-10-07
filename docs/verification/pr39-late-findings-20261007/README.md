@@ -9,7 +9,8 @@ acceptance.
 | Finding | Thread | Commit |
 | --- | --- | --- |
 | B — identity frame SQLite `query_only` | [r4206829231](https://github.com/SeanVasey/VA-Studio/pull/39#discussion_r4206829231) | `1d41bedf` `fix(identity): restore SQLite query_only after a caller replacement ends` |
-| A — suppression target after email change | [r4206829225](https://github.com/SeanVasey/VA-Studio/pull/39#discussion_r4206829225) | the `fix(suppression): ...` commit that adds this file |
+| A — suppression target after email change | [r4206829225](https://github.com/SeanVasey/VA-Studio/pull/39#discussion_r4206829225) | `bf6e5937` `fix(suppression): deliver the retained captured target after an email change` |
+| A follow-up — independent review C-A1 (Medium) and the Low | review of `bf6e5937` | the `fix(suppression): refuse an unauthentic selected target ...` commit that updates this file |
 
 ## Finding A — `SuppressionDelivery` misses the retained target after an email change
 
@@ -23,7 +24,7 @@ withdrawal intent is durable.
 email, which the consent and authority proof needs, and the suppression recipient, which
 should come from the target captured at withdrawal time.
 
-**Fix** (`SuppressionOutbox::retained()` plus three lines in `SuppressionDelivery`):
+**Fix** (`SuppressionOutbox::retained()` plus a few lines in `SuppressionDelivery`; the review follow-up also adds `SuppressionEvidence::qualified()`):
 
 - Before the graph is built, the outbox evidence frame captures one row (`LIMIT 1`, the
   lowest `id`, `FOR UPDATE` on MySQL) from this account and purpose's
@@ -36,7 +37,22 @@ should come from the target captured at withdrawal time.
 - The recipient is decrypted from that target's own ciphertext. `graph()` then runs
   unchanged on that recipient. It re-proves the full capture, recomputes the keyed HMAC
   against the stored `recipient_hmac`, and checks the latest intent → withdrawn event →
-  event capture chain. A target that isn't authentic still fails with a 503.
+  event capture chain.
+- *Review follow-up (C-A1).* In `bf6e5937`, `graph()` searched by the HMAC of the
+  decrypted address, not by the selected row. If the selected row's stored address didn't
+  HMAC to its own `recipient_hmac` (an out-of-band write or corruption), `graph()` found
+  no row and returned `not_requested`. The call sent nothing and raised no error, every
+  time, so the account's genuine pending target was never delivered. The base
+  `d20d4394` delivered it once. Now `retained()` returns the selected row's `id` together
+  with its email. `context()` refuses with **503** unless the target `graph()` resolves is
+  that same row. An unauthentic selected row therefore fails closed on every call and is
+  never skipped silently.
+- *Review follow-up (Low).* The selection subqueries now name
+  `customer_suppression_attempts`/`_confirmations` through `SuppressionEvidence::qualified()`.
+  That is the same schema qualification and temp-table shadow refusal `rows()` already
+  applies to the outer table (`main."…"` plus a `sqlite_temp_master` check on SQLite;
+  `` `db`.`…` `` plus a `SHOW CREATE TABLE` temporary check on MySQL). A same-connection
+  temp table now causes a 503 instead of a silent non-delivery.
 - The current email is used only when no target needs work, so existing status reporting
   is unchanged. The consent and authority proof (`ConsentEvidence::prove`) still binds
   the current user row and current email.
@@ -63,6 +79,23 @@ should come from the target captured at withdrawal time.
 Before the fix, all four cases fail (`finding-a-before-fix-sqlite.txt`: 4 tests, 4
 failures, with `not_requested` where `confirmed`/`unknown` was expected, and the
 oldest-first case sent only B).
+
+Review follow-up regressions (`tests/Feature/CustomerSuppressionRetainedTargetTest.php`):
+
+- `test_unauthentic_older_target_never_silently_blocks_genuine_pending_target`. This is
+  the reviewer's probe, renamed into the suppression test family with its assertions
+  kept. It inserts an older target row whose address doesn't match its own HMAC, then
+  makes a genuine withdrawal. Two `process()` calls must either deliver the genuine target
+  once or refuse with 503 and send nothing. Now: refused 503 on both calls, 0 sent.
+- `test_same_connection_temp_attempts_shadow_refuses_instead_of_silently_skipping_retained_target`.
+  It withdraws with A, changes the email to B, and creates a temp
+  `customer_suppression_attempts` table holding A's target id. `process()` must refuse
+  with 503 and send nothing. After the temp table is dropped, `process()` delivers once.
+
+Against the `bf6e5937` runtime (runtime changes stashed), both fail with a silent
+`not_requested` on SQLite and native MySQL (`c-a1-before-fix-sqlite.txt`,
+`c-a1-before-fix-native-mysql.txt`: 2 tests, 2 failures each). With the follow-up,
+both pass.
 
 ## Finding B — `IdentityCommittedFrame` leaves SQLite `query_only` on after a single close
 
@@ -147,11 +180,16 @@ APP_ENV=testing DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3412 DB_DATABASE=v
 | A pre-fix, SQLite | `--filter 'test_retained_and_current\|test_email_change_after'` | 4 tests, 11 assertions, **4 failures** — expected |
 | A SQLite | the 9 consent/suppression feature files (`CustomerConsent{Admission,Boundary,Migration,Preferences}Test`, `CustomerSuppression{KeyAdmission,Migration,NativeAdmission,SourceBoundary,}Test`) | 178 tests, 1052 assertions, 0 failures/errors, **3 skipped** (native-only DDL admission cases) |
 | A native | `--filter 'test_email_change_after_withdrawal\|test_retained_and_current\|test_grant_does_not_unsuppress\|test_changed_provider_binding\|test_single_positive_attempt'` | 7 tests, 92 assertions, OK, 0 skipped |
-| Pint | `php vendor/laravel/pint/builds/pint --test` on the 5 changed PHP files | passed |
+| C-A1 pre-fix, SQLite (`bf6e5937` runtime) | `tests/Feature/CustomerSuppressionRetainedTargetTest.php` | 2 tests, 5 assertions, **2 failures** — expected |
+| C-A1 pre-fix, native (`bf6e5937` runtime) | `tests/Feature/CustomerSuppressionRetainedTargetTest.php` | 2 tests, 5 assertions, **2 failures** (silent `not_requested`) — expected |
+| C-A1 SQLite | the 9 consent/suppression files plus `CustomerSuppressionRetainedTargetTest` | 180 tests, 1060 assertions, 0 failures/errors, **3 skipped** (the same native-only DDL admission cases) |
+| C-A1 native | `--filter 'CustomerSuppressionRetainedTargetTest\|test_email_change_after_withdrawal\|test_retained_and_current\|test_grant_does_not_unsuppress\|test_changed_provider_binding\|test_single_positive_attempt'` | 9 tests, 100 assertions, OK, 0 skipped |
+| Pint | `php vendor/laravel/pint/builds/pint --test` on the 5 changed PHP files; on the follow-up, the 3 suppression runtime files plus the new test | passed |
 | `git diff --check` | | clean |
 
-The post-fix SQLite and native runs executed on the working tree that became the final
-commit, with both fixes present. The B pre-fix run had only B's new test applied. The A
+The post-fix SQLite and native runs for B and A executed on the working tree that
+became `bf6e5937`, with both fixes present. The C-A1 runs executed on the working tree
+of the follow-up commit. The B pre-fix run had only B's new test applied. The A
 pre-fix run had A's runtime changes stashed.
 
 Not run: the full PHP suite, the native consent/suppression DDL admission cases,
@@ -159,12 +197,12 @@ Foundation CI and browser specs.
 
 ## For the independent reviewer
 
-1. **A, selection predicates.** The `NOT EXISTS`/`EXISTS` subqueries name
-   `customer_suppression_attempts`/`_confirmations` without a qualifier. `rows()` checks
-   temp-table shadows only for the outer table. A shadow can affect *selection* only.
-   `graph()` then captures attempts and confirmations through `rows()`, which refuses a
-   shadow with a 503. So a shadow can't cause a resend or a false confirmation, but
-   decide whether a non-delivery from a shadow is acceptable. On MySQL the subquery is a
+1. **A, selection predicates (resolved by the follow-up).** The subqueries are now
+   schema-qualified and shadow-refused through `SuppressionEvidence::qualified()`, and a
+   selected row must be the row `graph()` resolves, or the call fails with 503. The shadow
+   check on the subquery tables runs once, at capture. `prove()` re-runs the captured
+   predicate text, which stays qualified, and `graph()`'s own captures repeat the check
+   for attempts and confirmations. On MySQL the subquery is a
    non-locking read under the outer `FOR UPDATE`. A stale snapshot can only pick a target
    whose attempt `graph()` then sees through a locking read, which gives `unknown` and no
    send.
@@ -180,6 +218,7 @@ Foundation CI and browser specs.
    check that the settle closure can't run inside the frame's own active transaction: it
    is registered only from `close()`, after `used=true`. Review the limit described
    above.
-5. Previous approvals stay bound to their recorded commits. This change modifies the
-   reviewed `IdentityCommittedFrame`, so carrying it forward needs a new independent
-   review of `1d41bedf`.
+5. Previous approvals stay bound to their recorded commits. As relayed by the
+   coordinator, the independent review approved `1d41bedf` and approved `bf6e5937` on
+   condition C-A1. The follow-up commit fixes C-A1 and the Low, and it needs its own
+   review of the exact follow-up SHA.

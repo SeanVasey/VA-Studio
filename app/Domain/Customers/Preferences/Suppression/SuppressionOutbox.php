@@ -102,24 +102,27 @@ final class SuppressionOutbox
     }
 
     /**
-     * Recipient captured by this account's oldest retained target that still needs this
-     * operation: a claimed target, else (send) one without an attempt, else (inspect) one
-     * whose attempt under the current binding has no confirmation. Selection never uses
-     * the current account email; graph() then re-proves the target, HMAC and withdrawal.
+     * Row id and recipient captured by this account's oldest retained target that still
+     * needs this operation: a claimed target, else (send) one without an attempt, else
+     * (inspect) one whose attempt under the current binding has no confirmation. Selection
+     * never uses the current account email. The caller must require graph() to resolve
+     * this same row, which re-proves its capture, keyed HMAC and withdrawal.
+     *
+     * @return array{id: string, email: string}|null
      */
-    public function retained(CustomerPrincipal $principal, SuppressionEvidence $proof, array $policy, ?string $claimed, bool $inspect): ?string
+    public function retained(CustomerPrincipal $principal, SuppressionEvidence $proof, array $policy, ?string $claimed, bool $inspect): ?array
     {
         try {
             $values = [$principal->accountId, ConsentPolicy::PURPOSE];
             $where = 'customer_account_id=? AND purpose=? AND ';
+            $attempts = $proof->qualified('customer_suppression_attempts');
             if ($claimed !== null) {
                 [$where, $values] = [$where.'public_id=?', [...$values, $claimed]];
             } elseif (! $inspect) {
-                $where .= 'NOT EXISTS (SELECT 1 FROM customer_suppression_attempts WHERE customer_suppression_attempts.target_id=customer_suppression_targets.id)';
+                $where .= 'NOT EXISTS (SELECT 1 FROM '.$attempts.' a WHERE a.target_id=customer_suppression_targets.id)';
             } elseif ($policy['hash'] !== null) {
-                [$where, $values] = [$where.'EXISTS (SELECT 1 FROM customer_suppression_attempts WHERE customer_suppression_attempts.target_id=customer_suppression_targets.id'
-                    .' AND customer_suppression_attempts.binding_hash=? AND NOT EXISTS (SELECT 1 FROM customer_suppression_confirmations'
-                    .' WHERE customer_suppression_confirmations.attempt_id=customer_suppression_attempts.id))', [...$values, $policy['hash']]];
+                [$where, $values] = [$where.'EXISTS (SELECT 1 FROM '.$attempts.' a WHERE a.target_id=customer_suppression_targets.id AND a.binding_hash=?'
+                    .' AND NOT EXISTS (SELECT 1 FROM '.$proof->qualified('customer_suppression_confirmations').' c WHERE c.attempt_id=a.id))', [...$values, $policy['hash']]];
             } else {
                 return null;
             }
@@ -132,7 +135,7 @@ final class SuppressionOutbox
                 throw new ConsentException(503);
             }
 
-            return $capture['email'];
+            return ['id' => (string) $targets[0]['id'], 'email' => $capture['email']];
         } catch (Throwable) {
             throw new ConsentException(503);
         }
