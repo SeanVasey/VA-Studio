@@ -4,10 +4,20 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="theme-color" content="#101214">
+    <meta name="theme-color" content="#052e3a">
     @viteReactRefresh
     @vite('resources/js/app.tsx')
     <x-inertia::head>
+        @if (request()->routeIs('home', 'tracks.show', 'editorial.show'))
+            <link data-inertia="install:manifest" rel="manifest" href="/manifest.webmanifest">
+            <link data-inertia="install:touch-icon" rel="apple-touch-icon" sizes="180x180" href="/brand/apple-touch-icon.png">
+        @endif
+        @isset($privateMetadata)
+            <title data-inertia="title">{{ $privateMetadata['title'] }}</title>
+            <meta data-inertia="description" name="description" content="{{ $privateMetadata['description'] }}">
+            <meta data-inertia="robots" name="robots" content="{{ $privateMetadata['robots'] }}">
+            <meta data-inertia="referrer" name="referrer" content="no-referrer">
+        @else
         @isset($metadata)
             <title data-inertia="title">{{ $metadata['title'] }}</title>
             <meta data-inertia="description" name="description" content="{{ $metadata['description'] }}">
@@ -30,6 +40,7 @@
             <meta data-inertia="twitter:description" name="twitter:description" content="{{ $metadata['description'] }}">
             <meta data-inertia="twitter:image" name="twitter:image" content="{{ $metadata['imageUrl'] }}">
             <meta data-inertia="twitter:image:alt" name="twitter:image:alt" content="{{ $metadata['imageAlt'] }}">
+        @endisset
         @endisset
     </x-inertia::head>
 </head>
