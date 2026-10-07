@@ -1,0 +1,17 @@
+{
+  "docs/verification/cloud-identity-adapters-binding-independent-20261007.md": "72f25a4ce0306597d6bd5f97720fcec4738008b6c0afb96b73d4441e249fb4d4",
+  "docs/verification/cloud-identity-adapters-binding-independent-20261007/NestedConfigurationCallbackCanaryTest.php": "e9ddc3ea6eb47d64605a767abe8a0fd67e25ed3ec6048c28828bcdf6bcbdd07d",
+  "docs/verification/cloud-identity-adapters-binding-independent-20261007/canary-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+  "docs/verification/cloud-identity-adapters-binding-independent-20261007/final-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+  "docs/verification/cloud-identity-adapters-binding-independent-20261007/final-sqlite.txt": "1773e2436ac652cb9bdb72af0967d0b84ae4444dd025809ac3e4bff28ea665f8",
+  "docs/verification/cloud-identity-adapters-binding-independent-20261007/final-sqlite.xml": "9c7de703177ba56b3b40421ec186ccbb46ba63db3e4abde8b502ff55cfb36c2f",
+  "docs/verification/cloud-identity-adapters-binding-independent-20261007/held-receipt.json": "e4e340987b7431bab4e37caec04d7bd56aa240ce5203ff491066515aab09c536",
+  "docs/verification/cloud-identity-adapters-binding-independent-20261007/initial-source-carry.json": "bbc43b971872ad5e31a778d5f582c4ec88ead1d3665db5b04e896ffa95682409",
+  "docs/verification/cloud-identity-adapters-binding-independent-20261007/nested-configuration-snapshot.json": "91a9701822fbb5243c85c8392fc992bd9f979f35d3ef87f2f7e3cea2f1623e0f",
+  "docs/verification/cloud-identity-adapters-binding-independent-20261007/original-nested-config.txt": "1bd553dbbedba76a0ad5a044b346ab3617da614bee18a80a76a07ffa9b1c514b",
+  "docs/verification/cloud-identity-adapters-binding-independent-20261007/original-nested-config.xml": "a73e5478b79d281bcb43ef4edd745de51a0551e156aec7e08664a48302446b69",
+  "docs/verification/cloud-identity-adapters-binding-independent-20261007/own-autoload.txt": "ecbeba895d88434899610dea769ddc29e1cec92fa4a8f1fb1dc7b0aad56a0c7f",
+  "docs/verification/cloud-identity-adapters-binding-independent-20261007/source-map.json": "843837d7fe59bab8494d5d1e56dddb1c9503a30f6166327dbdfacf2c8e400ebc",
+  "docs/verification/cloud-identity-adapters-binding-independent-20261007/sqlite-canary.xml": "52c9470f4300e250ef26e2ef75639ddde55ce6042e990f62db01169220a4e420",
+  "docs/verification/cloud-identity-adapters-binding-independent-20261007/sqlite-selection.xml": "1383441ff3ffc77c63b703ebf4eaa4293884ee370469aa059b39d349c858c1dd"
+}

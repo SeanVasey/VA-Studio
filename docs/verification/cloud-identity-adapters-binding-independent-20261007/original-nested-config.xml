@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-identity-adapters-binding-independent/docs/verification/cloud-identity-adapters-binding-independent-20261007/sqlite-canary.xml" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="0.375766">
+    <testsuite name="Actual nested raw configuration handoff canary" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="0.375766">
+      <testsuite name="Tests\IndependentIdentityBinding\NestedConfigurationCallbackCanaryTest" file="/workspace/VA-Studio-identity-adapters-binding-independent/docs/verification/cloud-identity-adapters-binding-independent-20261007/NestedConfigurationCallbackCanaryTest.php" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="0.375766">
+        <testcase name="test_nested_raw_configuration_parent_cannot_run_a_callback_at_the_final_smtp_handoff" file="/workspace/VA-Studio-identity-adapters-binding-independent/docs/verification/cloud-identity-adapters-binding-independent-20261007/NestedConfigurationCallbackCanaryTest.php" line="15" class="Tests\IndependentIdentityBinding\NestedConfigurationCallbackCanaryTest" classname="Tests.IndependentIdentityBinding.NestedConfigurationCallbackCanaryTest" assertions="1" time="0.375766">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\IndependentIdentityBinding\NestedConfigurationCallbackCanaryTest::test_nested_raw_configuration_parent_cannot_run_a_callback_at_the_final_smtp_handoff
+A nested configuration callback withdrew credentials at the final SMTP guard but submission was accepted.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-identity-adapters-binding-independent/docs/verification/cloud-identity-adapters-binding-independent-20261007/NestedConfigurationCallbackCanaryTest.php:90
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>
