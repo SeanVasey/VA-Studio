@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="144" assertions="662" errors="14" failures="0" skipped="0" time="47.197976">
+    <testsuite name="Tests\Feature\CustomerListeningLibraryTest" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" tests="25" assertions="211" errors="0" failures="0" skipped="0" time="11.910041">
+      <testcase name="test_favorites_and_ordered_named_playlists_persist_with_encrypted_private_names" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="35" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="23" time="4.748566"/>
+      <testcase name="test_duplicates_are_noops_and_stale_mutations_cannot_overwrite_fresh_state" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="75" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="9" time="1.603671"/>
+      <testcase name="test_cross_account_playlist_ids_never_reveal_or_modify_foreign_state" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="91" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="8" time="0.029011"/>
+      <testsuite name="Tests\Feature\CustomerListeningLibraryTest::test_read_and_change_recheck_disabled_revoked_unverified_admin_and_credential_changed_access" tests="6" assertions="12" errors="0" failures="0" skipped="0" time="0.159070">
+        <testcase name="test_read_and_change_recheck_disabled_revoked_unverified_admin_and_credential_changed_access with data set #0" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="107" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="2" time="0.027171"/>
+        <testcase name="test_read_and_change_recheck_disabled_revoked_unverified_admin_and_credential_changed_access with data set #1" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="107" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="2" time="0.025118"/>
+        <testcase name="test_read_and_change_recheck_disabled_revoked_unverified_admin_and_credential_changed_access with data set #2" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="107" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="2" time="0.025631"/>
+        <testcase name="test_read_and_change_recheck_disabled_revoked_unverified_admin_and_credential_changed_access with data set #3" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="107" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="2" time="0.027270"/>
+        <testcase name="test_read_and_change_recheck_disabled_revoked_unverified_admin_and_credential_changed_access with data set #4" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="107" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="2" time="0.027466"/>
+        <testcase name="test_read_and_change_recheck_disabled_revoked_unverified_admin_and_credential_changed_access with data set #5" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="107" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="2" time="0.026414"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\CustomerListeningLibraryTest::test_fresh_availability_hides_withdrawn_or_unready_metadata_and_keeps_removal_usable" tests="2" assertions="12" errors="0" failures="0" skipped="0" time="2.720472">
+        <testcase name="test_fresh_availability_hides_withdrawn_or_unready_metadata_and_keeps_removal_usable with data set #0" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="135" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="6" time="1.385343"/>
+        <testcase name="test_fresh_availability_hides_withdrawn_or_unready_metadata_and_keeps_removal_usable with data set #1" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="135" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="6" time="1.335129"/>
+      </testsuite>
+      <testcase name="test_unknown_draft_and_falsely_published_tracks_are_not_savable" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="158" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="7" time="0.023964"/>
+      <testcase name="test_favorite_playlist_and_per_playlist_track_bounds_fail_without_changing_retained_state" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="168" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="102" time="1.336325"/>
+      <testsuite name="Tests\Feature\CustomerListeningLibraryTest::test_invalid_commands_are_refused_without_creating_state" tests="9" assertions="27" errors="0" failures="0" skipped="0" time="0.147138">
+        <testcase name="test_invalid_commands_are_refused_without_creating_state with data set #0" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="197" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="3" time="0.019819"/>
+        <testcase name="test_invalid_commands_are_refused_without_creating_state with data set #1" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="197" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="3" time="0.015247"/>
+        <testcase name="test_invalid_commands_are_refused_without_creating_state with data set #2" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="197" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="3" time="0.020705"/>
+        <testcase name="test_invalid_commands_are_refused_without_creating_state with data set #3" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="197" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="3" time="0.014625"/>
+        <testcase name="test_invalid_commands_are_refused_without_creating_state with data set #4" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="197" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="3" time="0.017791"/>
+        <testcase name="test_invalid_commands_are_refused_without_creating_state with data set #5" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="197" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="3" time="0.015150"/>
+        <testcase name="test_invalid_commands_are_refused_without_creating_state with data set #6" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="197" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="3" time="0.014603"/>
+        <testcase name="test_invalid_commands_are_refused_without_creating_state with data set #7" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="197" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="3" time="0.015063"/>
+        <testcase name="test_invalid_commands_are_refused_without_creating_state with data set #8" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="197" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="3" time="0.014134"/>
+      </testsuite>
+      <testcase name="test_corrupt_encrypted_state_fails_closed_and_is_never_replaced_by_empty_lists" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="218" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="5" time="0.016202"/>
+      <testcase name="test_encrypted_state_is_bound_to_its_account_and_database_revision" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="227" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="4" time="0.020251"/>
+      <testcase name="test_access_withdrawn_by_a_projection_callback_refuses_the_projection_and_rolls_back_the_save" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="239" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="2" time="1.105371"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\CustomerListeningMigrationTest" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningMigrationTest.php" tests="9" assertions="37" errors="0" failures="0" skipped="0" time="1.689259">
+      <testcase name="test_repeated_complete_owned_install_preserves_customer_preferences_and_real_credit_history" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningMigrationTest.php" line="33" class="Tests\Feature\CustomerListeningMigrationTest" classname="Tests.Feature.CustomerListeningMigrationTest" assertions="2" time="0.238272"/>
+      <testsuite name="Tests\Feature\CustomerListeningMigrationTest::test_rollback_always_refuses_before_query_and_retains_schema_history_and_repository_record" tests="2" assertions="6" errors="0" failures="0" skipped="0" time="0.337826">
+        <testcase name="test_rollback_always_refuses_before_query_and_retains_schema_history_and_repository_record with data set &quot;empty&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningMigrationTest.php" line="49" class="Tests\Feature\CustomerListeningMigrationTest" classname="Tests.Feature.CustomerListeningMigrationTest" assertions="3" time="0.164374"/>
+        <testcase name="test_rollback_always_refuses_before_query_and_retains_schema_history_and_repository_record with data set &quot;populated&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningMigrationTest.php" line="49" class="Tests\Feature\CustomerListeningMigrationTest" classname="Tests.Feature.CustomerListeningMigrationTest" assertions="3" time="0.173451"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\CustomerListeningMigrationTest::test_foreign_or_drifted_objects_are_never_adopted_or_dropped" tests="3" assertions="12" errors="0" failures="0" skipped="0" time="0.578309">
+        <testcase name="test_foreign_or_drifted_objects_are_never_adopted_or_dropped with data set &quot;index&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningMigrationTest.php" line="83" class="Tests\Feature\CustomerListeningMigrationTest" classname="Tests.Feature.CustomerListeningMigrationTest" assertions="4" time="0.183871"/>
+        <testcase name="test_foreign_or_drifted_objects_are_never_adopted_or_dropped with data set &quot;column&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningMigrationTest.php" line="83" class="Tests\Feature\CustomerListeningMigrationTest" classname="Tests.Feature.CustomerListeningMigrationTest" assertions="4" time="0.193747"/>
+        <testcase name="test_foreign_or_drifted_objects_are_never_adopted_or_dropped with data set &quot;trigger&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningMigrationTest.php" line="83" class="Tests\Feature\CustomerListeningMigrationTest" classname="Tests.Feature.CustomerListeningMigrationTest" assertions="4" time="0.200691"/>
+      </testsuite>
+      <testcase name="test_temporary_shadow_is_never_adopted_or_dropped" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningMigrationTest.php" line="103" class="Tests\Feature\CustomerListeningMigrationTest" classname="Tests.Feature.CustomerListeningMigrationTest" assertions="3" time="0.184100"/>
+      <testsuite name="Tests\Feature\CustomerListeningMigrationTest::test_real_migrator_restarts_an_exact_complete_unrecorded_install" tests="2" assertions="14" errors="0" failures="0" skipped="0" time="0.350752">
+        <testcase name="test_real_migrator_restarts_an_exact_complete_unrecorded_install with data set &quot;after complete up&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningMigrationTest.php" line="131" class="Tests\Feature\CustomerListeningMigrationTest" classname="Tests.Feature.CustomerListeningMigrationTest" assertions="6" time="0.175243"/>
+        <testcase name="test_real_migrator_restarts_an_exact_complete_unrecorded_install with data set &quot;after atomic CREATE event&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningMigrationTest.php" line="131" class="Tests\Feature\CustomerListeningMigrationTest" classname="Tests.Feature.CustomerListeningMigrationTest" assertions="8" time="0.175509"/>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\CustomerListeningPrimaryProofTest" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningPrimaryProofTest.php" tests="18" assertions="72" errors="0" failures="0" skipped="0" time="3.496161">
+      <testsuite name="Tests\Feature\CustomerListeningPrimaryProofTest::test_genuine_last_account_query_callbacks_cannot_release_private_state_or_commit_a_change" tests="18" assertions="72" errors="0" failures="0" skipped="0" time="3.496161">
+        <testcase name="test_genuine_last_account_query_callbacks_cannot_release_private_state_or_commit_a_change with data set &quot;read account&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningPrimaryProofTest.php" line="32" class="Tests\Feature\CustomerListeningPrimaryProofTest" classname="Tests.Feature.CustomerListeningPrimaryProofTest" assertions="4" time="0.177897"/>
+        <testcase name="test_genuine_last_account_query_callbacks_cannot_release_private_state_or_commit_a_change with data set &quot;read password&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningPrimaryProofTest.php" line="32" class="Tests\Feature\CustomerListeningPrimaryProofTest" classname="Tests.Feature.CustomerListeningPrimaryProofTest" assertions="4" time="0.196454"/>
+        <testcase name="test_genuine_last_account_query_callbacks_cannot_release_private_state_or_commit_a_change with data set &quot;read policy&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningPrimaryProofTest.php" line="32" class="Tests\Feature\CustomerListeningPrimaryProofTest" classname="Tests.Feature.CustomerListeningPrimaryProofTest" assertions="4" time="0.207141"/>
+        <testcase name="test_genuine_last_account_query_callbacks_cannot_release_private_state_or_commit_a_change with data set &quot;read role&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningPrimaryProofTest.php" line="32" class="Tests\Feature\CustomerListeningPrimaryProofTest" classname="Tests.Feature.CustomerListeningPrimaryProofTest" assertions="4" time="0.170635"/>
+        <testcase name="test_genuine_last_account_query_callbacks_cannot_release_private_state_or_commit_a_change with data set &quot;read email&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningPrimaryProofTest.php" line="32" class="Tests\Feature\CustomerListeningPrimaryProofTest" classname="Tests.Feature.CustomerListeningPrimaryProofTest" assertions="4" time="0.183080"/>
+        <testcase name="test_genuine_last_account_query_callbacks_cannot_release_private_state_or_commit_a_change with data set &quot;read library&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningPrimaryProofTest.php" line="32" class="Tests\Feature\CustomerListeningPrimaryProofTest" classname="Tests.Feature.CustomerListeningPrimaryProofTest" assertions="4" time="0.211049"/>
+        <testcase name="test_genuine_last_account_query_callbacks_cannot_release_private_state_or_commit_a_change with data set &quot;create account&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningPrimaryProofTest.php" line="32" class="Tests\Feature\CustomerListeningPrimaryProofTest" classname="Tests.Feature.CustomerListeningPrimaryProofTest" assertions="4" time="0.205362"/>
+        <testcase name="test_genuine_last_account_query_callbacks_cannot_release_private_state_or_commit_a_change with data set &quot;create password&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningPrimaryProofTest.php" line="32" class="Tests\Feature\CustomerListeningPrimaryProofTest" classname="Tests.Feature.CustomerListeningPrimaryProofTest" assertions="4" time="0.178411"/>
+        <testcase name="test_genuine_last_account_query_callbacks_cannot_release_private_state_or_commit_a_change with data set &quot;create policy&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningPrimaryProofTest.php" line="32" class="Tests\Feature\CustomerListeningPrimaryProofTest" classname="Tests.Feature.CustomerListeningPrimaryProofTest" assertions="4" time="0.203141"/>
+        <testcase name="test_genuine_last_account_query_callbacks_cannot_release_private_state_or_commit_a_change with data set &quot;create role&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningPrimaryProofTest.php" line="32" class="Tests\Feature\CustomerListeningPrimaryProofTest" classname="Tests.Feature.CustomerListeningPrimaryProofTest" assertions="4" time="0.243234"/>
+        <testcase name="test_genuine_last_account_query_callbacks_cannot_release_private_state_or_commit_a_change with data set &quot;create email&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningPrimaryProofTest.php" line="32" class="Tests\Feature\CustomerListeningPrimaryProofTest" classname="Tests.Feature.CustomerListeningPrimaryProofTest" assertions="4" time="0.161431"/>
+        <testcase name="test_genuine_last_account_query_callbacks_cannot_release_private_state_or_commit_a_change with data set &quot;create library&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningPrimaryProofTest.php" line="32" class="Tests\Feature\CustomerListeningPrimaryProofTest" classname="Tests.Feature.CustomerListeningPrimaryProofTest" assertions="4" time="0.184504"/>
+        <testcase name="test_genuine_last_account_query_callbacks_cannot_release_private_state_or_commit_a_change with data set &quot;no-op account&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningPrimaryProofTest.php" line="32" class="Tests\Feature\CustomerListeningPrimaryProofTest" classname="Tests.Feature.CustomerListeningPrimaryProofTest" assertions="4" time="0.192706"/>
+        <testcase name="test_genuine_last_account_query_callbacks_cannot_release_private_state_or_commit_a_change with data set &quot;no-op password&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningPrimaryProofTest.php" line="32" class="Tests\Feature\CustomerListeningPrimaryProofTest" classname="Tests.Feature.CustomerListeningPrimaryProofTest" assertions="4" time="0.160313"/>
+        <testcase name="test_genuine_last_account_query_callbacks_cannot_release_private_state_or_commit_a_change with data set &quot;no-op policy&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningPrimaryProofTest.php" line="32" class="Tests\Feature\CustomerListeningPrimaryProofTest" classname="Tests.Feature.CustomerListeningPrimaryProofTest" assertions="4" time="0.161236"/>
+        <testcase name="test_genuine_last_account_query_callbacks_cannot_release_private_state_or_commit_a_change with data set &quot;no-op role&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningPrimaryProofTest.php" line="32" class="Tests\Feature\CustomerListeningPrimaryProofTest" classname="Tests.Feature.CustomerListeningPrimaryProofTest" assertions="4" time="0.217665"/>
+        <testcase name="test_genuine_last_account_query_callbacks_cannot_release_private_state_or_commit_a_change with data set &quot;no-op email&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningPrimaryProofTest.php" line="32" class="Tests\Feature\CustomerListeningPrimaryProofTest" classname="Tests.Feature.CustomerListeningPrimaryProofTest" assertions="4" time="0.229089"/>
+        <testcase name="test_genuine_last_account_query_callbacks_cannot_release_private_state_or_commit_a_change with data set &quot;no-op library&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningPrimaryProofTest.php" line="32" class="Tests\Feature\CustomerListeningPrimaryProofTest" classname="Tests.Feature.CustomerListeningPrimaryProofTest" assertions="4" time="0.212813"/>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\CustomerListeningFreshnessTest" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningFreshnessTest.php" tests="17" assertions="66" errors="0" failures="0" skipped="0" time="19.737909">
+      <testsuite name="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit" tests="14" assertions="56" errors="0" failures="0" skipped="0" time="17.414302">
+        <testcase name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit with data set &quot;read track&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningFreshnessTest.php" line="38" class="Tests\Feature\CustomerListeningFreshnessTest" classname="Tests.Feature.CustomerListeningFreshnessTest" assertions="4" time="1.491290"/>
+        <testcase name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit with data set &quot;read metadata&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningFreshnessTest.php" line="38" class="Tests\Feature\CustomerListeningFreshnessTest" classname="Tests.Feature.CustomerListeningFreshnessTest" assertions="4" time="1.398198"/>
+        <testcase name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit with data set &quot;read offer&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningFreshnessTest.php" line="38" class="Tests\Feature\CustomerListeningFreshnessTest" classname="Tests.Feature.CustomerListeningFreshnessTest" assertions="4" time="1.429150"/>
+        <testcase name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit with data set &quot;read file&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningFreshnessTest.php" line="38" class="Tests\Feature\CustomerListeningFreshnessTest" classname="Tests.Feature.CustomerListeningFreshnessTest" assertions="4" time="1.273526"/>
+        <testcase name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit with data set &quot;read configuration&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningFreshnessTest.php" line="38" class="Tests\Feature\CustomerListeningFreshnessTest" classname="Tests.Feature.CustomerListeningFreshnessTest" assertions="4" time="1.407221"/>
+        <testcase name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit with data set &quot;read rights&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningFreshnessTest.php" line="38" class="Tests\Feature\CustomerListeningFreshnessTest" classname="Tests.Feature.CustomerListeningFreshnessTest" assertions="4" time="1.176631"/>
+        <testcase name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit with data set &quot;read disk&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningFreshnessTest.php" line="38" class="Tests\Feature\CustomerListeningFreshnessTest" classname="Tests.Feature.CustomerListeningFreshnessTest" assertions="4" time="1.142028"/>
+        <testcase name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit with data set &quot;change track&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningFreshnessTest.php" line="38" class="Tests\Feature\CustomerListeningFreshnessTest" classname="Tests.Feature.CustomerListeningFreshnessTest" assertions="4" time="1.176396"/>
+        <testcase name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit with data set &quot;change metadata&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningFreshnessTest.php" line="38" class="Tests\Feature\CustomerListeningFreshnessTest" classname="Tests.Feature.CustomerListeningFreshnessTest" assertions="4" time="1.194231"/>
+        <testcase name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit with data set &quot;change offer&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningFreshnessTest.php" line="38" class="Tests\Feature\CustomerListeningFreshnessTest" classname="Tests.Feature.CustomerListeningFreshnessTest" assertions="4" time="1.120278"/>
+        <testcase name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit with data set &quot;change file&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningFreshnessTest.php" line="38" class="Tests\Feature\CustomerListeningFreshnessTest" classname="Tests.Feature.CustomerListeningFreshnessTest" assertions="4" time="1.126413"/>
+        <testcase name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit with data set &quot;change configuration&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningFreshnessTest.php" line="38" class="Tests\Feature\CustomerListeningFreshnessTest" classname="Tests.Feature.CustomerListeningFreshnessTest" assertions="4" time="1.159455"/>
+        <testcase name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit with data set &quot;change rights&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningFreshnessTest.php" line="38" class="Tests\Feature\CustomerListeningFreshnessTest" classname="Tests.Feature.CustomerListeningFreshnessTest" assertions="4" time="1.163090"/>
+        <testcase name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit with data set &quot;change disk&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningFreshnessTest.php" line="38" class="Tests\Feature\CustomerListeningFreshnessTest" classname="Tests.Feature.CustomerListeningFreshnessTest" assertions="4" time="1.156395"/>
+      </testsuite>
+      <testcase name="test_callback_during_catalog_query_cannot_release_a_stale_retained_library_revision" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningFreshnessTest.php" line="80" class="Tests\Feature\CustomerListeningFreshnessTest" classname="Tests.Feature.CustomerListeningFreshnessTest" assertions="3" time="1.089891"/>
+      <testcase name="test_saved_model_callback_cannot_rebind_expected_physical_evidence_to_another_valid_revision" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningFreshnessTest.php" line="109" class="Tests\Feature\CustomerListeningFreshnessTest" classname="Tests.Feature.CustomerListeningFreshnessTest" assertions="3" time="0.158658"/>
+      <testcase name="test_framework_reads_cannot_use_a_temporary_catalog_shadow_while_proof_reads_main" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningFreshnessTest.php" line="133" class="Tests\Feature\CustomerListeningFreshnessTest" classname="Tests.Feature.CustomerListeningFreshnessTest" assertions="4" time="1.075058"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\CustomerListeningNotesTest" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" tests="26" assertions="173" errors="0" failures="0" skipped="0" time="2.584038">
+      <testcase name="test_actual_lyric_notes_persist_encrypted_and_private_export_contains_exact_own_inputs_only" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="63" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="23" time="1.152515"/>
+      <testcase name="test_exact_v1_payload_reads_and_exports_without_rewrite_and_promotes_only_effective_mutation" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="95" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="11" time="0.025876"/>
+      <testcase name="test_notes_require_existing_owned_references_without_allowing_private_catalog_discovery" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="116" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="16" time="0.968567"/>
+      <testcase name="test_removing_last_retained_reference_prunes_notes_but_shared_reference_preserves_them" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="134" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="4" time="0.024486"/>
+      <testcase name="test_clear_actually_removes_feature_contents_retains_monotonic_revision_and_blocks_stale_resurrection" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="147" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="14" time="0.025641"/>
+      <testcase name="test_clear_empty_absent_library_also_advances_and_leaves_empty_owned_row" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="165" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="6" time="0.019604"/>
+      <testsuite name="Tests\Feature\CustomerListeningNotesTest::test_note_character_byte_utf8_and_control_bounds_are_strict" tests="13" assertions="39" errors="0" failures="0" skipped="0" time="0.223812">
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #0" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.017609"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #1" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.017136"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #2" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.017868"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #3" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.018525"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #4" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.020418"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #5" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.017261"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #6" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.016357"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #7" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.016076"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #8" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.015670"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #9" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.017795"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #10" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.017091"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #11" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.016036"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #12" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.015968"/>
+      </testsuite>
+      <testcase name="test_maximum_utf8_and_count_bounds_are_accepted_without_exceeding_owned_note_capacity" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="189" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="6" time="0.027502"/>
+      <testsuite name="Tests\Feature\CustomerListeningNotesTest::test_malformed_v1_v2_payloads_are_refused_without_replacing_private_contents" tests="6" assertions="54" errors="0" failures="0" skipped="0" time="0.116034">
+        <testcase name="test_malformed_v1_v2_payloads_are_refused_without_replacing_private_contents with data set #0" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="213" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="9" time="0.024022"/>
+        <testcase name="test_malformed_v1_v2_payloads_are_refused_without_replacing_private_contents with data set #1" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="213" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="9" time="0.020055"/>
+        <testcase name="test_malformed_v1_v2_payloads_are_refused_without_replacing_private_contents with data set #2" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="213" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="9" time="0.018381"/>
+        <testcase name="test_malformed_v1_v2_payloads_are_refused_without_replacing_private_contents with data set #3" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="213" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="9" time="0.017779"/>
+        <testcase name="test_malformed_v1_v2_payloads_are_refused_without_replacing_private_contents with data set #4" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="213" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="9" time="0.017788"/>
+        <testcase name="test_malformed_v1_v2_payloads_are_refused_without_replacing_private_contents with data set #5" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="213" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="9" time="0.018010"/>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\CustomerListeningNotesBoundaryTest" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesBoundaryTest.php" tests="11" assertions="42" errors="0" failures="0" skipped="0" time="1.780402">
+      <testsuite name="Tests\Feature\CustomerListeningNotesBoundaryTest::test_new_private_operations_refuse_real_terminal_callback_changes_and_retain_original_contents" tests="9" assertions="36" errors="0" failures="0" skipped="0" time="1.455194">
+        <testcase name="test_new_private_operations_refuse_real_terminal_callback_changes_and_retain_original_contents with data set &quot;note account withdrawal&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesBoundaryTest.php" line="30" class="Tests\Feature\CustomerListeningNotesBoundaryTest" classname="Tests.Feature.CustomerListeningNotesBoundaryTest" assertions="4" time="0.162578"/>
+        <testcase name="test_new_private_operations_refuse_real_terminal_callback_changes_and_retain_original_contents with data set &quot;note retained revision&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesBoundaryTest.php" line="30" class="Tests\Feature\CustomerListeningNotesBoundaryTest" classname="Tests.Feature.CustomerListeningNotesBoundaryTest" assertions="4" time="0.164574"/>
+        <testcase name="test_new_private_operations_refuse_real_terminal_callback_changes_and_retain_original_contents with data set &quot;note deletion withdrawal&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesBoundaryTest.php" line="30" class="Tests\Feature\CustomerListeningNotesBoundaryTest" classname="Tests.Feature.CustomerListeningNotesBoundaryTest" assertions="4" time="0.163224"/>
+        <testcase name="test_new_private_operations_refuse_real_terminal_callback_changes_and_retain_original_contents with data set &quot;clear account withdrawal&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesBoundaryTest.php" line="30" class="Tests\Feature\CustomerListeningNotesBoundaryTest" classname="Tests.Feature.CustomerListeningNotesBoundaryTest" assertions="4" time="0.162703"/>
+        <testcase name="test_new_private_operations_refuse_real_terminal_callback_changes_and_retain_original_contents with data set &quot;clear retained revision&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesBoundaryTest.php" line="30" class="Tests\Feature\CustomerListeningNotesBoundaryTest" classname="Tests.Feature.CustomerListeningNotesBoundaryTest" assertions="4" time="0.158777"/>
+        <testcase name="test_new_private_operations_refuse_real_terminal_callback_changes_and_retain_original_contents with data set &quot;export account withdrawal&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesBoundaryTest.php" line="30" class="Tests\Feature\CustomerListeningNotesBoundaryTest" classname="Tests.Feature.CustomerListeningNotesBoundaryTest" assertions="4" time="0.165801"/>
+        <testcase name="test_new_private_operations_refuse_real_terminal_callback_changes_and_retain_original_contents with data set &quot;export credential withdrawal&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesBoundaryTest.php" line="30" class="Tests\Feature\CustomerListeningNotesBoundaryTest" classname="Tests.Feature.CustomerListeningNotesBoundaryTest" assertions="4" time="0.156642"/>
+        <testcase name="test_new_private_operations_refuse_real_terminal_callback_changes_and_retain_original_contents with data set &quot;export policy withdrawal&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesBoundaryTest.php" line="30" class="Tests\Feature\CustomerListeningNotesBoundaryTest" classname="Tests.Feature.CustomerListeningNotesBoundaryTest" assertions="4" time="0.164940"/>
+        <testcase name="test_new_private_operations_refuse_real_terminal_callback_changes_and_retain_original_contents with data set &quot;export retained revision&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesBoundaryTest.php" line="30" class="Tests\Feature\CustomerListeningNotesBoundaryTest" classname="Tests.Feature.CustomerListeningNotesBoundaryTest" assertions="4" time="0.155956"/>
+      </testsuite>
+      <testcase name="test_saved_note_model_callback_cannot_bind_projection_to_a_different_valid_revision" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesBoundaryTest.php" line="75" class="Tests\Feature\CustomerListeningNotesBoundaryTest" classname="Tests.Feature.CustomerListeningNotesBoundaryTest" assertions="3" time="0.164924"/>
+      <testcase name="test_cross_account_actor_cannot_clear_another_owned_feature_aggregate" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesBoundaryTest.php" line="102" class="Tests\Feature\CustomerListeningNotesBoundaryTest" classname="Tests.Feature.CustomerListeningNotesBoundaryTest" assertions="3" time="0.160284"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\CustomerAccountAccessTest" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerAccountAccessTest.php" tests="6" assertions="21" errors="0" failures="0" skipped="0" time="1.028761">
+      <testcase name="test_provisioning_is_explicit_idempotent_and_never_revives_withdrawn_access" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerAccountAccessTest.php" line="19" class="Tests\Feature\CustomerAccountAccessTest" classname="Tests.Feature.CustomerAccountAccessTest" assertions="5" time="0.176742"/>
+      <testcase name="test_account_owner_and_actor_cannot_be_swapped_or_omitted_at_transaction_fence" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerAccountAccessTest.php" line="31" class="Tests\Feature\CustomerAccountAccessTest" classname="Tests.Feature.CustomerAccountAccessTest" assertions="5" time="0.166385"/>
+      <testcase name="test_password_change_and_verification_or_staff_changes_invalidate_retained_principal" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerAccountAccessTest.php" line="50" class="Tests\Feature\CustomerAccountAccessTest" classname="Tests.Feature.CustomerAccountAccessTest" assertions="3" time="0.179239"/>
+      <testcase name="test_feature_withdrawal_and_production_environment_refuse_accounts_without_deleting_them" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerAccountAccessTest.php" line="64" class="Tests\Feature\CustomerAccountAccessTest" classname="Tests.Feature.CustomerAccountAccessTest" assertions="2" time="0.161429"/>
+      <testcase name="test_internal_principal_cannot_leak_owner_or_credential_through_debug_or_serialization" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerAccountAccessTest.php" line="86" class="Tests\Feature\CustomerAccountAccessTest" classname="Tests.Feature.CustomerAccountAccessTest" assertions="4" time="0.176993"/>
+      <testcase name="test_staff_and_unverified_users_cannot_be_provisioned" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerAccountAccessTest.php" line="104" class="Tests\Feature\CustomerAccountAccessTest" classname="Tests.Feature.CustomerAccountAccessTest" assertions="2" time="0.167973"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\PublicCatalogRelatedLinksTest" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" tests="32" assertions="40" errors="14" failures="0" skipped="0" time="4.971405">
+      <testcase name="test_links_preserve_selected_order_current_text_and_only_public_fields_without_changing_selections" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="47" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="0" time="0.182706">
+        <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\PublicCatalogRelatedLinksTest::test_links_preserve_selected_order_current_text_and_only_public_fields_without_changing_selections
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-customer-listening-notes/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php:49</error>
+      </testcase>
+      <testcase name="test_empty_and_unknown_native_id_lists_have_no_projection" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="78" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="5" time="0.174993"/>
+      <testsuite name="Tests\Feature\PublicCatalogRelatedLinksTest::test_related_id_validation_rejects_malformed_input_before_queries" tests="16" assertions="32" errors="0" failures="0" skipped="0" time="2.438427">
+        <testcase name="test_related_id_validation_rejects_malformed_input_before_queries with data set &quot;more than six&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="114" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="2" time="0.183426"/>
+        <testcase name="test_related_id_validation_rejects_malformed_input_before_queries with data set &quot;duplicate&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="114" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="2" time="0.146627"/>
+        <testcase name="test_related_id_validation_rejects_malformed_input_before_queries with data set &quot;associative&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="114" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="2" time="0.149635"/>
+        <testcase name="test_related_id_validation_rejects_malformed_input_before_queries with data set &quot;nonzero index&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="114" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="2" time="0.145398"/>
+        <testcase name="test_related_id_validation_rejects_malformed_input_before_queries with data set &quot;zero&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="114" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="2" time="0.150135"/>
+        <testcase name="test_related_id_validation_rejects_malformed_input_before_queries with data set &quot;negative&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="114" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="2" time="0.149925"/>
+        <testcase name="test_related_id_validation_rejects_malformed_input_before_queries with data set &quot;numeric string&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="114" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="2" time="0.159856"/>
+        <testcase name="test_related_id_validation_rejects_malformed_input_before_queries with data set &quot;leading-zero string&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="114" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="2" time="0.160197"/>
+        <testcase name="test_related_id_validation_rejects_malformed_input_before_queries with data set &quot;exponent string&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="114" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="2" time="0.152668"/>
+        <testcase name="test_related_id_validation_rejects_malformed_input_before_queries with data set &quot;integral float&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="114" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="2" time="0.150854"/>
+        <testcase name="test_related_id_validation_rejects_malformed_input_before_queries with data set &quot;fraction&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="114" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="2" time="0.147657"/>
+        <testcase name="test_related_id_validation_rejects_malformed_input_before_queries with data set &quot;true&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="114" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="2" time="0.151797"/>
+        <testcase name="test_related_id_validation_rejects_malformed_input_before_queries with data set &quot;false&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="114" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="2" time="0.145930"/>
+        <testcase name="test_related_id_validation_rejects_malformed_input_before_queries with data set &quot;null&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="114" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="2" time="0.148715"/>
+        <testcase name="test_related_id_validation_rejects_malformed_input_before_queries with data set &quot;nested&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="114" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="2" time="0.146165"/>
+        <testcase name="test_related_id_validation_rejects_malformed_input_before_queries with data set &quot;mixed types&quot;" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="114" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="2" time="0.149441"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\PublicCatalogRelatedLinksTest::test_fresh_links_and_choices_omit_only_currently_ineligible_tracks" tests="7" assertions="0" errors="7" failures="0" skipped="0" time="1.052077">
+        <testcase name="test_fresh_links_and_choices_omit_only_currently_ineligible_tracks with data set #0" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="134" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="0" time="0.147817">
+          <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\PublicCatalogRelatedLinksTest::test_fresh_links_and_choices_omit_only_currently_ineligible_tracks with data set #0
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-customer-listening-notes/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php:136</error>
+        </testcase>
+        <testcase name="test_fresh_links_and_choices_omit_only_currently_ineligible_tracks with data set #1" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="134" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="0" time="0.151812">
+          <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\PublicCatalogRelatedLinksTest::test_fresh_links_and_choices_omit_only_currently_ineligible_tracks with data set #1
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-customer-listening-notes/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php:136</error>
+        </testcase>
+        <testcase name="test_fresh_links_and_choices_omit_only_currently_ineligible_tracks with data set #2" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="134" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="0" time="0.148261">
+          <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\PublicCatalogRelatedLinksTest::test_fresh_links_and_choices_omit_only_currently_ineligible_tracks with data set #2
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-customer-listening-notes/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php:136</error>
+        </testcase>
+        <testcase name="test_fresh_links_and_choices_omit_only_currently_ineligible_tracks with data set #3" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="134" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="0" time="0.152664">
+          <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\PublicCatalogRelatedLinksTest::test_fresh_links_and_choices_omit_only_currently_ineligible_tracks with data set #3
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-customer-listening-notes/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php:136</error>
+        </testcase>
+        <testcase name="test_fresh_links_and_choices_omit_only_currently_ineligible_tracks with data set #4" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="134" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="0" time="0.150834">
+          <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\PublicCatalogRelatedLinksTest::test_fresh_links_and_choices_omit_only_currently_ineligible_tracks with data set #4
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-customer-listening-notes/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php:136</error>
+        </testcase>
+        <testcase name="test_fresh_links_and_choices_omit_only_currently_ineligible_tracks with data set #5" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="134" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="0" time="0.150829">
+          <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\PublicCatalogRelatedLinksTest::test_fresh_links_and_choices_omit_only_currently_ineligible_tracks with data set #5
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-customer-listening-notes/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php:136</error>
+        </testcase>
+        <testcase name="test_fresh_links_and_choices_omit_only_currently_ineligible_tracks with data set #6" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="134" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="0" time="0.149859">
+          <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\PublicCatalogRelatedLinksTest::test_fresh_links_and_choices_omit_only_currently_ineligible_tracks with data set #6
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-customer-listening-notes/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php:136</error>
+        </testcase>
+      </testsuite>
+      <testcase name="test_choices_search_only_current_title_and_artist_with_literal_wildcards_and_stable_order" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="177" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="0" time="0.154888">
+        <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\PublicCatalogRelatedLinksTest::test_choices_search_only_current_title_and_artist_with_literal_wildcards_and_stable_order
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-customer-listening-notes/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php:179</error>
+      </testcase>
+      <testcase name="test_choice_search_is_bounded_in_characters_before_hydrating_candidates" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="200" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="3" time="0.149918"/>
+      <testcase name="test_choices_hydrate_at_most_the_fixed_scan_limit_without_offset_or_unbounded_fallback" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="216" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="0" time="0.154248">
+        <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\PublicCatalogRelatedLinksTest::test_choices_hydrate_at_most_the_fixed_scan_limit_without_offset_or_unbounded_fallback
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-customer-listening-notes/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php:218</error>
+      </testcase>
+      <testsuite name="Tests\Feature\PublicCatalogRelatedLinksTest::test_inventory_unavailability_omits_a_track_even_while_publication_readiness_is_intact" tests="3" assertions="0" errors="3" failures="0" skipped="0" time="0.498582">
+        <testcase name="test_inventory_unavailability_omits_a_track_even_while_publication_readiness_is_intact with data set #0" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="243" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="0" time="0.181653">
+          <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\PublicCatalogRelatedLinksTest::test_inventory_unavailability_omits_a_track_even_while_publication_readiness_is_intact with data set #0
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-customer-listening-notes/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-customer-listening-notes/tests/Support/ExclusiveOfferFixtures.php:19
+/workspace/VA-Studio-customer-listening-notes/tests/Support/ExclusiveSelectionFixtures.php:29
+/workspace/VA-Studio-customer-listening-notes/tests/Support/ExclusiveSelectionFixtures.php:40
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php:247</error>
+        </testcase>
+        <testcase name="test_inventory_unavailability_omits_a_track_even_while_publication_readiness_is_intact with data set #1" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="243" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="0" time="0.161299">
+          <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\PublicCatalogRelatedLinksTest::test_inventory_unavailability_omits_a_track_even_while_publication_readiness_is_intact with data set #1
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-customer-listening-notes/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-customer-listening-notes/tests/Support/ExclusiveOfferFixtures.php:19
+/workspace/VA-Studio-customer-listening-notes/tests/Support/ExclusiveSelectionFixtures.php:29
+/workspace/VA-Studio-customer-listening-notes/tests/Support/ExclusiveSelectionFixtures.php:40
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php:247</error>
+        </testcase>
+        <testcase name="test_inventory_unavailability_omits_a_track_even_while_publication_readiness_is_intact with data set #2" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="243" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="0" time="0.155630">
+          <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\PublicCatalogRelatedLinksTest::test_inventory_unavailability_omits_a_track_even_while_publication_readiness_is_intact with data set #2
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-customer-listening-notes/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-customer-listening-notes/tests/Support/ExclusiveOfferFixtures.php:19
+/workspace/VA-Studio-customer-listening-notes/tests/Support/ExclusiveSelectionFixtures.php:29
+/workspace/VA-Studio-customer-listening-notes/tests/Support/ExclusiveSelectionFixtures.php:40
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php:247</error>
+        </testcase>
+      </testsuite>
+      <testcase name="test_a_genuinely_finalized_exclusive_sale_omits_the_ready_legacy_track_without_rewriting_evidence" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php" line="275" class="Tests\Feature\PublicCatalogRelatedLinksTest" classname="Tests.Feature.PublicCatalogRelatedLinksTest" assertions="0" time="0.165565">
+        <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\PublicCatalogRelatedLinksTest::test_a_genuinely_finalized_exclusive_sale_omits_the_ready_legacy_track_without_rewriting_evidence
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-customer-listening-notes/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-customer-listening-notes/tests/Support/ExclusiveOfferFixtures.php:19
+/workspace/VA-Studio-customer-listening-notes/tests/Support/ExclusiveSelectionFixtures.php:29
+/workspace/VA-Studio-customer-listening-notes/tests/Support/ExclusiveSelectionFixtures.php:40
+/workspace/VA-Studio-customer-listening-notes/tests/Support/OrderFixtures.php:42
+/workspace/VA-Studio-customer-listening-notes/tests/Support/CheckoutFixtures.php:39
+/workspace/VA-Studio-customer-listening-notes/tests/Support/PaymentFixtures.php:27
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/PublicCatalogRelatedLinksTest.php:284</error>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>
