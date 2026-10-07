@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\DiscoverySitemapWorkerTest" file="/workspace/VA-Studio-discovery-sitemap/tests/Feature/DiscoverySitemapWorkerTest.php" tests="3" assertions="9" errors="0" failures="3" skipped="0" time="4.371113">
+    <testcase name="test_actual_final_transaction_committed_epoch_withdrawal_refuses_prebuilt_xml" file="/workspace/VA-Studio-discovery-sitemap/tests/Feature/DiscoverySitemapWorkerTest.php" line="204" class="Tests\Feature\DiscoverySitemapWorkerTest" classname="Tests.Feature.DiscoverySitemapWorkerTest" assertions="3" time="1.810424">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\DiscoverySitemapWorkerTest::test_actual_final_transaction_committed_epoch_withdrawal_refuses_prebuilt_xml
+Changed/partial authority escaped.
+
+/workspace/VA-Studio-discovery-sitemap/tests/Feature/DiscoverySitemapWorkerTest.php:68
+/workspace/VA-Studio-discovery-sitemap/tests/Feature/DiscoverySitemapWorkerTest.php:215</failure>
+    </testcase>
+    <testcase name="test_actual_final_transaction_committed_configuration_withdrawal_refuses_prebuilt_xml" file="/workspace/VA-Studio-discovery-sitemap/tests/Feature/DiscoverySitemapWorkerTest.php" line="220" class="Tests\Feature\DiscoverySitemapWorkerTest" classname="Tests.Feature.DiscoverySitemapWorkerTest" assertions="3" time="1.252497">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\DiscoverySitemapWorkerTest::test_actual_final_transaction_committed_configuration_withdrawal_refuses_prebuilt_xml
+Changed/partial authority escaped.
+
+/workspace/VA-Studio-discovery-sitemap/tests/Feature/DiscoverySitemapWorkerTest.php:68
+/workspace/VA-Studio-discovery-sitemap/tests/Feature/DiscoverySitemapWorkerTest.php:231</failure>
+    </testcase>
+    <testcase name="test_actual_final_transaction_committed_pointer_replacement_refuses_prebuilt_xml" file="/workspace/VA-Studio-discovery-sitemap/tests/Feature/DiscoverySitemapWorkerTest.php" line="235" class="Tests\Feature\DiscoverySitemapWorkerTest" classname="Tests.Feature.DiscoverySitemapWorkerTest" assertions="3" time="1.308192">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\DiscoverySitemapWorkerTest::test_actual_final_transaction_committed_pointer_replacement_refuses_prebuilt_xml
+Changed/partial authority escaped.
+
+/workspace/VA-Studio-discovery-sitemap/tests/Feature/DiscoverySitemapWorkerTest.php:68
+/workspace/VA-Studio-discovery-sitemap/tests/Feature/DiscoverySitemapWorkerTest.php:248</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\CurrentEligibleTrackSnapshotTest" file="/workspace/VA-Studio-discovery-sitemap/tests/Feature/CurrentEligibleTrackSnapshotTest.php" tests="1" assertions="9" errors="0" failures="0" skipped="0" time="0.700953">
+    <testcase name="test_empty_and_49_candidate_pages_are_bounded_private_and_complete_by_continuation" file="/workspace/VA-Studio-discovery-sitemap/tests/Feature/CurrentEligibleTrackSnapshotTest.php" line="37" class="Tests\Feature\CurrentEligibleTrackSnapshotTest" classname="Tests.Feature.CurrentEligibleTrackSnapshotTest" assertions="9" time="0.700953"/>
+  </testsuite>
+</testsuites>

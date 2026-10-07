@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\DiscoverySitemapWorkerTest" file="/workspace/VA-Studio-discovery-sitemap/tests/Feature/DiscoverySitemapWorkerTest.php" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="0.462297">
+    <testcase name="test_real_private_command_keeps_capability_private_and_performs_one_bounded_operation" file="/workspace/VA-Studio-discovery-sitemap/tests/Feature/DiscoverySitemapWorkerTest.php" line="373" class="Tests\Feature\DiscoverySitemapWorkerTest" classname="Tests.Feature.DiscoverySitemapWorkerTest" assertions="0" time="0.462297">
+      <error type="Error">Tests\Feature\DiscoverySitemapWorkerTest::test_real_private_command_keeps_capability_private_and_performs_one_bounded_operation
+Error: Class "Tests\Feature\Artisan" not found
+
+/workspace/VA-Studio-discovery-sitemap/tests/Feature/DiscoverySitemapWorkerTest.php:377</error>
+    </testcase>
+  </testsuite>
+</testsuites>
