@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/native-successor-selection.xml" tests="5" assertions="82" errors="0" failures="0" skipped="0" time="74.052582">
+    <testsuite name="Independent native epoch recovery boundaries" tests="5" assertions="82" errors="0" failures="0" skipped="0" time="74.052582">
+      <testsuite name="Tests\Feature\DiscoveryEpochRecoveryTest" file="/workspace/VA-Studio-pr25-recovery-review/tests/Feature/DiscoveryEpochRecoveryTest.php" tests="4" assertions="78" errors="0" failures="0" skipped="0" time="62.044877">
+        <testcase name="test_failed_trigger_creation_retries_through_real_migrator_without_erasing_prior_data" file="/workspace/VA-Studio-pr25-recovery-review/tests/Feature/DiscoveryEpochRecoveryTest.php" line="25" class="Tests\Feature\DiscoveryEpochRecoveryTest" classname="Tests.Feature.DiscoveryEpochRecoveryTest" assertions="6" time="16.763359"/>
+        <testcase name="test_real_migrator_resumes_before_repository_log_and_uncertain_completed_log_is_not_duplicated" file="/workspace/VA-Studio-pr25-recovery-review/tests/Feature/DiscoveryEpochRecoveryTest.php" line="180" class="Tests\Feature\DiscoveryEpochRecoveryTest" classname="Tests.Feature.DiscoveryEpochRecoveryTest" assertions="30" time="16.688200"/>
+        <testsuite name="Tests\Feature\DiscoveryEpochRecoveryTest::test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="14.008519">
+          <testcase name="test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set &quot;missing seed&quot;" file="/workspace/VA-Studio-pr25-recovery-review/tests/Feature/DiscoveryEpochRecoveryTest.php" line="234" class="Tests\Feature\DiscoveryEpochRecoveryTest" classname="Tests.Feature.DiscoveryEpochRecoveryTest" assertions="4" time="14.008519"/>
+        </testsuite>
+        <testcase name="test_reserved_objects_cannot_hide_across_table_index_view_and_trigger_namespaces" file="/workspace/VA-Studio-pr25-recovery-review/tests/Feature/DiscoveryEpochRecoveryTest.php" line="320" class="Tests\Feature\DiscoveryEpochRecoveryTest" classname="Tests.Feature.DiscoveryEpochRecoveryTest" assertions="38" time="14.584798"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\NativeReservedAliasCanaryTest" file="/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/NativeReservedAliasCanaryTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="12.007705">
+        <testcase name="test_native_dictionary_alias_refuses_before_creating_epoch_table_or_seed" file="/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/NativeReservedAliasCanaryTest.php" line="15" class="Tests\Feature\NativeReservedAliasCanaryTest" classname="Tests.Feature.NativeReservedAliasCanaryTest" assertions="4" time="12.007705"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

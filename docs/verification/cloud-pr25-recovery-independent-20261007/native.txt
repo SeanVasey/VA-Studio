@@ -1,0 +1,19 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/native-selection.xml
+
+...........[31;1mE[0m..                                                    14 / 14 (100%)
+
+Time: 04:37.395, Memory: 79.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\DiscoveryRecoveryIndependentCanaryTest::test_native_extra_metadata_drift_refuses_before_any_ddl_and_preserves_permanent_rows@foreign check identity with data ('foreign check identity')
+PDOException: SQLSTATE[HY000]: General error: 3818 Check constraint 'CDE_ID_CHECK' cannot refer to an auto-increment column.
+
+/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/DiscoveryRecoveryIndependentCanaryTest.php:51
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 14[0m[37;41m, Assertions: 3923[0m[37;41m, Errors: 1[0m[37;41m.[0m

@@ -1,0 +1,7 @@
+{
+  "packages": 158,
+  "version_source_dist_mismatch": [],
+  "lock_sha256": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9",
+  "own_autoload": "/workspace/VA-Studio-pr25-recovery-review/vendor/autoload.php",
+  "borrowed_read_only_package_root": "/workspace/VA-Studio/vendor"
+}

@@ -1,0 +1,41 @@
+{
+  "native_boundary_tested_source": "6a5da20d9cd2ab078d79b05288d583436cc731a0",
+  "successor": "ed285b6a2b34bc1a2a2c91c42b64d68f317965af",
+  "method_text_comparison": {
+    "up": {
+      "before_sha256": "2f88adff06c9fa3144db42a732bfc4aff21aefea0b9ff4e411ee0e68acf9037e",
+      "after_sha256": "2f88adff06c9fa3144db42a732bfc4aff21aefea0b9ff4e411ee0e68acf9037e",
+      "unchanged": true
+    },
+    "sqlitePreflight": {
+      "before_sha256": "a4201fcb1fffcee6de512399b042d4139db8ddba5d0d5bc7c6aade7b051630ff",
+      "after_sha256": "64f181ec0fa6fd40b7a175b84995500a4788bc646dc927d0be9fe09761698421",
+      "unchanged": false
+    },
+    "mysqlPreflight": {
+      "before_sha256": "a909f77a20127023a99e390b96527db331bc00a1f2e00a77fbbcbd9434ab86f7",
+      "after_sha256": "cd98a4994a9ee2bcfb5545299bf2708e4669700ae31d5747ff2e5890b695bb23",
+      "unchanged": false
+    },
+    "refuseMysqlShadow": {
+      "before_sha256": "e8b2bc49fec5bd52dcc8402beb742a9da54ad98e87a78832280f8597f27a5cb3",
+      "after_sha256": "e8b2bc49fec5bd52dcc8402beb742a9da54ad98e87a78832280f8597f27a5cb3",
+      "unchanged": true
+    },
+    "mysqlTablePreflight": {
+      "before_sha256": "e926416660ccf89e68c04920e76b4c196abad4cffb318ff355a23faccd6b2432",
+      "after_sha256": "e926416660ccf89e68c04920e76b4c196abad4cffb318ff355a23faccd6b2432",
+      "unchanged": true
+    },
+    "down": {
+      "before_sha256": "00c2909c69a35d0bffb224d2151d97f38c604954dc720ae60c059c9366c88473",
+      "after_sha256": "00c2909c69a35d0bffb224d2151d97f38c604954dc720ae60c059c9366c88473",
+      "unchanged": true
+    }
+  },
+  "new_methods": [
+    "refuseMysqlTriggerAliases"
+  ],
+  "new_method_purpose": "Prepared reserved trigger-name alias lookup before any DDL; no mutation",
+  "original_discovery_epoch_guard_source_unchanged": true
+}

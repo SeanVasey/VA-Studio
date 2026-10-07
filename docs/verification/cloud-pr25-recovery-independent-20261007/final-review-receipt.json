@@ -1,0 +1,1099 @@
+{
+  "decision": "approved for focused development composition; no remaining source blockers",
+  "reviewed_executable": "ed285b6a2b34bc1a2a2c91c42b64d68f317965af",
+  "executable_tree": "0d22cdda957ab72b4430c7029c2f2b8a1fd990c8",
+  "author_evidence_head": "f304a32b894b3fba651435f89909e3d4d44b67fd",
+  "author_evidence_tree": "ba3c240cfb1ce3e18482910753c5d67c6c36354f",
+  "composed_candidate": "626f7d6688c5d528dc12baec3fbd4afe647f63e7",
+  "composed_tree": "cf0e6724f98b247a91831053cc9c2355b1b5eee4",
+  "published_pr25_base": "f713ce641cb043c9171c4a3b35c2e666d2bf146e",
+  "source": {
+    "database/migrations/2026_10_07_240000_catalog_discovery_epoch.php": {
+      "git_blob": "8429ab5aef283bddfa4d5a6071724f9983a8aad3",
+      "sha256": "93d8155e864ad96917f5a0d60804102cd4c40ecba961f50542d74afd5b9a80ce",
+      "composition_blob": "8429ab5aef283bddfa4d5a6071724f9983a8aad3",
+      "composition_sha256": "93d8155e864ad96917f5a0d60804102cd4c40ecba961f50542d74afd5b9a80ce",
+      "exact_source_match": true
+    },
+    "tests/Feature/DiscoveryEpochMigrationTest.php": {
+      "git_blob": "5ca094d427faa8d23ab3861370544c677fd156a8",
+      "sha256": "5756e7b7f9e3316c1aabf60034050fbf5de9e2717d7da274b8a00e59c70c2d40",
+      "composition_blob": "5ca094d427faa8d23ab3861370544c677fd156a8",
+      "composition_sha256": "5756e7b7f9e3316c1aabf60034050fbf5de9e2717d7da274b8a00e59c70c2d40",
+      "exact_source_match": true
+    },
+    "tests/Feature/DiscoveryEpochRecoveryTest.php": {
+      "git_blob": "5e69d9eb7f3f57b7e979350737867b7e4a1ce5fd",
+      "sha256": "38a2f77c55a1763105323ac7f047c5f63b1599e26c560ccd715a7d069b2201e1",
+      "composition_blob": "5e69d9eb7f3f57b7e979350737867b7e4a1ce5fd",
+      "composition_sha256": "38a2f77c55a1763105323ac7f047c5f63b1599e26c560ccd715a7d069b2201e1",
+      "exact_source_match": true
+    }
+  },
+  "author_evidence_validation": {
+    "artifacts": 39,
+    "sha256_manifest": "b0b37710bd2d7fde7f00d70121ba021f88092e3cf269907557fe94d9266e64bc",
+    "mismatches": [],
+    "post_executable_paths": [
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/NativeReservedAliasCanaryTest.php",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/README.md",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/SQLiteReservedIdentityCanaryTest.php",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/artifact-sha256.json",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/baseline-native-harness.php.txt",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/final-receipt.json",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/independent-namespace-red.txt",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/independent-namespace-red.xml",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/independent-native-accent-identity-probe.json",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/independent-native-alias-red.txt",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/independent-native-alias-red.xml",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/mysql-package-provenance.json",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/native-method-carry.json",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-baseline-mysql.txt",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-baseline-mysql.xml",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-baseline-sqlite.txt",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-baseline-sqlite.xml",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-final-corrected-mysql.txt",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-final-corrected-mysql.xml",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-final-corrected-pint.txt",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-final-corrected-sqlite.txt",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-final-corrected-sqlite.xml",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-final-mysql.txt",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-final-mysql.xml",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-final-pint.txt",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-final-sqlite.txt",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-final-sqlite.xml",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-namespace-fixed-mysql.txt",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-namespace-fixed-mysql.xml",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-namespace-fixed-sqlite.txt",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-namespace-fixed-sqlite.xml",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-namespace-own-red.txt",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-namespace-own-red.xml",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-native-alias-own-red.txt",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-native-alias-own-red.xml",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-native-check-alias-probe.json",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-repaired-mysql.txt",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-repaired-mysql.xml",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-runtime-graph.json",
+      "docs/verification/discovery-epoch-ddl-recovery-new-20261007/pr25-runtime-mysql.json"
+    ],
+    "junit": {
+      "pr25-final-corrected-sqlite.xml": {
+        "tests": 28,
+        "assertions": 4008,
+        "errors": 0,
+        "failures": 0,
+        "skips": 0,
+        "by_class": {
+          "Tests\\Feature\\DiscoveryEpochMigrationTest": {
+            "tests": 9,
+            "assertions": 40,
+            "errors": 0,
+            "failures": 0,
+            "skips": 0
+          },
+          "Tests\\Feature\\DiscoveryEpochRecoveryTest": {
+            "tests": 18,
+            "assertions": 3965,
+            "errors": 0,
+            "failures": 0,
+            "skips": 0
+          },
+          "Tests\\Feature\\SQLiteReservedIdentityCanaryTest": {
+            "tests": 1,
+            "assertions": 3,
+            "errors": 0,
+            "failures": 0,
+            "skips": 0
+          }
+        },
+        "cases": [
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+            "name": "test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set \"empty\"",
+            "assertions": 10
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+            "name": "test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set \"populated\"",
+            "assertions": 10
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+            "name": "test_down_refuses_before_any_database_read_or_write",
+            "assertions": 1
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+            "name": "test_actual_insert_update_delete_upsert_replace_aba_and_rollback_invalidate_atomically",
+            "assertions": 9
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+            "name": "test_missing_changed_guard_and_modified_table_fail_closed",
+            "assertions": 3
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+            "name": "test_overflow_refuses_parent_write_and_preserves_epoch_and_data",
+            "assertions": 3
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+            "name": "test_exact_installed_migration_is_idempotent_and_preserves_retained_data",
+            "assertions": 1
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+            "name": "test_foreign_guard_on_absent_installation_is_not_adopted_or_replaced",
+            "assertions": 2
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+            "name": "test_connection_local_dependency_shadow_refuses_capture",
+            "assertions": 1
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_failed_trigger_creation_retries_through_real_migrator_without_erasing_prior_data",
+            "assertions": 6
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_every_creation_statement_failure_resumes_only_missing_parts_and_preserves_surviving_guards",
+            "assertions": 3812
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_final_assertion_failure_resumes_without_replacing_any_object_or_seed",
+            "assertions": 28
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_real_final_assertion_drift_preserves_unlogged_objects_and_retry_refuses_before_ddl",
+            "assertions": 7
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_real_migrator_resumes_before_repository_log_and_uncertain_completed_log_is_not_duplicated",
+            "assertions": 30
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"column\"",
+            "assertions": 4
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"extra index\"",
+            "assertions": 4
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"changed guard\"",
+            "assertions": 4
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"foreign guard\"",
+            "assertions": 4
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"case guard\"",
+            "assertions": 4
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"extra epoch guard\"",
+            "assertions": 4
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"guard gap\"",
+            "assertions": 4
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"missing seed\"",
+            "assertions": 4
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"advanced partial epoch\"",
+            "assertions": 4
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"temporary epoch\"",
+            "assertions": 5
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"temporary dependency\"",
+            "assertions": 5
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"case table\"",
+            "assertions": 4
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_reserved_objects_cannot_hide_across_table_index_view_and_trigger_namespaces",
+            "assertions": 32
+          },
+          {
+            "class": "Tests\\Feature\\SQLiteReservedIdentityCanaryTest",
+            "name": "test_foreign_table_in_guard_namespace_cannot_hide_behind_exact_later_trigger",
+            "assertions": 3
+          }
+        ]
+      },
+      "pr25-final-corrected-mysql.xml": {
+        "tests": 8,
+        "assertions": 118,
+        "errors": 0,
+        "failures": 0,
+        "skips": 0,
+        "by_class": {
+          "Tests\\Feature\\DiscoveryEpochMigrationTest": {
+            "tests": 1,
+            "assertions": 1,
+            "errors": 0,
+            "failures": 0,
+            "skips": 0
+          },
+          "Tests\\Feature\\DiscoveryEpochRecoveryTest": {
+            "tests": 6,
+            "assertions": 113,
+            "errors": 0,
+            "failures": 0,
+            "skips": 0
+          },
+          "Tests\\Feature\\NativeReservedAliasCanaryTest": {
+            "tests": 1,
+            "assertions": 4,
+            "errors": 0,
+            "failures": 0,
+            "skips": 0
+          }
+        },
+        "cases": [
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+            "name": "test_exact_installed_migration_is_idempotent_and_preserves_retained_data",
+            "assertions": 1
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_failed_trigger_creation_retries_through_real_migrator_without_erasing_prior_data",
+            "assertions": 6
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_final_assertion_failure_resumes_without_replacing_any_object_or_seed",
+            "assertions": 28
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_real_final_assertion_drift_preserves_unlogged_objects_and_retry_refuses_before_ddl",
+            "assertions": 7
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_real_migrator_resumes_before_repository_log_and_uncertain_completed_log_is_not_duplicated",
+            "assertions": 30
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"missing seed\"",
+            "assertions": 4
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_reserved_objects_cannot_hide_across_table_index_view_and_trigger_namespaces",
+            "assertions": 38
+          },
+          {
+            "class": "Tests\\Feature\\NativeReservedAliasCanaryTest",
+            "name": "test_native_dictionary_alias_refuses_before_creating_epoch_table_or_seed",
+            "assertions": 4
+          }
+        ]
+      },
+      "pr25-final-mysql.xml": {
+        "tests": 26,
+        "assertions": 3973,
+        "errors": 0,
+        "failures": 0,
+        "skips": 0,
+        "by_class": {
+          "Tests\\Feature\\DiscoveryEpochMigrationTest": {
+            "tests": 9,
+            "assertions": 40,
+            "errors": 0,
+            "failures": 0,
+            "skips": 0
+          },
+          "Tests\\Feature\\DiscoveryEpochRecoveryTest": {
+            "tests": 17,
+            "assertions": 3933,
+            "errors": 0,
+            "failures": 0,
+            "skips": 0
+          }
+        },
+        "cases": [
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+            "name": "test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set \"empty\"",
+            "assertions": 10
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+            "name": "test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set \"populated\"",
+            "assertions": 10
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+            "name": "test_down_refuses_before_any_database_read_or_write",
+            "assertions": 1
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+            "name": "test_actual_insert_update_delete_upsert_replace_aba_and_rollback_invalidate_atomically",
+            "assertions": 9
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+            "name": "test_missing_changed_guard_and_modified_table_fail_closed",
+            "assertions": 3
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+            "name": "test_overflow_refuses_parent_write_and_preserves_epoch_and_data",
+            "assertions": 3
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+            "name": "test_exact_installed_migration_is_idempotent_and_preserves_retained_data",
+            "assertions": 1
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+            "name": "test_foreign_guard_on_absent_installation_is_not_adopted_or_replaced",
+            "assertions": 2
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+            "name": "test_connection_local_dependency_shadow_refuses_capture",
+            "assertions": 1
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_failed_trigger_creation_retries_through_real_migrator_without_erasing_prior_data",
+            "assertions": 6
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_every_creation_statement_failure_resumes_only_missing_parts_and_preserves_surviving_guards",
+            "assertions": 3812
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_final_assertion_failure_resumes_without_replacing_any_object_or_seed",
+            "assertions": 28
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_real_final_assertion_drift_preserves_unlogged_objects_and_retry_refuses_before_ddl",
+            "assertions": 7
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_real_migrator_resumes_before_repository_log_and_uncertain_completed_log_is_not_duplicated",
+            "assertions": 30
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"column\"",
+            "assertions": 4
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"extra index\"",
+            "assertions": 4
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"changed guard\"",
+            "assertions": 4
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"foreign guard\"",
+            "assertions": 4
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"case guard\"",
+            "assertions": 4
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"extra epoch guard\"",
+            "assertions": 4
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"guard gap\"",
+            "assertions": 4
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"missing seed\"",
+            "assertions": 4
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"advanced partial epoch\"",
+            "assertions": 4
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"temporary epoch\"",
+            "assertions": 5
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"temporary dependency\"",
+            "assertions": 5
+          },
+          {
+            "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+            "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"case table\"",
+            "assertions": 4
+          }
+        ]
+      }
+    }
+  },
+  "independent_successor_runs": {
+    "sqlite-successor.xml": {
+      "tests": 4,
+      "assertions": 40,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0,
+      "by_class": {
+        "Tests\\Feature\\DiscoveryEpochRecoveryTest": {
+          "tests": 2,
+          "assertions": 36,
+          "errors": 0,
+          "failures": 0,
+          "skips": 0
+        },
+        "Tests\\Feature\\DiscoveryEpochMigrationTest": {
+          "tests": 1,
+          "assertions": 1,
+          "errors": 0,
+          "failures": 0,
+          "skips": 0
+        },
+        "Tests\\Feature\\SQLiteReservedIdentityCanaryTest": {
+          "tests": 1,
+          "assertions": 3,
+          "errors": 0,
+          "failures": 0,
+          "skips": 0
+        }
+      },
+      "cases": [
+        {
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"missing seed\"",
+          "assertions": 4
+        },
+        {
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "name": "test_reserved_objects_cannot_hide_across_table_index_view_and_trigger_namespaces",
+          "assertions": 32
+        },
+        {
+          "class": "Tests\\Feature\\DiscoveryEpochMigrationTest",
+          "name": "test_exact_installed_migration_is_idempotent_and_preserves_retained_data",
+          "assertions": 1
+        },
+        {
+          "class": "Tests\\Feature\\SQLiteReservedIdentityCanaryTest",
+          "name": "test_foreign_table_in_guard_namespace_cannot_hide_behind_exact_later_trigger",
+          "assertions": 3
+        }
+      ]
+    },
+    "native-successor.xml": {
+      "tests": 5,
+      "assertions": 82,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0,
+      "by_class": {
+        "Tests\\Feature\\DiscoveryEpochRecoveryTest": {
+          "tests": 4,
+          "assertions": 78,
+          "errors": 0,
+          "failures": 0,
+          "skips": 0
+        },
+        "Tests\\Feature\\NativeReservedAliasCanaryTest": {
+          "tests": 1,
+          "assertions": 4,
+          "errors": 0,
+          "failures": 0,
+          "skips": 0
+        }
+      },
+      "cases": [
+        {
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "name": "test_failed_trigger_creation_retries_through_real_migrator_without_erasing_prior_data",
+          "assertions": 6
+        },
+        {
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "name": "test_real_migrator_resumes_before_repository_log_and_uncertain_completed_log_is_not_duplicated",
+          "assertions": 30
+        },
+        {
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"missing seed\"",
+          "assertions": 4
+        },
+        {
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "name": "test_reserved_objects_cannot_hide_across_table_index_view_and_trigger_namespaces",
+          "assertions": 38
+        },
+        {
+          "class": "Tests\\Feature\\NativeReservedAliasCanaryTest",
+          "name": "test_native_dictionary_alias_refuses_before_creating_epoch_table_or_seed",
+          "assertions": 4
+        }
+      ]
+    }
+  },
+  "composition_carry": {
+    "app/Domain/Catalog/ActivateExclusiveOffer.php": {
+      "git_blob": "19068788717bccb5d8debab09df0a77420b3bb22",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/BulkAddTrackTags.php": {
+      "git_blob": "cceb2fd5cc92c395640a78a8e50e8a08b1fbaaaf",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/BulkUpdateTrackMetadata.php": {
+      "git_blob": "7bb671024875bfae238dc158dc472c7ed4f4f706",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/DeactivateOffer.php": {
+      "git_blob": "11e384a7de0c1ec57110af25b3550b9631d7c158",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/Discovery/CurrentEligibleTrackSnapshot.php": {
+      "git_blob": "6cabf00083fe154b30f3988ef830e20da84c03e0",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/Discovery/DiscoveryEpoch.php": {
+      "git_blob": "53a4355d7658d40901c901cf0ae3896952a17e09",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/Discovery/EligibleTrackSnapshot.php": {
+      "git_blob": "cb79642447104d9932daa580ef8891650eb66451",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/ExclusiveActivationEvidence.php": {
+      "git_blob": "9c2f197cb10531b3e0a5c11a98df1f68f724baf3",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/ExclusiveOfferScope.php": {
+      "git_blob": "90e7422680a38f4b084214358eacbd17035333c9",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/Models/ExclusiveActivation.php": {
+      "git_blob": "93eeab3f0fbc92f272dc3d19e26b02b941756401",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/Models/Offer.php": {
+      "git_blob": "213807f96ca6e6e457d9f56bb632b1b6f5f1269e",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/Models/OfferRevision.php": {
+      "git_blob": "f9798e180e2ce56a3425ec7a6a673f2d4fab1cf7",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/Models/ProductDraft.php": {
+      "git_blob": "7b57bfb7ced64bd8676afc7f7b2dff7c11b0cfe7",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/Models/ProductDraftMember.php": {
+      "git_blob": "d52d120090475e1e3f0e99c5980279551c97024b",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/Models/ProductDraftVersion.php": {
+      "git_blob": "03039223f4e7df496cdf3247f550ecb470aee829",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/Models/Track.php": {
+      "git_blob": "69e7b92ebb2725fd2ed8ef225a8c8d2e6c83dc5b",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/Models/TrackMetadataPreset.php": {
+      "git_blob": "ffb835514428809ebf856eab99dafb8eb153684c",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/OfferDraftInput.php": {
+      "git_blob": "351bcee06f974f27c8a8af10a724afb38a7801b1",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/OfferSnapshot.php": {
+      "git_blob": "25b55869dd8644c21f8691e01a28982066101a54",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/PrepareExclusiveOffer.php": {
+      "git_blob": "1c355e00bba146e61afe88ba4362bd4cd30f9a75",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/ProductDraftManifest.php": {
+      "git_blob": "797a483a264430bf951a2a104e469a13eeb656d1",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/ProductDrafts.php": {
+      "git_blob": "150502ea269e7512dfe26852e916a069bd463ca7",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/PublicCatalog.php": {
+      "git_blob": "851443630e18098a0a2fda5e1b098ee217f2f3f7",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/PublicLicenseDisclosure.php": {
+      "git_blob": "66c5250cccc50309f17dd55a915afa239e4b7d11",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/PublicationReadiness.php": {
+      "git_blob": "c20478a17f3748030218b8c585b8543f530de770",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/PublishOffer.php": {
+      "git_blob": "688d9577e29bf22ec36838f498c89452f971c0e1",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/PublishTrack.php": {
+      "git_blob": "4563f216d85aad5b020ed55f28e3a621eaec1756",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/ReadPrivateTrackReview.php": {
+      "git_blob": "cf432076c2e7e01883ea7928816a16442facb9ea",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/ReadTrackPublicationManifest.php": {
+      "git_blob": "e80faa98b975dbfd1ef5fce9afb35193b489c4f9",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/ReviewedOfferDraft.php": {
+      "git_blob": "cf965c4f3dff3352091405822f3e868d1e871cff",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/SaveOfferDraft.php": {
+      "git_blob": "e8069526f5912649b26c80d6c08d907c35bd47e5",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/SaveTrackMetadata.php": {
+      "git_blob": "da008fbad65b854b73d1e1914db917ccb2df196f",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/TrackMetadataPresetPayload.php": {
+      "git_blob": "0b533d238cdb20d5156072b26b8e59abfa6ef079",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/TrackMetadataPresets.php": {
+      "git_blob": "5da13e0d3b50b338b7190d450ddb5282d41fd34f",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/TrackPublicationManifest.php": {
+      "git_blob": "c475f025ff81edc757f8e6a77f3bbad8a0103401",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/VerifyOfferFiles.php": {
+      "git_blob": "4b2bd64b096748c318f2826183ed7d13728eb495",
+      "composition_identical": true
+    },
+    "app/Domain/Catalog/VerifyTrackPublicationFiles.php": {
+      "git_blob": "b473886fc0e1053f17e3499703f5d1a6a036c094",
+      "composition_identical": true
+    },
+    "app/Domain/Commerce/Inventory/ExclusiveSelectionPolicy.php": {
+      "git_blob": "5b2a8a6cd85e67a1df979b1c7ae6621e9f958041",
+      "composition_identical": true
+    },
+    "app/Domain/Commerce/Inventory/InventoryPolicy.php": {
+      "git_blob": "63ea3ad66161d826f1854370e9852b5ef4f5d2aa",
+      "composition_identical": true
+    },
+    "app/Domain/Commerce/Inventory/ManageRightsScope.php": {
+      "git_blob": "5a26478538e6e0b98f2197495155335a681c354e",
+      "composition_identical": true
+    },
+    "app/Domain/Commerce/Inventory/ReserveQuoteInventory.php": {
+      "git_blob": "2b2f6cfcbc49606d7fbed2252596a01be8d3e414",
+      "composition_identical": true
+    },
+    "app/Domain/Commerce/Inventory/SelectionInventory.php": {
+      "git_blob": "e89742f8fc5687a36f819182a40df1ba73f11fa3",
+      "composition_identical": true
+    },
+    "composer.lock": {
+      "git_blob": "9e58027dcd989282b026d56347e26ea867723db9",
+      "composition_identical": true
+    },
+    "config/database.php": {
+      "git_blob": "abbb88e37246728f566c8a42fb86c554d50a92bc",
+      "composition_identical": true
+    },
+    "database/migrations/0001_01_01_000000_create_users_table.php": {
+      "git_blob": "05fb5d9ea95d1b527ba0e7074936553944b8d302",
+      "composition_identical": true
+    },
+    "database/migrations/0001_01_01_000001_create_cache_table.php": {
+      "git_blob": "06dc7a5ee782ac3a0f3f1c471b03120d87f2e655",
+      "composition_identical": true
+    },
+    "database/migrations/0001_01_01_000002_create_jobs_table.php": {
+      "git_blob": "edac6fee599f55c34fd7ade713079c7f007b2fe4",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_04_000001_create_catalog_foundation.php": {
+      "git_blob": "377bb10dbb0bc40b22a9077eab1d715cf64fc123",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_04_000002_add_admin_mfa_and_immutable_evidence.php": {
+      "git_blob": "8244883034631fc058f3a521bc05553d75b8efde",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_04_000003_media_processing.php": {
+      "git_blob": "beeb0043f5dd9a9eb5e9e140f7e3e76d0d0b2997",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_04_000004_license_evidence.php": {
+      "git_blob": "241df13f0e56e771b66924055f192e829bf0f672",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_04_000005_offer_revisions.php": {
+      "git_blob": "3dff4c40ed141df1fa350c4fed880340af871d0d",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_06_000006_provisional_quotes.php": {
+      "git_blob": "2600c1140a8d996d9c4d20d2dd590c57d26e8462",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_09_000007_stripe_webhook_receipts.php": {
+      "git_blob": "f2b785809c30cb61ba9816369362e8e17e53e0ca",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_09_000008_track_metadata_and_public_urls.php": {
+      "git_blob": "003ca7d13b34a136a7f7835fadcb9130f2c90d10",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_09_000009_stems_recordings.php": {
+      "git_blob": "29494236549f7263f28434f92209782698d6122c",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_10_000010_typed_license_terms.php": {
+      "git_blob": "309fc721f4c50c6e6215ab95ac7da3ae1c210736",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_11_000011_license_scope_terms.php": {
+      "git_blob": "0fe82edb1fe5fd32cf515de2c73e237924c4766e",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_12_000012_license_economic_terms.php": {
+      "git_blob": "04385414254efbf9418e54355f72e60af60bc411",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_12_000013_quote_pricing.php": {
+      "git_blob": "6073bd0c4b4bb27b0aadf69c98ebd09ed1c3e0fc",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_14_000014_promotion_usage.php": {
+      "git_blob": "a223d4ce09084d59f69e8cf9a7522886eb2e214e",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_17_000015_shared_rights_inventory.php": {
+      "git_blob": "f1be846ff88dff45ed36220655fb395dd1e4b0ca",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_23_000016_exclusive_activations.php": {
+      "git_blob": "e9c11ca3b3caa962c8da97fb48e05f69ad63e4fe",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_24_000017_order_preparation.php": {
+      "git_blob": "89edab3e5b6f40c1fdffac3cbf3b962f23628a4a",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_26_000018_hosted_test_checkout.php": {
+      "git_blob": "fb6983288ac2925120c36923c18328b492e72b67",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_26_000019_test_payment_evidence.php": {
+      "git_blob": "dd822f96c931f57f7b6e1faf5bf70efe07f9a7f8",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_26_000020_test_order_finalization.php": {
+      "git_blob": "53382253caebcec619c4b508941b03f55b0acebb",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_26_000021_test_contract_issuance.php": {
+      "git_blob": "c5f248331e7dbc14c47433ae106e2810c6f5bb64",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_26_000022_test_fulfillment_activation.php": {
+      "git_blob": "4b9eb0b8158656f954c84c3438730932aca708b5",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_26_000023_test_owner_delivery.php": {
+      "git_blob": "69a6c841aa308df9c764f2c675b16ab42fcc372c",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_28_000024_site_content_releases.php": {
+      "git_blob": "3618552b130091d5e76f203e4840ee66ce567203",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_29_000025_promotion_administration.php": {
+      "git_blob": "505c0d3e5b71a156e076b16b9cdee957eddcb9b4",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_29_000026_site_publication_schedules.php": {
+      "git_blob": "9dce73b6e112787e50d37ba9dcec5616bcb6080e",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_30_000027_site_images.php": {
+      "git_blob": "72cbbeca7b1ca5462dcd87dc3ce7daf1f5145192",
+      "composition_identical": true
+    },
+    "database/migrations/2026_09_30_000028_site_release_images.php": {
+      "git_blob": "9b5c7e45912d84ed234dd5ea8bf4c5a00f76ea8d",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_01_000029_byte_exact_hash_guards.php": {
+      "git_blob": "672ecf0f7585597698a442ff0ff0f842b188193d",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_01_000030_byte_exact_uuid_guards.php": {
+      "git_blob": "f33cf242926983da6b2cc78549f589322f5c882c",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_01_000031_customer_inquiries.php": {
+      "git_blob": "06162cf903f64bb5e5ac1998773e155827eea53d",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_01_000032_editorial_related_tracks_images.php": {
+      "git_blob": "5935e7d65c967b5ec56038c0f41877f6744a5e05",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_02_000033_track_metadata_presets.php": {
+      "git_blob": "e7c898b4d6027c51505c9ad405001efd650ef8a1",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_02_000034_track_publication_version.php": {
+      "git_blob": "b48002cfb47e55748f45ae21bb107110cbe3986c",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_02_000035_rights_evidence_guards.php": {
+      "git_blob": "47fec9114382938515a75eebe8b876f71933b236",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_02_000036_test_payment_exception_operations.php": {
+      "git_blob": "b28b6228a9846fc1b687549bb47f1e68d4dc8feb",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_06_000038_resumable_media_uploads.php": {
+      "git_blob": "96294be892a2af9594ee02badc56c4c284782144",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_06_000039_test_payment_financial_observations.php": {
+      "git_blob": "3ad9c6cff42c7b4f5642f5e75cc10629c606147c",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_06_000040_customer_accounts.php": {
+      "git_blob": "f139df54108dcc1410352e524da2c94a4f5ab7ad",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_06_000041_product_draft_versions.php": {
+      "git_blob": "d3ceec13cfcb6a141d0566454997f914119ca877",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_06_000042_test_unpaid_releases.php": {
+      "git_blob": "f7da0e3261a73d5eea45cd8a80aa82b9b8fc8a9b",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_06_000043_inquiry_messages.php": {
+      "git_blob": "f829bbd82bdccc83da959cada93e76270badcde3",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_06_000044_sound_kit_intake.php": {
+      "git_blob": "a5471d67a62063858262f8f1bd60d03f047cc593",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_06_000045_customer_identity_challenges.php": {
+      "git_blob": "da77d70bbb2fe47b1541b8af031167f35d0bcee9",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_06_000046_sound_kit_upload_sessions.php": {
+      "git_blob": "22ba23cd50c2ec637d0e74665987753f56a15d8a",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_06_000047_test_refund_resolutions.php": {
+      "git_blob": "93b0ebbe88e30ebe39d3ce8b12cb56d125533597",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_06_000048_customer_purchase_claims.php": {
+      "git_blob": "e6435d9571c6370fd52ff6939657d244a8189b66",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_06_000049_inquiry_order_contexts.php": {
+      "git_blob": "bfca31599fe6ae681f30c717abe99a9b54afb83a",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_06_230000_membership_credit_foundation.php": {
+      "git_blob": "265cb0b0dc0396b0f9c651f7e8c427cbdcd79c87",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_06_231000_test_transactional_notifications.php": {
+      "git_blob": "d088f782544ce40bba938d9b469f3bc12d076912",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_06_233000_production_track_policy_drafts.php": {
+      "git_blob": "54c4380844e8cdcd610f03206ec1b450399d435f",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_06_234000_service_draft_versions.php": {
+      "git_blob": "b97e17f818dc8c02dd150dac3d6d9365ccfffcda",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_06_235000_merch_draft_versions.php": {
+      "git_blob": "8499372758ddace3bb08e002869cd1fdfc915b93",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_06_236000_production_track_policy_capabilities.php": {
+      "git_blob": "e0a90dab6f012c708c5f0c76f532fff552254ff4",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_06_237000_catalog_import_progress.php": {
+      "git_blob": "976e5234df3e16e72b2332e159e1dac3b9c12f81",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_06_238000_production_track_preparation_packets.php": {
+      "git_blob": "7470a06f7dbe0831d58d555c218bcb8e0198c74d",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_07_239000_production_buyer_assent_observations.php": {
+      "git_blob": "8b566d6c5d2a6ab226bd4042b717061e9fd2a126",
+      "composition_identical": true
+    },
+    "database/migrations/2026_10_07_240000_catalog_discovery_epoch.php": {
+      "git_blob": "8429ab5aef283bddfa4d5a6071724f9983a8aad3",
+      "composition_identical": true
+    },
+    "package-lock.json": {
+      "git_blob": "614350366e7af397c14603dae9272082ecfae066",
+      "composition_identical": true
+    },
+    "phpunit.xml": {
+      "git_blob": "e7f0a48df619422a48dd39ceac63c30f998fe389",
+      "composition_identical": true
+    },
+    "scripts/ci/database-sqlite-skips.json": {
+      "git_blob": "3674c470b02d43c1d2012b4911cf8054f613ac8b",
+      "composition_identical": true
+    },
+    "tests/Feature/CurrentEligibleTrackSnapshotTest.php": {
+      "git_blob": "6317dd6e11800511566388f9cc65fbdb88ba0bb9",
+      "composition_identical": true
+    },
+    "tests/Feature/DiscoveryEpochMigrationTest.php": {
+      "git_blob": "5ca094d427faa8d23ab3861370544c677fd156a8",
+      "composition_identical": true
+    },
+    "tests/Feature/DiscoveryEpochRecoveryTest.php": {
+      "git_blob": "5e69d9eb7f3f57b7e979350737867b7e4a1ce5fd",
+      "composition_identical": true
+    },
+    "tests/Feature/DiscoverySnapshotConcurrencyTest.php": {
+      "git_blob": "430835c2390bdba43de83b0644d9bc17e895517d",
+      "composition_identical": true
+    }
+  },
+  "composition_main_has_no_new_migrations": true,
+  "selector": {
+    "actual_command": [
+      "python3",
+      "scripts/ci/test-focused-tests.py"
+    ],
+    "actual_cwd": "/workspace/VA-Studio-pr25-composed-review",
+    "source_sha": "626f7d6688c5d528dc12baec3fbd4afe647f63e7",
+    "source": {
+      "scripts/ci/focused-tests.py": {
+        "git_blob": "35ab246c585829fe8ddde0f25590aa3ed954ffc0",
+        "sha256": "032de31ccc1901f72c750bb0e8f9b274f27a1a2f74917f3d9b21ebebc94e67fb"
+      },
+      "scripts/ci/test-focused-tests.py": {
+        "git_blob": "edd95e7dc51c17d67088f1d802802272f42f3a32",
+        "sha256": "36edeacff0f933877a777e985c7168e01621bde4377144c71426c13dbc70947c"
+      }
+    },
+    "tests": 50,
+    "errors": 0,
+    "failures": 0,
+    "track_discovery_files": 6,
+    "file_cap": 32,
+    "native_skip_policy_exact_executable": true,
+    "limitations": "Selector regression checks execute the Python selection boundary; no hosted feedback or product matrix was launched."
+  },
+  "runtime_profile": "native-profile.json",
+  "dependency_graph": "dependency-identity.json",
+  "predecessor_boundary_carry": "method-source-carry.json",
+  "untested": [
+    "new recovery behavior on target MySQL8.4",
+    "fresh composed product rerun (source and graph exact carry)",
+    "complete Foundation/browser release matrix",
+    "historical production installation recovery",
+    "online concurrent migrators or writers"
+  ],
+  "external_effects": "isolated disposable reviewer schema only; no push/merge/CI/provider/configuration changes",
+  "successor_reproduction_argv": {
+    "sqlite-successor.xml": [
+      "php",
+      "-r",
+      "$GLOBALS[\"_composer_autoload_path\"] = getcwd().\"/vendor/autoload.php\"; require \"vendor/phpunit/phpunit/phpunit\";",
+      "--",
+      "-c",
+      "/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/sqlite-successor-selection.xml",
+      "--filter",
+      "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes\\ with\\ data\\ set\\ \"missing\\ seed\"|test_reserved_objects_cannot_hide_across_table_index_view_and_trigger_namespaces|test_exact_installed_migration_is_idempotent_and_preserves_retained_data|test_foreign_table_in_guard_namespace_cannot_hide_behind_exact_later_trigger",
+      "--log-junit",
+      "/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/reproduced-sqlite-successor.xml"
+    ],
+    "native-successor.xml": [
+      "php",
+      "-r",
+      "$GLOBALS[\"_composer_autoload_path\"] = getcwd().\"/vendor/autoload.php\"; require \"vendor/phpunit/phpunit/phpunit\";",
+      "--",
+      "-c",
+      "/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/native-successor-selection.xml",
+      "--filter",
+      "test_failed_trigger_creation_retries_through_real_migrator_without_erasing_prior_data|test_real_migrator_resumes_before_repository_log_and_uncertain_completed_log_is_not_duplicated|test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes\\ with\\ data\\ set\\ \"missing\\ seed\"|test_reserved_objects_cannot_hide_across_table_index_view_and_trigger_namespaces|test_native_dictionary_alias_refuses_before_creating_epoch_table_or_seed",
+      "--log-junit",
+      "/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/reproduced-native-successor.xml"
+    ]
+  },
+  "reproduction_note": "The argv entries are exact reproduction contracts derived from the retained configs/JUnit census, not reconstructed shell history. Source the rootless PHP activation and private review database task environment for native execution; APP_KEY was a synthetic fixture key."
+}
