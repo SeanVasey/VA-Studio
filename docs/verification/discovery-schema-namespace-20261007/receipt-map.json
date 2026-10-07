@@ -388,5 +388,148 @@
       "sha256": "30bc9e5caea2c3be51afe38e01515738acd6f9f2ed611a6e36d9f1ee50edf7ee"
     }
   ],
-  "status": "frozen source; independent successor review required; no publication/activation/wholeT36 closure"
+  "status": "frozen source; independent successor review required; no publication/activation/wholeT36 closure",
+  "receipt_source_attribution": {
+    "discovery-schema-repair-frozen-native.xml": {
+      "runtime": {
+        "source": "326e48d23635d198705fc0f8e1ba36a2b7d8396f",
+        "path": "app/Domain/Catalog/DiscoverySitemap/SitemapSchema.php",
+        "git_blob": "4c3f15110d73e030bbf2902306e1b6e019a289b9",
+        "sha256": "4200ae9f9de74eb1a41a4b410bd872fbe6265f04d9ef5a7fbbc42f27e2f933c5"
+      },
+      "test_definition": {
+        "source": "326e48d23635d198705fc0f8e1ba36a2b7d8396f",
+        "path": "tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php",
+        "git_blob": "3eef0f85d39452ef9c48ad9dd84fdc77103ce292",
+        "sha256": "43ac98175b4e928f9bdfacccb1781ea60ae68ebb21aa624184e06d8ae4e738ec"
+      },
+      "junit": {
+        "name": "CLI Arguments",
+        "tests": "17",
+        "assertions": "53",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "1",
+        "time": "3.990688"
+      }
+    },
+    "discovery-schema-repair-frozen-sqlite.xml": {
+      "runtime": {
+        "source": "326e48d23635d198705fc0f8e1ba36a2b7d8396f",
+        "path": "app/Domain/Catalog/DiscoverySitemap/SitemapSchema.php",
+        "git_blob": "4c3f15110d73e030bbf2902306e1b6e019a289b9",
+        "sha256": "4200ae9f9de74eb1a41a4b410bd872fbe6265f04d9ef5a7fbbc42f27e2f933c5"
+      },
+      "test_definition": {
+        "source": "326e48d23635d198705fc0f8e1ba36a2b7d8396f",
+        "path": "tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php",
+        "git_blob": "3eef0f85d39452ef9c48ad9dd84fdc77103ce292",
+        "sha256": "43ac98175b4e928f9bdfacccb1781ea60ae68ebb21aa624184e06d8ae4e738ec"
+      },
+      "junit": {
+        "name": "CLI Arguments",
+        "tests": "16",
+        "assertions": "27",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "6",
+        "time": "0.382846"
+      }
+    },
+    "discovery-schema-repair-final-native.xml": {
+      "runtime": {
+        "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+        "path": "app/Domain/Catalog/DiscoverySitemap/SitemapSchema.php",
+        "git_blob": "c9d16b0b58db2ce88b6c83d6ecfff590582dc556",
+        "sha256": "2f8100ff89111a7632b62386e05e0210727c5e84be8b58ebbbf0f10d3cc513a6"
+      },
+      "test_definition": {
+        "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+        "path": "tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php",
+        "git_blob": "b7f5be62d71824153b217989f4f75008298f1b8d",
+        "sha256": "15e5cc88f0b7cc464d35ec760dd9873a46912507d227ad3347d959cd253783c3"
+      },
+      "junit": {
+        "name": "CLI Arguments",
+        "tests": "17",
+        "assertions": "54",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "1",
+        "time": "2.571500"
+      }
+    },
+    "discovery-schema-repair-final-sqlite.xml": {
+      "runtime": {
+        "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+        "path": "app/Domain/Catalog/DiscoverySitemap/SitemapSchema.php",
+        "git_blob": "c9d16b0b58db2ce88b6c83d6ecfff590582dc556",
+        "sha256": "2f8100ff89111a7632b62386e05e0210727c5e84be8b58ebbbf0f10d3cc513a6"
+      },
+      "test_definition": {
+        "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+        "path": "tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php",
+        "git_blob": "b7f5be62d71824153b217989f4f75008298f1b8d",
+        "sha256": "15e5cc88f0b7cc464d35ec760dd9873a46912507d227ad3347d959cd253783c3"
+      },
+      "junit": {
+        "name": "CLI Arguments",
+        "tests": "16",
+        "assertions": "27",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "6",
+        "time": "0.409030"
+      }
+    },
+    "discovery-schema-repair-unique-original-native.xml": {
+      "runtime": {
+        "source": "326e48d23635d198705fc0f8e1ba36a2b7d8396f",
+        "path": "app/Domain/Catalog/DiscoverySitemap/SitemapSchema.php",
+        "git_blob": "4c3f15110d73e030bbf2902306e1b6e019a289b9",
+        "sha256": "4200ae9f9de74eb1a41a4b410bd872fbe6265f04d9ef5a7fbbc42f27e2f933c5"
+      },
+      "test_definition": {
+        "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+        "path": "tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php",
+        "git_blob": "b7f5be62d71824153b217989f4f75008298f1b8d",
+        "sha256": "15e5cc88f0b7cc464d35ec760dd9873a46912507d227ad3347d959cd253783c3"
+      },
+      "junit": {
+        "name": "Tests\\Feature\\DiscoverySitemapNamespaceAdmissionTest",
+        "file": "/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php",
+        "tests": "1",
+        "assertions": "1",
+        "errors": "0",
+        "failures": "1",
+        "skipped": "0",
+        "time": "0.304724"
+      }
+    },
+    "discovery-schema-repair-unique-successor-native.xml": {
+      "runtime": {
+        "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+        "path": "app/Domain/Catalog/DiscoverySitemap/SitemapSchema.php",
+        "git_blob": "c9d16b0b58db2ce88b6c83d6ecfff590582dc556",
+        "sha256": "2f8100ff89111a7632b62386e05e0210727c5e84be8b58ebbbf0f10d3cc513a6"
+      },
+      "test_definition": {
+        "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+        "path": "tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php",
+        "git_blob": "b7f5be62d71824153b217989f4f75008298f1b8d",
+        "sha256": "15e5cc88f0b7cc464d35ec760dd9873a46912507d227ad3347d959cd253783c3"
+      },
+      "junit": {
+        "name": "Tests\\Feature\\DiscoverySitemapNamespaceAdmissionTest",
+        "file": "/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php",
+        "tests": "1",
+        "assertions": "3",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "time": "0.391132"
+      }
+    }
+  },
+  "counter_distinction": "frozen-native is exact326: foreign owner NONUNIQUE KEY and two assertions in coexistence tuple (53 total). final-native is exact07: foreign owner UNIQUE KEY plus assertNull, three assertions in that tuple (54 total). The earlier 53 receipt is not final07 acceptance. Strengthened unchanged07 test against326 Schema produced the preserved UNIQUE source failure before repair."
 }
