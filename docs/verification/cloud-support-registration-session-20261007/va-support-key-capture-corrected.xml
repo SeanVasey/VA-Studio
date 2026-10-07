@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\SupportAttachmentKeyCaptureIndependentTest" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentKeyCaptureIndependentTest.php" tests="1" assertions="6" errors="0" failures="0" skipped="0" time="0.567484">
+    <testcase name="test_service_resolution_key_rotation_cannot_adopt_a_previously_minted_visitor_actor" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentKeyCaptureIndependentTest.php" line="13" class="Tests\Feature\SupportAttachmentKeyCaptureIndependentTest" classname="Tests.Feature.SupportAttachmentKeyCaptureIndependentTest" assertions="6" time="0.567484"/>
+  </testsuite>
+</testsuites>

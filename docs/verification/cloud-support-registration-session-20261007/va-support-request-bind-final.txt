@@ -1,0 +1,2 @@
+
+Fatal error: Cannot redeclare class ComposerAutoloaderInita945c17e6bd81edd1fbef49e338c3523 (previously declared in /workspace/VA-Studio/vendor/composer/autoload_real.php:5) in /workspace/VA-Studio-support-registration/vendor/composer/autoload_real.php on line 5

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\SupportAttachmentKeyCaptureIndependentTest" file="/workspace/VA-Studio-support-session-independent/tests/Feature/SupportAttachmentKeyCaptureIndependentTest.php" tests="1" assertions="6" errors="0" failures="1" skipped="0" time="14.547636">
+    <testcase name="test_service_resolution_key_rotation_cannot_adopt_a_previously_minted_visitor_actor" file="/workspace/VA-Studio-support-session-independent/tests/Feature/SupportAttachmentKeyCaptureIndependentTest.php" line="13" class="Tests\Feature\SupportAttachmentKeyCaptureIndependentTest" classname="Tests.Feature.SupportAttachmentKeyCaptureIndependentTest" assertions="6" time="14.547636">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentKeyCaptureIndependentTest::test_service_resolution_key_rotation_cannot_adopt_a_previously_minted_visitor_actor
+Failed asserting that an array contains 200.
+
+/workspace/VA-Studio-support-session-independent/tests/Feature/SupportAttachmentKeyCaptureIndependentTest.php:38</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

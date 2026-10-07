@@ -1,0 +1,62 @@
+{
+  "source": "966f842c0d187435fe2da787c78ee80be8c79e29",
+  "tree": "a43176c3f80c2c711b9f115ba104a1c9ae410f9b",
+  "base_registered_source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+  "owned_source_sha256": {
+    "app/Http/Controllers/SupportAttachmentController.php": "4c93dd37dde485bc0fc9fe12cea2e5577cfb4ec420ef2afad5e4d1076d1a0a8c",
+    "app/Http/Controllers/SupportAttachmentPageController.php": "bb47422cea831deaec74f97f88ad34049910d4a4d3f1fab03c5e5727c4a00fd6",
+    "app/Support/SupportAttachmentRequestContext.php": "e57a308da9ef5e84cec9c5f9ec60d2f95875ac8065c3d7e00095edbc135859cf",
+    "tests/Feature/PublicDiscoveryIndexTest.php": "3ecc3a5789dc22336cfb27b34309dc498c3954e428a2fb9adad156e02ae7aba3",
+    "tests/Feature/SupportAttachmentKeyCaptureIndependentTest.php": "c7c23fcbd259c2ac421f593f016b456dc33a05b0a0a13b7c6fa05ed4df1203b0",
+    "tests/Feature/SupportAttachmentSessionIndependentTest.php": "73a9a6c59af97b8c63a56f1fd159e6d058b7ab176b7539e1ffa7d87e05500e31"
+  },
+  "original_failures": {
+    "shared_provider_resolver_manager": "SQLite3/21 and native3/21 genuine failures on frozen3eb",
+    "shared_key": "bodyless GET SQLite1/6 and native1/6 genuine failures; first JSON GET422 is harness error",
+    "shared_default_guard": "SQLite1/7 and native1/7 genuine failures",
+    "producer_view": "native1/4 genuine failure; separate ownedproducer repair and independent review pending"
+  },
+  "root_correction_attempts": {
+    "first": "ReflectionProperty wrong singular name caused 14 failures, retained; not original independent defect",
+    "corrected": "18/330 first three peer methods + old9 + own6; key1/6 separately",
+    "artisan_runner": "copied Composer class duplication, test did not run; retained harness failure",
+    "final": "actual direct vendor/bin/phpunit 20/343, zero errors/failures/skips; root9+own6+peer4+key1"
+  },
+  "native_version": "8.0.46, not MySQL8.4 acceptance",
+  "independent_successor_review": "pending",
+  "final_foundation_and_browser": "deferred to full integrated exact SHA",
+  "artifacts_sha256": {
+    "ServiceProjectCommittedSchemaIndependentTest.php.txt": "6beb2f0bf0d08b5b97b4182a9e918528e4d8a4fe24792381c54c0d5f43632a5e",
+    "SupportAttachmentKeyCaptureIndependentTest.php.txt": "c7c23fcbd259c2ac421f593f016b456dc33a05b0a0a13b7c6fa05ed4df1203b0",
+    "SupportAttachmentSessionIndependentTest.php.txt": "73a9a6c59af97b8c63a56f1fd159e6d058b7ab176b7539e1ffa7d87e05500e31",
+    "original-session-boundary-canary.php.txt": "58d17d904fe930f350e3e7a577b419c5b4a35b0fdcb13a623482fc2c9afd47cb",
+    "support-session-independent-default-original-native.txt": "c7bc4ea4c5145ce983b869e1070eabceb4f636ff101a2c02ed8b8e7d3919b110",
+    "support-session-independent-default-original-native.xml": "3e083710f575003ec636775233a0f5a8b3fcfadc514220ac7c96c38838858375",
+    "support-session-independent-default-original.txt": "27a9e80b9917eed182256aa03048febced530c4a43440a01c3b6267dc1af5b59",
+    "support-session-independent-default-original.xml": "d9641ae690b38a0ad0a64b0821d62b3d3dc6128cc0813a41f08f1836404fc36e",
+    "support-session-independent-key-corrected-original.txt": "ed8712433e3eafdac839740d1e4bd1749d066695c767cd0e9a1500f1ae7458c6",
+    "support-session-independent-key-corrected-original.xml": "972a5797d8bbb1260f18e3048368c4e0a84ff7ee0f60a35dc9904b6ce8cf3fca",
+    "support-session-independent-key-original-native.txt": "ccb5dd76b734b9aa1c04ef06c8257798ad90cc8bef8c4041808fa36f4c30499e",
+    "support-session-independent-key-original-native.xml": "2120e93c3ee880343907aa8ad1b609d5b46109b1ecd9d2be231431d1d833566c",
+    "support-session-independent-key-original.txt": "bcb203c2a048bf1940646df0ed5d44550a2a74eac0989668018de7940422438e",
+    "support-session-independent-key-original.xml": "22bf2e9b34f0537b0998202daad35a74a0dcb9052d50bea1a33644460a2eb5cc",
+    "support-session-independent-producer-view-original-native.txt": "f514206039979627af7d62327879b6657977a0dfc295a00292eb25cf83e09b4a",
+    "support-session-independent-producer-view-original-native.xml": "ae4858350cfd1e2e9ffe7357779e6cb61ff2972ce49129c477531127069313a3",
+    "support-session-independent-three-original-native.txt": "c30b347eaf312ef44a95219c55257d00a79daf43e87f050ee4294267a79a63dd",
+    "support-session-independent-three-original-native.xml": "51c7ae35ba1cc87c61ddc50f8ff14a0133c6cdf8381d3d9f84f605ab953c1fec",
+    "support-session-independent-three-original.txt": "81eb1b0943c6d04952f24346b26ce0fed615c1285d1ab36ae888bf2b1d921086",
+    "support-session-independent-three-original.xml": "f0df782a7485586908c359f35b542c79ad10029b929b0ae8abdc5a4ba6fb60ee",
+    "va-support-key-capture-corrected.txt": "da4c4d62db8d2e9283dca95f3c00b2083b1c8c0974f2eb49276bd8edb190dd12",
+    "va-support-key-capture-corrected.xml": "218e6cef6ebf3d2833319496054f6b5d303760abdd8aac63baef6af91d0393ce",
+    "va-support-request-bind-final-corrected.txt": "5c7f357895d64a5fb644019aa5def4e003e96d535ef47d5eee244ff3741fe0ee",
+    "va-support-request-bind-final-corrected.xml": "2e5b761dfdc6a99995c794e0f8b21491bd6d9ce118798c7abeb2b68d71b1005b",
+    "va-support-request-bind-final-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "va-support-request-bind-final.txt": "d70e356b5650013ea19bc45c21f6931c32712d2d4b934cbe2cc1a18729b2b7a8",
+    "va-support-request-bind-repaired-corrected.txt": "29c8f948a69b83fbe8859009f210f1ea5b7a738e5457603256b3c7c196c4903a",
+    "va-support-request-bind-repaired-corrected.xml": "521d54fb358f7844f541f21e4f30c95098718939cee9332c8e6676d6b6eab850",
+    "va-support-request-bind-repaired.txt": "a4b789b454efb081fd41f4c011a4bf866d114d096da34171d3a69a754e14e073",
+    "va-support-request-bind-repaired.xml": "afc577b98abf02038e3669ce88fc12d10642ae5c7afe0a0b6c9aa2cdda57cd01",
+    "va-support-root-closure-session-original.txt": "a8447658734b72a9a0b4402f7443777a65252808c1944c74b0ce194c31071373",
+    "va-support-root-closure-session-original.xml": "2f3bbf8f1760275c3ef98483f162d4161522328a9e0171642382eeebb84be10f"
+  }
+}
