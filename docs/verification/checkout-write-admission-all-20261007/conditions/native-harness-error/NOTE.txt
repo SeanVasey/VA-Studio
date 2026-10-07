@@ -1,0 +1,1 @@
+Harness error: TMPDIR scratchpad/tmp-native2 did not exist, so the fixture's ffmpeg could not write its synthetic WAV; all 8 tests errored in setup before any checkout code ran. Not evidence.

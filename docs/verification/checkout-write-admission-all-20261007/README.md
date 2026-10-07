@@ -88,7 +88,7 @@ c6's rules are kept: ONE command observer per frame; ordinary committing delegat
 
 1. **Withdrawal after the final re-proof.** A withdrawal that commits after `proveCreatable()` returns and before or during the external `create` call crosses the provider boundary. No database transaction can be held across that I/O. Such a session belongs to reconciliation and refund handling, and this change does not claim it is closed.
 2. **A privileged listener that commits PDO directly.** It can still make rows durable before detection (c6 F-5, unchanged).
-3. **Staff evidence outside the `users` row.** MFA *policy* (`isMultiFactorAuthenticationRequired`, Filament panel objects) is not re-evaluated at commit. Only the raw enrollment columns and `app.env` (through the frame's captured `app` config parent) are compared.
+3. **Staff evidence outside the `users` row.** The MFA *requirement* is not re-evaluated at commit. The admin panel decides it with `isRequired: fn () => app()->isProduction()`, which reads the container's `env` instance (`$app['env']`). The frame does not track that instance: it compares only the `config` and `db` instances, the container aliases and the plain config parents, `app.env` among them. So a change to `$app['env']` alone is not compared at commit. What IS compared is the raw MFA enrollment columns (`app_authentication_secret`, `app_authentication_recovery_codes`) in the staff `users` row. Gate and Filament panel objects are also not re-evaluated. *(Wording corrected for review finding F-4; an earlier version wrongly said `app.env` covered the requirement.)*
 
 ## 4. Commands and results (exact source `2c3efc4e`)
 
@@ -143,6 +143,33 @@ Native total: 12 tests, 72 assertions, all green. The other 8 tests in `Producti
 ### Pint
 
 `php vendor/bin/pint --test` on every changed PHP file, canaries included: `{"result":"passed"}`.
+
+## 4a. Independent review conditions (follow-up commits on this branch)
+
+The independent review of `2c3efc4e` (`independent-review/DECISION.md`, written by the reviewer and left untracked) returned APPROVE WITH CONDITIONS. Each item is closed in its own commit:
+
+| Item | Commit | Change | Evidence |
+| --- | --- | --- | --- |
+| C1 (F-1, Medium) | `f4eb4a40` | Ports the basis and authority role/MFA cases and the committing capability-closure case on a NEW intent into `tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php`, each asserting `write_source_changed`. | `conditions/C1-*`. Unmutated 15/87 green. M1 (staff plan removed) gives 4 failures. M3 (intent history plan removed) gives 1 failure. Both mutations were reverted. |
+| C2 (F-2, Low) | `5eb82c3f` | The NEW-insert flag is a dedicated boolean `$inserted`, tested with `=== true`, in `TaxExemptions`, `ApproveExemptionAuthority` and `HostedCheckout`. The `$created` timestamps are unchanged. | SQLite: the permanent file 15/87, `ProductionCheckoutExemptionAuthorityTest` 11/50 and `ProductionCheckoutJourneyTest` 7/81 are green. |
+| F-3 (Low) | `fe027fe3` | Every refusal now pins its reason: `write_frame` (frame config snapshot), `changed` (`proveCreatable`) or `write_source_changed`. The combined basis test is split, because its shared by-reference flag re-applied the owner withdrawal in the offer iteration. A new test calls the staff capsule's `proveFresh()` directly inside the commit and requires `authority` for both authoring and owner withdrawal. | `conditions/F3-*`. 17/96 green. M5 gives 1 failure and was reverted. |
+| F-4 (Info) | this commit | Corrects the wording of residual 3 above. | — |
+
+The `CommandTransaction.php` and `OriginalCommitDispatcher.php` hashes are unchanged (`fd8fccde…`, `ed529e8f…`).
+
+**Native MySQL 8.4.11, conditions selection.** A second private `mysqld` was started on port 3422 with the same flags. The run is archived in `conditions/native/`.
+
+- **Source:** `fe027fe3`. The server was 8.4.11 on port 3422, and the schema had 0 tables after the run.
+- **Selection:** `--filter 'test_committing_capability_closure_refuses_new_intent_and_provider_io|test_committing_qualifier_staff_withdrawal_refuses_new_basis|test_committing_owner_staff_withdrawal_refuses_new_authority|test_staff_capsule_fresh_admission_itself_refuses_authoring_and_owner_withdrawal|test_committing_owner_delegation_or_offer_withdrawal_refuses_new_basis'`.
+- **Result:** **8 tests, 37 assertions, 0 failures, errors or skips** (1102 s).
+- **Not evidence:** a first attempt in `conditions/native-harness-error/` errored in fixture setup (8 errors). Its `TMPDIR` did not exist, so ffmpeg could not write the synthetic WAV, and no checkout code ran. The schema was reset and the run repeated unchanged.
+- **SQLite checkout family on `fe027fe3`:** `conditions/sqlite-family/`, **195 tests, 947 assertions, 0 failures, 0 errors**, with the same 8 named native-only skips.
+- **Cleanup:** the 3422 server was shut down at 17:16:11Z ("MySQL Server - end"), and its datadir, socket and temporary directories were removed. The other `mysqld` processes on this host belong to other lanes and were not touched.
+
+**Recorded open items (not widened here, per the review):**
+
+- F-5. The authority owner's row is not compared when a basis is created. Also, revoking a qualifier after a basis exists does not invalidate later intents.
+- F-6. `CheckoutRawPlans` still needs to be consolidated with the c6 `CheckoutWriteAdmission`.
 
 ## 5. Cleanup
 
