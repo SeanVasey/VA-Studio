@@ -1,0 +1,7 @@
+{
+  "original_setup_assertion": "Incorrectly assumed executable9f1 was a direct child of baseline5cba. It is the second of two composition source commits; actual baseline ancestor and complete tree comparison now verified.",
+  "original_failure": "Traceback line13 AssertionError, setup source proof exit1. Follow-on runtime probe failed: file not yet created. No tests had started and no source was edited.",
+  "regenerated_own_autoload_exit": 0,
+  "resolution": "Use actual ancestry plus exhaustive mode/type/blob carry proof, not a direct-parent assumption.",
+  "actual_executable_parent": "22646ff6cdca3446de0b272126fad215d0d283f2"
+}

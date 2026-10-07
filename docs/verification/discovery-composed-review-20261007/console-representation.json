@@ -1,0 +1,10 @@
+{
+  "purpose": "Normalize trailing console whitespace in review display without losing any original output byte. No source/runtime/test changes.",
+  "original_file": "platform.txt",
+  "original_raw_companion": "platform.txt.original.base64",
+  "original_sha256": "77c56e84933a3c3c8209918d34c2f0c282ac066ee22bb074e42dd7b71e11666c",
+  "original_bytes": 1896,
+  "display_sha256": "b8e4990a9c9bcf42e2a5b0d844a6281d62599be693db1f727fa48bc698f2b7f2",
+  "transform": "Remove only trailing space and tab on each LF-delimited line; preserve all line boundaries.",
+  "original_bytes_roundtrip_verified": true
+}

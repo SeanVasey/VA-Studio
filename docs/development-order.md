@@ -1,5 +1,22 @@
 # Ordered development status
 
+## Current development continuation — October 7, 2026 UTC
+
+PRs #17–#24 are merged in SeanVasey/VA-Studio; native current main is
+`717f0866444701637e7c396b4376891aa5dd995d`, tree `1c43bb29`.
+Dependency PRs #1–#3 are reconciled. Membership migration rollback review
+4201166306 is resolved, with actual MySQL regression evidence retaining data
+and repository bookkeeping. The reviewed bounded discovery prerequisite
+[composition](verification/track-discovery-composition-20261007/README.md)
+is next, followed by portable read-only D28 amount requirements.
+
+Next independent implementations are private retained candidate identity
+generation and untrusted amount input consistency. Neither represents public
+SEO completion, authoritative tax/amount observation, payment or launch. Six
+parent groups remain accepted and 34 open. Historical source/results below
+remain unchanged; current AGENTS.md governs focused low-cost development merges.
+
+
 ## Current production preparation checkpoint — October 6, 2026 UTC
 
 [PR #16](https://github.com/SeanVasey/VA-Studio/pull/16) merged reviewed private

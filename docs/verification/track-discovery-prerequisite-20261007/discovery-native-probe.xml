@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\DiscoveryEpochMigrationTest" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" tests="3" assertions="21" errors="0" failures="0" skipped="0" time="16.626349">
+    <testsuite name="Tests\Feature\DiscoveryEpochMigrationTest::test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate" tests="2" assertions="12" errors="0" failures="0" skipped="0" time="11.178157">
+      <testcase name="test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set &quot;empty&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="28" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="6" time="5.606383"/>
+      <testcase name="test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set &quot;populated&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="28" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="6" time="5.571774"/>
+    </testsuite>
+    <testcase name="test_actual_insert_update_delete_upsert_replace_aba_and_rollback_invalidate_atomically" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="50" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="9" time="5.448193"/>
+  </testsuite>
+</testsuites>

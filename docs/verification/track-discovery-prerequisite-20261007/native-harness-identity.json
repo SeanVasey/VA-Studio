@@ -1,0 +1,13 @@
+{
+  "path": "/workspace/scratch/0c039e9e0645/mysql-runtime/run-tests.py",
+  "sha256": "35bdde4f03a9d7a23d90337a77a938c1044f297553e0afe38d13eaee73ac854a",
+  "database": "fresh disposable private loopback TCP",
+  "server": "MySQL8.4.11",
+  "durability": {
+    "innodb_flush_log_at_trx_commit": 1,
+    "sync_binlog": 1,
+    "innodb_doublewrite": "ON",
+    "log_bin": true
+  },
+  "sqlite_is_not_native": true
+}

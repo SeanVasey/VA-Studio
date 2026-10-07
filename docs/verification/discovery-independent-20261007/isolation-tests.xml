@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Review\CurrentReadIsolationCanaryTest" file="/workspace/scratch/2876616e88c3/VA-Studio-discovery-independent/docs/verification/discovery-independent-20261007/CurrentReadIsolationCanaryTest.php" tests="1" assertions="8" errors="0" failures="0" skipped="0" time="6.534362">
+    <testcase name="test_capture_uses_actual_read_committed_without_changing_repeatable_read_session_default" file="/workspace/scratch/2876616e88c3/VA-Studio-discovery-independent/docs/verification/discovery-independent-20261007/CurrentReadIsolationCanaryTest.php" line="23" class="Tests\Review\CurrentReadIsolationCanaryTest" classname="Tests.Review.CurrentReadIsolationCanaryTest" assertions="8" time="6.534362"/>
+  </testsuite>
+</testsuites>

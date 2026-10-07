@@ -1,0 +1,18 @@
+{
+  "purpose": "Reversible console whitespace representation repair after approval; no source, tests, original red files, or approval facts change.",
+  "original_evidence_commit": "03ecc0dc7f0c138b6412f5d02cd65c2529178feb",
+  "approved_executable": "10dcb64d9c30231bd6949fd4d00811a283e820b0",
+  "approved_tree": "7e6ccdb4459775b67210c4d01c1413757946c418",
+  "original_37_digest_manifest_exact_companion": "corrected-artifact-sha256.original.json",
+  "original_manifest_sha256": "d2d9c49772dc5367038cf4f20abf0136f247e0494159ed38f716dc5482ce0846",
+  "original_file": "corrected-platform.txt",
+  "original_raw_companion": "corrected-platform.txt.original.base64",
+  "original_raw_sha256": "ce0b72bfb8101c604fdde9ee721dcd7fb97ccee9662f30c13e213adf6b319a03",
+  "original_raw_bytes": 2210,
+  "normalized_display_sha256": "6a23d993097851fd70fc74fae97afd889a04734cc0db6d77b356cd93d2f9c547",
+  "transform": "Remove trailing space/tab on each LF-delimited line, retaining every original raw byte in base64.",
+  "original_37_digests_verified_before_and_after_roundtrip": true,
+  "original_red_all_10_paths_unchanged": true,
+  "source_changes": false,
+  "test_rerun_required": false
+}

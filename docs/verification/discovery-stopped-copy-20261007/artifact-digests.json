@@ -1,0 +1,12 @@
+{
+  "README.md": "081bc324f1d97ef44099038abd6dff8e8e5e126f15ea7de54924a2df99d19183",
+  "autoload.txt": "e8e4e93986a923f4edc921f5c71120d026d8f0c26079cf7b660b7482e977bd77",
+  "borrowed-build-provenance-refusal.json": "a3da7cd365083e1eab406833559d5a1bf814bcd2957bad2998838fb12ecc7e50",
+  "copy-upgrade.txt": "27a41061bf32848b9232de3e1d1dd05e7d3b0753fc7bc1d4fbd79b8ca844af08",
+  "frontend-build-raw.base64": "ec802e2024bf51a5b148dfe883b2668d0e507a3229c6f5631a6954e154958a89",
+  "frontend-build.txt": "4f96004ec83bcb5d9dc90787fe80f390be177b9dbdc426adc1d63a17f16d351f",
+  "node-installed-graph.json": "b0dcbb8648deea4f3ce018d63c7b133642a7f578deec6bcb7562896006488aad",
+  "outcomes.json": "ba7db0a9b7452bb68894295132eff81a01c7b1a9ecd52ff007d1a7b548939b9c",
+  "runtime-origins.json": "1ae41db8caad9c9c4270f4b8aa11167ee79ae05ece77ec55a926d2b40febd846",
+  "source-runtime-build.json": "0a15335e17ba7f3553e5cf283fa365fa5dbd6baae05d6eee46010f418110cf87"
+}
