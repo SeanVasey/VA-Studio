@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Domain\Customers\ProductionIdentity;
+
+use RuntimeException;
+
+/** No recipient, proof, credential or chained transport diagnostic is a public error. */
+final class IdentityException extends RuntimeException
+{
+    public function __construct(public readonly string $reason = 'unavailable')
+    {
+        \paidNativeDiagnostic('identity_exception', 403, preg_match('/\A[a-z_]{1,80}\z/D', $reason) === 1 ? $reason : 'nonliteral_reason', debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
+        parent::__construct('This customer identity request could not be confirmed.');
+    }
+}

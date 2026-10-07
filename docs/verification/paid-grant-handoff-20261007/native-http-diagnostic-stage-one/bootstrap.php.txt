@@ -1,0 +1,11 @@
+<?php
+require_once '/workspace/VA-Studio-paid-grants-portable/vendor/autoload.php';
+require_once '/workspace/.va-studio-dependencies/paid/2ec1854-e8f7441/autoload.php';
+function paidNativeDiagnostic(string $stage, int $status, ?string $reason, array $trace): void {
+    $safe = array_map(static fn(array $f): array => array_intersect_key($f, array_flip(['file','line','class','function'])), $trace);
+    file_put_contents('/tmp/paid-native-http-diagnostic/refusals.jsonl', json_encode(['at_ns'=>hrtime(true),'stage'=>$stage,'status'=>$status,'reason'=>$reason,'trace'=>$safe], JSON_THROW_ON_ERROR)."\n", FILE_APPEND);
+}
+spl_autoload_register(static function(string $class): void {
+    $files = ['App\\Domain\\Grants\\Paid\\PaidGrantCommands'=>'PaidGrantCommands.php', 'App\\Domain\\Grants\\Paid\\PaidGrantException'=>'PaidGrantException.php'];
+    if(isset($files[$class])) { require_once '/tmp/paid-native-http-diagnostic/'.$files[$class]; }
+}, true, true);

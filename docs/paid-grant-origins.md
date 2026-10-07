@@ -87,8 +87,10 @@ independently reviewed.
 
 ## Remaining binding
 
-The exact provisional fixture snapshot is recorded outside the repository under
-`/workspace/.va-studio-dependencies/paid/2ec1854-e8f7441`. This combines exact
+The exact provisional 69-file fixture snapshot is Git-tracked under
+`tests/Fixtures/paid-development/2ec1854-e8f7441`, with per-file source commits and
+SHA256 values in its source map. Normal canonical Composer code takes priority;
+the isolated fallback requires an explicit development selection. This combines exact
 producer `2ec1854c2b3606250e59b157f06703151318af0a`, T23 family
 `b9871dff4cd734779cd12809d736fb69af4e3dc7`, and its single historical-receipt
 callback repair `e6c02b90719923bc4ba435f86399b077980c1ddc`, plus the exact
@@ -105,3 +107,8 @@ Default configuration has both rehearsal and operative flags off and no delivery
 policy. Activation requires actual approved terms/assets, supported producer
 capability and an explicit technical policy; no prices, terms, provider credentials,
 mail or live payment configuration are supplied here.
+
+The current held checkpoint, actual native delivery failures, deliberate fresh
+post-recovery authorization correction and next review steps are recorded in
+`docs/handoffs/paid252-native-ops-and-payment-readiness-20261007.md`. The original
+native failures remain retained; no authorization lifetime was extended.

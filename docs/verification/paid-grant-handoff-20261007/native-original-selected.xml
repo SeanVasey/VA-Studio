@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-paid-grants-commit-admission/phpunit.xml" tests="6" assertions="86" errors="1" failures="1" skipped="0" time="969.967918">
+    <testsuite name="Feature" tests="6" assertions="86" errors="1" failures="1" skipped="0" time="969.967918">
+      <testsuite name="Tests\Feature\PaidGrantCommitCapsuleTest" file="/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantCommitCapsuleTest.php" tests="2" assertions="29" errors="0" failures="0" skipped="0" time="248.354851">
+        <testsuite name="Tests\Feature\PaidGrantCommitCapsuleTest::test_opaque_capsule_closes_only_original_prepared_current_owner_policy_and_owned_writes_without_callbacks_or_new_locks" tests="2" assertions="29" errors="0" failures="0" skipped="0" time="248.354851">
+          <testcase name="test_opaque_capsule_closes_only_original_prepared_current_owner_policy_and_owned_writes_without_callbacks_or_new_locks with data set #0" file="/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantCommitCapsuleTest.php" line="93" class="Tests\Feature\PaidGrantCommitCapsuleTest" classname="Tests.Feature.PaidGrantCommitCapsuleTest" assertions="14" time="136.928573"/>
+          <testcase name="test_opaque_capsule_closes_only_original_prepared_current_owner_policy_and_owned_writes_without_callbacks_or_new_locks with data set #4" file="/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantCommitCapsuleTest.php" line="93" class="Tests\Feature\PaidGrantCommitCapsuleTest" classname="Tests.Feature.PaidGrantCommitCapsuleTest" assertions="15" time="111.426277"/>
+        </testsuite>
+      </testsuite>
+      <testsuite name="Tests\Feature\PaidGrantCommittingAdmissionTest" file="/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantCommittingAdmissionTest.php" tests="2" assertions="22" errors="0" failures="0" skipped="0" time="202.660240">
+        <testsuite name="Tests\Feature\PaidGrantCommittingAdmissionTest::test_genuine_last_committing_callback_cannot_withdraw_current_consumer_authority_and_commit_new_origin" tests="2" assertions="22" errors="0" failures="0" skipped="0" time="202.660240">
+          <testcase name="test_genuine_last_committing_callback_cannot_withdraw_current_consumer_authority_and_commit_new_origin with data set #0" file="/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantCommittingAdmissionTest.php" line="86" class="Tests\Feature\PaidGrantCommittingAdmissionTest" classname="Tests.Feature.PaidGrantCommittingAdmissionTest" assertions="11" time="119.428534"/>
+          <testcase name="test_genuine_last_committing_callback_cannot_withdraw_current_consumer_authority_and_commit_new_origin with data set #1" file="/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantCommittingAdmissionTest.php" line="86" class="Tests\Feature\PaidGrantCommittingAdmissionTest" classname="Tests.Feature.PaidGrantCommittingAdmissionTest" assertions="11" time="83.231705"/>
+        </testsuite>
+      </testsuite>
+      <testsuite name="Tests\Feature\PaidGrantDownloadJourneyTest" file="/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantDownloadJourneyTest.php" tests="1" assertions="12" errors="1" failures="0" skipped="0" time="237.889233">
+        <testcase name="test_actual_mailbox_recovery_keeps_original_paid_origin_and_pdf_and_allows_only_fresh_same_account_download" file="/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantDownloadJourneyTest.php" line="179" class="Tests\Feature\PaidGrantDownloadJourneyTest" classname="Tests.Feature.PaidGrantDownloadJourneyTest" assertions="12" time="237.889233">
+          <error type="App\Domain\Grants\Paid\PaidGrantException">Tests\Feature\PaidGrantDownloadJourneyTest::test_actual_mailbox_recovery_keeps_original_paid_origin_and_pdf_and_allows_only_fresh_same_account_download
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/workspace/VA-Studio-paid-grants-commit-admission/app/Domain/Grants/Paid/PaidGrantException.php:17
+/workspace/VA-Studio-paid-grants-commit-admission/app/Domain/Grants/Paid/PaidGrantDownloads.php:222
+/workspace/VA-Studio-paid-grants-commit-admission/app/Domain/Grants/Paid/PaidGrantDownloads.php:116
+/workspace/VA-Studio-paid-grants-commit-admission/app/Domain/Grants/Paid/PaidGrantCommands.php:64
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-paid-grants-commit-admission/app/Domain/Grants/Paid/PaidGrantCommands.php:43
+/workspace/VA-Studio-paid-grants-commit-admission/app/Domain/Grants/Paid/PaidGrantDownloads.php:126
+/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantDownloadJourneyTest.php:207</error>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Feature\PaidGrantHttpJourneyTest" file="/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantHttpJourneyTest.php" tests="1" assertions="23" errors="0" failures="1" skipped="0" time="281.063594">
+        <testcase name="test_actual_typed_buyer_http_finalization_paid_pdf_and_native_file_delivery_preserve_originals" file="/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantHttpJourneyTest.php" line="106" class="Tests\Feature\PaidGrantHttpJourneyTest" classname="Tests.Feature.PaidGrantHttpJourneyTest" assertions="23" time="281.063594">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\PaidGrantHttpJourneyTest::test_actual_typed_buyer_http_finalization_paid_pdf_and_native_file_delivery_preserve_originals
+Expected response status code [200] but received 409.
+Failed asserting that 409 is identical to 200.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/workspace/VA-Studio-paid-grants-commit-admission/tests/Feature/PaidGrantHttpJourneyTest.php:128</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

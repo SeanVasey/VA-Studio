@@ -1,0 +1,20 @@
+{
+  "schema": "vaseyaudio_member_fk_review_c5abcc9a46",
+  "probe_sha256": "72648803519da41d025222e000ecfeceef051ca3e0cdcd0dd01c4dbdbcdaca8a",
+  "probe_source": "7443754",
+  "membership_source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+  "phase": "successor",
+  "php_version": "8.4.26",
+  "review_composition": "d05abc70b9101a7eb8f40aa3d819e4090ca02d5d",
+  "datadir_in_workspace": true,
+  "privileges": [
+    "SELECT",
+    "REFERENCES"
+  ],
+  "scope": "one temporary users(id) fixture only; existing reviewer; no credentials changed",
+  "probe_exit_code": 0,
+  "schema_absent_after_cleanup": true,
+  "table_privileges_absent_after_cleanup": true,
+  "cross_schema_foreign_keys_absent_after_cleanup": true,
+  "reviewer_schema_sessions_after_cleanup": 0
+}

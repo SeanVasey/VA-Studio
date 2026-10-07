@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PaidGrantNativeHttpDiagnosticTest" file="/tmp/paid-native-http-diagnostic/PaidGrantNativeHttpDiagnosticTest.php" tests="1" assertions="36" errors="0" failures="1" skipped="0" time="288.891802">
+    <testcase name="test_actual_typed_buyer_http_finalization_paid_pdf_and_native_file_delivery_preserve_originals" file="/tmp/paid-native-http-diagnostic/PaidGrantNativeHttpDiagnosticTest.php" line="99" class="Tests\Feature\PaidGrantNativeHttpDiagnosticTest" classname="Tests.Feature.PaidGrantNativeHttpDiagnosticTest" assertions="36" time="288.891802">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\PaidGrantNativeHttpDiagnosticTest::test_actual_typed_buyer_http_finalization_paid_pdf_and_native_file_delivery_preserve_originals
+Expected response status code [200] but received 409.
+Failed asserting that 409 is identical to 200.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/tmp/paid-native-http-diagnostic/PaidGrantNativeHttpDiagnosticTest.php:122
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

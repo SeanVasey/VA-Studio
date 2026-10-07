@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PaidGrantDownloadJourneyTest" file="/workspace/VA-Studio-paid-grants-portable/tests/Feature/PaidGrantDownloadJourneyTest.php" tests="1" assertions="35" errors="0" failures="0" skipped="0" time="7.880104">
+    <testcase name="test_actual_mailbox_recovery_keeps_original_paid_origin_and_pdf_and_allows_only_fresh_same_account_download" file="/workspace/VA-Studio-paid-grants-portable/tests/Feature/PaidGrantDownloadJourneyTest.php" line="172" class="Tests\Feature\PaidGrantDownloadJourneyTest" classname="Tests.Feature.PaidGrantDownloadJourneyTest" assertions="35" time="7.880104"/>
+  </testsuite>
+</testsuites>

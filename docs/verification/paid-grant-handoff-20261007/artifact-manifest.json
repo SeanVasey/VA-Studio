@@ -1,0 +1,198 @@
+{
+  "source_before_evidence": "e27ca2dd22fad413cc3aff4e080bbe740fc181b3",
+  "status": "Held checkpoint; original native409 remains unresolved",
+  "files": [
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/README.md",
+      "sha256": "e997c0c2974ef679d0802b3b73a413954ab34f4f0cc1f126b04c791b2c37004e"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/build.txt",
+      "sha256": "339014c5c6d88baace4f6fce8abf36c421ae4a794e3071149ef0b3b0eb7f7a95"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/canonical-overlay-harness-failure.txt",
+      "sha256": "403184fbca7ebd5c3a6796165e50c694ba7f4220989c13f65150d77c59e331a6"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/checks.json",
+      "sha256": "f89182a2ecf298273aa1ccfbf5ecaec4c5023205f7cd51dc4fb1687aa788f95c"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/final-native-idle.json",
+      "sha256": "32443cf0b5a984d6d3c4e08d321c0bb6e2be3afb595ddc25a04a73dfe7037441"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/frontend.txt",
+      "sha256": "644b392c29ed10c5efbf192afa2550f82428e8af720e219af60ca95c01332a27"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/membership-boot-failure.json",
+      "sha256": "82690231b0f673b55e63464d47f5b8159d96337d0a6855fe2b0f18dd21e99e19"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/membership-boot-failure.txt",
+      "sha256": "4a22e0dff63a34e41faa0976ea00583c18ecbe5cd1ce95d8cbd02d3b8db67b98"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/membership-original-cleanup.json",
+      "sha256": "b987ee148b36bac1021eee425b3853ef8fe5ae20e3e65eb0be4a224fa092dea1"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/membership-successor-cleanup.json",
+      "sha256": "a52a55d26677f8f16b994dd49cfab8e603c3dfc0e8dd7db73ac99490eeaf18c8"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-http-diagnostic-stage-one/PaidGrantCommands.php.txt",
+      "sha256": "9b55d2ab0052a2f6b5503f1c1850780453b6fcca642080f823db90a7de3402e9"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-http-diagnostic-stage-one/PaidGrantException.php.txt",
+      "sha256": "04b3b37cf0822f8db9954ac1d60e3b42f7e771dfe695ae6aa4c071cb6ba89ab0"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-http-diagnostic-stage-one/bootstrap.php.txt",
+      "sha256": "4e2295ffd7332cfc5ca328a25bb39bfcb94ea60a9877bb1cf7205f90b0841cc8"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-http-diagnostic-stage-one/junit.xml",
+      "sha256": "e3137587afb53f87341e339b12deaa6e35ac60bca002570420fb3ee6587d31b6"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-http-diagnostic-stage-one/manifest.json",
+      "sha256": "5eb000dbf8319c5a1dfb41431b1324c3695d1ff579ab3fe5f9b30839deee90e5"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-http-diagnostic-stage-one/output.txt",
+      "sha256": "9940e643f968e29ec8b32fe3118db670ed6ce03593edbfe8cd12ffe66bf7de60"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-http-diagnostic-stage-two/IdentityException.php.txt",
+      "sha256": "8071614208d02d9629bde7077ed120000e15ea2497a19f387df7a2487a03c963"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-http-diagnostic-stage-two/PaidGrantCommands.php.txt",
+      "sha256": "9b55d2ab0052a2f6b5503f1c1850780453b6fcca642080f823db90a7de3402e9"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-http-diagnostic-stage-two/PaidGrantException.php.txt",
+      "sha256": "82c8d4d20cd8b43bb7376b5e98987326ef44e75de225b0e0deed9eb324f2289a"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-http-diagnostic-stage-two/PaidGrantNativeHttpDiagnosticTest.php.txt",
+      "sha256": "719de773540b1f4c0e6edf5c96744604ecf4e16bc59f7cf1ecd5ddaed9662ae9"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-http-diagnostic-stage-two/bootstrap.php.txt",
+      "sha256": "2c5b9edea81e107ff7d89efc0a4b817bbdf0bb02af8a13f791814e0c43d9f4a6"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-http-diagnostic-stage-two/fresh-recovery.txt",
+      "sha256": "8d43b79be31089266a1c5188c38014076547f9c44bb0342c48315003473810d2"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-http-diagnostic-stage-two/fresh-recovery.xml",
+      "sha256": "1b87be6d84776384c8e72d8b955864a765349a1cfd6c6643172998a3cce7ccff"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-http-diagnostic-stage-two/refusals.jsonl",
+      "sha256": "cec8347b0f902f7f0495a48bf241b94bc45a51633b96e1128e07d94a67138657"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-http-diagnostic-stage-two/stage-two-http.txt",
+      "sha256": "a728349303f20e751fc9bfefa9a29074b138e103ff851ffcabfc51c7154c2565"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-http-diagnostic-stage-two/stage-two-http.xml",
+      "sha256": "e9facbc57a1e4e0ec7faec0692d5fec5a4efb51286d596c8d12071784872104a"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-http-diagnostic-stage-two/stages.jsonl",
+      "sha256": "f2637929063d0a6aa7011c4b0b9f39498c9fea0dd08915f3582bd32e9f2c972c"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-http-refusal-summary.json",
+      "sha256": "c2591df1619aac982ba594fc075fdb37e3975c544d6ff97f5583d2cdd5d3ac47"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-mysql-provenance.json",
+      "sha256": "00c2da1f2fd94654887550247fc0ba995fefc6ff88c2704eac97ae842cf07f00"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-original-selected.txt",
+      "sha256": "c31d042d55218276b8695c30f8a8fb4d0b443e13a247bdd692c4402034ca0a98"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-original-selected.xml",
+      "sha256": "bf4327e94d792861aeeeb74634504ef9b60fde1a9aca8795064e8cec082b8f38"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-parent-successor.txt",
+      "sha256": "2d986423ff17d105338a0965078ae66978048bf7517df2048c9c1bd62f677cca"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/native-parent-successor.xml",
+      "sha256": "a2183c0ae58f7f79dfd0cbb888adfa83edeca55c517eeee40a21e764dd53b9dd"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/owned-runtime-source-manifest.json",
+      "sha256": "01baed168770ed789e5f9e611dc1a02bb5acd93f1edf666c83d0693fdfb5bee8"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/sqlite-affected-successor.txt",
+      "sha256": "f106a7c50b4f8aad450f13f9764c7756a2bf95068c49c4fab312221f911b3cd3"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/sqlite-affected-successor.xml",
+      "sha256": "8c8d18925c5e0af98903e0c14d25baae1d169522159379c8f1c8585c82cc2a68"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/sqlite-canonical-composer.txt",
+      "sha256": "c4c1ba1499d8730f13e577d72ef794f25992c951874c7fe59aca8c63d791f4a0"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/sqlite-canonical-composer.xml",
+      "sha256": "eb93529c67deca9e77396d0ee45c07cba7bf18ba1b9b652bb163bf88e651c133"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/sqlite-fresh-recovery.txt",
+      "sha256": "b208c04f4fc8296be3a831a7dcb1b11b5a62da156804040a3d1a02eec929da26"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/sqlite-fresh-recovery.xml",
+      "sha256": "55d60c40ede334fc7687c62f6ba9f73135d93b388bd5d10fef4bbb0b184809e8"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/sqlite-parent-and-committing-successor.txt",
+      "sha256": "ce5bb07f040e36f0a183e7b62ae70a88f475cc95feaf578fbcefd7698ea08237"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/sqlite-parent-and-committing-successor.xml",
+      "sha256": "05dae71cde7bd5d2b404ea0aa04804ea24609029e4559dfb2597740094b1f6b5"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/sqlite-parent-successor.txt",
+      "sha256": "58bc6ed22324772a4833268f3e32b8cd85a7e913f5b241c6d0d8a8a0c3e59785"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/sqlite-parent-successor.xml",
+      "sha256": "ebf5393c27d3e28a31156a6bb577e6e02ee7cc64eafdd80a1a21538a6926985b"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/sqlite-portable-development.txt",
+      "sha256": "fc7a7e013989269389a479fb60071ee06d4832806cd1fb94c44e98f440237a23"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/sqlite-portable-development.xml",
+      "sha256": "c182d7e6783353943e0a79688edad48c3c1ed316535cab5c08c813aa15694de0"
+    },
+    {
+      "path": "docs/verification/paid-grant-handoff-20261007/typecheck.txt",
+      "sha256": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f"
+    }
+  ]
+}

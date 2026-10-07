@@ -1,0 +1,2 @@
+
+Fatal error: Trait "Tests\Support\ProductionCheckoutJourneyFixture" not found in /workspace/VA-Studio-paid-grants-canonical-fixture/tests/Feature/PaidGrantCommitCapsuleTest.php on line 31

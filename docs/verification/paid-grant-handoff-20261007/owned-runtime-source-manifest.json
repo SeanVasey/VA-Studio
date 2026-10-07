@@ -1,0 +1,154 @@
+{
+  "source": "e27ca2dd22fad413cc3aff4e080bbe740fc181b3",
+  "status": "held/default-off preparation",
+  "files": [
+    {
+      "path": "app/Domain/Grants/Paid/Models/PaidOrderOrigin.php",
+      "sha256": "fbc46af6ebb03026c21eb0d0094385348f234cd739ef041588e845cf4fccbf5a"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantAssets.php",
+      "sha256": "bf3fd17e7d18207c0f92596c98ab0ebca1e8e176a170d86234e3111aaa630879"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantCommands.php",
+      "sha256": "e71b32249c8f94630394241c5118060f03ab7d758cd6a6280b7b4e83435ee617"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantConfiguration.php",
+      "sha256": "2d163d1306a66691e1b02bae703eb59db0436123251e5ae16ff06a18a5745836"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantConsumerCommitAdmission.php",
+      "sha256": "4c2ae673727b0aa97f6557b15ddde3378100ff4d5b2feb04c68abf57f9690879"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantDeadline.php",
+      "sha256": "63c4c2d18995afe343274af7fbcbfedac11411c5d9dcb8b85f180999d72a1c44"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantDocuments.php",
+      "sha256": "8fe2708ac5365b57041f6ae65d152f884502390a56075347ad763de406bb775b"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantDownloads.php",
+      "sha256": "a94bfddb8a66919ce576474ee5cc541e2182bd888e4241b445b87b4740f20d11"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantException.php",
+      "sha256": "39629f0b4b63168e3bb36bed864e7846ad378a01e1771d2959e202dbcfd15e34"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantFiles.php",
+      "sha256": "f37bcf56475596b4e41e03512520b7a002d196c772d5257801d40088d52cc418"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantForm.php",
+      "sha256": "4567b5b6b77d5a0104d67aff8c2ee4649237d38dba336c4c56473c3614f9dc58"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantInput.php",
+      "sha256": "bbd4337e6417f03d3cdccf9d25f46208ae7d067dee6cff53b3885e8fe2c50df3"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantJson.php",
+      "sha256": "e7fa85b5865a2fa415e611382a85bb5a8c613b796e9860d0a006950694c4422d"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantPdfRenderer.php",
+      "sha256": "8a0fce94ed52d65eb31ebf67941976cd31676a47300d9a5ed4b7289d64209c44"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantPolicy.php",
+      "sha256": "9c4a630031877a2c16dea51043a5cb263ec6b0986df80f8b500d1246605b6a63"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantPrepareStream.php",
+      "sha256": "22a0e4d0ef059821799a3b6d69c73c6a12287103e80d5da14d6ec464f51d7a81"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantProjectionRead.php",
+      "sha256": "9af1f6f3f58d1d7b020e3e39d2bbd0d05fa76ba45509b4be442313426acb8caa"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantReadReceipt.php",
+      "sha256": "d8ead7e1ca101bd1408d0e34fae07f670c2e3f66a033087c32c9cee52f14ccc8"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantReads.php",
+      "sha256": "19fcd83285b41dcb706b66770849d0818f9499972fca63ba9edc4ca1087769df"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantRecords.php",
+      "sha256": "3a17b5c9b2951dce115c40203292e85057b99705d474e27c87bacaa51473413e"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantRenderInput.php",
+      "sha256": "b3d2eb372fce8d87cc9cfea0cd1f35d18b609ef2636cef4b77a29e4c5541c5cc"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantRenderProfile.php",
+      "sha256": "8b89c67ea0266ac326691dadd19ebdea8e3127a73faf02754cb46e96d3cdb472"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantRendererProcess.php",
+      "sha256": "d138d616268483762beb2f45ffcd9489eddcdb59c0f4568852d7a40a485ad64f"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantRows.php",
+      "sha256": "4dba1da43b4b166f44cf411e2dd01f60ffab66f437248f163538815da618c909"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantSchema.php",
+      "sha256": "a616a4824f033c810385b8b180665d32ba13586e2dbbaaf1135fad0d6a10a603"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantText.php",
+      "sha256": "9eabe757ed8daa9618de7af7cd22911fd971a0f5174d5cb6eac7294c1e0c5411"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrantTransfer.php",
+      "sha256": "5303f4cc893912c8be95368cea68f6e59dc5b3fb49c4382640418946128d9443"
+    },
+    {
+      "path": "app/Domain/Grants/Paid/PaidGrants.php",
+      "sha256": "d233a9277e61dcb0e6e5fb486c0e8c9b74c63d48098788b1a5d6d69f2d5b8499"
+    },
+    {
+      "path": "app/Http/Controllers/PaidGrantController.php",
+      "sha256": "2cc55ab9744e41b87b35bfcc471dfed1259f3938c3e71f0075e33eab5591aa97"
+    },
+    {
+      "path": "app/Http/Middleware/PaidGrantPrivacy.php",
+      "sha256": "9505082b817dc89553d070662974b0b95d0406c3196fff160923ef4b14255f9a"
+    },
+    {
+      "path": "config/paid-grants.php",
+      "sha256": "13bd8813bd8a3fa7af75186168c358c20e06615017329cacd3076bc74cfbf0e6"
+    },
+    {
+      "path": "database/migrations/2026_10_07_252000_paid_grant_origins.php",
+      "sha256": "9ae9969482649176179d307fc48f3aea86d6f5ad8723bbe457a318b8cc18ebe3"
+    },
+    {
+      "path": "resources/contracts/paid-v1/profile-assets.json",
+      "sha256": "4a2221b64384c226e72cf16811e31f512a8a8f63c65081a04487ec5f7a573940"
+    },
+    {
+      "path": "resources/js/Pages/PaidGrants.tsx",
+      "sha256": "9c58a7eb83c03ca6f8cbb8d70d9d59a99984e03cf1e17d80509f06006f253250"
+    },
+    {
+      "path": "resources/js/components/PaidGrantJourney.tsx",
+      "sha256": "c5a586317ed15d33610ba3d1d5620a1d6383eb8c623c2c7797d7f475cff3e628"
+    },
+    {
+      "path": "routes/paid-grants.php",
+      "sha256": "cc416bfd1c47b737e3b01a1b38e9b1f8da091b14102791c7536101d28462d7b5"
+    },
+    {
+      "path": "scripts/render-paid-grant.php",
+      "sha256": "90c6dccdadabc117d7a11b6a21e4043cbe22e8616faa79141852e56ab14623fc"
+    }
+  ]
+}

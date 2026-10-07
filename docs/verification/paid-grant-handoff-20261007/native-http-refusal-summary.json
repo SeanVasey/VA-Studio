@@ -1,0 +1,142 @@
+{
+  "source": "e27ca2dd22fad413cc3aff4e080bbe740fc181b3",
+  "instrumentation": "temporary constructor/fixed reason/no-argument trace only; not runtime acceptance",
+  "authorization_return": {
+    "at_ns": 18343308082899,
+    "stage": "authorization_return",
+    "kind": "master_wav",
+    "authorization_array": true,
+    "token_shape": true
+  },
+  "refusals": [
+    {
+      "at_ns": 18383559492266,
+      "stage": "producer_refusal",
+      "status": 409,
+      "reason": "committed_read_frame",
+      "first_frames": [
+        {
+          "file": "/workspace/VA-Studio-paid-grants-portable/tests/Fixtures/paid-development/2ec1854-e8f7441/app/Domain/Commerce/ProductionCheckout/OriginalCommitDispatcher.php",
+          "line": 95,
+          "function": "require",
+          "class": "App\\Domain\\Commerce\\ProductionCheckout\\CheckoutException"
+        },
+        {
+          "file": "/workspace/VA-Studio-paid-grants-portable/tests/Fixtures/paid-development/2ec1854-e8f7441/app/Domain/Commerce/ProductionCheckout/OriginalCommitDispatcher.php",
+          "line": 54,
+          "function": "requireCurrent",
+          "class": "App\\Domain\\Commerce\\ProductionCheckout\\OriginalCommitDispatcher"
+        },
+        {
+          "file": "/workspace/VA-Studio-paid-grants-portable/tests/Fixtures/paid-development/2ec1854-e8f7441/app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderCommittedReadReceiptV1.php",
+          "line": 31,
+          "function": "historicalReceipt",
+          "class": "App\\Domain\\Commerce\\ProductionCheckout\\OriginalCommitDispatcher"
+        },
+        {
+          "file": "/workspace/VA-Studio-paid-grants-portable/tests/Fixtures/paid-development/2ec1854-e8f7441/app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderSourceV1.php",
+          "line": 58,
+          "function": "capture",
+          "class": "App\\Domain\\Commerce\\ProductionCheckout\\ProductionPaidOrderCommittedReadReceiptV1"
+        }
+      ]
+    },
+    {
+      "at_ns": 18383559630519,
+      "stage": "consumer_exception",
+      "status": 409,
+      "reason": null,
+      "first_frames": [
+        {
+          "file": "/tmp/paid-native-http-diagnostic/PaidGrantCommands.php",
+          "line": 95,
+          "function": "__construct",
+          "class": "App\\Domain\\Grants\\Paid\\PaidGrantException"
+        },
+        {
+          "file": "/workspace/VA-Studio-paid-grants-portable/app/Domain/Grants/Paid/PaidGrantDownloads.php",
+          "line": 132,
+          "function": "run",
+          "class": "App\\Domain\\Grants\\Paid\\PaidGrantCommands"
+        },
+        {
+          "file": "/workspace/VA-Studio-paid-grants-portable/app/Http/Controllers/PaidGrantController.php",
+          "line": 116,
+          "function": "redeem",
+          "class": "App\\Domain\\Grants\\Paid\\PaidGrantDownloads"
+        },
+        {
+          "file": "/workspace/VA-Studio-paid-grants-portable/app/Http/Controllers/PaidGrantController.php",
+          "line": 172,
+          "function": "{closure:App\\Http\\Controllers\\PaidGrantController::redeem():111}",
+          "class": "App\\Http\\Controllers\\PaidGrantController"
+        }
+      ]
+    },
+    {
+      "at_ns": 18587830289393,
+      "stage": "identity_exception",
+      "status": 403,
+      "reason": "unavailable",
+      "first_frames": [
+        {
+          "file": "/workspace/VA-Studio-paid-grants-portable/tests/Fixtures/paid-development/2ec1854-e8f7441/app/Domain/Customers/ProductionCustomerAccess.php",
+          "line": 291,
+          "function": "__construct",
+          "class": "App\\Domain\\Customers\\ProductionIdentity\\IdentityException"
+        },
+        {
+          "file": "/workspace/VA-Studio-paid-grants-portable/tests/Fixtures/paid-development/2ec1854-e8f7441/app/Domain/Customers/ProductionCustomerAccess.php",
+          "line": 56,
+          "function": "match",
+          "class": "App\\Domain\\Customers\\ProductionCustomerAccess"
+        },
+        {
+          "file": "/workspace/VA-Studio-paid-grants-portable/app/Domain/Grants/Paid/PaidGrantDownloads.php",
+          "line": 155,
+          "function": "current",
+          "class": "App\\Domain\\Customers\\ProductionCustomerAccess"
+        },
+        {
+          "file": "/workspace/VA-Studio-paid-grants-portable/app/Domain/Grants/Paid/PaidGrantDownloads.php",
+          "line": 109,
+          "function": "locate",
+          "class": "App\\Domain\\Grants\\Paid\\PaidGrantDownloads"
+        }
+      ]
+    },
+    {
+      "at_ns": 18587830347228,
+      "stage": "consumer_exception",
+      "status": 403,
+      "reason": null,
+      "first_frames": [
+        {
+          "file": "/workspace/VA-Studio-paid-grants-portable/app/Domain/Grants/Paid/PaidGrantDownloads.php",
+          "line": 157,
+          "function": "__construct",
+          "class": "App\\Domain\\Grants\\Paid\\PaidGrantException"
+        },
+        {
+          "file": "/workspace/VA-Studio-paid-grants-portable/app/Domain/Grants/Paid/PaidGrantDownloads.php",
+          "line": 109,
+          "function": "locate",
+          "class": "App\\Domain\\Grants\\Paid\\PaidGrantDownloads"
+        },
+        {
+          "file": "/workspace/VA-Studio-paid-grants-portable/tests/Feature/PaidGrantDownloadJourneyTest.php",
+          "line": 191,
+          "function": "redeem",
+          "class": "App\\Domain\\Grants\\Paid\\PaidGrantDownloads"
+        },
+        {
+          "file": "/workspace/VA-Studio/vendor/phpunit/phpunit/src/Framework/TestCase.php",
+          "line": 1318,
+          "function": "test_actual_mailbox_recovery_keeps_original_paid_origin_and_pdf_and_allows_only_fresh_same_account_download",
+          "class": "Tests\\Feature\\PaidGrantDownloadJourneyTest"
+        }
+      ]
+    }
+  ],
+  "diagnosis": "Second redemption Commands.run fails OriginalCommitDispatcher requireCurrent compound phase/deadline/dispatcher predicate during original receipt mint. No conjunct isolated and no lifetime changed."
+}

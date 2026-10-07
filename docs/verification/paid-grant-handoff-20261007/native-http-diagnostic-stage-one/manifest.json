@@ -1,0 +1,8 @@
+{
+  "purpose": "ONE original HTTP native case; temporary nonsecret refusal trace only, no policy/deadline changes",
+  "source": "af353d639e84340c025beafac0d5e2c4e736f1e9",
+  "modified": {
+    "PaidGrantCommands.php": "log fixed producer reason/status/trace after catch, preserve mapping",
+    "PaidGrantException.php": "log status/no-argument trace only at refusal"
+  }
+}

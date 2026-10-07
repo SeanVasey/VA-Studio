@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PaidGrantCommitParentOriginalCanaryTest" file="/workspace/VA-Studio-paid-grants-commit-admission/docs/verification/paid-grant-commit-admission-20261007/PaidGrantCommitParentOriginalCanaryTest.php" tests="1" assertions="14" errors="0" failures="0" skipped="0" time="4.071508">
+    <testsuite name="Tests\Feature\PaidGrantCommitParentOriginalCanaryTest::test_opaque_capsule_closes_only_original_prepared_current_owner_policy_and_owned_writes_without_callbacks_or_new_locks" tests="1" assertions="14" errors="0" failures="0" skipped="0" time="4.071508">
+      <testcase name="test_opaque_capsule_closes_only_original_prepared_current_owner_policy_and_owned_writes_without_callbacks_or_new_locks with data set #0" file="/workspace/VA-Studio-paid-grants-commit-admission/docs/verification/paid-grant-commit-admission-20261007/PaidGrantCommitParentOriginalCanaryTest.php" line="93" class="Tests\Feature\PaidGrantCommitParentOriginalCanaryTest" classname="Tests.Feature.PaidGrantCommitParentOriginalCanaryTest" assertions="14" time="4.071508"/>
+    </testsuite>
+  </testsuite>
+</testsuites>
