@@ -431,6 +431,12 @@ the Vite manifest is required before the release can be switched to; a failed li
 after `php artisan up` re-enters maintenance at once before aborting to the rollback; the
 rollback proves the worker's working directory after its restart, not while stopped.
 
+Codex's twenty-third pass (P1 ×2, docs): the recovery `php artisan down` after a failed
+live check is fatal and proven (marker file and exactly 503), and when that proof fails the
+sequence stops `<WEB_SERVICE>` and reports the broken release as still public instead of
+claiming maintenance; the S1 rollback's step 1 stops `<WEB_SERVICE>` and proves the PHP
+workers drained (`is-active`, `pgrep`) before step 2 drops and restores anything.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex

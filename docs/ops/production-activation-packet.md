@@ -199,10 +199,22 @@ test "$(readlink -f /proc/$(systemctl show -p MainPID --value <QUEUE_WORKER_SERV
 # Leave maintenance last, in this release only; the superseded release stays down. A service
 # that fails above keeps the host in maintenance (fail safe): fix it, then `php artisan up` by hand.
 # If the live check fails after `up`, re-enter maintenance at once (never leave a broken
-# release serving errors; S3 reuses this sequence) and go to the rollback below.
+# release serving errors; S3 reuses this sequence) and go to the rollback below. That recovery
+# `down` is itself a step that can fail (release storage not writable, for example), so it is
+# fatal and proven the same way as every other maintenance transition here: the marker file
+# exists and the origin answers exactly 503. If either proof fails, the broken release is
+# still public: stop <WEB_SERVICE> as the last resort and say so; never print "back in
+# maintenance" without the proof.
 php artisan up || exit 1
-[ "$(curl -s -o /dev/null -w '%{http_code}' https://<STAGING_ORIGIN>/)" = 200 ] \
-  || { php artisan down; echo 'not 200 after artisan up: back in maintenance; run the rollback'; exit 1; }
+if [ "$(curl -s -o /dev/null -w '%{http_code}' https://<STAGING_ORIGIN>/)" != 200 ]; then
+  php artisan down \
+    || { echo 'not 200 after artisan up AND artisan down failed: broken release still public; stopping <WEB_SERVICE>'; systemctl stop <WEB_SERVICE>; exit 1; }
+  [ -f storage/framework/maintenance.php ] \
+    || { echo 'not 200 after artisan up AND no maintenance marker: broken release still public; stopping <WEB_SERVICE>'; systemctl stop <WEB_SERVICE>; exit 1; }
+  [ "$(curl -s -o /dev/null -w '%{http_code}' https://<STAGING_ORIGIN>/)" = 503 ] \
+    || { echo 'not 200 after artisan up AND not 503 after artisan down: broken release still public; stopping <WEB_SERVICE>'; systemctl stop <WEB_SERVICE>; exit 1; }
+  echo 'not 200 after artisan up: back in maintenance (marker and 503 proven); run the rollback'; exit 1
+fi
 ```
 
 **Expected:**
@@ -232,7 +244,16 @@ php artisan up || exit 1
    maintenance mode is proven. Then stop the queue worker and scheduler services and confirm
    `systemctl is-active` reports them inactive: an in-flight media, contract, payment or
    scheduled-publication job must not write to the database or private storage while the
-   restore runs (the backup procedure quiesces the same way).
+   restore runs (the backup procedure quiesces the same way). The 503 proves only that NEW
+   requests are refused; an HTTP write admitted before `down` (an upload, a checkout
+   command) can still be running in a PHP worker, so stop the web workers too, exactly as
+   the S1 quiesce block does, before anything is dropped or restored:
+   `systemctl stop <WEB_SERVICE> || exit 1`, then `systemctl is-active --quiet <WEB_SERVICE>
+   && exit 1`, then `pgrep -u <APP_USER> -f 'php-fpm|artisan serve|octane' >/dev/null && {
+   echo 'PHP processes still serving'; exit 1; }`. Nothing in step 2 runs until that drain
+   proof passes; the web server in front answers 502/503 meanwhile, and step 3 starts
+   `<WEB_SERVICE>` again on the previous release (a start that is real, not a no-op against
+   workers that never stopped).
 2. Restore the pre-migration backup into the **staging** schema only, after dropping and
    recreating that schema: the dump is taken with `--databases` and without
    `--add-drop-database`, and MySQL's default `--add-drop-table` drops only tables the dump
