@@ -1,0 +1,6 @@
+{
+    "php": "8.4.26",
+    "sqlite": "3.46.1",
+    "source": "\/workspace\/VA-Studio-suppression-cached-primary\/app\/Domain\/Customers\/Preferences\/Suppression\/SuppressionDelivery.php",
+    "test": "\/workspace\/VA-Studio-suppression-cached-primary\/tests\/Feature\/CustomerSuppressionSourceBoundaryTest.php"
+}
