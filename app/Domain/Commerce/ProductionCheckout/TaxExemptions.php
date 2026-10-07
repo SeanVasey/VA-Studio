@@ -48,7 +48,8 @@ final class TaxExemptions
             $requestHash = CanonicalJson::hash($request);
             $existing = $rows->selector('basis', 'created_by = ? AND request_key = ?', [$qualifier->id, $digest]);
             CheckoutException::require(count($existing) <= 1);
-            if ($existing !== []) {
+            $created = $existing === [];
+            if (! $created) {
                 $record = $existing[0];
                 $body = Evidence::open($record, 'production_checkout_exemption_basis');
                 Evidence::same($request, $body['request']);
@@ -73,6 +74,11 @@ final class TaxExemptions
             CurrentPolicy::proveCurrent($rows->current, $current);
             StaffProof::proveCurrent($qualifier, $rows->current, $staff);
             $this->access->proveCurrent($principal, $buyer, $rows->current, $access);
+            if ($created) {
+                // Only a NEW basis installs the one commit observer; an exact replay writes nothing.
+                CheckoutStaffWriteAdmission::basis($rows, $qualifier, $staff, $buyer, $access, $current, $selection,
+                    $authority, $policy, $attestation, $record, $digest);
+            }
 
             return $record;
         });

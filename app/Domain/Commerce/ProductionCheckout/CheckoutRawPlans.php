@@ -8,139 +8,65 @@ use App\Domain\Commerce\Policy\Models\ProductionTrackPolicyDraft;
 use App\Domain\Commerce\ProductionPolicy\CapabilityHistory;
 use App\Domain\Commerce\ProductionPolicy\ProductionTrackCapabilities;
 use App\Domain\Commerce\ProductionPolicy\SourceCommitment;
-use App\Domain\Customers\ProductionCustomerAccess;
-use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Models\User;
-use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use PDO;
 use ReflectionProperty;
 
-/** Sealed server-authenticated NEW write admission. No caller snapshot or renewed identity proof at commit. */
-final class CheckoutWriteAdmission implements CheckoutCommitAdmission
+/**
+ * Fixed qualified raw SELECT plans on the captured internal primary of one original command frame.
+ *
+ * The plan, read, definition and identity/selection/history selectors deliberately reproduce the
+ * frozen c6 CheckoutWriteAdmission private machinery byte-for-byte in behavior, so that frozen
+ * capsule stays unchanged and independently reviewed. Consolidating CheckoutWriteAdmission onto
+ * this class is a separate refactor that needs its own review.
+ */
+final class CheckoutRawPlans
 {
     private array $plans = [];
 
     private array $definitions = [];
 
-    private array $actorAttributes;
+    private array $actors = [];
 
-    private function __construct(private readonly CheckoutCommandFrame $frame, private readonly FreshCheckoutPolicy $fresh, private readonly User $actor)
-    {
-        $attributes = (new ReflectionProperty(Model::class, 'attributes'))->getValue($actor);
-        CheckoutException::require(is_array($attributes) && $actor::class === User::class && $actor->exists, 'write_frame');
-        $this->actorAttributes = $attributes;
-    }
-
-    /** All extensible interpretation and private byte work completes before retaining the fixed raw plans. */
-    public static function capture(Records $rows, ProductionCustomerAccess $access, ProductionCustomerPrincipal $principal,
-        User $buyer, FreshCheckoutPolicy $fresh, string $kind, string $publicId): self
-    {
-        CheckoutException::require(in_array($kind, ['review', 'order'], true), 'write_frame');
-        $frame = $rows->commandFrame();
-        $frame->proveAnchor();
-        $identity = $access->lock($principal, $buyer, $rows->current);
-        $record = $rows->one($kind, $publicId);
-        $retained = $kind === 'review' ? OrderEvidence::review($rows, $record) : OrderEvidence::order($rows, $record);
-        $review = $kind === 'review' ? $retained : $retained['review'];
-        Evidence::same($access->durableBinding($principal), $review['body']['buyer']);
-        $current = CurrentPolicy::load($rows->current, $review['row']['candidate_id']);
-        Evidence::same($current['binding'], $review['body']['candidate']);
-        Evidence::same($current['context']->binding(), $review['body']['execution_context']);
-        $at = CarbonImmutable::now('UTC');
-        $selection = CurrentSelection::load($rows->current, $review['body']['request']['items'], $at);
-        Evidence::same($selection, $review['body']['selection']);
-        $basis = TaxExemptions::basis($rows, $review['body']['basis_public_id'], $current, $identity['durable_binding'], $selection, $at);
-        CurrentSelection::proveBytes($selection);
-        OrderEvidence::proveRetained($rows, $retained['raw']);
-        TaxExemptions::proveRetained($rows, $basis);
-        CurrentSelection::proveCurrent($rows->current, $selection, CarbonImmutable::now('UTC'));
-        CurrentPolicy::proveCurrent($rows->current, $current);
-        $access->proveCurrent($principal, $buyer, $rows->current, $identity);
-
-        // Convert authenticated temporal bounds once, using the ORIGINAL command budget, never at commit.
-        $until = [$review['body']['expires_at'], $basis['body']['request']['attestation']['effective_until']];
-        if ($kind === 'order') {
-            $until[] = $retained['body']['expires_at'];
-        }
-        $authority = Evidence::open($basis['authority'], 'production_checkout_exemption_authority');
-        $until[] = $authority['policy']['effective_until'];
-        foreach ($selection['graph']['offers'] as $offer) {
-            if ((string) $offer['is_active'] !== '1') {
-                continue;
-            }
-            $revision = self::one($selection['graph']['revisions'], $offer['current_revision_id']);
-            $license = self::one($selection['graph']['licenses'], $revision['license_version_id']);
-            if ($license['effective_until'] !== null) {
-                $until[] = $license['effective_until'];
-            }
-        }
-        $expires = min(array_map(fn (string $value): float => (float) CarbonImmutable::parse($value, 'UTC')->format('U.u'), $until));
-        $remaining = $expires - (float) CarbonImmutable::now('UTC')->format('U.u');
-        CheckoutException::require($remaining > 0, 'expired');
-        $frame->capDeadline(hrtime(true) + (int) floor($remaining * 1_000_000_000));
-        $admission = new self($frame, $fresh, $buyer);
-        $admission->captureIdentity($identity);
-        $admission->captureSelection($selection);
-        $admission->captureHistory($current['raw']);
-        foreach (['authority', 'basis', 'review', 'order', 'attempt'] as $tableKind) {
-            if (isset($retained['raw'][$tableKind])) {
-                $row = $retained['raw'][$tableKind];
-                $admission->plan(CheckoutSchema::TABLES[$tableKind], 'id = ?', [$row['id']], 2, [$row]);
-            }
-        }
-        $admission->plan(CheckoutSchema::TABLES[$kind], 'buyer_origin_id = ? AND request_key = ?',
-            [$record['buyer_origin_id'], $record['request_key']], 2, [$record]);
-        if ($kind === 'order') {
-            $admission->plan(CheckoutSchema::TABLES['line'], 'order_id = ?', [$record['id']], 11, $retained['lines']);
-            $admission->plan(CheckoutSchema::TABLES['attempt'], 'order_id = ?', [$record['id']], 2, [$retained['attempt']]);
-        }
-        // No resolver, decryptor, clock factory, renderer or identity verifier follows this original raw proof.
-        $admission->proveCurrent();
-        $admission->proveFresh();
-        $frame->register($admission);
-
-        return $admission;
-    }
+    public function __construct(private readonly CheckoutCommandFrame $frame) {}
 
     public function belongsTo(CheckoutCommandFrame $frame): bool
     {
         return $this->frame === $frame;
     }
 
-    public function proveCurrent(): void
+    /** Retains a caller-supplied model's exact attribute array; a swapped or mutated model refuses. */
+    public function actor(User $actor): void
     {
-        $this->frame->prove(1);
-        CheckoutException::require($this->actor::class === User::class && $this->actor->exists
-            && (new ReflectionProperty(Model::class, 'attributes'))->getValue($this->actor) === $this->actorAttributes, 'write_source_changed');
-        foreach ($this->definitions as $table => $definition) {
-            CheckoutException::require($this->definition($table) === $definition, 'write_source_changed');
-        }
-        foreach ($this->plans as $plan) {
-            CheckoutException::require($this->read($plan['table'], $plan['where'], $plan['bindings'], $plan['limit']) === $plan['raw'], 'write_source_changed');
-        }
-        $this->frame->prove(1);
+        $attributes = (new ReflectionProperty(Model::class, 'attributes'))->getValue($actor);
+        CheckoutException::require(is_array($attributes) && $actor::class === User::class && $actor->exists, 'write_frame');
+        $this->actors[] = [$actor, $attributes];
     }
 
-    public function proveFresh(): void
-    {
-        $this->fresh->prove();
-    }
-
-    private function captureIdentity(array $identity): void
+    /** Buyer identity rows returned by ProductionCustomerAccess::lock(). */
+    public function identity(array $identity): void
     {
         $this->plan('users', 'id = ?', [$identity['user']['id']], 2, [$identity['user']]);
         $this->plan('customer_accounts', 'user_id = ?', [$identity['user']['id']], 2, [$identity['account']]);
         $this->plan('production_identity_origins', 'account_id = ?', [$identity['account']['id']], 2, [$identity['origin']]);
         $this->plan('production_identity_verifications', 'origin_id = ?', [$identity['origin']['id']], 129, $identity['verification_history']);
-        $ids = array_column($identity['verification_history'], 'challenge_id');
-        foreach ($ids as $id) {
+        foreach (array_column($identity['verification_history'], 'challenge_id') as $id) {
             $this->plan('production_identity_challenges', 'id = ?', [$id], 2,
                 $this->read('production_identity_challenges', 'id = ?', [$id], 2));
         }
     }
 
-    private function captureSelection(array $selection): void
+    /** Staff evidence returned by StaffProof::lock(): the exact users row (role, verification, MFA enrollment) and its audits. */
+    public function staff(int $userId, array $staff): void
+    {
+        CheckoutException::require($userId > 0 && (string) ($staff['row']['id'] ?? '') === (string) $userId, 'write_frame');
+        $this->plan('users', 'id = ?', [$userId], 2, [$staff['row']]);
+        $this->plan('audit_events', 'subject_type = ? AND subject_id = ?', [User::class, $userId], 257, $staff['audits']);
+    }
+
+    /** Complete current catalog selection graph returned by CurrentSelection::load(). */
+    public function selection(array $selection): void
     {
         $graph = $selection['graph'];
         $ids = array_column($selection['items'], 'trackId');
@@ -161,7 +87,8 @@ final class CheckoutWriteAdmission implements CheckoutCommitAdmission
         }
     }
 
-    private function captureHistory(array $history): void
+    /** Complete source policy and capability history returned as CurrentPolicy::load()['raw']. */
+    public function history(array $history): void
     {
         $source = $history['source'];
         $id = $source['draft']['id'];
@@ -174,6 +101,35 @@ final class CheckoutWriteAdmission implements CheckoutCommitAdmission
         $this->set(CapabilityHistory::APPROVALS, 'production_track_capability_candidate_id', $ids, $history['approvals']);
         $this->set(CapabilityHistory::CLOSURES, 'production_track_capability_candidate_id', $ids, $history['closures']);
         $this->plan('audit_events', 'subject_type = ? AND subject_id = ?', [ProductionTrackCapabilities::class, $id], 769, $history['audits']);
+    }
+
+    /** One owned checkout row by primary key. */
+    public function row(string $kind, array $row): void
+    {
+        $this->plan(CheckoutSchema::TABLES[$kind], 'id = ?', [$row['id']], 2, [$row]);
+    }
+
+    /** The exact complete set of owned checkout rows behind a fixed selector. */
+    public function selector(string $kind, string $where, array $bindings, int $limit, array $expected): void
+    {
+        $this->plan(CheckoutSchema::TABLES[$kind], $where, $bindings, $limit, $expected);
+    }
+
+    /** Commit-time comparison: captured internal PDO and default statements only. */
+    public function proveCurrent(): void
+    {
+        $this->frame->prove(1);
+        foreach ($this->actors as [$actor, $attributes]) {
+            CheckoutException::require($actor::class === User::class && $actor->exists
+                && (new ReflectionProperty(Model::class, 'attributes'))->getValue($actor) === $attributes, 'write_source_changed');
+        }
+        foreach ($this->definitions as $table => $definition) {
+            CheckoutException::require($this->definition($table) === $definition, 'write_source_changed');
+        }
+        foreach ($this->plans as $plan) {
+            CheckoutException::require($this->read($plan['table'], $plan['where'], $plan['bindings'], $plan['limit']) === $plan['raw'], 'write_source_changed');
+        }
+        $this->frame->prove(1);
     }
 
     private function set(string $table, string $column, array $ids, array $expected): void
@@ -241,16 +197,6 @@ final class CheckoutWriteAdmission implements CheckoutCommitAdmission
         return $this->frame->driver() === 'mysql' ? '`'.str_replace('`', '``', $this->frame->database()).'`.`'.$table.'`' : 'main.'.$table;
     }
 
-    private static function one(array $rows, int $id): array
-    {
-        foreach ($rows as $row) {
-            if ($row['id'] === $id) {
-                return $row;
-            }
-        }
-        CheckoutException::require(false);
-    }
-
     private static function strings(array $values): array
     {
         foreach ($values as &$value) {
@@ -263,11 +209,11 @@ final class CheckoutWriteAdmission implements CheckoutCommitAdmission
 
     public function __serialize(): never
     {
-        throw new \LogicException('Checkout write admission is an internal server capability.');
+        throw new \LogicException('Checkout raw plans are an internal server capability.');
     }
 
     public function __debugInfo(): array
     {
-        return ['authority' => 'original_checkout_new_write_admission'];
+        return ['authority' => 'original_checkout_raw_plans'];
     }
 }
