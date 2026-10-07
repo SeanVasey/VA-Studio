@@ -437,6 +437,14 @@ sequence stops `<WEB_SERVICE>` and reports the broken release as still public in
 claiming maintenance; the S1 rollback's step 1 stops `<WEB_SERVICE>` and proves the PHP
 workers drained (`is-active`, `pgrep`) before step 2 drops and restores anything.
 
+Codex's twenty-fourth pass (P2 ×2): the preflight's `return_origin_https` check now applies
+the production policy's own rule (`MachinePolicyV1::origin()`, made `public static`; no
+logic change) instead of the looser readiness helper, so an origin `ExecutionContextV1`
+refuses (localhost, an IP literal, an invalid hostname, a trailing slash) can no longer pass
+the preflight; four new malformed cases, three red before the fix
+(`conditions/codex-origin-rule/`); `StripeCapabilityPreflightTest` 46 / 378. The S1
+`migrate --pretend` preview is fatal, so a failed preview never proceeds to `migrate --force`.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex

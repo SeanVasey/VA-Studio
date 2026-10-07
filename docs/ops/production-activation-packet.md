@@ -174,7 +174,7 @@ fi
 # never exposes a release without a marker.
 php artisan down || exit 1
 php artisan migrate:status
-php artisan migrate --pretend      # review the SQL
+php artisan migrate --pretend || { echo 'migration preview failed: nothing applied; host stays in maintenance'; exit 1; }   # review the SQL; a preview that fails never proceeds to the real migration
 php artisan migrate --force || { echo 'migration failed: host stays in maintenance; restore from the backup before retrying'; exit 1; }
 php artisan config:cache || exit 1
 php artisan vasey:doctor || exit 1

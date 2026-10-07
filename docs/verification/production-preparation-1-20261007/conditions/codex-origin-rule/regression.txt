@@ -1,0 +1,1 @@
+Class Tests\Support\ProductionTrackCapabilitiesFixtures declared in /home/user/VA-Studio-prep/tests/Support/ProductionTrackCapabilitiesFixtures.php does not extend PHPUnit\Framework\TestCase

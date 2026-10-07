@@ -5,6 +5,7 @@ namespace App\Domain\Commerce\Readiness;
 use App\Domain\Commerce\Checkout\CheckoutPolicy;
 use App\Domain\Commerce\Payments\StripeSdkCheckoutGateway;
 use App\Domain\Commerce\ProductionCheckout\ExecutionContextV1;
+use App\Domain\Commerce\ProductionPolicy\MachinePolicyV1;
 use Composer\InstalledVersions;
 use Illuminate\Support\Facades\DB;
 use PDO;
@@ -49,14 +50,17 @@ final class StripeCapabilityPreflight
 
         $modeValid = in_array($mode, ['test', 'live'], true);
         $accountValid = is_string($account) && preg_match('/\Aacct_[A-Za-z0-9]{1,64}\z/D', $account) === 1;
-        $originValid = ProductionCommerceReadiness::httpsOrigin($origin);
+        // The production policy's own rule (MachinePolicyV1::origin): https, bounded, no credentials, path, query, fragment
+        // or trailing slash, a syntactically valid hostname, and never localhost or 127.0.0.1. A looser check here would
+        // approve an origin ExecutionContextV1 can never use.
+        $originValid = MachinePolicyV1::origin($origin);
         $lifetimeValid = is_int($lifetime) && $lifetime >= 30 && $lifetime <= 3600;
         // The same rule ExecutionContextV1::make applies: test funds only in local/testing.
         $modeEnvironment = $modeValid && ($mode !== 'test' || app()->environment(['local', 'testing']));
         $add('funds_mode', 'configuration', $modeValid ? 'pass' : 'blocked', 'PRODUCTION_CHECKOUT_FUNDS_MODE must be exactly test or live (Sean decision).');
         $add('funds_mode_environment', 'configuration', $modeEnvironment ? 'pass' : 'blocked', 'Test funds are admitted only when APP_ENV is local or testing, as production checkout (ExecutionContextV1) requires.');
         $add('account_id_shape', 'configuration', $accountValid ? 'pass' : 'blocked', 'PRODUCTION_CHECKOUT_STRIPE_ACCOUNT_ID must be an own-account acct_ identifier (shape only; ownership unverified).');
-        $add('return_origin_https', 'configuration', $originValid ? 'pass' : 'blocked', 'PRODUCTION_CHECKOUT_RETURN_ORIGIN must be a bounded https origin without credentials, path, query or fragment.');
+        $add('return_origin_https', 'configuration', $originValid ? 'pass' : 'blocked', 'PRODUCTION_CHECKOUT_RETURN_ORIGIN must satisfy the production return-origin rule: a bounded https origin with a valid hostname, no credentials, path, query, fragment or trailing slash, and never localhost or an IP literal.');
         $add('review_lifetime_int', 'configuration', $lifetimeValid ? 'pass' : 'blocked', 'PRODUCTION_CHECKOUT_REVIEW_LIFETIME_SECONDS must resolve to an integer from 30 to 3600.');
 
         // References only: presence and prefix class, never the value or its length.
