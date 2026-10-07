@@ -1,0 +1,1 @@
+mysqld was stopped by the harness 30-minute background limit at 15:17:08Z mid-run; every case errored with 2006/2002. Not evidence.
