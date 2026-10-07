@@ -53,21 +53,29 @@ here. Pass credentials through a mode-0600 option file, never on the command lin
 # 0. Inputs (operator-supplied; none are defaults):
 #    <OPTION_FILE>   mode-0600 [client] file with host/port/user/password for a backup-only account
 #    <DATABASE>      production schema name
-#    <RESTORE_OPTION_FILE>, <RESTORE_DATABASE>  an isolated, empty restore target (never production)
+#    <RESTORE_OPTION_FILE>  a mode-0600 [client] file for an isolated MySQL server (never the
+#                           production server) on which schema <DATABASE> does not exist yet; the
+#                           restore keeps the original schema name, so nothing in the dump is rewritten
 #    <PRIVATE_ROOT>  the application's storage/app/private directory
 #    <RESTORE_PRIVATE_ROOT>  a new, isolated directory that does not exist yet (never the live root)
 #    <BACKUP_DIR>    a new mode-0700 directory on separate storage
 
+# 0b. Quiesce every writer first. --single-transaction snapshots the database, not the private
+#    files: an HTTP upload (ResumableMediaUploadController writes PrivateUploadParts while it
+#    updates upload/media rows) would land between steps 1 and 2. Maintenance mode plus stopped
+#    workers and scheduler, or a coordinated database/storage snapshot, is the only way both
+#    halves describe the same moment.
+php artisan down   # then stop the queue workers and the scheduler; confirm no php process is serving requests
+
 # 1. Consistent logical dump. InnoDB only; --single-transaction gives one snapshot without
-#    locking writers. --no-tablespaces avoids needing PROCESS. Keep binary data exact.
+#    locking writers. --no-tablespaces avoids needing PROCESS. --skip-comments drops the host,
+#    version and date header so the step 4 diff compares content only. Keep binary data exact.
 mysqldump --defaults-extra-file=<OPTION_FILE> --single-transaction --quick \
   --routines --triggers --events --hex-blob --no-tablespaces --set-gtid-purged=OFF \
-  --skip-dump-date --databases <DATABASE> > <BACKUP_DIR>/database.sql
+  --skip-dump-date --skip-comments --databases <DATABASE> > <BACKUP_DIR>/database.sql
 sha256sum <BACKUP_DIR>/database.sql > <BACKUP_DIR>/database.sql.sha256
 
-# 2. Private files with a manifest taken in the same maintenance window as step 1.
-#    Workers that write private files must be paused (or the snapshot taken at the storage
-#    layer) so the database and file manifests describe the same moment.
+# 2. Private files with a manifest, taken while the application is still down (step 0b).
 #    The manifest lists regular files only, so refuse any entry it would not cover (symlinks,
 #    hard links, devices, sockets): tar would archive and restore them unverified, and a
 #    symlink can point outside the restored root.
@@ -76,11 +84,12 @@ sha256sum <BACKUP_DIR>/database.sql > <BACKUP_DIR>/database.sql.sha256
 (cd <PRIVATE_ROOT> && find . -type f -print0 | sort -z | xargs -0 -r sha256sum) > <BACKUP_DIR>/private.sha256   # -r: an empty tree gives an empty manifest, not a hash of stdin
 tar --create --file=<BACKUP_DIR>/private.tar --directory=<PRIVATE_ROOT> --numeric-owner .
 sha256sum <BACKUP_DIR>/private.tar > <BACKUP_DIR>/private.tar.sha256
+php artisan up   # the live application resumes; everything below touches only the isolated targets
 
-# 3. Restore into the isolated target only.
+# 3. Restore into the isolated targets only. The dump is loaded unchanged (its CREATE DATABASE
+#    and USE name <DATABASE>), so no stored value can be rewritten by a rename.
 sha256sum --check <BACKUP_DIR>/database.sql.sha256 || exit 1
-sed 's/`<DATABASE>`/`<RESTORE_DATABASE>`/g' <BACKUP_DIR>/database.sql \
-  | mysql --defaults-extra-file=<RESTORE_OPTION_FILE>
+mysql --defaults-extra-file=<RESTORE_OPTION_FILE> < <BACKUP_DIR>/database.sql
 sha256sum --check <BACKUP_DIR>/private.tar.sha256 || exit 1   # the archive itself, not only its members, must be the one step 2 wrote
 mkdir -m 700 <RESTORE_PRIVATE_ROOT>
 tar --extract --file=<BACKUP_DIR>/private.tar --directory=<RESTORE_PRIVATE_ROOT> --no-same-owner
@@ -101,9 +110,8 @@ diff <(cd <RESTORE_PRIVATE_ROOT> && find . ! -type d | LC_ALL=C sort) \
   || { echo 'restored entry outside owner-only modes (0600/0400 files, 0700 directories)'; exit 1; }
 mysqldump --defaults-extra-file=<RESTORE_OPTION_FILE> --single-transaction --quick \
   --routines --triggers --events --hex-blob --no-tablespaces --set-gtid-purged=OFF \
-  --skip-dump-date --databases <RESTORE_DATABASE> \
-  | sed 's/`<RESTORE_DATABASE>`/`<DATABASE>`/g' | diff - <BACKUP_DIR>/database.sql
-mysql --defaults-extra-file=<RESTORE_OPTION_FILE> -e 'CHECKSUM TABLE <RESTORE_DATABASE>.orders EXTENDED'  # repeat per table and compare with the source
+  --skip-dump-date --skip-comments --databases <DATABASE> | diff - <BACKUP_DIR>/database.sql
+mysql --defaults-extra-file=<RESTORE_OPTION_FILE> -e 'CHECKSUM TABLE <DATABASE>.orders EXTENDED'  # repeat per table and compare with the source
 ```
 
 Treat these limits as open:
@@ -111,8 +119,9 @@ Treat these limits as open:
 - **Key custody.** Encrypted columns, such as webhook payload ciphertext, can only be read
   with the same `APP_KEY` (and any `APP_PREVIOUS_KEYS`). A restore without the paired key
   bytes is incomplete. Key escrow and rotation are host decisions.
-- **Name rewriting.** The `sed` rename in step 3 is a sketch. Review the dump for any other
-  schema-qualified references, such as views and routines, before relying on it.
+- **Server isolation.** The restore keeps the schema name, so the restore server must be a
+  separate instance that the application cannot reach; a second schema on the production
+  server is not an option for this procedure.
 - **Live-state boundaries.** A restore must never become the live database over accepted
   payments. The cutover runbook (§10) governs rollback, and a restored database alone is not
   a rollback.

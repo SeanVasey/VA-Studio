@@ -109,9 +109,8 @@ not_requested 1; the extra blocked check is `funds_mode_environment` with no fun
 - **R-3 (Info).** The probe uses the checkout's own `PRODUCTION_CHECKOUT_PROVIDER_IO_ENABLED`.
   Once checkout is composed, enabling it for the probe also enables checkout provider I/O.
   This is now noted in the packet's S2 step 2.
-- **R-4 (Low).** The documented MySQL restore `diff` will likely report dump-header noise.
-  Add `--skip-comments` to both dumps, or filter comment lines, and rehearse before relying
-  on it.
+- **R-4 (Low).** The documented MySQL restore `diff` would have reported dump-header noise;
+  both dumps now use `--skip-comments` (sixth Codex pass). Rehearse before relying on it.
 - **R-5 (Info).** The signature-only test asserts zero `verified_payments` and
   `payment_observations`, which come before any grant. It doesn't count entitlement tables
   directly.
@@ -278,6 +277,14 @@ empty private store now produces (the check is skipped for a zero-byte manifest;
 name diff still proves the empty tree), and `! -name .gitignore` exempted a nested
 `.gitignore` (now `! -path ./.gitignore`, root only). Rehearsed: empty store passes; nested
 0644 `.gitignore` refused; root 0644 `.gitignore` still accepted.
+
+Codex's sixth pass (P2 ×2, docs): HTTP requests can write private files between the
+database snapshot and the file manifest (pausing workers isn't enough), and the global `sed`
+schema rename could rewrite stored values. The procedure now quiesces with `php artisan down`
+plus stopped workers/scheduler before step 1 and `up` after step 2, and restores the dump
+unchanged into an isolated MySQL server under the original schema name (no rename at all).
+Both dumps use `--skip-comments`, which also closes the accepted R-4 dump-header noise. The
+"Name rewriting" open limit became "Server isolation". Still documented, not executed.
 
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
