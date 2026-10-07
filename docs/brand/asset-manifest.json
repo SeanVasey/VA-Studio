@@ -67,5 +67,85 @@
     }
   ],
   "total_asset_bytes": 1913452,
-  "identity_svg_status": "unverified: official source package retrieval failed; do not trace raster"
+  "identity_svg_status": "unverified: official source package retrieval failed; do not trace raster",
+  "installation_derivatives": [
+    {
+      "path": "public/brand/app-icon-192.png",
+      "width": 192,
+      "height": 192,
+      "bytes": 6670,
+      "sha256": "7f5f8f04ee485e5942f8bf9670d419a4461541b742d9fd49d2bf1aa11f134d91",
+      "source_path": "public/brand/vasey-audio-logo.png",
+      "source_sha256": "7b0ffd26d5ddffab9695fdd3e0a4bb306d50642dc6a51e25233fd1626ff07571",
+      "source_dimensions": [
+        420,
+        100
+      ],
+      "contained_dimensions": [
+        168,
+        40
+      ],
+      "offset": [
+        12,
+        76
+      ],
+      "background": "#052e3a",
+      "purpose": "any",
+      "transformation": "Complete original lockup, proportional Lanczos downscale when smaller, centered on opaque square; no crop, redraw or upscale.",
+      "generator": "Pillow 12.3.0; RGB PNG, compress_level=9, optimize=false",
+      "acceptance": "Source-preserving derivative only; physical launcher legibility and OS installation remain unverified."
+    },
+    {
+      "path": "public/brand/app-icon-512.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 24459,
+      "sha256": "66f16d1ae19df41927011fd3c618039b2d5572c5855b1968170b679d7248e416",
+      "source_path": "public/brand/vasey-audio-logo.png",
+      "source_sha256": "7b0ffd26d5ddffab9695fdd3e0a4bb306d50642dc6a51e25233fd1626ff07571",
+      "source_dimensions": [
+        420,
+        100
+      ],
+      "contained_dimensions": [
+        420,
+        100
+      ],
+      "offset": [
+        46,
+        206
+      ],
+      "background": "#052e3a",
+      "purpose": "any",
+      "transformation": "Complete original lockup, proportional Lanczos downscale when smaller, centered on opaque square; no crop, redraw or upscale.",
+      "generator": "Pillow 12.3.0; RGB PNG, compress_level=9, optimize=false",
+      "acceptance": "Source-preserving derivative only; physical launcher legibility and OS installation remain unverified."
+    },
+    {
+      "path": "public/brand/apple-touch-icon.png",
+      "width": 180,
+      "height": 180,
+      "bytes": 6618,
+      "sha256": "e15fe8023d6434e1afbdd23e7279f088664f833cd8d5cbe9fc4f95cd40e36020",
+      "source_path": "public/brand/vasey-audio-logo.png",
+      "source_sha256": "7b0ffd26d5ddffab9695fdd3e0a4bb306d50642dc6a51e25233fd1626ff07571",
+      "source_dimensions": [
+        420,
+        100
+      ],
+      "contained_dimensions": [
+        168,
+        40
+      ],
+      "offset": [
+        6,
+        70
+      ],
+      "background": "#052e3a",
+      "purpose": "any",
+      "transformation": "Complete original lockup, proportional Lanczos downscale when smaller, centered on opaque square; no crop, redraw or upscale.",
+      "generator": "Pillow 12.3.0; RGB PNG, compress_level=9, optimize=false",
+      "acceptance": "Source-preserving derivative only; physical launcher legibility and OS installation remain unverified."
+    }
+  ]
 }

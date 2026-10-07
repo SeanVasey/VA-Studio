@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\StorefrontMetadataTest" file="/workspace/VA-Studio-install-checkout/tests/Feature/StorefrontMetadataTest.php" tests="7" assertions="150" errors="0" failures="0" skipped="0" time="10.357258">
+    <testcase name="test_initial_home_html_and_inertia_props_agree_without_invented_catalog_metadata" file="/workspace/VA-Studio-install-checkout/tests/Feature/StorefrontMetadataTest.php" line="62" class="Tests\Feature\StorefrontMetadataTest" classname="Tests.Feature.StorefrontMetadataTest" assertions="39" time="0.527829"/>
+    <testcase name="test_track_html_uses_the_selected_public_track_and_retrievable_artwork" file="/workspace/VA-Studio-install-checkout/tests/Feature/StorefrontMetadataTest.php" line="76" class="Tests\Feature\StorefrontMetadataTest" classname="Tests.Feature.StorefrontMetadataTest" assertions="48" time="2.891626"/>
+    <testcase name="test_host_headers_and_tracking_queries_cannot_change_canonical_or_image_identity" file="/workspace/VA-Studio-install-checkout/tests/Feature/StorefrontMetadataTest.php" line="99" class="Tests\Feature\StorefrontMetadataTest" classname="Tests.Feature.StorefrontMetadataTest" assertions="4" time="1.245516"/>
+    <testcase name="test_metadata_escapes_markup_quotes_and_unicode_without_executable_head_content" file="/workspace/VA-Studio-install-checkout/tests/Feature/StorefrontMetadataTest.php" line="110" class="Tests\Feature\StorefrontMetadataTest" classname="Tests.Feature.StorefrontMetadataTest" assertions="36" time="1.574582"/>
+    <testcase name="test_draft_withdrawn_and_unknown_tracks_have_no_track_metadata" file="/workspace/VA-Studio-install-checkout/tests/Feature/StorefrontMetadataTest.php" line="124" class="Tests\Feature\StorefrontMetadataTest" classname="Tests.Feature.StorefrontMetadataTest" assertions="15" time="1.547311"/>
+    <testcase name="test_new_rights_hold_removes_track_metadata_even_while_the_track_is_marked_published" file="/workspace/VA-Studio-install-checkout/tests/Feature/StorefrontMetadataTest.php" line="139" class="Tests\Feature\StorefrontMetadataTest" classname="Tests.Feature.StorefrontMetadataTest" assertions="5" time="1.211430"/>
+    <testcase name="test_missing_artwork_never_produces_an_advertised_track_share_image" file="/workspace/VA-Studio-install-checkout/tests/Feature/StorefrontMetadataTest.php" line="147" class="Tests\Feature\StorefrontMetadataTest" classname="Tests.Feature.StorefrontMetadataTest" assertions="3" time="1.358965"/>
+  </testsuite>
+</testsuites>

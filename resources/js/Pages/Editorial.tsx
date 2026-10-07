@@ -7,6 +7,7 @@ import { EditorialVideo } from '../components/EditorialVideo';
 import { ContactInquiryForm } from '../components/ContactInquiryForm';
 import { InquiryConversationEntry } from '../components/InquiryConversation';
 import { SiteFooter, SiteHeader } from '../components/SiteChrome';
+import { InstallApp } from '../components/InstallApp';
 import { siteContentHref, type EditorialDescriptor, type SiteContent } from '../lib/site-content';
 import type { PageMetadata } from '../lib/catalog';
 
@@ -30,7 +31,7 @@ export default function Editorial({ siteContent, editorial, sitePreview = false,
   }
   const chrome = { content: siteContent, homeHref: href('/'), href, onNavigate: navigate };
   return <>
-    <MetadataHead metadata={metadata} />
+    <MetadataHead metadata={metadata} publicInstallation={!sitePreview} />
     <a className="skip-link" href="#main">Skip to content</a>
     {sitePreview && <div className="preview-banner">PRIVATE CONTENT PREVIEW <span>Visible only to staff. Purchasing and external actions are disabled.</span></div>}
     <SiteHeader {...chrome} currentPath={`/${editorial.section}`} />
@@ -56,7 +57,7 @@ export default function Editorial({ siteContent, editorial, sitePreview = false,
         </li>)}</ol>
       </section>}
     </main>
-    <SiteFooter {...chrome} />
+    <SiteFooter {...chrome}>{!sitePreview && <InstallApp />}</SiteFooter>
     <PersistentPlayer tracks={[]} purchasingDisabled={sitePreview} catalogUrl={href('/#catalog')} onNavigate={navigate} onLicense={track => { if (!sitePreview) router.visit(track.shareUrl); }} />
   </>;
 }
