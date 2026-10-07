@@ -8,7 +8,8 @@ symlinks and owns its Composer generated autoload files; original dependencies
 and manifests are unchanged. Its baseline does not contain peer SupportAttachments
 interfaces. Isolated commands used an external-only auto_prepend_file autoload
 shim to the peer's owned classes. The adjacent source-map records their SHA256
-bytes; no support classes or dependency shim are committed into product source.
+bytes,verified equal to frozen peer contract baseline
+1a178fd711e008fb8feda9ccf4c7bfa325d89f06; no support classes or dependency shim are committed into product source.
 Final composed review must include the peer's frozen contracts and ordinary app
 boot; these isolated receipts cannot certify a missing/incompatible registry.
 
