@@ -1,0 +1,13 @@
+{
+  "worktree": "/workspace/VA-Studio-identity-registration-independent",
+  "source": "4b3d47860373aad181c382899b9ab9677023eca0",
+  "setup": "source rootless activate; own Composer metadata/autoload and lockedcontent symlinks; composer dump-autoload --no-scripts --no-interaction; syntheticAPP_KEY from32 I characters",
+  "own_runner": "php -r '$GLOBALS[\"_composer_autoload_path\"]=getcwd().\"/vendor/autoload.php\"; require \"vendor/phpunit/phpunit/phpunit\";' -- -c <own selection> --log-junit <durable JUnit>",
+  "sqlite_http": "sqlite-http-selection.xml; actual15HTTP+unchangedcanary1; loopbacknetworkenabled forlocalSMTPfixture",
+  "native_journey": "source private service_review-task.env withoutprinting; native-registered-selection.xml; filter test_registered_http_uses_actual_smtp_proof_and_recovery_preserves_owner_but_invalidates_old_session; loopbacknetworkenabled",
+  "frontend": "npm run test -- tests/frontend/production-customer-identity.test.tsx tests/frontend/production-identity-registration.test.tsx --reporter=default --reporter=junit --outputFile=<own frontendJUnit>",
+  "admission_canaries": "sameownrunner andengine-specificselectionXML plus namedcanary file positional, --no-logging --log-junit <own redJUnit>; both useFULLrealprior-migrationfixtures, noauthorDB",
+  "canary_format": "php vendor/laravel/pint/builds/pint --test <two exactcanary paths>",
+  "raw_console_policy": "rawtxt retainedunchanged; excluded onlyfromstagedwhitespacecheck; allsourceandstructuredartifacts checked",
+  "graph": "all158lockedComposer identities match installed name/version/source/dist; locks unchanged"
+}
