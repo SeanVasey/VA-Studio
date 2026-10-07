@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-free-grants-independent/docs/verification/cloud-free-grants-independent-20261007/native-adverse-selection.xml" tests="2" assertions="103" errors="0" failures="0" skipped="0" time="48.301784">
+    <testsuite name="Independent free grants native-adverse-selection.xml" tests="2" assertions="103" errors="0" failures="0" skipped="0" time="48.301784">
+      <testsuite name="Tests\Feature\FreeGrantHttpTest" file="/workspace/VA-Studio-free-grants-independent/tests/Feature/FreeGrantHttpTest.php" tests="1" assertions="99" errors="0" failures="0" skipped="0" time="26.073354">
+        <testcase name="test_actual_customer_page_review_assent_real_pdf_and_native_attachment_preserve_exact_free_origin" file="/workspace/VA-Studio-free-grants-independent/tests/Feature/FreeGrantHttpTest.php" line="56" class="Tests\Feature\FreeGrantHttpTest" classname="Tests.Feature.FreeGrantHttpTest" assertions="99" time="26.073354"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\FreeGrantAuthorityTest" file="/workspace/VA-Studio-free-grants-independent/tests/Feature/FreeGrantAuthorityTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="22.228430">
+        <testsuite name="Tests\Feature\FreeGrantAuthorityTest::test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="22.228430">
+          <testcase name="test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #3" file="/workspace/VA-Studio-free-grants-independent/tests/Feature/FreeGrantAuthorityTest.php" line="34" class="Tests\Feature\FreeGrantAuthorityTest" classname="Tests.Feature.FreeGrantAuthorityTest" assertions="4" time="22.228430"/>
+        </testsuite>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,13 @@
+{
+  "worktree": "/workspace/VA-Studio-free-grants-independent",
+  "source": "821772ce9f86a706a711b4ed1a3889f1dac19899",
+  "toolchain": "source /workspace/.va-studio-toolchain/activate.sh; own Composer metadata/autoload; existing locked content symlinks; composer dump-autoload --no-scripts --no-interaction",
+  "key": "synthetic APP_KEY from32 F characters; never production",
+  "runner": "php -r '$GLOBALS[\"_composer_autoload_path\"]=getcwd().\"/vendor/autoload.php\"; require \"vendor/phpunit/phpunit/phpunit\";' -- -c <own selection> --log-junit <own durable XML>",
+  "sqlite": "sqlite-adverse-selection.xml: Journey, Downloads, Authority, PreparationStatus; SQLite:memory:",
+  "native": "private service_review-task.env without printing, native-adverse-selection.xml; --filter /test_actual_customer_page_review|test_terminal_real_container_resolution_withdrawal.*#3$/; loopback network additional permission",
+  "frontend": "npm run test -- tests/frontend/free-grant-journey.test.tsx --reporter=default --reporter=junit --outputFile=<own durable XML>",
+  "purpose_canary": "own runner and SQLite config with exactFreeGrantPurposeProfileCanaryTest.php positional file; --no-logging and own JUnit",
+  "canary_format": "Pint before execution and Pint --test afterward passed",
+  "reconciliation": "all50 source mapSHA256 exactGit821;35 committed author artifacts bound; native mixed/red/successJUnit parsed; ten schema/capacity/purpose paths exactebf; authorization/redeem and helpers entire suffix byte-exact;47 existingPR24 paid paths exactbase3fb;158 installed lock identities exact"
+}

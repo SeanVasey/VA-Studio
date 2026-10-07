@@ -2,18 +2,18 @@
 
 ## Active cloud ownership — October 7, 2026 UTC
 
-One integration owner `/root`; verified main `9f805b8e3cf92c73247c6da24045e96ed8857a99` includes PRs25–32.
+One integration owner `/root`; verified main `2cdd3da12261d27479955722952123d3a21ecc49` includes PRs25–33.
 Historical owner tables below describe earlier source, not active workers.
 
 | Worker | Isolated boundary | Current handoff |
 | --- | --- | --- |
-| `/root` | Primary/shared registration/evidence/publication | Consent merged after preflight37599609975; approved identity e48 publication next; free/discovery registration and suppression native review |
-| `/root/pr25_recovery` | ProductionCheckout246/provider/tax | Frozen f0 held-source successor SQLite123/613 plus seven precise skips; native affected proof in flight; supported automatic tax next |
-| `/root/completion_audit` | ProductionIdentity247 and new typed SMTP/account adapters | Exact parent floor3c approved in e48; separate configured TLS SMTP and sealed committed read-only feature frame under development |
-| `/root/native_mysql` | Paid252; service committed-read receipt | Free245 independently approved; service receipt598+8444 actual key-rotation repair handed off; isolated paid origins continue |
-| `/root/pr26_review` | Independent identity composition | Exact e48 approved: unchanged refusal probes, SQLite10/52, native2/42 registered actual SMTP/recovery; original reds retained |
-| `/root/crawler_routes` | Production feature253; narrow suppression251 repair | Production library/consent explicit original binding underway; actual native251 foreign-FK collision requires before-DDL refusal |
-| `/root/recovery_inventory` | Attachment249 closure; frozen discovery248 | Original registered download/DDL failures corrected provisionally; final receipt composition under checks. New discovery97d frozen SQLite36/218+one native skip/native16/68 |
+| `/root` | Primary/shared registration/evidence/publication | Identity247 merged; independently approved private free245 registration publication; attachment request966 and suppression251 composition |
+| `/root/pr25_recovery` | ProductionCheckout246/provider/tax | Actual three lazy-PDO/connection callbacks repaired in frozenb6f; exact checks then NEW committed-source receipt and supported automatic-tax255 |
+| `/root/completion_audit` | Typed identity adapters; operative free-origin child | Frozen101 adapter with retained genuine reds/final affected native proof awaits independent review; rootfreec59 independently approved; NEW typed productionfree original lineage/purpose |
+| `/root/native_mysql` | Paid252 consumers | Schema2bdd frozen; current typedV1 paidorigin3714 with genuine source/asset/current-proof checks; original fulfilment, full-order delivery and future255V2 consumer remain unfinished |
+| `/root/pr26_review` | Independent review and owned service producer | Service8444 permanent-view drift requires owned BASE_TABLE correction; then adapter101 independent review; T36 rootHTTP4/68 passed but schema blocker holds publication |
+| `/root/crawler_routes` | Production feature253; suppression251 successor | Narrow251 reserved-key admissionaed proven on unchanged native probe; NEW253 actual legacy/authority/initialization and prefix checks underway; NEW254 distinct production suppression follows |
+| `/root/recovery_inventory` | Independent attachment review; owned discovery schema | Sharedrequest966 actual20/343 passed, independent native review next; service permanent-view genuine red retained; discovery97 reserved CHECK collision requires Schema-only successor |
 
 
 Each worker has an isolated branch, independent autoload over unchanged locked

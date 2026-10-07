@@ -66,3 +66,5 @@ require __DIR__.'/services.php';
 require __DIR__.'/inquiry-conversations.php';
 
 require __DIR__.'/public-discovery.php';
+
+require __DIR__.'/free-grants.php';

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="8" failures="0" errors="0" time="0.577186269">
+    <testsuite name="tests/frontend/free-grant-journey.test.tsx" timestamp="2026-10-07T09:22:17.740Z" hostname="4fe41ffd3696" tests="8" failures="0" errors="0" skipped="0" time="0.577186269">
+        <testcase classname="tests/frontend/free-grant-journey.test.tsx" name="mounted explicit free purpose journey &gt; requires server review and affirmative assent before saving, prepares an original and submits only an explicit native download" time="0.274651548">
+        </testcase>
+        <testcase classname="tests/frontend/free-grant-journey.test.tsx" name="mounted explicit free purpose journey &gt; holds the same assent request after a lost response, refreshes saved state, and retries only deliberately with the same immutable body" time="0.10911653">
+        </testcase>
+        <testcase classname="tests/frontend/free-grant-journey.test.tsx" name="mounted explicit free purpose journey &gt; clears all selected terms, private unsaved name, pending assent and download secrets on a 403 read denial" time="0.034433196">
+        </testcase>
+        <testcase classname="tests/frontend/free-grant-journey.test.tsx" name="mounted explicit free purpose journey &gt; clears all selected terms, private unsaved name, pending assent and download secrets on a 404 read denial" time="0.036391651">
+        </testcase>
+        <testcase classname="tests/frontend/free-grant-journey.test.tsx" name="mounted explicit free purpose journey &gt; clears all selected terms, private unsaved name, pending assent and download secrets on a 419 read denial" time="0.025892294">
+        </testcase>
+        <testcase classname="tests/frontend/free-grant-journey.test.tsx" name="mounted explicit free purpose journey &gt; ignores a late authorization after page departure and never auto-submits a native file request" time="0.036163928">
+        </testcase>
+        <testcase classname="tests/frontend/free-grant-journey.test.tsx" name="mounted explicit free purpose journey &gt; uses fresh server retry admission for an expired claimed preparation and displays token-free consumed attempt status" time="0.057456396">
+        </testcase>
+        <testcase classname="tests/frontend/free-grant-journey.test.tsx" name="mounted explicit free purpose journey &gt; rejects malformed private extensions and paid provenance in free projections" time="0.001327076">
+        </testcase>
+    </testsuite>
+</testsuites>

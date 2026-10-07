@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\FreeGrantHttpTest" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantHttpTest.php" tests="13" assertions="239" errors="0" failures="2" skipped="0" time="8.702402">
+    <testcase name="test_actual_customer_page_review_assent_real_pdf_and_native_attachment_preserve_exact_free_origin" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantHttpTest.php" line="48" class="Tests\Feature\FreeGrantHttpTest" classname="Tests.Feature.FreeGrantHttpTest" assertions="86" time="2.598971"/>
+    <testsuite name="Tests\Feature\FreeGrantHttpTest::test_request_privacy_and_authority_refuse_before_free_origin_or_private_projection" tests="12" assertions="153" errors="0" failures="2" skipped="0" time="6.103432">
+      <testcase name="test_request_privacy_and_authority_refuse_before_free_origin_or_private_projection with data set #0" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantHttpTest.php" line="100" class="Tests\Feature\FreeGrantHttpTest" classname="Tests.Feature.FreeGrantHttpTest" assertions="15" time="0.433754"/>
+      <testcase name="test_request_privacy_and_authority_refuse_before_free_origin_or_private_projection with data set #1" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantHttpTest.php" line="100" class="Tests\Feature\FreeGrantHttpTest" classname="Tests.Feature.FreeGrantHttpTest" assertions="15" time="0.415662"/>
+      <testcase name="test_request_privacy_and_authority_refuse_before_free_origin_or_private_projection with data set #2" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantHttpTest.php" line="100" class="Tests\Feature\FreeGrantHttpTest" classname="Tests.Feature.FreeGrantHttpTest" assertions="15" time="0.443382"/>
+      <testcase name="test_request_privacy_and_authority_refuse_before_free_origin_or_private_projection with data set #3" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantHttpTest.php" line="100" class="Tests\Feature\FreeGrantHttpTest" classname="Tests.Feature.FreeGrantHttpTest" assertions="15" time="0.534093"/>
+      <testcase name="test_request_privacy_and_authority_refuse_before_free_origin_or_private_projection with data set #4" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantHttpTest.php" line="100" class="Tests\Feature\FreeGrantHttpTest" classname="Tests.Feature.FreeGrantHttpTest" assertions="15" time="0.539880"/>
+      <testcase name="test_request_privacy_and_authority_refuse_before_free_origin_or_private_projection with data set #5" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantHttpTest.php" line="100" class="Tests\Feature\FreeGrantHttpTest" classname="Tests.Feature.FreeGrantHttpTest" assertions="15" time="0.493793"/>
+      <testcase name="test_request_privacy_and_authority_refuse_before_free_origin_or_private_projection with data set #6" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantHttpTest.php" line="100" class="Tests\Feature\FreeGrantHttpTest" classname="Tests.Feature.FreeGrantHttpTest" assertions="15" time="0.529901"/>
+      <testcase name="test_request_privacy_and_authority_refuse_before_free_origin_or_private_projection with data set #7" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantHttpTest.php" line="100" class="Tests\Feature\FreeGrantHttpTest" classname="Tests.Feature.FreeGrantHttpTest" assertions="15" time="0.424189"/>
+      <testcase name="test_request_privacy_and_authority_refuse_before_free_origin_or_private_projection with data set #8" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantHttpTest.php" line="100" class="Tests\Feature\FreeGrantHttpTest" classname="Tests.Feature.FreeGrantHttpTest" assertions="2" time="0.503805">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\FreeGrantHttpTest::test_request_privacy_and_authority_refuse_before_free_origin_or_private_projection with data set #8
+Failed asserting that null is identical to 'FREE_GRANT_UNAVAILABLE'.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/AssertableJsonString.php:258
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:882
+/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantHttpTest.php:140</failure>
+      </testcase>
+      <testcase name="test_request_privacy_and_authority_refuse_before_free_origin_or_private_projection with data set #9" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantHttpTest.php" line="100" class="Tests\Feature\FreeGrantHttpTest" classname="Tests.Feature.FreeGrantHttpTest" assertions="1" time="0.570557">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\FreeGrantHttpTest::test_request_privacy_and_authority_refuse_before_free_origin_or_private_projection with data set #9
+Expected response status code [404] but received 419.
+Failed asserting that 419 is identical to 404.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantHttpTest.php:140</failure>
+      </testcase>
+      <testcase name="test_request_privacy_and_authority_refuse_before_free_origin_or_private_projection with data set #10" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantHttpTest.php" line="100" class="Tests\Feature\FreeGrantHttpTest" classname="Tests.Feature.FreeGrantHttpTest" assertions="15" time="0.580713"/>
+      <testcase name="test_request_privacy_and_authority_refuse_before_free_origin_or_private_projection with data set #11" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantHttpTest.php" line="100" class="Tests\Feature\FreeGrantHttpTest" classname="Tests.Feature.FreeGrantHttpTest" assertions="15" time="0.633704"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

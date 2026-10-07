@@ -1,0 +1,70 @@
+{
+  "candidate": "28ae480b05f34d295720d2ac816e92e9d9039742",
+  "native_server": "8.0.46-0ubuntu0.24.04.4",
+  "server_comment": "(Ubuntu)",
+  "database": "vaseyaudio_free_grants",
+  "sqlite_core": {
+    "recorded": 37,
+    "executed": 36,
+    "assertions": 2352,
+    "native_only_skips": 1,
+    "source": "ebf6298633870a0f1c7b431f8aa4bb25c26e94a9"
+  },
+  "native_schema": {
+    "recorded": 8,
+    "executed": 7,
+    "assertions": 768,
+    "sqlite_only_skips": 1,
+    "source": "ebf6298633870a0f1c7b431f8aa4bb25c26e94a9"
+  },
+  "native_capacity": {
+    "recorded": 1,
+    "executed": 1,
+    "assertions": 68,
+    "source": "ebf6298633870a0f1c7b431f8aa4bb25c26e94a9"
+  },
+  "sqlite_status_successor": {
+    "recorded": 22,
+    "executed": 22,
+    "assertions": 357,
+    "source": "d8e57770aa54cf62d9ba35800cc16447c4e16727"
+  },
+  "sqlite_shadow_final": {
+    "recorded": 1,
+    "executed": 1,
+    "assertions": 4,
+    "source": "28ae480b05f34d295720d2ac816e92e9d9039742"
+  },
+  "frontend": {
+    "recorded": 8,
+    "passed": 8,
+    "source": "d8e57770aa54cf62d9ba35800cc16447c4e16727"
+  },
+  "typecheck": "passed",
+  "independent_review": "pending",
+  "shared_registration": "parent-owned, pending actual composed proof",
+  "native_status_successor": {
+    "recorded": 3,
+    "passed": 2,
+    "errors": 1,
+    "assertions": 109,
+    "source": "d8e57770aa54cf62d9ba35800cc16447c4e16727",
+    "error": "Native fixture1366 before masking assertion; retained",
+    "passing_cases": [
+      {
+        "test": "test_abandoned_live_claim_is_closed_then_exact_deadline_status_admits_retry_under_the_original_assent",
+        "assertions": 10
+      },
+      {
+        "test": "test_actual_customer_page_review_assent_real_pdf_and_native_attachment_preserve_exact_free_origin",
+        "assertions": 99
+      }
+    ]
+  },
+  "native_shadow_final": {
+    "recorded": 1,
+    "passed": 1,
+    "assertions": 4,
+    "source": "28ae480b05f34d295720d2ac816e92e9d9039742"
+  }
+}

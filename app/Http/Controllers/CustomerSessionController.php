@@ -10,6 +10,7 @@ use App\Domain\Customers\CustomerIdentityPolicy;
 use App\Domain\Customers\CustomerPurchaseClaimPolicy;
 use App\Domain\Customers\CustomerPurchaseClaims;
 use App\Domain\Customers\CustomerSessions;
+use App\Domain\Grants\Free\FreeGrantPolicy;
 use App\Domain\Memberships\MembershipPolicy;
 use App\Domain\Services\Projects\ServiceProjectPolicy;
 use App\Domain\SiteBuilder\EditorialContent;
@@ -94,6 +95,7 @@ final class CustomerSessionController
             app(CustomerAccess::class)->current($principal);
             $props['testMembershipsEnabled'] = app(MembershipPolicy::class)->enabled();
             $props['serviceProjectsEnabled'] = app(ServiceProjectPolicy::class)->enabled();
+            $props['freeGrantsEnabled'] = app(FreeGrantPolicy::class)->enabled();
             // Transient UI invalidation only; never customer identity or request authority.
             $props['membershipHistoryScope'] = $props['testMembershipsEnabled'] ? bin2hex(random_bytes(16)) : null;
             $props['testListeningLibraryEnabled'] = true;
