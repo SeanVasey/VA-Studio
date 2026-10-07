@@ -1,0 +1,56 @@
+{
+  "reviewer": "/root/dependency_independent_review",
+  "decision": "approve bounded current-main DOM/Laravel compatibility change",
+  "source_commit": "66fde20d538521fc036f4e7d268fdc316e3698ea",
+  "source_tree": "3f2986157f59681dff3988a0a25b9ed884c9d4ad",
+  "parent": "27d229912d4c728f4c53549f6ed98fe1e993b434",
+  "source_paths_sha256": {
+    "composer.lock": "996bc7f800d5cc6b4312f5303fbd67a5cadd17e0eb640f3e2e94035e713289aa",
+    "package.json": "65db43e1b171566d2d89e075bc4a29af75a82a6782a3313751bb4d7e832a7ae0",
+    "package-lock.json": "6407d3a63e3b6e04f5824f53c41b8dc8a33581f987b21d780c795480122f93ea",
+    "tests/Unit/TcpdfContractRendererTest.php": "0a824142427dc436c646ad49998da968f93d05c51d7b3d5eff749d0ace600337",
+    "scripts/ops/persistent-content-upgrade.test.mjs": "90a3ef9f265abb97b26341d22c4fb0838e404d95c90c3e4f65c300f5f5dcc69a",
+    "scripts/dev/persistent-content.mjs": "0c5d6d89fbe8944f2af2a151c6ad4cf4a9822a9d41044b77c0e888a7e2d0c82a",
+    "app/Domain/Contracts/ContractRenderProfile.php": "fcf0a3cbbd785a41b438b5dcbb7fc0f6f1643d80aa1d6d6f8a0d7318cc789c8f",
+    "resources/contracts/test-v1/profile-assets.json": "44533c186a3b1350163025256a9ced519a6395ba8001541193d1d51b51688e50"
+  },
+  "checks": {
+    "tcpdf": {
+      "tests": 4,
+      "assertions": 18,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    "native_copy_upgrade": {
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    "lock_identity_probe": "changed exact composer.lock refused; four retained file digests unchanged; original graph recovery works; initializing identity gate only"
+  },
+  "runtime": {
+    "php": "8.4.26",
+    "package_directory_source": "author locked installed graph reused read-only; reviewer-owned regenerated metadata/autoload; PHPUnit directory copied",
+    "application_origin": "/workspace/scratch/2876616e88c3/VA-Studio-dependency-independent/app/Domain/Contracts/ContractRenderProfile.php"
+  },
+  "limits": [
+    "No independent fresh locked install/audits: author install/audit source inspected; both audits report zero advisories.",
+    "No whole MySQL/SQLite/browser acceptance, production rendering or customer documents claimed.",
+    "Full14 native copy upgrade cases belong to author; reviewer executed only specified two.",
+    "PR3 PDF/font successors remain deferred; historical v1 trusted metadata unchanged.",
+    "Harness setup failures retained separately; no weakening tests/workflows."
+  ],
+  "artifact_sha256": {
+    "lock-identity-probe.mjs": "b8063db744f423b9291183037f3571019c2fd71ffd03ee80fff6a0c80e9a7af1",
+    "runtime-profile.json": "8bfa98d8e75adda91180c7aa7b872a586819ba961bd2f3ace32094b59aada98e",
+    "tcpdf.txt": "72a9cf269e2529b1a98e7d57e27b6edab2b0ec6a0b5bca9921b74f6ddd751a73",
+    "graph-review.json": "9e112bdc0ed2362af2518dd69c98fc81b4bebf54c710de8cd06be7c43431ff8d",
+    "tcpdf.xml": "554619f301e2f7cad60cfe3be8db03842458ca69f61bad7a5f166308c738d022",
+    "autoload.txt": "b43e9024b086e4ec7bda6a4e7d64d5cf7093a2d27af74065653052ff25969d48",
+    "lock-identity.json": "6a1de383e5efe302ea3b83482793e6ef86206e79e6fa4af8d7fd7997f777001d",
+    "harness-failures.txt": "92178d0ebde4848a0bb921432d0e3b2d276f28d02aeaa02635799c7c2cb53983",
+    "copy-upgrade.txt": "6daa745ec704e041858ad95b88f1ce86682e963c0218280dfdf2659f2af701ce"
+  }
+}

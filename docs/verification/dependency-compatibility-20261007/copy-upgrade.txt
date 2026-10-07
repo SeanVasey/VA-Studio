@@ -1,0 +1,74 @@
+✔ a reviewed additive copy upgrade preserves original bytes, every old cell, key, session and business sequence (3069.652869ms)
+✔ a genuine crash-retained WAL and SHM are captured without opening or checkpointing the original database (3163.692876ms)
+✔ real authenticated HTTP sessions survive copy upgrade and restart while private paths and checkout remain blocked (8007.906391ms)
+✔ unchanged row counts do not hide a rewritten old value or timestamp; only the unavailable copy is affected (2842.855977ms)
+✔ old SQLite business sequence changes refuse even when all table rows remain identical (2989.931099ms)
+✔ removing an old CHECK refuses even when every column, row and business sequence remains identical (2680.129845ms)
+✔ BLOB to TEXT storage-class rewriting refuses despite identical retained binary bytes and row counts (3137.252742ms)
+✔ migration failure retains an unavailable destination and hides its raw exception without touching the original (2865.872337ms)
+✔ locked source, overlapping destination and explicit copy budget refuse before destination creation (2727.061496ms)
+✖ in-flight destination never starts and another copy operation cannot reuse the same source (3317.072528ms)
+✔ a moved, tampered or unreviewed source refuses without exposing or overwriting existing content (2342.095068ms)
+✖ tracked-source mutation, ignored executable migration and retrospective migration rewriting refuse (72.768664ms)
+✖ Git replacement refs and executable-mode drift cannot redefine an exact reviewed checkout (39.828679ms)
+✔ source descendant links and an unsafe target ancestor refuse without copying or mutating private bytes (2585.370649ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 11
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 46657.60336
+
+✖ failing tests:
+
+test at scripts/ops/persistent-content-upgrade.test.mjs:61:3
+✖ in-flight destination never starts and another copy operation cannot reuse the same source (3317.072528ms)
+  Error: Private copy upgrade refused or failed. The original workspace was not changed; an incomplete destination, if created, was retained unavailable.
+      at upgradeWorkspace (file:///workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/scripts/ops/persistent-content-upgrade.mjs:253:19)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async file:///workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/scripts/ops/persistent-content-upgrade.test.mjs:298:14
+      at async TestContext.<anonymous> (file:///workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/scripts/ops/persistent-content-upgrade.test.mjs:65:11)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at scripts/ops/persistent-content-upgrade.test.mjs:61:3
+✖ tracked-source mutation, ignored executable migration and retrospective migration rewriting refuse (72.768664ms)
+  Error: ENOSPC: no space left on device, copyfile '/workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/app/Domain/Contracts/RenderTestContract.php' -> '/tmp/private-copy-upgrade-fixtures-uoIx7A/case-GmJZXN/modified/app/Domain/Contracts/RenderTestContract.php'
+      at copyFileSync (node:fs:3177:11)
+      at copyFile (node:internal/fs/cp/cp-sync:101:3)
+      at onFile (node:internal/fs/cp/cp-sync:83:25)
+      at getStats (node:internal/fs/cp/cp-sync:72:12)
+      at cpSyncFn (node:internal/fs/cp/cp-sync:58:10)
+      at cpSync (node:fs:3219:3)
+      at release (file:///workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/scripts/ops/persistent-content-upgrade.test.mjs:30:68)
+      at file:///workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/scripts/ops/persistent-content-upgrade.test.mjs:315:20
+      at TestContext.<anonymous> (file:///workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/scripts/ops/persistent-content-upgrade.test.mjs:65:17)
+      at Test.runInAsyncScope (node:async_hooks:227:14) {
+    errno: -28,
+    code: 'ENOSPC',
+    syscall: 'copyfile',
+    path: '/workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/app/Domain/Contracts/RenderTestContract.php',
+    dest: '/tmp/private-copy-upgrade-fixtures-uoIx7A/case-GmJZXN/modified/app/Domain/Contracts/RenderTestContract.php'
+  }
+
+test at scripts/ops/persistent-content-upgrade.test.mjs:61:3
+✖ Git replacement refs and executable-mode drift cannot redefine an exact reviewed checkout (39.828679ms)
+  Error: ENOSPC: no space left on device, copyfile '/workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/app/Domain/Contracts/ReadGrantContract.php' -> '/tmp/private-copy-upgrade-fixtures-uoIx7A/case-4u4JZv/replaced/app/Domain/Contracts/ReadGrantContract.php'
+      at copyFileSync (node:fs:3177:11)
+      at copyFile (node:internal/fs/cp/cp-sync:101:3)
+      at onFile (node:internal/fs/cp/cp-sync:83:25)
+      at getStats (node:internal/fs/cp/cp-sync:72:12)
+      at cpSyncFn (node:internal/fs/cp/cp-sync:58:10)
+      at cpSync (node:fs:3219:3)
+      at release (file:///workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/scripts/ops/persistent-content-upgrade.test.mjs:30:68)
+      at file:///workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/scripts/ops/persistent-content-upgrade.test.mjs:329:20
+      at TestContext.<anonymous> (file:///workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/scripts/ops/persistent-content-upgrade.test.mjs:65:17)
+      at Test.runInAsyncScope (node:async_hooks:227:14) {
+    errno: -28,
+    code: 'ENOSPC',
+    syscall: 'copyfile',
+    path: '/workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/app/Domain/Contracts/ReadGrantContract.php',
+    dest: '/tmp/private-copy-upgrade-fixtures-uoIx7A/case-4u4JZv/replaced/app/Domain/Contracts/ReadGrantContract.php'
+  }

@@ -1,0 +1,1 @@
+PASS: actual prior/candidate Composer lockbytes change schema identity and refuse existing protected initializing workspace without identity/database mutation. No actual oldruntime or completed readyinstallation claimed.

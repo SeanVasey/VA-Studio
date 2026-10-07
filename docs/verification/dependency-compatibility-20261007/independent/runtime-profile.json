@@ -1,0 +1,23 @@
+{
+  "packages": {
+    "laravel/framework": {
+      "version": "v13.34.0",
+      "reference": "c829b4982d29344cbcf1d7ad78eb5d2bb8ae66c4"
+    },
+    "nesbot/carbon": {
+      "version": "3.14.2",
+      "reference": "94cfc34887f07ab5c0efa07914c8f527544e3224"
+    },
+    "tecnickcom/tc-lib-pdf": {
+      "version": "8.76.2",
+      "reference": "c383bd3ac09164c3fd1a6ac7da8f5460d19e47e3"
+    },
+    "tecnickcom/tc-lib-pdf-font": {
+      "version": "4.4.0",
+      "reference": "658e04565534c0cdd3d8d7ff12f1c6ebeab5f7ce"
+    }
+  },
+  "profile_hash": "ff46257d40e36ea4efc8a42a9df0d823141d13a586d0a416fdde5178dcf12621",
+  "app_origin": "/workspace/scratch/2876616e88c3/VA-Studio-dependency-independent/app/Domain/Contracts/ContractRenderProfile.php",
+  "profile_version": "test-buyer-pdf-v1"
+}

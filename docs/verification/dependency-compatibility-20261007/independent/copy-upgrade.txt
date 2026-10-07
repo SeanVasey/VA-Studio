@@ -1,0 +1,10 @@
+✔ a reviewed additive copy upgrade preserves original bytes, every old cell, key, session and business sequence (6050.271523ms)
+✔ a moved, tampered or unreviewed source refuses without exposing or overwriting existing content (2195.489196ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17973.626454
