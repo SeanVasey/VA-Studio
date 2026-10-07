@@ -32,12 +32,13 @@ final class ListeningLibrary
     {
         return DB::transaction(function () use ($principal, $actor): array {
             $evidence = new ListeningEvidence;
+            $rollout = ListeningRollout::capture();
             app(CustomerAccess::class)->lock($principal, $principal->ownerKey, $actor);
             $row = SavedListeningLibrary::where('customer_account_id', $principal->accountId)->lockForUpdate()->first();
             $state = $this->state($row, $principal->accountId);
             $version = $row?->version ?? 0;
 
-            return $this->project($principal, $state, $version, $evidence, $this->expected($row, $state, $version, $principal->accountId));
+            return $this->project($principal, $state, $version, $evidence, $this->expected($row, $state, $version, $principal->accountId), $rollout);
         });
     }
 
@@ -45,6 +46,7 @@ final class ListeningLibrary
     {
         return DB::transaction(function () use ($principal, $actor, $command): array {
             $evidence = new ListeningEvidence;
+            $rollout = ListeningRollout::capture();
             // Fresh user/account locks serialize first creation and every bounded list update.
             app(CustomerAccess::class)->lock($principal, $principal->ownerKey, $actor);
             $this->validateCommand($command);
@@ -54,10 +56,9 @@ final class ListeningLibrary
                 throw new ListeningException(409);
             }
             $state = $this->state($row, $principal->accountId);
-            $next = $this->pruneNotes($this->apply($state, $command, $evidence));
+            $next = $this->pruneNotes($this->apply($state, $command, $evidence, $rollout['promotionEnabled']));
             if ($next !== $state || $command['action'] === 'clear-library') {
                 $row ??= new SavedListeningLibrary(['customer_account_id' => $principal->accountId]);
-                $next = $this->v2($next);
                 $next['version'] = ++$version;
                 $row->fill(['version' => $version, 'payload' => $next]);
                 $encrypted = $row->getAttributes()['payload'] ?? null;
@@ -67,7 +68,7 @@ final class ListeningLibrary
                 $row->save();
             }
 
-            return $this->project($principal, $next, $version, $evidence, $this->expected($row, $next, $version, $principal->accountId));
+            return $this->project($principal, $next, $version, $evidence, $this->expected($row, $next, $version, $principal->accountId), $rollout);
         }, 3);
     }
 
@@ -135,11 +136,11 @@ final class ListeningLibrary
         }
     }
 
-    private function apply(array $state, array $command, ListeningEvidence $evidence): array
+    private function apply(array $state, array $command, ListeningEvidence $evidence, bool $promotionEnabled): array
     {
         $action = $command['action'];
         if ($action === 'clear-library') {
-            return [...$state, 'schema' => 2, 'favorites' => [], 'playlists' => [], 'notes' => []];
+            return [...$state, 'favorites' => [], 'playlists' => [], ...($state['schema'] === 2 ? ['notes' => []] : [])];
         }
         if ($action === 'set-track-note' || $action === 'delete-track-note') {
             if (! in_array($command['trackId'], $this->references($state), true)) {
@@ -153,6 +154,9 @@ final class ListeningLibrary
                 }
                 array_splice($notes, $index, 1);
             } else {
+                if ($state['schema'] === 1 && ! $promotionEnabled) {
+                    throw new ListeningException(503);
+                }
                 if ($index !== false && $notes[$index]['body'] === $command['body']) {
                     return $state;
                 }
@@ -343,7 +347,7 @@ final class ListeningLibrary
         }
     }
 
-    private function project(CustomerPrincipal $principal, array $state, int $version, ListeningEvidence $evidence, ?array $expectedRow): array
+    private function project(CustomerPrincipal $principal, array $state, int $version, ListeningEvidence $evidence, ?array $expectedRow, array $rollout): array
     {
         $ids = $state['favorites'];
         foreach ($state['playlists'] as $playlist) {
@@ -359,15 +363,16 @@ final class ListeningLibrary
         }
         $item = fn (string $id): array => ['trackId' => $id, 'available' => isset($tracks[$id])]
             + (isset($tracks[$id]) ? ['track' => $tracks[$id]] : []);
-        $result = ['listeningSchema' => 2, 'version' => $version,
+        $v2 = $state['schema'] === 2 || $rollout['promotionEnabled'];
+        $result = ['listeningSchema' => $v2 ? 2 : 1, 'version' => $version,
             'favorites' => array_map($item, $state['favorites']),
             'playlists' => array_map(fn ($playlist) => ['id' => $playlist['id'], 'name' => $playlist['name'], 'tracks' => array_map($item, $playlist['trackIds'])], $state['playlists']),
-            'notes' => $state['notes'] ?? [],
+            ...($v2 ? ['notes' => $state['notes'] ?? []] : []),
             'limits' => ['favorites' => self::FAVORITES, 'playlists' => self::PLAYLISTS, 'playlistTracks' => self::PLAYLIST_TRACKS,
-                'notes' => self::NOTES, 'noteCharacters' => self::NOTE_CHARACTERS, 'noteBytes' => self::NOTE_BYTES]];
+                ...($v2 ? ['notes' => self::NOTES, 'noteCharacters' => self::NOTE_CHARACTERS, 'noteBytes' => self::NOTE_BYTES] : [])]];
         // Media/readiness callbacks may withdraw access; never release a stale projection or commit.
         app(CustomerAccess::class)->current($principal);
-        $evidence->prove($principal, $expectedRow);
+        $evidence->prove($principal, $expectedRow, $rollout);
 
         return $result;
     }

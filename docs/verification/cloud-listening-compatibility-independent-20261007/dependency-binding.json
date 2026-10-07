@@ -1,0 +1,14 @@
+{
+  "locked_packages": 158,
+  "installed_identity_match": true,
+  "fields": [
+    "name",
+    "version",
+    "source",
+    "dist"
+  ],
+  "composer_lock_sha256": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9",
+  "package_lock_sha256": "6407d3a63e3b6e04f5824f53c41b8dc8a33581f987b21d780c795480122f93ea",
+  "graph_change_from_ff4602": false,
+  "autoload": "own composer metadata and autoload; package content symlinked to existing locked installation"
+}

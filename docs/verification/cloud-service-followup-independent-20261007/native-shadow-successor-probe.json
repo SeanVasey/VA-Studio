@@ -1,0 +1,10 @@
+{
+    "tested_source": "62de352163c25630530cd2467f1cef1461f8b56f",
+    "server": "8.0.46-0ubuntu0.24.04.4",
+    "real_callback_fired": true,
+    "temporary_users_copy_created": true,
+    "command_refused": true,
+    "permanent_user_mfa_after": "retained",
+    "retained_rows_exact": true,
+    "service_event_count": 0
+}

@@ -10,11 +10,18 @@ use Illuminate\Support\Facades\DB;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\CustomerFixtures;
+use Tests\Support\ListeningNotesFixtures;
 use Tests\TestCase;
 
 class CustomerListeningNotesCapacityTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        ListeningNotesFixtures::enablePromotion();
+    }
 
     public function test_actual_envelope_above_native_text_capacity_is_refused_without_writing_or_losing_the_retained_revision(): void
     {

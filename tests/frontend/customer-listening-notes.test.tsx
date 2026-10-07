@@ -34,6 +34,25 @@ async function blobText(blob: Blob): Promise<string> {
 }
 
 describe('V2 private listening inputs', () => {
+  it('keeps export and version-fenced clear available for V1 while note promotion is unavailable', async () => {
+    const v1: Extract<ListeningLibraryData, { listeningSchema: 1 }> = { listeningSchema: 1, version: 1, favorites: [unavailable], playlists: [],
+      limits: { favorites: 50, playlists: 10, playlistTracks: 25 } };
+    const own: ListeningExport = { exportSchema: 1, feature: 'customer-listening-library', version: 1, favorites: ['2'], playlists: [], notes: [] };
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(loaded(v1))
+      .mockResolvedValueOnce(response({ export: own })).mockResolvedValueOnce(loaded({ ...v1, version: 2, favorites: [] }));
+    render(<CustomerListeningLibrary />); await open();
+    expect(screen.queryByRole('textbox', { name: 'Your private lyric note' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Save lyric note' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Export saved library' }));
+    await waitFor(() => expect(blobs).toHaveLength(1));
+    expect(JSON.parse(await blobText(blobs[0]))).toEqual(own);
+    expect(command(fetcher)).toEqual({ version: 1 });
+    fireEvent.click(screen.getByRole('button', { name: 'Clear saved tracks, playlists and notes' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm clear' }));
+    await screen.findByText('No saved tracks yet.');
+    expect(command(fetcher, 2)).toEqual({ action: 'clear-library', version: 1 });
+    expect(screen.queryByRole('button', { name: 'Save lyric note' })).not.toBeInTheDocument();
+  });
   it('accepts exact V1/V2 projections and exports owned unavailable references without catalog data', () => {
     expect(validListeningLibrary(library())).toBe(true);
     const data = library(2, [{ trackId: '2', body: 'PRIVATE verse\n\tsecond line 🎵' }]);

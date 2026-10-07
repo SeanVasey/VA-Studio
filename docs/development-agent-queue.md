@@ -2,18 +2,18 @@
 
 ## Active cloud ownership — October 7, 2026 UTC
 
-One integration owner `/root`; verified main3fb7dd0 includes PRs25–29.
+One integration owner `/root`; verified mainda70eba includes PRs25–30.
 Historical owner tables below describe earlier source, not active workers.
 
 | Worker | Isolated boundary | Current handoff |
 | --- | --- | --- |
-| `/root` | Primary/shared registration/evidence/publication | PR29 merged; service62de352 authority/P2 repairs await independent successor review; notes capacity approved; mount next identity, checkout and attachments after review |
+| `/root` | Primary/shared registration/evidence/publication | PR30 merged; PR31 compatibility repair independently approved d412, one update/preflight/merge next; consent approved d22, identity departure fixed, attachments registration active |
 | `/root/pr25_recovery` | New ProductionCheckout246000/provider adapter/private routes/tests | Immutable review→assent→payable order→provider initiation/reconciliation; qualified exemption first, provider-calculated tax next |
 | `/root/completion_audit` | ProductionIdentity247000/routes/UI/local SMTP proof | Immutable origin, mailbox challenge, recovery/credential fencing, typed principal; no synthetic-account adoption by email |
-| `/root/native_mysql` | ServiceProjects244000; source adapter then free origins245000 | Service approval superseded; corrected attachment sourceb209b85 passes author14/72 each driver; free245 implementation active |
-| `/root/pr26_review` | Independent service composition/canaries | Service actual native shadow/provider successor review; notes/export/clear approved in fbe178ea with native overflow proof |
-| `/root/crawler_routes` | Listening notes/export/clear domain/UI/tests | Notes capacity handoff complete; consent250 domain/schema/UI active, suppression251 follows |
-| `/root/recovery_inventory` | Private attachments249000/scanner/routes/UI/tests | Quarantine→scan→immutable manifest, owner/source current proof, download/retry/retention; approved listening review carry complete |
+| `/root/native_mysql` | ServiceProjects244000; source adapter then free origins245000 | Service7dc approved; adapterb209 approval superseded by actual resolver failure, corrected c7 passes peer SQLite/native consumers; free245 active |
+| `/root/pr26_review` | Independent service composition/canaries | Service follow-up approved in2ddb; native consent250/source review next; notes approved in fbe178ea |
+| `/root/crawler_routes` | Listening compatibility; Preferences/Suppression251 | Consent correction fa06 frozen; V1-safe writes/default-off reviewed promotion repair precedes resuming251 |
+| `/root/recovery_inventory` | Private attachments249000/scanner/routes/UI/tests | 5a terminal projection/cleanup repair and c7 consumers tested; inquiry panel callback correction pending final source/evidence |
 
 Each worker has an isolated branch, independent autoload over unchanged locked
 packages and separate synthetic native databases where needed. Root owns shared

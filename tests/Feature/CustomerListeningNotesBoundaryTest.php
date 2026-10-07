@@ -11,6 +11,7 @@ use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\CustomerFixtures;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\ListeningNotesFixtures;
 use Tests\TestCase;
 
 class CustomerListeningNotesBoundaryTest extends TestCase
@@ -74,6 +75,7 @@ class CustomerListeningNotesBoundaryTest extends TestCase
 
     public function test_saved_note_model_callback_cannot_bind_projection_to_a_different_valid_revision(): void
     {
+        ListeningNotesFixtures::enablePromotion();
         $customer = CustomerFixtures::account();
         SavedListeningLibrary::create(['customer_account_id' => $customer['account']->id, 'version' => 1,
             'payload' => ['schema' => 1, 'accountId' => $customer['account']->id, 'version' => 1, 'favorites' => ['999'], 'playlists' => []]]);

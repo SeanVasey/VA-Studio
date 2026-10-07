@@ -40,3 +40,21 @@ Production adapter, consent/preferences/suppression and broader export/retention
 remain active downstream work. Full Foundation/MySQL8.4/native browsers and
 complete personal-store readiness are not established by this focused child.
 Publication/preflight/expected-head merge belong to the later checkpoint.
+
+## Corrected service/main composition
+
+ServicePR30 merged asda70eba95c46522cd4084db4e79f764ba401fd7c with tree34449b7,
+exact published00705ad source after preflight37594438072 passed. Both automatic
+findings resolved; originalauthority failures and superseding independent7dc
+approval stay retained. Notes composition7e80766/treeb57321f includes actual
+merged-main ancestry. All13 notes-owned/shared sources match approvedaf87 bytes.
+Among31 independent bound paths, only CustomerSessionController/bootstrap/
+CustomerLibrary changed to add already-reviewed service registration. There is
+no executable change from affectedtested4d36fb2 to7e80766; the difference carries
+service docs/evidence and actual merged-main ancestry.
+
+Real HTTP/export/capacity/service-route selection21/289 passes without skips;
+account/listening/notes/independent-listening/service mounted frontend98 and
+TypeScript pass. These overlap earlier runs and do not replace native acceptance.
+Original native1406 failure and corrected overflow/no-write proof carry on exact
+unchanged listening source. Independent bounded final-base review is next.

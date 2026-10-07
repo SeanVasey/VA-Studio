@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/promoted-sqlite-selection.xml" tests="3" assertions="8" errors="0" failures="0" skipped="1" time="0.857241">
+    <testsuite name="Promoted actual service authority regressions" tests="3" assertions="8" errors="0" failures="0" skipped="1" time="0.857241">
+      <testsuite name="Tests\Feature\ServiceProjectCurrentAuthorityTest" file="/workspace/VA-Studio-service-independent/tests/Feature/ServiceProjectCurrentAuthorityTest.php" tests="2" assertions="4" errors="0" failures="0" skipped="1" time="0.646798">
+        <testcase name="test_temporary_users_copy_cannot_mask_permanent_required_mfa_withdrawal_after_real_audit_callback" file="/workspace/VA-Studio-service-independent/tests/Feature/ServiceProjectCurrentAuthorityTest.php" line="22" class="Tests\Feature\ServiceProjectCurrentAuthorityTest" classname="Tests.Feature.ServiceProjectCurrentAuthorityTest" assertions="0" time="0.416563">
+          <skipped/>
+        </testcase>
+        <testcase name="test_real_mfa_provider_callback_cannot_withdraw_enrollment_after_the_verified_user_read" file="/workspace/VA-Studio-service-independent/tests/Feature/ServiceProjectCurrentAuthorityTest.php" line="89" class="Tests\Feature\ServiceProjectCurrentAuthorityTest" classname="Tests.Feature.ServiceProjectCurrentAuthorityTest" assertions="4" time="0.230235"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\ServiceProjectCredentialResolverTest" file="/workspace/VA-Studio-service-independent/tests/Feature/ServiceProjectCredentialResolverTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="0.210443">
+        <testcase name="test_real_customer_access_resolver_cannot_withdraw_credentials_after_final_physical_user_proof" file="/workspace/VA-Studio-service-independent/tests/Feature/ServiceProjectCredentialResolverTest.php" line="19" class="Tests\Feature\ServiceProjectCredentialResolverTest" classname="Tests.Feature.ServiceProjectCredentialResolverTest" assertions="4" time="0.210443"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,9 @@
+{
+    "tested_source": "13d7ae7896c1f3c43f8428e624e5731842072261",
+    "driver": "sqlite",
+    "genuine_provider_callback_fired": true,
+    "quote_audit_was_created": true,
+    "command_refused": false,
+    "retained_rows_exact": false,
+    "service_event_count": 1
+}

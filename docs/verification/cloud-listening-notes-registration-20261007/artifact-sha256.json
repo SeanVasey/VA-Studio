@@ -1,5 +1,5 @@
 {
-  "README.md": "3df6197784b879c31ec7e1301e170ae41393c368ba85d60a01ff37bcd7f0bbf3",
+  "README.md": "491b112f4a8855191e9453ef07ceb04ee37c55f26da2112fb17e513916f0fb90",
   "final-capacity-http-041453f.txt": "b7f06cf1f03548a68000a226e9196479538e093550aad5d94e890e1970e5ae0e",
   "final-capacity-http-041453f.xml": "e636c55487915d6f4b15ad39ccee854e310f2b40027eff492e4b8d6f11b15c73",
   "final-capacity-http-selection.phpunit.xml.txt": "2de15b25d262dab8f80d96491afb6e7c5facf787b005cf551f13b20006569828",
@@ -10,5 +10,10 @@
   "initial-shared-selection.phpunit.xml.txt": "bf8ca8b38300fbb48445425c5bea6fb26e0d33265ce1af8642699e2b2fe38226",
   "mounted-65-7b340ae.txt": "054de464f0dd254dd559a463a2bd2e4d172d1b97985ab183fb9a8f37ef0193b6",
   "mounted-new26-7b340ae.txt": "fbab2eaff764c3f69c0180c21d95887f30e426fc8ceddfeb9d857d7b7dd9e103",
+  "service-base-carry.json": "e47ca3676bf67579ac8a9e82308c1e037fc692f2bec4e611c00f7b809a1b916e",
+  "service-graph-frontend.txt": "1fe1a9aeeb5a88389342972dcfb37818b22a023b7d4e8d8d777eaa6729dd3e97",
+  "service-graph-php.txt": "12596dc9ffeeb3c64774a9dc727da18ab551b3ee00a27b113e5fceb80ecbd98c",
+  "service-graph-php.xml": "54d9dddd1474fe4eff2b2936fa856527a5567ec5ccc76940ab8b3f8b9435297e",
+  "service-graph-typecheck.txt": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f",
   "source-map.json": "fa5933c518607ce76f029d195b9301803d144a9098d1b5dcfa73f1d1a864247d"
 }

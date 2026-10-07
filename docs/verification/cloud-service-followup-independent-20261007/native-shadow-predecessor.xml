@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/mysql-selection.xml" tests="1" assertions="4" errors="0" failures="1" skipped="0" time="22.415050">
+    <testsuite name="Independent service physical authority shadow" tests="1" assertions="4" errors="0" failures="1" skipped="0" time="22.415050">
+      <testsuite name="Tests\IndependentServiceFollowup\ServiceAuthorityShadowCanaryTest" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/ServiceAuthorityShadowCanaryTest.php" tests="1" assertions="4" errors="0" failures="1" skipped="0" time="22.415050">
+        <testcase name="test_temporary_users_copy_cannot_mask_permanent_required_mfa_withdrawal_after_real_audit_callback" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/ServiceAuthorityShadowCanaryTest.php" line="19" class="Tests\IndependentServiceFollowup\ServiceAuthorityShadowCanaryTest" classname="Tests.IndependentServiceFollowup.ServiceAuthorityShadowCanaryTest" assertions="4" time="22.415050">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\IndependentServiceFollowup\ServiceAuthorityShadowCanaryTest::test_temporary_users_copy_cannot_mask_permanent_required_mfa_withdrawal_after_real_audit_callback
+Final authority must refuse the actual permanent MFA withdrawal even when a temporary same-name users copy retains the old values.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/ServiceAuthorityShadowCanaryTest.php:67
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

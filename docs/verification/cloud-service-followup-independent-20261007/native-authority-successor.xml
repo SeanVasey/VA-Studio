@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/mysql-selection.xml" tests="2" assertions="9" errors="0" failures="0" skipped="0" time="32.558574">
+    <testsuite name="Independent service physical authority shadow" tests="2" assertions="9" errors="0" failures="0" skipped="0" time="32.558574">
+      <testsuite name="Tests\IndependentServiceFollowup\ServiceAuthorityShadowCanaryTest" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/ServiceAuthorityShadowCanaryTest.php" tests="2" assertions="9" errors="0" failures="0" skipped="0" time="32.558574">
+        <testcase name="test_temporary_users_copy_cannot_mask_permanent_required_mfa_withdrawal_after_real_audit_callback" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/ServiceAuthorityShadowCanaryTest.php" line="22" class="Tests\IndependentServiceFollowup\ServiceAuthorityShadowCanaryTest" classname="Tests.IndependentServiceFollowup.ServiceAuthorityShadowCanaryTest" assertions="5" time="16.086685"/>
+        <testcase name="test_real_mfa_provider_callback_cannot_withdraw_enrollment_after_the_verified_user_read" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/ServiceAuthorityShadowCanaryTest.php" line="84" class="Tests\IndependentServiceFollowup\ServiceAuthorityShadowCanaryTest" classname="Tests.IndependentServiceFollowup.ServiceAuthorityShadowCanaryTest" assertions="4" time="16.471889"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>
