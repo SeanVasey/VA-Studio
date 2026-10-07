@@ -1,0 +1,4 @@
+App\Domain\Customers\Listening\ListeningLibrary /workspace/VA-Studio-customer-listening-notes/app/Domain/Customers/Listening/ListeningLibrary.php
+Tests\Feature\CustomerListeningNotesTest /workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php
+Tests\Feature\CustomerListeningNotesBoundaryTest /workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesBoundaryTest.php
+Tests\Feature\CustomerListeningNotesCapacityTest /workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesCapacityTest.php
