@@ -298,4 +298,53 @@ final class ProductionIdentityCommittedFrameTest extends TestCase
         $this->assertSame($replacement, DB::table('users')->where('id', $owner->principal()->userId)->value('password'));
         $this->assertSame(1, DB::table('committed_frame_fixture')->count());
     }
+
+    public static function unresolvedConnections(): array
+    {
+        return ['primary resolver' => ['primary'], 'secondary resolver' => ['secondary'], 'secondary null' => ['null']];
+    }
+
+    #[DataProvider('unresolvedConnections')]
+    public function test_late_unresolved_connection_is_refused_without_running_a_callback_after_feature_policy(string $kind): void
+    {
+        $owner = $this->owner();
+        $proof = $this->write($owner);
+        $access = new ProductionAccountFeatureAccess;
+        $primary = DB::connection()->getPdo();
+        $frame = IdentityCommittedFrame::begin($this->reader(), hrtime(true) + 30_000_000_000);
+        $access->lockCommitted($owner, $frame, $proof);
+        $name = 'identity_frame_late_resolver';
+        if ($kind === 'primary') {
+            $connection = DB::connection();
+        } else {
+            config(['database.connections.'.$name => config('database.connections.'.DB::getDefaultConnection())]);
+            $connection = DB::connection($name);
+        }
+        $physical = $connection->getPdo();
+        $callbacks = 0;
+        $connection->setPdo($kind === 'null' ? null : function () use ($physical, &$callbacks): PDO {
+            $callbacks++;
+            config(['production-account-features.enabled' => false]);
+
+            return $physical;
+        });
+        try {
+            try {
+                $access->proveCommitted($owner, $frame, $proof);
+                $this->fail('Late unresolved connection cannot release a private response.');
+            } catch (IdentityException) {
+                $this->assertSame(0, $callbacks);
+                $this->assertTrue(config('production-account-features.enabled'));
+                $this->assertSame(1, $primary->query('SELECT COUNT(*) FROM committed_frame_fixture')->fetchColumn());
+            }
+        } finally {
+            $connection->setPdo($physical);
+            $frame->close();
+            if ($kind !== 'primary') {
+                DB::purge($name);
+            }
+        }
+        $this->assertFalse(DB::connection()->getPdo()->inTransaction());
+        $this->assertSame(1, DB::table('committed_frame_fixture')->count());
+    }
 }
