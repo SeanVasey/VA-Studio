@@ -1,0 +1,16 @@
+{
+  "byte_exact_source_against_baseline18c": {
+    "app/Domain/Catalog/Discovery/DiscoveryEpoch.php": "540b5d43c02e0a100e39290598b96668a4bf6c30fd0813da6161f307bec801bf",
+    "app/Domain/Catalog/Discovery/EligibleTrackSnapshot.php": "72f1d990e90be9b3153277892678eb34a77c97ab21e3f8ca29232686c86863b3",
+    "database/migrations/2026_10_07_240000_catalog_discovery_epoch.php": "90664cb7f077cd7ef0a8744e147a0344f13fcc17139edae6f29b7d6c50812313",
+    "app/Domain/Catalog/PublicationReadiness.php": "6ed1f8c2bd1f0dc4b5fea0608848cf0149c12569e29b680640fea801f6fb8c60",
+    "app/Domain/Commerce/Inventory/SelectionInventory.php": "e00a74fe35c8ab885034e49bfe38e4392174467d454740e4e6ad84b2dc078fd6",
+    "tests/Feature/DiscoveryEpochMigrationTest.php": "5433f46e193572fc76def633b1b4d1b4fc47fc87bfd088919b08b949e9a4439e",
+    "tests/Feature/CatalogPaginationTest.php": "d4c8ac93a557295978bf3fbd5d330cd58887fefaf69dd5cb5c53a73e158fb218",
+    "tests/Feature/PublicCatalogRelatedLinksTest.php": "2e42a6b29c86a33ba3bb58bb3c0754168fc84b844b06738e67dd53c3675ba312",
+    "tests/Support/discovery-snapshot-worker.php": "570cacf72433c7753b8a4b8bc2ed8ee67d45d3d88a53715b77910bd5b2532afb"
+  },
+  "baseline_execution": "mysql-junit.xml and sqlite-junit.xml",
+  "fresh_changed_execution": "corrected-mysql-junit.xml and corrected-sqlite-junit.xml",
+  "scope": "Focused union evidence, not one full corrected five-file execution or complete Foundation acceptance"
+}

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="22" assertions="75" errors="0" failures="0" skipped="7" time="7.536861">
+    <testsuite name="Tests\Feature\CurrentEligibleTrackSnapshotTest" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/CurrentEligibleTrackSnapshotTest.php" tests="6" assertions="35" errors="0" failures="0" skipped="0" time="5.943852">
+      <testcase name="test_empty_and_49_candidate_pages_are_bounded_private_and_complete_by_continuation" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/CurrentEligibleTrackSnapshotTest.php" line="36" class="Tests\Feature\CurrentEligibleTrackSnapshotTest" classname="Tests.Feature.CurrentEligibleTrackSnapshotTest" assertions="9" time="0.703550"/>
+      <testcase name="test_current_paths_match_public_catalog_and_reject_unknown_or_changed_evidence" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/CurrentEligibleTrackSnapshotTest.php" line="63" class="Tests\Feature\CurrentEligibleTrackSnapshotTest" classname="Tests.Feature.CurrentEligibleTrackSnapshotTest" assertions="7" time="1.078469"/>
+      <testcase name="test_private_byte_loss_and_configuration_changes_refuse_retained_projection" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/CurrentEligibleTrackSnapshotTest.php" line="85" class="Tests\Feature\CurrentEligibleTrackSnapshotTest" classname="Tests.Feature.CurrentEligibleTrackSnapshotTest" assertions="2" time="0.895152"/>
+      <testcase name="test_caller_transaction_and_forged_continuation_are_refused" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/CurrentEligibleTrackSnapshotTest.php" line="102" class="Tests\Feature\CurrentEligibleTrackSnapshotTest" classname="Tests.Feature.CurrentEligibleTrackSnapshotTest" assertions="3" time="0.150180"/>
+      <testcase name="test_default_and_explicit_time_remain_equivalent_and_epoch_changes_during_read_fail_closed" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/CurrentEligibleTrackSnapshotTest.php" line="124" class="Tests\Feature\CurrentEligibleTrackSnapshotTest" classname="Tests.Feature.CurrentEligibleTrackSnapshotTest" assertions="5" time="0.937042"/>
+      <testcase name="test_explicit_license_and_hold_times_preserve_defaults_and_crossing_refuses_capture" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/CurrentEligibleTrackSnapshotTest.php" line="149" class="Tests\Feature\CurrentEligibleTrackSnapshotTest" classname="Tests.Feature.CurrentEligibleTrackSnapshotTest" assertions="9" time="2.179459"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\DiscoveryEpochMigrationTest" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" tests="9" assertions="40" errors="0" failures="0" skipped="0" time="1.593009">
+      <testsuite name="Tests\Feature\DiscoveryEpochMigrationTest::test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate" tests="2" assertions="20" errors="0" failures="0" skipped="0" time="0.341509">
+        <testcase name="test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set &quot;empty&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="31" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="10" time="0.158265"/>
+        <testcase name="test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set &quot;populated&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="31" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="10" time="0.183244"/>
+      </testsuite>
+      <testcase name="test_down_refuses_before_any_database_read_or_write" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="69" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="1" time="0.178164"/>
+      <testcase name="test_actual_insert_update_delete_upsert_replace_aba_and_rollback_invalidate_atomically" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="84" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="9" time="0.178852"/>
+      <testcase name="test_missing_changed_guard_and_modified_table_fail_closed" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="111" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="3" time="0.190260"/>
+      <testcase name="test_overflow_refuses_parent_write_and_preserves_epoch_and_data" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="137" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="3" time="0.155055"/>
+      <testcase name="test_new_installation_collision_refuses_before_ddl" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="155" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="1" time="0.178029"/>
+      <testcase name="test_foreign_guard_on_absent_installation_is_not_adopted_or_replaced" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="168" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="2" time="0.177468"/>
+      <testcase name="test_connection_local_dependency_shadow_refuses_capture" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="192" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="1" time="0.193673"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\DiscoverySnapshotConcurrencyTest" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoverySnapshotConcurrencyTest.php" tests="7" assertions="0" errors="0" failures="0" skipped="7" time="0.000000">
+      <testsuite name="Tests\Feature\DiscoverySnapshotConcurrencyTest::test_committed_writers_before_final_fence_refuse_prechange_capture" tests="6" assertions="0" errors="0" failures="0" skipped="6" time="0.000000">
+        <testcase name="test_committed_writers_before_final_fence_refuse_prechange_capture with data set &quot;unpublish&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoverySnapshotConcurrencyTest.php" line="52" class="Tests\Feature\DiscoverySnapshotConcurrencyTest" classname="Tests.Feature.DiscoverySnapshotConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_committed_writers_before_final_fence_refuse_prechange_capture with data set &quot;rights&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoverySnapshotConcurrencyTest.php" line="52" class="Tests\Feature\DiscoverySnapshotConcurrencyTest" classname="Tests.Feature.DiscoverySnapshotConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_committed_writers_before_final_fence_refuse_prechange_capture with data set &quot;offer&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoverySnapshotConcurrencyTest.php" line="52" class="Tests\Feature\DiscoverySnapshotConcurrencyTest" classname="Tests.Feature.DiscoverySnapshotConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_committed_writers_before_final_fence_refuse_prechange_capture with data set &quot;license&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoverySnapshotConcurrencyTest.php" line="52" class="Tests\Feature\DiscoverySnapshotConcurrencyTest" classname="Tests.Feature.DiscoverySnapshotConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_committed_writers_before_final_fence_refuse_prechange_capture with data set &quot;media&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoverySnapshotConcurrencyTest.php" line="52" class="Tests\Feature\DiscoverySnapshotConcurrencyTest" classname="Tests.Feature.DiscoverySnapshotConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_committed_writers_before_final_fence_refuse_prechange_capture with data set &quot;inventory&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoverySnapshotConcurrencyTest.php" line="52" class="Tests\Feature\DiscoverySnapshotConcurrencyTest" classname="Tests.Feature.DiscoverySnapshotConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+      </testsuite>
+      <testcase name="test_writer_waits_on_actual_final_epoch_record_and_retained_capture_then_refuses_consumption" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoverySnapshotConcurrencyTest.php" line="69" class="Tests\Feature\DiscoverySnapshotConcurrencyTest" classname="Tests.Feature.DiscoverySnapshotConcurrencyTest" assertions="0" time="0.000000">
+        <skipped/>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

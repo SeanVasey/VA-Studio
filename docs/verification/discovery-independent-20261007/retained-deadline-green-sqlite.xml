@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Review\RetainedDeadlineCanaryTest" file="/workspace/scratch/2876616e88c3/VA-Studio-discovery-independent/docs/verification/discovery-independent-20261007/RetainedDeadlineCanaryTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="1.545567">
+    <testcase name="test_original_capture_deadline_cannot_be_extended_during_consumption" file="/workspace/scratch/2876616e88c3/VA-Studio-discovery-independent/docs/verification/discovery-independent-20261007/RetainedDeadlineCanaryTest.php" line="25" class="Tests\Review\RetainedDeadlineCanaryTest" classname="Tests.Review.RetainedDeadlineCanaryTest" assertions="4" time="1.545567"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,10 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/native-successor-selection.xml
+
+.....                                                               5 / 5 (100%)
+
+Time: 01:14.056, Memory: 77.00 MB
+
+[30;42mOK (5 tests, 82 assertions)[0m

@@ -1,0 +1,37 @@
+{
+  "Tests\\Feature\\CurrentEligibleTrackSnapshotTest": {
+    "tests": 6,
+    "assertions": 35,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0
+  },
+  "Tests\\Feature\\DiscoveryEpochMigrationTest": {
+    "tests": 9,
+    "assertions": 40,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0
+  },
+  "Tests\\Feature\\DiscoverySnapshotConcurrencyTest": {
+    "tests": 7,
+    "assertions": 0,
+    "failures": 0,
+    "errors": 0,
+    "skips": 7
+  },
+  "Tests\\Feature\\CatalogPaginationTest": {
+    "tests": 7,
+    "assertions": 107,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0
+  },
+  "Tests\\Feature\\PublicCatalogRelatedLinksTest": {
+    "tests": 32,
+    "assertions": 142,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0
+  }
+}

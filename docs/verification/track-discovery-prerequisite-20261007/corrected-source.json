@@ -1,0 +1,12 @@
+{
+  "source": "10dcb64d9c30231bd6949fd4d00811a283e820b0",
+  "tree": "7e6ccdb4459775b67210c4d01c1413757946c418",
+  "parent": "18c7d357acc74dbff1c2fb7ad149832873d76bc3",
+  "files": {
+    "app/Domain/Catalog/Discovery/CurrentEligibleTrackSnapshot.php": "4292c66f41e05332dc3bb1dfe41b811496d4815beea70d866d3533d518d7d1f3",
+    "docs/architecture/bounded-track-discovery-prerequisite.md": "cebb392e8a85d47e5726b758a6f67926e84b6024fffb9529523cf12445492ff8",
+    "tests/Feature/CurrentEligibleTrackSnapshotTest.php": "cd046872eeddddac71c313f0b892f2dac533714b27d46d5db6cb1af4e27e2e15",
+    "tests/Feature/DiscoverySnapshotConcurrencyTest.php": "bafda9296abd0eea20850a623f9c5e0141538858b7b0037b7441a9811825dbf5"
+  },
+  "unchanged_migration_catalog_test_carry": "Migration/DiscoveryEpoch implementation, DiscoveryEpochMigrationTest, CatalogPaginationTest, PublicCatalogRelatedLinksTest and shared clocks/CI match18c byte-exact. CurrentEligibleTrackSnapshot and concurrency fixture changed; their affected cases rerun fresh10d."
+}

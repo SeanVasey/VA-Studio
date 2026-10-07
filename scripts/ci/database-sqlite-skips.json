@@ -601,6 +601,14 @@
     [
       "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest",
       "test_changed_capture_cannot_recover_winner_in_either_worker_order"
+    ],
+    [
+      "Tests\\Feature\\DiscoverySnapshotConcurrencyTest",
+      "test_committed_writers_before_final_fence_refuse_prechange_capture"
+    ],
+    [
+      "Tests\\Feature\\DiscoverySnapshotConcurrencyTest",
+      "test_writer_waits_on_actual_final_epoch_record_and_retained_capture_then_refuses_consumption"
     ]
   ]
 }

@@ -1,0 +1,16 @@
+{
+  "Tests\\Feature\\CurrentEligibleTrackSnapshotTest": {
+    "tests": 7,
+    "assertions": 41,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0
+  },
+  "Tests\\Feature\\DiscoverySnapshotConcurrencyTest": {
+    "tests": 7,
+    "assertions": 0,
+    "failures": 0,
+    "errors": 0,
+    "skips": 7
+  }
+}

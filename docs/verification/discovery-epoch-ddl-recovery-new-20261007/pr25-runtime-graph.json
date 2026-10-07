@@ -1,0 +1,9 @@
+{
+    "packages": 158,
+    "mismatches": [],
+    "origins": [
+        "\/workspace\/VA-Studio-pr25-recovery\/app\/Domain\/Catalog\/Discovery\/DiscoveryEpoch.php",
+        "\/workspace\/VA-Studio-pr25-recovery\/tests\/TestCase.php",
+        "\/workspace\/VA-Studio\/vendor\/laravel\/framework\/src\/Illuminate\/Database\/Migrations\/Migrator.php"
+    ]
+}

@@ -1,0 +1,8 @@
+
+Fatal error: Uncaught ReflectionException: Class "Mpdf\Mpdf" does not exist in Command line code:1
+Stack trace:
+#0 Command line code(1): ReflectionClass->__construct('Mpdf\\Mpdf')
+#1 [internal function]: {closure:Command line code:1}('Mpdf\\Mpdf')
+#2 Command line code(1): array_map(Object(Closure), Array)
+#3 {main}
+  thrown in Command line code on line 1

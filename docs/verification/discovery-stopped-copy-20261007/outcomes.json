@@ -1,0 +1,14 @@
+{
+  "source": "9f1bda29a20a6f6936efa9b86e9731194bd3ccf7",
+  "tree": "fe4be5659d1d769a0175e2a2c43da15cf1f7954d",
+  "actual_command": "PERSISTENT_UPGRADE_REQUIRE_PHP=1 node --test scripts/ops/persistent-content-upgrade.test.mjs",
+  "tests": 14,
+  "passed": 14,
+  "failures": 0,
+  "cancelled": 0,
+  "skipped": 0,
+  "duration_ms": 53362.272619,
+  "frontend_build": "passed exact-source npm run build",
+  "source_edits": 0,
+  "hosted_dispatches": 0
+}

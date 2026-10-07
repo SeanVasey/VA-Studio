@@ -1,0 +1,13 @@
+{
+    "database": "vaseyaudio_pr25_review",
+    "version": "8.0.46-0ubuntu0.24.04.4",
+    "registered": [
+        "cde_own_insért"
+    ],
+    "ascii_creation": "refused",
+    "error": [
+        "HY000",
+        1359,
+        "Trigger already exists"
+    ]
+}

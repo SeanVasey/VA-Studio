@@ -1,0 +1,10 @@
+{
+  "borrowed_candidate": "/workspace/scratch/2876616e88c3/VA-Studio-pdf-successor-activation",
+  "frontend_source_differences": [
+    "resources/js/Pages/CustomerLibrary.tsx",
+    "resources/js/lib/membership-history.ts",
+    "resources/js/components/OwnedMembershipHistory.tsx"
+  ],
+  "decision": "Do not use borrowed build as acceptance. Produce actual exact-source npm build.",
+  "application_modified": false
+}

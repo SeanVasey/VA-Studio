@@ -1,0 +1,16 @@
+{
+  "selector": {
+    "command": [
+      "python3",
+      "scripts/ci/test-focused-tests.py"
+    ],
+    "exit_code": 0
+  },
+  "cadence": {
+    "command": [
+      "python3",
+      "scripts/ci/test-workflow-cadence.py"
+    ],
+    "exit_code": 0
+  }
+}

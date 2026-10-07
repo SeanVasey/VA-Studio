@@ -1,0 +1,26 @@
+{
+  "validate": {
+    "command": [
+      "/workspace/scratch/0c039e9e0645/runtime-recovery/bin/composer",
+      "validate",
+      "--strict",
+      "--no-check-publish"
+    ],
+    "exit_code": 0
+  },
+  "platform": {
+    "command": [
+      "/workspace/scratch/0c039e9e0645/runtime-recovery/bin/composer",
+      "check-platform-reqs"
+    ],
+    "exit_code": 0
+  },
+  "audit": {
+    "command": [
+      "/workspace/scratch/0c039e9e0645/runtime-recovery/bin/composer",
+      "audit",
+      "--format=json"
+    ],
+    "exit_code": 0
+  }
+}

@@ -2,6 +2,14 @@
 
 ## Current development continuation — October 7, 2026 UTC
 
+PR28 merged at `28eba5e0832a0cbccbf636d4e73fbc77e15968af`, after
+independent source review, cheap preflight37587155280 and automatic code/security
+review. PR26/27 are retained ancestors. PR25 recovery executable `ed285b6a`
+is being composed with current main and frozen independent native evidence;
+its final publication/preflight remain pending.
+
+### Historical amount checkpoint before cloud recovery
+
 PRs #17–#24 are merged in SeanVasey/VA-Studio; actual main is
 `717f0866444701637e7c396b4376891aa5dd995d`, tree `1c43bb29`.
 Dependency PRs #1–#3 and the original PR #16 membership rollback review
@@ -15,6 +23,22 @@ Private candidate generation proceeds separately. T22/T36/full final acceptance
 and launch remain open; six parent groups remain accepted and 34 open.
 Current AGENTS.md governs focused low-cost development merges; historical
 source/results below retain their original scope.
+
+### Historical original PR25 branch checkpoint
+
+PRs #17–#24 are merged in SeanVasey/VA-Studio; native current main is
+`717f0866444701637e7c396b4376891aa5dd995d`, tree `1c43bb29`.
+Dependency PRs #1–#3 are reconciled. Membership migration rollback review
+4201166306 is resolved, with actual MySQL regression evidence retaining data
+and repository bookkeeping. The reviewed bounded discovery prerequisite
+[composition](verification/track-discovery-composition-20261007/README.md)
+is next, followed by portable read-only D28 amount requirements.
+
+Next independent implementations are private retained candidate identity
+generation and untrusted amount input consistency. Neither represents public
+SEO completion, authoritative tax/amount observation, payment or launch. Six
+parent groups remain accepted and 34 open. Historical source/results below
+remain unchanged; current AGENTS.md governs focused low-cost development merges.
 
 
 ## Current production preparation checkpoint — October 6, 2026 UTC

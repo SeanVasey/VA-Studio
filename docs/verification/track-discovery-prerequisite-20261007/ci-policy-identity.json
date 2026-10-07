@@ -1,0 +1,19 @@
+{
+  "old_tuples": 150,
+  "new_tuples": 152,
+  "original_150_preserved": true,
+  "original_150_sha256": "d93da4e7a13a8c6aff8f97f363eb6d93dde884bad53c9ae50eeb0ed32514c71c",
+  "new_exact_tuples": [
+    [
+      "Tests\\Feature\\DiscoverySnapshotConcurrencyTest",
+      "test_committed_writers_before_final_fence_refuse_prechange_capture"
+    ],
+    [
+      "Tests\\Feature\\DiscoverySnapshotConcurrencyTest",
+      "test_writer_waits_on_actual_final_epoch_record_and_retained_capture_then_refuses_consumption"
+    ]
+  ],
+  "max_focused_files": 32,
+  "automatic_triggers_changed": false,
+  "hosted_dispatches": 0
+}

@@ -148,3 +148,40 @@ bytes with independent generated autoloads; duplicate generated copies were
 removed after disk exhaustion, preserving all source and evidence. Remaining
 operative commerce, grant origins, paid products, CRM, migration and hosting
 work follows the audit after each coherent batch without another user prompt.
+
+## Third milestone and corrected PR25 composition
+
+PR28 merged expected head `ce830375604b90609a6b4f26eaf16a8a1269ebe3`
+as `28eba5e0832a0cbccbf636d4e73fbc77e15968af` at 02:29 America/Chicago,
+tree `dc10ec5278819be9c3448626e372413d8526293b`. Both ordered parents,
+merged state, cheap preflight37587155280 and completed automatic code/security
+review without findings were freshly verified. Root rebuilt the retained cloud
+installation at that main source; HTTP checks served the public manifest with
+fixed `/` id/scope, both exact approved icons, public empty catalog and private
+non-echoing/no-store/noindex unauthorized checkout return. No native installation
+or final integrated browser acceptance is inferred from this HTTP smoke.
+
+PR25 repair executable `ed285b6a2b34bc1a2a2c91c42b64d68f317965af`,
+author evidence `f304a32b894b3fba651435f89909e3d4d44b67fd`, is composed with
+main28eba at `626f7d6688c5d528dc12baec3fbd4afe647f63e7`. Three source/test
+blobs remain exact and all39 author artifact digests pass. The only merge
+conflicts were three status documents; both historical blocks are retained with
+explicit labels. Root adds the real retry regression as the sixth bounded
+`track-discovery` feedback file, with the32-file limit and native skip identities
+preserved; all50 selector/control tests pass. Author corrected SQLite28/4008
+and native8/118, independent SQLite4/40 and native5/82 pass. The unchanged
+112-boundary native proof carries with a precise source mapping; local8.0.46
+does not replace final8.4 acceptance. Exact composed review/publication/preflight
+are pending in this record; no merge or final acceptance is invented.
+
+Inquiry notification review separately reproduced three late-handoff defects
+(operator authority, enabled flag or current claim withdrawn after the last
+framework query); those corrections are in progress before approval. A native
+reserved trigger-alias canary passes without a schema write, so no speculative
+extra migration fix is requested. Listening repairs cover terminal authority,
+retained aggregate, mutable-model snapshot and public withdrawal plus atomic
+owned-schema retry/rollback retention. Root service registration is retained at
+`a01e84a` in its isolated worktree, awaiting the frozen actual service source
+and composition checks. Next code lanes are operative track checkout, additive
+SMTP/identity, distinct free/member grant origins and remaining CRM children;
+their authors retain explicit namespace/migration ownership before editing.

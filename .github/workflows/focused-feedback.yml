@@ -9,7 +9,7 @@ on:
         required: true
         type: choice
         default: unit
-        options: [unit, media, commerce, financial, customer, operator, licensing, publication, track-concurrency, seller, store-foundations, membership-migrations, production-preparation, private-continuation, frontend, membership-history-frontend, browser, bulk-license-browser]
+        options: [track-discovery, unit, media, commerce, financial, customer, operator, licensing, publication, track-concurrency, seller, store-foundations, membership-migrations, production-preparation, private-continuation, frontend, membership-history-frontend, browser, bulk-license-browser]
       engine:
         description: PHP database engine; frontend/browser require sqlite
         required: true

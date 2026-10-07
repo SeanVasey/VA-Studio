@@ -1,0 +1,15 @@
+diff --git a/scripts/ci/focused-tests.py b/scripts/ci/focused-tests.py
+index fe34f33..35ab246 100644
+--- a/scripts/ci/focused-tests.py
++++ b/scripts/ci/focused-tests.py
+@@ -26,0 +27 @@ PHP_TARGETS = {
++        "tests/Feature/DiscoveryEpochRecoveryTest.php",
+diff --git a/scripts/ci/test-focused-tests.py b/scripts/ci/test-focused-tests.py
+index db861ad..edd95e7 100644
+--- a/scripts/ci/test-focused-tests.py
++++ b/scripts/ci/test-focused-tests.py
+@@ -126,0 +127 @@ class SelectionTests(unittest.TestCase):
++            "tests/Feature/DiscoveryEpochRecoveryTest.php",
+@@ -151 +152 @@ class SelectionTests(unittest.TestCase):
+-        self.assertFalse(any(row[0] in {"Tests\\Feature\\DiscoveryEpochMigrationTest", "Tests\\Feature\\CurrentEligibleTrackSnapshotTest"}
++        self.assertFalse(any(row[0] in {"Tests\\Feature\\DiscoveryEpochMigrationTest", "Tests\\Feature\\DiscoveryEpochRecoveryTest", "Tests\\Feature\\CurrentEligibleTrackSnapshotTest"}

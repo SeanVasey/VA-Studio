@@ -1,0 +1,18 @@
+{
+  "executed_source": "18c7d357acc74dbff1c2fb7ad149832873d76bc3",
+  "executed_tree": "46f264a3ff556e1f948692bdbb3564671493b4c7",
+  "command": [
+    "/workspace/scratch/0c039e9e0645/runtime-recovery/bin/php",
+    "-d",
+    "memory_limit=512M",
+    "vendor/bin/phpunit",
+    "docs/verification/discovery-independent-20261007/RetainedDeadlineCanaryTest.php",
+    "--fail-on-empty-test-suite",
+    "--fail-on-warning",
+    "--log-junit",
+    "docs/verification/discovery-independent-20261007/retained-deadline-red.xml"
+  ],
+  "exit_code": 1,
+  "fresh_ephemeral_app_key": true,
+  "key_retained": false
+}
