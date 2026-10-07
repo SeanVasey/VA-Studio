@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"app\/Domain\/SupportAttachments\/InquiryAttachmentAuthority.php","fixers":["ordered_interfaces"]}]}

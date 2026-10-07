@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"tests\/Feature\/SupportAttachmentsTest.php","fixers":["class_attributes_separation","class_definition","fully_qualified_strict_types","unary_operator_spaces","no_multiple_statements_per_line","braces_position","statement_indentation","not_operator_with_successor_space","blank_line_before_statement","ordered_imports"]}]}

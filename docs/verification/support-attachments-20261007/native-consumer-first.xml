@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="26" assertions="286" errors="0" failures="2" skipped="0" time="298.656361">
+    <testsuite name="Tests\Feature\SupportAttachmentsTest" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" tests="17" assertions="106" errors="0" failures="0" skipped="0" time="200.060267">
+      <testcase name="test_owned_intake_scan_download_delete_preserves_encrypted_manifest_and_source_history" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="46" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="23" time="9.005187"/>
+      <testcase name="test_archival_closes_new_intake_and_process_but_preserves_ready_original_and_exact_replay" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="68" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="4" time="9.438528"/>
+      <testcase name="test_wrong_owner_source_and_revoked_operator_cannot_read_or_mutate" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="78" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="6" time="9.131479"/>
+      <testcase name="test_scanner_failure_is_truthful_and_explicit_retry_is_fenced" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="89" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="7" time="9.407990"/>
+      <testcase name="test_changed_private_original_never_becomes_ready_or_downloadable" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="98" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="3" time="8.904644"/>
+      <testcase name="test_unknown_intake_ack_exact_replay_retains_one_file_and_one_manifest" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="106" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="5" time="8.760040"/>
+      <testcase name="test_archive_and_owner_change_during_scanner_io_cannot_finish_claim" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="118" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="4" time="17.285108"/>
+      <testcase name="test_disabled_policy_and_production_environment_refuse_all_effects" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="131" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="5" time="14.787724"/>
+      <testcase name="test_archive_executable_and_oversize_bytes_are_refused" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="138" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="5" time="11.064693"/>
+      <testcase name="test_file_copy_handoff_ambiguity_retains_bounded_receiving_intent_and_exact_retry" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="146" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="9" time="10.841490"/>
+      <testcase name="test_deleted_request_replay_and_changed_file_never_restore_or_replace_bytes" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="160" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="6" time="10.423317"/>
+      <testcase name="test_unknown_scanner_claim_ack_requires_current_status_and_explicit_fenced_retry" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="170" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="7" time="11.784015"/>
+      <testcase name="test_expired_scanner_worker_cannot_overwrite_later_winner" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="183" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="5" time="10.574554"/>
+      <testcase name="test_expiry_closes_access_and_explicit_deletion_retains_manifest" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="193" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="7" time="11.946210"/>
+      <testcase name="test_last_staff_query_policy_withdrawal_refuses_before_retaining_or_mutating" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="202" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="4" time="15.879444"/>
+      <testcase name="test_missing_real_scanner_and_wrong_digest_remain_quarantined_failures" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="213" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="3" time="16.638236"/>
+      <testcase name="test_three_snapshot_slots_are_bounded_and_source_inode_links_are_refused" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="224" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="3" time="14.187610"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\SupportAttachmentHttpTest" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentHttpTest.php" tests="5" assertions="168" errors="0" failures="2" skipped="0" time="98.125770">
+      <testcase name="test_real_private_routes_intake_quarantine_scan_and_download_exact_original" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentHttpTest.php" line="37" class="Tests\Feature\SupportAttachmentHttpTest" classname="Tests.Feature.SupportAttachmentHttpTest" assertions="2" time="19.969187">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentHttpTest::test_real_private_routes_intake_quarantine_scan_and_download_exact_original
+Expected response status code [200] but received 422.
+Failed asserting that 422 is identical to 200.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentHttpTest.php:39</failure>
+      </testcase>
+      <testcase name="test_duplicate_escaped_command_keys_and_unrecognized_fields_are_rejected" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentHttpTest.php" line="47" class="Tests\Feature\SupportAttachmentHttpTest" classname="Tests.Feature.SupportAttachmentHttpTest" assertions="42" time="15.610294"/>
+      <testcase name="test_queries_ranges_foreign_origins_method_override_and_encoded_bytes_fail_closed" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentHttpTest.php" line="55" class="Tests\Feature\SupportAttachmentHttpTest" classname="Tests.Feature.SupportAttachmentHttpTest" assertions="67" time="20.405780"/>
+      <testcase name="test_missing_body_oversized_body_duplicate_upload_headers_and_invalid_name_refuse_before_manifest" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentHttpTest.php" line="64" class="Tests\Feature\SupportAttachmentHttpTest" classname="Tests.Feature.SupportAttachmentHttpTest" assertions="54" time="23.012509"/>
+      <testcase name="test_session_rotation_denies_retained_read_and_csrf_is_enforced_outside_testing" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentHttpTest.php" line="72" class="Tests\Feature\SupportAttachmentHttpTest" classname="Tests.Feature.SupportAttachmentHttpTest" assertions="3" time="19.128000">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentHttpTest::test_session_rotation_denies_retained_read_and_csrf_is_enforced_outside_testing
+Expected response status code [404] but received 422.
+Failed asserting that 422 is identical to 404.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentHttpTest.php:76</failure>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\SupportAttachmentSchemaTest" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentSchemaTest.php" tests="4" assertions="12" errors="0" failures="0" skipped="0" time="0.470325">
+      <testcase name="test_complete_unlogged_schema_retry_is_exact_and_prefix_safe" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentSchemaTest.php" line="26" class="Tests\Feature\SupportAttachmentSchemaTest" classname="Tests.Feature.SupportAttachmentSchemaTest" assertions="2" time="0.094066"/>
+      <testcase name="test_empty_atomic_table_and_each_owned_guard_prefix_can_resume" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentSchemaTest.php" line="31" class="Tests\Feature\SupportAttachmentSchemaTest" classname="Tests.Feature.SupportAttachmentSchemaTest" assertions="2" time="0.128595"/>
+      <testcase name="test_schema_drift_and_unknown_guards_refuse_before_mutation" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentSchemaTest.php" line="38" class="Tests\Feature\SupportAttachmentSchemaTest" classname="Tests.Feature.SupportAttachmentSchemaTest" assertions="2" time="0.110979"/>
+      <testcase name="test_retained_missing_guard_refuses_and_down_never_discards_originals" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentSchemaTest.php" line="45" class="Tests\Feature\SupportAttachmentSchemaTest" classname="Tests.Feature.SupportAttachmentSchemaTest" assertions="6" time="0.136684"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

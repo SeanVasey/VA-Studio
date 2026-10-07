@@ -1,0 +1,13 @@
+
+> test
+> vitest run tests/frontend/support-attachments.test.tsx
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-support-attachments
+
+
+ Test Files  1 passed (1)
+      Tests  17 passed (17)
+   Start at  08:38:21
+   Duration  1.24s (environment 46%, tests 39%, setup 7%, transform 7%, import 1%)
+

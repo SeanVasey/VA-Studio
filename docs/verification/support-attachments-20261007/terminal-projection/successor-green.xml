@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\SupportAttachmentsTest" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" tests="2" assertions="7" errors="0" failures="0" skipped="0" time="0.797807">
+    <testcase name="test_terminal_dto_encrypter_policy_withdrawal_cannot_commit_or_remove_original" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="417" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="4" time="0.545553"/>
+    <testcase name="test_terminal_dto_encrypter_row_mutation_cannot_return_stale_ready_state" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="426" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="3" time="0.252254"/>
+  </testsuite>
+</testsuites>

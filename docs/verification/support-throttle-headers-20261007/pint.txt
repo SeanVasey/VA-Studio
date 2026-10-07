@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"tests\/Feature\/SupportAttachmentRegistrationTest.php","fixers":["class_definition","fully_qualified_strict_types","braces_position","ordered_imports"]}]}

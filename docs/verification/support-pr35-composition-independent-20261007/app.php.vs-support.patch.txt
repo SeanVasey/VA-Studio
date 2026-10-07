@@ -1,0 +1,12 @@
+diff --git a/bootstrap/app.php b/bootstrap/app.php
+index 2a9d0e9..58880d4 100644
+--- a/bootstrap/app.php
++++ b/bootstrap/app.php
+@@ -36,6 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
+         then: function (): void {
+             Route::group([], base_path('routes/webhooks.php'));
+             Route::group([], base_path('routes/embeds.php'));
++            Route::group([], base_path('routes/discovery-track-sitemaps.php'));
+         },
+     )
+     ->withMiddleware(function (Middleware $middleware): void {

@@ -1,0 +1,19 @@
+{
+  "docs/verification/support-throttle-headers-20261007/pint.txt": "971122895da9aa373f3993e2989a8cae5cdd6df250d14a3da8ef9cf0f53fbc97",
+  "docs/verification/support-throttle-headers-20261007/source-binding.json": "ad323126566c5e1484622ed3fd5f18af5d87fdd78744e754bbacc6fdbb424ed5",
+  "docs/verification/support-throttle-headers-20261007/pint-final.txt": "971122895da9aa373f3993e2989a8cae5cdd6df250d14a3da8ef9cf0f53fbc97",
+  "docs/verification/support-throttle-headers-20261007/original.txt": "23b9e3135e472096e8a2876de562014f74c7458b24b495a944217abf4eb79361",
+  "docs/verification/support-throttle-headers-20261007/final.txt": "43d4b19dd4bdb9ccfebb6f6902abe33ad4f307b47bd8b2339868f7cb56d750db",
+  "docs/verification/support-throttle-headers-20261007/original.xml": "76adeebc0d89f058ebb820c7b355172556bdad7acfb6cfc64ccfb5a65a513382",
+  "docs/verification/support-throttle-headers-20261007/unchanged.txt": "927f930aabd4932f17195752a6ce9810f5f2258866ac69f7d7a167151640048a",
+  "docs/verification/support-throttle-headers-20261007/original-source.json": "fdbf479e835097badd1ca08c6372d7ff097eed1f653c2db4d2202e39a64ab900",
+  "docs/verification/support-throttle-headers-20261007/README.md": "bdeabc39a2e3aa8f135f02a9edae80a5f657c55fe24b52d8c6574c63d17d7fba",
+  "docs/verification/support-throttle-headers-20261007/repaired.xml": "836993d1a427779948bbdd38be8e947eac0f06f8108071982f10f5aaeba9b5bc",
+  "docs/verification/support-throttle-headers-20261007/final.xml": "a727eff4a910655bb7ca08583d9f1af6f69269c8fdfeeff2f055ea45362e2eb1",
+  "docs/verification/support-throttle-headers-20261007/unchanged.xml": "738a7ddb1c48b1d52f94dbe57b16449f9fd7b812e000eba1411b18b83d5390a2",
+  "docs/verification/support-throttle-headers-20261007/repaired.txt": "76458b36542e8d0979c535800b292d2270d39cfb5717e0b6b334ad17a9a444de",
+  "docs/verification/support-throttle-headers-20261007/original/bootstrap/app.php": "324778666edbbee394b1496cd61601a5347f83cc57f6b3c2bb0ca7e541dc2709",
+  "docs/verification/support-throttle-headers-20261007/original/app/Http/Middleware/SupportAttachmentPrivacy.php": "c5cdd553f0aa8a7d44744fc4ed546abcf26cf4e86f4fed2557c1a181f57f2fae",
+  "docs/verification/support-throttle-headers-20261007/original/app/Http/Responses/SupportAttachmentResponse.php": "81e4e4929df004a8b50ae4afb2dc700fde0f5c24b9a320b84401df309196f57b",
+  "docs/verification/support-throttle-headers-20261007/original/tests/Feature/SupportAttachmentRegistrationTest.php": "07b5129de89f2ae46058a877e73409fe78f56093f0b5c7bd84e3903a537bec15"
+}

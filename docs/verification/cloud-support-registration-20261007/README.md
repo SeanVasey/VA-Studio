@@ -1,0 +1,9 @@
+# Private attachment registration — held
+
+Frozen source781a3b4397784ed2e2fc86447cb91fec82af84e3 selectively composes dd18 consumer and c7 service adapter onto actual PR30 main. It registers source/policy families, bounded private API/page routes, fresh render scopes, private diagnostics and visitor/customer/operator entry points. HTML pages allow same-origin UI assets; API, streams and errors retain default-src none/sandbox. Production fixture admission remains default off.
+
+Actual registered six cases/247 assertions and five mounted entrypoint/page cases pass. Existing adapter/consumer25/144 and mounted73 pass; TypeScript/scoped Pint pass. A separate exact frozen nine-case selection records six passes, three genuine failures and zero errors. Integration is held: final download commit callback can disable policy while returning the original stream; an empty migration hole before a retained later guard is accepted; SQLite first-row lookup permits a foreign table masked by the own same-name trigger. Raw originals and source bindings are retained in receipt.json. Author repair and independent final-source review are pending.
+
+Earlier root harness failures remain retained separately: generated GET JSON bodies, incomplete Link mock and incorrect default-off response-status guesses. Their correction does not weaken server authority. An original canary text snapshot is retained before formatting; the same three assertions fail in the frozen formatted source. No source defect is claimed from those harness errors.
+
+New source is not recovered predecessor work and remains unpublished. Exact original files/scans/tombstones, cancellation/current authority and historical inquiry ownership remain retained. No production policy, actual ClamAV availability, executed browser, native8.4 or final exact-SHA Foundation claim.

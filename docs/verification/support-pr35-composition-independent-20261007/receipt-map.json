@@ -1,0 +1,112 @@
+{
+  "source": "408f2e4d93b7081e8c6725ed686d961c08710023",
+  "executable": "a9eb1ac23718874db3d38ae0dbeb1deab7539dba",
+  "approved_support": "5f9c1af243dd6474a68ba727ec7a361e66ea3b2e",
+  "approved_main": "cd83b0cf4bddaeac9b113fabe7a918e37bfd2901",
+  "prior_review": "662d5baec69a7f98b5fee5722df0d2819712b3e4",
+  "verified_carry": {
+    "unchanged_approved_bindings": 32,
+    "changed_test_bindings": 7,
+    "unchanged_original_artifacts": 41,
+    "source_bound_root_artifacts": 15
+  },
+  "incoming_byte_exact_main_bindings": [
+    {
+      "path": "app/Console/Commands/DiscoverySitemapBuild.php",
+      "source": "cd83b0cf4bddaeac9b113fabe7a918e37bfd2901",
+      "sha256": "1d5611412373b1796dc8c7d2e2a9a3882d52e7b7bb637507c0e47d832de700d9"
+    },
+    {
+      "path": "app/Domain/Catalog/Discovery/CurrentEligibleTrackSnapshot.php",
+      "source": "cd83b0cf4bddaeac9b113fabe7a918e37bfd2901",
+      "sha256": "ae98d542c70383d30656164a03c212a859dec1ab583780a68ec705c27f6bd12e"
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/CandidateBuildRequest.php",
+      "source": "cd83b0cf4bddaeac9b113fabe7a918e37bfd2901",
+      "sha256": "1471bcfbc5494008ffe8c0871678c24dacf5d8915ded514d4e9a47a10272d033"
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/CandidateWindow.php",
+      "source": "cd83b0cf4bddaeac9b113fabe7a918e37bfd2901",
+      "sha256": "66a244c1cdc0c49875997395b7d08574f7776818bf9d743481bd8d00f7263a5d"
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/DiscoverySitemapConsumption.php",
+      "source": "cd83b0cf4bddaeac9b113fabe7a918e37bfd2901",
+      "sha256": "607f97510d834361d7fb4e2154d0280839360741dfc15565f8a72e3227d0c03b"
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/SitemapConfiguration.php",
+      "source": "cd83b0cf4bddaeac9b113fabe7a918e37bfd2901",
+      "sha256": "4f17e9a6addd9afb3618755cc2ccd11a0c0a240bff718cff73b67d85fa8c92de"
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/SitemapException.php",
+      "source": "cd83b0cf4bddaeac9b113fabe7a918e37bfd2901",
+      "sha256": "b2ddf632f1e724145f358ab31a30e7a8d08463dcb638a61d9f7504d39d7c34c7"
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/SitemapProjection.php",
+      "source": "cd83b0cf4bddaeac9b113fabe7a918e37bfd2901",
+      "sha256": "b9c056c2cf1606daa02bd75800a4279418ea2e952a0210ffab2bb9312dd45a55"
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/SitemapSchema.php",
+      "source": "cd83b0cf4bddaeac9b113fabe7a918e37bfd2901",
+      "sha256": "2f8100ff89111a7632b62386e05e0210727c5e84be8b58ebbbf0f10d3cc513a6"
+    },
+    {
+      "path": "app/Domain/Catalog/DiscoverySitemap/SitemapStore.php",
+      "source": "cd83b0cf4bddaeac9b113fabe7a918e37bfd2901",
+      "sha256": "001a1e18cd64605522479fddade10cafb80ab8d3389a0a52e5d3d8dff626953b"
+    },
+    {
+      "path": "app/Http/Controllers/DiscoveryTrackSitemapController.php",
+      "source": "cd83b0cf4bddaeac9b113fabe7a918e37bfd2901",
+      "sha256": "7bdea01c6f5df898e980059b36df2fe1f1b0b2a86ec19e711e187d98a4a393c1"
+    },
+    {
+      "path": "app/Jobs/BuildDiscoverySitemapWindow.php",
+      "source": "cd83b0cf4bddaeac9b113fabe7a918e37bfd2901",
+      "sha256": "7339216badac201037011ac8540007bb5b064d13a4a3f781bbf37cf7866d7045"
+    },
+    {
+      "path": "config/discovery-sitemap.php",
+      "source": "cd83b0cf4bddaeac9b113fabe7a918e37bfd2901",
+      "sha256": "931fc2ea665e020d5269c576d35ae485a231df92034f59a4c22b759a180ae579"
+    },
+    {
+      "path": "database/migrations/2026_10_07_248000_create_discovery_sitemap_evidence.php",
+      "source": "cd83b0cf4bddaeac9b113fabe7a918e37bfd2901",
+      "sha256": "540b1d539a4859b3a0c641636f9395b80d448d78486975a58c94f96a1720f913"
+    },
+    {
+      "path": "routes/discovery-track-sitemaps.php",
+      "source": "cd83b0cf4bddaeac9b113fabe7a918e37bfd2901",
+      "sha256": "55f196571caf7c8b8441080349527adc4d9ef2e57afcb369082e6be7671cb12e"
+    }
+  ],
+  "shared_files": {
+    "bootstrap/app.php": "324778666edbbee394b1496cd61601a5347f83cc57f6b3c2bb0ca7e541dc2709",
+    "app/Http/Controllers/PublicDiscoveryController.php": "9d0fcb179ab3315f14eb7b1ae7f81ad6d698f50eb31ca799e98bef0f8fa96484",
+    "tests/Feature/PublicDiscoveryIndexTest.php": "5bc7ecfef421c1b56956b4b316a8aa71fc4675fdb44b1b549af1cc9dcc9bf6ba",
+    "resources/js/app.tsx": "cf38ac0f0221bc03fef9b318b82ed0974a4fbbdd0ad620d40004e9235a3df8c5",
+    "routes/web.php": "a39d0e051d67b63356844c4adce045f35e8640f00eb9af0a90858941ec8fa11f"
+  },
+  "root_source_bound_checks": {
+    "cases": 45,
+    "assertions": 608,
+    "errors": 0,
+    "failures": 0,
+    "skips": 0,
+    "fresh_peer_execution": false
+  },
+  "root_artifacts": {
+    "va-support-pr35-composed.txt": "8cd55d24995a754d08eec258ffcaea6a48ef76b5197a9e71308e0750e71c66ee",
+    "va-support-pr35-composed.xml": "c965736f4ce103f6f029c358355cdcb6faf2e0638e6a8f9e1306247f0a33846f",
+    "va-support-pr35-composed-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+  },
+  "root_receipt_sha256": "105f3c2966c908cebf8560f3f58f9fc9e7350ad288fa5bd73eba2757ae5dc7a3",
+  "scope": "Shared-only composition approval. Prior exact runtime and test-lifecycle approval carries; no duplicate native replay. Independently reviewed sitemap throttle correction must still integrate before publication."
+}

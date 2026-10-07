@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\SupportAttachmentKeyCaptureIndependentTest" file="/workspace/VA-Studio-support-session-independent/tests/Feature/SupportAttachmentKeyCaptureIndependentTest.php" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="0.549850">
+    <testcase name="test_service_resolution_key_rotation_cannot_adopt_a_previously_minted_visitor_actor" file="/workspace/VA-Studio-support-session-independent/tests/Feature/SupportAttachmentKeyCaptureIndependentTest.php" line="12" class="Tests\Feature\SupportAttachmentKeyCaptureIndependentTest" classname="Tests.Feature.SupportAttachmentKeyCaptureIndependentTest" assertions="2" time="0.549850">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentKeyCaptureIndependentTest::test_service_resolution_key_rotation_cannot_adopt_a_previously_minted_visitor_actor
+Failed asserting that 0 is identical to 1.
+
+/workspace/VA-Studio-support-session-independent/tests/Feature/SupportAttachmentKeyCaptureIndependentTest.php:26</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

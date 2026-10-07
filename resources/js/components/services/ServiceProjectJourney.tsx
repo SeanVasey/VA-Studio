@@ -14,7 +14,7 @@ function csrf(): Record<string, string> {
   return token ? { 'X-CSRF-TOKEN': token } : {};
 }
 
-export function ServiceProjectJourney({ initial }: { initial: ServiceProjectIndex }) {
+export function ServiceProjectJourney({ initial, attachmentsEnabled = false }: { initial: ServiceProjectIndex; attachmentsEnabled?: boolean }) {
   const [index, setIndex] = useState<ServiceProjectIndex | null>(initial);
   const [project, setProject] = useState<ServiceProject | null>(null);
   const [selected, setSelected] = useState('');
@@ -108,6 +108,7 @@ export function ServiceProjectJourney({ initial }: { initial: ServiceProjectInde
       <section aria-label="Your service projects"><h2>Your service projects</h2>{index.projects.length === 0 ? <p>No service briefs submitted yet.</p> : <ul>{index.projects.map(item => <li key={item.id}><button type="button" className="button button-outline" disabled={busy || pending !== null} onClick={() => void read(`/services/projects/${encodeURIComponent(item.id)}`)}>{item.title} · {item.status.replaceAll('_', ' ')}</button></li>)}</ul>}</section>
     </>}
     {project && <section aria-label="Service project journey">
+      {attachmentsEnabled === true && <a className="text-link" href={`/private-support/projects/${encodeURIComponent(project.id)}/attachments/view`}>Open private attachment files</a>}
       <h2>{project.title}</h2><p>Journey: <strong>{project.status.replaceAll('_', ' ')}</strong> · revision {project.version}</p><p className="service-project-copy">{project.summary}</p>
       {project.answers.map((answer, i) => <div key={i}><h3>{answer.question}</h3><p className="service-project-copy">{answer.answer}</p></div>)}
       {quote && <article aria-label="Exact authored quote"><h3>{quote.title}</h3><p className="service-project-copy">{quote.scope}</p><dl><dt>Authored total</dt><dd>{quote.currency} {quote.totalMinor} minor units</dd><dt>Requested deposit (uncollected)</dt><dd>{quote.currency} {quote.depositMinor} minor units</dd><dt>Included revisions</dt><dd>{quote.revisionAllowance} · used {project.revisionsUsed}</dd></dl>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\SupportAttachmentSchemaTest" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentSchemaTest.php" tests="4" assertions="12" errors="0" failures="0" skipped="0" time="0.534642">
+    <testcase name="test_complete_unlogged_schema_retry_is_exact_and_prefix_safe" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentSchemaTest.php" line="26" class="Tests\Feature\SupportAttachmentSchemaTest" classname="Tests.Feature.SupportAttachmentSchemaTest" assertions="2" time="0.248075"/>
+    <testcase name="test_empty_atomic_table_and_each_owned_guard_prefix_can_resume" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentSchemaTest.php" line="31" class="Tests\Feature\SupportAttachmentSchemaTest" classname="Tests.Feature.SupportAttachmentSchemaTest" assertions="2" time="0.092583"/>
+    <testcase name="test_schema_drift_and_unknown_guards_refuse_before_mutation" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentSchemaTest.php" line="38" class="Tests\Feature\SupportAttachmentSchemaTest" classname="Tests.Feature.SupportAttachmentSchemaTest" assertions="2" time="0.117809"/>
+    <testcase name="test_retained_missing_guard_refuses_and_down_never_discards_originals" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentSchemaTest.php" line="45" class="Tests\Feature\SupportAttachmentSchemaTest" classname="Tests.Feature.SupportAttachmentSchemaTest" assertions="6" time="0.076175"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"tests\/Feature\/SupportAttachmentKeyCaptureIndependentTest.php","fixers":["increment_style"]}]}

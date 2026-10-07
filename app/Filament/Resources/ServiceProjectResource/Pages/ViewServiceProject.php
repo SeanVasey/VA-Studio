@@ -6,6 +6,7 @@ use App\Domain\Services\Projects\ServiceProjectInput;
 use App\Domain\Services\Projects\ServiceProjects;
 use App\Filament\Resources\ServiceProjectResource;
 use App\Support\CanonicalJson;
+use App\Support\SupportAttachmentUi;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Checkbox;
@@ -69,7 +70,9 @@ final class ViewServiceProject extends ViewRecord
             ->modalDescription('Record cancellation in this scope journey. Payment, refunds, existing rights and delivered files require their separate approved workflows.')
             ->schema([Textarea::make('reason')->required()->maxLength(2000)]);
 
-        return [$quote, $begin, $ready, $cancel];
+        return [$quote, $begin, $ready, $cancel, Action::make('attachments')->label('Private attachments')
+            ->visible(fn (): bool => SupportAttachmentUi::enabled())
+            ->url(fn (): string => '/private-support/operator/projects/'.$this->getRecord()->public_id.'/attachments/view')];
     }
 
     private function milestone(string $action, string $label, string $state): Action

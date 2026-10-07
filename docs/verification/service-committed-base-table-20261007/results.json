@@ -1,0 +1,27 @@
+{
+  "source": "9ce31963abc3ba89f22ed9b39c009023cedef77d",
+  "original_native": {
+    "source": "8444f15ea3f5f3c74994fef48705b2a193de7cba",
+    "tests": 1,
+    "failed": 1,
+    "assertions": 5,
+    "errors": 0
+  },
+  "native": {
+    "server": "8.0.46-0ubuntu0.24.04.4 (Ubuntu)",
+    "database": "vaseyaudio_service_projects",
+    "tests": 7,
+    "passed": 7,
+    "assertions": 44
+  },
+  "sqlite": {
+    "recorded": 36,
+    "executed": 32,
+    "passed": 32,
+    "assertions": 143,
+    "skipped_native_dictionary_cases": 4
+  },
+  "pint": "passed",
+  "independent_unchanged_canary": "peer-owned, pending",
+  "production_activation": "none"
+}

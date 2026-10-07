@@ -1,0 +1,49 @@
+
+> test
+> vitest run tests/frontend/support-attachment-registration.test.tsx
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-support-registration
+
+ ❯ tests/frontend/support-attachment-registration.test.tsx (5 tests | 2 failed) 310ms
+   × passes the contact attachment flag through receipt-only conversation reading false 25ms
+   × passes the contact attachment flag through receipt-only conversation reading true 13ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/support-attachment-registration.test.tsx > passes the contact attachment flag through receipt-only conversation reading false
+ FAIL  tests/frontend/support-attachment-registration.test.tsx > passes the contact attachment flag through receipt-only conversation reading true
+Error: [vitest] No "Link" export is defined on the "@inertiajs/react" mock. Did you forget to return it from "vi.mock"?
+If you need to partially mock a module, you can use "importOriginal" helper inside:
+
+vi.mock(import("@inertiajs/react"), async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    // your mocked methods
+  }
+})
+
+ ❯ InstallApp resources/js/components/InstallApp.tsx:32:10
+     30|           <li><strong>Other browsers:</strong> look in the address bar…
+     31|         </ul>
+     32|         <Link href="/" onSuccess={() => document.getElementById('catal…
+       |          ^
+     33|       </div>
+     34|     </details> : null;
+ ❯ Object.react_stack_bottom_frame ../VA-Studio/node_modules/react-dom/cjs/react-dom-client.development.js:28571:20
+ ❯ renderWithHooks ../VA-Studio/node_modules/react-dom/cjs/react-dom-client.development.js:8030:22
+ ❯ updateFunctionComponent ../VA-Studio/node_modules/react-dom/cjs/react-dom-client.development.js:10569:19
+ ❯ beginWork ../VA-Studio/node_modules/react-dom/cjs/react-dom-client.development.js:12205:18
+ ❯ runWithFiberInDEV ../VA-Studio/node_modules/react-dom/cjs/react-dom-client.development.js:1048:13
+ ❯ performUnitOfWork ../VA-Studio/node_modules/react-dom/cjs/react-dom-client.development.js:19176:22
+ ❯ workLoopSync ../VA-Studio/node_modules/react-dom/cjs/react-dom-client.development.js:19004:41
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 3 passed (5)
+   Start at  09:15:27
+   Duration  1.40s (environment 44%, tests 25%, transform 21%, setup 6%, import 3%)
+

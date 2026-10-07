@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\SupportAttachmentsTest" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" tests="2" assertions="4" errors="0" failures="2" skipped="0" time="0.797537">
+    <testcase name="test_terminal_dto_encrypter_policy_withdrawal_cannot_commit_or_remove_original" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="417" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="2" time="0.537328">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\SupportAttachmentsTest::test_terminal_dto_encrypter_policy_withdrawal_cannot_commit_or_remove_original
+Refused attachment operation completed.
+
+/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php:474
+/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php:421</failure>
+    </testcase>
+    <testcase name="test_terminal_dto_encrypter_row_mutation_cannot_return_stale_ready_state" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="426" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="2" time="0.260208">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\SupportAttachmentsTest::test_terminal_dto_encrypter_row_mutation_cannot_return_stale_ready_state
+Refused attachment operation completed.
+
+/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php:474
+/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php:430</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

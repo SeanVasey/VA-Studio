@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\SupportAttachmentRegistrationTest" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" tests="2" assertions="5" errors="0" failures="2" skipped="0" time="0.787209">
+    <testcase name="test_empty_migration_hole_before_a_retained_later_guard_is_not_an_owned_prefix" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="147" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="3" time="0.545007">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentRegistrationTest::test_empty_migration_hole_before_a_retained_later_guard_is_not_an_owned_prefix
+A missing earlier guard with a retained later guard is not a contiguous owned DDL prefix.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php:157</failure>
+    </testcase>
+    <testcase name="test_sqlite_reserved_guard_name_cannot_mask_a_second_foreign_table" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="160" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="2" time="0.242202">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentRegistrationTest::test_sqlite_reserved_guard_name_cannot_mask_a_second_foreign_table
+Reserved guard admission must inspect every dictionary row, not only the first matching trigger.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php:174</failure>
+    </testcase>
+  </testsuite>
+</testsuites>
