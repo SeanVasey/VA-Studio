@@ -114,8 +114,9 @@ git checkout --detach <SHA> && test "$(git rev-parse HEAD)" = "<SHA>"
 # public/build and storage/app/private do not exist yet.)
 test -z "$(git status --porcelain --untracked-files=all --ignored)" || { echo 'dirty checkout'; exit 1; }
 test "$(git rev-parse HEAD^{tree})" = "$(git write-tree)" || { echo 'checkout differs from <SHA>'; exit 1; }
-composer install --no-dev --no-interaction --classmap-authoritative   # composer.lock is frozen
-npm ci && npm run build
+composer install --no-dev --no-interaction --classmap-authoritative || exit 1   # composer.lock is frozen
+npm ci && npm run build || exit 1   # a release with a missing or partial Vite build must never be switched to
+test -f public/build/manifest.json || { echo 'no Vite manifest'; exit 1; }
 # Persistent private storage is attached after the source checks, never copied into the
 # release. The disk root is storage_path('app/private') (config/filesystems.php, no
 # environment override). It is attached as a bind mount, not a symlink: the runtime
@@ -151,6 +152,13 @@ if [ -e <RELEASES_DIR>/current ]; then
   [ "$(curl -s -o /dev/null -w '%{http_code}' https://<STAGING_ORIGIN>/)" = 503 ] || { echo 'served release is not in maintenance (expected 503)'; exit 1; }
   systemctl stop <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> || exit 1
   systemctl is-active --quiet <QUEUE_WORKER_SERVICE> && exit 1; systemctl is-active --quiet <SCHEDULER_SERVICE> && exit 1
+  # The 503 proves only that NEW requests are refused; an upload admitted before `down` can
+  # still be writing. Stop the PHP web workers too and prove no PHP process serves requests
+  # before any snapshot (the backup procedure requires the same). The web server in front
+  # answers 502/503 meanwhile; the site stays unavailable until the switch below starts them.
+  systemctl stop <WEB_SERVICE> || exit 1
+  systemctl is-active --quiet <WEB_SERVICE> && exit 1
+  pgrep -u <APP_USER> -f 'php-fpm|artisan serve|octane' >/dev/null && { echo 'PHP processes still serving'; exit 1; }
 fi
 # Back up now and prove the backup restores before anything destructive runs
 # (docs/ops/backup-restore-proof.md, MySQL procedure, steps 1-4): the host is already
@@ -183,15 +191,18 @@ php artisan vasey:stripe-preflight --json     # still no provider I/O
 #   * * * * * php <RELEASES_DIR>/current/artisan schedule:run
 ln -sfn <RELEASES_DIR>/<SHA> <RELEASES_DIR>/current.next && mv -T <RELEASES_DIR>/current.next <RELEASES_DIR>/current || exit 1
 test "$(readlink -f <RELEASES_DIR>/current)" = "<RELEASES_DIR>/<SHA>" || { echo 'current does not point at <SHA>'; exit 1; }
-systemctl reload-or-restart <WEB_SERVICE> && systemctl is-active --quiet <WEB_SERVICE> || exit 1
+systemctl start <WEB_SERVICE> && systemctl is-active --quiet <WEB_SERVICE> || exit 1   # PHP workers were stopped above; they start on <SHA>
 [ "$(curl -s -o /dev/null -w '%{http_code}' https://<STAGING_ORIGIN>/)" = 503 ] || { echo 'new release is not in maintenance after the switch (expected 503)'; exit 1; }
 systemctl start <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> && systemctl is-active --quiet <QUEUE_WORKER_SERVICE> && systemctl is-active --quiet <SCHEDULER_SERVICE> || exit 1
 # The worker really runs this SHA: its main process's working directory is the new release.
 test "$(readlink -f /proc/$(systemctl show -p MainPID --value <QUEUE_WORKER_SERVICE>)/cwd)" = "<RELEASES_DIR>/<SHA>" || { echo 'worker not on <SHA>'; exit 1; }
 # Leave maintenance last, in this release only; the superseded release stays down. A service
 # that fails above keeps the host in maintenance (fail safe): fix it, then `php artisan up` by hand.
+# If the live check fails after `up`, re-enter maintenance at once (never leave a broken
+# release serving errors; S3 reuses this sequence) and go to the rollback below.
 php artisan up || exit 1
-[ "$(curl -s -o /dev/null -w '%{http_code}' https://<STAGING_ORIGIN>/)" = 200 ] || { echo 'staging does not answer 200 after artisan up'; exit 1; }
+[ "$(curl -s -o /dev/null -w '%{http_code}' https://<STAGING_ORIGIN>/)" = 200 ] \
+  || { php artisan down; echo 'not 200 after artisan up: back in maintenance; run the rollback'; exit 1; }
 ```
 
 **Expected:**
@@ -250,16 +261,18 @@ php artisan up || exit 1
    `storage/app/private` between releases, so switching the web unit to a release without
    its own marker would reopen HTTP traffic at once. Run `php artisan down || exit 1` inside
    `<RELEASES_DIR>/<PREVIOUS_SHA>`, then switch the units to that directory the way S1 does
-   (repoint `<RELEASES_DIR>/current` atomically, `reload-or-restart <WEB_SERVICE>`, verify
-   `readlink -f current` and the worker's `/proc/<MainPID>/cwd`); it was built and attached
-   by its own S1 run and still holds its `vendor/`, `public/build/`, `.env` and bind-mounted
-   private storage. Confirm the site still answers 503 after the switch. Never check another SHA out inside the current release
+   (repoint `<RELEASES_DIR>/current` atomically, start `<WEB_SERVICE>`, verify
+   `readlink -f current`); it was built and attached by its own S1 run and still holds its
+   `vendor/`, `public/build/`, `.env` and bind-mounted private storage. Confirm the site
+   answers exactly 503 after the switch. Never check another SHA out inside the current release
    directory: it would keep the newer `public/build` and serve an incompatible Vite manifest.
    If no built previous release exists, repeat the complete S1 checkout, build and attachment
    for `<PREVIOUS_SHA>` first (its S1 run ends in maintenance mode until this step lifts it).
 4. `php artisan config:cache` in the previous release, start the worker and scheduler
-   services, verify `is-active`, then `php artisan up` in the previous release only; the
-   superseded release stays down.
+   services, verify `is-active`, then prove the worker's `/proc/<MainPID>/cwd` is
+   `<RELEASES_DIR>/<PREVIOUS_SHA>` (a stopped service has no main process to inspect, so this
+   proof belongs here, after the start), then `php artisan up` in the previous release only
+   and require exactly 200; the superseded release stays down.
 5. Remove the staging DNS record if Sean asks.
 6. Rotate any staging secret that may have been exposed.
 

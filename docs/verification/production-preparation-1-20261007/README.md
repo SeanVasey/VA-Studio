@@ -424,6 +424,13 @@ Codex's twenty-first pass (P2 ×1, docs): every maintenance proof in S1 and its 
 captures the HTTP status and requires exactly 503 (and exactly 200 after `artisan up`), since
 a failed `curl -f` from the host is also what a DNS, egress or TLS failure produces.
 
+Codex's twenty-second pass (P1 ×3, P2 ×1, docs): the S1 quiesce also stops the PHP web
+workers and proves no PHP process serves requests before the snapshot (a 503 only proves
+new requests are refused); `composer install` and `npm ci && npm run build` are fatal and
+the Vite manifest is required before the release can be switched to; a failed live check
+after `php artisan up` re-enters maintenance at once before aborting to the rollback; the
+rollback proves the worker's working directory after its restart, not while stopped.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex
