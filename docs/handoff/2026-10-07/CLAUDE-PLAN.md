@@ -63,14 +63,14 @@ sensitive, flags still default-off unless Sean activates.
 | A1b | Frame admission for intent/basis/authority writes + initiate() re-proof (Codex P1/P2 ×2) | lane `harness/checkout-write-admission-all` running; RELEASE BLOCKER |
 | A2 | Paid252 consumer on composed producer; native 409 root cause; whole-order delivery; root route mount | composed + diagnosed on `harness/paid252-composition` (pushed): root cause is identity `IdentityMigrationOwnership::inspect()` cost (~470 metadata statements per identity assertion on MySQL) exhausting the 60 s authorization budget; fix routed to `harness/native-schema-isolation`; HTTP whole-order and root mount still open |
 | A3 | Tax255: `ProductionTaxCheckout`, Stripe Checkout `automatic_tax`, SourceV2 + V2 consumer adapter, migration 255000, default off | queued after A1 |
-| A4 | Live-payment preparation packet: SDK/API/mode preflight, webhook signature+dedup checks, unknown-outcome reconciliation, dry-run commands, activation checklist with Sean's inputs | lane `harness/production-preparation-1` running (with F1 backup/restore + config templates) |
+| A4 | Live-payment preparation packet: SDK/API/mode preflight, webhook signature+dedup checks, unknown-outcome reconciliation, dry-run commands, activation checklist with Sean's inputs | built on `harness/production-preparation-1` → PR #46 draft; independent review running. Gaps found: no live webhook receiver; test-mode payments need local/testing APP_ENV (staging path = Sean's decision); no operator reconciliation command |
 | A5 | Refund/dispute lifecycle (T21) on top of A2 provider-authoritative state | after A4 |
 
 ### Phase B — Customer identity, features, mail (T23/T32)
 | Step | Deliverable | Status |
 | --- | --- | --- |
-| B1 | Account features 253 reviewed + composed + canonical default-off `production-account-features` config | lane `harness/account-features-253` running |
-| B2 | PR39 late P2 findings: SuppressionDelivery old-recipient target; IdentityCommittedFrame single-close restoration | fixed on `harness/pr39-late-findings` (pushed); independent review running |
+| B1 | Account features 253 reviewed + composed + canonical default-off `production-account-features` config | reviewed APPROVE WITH CONDITIONS (dev merge) → PR #45 draft; C1 identity cost → `harness/native-schema-isolation`; C2/C3 → 254 preconditions |
+| B2 | PR39 late P2 findings: SuppressionDelivery old-recipient target; IdentityCommittedFrame single-close restoration | identity fix APPROVED; suppression fix APPROVE WITH CONDITION C-A1 (HMAC-mismatched older target must 503) being fixed on `harness/pr39-late-findings` |
 | B3 | Suppression254 (distinct family from 251; built on 253 withdrawal reader; provider contract default-off) | after B1 |
 | B4 | Root HTTP mount for 253 (session-bound routes, privacy middleware, body caps) + frontend | after B1 |
 | B5 | Email operations preflight: sender/origin/TLS/provider scope, queue/scheduler/retention facts | after B3 |
@@ -79,7 +79,7 @@ sensitive, flags still default-off unless Sean activates.
 | Step | Deliverable | Status |
 | --- | --- | --- |
 | C1 | 257 (incl. 3cd Rows guard) + 258 preparation reviewed and composed; implementation plan file | **merged** PR #42 → `3716324a`; findings F1/F2 → C1b |
-| C1b | F1 (SQLite app-function bypass of Rows guard) and F2 (activation without credit events) | lane `harness/membership-operative-1` running |
+| C1b | F1, F2 and Billing259 read-only evidence adapter | built on `harness/membership-operative-1` (pushed); SQLite green (40/24/88); native evidence in progress; policy env defect (fails closed) being fixed |
 | C2 | Operative 257 writer: reserve/lock/proveCurrent, one period per invoice, award/reserve/consume/release/expire, duplicate-invoice + last-credit independent-process MySQL races | after C1 |
 | C3 | Billing259: Stripe subscription/invoice/payment/charge/balance-transaction evidence adapter, default-off, pinned SDK 21.3.2 / API 2026-08-26.dahlia | after C2 |
 | C4 | 258 member-original renderer/storage/readiness; activation + credit consumption in one owned transaction; HTTP | after C2 |
