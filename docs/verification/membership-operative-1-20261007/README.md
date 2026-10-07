@@ -1,8 +1,15 @@
 # Membership operative lane 1: steps 0.1, 0.2 and Billing259 section 1
 
 - Branch: `harness/membership-operative-1` (local only, not pushed), from `de6ae38a` (`harness/membership-257-258`).
-- Commits: `75787f50` (0.1, F1), `960bc42c` (0.2, F2), `fe58fe91` (Billing259 section 1), plus the docs commit that adds this file.
-- Status: implemented and tested on SQLite. Native MySQL evidence is **incomplete** (see Native). Not independently reviewed. Nothing is registered, bound or enabled.
+- Commits:
+  - `75787f50` — step 0.1 (F1).
+  - `960bc42c` — step 0.2 (F2).
+  - `fe58fe91` — Billing259 section 1.
+  - `46b1b66a` — the first version of this file.
+  - `2dcfe136` — the O3 environment-read fix (coordinator follow-up).
+  - `9c1ca807` — test-only drift D2 fix.
+  - The docs commit that updates this file.
+- Status: implemented and tested on SQLite and native MySQL 8.4.11, with the selections listed below. Not independently reviewed. Nothing is registered, bound or enabled. Pushed as `origin/harness/membership-operative-1`.
 
 ## What changed
 
@@ -27,7 +34,16 @@ Native runs used the same command with `APP_ENV=testing DB_CONNECTION=mysql DB_H
 
 ## Results
 
-### SQLite (in-memory, commit `fe58fe91`; JUnit in `sqlite/`)
+### SQLite (in-memory, commit `9c1ca807`; JUnit in `sqlite-9c1ca807/`)
+
+| Selection | Tests | Assertions | Failures | Errors | Skipped |
+| --- | --- | --- | --- | --- | --- |
+| `tests/Feature/ProductionMembership` | 43 | 125 | 0 | 0 | 3 |
+| `tests/Feature/ProductionMemberOriginals` | 24 | 63 | 0 | 0 | 1 |
+| `tests/Feature/ProductionMembershipBilling` | 88 | 376 | 0 | 0 | 0 |
+| **Total** | **155** | **564** | **0** | **0** | **4** |
+
+### SQLite, earlier run (commit `fe58fe91`; JUnit in `sqlite/`)
 
 | Selection | Tests | Assertions | Failures | Errors | Skipped |
 | --- | --- | --- | --- | --- | --- |
@@ -47,16 +63,36 @@ The SQLite-only F1 cases do not skip on MySQL. There they assert that `Pdo\Mysql
 
 Pint over all changed paths: passed.
 
-### Native MySQL 8.4.11 (private instance): incomplete
+### Native MySQL 8.4.11 (second private instance, port 3322; JUnit in `native/`, ledger in `native/ledger.jsonl`)
 
-Only `MembershipRowsFunctionClosureTest` started, at `960bc42c`. It was stopped after 12 of 16 cases (12 progress dots, no failure shown) when the caller asked for this hand-back. No JUnit was written; the raw output is `native/f1-rows-function-closure-interrupted.txt`. These selections **never ran natively**:
+Each selection ran as its own PHPUnit process from a clean detached worktree at the listed commit (`dirty: false` in the ledger).
 
-- F2 `MemberActivationCouplingSchemaTest`
-- the changed 258 cases and the 258 global CHECK case
-- the three 257 native-only cases and `MembershipNativeStatementClosureTest`
-- every Billing case, including the `BillingSchema` MySQL CHECK-clause dictionary comparison and the two-process `BillingNativeDedupRaceTest`
+| Selection (label) | Commit | Tests | Assertions | Failures | Errors | Skipped |
+| --- | --- | --- | --- | --- | --- | --- |
+| `o3-policy-environment` (`MembershipPolicyEnvironmentTest`) | `2dcfe136` | 3 | 9 | 0 | 0 | 0 |
+| `f1-rows-function-closure` (`MembershipRowsFunctionClosureTest`, all 16) | `2dcfe136` | 16 | 114 | 0 | 0 | 0 |
+| `f2-activation-coupling` (`MemberActivationCouplingSchemaTest`) | `2dcfe136` | 10 | 26 | 0 | 0 | 0 |
+| `258-changed-and-native-only` (two changed author cases + global CHECK) | `2dcfe136` | 3 | 14 | 0 | 0 | 0 |
+| `257-native-only` (foreign CHECK, foreign UNIQUE, changed enum) | `2dcfe136` | 3 | 4 | 0 | **1** | 0 |
+| `257-statement-closure` (`MembershipNativeStatementClosureTest`) | `2dcfe136` | 1 | 3 | 0 | 0 | 0 |
+| `billing-schema` (`BillingSchemaPreparationTest`) | `2dcfe136` | 9 | 43 | 0 | 0 | 0 |
+| `billing-dedup-race` (two processes, one barrier) | `2dcfe136` | 1 | 14 | 0 | 0 | 0 |
+| `billing-unknown-outcome` (ambiguous response only, see note) | `2dcfe136` | 1 | 2 | 0 | 0 | 0 |
+| `billing-ledger` (newer non-settled hides settled; forged seal) | `2dcfe136` | 2 | 8 | 0 | 0 | 0 |
+| `billing-webhook-replay` | `2dcfe136` | 1 | 6 | 0 | 0 | 0 |
+| `billing-sdk-gateway` (complete graph through the SDK) | `2dcfe136` | 1 | 18 | 0 | 0 | 0 |
+| `257-native-only-after-d2-fix` (the three native-only cases + data-bearing prefix) | `9c1ca807` | 4 | 10 | 0 | 0 | 0 |
+| `billing-unknown-outcome-charge-stage` (timeout at charge, `#4`) | `9c1ca807` | 1 | 8 | 0 | 0 | 0 |
+| **All recorded runs** | | **56** | **279** | **0** | **1** | **0** |
 
-**MySQL behaviour of the new 258 guard and of `BillingSchema` is unproven.** The queued scripts covered every selection listed above (about 3 minutes per case on this saturated host).
+Notes on the native runs:
+
+- The one error is composition drift **D2**, the same class as D1. On MySQL, `test_native_foreign_check_reserves_actual_global_symbol_before_any_owned_ddl` failed with error 3730: the empty `production_membership_billing_subscriptions` table has an FK to 257 `production_membership_plan_versions`, and the 257 test helper dropped that parent after removing only the empty 258 tables. SQLite allows the drop, so only the native run caught it. Commit `9c1ca807` fixes the helper (test only, no product change). The red run stays recorded; the rerun at `9c1ca807` passes, including the D1 data-bearing case.
+- In the first unknown-outcome selection, the filter `…*charge` matched nothing: PHPUnit names unnamed data sets by index, not by value. So that run executed only the ambiguous-response case. The charge-stage case then ran separately with the index filter (`#4`).
+- MySQL ran with zero skips.
+- The earlier interrupted F1 run on port 3318 (12 of 16 progress dots, no JUnit) is kept as `native/f1-rows-function-closure-interrupted.txt`. The full F1 file above supersedes it.
+
+Not run natively: the remaining Billing cases (6 of the 7 timeout stages, the other ledger, webhook and SDK-gateway cases, policy, pin and boot tests), the other 257/258 cases that are not native-only, and the cross-reader survey probe. The race case is the only proof of concurrency. SQLite proves none.
 
 ## Cross-reader survey (F1 pattern, report only)
 
@@ -80,7 +116,14 @@ Residual R1: SQLite does not show a built-in collation (`BINARY`, `NOCASE`, `RTR
 
 ## Other findings
 
-- **O3 (latent, fail-closed, not fixed):** `MembershipPolicy` and `MemberGrantPolicy` read the environment from `Container::$instances['env']`. Laravel binds `env` through `offsetSet` (a closure), so that key is always absent. Rehearsal provenance is therefore refused even in `testing` (observed reason: `provenance`). This blocks section 2 rehearsal. `BillingPolicy::environment()` shows a read that does not invoke the binding: it accepts only the container's own `offsetSet` closure and reads its captured value by reflection.
+- **O3 (fixed in `2dcfe136`):** `MembershipPolicy` and `MemberGrantPolicy` read the environment from `Container::$instances['env']`. Laravel binds `env` through `offsetSet` (a closure), so rehearsal was refused even in `testing`. Both now read it the way `BillingPolicy` does:
+  - An instance keeps container precedence.
+  - Otherwise only the container's own `offsetSet` closure is accepted, and its captured value is read by reflection.
+  - Any other `env` binding refuses with `changed_policy` without being invoked.
+  - The production refusal is unchanged.
+  - `MembershipPolicyEnvironmentTest` was red before the fix (2 errors, 1 failure; `o3/red-before-fix-sqlite.xml`) and now passes on both drivers.
+  - The existing nullable-environment baseline test now removes the real binding as well as the instance.
+- **D2 (fixed in `9c1ca807`, test only):** see the native notes above.
 - **Provider schema:** the locked SDK's `OPENAPI_VERSION` is `v2442`. The public `stripe/openapi` tags v2442 to v2450 serve `latest/openapi.spec3.sdk.json` with `info.version` `2026-07-29.dahlia`, not `2026-08-26.dahlia`. That spec is recorded as not adopted (`../membership-billing-259/provider-schema/manifest.json`). `BillingProviderPin` pins the locked SDK model files by SHA256 instead. An official `2026-08-26.dahlia` schema artifact is still open.
 - **CI skip census:** `scripts/ci/database-sqlite-skips.json` does not list the four existing 257/258 native-only skips. Root's census normalization must add them. This lane added no new skipping case.
 
@@ -109,7 +152,7 @@ Billing refuses every unapproved shape until a typed fact enables it: discount, 
 
 ## Untested
 
-- Every native selection after F1 case 12 (listed above).
+- The native gaps listed under Native above.
 - Real Stripe I/O: none was made. The SDK path was exercised only through a loopback `ClientInterface` fixture.
 - The staff approval writer and the paid-invoice authority (not built).
 - A real queue: `RetrieveMembershipInvoice` fails closed because no gateway is bound. With a sync queue, a dispatch inside webhook intake would raise after the hint commits, so root should mount intake with an async queue.
@@ -120,12 +163,22 @@ Billing refuses every unapproved shape until a typed fact enables it: discount, 
 
 Full log: `private-instance-lifecycle.txt`.
 
+First instance:
+
 - mysqld 8.4.11, `--no-defaults`, port 3318, datadir in the session scratchpad.
 - The first start failed because the socket path exceeded 107 bytes. The second start succeeded at 14:45:47Z.
 - At the stop (15:18:59Z) the native batches were killed and the only user schema was `vaseyaudio_member_ops`.
 - The TCP shutdown did not stop the process, so it was stopped with SIGTERM.
 - Post-check: no mysqld on 3318, datadir removed, temporary native worktree removed.
 - Nothing was created, changed or dropped on the shared 3306 server.
+
+Second instance:
+
+- mysqld 8.4.11, `--no-defaults`, port 3322, datadir `mysql-mo2/` in the scratchpad, pid 4006.
+- Started at 15:27:31Z.
+- All queued selections finished by 17:32:19Z. The only user schema was `vaseyaudio_member_ops`.
+- It stopped through TCP shutdown and the process was verified gone by PID. No mysqld remains on 3322.
+- Its datadir and the native worktree (`/home/user/VA-Studio-member-ops-native`) were removed.
 
 ## Hashes at `fe58fe91`
 
@@ -142,3 +195,11 @@ Full log: `private-instance-lifecycle.txt`.
 | `app/Domain/Memberships/Billing/BillingPolicy.php` | `974e44a65c868cf28456a24662f42c0202a919c16aa3688b001dde93a4d6991d` |
 | `app/Domain/Memberships/Billing/BillingLedger.php` | `f6ddf0ced4bb480f2f1424eccad8f2f478b93d53d99ab414f0b8f6040780981c` |
 | `config/production-membership-billing.php` | `50e17d551cebc2dd096067a8c7676b6c427960911e2dfad323ea2274ef6a75cb` |
+
+Changed after `fe58fe91` (hashes at `9c1ca807`); `MembershipPolicy.php` supersedes the row above.
+
+| Path | SHA256 |
+| --- | --- |
+| `app/Domain/Memberships/Production/MembershipPolicy.php` | `9f37be772eb33737bfbf076f0005b306908e68b6fbd581fcd78d15928f485f8f` |
+| `app/Domain/Grants/Member/MemberGrantPolicy.php` | `a57bcef5d91c56f47ba498c284e8cc8eb82346dd3554e141cae3a01f0c178929` |
+| `tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php` | `8b944f62f0c0a2d5a5d71f03b9c24288761c94887867dd032f8ee20381c1358f` |

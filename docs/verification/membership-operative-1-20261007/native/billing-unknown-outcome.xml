@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest" file="/home/user/VA-Studio-member-ops-native/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="152.825512">
+    <testcase name="test_ambiguous_provider_response_is_unknown_not_refused" file="/home/user/VA-Studio-member-ops-native/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php" line="58" class="Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingUnknownOutcomeTest" assertions="2" time="152.825512"/>
+  </testsuite>
+</testsuites>
