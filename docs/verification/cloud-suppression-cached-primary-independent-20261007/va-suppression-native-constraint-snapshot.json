@@ -1,0 +1,15 @@
+{
+    "driver": "mysql",
+    "version": "8.0.46-0ubuntu0.24.04.4",
+    "before": [],
+    "after": [],
+    "ddl": [],
+    "refusal": "Foreign or aliased suppression key requires inspection.",
+    "refusalClass": "LogicException",
+    "foreignMarker": [
+        {
+            "id": 9123,
+            "user_id": null
+        }
+    ]
+}

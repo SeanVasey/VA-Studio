@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\CustomerSuppressionSourceBoundaryTest" file="/workspace/VA-Studio-suppression-cached-primary/tests/Feature/CustomerSuppressionSourceBoundaryTest.php" tests="7" assertions="20" errors="2" failures="4" skipped="0" time="2.158686">
+    <testsuite name="Tests\Feature\CustomerSuppressionSourceBoundaryTest::test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection" tests="4" assertions="8" errors="2" failures="2" skipped="0" time="1.297581">
+      <testcase name="test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set &quot;send positive&quot;" file="/workspace/VA-Studio-suppression-cached-primary/tests/Feature/CustomerSuppressionSourceBoundaryTest.php" line="28" class="Tests\Feature\CustomerSuppressionSourceBoundaryTest" classname="Tests.Feature.CustomerSuppressionSourceBoundaryTest" assertions="3" time="0.494840">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerSuppressionSourceBoundaryTest::test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set "send positive"
+Failed asserting that false is true.
+
+/workspace/VA-Studio-suppression-cached-primary/tests/Feature/CustomerSuppressionSourceBoundaryTest.php:67</failure>
+      </testcase>
+      <testcase name="test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set &quot;send ambiguous&quot;" file="/workspace/VA-Studio-suppression-cached-primary/tests/Feature/CustomerSuppressionSourceBoundaryTest.php" line="28" class="Tests\Feature\CustomerSuppressionSourceBoundaryTest" classname="Tests.Feature.CustomerSuppressionSourceBoundaryTest" assertions="3" time="0.275157">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerSuppressionSourceBoundaryTest::test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set "send ambiguous"
+Failed asserting that false is true.
+
+/workspace/VA-Studio-suppression-cached-primary/tests/Feature/CustomerSuppressionSourceBoundaryTest.php:67</failure>
+      </testcase>
+      <testcase name="test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set &quot;inspect positive&quot;" file="/workspace/VA-Studio-suppression-cached-primary/tests/Feature/CustomerSuppressionSourceBoundaryTest.php" line="28" class="Tests\Feature\CustomerSuppressionSourceBoundaryTest" classname="Tests.Feature.CustomerSuppressionSourceBoundaryTest" assertions="1" time="0.267656">
+        <error type="App\Domain\Customers\Preferences\ConsentException">Tests\Feature\CustomerSuppressionSourceBoundaryTest::test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set "inspect positive"
+App\Domain\Customers\Preferences\ConsentException: Communication preferences could not be confirmed. Reload before another choice.
+
+/workspace/VA-Studio-suppression-cached-primary/app/Domain/Customers/Preferences/Suppression/SuppressionEvidence.php:75
+/workspace/VA-Studio-suppression-cached-primary/app/Domain/Customers/Preferences/Suppression/SuppressionDelivery.php:166
+/workspace/VA-Studio-suppression-cached-primary/app/Domain/Customers/Preferences/Suppression/SuppressionDelivery.php:61
+/workspace/VA-Studio-suppression-cached-primary/app/Domain/Customers/Preferences/Suppression/SuppressionDelivery.php:202
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-suppression-cached-primary/app/Domain/Customers/Preferences/Suppression/SuppressionDelivery.php:199
+/workspace/VA-Studio-suppression-cached-primary/app/Domain/Customers/Preferences/Suppression/SuppressionDelivery.php:40
+/workspace/VA-Studio-suppression-cached-primary/tests/Feature/CustomerSuppressionSourceBoundaryTest.php:35</error>
+      </testcase>
+      <testcase name="test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set &quot;inspect ambiguous&quot;" file="/workspace/VA-Studio-suppression-cached-primary/tests/Feature/CustomerSuppressionSourceBoundaryTest.php" line="28" class="Tests\Feature\CustomerSuppressionSourceBoundaryTest" classname="Tests.Feature.CustomerSuppressionSourceBoundaryTest" assertions="1" time="0.259928">
+        <error type="App\Domain\Customers\Preferences\ConsentException">Tests\Feature\CustomerSuppressionSourceBoundaryTest::test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set "inspect ambiguous"
+App\Domain\Customers\Preferences\ConsentException: Communication preferences could not be confirmed. Reload before another choice.
+
+/workspace/VA-Studio-suppression-cached-primary/app/Domain/Customers/Preferences/Suppression/SuppressionEvidence.php:75
+/workspace/VA-Studio-suppression-cached-primary/app/Domain/Customers/Preferences/Suppression/SuppressionDelivery.php:166
+/workspace/VA-Studio-suppression-cached-primary/app/Domain/Customers/Preferences/Suppression/SuppressionDelivery.php:61
+/workspace/VA-Studio-suppression-cached-primary/app/Domain/Customers/Preferences/Suppression/SuppressionDelivery.php:202
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-suppression-cached-primary/app/Domain/Customers/Preferences/Suppression/SuppressionDelivery.php:199
+/workspace/VA-Studio-suppression-cached-primary/app/Domain/Customers/Preferences/Suppression/SuppressionDelivery.php:40
+/workspace/VA-Studio-suppression-cached-primary/tests/Feature/CustomerSuppressionSourceBoundaryTest.php:35</error>
+      </testcase>
+    </testsuite>
+    <testcase name="test_same_primary_commit_reopen_refuses_without_rolling_back_the_foreign_transaction" file="/workspace/VA-Studio-suppression-cached-primary/tests/Feature/CustomerSuppressionSourceBoundaryTest.php" line="97" class="Tests\Feature\CustomerSuppressionSourceBoundaryTest" classname="Tests.Feature.CustomerSuppressionSourceBoundaryTest" assertions="3" time="0.266045">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerSuppressionSourceBoundaryTest::test_same_primary_commit_reopen_refuses_without_rolling_back_the_foreign_transaction
+Failed asserting that false is true.
+
+/workspace/VA-Studio-suppression-cached-primary/tests/Feature/CustomerSuppressionSourceBoundaryTest.php:121</failure>
+    </testcase>
+    <testcase name="test_replacement_primary_transaction_remains_owned_by_its_caller" file="/workspace/VA-Studio-suppression-cached-primary/tests/Feature/CustomerSuppressionSourceBoundaryTest.php" line="144" class="Tests\Feature\CustomerSuppressionSourceBoundaryTest" classname="Tests.Feature.CustomerSuppressionSourceBoundaryTest" assertions="3" time="0.309968">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerSuppressionSourceBoundaryTest::test_replacement_primary_transaction_remains_owned_by_its_caller
+Failed asserting that two variables reference the same object.
+
+/workspace/VA-Studio-suppression-cached-primary/tests/Feature/CustomerSuppressionSourceBoundaryTest.php:168</failure>
+    </testcase>
+    <testcase name="test_raw_transaction_without_a_framework_owner_is_refused_before_any_attempt" file="/workspace/VA-Studio-suppression-cached-primary/tests/Feature/CustomerSuppressionSourceBoundaryTest.php" line="191" class="Tests\Feature\CustomerSuppressionSourceBoundaryTest" classname="Tests.Feature.CustomerSuppressionSourceBoundaryTest" assertions="6" time="0.285092"/>
+  </testsuite>
+</testsuites>

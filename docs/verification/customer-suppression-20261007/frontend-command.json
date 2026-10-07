@@ -1,0 +1,11 @@
+{
+  "command": [
+    "npm",
+    "test",
+    "--",
+    "--run",
+    "tests/frontend/customer-communication-preferences.test.tsx",
+    "tests/frontend/customer-suppression-status.test.tsx"
+  ],
+  "exitCode": 0
+}

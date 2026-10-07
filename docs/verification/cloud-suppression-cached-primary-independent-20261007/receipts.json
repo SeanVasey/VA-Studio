@@ -1,0 +1,111 @@
+{
+  "executable": "3a30bc78d9a7cc6137d14d00437e4b82c950f71a",
+  "tree": "dd55e50721f1609c58635453e9ab4ed604792914",
+  "base_main": "760da5ac70a1082f13d87351a4446459e19947bb",
+  "owned_runtime": "983b497edfbdb56ce9995530b83f890ac741ade5",
+  "owned_docs": "9358de448f3f6f4be422890842a64efb2d231b95",
+  "source_bindings": [
+    {
+      "path": "app/Domain/Customers/Preferences/Suppression/SuppressionDelivery.php",
+      "sha256": "7b443c87ae93ec481411d423490a22d25878d3c11da8015b8bac4b80f95e81ad"
+    },
+    {
+      "path": "app/Domain/Customers/Preferences/Suppression/SuppressionEvidence.php",
+      "sha256": "4c9f77aecc60436fd7331a95b59ad56fcf8a2427a84b3914a3fa9dd29d0454d5"
+    },
+    {
+      "path": "tests/Feature/CustomerSuppressionSourceBoundaryTest.php",
+      "sha256": "fc0b58903f7c80b669189f30521379d5f4746f479b132ec7e9c26f0f6270018e"
+    }
+  ],
+  "dependency_bindings": [
+    {
+      "path": "app/Domain/Customers/Preferences/ConsentMigrationAdmission.php",
+      "sha256": "d5d6c464c2d28e32ef65f1d801aa98eaa59f28b45658af19a753ebf46a0f6f03",
+      "byteExactParent": true
+    },
+    {
+      "path": "app/Domain/Customers/Preferences/ConsentEvidence.php",
+      "sha256": "af03ae8feab2a85cf592fe9414b9425389a60286553080288b9bc115b223b96a",
+      "byteExactParent": true
+    },
+    {
+      "path": "app/Domain/Customers/Preferences/CustomerConsentPreferences.php",
+      "sha256": "f6b069fbbef8849a9539af1b20b8684266a0c93a24148b8a03284698377e0546",
+      "byteExactParent": true
+    },
+    {
+      "path": "app/Domain/Customers/CustomerAccess.php",
+      "sha256": "cb59745ecbdea2a9cedce51be535d428f2e1a3613829547716e9633fbff061bd",
+      "byteExactParent": true
+    },
+    {
+      "path": "app/Domain/Customers/CustomerAccessPolicy.php",
+      "sha256": "2a144608b6988d0cd96a1f2eb9b7164c226b3fa60e822496bda8fe3f2099fd40",
+      "byteExactParent": true
+    },
+    {
+      "path": "app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php",
+      "sha256": "6dfc9d878ae2adb56812fcfd8997f5be4abf7fa7d5daa54848dca4d4b7eb36d2",
+      "byteExactParent": true
+    },
+    {
+      "path": "app/Domain/Customers/Preferences/Suppression/SuppressionOutbox.php",
+      "sha256": "091053b773eedc329e3652891ae0a6de46bd61d748346c415b7740aa382623f6",
+      "byteExactParent": true
+    },
+    {
+      "path": "app/Domain/Customers/Preferences/Suppression/SuppressionPolicy.php",
+      "sha256": "9f9197694aa138f65f6d3bb2f6e3bbd73414d2d13461928e35285d7af60d0595",
+      "byteExactParent": true
+    },
+    {
+      "path": "database/migrations/2026_10_07_250000_customer_consent.php",
+      "sha256": "9de1cc2783fd73eacdd84eea80445b8d573d53b0e73d4a0bae8cbd2a5e73ae12",
+      "byteExactParent": true
+    },
+    {
+      "path": "database/migrations/2026_10_07_251000_customer_suppression.php",
+      "sha256": "5c7a4ed4ea2baac94ea0ff34dc331d62e53c1790dfe72da47e42e6347a2a0a43",
+      "byteExactParent": true
+    },
+    {
+      "path": "config/customer-suppression.php",
+      "sha256": "53765051cc3449827c087a39aa96f22b04178f30761423ca770b8eeee2e534b9",
+      "byteExactParent": true
+    },
+    {
+      "path": "resources/js/components/CustomerCommunicationPreferences.tsx",
+      "sha256": "426fc857ff87c1b8d85b3a1ab54ef2eb2cc0223cad9a14fdf514a9693f53324f",
+      "byteExactParent": true
+    }
+  ],
+  "author_verified_artifacts": 38,
+  "original_probe_sha256": "85ac73175f4d2e6cef62c7311cd52fb0c27a2520d6d34cba3be44a372f480e78",
+  "independent_results": {
+    "registered_plus_original_sqlite": "17/179 zero F/E/S",
+    "unchanged_original_runtime_and_namespace_native": "2/13 zero F/E/S",
+    "owned_transaction_regressions_sqlite": "7/90 zero F/E/S"
+  },
+  "harness_error": "First additional boundary invocation supplied a29-byte synthetic APP_KEY and produced7errors/7assertions before boundary exercise. Corrected invocation generated32 constant synthetic bytes; source unchanged. Both actual outputs retained.",
+  "snapshot_attribution": "Unchanged runtime probe hardcodes predecessor df0 in its snapshot source field. Actual corrected execution is3a30 as above; callbacks0/refusedtrue/sent1/depth0/physicalTxfalse. Corrected snapshots copied separately; originalDF0 red artifacts are untouched.",
+  "review": "Independent root read of Evidence raw cached admission and Delivery original physical-savepoint cleanup; immutable source/dependency/artifact hashes verified. Replacement caller transaction preserved by owned tests and ownSQLite7/90. OldConsentEvidence and original policy unchanged.",
+  "limitations": [
+    "Focused MySQL8.0.46 evidence; final8.4/nativebrowser/Foundation deferred",
+    "Unbound/defaultoff synthetic provider family; no actual external suppression effect",
+    "Global final active fixture/skip census normalization remains required"
+  ],
+  "artifacts_sha256": {
+    "unchanged-runtime-probe.php.txt": "85ac73175f4d2e6cef62c7311cd52fb0c27a2520d6d34cba3be44a372f480e78",
+    "va-suppression-cached-primary-root-native.txt": "fabb9918e980ca620865fc6452781c7bdc37945fea8cf6ecf782e626cb4c0b8c",
+    "va-suppression-cached-primary-root-native.xml": "d4d72e2f813147e174561d48e836ffbd50015ca877c3a23c9a6215266e556975",
+    "va-suppression-cached-primary-root.txt": "fd4448d4762272ae46a0e1b0269570bc016ac573a2078e652bfa6c43078907e1",
+    "va-suppression-cached-primary-root.xml": "a106a9d0fe5a0786040cf04e1c5ede518658eaf906fdadc3086367a62205536c",
+    "va-suppression-lazy-primary-snapshot.json": "b5e8b020cd6a0a98a3f3393aff9acb13af56ee4d733929589fc8366848c51a27",
+    "va-suppression-native-constraint-snapshot.json": "c0f4ba0e3cfb728f024814bad5b8cfb1ef501c295b36f6ab947a83139a33d258",
+    "va-suppression-source-boundary-independent-corrected.txt": "af94caba79b50b72688f59b6b9583e82323d7f675d948e58aa5898454e1b10e0",
+    "va-suppression-source-boundary-independent-corrected.xml": "bdacfe01a89763bf6520d729b83d56dfe2ec0ada9f37113b12479e21f4f50b79",
+    "va-suppression-source-boundary-independent.txt": "ea45f25b4067ac46171ba72c8731d6b6630f187ed9f47400250e9382a8359d2b",
+    "va-suppression-source-boundary-independent.xml": "9ad2605e914ccd5414433f143c98fdbc45b2590d68719946920d2cf2102c0f4a"
+  }
+}

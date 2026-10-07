@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\CustomerSuppressionNativeAdmissionTest" file="/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionNativeAdmissionTest.php" tests="1" assertions="9" errors="0" failures="0" skipped="0" time="25.207187">
+    <testcase name="test_foreign_reserved_constraint_is_refused_before_any_owned_ddl" file="/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionNativeAdmissionTest.php" line="15" class="Tests\Feature\CustomerSuppressionNativeAdmissionTest" classname="Tests.Feature.CustomerSuppressionNativeAdmissionTest" assertions="9" time="25.207187"/>
+  </testsuite>
+</testsuites>

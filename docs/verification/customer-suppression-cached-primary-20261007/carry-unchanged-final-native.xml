@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="6" assertions="37" errors="0" failures="0" skipped="0" time="108.970793">
+    <testsuite name="Tests\Feature\CustomerSuppressionTest" file="/workspace/VA-Studio-suppression-cached-primary/tests/Feature/CustomerSuppressionTest.php" tests="5" assertions="33" errors="0" failures="0" skipped="0" time="95.669937">
+      <testcase name="test_single_positive_attempt_is_committed_before_adapter_and_is_never_sent_again" file="/workspace/VA-Studio-suppression-cached-primary/tests/Feature/CustomerSuppressionTest.php" line="67" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="12" time="30.220453"/>
+      <testcase name="test_late_credential_withdrawal_after_positive_receipt_cannot_confirm" file="/workspace/VA-Studio-suppression-cached-primary/tests/Feature/CustomerSuppressionTest.php" line="196" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="6" time="18.969883"/>
+      <testcase name="test_terminal_adapter_policy_callback_cannot_release_confirmation" file="/workspace/VA-Studio-suppression-cached-primary/tests/Feature/CustomerSuppressionTest.php" line="212" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="5" time="16.222665"/>
+      <testcase name="test_terminal_framework_query_withdrawal_cannot_release_positive_receipt" file="/workspace/VA-Studio-suppression-cached-primary/tests/Feature/CustomerSuppressionTest.php" line="278" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="6" time="14.946049"/>
+      <testcase name="test_customer_policy_disabled_by_adapter_cannot_release_receipt_or_private_status" file="/workspace/VA-Studio-suppression-cached-primary/tests/Feature/CustomerSuppressionTest.php" line="302" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="4" time="15.310888"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\CustomerSuppressionLazyBoundaryCanaryTest" file="/tmp/CustomerSuppressionLazyBoundaryCanaryTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="13.300856">
+      <testcase name="test_late_primary_resolver_cannot_release_confirmation_after_policy_withdrawal" file="/tmp/CustomerSuppressionLazyBoundaryCanaryTest.php" line="14" class="Tests\Feature\CustomerSuppressionLazyBoundaryCanaryTest" classname="Tests.Feature.CustomerSuppressionLazyBoundaryCanaryTest" assertions="4" time="13.300856"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

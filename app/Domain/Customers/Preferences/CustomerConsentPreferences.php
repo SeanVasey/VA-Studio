@@ -9,6 +9,9 @@ use App\Domain\Customers\CustomerPrincipal;
 use App\Domain\Customers\Preferences\Models\ConsentEvent;
 use App\Domain\Customers\Preferences\Models\ConsentPolicySnapshot;
 use App\Domain\Customers\Preferences\Models\ConsentState;
+use App\Domain\Customers\Preferences\Suppression\SuppressionEvidence;
+use App\Domain\Customers\Preferences\Suppression\SuppressionOutbox;
+use App\Domain\Customers\Preferences\Suppression\SuppressionPolicy;
 use App\Models\User;
 use App\Support\CanonicalJson;
 use Illuminate\Database\Eloquent\Model;
@@ -52,6 +55,7 @@ final class CustomerConsentPreferences
             $grantsEnabled = $this->runtime->grantsEnabled();
             $configuration = config('customer-preferences');
             $configured = $policySource->configured();
+            $suppressionPolicy = SuppressionPolicy::capture();
             $state = ConsentState::where('customer_account_id', $principal->accountId)->where('purpose', ConsentPolicy::PURPOSE)->lockForUpdate()->first();
             $events = ConsentEvent::where('customer_account_id', $principal->accountId)->where('purpose', ConsentPolicy::PURPOSE)->orderByDesc('revision')->limit(2)->lockForUpdate()->get();
             $policies = [];
@@ -115,6 +119,9 @@ final class CustomerConsentPreferences
                 $state ??= new ConsentState;
                 $state->fill($stateAttributes)->save();
                 $this->expected($state, $stateAttributes);
+                if (! $grant) {
+                    (new SuppressionOutbox)->withdrawal($event, $recipient);
+                }
                 $events = $events->prepend($event)->take(2);
             }
             $status = $events->first()?->status ?? 'unknown';
@@ -124,9 +131,11 @@ final class CustomerConsentPreferences
                 || ! hash_equals($events[0]->recipient_hmac, $this->recipientHash($principal->accountId, $recipient)))) {
                 $status = 'unknown';
             }
+            $suppressionProof = new SuppressionEvidence;
+            $suppression = (new SuppressionOutbox)->graph($principal, $recipient, $suppressionProof, $suppressionPolicy);
             $projection = ['schema' => 1, 'purposes' => [['purpose' => ConsentPolicy::PURPOSE, 'version' => $revision, 'status' => $status,
                 'notice' => $configured ? ['version' => $configured['version'], 'hash' => $configured['notice_hash'], 'text' => $configured['notice']] : null,
-                'canGrant' => $grantsEnabled && $configured !== null && ! $collision]]];
+                'canGrant' => $grantsEnabled && $configured !== null && ! $collision, 'suppression' => ['status' => $suppression['status']]]]];
             $expectedStates = $state ? [$state->getRawOriginal()] : [];
             $expectedEvents = $events->map(fn ($event) => $event->getRawOriginal())->all();
             $expectedPolicies = array_map(fn ($policy) => $policy->getRawOriginal(), array_values($policies));
@@ -139,7 +148,9 @@ final class CustomerConsentPreferences
                 throw new ConsentException(503);
             }
             $currentAccessPolicy->requireEnabled();
+            SuppressionPolicy::current($suppressionPolicy);
             $proof->prove($principal, $email, $expectedStates, $expectedEvents, $expectedPolicies, $range);
+            $suppressionProof->prove();
 
             return $projection;
         });

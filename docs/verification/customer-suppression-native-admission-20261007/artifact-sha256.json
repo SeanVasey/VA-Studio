@@ -1,0 +1,21 @@
+{
+  "sqlite-carry.txt": "23a2ce751356c1da8966996af0babff9712c02463ea28da7e472ac831fe9938b",
+  "pint-final.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+  "sqlite-keys-final.junit.xml": "10757ab7e59add0f2bcc6f01bd1a6c600ef85209b1d2f8c9241acef9e7241531",
+  "sqlite-keys.txt": "6ba3cb36bb7561fa651077d0fff1dbae3b72cc025f7fa8e77493ed4d6c3362d5",
+  "sqlite-keys-final.txt": "4812ebdf38d4c382f6b43034d5e3ef2e67f0af0fbbdbadfc2168cc00c99f74a0",
+  "source-evidence.json": "627b47bf9256f4ee5d979a3ca9b0b6513f7a4167f909296e85d6a89101f5233a",
+  "native-alias-restart.junit.xml": "215ad146096e1a60b30c10181149c48a304571a4fd962aa8e3768d9fcfa370a4",
+  "README.md": "a4bb395196c67a9290c85191a2f24a41b4fef7659e84c473df11e772cf7d30f9",
+  "sqlite-carry.junit.xml": "bf8682f1e79fbec43845a7ed2ef97868a4220ecba8dbfd084c91eff715b0c990",
+  "native-alias-restart.txt": "937316056baf6d78b802dcc61e91dd28696e00b15c7fadcb324809a7d7f9dad8",
+  "sqlite-keys.junit.xml": "589051d2142d3372c3a0420d04a6e1a68740fac701eb3690317054885660cda4",
+  "va-suppression-native-constraint-original.xml": "38d71e437ee8a7a4c3a6ad7addfd0204b9fba208697b4a17067d3abd30fa4b74",
+  "va-suppression-native-constraint-snapshot.json": "0f94ac2d7884dfb8fd11cd6fd45fffce00d04a309f086db8a474fc91f2cadab3",
+  "native-keys-before-alias-fixture-correction.junit.xml": "c76b31f075d32245b8b621a5c07c52bdb1008d5bd5ba9435bfe1354517b5d427",
+  "OriginalCustomerSuppressionNativeAdmissionTest.php": "e8cb8638616ac4f96a34319c9a236b041b29344681d75621f1e5126aab36eb5f",
+  "native-keys-before-alias-fixture-correction.txt": "055a37494b2bd9c33d73106caca9320279ac2d9cd72f2024e927296665966e42",
+  "va-suppression-native-constraint-original.txt": "7ba31183f35bff3657d4e12b39d8df5a60545d973b94121aa978f1231f20014d",
+  "original-canary-green.txt": "b70e28ecfbccf1dceccdee9c72ad12c30443948202615a05fbfd2d309449d504",
+  "original-canary-green.junit.xml": "b318f153b8dec67b9a6954e4c71ec51c102be8dcfaf18af6ea051bc64f5bc96e"
+}

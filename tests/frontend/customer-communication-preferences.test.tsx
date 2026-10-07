@@ -4,7 +4,7 @@ import { CustomerCommunicationPreferences, validCommunicationPreferences, type C
 
 const notice = { version: 'synthetic-v1', hash: 'a'.repeat(64), text: 'Synthetic reviewed fixture only. No production legal notice.' };
 function preferences(version = 0, status: 'unknown' | 'granted' | 'withdrawn' = 'unknown', enabled = true): CommunicationPreferences {
-  return { schema: 1, purposes: [{ purpose: 'email_marketing', version, status, notice: enabled ? notice : null, canGrant: enabled }] };
+  return { schema: 1, purposes: [{ purpose: 'email_marketing', version, status, notice: enabled ? notice : null, canGrant: enabled, suppression: { status: 'not_requested' } }] };
 }
 const response = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status, headers: { 'Content-Type': 'application/json' } });
 const loaded = (value: unknown) => response({ preferences: value });

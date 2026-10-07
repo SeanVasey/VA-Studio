@@ -1,0 +1,56 @@
+{
+  "source": "50fb8d0442a4f53632e1f25785b49d3148161d20",
+  "sourceTree": "06d9abca0b78f70851d42985ce70b027a25ea522",
+  "base": "d22e1ddc9f01089dec15c2eca0519c2bc5424876",
+  "files": {
+    "app/Domain/Customers/Preferences/CustomerConsentPreferences.php": "f6b069fbbef8849a9539af1b20b8684266a0c93a24148b8a03284698377e0546",
+    "app/Domain/Customers/Preferences/Suppression/Models/SuppressionAttempt.php": "70974f48d0f621a222af38ac855eb3088299e4e65e18238e31e5ed9195244810",
+    "app/Domain/Customers/Preferences/Suppression/Models/SuppressionConfirmation.php": "6748f0ad19e6c670d0e775160fd7847c348200aa189fd8c923c5ecf19d573927",
+    "app/Domain/Customers/Preferences/Suppression/Models/SuppressionIntent.php": "21647934f9c2179fc7cff20dcf0a1a874696eb08c4f32d7190805868bc6dc3c5",
+    "app/Domain/Customers/Preferences/Suppression/Models/SuppressionTarget.php": "1430ea2f99824fce33ebda712ebca40be1ffecb1a7818be5638fad63a6905e6a",
+    "app/Domain/Customers/Preferences/Suppression/SuppressionAdapter.php": "f0010a502909978510e31e53cf6a67a5b35fd25dfeca46e0890e9553ce026796",
+    "app/Domain/Customers/Preferences/Suppression/SuppressionDelivery.php": "1c668cddd3f500cdd665f0ab7372ab0860dcd58d5a72dee2d2bae623dd01e2ef",
+    "app/Domain/Customers/Preferences/Suppression/SuppressionEvidence.php": "b9065ca87ba90adf63341f8fa8350c87c6a721c9c197d004a66ae590071b027e",
+    "app/Domain/Customers/Preferences/Suppression/SuppressionOutbox.php": "091053b773eedc329e3652891ae0a6de46bd61d748346c415b7740aa382623f6",
+    "app/Domain/Customers/Preferences/Suppression/SuppressionPolicy.php": "9f9197694aa138f65f6d3bb2f6e3bbd73414d2d13461928e35285d7af60d0595",
+    "app/Domain/Customers/Preferences/Suppression/SuppressionReceipt.php": "9b572aa14ea9818c03173482d22fd71689c293534e349fc6503fb52d556cc113",
+    "app/Domain/Customers/Preferences/Suppression/SuppressionRequest.php": "fcd19c6f1af35ebd9ca6ec7a7c26ec737eac222a890c54e57a9a82c0ae3fc5e1",
+    "app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php": "128035efd83fabd92ef2a3db806dd887a0b6d91ce3074598273de78f021b0933",
+    "app/Domain/Customers/Preferences/Suppression/UnboundSuppressionAdapter.php": "b7bc628e61b57b11d65fa7537ddea20c1f5854d7fb5ac30840f25827c722e644",
+    "config/customer-suppression.php": "53765051cc3449827c087a39aa96f22b04178f30761423ca770b8eeee2e534b9",
+    "database/migrations/2026_10_07_251000_customer_suppression.php": "5c7a4ed4ea2baac94ea0ff34dc331d62e53c1790dfe72da47e42e6347a2a0a43",
+    "docs/verification/customer-suppression-20261007/README.md": "9cef8b0813e01a37ace969f999e3f81fd60a2346f51b1a50a77430cd291d85f8",
+    "resources/js/components/CustomerCommunicationPreferences.tsx": "426fc857ff87c1b8d85b3a1ab54ef2eb2cc0223cad9a14fdf514a9693f53324f",
+    "tests/Feature/CustomerConsentPreferencesTest.php": "736653799e984221c6bb8658ccf0f6e0550e4b64d5175f0ad056fb85cbbf8727",
+    "tests/Feature/CustomerSuppressionMigrationTest.php": "c24dfcb30c0e5d82df201097acbac24b96d39f56dbf7019d7f620331afaa18b2",
+    "tests/Feature/CustomerSuppressionTest.php": "fb063e07b037cc0554d9566c8de8c0f765bc9872fca69f8cd51d72f5de7d2a8b",
+    "tests/Support/SuppressionFixtures.php": "35cb972ffa1d2dedb2d4be9870a4327198e79abf7304fece3028504273e03f60",
+    "tests/frontend/customer-communication-preferences.test.tsx": "6d3d33a95567ccec2ab30deff4b729a81dcbfbc9fa0c1907d35c65ffa001a32c",
+    "tests/frontend/customer-suppression-status.test.tsx": "ff585fa75d439bed68711933b009c21af5d1174dcb86352f595f524d46197c8b"
+  },
+  "unchangedApprovedDependencies": {
+    "database/migrations/2026_10_07_250000_customer_consent.php": {
+      "baseBlob": "2d2f75ab7d3c5b0bf4867666571a1097a63546f1",
+      "sourceBlob": "2d2f75ab7d3c5b0bf4867666571a1097a63546f1"
+    },
+    "app/Domain/Customers/Preferences/ConsentMigrationAdmission.php": {
+      "baseBlob": "12a0d2ee252b233ebcc0919aefd5c25607a196cd",
+      "sourceBlob": "12a0d2ee252b233ebcc0919aefd5c25607a196cd"
+    },
+    "app/Domain/Customers/Preferences/ConsentEvidence.php": {
+      "baseBlob": "bfd36e625dfe0a422dab48d5b02efb3a2de2853e",
+      "sourceBlob": "bfd36e625dfe0a422dab48d5b02efb3a2de2853e"
+    },
+    "app/Domain/Customers/CustomerAccess.php": {
+      "baseBlob": "310bb10219405110a3db5a5844132c42d0291887",
+      "sourceBlob": "310bb10219405110a3db5a5844132c42d0291887"
+    },
+    "app/Domain/Customers/CustomerAccessPolicy.php": {
+      "baseBlob": "ceccc3a417413dec27b855d465d30349cef20fa3",
+      "sourceBlob": "ceccc3a417413dec27b855d465d30349cef20fa3"
+    }
+  },
+  "nativeAuthorExecution": false,
+  "providerInstalled": false,
+  "productionActivated": false
+}

@@ -1,0 +1,1249 @@
+{
+  "source": "983b497edfbdb56ce9995530b83f890ac741ade5",
+  "parent": "272c0ea1339805316be1f47f2aa93f3ee50c9ea9",
+  "predecessorRuntime": "50fb8d0442a4f53632e1f25785b49d3148161d20",
+  "correctedSchema": "aedab416a5099f958c11a5398870cfe4173241e5",
+  "originalRootSource": "df0f77eee08417137a828047fa495860f499115c",
+  "originalRootEvidence": "ce7a9f91ad3db2025d61dfe9504ef47e63b0462f",
+  "sourceFiles": [
+    {
+      "path": "app/Domain/Customers/Preferences/Suppression/SuppressionDelivery.php",
+      "sha256": "7b443c87ae93ec481411d423490a22d25878d3c11da8015b8bac4b80f95e81ad"
+    },
+    {
+      "path": "app/Domain/Customers/Preferences/Suppression/SuppressionEvidence.php",
+      "sha256": "4c9f77aecc60436fd7331a95b59ad56fcf8a2427a84b3914a3fa9dd29d0454d5"
+    },
+    {
+      "path": "tests/Feature/CustomerSuppressionSourceBoundaryTest.php",
+      "sha256": "fc0b58903f7c80b669189f30521379d5f4746f479b132ec7e9c26f0f6270018e"
+    }
+  ],
+  "unchangedDependencies": [
+    {
+      "path": "app/Domain/Customers/Preferences/ConsentMigrationAdmission.php",
+      "sha256": "d5d6c464c2d28e32ef65f1d801aa98eaa59f28b45658af19a753ebf46a0f6f03",
+      "byteExactParent": true
+    },
+    {
+      "path": "app/Domain/Customers/Preferences/ConsentEvidence.php",
+      "sha256": "af03ae8feab2a85cf592fe9414b9425389a60286553080288b9bc115b223b96a",
+      "byteExactParent": true
+    },
+    {
+      "path": "app/Domain/Customers/Preferences/CustomerConsentPreferences.php",
+      "sha256": "f6b069fbbef8849a9539af1b20b8684266a0c93a24148b8a03284698377e0546",
+      "byteExactParent": true
+    },
+    {
+      "path": "app/Domain/Customers/CustomerAccess.php",
+      "sha256": "cb59745ecbdea2a9cedce51be535d428f2e1a3613829547716e9633fbff061bd",
+      "byteExactParent": true
+    },
+    {
+      "path": "app/Domain/Customers/CustomerAccessPolicy.php",
+      "sha256": "2a144608b6988d0cd96a1f2eb9b7164c226b3fa60e822496bda8fe3f2099fd40",
+      "byteExactParent": true
+    },
+    {
+      "path": "app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php",
+      "sha256": "6dfc9d878ae2adb56812fcfd8997f5be4abf7fa7d5daa54848dca4d4b7eb36d2",
+      "byteExactParent": true
+    },
+    {
+      "path": "app/Domain/Customers/Preferences/Suppression/SuppressionOutbox.php",
+      "sha256": "091053b773eedc329e3652891ae0a6de46bd61d748346c415b7740aa382623f6",
+      "byteExactParent": true
+    },
+    {
+      "path": "app/Domain/Customers/Preferences/Suppression/SuppressionPolicy.php",
+      "sha256": "9f9197694aa138f65f6d3bb2f6e3bbd73414d2d13461928e35285d7af60d0595",
+      "byteExactParent": true
+    },
+    {
+      "path": "database/migrations/2026_10_07_250000_customer_consent.php",
+      "sha256": "9de1cc2783fd73eacdd84eea80445b8d573d53b0e73d4a0bae8cbd2a5e73ae12",
+      "byteExactParent": true
+    },
+    {
+      "path": "database/migrations/2026_10_07_251000_customer_suppression.php",
+      "sha256": "5c7a4ed4ea2baac94ea0ff34dc331d62e53c1790dfe72da47e42e6347a2a0a43",
+      "byteExactParent": true
+    },
+    {
+      "path": "config/customer-suppression.php",
+      "sha256": "53765051cc3449827c087a39aa96f22b04178f30761423ca770b8eeee2e534b9",
+      "byteExactParent": true
+    },
+    {
+      "path": "resources/js/components/CustomerCommunicationPreferences.tsx",
+      "sha256": "426fc857ff87c1b8d85b3a1ab54ef2eb2cc0223cad9a14fdf514a9693f53324f",
+      "byteExactParent": true
+    }
+  ],
+  "originalCanarySha256": "85ac73175f4d2e6cef62c7311cd52fb0c27a2520d6d34cba3be44a372f480e78",
+  "nativeServer": "8.0.46-0ubuntu0.24.04.4",
+  "nativeDatabase": "vaseyaudio_suppress_fix",
+  "finalReceipts": [
+    {
+      "path": "affected-final-sqlite.xml",
+      "tests": 174,
+      "passed": 172,
+      "skipped": 2,
+      "assertions": 990,
+      "cases": [
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_default_off_withdrawal_is_atomic_encrypted_pending_and_repeated_intents_advance",
+          "assertions": 31,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_intent_failure_rolls_back_consent_and_target_without_partial_choice",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_single_positive_attempt_is_committed_before_adapter_and_is_never_sent_again",
+          "assertions": 12,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_ambiguous_or_wrong_receipt_never_confirms_or_retries_even_after_repeated_withdrawal with data set #0",
+          "assertions": 11,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_ambiguous_or_wrong_receipt_never_confirms_or_retries_even_after_repeated_withdrawal with data set #1",
+          "assertions": 11,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_ambiguous_or_wrong_receipt_never_confirms_or_retries_even_after_repeated_withdrawal with data set #2",
+          "assertions": 11,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_ambiguous_or_wrong_receipt_never_confirms_or_retries_even_after_repeated_withdrawal with data set #3",
+          "assertions": 11,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_ambiguous_or_wrong_receipt_never_confirms_or_retries_even_after_repeated_withdrawal with data set #4",
+          "assertions": 11,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_ambiguous_or_wrong_receipt_never_confirms_or_retries_even_after_repeated_withdrawal with data set #5",
+          "assertions": 11,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_ambiguous_or_wrong_receipt_never_confirms_or_retries_even_after_repeated_withdrawal with data set #6",
+          "assertions": 11,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_default_unbound_adapter_cannot_send_even_under_synthetic_enabled_binding",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_non_boolean_or_invalid_binding_cannot_authorize_transport with data set #0",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_non_boolean_or_invalid_binding_cannot_authorize_transport with data set #1",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_non_boolean_or_invalid_binding_cannot_authorize_transport with data set #2",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_non_boolean_or_invalid_binding_cannot_authorize_transport with data set #3",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_non_boolean_or_invalid_binding_cannot_authorize_transport with data set #4",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_nested_transaction_and_stale_version_refuse_before_attempt_or_adapter",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_other_actor_and_revoked_account_cannot_claim_or_inspect",
+          "assertions": 7,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_credentials_changed_after_durable_claim_block_transport_and_retain_unknown",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_late_credential_withdrawal_after_positive_receipt_cannot_confirm",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_terminal_adapter_policy_callback_cannot_release_confirmation",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_changed_provider_binding_never_resends_old_unknown_or_projects_old_confirmation",
+          "assertions": 7,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_grant_does_not_unsuppress_and_changed_recipient_never_reuses_other_target",
+          "assertions": 7,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_saved_attempt_callback_cannot_replace_intended_operation_and_commit_transport",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_terminal_framework_query_withdrawal_cannot_release_positive_receipt",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_customer_policy_disabled_by_adapter_cannot_release_receipt_or_private_status",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_reconcile_uses_current_actor_and_credentials_and_never_sends",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_current_production_account_policy_stays_required_before_any_transport",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_native_and_sqlite_guards_retain_every_target_intent_attempt_and_receipt",
+          "assertions": 13,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_binding_resolver_failure_is_generic_and_never_claims_or_transports",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionSourceBoundaryTest",
+          "name": "test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set \"send positive\"",
+          "assertions": 15,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionSourceBoundaryTest",
+          "name": "test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set \"send ambiguous\"",
+          "assertions": 15,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionSourceBoundaryTest",
+          "name": "test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set \"inspect positive\"",
+          "assertions": 16,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionSourceBoundaryTest",
+          "name": "test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set \"inspect ambiguous\"",
+          "assertions": 16,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionSourceBoundaryTest",
+          "name": "test_same_primary_commit_reopen_refuses_without_rolling_back_the_foreign_transaction",
+          "assertions": 12,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionSourceBoundaryTest",
+          "name": "test_replacement_primary_transaction_remains_owned_by_its_caller",
+          "assertions": 10,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionSourceBoundaryTest",
+          "name": "test_raw_transaction_without_a_framework_owner_is_refused_before_any_attempt",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_every_known_installation_prefix_resumes_without_changing_prior_customer_history with data set #0",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_every_known_installation_prefix_resumes_without_changing_prior_customer_history with data set #1",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_every_known_installation_prefix_resumes_without_changing_prior_customer_history with data set #2",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_every_known_installation_prefix_resumes_without_changing_prior_customer_history with data set #3",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_every_known_installation_prefix_resumes_without_changing_prior_customer_history with data set #4",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_every_known_installation_prefix_resumes_without_changing_prior_customer_history with data set #5",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_every_known_installation_prefix_resumes_without_changing_prior_customer_history with data set #6",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_every_known_installation_prefix_resumes_without_changing_prior_customer_history with data set #7",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_every_known_installation_prefix_resumes_without_changing_prior_customer_history with data set #8",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_every_known_installation_prefix_resumes_without_changing_prior_customer_history with data set #9",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_every_known_installation_prefix_resumes_without_changing_prior_customer_history with data set #10",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_every_known_installation_prefix_resumes_without_changing_prior_customer_history with data set #11",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_every_known_installation_prefix_resumes_without_changing_prior_customer_history with data set #12",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_every_known_installation_prefix_resumes_without_changing_prior_customer_history with data set #13",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_every_known_installation_prefix_resumes_without_changing_prior_customer_history with data set #14",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_every_known_installation_prefix_resumes_without_changing_prior_customer_history with data set #15",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_every_known_installation_prefix_resumes_without_changing_prior_customer_history with data set #16",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_real_migrator_retries_complete_unlogged_create_interruption",
+          "assertions": 9,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_foreign_same_name_trigger_is_refused_before_any_owned_ddl",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_missing_or_drifted_consent_dependency_is_refused_before_any_owned_ddl",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_missing_identity_dependency_and_disabled_fk_enforcement_are_refused_without_installing",
+          "assertions": 7,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_temporary_dependency_or_owned_alias_cannot_be_adopted",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_non_prefix_or_recorded_missing_guard_is_refused_without_repair",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_recorded_missing_guard_is_refused_without_silent_repair",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_foreign_coexisting_name_or_last_ddl_extra_trigger_cannot_be_adopted",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_last_ddl_callback_cannot_record_a_schema_with_an_earlier_guard_removed",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_all_retained_rows_survive_refused_rollback_and_raw_update_delete_duplicate",
+          "assertions": 7,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_sqlite_replace_cannot_delete_retained_target_or_intent",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+          "name": "test_existing_foreign_index_and_reserved_guard_index_refuse_without_adoption",
+          "assertions": 7,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+          "name": "test_exact_complete_owned_graph_still_revalidates",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+          "name": "test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl with data set \"customer_suppression_targets_public_unique\"",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+          "name": "test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl with data set \"customer_suppression_targets_recipient_unique\"",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+          "name": "test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl with data set \"customer_suppression_targets_customer_account_id_fk\"",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+          "name": "test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl with data set \"customer_suppression_intents_public_unique\"",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+          "name": "test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl with data set \"customer_suppression_intents_event_unique\"",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+          "name": "test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl with data set \"customer_suppression_intents_target_index\"",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+          "name": "test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl with data set \"customer_suppression_intents_consent_event_id_fk\"",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+          "name": "test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl with data set \"customer_suppression_intents_target_id_fk\"",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+          "name": "test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl with data set \"customer_suppression_attempts_public_unique\"",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+          "name": "test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl with data set \"customer_suppression_attempts_target_unique\"",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+          "name": "test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl with data set \"customer_suppression_attempts_target_id_fk\"",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+          "name": "test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl with data set \"customer_suppression_confirmations_attempt_unique\"",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+          "name": "test_every_derived_reserved_key_on_a_foreign_index_refuses_before_ddl with data set \"customer_suppression_confirmations_attempt_id_fk\"",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+          "name": "test_foreign_reserved_native_foreign_key_refuses_before_owned_ddl",
+          "assertions": 1,
+          "status": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+          "name": "test_native_dictionary_collation_alias_of_reserved_constraint_refuses_before_ddl",
+          "assertions": 1,
+          "status": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+          "name": "test_reserved_key_used_by_another_object_kind_refuses_before_ddl",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+          "name": "test_temporary_reserved_key_refuses_before_ddl",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+          "name": "test_final_ddl_callback_cannot_record_a_late_foreign_reserved_index",
+          "assertions": 9,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_unknown_default_never_creates_a_choice_or_invents_a_notice",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_exact_affirmative_choice_persists_encrypted_server_recipient_and_original_notice",
+          "assertions": 18,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_every_withdrawal_advances_revision_even_unknown_or_already_withdrawn_and_fences_stale_grants",
+          "assertions": 11,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_changed_or_disabled_notice_never_infers_grant_and_withdrawal_remains_available",
+          "assertions": 7,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_notice_version_cannot_be_reused_to_replace_original_copy_but_customer_can_withdraw",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_separate_accounts_have_independent_revisions_and_cannot_supply_another_owner_or_recipient",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_untrusted_or_incomplete_consent_commands_refuse_without_any_capture with data set \"missing affirmative\"",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_untrusted_or_incomplete_consent_commands_refuse_without_any_capture with data set \"false affirmative\"",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_untrusted_or_incomplete_consent_commands_refuse_without_any_capture with data set \"numeric affirmative\"",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_untrusted_or_incomplete_consent_commands_refuse_without_any_capture with data set \"string version\"",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_untrusted_or_incomplete_consent_commands_refuse_without_any_capture with data set \"negative version\"",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_untrusted_or_incomplete_consent_commands_refuse_without_any_capture with data set \"float version\"",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_untrusted_or_incomplete_consent_commands_refuse_without_any_capture with data set \"foreign purpose\"",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_untrusted_or_incomplete_consent_commands_refuse_without_any_capture with data set \"old notice version\"",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_untrusted_or_incomplete_consent_commands_refuse_without_any_capture with data set \"wrong hash\"",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_untrusted_or_incomplete_consent_commands_refuse_without_any_capture with data set \"extra recipient\"",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_untrusted_or_incomplete_consent_commands_refuse_without_any_capture with data set \"unknown action\"",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_untrusted_or_incomplete_consent_commands_refuse_without_any_capture with data set \"extended notice field\"",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_recipient_change_does_not_promote_old_capture_to_new_address",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_missing_unreviewed_or_invalid_purpose_policy_cannot_create_opt_in_and_does_not_block_withdrawal with data set \"missing policy\"",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_missing_unreviewed_or_invalid_purpose_policy_cannot_create_opt_in_and_does_not_block_withdrawal with data set \"missing review\"",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_missing_unreviewed_or_invalid_purpose_policy_cannot_create_opt_in_and_does_not_block_withdrawal with data set \"notice too long\"",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_missing_unreviewed_or_invalid_purpose_policy_cannot_create_opt_in_and_does_not_block_withdrawal with data set \"invalid UTF8\"",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_missing_unreviewed_or_invalid_purpose_policy_cannot_create_opt_in_and_does_not_block_withdrawal with data set \"Unicode whitespace\"",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_missing_unreviewed_or_invalid_purpose_policy_cannot_create_opt_in_and_does_not_block_withdrawal with data set \"format controls\"",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_missing_unreviewed_or_invalid_purpose_policy_cannot_create_opt_in_and_does_not_block_withdrawal with data set \"extended policy\"",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_missing_unreviewed_or_invalid_purpose_policy_cannot_create_opt_in_and_does_not_block_withdrawal with data set \"overlong version\"",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_actual_account_listening_and_order_preparation_do_not_infer_marketing_consent",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentPreferencesTest",
+          "name": "test_runtime_adapter_can_be_replaced_without_changing_domain_production_guards",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentBoundaryTest",
+          "name": "test_final_account_query_callback_cannot_release_or_commit_stale_consent with data set \"read account\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentBoundaryTest",
+          "name": "test_final_account_query_callback_cannot_release_or_commit_stale_consent with data set \"read credential\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentBoundaryTest",
+          "name": "test_final_account_query_callback_cannot_release_or_commit_stale_consent with data set \"read recipient\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentBoundaryTest",
+          "name": "test_final_account_query_callback_cannot_release_or_commit_stale_consent with data set \"read purpose\"",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentBoundaryTest",
+          "name": "test_final_account_query_callback_cannot_release_or_commit_stale_consent with data set \"read graph\"",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentBoundaryTest",
+          "name": "test_final_account_query_callback_cannot_release_or_commit_stale_consent with data set \"grant account\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentBoundaryTest",
+          "name": "test_final_account_query_callback_cannot_release_or_commit_stale_consent with data set \"grant credential\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentBoundaryTest",
+          "name": "test_final_account_query_callback_cannot_release_or_commit_stale_consent with data set \"grant recipient\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentBoundaryTest",
+          "name": "test_final_account_query_callback_cannot_release_or_commit_stale_consent with data set \"grant purpose\"",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentBoundaryTest",
+          "name": "test_final_account_query_callback_cannot_release_or_commit_stale_consent with data set \"grant graph\"",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentBoundaryTest",
+          "name": "test_final_account_query_callback_cannot_release_or_commit_stale_consent with data set \"withdraw account\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentBoundaryTest",
+          "name": "test_final_account_query_callback_cannot_release_or_commit_stale_consent with data set \"withdraw credential\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentBoundaryTest",
+          "name": "test_final_account_query_callback_cannot_release_or_commit_stale_consent with data set \"withdraw recipient\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentBoundaryTest",
+          "name": "test_final_account_query_callback_cannot_release_or_commit_stale_consent with data set \"withdraw purpose\"",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentBoundaryTest",
+          "name": "test_final_account_query_callback_cannot_release_or_commit_stale_consent with data set \"withdraw graph\"",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentBoundaryTest",
+          "name": "test_same_saved_state_model_cannot_be_refreshed_to_a_different_intended_revision",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentBoundaryTest",
+          "name": "test_revoked_principal_and_disabled_customer_access_cannot_read_or_change_preferences",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_reserved_identity_across_object_kinds_is_refused_on_full_valid_dependencies with data set \"table name as trigger\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_reserved_identity_across_object_kinds_is_refused_on_full_valid_dependencies with data set \"complete table and same-name foreign trigger\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_reserved_identity_across_object_kinds_is_refused_on_full_valid_dependencies with data set \"guard name as table\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_reserved_identity_across_object_kinds_is_refused_on_full_valid_dependencies with data set \"guard name as index\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_reserved_identity_across_object_kinds_is_refused_on_full_valid_dependencies with data set \"dictionary case/accent alias\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set \"missing users\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set \"missing accounts\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set \"missing owners\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set \"account column drift\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set \"missing account identity key\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set \"missing user email key\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set \"missing account retention guard\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set \"missing user discovery guard\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set \"missing owner retention guard\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set \"foreign-key enforcement disabled\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set \"temporary users\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set \"temporary accounts\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set \"temporary owners\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_final_framework_ddl_callback_cannot_record_a_missing_earlier_guard with data set \"earlier own guard\"",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_final_framework_ddl_callback_cannot_record_a_missing_earlier_guard with data set \"retained account dependency guard\"",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_terminal_container_policy_resolution_cannot_commit_outdated_grant",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentAdmissionTest",
+          "name": "test_terminal_runtime_callback_cannot_change_notice_after_configuration_check",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentMigrationTest",
+          "name": "test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set \"after DDL step 1\"",
+          "assertions": 11,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentMigrationTest",
+          "name": "test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set \"after DDL step 2\"",
+          "assertions": 11,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentMigrationTest",
+          "name": "test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set \"after DDL step 3\"",
+          "assertions": 11,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentMigrationTest",
+          "name": "test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set \"after DDL step 4\"",
+          "assertions": 11,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentMigrationTest",
+          "name": "test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set \"after DDL step 5\"",
+          "assertions": 11,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentMigrationTest",
+          "name": "test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set \"after DDL step 6\"",
+          "assertions": 11,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentMigrationTest",
+          "name": "test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set \"after DDL step 7\"",
+          "assertions": 11,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentMigrationTest",
+          "name": "test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set \"after DDL step 8\"",
+          "assertions": 11,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentMigrationTest",
+          "name": "test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set \"after DDL step 9\"",
+          "assertions": 11,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentMigrationTest",
+          "name": "test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set \"after DDL step 10\"",
+          "assertions": 11,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentMigrationTest",
+          "name": "test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set \"after DDL step 11\"",
+          "assertions": 11,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentMigrationTest",
+          "name": "test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set \"after DDL step 12\"",
+          "assertions": 11,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentMigrationTest",
+          "name": "test_operational_rollback_refuses_before_queries_and_keeps_policy_choice_history_and_repository_record",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentMigrationTest",
+          "name": "test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object with data set \"extra index\"",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentMigrationTest",
+          "name": "test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object with data set \"extra column\"",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentMigrationTest",
+          "name": "test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object with data set \"unexpected trigger\"",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentMigrationTest",
+          "name": "test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object with data set \"missing prefix trigger\"",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentMigrationTest",
+          "name": "test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object with data set \"missing final recorded trigger\"",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentMigrationTest",
+          "name": "test_foreign_or_drifted_storage_refuses_without_adopting_or_dropping_any_object with data set \"temporary shadow\"",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerConsentMigrationTest",
+          "name": "test_direct_sql_cannot_rewrite_delete_replace_or_rebind_retained_graph",
+          "assertions": 10,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionLazyBoundaryCanaryTest",
+          "name": "test_late_primary_resolver_cannot_release_confirmation_after_policy_withdrawal",
+          "assertions": 4,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "path": "source-boundaries-native.xml",
+      "tests": 7,
+      "passed": 7,
+      "skipped": 0,
+      "assertions": 90,
+      "cases": [
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionSourceBoundaryTest",
+          "name": "test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set \"send positive\"",
+          "assertions": 15,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionSourceBoundaryTest",
+          "name": "test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set \"send ambiguous\"",
+          "assertions": 15,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionSourceBoundaryTest",
+          "name": "test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set \"inspect positive\"",
+          "assertions": 16,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionSourceBoundaryTest",
+          "name": "test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set \"inspect ambiguous\"",
+          "assertions": 16,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionSourceBoundaryTest",
+          "name": "test_same_primary_commit_reopen_refuses_without_rolling_back_the_foreign_transaction",
+          "assertions": 12,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionSourceBoundaryTest",
+          "name": "test_replacement_primary_transaction_remains_owned_by_its_caller",
+          "assertions": 10,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionSourceBoundaryTest",
+          "name": "test_raw_transaction_without_a_framework_owner_is_refused_before_any_attempt",
+          "assertions": 6,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "path": "carry-unchanged-final-native.xml",
+      "tests": 6,
+      "passed": 6,
+      "skipped": 0,
+      "assertions": 37,
+      "cases": [
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_single_positive_attempt_is_committed_before_adapter_and_is_never_sent_again",
+          "assertions": 12,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_late_credential_withdrawal_after_positive_receipt_cannot_confirm",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_terminal_adapter_policy_callback_cannot_release_confirmation",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_terminal_framework_query_withdrawal_cannot_release_positive_receipt",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionTest",
+          "name": "test_customer_policy_disabled_by_adapter_cannot_release_receipt_or_private_status",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\CustomerSuppressionLazyBoundaryCanaryTest",
+          "name": "test_late_primary_resolver_cannot_release_confirmation_after_policy_withdrawal",
+          "assertions": 4,
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "intermediateReceiptsExcluded": [
+    "runtime-carry-sqlite",
+    "runtime-carry-depth-sqlite",
+    "source-boundaries-initial-sqlite",
+    "intermediate-unchanged-sqlite",
+    "intermediate-unchanged-native"
+  ],
+  "unrecordedSetupFailure": "Direct symlinked package binary loaded original Composer autoload; copied wrapper used for all recorded predecessor and final runs.",
+  "externalProviderCalls": 0,
+  "realRecipients": 0,
+  "scope": "Focused author evidence; parent exact composition and independent review required; no native8.4 or full acceptance."
+}
