@@ -7,6 +7,7 @@ use App\Domain\Contracts\ContractIssuancePolicy;
 use App\Domain\Contracts\ContractRenderProfile;
 use App\Domain\Contracts\ContractRenderProfileRegistry;
 use App\Domain\Contracts\TcpdfContractRenderer;
+use Composer\InstalledVersions;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Tests\Support\ContractRendererFixtures;
@@ -21,12 +22,15 @@ class ContractRenderProfileRegistryTest extends TestCase
     public function test_retained_v1_metadata_hash_and_real_pdf_bytes_are_identical_to_before_registry(): void
     {
         $retained = $this->retained();
-        $profile = ContractRenderProfile::current();
+        $profile = ContractRenderProfileRegistry::metadata('test-buyer-pdf-v1');
         $this->assertSame($retained['profile'], $profile);
         $this->assertSame($retained['profile_hash'], ContractRenderProfile::hash($retained['profile']));
         $this->assertSame($retained['profile'], ContractRenderProfileRegistry::metadata('test-buyer-pdf-v1'));
-        $this->assertSame(ContractIssuancePolicy::V1_CONTRACT, ContractIssuancePolicy::CONTRACT);
+        $this->assertSame(ContractIssuancePolicy::V2_CONTRACT, ContractIssuancePolicy::CONTRACT);
         $this->assertSame(ContractIssuancePolicy::V1_CONTRACT, ContractIssuancePolicy::validate($retained['profile']['issuance_policy']));
+        if (InstalledVersions::getReference('tecnickcom/tc-lib-pdf') !== 'c383bd3ac09164c3fd1a6ac7da8f5460d19e47e3') {
+            $this->expectException(ContractIssuanceException::class);
+        }
         $rendered = (new TcpdfContractRenderer)->render(ContractRendererFixtures::input(), $retained['profile']);
         $this->assertSame($retained['pdf_sha256'], $rendered->sha256);
         $this->assertSame($retained['size_bytes'], $rendered->sizeBytes);

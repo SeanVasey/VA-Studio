@@ -34,17 +34,17 @@ class TestContractProfileSuccessorTest extends TestCase
         return ContractRenderProfileRegistry::metadata('test-buyer-pdf-v2');
     }
 
-    public function test_current_profile_and_policy_stay_v1_and_its_retained_metadata_stays_exact(): void
+    public function test_current_profile_and_policy_select_v2_and_retained_v1_metadata_stays_exact(): void
     {
-        $this->assertSame('test-buyer-pdf-v1', ContractRenderProfile::VERSION);
-        $this->assertSame(ContractIssuancePolicy::V1_CONTRACT, ContractIssuancePolicy::CONTRACT);
+        $this->assertSame('test-buyer-pdf-v2', ContractRenderProfile::VERSION);
+        $this->assertSame(ContractIssuancePolicy::V2_CONTRACT, ContractIssuancePolicy::CONTRACT);
         $this->assertSame($this->v1()['profile'], ContractRenderProfile::validate($this->v1()['profile']));
         $this->assertSame($this->v1()['profile_hash'], ContractRenderProfile::hash($this->v1()['profile']));
         if ($this->successorRuntime()) {
+            $this->assertSame($this->v2(), ContractRenderProfile::current());
+        } else {
             $this->expectException(ContractIssuanceException::class);
             ContractRenderProfile::current();
-        } else {
-            $this->assertSame($this->v1()['profile'], ContractRenderProfile::current());
         }
     }
 

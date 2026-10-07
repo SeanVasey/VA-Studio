@@ -22,7 +22,7 @@ final class ContractIssuancePolicy
         'lease_seconds' => 300, 'max_attempts' => 5, 'retry_seconds' => 60,
     ];
 
-    public const CONTRACT = self::V1_CONTRACT;
+    public const CONTRACT = self::V2_CONTRACT;
 
     private const RETAINED_POLICIES = [
         'test-contract-issuance-v1' => self::V1_CONTRACT,
