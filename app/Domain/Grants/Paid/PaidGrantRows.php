@@ -46,6 +46,8 @@ final class PaidGrantRows
 
     private bool $committed = false;
 
+    private ?CurrentRows $sourceReader = null;
+
     public function __construct()
     {
         $this->application = app();
@@ -117,17 +119,38 @@ final class PaidGrantRows
         PaidGrantException::require(! $this->ended && ! $this->finished && $this->connection->transactionLevel() === 1 && $this->primary->inTransaction());
     }
 
-    /** After the producer's LAST proof only: releasing this older marker expires its younger marker. */
-    public function finish(): void
+    /** Prove the earliest frame after current/historical callbacks, before the younger producer anchor exists. */
+    public function admitSource(): CurrentRows
+    {
+        $this->assertCurrent();
+        PaidGrantException::require($this->sourceReader === null);
+        $this->proveMarker();
+        $this->sourceReader = new CurrentRows($this->primary, $this->driver);
+
+        return $this->sourceReader;
+    }
+
+    private function proveMarker(): void
     {
         $this->assertCurrent();
         try {
             $this->primary->exec('RELEASE SAVEPOINT '.$this->marker);
-            // Keep our final marker until actual commit so failed framework commits can
-            // still roll back this original frame without resolving a replacement PDO.
+            // Retain the original consumer frame for failure cleanup. Admission occurs
+            // before the producer anchor; releasing this older marker afterward would expire it.
             $this->primary->exec('SAVEPOINT '.$this->marker);
         } catch (Throwable) {
             throw new PaidGrantException;
+        }
+        $this->identityCurrent();
+    }
+
+    /** Once admitted, leave the producer's younger anchor intact through its final commit observer. */
+    public function finish(): void
+    {
+        $this->assertCurrent();
+        if ($this->sourceReader === null) {
+            // Metadata-only frames have no producer anchor and still prove their original frame.
+            $this->proveMarker();
         }
         $this->finished = true;
         $this->identityCurrent();
@@ -160,7 +183,7 @@ final class PaidGrantRows
     {
         $this->assertCurrent();
 
-        return new CurrentRows($this->primary, $this->driver);
+        return $this->sourceReader ?? new CurrentRows($this->primary, $this->driver);
     }
 
     public function identity(): PDO

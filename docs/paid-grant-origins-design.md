@@ -27,13 +27,14 @@ without promotions; this consumer does not expand that offer surface.
 
 ## Dependencies and typed source
 
-The current provisional producer is checkout
-`9f948b4eca4fe0ce0e91221afff920652fe3a21a`. Its source/locator bytes are unchanged
-from `ff4c6749692cc474fb81202b9554993f510350a9`, but the producer remains held for
-independent successor review. A newly executed autocommit-mint canary is red on
-9f: its retained reader must require the consumer's open physical/framework
-transaction. The producer owner is preparing that exact guard. No consumer approval
-can be bound to the held 9f merely because the public interface is stable.
+The executable preparation currently borrows a separate immutable snapshot of
+`f0a1615be0833804959662fad5d7a7a8e1389ee0`. It repairs the original 9f
+autocommit/transaction-continuity boundary, but later failed the genuine expired
+same-PDO lazy callback case. The producer's callback repair is frozen separately at
+`b6f1dfbb7b92cee5319eac79443b88bf24178ab2`, with independent review pending.
+Its additive committed-read receipt and the required T23 witness are still being
+implemented. Public signatures or local preparation results confer no dependency
+approval; the final consumer must bind exact reviewed successor bytes.
 
 T23 supplies a privately minted `ProductionCustomerPrincipal`, original session
 verification, current raw actor/account/origin proof, and historical verification
@@ -51,7 +52,10 @@ The producer contract is deliberately two step:
    authority, compare its stable user/account/origin ownership to the located
    original, then prelock
    `ProductionCustomerAccess::verifyHistoricalBinding(binding, CurrentRows)`.
-3. Call `ProductionPaidOrderSourceV1::lockedRead(locator, CurrentRows,
+3. Prove and release/renew the earliest consumer marker immediately after the
+   current/historical prelock, before the producer creates its younger anchor.
+   Capture one `CurrentRows` object, then immediately call
+   `ProductionPaidOrderSourceV1::lockedRead(locator, CurrentRows,
    prelockedHistoricalRaw)` on that same captured primary. The private,
    nonserializable producer object verifies the complete original order/review/
    basis/candidate/lines/attempt/intent/session/confirmed on-time payment graph.
@@ -59,8 +63,20 @@ The producer contract is deliberately two step:
    canonical source hashes and original evidence in the owned encrypted origin.
    Any evidence decryption or dependency resolution belongs before final raw reads.
 5. After all own writes, audits, policy/adapter callbacks and full consumer graph
-   comparisons, call `proveRetainedCurrent(CurrentRows)`, make the qualified raw
-   current-owner comparison, recheck pure policy flags and the captured transaction.
+   comparisons, make the current-owner comparison, then call
+   `proveRetainedCurrent(CurrentRows)` and recheck pure flags/frame. Consumer
+   completion must not release the older marker after source capture, because
+   SQLite also expires younger savepoints. The producer's final commit observer
+   must retain its original anchor through all ordinary committing callbacks.
+
+The separate proposed producer receipt is
+`committedReadReceipt(CurrentRows, int originalDeadlineNs)`. At most two opaque,
+one-use siblings bind the same original reader/source/frame/deadline. One closes
+the producer financial graph immediately after commit; the second closes it after
+response work and before first bytes. Neither an expired SourceV1 nor stored raw
+arrays can replace that receipt. Current preparation closes the owned origin and
+current owner after commit, but this producer receipt binding is unfinished and
+blocks final private-response/stream acceptance.
 
 Line evidence includes original producer/order/line/payment UUID/hash, provider
 payment/account/mode and receipt provenance, buyer verification binding and original

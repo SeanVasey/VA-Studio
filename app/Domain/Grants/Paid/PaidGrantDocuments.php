@@ -22,8 +22,10 @@ final class PaidGrantDocuments
     public function prepare(string $batchId, ProductionCustomerPrincipal $principal, User $actor): array
     {
         PaidGrantInput::uuid($batchId);
+        $deadline = PaidGrantDeadline::start(self::LEASE_SECONDS);
         $commands = new PaidGrantCommands;
         for ($lineNumber = 0; $lineNumber < 10; $lineNumber++) {
+            $deadline->proveCurrent();
             $claim = $commands->run($batchId, $principal, $actor, function (array $graph, PaidGrantRows $rows): array {
                 if ($graph['complete'] !== null) {
                     return ['done' => true];
@@ -47,7 +49,7 @@ final class PaidGrantDocuments
                 }
 
                 return ['done' => true];
-            });
+            }, $deadline);
             if (isset($claim['busy'])) {
                 return $claim['projection'];
             }
@@ -55,6 +57,7 @@ final class PaidGrantDocuments
                 break;
             }
             try {
+                $deadline->proveCurrent();
                 $input = PaidGrantRenderInput::fromOrigin($claim['body']);
                 $expected = (new PaidGrantText)->build($input);
                 $rendered = app(PaidGrantRendererProcess::class)->render($input, $claim['body']['profile']);
@@ -62,7 +65,8 @@ final class PaidGrantDocuments
                     && hash_equals($expected['text_digest'], $rendered->textDigest)
                     && hash_equals(CanonicalJson::hash($claim['body']['profile']), $rendered->profileHash));
                 $artifact = app(PaidGrantFiles::class)->store($claim['origin'], $claim['claim_id'], $claim['body']['source']['provenance'], $rendered);
-                (new PaidGrantAssets)->verify($claim['body']['assets']);
+                $deadline->proveCurrent();
+                (new PaidGrantAssets)->verify($claim['body']['assets'], $deadline->value());
                 $commands->run($batchId, $principal, $actor, function (array $graph, PaidGrantRows $rows) use ($claim, $artifact, $expected, $actor): array {
                     $line = $this->line($graph, $claim['origin']);
                     PaidGrantException::require($line['origin']['payload_hash'] === $claim['origin_hash'] && $line['body'] === $claim['body']
@@ -78,7 +82,7 @@ final class PaidGrantDocuments
                     $this->audit('paid_original.prepared', $graph, ['original_hash' => CanonicalJson::hash($manifest)], $actor);
 
                     return ['prepared' => true];
-                });
+                }, $deadline);
             } catch (Throwable $error) {
                 // Only this still-owned claim may become failed. Withdrawal/staleness never renews authority.
                 try {
@@ -89,7 +93,7 @@ final class PaidGrantDocuments
                         }
 
                         return [];
-                    });
+                    }, $deadline);
                 } catch (Throwable) {
                     // Retained lease/attempt remains truthful until a fresh authorized retry after expiry.
                 }
@@ -97,27 +101,27 @@ final class PaidGrantDocuments
             }
         }
 
-        return $this->complete($batchId, $principal, $actor);
+        return $this->complete($batchId, $principal, $actor, $deadline);
     }
 
-    private function complete(string $batchId, ProductionCustomerPrincipal $principal, User $actor): array
+    private function complete(string $batchId, ProductionCustomerPrincipal $principal, User $actor, PaidGrantDeadline $deadline): array
     {
         $commands = new PaidGrantCommands;
         $bundle = $commands->run($batchId, $principal, $actor, function (array $graph): array {
             PaidGrantException::require(count(array_filter($graph['lines'], fn (array $line): bool => $line['work']['state'] === 'complete')) === count($graph['lines']), 409);
 
             return $graph;
-        });
-        $deadline = hrtime(true) + 300_000_000_000;
+        }, $deadline);
         foreach ($bundle['lines'] as $line) {
             // Existing originals are exact restore-only. Missing bytes never create another render claim.
             app(PaidGrantFiles::class)->verify($line['manifest']['artifact']);
-            (new PaidGrantAssets)->verify($line['body']['assets'], $deadline);
-            PaidGrantException::require(hrtime(true) <= $deadline);
+            (new PaidGrantAssets)->verify($line['body']['assets'], $deadline->value());
+            $deadline->proveCurrent();
         }
 
         return $commands->run($batchId, $principal, $actor, function (array $graph, PaidGrantRows $rows) use ($bundle, $actor, $deadline): array {
-            PaidGrantException::require(hrtime(true) <= $deadline && $graph === $bundle, 409);
+            $deadline->proveCurrent();
+            PaidGrantException::require($graph === $bundle, 409);
             if ($graph['complete'] === null) {
                 $at = CarbonImmutable::now('UTC')->startOfSecond();
                 $manifest = ['schema_version' => 'paid-complete-order-v1', 'batch_hash' => $graph['batch']['payload_hash'],

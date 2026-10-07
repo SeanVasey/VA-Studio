@@ -2,7 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderLocatorV1;
+use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderSourceV1;
 use App\Domain\Contracts\ContractIssuanceException;
+use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTransport;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
@@ -13,6 +16,7 @@ use App\Domain\Grants\Paid\PaidGrantPolicy;
 use App\Domain\Grants\Paid\PaidGrantRecords;
 use App\Domain\Grants\Paid\PaidGrantRendererProcess;
 use App\Domain\Grants\Paid\PaidGrantRenderInput;
+use App\Domain\Grants\Paid\PaidGrantRows;
 use App\Domain\Grants\Paid\PaidGrants;
 use App\Domain\Grants\Paid\PaidGrantSchema;
 use App\Providers\ProductionCheckoutServiceProvider;
@@ -21,6 +25,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Schema;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\Process;
 use Tests\Support\FinalizationDatabaseMigrations;
@@ -39,7 +44,7 @@ final class PaidGrantSourceJourneyTest extends TestCase
     {
         $this->assertTrue(app()->environment('testing'));
         if (DB::getDriverName() === 'mysql') {
-            $this->assertSame('vaseyaudio_paid_grants', DB::getDatabaseName());
+            $this->assertSame(getenv('DB_DATABASE'), DB::getDatabaseName(), 'The externally selected disposable testing schema is required.');
         }
         $this->assertFileExists(self::DEPENDENCY.'/source-map.json', 'Exact provisional producer/identity fixture snapshot is required.');
         app('migrator')->path(self::DEPENDENCY.'/database/migrations');
@@ -110,6 +115,57 @@ final class PaidGrantSourceJourneyTest extends TestCase
         $this->assertSame('verified', $f['hosted']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId'])['paymentStatus']);
 
         return $f;
+    }
+
+    public function test_original_consumer_handoff_preserves_caller_writes_and_younger_actual_paid_source_anchor_until_commit(): void
+    {
+        $f = $this->paid();
+        $locator = ProductionPaidOrderLocatorV1::locate($f['order']['orderId']);
+        Schema::create('paid_consumer_probe', fn ($table) => $table->string('original_write'));
+        $rows = null;
+        DB::transaction(function () use ($f, $locator, &$rows): void {
+            $rows = new PaidGrantRows;
+            $access = app(ProductionCustomerAccess::class);
+            $authority = $access->lock($f['buyer']['principal'], $f['buyer']['user'], $rows->current());
+            $historical = $access->verifyHistoricalBinding($locator->historicalBuyerBinding(), $rows->current());
+            DB::table('paid_consumer_probe')->insert(['original_write' => 'BEFORE-SOURCE']);
+            $reader = $rows->admitSource();
+            $source = ProductionPaidOrderSourceV1::lockedRead($locator, $reader, $historical);
+            $this->assertSame($reader, $rows->current());
+            DB::table('paid_consumer_probe')->insert(['original_write' => 'AFTER-SOURCE']);
+            $access->proveCurrent($f['buyer']['principal'], $f['buyer']['user'], $reader, $authority);
+            $source->proveRetainedCurrent($reader);
+            $rows->finish();
+            // The supported producer's final commit observer must still be able to prove this anchor.
+            $source->proveRetainedCurrent($reader);
+            $this->assertSame(['BEFORE-SOURCE', 'AFTER-SOURCE'], DB::table('paid_consumer_probe')->pluck('original_write')->all());
+        });
+        $rows->assertCommitted();
+        $this->assertSame(['BEFORE-SOURCE', 'AFTER-SOURCE'], DB::table('paid_consumer_probe')->pluck('original_write')->all());
+        $this->assertDatabaseCount('paid_order_origins', 0);
+    }
+
+    public function test_genuine_current_authority_resolution_direct_commit_and_reopen_cannot_mint_paid_origin(): void
+    {
+        $f = $this->paid();
+        $fired = false;
+        $pdo = DB::connection()->getPdo();
+        app()->afterResolving(ProductionCustomerAccess::class, function () use (&$fired, $pdo): void {
+            if (! $fired && DB::transactionLevel() === 1) {
+                $fired = true;
+                $pdo->commit();
+                $pdo->beginTransaction();
+            }
+        });
+        try {
+            (new PaidGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+            $this->fail('Pre-source callback replaced the earliest consumer frame but minted an origin.');
+        } catch (PaidGrantException) {
+            $this->assertTrue($fired);
+        }
+        $this->assertDatabaseCount('paid_order_origins', 0);
+        $this->assertDatabaseCount('paid_grant_origins', 0);
+        $this->assertDatabaseCount('paid_document_work', 0);
     }
 
     public function test_a_different_actually_verified_customer_cannot_consume_original_buyer_payment(): void

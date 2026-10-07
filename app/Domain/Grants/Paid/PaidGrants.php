@@ -33,6 +33,7 @@ final class PaidGrants
     private function finalizeOwned(ProductionCustomerPrincipal $principal, User $actor, string $orderId): array
     {
         PaidGrantInput::uuid($orderId);
+        $deadline = PaidGrantDeadline::start();
         $this->outsideTransactions();
         $locator = ProductionPaidOrderLocatorV1::locate($orderId);
         $receipt = null;
@@ -49,8 +50,9 @@ final class PaidGrants
                 $original = $locator->historicalBuyerBinding();
                 $this->sameOwner($current, $original);
                 $historical = $access->verifyHistoricalBinding($original, $rows->current());
-                // The older consumer marker is never released/renewed between this capture and final source proof.
-                $source = ProductionPaidOrderSourceV1::lockedRead($locator, $rows->current(), $historical);
+                $reader = $rows->admitSource();
+                // No callback gap between original consumer admission and the younger producer capture.
+                $source = ProductionPaidOrderSourceV1::lockedRead($locator, $reader, $historical);
                 $lines = [];
                 for ($position = 1; $position <= $source->lineCount(); $position++) {
                     $line = $source->line($position);
@@ -108,6 +110,7 @@ final class PaidGrants
         }
         PaidGrantException::require($receipt instanceof PaidGrantReadReceipt);
         $receipt->proveClosed();
+        $deadline->proveCurrent();
 
         return $projection;
     }
@@ -185,8 +188,8 @@ final class PaidGrants
         }
         $receipt->proveLive();
         // Producer reproof does not resolve consumer authority; its public line extraction already occurred above.
-        $source->proveRetainedCurrent($rows->current());
         $access->proveCurrent($principal, $actor, $rows->current(), $authority);
+        $source->proveRetainedCurrent($rows->current());
         PaidGrantPolicy::provePure($policy, $rows->configuration, $rows->environment);
         $rows->finish();
     }
@@ -223,11 +226,13 @@ final class PaidGrants
     {
         return ['id' => $graph['batch']['public_id'], 'orderId' => $graph['payload']['order_id'], 'purpose' => 'paid-license-grant',
             'provenance' => $graph['payload']['provenance'], 'fulfilled' => $graph['complete'] !== null,
-            'lines' => array_map(fn (array $line): array => ['id' => $line['origin']['public_id'], 'position' => (int) $line['origin']['position'],
+            'lines' => array_map(fn (array $line): array => ['id' => $line['origin']['public_id'], 'originHash' => $line['origin']['payload_hash'], 'position' => (int) $line['origin']['position'],
                 'title' => $line['body']['source']['product']['title'], 'license' => $line['body']['disclosure'],
                 'declaredName' => $line['body']['source']['buyer_declarations']['legal_name'], 'assentedAt' => $line['body']['source']['assent']['accepted_at'],
+                'currency' => $line['body']['source']['amounts']['currency'], 'lineAmountMinor' => $line['body']['source']['line_amount_minor'], 'lineTaxMinor' => $line['body']['source']['line_tax_minor'],
                 'documentStatus' => $line['work']['state'], 'attempts' => (int) $line['work']['attempts'],
-                'files' => $graph['complete'] === null ? [] : array_map(fn (array $file): array => ['kind' => $file['role'], 'sha256' => $file['sha256'], 'sizeBytes' => $file['size_bytes']], $line['body']['assets']['files'])], $graph['lines'])];
+                'files' => $graph['complete'] === null ? [] : [['kind' => 'contract', 'sha256' => $line['manifest']['artifact']['pdf_hash'], 'sizeBytes' => $line['manifest']['artifact']['size_bytes']],
+                    ...array_map(fn (array $file): array => ['kind' => $file['role'], 'sha256' => $file['sha256'], 'sizeBytes' => $file['size_bytes']], $line['body']['assets']['files'])]], $graph['lines'])];
     }
 
     public function outsideTransactions(): void

@@ -25,7 +25,7 @@ final class PaidGrantSchemaRecoveryTest extends TestCase
         parent::setUp();
         $this->assertTrue(app()->environment('testing'));
         if (DB::getDriverName() === 'mysql') {
-            $this->assertSame('vaseyaudio_paid_grants', DB::getDatabaseName(), 'A dedicated synthetic paid-grant schema is required.');
+            $this->assertSame(getenv('DB_DATABASE'), DB::getDatabaseName(), 'The externally selected disposable testing schema is required.');
         } else {
             $this->assertSame(':memory:', DB::getDatabaseName());
         }

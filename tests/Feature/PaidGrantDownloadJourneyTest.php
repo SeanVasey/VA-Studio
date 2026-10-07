@@ -6,26 +6,26 @@ use App\Domain\Commerce\ProductionCheckout\ApproveExemptionAuthority;
 use App\Domain\Commerce\ProductionCheckout\HostedCheckout;
 use App\Domain\Commerce\ProductionCheckout\ProductionCheckout;
 use App\Domain\Commerce\ProductionCheckout\TaxExemptions;
-use App\Domain\Contracts\ContractIssuanceException;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTransport;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
 use App\Domain\Customers\ProductionIdentity\Notifications\WorkIdentityNotice;
-use App\Domain\Delivery\DeliveryException;
 use App\Domain\Grants\Paid\PaidGrantDocuments;
+use App\Domain\Grants\Paid\PaidGrantDownloads;
 use App\Domain\Grants\Paid\PaidGrantException;
-use App\Domain\Grants\Paid\PaidGrantFiles;
+use App\Domain\Grants\Paid\PaidGrantPrepareStream;
 use App\Domain\Grants\Paid\PaidGrantRecords;
-use App\Domain\Grants\Paid\PaidGrantRendererProcess;
 use App\Domain\Grants\Paid\PaidGrants;
-use App\Domain\Grants\Paid\PaidGrantSchema;
 use App\Providers\ProductionCheckoutServiceProvider;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\ProductionCheckoutFixtures;
@@ -35,7 +35,7 @@ use Tests\Support\QuoteFixtures;
 use Tests\TestCase;
 
 /** Actual SMTP-enrolled buyer + frozen synthetic paid source. No live payment/legal facts are certified. */
-final class PaidGrantDocumentJourneyTest extends TestCase
+final class PaidGrantDownloadJourneyTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
     use ProductionCheckoutJourneyFixture;
@@ -117,105 +117,126 @@ final class PaidGrantDocumentJourneyTest extends TestCase
         return $f;
     }
 
-    public function test_actual_claim_render_original_and_complete_order_are_idempotent_and_missing_original_is_restore_only(): void
+    private function complete(): array
     {
         $f = $this->retained();
-        $documents = new PaidGrantDocuments;
-        $complete = $documents->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
-        $this->assertTrue($complete['fulfilled']);
-        $this->assertSame('complete', $complete['lines'][0]['documentStatus']);
-        $this->assertSame(1, $complete['lines'][0]['attempts']);
-        $this->assertCount(2, $complete['lines'][0]['files']);
-        $before = $this->ownedRows();
-        $this->assertSame($complete, $documents->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']));
-        $this->assertSame($before, $this->ownedRows());
-        $manifest = PaidGrantRecords::decode((array) DB::table('paid_originals')->sole());
-        $path = Storage::disk('local')->path($manifest['artifact']['storage_path']);
-        $bytes = file_get_contents($path);
-        rename($path, $path.'.retained-away');
-        try {
-            $documents->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
-            $this->fail('A missing original must never cause a replacement claim or be reported available.');
-        } catch (ContractIssuanceException $error) {
-            $this->assertSame('original_unavailable', $error->reason);
-            $this->assertSame($before, $this->ownedRows());
-        } finally {
-            rename($path.'.retained-away', $path);
+        $f['batch'] = (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
+
+        return $f;
+    }
+
+    private function authorize(array $f, string $kind = 'master_wav'): array
+    {
+        return (new PaidGrantDownloads)->authorize($f['batch']['id'], $f['batch']['lines'][0]['id'],
+            ['requestKey' => (string) Str::uuid(), 'originHash' => $f['batch']['lines'][0]['originHash'], 'kind' => $kind, 'nonce' => bin2hex(random_bytes(32))],
+            $f['buyer']['principal'], $f['buyer']['user']);
+    }
+
+    public function test_exact_paid_master_and_original_pdf_are_one_attempt_each_with_token_free_bounded_status_and_consumed_replay_refusal(): void
+    {
+        $f = $this->complete();
+        $downloads = new PaidGrantDownloads;
+        $original = (array) DB::table('paid_originals')->sole();
+        foreach (['master_wav', 'contract'] as $kind) {
+            $input = ['requestKey' => (string) Str::uuid(), 'originHash' => $f['batch']['lines'][0]['originHash'], 'kind' => $kind, 'nonce' => bin2hex(random_bytes(32))];
+            $auth = $downloads->authorize($f['batch']['id'], $f['batch']['lines'][0]['id'], $input, $f['buyer']['principal'], $f['buyer']['user']);
+            $this->assertSame($auth, $downloads->authorize($f['batch']['id'], $f['batch']['lines'][0]['id'], $input, $f['buyer']['principal'], $f['buyer']['user']));
+            $path = $kind === 'master_wav' ? $f['catalog']['media']['master_wav']->storage_path : PaidGrantRecords::decode($original)['artifact']['storage_path'];
+            $expected = file_get_contents(Storage::disk('local')->path($path));
+            $transfer = $downloads->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user']);
+            $bytes = '';
+            $transfer->writeTo(function (string $chunk) use (&$bytes): void {
+                $bytes .= $chunk;
+            });
+            $this->assertSame($expected, $bytes);
+            $this->assertSame(hash('sha256', $expected), $transfer->sha256);
+            $this->assertSame(strlen($expected), $transfer->sizeBytes);
+            try {
+                $downloads->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user']);
+                $this->fail('A spent authorization cannot consume another attempt.');
+            } catch (PaidGrantException $error) {
+                $this->assertSame(409, $error->status);
+            }
+            $status = $downloads->status($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
+            $this->assertStringNotContainsString($auth['token'], json_encode($status, JSON_THROW_ON_ERROR));
+            $this->assertStringNotContainsString($path, json_encode($status, JSON_THROW_ON_ERROR));
         }
-        $this->assertSame($bytes, file_get_contents($path));
-        $this->assertSame($complete, $documents->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']));
-        $this->assertSame($before, $this->ownedRows());
+        $this->assertSame(2, $status['lines'][0]['attemptCount']);
+        $this->assertCount(2, $status['lines'][0]['history']);
+        $this->assertSame(['attempted', 'attempted'], array_column($status['lines'][0]['history'], 'status'));
+        $this->assertSame($original, (array) DB::table('paid_originals')->sole());
+        $this->assertDatabaseCount('paid_redemptions', 2);
         $this->assertDatabaseCount('license_grants', 0);
     }
 
-    public function test_failed_second_line_retains_first_original_without_any_activation_until_exact_fresh_retry(): void
+    public function test_actual_source_copy_withdrawal_cannot_consume_attempt_or_return_private_bytes(): void
     {
-        $f = $this->retained(true);
-        $second = Storage::disk('local')->path($f['second']['media']['master_wav']->storage_path);
-        $renders = 0;
-        $moved = false;
-        app()->afterResolving(PaidGrantRendererProcess::class, function () use ($second, &$renders, &$moved): void {
-            if (++$renders === 2) {
-                rename($second, $second.'.retained-away');
-                $moved = true;
+        $f = $this->complete();
+        $auth = $this->authorize($f);
+        $fired = false;
+        app()->instance(PaidGrantPrepareStream::class, new class($f['buyer']['user']->id, $fired) extends PaidGrantPrepareStream
+        {
+            public function __construct(private readonly int $userId, private bool &$fired) {}
+
+            protected function copyTarget(array $target, $destination, int $deadline): void
+            {
+                parent::copyTarget($target, $destination, $deadline);
+                $this->fired = true;
+                DB::table('users')->where('id', $this->userId)->update(['password' => Hash::make('Credential withdrawn while exact paid master copied')]);
             }
         });
         try {
-            (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
-            $this->fail('Incomplete physical deliverables cannot activate any line of a complete paid order.');
-        } catch (DeliveryException $error) {
-            $this->assertTrue($moved, $error->getMessage());
-            $this->assertSame('asset_unavailable', $error->reason);
-            $this->assertSame(['complete', 'failed'], DB::table('paid_document_work')->orderBy('id')->pluck('state')->all());
-            $this->assertDatabaseCount('paid_originals', 1);
-            $this->assertDatabaseCount('paid_fulfillments', 0);
-        } finally {
-            if ($moved) {
-                rename($second.'.retained-away', $second);
-            }
+            (new PaidGrantDownloads)->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user']);
+            $this->fail('A verified descriptor does not renew withdrawn owner authority.');
+        } catch (PaidGrantException $error) {
+            $this->assertTrue($fired);
+            $this->assertSame(403, $error->status);
         }
-        $first = (array) DB::table('paid_originals')->sole();
-        $firstBytes = (new PaidGrantFiles)->verify(PaidGrantRecords::decode($first)['artifact']);
-        $complete = (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
-        $this->assertTrue($complete['fulfilled']);
-        $this->assertCount(2, $complete['lines']);
-        $this->assertSame([1, 2], array_column($complete['lines'], 'attempts'));
-        $this->assertSame($first, (array) DB::table('paid_originals')->where('id', $first['id'])->sole());
-        $this->assertSame($firstBytes, (new PaidGrantFiles)->verify(PaidGrantRecords::decode($first)['artifact']));
-        $this->assertDatabaseCount('paid_originals', 2);
+        $this->assertDatabaseCount('paid_redemptions', 0);
+        $this->assertDatabaseCount('paid_originals', 1);
         $this->assertDatabaseCount('paid_fulfillments', 1);
     }
 
-    public function test_credential_withdrawal_during_real_render_cannot_publish_original_or_extend_claim_authority(): void
+    public function test_actual_final_commit_policy_withdrawal_refuses_stream_and_retains_truthful_consumed_attempt(): void
     {
-        $f = $this->retained();
+        $f = $this->complete();
+        $auth = $this->authorize($f);
         $fired = false;
-        app()->afterResolving(PaidGrantRendererProcess::class, function () use ($f, &$fired): void {
-            $fired = true;
-            DB::table('users')->where('id', $f['buyer']['user']->id)->update(['password' => Hash::make('Withdrawn while paid original renders')]);
+        Event::listen(TransactionCommitted::class, function () use (&$fired): void {
+            if (! $fired && DB::table('paid_redemptions')->count() === 1) {
+                $fired = true;
+                config(['paid-grants.rehearsal_enabled' => false]);
+            }
         });
         try {
-            (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
-            $this->fail('Original rendering does not renew the withdrawn buyer session.');
+            (new PaidGrantDownloads)->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user']);
+            $this->fail('A final commit callback cannot release a private stream after policy withdrawal.');
         } catch (PaidGrantException $error) {
-            $this->assertSame(403, $error->status);
             $this->assertTrue($fired);
+            $this->assertSame(403, $error->status);
         }
-        $work = (array) DB::table('paid_document_work')->sole();
-        $this->assertSame('claimed', $work['state']);
-        $this->assertSame(1, (int) $work['attempts']);
-        $this->assertDatabaseCount('paid_originals', 0);
-        $this->assertDatabaseCount('paid_fulfillments', 0);
-        $this->assertDatabaseCount('paid_grant_origins', 1);
+        $this->assertDatabaseCount('paid_redemptions', 1);
+        $this->assertDatabaseCount('paid_originals', 1);
     }
 
-    private function ownedRows(): array
+    public function test_held_transfer_rechecks_original_owner_before_first_byte_without_new_transaction_or_principal(): void
     {
-        $result = [];
-        foreach (array_keys(PaidGrantSchema::specs()) as $table) {
-            $result[$table] = DB::table($table)->orderBy('id')->get()->map(fn ($row): array => (array) $row)->all();
+        $f = $this->complete();
+        $auth = $this->authorize($f);
+        $transfer = (new PaidGrantDownloads)->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user']);
+        DB::table('users')->where('id', $f['buyer']['user']->id)->update(['password' => Hash::make('Credential withdrawn before paid response body')]);
+        $bytes = '';
+        try {
+            $transfer->writeTo(function (string $chunk) use (&$bytes): void {
+                $bytes .= $chunk;
+            });
+            $this->fail('The original response proof cannot renew the changed owner before bytes.');
+        } catch (PaidGrantException $error) {
+            $this->assertSame(403, $error->status);
         }
-
-        return $result;
+        $this->assertSame('', $bytes);
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse(DB::connection()->getPdo()->inTransaction());
+        $this->assertDatabaseCount('paid_redemptions', 1);
     }
 }

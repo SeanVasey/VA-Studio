@@ -18,9 +18,15 @@ use Throwable;
 /** Trusted owned commands share one current-buyer -> original-buyer -> producer -> owned-graph lock order. */
 final class PaidGrantCommands
 {
-    public function run(string $batchId, ProductionCustomerPrincipal $principal, User $actor, Closure $operation, ?int $observationDeadline = null): array
+    public function run(string $batchId, ProductionCustomerPrincipal $principal, User $actor, Closure $operation,
+        PaidGrantDeadline|int|null $observationDeadline = null, ?Closure $additionalSnapshots = null, ?Closure $captureRead = null): array
     {
         PaidGrantInput::uuid($batchId);
+        $deadline = $observationDeadline instanceof PaidGrantDeadline ? $observationDeadline : PaidGrantDeadline::start();
+        if (is_int($observationDeadline)) {
+            $deadline->shortenTo($observationDeadline);
+        }
+        $deadline->proveCurrent();
         $grants = new PaidGrants;
         $grants->outsideTransactions();
         $heldRows = null;
@@ -30,7 +36,7 @@ final class PaidGrantCommands
             app(ProductionCustomerAccess::class)->current($principal, $actor);
             $orderId = $this->locate($batchId, $principal->accountId);
             $locator = ProductionPaidOrderLocatorV1::locate($orderId);
-            $result = DB::transaction(function () use ($batchId, $principal, $actor, $operation, $locator, $grants, &$heldRows, &$receipt): array {
+            $result = DB::transaction(function () use ($batchId, $principal, $actor, $operation, $locator, $grants, $additionalSnapshots, &$heldRows, &$receipt): array {
                 $rows = new PaidGrantRows;
                 $heldRows = $rows;
                 $policy = app(PaidGrantPolicy::class)->capture();
@@ -40,7 +46,8 @@ final class PaidGrantCommands
                 $original = $locator->historicalBuyerBinding();
                 $grants->sameOwner($binding, $original);
                 $historical = $access->verifyHistoricalBinding($original, $rows->current());
-                $source = ProductionPaidOrderSourceV1::lockedRead($locator, $rows->current(), $historical);
+                $reader = $rows->admitSource();
+                $source = ProductionPaidOrderSourceV1::lockedRead($locator, $reader, $historical);
                 $sources = [];
                 for ($position = 1; $position <= $source->lineCount(); $position++) {
                     $sources[] = $source->line($position);
@@ -52,14 +59,18 @@ final class PaidGrantCommands
                 $result = $operation($graph, $rows);
                 PaidGrantException::require(is_array($result));
                 $expected = $grants->graph($batchId, $binding['account_id'], $rows);
-                $receipt = PaidGrantReadReceipt::capture($rows, $principal, $actor, $authority, $policy, $grants->snapshots($expected, $rows));
+                $snapshots = $additionalSnapshots === null ? [] : $additionalSnapshots($expected, $rows);
+                PaidGrantException::require(is_array($snapshots) && array_is_list($snapshots));
+                $receipt = PaidGrantReadReceipt::capture($rows, $principal, $actor, $authority, $policy, [...$grants->snapshots($expected, $rows), ...$snapshots]);
                 $grants->fence($principal, $actor, $access, $authority, $source, $policy, $expected, $rows, $receipt);
 
                 return $result;
             });
             PaidGrantException::require($receipt instanceof PaidGrantReadReceipt);
+            // Trusted transfer construction occurs before the terminal post-commit raw proof.
+            $captureRead?->__invoke($receipt);
             $receipt->proveClosed();
-            PaidGrantException::require($observationDeadline === null || hrtime(true) <= $observationDeadline);
+            $deadline->proveCurrent();
 
             return $result;
         } catch (IdentityException) {
