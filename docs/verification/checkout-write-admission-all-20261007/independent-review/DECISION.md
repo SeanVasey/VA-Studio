@@ -160,3 +160,80 @@ TMPDIR=<tmp> php -d memory_limit=1G -r '$GLOBALS["_composer_autoload_path"]=getc
    - Both review worktrees were removed with `git -C /home/user/VA-Studio worktree remove --force`.
 
 Raw outputs (ANSI stripped), JUnit and JSON snapshots are in `review-evidence/{red,green,base,native,M1..M5}/`. I wrote no throwaway test files.
+
+## Addendum 1: re-review of the condition commits
+
+Reviewer: the same independent security/architecture subagent (Claude), 2026-10-07. This is development review evidence. It is not Foundation CI, not release acceptance and not authorization for any live path. I did not commit or push anything.
+
+### A1.1 Reviewed source
+
+| Item | Value |
+| --- | --- |
+| Branch head reviewed | `8c30ce5b6bfc518c8e52b2016bdaf9b87e0c9561` (adds only this review record on top of `8917f305`) |
+| Delta assessed | `c70aae57..8c30ce5b`: `f4eb4a40` (C1), `5eb82c3f` (C2), `fe027fe3` (F-3), `8917f305` (F-4), `8c30ce5b` (review record) |
+| Executable change | `git diff --stat c70aae57 8c30ce5b -- app tests config routes bootstrap database` lists 4 files: `ApproveExemptionAuthority.php`, `HostedCheckout.php`, `TaxExemptions.php` (6 lines each) and `tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php` (+147/−21). |
+| Untouched | `config/`, `routes/`, `bootstrap/`, `database/`, `.github/`, `app/Providers`, `composer.*`, `package.json` and `phpunit.xml`: `git diff --stat` is empty. |
+| Frozen files | `CommandTransaction.php` sha256 `fd8fccde…394be8` and `OriginalCommitDispatcher.php` sha256 `ed529e8f…dcd372` are unchanged. `git diff --quiet ece5a9ee 8c30ce5b` passes for both. |
+| Implementer's evidence source | `fe027fe3`. `git diff fe027fe3 8c30ce5b -- app tests config routes bootstrap database .github` is empty, so their SQLite-family and native runs apply to this head's executable source. |
+
+### A1.2 Environment
+
+- One detached worktree: `VA_STUDIO_MAIN=/home/user/VA-Studio scripts/dev/mkworktree.sh /home/user/VA-Studio-review-admission2 8c30ce5b`.
+- PHP 8.4.26 and PHPUnit 12.5.34.
+- SQLite `:memory:`.
+- `public/build` was absent.
+- I used the same runner as §6, with a per-run `TMPDIR` in the session scratchpad.
+- I did **not** run native MySQL in this addendum (see A1.6).
+
+### A1.3 Decision
+
+**APPROVE WITH CONDITIONS carries to `8c30ce5b`, and C1 and C2 are closed.** F-3 and F-4 are closed as well. No condition remains open for this lane. The admission semantics did not change: the `app/` delta only renames a flag and changes its check. I found no new finding above Info.
+
+| Item | Status | Basis |
+| --- | --- | --- |
+| C1 (F-1, Medium) | **Closed** | The permanent Feature file now holds these cases, each asserting `write_source_changed`: basis role and MFA, authority role and MFA (data providers), and the NEW-intent committing capability closure. M1 turns 4 tests red and M3 turns 1 test red (A1.4). |
+| C2 (F-2, Low) | **Closed** | `TaxExemptions::qualify()` and `ApproveExemptionAuthority::approve()` use a dedicated `$inserted = $existing === []`. It is never reassigned, and the guard is `if ($inserted === true)`. `$created` stays the timestamp string. `HostedCheckout::prepare()` got the same rename and was already correct, so its semantics are unchanged. M6 (A1.4) shows the permanent suite now catches the F-2 failure mode, a NEW basis that installs no observer. |
+| F-3 (Low) | **Closed** | Every refusal pins its reason, and `assertRefused()` now takes a non-null `string`. A new test calls the staff capsule's `proveFresh()` directly inside the commit and requires `['authority','authority']` for the authoring and owner withdrawals. M5, which left the suite green at `c70aae57`, now gives 1 failure. Splitting the combined basis test also removes a latent by-reference `$active` interaction that I had not flagged. |
+| F-4 (Info) | **Closed** | README residual 3 now says the MFA requirement is `app()->isProduction()`, read from the container's `env` instance, which the frame does not track. I checked this against `AdminPanelProvider.php:77` and `CheckoutCommandFrame::rawBindings()/configuration()` (`config` and `db` instances, aliases, and the `app`/`database`/`production_checkout`/`production-customer-identity` parents). The wording is accurate. |
+| F-5, F-6, F-7 | Unchanged | Recorded as open items in README §4a. They are not widened here, and none is a condition of this lane. |
+
+### A1.4 Commands and results (SQLite, worktree at `8c30ce5b`)
+
+1. **Green.** The three files ran concurrently in separate processes:
+
+   | File | Exit | Result | Time |
+   | --- | --- | --- | --- |
+   | `tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php` | 0 | OK, 17 tests, 96 assertions | 74.3 s |
+   | `tests/Feature/ProductionCheckoutExemptionAuthorityTest.php` | 0 | OK, 11 tests, 50 assertions | 46.9 s |
+   | `tests/Feature/ProductionCheckoutJourneyTest.php` | 0 | OK, 7 tests, 81 assertions | 57.1 s |
+
+   These counts match the implementer's `conditions/sqlite-family` files. I summed that family's JUnit: 195 tests, 947 assertions, 0 errors, 0 failures and 8 skips, which matches their claim. I did not rerun the other 15 family files myself.
+2. **Mutations.** Each was applied with `sed` and run against the whole permanent Feature file only (no canaries). Each was reverted with `git checkout -- app`, and `git diff --quiet -- app` succeeded after every one.
+
+   | ID | Mutation | Result |
+   | --- | --- | --- |
+   | M1 | `CheckoutStaffWriteAdmission::open()` without `$plans->staff($actor->id, $staff)` | **exit 1, 4 failures** (17 tests / 84 assertions): basis@role, basis@mfa, authority@role, authority@mfa. Each failed with "A withdrawn NEW checkout write was admitted." At `c70aae57` the same mutation left the file green. |
+   | M3 | `CheckoutIntentAdmission::capture()` without `$plans->history($current['raw'])` | **exit 1, 1 failure** (17/92): `test_committing_capability_closure_refuses_new_intent_and_provider_io`. Expected `write_source_changed`, got `changed`: the intent committed and only `proveCreatable()` stopped provider I/O. Pinning the reason is what distinguishes the commit-time guard from that defence in depth. Green at `c70aae57`. |
+   | M5 | Staff `proveFresh()` without the authoring and owner checks | **exit 1, 1 failure** (17/95): the direct `proveFresh()` test got `admitted` instead of `authority`. Green at `c70aae57`. |
+   | M6 (new) | `TaxExemptions::qualify()` guard changed to `if ($inserted === "M6-never")`, so no NEW-basis observer is installed. This is the F-2 regression class. | **exit 1, 5 failures** (17/80): basis owner-delegation, basis offer, basis@role, basis@mfa, and the observer-pattern test. |
+
+   After the mutations, `git status --short` in the worktree showed only the untracked evidence folder and this file.
+
+Raw outputs (ANSI stripped), JUnit and the mutation diffs are in `review-evidence/addendum1/{green,M1,M3,M5,M6}/`.
+
+### A1.5 New findings
+
+| ID | Severity | Finding | Recommendation |
+| --- | --- | --- | --- |
+| A1-1 | Info | README §4a says `independent-review/DECISION.md` was "written by the reviewer and left untracked". It is tracked from `8c30ce5b`. | Correct the wording when this addendum is committed. |
+| A1-2 | Info | The direct `proveFresh()` test reads the private `CheckoutCommandCommitDispatcher::$admission` through `ReflectionProperty`. That is test-only coupling to a private name. It cannot pass vacuously: a rename throws `ReflectionException`, the test asserts `assertInstanceOf(CheckoutStaffWriteAdmission::class, …)`, and a frame without the observer leaves `$refusals` empty, which fails `assertSame(['authority','authority'], …)`. | None required. Revisit if F-6's consolidation renames the dispatcher fields. |
+| A1-3 | Info | Pinning `write_frame` for the owner-delegation and authoring withdrawals records that the frame's config snapshot pre-empts the capsule. M6 shows those cases still depend on the observer being installed, so the pin does not hide a missing capsule. | None. |
+
+### A1.6 Not reviewed in this addendum
+
+- **Native MySQL rerun.** I relied on the implementer's `conditions/native/` run (MySQL 8.4.11 on a private port 3422: 8 tests, 37 assertions, green on `fe027fe3`, which is executable-identical to this head). I checked that its JUnit names the 8 new or changed cases. I did not start a server, and the shared :3306 server was not touched.
+- **Everything in §5 still applies:** MySQL 8.0, hosted Foundation CI, the full PHP suite, route and provider registration, live providers, Paid252 composition, Pint and browser specs.
+
+### A1.7 Cleanup
+
+All mutations were reverted (`git diff --quiet -- app` succeeded), and no flag, registration or `app/` file differs from `8c30ce5b`. The review worktree `/home/user/VA-Studio-review-admission2` holds two uncommitted items for the caller to commit: this file and the untracked `review-evidence/addendum1/`.

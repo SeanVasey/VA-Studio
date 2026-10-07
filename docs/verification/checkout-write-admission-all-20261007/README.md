@@ -146,7 +146,7 @@ Native total: 12 tests, 72 assertions, all green. The other 8 tests in `Producti
 
 ## 4a. Independent review conditions (follow-up commits on this branch)
 
-The independent review of `2c3efc4e` (`independent-review/DECISION.md`, written by the reviewer and left untracked) returned APPROVE WITH CONDITIONS. Each item is closed in its own commit:
+The independent review of `2c3efc4e` (`independent-review/DECISION.md`, written by the reviewer and committed in `8c30ce5b`) returned APPROVE WITH CONDITIONS. Each item is closed in its own commit:
 
 | Item | Commit | Change | Evidence |
 | --- | --- | --- | --- |
@@ -194,3 +194,16 @@ The `CommandTransaction.php` and `OriginalCommitDispatcher.php` hashes are uncha
 6. **`proveCreatable()` ordering.** It runs after `requireGateway()` and before the provider `try`. Retries also run it. A refusal leaves no `uncertain` observation.
 7. **Residual.** §3 states the race that crosses the external call as open. Do not read this work as closing it.
 8. **Not covered.** Composition with Paid252 / receipt consumers beyond the unchanged receipt pair; MySQL 8.0; hosted Foundation CI; route/provider registration (root's step after review).
+
+## 4b. Re-review of the condition commits
+
+Addendum 1 in `independent-review/DECISION.md` (evidence in `review-evidence/addendum1/`)
+assessed `c70aae57..8c30ce5b`: APPROVE WITH CONDITIONS carries to `8c30ce5b` with C1, C2,
+F-3 and F-4 closed and nothing new above Info. The reviewer re-ran the three affected test
+files on SQLite (17/96, 11/50, 7/81), re-applied mutations M1 (4 failures), M3 (1), M5 (1)
+and a new M6 (basis observer never installed: 5 failures) against the permanent file, and
+confirmed the frozen c6 files and every non-test surface are unchanged. Info A1-1 (this
+README's "left untracked" wording) is corrected above; A1-2 and A1-3 record why the direct
+`proveFresh()` test and the pinned `write_frame` reasons cannot pass by accident. F-5, F-6
+and F-7 remain open items, not conditions.
+
