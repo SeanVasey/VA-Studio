@@ -1,0 +1,131 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-admission4/phpunit.xml
+
+.E..E.                                                              6 / 6 (100%)
+
+Time: 00:19.771, Memory: 98.00 MB
+
+There were 2 errors:
+
+1) Tests\ReviewProbe4\TerminalPostCommitProbeTest::test_probe@aftercommit/offer_framework_tx with data ('aftercommit', 'offer_framework_tx')
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 cannot VACUUM from within a transaction (Connection: sqlite, Database: :memory:, SQL: vacuum "main")
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Schema/SQLiteBuilder.php:116
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/WipeCommand.php:78
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/WipeCommand.php:53
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/symfony/console/Application.php:1094
+/home/user/VA-Studio/vendor/symfony/console/Application.php:356
+/home/user/VA-Studio/vendor/symfony/console/Application.php:195
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+/home/user/VA-Studio-review-admission4/tests/Support/FinalizationDatabaseMigrations.php:32
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:333
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:129
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:101
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1 cannot VACUUM from within a transaction
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:601
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:846
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Schema/SQLiteBuilder.php:116
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/WipeCommand.php:78
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/WipeCommand.php:53
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/symfony/console/Application.php:1094
+/home/user/VA-Studio/vendor/symfony/console/Application.php:356
+/home/user/VA-Studio/vendor/symfony/console/Application.php:195
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+/home/user/VA-Studio-review-admission4/tests/Support/FinalizationDatabaseMigrations.php:32
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:333
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:129
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:101
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\ReviewProbe4\TerminalPostCommitProbeTest::test_probe@committed/offer_framework_tx with data ('committed', 'offer_framework_tx')
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 cannot VACUUM from within a transaction (Connection: sqlite, Database: :memory:, SQL: vacuum "main")
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Schema/SQLiteBuilder.php:116
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/WipeCommand.php:78
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/WipeCommand.php:53
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/symfony/console/Application.php:1094
+/home/user/VA-Studio/vendor/symfony/console/Application.php:356
+/home/user/VA-Studio/vendor/symfony/console/Application.php:195
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+/home/user/VA-Studio-review-admission4/tests/Support/FinalizationDatabaseMigrations.php:32
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:333
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:129
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:101
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1 cannot VACUUM from within a transaction
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:601
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:846
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Schema/SQLiteBuilder.php:116
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/WipeCommand.php:78
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/WipeCommand.php:53
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/symfony/console/Application.php:1094
+/home/user/VA-Studio/vendor/symfony/console/Application.php:356
+/home/user/VA-Studio/vendor/symfony/console/Application.php:195
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+/home/user/VA-Studio-review-admission4/tests/Support/FinalizationDatabaseMigrations.php:32
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:333
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:129
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:101
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 6, Assertions: 12, Errors: 2.

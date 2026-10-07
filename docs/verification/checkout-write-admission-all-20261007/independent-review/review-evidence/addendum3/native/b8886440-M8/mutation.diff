@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php b/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php
+index efa039e6..d1e8afae 100644
+--- a/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php
++++ b/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php
+@@ -177,8 +177,6 @@ final class HostedCheckout
+             $this->access->proveCurrent($principal, $buyer, $rows->current, $access);
+             CheckoutException::require(config('production_checkout.fresh_checkout_enabled') === true, 'disabled', 503);
+             $fresh->prove();
+-            CheckoutIntentAdmission::reprove($rows, $access, $buyer, $fresh, $prepared['order'], $prepared['intent'],
+-                $prepared['current'], $prepared['selection'], $prepared['basis']);
+         });
+     }
+ 

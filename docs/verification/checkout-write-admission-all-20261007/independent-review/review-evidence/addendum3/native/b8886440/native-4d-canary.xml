@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Canary\ReproveCommitAdmissionCanaryTest" file="/home/user/VA-Studio-review-admission4/docs/verification/checkout-write-admission-all-20261007/conditions/codex-reprove-admission/canary/ReproveCommitAdmissionCanaryTest.php" tests="1" assertions="4" errors="0" failures="1" skipped="0" time="237.203683">
+    <testcase name="test_offer_withdrawn_in_the_reprove_commit_refuses_before_provider_create" file="/home/user/VA-Studio-review-admission4/docs/verification/checkout-write-admission-all-20261007/conditions/codex-reprove-admission/canary/ReproveCommitAdmissionCanaryTest.php" line="42" class="Tests\Canary\ReproveCommitAdmissionCanaryTest" classname="Tests.Canary.ReproveCommitAdmissionCanaryTest" assertions="4" time="237.203683">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Canary\ReproveCommitAdmissionCanaryTest::test_offer_withdrawn_in_the_reprove_commit_refuses_before_provider_create
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'CheckoutException:write_source_changed'
++'CheckoutException:changed'
+
+/home/user/VA-Studio-review-admission4/docs/verification/checkout-write-admission-all-20261007/conditions/codex-reprove-admission/canary/ReproveCommitAdmissionCanaryTest.php:72
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

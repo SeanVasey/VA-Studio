@@ -1,0 +1,238 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-admission/phpunit.xml
+
+[41;37mF[0m[41;37mF[0m[41;37mF[0m                                                                 3 / 3 (100%)
+
+Time: 00:14.053, Memory: 96.00 MB
+
+There were 3 failures:
+
+1) Tests\Canary\HostedIntentCommitAdmissionCanaryTest::test_committing_offer_deactivation_refuses_new_intent_and_provider_io
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &0 []
++Array &0 [
++    0 => Array &1 [
++        'params' => Array &2 [
++            'adaptive_pricing' => Array &3 [
++                'enabled' => false,
++            ],
++            'allow_promotion_codes' => false,
++            'automatic_tax' => Array &4 [
++                'enabled' => false,
++            ],
++            'cancel_url' => 'https://review.invalid/production/checkout/orders/8a5dd5b6-ac73-4840-8d2a-c5f5b566c9f6/return',
++            'client_reference_id' => '8a5dd5b6-ac73-4840-8d2a-c5f5b566c9f6',
++            'customer_creation' => 'if_required',
++            'expand' => Array &5 [
++                0 => 'line_items.data.price.product',
++            ],
++            'expires_at' => 1791387925,
++            'line_items' => Array &6 [
++                0 => Array &7 [
++                    'price_data' => Array &8 [
++                        'currency' => 'usd',
++                        'product_data' => Array &9 [
++                            'metadata' => Array &10 [
++                                'line_hash' => '884c63b0c1744f31881ce345b2f4fa6a9a4b099449d90cbdd4557cf1cd41b92a',
++                                'line_id' => '69027a6a-6f1f-4d4b-9224-0706888459fd',
++                            ],
++                            'name' => 'Synthetic quote recording — NONBINDING TEST FIXTURE',
++                        ],
++                        'unit_amount' => 4999,
++                    ],
++                    'quantity' => 1,
++                ],
++            ],
++            'metadata' => Array &11 [
++                'attempt_id' => '4407eacf-4a6d-41f0-ae19-4b9cc92e59c6',
++                'buyer_origin_id' => '29905b41-997e-4623-8d39-229605ad8dc6',
++                'funds_mode' => 'test',
++                'intent_id' => '0af38acb-b44b-4e43-8e54-cbdbf2e74b3f',
++                'order_hash' => '044dffa944577965bcb8c36e4103aa76c93a70ddb8d11256acecd6166b233710',
++                'order_id' => '8a5dd5b6-ac73-4840-8d2a-c5f5b566c9f6',
++                'producer' => 'production_checkout_v1',
++                'schema_version' => '1',
++            ],
++            'mode' => 'payment',
++            'payment_intent_data' => Array &12 [
++                'capture_method' => 'automatic',
++                'metadata' => Array &13 [
++                    'attempt_id' => '4407eacf-4a6d-41f0-ae19-4b9cc92e59c6',
++                    'buyer_origin_id' => '29905b41-997e-4623-8d39-229605ad8dc6',
++                    'funds_mode' => 'test',
++                    'intent_id' => '0af38acb-b44b-4e43-8e54-cbdbf2e74b3f',
++                    'order_hash' => '044dffa944577965bcb8c36e4103aa76c93a70ddb8d11256acecd6166b233710',
++                    'order_id' => '8a5dd5b6-ac73-4840-8d2a-c5f5b566c9f6',
++                    'producer' => 'production_checkout_v1',
++                    'schema_version' => '1',
++                ],
++            ],
++            'payment_method_types' => Array &14 [
++                0 => 'card',
++            ],
++            'success_url' => 'https://review.invalid/production/checkout/orders/8a5dd5b6-ac73-4840-8d2a-c5f5b566c9f6/return',
++        ],
++        'key' => 'va-production-checkout-v1-0af38acb-b44b-4e43-8e54-cbdbf2e74b3f',
++    ],
++]
+
+/home/user/VA-Studio-admission/docs/verification/checkout-write-admission-all-20261007/canaries/HostedIntentCommitAdmissionCanaryTest.php:56
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Canary\HostedIntentCommitAdmissionCanaryTest::test_committing_capability_closure_refuses_new_intent_and_provider_io
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &0 []
++Array &0 [
++    0 => Array &1 [
++        'params' => Array &2 [
++            'adaptive_pricing' => Array &3 [
++                'enabled' => false,
++            ],
++            'allow_promotion_codes' => false,
++            'automatic_tax' => Array &4 [
++                'enabled' => false,
++            ],
++            'cancel_url' => 'https://review.invalid/production/checkout/orders/212f06a0-a9c7-43fd-b15a-819394e485d0/return',
++            'client_reference_id' => '212f06a0-a9c7-43fd-b15a-819394e485d0',
++            'customer_creation' => 'if_required',
++            'expand' => Array &5 [
++                0 => 'line_items.data.price.product',
++            ],
++            'expires_at' => 1791387929,
++            'line_items' => Array &6 [
++                0 => Array &7 [
++                    'price_data' => Array &8 [
++                        'currency' => 'usd',
++                        'product_data' => Array &9 [
++                            'metadata' => Array &10 [
++                                'line_hash' => '3c4f25f90621e0342462641abb4726434ea1ea35e0f67848be3f1fc6079b7aa2',
++                                'line_id' => '58d0dc16-b388-430d-9617-6bfda424afa5',
++                            ],
++                            'name' => 'Synthetic quote recording — NONBINDING TEST FIXTURE',
++                        ],
++                        'unit_amount' => 4999,
++                    ],
++                    'quantity' => 1,
++                ],
++            ],
++            'metadata' => Array &11 [
++                'attempt_id' => '36a6614c-b106-49a1-a336-fa298ab7d7bd',
++                'buyer_origin_id' => 'f10fb563-0fec-477d-90c8-435115677a95',
++                'funds_mode' => 'test',
++                'intent_id' => '081ae152-3505-480a-8843-2928d32ecf99',
++                'order_hash' => '397fcec1222290b574d035ed735559b018a66d48bbbf71acccb4ea24bf005bd3',
++                'order_id' => '212f06a0-a9c7-43fd-b15a-819394e485d0',
++                'producer' => 'production_checkout_v1',
++                'schema_version' => '1',
++            ],
++            'mode' => 'payment',
++            'payment_intent_data' => Array &12 [
++                'capture_method' => 'automatic',
++                'metadata' => Array &13 [
++                    'attempt_id' => '36a6614c-b106-49a1-a336-fa298ab7d7bd',
++                    'buyer_origin_id' => 'f10fb563-0fec-477d-90c8-435115677a95',
++                    'funds_mode' => 'test',
++                    'intent_id' => '081ae152-3505-480a-8843-2928d32ecf99',
++                    'order_hash' => '397fcec1222290b574d035ed735559b018a66d48bbbf71acccb4ea24bf005bd3',
++                    'order_id' => '212f06a0-a9c7-43fd-b15a-819394e485d0',
++                    'producer' => 'production_checkout_v1',
++                    'schema_version' => '1',
++                ],
++            ],
++            'payment_method_types' => Array &14 [
++                0 => 'card',
++            ],
++            'success_url' => 'https://review.invalid/production/checkout/orders/212f06a0-a9c7-43fd-b15a-819394e485d0/return',
++        ],
++        'key' => 'va-production-checkout-v1-081ae152-3505-480a-8843-2928d32ecf99',
++    ],
++]
+
+/home/user/VA-Studio-admission/docs/verification/checkout-write-admission-all-20261007/canaries/HostedIntentCommitAdmissionCanaryTest.php:79
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Canary\HostedIntentCommitAdmissionCanaryTest::test_offer_withdrawn_after_intent_commit_before_first_create_refuses_provider_io
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &0 []
++Array &0 [
++    0 => Array &1 [
++        'params' => Array &2 [
++            'adaptive_pricing' => Array &3 [
++                'enabled' => false,
++            ],
++            'allow_promotion_codes' => false,
++            'automatic_tax' => Array &4 [
++                'enabled' => false,
++            ],
++            'cancel_url' => 'https://review.invalid/production/checkout/orders/584e27a0-1566-42de-80c7-3b3d615041df/return',
++            'client_reference_id' => '584e27a0-1566-42de-80c7-3b3d615041df',
++            'customer_creation' => 'if_required',
++            'expand' => Array &5 [
++                0 => 'line_items.data.price.product',
++            ],
++            'expires_at' => 1791387933,
++            'line_items' => Array &6 [
++                0 => Array &7 [
++                    'price_data' => Array &8 [
++                        'currency' => 'usd',
++                        'product_data' => Array &9 [
++                            'metadata' => Array &10 [
++                                'line_hash' => '4317c578803154dfcf171cbcb01ddf9653df0bf4ce258a6100d4f02a1f3c8011',
++                                'line_id' => '49c3bc3f-5cf0-4737-a306-54fcf1358ba6',
++                            ],
++                            'name' => 'Synthetic quote recording — NONBINDING TEST FIXTURE',
++                        ],
++                        'unit_amount' => 4999,
++                    ],
++                    'quantity' => 1,
++                ],
++            ],
++            'metadata' => Array &11 [
++                'attempt_id' => 'eb6823c7-44e8-4513-9efc-c1ee0e856ff8',
++                'buyer_origin_id' => '29dd2c0a-09a9-4c04-bb00-3be2b590ee74',
++                'funds_mode' => 'test',
++                'intent_id' => '3fd1245f-37d6-4ba8-9f77-aaacf9c5f01a',
++                'order_hash' => 'f60fbfac5e1a56a3b72ccbc452996093539c2b364c76da644a2602f4005d7e53',
++                'order_id' => '584e27a0-1566-42de-80c7-3b3d615041df',
++                'producer' => 'production_checkout_v1',
++                'schema_version' => '1',
++            ],
++            'mode' => 'payment',
++            'payment_intent_data' => Array &12 [
++                'capture_method' => 'automatic',
++                'metadata' => Array &13 [
++                    'attempt_id' => 'eb6823c7-44e8-4513-9efc-c1ee0e856ff8',
++                    'buyer_origin_id' => '29dd2c0a-09a9-4c04-bb00-3be2b590ee74',
++                    'funds_mode' => 'test',
++                    'intent_id' => '3fd1245f-37d6-4ba8-9f77-aaacf9c5f01a',
++                    'order_hash' => 'f60fbfac5e1a56a3b72ccbc452996093539c2b364c76da644a2602f4005d7e53',
++                    'order_id' => '584e27a0-1566-42de-80c7-3b3d615041df',
++                    'producer' => 'production_checkout_v1',
++                    'schema_version' => '1',
++                ],
++            ],
++            'payment_method_types' => Array &14 [
++                0 => 'card',
++            ],
++            'success_url' => 'https://review.invalid/production/checkout/orders/584e27a0-1566-42de-80c7-3b3d615041df/return',
++        ],
++        'key' => 'va-production-checkout-v1-3fd1245f-37d6-4ba8-9f77-aaacf9c5f01a',
++    ],
++]
+
+/home/user/VA-Studio-admission/docs/verification/checkout-write-admission-all-20261007/canaries/HostedIntentCommitAdmissionCanaryTest.php:97
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 3[0m[37;41m, Assertions: 9[0m[37;41m, Failures: 3[0m[37;41m.[0m

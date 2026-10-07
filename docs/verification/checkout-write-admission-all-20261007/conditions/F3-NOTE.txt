@@ -1,0 +1,16 @@
+F-3 evidence. Source: app/ tree of 5eb82c3f plus the F-3 version of
+tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php (committed with this note). SQLite.
+
+Reasons pinned (probed before pinning): fresh withdrawal on a NEW intent -> write_frame; capability
+closed after the intent commit -> changed (proveCreatable); authoring withdrawal on a NEW authority ->
+write_frame; owner-delegation withdrawal on a NEW basis -> write_frame; offer withdrawal on a NEW
+basis -> write_source_changed. write_frame comes from the frame's retained config snapshot, which runs
+before the capsule's proveFresh(); test_staff_capsule_fresh_admission_itself_refuses_authoring_and_owner_withdrawal
+calls proveFresh() directly inside the commit to prove the capsule's own check ('authority').
+
+The previous combined basis test shared one by-reference `$active` flag across loop iterations, so its
+second (offer) iteration also re-applied the owner withdrawal. It is split into a data-provider test.
+
+F3-green : 17 tests / 96 assertions, exit 0.
+F3-M5    : CheckoutStaffWriteAdmission::proveFresh() without the authoring and owner checks -> exit 1,
+           1 failure (the direct proveFresh test). Reverted with git checkout; git diff --quiet -- app succeeded.

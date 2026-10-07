@@ -1,0 +1,13 @@
+{
+    "case": "race",
+    "driver": "mysql",
+    "callbacks": 1,
+    "refused": "App\\Domain\\Commerce\\ProductionCheckout\\CheckoutException",
+    "provider_creates": 0,
+    "counts": {
+        "intent": 1,
+        "session": 0,
+        "observation": 0,
+        "payment": 0
+    }
+}

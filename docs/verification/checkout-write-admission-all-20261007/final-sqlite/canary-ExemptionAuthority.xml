@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Canary\ExemptionAuthorityCommitAdmissionCanaryTest" file="/home/user/VA-Studio-admission/docs/verification/checkout-write-admission-all-20261007/canaries/ExemptionAuthorityCommitAdmissionCanaryTest.php" tests="2" assertions="8" errors="0" failures="0" skipped="0" time="6.601775">
+    <testcase name="test_committing_owner_role_withdrawal_refuses_new_authority" file="/home/user/VA-Studio-admission/docs/verification/checkout-write-admission-all-20261007/canaries/ExemptionAuthorityCommitAdmissionCanaryTest.php" line="29" class="Tests\Canary\ExemptionAuthorityCommitAdmissionCanaryTest" classname="Tests.Canary.ExemptionAuthorityCommitAdmissionCanaryTest" assertions="4" time="3.450957"/>
+    <testcase name="test_committing_owner_mfa_withdrawal_refuses_new_authority" file="/home/user/VA-Studio-admission/docs/verification/checkout-write-admission-all-20261007/canaries/ExemptionAuthorityCommitAdmissionCanaryTest.php" line="37" class="Tests\Canary\ExemptionAuthorityCommitAdmissionCanaryTest" classname="Tests.Canary.ExemptionAuthorityCommitAdmissionCanaryTest" assertions="4" time="3.150818"/>
+  </testsuite>
+</testsuites>

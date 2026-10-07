@@ -1,0 +1,11 @@
+{
+    "armed": true,
+    "observed": false,
+    "admitted": true,
+    "after": 0,
+    "acted": 0,
+    "at_create": 1,
+    "driver": "mysql",
+    "error": null,
+    "provider_creates": 1
+}

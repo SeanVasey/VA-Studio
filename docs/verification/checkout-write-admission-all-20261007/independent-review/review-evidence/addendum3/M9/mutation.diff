@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionCheckout/CheckoutIntentAdmission.php b/app/Domain/Commerce/ProductionCheckout/CheckoutIntentAdmission.php
+index c121dbc6..859ed7a8 100644
+--- a/app/Domain/Commerce/ProductionCheckout/CheckoutIntentAdmission.php
++++ b/app/Domain/Commerce/ProductionCheckout/CheckoutIntentAdmission.php
+@@ -78,7 +78,7 @@ final class CheckoutIntentAdmission implements CheckoutCommitAdmission
+         $plans->row('intent', $intent['row']);
+         $plans->selector('intent', 'order_id = ?', [$orderId], 2, [$intent['row']]);
+         $plans->selector('session', 'intent_id = ?', [$intent['row']['id']], 2, []);
+-        $plans->selector('observation', 'intent_id = ?', [$intent['row']['id']], 129, $intent['observations']);
++        $plans->selector('observation', 'intent_id = ?', [$intent['row']['id']], 129, []);
+         $plans->selector('payment', 'intent_id = ?', [$intent['row']['id']], 2, []);
+ 
+         $admission = new self($plans, $fresh);

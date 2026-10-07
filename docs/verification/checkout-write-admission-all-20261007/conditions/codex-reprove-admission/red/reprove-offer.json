@@ -1,0 +1,8 @@
+{
+    "driver": "sqlite",
+    "acted": 1,
+    "refused": null,
+    "provider_creates": 1,
+    "sessions": 1,
+    "inactive_offers": 1
+}

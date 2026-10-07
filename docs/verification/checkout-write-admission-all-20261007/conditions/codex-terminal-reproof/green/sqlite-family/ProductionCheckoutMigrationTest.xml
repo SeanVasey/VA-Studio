@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionCheckoutMigrationTest" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutMigrationTest.php" tests="18" assertions="132" errors="0" failures="0" skipped="5" time="16.044803">
+    <testcase name="test_exact_installed_graph_repeats_without_writes_and_preserves_records" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutMigrationTest.php" line="24" class="Tests\Feature\ProductionCheckoutMigrationTest" classname="Tests.Feature.ProductionCheckoutMigrationTest" assertions="3" time="2.164752"/>
+    <testsuite name="Tests\Feature\ProductionCheckoutMigrationTest::test_exact_empty_prefix_resumes_only_missing_objects" tests="6" assertions="12" errors="0" failures="0" skipped="0" time="3.745449">
+      <testcase name="test_exact_empty_prefix_resumes_only_missing_objects with data set #0" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutMigrationTest.php" line="58" class="Tests\Feature\ProductionCheckoutMigrationTest" classname="Tests.Feature.ProductionCheckoutMigrationTest" assertions="2" time="0.498727"/>
+      <testcase name="test_exact_empty_prefix_resumes_only_missing_objects with data set #1" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutMigrationTest.php" line="58" class="Tests\Feature\ProductionCheckoutMigrationTest" classname="Tests.Feature.ProductionCheckoutMigrationTest" assertions="2" time="0.587757"/>
+      <testcase name="test_exact_empty_prefix_resumes_only_missing_objects with data set #2" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutMigrationTest.php" line="58" class="Tests\Feature\ProductionCheckoutMigrationTest" classname="Tests.Feature.ProductionCheckoutMigrationTest" assertions="2" time="0.630480"/>
+      <testcase name="test_exact_empty_prefix_resumes_only_missing_objects with data set #3" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutMigrationTest.php" line="58" class="Tests\Feature\ProductionCheckoutMigrationTest" classname="Tests.Feature.ProductionCheckoutMigrationTest" assertions="2" time="0.704511"/>
+      <testcase name="test_exact_empty_prefix_resumes_only_missing_objects with data set #4" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutMigrationTest.php" line="58" class="Tests\Feature\ProductionCheckoutMigrationTest" classname="Tests.Feature.ProductionCheckoutMigrationTest" assertions="2" time="0.666609"/>
+      <testcase name="test_exact_empty_prefix_resumes_only_missing_objects with data set #5" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutMigrationTest.php" line="58" class="Tests\Feature\ProductionCheckoutMigrationTest" classname="Tests.Feature.ProductionCheckoutMigrationTest" assertions="2" time="0.657365"/>
+    </testsuite>
+    <testcase name="test_foreign_reserved_namespace_refuses_before_writes" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutMigrationTest.php" line="81" class="Tests\Feature\ProductionCheckoutMigrationTest" classname="Tests.Feature.ProductionCheckoutMigrationTest" assertions="2" time="0.685773"/>
+    <testcase name="test_before_and_after_creation_failures_resume_exact_prefixes_without_changing_parent_rows_or_guards" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutMigrationTest.php" line="101" class="Tests\Feature\ProductionCheckoutMigrationTest" classname="Tests.Feature.ProductionCheckoutMigrationTest" assertions="72" time="1.200735"/>
+    <testcase name="test_populated_partial_installation_preserves_all_records_and_surviving_guards_before_refusal" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutMigrationTest.php" line="153" class="Tests\Feature\ProductionCheckoutMigrationTest" classname="Tests.Feature.ProductionCheckoutMigrationTest" assertions="3" time="1.784618"/>
+    <testcase name="test_interior_guard_gap_is_not_adopted_as_a_prefix" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutMigrationTest.php" line="181" class="Tests\Feature\ProductionCheckoutMigrationTest" classname="Tests.Feature.ProductionCheckoutMigrationTest" assertions="2" time="0.681070"/>
+    <testcase name="test_sqlite_duplicate_table_and_trigger_namespace_cannot_hide_a_foreign_marker" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutMigrationTest.php" line="200" class="Tests\Feature\ProductionCheckoutMigrationTest" classname="Tests.Feature.ProductionCheckoutMigrationTest" assertions="2" time="0.643708"/>
+    <testcase name="test_native_dictionary_accent_alias_is_rejected_before_creating_the_first_owned_table" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutMigrationTest.php" line="226" class="Tests\Feature\ProductionCheckoutMigrationTest" classname="Tests.Feature.ProductionCheckoutMigrationTest" assertions="0" time="0.797641">
+      <skipped/>
+    </testcase>
+    <testsuite name="Tests\Feature\ProductionCheckoutMigrationTest::test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl" tests="3" assertions="0" errors="0" failures="0" skipped="3" time="2.516753">
+      <testcase name="test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl with data set #0" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutMigrationTest.php" line="255" class="Tests\Feature\ProductionCheckoutMigrationTest" classname="Tests.Feature.ProductionCheckoutMigrationTest" assertions="0" time="0.774949">
+        <skipped/>
+      </testcase>
+      <testcase name="test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl with data set #1" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutMigrationTest.php" line="255" class="Tests\Feature\ProductionCheckoutMigrationTest" classname="Tests.Feature.ProductionCheckoutMigrationTest" assertions="0" time="0.950588">
+        <skipped/>
+      </testcase>
+      <testcase name="test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl with data set #2" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutMigrationTest.php" line="255" class="Tests\Feature\ProductionCheckoutMigrationTest" classname="Tests.Feature.ProductionCheckoutMigrationTest" assertions="0" time="0.791216">
+        <skipped/>
+      </testcase>
+    </testsuite>
+    <testcase name="test_native_unowned_stored_routine_reference_refuses_before_any_owned_ddl" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutMigrationTest.php" line="281" class="Tests\Feature\ProductionCheckoutMigrationTest" classname="Tests.Feature.ProductionCheckoutMigrationTest" assertions="0" time="0.879955">
+      <skipped/>
+    </testcase>
+    <testcase name="test_final_assertion_interruption_and_repository_log_uncertainty_retry_without_duplicate_bookkeeping" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutMigrationTest.php" line="309" class="Tests\Feature\ProductionCheckoutMigrationTest" classname="Tests.Feature.ProductionCheckoutMigrationTest" assertions="36" time="0.944348"/>
+  </testsuite>
+</testsuites>

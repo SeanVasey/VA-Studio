@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Canary\ReproveCommitAdmissionCanaryTest" file="/home/user/VA-Studio-review-admission4/docs/verification/checkout-write-admission-all-20261007/conditions/codex-reprove-admission/canary/ReproveCommitAdmissionCanaryTest.php" tests="1" assertions="6" errors="0" failures="0" skipped="0" time="164.667512">
+    <testcase name="test_offer_withdrawn_in_the_reprove_commit_refuses_before_provider_create" file="/home/user/VA-Studio-review-admission4/docs/verification/checkout-write-admission-all-20261007/conditions/codex-reprove-admission/canary/ReproveCommitAdmissionCanaryTest.php" line="42" class="Tests\Canary\ReproveCommitAdmissionCanaryTest" classname="Tests.Canary.ReproveCommitAdmissionCanaryTest" assertions="6" time="164.667512"/>
+  </testsuite>
+</testsuites>
