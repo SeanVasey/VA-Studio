@@ -1,0 +1,13 @@
+{
+  "docs/verification/cloud-identity-historical-independent-20261007/admission-probe-correction/HistoricalNestedConfigurationAdmissionCanaryTest.php": "3de75325f858953b2927026703dc1d006eb7005d2e62c1ef210e2f812ddd79e2",
+  "docs/verification/cloud-identity-historical-independent-20261007/admission-probe-correction/README.md": "7c4bff679131755d315e97ed1bae22bf06a0d32f1e68f9bbe088a0c5676f342b",
+  "docs/verification/cloud-identity-historical-independent-20261007/admission-probe-correction/nested-snapshot.json": "08dea67ed9ad7af047a7961539b16841a05618114607f6f07a78723a4c13e02f",
+  "docs/verification/cloud-identity-historical-independent-20261007/admission-probe-correction/original-red.txt": "a45136e3f7cda63a590f904e40d9badf52bcd0351660faced5973b987e79ef4b",
+  "docs/verification/cloud-identity-historical-independent-20261007/admission-probe-correction/original-red.xml": "a808bb175254abd450e9de7b4e50066d22d000be6259355f4198288f7f2c4090",
+  "docs/verification/cloud-identity-historical-independent-20261007/admission-probe-correction/pint-format.txt": "3c5ae2e2e1b9438dba3939bc7d351920916e84e9c2b5d76450af46fbf7b2496e",
+  "docs/verification/cloud-identity-historical-independent-20261007/admission-probe-correction/pint-initial.txt": "4aa1985a52413e545cac63b69df7a64a80a6d54a0326a9f120620ed5deb06ef5",
+  "docs/verification/cloud-identity-historical-independent-20261007/admission-probe-correction/preformat-original-red.txt": "b0074bf2968edc689957ab30e496f453ed09919276877e0f72cfd173cb950570",
+  "docs/verification/cloud-identity-historical-independent-20261007/admission-probe-correction/preformat-original-red.xml": "35684a959efadf0e059765a95807b5ab99cc53112a6e266cb48a6335099dc11c",
+  "docs/verification/cloud-identity-historical-independent-20261007/admission-probe-correction/receipt.json": "a7afab52c81e8a19bc4f3fae84e197ce85e5408915b1aef5df8a54b26cfecc18",
+  "docs/verification/cloud-identity-historical-independent-20261007/admission-probe-correction/sqlite-selection.xml": "339599efaec8f2b9e064f9287cdc8fc0beeacf0b100d0c693bdb73fedd701595"
+}

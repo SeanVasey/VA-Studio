@@ -1,0 +1,5 @@
+# Admission-aware successor probe
+
+The immutable c02f3d96 original probe/red remains in its parent folder. That original catches refusal only around closed proof, so correct early witness admission would show as a harness error. This successor changes only the catch boundary to cover capture plus closure, renames the private test classes, and formats indentation. Its three substantive assertions remain zero callback invocations, retained fixture 9123 and no active transaction. Safe capture refusal and safe callback-free closure are both permitted; successful closure after callback writes still fails.
+
+The formatted exact successor probe was executed against unchanged dc17/e6 and reproduces the same genuine 1 failure / 3 assertions, zero errors/skips and 60 callbacks. Preformat execution receipts are historical whitespace-only source; final original-red files bind the formatted probe SHA256 in receipt.json. The first Pint command used an absent vendor/bin path; its shell error is retained separately and corrected using the locked PHP Pint executable. No product behavior is attributed to that command error.
