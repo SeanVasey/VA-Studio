@@ -13,7 +13,9 @@ for d in "$main"/vendor/*; do
   ln -s "$d" "$dest/vendor/$n"
 done
 mkdir -p "$dest/vendor/composer"
-cp "$main"/vendor/composer/installed.json "$main"/vendor/composer/installed.php "$dest/vendor/composer/"
+cp "$main"/vendor/composer/installed.json "$main"/vendor/composer/installed.php \
+   "$main"/vendor/composer/InstalledVersions.php "$dest/vendor/composer/"
+ln -s "$main/vendor/bin" "$dest/vendor/bin"
 cp "$main/.env" "$dest/.env"
 (cd "$dest" && COMPOSER_ALLOW_SUPERUSER=1 composer dump-autoload -q 2>&1 | grep -v "Ambiguous class" || true)
 echo "worktree $dest at $(git -C "$dest" rev-parse HEAD)"
