@@ -17,10 +17,13 @@ use App\Domain\Commerce\ProductionPreparation\ReadProductionTrackPreparationPack
 use App\Domain\Commerce\ProductionPreparation\SaveProductionTrackPreparationPacket;
 use App\Support\CanonicalJson;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\ValidationException;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\ProductionTrackPreparationFixtures as Fixture;
@@ -166,6 +169,75 @@ class ProductionTrackPreparationPacketTest extends TestCase
             $this->fail('Key request changed.');
         } catch (ValidationException) {
             $this->assertSame($before, Fixture::rows());
+        }
+    }
+
+    public function test_packet_created_after_historical_miss_replays_exact_retained_rows_without_new_encryption(): void
+    {
+        $f = Fixture::prepared();
+        $winner = null;
+        $before = null;
+        $armed = true;
+        Event::listen(TransactionCommitted::class, function () use ($f, &$armed, &$winner, &$before): void {
+            if (! $armed) {
+                return;
+            }
+            $armed = false;
+            $this->assertSame(0, DB::transactionLevel());
+            $this->assertDatabaseCount(PacketEvidence::PACKETS, 0);
+            $winner = app(SaveProductionTrackPreparationPacket::class)->applyReviewed($f['capture'], $f['actor']);
+            $before = Fixture::rows();
+            $encrypter = Mockery::mock(Crypt::getFacadeRoot())->makePartial();
+            $encrypter->shouldNotReceive('encryptString');
+            Crypt::swap($encrypter);
+        });
+        $same = app(SaveProductionTrackPreparationPacket::class)->applyReviewed($f['capture'], $f['actor']);
+        $this->assertNotNull($winner);
+        $this->assertSame($winner->getAttributes(), $same->getAttributes());
+        $this->assertSame($before, Fixture::rows());
+        $this->assertDatabaseCount(PacketEvidence::PACKETS, 1);
+        $this->assertDatabaseCount(PacketEvidence::LINES, 1);
+        $this->assertSame(1, DB::table('audit_events')->where('action', 'commerce.production_preparation.packet_retained')->count());
+        Http::assertNothingSent();
+    }
+
+    public function test_changed_request_after_historical_miss_cannot_recover_the_winner(): void
+    {
+        $f = Fixture::prepared();
+        $capture = $f['capture'];
+        $capture['request']['items'][0]['offerId']++;
+        unset($capture['signature']);
+        $capture['signature'] = PacketEvidence::signature('production-packet-review-v1', $capture);
+        $before = null;
+        $armed = true;
+        Event::listen(TransactionCommitted::class, function () use ($f, &$armed, &$before): void {
+            if (! $armed) {
+                return;
+            }
+            $armed = false;
+            $this->assertDatabaseCount(PacketEvidence::PACKETS, 0);
+            app(SaveProductionTrackPreparationPacket::class)->applyReviewed($f['capture'], $f['actor']);
+            $before = Fixture::rows();
+        });
+        try {
+            app(SaveProductionTrackPreparationPacket::class)->applyReviewed($capture, $f['actor']);
+            $this->fail('Changed request recovered the concurrent winner.');
+        } catch (ValidationException) {
+            $this->assertNotNull($before);
+            $this->assertSame($before, Fixture::rows());
+        }
+    }
+
+    public function test_peer_actor_cannot_replay_the_signed_creator_capture(): void
+    {
+        $f = Fixture::prepared(true);
+        $before = Fixture::rows();
+        try {
+            app(SaveProductionTrackPreparationPacket::class)->applyReviewed($f['capture'], $f['reviewer']);
+            $this->fail('Peer actor recovered a creator capture.');
+        } catch (AuthorizationException) {
+            $this->assertSame($before, Fixture::rows());
+            $this->assertNull(app(ReadProductionTrackPreparationPacket::class)->recover($f['key'], $f['reviewer']));
         }
     }
 
