@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\DiscoverySitemapNamespaceAdmissionTest" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="0.391132">
+    <testcase name="test_native_foreign_table_local_unique_names_do_not_reserve_owned_constraint_names" file="/workspace/VA-Studio-discovery-schema-repair/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php" line="121" class="Tests\Feature\DiscoverySitemapNamespaceAdmissionTest" classname="Tests.Feature.DiscoverySitemapNamespaceAdmissionTest" assertions="3" time="0.391132"/>
+  </testsuite>
+</testsuites>

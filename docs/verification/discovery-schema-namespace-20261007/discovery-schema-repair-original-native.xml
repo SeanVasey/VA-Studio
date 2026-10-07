@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\IndependentDiscovery\DiscoveryNativeNamespaceCanaryTest" file="/workspace/VA-Studio-discovery-schema-repair/docs/verification/cloud-discovery-independent-20261007/DiscoveryNativeNamespaceCanaryTest.php" tests="1" assertions="4" errors="0" failures="1" skipped="0" time="0.351012">
+    <testcase name="test_foreign_reserved_check_name_is_refused_before_any_owned_ddl" file="/workspace/VA-Studio-discovery-schema-repair/docs/verification/cloud-discovery-independent-20261007/DiscoveryNativeNamespaceCanaryTest.php" line="13" class="Tests\IndependentDiscovery\DiscoveryNativeNamespaceCanaryTest" classname="Tests.IndependentDiscovery.DiscoveryNativeNamespaceCanaryTest" assertions="4" time="0.351012">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\IndependentDiscovery\DiscoveryNativeNamespaceCanaryTest::test_foreign_reserved_check_name_is_refused_before_any_owned_ddl
+Foreign reserved CHECK identity must be refused before any earlier owned table or guard DDL.
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+     'tables' =&gt; Array &amp;1 [
+         0 =&gt; Array &amp;2 [
++            'TABLE_NAME' =&gt; 'dss_indep_discovery_sitemap_generations',
++            'TABLE_TYPE' =&gt; 'BASE TABLE',
++            'ENGINE' =&gt; 'InnoDB',
++        ],
++        1 =&gt; Array &amp;3 [
+             'TABLE_NAME' =&gt; 'dss_indep_foreign',
+             'TABLE_TYPE' =&gt; 'BASE TABLE',
+             'ENGINE' =&gt; 'InnoDB',
+         ],
+     ],
+-    'guards' =&gt; Array &amp;3 [],
++    'guards' =&gt; Array &amp;4 [
++        0 =&gt; Array &amp;5 [
++            'TRIGGER_NAME' =&gt; 'dss_indep_discovery_sitemap_generations_delete',
++            'EVENT_OBJECT_TABLE' =&gt; 'dss_indep_discovery_sitemap_generations',
++            'ACTION_STATEMENT' =&gt; 'BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Immutable discovery sitemap evidence'; END IF; END',
++        ],
++        1 =&gt; Array &amp;6 [
++            'TRIGGER_NAME' =&gt; 'dss_indep_discovery_sitemap_generations_insert',
++            'EVENT_OBJECT_TABLE' =&gt; 'dss_indep_discovery_sitemap_generations',
++            'ACTION_STATEMENT' =&gt; 'BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `dss_indep_discovery_sitemap_generations` WHERE id = NEW.id)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Immutable discovery sitemap evidence'; END IF; END',
++        ],
++        2 =&gt; Array &amp;7 [
++            'TRIGGER_NAME' =&gt; 'dss_indep_discovery_sitemap_generations_update',
++            'EVENT_OBJECT_TABLE' =&gt; 'dss_indep_discovery_sitemap_generations',
++            'ACTION_STATEMENT' =&gt; 'BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Immutable discovery sitemap evidence'; END IF; END',
++        ],
++    ],
+ ]
+
+/workspace/VA-Studio-discovery-schema-repair/docs/verification/cloud-discovery-independent-20261007/DiscoveryNativeNamespaceCanaryTest.php:52</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,44 @@
+{
+    "source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+    "server_version": "8.0.46-0ubuntu0.24.04.4",
+    "foreign_constraint": "dss_indep_discovery_sitemap_windows_bounds",
+    "caught": {
+        "class": "App\\Domain\\Catalog\\DiscoverySitemap\\SitemapException",
+        "code": "0",
+        "mysql_code": null
+    },
+    "owned_tables_created": [],
+    "foreign_before": {
+        "Table": "dss_indep_foreign",
+        "Create Table": "CREATE TABLE `dss_indep_foreign` (\n  `id` int NOT NULL,\n  PRIMARY KEY (`id`),\n  CONSTRAINT `dss_indep_discovery_sitemap_windows_bounds` CHECK ((`id` >= 0))\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    },
+    "foreign_after": {
+        "Table": "dss_indep_foreign",
+        "Create Table": "CREATE TABLE `dss_indep_foreign` (\n  `id` int NOT NULL,\n  PRIMARY KEY (`id`),\n  CONSTRAINT `dss_indep_discovery_sitemap_windows_bounds` CHECK ((`id` >= 0))\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    },
+    "foreign_rows": [
+        {
+            "id": 5
+        }
+    ],
+    "before": {
+        "tables": [
+            {
+                "TABLE_NAME": "dss_indep_foreign",
+                "TABLE_TYPE": "BASE TABLE",
+                "ENGINE": "InnoDB"
+            }
+        ],
+        "guards": []
+    },
+    "after": {
+        "tables": [
+            {
+                "TABLE_NAME": "dss_indep_foreign",
+                "TABLE_TYPE": "BASE TABLE",
+                "ENGINE": "InnoDB"
+            }
+        ],
+        "guards": []
+    }
+}
