@@ -1,0 +1,93 @@
+{
+  "reviewed_source": "ff0f7a85be397f017a227967058f745ceea3da28",
+  "composition": "e747d62a09304b7a6fa7d056cdc60e34dda478f4",
+  "composition_tree": "1d54cb74bc2d56fe03b7053c1a49092075a6313f",
+  "source_commits": [
+    "1969bbad995e1e978bf19fc809d5b39440d7d3ce",
+    "ff0f7a85be397f017a227967058f745ceea3da28"
+  ],
+  "author_evidence": "a4f9e63fdfbd72d781d0e97379235a0461a8ffad",
+  "original_evidence": "c0029cdee5d5445a7c801ce89ae3b3e09df2420c",
+  "historical_233_approval": "a82e36e5615751541633416a155a9f8ace48a6c3",
+  "files": {
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php": "02ca521c47701a4b47ca953e6e2a3657c36127e48aaeb8f3c1ca243504cc6ad7",
+    "tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php": "4fc733eaa93b9be30e675e82ab3b74a48eb1fdff932ab44ccf381bfb1b306b0a"
+  },
+  "carried_233": {
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantHttpIdentity.php": "cd394c089390021a46b34a7bf489a8a7f976b12ebd6fe84001f53ac57edd7217",
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantIdentity.php": "81a64ba3eb9a848cb9a70c2415f6b573043dc49d4af2a3d736aae9ab0044a2e8",
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantIdentityPolicy.php": "f58aeac35bc9c2d34a8d88b3a9c43afb48893e89be615a64c00fc587efe8cd4d",
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantLineage.php": "8648e8c095cb690e8c01128719d1556e20dfa2a323ad8f71524922e9b58df4bc",
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantBoundary.php": "5c50519c8fb5751bf777a883a63e8cecd295df469220e96634b3afa07d3bdbd6",
+    "app/Domain/Grants/Free/TestFreeGrantIdentity.php": "ce692a10970b7866a0eeba3a547d12aa4734c1544dad9ed655e95443c6927a30",
+    "app/Domain/Grants/Free/FreeGrants.php": "5a48da0ae2bb6e7e12d957547c2b6e30befa98aa65807d719dc5e48ca3715df2",
+    "app/Domain/Customers/ProductionCustomerAccess.php": "4f013b5114b8b8ee8cd53d42277368a215861b8c48a07672fd2337e4fc483eb4",
+    "app/Domain/Customers/ProductionIdentity/IdentityRows.php": "deb303101abe98ca505c43e34ab49cc636b56fed42e5b808044380108fdb42bd",
+    "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php": "6058e3e4ced2900e1ccc93bd9110691c041ad0c4ecafe2f0373d323ceb17cb90",
+    "tests/Support/ProductionIdentityFixture.php": "558b6269d305b7b213e4b8c102c7e9e117dfb8cce30c4c76a7520482609391b7"
+  },
+  "verified_author_artifacts": {
+    "docs/verification/production-free-http-parent-guard-20261007/ProductionFreeHttpNestedConfigurationCanaryTest.php": "112bc4275e272dc9bd5bac83a0128e66fa16662496f4cc7ec3c2ac6a9d65fea6",
+    "docs/verification/production-free-http-parent-guard-20261007/final/free-http-parent-original-marker-successor.txt": "d849d00d66038713820f8ae43eca34263bedf04f146a1bfd59b9437f4105fb3e",
+    "docs/verification/production-free-http-parent-guard-20261007/final/free-http-parent-original-marker-successor.xml": "f76cfd00491c697d47bef159e1938799cf85c4959bf50d34b5e89fd58e6532da",
+    "docs/verification/production-free-http-parent-guard-20261007/final/free-http-parent-successor-native-final.txt": "a58a6954d94ef297e194a7b0baaa219f48515a30b26e94fb12904ee49a5c17c2",
+    "docs/verification/production-free-http-parent-guard-20261007/final/free-http-parent-successor-native-final.xml": "7c961eb87e670df446d16322ccf007b69866c03743057f14299506672824f5b5",
+    "docs/verification/production-free-http-parent-guard-20261007/final/free-http-parent-successor-pint-final.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "docs/verification/production-free-http-parent-guard-20261007/final/free-http-parent-successor-pint-final2.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "docs/verification/production-free-http-parent-guard-20261007/final/free-http-parent-successor-sqlite-final.txt": "f503c62eab7a84c3e3951cf4d821a286a7d756e15dcded3b0666b521242a7d87",
+    "docs/verification/production-free-http-parent-guard-20261007/final/free-http-parent-successor-sqlite-final.xml": "839f8f95ea7c105105d470c9646dbe53c89798389d2268ef38149c25b7ed6078",
+    "docs/verification/production-free-http-parent-guard-20261007/final/free-http-parent-successor-sqlite.txt": "9d23c642fabeefac1f670a46653d1032cfc4fb0da7eaeba0d550551afcd0340f",
+    "docs/verification/production-free-http-parent-guard-20261007/final/free-http-parent-successor-sqlite.xml": "3ddfd161d69a943e63b5f2148e6143e73a78405d490cef2b2e903babd41f36ef",
+    "docs/verification/production-free-http-parent-guard-20261007/final/native-nested-snapshot.raw.json": "253444050b2244bc9bc5ae051add78ad83ee121d934749e30496ad36e2144c83",
+    "docs/verification/production-free-http-parent-guard-20261007/final/source-receipt.json": "4d600837b011455a761a12606c0802a968f502af21063b169d71b3533ea66dfa",
+    "docs/verification/production-free-http-parent-guard-20261007/final/sqlite-nested-snapshot.raw.json": "253444050b2244bc9bc5ae051add78ad83ee121d934749e30496ad36e2144c83",
+    "docs/verification/production-free-http-parent-guard-20261007/nested-snapshot.json": "c7a4cd6fb65c92244b513df0268ce6e196236c7cc9143c662293ec17b77f0c89",
+    "docs/verification/production-free-http-parent-guard-20261007/original-artifact-sha256.json": "1dc4f5a015de16ec602765a99c9458d69c799862db6f19f6a8ffbd96bfdb3d16",
+    "docs/verification/production-free-http-parent-guard-20261007/original-probe-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "docs/verification/production-free-http-parent-guard-20261007/original-red.txt": "b72f7c6e5e0c20a232043e2bba5c18fb6fe4ec26743f7b755ec12badb2b6a491",
+    "docs/verification/production-free-http-parent-guard-20261007/original-red.xml": "1d9bea045037c4e6ed70fbdd9aa23435359e6e0e919ced1cdae75cbe7c584645",
+    "docs/verification/production-free-http-parent-guard-20261007/original-source-map.json": "c10c7698956518468889fd269cc8bb3f5d67428acaf943ad293f424661fa6e39",
+    "docs/verification/production-free-http-parent-guard-20261007.md": "883bd1947f2ed79944ad29055c2e6143dd8cb1bc250bdfba953589bca56b9eea"
+  },
+  "results": {
+    "sqlite.xml": {
+      "name": "CLI Arguments",
+      "tests": "10",
+      "assertions": "55",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "11.702334"
+    },
+    "native.xml": {
+      "name": "CLI Arguments",
+      "tests": "2",
+      "assertions": "15",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "120.156119"
+    }
+  },
+  "original_probe_sha256": "112bc4275e272dc9bd5bac83a0128e66fa16662496f4cc7ec3c2ac6a9d65fea6",
+  "native_engine": "MySQL 8.0.46-0ubuntu0.24.04.4",
+  "native_schema": "vaseyaudio_support_closure",
+  "snapshot_actual_source": "ff0f7a85be397f017a227967058f745ceea3da28",
+  "snapshot_embedded_source_is_historical": "233f0864028156faeb70c63259910214e47762cb",
+  "artifacts": {
+    "docs/verification/production-free-parent-independent-20261007/ProductionFreeHttpNestedConfigurationCanaryTest.php": "112bc4275e272dc9bd5bac83a0128e66fa16662496f4cc7ec3c2ac6a9d65fea6",
+    "docs/verification/production-free-parent-independent-20261007/author-artifact-sha256.json": "e16723faa10b7d962e5de12f613d41aba678046a125f0901ed0a52292d4b60fd",
+    "docs/verification/production-free-parent-independent-20261007/author-source-receipt.json": "4d600837b011455a761a12606c0802a968f502af21063b169d71b3533ea66dfa",
+    "docs/verification/production-free-parent-independent-20261007/native-snapshot.raw.json": "253444050b2244bc9bc5ae051add78ad83ee121d934749e30496ad36e2144c83",
+    "docs/verification/production-free-parent-independent-20261007/native.txt": "cae2e0fef0a952024363cccc8c00e30c16c5fd01a091f2f99775597244a8314d",
+    "docs/verification/production-free-parent-independent-20261007/native.xml": "88d46215acf47485262f522f2bf0570eeb6c7b0a4e314379355c0a95c7c60fdb",
+    "docs/verification/production-free-parent-independent-20261007/nested-snapshot.json": "253444050b2244bc9bc5ae051add78ad83ee121d934749e30496ad36e2144c83",
+    "docs/verification/production-free-parent-independent-20261007/original-artifact-sha256.json": "1dc4f5a015de16ec602765a99c9458d69c799862db6f19f6a8ffbd96bfdb3d16",
+    "docs/verification/production-free-parent-independent-20261007/original-red.txt": "b72f7c6e5e0c20a232043e2bba5c18fb6fe4ec26743f7b755ec12badb2b6a491",
+    "docs/verification/production-free-parent-independent-20261007/original-red.xml": "1d9bea045037c4e6ed70fbdd9aa23435359e6e0e919ced1cdae75cbe7c584645",
+    "docs/verification/production-free-parent-independent-20261007/original-source-map.json": "c10c7698956518468889fd269cc8bb3f5d67428acaf943ad293f424661fa6e39",
+    "docs/verification/production-free-parent-independent-20261007/pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "docs/verification/production-free-parent-independent-20261007/sqlite.txt": "b90c3a2f0d9016d621283bd5dd6a4b05eb99cbf55be95b70aa60032c5c3f2f89",
+    "docs/verification/production-free-parent-independent-20261007/sqlite.xml": "a8c041885557a78ea9341b6b3104f3cc56ce7f571befec0657bd8c9a8aa0dc2b"
+  }
+}

@@ -1,0 +1,11 @@
+# Independent Free HTTP raw-parent successor review
+
+Exact source `ff0f7a85be397f017a227967058f745ceea3da28`, selectively composed as `e747d62a09304b7a6fa7d056cdc60e34dda478f4`, is independently approved for this bounded unregistered identity preparation. The review changes no runtime. Historical source233 approval remains source-bound; this successor closes the later actual nested configuration defect.
+
+The unchanged `112bc427...` canary originally executes an armed real Repository `app` ArrayObject after authentic SMTP owner binding and final session marker proof. Its getter forgets that marker, yet source233 releases authority: one failure/three assertions/zero errors. Original bytes, red output and source mapping remain retained.
+
+The successor admits raw plain-array configuration parents before callback-capable policy/guard work and before the final comparison. It checks the key and cached environment types before indexing those values; Laravel's legitimate missing cached environment remains nullable. No ArrayAccess offset, string conversion, policy/provider resolution or new account transaction follows the final marker proof. Current request/guard/session/key/config comparisons and the existing principal/actor API remain unchanged. Actual T23/Core/Test source is carried byte-exact.
+
+Fresh independent SQLite selection passed10 cases/55 assertions, including the unchanged original, all parent/key/environment revocations and default404. Fresh native MySQL8.0.46 passed the unchanged original plus actual loopback SMTP/current-owner positive: two cases/15 assertions. Both have zero failures/errors/skips. Scoped Pint and whitespace pass. The two source bindings,11 carried bindings and21 author artifact hashes independently reconcile. Author final13/76 SQLite and3/21 native evidence is carried separately. Intermediate1969's13 recorded/31 assertions/two failures/ten errors belongs to its nullable-environment admission defect, not the final source.
+
+Raw native snapshot retains the unchanged probe's historical embedded233 label; the receipt binds its actual ff0 execution separately. No broad suite or hosted run was repeated. This approval does not register an operative grant endpoint or establish approved terms/profile/assets, producer readiness, production transport or cutover acceptance.

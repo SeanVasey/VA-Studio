@@ -1,0 +1,70 @@
+{
+  "executable_source": "ff0f7a85be397f017a227967058f745ceea3da28",
+  "original_source": "233f0864028156faeb70c63259910214e47762cb",
+  "files": {
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php": "02ca521c47701a4b47ca953e6e2a3657c36127e48aaeb8f3c1ca243504cc6ad7",
+    "tests/Feature/ProductionFreeIdentity/ProductionFreeHttpConfigurationAdmissionTest.php": "4fc733eaa93b9be30e675e82ab3b74a48eb1fdff932ab44ccf381bfb1b306b0a"
+  },
+  "unchanged_233": {
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantHttpIdentity.php": "cd394c089390021a46b34a7bf489a8a7f976b12ebd6fe84001f53ac57edd7217",
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantIdentity.php": "81a64ba3eb9a848cb9a70c2415f6b573043dc49d4af2a3d736aae9ab0044a2e8",
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantIdentityPolicy.php": "f58aeac35bc9c2d34a8d88b3a9c43afb48893e89be615a64c00fc587efe8cd4d",
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantLineage.php": "8648e8c095cb690e8c01128719d1556e20dfa2a323ad8f71524922e9b58df4bc",
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantBoundary.php": "5c50519c8fb5751bf777a883a63e8cecd295df469220e96634b3afa07d3bdbd6",
+    "app/Domain/Grants/Free/TestFreeGrantIdentity.php": "ce692a10970b7866a0eeba3a547d12aa4734c1544dad9ed655e95443c6927a30",
+    "app/Domain/Grants/Free/FreeGrants.php": "5a48da0ae2bb6e7e12d957547c2b6e30befa98aa65807d719dc5e48ca3715df2",
+    "app/Domain/Customers/ProductionCustomerAccess.php": "4f013b5114b8b8ee8cd53d42277368a215861b8c48a07672fd2337e4fc483eb4",
+    "app/Domain/Customers/ProductionIdentity/IdentityRows.php": "deb303101abe98ca505c43e34ab49cc636b56fed42e5b808044380108fdb42bd",
+    "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php": "6058e3e4ced2900e1ccc93bd9110691c041ad0c4ecafe2f0373d323ceb17cb90",
+    "tests/Support/ProductionIdentityFixture.php": "558b6269d305b7b213e4b8c102c7e9e117dfb8cce30c4c76a7520482609391b7"
+  },
+  "original_probe_sha256": "112bc4275e272dc9bd5bac83a0128e66fa16662496f4cc7ec3c2ac6a9d65fea6",
+  "original_marker_probe_sha256": "44f495bbc052587020f65bcf4c71685d360a84ef412075eb85078136ce988424",
+  "native_engine": "8.0.46-0ubuntu0.24.04.4",
+  "results": {
+    "free-http-parent-original-marker-successor.xml": {
+      "tests": 1,
+      "assertions": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executable_source": "ff0f7a85be397f017a227967058f745ceea3da28"
+    },
+    "free-http-parent-successor-sqlite-final.xml": {
+      "tests": 13,
+      "assertions": 76,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executable_source": "ff0f7a85be397f017a227967058f745ceea3da28"
+    },
+    "free-http-parent-successor-sqlite.xml": {
+      "tests": 13,
+      "assertions": 31,
+      "failures": 2,
+      "errors": 10,
+      "skipped": 0,
+      "executable_source": "1969bbad995e1e978bf19fc809d5b39440d7d3ce"
+    },
+    "free-http-parent-successor-native-final.xml": {
+      "tests": 3,
+      "assertions": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "executable_source": "ff0f7a85be397f017a227967058f745ceea3da28"
+    }
+  },
+  "sqlite_snapshot_binding": {
+    "artifact": "docs/verification/production-free-http-parent-guard-20261007/final/sqlite-nested-snapshot.raw.json",
+    "actual_source": "ff0f7a85be397f017a227967058f745ceea3da28",
+    "embedded_historical_source": "233f0864028156faeb70c63259910214e47762cb",
+    "note": "Unchanged canary retains original hardcoded label; actual execution separately bound."
+  },
+  "native_snapshot_binding": {
+    "artifact": "docs/verification/production-free-http-parent-guard-20261007/final/native-nested-snapshot.raw.json",
+    "actual_source": "ff0f7a85be397f017a227967058f745ceea3da28",
+    "embedded_historical_source": "233f0864028156faeb70c63259910214e47762cb",
+    "note": "Unchanged canary retains original hardcoded label; actual execution separately bound."
+  }
+}

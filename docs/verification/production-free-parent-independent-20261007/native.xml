@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="2" assertions="15" errors="0" failures="0" skipped="0" time="120.156119">
+    <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpNestedConfigurationCanaryTest" file="/workspace/VA-Studio-production-free-identity-independent/docs/verification/production-free-parent-independent-20261007/ProductionFreeHttpNestedConfigurationCanaryTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="61.399674">
+      <testcase name="test_retained_http_closure_cannot_resolve_a_nested_configuration_callback_after_marker_proof" file="/workspace/VA-Studio-production-free-identity-independent/docs/verification/production-free-parent-independent-20261007/ProductionFreeHttpNestedConfigurationCanaryTest.php" line="21" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpNestedConfigurationCanaryTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpNestedConfigurationCanaryTest" assertions="5" time="61.399674"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest" file="/workspace/VA-Studio-production-free-identity-independent/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php" tests="1" assertions="10" errors="0" failures="0" skipped="0" time="58.756446">
+      <testcase name="test_actual_smtp_current_owner_has_sealed_request_binding_without_public_or_cached_remint" file="/workspace/VA-Studio-production-free-identity-independent/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php" line="33" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest" assertions="10" time="58.756446"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

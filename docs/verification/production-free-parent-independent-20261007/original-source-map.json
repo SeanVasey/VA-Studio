@@ -1,0 +1,23 @@
+{
+  "executable_source": "233f0864028156faeb70c63259910214e47762cb",
+  "parent_with_evidence": "a0d4afe2e19acd999be749021b39482c65c31d1c",
+  "files": {
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php": "94e0c8467a91e9edc0ab0786d4e70a1df08ecc459deaa5d57e7008ed112b1f64"
+  },
+  "probe_sha256": "112bc4275e272dc9bd5bac83a0128e66fa16662496f4cc7ec3c2ac6a9d65fea6",
+  "actual": {
+    "tests": 1,
+    "assertions": 3,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0
+  },
+  "snapshot": {
+    "source": "233f0864028156faeb70c63259910214e47762cb",
+    "callbacks": 1,
+    "released": true,
+    "refused": false,
+    "marker_retained": false,
+    "active_transaction": false
+  }
+}
