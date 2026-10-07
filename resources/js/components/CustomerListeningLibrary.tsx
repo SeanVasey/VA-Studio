@@ -208,13 +208,15 @@ export function CustomerListeningLibrary() {
           <button type="submit" className="button button-outline" disabled={busy || !noteTrack || !noteBody(draft) || (!existingNote && library.notes.length >= library.limits.notes)}>Save lyric note</button>
           <button type="button" className="button button-outline" disabled={busy || !existingNote} onClick={() => noteTrack && change('delete-track-note', { trackId: noteTrack })}>Delete lyric note</button>
         </form>}
+      </div>}
+      <div aria-label="Private saved library controls">
         <button type="button" className="button button-outline" disabled={busy} onClick={() => void request('export')}>Export saved library</button>
         <button type="button" className="button button-outline" disabled={busy} onClick={() => setClearing(true)}>Clear saved tracks, playlists and notes</button>
         {clearing && <div role="group" aria-label="Clear saved library confirmation"><p>Delete your saved tracks, playlists and lyric notes from this account?</p>
           <button type="button" className="button button-outline" disabled={busy} onClick={() => change('clear-library', {})}>Confirm clear</button>
           <button type="button" className="button button-outline" disabled={busy} onClick={() => setClearing(false)}>Keep saved library</button>
         </div>}
-      </div>}
+      </div>
       {playlist && <div aria-label="Selected playlist"><h3>{playlist.name}</h3>
         <form className="customer-order-lookup-form" onSubmit={event => { event.preventDefault(); change('rename-playlist', { playlistId: playlist.id, name: rename.trim() }); }}>
           <div className="customer-account-field"><label htmlFor="listening-rename-playlist">Rename playlist</label><input id="listening-rename-playlist" value={rename} maxLength={80} disabled={busy} onChange={event => setRename(event.target.value)} /></div>

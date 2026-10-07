@@ -12,6 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\CustomerFixtures;
+use Tests\Support\ListeningNotesFixtures;
 use Tests\Support\QuoteFixtures;
 use Tests\TestCase;
 
@@ -24,6 +25,7 @@ class CustomerListeningNotesTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        ListeningNotesFixtures::enablePromotion();
         $this->fakePrivateMediaStorage();
         $this->customer = CustomerFixtures::account();
     }
