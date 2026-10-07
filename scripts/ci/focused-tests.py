@@ -24,6 +24,7 @@ PHP_TARGETS = {
     "track-discovery": (
         "tests/Feature/CurrentEligibleTrackSnapshotTest.php",
         "tests/Feature/DiscoveryEpochMigrationTest.php",
+        "tests/Feature/DiscoveryEpochRecoveryTest.php",
         "tests/Feature/DiscoverySnapshotConcurrencyTest.php",
         "tests/Feature/CatalogPaginationTest.php",
         "tests/Feature/PublicCatalogRelatedLinksTest.php",

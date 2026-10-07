@@ -124,6 +124,7 @@ class SelectionTests(unittest.TestCase):
         required = (
             "tests/Feature/CurrentEligibleTrackSnapshotTest.php",
             "tests/Feature/DiscoveryEpochMigrationTest.php",
+            "tests/Feature/DiscoveryEpochRecoveryTest.php",
             "tests/Feature/DiscoverySnapshotConcurrencyTest.php",
             "tests/Feature/CatalogPaginationTest.php",
             "tests/Feature/PublicCatalogRelatedLinksTest.php",
@@ -148,7 +149,7 @@ class SelectionTests(unittest.TestCase):
         source = (ROOT / "tests/Feature/DiscoverySnapshotConcurrencyTest.php").read_text()
         for method in methods:
             self.assertIn("function " + method + "(", source)
-        self.assertFalse(any(row[0] in {"Tests\\Feature\\DiscoveryEpochMigrationTest", "Tests\\Feature\\CurrentEligibleTrackSnapshotTest"}
+        self.assertFalse(any(row[0] in {"Tests\\Feature\\DiscoveryEpochMigrationTest", "Tests\\Feature\\DiscoveryEpochRecoveryTest", "Tests\\Feature\\CurrentEligibleTrackSnapshotTest"}
                              for row in policy["methods"]))
 
     def test_production_preparation_keeps_complete_adapter_fences_in_bounded_feedback(self):
