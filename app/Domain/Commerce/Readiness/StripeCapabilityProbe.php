@@ -3,6 +3,7 @@
 namespace App\Domain\Commerce\Readiness;
 
 use App\Domain\Commerce\ProductionCheckout\ExecutionContextV1;
+use Closure;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 use SensitiveParameter;
@@ -25,7 +26,11 @@ final class StripeCapabilityProbe
 
     private const STATUSES = ['active', 'inactive', 'pending', 'unrequested', 'disabled'];
 
-    public function __construct(private readonly ?ClientInterface $fixtureTransport = null) {}
+    /**
+     * @param  ?Closure(): ClientInterface  $realTransport  Builds the real network transport; the default is a bounded
+     *                                                      CurlClient. Only a test may observe whether it is invoked.
+     */
+    public function __construct(private readonly ?ClientInterface $fixtureTransport = null, private readonly ?Closure $realTransport = null) {}
 
     public function usesFixture(): bool
     {
@@ -39,7 +44,8 @@ final class StripeCapabilityProbe
             self::require(in_array($mode, ['test', 'live'], true)
                 && preg_match('/\Ask_'.$mode.'_[A-Za-z0-9]{1,240}\z/D', $secret) === 1
                 && preg_match('/\Aacct_[A-Za-z0-9]{1,64}\z/D', $accountId) === 1
-                && ($this->fixtureTransport === null || app()->environment('testing'))
+                // Fixture only in testing, and in testing only a fixture: the real transport is never built there.
+                && ($this->fixtureTransport === null) !== app()->environment('testing')
                 && Stripe::$accountId === null && Stripe::$verifySslCerts === true && Stripe::$logger === null);
             foreach (DB::getConnections() as $connection) {
                 self::require($connection->transactionLevel() === 0);
@@ -47,7 +53,9 @@ final class StripeCapabilityProbe
             $client = new StripeClient(['api_key' => $secret, 'api_base' => BaseStripeClient::DEFAULT_API_BASE,
                 'stripe_version' => ExecutionContextV1::API_VERSION, 'stripe_account' => null, 'stripe_context' => null,
                 'max_network_retries' => 0]);
-            $transport = $this->fixtureTransport ?? (new CurlClient)->setConnectTimeout(3)->setTimeout(10);
+            $transport = $this->fixtureTransport ?? ($this->realTransport !== null ? ($this->realTransport)()
+                : (new CurlClient)->setConnectTimeout(3)->setTimeout(10));
+            self::require($transport instanceof ClientInterface);
             $previous = ApiRequestor::httpClient();
             ApiRequestor::setHttpClient($transport);
             try {

@@ -50,7 +50,10 @@ final class StripeCapabilityPreflight
         $accountValid = is_string($account) && preg_match('/\Aacct_[A-Za-z0-9]{1,64}\z/D', $account) === 1;
         $originValid = ProductionCommerceReadiness::httpsOrigin($origin);
         $lifetimeValid = is_int($lifetime) && $lifetime >= 30 && $lifetime <= 3600;
-        $add('funds_mode', 'configuration', $modeValid ? 'pass' : 'blocked', 'PRODUCTION_CHECKOUT_FUNDS_MODE must be exactly test or live (Sean decision; test is local/testing only).');
+        // The same rule ExecutionContextV1::make applies: test funds only in local/testing.
+        $modeEnvironment = $modeValid && ($mode !== 'test' || app()->environment(['local', 'testing']));
+        $add('funds_mode', 'configuration', $modeValid ? 'pass' : 'blocked', 'PRODUCTION_CHECKOUT_FUNDS_MODE must be exactly test or live (Sean decision).');
+        $add('funds_mode_environment', 'configuration', $modeEnvironment ? 'pass' : 'blocked', 'Test funds are admitted only when APP_ENV is local or testing, as production checkout (ExecutionContextV1) requires.');
         $add('account_id_shape', 'configuration', $accountValid ? 'pass' : 'blocked', 'PRODUCTION_CHECKOUT_STRIPE_ACCOUNT_ID must be an own-account acct_ identifier (shape only; ownership unverified).');
         $add('return_origin_https', 'configuration', $originValid ? 'pass' : 'blocked', 'PRODUCTION_CHECKOUT_RETURN_ORIGIN must be a bounded https origin without credentials, path, query or fragment.');
         $add('review_lifetime_int', 'configuration', $lifetimeValid ? 'pass' : 'blocked', 'PRODUCTION_CHECKOUT_REVIEW_LIFETIME_SECONDS must resolve to an integer from 30 to 3600.');
@@ -78,7 +81,7 @@ final class StripeCapabilityPreflight
             $add($id, 'pin', $ok ? 'pass' : 'blocked', $message);
         }
 
-        $shapeValid = $modeValid && $accountValid && $originValid && $lifetimeValid && (! $secretPresent || $secretShape);
+        $shapeValid = $modeEnvironment && $accountValid && $originValid && $lifetimeValid && (! $secretPresent || $secretShape);
         $observation = null;
         $probeStatus = 'not_requested';
         $probeReason = null;

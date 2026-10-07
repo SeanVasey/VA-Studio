@@ -353,6 +353,53 @@ class StripeCapabilityPreflightTest extends TestCase
         }
     }
 
+    public function test_probe_class_itself_never_builds_the_real_transport_in_testing(): void
+    {
+        // R-1: the class guard, not only the command, must refuse a real transport in testing.
+        $built = 0;
+        $probe = new StripeCapabilityProbe(null, function () use (&$built): ClientInterface {
+            $built++;
+
+            return new StripePreflightHttpFixture([], true);
+        });
+        $this->assertFalse($probe->usesFixture());
+        $previous = ApiRequestor::httpClient();
+        try {
+            $probe->observe('test', self::ACCOUNT, self::SECRET);
+            $this->fail('The probe admitted a real transport in testing.');
+        } catch (RuntimeException $error) {
+            $this->assertNull($error->getPrevious());
+        }
+        $this->assertSame(0, $built);
+        $this->assertSame($previous, ApiRequestor::httpClient());
+    }
+
+    public static function fundsModeEnvironments(): array
+    {
+        return [
+            'test funds on production' => ['production', 'test', 'blocked'],
+            'test funds on staging' => ['staging', 'test', 'blocked'],
+            'test funds on local' => ['local', 'test', 'pass'],
+            'test funds in testing' => ['testing', 'test', 'pass'],
+            'live funds on production' => ['production', 'live', 'pass'],
+        ];
+    }
+
+    #[DataProvider('fundsModeEnvironments')]
+    public function test_funds_mode_follows_the_checkout_environment_rule(string $environment, string $mode, string $status): void
+    {
+        // R-2: ExecutionContextV1 refuses test funds outside local/testing; the preflight must not pass that configuration.
+        $this->shaped(['production_checkout.funds_mode' => $mode]);
+        $this->app->instance('env', $environment);
+        try {
+            $report = app(StripeCapabilityPreflight::class)->collect(true, false);
+        } finally {
+            $this->app->instance('env', 'testing');
+        }
+        $this->assertSame($status, $this->check($report, 'funds_mode_environment'));
+        $this->assertSame($status === 'pass', $report['configuration_shape_valid']);
+    }
+
     public function test_probe_class_refuses_fixture_transport_outside_testing(): void
     {
         $probe = new StripeCapabilityProbe(new StripePreflightHttpFixture([self::account(), self::capabilities()]));
