@@ -1,0 +1,270 @@
+{
+  "repository": "https://github.com/SeanVasey/VA-Studio",
+  "main_before_final_checkpoint": "aff987410d8a843c0b6fa336e5edcbc61e0911b5",
+  "final_checkpoint_branch": "codex/cloud-primary-development-20261007",
+  "self_reference_note": "Final checkpoint commit and main merge are obtained from this repository Git/PR publication; this ledger pins the independent worker refs at handoff, not its own containing commit.",
+  "worker_state": "All six original agent lanes frozen, pushed and idle. Root completes only final checkpoint publication.",
+  "reviewed_source": {
+    "support_headers": "35b3d98bb2aec3366d8e8719e2b10e746c804bd8",
+    "identity_smtp_history": "519170f9e5541602577381f17fa39c366b8e608b",
+    "suppression": "983b497edfbdb56ce9995530b83f890ac741ade5",
+    "identity_idle_cleanup": "5053af53e85ab49aea2a2a6eb85d66d821f49e95",
+    "source_receipt_contract_only": "2ec1854c2b3606250e59b157f06703151318af0a",
+    "membership_preparation_only": "16e084b924fb9132b76095f26a35f28dc5f1feaf"
+  },
+  "branches": [
+    {
+      "branch": "codex/checkout-callback-free-source-20261007",
+      "head": "01fd387b4d8ed52b301f92f6e41b7d7b1ebd9a69",
+      "owner": "pr25_recovery",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/checkout-committed-read-receipt-20261007",
+      "head": "65857cc39eef8b8630afbd46e548cd08767392e9",
+      "owner": "pr25_recovery",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/checkout-original-write-commit-admission-20261007",
+      "head": "abb85f00ace7e219470ed6ecbf02f94869a59014",
+      "owner": "pr25_recovery",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/checkout-receipt-independent-20261007",
+      "head": "b76f77526956747696b649c4be511ff9cd6e5859",
+      "owner": "pr26_review",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/checkout-receipt-plain-parents-20261007",
+      "head": "6d4736b685a69916cde87cfc8d7d4617a8073fce",
+      "owner": "pr25_recovery",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/checkout-terminal-fresh-policy-20261007",
+      "head": "55aec5fdde4c6959d11ed7e7d4ff21a7394d0e4e",
+      "owner": "pr25_recovery",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/checkout-terminal-policy-independent-20261007",
+      "head": "209eaf438e1cc7c3ccd9a84b2ad4048aa86b9fe6",
+      "owner": "pr26_review",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/cloud-completion-audit-20261007",
+      "head": "6e1839c7f3ab1f9ae2fbfe3518ddc8f45b97eacd",
+      "owner": "completion_audit",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/cloud-listening-independent-composed-20261007",
+      "head": "32e33ef957074d2da68c8b774603e338d9cbbcc1",
+      "owner": "recovery_inventory",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/cloud-recovery-inventory-20261007",
+      "head": "147affc207c14baa7d4a96f9ef605e19868b34bd",
+      "owner": "recovery_inventory",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/discovery-schema-namespace-repair-20261007",
+      "head": "8cf82db12086d2579390882ccbc6a24eaf63a9c6",
+      "owner": "recovery_inventory",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/free-registration-independent-20261007",
+      "head": "e4fe6e9341060ccc727adf3fbc394f25259740a6",
+      "owner": "completion_audit",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/identity-adapters-callback-repair-20261007",
+      "head": "9c1b1354c3b0ae7ed3c31d77838ee9887cbb437a",
+      "owner": "completion_audit",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/identity-frame-cleanup-independent-20261007",
+      "head": "09c576977784ca8450fd4a8acac9d7c7c4f38ea6",
+      "owner": "pr26_review",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/identity-historical-callback-repair-20261007",
+      "head": "3cf11d745f51fdacdc72a3a222469403e795aed9",
+      "owner": "completion_audit",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/identity-smtp-historical-composition-independent-20261007",
+      "head": "34cd180037874a21a1a4b511f0d9b038511493ed",
+      "owner": "pr26_review",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/membership-billing-operations-handoff-20261007",
+      "head": "dafdc6f0dade503f718ace45ecf56d915d43a569",
+      "owner": "recovery_inventory",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/membership-callback-independent-20261007",
+      "head": "8d3207a042babc90048e49c671d3f57358dbc863",
+      "owner": "pr26_review",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/membership-preparation-independent-20261007",
+      "head": "8fdacaf255caf50f1433eb21f88d1d0aa0d8df3f",
+      "owner": "pr26_review",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/new-discovery-sitemap-worker-20261007",
+      "head": "1b7625b07200f2c2e8c4856409aae56cebd3b2dd",
+      "owner": "recovery_inventory",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/paid-grant-commit-admission-20261007",
+      "head": "e8a2b93d4557a8bee20172158f8d0df7ee157a98",
+      "owner": "native_mysql",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/paid-grant-fixture-portability-20261007",
+      "head": "972a76c5e04da0f61d409d6caf9eb84281fef2a3",
+      "owner": "native_mysql",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/paid-grant-origins-20261007",
+      "head": "0b745151ac56f1bfd2a6d9ff0eb34c3f5c92fac6",
+      "owner": "native_mysql",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/private-support-attachments-20261007",
+      "head": "419627bb4e72a18ce7fd724860667cd0e063f574",
+      "owner": "recovery_inventory",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/production-customer-identity-local-smtp-20261007",
+      "head": "aa0eb63c8e7a6d4fad07fed6e6c868765b851298",
+      "owner": "completion_audit",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/production-free-family-20261007",
+      "head": "5bfdd4f00dd4e1c2d989625a810a81ddf4bad152",
+      "owner": "completion_audit",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/production-free-http-parent-guard-20261007",
+      "head": "a4f9e63fdfbd72d781d0e97379235a0461a8ffad",
+      "owner": "completion_audit",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/production-free-identity-independent-20261007",
+      "head": "fbd3d56bba11f187c528018c5b0bf51e89a4eb4f",
+      "owner": "recovery_inventory",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/production-identity-adapters-20261007",
+      "head": "19fe9aa3fad51b7e14b71d3355f290dfe40e0f64",
+      "owner": "completion_audit",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/production-member-original-preparation-20261007",
+      "head": "fb573a410cda76dd97884e81bc8e15437831a9ae",
+      "owner": "recovery_inventory",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/production-membership-preparation-20261007",
+      "head": "7fa3c62e61fae6e98e61e75eb0451edd588683d0",
+      "owner": "recovery_inventory",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/recover-inquiry-notifications-20261007",
+      "head": "a6145547ac91faca24e1965a6112c440e4680ab6",
+      "owner": "completion_audit",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/recovered-install-checkout-ui-20261007",
+      "head": "ddd7c58d9914aeaeb1da782cfee8dc3dfffb8dfd",
+      "owner": "recovery_inventory",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/review-recovery-identity-adapters-5d53585f-20261007",
+      "head": "5d53585fb3ea65c8a6f4162d8e71bd043caea538",
+      "owner": "pr26_review",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/review-recovery-identity-historical-b24ed814-20261007",
+      "head": "b24ed8142248d6794858b4a3619c43178dfe098b",
+      "owner": "pr26_review",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/review-recovery-smtp-binding-5b1a4abe-20261007",
+      "head": "5b1a4abeba878723e180a516b3a68cde46141754",
+      "owner": "pr26_review",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/support-committed-read-closure-20261007",
+      "head": "db62b00a20b3a8a547194d211ebdd53484a32a70",
+      "owner": "recovery_inventory",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/support-pr35-composition-independent-20261007",
+      "head": "de314e2fb6fec289ae2a349867f7a7218d2f0827",
+      "owner": "recovery_inventory",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/support-retry-header-independent-20261007",
+      "head": "67c0f68f3862c79be1753ceae16399a1708fd434",
+      "owner": "pr26_review",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/support-session-independent-20261007",
+      "head": "15c9e34630966243ce92783dbacf167f908262ee",
+      "owner": "recovery_inventory",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "codex/support-test-lifecycle-independent-20261007",
+      "head": "662d5baec69a7f98b5fee5722df0d2819712b3e4",
+      "owner": "recovery_inventory",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    },
+    {
+      "branch": "customer-production-account-features-t32",
+      "head": "3f32ffaeb4ea5225779d887d86c43d88d6204fc5",
+      "owner": "crawler_routes",
+      "status": "Preserved development/review source; see central and owner packets for approval/holds. Pushed does not mean integrated or accepted."
+    }
+  ],
+  "verification": "Root independently confirmed all42 exact worker refs with git ls-remote after all agents froze; their earlier receipts remain point-in-time originals."
+}

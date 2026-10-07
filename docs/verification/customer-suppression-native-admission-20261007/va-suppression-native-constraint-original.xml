@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\CustomerSuppressionNativeAdmissionTest" file="/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionNativeAdmissionTest.php" tests="1" assertions="7" errors="0" failures="1" skipped="0" time="17.042944">
+    <testcase name="test_foreign_reserved_constraint_is_refused_before_any_owned_ddl" file="/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionNativeAdmissionTest.php" line="15" class="Tests\Feature\CustomerSuppressionNativeAdmissionTest" classname="Tests.Feature.CustomerSuppressionNativeAdmissionTest" assertions="7" time="17.042944">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerSuppressionNativeAdmissionTest::test_foreign_reserved_constraint_is_refused_before_any_owned_ddl
+Refuse the foreign reserved name during admission.
+Failed asserting that an instance of class Illuminate\Database\QueryException is an instance of class LogicException.
+
+/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionNativeAdmissionTest.php:51</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,27 +1,34 @@
 # Development agents and launch queue
 
-## Active cloud ownership — October 7, 2026 UTC
+## Frozen cloud ownership at Claude handoff — October 7, 2026 UTC
 
-One integration owner `/root`; verified main `ef444949bd694b841112695c90b7d27c2f698ead` includes PRs25–36.
-Historical owner tables below describe earlier source, not active workers.
+Sean explicitly requested finishing/pushing current batches and handing remaining
+implementation to another harness. `/root` is the integration/publication owner;
+workers are freezing and publishing their final checkpoints, then becoming idle.
+The detailed [Claude handoff](handoff/2026-10-07/README.md) and final remote inventory
+supersede older live-worker tables. Reviewed main through38 is
+`aff987410d8a843c0b6fa336e5edcbc61e0911b5`; the last current batch adds reviewed
+suppression251, the independently checked original-frame cleanup correction and
+this handoff. Its actual PR/preflight/merge disposition is retained at publication.
 
-| Worker | Isolated boundary | Current handoff |
+| Owner | Frozen boundary | Handoff state |
 | --- | --- | --- |
-| `/root` | Primary/shared registration/evidence/publication | PR36 bounded full sitemap crawl merged; Support sharedde314/runtime15c/lifecycle662 publication; SMTPf5/suppression983; final test census |
-| `/root/pr25_recovery` | ProductionCheckout246/provider/tax | 6e media repair passesSQLite/native5/39+original1/5; actual physicalcommit flagwithdraw stillwrites1order/line/attempt, wholeHELD. ProducerContext2ec parent repair under native review; NEWcommandwriteobserver, then automatictax255 |
-| `/root/completion_audit` | Typed identity producer; operative free256 | Production-free233 independently approveda82; historical witness e8 independently approvedb24; NEW free233 parent callback1FAIL3 repairff0 under checks, then operativefree256 |
-| `/root/native_mysql` | Paid252 consumers | def native4/118 is component proof; actual precommit policy/password changes left durable origins2FAIL14. NEW same-observer consumer capsule closes original SQLite probes; source/HTTP/native review pending |
-| `/root/pr26_review` | Independent historical and public boundary review | SMTPf5 independently approved5b; Discovery P2 approvaleb2; e8 historical approvedb24 and throttleapproved2dead merged36; current NEW257 prep review, author parent correction pending |
-| `/root/crawler_routes` | Production feature253 and suppression254 | 253 native boundary/config parent and server-only withdrawal reader repairs before freeze; NEW254 immutable suppression follows distinct production withdrawal lineage |
-| `/root/recovery_inventory` | Membership257/member258; free/support independent review | Free233 approval historicalHELD by newparentred; supportlifecycle662/sharedde314 approved. Membership preparationb635 native9/30 is historical, raw-parent/review corrections pending; NEW258 then operative257/258 fulfilment |
+| `/root` | Primary/shared registration/evidence/publication | Support37 and identity/SMTP/history38 merged; suppression983 source-bound approved; late actual identity foreign-query-only defect corrected5053 withSQLite13/78+native1/4; final publication/checkpoint |
+| `/root/pr25_recovery` | Checkout246/paid producer/automatic tax255 | Physicalc6 author-testedSQLite17/129+native7/50, unreviewed; immutable parent2ec producer contract independently approvedc0cc. Whole fresh-write composition pending; tax255 and live-payment preparation queued |
+| `/root/completion_audit` | Historical/free identity/content | Historicale8 approvedb24 and integrated38; freeff0 independently approvedfbd component.256 has metadata observations and handoff only, no operative schema/grant/HTTP/admin/PDF/assets; content migration preparation queued |
+| `/root/native_mysql` | Paid252 consumer/private delivery/native operations | Portable69-file source fixture retained; recovery actualSQLite1/35/native1/36 passes after deliberate fresh authorization. Native delivery409 persists at committed_read_frame in second redeem; consumer independent approval/composition pending |
+| `/root/pr26_review` | Independent exact-source reviews | Source2ec contract approvedc0cc; membership16e preparation approved8fd; Support headers67c and SMTP/history34cd approved. Narrow5053 cleanup review/source receipt completes this batch; wider commerce/readiness remains unaccepted |
+| `/root/crawler_routes` | Account features253/suppression254/email | Final3ce tests/runtime9d:83SQLite passes/766assertions+3native-onlyskips, finalnative1/6; earlierb6native9/109 separate. Unreviewed253 needs canonical application registration/default-off configuration;254/email preparation queued |
+| `/root/recovery_inventory` | Membership257/member258/Billing259/host operations | Reviewed16e preparation stays exact; newerRows3cd authorSQLite21/58+native1/3 unreviewed. Memberc4 prepSQLite21/52+native5/17 unreviewed. Operative257/258, Billing259 and host operations remain documented dependencies/plans |
 
-
-Each worker has an isolated branch, independent autoload over unchanged locked
-packages and separate synthetic native databases where needed. Root owns shared
-files/publication. No worker dispatches hosted CI, binds external transport,
-configures production secrets or transacts real money. The
-[checkpoint](verification/cloud-primary-checkpoint-20261007.md) and
-[audit](verification/cloud-completion-audit-20261007.md) retain full dependencies.
+All source/evidence is preserved on named origin branches. Owner packets and
+remote readback distinguish accepted components, author-only proofs, actual
+failures and queued work. Sean approved membership test setup; no real credentials,
+provider I/O, external mail/payment, service purchase or production cutover occurred.
+The [preparation queue](live-payment-and-production-preparation-queue.md) records
+concrete downstream deliverables and the later authorization boundary. Final full
+implementation, test engine/census normalization and consolidated exact-SHA
+Foundation/native8.4/browser acceptance are handed forward without weaker controls.
 
 ## Active production preparation — October 6, 2026 UTC
 

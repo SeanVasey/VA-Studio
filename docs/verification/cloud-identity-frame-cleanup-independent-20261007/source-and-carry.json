@@ -1,0 +1,208 @@
+{
+  "executable": "5053af53e85ab49aea2a2a6eb85d66d821f49e95",
+  "parent": "6feca441ced6581ddf2ccab0d31511f8627092f7",
+  "root_evidence_commit": "52be90699ff8f78e5e8eaa0f56b916e14e665b39",
+  "prior_composition_approval": "34cd180037874a21a1a4b511f0d9b038511493ed",
+  "prior_composition_source": "519170f9e5541602577381f17fa39c366b8e608b",
+  "exact_changed_paths": [
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php",
+      "git_blob": "4b6b7fdc385325b4bd79601a796acacec8879cb7",
+      "sha256": "5689637577c6ffe61cec52eb60d7445432f992a2246be133be8e0dd424b13da7",
+      "prior_sha256": "623e31f469a0a1779e3f992f5d1c48b0aaa2382d308109bc33cc78f70a7c821b"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php",
+      "git_blob": "5e8571960572b5621bcd5956f79e5dc7412a8a6a",
+      "sha256": "19eddedf7f11341ca4360814eeb345a0dbdb1068846183f4ca9c720356c3ec06",
+      "prior_sha256": "9ca308545605e95affd0e2feef88d91296e42dc5971b8a49356bfcf1ef348392"
+    }
+  ],
+  "unchanged_composition_paths": [
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/CurrentRows.php",
+      "git_blob": "eb357333f427bea8e124818564c6b083e7c75d31",
+      "sha256": "02421b3afb5911bab22bec749c3c691f45379aab4f48c3522831be051235e428",
+      "prior_sha256": "02421b3afb5911bab22bec749c3c691f45379aab4f48c3522831be051235e428"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionCustomerAccess.php",
+      "git_blob": "34ad6a32c2b3b25517536db61683f2558627fded",
+      "sha256": "7dbaeed358ab1051dd34608fbf966645ae7756f163700733bf9708f1233aba42",
+      "prior_sha256": "7dbaeed358ab1051dd34608fbf966645ae7756f163700733bf9708f1233aba42"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureAccess.php",
+      "git_blob": "0d2f25151a74c80a22466fa9c7a6f6310c75278c",
+      "sha256": "7b47e7ae6617581d18d25687e35ea28d6804394ead13550555b81b7a91f02fd6",
+      "prior_sha256": "7b47e7ae6617581d18d25687e35ea28d6804394ead13550555b81b7a91f02fd6"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureIdentity.php",
+      "git_blob": "8641a127a4207c717005a632f0b4c46fe4740c13",
+      "sha256": "940a64d2f0bc9f0f60719a38fa4436fcfcca5ecbc81e059f4b5130e37c5a2ad7",
+      "prior_sha256": "940a64d2f0bc9f0f60719a38fa4436fcfcca5ecbc81e059f4b5130e37c5a2ad7"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeaturePolicy.php",
+      "git_blob": "9ab0a87bb547950566818b5da88a17ddd6354dae",
+      "sha256": "6438997b0e13e2b8e7b39b43ab983ace8151bf2bd3d08164e78ed0a32213001e",
+      "prior_sha256": "6438997b0e13e2b8e7b39b43ab983ace8151bf2bd3d08164e78ed0a32213001e"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommitSeal.php",
+      "git_blob": "0bcf7b19c5b9e9fd02b5524b7f2ee01399f1f28e",
+      "sha256": "3a0686a3f04bf3679d384ce06a33bdfa0c6599a593d7f0cc59476f3cf4937b97",
+      "prior_sha256": "3a0686a3f04bf3679d384ce06a33bdfa0c6599a593d7f0cc59476f3cf4937b97"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommittedReceipt.php",
+      "git_blob": "78489b6d3fd644514f0f80f948172bf5389c656d",
+      "sha256": "82a2b5217f57da35eb90e099b4d26240c4c40082fa18977356de25b4c862cd78",
+      "prior_sha256": "82a2b5217f57da35eb90e099b4d26240c4c40082fa18977356de25b4c862cd78"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityHistoricalPlainRows.php",
+      "git_blob": "0cfc2884a9c6532d4c5d49aad33fc55700dcd5ba",
+      "sha256": "2117a278b26b7b643429f460e549adcbe0b499efdfca8ee14ab8939c4a048769",
+      "prior_sha256": "2117a278b26b7b643429f460e549adcbe0b499efdfca8ee14ab8939c4a048769"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php",
+      "git_blob": "193215351accc8f6d053a1bb2257e0de6e6d58dc",
+      "sha256": "6058e3e4ced2900e1ccc93bd9110691c041ad0c4ecafe2f0373d323ceb17cb90",
+      "prior_sha256": "6058e3e4ced2900e1ccc93bd9110691c041ad0c4ecafe2f0373d323ceb17cb90"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityOriginalCommitWitness.php",
+      "git_blob": "43032921e64fe9c179fbb5befdb8377c58e6a4e2",
+      "sha256": "1bc64f515cd6707b5e3dd9577aa98ac3aa32fc8b731d87654eb484caf1dc65fc",
+      "prior_sha256": "1bc64f515cd6707b5e3dd9577aa98ac3aa32fc8b731d87654eb484caf1dc65fc"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityRows.php",
+      "git_blob": "c823a792d9087bf19c920daa96917a1acc00ef25",
+      "sha256": "470a2a4816739aef151ad429f9b8b6c359a0eba0b8068a60d1f215b6547794a4",
+      "prior_sha256": "470a2a4816739aef151ad429f9b8b6c359a0eba0b8068a60d1f215b6547794a4"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/ConfigurationBoundIdentityTransport.php",
+      "git_blob": "8e033454705343e72374b9156eb212e93c18450b",
+      "sha256": "4c369241dde1ff5d4214434f284745b8d7ed53fb9488a03c8b72b397083dd454",
+      "prior_sha256": "4c369241dde1ff5d4214434f284745b8d7ed53fb9488a03c8b72b397083dd454"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/ConfiguredSmtpIdentityTransport.php",
+      "git_blob": "ea770377eb44bc89f8d5a02fc47e3f28f1ef5717",
+      "sha256": "75068247694ea5024387ac66b97698aeafd3c5993ac34442f85f72d4c3f316f0",
+      "prior_sha256": "75068247694ea5024387ac66b97698aeafd3c5993ac34442f85f72d4c3f316f0"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentityEsmtpClient.php",
+      "git_blob": "4c3433e7085376660365784dd353a14b086c0a24",
+      "sha256": "88877b44bfb1f6901aced5a31249637b2a18b9164fda9a750374272d2e421374",
+      "prior_sha256": "88877b44bfb1f6901aced5a31249637b2a18b9164fda9a750374272d2e421374"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentitySmtpFactory.php",
+      "git_blob": "190a9460d7774cc787526d89eb1901fa88bb1099",
+      "sha256": "a294f78b62fa353eb1a80e1adacac8b93acae14aba0e7b5b5b8b6fd5db0e41b9",
+      "prior_sha256": "a294f78b62fa353eb1a80e1adacac8b93acae14aba0e7b5b5b8b6fd5db0e41b9"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php",
+      "git_blob": "347645f485d3bcd4cdc075ffe181a30789f66c30",
+      "sha256": "99916a84234471ca95c8ec6c8b6b57324321e0132b38197c42f6c43b66eaf8d5",
+      "prior_sha256": "99916a84234471ca95c8ec6c8b6b57324321e0132b38197c42f6c43b66eaf8d5"
+    },
+    {
+      "path": "app/Providers/AppServiceProvider.php",
+      "git_blob": "2e2f22c3425b84cfe7cb6ddb5ebaf0c2d98f8d63",
+      "sha256": "3af097c9efcf180e0540fc3d62053fab23f426dd765282e29a2209571819d4d0",
+      "prior_sha256": "3af097c9efcf180e0540fc3d62053fab23f426dd765282e29a2209571819d4d0"
+    },
+    {
+      "path": "config/production-identity-smtp.php",
+      "git_blob": "dc5838b87a3127d998ac8b972b666e723c9c991f",
+      "sha256": "75413404f81d57f54eb4c4d838c795c50a18a0b44cbb50e0d3363961df75b3f9",
+      "prior_sha256": "75413404f81d57f54eb4c4d838c795c50a18a0b44cbb50e0d3363961df75b3f9"
+    },
+    {
+      "path": "database/migrations/2026_10_07_247000_production_customer_identity.php",
+      "git_blob": "f82b5334e2d582ea63f91674b835f43f5bd28815",
+      "sha256": "a2cfa089ea5452aec894f24f6779f5deee63fb3a2453fd6c12d4a5d8b1273166",
+      "prior_sha256": "a2cfa089ea5452aec894f24f6779f5deee63fb3a2453fd6c12d4a5d8b1273166"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php",
+      "git_blob": "75947ba8a625fcbdf9df0f63de13f568d9e4dc59",
+      "sha256": "a2a1d7608e9c47d07c9456b8828a0c83141b4a7f078e7e3b01019598d285e0d0",
+      "prior_sha256": "a2a1d7608e9c47d07c9456b8828a0c83141b4a7f078e7e3b01019598d285e0d0"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentityAdapters/ConfiguredIdentitySmtpTest.php",
+      "git_blob": "1c184c7b5770a63260eeda0171f48549dcad955f",
+      "sha256": "f211b7e48c31a6f4771ed9f3e02932c23938456264fe96d9095f46dddb4fafe9",
+      "prior_sha256": "f211b7e48c31a6f4771ed9f3e02932c23938456264fe96d9095f46dddb4fafe9"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php",
+      "git_blob": "e76c20ab6e8b43f22fa5e59517678da9f9f06cbe",
+      "sha256": "f16fc133a0130687a06db97cf534d3a8c8852ff8d91ad9941723067a2b3c3dd1",
+      "prior_sha256": "f16fc133a0130687a06db97cf534d3a8c8852ff8d91ad9941723067a2b3c3dd1"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentityAdapters/IdentityHistoricalConfigurationAdmissionTest.php",
+      "git_blob": "687da559c9cc442e7596f9bae0027367ee6d9088",
+      "sha256": "b7436258def3ac2cd814f86ff9b6d8af7895945b3ff4949e76cec62501ed156d",
+      "prior_sha256": "b7436258def3ac2cd814f86ff9b6d8af7895945b3ff4949e76cec62501ed156d"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentityAdapters/ProductionAccountFeatureAccessTest.php",
+      "git_blob": "e2921a774916b757f9d62d51da18918c7444bef5",
+      "sha256": "53cd630a1828bcf636000bb51dcfc606be4ce1dd7d8fac0929387671555d9be6",
+      "prior_sha256": "53cd630a1828bcf636000bb51dcfc606be4ce1dd7d8fac0929387671555d9be6"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentitySmtpBindingTest.php",
+      "git_blob": "ce33745ee305b9e72f001e4f3f0f2a92150ec364",
+      "sha256": "e359ebcacd4da09b3ec10def4310455952d494c97a41ddb2da6fd792f0e6d3cf",
+      "prior_sha256": "e359ebcacd4da09b3ec10def4310455952d494c97a41ddb2da6fd792f0e6d3cf"
+    },
+    {
+      "path": "tests/Support/IdentityHistoricalCommitFixture.php",
+      "git_blob": "f998ff867b317cc1074386195bfcdbe42b077907",
+      "sha256": "c36d6def466cb27d742c1b9596177a295d9d3f0820a7b51314a0b43425c450a2",
+      "prior_sha256": "c36d6def466cb27d742c1b9596177a295d9d3f0820a7b51314a0b43425c450a2"
+    },
+    {
+      "path": "tests/Support/ProductionIdentityTlsSmtpFixture.php",
+      "git_blob": "db78ae36010a7a1309045dadf351148ade743295",
+      "sha256": "03d5ddb1d3ecf63ce908e04d32e856e4b1a68f657578cbe20418adfaeb0241a6",
+      "prior_sha256": "03d5ddb1d3ecf63ce908e04d32e856e4b1a68f657578cbe20418adfaeb0241a6"
+    },
+    {
+      "path": "tests/Support/production_identity_tls_smtp_sink.py",
+      "git_blob": "438c80bc75cb1c1e36334b3315ddf6d8dae33a0a",
+      "sha256": "48f953c5df3643bbcbc660f70fd258b7059207304876b04d318b1590409a5c51",
+      "prior_sha256": "48f953c5df3643bbcbc660f70fd258b7059207304876b04d318b1590409a5c51"
+    }
+  ],
+  "counts": {
+    "bound_paths": 30,
+    "unchanged": 28,
+    "changed": 2,
+    "runtime_changed": 1,
+    "test_changed": 1,
+    "verified_root_committed_artifacts": 17
+  },
+  "complete_old_frame_class_recovered_by_reverting_only_reviewed_close_and_restore_hunks": true,
+  "all_old_test_bytes_exact_after_removing_one_added_method": true,
+  "root_original_probe_sha256": "9a55aa2ebec90dfdbc1a15570431c9e26e31e1358cb110dffb14ef858d3ee81d",
+  "root_original_probe_actual_result": "1 failure/3 assertions, zero errors, on 6feca441ced6581ddf2ccab0d31511f8627092f7",
+  "independent_current_final": "SQLite1/6 zero failures/errors/skips",
+  "independent_current_unchanged_original": "SQLite1/5 zero failures/errors/skips",
+  "root_current_family": "SQLite14 recorded/13 executed/78 assertions; one existing named native-only skip; zero failures/errors",
+  "root_current_native": "MySQL8.0.46 selected counterpart1/4 zero failures/errors/skips; root execution, not independently repeated",
+  "reviewed_patch_decompressed_sha256": "0b205116cfdc88975c07d25061dc765f8f2325117a94ce9ca0992442bca2e52a"
+}

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\CustomerCommunicationPreferencesHttpTest" file="/workspace/VA-Studio/tests/Feature/CustomerCommunicationPreferencesHttpTest.php" tests="2" assertions="36" errors="0" failures="0" skipped="0" time="2.507588">
+    <testcase name="test_real_signed_in_choice_keeps_unknown_distinct_and_fences_stale_grants_after_withdrawal" file="/workspace/VA-Studio/tests/Feature/CustomerCommunicationPreferencesHttpTest.php" line="24" class="Tests\Feature\CustomerCommunicationPreferencesHttpTest" classname="Tests.Feature.CustomerCommunicationPreferencesHttpTest" assertions="28" time="1.578535"/>
+    <testcase name="test_current_password_withdrawal_refuses_even_with_a_cached_authenticated_guard_and_retains_consent_history" file="/workspace/VA-Studio/tests/Feature/CustomerCommunicationPreferencesHttpTest.php" line="51" class="Tests\Feature\CustomerCommunicationPreferencesHttpTest" classname="Tests.Feature.CustomerCommunicationPreferencesHttpTest" assertions="8" time="0.929053"/>
+  </testsuite>
+</testsuites>

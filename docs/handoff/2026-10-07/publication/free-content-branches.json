@@ -1,0 +1,55 @@
+{
+  "recorded_owned_branch_heads": {
+    "codex/cloud-completion-audit-20261007": "6e1839c7f3ab1f9ae2fbfe3518ddc8f45b97eacd",
+    "codex/recover-inquiry-notifications-20261007": "a6145547ac91faca24e1965a6112c440e4680ab6",
+    "codex/production-customer-identity-local-smtp-20261007": "aa0eb63c8e7a6d4fad07fed6e6c868765b851298",
+    "codex/production-identity-adapters-20261007": "19fe9aa3fad51b7e14b71d3355f290dfe40e0f64",
+    "codex/identity-adapters-callback-repair-20261007": "9c1b1354c3b0ae7ed3c31d77838ee9887cbb437a",
+    "codex/identity-historical-callback-repair-20261007": "3cf11d745f51fdacdc72a3a222469403e795aed9",
+    "codex/free-registration-independent-20261007": "e4fe6e9341060ccc727adf3fbc394f25259740a6",
+    "codex/production-free-http-parent-guard-20261007": "a4f9e63fdfbd72d781d0e97379235a0461a8ffad"
+  },
+  "significant_sources_reachable_from_owned_heads": {
+    "3c2158e726a3bd3fdd57597adcb5756c49dff2ce": [
+      "codex/production-customer-identity-local-smtp-20261007"
+    ],
+    "101e3832e8e5637cab784eb2a800d60642a746b4": [
+      "codex/identity-adapters-callback-repair-20261007",
+      "codex/identity-historical-callback-repair-20261007"
+    ],
+    "e8f744163600bb394e3f09c8c7f838f9fc62c885": [
+      "codex/identity-historical-callback-repair-20261007"
+    ],
+    "b9871dff4cd734779cd12809d736fb69af4e3dc7": [
+      "codex/identity-historical-callback-repair-20261007"
+    ],
+    "e6c02b90719923bc4ba435f86399b077980c1ddc": [
+      "codex/identity-historical-callback-repair-20261007"
+    ],
+    "dc17abcd3a60a0c47bd1247b52f239caede912c4": [
+      "codex/identity-historical-callback-repair-20261007"
+    ],
+    "3f49d2a2a4f853778afa66db8f0f61442e2ab586": [
+      "codex/production-free-http-parent-guard-20261007"
+    ],
+    "233f0864028156faeb70c63259910214e47762cb": [
+      "codex/production-free-http-parent-guard-20261007"
+    ],
+    "ff0f7a85be397f017a227967058f745ceea3da28": [
+      "codex/production-free-http-parent-guard-20261007"
+    ],
+    "c0029cdee5d5445a7c801ce89ae3b3e09df2420c": [
+      "codex/production-free-http-parent-guard-20261007"
+    ],
+    "1969bbad995e1e978bf19fc809d5b39440d7d3ce": [
+      "codex/production-free-http-parent-guard-20261007"
+    ]
+  },
+  "checkpoint_dependency_base": "519170f9e5541602577381f17fa39c366b8e608b",
+  "peer_approval_heads_root_or_peer_owned": {
+    "codex/identity-historical-fix-independent-20261007": "b24ed8142248d6794858b4a3619c43178dfe098b",
+    "codex/production-free-identity-independent-20261007": "fbd3d56bba11f187c528018c5b0bf51e89a4eb4f",
+    "codex/identity-adapters-ordinary-independent-20261007": "5d53585fb3ea65c8a6f4162d8e71bd043caea538"
+  },
+  "not_an_integration_or_approval_of_failed_source": true
+}

@@ -1,0 +1,15 @@
+{
+  "remote": "https://github.com/SeanVasey/VA-Studio.git",
+  "remote_refs_verified": {
+    "refs/heads/codex/paid-grant-commit-admission-20261007": "e8a2b93d4557a8bee20172158f8d0df7ee157a98",
+    "refs/heads/codex/paid-grant-fixture-portability-20261007": "972a76c5e04da0f61d409d6caf9eb84281fef2a3",
+    "refs/heads/codex/paid-grant-origins-20261007": "0b745151ac56f1bfd2a6d9ff0eb34c3f5c92fac6"
+  },
+  "handoff": "docs/handoffs/paid252-native-ops-and-payment-readiness-20261007.md",
+  "head": "972a76c5e04da0f61d409d6caf9eb84281fef2a3",
+  "status": "Held252 checkpoint pushed; native HTTP409 unresolved, no merge/CI/activation",
+  "original_failure_preserved": true,
+  "fresh_recovery_mysql": "1/36 passed",
+  "paid_grant_other_schema_sessions": 0,
+  "worktree_clean": true
+}

@@ -1,0 +1,19 @@
+{
+  "docs/verification/identity-foreign-readonly-cleanup-20261007/pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+  "docs/verification/identity-foreign-readonly-cleanup-20261007/source-binding.json": "b4f83b23d96b32eb1efae12a4a68e8caf40cc4ff229c21dd94bd7f9643c63a39",
+  "docs/verification/identity-foreign-readonly-cleanup-20261007/pint-final.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+  "docs/verification/identity-foreign-readonly-cleanup-20261007/family-final.xml": "7dd1c619f45767145f7d1689b8e3ece37d843b7148ee927e8d5ff06317615393",
+  "docs/verification/identity-foreign-readonly-cleanup-20261007/family.txt": "f55045e5b36fbb1d5bc79f74750166085fb82356dee492cb8dc9ff94ef788900",
+  "docs/verification/identity-foreign-readonly-cleanup-20261007/original.txt": "a7ea4ecf64d6a199084bc5552af84df2d1c35f98687efd9f91763c26a5eaa092",
+  "docs/verification/identity-foreign-readonly-cleanup-20261007/original.xml": "ba78e7652495ccd7ef7d41bb2b3e79e0270ea449bdda1f6e16ccbc0eebfd86ae",
+  "docs/verification/identity-foreign-readonly-cleanup-20261007/unchanged.txt": "b66ef6542c5ef9ef2aa749afd74f010db418be6e776abee9fdfd552cfa677242",
+  "docs/verification/identity-foreign-readonly-cleanup-20261007/original-source.json": "dfd8349c0631ea1ae9a351872684ae658d9ff85511113206038f8e14455b3f91",
+  "docs/verification/identity-foreign-readonly-cleanup-20261007/README.md": "75e58dac69d8c6aeb727e073a080369d5bb2d02ce1e27ff3db6992eb4008fc37",
+  "docs/verification/identity-foreign-readonly-cleanup-20261007/family-final.txt": "2d836f2ef603ad78b0ca3e4d7082ff37444649a3e4147d50e6100ddd9f3325b7",
+  "docs/verification/identity-foreign-readonly-cleanup-20261007/native.txt": "b4a1caae31deaddd26e5cf5a4b78896edc19f5ba473f694711f290d2da11c0c5",
+  "docs/verification/identity-foreign-readonly-cleanup-20261007/native.xml": "91317658215583aabc571120169e1875eefab8056ebae4fba92906da77e29055",
+  "docs/verification/identity-foreign-readonly-cleanup-20261007/unchanged.xml": "f16be29fb4ddd5951dd35fe8738e722c28232dce9dde4ace20091c58344e23f8",
+  "docs/verification/identity-foreign-readonly-cleanup-20261007/family.xml": "be5ae6e1b77673a6dbc55960045dc9feb6bfc10fd6506be847bcca0f83d5f5c9",
+  "docs/verification/identity-foreign-readonly-cleanup-20261007/original/app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php": "623e31f469a0a1779e3f992f5d1c48b0aaa2382d308109bc33cc78f70a7c821b",
+  "docs/verification/identity-foreign-readonly-cleanup-20261007/original/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php": "9a55aa2ebec90dfdbc1a15570431c9e26e31e1358cb110dffb14ef858d3ee81d"
+}

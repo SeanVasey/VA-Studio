@@ -1,0 +1,10 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-identity-frame-cleanup-independent/phpunit.xml
+
+.                                                                   1 / 1 (100%)
+
+Time: 00:00.775, Memory: 75.00 MB
+
+[30;42mOK (1 test, 6 assertions)[0m

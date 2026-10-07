@@ -1,0 +1,12 @@
+{
+    "source": "df0f77eee08417137a828047fa495860f499115c",
+    "callbacks": 1,
+    "enabled": false,
+    "result": {
+        "status": "confirmed"
+    },
+    "refused": false,
+    "sent": 1,
+    "frameworkDepth": 0,
+    "physicalTransaction": true
+}

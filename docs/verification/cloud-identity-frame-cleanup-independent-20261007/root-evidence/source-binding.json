@@ -1,0 +1,13 @@
+{
+  "executable": "5053af53e85ab49aea2a2a6eb85d66d821f49e95",
+  "predecessor_composition": "6feca441ced6581ddf2ccab0d31511f8627092f7",
+  "original": "1genuine failure/3assertions/zeroerrors; foreign query_only changed1to0",
+  "current_sqlite": "14recorded/13executed/78assertions,1existing named native-only skip,zero failures/errors",
+  "byte_unchanged_original_probe": "1/5 zero failures/errors/skips; same archived regression file",
+  "source_sha256": {
+    "app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php": "5689637577c6ffe61cec52eb60d7445432f992a2246be133be8e0dd424b13da7",
+    "tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php": "19eddedf7f11341ca4360814eeb345a0dbdb1068846183f4ca9c720356c3ec06"
+  },
+  "native": "Actual MySQL8.0.46 selected counterpart1/4 zero failures/errors/skips; existing dedicated identity_smtp schema; original replacement/savepoint preserved.",
+  "scope": "One runtime helper/close state correction plus one active cross-engine case. No caller rollback, identity/financial API, original source/deadline/frame renewal."
+}

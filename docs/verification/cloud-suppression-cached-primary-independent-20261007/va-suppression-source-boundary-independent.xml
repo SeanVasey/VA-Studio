@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\CustomerSuppressionSourceBoundaryTest" file="/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php" tests="7" assertions="7" errors="7" failures="0" skipped="0" time="3.902109">
+    <testsuite name="Tests\Feature\CustomerSuppressionSourceBoundaryTest::test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection" tests="4" assertions="4" errors="4" failures="0" skipped="0" time="2.189492">
+      <testcase name="test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set &quot;send positive&quot;" file="/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php" line="28" class="Tests\Feature\CustomerSuppressionSourceBoundaryTest" classname="Tests.Feature.CustomerSuppressionSourceBoundaryTest" assertions="1" time="0.736313">
+        <error type="RuntimeException">Tests\Feature\CustomerSuppressionSourceBoundaryTest::test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set "send positive"
+RuntimeException: Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/Encrypter.php:61
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:358
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:111
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:47
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:42
+/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php:212
+/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php:30</error>
+      </testcase>
+      <testcase name="test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set &quot;send ambiguous&quot;" file="/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php" line="28" class="Tests\Feature\CustomerSuppressionSourceBoundaryTest" classname="Tests.Feature.CustomerSuppressionSourceBoundaryTest" assertions="1" time="0.467234">
+        <error type="RuntimeException">Tests\Feature\CustomerSuppressionSourceBoundaryTest::test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set "send ambiguous"
+RuntimeException: Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/Encrypter.php:61
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:358
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:111
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:47
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:42
+/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php:212
+/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php:30</error>
+      </testcase>
+      <testcase name="test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set &quot;inspect positive&quot;" file="/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php" line="28" class="Tests\Feature\CustomerSuppressionSourceBoundaryTest" classname="Tests.Feature.CustomerSuppressionSourceBoundaryTest" assertions="1" time="0.494276">
+        <error type="RuntimeException">Tests\Feature\CustomerSuppressionSourceBoundaryTest::test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set "inspect positive"
+RuntimeException: Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/Encrypter.php:61
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:358
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:111
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:47
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:42
+/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php:212
+/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php:30</error>
+      </testcase>
+      <testcase name="test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set &quot;inspect ambiguous&quot;" file="/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php" line="28" class="Tests\Feature\CustomerSuppressionSourceBoundaryTest" classname="Tests.Feature.CustomerSuppressionSourceBoundaryTest" assertions="1" time="0.491669">
+        <error type="RuntimeException">Tests\Feature\CustomerSuppressionSourceBoundaryTest::test_lazy_primary_is_not_resolved_and_lost_receipt_requires_inspection with data set "inspect ambiguous"
+RuntimeException: Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/Encrypter.php:61
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:358
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:111
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:47
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:42
+/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php:212
+/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php:30</error>
+      </testcase>
+    </testsuite>
+    <testcase name="test_same_primary_commit_reopen_refuses_without_rolling_back_the_foreign_transaction" file="/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php" line="97" class="Tests\Feature\CustomerSuppressionSourceBoundaryTest" classname="Tests.Feature.CustomerSuppressionSourceBoundaryTest" assertions="1" time="0.489414">
+      <error type="RuntimeException">Tests\Feature\CustomerSuppressionSourceBoundaryTest::test_same_primary_commit_reopen_refuses_without_rolling_back_the_foreign_transaction
+RuntimeException: Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/Encrypter.php:61
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:358
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:111
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:47
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:42
+/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php:212
+/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php:99</error>
+    </testcase>
+    <testcase name="test_replacement_primary_transaction_remains_owned_by_its_caller" file="/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php" line="144" class="Tests\Feature\CustomerSuppressionSourceBoundaryTest" classname="Tests.Feature.CustomerSuppressionSourceBoundaryTest" assertions="1" time="0.595217">
+      <error type="RuntimeException">Tests\Feature\CustomerSuppressionSourceBoundaryTest::test_replacement_primary_transaction_remains_owned_by_its_caller
+RuntimeException: Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/Encrypter.php:61
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:358
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:111
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:47
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:42
+/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php:212
+/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php:146</error>
+    </testcase>
+    <testcase name="test_raw_transaction_without_a_framework_owner_is_refused_before_any_attempt" file="/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php" line="191" class="Tests\Feature\CustomerSuppressionSourceBoundaryTest" classname="Tests.Feature.CustomerSuppressionSourceBoundaryTest" assertions="1" time="0.627986">
+      <error type="RuntimeException">Tests\Feature\CustomerSuppressionSourceBoundaryTest::test_raw_transaction_without_a_framework_owner_is_refused_before_any_attempt
+RuntimeException: Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/Encrypter.php:61
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:358
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:111
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:47
+/workspace/VA-Studio-suppression-registration/app/Domain/Customers/Preferences/CustomerConsentPreferences.php:42
+/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php:212
+/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionSourceBoundaryTest.php:193</error>
+    </testcase>
+  </testsuite>
+</testsuites>

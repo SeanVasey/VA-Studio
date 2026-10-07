@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\CustomerSuppressionLazyBoundaryCanaryTest" file="/tmp/CustomerSuppressionLazyBoundaryCanaryTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="22.206497">
+    <testcase name="test_late_primary_resolver_cannot_release_confirmation_after_policy_withdrawal" file="/tmp/CustomerSuppressionLazyBoundaryCanaryTest.php" line="14" class="Tests\Feature\CustomerSuppressionLazyBoundaryCanaryTest" classname="Tests.Feature.CustomerSuppressionLazyBoundaryCanaryTest" assertions="4" time="22.206497"/>
+  </testsuite>
+</testsuites>

@@ -26,7 +26,7 @@ class CustomerConsentPreferencesTest extends TestCase
     {
         $customer = CustomerFixtures::account();
         $service = app(CustomerConsentPreferences::class);
-        $this->assertSame(['schema' => 1, 'purposes' => [['purpose' => 'email_marketing', 'version' => 0, 'status' => 'unknown', 'notice' => null, 'canGrant' => false]]], $service->read($customer['principal'], $customer['user']));
+        $this->assertSame(['schema' => 1, 'purposes' => [['purpose' => 'email_marketing', 'version' => 0, 'status' => 'unknown', 'notice' => null, 'canGrant' => false, 'suppression' => ['status' => 'not_requested']]]], $service->read($customer['principal'], $customer['user']));
         $this->assertSame(0, ConsentEvent::count());
         $this->assertSame(0, ConsentState::count());
         $this->assertSame(0, ConsentPolicySnapshot::count());

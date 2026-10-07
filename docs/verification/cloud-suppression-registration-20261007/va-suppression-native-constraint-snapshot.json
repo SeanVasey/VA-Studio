@@ -1,0 +1,19 @@
+{
+    "driver": "mysql",
+    "version": "8.0.46-0ubuntu0.24.04.4",
+    "before": [],
+    "after": [
+        "customer_suppression_targets"
+    ],
+    "ddl": [
+        "CREATE TABLE `customer_suppression_targets` (`id` bigint unsigned NOT NULL AUTO_INCREMENT, `public_id` char(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL, `customer_account_id` bigint unsigned NOT NULL, `purpose` varchar(40) CHARACTER SET ascii COLLATE ascii_bin NOT NULL, `recipient_hmac` char(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL, `recipient_ciphertext` text CHARACTER SET ascii COLLATE ascii_bin NOT NULL, `created_at` timestamp NOT NULL, PRIMARY KEY (`id`), UNIQUE KEY `customer_suppression_targets_public_unique` (`public_id`), UNIQUE KEY `customer_suppression_targets_recipient_unique` (`customer_account_id`, `purpose`, `recipient_hmac`), CONSTRAINT `customer_suppression_targets_customer_account_id_fk` FOREIGN KEY (`customer_account_id`) REFERENCES `customer_accounts` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='VA retained customer suppression v1'"
+    ],
+    "refusal": "SQLSTATE[HY000]: General error: 1826 Duplicate foreign key constraint name 'customer_suppression_intents_consent_event_id_fk' (Connection: mysql, Host: 127.0.0.1, Port: 33067, Database: vaseyaudio_suppress_review, SQL: CREATE TABLE `customer_suppression_intents` (`id` bigint unsigned NOT NULL AUTO_INCREMENT, `public_id` char(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL, `consent_event_id` bigint unsigned NOT NULL, `target_id` bigint unsigned NOT NULL, `created_at` timestamp NOT NULL, PRIMARY KEY (`id`), UNIQUE KEY `customer_suppression_intents_public_unique` (`public_id`), UNIQUE KEY `customer_suppression_intents_event_unique` (`consent_event_id`), KEY `customer_suppression_intents_target_index` (`target_id`), CONSTRAINT `customer_suppression_intents_consent_event_id_fk` FOREIGN KEY (`consent_event_id`) REFERENCES `customer_consent_events` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT, CONSTRAINT `customer_suppression_intents_target_id_fk` FOREIGN KEY (`target_id`) REFERENCES `customer_suppression_targets` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='VA retained customer suppression v1')",
+    "refusalClass": "Illuminate\\Database\\QueryException",
+    "foreignMarker": [
+        {
+            "id": 9123,
+            "user_id": null
+        }
+    ]
+}

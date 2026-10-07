@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\CustomerSuppressionTest" file="/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionTest.php" tests="6" assertions="48" errors="0" failures="0" skipped="0" time="115.157473">
+    <testcase name="test_single_positive_attempt_is_committed_before_adapter_and_is_never_sent_again" file="/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionTest.php" line="67" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="12" time="19.658120"/>
+    <testcase name="test_credentials_changed_after_durable_claim_block_transport_and_retain_unknown" file="/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionTest.php" line="183" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="5" time="17.545768"/>
+    <testcase name="test_late_credential_withdrawal_after_positive_receipt_cannot_confirm" file="/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionTest.php" line="196" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="6" time="15.473002"/>
+    <testcase name="test_terminal_adapter_policy_callback_cannot_release_confirmation" file="/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionTest.php" line="212" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="5" time="19.639890"/>
+    <testcase name="test_changed_provider_binding_never_resends_old_unknown_or_projects_old_confirmation" file="/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionTest.php" line="233" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="7" time="22.505260"/>
+    <testcase name="test_native_and_sqlite_guards_retain_every_target_intent_attempt_and_receipt" file="/workspace/VA-Studio-suppression-registration/tests/Feature/CustomerSuppressionTest.php" line="344" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="13" time="20.335435"/>
+  </testsuite>
+</testsuites>

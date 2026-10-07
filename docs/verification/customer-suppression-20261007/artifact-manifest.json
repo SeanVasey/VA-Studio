@@ -1,0 +1,20 @@
+{
+  "README.md": "9cef8b0813e01a37ace969f999e3f81fd60a2346f51b1a50a77430cd291d85f8",
+  "RESULTS.md": "1084d1613d1cf47e425643a845ab47f93520c295e9a3a239f4563642cfb6a32a",
+  "candidate-101-green.txt": "b591c9a18e405b1ac6853be3b97e10ece2e3047ba985059831bb21a540052d0a",
+  "candidate-104-green.txt": "815789a49c37d6fbf14ad436f74477254892cab09d7801d04776ccf2141d8296",
+  "frontend-command.json": "b7428e0e57d4c9804014777e31e380436c2f543506acfcdc1b5607be66526b1a",
+  "frontend.txt": "42f25001f71f50b0cfd41b258e3361ffcb753f574072ec928ad49039b0b446d1",
+  "initial-domain-green.txt": "8ba5191043938070785c048e4dadae9f39029c65453b487056c77c79283417d9",
+  "initial-fixture-parse-errors.txt": "f6866f85e839fe94ce7975e9533dd3eb8da9755a6ff46e7c8bfa9132b21cbb59",
+  "initial-migration-green.txt": "a7f09009b79d965bc371be9bca789c738a3bcb1edc26910db112321a5e872560",
+  "php-commands.json": "180d8a7ee4f96b7d8bc1cf0ef3e284fe7791a053afced03d33df40cc0e99308f",
+  "php-focused-junit.xml": "955b3659dd49d57c44cb89c8401baa9301232d04a6d5fdab94e6b644e9e59647",
+  "php-focused.txt": "c0c8c9cc15ed5ed020903665e354de3765b1e79a164d5f2a271d8eeff34e1173",
+  "pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+  "results.json": "fc07175ff106aefe3919c94d26ccdab4366eb5da2f5ae39c191f95cbd832b5e4",
+  "runtime.json": "1aa1dcb319bfd2d4e13bc737ae727c01c2bd276017d77dea18487b5aab5d7bb8",
+  "source-manifest.json": "2874a71725a57ab2bc66de753ba3f16854ee49b348c87688490251dca76fc8bf",
+  "typecheck-command.json": "652dea0afa80126e3be5d25ca9bb5e3af9595f853b436e79bdb8254c1affdcf3",
+  "typecheck.txt": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f"
+}

@@ -1,0 +1,13 @@
+
+> test
+> vitest run tests/frontend/customer-communication-preferences.test.tsx tests/frontend/customer-communication-registration.test.tsx tests/frontend/customer-suppression-status.test.tsx
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-suppression-registration
+
+
+ Test Files  3 passed (3)
+      Tests  39 passed (39)
+   Start at  10:14:25
+   Duration  2.04s (environment 48%, tests 26%, transform 10%, setup 9%, import 7%)
+

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 export interface CommunicationPurpose { purpose: 'email_marketing'; version: number; status: 'unknown' | 'granted' | 'withdrawn';
-  notice: null | { version: string; hash: string; text: string }; canGrant: boolean }
+  notice: null | { version: string; hash: string; text: string }; canGrant: boolean; suppression: { status: 'not_requested' | 'pending' | 'confirmed' | 'unknown' } }
 export interface CommunicationPreferences { schema: 1; purposes: [CommunicationPurpose] }
 const record = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
 const keys = (value: Record<string, unknown>, names: string[]) => Object.keys(value).length === names.length && names.every(name => Object.hasOwn(value, name));
@@ -10,10 +10,12 @@ const noticeText = (value: unknown): value is string => typeof value === 'string
 export function validCommunicationPreferences(value: unknown): value is CommunicationPreferences {
   if (!record(value) || !keys(value, ['schema', 'purposes']) || value.schema !== 1 || !Array.isArray(value.purposes) || value.purposes.length !== 1) return false;
   const purpose = value.purposes[0];
-  if (!record(purpose) || !keys(purpose, ['purpose', 'version', 'status', 'notice', 'canGrant']) || purpose.purpose !== 'email_marketing'
+  if (!record(purpose) || !keys(purpose, ['purpose', 'version', 'status', 'notice', 'canGrant', 'suppression']) || purpose.purpose !== 'email_marketing'
     || typeof purpose.version !== 'number' || !Number.isInteger(purpose.version) || purpose.version < 0 || purpose.version > 2147483646
     || typeof purpose.status !== 'string' || !['unknown', 'granted', 'withdrawn'].includes(purpose.status) || typeof purpose.canGrant !== 'boolean'
-    || (purpose.version === 0 && purpose.status !== 'unknown')) return false;
+    || !record(purpose.suppression) || !keys(purpose.suppression, ['status']) || typeof purpose.suppression.status !== 'string'
+    || !['not_requested', 'pending', 'confirmed', 'unknown'].includes(purpose.suppression.status)
+    || (purpose.version === 0 && (purpose.status !== 'unknown' || purpose.suppression.status !== 'not_requested'))) return false;
   if (purpose.notice !== null && !(record(purpose.notice) && keys(purpose.notice, ['version', 'hash', 'text'])
     && typeof purpose.notice.version === 'string' && /^[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}$/.test(purpose.notice.version)
     && typeof purpose.notice.hash === 'string' && /^[a-f0-9]{64}$/.test(purpose.notice.hash) && noticeText(purpose.notice.text))) return false;
@@ -101,6 +103,9 @@ export function CustomerCommunicationPreferences({ scope }: { scope: string }) {
     {currentMessage && <p role="alert" tabIndex={-1} ref={alert}>{currentMessage}{expired && <a href="/account/sign-in">Open a fresh sign-in page</a>}</p>}
     {purpose && <div aria-label="Email marketing preference"><h3>Email marketing</h3>
       <p>{purpose.status === 'unknown' ? 'Current consent is unknown.' : purpose.status === 'granted' ? 'Your saved choice is opt in.' : 'Your saved choice is withdrawn.'}</p>
+      {purpose.suppression.status !== 'not_requested' && <p aria-label="Provider suppression status">{purpose.suppression.status === 'pending' ? 'Suppression is queued. Provider confirmation is pending.'
+        : purpose.suppression.status === 'confirmed' ? 'Suppression is confirmed for the configured provider scope.'
+          : 'Provider suppression is not confirmed. A new request will not be sent automatically.'}</p>}
       {purpose.notice && <div aria-label="Current email marketing notice"><p style={{ whiteSpace: 'pre-wrap' }}>{purpose.notice.text}</p><p>Notice version: {purpose.notice.version}</p></div>}
       {purpose.canGrant && purpose.notice ? <form onSubmit={event => { event.preventDefault(); void request('grant-consent'); }}>
         <label><input type="checkbox" checked={affirmative} disabled={busy} onChange={event => setAffirmative(event.target.checked)} /> I choose to opt in to email marketing under the notice above.</label>

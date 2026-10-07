@@ -1,0 +1,56 @@
+{
+  "source": "50fb8d0442a4f53632e1f25785b49d3148161d20",
+  "php": {
+    "tests": 105,
+    "assertions": 553,
+    "errors": 0,
+    "failures": 0,
+    "suites": [
+      {
+        "name": "Tests\\Feature\\CustomerSuppressionTest",
+        "tests": 30,
+        "assertions": 232,
+        "errors": 0,
+        "failures": 0
+      },
+      {
+        "name": "Tests\\Feature\\CustomerSuppressionMigrationTest",
+        "tests": 29,
+        "assertions": 132,
+        "errors": 0,
+        "failures": 0
+      },
+      {
+        "name": "Tests\\Feature\\CustomerConsentPreferencesTest",
+        "tests": 29,
+        "assertions": 147,
+        "errors": 0,
+        "failures": 0
+      },
+      {
+        "name": "Tests\\Feature\\CustomerConsentBoundaryTest",
+        "tests": 17,
+        "assertions": 42,
+        "errors": 0,
+        "failures": 0
+      }
+    ]
+  },
+  "frontend": {
+    "tests": 34,
+    "files": 2,
+    "exitCode": 0
+  },
+  "typecheck": {
+    "exitCode": 0
+  },
+  "pint": {
+    "exitCode": 0
+  },
+  "initialHarnessError": {
+    "receipt": "initial-fixture-parse-errors.txt",
+    "cause": "Extra closing array bracket in the newly authored synthetic adapter fixture. Fixed only the fixture before any provider-bound cases could execute. Not a product red receipt."
+  },
+  "nativeMySQL": "Not executed by author; independent exact-source schema/prefix/concurrency review remains required.",
+  "providerDelivery": "Only synthetic adapter callbacks executed; default off and unbound. No marketing/provider installation or production activation."
+}

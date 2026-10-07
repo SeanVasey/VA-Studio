@@ -7,9 +7,13 @@ or Mac execution was used. The current branch is
 
 ## Current recovery state
 
-Verified mainef44494 includes immediate PR25/26/23 repairs and PRs27–36. Starting-state
-sections below are historical. Current owned work and source receipts are in
-the newest milestone and current agent queue.
+Current development is frozen for the user-requested Claude Code handoff. Reviewed
+main through38 isaff987410d8a843c0b6fa336e5edcbc61e0911b5; the final current batch adds
+approved suppression251, the independently reviewed5053 identity cleanup correction
+and the complete six-owner checkpoint. The detailed handoff and42-ref remote
+inventory supersede older active-owner tables. Original failures and all unfinished
+source remain on verified origin branches. Publication/preflight/merge are recorded
+on the final checkpoint PR; no complete Foundation/live acceptance is claimed.
 
 ## Verified starting source and recovery limits
 
@@ -502,3 +506,52 @@ Checkout6e source-valid media repair passes authorSQLite5/39/native5/39 and unch
 Production253 exacttyped module nativepartial7/62 has4pass+3legitimate original10sec deadline errors; two realSQL guards/postcommitcredential/foreigntransaction passes are separate from three held consumers. Actuallateconfigparent probes2FAIL9 demonstrate stalegrantedprojection after modulewithdrawal. NEWownrawparent/statement guard and heldContext-only dependency proof optimization are assigned; migration fullfloor/ordinary101 bodies stay exact, no budgetextension. Server-onlyauthenticatedwithdrawalreader precedes distinct254suppression. Membership257 b635 native9/30 preparation is historical/unapproved while ownrawparent/typedleaf correction and independent structural review proceed, then NEW258/operativeinvoice/award/reservation/memberfulfilment.
 
 All full personal-store requirements remain active, including otherproducts, exclusive/promotion/refund/provider/operator flows, source migration and content/payment/hosting preparation. Finalactive test lifecycle/dualenginecoverage/exactSQLite-only-native census and native8.4/browser/exact-SHA Foundation remain implementation/acceptance work, without relaxed controls. No external mail, user content, credentials, money, servicespurchase, deployment, DNS, budget or protection change occurred.
+
+
+## Final current-batch checkpoint and Claude handoff — October7
+
+Sean requested finishing/pushing current batches and handing remaining work to
+Claude Code, then explicitly directed stopping further development/diagnostic
+rounds. All six worker lanes are frozen, pushed and idle. No new implementation
+is started after this checkpoint.
+
+Support37 merged899df195a4c7b74b1cccb26bf48b0cae920037b9 on08379bd with
+preflight37617713511. Identity/SMTP/historical receipts38 merged
+aff987410d8a843c0b6fa336e5edcbc61e0911b5 on28dfe8d with
+preflight37618153550. Final current source composes approved suppression983
+(source15 bindings preserved, actual registered preference2/36 after main38)
+and narrowly corrected identity cleanup5053af53e85ab49aea2a2a6eb85d66d821f49e95.
+Actual automated finding4206672462 arrived after38; original1FAIL3 is preserved.
+The correction retains foreign read-only state and defers original idle-default
+restoration until the caller ends its transaction. Root family13executed/78asserts
+plus1existing native-onlyskip, unchanged original1/5 and native1/4 pass. Independent
+09c576977784ca8450fd4a8acac9d7c7c4f38ea6 approves exact source with own1/6+1/5.
+Old30identity bindings reconcile to28exact plus precisely Frame/test changes;
+no Source financial API, identity historical helper or authority budget changed.
+
+All42 worker refs are independently matched by root ls-remote and recorded in
+`docs/handoff/2026-10-07/remote-branches.json`. All6 detailed owner packets are
+byte-identical frozen snapshots with original commit/path/SHA256. The handoff
+includes its continuation prompt, branch/dependency integration order, originals,
+passed/failed/deferred commands, source/receipt maps, queued content/payment/host
+work and specific later authorization actions. CLAUDE.md sections1–12 remain
+byte-identical; only Project Notes add current user-authorized continuation rules.
+
+Checkoutc6 is author-tested but unreviewed; Source2ec contract approvedc0cc is a
+separate component. Paid252 portable69-file fixture is Git-tracked; actual native
+recovery1/36 and SQLite1/35 pass, while native delivery409 persists at
+OriginalCommitDispatcher95 in second redemption receipt mint.253 final3ce/runtime9d
+has83SQLite passes/766asserts+3native-onlyskips and finalnative1/6; earlierb6native9/109
+remains separately source-bound.257 reviewed16e preparation remains exact; newer
+Rows3cd and258c4 preparation need independent review and operative writers.
+Tax255/free256/Billing259/customer mail254/content migration/host operation work
+is explicitly missing or queued, alongside all other agreed personal-store scope.
+Six accepted/34open groups and103 parity mappings are unchanged.
+
+No final Foundation was dispatched. Active-fixture schema portability/dual-engine
+counterparts/exact SQLite-native-only census, actual native8.4/browser/full final
+acceptance and provider/storage/restore interoperability remain handed-forward work.
+Security, auditing, original contracts/files, CI controls, budgets and protections
+are preserved. No real keys, mail, payment, purchases, deployment or DNS/cutover
+were configured or performed. Necessary synthetic membership setup is approved;
+real production actions retain separate authorization.

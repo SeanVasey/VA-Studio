@@ -1,0 +1,38 @@
+[
+  {
+    "owner_packet": "docs/handoff/2026-10-07/owners/checkout.md",
+    "original_commit": "abb85f00ace7e219470ed6ecbf02f94869a59014",
+    "original_path": "docs/handoff/checkout-source-and-payment-preparation-20261007.md",
+    "sha256": "379efb460d946690f564d24e10fdc3ea3dac9219176c447c60121e0525563305"
+  },
+  {
+    "owner_packet": "docs/handoff/2026-10-07/owners/free-content.md",
+    "original_commit": "5bfdd4f00dd4e1c2d989625a810a81ddf4bad152",
+    "original_path": "docs/handoffs/production-free-identity-and-content-20261007.md",
+    "sha256": "a8acb336704b80a6fa32c4cdb6725f2e21a01b176d498d627906f801bcfb8aa1"
+  },
+  {
+    "owner_packet": "docs/handoff/2026-10-07/owners/memberships-operations.md",
+    "original_commit": "dafdc6f0dade503f718ace45ecf56d915d43a569",
+    "original_path": "docs/handoff/recovery-inventory-claude-code-20261007.md",
+    "sha256": "4dfa8c8d94ee6f2e2aa2a8b8d2120e37160a15b50143abbecc73bb901e248960"
+  },
+  {
+    "owner_packet": "docs/handoff/2026-10-07/owners/independent-review.md",
+    "original_commit": "b76f77526956747696b649c4be511ff9cd6e5859",
+    "original_path": "docs/verification/cloud-independent-review-handoff-20261007.md",
+    "sha256": "695b9450e999b8ecca26a778d34d0d4f83ab4ff7fbfcc6a326cd6d0dc220de1d"
+  },
+  {
+    "owner_packet": "docs/handoff/2026-10-07/owners/account-features-email.md",
+    "original_commit": "3f32ffaeb4ea5225779d887d86c43d88d6204fc5",
+    "original_path": "docs/verification/production-account-features-20261007/HANDOFF.md",
+    "sha256": "c1f132e95c948ba620b608d5ae1ab25d5fe61a8d32872591d86581affec07486"
+  },
+  {
+    "owner_packet": "docs/handoff/2026-10-07/owners/paid-delivery-native-operations.md",
+    "original_commit": "972a76c5e04da0f61d409d6caf9eb84281fef2a3",
+    "original_path": "docs/handoffs/paid252-native-ops-and-payment-readiness-20261007.md",
+    "sha256": "3e89814dfd02e9d62bc6bcdac858ab8cc18c6bf0e71ba52361cfe0dad19d178a"
+  }
+]

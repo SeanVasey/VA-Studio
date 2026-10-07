@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest" file="/workspace/VA-Studio-identity-frame-cleanup-independent/docs/verification/cloud-identity-frame-cleanup-independent-20261007/root-evidence/original/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="0.749257">
+    <testcase name="test_close_preserves_replacement_transaction_read_only_state" file="/workspace/VA-Studio-identity-frame-cleanup-independent/docs/verification/cloud-identity-frame-cleanup-independent-20261007/root-evidence/original/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php" line="232" class="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest" classname="Tests.Feature.ProductionIdentityAdapters.ProductionIdentityCommittedFrameTest" assertions="5" time="0.749257"/>
+  </testsuite>
+</testsuites>
