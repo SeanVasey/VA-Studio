@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="4" assertions="26" errors="0" failures="0" skipped="0" time="156.168743">
+    <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest" file="/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php" tests="3" assertions="19" errors="0" failures="0" skipped="0" time="102.715478">
+      <testcase name="test_actual_smtp_current_owner_has_sealed_request_binding_without_public_or_cached_remint" file="/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php" line="33" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest" assertions="10" time="62.833196"/>
+      <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest::test_actual_source_commit_withdrawal_cannot_return_http_authority" tests="1" assertions="6" errors="0" failures="0" skipped="0" time="19.490140">
+        <testcase name="test_actual_source_commit_withdrawal_cannot_return_http_authority with data set &quot;marker_forget&quot;" file="/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php" line="81" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest" assertions="6" time="19.490140"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest::test_retained_same_request_binding_refuses_later_consumer_withdrawal_without_callbacks" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="20.392142">
+        <testcase name="test_retained_same_request_binding_refuses_later_consumer_withdrawal_without_callbacks with data set &quot;request_resolver&quot;" file="/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php" line="105" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpBindingTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest" assertions="3" time="20.392142"/>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpCurrentMarkerIndependentTest" file="/workspace/VA-Studio-production-free-http-repair/docs/verification/production-free-http-marker-repair-20261007/ProductionFreeHttpCurrentMarkerIndependentTest.php" tests="1" assertions="7" errors="0" failures="0" skipped="0" time="53.453265">
+      <testcase name="test_actual_current_source_commit_cannot_revoke_marker_and_return_http_authority" file="/workspace/VA-Studio-production-free-http-repair/docs/verification/production-free-http-marker-repair-20261007/ProductionFreeHttpCurrentMarkerIndependentTest.php" line="20" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpCurrentMarkerIndependentTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpCurrentMarkerIndependentTest" assertions="7" time="53.453265"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

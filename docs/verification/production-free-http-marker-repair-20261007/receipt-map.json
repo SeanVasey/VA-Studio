@@ -1,0 +1,467 @@
+{
+  "executable_source": "233f0864028156faeb70c63259910214e47762cb",
+  "source_parent": "652635e7493143aabd38e10cc42b296260fe56bf",
+  "original_independent_red_commit": "c28cea2bfefa5ba03da37598ca36b0472efd74ff",
+  "original_probe_sha256": "44f495bbc052587020f65bcf4c71685d360a84ef412075eb85078136ce988424",
+  "owned_source": {
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantHttpBinding.php": "94e0c8467a91e9edc0ab0786d4e70a1df08ecc459deaa5d57e7008ed112b1f64",
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantHttpIdentity.php": "cd394c089390021a46b34a7bf489a8a7f976b12ebd6fe84001f53ac57edd7217",
+    "tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php": "ffc5ddd8b44b03880db590d0d7d48a80167f8c2c63f030e7db9ed3192776977a"
+  },
+  "unchanged_dependencies": {
+    "app/Domain/Customers/ProductionCustomerAccess.php": {
+      "base": "652635e7493143aabd38e10cc42b296260fe56bf",
+      "sha256": "4f013b5114b8b8ee8cd53d42277368a215861b8c48a07672fd2337e4fc483eb4"
+    },
+    "app/Domain/Customers/ProductionCustomerPrincipal.php": {
+      "base": "652635e7493143aabd38e10cc42b296260fe56bf",
+      "sha256": "ab0ddc7dcabb41fd8d003582c9a78814a90f5cd4fa80be4bc2c5208192306b0c"
+    },
+    "app/Domain/Customers/ProductionIdentity/ProductionCustomerSessions.php": {
+      "base": "652635e7493143aabd38e10cc42b296260fe56bf",
+      "sha256": "73efe65ab06626178fc1aa6ecd6ff426b30a04d58acd68b164acaa31c9a5d1d6"
+    },
+    "app/Domain/Grants/Free/TestFreeGrantIdentity.php": {
+      "base": "652635e7493143aabd38e10cc42b296260fe56bf",
+      "sha256": "ce692a10970b7866a0eeba3a547d12aa4734c1544dad9ed655e95443c6927a30"
+    },
+    "app/Domain/Grants/Free/FreeGrants.php": {
+      "base": "652635e7493143aabd38e10cc42b296260fe56bf",
+      "sha256": "5a48da0ae2bb6e7e12d957547c2b6e30befa98aa65807d719dc5e48ca3715df2"
+    },
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantIdentity.php": {
+      "base": "652635e7493143aabd38e10cc42b296260fe56bf",
+      "sha256": "81a64ba3eb9a848cb9a70c2415f6b573043dc49d4af2a3d736aae9ab0044a2e8"
+    },
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantIdentityPolicy.php": {
+      "base": "652635e7493143aabd38e10cc42b296260fe56bf",
+      "sha256": "f58aeac35bc9c2d34a8d88b3a9c43afb48893e89be615a64c00fc587efe8cd4d"
+    },
+    "tests/Support/ProductionIdentityFixture.php": {
+      "base": "652635e7493143aabd38e10cc42b296260fe56bf",
+      "sha256": "558b6269d305b7b213e4b8c102c7e9e117dfb8cce30c4c76a7520482609391b7"
+    }
+  },
+  "checks": [
+    {
+      "name": "sqlite-final",
+      "counters": {
+        "tests": "34",
+        "assertions": "202",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      "tests": [
+        {
+          "name": "test_actual_smtp_current_owner_has_sealed_request_binding_without_public_or_cached_remint",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "33",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "10",
+          "time": "1.726880"
+        },
+        {
+          "name": "test_initial_request_resolver_cannot_withdraw_purpose_before_binding_capture",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "63",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "3",
+          "time": "1.186642"
+        },
+        {
+          "name": "test_actual_source_commit_withdrawal_cannot_return_http_authority with data set \"marker_forget\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "81",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "7",
+          "time": "1.166520"
+        },
+        {
+          "name": "test_actual_source_commit_withdrawal_cannot_return_http_authority with data set \"marker_replace\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "81",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "7",
+          "time": "0.989671"
+        },
+        {
+          "name": "test_actual_source_commit_withdrawal_cannot_return_http_authority with data set \"session_replace\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "81",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "7",
+          "time": "1.055470"
+        },
+        {
+          "name": "test_actual_source_commit_withdrawal_cannot_return_http_authority with data set \"session_id\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "81",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "7",
+          "time": "1.069083"
+        },
+        {
+          "name": "test_actual_source_commit_withdrawal_cannot_return_http_authority with data set \"guard_forget\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "81",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "7",
+          "time": "1.166280"
+        },
+        {
+          "name": "test_actual_source_commit_withdrawal_cannot_return_http_authority with data set \"guard_actor\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "81",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "7",
+          "time": "1.208887"
+        },
+        {
+          "name": "test_actual_source_commit_withdrawal_cannot_return_http_authority with data set \"request_resolver\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "81",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "7",
+          "time": "1.057112"
+        },
+        {
+          "name": "test_actual_source_commit_withdrawal_cannot_return_http_authority with data set \"auth_resolver\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "81",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "7",
+          "time": "0.958062"
+        },
+        {
+          "name": "test_actual_source_commit_withdrawal_cannot_return_http_authority with data set \"key\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "81",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "7",
+          "time": "0.902562"
+        },
+        {
+          "name": "test_actual_source_commit_withdrawal_cannot_return_http_authority with data set \"purpose\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "81",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "7",
+          "time": "0.962357"
+        },
+        {
+          "name": "test_actual_source_commit_withdrawal_cannot_return_http_authority with data set \"actor_attributes\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "81",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "7",
+          "time": "0.979880"
+        },
+        {
+          "name": "test_actual_source_commit_withdrawal_cannot_return_http_authority with data set \"login_marker\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "81",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "7",
+          "time": "0.975406"
+        },
+        {
+          "name": "test_retained_same_request_binding_refuses_later_consumer_withdrawal_without_callbacks with data set \"marker_forget\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "105",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "4",
+          "time": "1.076957"
+        },
+        {
+          "name": "test_retained_same_request_binding_refuses_later_consumer_withdrawal_without_callbacks with data set \"marker_replace\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "105",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "4",
+          "time": "0.976174"
+        },
+        {
+          "name": "test_retained_same_request_binding_refuses_later_consumer_withdrawal_without_callbacks with data set \"session_replace\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "105",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "4",
+          "time": "1.012253"
+        },
+        {
+          "name": "test_retained_same_request_binding_refuses_later_consumer_withdrawal_without_callbacks with data set \"session_id\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "105",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "4",
+          "time": "0.903491"
+        },
+        {
+          "name": "test_retained_same_request_binding_refuses_later_consumer_withdrawal_without_callbacks with data set \"guard_forget\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "105",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "4",
+          "time": "0.951571"
+        },
+        {
+          "name": "test_retained_same_request_binding_refuses_later_consumer_withdrawal_without_callbacks with data set \"guard_actor\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "105",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "4",
+          "time": "1.064774"
+        },
+        {
+          "name": "test_retained_same_request_binding_refuses_later_consumer_withdrawal_without_callbacks with data set \"request_resolver\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "105",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "4",
+          "time": "1.243173"
+        },
+        {
+          "name": "test_retained_same_request_binding_refuses_later_consumer_withdrawal_without_callbacks with data set \"auth_resolver\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "105",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "4",
+          "time": "1.192393"
+        },
+        {
+          "name": "test_retained_same_request_binding_refuses_later_consumer_withdrawal_without_callbacks with data set \"key\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "105",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "4",
+          "time": "1.284358"
+        },
+        {
+          "name": "test_retained_same_request_binding_refuses_later_consumer_withdrawal_without_callbacks with data set \"purpose\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "105",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "4",
+          "time": "1.376348"
+        },
+        {
+          "name": "test_retained_same_request_binding_refuses_later_consumer_withdrawal_without_callbacks with data set \"actor_attributes\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "105",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "4",
+          "time": "1.381825"
+        },
+        {
+          "name": "test_retained_same_request_binding_refuses_later_consumer_withdrawal_without_callbacks with data set \"login_marker\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "105",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "4",
+          "time": "1.130509"
+        },
+        {
+          "name": "test_actual_mailbox_owner_has_distinct_safe_free_binding_and_locked_original_proof",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php",
+          "line": "29",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeIdentityTest",
+          "assertions": "14",
+          "time": "1.137431"
+        },
+        {
+          "name": "test_current_recovery_rejects_old_marker_while_retaining_exact_original_origin_history",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php",
+          "line": "56",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeIdentityTest",
+          "assertions": "6",
+          "time": "1.582217"
+        },
+        {
+          "name": "test_actual_normal_mutation_rolls_back_on_terminal_policy_credential_or_lazy_connection_withdrawal with data set #0",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php",
+          "line": "93",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeIdentityTest",
+          "assertions": "5",
+          "time": "1.037924"
+        },
+        {
+          "name": "test_actual_normal_mutation_rolls_back_on_terminal_policy_credential_or_lazy_connection_withdrawal with data set #1",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php",
+          "line": "93",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeIdentityTest",
+          "assertions": "5",
+          "time": "1.076248"
+        },
+        {
+          "name": "test_actual_normal_mutation_rolls_back_on_terminal_policy_credential_or_lazy_connection_withdrawal with data set #2",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php",
+          "line": "93",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeIdentityTest",
+          "assertions": "5",
+          "time": "0.916834"
+        },
+        {
+          "name": "test_old_test_binding_foreign_origin_and_purpose_or_provenance_relabels_are_refused",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php",
+          "line": "137",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeIdentityTest",
+          "assertions": "7",
+          "time": "0.851565"
+        },
+        {
+          "name": "test_default_off_missing_real_marker_and_old_principal_are_refused",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php",
+          "line": "165",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeIdentityTest",
+          "assertions": "8",
+          "time": "0.955360"
+        },
+        {
+          "name": "test_actual_current_source_commit_cannot_revoke_marker_and_return_http_authority",
+          "file": "/workspace/VA-Studio-production-free-http-repair/docs/verification/production-free-http-marker-repair-20261007/ProductionFreeHttpCurrentMarkerIndependentTest.php",
+          "line": "20",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpCurrentMarkerIndependentTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpCurrentMarkerIndependentTest",
+          "assertions": "7",
+          "time": "0.945817"
+        }
+      ]
+    },
+    {
+      "name": "native-final",
+      "counters": {
+        "tests": "4",
+        "assertions": "26",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      "tests": [
+        {
+          "name": "test_actual_smtp_current_owner_has_sealed_request_binding_without_public_or_cached_remint",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "33",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "10",
+          "time": "62.833196"
+        },
+        {
+          "name": "test_actual_source_commit_withdrawal_cannot_return_http_authority with data set \"marker_forget\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "81",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "6",
+          "time": "19.490140"
+        },
+        {
+          "name": "test_retained_same_request_binding_refuses_later_consumer_withdrawal_without_callbacks with data set \"request_resolver\"",
+          "file": "/workspace/VA-Studio-production-free-http-repair/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpBindingTest.php",
+          "line": "105",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpBindingTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpBindingTest",
+          "assertions": "3",
+          "time": "20.392142"
+        },
+        {
+          "name": "test_actual_current_source_commit_cannot_revoke_marker_and_return_http_authority",
+          "file": "/workspace/VA-Studio-production-free-http-repair/docs/verification/production-free-http-marker-repair-20261007/ProductionFreeHttpCurrentMarkerIndependentTest.php",
+          "line": "20",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpCurrentMarkerIndependentTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpCurrentMarkerIndependentTest",
+          "assertions": "7",
+          "time": "53.453265"
+        }
+      ]
+    },
+    {
+      "name": "original-red",
+      "counters": {
+        "tests": "1",
+        "assertions": "7",
+        "failures": "1",
+        "errors": "0",
+        "skipped": "0"
+      },
+      "tests": [
+        {
+          "name": "test_actual_current_source_commit_cannot_revoke_marker_and_return_http_authority",
+          "file": "/workspace/VA-Studio-production-free-identity-independent/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpCurrentMarkerIndependentTest.php",
+          "line": "20",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpCurrentMarkerIndependentTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpCurrentMarkerIndependentTest",
+          "assertions": "7",
+          "time": "1.184835"
+        }
+      ]
+    },
+    {
+      "name": "original-native-red",
+      "counters": {
+        "tests": "1",
+        "assertions": "7",
+        "failures": "1",
+        "errors": "0",
+        "skipped": "0"
+      },
+      "tests": [
+        {
+          "name": "test_actual_current_source_commit_cannot_revoke_marker_and_return_http_authority",
+          "file": "/workspace/VA-Studio-production-free-identity-independent/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpCurrentMarkerIndependentTest.php",
+          "line": "20",
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeHttpCurrentMarkerIndependentTest",
+          "classname": "Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpCurrentMarkerIndependentTest",
+          "assertions": "7",
+          "time": "67.150444"
+        }
+      ]
+    }
+  ],
+  "artifacts": {
+    "pint-final.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "original-native-red.txt": "822956dac1521276cbb1e7bf2258159b7f73cac778f5ee07e76623162f7775bf",
+    "sqlite-final.txt": "31976b524c3796441635047d4ea27cff573ef87a1ffd308e9a175e118e66eaae",
+    "original-native-red.xml": "2870b33bcbb3d319998812a1413d434f3b560517785eb640c0379f29029663db",
+    "native-final.xml": "79d3e85bb2f04ad1b2654cc4dbf83dc5d76487635744aa284f8b55c229584c91",
+    "sqlite-final.xml": "0314aa2da3978d8b9747e9d73560bdb594fbbdebca91089223c8b207e03b6bc8",
+    "ProductionFreeHttpCurrentMarkerIndependentTest.php": "44f495bbc052587020f65bcf4c71685d360a84ef412075eb85078136ce988424",
+    "native-final.txt": "f0e1eb961fa92fb007fd22ce49c29fe078aed93dc0d5e7d5c89cd816f0413af6",
+    "original-red.txt": "e7bb9d3fb4ffb22535800c9a86560f1da1edea3b6eed72b763110c60f631d06c",
+    "original-red.xml": "da8e11f12ed71ddf3acb52cf69bd6d9b0dc1c8c04e09d6abba0fdbeeca437755"
+  }
+}

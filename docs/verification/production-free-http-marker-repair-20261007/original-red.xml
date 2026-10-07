@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpCurrentMarkerIndependentTest" file="/workspace/VA-Studio-production-free-identity-independent/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpCurrentMarkerIndependentTest.php" tests="1" assertions="7" errors="0" failures="1" skipped="0" time="1.184835">
+    <testcase name="test_actual_current_source_commit_cannot_revoke_marker_and_return_http_authority" file="/workspace/VA-Studio-production-free-identity-independent/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpCurrentMarkerIndependentTest.php" line="20" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpCurrentMarkerIndependentTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeHttpCurrentMarkerIndependentTest" assertions="7" time="1.184835">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionFreeIdentity\ProductionFreeHttpCurrentMarkerIndependentTest::test_actual_current_source_commit_cannot_revoke_marker_and_return_http_authority
+Actual HTTP identity must refuse the withdrawn original session marker after current-source callbacks.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-production-free-identity-independent/tests/Feature/ProductionFreeIdentity/ProductionFreeHttpCurrentMarkerIndependentTest.php:49</failure>
+    </testcase>
+  </testsuite>
+</testsuites>
