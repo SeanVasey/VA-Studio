@@ -1,0 +1,11 @@
+To https://github.com/SeanVasey/VA-Studio.git
+*	refs/heads/codex/cloud-completion-audit-20261007:refs/heads/codex/cloud-completion-audit-20261007	[new branch]
+*	refs/heads/codex/recover-inquiry-notifications-20261007:refs/heads/codex/recover-inquiry-notifications-20261007	[new branch]
+*	refs/heads/codex/production-customer-identity-local-smtp-20261007:refs/heads/codex/production-customer-identity-local-smtp-20261007	[new branch]
+*	refs/heads/codex/production-identity-adapters-20261007:refs/heads/codex/production-identity-adapters-20261007	[new branch]
+*	refs/heads/codex/identity-adapters-callback-repair-20261007:refs/heads/codex/identity-adapters-callback-repair-20261007	[new branch]
+*	refs/heads/codex/identity-historical-callback-repair-20261007:refs/heads/codex/identity-historical-callback-repair-20261007	[new branch]
+*	refs/heads/codex/free-registration-independent-20261007:refs/heads/codex/free-registration-independent-20261007	[new branch]
+*	refs/heads/codex/production-free-http-parent-guard-20261007:refs/heads/codex/production-free-http-parent-guard-20261007	[new branch]
+*	refs/heads/codex/production-free-family-20261007:refs/heads/codex/production-free-family-20261007	[new branch]
+Done

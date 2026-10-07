@@ -1,0 +1,9 @@
+6e1839c7f3ab1f9ae2fbfe3518ddc8f45b97eacd	refs/heads/codex/cloud-completion-audit-20261007
+e4fe6e9341060ccc727adf3fbc394f25259740a6	refs/heads/codex/free-registration-independent-20261007
+9c1b1354c3b0ae7ed3c31d77838ee9887cbb437a	refs/heads/codex/identity-adapters-callback-repair-20261007
+3cf11d745f51fdacdc72a3a222469403e795aed9	refs/heads/codex/identity-historical-callback-repair-20261007
+aa0eb63c8e7a6d4fad07fed6e6c868765b851298	refs/heads/codex/production-customer-identity-local-smtp-20261007
+e1b7bd22256dbbef31f9dc5e83c9a6c9fcc7cd5a	refs/heads/codex/production-free-family-20261007
+a4f9e63fdfbd72d781d0e97379235a0461a8ffad	refs/heads/codex/production-free-http-parent-guard-20261007
+19fe9aa3fad51b7e14b71d3355f290dfe40e0f64	refs/heads/codex/production-identity-adapters-20261007
+a6145547ac91faca24e1965a6112c440e4680ab6	refs/heads/codex/recover-inquiry-notifications-20261007
