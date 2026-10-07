@@ -8,6 +8,8 @@ use App\Domain\Commerce\Payments\StripePaymentGateway;
 use App\Domain\Commerce\Payments\StripeSdkCheckoutGateway;
 use App\Domain\Contracts\ContractRenderer;
 use App\Domain\Contracts\IsolatedContractRenderer;
+use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTransport;
+use App\Domain\Customers\ProductionIdentity\Notifications\IdentitySmtpFactory;
 use App\Domain\Media\MediaWorkflowBudget;
 use App\Models\User;
 use Illuminate\Auth\Events\Login;
@@ -24,6 +26,8 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(IdentityNoticeTransport::class,
+            fn ($app) => IdentitySmtpFactory::make($app, $app['config']));
         $this->app->scoped(MediaWorkflowBudget::class);
         $this->app->bind(ContractRenderer::class,
             IsolatedContractRenderer::class);
