@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Catalog\DiscoverySitemap\SitemapException;
+use App\Domain\Catalog\DiscoverySitemap\SitemapStore;
 use App\Domain\SiteBuilder\PublicPagesSitemap;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,6 +13,15 @@ final class PublicDiscoveryController extends Controller
     public function index(Request $request): Response
     {
         $this->admit($request);
+        if (app()->environment('production') && config('discovery-sitemap.enabled') === true) {
+            try {
+                return $this->response(app(SitemapStore::class)->currentIndexXml(), 'application/xml; charset=UTF-8');
+            } catch (SitemapException $error) {
+                return $this->response('', 'application/xml; charset=UTF-8', $error->status);
+            } catch (\Throwable) {
+                return $this->response('', 'application/xml; charset=UTF-8', 503);
+            }
+        }
         $origin = app(PublicPagesSitemap::class)->canonicalOrigin();
         $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
         if (app()->environment('production')) {
@@ -44,9 +55,9 @@ final class PublicDiscoveryController extends Controller
         abort_if(! is_resource($stream) || stream_get_contents($stream, 1) !== '' || $request->query() !== [], 404);
     }
 
-    private function response(string $content, string $type): Response
+    private function response(string $content, string $type, int $status = 200): Response
     {
-        return response($content, 200, [
+        return response($content, $status, [
             'Content-Type' => $type,
             'Cache-Control' => 'no-store, private',
             'X-Content-Type-Options' => 'nosniff',
