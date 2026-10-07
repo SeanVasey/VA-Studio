@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\SupportAttachmentRegistrationTest" file="/workspace/VA-Studio-support-registration/docs/verification/support-throttle-headers-20261007/original/tests/Feature/SupportAttachmentRegistrationTest.php" tests="2" assertions="136" errors="0" failures="0" skipped="0" time="1.558854">
+    <testcase name="test_actual_page_and_action_throttles_keep_safe_retry_headers_on_private_errors" file="/workspace/VA-Studio-support-registration/docs/verification/support-throttle-headers-20261007/original/tests/Feature/SupportAttachmentRegistrationTest.php" line="125" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="110" time="1.102626"/>
+    <testcase name="test_private_http_exception_headers_cannot_disclose_arbitrary_values_or_redirect" file="/workspace/VA-Studio-support-registration/docs/verification/support-throttle-headers-20261007/original/tests/Feature/SupportAttachmentRegistrationTest.php" line="142" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="26" time="0.456228"/>
+  </testsuite>
+</testsuites>

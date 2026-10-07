@@ -1,0 +1,18 @@
+{
+  "executable_head": "35b3d98bb2aec3366d8e8719e2b10e746c804bd8",
+  "published_predecessor": "6a1c727339f4b6377285e831add6f8a01bc07b00",
+  "actual_review_comment": "https://github.com/SeanVasey/VA-Studio/pull/37#discussion_r4206399449",
+  "source_sha256": {
+    "app/Http/Responses/SupportAttachmentResponse.php": "b6a7f26599a07746e8ce169547ad955fab65d500c399fce0b5077ad7ba334965",
+    "app/Http/Middleware/SupportAttachmentPrivacy.php": "1e21eb08287e8a232b5451acafebb7cef2ed87312285a8d2e70e6b0217a4173a",
+    "bootstrap/app.php": "866204f62ff4ca102c703a52a683350a810bd6d2592457707ac551bd94f5d5b7",
+    "tests/Feature/SupportAttachmentRegistrationTest.php": "7a9033b392b1cc52262b7b1b6bd3701f7384726e3aa065d35c5000237d20a75d"
+  },
+  "proofs": {
+    "original": "2 tests/88 assertions,2 failures,zero errors",
+    "final_registered_sqlite": "12 tests/405 assertions,zero failures/errors/skips",
+    "unchanged_original_regressions": "2 tests/136 assertions,zero failures/errors/skips"
+  },
+  "runtime_scope": "3 files; no source/schema/current-owner/scanner/provider/database-I/O change",
+  "native": "Not repeated for response header projection; earlier source-bound native support receipts retained. Final exact candidate acceptance pending."
+}
