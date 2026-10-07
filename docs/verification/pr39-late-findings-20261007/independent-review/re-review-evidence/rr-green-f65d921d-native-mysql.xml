@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\CustomerSuppressionRetainedTargetTest" file="/home/user/VA-Studio-review-p2/tests/Feature/CustomerSuppressionRetainedTargetTest.php" tests="2" assertions="8" errors="0" failures="0" skipped="0" time="240.543181">
+    <testcase name="test_unauthentic_older_target_never_silently_blocks_genuine_pending_target" file="/home/user/VA-Studio-review-p2/tests/Feature/CustomerSuppressionRetainedTargetTest.php" line="34" class="Tests\Feature\CustomerSuppressionRetainedTargetTest" classname="Tests.Feature.CustomerSuppressionRetainedTargetTest" assertions="3" time="152.254765"/>
+    <testcase name="test_same_connection_temp_attempts_shadow_refuses_instead_of_silently_skipping_retained_target" file="/home/user/VA-Studio-review-p2/tests/Feature/CustomerSuppressionRetainedTargetTest.php" line="59" class="Tests\Feature\CustomerSuppressionRetainedTargetTest" classname="Tests.Feature.CustomerSuppressionRetainedTargetTest" assertions="5" time="88.288416"/>
+  </testsuite>
+</testsuites>

@@ -267,6 +267,59 @@ final class ProductionIdentityCommittedFrameTest extends TestCase
         }
     }
 
+    public static function replacementEndings(): array
+    {
+        return ['rollback then statement' => ['rollBack', 'statement'], 'rollback then transaction' => ['rollBack', 'transaction'],
+            'commit then statement' => ['commit', 'statement'], 'commit then transaction' => ['commit', 'transaction']];
+    }
+
+    #[DataProvider('replacementEndings')]
+    public function test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close(string $ending, string $next): void
+    {
+        $pdo = DB::connection()->getPdo();
+        $sqlite = DB::getDriverName() === 'sqlite';
+        $setting = fn () => $sqlite ? (int) $pdo->query('PRAGMA query_only')->fetchColumn()
+            : (int) $pdo->query('SELECT @@SESSION.transaction_read_only')->fetchColumn();
+        $default = $setting();
+        $frame = IdentityCommittedFrame::begin($this->reader(), hrtime(true) + 30_000_000_000);
+        try {
+            $pdo->commit();
+            $pdo->beginTransaction();
+            $frame->close();
+            $this->assertTrue($pdo->inTransaction(), 'The single close leaves the caller replacement open.');
+            DB::select('SELECT 1');
+            $this->assertTrue($pdo->inTransaction());
+            if ($sqlite) {
+                $this->assertSame(1, $setting(), 'Framework use during the replacement must not change its setting.');
+            }
+            $pdo->{$ending}();
+            // No further close(): ordinary framework work after the caller ends its replacement.
+            if ($next === 'statement') {
+                DB::table('committed_frame_fixture')->insert(['id' => 7]);
+            } else {
+                DB::transaction(fn () => DB::table('committed_frame_fixture')->insert(['id' => 7]));
+            }
+            $this->assertSame($default, $setting(), 'The captured idle default must be restored once the replacement ends.');
+            $this->assertSame([7], DB::table('committed_frame_fixture')->pluck('id')->all());
+            foreach (['reader', 'assertActive', 'finish'] as $reuse) {
+                try {
+                    $frame->{$reuse}();
+                    $this->fail('A closed frame cannot be reused.');
+                } catch (IdentityException) {
+                    $this->assertFalse($pdo->inTransaction());
+                }
+            }
+            $this->assertSame($default, $setting());
+        } finally {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            if ($sqlite) {
+                $pdo->exec('PRAGMA query_only=OFF');
+            }
+        }
+    }
+
     public function test_expiring_original_deadline_cannot_be_renewed_by_starting_final_proof(): void
     {
         $owner = $this->owner();

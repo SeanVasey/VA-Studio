@@ -1,0 +1,12 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-p2/phpunit.xml
+
+
+REVIEW-PROBE outcomes=["refused:503","refused:503"] sent=0 attempts=0
+.                                                                   1 / 1 (100%)
+
+Time: 00:00.976, Memory: 79.00 MB
+
+[30;42mOK (1 test, 3 assertions)[0m

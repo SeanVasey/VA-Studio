@@ -119,11 +119,11 @@ final class SuppressionEvidence
         }
     }
 
-    private function rows(string $table, string $where, array $values, int $limit, ?string $order): array
+    /** Schema-qualified, shadow-refused name of a closed table; also for code-owned subqueries. */
+    public function qualified(string $table): string
     {
-        // Closed code-owned table/predicate/order literals; never an HTTP/query fragment.
         $allowed = ['users', 'customer_accounts', 'customer_consent_states', 'customer_consent_events', 'customer_consent_policies', ...SuppressionSchema::TABLES];
-        if (! in_array($table, $allowed, true) || $limit < 1 || $limit > 2) {
+        if (! in_array($table, $allowed, true)) {
             throw new ConsentException(503);
         }
         if ($this->driver === 'sqlite') {
@@ -132,14 +132,25 @@ final class SuppressionEvidence
             if ((int) $shadow->fetchColumn() !== 0) {
                 throw new ConsentException(503);
             }
-            $qualified = 'main."'.$table.'"';
-        } else {
-            $qualified = '`'.str_replace('`', '``', $this->database).'`.`'.$table.'`';
-            $schema = $this->primary->query('SHOW CREATE TABLE '.$qualified)->fetch(PDO::FETCH_ASSOC);
-            if (str_contains(strtoupper((string) ($schema['Create Table'] ?? '')), 'CREATE TEMPORARY TABLE')) {
-                throw new ConsentException(503);
-            }
+
+            return 'main."'.$table.'"';
         }
+        $qualified = '`'.str_replace('`', '``', $this->database).'`.`'.$table.'`';
+        $schema = $this->primary->query('SHOW CREATE TABLE '.$qualified)->fetch(PDO::FETCH_ASSOC);
+        if (str_contains(strtoupper((string) ($schema['Create Table'] ?? '')), 'CREATE TEMPORARY TABLE')) {
+            throw new ConsentException(503);
+        }
+
+        return $qualified;
+    }
+
+    private function rows(string $table, string $where, array $values, int $limit, ?string $order): array
+    {
+        // Closed code-owned table/predicate/order literals; never an HTTP/query fragment.
+        if ($limit < 1 || $limit > 2) {
+            throw new ConsentException(503);
+        }
+        $qualified = $this->qualified($table);
         $statement = $this->primary->prepare('SELECT * FROM '.$qualified.' WHERE '.$where.($order ? ' ORDER BY '.$order : '').' LIMIT '.$limit.($this->driver === 'mysql' ? ' FOR UPDATE' : ''));
         $statement->execute($values);
 

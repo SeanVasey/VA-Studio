@@ -27,6 +27,8 @@ final class IdentityCommittedFrame
 
     private bool $closed = false;
 
+    private bool $deferred = false;
+
     private function __construct(private readonly CurrentRows $reader, private readonly int $originalDeadlineNs)
     {
         $this->connection = DB::connection();
@@ -139,7 +141,30 @@ final class IdentityCommittedFrame
             // A replacement belongs to its caller. A later close may restore
             // the captured idle setting only after that caller ends its frame.
             $this->closed = ! $this->primary->inTransaction();
+            $this->deferRestoration();
         }
+    }
+
+    /**
+     * PDO exposes no hook for a raw commit/rollback, so restoration settles at the
+     * caller's next framework statement or transaction start, and only once this
+     * connection is idle. An active foreign transaction is never changed; used
+     * stays true, so a settled frame grants no authority.
+     */
+    private function deferRestoration(): void
+    {
+        if ($this->closed || $this->deferred || $this->driver !== 'sqlite') {
+            return;
+        }
+        $this->deferred = true;
+        $settle = function (): void {
+            if (! $this->closed && ! $this->primary->inTransaction()) {
+                $this->restoreSqlite();
+                $this->closed = true;
+            }
+        };
+        $this->connection->beforeStartingTransaction($settle);
+        $this->connection->beforeExecuting($settle);
     }
 
     private function connectionCurrent(): void
