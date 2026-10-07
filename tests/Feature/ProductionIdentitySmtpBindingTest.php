@@ -142,6 +142,46 @@ final class ProductionIdentitySmtpBindingTest extends TestCase
         return [['extra'], ['port'], ['security']];
     }
 
+    #[DataProvider('rawParents')]
+    public function test_final_guard_refuses_callback_capable_raw_parents_before_reading_them(string $section): void
+    {
+        config(['app.key' => 'base64:'.base64_encode(str_repeat('I', 32)),
+            'production-identity-smtp.settings' => $this->rehearsal(65530, 'implicit_tls', '/etc/ssl/certs/ca-certificates.crt')]);
+        $transport = $this->app->make(IdentityNoticeTransport::class);
+        $mail = new IdentityMail('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'enroll', $transport->provenance(), 'buyer@example.test',
+            'http://localhost/customer/access#enroll.aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.'.str_repeat('a', 64));
+        $original = config($section);
+        $parent = new class($original) extends \ArrayObject
+        {
+            public int $callbacks = 0;
+
+            public function offsetGet(mixed $key): mixed
+            {
+                $this->callbacks++;
+
+                return parent::offsetGet($key);
+            }
+        };
+        config([$section => $parent]);
+        try {
+            $refused = false;
+            try {
+                $transport->submit($mail);
+            } catch (DefinitelyNotSubmitted) {
+                $refused = true;
+            }
+            $this->assertTrue($refused);
+            $this->assertSame(0, $parent->callbacks);
+        } finally {
+            config([$section => $original]);
+        }
+    }
+
+    public static function rawParents(): array
+    {
+        return [['production-identity-smtp'], ['app']];
+    }
+
     private function rehearsal(int $port, string $security, string $caFile): array
     {
         return ['mode' => 'rehearsal', 'port' => $port, 'security' => $security, 'ca_file' => $caFile,

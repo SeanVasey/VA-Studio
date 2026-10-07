@@ -21,6 +21,8 @@ final readonly class ConfigurationBoundIdentityTransport implements IdentityNoti
         $items = (new ReflectionProperty(Repository::class, 'items'))->getValue($this->config);
 
         return ($instances['config'] ?? null) === $this->config
+            && is_array($items['production-identity-smtp'] ?? null)
+            && is_array($items['app'] ?? null)
             && ($items['production-identity-smtp']['settings'] ?? null) === $this->settings
             && ($items['app']['key'] ?? null) === $this->key;
     }
