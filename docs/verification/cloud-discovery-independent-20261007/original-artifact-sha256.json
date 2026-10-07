@@ -1,0 +1,14 @@
+{
+  "count": 8,
+  "scope": "tracked durable original native namespace blocker; excludes this map/report",
+  "sha256": {
+    "docs/verification/cloud-discovery-independent-20261007/DiscoveryNativeNamespaceCanaryTest.php": "ccdb1487b0970d0935ebfe505cf01690c2065c1611b624f560cf644ccab70da1",
+    "docs/verification/cloud-discovery-independent-20261007/blocked-receipt.json": "d173764ce3b934285ea00290ed1028cc96422e2c03adf9c2520b90a67060b8af",
+    "docs/verification/cloud-discovery-independent-20261007/canary-pint.txt": "aece28361fe8e203542aad615c80a3cc4ad1a0bceea028f3de96a8984384cfe3",
+    "docs/verification/cloud-discovery-independent-20261007/namespace-native-selection.xml": "a454e1fa39f849a035b9bcacae120a8475ae0c27cac340916b6a12fa670b7069",
+    "docs/verification/cloud-discovery-independent-20261007/native-namespace-snapshot.json": "690dbd69fdfc78d58b0e4de7f724a339e4b3e4c12a8503fe421aa03503525d99",
+    "docs/verification/cloud-discovery-independent-20261007/native-namespace.txt": "f823455dec7abf5e4d6fd89d13f57503521f6730c001932fd6d8c5e780ce20b2",
+    "docs/verification/cloud-discovery-independent-20261007/native-namespace.xml": "7744a89692a319dfab4b40067cc355775d96a4634a1aa25f68d853bd0e7b150e",
+    "docs/verification/cloud-discovery-independent-20261007/own-autoload.txt": "d56bc57717d88cac0bb1f01564b7f6feb3635d8e87d826b4fd74fc0276a3cbc5"
+  }
+}
