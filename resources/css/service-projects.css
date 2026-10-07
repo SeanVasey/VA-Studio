@@ -1,0 +1,13 @@
+.service-project-journey { display: grid; gap: 28px; }
+.service-project-journey section { padding: 24px; border: 1px solid var(--va-border); background: var(--va-surface); overflow-wrap: anywhere; }
+.service-project-journey form, .service-project-journey form > div { display: grid; gap: 12px; }
+.service-project-journey input, .service-project-journey textarea, .service-project-journey select { width: 100%; min-height: 48px; padding: 12px; background: var(--va-canvas); color: var(--va-text-strong); border: 1px solid var(--va-border); border-radius: var(--va-radius-control); font: inherit; }
+.service-project-journey textarea { min-height: 120px; }
+.service-project-journey h2, .service-project-journey h3, .service-project-journey h4 { margin: 20px 0 12px; }
+.service-project-journey li { margin: 16px 0; }
+.service-project-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 16px 0; }
+.service-project-copy { white-space: pre-wrap; line-height: 1.6; }
+.service-project-journey dt { font-weight: 600; margin-top: 12px; }
+.service-project-journey dd { margin: 4px 0; }
+.service-project-journey summary { min-height: 44px; padding: 12px 0; cursor: pointer; }
+@media (max-width: 600px) { .service-project-journey section { padding: 16px; } .service-project-actions .button { width: 100%; } }
