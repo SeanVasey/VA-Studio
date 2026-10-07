@@ -69,7 +69,7 @@ sensitive, flags still default-off unless Sean activates.
 ### Phase B — Customer identity, features, mail (T23/T32)
 | Step | Deliverable | Status |
 | --- | --- | --- |
-| B1 | Account features 253 reviewed + composed + canonical default-off `production-account-features` config | reviewed APPROVE WITH CONDITIONS (dev merge) → PR #45 draft; C1 identity cost → `harness/native-schema-isolation`; C2/C3 → 254 preconditions |
+| B1 | Account features 253 reviewed + composed + canonical default-off `production-account-features` config | **merged** PR #45 → `1462e822` (dev merge; C1 activation blocker → `harness/native-schema-isolation`; C2/C3 → 254 lane) |
 | B2 | PR39 late P2 findings: SuppressionDelivery old-recipient target; IdentityCommittedFrame single-close restoration | identity fix APPROVED; suppression fix APPROVE WITH CONDITION C-A1 (HMAC-mismatched older target must 503) being fixed on `harness/pr39-late-findings` |
 | B3 | Suppression254 (distinct family from 251; built on 253 withdrawal reader; provider contract default-off) | after B1 |
 | B4 | Root HTTP mount for 253 (session-bound routes, privacy middleware, body caps) + frontend | after B1 |
@@ -124,3 +124,4 @@ geometry (not to be recreated). Each is listed again in the activation packets
 | 2026-10-07 | A1 merged | PR #41 merged at `37653bf1` (head `ece5a9ee`, code head `a97937ad`) | preflight run 47 success; Codex security review no findings; Codex code review P1 r4208264406 + P2 r4208264416 + P2 r4208109348 answered and deferred with reviewer agreement | independent APPROVE (addenda 1–3); open RELEASE BLOCKERS: frame admission for intent/basis/authority writes on `harness/checkout-write-admission-all`; conditions: no route/provider registration, no provider_io_enabled until closed |
 | 2026-10-07 | C1 merged | PR #42 merged at `3716324a` (head `de6ae38a`) | preflight run 48 success; Codex code+security no findings | independent decision: composition APPROVED, Rows 3cd narrow APPROVE (F1 open), 258 join APPROVED (F2 open before activation) |
 | 2026-10-07 | docs ledger | PR #43 merged at `03c58d87` | preflight run 50 success | docs-only |
+| 2026-10-07 | B1 merged | PR #45 merged at `1462e822` (head `8773b720`) | preflight run 56 success; Codex security no findings; Codex P1 = C1 answered | independent APPROVE WITH CONDITIONS (dev merge only); ACTIVATION BLOCKER C1: 253 admission + identity inspect() cost exceed the 10 s deadline natively |
