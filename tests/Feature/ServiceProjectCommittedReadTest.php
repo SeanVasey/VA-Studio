@@ -174,6 +174,43 @@ final class ServiceProjectCommittedReadTest extends TestCase
         $this->assertDatabaseCount('service_project_events', 0);
     }
 
+    public static function capturedTables(): array
+    {
+        return [['users'], ['customer_accounts'], ['service_projects'], ['service_project_events']];
+    }
+
+    #[DataProvider('capturedTables')]
+    public function test_permanent_native_view_cannot_replace_any_captured_table_even_with_identical_original_rows(string $table): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Actual native MySQL permanent dictionary and SHOW CREATE behavior required.');
+        }
+        $f = F::setup();
+        $current = $this->read($f);
+        $current['receipt']->proveClosed();
+        $pdo = DB::connection()->getPdo();
+        $definition = $pdo->query('SHOW CREATE TABLE `'.$table.'`')->fetch(PDO::FETCH_NUM);
+        $originals = $pdo->query('SELECT * FROM `'.$table.'` ORDER BY id')->fetchAll(PDO::FETCH_ASSOC);
+        $retained = 'receipt_retained_'.$table;
+        $pdo->exec('RENAME TABLE `'.$table.'` TO `'.$retained.'`');
+        try {
+            $pdo->exec('CREATE VIEW `'.$table.'` AS SELECT * FROM `'.$retained.'`');
+            $dictionary = $pdo->prepare('SELECT TABLE_TYPE FROM information_schema.TABLES WHERE BINARY TABLE_SCHEMA = BINARY DATABASE() AND BINARY TABLE_NAME = BINARY ?');
+            $dictionary->execute([$table]);
+            $this->assertSame('VIEW', $dictionary->fetchColumn());
+            $this->assertSame($originals, $pdo->query('SELECT * FROM `'.$table.'` ORDER BY id')->fetchAll(PDO::FETCH_ASSOC));
+            $this->assertSame(0, DB::transactionLevel());
+            $this->assertFalse($pdo->inTransaction());
+            $this->refused(fn () => $current['receipt']->proveClosed(), 503);
+        } finally {
+            $pdo->exec('DROP VIEW IF EXISTS `'.$table.'`');
+            $pdo->exec('RENAME TABLE `'.$retained.'` TO `'.$table.'`');
+        }
+        $this->assertSame($definition, $pdo->query('SHOW CREATE TABLE `'.$table.'`')->fetch(PDO::FETCH_NUM));
+        $this->assertSame($originals, $pdo->query('SELECT * FROM `'.$table.'` ORDER BY id')->fetchAll(PDO::FETCH_ASSOC));
+        $current['receipt']->proveClosed();
+    }
+
     public static function staffChanges(): array
     {
         return [['mfa', 403], ['credential', 403], ['service-flag', 404]];

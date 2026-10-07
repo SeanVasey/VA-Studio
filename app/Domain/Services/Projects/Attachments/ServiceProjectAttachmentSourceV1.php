@@ -206,8 +206,16 @@ final class ServiceProjectAttachmentSourceV1 implements AttachmentSourceToken, J
                     $query->execute([$physical]);
                     AttachmentException::require($query->fetchAll(PDO::FETCH_NUM) === [['table', $physical]], 503);
                 } else {
+                    // SHOW CREATE TABLE also returns permanent view definitions. Require
+                    // one exact persistent base-table identity, including dictionary spelling,
+                    // before reading any actor/source bytes through the captured table name.
+                    $query = $this->primary->prepare('SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?');
+                    $query->execute([$database, $physical]);
+                    AttachmentException::require($query->fetchAll(PDO::FETCH_NUM) === [[$database, $physical, 'BASE TABLE']], 503);
                     $definition = $this->primary->query('SHOW CREATE TABLE '.$tables[$logical])->fetch(PDO::FETCH_NUM);
-                    AttachmentException::require(is_array($definition) && ! str_contains(strtoupper($definition[1]), 'CREATE TEMPORARY TABLE'), 503);
+                    AttachmentException::require(is_array($definition) && count($definition) === 2
+                        && $definition[0] === $physical && is_string($definition[1])
+                        && str_starts_with($definition[1], 'CREATE TABLE '), 503);
                 }
             }
             $read = function (string $table, string $where, array $bindings, int $limit) use ($tables): array {
