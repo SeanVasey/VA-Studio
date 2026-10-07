@@ -1,0 +1,13 @@
+
+> test
+> vitest run tests/frontend/support-attachment-registration.test.tsx tests/frontend/support-attachments.test.tsx tests/frontend/free-grant-journey.test.tsx
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-support-registration
+
+
+ Test Files  3 passed (3)
+      Tests  30 passed (30)
+   Start at  10:27:06
+   Duration  2.45s (environment 55%, tests 26%, transform 11%, setup 6%, import 1%)
+
