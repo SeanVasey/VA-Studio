@@ -1,3 +1,9 @@
 Private disposable mysqld 8.4.11 for lane harness/membership-operative-1: 127.0.0.1:3318, datadir/socket/log under the session scratchpad (mysql-member-ops/), --no-defaults (same compiled defaults as the shared 3306 server: sql_mode, utf8mb4_0900_ai_ci, log_bin=1, REPEATABLE-READ), --initialize-insecure then root password set to the synthetic CI-only value.
 2026-10-07T14:44:57Z first start attempt aborted: socket path longer than 107 bytes (MY-010267); no database created; the earlier preliminary log line claiming a start was wrong and is replaced by this entry.
 2026-10-07T14:45:47Z started on 127.0.0.1:3318 (socket $scratchpad/mysql-member-ops/s); database vaseyaudio_member_ops created
+2026-10-07T15:18:59Z native batches stopped at the caller's hand-back request: f1 selection interrupted after 12 of 16 cases (12 progress dots, no failures shown, no JUnit written); f2, 258, 257 and Billing native selections never started
+2026-10-07T15:18:59Z pre-shutdown schemata: vaseyaudio_member_ops
+2026-10-07T15:18:59Z shutdown; ping now: Can't connect to MySQL server on '127.0.0.1:3318' (111)'
+2026-10-07T15:18:59Z datadir removed: yes. Nothing was created, changed or dropped on the shared 3306 server.
+2026-10-07T15:19:07Z native worktree /home/user/VA-Studio-member-ops-native removed
+2026-10-07T15:20:23Z correction: the TCP shutdown above did not stop the process (pid 30677 kept running after the datadir was removed); it was then stopped with SIGTERM. Post-check: 0 mysqld processes on port 3318, datadir absent.
