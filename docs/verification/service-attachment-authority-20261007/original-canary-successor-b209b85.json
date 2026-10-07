@@ -1,0 +1,13 @@
+{
+  "source": "b209b850166998967a76edb873a5dfcdd18bfbce",
+  "engine": "SQLite in-memory",
+  "command": "php -d auto_prepend_file=<external-local-shim> vendor/bin/phpunit <unchanged-independent-ServiceAttachmentTerminalCanaryTest.php>",
+  "result": {
+    "tool": "phpunit",
+    "result": "passed",
+    "tests": 1,
+    "passed": 1,
+    "assertions": 8,
+    "duration_ms": 527
+  }
+}
