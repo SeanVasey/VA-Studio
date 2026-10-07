@@ -550,8 +550,9 @@ final class IdentityMigrationOwnership
     /**
      * One statement for many per-name dictionary lookups. The schema's catalog rows are
      * materialized once as a CTE (NO_MERGE, otherwise every branch rescans the dictionary)
-     * with only the selected, lookup and ordering columns; each UNION ALL branch then applies
-     * the unchanged single-name predicate, parameter and column collation to those rows.
+     * with only the selected, lookup and ordering columns and only rows matching one of the
+     * names; each UNION ALL branch then applies the unchanged single-name predicate, parameter
+     * and column collation to those rows.
      *
      * @return array<string, list<array<string, mixed>>> rows per requested name, in the statement's order
      */
@@ -570,12 +571,12 @@ final class IdentityMigrationOwnership
         $ordering = implode('', array_map(fn (int $index, string $column): string => ', '.$column.' AS identity_order_'.$index, array_keys($order), $order));
         $predicate = $part[4].'identity_key'.$part[6].'=?';
         $branches = array_map(fn (int $position): string => 'SELECT /*+ NO_MERGE(lookup) */ '.$position.' AS identity_lookup, lookup.* FROM lookup WHERE '.$predicate, array_keys($names));
-        // An exact predicate may prefilter with the same column equality; a LOWER() alias lookup scans every row.
-        $exact = $part[4] === '';
-        $prefilter = $exact ? ' AND '.$part[5].' IN ('.implode(',', array_fill(0, count($names), '?')).')' : '';
+        // IN is the disjunction of the branch equalities (same operands, same comparison collation),
+        // so the prefilter keeps exactly the rows some branch would match, including LOWER() aliases.
+        $prefilter = ' AND '.$part[4].$part[5].$part[6].' IN ('.implode(',', array_fill(0, count($names), '?')).')';
         $statement = 'WITH lookup AS (SELECT '.$part[1].', '.$part[5].' AS identity_key'.$ordering.' FROM '.$part[2].' WHERE '.$part[3].$prefilter.') '.implode(' UNION ALL ', $branches)
             .($order === [] ? '' : ' ORDER BY identity_lookup'.implode('', array_map(fn (int $index): string => ', identity_order_'.$index, array_keys($order))));
-        foreach ($this->query($pdo, $statement, $exact ? [...$names, ...$names] : $names) as $row) {
+        foreach ($this->query($pdo, $statement, [...$names, ...$names]) as $row) {
             $name = $names[(int) $row['identity_lookup']];
             foreach (array_keys($row) as $column) {
                 if (str_starts_with($column, 'identity_')) {
