@@ -70,9 +70,15 @@ stopped writers; this is not a concurrent online-DDL protocol.
 The future paid grant consumer has a separate two-step source seam: locate the
 original buyer/order commitment without locking order; prelock T23 historical
 identity; authenticate the complete original order/line/provider/payment graph
-using the consumer's captured primary CurrentRows; mint a nonserializable typed
-source; recheck the retained source and original identity prefix before consumer
-commit. This source performs no grant write. It excludes paid exceptions and does
+using the consumer's captured primary CurrentRows in exactly one framework and
+physical transaction; mint a nonserializable typed source; recheck the retained
+source and original identity prefix before consumer commit. A private PDO
+savepoint is captured before any source decryption callback. Entry and terminal
+release/renew proofs bind the same Connection, PDO, driver, database, prefix and
+transaction frame. A direct commit/reopen cannot restore its destroyed anchor;
+postcommit use, framework nesting and rollback across an earlier savepoint refuse.
+The fence never rolls back consumer writes. A retained source must not cross I/O
+or a transaction boundary. This source performs no grant write. It excludes paid exceptions and does
 not itself confer current buyer access or production grant capability.
 
 ## Provider source receipt
@@ -87,6 +93,16 @@ version limitations are retained beside it. The retrieved spec identifies API
 `2026-08-26.dahlia`; this is source research, not actual pinned-account compatibility
 proof. Narrative/provider API pages returned 403 locally.
 
+The subsequent matching pinned official source is preserved separately as
+`provider-source/stripe-openapi-dahlia-30d3391c.json.gz`: commit
+`30d3391cc09a0f67ad29bee002f570811b19e1da`, API `2026-08-26.dahlia`,
+8,028,700 bytes, SHA256
+`f0e0fc8fffbffda45bf5f3df59846443c1d47a3cfcbfae232eedf4743124ebee`.
+Its exact GitHub source/commit-history and deterministic gzip receipt are retained.
+Matching documentation does not prove any actual merchant account/API execution.
+The original Endive receipt remains intact; the later retrieval does not relabel
+the original research as a matching pinned document.
+
 The retrieved Checkout `payment_intent_data` schema exposes no tax/calculation
 linkage. No unsupported parameter or fabricated tax line is authored. A separate
 provider-calculated hosted amount and buyer-reviewed session-binding child is
@@ -94,48 +110,104 @@ still required. Broader taxes, discounts/promotions, scoped/exclusive inventory,
 exception/refund/dispute resolution, original documents, grants and fulfillment
 remain explicit dependent work; this limited path is not launch readiness.
 
-## Dependency and development checks
+## Frozen source and dependency
 
-Commands use the existing locked toolchain under
-`/workspace/.va-studio-toolchain/activate.sh`. Native loopback uses the private
-checkout test env and additional network sandbox permission; credentials are
-never included in output.
+Final checkout executable source is
+`f0a1615be0833804959662fad5d7a7a8e1389ee0`, tree
+`9094a25b28cc353678753cff47101239864b2ef8`. The evidence-only commit following it
+adds standalone verification snapshots and receipts; runtime, registered test
+suite, dependency and activation bytes remain exact. The final
+manifest retains SHA256 and Git blob identity for all 48 owned executable/test
+files and all 38 borrowed dependency files.
 
-The isolated checkout worktree borrows exact T23 source commits
-`1d90a1658618d79e36519d57c75b77af8b48d74a` and its repaired successor
-`8e551ca71be9467e305e28ac29f3b23ab76a3739`. Local cherry-pick identities are
-`e7ad219` and `5dac2e2`; these are dependency copies, not checkout-authored identity
-changes or independent approval. The initial T23 candidate had a demonstrated
-temporary-table bypass; it is retained only as historical unapproved evidence.
-The successor adds fixed captured-primary/permanent-schema identity reads and
-the two CurrentRows getters used by the checkout paid-source reader. Source APIs
-and the actual local-SMTP fixture remain unchanged. Final T23 review is separate.
+The isolated worktree borrows exact T23 commits
+`1d90a1658618d79e36519d57c75b77af8b48d74a`,
+`8e551ca71be9467e305e28ac29f3b23ab76a3739` and
+`eaaa55be3bf35193e68a3ad8cac3cc99eec85e5e`; local copies are `e7ad219`,
+`5dac2e2` and `d83ee5d`. These are dependency copies and author evidence, not
+checkout-authored identity changes or independent T23 approval. The original
+candidate's temporary-user shadow bypass and the second candidate's numeric
+unknown-role coercion are superseded. Latest bytes qualify the captured permanent
+identity schema and require exact current raw authority flags. APIs and actual
+SMTP enrollment fixture remain unchanged. Historical original identity-prefix
+proof excludes later mutable credentials/access state and confers no current
+buyer authority.
 
-The full selected checkout development suite against the repaired dependency
-records **114 tests, 111 passed, 538 assertions, three named native-only skips**.
-It includes actual SMTP enrollment, qualified review/order/assent, HTTP sign-in
-marker and return, exact request retry, retrieved payment reconciliation,
-credential recovery during provider I/O, historical original-buyer paid source,
-late-payment exclusion, source/row/guard preservation, ambiguous JSON refusal,
-physical runtime shadows and a postcommit shadow callback. SDK transport tests
-use its actual locked implementation with strictly rehearsal-bound HTTP fixtures.
-The retrieved provider line identity, exact price and buyer-visible recording/
-license name must all match; private provider customer details are excluded.
+Two earlier checkout executable freezes are preserved as superseded candidates:
+`ff4c6749692cc474fb81202b9554993f510350a9` and
+`9f948b4eca4fe0ce0e91221afff920652fe3a21a`. Three actual unchanged ff4 red
+canaries demonstrated unknown owner-role admission, foreign native constraint
+identity admission (three owned tables created before collision) and a foreign
+routine reference admitted through installation. The 9f repair requires exact
+raw owner authority and rejects constraint identities using MySQL dictionary
+collation plus foreign/opaque routines before DDL. Native exact, uppercase and
+accent aliases collide with the original reserved constraint, error1826. Its
+receipt is retained. A fourth actual unchanged 9f red canary demonstrated paid
+source mint in autocommit; f0 adds the original-frame savepoint fence above.
 
-Earlier native MySQL 8.0.46 development probes passed migration 10/125 plus
-affected canaries 3/8, and native race/permanent-boundary 9/229. The initial native
-journey pilot passed six cases and had a seventh-case test helper type error;
-that helper was corrected and its SQLite HTTP case passed. These runs preceded
-the final source freeze or repaired dependency and are not final runtime approval.
-The first race barrier also incorrectly included credential email-scan locks;
-the corrected probe authenticates before its barrier and observes both independent
-assent commands waiting on the exact original user's InnoDB primary record.
-Earlier same-name `CREATE TEMPORARY TABLE ... LIKE ...` setup failed on MySQL and
-was replaced by explicit temporary marker tables. Those are test setup fixes,
-not weakened runtime admission. Final frozen native results are recorded in a
-separate receipt after the executable source commit.
+The ff4→9f source map records 42/46 owned files byte-exact and four changed files.
+The 9f→f0 map records 44/46 prior owned files byte-exact, two changed files and two
+new files. Migration/DDL/guard definitions, owner-authority repair, request/
+reconciliation, line projection, public DTO method signatures and prior tests
+remain exact after 9f. The 9f native installer/authority/physical-boundary/race
+proof remains attributable to 9f with that mapping; it is not reported as a new
+full native run on f0. The affected paid-source cases execute afresh on f0.
 
-SQLite is not proof of MySQL DDL or concurrency. No substitute buyer authority
-DTO was used. Checkout issues no grant or original document. Independent review
-must assess the final exact executable commit and reconcile its receipts before
-root integration. MySQL 8.4 and final integrated acceptance remain gates.
+## Recorded checks
+
+Commands use the locked `/workspace/.va-studio-toolchain/activate.sh`. Native
+loopback uses the private isolated checkout env and additional network sandbox
+permission. All enrolled identities consume proof received through actual local
+synthetic SMTP DATA. Provider observations and HTTP transports remain explicit
+rehearsal fixtures; no actual Stripe credentials, payment call or account approval
+is supplied. Final-run argv, source, JUnit, output and exit code are retained under
+`evidence/`; earlier frozen and red receipts retain testcase identities, output
+and exit code, with equivalent reproduction selections documented separately.
+`checks.json` reconciles exact counts and source attribution.
+
+| Exact source | Selected check | Recorded outcome |
+| --- | --- | --- |
+| ff4 + borrowed1d/8e | Full selected native MySQL8.0.46 checkout | 114 recorded,113 passed,2497 assertions,1 SQLite-only skip; historical superseded candidate |
+| 9f + exact borrowed eaaa | Full selected SQLite checkout + two unchanged role canaries | 122 recorded,115 passed,556 assertions,7 named native-only skips |
+| 9f + exact borrowed eaaa | Affected native authority/migration/boundary/journey/race + unchanged foreign-FK/routine canaries + T23 strict-schema role case | 48 recorded,47 passed,2241 assertions,1 SQLite-only skip |
+| f0 + exact borrowed eaaa | Full selected SQLite checkout + two unchanged role canaries | 130 recorded,123 passed,613 assertions,7 named native-only skips |
+| f0 + exact borrowed eaaa | Unchanged original autocommit source canary, SQLite | 1 test,4 assertions,passed |
+| f0 + exact borrowed eaaa | Affected native held-source cases and original paid/recovery/late-exception source journeys | 11 tests,92 assertions,passed; 654871ms |
+| f0 + exact borrowed eaaa | Unchanged original autocommit source canary, native | 1 test,4 assertions,passed;72833ms |
+
+Seven SQLite skips are the native trigger accent identity, three foreign-FK
+exact/case/accent variants, the foreign-routine reference, and two native competing
+assent races. Native's one skip is the SQLite separate table/trigger namespace
+case. Named skips, testcase identities and their platform limits are in JUnit.
+
+The eight new source-frame cases use actual enrolled and confirmed rehearsal
+payment graphs: raw PDO-only transaction; proof after framework commit; direct
+PDO commit/reopen; framework commit/reopen; framework nesting; rollback across
+an older savepoint; direct reopen during source decryption; repeated terminal
+proof preserving a consumer write committed afterward. The direct reopen
+asserts same Tx1/raw-inTransaction booleans, proving the private anchor adds an
+actual continuity check. Returned errors are sanitized and have no driver cause.
+Original enrollment/paid-source, credential recovery during provider reads and
+late-payment exclusion flows are selected again for affected native coverage.
+
+Nonpassing evidence remains visible. All four unchanged author red canaries are
+retained with original sources and JUnit. The first held-frame pilot recorded
+10 tests,9 passed,83 assertions,1 error because its raw-only test attempted T23
+historical proof inside an already invalid raw transaction before reaching the
+checkout call. Moving that proof before raw BEGIN exercised the intended checkout
+refusal; the corrected pilot passed10/86 without changing runtime. An earlier
+repair harness lacked APP_KEY for the external T23 canary; its failure and
+corrected explicit synthetic-key run are preserved separately. Neither is an
+invented runtime pass. Earlier native pilots had a test-helper type error,
+incorrect credential-lock barrier and unsupported temporary-LIKE setup; final
+corrected immutable receipts supersede those developmental probes.
+
+SQLite does not prove native DDL or concurrency. Oracle MySQL8.0.46 Ubuntu is
+actual native MySQL, distinct from the MySQL8.4 final gate. No substitute buyer
+DTO was used. Independent checkout review must assess f0 plus exact dependency
+and reconcile unchanged red canaries before root integration. Integrated privacy
+composition, independent T23 approval, current-source MySQL8.4 and complete final
+integrated acceptance remain gates. No grant, original document, production
+activation or T22/launch completion is claimed. The next required child is
+provider-calculated Checkout automatic_tax with buyer/session provenance and
+retained reviewed-session binding, using supported pinned provider parameters.

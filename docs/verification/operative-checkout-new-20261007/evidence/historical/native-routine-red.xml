@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Canary\ProductionCheckoutForeignRoutineCanaryTest" file="/tmp/ProductionCheckoutForeignRoutineCanaryTest.php" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="14.509403">
+    <testcase name="test_unowned_stored_routine_reference_is_refused_before_any_checkout_ddl" file="/tmp/ProductionCheckoutForeignRoutineCanaryTest.php" line="16" class="Tests\Canary\ProductionCheckoutForeignRoutineCanaryTest" classname="Tests.Canary.ProductionCheckoutForeignRoutineCanaryTest" assertions="2" time="14.509403">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Canary\ProductionCheckoutForeignRoutineCanaryTest::test_unowned_stored_routine_reference_is_refused_before_any_checkout_ddl
+A foreign stored routine reference was accepted.
+Failed asserting that false is true.
+
+/tmp/ProductionCheckoutForeignRoutineCanaryTest.php:41</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

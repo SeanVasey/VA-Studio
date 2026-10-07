@@ -1,0 +1,67 @@
+{
+  "note": "Equivalent reproduction selections from retained JUnit; these are not claimed as persisted original argv. Use exact source worktree/dependency and an isolated disposable native schema; tests wipe their fixture schema. The final f0 command.json files preserve actual argv.",
+  "initial_ff4_full_selection": {
+    "source": "ff4c6749692cc474fb81202b9554993f510350a9",
+    "selection": [
+      "tests/Unit/ProductionCheckoutProviderTest.php",
+      "tests/Unit/ProductionHostedEvidenceTest.php",
+      "tests/Feature/ProductionCheckout*Test.php at ff4"
+    ],
+    "driver": "native mysql8.0.46",
+    "dependency": "exact1d+8e"
+  },
+  "9f_sqlite_selection": {
+    "source": "9f948b4eca4fe0ce0e91221afff920652fe3a21a",
+    "selection": [
+      "tests/Unit/ProductionCheckoutProviderTest.php",
+      "tests/Unit/ProductionHostedEvidenceTest.php",
+      "tests/Feature/ProductionCheckout*Test.php at9f",
+      "canaries/ProductionCheckoutUnknownStaffCanaryTest.php only unique method",
+      "canaries/IdentityUnknownRoleCanaryTest.php only unique method"
+    ],
+    "dependency": "exact1d+8e+eaaa",
+    "additional_env": "explicit synthetic APP_KEY"
+  },
+  "9f_native_selection": {
+    "source": "9f948b4eca4fe0ce0e91221afff920652fe3a21a",
+    "selection": [
+      "tests/Feature/ProductionCheckoutExemptionAuthorityTest.php",
+      "tests/Feature/ProductionCheckoutMigrationTest.php",
+      "tests/Feature/ProductionCheckoutPrimaryBoundaryTest.php",
+      "tests/Feature/ProductionCheckoutJourneyTest.php",
+      "tests/Feature/ProductionCheckoutNativeRaceTest.php",
+      "canaries/ProductionCheckoutForeignConstraintCanaryTest.php only unique method",
+      "canaries/ProductionCheckoutForeignRoutineCanaryTest.php only unique method",
+      "tests/Feature/ProductionIdentity/ProductionIdentityRuntimeTest.php only unknown-role method"
+    ],
+    "filter": "ProductionCheckout|unknown_permanent_role_flag_never_counts_as_nonstaff_customer_authority",
+    "dependency": "exact1d+8e+eaaa",
+    "additional_env": "explicit synthetic APP_KEY"
+  },
+  "unchanged_red_canaries": [
+    {
+      "source": "ff4c6749692cc474fb81202b9554993f510350a9",
+      "driver": "sqlite",
+      "snapshot": "canaries/ProductionCheckoutUnknownStaffCanaryTest.php",
+      "filter": "unknown_raw_staff_flag_is_refused_before_owner_authority_write"
+    },
+    {
+      "source": "ff4c6749692cc474fb81202b9554993f510350a9",
+      "driver": "native mysql8.0.46",
+      "snapshot": "canaries/ProductionCheckoutForeignConstraintCanaryTest.php",
+      "filter": "foreign_schema_global_fk_identity_is_refused_before_any_checkout_ddl"
+    },
+    {
+      "source": "ff4c6749692cc474fb81202b9554993f510350a9",
+      "driver": "native mysql8.0.46",
+      "snapshot": "canaries/ProductionCheckoutForeignRoutineCanaryTest.php",
+      "filter": "unowned_stored_routine_reference_is_refused_before_any_checkout_ddl"
+    },
+    {
+      "source": "9f948b4eca4fe0ce0e91221afff920652fe3a21a",
+      "driver": "sqlite",
+      "snapshot": "canaries/ProductionCheckoutSourceTransactionCanaryTest.php",
+      "filter": "paid_locked_source_never_mints_without_a_held_consumer_transaction"
+    }
+  ]
+}

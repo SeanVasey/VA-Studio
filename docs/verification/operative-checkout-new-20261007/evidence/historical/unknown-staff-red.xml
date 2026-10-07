@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Canary\ProductionCheckoutUnknownStaffCanaryTest" file="/tmp/ProductionCheckoutUnknownStaffCanaryTest.php" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="1.936476">
+    <testcase name="test_unknown_raw_staff_flag_is_refused_before_owner_authority_write" file="/tmp/ProductionCheckoutUnknownStaffCanaryTest.php" line="17" class="Tests\Canary\ProductionCheckoutUnknownStaffCanaryTest" classname="Tests.Canary.ProductionCheckoutUnknownStaffCanaryTest" assertions="2" time="1.936476">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Canary\ProductionCheckoutUnknownStaffCanaryTest::test_unknown_raw_staff_flag_is_refused_before_owner_authority_write
+Unknown raw staff flag was accepted as delegated owner authority.
+
+/tmp/ProductionCheckoutUnknownStaffCanaryTest.php:27</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

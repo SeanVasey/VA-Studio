@@ -1,0 +1,3370 @@
+{
+  "schema_version": 1,
+  "checkout_executable_sha": "f0a1615be0833804959662fad5d7a7a8e1389ee0",
+  "checkout_executable_tree": "9094a25b28cc353678753cff47101239864b2ef8",
+  "source_manifest": "evidence/final-source-manifest.json",
+  "source_maps": [
+    "evidence/historical/ff4-to-9f-source-map.json",
+    "evidence/9f-to-final-source-map.json",
+    "evidence/paid-public-seam-map.json"
+  ],
+  "canaries": [
+    {
+      "path": "canaries/IdentityUnknownRoleCanaryTest.php",
+      "bytes": 782,
+      "sha256": "0341c4a89c96bc78e9d66a3ffb05c3688d85a80f72ba955b51ff5c12ecfdff1b",
+      "attribution": "External T23 original unknown-role canary; unchanged standalone snapshot."
+    },
+    {
+      "path": "canaries/ProductionCheckoutForeignConstraintCanaryTest.php",
+      "bytes": 1839,
+      "sha256": "6d28b3a9cd8bb1d3c9b55f2a34f904ea2aa22262ddd8e0131f66cd5fe81f9bb3",
+      "attribution": "Checkout author original red canary; unchanged standalone snapshot."
+    },
+    {
+      "path": "canaries/ProductionCheckoutForeignRoutineCanaryTest.php",
+      "bytes": 2168,
+      "sha256": "096c6e15cecead410a0e6539534fba706fdb0c3c5a78b2cc5e18a780fe0e7a97",
+      "attribution": "Checkout author original red canary; unchanged standalone snapshot."
+    },
+    {
+      "path": "canaries/ProductionCheckoutSourceTransactionCanaryTest.php",
+      "bytes": 1401,
+      "sha256": "72fe349e05793935b640425b31b2752d47e180f4279e313c909e19026c2d4002",
+      "attribution": "Checkout author original red canary; unchanged standalone snapshot."
+    },
+    {
+      "path": "canaries/ProductionCheckoutUnknownStaffCanaryTest.php",
+      "bytes": 1525,
+      "sha256": "b833004d873dab04d1fcad29ef2dc93dc622e82f5425c61d61ef215d8d3686c8",
+      "attribution": "Checkout author original red canary; unchanged standalone snapshot."
+    }
+  ],
+  "checks": [
+    {
+      "receipt_prefix": "historical/ff4-native",
+      "source_sha": "ff4c6749692cc474fb81202b9554993f510350a9",
+      "attribution": "historical_superseded_candidate",
+      "recorded_tests": 114,
+      "passed_tests": 113,
+      "assertions": 2497,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "exit_code": 0,
+      "testcases": [
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_context_distinguishes_declared_target_from_rehearsal_and_supports_configured_live_runtime",
+          "assertions": 6,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #0",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #1",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #2",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #3",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #4",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #5",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #6",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #7",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #8",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_actual_sdk_own_account_request_is_pinned_and_transport_restored",
+          "assertions": 9,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_actual_sdk_create_then_retrieve_and_payment_get_use_one_frozen_request_and_own_account",
+          "assertions": 24,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_expiry_that_elapsed_during_own_account_read_is_refused_before_checkout_post",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #0",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #1",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #2",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #3",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #4",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #5",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #6",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #7",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #8",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #9",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_retrieved_complete_session_and_successful_payment_match_exact_frozen_mapping",
+          "assertions": 5,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #0",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #1",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #2",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #3",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #4",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #5",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #6",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #7",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #8",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #9",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #10",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #11",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #12",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #13",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #14",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #15",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #16",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #17",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #18",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #19",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #20",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #21",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #22",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #23",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #24",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #25",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #26",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #27",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #28",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #29",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #30",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #31",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #32",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #33",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_browser_or_session_paid_claim_without_payment_intent_is_not_confirmation",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_default_off_never_queries_private_or_payment_data_and_never_resolves_identity",
+          "assertions": 12,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #0",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #1",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #2",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #3",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #4",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #5",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #6",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #7",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #8",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #9",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #10",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #11",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #12",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #13",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_outer_boundary_sanitizes_downstream_session_csrf_and_exception_paths",
+          "assertions": 10,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_installed_graph_repeats_without_writes_and_preserves_records",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #0",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #1",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #2",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #3",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #4",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #5",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_foreign_reserved_namespace_refuses_before_writes",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_before_and_after_creation_failures_resume_exact_prefixes_without_changing_parent_rows_or_guards",
+          "assertions": 72,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_populated_partial_installation_preserves_all_records_and_surviving_guards_before_refusal",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_interior_guard_gap_is_not_adopted_as_a_prefix",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_sqlite_duplicate_table_and_trigger_namespace_cannot_hide_a_foreign_marker",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_dictionary_accent_alias_is_rejected_before_creating_the_first_owned_table",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_final_assertion_interruption_and_repository_log_uncertainty_retry_without_duplicate_bookkeeping",
+          "assertions": 36,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_actual_owner_command_freezes_scoped_policy_and_exact_replay_conflicts_preserve_original",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #0",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #1",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #2",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #3",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #4",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #5",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #6",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #7",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_temporary_shadow_cannot_supply_authority_or_redirect_financial_retention with data set #0",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_temporary_shadow_cannot_supply_authority_or_redirect_financial_retention with data set #1",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_temporary_shadow_cannot_supply_authority_or_redirect_financial_retention with data set #2",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_temporary_shadow_cannot_supply_authority_or_redirect_financial_retention with data set #3",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_temporary_shadow_cannot_supply_authority_or_redirect_financial_retention with data set #4",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_shadow_installed_during_callback_is_refused_by_terminal_boundary",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_postcommit_callback_shadow_suppresses_result_and_keeps_original_permanent_graph",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_actual_mailbox_enrollment_payable_assent_hosted_request_reconciliation_and_retained_paid_source",
+          "assertions": 20,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_lost_create_response_retries_same_original_key_and_request_before_binding_one_session",
+          "assertions": 9,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_reconciliation_and_original_order_replay_remain_available_after_fresh_checkout_withdrawal",
+          "assertions": 5,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_first_confirmed_observation_after_attempt_deadline_is_retained_as_paid_exception",
+          "assertions": 6,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_explicit_assent_exact_review_and_original_buyer_are_required_before_any_order_write",
+          "assertions": 11,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_recovery_during_provider_read_retains_confirmed_money_and_original_source_but_denies_old_principal",
+          "assertions": 9,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_http_checkout_uses_real_new_sign_in_marker_and_a_return_never_creates_payment",
+          "assertions": 21,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutNativeRaceTest",
+          "name": "test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order with data set #0",
+          "assertions": 959,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutNativeRaceTest",
+          "name": "test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order with data set #1",
+          "assertions": 999,
+          "outcome": "passed"
+        }
+      ],
+      "duration_ms": 913799,
+      "command_attribution": "Original argv not persisted; retained JUnit testcase identities and equivalent reproduction selections are explicit."
+    },
+    {
+      "receipt_prefix": "historical/9f-native",
+      "source_sha": "9f948b4eca4fe0ce0e91221afff920652fe3a21a",
+      "attribution": "prior_frozen_proof_with_explicit_source_map",
+      "recorded_tests": 48,
+      "passed_tests": 47,
+      "assertions": 2241,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "exit_code": 0,
+      "testcases": [
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_actual_owner_command_freezes_scoped_policy_and_exact_replay_conflicts_preserve_original",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_unknown_persisted_staff_role_cannot_author_owner_policy with data set #0",
+          "assertions": 5,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_unknown_persisted_staff_role_cannot_author_owner_policy with data set #1",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #0",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #1",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #2",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #3",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #4",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #5",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #6",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #7",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_installed_graph_repeats_without_writes_and_preserves_records",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #0",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #1",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #2",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #3",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #4",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #5",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_foreign_reserved_namespace_refuses_before_writes",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_before_and_after_creation_failures_resume_exact_prefixes_without_changing_parent_rows_or_guards",
+          "assertions": 72,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_populated_partial_installation_preserves_all_records_and_surviving_guards_before_refusal",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_interior_guard_gap_is_not_adopted_as_a_prefix",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_sqlite_duplicate_table_and_trigger_namespace_cannot_hide_a_foreign_marker",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_dictionary_accent_alias_is_rejected_before_creating_the_first_owned_table",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl with data set #0",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl with data set #1",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl with data set #2",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_unowned_stored_routine_reference_refuses_before_any_owned_ddl",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_final_assertion_interruption_and_repository_log_uncertainty_retry_without_duplicate_bookkeeping",
+          "assertions": 36,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_temporary_shadow_cannot_supply_authority_or_redirect_financial_retention with data set #0",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_temporary_shadow_cannot_supply_authority_or_redirect_financial_retention with data set #1",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_temporary_shadow_cannot_supply_authority_or_redirect_financial_retention with data set #2",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_temporary_shadow_cannot_supply_authority_or_redirect_financial_retention with data set #3",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_temporary_shadow_cannot_supply_authority_or_redirect_financial_retention with data set #4",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_shadow_installed_during_callback_is_refused_by_terminal_boundary",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_postcommit_callback_shadow_suppresses_result_and_keeps_original_permanent_graph",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_actual_mailbox_enrollment_payable_assent_hosted_request_reconciliation_and_retained_paid_source",
+          "assertions": 20,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_lost_create_response_retries_same_original_key_and_request_before_binding_one_session",
+          "assertions": 9,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_reconciliation_and_original_order_replay_remain_available_after_fresh_checkout_withdrawal",
+          "assertions": 5,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_first_confirmed_observation_after_attempt_deadline_is_retained_as_paid_exception",
+          "assertions": 6,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_explicit_assent_exact_review_and_original_buyer_are_required_before_any_order_write",
+          "assertions": 11,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_recovery_during_provider_read_retains_confirmed_money_and_original_source_but_denies_old_principal",
+          "assertions": 9,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_http_checkout_uses_real_new_sign_in_marker_and_a_return_never_creates_payment",
+          "assertions": 21,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutNativeRaceTest",
+          "name": "test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order with data set #0",
+          "assertions": 970,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutNativeRaceTest",
+          "name": "test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order with data set #1",
+          "assertions": 959,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Canary\\ProductionCheckoutForeignConstraintCanaryTest",
+          "name": "test_foreign_schema_global_fk_identity_is_refused_before_any_checkout_ddl",
+          "assertions": 5,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Canary\\ProductionCheckoutForeignRoutineCanaryTest",
+          "name": "test_unowned_stored_routine_reference_is_refused_before_any_checkout_ddl",
+          "assertions": 5,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityRuntimeTest",
+          "name": "test_unknown_permanent_role_flag_never_counts_as_nonstaff_customer_authority",
+          "assertions": 4,
+          "outcome": "passed"
+        }
+      ],
+      "duration_ms": 962896,
+      "command_attribution": "Original argv not persisted; retained JUnit testcase identities and equivalent reproduction selections are explicit."
+    },
+    {
+      "receipt_prefix": "historical/9f-sqlite",
+      "source_sha": "9f948b4eca4fe0ce0e91221afff920652fe3a21a",
+      "attribution": "historical_superseded_candidate",
+      "recorded_tests": 122,
+      "passed_tests": 115,
+      "assertions": 556,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 7,
+      "exit_code": 0,
+      "testcases": [
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_context_distinguishes_declared_target_from_rehearsal_and_supports_configured_live_runtime",
+          "assertions": 6,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #0",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #1",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #2",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #3",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #4",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #5",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #6",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #7",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #8",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_actual_sdk_own_account_request_is_pinned_and_transport_restored",
+          "assertions": 9,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_actual_sdk_create_then_retrieve_and_payment_get_use_one_frozen_request_and_own_account",
+          "assertions": 24,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_expiry_that_elapsed_during_own_account_read_is_refused_before_checkout_post",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #0",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #1",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #2",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #3",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #4",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #5",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #6",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #7",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #8",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #9",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_retrieved_complete_session_and_successful_payment_match_exact_frozen_mapping",
+          "assertions": 5,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #0",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #1",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #2",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #3",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #4",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #5",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #6",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #7",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #8",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #9",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #10",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #11",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #12",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #13",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #14",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #15",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #16",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #17",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #18",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #19",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #20",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #21",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #22",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #23",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #24",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #25",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #26",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #27",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #28",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #29",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #30",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #31",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #32",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #33",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_browser_or_session_paid_claim_without_payment_intent_is_not_confirmation",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_default_off_never_queries_private_or_payment_data_and_never_resolves_identity",
+          "assertions": 12,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #0",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #1",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #2",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #3",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #4",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #5",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #6",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #7",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #8",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #9",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #10",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #11",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #12",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #13",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_outer_boundary_sanitizes_downstream_session_csrf_and_exception_paths",
+          "assertions": 10,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_installed_graph_repeats_without_writes_and_preserves_records",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #0",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #1",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #2",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #3",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #4",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #5",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_foreign_reserved_namespace_refuses_before_writes",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_before_and_after_creation_failures_resume_exact_prefixes_without_changing_parent_rows_or_guards",
+          "assertions": 72,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_populated_partial_installation_preserves_all_records_and_surviving_guards_before_refusal",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_interior_guard_gap_is_not_adopted_as_a_prefix",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_sqlite_duplicate_table_and_trigger_namespace_cannot_hide_a_foreign_marker",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_dictionary_accent_alias_is_rejected_before_creating_the_first_owned_table",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl with data set #0",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl with data set #1",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl with data set #2",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_unowned_stored_routine_reference_refuses_before_any_owned_ddl",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_final_assertion_interruption_and_repository_log_uncertainty_retry_without_duplicate_bookkeeping",
+          "assertions": 36,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_actual_owner_command_freezes_scoped_policy_and_exact_replay_conflicts_preserve_original",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_unknown_persisted_staff_role_cannot_author_owner_policy with data set #0",
+          "assertions": 5,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_unknown_persisted_staff_role_cannot_author_owner_policy with data set #1",
+          "assertions": 5,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #0",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #1",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #2",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #3",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #4",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #5",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #6",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #7",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_temporary_shadow_cannot_supply_authority_or_redirect_financial_retention with data set #0",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_temporary_shadow_cannot_supply_authority_or_redirect_financial_retention with data set #1",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_temporary_shadow_cannot_supply_authority_or_redirect_financial_retention with data set #2",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_temporary_shadow_cannot_supply_authority_or_redirect_financial_retention with data set #3",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_temporary_shadow_cannot_supply_authority_or_redirect_financial_retention with data set #4",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_shadow_installed_during_callback_is_refused_by_terminal_boundary",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_postcommit_callback_shadow_suppresses_result_and_keeps_original_permanent_graph",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_actual_mailbox_enrollment_payable_assent_hosted_request_reconciliation_and_retained_paid_source",
+          "assertions": 20,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_lost_create_response_retries_same_original_key_and_request_before_binding_one_session",
+          "assertions": 9,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_reconciliation_and_original_order_replay_remain_available_after_fresh_checkout_withdrawal",
+          "assertions": 5,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_first_confirmed_observation_after_attempt_deadline_is_retained_as_paid_exception",
+          "assertions": 6,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_explicit_assent_exact_review_and_original_buyer_are_required_before_any_order_write",
+          "assertions": 11,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_recovery_during_provider_read_retains_confirmed_money_and_original_source_but_denies_old_principal",
+          "assertions": 9,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_http_checkout_uses_real_new_sign_in_marker_and_a_return_never_creates_payment",
+          "assertions": 21,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutNativeRaceTest",
+          "name": "test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order with data set #0",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutNativeRaceTest",
+          "name": "test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order with data set #1",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Canary\\ProductionCheckoutUnknownStaffCanaryTest",
+          "name": "test_unknown_raw_staff_flag_is_refused_before_owner_authority_write",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\AuthorIdentityCanaries\\IdentityUnknownRoleCanaryTest",
+          "name": "test_unknown_permanent_role_flag_never_counts_as_nonstaff_customer_authority",
+          "assertions": 4,
+          "outcome": "passed"
+        }
+      ],
+      "duration_ms": 48997,
+      "command_attribution": "Original argv not persisted; retained JUnit testcase identities and equivalent reproduction selections are explicit."
+    },
+    {
+      "receipt_prefix": "historical/unknown-staff-red",
+      "source_sha": "ff4c6749692cc474fb81202b9554993f510350a9",
+      "attribution": "unchanged_actual_red_canary",
+      "recorded_tests": 1,
+      "passed_tests": 0,
+      "assertions": 2,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "exit_code": 1,
+      "testcases": [
+        {
+          "class": "Tests\\Canary\\ProductionCheckoutUnknownStaffCanaryTest",
+          "name": "test_unknown_raw_staff_flag_is_refused_before_owner_authority_write",
+          "assertions": 2,
+          "outcome": "failure"
+        }
+      ],
+      "duration_ms": 1938,
+      "command_attribution": "Original argv not persisted; retained JUnit testcase identities and equivalent reproduction selections are explicit."
+    },
+    {
+      "receipt_prefix": "historical/native-fk-red",
+      "source_sha": "ff4c6749692cc474fb81202b9554993f510350a9",
+      "attribution": "unchanged_actual_red_canary",
+      "recorded_tests": 1,
+      "passed_tests": 0,
+      "assertions": 3,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "exit_code": 1,
+      "testcases": [
+        {
+          "class": "Tests\\Canary\\ProductionCheckoutForeignConstraintCanaryTest",
+          "name": "test_foreign_schema_global_fk_identity_is_refused_before_any_checkout_ddl",
+          "assertions": 3,
+          "outcome": "failure"
+        }
+      ],
+      "duration_ms": 12619,
+      "command_attribution": "Original argv not persisted; retained JUnit testcase identities and equivalent reproduction selections are explicit."
+    },
+    {
+      "receipt_prefix": "historical/native-routine-red",
+      "source_sha": "ff4c6749692cc474fb81202b9554993f510350a9",
+      "attribution": "unchanged_actual_red_canary",
+      "recorded_tests": 1,
+      "passed_tests": 0,
+      "assertions": 2,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "exit_code": 1,
+      "testcases": [
+        {
+          "class": "Tests\\Canary\\ProductionCheckoutForeignRoutineCanaryTest",
+          "name": "test_unowned_stored_routine_reference_is_refused_before_any_checkout_ddl",
+          "assertions": 2,
+          "outcome": "failure"
+        }
+      ],
+      "duration_ms": 14511,
+      "command_attribution": "Original argv not persisted; retained JUnit testcase identities and equivalent reproduction selections are explicit."
+    },
+    {
+      "receipt_prefix": "historical/source-transaction-red",
+      "source_sha": "9f948b4eca4fe0ce0e91221afff920652fe3a21a",
+      "attribution": "unchanged_actual_red_canary",
+      "recorded_tests": 1,
+      "passed_tests": 0,
+      "assertions": 4,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "exit_code": 1,
+      "testcases": [
+        {
+          "class": "Tests\\Canary\\ProductionCheckoutSourceTransactionCanaryTest",
+          "name": "test_paid_locked_source_never_mints_without_a_held_consumer_transaction",
+          "assertions": 4,
+          "outcome": "failure"
+        }
+      ],
+      "duration_ms": 3605,
+      "command_attribution": "Original argv not persisted; retained JUnit testcase identities and equivalent reproduction selections are explicit."
+    },
+    {
+      "receipt_prefix": "historical/held-pilot-identity-harness-error",
+      "source_sha": "pre-f0 unfrozen development",
+      "attribution": "test_setup_error_before_checkout_call",
+      "recorded_tests": 10,
+      "passed_tests": 9,
+      "assertions": 83,
+      "failures": 0,
+      "errors": 1,
+      "skipped": 0,
+      "exit_code": 2,
+      "testcases": [
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_raw_pdo_transaction_without_framework_transaction_never_mints_source",
+          "assertions": 3,
+          "outcome": "error"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_source_proof_after_original_framework_commit_is_refused",
+          "assertions": 6,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_original_transaction_frame_cannot_be_replaced_or_nested with data set #0",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_original_transaction_frame_cannot_be_replaced_or_nested with data set #1",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_original_transaction_frame_cannot_be_replaced_or_nested with data set #2",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_original_transaction_frame_cannot_be_replaced_or_nested with data set #3",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_direct_commit_reopen_during_source_decryption_cannot_mint_rebound_source",
+          "assertions": 7,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_repeated_terminal_proofs_preserve_consumer_writes_after_source_capture",
+          "assertions": 6,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_actual_mailbox_enrollment_payable_assent_hosted_request_reconciliation_and_retained_paid_source",
+          "assertions": 20,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_recovery_during_provider_read_retains_confirmed_money_and_original_source_but_denies_old_principal",
+          "assertions": 9,
+          "outcome": "passed"
+        }
+      ],
+      "duration_ms": 23361,
+      "command_attribution": "Original argv not persisted; retained JUnit testcase identities and equivalent reproduction selections are explicit."
+    },
+    {
+      "receipt_prefix": "historical/held-pilot-sqlite-fixed",
+      "source_sha": "pre-f0 unfrozen development",
+      "attribution": "corrected_development_pilot",
+      "recorded_tests": 10,
+      "passed_tests": 10,
+      "assertions": 86,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "testcases": [
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_raw_pdo_transaction_without_framework_transaction_never_mints_source",
+          "assertions": 6,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_source_proof_after_original_framework_commit_is_refused",
+          "assertions": 6,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_original_transaction_frame_cannot_be_replaced_or_nested with data set #0",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_original_transaction_frame_cannot_be_replaced_or_nested with data set #1",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_original_transaction_frame_cannot_be_replaced_or_nested with data set #2",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_original_transaction_frame_cannot_be_replaced_or_nested with data set #3",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_direct_commit_reopen_during_source_decryption_cannot_mint_rebound_source",
+          "assertions": 7,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_repeated_terminal_proofs_preserve_consumer_writes_after_source_capture",
+          "assertions": 6,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_actual_mailbox_enrollment_payable_assent_hosted_request_reconciliation_and_retained_paid_source",
+          "assertions": 20,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_recovery_during_provider_read_retains_confirmed_money_and_original_source_but_denies_old_principal",
+          "assertions": 9,
+          "outcome": "passed"
+        }
+      ],
+      "duration_ms": 22426,
+      "command_attribution": "Original argv not persisted; retained JUnit testcase identities and equivalent reproduction selections are explicit."
+    },
+    {
+      "receipt_prefix": "historical/repair-sqlite-missing-key-harness-error",
+      "source_sha": "pre-9f unfrozen development",
+      "attribution": "missing_synthetic_key_external_canary_harness_error",
+      "recorded_tests": 31,
+      "passed_tests": 25,
+      "assertions": 187,
+      "failures": 0,
+      "errors": 1,
+      "skipped": 5,
+      "exit_code": 2,
+      "testcases": [
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_actual_owner_command_freezes_scoped_policy_and_exact_replay_conflicts_preserve_original",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_unknown_persisted_staff_role_cannot_author_owner_policy with data set #0",
+          "assertions": 5,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_unknown_persisted_staff_role_cannot_author_owner_policy with data set #1",
+          "assertions": 5,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #0",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #1",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #2",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #3",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #4",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #5",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #6",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #7",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_installed_graph_repeats_without_writes_and_preserves_records",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #0",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #1",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #2",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #3",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #4",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #5",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_foreign_reserved_namespace_refuses_before_writes",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_before_and_after_creation_failures_resume_exact_prefixes_without_changing_parent_rows_or_guards",
+          "assertions": 72,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_populated_partial_installation_preserves_all_records_and_surviving_guards_before_refusal",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_interior_guard_gap_is_not_adopted_as_a_prefix",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_sqlite_duplicate_table_and_trigger_namespace_cannot_hide_a_foreign_marker",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_dictionary_accent_alias_is_rejected_before_creating_the_first_owned_table",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl with data set #0",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl with data set #1",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl with data set #2",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_unowned_stored_routine_reference_refuses_before_any_owned_ddl",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_final_assertion_interruption_and_repository_log_uncertainty_retry_without_duplicate_bookkeeping",
+          "assertions": 36,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Canary\\ProductionCheckoutUnknownStaffCanaryTest",
+          "name": "test_unknown_raw_staff_flag_is_refused_before_owner_authority_write",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\AuthorIdentityCanaries\\IdentityUnknownRoleCanaryTest",
+          "name": "test_unknown_permanent_role_flag_never_counts_as_nonstaff_customer_authority",
+          "assertions": 1,
+          "outcome": "error"
+        }
+      ],
+      "duration_ms": 21485,
+      "command_attribution": "Original argv not persisted; retained JUnit testcase identities and equivalent reproduction selections are explicit."
+    },
+    {
+      "receipt_prefix": "historical/repair-sqlite-fixed",
+      "source_sha": "pre-9f unfrozen development",
+      "attribution": "corrected_development_pilot",
+      "recorded_tests": 31,
+      "passed_tests": 26,
+      "assertions": 190,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 5,
+      "exit_code": 0,
+      "testcases": [
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_actual_owner_command_freezes_scoped_policy_and_exact_replay_conflicts_preserve_original",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_unknown_persisted_staff_role_cannot_author_owner_policy with data set #0",
+          "assertions": 5,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_unknown_persisted_staff_role_cannot_author_owner_policy with data set #1",
+          "assertions": 5,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #0",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #1",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #2",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #3",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #4",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #5",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #6",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #7",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_installed_graph_repeats_without_writes_and_preserves_records",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #0",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #1",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #2",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #3",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #4",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #5",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_foreign_reserved_namespace_refuses_before_writes",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_before_and_after_creation_failures_resume_exact_prefixes_without_changing_parent_rows_or_guards",
+          "assertions": 72,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_populated_partial_installation_preserves_all_records_and_surviving_guards_before_refusal",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_interior_guard_gap_is_not_adopted_as_a_prefix",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_sqlite_duplicate_table_and_trigger_namespace_cannot_hide_a_foreign_marker",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_dictionary_accent_alias_is_rejected_before_creating_the_first_owned_table",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl with data set #0",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl with data set #1",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl with data set #2",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_unowned_stored_routine_reference_refuses_before_any_owned_ddl",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_final_assertion_interruption_and_repository_log_uncertainty_retry_without_duplicate_bookkeeping",
+          "assertions": 36,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Canary\\ProductionCheckoutUnknownStaffCanaryTest",
+          "name": "test_unknown_raw_staff_flag_is_refused_before_owner_authority_write",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\AuthorIdentityCanaries\\IdentityUnknownRoleCanaryTest",
+          "name": "test_unknown_permanent_role_flag_never_counts_as_nonstaff_customer_authority",
+          "assertions": 4,
+          "outcome": "passed"
+        }
+      ],
+      "duration_ms": 30808,
+      "command_attribution": "Original argv not persisted; retained JUnit testcase identities and equivalent reproduction selections are explicit."
+    },
+    {
+      "receipt_prefix": "held-frozen-sqlite",
+      "source_sha": "f0a1615be0833804959662fad5d7a7a8e1389ee0",
+      "attribution": "current_frozen_author_check",
+      "recorded_tests": 130,
+      "passed_tests": 123,
+      "assertions": 613,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 7,
+      "exit_code": 0,
+      "testcases": [
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_context_distinguishes_declared_target_from_rehearsal_and_supports_configured_live_runtime",
+          "assertions": 6,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #0",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #1",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #2",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #3",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #4",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #5",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #6",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #7",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_unsupported_choices_are_refused_without_substitution with data set #8",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_actual_sdk_own_account_request_is_pinned_and_transport_restored",
+          "assertions": 9,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_actual_sdk_create_then_retrieve_and_payment_get_use_one_frozen_request_and_own_account",
+          "assertions": 24,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_expiry_that_elapsed_during_own_account_read_is_refused_before_checkout_post",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #0",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #1",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #2",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #3",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #4",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #5",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #6",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #7",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #8",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionCheckoutProviderTest",
+          "name": "test_provider_failure_is_sanitized_and_never_escapes_an_injected_live_transport with data set #9",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_retrieved_complete_session_and_successful_payment_match_exact_frozen_mapping",
+          "assertions": 5,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #0",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #1",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #2",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #3",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #4",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #5",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #6",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #7",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #8",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #9",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #10",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #11",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #12",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #13",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #14",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #15",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #16",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #17",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #18",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #19",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #20",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #21",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #22",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #23",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #24",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #25",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #26",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #27",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #28",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #29",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #30",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #31",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #32",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_foreign_incomplete_or_disagreeing_evidence_cannot_confirm with data set #33",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Unit\\ProductionHostedEvidenceTest",
+          "name": "test_browser_or_session_paid_claim_without_payment_intent_is_not_confirmation",
+          "assertions": 1,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_actual_owner_command_freezes_scoped_policy_and_exact_replay_conflicts_preserve_original",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_unknown_persisted_staff_role_cannot_author_owner_policy with data set #0",
+          "assertions": 5,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_unknown_persisted_staff_role_cannot_author_owner_policy with data set #1",
+          "assertions": 5,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #0",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #1",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #2",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #3",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #4",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #5",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #6",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutExemptionAuthorityTest",
+          "name": "test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope with data set #7",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_default_off_never_queries_private_or_payment_data_and_never_resolves_identity",
+          "assertions": 12,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #0",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #1",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #2",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #3",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #4",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #5",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #6",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #7",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #8",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #9",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #10",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #11",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #12",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_private_transport_refusals_are_bounded_and_sanitized with data set #13",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutHttpBoundaryTest",
+          "name": "test_outer_boundary_sanitizes_downstream_session_csrf_and_exception_paths",
+          "assertions": 10,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_actual_mailbox_enrollment_payable_assent_hosted_request_reconciliation_and_retained_paid_source",
+          "assertions": 20,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_lost_create_response_retries_same_original_key_and_request_before_binding_one_session",
+          "assertions": 9,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_reconciliation_and_original_order_replay_remain_available_after_fresh_checkout_withdrawal",
+          "assertions": 5,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_first_confirmed_observation_after_attempt_deadline_is_retained_as_paid_exception",
+          "assertions": 6,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_explicit_assent_exact_review_and_original_buyer_are_required_before_any_order_write",
+          "assertions": 11,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_recovery_during_provider_read_retains_confirmed_money_and_original_source_but_denies_old_principal",
+          "assertions": 9,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_http_checkout_uses_real_new_sign_in_marker_and_a_return_never_creates_payment",
+          "assertions": 21,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_installed_graph_repeats_without_writes_and_preserves_records",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #0",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #1",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #2",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #3",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #4",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_exact_empty_prefix_resumes_only_missing_objects with data set #5",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_foreign_reserved_namespace_refuses_before_writes",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_before_and_after_creation_failures_resume_exact_prefixes_without_changing_parent_rows_or_guards",
+          "assertions": 72,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_populated_partial_installation_preserves_all_records_and_surviving_guards_before_refusal",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_interior_guard_gap_is_not_adopted_as_a_prefix",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_sqlite_duplicate_table_and_trigger_namespace_cannot_hide_a_foreign_marker",
+          "assertions": 2,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_dictionary_accent_alias_is_rejected_before_creating_the_first_owned_table",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl with data set #0",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl with data set #1",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl with data set #2",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_native_unowned_stored_routine_reference_refuses_before_any_owned_ddl",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutMigrationTest",
+          "name": "test_final_assertion_interruption_and_repository_log_uncertainty_retry_without_duplicate_bookkeeping",
+          "assertions": 36,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutNativeRaceTest",
+          "name": "test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order with data set #0",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutNativeRaceTest",
+          "name": "test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order with data set #1",
+          "assertions": 0,
+          "outcome": "skipped"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_temporary_shadow_cannot_supply_authority_or_redirect_financial_retention with data set #0",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_temporary_shadow_cannot_supply_authority_or_redirect_financial_retention with data set #1",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_temporary_shadow_cannot_supply_authority_or_redirect_financial_retention with data set #2",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_temporary_shadow_cannot_supply_authority_or_redirect_financial_retention with data set #3",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_temporary_shadow_cannot_supply_authority_or_redirect_financial_retention with data set #4",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_shadow_installed_during_callback_is_refused_by_terminal_boundary",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutPrimaryBoundaryTest",
+          "name": "test_postcommit_callback_shadow_suppresses_result_and_keeps_original_permanent_graph",
+          "assertions": 3,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_raw_pdo_transaction_without_framework_transaction_never_mints_source",
+          "assertions": 6,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_source_proof_after_original_framework_commit_is_refused",
+          "assertions": 6,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_original_transaction_frame_cannot_be_replaced_or_nested with data set #0",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_original_transaction_frame_cannot_be_replaced_or_nested with data set #1",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_original_transaction_frame_cannot_be_replaced_or_nested with data set #2",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_original_transaction_frame_cannot_be_replaced_or_nested with data set #3",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_direct_commit_reopen_during_source_decryption_cannot_mint_rebound_source",
+          "assertions": 7,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_repeated_terminal_proofs_preserve_consumer_writes_after_source_capture",
+          "assertions": 6,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Canary\\ProductionCheckoutUnknownStaffCanaryTest",
+          "name": "test_unknown_raw_staff_flag_is_refused_before_owner_authority_write",
+          "assertions": 4,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\AuthorIdentityCanaries\\IdentityUnknownRoleCanaryTest",
+          "name": "test_unknown_permanent_role_flag_never_counts_as_nonstaff_customer_authority",
+          "assertions": 4,
+          "outcome": "passed"
+        }
+      ],
+      "duration_ms": 62578,
+      "actual_command_receipt": "evidence/held-frozen-sqlite.command.json"
+    },
+    {
+      "receipt_prefix": "held-frozen-canary-sqlite",
+      "source_sha": "f0a1615be0833804959662fad5d7a7a8e1389ee0",
+      "attribution": "current_frozen_unchanged_red_canary_replay",
+      "recorded_tests": 1,
+      "passed_tests": 1,
+      "assertions": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "testcases": [
+        {
+          "class": "Tests\\Canary\\ProductionCheckoutSourceTransactionCanaryTest",
+          "name": "test_paid_locked_source_never_mints_without_a_held_consumer_transaction",
+          "assertions": 4,
+          "outcome": "passed"
+        }
+      ],
+      "duration_ms": 2760,
+      "actual_command_receipt": "evidence/held-frozen-canary-sqlite.command.json"
+    },
+    {
+      "receipt_prefix": "held-frozen-native",
+      "source_sha": "f0a1615be0833804959662fad5d7a7a8e1389ee0",
+      "attribution": "current_frozen_affected_author_check",
+      "recorded_tests": 11,
+      "passed_tests": 11,
+      "assertions": 92,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "testcases": [
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_raw_pdo_transaction_without_framework_transaction_never_mints_source",
+          "assertions": 6,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_source_proof_after_original_framework_commit_is_refused",
+          "assertions": 6,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_original_transaction_frame_cannot_be_replaced_or_nested with data set #0",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_original_transaction_frame_cannot_be_replaced_or_nested with data set #1",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_original_transaction_frame_cannot_be_replaced_or_nested with data set #2",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_original_transaction_frame_cannot_be_replaced_or_nested with data set #3",
+          "assertions": 8,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_direct_commit_reopen_during_source_decryption_cannot_mint_rebound_source",
+          "assertions": 7,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutSourceTransactionTest",
+          "name": "test_repeated_terminal_proofs_preserve_consumer_writes_after_source_capture",
+          "assertions": 6,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_actual_mailbox_enrollment_payable_assent_hosted_request_reconciliation_and_retained_paid_source",
+          "assertions": 20,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_first_confirmed_observation_after_attempt_deadline_is_retained_as_paid_exception",
+          "assertions": 6,
+          "outcome": "passed"
+        },
+        {
+          "class": "Tests\\Feature\\ProductionCheckoutJourneyTest",
+          "name": "test_recovery_during_provider_read_retains_confirmed_money_and_original_source_but_denies_old_principal",
+          "assertions": 9,
+          "outcome": "passed"
+        }
+      ],
+      "duration_ms": 654871,
+      "actual_command_receipt": "evidence/held-frozen-native.command.json"
+    },
+    {
+      "receipt_prefix": "held-frozen-canary-native",
+      "source_sha": "f0a1615be0833804959662fad5d7a7a8e1389ee0",
+      "attribution": "current_frozen_unchanged_red_canary_replay",
+      "recorded_tests": 1,
+      "passed_tests": 1,
+      "assertions": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "testcases": [
+        {
+          "class": "Tests\\Canary\\ProductionCheckoutSourceTransactionCanaryTest",
+          "name": "test_paid_locked_source_never_mints_without_a_held_consumer_transaction",
+          "assertions": 4,
+          "outcome": "passed"
+        }
+      ],
+      "duration_ms": 72833,
+      "actual_command_receipt": "evidence/held-frozen-canary-native.command.json"
+    }
+  ],
+  "formatting": {
+    "receipt_prefix": "held-frozen-pint",
+    "source_sha": "f0a1615be0833804959662fad5d7a7a8e1389ee0",
+    "exit_code": 0,
+    "actual_command_receipt": "evidence/held-frozen-pint.command.json"
+  },
+  "approval": "Author verification only. Independent checkout/T23 review, integration privacy composition, current-source MySQL8.4 and final integrated gates remain separate. No live provider/account/tax/payment proof."
+}

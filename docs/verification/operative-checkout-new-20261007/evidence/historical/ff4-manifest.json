@@ -1,0 +1,521 @@
+{
+  "checkout_executable_sha": "ff4c6749692cc474fb81202b9554993f510350a9",
+  "tree": "3da870a155248d5cb9bfde0e3e71d158572a04ac",
+  "owned_files": [
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ApproveExemptionAuthority.php",
+      "bytes": 3294,
+      "sha256": "2e96884a8bfc6737de5a7a5f57b50cec9b514f5a3133280de9720c411b090ae6",
+      "git_blob": "2bfa1a492d5e713dd5b1775781ba28f8b839ef6a"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CheckoutException.php",
+      "bytes": 507,
+      "sha256": "271e6eaf728665edf521b64daadbdcf00b5c2f432c344138b648bc9f61140241",
+      "git_blob": "468d9264b39643b3d06d3db34156792e769c22b3"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CheckoutSchema.php",
+      "bytes": 9582,
+      "sha256": "f5ae038aac1aab1aa30e56fada96fdb6855c5bc585829745a16e3cac18afa770",
+      "git_blob": "f2039ce055e4760d52377995f7f76b8b2327b6f1"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CheckoutSchemaInstaller.php",
+      "bytes": 12025,
+      "sha256": "773775e2fdfea5c874d76862dfa0e8a60f87c6753e489bc02d760b066eec58bf",
+      "git_blob": "4560f359dfbc1a555bacb336c6286f9169228edb"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CommandTransaction.php",
+      "bytes": 1422,
+      "sha256": "8f4e3482031e1747a0b6e7fc94007c62e732fec05a076a741a928229913296f1",
+      "git_blob": "04ce3138ee584b98b8d5442ca9529436d8d7dbf6"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CurrentPolicy.php",
+      "bytes": 3149,
+      "sha256": "b151c733ad31dc67e57e2c3a33b98791130f07160b976de114b5a0ba5467c532",
+      "git_blob": "ca9171f7390934a363b31a3ae88e60b1559a2b35"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CurrentSelection.php",
+      "bytes": 4049,
+      "sha256": "b0c47f1fd18059acfbe57ed2d27527a90e1a958baeef47899b14f39da303a584",
+      "git_blob": "6d1839986dcf80c8ff0e172cc5f6cb1eb9fff50f"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/Evidence.php",
+      "bytes": 2971,
+      "sha256": "e557b6a0b904cbcfa2e0c7325302e60e9ec5189814c1af79a2be2e0c590a5847",
+      "git_blob": "488f53b54dbb040e95991729a3ff6fa8f6e8e0c6"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ExecutionContextV1.php",
+      "bytes": 4063,
+      "sha256": "ac908ae218e7988ef5cef50eaeed808a4838c57422e99a1694fff6ecd4c4436c",
+      "git_blob": "123b394ff75eb36169fa1b311c2518c1ac432e04"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ExemptionPolicyV1.php",
+      "bytes": 3244,
+      "sha256": "971377ae3cc85145da1f47490569aaecdf1b85c9961089114a4a20dd7eaa04b7",
+      "git_blob": "62f25df20187ef0674c7140dfc96957cacc5d940"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/HostedCheckout.php",
+      "bytes": 17392,
+      "sha256": "b95de60fd827eefdb557b9762e3a2d2f628139b3fd7a52b89401c524c4e0f8ee",
+      "git_blob": "5f21f7076d5b1c0fcd368747bc858e2825d42f9e"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/HostedEvidence.php",
+      "bytes": 18337,
+      "sha256": "13eb973ddd2ea872c788f18d7258aff30b1b73c21923d1ad2a2d05e4272e2024",
+      "git_blob": "40969356c7eaa3cbe9954b254d18f6afb2cc0750"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/OrderEvidence.php",
+      "bytes": 10521,
+      "sha256": "4b7864a88b3f0bd4fcdc21169f8d36fc5243b484f3eb88cb2b8bb270ede2a8b0",
+      "git_blob": "d28f60aa060c2f0181038c78068eb701eef7485b"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/OwnAccountStripeGateway.php",
+      "bytes": 8084,
+      "sha256": "7b08341640033b05df0d4318653e68c348ad1a62ee59c97dbc01a36af722785b",
+      "git_blob": "e5170e8e7315948321915623ec65de9be64fedf1"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/PrimaryBoundary.php",
+      "bytes": 3182,
+      "sha256": "47eeda8eebcf03f9e4e794368276220f1165108e138f1237792ddd9f200ac29a",
+      "git_blob": "1b8982d2eede83179f6d277e60965d0ad0c290b5"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionCheckout.php",
+      "bytes": 15439,
+      "sha256": "eff295bb191cbc748fd0bb9cfd6c94bc7060ad70e148a712d08d7c3bae6ccca9",
+      "git_blob": "0604afc71de336d371e0a00da6d0ce5a4e2e1275"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderLocatorV1.php",
+      "bytes": 2200,
+      "sha256": "c881ad5238322ebe3c14f161c225ae518ad6c4255ab978cb60f551c8747fff11",
+      "git_blob": "2484ba1e12a90f6866d98b97f31fd7968c21b466"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderSourceV1.php",
+      "bytes": 5798,
+      "sha256": "af9e70fbb424dec52a518664bd7b442c5fbe5b5a3c84e31575d20cfcbd025ecb",
+      "git_blob": "a3d47474b5b58be765aa37660e7d7c912a0b8b68"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProviderGateway.php",
+      "bytes": 745,
+      "sha256": "8b6fa1fa41b62bbc454b8a06edd02d37bfb73dba29fc33a245a69572640ccc46",
+      "git_blob": "4c979bcaa8d1e9dc67e3aa55b3a0733ec61ad9f6"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/Records.php",
+      "bytes": 2549,
+      "sha256": "81e7e0ec3a7b4eb6a36a28c3b6626b3728f1e04e6ee35f146b526df3e29bbb16",
+      "git_blob": "9983500afdaa2cabf234b0fdc955a8fe4380b7f0"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/StaffProof.php",
+      "bytes": 1265,
+      "sha256": "5c033d937337cd8ca482e2a4f51499672f8b0cfc8b4c46d5f672e6bd36ab7d7d",
+      "git_blob": "79e3b7907de93d84344327271999efc108f29deb"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/TaxExemptions.php",
+      "bytes": 9356,
+      "sha256": "1560cfbb7f2c20afc3c873f79e240995a9181bbe2329f5f9088b78ba737ea95d",
+      "git_blob": "a03489cc8cd2fe0df9261d3508972b748917f578"
+    },
+    {
+      "path": "app/Http/Controllers/ProductionCheckoutController.php",
+      "bytes": 6539,
+      "sha256": "f381efa18dee75f79ac92afa84ded819cc7db118393716e76dbc6dc621279eb1",
+      "git_blob": "5a3250f497fac99a0295a8a92bad96565413e587"
+    },
+    {
+      "path": "app/Http/Middleware/ProductionCheckoutPrivacy.php",
+      "bytes": 2899,
+      "sha256": "2ce2682247473ff39455f192095796d5c351c548ad541a7c296dc1c7eddf5dea",
+      "git_blob": "682367a7111dc8eba601c0949e4633c8a4e60fd8"
+    },
+    {
+      "path": "app/Http/Responses/ProductionCheckoutResponse.php",
+      "bytes": 1161,
+      "sha256": "1e27372c1dba3fdfb7ecfc5b40739a094b06a25a3d7728666adac235ba7947f4",
+      "git_blob": "4316c6210ffebccdef795da6f98062211b3f9974"
+    },
+    {
+      "path": "app/Providers/ProductionCheckoutServiceProvider.php",
+      "bytes": 500,
+      "sha256": "e228541e68867a3a7d3edc5e390e7474d2f0a9ad923a6f7e27b95870835bfd83",
+      "git_blob": "cf4960167a4ee2d60e30f7165f4529e6664b6b49"
+    },
+    {
+      "path": "config/production_checkout.php",
+      "bytes": 978,
+      "sha256": "2039927afa1113af4470c9961456ecbe66c8872005e775d5e48fa19e1d03a34a",
+      "git_blob": "af027d28704b1be53ce132a14f1116e54b43ca75"
+    },
+    {
+      "path": "database/migrations/2026_10_07_246000_production_checkout.php",
+      "bytes": 409,
+      "sha256": "e834a67c3ffeeb26a9dc11a5701eb5e4d30f332421395b3e682e773996dec615",
+      "git_blob": "7fe1867e146fef83e23765c16c42896f737cbe71"
+    },
+    {
+      "path": "docs/verification/operative-checkout-new-20261007/README.md",
+      "bytes": 9199,
+      "sha256": "5ea4dc2787d8f1f19decb5b6505cda77b90a19086b09ed62c30d29e25b2967a8",
+      "git_blob": "76a4250020ea51d9ea2f33f9e0831e793ee5c187"
+    },
+    {
+      "path": "docs/verification/operative-checkout-new-20261007/provider-source/checkout-create-properties.json",
+      "bytes": 10123,
+      "sha256": "374de301a562efd659491d828b1b9a18b51fd14dc576f4fa556047963f6d636d",
+      "git_blob": "9b90f7742a3f7aed392af78bacc0a884df915e31"
+    },
+    {
+      "path": "docs/verification/operative-checkout-new-20261007/provider-source/receipt.json",
+      "bytes": 1415,
+      "sha256": "ce41f4135cb1a922ec16ef1f262fb79635d5b15c7e333f6feb15a670255d7464",
+      "git_blob": "953c6afa514b57efbf622a6a9ce44274e8dbabbc"
+    },
+    {
+      "path": "docs/verification/operative-checkout-new-20261007/provider-source/stripe-openapi-bcfd59f4.json.gz",
+      "bytes": 702524,
+      "sha256": "00ee065b56734b028cdadabfa7b67264caecb306eeb2d698e56942d21169721b",
+      "git_blob": "8267bfaf97d9b18f0ee9f2849c99b60b4526bbd4"
+    },
+    {
+      "path": "routes/production-checkout.php",
+      "bytes": 1545,
+      "sha256": "415b6c42a8381f5d62519d1f0b108538e6ed86ccf19d85e267dc3e2f1c2ac496",
+      "git_blob": "795c09300920aa1fd99451916ccafbcb98a736e1"
+    },
+    {
+      "path": "tests/Feature/ProductionCheckoutExemptionAuthorityTest.php",
+      "bytes": 4517,
+      "sha256": "351b7e7b40567b59299baccf58fd41b69a889ae7bf70eca78ffcfdb1d9c6927f",
+      "git_blob": "c07193b92274e7890414243101d4ff23a9c19dbf"
+    },
+    {
+      "path": "tests/Feature/ProductionCheckoutHttpBoundaryTest.php",
+      "bytes": 5183,
+      "sha256": "6ce27486d70cd28cf5b4c78dae2c1b51db9845faa20947fd0dfbc677528a04cc",
+      "git_blob": "fd1ecf88e639135c82280d1d3c769065799ed632"
+    },
+    {
+      "path": "tests/Feature/ProductionCheckoutJourneyTest.php",
+      "bytes": 14072,
+      "sha256": "2c596361740004a9587b42e413c11c7966c59fbc3839eb536ff341064ac33172",
+      "git_blob": "6ae1132c9213ee6ca224cbbf4162502cdc3b8149"
+    },
+    {
+      "path": "tests/Feature/ProductionCheckoutMigrationTest.php",
+      "bytes": 16506,
+      "sha256": "bde4c00e3bea04a5a9a6733397af3462437fa23100226840e7cebdda68cf0e0e",
+      "git_blob": "1cd962b056d511ccdfb970b2d254e5e232e0ed18"
+    },
+    {
+      "path": "tests/Feature/ProductionCheckoutNativeRaceTest.php",
+      "bytes": 7309,
+      "sha256": "e449bd92ac4555009779265d271c61bc9ea7088c5ec507b52b3c6c01ddb11392",
+      "git_blob": "a495917339519bf70988214a07e12c9aa7ff39db"
+    },
+    {
+      "path": "tests/Feature/ProductionCheckoutPrimaryBoundaryTest.php",
+      "bytes": 4151,
+      "sha256": "19cf210b1a3053f9c5e6557c39acdd8de047bc72c5a9239f7cb9f57d6f3e4149",
+      "git_blob": "c3033839fb5768d30d52c14c174351e598aadc6b"
+    },
+    {
+      "path": "tests/Support/ProductionCheckoutFixtures.php",
+      "bytes": 2364,
+      "sha256": "31eea4cd98f80f4e2d90c987657f0d22264d355a16078107a5b33884f42c7558",
+      "git_blob": "7a2294b06275ebd4479ff3b334dd769cd5037434"
+    },
+    {
+      "path": "tests/Support/ProductionCheckoutGatewayFixture.php",
+      "bytes": 2482,
+      "sha256": "b91274f94105fd49bb8aa5a555c2987e3306624063f2ddc37dd511116d6e4130",
+      "git_blob": "aa9f4904c34cb44389208ea5efa9fd35f4101d77"
+    },
+    {
+      "path": "tests/Support/ProductionCheckoutJourneyFixture.php",
+      "bytes": 2199,
+      "sha256": "b3c3a32f284066d1c78132841facbfa86bcf162cd7f835c743df1a40e0bf24b4",
+      "git_blob": "ff79aa49460f700010724cf93bef619ba0cd63aa"
+    },
+    {
+      "path": "tests/Support/ProductionCheckoutProviderFixtures.php",
+      "bytes": 4774,
+      "sha256": "edb2774496bfad0825d42f29b4c7d5d9c55692e7a1afd4bfb5010318b02a60d6",
+      "git_blob": "5247e5f087e27b7aba81bde020922dd3150bfaf5"
+    },
+    {
+      "path": "tests/Support/production-checkout-race-worker.php",
+      "bytes": 3120,
+      "sha256": "f0974f25d5ee0ffe696edf3c4ebec19f3ab0cb636b459458af44d96f400d4e00",
+      "git_blob": "5c55c9d5f1363a85397aa4c0d6a9a92f136bc147"
+    },
+    {
+      "path": "tests/Unit/ProductionCheckoutProviderTest.php",
+      "bytes": 11721,
+      "sha256": "d29a941d7f8c5ecbb66e3251c06c70144ac9b529ee62b5d57263e5ed968fe36a",
+      "git_blob": "6e7d85b65487952eaee12c63367a607f5651b4e6"
+    },
+    {
+      "path": "tests/Unit/ProductionHostedEvidenceTest.php",
+      "bytes": 5624,
+      "sha256": "ca63ae8463338554de3703c233810a3af2287649a98aaa1fef6dfb82c2706281",
+      "git_blob": "6f7d2a825568fd6ddabe839e70a7e0df32635780"
+    }
+  ],
+  "borrowed_dependency_upstream_shas": [
+    "1d90a1658618d79e36519d57c75b77af8b48d74a",
+    "8e551ca71be9467e305e28ac29f3b23ab76a3739"
+  ],
+  "borrowed_dependency_local_shas": [
+    "e7ad2191aa28d5229c639a404f90badf5dc12e73",
+    "5dac2e2239561a34bde36fabbf66390675b454e4"
+  ],
+  "borrowed_dependency_files": [
+    {
+      "path": "app/Console/Commands/ProcessProductionIdentityNotices.php",
+      "bytes": 2408,
+      "sha256": "1d7cdcd3cd5facc769df0f69e0c87997cb7753f06cbe92837648e164da6dcdb7",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/CurrentRows.php",
+      "bytes": 1779,
+      "sha256": "02421b3afb5911bab22bec749c3c691f45379aab4f48c3522831be051235e428",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionCustomerAccess.php",
+      "bytes": 15315,
+      "sha256": "87791e6b1b21f07cc79ec7ff1dc796c77ecdebcf1aa51fc4087583261d25307c",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionCustomerPrincipal.php",
+      "bytes": 2484,
+      "sha256": "ab0ddc7dcabb41fd8d003582c9a78814a90f5cd4fa80be4bc2c5208192306b0c",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/CompleteIdentity.php",
+      "bytes": 12357,
+      "sha256": "f27f8f3430f02acbac67d9724d921c185db80e7e17bb2be7d0a5e0ad4cabb75a",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityDatabase.php",
+      "bytes": 2372,
+      "sha256": "03a9411dc14cf1883226ae552a3333c74a349a8d5c6a6fea588a9544d5dfc732",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityEvidence.php",
+      "bytes": 2598,
+      "sha256": "23f855f53a01e5df3a4dab630e9fc8e2d513f23bf56de391f2380d41d29ee9a8",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityException.php",
+      "bytes": 410,
+      "sha256": "91259fe2f5e59549b8f385edc2194b51ea70266fbe2a8992fce3615696661563",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php",
+      "bytes": 16921,
+      "sha256": "c294948fc459e9f202fcd1194e3ae5cc2a3e9a0b4500e8359d54613f27e675f1",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityPolicy.php",
+      "bytes": 2855,
+      "sha256": "445a001b81c7125b4c87188a3515406424ce2d89bb97cb3d3edc02f1dc12298f",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityRequests.php",
+      "bytes": 9218,
+      "sha256": "29004a9336e4e181ba28581006255195f4efc7b43b9395244e2c1dc3100a69bb",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityRows.php",
+      "bytes": 6989,
+      "sha256": "deb303101abe98ca505c43e34ab49cc636b56fed42e5b808044380108fdb42bd",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentitySchema.php",
+      "bytes": 15384,
+      "sha256": "6ca4d4ca4260e13b8a26752ebd8466f3c3edd7047c9ddc71004e45f242e619dc",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/DefinitelyNotSubmitted.php",
+      "bytes": 356,
+      "sha256": "042cb2c999c0b275083ad0df6dba31a19a682dafcc666911eafaebd554089ee4",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentityAcceptance.php",
+      "bytes": 494,
+      "sha256": "65d588591c45e30b6511f2c3a175418f90df0df97f60391199a97823a6b1d30a",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentityMail.php",
+      "bytes": 1391,
+      "sha256": "7c2aae31553bf34f9ea33f57fa350976e1ab91e93e9333061504c3f9b488b715",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentityNoticeTransport.php",
+      "bytes": 368,
+      "sha256": "9877286016507f010adcd7b3bae0d95071fb2fdf91a519d5df74b4f3424ba3e1",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/LoopbackSmtp.php",
+      "bytes": 4310,
+      "sha256": "8569b270d19b981334ee506db4046c74bf2d80b143712506adbea6307b38c682",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/WorkIdentityNotice.php",
+      "bytes": 13301,
+      "sha256": "6cd6a88bbaab3b25444af5479f8e60485afef8667711c0223e929887ebca3e72",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/ProductionCustomerSessions.php",
+      "bytes": 3340,
+      "sha256": "73efe65ab06626178fc1aa6ecd6ff426b30a04d58acd68b164acaa31c9a5d1d6",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Http/Controllers/ProductionIdentity/CustomerIdentityController.php",
+      "bytes": 4764,
+      "sha256": "5c260d6ef4edbe9e72065cb4e9379375239ba706c7a4a71eb322d7d6c965eb37",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Http/Middleware/ProductionIdentity/IdentityPrivacy.php",
+      "bytes": 3174,
+      "sha256": "4c4d7a232282d9edd621ffff6b129b53468a8263e84d853b0077e4766bc307f6",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Http/Requests/ProductionIdentity/IdentityBody.php",
+      "bytes": 736,
+      "sha256": "09c14e6ccd9edf02d413cdad03238b5d82dbf704a22fb8bbb0638f81846575e1",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "app/Jobs/DeliverProductionIdentityNotice.php",
+      "bytes": 526,
+      "sha256": "061de336297e398ded168dad925457b69dbf4c05242bde6f9591e7837280e539",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "database/migrations/2026_10_07_247000_production_customer_identity.php",
+      "bytes": 1913,
+      "sha256": "a2cfa089ea5452aec894f24f6779f5deee63fb3a2453fd6c12d4a5d8b1273166",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "resources/js/Pages/ProductionCustomerIdentity.tsx",
+      "bytes": 7114,
+      "sha256": "d52945031704cb51ef28bdbaae26522e25b6eca44c1334e269aa72dbfdc54647",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "resources/js/lib/production-customer-identity.ts",
+      "bytes": 2963,
+      "sha256": "35b19c0238482e9cc21b95a5b456ee12b4caf33e3048b34775d658a1262d38bf",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "routes/production-customer-identity.php",
+      "bytes": 1047,
+      "sha256": "2f9b3f7f03d50a3c8930f52a6d8187e533ead4d1c0acb1c156b2c8c161abca43",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityHttpTest.php",
+      "bytes": 6210,
+      "sha256": "db494d78a1710827df7c8dd407771c14dfa699e6224353d0f89e38973e07006c",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityJourneyTest.php",
+      "bytes": 8527,
+      "sha256": "72bc446efba9065be3d3b4ddc2725516449b54a53752aa59329a82d1df36e4bc",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityMigrationTest.php",
+      "bytes": 5984,
+      "sha256": "7a7997f60d985e5d303b3bf58128d5fd00ff476a4873897337f196c4b67c0098",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityNativeRaceTest.php",
+      "bytes": 9215,
+      "sha256": "602c72b951f3a8464e610338274d1b0698325e2be26843a29cfa84199053372f",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityNoticeTest.php",
+      "bytes": 7958,
+      "sha256": "7167840fc7eb738b5ccd6397d877542d0246c41af67e5d205d341a87299d2fc8",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityRuntimeTest.php",
+      "bytes": 6599,
+      "sha256": "88f77488ebcc175b98365047df38dbbf68f799467e7dcd0d9872725a9d5ac9c7",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "tests/Support/ProductionIdentityFixture.php",
+      "bytes": 5364,
+      "sha256": "558b6269d305b7b213e4b8c102c7e9e117dfb8cce30c4c76a7520482609391b7",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "tests/Support/production-identity-race-worker.php",
+      "bytes": 3206,
+      "sha256": "67a526ef790be061f0661d58a8b19a0069e3a3972d74d591df0c80dfe2cd1a33",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "tests/Support/production_identity_smtp_sink.py",
+      "bytes": 1441,
+      "sha256": "d0291a72f85013c9ae994dd4a391404645c6e6e535961339a539b44ae9fd44c6",
+      "exact_borrowed_bytes": true
+    },
+    {
+      "path": "tests/frontend/production-customer-identity.test.tsx",
+      "bytes": 4782,
+      "sha256": "b28ce89834966d474ec0838d1c71bdae0b602b45535485fa9a186de920d51bdb",
+      "exact_borrowed_bytes": true
+    }
+  ],
+  "approval": "unapproved development candidate; ff4 is superseded by reproduced unknown delegated staff role canary and upstream eaaa dependency"
+}

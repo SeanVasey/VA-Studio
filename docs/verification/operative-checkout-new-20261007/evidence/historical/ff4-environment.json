@@ -1,0 +1,18 @@
+{
+    "captured_at": "2026-10-07T08:47:47Z",
+    "php": "8.4.26",
+    "mysql": {
+        "version": "8.0.46-0ubuntu0.24.04.4",
+        "version_comment": "(Ubuntu)",
+        "lower_case_table_names": 0,
+        "transaction_isolation": "REPEATABLE-READ"
+    },
+    "locked_packages": {
+        "laravel/framework": "v13.34.0",
+        "stripe/stripe-php": "v21.3.2",
+        "phpunit/phpunit": "12.5.34",
+        "laravel/pint": "v1.32.1"
+    },
+    "ephemeral_database": "dedicated production checkout synthetic schema",
+    "network_io": "loopback MySQL and actual local synthetic SMTP only; provider adapter uses strictly testing-bound SDK HTTP fixtures"
+}
