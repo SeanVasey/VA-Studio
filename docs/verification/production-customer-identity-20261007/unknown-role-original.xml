@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\AuthorIdentityCanaries\IdentityUnknownRoleCanaryTest" file="/workspace/VA-Studio-production-identity/docs/verification/production-customer-identity-20261007/IdentityUnknownRoleCanaryTest.php" tests="1" assertions="4" errors="0" failures="1" skipped="0" time="1.101105">
+    <testcase name="test_unknown_permanent_role_flag_never_counts_as_nonstaff_customer_authority" file="/workspace/VA-Studio-production-identity/docs/verification/production-customer-identity-20261007/IdentityUnknownRoleCanaryTest.php" line="10" class="Tests\AuthorIdentityCanaries\IdentityUnknownRoleCanaryTest" classname="Tests.AuthorIdentityCanaries.IdentityUnknownRoleCanaryTest" assertions="4" time="1.101105">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\AuthorIdentityCanaries\IdentityUnknownRoleCanaryTest::test_unknown_permanent_role_flag_never_counts_as_nonstaff_customer_authority
+Failed asserting that Array &amp;0 [
+    'user' =&gt; App\Models\User Object #5727 (
+        'connection' =&gt; null,
+        'table' =&gt; 'users',
+        'primaryKey' =&gt; 'id',
+        'keyType' =&gt; 'int',
+        'incrementing' =&gt; true,
+        'with' =&gt; Array &amp;1 [],
+        'withCount' =&gt; Array &amp;2 [],
+        'refreshes' =&gt; Array &amp;3 [],
+        'preventsLazyLoading' =&gt; false,
+        'perPage' =&gt; 15,
+        'exists' =&gt; true,
+        'wasRecentlyCreated' =&gt; false,
+        'escapeWhenCastingToString' =&gt; false,
+        'attributes' =&gt; Array &amp;4 [
+            'id' =&gt; 1,
+            'name' =&gt; 'Declared buyer',
+            'email' =&gt; 'buyer@example.test',
+            'email_verified_at' =&gt; '2026-10-07 08:39:21',
+            'password' =&gt; '$2y$04$Z5F9VAD3w/RP9HxkLMCc/ezWHxnepNNuVEnE5BqDUpNPKaAIFOIAm',
+            'remember_token' =&gt; null,
+            'created_at' =&gt; '2026-10-07 08:39:21',
+            'updated_at' =&gt; '2026-10-07 08:39:21',
+            'is_admin' =&gt; 'withdrawn',
+            'app_authentication_secret' =&gt; null,
+            'app_authentication_recovery_codes' =&gt; null,
+        ],
+        'original' =&gt; Array &amp;5 [
+            'id' =&gt; 1,
+            'name' =&gt; 'Declared buyer',
+            'email' =&gt; 'buyer@example.test',
+            'email_verified_at' =&gt; '2026-10-07 08:39:21',
+            'password' =&gt; '$2y$04$Z5F9VAD3w/RP9HxkLMCc/ezWHxnepNNuVEnE5BqDUpNPKaAIFOIAm',
+            'remember_token' =&gt; null,
+            'created_at' =&gt; '2026-10-07 08:39:21',
+            'updated_at' =&gt; '2026-10-07 08:39:21',
+            'is_admin' =&gt; 'withdrawn',
+            'app_authentication_secret' =&gt; null,
+            'app_authentication_recovery_codes' =&gt; null,
+        ],
+        'changes' =&gt; Array &amp;6 [],
+        'previous' =&gt; Array &amp;7 [],
+        'casts' =&gt; Array &amp;8 [
+            'email_verified_at' =&gt; 'datetime',
+            'password' =&gt; 'hashed',
+            'is_admin' =&gt; 'boolean',
+            'app_authentication_secret' =&gt; 'encrypted',
+            'app_authentication_recovery_codes' =&gt; 'encrypted:array',
+        ],
+        'classCastCache' =&gt; Array &amp;9 [],
+        'attributeCastCache' =&gt; Array &amp;10 [],
+        'dateFormat' =&gt; null,
+        'appends' =&gt; Array &amp;11 [],
+        'dispatchesEvents' =&gt; Array &amp;12 [],
+        'observables' =&gt; Array &amp;13 [],
+        'relations' =&gt; Array &amp;14 [],
+        'touches' =&gt; Array &amp;15 [],
+        'relationAutoloadCallback' =&gt; null,
+        'relationAutoloadContext' =&gt; null,
+        'timestamps' =&gt; true,
+        'usesUniqueIds' =&gt; false,
+        'hidden' =&gt; Array &amp;16 [
+            0 =&gt; 'password',
+            1 =&gt; 'remember_token',
+            2 =&gt; 'app_authentication_secret',
+            3 =&gt; 'app_authentication_recovery_codes',
+        ],
+        'visible' =&gt; Array &amp;17 [],
+        'fillable' =&gt; Array &amp;18 [
+            0 =&gt; 'name',
+            1 =&gt; 'email',
+            2 =&gt; 'password',
+        ],
+        'guarded' =&gt; Array &amp;19 [
+            0 =&gt; '*',
+        ],
+        'authPasswordName' =&gt; 'password',
+        'rememberTokenName' =&gt; 'remember_token',
+    ),
+    'principal' =&gt; App\Domain\Customers\ProductionCustomerPrincipal Object #5720 (
+        'accountId' =&gt; 1,
+        'userId' =&gt; 1,
+        'accessVersion' =&gt; 1,
+        'provenance' =&gt; 'synthetic_rehearsal',
+        'ownerDigest' =&gt; '9f33f4b68b6577de8c1ef256910dd47bb4f9feea87399637d9dfed5ea111c3a0',
+        'credentialBinding' =&gt; '3a3d834e02960d45077c010e5dc456c19820db05fa976a9e2e32bb37017483a0',
+        'binding' =&gt; Array &amp;20 [
+            'schema_version' =&gt; 1,
+            'origin_id' =&gt; 'dbf5c762-067f-417d-a0c0-2fe2e86dcf8d',
+            'provenance' =&gt; 'synthetic_rehearsal',
+            'account_id' =&gt; 1,
+            'account_public_id' =&gt; '74613df0-f03c-4d3e-86e8-a9846d6eb0ce',
+            'user_id' =&gt; 1,
+            'verification_observation_id' =&gt; '6e8b9c4b-1042-4360-8d27-794c7e6bc1c0',
+            'verification_observation_hash' =&gt; '2b6f711aad65b8ac63fc89146b9ac4f023c857a067f2fb86a9f927884a4e223a',
+            'identity_policy_version' =&gt; 'personal-store-customer-identity-v1',
+            'identity_policy_hash' =&gt; 'eff029e47c7fe2364f25ab3ed68694b485531b542b6e3f82d18c29a361ea991c',
+        ],
+    ),
+] is null.
+
+/workspace/VA-Studio-production-identity/docs/verification/production-customer-identity-20261007/IdentityUnknownRoleCanaryTest.php:15</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

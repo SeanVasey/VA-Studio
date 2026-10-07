@@ -1,0 +1,15 @@
+
+> test
+> vitest run tests/frontend/production-customer-identity.test.tsx --reporter=default --reporter=junit --outputFile=docs/verification/production-customer-identity-20261007/frontend.xml
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-production-identity
+
+ ✓ tests/frontend/production-customer-identity.test.tsx (8 tests) 323ms
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  08:47:00
+   Duration  1.23s (environment 53%, tests 30%, setup 8%, transform 7%, import 1%)
+
+JUNIT report written to /workspace/VA-Studio-production-identity/docs/verification/production-customer-identity-20261007/frontend.xml
