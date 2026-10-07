@@ -1,0 +1,295 @@
+{
+  "source": "c4cd6d9355257a39d2740b0a4fe55c3e376ef5b3",
+  "base": "b635e12992dc91f5131f35e5c46b8dab6ff30eee",
+  "source_commits": [
+    "3c8098e7750c746b42c8cde3283c36e631607059",
+    "c4cd6d9355257a39d2740b0a4fe55c3e376ef5b3"
+  ],
+  "original_self_review_evidence": "21b793683fad3702ee77c242da16755416d8e4df",
+  "parent_raw_guard_source": "d6933489ae701c5b45192fc3f368a225d41a9185",
+  "parent_fk_source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+  "schema_algorithm_source": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+  "source_bindings": {
+    "app/Domain/Grants/Member/MemberGrantException.php": "9e816278b19b1291a1768b924c8bcb421020e715292e2feec7a3c5a1a3eccee1",
+    "app/Domain/Grants/Member/MemberGrantFactsAuthority.php": "1a93286e5559004b371a95f1f11cec906efa8fde1fe3dd612335700e6f89ef96",
+    "app/Domain/Grants/Member/MemberGrantFactsBinding.php": "84b1a5035a402d29cb2eb1c0f65f693504b71254558e17b3bf2d8e5e0dcf3425",
+    "app/Domain/Grants/Member/MemberGrantFactsProof.php": "354bd53d37e579303c21350b4053dd36cfef89159d7cb4eba4fa19e41cd5b3fa",
+    "app/Domain/Grants/Member/MemberGrantPolicy.php": "42d98afbc87e2d97d9ee19aa17f7ebd1a9948db0ca19f6f6b8f4afbe36112cf8",
+    "app/Domain/Grants/Member/MemberGrantProfileBinding.php": "3a4fc9d5357c6395fa80ae03d302b8e88d042a8266c6a3c6ece494781d051bac",
+    "app/Domain/Grants/Member/MemberGrantSchema.php": "064af8e1b0c775475a28fab7300a0d5473b58da11836fb6eddf47de24b04aed7",
+    "app/Domain/Grants/Member/MemberOriginalArtifactAuthority.php": "259d236aa11cf1833256e8ae3f2b5f7d4fab64edfe4ae6e0e85e93ea62126605",
+    "app/Domain/Grants/Member/MemberOriginalArtifactManifest.php": "796fb3bd257c84a857821209a6714f7fe2b6fddb05ae1930f117d6fc4526ef60",
+    "app/Domain/Grants/Member/MemberOriginalArtifactReceipt.php": "f74f8c2a9b1c3f0860bffbceaf45a272e4bfcd5956df742148c561a9546c0b1b",
+    "app/Domain/Memberships/Production/MemberGrantIntent.php": "7bd43b0410567621d264b8fa92a1b7d1e959d631563cab6c0fa6109b9ec9459c",
+    "app/Domain/Memberships/Production/MembershipReservationAuthority.php": "0d0a50e0a52570087d47ab9482d8b883cbda17063187fb531f124beaecfa9771",
+    "app/Domain/Memberships/Production/MembershipSchema.php": "93898457684c9005853e539d344142b1c8bc1141a0554e1e76466bc378ced799",
+    "config/member-grants.php": "06a26f7ea96868f7d45555b65fb8aa32e7e31412eaa2292d8c5cd5a02f8ffa3f",
+    "database/migrations/2026_10_07_258000_create_production_member_originals.php": "4a20e69a6a71290a9bd5186632b6d663e7268986282398875308f6c85499bd6e",
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php": "397f26f54104e00fcd90d67985e10d998478645d2dd26e95e9f4f15915444932",
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalSchemaPreparationTest.php": "57ade7ec10e76608550672ef2e308303e408c7b3a037e2c2b14186304b440347"
+  },
+  "dependencies": {
+    "app/Domain/Memberships/Production/MembershipRows.php": "a62d9848a193f78358d2ec6538d35f2d3871a5973d36c4d660d1ae8f7e93783c",
+    "app/Domain/Memberships/Production/MembershipPolicy.php": "816f79d6487343a5bd7f3d2bdc25c28f57a4becccf6debfafd0c6b88c503af16",
+    "app/Domain/Memberships/Production/MembershipValues.php": "0a6f2279012adbfbe11cfa3bfb4e55b13bd17715b270bb7aeef5310656d2fe65",
+    "app/Domain/Memberships/Production/MembershipPaidInvoiceAuthority.php": "a68625cee763c934fe74234fd98d9756dbdc10fe905f00b0b3551b0875380628",
+    "app/Domain/Memberships/Production/MembershipPaidInvoiceProof.php": "e471af3bcbff4bf6855a0a0eafa4459222fd8f69d8deacd79af493171ef818cc",
+    "app/Domain/Memberships/Production/MembershipEligibleLicenseAuthority.php": "601c8df8a23eadb2c902c459e18a61f10ead9ddfc4527a59d6a73b848ebbcce6",
+    "app/Domain/Memberships/Production/MembershipEligibleLicenseProof.php": "9475b15707b6a66d9a9e8e6847d2c29504cb8baa0b16bb46cef8dd3582a72f8b",
+    "app/Domain/Memberships/Production/MembershipReservationProof.php": "71068504f41cf95cb11d9e9f5d9be93082a72ae9b6c71c446cee3fbc47b2c540",
+    "app/Domain/Memberships/Production/MemberGrantAuthority.php": "02b32f1aa885dc9b6272d7b6643493131bc447c7a7d6ba7d77b45965abb4177e",
+    "app/Domain/Memberships/Production/MemberGrantReceipt.php": "ee87a595896faba469ef06f563e39c79f68248bbbb7c53c64aa6c684baa37926",
+    "app/Domain/Customers/ProductionCustomerPrincipal.php": "ab0ddc7dcabb41fd8d003582c9a78814a90f5cd4fa80be4bc2c5208192306b0c",
+    "app/Domain/Customers/ProductionCustomerAccess.php": "4f013b5114b8b8ee8cd53d42277368a215861b8c48a07672fd2337e4fc483eb4",
+    "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php": "6058e3e4ced2900e1ccc93bd9110691c041ad0c4ecafe2f0373d323ceb17cb90",
+    "app/Support/CanonicalJson.php": "6e8f14f950bbb7ed3c4a8162ecf7c2fd2752031d1679285cea8bb0a5f5f82d89",
+    "tests/Support/FinalizationDatabaseMigrations.php": "38d248d182fffb7aa6c0583ebb8235c5b60b03fe8865d679b9eb804728a792ff"
+  },
+  "unchanged_synthetic": [
+    {
+      "path": "app/Domain/Memberships/CreditLedger.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "da00984fc8dfb9e610d19c18d63ed91520efe6d846cc879010ae67156ef139ac"
+    },
+    {
+      "path": "app/Domain/Memberships/MembershipAdministration.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "c482b725adb55b280ffe1f97a78be1913ed6443969522afb9db71f5ad526e43c"
+    },
+    {
+      "path": "app/Domain/Memberships/MembershipCustomerHistory.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "e80d3069501883ccbcc6bef8adad91b60a04c93747bb91a5af7068fc633604de"
+    },
+    {
+      "path": "app/Domain/Memberships/MembershipEvidence.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "efa3205598a107798c974ba3e2bce801423d71b62879dc96f1b981a822bb2532"
+    },
+    {
+      "path": "app/Domain/Memberships/MembershipPlans.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "dee36cc481d80e47bc08d9d8ba0b61d9128719fda628c4c3f0be7d5ffff71b5d"
+    },
+    {
+      "path": "app/Domain/Memberships/MembershipPolicy.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "6676a5db75015a0b3bcea89566447f93eed114c560b1fee635b74d7462caa36e"
+    },
+    {
+      "path": "app/Domain/Memberships/Models/MembershipCreditBucket.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "27e3c5994baa3e7b7283ccb3f4549f8a9b1626383b2aaf4f038ea6d49b42e2b6"
+    },
+    {
+      "path": "app/Domain/Memberships/Models/MembershipCreditEvent.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "51d0b2003f7650b2ba230210c28491039453be2e2b371eebaf4e20ae601244bc"
+    },
+    {
+      "path": "app/Domain/Memberships/Models/MembershipPlan.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "50244578407b5a9c51390621c07878aad065e1aa3992efd2ad86f03b68b85410"
+    },
+    {
+      "path": "app/Domain/Memberships/Models/MembershipPlanVersion.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "15710d8bdca1954f33eafcb5108ad6f42729d61db10bcdb7b2cab459aac547c1"
+    },
+    {
+      "path": "config/memberships.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "ac22a093065fce3e15d8312f398c85d5f6c234f87d6b981c8d6445a72cfdd5cb"
+    },
+    {
+      "path": "database/migrations/2026_10_06_230000_membership_credit_foundation.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "6402db1b8412d8b01738edd270ec8ad899f1aed3a13369f167b408551df43a70"
+    },
+    {
+      "path": "tests/Feature/MembershipAdministrationActionTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "bfda00f60d31df41f3f1a7bd37d2459a1cbdd97d94e92b72f54c21dad2707613"
+    },
+    {
+      "path": "tests/Feature/MembershipAdministrationTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "f7491430e6894768f163702f52baf8adbff49b1459f2a91935f5c32017fe6bf7"
+    },
+    {
+      "path": "tests/Feature/MembershipCreditConcurrencyTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "2c0b4d1432159513c3c1ca6de9656bc3c35a7b8964d5c34ec26a6bf442e7b924"
+    },
+    {
+      "path": "tests/Feature/MembershipCreditEngineTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "6d6ebc8bcc76fc8fd9d2d85fa33de24df61835b6960e5919c360b4673ea119ed"
+    },
+    {
+      "path": "tests/Feature/MembershipCreditLedgerTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "81d0d118da86f9fd2fe7c3bcbb6d5e1a60864ca9c14b970b42bb28cb280f1760"
+    },
+    {
+      "path": "tests/Feature/MembershipCreditMigrationTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "2634eb594674af98be59a6e9e3d901ab9dbdb8f3e0e6fb80eb496f6bb2fd2511"
+    },
+    {
+      "path": "tests/Feature/MembershipCustomerHistoryHttpTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "a0d95ed53c18293d917c1a30abd92fbf151fba0b82b8df6d3792d4be9a5d45a7"
+    },
+    {
+      "path": "tests/Feature/MembershipCustomerHistoryTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "4e197932a1a23781dcd1c8611d1b6dc099d3c5e2974c53fc14a8ff1555bb36ed"
+    },
+    {
+      "path": "tests/Feature/MembershipCustomerLibraryCapabilityTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "655c9f161f9e2e4d46deb14a0a85459a574cac8142af98218a60e58e75c8564f"
+    },
+    {
+      "path": "tests/Feature/MembershipGrantClockBoundaryTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "70aa442635c7247bca326585babdfe1871935280b6acda3c3bcb0186b9fb8d53"
+    },
+    {
+      "path": "tests/Feature/MembershipPlanTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "a7ca86d70a43998f5d974c34bbd1e5239b2cc17d0dfa8311ba8333b18e1322ce"
+    },
+    {
+      "path": "tests/Feature/MembershipPrimaryProofTest.php",
+      "source": "760da5ac70a1082f13d87351a4446459e19947bb",
+      "sha256": "885f435888e6995d6e25757319e2988a75f25904eff01b38e132657e1ea7e074"
+    }
+  ],
+  "unchanged_old_free_contract_bindings": {
+    "app/Domain/Contracts/ContractEvidence.php": "0d845114acf681829b457cc61fbcb2ed068e94848de77a4197ee0f3b15689f18",
+    "app/Domain/Contracts/ContractFiles.php": "3ab16f6dd6e71221de3925101329ec53807fe927fa3688188999a531e5763f1c",
+    "app/Domain/Contracts/ContractIo.php": "245cce48509e9df21a8cbc3d4cac625c1a446044d27d03bee5203a1b735138c8",
+    "app/Domain/Contracts/ContractIssuanceException.php": "9df97742776ba51f031b088ade0fde06e2a73ad1d90284141b91ee6e3eb8a8be",
+    "app/Domain/Contracts/ContractIssuancePolicy.php": "9f0de213790e3ae91141aa8b866750f24c7dc3198671db2ec56b7f5f1795e01d",
+    "app/Domain/Contracts/ContractRenderProfile.php": "8b51ac91c35e9809a6040d32519a166d4652a759e265b97c32d205c865e95d40",
+    "app/Domain/Contracts/ContractRenderProfileRegistry.php": "d6718f8f0d962679da3b6429c0edcfba76db223df216c03c99d0710f03e272e7",
+    "app/Domain/Contracts/ContractRenderWorkspace.php": "61cd991e9389fcca6b04fc4d0e5ec2c2c0f75266979dfa64af5e305f754e61ad",
+    "app/Domain/Contracts/ContractRenderer.php": "4ef17678b4c8fd48b255e3a72eb26a32fe7f0d8da7d6ffe29ef5f4de8d141c4a",
+    "app/Domain/Contracts/ContractText.php": "46d145c921ff5a94b3d2928c9b7d9caf0697d33f8ba5c5c30ca65598e1d68a08",
+    "app/Domain/Contracts/ContractWork.php": "a9e90c86ac7304f9f6c3d57062827f02e8293b3b043e816c8d27798559fc10e2",
+    "app/Domain/Contracts/DispatchTestContract.php": "939fe90f3b275fdaf7b53746e8a858b04604e1ad35adb8c04ecfb3affb4ed003",
+    "app/Domain/Contracts/IsolatedContractRenderer.php": "f2937ce2c7c5b37ae3c9b7ca1b6f2f282c5e7c701fe32d455b5c0efb4901a31d",
+    "app/Domain/Contracts/Models/ContractRenderRequest.php": "48a48883a001691640388fb5cf3b7e79346bd4139a58655241003cae2b36d6ff",
+    "app/Domain/Contracts/Models/ContractRenderWork.php": "ed21f0026da349d39b56d9b9e432f96032378625af44add4ae3405fdc8696423",
+    "app/Domain/Contracts/Models/GrantContract.php": "a5760c5fd5747bab16b5c8558e23e07a52c950ac08b941d9caa0c29cf4d599c4",
+    "app/Domain/Contracts/ReadContractStatus.php": "572a68ce2ef94fc23ca90060725022108a6d26003ada68686eafea442b3b6e5d",
+    "app/Domain/Contracts/ReadGrantContract.php": "1359c56af527e0801b7de9fbbc8a603ae30abd8eff95bc95224ae6804d0664a9",
+    "app/Domain/Contracts/RenderTestContract.php": "b2e82426a0cb95669b7a39e535dd6a2a40d1b41569e42beb7568b2920d58daca",
+    "app/Domain/Contracts/RenderedContract.php": "b3fa57b8c8cc8e354597a5fc5f12b7942aa734e9d1bab9f0d2014358dd1d249f",
+    "app/Domain/Contracts/RequestTestContract.php": "5cd693b4e1150495baffdbed62190026305928ab388c1790787e30c986c92d79",
+    "app/Domain/Contracts/TcpdfContractRenderer.php": "620b66766143ab72532e8fa3a161d3eb1012368bbf195cea70b9b8907cdd763a",
+    "app/Domain/Contracts/TcpdfV2ContractRenderer.php": "36f8454d055bae4b20f9eb67a861d4a4709fc1708acb4a47d353c4ba061e70d2",
+    "app/Domain/Contracts/VersionedContractRenderer.php": "837d59e1fd09440cb93f5f2e2eff0f9b9d3d5326666d4f289477d3f6cc98c732",
+    "app/Domain/Grants/Free/FreeGrantDefinitions.php": "a5956530da0f570ad1b95f8af896f913cc179ca7138c188fc7cee36a3f189dad",
+    "app/Domain/Grants/Free/FreeGrantDocuments.php": "c1eed3aadf28d01aada98fd3f1ce19112be5be854701de5fffc2216109ff9f18",
+    "app/Domain/Grants/Free/FreeGrantDownloads.php": "50a2cb445b8a98f3defac0f0f721f7bc5ffaf28717c0220e6d83d7b6b260fc8d",
+    "app/Domain/Grants/Free/FreeGrantException.php": "abdc9bb87d2b16ff60ca61f9ebffe0d0c217a9167476b8738beba06b1218f3d7",
+    "app/Domain/Grants/Free/FreeGrantForm.php": "3b7c6626080f52f8fc7f064c4987802202715e8b5198db9b2414713539a31908",
+    "app/Domain/Grants/Free/FreeGrantHttpIdentity.php": "2accbe6deb2c7421310b4d06c94b9ce79b7bc30440a83388a1449d37bb48b0ce",
+    "app/Domain/Grants/Free/FreeGrantIdentity.php": "f8745d02f66276a82e57f44bb24619c7df31624f09ea127be6a4c9492f9b6c5d",
+    "app/Domain/Grants/Free/FreeGrantInput.php": "d1afc60c3e71f1c2e380de3257e348f50fd43e2bd24a12e43adf4d663c05b3f2",
+    "app/Domain/Grants/Free/FreeGrantJson.php": "6ba0c11575fd94947a79b804fa96c71aae7ee1ed447cb79a33c6f5c6251fccf7",
+    "app/Domain/Grants/Free/FreeGrantPdfRenderer.php": "2ca8a4fd59b2934d3ea0fa06aae8337339fe7adbc6ff42a57b01e07e5e0fef63",
+    "app/Domain/Grants/Free/FreeGrantPolicy.php": "99a16e3bb380cc682cf356f69d217b1ca0e52166b2a4855dc10f925145f25ff5",
+    "app/Domain/Grants/Free/FreeGrantReads.php": "13e696e4bbc0101f73df9e508269079f04f02be2d930e9020f07b5cb7bd24c83",
+    "app/Domain/Grants/Free/FreeGrantRecords.php": "91603e1c5a085ce9c6952950c345e57369eba3619bacececa5104527d568a595",
+    "app/Domain/Grants/Free/FreeGrantRenderInput.php": "efd1b3dae37efdeaf91d61fc96216532fa92ea43ea08fbbac1e524e3635a9060",
+    "app/Domain/Grants/Free/FreeGrantRenderProfile.php": "55746e542701d97ef17e0100ec3caf237940cd6197778a233b123e0c14a944da",
+    "app/Domain/Grants/Free/FreeGrantRendererProcess.php": "af3031bf9c37f6c528d7dcb48b1a347708520aab038b8a27e21a33d10ef31732",
+    "app/Domain/Grants/Free/FreeGrantRows.php": "8088f1562f7eb2af8419ceb2ed5604f4e59af9af52a294067d7b421d11382f28",
+    "app/Domain/Grants/Free/FreeGrantSchema.php": "c6c306fdb49344ed3e2914887c3013ad625dc6cf38cb79f2e51137cd5bc1d720",
+    "app/Domain/Grants/Free/FreeGrantSources.php": "c4c08022d4250d62a847df942fea53e94e6335bd2b0e704ddad9354df9a41ef1",
+    "app/Domain/Grants/Free/FreeGrantStaff.php": "0145b8e55036f4bc03d4cceaa84ccd5d0bd6b4984be70f0ac197b20fcfc5e172",
+    "app/Domain/Grants/Free/FreeGrantText.php": "ef6f23c3d65039fd138a6a459bfe448624e391997af69d3637eb88d132ebe883",
+    "app/Domain/Grants/Free/FreeGrantTransfer.php": "e1fa94d1c9582c6f913c9350cde0ff00794a20dc9e9d2621f7c8aba30aa1a5b9",
+    "app/Domain/Grants/Free/FreeGrants.php": "6bd15361692f90fd2c25fb62caac50010bbe380a4f8ae047e82ab8fd00ea65ff",
+    "app/Domain/Grants/Free/Models/FreeDefinition.php": "37a0f781fd9e398f8805113c6e421515394028461bb10bb8725a1f4a53c9325f",
+    "app/Domain/Grants/Free/TestFreeGrantIdentity.php": "ce692a10970b7866a0eeba3a547d12aa4734c1544dad9ed655e95443c6927a30",
+    "resources/contracts/free-v1/profile-assets.json": "570f6a023927228e0ac6def670df603b5b595ffd916acf69bf569fecaeab74c8",
+    "resources/contracts/test-v1/PROVENANCE.md": "725d85a9831d40d5962c4294adc4b84daffd79d2807237ebe4461245d80789fa",
+    "resources/contracts/test-v1/fonts/generated/dejavusans.ctg.z": "e32a1fea0a049ccf1c687eba84f804339c4599eba4eedb1ff4ee4427aee34b93",
+    "resources/contracts/test-v1/fonts/generated/dejavusans.json": "4912381c5c0baccdca18246cb5ffb8d234fae48de71d002a523d082859bbfde4",
+    "resources/contracts/test-v1/fonts/generated/dejavusans.z": "bf01c0d0a4d745951b355b0d253b4076d5e0da2aef8114d42c0f2ab83ec257fe",
+    "resources/contracts/test-v1/fonts/generated/dejavusansb.ctg.z": "e59d2256ed0a75d999d124c994c42bb025efa782c3e77e251f7497f4f539e089",
+    "resources/contracts/test-v1/fonts/generated/dejavusansb.json": "5128b3fcdd515b6fc80cceca16f0b0118be333aa1558cf193c487c4ad3144a10",
+    "resources/contracts/test-v1/fonts/generated/dejavusansb.z": "34fa710f984b43306f89abd2458a213a63ecfecd59976154a03183b65a8f1554",
+    "resources/contracts/test-v1/fonts/source/DejaVuSans-Bold.ttf": "e6476c1b80502924294eed40894c5b18e06c181444ca953e5334262df9c27724",
+    "resources/contracts/test-v1/fonts/source/DejaVuSans.ttf": "7da195a74c55bef988d0d48f9508bd5d849425c1770dba5d7bfc6ce9ed848954",
+    "resources/contracts/test-v1/fonts/source/LICENSE": "7a083b136e64d064794c3419751e5c7dd10d2f64c108fe5ba161eae5e5958a93",
+    "resources/contracts/test-v1/profile-assets.json": "44533c186a3b1350163025256a9ced519a6395ba8001541193d1d51b51688e50",
+    "resources/contracts/test-v2/PROVENANCE.md": "3718567408cf5bb4344ae9bb9b5bd78154c2b51abf3152f0bd944617470e9048",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.ctg.z": "e32a1fea0a049ccf1c687eba84f804339c4599eba4eedb1ff4ee4427aee34b93",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.json": "4912381c5c0baccdca18246cb5ffb8d234fae48de71d002a523d082859bbfde4",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.z": "bf01c0d0a4d745951b355b0d253b4076d5e0da2aef8114d42c0f2ab83ec257fe",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.ctg.z": "e59d2256ed0a75d999d124c994c42bb025efa782c3e77e251f7497f4f539e089",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.json": "5128b3fcdd515b6fc80cceca16f0b0118be333aa1558cf193c487c4ad3144a10",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.z": "34fa710f984b43306f89abd2458a213a63ecfecd59976154a03183b65a8f1554",
+    "resources/contracts/test-v2/fonts/source/DejaVuSans-Bold.ttf": "e6476c1b80502924294eed40894c5b18e06c181444ca953e5334262df9c27724",
+    "resources/contracts/test-v2/fonts/source/DejaVuSans.ttf": "7da195a74c55bef988d0d48f9508bd5d849425c1770dba5d7bfc6ce9ed848954",
+    "resources/contracts/test-v2/fonts/source/LICENSE": "7a083b136e64d064794c3419751e5c7dd10d2f64c108fe5ba161eae5e5958a93",
+    "resources/contracts/test-v2/profile-assets.json": "29e0b1b33abc78ab48c6669579dbb3296eb9e282f2a16b0fb337db8417b68dac"
+  },
+  "results": {
+    "final-sqlite.xml": {
+      "name": "CLI Arguments",
+      "tests": "22",
+      "assertions": "52",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "1",
+      "time": "5.570653"
+    },
+    "final-native.xml": {
+      "name": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalSchemaPreparationTest",
+      "file": "/workspace/VA-Studio-production-member-originals/tests/Feature/ProductionMemberOriginals/MemberOriginalSchemaPreparationTest.php",
+      "tests": "5",
+      "assertions": "17",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "173.718203"
+    }
+  },
+  "technical_bounds_not_policy": {
+    "artifacts": 16,
+    "bytes_per_artifact": 536870912
+  },
+  "scope": "unregistered default-off preparation, not authenticated invoices, benefits, private originals or usable grants",
+  "known_prerequisites": [
+    "actual approved member-specific terms/profile/benefit/retention facts",
+    "sealed current original typedT23 and provider subscription/invoice producer",
+    "current T25 eligible-license adapter",
+    "operative257 award/reservation writer and last-credit contention",
+    "258 actual renderer/storage/activation/read consumers and private HTTP registration",
+    "new finite native PDO reader header successor before operative consumers"
+  ],
+  "artifacts": {
+    "docs/verification/production-member-originals-preparation-20261007/MemberOriginalSchemaPreparationTest.php": "57ade7ec10e76608550672ef2e308303e408c7b3a037e2c2b14186304b440347",
+    "docs/verification/production-member-originals-preparation-20261007/autoload.txt": "caec00a9ed87a86079b23d38ffeeb25d4df0d2dac803ebc9b777418774eb191f",
+    "docs/verification/production-member-originals-preparation-20261007/final-native.txt": "352f313e943bb56b98285c13ab8bd2ea5f39a7210b7b57631b0fc8adaa93d7cf",
+    "docs/verification/production-member-originals-preparation-20261007/final-native.xml": "18b009825141b8ae33c8703979bb91ae1d4f3f1fb08149ffec138c65157843d0",
+    "docs/verification/production-member-originals-preparation-20261007/final-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "docs/verification/production-member-originals-preparation-20261007/final-sqlite.txt": "01f1c71a8ed9a74c0862ebd9e368515dbe6d65ec7a571b4bc44f56cebb751a2f",
+    "docs/verification/production-member-originals-preparation-20261007/final-sqlite.xml": "3e05adf07f4e11b80cf30a86eff2b9f821df22198775615e0e556098a81129c6",
+    "docs/verification/production-member-originals-preparation-20261007/first-sqlite.txt": "74ed32c74ef6a6bf1d088c4af11d10a2f74bad2f48b996981f6177c4ab763fbb",
+    "docs/verification/production-member-originals-preparation-20261007/first-sqlite.xml": "53f9cbce4c0e03511f690083426575a2726246fecb6a593e52551a7c824f670d",
+    "docs/verification/production-member-originals-preparation-20261007/owner-original-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "docs/verification/production-member-originals-preparation-20261007/owner-original-receipt.json": "b3430c5cbfc037f8d457d756f26dd63298b35fb58fd92957fd05e696b8327f30",
+    "docs/verification/production-member-originals-preparation-20261007/owner-original-red.txt": "7977dd137457ee725d101cae2f8a0fffc0fe4a68b8ed63cb9a0c25f0cd37b4e5",
+    "docs/verification/production-member-originals-preparation-20261007/owner-original-red.xml": "1859655a5b426213b2b8a28f39b222986eb26f51a4b4f8aa9a8e02ad2cd55f43",
+    "docs/verification/production-member-originals-preparation-20261007/reflection.json": "fd8fe4684a707e78a49a847bed2d7836c11967d876ae672ff9a3e0f7cc3de1c1"
+  },
+  "reflection_sha256": "fd8fe4684a707e78a49a847bed2d7836c11967d876ae672ff9a3e0f7cc3de1c1"
+}

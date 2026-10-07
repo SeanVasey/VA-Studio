@@ -1,0 +1,12 @@
+{
+    "App\\Domain\\Grants\\Member\\MemberGrantException": "/workspace/VA-Studio-production-member-originals/app/Domain/Grants/Member/MemberGrantException.php",
+    "App\\Domain\\Grants\\Member\\MemberGrantFactsAuthority": "/workspace/VA-Studio-production-member-originals/app/Domain/Grants/Member/MemberGrantFactsAuthority.php",
+    "App\\Domain\\Grants\\Member\\MemberGrantFactsBinding": "/workspace/VA-Studio-production-member-originals/app/Domain/Grants/Member/MemberGrantFactsBinding.php",
+    "App\\Domain\\Grants\\Member\\MemberGrantFactsProof": "/workspace/VA-Studio-production-member-originals/app/Domain/Grants/Member/MemberGrantFactsProof.php",
+    "App\\Domain\\Grants\\Member\\MemberGrantPolicy": "/workspace/VA-Studio-production-member-originals/app/Domain/Grants/Member/MemberGrantPolicy.php",
+    "App\\Domain\\Grants\\Member\\MemberGrantProfileBinding": "/workspace/VA-Studio-production-member-originals/app/Domain/Grants/Member/MemberGrantProfileBinding.php",
+    "App\\Domain\\Grants\\Member\\MemberGrantSchema": "/workspace/VA-Studio-production-member-originals/app/Domain/Grants/Member/MemberGrantSchema.php",
+    "App\\Domain\\Grants\\Member\\MemberOriginalArtifactAuthority": "/workspace/VA-Studio-production-member-originals/app/Domain/Grants/Member/MemberOriginalArtifactAuthority.php",
+    "App\\Domain\\Grants\\Member\\MemberOriginalArtifactManifest": "/workspace/VA-Studio-production-member-originals/app/Domain/Grants/Member/MemberOriginalArtifactManifest.php",
+    "App\\Domain\\Grants\\Member\\MemberOriginalArtifactReceipt": "/workspace/VA-Studio-production-member-originals/app/Domain/Grants/Member/MemberOriginalArtifactReceipt.php"
+}
