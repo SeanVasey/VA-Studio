@@ -1,0 +1,250 @@
+diff --git a/tests/Feature/ServiceProjectCommittedSchemaIndependentTest.php b/tests/Feature/ServiceProjectCommittedSchemaIndependentTest.php
+index a8ba993..5b395a9 100644
+--- a/tests/Feature/ServiceProjectCommittedSchemaIndependentTest.php
++++ b/tests/Feature/ServiceProjectCommittedSchemaIndependentTest.php
+@@ -20,8 +20,8 @@ class ServiceProjectCommittedSchemaIndependentTest extends TestCase
+ 
+     public function runDatabaseMigrations()
+     {
+-        if (DB::getDriverName() !== 'mysql' || getenv('ATTACHMENT_NATIVE_ISOLATED') !== '1' || DB::getDatabaseName() !== 'vaseyaudio_support_closure') {
+-            $this->markTestSkipped('Actual dedicated synthetic native reviewer database required.');
++        if (DB::getDriverName() !== 'mysql') {
++            $this->markTestSkipped('Native MySQL permanent table/view dictionary required.');
+         }
+         $this->runDisposableMigrations();
+     }
+diff --git a/tests/Feature/SupportAttachmentCommittedClosureTest.php b/tests/Feature/SupportAttachmentCommittedClosureTest.php
+index 0310204..9224789 100644
+--- a/tests/Feature/SupportAttachmentCommittedClosureTest.php
++++ b/tests/Feature/SupportAttachmentCommittedClosureTest.php
+@@ -18,12 +18,15 @@ use Illuminate\Encryption\Encrypter;
+ use Illuminate\Support\Facades\Crypt;
+ use Illuminate\Support\Facades\DB;
+ use Illuminate\Support\Str;
++use Tests\Support\FinalizationDatabaseMigrations;
+ use Tests\Support\InquiryConversationFixtures;
+ use Tests\Support\TestOnlyMediaScanner;
+ use Tests\TestCase;
+ 
+ class SupportAttachmentCommittedClosureTest extends TestCase
+ {
++    use FinalizationDatabaseMigrations;
++
+     private array $fixture;
+ 
+     private SupportAttachments $attachments;
+@@ -34,14 +37,6 @@ class SupportAttachmentCommittedClosureTest extends TestCase
+     {
+         parent::setUp();
+         config(['app.key' => 'base64:'.base64_encode(str_repeat('S', 32))]);
+-        if (DB::getDriverName() === 'mysql') {
+-            if (getenv('ATTACHMENT_NATIVE_ISOLATED') !== '1') {
+-                $this->markTestSkipped('Explicit dedicated synthetic attachment native database required.');
+-            }
+-            $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0);
+-        } else {
+-            $this->artisan('migrate', ['--force' => true])->assertExitCode(0);
+-        }
+         $this->fakePrivateMediaStorage();
+         $this->fixture = InquiryConversationFixtures::create();
+         config(['support-attachments.fixture_enabled' => true]);
+diff --git a/tests/Feature/SupportAttachmentHttpTest.php b/tests/Feature/SupportAttachmentHttpTest.php
+index 95928e2..288e8e0 100644
+--- a/tests/Feature/SupportAttachmentHttpTest.php
++++ b/tests/Feature/SupportAttachmentHttpTest.php
+@@ -11,26 +11,21 @@ use Illuminate\Contracts\Http\Kernel;
+ use Illuminate\Support\Facades\DB;
+ use Illuminate\Support\Facades\Route;
+ use Illuminate\Support\Str;
++use Tests\Support\FinalizationDatabaseMigrations;
+ use Tests\Support\InquiryConversationFixtures as Fixture;
+ use Tests\Support\TestOnlyMediaScanner;
+ use Tests\TestCase;
+ 
+ class SupportAttachmentHttpTest extends TestCase
+ {
++    use FinalizationDatabaseMigrations;
++
+     private string $base;
+ 
+     protected function setUp(): void
+     {
+         parent::setUp();
+         config(['app.key' => 'base64:'.base64_encode(str_repeat('S', 32))]);
+-        if (DB::getDriverName() === 'mysql') {
+-            if (getenv('ATTACHMENT_NATIVE_ISOLATED') !== '1') {
+-                $this->markTestSkipped('Explicit isolated attachment native fixtures required.');
+-            }
+-            $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0);
+-        } else {
+-            $this->artisan('migrate', ['--force' => true])->assertExitCode(0);
+-        }
+         $this->fakePrivateMediaStorage();
+         config(['support-attachments.fixture_enabled' => true]);
+         $secret = str_repeat('b', 64);
+@@ -97,9 +92,13 @@ class SupportAttachmentHttpTest extends TestCase
+         $this->withSession(['_inquiry_owner' => ['context' => 'guest', 'secret' => str_repeat('c', 64)]]);
+         $this->private($this->get($this->base)->assertStatus(404));
+         app()->detectEnvironment(fn () => 'production');
+-        $response = $this->call('POST', $this->base.'/upload', [], [], [], ['CONTENT_TYPE' => 'application/octet-stream', 'HTTP_ACCEPT' => 'application/json'], 'Synthetic text file.');
+-        $this->private($response->assertStatus(419));
+-        $this->assertDatabaseCount('support_attachments', 1);
++        try {
++            $response = $this->call('POST', $this->base.'/upload', [], [], [], ['CONTENT_TYPE' => 'application/octet-stream', 'HTTP_ACCEPT' => 'application/json'], 'Synthetic text file.');
++            $this->private($response->assertStatus(419));
++            $this->assertDatabaseCount('support_attachments', 1);
++        } finally {
++            app()->detectEnvironment(fn () => 'testing');
++        }
+     }
+ 
+     private function upload(string $bytes, array $extra = [])
+diff --git a/tests/Feature/SupportAttachmentKeyCaptureIndependentTest.php b/tests/Feature/SupportAttachmentKeyCaptureIndependentTest.php
+index 40176a6..4372469 100644
+--- a/tests/Feature/SupportAttachmentKeyCaptureIndependentTest.php
++++ b/tests/Feature/SupportAttachmentKeyCaptureIndependentTest.php
+@@ -3,24 +3,18 @@
+ namespace Tests\Feature;
+ 
+ use App\Domain\SupportAttachments\SupportAttachments;
+-use Illuminate\Support\Facades\DB;
++use Tests\Support\FinalizationDatabaseMigrations;
+ use Tests\Support\InquiryConversationFixtures;
+ use Tests\TestCase;
+ 
+ /** Actor ownership derives from app.key as well as the captured session marker. */
+ class SupportAttachmentKeyCaptureIndependentTest extends TestCase
+ {
++    use FinalizationDatabaseMigrations;
++
+     public function test_service_resolution_key_rotation_cannot_adopt_a_previously_minted_visitor_actor(): void
+     {
+         config(['app.key' => 'base64:'.base64_encode(str_repeat('S', 32)), 'support-attachments.fixture_enabled' => true]);
+-        if (DB::getDriverName() === 'mysql') {
+-            if (getenv('ATTACHMENT_NATIVE_ISOLATED') !== '1' || DB::getDatabaseName() !== 'vaseyaudio_support_closure') {
+-                $this->markTestSkipped('Explicit dedicated synthetic reviewer database required.');
+-            }
+-            $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0);
+-        } else {
+-            $this->artisan('migrate', ['--force' => true])->assertExitCode(0);
+-        }
+         $secret = str_repeat('b', 64);
+         $this->withSession(['_inquiry_owner' => ['context' => 'guest', 'secret' => $secret]]);
+         $owner = hash_hmac('sha256', "vasey-inquiry-owner-v1\0guest\0".$secret, (string) config('app.key'));
+diff --git a/tests/Feature/SupportAttachmentNativeConcurrencyTest.php b/tests/Feature/SupportAttachmentNativeConcurrencyTest.php
+index 39b6f69..6a7a6d9 100644
+--- a/tests/Feature/SupportAttachmentNativeConcurrencyTest.php
++++ b/tests/Feature/SupportAttachmentNativeConcurrencyTest.php
+@@ -11,19 +11,21 @@ use App\Domain\SupportAttachments\SupportAttachments;
+ use Illuminate\Support\Facades\DB;
+ use Illuminate\Support\Str;
+ use Symfony\Component\Process\Process;
++use Tests\Support\FinalizationDatabaseMigrations;
+ use Tests\Support\InquiryConversationFixtures as Fixture;
+ use Tests\Support\TestOnlyMediaScanner;
+ use Tests\TestCase;
+ 
+ class SupportAttachmentNativeConcurrencyTest extends TestCase
+ {
++    use FinalizationDatabaseMigrations;
++
+     public function test_native_last_file_reservation_serializes_real_contenders_and_retains_exact_originals(): void
+     {
+-        if (DB::getDriverName() !== 'mysql' || getenv('ATTACHMENT_NATIVE_ISOLATED') !== '1') {
+-            $this->markTestSkipped('Requires explicitly isolated native attachment database and process lock observation.');
++        if (DB::getDriverName() !== 'mysql') {
++            $this->markTestSkipped('Requires native MySQL process lock observation.');
+         }
+         config(['app.key' => 'base64:'.base64_encode(str_repeat('S', 32)), 'support-attachments.fixture_enabled' => true]);
+-        $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0);
+         $this->fakePrivateMediaStorage();
+         $fixture = Fixture::create();
+         $root = config('filesystems.disks.local.root');
+diff --git a/tests/Feature/SupportAttachmentRegistrationTest.php b/tests/Feature/SupportAttachmentRegistrationTest.php
+index d9f8a2d..f5d985b 100644
+--- a/tests/Feature/SupportAttachmentRegistrationTest.php
++++ b/tests/Feature/SupportAttachmentRegistrationTest.php
+@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
+ use Illuminate\Support\Facades\Route;
+ use Illuminate\Support\Str;
+ use Tests\Support\CustomerFixtures;
++use Tests\Support\FinalizationDatabaseMigrations;
+ use Tests\Support\InquiryConversationFixtures;
+ use Tests\Support\ServiceProjectFixtures;
+ use Tests\Support\TestOnlyMediaScanner;
+@@ -19,18 +20,12 @@ use Tests\TestCase;
+ /** Boot the actual root routes/provider/privacy; no per-test route or authority registration. */
+ final class SupportAttachmentRegistrationTest extends TestCase
+ {
++    use FinalizationDatabaseMigrations;
++
+     protected function setUp(): void
+     {
+         parent::setUp();
+         config(['app.key' => 'base64:'.base64_encode(str_repeat('S', 32)), 'support-attachments.fixture_enabled' => true]);
+-        if (DB::getDriverName() === 'mysql') {
+-            if (getenv('ATTACHMENT_NATIVE_ISOLATED') !== '1') {
+-                $this->markTestSkipped('Explicit isolated attachment native fixtures required.');
+-            }
+-            $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0);
+-        } else {
+-            $this->artisan('migrate', ['--force' => true])->assertExitCode(0);
+-        }
+         $this->fakePrivateMediaStorage();
+         $this->withoutVite();
+         $this->app->bind(MalwareScanner::class, TestOnlyMediaScanner::class);
+@@ -159,11 +154,8 @@ final class SupportAttachmentRegistrationTest extends TestCase
+         $this->assertTrue($refused, 'A missing earlier guard with a retained later guard is not a contiguous owned DDL prefix.');
+     }
+ 
+-    public function test_sqlite_reserved_guard_name_cannot_mask_a_second_foreign_table(): void
++    public function test_reserved_guard_name_cannot_mask_a_second_foreign_table(): void
+     {
+-        if (DB::getDriverName() !== 'sqlite') {
+-            $this->markTestSkipped('SQLite permits table and trigger to coexist under this same exact name.');
+-        }
+         $pdo = DB::connection()->getPdo();
+         $pdo->exec('CREATE TABLE support_attachments_update (marker INTEGER PRIMARY KEY)');
+         $pdo->exec('INSERT INTO support_attachments_update (marker) VALUES (9123)');
+@@ -174,7 +166,7 @@ final class SupportAttachmentRegistrationTest extends TestCase
+             $refused = true;
+         }
+         $this->assertTrue($refused, 'Reserved guard admission must inspect every dictionary row, not only the first matching trigger.');
+-        $this->assertSame(9123, (int) $pdo->query('SELECT marker FROM main.support_attachments_update')->fetchColumn());
++        $this->assertSame(9123, (int) $pdo->query('SELECT marker FROM '.(DB::getDriverName() === 'sqlite' ? 'main.' : '').'support_attachments_update')->fetchColumn());
+     }
+ 
+     private function privateGet(string $path, array $headers = [])
+diff --git a/tests/Feature/SupportAttachmentSessionIndependentTest.php b/tests/Feature/SupportAttachmentSessionIndependentTest.php
+index 1095cd7..9749dc9 100644
+--- a/tests/Feature/SupportAttachmentSessionIndependentTest.php
++++ b/tests/Feature/SupportAttachmentSessionIndependentTest.php
+@@ -10,6 +10,7 @@ use Illuminate\Database\Events\TransactionCommitted;
+ use Illuminate\Support\Facades\Auth;
+ use Illuminate\Support\Facades\DB;
+ use Illuminate\Support\Str;
++use Tests\Support\FinalizationDatabaseMigrations;
+ use Tests\Support\InquiryConversationFixtures;
+ use Tests\Support\TestOnlyMediaScanner;
+ use Tests\TestCase;
+@@ -17,18 +18,12 @@ use Tests\TestCase;
+ /** Actual registered HTTP and actual provider query; no fabricated actor or context. */
+ class SupportAttachmentSessionIndependentTest extends TestCase
+ {
++    use FinalizationDatabaseMigrations;
++
+     protected function setUp(): void
+     {
+         parent::setUp();
+         config(['app.key' => 'base64:'.base64_encode(str_repeat('S', 32)), 'support-attachments.fixture_enabled' => true]);
+-        if (DB::getDriverName() === 'mysql') {
+-            if (getenv('ATTACHMENT_NATIVE_ISOLATED') !== '1' || DB::getDatabaseName() !== 'vaseyaudio_support_closure') {
+-                $this->markTestSkipped('Explicit dedicated synthetic reviewer database required.');
+-            }
+-            $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0);
+-        } else {
+-            $this->artisan('migrate', ['--force' => true])->assertExitCode(0);
+-        }
+         $this->fakePrivateMediaStorage();
+         $this->withoutVite();
+         $this->app->bind(MalwareScanner::class, TestOnlyMediaScanner::class);
