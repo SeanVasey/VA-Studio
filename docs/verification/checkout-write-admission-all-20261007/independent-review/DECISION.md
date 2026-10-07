@@ -237,3 +237,98 @@ Raw outputs (ANSI stripped), JUnit and the mutation diffs are in `review-evidenc
 ### A1.7 Cleanup
 
 All mutations were reverted (`git diff --quiet -- app` succeeded), and no flag, registration or `app/` file differs from `8c30ce5b`. The review worktree `/home/user/VA-Studio-review-admission2` holds two uncommitted items for the caller to commit: this file and the untracked `review-evidence/addendum1/`.
+
+## Addendum 2: re-review of the Codex P2 r4209950553 fix
+
+Reviewer: the same independent security/architecture subagent (Claude), 2026-10-07. This is development review evidence. It is not Foundation CI, not release acceptance and not authorization for any live path. I did not commit or push anything.
+
+### A2.1 Reviewed source
+
+| Item | Value |
+| --- | --- |
+| Head reviewed | `0cb13ca58f0e4b8784ee3df7cb0679bc8ddf94e0` (one commit on top of `9f3f1115`) |
+| Executable change | `git diff --stat 9f3f1115 0cb13ca5 -- app tests config routes bootstrap database .github composer.json composer.lock package.json phpunit.xml` lists 3 files: `CheckoutStaffWriteAdmission.php` (+34/−1), `tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php` (+27) and `tests/Support/ProductionCheckoutFixtures.php` (+2/−2). Nothing under `config/`, `routes/`, `bootstrap/`, `database/`, `.github/`, the Composer or npm manifests, or `phpunit.xml` changed. |
+| Frozen files | `CommandTransaction.php` sha256 `fd8fccde…394be8` and `OriginalCommitDispatcher.php` sha256 `ed529e8f…dcd372` are unchanged. `git diff --quiet` passes for both from `ece5a9ee` and from `9f3f1115`. |
+| Other admission files | `CheckoutIntentAdmission.php`, `CheckoutWriteAdmission.php`, `CheckoutCommandCommitDispatcher.php`, `CheckoutCommandFrame.php` and `CheckoutRawPlans.php` are byte-identical between `9f3f1115` and `0cb13ca5`. Their differences from `ece5a9ee` are the lane changes reviewed in §3 and Addendum 1. |
+| Evidence | `review-evidence/addendum2/source-checks.txt`, `delta-9f3f1115..0cb13ca5.diff` |
+
+### A2.2 Environment
+
+- One detached worktree: `scripts/dev/mkworktree.sh /home/user/VA-Studio-review-admission3 0cb13ca5`.
+- PHP 8.4.26 and PHPUnit 12.5.34.
+- SQLite `:memory:`.
+- `public/build` was absent.
+- I used the worktree-local autoload runner with a per-run `TMPDIR` in the session scratchpad.
+- I did not run native MySQL (see A2.7).
+
+### A2.3 Decision
+
+**APPROVE WITH CONDITIONS carries to `0cb13ca5`, and Codex P2 r4209950553 is closed.** No condition is open for this lane. I found nothing above Info.
+
+### A2.4 Semantics
+
+1. **Helper equivalence.** `licenseUntil()` and its `one()` are textually identical to the loop and `one()` in `CheckoutIntentAdmission::capture()`. I extracted both with `sed` and ran `diff`, which exited 0 (`loop-equivalence.diff`). The helper:
+   - skips offers whose `(string) is_active !== '1'`, so only active offers count;
+   - resolves the current revision, then its license version, through `one()`. `one()` compares `id` strictly and throws `CheckoutException('changed', 409)` when a row is missing, so a missing row is refused and never silently skipped;
+   - keeps only non-null `effective_until`, so a license with no expiry adds no cap.
+
+   This is also the set `PreparationSelection::effective()` checks: every active offer in the selection graph, with `(int) is_active === 1`. That method is what `qualify()` runs through `CurrentSelection::proveCurrent()`. The cap therefore matches exactly the predicate that the frozen clock had last proven true. The two `is_active` casts agree for every value a tinyint column returns.
+2. **Cap application.** `open()` takes the minimum of the policy, attestation and license bounds. It converts that minimum once against wall-clock `now()` into an `hrtime` deadline, refuses `expired` when no time remains, and calls `capDeadline()`. At `TransactionCommitting`, `CheckoutCommandFrame::prove(1)` checks `hrtime(true) < deadlineNs` and refuses `write_frame`. That check runs after ordinary delegates and before `proveCurrent()`. A license that expires during the commit therefore rolls back the whole physical transaction, the same way an expiring attestation does.
+3. **Ordering (Info A2-3).** In `basis()`, `licenseUntil()` runs before `open()` and therefore before `proveAnchor()`. In the intent admission, the loop runs after `proveAnchor()`. The helper only reads the already-loaded `$selection` array: no database access, resolver or callback. A throw from it propagates inside `CommandTransaction::run()` and rolls back. The order makes no difference.
+4. **`authority()` needs no further cap.** I looked for any other bound it omits. `approve()` has one temporal check, `ExemptionPolicyV1::effective($policy, $at)`. It loads no selection, license or order. `StaffProof`, `CurrentPolicy` and `ExemptionPolicyV1::validate()` contain no `now()`, `until` or `expires` comparison (grep). An authority is a per-candidate delegation: licenses are re-checked when a basis is qualified, which this fix now caps, and again when an intent is created. Capping `authority()` at license expiries would add a bound that no authority check requires. `[$policy['effective_until']]` is the complete cap.
+5. **Other `basis()` bounds.** `qualify()` time-checks the policy, the attestation and, through `PreparationSelection::license()` and `effective()`, the license versions. The customer-access challenge windows compare stored `created_at` and `expires_at` values with each other, not with `now()`, so time passing does not expire them. The reservation-window requirement in `TaxExemptions::basis()` applies when a basis is used, not when it is created. The policy bound is redundant with the attestation bound, because `qualify()` requires attestation `effective_until` ≤ policy `effective_until`, but it is harmless. After this fix, every bound that `qualify()` evaluates against the clock is folded into the cap.
+
+### A2.5 Commands and results (SQLite, worktree at `0cb13ca5`)
+
+1. **Green.** The three files ran concurrently in separate processes:
+
+   | File | Exit | Result | Wall time |
+   | --- | --- | --- | --- |
+   | `tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php` | 0 | OK, 18 tests, 102 assertions | 53.5 s |
+   | `tests/Feature/ProductionCheckoutExemptionAuthorityTest.php` | 0 | OK, 11 tests, 50 assertions | 24.5 s |
+   | `tests/Feature/ProductionCheckoutJourneyTest.php` | 0 | OK, 7 tests, 81 assertions | 35.1 s |
+
+   These counts match the implementer's `conditions/codex-license-expiry/green/` claims. In the JUnit, the new test made 6 assertions in 4.66 s.
+2. **Mutation M7.** I removed `, ...self::licenseUntil($selection)` from `basis()` with `sed`. The result was **exit 1, 1 failure** (18 tests, 98 assertions): `test_new_basis_admission_is_capped_at_the_selected_license_expiry` failed with "A withdrawn NEW checkout write was admitted.", meaning the basis committed. The other 17 tests stayed green. M7's `app/` tree differs from `9f3f1115` only by the unused private helper, so it reproduces the implementer's red run. I reverted with `git checkout -- app`, and `git diff --quiet -- app` succeeded.
+3. **Pint.** `vendor/bin/pint --test` on the three changed PHP files passed (`pint.txt`).
+
+### A2.6 Robustness of the real-time regression
+
+**Mechanism.** The test freezes Carbon at `until − 1.5 s`. `open()` therefore always computes exactly 1.5 s of budget and adds it to the `hrtime` taken at `open()`. Fixture setup, enrollment, `approve()`, and the part of `qualify()` before `open()` all happen before the deadline is anchored, so their speed cannot shorten it. Every check of policy, attestation or license effectiveness reads the frozen clock. A slow machine can therefore never produce `expired` or `changed`. The only clock-sensitive refusal is the frame's `hrtime` comparison, which always refuses with `write_frame`. The 2.5 s sleep is a floor added after the anchor, so load only makes the expiry more certain. Mutation M7 cannot go green under any timing, because nothing caps a 300 s frame deadline.
+
+**The one failure mode.** The deadline passes **before** the commit only if the stretch from `open()` to `TransactionCommitting` takes at least 1.5 s on its own. That stretch covers the rest of `open()`, raw-plan capture, `seal()`'s `proveCurrent()` and `proveFresh()`, `register()`/`capture()`, and the commit call.
+
+- **Probe P1.** I temporarily inserted `usleep(2_000_000)` after `open()` (`P1-slow-capture/probe.diff`). The refusal still had reason `write_frame` and the basis still rolled back. It came from `CheckoutCommandCommitDispatcher::capture()`'s `prove(1)`, before the commit, so the listener never slept and the test failed at `assertTrue($slept)` ("Failed asserting that false is true").
+- **Result.** Under extreme stall the test fails loudly, with the same refusal reason and no false green. It does not flake toward a pass.
+- **Probe P2.** I temporarily instrumented the window from `open()` to `TransactionCommitting` (`P2-load/probe.diff`). Each run records two windows, the authority frame and then the basis frame.
+
+  | Condition | Runs | Windows | Result |
+  | --- | --- | --- | --- |
+  | Idle | 3 sequential | 4.7–12.1 ms (basis 11.7–12.1 ms) | all OK |
+  | Loaded: 8 busy-loop burners plus 4 concurrent test processes on 4 vCPUs (3× oversubscribed) | 4 | 20.9–134.7 ms | all OK |
+
+  That leaves at least an 11× margin. Both probes were reverted, and `git diff --quiet -- app` succeeded after each.
+
+**Judgement.** The test is robust enough for CI. A false pass is impossible. A false failure needs a stall of 1.5 s or more inside a few-millisecond span, such as a frozen VM or swap storm, and it would show up as the `$slept` assertion, not as a wrong reason. I did not measure MySQL, where plan capture adds network round trips and `SHOW CREATE TABLE`. I expect that window to stay far below 1.5 s, but this is unmeasured.
+
+### A2.7 New findings
+
+| ID | Severity | Finding | Recommendation |
+| --- | --- | --- | --- |
+| A2-1 | Info | The regression depends on real time: 1.5 s of budget against a 2.5 s sleep. If `open()` to commit stalls for 1.5 s or more, the test fails at `assertTrue($slept)` with a generic message. Measured margin is at least 11× (A2.6). | Optional: give `assertTrue($slept, …)` a message saying the frame expired before the commit, or widen both offsets (for example, freeze 5 s before and sleep 6 s) at a cost of +3.5 s per run. Not a condition. |
+| A2-2 | Info | The license loop and `one()` now exist verbatim in both `CheckoutIntentAdmission` and `CheckoutStaffWriteAdmission`. If a future temporal bound is added to one copy, the other will drift. | Fold into the F-6 consolidation, for example a shared `CheckoutRawPlans::licenseUntil()`, under its own review. Not a condition. |
+| A2-3 | Info | `licenseUntil()` runs before `proveAnchor()` in `basis()`, unlike the intent admission. It is pure and in-memory, and a throw rolls back (A2.4 item 3). | None. |
+
+F-5, F-6 and F-7 remain open items as before. A2-2 extends F-6.
+
+### A2.8 Not reviewed in this addendum
+
+- **Native MySQL.** The implementer made no native run for this item, and neither did I. The change is pure PHP arithmetic over rows that the reviewed raw plans already capture. The deadline check is `hrtime`-based and independent of the driver.
+- **Everything in §5 still applies:** MySQL 8.0, hosted Foundation CI, the full PHP suite, route and provider registration, live providers, Paid252 composition and browser specs.
+
+### A2.9 Cleanup
+
+- M7, P1 and P2 were each reverted with `git checkout -- app`, and `git diff --quiet -- app` succeeded after each.
+- No flag, registration, configuration or `app/` file differs from `0cb13ca5`.
+- The review worktree `/home/user/VA-Studio-review-admission3` holds two uncommitted items for the caller to commit: this file and the untracked `review-evidence/addendum2/`.
+- Raw outputs (ANSI stripped), JUnit, probe and mutation diffs, and window timings are in `review-evidence/addendum2/{green,M7,P1-slow-capture,P2-load}/`.

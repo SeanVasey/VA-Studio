@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php b/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
+index 4ea5c81a..e74e3f40 100644
+--- a/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
++++ b/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
+@@ -43,7 +43,7 @@ final class CheckoutStaffWriteAdmission implements CheckoutCommitAdmission
+         array $selection, array $authority, array $policy, array $attestation, array $record, string $requestKey): self
+     {
+         $until = [$policy['effective_until'], $attestation['effective_until'], ...self::licenseUntil($selection)];
+-        [$frame, $plans] = self::open($rows, $qualifier, $staff, $until);
++        [$frame, $plans] = self::open($rows, $qualifier, $staff, $until); usleep(2_000_000);
+         $plans->actor($buyer);
+         $plans->identity($identity);
+         $plans->selection($selection);
