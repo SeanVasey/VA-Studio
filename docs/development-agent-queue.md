@@ -2,17 +2,17 @@
 
 ## Active cloud ownership — October 7, 2026 UTC
 
-One integration owner `/root`; verified maincad70a7 includes PRs25–28.
+One integration owner `/root`; verified main3fb7dd0 includes PRs25–29.
 Historical owner tables below describe earlier source, not active workers.
 
 | Worker | Isolated boundary | Current handoff |
 | --- | --- | --- |
-| `/root` | Primary/shared registration/evidence/publication | Publish reviewed listening/inquiry composition; mount next export, identity, checkout and attachments after exact source review |
+| `/root` | Primary/shared registration/evidence/publication | PR29 merged; publish reviewed service13d7ae; mount next export, identity, checkout and attachments after exact source review |
 | `/root/pr25_recovery` | New ProductionCheckout246000/provider adapter/private routes/tests | Immutable review→assent→payable order→provider initiation/reconciliation; qualified exemption first, provider-calculated tax next |
 | `/root/completion_audit` | ProductionIdentity247000/routes/UI/local SMTP proof | Immutable origin, mailbox challenge, recovery/credential fencing, typed principal; no synthetic-account adoption by email |
-| `/root/native_mysql` | ServiceProjects244000; source adapter then free origins245000 | Corrected migration/private-input denial under final review; next attachment source adapter, then explicit free-purpose assent/document/download |
-| `/root/pr26_review` | Independent service composition/canaries | Three original blockers now green on dccd15e; reconcile author final evidence and record final approval |
-| `/root/crawler_routes` | Listening notes/export/clear domain/UI/tests | Preserve V1, effect-only V2 notes, expected-version export and retained empty row on clear; root owns HTTP grammar/privacy/export route |
+| `/root/native_mysql` | ServiceProjects244000; source adapter then free origins245000 | Service13d7ae independently approved; attachment source adaptere765 frozen/native checks; then explicit free-purpose assent/document/download |
+| `/root/pr26_review` | Independent service composition/canaries | Service13d7ae approved in7769db3; independent notes/export/clear and real nativeTEXT overflow review |
+| `/root/crawler_routes` | Listening notes/export/clear domain/UI/tests | Notes041→18a→ebb capacity repair/final evidence; next concrete consent/preferences/suppression design250 |
 | `/root/recovery_inventory` | Private attachments249000/scanner/routes/UI/tests | Quarantine→scan→immutable manifest, owner/source current proof, download/retry/retention; approved listening review carry complete |
 
 Each worker has an isolated branch, independent autoload over unchanged locked

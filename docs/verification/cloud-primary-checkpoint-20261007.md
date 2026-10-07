@@ -7,7 +7,7 @@ or Mac execution was used. The current branch is
 
 ## Current recovery state
 
-Verified maincad70a7 includes the immediate PR25/26/23 repairs. Starting-state
+Verified main3fb7dd0 includes the immediate PR25/26/23 repairs. Starting-state
 sections below are historical. Current owned work and source receipts are in
 the newest milestone and current agent queue.
 
@@ -222,3 +222,36 @@ export/clear and attachments249 advance independently. Service source adapter
 precedes distinct free-grant245, then membership/product delivery. No external
 message, live payment, entitlement import, deploy or full verification is claimed.
 Work continues without a new user prompt.
+
+## Fifth milestone: PR29 merged and service publication candidate
+
+PR29 merged expected head `85ebb0c36eb13def6c3f272a3905185d88fde1a3`
+as `3fb7dd05142e4539e2f0af17831d66a1544d0cb0` at03:01 America/Chicago,
+tree `00ae5a84254b1fe55913bc00c42016a9d39f7c10`. Fresh merged-state/tree/
+ordered-parent readbacks passed. Cheap preflight37590341640 and automatic
+code/security review on85ebb completed without findings. Original receipts,
+independent source review and default-off unbound notification boundary remain.
+
+Service final executable `13d7ae7896c1f3c43f8428e624e5731842072261`,
+tree `b917b4e0cbe647952d928f41abf837904eca1cb3`, is independently approved
+in review7769db35. Its exact author38105 schema/authority/quote/milestone/event
+and interface paths are retained; all29 owned paths map exactly. Independent
+original restart/composite-key/denial canaries now pass, plus actual native
+MFA/registration, CSRF and fresh migration retry on the graph containing242/243.
+Root shared50/422, mounted48, TypeScript, formatted boot2/32, scoped Pint and
+50 selector checks pass. One actual native service contention identity extends
+the registry158 with exact original150/prior157 order. Root's initial wrong
+filename, formatting failures and accidental sort failure are retained with
+corrected proof; no guards/assertions were weakened.
+
+The buyer can save a bound encrypted brief, review/accept/decline an explicit
+immutable staff quote, follow milestones, request bounded revisions and retain
+cancellation history. Scope acceptance does not collect money or grant delivery.
+Service publication/preflight remains pending here; fullT28 criteria stay open.
+Next service authority adapter unlocks attachment source writes; free245 follows.
+Listening notes/export/clear is composed and HTTP-tested but held for confirmed
+aggregateTEXT capacity repair and independent actual overflow proof. Checkout246,
+identity247/localSMTP, attachments249 and consent/preferences250 advance with
+separate ownership. Final Foundation/MySQL8.4/browser, actual legal/provider/
+content/hosting prerequisites and remaining paid product/member fulfillment are
+still open. No external activation or launch action occurred.
