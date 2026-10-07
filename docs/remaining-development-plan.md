@@ -8,11 +8,14 @@ private checkout and private listening/inquiry alerts. Exact-source independent
 review, cheap preflight and expected-head merges pass; complete Foundation
 verification remains reserved for the final integrated candidate.
 
-Service executable13d7ae is independently approved with fresh original red-now-
-green SQLite/native/UI canaries and root shared50/422, mounted48, TypeScript/
-Pint/selector checks. See [source-bound registration evidence](verification/cloud-service-registration-20261007/README.md).
-Publication/preflight are pending here. Listening notes/export/clear7b→18a→ebb
-is HTTP/UI-tested but held for actual aggregateTEXT capacity/overflow review.
+PR30 is held after automatic P2 findings and independently demonstrated native
+temporary-table/MFA and real-provider authority failures. Predecessor13d7ae
+approval is superseded. Root repair62de352 passes affected15/156, frontend7 and
+TypeScript; independent original successor canaries/review are pending. See
+[follow-up evidence](verification/cloud-service-followup-root-20261007/README.md).
+Notes/export/clear capacity repair is independently approved ataf87b702 in
+fbe178ea: actual native86,184-byte rejection retains original64,800-byte history.
+It awaits publication on the corrected service/main graph.
 
 ProductionCheckout246, ProductionIdentity247/localSMTP, attachments249 and
 preferences/consent250 are active isolated code lanes. Service source adapter

@@ -255,3 +255,27 @@ identity247/localSMTP, attachments249 and consent/preferences250 advance with
 separate ownership. Final Foundation/MySQL8.4/browser, actual legal/provider/
 content/hosting prerequisites and remaining paid product/member fulfillment are
 still open. No external activation or launch action occurred.
+
+## Sixth checkpoint: service review held, corrected authority pending review
+
+Main remains3fb7dd05142e4539e2f0af17831d66a1544d0cb0. PR30 published
+9d9680ed51fc3fb0c3c4afa8ac7c2e42b991d5f1 has cheap preflight37591585279,
+but two automatic P2 findings remain awaiting verified repair. Root8c7feaee
+fixes newest50 accessibility and fixed private diagnostic reporting (5/76).
+Independent actual native temporary-users shadow and actual SQLite MFA-provider
+callback each demonstrated unauthorized quote commits on predecessor13d7ae.
+That prior approval is superseded, not silently carried. Root62de352 captures
+permanent primary reads/refuses shadows and moves callbacks before final raw
+actor/graph proof (affected15/156; frontend7/typecheck). Original successor
+canaries and actual-source independent review precede one batched update.
+
+Notes/export/clear is now approved: rootaf87b702 plus independent fbe178ea
+retains original native overflow1406 and proves86,184-byte next envelope rejected
+with zero SQL writes, original64,800-byte/history preserved; V1 and empty clear
+fences pass. Root notes worktree nowfbe178ea; publication awaits corrected base.
+Service attachmentb209b85 repairs root-confirmed last-query flag withdrawal;
+root's original SQLite1/1 failure and native1/1 failure are preserved, successor
+SQLite1/8 passes, native retest remains active. Its held source is not in PR30.
+Checkout246, identity247/localSMTP, attachments249, consent250 and free245
+continue isolated code. Whole personal-store/member/product/migration/hosting
+preparation and final exact-SHA Foundation remain open; no cutover or activation.

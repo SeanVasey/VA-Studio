@@ -1,0 +1,13 @@
+
+> test
+> vitest run tests/frontend/service-project-journey.test.tsx
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-service-registration
+
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  08:19:05
+   Duration  1.25s (environment 51%, tests 33%, setup 7%, transform 7%, import 1%)
+

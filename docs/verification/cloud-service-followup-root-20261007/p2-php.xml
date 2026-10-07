@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="5" assertions="76" errors="0" failures="0" skipped="0" time="3.523845">
+    <testsuite name="Tests\Feature\ServiceProjectReviewRegressionTest" file="/workspace/VA-Studio-service-registration/tests/Feature/ServiceProjectReviewRegressionTest.php" tests="2" assertions="18" errors="0" failures="0" skipped="0" time="1.314317">
+      <testcase name="test_the_bounded_service_index_includes_new_definitions_after_fifty_and_the_latest_brief_can_be_submitted" file="/workspace/VA-Studio-service-registration/tests/Feature/ServiceProjectReviewRegressionTest.php" line="22" class="Tests\Feature\ServiceProjectReviewRegressionTest" classname="Tests.Feature.ServiceProjectReviewRegressionTest" assertions="6" time="0.753983"/>
+      <testcase name="test_real_transactional_failure_logs_only_a_fixed_exception_class_and_rolls_back_the_brief" file="/workspace/VA-Studio-service-registration/tests/Feature/ServiceProjectReviewRegressionTest.php" line="45" class="Tests\Feature\ServiceProjectReviewRegressionTest" classname="Tests.Feature.ServiceProjectReviewRegressionTest" assertions="12" time="0.560334"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ServiceProjectHttpAndOperatorTest" file="/workspace/VA-Studio-service-registration/tests/Feature/ServiceProjectHttpAndOperatorTest.php" tests="3" assertions="58" errors="0" failures="0" skipped="0" time="2.209528">
+      <testcase name="test_mounted_operator_quote_and_milestone_actions_join_actual_buyer_http_acceptance" file="/workspace/VA-Studio-service-registration/tests/Feature/ServiceProjectHttpAndOperatorTest.php" line="41" class="Tests\Feature\ServiceProjectHttpAndOperatorTest" classname="Tests.Feature.ServiceProjectHttpAndOperatorTest" assertions="26" time="1.002639"/>
+      <testcase name="test_real_http_bodies_cross_customer_denial_and_privacy_do_not_accept_client_authority_or_unbounded_input" file="/workspace/VA-Studio-service-registration/tests/Feature/ServiceProjectHttpAndOperatorTest.php" line="59" class="Tests\Feature\ServiceProjectHttpAndOperatorTest" classname="Tests.Feature.ServiceProjectHttpAndOperatorTest" assertions="20" time="0.736824"/>
+      <testcase name="test_two_opened_staff_actions_cannot_overwrite_one_another_and_customer_cannot_mount_staff_resource" file="/workspace/VA-Studio-service-registration/tests/Feature/ServiceProjectHttpAndOperatorTest.php" line="81" class="Tests\Feature\ServiceProjectHttpAndOperatorTest" classname="Tests.Feature.ServiceProjectHttpAndOperatorTest" assertions="12" time="0.470065"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -7,12 +7,12 @@ Historical owner tables below describe earlier source, not active workers.
 
 | Worker | Isolated boundary | Current handoff |
 | --- | --- | --- |
-| `/root` | Primary/shared registration/evidence/publication | PR29 merged; publish reviewed service13d7ae; mount next export, identity, checkout and attachments after exact source review |
+| `/root` | Primary/shared registration/evidence/publication | PR29 merged; service62de352 authority/P2 repairs await independent successor review; notes capacity approved; mount next identity, checkout and attachments after review |
 | `/root/pr25_recovery` | New ProductionCheckout246000/provider adapter/private routes/tests | Immutable review→assent→payable order→provider initiation/reconciliation; qualified exemption first, provider-calculated tax next |
 | `/root/completion_audit` | ProductionIdentity247000/routes/UI/local SMTP proof | Immutable origin, mailbox challenge, recovery/credential fencing, typed principal; no synthetic-account adoption by email |
-| `/root/native_mysql` | ServiceProjects244000; source adapter then free origins245000 | Service13d7ae independently approved; attachment source adaptere765 frozen/native checks; then explicit free-purpose assent/document/download |
-| `/root/pr26_review` | Independent service composition/canaries | Service13d7ae approved in7769db3; independent notes/export/clear and real nativeTEXT overflow review |
-| `/root/crawler_routes` | Listening notes/export/clear domain/UI/tests | Notes041→18a→ebb capacity repair/final evidence; next concrete consent/preferences/suppression design250 |
+| `/root/native_mysql` | ServiceProjects244000; source adapter then free origins245000 | Service approval superseded; corrected attachment sourceb209b85 passes author14/72 each driver; free245 implementation active |
+| `/root/pr26_review` | Independent service composition/canaries | Service actual native shadow/provider successor review; notes/export/clear approved in fbe178ea with native overflow proof |
+| `/root/crawler_routes` | Listening notes/export/clear domain/UI/tests | Notes capacity handoff complete; consent250 domain/schema/UI active, suppression251 follows |
 | `/root/recovery_inventory` | Private attachments249000/scanner/routes/UI/tests | Quarantine→scan→immutable manifest, owner/source current proof, download/retry/retention; approved listening review carry complete |
 
 Each worker has an isolated branch, independent autoload over unchanged locked
