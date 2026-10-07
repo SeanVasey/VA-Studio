@@ -1,0 +1,38 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Domain\Services\Projects\ServiceProjectSchema;
+use Illuminate\Support\Facades\DB;
+use LogicException;
+use Tests\TestCase;
+
+/** Actual SQLite key metadata: a first composite-PK member is not a referenced key. */
+final class ServiceProjectDependencyCanaryTest extends TestCase
+{
+    public function test_nonunique_dependency_id_is_refused_before_service_ddl(): void
+    {
+        $this->assertSame('sqlite', DB::getDriverName());
+        DB::unprepared('CREATE TABLE users (id INTEGER NOT NULL, tenant INTEGER NOT NULL, PRIMARY KEY (id, tenant))');
+        DB::unprepared('CREATE TABLE customer_accounts (id INTEGER PRIMARY KEY)');
+        DB::unprepared('CREATE TABLE service_draft_versions (id INTEGER PRIMARY KEY)');
+        $before = DB::select("SELECT type, name, sql FROM sqlite_master ORDER BY type, name");
+        $writes = [];
+        DB::connection()->beforeExecuting(function (string $sql) use (&$writes): void {
+            if (preg_match('/\A\s*(CREATE|ALTER|DROP)\b/i', $sql)) {
+                $writes[] = $sql;
+            }
+        });
+        $refusal = null;
+        try {
+            ServiceProjectSchema::install();
+        } catch (LogicException $error) {
+            $refusal = $error->getMessage();
+        }
+        file_put_contents(__DIR__.'/dependency-sqlite-probe.json', json_encode(['source' => getenv('SERVICE_REVIEW_SOURCE_SHA') ?: '159f3e79949102bbc9b35ade940358382c18a3d3',
+            'dependency_key' => DB::select('PRAGMA table_xinfo(users)'), 'ddl_attempts' => $writes, 'refusal' => $refusal], JSON_PRETTY_PRINT)."\n");
+        $this->assertNotNull($refusal, 'Composite (id, tenant) does not make id a valid single-column foreign key target.');
+        $this->assertSame([], $writes, 'Dependency key drift must refuse before creating service objects.');
+        $this->assertEquals($before, DB::select("SELECT type, name, sql FROM sqlite_master ORDER BY type, name"));
+    }
+}

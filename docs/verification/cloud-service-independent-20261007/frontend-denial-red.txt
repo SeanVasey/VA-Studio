@@ -1,0 +1,34 @@
+
+ RUN  v5.0.1 /workspace/VA-Studio-service-independent
+
+ ❯ docs/verification/cloud-service-independent-20261007/service-denial-privacy.test.tsx (1 test | 1 failed) 210ms
+   × access denial clears entered private text before another successful account read 209ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  docs/verification/cloud-service-independent-20261007/service-denial-privacy.test.tsx > access denial clears entered private text before another successful account read
+Error: expect(element).not.toBeInTheDocument()
+
+expected document not to contain element, found <textarea
+  id="service-summary"
+  maxlength="4000"
+  required=""
+>
+  First account private unsaved brief
+</textarea> instead
+ ❯ docs/verification/cloud-service-independent-20261007/service-denial-privacy.test.tsx:21:81
+     19|   await screen.findByLabelText('Submit a private service brief');
+     20|   // A new current account response must not revive the withdrawn acco…
+     21|   expect(screen.queryByDisplayValue('First account private unsaved bri…
+       |                                                                                 ^
+     22|   expect(screen.queryByDisplayValue('First account private unsaved ans…
+     23| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  07:41:14
+   Duration  1.00s (environment 60%, tests 23%, setup 9%, transform 6%, import 1%)
+

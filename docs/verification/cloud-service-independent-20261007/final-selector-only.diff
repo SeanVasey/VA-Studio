@@ -1,0 +1,9 @@
+diff --git a/scripts/ci/database-sqlite-skips.json b/scripts/ci/database-sqlite-skips.json
+index 2e1a9f1..95d5999 100644
+--- a/scripts/ci/database-sqlite-skips.json
++++ b/scripts/ci/database-sqlite-skips.json
+@@ -631,0 +632,4 @@
++    ],
++    [
++      "Tests\\Feature\\ServiceProjectConcurrencyTest",
++      "test_two_staff_quotes_wait_on_the_exact_project_and_current_reads_reject_old_mvcc_state"

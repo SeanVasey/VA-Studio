@@ -1,5 +1,7 @@
 # Cloud personal-store completion audit — October 7, 2026
 
+Current overlay October7: verified main3fb7dd0 includes immediate PR25/26/23 repairs, public installation/private checkout and reviewed private favorites/playlists/inquiry alerts. PR30 is held: predecessor service13d7ae approval is superseded by genuine temporary-table/MFA and provider failures; root62de352 repair awaits independent review. Notes/export/clear capacity repair is independently approved in fbe178ea. Checkout246, identity247, attachments249 and consent250 remain active code. The baseline inventory below stays bound to its recorded source; newest source/evidence is in the cloud checkpoint. No parent count or launch criterion is closed by these children.
+
 Inspected source: `717f0866444701637e7c396b4376891aa5dd995d`, tree
 `1c43bb29aefb56f3698ba734e756d685fd018245`, in an isolated worktree at
 `/workspace/VA-Studio-completion-audit`. This is read-only implementation and

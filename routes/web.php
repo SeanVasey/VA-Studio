@@ -8,6 +8,7 @@ use App\Http\Controllers\PublicSiteImageController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\StorefrontController;
 use App\Http\Controllers\TestCheckoutController;
+use App\Http\Controllers\TestExceptionResolutionController;
 use App\Http\Controllers\TestOwnerDeliveryController;
 use App\Http\Middleware\CustomerCommerceAccess;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -43,7 +44,7 @@ Route::withoutMiddleware(HandleInertiaRequests::class)->middleware(CustomerComme
     Route::get('/orders/history', [OrderController::class, 'history'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.history');
     Route::get('/orders/{order}/status', [OrderController::class, 'status'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.status');
     Route::get('/orders/{order}/items', [OrderController::class, 'items'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.items');
-    Route::get('/orders/{order}/exception-resolution', \App\Http\Controllers\TestExceptionResolutionController::class)->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.exception-resolution');
+    Route::get('/orders/{order}/exception-resolution', TestExceptionResolutionController::class)->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.exception-resolution');
     Route::get('/quotes/{quote}/order', [OrderController::class, 'forQuote'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.for-quote');
     Route::post('/orders/{order}/checkout', [TestCheckoutController::class, 'start'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.checkout');
     Route::get('/orders/{order}/checkout', [TestCheckoutController::class, 'status'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.checkout-status');
@@ -59,6 +60,7 @@ Route::post('/checkout', fn () => response()->json([
 ], 503))->middleware('throttle:10,1')->name('checkout.store');
 
 require __DIR__.'/customer.php';
+require __DIR__.'/services.php';
 require __DIR__.'/inquiry-conversations.php';
 
 require __DIR__.'/public-discovery.php';

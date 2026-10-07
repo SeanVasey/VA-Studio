@@ -1,0 +1,18 @@
+{
+  "README.md": "3a46ec6e4760339044dc42c5f0598a99c96de8ae949e1aa902a44983a9940902",
+  "final-pint-66b7b8f.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+  "formatted-boot-66b7b8f.txt": "e411cf8370725b1a4d6b521b9d838ef0be7dbdca74c1bf2c306808233dd41077",
+  "formatted-boot-66b7b8f.xml": "6598425356d96ee2fb37cf0255b6adddd727be75238ad78e6859e8d48aa3cc34",
+  "initial-wrong-pint-path.txt": "678ac4c023c8bc3fb1cd6b40ee5c24a0623ab0533e8d69fd6c68c05492450baf",
+  "initial-wrong-selection.txt": "a340818c41f6f74d25e09aa55bbf7b71915b4c7fcd31bcedc415d95ed0ae4352",
+  "mounted-frontend-0561112.txt": "dba4aea8b43028a64c1a337993ad20f4c3cb3e0b12edb26c87b6a1def7bbae78",
+  "registry-order-corrected.txt": "191062c69fab22e7a427a3e696db060f95f8e296b3ff9266010feee05aa0b780",
+  "registry-order-failure.txt": "66b1dfdd5c5f9336beee914262cadb43307600a0de0b45b766eedcacde35390e",
+  "shared-format-failure.txt": "c9bdd28cdc91b85e680219353cb75afade6998f07f33cd352218a409c571618d",
+  "shared-format-fix.txt": "cb214f361a5f6785003c0e2123f11ea4e6ece1e4419c90874314fa2c0564d174",
+  "shared-junit-0561112.xml": "82c540c9bae3cccfb3e98ad270cb76f6b765b4607618b31c4b6a87da49fb6701",
+  "shared-php-0561112.txt": "80538a46992ce82156433ad00688a11e980ad47b056253226f31aad7d1099c58",
+  "shared-selection.phpunit.xml.txt": "47654f4e1114aec703034ebf21fd94791d8b60d8c6017dfcc7aef514a3216667",
+  "source-map.json": "e628e45555d837923ca2fbe152796fbd5b53a28fca449daf5f19fca70dd0c159",
+  "typecheck-0561112.txt": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f"
+}

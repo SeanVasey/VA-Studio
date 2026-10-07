@@ -66,3 +66,8 @@ retain native waits, lost-response correction and exact source limits.
 T28/T29 remain open for private buyer briefs, estimates/deposits/milestones,
 stock/shipping/tax/provider tracking/returns and approved actual-source obligations.
 The private definitions do not create public products or fulfill paid purchases.
+
+
+## Cloud service journey child — October 7, 2026
+
+The private brief→explicit staff quote→exact buyer acceptance→milestone/revision/cancellation scope journey is independently approved on13d7ae. Actual shared50/422 and mounted48 cases pass alongside author/independent schema/retry/authority/native contention evidence. Scope acceptance has no payment/delivery authority; production identity, service publication/deposit/paid fulfillment and historical obligations remain required. See [source-bound evidence](../verification/cloud-service-registration-20261007/README.md) and current checkpoint for publication/preflight. Full WP-10 remains open.

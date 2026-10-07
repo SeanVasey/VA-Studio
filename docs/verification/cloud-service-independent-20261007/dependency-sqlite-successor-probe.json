@@ -1,0 +1,27 @@
+{
+    "source": "dccd15e202827d22ac19bd0d0f12ce60a43f73d8",
+    "dependency_key": [
+        {
+            "cid": 0,
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 1,
+            "hidden": 0
+        },
+        {
+            "cid": 1,
+            "name": "tenant",
+            "type": "INTEGER",
+            "notnull": 1,
+            "dflt_value": null,
+            "pk": 2,
+            "hidden": 0
+        }
+    ],
+    "foreign_keys_enabled": 1,
+    "ddl_attempts": [],
+    "refusal": "Service dependency key changed.",
+    "actual_sqlite_dml_refusal": null
+}

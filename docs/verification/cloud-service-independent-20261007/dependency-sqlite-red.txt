@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/dependency-sqlite-selection.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:00.188, Memory: 59.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ServiceProjectDependencyCanaryTest::test_nonunique_dependency_id_is_refused_before_service_ddl
+Composite (id, tenant) does not make id a valid single-column foreign key target.
+Failed asserting that null is not null.
+
+/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/ServiceProjectDependencyCanaryTest.php:34
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 2[0m[37;41m, Failures: 1[0m[37;41m.[0m

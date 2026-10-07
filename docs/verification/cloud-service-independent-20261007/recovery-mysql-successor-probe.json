@@ -1,0 +1,85 @@
+{
+    "source": "dccd15e202827d22ac19bd0d0f12ce60a43f73d8",
+    "driver": "mysql",
+    "version": "8.0.46-0ubuntu0.24.04.4",
+    "surviving_objects_before_retry": {
+        "tables": {
+            "service_project_events": {
+                "Table": "service_project_events",
+                "Create Table": "CREATE TABLE `service_project_events` (\n  `id` bigint unsigned NOT NULL AUTO_INCREMENT,\n  `public_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `project_id` bigint unsigned NOT NULL,\n  `number` int unsigned NOT NULL,\n  `operation` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `actor_kind` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `actor_id` bigint unsigned NOT NULL,\n  `request_key` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `request_hash` char(64) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,\n  `payload_hash` char(64) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `created_at` timestamp NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `service_project_events_public` (`public_id`),\n  UNIQUE KEY `service_project_events_number` (`project_id`,`number`),\n  UNIQUE KEY `service_project_events_request` (`project_id`,`request_key`),\n  KEY `service_project_events_actor_id_foreign` (`actor_id`),\n  CONSTRAINT `service_project_events_actor_id_foreign` FOREIGN KEY (`actor_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT,\n  CONSTRAINT `service_project_events_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `service_projects` (`id`) ON DELETE RESTRICT\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+            },
+            "service_projects": {
+                "Table": "service_projects",
+                "Create Table": "CREATE TABLE `service_projects` (\n  `id` bigint unsigned NOT NULL AUTO_INCREMENT,\n  `public_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `customer_account_id` bigint unsigned NOT NULL,\n  `service_version_id` bigint unsigned NOT NULL,\n  `service_manifest` longtext COLLATE utf8mb4_unicode_ci NOT NULL,\n  `service_hash` char(64) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `brief` longtext COLLATE utf8mb4_unicode_ci NOT NULL,\n  `brief_hash` char(64) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `creation_key` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `created_by` bigint unsigned NOT NULL,\n  `created_at` timestamp NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `service_projects_public` (`public_id`),\n  UNIQUE KEY `service_projects_request` (`customer_account_id`,`creation_key`),\n  KEY `service_projects_service_version_id_foreign` (`service_version_id`),\n  KEY `service_projects_created_by_foreign` (`created_by`),\n  CONSTRAINT `service_projects_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE RESTRICT,\n  CONSTRAINT `service_projects_customer_account_id_foreign` FOREIGN KEY (`customer_account_id`) REFERENCES `customer_accounts` (`id`) ON DELETE RESTRICT,\n  CONSTRAINT `service_projects_service_version_id_foreign` FOREIGN KEY (`service_version_id`) REFERENCES `service_draft_versions` (`id`) ON DELETE RESTRICT\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+            }
+        },
+        "guards": [
+            {
+                "TRIGGER_NAME": "service_projects_immutable",
+                "ACTION_TIMING": "BEFORE",
+                "EVENT_MANIPULATION": "UPDATE",
+                "EVENT_OBJECT_TABLE": "service_projects",
+                "ACTION_STATEMENT": "BEGIN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain service project evidence'; END"
+            }
+        ]
+    },
+    "objects_after_retry": {
+        "tables": {
+            "service_project_events": {
+                "Table": "service_project_events",
+                "Create Table": "CREATE TABLE `service_project_events` (\n  `id` bigint unsigned NOT NULL AUTO_INCREMENT,\n  `public_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `project_id` bigint unsigned NOT NULL,\n  `number` int unsigned NOT NULL,\n  `operation` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `actor_kind` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `actor_id` bigint unsigned NOT NULL,\n  `request_key` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `request_hash` char(64) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,\n  `payload_hash` char(64) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `created_at` timestamp NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `service_project_events_public` (`public_id`),\n  UNIQUE KEY `service_project_events_number` (`project_id`,`number`),\n  UNIQUE KEY `service_project_events_request` (`project_id`,`request_key`),\n  KEY `service_project_events_actor_id_foreign` (`actor_id`),\n  CONSTRAINT `service_project_events_actor_id_foreign` FOREIGN KEY (`actor_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT,\n  CONSTRAINT `service_project_events_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `service_projects` (`id`) ON DELETE RESTRICT\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+            },
+            "service_projects": {
+                "Table": "service_projects",
+                "Create Table": "CREATE TABLE `service_projects` (\n  `id` bigint unsigned NOT NULL AUTO_INCREMENT,\n  `public_id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `customer_account_id` bigint unsigned NOT NULL,\n  `service_version_id` bigint unsigned NOT NULL,\n  `service_manifest` longtext COLLATE utf8mb4_unicode_ci NOT NULL,\n  `service_hash` char(64) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `brief` longtext COLLATE utf8mb4_unicode_ci NOT NULL,\n  `brief_hash` char(64) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `creation_key` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `created_by` bigint unsigned NOT NULL,\n  `created_at` timestamp NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `service_projects_public` (`public_id`),\n  UNIQUE KEY `service_projects_request` (`customer_account_id`,`creation_key`),\n  KEY `service_projects_service_version_id_foreign` (`service_version_id`),\n  KEY `service_projects_created_by_foreign` (`created_by`),\n  CONSTRAINT `service_projects_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE RESTRICT,\n  CONSTRAINT `service_projects_customer_account_id_foreign` FOREIGN KEY (`customer_account_id`) REFERENCES `customer_accounts` (`id`) ON DELETE RESTRICT,\n  CONSTRAINT `service_projects_service_version_id_foreign` FOREIGN KEY (`service_version_id`) REFERENCES `service_draft_versions` (`id`) ON DELETE RESTRICT\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+            }
+        },
+        "guards": [
+            {
+                "TRIGGER_NAME": "service_projects_immutable",
+                "ACTION_TIMING": "BEFORE",
+                "EVENT_MANIPULATION": "UPDATE",
+                "EVENT_OBJECT_TABLE": "service_projects",
+                "ACTION_STATEMENT": "BEGIN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain service project evidence'; END"
+            },
+            {
+                "TRIGGER_NAME": "service_projects_insert",
+                "ACTION_TIMING": "BEFORE",
+                "EVENT_MANIPULATION": "INSERT",
+                "EVENT_OBJECT_TABLE": "service_projects",
+                "ACTION_STATEMENT": "BEGIN IF NOT (CHAR_LENGTH(NEW.service_hash) = 64 AND REGEXP_LIKE(NEW.service_hash, '^[a-f0-9]{64}$', 'c')) OR NOT (CHAR_LENGTH(NEW.brief_hash) = 64 AND REGEXP_LIKE(NEW.brief_hash, '^[a-f0-9]{64}$', 'c')) OR EXISTS (SELECT 1 FROM `service_projects` WHERE id = NEW.id OR public_id = NEW.public_id OR (customer_account_id = NEW.customer_account_id AND creation_key = NEW.creation_key)) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain service project evidence'; END IF; END"
+            },
+            {
+                "TRIGGER_NAME": "service_projects_retain",
+                "ACTION_TIMING": "BEFORE",
+                "EVENT_MANIPULATION": "DELETE",
+                "EVENT_OBJECT_TABLE": "service_projects",
+                "ACTION_STATEMENT": "BEGIN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain service project evidence'; END"
+            },
+            {
+                "TRIGGER_NAME": "service_project_events_immutable",
+                "ACTION_TIMING": "BEFORE",
+                "EVENT_MANIPULATION": "UPDATE",
+                "EVENT_OBJECT_TABLE": "service_project_events",
+                "ACTION_STATEMENT": "BEGIN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain service project evidence'; END"
+            },
+            {
+                "TRIGGER_NAME": "service_project_events_insert",
+                "ACTION_TIMING": "BEFORE",
+                "EVENT_MANIPULATION": "INSERT",
+                "EVENT_OBJECT_TABLE": "service_project_events",
+                "ACTION_STATEMENT": "BEGIN IF NEW.number < 1 OR NEW.number > 1000 OR NEW.actor_kind NOT IN ('staff', 'buyer') OR NOT (CHAR_LENGTH(NEW.request_hash) = 64 AND REGEXP_LIKE(NEW.request_hash, '^[a-f0-9]{64}$', 'c')) OR NOT (CHAR_LENGTH(NEW.payload_hash) = 64 AND REGEXP_LIKE(NEW.payload_hash, '^[a-f0-9]{64}$', 'c')) OR EXISTS (SELECT 1 FROM `service_project_events` WHERE id = NEW.id OR public_id = NEW.public_id OR (project_id = NEW.project_id AND (number = NEW.number OR request_key = NEW.request_key))) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain service project evidence'; END IF; END"
+            },
+            {
+                "TRIGGER_NAME": "service_project_events_retain",
+                "ACTION_TIMING": "BEFORE",
+                "EVENT_MANIPULATION": "DELETE",
+                "EVENT_OBJECT_TABLE": "service_project_events",
+                "ACTION_STATEMENT": "BEGIN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain service project evidence'; END"
+            }
+        ]
+    },
+    "prior_definition_and_ledger_preserved": true,
+    "retry_failure": null,
+    "migration_records": 1
+}

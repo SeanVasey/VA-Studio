@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/successor-sqlite-selection.xml" tests="2" assertions="19" errors="0" failures="0" skipped="0" time="0.615211">
+    <testsuite name="Independent original recovery and dependency reds now green on composition" tests="2" assertions="19" errors="0" failures="0" skipped="0" time="0.615211">
+      <testsuite name="Tests\Feature\ServiceProjectRecoveryCanaryTest" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/ServiceProjectRecoveryCanaryTest.php" tests="1" assertions="15" errors="0" failures="0" skipped="0" time="0.597959">
+        <testcase name="test_exact_owned_partial_install_can_retry_without_erasing_prior_definitions_or_bookkeeping" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/ServiceProjectRecoveryCanaryTest.php" line="23" class="Tests\Feature\ServiceProjectRecoveryCanaryTest" classname="Tests.Feature.ServiceProjectRecoveryCanaryTest" assertions="15" time="0.597959"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\ServiceProjectDependencyCanaryTest" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/ServiceProjectDependencyCanaryTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="0.017251">
+        <testcase name="test_nonunique_dependency_id_is_refused_before_service_ddl" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-independent-20261007/ServiceProjectDependencyCanaryTest.php" line="14" class="Tests\Feature\ServiceProjectDependencyCanaryTest" classname="Tests.Feature.ServiceProjectDependencyCanaryTest" assertions="4" time="0.017251"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

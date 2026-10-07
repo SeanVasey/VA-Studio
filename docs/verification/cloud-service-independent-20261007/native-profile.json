@@ -1,0 +1,16 @@
+{
+    "version": "8.0.46-0ubuntu0.24.04.4",
+    "schema_name": "vaseyaudio_service_review",
+    "case_mode": 0,
+    "flush_at_commit": 1,
+    "sync_binlog": 1,
+    "doublewrite": "ON",
+    "log_bin": 0,
+    "php": "8.4.26",
+    "pdo_driver": "mysql",
+    "origins": [
+        "/workspace/VA-Studio-service-independent/app/Domain/Services/Projects/ServiceProjectSchema.php",
+        "/workspace/VA-Studio-service-independent/app/Domain/Services/Projects/ServiceProjects.php",
+        "/workspace/VA-Studio-service-independent/tests/TestCase.php"
+    ]
+}

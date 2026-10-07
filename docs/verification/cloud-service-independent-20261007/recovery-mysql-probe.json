@@ -1,0 +1,46 @@
+{
+    "source": "a03dec44dd2004963998fa648125e191f7dad269",
+    "driver": "mysql",
+    "version": "8.0.46-0ubuntu0.24.04.4",
+    "surviving_objects_before_retry": {
+        "tables": [
+            {
+                "TABLE_NAME": "service_project_events"
+            },
+            {
+                "TABLE_NAME": "service_projects"
+            }
+        ],
+        "guards": [
+            {
+                "TRIGGER_NAME": "service_projects_immutable",
+                "ACTION_TIMING": "BEFORE",
+                "EVENT_MANIPULATION": "UPDATE",
+                "EVENT_OBJECT_TABLE": "service_projects",
+                "ACTION_STATEMENT": "BEGIN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain service project evidence'; END"
+            }
+        ]
+    },
+    "objects_after_retry": {
+        "tables": [
+            {
+                "TABLE_NAME": "service_project_events"
+            },
+            {
+                "TABLE_NAME": "service_projects"
+            }
+        ],
+        "guards": [
+            {
+                "TRIGGER_NAME": "service_projects_immutable",
+                "ACTION_TIMING": "BEFORE",
+                "EVENT_MANIPULATION": "UPDATE",
+                "EVENT_OBJECT_TABLE": "service_projects",
+                "ACTION_STATEMENT": "BEGIN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain service project evidence'; END"
+            }
+        ]
+    },
+    "prior_definition_and_ledger_preserved": true,
+    "retry_failure": "Retain existing or partial service project schema for inspection.",
+    "migration_records": 0
+}

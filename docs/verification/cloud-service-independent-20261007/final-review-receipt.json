@@ -1,0 +1,950 @@
+{
+  "decision": "approved for focused development integration; no remaining blockers",
+  "author_implementation": "e561ce821feaa9d85c4a07b4bf6c882f8d989377",
+  "author_corrected_executable": "38105a6d1cd8c5c8f2654fd81e28bff3d6ca2acb",
+  "corrected_tree": "4cec8dda2b46361493ecd320b2cbd110ca987cb7",
+  "author_evidence": "05ab4cae5a323b78a3d1ffafba20b874213fb6ea",
+  "tested_composition": "dccd15e202827d22ac19bd0d0f12ce60a43f73d8",
+  "tested_tree": "4bee2595803beaf94ef2a9b79a229a612e7b55f8",
+  "approved_composition": "13d7ae7896c1f3c43f8428e624e5731842072261",
+  "approved_tree": "b917b4e0cbe647952d928f41abf837904eca1cb3",
+  "post_test_changes": [
+    "docs/service-projects.md",
+    "docs/verification/service-project-journey-20261007/README.md",
+    "docs/verification/service-project-journey-20261007/denial-frontend-38105a6.txt",
+    "docs/verification/service-project-journey-20261007/denial-typecheck-38105a6.txt",
+    "docs/verification/service-project-journey-20261007/recovery-mysql-initial-red.json",
+    "docs/verification/service-project-journey-20261007/recovery-mysql-selection-38105a6.json",
+    "docs/verification/service-project-journey-20261007/recovery-sqlite-38105a6.json"
+  ],
+  "source": {
+    "app/Domain/Services/Projects/Models/ServiceProject.php": {
+      "git_blob": "eb33653676d77f132943bea4e0e097f01e588fc2",
+      "sha256": "e4ca06bc02739092c400e6c96f16d98a66d1d4562cf1a5822cc5e427c11a8388",
+      "exact_tested_source": true
+    },
+    "app/Domain/Services/Projects/Models/ServiceProjectEvent.php": {
+      "git_blob": "7d14707eef0d703afa00780bb5d74798b01c7eab",
+      "sha256": "467e5bc3121564d3d670c94b54c7db79885712e7ad4af0435912698402136de4",
+      "exact_tested_source": true
+    },
+    "app/Domain/Services/Projects/ServiceProjectException.php": {
+      "git_blob": "2078c7160edbe3967f6162218aa1a32a9b85f47b",
+      "sha256": "d800714ee47c88d580bd27ba850197371b4804a0e4c92c94e22ed1ddb055109e",
+      "exact_tested_source": true
+    },
+    "app/Domain/Services/Projects/ServiceProjectInput.php": {
+      "git_blob": "4e3b1428854ac7185e29e7abdeecdb91f4ffaf88",
+      "sha256": "890c372f8f08b75570948fd7827caeb5f0d7ad52368aafe407d511c78f2b8a3d",
+      "exact_tested_source": true
+    },
+    "app/Domain/Services/Projects/ServiceProjectJson.php": {
+      "git_blob": "cdd77ce54c7d9bee96f467491128b8dde4c34d64",
+      "sha256": "c69871f6a6a6524b81a7c8b7c1567ba822ce8fdf47d1fb0fcfb78bef99a5167c",
+      "exact_tested_source": true
+    },
+    "app/Domain/Services/Projects/ServiceProjectPolicy.php": {
+      "git_blob": "d531e06712de758a66313ae6c6c444e2bcfe34b5",
+      "sha256": "6c63197b8f213277431cbba23cc04b27ee52713a9d31cc279fec61a3e065cea7",
+      "exact_tested_source": true
+    },
+    "app/Domain/Services/Projects/ServiceProjectSchema.php": {
+      "git_blob": "2e1b90e8222fd2ad789acb2deb79d5a98d63a3d0",
+      "sha256": "e11600099cfaffedc9b0b5b96e1081d1a8ad635dc4891d0cd33cbf3679a0bba0",
+      "exact_tested_source": true
+    },
+    "app/Domain/Services/Projects/ServiceProjects.php": {
+      "git_blob": "acd8d83e4bcca448cb129ff17d8b80a09c25040f",
+      "sha256": "6d02427b42626a34fd1eaf482de749401e7c7d5aeff808762ecd89649a6ed661",
+      "exact_tested_source": true
+    },
+    "app/Filament/Resources/ServiceProjectResource.php": {
+      "git_blob": "38c3cf72b135fa2388ebbe1f21e38a7ce3e5c8d0",
+      "sha256": "4b10951723a3f82fc4c25e41ca108acde1536583cfc0be11792ec6e449ae9b8f",
+      "exact_tested_source": true
+    },
+    "app/Filament/Resources/ServiceProjectResource/Pages/ListServiceProjects.php": {
+      "git_blob": "5a75955705790aa4492c00f8bd0b11b99123dcf1",
+      "sha256": "999aad3e70059a9f109e92f1cf80ccc63a5f1c45cc14185933586f2f0cfb0893",
+      "exact_tested_source": true
+    },
+    "app/Filament/Resources/ServiceProjectResource/Pages/ViewServiceProject.php": {
+      "git_blob": "b71a7712409f99b38e312439bb4a12adc45779ce",
+      "sha256": "5fb720a6f100a4f0967abd6921dc39c29a7c6652baebde8a80d370389e1e18de",
+      "exact_tested_source": true
+    },
+    "app/Http/Controllers/ServiceProjectController.php": {
+      "git_blob": "f407d43d3f4b6d7e19181a18574952e0aebeefd2",
+      "sha256": "62fab73ff79a9b7cabe426130540434d46c710b766c485c1561661c701668a31",
+      "exact_tested_source": true
+    },
+    "app/Http/Middleware/ServiceProjectPrivacy.php": {
+      "git_blob": "d43f3bf9d8875297502d44bec7302732c2ebb39a",
+      "sha256": "b9ae76b084d02e0abd5cad305d0d0220e7aeae443373fce4ac03a9bceb9ee009",
+      "exact_tested_source": true
+    },
+    "config/services-projects.php": {
+      "git_blob": "d693db9e2fc33a7f92c03b870cec6768feabd4d6",
+      "sha256": "9a7baad0eb1ca886742814b2002eafa898ee75a0595cba49cc2d3bbd036dc8cd",
+      "exact_tested_source": true
+    },
+    "database/migrations/2026_10_07_244000_service_projects.php": {
+      "git_blob": "af9d99e0d8e6aa69cc29e7e33ab94c6fdfb449ad",
+      "sha256": "eb1a5beb518ae7c50c2f4f852231d6bb0c2b98cf80cb8ae8eb3d0d73b81757f8",
+      "exact_tested_source": true
+    },
+    "resources/css/service-projects.css": {
+      "git_blob": "20ed58dec8f1c0c8a1ff7d3a3e2d6b74df1c6a95",
+      "sha256": "4096911399c61810d8e0285dcf1cb2fde610f8b6fcdfec5766c2d9963946ba8e",
+      "exact_tested_source": true
+    },
+    "resources/js/Pages/ServiceProjects.tsx": {
+      "git_blob": "36cc5168d35f3e6148a3f0ecb5bea75e6f0632b3",
+      "sha256": "736437af70a0c96ec539eff61172f618859acbaff915057757e71b89df9af901",
+      "exact_tested_source": true
+    },
+    "resources/js/components/services/ServiceProjectJourney.tsx": {
+      "git_blob": "2325b7352d72331780497d2a3367f30eaa84c5da",
+      "sha256": "a392452caa64a7649687e1b75cbbee695f75a40fd6225bfa54d8960616032533",
+      "exact_tested_source": true
+    },
+    "routes/services.php": {
+      "git_blob": "56d55ca9cf78c95dfa5ed5ff5a9c7be18fb1ac09",
+      "sha256": "352cb23995c513322dd61cd6990f222e31c5206ff6a821f9855e6512453525e8",
+      "exact_tested_source": true
+    },
+    "tests/Feature/ServiceProjectConcurrencyTest.php": {
+      "git_blob": "b5fef44257424fd4b0f64deefd6613b9f6776abd",
+      "sha256": "4a1fefb59bdc97ff0e35fd83a53175dac071bd82517824793eced190091beaa6",
+      "exact_tested_source": true
+    },
+    "tests/Feature/ServiceProjectHttpAndOperatorTest.php": {
+      "git_blob": "ae46b394a6d543f3acbe8267ed5d2724a5b5f0ed",
+      "sha256": "113f559c756a8302c62efa702adc9cfc0759b87d16303ffd8a737540f1b9cdfb",
+      "exact_tested_source": true
+    },
+    "tests/Feature/ServiceProjectJourneyTest.php": {
+      "git_blob": "7208494f2b5514a3220b59024ff16324da25a41c",
+      "sha256": "4aea7ac96fb8c4c9ab52917d95125a62bfffe238ad7832a23a0b1048562b2406",
+      "exact_tested_source": true
+    },
+    "tests/Feature/ServiceProjectSchemaTest.php": {
+      "git_blob": "f0646e18cce54a4745883ea175dd070148380b56",
+      "sha256": "1980a16330f3d49872f8f0b2b4c26e1ea5a6cfc423e51a0a21212ace036b023e",
+      "exact_tested_source": true
+    },
+    "tests/Support/ServiceProjectFixtures.php": {
+      "git_blob": "b8d8e4a96e74104af9e9b6596934640c6e97ff33",
+      "sha256": "86b5ed7ab50a90a2c3b1c543f70167f6697cbaed810311ffdbe093c333da777f",
+      "exact_tested_source": true
+    },
+    "tests/Support/service-project-worker.php": {
+      "git_blob": "77e7817e619683d1395547a7dbe99f9ae349fe7d",
+      "sha256": "e9ee562508a485d227a3779f81c7acb838daec63e5efb1100e7eefbc0357195d",
+      "exact_tested_source": true
+    },
+    "tests/Unit/ServiceProjectInputTest.php": {
+      "git_blob": "bc6bf981bb2bd12b328f6eb9577a494152512c5f",
+      "sha256": "83de324407cd7f4dd5f05bee0e6f35dd39b415d12f68c50cc7728a66e775812a",
+      "exact_tested_source": true
+    },
+    "tests/Unit/ServiceProjectJsonTest.php": {
+      "git_blob": "7e793f16f88e5ed88b2c878b733455de06e1f064",
+      "sha256": "42ed03954f579e3588da251b1bdccadf020e84d8de7bf700cff7e9a5fff34896",
+      "exact_tested_source": true
+    },
+    "tests/frontend/service-project-journey.test.tsx": {
+      "git_blob": "2056e805bacf46951e055a01eb29c5a8c6f1bc66",
+      "sha256": "8e7d754b99edfffa4ab39f0dda33cc6f4850d2a14479c00e04b95d8289a746bc",
+      "exact_tested_source": true
+    },
+    "bootstrap/app.php": {
+      "git_blob": "1559d683773aa5e8848641d67a22d5ea96173ae2",
+      "sha256": "e876c455c4ca2cf5133aed8451a84cc8852de4893405d2d53367467704a4edf7",
+      "exact_tested_source": true
+    },
+    "routes/web.php": {
+      "git_blob": "2c79998fc79ed728428eb97b6b083d1f184d8753",
+      "sha256": "45e63382e8bb2c83abcf019e7390ad68419eb765ad3804d2b7de1adce26f1852",
+      "exact_tested_source": true
+    },
+    "app/Http/Controllers/PublicDiscoveryController.php": {
+      "git_blob": "2e9f58e3c2918d088f4e914b9c876a851467f78f",
+      "sha256": "2ec78728ab767c5cc3c45c64d2ab84a02106f1d36a880af7af016596dde96e6d",
+      "exact_tested_source": true
+    },
+    "resources/js/components/SiteChrome.tsx": {
+      "git_blob": "c4c692a2f87738bb0c59737b99432d9aa8805173",
+      "sha256": "d299b12b5ee5a638bac57130ca105b0e6a7dd1042ea88bb68d21ace1388d4e56",
+      "exact_tested_source": true
+    },
+    "composer.lock": {
+      "git_blob": "9e58027dcd989282b026d56347e26ea867723db9",
+      "sha256": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9",
+      "exact_tested_source": true
+    },
+    "package-lock.json": {
+      "git_blob": "614350366e7af397c14603dae9272082ecfae066",
+      "sha256": "6407d3a63e3b6e04f5824f53c41b8dc8a33581f987b21d780c795480122f93ea",
+      "exact_tested_source": true
+    },
+    "tests/Feature/ServiceProjectRecoveryTest.php": {
+      "git_blob": "ea50531dd32dd7a0a846a4eb89e6751a4cd6fa9a",
+      "sha256": "999e32b6dc87aae041dfd61904b7a5ef235c9fbec5025856cdb2a1f4a05f7e61",
+      "exact_tested_source": true
+    }
+  },
+  "earlier_authority_source_carry": {
+    "app/Domain/Services/Projects/Models/ServiceProject.php": {
+      "before_blob": "eb33653676d77f132943bea4e0e097f01e588fc2",
+      "after_blob": "eb33653676d77f132943bea4e0e097f01e588fc2",
+      "unchanged": true
+    },
+    "app/Domain/Services/Projects/Models/ServiceProjectEvent.php": {
+      "before_blob": "7d14707eef0d703afa00780bb5d74798b01c7eab",
+      "after_blob": "7d14707eef0d703afa00780bb5d74798b01c7eab",
+      "unchanged": true
+    },
+    "app/Domain/Services/Projects/ServiceProjectException.php": {
+      "before_blob": "2078c7160edbe3967f6162218aa1a32a9b85f47b",
+      "after_blob": "2078c7160edbe3967f6162218aa1a32a9b85f47b",
+      "unchanged": true
+    },
+    "app/Domain/Services/Projects/ServiceProjectInput.php": {
+      "before_blob": "4e3b1428854ac7185e29e7abdeecdb91f4ffaf88",
+      "after_blob": "4e3b1428854ac7185e29e7abdeecdb91f4ffaf88",
+      "unchanged": true
+    },
+    "app/Domain/Services/Projects/ServiceProjectJson.php": {
+      "before_blob": "cdd77ce54c7d9bee96f467491128b8dde4c34d64",
+      "after_blob": "cdd77ce54c7d9bee96f467491128b8dde4c34d64",
+      "unchanged": true
+    },
+    "app/Domain/Services/Projects/ServiceProjectPolicy.php": {
+      "before_blob": "d531e06712de758a66313ae6c6c444e2bcfe34b5",
+      "after_blob": "d531e06712de758a66313ae6c6c444e2bcfe34b5",
+      "unchanged": true
+    },
+    "app/Domain/Services/Projects/ServiceProjectSchema.php": {
+      "before_blob": "11f54da88a9aad77eb92f03e2cd91bdd2f1df6db",
+      "after_blob": "2e1b90e8222fd2ad789acb2deb79d5a98d63a3d0",
+      "unchanged": false
+    },
+    "app/Domain/Services/Projects/ServiceProjects.php": {
+      "before_blob": "acd8d83e4bcca448cb129ff17d8b80a09c25040f",
+      "after_blob": "acd8d83e4bcca448cb129ff17d8b80a09c25040f",
+      "unchanged": true
+    },
+    "app/Filament/Resources/ServiceProjectResource.php": {
+      "before_blob": "38c3cf72b135fa2388ebbe1f21e38a7ce3e5c8d0",
+      "after_blob": "38c3cf72b135fa2388ebbe1f21e38a7ce3e5c8d0",
+      "unchanged": true
+    },
+    "app/Filament/Resources/ServiceProjectResource/Pages/ListServiceProjects.php": {
+      "before_blob": "5a75955705790aa4492c00f8bd0b11b99123dcf1",
+      "after_blob": "5a75955705790aa4492c00f8bd0b11b99123dcf1",
+      "unchanged": true
+    },
+    "app/Filament/Resources/ServiceProjectResource/Pages/ViewServiceProject.php": {
+      "before_blob": "b71a7712409f99b38e312439bb4a12adc45779ce",
+      "after_blob": "b71a7712409f99b38e312439bb4a12adc45779ce",
+      "unchanged": true
+    },
+    "app/Http/Controllers/ServiceProjectController.php": {
+      "before_blob": "f407d43d3f4b6d7e19181a18574952e0aebeefd2",
+      "after_blob": "f407d43d3f4b6d7e19181a18574952e0aebeefd2",
+      "unchanged": true
+    },
+    "app/Http/Middleware/ServiceProjectPrivacy.php": {
+      "before_blob": "d43f3bf9d8875297502d44bec7302732c2ebb39a",
+      "after_blob": "d43f3bf9d8875297502d44bec7302732c2ebb39a",
+      "unchanged": true
+    },
+    "config/services-projects.php": {
+      "before_blob": "d693db9e2fc33a7f92c03b870cec6768feabd4d6",
+      "after_blob": "d693db9e2fc33a7f92c03b870cec6768feabd4d6",
+      "unchanged": true
+    },
+    "database/migrations/2026_10_07_244000_service_projects.php": {
+      "before_blob": "af9d99e0d8e6aa69cc29e7e33ab94c6fdfb449ad",
+      "after_blob": "af9d99e0d8e6aa69cc29e7e33ab94c6fdfb449ad",
+      "unchanged": true
+    },
+    "resources/css/service-projects.css": {
+      "before_blob": "20ed58dec8f1c0c8a1ff7d3a3e2d6b74df1c6a95",
+      "after_blob": "20ed58dec8f1c0c8a1ff7d3a3e2d6b74df1c6a95",
+      "unchanged": true
+    },
+    "resources/js/Pages/ServiceProjects.tsx": {
+      "before_blob": "36cc5168d35f3e6148a3f0ecb5bea75e6f0632b3",
+      "after_blob": "36cc5168d35f3e6148a3f0ecb5bea75e6f0632b3",
+      "unchanged": true
+    },
+    "resources/js/components/services/ServiceProjectJourney.tsx": {
+      "before_blob": "0a49e5c0ff7f02ad77a043e1c19d41b85724f5b5",
+      "after_blob": "2325b7352d72331780497d2a3367f30eaa84c5da",
+      "unchanged": false
+    },
+    "routes/services.php": {
+      "before_blob": "56d55ca9cf78c95dfa5ed5ff5a9c7be18fb1ac09",
+      "after_blob": "56d55ca9cf78c95dfa5ed5ff5a9c7be18fb1ac09",
+      "unchanged": true
+    },
+    "tests/Feature/ServiceProjectConcurrencyTest.php": {
+      "before_blob": "b5fef44257424fd4b0f64deefd6613b9f6776abd",
+      "after_blob": "b5fef44257424fd4b0f64deefd6613b9f6776abd",
+      "unchanged": true
+    },
+    "tests/Feature/ServiceProjectHttpAndOperatorTest.php": {
+      "before_blob": "ae46b394a6d543f3acbe8267ed5d2724a5b5f0ed",
+      "after_blob": "ae46b394a6d543f3acbe8267ed5d2724a5b5f0ed",
+      "unchanged": true
+    },
+    "tests/Feature/ServiceProjectJourneyTest.php": {
+      "before_blob": "7208494f2b5514a3220b59024ff16324da25a41c",
+      "after_blob": "7208494f2b5514a3220b59024ff16324da25a41c",
+      "unchanged": true
+    },
+    "tests/Feature/ServiceProjectSchemaTest.php": {
+      "before_blob": "e5e79c8a235305041bad4112b4befac56b9447c7",
+      "after_blob": "f0646e18cce54a4745883ea175dd070148380b56",
+      "unchanged": false
+    },
+    "tests/Support/ServiceProjectFixtures.php": {
+      "before_blob": "b8d8e4a96e74104af9e9b6596934640c6e97ff33",
+      "after_blob": "b8d8e4a96e74104af9e9b6596934640c6e97ff33",
+      "unchanged": true
+    },
+    "tests/Support/service-project-worker.php": {
+      "before_blob": "77e7817e619683d1395547a7dbe99f9ae349fe7d",
+      "after_blob": "77e7817e619683d1395547a7dbe99f9ae349fe7d",
+      "unchanged": true
+    },
+    "tests/Unit/ServiceProjectInputTest.php": {
+      "before_blob": "bc6bf981bb2bd12b328f6eb9577a494152512c5f",
+      "after_blob": "bc6bf981bb2bd12b328f6eb9577a494152512c5f",
+      "unchanged": true
+    },
+    "tests/Unit/ServiceProjectJsonTest.php": {
+      "before_blob": "7e793f16f88e5ed88b2c878b733455de06e1f064",
+      "after_blob": "7e793f16f88e5ed88b2c878b733455de06e1f064",
+      "unchanged": true
+    },
+    "tests/frontend/service-project-journey.test.tsx": {
+      "before_blob": "7426a095f55a0f8ab199c421204efda349e17f3c",
+      "after_blob": "2056e805bacf46951e055a01eb29c5a8c6f1bc66",
+      "unchanged": false
+    },
+    "bootstrap/app.php": {
+      "before_blob": "1559d683773aa5e8848641d67a22d5ea96173ae2",
+      "after_blob": "1559d683773aa5e8848641d67a22d5ea96173ae2",
+      "unchanged": true
+    },
+    "routes/web.php": {
+      "before_blob": "2c79998fc79ed728428eb97b6b083d1f184d8753",
+      "after_blob": "2c79998fc79ed728428eb97b6b083d1f184d8753",
+      "unchanged": true
+    },
+    "app/Http/Controllers/PublicDiscoveryController.php": {
+      "before_blob": "2e9f58e3c2918d088f4e914b9c876a851467f78f",
+      "after_blob": "2e9f58e3c2918d088f4e914b9c876a851467f78f",
+      "unchanged": true
+    },
+    "resources/js/components/SiteChrome.tsx": {
+      "before_blob": "c4c692a2f87738bb0c59737b99432d9aa8805173",
+      "after_blob": "c4c692a2f87738bb0c59737b99432d9aa8805173",
+      "unchanged": true
+    },
+    "composer.lock": {
+      "before_blob": "9e58027dcd989282b026d56347e26ea867723db9",
+      "after_blob": "9e58027dcd989282b026d56347e26ea867723db9",
+      "unchanged": true
+    },
+    "package-lock.json": {
+      "before_blob": "614350366e7af397c14603dae9272082ecfae066",
+      "after_blob": "614350366e7af397c14603dae9272082ecfae066",
+      "unchanged": true
+    }
+  },
+  "new_recovery_test": "tests/Feature/ServiceProjectRecoveryTest.php",
+  "author_source_paths_exact_composition": [
+    "app/Domain/Services/Projects/Models/ServiceProject.php",
+    "app/Domain/Services/Projects/Models/ServiceProjectEvent.php",
+    "app/Domain/Services/Projects/ServiceProjectException.php",
+    "app/Domain/Services/Projects/ServiceProjectInput.php",
+    "app/Domain/Services/Projects/ServiceProjectJson.php",
+    "app/Domain/Services/Projects/ServiceProjectPolicy.php",
+    "app/Domain/Services/Projects/ServiceProjectSchema.php",
+    "app/Domain/Services/Projects/ServiceProjects.php",
+    "app/Filament/Resources/ServiceProjectResource.php",
+    "app/Filament/Resources/ServiceProjectResource/Pages/ListServiceProjects.php",
+    "app/Filament/Resources/ServiceProjectResource/Pages/ViewServiceProject.php",
+    "app/Http/Controllers/ServiceProjectController.php",
+    "app/Http/Middleware/ServiceProjectPrivacy.php",
+    "config/services-projects.php",
+    "database/migrations/2026_10_07_244000_service_projects.php",
+    "resources/css/service-projects.css",
+    "resources/js/Pages/ServiceProjects.tsx",
+    "resources/js/components/services/ServiceProjectJourney.tsx",
+    "routes/services.php",
+    "tests/Feature/ServiceProjectConcurrencyTest.php",
+    "tests/Feature/ServiceProjectHttpAndOperatorTest.php",
+    "tests/Feature/ServiceProjectJourneyTest.php",
+    "tests/Feature/ServiceProjectSchemaTest.php",
+    "tests/Support/ServiceProjectFixtures.php",
+    "tests/Support/service-project-worker.php",
+    "tests/Unit/ServiceProjectInputTest.php",
+    "tests/Unit/ServiceProjectJsonTest.php",
+    "tests/frontend/service-project-journey.test.tsx",
+    "composer.lock",
+    "package-lock.json",
+    "tests/Feature/ServiceProjectRecoveryTest.php"
+  ],
+  "independent_junit": {
+    "recovery-sqlite-red.xml": {
+      "tests": 1,
+      "assertions": 7,
+      "failures": 1,
+      "errors": 0,
+      "skips": 0,
+      "cases": [
+        {
+          "class": "Tests\\Feature\\ServiceProjectRecoveryCanaryTest",
+          "name": "test_exact_owned_partial_install_can_retry_without_erasing_prior_definitions_or_bookkeeping",
+          "assertions": 7
+        }
+      ]
+    },
+    "recovery-mysql-red.xml": {
+      "tests": 1,
+      "assertions": 7,
+      "failures": 1,
+      "errors": 0,
+      "skips": 0,
+      "cases": [
+        {
+          "class": "Tests\\Feature\\ServiceProjectRecoveryCanaryTest",
+          "name": "test_exact_owned_partial_install_can_retry_without_erasing_prior_definitions_or_bookkeeping",
+          "assertions": 7
+        }
+      ]
+    },
+    "dependency-sqlite-red.xml": {
+      "tests": 1,
+      "assertions": 2,
+      "failures": 1,
+      "errors": 0,
+      "skips": 0,
+      "cases": [
+        {
+          "class": "Tests\\Feature\\ServiceProjectDependencyCanaryTest",
+          "name": "test_nonunique_dependency_id_is_refused_before_service_ddl",
+          "assertions": 2
+        }
+      ]
+    },
+    "dependency-sqlite-confirmed-red.xml": {
+      "tests": 1,
+      "assertions": 2,
+      "failures": 1,
+      "errors": 0,
+      "skips": 0,
+      "cases": [
+        {
+          "class": "Tests\\Feature\\ServiceProjectDependencyCanaryTest",
+          "name": "test_nonunique_dependency_id_is_refused_before_service_ddl",
+          "assertions": 2
+        }
+      ]
+    },
+    "authority-mysql.xml": {
+      "tests": 2,
+      "assertions": 21,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "cases": [
+        {
+          "class": "Tests\\Feature\\ServiceProjectAuthorityCanaryTest",
+          "name": "test_audit_callback_mfa_withdrawal_aborts_quote_and_preserves_all_retained_rows",
+          "assertions": 2
+        },
+        {
+          "class": "Tests\\Feature\\ServiceProjectRegistrationCanaryTest",
+          "name": "test_actual_route_registry_and_unknown_private_descendant_are_bounded_and_private",
+          "assertions": 19
+        }
+      ]
+    },
+    "successor-sqlite.xml": {
+      "tests": 2,
+      "assertions": 19,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "cases": [
+        {
+          "class": "Tests\\Feature\\ServiceProjectRecoveryCanaryTest",
+          "name": "test_exact_owned_partial_install_can_retry_without_erasing_prior_definitions_or_bookkeeping",
+          "assertions": 15
+        },
+        {
+          "class": "Tests\\Feature\\ServiceProjectDependencyCanaryTest",
+          "name": "test_nonunique_dependency_id_is_refused_before_service_ddl",
+          "assertions": 4
+        }
+      ]
+    },
+    "successor-mysql.xml": {
+      "tests": 1,
+      "assertions": 10,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "cases": [
+        {
+          "class": "Tests\\Feature\\ServiceProjectRecoveryCanaryTest",
+          "name": "test_exact_owned_partial_install_can_retry_without_erasing_prior_definitions_or_bookkeeping",
+          "assertions": 10
+        }
+      ]
+    },
+    "csrf-sqlite.xml": {
+      "tests": 1,
+      "assertions": 6,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "cases": [
+        {
+          "class": "Tests\\Feature\\ServiceProjectRegistrationCanaryTest",
+          "name": "test_actual_web_csrf_refuses_a_tokenless_post_with_a_private_response",
+          "assertions": 6
+        }
+      ]
+    },
+    "joined-mysql.xml": {
+      "tests": 1,
+      "assertions": 10,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "source": "05611124d014a56ed2b43e718b58402fa3e7c08f",
+      "reason": "Two new predecessor migrations change the global catalog scanned by service preflight; one focused native bootstrap/recovery canary validates the final joined graph."
+    }
+  },
+  "independent_frontend": {
+    "red": "frontend-denial-red.txt",
+    "red_tests": 1,
+    "red_failures": 1,
+    "successor": "frontend-successor.txt",
+    "tests": 1,
+    "failures": 0,
+    "tested_source": "dccd15e202827d22ac19bd0d0f12ce60a43f73d8"
+  },
+  "author_evidence_digests": {
+    "README.md": "5b90d0871f7f935c95accc4f93fb5b89f797439eea648a6daab4440459e0791e",
+    "denial-frontend-38105a6.txt": "7d4446738d785a78397b6ae40678a2d776d5ba77d57e0ca23418ff2531e4ebae",
+    "denial-typecheck-38105a6.txt": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f",
+    "frontend-final.txt": "ae72f6cb3ba52abe972457753e2c2192ccfe418eec1ca8f8f491f8c1088433e7",
+    "native-initial.json": "c0c0ced0a4c277aada1f6aa548f3d44daf09a9d637893674aceed237aef35143",
+    "native-schema-final.json": "bd9033b1a3ba0d0c18882f0f011a6711d08db4131e04a2d18283ec38fd1a483a",
+    "recovery-mysql-initial-red.json": "af1dac1aec0b1ed2dd849b39caaf4255abe40cb6c825d66f45066fb6b0ceef2e",
+    "recovery-mysql-selection-38105a6.json": "34ca608d797052ff372641c9fe3b0f9a202964a3f04b2eaa6dbf8f8f140a520c",
+    "recovery-sqlite-38105a6.json": "eb602153ada438d36633da6091be29596f13aed7158152bd367e88482f1b828b",
+    "sqlite-final.json": "1e280b1a607376648096af6f43899b1472d585c18040bf63afc1e95c080d8854"
+  },
+  "author_console_receipts": {
+    "native-initial.json": {
+      "tool": "phpunit",
+      "result": "failed",
+      "tests": 36,
+      "passed": 35,
+      "assertions": 214,
+      "duration_ms": 198953,
+      "failed": 1,
+      "failures": [
+        {
+          "test": "Tests\\Feature\\ServiceProjectSchemaTest::test_failed_ddl_retains_prior_service_rows_and_never_logs_or_adopts_partial_native_schema",
+          "file": "/workspace/VA-Studio-service-projects/tests/Feature/ServiceProjectSchemaTest.php",
+          "line": 100,
+          "message": "Failed asserting that two arrays are identical.\n--- Expected\n+++ Actual\n@@ @@\n Array &0 [\n-    0 => stdClass Object #9691 (\n+    0 => stdClass Object #10111 (\n         'TRIGGER_NAME' => 'service_projects_immutable',\n     ),\n ]"
+        }
+      ]
+    },
+    "native-schema-final.json": {
+      "tool": "phpunit",
+      "result": "passed",
+      "tests": 3,
+      "passed": 3,
+      "assertions": 19,
+      "duration_ms": 36630
+    },
+    "recovery-mysql-initial-red.json": {
+      "tool": "phpunit",
+      "result": "failed",
+      "tests": 8,
+      "passed": 7,
+      "assertions": 139,
+      "duration_ms": 189082,
+      "errors": 1,
+      "error_details": [
+        {
+          "test": "Tests\\Feature\\ServiceProjectRecoveryTest::test_dependency_shadow_and_external_reference_are_refused_without_schema_or_log_changes",
+          "file": "/workspace/VA-Studio-service-projects/tests/Feature/ServiceProjectRecoveryTest.php",
+          "line": 187,
+          "message": "SQLSTATE[42000]: Syntax error or access violation: 1066 Not unique table/alias: 'users' (Connection: mysql, Host: 127.0.0.1, Port: 33067, Database: vaseyaudio_service_projects, SQL: CREATE TEMPORARY TABLE users LIKE users)",
+          "trace": [
+            "/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857",
+            "/workspace/VA-Studio-service-projects/tests/Feature/ServiceProjectRecoveryTest.php:187"
+          ]
+        }
+      ]
+    },
+    "recovery-mysql-selection-38105a6.json": {
+      "tool": "phpunit",
+      "result": "passed",
+      "tests": 10,
+      "passed": 10,
+      "assertions": 156,
+      "duration_ms": 208400
+    },
+    "recovery-sqlite-38105a6.json": {
+      "tool": "phpunit",
+      "result": "passed",
+      "tests": 10,
+      "passed": 10,
+      "assertions": 122,
+      "duration_ms": 3885
+    },
+    "sqlite-final.json": {
+      "tool": "phpunit",
+      "result": "passed",
+      "tests": 35,
+      "passed": 35,
+      "assertions": 144,
+      "duration_ms": 4661
+    }
+  },
+  "native_author_selection_engine_split": {
+    "total_tests": 10,
+    "total_assertions": 156,
+    "mysql_tests": 9,
+    "standalone_sqlite_tests": 1,
+    "explicit_sqlite_case": "test_sqlite_dependency_id_must_be_the_entire_primary_key_before_any_owned_ddl"
+  },
+  "native_profile": "native-profile.json",
+  "dependency_identity": {
+    "locked_packages": 158,
+    "mismatches": [],
+    "own_autoload": "/workspace/VA-Studio-service-independent/vendor/autoload.php",
+    "read_only_package_symlinks": "/workspace/VA-Studio/vendor",
+    "node_modules": "/workspace/VA-Studio/node_modules"
+  },
+  "historical_source_and_commands": "initial-source-and-commands.json",
+  "untested": [
+    "current-source targetMySQL8.4",
+    "complete Foundation/browser/device acceptance",
+    "live concurrent schema writers/migrators",
+    "real historical service installation/data",
+    "production briefs/attachments/deposits/providers/entitlements/delivery",
+    "later listening notes/export/clear increment is a separate pending review"
+  ],
+  "effects": "isolated reviewer schema only; no product/source/shared docs changes by reviewer; no push/merge/hostedCI/provider activity",
+  "commands": {
+    "successor_phpunit_common_argv": [
+      "php",
+      "-r",
+      "$GLOBALS[\"_composer_autoload_path\"] = getcwd().\"/vendor/autoload.php\"; require \"vendor/phpunit/phpunit/phpunit\";",
+      "--"
+    ],
+    "successor_sqlite_suffix": [
+      "-c",
+      "docs/verification/cloud-service-independent-20261007/successor-sqlite-selection.xml",
+      "--log-junit",
+      "docs/verification/cloud-service-independent-20261007/successor-sqlite.xml"
+    ],
+    "successor_mysql_suffix": [
+      "-c",
+      "docs/verification/cloud-service-independent-20261007/recovery-mysql-selection.xml",
+      "--log-junit",
+      "docs/verification/cloud-service-independent-20261007/successor-mysql.xml"
+    ],
+    "csrf_suffix": [
+      "-c",
+      "docs/verification/cloud-service-independent-20261007/csrf-sqlite-selection.xml",
+      "--filter",
+      "test_actual_web_csrf",
+      "--log-junit",
+      "docs/verification/cloud-service-independent-20261007/csrf-sqlite.xml"
+    ],
+    "frontend": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "--maxWorkers=1",
+      "--config",
+      "docs/verification/cloud-service-independent-20261007/frontend-selection.config.ts"
+    ],
+    "environment": "Rootless PHP activation; native private service_review-task.env and network permission; synthetic APP_KEY; successor SERVICE_REVIEW_PHASE=successor and exact tested-composition SOURCE_SHA."
+  },
+  "approved_service_base_composition": "08a1fd911665671322817b494c88be26fe93609e",
+  "approved_service_base_tree": "b7dfcd0e36ffe899779f3fb9473c6d43b581bbc8",
+  "final_joined_native_test_source": "05611124d014a56ed2b43e718b58402fa3e7c08f",
+  "final_joined_native_test_tree": "49f45b6f36f64fd83d52352576c146031665170c",
+  "joined_main": "85ebb0c36eb13def6c3f272a3905185d88fde1a3",
+  "format_only_successor": {
+    "paths": [
+      "bootstrap/app.php",
+      "routes/web.php"
+    ],
+    "review": "One use-order move; imported the same TestExceptionResolutionController class instead of its fully qualified spelling. No service route/privacy/authority/DDL behavior changes.",
+    "hunks": "final-format-only.diff"
+  },
+  "current_source": {
+    "app/Domain/Services/Projects/Models/ServiceProject.php": {
+      "git_blob": "eb33653676d77f132943bea4e0e097f01e588fc2",
+      "sha256": "e4ca06bc02739092c400e6c96f16d98a66d1d4562cf1a5822cc5e427c11a8388"
+    },
+    "app/Domain/Services/Projects/Models/ServiceProjectEvent.php": {
+      "git_blob": "7d14707eef0d703afa00780bb5d74798b01c7eab",
+      "sha256": "467e5bc3121564d3d670c94b54c7db79885712e7ad4af0435912698402136de4"
+    },
+    "app/Domain/Services/Projects/ServiceProjectException.php": {
+      "git_blob": "2078c7160edbe3967f6162218aa1a32a9b85f47b",
+      "sha256": "d800714ee47c88d580bd27ba850197371b4804a0e4c92c94e22ed1ddb055109e"
+    },
+    "app/Domain/Services/Projects/ServiceProjectInput.php": {
+      "git_blob": "4e3b1428854ac7185e29e7abdeecdb91f4ffaf88",
+      "sha256": "890c372f8f08b75570948fd7827caeb5f0d7ad52368aafe407d511c78f2b8a3d"
+    },
+    "app/Domain/Services/Projects/ServiceProjectJson.php": {
+      "git_blob": "cdd77ce54c7d9bee96f467491128b8dde4c34d64",
+      "sha256": "c69871f6a6a6524b81a7c8b7c1567ba822ce8fdf47d1fb0fcfb78bef99a5167c"
+    },
+    "app/Domain/Services/Projects/ServiceProjectPolicy.php": {
+      "git_blob": "d531e06712de758a66313ae6c6c444e2bcfe34b5",
+      "sha256": "6c63197b8f213277431cbba23cc04b27ee52713a9d31cc279fec61a3e065cea7"
+    },
+    "app/Domain/Services/Projects/ServiceProjectSchema.php": {
+      "git_blob": "2e1b90e8222fd2ad789acb2deb79d5a98d63a3d0",
+      "sha256": "e11600099cfaffedc9b0b5b96e1081d1a8ad635dc4891d0cd33cbf3679a0bba0"
+    },
+    "app/Domain/Services/Projects/ServiceProjects.php": {
+      "git_blob": "acd8d83e4bcca448cb129ff17d8b80a09c25040f",
+      "sha256": "6d02427b42626a34fd1eaf482de749401e7c7d5aeff808762ecd89649a6ed661"
+    },
+    "app/Filament/Resources/ServiceProjectResource.php": {
+      "git_blob": "38c3cf72b135fa2388ebbe1f21e38a7ce3e5c8d0",
+      "sha256": "4b10951723a3f82fc4c25e41ca108acde1536583cfc0be11792ec6e449ae9b8f"
+    },
+    "app/Filament/Resources/ServiceProjectResource/Pages/ListServiceProjects.php": {
+      "git_blob": "5a75955705790aa4492c00f8bd0b11b99123dcf1",
+      "sha256": "999aad3e70059a9f109e92f1cf80ccc63a5f1c45cc14185933586f2f0cfb0893"
+    },
+    "app/Filament/Resources/ServiceProjectResource/Pages/ViewServiceProject.php": {
+      "git_blob": "b71a7712409f99b38e312439bb4a12adc45779ce",
+      "sha256": "5fb720a6f100a4f0967abd6921dc39c29a7c6652baebde8a80d370389e1e18de"
+    },
+    "app/Http/Controllers/ServiceProjectController.php": {
+      "git_blob": "f407d43d3f4b6d7e19181a18574952e0aebeefd2",
+      "sha256": "62fab73ff79a9b7cabe426130540434d46c710b766c485c1561661c701668a31"
+    },
+    "app/Http/Middleware/ServiceProjectPrivacy.php": {
+      "git_blob": "d43f3bf9d8875297502d44bec7302732c2ebb39a",
+      "sha256": "b9ae76b084d02e0abd5cad305d0d0220e7aeae443373fce4ac03a9bceb9ee009"
+    },
+    "config/services-projects.php": {
+      "git_blob": "d693db9e2fc33a7f92c03b870cec6768feabd4d6",
+      "sha256": "9a7baad0eb1ca886742814b2002eafa898ee75a0595cba49cc2d3bbd036dc8cd"
+    },
+    "database/migrations/2026_10_07_244000_service_projects.php": {
+      "git_blob": "af9d99e0d8e6aa69cc29e7e33ab94c6fdfb449ad",
+      "sha256": "eb1a5beb518ae7c50c2f4f852231d6bb0c2b98cf80cb8ae8eb3d0d73b81757f8"
+    },
+    "resources/css/service-projects.css": {
+      "git_blob": "20ed58dec8f1c0c8a1ff7d3a3e2d6b74df1c6a95",
+      "sha256": "4096911399c61810d8e0285dcf1cb2fde610f8b6fcdfec5766c2d9963946ba8e"
+    },
+    "resources/js/Pages/ServiceProjects.tsx": {
+      "git_blob": "36cc5168d35f3e6148a3f0ecb5bea75e6f0632b3",
+      "sha256": "736437af70a0c96ec539eff61172f618859acbaff915057757e71b89df9af901"
+    },
+    "resources/js/components/services/ServiceProjectJourney.tsx": {
+      "git_blob": "2325b7352d72331780497d2a3367f30eaa84c5da",
+      "sha256": "a392452caa64a7649687e1b75cbbee695f75a40fd6225bfa54d8960616032533"
+    },
+    "routes/services.php": {
+      "git_blob": "56d55ca9cf78c95dfa5ed5ff5a9c7be18fb1ac09",
+      "sha256": "352cb23995c513322dd61cd6990f222e31c5206ff6a821f9855e6512453525e8"
+    },
+    "tests/Feature/ServiceProjectConcurrencyTest.php": {
+      "git_blob": "b5fef44257424fd4b0f64deefd6613b9f6776abd",
+      "sha256": "4a1fefb59bdc97ff0e35fd83a53175dac071bd82517824793eced190091beaa6"
+    },
+    "tests/Feature/ServiceProjectHttpAndOperatorTest.php": {
+      "git_blob": "ae46b394a6d543f3acbe8267ed5d2724a5b5f0ed",
+      "sha256": "113f559c756a8302c62efa702adc9cfc0759b87d16303ffd8a737540f1b9cdfb"
+    },
+    "tests/Feature/ServiceProjectJourneyTest.php": {
+      "git_blob": "7208494f2b5514a3220b59024ff16324da25a41c",
+      "sha256": "4aea7ac96fb8c4c9ab52917d95125a62bfffe238ad7832a23a0b1048562b2406"
+    },
+    "tests/Feature/ServiceProjectSchemaTest.php": {
+      "git_blob": "f0646e18cce54a4745883ea175dd070148380b56",
+      "sha256": "1980a16330f3d49872f8f0b2b4c26e1ea5a6cfc423e51a0a21212ace036b023e"
+    },
+    "tests/Support/ServiceProjectFixtures.php": {
+      "git_blob": "b8d8e4a96e74104af9e9b6596934640c6e97ff33",
+      "sha256": "86b5ed7ab50a90a2c3b1c543f70167f6697cbaed810311ffdbe093c333da777f"
+    },
+    "tests/Support/service-project-worker.php": {
+      "git_blob": "77e7817e619683d1395547a7dbe99f9ae349fe7d",
+      "sha256": "e9ee562508a485d227a3779f81c7acb838daec63e5efb1100e7eefbc0357195d"
+    },
+    "tests/Unit/ServiceProjectInputTest.php": {
+      "git_blob": "bc6bf981bb2bd12b328f6eb9577a494152512c5f",
+      "sha256": "83de324407cd7f4dd5f05bee0e6f35dd39b415d12f68c50cc7728a66e775812a"
+    },
+    "tests/Unit/ServiceProjectJsonTest.php": {
+      "git_blob": "7e793f16f88e5ed88b2c878b733455de06e1f064",
+      "sha256": "42ed03954f579e3588da251b1bdccadf020e84d8de7bf700cff7e9a5fff34896"
+    },
+    "tests/frontend/service-project-journey.test.tsx": {
+      "git_blob": "2056e805bacf46951e055a01eb29c5a8c6f1bc66",
+      "sha256": "8e7d754b99edfffa4ab39f0dda33cc6f4850d2a14479c00e04b95d8289a746bc"
+    },
+    "bootstrap/app.php": {
+      "git_blob": "ad1074da34581130a90c7ca61b528c29c6c5b42a",
+      "sha256": "e9fcaa1432324ca8cc7e3edab0c5ae978a75ba1aed5683f1a3230196c2fd4ce5"
+    },
+    "routes/web.php": {
+      "git_blob": "da743b2f62b7a96047922277b2ab4af2e8335e57",
+      "sha256": "054b9d528ef0f454c65393f3d0e325bd78123aa7450ee570b25bdd4ea1ba0676"
+    },
+    "app/Http/Controllers/PublicDiscoveryController.php": {
+      "git_blob": "2e9f58e3c2918d088f4e914b9c876a851467f78f",
+      "sha256": "2ec78728ab767c5cc3c45c64d2ab84a02106f1d36a880af7af016596dde96e6d"
+    },
+    "resources/js/components/SiteChrome.tsx": {
+      "git_blob": "c4c692a2f87738bb0c59737b99432d9aa8805173",
+      "sha256": "d299b12b5ee5a638bac57130ca105b0e6a7dd1042ea88bb68d21ace1388d4e56"
+    },
+    "composer.lock": {
+      "git_blob": "9e58027dcd989282b026d56347e26ea867723db9",
+      "sha256": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9"
+    },
+    "package-lock.json": {
+      "git_blob": "614350366e7af397c14603dae9272082ecfae066",
+      "sha256": "6407d3a63e3b6e04f5824f53c41b8dc8a33581f987b21d780c795480122f93ea"
+    },
+    "tests/Feature/ServiceProjectRecoveryTest.php": {
+      "git_blob": "ea50531dd32dd7a0a846a4eb89e6751a4cd6fa9a",
+      "sha256": "999e32b6dc87aae041dfd61904b7a5ef235c9fbec5025856cdb2a1f4a05f7e61"
+    },
+    "app/Http/Controllers/CustomerSessionController.php": {
+      "git_blob": "6b82e0e070815eb8d36f4f44a4d0fe3ca2ed5def",
+      "sha256": "9063fc5e3a44e43606d2c907a9fcfd39566ec1ae5c6a1bf3bb45fce899985dfc"
+    },
+    "app/Http/Middleware/CustomerPrivacy.php": {
+      "git_blob": "16289f877e80ccf945b3cf928b529f04e5bdb8d4",
+      "sha256": "4b496116012bcaa9961b23bae13b611191355ee92cf425b08e0c28e412454883"
+    },
+    "resources/js/Pages/CustomerLibrary.tsx": {
+      "git_blob": "9e058aabcc7520d3f7771cb6911898efc7c9df31",
+      "sha256": "fe19c03c50d1d3d413b252ecfd3e37a2eca847c0cb20700963204c7758f31ba7"
+    },
+    "app/Domain/Customers/CustomerAccess.php": {
+      "git_blob": "310bb10219405110a3db5a5844132c42d0291887",
+      "sha256": "cb59745ecbdea2a9cedce51be535d428f2e1a3613829547716e9633fbff061bd"
+    },
+    "app/Domain/Customers/CustomerAccessPolicy.php": {
+      "git_blob": "ceccc3a417413dec27b855d465d30349cef20fa3",
+      "sha256": "2a144608b6988d0cd96a1f2eb9b7164c226b3fa60e822496bda8fe3f2099fd40"
+    },
+    "app/Domain/Customers/CustomerPrincipal.php": {
+      "git_blob": "5fea086aee4cb54b1aa51deb16028fd78c66a5b2",
+      "sha256": "e7407ed4c9aa90f8bb9850d4d91f2d7dc5aa650a12c767e529db44c08cf63e10"
+    },
+    "app/Models/User.php": {
+      "git_blob": "52ef24c251018d12807d31184bfd21675c5291ec",
+      "sha256": "c85dc4056ab81fcca8143812f6f5a1f7aa12ec5587a72e682c823c74873c987f"
+    },
+    "app/Support/Access/AdminMultiFactor.php": {
+      "git_blob": "db0367fc9ee1fd1e1c81c1b0ed6ab174a758e6a5",
+      "sha256": "dc83e64ae86754c6ac2a6b64cb420e687d5ecaf4f5d87225060d021597681710"
+    },
+    "app/Support/Audit/AuditEvent.php": {
+      "git_blob": "b8ba713b26e5f0df45197b1ff9635fc88d9b92de",
+      "sha256": "2ffedca8e08a1ecdada46ab9732920cfcad64d7fa53e147e197724bf4fbbe6b0"
+    },
+    "app/Support/CanonicalJson.php": {
+      "git_blob": "4450b0c4f0a147f49db4732ea4d34c0804c54a25",
+      "sha256": "6e8f14f950bbb7ed3c4a8162ecf7c2fd2752031d1679285cea8bb0a5f5f82d89"
+    },
+    "app/Providers/Filament/AdminPanelProvider.php": {
+      "git_blob": "fa1dc4d09f0b4b1a89e54bcadde132c55715fa86",
+      "sha256": "dc879c6aaee98bc02301f7827fb32616eeca2623bb5396b9723cbd2cdbf1228c"
+    },
+    "database/migrations/2026_10_07_242000_customer_saved_tracks.php": {
+      "git_blob": "1c26493419f561e32fa9aaadfdba232b1eb2e04d",
+      "sha256": "1202c18366e67012224745a12e06b2ef46d654725f2eeb48e779cf9569cd7392"
+    },
+    "database/migrations/2026_10_07_243000_inquiry_notification_intents.php": {
+      "git_blob": "4ef91d9ebb9c0ec1446c8fb13ea038eddb7aa8cb",
+      "sha256": "afd182c082171b62036aa839d5a3757cd2f3a16ec16c986def5abeb0ff8503c5"
+    },
+    "scripts/ci/database-sqlite-skips.json": {
+      "git_blob": "95d59992a005c6f24ca3421ad2b3d2d6836d73cf",
+      "sha256": "7ba26275ad61ab200704678fe0b904fa53b5349c32c6ad54b77a5d0e06f34ac1"
+    }
+  },
+  "authority_dependencies_unchanged_from_original": {
+    "app/Domain/Customers/CustomerAccess.php": true,
+    "app/Domain/Customers/CustomerAccessPolicy.php": true,
+    "app/Domain/Customers/CustomerPrincipal.php": true,
+    "app/Models/User.php": true,
+    "app/Support/Access/AdminMultiFactor.php": true,
+    "app/Support/Audit/AuditEvent.php": true,
+    "app/Support/CanonicalJson.php": true,
+    "app/Providers/Filament/AdminPanelProvider.php": true
+  },
+  "parent_focused_checks": {
+    "attribution": "Reported by parent root; not reviewer reruns",
+    "joined_056_php": {
+      "cases": 50,
+      "assertions": 422,
+      "passed": true,
+      "scope": "actualServiceRegistration+HttpOperator+CustomerSession+ListeningHTTP+PublicDiscoveryIndex"
+    },
+    "joined_056_frontend": {
+      "cases": 48,
+      "passed": true
+    },
+    "joined_056_typecheck": "passed",
+    "format_66_regression": {
+      "cases": 2,
+      "assertions": 32,
+      "passed": true
+    },
+    "format_66_pint": "passed"
+  },
+  "final_selector_carry": {
+    "from_source": "66b7b8fbbc71aeb54624f5e67ca2b6550327b0cd",
+    "to_source": "13d7ae7896c1f3c43f8428e624e5731842072261",
+    "only_changed_path": "scripts/ci/database-sqlite-skips.json",
+    "previous_method_count": 157,
+    "current_method_count": 158,
+    "previous_order_preserved": true,
+    "added_tuple": [
+      "Tests\\Feature\\ServiceProjectConcurrencyTest",
+      "test_two_staff_quotes_wait_on_the_exact_project_and_current_reads_reject_old_mvcc_state"
+    ],
+    "sha256": "7ba26275ad61ab200704678fe0b904fa53b5349c32c6ad54b77a5d0e06f34ac1",
+    "root_selector_checks": 50,
+    "root_checks_attributed_not_repeated": true,
+    "runtime_and_shared_boot_byte_exact": true,
+    "ancestry_merge_tree_unchanged": true
+  },
+  "verification_note": "Raw runner consoles retain original terminal newlines; whitespace checks disable only blank-at-eof for these verbatim artifacts."
+}
