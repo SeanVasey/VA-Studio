@@ -1,0 +1,13 @@
+{
+  "InquiryNativeAliasCanaryTest.php": "fd709ae513bdae085bfde5034a914bc5d8da5905169b1d9aee14d1d8eb7df56d",
+  "InquiryTerminalHandoffCanaryTest.php": "36d63002348d5527b7ffc86132ed84caecb49d6564c8c995115d92fedf158f84",
+  "corrected-terminal-junit.xml": "bd83cafa099a10488003a0a127e717e016e14af1cadf005d9b5074f8ab7b8de6",
+  "corrected-terminal.log": "20d25350994c0a2b9aa97b0239a1ca548aa692b4b25c31e9159d3321e34b9fd7",
+  "executed-native-alias-canary.php.txt": "ad4f39f0b50a7cd8a427625a19bb7f4b45166be0598b1b8b057daab7edcf7d7b",
+  "executed-terminal-canary.php.txt": "cc9145d169c99055c6b73084767a67b44a43353871840c990befc9121a7bbf05",
+  "original-native-alias-junit.xml": "fae6bffb7a3f5d10423fa89dff30ab291daf0b88c39d316cecceff8f383f2362",
+  "original-native-alias.log": "1fa0b711df1033d9bb2ce8b053cf9e3b81d2b7f8e42dd28049b8aadbb5ca0ff2",
+  "original-terminal-junit.xml": "bd41f425d8e43930ea48517b3399bc4ec144449a520b04c7199fa7e00388f5d8",
+  "original-terminal.log": "94cd754bfb9f38b2bbc42a182cc69e229cc6726594750a0ebd99ae879f480554",
+  "review-receipt.json": "6ebb3eb2d1abf00806472f0d294e6eea47f150b0097e5d0005a0352458e3f3e9"
+}
