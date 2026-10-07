@@ -1,0 +1,85 @@
+{
+  "testedSource": "3339f945655012c2a5544dbbff891b607eced18c",
+  "testedTree": "e40ba6d72bc75f55bb008978d9653fd3dae2f831",
+  "repairParent": "0a55f318b46ed3bacd47cafa38421c330044390b",
+  "originalExecutable": "d540f60aabe8a802f1a9d242b90569e9886b257c",
+  "repairCommits": [
+    "288273df8398074be928a44256c0f87ca8005a03",
+    "3339f945655012c2a5544dbbff891b607eced18c"
+  ],
+  "runtime": "PHP 8.4.26 / SQLite :memory: / Node 24.19.0",
+  "installedLockedIdentitiesMatch": true,
+  "installedPackages": 158,
+  "sourcePaths": {
+    "app/Domain/Customers/Listening/ListeningException.php": "753bceac6616693eeba91a160640ff554dc81d5ba1db41e714731af95daed03c",
+    "app/Domain/Customers/Listening/ListeningLibrary.php": "30aca52bd3d15e314bdfa6bad146870991a1269a4178cd64d9c27b7e376aa2a7",
+    "app/Domain/Customers/Listening/SavedListeningLibrary.php": "a16d0d1fc1095563ffee8409633ea1a53a1f2dc34718f5ef0fba0cd4706d863c",
+    "database/migrations/2026_10_07_242000_customer_saved_tracks.php": "1202c18366e67012224745a12e06b2ef46d654725f2eeb48e779cf9569cd7392",
+    "resources/js/components/CustomerListeningLibrary.tsx": "6ede69f0214f4aee801b2d8ec9733c8725da22354c3c464599fea48ed82bcc06",
+    "tests/Feature/CustomerListeningLibraryTest.php": "3e93f9d627d65a5168dca0a84f42d5268a59812607b893a2e9deaa1ddff742ad",
+    "tests/Feature/CustomerListeningMigrationTest.php": "2b087b916f09212126e88d08dbd6f194f9a2d7d403497b63deb8b71f7b402a5f",
+    "tests/frontend/customer-listening-library.test.tsx": "c3bb1ba05c1f2485296923237b5d4728efa21e3cfac4d726b0ba9b9dcb44bee3",
+    "app/Domain/Customers/Listening/ListeningEvidence.php": "4b22665239f1df455b29c41b91196b6c910822105b72168a1dca4ed677e807c3",
+    "tests/Feature/CustomerListeningPrimaryProofTest.php": "abc09341e028ca92ae8a91c676d3bbf879a354432f5a286dff6267786dc5bd78",
+    "tests/Feature/CustomerListeningFreshnessTest.php": "d516f0c80d3ed1b8ff9450be215793fe842c17e5e88c58c61ca886ea855f6187"
+  },
+  "dependencies": {
+    "composer.json": "132cb2a16c6ce2960d059cfddecae8e1accf6138a258dd8bab2c0c7b822f5607",
+    "composer.lock": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9",
+    "package.json": "65db43e1b171566d2d89e075bc4a29af75a82a6782a3313751bb4d7e832a7ae0",
+    "package-lock.json": "6407d3a63e3b6e04f5824f53c41b8dc8a33581f987b21d780c795480122f93ea"
+  },
+  "focusedPhp": {
+    "tests": 107,
+    "assertions": 549,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "focusedFrontend": {
+    "tests": 24,
+    "files": 1,
+    "failures": 0
+  },
+  "vendorLayout": "Package namespaces symlink the existing locked /workspace/VA-Studio/vendor; independent vendor/composer, autoload.php and bin wrappers regenerated no-scripts/no-plugins; own domain/test reflection checked.",
+  "evidenceHashes": {
+    "README.md": "452e157acee4ba72707a61a1c6d2d7dfb5afa4c32afc2e9a4e3a5dbe5517fba7",
+    "autoload-reflection.txt": "f2e527e08a2afb40b7703e5e652f5c5202fd18a1eb931bcde88f02b3f6a3d2df",
+    "first-frozen-288273d-php.txt": "d9a394449ab9210dd28c3a6d8676da79ef6ca1575e9d987179006445c540366c",
+    "first-frozen-288273d-php.xml": "ff48c0ea41fee4d3fd9d3e0c9e7c1cddd605e2349a892ef571450ec8ef25620e",
+    "frozen-frontend.txt": "e564109b53f6ee72f02d94c9647ab04d10419622e8c6e855cfd910bae544d395",
+    "frozen-frontend.txt.gz": "39359eec7b4b37ea46a7f51647a8457c6336f8f36ef9b50dcbb5c91b7751f20e",
+    "frozen-php.txt": "243fb976736ea76686f15df635e47c24aa0e2fabb53970a5930a6a26179986ba",
+    "frozen-php.xml": "412801dd57aaa90069886d91d432ca6433cafdaf660a6bb23f09be2ec0e751f7",
+    "immutable-media-probe-error.txt": "0cf5a1df5838a45b41851c12d04e10aaebbf5c926593a27363cbc7cf42b59928",
+    "immutable-media-probe-error.xml": "8ea482892596b2362fcfac69829778d634b65c99c467d430d3affef6607115e3",
+    "pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "raw-row-order-first-failure.txt": "759c4262f5095c9b6a21c41fa3e8a37f975d64442b7ae932db5c8b01a98359a8",
+    "raw-row-order-repair.txt": "3113ad9d0e836a15f7f579fa856b2804970caf07c220a34d053d727062d35dc4",
+    "repair-focused.txt": "1e82fbc18ab951f2805fcf7999499deef1e24db41d4c21e11f2b60c37c27f948",
+    "repair-focused.xml": "8b18588b573d37fc8336fbc3f770319c04e0c5bffba3358edee1ff60fc81580f",
+    "shadow-baseline-red.txt": "d0bea54e4225d66868e18390662aad221dd1c9d08da8c44b5e6903d156a31fa4",
+    "shadow-baseline-red.xml": "6da13a7e7ad0783dfe5e93523640e6600bb114985099e23afd06b706e6173eca",
+    "shadow-repair.txt": "88248fe810c4309e235014468f9c5e30acffecb873aa66f62c01821a97199061",
+    "shadow-repair.xml": "2e3e3f0a80f0d49f12d66cc98da7f363d450733dedd362b67d4d0e7b511a546b",
+    "terminal-callback-baseline-red.txt": "0b1e3906914920ba10c21a80bd2adb8daf3ddc47e89995bf2e46eb579697c6f8",
+    "typecheck.txt": "dac125c794db702133345f3a0d33f3193f975fddc564ca4f1498b0d4132ed500",
+    "typecheck.txt.gz": "2fe7ab713d79076a320d54898138afd6a9af703dd6ca183fe18fd31669373051"
+  },
+  "limits": {
+    "favoriteReferences": 50,
+    "playlists": 10,
+    "playlistTrackReferences": 25,
+    "referenceTotal": 300,
+    "publicIdChunk": 10,
+    "dependencyRowsPerClosureTable": 256,
+    "dependencyQueryFetchLimit": 257
+  },
+  "untestedHere": [
+    "native MySQL DDL/concurrency",
+    "root composed HTTP/mount",
+    "browser/device/full Foundation",
+    "hosted CI",
+    "production activation"
+  ]
+}
