@@ -15,17 +15,23 @@ final class SupportAttachments
 
     public function list(string $kind, string $sourceId, AttachmentActor $actor): array
     {
-        return $this->transaction(function (AttachmentRows $rows) use ($kind, $sourceId, $actor): array {
+        $closed = $this->transaction(function (AttachmentRows $rows) use ($kind, $sourceId, $actor): array {
             [$authority, $proof, $policy] = $this->source($kind, $sourceId, null, 'list', $actor, $rows);
             $attachments = $rows->rows('support_attachments', 'source_kind = ? AND source_id = ?', [$kind, $sourceId], 11);
             AttachmentException::require(count($attachments) <= $policy->maxFiles());
+            $decisionAt = $this->now();
             $items = array_map(fn ($row) => array_replace($this->dto($this->retained($row, $proof, $policy)),
                 ['canRetry' => ($proof->token->binding()['intake_open'] ?? false) === true && $this->dto($row)['canRetry']]), $attachments);
             $result = ['sourceVersion' => $proof->token->version(), 'canIntake' => ($proof->token->binding()['intake_open'] ?? false) === true && count($attachments) < $policy->maxFiles(), 'attachments' => $items, 'policy' => ['maxBytes' => $policy->maxBytes(), 'maxFiles' => $policy->maxFiles(), 'retentionSeconds' => $policy->lifetimeSeconds(), 'provenance' => $policy->commitment()['provenance'] ?? 'unavailable']];
+            AttachmentException::require($authority instanceof AttachmentCommittedReadAuthority);
+            $receipt = new AttachmentCommittedProjection($this->registry, $authority->committedReadReceipt($proof, $rows), $rows, $policy, $proof, $attachments, $decisionAt, [$kind, $sourceId, $attachments]);
             $this->terminal($authority, $proof, $policy, $rows, $attachments, [$kind, $sourceId, $attachments]);
 
-            return $result;
+            return ['result' => $result, 'receipt' => $receipt];
         });
+        $closed['receipt']->proveClosed();
+
+        return $closed['result'];
     }
 
     public function intake(string $kind, string $sourceId, int $sourceVersion, AttachmentActor $actor, string $requestKey, string $name, string $trustedUploadPath): array
@@ -184,11 +190,13 @@ final class SupportAttachments
         $this->uuid($id);
         $prepare = fn (AttachmentRows $rows) => $this->readReady($rows, $kind, $sourceId, $id, $actor);
         $first = $this->transaction($prepare);
+        $first['receipt']->proveClosed();
         $snapshot = $this->files->snapshot($id, $first['file']);
         try {
             $snapshot->seal();
             $current = $this->transaction($prepare);
-            AttachmentException::require($current === $first);
+            $current['receipt']->proveClosed();
+            AttachmentException::require($current['row'] === $first['row'] && $current['file'] === $first['file'] && $current['configuration'] === $first['configuration']);
 
             return ['stream' => $snapshot, 'file' => $first['file']];
         } catch (Throwable $error) {
@@ -242,14 +250,18 @@ final class SupportAttachments
         [$authority, $proof, $policy] = $this->source($kind, $sourceId, null, 'download', $actor, $rows);
         $row = $this->attachment($rows, $kind, $sourceId, $id, $proof, $policy);
         $file = $this->manifest($row);
-        AttachmentException::require($row['state'] === 'ready' && (int) $row['expires_at'] > $this->now(), 409, 'not_ready');
+        $decisionAt = $this->now();
+        AttachmentException::require($row['state'] === 'ready' && (int) $row['expires_at'] > $decisionAt, 409, 'not_ready');
         $scan = $this->decrypt((string) $row['scan_evidence']);
         AttachmentException::require(($scan['status'] ?? null) === 'clean' && $policy->allowsScanEngine($scan['engine'] ?? '')
             && ($scan['sha256'] ?? null) === $file['sha256'] && ($scan['manifest_hash'] ?? null) === $row['manifest_hash']
             && ($scan['policy_hash'] ?? null) === $row['policy_hash'] && ($scan['attempt'] ?? null) === (int) $row['attempt']);
+        AttachmentException::require($authority instanceof AttachmentCommittedReadAuthority);
+        $receipt = new AttachmentCommittedProjection($this->registry, $authority->committedReadReceipt($proof, $rows), $rows, $policy, $proof, [$row], $decisionAt);
+        $configuration = AttachmentRemoval::configuration();
         $this->terminal($authority, $proof, $policy, $rows, [$row]);
 
-        return ['row' => $row, 'file' => $file];
+        return ['row' => $row, 'file' => $file, 'receipt' => $receipt, 'configuration' => $configuration];
     }
 
     private function source(string $kind, string $sourceId, ?int $version, string $purpose, AttachmentActor $actor, AttachmentRows $rows): array
