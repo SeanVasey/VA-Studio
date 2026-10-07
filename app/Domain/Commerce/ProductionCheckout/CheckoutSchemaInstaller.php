@@ -107,6 +107,17 @@ final class CheckoutSchemaInstaller
                 $present[$name] = true;
             }
         }
+        // Foreign-key names share the schema dictionary, including case/accent aliases.
+        // A collision on a later table must be refused before any earlier table commits.
+        foreach (DB::select('SELECT o.TABLE_NAME, o.CONSTRAINT_NAME, o.CONSTRAINT_TYPE FROM information_schema.TABLE_CONSTRAINTS o JOIN ('.$reserved.') r ON CONVERT(o.CONSTRAINT_NAME USING utf8mb3) COLLATE utf8mb3_general_ci = r.name WHERE o.CONSTRAINT_SCHEMA = ?', [...$names, $database]) as $constraint) {
+            $definition = $tables[$constraint->TABLE_NAME] ?? null;
+            $owned = $definition !== null && (($constraint->CONSTRAINT_TYPE === 'UNIQUE' && isset($definition['unique'][$constraint->CONSTRAINT_NAME]))
+                || ($constraint->CONSTRAINT_TYPE === 'FOREIGN KEY' && in_array($constraint->CONSTRAINT_NAME,
+                    array_map(fn (string $field): string => $definition['prefix'].'_f_'.$field, array_keys($definition['foreign'])), true)));
+            if (! $owned) {
+                $this->reject('foreign constraint dictionary identity');
+            }
+        }
         foreach ($tables as $name => $definition) {
             try {
                 $shown = (array) DB::selectOne('SHOW CREATE TABLE '.$name);
@@ -138,6 +149,11 @@ final class CheckoutSchemaInstaller
         foreach (DB::select('SELECT TRIGGER_NAME, ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = ?', [$database]) as $guard) {
             if (! isset($statements[$guard->TRIGGER_NAME]) && $this->referencesOwned($guard->ACTION_STATEMENT)) {
                 $this->reject('foreign guard reference');
+            }
+        }
+        foreach (DB::select('SELECT ROUTINE_NAME, ROUTINE_DEFINITION FROM information_schema.ROUTINES WHERE ROUTINE_SCHEMA = ?', [$database]) as $routine) {
+            if ($routine->ROUTINE_DEFINITION === null || $this->referencesOwned($routine->ROUTINE_DEFINITION)) {
+                $this->reject('foreign or opaque routine reference');
             }
         }
 

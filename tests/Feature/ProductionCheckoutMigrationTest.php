@@ -246,6 +246,66 @@ class ProductionCheckoutMigrationTest extends TestCase
         }
     }
 
+    public static function nativeForeignConstraintNames(): array
+    {
+        return [['pco_3_f_review_id'], ['PCO_3_F_REVIEW_ID'], ['pco_3_f_reviéw_id']];
+    }
+
+    #[DataProvider('nativeForeignConstraintNames')]
+    public function test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl(string $foreignName): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Actual MySQL schema-global FK dictionary is required.');
+        }
+        $this->removeFixture();
+        DB::unprepared('CREATE TABLE synthetic_foreign_fk_holder (marker INT NOT NULL, owner_id BIGINT UNSIGNED NULL, CONSTRAINT `'.$foreignName.'` FOREIGN KEY (owner_id) REFERENCES users(id)) ENGINE=InnoDB');
+        DB::table('synthetic_foreign_fk_holder')->insert(['marker' => 9123, 'owner_id' => null]);
+        $constraints = array_map(fn ($row): array => (array) $row, DB::select("SELECT TABLE_NAME, CONSTRAINT_NAME, CONSTRAINT_TYPE FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=DATABASE() AND TABLE_NAME='synthetic_foreign_fk_holder' ORDER BY CONSTRAINT_NAME"));
+        $writes = [];
+        DB::listen(function (QueryExecuted $event) use (&$writes): void {
+            if (preg_match('/\A\s*(?:CREATE|ALTER|DROP|INSERT|UPDATE|DELETE)\b/i', $event->sql)) {
+                $writes[] = $event->sql;
+            }
+        });
+        try {
+            (new CheckoutSchemaInstaller)->up();
+            $this->fail('Foreign constraint dictionary identity caused partial checkout DDL.');
+        } catch (\LogicException) {
+            $this->assertSame([], $writes);
+            $this->assertFalse(DB::getSchemaBuilder()->hasTable(CheckoutSchema::TABLES['authority']));
+            $this->assertSame(9123, DB::table('synthetic_foreign_fk_holder')->value('marker'));
+            $this->assertSame($constraints, array_map(fn ($row): array => (array) $row, DB::select("SELECT TABLE_NAME, CONSTRAINT_NAME, CONSTRAINT_TYPE FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=DATABASE() AND TABLE_NAME='synthetic_foreign_fk_holder' ORDER BY CONSTRAINT_NAME")));
+        }
+    }
+
+    public function test_native_unowned_stored_routine_reference_refuses_before_any_owned_ddl(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Actual retained MySQL stored routine metadata is required.');
+        }
+        $this->removeFixture();
+        DB::unprepared('CREATE PROCEDURE synthetic_foreign_checkout_reader() SELECT COUNT(*) FROM production_checkout_orders');
+        $before = (array) DB::selectOne("SELECT ROUTINE_NAME, ROUTINE_DEFINITION FROM information_schema.ROUTINES WHERE ROUTINE_SCHEMA=DATABASE() AND ROUTINE_NAME='synthetic_foreign_checkout_reader'");
+        $writes = [];
+        $tracking = (object) ['active' => true];
+        DB::listen(function (QueryExecuted $event) use (&$writes, $tracking): void {
+            if ($tracking->active && preg_match('/\A\s*(?:CREATE|ALTER|DROP|INSERT|UPDATE|DELETE)\b/i', $event->sql)) {
+                $writes[] = $event->sql;
+            }
+        });
+        try {
+            (new CheckoutSchemaInstaller)->up();
+            $this->fail('Unowned stored routine acquired a new checkout source.');
+        } catch (\LogicException) {
+            $this->assertSame([], $writes);
+            $this->assertFalse(DB::getSchemaBuilder()->hasTable(CheckoutSchema::TABLES['authority']));
+            $this->assertSame($before, (array) DB::selectOne("SELECT ROUTINE_NAME, ROUTINE_DEFINITION FROM information_schema.ROUTINES WHERE ROUTINE_SCHEMA=DATABASE() AND ROUTINE_NAME='synthetic_foreign_checkout_reader'"));
+        } finally {
+            $tracking->active = false;
+            DB::unprepared('DROP PROCEDURE synthetic_foreign_checkout_reader');
+        }
+    }
+
     public function test_final_assertion_interruption_and_repository_log_uncertainty_retry_without_duplicate_bookkeeping(): void
     {
         foreach (['final_assertion', 'migration_ended', 'before_log', 'after_log'] as $failure) {

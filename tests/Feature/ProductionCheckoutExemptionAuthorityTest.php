@@ -53,6 +53,38 @@ class ProductionCheckoutExemptionAuthorityTest extends TestCase
         return [['disabled'], ['not_delegated'], ['not_approved'], ['wrong_provenance'], ['wrong_tax_source'], ['unscoped_qualifier'], ['expired'], ['config_race']];
     }
 
+    public static function unknownStaffFlags(): array
+    {
+        return [[2], ['withdrawn']];
+    }
+
+    #[DataProvider('unknownStaffFlags')]
+    public function test_unknown_persisted_staff_role_cannot_author_owner_policy(int|string $flag): void
+    {
+        $f = F::catalog();
+        $policy = F::exemptionPolicy($f);
+        try {
+            DB::connection()->getPdo()->prepare('UPDATE users SET is_admin = ? WHERE id = ?')->execute([$flag, $f['actor']->id]);
+        } catch (\PDOException) {
+            // Native strict numeric storage refuses this malformed textual assignment.
+            $this->assertSame('mysql', DB::getDriverName());
+            $this->assertSame('withdrawn', $flag);
+            $this->assertDatabaseCount(CheckoutSchema::TABLES['authority'], 0);
+
+            return;
+        }
+        $this->assertTrue($f['actor']->fresh()->is_admin);
+        try {
+            app(ApproveExemptionAuthority::class)->approve($f['candidate']->id, $policy, 'synthetic-unknown-staff-role', $f['actor']);
+            $this->fail('Unknown persisted role became delegated owner authority.');
+        } catch (CheckoutException) {
+            $this->assertDatabaseCount(CheckoutSchema::TABLES['authority'], 0);
+            $this->assertDatabaseCount('orders', 0);
+            $this->assertDatabaseCount('license_grants', 0);
+            $this->assertSame(0, DB::transactionLevel());
+        }
+    }
+
     #[DataProvider('invalidPolicies')]
     public function test_mfa_and_reported_qualification_never_substitute_for_explicit_owner_scope(string $case): void
     {

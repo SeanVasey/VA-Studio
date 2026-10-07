@@ -15,7 +15,8 @@ final class StaffProof
     {
         CheckoutException::require($actor->exists && is_int($actor->getKey()) && $actor->id > 0, 'authority', 403);
         $current = User::query()->lockForUpdate()->find($actor->id);
-        CheckoutException::require($current !== null, 'authority', 403);
+        CheckoutException::require($current !== null && (string) $current->getRawOriginal('is_admin') === '1'
+            && $current->getRawOriginal('email_verified_at') !== null, 'authority', 403);
         Gate::forUser($current)->authorize('administer-catalog', [true]);
         CheckoutException::require(AdminMultiFactor::satisfiedBy($current, lockForUpdate: true), 'authority', 403);
         $raw = PacketAuthority::raw($reader, $actor->id);
