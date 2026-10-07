@@ -110,7 +110,7 @@ class ServiceProjectSchemaTest extends TestCase
                 $this->fail('Native partial schema must remain unadopted for inspection.');
             } catch (LogicException) {
                 $this->assertDatabaseMissing('migrations', ['migration' => self::MIGRATION]);
-                $this->assertSame($objects, DB::select('SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = ? AND TRIGGER_NAME LIKE ?', [DB::getDatabaseName(), 'service_project%']));
+                $this->assertSame(array_column($objects, 'TRIGGER_NAME'), array_column(DB::select('SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = ? AND TRIGGER_NAME LIKE ?', [DB::getDatabaseName(), 'service_project%']), 'TRIGGER_NAME'));
             }
         } else {
             $this->assertTrue(Schema::hasTable('service_projects'));
