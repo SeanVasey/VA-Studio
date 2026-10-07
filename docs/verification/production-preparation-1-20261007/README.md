@@ -391,6 +391,12 @@ step and stays in maintenance with workers stopped through the migration until t
 release is activated. The S1 rollback restores the paired private archive (verified as in the
 backup's step 4) alongside the database while writers are stopped, before any release switch.
 
+Codex's seventeenth pass (P2 ×2, docs): the S1 stage promised a resume at its end but ended
+with foreground `queue:work` templates and never started the services or left maintenance;
+the templates are now comments (unit/cron lines) followed by a required `systemctl start`
+plus `is-active`, a fatal `php artisan up` and a reachability check. The backup procedure's
+`php artisan up` is fatal too, so a host left in maintenance never continues into the restore.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex

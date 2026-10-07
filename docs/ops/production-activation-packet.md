@@ -150,11 +150,20 @@ php artisan vasey:doctor
 php artisan vasey:commerce-readiness --json   # effective cached configuration
 php artisan vasey:stripe-preflight --json     # still no provider I/O
 
-# Supervised workers and the scheduler (host supervisor and cron, as U-02 decides):
-php artisan queue:work database --queue=media --timeout=900 --tries=3 --sleep=1    # docs/media-processing.md
-php artisan queue:work database --queue=contracts --tries=1 --timeout=90            # docs/test-contract-issuance.md
-php artisan queue:work database --queue=payments,inquiry-alerts,default --tries=1   # per-queue flags: confirm in each feature doc
-* * * * * php <APP_ROOT>/artisan schedule:run
+# Supervised workers and the scheduler (host supervisor and cron, as U-02 decides). These are
+# the unit/cron command lines, not commands to run in this shell: a foreground queue:work
+# would block here.
+#   php artisan queue:work database --queue=media --timeout=900 --tries=3 --sleep=1    # docs/media-processing.md
+#   php artisan queue:work database --queue=contracts --tries=1 --timeout=90            # docs/test-contract-issuance.md
+#   php artisan queue:work database --queue=payments,inquiry-alerts,default --tries=1   # per-queue flags: confirm in each feature doc
+#   * * * * * php <APP_ROOT>/artisan schedule:run
+# Resume, in this release only, once the migration and checks above have passed: start the
+# supervised services, verify them, then leave maintenance mode as the last required step.
+# A service that fails to start keeps the host in maintenance (fail safe): fix it, then run
+# `php artisan up` by hand.
+systemctl start <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> && systemctl is-active <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> || exit 1
+php artisan up || exit 1
+curl -fsS -o /dev/null https://<STAGING_ORIGIN>/ || { echo 'staging still unavailable after artisan up'; exit 1; }
 ```
 
 **Expected:**

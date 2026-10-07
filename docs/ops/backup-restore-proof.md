@@ -102,7 +102,7 @@ sha256sum <BACKUP_DIR>/private.tar > <BACKUP_DIR>/private.tar.sha256
 # fails to start the application stays in maintenance mode (fail safe): fix the service,
 # then run `php artisan up` by hand. Everything below touches only the isolated targets.
 systemctl start <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> && systemctl is-active <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> || exit 1
-php artisan up   # lifts maintenance mode only, and only once the writers above are back
+php artisan up || exit 1   # lifts maintenance mode only, and only once the writers above are back; a failed up must not continue into the restore
 
 # 3. Restore into the isolated targets only. The dump is loaded unchanged (its CREATE DATABASE
 #    and USE name <DATABASE>), so no stored value can be rewritten by a rename.
