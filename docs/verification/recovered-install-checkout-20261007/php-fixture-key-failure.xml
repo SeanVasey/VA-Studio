@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="12" assertions="45" errors="10" failures="0" skipped="0" time="2.845148">
+    <testsuite name="Tests\Feature\PublicInstallMetadataTest" file="/workspace/VA-Studio-install-checkout/tests/Feature/PublicInstallMetadataTest.php" tests="6" assertions="45" errors="4" failures="0" skipped="0" time="0.661731">
+      <testcase name="test_static_manifest_is_a_minimal_public_root_identity_without_private_or_tracking_urls" file="/workspace/VA-Studio-install-checkout/tests/Feature/PublicInstallMetadataTest.php" line="67" class="Tests\Feature\PublicInstallMetadataTest" classname="Tests.Feature.PublicInstallMetadataTest" assertions="1" time="0.475704"/>
+      <testcase name="test_icon_derivatives_pin_the_whole_original_geometry_and_actual_png_bytes" file="/workspace/VA-Studio-install-checkout/tests/Feature/PublicInstallMetadataTest.php" line="81" class="Tests\Feature\PublicInstallMetadataTest" classname="Tests.Feature.PublicInstallMetadataTest" assertions="44" time="0.013177"/>
+      <testcase name="test_public_html_uses_fixed_keyed_install_links_independent_of_host_and_query_values" file="/workspace/VA-Studio-install-checkout/tests/Feature/PublicInstallMetadataTest.php" line="109" class="Tests\Feature\PublicInstallMetadataTest" classname="Tests.Feature.PublicInstallMetadataTest" assertions="0" time="0.087531">
+        <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\PublicInstallMetadataTest::test_public_html_uses_fixed_keyed_install_links_independent_of_host_and_query_values
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1363
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1264
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1187
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:257
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:215
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php:642
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php:368
+/workspace/VA-Studio-install-checkout/tests/Feature/PublicInstallMetadataTest.php:115</error>
+      </testcase>
+      <testcase name="test_only_current_eligible_track_html_has_install_metadata_and_withdrawal_stays_private" file="/workspace/VA-Studio-install-checkout/tests/Feature/PublicInstallMetadataTest.php" line="126" class="Tests\Feature\PublicInstallMetadataTest" classname="Tests.Feature.PublicInstallMetadataTest" assertions="0" time="0.018002">
+        <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\PublicInstallMetadataTest::test_only_current_eligible_track_html_has_install_metadata_and_withdrawal_stays_private
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio-install-checkout/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-install-checkout/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-install-checkout/tests/Feature/PublicInstallMetadataTest.php:128</error>
+      </testcase>
+      <testcase name="test_private_staff_previews_have_no_install_links_and_preserve_private_headers_and_rows" file="/workspace/VA-Studio-install-checkout/tests/Feature/PublicInstallMetadataTest.php" line="136" class="Tests\Feature\PublicInstallMetadataTest" classname="Tests.Feature.PublicInstallMetadataTest" assertions="0" time="0.026386">
+        <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\PublicInstallMetadataTest::test_private_staff_previews_have_no_install_links_and_preserve_private_headers_and_rows
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1363
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1264
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1187
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:257
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:215
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php:642
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php:368
+/workspace/VA-Studio-install-checkout/tests/Feature/PublicInstallMetadataTest.php:146</error>
+      </testcase>
+      <testcase name="test_owned_private_checkout_has_no_install_or_public_share_metadata_and_performs_no_provider_handoff" file="/workspace/VA-Studio-install-checkout/tests/Feature/PublicInstallMetadataTest.php" line="156" class="Tests\Feature\PublicInstallMetadataTest" classname="Tests.Feature.PublicInstallMetadataTest" assertions="0" time="0.040930">
+        <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\PublicInstallMetadataTest::test_owned_private_checkout_has_no_install_or_public_share_metadata_and_performs_no_provider_handoff
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio-install-checkout/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-install-checkout/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-install-checkout/tests/Support/InventoryFixtures.php:28
+/workspace/VA-Studio-install-checkout/tests/Feature/PublicInstallMetadataTest.php:161</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\CheckoutReturnPresentationTest" file="/workspace/VA-Studio-install-checkout/tests/Feature/CheckoutReturnPresentationTest.php" tests="6" assertions="0" errors="6" failures="0" skipped="0" time="2.183417">
+      <testcase name="test_owned_html_and_inertia_use_one_current_public_chrome_without_private_body_or_payment_writes" file="/workspace/VA-Studio-install-checkout/tests/Feature/CheckoutReturnPresentationTest.php" line="211" class="Tests\Feature\CheckoutReturnPresentationTest" classname="Tests.Feature.CheckoutReturnPresentationTest" assertions="0" time="0.311986">
+        <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\CheckoutReturnPresentationTest::test_owned_html_and_inertia_use_one_current_public_chrome_without_private_body_or_payment_writes
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio-install-checkout/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-install-checkout/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-install-checkout/tests/Support/InventoryFixtures.php:28
+/workspace/VA-Studio-install-checkout/tests/Feature/CheckoutReturnPresentationTest.php:71
+/workspace/VA-Studio-install-checkout/tests/Feature/CheckoutReturnPresentationTest.php:213</error>
+      </testcase>
+      <testcase name="test_never_published_site_uses_approved_static_defaults_and_ignores_private_draft_queries" file="/workspace/VA-Studio-install-checkout/tests/Feature/CheckoutReturnPresentationTest.php" line="255" class="Tests\Feature\CheckoutReturnPresentationTest" classname="Tests.Feature.CheckoutReturnPresentationTest" assertions="0" time="0.479529">
+        <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\CheckoutReturnPresentationTest::test_never_published_site_uses_approved_static_defaults_and_ignores_private_draft_queries
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio-install-checkout/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-install-checkout/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-install-checkout/tests/Support/InventoryFixtures.php:28
+/workspace/VA-Studio-install-checkout/tests/Feature/CheckoutReturnPresentationTest.php:71
+/workspace/VA-Studio-install-checkout/tests/Feature/CheckoutReturnPresentationTest.php:257</error>
+      </testcase>
+      <testcase name="test_a_real_corrupt_active_hash_uses_static_private_chrome_without_repairing_publication" file="/workspace/VA-Studio-install-checkout/tests/Feature/CheckoutReturnPresentationTest.php" line="274" class="Tests\Feature\CheckoutReturnPresentationTest" classname="Tests.Feature.CheckoutReturnPresentationTest" assertions="0" time="0.562253">
+        <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\CheckoutReturnPresentationTest::test_a_real_corrupt_active_hash_uses_static_private_chrome_without_repairing_publication
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio-install-checkout/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-install-checkout/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-install-checkout/tests/Support/InventoryFixtures.php:28
+/workspace/VA-Studio-install-checkout/tests/Feature/CheckoutReturnPresentationTest.php:71
+/workspace/VA-Studio-install-checkout/tests/Feature/CheckoutReturnPresentationTest.php:276</error>
+      </testcase>
+      <testsuite name="Tests\Feature\CheckoutReturnPresentationTest::test_a_real_missing_or_damaged_pointer_preserves_private_status_without_cms_writes" tests="2" assertions="0" errors="2" failures="0" skipped="0" time="0.640540">
+        <testcase name="test_a_real_missing_or_damaged_pointer_preserves_private_status_without_cms_writes with data set &quot;missing singleton&quot;" file="/workspace/VA-Studio-install-checkout/tests/Feature/CheckoutReturnPresentationTest.php" line="296" class="Tests\Feature\CheckoutReturnPresentationTest" classname="Tests.Feature.CheckoutReturnPresentationTest" assertions="0" time="0.437941">
+          <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\CheckoutReturnPresentationTest::test_a_real_missing_or_damaged_pointer_preserves_private_status_without_cms_writes with data set "missing singleton"
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio-install-checkout/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-install-checkout/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-install-checkout/tests/Support/InventoryFixtures.php:28
+/workspace/VA-Studio-install-checkout/tests/Feature/CheckoutReturnPresentationTest.php:71
+/workspace/VA-Studio-install-checkout/tests/Feature/CheckoutReturnPresentationTest.php:298</error>
+        </testcase>
+        <testcase name="test_a_real_missing_or_damaged_pointer_preserves_private_status_without_cms_writes with data set &quot;revision without retained history&quot;" file="/workspace/VA-Studio-install-checkout/tests/Feature/CheckoutReturnPresentationTest.php" line="296" class="Tests\Feature\CheckoutReturnPresentationTest" classname="Tests.Feature.CheckoutReturnPresentationTest" assertions="0" time="0.202599">
+          <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\CheckoutReturnPresentationTest::test_a_real_missing_or_damaged_pointer_preserves_private_status_without_cms_writes with data set "revision without retained history"
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio-install-checkout/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-install-checkout/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-install-checkout/tests/Support/InventoryFixtures.php:28
+/workspace/VA-Studio-install-checkout/tests/Feature/CheckoutReturnPresentationTest.php:71
+/workspace/VA-Studio-install-checkout/tests/Feature/CheckoutReturnPresentationTest.php:298</error>
+        </testcase>
+      </testsuite>
+      <testcase name="test_foreign_and_unknown_orders_are_identically_denied_before_reading_public_chrome" file="/workspace/VA-Studio-install-checkout/tests/Feature/CheckoutReturnPresentationTest.php" line="337" class="Tests\Feature\CheckoutReturnPresentationTest" classname="Tests.Feature.CheckoutReturnPresentationTest" assertions="0" time="0.189109">
+        <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\CheckoutReturnPresentationTest::test_foreign_and_unknown_orders_are_identically_denied_before_reading_public_chrome
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio-install-checkout/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2807
+/workspace/VA-Studio-install-checkout/vendor/filament/filament/src/Auth/MultiFactor/App/Concerns/InteractsWithAppAuthentication.php:40
+/workspace/VA-Studio-install-checkout/tests/Support/QuoteFixtures.php:20
+/workspace/VA-Studio-install-checkout/tests/Support/InventoryFixtures.php:28
+/workspace/VA-Studio-install-checkout/tests/Feature/CheckoutReturnPresentationTest.php:71
+/workspace/VA-Studio-install-checkout/tests/Feature/CheckoutReturnPresentationTest.php:339</error>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

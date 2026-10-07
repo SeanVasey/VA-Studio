@@ -1,0 +1,287 @@
+{
+  "schema": 1,
+  "base": "5b58e2e4805ed5a30cf3071457cbc8e526c1425a",
+  "source_commit": "ae8ca1d8a4c61f0edd207cdb63ae828c128d9e45",
+  "source_tree": "c75f3de0c1267e10e0f95340b387c3a7ceb68cdd",
+  "tested_executable_commit": "26700f97268a29209718ffc2fac534deb5259c2d",
+  "tested_executable_tree": "462c55bd5fc053118127ca04e01a0c2844dad88f",
+  "paths": [
+    {
+      "path": "app/Http/Controllers/TestCheckoutController.php",
+      "source_blob": "a01f5e9cbe87f346ddbf12420c2885dd686edfe3",
+      "source_sha256": "6f22a970c0fa3417cfc60ccb13ed2082914efca847b0d32175629f76a539d2b4",
+      "candidate_blob": "262ef5beb3e3f4c8229e285ae79821b605f617bb",
+      "candidate_sha256": "457ca3c1a5bd7ba85418e69d3e41dcf25f32a2b36a33676856c9b5c735d08ed1",
+      "candidate_bytes": 4303,
+      "exact_recovered_source": false,
+      "base_blob": "7d872ea5b831ce2b6d7b0b77cb6b0b7cfe8739d4",
+      "recomposition_reason": "Apply only installation/checkout-presentation additions onto current-main source; preserve customer commerce identity/navigation, inquiry fallback and other later changes."
+    },
+    {
+      "path": "docs/brand/asset-manifest.json",
+      "source_blob": "267e3f493268a45f6d52d5b10e0528e426bec18f",
+      "source_sha256": "3f933824ca5748449b9c376297d6c6b20c554f6f72b9e41846568f4f897aae45",
+      "candidate_blob": "267e3f493268a45f6d52d5b10e0528e426bec18f",
+      "candidate_sha256": "3f933824ca5748449b9c376297d6c6b20c554f6f72b9e41846568f4f897aae45",
+      "candidate_bytes": 6184,
+      "exact_recovered_source": true,
+      "base_blob": "e936a258edea40602d4742dab88a87f16fbe53a7",
+      "recomposition_reason": null
+    },
+    {
+      "path": "public/brand/app-icon-192.png",
+      "source_blob": "6b9e48ae48b750911ab5d91159cc853ff0c616b5",
+      "source_sha256": "7f5f8f04ee485e5942f8bf9670d419a4461541b742d9fd49d2bf1aa11f134d91",
+      "candidate_blob": "6b9e48ae48b750911ab5d91159cc853ff0c616b5",
+      "candidate_sha256": "7f5f8f04ee485e5942f8bf9670d419a4461541b742d9fd49d2bf1aa11f134d91",
+      "candidate_bytes": 6670,
+      "exact_recovered_source": true,
+      "base_blob": null,
+      "recomposition_reason": null
+    },
+    {
+      "path": "public/brand/app-icon-512.png",
+      "source_blob": "fdc4048db7518ec4ce271851d8eb43235b187208",
+      "source_sha256": "66f16d1ae19df41927011fd3c618039b2d5572c5855b1968170b679d7248e416",
+      "candidate_blob": "fdc4048db7518ec4ce271851d8eb43235b187208",
+      "candidate_sha256": "66f16d1ae19df41927011fd3c618039b2d5572c5855b1968170b679d7248e416",
+      "candidate_bytes": 24459,
+      "exact_recovered_source": true,
+      "base_blob": null,
+      "recomposition_reason": null
+    },
+    {
+      "path": "public/brand/apple-touch-icon.png",
+      "source_blob": "93626dd60de22045ffc58eb200368231c1a9a105",
+      "source_sha256": "e15fe8023d6434e1afbdd23e7279f088664f833cd8d5cbe9fc4f95cd40e36020",
+      "candidate_blob": "93626dd60de22045ffc58eb200368231c1a9a105",
+      "candidate_sha256": "e15fe8023d6434e1afbdd23e7279f088664f833cd8d5cbe9fc4f95cd40e36020",
+      "candidate_bytes": 6618,
+      "exact_recovered_source": true,
+      "base_blob": null,
+      "recomposition_reason": null
+    },
+    {
+      "path": "public/manifest.webmanifest",
+      "source_blob": "d49429a8d4d014028df813afed2cfcd29253eae7",
+      "source_sha256": "00a11fe39299349cec8240ba795e99dbfe73113c34572568bc2e58efaa68bd52",
+      "candidate_blob": "d49429a8d4d014028df813afed2cfcd29253eae7",
+      "candidate_sha256": "00a11fe39299349cec8240ba795e99dbfe73113c34572568bc2e58efaa68bd52",
+      "candidate_bytes": 415,
+      "exact_recovered_source": true,
+      "base_blob": null,
+      "recomposition_reason": null
+    },
+    {
+      "path": "resources/css/app.css",
+      "source_blob": "2d0eeab4d155f03686b4ee2e21d09b0d782954a6",
+      "source_sha256": "7f3230f435a62157d13a2d021b2fc02cb1e280043bf182fa987620b9661abb56",
+      "candidate_blob": "2d0eeab4d155f03686b4ee2e21d09b0d782954a6",
+      "candidate_sha256": "7f3230f435a62157d13a2d021b2fc02cb1e280043bf182fa987620b9661abb56",
+      "candidate_bytes": 42053,
+      "exact_recovered_source": true,
+      "base_blob": "a5bdfe56cfcda6296c6448bfd170d4c27658794b",
+      "recomposition_reason": null
+    },
+    {
+      "path": "resources/js/Pages/CheckoutReturn.tsx",
+      "source_blob": "c77566102ae27ec3c8dc6e3a44dccc8ad60a3a65",
+      "source_sha256": "64f2e1c746f5d469079a5ef5d3b201ec207e740af4264fc54fa38c9af38fb619",
+      "candidate_blob": "c77566102ae27ec3c8dc6e3a44dccc8ad60a3a65",
+      "candidate_sha256": "64f2e1c746f5d469079a5ef5d3b201ec207e740af4264fc54fa38c9af38fb619",
+      "candidate_bytes": 2627,
+      "exact_recovered_source": true,
+      "base_blob": "7fcf6d1ae0aca7764ec9c33df994956895223b9b",
+      "recomposition_reason": null
+    },
+    {
+      "path": "resources/js/Pages/Editorial.tsx",
+      "source_blob": "a7fd4b8b279b0d9028bd860bb1aa0e5b73425a41",
+      "source_sha256": "e63fc381b69f129e5ed7b6618121956a6bd49ed5d093c1f174a8f05ca254e550",
+      "candidate_blob": "6f0edce7cc8425d613d41f30c052cc05af1b13aa",
+      "candidate_sha256": "a30920f583d83c10193506ebc8fbbdeaea3999e92ac11841bb6c1096d6d7c89c",
+      "candidate_bytes": 5802,
+      "exact_recovered_source": false,
+      "base_blob": "d5241ba625108eaa735c598cfc3ec6eeb72c0905",
+      "recomposition_reason": "Apply only installation/checkout-presentation additions onto current-main source; preserve customer commerce identity/navigation, inquiry fallback and other later changes."
+    },
+    {
+      "path": "resources/js/Pages/Storefront.tsx",
+      "source_blob": "1ac95af781765ee8075e8b8f8570cd96a349e4c2",
+      "source_sha256": "a2eafd5e820a7dc49f9dd65b37a48befdc6a4883701f09632a46215c0b59b78e",
+      "candidate_blob": "14eea6fc0372648ed23e245ef2433db2797eaf02",
+      "candidate_sha256": "dee43bd8d5094bc66a142004a3140581ecb11a93fe33f74475a3cbcbc0fbec32",
+      "candidate_bytes": 28239,
+      "exact_recovered_source": false,
+      "base_blob": "189ee028aa7056e343fc52a717ae76e519f21987",
+      "recomposition_reason": "Apply only installation/checkout-presentation additions onto current-main source; preserve customer commerce identity/navigation, inquiry fallback and other later changes."
+    },
+    {
+      "path": "resources/js/components/InstallApp.tsx",
+      "source_blob": "ecdf3eec033731dc0770107c2ce79e5ff1122853",
+      "source_sha256": "db1f5a5939078b1ff7bd4242ca49f5541cb573bebd395e10f266bbee3150f27a",
+      "candidate_blob": "ecdf3eec033731dc0770107c2ce79e5ff1122853",
+      "candidate_sha256": "db1f5a5939078b1ff7bd4242ca49f5541cb573bebd395e10f266bbee3150f27a",
+      "candidate_bytes": 2395,
+      "exact_recovered_source": true,
+      "base_blob": null,
+      "recomposition_reason": null
+    },
+    {
+      "path": "resources/js/components/MetadataHead.tsx",
+      "source_blob": "74e39b84307b7fc73de94e6badb75c03a718bc7b",
+      "source_sha256": "b3bee74ae96ee173c5a367c996d28c65fa7757d1408a4b195a16c796b3fac336",
+      "candidate_blob": "74e39b84307b7fc73de94e6badb75c03a718bc7b",
+      "candidate_sha256": "b3bee74ae96ee173c5a367c996d28c65fa7757d1408a4b195a16c796b3fac336",
+      "candidate_bytes": 2301,
+      "exact_recovered_source": true,
+      "base_blob": "404d925263b3702c6a4be6fdee0fb024c2f5b3f3",
+      "recomposition_reason": null
+    },
+    {
+      "path": "resources/js/components/PrivatePageHead.tsx",
+      "source_blob": "c666636c0166ca20cb7addc8bb5d5b896bf15ac3",
+      "source_sha256": "341b7e1e9e66250102ff6fc03d97f92559b682f1d9f8456e69cbcac25424adc2",
+      "candidate_blob": "c666636c0166ca20cb7addc8bb5d5b896bf15ac3",
+      "candidate_sha256": "341b7e1e9e66250102ff6fc03d97f92559b682f1d9f8456e69cbcac25424adc2",
+      "candidate_bytes": 546,
+      "exact_recovered_source": true,
+      "base_blob": null,
+      "recomposition_reason": null
+    },
+    {
+      "path": "resources/js/components/SiteChrome.tsx",
+      "source_blob": "09259c60736e488adb89c529d29fb838ffe77bb5",
+      "source_sha256": "9d297991f522816b7effc49276ce066e399efb0458b97d82738ce28ba3f10564",
+      "candidate_blob": "c4c692a2f87738bb0c59737b99432d9aa8805173",
+      "candidate_sha256": "d299b12b5ee5a638bac57130ca105b0e6a7dd1042ea88bb68d21ace1388d4e56",
+      "candidate_bytes": 2733,
+      "exact_recovered_source": false,
+      "base_blob": "a6cb934b62cf6d5e9865c0b37f2bb7ec25fab071",
+      "recomposition_reason": "Apply only installation/checkout-presentation additions onto current-main source; preserve customer commerce identity/navigation, inquiry fallback and other later changes."
+    },
+    {
+      "path": "resources/js/lib/install-app.ts",
+      "source_blob": "2e5e9a85416fa174c31738a09d3be9992201be7e",
+      "source_sha256": "b05a42958f06c44ddfdd442867dacea203b0c708f9de35c13070d1a9c7530f9c",
+      "candidate_blob": "2e5e9a85416fa174c31738a09d3be9992201be7e",
+      "candidate_sha256": "b05a42958f06c44ddfdd442867dacea203b0c708f9de35c13070d1a9c7530f9c",
+      "candidate_bytes": 3520,
+      "exact_recovered_source": true,
+      "base_blob": null,
+      "recomposition_reason": null
+    },
+    {
+      "path": "resources/views/app.blade.php",
+      "source_blob": "d36d9e39aa1f9db3f17426365fe98d014c9bd26b",
+      "source_sha256": "87cb57c0ecef75b498e687165109784b3252bb9bdeffc2c537cd83ffa76bdbff",
+      "candidate_blob": "d36d9e39aa1f9db3f17426365fe98d014c9bd26b",
+      "candidate_sha256": "87cb57c0ecef75b498e687165109784b3252bb9bdeffc2c537cd83ffa76bdbff",
+      "candidate_bytes": 3247,
+      "exact_recovered_source": true,
+      "base_blob": "05e64c2d6a411f83068418be1466dc7a5f4e4e4c",
+      "recomposition_reason": null
+    },
+    {
+      "path": "tests/Feature/CheckoutReturnPresentationTest.php",
+      "source_blob": "b2368376a62f697cbd21425f05c6a86cc9ae2932",
+      "source_sha256": "bf1e4999a53f6c4a40f8803b951c1c4f7059b96507a8f58e22777c24378c158d",
+      "candidate_blob": "09360ff2182d251d0cf2737012e8d2c857139abb",
+      "candidate_sha256": "e2626ac6a33ad8f23e9648c8284f5515cd7583c573affef33b4115bbdf5e33ba",
+      "candidate_bytes": 19742,
+      "exact_recovered_source": false,
+      "base_blob": null,
+      "recomposition_reason": "Extend strict raw snapshots to all current-main additive tables while preserving every original named table and assertion."
+    },
+    {
+      "path": "tests/Feature/PublicInstallMetadataTest.php",
+      "source_blob": "1495947da79d90bb268725e319e80ade628a6bbe",
+      "source_sha256": "6350bed99a7ae98407c253ada4aa17df3bc332b1d2ac93ee8d3a1f62c2fe110f",
+      "candidate_blob": "1495947da79d90bb268725e319e80ade628a6bbe",
+      "candidate_sha256": "6350bed99a7ae98407c253ada4aa17df3bc332b1d2ac93ee8d3a1f62c2fe110f",
+      "candidate_bytes": 10088,
+      "exact_recovered_source": true,
+      "base_blob": null,
+      "recomposition_reason": null
+    },
+    {
+      "path": "tests/browser/public-install.spec.ts",
+      "source_blob": "992754f0afe5e844c01d601fdee50e190cb66a1a",
+      "source_sha256": "d9fad1c97fef3354a2ecb3e7483432db4c06816de60da63294c10136ef9bb1e1",
+      "candidate_blob": "992754f0afe5e844c01d601fdee50e190cb66a1a",
+      "candidate_sha256": "d9fad1c97fef3354a2ecb3e7483432db4c06816de60da63294c10136ef9bb1e1",
+      "candidate_bytes": 9673,
+      "exact_recovered_source": true,
+      "base_blob": null,
+      "recomposition_reason": null
+    },
+    {
+      "path": "tests/browser/test-checkout.spec.ts",
+      "source_blob": "70da6fdbf074fc0facd37dc746afe4e6e61e7b55",
+      "source_sha256": "10471c06692c99752af83a82b74c172e01f606c48b41c5bd40eb556b20b30108",
+      "candidate_blob": "70da6fdbf074fc0facd37dc746afe4e6e61e7b55",
+      "candidate_sha256": "10471c06692c99752af83a82b74c172e01f606c48b41c5bd40eb556b20b30108",
+      "candidate_bytes": 15824,
+      "exact_recovered_source": true,
+      "base_blob": "8ed42e547ae5350c61985e8026892c895951de64",
+      "recomposition_reason": null
+    },
+    {
+      "path": "tests/browser/verify-public-installation-fixture.php",
+      "source_blob": "468eac1ed86e67097b1fe9231c53e2a28ba1ef63",
+      "source_sha256": "ea336ebeeb92463d70ef1a27b64c1221b8715f895286a14d7f6e201b603c7561",
+      "candidate_blob": "468eac1ed86e67097b1fe9231c53e2a28ba1ef63",
+      "candidate_sha256": "ea336ebeeb92463d70ef1a27b64c1221b8715f895286a14d7f6e201b603c7561",
+      "candidate_bytes": 11502,
+      "exact_recovered_source": true,
+      "base_blob": null,
+      "recomposition_reason": null
+    },
+    {
+      "path": "tests/frontend/checkout-return.test.tsx",
+      "source_blob": "2f2116214f0dc8f861dca883e716d600c41711f7",
+      "source_sha256": "54e7b97e7d28316a4f6cf085f8123c73a18d8853b225a23ce03053d1a84dc6cd",
+      "candidate_blob": "2f2116214f0dc8f861dca883e716d600c41711f7",
+      "candidate_sha256": "54e7b97e7d28316a4f6cf085f8123c73a18d8853b225a23ce03053d1a84dc6cd",
+      "candidate_bytes": 8602,
+      "exact_recovered_source": true,
+      "base_blob": "86be5ecd6b515583ab27f87f943d3db6c65d81b5",
+      "recomposition_reason": null
+    },
+    {
+      "path": "tests/frontend/install-app.test.tsx",
+      "source_blob": "753921668f802e0aac208c9d28d91f800c4b4a9f",
+      "source_sha256": "45cba2c21d50236e997358789fdaf8368755223d4ac9c2383cab361677aba8d1",
+      "candidate_blob": "753921668f802e0aac208c9d28d91f800c4b4a9f",
+      "candidate_sha256": "45cba2c21d50236e997358789fdaf8368755223d4ac9c2383cab361677aba8d1",
+      "candidate_bytes": 16033,
+      "exact_recovered_source": true,
+      "base_blob": null,
+      "recomposition_reason": null
+    },
+    {
+      "path": "tests/frontend/metadata.test.tsx",
+      "source_blob": "b5ac4f1caa73296d5145dada422c461073a3a27b",
+      "source_sha256": "0b8c486dd834c49202e48227fbd0972be7060bdd94d785ed8e8aa94945ca3f85",
+      "candidate_blob": "b5ac4f1caa73296d5145dada422c461073a3a27b",
+      "candidate_sha256": "0b8c486dd834c49202e48227fbd0972be7060bdd94d785ed8e8aa94945ca3f85",
+      "candidate_bytes": 13678,
+      "exact_recovered_source": true,
+      "base_blob": "704db2ede71b880eb357d70c57eb0cea023cb55e",
+      "recomposition_reason": null
+    }
+  ],
+  "exact_recovered_source_paths": 19,
+  "recomposed_paths": 5,
+  "historical_evidence_paths": [
+    "docs/verification/public-app-installation.md",
+    "docs/verification/checkout-return-shell.md",
+    "docs/brand/asset-manifest.json"
+  ],
+  "limits": [
+    "Historical passes belong to historical source; current local receipts are recorded separately.",
+    "Native browser engines are absent locally; recovered native definitions were listed but not executed.",
+    "Exact original lockup/icon derivative bytes recovered from Git; no generation, redraw or model-created asset.",
+    "No workflow, lockfile, migration, live provider, DNS, account setting or customer import changes."
+  ]
+}
