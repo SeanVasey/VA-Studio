@@ -11,7 +11,8 @@ foreach ($namespaces as $prefix => $paths) {
     }
 }
 foreach (['ContractRenderer', 'RenderedContract', 'ContractIssuanceException', 'ContractIssuancePolicy',
-    'ContractRenderProfile', 'ContractRenderProfileRegistry', 'ContractText', 'TcpdfContractRenderer'] as $name) {
+    'ContractRenderProfile', 'ContractRenderProfileRegistry', 'ContractText', 'TcpdfContractRenderer',
+    'TcpdfV2ContractRenderer', 'VersionedContractRenderer'] as $name) {
     $loader->addClassMap(['App\\Domain\\Contracts\\'.$name => $root.'/app/Domain/Contracts/'.$name.'.php']);
 }
 $loader->addClassMap([

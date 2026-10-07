@@ -15,10 +15,18 @@ final class ContractIssuancePolicy
         'lease_seconds' => 300, 'max_attempts' => 5, 'retry_seconds' => 60,
     ];
 
+    public const V2_CONTRACT = [
+        'schema_version' => 1, 'purpose' => 'test_contract_issuance', 'version' => 'test-contract-issuance-v2',
+        'profile' => 'test-buyer-pdf-v2', 'originals' => 'preserve_first_committed',
+        'missing_original' => 'restore_only', 'buyer_identity' => 'unverified_guest', 'entitlements' => 'pending',
+        'lease_seconds' => 300, 'max_attempts' => 5, 'retry_seconds' => 60,
+    ];
+
     public const CONTRACT = self::V1_CONTRACT;
 
     private const RETAINED_POLICIES = [
         'test-contract-issuance-v1' => self::V1_CONTRACT,
+        'test-contract-issuance-v2' => self::V2_CONTRACT,
     ];
 
     public function account(): string
