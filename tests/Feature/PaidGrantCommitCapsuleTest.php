@@ -86,7 +86,7 @@ final class PaidGrantCommitCapsuleTest extends TestCase
 
     public static function capsuleCases(): array
     {
-        return [['valid'], ['policy'], ['password'], ['config-subclass'], ['statement-class'], ['foreign-primary'], ['expired']];
+        return [['valid'], ['policy'], ['password'], ['config-subclass'], ['app-parent'], ['database-parent'], ['paid-parent'], ['identity-parent'], ['statement-class'], ['foreign-primary'], ['expired']];
     }
 
     #[DataProvider('capsuleCases')]
@@ -99,6 +99,7 @@ final class PaidGrantCommitCapsuleTest extends TestCase
         $batch = (new PaidGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
         $locator = ProductionPaidOrderLocatorV1::locate($f['order']['orderId']);
         $configuration = app('config');
+        $originalParents = array_intersect_key($configuration->all(), array_flip(['app', 'database', 'paid-grants', 'production-customer-identity']));
         $pdo = DB::connection()->getPdo();
         $held = null;
         $callbackInvoked = false;
@@ -137,6 +138,9 @@ final class PaidGrantCommitCapsuleTest extends TestCase
                     DB::table('users')->where('id', $f['buyer']['user']->id)->update(['password' => Hash::make('Prepared current write authority withdrawn')]);
                 } elseif ($kind === 'config-subclass') {
                     app()->instance('config', new PaidAdmissionCallbackConfiguration($configuration->all(), $callbackInvoked));
+                } elseif (in_array($kind, ['app-parent', 'database-parent', 'paid-parent', 'identity-parent'], true)) {
+                    $parent = ['app-parent' => 'app', 'database-parent' => 'database', 'paid-parent' => 'paid-grants', 'identity-parent' => 'production-customer-identity'][$kind];
+                    $configuration->set($parent, new PaidAdmissionCallbackParent($configuration->get($parent), $callbackInvoked));
                 } elseif ($kind === 'statement-class') {
                     $pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, [PaidAdmissionCallbackStatement::class, [&$callbackInvoked]]);
                 } elseif ($kind === 'expired') {
@@ -155,6 +159,9 @@ final class PaidGrantCommitCapsuleTest extends TestCase
             $this->assertNotSame('valid', $kind, 'Original prepared authority must remain usable.');
             $this->assertContains($error->status, [403, 410, 503]);
         } finally {
+            foreach ($originalParents as $parent => $values) {
+                $configuration->set($parent, $values);
+            }
             app()->instance('config', $configuration);
             $pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, [\PDOStatement::class]);
         }
@@ -187,5 +194,27 @@ final class PaidAdmissionCallbackStatement extends \PDOStatement
     protected function __construct(private bool &$invoked)
     {
         $this->invoked = true;
+    }
+}
+
+final class PaidAdmissionCallbackParent extends \ArrayObject
+{
+    public function __construct(array $values, private bool &$invoked)
+    {
+        parent::__construct($values);
+    }
+
+    public function offsetExists(mixed $key): bool
+    {
+        $this->invoked = true;
+
+        return parent::offsetExists($key);
+    }
+
+    public function offsetGet(mixed $key): mixed
+    {
+        $this->invoked = true;
+
+        return parent::offsetGet($key);
     }
 }

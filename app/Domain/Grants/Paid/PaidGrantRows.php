@@ -76,10 +76,12 @@ final class PaidGrantRows
         $manager = $this->originalBindings[1];
         PaidGrantException::require($configuration instanceof Repository && $configuration::class === Repository::class
             && $manager instanceof DatabaseManager && $manager::class === DatabaseManager::class
-            && is_string($configuration->get('app.env')));
+            && is_string(PaidGrantConfiguration::read($configuration, 'app.env')));
         $this->manager = $manager;
         $this->configuration = $configuration;
-        $this->name = $this->manager->getDefaultConnection();
+        $name = PaidGrantConfiguration::read($configuration, 'database.default');
+        PaidGrantException::require(is_string($name));
+        $this->name = $name;
         $connection = $this->manager->getConnections()[$this->name] ?? null;
         PaidGrantException::require($connection instanceof Connection
             && in_array($connection::class, [MySqlConnection::class, SQLiteConnection::class], true));
@@ -91,8 +93,8 @@ final class PaidGrantRows
         $this->driver = $this->connection->getDriverName();
         $this->prefix = $this->connection->getTablePrefix();
         $this->database = $this->driver === 'mysql' ? (string) $this->primary->query('SELECT DATABASE()')->fetchColumn() : 'main';
-        $this->configuredEnvironment = $configuration->get('app.env');
-        $this->keyHash = hash('sha256', (string) $this->configuration->get('app.key'));
+        $this->configuredEnvironment = PaidGrantConfiguration::read($configuration, 'app.env');
+        $this->keyHash = hash('sha256', (string) PaidGrantConfiguration::read($configuration, 'app.key'));
         // Producer's retained reader currently names unprefixed tables; never silently bind a different graph.
         PaidGrantException::require(in_array($this->driver, ['sqlite', 'mysql'], true) && $this->prefix === ''
             && preg_match('/\A[a-zA-Z0-9_]+\z/D', $this->database) === 1);
@@ -139,15 +141,15 @@ final class PaidGrantRows
     {
         PaidGrantException::require(Container::getInstance() === $this->application
             && ($this->rawBindings)() === $this->originalBindings
-            && $this->manager->getDefaultConnection() === $this->name
+            && PaidGrantConfiguration::read($this->configuration, 'database.default') === $this->name
             && ($this->manager->getConnections()[$this->name] ?? null) === $this->connection
             && $this->connection->getRawPdo() === $this->primary
             && $this->connection->getDriverName() === $this->driver && $this->connection->getTablePrefix() === $this->prefix
             && $this->primary->getAttribute(PDO::ATTR_STATEMENT_CLASS) === [PDOStatement::class]
             && $this->primary->getAttribute(PDO::ATTR_DRIVER_NAME) === $this->driver
             && $this->primary->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION
-            && $this->configuration->get('app.env') === $this->configuredEnvironment
-            && hash_equals($this->keyHash, hash('sha256', (string) $this->configuration->get('app.key'))));
+            && PaidGrantConfiguration::read($this->configuration, 'app.env') === $this->configuredEnvironment
+            && hash_equals($this->keyHash, hash('sha256', (string) PaidGrantConfiguration::read($this->configuration, 'app.key'))));
         if ($this->driver === 'mysql') {
             PaidGrantException::require($this->primary->query('SELECT DATABASE()')->fetchColumn() === $this->database);
         }

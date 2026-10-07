@@ -33,12 +33,12 @@ final class PaidGrantPolicy
     public static function provePure(array $policy, Repository $configuration, string $environment): void
     {
         $rehearsal = in_array($environment, ['local', 'testing'], true);
-        $current = $configuration->get('paid-grants.delivery_policy');
+        $current = PaidGrantConfiguration::read($configuration, 'paid-grants.delivery_policy');
         PaidGrantException::require(is_array($current) && CanonicalJson::encode($current) === CanonicalJson::encode($policy)
-            && ($rehearsal ? $configuration->get('paid-grants.rehearsal_enabled') === true && $policy['provenance'] === 'synthetic_rehearsal'
-                : $configuration->get('paid-grants.operative_enabled') === true && $policy['provenance'] === 'verified_production')
-            && $configuration->get('production-customer-identity.enabled') === true
-            && $configuration->get('production-customer-identity.provenance') === $policy['provenance'], 403);
+            && ($rehearsal ? PaidGrantConfiguration::read($configuration, 'paid-grants.rehearsal_enabled') === true && $policy['provenance'] === 'synthetic_rehearsal'
+                : PaidGrantConfiguration::read($configuration, 'paid-grants.operative_enabled') === true && $policy['provenance'] === 'verified_production')
+            && PaidGrantConfiguration::read($configuration, 'production-customer-identity.enabled') === true
+            && PaidGrantConfiguration::read($configuration, 'production-customer-identity.provenance') === $policy['provenance'], 403);
     }
 
     public function source(array $line, array $policy): void
