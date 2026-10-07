@@ -1,0 +1,283 @@
+{
+  "source_commit": "af4870b757393faa4fc03e3a5701086f6627ff83",
+  "runtime_source_commit": "eaaa55be3bf35193e68a3ad8cac3cc99eec85e5e",
+  "evidence_parent_commit": "580c6e9ca60571ff54ade694ea3b4f3e37e60cf7",
+  "independent_review": "pending_root_exact_successor_review",
+  "ui_source_map": [
+    {
+      "path": "resources/js/Pages/ProductionCustomerIdentity.tsx",
+      "git_blob": "47ef9453242bd3005955a061365c49079d307a8c",
+      "sha256": "52b5ce92536e539e457463fde5ebc4b7087e6b8596d0a9cf81b44ee42b839c28"
+    },
+    {
+      "path": "resources/js/lib/production-customer-identity.ts",
+      "git_blob": "51328605b458cf534245f317193300bfbbacc2c4",
+      "sha256": "76e725ca9709e78b96989e667686563e2f1040c579a2cac6b70d389ad7942a65"
+    },
+    {
+      "path": "tests/frontend/production-customer-identity.test.tsx",
+      "git_blob": "afd87830179614d0bd8bc997f9458edccecea697",
+      "sha256": "f04717fb863642fbf2605e6aeb6fe0cc4ea41821b02d506b571c9212bcb84074"
+    },
+    {
+      "path": "tests/frontend/production-identity-registration-canary.test.tsx",
+      "git_blob": "3764d5fa2ce771bcb93911a643c26397a86d619c",
+      "sha256": "b1856e9c1993d790128cf00dced3e036dae9abafaa93646607848b2f11068a74"
+    }
+  ],
+  "root_unchanged_canary": {
+    "original_path": "/workspace/VA-Studio-identity-registration/tests/frontend/production-identity-registration.test.tsx",
+    "retained_path": "tests/frontend/production-identity-registration-canary.test.tsx",
+    "sha256": "b1856e9c1993d790128cf00dced3e036dae9abafaa93646607848b2f11068a74",
+    "original_source_status": "Root actual pagehide canary failed on eaaa, preserved raw original-root-pagehide.txt",
+    "successor_status": "Passed unchanged within the final 14 cases"
+  },
+  "unchanged_runtime_files": [
+    {
+      "path": "app/Console/Commands/ProcessProductionIdentityNotices.php",
+      "status": "A",
+      "git_blob": "a1edbed5480e85674ba96a1484aa25f36d0fb0ef",
+      "sha256": "1d7cdcd3cd5facc769df0f69e0c87997cb7753f06cbe92837648e164da6dcdb7"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/CurrentRows.php",
+      "status": "M",
+      "git_blob": "eb357333f427bea8e124818564c6b083e7c75d31",
+      "sha256": "02421b3afb5911bab22bec749c3c691f45379aab4f48c3522831be051235e428"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionCustomerAccess.php",
+      "status": "A",
+      "git_blob": "c922cc3dd6cc21dabf3316328680df6091331591",
+      "sha256": "4f013b5114b8b8ee8cd53d42277368a215861b8c48a07672fd2337e4fc483eb4"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionCustomerPrincipal.php",
+      "status": "A",
+      "git_blob": "abf7273087e9308a26df98759d695cb8788c8840",
+      "sha256": "ab0ddc7dcabb41fd8d003582c9a78814a90f5cd4fa80be4bc2c5208192306b0c"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/CompleteIdentity.php",
+      "status": "A",
+      "git_blob": "b8e35a04fe164affd445ee401eaff2b606432039",
+      "sha256": "b8820fa80d7ab8bf588d443dfdf31dc80617e289b54c3116a8b3a8f685cf8546"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityDatabase.php",
+      "status": "A",
+      "git_blob": "15bee82c4a0f655970e70b7dc56d34169153d598",
+      "sha256": "03a9411dc14cf1883226ae552a3333c74a349a8d5c6a6fea588a9544d5dfc732"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityEvidence.php",
+      "status": "A",
+      "git_blob": "88850d925ec4d163b3368481942203f7ac938592",
+      "sha256": "23f855f53a01e5df3a4dab630e9fc8e2d513f23bf56de391f2380d41d29ee9a8"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityException.php",
+      "status": "A",
+      "git_blob": "7d0cc1adebf3237f6949a3c3a01e7b75e5ee61c9",
+      "sha256": "91259fe2f5e59549b8f385edc2194b51ea70266fbe2a8992fce3615696661563"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php",
+      "status": "A",
+      "git_blob": "7515ddbae114b41948c9c5d05e4cf2b5bda7d0f2",
+      "sha256": "c294948fc459e9f202fcd1194e3ae5cc2a3e9a0b4500e8359d54613f27e675f1"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityPolicy.php",
+      "status": "A",
+      "git_blob": "00d1d575b626b9dbadac71a99860d28c1cf3e959",
+      "sha256": "445a001b81c7125b4c87188a3515406424ce2d89bb97cb3d3edc02f1dc12298f"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityRequests.php",
+      "status": "A",
+      "git_blob": "6398ff07cdb72cc5467fbe078019480a6408d5a5",
+      "sha256": "5b4b0a0b90b252589794de84f34d44a12a9c9cdf39613521a13cffcedcae9dc9"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityRows.php",
+      "status": "A",
+      "git_blob": "a9b7cba29c07d879020d3affe910e66aca5efe91",
+      "sha256": "deb303101abe98ca505c43e34ab49cc636b56fed42e5b808044380108fdb42bd"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentitySchema.php",
+      "status": "A",
+      "git_blob": "55f4ef40660051ef924018b013fc173bfb6f9ccc",
+      "sha256": "6ca4d4ca4260e13b8a26752ebd8466f3c3edd7047c9ddc71004e45f242e619dc"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/DefinitelyNotSubmitted.php",
+      "status": "A",
+      "git_blob": "3acd5f0237eda2db881b18e50fe440dca1644734",
+      "sha256": "042cb2c999c0b275083ad0df6dba31a19a682dafcc666911eafaebd554089ee4"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentityAcceptance.php",
+      "status": "A",
+      "git_blob": "53900b095aa873af42dbede4bf1b2af96dba684a",
+      "sha256": "65d588591c45e30b6511f2c3a175418f90df0df97f60391199a97823a6b1d30a"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentityMail.php",
+      "status": "A",
+      "git_blob": "5661025016b847a00de0bbe9e6b0a2afbdcf7a9f",
+      "sha256": "7c2aae31553bf34f9ea33f57fa350976e1ab91e93e9333061504c3f9b488b715"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentityNoticeTransport.php",
+      "status": "A",
+      "git_blob": "4c504ac765267916cfb1527ea701677f83d7b64d",
+      "sha256": "9877286016507f010adcd7b3bae0d95071fb2fdf91a519d5df74b4f3424ba3e1"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/LoopbackSmtp.php",
+      "status": "A",
+      "git_blob": "298f922517c4ef7f3c2a254cb1159ff7fb4c8d30",
+      "sha256": "8569b270d19b981334ee506db4046c74bf2d80b143712506adbea6307b38c682"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/WorkIdentityNotice.php",
+      "status": "A",
+      "git_blob": "63f49f136dc5bb29d762c79f39d6b888bf3eef50",
+      "sha256": "bc32bdaba43bf9ad0956121da38820eb9adf5da5f421ba160140f0606d224c93"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/ProductionCustomerSessions.php",
+      "status": "A",
+      "git_blob": "e2ee7dc46eb6d5e8f1afde877f2751aa9096c14c",
+      "sha256": "73efe65ab06626178fc1aa6ecd6ff426b30a04d58acd68b164acaa31c9a5d1d6"
+    },
+    {
+      "path": "app/Http/Controllers/ProductionIdentity/CustomerIdentityController.php",
+      "status": "A",
+      "git_blob": "f48c80440eb3e4310dfc0c6256921c6da03a9f90",
+      "sha256": "5c260d6ef4edbe9e72065cb4e9379375239ba706c7a4a71eb322d7d6c965eb37"
+    },
+    {
+      "path": "app/Http/Middleware/ProductionIdentity/IdentityPrivacy.php",
+      "status": "A",
+      "git_blob": "76241e9afbc8eac92c4dbe247fa9da5cb2e652fc",
+      "sha256": "4c4d7a232282d9edd621ffff6b129b53468a8263e84d853b0077e4766bc307f6"
+    },
+    {
+      "path": "app/Http/Requests/ProductionIdentity/IdentityBody.php",
+      "status": "A",
+      "git_blob": "fcbe2dbf31edc11d3ac1b4983054d2bc233a2223",
+      "sha256": "09c14e6ccd9edf02d413cdad03238b5d82dbf704a22fb8bbb0638f81846575e1"
+    },
+    {
+      "path": "app/Jobs/DeliverProductionIdentityNotice.php",
+      "status": "A",
+      "git_blob": "b57f6eb902104974b858fc4f044988163ca8ef02",
+      "sha256": "061de336297e398ded168dad925457b69dbf4c05242bde6f9591e7837280e539"
+    },
+    {
+      "path": "database/migrations/2026_10_07_247000_production_customer_identity.php",
+      "status": "A",
+      "git_blob": "f82b5334e2d582ea63f91674b835f43f5bd28815",
+      "sha256": "a2cfa089ea5452aec894f24f6779f5deee63fb3a2453fd6c12d4a5d8b1273166"
+    },
+    {
+      "path": "routes/production-customer-identity.php",
+      "status": "A",
+      "git_blob": "e0e1c8fe62ee26f0d7b94ab635e9d56d8e049518",
+      "sha256": "2f9b3f7f03d50a3c8930f52a6d8187e533ead4d1c0acb1c156b2c8c161abca43"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityHttpTest.php",
+      "status": "A",
+      "git_blob": "feefa1e63a5553723f3d83813e001159ad8fdee6",
+      "sha256": "db494d78a1710827df7c8dd407771c14dfa699e6224353d0f89e38973e07006c"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityJourneyTest.php",
+      "status": "A",
+      "git_blob": "0771d846f66f99e09a24806851b005ceba788360",
+      "sha256": "72bc446efba9065be3d3b4ddc2725516449b54a53752aa59329a82d1df36e4bc"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityMigrationTest.php",
+      "status": "A",
+      "git_blob": "ce95a30e5d2dd51749e1de356e3fd1596a4819f9",
+      "sha256": "7a7997f60d985e5d303b3bf58128d5fd00ff476a4873897337f196c4b67c0098"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityNativeRaceTest.php",
+      "status": "A",
+      "git_blob": "6fe9cbeb99c5747a727ed8350d52d25831e43962",
+      "sha256": "602c72b951f3a8464e610338274d1b0698325e2be26843a29cfa84199053372f"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityNoticeTest.php",
+      "status": "A",
+      "git_blob": "6575474d73a734edbbb476b63f9f01934c76e152",
+      "sha256": "7167840fc7eb738b5ccd6397d877542d0246c41af67e5d205d341a87299d2fc8"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityRuntimeTest.php",
+      "status": "A",
+      "git_blob": "97230fd61d225833144d4135ad5714e1e4a7f9c9",
+      "sha256": "b1ab853981c69c12209b551991b1a9df7171f68f3ded9701aab574ac6f40b995"
+    },
+    {
+      "path": "tests/Support/ProductionIdentityFixture.php",
+      "status": "A",
+      "git_blob": "1ab9e07719ae248173ac5c766dbc4257a62076ab",
+      "sha256": "558b6269d305b7b213e4b8c102c7e9e117dfb8cce30c4c76a7520482609391b7"
+    },
+    {
+      "path": "tests/Support/production-identity-race-worker.php",
+      "status": "A",
+      "git_blob": "b7432df17d7243786ea605fb7217f992d6a96392",
+      "sha256": "67a526ef790be061f0661d58a8b19a0069e3a3972d74d591df0c80dfe2cd1a33"
+    },
+    {
+      "path": "tests/Support/production_identity_smtp_sink.py",
+      "status": "A",
+      "git_blob": "ad852c9ddfc2b039306abf7cd5c9be61a997a647",
+      "sha256": "d0291a72f85013c9ae994dd4a391404645c6e6e535961339a539b44ae9fd44c6"
+    }
+  ],
+  "runtime_evidence_carry": {
+    "receipt": "docs/verification/production-customer-identity-20261007/receipts.json",
+    "receipt_sha256": "154644095fda01283fb2e4d6cf0cbe49f9295b214fed9c36bcbc84a5e1d64e36",
+    "native": "46 executed / 1,464 assertions / zero failures, errors or skips; exact MySQL 8.0.46",
+    "sqlite": "46 recorded / 39 executed / 209 assertions / seven named native-only skips",
+    "canaries": "Two executed / nine assertions; passed",
+    "scope": "Only PHP/domain/runtime fixture bytes carried; previous8frontendcases do not approve this UI successor; no repeated broad/native run for JS-only change."
+  },
+  "checks": [
+    {
+      "artifact": "frontend.xml",
+      "source_commit": "af4870b757393faa4fc03e3a5701086f6627ff83",
+      "tests_recorded": 14,
+      "tests_executed": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "9635f1e586ab7c99b90424d7e35d54eef650fc82dc95d92756496f8b37a23dd0"
+    },
+    {
+      "artifact": "typecheck.txt",
+      "source_commit": "af4870b757393faa4fc03e3a5701086f6627ff83",
+      "outcome": "passed"
+    }
+  ],
+  "commands": [
+    "npm run typecheck",
+    "npm run test -- tests/frontend/production-customer-identity.test.tsx tests/frontend/production-identity-registration-canary.test.tsx --reporter=default --reporter=junit --outputFile=docs/verification/production-customer-identity-page-exit-20261007/frontend.xml"
+  ],
+  "artifacts": {
+    "frontend.txt": "d38300ac5af1c02da87dd3555230a5daf26e60e55ab4e767b63543dddfc36a84",
+    "frontend.xml": "9635f1e586ab7c99b90424d7e35d54eef650fc82dc95d92756496f8b37a23dd0",
+    "original-root-pagehide.txt": "4000b63c5155f3fb0fca68ac82ccdf4842c7625f6ffd2ff091bd5ce07fd26ff9",
+    "typecheck.txt": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f"
+  },
+  "limits": "Synthetic browser lifecycle/StrictMode checks in jsdom; not an actual hosted browser BFCache or deployment acceptance. No external sends/credentials/CI/push/merge."
+}

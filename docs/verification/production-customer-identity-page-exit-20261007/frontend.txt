@@ -1,0 +1,16 @@
+
+> test
+> vitest run tests/frontend/production-customer-identity.test.tsx tests/frontend/production-identity-registration-canary.test.tsx --reporter=default --reporter=junit --outputFile=docs/verification/production-customer-identity-page-exit-20261007/frontend.xml
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-production-identity
+
+ ✓ tests/frontend/production-identity-registration-canary.test.tsx (1 test) 296ms
+ ✓ tests/frontend/production-customer-identity.test.tsx (13 tests) 474ms
+
+ Test Files  2 passed (2)
+      Tests  14 passed (14)
+   Start at  08:59:06
+   Duration  1.88s (environment 51%, tests 24%, transform 12%, setup 10%, import 2%)
+
+JUNIT report written to /workspace/VA-Studio-production-identity/docs/verification/production-customer-identity-page-exit-20261007/frontend.xml
