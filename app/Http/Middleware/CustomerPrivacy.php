@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Requests\CustomerListeningRequest;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,8 +34,10 @@ final class CustomerPrivacy
                 return self::error(415);
             }
             $stream = $request->getContent(true);
-            $body = is_resource($stream) ? stream_get_contents($stream, 4097) : false;
-            if ($body === false || strlen($body) > 4096) {
+            $limit = $request->is('account/listening-library', 'account/listening-library/export')
+                ? CustomerListeningRequest::BODY_BYTES : 4096;
+            $body = is_resource($stream) ? stream_get_contents($stream, $limit + 1) : false;
+            if ($body === false || strlen($body) > $limit) {
                 return self::error(413);
             }
             $request->attributes->set('_customer_body', $body);
@@ -61,7 +64,7 @@ final class CustomerPrivacy
 
     public static function error(int $status): Response
     {
-        if (request()->is('account/listening-library')) {
+        if (request()->is('account/listening-library', 'account/listening-library/*')) {
             return self::protect(response()->json(['code' => 'CUSTOMER_LISTENING_UNAVAILABLE',
                 'message' => 'Saved tracks and playlists could not be confirmed. Reload your library before making another change.'], $status >= 500 ? 503 : $status));
         }

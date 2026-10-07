@@ -9,9 +9,14 @@ use stdClass;
 
 final class CustomerListeningRequest
 {
+    public const BODY_BYTES = 16384;
+
     public static function body(Request $request): array
     {
         $raw = $request->attributes->get('_customer_body');
+        if (! is_string($raw) || strlen($raw) > self::BODY_BYTES) {
+            self::refuse();
+        }
         try {
             $object = is_string($raw) ? json_decode($raw, false, 4, JSON_THROW_ON_ERROR) : null;
         } catch (JsonException) {
@@ -45,6 +50,17 @@ final class CustomerListeningRequest
         }
 
         return $body;
+    }
+
+    public static function exportVersion(Request $request): int
+    {
+        $body = self::body($request);
+        if (array_keys($body) !== ['version'] || ! is_int($body['version'])
+            || $body['version'] < 0 || $body['version'] > 2147483646) {
+            self::refuse();
+        }
+
+        return $body['version'];
     }
 
     private static function refuse(): never
