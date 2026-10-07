@@ -25,6 +25,9 @@ final class ListeningLibrary
 
     public const NOTE_BYTES = 4000;
 
+    // Keep the actual encrypted envelope inside the existing MySQL TEXT capacity.
+    public const ENCRYPTED_PAYLOAD_BYTES = 60000;
+
     public function read(CustomerPrincipal $principal, User $actor): array
     {
         return DB::transaction(function () use ($principal, $actor): array {
@@ -56,7 +59,12 @@ final class ListeningLibrary
                 $row ??= new SavedListeningLibrary(['customer_account_id' => $principal->accountId]);
                 $next = $this->v2($next);
                 $next['version'] = ++$version;
-                $row->fill(['version' => $version, 'payload' => $next])->save();
+                $row->fill(['version' => $version, 'payload' => $next]);
+                $encrypted = $row->getAttributes()['payload'] ?? null;
+                if (! is_string($encrypted) || strlen($encrypted) > self::ENCRYPTED_PAYLOAD_BYTES) {
+                    throw new ListeningException;
+                }
+                $row->save();
             }
 
             return $this->project($principal, $next, $version, $evidence, $this->expected($row, $next, $version, $principal->accountId));

@@ -198,7 +198,7 @@ export function CustomerListeningLibrary() {
       </form>
       <div aria-label="Your playlists"><h3>Playlists</h3>{library.playlists.length === 0 ? <p>No playlists yet.</p> : library.playlists.map(list => <button key={list.id} type="button" className="button button-outline" aria-pressed={selected === list.id} disabled={busy} onClick={() => select(list)}>Open playlist {list.name}</button>)}</div>
       {library.listeningSchema === 2 && <div aria-label="Private lyric notes"><h3>Lyric notes</h3>
-        <p>Private notes for your saved track references. Removing the last favorite or playlist reference also removes its note.</p>
+        <p>Private notes for your saved track references. Removing the last favorite or playlist reference also removes its note. If your library is full, shorten a note or remove older notes.</p>
         {references.length === 0 ? <p>Save a public track or add it to a playlist before adding lyric notes.</p> : <form className="customer-order-lookup-form" onSubmit={event => { event.preventDefault(); if (noteTrack && noteBody(draft)) change('set-track-note', { trackId: noteTrack, body: draft }); }}>
           <div className="customer-account-field"><label htmlFor="listening-note-track">Saved track for lyric notes</label><select id="listening-note-track" value={noteTrack ?? ''} disabled={busy} onChange={event => { setNoteTrack(event.target.value || null); setDraft(library.notes.find(note => note.trackId === event.target.value)?.body ?? ''); }}>
             <option value="">Choose a saved track</option>{references.map(item => <option key={item.trackId} value={item.trackId}>{itemTitle(item)}</option>)}
