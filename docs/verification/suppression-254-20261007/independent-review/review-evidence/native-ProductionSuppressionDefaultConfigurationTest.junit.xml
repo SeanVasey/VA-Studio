@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionSuppression\ProductionSuppressionDefaultConfigurationTest" file="/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionDefaultConfigurationTest.php" tests="2" assertions="171" errors="1" failures="0" skipped="0" time="177.900002">
+    <testcase name="test_booted_parent_is_the_exact_closed_default_off_plain_array" file="/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionDefaultConfigurationTest.php" line="24" class="Tests\Feature\ProductionSuppression\ProductionSuppressionDefaultConfigurationTest" classname="Tests.Feature.ProductionSuppression.ProductionSuppressionDefaultConfigurationTest" assertions="169" time="0.440831"/>
+    <testcase name="test_production_environment_refuses_with_shipped_defaults_before_any_row_or_provider_call" file="/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionDefaultConfigurationTest.php" line="35" class="Tests\Feature\ProductionSuppression\ProductionSuppressionDefaultConfigurationTest" classname="Tests.Feature.ProductionSuppression.ProductionSuppressionDefaultConfigurationTest" assertions="2" time="177.459171">
+      <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionSuppression\ProductionSuppressionDefaultConfigurationTest::test_production_environment_refuses_with_shipped_defaults_before_any_row_or_provider_call
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionDefaultConfigurationTest.php:42
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+  </testsuite>
+</testsuites>
