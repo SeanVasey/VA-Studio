@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="4" assertions="15" errors="0" failures="0" skipped="0" time="8.447371">
+    <testsuite name="Tests\Feature\ProductionCheckoutSourceTransactionTest" file="/workspace/VA-Studio-checkout-callback-repair/tests/Feature/ProductionCheckoutSourceTransactionTest.php" tests="2" assertions="8" errors="0" failures="0" skipped="0" time="4.501192">
+      <testcase name="test_expired_source_refusal_does_not_resolve_a_lazy_primary_that_withdraws_buyer_credentials" file="/workspace/VA-Studio-checkout-callback-repair/tests/Feature/ProductionCheckoutSourceTransactionTest.php" line="95" class="Tests\Feature\ProductionCheckoutSourceTransactionTest" classname="Tests.Feature.ProductionCheckoutSourceTransactionTest" assertions="4" time="2.663443"/>
+      <testcase name="test_command_postcommit_refusal_does_not_resolve_a_lazy_primary_or_return_prepared_result" file="/workspace/VA-Studio-checkout-callback-repair/tests/Feature/ProductionCheckoutSourceTransactionTest.php" line="126" class="Tests\Feature\ProductionCheckoutSourceTransactionTest" classname="Tests.Feature.ProductionCheckoutSourceTransactionTest" assertions="4" time="1.837749"/>
+    </testsuite>
+    <testsuite name="Tests\Canary\ProductionCheckoutLazyPrimaryCanaryTest" file="/tmp/ProductionCheckoutLazyPrimaryCanaryTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="2.144434">
+      <testcase name="test_expired_source_refusal_never_resolves_lazy_primary_or_withdraws_original_buyer" file="/tmp/ProductionCheckoutLazyPrimaryCanaryTest.php" line="11" class="Tests\Canary\ProductionCheckoutLazyPrimaryCanaryTest" classname="Tests.Canary.ProductionCheckoutLazyPrimaryCanaryTest" assertions="4" time="2.144434"/>
+    </testsuite>
+    <testsuite name="Tests\Canary\ProductionCheckoutLazyCommandCanaryTest" file="/tmp/ProductionCheckoutLazyCommandCanaryTest.php" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="1.801745">
+      <testcase name="test_postcommit_lazy_primary_withdrawal_never_runs_or_returns_prepared_result" file="/tmp/ProductionCheckoutLazyCommandCanaryTest.php" line="10" class="Tests\Canary\ProductionCheckoutLazyCommandCanaryTest" classname="Tests.Canary.ProductionCheckoutLazyCommandCanaryTest" assertions="3" time="1.801745"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

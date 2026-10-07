@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Canary\ProductionCheckoutSourceTransactionCanaryTest" file="/tmp/ProductionCheckoutSourceTransactionCanaryTest.php" tests="1" assertions="4" errors="0" failures="1" skipped="0" time="3.603391">
+    <testcase name="test_paid_locked_source_never_mints_without_a_held_consumer_transaction" file="/tmp/ProductionCheckoutSourceTransactionCanaryTest.php" line="14" class="Tests\Canary\ProductionCheckoutSourceTransactionCanaryTest" classname="Tests.Canary.ProductionCheckoutSourceTransactionCanaryTest" assertions="4" time="3.603391">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Canary\ProductionCheckoutSourceTransactionCanaryTest::test_paid_locked_source_never_mints_without_a_held_consumer_transaction
+Failed asserting that exception of type "App\Domain\Commerce\ProductionCheckout\CheckoutException" is thrown.</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

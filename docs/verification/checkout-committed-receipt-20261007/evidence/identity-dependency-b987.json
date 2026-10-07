@@ -1,0 +1,71 @@
+{
+  "upstream_commit": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+  "status": "unreviewed historical receipt dependency; current identity/adapters parent approved separately; no financial acceptance",
+  "runtime_source_ready": "94c546f190a866f8b21fcc2d78a2ef53632b404f",
+  "files": [
+    {
+      "path": "app/Domain/Customers/ProductionCustomerAccess.php",
+      "sha256": "7dbaeed358ab1051dd34608fbf966645ae7756f163700733bf9708f1233aba42"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureAccess.php",
+      "sha256": "7b47e7ae6617581d18d25687e35ea28d6804394ead13550555b81b7a91f02fd6"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureIdentity.php",
+      "sha256": "940a64d2f0bc9f0f60719a38fa4436fcfcca5ecbc81e059f4b5130e37c5a2ad7"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeaturePolicy.php",
+      "sha256": "6438997b0e13e2b8e7b39b43ab983ace8151bf2bd3d08164e78ed0a32213001e"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php",
+      "sha256": "623e31f469a0a1779e3f992f5d1c48b0aaa2382d308109bc33cc78f70a7c821b"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommitSeal.php",
+      "sha256": "3a0686a3f04bf3679d384ce06a33bdfa0c6599a593d7f0cc59476f3cf4937b97"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommittedReceipt.php",
+      "sha256": "3cd04111ec02a7017ec96f9a1bd5bc25f1c200115a925e5570d7002c2858cd0f"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityHistoricalPlainRows.php",
+      "sha256": "2117a278b26b7b643429f460e549adcbe0b499efdfca8ee14ab8939c4a048769"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php",
+      "sha256": "6058e3e4ced2900e1ccc93bd9110691c041ad0c4ecafe2f0373d323ceb17cb90"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityOriginalCommitWitness.php",
+      "sha256": "237209e42fe54ba2557ee97b27fa8d826ab104ad3f08c6b81e8ddc7fa01061ba"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityRows.php",
+      "sha256": "470a2a4816739aef151ad429f9b8b6c359a0eba0b8068a60d1f215b6547794a4"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/ConfiguredSmtpIdentityTransport.php",
+      "sha256": "75068247694ea5024387ac66b97698aeafd3c5993ac34442f85f72d4c3f316f0"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentityEsmtpClient.php",
+      "sha256": "88877b44bfb1f6901aced5a31249637b2a18b9164fda9a750374272d2e421374"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php",
+      "sha256": "99916a84234471ca95c8ec6c8b6b57324321e0132b38197c42f6c43b66eaf8d5"
+    },
+    {
+      "path": "tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php",
+      "sha256": "077545082a975decb1cf9c94175a10f500ac1b612329f484e0f019279013dabd"
+    },
+    {
+      "path": "tests/Support/IdentityHistoricalCommitFixture.php",
+      "sha256": "c36d6def466cb27d742c1b9596177a295d9d3f0820a7b51314a0b43425c450a2"
+    }
+  ]
+}

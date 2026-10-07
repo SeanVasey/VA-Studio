@@ -1,0 +1,6 @@
+{
+    "callbacks": 0,
+    "marker": 9123,
+    "refusal": "committed_read_frame",
+    "physical_transaction": false
+}

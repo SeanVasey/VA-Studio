@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Canary\ProductionCheckoutLazyCommandCanaryTest" file="/tmp/ProductionCheckoutLazyCommandCanaryTest.php" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="2.179824">
+    <testcase name="test_postcommit_lazy_primary_withdrawal_never_runs_or_returns_prepared_result" file="/tmp/ProductionCheckoutLazyCommandCanaryTest.php" line="10" class="Tests\Canary\ProductionCheckoutLazyCommandCanaryTest" classname="Tests.Canary.ProductionCheckoutLazyCommandCanaryTest" assertions="2" time="2.179824">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Canary\ProductionCheckoutLazyCommandCanaryTest::test_postcommit_lazy_primary_withdrawal_never_runs_or_returns_prepared_result
+Prepared result escaped through lazy primary callback.
+
+/tmp/ProductionCheckoutLazyCommandCanaryTest.php:18</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

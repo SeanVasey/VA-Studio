@@ -1,0 +1,27 @@
+{
+    "source": "b6f1dfbb7b92cee5319eac79443b88bf24178ab2",
+    "expected_initial_resolution_count": 2,
+    "actual_resolver_callbacks": 4,
+    "fresh_enabled": false,
+    "refusal": null,
+    "returned_order": {
+        "orderId": "3b414a6a-136c-4426-87f4-6ef599e9987e",
+        "createdAt": "2026-10-07T11:07:11Z",
+        "amounts": {
+            "currency": "USD",
+            "subtotal_minor": 4999,
+            "tax_minor": 0,
+            "total_minor": 4999
+        },
+        "assentAccepted": true,
+        "fundsMode": "test",
+        "paymentStatus": "unverified",
+        "fulfillmentStatus": "pending_payment"
+    },
+    "retained_counts": {
+        "order": 1,
+        "line": 1,
+        "attempt": 1
+    },
+    "review_row_unchanged": true
+}\n

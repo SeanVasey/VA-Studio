@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "vendor/bin/phpunit",
+    "tests/Feature/ProductionCheckoutSourceTransactionTest.php",
+    "tests/Feature/ProductionCheckoutJourneyTest.php",
+    "tests/Feature/ProductionCheckoutPrimaryBoundaryTest.php",
+    "--filter",
+    "expired_source_refusal_does_not_resolve_a_lazy_primary|command_postcommit_refusal_does_not_resolve_a_lazy_primary|expired_source_refusal_does_not_invoke_an_uncached_connection|original_transaction_frame_cannot_be_replaced_or_nested|repeated_terminal_proofs_preserve_consumer_writes|actual_mailbox_enrollment_payable|recovery_during_provider_read|postcommit_callback_shadow_suppresses_result_and_keeps_original_permanent_graph",
+    "--log-junit",
+    "/tmp/va-production-checkout-callback-frozen-native.xml",
+    "--colors=never"
+  ],
+  "source_sha": "b6f1dfbb7b92cee5319eac79443b88bf24178ab2",
+  "environment": "Native Oracle MySQL8.0.46 dedicated isolated checkout schema; private task.env; actual loopback synthetic SMTP; network sandbox grant"
+}

@@ -1,0 +1,145 @@
+{
+  "base_sha": "1fddf3d726245265745e9e285a653d5603d483c6",
+  "status": "uncommitted NEW receipt preparation; no fake identity classes; only predependency cases run",
+  "argv": [
+    "vendor/bin/phpunit",
+    "tests/Feature/ProductionCheckoutSourceTransactionTest.php",
+    "tests/Feature/ProductionCheckoutCommittedRowsTest.php",
+    "tests/Feature/ProductionCheckoutCommittedReceiptTest.php",
+    "--filter",
+    "ProductionCheckoutSourceTransactionTest|ProductionCheckoutCommittedRowsTest|disabled_receipt_capability|config_withdrawal_during_actual_source_decryption",
+    "--colors=never",
+    "--log-junit",
+    "/tmp/va-checkout-receipt-predependency-baseline.xml"
+  ],
+  "files": [
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ApproveExemptionAuthority.php",
+      "sha256": "2e96884a8bfc6737de5a7a5f57b50cec9b514f5a3133280de9720c411b090ae6"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CheckoutException.php",
+      "sha256": "271e6eaf728665edf521b64daadbdcf00b5c2f432c344138b648bc9f61140241"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CheckoutSchema.php",
+      "sha256": "f5ae038aac1aab1aa30e56fada96fdb6855c5bc585829745a16e3cac18afa770"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CheckoutSchemaInstaller.php",
+      "sha256": "c04dbc3b448272290ec9e818ccc4e8b87139d9d20db1cf5aeb0932da015389d8"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CommandTransaction.php",
+      "sha256": "caaa90a41de3ebe343d54f86f46e3abc5e711f8caa32c07298c59d77f393aa97"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CommittedReadContext.php",
+      "sha256": "381cc861946a7f97bd96ebbbd92a03184649ca3a1fd832644073e194a8c886cf"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CurrentPolicy.php",
+      "sha256": "b151c733ad31dc67e57e2c3a33b98791130f07160b976de114b5a0ba5467c532"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CurrentSelection.php",
+      "sha256": "b0c47f1fd18059acfbe57ed2d27527a90e1a958baeef47899b14f39da303a584"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/Evidence.php",
+      "sha256": "e557b6a0b904cbcfa2e0c7325302e60e9ec5189814c1af79a2be2e0c590a5847"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ExecutionContextV1.php",
+      "sha256": "ac908ae218e7988ef5cef50eaeed808a4838c57422e99a1694fff6ecd4c4436c"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ExemptionPolicyV1.php",
+      "sha256": "971377ae3cc85145da1f47490569aaecdf1b85c9961089114a4a20dd7eaa04b7"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/HeldSourceTransaction.php",
+      "sha256": "4c666b7d13aa4d341ce23310a909d47d5a9e6797da2ea8dd80f398f64a65fe8b"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/HostedCheckout.php",
+      "sha256": "b95de60fd827eefdb557b9762e3a2d2f628139b3fd7a52b89401c524c4e0f8ee"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/HostedEvidence.php",
+      "sha256": "13eb973ddd2ea872c788f18d7258aff30b1b73c21923d1ad2a2d05e4272e2024"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/OrderEvidence.php",
+      "sha256": "4b7864a88b3f0bd4fcdc21169f8d36fc5243b484f3eb88cb2b8bb270ede2a8b0"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/OriginalCommitDispatcher.php",
+      "sha256": "e4ce6f5c7f717dce92ad777afb3b8784d97d779463e139db232fbbc675520bf0"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/OwnAccountStripeGateway.php",
+      "sha256": "7b08341640033b05df0d4318653e68c348ad1a62ee59c97dbc01a36af722785b"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/PrimaryBoundary.php",
+      "sha256": "469d849f7f8277e266e034c964c5b5c5d01232bbe2fb6fc4665fc75d23afe6c3"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionCheckout.php",
+      "sha256": "eff295bb191cbc748fd0bb9cfd6c94bc7060ad70e148a712d08d7c3bae6ccca9"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderCommittedReadReceiptV1.php",
+      "sha256": "48921eec0bc177fc3c8314474dc17766d3ae39326ccd74f6a34cee1997974d9c"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderLocatorV1.php",
+      "sha256": "c881ad5238322ebe3c14f161c225ae518ad6c4255ab978cb60f551c8747fff11"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderSourceV1.php",
+      "sha256": "3844e7b6fef9402a17ac5c5b258e8d4faf55730a4c021be107c1419dffb748d2"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProviderGateway.php",
+      "sha256": "8b6fa1fa41b62bbc454b8a06edd02d37bfb73dba29fc33a245a69572640ccc46"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/Records.php",
+      "sha256": "ba9d56a49613a7e74a5416481d2a93faeeda8348c3909ee357e2dda3ba3fee0e"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ResolvedConnection.php",
+      "sha256": "314596810f65f280c7804ae1bf58887bf3c223626a7bc5c792cf5d9e548cf575"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/StaffProof.php",
+      "sha256": "479ebb9617d26d554ab66b8bc6f7cb028d2c899eae56cd30bb7ec404f00c8d0a"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/TaxExemptions.php",
+      "sha256": "1560cfbb7f2c20afc3c873f79e240995a9181bbe2329f5f9088b78ba737ea95d"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/CurrentRows.php",
+      "sha256": "224fd368edf4028fd2002227de16558f55514d5bda908bcd51f7a1a4ee50d1da"
+    },
+    {
+      "path": "config/production_checkout.php",
+      "sha256": "8be44ca3e4eac53d7adbc4d5103a40a371301572908708a84b66e259825e82dd"
+    },
+    {
+      "path": "tests/Feature/ProductionCheckoutCommittedReceiptTest.php",
+      "sha256": "e560df811dd1f2ca106c1f4d33e9424881e4c1e0ae041b9926f0ca6412762e8f"
+    },
+    {
+      "path": "tests/Feature/ProductionCheckoutCommittedRowsTest.php",
+      "sha256": "e0f30732d3be17845776080c464554f9fcab567ca078d5434ba6efc30f7b6b77"
+    },
+    {
+      "path": "tests/Feature/ProductionCheckoutSourceTransactionTest.php",
+      "sha256": "35de299e07fc253e0ae679cc37585a8298802e4a5415e7566b4fb237edc609f4"
+    }
+  ]
+}

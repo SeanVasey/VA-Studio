@@ -1,0 +1,25 @@
+{
+  "source_sha": "90d09a5363c78eb54531526916008f197d4dcb8d",
+  "identity_witness_source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+  "identity_receipt_source": "e6c02b90719923bc4ba435f86399b077980c1ddc",
+  "canary_sha256": "db34517b2eb744aa74abcc77bb288a3e75c40b2edc9edfee9db6aee3cc553472",
+  "argv": [
+    "vendor/bin/phpunit",
+    "docs/verification/checkout-receipt-parent-repair-20261007/CheckoutReceiptArrayParentCanaryTest.php",
+    "--filter",
+    "test_plain_receipt_rejects_late_app_arrayobject_parent",
+    "--colors=never",
+    "--log-junit",
+    "/tmp/checkout-receipt-parent-original-red.xml"
+  ],
+  "result": {
+    "tests": 1,
+    "assertions": 2,
+    "failures": 1,
+    "errors": 0,
+    "callbacks": 104,
+    "marker": 9133,
+    "refusal": null,
+    "physical_transaction": false
+  }
+}

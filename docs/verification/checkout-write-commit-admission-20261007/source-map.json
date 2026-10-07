@@ -1,0 +1,21 @@
+{
+  "executable_source": "c6d8234533b00bc741925c2028befdb7b455ea6d",
+  "tree": "d163f4f29310d565f04be81678606e8c9aa7e2bb",
+  "base": "6e3932aa22d2668508dc66b696b6108b6d094f53",
+  "owned": {
+    "app/Domain/Commerce/ProductionCheckout/CommandTransaction.php": "e2172b0fc144cd2c25468daa2a2e23cc7b063fcfbdc0498b2fad14a7550d5d69",
+    "app/Domain/Commerce/ProductionCheckout/ProductionCheckout.php": "1b9bb5c953335ce530c3cb1c0484bbb8375bdcd9049b429faddce6d12587a8ee",
+    "app/Domain/Commerce/ProductionCheckout/Records.php": "516d0268316e72fd7093cd618699ea296dbd32b2944317525bcf1d05c0a90641",
+    "app/Domain/Commerce/ProductionCheckout/CheckoutCommandCommitDispatcher.php": "6846dccc351879e66be3e4b3009b84399f15aa6e17bec2ad99bc02230c1aac8b",
+    "app/Domain/Commerce/ProductionCheckout/CheckoutCommandFrame.php": "026a1cfef68d71f6566892b6271b8f5ec7d01d36445ebf5b4ea318ea8654bd52",
+    "app/Domain/Commerce/ProductionCheckout/CheckoutWriteAdmission.php": "0587d9933ecca35a7fa921d624d28b5c998302f8314603ca3961f192f141f751",
+    "tests/Feature/ProductionCheckoutWriteCommitTest.php": "d5a5c8bb0a2e8ec8c972782b3da903ce5e70f9f5ecc5d1c32dc6c86341f56b60"
+  },
+  "unchanged": {
+    "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderSourceV1.php": "c65017aefc39ebff9a574a54b00b8f50aa9090b956cc264aba34eda29b660a97",
+    "app/Domain/Commerce/ProductionPolicy/CurrentRows.php": "02421b3afb5911bab22bec749c3c691f45379aab4f48c3522831be051235e428",
+    "app/Domain/Customers/ProductionCustomerAccess.php": "4f013b5114b8b8ee8cd53d42277368a215861b8c48a07672fd2337e4fc483eb4",
+    "app/Domain/Customers/ProductionIdentity/IdentityRows.php": "deb303101abe98ca505c43e34ab49cc636b56fed42e5b808044380108fdb42bd",
+    "app/Domain/Commerce/ProductionCheckout/FreshCheckoutPolicy.php": "49388132bd3fcc79f5520188d580970cc780d6c4799205951902925ec6609faa"
+  }
+}

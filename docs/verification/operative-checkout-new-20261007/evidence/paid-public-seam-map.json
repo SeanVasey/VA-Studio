@@ -1,0 +1,46 @@
+{
+  "previous_sha": "9f948b4eca4fe0ce0e91221afff920652fe3a21a",
+  "current_sha": "f0a1615be0833804959662fad5d7a7a8e1389ee0",
+  "public_method_signatures_byte_exact": [
+    "public static function lockedRead(ProductionPaidOrderLocatorV1 $locator, CurrentRows $reader, array $prelockedIdentityRaw): self",
+    "public function proveRetainedCurrent(CurrentRows $reader): void",
+    "public function line(int $position): array",
+    "public function lineCount(): int",
+    "public function __serialize(): array",
+    "public function jsonSerialize(): never",
+    "public function __unserialize(array $data): void",
+    "public function __debugInfo(): array"
+  ],
+  "accessor_and_serialization_bodies_byte_exact": [
+    {
+      "method": "line",
+      "sha256": "92b4b6df690927dd1f596c49fe83e06d44ed0257e233ff557c1689be2bb8b782"
+    },
+    {
+      "method": "lineCount",
+      "sha256": "b5e6dff3b9e744e2e21390fc487e35dd0bef833357b1d757dc0421ca1423f87d"
+    },
+    {
+      "method": "__serialize",
+      "sha256": "99262bef5c49a31ff7eee1b8e5fe406ae56694963318d3857c279a49787b8423"
+    },
+    {
+      "method": "jsonSerialize",
+      "sha256": "9d015feefe8b44ca38d83ecfba774b816426723c11e1629740669b08f9d591c7"
+    },
+    {
+      "method": "__unserialize",
+      "sha256": "ce116a472328887a0da27c184b87f0c0612014cda7bf2cd6b882c8bd993aecc5"
+    },
+    {
+      "method": "__debugInfo",
+      "sha256": "8a2a6626e8cebd2852227ee9b3951f83c9932fa904029ec09c0bceaa60908cdc"
+    }
+  ],
+  "locator_file_byte_exact": true,
+  "changed_source_bodies": [
+    "private constructor adds private transaction fence",
+    "lockedRead captures fence before callbacks and retains it",
+    "proveRetainedCurrent fences entry and terminal"
+  ]
+}

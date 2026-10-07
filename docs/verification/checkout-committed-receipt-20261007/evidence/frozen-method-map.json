@@ -1,0 +1,164 @@
+{
+    "base_sha": "b6f1dfbb7b92cee5319eac79443b88bf24178ab2",
+    "source_sha": "90d09a5363c78eb54531526916008f197d4dcb8d",
+    "method_map": {
+        "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderSourceV1.php": {
+            "__construct": {
+                "byte_exact": true,
+                "original_sha256": "fad207b0cba342bc793150b05776b000feab739e383ff9d7de5a53582cb470db",
+                "current_sha256": "fad207b0cba342bc793150b05776b000feab739e383ff9d7de5a53582cb470db"
+            },
+            "lockedRead": {
+                "byte_exact": true,
+                "original_sha256": "bd4bfe8987c1d2587bb9837571994a4f4b70acd3ba14f972945d2d4c74dd2de2",
+                "current_sha256": "bd4bfe8987c1d2587bb9837571994a4f4b70acd3ba14f972945d2d4c74dd2de2"
+            },
+            "proveRetainedCurrent": {
+                "byte_exact": true,
+                "original_sha256": "3faac2577a1fa4cfa2bbd6f1b1cb909d24c1839e6e551a70436884516f5bc1ba",
+                "current_sha256": "3faac2577a1fa4cfa2bbd6f1b1cb909d24c1839e6e551a70436884516f5bc1ba"
+            },
+            "line": {
+                "byte_exact": true,
+                "original_sha256": "efdef5b43072856737726dd5e4191a9de8fc08c588c204756ddee1087df4163d",
+                "current_sha256": "efdef5b43072856737726dd5e4191a9de8fc08c588c204756ddee1087df4163d"
+            },
+            "lineCount": {
+                "byte_exact": true,
+                "original_sha256": "18345dfd470123a39fa28019c6d87fe87c9ed44b8fc0b7e38cbabe819ab5fda7",
+                "current_sha256": "18345dfd470123a39fa28019c6d87fe87c9ed44b8fc0b7e38cbabe819ab5fda7"
+            },
+            "__serialize": {
+                "byte_exact": true,
+                "original_sha256": "fbbecd145423e50b3b712ce526bb6435cf15a7e75f931b449bbdd64ed70d61ae",
+                "current_sha256": "fbbecd145423e50b3b712ce526bb6435cf15a7e75f931b449bbdd64ed70d61ae"
+            },
+            "jsonSerialize": {
+                "byte_exact": true,
+                "original_sha256": "6e966d438833d5e2f0e16f0ad76bb934b242012a97ee145a0178b8803c495db0",
+                "current_sha256": "6e966d438833d5e2f0e16f0ad76bb934b242012a97ee145a0178b8803c495db0"
+            },
+            "__unserialize": {
+                "byte_exact": true,
+                "original_sha256": "3abff72e5f095ee9e67333be87d7b083c4a7792d134c561019f5e8679fad5dc1",
+                "current_sha256": "3abff72e5f095ee9e67333be87d7b083c4a7792d134c561019f5e8679fad5dc1"
+            },
+            "__debugInfo": {
+                "byte_exact": true,
+                "original_sha256": "8a7d71f88cae34d7c217ce37f1d0f76e7f376c4332a2a8059c0874270bfc487c",
+                "current_sha256": "8a7d71f88cae34d7c217ce37f1d0f76e7f376c4332a2a8059c0874270bfc487c"
+            }
+        },
+        "app/Domain/Commerce/ProductionPolicy/CurrentRows.php": {
+            "__construct": {
+                "byte_exact": true,
+                "original_sha256": "088ec2a01a4e713bb073ee4fe938016cba7f2b993c3e7b56b0879241f887ded4",
+                "current_sha256": "088ec2a01a4e713bb073ee4fe938016cba7f2b993c3e7b56b0879241f887ded4"
+            },
+            "identityPrimary": {
+                "byte_exact": true,
+                "original_sha256": "fc00f36c61a89783ca9e3b70eb8f58bc0a52235a06aadef753ba2ac0f16a6aaf",
+                "current_sha256": "fc00f36c61a89783ca9e3b70eb8f58bc0a52235a06aadef753ba2ac0f16a6aaf"
+            },
+            "identityDriver": {
+                "byte_exact": true,
+                "original_sha256": "5997fb69cd03ec6086550bf0884ab6df3b4d81e04c1c5bcba722f4f683fc10dd",
+                "current_sha256": "5997fb69cd03ec6086550bf0884ab6df3b4d81e04c1c5bcba722f4f683fc10dd"
+            },
+            "rows": {
+                "byte_exact": false,
+                "original_sha256": "4a98a0a5a7607738d6c623721ab7790eff99bef4530e250314902684caf92bfc",
+                "current_sha256": "714239bab3640d77edf6a05e1514efd368eeeb3e34072592d86042254beb8fdd"
+            },
+            "one": {
+                "byte_exact": true,
+                "original_sha256": "4203899c68ba93de7001d3c63a260216a36087538a753ad4b7fb3e4dddf16834",
+                "current_sha256": "4203899c68ba93de7001d3c63a260216a36087538a753ad4b7fb3e4dddf16834"
+            },
+            "audits": {
+                "byte_exact": true,
+                "original_sha256": "698515e3383f4795f0aba641e387020b8422bd08aba38faefdb7e47e7fffdb71",
+                "current_sha256": "698515e3383f4795f0aba641e387020b8422bd08aba38faefdb7e47e7fffdb71"
+            },
+            "audit": {
+                "byte_exact": true,
+                "original_sha256": "68f60138efa85429736009d1e42f4124a98438e0fa508abfa4b9767f69f24dbc",
+                "current_sha256": "68f60138efa85429736009d1e42f4124a98438e0fa508abfa4b9767f69f24dbc"
+            }
+        },
+        "app/Domain/Commerce/ProductionCheckout/HeldSourceTransaction.php": {
+            "__construct": {
+                "byte_exact": false,
+                "original_sha256": "33056230e4cfb9d8dbbb1871324417f816400cf12ec5e7fba266b7bb278726cc",
+                "current_sha256": "804a1f1de6b7507e17312d954459ff17ec911fd55682799bc6f9aeb574d180c3"
+            },
+            "requireCurrent": {
+                "byte_exact": true,
+                "original_sha256": "a47ca1887bda9d0ef03349c2a014d27ba66c8df235876f43385594ee4ee747a6",
+                "current_sha256": "a47ca1887bda9d0ef03349c2a014d27ba66c8df235876f43385594ee4ee747a6"
+            },
+            "capture": {
+                "byte_exact": false,
+                "original_sha256": "54f62002d539e8da5c607099a21315036251ee0d2f8f26eb1584168075ee05f9",
+                "current_sha256": "0a9dd00156176f19ad2b30932d45a63e64bbe9510599aaaab25d974c479dd76d"
+            },
+            "prove": {
+                "byte_exact": true,
+                "original_sha256": "72a3ae32b465c1cd7b48c2492b033e952246bd07599eb68cca8cc4e45c651966",
+                "current_sha256": "72a3ae32b465c1cd7b48c2492b033e952246bd07599eb68cca8cc4e45c651966"
+            },
+            "requireFrame": {
+                "byte_exact": true,
+                "original_sha256": "12633174b0d69cee52d4252eecf6f885618817948526a144228a757dcca4d9ef",
+                "current_sha256": "12633174b0d69cee52d4252eecf6f885618817948526a144228a757dcca4d9ef"
+            },
+            "execute": {
+                "byte_exact": true,
+                "original_sha256": "c36cfd76f531e3e9fe8b70dd8c868519b1109171a08f0aca8f5b915abe887143",
+                "current_sha256": "c36cfd76f531e3e9fe8b70dd8c868519b1109171a08f0aca8f5b915abe887143"
+            },
+            "__debugInfo": {
+                "byte_exact": true,
+                "original_sha256": "6229d90021659a34b87b2b1735febdbebe4cdc65626e7a0901071bdd84c06737",
+                "current_sha256": "6229d90021659a34b87b2b1735febdbebe4cdc65626e7a0901071bdd84c06737"
+            }
+        },
+        "app/Domain/Commerce/ProductionCheckout/Records.php": {
+            "__construct": {
+                "byte_exact": true,
+                "original_sha256": "46ae905f9e7f38d04b3919b137c08d2b6aa55e87c85942b106cf3f7c7d914f4b",
+                "current_sha256": "46ae905f9e7f38d04b3919b137c08d2b6aa55e87c85942b106cf3f7c7d914f4b"
+            },
+            "retained": {
+                "byte_exact": true,
+                "original_sha256": "05cefd53fbef459b0a95d384f60a46853949400bdd1874eecca1667aa1100507",
+                "current_sha256": "05cefd53fbef459b0a95d384f60a46853949400bdd1874eecca1667aa1100507"
+            },
+            "provePrimary": {
+                "byte_exact": true,
+                "original_sha256": "e5face44e10c0230399f5b13d7c9ba6690b391c8c1637ccdef23e2d403502532",
+                "current_sha256": "e5face44e10c0230399f5b13d7c9ba6690b391c8c1637ccdef23e2d403502532"
+            },
+            "insert": {
+                "byte_exact": true,
+                "original_sha256": "169b0c17780338f07a59e5f57a20eb0c0109a62257abf08a49e1c133c02b4c90",
+                "current_sha256": "169b0c17780338f07a59e5f57a20eb0c0109a62257abf08a49e1c133c02b4c90"
+            },
+            "one": {
+                "byte_exact": true,
+                "original_sha256": "b43efb3125e25f4145cc44b4b3ac75c5e98fe9a8edc5e995aa3a831d3337008f",
+                "current_sha256": "b43efb3125e25f4145cc44b4b3ac75c5e98fe9a8edc5e995aa3a831d3337008f"
+            },
+            "selector": {
+                "byte_exact": true,
+                "original_sha256": "1f435aba6c48bb7ffb479d99434aa54ed342a0d5671d9d8d9b6088ab79f9cf66",
+                "current_sha256": "1f435aba6c48bb7ffb479d99434aa54ed342a0d5671d9d8d9b6088ab79f9cf66"
+            }
+        }
+    },
+    "default_rows_sql_and_return_block": {
+        "byte_exact": true,
+        "bytes": 321,
+        "sha256": "64ea725dfc5a8fdb46d51faa135cb73e4c57273b7fffdea4a3db900aff80904c"
+    }
+}

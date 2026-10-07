@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "vendor/bin/pint",
+    "--test",
+    "app/Domain/Commerce/ProductionCheckout/HeldSourceTransaction.php",
+    "app/Domain/Commerce/ProductionCheckout/Records.php",
+    "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderSourceV1.php",
+    "tests/Feature/ProductionCheckoutSourceTransactionTest.php"
+  ],
+  "source_sha": "f0a1615be0833804959662fad5d7a7a8e1389ee0"
+}

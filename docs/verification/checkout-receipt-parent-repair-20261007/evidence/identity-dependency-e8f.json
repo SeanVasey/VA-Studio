@@ -1,0 +1,10 @@
+{
+  "upstream_commit": "e8f744163600bb394e3f09c8c7f838f9fc62c885",
+  "status": "unreviewed historical witness parent guard successor",
+  "files": [
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityOriginalCommitWitness.php",
+      "sha256": "1bc64f515cd6707b5e3dd9577aa98ac3aa32fc8b731d87654eb484caf1dc65fc"
+    }
+  ]
+}

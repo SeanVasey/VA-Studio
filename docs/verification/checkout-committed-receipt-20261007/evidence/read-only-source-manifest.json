@@ -1,0 +1,50 @@
+{
+  "source_sha": "1fddf3d726245265745e9e285a653d5603d483c6",
+  "base_sha": "b6f1dfbb7b92cee5319eac79443b88bf24178ab2",
+  "authorized_shared_files": [
+    "app/Domain/Commerce/ProductionPolicy/CurrentRows.php"
+  ],
+  "unchanged_method_bodies": {
+    "__construct": {
+      "bytes": 69,
+      "sha256": "eb2310625b28af7f961a317baec49d69e264d2122d6c614a57d310d9a9a510de"
+    },
+    "identityPrimary": {
+      "bytes": 74,
+      "sha256": "53d082c839841892877402514f9a3960df2dcff5a816d3ac14cc5ded088cdd62"
+    },
+    "identityDriver": {
+      "bytes": 75,
+      "sha256": "76519f19cb5f9e9286aa3b90506b56c185a40c67b0e67e56fa92cb14a23e02ab"
+    },
+    "one": {
+      "bytes": 117,
+      "sha256": "1d4bc52238a249f1a8b402b29980dfcdee206891bd4fd4150b13bcee1b2753b7"
+    },
+    "audits": {
+      "bytes": 203,
+      "sha256": "3c0d05dfe799bf9f454556a8c3f4c2004dcd6ad2ddaa3de559610a33bb0e101b"
+    },
+    "audit": {
+      "bytes": 486,
+      "sha256": "eba5482f63dc1e5dfa014aaa7c771170ef2c522383f32924a458e73d48a70000"
+    }
+  },
+  "default_rows_sql_and_return_block": {
+    "bytes": 323,
+    "sha256": "214d94630ba531b2ff28a63fc733157f0ba8882e0d8081c108ad609f91138e44",
+    "byte_exact_original": true
+  },
+  "files": [
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/CurrentRows.php",
+      "bytes": 3040,
+      "sha256": "224fd368edf4028fd2002227de16558f55514d5bda908bcd51f7a1a4ee50d1da"
+    },
+    {
+      "path": "tests/Feature/ProductionCheckoutCommittedRowsTest.php",
+      "bytes": 4126,
+      "sha256": "e0f30732d3be17845776080c464554f9fcab567ca078d5434ba6efc30f7b6b77"
+    }
+  ]
+}

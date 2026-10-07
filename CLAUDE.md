@@ -146,7 +146,7 @@ Repo-specific facts and invariants. §1–§12 stay byte-identical across repos;
 
 ### Current user-authorized handoff — October 7, 2026
 
-Read `docs/handoff/2026-10-07/README.md` and its final branch inventory before continuation. Sean requested completion/push of current development batches and handoff of remaining implementation to another harness. Preserve reviewed main, unfinished branches, original failures and immutable originals as separately attributed source.
+Read `docs/handoff/2026-10-07/CLAUDE-PLAN.md` first (plan, lane protocol, state ledger), then `docs/handoff/2026-10-07/README.md` and its branch inventory. Sean requested completion/push of current development batches and handoff of remaining implementation to another harness. Preserve reviewed main, unfinished branches, original failures and immutable originals as separately attributed source.
 
 Sean's current `AGENTS.md` CI cost policy supersedes earlier gate adaptations here: focused affected checks, independent sensitive review and cheap preflight authorize development merges. Foundation remains one manual final integrated exact-SHA verification; do not restore automatic database/browser matrices or weaken security/protections. Current partitioning uses eight MySQL/two SQLite shards with an exact native-only SQLite method census, which still needs normalization after new families. No final handoff acceptance is claimed.
 

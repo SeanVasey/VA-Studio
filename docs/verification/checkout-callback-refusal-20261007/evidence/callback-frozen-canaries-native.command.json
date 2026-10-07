@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "vendor/bin/phpunit",
+    "docs/verification/checkout-callback-refusal-20261007/canaries/ProductionCheckoutLazyCommandCanaryTest.php",
+    "docs/verification/checkout-callback-refusal-20261007/canaries/ProductionCheckoutLazyPrimaryCanaryTest.php",
+    "docs/verification/checkout-callback-refusal-20261007/canaries/ProductionCheckoutUnresolvedConnectionCanaryTest.php",
+    "--filter",
+    "expired_source_refusal_never_resolves_lazy_primary_or_withdraws_original_buyer|postcommit_lazy_primary_withdrawal_never_runs_or_returns_prepared_result|expired_source_never_resolves_uncached_connection_that_withdraws_buyer",
+    "--log-junit",
+    "/tmp/va-production-checkout-callback-frozen-canaries-native.xml",
+    "--colors=never"
+  ],
+  "source_sha": "b6f1dfbb7b92cee5319eac79443b88bf24178ab2",
+  "environment": "Native Oracle MySQL8.0.46 dedicated isolated checkout schema; private task.env; actual loopback synthetic SMTP; network sandbox grant"
+}

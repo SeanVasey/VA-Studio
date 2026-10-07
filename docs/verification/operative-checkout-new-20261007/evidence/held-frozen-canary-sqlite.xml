@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Canary\ProductionCheckoutSourceTransactionCanaryTest" file="/workspace/VA-Studio-production-checkout/docs/verification/operative-checkout-new-20261007/canaries/ProductionCheckoutSourceTransactionCanaryTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="2.758861">
+    <testcase name="test_paid_locked_source_never_mints_without_a_held_consumer_transaction" file="/workspace/VA-Studio-production-checkout/docs/verification/operative-checkout-new-20261007/canaries/ProductionCheckoutSourceTransactionCanaryTest.php" line="14" class="Tests\Canary\ProductionCheckoutSourceTransactionCanaryTest" classname="Tests.Canary.ProductionCheckoutSourceTransactionCanaryTest" assertions="4" time="2.758861"/>
+  </testsuite>
+</testsuites>

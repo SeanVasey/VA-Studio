@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "vendor/bin/phpunit",
+    "/tmp/CheckoutReadonlyStatementCallbackCanaryTest.php",
+    "--colors=never",
+    "--log-junit",
+    "/tmp/va-checkout-statement-callback-red-sqlite.xml"
+  ],
+  "affected_source": "CurrentRows byte-exact1fddf3d726245265745e9e285a653d5603d483c6",
+  "affected_file_sha256": "224fd368edf4028fd2002227de16558f55514d5bda908bcd51f7a1a4ee50d1da",
+  "other_runtime": "uncommitted receipt work is not invoked by this canary"
+}

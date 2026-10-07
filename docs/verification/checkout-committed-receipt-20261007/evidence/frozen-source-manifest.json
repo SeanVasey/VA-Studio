@@ -1,0 +1,183 @@
+{
+  "base_sha": "b6f1dfbb7b92cee5319eac79443b88bf24178ab2",
+  "source_sha": "90d09a5363c78eb54531526916008f197d4dcb8d",
+  "tree": "ec6e31ba66a72d813c6c13683b6a4fc7a3d20c67",
+  "owned_and_explicit_shared_delta": [
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CommittedReadContext.php",
+      "bytes": 5351,
+      "sha256": "5083fe8f7a5a4a27904497ba40a7f5e12dc975a8cba64c6ad5416a65228f339b"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/HeldSourceTransaction.php",
+      "bytes": 3436,
+      "sha256": "4c666b7d13aa4d341ce23310a909d47d5a9e6797da2ea8dd80f398f64a65fe8b"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/OriginalCommitDispatcher.php",
+      "bytes": 7818,
+      "sha256": "c102ae223e433ab8e086a563fcba94a83f63d009f293d424756170d0ea819a0f"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderCommittedReadReceiptV1.php",
+      "bytes": 4000,
+      "sha256": "190aa5e356bdcd2f719e85277632c87911d99b0f7e4eb9eb8977f539d85c75e0"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderConsumerCommitAdmissionV1.php",
+      "bytes": 379,
+      "sha256": "0a1b219af99bf60d0b77f4570711a37e186c1e737d1fa721e886c607983c9608"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderSourceV1.php",
+      "bytes": 7809,
+      "sha256": "ca7ce0c8f6fd1d90b6ec299770947fe9117a30d268457db706adfae3eeff2983"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/Records.php",
+      "bytes": 2945,
+      "sha256": "ba9d56a49613a7e74a5416481d2a93faeeda8348c3909ee357e2dda3ba3fee0e"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/CurrentRows.php",
+      "bytes": 3672,
+      "sha256": "a7e682df609b29225c088b24a817169146066f8ff74e3fbafebd361c22ad350e"
+    },
+    {
+      "path": "config/production_checkout.php",
+      "bytes": 1167,
+      "sha256": "8be44ca3e4eac53d7adbc4d5103a40a371301572908708a84b66e259825e82dd"
+    },
+    {
+      "path": "tests/Feature/ProductionCheckoutCommittedReceiptTest.php",
+      "bytes": 20253,
+      "sha256": "4e06c9f84f453404ed5f374bc00f5b4d6822bd8f177c44063416077f91a15fae"
+    },
+    {
+      "path": "tests/Feature/ProductionCheckoutCommittedRowsTest.php",
+      "bytes": 7741,
+      "sha256": "3cb150038674f554602dd3e6771aacc02cc218c216bbf1683e92d9c45ba1cc0d"
+    }
+  ],
+  "borrowed_identity": [
+    {
+      "path": "app/Domain/Customers/ProductionCustomerAccess.php",
+      "upstream": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "7dbaeed358ab1051dd34608fbf966645ae7756f163700733bf9708f1233aba42",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureAccess.php",
+      "upstream": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "7b47e7ae6617581d18d25687e35ea28d6804394ead13550555b81b7a91f02fd6",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureIdentity.php",
+      "upstream": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "940a64d2f0bc9f0f60719a38fa4436fcfcca5ecbc81e059f4b5130e37c5a2ad7",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeaturePolicy.php",
+      "upstream": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "6438997b0e13e2b8e7b39b43ab983ace8151bf2bd3d08164e78ed0a32213001e",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php",
+      "upstream": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "623e31f469a0a1779e3f992f5d1c48b0aaa2382d308109bc33cc78f70a7c821b",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommitSeal.php",
+      "upstream": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "3a0686a3f04bf3679d384ce06a33bdfa0c6599a593d7f0cc59476f3cf4937b97",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommittedReceipt.php",
+      "upstream": "e6c02b90719923bc4ba435f86399b077980c1ddc",
+      "sha256": "82a2b5217f57da35eb90e099b4d26240c4c40082fa18977356de25b4c862cd78",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityHistoricalPlainRows.php",
+      "upstream": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "2117a278b26b7b643429f460e549adcbe0b499efdfca8ee14ab8939c4a048769",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php",
+      "upstream": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "6058e3e4ced2900e1ccc93bd9110691c041ad0c4ecafe2f0373d323ceb17cb90",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityOriginalCommitWitness.php",
+      "upstream": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "237209e42fe54ba2557ee97b27fa8d826ab104ad3f08c6b81e8ddc7fa01061ba",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityRows.php",
+      "upstream": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "470a2a4816739aef151ad429f9b8b6c359a0eba0b8068a60d1f215b6547794a4",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/ConfiguredSmtpIdentityTransport.php",
+      "upstream": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "75068247694ea5024387ac66b97698aeafd3c5993ac34442f85f72d4c3f316f0",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentityEsmtpClient.php",
+      "upstream": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "88877b44bfb1f6901aced5a31249637b2a18b9164fda9a750374272d2e421374",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php",
+      "upstream": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "99916a84234471ca95c8ec6c8b6b57324321e0132b38197c42f6c43b66eaf8d5",
+      "byte_exact": true
+    },
+    {
+      "path": "tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php",
+      "upstream": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "077545082a975decb1cf9c94175a10f500ac1b612329f484e0f019279013dabd",
+      "byte_exact": true
+    },
+    {
+      "path": "tests/Support/IdentityHistoricalCommitFixture.php",
+      "upstream": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "c36d6def466cb27d742c1b9596177a295d9d3f0820a7b51314a0b43425c450a2",
+      "byte_exact": true
+    }
+  ],
+  "byte_exact_checkout_paths": [
+    "app/Domain/Commerce/ProductionCheckout/OwnAccountStripeGateway.php",
+    "app/Domain/Commerce/ProductionCheckout/OrderEvidence.php",
+    "app/Domain/Commerce/ProductionCheckout/ProductionCheckout.php",
+    "app/Domain/Commerce/ProductionCheckout/ApproveExemptionAuthority.php",
+    "app/Domain/Commerce/ProductionCheckout/ExemptionPolicyV1.php",
+    "app/Domain/Commerce/ProductionCheckout/ResolvedConnection.php",
+    "app/Domain/Commerce/ProductionCheckout/CurrentPolicy.php",
+    "app/Domain/Commerce/ProductionCheckout/HostedCheckout.php",
+    "app/Domain/Commerce/ProductionCheckout/PrimaryBoundary.php",
+    "app/Domain/Commerce/ProductionCheckout/ExecutionContextV1.php",
+    "app/Domain/Commerce/ProductionCheckout/TaxExemptions.php",
+    "app/Domain/Commerce/ProductionCheckout/CheckoutException.php",
+    "app/Domain/Commerce/ProductionCheckout/StaffProof.php",
+    "app/Domain/Commerce/ProductionCheckout/CheckoutSchema.php",
+    "app/Domain/Commerce/ProductionCheckout/CurrentSelection.php",
+    "app/Domain/Commerce/ProductionCheckout/Evidence.php",
+    "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderLocatorV1.php",
+    "app/Domain/Commerce/ProductionCheckout/CommandTransaction.php",
+    "app/Domain/Commerce/ProductionCheckout/CheckoutSchemaInstaller.php",
+    "app/Domain/Commerce/ProductionCheckout/ProviderGateway.php",
+    "app/Domain/Commerce/ProductionCheckout/HostedEvidence.php"
+  ]
+}
