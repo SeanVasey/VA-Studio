@@ -1,0 +1,21 @@
+{
+  "source": "3c8098e7750c746b42c8cde3283c36e631607059",
+  "files": {
+    "app/Domain/Grants/Member/MemberGrantSchema.php": "0115e88b858f386a8ae815af47d256a1b5414acdf987b95a9d0e6165660060be",
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalSchemaPreparationTest.php": "57ade7ec10e76608550672ef2e308303e408c7b3a037e2c2b14186304b440347"
+  },
+  "result": {
+    "tests": 2,
+    "failures": 2,
+    "errors": 0,
+    "assertions": 2
+  },
+  "scope": "actual structural admission; unregistered default-off preparation, no payment or usable grant authority",
+  "artifacts": {
+    "docs/verification/production-member-originals-preparation-20261007/owner-original-red.txt": "7977dd137457ee725d101cae2f8a0fffc0fe4a68b8ed63cb9a0c25f0cd37b4e5",
+    "docs/verification/production-member-originals-preparation-20261007/first-sqlite.xml": "53f9cbce4c0e03511f690083426575a2726246fecb6a593e52551a7c824f670d",
+    "docs/verification/production-member-originals-preparation-20261007/owner-original-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "docs/verification/production-member-originals-preparation-20261007/first-sqlite.txt": "74ed32c74ef6a6bf1d088c4af11d10a2f74bad2f48b996981f6177c4ab763fbb",
+    "docs/verification/production-member-originals-preparation-20261007/owner-original-red.xml": "1859655a5b426213b2b8a28f39b222986eb26f51a4b4f8aa9a8e02ad2cd55f43"
+  }
+}

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest" file="/workspace/VA-Studio-production-member-originals/tests/Feature/ProductionMemberOriginals/MemberOriginalSchemaPreparationTest.php" tests="2" assertions="2" errors="0" failures="2" skipped="0" time="1.483087">
+    <testcase name="test_original_cannot_bind_the_same_redemption_to_a_different_current_account" file="/workspace/VA-Studio-production-member-originals/tests/Feature/ProductionMemberOriginals/MemberOriginalSchemaPreparationTest.php" line="126" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalSchemaPreparationTest" assertions="1" time="0.880795">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_original_cannot_bind_the_same_redemption_to_a_different_current_account
+Immutable original structure must refuse.
+
+/workspace/VA-Studio-production-member-originals/tests/Feature/ProductionMemberOriginals/MemberOriginalSchemaPreparationTest.php:266
+/workspace/VA-Studio-production-member-originals/tests/Feature/ProductionMemberOriginals/MemberOriginalSchemaPreparationTest.php:132</failure>
+    </testcase>
+    <testcase name="test_original_cannot_bind_a_redemption_to_another_source_invoice" file="/workspace/VA-Studio-production-member-originals/tests/Feature/ProductionMemberOriginals/MemberOriginalSchemaPreparationTest.php" line="136" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalSchemaPreparationTest" assertions="1" time="0.602293">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest::test_original_cannot_bind_a_redemption_to_another_source_invoice
+Immutable original structure must refuse.
+
+/workspace/VA-Studio-production-member-originals/tests/Feature/ProductionMemberOriginals/MemberOriginalSchemaPreparationTest.php:266
+/workspace/VA-Studio-production-member-originals/tests/Feature/ProductionMemberOriginals/MemberOriginalSchemaPreparationTest.php:140</failure>
+    </testcase>
+  </testsuite>
+</testsuites>
