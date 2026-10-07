@@ -401,3 +401,13 @@ candidate completeness and fresh eligibility, explicitly not recovered old work.
 Only two new snapshot seams/imports are coordinated to its author; original
 snapshot methods must remain exact before independent review. Full personal-store
 implementation and final exact-SHA acceptance continue; no external activation.
+
+## Eleventh checkpoint — PR31 merged and consent registration ready
+
+PR31 expected head933134c merged as4150b858d05c837cf85801cf0ee1537a3c98464f, tree64ef3f3b9e80b02cf81d2d686ef9329c37e4d619, parentsda70eba/933134c. Fresh preflight37598818397 succeeded and actual thread4204862600 resolved after published correction. Primary checkout fast-forwarded without discarding its checkpoint ancestry.
+
+Consent independently approved d22 source is composed onto that main as e319; all38 review bindings remain byte exact. Root actual registered16/171, mounted63 and TypeScript pass. Evidence-only publication follows with one cheap preflight and expected-head merge. Production account adapter and suppression251 remain separate unfinished scope.
+
+Identity registration4b3 passed root15/182 and frontend14. Independent source review found actual247 installer accepts an incompatible users idTEXT-only table; the original1failure/3assertions is retained and approval withheld pending narrow owned repair. Reviewer shared16/187/nativeSMTP journey1/38 are green component checks. New default-off configured TLS SMTP/account adaptersd9b3937 remain provisional and unbound.
+
+Attachment root registered six checks/247 assertions and mounted five pass; prior accidental getJson GET bodies, incomplete frontend Link mock and wrong default-off status expectations are retained as harness errors. Actual HTML pages allow same-origin UI assets; API/stream/error responses keep sandbox. Whole source/independent review remains pending. Checkout9f narrow successor repairs actual three admission/authority defects and awaits native/independent proof; freeebf remains provisional during retry/status correction. New paid252, suppression251 and discovery248 replacement continue. No user-content, credentials, external messages, money or deployment actions occurred.

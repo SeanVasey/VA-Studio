@@ -1,0 +1,5 @@
+# Consent registration on merged PR31
+
+Executable e3197a4435588c1c8460798a6fa6c9772a4e1c32 composes independently approved consent250 d22e1dd onto verified main4150b858 (PR31). All38 independent source bindings remain byte exact. Actual registered HTTP16/171 and mounted preferences/account63 plus TypeScript pass on this composition; original admission/policy failures and corrected SQLite/native/race evidence remain in the independent receipt.
+
+The private current-account API preserves unknown, granted and withdrawn separately, stores immutable exact affirmative notice/purpose choices, advances every withdrawal and refuses stale grants. Reads and withdrawals remain possible when grant admission is disabled. The UI uses fresh account render scopes and removes private choices on departure/denial. Default-off notice policy has no invented legal approval; verified production identity binding and suppression251 are separate pending children. No transport or external messages are activated. Final8.4/browser/Foundation remain pending.
