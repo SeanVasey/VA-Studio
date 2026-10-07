@@ -1,0 +1,5 @@
+To https://github.com/SeanVasey/VA-Studio.git
+ * [new branch]        codex/checkout-committed-read-receipt-20261007 -> codex/checkout-committed-read-receipt-20261007
+ * [new branch]        codex/checkout-receipt-plain-parents-20261007 -> codex/checkout-receipt-plain-parents-20261007
+ * [new branch]        codex/checkout-terminal-fresh-policy-20261007 -> codex/checkout-terminal-fresh-policy-20261007
+ * [new branch]        codex/checkout-original-write-commit-admission-20261007 -> codex/checkout-original-write-commit-admission-20261007

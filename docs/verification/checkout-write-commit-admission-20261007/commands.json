@@ -1,0 +1,33 @@
+{
+  "executable_source": "c6d8234533b00bc741925c2028befdb7b455ea6d",
+  "cwd": "/workspace/VA-Studio-checkout-write-admission",
+  "toolchain": "/workspace/.va-studio-toolchain/activate.sh",
+  "native_private_env": "/workspace/.va-studio-toolchain/mysql/checkout_preflight-task.env",
+  "network_permission": "with_additional_permissions/network.enabled=true",
+  "native_owned_args": [
+    "vendor/bin/phpunit",
+    "--filter",
+    "test_committing_persisted_password_withdrawal_rolls_back_order_and_original_password|test_committing_identity_module_withdrawal_rolls_back_order|test_ordinary_committing_caller_write_survives_positive_order_commit_and_observer_restores|test_committing_direct_physical_commit_reopen_refuses_and_preserves_replacement_frame|test_committing_arrayobject_app_parent_is_refused_without_offset_callbacks|test_committing_fresh_withdrawal_refuses_new_review_and_retains_original",
+    "--log-junit",
+    "/workspace/VA-Studio-checkout-write-admission/docs/verification/checkout-write-commit-admission-20261007/final-native-owned.xml",
+    "tests/Feature/ProductionCheckoutWriteCommitTest.php"
+  ],
+  "native_original_args": [
+    "vendor/bin/phpunit",
+    "--filter",
+    "test_physical_committing_policy_withdrawal_prevents_new_order_rows",
+    "--log-junit",
+    "/workspace/VA-Studio-checkout-write-admission/docs/verification/checkout-write-commit-admission-20261007/final-native-original.xml",
+    "/workspace/VA-Studio-checkout-write-admission/docs/verification/checkout-write-commit-admission-20261007/CheckoutPhysicalCommitFreshPolicyCanaryTest.php"
+  ],
+  "unchanged_physical_probe_sha256": "ce1149920fe12f7e393d659d83355ca11bf2b524059bc5cdbc868e5bbb7407aa",
+  "secondary_snapshot_sha256": "d700297ef799272adda65b65fbab0d263fcecfa7ff8af8b4656468d5359f71f1",
+  "native": {
+    "driver": "mysql",
+    "pdo_class": "PDO",
+    "version": "8.0.46-0ubuntu0.24.04.4",
+    "version_comment": "(Ubuntu)",
+    "port": 33067,
+    "php": "8.4.26"
+  }
+}

@@ -1,0 +1,4 @@
+65857cc39eef8b8630afbd46e548cd08767392e9	refs/heads/codex/checkout-committed-read-receipt-20261007
+a69ebd951fe09ba43db299608c872d2211b16597	refs/heads/codex/checkout-original-write-commit-admission-20261007
+6d4736b685a69916cde87cfc8d7d4617a8073fce	refs/heads/codex/checkout-receipt-plain-parents-20261007
+55aec5fdde4c6959d11ed7e7d4ff21a7394d0e4e	refs/heads/codex/checkout-terminal-fresh-policy-20261007

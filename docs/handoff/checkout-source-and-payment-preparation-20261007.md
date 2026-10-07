@@ -8,6 +8,7 @@ Repository: `SeanVasey/VA-Studio`, origin `https://github.com/SeanVasey/VA-Studi
 
 | Branch | Executable source | Evidence head at this checkpoint | Status |
 | --- | --- | --- | --- |
+| `codex/checkout-callback-free-source-20261007` | `b6f1dfbb7b92cee5319eac79443b88bf24178ab2` | `01fd387b4d8ed52b301f92f6e41b7d7b1ebd9a69` | Historical callback repair/evidence; old whole approval held by later fresh-write defects |
 | `codex/checkout-committed-read-receipt-20261007` | `90d09a5363c78eb54531526916008f197d4dcb8d` | `65857cc39eef8b8630afbd46e548cd08767392e9` | Immutable historical producer receipt; held after genuine config-parent defect |
 | `codex/checkout-receipt-plain-parents-20261007` | `2ec1854c2b3606250e59b157f06703151318af0a` | `6d4736b685a69916cde87cfc8d7d4617a8073fce` | Frozen replacement parent admission + exact approved T23 witness; whole producer review pending |
 | `codex/checkout-terminal-fresh-policy-20261007` | `6e3932aa22d2668508dc66b696b6108b6d094f53` | `55aec5fdde4c6959d11ed7e7d4ff21a7394d0e4e` | Terminal media callback repair valid; NEW writes held by later physical-commit defect |
@@ -54,7 +55,7 @@ Paid252 owner `native_mysql` consumes this concrete seam, preserves producer UUI
 
 Source6e: affected SQLite5/39 and actual MySQL8.0.46 same5/39; separate unchanged media canary1/5 on each. Source2ec: SQLite27/145 plus unchanged parent1/5; actual native bounded7/38 plus unchanged parent1/5. Exact90 historical native33/157 is reader9/27 +source/receipt24/130; original mixed SQLite fixture error and all actual statement/config reds remain visible.
 
-Frozen c6: affected SQLite17/129 green (12 new original-commit checks and5 unchanged media/replay/actual journey checks), unchanged physical canary1/5 and unchanged password/module probes2/16 green separately. Native6 is running at this checkpoint. Its final results will be appended to the verification README without changing executablec6. A first six-case invocation omitted private env and ran SQLite; it is retained as `pilot-default-sqlite-mislabeled-native` and is NOT native evidence. One probe filename/class harness error is also preserved.
+Frozen c6: affected SQLite17/129 green (12 new original-commit checks and5 unchanged media/replay/actual journey checks), unchanged physical canary1/5 and unchanged password/module probes2/16 green separately. Final actual native MySQL8.0.46 selected6/45 plus unchanged physical canary1/5 are green, zero failures/errors/skips. Detailed immutable receipt is in the verification README; executablec6 is unchanged. A first six-case invocation omitted private env and ran SQLite; it is retained as `pilot-default-sqlite-mislabeled-native` and is NOT native evidence. One probe filename/class harness error is also preserved.
 
 ```sh
 source /workspace/.va-studio-toolchain/activate.sh
@@ -71,7 +72,7 @@ Run duplicated canary classes separately from their core test file. The older te
 
 ## Next actions, held work and queues
 
-1. Reconcile final native c6 receipt against frozen7 owned hashes. Independently review exactc6 and exact2ec, rerunning the unchanged actual canaries. No approval carry from b6/90/6e whole sources.
+1. Final native c6 receipt is complete (selected6/45 +unchanged1/5); reconcile it against frozen7 owned hashes. Independently review exactc6 and exact2ec, rerunning the unchanged actual canaries. No approval carry from b6/90/6e whole sources.
 2. Root alone composes reviewed physical c6, terminal6e and parent2ec. Preserve2ec additive Source receipt/Records committed-read mode/shared CurrentRows extension, c6 original frame registration and original `SourceV1.line` bytes. The c6 branch starts from6e and does NOT itself contain2ec receipts. Resolve the Records/CommandTransaction composition explicitly, prove held Source/receipt and NEW-write flows together, and update remote/evidence hashes. Do not replace2ec Source with the old f0 source while composing.
 3. Complete independently reviewed Paid252 binding and before-first-byte closure against the exact composed producer and e8 T23 witness; receipt preparation is not grant/production acceptance.
 4. **Tax255 queued, no source authored yet:** NEW `ProductionTaxCheckout` namespace/config/controller/privacy/routes and migration255000, supported Stripe Checkout `automatic_tax`, retained buyer-reviewed provider session/calculated amounts and new SourceV2. Preserve frozen V1 purpose/line bytes; a separate V2 paid consumer adapter is mandatory. Default off, no live provider I/O, no invented `payment_intent_data.tax.calculation`, no promotion/exclusive/refund/general tax claims. Root owns shared mounts/registration and approved current T23 identity floor.
