@@ -134,7 +134,8 @@ final class MachinePolicyV1
         return $parsed !== false && $parsed->format('Y-m-d') === $date;
     }
 
-    private static function origin(mixed $value): bool
+    /** The production return-origin rule; the Stripe capability preflight applies the same predicate. */
+    public static function origin(mixed $value): bool
     {
         if (! is_string($value) || strlen($value) > 255 || preg_match('/[\x00-\x20\x7f\\\\]/', $value) || str_ends_with($value, '/')) {
             return false;

@@ -1,0 +1,47 @@
+| Input | httpsOrigin (old preflight) | MachinePolicyV1::origin (policy = new preflight) | Differs |
+| --- | --- | --- | --- |
+| `https://review.invalid` | accept | accept |  |
+| `https://shop.vasey.audio` | accept | accept |  |
+| `https://review.invalid:443` | accept | accept |  |
+| `https://review.invalid:8443` | accept | accept |  |
+| `https://review.invalid:1` | accept | accept |  |
+| `https://review.invalid:65535` | accept | accept |  |
+| `https://review.invalid:65536` | refuse | refuse |  |
+| `https://review.invalid:0` | refuse | accept | policy only |
+| `https://review.invalid:` | accept | accept |  |
+| `HTTPS://review.invalid` | refuse | refuse |  |
+| `https://REVIEW.INVALID` | accept | accept |  |
+| `http://review.invalid` | refuse | refuse |  |
+| `https://review.invalid/` | refuse | refuse |  |
+| `https://review.invalid/return` | refuse | refuse |  |
+| `https://review.invalid?` | refuse | refuse |  |
+| `https://review.invalid#` | refuse | refuse |  |
+| `https://user:pass@review.invalid` | refuse | refuse |  |
+| `https://localhost` | accept | refuse | httpsOrigin only |
+| `https://LOCALHOST` | accept | refuse | httpsOrigin only |
+| `https://localhost:443` | accept | refuse | httpsOrigin only |
+| `https://localhost.` | accept | refuse | httpsOrigin only |
+| `https://127.0.0.1` | accept | refuse | httpsOrigin only |
+| `https://127.0.0.2` | accept | accept |  |
+| `https://10.0.0.1` | accept | accept |  |
+| `https://0.0.0.0` | accept | accept |  |
+| `https://2130706433` | accept | accept |  |
+| `https://[::1]` | accept | refuse | httpsOrigin only |
+| `https://[::1]:443` | accept | refuse | httpsOrigin only |
+| `https://[2001:db8::1]` | accept | refuse | httpsOrigin only |
+| `https://-` | accept | refuse | httpsOrigin only |
+| `https://review.invalid.` | accept | refuse | httpsOrigin only |
+| `https://bücher.example` | accept | refuse | httpsOrigin only |
+| `https://xn--bcher-kva.example` | accept | accept |  |
+| `https://a..b` | accept | accept |  |
+| `https://review_invalid` | accept | refuse | httpsOrigin only |
+| `https://<247-char host> (len 255)` | accept | accept |  |
+| `https://<248-char host> (len 256)` | refuse | refuse |  |
+| `https:review.invalid` | refuse | refuse |  |
+| `https:///review.invalid` | refuse | refuse |  |
+| ` https://review.invalid` | refuse | refuse |  |
+| `https://review.invalid\` | refuse | refuse |  |
+| `NULL` | refuse | refuse |  |
+| `443` | refuse | refuse |  |
+
+cases=43 differing=13 php=8.4.26
