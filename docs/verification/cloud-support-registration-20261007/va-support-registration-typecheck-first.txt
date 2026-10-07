@@ -1,0 +1,5 @@
+
+> typecheck
+> tsc --noEmit
+
+resources/js/components/ContactInquiryForm.tsx(171,132): error TS2304: Cannot find name 'props'.
