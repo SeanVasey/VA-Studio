@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Domain\SupportAttachments\AttachmentException;
 use App\Domain\SupportAttachments\SupportAttachments;
 use App\Http\Responses\SupportAttachmentResponse as PrivateResponse;
+use App\Support\SupportAttachmentRequestContext;
 use App\Support\SupportAttachmentRequestIdentity;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,15 +17,20 @@ final class SupportAttachmentPageController
     {
         try {
             $actor = app(SupportAttachmentRequestIdentity::class)->actor($request);
+            $context = SupportAttachmentRequestContext::capture($request);
             $kind = $request->route('support_kind');
-            app(SupportAttachments::class)->list($kind, $source, $actor);
+            $service = app(SupportAttachments::class);
             Inertia::encryptHistory();
             $request->attributes->set('_support_attachment_page', true);
 
-            return PrivateResponse::protect(Inertia::render('PrivateSupportAttachments', [
+            $response = Inertia::render('PrivateSupportAttachments', [
                 'sourceKind' => $kind, 'sourceId' => $source, 'audience' => $actor->audience,
                 'renderScope' => bin2hex(random_bytes(16)),
-            ])->toResponse($request), true);
+            ])->toResponse($request);
+            $service->list($kind, $source, $actor);
+            $context->prove();
+
+            return PrivateResponse::protect($response, true);
         } catch (AttachmentException $error) {
             return PrivateResponse::error($error->status);
         } catch (\Throwable $error) {
