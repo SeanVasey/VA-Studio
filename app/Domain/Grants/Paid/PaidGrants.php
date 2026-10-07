@@ -3,6 +3,7 @@
 namespace App\Domain\Grants\Paid;
 
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
+use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderCommittedReadReceiptV1;
 use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderLocatorV1;
 use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderSourceV1;
 use App\Domain\Customers\ProductionCustomerAccess;
@@ -19,10 +20,10 @@ use Illuminate\Support\Str;
 /** New typed paid consumer; current original-session buyer authority precedes immutable historical proof. */
 final class PaidGrants
 {
-    public function finalize(ProductionCustomerPrincipal $principal, User $actor, string $orderId): array
+    public function finalize(ProductionCustomerPrincipal $principal, User $actor, string $orderId, ?PaidGrantProjectionRead $projectionRead = null): array
     {
         try {
-            return $this->finalizeOwned($principal, $actor, $orderId);
+            return $this->finalizeOwned($principal, $actor, $orderId, $projectionRead);
         } catch (IdentityException) {
             throw new PaidGrantException(403);
         } catch (CheckoutException $error) {
@@ -30,7 +31,7 @@ final class PaidGrants
         }
     }
 
-    private function finalizeOwned(ProductionCustomerPrincipal $principal, User $actor, string $orderId): array
+    private function finalizeOwned(ProductionCustomerPrincipal $principal, User $actor, string $orderId, ?PaidGrantProjectionRead $projectionRead): array
     {
         PaidGrantInput::uuid($orderId);
         $deadline = PaidGrantDeadline::start();
@@ -38,8 +39,11 @@ final class PaidGrants
         $locator = ProductionPaidOrderLocatorV1::locate($orderId);
         $receipt = null;
         $heldRows = null;
+        $producerRead = null;
+        $producerSecond = null;
         try {
-            $projection = DB::transaction(function () use ($principal, $actor, $orderId, $locator, &$receipt, &$heldRows): array {
+            $projection = DB::transaction(function () use ($principal, $actor, $orderId, $locator, $deadline, $projectionRead,
+                &$receipt, &$heldRows, &$producerRead, &$producerSecond): array {
                 $rows = new PaidGrantRows;
                 $heldRows = $rows;
                 $policyService = app(PaidGrantPolicy::class);
@@ -100,6 +104,11 @@ final class PaidGrants
                 $projection = $this->project($graph);
                 $snapshots = $this->snapshots($graph, $rows);
                 $receipt = PaidGrantReadReceipt::capture($rows, $principal, $actor, $authority, $policy, $snapshots);
+                $admission = PaidGrantConsumerCommitAdmission::capture($receipt, $deadline);
+                $producerRead = $source->committedReadReceipt($reader, $deadline->value(), $admission);
+                if ($projectionRead !== null) {
+                    $producerSecond = $source->committedReadReceipt($reader, $deadline->value(), $admission);
+                }
                 $this->fence($principal, $actor, $access, $authority, $source, $policy, $graph, $rows, $receipt);
 
                 return $projection;
@@ -108,8 +117,12 @@ final class PaidGrants
             $heldRows?->abort();
             throw $error;
         }
-        PaidGrantException::require($receipt instanceof PaidGrantReadReceipt);
+        PaidGrantException::require($receipt instanceof PaidGrantReadReceipt && $producerRead instanceof ProductionPaidOrderCommittedReadReceiptV1
+            && ($projectionRead === null || $producerSecond instanceof ProductionPaidOrderCommittedReadReceiptV1));
+        $projectionRead?->capture($receipt, $producerSecond, $deadline);
         $receipt->proveClosed();
+        $producerRead->proveClosed();
+        $receipt->proveRawClosed();
         $deadline->proveCurrent();
 
         return $projection;

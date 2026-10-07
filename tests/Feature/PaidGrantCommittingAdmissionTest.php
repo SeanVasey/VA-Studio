@@ -26,7 +26,7 @@ final class PaidGrantCommittingAdmissionTest extends TestCase
     use FinalizationDatabaseMigrations;
     use ProductionCheckoutJourneyFixture;
 
-    private const DEPENDENCY = '/workspace/.va-studio-dependencies/paid/f0a1615';
+    private const DEPENDENCY = '/workspace/.va-studio-dependencies/paid/90d09a5-e6c02b9';
 
     protected function beforeRefreshingDatabase(): void
     {
@@ -47,6 +47,10 @@ final class PaidGrantCommittingAdmissionTest extends TestCase
             'production-customer-identity.enabled' => true, 'production-customer-identity.provenance' => IdentityPolicy::REHEARSAL,
             'production-customer-identity.public_origin' => 'http://localhost', 'production-customer-identity.notifications_enabled' => true,
             'production-customer-identity.transport_capability' => LoopbackSmtp::CAPABILITY,
+            'production_checkout.committed_read_receipts_enabled' => true,
+            'production_checkout.committed_read_receipt_version' => 'production-checkout-committed-read-v1',
+            'production-customer-identity.historical_receipts_enabled' => true,
+            'production-customer-identity.historical_receipts_version' => 'identity-historical-committed-receipt-v1',
             'production_checkout.fresh_checkout_enabled' => true, 'production_checkout.reconciliation_enabled' => true,
             'paid-grants.rehearsal_enabled' => true,
             'paid-grants.delivery_policy' => ['schema_version' => 1, 'version' => 'explicit-synthetic-delivery-v1', 'purpose' => 'paid-original-delivery',

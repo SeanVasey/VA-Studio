@@ -3,7 +3,6 @@
 namespace App\Domain\Grants\Paid;
 
 use App\Domain\Delivery\PreparedDeliveryStream;
-use Closure;
 use LogicException;
 
 /** Owns only an exact unlinked descriptor; its original closed read cannot mint a new entitlement. */
@@ -14,7 +13,7 @@ final class PaidGrantTransfer
     public readonly string $sha256;
 
     public function __construct(private readonly PreparedDeliveryStream $stream, public readonly string $filename,
-        public readonly string $mimeType, private readonly Closure $closedRead, private readonly int $deadline)
+        public readonly string $mimeType, private readonly PaidGrantProjectionRead $closedRead, private readonly int $deadline)
     {
         $this->sizeBytes = $stream->sizeBytes;
         $this->sha256 = $stream->sha256;
@@ -23,7 +22,7 @@ final class PaidGrantTransfer
     public function writeTo(callable $consumer): void
     {
         try {
-            ($this->closedRead)();
+            $this->closedRead->proveBeforeBytes();
             PaidGrantException::require(hrtime(true) <= $this->deadline, 410);
             $this->stream->writeTo(function (string $bytes) use ($consumer): void {
                 PaidGrantException::require(hrtime(true) <= $this->deadline, 410);

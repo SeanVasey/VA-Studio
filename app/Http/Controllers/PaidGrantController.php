@@ -12,6 +12,7 @@ use App\Domain\Grants\Paid\PaidGrantException;
 use App\Domain\Grants\Paid\PaidGrantInput;
 use App\Domain\Grants\Paid\PaidGrantJson;
 use App\Domain\Grants\Paid\PaidGrantPolicy;
+use App\Domain\Grants\Paid\PaidGrantProjectionRead;
 use App\Domain\Grants\Paid\PaidGrantReads;
 use App\Domain\Grants\Paid\PaidGrants;
 use App\Http\Middleware\PaidGrantPrivacy;
@@ -42,7 +43,9 @@ final class PaidGrantController
         return $this->run(function () use ($request): Response {
             [$principal, $actor] = $this->identity($request);
 
-            return response()->json((new PaidGrantReads)->index($principal, $actor));
+            $read = PaidGrantProjectionRead::begin();
+
+            return $this->json((new PaidGrantReads)->index($principal, $actor, $read), $read);
         });
     }
 
@@ -52,7 +55,9 @@ final class PaidGrantController
             [$principal, $actor] = $this->identity($request);
             PaidGrantInput::keys($this->body($request), []);
 
-            return response()->json(['origin' => (new PaidGrants)->finalize($principal, $actor, $order)]);
+            $read = PaidGrantProjectionRead::begin();
+
+            return $this->json(['origin' => (new PaidGrants)->finalize($principal, $actor, $order, $read)], $read);
         });
     }
 
@@ -61,7 +66,9 @@ final class PaidGrantController
         return $this->run(function () use ($batch, $request): Response {
             [$principal, $actor] = $this->identity($request);
 
-            return response()->json(['origin' => (new PaidGrantReads)->show($batch, $principal, $actor)]);
+            $read = PaidGrantProjectionRead::begin();
+
+            return $this->json(['origin' => (new PaidGrantReads)->show($batch, $principal, $actor, $read)], $read);
         });
     }
 
@@ -71,7 +78,9 @@ final class PaidGrantController
             [$principal, $actor] = $this->identity($request);
             PaidGrantInput::keys($this->body($request), []);
 
-            return response()->json(['origin' => (new PaidGrantDocuments)->prepare($batch, $principal, $actor)]);
+            $read = PaidGrantProjectionRead::begin();
+
+            return $this->json(['origin' => (new PaidGrantDocuments)->prepare($batch, $principal, $actor, $read)], $read);
         });
     }
 
@@ -80,7 +89,9 @@ final class PaidGrantController
         return $this->run(function () use ($batch, $request): Response {
             [$principal, $actor] = $this->identity($request);
 
-            return response()->json(['status' => (new PaidGrantDownloads)->status($batch, $principal, $actor)]);
+            $read = PaidGrantProjectionRead::begin();
+
+            return $this->json(['status' => (new PaidGrantDownloads)->status($batch, $principal, $actor, $read)], $read);
         });
     }
 
@@ -89,7 +100,9 @@ final class PaidGrantController
         return $this->run(function () use ($batch, $line, $request): Response {
             [$principal, $actor] = $this->identity($request);
 
-            return response()->json(['authorization' => (new PaidGrantDownloads)->authorize($batch, $line, $this->body($request), $principal, $actor)]);
+            $read = PaidGrantProjectionRead::begin();
+
+            return $this->json(['authorization' => (new PaidGrantDownloads)->authorize($batch, $line, $this->body($request), $principal, $actor, $read)], $read);
         });
     }
 
@@ -103,9 +116,16 @@ final class PaidGrantController
             $transfer = (new PaidGrantDownloads)->redeem($authorization, $input['token'], $principal, $actor);
 
             return response()->stream(function () use ($transfer): void {
-                $transfer->writeTo(static function (string $bytes): void {
-                    echo $bytes;
-                });
+                try {
+                    $transfer->writeTo(static function (string $bytes): void {
+                        echo $bytes;
+                    });
+                } catch (Throwable $error) {
+                    // Headers may already be sent. Emit no private/error bytes into the attachment stream.
+                    if (! $error instanceof PaidGrantException) {
+                        PaidGrantPrivacy::report($error);
+                    }
+                }
             }, 200, ['Content-Type' => $transfer->mimeType, 'Content-Length' => (string) $transfer->sizeBytes,
                 'Content-Disposition' => 'attachment; filename="'.$transfer->filename.'"', 'X-Paid-Grant-Sha256' => $transfer->sha256]);
         });
@@ -119,6 +139,26 @@ final class PaidGrantController
         PaidGrantException::require($actor instanceof User && $actor->exists, 403);
 
         return [$principal, $actor];
+    }
+
+    private function json(array $data, PaidGrantProjectionRead $read): Response
+    {
+        $encoded = json_encode($data, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        PaidGrantException::require(strlen($encoded) <= 4 * 1024 * 1024);
+
+        return response()->stream(static function () use ($read, $encoded): void {
+            try {
+                $read->proveBeforeBytes();
+                echo $encoded;
+            } catch (Throwable $error) {
+                $status = $error instanceof PaidGrantException ? $error->status : 503;
+                if (! $error instanceof PaidGrantException) {
+                    PaidGrantPrivacy::report($error);
+                }
+                // A late denial carries no original projection; headers can already be on the wire.
+                echo json_encode(['error' => 'Paid grant request unavailable.', 'status' => $status], JSON_THROW_ON_ERROR);
+            }
+        }, 200, ['Content-Type' => 'application/json']);
     }
 
     private function body(Request $request): array

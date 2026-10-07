@@ -19,6 +19,18 @@ async function openSaved() {
 }
 
 describe('mounted original paid-purpose journey', () => {
+  it('clears every private field on a sealed body denial after successful HTTP headers', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete }))
+      .mockResolvedValueOnce(response({ error: 'Paid grant request unavailable.', status: 403 }));
+    render(<PaidGrantJourney />); await openSaved();
+    fireEvent.change(screen.getByLabelText('Saved order reference'), { target: { value: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh paid licenses' }));
+    await screen.findByRole('link', { name: 'Open a fresh sign-in page' });
+    expect(screen.queryByLabelText('Retained paid order')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Saved order reference')).not.toBeInTheDocument();
+    expect(screen.queryByText(complete.lines[0].license.termsText)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Authorize/ })).not.toBeInTheDocument();
+  });
   it('retains original accepted terms, waits for all-line preparation and requires explicit native token POST without storage or URLs', async () => {
     const token = 'PRIVATE_SYNTHETIC_PAID_TOKEN'.padEnd(43, 'a');
     const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin })).mockResolvedValueOnce(response({ origin: complete }))

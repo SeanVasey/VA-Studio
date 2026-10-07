@@ -15,11 +15,12 @@ final class PaidGrantReads
 {
     public const LIMIT = 20;
 
-    public function index(ProductionCustomerPrincipal $principal, User $actor): array
+    public function index(ProductionCustomerPrincipal $principal, User $actor, ?PaidGrantProjectionRead $projectionRead = null): array
     {
         (new PaidGrants)->outsideTransactions();
         $held = null;
         $receipt = null;
+        $deadline = PaidGrantDeadline::start();
         try {
             $result = DB::transaction(function () use ($principal, $actor, &$held, &$receipt): array {
                 $rows = new PaidGrantRows;
@@ -61,7 +62,10 @@ final class PaidGrantReads
                 return ['schemaVersion' => 1, 'originLimit' => self::LIMIT, 'origins' => $origins];
             });
             PaidGrantException::require($receipt instanceof PaidGrantReadReceipt);
+            $projectionRead?->capture($receipt, null, $deadline);
             $receipt->proveClosed();
+            $receipt->proveRawClosed();
+            $deadline->proveCurrent();
 
             return $result;
         } catch (IdentityException) {
@@ -73,9 +77,9 @@ final class PaidGrantReads
         }
     }
 
-    public function show(string $id, ProductionCustomerPrincipal $principal, User $actor): array
+    public function show(string $id, ProductionCustomerPrincipal $principal, User $actor, ?PaidGrantProjectionRead $projectionRead = null): array
     {
         return (new PaidGrantCommands)->run($id, $principal, $actor,
-            fn (array $graph): array => (new PaidGrants)->project($graph));
+            fn (array $graph): array => (new PaidGrants)->project($graph), projectionRead: $projectionRead);
     }
 }

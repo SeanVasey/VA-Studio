@@ -18,7 +18,7 @@ final class PaidGrantDownloads
     private const KINDS = ['contract', 'master_wav', 'download_mp3', 'stems_zip'];
 
     /** No token or path is returned, and DB preparation status never claims continuing physical availability. */
-    public function status(string $batchId, ProductionCustomerPrincipal $principal, User $actor): array
+    public function status(string $batchId, ProductionCustomerPrincipal $principal, User $actor, ?PaidGrantProjectionRead $projectionRead = null): array
     {
         $snapshots = [];
 
@@ -52,10 +52,10 @@ final class PaidGrantDownloads
             return ['schemaVersion' => 1, 'originId' => $graph['batch']['public_id'], 'fulfilled' => $graph['complete'] !== null, 'lines' => $lines];
         }, additionalSnapshots: function () use (&$snapshots): array {
             return $snapshots;
-        });
+        }, projectionRead: $projectionRead);
     }
 
-    public function authorize(string $batchId, string $lineId, array $input, ProductionCustomerPrincipal $principal, User $actor): array
+    public function authorize(string $batchId, string $lineId, array $input, ProductionCustomerPrincipal $principal, User $actor, ?PaidGrantProjectionRead $projectionRead = null): array
     {
         PaidGrantInput::uuid($lineId);
         PaidGrantInput::keys($input, ['requestKey', 'originHash', 'kind', 'nonce']);
@@ -97,7 +97,7 @@ final class PaidGrantDownloads
                 'filename' => $this->filename($lineId, $auth['target']), 'mimeType' => $this->mime($auth['target'])];
         }, $deadline, additionalSnapshots: function (array $graph, PaidGrantRows $rows) use (&$auth): array {
             return $this->authSnapshots($auth, $rows);
-        });
+        }, projectionRead: $projectionRead);
     }
 
     /** Exact physical snapshot between two freshly authenticated producer/owner frames; one committed attempt. */
@@ -127,7 +127,7 @@ final class PaidGrantDownloads
             additionalSnapshots: fn (array $graph, PaidGrantRows $rows): array => $this->authSnapshots($locator['auth'], $rows));
         $deadline->shortenTo($this->deadline($before['auth']));
         $prepared = app(PaidGrantPrepareStream::class)->handle($before['payload']['target'], $deadline->value());
-        $receipt = null;
+        $projectionRead = PaidGrantProjectionRead::begin();
         try {
             $commands->run($locator['batch_id'], $principal, $actor, function (array $graph, PaidGrantRows $rows) use ($inspect, $before): array {
                 $current = $inspect($graph, $rows);
@@ -137,13 +137,10 @@ final class PaidGrantDownloads
 
                 return [];
             }, $deadline, additionalSnapshots: fn (array $graph, PaidGrantRows $rows): array => $this->authSnapshots($before['auth'], $rows),
-                captureRead: function (PaidGrantReadReceipt $read) use (&$receipt): void {
-                    $receipt = $read;
-                });
-            PaidGrantException::require($receipt instanceof PaidGrantReadReceipt);
+                projectionRead: $projectionRead);
 
             return new PaidGrantTransfer($prepared, $this->filename($before['line']['origin']['public_id'], $before['auth']['target']), $this->mime($before['auth']['target']),
-                static fn () => $receipt->proveClosed(), $deadline->value());
+                $projectionRead, $deadline->value());
         } catch (Throwable $error) {
             $prepared->close();
             throw $error;

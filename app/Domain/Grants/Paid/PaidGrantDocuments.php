@@ -19,7 +19,7 @@ final class PaidGrantDocuments
 
     public const LEASE_SECONDS = 300;
 
-    public function prepare(string $batchId, ProductionCustomerPrincipal $principal, User $actor): array
+    public function prepare(string $batchId, ProductionCustomerPrincipal $principal, User $actor, ?PaidGrantProjectionRead $projectionRead = null): array
     {
         PaidGrantInput::uuid($batchId);
         $deadline = PaidGrantDeadline::start(self::LEASE_SECONDS);
@@ -51,7 +51,9 @@ final class PaidGrantDocuments
                 return ['done' => true];
             }, $deadline);
             if (isset($claim['busy'])) {
-                return $claim['projection'];
+                // A fresh terminal read mints the body receipt; an earlier claim frame cannot lend it.
+                return $commands->run($batchId, $principal, $actor,
+                    fn (array $graph): array => (new PaidGrants)->project($graph), $deadline, projectionRead: $projectionRead);
             }
             if (isset($claim['done'])) {
                 break;
@@ -101,10 +103,10 @@ final class PaidGrantDocuments
             }
         }
 
-        return $this->complete($batchId, $principal, $actor, $deadline);
+        return $this->complete($batchId, $principal, $actor, $deadline, $projectionRead);
     }
 
-    private function complete(string $batchId, ProductionCustomerPrincipal $principal, User $actor, PaidGrantDeadline $deadline): array
+    private function complete(string $batchId, ProductionCustomerPrincipal $principal, User $actor, PaidGrantDeadline $deadline, ?PaidGrantProjectionRead $projectionRead): array
     {
         $commands = new PaidGrantCommands;
         $bundle = $commands->run($batchId, $principal, $actor, function (array $graph): array {
@@ -135,7 +137,7 @@ final class PaidGrantDocuments
             }
 
             return (new PaidGrants)->project($graph);
-        }, $deadline);
+        }, $deadline, projectionRead: $projectionRead);
     }
 
     private function line(array $graph, string $id): array

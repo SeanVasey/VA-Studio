@@ -3,6 +3,7 @@
 namespace App\Domain\Grants\Paid;
 
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
+use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderCommittedReadReceiptV1;
 use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderLocatorV1;
 use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderSourceV1;
 use App\Domain\Customers\ProductionCustomerAccess;
@@ -19,7 +20,8 @@ use Throwable;
 final class PaidGrantCommands
 {
     public function run(string $batchId, ProductionCustomerPrincipal $principal, User $actor, Closure $operation,
-        PaidGrantDeadline|int|null $observationDeadline = null, ?Closure $additionalSnapshots = null, ?Closure $captureRead = null): array
+        PaidGrantDeadline|int|null $observationDeadline = null, ?Closure $additionalSnapshots = null,
+        ?PaidGrantProjectionRead $projectionRead = null): array
     {
         PaidGrantInput::uuid($batchId);
         $deadline = $observationDeadline instanceof PaidGrantDeadline ? $observationDeadline : PaidGrantDeadline::start();
@@ -31,12 +33,15 @@ final class PaidGrantCommands
         $grants->outsideTransactions();
         $heldRows = null;
         $receipt = null;
+        $producerRead = null;
+        $producerSecond = null;
         try {
             app(PaidGrantPolicy::class)->capture();
             app(ProductionCustomerAccess::class)->current($principal, $actor);
             $orderId = $this->locate($batchId, $principal->accountId);
             $locator = ProductionPaidOrderLocatorV1::locate($orderId);
-            $result = DB::transaction(function () use ($batchId, $principal, $actor, $operation, $locator, $grants, $additionalSnapshots, &$heldRows, &$receipt): array {
+            $result = DB::transaction(function () use ($batchId, $principal, $actor, $operation, $locator, $grants, $additionalSnapshots,
+                $deadline, $projectionRead, &$heldRows, &$receipt, &$producerRead, &$producerSecond): array {
                 $rows = new PaidGrantRows;
                 $heldRows = $rows;
                 $policy = app(PaidGrantPolicy::class)->capture();
@@ -62,14 +67,22 @@ final class PaidGrantCommands
                 $snapshots = $additionalSnapshots === null ? [] : $additionalSnapshots($expected, $rows);
                 PaidGrantException::require(is_array($snapshots) && array_is_list($snapshots));
                 $receipt = PaidGrantReadReceipt::capture($rows, $principal, $actor, $authority, $policy, [...$grants->snapshots($expected, $rows), ...$snapshots]);
+                $admission = PaidGrantConsumerCommitAdmission::capture($receipt, $deadline);
+                $producerRead = $source->committedReadReceipt($reader, $deadline->value(), $admission);
+                if ($projectionRead !== null) {
+                    $producerSecond = $source->committedReadReceipt($reader, $deadline->value(), $admission);
+                }
                 $grants->fence($principal, $actor, $access, $authority, $source, $policy, $expected, $rows, $receipt);
 
                 return $result;
             });
-            PaidGrantException::require($receipt instanceof PaidGrantReadReceipt);
+            PaidGrantException::require($receipt instanceof PaidGrantReadReceipt && $producerRead instanceof ProductionPaidOrderCommittedReadReceiptV1
+                && ($projectionRead === null || $producerSecond instanceof ProductionPaidOrderCommittedReadReceiptV1));
             // Trusted transfer construction occurs before the terminal post-commit raw proof.
-            $captureRead?->__invoke($receipt);
+            $projectionRead?->capture($receipt, $producerSecond, $deadline);
             $receipt->proveClosed();
+            $producerRead->proveClosed();
+            $receipt->proveRawClosed();
             $deadline->proveCurrent();
 
             return $result;

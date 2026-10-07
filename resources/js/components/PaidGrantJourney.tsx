@@ -102,6 +102,12 @@ export function PaidGrantJourney() {
       if (!owns() || abort.signal.aborted) return;
       if ([403, 404, 419].includes(response.status)) { refuse(); return; }
       const value = await readJson(response, abort.signal); if (!owns() || abort.signal.aborted) return;
+      // A body closure can deny before private bytes after headers have already left the server.
+      if (obj(value) && exact(value, ['error', 'status']) && value.error === 'Paid grant request unavailable.'
+        && Number.isInteger(value.status) && [403, 404, 419, 503].includes(value.status as number)) {
+        if ([403, 404, 419].includes(value.status as number)) refuse(); else setMessage(unknown);
+        return;
+      }
       if (!response.ok) { setMessage(unknown); return; }
       commit(value);
     } catch { if (owns()) { if (!body) { setData(null); setOrigin(null); setStatus(null); } setMessage(unknown); } }

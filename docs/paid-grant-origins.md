@@ -2,7 +2,7 @@
 
 This is a default-off, additive T24/T25 preparation in the isolated paid-grant
 branch. It has actual customer library, preparation and native POST download code,
-but its final producer committed-read receipt dependency is unfinished. It is not
+bound in isolated tests to a provisional producer committed-read receipt. It is not
 production activation, dependency approval or completed commerce.
 
 ## Retained originals
@@ -53,6 +53,22 @@ frame can record one immutable attempted download. Native POST carries token and
 CSRF in its body. Tokens never enter URLs or browser storage. The held response
 rechecks current ownership before first bytes and closes its descriptor on failure.
 
+One private consumer commit capsule captures the current owner, policy, owned
+records and original deadline. The producer's single original commit observer
+checks that capsule after ordinary committing callbacks and before its historical
+identity/source proof and physical commit. A refusal aborts only the still-held
+original consumer transaction, including Laravel's depth-zero/PDO-active listener
+failure case. It does not roll back to a source savepoint or adopt a reopened frame.
+
+Two distinct one-use producer read receipts share the original reader, frame,
+deadline and capsule. The first closes the committed domain return. The second
+closes private JSON or file output after consumer/framework callback work and
+before first private bytes; current owner/config checks run raw again afterward.
+Late JSON refusal emits only a generic body, because HTTP headers may already be
+sent. The mounted UI recognizes that denial and clears private state. A late
+attachment refusal emits no private bytes; the recorded attempted download stays
+consumed rather than being reported as delivered.
+
 Read authority denial clears every entered reference, private projection, pending
 request and token. Departure/unmount aborts requests and ignores late results.
 Unknown errors use a fixed sanitized reporter with only the exception class.
@@ -72,12 +88,16 @@ independently reviewed.
 ## Remaining binding
 
 The exact provisional fixture snapshot is recorded outside the repository under
-`/workspace/.va-studio-dependencies/paid/f0a1615`. The final candidate must replace
-it with the reviewed producer and T23 dependency, bind both one-use producer
-committed-read siblings under the original budget and rerun affected original
-canaries on the actual composed source. The current owned receipt closes the
-current owner, assets and paid-origin graph; it does not yet close post-commit
-producer financial drift. No final response/download authority approval is claimed.
+`/workspace/.va-studio-dependencies/paid/90d09a5-e6c02b9`. This combines exact
+producer `90d09a5363c78eb54531526916008f197d4dcb8d`, T23 family
+`b9871dff4cd734779cd12809d736fb69af4e3dc7`, and its single historical-receipt
+callback repair `e6c02b90719923bc4ba435f86399b077980c1ddc`.
+Those dependencies remain unapproved and held for new source findings. In
+particular, producer and consumer raw configuration admission must refuse
+callback-capable configuration parents before reading them. The final candidate
+must bind reviewed successors and rerun the original canaries and affected tests
+on the actual composed source. No final response/download authority approval is
+claimed.
 
 Default configuration has both rehearsal and operative flags off and no delivery
 policy. Activation requires actual approved terms/assets, supported producer

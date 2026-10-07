@@ -7,11 +7,12 @@ use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Models\User;
 use Closure;
 use LogicException;
+use PDO;
 
 /** An original in-transaction read can close commit callbacks; it never renews owner/source authority. */
 final readonly class PaidGrantReadReceipt implements \JsonSerializable
 {
-    private function __construct(private Closure $proof) {}
+    private function __construct(private Closure $proof, private Closure $commitAdmission, private Closure $closedRaw, private PaidGrantRows $rows) {}
 
     public static function capture(PaidGrantRows $rows, ProductionCustomerPrincipal $principal, User $actor,
         array $authority, array $policy, array $snapshots): self
@@ -31,7 +32,7 @@ final readonly class PaidGrantReadReceipt implements \JsonSerializable
         }
         $actorId = $actor->getKey();
 
-        return new self(static function (bool $closed) use ($rows, $actor, $actorId, $owner, $snapshots, $policy): void {
+        $proof = static function (bool $closed) use ($rows, $actor, $actorId, $owner, $snapshots, $policy): void {
             // Resolvers/environment/model access precede every final raw owner/source comparison.
             app(PaidGrantPolicy::class);
             $closed ? $rows->committedCallbackPhase() : $rows->callbackPhase();
@@ -41,7 +42,32 @@ final readonly class PaidGrantReadReceipt implements \JsonSerializable
             }
             PaidGrantPolicy::provePure($policy, $rows->configuration, $rows->environment);
             $closed ? $rows->assertCommitted() : $rows->assertCurrent();
-        });
+        };
+        $admission = static function (PDO $primary) use ($rows, $actor, $actorId, $owner, $snapshots, $policy): void {
+            // Original captured dependencies only. No container resolution, casts, provider getters or new row locks.
+            PaidGrantException::require($primary === $rows->primary);
+            $rows->assertPrepared();
+            PaidGrantException::require($actor::class === User::class && $actor->exists
+                && $actor->getRawOriginal('id') === $actorId, 403);
+            foreach ([...$owner, ...$snapshots] as [$table, $where, $bindings, $limit, $expected]) {
+                PaidGrantException::require($rows->preparedRows($table, $where, $bindings, $limit) === $expected, 403);
+            }
+            PaidGrantPolicy::provePure($policy, $rows->configuration, $rows->environment);
+            $rows->assertPrepared();
+        };
+
+        $closedRaw = static function () use ($rows, $actor, $actorId, $owner, $snapshots, $policy): void {
+            $rows->assertCommitted();
+            PaidGrantException::require($actor::class === User::class && $actor->exists
+                && $actor->getRawOriginal('id') === $actorId, 403);
+            foreach ([...$owner, ...$snapshots] as [$table, $where, $bindings, $limit, $expected]) {
+                PaidGrantException::require($rows->rows($table, $where, $bindings, $limit, true) === $expected, 403);
+            }
+            PaidGrantPolicy::provePure($policy, $rows->configuration, $rows->environment);
+            $rows->assertCommitted();
+        };
+
+        return new self($proof, $admission, $closedRaw, $rows);
     }
 
     public function proveLive(): void
@@ -52,6 +78,21 @@ final readonly class PaidGrantReadReceipt implements \JsonSerializable
     public function proveClosed(): void
     {
         ($this->proof)(true);
+    }
+
+    public function requireCommitAdmissionMint(): void
+    {
+        $this->rows->assertCurrent();
+    }
+
+    public function proveCommitAdmission(PDO $capturedPrimary): void
+    {
+        ($this->commitAdmission)($capturedPrimary);
+    }
+
+    public function proveRawClosed(): void
+    {
+        ($this->closedRaw)();
     }
 
     public function __serialize(): array

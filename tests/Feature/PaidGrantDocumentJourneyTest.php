@@ -13,11 +13,14 @@ use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTranspor
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
 use App\Domain\Customers\ProductionIdentity\Notifications\WorkIdentityNotice;
 use App\Domain\Delivery\DeliveryException;
+use App\Domain\Grants\Paid\PaidGrantCommands;
 use App\Domain\Grants\Paid\PaidGrantDocuments;
 use App\Domain\Grants\Paid\PaidGrantException;
 use App\Domain\Grants\Paid\PaidGrantFiles;
+use App\Domain\Grants\Paid\PaidGrantProjectionRead;
 use App\Domain\Grants\Paid\PaidGrantRecords;
 use App\Domain\Grants\Paid\PaidGrantRendererProcess;
+use App\Domain\Grants\Paid\PaidGrantRows;
 use App\Domain\Grants\Paid\PaidGrants;
 use App\Domain\Grants\Paid\PaidGrantSchema;
 use App\Providers\ProductionCheckoutServiceProvider;
@@ -26,6 +29,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\ProductionCheckoutFixtures;
@@ -40,7 +44,7 @@ final class PaidGrantDocumentJourneyTest extends TestCase
     use FinalizationDatabaseMigrations;
     use ProductionCheckoutJourneyFixture;
 
-    private const DEPENDENCY = '/workspace/.va-studio-dependencies/paid/f0a1615';
+    private const DEPENDENCY = '/workspace/.va-studio-dependencies/paid/90d09a5-e6c02b9';
 
     protected function beforeRefreshingDatabase(): void
     {
@@ -61,6 +65,10 @@ final class PaidGrantDocumentJourneyTest extends TestCase
             'production-customer-identity.enabled' => true, 'production-customer-identity.provenance' => IdentityPolicy::REHEARSAL,
             'production-customer-identity.public_origin' => 'http://localhost', 'production-customer-identity.notifications_enabled' => true,
             'production-customer-identity.transport_capability' => LoopbackSmtp::CAPABILITY,
+            'production_checkout.committed_read_receipts_enabled' => true,
+            'production_checkout.committed_read_receipt_version' => 'production-checkout-committed-read-v1',
+            'production-customer-identity.historical_receipts_enabled' => true,
+            'production-customer-identity.historical_receipts_version' => 'identity-historical-committed-receipt-v1',
             'production_checkout.fresh_checkout_enabled' => true, 'production_checkout.reconciliation_enabled' => true,
             'paid-grants.rehearsal_enabled' => true,
             'paid-grants.delivery_policy' => ['schema_version' => 1, 'version' => 'explicit-synthetic-delivery-v1', 'purpose' => 'paid-original-delivery',
@@ -184,6 +192,36 @@ final class PaidGrantDocumentJourneyTest extends TestCase
         $this->assertSame($firstBytes, (new PaidGrantFiles)->verify(PaidGrantRecords::decode($first)['artifact']));
         $this->assertDatabaseCount('paid_originals', 2);
         $this->assertDatabaseCount('paid_fulfillments', 1);
+    }
+
+    public function test_busy_original_claim_returns_only_a_fresh_one_use_body_receipt_without_new_claim_or_activation(): void
+    {
+        $f = $this->retained();
+        $expires = CarbonImmutable::now('UTC')->addSeconds(PaidGrantDocuments::LEASE_SECONDS)->format('Y-m-d H:i:s');
+        (new PaidGrantCommands)->run($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'],
+            function (array $graph, PaidGrantRows $rows) use ($expires): array {
+                $rows->execute('UPDATE '.$rows->table('paid_document_work')." SET state = 'claimed', attempts = 1, claim_id = ?, expires_at = ? WHERE id = ?",
+                    [(string) Str::uuid(), $expires, $graph['lines'][0]['work']['id']]);
+
+                return [];
+            });
+        $before = $this->ownedRows();
+        $read = PaidGrantProjectionRead::begin();
+        $waiting = (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'], $read);
+        $this->assertFalse($waiting['fulfilled']);
+        $this->assertSame('claimed', $waiting['lines'][0]['documentStatus']);
+        $this->assertSame(1, $waiting['lines'][0]['attempts']);
+        $this->assertSame([], $waiting['lines'][0]['files']);
+        $this->assertSame($before, $this->ownedRows());
+        $read->proveBeforeBytes();
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse(DB::connection()->getRawPdo()->inTransaction());
+        try {
+            $read->proveBeforeBytes();
+            $this->fail('The captured original body receipt cannot be reused.');
+        } catch (PaidGrantException) {
+            $this->assertSame($before, $this->ownedRows());
+        }
     }
 
     public function test_credential_withdrawal_during_real_render_cannot_publish_original_or_extend_claim_authority(): void

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTransport;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
@@ -32,7 +33,7 @@ final class PaidGrantHttpJourneyTest extends TestCase
     use FinalizationDatabaseMigrations;
     use ProductionCheckoutJourneyFixture;
 
-    private const DEPENDENCY = '/workspace/.va-studio-dependencies/paid/f0a1615';
+    private const DEPENDENCY = '/workspace/.va-studio-dependencies/paid/90d09a5-e6c02b9';
 
     protected function beforeRefreshingDatabase(): void
     {
@@ -59,6 +60,10 @@ final class PaidGrantHttpJourneyTest extends TestCase
             'production-customer-identity.enabled' => true, 'production-customer-identity.provenance' => IdentityPolicy::REHEARSAL,
             'production-customer-identity.public_origin' => 'http://localhost', 'production-customer-identity.notifications_enabled' => true,
             'production-customer-identity.transport_capability' => LoopbackSmtp::CAPABILITY,
+            'production_checkout.committed_read_receipts_enabled' => true,
+            'production_checkout.committed_read_receipt_version' => 'production-checkout-committed-read-v1',
+            'production-customer-identity.historical_receipts_enabled' => true,
+            'production-customer-identity.historical_receipts_version' => 'identity-historical-committed-receipt-v1',
             'production_checkout.fresh_checkout_enabled' => true, 'production_checkout.reconciliation_enabled' => true,
             'paid-grants.rehearsal_enabled' => true,
             'paid-grants.delivery_policy' => ['schema_version' => 1, 'version' => 'explicit-synthetic-delivery-v1', 'purpose' => 'paid-original-delivery',
@@ -151,6 +156,39 @@ final class PaidGrantHttpJourneyTest extends TestCase
         $response = $this->postJson('/paid-grants/orders/'.Str::uuid().'/finalize', ['private' => 'PRIVATE-BODY-SENTINEL'])->assertStatus(503)
             ->assertDontSee('PRIVATE-BODY-SENTINEL', false)->assertDontSee('PRIVATE-EXCEPTION-SENTINEL', false);
         $this->assertPrivate($response);
+    }
+
+    public static function lateBodyWithdrawals(): array
+    {
+        return [['paid-policy', 403], ['buyer-credential', 403], ['producer-receipt-policy', 503]];
+    }
+
+    #[DataProvider('lateBodyWithdrawals')]
+    public function test_actual_private_json_body_seal_closes_withdrawal_after_response_and_before_first_original_byte(string $kind, int $status): void
+    {
+        $f = $this->payable();
+        $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $f['gateway']->paid = true;
+        $this->assertSame('verified', $f['hosted']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId'])['paymentStatus']);
+        $this->login($f['buyer']);
+        $response = $this->call('POST', '/paid-grants/orders/'.$f['order']['orderId'].'/finalize', [], [], [], ['CONTENT_TYPE' => 'application/json'], '{}')->assertOk();
+        $this->assertPrivate($response);
+        $this->assertDatabaseCount('paid_order_origins', 1);
+        if ($kind === 'paid-policy') {
+            config(['paid-grants.rehearsal_enabled' => false]);
+        } elseif ($kind === 'buyer-credential') {
+            DB::table('users')->where('id', $f['buyer']['user']->id)->update(['password' => Hash::make('WITHDRAWN AFTER RESPONSE')]);
+        } else {
+            config(['production_checkout.committed_read_receipts_enabled' => false]);
+            Log::shouldReceive('error')->once()->with('Paid grant request failed.', ['exception_class' => CheckoutException::class]);
+        }
+        $body = $response->streamedContent();
+        $this->assertSame(['error' => 'Paid grant request unavailable.', 'status' => $status], json_decode($body, true, 4, JSON_THROW_ON_ERROR));
+        $this->assertStringNotContainsString('Declared synthetic buyer', $body);
+        $this->assertStringNotContainsString('termsText', $body);
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse(DB::connection()->getRawPdo()->inTransaction());
+        $this->assertDatabaseCount('paid_fulfillments', 0);
     }
 
     public static function refusals(): array
