@@ -12,12 +12,14 @@ use App\Domain\Customers\ProductionFeatures\ProductionFeatureException;
 use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeatureAccess;
 use ArrayObject;
 use Closure;
+use Illuminate\Container\Container;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use PDO;
 use PDOStatement;
 use PHPUnit\Framework\Attributes\DataProvider;
+use ReflectionProperty;
 use Tests\Support\ProductionFeatureFixtures;
 use Tests\Support\QuoteFixtures;
 use Tests\TestCase;
@@ -226,10 +228,14 @@ class ProductionFeaturePlainConfigurationTest extends TestCase
         $preferences->initialize($owner);
         $command = $this->productionGrant();
         $fired = false;
-        ProductionConsentState::saved(function () use (&$fired, $target): void {
-            app()->beforeResolving($target, function () use (&$fired): void {
+        $application = app();
+        $repository = app('config');
+        $callbacks = new ReflectionProperty(Container::class, 'beforeResolvingCallbacks');
+        $originalCallbacks = $callbacks->getValue($application);
+        ProductionConsentState::saved(function () use (&$fired, $target, $repository): void {
+            app()->beforeResolving($target, function () use (&$fired, $repository): void {
                 $fired = true;
-                config(['production-customer-preferences.grants_enabled' => false]);
+                $repository->set('production-customer-preferences.grants_enabled', false);
             });
         });
         try {
@@ -243,6 +249,7 @@ class ProductionFeaturePlainConfigurationTest extends TestCase
             $this->assertSame(0, DB::table('production_consent_events')->count());
             $this->assertSame(0, DB::table('production_consent_states')->count());
         } finally {
+            $callbacks->setValue($application, $originalCallbacks);
             ProductionConsentState::flushEventListeners();
         }
     }

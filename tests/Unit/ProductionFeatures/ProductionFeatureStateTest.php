@@ -7,11 +7,22 @@ use App\Domain\Customers\ProductionFeatures\Listening\ProductionListeningRollout
 use App\Domain\Customers\ProductionFeatures\Listening\ProductionListeningState;
 use App\Domain\Customers\ProductionFeatures\Preferences\ProductionConsentPurposePolicy;
 use App\Domain\Customers\ProductionFeatures\ProductionFeatureConfiguration;
+use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeaturePolicy;
 use Tests\Support\ConsentFixtures;
 use Tests\TestCase;
 
 final class ProductionFeatureStateTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // These pure policy cases do not activate account authority; supply the closed root seam
+        // and a synthetic key required by the raw source reader, just as feature fixtures do.
+        config(['app.key' => 'base64:'.base64_encode(str_repeat('k', 32)),
+            'production-account-features' => ['enabled' => false, 'provenance' => null,
+                'versions' => ProductionAccountFeaturePolicy::VERSIONS]]);
+    }
+
     public function test_ordinary_production_state_remains_v1_and_repeated_intent_preserves_state(): void
     {
         $rules = new ProductionListeningState;
