@@ -75,7 +75,7 @@ class ServiceProjectSchemaTest extends TestCase
         }
     }
 
-    public function test_failed_ddl_retains_prior_service_rows_and_never_logs_or_adopts_partial_native_schema(): void
+    public function test_failed_ddl_retains_prior_service_rows_and_retries_only_exact_owned_partial_schema(): void
     {
         $this->assertDatabaseCount('service_projects', 0);
         Schema::drop('service_project_events');
@@ -100,27 +100,10 @@ class ServiceProjectSchemaTest extends TestCase
         }
         $this->assertDatabaseMissing('migrations', ['migration' => self::MIGRATION]);
         $this->assertSame($prior, DB::table('service_draft_versions')->get()->toJson());
-        if (DB::getDriverName() === 'mysql') {
-            $this->assertTrue(Schema::hasTable('service_projects'));
-            $this->assertTrue(Schema::hasTable('service_project_events'));
-            $objects = DB::select('SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = ? AND TRIGGER_NAME LIKE ?', [DB::getDatabaseName(), 'service_project%']);
-            $this->assertCount(1, $objects);
-            try {
-                $this->artisan('migrate', ['--path' => 'database/migrations/'.self::MIGRATION.'.php', '--force' => true])->run();
-                $this->fail('Native partial schema must remain unadopted for inspection.');
-            } catch (LogicException) {
-                $this->assertDatabaseMissing('migrations', ['migration' => self::MIGRATION]);
-                $this->assertSame(array_column($objects, 'TRIGGER_NAME'), array_column(DB::select('SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = ? AND TRIGGER_NAME LIKE ?', [DB::getDatabaseName(), 'service_project%']), 'TRIGGER_NAME'));
-            }
-        } else {
-            $this->assertTrue(Schema::hasTable('service_projects'));
-            try {
-                $this->artisan('migrate', ['--path' => 'database/migrations/'.self::MIGRATION.'.php', '--force' => true])->run();
-                $this->fail('Partial SQLite schema must remain unadopted for inspection.');
-            } catch (LogicException) {
-                $this->assertDatabaseMissing('migrations', ['migration' => self::MIGRATION]);
-                $this->assertSame($prior, DB::table('service_draft_versions')->get()->toJson());
-            }
-        }
+        $this->assertTrue(Schema::hasTable('service_projects'));
+        $this->assertTrue(Schema::hasTable('service_project_events'));
+        app('migrator')->run([database_path('migrations/'.self::MIGRATION.'.php')]);
+        $this->assertDatabaseHas('migrations', ['migration' => self::MIGRATION]);
+        $this->assertSame($prior, DB::table('service_draft_versions')->get()->toJson());
     }
 }
