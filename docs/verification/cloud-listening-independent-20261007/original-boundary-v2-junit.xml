@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ListeningIndependentBoundaryTest" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" tests="8" assertions="16" errors="0" failures="8" skipped="0" time="3.711655">
+    <testsuite name="Tests\Feature\ListeningIndependentBoundaryTest::test_terminal_authority_query_callback_cannot_release_or_commit_stale_state" tests="6" assertions="12" errors="0" failures="6" skipped="0" time="1.763817">
+      <testcase name="test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set &quot;read account&quot;" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" line="23" class="Tests\Feature\ListeningIndependentBoundaryTest" classname="Tests.Feature.ListeningIndependentBoundaryTest" assertions="2" time="0.748027">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ListeningIndependentBoundaryTest::test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set "read account"
+Final-query account callback released stale read result: {"listeningSchema":1,"version":1,"favorites":[],"playlists":[{"id":"71829373-ed00-4477-88e9-787e24f28348","name":"Independent retained private list","tracks":[]}],"limits":{"favorites":50,"playlists":10,"playlistTracks":25}}
+Failed asserting that false is true.
+
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:54</failure>
+      </testcase>
+      <testcase name="test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set &quot;read credentials&quot;" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" line="23" class="Tests\Feature\ListeningIndependentBoundaryTest" classname="Tests.Feature.ListeningIndependentBoundaryTest" assertions="2" time="0.213714">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ListeningIndependentBoundaryTest::test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set "read credentials"
+Final-query credentials callback released stale read result: {"listeningSchema":1,"version":1,"favorites":[],"playlists":[{"id":"e4e05734-893d-497d-9e72-5f023165a143","name":"Independent retained private list","tracks":[]}],"limits":{"favorites":50,"playlists":10,"playlistTracks":25}}
+Failed asserting that false is true.
+
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:54</failure>
+      </testcase>
+      <testcase name="test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set &quot;read policy&quot;" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" line="23" class="Tests\Feature\ListeningIndependentBoundaryTest" classname="Tests.Feature.ListeningIndependentBoundaryTest" assertions="2" time="0.223684">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ListeningIndependentBoundaryTest::test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set "read policy"
+Final-query policy callback released stale read result: {"listeningSchema":1,"version":1,"favorites":[],"playlists":[{"id":"58ab3973-fcf5-4ae9-ad6b-6dd1e9a2c822","name":"Independent retained private list","tracks":[]}],"limits":{"favorites":50,"playlists":10,"playlistTracks":25}}
+Failed asserting that false is true.
+
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:54</failure>
+      </testcase>
+      <testcase name="test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set &quot;change account&quot;" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" line="23" class="Tests\Feature\ListeningIndependentBoundaryTest" classname="Tests.Feature.ListeningIndependentBoundaryTest" assertions="2" time="0.191063">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ListeningIndependentBoundaryTest::test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set "change account"
+Final-query account callback released stale change result: {"listeningSchema":1,"version":1,"favorites":[],"playlists":[{"id":"93cb5eb9-256e-418b-a8c3-8a4c66475a48","name":"Independent private list","tracks":[]}],"limits":{"favorites":50,"playlists":10,"playlistTracks":25}}
+Failed asserting that false is true.
+
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:54</failure>
+      </testcase>
+      <testcase name="test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set &quot;change credentials&quot;" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" line="23" class="Tests\Feature\ListeningIndependentBoundaryTest" classname="Tests.Feature.ListeningIndependentBoundaryTest" assertions="2" time="0.204587">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ListeningIndependentBoundaryTest::test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set "change credentials"
+Final-query credentials callback released stale change result: {"listeningSchema":1,"version":1,"favorites":[],"playlists":[{"id":"c48978e6-ff89-4fab-8e75-55f87a5c3928","name":"Independent private list","tracks":[]}],"limits":{"favorites":50,"playlists":10,"playlistTracks":25}}
+Failed asserting that false is true.
+
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:54</failure>
+      </testcase>
+      <testcase name="test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set &quot;change policy&quot;" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" line="23" class="Tests\Feature\ListeningIndependentBoundaryTest" classname="Tests.Feature.ListeningIndependentBoundaryTest" assertions="2" time="0.182742">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ListeningIndependentBoundaryTest::test_terminal_authority_query_callback_cannot_release_or_commit_stale_state with data set "change policy"
+Final-query policy callback released stale change result: {"listeningSchema":1,"version":1,"favorites":[],"playlists":[{"id":"802a052c-fcad-4c0a-a5b8-2ba1a23b3b48","name":"Independent private list","tracks":[]}],"limits":{"favorites":50,"playlists":10,"playlistTracks":25}}
+Failed asserting that false is true.
+
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:54</failure>
+      </testcase>
+    </testsuite>
+    <testcase name="test_public_query_callback_cannot_release_a_superseded_retained_library" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" line="69" class="Tests\Feature\ListeningIndependentBoundaryTest" classname="Tests.Feature.ListeningIndependentBoundaryTest" assertions="2" time="1.756871">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ListeningIndependentBoundaryTest::test_public_query_callback_cannot_release_a_superseded_retained_library
+Public query callback superseded encrypted retained revision but stale result escaped: {"listeningSchema":1,"version":1,"favorites":[{"trackId":"1","available":true,"track":{"title":"Synthetic quote recording","artist":"Test only","href":"\/tracks\/quote-fixture-020be45f-1f69-457f-9709-fc22aa2df58d"}}],"playlists":[],"limits":{"favorites":50,"playlists":10,"playlistTracks":25}}
+Failed asserting that false is true.
+
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:92</failure>
+    </testcase>
+    <testcase name="test_empty_storage_with_drifted_unique_index_is_retained_on_rollback" file="/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php" line="95" class="Tests\Feature\ListeningIndependentBoundaryTest" classname="Tests.Feature.ListeningIndependentBoundaryTest" assertions="2" time="0.190967">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ListeningIndependentBoundaryTest::test_empty_storage_with_drifted_unique_index_is_retained_on_rollback
+Rollback accepted same-name empty storage after the unique index was removed; table retained=false
+Failed asserting that false is true.
+
+/workspace/VA-Studio-listening-independent/docs/verification/cloud-listening-independent-20261007/ListeningIndependentBoundaryTest.php:106</failure>
+    </testcase>
+  </testsuite>
+</testsuites>
