@@ -49,13 +49,14 @@ final class IdentityOriginalCommitWitness implements JsonSerializable
         $this->driver = $reader->identityDriver();
         $this->statementAdmission();
         $this->manager = DB::getFacadeRoot();
-        $this->connection = $this->manager->connection();
         $this->container = app();
         $this->config = config();
+        $this->configuration = $this->configuration();
+        // Even default connection selection can dereference database configuration. Admit parents first.
+        $this->connection = $this->manager->connection();
         $this->schema = $this->driver === 'sqlite' ? 'main' : $this->connection->getDatabaseName();
         $this->databaseName = $this->connection->getDatabaseName();
         $this->name = $this->connection->getName();
-        $this->configuration = $this->configuration();
         $this->receipts = new SplObjectStorage;
         if ($originalDeadlineNs <= hrtime(true) || $originalDeadlineNs > hrtime(true) + 300_000_000_000) {
             throw new IdentityException('historical_commit_required');
@@ -204,10 +205,16 @@ final class IdentityOriginalCommitWitness implements JsonSerializable
     private function configuration(): array
     {
         $items = $this->property(Repository::class, 'items', $this->config);
-        $identity = $items['production-customer-identity'] ?? [];
+        // Raw parents may be ArrayAccess extensions. Reject them before any nested lookup can run code.
+        if (! is_array($items) || ! is_array($items['app'] ?? null)
+            || ! is_array($items['production-customer-identity'] ?? null) || ! is_array($items['database'] ?? null)) {
+            throw new IdentityException('historical_plain_configuration_required');
+        }
+        $identity = $items['production-customer-identity'];
         if (($identity['historical_receipts_enabled'] ?? null) !== true
             || ($identity['historical_receipts_version'] ?? null) !== IdentityHistoricalCommittedReceipt::VERSION
-            || ! is_string($items['app']['key'] ?? null) || $items['app']['key'] === '') {
+            || ! is_string($items['app']['key'] ?? null) || $items['app']['key'] === ''
+            || ! is_string($items['database']['default'] ?? null) || $items['database']['default'] === '') {
             throw new IdentityException('historical_commit_required');
         }
 
