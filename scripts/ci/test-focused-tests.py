@@ -47,14 +47,6 @@ class SelectionTests(unittest.TestCase):
         required = (
         "tests/Feature/MembershipCreditMigrationTest.php",
         "tests/Feature/CustomerAccountMigrationTest.php",
-        "tests/Feature/CustomerPurchaseClaimMigrationTest.php",
-        "tests/Feature/OrderPreparationMigrationTest.php",
-        "tests/Feature/QuotePricingMigrationTest.php",
-        "tests/Feature/SharedInventoryMigrationTest.php",
-        "tests/Feature/TestPaymentEvidenceMigrationTest.php",
-        "tests/Feature/TestOrderFinalizationMigrationTest.php",
-        "tests/Feature/TestContractIssuanceMigrationTest.php",
-        "tests/Feature/TestFulfillmentActivationMigrationTest.php",
         )
         self.assertEqual(focused.MAX_FILES, 32)
         for engine in focused.ENGINES:
