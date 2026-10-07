@@ -128,3 +128,41 @@ Throwaway source sha256:
 - Their datadirs (`scratchpad/mysql-rev254` and `scratchpad/mysql-rev254b`) and sockets (`/tmp/claude-0/s3427.sock` and `/tmp/claude-0/s3447.sock`) were removed.
 - Both review worktrees were removed with `git worktree remove --force`.
 - Nothing was committed or pushed.
+
+## Addendum 1: delta `452cdab1..cd495445` (2026-10-07)
+
+**Verdict: APPROVE WITH CONDITIONS carries to `cd4954455fd90fa20e37d01a5f1573b147e64ee4`** (tree `57a7a7e0568da0e88e55a6ffd01136c6d08988fa`). **R1 is closed.** R3 and R8 are addressed. C1, R2 and R9 remain as conditions. The reviewer did this in a fresh detached worktree `/home/user/VA-Studio-review-supp254b`, on SQLite only, with no MySQL.
+
+### Scope of the delta
+
+Scope was read with `git diff 452cdab1 cd495445 -- app tests config database`. Nothing under `config/` or `database/` changed.
+
+| Commit | Change | Assessment |
+| --- | --- | --- |
+| `939f8160` (R1) | Adds `test_receipts_scoped_to_another_recipient_provider_or_account_never_confirm` to `ProductionSuppressionJourneyTest`, plus an optional `$email` on the `withdrawn()` helper. It covers five receipts: a wrong recipient HMAC, another account's recipient HMAC, a wrong provider hash, another account's whole receipt and another account's operation id. Each answer differs in only the named field. After each one it asserts no confirmation and no resend. A positive control then confirms, and the other account stays `unknown`. | Sound. The positive control rules out a broken fixture. |
+| `f7a73aa6` (R3) | Docblock only: `boundTo()` must be pure and configuration-only, because it runs inside the held transaction at the commit fence. | Matches R3. No behaviour change. |
+| `7d0027aa` (R8) | `#[\SensitiveParameter]` on `ProductionSuppressionRequest::fromRecords($recipient)`, the private constructor's `$values`, `ProductionSuppressionRecords::request($capture)` and `encrypt($plain)`. | Matches R8. A direct probe with `zend.exception_ignore_args=0` (a forced TypeError calling `fromRecords`) shows the recipient redacted from `getTrace()` and `getTraceAsString()`. A first probe through `ReflectionMethod::invoke` did show the address, but only because the `invoke` frame's own arguments are not marked sensitive. That is an artifact of the probe, not a runtime path. |
+| `0ef61400`, `cd495445` | Docs only (README section and this DECISION). | No code impact. |
+
+The 253 sources, the 254 runtime logic, the schema, the default-off configuration and the deadline are unchanged.
+
+### Commands and results (SQLite, worktree at `cd495445`)
+
+Each mutation was applied on its own, then reverted with `git checkout -- app`. `git status` was clean afterwards apart from the evidence directory.
+
+| Command | Result | Receipt (`review-evidence/addendum-1/`) |
+| --- | --- | --- |
+| `PHPUNIT tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php` | **8 tests / 121 assertions OK** | `journey.txt` |
+| M2: remove both the recipient-HMAC and provider-hash comparisons from `ProductionSuppressionReceipt::confirms` | **Killed**: 1 failure, `wrong recipient hmac` | `m2.txt` |
+| M2b: remove only the provider-hash comparison | **Killed**: 1 failure, `wrong provider hash` | `m2b.txt` |
+| M2c: remove only the recipient-HMAC comparison | **Killed**: 1 failure, `wrong recipient hmac` | `m2c.txt` |
+| `PHPUNIT tests/Feature/ProductionSuppression` | **45 tests / 577 assertions OK, 6 native-only skips** | `suite254.txt` |
+
+### Remaining conditions (unchanged)
+
+1. **C1** blocks activation, Foundation final verification and final acceptance. After the fix, the full 254 selection must pass natively on MySQL 8.4.
+2. **R2**: Sean decides the withdraw → re-grant → first-request semantics before any activation or provider binding.
+3. **R9**: an operator procedure for stuck `unknown` attempts is needed before any provider binding.
+4. Defaults stay shipped: `enabled=false`, `provider=null`, no route and no adapter.
+
+R4–R7 remain informational and out of model.

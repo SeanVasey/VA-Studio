@@ -1,0 +1,27 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-supp254b/phpunit.xml
+
+.[41;37mF[0m......                                                            8 / 8 (100%)
+
+Time: 00:23.499, Memory: 111.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest::test_receipts_scoped_to_another_recipient_provider_or_account_never_confirm
+wrong recipient hmac
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    'status' => 'unknown',
++    'status' => 'confirmed',
+ ]
+
+/home/user/VA-Studio-review-supp254b/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:107
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 8[0m[37;41m, Assertions: 108[0m[37;41m, Failures: 1[0m[37;41m.[0m
