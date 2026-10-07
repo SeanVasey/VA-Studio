@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\DiscoverySitemapRegistrationTest" file="/workspace/VA-Studio-discovery-registration/tests/Feature/DiscoverySitemapRegistrationTest.php" tests="4" assertions="18" errors="1" failures="3" skipped="0" time="2.629991">
+    <testcase name="test_default_off_keeps_existing_site_index_and_public_routes_have_no_session_stack" file="/workspace/VA-Studio-discovery-registration/tests/Feature/DiscoverySitemapRegistrationTest.php" line="38" class="Tests\Feature\DiscoverySitemapRegistrationTest" classname="Tests.Feature.DiscoverySitemapRegistrationTest" assertions="6" time="0.529593">
+      <error type="Mockery\Exception\BadMethodCallException">Tests\Feature\DiscoverySitemapRegistrationTest::test_default_off_keeps_existing_site_index_and_public_routes_have_no_session_stack
+Mockery\Exception\BadMethodCallException: Received Mockery_1_Illuminate_Console_OutputStyle::askQuestion(), but no expectations were specified
+
+/workspace/VA-Studio/vendor/symfony/console/Style/SymfonyStyle.php:234
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Confirm.php:17
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Component.php:117
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Confirm.php:16
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Factory.php:61
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/ConfiguresPrompts.php:78
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/ConfiguresPrompts.php:141
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/ConfiguresPrompts.php:77
+/workspace/VA-Studio/vendor/laravel/prompts/src/Concerns/Fallback.php:59
+/workspace/VA-Studio/vendor/laravel/prompts/src/Prompt.php:108
+/workspace/VA-Studio/vendor/laravel/prompts/src/helpers.php:149
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/ConfirmableTrait.php:33
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/WipeCommand.php:41
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/workspace/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/workspace/VA-Studio/vendor/symfony/console/Application.php:1094
+/workspace/VA-Studio/vendor/symfony/console/Application.php:356
+/workspace/VA-Studio/vendor/symfony/console/Application.php:195
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+/workspace/VA-Studio-discovery-registration/tests/Support/FinalizationDatabaseMigrations.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:333
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:129
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:101</error>
+    </testcase>
+    <testcase name="test_registered_complete_generation_is_canonical_and_fresh_eligibility_refuses_removed_asset" file="/workspace/VA-Studio-discovery-registration/tests/Feature/DiscoverySitemapRegistrationTest.php" line="48" class="Tests\Feature\DiscoverySitemapRegistrationTest" classname="Tests.Feature.DiscoverySitemapRegistrationTest" assertions="6" time="1.504272">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\DiscoverySitemapRegistrationTest::test_registered_complete_generation_is_canonical_and_fresh_eligibility_refuses_removed_asset
+Failed asserting that '&lt;?xml version="1.0" encoding="UTF-8"?&gt;\n
+&lt;urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"&gt;&lt;/urlset&gt;\n
+' [ASCII](length: 109) contains "https://synthetic.example/tracks/quote-fixture-eb267e27-5a50-4343-a829-00476eb99adc" [ASCII](length: 83).
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:720
+/workspace/VA-Studio-discovery-registration/tests/Feature/DiscoverySitemapRegistrationTest.php:56</failure>
+    </testcase>
+    <testsuite name="Tests\Feature\DiscoverySitemapRegistrationTest::test_response_creation_cannot_resolve_callbacks_after_terminal_source_proof" tests="2" assertions="6" errors="0" failures="2" skipped="0" time="0.596126">
+      <testcase name="test_response_creation_cannot_resolve_callbacks_after_terminal_source_proof with data set #0" file="/workspace/VA-Studio-discovery-registration/tests/Feature/DiscoverySitemapRegistrationTest.php" line="73" class="Tests\Feature\DiscoverySitemapRegistrationTest" classname="Tests.Feature.DiscoverySitemapRegistrationTest" assertions="3" time="0.280656">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\DiscoverySitemapRegistrationTest::test_response_creation_cannot_resolve_callbacks_after_terminal_source_proof with data set #0
+No response-factory callback after terminal source proof.
+Failed asserting that 1 is identical to 0.
+
+/workspace/VA-Studio-discovery-registration/tests/Feature/DiscoverySitemapRegistrationTest.php:84</failure>
+      </testcase>
+      <testcase name="test_response_creation_cannot_resolve_callbacks_after_terminal_source_proof with data set #1" file="/workspace/VA-Studio-discovery-registration/tests/Feature/DiscoverySitemapRegistrationTest.php" line="73" class="Tests\Feature\DiscoverySitemapRegistrationTest" classname="Tests.Feature.DiscoverySitemapRegistrationTest" assertions="3" time="0.315470">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\DiscoverySitemapRegistrationTest::test_response_creation_cannot_resolve_callbacks_after_terminal_source_proof with data set #1
+No response-factory callback after terminal source proof.
+Failed asserting that 1 is identical to 0.
+
+/workspace/VA-Studio-discovery-registration/tests/Feature/DiscoverySitemapRegistrationTest.php:84</failure>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>
