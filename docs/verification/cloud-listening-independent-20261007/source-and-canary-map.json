@@ -1,0 +1,209 @@
+{
+  "original_source": "1be99f0fa37cc7e120d427dd4494708300bf7d5a",
+  "original_tree": "190c454584bad292b325702b4d35905453e05437",
+  "original_feature_paths": {
+    "app/Domain/Customers/Listening/ListeningException.php": "753bceac6616693eeba91a160640ff554dc81d5ba1db41e714731af95daed03c",
+    "app/Domain/Customers/Listening/ListeningLibrary.php": "7e7b793f3d9f6ff5b9b72f9376f550a0bdc3c79d0c2c7f9d791c5155db055dc8",
+    "app/Domain/Customers/Listening/SavedListeningLibrary.php": "a16d0d1fc1095563ffee8409633ea1a53a1f2dc34718f5ef0fba0cd4706d863c",
+    "app/Http/Controllers/CustomerListeningLibraryController.php": "c41c3c80ed5d53354be1fe5986b37435fa72eedda0273abf0fc02e468c801614",
+    "app/Http/Controllers/CustomerSessionController.php": "4ecfbce20c6a60698663964d2373f512292ac0b7170b29dfddcdbc39178e4ab8",
+    "app/Http/Middleware/CustomerPrivacy.php": "4b496116012bcaa9961b23bae13b611191355ee92cf425b08e0c28e412454883",
+    "app/Http/Requests/CustomerListeningRequest.php": "5fd9d9b9b4d878a76ecf8092119a26963e163e025c6434a4c4b9e7ba10301eaf",
+    "database/migrations/2026_10_07_242000_customer_saved_tracks.php": "e46cfe52b74631e535fa8ef3579730c39d7b1ce9bc484c52d4b47b66205cfc65",
+    "resources/js/Pages/CustomerLibrary.tsx": "3d7efeeb1382a902882765e857262df02a9fa6c3c263291b19f97d781d2478cb",
+    "resources/js/components/CustomerListeningLibrary.tsx": "6ede69f0214f4aee801b2d8ec9733c8725da22354c3c464599fea48ed82bcc06",
+    "routes/customer.php": "4473538e56cb1cae5e73482a50ab2743d1227a1610cc5bdbd9db0664ce31db46",
+    "tests/Feature/CustomerListeningLibraryHttpTest.php": "988d0a4284a789e9c543466e46868b4cc6790a69016408e502f66ba654e7d2da",
+    "tests/Feature/CustomerListeningLibraryTest.php": "3e93f9d627d65a5168dca0a84f42d5268a59812607b893a2e9deaa1ddff742ad",
+    "tests/Feature/CustomerListeningMigrationTest.php": "1fd5ee1f8c0affa88a202b4c11572cd9ac7dd0bc5eaa5b6be0e939ea42b53de9",
+    "tests/Unit/CustomerListeningRequestTest.php": "055c3f05e1b281c574644194df083784a90e4fd3107bdaab3a52f7cd4303987a",
+    "tests/frontend/customer-listening-library.test.tsx": "c3bb1ba05c1f2485296923237b5d4728efa21e3cfac4d726b0ba9b9dcb44bee3"
+  },
+  "final_original_boundary_canary_sha256": "17c1457be8e60f069e4c6a6971321958ae333f8eb87c116b0fced533ec84a6d0",
+  "original_contention_canary_sha256": "8f119451d49b850c8f015d010a8a0139050c2de60e6ce58472bad097ac150eff",
+  "original_contention_worker_sha256": "2103badcd9ce5ba56594f09fe672b197a0c549d536f7a0f344badff94c88dcc3",
+  "independent_page_canary_sha256": "d1eeb67da3de042afe1517a43c0e1ecd8c364bc097591b2e356b239d4cf2a2d3",
+  "final_original_v4_canaries_sha256": {
+    "ListeningIndependentContentionTest.php": "8f119451d49b850c8f015d010a8a0139050c2de60e6ce58472bad097ac150eff",
+    "ListeningIndependentRestartTest.php": "20c9d434867a18621bf7d12f951038cfab49d6fccce6cba21329493c199ac977",
+    "ListeningIndependentBoundaryTest.php": "976ba412c210db09d9f5f1e8d6e785f452fbe841bb84bc0be11ef10f7e890474"
+  },
+  "baseline_evidence_sha256": {
+    "original-native-contention-receipt.json": "d3c31c2bd41ecf5483bc5a950e14ff226109822945cee34d284f975b69f6223b",
+    "ListeningIndependentContentionTest.pre-successor.php.txt": "8f119451d49b850c8f015d010a8a0139050c2de60e6ce58472bad097ac150eff",
+    "original-final-v3-junit.xml": "1a2603e04014b083c5abe8615b4ef858270c8080efc8bf079337ae664fe9e35f",
+    "original-restart-junit.xml": "13c1cbd00b30b2dd33c51b6c233ae701a6be613ff0512281bb8d307dd35452eb",
+    "ListeningIndependentContentionTest.original-v4.php.txt": "8f119451d49b850c8f015d010a8a0139050c2de60e6ce58472bad097ac150eff",
+    "original-public-withdrawal-junit.xml": "b0713220e6d5a442c5227c316592fbce96d7b8931c948515d699d4097a6cf105",
+    "original-public-withdrawal.log": "a892d9d0256a4009eb53aed60312045f6d8ff4fd1018b8db02051da01f354db3",
+    "ListeningIndependentContentionTest.original.php.txt": "8f119451d49b850c8f015d010a8a0139050c2de60e6ce58472bad097ac150eff",
+    "original-boundary-v2.log": "512ba599ada31ab3548c46ce33a5e42d4d2734e06feab98be40cb015fe4b56cf",
+    "ListeningIndependentBoundaryTest.original.php.txt": "17c1457be8e60f069e4c6a6971321958ae333f8eb87c116b0fced533ec84a6d0",
+    "ListeningIndependentBoundaryTest.original-v4.php.txt": "976ba412c210db09d9f5f1e8d6e785f452fbe841bb84bc0be11ef10f7e890474",
+    "original-model-callback-junit.xml": "ee65264d89608db85a559d9985a1965cef380bcd19dd88ded270df30d755ccbb",
+    "original-boundary.log": "8ff102d4fafb352cc7c0583bfa5e80ea638f2ee574756409029cc49f766cdebd",
+    "ListeningIndependentRestartTest.pre-successor.php.txt": "20c9d434867a18621bf7d12f951038cfab49d6fccce6cba21329493c199ac977",
+    "original-final-v4-junit.xml": "091c92c0ad540b89642e4c4de0db35fb25ff43a52a74d10dd6e2c3767675b742",
+    "listening-worker.original.php.txt": "2103badcd9ce5ba56594f09fe672b197a0c549d536f7a0f344badff94c88dcc3",
+    "original-native-contention-junit.xml": "2399413599015db2b9bc8a85d201e6129254ad69a2e89a2e16fbe4fede306f96",
+    "ListeningIndependentBoundaryTest.pre-successor.php.txt": "7fc4980ad6ce94272c64e88d9ae2ea8e4565e42047f46ac1d1f6eeb92d1a118a",
+    "original-boundary-v2-junit.xml": "78b9b54a62b38e1e5656ece23581ca2496ee51f00b5193578ffa04ad18b05b05",
+    "original-boundary-junit.xml": "2c29e33fc5c1aeac37f355beb4afea8e60d78ffcb8b415046b8e257afa80c6c9",
+    "original-restart.log": "9af10b5ff24b90333f4966ad37cabe789cf7c2c49273024dcebc3afb7907e38a",
+    "original-native-contention.log": "248cc77151ce347836a7aaf36394ed89e61de73f068eb79ee8516f3e3385d7f8",
+    "ListeningIndependentRestartTest.original-v4.php.txt": "20c9d434867a18621bf7d12f951038cfab49d6fccce6cba21329493c199ac977",
+    "original-model-callback.log": "6bc1a40a0bc911d7e0df22026105dba7b8b9b196724e2b31c122cf47e185270c",
+    "original-final-boundary-junit.xml": "614c36d46ea14ca9ba8d38fa275b76619c4f6f9ac8c60c4f895e11341861c423",
+    "original-page-vitest.log": "c345037797e20ebbebc7782a3025dc5940289066b20500a0d89bd5becd75be93",
+    "original-page-vitest.json": "b0ec0d0be1276f2e46116e0c7bfdbc151c742f156ad56b9ac9f2332dcebac132",
+    "original-final-boundary.log": "103d6e365bd932fe65f742b97aaaaf7d09b591f9652ef8693da3ab136ffba244",
+    "original-final-v4.log": "7b8178fd3f8699b01d0eb39ffdde9aacdf3f6ca643cf75f74f41937eb7822ea4",
+    "original-final-v3.log": "dc2681ec25f2a229e8955272bf9f5880b46dc4b2cc08bf84389fbcc5f4cc49fe"
+  },
+  "pre_successor_frozen_canaries_sha256": {
+    "ListeningIndependentContentionTest.php": "8f119451d49b850c8f015d010a8a0139050c2de60e6ce58472bad097ac150eff",
+    "ListeningIndependentRestartTest.php": "20c9d434867a18621bf7d12f951038cfab49d6fccce6cba21329493c199ac977",
+    "ListeningIndependentBoundaryTest.php": "7fc4980ad6ce94272c64e88d9ae2ea8e4565e42047f46ac1d1f6eeb92d1a118a"
+  },
+  "pre_successor_frozen_worker_sha256": "cdf06b93fd77d99e5140a451bbb2a1791b6d9e1a2d301226a8e2fdfa42f64ce3",
+  "first_repaired_source": "e07f5bab65931ace7d995df77328616cb03be493",
+  "first_repaired_tree": "ee3da7f63f0589ad4dc24fb991b64b866d76d333",
+  "first_repaired_feature_paths": {
+    "app/Domain/Customers/Listening/ListeningEvidence.php": "0e6e122a9a1eeea52751f7b7fe2e0183f866ea7df1119630346ea04acf00e848",
+    "app/Domain/Customers/Listening/ListeningException.php": "753bceac6616693eeba91a160640ff554dc81d5ba1db41e714731af95daed03c",
+    "app/Domain/Customers/Listening/ListeningLibrary.php": "30aca52bd3d15e314bdfa6bad146870991a1269a4178cd64d9c27b7e376aa2a7",
+    "app/Domain/Customers/Listening/SavedListeningLibrary.php": "a16d0d1fc1095563ffee8409633ea1a53a1f2dc34718f5ef0fba0cd4706d863c",
+    "app/Http/Controllers/CustomerListeningLibraryController.php": "c41c3c80ed5d53354be1fe5986b37435fa72eedda0273abf0fc02e468c801614",
+    "app/Http/Controllers/CustomerSessionController.php": "4ecfbce20c6a60698663964d2373f512292ac0b7170b29dfddcdbc39178e4ab8",
+    "app/Http/Middleware/CustomerPrivacy.php": "4b496116012bcaa9961b23bae13b611191355ee92cf425b08e0c28e412454883",
+    "app/Http/Requests/CustomerListeningRequest.php": "5fd9d9b9b4d878a76ecf8092119a26963e163e025c6434a4c4b9e7ba10301eaf",
+    "database/migrations/2026_10_07_242000_customer_saved_tracks.php": "1202c18366e67012224745a12e06b2ef46d654725f2eeb48e779cf9569cd7392",
+    "resources/js/Pages/CustomerLibrary.tsx": "3d7efeeb1382a902882765e857262df02a9fa6c3c263291b19f97d781d2478cb",
+    "resources/js/components/CustomerListeningLibrary.tsx": "6ede69f0214f4aee801b2d8ec9733c8725da22354c3c464599fea48ed82bcc06",
+    "routes/customer.php": "4473538e56cb1cae5e73482a50ab2743d1227a1610cc5bdbd9db0664ce31db46"
+  },
+  "canary_rollback_correction": "On refusal assert nested unpublish was rolled back; require unavailable-without-text-or-URL only when the read returned. Corrected canary still rejects original1be.",
+  "repaired_canaries_sha256": {
+    "ListeningIndependentContentionTest.php": "8f119451d49b850c8f015d010a8a0139050c2de60e6ce58472bad097ac150eff",
+    "ListeningIndependentRestartTest.php": "20c9d434867a18621bf7d12f951038cfab49d6fccce6cba21329493c199ac977",
+    "ListeningIndependentBoundaryTest.php": "0f54da21a14a95af7a524c5c540a2fe3a4ca85b8eef655182988f7f2c0571600"
+  },
+  "repaired_evidence_sha256": {
+    "pre-shadow-fix-junit.xml": "74108ea4f8723225f9649b47a4f54d6bd6a0e16267fe70a8473285f725b77e9b",
+    "repaired-independent-sqlite-junit.xml": "1cc436676e36126fcfbd83d748f2707b55dbd162a7f64bd509dca304c7e3733a",
+    "repaired-independent-mysql-junit.xml": "9cebcfca3cfb6734dee32f0f09cf14cf4af698f6312bc4902c7ed754320574e7",
+    "repaired-independent-mysql.log": "2ed5aa6819f223002e824fd619529f854df957c4f10994bc144d29ec714bfa6d",
+    "repaired-typecheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "repaired-independent-sqlite.log": "f5c9b07515e4169e3ac513dad657cbbee5b741eac9bc2cad29f58be2c02262d6",
+    "repaired-independent-sqlite-corrected-junit.xml": "81b353b7c64167202410b6c0c0a1be0749d972c49579b0ce41b402ba052e1fcf",
+    "repaired-page-vitest.log": "e359ca3a78de16fc563a534df78ff9a53322378044024b6925180bccfa01d9fe",
+    "repaired-pint.log": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "native-contention-receipt.json": "0af88909af62a9f52952fe8e6d29ced5dfbd7fe3e895ff3bcc34539164200cb5",
+    "repaired-page-vitest.json": "782d24e7bac9cbefd04f220a2b5ad83319f44d626a261b897dad89bd1cfe18f0",
+    "pre-shadow-fix.log": "7cc601ec689eecfafbe0955a0ba44e9e889840fc604a3902015e90759fa042e8",
+    "repaired-independent-sqlite-corrected.log": "99109de8415162306ffab1cc82a9d8123daeb2136814dd3fa43044d7ff1ed8b4"
+  },
+  "final_composed_source": "ca3b1fa7eb60edd2228b73742da33179228a277e",
+  "final_composed_tree": "e93ec0f3d747d0536400efafb40e526ab3880763",
+  "final_composed_runtime_paths": {
+    "app/Domain/Catalog/Discovery/CurrentEligibleTrackSnapshot.php": "4292c66f41e05332dc3bb1dfe41b811496d4815beea70d866d3533d518d7d1f3",
+    "app/Domain/Catalog/Discovery/DiscoveryEpoch.php": "540b5d43c02e0a100e39290598b96668a4bf6c30fd0813da6161f307bec801bf",
+    "app/Domain/Catalog/Discovery/EligibleTrackSnapshot.php": "72f1d990e90be9b3153277892678eb34a77c97ab21e3f8ca29232686c86863b3",
+    "app/Domain/Catalog/PublicationReadiness.php": "6ed1f8c2bd1f0dc4b5fea0608848cf0149c12569e29b680640fea801f6fb8c60",
+    "app/Domain/Commerce/Inventory/SelectionInventory.php": "e00a74fe35c8ab885034e49bfe38e4392174467d454740e4e6ad84b2dc078fd6",
+    "app/Domain/Customers/Listening/ListeningEvidence.php": "4b22665239f1df455b29c41b91196b6c910822105b72168a1dca4ed677e807c3",
+    "app/Domain/Customers/Listening/ListeningException.php": "753bceac6616693eeba91a160640ff554dc81d5ba1db41e714731af95daed03c",
+    "app/Domain/Customers/Listening/ListeningLibrary.php": "30aca52bd3d15e314bdfa6bad146870991a1269a4178cd64d9c27b7e376aa2a7",
+    "app/Domain/Customers/Listening/SavedListeningLibrary.php": "a16d0d1fc1095563ffee8409633ea1a53a1f2dc34718f5ef0fba0cd4706d863c",
+    "app/Http/Controllers/CustomerListeningLibraryController.php": "c41c3c80ed5d53354be1fe5986b37435fa72eedda0273abf0fc02e468c801614",
+    "app/Http/Controllers/CustomerSessionController.php": "4ecfbce20c6a60698663964d2373f512292ac0b7170b29dfddcdbc39178e4ab8",
+    "app/Http/Middleware/CustomerPrivacy.php": "4b496116012bcaa9961b23bae13b611191355ee92cf425b08e0c28e412454883",
+    "app/Http/Requests/CustomerListeningRequest.php": "5fd9d9b9b4d878a76ecf8092119a26963e163e025c6434a4c4b9e7ba10301eaf",
+    "database/migrations/2026_10_07_240000_catalog_discovery_epoch.php": "93d8155e864ad96917f5a0d60804102cd4c40ecba961f50542d74afd5b9a80ce",
+    "database/migrations/2026_10_07_242000_customer_saved_tracks.php": "1202c18366e67012224745a12e06b2ef46d654725f2eeb48e779cf9569cd7392",
+    "resources/js/Pages/CustomerLibrary.tsx": "3d7efeeb1382a902882765e857262df02a9fa6c3c263291b19f97d781d2478cb",
+    "resources/js/components/CustomerListeningLibrary.tsx": "6ede69f0214f4aee801b2d8ec9733c8725da22354c3c464599fea48ed82bcc06",
+    "routes/customer.php": "4473538e56cb1cae5e73482a50ab2743d1227a1610cc5bdbd9db0664ce31db46"
+  },
+  "frontend_source_equivalence": {
+    "resources/js/Pages/CustomerLibrary.tsx": [
+      "0be66fb7450985512f342facb1dc021663bbec14",
+      "0be66fb7450985512f342facb1dc021663bbec14"
+    ],
+    "resources/js/components/CustomerListeningLibrary.tsx": [
+      "efece8aa35e95c8a0eac785bf4f44edb19590cec",
+      "efece8aa35e95c8a0eac785bf4f44edb19590cec"
+    ]
+  },
+  "catalog_dependency_graph_review": "PublicCatalog::selections unchanged; new nullable time arguments default to existing now semantics; ListeningEvidence captures existing track/rights/media/license/inventory dependency rows. DiscoveryEpoch triggers mutate an invalidation counter and are not consulted by listening selection. Native probes rerun on final composed schema.",
+  "final_composed_canaries_sha256": {
+    "ListeningIndependentContentionTest.php": "8f119451d49b850c8f015d010a8a0139050c2de60e6ce58472bad097ac150eff",
+    "ListeningIndependentRestartTest.php": "20c9d434867a18621bf7d12f951038cfab49d6fccce6cba21329493c199ac977",
+    "ListeningIndependentBoundaryTest.php": "0f54da21a14a95af7a524c5c540a2fe3a4ca85b8eef655182988f7f2c0571600"
+  },
+  "first_repaired_contention_receipt_recovery": "Exact earlier receipt restored from final receipt with recorded earlier source SHA; SHA256 matches the independently recorded earlier receipt hash.",
+  "frontend_tree_equivalence": {
+    "resources/js": [
+      "d49c508031fb709c47c03dd6a2da9c65f3986e76",
+      "d49c508031fb709c47c03dd6a2da9c65f3986e76"
+    ],
+    "resources/css": [
+      "7186a53616a1d1eff116c9bd7ffdd1f44f697adb",
+      "7186a53616a1d1eff116c9bd7ffdd1f44f697adb"
+    ],
+    "vitest.config.ts": [
+      "f7d3a59c9f5e1d73e42c47a22c2402037a3d509f",
+      "f7d3a59c9f5e1d73e42c47a22c2402037a3d509f"
+    ],
+    "tsconfig.json": [
+      "ec130eb7d02b818d63c93e4795dfca81d5ec93a3",
+      "ec130eb7d02b818d63c93e4795dfca81d5ec93a3"
+    ],
+    "package.json": [
+      "1c5a39755658dde7d625498391b4acf640994b5a",
+      "1c5a39755658dde7d625498391b4acf640994b5a"
+    ],
+    "package-lock.json": [
+      "614350366e7af397c14603dae9272082ecfae066",
+      "614350366e7af397c14603dae9272082ecfae066"
+    ],
+    "composer.json": [
+      "cbb669c31bb1610a4b9cd93b2762905a82a7312c",
+      "cbb669c31bb1610a4b9cd93b2762905a82a7312c"
+    ],
+    "composer.lock": [
+      "9e58027dcd989282b026d56347e26ea867723db9",
+      "9e58027dcd989282b026d56347e26ea867723db9"
+    ]
+  },
+  "final_composed_evidence_sha256": {
+    "final-composed-independent-sqlite-junit.xml": "54f1c5aa7a3ef613f2684afd0645d22d07cc4013fef9aefa296e48886cf9fea0",
+    "final-composed-independent-mysql.log": "44d429e7e06b972d9032b791680ea76d781436640966bc02b2c6065ccf8743ae",
+    "final-composed-independent-mysql-junit.xml": "9e1e89345cac9887c9c45e5ae55a6cd7af26ce8722836e2576d3f5e6a59307d2",
+    "native-contention-receipt.json": "55f0a133daff7410cbae2ef69b9b813e9403395262b1025d4181b73e1db52749",
+    "final-composed-pint.log": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "final-composed-independent-sqlite.log": "bf1f622f3a634645ee9b0c55e854c80b55c0c10bbc568c73d5623a6f3b556a88"
+  },
+  "approval": {
+    "source": "ca3b1fa7eb60edd2228b73742da33179228a277e",
+    "tree": "e93ec0f3d747d0536400efafb40e526ab3880763",
+    "sqlite": {
+      "cases": 13,
+      "assertions": 50,
+      "result": "passed"
+    },
+    "mysql": {
+      "cases": 3,
+      "assertions": 28,
+      "result": "passed",
+      "version": "8.0.46-0ubuntu0.24.04.4"
+    },
+    "frontend": {
+      "cases": 65,
+      "result": "passed",
+      "executed_source": "e07f5bab65931ace7d995df77328616cb03be493",
+      "whole_tree_equivalence": true
+    },
+    "scope": "focused local development merge approval; no complete release acceptance"
+  }
+}
