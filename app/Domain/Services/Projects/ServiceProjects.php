@@ -20,11 +20,12 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use LogicException;
-use PDO;
 
 /** Synthetic scope preparation only. Each command fences authority before an immutable append. */
 final class ServiceProjects
 {
+    private ?ServiceProjectRows $reads = null;
+
     public function customerIndex(CustomerPrincipal $principal, User $actor): array
     {
         return $this->transaction(function () use ($principal, $actor): array {
@@ -87,8 +88,7 @@ final class ServiceProjects
             $project = $this->rows('service_projects', ['id' => $id])[0];
             $expected = $this->rawEvidence($project);
             $this->audit($project, 'brief_submitted', 0, $project['brief_hash'], $actor->id);
-            $this->finalEvidence($project, $expected);
-            $this->finalAuthority($authority);
+            $this->finalAuthority($authority, $project, $expected);
 
             return ['project' => $this->projection($project, []), 'replayed' => false];
         });
@@ -109,8 +109,9 @@ final class ServiceProjects
     {
         return $this->transaction(function () use ($id, $actor): array {
             $authority = $this->operator($actor);
-            $result = $this->project($id)['projection'];
-            $this->finalAuthority($authority);
+            $context = $this->project($id);
+            $result = $context['projection'];
+            $this->finalAuthority($authority, $context['row'], ['project' => $context['row'], 'events' => $context['events']]);
 
             return $result;
         });
@@ -150,7 +151,7 @@ final class ServiceProjects
                     if ($event['request_hash'] !== $requestHash) {
                         throw new ServiceProjectException;
                     }
-                    $this->finalAuthority($authority);
+                    $this->finalAuthority($authority, $project, ['project' => $project, 'events' => $events]);
 
                     return ['project' => $context['projection'], 'replayed' => true];
                 }
@@ -172,10 +173,9 @@ final class ServiceProjects
                 'payload_hash' => CanonicalJson::hash($payload), 'created_at' => now()]);
             $expected = $this->rawEvidence($project);
             $this->audit($project, $body['action'], $number, CanonicalJson::hash($payload), $actor->id);
-            $this->finalEvidence($project, $expected);
             $finalEvents = $expected['events'];
             $result = $this->projection($project, $finalEvents);
-            $this->finalAuthority($authority);
+            $this->finalAuthority($authority, $project, $expected);
 
             return ['project' => $result, 'replayed' => false];
         });
@@ -373,17 +373,38 @@ final class ServiceProjects
     }
 
     /** Primary PDO locking reads emit no Eloquent or QueryExecuted observers after this fence. */
-    private function finalAuthority(array $authority): void
+    private function finalAuthority(array $authority, ?array $project = null, ?array $evidence = null): void
     {
-        app(ServiceProjectPolicy::class)->requireEnabled();
         $expected = $authority['user'];
+        $principal = $authority['principal'];
+        $panel = null;
+        $required = false;
+        $providers = [];
+        $mfa = true;
+        if (! $principal) {
+            $panel = Filament::getPanel('admin');
+            $required = $panel?->isMultiFactorAuthenticationRequired() ?? false;
+            $providers = $panel?->getMultiFactorAuthenticationProviders() ?? [];
+            $hydrated = new User;
+            $hydrated->setRawAttributes($expected ?? [], true);
+            // Providers can run arbitrary framework callbacks. No provider follows the raw proof.
+            $mfa = ! $required || collect($providers)->contains(fn ($provider): bool => $provider->isEnabled($hydrated));
+        }
+        app(ServiceProjectPolicy::class)->requireEnabled();
+        if ($principal) {
+            app(CustomerAccessPolicy::class)->requireEnabled();
+        } elseif (! $panel || Filament::getPanel('admin') !== $panel || $panel->isMultiFactorAuthenticationRequired() !== $required
+            || $panel->getMultiFactorAuthenticationProviders() !== $providers || ! $mfa) {
+            throw new AuthorizationException;
+        }
+        if ($project !== null) {
+            $this->finalEvidence($project, $evidence ?? []);
+        }
         $user = $expected ? ($this->rows('users', ['id' => (int) $expected['id']])[0] ?? null) : null;
         if (! $user || $user !== $expected || $user['email_verified_at'] === null) {
             throw new AuthorizationException;
         }
-        $principal = $authority['principal'];
         if ($principal) {
-            app(CustomerAccessPolicy::class)->requireEnabled();
             $account = $this->rows('customer_accounts', ['id' => $principal->accountId])[0] ?? null;
             $hydrated = new User;
             $hydrated->setRawAttributes($user, true);
@@ -393,11 +414,7 @@ final class ServiceProjects
                 throw new AuthorizationException;
             }
         } else {
-            $panel = Filament::getPanel('admin');
-            $hydrated = new User;
-            $hydrated->setRawAttributes($user, true);
-            if (! $user['is_admin'] || ! $panel || ($panel->isMultiFactorAuthenticationRequired()
-                && ! collect($panel->getMultiFactorAuthenticationProviders())->contains(fn ($provider): bool => $provider->isEnabled($hydrated)))) {
+            if (! $user['is_admin']) {
                 throw new AuthorizationException;
             }
         }
@@ -418,18 +435,7 @@ final class ServiceProjects
 
     private function rows(string $table, array $where, string $order = 'id', ?int $limit = null, bool $descending = false): array
     {
-        $db = DB::connection();
-        $grammar = $db->getQueryGrammar();
-        $sql = 'SELECT * FROM '.$grammar->wrapTable($table)
-            .($where === [] ? '' : ' WHERE '.implode(' AND ', array_map(fn (string $column): string => $grammar->wrap($column).' = ?', array_keys($where))))
-            .' ORDER BY '.$grammar->wrap($order).($descending ? ' DESC' : '').($limit === null ? '' : ' LIMIT '.$limit).($db->getDriverName() === 'mysql' ? ' FOR UPDATE' : '');
-        $statement = $db->getPdo()->prepare($sql);
-        foreach (array_values($where) as $index => $value) {
-            $statement->bindValue($index + 1, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
-        }
-        $statement->execute();
-
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
+        return ($this->reads ?? throw new ServiceProjectException(503))->rows($table, $where, $order, $limit, $descending);
     }
 
     private function encrypt(array $body): string
@@ -463,6 +469,13 @@ final class ServiceProjects
         }
         app(ServiceProjectPolicy::class)->requireEnabled();
 
-        return DB::transaction($callback, 3);
+        return DB::transaction(function () use ($callback): mixed {
+            $this->reads = new ServiceProjectRows;
+            try {
+                return $callback();
+            } finally {
+                $this->reads = null;
+            }
+        }, 3);
     }
 }
