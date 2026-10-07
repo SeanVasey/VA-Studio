@@ -104,6 +104,27 @@ APP_ENV=testing DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3417 DB_DATABASE=v
 
 The socket lives outside the scratch datadir because the scratch path exceeds mysqld's 107-byte socket limit. The first start attempt aborted on that limit; see `error.log` in the datadir before cleanup.
 
+## Independent review (APPROVE WITH CONDITIONS)
+
+An independent harness reviewed code head `452cdab1` and decided APPROVE WITH CONDITIONS for a reversible development merge (`independent-review/DECISION.md`). The approval does not cover activation, binding a provider, mounting a route, Foundation final verification or launch readiness. Defaults stay as shipped: `enabled=false`, `provider=null`, no route, no adapter.
+
+Conditions:
+
+1. **C1, native deadline (open).** The 253 native deadline exhaustion still applies to 254. It blocks the native runtime evidence for 254 and so blocks activation. Once it is repaired, the full `tests/Feature/ProductionSuppression` selection must pass natively on MySQL 8.4 on the target host class. Nothing in this lane claims a native result for the 254 runtime.
+2. **R1, receipt-scope test gap (closed in this lane, SQLite).** `ProductionSuppressionJourneyTest::test_receipts_scoped_to_another_recipient_provider_or_account_never_confirm` pins the recipient-HMAC, provider-hash and cross-account comparisons. With the comparisons removed it fails (both removed, provider hash only, recipient HMAC only), and it passes with the source restored. Receipts and JUnit: `conditions/R1/`.
+3. **R2, Sean's decision (open).** After withdraw, re-grant, the first `request()` still records the target, intent and attempt and calls `suppress()` for the historical withdrawal, because the 253 reader keeps returning the retained withdrawal while the current status is `granted`. There is no unsuppress path, so this overrides the customer's current grant at the provider. It errs toward not mailing and does not infer consent, but it is a customer-visible semantic that is undecided. Sean decides before any activation or provider binding: either require the current status to be withdrawn for a new target or attempt, or document the behaviour with a defined re-subscribe path.
+4. **Defaults stay shipped.** A provider binding or enabling the parent needs a separately reviewed adapter, scope and operator procedure, plus Sean's authorization.
+
+Closed in this lane without a behaviour change: R3 (`ProductionSuppressionProvider::boundTo()` must be pure and configuration-only, because it runs inside the held transaction) and R8 (the recipient-carrying parameters of `ProductionSuppressionRequest::fromRecords()` and its constructor, and `ProductionSuppressionRecords::request()` and `encrypt()`, are `#[SensitiveParameter]`).
+
+Documented as out of model or accepted (reviewer Info findings, no code change):
+
+- **R4, fibers.** C2 liveness means the minting callback frame has not returned. A fiber suspended inside a sealed callback keeps the context live, and code outside the frame can read the withdrawal until the fiber resumes. A second concurrent `run()` still refuses. Keep fibers out of sealed callbacks.
+- **R5, private statics.** `ProductionFeatureOperation::$live` and the two `WeakMap` seals are reachable through Reflection and through `Closure::bind` to the private scope. Both are deliberate scope violations outside the stated model. The seals are not a hostile-code boundary.
+- **R6, `fromRecords` minting.** `ProductionSuppressionRequest::fromRecords()` is public static (`@internal` in its docblock only), so server code can mint a transport request with any recipient. It cannot reach `reconcile()` confirmation, because the claim comes only from the sealed run. Consider restricting minting to `ProductionSuppressionRecords` before a real adapter is bound.
+- **R7, `serverSnapshot()` and liveness.** A `ProductionConsentWithdrawal` that a callback leaked out of `run()` still returns the recipient from `serverSnapshot()`. The reader is sealed but the minted object is not tied to liveness. 254 uses it only inside the callback. Optional hardening: require the minting context to be live.
+- **R9, operator procedure (open).** An `unknown` attempt stays unknown in two cases: a failed postcommit proof (transport never ran) and rebinding to a different provider hash (`reconcile` builds no claim). An operator procedure is needed before activation.
+
 ## Untested and open
 
 - **Real provider**: no adapter, credential, provider account, scope or transport exists. Receipts come from the synthetic in-process `tests/Support/RecordingSuppressionProvider.php`. Binding one needs separate review and Sean's authorization.
