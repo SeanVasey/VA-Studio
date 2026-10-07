@@ -57,8 +57,11 @@ here. Pass credentials through a mode-0600 option file, never on the command lin
 #                           production server) on which schema <DATABASE> does not exist yet; the
 #                           restore keeps the original schema name, so nothing in the dump is rewritten
 #    <PRIVATE_ROOT>  the application's storage/app/private directory
-#    <RESTORE_PRIVATE_ROOT>  a new, isolated directory that does not exist yet (never the live root)
-#    <BACKUP_DIR>    a new mode-0700 directory on separate storage
+#    <RESTORE_PRIVATE_ROOT>  a new, isolated directory that does not exist yet (never the live root);
+#                           its parent must be traversable by <APP_USER>, which extracts into it
+#    <BACKUP_DIR>    a new mode-0700 directory on separate storage, owned by the operator
+#    <APP_USER> / <APP_GROUP>  the application's user and its primary group, named separately:
+#                           an account such as nobody has no group of its own name
 
 # 0b. Quiesce every writer first. --single-transaction snapshots the database, not the private
 #    files: an HTTP upload (ResumableMediaUploadController writes PrivateUploadParts while it
@@ -83,8 +86,10 @@ sha256sum <BACKUP_DIR>/database.sql > <BACKUP_DIR>/database.sql.sha256
 #    symlink can point outside the restored root.
 #    If this refusal fires the application stays down (fail safe): investigate the entry,
 #    then run `php artisan up` by hand before resuming service.
-(cd <PRIVATE_ROOT> && ! find . \( ! -type f ! -type d \) -o \( -type f -links +1 \) | grep -q .) \
-  || { echo 'unmanifested entry in <PRIVATE_ROOT>'; exit 1; }
+#    Each find check below captures its output instead of piping it: a find that fails
+#    (unreadable entry, unknown user or group name) must stop the procedure, not pass it.
+unmanifested=$(cd <PRIVATE_ROOT> && find . \( ! -type f ! -type d \) -o \( -type f -links +1 \)) || exit 1
+[ -z "$unmanifested" ] || { echo 'unmanifested entry in <PRIVATE_ROOT>'; exit 1; }
 (cd <PRIVATE_ROOT> && find . -type f -print0 | sort -z | xargs -0 -r sha256sum) > <BACKUP_DIR>/private.sha256   # -r: an empty tree gives an empty manifest, not a hash of stdin
 tar --create --file=<BACKUP_DIR>/private.tar --directory=<PRIVATE_ROOT> --numeric-owner .
 sha256sum <BACKUP_DIR>/private.tar > <BACKUP_DIR>/private.tar.sha256
@@ -102,8 +107,14 @@ mysql --defaults-extra-file=<RESTORE_OPTION_FILE> < <BACKUP_DIR>/database.sql
 sha256sum --check <BACKUP_DIR>/private.tar.sha256 || exit 1   # the archive itself, not only its members, must be the one step 2 wrote
 #    Extract as the application user, never as root: --no-same-owner creates files as the
 #    invoking user, and the application must be able to read its restored masters and contracts.
-runuser -u <APP_USER> -- mkdir -m 700 <RESTORE_PRIVATE_ROOT>
-runuser -u <APP_USER> -- tar --extract --file=<BACKUP_DIR>/private.tar --directory=<RESTORE_PRIVATE_ROOT> --no-same-owner || exit 1
+#    <BACKUP_DIR> stays operator-only (0700): the operator's shell opens the archive and hands
+#    it to the application user's tar on stdin, and creates the restore root for that user,
+#    so neither the backup nor the restore parent is ever widened. --preserve-permissions
+#    applies the archived modes regardless of the application user's umask (a 077 umask would
+#    otherwise turn the tracked 0644 root .gitignore into 0600 and fail the step 4 check).
+mkdir -m 700 <RESTORE_PRIVATE_ROOT> && chown <APP_USER>:<APP_GROUP> <RESTORE_PRIVATE_ROOT> || exit 1
+runuser -u <APP_USER> -- tar --extract --file=- --directory=<RESTORE_PRIVATE_ROOT> --no-same-owner --preserve-permissions \
+  < <BACKUP_DIR>/private.tar || exit 1
 #    A partial extraction can omit an empty trailing directory that the step 4 file checks
 #    cannot see, so a nonzero tar stops the procedure here.
 
@@ -119,11 +130,13 @@ diff <(cd <RESTORE_PRIVATE_ROOT> && find . ! -type d | LC_ALL=C sort) \
 #    revisions and sound-kit originals are written as 0400). The tracked root
 #    storage/app/private/.gitignore is the one 0644 file the checkout itself places there;
 #    a .gitignore anywhere deeper is not exempt.
-(cd <RESTORE_PRIVATE_ROOT> && ! find . \( -type f ! -path ./.gitignore ! -perm 0600 ! -perm 0400 \) -o \( -type d ! -perm 0700 \) | grep -q .) \
-  || { echo 'restored entry outside owner-only modes (0600/0400 files, 0700 directories)'; exit 1; }
-#    Every restored entry must belong to the application user and group.
-(cd <RESTORE_PRIVATE_ROOT> && ! find . \( ! -user <APP_USER> -o ! -group <APP_USER> \) | grep -q .) \
-  || { echo 'restored entry not owned by <APP_USER>'; exit 1; }
+widened=$(cd <RESTORE_PRIVATE_ROOT> && find . \( -type f ! -path ./.gitignore ! -perm 0600 ! -perm 0400 \) -o \( -type d ! -perm 0700 \)) || exit 1
+[ -z "$widened" ] || { echo 'restored entry outside owner-only modes (0600/0400 files, 0700 directories)'; exit 1; }
+#    Every restored entry must belong to the application user and its group. find exits
+#    nonzero for an unknown -user or -group name, which the capture above turns into a stop
+#    instead of an empty, passing result.
+foreign=$(cd <RESTORE_PRIVATE_ROOT> && find . \( ! -user <APP_USER> -o ! -group <APP_GROUP> \)) || exit 1
+[ -z "$foreign" ] || { echo 'restored entry not owned by <APP_USER>:<APP_GROUP>'; exit 1; }
 #    The exempted root .gitignore must itself be exactly 0644 when present.
 (cd <RESTORE_PRIVATE_ROOT> && { [ ! -e .gitignore ] || [ "$(stat -c %a .gitignore)" = 644 ]; }) \
   || { echo 'root .gitignore is not 0644'; exit 1; }

@@ -547,3 +547,81 @@ f594d3d5ec4ace820cdcd03d80670f1c82fea17bd620a39a92e51db30e19b387  tests/Feature/
 7262a4d48525a02ff119c4490c40633b3aa5c2a684df92c0fb1bb2ea55082745  independent-review/DECISION.md as committed at 9b6b48be (before this addendum)
 72df619802841c22e700aa5390aace4462932d7fad3e46c5ef7f016d5bde85a0  review-evidence/backup-doc-rehearsal-9b6b48be.sh.txt (VA-Studio-review-prep)
 ```
+
+---
+
+## Addendum 5: condition-3 re-review of `4e76bf5a` (2026-10-07)
+
+**Result: APPROVE WITH CONDITIONS carries to `4e76bf5a0db8c84dbc2502ac580035ebe8502909`.** Conditions 1 and 3 still apply. The backup-script fix is correct. Two new Low findings, B-4 and B-5, are in the documented MySQL/private-file procedure. That procedure is not executed, so they don't block merge, but fix them before anyone runs it.
+
+### Delta `9b6b48be..4e76bf5a`
+
+- **Script.** `proof_tree()` now runs `lstat()` on the root before the walk. It requires a directory (`S_IFDIR`) with mode exactly `0700`, and seeds `$safe` from that result. The walk itself is unchanged.
+- **Test.** `BackupRestoreProofTest` gains `'restored private root widened' => ['chmod_private_root', 'restored_private_tree_safe']`.
+- **Everything else.** Documentation (`backup-restore-proof.md`, `production-activation-packet.md`, the lane README and the DECISION copy), plus the frontend `waitFor` test from `c49c3b3b`, already noted in Addendum 4. Nothing in `app/`, `config/`, `routes/` or `database/` changed.
+
+### Red before, green after
+
+| Script | `tests/Unit/BackupRestoreProofTest.php` result |
+| --- | --- |
+| `4e76bf5a` | pass, 11 tests, 269 assertions |
+| `9b6b48be` (old) | 10/11; the new case fails: expected `BLOCKED`, got `RESTORE_VERIFIED` |
+
+### End-to-end runs (script at `4e76bf5a`)
+
+`--synthetic-proof` in a fresh 0700 scratch workdir gives `RESTORE_VERIFIED`: 15 checks, 28,672 database bytes, 7 private files, 398,644 bytes.
+
+`--verify` results:
+
+| Restore state | Result | Blocked check |
+| --- | --- | --- |
+| clean | `RESTORE_VERIFIED` | — |
+| flipped private byte | `BLOCKED` | `restored_private_files_match_manifest`, `restored_private_bytes_equal_backup` |
+| flipped DB byte | `BLOCKED` | `restored_database_bytes_equal_backup`, `restored_database_logical_matches_manifest` |
+| extra unlisted file | `BLOCKED` | `restored_private_files_match_manifest` |
+| restore root 0777 | `BLOCKED` | `restored_private_tree_safe` |
+| restore root 0750 | `BLOCKED` | `restored_private_tree_safe` |
+| backup root 0755 | `BLOCKED` | `backup_private_tree_matches_manifest` |
+| restore root replaced by a regular 0700 file | `BLOCKED` | `completed_without_error` |
+| all reverted | `RESTORE_VERIFIED` | — |
+
+**The symlinked-root bypass is closed.** With `restore/private` replaced by a symlink to an intact 0700 copy:
+
+- the old `9b6b48be` script gives `RESTORE_VERIFIED`: it followed the link through `scandir`;
+- `4e76bf5a` gives `BLOCKED`, `restored_private_tree_safe`, because `lstat` sees a link, not a directory.
+
+A symlinked *backup* root is likewise `BLOCKED` (`backup_private_tree_matches_manifest`). Suggested regression case, Info: add `symlink_private_root` to the tampering data set.
+
+### Rehearsal of the documented private-file fragments
+
+The private-file parts of steps 2–4 were copied verbatim to `review-evidence/backup-doc-rehearsal-4e76bf5a.sh.txt`. They were run as root plus a temporary unprivileged `review_app` user, in a temporary `/tmp/review-rehearse-*` directory; both were deleted afterwards.
+
+**What works:**
+
+- `|| exit 1` on the name `diff` closes B-3.
+- With the archive readable by the application user: extraction as `review_app`, then checksums, names, modes, ownership and the root `.gitignore` check all pass.
+- A restored file chowned to root is refused with `restored entry not owned by review_app`.
+
+**B-4 (Low): the backup directory and the application-user extraction conflict.** Step 0 defines `<BACKUP_DIR>` as "a new mode-0700 directory". When root owns it, `runuser -u <APP_USER> -- tar --extract --file=<BACKUP_DIR>/private.tar` fails with `Cannot open: Permission denied`. That stops at `|| exit 1`, so it fails closed, but the procedure can't succeed as written. State that `<BACKUP_DIR>` (or a copy of `private.tar`) must be readable by `<APP_USER>`, and that the parent of `<RESTORE_PRIVATE_ROOT>` must be writable by it.
+
+**B-5 (Low): the ownership check passes vacuously.**
+
+- The check is `find . \( ! -user <APP_USER> -o ! -group <APP_USER> \)`. It assumes a group with the same name as the user exists.
+- With `APP_USER=nobody` (no group named `nobody`), `find` errors, prints nothing, and `! … | grep -q .` treats that as clean. A root-owned restored file was accepted, and step 4 completed.
+- The same pattern turns any `find` error, such as an unreadable subdirectory, into a pass in the other `! find … | grep -q .` checks.
+- Fix:
+  - add an explicit `<APP_GROUP>` input;
+  - make the checks fatal on a `find` failure, for example by capturing `find` output and its exit status separately, or with `set -o pipefail` plus an explicit status test.
+
+**Info:** if the application user's umask is `077`, tar (run as non-root) restores the root `.gitignore` as `0600`, and the strict "exactly 0644" check then refuses it. This fails closed. Either document the umask, or accept `0600` there.
+
+### SHA-256 (at `4e76bf5a`)
+
+```
+faa2156233ea73dd1b4217773c9cb8f25bd222a779cf9a4a2220b6a86f6988aa  scripts/ops/backup-restore-proof.php
+2a4f61b4aec1092c13eac8bbc2e8ca8472c65d31339676c55c606ae26ed33430  tests/Unit/BackupRestoreProofTest.php
+fa4bad6d658c0559b1f571fb042266fa4c612b73f813d7d4f61c57cae24c1a7e  docs/ops/backup-restore-proof.md
+572a43af156713019b9db3c36cd64466fb82befc7f8a7e52b8abd9940afb7149  docs/ops/production-activation-packet.md
+b7f818120632ff095f774eaed1cb387612e2f9a8125b5d1441d5ee6a43977beb  independent-review/DECISION.md as committed at 4e76bf5a (before this addendum)
+bcf5dc84e4b0cff2692d005c3bbcec2eb0ee7841be96ad530e54097724b9c8e1  review-evidence/backup-doc-rehearsal-4e76bf5a.sh.txt (VA-Studio-review-prep)
+```

@@ -27,6 +27,8 @@ It used no native MySQL: every PHP test ran on the SQLite default from `phpunit.
 | `f4c55acf` | Codex P2 ×2 on PR #46: raw-PDO transaction guard in the preflight and probe (with regression test); documented MySQL backup refuses unmanifested entries and verifies the exact restored tree |
 | `6abeaa94`, `99974a07` | Review addendum 2; Codex P2 ×2 on docs (`xargs -r`; clean-worktree deploy check) |
 | the commit after `99974a07` | Codex P2 ×2: the probe reads capabilities from the own-account response instead of the Connect list endpoint; the backup procedure verifies the archive digest before extraction and the restored modes after |
+| `4e76bf5a` | Codex P2 ×2: `proof_tree()` proves the private root's own mode; documented extraction fatal on a nonzero `tar` |
+| the commit after `4e76bf5a` | Review addendum 5; symlinked-root tampering case; B-4/B-5 documentation fixes |
 
 The first tested source was `01a2590d29ea27ebe5bb10df78c1ef5bb5f0ece6`, and the reviewer
 assessed exactly that. The review follow-up was tested at
@@ -342,6 +344,23 @@ are now proven before the walk, with a ninth tampering case in `BackupRestorePro
 on the old script, green after). The documented restore's `tar --extract` is now fatal on a
 nonzero exit (a partial extraction can omit an empty trailing directory the file checks
 cannot see). The script change falls under the review's condition 3.
+
+Review addendum 5 (`independent-review/DECISION.md`): APPROVE WITH CONDITIONS carries to
+`4e76bf5a`; the reviewer also showed that a restored root replaced by a symlink to an intact
+0700 copy verified on the old script and is `BLOCKED` on the new one. The commit after
+`4e76bf5a` adds that tenth tampering case (`restored private root replaced by a symlink`,
+red on the old script, green after; the file is now 12 tests / 286 assertions) and closes the
+addendum's documentation findings: B-4, the operator's 0700 `<BACKUP_DIR>` could not be read by
+`<APP_USER>` during extraction, so the operator's shell now opens the archive and hands it to
+the application user's `tar` on stdin and creates `<RESTORE_PRIVATE_ROOT>` for that user
+(parent must be traversable by it); B-5, the ownership check assumed a group named after the
+user and any `find` failure in the pipe-to-`grep` checks passed vacuously, so the inputs
+name `<APP_GROUP>` separately and every `find` check captures its output and stops on a
+nonzero exit; Info, `--preserve-permissions` keeps the archived 0644 root `.gitignore` under a
+077 umask. Rehearsed as root with a temporary unprivileged user (removed afterwards): the
+happy path passes under umask 077 with the backup directory still 0700; a root-owned restored
+file is refused; an unknown group name stops the procedure (the old form passed); without
+`-p` the root `.gitignore` came back 0600.
 
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to

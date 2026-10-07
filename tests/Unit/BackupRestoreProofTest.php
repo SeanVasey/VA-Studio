@@ -113,6 +113,7 @@ class BackupRestoreProofTest extends TestCase
             'restored symlink planted' => ['symlink_private', 'restored_private_tree_safe'],
             'restored file permissions widened' => ['chmod_private', 'restored_private_tree_safe'],
             'restored private root widened' => ['chmod_private_root', 'restored_private_tree_safe'],
+            'restored private root replaced by a symlink' => ['symlink_private_root', 'restored_private_tree_safe'],
             'restored database byte changed' => ['flip_database', 'restored_database_bytes_equal_backup'],
             'backup file changed after manifest' => ['flip_backup', 'backup_private_tree_matches_manifest'],
             'manifest edited' => ['edit_manifest', 'manifest_digest_matches'],
@@ -136,6 +137,8 @@ class BackupRestoreProofTest extends TestCase
             'symlink_private' => symlink('/etc/hostname', $restore.'/private/contracts/link.bin'),
             'chmod_private' => chmod($restore.'/private/contracts/synthetic-contract-0001.bin', 0644),
             'chmod_private_root' => chmod($restore.'/private', 0777),
+            // An intact 0700 copy behind a link: a proof that follows the link would still verify.
+            'symlink_private_root' => rename($restore.'/private', $restore.'/private-real') && symlink($restore.'/private-real', $restore.'/private'),
             'flip_database' => $flip($restore.'/database.sqlite', 200),
             'flip_backup' => $flip($this->workdir.'/backup/private/masters/synthetic-track-0002.bin', 10),
             'edit_manifest' => file_put_contents($this->workdir.'/backup/manifest.json', str_replace('"synthetic": true', '"synthetic":true', file_get_contents($this->workdir.'/backup/manifest.json'))),
