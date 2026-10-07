@@ -39,7 +39,7 @@ final class SuppressionSchema
             $namespace[$name] = ['trigger', $trigger['table']];
         }
         $admission = new ConsentMigrationAdmission($pdo, $driver, $database);
-        $admission->namespace($namespace + ['migrations' => ['table', 'migrations']]);
+        $this->namespace($pdo, $driver, $database, $admission, $namespace + ['migrations' => ['table', 'migrations']]);
         $this->dependencies($pdo, $driver, $database, $admission);
         $known = array_keys($this->triggers($driver));
         foreach (self::TABLES as $table) {
@@ -88,7 +88,7 @@ final class SuppressionSchema
         }
         // The last framework DDL callback can alter an earlier object or dependency.
         // Reassert the complete captured schema with raw PDO before allowing bookkeeping.
-        $admission->namespace($namespace + ['migrations' => ['table', 'migrations']]);
+        $this->namespace($pdo, $driver, $database, $admission, $namespace + ['migrations' => ['table', 'migrations']]);
         $this->dependencies($pdo, $driver, $database, $admission);
         foreach ($steps as [$type, $name, $sql]) {
             $this->owned($pdo, $driver, $type, $name, $sql);
@@ -144,6 +144,51 @@ final class SuppressionSchema
             'customer_suppression_attempts' => ['target_id' => 'customer_suppression_targets'],
             'customer_suppression_confirmations' => ['attempt_id' => 'customer_suppression_attempts'],
         };
+    }
+
+    private function namespace(PDO $pdo, string $driver, string $database, ConsentMigrationAdmission $admission, array $namespace): void
+    {
+        $admission->namespace($namespace);
+        foreach (self::TABLES as $table) {
+            foreach ([...array_keys($this->indexes($table)), ...array_map(fn ($column) => $table.'_'.$column.'_fk', array_keys($this->foreign($table)))] as $name) {
+                if ($driver === 'sqlite') {
+                    foreach (['main.sqlite_master', 'sqlite_temp_master'] as $dictionary) {
+                        $statement = $pdo->prepare('SELECT name FROM '.$dictionary.' WHERE name COLLATE NOCASE=?');
+                        $statement->execute([$name]);
+                        if ($statement->fetchAll(PDO::FETCH_ASSOC) !== []) {
+                            throw new LogicException('Reserved suppression key collision.');
+                        }
+                    }
+
+                    continue;
+                }
+                foreach ([['TABLES', 'TABLE_SCHEMA', 'TABLE_NAME'], ['TRIGGERS', 'TRIGGER_SCHEMA', 'TRIGGER_NAME'], ['ROUTINES', 'ROUTINE_SCHEMA', 'ROUTINE_NAME'], ['EVENTS', 'EVENT_SCHEMA', 'EVENT_NAME']] as [$dictionary,$schema,$column]) {
+                    $statement = $pdo->prepare('SELECT '.$column.' FROM information_schema.'.$dictionary.' WHERE '.$schema.'=DATABASE() AND '.$column.'=?');
+                    $statement->execute([$name]);
+                    if ($statement->fetchAll(PDO::FETCH_ASSOC) !== []) {
+                        throw new LogicException('Reserved suppression key collision.');
+                    }
+                }
+                try {
+                    $pdo->query('SHOW CREATE TABLE `'.str_replace('`', '``', $database).'`.`'.$name.'`');
+                    throw new LogicException('Temporary suppression key collision.');
+                } catch (PDOException $error) {
+                    if (($error->errorInfo[0] ?? null) !== '42S02' || ($error->errorInfo[1] ?? null) !== 1146) {
+                        throw $error;
+                    }
+                }
+                foreach ([['STATISTICS', 'TABLE_SCHEMA', 'INDEX_NAME'], ['TABLE_CONSTRAINTS', 'CONSTRAINT_SCHEMA', 'CONSTRAINT_NAME']] as [$dictionary,$schema,$column]) {
+                    // Compare native dictionary names/aliases directly, preserving every row and owner.
+                    $statement = $pdo->prepare('SELECT TABLE_NAME,'.$column.' name FROM information_schema.'.$dictionary.' WHERE '.$schema.'=DATABASE() AND '.$column.'=?');
+                    $statement->execute([$name]);
+                    foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                        if ($row !== ['TABLE_NAME' => $table, 'name' => $name] || ! $this->exists($pdo, $driver, 'table', $table)) {
+                            throw new LogicException('Foreign or aliased suppression key requires inspection.');
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private function dependencies(PDO $pdo, string $driver, string $database, ConsentMigrationAdmission $admission): void
