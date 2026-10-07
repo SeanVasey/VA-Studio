@@ -41,7 +41,8 @@ final class OriginalCommitDispatcher implements Dispatcher
 
             return $delegate;
         }
-        CheckoutException::require($delegate instanceof Dispatcher, 'committed_read_frame');
+        // A NEW-write command frame owns its own sole observer and anchor; never stack on it.
+        CheckoutException::require($delegate instanceof Dispatcher && ! $delegate instanceof CheckoutCommandCommitDispatcher, 'committed_read_frame');
         $observer = new self($delegate, $source, $reader, $context, $deadlineNs,
             IdentityOriginalCommitWitness::capture($reader, $deadlineNs), $admission);
         $context->connection()->setEventDispatcher($observer);
