@@ -465,6 +465,11 @@ directory are both refused); the resume checks each restarted unit with its own
 `is-active --quiet`, because a multi-unit `is-active` exits 0 when at least one unit is
 active.
 
+Codex's twenty-sixth pass (P2 ×1, docs): the backup procedure's step 0b now stops and
+proves the web workers as well as the queue worker and scheduler (per-unit `is-active`,
+`pgrep` drain), and its resume starts and verifies `<WEB_SERVICE>` before `php artisan up`,
+so maintenance is never lifted on a site with no PHP workers behind the proxy.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex

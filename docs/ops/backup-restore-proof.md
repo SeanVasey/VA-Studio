@@ -69,7 +69,15 @@ here. Pass credentials through a mode-0600 option file, never on the command lin
 #    workers and scheduler, or a coordinated database/storage snapshot, is the only way both
 #    halves describe the same moment.
 php artisan down || exit 1   # a failed maintenance-mode entry (e.g. its store unavailable) must not start a snapshot
-# then stop the queue workers and the scheduler; confirm no php process is serving requests
+#    Then stop every writer and prove it, the way the activation packet's S1 quiesce does: the
+#    503 only refuses NEW requests, so the PHP web workers are stopped too (an upload admitted
+#    before `down` can still be writing) and no PHP process may be serving. `systemctl` lines
+#    need the unit-scoped sudoers grant the packet describes; `is-active` is checked per unit.
+systemctl stop <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> <WEB_SERVICE> || exit 1
+systemctl is-active --quiet <QUEUE_WORKER_SERVICE> && exit 1
+systemctl is-active --quiet <SCHEDULER_SERVICE> && exit 1
+systemctl is-active --quiet <WEB_SERVICE> && exit 1
+pgrep -u <APP_USER> -f 'php-fpm|artisan serve|octane' >/dev/null && { echo 'PHP processes still serving'; exit 1; }
 
 # 1. Consistent logical dump. InnoDB only; --single-transaction gives one snapshot without
 #    locking writers. --no-tablespaces avoids needing PROCESS. --skip-comments drops the host,
@@ -101,7 +109,7 @@ printf '%s\n' "$dirs" | LC_ALL=C sort > <BACKUP_DIR>/private.dirs
 #    file-only manifest cannot see, so archive creation is fatal, as extraction is in step 3.
 tar --create --file=<BACKUP_DIR>/private.tar --directory=<PRIVATE_ROOT> --numeric-owner . || exit 1
 sha256sum <BACKUP_DIR>/private.tar > <BACKUP_DIR>/private.tar.sha256
-# Restart every writer stopped in step 0b and verify it is back before HTTP traffic resumes
+# Restart every service stopped in step 0b (web workers included) and verify each is back before HTTP traffic resumes
 # (the queue workers carry payment, contract and media work; the scheduler carries recovery
 # jobs). Service names are the host's; the private-server runbook names them. If a service
 # fails to start the application stays in maintenance mode (fail safe): fix the service,
@@ -109,7 +117,8 @@ sha256sum <BACKUP_DIR>/private.tar > <BACKUP_DIR>/private.tar.sha256
 # `is-active` with several units exits 0 when at least ONE is active, so each unit is
 # checked on its own: a worker or scheduler that exited right after starting must stop the
 # procedure before `artisan up` reopens traffic.
-systemctl start <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> || exit 1
+systemctl start <WEB_SERVICE> <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> || exit 1
+systemctl is-active --quiet <WEB_SERVICE> || exit 1            # stopped in step 0b: without it `artisan up` lifts maintenance on a site with no PHP workers behind the proxy
 systemctl is-active --quiet <QUEUE_WORKER_SERVICE> || exit 1
 systemctl is-active --quiet <SCHEDULER_SERVICE> || exit 1
 php artisan up || exit 1   # lifts maintenance mode only, and only once the writers above are back; a failed up must not continue into the restore
