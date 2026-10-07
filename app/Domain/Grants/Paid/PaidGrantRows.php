@@ -8,6 +8,7 @@ use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionRolledBack;
 use Illuminate\Database\MySqlConnection;
@@ -16,6 +17,7 @@ use Illuminate\Foundation\Application;
 use PDO;
 use PDOStatement;
 use ReflectionClass;
+use ReflectionProperty;
 use Throwable;
 
 /** Captured transaction, permanent qualified raw rows and a private final-only marker. */
@@ -216,17 +218,38 @@ final class PaidGrantRows
     /** Failure cleanup only for the still-present original marker; never resolve a replacement PDO. */
     public function abort(): void
     {
-        if ($this->committed || ! $this->primary->inTransaction()) {
-            return;
-        }
         try {
-            $this->primary->exec('RELEASE SAVEPOINT '.$this->marker);
-        } catch (Throwable) {
-            // Original commit/rollback/reopen expired this frame; do not adopt another transaction.
+            if ($this->committed || ! $this->primary->inTransaction()) {
+                return;
+            }
+            try {
+                $this->primary->exec('RELEASE SAVEPOINT '.$this->marker);
+            } catch (Throwable) {
+                // Original commit/rollback/reopen expired this frame; do not adopt another transaction.
+                return;
+            }
+            $this->primary->rollBack();
+            $this->ended = true;
+        } finally {
+            $this->forgetRefusedFrameRecords();
+        }
+    }
+
+    /**
+     * A commit-time refusal lowers Laravel's depth without notifying the transactions manager, so the refused
+     * frame's pending record (and any after-commit work registered inside it) would otherwise run on the next
+     * unrelated commit. Paid commands start outside every transaction and own the only frame on this
+     * connection, so clearing its records at depth zero discards nothing that belongs to a caller.
+     */
+    private function forgetRefusedFrameRecords(): void
+    {
+        if ($this->connection->transactionLevel() !== 0) {
             return;
         }
-        $this->primary->rollBack();
-        $this->ended = true;
+        $manager = (new ReflectionProperty(Connection::class, 'transactionsManager'))->getValue($this->connection);
+        if ($manager instanceof DatabaseTransactionsManager) {
+            $manager->rollback($this->connection->getName(), 0);
+        }
     }
 
     public function current(): CurrentRows
