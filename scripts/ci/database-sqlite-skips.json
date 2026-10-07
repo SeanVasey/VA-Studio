@@ -633,6 +633,10 @@
     [
       "Tests\\Feature\\ServiceProjectConcurrencyTest",
       "test_two_staff_quotes_wait_on_the_exact_project_and_current_reads_reject_old_mvcc_state"
+    ],
+    [
+      "Tests\\Feature\\ServiceProjectCurrentAuthorityTest",
+      "test_temporary_users_copy_cannot_mask_permanent_required_mfa_withdrawal_after_real_audit_callback"
     ]
   ]
 }
