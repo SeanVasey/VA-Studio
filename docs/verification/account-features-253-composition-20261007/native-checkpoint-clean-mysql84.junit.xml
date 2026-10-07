@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="10" assertions="24" errors="9" failures="0" skipped="0" time="1824.335217">
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" tests="2" assertions="4" errors="2" failures="0" skipped="0" time="312.209840">
+      <testcase name="test_actual_public_catalog_projection_and_all_ordinary_writes_keep_pinned_v1_readable" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" line="100" class="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureBoundaryTest" assertions="2" time="171.095744">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest::test_actual_public_catalog_projection_and_all_ordinary_writes_keep_pinned_v1_readable
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:103
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:54
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:29
+/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php:106</error>
+      </testcase>
+      <testcase name="test_postcommit_public_withdrawal_cannot_release_old_public_link_and_reload_is_fresh" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" line="232" class="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureBoundaryTest" assertions="2" time="141.114095">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest::test_postcommit_public_withdrawal_cannot_release_old_public_link_and_reload_is_fresh
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:103
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:54
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:29
+/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php:237</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureHeldFloorTest" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureHeldFloorTest.php" tests="1" assertions="6" errors="0" failures="0" skipped="0" time="168.212705">
+      <testcase name="test_commit_event_identity_floor_withdrawal_withholds_projection_and_preserves_durable_write" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureHeldFloorTest.php" line="80" class="Tests\Feature\ProductionFeatures\ProductionFeatureHeldFloorTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureHeldFloorTest" assertions="6" time="168.212705"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php" tests="1" assertions="2" errors="1" failures="0" skipped="0" time="159.421020">
+      <testcase name="test_plain_scalar_reference_cannot_mutate_the_captured_purpose_snapshot_in_place" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php" line="151" class="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest" classname="Tests.Feature.ProductionFeatures.ProductionFeaturePlainConfigurationTest" assertions="2" time="159.421020">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest::test_plain_scalar_reference_cannot_mutate_the_captured_purpose_snapshot_in_place
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:103
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php:155</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" tests="3" assertions="6" errors="3" failures="0" skipped="0" time="540.672810">
+      <testcase name="test_beginning_listener_cannot_make_the_feature_adopt_or_commit_a_foreign_transaction" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" line="33" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionEventsTest" assertions="2" time="124.722560">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_beginning_listener_cannot_make_the_feature_adopt_or_commit_a_foreign_transaction
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:103
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:54
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:29
+/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:37</error>
+      </testcase>
+      <testcase name="test_committing_listener_purpose_withdrawal_prevents_a_durable_grant" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" line="77" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionEventsTest" assertions="2" time="180.328244">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_committing_listener_purpose_withdrawal_prevents_a_durable_grant
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:103
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:81</error>
+      </testcase>
+      <testcase name="test_regular_begin_commit_and_aftercommit_callback_order_is_preserved" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" line="105" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionEventsTest" assertions="2" time="235.622006">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_regular_begin_commit_and_aftercommit_callback_order_is_preserved
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:103
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:54
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:29
+/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:109</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionOwnershipTest" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php" tests="2" assertions="4" errors="2" failures="0" skipped="0" time="414.759743">
+      <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionOwnershipTest::test_saved_callback_commit_reopen_cannot_make_cleanup_rollback_a_foreign_transaction" tests="2" assertions="4" errors="2" failures="0" skipped="0" time="414.759743">
+        <testcase name="test_saved_callback_commit_reopen_cannot_make_cleanup_rollback_a_foreign_transaction with data set #0" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php" line="27" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionOwnershipTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionOwnershipTest" assertions="2" time="243.936923">
+          <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionOwnershipTest::test_saved_callback_commit_reopen_cannot_make_cleanup_rollback_a_foreign_transaction with data set #0
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php:338
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php:236
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php:98
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:1129
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:206
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:60
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:54
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:29
+/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php:31</error>
+        </testcase>
+        <testcase name="test_saved_callback_commit_reopen_cannot_make_cleanup_rollback_a_foreign_transaction with data set #1" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php" line="27" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionOwnershipTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionOwnershipTest" assertions="2" time="170.822820">
+          <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionOwnershipTest::test_saved_callback_commit_reopen_cannot_make_cleanup_rollback_a_foreign_transaction with data set #1
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:103
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php:31</error>
+        </testcase>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionListeningNotesCapacityTest" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionListeningNotesCapacityTest.php" tests="1" assertions="2" errors="1" failures="0" skipped="0" time="229.059100">
+      <testcase name="test_actual_over_text_capacity_envelope_is_refused_before_update_with_row_and_revision_unchanged" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionListeningNotesCapacityTest.php" line="57" class="Tests\Feature\ProductionFeatures\ProductionListeningNotesCapacityTest" classname="Tests.Feature.ProductionFeatures.ProductionListeningNotesCapacityTest" assertions="2" time="229.059100">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionListeningNotesCapacityTest::test_actual_over_text_capacity_envelope_is_refused_before_update_with_row_and_revision_unchanged
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:103
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:54
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:29
+/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionListeningNotesCapacityTest.php:61</error>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>
