@@ -3,6 +3,7 @@
 namespace App\Domain\Customers\Preferences;
 
 use App\Domain\Customers\CustomerAccess;
+use App\Domain\Customers\CustomerAccessPolicy;
 use App\Domain\Customers\CustomerIdentityPolicy;
 use App\Domain\Customers\CustomerPrincipal;
 use App\Domain\Customers\Preferences\Models\ConsentEvent;
@@ -47,9 +48,10 @@ final class CustomerConsentPreferences
             $user = User::whereKey($principal->userId)->firstOrFail();
             $email = $user->email;
             $recipient = CustomerIdentityPolicy::email($email);
-            $configuration = config('customer-preferences');
+            $policySource = app(ConsentPolicy::class);
             $grantsEnabled = $this->runtime->grantsEnabled();
-            $configured = app(ConsentPolicy::class)->configured();
+            $configuration = config('customer-preferences');
+            $configured = $policySource->configured();
             $state = ConsentState::where('customer_account_id', $principal->accountId)->where('purpose', ConsentPolicy::PURPOSE)->lockForUpdate()->first();
             $events = ConsentEvent::where('customer_account_id', $principal->accountId)->where('purpose', ConsentPolicy::PURPOSE)->orderByDesc('revision')->limit(2)->lockForUpdate()->get();
             $policies = [];
@@ -130,9 +132,13 @@ final class CustomerConsentPreferences
             $expectedPolicies = array_map(fn ($policy) => $policy->getRawOriginal(), array_values($policies));
             $range = $configured ? ['version' => $configured['version'], 'rows' => $configuredRow ? [$configuredRow->getRawOriginal()] : []] : null;
             $access->current($principal);
-            if (config('customer-preferences') !== $configuration || $this->runtime->grantsEnabled() !== $grantsEnabled) {
+            // Resolve extensible/container policy callbacks before the final pure policy checks.
+            $currentAccessPolicy = app(CustomerAccessPolicy::class);
+            $currentGrantsEnabled = $this->runtime->grantsEnabled();
+            if (config('customer-preferences') !== $configuration || $currentGrantsEnabled !== $grantsEnabled) {
                 throw new ConsentException(503);
             }
+            $currentAccessPolicy->requireEnabled();
             $proof->prove($principal, $email, $expectedStates, $expectedEvents, $expectedPolicies, $range);
 
             return $projection;
