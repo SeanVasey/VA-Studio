@@ -1,0 +1,6 @@
+.free-grant-terms { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; line-height: 1.6; padding: 20px; border: 1px solid var(--va-border); background: var(--va-surface); }
+[aria-label="Free grant journey"] { display: grid; gap: 20px; }
+[aria-label="Free grant journey"] section, [aria-label="Free grant journey"] article, [aria-label="Free grant journey"] form { display: grid; gap: 16px; overflow-wrap: anywhere; }
+[aria-label="Free grant journey"] button { min-height: 48px; max-width: 100%; white-space: normal; }
+[aria-label="Free grant journey"] input[type="checkbox"] { width: 20px; height: 20px; margin-right: 8px; }
+[aria-label="Published free definitions"], [aria-label="Saved free grants"] { display: grid; gap: 20px; }
