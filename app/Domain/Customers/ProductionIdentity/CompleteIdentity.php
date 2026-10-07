@@ -76,7 +76,7 @@ final class CompleteIdentity
                 $observation = $completed[0];
                 IdentityEvidence::verify('verification', $observation, 'observation_hash');
                 if ($origin === [] || $account === [] || ! hash_equals($observation['completion_hash'], $completionHash)
-                    || (int) $user['is_admin'] !== 0 || $user['email_verified_at'] === null || (int) $account['active'] !== 1
+                    || (string) $user['is_admin'] !== '0' || $user['email_verified_at'] === null || (string) $account['active'] !== '1'
                     || (int) $account['access_version'] !== ($challenge['purpose'] === 'enroll' ? 1 : (int) $challenge['bound_access_version'])
                     || ! hash_equals($observation['credential_binding'], IdentityPolicy::digest('credential', $user['password']))
                     || ! hash_equals($observation['recipient_hmac'], IdentityPolicy::digest('recipient', $email))) {
@@ -107,8 +107,8 @@ final class CompleteIdentity
                 $user = $database->rows->one('users', $userId);
                 $account = $database->rows->one('customer_accounts', $accountId);
             } else {
-                if ($origin === [] || $observations === [] || count($observations) >= 128 || (int) $user['is_admin'] !== 0
-                    || $user['email_verified_at'] === null || (int) $account['active'] !== 1
+                if ($origin === [] || $observations === [] || count($observations) >= 128 || (string) $user['is_admin'] !== '0'
+                    || $user['email_verified_at'] === null || (string) $account['active'] !== '1'
                     || (int) $challenge['bound_origin_id'] !== (int) $origin['id'] || (int) $challenge['bound_user_id'] !== (int) $user['id']
                     || (int) $challenge['bound_account_id'] !== (int) $account['id'] || (int) $challenge['bound_access_version'] !== (int) $account['access_version']
                     || ! hash_equals($challenge['bound_credential_binding'], IdentityPolicy::digest('credential', $user['password']))) {
