@@ -222,8 +222,42 @@ final class SitemapSchema
             }
         }
         if ($driver === 'sqlite') {
-            $rows = $pdo->query('SELECT name, type FROM main.sqlite_master')->fetchAll(PDO::FETCH_ASSOC);
+            // Inline non-integer primary keys create schema-global autoindexes. Their
+            // identity belongs to the owned table, unlike SQLite's named CHECK/FK clauses.
+            $indexes = [];
+            foreach (array_slice(self::TABLES, 0, 2) as $logical) {
+                $name = DB::connection()->getTablePrefix().$logical;
+                $indexes[strtolower('sqlite_autoindex_'.$name.'_1')] = ['name' => 'sqlite_autoindex_'.$name.'_1', 'type' => 'index', 'tbl_name' => $name, 'sql' => null];
+            }
+            $objects = $pdo->query('SELECT name, type, tbl_name, sql FROM main.sqlite_master')->fetchAll(PDO::FETCH_ASSOC);
+            $rows = [];
+            $seen = [];
+            foreach ($objects as $object) {
+                $key = strtolower($object['name']);
+                if (isset($indexes[$key])) {
+                    SitemapException::require(! isset($seen[$key]) && $indexes[$key] === $object, 'schema_namespace');
+                    $seen[$key] = true;
+                }
+                $rows[] = ['name' => $object['name'], 'type' => $object['type']];
+            }
         } else {
+            // CHECK and FK symbols are schema-global in distinct native namespaces.
+            // Query with the dictionary's name collation, then require exact bytes and
+            // ownership. A foreign table-local index/unique name is allowed to coexist.
+            $statement = $pdo->prepare('SELECT CONSTRAINT_NAME, TABLE_NAME, CONSTRAINT_TYPE FROM information_schema.TABLE_CONSTRAINTS WHERE BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND CONSTRAINT_TYPE = ? AND CONSTRAINT_NAME = ?');
+            foreach (self::TABLES as $logical) {
+                $name = DB::connection()->getTablePrefix().$logical;
+                $definition = $this->definition($logical, $driver);
+                $constraints = [$name.'_bounds' => 'CHECK'];
+                if ($definition['foreign'] !== []) {
+                    $constraints[$name.'_owner'] = 'FOREIGN KEY';
+                }
+                foreach ($constraints as $symbol => $type) {
+                    $statement->execute([$type, $symbol]);
+                    $objects = $statement->fetchAll(PDO::FETCH_ASSOC);
+                    SitemapException::require($objects === [] || $objects === [['CONSTRAINT_NAME' => $symbol, 'TABLE_NAME' => $name, 'CONSTRAINT_TYPE' => $type]], 'schema_namespace');
+                }
+            }
             $rows = $pdo->query("SELECT TABLE_NAME AS name, 'table' AS type FROM information_schema.TABLES WHERE BINARY TABLE_SCHEMA = BINARY DATABASE() UNION ALL SELECT TRIGGER_NAME AS name, 'trigger' AS type FROM information_schema.TRIGGERS WHERE BINARY TRIGGER_SCHEMA = BINARY DATABASE()")->fetchAll(PDO::FETCH_ASSOC);
             foreach ($reserved as $expected) {
                 if ($expected['type'] === 'trigger') {
