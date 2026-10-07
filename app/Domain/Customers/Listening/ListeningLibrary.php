@@ -22,16 +22,20 @@ final class ListeningLibrary
     public function read(CustomerPrincipal $principal, User $actor): array
     {
         return DB::transaction(function () use ($principal, $actor): array {
+            $evidence = new ListeningEvidence;
             app(CustomerAccess::class)->lock($principal, $principal->ownerKey, $actor);
             $row = SavedListeningLibrary::where('customer_account_id', $principal->accountId)->lockForUpdate()->first();
+            $state = $this->state($row, $principal->accountId);
+            $version = $row?->version ?? 0;
 
-            return $this->project($principal, $this->state($row, $principal->accountId), $row?->version ?? 0);
+            return $this->project($principal, $state, $version, $evidence, $this->expected($row, $state, $version, $principal->accountId));
         });
     }
 
     public function change(CustomerPrincipal $principal, User $actor, array $command): array
     {
         return DB::transaction(function () use ($principal, $actor, $command): array {
+            $evidence = new ListeningEvidence;
             // Fresh user/account locks serialize first creation and every bounded list update.
             app(CustomerAccess::class)->lock($principal, $principal->ownerKey, $actor);
             $this->validateCommand($command);
@@ -41,14 +45,14 @@ final class ListeningLibrary
                 throw new ListeningException(409);
             }
             $state = $this->state($row, $principal->accountId);
-            $next = $this->apply($state, $command);
+            $next = $this->apply($state, $command, $evidence);
             if ($next !== $state) {
                 $row ??= new SavedListeningLibrary(['customer_account_id' => $principal->accountId]);
                 $next['version'] = ++$version;
                 $row->fill(['version' => $version, 'payload' => $next])->save();
             }
 
-            return $this->project($principal, $next, $version);
+            return $this->project($principal, $next, $version, $evidence, $this->expected($row, $next, $version, $principal->accountId));
         }, 3);
     }
 
@@ -86,12 +90,12 @@ final class ListeningLibrary
         }
     }
 
-    private function apply(array $state, array $command): array
+    private function apply(array $state, array $command, ListeningEvidence $evidence): array
     {
         $action = $command['action'];
         if ($action === 'save-track' || $action === 'remove-saved-track') {
             if ($action === 'save-track') {
-                $this->requirePublic($command['trackId']);
+                $this->requirePublic($command['trackId'], $evidence);
                 $state['favorites'] = $this->append($state['favorites'], $command['trackId'], self::FAVORITES);
             } else {
                 $state['favorites'] = array_values(array_diff($state['favorites'], [$command['trackId']]));
@@ -118,7 +122,7 @@ final class ListeningLibrary
             if ($action === 'rename-playlist') {
                 $playlist['name'] = $command['name'];
             } elseif ($action === 'add-playlist-track') {
-                $this->requirePublic($command['trackId']);
+                $this->requirePublic($command['trackId'], $evidence);
                 $playlist['trackIds'] = $this->append($playlist['trackIds'], $command['trackId'], self::PLAYLIST_TRACKS);
             } elseif ($action === 'remove-playlist-track') {
                 $playlist['trackIds'] = array_values(array_diff($playlist['trackIds'], [$command['trackId']]));
@@ -146,8 +150,9 @@ final class ListeningLibrary
         return [...$ids, $id];
     }
 
-    private function requirePublic(string $id): void
+    private function requirePublic(string $id, ListeningEvidence $evidence): void
     {
+        $evidence->capturePublic([(int) $id]);
         if (app(PublicCatalog::class)->selections([(int) $id])['tracks'] === []) {
             throw new ListeningException(404);
         }
@@ -185,6 +190,17 @@ final class ListeningLibrary
         }
     }
 
+    private function expected(?SavedListeningLibrary $row, array $state, int $version, int $accountId): ?array
+    {
+        // A saved callback may refresh this very instance to a different valid revision.
+        // Bind the physical evidence to the local intended state, not a rebound model.
+        if (($row?->version ?? 0) !== $version || $this->state($row, $accountId) !== $state) {
+            throw new ListeningException(503);
+        }
+
+        return $row?->getRawOriginal();
+    }
+
     private function id(mixed $id): void
     {
         if (! is_string($id) || preg_match('/\A[1-9][0-9]{0,17}\z/D', $id) !== 1) {
@@ -202,7 +218,7 @@ final class ListeningLibrary
         }
     }
 
-    private function project(CustomerPrincipal $principal, array $state, int $version): array
+    private function project(CustomerPrincipal $principal, array $state, int $version, ListeningEvidence $evidence, ?array $expectedRow): array
     {
         $ids = $state['favorites'];
         foreach ($state['playlists'] as $playlist) {
@@ -211,6 +227,7 @@ final class ListeningLibrary
         $tracks = [];
         // A closed aggregate has at most 300 references. Never enumerate the catalog.
         foreach (array_chunk(array_values(array_unique($ids)), 10) as $chunk) {
+            $evidence->capturePublic(array_map('intval', $chunk));
             foreach (app(PublicCatalog::class)->selections(array_map('intval', $chunk))['tracks'] as $track) {
                 $tracks[$track['id']] = ['title' => $track['title'], 'artist' => $track['artist'], 'href' => route('tracks.show', $track['slug'], false)];
             }
@@ -223,6 +240,7 @@ final class ListeningLibrary
             'limits' => ['favorites' => self::FAVORITES, 'playlists' => self::PLAYLISTS, 'playlistTracks' => self::PLAYLIST_TRACKS]];
         // Media/readiness callbacks may withdraw access; never release a stale projection or commit.
         app(CustomerAccess::class)->current($principal);
+        $evidence->prove($principal, $expectedRow);
 
         return $result;
     }
