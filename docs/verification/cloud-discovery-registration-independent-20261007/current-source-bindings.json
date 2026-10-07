@@ -1,0 +1,188 @@
+[
+  {
+    "path": "app/Application/Media/MediaIntegrity.php",
+    "git_blob": "f148e184c1488e8f462105a5896acb43ac703265",
+    "sha256": "3fa401b5c08b274154f734191dfc2d23467637aba0079ee602f6f34cedcd89ea",
+    "bytes": 1354
+  },
+  {
+    "path": "app/Console/Commands/DiscoverySitemapBuild.php",
+    "git_blob": "3b6275947c0398665e4228939d8d093ed75b4982",
+    "sha256": "b95c6d28dd9e1817a3582208bd6b4304fb96acd76a63e0dd7d08262fa3a5b146",
+    "bytes": 3392
+  },
+  {
+    "path": "app/Domain/Catalog/Discovery/CurrentEligibleTrackSnapshot.php",
+    "git_blob": "d625c22bdbd76521a939f68cfb69464464f1cb7c",
+    "sha256": "ae98d542c70383d30656164a03c212a859dec1ab583780a68ec705c27f6bd12e",
+    "bytes": 16506
+  },
+  {
+    "path": "app/Domain/Catalog/Discovery/DiscoveryEpoch.php",
+    "git_blob": "53a4355d7658d40901c901cf0ae3896952a17e09",
+    "sha256": "540b5d43c02e0a100e39290598b96668a4bf6c30fd0813da6161f307bec801bf",
+    "bytes": 11148
+  },
+  {
+    "path": "app/Domain/Catalog/Discovery/EligibleTrackSnapshot.php",
+    "git_blob": "cb79642447104d9932daa580ef8891650eb66451",
+    "sha256": "72f1d990e90be9b3153277892678eb34a77c97ab21e3f8ca29232686c86863b3",
+    "bytes": 551
+  },
+  {
+    "path": "app/Domain/Catalog/DiscoverySitemap/CandidateBuildRequest.php",
+    "git_blob": "0de79f24baaeb68a7cc9de5fcbf97de2f56542c3",
+    "sha256": "1471bcfbc5494008ffe8c0871678c24dacf5d8915ded514d4e9a47a10272d033",
+    "bytes": 1613
+  },
+  {
+    "path": "app/Domain/Catalog/DiscoverySitemap/CandidateWindow.php",
+    "git_blob": "76f055e40b2a2928563afb2ef72221eb3867e2f8",
+    "sha256": "66a244c1cdc0c49875997395b7d08574f7776818bf9d743481bd8d00f7263a5d",
+    "bytes": 3721
+  },
+  {
+    "path": "app/Domain/Catalog/DiscoverySitemap/DiscoverySitemapConsumption.php",
+    "git_blob": "34c0fb17d32a7c65aaa313367733a93c516541ab",
+    "sha256": "607f97510d834361d7fb4e2154d0280839360741dfc15565f8a72e3227d0c03b",
+    "bytes": 3882
+  },
+  {
+    "path": "app/Domain/Catalog/DiscoverySitemap/SitemapConfiguration.php",
+    "git_blob": "e4ccbfeb612663182a098177bf4112ebd7e88724",
+    "sha256": "4f17e9a6addd9afb3618755cc2ccd11a0c0a240bff718cff73b67d85fa8c92de",
+    "bytes": 1466
+  },
+  {
+    "path": "app/Domain/Catalog/DiscoverySitemap/SitemapException.php",
+    "git_blob": "81aa6001eef5785713d4f27a7c933755421ccdce",
+    "sha256": "b2ddf632f1e724145f358ab31a30e7a8d08463dcb638a61d9f7504d39d7c34c7",
+    "bytes": 606
+  },
+  {
+    "path": "app/Domain/Catalog/DiscoverySitemap/SitemapProjection.php",
+    "git_blob": "fcacfe23bf74c35a6def8f1d13f8922f9773ae80",
+    "sha256": "b9c056c2cf1606daa02bd75800a4279418ea2e952a0210ffab2bb9312dd45a55",
+    "bytes": 1054
+  },
+  {
+    "path": "app/Domain/Catalog/DiscoverySitemap/SitemapSchema.php",
+    "git_blob": "c9d16b0b58db2ce88b6c83d6ecfff590582dc556",
+    "sha256": "2f8100ff89111a7632b62386e05e0210727c5e84be8b58ebbbf0f10d3cc513a6",
+    "bytes": 22390
+  },
+  {
+    "path": "app/Domain/Catalog/DiscoverySitemap/SitemapStore.php",
+    "git_blob": "6e4389a10f57f0363203bc9f9a45f930744b215f",
+    "sha256": "31306070f3fe14aba8f39105d9ff66e506a3ba92e8d4a58297f3aa6035aaba14",
+    "bytes": 26745
+  },
+  {
+    "path": "app/Domain/Catalog/PublicationReadiness.php",
+    "git_blob": "c20478a17f3748030218b8c585b8543f530de770",
+    "sha256": "6ed1f8c2bd1f0dc4b5fea0608848cf0149c12569e29b680640fea801f6fb8c60",
+    "bytes": 11897
+  },
+  {
+    "path": "app/Domain/Commerce/Inventory/SelectionInventory.php",
+    "git_blob": "e89742f8fc5687a36f819182a40df1ba73f11fa3",
+    "sha256": "e00a74fe35c8ab885034e49bfe38e4392174467d454740e4e6ad84b2dc078fd6",
+    "bytes": 3545
+  },
+  {
+    "path": "app/Domain/SiteBuilder/PublicPagesSitemap.php",
+    "git_blob": "8a4b1d3c62106236fb9b5860101da7e55744aae5",
+    "sha256": "524baebfd6037baffa8d34c4adf20ad1c4eca6b3df28e4e3e66396392ff8afda",
+    "bytes": 2118
+  },
+  {
+    "path": "app/Http/Controllers/DiscoveryTrackSitemapController.php",
+    "git_blob": "24453a6c94f891547dea6cdfcb30744d7f3b545e",
+    "sha256": "7bdea01c6f5df898e980059b36df2fe1f1b0b2a86ec19e711e187d98a4a393c1",
+    "bytes": 1854
+  },
+  {
+    "path": "app/Http/Controllers/PublicDiscoveryController.php",
+    "git_blob": "315d75313e2cf4e37083ec7643e7c6c3a7d827af",
+    "sha256": "9dc204446782ed84351b3d8bb5755650b1a35f2580827668999606cd4248c3f4",
+    "bytes": 2840
+  },
+  {
+    "path": "app/Jobs/BuildDiscoverySitemapWindow.php",
+    "git_blob": "53f2322d92d8ff3b5372c184eecad99a4db16e9e",
+    "sha256": "7339216badac201037011ac8540007bb5b064d13a4a3f781bbf37cf7866d7045",
+    "bytes": 1220
+  },
+  {
+    "path": "app/Support/CanonicalJson.php",
+    "git_blob": "4450b0c4f0a147f49db4732ea4d34c0804c54a25",
+    "sha256": "6e8f14f950bbb7ed3c4a8162ecf7c2fd2752031d1679285cea8bb0a5f5f82d89",
+    "bytes": 1656
+  },
+  {
+    "path": "bootstrap/app.php",
+    "git_blob": "da663e4e845276232a635c958a52c0e48b03e67f",
+    "sha256": "83c36e861c3487881afd2fb54fd60f0def18610263fcbef9f4813d05be441c3d",
+    "bytes": 14199
+  },
+  {
+    "path": "config/discovery-sitemap.php",
+    "git_blob": "047e6abc71fc05b12aa691833848a7d4fd4a6b54",
+    "sha256": "931fc2ea665e020d5269c576d35ae485a231df92034f59a4c22b759a180ae579",
+    "bytes": 172
+  },
+  {
+    "path": "database/migrations/2026_10_07_248000_create_discovery_sitemap_evidence.php",
+    "git_blob": "0f1fe242d7ad26057f766266d85538ba7e5418da",
+    "sha256": "540b1d539a4859b3a0c641636f9395b80d448d78486975a58c94f96a1720f913",
+    "bytes": 310
+  },
+  {
+    "path": "routes/discovery-track-sitemaps.php",
+    "git_blob": "b343077fec1a14cd386648f46bb7255573c09c19",
+    "sha256": "55f196571caf7c8b8441080349527adc4d9ef2e57afcb369082e6be7671cb12e",
+    "bytes": 398
+  },
+  {
+    "path": "tests/Feature/DiscoverySitemapConcurrencyTest.php",
+    "git_blob": "a963e5b61b22ac3e427e28ddb37b22bfc205044c",
+    "sha256": "6cb52fea4ed98473c9cf69d8ea1a5b5e5136e6d18db788c441c1343cc0a223d2",
+    "bytes": 5266
+  },
+  {
+    "path": "tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php",
+    "git_blob": "b7f5be62d71824153b217989f4f75008298f1b8d",
+    "sha256": "15e5cc88f0b7cc464d35ec760dd9873a46912507d227ad3347d959cd253783c3",
+    "bytes": 10439
+  },
+  {
+    "path": "tests/Feature/DiscoverySitemapRegistrationTest.php",
+    "git_blob": "d16811b1f9647b6a85b507366c312851f1e0b653",
+    "sha256": "0e017493eb62f86df954b287eb7ff1a92b4f510206eaab00a4f35c65f4782b06",
+    "bytes": 5339
+  },
+  {
+    "path": "tests/Feature/DiscoverySitemapSchemaTest.php",
+    "git_blob": "041d030ae29fa0b5da17c084457cf63b2590abb5",
+    "sha256": "494928d8bfc90fbff7f45d2f5294880c11b2f62bd823e6d26484189aac5fbbe3",
+    "bytes": 8962
+  },
+  {
+    "path": "tests/Feature/DiscoverySitemapWorkerTest.php",
+    "git_blob": "8e9d79536a2b79c741a3308b774d615e921a4f1f",
+    "sha256": "fae2ac3de93066d8cb7b9ba1b4ffce8494d71127bfe47b38c0878d898b264c01",
+    "bytes": 21124
+  },
+  {
+    "path": "tests/Feature/PublicDiscoveryIndexTest.php",
+    "git_blob": "8afdf046f03b0bb180f356aaeedc4205b3a15ddd",
+    "sha256": "73f8278b77946f69c9f3430cf2a9291e1d257bef23af6f6fda8feb0aac2017c7",
+    "bytes": 5463
+  },
+  {
+    "path": "tests/Support/discovery-sitemap-native-worker.php",
+    "git_blob": "a1bb99cb8dd5941fabc2ad43c9c2eb857e5d92cf",
+    "sha256": "54ff572d98e4529b72dffd5350d43ba6d360147720d3c253bd869720bfba112b",
+    "bytes": 1373
+  }
+]

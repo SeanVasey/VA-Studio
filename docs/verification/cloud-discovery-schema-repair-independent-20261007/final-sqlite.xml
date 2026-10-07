@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-discovery-schema-independent/docs/verification/cloud-discovery-schema-repair-independent-20261007/sqlite-selection.xml" tests="2" assertions="5" errors="0" failures="0" skipped="0" time="0.173784">
+    <testsuite name="Independent SQLite namespace affected cases" tests="2" assertions="5" errors="0" failures="0" skipped="0" time="0.173784">
+      <testsuite name="Tests\Feature\DiscoverySitemapSchemaTest" file="/workspace/VA-Studio-discovery-schema-independent/tests/Feature/DiscoverySitemapSchemaTest.php" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="0.160119">
+        <testcase name="test_reserved_guard_name_cannot_mask_second_dictionary_object" file="/workspace/VA-Studio-discovery-schema-independent/tests/Feature/DiscoverySitemapSchemaTest.php" line="131" class="Tests\Feature\DiscoverySitemapSchemaTest" classname="Tests.Feature.DiscoverySitemapSchemaTest" assertions="2" time="0.160119"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\DiscoverySitemapNamespaceAdmissionTest" file="/workspace/VA-Studio-discovery-schema-independent/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="0.013665">
+        <testcase name="test_sqlite_named_inline_check_and_fk_clauses_do_not_reserve_foreign_index_names" file="/workspace/VA-Studio-discovery-schema-independent/tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php" line="155" class="Tests\Feature\DiscoverySitemapNamespaceAdmissionTest" classname="Tests.Feature.DiscoverySitemapNamespaceAdmissionTest" assertions="3" time="0.013665"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>
