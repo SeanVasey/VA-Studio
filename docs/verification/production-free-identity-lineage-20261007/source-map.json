@@ -1,0 +1,148 @@
+{
+  "source": "3f49d2a2a4f853778afa66db8f0f61442e2ab586",
+  "initial_child": "ac0b56ec194056bafcb4c85e3661963577d81d2b",
+  "registered_base": "c59e739baa0e997a3bb08a1d6cb27fe271d32b32",
+  "approved_identity_main": "2cdd3da12261d27479955722952123d3a21ecc49",
+  "files": {
+    "app/Domain/Grants/Free/FreeGrantOriginalIdentity.php": {
+      "git_blob": "e833119d25a173371605c257c3c6e345a4ae5e13",
+      "sha256": "a10e8b9ba08f05fff565b97365ea6577aa8a9e7b72bfe6279cf7a84e25bf7f43"
+    },
+    "app/Domain/Grants/Free/FreeGrants.php": {
+      "git_blob": "b4b638e783a813b550e70f1fb961d3abaedd38ba",
+      "sha256": "5a48da0ae2bb6e7e12d957547c2b6e30befa98aa65807d719dc5e48ca3715df2"
+    },
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantBoundary.php": {
+      "git_blob": "0b52f02b674b9a0dbdf98dda0a392331d82597e8",
+      "sha256": "5c50519c8fb5751bf777a883a63e8cecd295df469220e96634b3afa07d3bdbd6"
+    },
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantHttpIdentity.php": {
+      "git_blob": "0f3338240b09ae98a2f9c7db12463db4f20a5847",
+      "sha256": "d5de1256ea354c05bde2002f899c83a7dcd845ca0f171a1f5694b1ee923cf7ee"
+    },
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantIdentity.php": {
+      "git_blob": "f660581a7edd24fbf69129dfe617ff212b00b0a1",
+      "sha256": "81a64ba3eb9a848cb9a70c2415f6b573043dc49d4af2a3d736aae9ab0044a2e8"
+    },
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantIdentityPolicy.php": {
+      "git_blob": "b2452539dcb14530be5792a7d14f4e4fb02e0a92",
+      "sha256": "f58aeac35bc9c2d34a8d88b3a9c43afb48893e89be615a64c00fc587efe8cd4d"
+    },
+    "app/Domain/Grants/Free/Production/ProductionFreeGrantLineage.php": {
+      "git_blob": "de46f9cdf0fb5f7565340dfe011605cbce766d1a",
+      "sha256": "8648e8c095cb690e8c01128719d1556e20dfa2a323ad8f71524922e9b58df4bc"
+    },
+    "tests/Feature/ProductionFreeIdentity/FreeGrantOriginalFenceTest.php": {
+      "git_blob": "262e51b030f1e25aa76ca616ecae40d6812ba386",
+      "sha256": "0d16f498b40cfded784f8ebd2886f13dd47d8d280cc974ab42b548491875bc74"
+    },
+    "tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php": {
+      "git_blob": "3b54767e90510bb6ad48cae1c1c2566fe9f1c173",
+      "sha256": "ff328f33ce68c34546fe3814a52ee38783c5894a7220ebb2706e64c7575c0f17"
+    }
+  },
+  "byte_exact_registered_dependencies": {
+    "app/Domain/Customers/ProductionCustomerAccess.php": {
+      "git_blob": "c922cc3dd6cc21dabf3316328680df6091331591",
+      "sha256": "4f013b5114b8b8ee8cd53d42277368a215861b8c48a07672fd2337e4fc483eb4"
+    },
+    "app/Domain/Customers/ProductionCustomerPrincipal.php": {
+      "git_blob": "abf7273087e9308a26df98759d695cb8788c8840",
+      "sha256": "ab0ddc7dcabb41fd8d003582c9a78814a90f5cd4fa80be4bc2c5208192306b0c"
+    },
+    "app/Domain/Customers/ProductionIdentity/ProductionCustomerSessions.php": {
+      "git_blob": "e2ee7dc46eb6d5e8f1afde877f2751aa9096c14c",
+      "sha256": "73efe65ab06626178fc1aa6ecd6ff426b30a04d58acd68b164acaa31c9a5d1d6"
+    },
+    "app/Domain/Customers/ProductionIdentity/IdentityRows.php": {
+      "git_blob": "a9b7cba29c07d879020d3affe910e66aca5efe91",
+      "sha256": "deb303101abe98ca505c43e34ab49cc636b56fed42e5b808044380108fdb42bd"
+    },
+    "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php": {
+      "git_blob": "193215351accc8f6d053a1bb2257e0de6e6d58dc",
+      "sha256": "6058e3e4ced2900e1ccc93bd9110691c041ad0c4ecafe2f0373d323ceb17cb90"
+    },
+    "app/Domain/Customers/ProductionIdentity/IdentityPolicy.php": {
+      "git_blob": "00d1d575b626b9dbadac71a99860d28c1cf3e959",
+      "sha256": "445a001b81c7125b4c87188a3515406424ce2d89bb97cb3d3edc02f1dc12298f"
+    },
+    "app/Domain/Customers/ProductionIdentity/IdentityEvidence.php": {
+      "git_blob": "88850d925ec4d163b3368481942203f7ac938592",
+      "sha256": "23f855f53a01e5df3a4dab630e9fc8e2d513f23bf56de391f2380d41d29ee9a8"
+    },
+    "app/Domain/Commerce/ProductionPolicy/CurrentRows.php": {
+      "git_blob": "eb357333f427bea8e124818564c6b083e7c75d31",
+      "sha256": "02421b3afb5911bab22bec749c3c691f45379aab4f48c3522831be051235e428"
+    },
+    "app/Domain/Grants/Free/FreeGrantRows.php": {
+      "git_blob": "3668abe4eb786387dbac0f536c1494d128949df7",
+      "sha256": "8088f1562f7eb2af8419ceb2ed5604f4e59af9af52a294067d7b421d11382f28"
+    },
+    "app/Domain/Grants/Free/FreeGrantPolicy.php": {
+      "git_blob": "a7409244c36e1b9649e1f8c4d2e361a4cc794dca",
+      "sha256": "99a16e3bb380cc682cf356f69d217b1ca0e52166b2a4855dc10f925145f25ff5"
+    },
+    "app/Domain/Grants/Free/TestFreeGrantIdentity.php": {
+      "git_blob": "32b64336b4d9ea33c9a3eb8aed80ad53b7f63e0e",
+      "sha256": "ce692a10970b7866a0eeba3a547d12aa4734c1544dad9ed655e95443c6927a30"
+    },
+    "tests/Support/ProductionIdentityFixture.php": {
+      "git_blob": "1ab9e07719ae248173ac5c766dbc4257a62076ab",
+      "sha256": "558b6269d305b7b213e4b8c102c7e9e117dfb8cce30c4c76a7520482609391b7"
+    }
+  },
+  "old_free_family_unchanged_paths": [
+    "app/Domain/Grants/Free/FreeGrantDefinitions.php",
+    "app/Domain/Grants/Free/FreeGrantDocuments.php",
+    "app/Domain/Grants/Free/FreeGrantDownloads.php",
+    "app/Domain/Grants/Free/FreeGrantException.php",
+    "app/Domain/Grants/Free/FreeGrantForm.php",
+    "app/Domain/Grants/Free/FreeGrantHttpIdentity.php",
+    "app/Domain/Grants/Free/FreeGrantIdentity.php",
+    "app/Domain/Grants/Free/FreeGrantInput.php",
+    "app/Domain/Grants/Free/FreeGrantJson.php",
+    "app/Domain/Grants/Free/FreeGrantPdfRenderer.php",
+    "app/Domain/Grants/Free/FreeGrantPolicy.php",
+    "app/Domain/Grants/Free/FreeGrantReads.php",
+    "app/Domain/Grants/Free/FreeGrantRecords.php",
+    "app/Domain/Grants/Free/FreeGrantRenderInput.php",
+    "app/Domain/Grants/Free/FreeGrantRenderProfile.php",
+    "app/Domain/Grants/Free/FreeGrantRendererProcess.php",
+    "app/Domain/Grants/Free/FreeGrantRows.php",
+    "app/Domain/Grants/Free/FreeGrantSchema.php",
+    "app/Domain/Grants/Free/FreeGrantSources.php",
+    "app/Domain/Grants/Free/FreeGrantStaff.php",
+    "app/Domain/Grants/Free/FreeGrantText.php",
+    "app/Domain/Grants/Free/FreeGrantTransfer.php",
+    "app/Domain/Grants/Free/Models/FreeDefinition.php",
+    "app/Domain/Grants/Free/TestFreeGrantIdentity.php",
+    "app/Filament/Resources/FreeDefinitionResource.php",
+    "app/Filament/Resources/FreeDefinitionResource/Pages/ManageFreeDefinitions.php",
+    "app/Http/Middleware/FreeGrantPrivacy.php",
+    "config/free-grants.php",
+    "database/migrations/2026_10_07_245000_free_grant_origins.php",
+    "resources/contracts/free-v1/profile-assets.json",
+    "resources/css/free-grants.css",
+    "resources/js/components/FreeGrantJourney.tsx",
+    "resources/views/admin/free-grant-definition.blade.php",
+    "routes/free-grants.php",
+    "scripts/render-free-grant.php",
+    "tests/Feature/FreeGrantAdministrationTest.php",
+    "tests/Feature/FreeGrantAuthorityTest.php",
+    "tests/Feature/FreeGrantConcurrencyTest.php",
+    "tests/Feature/FreeGrantDefinitionsTest.php",
+    "tests/Feature/FreeGrantDownloadsTest.php",
+    "tests/Feature/FreeGrantHttpTest.php",
+    "tests/Feature/FreeGrantJourneyTest.php",
+    "tests/Feature/FreeGrantPreparationStatusTest.php",
+    "tests/Feature/FreeGrantSchemaRecoveryTest.php",
+    "tests/Support/FreeGrantFixtures.php",
+    "tests/Support/free-grant-race-worker.php",
+    "tests/frontend/free-grant-journey.test.tsx"
+  ],
+  "old_free_family_changed_paths": [
+    "app/Domain/Grants/Free/FreeGrants.php",
+    "app/Http/Controllers/FreeGrantController.php",
+    "resources/js/Pages/FreeGrants.tsx"
+  ]
+}

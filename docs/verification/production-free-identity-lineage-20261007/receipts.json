@@ -1,0 +1,215 @@
+{
+  "source": "3f49d2a2a4f853778afa66db8f0f61442e2ab586",
+  "status": "author bounded identity/lineage source checks green; independent review and operative free fulfillment pending",
+  "native_version": "8.0.46-0ubuntu0.24.04.4",
+  "native_schema": "vaseyaudio_production_identity",
+  "checks": {
+    "final-sqlite.xml": {
+      "tests": 12,
+      "assertions": 217,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "source": "3f49d2a2a4f853778afa66db8f0f61442e2ab586",
+      "role": "final whole child plus unmodified registered free3",
+      "duration_seconds": 18.945546,
+      "methods": [
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\FreeGrantOriginalFenceTest",
+          "name": "test_optional_original_authority_refusal_rolls_back_actual_origin_and_work with data set #0",
+          "assertions": 7
+        },
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\FreeGrantOriginalFenceTest",
+          "name": "test_optional_original_authority_refusal_rolls_back_actual_origin_and_work with data set #1",
+          "assertions": 7
+        },
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "name": "test_actual_mailbox_owner_has_distinct_safe_free_binding_and_locked_original_proof",
+          "assertions": 14
+        },
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "name": "test_current_recovery_rejects_old_marker_while_retaining_exact_original_origin_history",
+          "assertions": 6
+        },
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "name": "test_actual_normal_mutation_rolls_back_on_terminal_policy_credential_or_lazy_connection_withdrawal with data set #0",
+          "assertions": 5
+        },
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "name": "test_actual_normal_mutation_rolls_back_on_terminal_policy_credential_or_lazy_connection_withdrawal with data set #1",
+          "assertions": 5
+        },
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "name": "test_actual_normal_mutation_rolls_back_on_terminal_policy_credential_or_lazy_connection_withdrawal with data set #2",
+          "assertions": 5
+        },
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "name": "test_old_test_binding_foreign_origin_and_purpose_or_provenance_relabels_are_refused",
+          "assertions": 7
+        },
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "name": "test_default_off_missing_real_marker_and_old_principal_are_refused",
+          "assertions": 8
+        },
+        {
+          "class": "Tests\\Feature\\FreeGrantRegistrationTest",
+          "name": "test_registered_routes_preserve_actual_assent_original_pdf_and_exact_downloads",
+          "assertions": 99
+        },
+        {
+          "class": "Tests\\Feature\\FreeGrantRegistrationTest",
+          "name": "test_registered_page_changes_scope_and_account_link_requires_feature_enablement",
+          "assertions": 19
+        },
+        {
+          "class": "Tests\\Feature\\FreeGrantRegistrationTest",
+          "name": "test_global_private_boundary_handles_missing_route_wrong_method_and_real_csrf_before_writes",
+          "assertions": 35
+        }
+      ]
+    },
+    "final-native.xml": {
+      "tests": 3,
+      "assertions": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "source": "3f49d2a2a4f853778afa66db8f0f61442e2ab586",
+      "role": "final actual mailbox/current-original/recovery plus lazy-secondary withdrawal",
+      "duration_seconds": 119.194317,
+      "methods": [
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "name": "test_actual_mailbox_owner_has_distinct_safe_free_binding_and_locked_original_proof",
+          "assertions": 14
+        },
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "name": "test_current_recovery_rejects_old_marker_while_retaining_exact_original_origin_history",
+          "assertions": 5
+        },
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "name": "test_actual_normal_mutation_rolls_back_on_terminal_policy_credential_or_lazy_connection_withdrawal with data set #1",
+          "assertions": 4
+        }
+      ]
+    },
+    "historical-ac0/native-current-history.xml": {
+      "tests": 2,
+      "assertions": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "source": "ac0b56ec194056bafcb4c85e3661963577d81d2b",
+      "role": "historical initial family before explicit free family pin",
+      "duration_seconds": 108.558817,
+      "methods": [
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "name": "test_actual_mailbox_owner_has_distinct_safe_free_binding_and_locked_original_proof",
+          "assertions": 13
+        },
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "name": "test_current_recovery_rejects_old_marker_while_retaining_exact_original_origin_history",
+          "assertions": 5
+        }
+      ]
+    },
+    "historical-ac0/sqlite-affected.xml": {
+      "tests": 12,
+      "assertions": 216,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "source": "ac0b56ec194056bafcb4c85e3661963577d81d2b",
+      "role": "historical initial source",
+      "duration_seconds": 18.597687,
+      "methods": [
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\FreeGrantOriginalFenceTest",
+          "name": "test_optional_original_authority_refusal_rolls_back_actual_origin_and_work with data set #0",
+          "assertions": 7
+        },
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\FreeGrantOriginalFenceTest",
+          "name": "test_optional_original_authority_refusal_rolls_back_actual_origin_and_work with data set #1",
+          "assertions": 7
+        },
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "name": "test_actual_mailbox_owner_has_distinct_safe_free_binding_and_locked_original_proof",
+          "assertions": 13
+        },
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "name": "test_current_recovery_rejects_old_marker_while_retaining_exact_original_origin_history",
+          "assertions": 6
+        },
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "name": "test_actual_normal_mutation_rolls_back_on_terminal_policy_credential_or_lazy_connection_withdrawal with data set #0",
+          "assertions": 5
+        },
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "name": "test_actual_normal_mutation_rolls_back_on_terminal_policy_credential_or_lazy_connection_withdrawal with data set #1",
+          "assertions": 5
+        },
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "name": "test_actual_normal_mutation_rolls_back_on_terminal_policy_credential_or_lazy_connection_withdrawal with data set #2",
+          "assertions": 5
+        },
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "name": "test_old_test_binding_foreign_origin_and_purpose_or_provenance_relabels_are_refused",
+          "assertions": 7
+        },
+        {
+          "class": "Tests\\Feature\\ProductionFreeIdentity\\ProductionFreeIdentityTest",
+          "name": "test_default_off_missing_real_marker_and_old_principal_are_refused",
+          "assertions": 8
+        },
+        {
+          "class": "Tests\\Feature\\FreeGrantRegistrationTest",
+          "name": "test_registered_routes_preserve_actual_assent_original_pdf_and_exact_downloads",
+          "assertions": 99
+        },
+        {
+          "class": "Tests\\Feature\\FreeGrantRegistrationTest",
+          "name": "test_registered_page_changes_scope_and_account_link_requires_feature_enablement",
+          "assertions": 19
+        },
+        {
+          "class": "Tests\\Feature\\FreeGrantRegistrationTest",
+          "name": "test_global_private_boundary_handles_missing_route_wrong_method_and_real_csrf_before_writes",
+          "assertions": 35
+        }
+      ]
+    }
+  },
+  "artifacts_sha256": {
+    "development/canonical-key-order-fixture-failure.xml": "ef3d13ee32784eea5ba010548b8a00bc3e3254e68f2a2e913e49b7aff0a744d5",
+    "development/missing-guard-fixture-error.xml": "04e8e487f136df23d099d9439ed05257faf8c398edac9d0de0a84a694d37b68a",
+    "final-native.txt": "8669e9ccbab7ceca4299148d1857d9ea99d6843e7e41a3850bcc6c6c8c00ac4e",
+    "final-native.xml": "1d38f233259246a577a6841086c36bae878a6983f22a6b91038c9fca1ace4718",
+    "final-sqlite.txt": "7db0a92820fb0698928e595cb6ab686315a378e78495983d77e8e7bbd48d4316",
+    "final-sqlite.xml": "6554a1b2983c871767c0a76c98232881a8b0430374031ca6d858bb2114f63e4e",
+    "historical-ac0/native-current-history.txt": "b09840fa684a89ddb73ae6f8f53048344db2d55187ba86fc24ac22bfe52b092b",
+    "historical-ac0/native-current-history.xml": "6b609f88e29d4163716a909793cfc8be15d5b25850ab801539ac84c0bd6fd105",
+    "historical-ac0/sqlite-affected.txt": "b113edab897c680005c31c169849dd54cb9d8beaafa34168f3dd33389a8fc616",
+    "historical-ac0/sqlite-affected.xml": "cdedcc8db4480a992727397b86ef63dd7ccaa2e278230371eea172c3f8632073",
+    "pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "source-map.json": "539d213b17705fb9c519185244a41369d28110f6ad86b5bd1ca2afaa7057cbbe"
+  }
+}
