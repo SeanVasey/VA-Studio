@@ -87,14 +87,24 @@ same privacy policy through the integrated global middleware.
 
 ## Schema and actual limits
 
-Migration `2026_10_07_244000_service_projects` adds two InnoDB tables with immutable
-SQL guards and refuses any existing, temporary, conflicting or interrupted schema
-object before its first change. A failed native DDL install can leave owned empty
-tables/guards: it is deliberately unlogged and refuses automatic adoption on
-retry. Preserve those objects for inspection and an explicit reviewed recovery;
-this migration does not silently remove or adopt partial installation state.
-Actual rollback refuses and retains both application rows and migration ledger.
-The focused tests execute these failure/rollback paths on actual engines.
+Migration `2026_10_07_244000_service_projects` adds two InnoDB tables and six
+immutable SQL guards. Each generated CREATE/INDEX/FK/guard statement belongs to
+one fixed ordered installation. A retry preflights the complete surviving
+columns, storage, indexes, foreign keys and trigger definitions/environment,
+reserved namespaces (including native accent aliases), dependency keys and
+temporary shadows before any change. It appends only the missing suffix of an
+exact contiguous owned prefix. Incomplete installations must contain no rows;
+drift, gaps, external references and shadows require inspection and remain
+unchanged. Completed exact installations can retain encrypted history and be
+readmitted after final-guard or migration-log response uncertainty. No recovery
+step drops, replaces or repairs an existing object.
+
+Application writers and competing migrators must be stopped for operative DDL.
+Foreign/unique-key enforcement is required. Actual rollback refuses and retains
+both application rows and migration ledger. Focused real-Migrator probes interrupt
+after every generated statement (13 SQLite /18 MySQL), retry only the missing
+suffix, and preserve prior service definitions and bookkeeping. Independent
+review also verifies exact completed table/guard definitions survive a retry.
 
 There is no real customer/service source import, private file intake/scanning,
 service payment/deposit collection, deliverable entitlement, operative booking,
