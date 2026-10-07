@@ -1,0 +1,28 @@
+{
+  "local_executable": "700735d2dfbbc002aa7b6664ab63a94ba5af5de5",
+  "tree": "02f6a70f09baf5538412e781a39d9d86efbec4e7",
+  "native_executable": "a762ea23a8e15565c534142b93e47bbcaa656ab6",
+  "ordered_native_parents": [
+    "e4cf4c164ed28890af560c00e19a3cdda76f0240"
+  ],
+  "exact_approved_leaf": "5452c595b933fc673caa1c719ab3882daf55c26e",
+  "source_paths": [
+    "app/Domain/SiteBuilder/PublicPagesSitemap.php",
+    "app/Http/Controllers/PublicDiscoveryController.php",
+    "routes/public-discovery.php",
+    "tests/Feature/PublicDiscoveryIndexTest.php"
+  ],
+  "independent_review": "43b9081aca9e84c1aeedf0198bf359992edb50d7",
+  "focused_author": {
+    "tests": 40,
+    "assertions": 140
+  },
+  "focused_independent": {
+    "tests": 43,
+    "assertions": 225
+  },
+  "root_verified_reviewer_digests": 10,
+  "lock_ci_exception_changes": false,
+  "track_sitemap_included": false,
+  "preflight": "pending exact final metadata candidate"
+}

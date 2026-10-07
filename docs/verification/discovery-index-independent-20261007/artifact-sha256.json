@@ -1,0 +1,12 @@
+{
+  "DiscoveryIndexIndependentCanaryTest.php": "144d9a9244e846c87c7b4aee410dc8b750043617d95cbb30ed0b9a79723e131f",
+  "README.md": "f6d44389d5ba8b41b7392b3bf6e0f65b5aa2fb2c50a5e9ac2060d3875b0ac3cc",
+  "autoload.txt": "afeb0b5d7e62fceb3d16eccd467ab17523db45208bf5df792020dc1ea80897ad",
+  "execution.json": "16bd2f07ecbda72f528e97bc976d2f846329796540e634d227379fe0030d9860",
+  "focused.txt": "1c5ce6371b1ef6d83857509441185b93cccfff6eb3801b92702b1afca881f9d2",
+  "focused.xml": "bad26085e2ebeb571477f13cc5541d0d871aae906823fc5b494e707627932218",
+  "installed-graph.json": "c3b8e9ca235624b0bbcb1dd12d639c0eb3be74a4997fe8aa16ea5e1c421995fb",
+  "review-receipt.json": "c24fafd5c94673fcd92f42777ff046f36ae3d8ff51d84b7c23bf041a2e160701",
+  "selection.xml": "c39f63fbb4d219a956faef4786c87acea6ea04bceb9a215fd7c3e9994d6293af",
+  "source-binding.json": "6d536ea6c403bca75996bd5e2b45365d65b84ab95495487d00ffab06ae66567b"
+}

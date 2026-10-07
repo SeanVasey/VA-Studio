@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"app\/Domain\/SiteBuilder\/PublicPagesSitemap.php","fixers":["class_attributes_separation","unary_operator_spaces","not_operator_with_successor_space"]},{"path":"routes\/public-discovery.php","fixers":["ordered_imports"]}]}

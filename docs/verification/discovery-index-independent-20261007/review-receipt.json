@@ -1,0 +1,22 @@
+{
+  "disposition": "approved focused development integration",
+  "reviewed_source": "5452c595b933fc673caa1c719ab3882daf55c26e",
+  "reviewed_tree": "10f7cd9694b453b903b115dc6e39600ff71948f5",
+  "executed_source": "6aa74559dda0af17d7eb29ed69eb0dee9e404aa2",
+  "focused": {
+    "tests": 43,
+    "assertions": 225,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "installed_package_identities": 158,
+  "findings": [],
+  "canonical_predicate_preserved": true,
+  "catalog_customer_publication_sql_forbidden_canary_passed": true,
+  "native_mysql": false,
+  "browser": false,
+  "full_acceptance": false,
+  "hosted_dispatch": false,
+  "track_sitemap": "deferred pending bounded authoritative eligibility index"
+}
