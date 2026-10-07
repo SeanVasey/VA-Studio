@@ -1,0 +1,85 @@
+<?php
+
+namespace App\Domain\Customers\ProductionFeatures;
+
+use Illuminate\Database\Connection;
+use Illuminate\Support\Facades\DB;
+use PDO;
+use Throwable;
+
+/** Original outer transaction ownership before identity/module hooks; never adopts a replacement. */
+final class ProductionFeatureTransaction
+{
+    private readonly PDO $primary;
+
+    private readonly string $database;
+
+    private readonly string $driver;
+
+    private readonly string $name;
+
+    private readonly string $anchor;
+
+    public function __construct(private readonly Connection $connection)
+    {
+        $primary = $connection->getRawPdo();
+        if (! $primary instanceof PDO || $connection->transactionLevel() !== 1 || ! $primary->inTransaction()) {
+            throw new ProductionFeatureException;
+        }
+        ProductionFeatureConfiguration::plainPrimary($primary);
+        $this->primary = $primary;
+        $this->database = $connection->getDatabaseName();
+        $this->driver = (string) $primary->getAttribute(PDO::ATTR_DRIVER_NAME);
+        $this->name = $connection->getName();
+        $this->source();
+        $this->anchor = 'va_feature_outer_'.bin2hex(random_bytes(16));
+        $primary->exec('SAVEPOINT '.$this->anchor);
+    }
+
+    public function admit(): void
+    {
+        $this->source();
+        try {
+            $this->primary->exec('RELEASE SAVEPOINT '.$this->anchor);
+            $this->primary->exec('SAVEPOINT '.$this->anchor);
+        } catch (Throwable) {
+            throw new ProductionFeatureException;
+        }
+    }
+
+    public function protectFailure(): bool
+    {
+        $owned = false;
+        if ($this->primary->inTransaction()) {
+            try {
+                $this->primary->exec('RELEASE SAVEPOINT '.$this->anchor);
+                $owned = true;
+            } catch (Throwable) {
+                // A commit/reopen has lost the original marker; its transaction is foreign.
+            }
+        }
+        $cached = $this->connection->getRawPdo();
+        if ($owned && $cached === $this->primary && $this->connection->transactionLevel() === 1) {
+            return true;
+        }
+        if ($owned) {
+            $this->primary->rollBack();
+        }
+        // Stop Laravel's catch from resolving/rolling back a foreign source. Preserve its PDO.
+        $this->connection->setPdo($cached);
+
+        return false;
+    }
+
+    private function source(): void
+    {
+        ProductionFeatureConfiguration::plainPrimary($this->primary);
+        if (! in_array($this->driver, ['sqlite', 'mysql'], true) || ! $this->primary->inTransaction()
+            || DB::getDefaultConnection() !== $this->name || (DB::getConnections()[$this->name] ?? null) !== $this->connection
+            || $this->connection->getRawPdo() !== $this->primary || $this->connection->transactionLevel() !== 1
+            || $this->connection->getDatabaseName() !== $this->database || $this->connection->getTablePrefix() !== ''
+            || ($this->driver === 'mysql' && $this->primary->query('SELECT DATABASE()')->fetchColumn() !== $this->database)) {
+            throw new ProductionFeatureException;
+        }
+    }
+}
