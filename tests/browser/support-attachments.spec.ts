@@ -48,6 +48,6 @@ test('visitor attachment uses real quarantine, exact upload replay, scanner refu
     await expect(panel.getByText(filename, { exact: true })).toHaveCount(0); await expect(panel.getByLabel('Choose private file', { exact: true })).toHaveCount(0);
     await expect(panel.getByRole('button')).toHaveCount(0); expect(errors).toEqual([]);
   } finally {
-    await foreign?.close(); fixtureOperation('conversation-cleanup', testInfo.project.name, fixture);
+    await foreign?.close(); fixtureOperation('conversation-restore', testInfo.project.name);
   }
 });
