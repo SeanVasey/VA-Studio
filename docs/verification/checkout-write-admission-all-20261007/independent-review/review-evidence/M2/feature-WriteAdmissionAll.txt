@@ -1,0 +1,25 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-admission/phpunit.xml
+
+F.........                                                        10 / 10 (100%)
+
+Time: 00:33.217, Memory: 100.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_committing_offer_withdrawal_refuses_new_intent_rolls_back_and_restores_dispatcher
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'write_source_changed'
++'changed'
+
+/home/user/VA-Studio-review-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:235
+/home/user/VA-Studio-review-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:53
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 10, Assertions: 56, Failures: 1.

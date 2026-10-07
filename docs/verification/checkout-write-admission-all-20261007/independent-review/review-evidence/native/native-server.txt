@@ -1,0 +1,1 @@
+mysqld 8.4.11 Community, private, 127.0.0.1:3437, datadir under session scratchpad (removed after run); schema vaseyaudio_review had 0 tables after run; source c70aae57 (app tree = 2c3efc4e)

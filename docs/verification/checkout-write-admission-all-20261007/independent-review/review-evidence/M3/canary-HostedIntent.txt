@@ -1,0 +1,21 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-admission/phpunit.xml
+
+.F.                                                                 3 / 3 (100%)
+
+Time: 00:18.512, Memory: 96.00 MB
+
+There was 1 failure:
+
+1) Tests\Canary\HostedIntentCommitAdmissionCanaryTest::test_committing_capability_closure_refuses_new_intent_and_provider_io
+Failed asserting that table [production_checkout_provider_intents] matches expected entries count of 0. Entries found: 1.
+.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithDatabase.php:118
+/home/user/VA-Studio-review-admission/docs/verification/checkout-write-admission-all-20261007/canaries/HostedIntentCommitAdmissionCanaryTest.php:81
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 3, Assertions: 19, Failures: 1.

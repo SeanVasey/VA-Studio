@@ -1,0 +1,3 @@
+canary-ExemptionAuthority 1
+canary-ExemptionBasis 1
+feature-WriteAdmissionAll 0
