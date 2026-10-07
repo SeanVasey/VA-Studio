@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-supp254/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 00:02.086, Memory: 81.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionSuppression\ProductionSuppressionTimestampGuardTest::test_every_created_at_the_runtime_validates_must_be_a_real_timestamp_at_the_trigger
+production_suppression_targets accepted a created_at of hour 24.
+
+/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionTimestampGuardTest.php:105
+/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionTimestampGuardTest.php:92
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 26, Failures: 1.

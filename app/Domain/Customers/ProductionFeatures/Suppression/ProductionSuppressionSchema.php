@@ -370,17 +370,31 @@ final class ProductionSuppressionSchema
 
             return $length($c).'=36 AND NEW.'.$c.($driver === 'sqlite' ? " GLOB '$pattern'" : " REGEXP '^$pattern\$'");
         };
-        $target = "NEW.purpose='email_marketing' AND ".$uuid('public_id').' AND '.$hex('recipient_hmac').' AND '.$bytes('recipient_ciphertext').' BETWEEN 1 AND 8192'
+        // Mirrors ProductionFeatureShape::timestamp(), which every read applies to created_at: exactly YYYY-MM-DD HH:MM:SS and a real
+        // calendar instant. A row failing it would commit, fail every graph read and stay unrepairable under the append-only guards.
+        // SQLite stores any text in a datetime-affinity column, so the guard owns the whole shape: the GLOB pins digits, separators and
+        // length (GLOB matches the entire value, so a trailing newline fails), and datetime() returns NULL for unparsable input and
+        // normalises out-of-range dates (2026-02-30 becomes 2026-03-02), so equality refuses both. It does return an hour of 24 unchanged
+        // (2026-10-07 24:20:59), which the runtime refuses, so the hour is bounded explicitly.
+        // MySQL declares the column TIMESTAMP, so strict sql_mode refuses an unparsable or calendar-invalid string before the trigger sees
+        // NEW (the session's coercion also normalises accepted input such as 'T' separators, so the trigger can only judge the stored
+        // value). Under a non-strict sql_mode the same input becomes the zero date with a warning, so the guard also refuses the zero date
+        // (YEAR() is 0 only for it; a TIMESTAMP is otherwise 1970..2038). The CHAR pattern and the STR_TO_DATE round trip hold the exact
+        // format and calendar validity under any sql_mode; a NULL anywhere makes the guard fail closed through COALESCE.
+        $stamp = $driver === 'sqlite'
+            ? "NEW.created_at GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]' AND substr(NEW.created_at,12,2)<'24' AND datetime(NEW.created_at)=NEW.created_at"
+            : "CAST(NEW.created_at AS CHAR) REGEXP '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}\$' AND YEAR(NEW.created_at)>0 AND NEW.created_at=STR_TO_DATE(CAST(NEW.created_at AS CHAR), '%Y-%m-%d %H:%i:%s')";
+        $target = "NEW.purpose='email_marketing' AND ".$stamp.' AND '.$uuid('public_id').' AND '.$hex('recipient_hmac').' AND '.$bytes('recipient_ciphertext').' BETWEEN 1 AND 8192'
             ." AND EXISTS (SELECT 1 FROM production_account_feature_bindings b WHERE b.id=NEW.binding_id AND b.feature='consent_preferences')"
             ." AND EXISTS (SELECT 1 FROM production_consent_events e WHERE e.id=NEW.withdrawal_event_id AND e.binding_id=NEW.binding_id AND e.purpose=NEW.purpose AND e.status='withdrawn' AND e.affirmative=0 AND e.recipient_hmac=NEW.recipient_hmac AND e.created_at<=NEW.created_at)"
             .' AND NOT EXISTS (SELECT 1 FROM production_suppression_targets WHERE id=NEW.id OR public_id=NEW.public_id OR (binding_id=NEW.binding_id AND purpose=NEW.purpose AND recipient_hmac=NEW.recipient_hmac))';
-        $intent = $uuid('public_id')
+        $intent = $stamp.' AND '.$uuid('public_id')
             ." AND EXISTS (SELECT 1 FROM production_suppression_targets t JOIN production_consent_events e ON e.binding_id=t.binding_id AND e.purpose=t.purpose AND e.recipient_hmac=t.recipient_hmac WHERE t.id=NEW.target_id AND e.id=NEW.withdrawal_event_id AND e.status='withdrawn' AND e.affirmative=0 AND t.created_at<=NEW.created_at AND e.created_at<=NEW.created_at)"
             .' AND NOT EXISTS (SELECT 1 FROM production_suppression_intents WHERE id=NEW.id OR public_id=NEW.public_id OR withdrawal_event_id=NEW.withdrawal_event_id)';
-        $attempt = $uuid('public_id').' AND '.$hex('provider_hash').' AND '.$hex('request_hash').' AND '.$bytes('provider_ciphertext').' BETWEEN 1 AND 8192'
+        $attempt = $stamp.' AND '.$uuid('public_id').' AND '.$hex('provider_hash').' AND '.$hex('request_hash').' AND '.$bytes('provider_ciphertext').' BETWEEN 1 AND 8192'
             .' AND EXISTS (SELECT 1 FROM production_suppression_intents i WHERE i.id=NEW.intent_id AND i.target_id=NEW.target_id AND i.created_at<=NEW.created_at)'
             .' AND NOT EXISTS (SELECT 1 FROM production_suppression_attempts WHERE id=NEW.id OR public_id=NEW.public_id OR target_id=NEW.target_id OR intent_id=NEW.intent_id)';
-        $confirmation = $hex('request_hash').' AND '.$hex('receipt_hash').' AND '.$bytes('receipt_ciphertext').' BETWEEN 1 AND 8192'
+        $confirmation = $stamp.' AND '.$hex('request_hash').' AND '.$hex('receipt_hash').' AND '.$bytes('receipt_ciphertext').' BETWEEN 1 AND 8192'
             .' AND EXISTS (SELECT 1 FROM production_suppression_attempts a WHERE a.id=NEW.attempt_id AND a.request_hash=NEW.request_hash AND a.created_at<=NEW.created_at)'
             .' AND NOT EXISTS (SELECT 1 FROM production_suppression_confirmations WHERE id=NEW.id OR attempt_id=NEW.attempt_id)';
         $result = [];
