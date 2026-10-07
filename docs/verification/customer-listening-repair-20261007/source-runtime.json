@@ -39,11 +39,13 @@
   "focusedFrontend": {
     "tests": 24,
     "files": 1,
-    "failures": 0
+    "failures": 0,
+    "executedAtSource": "288273df8398074be928a44256c0f87ca8005a03",
+    "allFrontendSourcesAndDependencyLocksUnchangedAtFinal": true
   },
   "vendorLayout": "Package namespaces symlink the existing locked /workspace/VA-Studio/vendor; independent vendor/composer, autoload.php and bin wrappers regenerated no-scripts/no-plugins; own domain/test reflection checked.",
   "evidenceHashes": {
-    "README.md": "452e157acee4ba72707a61a1c6d2d7dfb5afa4c32afc2e9a4e3a5dbe5517fba7",
+    "README.md": "f94ea384a278903077aad84ad57b202e0090fbce01acdbd2f37b1433fef205b7",
     "autoload-reflection.txt": "f2e527e08a2afb40b7703e5e652f5c5202fd18a1eb931bcde88f02b3f6a3d2df",
     "first-frozen-288273d-php.txt": "d9a394449ab9210dd28c3a6d8676da79ef6ca1575e9d987179006445c540366c",
     "first-frozen-288273d-php.xml": "ff48c0ea41fee4d3fd9d3e0c9e7c1cddd605e2349a892ef571450ec8ef25620e",
@@ -81,5 +83,6 @@
     "browser/device/full Foundation",
     "hosted CI",
     "production activation"
-  ]
+  ],
+  "typecheckExecutedAtSource": "288273df8398074be928a44256c0f87ca8005a03"
 }

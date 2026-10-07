@@ -67,7 +67,9 @@ The focused PHP selection covers the 25 original listening cases, 18 real last
 account callback cases across read/create/no-op, 17 freshness/model/shadow cases,
 9 atomic migration/ownership/retention cases and the existing customer access and
 public eligibility regressions. All 24 frontend cases passed; TypeScript, Pint,
-autoload reflection and whitespace checks passed. PHP 8.4.26 uses SQLite
+autoload reflection and whitespace checks passed. Frontend/TypeScript executed
+at `288273d`; all frontend sources and dependency locks are byte-identical at
+final `3339f94`. The final PHP, Pint and whitespace checks apply to `3339f94`. PHP 8.4.26 uses SQLite
 `:memory:`; Node is 24.19.0.
 
 ```sh
