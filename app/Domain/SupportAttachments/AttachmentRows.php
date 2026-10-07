@@ -10,8 +10,11 @@ use PDO;
 final class AttachmentRows
 {
     private PDO $primary;
+
     private string $driver;
+
     private string $prefix;
+
     private string $database;
 
     public function __construct()
@@ -26,9 +29,22 @@ final class AttachmentRows
             && preg_match('/\A[a-zA-Z0-9_]+\z/D', $this->database) === 1);
     }
 
-    public function identity(): PDO { return $this->primary; }
-    public function driver(): string { return $this->driver; }
-    public function current(): CurrentRows { $this->assertCurrent(); return new CurrentRows($this->primary, $this->driver); }
+    public function identity(): PDO
+    {
+        return $this->primary;
+    }
+
+    public function driver(): string
+    {
+        return $this->driver;
+    }
+
+    public function current(): CurrentRows
+    {
+        $this->assertCurrent();
+
+        return new CurrentRows($this->primary, $this->driver);
+    }
 
     public function assertCurrent(): void
     {
@@ -60,6 +76,7 @@ final class AttachmentRows
     public function rows(string $table, string $where, array $bindings, int $limit): array
     {
         AttachmentException::require($limit >= 1 && $limit <= 101);
+
         return $this->current()->rows($this->table($table), $where, $bindings, $limit);
     }
 
@@ -67,6 +84,7 @@ final class AttachmentRows
     {
         $rows = $this->rows($table, $where, $bindings, 2);
         AttachmentException::require(count($rows) <= 1);
+
         return $rows[0] ?? [];
     }
 

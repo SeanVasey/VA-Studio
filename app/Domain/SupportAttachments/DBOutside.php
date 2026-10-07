@@ -6,5 +6,8 @@ use Illuminate\Support\Facades\DB;
 
 final class DBOutside
 {
-    public static function check(): bool { return DB::transactionLevel() === 0; }
+    public static function check(): bool
+    {
+        return DB::transactionLevel() === 0;
+    }
 }

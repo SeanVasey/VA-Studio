@@ -13,6 +13,7 @@ final class AttachmentRegistry
     {
         $source = $this->sources[$kind] ?? null;
         AttachmentException::require($source instanceof AttachmentSourceAuthority);
+
         return $source;
     }
 
@@ -26,8 +27,12 @@ final class AttachmentRegistry
         }
         AttachmentException::require($policy->maxBytes() >= 1 && $policy->maxBytes() <= 5242880
             && $policy->maxFiles() >= 1 && $policy->maxFiles() <= 10 && $policy->lifetimeSeconds() >= 1 && $policy->lifetimeSeconds() <= 86400);
+
         return $policy;
     }
 
-    public static function hash(array $value): string { return hash('sha256', CanonicalJson::encode($value)); }
+    public static function hash(array $value): string
+    {
+        return hash('sha256', CanonicalJson::encode($value));
+    }
 }
