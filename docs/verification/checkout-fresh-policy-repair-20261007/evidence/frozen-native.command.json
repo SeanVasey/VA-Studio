@@ -1,0 +1,25 @@
+{
+  "source_sha": "6e3932aa22d2668508dc66b696b6108b6d094f53",
+  "environment": "Actual Oracle MySQL8.0.46 isolated preflight schema/private environment/loopback network grant",
+  "selections": [
+    [
+      "vendor/bin/phpunit",
+      "tests/Feature/ProductionCheckoutFreshPolicyTest.php",
+      "tests/Feature/ProductionCheckoutJourneyTest.php",
+      "--filter",
+      "ProductionCheckoutFreshPolicyTest|test_actual_mailbox_enrollment_payable_assent_hosted_request_reconciliation_and_retained_paid_source|test_reconciliation_and_original_order_replay_remain_available_after_fresh_checkout_withdrawal",
+      "--colors=never",
+      "--log-junit",
+      "docs/verification/checkout-fresh-policy-repair-20261007/evidence/frozen-native-affected.xml"
+    ],
+    [
+      "vendor/bin/phpunit",
+      "docs/verification/checkout-fresh-policy-repair-20261007/CheckoutTerminalFreshPolicyCanaryTest.php",
+      "--filter",
+      "test_terminal_private_media_resolution_withdrawal",
+      "--colors=never",
+      "--log-junit",
+      "docs/verification/checkout-fresh-policy-repair-20261007/evidence/frozen-native-unchanged-canary.xml"
+    ]
+  ]
+}

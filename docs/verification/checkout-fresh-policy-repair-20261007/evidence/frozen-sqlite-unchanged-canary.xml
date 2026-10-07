@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Canary\CheckoutTerminalFreshPolicyCanaryTest" file="/workspace/VA-Studio-checkout-fresh-policy-repair/docs/verification/checkout-fresh-policy-repair-20261007/CheckoutTerminalFreshPolicyCanaryTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="2.625433">
+    <testcase name="test_terminal_private_media_resolution_withdrawal_refuses_new_order_and_rolls_back" file="/workspace/VA-Studio-checkout-fresh-policy-repair/docs/verification/checkout-fresh-policy-repair-20261007/CheckoutTerminalFreshPolicyCanaryTest.php" line="14" class="Tests\Canary\CheckoutTerminalFreshPolicyCanaryTest" classname="Tests.Canary.CheckoutTerminalFreshPolicyCanaryTest" assertions="5" time="2.625433"/>
+  </testsuite>
+</testsuites>
