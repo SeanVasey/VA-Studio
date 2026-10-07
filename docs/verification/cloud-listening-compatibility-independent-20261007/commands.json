@@ -1,0 +1,25 @@
+{
+  "worktree": "/workspace/VA-Studio-listening-compatibility-independent",
+  "source": "d412759ab193f7c7a5cbd2de91eb83320cbc9618",
+  "preparation": [
+    "source /workspace/.va-studio-toolchain/activate.sh",
+    "own vendor/composer metadata and own autoload; existing locked package content symlinks",
+    "composer dump-autoload --no-scripts --no-interaction"
+  ],
+  "sqlite": {
+    "environment": "APP_ENV=testing; synthetic APP_KEY from32 r characters; XML selectsSQLite:memory:",
+    "runner": "php -r '$GLOBALS[\"_composer_autoload_path\"]=getcwd().\"/vendor/autoload.php\"; require \"vendor/phpunit/phpunit/phpunit\";' -- -c docs/verification/cloud-listening-compatibility-independent-20261007/sqlite-compatibility-selection.xml --log-junit docs/verification/cloud-listening-compatibility-independent-20261007/final-sqlite-junit.xml"
+  },
+  "native": {
+    "environment": "source private /workspace/.va-studio-toolchain/mysql/service_review-task.env without printing; same synthetic APP_KEY; network-enabled sandbox for loopback",
+    "setup": "php artisan db:wipe --force --no-interaction (only isolated reviewer schema)",
+    "runner": "same own PHPUnit runner with native-capacity-selection.xml and final-native-capacity-junit.xml; native XML omitsDB env overrides"
+  },
+  "reconciliation": [
+    "pin ca3 Gitblob equals reader fixture exact bytes andSHA256",
+    "source23 bindings from actuald412;13 exactauthor49 sourceblobs",
+    "author5180 committed22 SHA256SUMS artifacts verified fromGit",
+    "locked158 Composer name/version/source/dist identities equalinstalled"
+  ],
+  "source_format_validation": "parent exactd412 scopedPint green; own new Markdown/JSON/XML stageddiff whitespace verified separately from verbatim raw consoles"
+}

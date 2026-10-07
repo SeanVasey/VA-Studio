@@ -1,0 +1,56 @@
+{
+  "reviewed_commit": "d412759ab193f7c7a5cbd2de91eb83320cbc9618",
+  "reviewed_tree": "07a264ddb0a231d7e85ca0f8839383e7efc3fa2f",
+  "decision": "approve bounded development candidate; no compatibility repair blocker remains in reviewed source",
+  "independent_runs": [
+    {
+      "selection": "sqlite-compatibility-selection.xml",
+      "stdout": "final-sqlite.txt",
+      "junit": "final-sqlite-junit.xml",
+      "scope": "actual pinned prior-reader V1 compatibility, opt-in, retained V2, late framework/DI callback refusal",
+      "tests": 34,
+      "assertions": 207,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "selection": "native-capacity-selection.xml",
+      "stdout": "final-native-capacity.txt",
+      "junit": "final-native-capacity-junit.xml",
+      "scope": "actual native TEXT65,535 and encrypted60,000 guards, whole-row/revision preservation, export and recovery with explicit synthetic opt-in",
+      "tests": 3,
+      "assertions": 111,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    }
+  ],
+  "runtime": {
+    "php": "8.4.26",
+    "sqlite": "in-memory isolated testing schema",
+    "mysql": "native8.0.46-0ubuntu0.24.04.4 independent limited schema; REPEATABLE-READ/STRICT_TRANS_TABLES",
+    "node": "24.19.0"
+  },
+  "source_and_graph": {
+    "source_bindings": 23,
+    "author_changed_paths": 13,
+    "root_test_only_delta_paths": 1,
+    "locked_php_package_identities": 158,
+    "dependency_graph_changed": false
+  },
+  "authorization": "delegated independent review only; no production flag enabled, no product edits, no hostedCI, provider, publication, push, published-branch merge or external writes",
+  "limitations": [
+    "No full acceptance matrix or MySQL8.4 claim.",
+    "Pinned historical reader is the actual class, executed against current unchanged auth/model dependencies, not a complete historical deployment.",
+    "V2 promotion needs the separately reviewed stopped/backup upgrade. Disabling the flag does not make retainedV2 readable by older code.",
+    "SQLite proves the actual late callback regressions; the bounded native selection covers affected promotion/storage behavior, not all34 SQLite cases or a new native race."
+  ],
+  "carry": {
+    "original_notes_native_overflow": "retained earlier7b PDO1406 predecessor evidence remains valid; SQLshape, cipher and60k capacity guard unchanged",
+    "root_composed_php": "parent reports exactd41253/464 (HTTP16 +compatibility34 +capacity3); not independently rerun all53",
+    "author_evidence": "all22 durable manifest digests and13 source bindings from5180e16 independently reconciled",
+    "author_native": false
+  },
+  "reconciliation_note": "First source-binding attempt used incorrect lowercase resources/js/pages path; failed before receipt was emitted. Corrected to actual resources/js/Pages; source unchanged and both independent test runs already passed."
+}
