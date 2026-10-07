@@ -8,11 +8,14 @@ use App\Jobs\NotifyInquiryOperatorJob;
 use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
 use App\Support\Audit\AuditEvent;
+use Filament\Facades\Filament;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use LogicException;
+use PDO;
 use Throwable;
 
 /** Durable minimal intent; a wakeup is an optimization, never persistence evidence. */
@@ -91,6 +94,8 @@ final class InquiryNotificationWork
     public function process(int $id): string
     {
         $this->outsideTransactions();
+        $connection = DB::connection();
+        $primary = $connection->getPdo();
         if (! $this->enabled()) {
             return 'disabled';
         }
@@ -99,11 +104,11 @@ final class InquiryNotificationWork
             return InquiryNotificationIntent::findOrFail($id)->state;
         }
 
-        return $this->handoff($claim);
+        return $this->handoff($claim, $connection, $primary);
     }
 
     /** Only process() owns this one-use in-memory claim; it is never a caller-facing replay entry point. */
-    private function handoff(InquiryNotificationIntent $claim): string
+    private function handoff(InquiryNotificationIntent $claim, Connection $connection, PDO $primary): string
     {
         $this->outsideTransactions();
         $ready = DB::transaction(function () use ($claim): ?array {
@@ -128,20 +133,34 @@ final class InquiryNotificationWork
         if ($ready === null) {
             return 'stale';
         }
+        // Container and panel callbacks must finish before the complete primary proof.
+        $transport = app(InquiryAlertTransport::class);
+        $panel = Filament::getPanel('admin');
+        $mfa = $panel === null ? null : [$panel->isMultiFactorAuthenticationRequired(), $panel->getMultiFactorAuthenticationProviders()];
         // Refresh authority/config after releasing locks and immediately before processor I/O.
         if (! $this->enabled()) {
             return $this->settle($claim, 'blocked', 'configuration_withdrawn');
         }
-        if ($this->operator($ready['intent']) === null) {
+        $operator = $this->operator($ready['intent']);
+        if ($operator === null) {
             return $this->settle($claim, 'blocked', 'authority_withdrawn');
         }
         if ($ready['intent']->lease_expires_at->lessThanOrEqualTo(now())) {
             return $this->settle($claim, 'unknown', 'lease_expired');
         }
-        // Authority reads can run application observers; none may leave a transaction around I/O.
-        $this->outsideTransactions();
+        $currentPanel = Filament::getPanel('admin');
+        if ($currentPanel !== $panel || $mfa === null
+            || $mfa !== [$currentPanel->isMultiFactorAuthenticationRequired(), $currentPanel->getMultiFactorAuthenticationProviders()]) {
+            return $this->settle($claim, 'blocked', 'authority_withdrawn');
+        }
+        $refusal = $this->terminal($ready, $operator, $connection, $primary);
+        if ($refusal !== null) {
+            return $refusal === 'stale' ? 'stale' : $this->settle($claim,
+                $refusal === 'lease_expired' ? 'unknown' : 'blocked', $refusal);
+        }
+        // No application/model/query/container callback follows the terminal proof before I/O.
         try {
-            app(InquiryAlertTransport::class)->submit($ready['alert']);
+            $transport->submit($ready['alert']);
         } catch (InquiryAlertNotSubmitted) {
             return $this->settle($claim, $ready['intent']->attempts < self::MAX_ATTEMPTS ? 'retry' : 'blocked',
                 $ready['intent']->attempts < self::MAX_ATTEMPTS ? 'definitely_not_submitted' : 'retry_exhausted');
@@ -150,6 +169,54 @@ final class InquiryNotificationWork
         }
 
         return $this->settle($claim, 'submitted', 'handed_off');
+    }
+
+    /** Current captured writer rows; query-builder reads would dispatch QueryExecuted again. */
+    private function terminal(array $ready, User $operator, Connection $connection, PDO $primary): ?string
+    {
+        if ($connection !== DB::connection() || $primary !== $connection->getPdo() || $primary->inTransaction()) {
+            throw new LogicException('Inquiry notification primary connection changed before handoff.');
+        }
+        $intent = $ready['intent'];
+        $current = $this->primaryRow($primary, 'inquiry_notification_intents', $intent->id);
+        if ($current === null || $this->strings($current) !== $this->strings($intent->getRawOriginal())) {
+            return 'stale';
+        }
+        $user = $this->primaryRow($primary, 'users', $operator->id);
+        $inquiry = $this->primaryRow($primary, 'customer_inquiries', $intent->customer_inquiry_id);
+        if ($user === null || $this->strings($user) !== $this->strings($operator->getRawOriginal())
+            || $inquiry === null || (int) $inquiry['operator_user_id'] !== $intent->operator_user_id
+            || $inquiry['public_id'] !== $ready['alert']->receipt) {
+            return 'authority_withdrawn';
+        }
+        // Pure checks after every framework callback and primary read; no transaction may wrap I/O.
+        $this->outsideTransactions();
+        if (! $this->enabled()) {
+            return 'configuration_withdrawn';
+        }
+
+        return $intent->lease_expires_at->lessThanOrEqualTo(now()) ? 'lease_expired' : null;
+    }
+
+    private function primaryRow(PDO $primary, string $table, int $id): ?array
+    {
+        if (! in_array($table, ['inquiry_notification_intents', 'customer_inquiries', 'users'], true)) {
+            throw new LogicException('Unexpected inquiry notification proof table.');
+        }
+        $statement = $primary->prepare('SELECT * FROM `'.$table.'` WHERE `id` = ?');
+        $statement->bindValue(1, $id, PDO::PARAM_INT);
+        $statement->execute();
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        return count($rows) === 1 ? $rows[0] : null;
+    }
+
+    private function strings(array $row): array
+    {
+        $row = array_map(fn ($value) => $value === null ? null : (string) $value, $row);
+        ksort($row);
+
+        return $row;
     }
 
     public function eligible(int $limit): array

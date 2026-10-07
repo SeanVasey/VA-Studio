@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use LogicException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionMethod;
 use RuntimeException;
 use Tests\Support\FinalizationDatabaseMigrations;
@@ -275,7 +276,8 @@ class InquiryNotificationWorkTest extends TestCase
                     $claim->customer_inquiry_id = 0;
                     $claim->attempts = 0;
                 }
-                $this->assertSame('stale', $handoff->invoke($work, $claim));
+                $connection = DB::connection();
+                $this->assertSame('stale', $handoff->invoke($work, $claim, $connection, $connection->getPdo()));
                 $this->assertSame('blocked', $intent->fresh()->state);
                 $this->assertSame($withdrawal === 'configuration' ? 'configuration_withdrawn' : 'authority_withdrawn', $intent->fresh()->outcome);
                 $this->assertSame($this->operator->id, $intent->fresh()->operator_user_id);
@@ -406,5 +408,64 @@ class InquiryNotificationWorkTest extends TestCase
         $this->assertSame('unknown', $intent->fresh()->state);
         $this->assertSame('lease_expired', $intent->fresh()->outcome);
         $this->assertSame([], $sink->alerts);
+    }
+
+    #[DataProvider('terminalWithdrawals')]
+    public function test_the_last_framework_authority_callback_cannot_authorize_a_withdrawn_handoff(string $change): void
+    {
+        $intent = $this->save();
+        $sink = $this->adapter();
+        $panel = Filament::getPanel('admin');
+        $required = $panel->isMultiFactorAuthenticationRequired();
+        $default = config('database.default');
+        config(['database.connections.inquiry_secondary' => config('database.connections.'.$default)]);
+        $outsideReads = 0;
+        $armed = true;
+        $fired = false;
+        DB::listen(function ($query) use ($change, $intent, $panel, &$outsideReads, &$armed, &$fired): void {
+            if (! $armed || DB::transactionLevel() !== 0 || ! preg_match('/^select .* from ["`]users["`]/i', $query->sql)
+                || ++$outsideReads !== 3) {
+                return;
+            }
+            $armed = false;
+            $fired = true;
+            match ($change) {
+                'operator' => User::whereKey($this->operator->id)->update(['is_admin' => false]),
+                'verification' => User::whereKey($this->operator->id)->update(['email_verified_at' => null]),
+                'configuration' => config(['inquiries.operator_notifications_enabled' => false]),
+                'claim' => DB::table('inquiry_notification_intents')->where('id', $intent->id)->update([
+                    'state' => 'unknown', 'outcome' => 'handoff_uncertain', 'claim_token' => null,
+                    'lease_expires_at' => null, 'next_attempt_at' => null, 'updated_at' => now(),
+                ]),
+                'mfa requirement' => $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: true),
+                'lease' => $this->travel(InquiryNotificationWork::LEASE_SECONDS)->seconds(),
+                'primary connection' => config(['database.default' => 'inquiry_secondary']),
+            };
+        });
+        try {
+            try {
+                app(InquiryNotificationWork::class)->process($intent->id);
+                $this->assertNotSame('primary connection', $change, 'Replacing the captured writer must refuse the handoff.');
+            } catch (LogicException $exception) {
+                $this->assertSame('primary connection', $change, $exception->getMessage());
+            }
+            $this->assertTrue($fired, 'The probe must run after the last framework authority row is read.');
+            $this->assertSame([], $sink->alerts);
+        } finally {
+            $armed = false;
+            config(['database.default' => $default]);
+            DB::purge('inquiry_secondary');
+            $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: $required);
+        }
+        $this->assertSame(match ($change) {
+            'claim', 'lease' => 'unknown', 'primary connection' => 'processing', default => 'blocked',
+        }, $intent->fresh()->state);
+        Mail::assertNothingSent();
+    }
+
+    public static function terminalWithdrawals(): array
+    {
+        return array_combine($changes = ['operator', 'verification', 'configuration', 'claim', 'mfa requirement', 'lease', 'primary connection'],
+            array_map(fn (string $change): array => [$change], $changes));
     }
 }

@@ -246,16 +246,21 @@ class InquiryNotificationMigrationTest extends TestCase
                 ? 'CREATE TRIGGER synthetic_notification_dependency BEFORE UPDATE ON users BEGIN SELECT COUNT(*) FROM inquiry_notification_intents; END'
                 : 'CREATE TRIGGER synthetic_notification_dependency BEFORE UPDATE ON users FOR EACH ROW BEGIN SET @synthetic_notification_reference = (SELECT COUNT(*) FROM inquiry_notification_intents); END');
         }
-        $before = $this->schemaRows();
-        $migration = require database_path('migrations/2026_10_07_243000_inquiry_notification_intents.php');
-        foreach (['up', 'down'] as $method) {
-            $this->migrationRefused(fn () => $migration->$method());
-            $this->assertSame($before, $this->schemaRows());
-            $this->assertCount(3, $this->triggers());
-            $this->assertDatabaseCount('inquiry_notification_intents', 0);
-            if ($kind === 'foreign key') {
-                $this->assertSame('Synthetic retained foreign dependency', DB::table('synthetic_notification_dependency')->sole()->retained_note);
+        try {
+            $before = $this->schemaRows();
+            $migration = require database_path('migrations/2026_10_07_243000_inquiry_notification_intents.php');
+            foreach (['up', 'down'] as $method) {
+                $this->migrationRefused(fn () => $migration->$method());
+                $this->assertSame($before, $this->schemaRows());
+                $this->assertCount(3, $this->triggers());
+                $this->assertDatabaseCount('inquiry_notification_intents', 0);
+                if ($kind === 'foreign key') {
+                    $this->assertSame('Synthetic retained foreign dependency', DB::table('synthetic_notification_dependency')->sole()->retained_note);
+                }
             }
+        } finally {
+            // db:wipe intentionally need not remove views; each synthetic dependency belongs to this case.
+            DB::unprepared('DROP '.($kind === 'foreign key' ? 'TABLE' : ($kind === 'view' ? 'VIEW' : 'TRIGGER')).' synthetic_notification_dependency');
         }
     }
 
