@@ -11,19 +11,21 @@ use App\Domain\SupportAttachments\SupportAttachments;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InquiryConversationFixtures as Fixture;
 use Tests\Support\TestOnlyMediaScanner;
 use Tests\TestCase;
 
 class SupportAttachmentNativeConcurrencyTest extends TestCase
 {
+    use FinalizationDatabaseMigrations;
+
     public function test_native_last_file_reservation_serializes_real_contenders_and_retains_exact_originals(): void
     {
-        if (DB::getDriverName() !== 'mysql' || getenv('ATTACHMENT_NATIVE_ISOLATED') !== '1') {
-            $this->markTestSkipped('Requires explicitly isolated native attachment database and process lock observation.');
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Requires native MySQL process lock observation.');
         }
         config(['app.key' => 'base64:'.base64_encode(str_repeat('S', 32)), 'support-attachments.fixture_enabled' => true]);
-        $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0);
         $this->fakePrivateMediaStorage();
         $fixture = Fixture::create();
         $root = config('filesystems.disks.local.root');

@@ -18,12 +18,15 @@ use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InquiryConversationFixtures;
 use Tests\Support\TestOnlyMediaScanner;
 use Tests\TestCase;
 
 class SupportAttachmentCommittedClosureTest extends TestCase
 {
+    use FinalizationDatabaseMigrations;
+
     private array $fixture;
 
     private SupportAttachments $attachments;
@@ -34,14 +37,6 @@ class SupportAttachmentCommittedClosureTest extends TestCase
     {
         parent::setUp();
         config(['app.key' => 'base64:'.base64_encode(str_repeat('S', 32))]);
-        if (DB::getDriverName() === 'mysql') {
-            if (getenv('ATTACHMENT_NATIVE_ISOLATED') !== '1') {
-                $this->markTestSkipped('Explicit dedicated synthetic attachment native database required.');
-            }
-            $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0);
-        } else {
-            $this->artisan('migrate', ['--force' => true])->assertExitCode(0);
-        }
         $this->fakePrivateMediaStorage();
         $this->fixture = InquiryConversationFixtures::create();
         config(['support-attachments.fixture_enabled' => true]);

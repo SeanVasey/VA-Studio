@@ -11,26 +11,21 @@ use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InquiryConversationFixtures as Fixture;
 use Tests\Support\TestOnlyMediaScanner;
 use Tests\TestCase;
 
 class SupportAttachmentHttpTest extends TestCase
 {
+    use FinalizationDatabaseMigrations;
+
     private string $base;
 
     protected function setUp(): void
     {
         parent::setUp();
         config(['app.key' => 'base64:'.base64_encode(str_repeat('S', 32))]);
-        if (DB::getDriverName() === 'mysql') {
-            if (getenv('ATTACHMENT_NATIVE_ISOLATED') !== '1') {
-                $this->markTestSkipped('Explicit isolated attachment native fixtures required.');
-            }
-            $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0);
-        } else {
-            $this->artisan('migrate', ['--force' => true])->assertExitCode(0);
-        }
         $this->fakePrivateMediaStorage();
         config(['support-attachments.fixture_enabled' => true]);
         $secret = str_repeat('b', 64);

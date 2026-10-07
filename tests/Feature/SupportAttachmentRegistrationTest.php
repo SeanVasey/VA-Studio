@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Tests\Support\CustomerFixtures;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InquiryConversationFixtures;
 use Tests\Support\ServiceProjectFixtures;
 use Tests\Support\TestOnlyMediaScanner;
@@ -19,18 +20,12 @@ use Tests\TestCase;
 /** Boot the actual root routes/provider/privacy; no per-test route or authority registration. */
 final class SupportAttachmentRegistrationTest extends TestCase
 {
+    use FinalizationDatabaseMigrations;
+
     protected function setUp(): void
     {
         parent::setUp();
         config(['app.key' => 'base64:'.base64_encode(str_repeat('S', 32)), 'support-attachments.fixture_enabled' => true]);
-        if (DB::getDriverName() === 'mysql') {
-            if (getenv('ATTACHMENT_NATIVE_ISOLATED') !== '1') {
-                $this->markTestSkipped('Explicit isolated attachment native fixtures required.');
-            }
-            $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0);
-        } else {
-            $this->artisan('migrate', ['--force' => true])->assertExitCode(0);
-        }
         $this->fakePrivateMediaStorage();
         $this->withoutVite();
         $this->app->bind(MalwareScanner::class, TestOnlyMediaScanner::class);
@@ -159,11 +154,8 @@ final class SupportAttachmentRegistrationTest extends TestCase
         $this->assertTrue($refused, 'A missing earlier guard with a retained later guard is not a contiguous owned DDL prefix.');
     }
 
-    public function test_sqlite_reserved_guard_name_cannot_mask_a_second_foreign_table(): void
+    public function test_reserved_guard_name_cannot_mask_a_second_foreign_table(): void
     {
-        if (DB::getDriverName() !== 'sqlite') {
-            $this->markTestSkipped('SQLite permits table and trigger to coexist under this same exact name.');
-        }
         $pdo = DB::connection()->getPdo();
         $pdo->exec('CREATE TABLE support_attachments_update (marker INTEGER PRIMARY KEY)');
         $pdo->exec('INSERT INTO support_attachments_update (marker) VALUES (9123)');
@@ -174,7 +166,7 @@ final class SupportAttachmentRegistrationTest extends TestCase
             $refused = true;
         }
         $this->assertTrue($refused, 'Reserved guard admission must inspect every dictionary row, not only the first matching trigger.');
-        $this->assertSame(9123, (int) $pdo->query('SELECT marker FROM main.support_attachments_update')->fetchColumn());
+        $this->assertSame(9123, (int) $pdo->query('SELECT marker FROM '.(DB::getDriverName() === 'sqlite' ? 'main.' : '').'support_attachments_update')->fetchColumn());
     }
 
     private function privateGet(string $path, array $headers = [])
