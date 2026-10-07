@@ -17,6 +17,7 @@ class CustomerListeningExportHttpTest extends TestCase
 
     private function login(array $fixture): void
     {
+        \Tests\Support\ListeningNotesFixtures::enablePromotion();
         $principal = app(CustomerAccess::class)->principal($fixture['user']);
         $this->actingAs($fixture['user'], 'customer')->withSession(['_customer_access' => [
             'account_id' => $principal->accountId, 'access_version' => $principal->accessVersion,
