@@ -72,7 +72,7 @@ final class SupportAttachmentPrivacy
         } catch (TokenMismatchException) {
             return PrivateResponse::error(419);
         } catch (HttpExceptionInterface $error) {
-            return PrivateResponse::error($error->getStatusCode());
+            return PrivateResponse::error($error->getStatusCode(), $error->getHeaders());
         } catch (\Throwable $error) {
             return PrivateResponse::failure($error);
         }

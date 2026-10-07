@@ -170,7 +170,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // generic too, including in debug mode, without changing other routes.
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request): Response {
             if (SupportAttachmentPrivacy::matches($request)) {
-                return $response->getStatusCode() >= 400 ? SupportAttachmentResponse::error($response->getStatusCode()) : SupportAttachmentResponse::protect($response);
+                return $response->getStatusCode() >= 400 ? SupportAttachmentResponse::error($response->getStatusCode(), $response->headers->all()) : SupportAttachmentResponse::protect($response);
             }
             if (FreeGrantPrivacy::matches($request)) {
                 return $response->getStatusCode() >= 400 ? FreeGrantPrivacy::error($response->getStatusCode()) : FreeGrantPrivacy::protect($response);

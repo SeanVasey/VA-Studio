@@ -4,12 +4,14 @@ namespace Tests\Feature;
 
 use App\Domain\Media\MalwareScanner;
 use App\Domain\SupportAttachments\AttachmentSchema;
+use App\Http\Responses\SupportAttachmentResponse;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\Support\CustomerFixtures;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InquiryConversationFixtures;
@@ -120,6 +122,49 @@ final class SupportAttachmentRegistrationTest extends TestCase
         config(['app.debug' => true]);
         Log::shouldReceive('error')->once()->with('Private attachment request failed.', ['exception_class' => \RuntimeException::class]);
         $this->sandbox($this->get('/private-support/registered-failure')->assertStatus(503)->assertDontSee('Synthetic private', false)->assertDontSee('trace', false));
+    }
+
+    public function test_actual_page_and_action_throttles_keep_safe_retry_headers_on_private_errors(): void
+    {
+        $base = $this->inquiry();
+        foreach ([[$base.'/view', 60, 'GET'], [$base.'/'.str_repeat('a', 36).'/process', 10, 'POST']] as [$path, $limit, $method]) {
+            for ($attempt = 0; $attempt < $limit; $attempt++) {
+                $response = $method === 'GET' ? $this->get($path) : $this->postJson($path, ['sourceVersion' => 0, 'attempt' => 0]);
+                $this->assertNotSame(429, $response->getStatusCode());
+            }
+            $response = $method === 'GET' ? $this->get($path) : $this->postJson($path, ['sourceVersion' => 0, 'attempt' => 0]);
+            $this->sandbox($response->assertStatus(429));
+            $response->assertHeader('X-RateLimit-Limit', (string) $limit)->assertHeader('X-RateLimit-Remaining', '0');
+            $this->assertMatchesRegularExpression('/\A[0-9]+\z/', $response->headers->get('Retry-After', ''));
+            $this->assertMatchesRegularExpression('/\A[0-9]+\z/', $response->headers->get('X-RateLimit-Reset', ''));
+            $response->assertDontSee('trace', false);
+        }
+    }
+
+    public function test_private_http_exception_headers_cannot_disclose_arbitrary_values_or_redirect(): void
+    {
+        Route::middleware('web')->get('/private-support/synthetic-header-error', fn () => throw new HttpException(429, 'SYNTHETIC-PRIVATE-MESSAGE', null, [
+            'Retry-After' => '31', 'X-RateLimit-Limit' => '10', 'X-RateLimit-Remaining' => '0', 'X-RateLimit-Reset' => '1900000000',
+            'Location' => 'https://synthetic-private.invalid', 'X-Private' => 'SYNTHETIC-PRIVATE-HEADER', 'Set-Cookie' => 'private=SYNTHETIC-PRIVATE-COOKIE',
+        ]));
+        $response = $this->get('/private-support/synthetic-header-error')->assertStatus(429);
+        $this->sandbox($response);
+        $response->assertHeader('Retry-After', '31')->assertHeader('X-RateLimit-Limit', '10')->assertHeader('X-RateLimit-Remaining', '0')->assertHeader('X-RateLimit-Reset', '1900000000');
+        $this->assertFalse($response->headers->has('Location'));
+        $this->assertFalse($response->headers->has('X-Private'));
+        $this->assertStringNotContainsString('SYNTHETIC-PRIVATE-COOKIE', (string) $response->headers);
+        $response->assertDontSee('SYNTHETIC-PRIVATE', false)->assertDontSee('trace', false);
+    }
+
+    public function test_private_error_projection_refuses_nonfinite_and_ambiguous_throttle_values(): void
+    {
+        $response = SupportAttachmentResponse::error(429, [
+            'Retry-After' => ['31', '32'], 'X-RateLimit-Limit' => '1e9', 'X-RateLimit-Remaining' => '-1',
+            'X-RateLimit-Reset' => str_repeat('9', 21), 'Location' => 'https://private.invalid',
+        ]);
+        foreach (['Retry-After', 'X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset', 'Location'] as $name) {
+            $this->assertFalse($response->headers->has($name));
+        }
     }
 
     public function test_final_download_commit_callback_cannot_withdraw_policy_and_still_return_original_bytes(): void

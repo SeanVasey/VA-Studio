@@ -33,7 +33,7 @@ final class SupportAttachmentResponse
         return $response;
     }
 
-    public static function error(int $status): Response
+    public static function error(int $status, array $headers = []): Response
     {
         $message = match ($status) {
             403, 404 => 'These private attachments are unavailable.',
@@ -45,6 +45,24 @@ final class SupportAttachmentResponse
             default => 'This action could not be confirmed. Check its status before retrying.',
         };
 
-        return self::protect(response()->json(['code' => 'PRIVATE_ATTACHMENT_UNAVAILABLE', 'message' => $message], $status >= 500 ? 503 : $status));
+        // Exception bodies and arbitrary headers remain private. Retain only the
+        // finite numeric throttle metadata needed for an explicit later retry.
+        $safe = [];
+        foreach ($headers as $name => $value) {
+            if (! is_string($name) || ! in_array(strtolower($name), ['retry-after', 'x-ratelimit-limit', 'x-ratelimit-remaining', 'x-ratelimit-reset'], true)) {
+                continue;
+            }
+            if (is_array($value)) {
+                if (array_keys($value) !== [0]) {
+                    continue;
+                }
+                $value = $value[0];
+            }
+            if ((is_string($value) || is_int($value)) && preg_match('/\A[0-9]{1,20}\z/D', (string) $value) === 1) {
+                $safe[$name] = (string) $value;
+            }
+        }
+
+        return self::protect(response()->json(['code' => 'PRIVATE_ATTACHMENT_UNAVAILABLE', 'message' => $message], $status >= 500 ? 503 : $status, $safe));
     }
 }
