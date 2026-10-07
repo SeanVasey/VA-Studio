@@ -1,0 +1,48 @@
+{
+  "local_executable": "254c488247206ddf95f3be2943b2064601f3b97d",
+  "tree": "715f8c6d131faf7c7e084ba6e98e6552d5a07bcd",
+  "native_executable": "727de5fb9077c5a27406acb79508aef83a08967f",
+  "ordered_native_parents": [
+    "43b919c4f5cef9bb259515904333a7aa20dcb6fb"
+  ],
+  "approved_leaf": "fab8677007aa3ae8f9639673d7eafcd22428eff2",
+  "independent_leaf_evidence": "560904c76be66ef45a2966df9888f60eef6395cb",
+  "independent_composed_evidence": "0eec3e90c55d53c879850c6d1b863a1bdcb5b182",
+  "exact_source_paths": [
+    "app/Domain/Contracts/ContractIssuancePolicy.php",
+    "app/Domain/Contracts/ContractRenderProfileRegistry.php",
+    "composer.lock",
+    "config/contracts.php",
+    "tests/Feature/TestContractProfileSuccessorTest.php",
+    "tests/Feature/TestContractSuccessorActivationTest.php",
+    "tests/Support/ContractFixtures.php",
+    "tests/Unit/ContractRenderProfileRegistryTest.php",
+    "tests/Unit/TcpdfContractRendererTest.php"
+  ],
+  "current_profile": "test-buyer-pdf-v2",
+  "current_policy": "test-contract-issuance-v2",
+  "default_issuance_enabled": false,
+  "test_only": true,
+  "exact_pr3_changed_line_projection": 22,
+  "changed_lock_records": [
+    "tecnickcom/tc-lib-pdf",
+    "tecnickcom/tc-lib-pdf-font"
+  ],
+  "focused_composed": {
+    "tests": 144,
+    "assertions": 820,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "root_digest_verified": {
+    "author": 33,
+    "independent_leaf": 28,
+    "independent_composition": 18
+  },
+  "old_original_real_pdf_bytes": 842536,
+  "old_original_real_cross_runtime_verified": true,
+  "migration_ci_exception_asset_or_core_coordinator_changes": false,
+  "preflight": "pending exact final metadata candidate",
+  "pr3": "close as superseded only after verified merge"
+}

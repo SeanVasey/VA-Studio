@@ -4,7 +4,7 @@ namespace Tests\Unit;
 
 use App\Domain\Contracts\ContractRenderProfile;
 use App\Domain\Contracts\ContractText;
-use App\Domain\Contracts\TcpdfContractRenderer;
+use App\Domain\Contracts\VersionedContractRenderer;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Tests\Support\ContractRendererFixtures;
@@ -16,7 +16,7 @@ class TcpdfContractRendererTest extends TestCase
         $profile = ContractRenderProfile::current();
         $input = ContractRendererFixtures::input();
         $input['disclosure']['termsText'] = str_repeat("Synthetic FULL TERMS paragraph. Zoë Ελληνικά Кириллица.\n", 150).'FINAL TERMS SENTINEL';
-        $renderer = new TcpdfContractRenderer;
+        $renderer = new VersionedContractRenderer;
         $first = $renderer->render($input, $profile);
         $timezone = date_default_timezone_get();
         try {
@@ -54,7 +54,7 @@ class TcpdfContractRendererTest extends TestCase
         $profile = ContractRenderProfile::current();
         $this->assertSame($profile, ContractRenderProfile::validate($profile));
         $this->expectException(RuntimeException::class);
-        ContractRenderProfile::verifyRuntime($profile, sys_get_temp_dir().'/vasey-absent-contract-profile');
+        ContractRenderProfile::verifyVersionRuntime($profile, $profile['version'], sys_get_temp_dir().'/vasey-absent-contract-profile');
     }
 
     public function test_a_common_script_codepoint_absent_from_the_actual_font_fails_closed(): void
@@ -63,6 +63,6 @@ class TcpdfContractRendererTest extends TestCase
         $input['buyer']['legal_name'] = "Test \u{1FAE8}";
         $profile = ContractRenderProfile::current();
         $this->expectException(RuntimeException::class);
-        (new TcpdfContractRenderer)->render($input, $profile);
+        (new VersionedContractRenderer)->render($input, $profile);
     }
 }

@@ -1,0 +1,11 @@
+{
+  "tested_executable": "254c488247206ddf95f3be2943b2064601f3b97d",
+  "metadata_envelope_reviewed": "6e237104f175678b8ca3bee6af18c02b79a65e16",
+  "metadata_envelope_tree": "85c197eb126ee00c4f25a07d2272946b1613fadf",
+  "author_paths_exact_frozen_evidence_including_issuance_guide": 35,
+  "independent_paths_exact_prior_review": 29,
+  "only_docs_paths_differ_from_executed_source": 64,
+  "executable_paths_unchanged": true,
+  "author_source_evidence": "9cb38f3916ce6e61cc28f95b42bdfe64a452e1eb",
+  "prior_independent_review": "560904c76be66ef45a2966df9888f60eef6395cb"
+}

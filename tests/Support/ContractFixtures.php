@@ -5,6 +5,7 @@ namespace Tests\Support;
 use App\Domain\Commerce\Finalization\FinalizeTestPayment;
 use App\Domain\Commerce\Models\LicenseGrant;
 use App\Domain\Commerce\Models\OrderFinalization;
+use App\Domain\Contracts\ContractIssuancePolicy;
 use App\Domain\Contracts\ContractRenderer;
 use App\Domain\Contracts\ContractRenderProfile;
 use App\Domain\Contracts\ContractText;
@@ -26,9 +27,7 @@ final class ContractFixtures
 
     public static function policy(): array
     {
-        return ['schema_version' => 1, 'purpose' => 'test_contract_issuance', 'version' => 'test-contract-issuance-v1',
-            'profile' => 'test-buyer-pdf-v1', 'originals' => 'preserve_first_committed', 'missing_original' => 'restore_only',
-            'buyer_identity' => 'unverified_guest', 'entitlements' => 'pending', 'lease_seconds' => 300, 'max_attempts' => 5, 'retry_seconds' => 60];
+        return ContractIssuancePolicy::CONTRACT;
     }
 
     public static function paid(object $gateway, bool $mixed = false): array
@@ -41,7 +40,9 @@ final class ContractFixtures
     public static function finalize(array $fixture): array
     {
         $outcome = app(FinalizeTestPayment::class)->handle($fixture['payment']->id);
-        if ($outcome !== 'paid') { throw new \LogicException('Synthetic payment did not finalize: '.$outcome); }
+        if ($outcome !== 'paid') {
+            throw new \LogicException('Synthetic payment did not finalize: '.$outcome);
+        }
         $finalization = OrderFinalization::where('order_id', $fixture['order']->id)->sole();
         $grants = LicenseGrant::where('order_finalization_id', $finalization->id)->orderBy('order_line_id')->get();
 
@@ -60,14 +61,18 @@ final class ContractFixtures
 
     public static function renderer(): ContractRenderer
     {
-        return new class implements ContractRenderer {
+        return new class implements ContractRenderer
+        {
             public array $calls = [];
+
             public mixed $onRender = null;
 
             public function render(array $input, array $profile): RenderedContract
             {
                 $this->calls[] = ['input' => $input, 'profile' => $profile, 'transaction_level' => DB::transactionLevel()];
-                if ($this->onRender !== null) { return ($this->onRender)($input, $profile); }
+                if ($this->onRender !== null) {
+                    return ($this->onRender)($input, $profile);
+                }
 
                 return ContractFixtures::syntheticResult($input, $profile);
             }

@@ -1,0 +1,42 @@
+{
+  "new_runtime": {
+    "packages": 158,
+    "actual_installed_matches_candidate_lock": true,
+    "pdf": [
+      "8.76.3",
+      "d417129fad37d49dc9fc0d1e229e9740e1c774a3"
+    ],
+    "font": [
+      "4.4.1",
+      "a78b8e0ac9284d1594b6ba68488cf65c3e958f7b"
+    ]
+  },
+  "old_runtime": {
+    "packages": 158,
+    "actual_installed_matches_retained_predecessor_lock": true,
+    "candidate_lock_mismatch_intentional": [
+      "tecnickcom/tc-lib-pdf",
+      "tecnickcom/tc-lib-pdf-font"
+    ],
+    "pdf": [
+      "8.76.2",
+      "c383bd3ac09164c3fd1a6ac7da8f5460d19e47e3"
+    ],
+    "font": [
+      "4.4.0",
+      "658e04565534c0cdd3d8d7ff12f1c6ebeab5f7ce"
+    ]
+  },
+  "unchanged_protected_source_sha256": {
+    "app/Domain/Contracts/ContractText.php": "46d145c921ff5a94b3d2928c9b7d9caf0697d33f8ba5c5c30ca65598e1d68a08",
+    "app/Domain/Contracts/TcpdfContractRenderer.php": "620b66766143ab72532e8fa3a161d3eb1012368bbf195cea70b9b8907cdd763a",
+    "resources/contracts/test-v1/profile-assets.json": "44533c186a3b1350163025256a9ced519a6395ba8001541193d1d51b51688e50",
+    "resources/contracts/test-v2/profile-assets.json": "29e0b1b33abc78ab48c6669579dbb3296eb9e282f2a16b0fb337db8417b68dac",
+    "app/Domain/Contracts/ReadGrantContract.php": "1359c56af527e0801b7de9fbbc8a603ae30abd8eff95bc95224ae6804d0664a9",
+    "app/Domain/Contracts/RequestTestContract.php": "5cd693b4e1150495baffdbed62190026305928ab388c1790787e30c986c92d79",
+    "app/Domain/Contracts/RenderTestContract.php": "b2e82426a0cb95669b7a39e535dd6a2a40d1b41569e42beb7568b2920d58daca",
+    "app/Domain/Contracts/ContractWork.php": "a9e90c86ac7304f9f6c3d57062827f02e8293b3b043e816c8d27798559fc10e2"
+  },
+  "build_origin": "VA-Studio-dependency-compat public/build, frontend locks unchanged from retained candidate",
+  "build_manifest_sha256": "a43e6ead807eb8954bc1105308779eeb2d49c5c067c01ad44b005f88be2562ac"
+}

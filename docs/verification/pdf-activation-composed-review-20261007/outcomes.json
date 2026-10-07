@@ -1,0 +1,31 @@
+{
+  "approved_executable": "254c488247206ddf95f3be2943b2064601f3b97d",
+  "approved_tree": "715f8c6d131faf7c7e084ba6e98e6552d5a07bcd",
+  "source_leaf_approval_carried_from": "560904c76be66ef45a2966df9888f60eef6395cb",
+  "source_leaf_executable": "fab8677007aa3ae8f9639673d7eafcd22428eff2",
+  "result": "approved_final_composition_for_bounded_test_only_development_activation",
+  "unresolved_findings": [],
+  "own_composed_focused_selection": {
+    "name": "/workspace/scratch/2876616e88c3/VA-Studio-pdf-activation-composed-review/activation-composed-focused.phpunit.xml",
+    "tests": "144",
+    "assertions": "820",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "111.231107"
+  },
+  "own_dependency_exit_codes": {
+    "validate": 0,
+    "platform": 0,
+    "audit": 0,
+    "runtime_probe": 0
+  },
+  "audit_advisories": 0,
+  "audit_abandoned": 0,
+  "own_actual_candidate_installed_references_verified": 158,
+  "original_and_new_runtime_canaries_carried_without_rerun": true,
+  "issuance_default_off_and_explicit_v2_policy_unchanged": true,
+  "low_cost_ci_preserved": true,
+  "full_foundation_native_browser_hosted_or_live_effects": false,
+  "ephemeral_key_retained": false
+}

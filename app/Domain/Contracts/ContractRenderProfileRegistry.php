@@ -7,7 +7,7 @@ use Throwable;
 /** Explicit trusted versions: retained metadata never follows the current renderer implicitly. */
 final class ContractRenderProfileRegistry
 {
-    public const CURRENT_VERSION = 'test-buyer-pdf-v1';
+    public const CURRENT_VERSION = 'test-buyer-pdf-v2';
 
     public const V1_LIMITS = ['input_bytes' => 1048576, 'output_bytes' => 16777216, 'pages' => 100,
         'runtime_seconds' => 60, 'memory_bytes' => 134217728, 'claim_seconds' => 300,

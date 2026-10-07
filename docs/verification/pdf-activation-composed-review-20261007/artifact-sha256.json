@@ -1,0 +1,20 @@
+{
+  "README.md": "52ca5d89e4efe927032a1680e350db6fef3dafbc5a160825783d841745fe5312",
+  "audit-stderr.txt": "dca257f696c35ff66f2907c8824e6b00ddc5865ad907a67a21238aa5d729545d",
+  "audit.json": "3d68c4566587606c21e4bcd82b55d322ddb79158f657d9fb90bf0d24ab5bccdf",
+  "autoload.txt": "e399acde710f4abc7bda4c8afc5fb5598d09980bda4277f83c7e535c93159330",
+  "dependency-exits.json": "24a5221ee34b3b5c40364919bb2e7263c49fcf081cba7c23a46442937886432e",
+  "execution.json": "b8760cd7e8e8a619a36e0e3341a8a3eaa16dffa41131082c18f56fe4ebdb179c",
+  "metadata-envelope.json": "42a2e54880c927ffbbaa7aa2b9f7a448d49326e47646d889a2d8071b81106af4",
+  "outcomes.json": "ccac37b42b7e1ed2339bd3b97d518918e3f98db567ef5ce40a3a033f2cec699b",
+  "platform.txt": "ce0b72bfb8101c604fdde9ee721dcd7fb97ccee9662f30c13e213adf6b319a03",
+  "runtime-graph.json": "394a61b6c7312010d6034b138ce04c87772dece27b55e62585fb336fb7372d6c",
+  "runtime-probe-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "runtime-probe.php": "0d5225cbec42a1280b4dff51c5762598164996640bba6394d0eb22fa60ad80d3",
+  "selection.xml": "8410914de5c9a00920e1af73bf2f28608ff1376091694daf6bb518a6d178ff90",
+  "setup-diagnostic.txt": "172f290dddf4ffc2e3fa74f3dce25fb071810ff923624a75e4c53943bcc7490f",
+  "source.json": "893d4e6d94e7ae2c1f655961750dc7c5f92ff64d57d6a2a0cfc10af954fbc16c",
+  "tests.txt": "99d66a4ff7e74a2ab18825dac3698055b389bdaacdccdae4a4cf5e07f82018ca",
+  "tests.xml": "cd2d55c2133e0f10af76de54914edc9aabbd9f95f1c4e3c853e1e77bd9a3ae3f",
+  "validate.txt": "16305168e7087ff29b5ee1f3fbe9b9bc8c5f90c84440cdfe79a97c6e4cb7c651"
+}

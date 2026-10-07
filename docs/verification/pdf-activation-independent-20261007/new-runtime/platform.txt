@@ -1,0 +1,28 @@
+Composer plugins have been disabled for safety in this non-interactive session.
+Set COMPOSER_ALLOW_SUPERUSER=1 if you want to allow plugins to run as root/super user.
+Do not run Composer as root/super user! See https://getcomposer.org/root for details
+Checking platform requirements for packages in the vendor dir
+composer-runtime-api 2.2.2      success                                       
+ext-ctype            *          success provided by symfony/polyfill-ctype    
+ext-curl             8.4.26     success                                       
+ext-dom              20031129   success                                       
+ext-fileinfo         8.4.26     success                                       
+ext-filter           8.4.26     success                                       
+ext-gd               8.4.26     success                                       
+ext-hash             8.4.26     success                                       
+ext-iconv            8.4.26     success                                       
+ext-intl             8.4.26     success                                       
+ext-json             8.4.26     success                                       
+ext-libxml           8.4.26     success                                       
+ext-mbstring         *          success provided by symfony/polyfill-mbstring 
+ext-openssl          8.4.26     success                                       
+ext-pcre             8.4.26     success                                       
+ext-phar             8.4.26     success                                       
+ext-session          8.4.26     success                                       
+ext-tokenizer        8.4.26     success                                       
+ext-xml              8.4.26     success                                       
+ext-xmlreader        8.4.26     success                                       
+ext-xmlwriter        8.4.26     success                                       
+ext-zip              1.22.8     success                                       
+ext-zlib             8.4.26     success                                       
+php                  8.4.26     success                                       
