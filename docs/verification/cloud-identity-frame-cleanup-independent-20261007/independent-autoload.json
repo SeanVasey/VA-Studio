@@ -1,0 +1,6 @@
+{
+    "php": "8.4.26",
+    "frame": "\/workspace\/VA-Studio-identity-frame-cleanup-independent\/app\/Domain\/Customers\/ProductionIdentity\/IdentityCommittedFrame.php",
+    "active_test": "\/workspace\/VA-Studio-identity-frame-cleanup-independent\/tests\/Feature\/ProductionIdentityAdapters\/ProductionIdentityCommittedFrameTest.php",
+    "current_rows": "\/workspace\/VA-Studio-identity-frame-cleanup-independent\/app\/Domain\/Commerce\/ProductionPolicy\/CurrentRows.php"
+}
