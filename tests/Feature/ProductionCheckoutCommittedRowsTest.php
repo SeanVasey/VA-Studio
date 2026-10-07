@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use LogicException;
 use PDO;
 use PDOException;
+use PDOStatement;
 use Tests\TestCase;
 
 /** Real PDO admission and native row-lock distinction for the explicit frozen-receipt reader. */
@@ -70,6 +71,48 @@ class ProductionCheckoutCommittedRowsTest extends TestCase
         }
     }
 
+    public function test_explicit_reader_refuses_wrong_driver_claim_for_actual_core_pdo(): void
+    {
+        try {
+            CurrentRows::committedReadOnly($this->primary, $this->driver === 'sqlite' ? 'mysql' : 'sqlite');
+            $this->fail('Plain reader adopted a different claimed driver.');
+        } catch (LogicException $error) {
+            $this->assertSame('committed_read_frame', $error->getMessage());
+            $this->assertFalse($this->primary->inTransaction());
+        }
+    }
+
+    public function test_factory_refuses_statement_constructor_that_writes_original_committed_row(): void
+    {
+        $this->refuseWritingStatement(fn () => CurrentRows::committedReadOnly($this->primary, $this->driver));
+    }
+
+    public function test_original_plain_reader_refuses_later_statement_constructor_before_prepare(): void
+    {
+        $reader = CurrentRows::committedReadOnly($this->primary, $this->driver);
+        $this->refuseWritingStatement(fn () => $reader->one($this->table, 1));
+    }
+
+    private function refuseWritingStatement(\Closure $attempt): void
+    {
+        $default = $this->primary->getAttribute(PDO::ATTR_STATEMENT_CLASS);
+        CommittedRowsWritingStatement::$called = false;
+        try {
+            $this->primary->setAttribute(PDO::ATTR_STATEMENT_CLASS, [CommittedRowsWritingStatement::class, [$this->primary, $this->table]]);
+            try {
+                $attempt();
+                $this->fail('Plain reader admitted a write-capable statement constructor.');
+            } catch (LogicException $error) {
+                $this->assertSame('committed_read_frame', $error->getMessage());
+            }
+        } finally {
+            $this->primary->setAttribute(PDO::ATTR_STATEMENT_CLASS, $default);
+        }
+        $this->assertFalse(CommittedRowsWritingStatement::$called);
+        $this->assertSame(9123, (int) $this->primary->query('SELECT marker FROM '.$this->table.' WHERE id=1')->fetchColumn());
+        $this->assertFalse($this->primary->inTransaction());
+    }
+
     public function test_native_plain_reader_does_not_wait_for_foreign_row_lock_while_default_reader_still_locks(): void
     {
         if ($this->driver !== 'mysql') {
@@ -95,5 +138,17 @@ class ProductionCheckoutCommittedRowsTest extends TestCase
             $this->primary->exec('SET SESSION innodb_lock_wait_timeout='.$timeout);
         }
         $this->assertSame(9123, (int) $this->primary->query('SELECT marker FROM '.$this->table.' WHERE id=1')->fetchColumn());
+    }
+}
+
+/** Actual PDO extension hook used only to reproduce the discovered write during plain prepare(). */
+final class CommittedRowsWritingStatement extends PDOStatement
+{
+    public static bool $called = false;
+
+    protected function __construct(PDO $primary, string $table)
+    {
+        self::$called = true;
+        $primary->exec('UPDATE '.$table.' SET marker=9133 WHERE id=1');
     }
 }
