@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "version": "paid-grant-pdf-implementation-v1",
+  "files": {
+    "app/Domain/Grants/Paid/PaidGrantText.php": "9eabe757ed8daa9618de7af7cd22911fd971a0f5174d5cb6eac7294c1e0c5411",
+    "app/Domain/Grants/Paid/PaidGrantPdfRenderer.php": "8a0fce94ed52d65eb31ebf67941976cd31676a47300d9a5ed4b7289d64209c44",
+    "app/Domain/Grants/Paid/PaidGrantRendererProcess.php": "d138d616268483762beb2f45ffcd9489eddcdb59c0f4568852d7a40a485ad64f",
+    "app/Domain/Grants/Paid/PaidGrantRenderInput.php": "b3d2eb372fce8d87cc9cfea0cd1f35d18b609ef2636cef4b77a29e4c5541c5cc",
+    "app/Domain/Grants/Paid/PaidGrantFiles.php": "f37bcf56475596b4e41e03512520b7a002d196c772d5257801d40088d52cc418",
+    "scripts/render-paid-grant.php": "90c6dccdadabc117d7a11b6a21e4043cbe22e8616faa79141852e56ab14623fc"
+  }
+}
