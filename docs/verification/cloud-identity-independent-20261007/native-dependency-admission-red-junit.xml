@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\IndependentIdentityRegistration\IdentityNativeDependencyAdmissionCanaryTest" file="/workspace/VA-Studio-identity-registration-independent/docs/verification/cloud-identity-independent-20261007/IdentityNativeDependencyAdmissionCanaryTest.php" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="19.334270">
+    <testcase name="test_missing_native_parent_columns_are_refused_before_owned_ddl" file="/workspace/VA-Studio-identity-registration-independent/docs/verification/cloud-identity-independent-20261007/IdentityNativeDependencyAdmissionCanaryTest.php" line="15" class="Tests\IndependentIdentityRegistration\IdentityNativeDependencyAdmissionCanaryTest" classname="Tests.IndependentIdentityRegistration.IdentityNativeDependencyAdmissionCanaryTest" assertions="3" time="19.334270">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\IndependentIdentityRegistration\IdentityNativeDependencyAdmissionCanaryTest::test_missing_native_parent_columns_are_refused_before_owned_ddl
+Missing required native users credential columns must be refused before identity DDL.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-identity-registration-independent/docs/verification/cloud-identity-independent-20261007/IdentityNativeDependencyAdmissionCanaryTest.php:40
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

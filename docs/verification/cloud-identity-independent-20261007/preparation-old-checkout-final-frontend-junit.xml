@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="8" failures="0" errors="0" time="0.301755915">
+    <testsuite name="tests/frontend/production-customer-identity.test.tsx" timestamp="2026-10-07T09:11:32.355Z" hostname="4fe41ffd3696" tests="8" failures="0" errors="0" skipped="0" time="0.301755915">
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; clears fragments/query/history and consumes the proof once without storage or props" time="0.018381362">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; rejects malformed bearer " time="0.002395513">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; rejects malformed bearer #enroll.bad.proof" time="0.001227169">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; rejects malformed bearer #enroll.aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&amp;email=private" time="0.00113221">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; rejects malformed bearer #ENROLL.aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" time="0.001054517">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; retries identical request after uncertain response and accepts only the fixed minimal envelope" time="0.230160959">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; keeps completion proof out of rendered markup and sends it only in the fixed POST body" time="0.043658655">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; rejects duplicate keys and arbitrary redirects in success envelopes and uses current CSRF cookie" time="0.001295189">
+        </testcase>
+    </testsuite>
+</testsuites>

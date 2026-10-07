@@ -1,0 +1,32 @@
+{
+  "initial_source_commit": "1d90a1658618d79e36519d57c75b77af8b48d74a",
+  "status": "blocked_by_unchanged_independent_actual_smtp_permanent_user_temporary_shadow_canary",
+  "original_manifest_preserved_without_relabeling": true,
+  "preserved_raw_artifacts": {
+    "pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "final-sqlite.xml": "8c0630757c9b283cf69ae1c3fc7b3c47b0d2b459fe539982d8bbc1c9b92879d4",
+    "final-native.txt": "b0347f651ad97dfe6cd1391194935f879b262c5296bf1daa8b5b5112014bcb50",
+    "receipts.json": "96fdec41b76423b3bf7ef5c92a841d043dc9eec2caef6edd41641250088cb730",
+    "final-native.xml": "399d990c5252c678842dd79c4a56e2b933bc81c8bd92756c0696c981976173c2",
+    "source-map.json": "e11090f4f7addac05a5f992460e74ed408cc245e86aee581b79b6a3aeb402af6",
+    "final-sqlite.txt": "cb487cb7057ee3fa1d9b8caa2d96a353adda1c790b7303c4a0ad666279d71dda"
+  },
+  "original_manifest_references_without_archived_raw_artifact": [
+    "frontend.txt",
+    "frontend.xml",
+    "typecheck.txt"
+  ],
+  "intermediate_source_commit": "8e551ca71be9467e305e28ac29f3b23ab76a3739",
+  "intermediate_status": "superseded_by_actual_unknown_permanent_role_canary",
+  "intermediate_native_run_status": "development_only; began before final flag source changes and completed while they were being authored; not an exact frozen-source receipt",
+  "final_source_commit": "eaaa55be3bf35193e68a3ad8cac3cc99eec85e5e",
+  "superseded_artifacts": {
+    "pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "final-sqlite.xml": "8da70c827d3cd7fb47e90f7b9af633a8eb61c1a89ff7549c967845c2791250d8",
+    "unchanged-review-canary.txt": "616123b1ba322cee7839b46392bcbe397e5313a58c823053a89c438fb32da9ce",
+    "final-native.txt": "24573a418c9ccbe6ee799a96ee590627a0d6580942cb00922a3bd50e5ea5d3a1",
+    "unchanged-review-canary.xml": "bcf27ab7cd2ede892009ac71aa55e7c6089537696d23639d0ee7840bf5d914fc",
+    "final-native.xml": "17ff9068fa95fab94f81a816dd411200ca1cf3626b90e2ba38a5109663c5b5e8",
+    "final-sqlite.txt": "f793db69d5216769e3f71d1ae675a972a8d4a7270fb04ede8bf73269fa4e2001"
+  }
+}

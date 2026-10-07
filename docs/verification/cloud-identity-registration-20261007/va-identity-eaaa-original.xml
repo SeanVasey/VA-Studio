@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\IndependentIdentity\ProductionIdentityPermanentUserCanaryTest" file="/workspace/VA-Studio-identity-independent/tests/Feature/ProductionIdentityPermanentUserCanaryTest.php" tests="1" assertions="1" errors="1" failures="0" skipped="0" time="0.437441">
+    <testcase name="test_sign_in_observes_permanent_credential_withdrawal_and_refuses_a_temporary_old_user_copy" file="/workspace/VA-Studio-identity-independent/tests/Feature/ProductionIdentityPermanentUserCanaryTest.php" line="15" class="Tests\IndependentIdentity\ProductionIdentityPermanentUserCanaryTest" classname="Tests.IndependentIdentity.ProductionIdentityPermanentUserCanaryTest" assertions="1" time="0.437441">
+      <error type="App\Domain\Customers\ProductionIdentity\IdentityException">Tests\IndependentIdentity\ProductionIdentityPermanentUserCanaryTest::test_sign_in_observes_permanent_credential_withdrawal_and_refuses_a_temporary_old_user_copy
+App\Domain\Customers\ProductionIdentity\IdentityException: This customer identity request could not be confirmed.
+
+/workspace/VA-Studio-identity-independent/app/Domain/Customers/ProductionIdentity/IdentityPolicy.php:85
+/workspace/VA-Studio-identity-independent/app/Domain/Customers/ProductionIdentity/IdentityRequests.php:26
+/workspace/VA-Studio-identity-independent/tests/Support/ProductionIdentityFixture.php:68
+/workspace/VA-Studio-identity-independent/tests/Support/ProductionIdentityFixture.php:49
+/workspace/VA-Studio-identity-independent/tests/Feature/ProductionIdentityPermanentUserCanaryTest.php:18</error>
+    </testcase>
+  </testsuite>
+</testsuites>

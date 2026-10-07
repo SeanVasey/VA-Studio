@@ -1,0 +1,13 @@
+
+> test
+> vitest run tests/frontend/production-customer-identity.test.tsx tests/frontend/production-identity-registration.test.tsx
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-identity-registration
+
+
+ Test Files  2 passed (2)
+      Tests  14 passed (14)
+   Start at  09:01:02
+   Duration  1.14s (environment 55%, tests 25%, setup 9%, transform 8%, import 2%)
+
