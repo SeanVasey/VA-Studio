@@ -2,7 +2,11 @@
 
 Lane `harness/production-preparation-1`, a worktree of `main` at
 `3716324a51b0f7458ea68bdbab7b0696955923a7` (PR #42 merge). This is a development checkpoint,
-**not** production acceptance. It is not pushed and it has no independent review yet.
+**not** production acceptance. The branch is pushed as PR #46. An independent review of
+`01a2590d` returned **APPROVE WITH CONDITIONS**
+([`independent-review/DECISION.md`](independent-review/DECISION.md)). Its R-1, R-2 and R-6
+follow-ups are below. The approval covers merging the preparation tooling only, not any
+activation, real key, `--probe` against Stripe, flag change or S1–S3 step.
 
 This lane used no real credentials, made no network or provider calls, deployed nothing and
 changed no DNS. Every key, account, event and file in it is synthetic and labelled that way.
@@ -17,10 +21,15 @@ It used no native MySQL: every PHP test ran on the SQLite default from `phpunit.
 | `0dff5565` | 3: synthetic backup/restore proof and MySQL procedure (documented, not run) |
 | `eebd453f` | 4: annotated production environment template and the `.env.example` documentation block |
 | `01a2590d` | 5: staged activation packet (prepared, not executed) |
-| this commit | 6: this receipt |
+| `a2b56002` | 6: this receipt (first version) |
+| `3d615162` | Review R-1 and R-2 fixes (probe class guard; funds mode bound to `APP_ENV`) |
+| the commit after `3d615162` | Review R-6: this README, the packet's plan path and R-3 note, the queue row, and `independent-review/DECISION.md` |
 
-The tested source is `01a2590d29ea27ebe5bb10df78c1ef5bb5f0ece6`. This README is the only
-file added after it.
+The first tested source was `01a2590d29ea27ebe5bb10df78c1ef5bb5f0ece6`, and the reviewer
+assessed exactly that. The review follow-up was tested at
+`3d6151624c063c98075eef3414114ee7afe06c5f`; after it, only documentation changed. The
+reviewer's condition 3 applies: `StripeCapabilityProbe.php`, `StripeCapabilityPreflight.php`
+and their test changed after `01a2590d`, so those files need re-review.
 
 ## Commands and results
 
@@ -50,6 +59,61 @@ Other checks:
 | `git diff --check 3716324a..HEAD` | clean |
 | `php artisan vasey:stripe-preflight --json` (local `.env`, no checkout configuration) | exit 1; `configuration_shape_valid: false`, `pins_valid: true`; counts blocked 5 / absent 2 / pass 5 / not_requested 1; `provider_io_performed: false` |
 | `php scripts/ops/backup-restore-proof.php --synthetic-proof --workdir <scratch 0700 dir>` | `RESTORE_VERIFIED`, 15/15 checks; 28,672 database bytes; 7 private files, 398,644 bytes |
+
+## Review follow-up (2026-10-07)
+
+**R-1 (Low), fixed in `3d615162`.** The guard in `StripeCapabilityProbe::observe()` now
+requires a fixture transport exactly when `APP_ENV` is `testing`, so the class itself (not
+only the preflight command) never builds the real transport under tests. An optional
+real-transport factory (default: the same bounded `CurlClient`) lets the new test prove the
+factory is never called.
+
+**R-2 (Low), fixed in `3d615162`.** The new check `funds_mode_environment` applies the rule
+`ExecutionContextV1::make` uses: test funds only when `APP_ENV` is `local` or `testing`. It
+feeds `configuration_shape_valid`, so it also gates the probe. Live funds outside production
+stay allowed, because checkout allows them (`ProductionCheckoutProviderTest` runs live in
+`testing`). The reviewer's stronger "live only in production" option was not adopted, so
+that the preflight matches checkout exactly.
+
+**Red, then green.** The red run used no network: the factory returned a throwing fake
+transport.
+
+| Run | Source | Tests | Assertions | Failures |
+| --- | --- | ---: | ---: | ---: |
+| Red: `--filter 'never_builds_the_real_transport\|funds_mode_follows'` | before the fix | 6 | 8 | 6 |
+| Green: the full file | `3d615162` | 37 | 318 | 0 |
+
+In the red run, R-1 built the real transport once, and R-2's check was missing in all five
+environment cases.
+
+**The six suites again, at `3d615162`:**
+
+| Selection | Tests | Assertions | Failures | Errors | Skips |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `StripeCapabilityPreflightTest` | 37 | 318 | 0 | 0 | 0 |
+| `PaymentWebhookPreparationChecksTest` | 13 | 113 | 0 | 0 | 0 |
+| `BackupRestoreProofTest` | 10 | 252 | 0 | 0 | 0 |
+| `ProductionEnvironmentTemplateTest` | 6 | 1629 | 0 | 0 | 0 |
+| `ProductionCommerceReadinessTest` | 66 | 334 | 0 | 0 | 0 |
+| `StripeWebhookTest` | 53 | 230 | 0 | 0 | 0 |
+| **Total** | **185** | **2876** | **0** | **0** | **0** |
+
+Pint `--test` passes on the changed files, and `git diff --check` is clean. A local
+`php artisan vasey:stripe-preflight --json` now reports blocked 6 / absent 2 / pass 5 /
+not_requested 1; the extra blocked check is `funds_mode_environment` with no funds mode set.
+
+**Accepted findings, documented and not changed here:**
+- **R-3 (Info).** The probe uses the checkout's own `PRODUCTION_CHECKOUT_PROVIDER_IO_ENABLED`.
+  Once checkout is composed, enabling it for the probe also enables checkout provider I/O.
+  This is now noted in the packet's S2 step 2.
+- **R-4 (Low).** The documented MySQL restore `diff` will likely report dump-header noise.
+  Add `--skip-comments` to both dumps, or filter comment lines, and rehearse before relying
+  on it.
+- **R-5 (Info).** The signature-only test asserts zero `verified_payments` and
+  `payment_observations`, which come before any grant. It doesn't count entitlement tables
+  directly.
+- **R-7 (Info).** A `failed` probe reports `provider_io_performed: true` even when it failed
+  on a precondition. This over-reports, which is the safe direction.
 
 ## Mutation checks
 
@@ -140,13 +204,17 @@ them.
   used in this lane.
 - Host, storage, worker, scheduler, TLS, mail and DNS behaviour, all of which wait on U-02 and
   U-03.
-- Hosted CI. No Foundation CI or PR preflight ran (CI cost policy). No independent review has
-  assessed this candidate. The probe and the webhook-chain conclusions touch payment code, so
-  they need an independent review before anyone relies on them.
+- Hosted CI. No Foundation CI ran (CI cost policy). The independent review assessed
+  `01a2590d`; the R-1 and R-2 source change in `3d615162` needs re-review under its
+  condition 3.
 - Every merchant, tax, legal, price and terms fact. None was invented here; placeholders look
   like `<...>`, and fixtures use `SYNTHETIC`, `.invalid` and the `XXX` currency code.
 
 ## Next dependency
 
-An independent review of `7ffe5566..01a2590d`. After that, root composition decides whether to
-ship it with A4 or after A3 (Tax255), and Sean decides between S2a and S2b.
+1. Re-review the R-1 and R-2 delta (`a2b56002..3d615162`).
+2. Root composition then decides whether to ship this with A4 or after A3 (Tax255).
+3. Sean decides between S2a and S2b.
+
+Plan references are to `docs/handoff/2026-10-07/CLAUDE-PLAN.md`: §3 A4 and F1, and the §4
+list of inputs only Sean can supply.

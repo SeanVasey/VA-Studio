@@ -10,7 +10,8 @@ Prepared October 7, 2026 by lane `harness/production-preparation-1`, from base `
 > and the exact 40-character commit SHA it applies to. A template, a passing preflight or a
 > configured flag isn't operational proof and doesn't authorize anything.
 
-The packet implements CLAUDE-PLAN §3 A4 (live-payment preparation) and the
+The packet implements §3 A4 (live-payment preparation) of `docs/handoff/2026-10-07/CLAUDE-PLAN.md`
+(cited below as CLAUDE-PLAN) and the
 preparation half of F1 (rollout and rollback). The cutover runbook
 (`docs/migration/cutover_runbook.md`) still governs launch and rollback. Where the two
 differ, the runbook wins, and the difference should be reported.
@@ -36,7 +37,7 @@ lands, the stage that depends on it stays blocked whatever the environment conta
 
 ## 2. Inputs only Sean can supply
 
-These come from the CLAUDE-PLAN §4 list. Placeholders in this packet look like `<...>`; none
+These come from the `docs/handoff/2026-10-07/CLAUDE-PLAN.md` §4 list. Placeholders in this packet look like `<...>`; none
 of them has a value here.
 
 | Input | Unblocks | Where it lands |
@@ -176,10 +177,13 @@ and `PRODUCTION_CHECKOUT_REVIEW_LIFETIME_SECONDS`, plus an approved machine poli
 
 ```sh
 # 1. Shape only (no provider I/O): expect configuration_shape_valid=true, secret_key_reference=present.
+#    Test funds pass funds_mode_environment only when APP_ENV is local or testing (the ExecutionContextV1 rule).
 php artisan vasey:stripe-preflight --json
 
 # 2. The first provider contact: read-only GET /v1/account and capabilities.
 #    Needs PRODUCTION_CHECKOUT_PROVIDER_IO_ENABLED=true and config:cache. Both flags are mandatory.
+#    That flag is the checkout's own provider I/O switch (review R-3): once checkout is composed and registered,
+#    enabling it for the probe also enables checkout provider I/O on the host. Turn it off again afterwards.
 php artisan vasey:stripe-preflight --json --probe --i-understand-this-calls-stripe
 
 # 3. Test-mode receiver drills (S2a), with STRIPE_WEBHOOK_ENABLED=true and test flags on:
