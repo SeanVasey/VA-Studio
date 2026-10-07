@@ -3,8 +3,10 @@
 namespace App\Domain\Memberships\Production;
 
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
+use Closure;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
+use ReflectionFunction;
 use ReflectionProperty;
 
 /** Default-off capability/facts gate. A flag, hash, redirect or synthetic ledger cannot award. */
@@ -67,7 +69,7 @@ final class MembershipPolicy
         $items = (new ReflectionProperty(Repository::class, 'items'))->getValue($this->repository);
         MembershipException::require(is_array($items) && is_array($items['production-memberships'] ?? []), 'changed_policy');
         $policy = $items['production-memberships'] ?? [];
-        $environment = $instances['env'] ?? null;
+        $environment = $this->environment($instances);
         $database = $items['database'] ?? null;
         MembershipException::require(is_array($database) && is_string($database['default'] ?? null)
             && is_array($database['connections'] ?? null) && is_array($database['connections'][$database['default']] ?? null), 'changed_policy');
@@ -81,5 +83,31 @@ final class MembershipPolicy
         return ['enabled' => $policy['enabled'] ?? null, 'version' => $policy['version'] ?? null,
             'provenance' => $policy['provenance'] ?? null, 'approved_policy_hash' => $policy['approved_policy_hash'] ?? null,
             'environment' => $environment, 'driver' => $driver];
+    }
+
+    /**
+     * Laravel binds `env` through Container::offsetSet as `fn () => $value`, never as an instance.
+     * Read that captured value by reflection instead of resolving the binding, and refuse any other
+     * binding: resolving it would run a callback. An instance, if one is ever set, keeps precedence
+     * exactly as the container gives it.
+     */
+    private function environment(array $instances): mixed
+    {
+        if (array_key_exists('env', $instances)) {
+            return $instances['env'];
+        }
+        $bindings = (new ReflectionProperty(Container::class, 'bindings'))->getValue($this->container);
+        $concrete = is_array($bindings) ? ($bindings['env']['concrete'] ?? null) : null;
+        if ($concrete === null) {
+            return null;
+        }
+        MembershipException::require($concrete instanceof Closure, 'changed_policy');
+        $function = new ReflectionFunction($concrete);
+        $variables = $function->getStaticVariables();
+        MembershipException::require($function->getClosureScopeClass()?->getName() === Container::class
+            && $function->getClosureThis() === $this->container && array_keys($variables) === ['value']
+            && is_string($variables['value']), 'changed_policy');
+
+        return $variables['value'];
     }
 }

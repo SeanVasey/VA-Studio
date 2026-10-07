@@ -132,11 +132,17 @@ class MembershipPreparationTest extends TestCase
 
     public function test_nullable_cached_environment_is_an_ordinary_baseline_without_award_authority(): void
     {
+        // Laravel keeps `env` as a binding, not an instance; remove both to reach a null environment.
         $property = new ReflectionProperty(Container::class, 'instances');
+        $bindingsProperty = new ReflectionProperty(Container::class, 'bindings');
         $instances = $property->getValue($this->app);
+        $bindings = $bindingsProperty->getValue($this->app);
         $withoutEnvironment = $instances;
         unset($withoutEnvironment['env']);
+        $withoutBinding = $bindings;
+        unset($withoutBinding['env']);
         $property->setValue($this->app, $withoutEnvironment);
+        $bindingsProperty->setValue($this->app, $withoutBinding);
         try {
             $policy = new MembershipPolicy;
             $baseline = (new ReflectionMethod(MembershipPolicy::class, 'configuration'))->invoke($policy);
@@ -145,6 +151,7 @@ class MembershipPreparationTest extends TestCase
             $policy->proveConfiguration($baseline);
         } finally {
             $property->setValue($this->app, $instances);
+            $bindingsProperty->setValue($this->app, $bindings);
         }
     }
 
