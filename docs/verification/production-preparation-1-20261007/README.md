@@ -362,6 +362,12 @@ happy path passes under umask 077 with the backup directory still 0700; a root-o
 file is refused; an unknown group name stops the procedure (the old form passed); without
 `-p` the root `.gitignore` came back 0600.
 
+Codex's thirteenth pass (P2 ×2, docs): `php artisan up` preceded the worker and scheduler
+restart, so a service that failed to start left the application live without its writers;
+the restart and `is-active` check now come first and a successful `php artisan up` is the
+final step (a failed start keeps maintenance mode on). The step 2 `tar --create` is fatal on
+a nonzero exit, as extraction already was.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex

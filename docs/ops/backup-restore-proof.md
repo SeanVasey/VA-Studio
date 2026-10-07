@@ -91,14 +91,17 @@ sha256sum <BACKUP_DIR>/database.sql > <BACKUP_DIR>/database.sql.sha256
 unmanifested=$(cd <PRIVATE_ROOT> && find . \( ! -type f ! -type d \) -o \( -type f -links +1 \)) || exit 1
 [ -z "$unmanifested" ] || { echo 'unmanifested entry in <PRIVATE_ROOT>'; exit 1; }
 (cd <PRIVATE_ROOT> && find . -type f -print0 | sort -z | xargs -0 -r sha256sum) > <BACKUP_DIR>/private.sha256   # -r: an empty tree gives an empty manifest, not a hash of stdin
-tar --create --file=<BACKUP_DIR>/private.tar --directory=<PRIVATE_ROOT> --numeric-owner .
+#    A partial archive (tar stopped by a read error) can omit an empty directory the
+#    file-only manifest cannot see, so archive creation is fatal, as extraction is in step 3.
+tar --create --file=<BACKUP_DIR>/private.tar --directory=<PRIVATE_ROOT> --numeric-owner . || exit 1
 sha256sum <BACKUP_DIR>/private.tar > <BACKUP_DIR>/private.tar.sha256
-php artisan up   # lifts maintenance mode only; it does not restart anything stopped in step 0b
-# Restart every writer stopped in step 0b and verify it is back before treating the live
-# installation as resumed (the queue workers carry payment, contract and media work; the
-# scheduler carries recovery jobs). Service names are the host's; the private-server
-# runbook names them. Everything below touches only the isolated targets.
+# Restart every writer stopped in step 0b and verify it is back before HTTP traffic resumes
+# (the queue workers carry payment, contract and media work; the scheduler carries recovery
+# jobs). Service names are the host's; the private-server runbook names them. If a service
+# fails to start the application stays in maintenance mode (fail safe): fix the service,
+# then run `php artisan up` by hand. Everything below touches only the isolated targets.
 systemctl start <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> && systemctl is-active <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> || exit 1
+php artisan up   # lifts maintenance mode only, and only once the writers above are back
 
 # 3. Restore into the isolated targets only. The dump is loaded unchanged (its CREATE DATABASE
 #    and USE name <DATABASE>), so no stored value can be rewritten by a rename.
