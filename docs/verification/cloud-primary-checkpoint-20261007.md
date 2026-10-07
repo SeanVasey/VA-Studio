@@ -106,3 +106,45 @@ against current source rather than importing obsolete workflows. The
 [all-scope audit](cloud-completion-audit-20261007.md) retains40 groups/103 mappings
 and concrete authorized code gaps. Customer favorites/playlists, recovered inquiry
 work and public installation/private checkout now advance in isolated branches.
+
+## Second integration milestone and reviewed recovery batch
+
+PR27 merged expected head `bc64fa9940ad53d7e92a270046fca2db34bfb8c0`
+at 02:15 America/Chicago as `22d340bd0a19cfb025b0f2b48171283f4b61d156`,
+tree `56c4d61845dcddd531165a10096c1af73299e882`. Fresh Git/GitHub readbacks
+verified both ordered parents. Cheap preflight37585789826 and automatic code/
+security review completed without findings; independent route/evidence review
+remains recorded. No routine matrix was launched.
+
+Recovered public installation/private checkout executable
+`26700f97268a29209718ffc2fac534deb5259c2d`, evidence
+`ddd7c58d9914aeaeb1da782cfee8dc3dfffb8dfd`, is composed at
+`d6324f9808fba13346aaf2b628df83b62c192208`. Root's independent review
+`11ac78a4a7c43b08581a1204b42125c8d99ebf97` verifies all24 source paths,
+19 exact recovered blobs and actual focused receipts. No commerce domain,
+contract, migration, dependency or workflow changed. Public manifest uses exact
+approved whole-logo derivatives; authorized checkout return reuses current
+site chrome and fixed private metadata. Current native browser definitions
+are unexecuted; historical native receipts are provenance only. Publication
+and cheap preflight follow this checkpoint; no final acceptance is claimed.
+
+Unfinished sensitive lanes have concrete retained review findings: PR25's
+112 before/after DDL failure boundaries are under native review, with a new
+SQLite reserved table/trigger identity collision repair pending; listening
+has reproduced terminal account/password/policy/row drift and insufficient
+rollback-ownership checks, being repaired before approval. Root account API/
+page registration is composed in `/workspace/VA-Studio-listening-registration`.
+Two root HTTP test-fixture failures (CSRF middleware identity and missing token
+before the production-policy assertion) were corrected; corrected11/89 pass
+does not resolve the domain findings. Inquiry notifications are undergoing
+native proof and foreign-reference rollback repair. Service brief/quote/project
+code and UI are in progress. Actual owner/file boundaries are in the current
+agent queue; none of these unfinished lanes is reported as accepted.
+
+Rootless native MySQL8.0.46 remains running for separate synthetic author/review
+databases. It supplies real local concurrency/DDL evidence, not MySQL8.4 final
+certification. Worktree package directories share unchanged locked package
+bytes with independent generated autoloads; duplicate generated copies were
+removed after disk exhaustion, preserving all source and evidence. Remaining
+operative commerce, grant origins, paid products, CRM, migration and hosting
+work follows the audit after each coherent batch without another user prompt.

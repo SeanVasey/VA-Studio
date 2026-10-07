@@ -1,5 +1,19 @@
 # Remaining development and completion plan
 
+## Current cloud execution — October 7, 2026 UTC
+
+PR26 and PR27 are merged at verified main
+`22d340bd0a19cfb025b0f2b48171283f4b61d156`. The
+[source-backed completion audit](verification/cloud-completion-audit-20261007.md)
+reconciles all40 groups and103 parity mappings against actual source; counts
+are outcome tracking, not a completion percentage. The
+[current agent queue](development-agent-queue.md) replaces stale active owner
+tables below. Reviewed installation/checkout recovery is composed; PR25
+migration recovery, private listening, inquiry notifications and service
+projects continue with independent sensitive review and focused local checks.
+The full personal-store scope and existing obligations remain required. No
+final acceptance or production readiness follows from these development passes.
+
 ## Reviewed corrective development candidate — October 7, 2026 UTC
 
 PR #17 retains policy-bound preparation and corrects both the PR #16 membership
