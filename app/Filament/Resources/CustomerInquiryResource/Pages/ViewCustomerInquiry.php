@@ -6,6 +6,7 @@ use App\Domain\Inquiries\InquiryAdministration;
 use App\Domain\Inquiries\InquiryConversation;
 use App\Domain\Inquiries\InquiryException;
 use App\Filament\Resources\CustomerInquiryResource;
+use App\Support\SupportAttachmentUi;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Textarea;
@@ -77,6 +78,8 @@ final class ViewCustomerInquiry extends ViewRecord
                 $this->replyRequestKey = null;
                 $this->replyMessage = null;
                 Notification::make()->success()->title('Reply saved in app')->body('No email was sent.')->send();
-            }), CustomerInquiryResource::stateAction('markRead', 'Mark read', 'read'), CustomerInquiryResource::stateAction('archive', 'Archive', 'archived')];
+            }), CustomerInquiryResource::stateAction('markRead', 'Mark read', 'read'), CustomerInquiryResource::stateAction('archive', 'Archive', 'archived'),
+            Action::make('attachments')->label('Private attachments')->visible(fn (): bool => SupportAttachmentUi::enabled())
+                ->url(fn (): string => '/private-support/operator/inquiries/'.$this->getRecord()->public_id.'/attachments/view')];
     }
 }

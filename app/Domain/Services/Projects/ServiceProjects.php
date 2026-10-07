@@ -137,6 +137,17 @@ final class ServiceProjects
         return $this->command($id, ServiceProjectInput::command($body, true), $actor);
     }
 
+    /** Internal retained-row validation; the attachment adapter separately owns current authority and locks. */
+    public function attachmentGraphState(array $project, array $events): array
+    {
+        if (count($events) > 1000) {
+            throw new ServiceProjectException(503);
+        }
+        $projection = $this->projection($project, $events);
+
+        return ['version' => $projection['version'], 'status' => $projection['status']];
+    }
+
     private function command(string $id, array $body, User $actor, ?CustomerPrincipal $principal = null): array
     {
         return $this->transaction(function () use ($id, $body, $actor, $principal): array {

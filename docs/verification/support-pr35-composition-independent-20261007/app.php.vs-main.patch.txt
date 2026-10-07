@@ -1,0 +1,50 @@
+diff --git a/bootstrap/app.php b/bootstrap/app.php
+index da663e4..58880d4 100644
+--- a/bootstrap/app.php
++++ b/bootstrap/app.php
+@@ -10,10 +10,12 @@ use App\Http\Middleware\ResumableUploadPrivacy;
+ use App\Http\Middleware\ServiceProjectPrivacy;
+ use App\Http\Middleware\SitePreviewPrivacy;
+ use App\Http\Middleware\StripeWebhookBodyLimit;
++use App\Http\Middleware\SupportAttachmentPrivacy;
+ use App\Http\Middleware\TestDeliveryPrivacy;
+ use App\Http\Middleware\TestExceptionResolutionPrivacy;
+ use App\Http\Responses\InquiryResponse;
+ use App\Http\Responses\PublicTrackEmbedResponse;
++use App\Http\Responses\SupportAttachmentResponse;
+ use App\Http\Responses\TestDeliveryResponse;
+ use App\Http\Responses\TestExceptionResolutionResponse;
+ use Illuminate\Contracts\Cache\LockTimeoutException;
+@@ -49,6 +51,7 @@ return Application::configure(basePath: dirname(__DIR__))
+         $middleware->prepend(ServiceProjectPrivacy::class);
+         $middleware->prepend(IdentityPrivacy::class);
+         $middleware->prepend(FreeGrantPrivacy::class);
++        $middleware->prepend(SupportAttachmentPrivacy::class);
+         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
+         $middleware->web(append: [HandleInertiaRequests::class]);
+     })
+@@ -58,6 +61,14 @@ return Application::configure(basePath: dirname(__DIR__))
+             fn (Request $request) => ((CustomerPrivacy::matches($request) || ServiceProjectPrivacy::matches($request)) && $request->isMethod('POST')) || ResumableUploadPrivacy::endpoint($request) || $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
+         );
+         $exceptions->report(function (Throwable $exception) {
++            if (SupportAttachmentPrivacy::matches(request())) {
++                try {
++                    Log::error('Private attachment request failed.', ['exception_class' => $exception::class]);
++                } catch (Throwable) { /* Preserve the private response. */
++                }
++
++                return false;
++            }
+             if (FreeGrantPrivacy::matches(request())) {
+                 FreeGrantPrivacy::report($exception);
+ 
+@@ -158,6 +169,9 @@ return Application::configure(basePath: dirname(__DIR__))
+         // Middleware failures occur before the controller. Keep those private and
+         // generic too, including in debug mode, without changing other routes.
+         $exceptions->respond(function (Response $response, Throwable $exception, Request $request): Response {
++            if (SupportAttachmentPrivacy::matches($request)) {
++                return $response->getStatusCode() >= 400 ? SupportAttachmentResponse::error($response->getStatusCode()) : SupportAttachmentResponse::protect($response);
++            }
+             if (FreeGrantPrivacy::matches($request)) {
+                 return $response->getStatusCode() >= 400 ? FreeGrantPrivacy::error($response->getStatusCode()) : FreeGrantPrivacy::protect($response);
+             }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\SupportAttachmentRegistrationTest" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" tests="2" assertions="88" errors="0" failures="2" skipped="0" time="1.529658">
+    <testcase name="test_actual_page_and_action_throttles_keep_safe_retry_headers_on_private_errors" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="125" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="74" time="1.083463">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentRegistrationTest::test_actual_page_and_action_throttles_keep_safe_retry_headers_on_private_errors
+Header [X-RateLimit-Limit] not present on response.
+Failed asserting that false is true.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:378
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php:135</failure>
+    </testcase>
+    <testcase name="test_private_http_exception_headers_cannot_disclose_arbitrary_values_or_redirect" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="142" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="14" time="0.446194">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentRegistrationTest::test_private_http_exception_headers_cannot_disclose_arbitrary_values_or_redirect
+Header [Retry-After] not present on response.
+Failed asserting that false is true.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:378
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php:150</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="SupportClosureSessionBoundaryTest" file="/tmp/SupportClosureSessionBoundaryTest.php" tests="1" assertions="6" errors="0" failures="1" skipped="0" time="0.833230">
+    <testcase name="test_actual_final_download_session_owner_revocation_is_not_old_request_authority" file="/tmp/SupportClosureSessionBoundaryTest.php" line="14" class="SupportClosureSessionBoundaryTest" classname="SupportClosureSessionBoundaryTest" assertions="6" time="0.833230">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">SupportClosureSessionBoundaryTest::test_actual_final_download_session_owner_revocation_is_not_old_request_authority
+Expected response status code [403] but received 200.
+Failed asserting that 200 is identical to 403.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/tmp/SupportClosureSessionBoundaryTest.php:28</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

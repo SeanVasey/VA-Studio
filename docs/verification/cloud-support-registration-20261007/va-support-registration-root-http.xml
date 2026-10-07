@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\SupportAttachmentRegistrationTest" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" tests="6" assertions="81" errors="0" failures="4" skipped="0" time="2.214032">
+    <testcase name="test_visitor_page_has_fresh_scope_and_executable_page_csp_but_json_and_original_are_sandboxed" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="37" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="23" time="0.581555">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentRegistrationTest::test_visitor_page_has_fresh_scope_and_executable_page_csp_but_json_and_original_are_sandboxed
+Expected response status code [200] but received 422.
+Failed asserting that 422 is identical to 200.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php:51</failure>
+    </testcase>
+    <testcase name="test_registered_project_provider_admits_only_current_owner_or_current_mfa_operator" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="61" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="4" time="0.475379">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentRegistrationTest::test_registered_project_provider_admits_only_current_owner_or_current_mfa_operator
+Expected response status code [200] but received 422.
+Failed asserting that 422 is identical to 200.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php:68</failure>
+    </testcase>
+    <testcase name="test_visitor_rotation_and_default_off_disable_page_and_api_without_disclosing_source" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="81" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="16" time="0.276412">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentRegistrationTest::test_visitor_rotation_and_default_off_disable_page_and_api_without_disclosing_source
+Expected response status code [404] but received 422.
+Failed asserting that 422 is identical to 404.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:151
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php:86</failure>
+    </testcase>
+    <testcase name="test_real_csrf_precedes_upload_and_private_errors_never_echo_filename_or_file" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="92" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="19" time="0.266201"/>
+    <testcase name="test_unknown_routes_methods_query_and_foreign_origin_are_private_before_controller" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="110" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="2" time="0.240097">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentRegistrationTest::test_unknown_routes_methods_query_and_foreign_origin_are_private_before_controller
+Expected response status code [404] but received 422.
+Failed asserting that 422 is identical to 404.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:151
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php:113</failure>
+    </testcase>
+    <testcase name="test_precontroller_failure_logs_only_exception_class_and_sandboxes_debug_response" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="119" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="17" time="0.374387"/>
+  </testsuite>
+</testsuites>

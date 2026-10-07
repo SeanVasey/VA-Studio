@@ -1,0 +1,21 @@
+{
+  "source": "35b3d98bb2aec3366d8e8719e2b10e746c804bd8",
+  "documentation_base": "e2ca76c0d19c55e504108831edfb1666fc07e6aa",
+  "published_predecessor": "6a1c727339f4b6377285e831add6f8a01bc07b00",
+  "verified_source": {
+    "app/Http/Responses/SupportAttachmentResponse.php": "b6a7f26599a07746e8ce169547ad955fab65d500c399fce0b5077ad7ba334965",
+    "app/Http/Middleware/SupportAttachmentPrivacy.php": "1e21eb08287e8a232b5451acafebb7cef2ed87312285a8d2e70e6b0217a4173a",
+    "bootstrap/app.php": "866204f62ff4ca102c703a52a683350a810bd6d2592457707ac551bd94f5d5b7",
+    "tests/Feature/SupportAttachmentRegistrationTest.php": "7a9033b392b1cc52262b7b1b6bd3701f7384726e3aa065d35c5000237d20a75d"
+  },
+  "verified_root_artifacts": 17,
+  "own_result": {
+    "cases": 3,
+    "assertions": 141,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "seconds": 2.2
+  },
+  "scope": "Three runtime response-projection paths + regression test only; no domain/schema/authority/provider or native query changes"
+}

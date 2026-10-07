@@ -1,0 +1,55 @@
+{
+  "executable_composition": "a9eb1ac23718874db3d38ae0dbeb1deab7539dba",
+  "main": "cd83b0cf4bddaeac9b113fabe7a918e37bfd2901",
+  "checkpoint": "7131d87",
+  "prior_runtime_approval": "15c9e34630966243ce92783dbacf167f908262ee",
+  "test_lifecycle_approval": "662d5baec69a7f98b5fee5722df0d2819712b3e4",
+  "verified_carry": {
+    "unchanged_approved_bindings": 32,
+    "unchanged_original_artifacts": 41,
+    "changed_test_bindings": 7,
+    "source_bound_root_artifacts": 15
+  },
+  "actual_shared_selection": {
+    "tests": 45,
+    "passed": 45,
+    "assertions": 608,
+    "files": [
+      "SupportAttachmentRegistrationTest",
+      "PublicDiscoveryIndexTest",
+      "DiscoverySitemapRegistrationTest",
+      "DiscoverySitemapReviewRegressionTest",
+      "FreeGrantRegistrationTest"
+    ]
+  },
+  "shared_files_sha256": {
+    "bootstrap/app.php": "324778666edbbee394b1496cd61601a5347f83cc57f6b3c2bb0ca7e541dc2709",
+    "app/Http/Controllers/PublicDiscoveryController.php": "9d0fcb179ab3315f14eb7b1ae7f81ad6d698f50eb31ca799e98bef0f8fa96484",
+    "tests/Feature/PublicDiscoveryIndexTest.php": "5bc7ecfef421c1b56956b4b316a8aa71fc4675fdb44b1b549af1cc9dcc9bf6ba",
+    "resources/js/app.tsx": "cf38ac0f0221bc03fef9b318b82ed0974a4fbbdd0ad620d40004e9235a3df8c5",
+    "routes/web.php": "a39d0e051d67b63356844c4adce045f35e8640f00eb9af0a90858941ec8fa11f",
+    "routes/discovery-track-sitemaps.php": "7537a4120fa840eeb9e44bdc65c6a04567c121880a40ca128ac472286d4961ec",
+    "tests/Feature/DiscoverySitemapRegistrationTest.php": "f569470a7a0dee246ca4a44e447f8cc58fa107518dabd753d85939c538fe3661"
+  },
+  "artifact_sha256": {
+    "va-support-pr35-composed.txt": "8cd55d24995a754d08eec258ffcaea6a48ef76b5197a9e71308e0750e71c66ee",
+    "va-support-pr35-composed.xml": "c965736f4ce103f6f029c358355cdcb6faf2e0638e6a8f9e1306247f0a33846f",
+    "va-support-pr35-composed-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "va-support-throttle-composed.txt": "60888c7f7abc235b1845224f3d35a3cdc3fc184fa0bb6876cc8de8fd20bbd083",
+    "va-support-throttle-composed.xml": "e451d49283326a9398dd29544427a77e5e76b7591fd2994c6c45d52ff7e75913"
+  },
+  "limitations": [
+    "Separate fullfamily throttle correction is mergedPR36 with approved exactsource. Support runtime/lifecycle/shared approvals carry on this onlydisjoint route/test delta.",
+    "Native runtime/normalizedfixture selections retain exact predecessor source attribution; no new native execution in this shared-only merge",
+    "Defaultofffixturefamily; no production actor/provider/scanner or final8.4/browser/Foundation acceptance"
+  ],
+  "final_shared_composition": "f859f88cb65a57cc0effd33eca3996d790ca9dfa",
+  "merged_throttle_main": "ef444949bd694b841112695c90b7d27c2f698ead",
+  "throttle_independent_approval": "2dead7973683362b80823d14d81386e2fb8c6946",
+  "shared_independent_approval": "de314e2fb6fec289ae2a349867f7a7218d2f0827",
+  "actual_new_family_after_support_merge": {
+    "tests": 1,
+    "passed": 1,
+    "assertions": 193
+  }
+}

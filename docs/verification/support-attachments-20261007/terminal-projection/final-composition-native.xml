@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="3" assertions="96" errors="0" failures="0" skipped="0" time="81.829754">
+    <testsuite name="Tests\Feature\SupportAttachmentsTest" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" tests="1" assertions="6" errors="0" failures="0" skipped="0" time="28.845917">
+      <testcase name="test_terminal_inquiry_panel_callback_cannot_withdraw_intake_and_finish_scan" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentsTest.php" line="544" class="Tests\Feature\SupportAttachmentsTest" classname="Tests.Feature.SupportAttachmentsTest" assertions="6" time="28.845917"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\SupportAttachmentHttpTest" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentHttpTest.php" tests="2" assertions="90" errors="0" failures="0" skipped="0" time="52.983837">
+      <testcase name="test_real_private_routes_intake_quarantine_scan_and_download_exact_original" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentHttpTest.php" line="47" class="Tests\Feature\SupportAttachmentHttpTest" classname="Tests.Feature.SupportAttachmentHttpTest" assertions="61" time="28.905919"/>
+      <testcase name="test_session_rotation_denies_retained_read_and_csrf_is_enforced_outside_testing" file="/workspace/VA-Studio-support-attachments/tests/Feature/SupportAttachmentHttpTest.php" line="94" class="Tests\Feature\SupportAttachmentHttpTest" classname="Tests.Feature.SupportAttachmentHttpTest" assertions="29" time="24.077917"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

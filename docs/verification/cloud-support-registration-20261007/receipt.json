@@ -1,0 +1,442 @@
+{
+  "frozen_registration_source": "781a3b4397784ed2e2fc86447cb91fec82af84e3",
+  "selective_base": "da70eba95c46522cd4084db4e79f764ba401fd7c",
+  "source_bindings": [
+    {
+      "path": "app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentAuthority.php",
+      "git_blob": "dc8ec390c9a541a7c46c14066767cea74273c93c",
+      "sha256": "b21dcd4c4b048f90c6c5502dc167d7c62c9691fb05a867d0550215f0174c9495"
+    },
+    {
+      "path": "app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentSourceV1.php",
+      "git_blob": "22672055a3754665b9d834568c0a36ceac5eb676",
+      "sha256": "f441db1a805c1802688e272921470916ac6b45f57d58ea0751b40842fef5b97e"
+    },
+    {
+      "path": "app/Domain/Services/Projects/ServiceProjects.php",
+      "git_blob": "6a6bf96793a292f359a431fb0de4f9887f071039",
+      "sha256": "7ab19cfeb0f4b90641c4235faf31bb74881b9f4bbcb69265bfaec33ccc454223"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentActor.php",
+      "git_blob": "22b5b290416af3377ce3c700f38f1baf09b48c33",
+      "sha256": "a13026bdd672d8e455919919d59994a813fa69711e67c230a4f8390cb8d4b5e6"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentActorResolver.php",
+      "git_blob": "443e9cd17580981dab6c8b92cf7d2c5cd68f60e4",
+      "sha256": "eb72264687744b948add30ac55abada9492d22286610a55f7b6ac2f51adee7e3"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentException.php",
+      "git_blob": "6a23d9870c1b092b534bc31166813d468b5d3daf",
+      "sha256": "3ce2e774906120a7a3e15211d88c110aed83c13625267e4e3caa36146aa2a583"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentFiles.php",
+      "git_blob": "e05f45c5aff45fe3e8c5a891b7c6c185fa7abaec",
+      "sha256": "4344ff6748515027b519b469ee61cc39b92c7b4bf612093595ec79f50290cb33"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentMutationAuthority.php",
+      "git_blob": "1eb6ba27d38b4983e4ad98974f24838de83782f1",
+      "sha256": "07399afcf97da7d6294b109a1dd022dd9567c88b39036e46cfa4d63ee43fc8c0"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentPolicy.php",
+      "git_blob": "a253c510a45357a4a439ac5dfb1e99d1b1c074a4",
+      "sha256": "18f642b2aafb412f87c086d3954e091ed8749e2a1300adc94b4df694dee3d00b"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentRegistry.php",
+      "git_blob": "07d7f4c1b2ba6df55c8d81c81bbc31463103d84e",
+      "sha256": "8585883afbdc7d10ee0224f1f9a936c242ea2122038a441cfe624e49d964035d"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentRemoval.php",
+      "git_blob": "96dd0fd55460d7b13804e3769e591a5f67dd10e4",
+      "sha256": "eb836a6fdb119be91b4957f209b660fa53e36f33944b8dbf83e54dc3feba6d22"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentRows.php",
+      "git_blob": "cc68e2f5bf30bbfc057a7f670195c5761fdacab8",
+      "sha256": "03269d3ad1a7b432df37fd8fcb026ed8b30b13ccb12d9029dd657cf316d378d4"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentSchema.php",
+      "git_blob": "9b7b64605560f1177c91b893c8a2dff21b96b88a",
+      "sha256": "8e4221aa01a8a8ee3aecd28c15bf982e3d27fe769cad5bdcb5f6b93f5b85427f"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentSnapshot.php",
+      "git_blob": "29e999df1ecb9ca75fc6b5eda56697c3c034c1fb",
+      "sha256": "b0e032d49b5694604ccc1d42e9641f3d085a09df3c015f504f25e21efab94fbf"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentSourceAuthority.php",
+      "git_blob": "590232fd9ad799bba9a20c536a8f7b551de82325",
+      "sha256": "1837028d3b88cad1e430dfd839c214b8be282b6800d8bf93afab36454f828e35"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentSourceProof.php",
+      "git_blob": "96c6c10b9f901029e357f1a393174c3d02d1d530",
+      "sha256": "9dde9b72e84945cd84b5b53bc2548da5acb92565d7add83e643f42a0c7610aa6"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentSourceToken.php",
+      "git_blob": "d9c38b5242a436bf089bc1e837045808b572edef",
+      "sha256": "4566e957361a465a2ee1bfa381e9b031c15fbd2dbd48ea9518de9d4063bcb038"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/DBOutside.php",
+      "git_blob": "632e8d40dbf3a48fbe6a0919f07542ceee29270f",
+      "sha256": "ef7314bc5bf84bdab9f15d8a429a412d12960db4b5abeffab37e8f957cc61beb"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/FixtureAttachmentPolicy.php",
+      "git_blob": "ab2ac866372bbf5a505bf82c30396d57f5fa4c0d",
+      "sha256": "76bb3ad121764939e978f84034c5227060ba872815a5e322e0d0ec93dd6bae0a"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/InquiryAttachmentAuthority.php",
+      "git_blob": "f4a0ca4b31428400bed588e96d315fc5b6483ee0",
+      "sha256": "ed3b6629306adf7921233f88931926208bea33f951c51758db17ed71fdc6deec"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/InquiryAttachmentToken.php",
+      "git_blob": "9f1af71f08090b15921e60c8028f7e94264dd583",
+      "sha256": "c40195c21022088a61240eff270bc5f5a492984657b4dde2d4db1ecb7f7f62e0"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/Models/SupportAttachment.php",
+      "git_blob": "3fd7bef256dbafa0abd0a61f4706b9423b6e4b30",
+      "sha256": "de0d0a3f11192d48cfcd82f729d5b51d7dc7209c2bf6add2b2ed95a14753db5d"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/RehearsalAttachmentActors.php",
+      "git_blob": "6085fc93caccfb8a8706188840fc6380119458ff",
+      "sha256": "8d139b2bc8aa358733350fe49d40f242d6aa0ea8fe47e2de1a8971c9e0b5e6f2"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/SupportAttachments.php",
+      "git_blob": "647120d4625a571183bc1b5862b149f0a3b762bd",
+      "sha256": "332434a5eb5b8386ce9e24432672508c26c7b6e98953ff699de1242f03d102cc"
+    },
+    {
+      "path": "app/Filament/Resources/CustomerInquiryResource/Pages/ViewCustomerInquiry.php",
+      "git_blob": "c030c7bcd35e02fbe9c321a63b0178d52ab5fbf5",
+      "sha256": "7b47416dd4e35e12829f1055f2ecd18fce0209d0e020e71623428963d76b94a7"
+    },
+    {
+      "path": "app/Filament/Resources/ServiceProjectResource/Pages/ViewServiceProject.php",
+      "git_blob": "10c72c94bcea4ff486a10ffdeaaf219f30141dec",
+      "sha256": "3989f9895abc4777f0ffd3c0aea789527ae732e8c718b8de515e1d6f22fd7742"
+    },
+    {
+      "path": "app/Http/Controllers/EditorialController.php",
+      "git_blob": "f64efd369cc5afa665a12b715aae4f2e038732e3",
+      "sha256": "cd331cf2424a1b1d95fb0f6f701c4a29522464b78bed53d69eda942dfcbae1fe"
+    },
+    {
+      "path": "app/Http/Controllers/PublicDiscoveryController.php",
+      "git_blob": "4e18d85b1aa5478af25f25d00ced024097654622",
+      "sha256": "026638f64333309135a91644de66fa64c7366fb3c7157a65b0dce49d22033eaf"
+    },
+    {
+      "path": "app/Http/Controllers/ServiceProjectController.php",
+      "git_blob": "1e155dad362a621541f153e889c5b789a2a1c81e",
+      "sha256": "9f520a97e815189e19961ced4d7dfb54eb740b34386b645e096fb3dff7f6e7a6"
+    },
+    {
+      "path": "app/Http/Controllers/SupportAttachmentController.php",
+      "git_blob": "f1d7dece875da383a89eaac698a7f522aceb085b",
+      "sha256": "e0bbe45903b4bff5ff125f742a2596e48c96cc155c0b5c8d2841be2e8e13fe36"
+    },
+    {
+      "path": "app/Http/Controllers/SupportAttachmentPageController.php",
+      "git_blob": "86fe3ac844ea4c9e4dd66ee03ae61597efa58373",
+      "sha256": "39df18b1767fb32ef26ef206d9e2323045beb869040c770803f5bca547d62e3e"
+    },
+    {
+      "path": "app/Http/Middleware/SupportAttachmentPrivacy.php",
+      "git_blob": "cad2c98d3d91dc06a5adf710502a7eaac682db8b",
+      "sha256": "c5cdd553f0aa8a7d44744fc4ed546abcf26cf4e86f4fed2557c1a181f57f2fae"
+    },
+    {
+      "path": "app/Http/Requests/SupportAttachmentRequest.php",
+      "git_blob": "2bd940a90f6ba3380d1d141fd81ad716d477c44f",
+      "sha256": "e96c2ec5551025359bc998b0504218e39e536e1bacd1ab0fd156acf956fccf69"
+    },
+    {
+      "path": "app/Http/Responses/SupportAttachmentResponse.php",
+      "git_blob": "f2218c81402699fe1b6a1dc10d2c1ea2a29360ef",
+      "sha256": "81e4e4929df004a8b50ae4afb2dc700fde0f5c24b9a320b84401df309196f57b"
+    },
+    {
+      "path": "app/Providers/SupportAttachmentServiceProvider.php",
+      "git_blob": "88ee4c848c189f67b075893352390a4120938595",
+      "sha256": "50cef39f2bdff280c9645a31fa8fb40d309a6b215e003353cb1d4de14894d7f6"
+    },
+    {
+      "path": "app/Support/SupportAttachmentRequestIdentity.php",
+      "git_blob": "75a10d0f98df2f7c8ee50e5fad95f1658c9c37cf",
+      "sha256": "8ba94b2d24fc7f13620b8c15f4965295d07c5a7343c6363752e476f9a71920c7"
+    },
+    {
+      "path": "app/Support/SupportAttachmentUi.php",
+      "git_blob": "0d3885c46ac65f576466a41e9d2569eca1bcfcb4",
+      "sha256": "7af0a22a536c5bf2bdb69199c615ddf40bbf322d2ec65c2a0a109aaa78ebbfa4"
+    },
+    {
+      "path": "bootstrap/app.php",
+      "git_blob": "b054cd0bf2d82f9957b1cc088197e0da902a1a05",
+      "sha256": "2f259cc2586c36c20f5886bec4c1fd09dc79a697604e3642a5cf5bfe4c635180"
+    },
+    {
+      "path": "bootstrap/providers.php",
+      "git_blob": "d9220c0c331b2192cc719f6feeb4b8bb59b04153",
+      "sha256": "4a7e3af70523aedec308ba5220817f0ba1580d26d1873bb13ad49e4007f41834"
+    },
+    {
+      "path": "config/support-attachments.php",
+      "git_blob": "eb32adacc12a4d0848f921a61195f7b6c8ce3062",
+      "sha256": "651fe08233b06c9b6bb561c09eaaadd53ad7ba86d60c67ef16ff1032cad5a9d9"
+    },
+    {
+      "path": "database/migrations/2026_10_07_249000_support_attachments.php",
+      "git_blob": "b5ef16d68094755abc92865cbbaba9b0525925ce",
+      "sha256": "63d0ae4f052f74aab91aa87612cf8dc6b28b8b339d6e69dec606ee19b50e3ae4"
+    },
+    {
+      "path": "resources/js/Pages/Editorial.tsx",
+      "git_blob": "dd4f7684178ae988e3a48093d562e89c86741ad7",
+      "sha256": "e0a5a923876b374b984465f6a7408ff4b34d4d414e2b0d9c7689f71f5cc4c5f3"
+    },
+    {
+      "path": "resources/js/Pages/PrivateSupportAttachments.tsx",
+      "git_blob": "fe10e8dd633223999cccff35257b7a139e392bed",
+      "sha256": "f884f6892c5b8472580f543bbf3d779f4b6a1cfcce5216447829892a4cc4e97a"
+    },
+    {
+      "path": "resources/js/Pages/ServiceProjects.tsx",
+      "git_blob": "2ab8316a64dda9cb59cddb7488161ca2925e1e85",
+      "sha256": "2f37fe97bfc73eac04416aef7aff80da29b5e5a05b0de774e4fbd98ebf30b14a"
+    },
+    {
+      "path": "resources/js/app.tsx",
+      "git_blob": "efa3a6af4104925fd15439775824d79e800d73c5",
+      "sha256": "f98552fd93e07ac7940186ab6d8a3624a1a41cd3c756b7892e3afebfa8a0a15d"
+    },
+    {
+      "path": "resources/js/components/ContactInquiryForm.tsx",
+      "git_blob": "694063b32eb446a212036771bc003ef1b76498b3",
+      "sha256": "3965e57c1141953cad6dde7c84f8a78c9907ba00ea53aa88a82648949c119357"
+    },
+    {
+      "path": "resources/js/components/InquiryConversation.tsx",
+      "git_blob": "be0ed9945ba92d4e89b612828323a1cdf2dc088f",
+      "sha256": "0c0748bd95cfbd66a78ef940a2f92f47f9e4ca9a7e718dd2581b7ab8f091be0b"
+    },
+    {
+      "path": "resources/js/components/SupportAttachments.tsx",
+      "git_blob": "7c4c88e40125791c19a8f62edadaafaa11554c41",
+      "sha256": "dcbdc9fe97dfe7a9a7aa95082d749cb0fbecd37ff199e3e6ffaf7319dda4a0f4"
+    },
+    {
+      "path": "resources/js/components/services/ServiceProjectJourney.tsx",
+      "git_blob": "f24ab3243f0c07bc0fa3a176ed1b130844ed454a",
+      "sha256": "cd1e8901183ff52605320af26324048301c9dfc9ea12ae30aafa3ec98783a428"
+    },
+    {
+      "path": "routes/support-attachment-pages.php",
+      "git_blob": "ed754c926bc5c5e519ada3a425e12a5af760212b",
+      "sha256": "cf5a99be2e1417f8a7ce814a36ffe0724b9068bb170ab76e02ac0c76a8d62ae0"
+    },
+    {
+      "path": "routes/support-attachments.php",
+      "git_blob": "26ec4c3fa8b29809ea4133fdaa081522a262eac8",
+      "sha256": "5b771ce0972faa78e8a29c8a96703a578b94d4b902cf3d588f932b51799c102c"
+    },
+    {
+      "path": "routes/web.php",
+      "git_blob": "eb6eed9667efbbed11a1f36010c2d417aeb43aed",
+      "sha256": "169e0e35e974d6dbdaf0e6a6a7c782e03cf031d27578a7c2adc2b7affcf40d82"
+    },
+    {
+      "path": "tests/Feature/ServiceProjectAttachmentAuthorityTest.php",
+      "git_blob": "a7f7f09b8bb41cbaa27b66f5aa8bff84c2bb8637",
+      "sha256": "bc5ff39d80525dfa8f3670ccc5dbc9dd13ab0a84a4b29a7dc4e00c888c888721"
+    },
+    {
+      "path": "tests/Feature/ServiceSupportAttachmentsTest.php",
+      "git_blob": "9399f0f720d56ca814d942071f424cc16a8d3b63",
+      "sha256": "d63c6b145eb7b88cfdb962b96b992db44033c1551f010b55373211777cb62e26"
+    },
+    {
+      "path": "tests/Feature/SupportAttachmentHttpTest.php",
+      "git_blob": "95928e21ffb9e4c18a76508e320f99407e1508f5",
+      "sha256": "deb599c15a55c249d0266821269584ef4b828c342249a8fe8b9e1e6855a4f5e8"
+    },
+    {
+      "path": "tests/Feature/SupportAttachmentNativeConcurrencyTest.php",
+      "git_blob": "39b6f69101071d8677b95c09b48a4fea572756ec",
+      "sha256": "41b1a5cba57e4a7025af0540c72448eaa00ecc2e11583756ebb42bd722cb7cf9"
+    },
+    {
+      "path": "tests/Feature/SupportAttachmentRegistrationTest.php",
+      "git_blob": "d9f8a2d5add0c81bf3c7fd1adcd9489127f75032",
+      "sha256": "aff0de12fdce6079e367a553e5cd9fae0a59e9458fe5cc66264684732f90c264"
+    },
+    {
+      "path": "tests/Feature/SupportAttachmentSchemaTest.php",
+      "git_blob": "e9818bcf4bc50f298e736d15f5dd5c0fcd48d6ae",
+      "sha256": "fcce801b57c32f53d2516682cc88bffe841d44e701075199d57703d873f7984f"
+    },
+    {
+      "path": "tests/Feature/SupportAttachmentsTest.php",
+      "git_blob": "180a8b577254a9ced1585765b2799907308ab1fb",
+      "sha256": "c3b02c2626e11c0d0aa86973560640c805fe8d4ac4ce55c07313f537e770bb1b"
+    },
+    {
+      "path": "tests/Support/support-attachment-race-worker.php",
+      "git_blob": "fded98ee10edb027c2622458732e12f20e334c02",
+      "sha256": "2b4f57ed90abeac47f44fd667f00bd7517ceb48592ce67cefa08860fca8b9e0a"
+    },
+    {
+      "path": "tests/browser/support-attachments.spec.ts",
+      "git_blob": "7d22db833bbf5f1f4173da5637ac7b0f60a4843e",
+      "sha256": "67611b0231941b81d17f7297c0232e42ff3f6c14487e40f345f1d37a27b19e06"
+    },
+    {
+      "path": "tests/frontend/support-attachment-registration.test.tsx",
+      "git_blob": "cf707b0f78bb25a990f54d0d870fdf4e8693f61e",
+      "sha256": "5d4d41de20814c56fc84808c4d1bc90c994d17d10e988377c22f0c86bd847491"
+    },
+    {
+      "path": "tests/frontend/support-attachments.test.tsx",
+      "git_blob": "f420ea0997f7bfc61ad91c87d5bb038cf3358fec",
+      "sha256": "b23f1237770c429e6a064b3d153edb77bcb02de36243eff5ba1adbcc34d71ae2"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-adapter-consumer.txt",
+      "sha256": "833cf6217b2f84e2bd607857e3fd519720930a9a0afe4ebc70f1428b0d54144d"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-adapter-consumer.xml",
+      "sha256": "8fe39c27ffe5660f359347e2ff9c60e02e5d747bd6cc4ae550488bbc16fdaf92"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-existing-front.txt",
+      "sha256": "02bf36398c86985220fb4756b5e913eaef4e560dd6e84fe3f15a20bce3e6a674"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-typecheck-first.txt",
+      "sha256": "8ebef5f046334a0f0dfc80fb94c45d2403c6320f86c57e601ff520111ba69df1"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-typecheck-corrected.txt",
+      "sha256": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-root-http.txt",
+      "sha256": "2a38c7fd3c3868bd1a5e8f287734212585d3a007d8ee895d0ee1f8a8cfd16a0a"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-root-http.xml",
+      "sha256": "e39434dca8a5e16ab8a131a9a1c1357e1d63ec0d467ee366e3ee39b84639501f"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-root-http-corrected.txt",
+      "sha256": "8bd019a512620e3ee50b436585e8c71955930c9259214f724755609b0c2d6620"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-root-http-corrected.xml",
+      "sha256": "116d967cb310b1a4567073275f33ed2b1a6acf605901f14030f290aed691d620"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-root-http-final.txt",
+      "sha256": "5e5f5f3120f106fd65af4991415e902af1c63076b90ef2ceb8ca43952cb7a213"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-root-http-final.xml",
+      "sha256": "c70e11235eb5ec527f88644d7dad6165a0d8c2fd26a11772d2616f54e507c83f"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-root-http-success.txt",
+      "sha256": "9bf3cd95a290b6fc02d300edfb50850aff7e0d3f13182d79a74d281a9f8c49c0"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-root-http-success.xml",
+      "sha256": "e04405c1b061b0a9a28661c4a193b9cb2cfbd0f823261492a27153b8b2fe60c3"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-mounted.txt",
+      "sha256": "61ab7ffd60c43bdfa81669977075fcbb59d1d161334b98d1e5dbb25ef91f9628"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-mounted-corrected.txt",
+      "sha256": "17a89fe6978cf4b6c9481056267261b39756d3b19642398bb4e6d028996538f5"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-root-typecheck.txt",
+      "sha256": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-download-commit-original.txt",
+      "sha256": "a6661502042ec1d89aa4f4c331ef14fe51630cb14790f2cc376b35201fcbf5a9"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-download-commit-original.xml",
+      "sha256": "20363c499da668b1f99a0cf0d50b37f50c0834afc22322a93cbf3953b6c514fe"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-schema-original.txt",
+      "sha256": "90665ef5f2003c0144d2eee41c51fa2763e6f237ce8d61dc2901581a412bd689"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-schema-original.xml",
+      "sha256": "3cbf219907ada05f90885c2f974b35c7eb6181204e741dae70834aa102b01d1e"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-root-held.txt",
+      "sha256": "38a6a59fd1d073f5b7cb272acf0f1bfc1960a003eb8183ab24206afc480d9fdc"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-root-held.xml",
+      "sha256": "00edb3c27cc6ea581d53ec96808712ed6adb7fb0f6464a7a0d6c8d156f066704"
+    },
+    {
+      "path": "docs/verification/cloud-support-registration-20261007/va-support-registration-final-format.txt",
+      "sha256": "971122895da9aa373f3993e2989a8cae5cdd6df250d14a3da8ef9cf0f53fbc97"
+    }
+  ],
+  "decision": "held: three reproduced source defects",
+  "results": {
+    "root_http_original_components": "six passed/247 assertions before adverse canaries",
+    "root_frozen_http": "nine recorded/six passed/258 assertions/three FAIL/zero errors",
+    "core_adapter_consumer": "25/144 passed",
+    "existing_mounted": "73 passed",
+    "new_registration_mounted": "five passed",
+    "typescript_and_scoped_format": "passed"
+  },
+  "source_defects": [
+    "Final TransactionCommitted download event withdraws actual policy; endpoint still returns200original stream (1FAIL/6asserts0err)",
+    "Migration recreates missing earlier update guard with retained later delete guard instead of refusing noncontiguous owned prefix",
+    "SQLite matching actual own trigger masks second foreign table with reserved guard identity marker9123"
+  ],
+  "harness_errors_retained": [
+    "Laravel getJson generated a GET body; strict zero-body boundary correctly returned422; corrected actual GET uses Accept header only",
+    "Incomplete frontend Inertia Link mock caused two mount errors; corrected mock retains same actual navigation assertions",
+    "Root default-off status guesses403/404 were wrong; existing fixture policy uses generic503 after current owner admission",
+    "Initial destructured inquiry form incorrectly referenced props.attachmentsEnabled; TypeScript caught it, corrected direct destructured prop"
+  ],
+  "ownership": "recovery_inventory repairs only ownedAttachmentSchema/download after privateT36 freeze; root owns sharedregistration; servicec7 retained separately",
+  "limits": [
+    "Root source is unpublished and held; no overall independent approval",
+    "Technical attachment policy is synthetic/defaultoff; no approved production filepolicy claimed",
+    "Defined browser spec not executed; native8.4/finalFoundation pending",
+    "No external I/O, productioncredentials or deployment"
+  ]
+}

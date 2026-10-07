@@ -1,0 +1,16 @@
+{
+    "mysql": "8.0.46-0ubuntu0.24.04.4",
+    "isolation": "REPEATABLE-READ",
+    "observed_waits": 1,
+    "results": {
+        "first": {
+            "status": 200,
+            "state": "quarantined"
+        },
+        "second": {
+            "status": 409
+        }
+    },
+    "retained_manifests": 10,
+    "retained_originals": 10
+}

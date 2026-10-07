@@ -1,0 +1,13 @@
+
+> test
+> vitest run resources/js/components/SupportAttachments.test.tsx
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-support-attachments
+
+No test files found, exiting with code 1
+
+filter: resources/js/components/SupportAttachments.test.tsx
+include: tests/frontend/**/*.test.{ts,tsx}
+exclude:  **/node_modules/**, **/.git/**
+

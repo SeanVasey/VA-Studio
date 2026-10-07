@@ -1,0 +1,45 @@
+{
+  "executable": "940dc36824bfbf169f30941cba22fb23f39fc816",
+  "tree": "efe57e6789c9d0ff2e9a1556e6a89ab4ca1e77af",
+  "main_base": "760da5ac70a1082f13d87351a4446459e19947bb",
+  "independent_approval": "15c9e34630966243ce92783dbacf167f908262ee",
+  "approval_source": "c7258bcf3d32b88ffddf0fbcb667eac27b47337e",
+  "verified_independent_bindings": {
+    "owned": 7,
+    "unchanged_core": 27,
+    "artifacts": 41,
+    "all_byte_exact": true
+  },
+  "post_main_shared_composition": {
+    "actual_http_crawler_free": "46/599 zero errors/failures/skips",
+    "frontend": "3files30cases",
+    "typescript": "green",
+    "conflicts": "bootstrap independent prefix reporter/protection hooks; robots union; exact crawler expected fixture",
+    "runtime": "seven independently reviewed successor paths and27core unchanged"
+  },
+  "native_carry": {
+    "engine": "MySQL8.0.46",
+    "originals": "6/38 including five request failures plus same-row permanent VIEW",
+    "registered_positives": "2/113",
+    "source_role": "independent execution on c725 before mainfree shared hooks; byteexact domain/context source carries; rootaffected composedSQLite supplies new shared checks"
+  },
+  "shared_files_sha256": {
+    "bootstrap/app.php": "9bb0b92ceb57c75b62824703c47614ff1f4218f00600ee1147ba0615fffa3c92",
+    "app/Http/Controllers/PublicDiscoveryController.php": "645534a7ee615b3a2b8e1d57060feec34d071e4f267b169d13d31801c3b8dbdc",
+    "tests/Feature/PublicDiscoveryIndexTest.php": "5bc7ecfef421c1b56956b4b316a8aa71fc4675fdb44b1b549af1cc9dcc9bf6ba",
+    "resources/js/app.tsx": "cf38ac0f0221bc03fef9b318b82ed0974a4fbbdd0ad620d40004e9235a3df8c5",
+    "routes/web.php": "a39d0e051d67b63356844c4adce045f35e8640f00eb9af0a90858941ec8fa11f"
+  },
+  "artifacts_sha256": {
+    "va-support-pr34-merge-pint.txt": "8b64446bdcad0f7cde6d0c882d6da2aa1fef578695560f979c3373c0bc289129",
+    "va-support-pr34-composed.xml": "5b79121b45b26562d0b385d94e04b145d688568b05a737dd62b20efc1c8a58f2",
+    "va-support-pr34-types.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "va-support-pr34-frontend.txt": "da5c016af0fd670d556ce5b760d0807a922332a975c42499a343fcec8a1a0057",
+    "va-support-pr34-composed.txt": "6f0ffbd5143ed458ba4f99017fc6a3c4e94fea7ad73e5b2db4d35df7c0cb023c"
+  },
+  "limitations": [
+    "Default-off fixture family; no production actor/provider/ClamAV acceptance",
+    "No native8.4/final browser/Foundation",
+    "No external mail/payment/scanner effects or credentials configured"
+  ]
+}

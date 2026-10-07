@@ -1,0 +1,13 @@
+
+> test
+> vitest run tests/frontend/support-attachment-registration.test.tsx
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-support-registration
+
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  09:16:12
+   Duration  1.78s (environment 44%, tests 28%, transform 18%, setup 8%, import 2%)
+

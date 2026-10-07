@@ -1,0 +1,527 @@
+{
+  "reviewed_source": "4e103201c04033e8a777f5a9891715e29b530f1e",
+  "tree": "392b4d298f77c316a5a5f977678a2709039a7250",
+  "delta_base": "e7409425da77f4293731d2d8319f9be1b85a6faa",
+  "runtime_approval": "15c9e34630966243ce92783dbacf167f908262ee",
+  "runtime_root": "966f842c0d187435fe2da787c78ee80be8c79e29",
+  "runtime_producer": "9ce31963abc3ba89f22ed9b39c009023cedef77d",
+  "unchanged_approved_bindings": [
+    {
+      "path": "app/Support/SupportAttachmentRequestContext.php",
+      "source": "966f842c0d187435fe2da787c78ee80be8c79e29",
+      "git_blob": "ad702da7f7d89efa9c0e8ddaf702a6c091a27e09",
+      "sha256": "e57a308da9ef5e84cec9c5f9ec60d2f95875ac8065c3d7e00095edbc135859cf",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Http/Controllers/SupportAttachmentController.php",
+      "source": "966f842c0d187435fe2da787c78ee80be8c79e29",
+      "git_blob": "a77d31d4f4a2d913bb1d50c2cad824c63f705b2e",
+      "sha256": "4c93dd37dde485bc0fc9fe12cea2e5577cfb4ec420ef2afad5e4d1076d1a0a8c",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Http/Controllers/SupportAttachmentPageController.php",
+      "source": "966f842c0d187435fe2da787c78ee80be8c79e29",
+      "git_blob": "4d561f89c915ef976bbce67d685b43e82aa20c8e",
+      "sha256": "bb47422cea831deaec74f97f88ad34049910d4a4d3f1fab03c5e5727c4a00fd6",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentSourceV1.php",
+      "source": "9ce31963abc3ba89f22ed9b39c009023cedef77d",
+      "git_blob": "f09082d2e75aebb0380dfa5fc76402df9c7fb6c1",
+      "sha256": "26beec4c34440038fd8c15f3af3906bb2520f336c60ec76a656d60ecb9921943",
+      "byte_exact": true
+    },
+    {
+      "path": "tests/Feature/ServiceProjectCommittedReadTest.php",
+      "source": "9ce31963abc3ba89f22ed9b39c009023cedef77d",
+      "git_blob": "e8fffa68a1c99816331892478b9f652f110b7f90",
+      "sha256": "fae7094cde465d09586c1160b9bcbd10a0e139a206d7cbc49a8c4cde3857306a",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentActor.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "a13026bdd672d8e455919919d59994a813fa69711e67c230a4f8390cb8d4b5e6",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentActorResolver.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "eb72264687744b948add30ac55abada9492d22286610a55f7b6ac2f51adee7e3",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentCommittedProjection.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "a4a3c20e7a9c89da31d76a348af42fe639579e12d73fc5ec20475206aad10d73",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentCommittedReadAuthority.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "e0ed2e7c062540927cccf7c11df46c7004c2c26ba75da842cb714f435cc123e9",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentCommittedReadReceipt.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "cdfccf041ef5d6b16140d4cba01d4dd61abeefe856112fb606bf0c2b52a980b3",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentCommittedRows.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "4740a9d44af3c9cddfb249582ba0e196cbbb4e4544617e6fa4320ee5ef16fcc5",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentException.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "3ce2e774906120a7a3e15211d88c110aed83c13625267e4e3caa36146aa2a583",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentFiles.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "4344ff6748515027b519b469ee61cc39b92c7b4bf612093595ec79f50290cb33",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentMutationAuthority.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "07399afcf97da7d6294b109a1dd022dd9567c88b39036e46cfa4d63ee43fc8c0",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentPolicy.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "18f642b2aafb412f87c086d3954e091ed8749e2a1300adc94b4df694dee3d00b",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentRegistry.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "8585883afbdc7d10ee0224f1f9a936c242ea2122038a441cfe624e49d964035d",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentRemoval.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "eb836a6fdb119be91b4957f209b660fa53e36f33944b8dbf83e54dc3feba6d22",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentRows.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "03269d3ad1a7b432df37fd8fcb026ed8b30b13ccb12d9029dd657cf316d378d4",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentSchema.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "188401226c21e9a9bea5c320805545f120a91375b66a577baff6ee30beb780d9",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentSnapshot.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "b0e032d49b5694604ccc1d42e9641f3d085a09df3c015f504f25e21efab94fbf",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentSourceAuthority.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "1837028d3b88cad1e430dfd839c214b8be282b6800d8bf93afab36454f828e35",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentSourceProof.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "9dde9b72e84945cd84b5b53bc2548da5acb92565d7add83e643f42a0c7610aa6",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentSourceToken.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "4566e957361a465a2ee1bfa381e9b031c15fbd2dbd48ea9518de9d4063bcb038",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/DBOutside.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "ef7314bc5bf84bdab9f15d8a429a412d12960db4b5abeffab37e8f957cc61beb",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/FixtureAttachmentPolicy.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "76bb3ad121764939e978f84034c5227060ba872815a5e322e0d0ec93dd6bae0a",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/InquiryAttachmentAuthority.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "97f21cadb97119a51e6288e3ca57c96e1a6353cc68bd034c35dc0687cac6a18b",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/InquiryAttachmentToken.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "c40195c21022088a61240eff270bc5f5a492984657b4dde2d4db1ecb7f7f62e0",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/InquiryCommittedReadReceipt.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "de693dfcd2cf09339b5550f6702ddfa6e69604c9816a752c0812db9f50decc1d",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/RehearsalAttachmentActors.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "8d139b2bc8aa358733350fe49d40f242d6aa0ea8fe47e2de1a8971c9e0b5e6f2",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/SupportAttachments/SupportAttachments.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "2e6a900abe0ee3ac2bc369049da04c89b8c5e62c9cca25b664ce1a34df874c3e",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentAuthority.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "ad96c01a17ba497f3637b8c71d2a02283c975fcb2efb1550b0af2dc9ff4b527b",
+      "byte_exact": true
+    },
+    {
+      "path": "app/Domain/Services/Projects/Attachments/ServiceProjectCommittedReadReceipt.php",
+      "source": "3eb77291f2205acd8b8d265daaa9697b5efe0e55",
+      "sha256": "61b0430c83ffc4a275b3ae152335241128d23fa8a755472a2f9aa6c93c5d6035",
+      "byte_exact": true
+    }
+  ],
+  "unchanged_original_artifacts": [
+    {
+      "path": "docs/verification/support-session-independent-20261007/ServiceProjectCommittedSchemaIndependentTest.original.php.txt",
+      "bytes": 2931,
+      "sha256": "6beb2f0bf0d08b5b97b4182a9e918528e4d8a4fe24792381c54c0d5f43632a5e"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/SupportAttachmentKeyCaptureIndependentTest.original.php.txt",
+      "bytes": 2153,
+      "sha256": "c7c23fcbd259c2ac421f593f016b456dc33a05b0a0a13b7c6fa05ed4df1203b0"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/SupportAttachmentSessionIndependentTest.original.php.txt",
+      "bytes": 6279,
+      "sha256": "73a9a6c59af97b8c63a56f1fd159e6d058b7ab176b7539e1ffa7d87e05500e31"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/SupportClosureSessionBoundaryTest.php.txt",
+      "bytes": 2063,
+      "sha256": "58d17d904fe930f350e3e7a577b419c5b4a35b0fdcb13a623482fc2c9afd47cb"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/original-receipt-map.json",
+      "bytes": 11756,
+      "sha256": "eb34ea717cf18f4b15b13a411d538216c29f96f1be83ecbab72905fb94a38775"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-autoload.txt",
+      "bytes": 2297,
+      "sha256": "24c0fd59bb8ee73fad2708a4f9cb96b2b8cfe4adc76de1ca193fa5bdb0b77c48"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-canary-pint.txt",
+      "bytes": 142,
+      "sha256": "a4cc14d83aed17d31ff91b83d5ca6a46e66ceccea141a3b734aaaf12647ebc34"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-capture-original.txt",
+      "bytes": 449,
+      "sha256": "6133c7ee129d666d05cf15ec63f987436aaa3909225dfbdb0ad5c05ed07e5e0f"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-capture-original.xml",
+      "bytes": 1122,
+      "sha256": "45b9f2241c42abb2d00a0ed05bf6a853c5662b860dce6cda5753c321a2ea7f44"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-default-original-native.txt",
+      "bytes": 829,
+      "sha256": "c7bc4ea4c5145ce983b869e1070eabceb4f636ff101a2c02ed8b8e7d3919b110"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-default-original-native.xml",
+      "bytes": 1452,
+      "sha256": "3e083710f575003ec636775233a0f5a8b3fcfadc514220ac7c96c38838858375"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-default-original.txt",
+      "bytes": 827,
+      "sha256": "27a9e80b9917eed182256aa03048febced530c4a43440a01c3b6267dc1af5b59"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-default-original.xml",
+      "bytes": 1450,
+      "sha256": "d9641ae690b38a0ad0a64b0821d62b3d3dc6128cc0813a41f08f1836404fc36e"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-existing-original.txt",
+      "bytes": 96,
+      "sha256": "7ac790489f7b32f0060336dd2d55c07390d7a7e7f0f56dea950eff3454e86bd3"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-existing-original.xml",
+      "bytes": 7159,
+      "sha256": "937285fc8ba52ca94bc5c69f82201cde306f637b14aab5b95f9e20c7e03734a9"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-final-canary-pint.txt",
+      "bytes": 33,
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-key-corrected-original.txt",
+      "bytes": 456,
+      "sha256": "ed8712433e3eafdac839740d1e4bd1749d066695c767cd0e9a1500f1ae7458c6"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-key-corrected-original.xml",
+      "bytes": 1145,
+      "sha256": "972a5797d8bbb1260f18e3048368c4e0a84ff7ee0f60a35dc9904b6ce8cf3fca"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-key-original-native.txt",
+      "bytes": 458,
+      "sha256": "ccb5dd76b734b9aa1c04ef06c8257798ad90cc8bef8c4041808fa36f4c30499e"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-key-original-native.xml",
+      "bytes": 1147,
+      "sha256": "2120e93c3ee880343907aa8ad1b609d5b46109b1ecd9d2be231431d1d833566c"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-key-original.txt",
+      "bytes": 454,
+      "sha256": "bcb203c2a048bf1940646df0ed5d44550a2a74eac0989668018de7940422438e"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-key-original.xml",
+      "bytes": 1143,
+      "sha256": "22bf2e9b34f0537b0998202daad35a74a0dcb9052d50bea1a33644460a2eb5cc"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-key-pint.txt",
+      "bytes": 145,
+      "sha256": "65cbf44e19ec06bd015a92f6b29acea15e59aa2806265c218309d100f192757a"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-producer-original.txt",
+      "bytes": 95,
+      "sha256": "cefb1cecd3b55c2beb6b1b368f2cb8b1667f75108152614eea6de50b145e040b"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-producer-original.xml",
+      "bytes": 6646,
+      "sha256": "7980fbaf6ad2a1dc7637f66cb66c13512baa903165ae855fa97cc237ebab9b34"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-producer-view-original-native.txt",
+      "bytes": 493,
+      "sha256": "f514206039979627af7d62327879b6657977a0dfc295a00292eb25cf83e09b4a"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-producer-view-original-native.xml",
+      "bytes": 1182,
+      "sha256": "ae4858350cfd1e2e9ffe7357779e6cb61ff2972ce49129c477531127069313a3"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-successor-native.txt",
+      "bytes": 94,
+      "sha256": "c11f38d1db17b291331537c767fe7ec02db7088b3b4982c9edbd4009edb36fbb"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-successor-native.xml",
+      "bytes": 3425,
+      "sha256": "de1015a5f0fbe84ea1c13b5912081537be5818e1f662c0f7a81245376a818742"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-successor-pint.txt",
+      "bytes": 33,
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-successor-positive-native.txt",
+      "bytes": 95,
+      "sha256": "71d3b50500854a9d943e815173c8c5ad01224f90b5f97c5555056e8bf9bb7895"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-successor-positive-native.xml",
+      "bytes": 1095,
+      "sha256": "825a41516bbfce770ba961fbacdf49deea3ac4d3de00d070f51769b928eaaf6f"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-successor-sqlite.txt",
+      "bytes": 109,
+      "sha256": "f1cc5ebe13c284be029a15870f39ea6b3486f594b07da5f6df739ed1f38d4765"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-successor-sqlite.xml",
+      "bytes": 18324,
+      "sha256": "00fec981ba3dbe8827493140af6f79f0143545f197bd28b82c2ab55dd5e26c7d"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-three-canary-pint.txt",
+      "bytes": 173,
+      "sha256": "d672d485420a9d7250a81527a5c2ea07816fed96647391321c08fbacc68096ff"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-three-original-native.txt",
+      "bytes": 1893,
+      "sha256": "c30b347eaf312ef44a95219c55257d00a79daf43e87f050ee4294267a79a63dd"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-three-original-native.xml",
+      "bytes": 3367,
+      "sha256": "51c7ae35ba1cc87c61ddc50f8ff14a0133c6cdf8381d3d9f84f605ab953c1fec"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-three-original.txt",
+      "bytes": 1888,
+      "sha256": "81eb1b0943c6d04952f24346b26ce0fed615c1285d1ab36ae888bf2b1d921086"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-three-original.xml",
+      "bytes": 3361,
+      "sha256": "f0df782a7485586908c359f35b542c79ad10029b929b0ae8abdc5a4ba6fb60ee"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/support-session-independent-view-canary-pint.txt",
+      "bytes": 33,
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "path": "docs/verification/support-session-independent-20261007/three-original-sqlite-canaries.php.txt",
+      "bytes": 5482,
+      "sha256": "f47e4301bba07e4a9146fcab56ac6e36a71e3312e532ddd134fe12a3f44b0bab"
+    }
+  ],
+  "changed_test_bindings": [
+    {
+      "path": "tests/Feature/ServiceProjectCommittedSchemaIndependentTest.php",
+      "sha256": "e826569a8efbb433274e3e56ebf134f114e5b48c84533e323df9fd3dcb39a00b"
+    },
+    {
+      "path": "tests/Feature/SupportAttachmentCommittedClosureTest.php",
+      "sha256": "cc7eba397ca8db7a9f48741bd04124555e06ca47f69bfe0280c4d25509b8149f"
+    },
+    {
+      "path": "tests/Feature/SupportAttachmentHttpTest.php",
+      "sha256": "2146e29f3d29db3f5d28efdec9e8cb6a2a27ece85a2aca4db25dce0449f018f6"
+    },
+    {
+      "path": "tests/Feature/SupportAttachmentKeyCaptureIndependentTest.php",
+      "sha256": "869c3f1f879ec02294335c28fd21af74eac2332402f5edac4b5f4269af344e2b"
+    },
+    {
+      "path": "tests/Feature/SupportAttachmentNativeConcurrencyTest.php",
+      "sha256": "c31eecf01bb9b85392c2f6e4387596a63fe72360c285ebef655f22d9484d47c8"
+    },
+    {
+      "path": "tests/Feature/SupportAttachmentRegistrationTest.php",
+      "sha256": "a19e6ab988d390f7cf3ee9a9b97992439f4f2b817700135951050b6caa87198f"
+    },
+    {
+      "path": "tests/Feature/SupportAttachmentSessionIndependentTest.php",
+      "sha256": "b6263200dc3e42be60cf6eb6fffbe9a54a6e26f995d1d18f6edc4008205cbbad"
+    }
+  ],
+  "existing_fixture_trait": {
+    "path": "tests/Support/FinalizationDatabaseMigrations.php",
+    "sha256": "38d248d182fffb7aa6c0583ebb8235c5b60b03fe8865d679b9eb804728a792ff"
+  },
+  "root_evidence": "581f242",
+  "source_bound_root_artifacts": [
+    {
+      "path": "docs/verification/cloud-support-fixture-normalization-20261007/README.md",
+      "sha256": "73bd9ac7aeec8513467a2e795e26882f01da26d17a2266954000df8dd4d41586",
+      "bytes": 846
+    },
+    {
+      "path": "docs/verification/cloud-support-fixture-normalization-20261007/receipts.json",
+      "sha256": "23c616e0bea21b1defc42b05e8ce6a00cc826fa61b00747aae49981dae00ce20",
+      "bytes": 6481
+    },
+    {
+      "path": "docs/verification/cloud-support-fixture-normalization-20261007/va-support-fixture-all-normalization-native.txt",
+      "sha256": "1ab65b66dd871ea4a2989cb5a362998a4a485250cb4649bb38a4c0f9565adc3e",
+      "bytes": 96
+    },
+    {
+      "path": "docs/verification/cloud-support-fixture-normalization-20261007/va-support-fixture-all-normalization-native.xml",
+      "sha256": "df272503156483eef98983fa5ddbb65c49cfc00c9c601dee7892a4d22f0ae972",
+      "bytes": 2226
+    },
+    {
+      "path": "docs/verification/cloud-support-fixture-normalization-20261007/va-support-fixture-all-normalization-pint.txt",
+      "sha256": "d43cd4b14c8b0866ffd5be27e83cbc6df04659c6e0283522f5ab6afc496aff7c",
+      "bytes": 553
+    },
+    {
+      "path": "docs/verification/cloud-support-fixture-normalization-20261007/va-support-fixture-all-normalization-sqlite.txt",
+      "sha256": "960dc6e3cc6eac7ca0d563504ca13c14d94bc37c8b1399da01e06c89702a4e81",
+      "bytes": 669
+    },
+    {
+      "path": "docs/verification/cloud-support-fixture-normalization-20261007/va-support-fixture-all-normalization-sqlite.xml",
+      "sha256": "e5d014bad9050e7cdd1dd41fd5435478b434972e99976d4da29e39504ab8802a",
+      "bytes": 15288
+    },
+    {
+      "path": "docs/verification/cloud-support-fixture-normalization-20261007/va-support-fixture-env-corrected.txt",
+      "sha256": "2a8f21b517d54ebefee2cdffe918e66bc601bedf9fbc23657de5ceacc8476d89",
+      "bytes": 93
+    },
+    {
+      "path": "docs/verification/cloud-support-fixture-normalization-20261007/va-support-fixture-env-corrected.xml",
+      "sha256": "d9b37f4c65d7a019c24ea750705630099afb474c54b3c44a38e5e06df8ac26d6",
+      "bytes": 651
+    },
+    {
+      "path": "docs/verification/cloud-support-fixture-normalization-20261007/va-support-fixture-env-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "path": "docs/verification/cloud-support-fixture-normalization-20261007/va-support-fixture-normalization-native.txt",
+      "sha256": "f2ff25b38ac508cd3597811a127d112faab27c26f8e035aef0eb90fd801343dd",
+      "bytes": 95
+    },
+    {
+      "path": "docs/verification/cloud-support-fixture-normalization-20261007/va-support-fixture-normalization-native.xml",
+      "sha256": "5bea2b9a2d0ac7209e571986ba7e85a6a484871358a7105064e20054e6e66cb2",
+      "bytes": 3364
+    },
+    {
+      "path": "docs/verification/cloud-support-fixture-normalization-20261007/va-support-fixture-normalization-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    {
+      "path": "docs/verification/cloud-support-fixture-normalization-20261007/va-support-fixture-normalization-sqlite.txt",
+      "sha256": "d590644b60d2509547499db88d446eceee8df8fbbbc4b6a2662bb3a86a668589",
+      "bytes": 105
+    },
+    {
+      "path": "docs/verification/cloud-support-fixture-normalization-20261007/va-support-fixture-normalization-sqlite.xml",
+      "sha256": "fdfdddfdfa889a5ad7186710b43f52b4961061d3d27295399efec3d1446ec8d0",
+      "bytes": 3388
+    }
+  ],
+  "review": "Source-only approval of seven active test lifecycle deltas. No runtime authority change and no fresh broad native replay. Original archival probes unchanged. Final whole-source census and production/host/policy gates remain separate."
+}

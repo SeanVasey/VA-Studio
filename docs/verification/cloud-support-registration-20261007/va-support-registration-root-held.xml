@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\SupportAttachmentRegistrationTest" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" tests="9" assertions="258" errors="0" failures="3" skipped="0" time="3.525356">
+    <testcase name="test_visitor_page_has_fresh_scope_and_executable_page_csp_but_json_and_original_are_sandboxed" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="39" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="54" time="0.684051"/>
+    <testcase name="test_registered_project_provider_admits_only_current_owner_or_current_mfa_operator" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="63" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="59" time="0.723672"/>
+    <testcase name="test_visitor_rotation_and_default_off_disable_page_and_api_without_disclosing_source" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="83" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="42" time="0.331060"/>
+    <testcase name="test_real_csrf_precedes_upload_and_private_errors_never_echo_filename_or_file" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="95" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="19" time="0.301796"/>
+    <testcase name="test_unknown_routes_methods_query_and_foreign_origin_are_private_before_controller" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="113" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="56" time="0.264126"/>
+    <testcase name="test_precontroller_failure_logs_only_exception_class_and_sandboxes_debug_response" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="122" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="17" time="0.367709"/>
+    <testcase name="test_final_download_commit_callback_cannot_withdraw_policy_and_still_return_original_bytes" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="130" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="6" time="0.327166">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentRegistrationTest::test_final_download_commit_callback_cannot_withdraw_policy_and_still_return_original_bytes
+Expected response status code [503] but received 200.
+Failed asserting that 200 is identical to 503.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php:145</failure>
+    </testcase>
+    <testcase name="test_empty_migration_hole_before_a_retained_later_guard_is_not_an_owned_prefix" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="149" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="3" time="0.270470">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentRegistrationTest::test_empty_migration_hole_before_a_retained_later_guard_is_not_an_owned_prefix
+A missing earlier guard with a retained later guard is not a contiguous owned DDL prefix.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php:159</failure>
+    </testcase>
+    <testcase name="test_sqlite_reserved_guard_name_cannot_mask_a_second_foreign_table" file="/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php" line="162" class="Tests\Feature\SupportAttachmentRegistrationTest" classname="Tests.Feature.SupportAttachmentRegistrationTest" assertions="2" time="0.255306">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SupportAttachmentRegistrationTest::test_sqlite_reserved_guard_name_cannot_mask_a_second_foreign_table
+Reserved guard admission must inspect every dictionary row, not only the first matching trigger.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-support-registration/tests/Feature/SupportAttachmentRegistrationTest.php:176</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

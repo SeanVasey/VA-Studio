@@ -1,0 +1,1508 @@
+{
+  "source_sha": "2841ddd846c66c5c23d077ae49bf5ef6b559639b",
+  "source_tree": "86fea934f14069a5c0d57877cfea3ae74974987b",
+  "parent_integration_sha": "409d3c468966d21ea2f72968befa06239aa2ede7",
+  "approved_adapter_at_execution": "c7bc89460ab10f2ea2317dd63909cc4499179d65",
+  "status": "service_consumer_green; inquiry_panel_successor_pending",
+  "files": [
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/CapabilityHistory.php",
+      "ownership": "dependency",
+      "git_blob": "a0a09eadfb6a91eb9142a89147fdd78c30ed6e35",
+      "sha256": "42b9e84d1e5543e3af48a3221deb9bca9cccbe8f3a195ab68bc90debb77b1a37"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php",
+      "ownership": "dependency",
+      "git_blob": "0a2cc683d057a6977ca3ac8d08a53e5330cd4c58",
+      "sha256": "ff9a4d2b7da807d99bd0ac1b13cb77de4afc2b12bee90f88b158401531f8ab85"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/CloseProductionTrackCapabilities.php",
+      "ownership": "dependency",
+      "git_blob": "286d31e82949362cd30b16e25ecf22b9280d657e",
+      "sha256": "d27f621a42650453f6b5aaeba833fca077b213e5561c112553523ae7f122bf40"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/CurrentRows.php",
+      "ownership": "dependency",
+      "git_blob": "c7b6907f6716564bafa7e3cefb066bfc3b6bea55",
+      "sha256": "ca24e0b28d5cc6e53a1ccdcfd472390e984e0a68bbf2ee4aeea19dab166b0a27"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php",
+      "ownership": "dependency",
+      "git_blob": "0d205d23b2c5fc04d7d99b719b5989e5dc758ad6",
+      "sha256": "ebdd882d4e8f6ac4d2a58b8da67784d336a0cabf0d58d2024d77d8bb601480dc"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/Models/ImmutableCapabilityEvidence.php",
+      "ownership": "dependency",
+      "git_blob": "750ed2911819c74d8d7263177247939e50468cf0",
+      "sha256": "c410d3df1f7a6166a3d383341070241b3f81fef73e06a3686fe709ee922cd14c"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/Models/ProductionTrackCapabilityApproval.php",
+      "ownership": "dependency",
+      "git_blob": "d067c295bc4e4e53eea846a9ef1c7f95996e3f4e",
+      "sha256": "5711b9e4bab2ecf899f490d24276f5636b6115375a2feef1af6c3c1b67bbd9a9"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/Models/ProductionTrackCapabilityCandidate.php",
+      "ownership": "dependency",
+      "git_blob": "1cdeb770ed173d79757aa2ff3fcc5e61166471c2",
+      "sha256": "5e2566a169c95a90e056453c625998ce77e6db83b4717f7746069052491530d6"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/Models/ProductionTrackCapabilityClosure.php",
+      "ownership": "dependency",
+      "git_blob": "314075ff10acbf72421ec01002608e03e0fb397d",
+      "sha256": "098ddaeda17e75191c731c82aa7ec15e8a907e6f7d2903e10cb27c8ed06ca614"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/PreparationContextV1.php",
+      "ownership": "dependency",
+      "git_blob": "6e8c3d4b66ea462c75c41abbe7890c879d853590",
+      "sha256": "1e022477267c0b65a1b3d74b4aa81e76e89a1b5e543604be4f4528a9b553db05"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/PrepareProductionTrackCapabilities.php",
+      "ownership": "dependency",
+      "git_blob": "8aec557eb88beda9c519d2e8725284bac02c3a83",
+      "sha256": "776464566491b43c4730b2142d3dc65cfd9d13e418291bc31a851c282dd47114"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/ProductionTrackCapabilities.php",
+      "ownership": "dependency",
+      "git_blob": "cd49f3c01c64f5c17932ba998e853c840cf4b763",
+      "sha256": "510b5ade1cb84b0a475e258862c1448c6f9f9c8747a63796869dfb992fb50762"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/ReadProductionTrackCapabilities.php",
+      "ownership": "dependency",
+      "git_blob": "c66278be9f2e68ff1553e422e17333c9247e3ea2",
+      "sha256": "84219d870080b6d875653587fa80c3e0d66b4cba5517592927b65445804524d5"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/ReviewProductionTrackCapabilities.php",
+      "ownership": "dependency",
+      "git_blob": "95780fba7a301c7fbb25f472f4dd82ca9b549ee0",
+      "sha256": "024c867e62149f5a600d5742c32306610d89fc6889ee5339ff6f6195d3c375b6"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/SaveProductionTrackCapabilities.php",
+      "ownership": "dependency",
+      "git_blob": "05667ed7ddac1e1747f98e9126e186f072df0fe8",
+      "sha256": "af33007445f23118d1a000af691307357a3601dffe1281380ea77123d0be6b64"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/SourceCommitment.php",
+      "ownership": "dependency",
+      "git_blob": "39763718a7ddd3aab45ae591e8b01c0263117ed7",
+      "sha256": "4784f7794c2818d0b1b12e9f7173a470bf366c34d53ea74c678891693e6566b8"
+    },
+    {
+      "path": "app/Domain/Customers/CustomerAccess.php",
+      "ownership": "dependency",
+      "git_blob": "310bb10219405110a3db5a5844132c42d0291887",
+      "sha256": "cb59745ecbdea2a9cedce51be535d428f2e1a3613829547716e9633fbff061bd"
+    },
+    {
+      "path": "app/Domain/Customers/CustomerAccessException.php",
+      "ownership": "dependency",
+      "git_blob": "7d754c854db5cc5c582050fcc66550a55f8ec2e4",
+      "sha256": "d838f9067c450f58b828effd8a148824a18cad766cb7bf3f3f59cba225e83e87"
+    },
+    {
+      "path": "app/Domain/Customers/CustomerAccessPolicy.php",
+      "ownership": "dependency",
+      "git_blob": "ceccc3a417413dec27b855d465d30349cef20fa3",
+      "sha256": "2a144608b6988d0cd96a1f2eb9b7164c226b3fa60e822496bda8fe3f2099fd40"
+    },
+    {
+      "path": "app/Domain/Customers/CustomerAccounts.php",
+      "ownership": "dependency",
+      "git_blob": "89eb6c9a9595b620ea78d3734fab5178f57202a3",
+      "sha256": "b61996873f9e3a1bcac6820b5d9696b3778fa75aced6221c6025d14c7198572f"
+    },
+    {
+      "path": "app/Domain/Customers/CustomerIdentityCapture.php",
+      "ownership": "dependency",
+      "git_blob": "279c55baa84c5cce66de23f1fc7faec5d229dbbe",
+      "sha256": "7237200aa79df4445715d8030668328eb4dadf24203914eaee75ac6bc9c791d8"
+    },
+    {
+      "path": "app/Domain/Customers/CustomerIdentityChallenges.php",
+      "ownership": "dependency",
+      "git_blob": "ac92dee80ef444b0d5c76f561027fd504ba03c70",
+      "sha256": "2c1384ae30083a03f83ba3f093bdd24f6bdfe7a308535a961dedc53f619d6f40"
+    },
+    {
+      "path": "app/Domain/Customers/CustomerIdentityPolicy.php",
+      "ownership": "dependency",
+      "git_blob": "451943f650cb82b7f240d4c812eae2b616ec8832",
+      "sha256": "5ac7896fa90c2a68e0aa6efc93ebe5066e72da1a562bb28be53b4ac2a58ecb5d"
+    },
+    {
+      "path": "app/Domain/Customers/CustomerPrincipal.php",
+      "ownership": "dependency",
+      "git_blob": "5fea086aee4cb54b1aa51deb16028fd78c66a5b2",
+      "sha256": "e7407ed4c9aa90f8bb9850d4d91f2d7dc5aa650a12c767e529db44c08cf63e10"
+    },
+    {
+      "path": "app/Domain/Customers/CustomerPurchaseClaimPolicy.php",
+      "ownership": "dependency",
+      "git_blob": "57503fc2003700c68342c8cad2bf98f80c6f4022",
+      "sha256": "8d1c311fa41dccf13a8b5b0dbe61d9a0021049f817c28a54bcd7ff235d9b032c"
+    },
+    {
+      "path": "app/Domain/Customers/CustomerPurchaseClaims.php",
+      "ownership": "dependency",
+      "git_blob": "b4afd399bbe3a2da05784a0839fd7c9b6ac01f47",
+      "sha256": "06b280c6ad46e247e8287eeb02586e1a56c7fa657249718a15e50e1df9c88c31"
+    },
+    {
+      "path": "app/Domain/Customers/CustomerSessions.php",
+      "ownership": "dependency",
+      "git_blob": "677c716e0d3ba6cdec06c25b172eb7d434f88814",
+      "sha256": "9d60f144d28c3baf93f5d0f8690ddecec16cc7b23e7ec5f41f1281fab97da5c8"
+    },
+    {
+      "path": "app/Domain/Customers/Listening/ListeningEvidence.php",
+      "ownership": "dependency",
+      "git_blob": "35629fc027f6ebacf6ed427635b9e13869caeb07",
+      "sha256": "4b22665239f1df455b29c41b91196b6c910822105b72168a1dca4ed677e807c3"
+    },
+    {
+      "path": "app/Domain/Customers/Listening/ListeningException.php",
+      "ownership": "dependency",
+      "git_blob": "fc217bd52889b6b04f432395d1d425ee960d6d72",
+      "sha256": "753bceac6616693eeba91a160640ff554dc81d5ba1db41e714731af95daed03c"
+    },
+    {
+      "path": "app/Domain/Customers/Listening/ListeningLibrary.php",
+      "ownership": "dependency",
+      "git_blob": "2a4db92c0d7ea2548f0e1f80aac5bd4f351dcc63",
+      "sha256": "30aca52bd3d15e314bdfa6bad146870991a1269a4178cd64d9c27b7e376aa2a7"
+    },
+    {
+      "path": "app/Domain/Customers/Listening/SavedListeningLibrary.php",
+      "ownership": "dependency",
+      "git_blob": "4f2cba6a93cb3430890cba7f676195bfe2cb3528",
+      "sha256": "a16d0d1fc1095563ffee8409633ea1a53a1f2dc34718f5ef0fba0cd4706d863c"
+    },
+    {
+      "path": "app/Domain/Customers/Models/CustomerAccount.php",
+      "ownership": "dependency",
+      "git_blob": "d8fc1128ab49d472feac1484e25e40ed4157c507",
+      "sha256": "4c58d768353c9281ced1231aba72bca9c853963b25c61f4c9a1732530e068f33"
+    },
+    {
+      "path": "app/Domain/Customers/Models/CustomerIdentityChallenge.php",
+      "ownership": "dependency",
+      "git_blob": "3d5fc30f22661afa1937bbeb9fc0b82def88ad5e",
+      "sha256": "2e9cf4e3789baff1712321248234c7c5f3e3c0df0f1469448e165a4d4abfbaff"
+    },
+    {
+      "path": "app/Domain/Customers/Models/CustomerPurchaseChallenge.php",
+      "ownership": "dependency",
+      "git_blob": "572b547869793225dc3ab490b8d1b3385bc4bd7d",
+      "sha256": "ec62a32734bb75bcfa774b1c39e9f4299c93d70fd9fafe05013bcf2cc958110f"
+    },
+    {
+      "path": "app/Domain/Customers/Models/CustomerPurchaseClaim.php",
+      "ownership": "dependency",
+      "git_blob": "f414ef775864e1f25acafcd1befd5a431553a149",
+      "sha256": "3181aba8b49482a7657c1f3c0a68c90ca3f4d8b076e4295d81e9d2c61719932a"
+    },
+    {
+      "path": "app/Domain/Customers/PurchaseAccess.php",
+      "ownership": "dependency",
+      "git_blob": "30f057a0a3e94d19195b9041cc2f771942b01c76",
+      "sha256": "91456b65f3505fc9c2057e55eb595b409633132499def7aa9fc9e62589aea988"
+    },
+    {
+      "path": "app/Domain/Delivery/ActivateTestFulfillment.php",
+      "ownership": "dependency",
+      "git_blob": "e9358e560703bdae48abf66bb5f897b56a8ad88d",
+      "sha256": "8332e240c05a530308e581081f56e8514b811d6379390e8a0d75d46918dd2fa0"
+    },
+    {
+      "path": "app/Domain/Delivery/ActivationEvidence.php",
+      "ownership": "dependency",
+      "git_blob": "991c4c38cbbd2b66bf51e687e5fc2d7ec2de89e9",
+      "sha256": "f598e877120173be6b1c730abc3c529ae5a227b7bf6c668d682de0bf5afaabae"
+    },
+    {
+      "path": "app/Domain/Delivery/ActivationPolicy.php",
+      "ownership": "dependency",
+      "git_blob": "4d37b720dd4bbc224608bad8fa2f5e7db5a080e9",
+      "sha256": "23253c453e7edefcf877eb191a07b0fba69f877a48fdfc91b8cfd36bbdaa7086"
+    },
+    {
+      "path": "app/Domain/Delivery/DeliveryAccessEvidence.php",
+      "ownership": "dependency",
+      "git_blob": "3c77bef3c67ec8919df5b0c35cb28d5f3fc4cd4f",
+      "sha256": "3a76258770743ff989f13f7f94bffeb05fca5d8399582f2875acdd20379b62b9"
+    },
+    {
+      "path": "app/Domain/Delivery/DeliveryAssetFiles.php",
+      "ownership": "dependency",
+      "git_blob": "934b4be4216916e5c3f9792b49ffa367f6f1d10f",
+      "sha256": "3a3771443bf527d56c4a521c01b9840c847b33a9da23b7ad455c96d52820764c"
+    },
+    {
+      "path": "app/Domain/Delivery/DeliveryAssets.php",
+      "ownership": "dependency",
+      "git_blob": "1c0d933c3a770856f17120252808ce45ad94a556",
+      "sha256": "8e06e94b676d714bef51e99b187635cdb0514526f9e4b24e051f8d827729df26"
+    },
+    {
+      "path": "app/Domain/Delivery/DeliveryException.php",
+      "ownership": "dependency",
+      "git_blob": "d339fc73a6b83648271815bba65d79b91fd6454e",
+      "sha256": "a43ad378c7b5cb199471caa882e3fe0e276cd91d69800f5861eb202aa6070adc"
+    },
+    {
+      "path": "app/Domain/Delivery/IssueTestDelivery.php",
+      "ownership": "dependency",
+      "git_blob": "5d1809ecc85f7c325ee2bd74ca7582f7cc1b7001",
+      "sha256": "6d35ca3e7fb1501ae56539b1b9b276c6cd6f0424090eb1960a0694aa50a0bb1a"
+    },
+    {
+      "path": "app/Domain/Delivery/IssuedTestDelivery.php",
+      "ownership": "dependency",
+      "git_blob": "943e4d1485d95ac09fc47d7228a1fc88f4f3fa3a",
+      "sha256": "6835c1300b2aec73f2efe14d2f79f371450e42de5a027b85755b50aed47814dd"
+    },
+    {
+      "path": "app/Domain/Delivery/ManageTestDeliveryControl.php",
+      "ownership": "dependency",
+      "git_blob": "ffabf28b119d275e12e418e7cbbdfeee7695cb1a",
+      "sha256": "ec09470b9c61f3cc63c367f3616a2a1d012445f02edbfed0d3e04330ab119aea"
+    },
+    {
+      "path": "app/Domain/Delivery/MediaEvidenceValues.php",
+      "ownership": "dependency",
+      "git_blob": "db0dc18a62cc960c29e29da0c9e6b36bdba0b84d",
+      "sha256": "719d7bbec020b3cf2af487b313d9c1116e68d7df8c116047d53d17491107e2e5"
+    },
+    {
+      "path": "app/Domain/Delivery/Models/TestDeliveryAuthorization.php",
+      "ownership": "dependency",
+      "git_blob": "658841e167c07da77058131955d0c73ab3afa2d7",
+      "sha256": "122a935ee133f6a173378e6b3ee8f909abbbfe8a5231532043bed02b0cbed38b"
+    },
+    {
+      "path": "app/Domain/Delivery/Models/TestDeliveryControl.php",
+      "ownership": "dependency",
+      "git_blob": "45d287b654bfeb26b2921b13c7183c94b4c1f9ca",
+      "sha256": "4c1049d08258dade6a30161eb30d38e30bbd5047d7ad6ed1a77ae18564a64bc6"
+    },
+    {
+      "path": "app/Domain/Delivery/Models/TestDeliveryRedemption.php",
+      "ownership": "dependency",
+      "git_blob": "7742d46f0b72c11cb0190409e4d888589a81fd8c",
+      "sha256": "421f5ab38093a08056592e1659eb33f4dece2c4dc499659100587625a66994b2"
+    },
+    {
+      "path": "app/Domain/Delivery/Models/TestFulfillmentActivation.php",
+      "ownership": "dependency",
+      "git_blob": "8522e962f475bb612a3afc2d851cc42a422d26a2",
+      "sha256": "8cd15305c07ff8e1b99a5139a47c5d837374e5457b47f92812d988c01b35f414"
+    },
+    {
+      "path": "app/Domain/Delivery/PrepareTestDeliveryStream.php",
+      "ownership": "dependency",
+      "git_blob": "7a80bca96409ad8aa30813efc5e77ee9241a405d",
+      "sha256": "64cd15b6143e3d771769f3366d7a171b7ec95c742659f43617daef5d4a59e336"
+    },
+    {
+      "path": "app/Domain/Delivery/PreparedDeliveryStream.php",
+      "ownership": "dependency",
+      "git_blob": "eaf2758babd8b71b413230db2b51ea348383ea71",
+      "sha256": "e976fc7d0803cde84a769d83f1ca28b2449f7c1dcdd7effda0b8bf42e8c12e13"
+    },
+    {
+      "path": "app/Domain/Delivery/ReadTestDeliveryAuthorization.php",
+      "ownership": "dependency",
+      "git_blob": "76d330f15dd407ddc3c63bed468fcdd293070740",
+      "sha256": "bb4206b32eb513d3497e97e69852624e2fc4db2de4de2c05ee46b4c3189afe8d"
+    },
+    {
+      "path": "app/Domain/Delivery/ReadTestFulfillmentActivation.php",
+      "ownership": "dependency",
+      "git_blob": "3f2b057441ffb44386127143a63f3b4747622725",
+      "sha256": "e19889fd9c1b4680d95fc2441acbacf3842dee0adb6d15cbab202f898e818cf6"
+    },
+    {
+      "path": "app/Domain/Delivery/ReadTestOwnerDelivery.php",
+      "ownership": "dependency",
+      "git_blob": "04d6279f3a6989773ec0e1ce833032283e4018bc",
+      "sha256": "45942ae587195a4b580de41a1dcacc6a2b00ff70f73acfa60b72206bde19356e"
+    },
+    {
+      "path": "app/Domain/Delivery/RedeemTestDelivery.php",
+      "ownership": "dependency",
+      "git_blob": "690587933531e999553f8423bb4925d685551d67",
+      "sha256": "1a01ab4860640455cd2df0433ddad58a60becfd78903942e919da2d3eeeddc99"
+    },
+    {
+      "path": "app/Domain/Delivery/TestAccessPolicy.php",
+      "ownership": "dependency",
+      "git_blob": "8dc46263f352b909556170b8bba4e4f91b07ce56",
+      "sha256": "f6717994afbd8c48fc814fab413029c7e46f1f8fe7b7dd79611ffcb588c1c04a"
+    },
+    {
+      "path": "app/Domain/Inquiries/InquiryAdministration.php",
+      "ownership": "dependency",
+      "git_blob": "b106e7292e056ee9fe4039a66cc5ba989e8a3021",
+      "sha256": "c2bc60e5d9fff5b8d4f1cfea7d205b47839230be8a66045294467c504a60f07a"
+    },
+    {
+      "path": "app/Domain/Inquiries/InquiryConversation.php",
+      "ownership": "dependency",
+      "git_blob": "8be564c5aca9851fffd55cbe75777073406ad1c6",
+      "sha256": "63ff2999679bece00470983d2dde1a07b2d2f79e56facd137334a53dc3a732ad"
+    },
+    {
+      "path": "app/Domain/Inquiries/InquiryException.php",
+      "ownership": "dependency",
+      "git_blob": "426225367679a0f52c0cc8d13b884d5d40461bff",
+      "sha256": "dfdcd519867561a4adbd039d9532c4a65ec1112d3c90cd77aaee6d471d947414"
+    },
+    {
+      "path": "app/Domain/Inquiries/InquiryInput.php",
+      "ownership": "dependency",
+      "git_blob": "5102de1b7ef19bb75c363cf72f4c4e7959455401",
+      "sha256": "f6537ffb9a931e868159b117eb0225fbcabcee8fa386e681e7787ac87cac692c"
+    },
+    {
+      "path": "app/Domain/Inquiries/InquiryPolicy.php",
+      "ownership": "dependency",
+      "git_blob": "eee6a8e940718e3cb14bed6b1ad553610c4d8c1c",
+      "sha256": "e488dd79b099d8f3e2a43ec6cc49d67b6dc6e2fe9626578226f8433c2d6bc458"
+    },
+    {
+      "path": "app/Domain/Inquiries/Models/CustomerInquiry.php",
+      "ownership": "dependency",
+      "git_blob": "39323478b062789f700aa874ad6b63085ce9640f",
+      "sha256": "55d3d8dc7dd7a78d6dd6d1f73a904f42458c6be9d2bd119e4fb6fad8554f6a27"
+    },
+    {
+      "path": "app/Domain/Inquiries/Models/InquiryMessage.php",
+      "ownership": "dependency",
+      "git_blob": "42e032db58b84f9fbc2296075f8635d344922f9f",
+      "sha256": "870928bd429a7552a8e0d0c6ab5c999986475739b8c12a669edec98eacf00949"
+    },
+    {
+      "path": "app/Domain/Inquiries/Models/InquiryNotificationIntent.php",
+      "ownership": "dependency",
+      "git_blob": "2da7738ae4a3bc9fd3a1c4b13ec5f437ef1fba30",
+      "sha256": "dc6c6cf9ba5995cc33f7ce92ae0670e746a77b8a066efc1036f7c9457a0ea0f8"
+    },
+    {
+      "path": "app/Domain/Inquiries/Models/InquiryOrderContext.php",
+      "ownership": "dependency",
+      "git_blob": "51f6bf364a207de4ea767184eb9d945344df6a07",
+      "sha256": "9fd13e9f5a39aca551d0ad819c889752ab294a52ca661cb473006ff25b357677"
+    },
+    {
+      "path": "app/Domain/Inquiries/Notifications/InquiryAlertNotSubmitted.php",
+      "ownership": "dependency",
+      "git_blob": "90a90c8188ddb5eac730cb8f05495f6a8195a223",
+      "sha256": "ab392132f117e3ae9f051c582f3c15cac27808a9c7fc4119415a78506c91c7d2"
+    },
+    {
+      "path": "app/Domain/Inquiries/Notifications/InquiryAlertTransport.php",
+      "ownership": "dependency",
+      "git_blob": "0fb13572bf7db36271089f5335e9a7f51a5a63bc",
+      "sha256": "2d4c04fe70a4b34882bc9a429bc3d480cbca008ea3db8fb04ad2022044fdfb29"
+    },
+    {
+      "path": "app/Domain/Inquiries/Notifications/InquiryNotificationWork.php",
+      "ownership": "dependency",
+      "git_blob": "5b854774ef5f3d6443f8193e4dc33763d0c487ca",
+      "sha256": "499b425fd73ab67facc57fb3443b562c2a3ebb63b624ce29f097cc5ea8db147d"
+    },
+    {
+      "path": "app/Domain/Inquiries/Notifications/OperatorInquiryAlert.php",
+      "ownership": "dependency",
+      "git_blob": "d71e633a59d35335cf1ea6852cbe9499a580b435",
+      "sha256": "2dbda5cbf9dd976e533be2215b9e069f46bbaf88b11ba475c3ea5df748aa8ec0"
+    },
+    {
+      "path": "app/Domain/Inquiries/OrderInquiry.php",
+      "ownership": "dependency",
+      "git_blob": "fd4a416bbff437fbff8674620f632289411b2f5e",
+      "sha256": "63c557ba71ac2bf1e1b962205054041363a62c4233da628b22d567495f1a6a3e"
+    },
+    {
+      "path": "app/Domain/Inquiries/ReadOwnedInquiries.php",
+      "ownership": "dependency",
+      "git_blob": "5b3870303c560970658751809cd1f55d3545e7fb",
+      "sha256": "15abdf73e2f2a19b7cf8119b954fa46cc41cc26bc4241b6b0efd068b05929385"
+    },
+    {
+      "path": "app/Domain/Inquiries/SubmitInquiry.php",
+      "ownership": "dependency",
+      "git_blob": "699cfac5b3447af5207d17285eaabfe7f2ca7495",
+      "sha256": "17a8db1d96ecffe7d660dd156d86b7752878324d453ed306b66725df728d0bd4"
+    },
+    {
+      "path": "app/Domain/Media/MalwareScanner.php",
+      "ownership": "dependency",
+      "git_blob": "7919822b27fb0bd719534c82bfffef01ff750760",
+      "sha256": "a3d9496dacf9efbc359ea93e0bd04ca91ef8c11ec80b7e518afe8bce75d8bc08"
+    },
+    {
+      "path": "app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentAuthority.php",
+      "ownership": "dependency",
+      "git_blob": "dc8ec390c9a541a7c46c14066767cea74273c93c",
+      "sha256": "b21dcd4c4b048f90c6c5502dc167d7c62c9691fb05a867d0550215f0174c9495"
+    },
+    {
+      "path": "app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentSourceV1.php",
+      "ownership": "dependency",
+      "git_blob": "22672055a3754665b9d834568c0a36ceac5eb676",
+      "sha256": "f441db1a805c1802688e272921470916ac6b45f57d58ea0751b40842fef5b97e"
+    },
+    {
+      "path": "app/Domain/Services/Projects/Models/ServiceProject.php",
+      "ownership": "dependency",
+      "git_blob": "eb33653676d77f132943bea4e0e097f01e588fc2",
+      "sha256": "e4ca06bc02739092c400e6c96f16d98a66d1d4562cf1a5822cc5e427c11a8388"
+    },
+    {
+      "path": "app/Domain/Services/Projects/Models/ServiceProjectEvent.php",
+      "ownership": "dependency",
+      "git_blob": "7d14707eef0d703afa00780bb5d74798b01c7eab",
+      "sha256": "467e5bc3121564d3d670c94b54c7db79885712e7ad4af0435912698402136de4"
+    },
+    {
+      "path": "app/Domain/Services/Projects/ServiceProjectException.php",
+      "ownership": "dependency",
+      "git_blob": "2078c7160edbe3967f6162218aa1a32a9b85f47b",
+      "sha256": "d800714ee47c88d580bd27ba850197371b4804a0e4c92c94e22ed1ddb055109e"
+    },
+    {
+      "path": "app/Domain/Services/Projects/ServiceProjectInput.php",
+      "ownership": "dependency",
+      "git_blob": "4e3b1428854ac7185e29e7abdeecdb91f4ffaf88",
+      "sha256": "890c372f8f08b75570948fd7827caeb5f0d7ad52368aafe407d511c78f2b8a3d"
+    },
+    {
+      "path": "app/Domain/Services/Projects/ServiceProjectJson.php",
+      "ownership": "dependency",
+      "git_blob": "cdd77ce54c7d9bee96f467491128b8dde4c34d64",
+      "sha256": "c69871f6a6a6524b81a7c8b7c1567ba822ce8fdf47d1fb0fcfb78bef99a5167c"
+    },
+    {
+      "path": "app/Domain/Services/Projects/ServiceProjectPolicy.php",
+      "ownership": "dependency",
+      "git_blob": "d531e06712de758a66313ae6c6c444e2bcfe34b5",
+      "sha256": "6c63197b8f213277431cbba23cc04b27ee52713a9d31cc279fec61a3e065cea7"
+    },
+    {
+      "path": "app/Domain/Services/Projects/ServiceProjectSchema.php",
+      "ownership": "dependency",
+      "git_blob": "2e1b90e8222fd2ad789acb2deb79d5a98d63a3d0",
+      "sha256": "e11600099cfaffedc9b0b5b96e1081d1a8ad635dc4891d0cd33cbf3679a0bba0"
+    },
+    {
+      "path": "app/Domain/Services/Projects/ServiceProjects.php",
+      "ownership": "dependency",
+      "git_blob": "9491223240faa0139e0c91c9c3685b6e4b4e4e23",
+      "sha256": "bacac004892e2d55821390c0ddcb78ea4e06f03059e4c35363913632941145a3"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentActor.php",
+      "ownership": "attachment_child",
+      "git_blob": "22b5b290416af3377ce3c700f38f1baf09b48c33",
+      "sha256": "a13026bdd672d8e455919919d59994a813fa69711e67c230a4f8390cb8d4b5e6"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentActorResolver.php",
+      "ownership": "attachment_child",
+      "git_blob": "443e9cd17580981dab6c8b92cf7d2c5cd68f60e4",
+      "sha256": "eb72264687744b948add30ac55abada9492d22286610a55f7b6ac2f51adee7e3"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentException.php",
+      "ownership": "attachment_child",
+      "git_blob": "6a23d9870c1b092b534bc31166813d468b5d3daf",
+      "sha256": "3ce2e774906120a7a3e15211d88c110aed83c13625267e4e3caa36146aa2a583"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentFiles.php",
+      "ownership": "attachment_child",
+      "git_blob": "e05f45c5aff45fe3e8c5a891b7c6c185fa7abaec",
+      "sha256": "4344ff6748515027b519b469ee61cc39b92c7b4bf612093595ec79f50290cb33"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentMutationAuthority.php",
+      "ownership": "attachment_child",
+      "git_blob": "1eb6ba27d38b4983e4ad98974f24838de83782f1",
+      "sha256": "07399afcf97da7d6294b109a1dd022dd9567c88b39036e46cfa4d63ee43fc8c0"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentPolicy.php",
+      "ownership": "attachment_child",
+      "git_blob": "a253c510a45357a4a439ac5dfb1e99d1b1c074a4",
+      "sha256": "18f642b2aafb412f87c086d3954e091ed8749e2a1300adc94b4df694dee3d00b"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentRegistry.php",
+      "ownership": "attachment_child",
+      "git_blob": "07d7f4c1b2ba6df55c8d81c81bbc31463103d84e",
+      "sha256": "8585883afbdc7d10ee0224f1f9a936c242ea2122038a441cfe624e49d964035d"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentRemoval.php",
+      "ownership": "attachment_child",
+      "git_blob": "96dd0fd55460d7b13804e3769e591a5f67dd10e4",
+      "sha256": "eb836a6fdb119be91b4957f209b660fa53e36f33944b8dbf83e54dc3feba6d22"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentRows.php",
+      "ownership": "attachment_child",
+      "git_blob": "cc68e2f5bf30bbfc057a7f670195c5761fdacab8",
+      "sha256": "03269d3ad1a7b432df37fd8fcb026ed8b30b13ccb12d9029dd657cf316d378d4"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentSchema.php",
+      "ownership": "attachment_child",
+      "git_blob": "9b7b64605560f1177c91b893c8a2dff21b96b88a",
+      "sha256": "8e4221aa01a8a8ee3aecd28c15bf982e3d27fe769cad5bdcb5f6b93f5b85427f"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentSnapshot.php",
+      "ownership": "attachment_child",
+      "git_blob": "29e999df1ecb9ca75fc6b5eda56697c3c034c1fb",
+      "sha256": "b0e032d49b5694604ccc1d42e9641f3d085a09df3c015f504f25e21efab94fbf"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentSourceAuthority.php",
+      "ownership": "attachment_child",
+      "git_blob": "590232fd9ad799bba9a20c536a8f7b551de82325",
+      "sha256": "1837028d3b88cad1e430dfd839c214b8be282b6800d8bf93afab36454f828e35"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentSourceProof.php",
+      "ownership": "attachment_child",
+      "git_blob": "96c6c10b9f901029e357f1a393174c3d02d1d530",
+      "sha256": "9dde9b72e84945cd84b5b53bc2548da5acb92565d7add83e643f42a0c7610aa6"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/AttachmentSourceToken.php",
+      "ownership": "attachment_child",
+      "git_blob": "d9c38b5242a436bf089bc1e837045808b572edef",
+      "sha256": "4566e957361a465a2ee1bfa381e9b031c15fbd2dbd48ea9518de9d4063bcb038"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/DBOutside.php",
+      "ownership": "attachment_child",
+      "git_blob": "632e8d40dbf3a48fbe6a0919f07542ceee29270f",
+      "sha256": "ef7314bc5bf84bdab9f15d8a429a412d12960db4b5abeffab37e8f957cc61beb"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/FixtureAttachmentPolicy.php",
+      "ownership": "attachment_child",
+      "git_blob": "ab2ac866372bbf5a505bf82c30396d57f5fa4c0d",
+      "sha256": "76bb3ad121764939e978f84034c5227060ba872815a5e322e0d0ec93dd6bae0a"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/InquiryAttachmentAuthority.php",
+      "ownership": "attachment_child",
+      "git_blob": "eef295887017cb04758b56930f2ac0e72e493662",
+      "sha256": "5fe1bee87906f6076d8de4fabd76e7cfa9182f8b28917efb2d6385c9a4f58ef9"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/InquiryAttachmentToken.php",
+      "ownership": "attachment_child",
+      "git_blob": "9f1af71f08090b15921e60c8028f7e94264dd583",
+      "sha256": "c40195c21022088a61240eff270bc5f5a492984657b4dde2d4db1ecb7f7f62e0"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/Models/SupportAttachment.php",
+      "ownership": "attachment_child",
+      "git_blob": "3fd7bef256dbafa0abd0a61f4706b9423b6e4b30",
+      "sha256": "de0d0a3f11192d48cfcd82f729d5b51d7dc7209c2bf6add2b2ed95a14753db5d"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/RehearsalAttachmentActors.php",
+      "ownership": "attachment_child",
+      "git_blob": "6085fc93caccfb8a8706188840fc6380119458ff",
+      "sha256": "8d139b2bc8aa358733350fe49d40f242d6aa0ea8fe47e2de1a8971c9e0b5e6f2"
+    },
+    {
+      "path": "app/Domain/SupportAttachments/SupportAttachments.php",
+      "ownership": "attachment_child",
+      "git_blob": "647120d4625a571183bc1b5862b149f0a3b762bd",
+      "sha256": "332434a5eb5b8386ce9e24432672508c26c7b6e98953ff699de1242f03d102cc"
+    },
+    {
+      "path": "app/Http/Controllers/SupportAttachmentController.php",
+      "ownership": "attachment_child",
+      "git_blob": "f35181e9f1b55a73c001e05f616267f8cdbaa22a",
+      "sha256": "8be9f9ff482b5355c82eac25a0e3cd12ded2492525ef63c31ac8c10858ca61e7"
+    },
+    {
+      "path": "app/Http/Middleware/CustomerCommerceAccess.php",
+      "ownership": "dependency",
+      "git_blob": "7b90a49ec8e8872a81f093120589edad10cff6f4",
+      "sha256": "0bb95d9c866db2de90d7a8c92626d975e64f244f1397c48eac392585cf819f96"
+    },
+    {
+      "path": "app/Http/Middleware/CustomerPrivacy.php",
+      "ownership": "dependency",
+      "git_blob": "16289f877e80ccf945b3cf928b529f04e5bdb8d4",
+      "sha256": "4b496116012bcaa9961b23bae13b611191355ee92cf425b08e0c28e412454883"
+    },
+    {
+      "path": "app/Http/Middleware/HandleInertiaRequests.php",
+      "ownership": "dependency",
+      "git_blob": "239d12e87644956d5dab315cf07463a214a4e8cd",
+      "sha256": "559d3a5cb591e2e52822e5e1866f0d144b69adfd98f591dd3066605fd9b2945f"
+    },
+    {
+      "path": "app/Http/Middleware/InquiryPrivacy.php",
+      "ownership": "dependency",
+      "git_blob": "f72518f478b87ddeaed0fc7a737303e139648eca",
+      "sha256": "015d6efbd8f6c87706d43798a4b4914d00a1bf3d19bdcbb0879c0beba2c30add"
+    },
+    {
+      "path": "app/Http/Middleware/PrivateTrackReviewPrivacy.php",
+      "ownership": "dependency",
+      "git_blob": "7ff3fd0d5ca3d094256512d49b77e5ab0e00c416",
+      "sha256": "60a7b74331e5c3a5d5aeea7a627dc9a944dc869dd2745089f5c29cb74065a7e8"
+    },
+    {
+      "path": "app/Http/Middleware/ResumableUploadPrivacy.php",
+      "ownership": "dependency",
+      "git_blob": "836555df29f5896bc6c1549209297e91c6460378",
+      "sha256": "ae41dbfcd95b8610b554dae7505a95ffb96a0abd2833689bfacb398fc4dadfdf"
+    },
+    {
+      "path": "app/Http/Middleware/ServiceProjectPrivacy.php",
+      "ownership": "dependency",
+      "git_blob": "d43f3bf9d8875297502d44bec7302732c2ebb39a",
+      "sha256": "b9ae76b084d02e0abd5cad305d0d0220e7aeae443373fce4ac03a9bceb9ee009"
+    },
+    {
+      "path": "app/Http/Middleware/SitePreviewPrivacy.php",
+      "ownership": "dependency",
+      "git_blob": "3e47f2e6e83c7da96bf1da821633e80736bc812b",
+      "sha256": "effe28088de3c587dbf87bcf8f90d59989e9b229cea7e985fc73a3fc0a0e9866"
+    },
+    {
+      "path": "app/Http/Middleware/StripeWebhookBodyLimit.php",
+      "ownership": "dependency",
+      "git_blob": "00505d65e7b14829de2f13949a591b3b4a37f635",
+      "sha256": "2959ea776871754705170c661b0e1cffd08051977c204bbe1607d762a172f61a"
+    },
+    {
+      "path": "app/Http/Middleware/SupportAttachmentPrivacy.php",
+      "ownership": "attachment_child",
+      "git_blob": "c3ed7b672c150a495e960069182dee661f247b8e",
+      "sha256": "52877746c7db00527706c9a5b4fd42ed13a7876ce1dfea0f8e65eb8778057917"
+    },
+    {
+      "path": "app/Http/Middleware/TestDeliveryPrivacy.php",
+      "ownership": "dependency",
+      "git_blob": "35e1599009a7cdc87948a8fff9d11d4230d4234f",
+      "sha256": "a1b16c25397becbe23dc83af1a3136ad2cb8b80ccd32864e64ebcde03bcc955c"
+    },
+    {
+      "path": "app/Http/Middleware/TestExceptionResolutionPrivacy.php",
+      "ownership": "dependency",
+      "git_blob": "39c10d95ea899b2454ae8c3019492c1850916c48",
+      "sha256": "75ee2ee4a46b232b1f837e65be3c4ce127219f34390e48fe3b96162de13d8295"
+    },
+    {
+      "path": "app/Http/Requests/SupportAttachmentRequest.php",
+      "ownership": "attachment_child",
+      "git_blob": "2bd940a90f6ba3380d1d141fd81ad716d477c44f",
+      "sha256": "e96c2ec5551025359bc998b0504218e39e536e1bacd1ab0fd156acf956fccf69"
+    },
+    {
+      "path": "app/Http/Responses/SupportAttachmentResponse.php",
+      "ownership": "attachment_child",
+      "git_blob": "cdd387dd35debf6ca1dd20af2c0b9c123693a47f",
+      "sha256": "e2fd5f615a51f828fbf5f6e3309f72d000d02bb3e06e996efa86b613d7706cf5"
+    },
+    {
+      "path": "app/Models/User.php",
+      "ownership": "dependency",
+      "git_blob": "52ef24c251018d12807d31184bfd21675c5291ec",
+      "sha256": "c85dc4056ab81fcca8143812f6f5a1f7aa12ec5587a72e682c823c74873c987f"
+    },
+    {
+      "path": "app/Providers/AppServiceProvider.php",
+      "ownership": "dependency",
+      "git_blob": "16a1a68e42c359cb1c630f0b8642dae30fc4fd19",
+      "sha256": "3afe9571d39ab0d7ddcd4813dd7ce97aeb9b3b28c645e4283327cebdb2ef8a0d"
+    },
+    {
+      "path": "app/Providers/Filament/AdminPanelProvider.php",
+      "ownership": "dependency",
+      "git_blob": "fa1dc4d09f0b4b1a89e54bcadde132c55715fa86",
+      "sha256": "dc879c6aaee98bc02301f7827fb32616eeca2623bb5396b9723cbd2cdbf1228c"
+    },
+    {
+      "path": "app/Support/Access/AdminMultiFactor.php",
+      "ownership": "dependency",
+      "git_blob": "db0367fc9ee1fd1e1c81c1b0ed6ab174a758e6a5",
+      "sha256": "dc83e64ae86754c6ac2a6b64cb420e687d5ecaf4f5d87225060d021597681710"
+    },
+    {
+      "path": "app/Support/Audit/AuditEvent.php",
+      "ownership": "dependency",
+      "git_blob": "b8ba713b26e5f0df45197b1ff9635fc88d9b92de",
+      "sha256": "2ffedca8e08a1ecdada46ab9732920cfcad64d7fa53e147e197724bf4fbbe6b0"
+    },
+    {
+      "path": "app/Support/CanonicalJson.php",
+      "ownership": "dependency",
+      "git_blob": "4450b0c4f0a147f49db4732ea4d34c0804c54a25",
+      "sha256": "6e8f14f950bbb7ed3c4a8162ecf7c2fd2752031d1679285cea8bb0a5f5f82d89"
+    },
+    {
+      "path": "app/Support/CommerceRequestIdentity.php",
+      "ownership": "dependency",
+      "git_blob": "21c8de9947441cf8ecd0b17d48daf530117959c5",
+      "sha256": "848c758e0dbdb56b80884e3f91e6fd2946c005717d8805ebba9a7ec21871de1a"
+    },
+    {
+      "path": "app/Support/Diagnostics/InstallationReport.php",
+      "ownership": "dependency",
+      "git_blob": "5028bd7bed2f9e1569a67a7ac6cb3ce381d80bdf",
+      "sha256": "85e04f6d39223f2946716038d9147485cb9ffacddeed48ff04211f3f4c683550"
+    },
+    {
+      "path": "app/Support/InquiryOwner.php",
+      "ownership": "dependency",
+      "git_blob": "0b08dac5e715fcd46986e902db31dca27a812b54",
+      "sha256": "43a98b3d0a5b5e2bf3a07673f8ce55d492b7f0b31a59bd39b446b5cd4f9fc292"
+    },
+    {
+      "path": "app/Support/Money/AllocateDiscount.php",
+      "ownership": "dependency",
+      "git_blob": "98d76e8f642df162be609d8260e6e3d2795abb53",
+      "sha256": "0d9153dc9fe8114e03bb1becf1883b9ebfb7aaafd0b041b805a396a8b5320488"
+    },
+    {
+      "path": "app/Support/Money/MinorUnits.php",
+      "ownership": "dependency",
+      "git_blob": "bf5863a362b2d316e16fc177f1edb194244c0d5a",
+      "sha256": "ad6b875ebcb416cffee737e1eb7b9e48f65e7a6a9c974ffe84de600c9dc9ef55"
+    },
+    {
+      "path": "app/Support/QuoteOwner.php",
+      "ownership": "dependency",
+      "git_blob": "0c9d36b3eb00b1995f4e909e496082a0b480bf30",
+      "sha256": "a607a027b0f266a47d02654fb98908c7b5b081eea5ee838bffd1e1d2844e9431"
+    },
+    {
+      "path": "app/Support/StorefrontMetadata.php",
+      "ownership": "dependency",
+      "git_blob": "a87ee646ea4e37dc68d9d0736575464a83bed93f",
+      "sha256": "023140df5f43e8abe182a450767ffc3fe4376486c7f3aafbcde45fec5c6968d8"
+    },
+    {
+      "path": "bootstrap/app.php",
+      "ownership": "dependency",
+      "git_blob": "ad1074da34581130a90c7ca61b528c29c6c5b42a",
+      "sha256": "e9fcaa1432324ca8cc7e3edab0c5ae978a75ba1aed5683f1a3230196c2fd4ce5"
+    },
+    {
+      "path": "composer.lock",
+      "ownership": "dependency",
+      "git_blob": "9e58027dcd989282b026d56347e26ea867723db9",
+      "sha256": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9"
+    },
+    {
+      "path": "config/app.php",
+      "ownership": "dependency",
+      "git_blob": "dfa47ba05c1c5f460f788307bd56b75b546b4758",
+      "sha256": "b4b25e15efa76846a7f2e19fd1044fec4945e4e928c4098126a2b0042b034383"
+    },
+    {
+      "path": "config/auth.php",
+      "ownership": "dependency",
+      "git_blob": "ac0c6590265071ff0ca6b2bf80d8558952f59419",
+      "sha256": "5db47c59bcecadd8afde9bc341400da117a219c1733ad0cc15d0e61ae2c2b85b"
+    },
+    {
+      "path": "config/cache.php",
+      "ownership": "dependency",
+      "git_blob": "d7eec61a39914c7b4794339e723da8503eea3d41",
+      "sha256": "ee4ad2bba1edfcff52e9599f37371f2370d0b167cc226ce72d46cdf6edf2dc55"
+    },
+    {
+      "path": "config/commerce.php",
+      "ownership": "dependency",
+      "git_blob": "55cb862f7ef392cdf4d42a2644fb8295b2098a41",
+      "sha256": "d0781cab9ba33c14198072f87ae2920d6918f7744489f4ce2bb7eda55a4a6ea1"
+    },
+    {
+      "path": "config/contracts.php",
+      "ownership": "dependency",
+      "git_blob": "715f55ad100b3a110bbaa6eeecdd16bd7692ad9c",
+      "sha256": "6058568761d4abfa275155937a7467cbb25125f1cd5081f912d55a69359a93b4"
+    },
+    {
+      "path": "config/customer.php",
+      "ownership": "dependency",
+      "git_blob": "f8d887669981f93863bc82e3e524c2964f072573",
+      "sha256": "98b73b008fd5fd5388ae5332e3d3d6aa7c7f055f329c27d48076e6934dd7aa8d"
+    },
+    {
+      "path": "config/database.php",
+      "ownership": "dependency",
+      "git_blob": "abbb88e37246728f566c8a42fb86c554d50a92bc",
+      "sha256": "02cd62f589b43d33f9ceac740705dac1dec9740eb2bb9e6e202d4b66a15244cf"
+    },
+    {
+      "path": "config/delivery.php",
+      "ownership": "dependency",
+      "git_blob": "79f30cb84c1b849595519bd1185b042c71041aaf",
+      "sha256": "ea94798c31b47c5a6a468b58b63af29f309a62c9d7b6a86581673992a8d04f1f"
+    },
+    {
+      "path": "config/filesystems.php",
+      "ownership": "dependency",
+      "git_blob": "1713a61ca339bafdd35e5b86ab42b7e2506d8948",
+      "sha256": "167dd51e6b13f1b338b703f8cb2b49828b98289306208915ec9dac347471c64d"
+    },
+    {
+      "path": "config/inquiries.php",
+      "ownership": "dependency",
+      "git_blob": "e223afba8c5a05dfd491f461a06855e9714746f4",
+      "sha256": "96d84c151a2336b919a5bca08c3cd4173ab7b1ebdf6a21efdc51a9e66731e011"
+    },
+    {
+      "path": "config/livewire.php",
+      "ownership": "dependency",
+      "git_blob": "7aedb6478c1d2da76da6adee4f1307503988c08e",
+      "sha256": "ecb32f202147e1147b04fea94683222f22120694f481291a3129e48fcca8d6fb"
+    },
+    {
+      "path": "config/logging.php",
+      "ownership": "dependency",
+      "git_blob": "97bdc0390b3cb6e55231fa12bdf50d649d37b400",
+      "sha256": "beb1ffd0db910f6f0b4f75214c3d5aa385d692733ece8a450f4c169d2c99ce38"
+    },
+    {
+      "path": "config/mail.php",
+      "ownership": "dependency",
+      "git_blob": "e32e88da2cc82d4139c032c28b03005afc6008c6",
+      "sha256": "c43ff49a31c5f32ce21eb7159f2a4b3cd2f4074eaed5838d265646dbfedd3474"
+    },
+    {
+      "path": "config/media.php",
+      "ownership": "dependency",
+      "git_blob": "22884e7d285b898acc8f5a3b941c2cf265f38716",
+      "sha256": "09d0f58d0479d354e60bed1e02d8f5d7490c3abe9d2ff753c4ef09dcaed80602"
+    },
+    {
+      "path": "config/memberships.php",
+      "ownership": "dependency",
+      "git_blob": "34ef7b52b58ebb376b0d629f35546fc3d1600965",
+      "sha256": "ac22a093065fce3e15d8312f398c85d5f6c234f87d6b981c8d6445a72cfdd5cb"
+    },
+    {
+      "path": "config/payments.php",
+      "ownership": "dependency",
+      "git_blob": "dfb73305991e838b3ff2e7a27dee15c194cfd1b0",
+      "sha256": "397e1cd903cfe0387b8c7efaa0f9c9958a7a1f893e6569f6347142a383b2e692"
+    },
+    {
+      "path": "config/queue.php",
+      "ownership": "dependency",
+      "git_blob": "5a63fa4a04c3aa3430fa386611c76f65c00b7b25",
+      "sha256": "ac9e8848df5b652431e71c31f243f70aa0d94ab0e722194993493b196f80c5e3"
+    },
+    {
+      "path": "config/refund-resolution.php",
+      "ownership": "dependency",
+      "git_blob": "2f8e6a98c7a50747c20e91b6eef10e48f47b16dc",
+      "sha256": "ac7c5f356b3b52d71ed707f5d03f98922b22b1b78fa01e3a535ad3a6a7c4831f"
+    },
+    {
+      "path": "config/services-projects.php",
+      "ownership": "dependency",
+      "git_blob": "d693db9e2fc33a7f92c03b870cec6768feabd4d6",
+      "sha256": "9a7baad0eb1ca886742814b2002eafa898ee75a0595cba49cc2d3bbd036dc8cd"
+    },
+    {
+      "path": "config/services.php",
+      "ownership": "dependency",
+      "git_blob": "ec226a406664750084d2e49b32fa3b7d03a31ff4",
+      "sha256": "b7ee786ea1adbc92db9f229f479431c94503527c47051da3862eb0e4d7db70aa"
+    },
+    {
+      "path": "config/session.php",
+      "ownership": "dependency",
+      "git_blob": "f5744827f901d05402fe81e2314290ff539c0fd9",
+      "sha256": "64272cfbef6f47c65bf857f1c5b1e853700c0d0278de46b86663fd83ef4aeed8"
+    },
+    {
+      "path": "config/transactional-notifications.php",
+      "ownership": "dependency",
+      "git_blob": "03483a04da26b836985e6a46d463f51bcc31dfae",
+      "sha256": "7a10a2e2df4e442754bd45f8523679e717cf38d96ae170001f07a7857762e739"
+    },
+    {
+      "path": "config/unpaid-release.php",
+      "ownership": "dependency",
+      "git_blob": "3428f2b93bb9afab6b7bf4a3c4315b3390c77f6e",
+      "sha256": "cf8b6fbd53e38e53403c1eea6107545847398a539b1aec367f25b2c4da3ba065"
+    },
+    {
+      "path": "database/migrations/0001_01_01_000000_create_users_table.php",
+      "ownership": "dependency",
+      "git_blob": "05fb5d9ea95d1b527ba0e7074936553944b8d302",
+      "sha256": "10d79883bc08ce46510f9ad8b1830b4d06d586dc56ae2c8bac3b3e491f69a90f"
+    },
+    {
+      "path": "database/migrations/0001_01_01_000001_create_cache_table.php",
+      "ownership": "dependency",
+      "git_blob": "06dc7a5ee782ac3a0f3f1c471b03120d87f2e655",
+      "sha256": "fbb4665e5a977e71df4e74ec75b3c06ca4f17ad0de7138fe9786639189978e77"
+    },
+    {
+      "path": "database/migrations/0001_01_01_000002_create_jobs_table.php",
+      "ownership": "dependency",
+      "git_blob": "edac6fee599f55c34fd7ade713079c7f007b2fe4",
+      "sha256": "df4910687180313a14a3f96a8bddd808ae145ed1b107cd772caf865c0dc2b746"
+    },
+    {
+      "path": "database/migrations/2026_09_04_000001_create_catalog_foundation.php",
+      "ownership": "dependency",
+      "git_blob": "377bb10dbb0bc40b22a9077eab1d715cf64fc123",
+      "sha256": "cb2f0670080c6ae9ad48b8512bc1bcdbd78b93d1f5ddb6dcb8b50cc1fd384366"
+    },
+    {
+      "path": "database/migrations/2026_09_04_000002_add_admin_mfa_and_immutable_evidence.php",
+      "ownership": "dependency",
+      "git_blob": "8244883034631fc058f3a521bc05553d75b8efde",
+      "sha256": "39d9c01922e9333dbc1ee071d8f963fee60efa757d96bc37e7212e441e0e396d"
+    },
+    {
+      "path": "database/migrations/2026_09_04_000003_media_processing.php",
+      "ownership": "dependency",
+      "git_blob": "beeb0043f5dd9a9eb5e9e140f7e3e76d0d0b2997",
+      "sha256": "c7e08011ad59e63d89956259071f219d8f08306371dd691f9b405ebac5c3ef13"
+    },
+    {
+      "path": "database/migrations/2026_09_04_000004_license_evidence.php",
+      "ownership": "dependency",
+      "git_blob": "241df13f0e56e771b66924055f192e829bf0f672",
+      "sha256": "4e91b531e4a305437a11921c56d9492663ba6b85869e47656e3aed41aa4d724e"
+    },
+    {
+      "path": "database/migrations/2026_09_04_000005_offer_revisions.php",
+      "ownership": "dependency",
+      "git_blob": "3dff4c40ed141df1fa350c4fed880340af871d0d",
+      "sha256": "514d5c6d1ad88729fafbe69dec6c72d1d9d6830408196afe18b8e67018383d2c"
+    },
+    {
+      "path": "database/migrations/2026_09_06_000006_provisional_quotes.php",
+      "ownership": "dependency",
+      "git_blob": "2600c1140a8d996d9c4d20d2dd590c57d26e8462",
+      "sha256": "26a32a75d2c0223c2b2304d3aa33968fda4fa647dc4f019565dee34df8baa818"
+    },
+    {
+      "path": "database/migrations/2026_09_09_000007_stripe_webhook_receipts.php",
+      "ownership": "dependency",
+      "git_blob": "f2b785809c30cb61ba9816369362e8e17e53e0ca",
+      "sha256": "f5887c624cdd11e94239466b31c4a4e5e9c21dab2a3a8301291e74c1e0e63934"
+    },
+    {
+      "path": "database/migrations/2026_09_09_000008_track_metadata_and_public_urls.php",
+      "ownership": "dependency",
+      "git_blob": "003ca7d13b34a136a7f7835fadcb9130f2c90d10",
+      "sha256": "4501b93343cd7c1385559c7b8bbaa4603356f2c1f5487b31778c332a3fcceef4"
+    },
+    {
+      "path": "database/migrations/2026_09_09_000009_stems_recordings.php",
+      "ownership": "dependency",
+      "git_blob": "29494236549f7263f28434f92209782698d6122c",
+      "sha256": "e1adfc50450db3b898f7faee68252462be156c988eaaf5fa36d3b7537cc7a876"
+    },
+    {
+      "path": "database/migrations/2026_09_10_000010_typed_license_terms.php",
+      "ownership": "dependency",
+      "git_blob": "309fc721f4c50c6e6215ab95ac7da3ae1c210736",
+      "sha256": "340390224fb187646657a652fc104ee61fec138e4149a5671682ef47028630a7"
+    },
+    {
+      "path": "database/migrations/2026_09_11_000011_license_scope_terms.php",
+      "ownership": "dependency",
+      "git_blob": "0fe82edb1fe5fd32cf515de2c73e237924c4766e",
+      "sha256": "abd597f1ee6ded2bd57406064de0a689eb5e9c543c2fbe6bf73ee7fa996d50b9"
+    },
+    {
+      "path": "database/migrations/2026_09_12_000012_license_economic_terms.php",
+      "ownership": "dependency",
+      "git_blob": "04385414254efbf9418e54355f72e60af60bc411",
+      "sha256": "6a093efbd57368aed12f25867e8d94130a1388448039b6023c502b65c2589a4a"
+    },
+    {
+      "path": "database/migrations/2026_09_12_000013_quote_pricing.php",
+      "ownership": "dependency",
+      "git_blob": "6073bd0c4b4bb27b0aadf69c98ebd09ed1c3e0fc",
+      "sha256": "9c61da3a3281e4b28abd427025af438c365ee88cb34c036cafcbebf14f5da2a4"
+    },
+    {
+      "path": "database/migrations/2026_09_14_000014_promotion_usage.php",
+      "ownership": "dependency",
+      "git_blob": "a223d4ce09084d59f69e8cf9a7522886eb2e214e",
+      "sha256": "22e66f6277f660d243061a91ceee64e14913d42ca877ec355a7c1d01e6afac00"
+    },
+    {
+      "path": "database/migrations/2026_09_17_000015_shared_rights_inventory.php",
+      "ownership": "dependency",
+      "git_blob": "f1be846ff88dff45ed36220655fb395dd1e4b0ca",
+      "sha256": "ff4e6662803f72802664463e55f847260096e348aa2f2f18c3f3c9f93f0fdb14"
+    },
+    {
+      "path": "database/migrations/2026_09_23_000016_exclusive_activations.php",
+      "ownership": "dependency",
+      "git_blob": "e9c11ca3b3caa962c8da97fb48e05f69ad63e4fe",
+      "sha256": "a3a0693918782c27a384e3719749efc67e0a8fcd98ec60368a567a103e4b3a13"
+    },
+    {
+      "path": "database/migrations/2026_09_24_000017_order_preparation.php",
+      "ownership": "dependency",
+      "git_blob": "89edab3e5b6f40c1fdffac3cbf3b962f23628a4a",
+      "sha256": "190dcf113417b66b124995d7f6c837887da42c8ee0635c26defe3974835aaada"
+    },
+    {
+      "path": "database/migrations/2026_09_26_000018_hosted_test_checkout.php",
+      "ownership": "dependency",
+      "git_blob": "fb6983288ac2925120c36923c18328b492e72b67",
+      "sha256": "fc4fe92a1e260a66eeb4cbc37c720665feb243f3cb4df642bb8e7437bfbc5504"
+    },
+    {
+      "path": "database/migrations/2026_09_26_000019_test_payment_evidence.php",
+      "ownership": "dependency",
+      "git_blob": "dd822f96c931f57f7b6e1faf5bf70efe07f9a7f8",
+      "sha256": "867957a442fb4ec142ba8eeef7e51536e5ba04a488b5b23148715893d48f8211"
+    },
+    {
+      "path": "database/migrations/2026_09_26_000020_test_order_finalization.php",
+      "ownership": "dependency",
+      "git_blob": "53382253caebcec619c4b508941b03f55b0acebb",
+      "sha256": "f4a57bc894119bca8ca891664f0dde9a1e3f285830026345be29871bf2d0e22e"
+    },
+    {
+      "path": "database/migrations/2026_09_26_000021_test_contract_issuance.php",
+      "ownership": "dependency",
+      "git_blob": "c5f248331e7dbc14c47433ae106e2810c6f5bb64",
+      "sha256": "f4dc4844d135333b887e2c590fc0848c7a2338d1708dae5c34ce12e71b2a1e9c"
+    },
+    {
+      "path": "database/migrations/2026_09_26_000022_test_fulfillment_activation.php",
+      "ownership": "dependency",
+      "git_blob": "4b9eb0b8158656f954c84c3438730932aca708b5",
+      "sha256": "1483d7a2bd00e64d7c7bdd9472e07eb010a55ab3902115ef6629e5b5503d9823"
+    },
+    {
+      "path": "database/migrations/2026_09_26_000023_test_owner_delivery.php",
+      "ownership": "dependency",
+      "git_blob": "69a6c841aa308df9c764f2c675b16ab42fcc372c",
+      "sha256": "55896e9f6cf82da87b0a1ec43744893e8f540e60baedf11613dbbd8df6987dde"
+    },
+    {
+      "path": "database/migrations/2026_09_28_000024_site_content_releases.php",
+      "ownership": "dependency",
+      "git_blob": "3618552b130091d5e76f203e4840ee66ce567203",
+      "sha256": "106abb7638f5cb02547648f1830a997dd03dd53026beba080b1a5b701fb2ac60"
+    },
+    {
+      "path": "database/migrations/2026_09_29_000025_promotion_administration.php",
+      "ownership": "dependency",
+      "git_blob": "505c0d3e5b71a156e076b16b9cdee957eddcb9b4",
+      "sha256": "fc72b4b2e395b94d06ac4b7ccdbd6f1d912541d86abaf76c0c73e1fd30e49d8c"
+    },
+    {
+      "path": "database/migrations/2026_09_29_000026_site_publication_schedules.php",
+      "ownership": "dependency",
+      "git_blob": "9dce73b6e112787e50d37ba9dcec5616bcb6080e",
+      "sha256": "a585c0e72da84c79d2032651f27b23ef0b1ceab89aad25beb6ee8fa3b63a0a09"
+    },
+    {
+      "path": "database/migrations/2026_09_30_000027_site_images.php",
+      "ownership": "dependency",
+      "git_blob": "72cbbeca7b1ca5462dcd87dc3ce7daf1f5145192",
+      "sha256": "ad5c0a47c31a74ad888a0c616d148f7890b84c7aae584d5c72d3909700c7e941"
+    },
+    {
+      "path": "database/migrations/2026_09_30_000028_site_release_images.php",
+      "ownership": "dependency",
+      "git_blob": "9b5c7e45912d84ed234dd5ea8bf4c5a00f76ea8d",
+      "sha256": "ddfe219135328aa018f7929150e648709983b9290fe129fa13fd7ff29551dfed"
+    },
+    {
+      "path": "database/migrations/2026_10_01_000029_byte_exact_hash_guards.php",
+      "ownership": "dependency",
+      "git_blob": "672ecf0f7585597698a442ff0ff0f842b188193d",
+      "sha256": "93141102adbb97168529d94e89ca1e342ea5d48f8e1931e8a4f94b6aa2b64bde"
+    },
+    {
+      "path": "database/migrations/2026_10_01_000030_byte_exact_uuid_guards.php",
+      "ownership": "dependency",
+      "git_blob": "f33cf242926983da6b2cc78549f589322f5c882c",
+      "sha256": "0226ca92999797ebe55cf510d5bcc01298c103a6e459abd90f00479cd67a4fbf"
+    },
+    {
+      "path": "database/migrations/2026_10_01_000031_customer_inquiries.php",
+      "ownership": "dependency",
+      "git_blob": "06162cf903f64bb5e5ac1998773e155827eea53d",
+      "sha256": "7dba3048f15ec167aeb8e15bb9f4ec8bdbb4a97839545afed498b79a0e70c282"
+    },
+    {
+      "path": "database/migrations/2026_10_01_000032_editorial_related_tracks_images.php",
+      "ownership": "dependency",
+      "git_blob": "5935e7d65c967b5ec56038c0f41877f6744a5e05",
+      "sha256": "873b168c47558a4a7de58db9dbbc72589d310da28b8fc13f9687514dc438c43a"
+    },
+    {
+      "path": "database/migrations/2026_10_02_000033_track_metadata_presets.php",
+      "ownership": "dependency",
+      "git_blob": "e7c898b4d6027c51505c9ad405001efd650ef8a1",
+      "sha256": "1440c8d61cd271ef58b4598078df144dd2c126d77f0ca5cc2aa21f983e1f38cc"
+    },
+    {
+      "path": "database/migrations/2026_10_02_000034_track_publication_version.php",
+      "ownership": "dependency",
+      "git_blob": "b48002cfb47e55748f45ae21bb107110cbe3986c",
+      "sha256": "7afd5feaf421e98581599d8a546cb01920e93993419eb1ca4557e54a4ce284e0"
+    },
+    {
+      "path": "database/migrations/2026_10_02_000035_rights_evidence_guards.php",
+      "ownership": "dependency",
+      "git_blob": "47fec9114382938515a75eebe8b876f71933b236",
+      "sha256": "640f55753ac058442cbab2c3b29fba3fb86af66e966bf4e9fa6d90cdb5233ad4"
+    },
+    {
+      "path": "database/migrations/2026_10_02_000036_test_payment_exception_operations.php",
+      "ownership": "dependency",
+      "git_blob": "b28b6228a9846fc1b687549bb47f1e68d4dc8feb",
+      "sha256": "95666ce5056194cd8ac6c87f2d3d181968eda860b0699c3067239fa3da004324"
+    },
+    {
+      "path": "database/migrations/2026_10_06_000038_resumable_media_uploads.php",
+      "ownership": "dependency",
+      "git_blob": "96294be892a2af9594ee02badc56c4c284782144",
+      "sha256": "c9c0fd4175256b6de4be45e671a4b1e8f63f71c2cf5cef494e63939f6862dda9"
+    },
+    {
+      "path": "database/migrations/2026_10_06_000039_test_payment_financial_observations.php",
+      "ownership": "dependency",
+      "git_blob": "3ad9c6cff42c7b4f5642f5e75cc10629c606147c",
+      "sha256": "98e26eb8781f822896d9761b42bd7ae9692e6217249b9aac169409fa0de51e6c"
+    },
+    {
+      "path": "database/migrations/2026_10_06_000040_customer_accounts.php",
+      "ownership": "dependency",
+      "git_blob": "f139df54108dcc1410352e524da2c94a4f5ab7ad",
+      "sha256": "659db171c443ee652dad9a13f92bbc30f41c167cfab7a557ab50bc58538f0c63"
+    },
+    {
+      "path": "database/migrations/2026_10_06_000041_product_draft_versions.php",
+      "ownership": "dependency",
+      "git_blob": "d3ceec13cfcb6a141d0566454997f914119ca877",
+      "sha256": "077a8f81417476d110f9d25b8d8be3c7c7035f491a7a5949cd5440b8a291ea59"
+    },
+    {
+      "path": "database/migrations/2026_10_06_000042_test_unpaid_releases.php",
+      "ownership": "dependency",
+      "git_blob": "f7da0e3261a73d5eea45cd8a80aa82b9b8fc8a9b",
+      "sha256": "2266366176a4856c2908a2550f93b8c177ac2953f114c4662b7b1e164307801f"
+    },
+    {
+      "path": "database/migrations/2026_10_06_000043_inquiry_messages.php",
+      "ownership": "dependency",
+      "git_blob": "f829bbd82bdccc83da959cada93e76270badcde3",
+      "sha256": "4f80bbc251bfaaee1366e69c04c8fe60b52481d8a2aad8e362d0345ad95f6824"
+    },
+    {
+      "path": "database/migrations/2026_10_06_000044_sound_kit_intake.php",
+      "ownership": "dependency",
+      "git_blob": "a5471d67a62063858262f8f1bd60d03f047cc593",
+      "sha256": "065aa9d52c5f398c02522187b763a64d689b5e8f6873fa83ea6b282287c9ad46"
+    },
+    {
+      "path": "database/migrations/2026_10_06_000045_customer_identity_challenges.php",
+      "ownership": "dependency",
+      "git_blob": "da77d70bbb2fe47b1541b8af031167f35d0bcee9",
+      "sha256": "87e83ce75511292814138a5e7d33d365f84c0aa1a4cf69e1456f9b738ae47943"
+    },
+    {
+      "path": "database/migrations/2026_10_06_000046_sound_kit_upload_sessions.php",
+      "ownership": "dependency",
+      "git_blob": "22ba23cd50c2ec637d0e74665987753f56a15d8a",
+      "sha256": "ef1956cb2255877b25812f8223ed2a3f65fde4c14ad7c1f8fd4c5a42df744c23"
+    },
+    {
+      "path": "database/migrations/2026_10_06_000047_test_refund_resolutions.php",
+      "ownership": "dependency",
+      "git_blob": "93b0ebbe88e30ebe39d3ce8b12cb56d125533597",
+      "sha256": "5392a465d055b3cef2799c478f83af3345798d16374cf3254be847948921f8df"
+    },
+    {
+      "path": "database/migrations/2026_10_06_000048_customer_purchase_claims.php",
+      "ownership": "dependency",
+      "git_blob": "e6435d9571c6370fd52ff6939657d244a8189b66",
+      "sha256": "e02d74c5fc62d266dfca60ea65a80456c89995361fca3f485b3404c2a68d1e2e"
+    },
+    {
+      "path": "database/migrations/2026_10_06_000049_inquiry_order_contexts.php",
+      "ownership": "dependency",
+      "git_blob": "bfca31599fe6ae681f30c717abe99a9b54afb83a",
+      "sha256": "cf3b01bd9e595993a074cafe41a6c31ee52500047bb7410295494b981b3e9831"
+    },
+    {
+      "path": "database/migrations/2026_10_06_230000_membership_credit_foundation.php",
+      "ownership": "dependency",
+      "git_blob": "265cb0b0dc0396b0f9c651f7e8c427cbdcd79c87",
+      "sha256": "6402db1b8412d8b01738edd270ec8ad899f1aed3a13369f167b408551df43a70"
+    },
+    {
+      "path": "database/migrations/2026_10_06_231000_test_transactional_notifications.php",
+      "ownership": "dependency",
+      "git_blob": "d088f782544ce40bba938d9b469f3bc12d076912",
+      "sha256": "e90eb32d88d46d0c500ece848d5c48571e19fa981ddc3530be370982ae445859"
+    },
+    {
+      "path": "database/migrations/2026_10_06_233000_production_track_policy_drafts.php",
+      "ownership": "dependency",
+      "git_blob": "54c4380844e8cdcd610f03206ec1b450399d435f",
+      "sha256": "52aef836d91c3e87abe8892c6139e7e065f518584b589af6e0a3e71d2ebd6504"
+    },
+    {
+      "path": "database/migrations/2026_10_06_234000_service_draft_versions.php",
+      "ownership": "dependency",
+      "git_blob": "b97e17f818dc8c02dd150dac3d6d9365ccfffcda",
+      "sha256": "ea7fd9f795c6e53090ca8ea347a028943996a940d36b70b6b9ba75684f3f4c8a"
+    },
+    {
+      "path": "database/migrations/2026_10_06_235000_merch_draft_versions.php",
+      "ownership": "dependency",
+      "git_blob": "8499372758ddace3bb08e002869cd1fdfc915b93",
+      "sha256": "3467c327d933cb52b64251ad174fb43095d17acafaa55a96dee92b0351050550"
+    },
+    {
+      "path": "database/migrations/2026_10_06_236000_production_track_policy_capabilities.php",
+      "ownership": "dependency",
+      "git_blob": "e0a90dab6f012c708c5f0c76f532fff552254ff4",
+      "sha256": "8e6494a1002e793e60c9f8cd768b312c070fa7588418eb0dc4b4ba9cfd3a634e"
+    },
+    {
+      "path": "database/migrations/2026_10_06_237000_catalog_import_progress.php",
+      "ownership": "dependency",
+      "git_blob": "976e5234df3e16e72b2332e159e1dac3b9c12f81",
+      "sha256": "55f333b9bb48816ddaf3b0e06d81c60570537fc93334d7ea33dc8bf8e50cb3fb"
+    },
+    {
+      "path": "database/migrations/2026_10_06_238000_production_track_preparation_packets.php",
+      "ownership": "dependency",
+      "git_blob": "7470a06f7dbe0831d58d555c218bcb8e0198c74d",
+      "sha256": "88c4c224a625656f2e20a4e1bfb7ac632292f9c60a327c920375d9f813ea394c"
+    },
+    {
+      "path": "database/migrations/2026_10_07_239000_production_buyer_assent_observations.php",
+      "ownership": "dependency",
+      "git_blob": "8b566d6c5d2a6ab226bd4042b717061e9fd2a126",
+      "sha256": "defcef254a47d104510f7778102cf31edf02f203cd5a9f120b5db44cc0288b24"
+    },
+    {
+      "path": "database/migrations/2026_10_07_240000_catalog_discovery_epoch.php",
+      "ownership": "dependency",
+      "git_blob": "8429ab5aef283bddfa4d5a6071724f9983a8aad3",
+      "sha256": "93d8155e864ad96917f5a0d60804102cd4c40ecba961f50542d74afd5b9a80ce"
+    },
+    {
+      "path": "database/migrations/2026_10_07_242000_customer_saved_tracks.php",
+      "ownership": "dependency",
+      "git_blob": "1c26493419f561e32fa9aaadfdba232b1eb2e04d",
+      "sha256": "1202c18366e67012224745a12e06b2ef46d654725f2eeb48e779cf9569cd7392"
+    },
+    {
+      "path": "database/migrations/2026_10_07_243000_inquiry_notification_intents.php",
+      "ownership": "dependency",
+      "git_blob": "4ef91d9ebb9c0ec1446c8fb13ea038eddb7aa8cb",
+      "sha256": "afd182c082171b62036aa839d5a3757cd2f3a16ec16c986def5abeb0ff8503c5"
+    },
+    {
+      "path": "database/migrations/2026_10_07_244000_service_projects.php",
+      "ownership": "dependency",
+      "git_blob": "af9d99e0d8e6aa69cc29e7e33ab94c6fdfb449ad",
+      "sha256": "eb1a5beb518ae7c50c2f4f852231d6bb0c2b98cf80cb8ae8eb3d0d73b81757f8"
+    },
+    {
+      "path": "database/migrations/2026_10_07_249000_support_attachments.php",
+      "ownership": "attachment_child",
+      "git_blob": "b5ef16d68094755abc92865cbbaba9b0525925ce",
+      "sha256": "63d0ae4f052f74aab91aa87612cf8dc6b28b8b339d6e69dec606ee19b50e3ae4"
+    },
+    {
+      "path": "package-lock.json",
+      "ownership": "dependency",
+      "git_blob": "614350366e7af397c14603dae9272082ecfae066",
+      "sha256": "6407d3a63e3b6e04f5824f53c41b8dc8a33581f987b21d780c795480122f93ea"
+    },
+    {
+      "path": "phpunit.xml",
+      "ownership": "dependency",
+      "git_blob": "e7f0a48df619422a48dd39ceac63c30f998fe389",
+      "sha256": "493369cfb7feea104da4bec214c2cc6526ca2f1b9d937c50a2961fc59cb61aaf"
+    },
+    {
+      "path": "resources/js/components/SupportAttachments.tsx",
+      "ownership": "attachment_child",
+      "git_blob": "7c4c88e40125791c19a8f62edadaafaa11554c41",
+      "sha256": "dcbdc9fe97dfe7a9a7aa95082d749cb0fbecd37ff199e3e6ffaf7319dda4a0f4"
+    },
+    {
+      "path": "routes/console.php",
+      "ownership": "dependency",
+      "git_blob": "dac0e48095333f6da2d6d39843904c1de7ed957e",
+      "sha256": "a8f59fe29174f0ea5714cdc1ac1731af09e0d413825eb877a159d96bb157c2a3"
+    },
+    {
+      "path": "routes/customer.php",
+      "ownership": "dependency",
+      "git_blob": "e300854f40798d68dc48a38f780c28d5a7251d2a",
+      "sha256": "4473538e56cb1cae5e73482a50ab2743d1227a1610cc5bdbd9db0664ce31db46"
+    },
+    {
+      "path": "routes/embeds.php",
+      "ownership": "dependency",
+      "git_blob": "43af319da1bd7ca7b134aa1e79934a5801653d4d",
+      "sha256": "4f59bb0f07619a4b6c0cf3db7d5348501d61ba74c6422892af6297fc9b2f8361"
+    },
+    {
+      "path": "routes/inquiry-conversations.php",
+      "ownership": "dependency",
+      "git_blob": "24327bd9e519fd0384e9e1cde4a5ba383b0ae7dd",
+      "sha256": "75228a8bfe5e8285c8983af4119f4589a1a0e3b3dee9524080d4a8ce17b52372"
+    },
+    {
+      "path": "routes/public-discovery.php",
+      "ownership": "dependency",
+      "git_blob": "cd7aa13ac39debb0ed4f880e4d546f91e54b62d8",
+      "sha256": "5c2ab822fd9ba99a6a59d125f139b6c0c00daabdc2d535a934bd8273bf464c61"
+    },
+    {
+      "path": "routes/services.php",
+      "ownership": "dependency",
+      "git_blob": "56d55ca9cf78c95dfa5ed5ff5a9c7be18fb1ac09",
+      "sha256": "352cb23995c513322dd61cd6990f222e31c5206ff6a821f9855e6512453525e8"
+    },
+    {
+      "path": "routes/support-attachments.php",
+      "ownership": "attachment_child",
+      "git_blob": "26ec4c3fa8b29809ea4133fdaa081522a262eac8",
+      "sha256": "5b771ce0972faa78e8a29c8a96703a578b94d4b902cf3d588f932b51799c102c"
+    },
+    {
+      "path": "routes/web.php",
+      "ownership": "dependency",
+      "git_blob": "da743b2f62b7a96047922277b2ab4af2e8335e57",
+      "sha256": "054b9d528ef0f454c65393f3d0e325bd78123aa7450ee570b25bdd4ea1ba0676"
+    },
+    {
+      "path": "routes/webhooks.php",
+      "ownership": "dependency",
+      "git_blob": "f841c918f80f62ccb5908628723fb2c2c4953d9e",
+      "sha256": "a49d688a67156cdb198e278890345609f8566ee2f2315267215ae5bdc0d35bb2"
+    },
+    {
+      "path": "tests/Feature/ServiceSupportAttachmentsTest.php",
+      "ownership": "attachment_child",
+      "git_blob": "9399f0f720d56ca814d942071f424cc16a8d3b63",
+      "sha256": "d63c6b145eb7b88cfdb962b96b992db44033c1551f010b55373211777cb62e26"
+    },
+    {
+      "path": "tests/Feature/SupportAttachmentHttpTest.php",
+      "ownership": "attachment_child",
+      "git_blob": "95928e21ffb9e4c18a76508e320f99407e1508f5",
+      "sha256": "deb599c15a55c249d0266821269584ef4b828c342249a8fe8b9e1e6855a4f5e8"
+    },
+    {
+      "path": "tests/Feature/SupportAttachmentNativeConcurrencyTest.php",
+      "ownership": "attachment_child",
+      "git_blob": "39b6f69101071d8677b95c09b48a4fea572756ec",
+      "sha256": "41b1a5cba57e4a7025af0540c72448eaa00ecc2e11583756ebb42bd722cb7cf9"
+    },
+    {
+      "path": "tests/Feature/SupportAttachmentSchemaTest.php",
+      "ownership": "attachment_child",
+      "git_blob": "e9818bcf4bc50f298e736d15f5dd5c0fcd48d6ae",
+      "sha256": "fcce801b57c32f53d2516682cc88bffe841d44e701075199d57703d873f7984f"
+    },
+    {
+      "path": "tests/Feature/SupportAttachmentsTest.php",
+      "ownership": "attachment_child",
+      "git_blob": "b1109e32afa9f791d9530ba8f6fde147e84a6257",
+      "sha256": "4a6ae614ba2f68223c0e45eecf7ec062b1304bd70e7cd7d298894718ae04b259"
+    },
+    {
+      "path": "tests/Support/CustomerFixtures.php",
+      "ownership": "dependency",
+      "git_blob": "df16f365a826300c14f8b3c6effdd4ac6479faf9",
+      "sha256": "7eb6b9ff2154a17f847b4b131e0f9bd3eb1df1e12096026ca858739ce4f56ec8"
+    },
+    {
+      "path": "tests/Support/InquiryConversationFixtures.php",
+      "ownership": "dependency",
+      "git_blob": "49680f90b169f27ef12ccd2c80575cbfb01c5ec4",
+      "sha256": "045952429e8a864497bbc7eeb4be89d03665af9e3575b68f01e8f1405ed7cfa5"
+    },
+    {
+      "path": "tests/Support/ServiceProjectFixtures.php",
+      "ownership": "dependency",
+      "git_blob": "b8d8e4a96e74104af9e9b6596934640c6e97ff33",
+      "sha256": "86b5ed7ab50a90a2c3b1c543f70167f6697cbaed810311ffdbe093c333da777f"
+    },
+    {
+      "path": "tests/Support/TestOnlyMediaScanner.php",
+      "ownership": "dependency",
+      "git_blob": "2548414101dc1208eaf4cd856babfcd1ea077669",
+      "sha256": "f43f882f5dc1f0d93be1dd640cc73a9c2dc7720f3ac654540bc2eb4373507bf2"
+    },
+    {
+      "path": "tests/Support/support-attachment-race-worker.php",
+      "ownership": "attachment_child",
+      "git_blob": "fded98ee10edb027c2622458732e12f20e334c02",
+      "sha256": "2b4f57ed90abeac47f44fd667f00bd7517ceb48592ce67cefa08860fca8b9e0a"
+    },
+    {
+      "path": "tests/TestCase.php",
+      "ownership": "dependency",
+      "git_blob": "5f56769b8f2f608a753e30d8e342944560a655a3",
+      "sha256": "c1ab95960b6a3c234c48773131990da48f7fc7d3b901cb66a40af0dafa41df40"
+    },
+    {
+      "path": "tests/browser/support-attachments.spec.ts",
+      "ownership": "attachment_child",
+      "git_blob": "1625af6d96a9ca312cf0d6329de7e9ca6690cb07",
+      "sha256": "668e1c849d93a0c68eadfba10994b41d2a81dee034936e4de38781b18c8049b6"
+    },
+    {
+      "path": "tests/frontend/support-attachments.test.tsx",
+      "ownership": "attachment_child",
+      "git_blob": "f420ea0997f7bfc61ad91c87d5bb038cf3358fec",
+      "sha256": "b23f1237770c429e6a064b3d153edb77bcb02de36243eff5ba1adbcc34d71ae2"
+    }
+  ],
+  "rules": [
+    "Exact source inputs; no inaccessible prior work recovered",
+    "Native predecessor red and affected selection run before composing repaired adapter",
+    "Historical development receipts do not imply frozen-head acceptance"
+  ]
+}

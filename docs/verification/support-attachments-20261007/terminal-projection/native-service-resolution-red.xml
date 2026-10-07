@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ServiceSupportAttachmentsTest" file="/workspace/VA-Studio-support-attachments/tests/Feature/ServiceSupportAttachmentsTest.php" tests="2" assertions="6" errors="0" failures="2" skipped="0" time="42.666605">
+    <testcase name="test_terminal_customer_stamp_resolution_cannot_withdraw_credential_and_return_private_projection" file="/workspace/VA-Studio-support-attachments/tests/Feature/ServiceSupportAttachmentsTest.php" line="174" class="Tests\Feature\ServiceSupportAttachmentsTest" classname="Tests.Feature.ServiceSupportAttachmentsTest" assertions="3" time="19.160012">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ServiceSupportAttachmentsTest::test_terminal_customer_stamp_resolution_cannot_withdraw_credential_and_return_private_projection
+Current source authority must refuse the attachment operation.
+
+/workspace/VA-Studio-support-attachments/tests/Feature/ServiceSupportAttachmentsTest.php:228
+/workspace/VA-Studio-support-attachments/tests/Feature/ServiceSupportAttachmentsTest.php:184</failure>
+    </testcase>
+    <testcase name="test_terminal_service_policy_resolution_cannot_withdraw_account_and_return_private_projection" file="/workspace/VA-Studio-support-attachments/tests/Feature/ServiceSupportAttachmentsTest.php" line="189" class="Tests\Feature\ServiceSupportAttachmentsTest" classname="Tests.Feature.ServiceSupportAttachmentsTest" assertions="3" time="23.506592">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ServiceSupportAttachmentsTest::test_terminal_service_policy_resolution_cannot_withdraw_account_and_return_private_projection
+Current source authority must refuse the attachment operation.
+
+/workspace/VA-Studio-support-attachments/tests/Feature/ServiceSupportAttachmentsTest.php:228
+/workspace/VA-Studio-support-attachments/tests/Feature/ServiceSupportAttachmentsTest.php:199</failure>
+    </testcase>
+  </testsuite>
+</testsuites>
