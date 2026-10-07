@@ -107,7 +107,7 @@ php artisan up || exit 1   # lifts maintenance mode only, and only once the writ
 # 3. Restore into the isolated targets only. The dump is loaded unchanged (its CREATE DATABASE
 #    and USE name <DATABASE>), so no stored value can be rewritten by a rename.
 sha256sum --check <BACKUP_DIR>/database.sql.sha256 || exit 1
-mysql --defaults-extra-file=<RESTORE_OPTION_FILE> < <BACKUP_DIR>/database.sql
+mysql --defaults-extra-file=<RESTORE_OPTION_FILE> < <BACKUP_DIR>/database.sql || exit 1   # a failed load must never reach the private restore or the verification
 sha256sum --check <BACKUP_DIR>/private.tar.sha256 || exit 1   # the archive itself, not only its members, must be the one step 2 wrote
 #    Extract as the application user, never as root: --no-same-owner creates files as the
 #    invoking user, and the application must be able to read its restored masters and contracts.

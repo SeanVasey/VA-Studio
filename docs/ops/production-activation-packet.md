@@ -220,9 +220,16 @@ curl -fsS -o /dev/null https://<STAGING_ORIGIN>/ || { echo 'staging still unavai
    would otherwise leave the earlier database with a later tree (orphaned files, missing
    references). With writers still stopped, extract `private.tar` into a fresh directory as
    the application user and verify it exactly as the backup procedure's step 4 does (digest,
-   manifest, names, modes, ownership); then replace the contents of `<PERSISTENT_ROOT>/private`
-   with the verified tree (move the current tree aside, never delete it) before any release
-   is switched.
+   manifest, names, modes, ownership); then replace the *contents* of
+   `<PERSISTENT_ROOT>/private` while keeping that directory object in place: every release's
+   `storage/app/private` is a bind mount of it, and a bind mount follows the mounted inode,
+   not the path, so swapping the directory itself would leave the releases attached to the
+   old, post-snapshot tree. As the application user, with writers still stopped: move the
+   current entries into a new sibling `<PERSISTENT_ROOT>/private.pre-rollback-<UTC stamp>`
+   (0700, never deleted), move the verified entries in, and prove it before any release is
+   switched — `stat -c %d:%i <PERSISTENT_ROOT>/private` unchanged, the manifest check
+   passing when run against `<RELEASES_DIR>/<PREVIOUS_SHA>/storage/app/private` (through the
+   mount), and `private.pre-rollback-*` absent from the mounted view.
 3. Enter maintenance in the previous release before switching: `APP_MAINTENANCE_DRIVER=file`
    writes a release-local `storage/framework/maintenance.php`, and S1 shares only
    `storage/app/private` between releases, so switching the web unit to a release without

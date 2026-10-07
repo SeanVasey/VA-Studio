@@ -407,6 +407,12 @@ repointing the `current` symlink atomically, reloading the web service and provi
 site still answers 503, before the final `php artisan up`. The rollback's release switch now
 uses the same mechanism. Documentation only; not executed.
 
+Codex's nineteenth pass (P2 ×2, docs): the restore's `mysql` load is fatal on failure; the S1
+rollback replaces the contents of `<PERSISTENT_ROOT>/private` in place (entries moved aside
+into a 0700 sibling, verified entries moved in, device:inode unchanged, manifest re-checked
+through the previous release's bind mount) instead of swapping the directory object, which a
+bind mount would not follow.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex
