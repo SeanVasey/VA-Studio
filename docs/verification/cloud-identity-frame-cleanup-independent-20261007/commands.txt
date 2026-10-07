@@ -1,0 +1,8 @@
+cwd=/workspace/VA-Studio-identity-frame-cleanup-independent
+source /workspace/.va-studio-toolchain/activate.sh
+composer dump-autoload --no-scripts --no-interaction
+# Both PHPUnit processes set APP_ENV=testing and an isolated synthetic 32-byte APP_KEY.
+php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- -c phpunit.xml --filter test_close_preserves_replacement_transaction_read_only_state --log-junit docs/verification/cloud-identity-frame-cleanup-independent-20261007/independent-final.xml tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php
+# Preload only the unchanged archived test, avoiding the active class's optimized autoload entry. Runtime resolution stays in the reviewed checkout.
+php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/autoload.php"; require "docs/verification/cloud-identity-frame-cleanup-independent-20261007/root-evidence/original/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php"; require "vendor/phpunit/phpunit/phpunit";' -- -c phpunit.xml --filter test_close_preserves_replacement_transaction_read_only_state --log-junit docs/verification/cloud-identity-frame-cleanup-independent-20261007/independent-unchanged-original.xml docs/verification/cloud-identity-frame-cleanup-independent-20261007/root-evidence/original/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php
+php vendor/laravel/pint/builds/pint --test app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php

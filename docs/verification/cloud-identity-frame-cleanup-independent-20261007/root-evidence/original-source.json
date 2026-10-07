@@ -1,0 +1,8 @@
+{
+  "executable": "6feca441ced6581ddf2ccab0d31511f8627092f7",
+  "actual_review_comment": "https://github.com/SeanVasey/VA-Studio/pull/38#discussion_r4206672462",
+  "source_sha256": {
+    "app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php": "623e31f469a0a1779e3f992f5d1c48b0aaa2382d308109bc33cc78f70a7c821b",
+    "tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php": "9a55aa2ebec90dfdbc1a15570431c9e26e31e1358cb110dffb14ef858d3ee81d"
+  }
+}
