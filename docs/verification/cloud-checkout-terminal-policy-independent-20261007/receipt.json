@@ -1,0 +1,46 @@
+{
+  "decision": "BLOCKED; prior 5a807d whole-source approval is historical pending correction",
+  "source": "b6f1dfbb7b92cee5319eac79443b88bf24178ab2",
+  "tree": "a2786396b2d93eef23785f75018ff402267880fa",
+  "source_sha256": {
+    "app/Domain/Commerce/ProductionCheckout/ProductionCheckout.php": "eff295bb191cbc748fd0bb9cfd6c94bc7060ad70e148a712d08d7c3bae6ccca9",
+    "app/Domain/Commerce/ProductionCheckout/CurrentSelection.php": "b0c47f1fd18059acfbe57ed2d27527a90e1a958baeef47899b14f39da303a584"
+  },
+  "canary_sha256": "1c9ebf899a1cce43238b6eef7bef035177cd360d926493df311115318c935712",
+  "result": {
+    "tests": 1,
+    "assertions": 4,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0
+  },
+  "snapshot": {
+    "source": "b6f1dfbb7b92cee5319eac79443b88bf24178ab2",
+    "expected_initial_resolution_count": 2,
+    "actual_resolver_callbacks": 4,
+    "fresh_enabled": false,
+    "refusal": null,
+    "returned_order": {
+      "orderId": "3b414a6a-136c-4426-87f4-6ef599e9987e",
+      "createdAt": "2026-10-07T11:07:11Z",
+      "amounts": {
+        "currency": "USD",
+        "subtotal_minor": 4999,
+        "tax_minor": 0,
+        "total_minor": 4999
+      },
+      "assentAccepted": true,
+      "fundsMode": "test",
+      "paymentStatus": "unverified",
+      "fulfillmentStatus": "pending_payment"
+    },
+    "retained_counts": {
+      "order": 1,
+      "line": 1,
+      "attempt": 1
+    },
+    "review_row_unchanged": true
+  },
+  "snapshot_note": "Original writer used a literal trailing backslash-n; exact raw bytes retained as original-snapshot.json.txt and parsed companion strips only those final two bytes. Execution and product assertions were unaffected.",
+  "scope": "Genuine Laravel PrivateMediaFiles resolving callback; no external provider, only isolated SMTP loopback fixture. Production source unchanged."
+}

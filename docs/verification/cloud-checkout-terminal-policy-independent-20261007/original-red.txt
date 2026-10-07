@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-checkout-terminal-policy-independent/docs/verification/cloud-checkout-terminal-policy-independent-20261007/sqlite-selection.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:02.074, Memory: 84.00 MB
+
+There was 1 failure:
+
+1) Tests\Canary\CheckoutTerminalFreshPolicyCanaryTest::test_terminal_private_media_resolution_withdrawal_refuses_new_order_and_rolls_back
+New order escaped after terminal fresh-checkout policy withdrawal.
+Failed asserting that null is identical to 'disabled'.
+
+/workspace/VA-Studio-checkout-terminal-policy-independent/docs/verification/cloud-checkout-terminal-policy-independent-20261007/CheckoutTerminalFreshPolicyCanaryTest.php:50
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 4[0m[37;41m, Failures: 1[0m[37;41m.[0m

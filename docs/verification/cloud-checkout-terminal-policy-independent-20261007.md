@@ -1,0 +1,9 @@
+# Independent checkout terminal fresh-policy regression
+
+Approval is withheld on executable `b6f1dfbb7b92cee5319eac79443b88bf24178ab2`; the earlier `5a807d4` whole-source decision is historical pending correction. The single actual SQLite canary fails once / four assertions, zero errors or skips.
+
+`ProductionCheckout::accept()` performs its terminal `fresh()` check before `CurrentSelection::proveBytes()`. That byte proof resolves `PrivateMediaFiles` through the real Laravel container. The retained callback withdraws `production_checkout.fresh_checkout_enabled` during that terminal resolution, after the two ordinary initial asset resolutions. Four actual callbacks run; the flag ends false, no refusal occurs, and a new order, line and attempt each persist. The prior retained review row stays unchanged. A new 49.99 USD test-mode order is returned with exact assent and pending payment. No provider dispatch occurs.
+
+The canary uses the existing actual enrolled-buyer/source/catalog/qualification/review fixture and a supported container resolving callback. Source remains unchanged. Move callback-producing work before the final pure fresh-policy proof, or recheck that fresh policy after all such callbacks and before committing fresh review/order writes. Preserve existing order replay and reconciliation after withdrawal. The similar fresh-review terminal sequence has the same check-before-byte-resolution ordering and needs assessment in the narrow correction.
+
+Raw stdout/JUnit, exact canary and original snapshot bytes are retained. The snapshot's literal trailing backslash-n is explicitly documented; its parsed companion changes only that serialization suffix. No product assertion or result is attributed to that harness formatting issue. Native execution is unnecessary to establish this actual framework callback ordering; no native successor pass is claimed.
