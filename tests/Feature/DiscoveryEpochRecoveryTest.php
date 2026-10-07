@@ -318,19 +318,22 @@ class DiscoveryEpochRecoveryTest extends TestCase
     private function databaseSnapshot(PDO $pdo): array
     {
         $driver = DB::getDriverName();
+        // MySQL cannot qualify around a connection-local shadow. An independent
+        // native reader proves permanent rows/DDL while the primary retains its shadow.
+        $reader = $driver === 'mysql' ? DB::build(DB::connection()->getConfig())->getPdo() : $pdo;
         $objects = $driver === 'mysql'
-            ? $pdo->query('SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() ORDER BY TABLE_NAME')->fetchAll(PDO::FETCH_COLUMN)
-            : $pdo->query("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name")->fetchAll(PDO::FETCH_COLUMN);
+            ? $reader->query('SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() ORDER BY TABLE_NAME')->fetchAll(PDO::FETCH_COLUMN)
+            : $reader->query("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name")->fetchAll(PDO::FETCH_COLUMN);
         $snapshot = ['tables' => [], 'guards' => $driver === 'mysql'
-            ? $pdo->query('SELECT * FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE() ORDER BY TRIGGER_NAME')->fetchAll(PDO::FETCH_ASSOC)
-            : $pdo->query('SELECT * FROM sqlite_master ORDER BY type, name')->fetchAll(PDO::FETCH_ASSOC)];
+            ? $reader->query('SELECT * FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE() ORDER BY TRIGGER_NAME')->fetchAll(PDO::FETCH_ASSOC)
+            : $reader->query('SELECT * FROM sqlite_master ORDER BY type, name')->fetchAll(PDO::FETCH_ASSOC)];
         foreach ($objects as $table) {
             $wrapped = $driver === 'mysql' ? '`'.$table.'`' : 'main."'.$table.'"';
-            $rows = $pdo->query('SELECT * FROM '.$wrapped)->fetchAll(PDO::FETCH_ASSOC);
+            $rows = $reader->query('SELECT * FROM '.$wrapped)->fetchAll(PDO::FETCH_ASSOC);
             usort($rows, fn (array $left, array $right): int => strcmp(serialize($left), serialize($right)));
             $snapshot['tables'][$table] = ['rows' => $rows];
             if ($driver === 'mysql') {
-                $snapshot['tables'][$table]['definition'] = $pdo->query('SHOW CREATE TABLE '.$wrapped)->fetchAll(PDO::FETCH_ASSOC);
+                $snapshot['tables'][$table]['definition'] = $reader->query('SHOW CREATE TABLE '.$wrapped)->fetchAll(PDO::FETCH_ASSOC);
             }
         }
 
