@@ -242,7 +242,9 @@ return new class extends Migration
 
     public function down(): void
     {
-        // Operational rollback is code-only. No anchor, source, movement, foreign object or guard is removed.
-        // Destructive removal needs a separate independently reviewed retention migration.
+        // A successful no-op would let Laravel delete the repository row while these
+        // retained tables and guards remain. Refuse before any read or mutation so
+        // ordinary migrate continues to recognize the installed membership schema.
+        throw new LogicException('Membership schema rollback is refused; retain its migration record, data and guards.');
     }
 };

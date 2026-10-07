@@ -4,8 +4,11 @@ namespace Tests\Feature;
 
 use App\Domain\Memberships\CreditLedger;
 use Illuminate\Database\QueryException;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\FinalizationDatabaseMigrations;
@@ -17,6 +20,8 @@ class MembershipCreditMigrationTest extends TestCase
     use FinalizationDatabaseMigrations;
 
     private const TABLES = ['membership_plans', 'membership_plan_versions', 'membership_credit_buckets', 'membership_credit_events'];
+
+    private const MIGRATION = '2026_10_06_230000_membership_credit_foundation';
 
     protected function setUp(): void
     {
@@ -156,7 +161,12 @@ class MembershipCreditMigrationTest extends TestCase
         } catch (LogicException) {
             $this->assertTrue(true);
         }
-        $migration->down();
+        try {
+            $migration->down();
+            $this->fail('Retained membership rollback reported success.');
+        } catch (LogicException $exception) {
+            $this->assertSame('Membership schema rollback is refused; retain its migration record, data and guards.', $exception->getMessage());
+        }
         $this->assertSame($before, $this->rows());
         $this->assertSame($schema, $this->schema());
     }
@@ -185,6 +195,98 @@ class MembershipCreditMigrationTest extends TestCase
             $this->assertSame(0, DB::table('information_schema.TABLES')->where('TABLE_SCHEMA', DB::getDatabaseName())->whereIn('TABLE_NAME', self::TABLES)->count());
         }
         DB::unprepared('DROP TABLE membership_plans');
+    }
+
+    public static function rollbackSchemas(): array
+    {
+        return ['empty retained schema' => [false], 'populated retained schema' => [true]];
+    }
+
+    #[DataProvider('rollbackSchemas')]
+    public function test_actual_artisan_rollback_preserves_migration_bookkeeping_and_exact_retained_evidence(bool $populated): void
+    {
+        if ($populated) {
+            $f = F::bucket();
+            app(CreditLedger::class)->reserve($f['grant']['bucket_id'], 1, 'synthetic:rollback_retained_resource', 'rollback-retained-reserve', $f['principal'], $f['user']);
+        }
+        // The actual Migrator must select 230000, rather than silently examining a later child.
+        $batch = (int) DB::table('migrations')->max('batch') + 1;
+        $this->assertSame(1, DB::table('migrations')->where('migration', self::MIGRATION)->update(['batch' => $batch]));
+        $record = (array) DB::table('migrations')->where('migration', self::MIGRATION)->sole();
+        $this->assertSame(self::MIGRATION, app('migration.repository')->getLast()[0]->migration);
+        foreach (self::TABLES as $table) {
+            $this->assertTrue(Schema::hasTable($table));
+        }
+        $this->assertSame($populated ? 2 : 0, DB::table('membership_credit_events')->count());
+        $this->assertSame(12, DB::getDriverName() === 'sqlite'
+            ? DB::table('sqlite_master')->where('type', 'trigger')->whereIn('tbl_name', self::TABLES)->count()
+            : DB::table('information_schema.TRIGGERS')->where('TRIGGER_SCHEMA', DB::getDatabaseName())->whereIn('EVENT_OBJECT_TABLE', self::TABLES)->count());
+        $before = $this->retainedSnapshot();
+        $refused = false;
+        try {
+            Artisan::call('migrate:rollback', ['--path' => [database_path('migrations/'.self::MIGRATION.'.php')],
+                '--realpath' => true, '--step' => 1, '--force' => true]);
+        } catch (LogicException $exception) {
+            $this->assertSame('Membership schema rollback is refused; retain its migration record, data and guards.', $exception->getMessage());
+            $refused = true;
+        }
+        // An empty successful down() fails here: Migrator deletes the repository row.
+        $this->assertSame($before, $this->retainedSnapshot());
+        $this->assertTrue($refused, 'Retaining tables alone is not a successful rollback.');
+        $this->assertSame($record, (array) DB::table('migrations')->where('migration', self::MIGRATION)->sole());
+        $this->assertSame(0, Artisan::call('migrate', ['--force' => true]));
+        $this->assertSame($before, $this->retainedSnapshot(), 'Ordinary migrate must preserve the recorded retained schema without attempting to reinstall it.');
+
+        // Prove useful forward migration, not only a command that reports nothing pending.
+        $directory = storage_path('framework/testing/membership-rollback-'.Str::uuid());
+        (new Filesystem)->ensureDirectoryExists($directory);
+        $this->beforeApplicationDestroyed(fn () => (new Filesystem)->deleteDirectory($directory));
+        $probe = '2099_01_01_000000_membership_rollback_forward_probe';
+        file_put_contents($directory.'/'.$probe.'.php', <<<'PHP'
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('membership_rollback_forward_probe', function (Blueprint $table): void {
+            $table->engine('InnoDB');
+            $table->unsignedInteger('synthetic_marker');
+        });
+    }
+
+    public function down(): void
+    {
+        throw new LogicException('Disposable probe cleanup belongs to the testing lifecycle.');
+    }
+};
+PHP);
+        $this->assertSame(0, Artisan::call('migrate', ['--path' => [$directory], '--realpath' => true, '--force' => true]));
+        $this->assertTrue(Schema::hasTable('membership_rollback_forward_probe'));
+        $this->assertSame(1, DB::table('migrations')->where('migration', $probe)->count());
+        DB::table('membership_rollback_forward_probe')->insert(['synthetic_marker' => 42]);
+        $this->assertSame(42, (int) DB::table('membership_rollback_forward_probe')->value('synthetic_marker'));
+        $after = $this->retainedSnapshot();
+        $after['migration_records'] = array_values(array_filter($after['migration_records'], fn ($row) => $row['migration'] !== $probe));
+        $this->assertSame($before, $after, 'Forward migration must leave the complete retained membership evidence unchanged.');
+        $this->assertSame(0, DB::transactionLevel());
+    }
+
+    private function retainedSnapshot(): array
+    {
+        $definitions = DB::getDriverName() === 'sqlite'
+            ? DB::table('sqlite_master')->whereIn('tbl_name', self::TABLES)->orderBy('name')->get()->map(fn ($row) => (array) $row)->all()
+            : array_map(fn ($table) => (array) DB::selectOne('SHOW CREATE TABLE '.DB::connection()->getQueryGrammar()->wrapTable($table)), self::TABLES);
+
+        return ['migration_records' => DB::table('migrations')->orderBy('id')->get()->map(fn ($row) => (array) $row)->all(),
+            'table_definitions' => $definitions, 'guards' => $this->schema(), 'membership_rows' => $this->rows(),
+            'users' => DB::table('users')->orderBy('id')->get()->toJson(),
+            'accounts' => DB::table('customer_accounts')->orderBy('id')->get()->toJson(),
+            'audits' => DB::table('audit_events')->orderBy('id')->get()->toJson()];
     }
 
     private function schema(): string
