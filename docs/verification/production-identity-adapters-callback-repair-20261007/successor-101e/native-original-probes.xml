@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="2" assertions="8" errors="0" failures="0" skipped="0" time="60.832838">
+    <testsuite name="Tests\IndependentIdentityAdapters\CommittedFeatureCallbackCanaryTest" file="/workspace/VA-Studio-production-identity-adapters-repair/docs/verification/production-identity-adapters-callback-repair-20261007/probes/CommittedFeatureCallbackCanaryTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="30.691754">
+      <testcase name="test_lazy_secondary_connection_withdrawal_cannot_follow_terminal_feature_policy" file="/workspace/VA-Studio-production-identity-adapters-repair/docs/verification/production-identity-adapters-callback-repair-20261007/probes/CommittedFeatureCallbackCanaryTest.php" line="21" class="Tests\IndependentIdentityAdapters\CommittedFeatureCallbackCanaryTest" classname="Tests.IndependentIdentityAdapters.CommittedFeatureCallbackCanaryTest" assertions="4" time="30.691754"/>
+    </testsuite>
+    <testsuite name="Tests\IndependentIdentityAdapters\FeatureOrdinaryCallbackCanaryTest" file="/workspace/VA-Studio-production-identity-adapters-repair/docs/verification/production-identity-adapters-callback-repair-20261007/probes/FeatureOrdinaryCallbackCanaryTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="30.141084">
+      <testcase name="test_lazy_secondary_connection_cannot_withdraw_feature_after_normal_transaction_fence" file="/workspace/VA-Studio-production-identity-adapters-repair/docs/verification/production-identity-adapters-callback-repair-20261007/probes/FeatureOrdinaryCallbackCanaryTest.php" line="21" class="Tests\IndependentIdentityAdapters\FeatureOrdinaryCallbackCanaryTest" classname="Tests.IndependentIdentityAdapters.FeatureOrdinaryCallbackCanaryTest" assertions="4" time="30.141084"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

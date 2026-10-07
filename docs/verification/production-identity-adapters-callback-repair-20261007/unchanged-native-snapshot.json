@@ -1,0 +1,9 @@
+{
+    "source": "cdc99263b8fd9b624cce326519545e0fe5f18d05",
+    "callback_count": 0,
+    "feature_enabled_after_final_proof": true,
+    "refused": true,
+    "private_projection_released": false,
+    "framework_transaction_depth": 0,
+    "physical_transaction_active": false
+}
