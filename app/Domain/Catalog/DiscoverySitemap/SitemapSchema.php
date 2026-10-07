@@ -313,20 +313,20 @@ final class SitemapSchema
         $wanted = ['PRIMARY' => 'PRIMARY KEY', $name.'_bounds' => 'CHECK'];
         foreach ($definition['foreign'] as $column => $target) {
             $wanted[$name.'_owner'] = 'FOREIGN KEY';
-            $s = $pdo->prepare('SELECT COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, ORDINAL_POSITION FROM information_schema.KEY_COLUMN_USAGE WHERE BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND CONSTRAINT_NAME = ?');
-            $s->execute([$name.'_owner']);
+            $s = $pdo->prepare('SELECT COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, ORDINAL_POSITION FROM information_schema.KEY_COLUMN_USAGE WHERE BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND BINARY TABLE_NAME = BINARY ? AND CONSTRAINT_NAME = ?');
+            $s->execute([$name, $name.'_owner']);
             SitemapException::require($s->fetchAll(PDO::FETCH_ASSOC) === [['COLUMN_NAME' => $column, 'REFERENCED_TABLE_NAME' => DB::connection()->getTablePrefix().$target, 'REFERENCED_COLUMN_NAME' => 'id', 'ORDINAL_POSITION' => 1]], 'schema');
-            $s = $pdo->prepare('SELECT UPDATE_RULE, DELETE_RULE FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND CONSTRAINT_NAME = ?');
-            $s->execute([$name.'_owner']);
-            SitemapException::require($s->fetch(PDO::FETCH_ASSOC) === ['UPDATE_RULE' => 'RESTRICT', 'DELETE_RULE' => 'RESTRICT'], 'schema');
+            $s = $pdo->prepare('SELECT UPDATE_RULE, DELETE_RULE FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND BINARY TABLE_NAME = BINARY ? AND CONSTRAINT_NAME = ?');
+            $s->execute([$name, $name.'_owner']);
+            SitemapException::require($s->fetchAll(PDO::FETCH_ASSOC) === [['UPDATE_RULE' => 'RESTRICT', 'DELETE_RULE' => 'RESTRICT']], 'schema');
         }
         ksort($actual);
         ksort($wanted);
         SitemapException::require($actual === $wanted, 'schema');
-        $s = $pdo->prepare('SELECT c.CHECK_CLAUSE, t.ENFORCED FROM information_schema.CHECK_CONSTRAINTS c JOIN information_schema.TABLE_CONSTRAINTS t ON t.CONSTRAINT_SCHEMA = c.CONSTRAINT_SCHEMA AND t.CONSTRAINT_NAME = c.CONSTRAINT_NAME WHERE BINARY t.TABLE_SCHEMA = BINARY DATABASE() AND t.CONSTRAINT_NAME = ?');
-        $s->execute([$name.'_bounds']);
-        $row = $s->fetch(PDO::FETCH_ASSOC);
-        SitemapException::require($row && $row['ENFORCED'] === 'YES' && $this->check($row['CHECK_CLAUSE']) === $this->check($definition['check']), 'schema');
+        $s = $pdo->prepare("SELECT c.CHECK_CLAUSE, t.ENFORCED FROM information_schema.CHECK_CONSTRAINTS c JOIN information_schema.TABLE_CONSTRAINTS t ON BINARY t.CONSTRAINT_SCHEMA = BINARY c.CONSTRAINT_SCHEMA AND BINARY t.CONSTRAINT_NAME = BINARY c.CONSTRAINT_NAME WHERE BINARY t.TABLE_SCHEMA = BINARY DATABASE() AND BINARY t.TABLE_NAME = BINARY ? AND t.CONSTRAINT_TYPE = 'CHECK' AND t.CONSTRAINT_NAME = ?");
+        $s->execute([$name, $name.'_bounds']);
+        $rows = $s->fetchAll(PDO::FETCH_ASSOC);
+        SitemapException::require(count($rows) === 1 && $rows[0]['ENFORCED'] === 'YES' && $this->check($rows[0]['CHECK_CLAUSE']) === $this->check($definition['check']), 'schema');
     }
 
     private function sql(string $sql): string
