@@ -55,18 +55,19 @@ final class FreeGrantAuthorityTest extends TestCase
 
                 return;
             }
+            $oldUser = $kind === 'shadow' ? DB::connection()->getPdo()->query('SELECT * FROM users WHERE id = '.(int) $f['customer']['user']->id)->fetch(\PDO::FETCH_ASSOC) : [];
             DB::table('users')->where('id', $f['customer']['user']->id)->update(['password' => 'WITHDRAWN-PRIVATE-CREDENTIAL']);
             if ($kind === 'shadow') {
                 $pdo = DB::connection()->getPdo();
                 if (DB::getDriverName() === 'mysql') {
                     $definition = $pdo->query('SHOW CREATE TABLE users')->fetch(\PDO::FETCH_NUM)[1];
                     $pdo->exec(preg_replace('/\ACREATE TABLE /', 'CREATE TEMPORARY TABLE ', $definition));
-                    $columns = array_keys($f['customer']['user']->getAttributes());
-                    $statement = $pdo->prepare('INSERT INTO users ('.implode(',', array_map(fn ($c) => '`'.$c.'`', $columns)).') VALUES ('.implode(',', array_fill(0, count($columns), '?')).')');
-                    $statement->execute(array_values($f['customer']['user']->getAttributes()));
                 } else {
-                    $pdo->exec('CREATE TEMP TABLE users AS SELECT * FROM main.users');
+                    $pdo->exec('CREATE TEMP TABLE users AS SELECT * FROM main.users WHERE 0');
                 }
+                $columns = array_keys($oldUser);
+                $statement = $pdo->prepare('INSERT INTO users ('.implode(',', array_map(fn ($c) => '`'.$c.'`', $columns)).') VALUES ('.implode(',', array_fill(0, count($columns), '?')).')');
+                $statement->execute(array_values($oldUser));
             }
         });
         try {
