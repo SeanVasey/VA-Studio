@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest" file="/workspace/VA-Studio-production-identity-adapters-repair/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php" tests="1" assertions="6" errors="0" failures="0" skipped="0" time="30.099748">
+    <testcase name="test_native_validation_reads_current_committed_credential_instead_of_an_old_repeatable_read_snapshot" file="/workspace/VA-Studio-production-identity-adapters-repair/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php" line="271" class="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest" classname="Tests.Feature.ProductionIdentityAdapters.ProductionIdentityCommittedFrameTest" assertions="6" time="30.099748"/>
+  </testsuite>
+</testsuites>
