@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="24" assertions="154" errors="6" failures="0" skipped="0" time="6.730797">
+    <testsuite name="Tests\Feature\ProductionIdentityRegistrationTest" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentityRegistrationTest.php" tests="7" assertions="83" errors="1" failures="0" skipped="0" time="2.228813">
+      <testcase name="test_registered_http_uses_actual_smtp_proof_and_recovery_preserves_owner_but_invalidates_old_session" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentityRegistrationTest.php" line="26" class="Tests\Feature\ProductionIdentityRegistrationTest" classname="Tests.Feature.ProductionIdentityRegistrationTest" assertions="3" time="0.577021">
+        <error type="App\Domain\Customers\ProductionIdentity\IdentityException">Tests\Feature\ProductionIdentityRegistrationTest::test_registered_http_uses_actual_smtp_proof_and_recovery_preserves_owner_but_invalidates_old_session
+App\Domain\Customers\ProductionIdentity\IdentityException: This customer identity request could not be confirmed.
+
+/workspace/VA-Studio-identity-registration/app/Domain/Customers/ProductionIdentity/Notifications/LoopbackSmtp.php:18
+/workspace/VA-Studio-identity-registration/tests/Support/ProductionIdentityFixture.php:96
+/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentityRegistrationTest.php:98
+/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentityRegistrationTest.php:29</error>
+      </testcase>
+      <testcase name="test_real_csrf_fails_with_private_generic_response_before_any_writer" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentityRegistrationTest.php" line="55" class="Tests\Feature\ProductionIdentityRegistrationTest" classname="Tests.Feature.ProductionIdentityRegistrationTest" assertions="15" time="0.269810"/>
+      <testsuite name="Tests\Feature\ProductionIdentityRegistrationTest::test_global_private_boundary_covers_unregistered_paths_methods_and_disabled_identity" tests="4" assertions="52" errors="0" failures="0" skipped="0" time="1.105797">
+        <testcase name="test_global_private_boundary_covers_unregistered_paths_methods_and_disabled_identity with data set #0" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentityRegistrationTest.php" line="75" class="Tests\Feature\ProductionIdentityRegistrationTest" classname="Tests.Feature.ProductionIdentityRegistrationTest" assertions="13" time="0.303353"/>
+        <testcase name="test_global_private_boundary_covers_unregistered_paths_methods_and_disabled_identity with data set #1" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentityRegistrationTest.php" line="75" class="Tests\Feature\ProductionIdentityRegistrationTest" classname="Tests.Feature.ProductionIdentityRegistrationTest" assertions="13" time="0.266768"/>
+        <testcase name="test_global_private_boundary_covers_unregistered_paths_methods_and_disabled_identity with data set #2" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentityRegistrationTest.php" line="75" class="Tests\Feature\ProductionIdentityRegistrationTest" classname="Tests.Feature.ProductionIdentityRegistrationTest" assertions="13" time="0.277867"/>
+        <testcase name="test_global_private_boundary_covers_unregistered_paths_methods_and_disabled_identity with data set #3" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentityRegistrationTest.php" line="75" class="Tests\Feature\ProductionIdentityRegistrationTest" classname="Tests.Feature.ProductionIdentityRegistrationTest" assertions="13" time="0.257809"/>
+      </testsuite>
+      <testcase name="test_precontroller_exception_is_sanitized_and_logged_without_private_message_or_trace" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentityRegistrationTest.php" line="88" class="Tests\Feature\ProductionIdentityRegistrationTest" classname="Tests.Feature.ProductionIdentityRegistrationTest" assertions="13" time="0.276185"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionIdentity\ProductionIdentityHttpTest" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityHttpTest.php" tests="8" assertions="23" errors="5" failures="0" skipped="0" time="2.098807">
+      <testcase name="test_http_mailbox_completion_and_new_session_do_not_change_staff_guard_and_recovery_invalidates_old_marker" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityHttpTest.php" line="28" class="Tests\Feature\ProductionIdentity\ProductionIdentityHttpTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityHttpTest" assertions="1" time="0.233679">
+        <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\ProductionIdentity\ProductionIdentityHttpTest::test_http_mailbox_completion_and_new_session_do_not_change_staff_guard_and_recovery_invalidates_old_marker
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1363
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1264
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1187
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:257
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:215
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php:642
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php:604
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php:411
+/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityHttpTest.php:32</error>
+      </testcase>
+      <testcase name="test_login_event_credential_change_cannot_stamp_later_password_as_authenticated" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityHttpTest.php" line="55" class="Tests\Feature\ProductionIdentity\ProductionIdentityHttpTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityHttpTest" assertions="1" time="0.237211">
+        <error type="App\Domain\Customers\ProductionIdentity\IdentityException">Tests\Feature\ProductionIdentity\ProductionIdentityHttpTest::test_login_event_credential_change_cannot_stamp_later_password_as_authenticated
+App\Domain\Customers\ProductionIdentity\IdentityException: This customer identity request could not be confirmed.
+
+/workspace/VA-Studio-identity-registration/app/Domain/Customers/ProductionIdentity/IdentityPolicy.php:85
+/workspace/VA-Studio-identity-registration/app/Domain/Customers/ProductionIdentity/IdentityRequests.php:26
+/workspace/VA-Studio-identity-registration/tests/Support/ProductionIdentityFixture.php:68
+/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityHttpTest.php:57</error>
+      </testcase>
+      <testcase name="test_legacy_cached_customer_guard_without_new_session_marker_does_not_mint_access" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityHttpTest.php" line="68" class="Tests\Feature\ProductionIdentity\ProductionIdentityHttpTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityHttpTest" assertions="1" time="0.222096">
+        <error type="App\Domain\Customers\ProductionIdentity\IdentityException">Tests\Feature\ProductionIdentity\ProductionIdentityHttpTest::test_legacy_cached_customer_guard_without_new_session_marker_does_not_mint_access
+App\Domain\Customers\ProductionIdentity\IdentityException: This customer identity request could not be confirmed.
+
+/workspace/VA-Studio-identity-registration/app/Domain/Customers/ProductionIdentity/IdentityPolicy.php:85
+/workspace/VA-Studio-identity-registration/app/Domain/Customers/ProductionIdentity/IdentityRequests.php:26
+/workspace/VA-Studio-identity-registration/tests/Support/ProductionIdentityFixture.php:68
+/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityHttpTest.php:70</error>
+      </testcase>
+      <testsuite name="Tests\Feature\ProductionIdentity\ProductionIdentityHttpTest::test_private_boundary_rejects_ambiguous_body_query_origin_or_size_without_echo" tests="4" assertions="19" errors="1" failures="0" skipped="0" time="1.127952">
+        <testcase name="test_private_boundary_rejects_ambiguous_body_query_origin_or_size_without_echo with data set #0" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityHttpTest.php" line="76" class="Tests\Feature\ProductionIdentity\ProductionIdentityHttpTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityHttpTest" assertions="6" time="0.241170"/>
+        <testcase name="test_private_boundary_rejects_ambiguous_body_query_origin_or_size_without_echo with data set #1" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityHttpTest.php" line="76" class="Tests\Feature\ProductionIdentity\ProductionIdentityHttpTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityHttpTest" assertions="6" time="0.266010"/>
+        <testcase name="test_private_boundary_rejects_ambiguous_body_query_origin_or_size_without_echo with data set #2" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityHttpTest.php" line="76" class="Tests\Feature\ProductionIdentity\ProductionIdentityHttpTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityHttpTest" assertions="6" time="0.364184"/>
+        <testcase name="test_private_boundary_rejects_ambiguous_body_query_origin_or_size_without_echo with data set #3" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityHttpTest.php" line="76" class="Tests\Feature\ProductionIdentity\ProductionIdentityHttpTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityHttpTest" assertions="1" time="0.256589">
+          <error type="Illuminate\Encryption\MissingAppKeyException">Tests\Feature\ProductionIdentity\ProductionIdentityHttpTest::test_private_boundary_rejects_ambiguous_body_query_origin_or_size_without_echo with data set #3
+Illuminate\Encryption\MissingAppKeyException: No application encryption key has been specified.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:83
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/helpers.php:393
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:81
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:64
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1363
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1264
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1187
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:257
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:215
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php:642
+/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityHttpTest.php:78</error>
+        </testcase>
+      </testsuite>
+      <testcase name="test_real_csrf_rejection_never_flashes_proof_or_password" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityHttpTest.php" line="89" class="Tests\Feature\ProductionIdentity\ProductionIdentityHttpTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityHttpTest" assertions="1" time="0.277868">
+        <error type="App\Domain\Customers\ProductionIdentity\IdentityException">Tests\Feature\ProductionIdentity\ProductionIdentityHttpTest::test_real_csrf_rejection_never_flashes_proof_or_password
+App\Domain\Customers\ProductionIdentity\IdentityException: This customer identity request could not be confirmed.
+
+/workspace/VA-Studio-identity-registration/app/Domain/Customers/ProductionIdentity/IdentityPolicy.php:85
+/workspace/VA-Studio-identity-registration/app/Domain/Customers/ProductionIdentity/IdentityRequests.php:26
+/workspace/VA-Studio-identity-registration/tests/Support/ProductionIdentityFixture.php:68
+/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityHttpTest.php:91</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php" tests="9" assertions="48" errors="0" failures="0" skipped="0" time="2.403178">
+      <testsuite name="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest::test_actual_parent_metadata_is_refused_before_any_owned_ddl" tests="4" assertions="20" errors="0" failures="0" skipped="0" time="1.058378">
+        <testcase name="test_actual_parent_metadata_is_refused_before_any_owned_ddl with data set &quot;users credential column&quot;" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php" line="34" class="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityDependencyAdmissionTest" assertions="5" time="0.265859"/>
+        <testcase name="test_actual_parent_metadata_is_refused_before_any_owned_ddl with data set &quot;users credential nullability&quot;" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php" line="34" class="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityDependencyAdmissionTest" assertions="5" time="0.264976"/>
+        <testcase name="test_actual_parent_metadata_is_refused_before_any_owned_ddl with data set &quot;account access generation&quot;" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php" line="34" class="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityDependencyAdmissionTest" assertions="5" time="0.261310"/>
+        <testcase name="test_actual_parent_metadata_is_refused_before_any_owned_ddl with data set &quot;owner identity type&quot;" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php" line="34" class="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityDependencyAdmissionTest" assertions="5" time="0.266233"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest::test_changed_or_missing_actual_parent_guard_is_refused_before_owned_ddl" tests="2" assertions="14" errors="0" failures="0" skipped="0" time="0.537719">
+        <testcase name="test_changed_or_missing_actual_parent_guard_is_refused_before_owned_ddl with data set &quot;account immutable owner&quot;" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php" line="81" class="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityDependencyAdmissionTest" assertions="7" time="0.286958"/>
+        <testcase name="test_changed_or_missing_actual_parent_guard_is_refused_before_owned_ddl with data set &quot;retained owner&quot;" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php" line="81" class="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityDependencyAdmissionTest" assertions="7" time="0.250761"/>
+      </testsuite>
+      <testcase name="test_required_unique_key_and_disabled_foreign_keys_are_refused_before_owned_ddl" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php" line="106" class="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityDependencyAdmissionTest" assertions="6" time="0.242265"/>
+      <testcase name="test_permanent_parent_temporary_shadow_is_refused_before_owned_ddl" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php" line="128" class="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityDependencyAdmissionTest" assertions="4" time="0.269132"/>
+      <testcase name="test_empty_owned_prefix_does_not_allow_a_withdrawn_dependency_guard_to_be_repaired" file="/workspace/VA-Studio-identity-registration/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php" line="144" class="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityDependencyAdmissionTest" assertions="4" time="0.295682"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,16 @@
+
+> test
+> vitest run tests/frontend/production-customer-identity.test.tsx tests/frontend/production-identity-registration.test.tsx --reporter=default --reporter=junit --outputFile=docs/verification/cloud-identity-independent-20261007/final-frontend-junit.xml
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-identity-registration-independent
+
+ ✓ tests/frontend/production-identity-registration.test.tsx (1 test) 249ms
+ ✓ tests/frontend/production-customer-identity.test.tsx (13 tests) 415ms
+
+ Test Files  2 passed (2)
+      Tests  14 passed (14)
+   Start at  09:12:14
+   Duration  1.39s (environment 54%, tests 28%, transform 9%, setup 7%, import 2%)
+
+JUNIT report written to /workspace/VA-Studio-identity-registration-independent/docs/verification/cloud-identity-independent-20261007/final-frontend-junit.xml

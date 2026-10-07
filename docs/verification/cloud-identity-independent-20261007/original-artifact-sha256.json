@@ -1,0 +1,32 @@
+{
+  "count": 26,
+  "scope": "tracked durable original reviewer evidence only; excludes this manifest and report",
+  "sha256": {
+    "docs/verification/cloud-identity-independent-20261007/IdentityDependencyAdmissionCanaryTest.php": "161571fc869801381a5905b30a30901c0fd6d798e87e1d59f182bb5aeb63b4d6",
+    "docs/verification/cloud-identity-independent-20261007/IdentityNativeDependencyAdmissionCanaryTest.php": "4ad5a40000a13a65716bbfa26bb53e1062eaca280605e3e2c03386c188463b23",
+    "docs/verification/cloud-identity-independent-20261007/blocked-receipt.json": "5940a90066ac7b070f0317a06d6ce705746a421c9d005d7ad6418e05a34bfef5",
+    "docs/verification/cloud-identity-independent-20261007/canary-pint.txt": "541d85d43f3da09966440a4011ae98ae754304cf123aa467818382cf0ab64173",
+    "docs/verification/cloud-identity-independent-20261007/commands.json": "3a21e514806a5ca2a36ea4178a95d401f5a611d1a30ca2b31e5256dec6291ece",
+    "docs/verification/cloud-identity-independent-20261007/dependency-admission-red-junit.xml": "25abc86204dda2591d434e0f778b3d28b1f8347562e207626ea845c39d39fe8b",
+    "docs/verification/cloud-identity-independent-20261007/dependency-admission-red.txt": "3a44727e558c5b2b2cea1b57c96b3815923298503538de763f6980d29a3b68f5",
+    "docs/verification/cloud-identity-independent-20261007/dependency-admission-snapshot.json": "9064ac569d0567f4ab8dc82fa2f8826ffec46ac4c3e96838f5886a5f45584d48",
+    "docs/verification/cloud-identity-independent-20261007/final-frontend-junit.xml": "21ee88f2d04b98f9ff94a028ab84b1021df8e5a2f50918e508692df2a568a82b",
+    "docs/verification/cloud-identity-independent-20261007/final-frontend.txt": "8201bf91a69b689c2179a25d46f1a98a4a9161f26d3b41d76296df0d7bbe0299",
+    "docs/verification/cloud-identity-independent-20261007/final-native-registered-junit.xml": "36501b9f9395b89256ec3c3ab252b805e4b70cb3cdfdf9acea59761f4431871c",
+    "docs/verification/cloud-identity-independent-20261007/final-native-registered.txt": "3ade90057e2e0f3abd9293aecebc8577dee8e24b9082bb5e2e51c71f96168cb0",
+    "docs/verification/cloud-identity-independent-20261007/final-sqlite-http-junit.xml": "9219f2f99dc6e2ee273d19381665f9f2b56c43f81fff16d71c28673f0aeccf77",
+    "docs/verification/cloud-identity-independent-20261007/final-sqlite-http.txt": "0d8cd6a3d797dbe0316df7679e30f1048729aee88d60a0384f36162c2693ed46",
+    "docs/verification/cloud-identity-independent-20261007/native-dependency-admission-red-junit.xml": "7c7b4632d849e8928674c904a152399ccbc805169c8107113c79c379d0a1ecea",
+    "docs/verification/cloud-identity-independent-20261007/native-dependency-admission-red.txt": "c90fd326a6fbb0740e632aba078313c6e6668c0580770fc85f28812e05fa3865",
+    "docs/verification/cloud-identity-independent-20261007/native-dependency-admission-snapshot.json": "a6f20817d5ec4a982c015941dc87f573ccb45876edd18364a0776742aebc8172",
+    "docs/verification/cloud-identity-independent-20261007/native-registered-selection.xml": "07ea1bb9372ad290930e9de7f1b0c6784fa0a849877824b967d8c03c73a2c54d",
+    "docs/verification/cloud-identity-independent-20261007/own-autoload.txt": "11b7ad6d0e3a9c59266d0b0506ac947dd3d033d520818c58f53196ace77b9145",
+    "docs/verification/cloud-identity-independent-20261007/preparation-old-checkout-final-frontend-junit.xml": "c69b982f670eb4c8fc14173779c7451afcfba7633ebeb9d60d55cee7baf2562c",
+    "docs/verification/cloud-identity-independent-20261007/preparation-old-checkout-final-frontend.txt": "0d60d72536ff3cd7d9960b5b98ddbd3a91e054da90cb1a9e910d5b47ef72d48a",
+    "docs/verification/cloud-identity-independent-20261007/preparation-old-checkout-final-native-registered.txt": "b7f1f9f98a90ad2e9c855b6eddaeba8f9c3eb07520a3412f2df67c930920844f",
+    "docs/verification/cloud-identity-independent-20261007/preparation-old-checkout-final-sqlite-http.txt": "e9facf9fe9aa44e0c975069b6fd36f3ae84c82c196b19d6c6173a759b6d101fa",
+    "docs/verification/cloud-identity-independent-20261007/preparation-old-checkout-own-autoload.txt": "2ce351bb5890a7f6762e6b3f959420fd6bdf8880555ac5770498136b9e3360ae",
+    "docs/verification/cloud-identity-independent-20261007/source-evidence-reconciliation.json": "8316a49bd117d53d7cd5c1951b981eb7d0b877237356a6cccecfaabc6446c20c",
+    "docs/verification/cloud-identity-independent-20261007/sqlite-http-selection.xml": "0aa0aefa637c1c88c280134a61b2a0947e2cac792dc30eb4a4b49cb9b76016ae"
+  }
+}

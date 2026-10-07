@@ -1,0 +1,15 @@
+{
+    "capacity": 65535,
+    "retained_bytes": 64800,
+    "intent_bytes": 86184,
+    "sql_attempts": 1,
+    "driver_error": [
+        "22001",
+        1406,
+        "Data too long for column 'payload' at row 1"
+    ],
+    "prior_rows_exact": true,
+    "actual_source": "7b340ae172597d0311c5c8441ac93dacf206a2be",
+    "actual_driver": "mysql",
+    "native_version": "8.0.46-0ubuntu0.24.04.4"
+}

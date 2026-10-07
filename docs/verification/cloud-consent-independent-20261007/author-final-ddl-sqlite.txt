@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/probe-sqlite.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:00.263, Memory: 67.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ConsentMigrationProbeTest::test_final_ddl_callback_cannot_remove_an_earlier_guard_and_record_completed_installation
+Final full-graph assertion must detect an earlier dropped guard before migrator bookkeeping.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php:64
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 2[0m[37;41m, Failures: 1[0m[37;41m.[0m

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="14" failures="0" errors="0" time="0.769570021">
+    <testsuite name="tests/frontend/production-customer-identity.test.tsx" timestamp="2026-10-07T08:59:08.806Z" hostname="4fe41ffd3696" tests="13" failures="0" errors="0" skipped="0" time="0.473728837">
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; clears fragments/query/history and consumes the proof once without storage or props" time="0.026094764">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; rejects malformed bearer " time="0.002901795">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; rejects malformed bearer #enroll.bad.proof" time="0.001190015">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; rejects malformed bearer #enroll.aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&amp;email=private" time="0.001323551">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; rejects malformed bearer #ENROLL.aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" time="0.001153431">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; retries identical request after uncertain response and accepts only the fixed minimal envelope" time="0.29240152">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; keeps completion proof out of rendered markup and sends it only in the fixed POST body" time="0.036132614">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; erases enroll private input and permanently closes the departed page even when fetch ignores abort" time="0.024523992">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; erases recover private input and permanently closes the departed page even when fetch ignores abort" time="0.02008138">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; erases sign-in private input and permanently closes the departed page even when fetch ignores abort" time="0.024869257">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; erases a completion attempt, refuses BFCache restoration and aborts on unmount" time="0.020324747">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; preserves a fresh completion link through React effect rehearsal and aborts real removal" time="0.018507458">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; rejects duplicate keys and arbitrary redirects in success envelopes and uses current CSRF cookie" time="0.002549006">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/frontend/production-identity-registration-canary.test.tsx" timestamp="2026-10-07T08:59:08.825Z" hostname="4fe41ffd3696" tests="1" failures="0" errors="0" skipped="0" time="0.295841184">
+        <testcase classname="tests/frontend/production-identity-registration-canary.test.tsx" name="erases completion credentials on page departure and ignores the pending acknowledgement" time="0.293632085">
+        </testcase>
+    </testsuite>
+</testsuites>

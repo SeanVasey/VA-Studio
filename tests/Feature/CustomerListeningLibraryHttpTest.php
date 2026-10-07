@@ -75,7 +75,7 @@ class CustomerListeningLibraryHttpTest extends TestCase
             'origin' => $this->postJson('/account/listening-library', $body, ['Origin' => 'https://foreign.invalid']),
             'duplicate' => $this->raw('{"action":"create-playlist","action":"delete-playlist","version":0,"name":"PRIVATE-SENTINEL"}'),
             'escaped-duplicate' => $this->raw('{"action":"create-playlist","\\u0061ction":"delete-playlist","version":0,"name":"PRIVATE-SENTINEL"}'),
-            'oversized' => $this->raw(str_repeat('x', 4097)),
+            'oversized' => $this->raw(str_repeat('x', 16385)),
             'wrong-type' => $this->post('/account/listening-library', $body),
             'credential-change' => $this->afterCredentialChange($fixture, $body),
             'production' => $this->inProduction($body),

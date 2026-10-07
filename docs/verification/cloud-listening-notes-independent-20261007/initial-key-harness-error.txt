@@ -1,0 +1,34 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-notes-independent/docs/verification/cloud-listening-notes-independent-20261007/mysql-selection.xml
+
+[31;1mE[0m                                                                   1 / 1 (100%)
+
+Time: 00:08.005, Memory: 77.00 MB
+
+There was 1 error:
+
+1) Tests\IndependentListeningNotes\ListeningNotesCapacityCanaryTest::test_real_oversized_encrypted_text_intent_is_refused_before_sql_and_retains_exportable_state
+RuntimeException: Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/Encrypter.php:61
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:700
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:331
+/workspace/VA-Studio-notes-independent/docs/verification/cloud-listening-notes-independent-20261007/ListeningNotesCapacityCanaryTest.php:29
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 0[0m[37;41m, Errors: 1[0m[37;41m.[0m

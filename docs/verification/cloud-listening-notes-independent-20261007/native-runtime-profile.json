@@ -1,0 +1,20 @@
+{
+    "observed_source": "12738218c9e47074cae6bbfba88f93141799dec4",
+    "php_runtime": "8.4.26",
+    "server": {
+        "version": "8.0.46-0ubuntu0.24.04.4",
+        "comment": "(Ubuntu)",
+        "sql_mode": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+        "case_mode": 0,
+        "flush_at_commit": 1,
+        "sync_binlog": 1,
+        "doublewrite": "ON",
+        "log_bin": 0
+    },
+    "sqlite_version": "3.46.1",
+    "autoload": {
+        "App\\Domain\\Customers\\Listening\\ListeningLibrary": "\/workspace\/VA-Studio-notes-independent\/app\/Domain\/Customers\/Listening\/ListeningLibrary.php",
+        "App\\Domain\\Customers\\Listening\\SavedListeningLibrary": "\/workspace\/VA-Studio-notes-independent\/app\/Domain\/Customers\/Listening\/SavedListeningLibrary.php",
+        "Tests\\TestCase": "\/workspace\/VA-Studio-notes-independent\/tests\/TestCase.php"
+    }
+}

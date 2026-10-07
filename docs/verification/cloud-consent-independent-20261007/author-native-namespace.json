@@ -1,0 +1,110 @@
+{
+    "source": "0143f4b6bb7c529aed003fdfc741bf93f2e3a9ed",
+    "driver": "mysql",
+    "refused": false,
+    "error": null,
+    "objects_unchanged": false,
+    "before": [
+        [
+            {
+                "TABLE_NAME": "customer_accounts",
+                "TABLE_TYPE": "BASE TABLE"
+            },
+            {
+                "TABLE_NAME": "review_sentinel",
+                "TABLE_TYPE": "BASE TABLE"
+            },
+            {
+                "TABLE_NAME": "users",
+                "TABLE_TYPE": "BASE TABLE"
+            }
+        ],
+        [
+            {
+                "TRIGGER_NAME": "customer_consent_policies",
+                "EVENT_OBJECT_TABLE": "review_sentinel",
+                "ACTION_STATEMENT": "SET @consent_probe=1"
+            }
+        ]
+    ],
+    "after": [
+        [
+            {
+                "TABLE_NAME": "customer_accounts",
+                "TABLE_TYPE": "BASE TABLE"
+            },
+            {
+                "TABLE_NAME": "customer_consent_events",
+                "TABLE_TYPE": "BASE TABLE"
+            },
+            {
+                "TABLE_NAME": "customer_consent_policies",
+                "TABLE_TYPE": "BASE TABLE"
+            },
+            {
+                "TABLE_NAME": "customer_consent_states",
+                "TABLE_TYPE": "BASE TABLE"
+            },
+            {
+                "TABLE_NAME": "review_sentinel",
+                "TABLE_TYPE": "BASE TABLE"
+            },
+            {
+                "TABLE_NAME": "users",
+                "TABLE_TYPE": "BASE TABLE"
+            }
+        ],
+        [
+            {
+                "TRIGGER_NAME": "customer_consent_events_retain_delete",
+                "EVENT_OBJECT_TABLE": "customer_consent_events",
+                "ACTION_STATEMENT": "BEGIN IF NOT (0=1) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Retained consent graph refused'; END IF; END"
+            },
+            {
+                "TRIGGER_NAME": "customer_consent_events_retain_insert",
+                "EVENT_OBJECT_TABLE": "customer_consent_events",
+                "ACTION_STATEMENT": "BEGIN IF NOT (NEW.purpose='email_marketing' AND NEW.source='first_party_customer' AND NEW.revision BETWEEN 1 AND 2147483646 AND CHAR_LENGTH(NEW.recipient_hmac)=64 AND NEW.recipient_hmac REGEXP '^[a-f0-9]{64}$' AND LENGTH(NEW.recipient_ciphertext) BETWEEN 1 AND 4096 AND CHAR_LENGTH(NEW.public_id)=36 AND ((NEW.status='granted' AND NEW.affirmative=1 AND NEW.policy_id IS NOT NULL) OR (NEW.status='withdrawn' AND NEW.affirmative=0)) AND (NEW.policy_id IS NULL OR EXISTS (SELECT 1 FROM customer_consent_policies WHERE id=NEW.policy_id AND purpose=NEW.purpose)) AND NEW.revision=COALESCE((SELECT revision FROM customer_consent_states WHERE customer_account_id=NEW.customer_account_id AND purpose=NEW.purpose),0)+1 AND EXISTS (SELECT 1 FROM customer_accounts a JOIN users u ON u.id=a.user_id WHERE a.id=NEW.customer_account_id AND a.active=1 AND u.is_admin=0 AND u.email_verified_at IS NOT NULL) AND NOT EXISTS (SELECT 1 FROM customer_consent_events WHERE id=NEW.id OR public_id=NEW.public_id OR (customer_account_id=NEW.customer_account_id AND purpose=NEW.purpose AND revision=NEW.revision))) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Retained consent graph refused'; END IF; END"
+            },
+            {
+                "TRIGGER_NAME": "customer_consent_events_retain_update",
+                "EVENT_OBJECT_TABLE": "customer_consent_events",
+                "ACTION_STATEMENT": "BEGIN IF NOT (0=1) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Retained consent graph refused'; END IF; END"
+            },
+            {
+                "TRIGGER_NAME": "customer_consent_policies",
+                "EVENT_OBJECT_TABLE": "review_sentinel",
+                "ACTION_STATEMENT": "SET @consent_probe=1"
+            },
+            {
+                "TRIGGER_NAME": "customer_consent_policies_retain_delete",
+                "EVENT_OBJECT_TABLE": "customer_consent_policies",
+                "ACTION_STATEMENT": "BEGIN IF NOT (0=1) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Retained consent graph refused'; END IF; END"
+            },
+            {
+                "TRIGGER_NAME": "customer_consent_policies_retain_insert",
+                "EVENT_OBJECT_TABLE": "customer_consent_policies",
+                "ACTION_STATEMENT": "BEGIN IF NOT (NEW.purpose='email_marketing' AND CHAR_LENGTH(NEW.version) BETWEEN 1 AND 80 AND CHAR_LENGTH(NEW.notice) BETWEEN 1 AND 2000 AND LENGTH(NEW.notice)<=8000 AND CHAR_LENGTH(NEW.review_reference) BETWEEN 1 AND 200 AND LENGTH(NEW.review_reference)<=800 AND CHAR_LENGTH(NEW.notice_hash)=64 AND NEW.notice_hash REGEXP '^[a-f0-9]{64}$' AND CHAR_LENGTH(NEW.policy_hash)=64 AND NEW.policy_hash REGEXP '^[a-f0-9]{64}$' AND NOT EXISTS (SELECT 1 FROM customer_consent_policies WHERE id=NEW.id OR (purpose=NEW.purpose AND version=NEW.version))) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Retained consent graph refused'; END IF; END"
+            },
+            {
+                "TRIGGER_NAME": "customer_consent_policies_retain_update",
+                "EVENT_OBJECT_TABLE": "customer_consent_policies",
+                "ACTION_STATEMENT": "BEGIN IF NOT (0=1) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Retained consent graph refused'; END IF; END"
+            },
+            {
+                "TRIGGER_NAME": "customer_consent_states_retain_delete",
+                "EVENT_OBJECT_TABLE": "customer_consent_states",
+                "ACTION_STATEMENT": "BEGIN IF NOT (0=1) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Retained consent graph refused'; END IF; END"
+            },
+            {
+                "TRIGGER_NAME": "customer_consent_states_retain_insert",
+                "EVENT_OBJECT_TABLE": "customer_consent_states",
+                "ACTION_STATEMENT": "BEGIN IF NOT (NEW.purpose='email_marketing' AND NEW.revision=1 AND EXISTS (SELECT 1 FROM customer_consent_events WHERE id=NEW.event_id AND customer_account_id=NEW.customer_account_id AND purpose=NEW.purpose AND revision=NEW.revision) AND NOT EXISTS (SELECT 1 FROM customer_consent_states WHERE id=NEW.id OR (customer_account_id=NEW.customer_account_id AND purpose=NEW.purpose))) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Retained consent graph refused'; END IF; END"
+            },
+            {
+                "TRIGGER_NAME": "customer_consent_states_retain_update",
+                "EVENT_OBJECT_TABLE": "customer_consent_states",
+                "ACTION_STATEMENT": "BEGIN IF NOT (NEW.id=OLD.id AND NEW.customer_account_id=OLD.customer_account_id AND NEW.purpose=OLD.purpose AND NEW.created_at=OLD.created_at AND NEW.revision=OLD.revision+1 AND NEW.revision<=2147483646 AND NEW.updated_at>=OLD.updated_at AND EXISTS (SELECT 1 FROM customer_consent_events WHERE id=NEW.event_id AND customer_account_id=NEW.customer_account_id AND purpose=NEW.purpose AND revision=NEW.revision)) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Retained consent graph refused'; END IF; END"
+            }
+        ]
+    ]
+}

@@ -1,0 +1,178 @@
+{
+  "source": "0143f4b6bb7c529aed003fdfc741bf93f2e3a9ed",
+  "tree": "1379247a58593c145d27f951a4020fab57294663",
+  "docs_only": "6b055b7b8feccf54c6d33384fb62ef98efa94fb4",
+  "source_bindings": {
+    "app/Domain/Customers/Preferences/ConsentEvidence.php": {
+      "blob": "b76164e3388abf131f8262bed976c33ecfeb6a08",
+      "sha256": "a17c6dcdfa7dbbe5f1ba917407c6d8fc552fff4ef27cc55c2662d983e5fa0035"
+    },
+    "app/Domain/Customers/Preferences/ConsentException.php": {
+      "blob": "9ac4bdea57424de3cfbdac5b58ad9eea194cf1b9",
+      "sha256": "0f1c8ecc7372fb4ad8370a9dafeb9fb55e96a722210ff78fbe38397bdf6d93c2"
+    },
+    "app/Domain/Customers/Preferences/ConsentPolicy.php": {
+      "blob": "0da507e0811d9cb0f1df2e01a0c716ea5aef7bc6",
+      "sha256": "faf7bf988a35534cc9e18c6f68af3ec00f5185c1e5f196bf8eeaa08fa2639da1"
+    },
+    "app/Domain/Customers/Preferences/ConsentRuntime.php": {
+      "blob": "3aad7d30abfec79aa2f40fec8bcb46eca82edbbc",
+      "sha256": "2115006f35a6929c0b4b439ecc58c06b51705b96a770ee607f0ecf9c13ae3490"
+    },
+    "app/Domain/Customers/Preferences/CustomerConsentPreferences.php": {
+      "blob": "65c75ef4ef151f03d61d0692d12080c72b40ba43",
+      "sha256": "1ce927a08e64b271e29eb7aa6210c942789eb56c352f20aaacdddd15204041d2"
+    },
+    "app/Domain/Customers/Preferences/LocalConsentRuntime.php": {
+      "blob": "83371168323a3c89aa1a9dbd024912e2b3e2fa98",
+      "sha256": "131bd85fe8b6a6ea041f44b6ca78aa5edea3a458c7d6e453b4a667847a6b6ef8"
+    },
+    "app/Domain/Customers/Preferences/Models/ConsentEvent.php": {
+      "blob": "c35611aeaa798693b529ab45f38cfbc0be0715bd",
+      "sha256": "20cb33ca5d06d700375187840ca5bd90f6b6f5cdeed691dbe6bc499112371b05"
+    },
+    "app/Domain/Customers/Preferences/Models/ConsentPolicySnapshot.php": {
+      "blob": "464334388b931028854a2b026a045bb2380b75b9",
+      "sha256": "113bfed543a32c8948dd40190363f32a8288a451fb5b4c3078c013c7b0c0b462"
+    },
+    "app/Domain/Customers/Preferences/Models/ConsentState.php": {
+      "blob": "c977bbe246f6852725011515a4366733b54dafe2",
+      "sha256": "1975503b1fd021f2867b0f1296127b67becdc43bddf283942aad8be6c87fa051"
+    },
+    "config/customer-preferences.php": {
+      "blob": "f657798850583428af51d7479f3a3d3aeab1844d",
+      "sha256": "dd069f3a1d7450a90f0923a423b6cab0cdc31ffab4af2c5fbbb8be569ffbbb19"
+    },
+    "database/migrations/2026_10_07_250000_customer_consent.php": {
+      "blob": "b894d3feb300676eb771a5a32a7b95724cba88f2",
+      "sha256": "bbc6b25f8e13836d0932c4f2814108ee55d9bb14c4ac6e77c037a8ad1648cc13"
+    },
+    "resources/js/components/CustomerCommunicationPreferences.tsx": {
+      "blob": "c3f449c633e85f56a2f3560a4e46e42bbe2d8b97",
+      "sha256": "c98efec148592deae7886b63647339cff3d4d4f70c7c57cd597318dad8f8067e"
+    },
+    "tests/Feature/CustomerConsentBoundaryTest.php": {
+      "blob": "b1bb91ce3e9fb7557c52caa71707d99dc86fa9dc",
+      "sha256": "3fdc845b048a602b88b50df7b5fc5d8b8dbb9af4e8a37373cc49fc73135c998a"
+    },
+    "tests/Feature/CustomerConsentMigrationTest.php": {
+      "blob": "68ad89ffdc5175f5bbe3e6cb6748fa93307463c3",
+      "sha256": "8226286ebf90b2c4cb7c459d55bed57e40504aad6f97ff68bff5bc3049577403"
+    },
+    "tests/Feature/CustomerConsentPreferencesTest.php": {
+      "blob": "664f12b271bc56c5fd6180de862dc8ec86b86e8f",
+      "sha256": "9dccd2d115fdb47d2b94d73964d12463b64af7275668c6a740f40d4bc653ae6c"
+    },
+    "tests/Support/ConsentFixtures.php": {
+      "blob": "9d0a6847e0f3ca14fb3c06815cf5fd455ddf4d6c",
+      "sha256": "bbccae78ee99f140f334341b2b965f2dc7496afcd3b24befbcf8996a62588dc7"
+    },
+    "tests/frontend/customer-communication-preferences.test.tsx": {
+      "blob": "effa3db8440da9195e3bbd48b26d115d03087bf8",
+      "sha256": "c7501740d346924d049f3bc8f3e2bd3488cada544da9ab150c3caf264d8a6b79"
+    }
+  },
+  "author_digests_checked": {
+    "README.md": "bfaa4d2a86f96565e66447071299b2d59f83fb81d2cf577fccca78501bbca526",
+    "autoload-reflection.txt": "d754aef17eb720c8b535f1beddd6a64e3950eafca4eef86921d80aacc79d475f",
+    "boundary-focused.txt": "50f549f7905f62567c9ec0d816b51e6b8cfb8dc5be4fd8ccbe4e743641bc2cb6",
+    "boundary-focused.xml": "58adb93cf4936aeab8445883f422cb463e91178b36c1a08882cf03887aa97e6e",
+    "focused-before-production-test-refinement.txt": "583ef799d2be77bb31c21a32296310d9ca67928d8edb871fe399833b7c44976b",
+    "focused-before-production-test-refinement.xml": "56aa2855e6bb918fe2d7b2b786a90aa73f2ae5c72bec5a924b45bd46b1915767",
+    "frozen-frontend.txt": "337beb65e73b5fa240ffcf98357a14511878bb01bdb139327720eb6d774ea6b6",
+    "frozen-frontend.txt.gz": "78c83f6e751a01fb6b19da7076b93cfa94975fbf17c7cb4173dff605499d0929",
+    "frozen-php.txt": "0d090aa363c255af02922dec3469d6a1c49dbacad14553c67e8c451284428873",
+    "frozen-php.xml": "cd1b6f9f0c1fd975d5c673acdb64c016adab096cf40219b1b8e2af17e84e47dd",
+    "frozen-pint.txt": "9fa3c401d4d7dcf9d616a4e847f09d73bafe2397e5f1b5b77531e2516436ed5a",
+    "frozen-pint.txt.gz": "efdc4d1c88ec838ecb0ae513f94edb8121388680be4acc3c464b7f3b49f55cac",
+    "frozen-typecheck.txt": "dac125c794db702133345f3a0d33f3193f975fddc564ca4f1498b0d4132ed500",
+    "frozen-typecheck.txt.gz": "2fe7ab713d79076a320d54898138afd6a9af703dd6ca183fe18fd31669373051",
+    "initial-purpose-field-harness-failure.txt": "83ffc36b82c7fe8b548839b9afdfa75024982bd8ab2858c0c854ebccae8857ab",
+    "initial-purpose-field-harness-failure.xml": "b1f5001c89813efa5d7b8f5a533be6412a4313f3b9514f250ae467c3071c96c0",
+    "migration-focused-before-recorded-tail-case.txt": "ab2befb2f511bd28b423678fc6c4a1a57bdb368201b2bed3499cf956532f330c",
+    "migration-focused-before-recorded-tail-case.xml": "00cbb8e77cd76fb38377dc4e754d866e98036c9ee1e17fa900329abdc839c6b8",
+    "source-runtime.json": "c16db8b6742956e83e3a2adb04fd1c38461c85d82d4bb4f2ea9a6232118042e1"
+  },
+  "independent_cases": {
+    "author-terminal-policy-sqlite-junit.xml": {
+      "tests": "1",
+      "assertions": "2",
+      "errors": "0",
+      "failures": "1",
+      "skipped": "0",
+      "time": "0.454320"
+    },
+    "author-final-ddl-sqlite-junit.xml": {
+      "tests": "1",
+      "assertions": "2",
+      "errors": "0",
+      "failures": "1",
+      "skipped": "0",
+      "time": "0.261844"
+    },
+    "author-native-race-junit.xml": {
+      "tests": "1",
+      "assertions": "14",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "12.406534"
+    },
+    "author-native-prefix1-corrected-junit.xml": {
+      "tests": "1",
+      "assertions": "11",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "11.280104"
+    },
+    "author-terminal-policy-mysql-junit.xml": {
+      "tests": "1",
+      "assertions": "2",
+      "errors": "0",
+      "failures": "1",
+      "skipped": "0",
+      "time": "15.376941"
+    },
+    "author-native-selected-junit.xml": {
+      "tests": "7",
+      "assertions": "39",
+      "errors": "1",
+      "failures": "0",
+      "skipped": "0",
+      "time": "32.887963"
+    },
+    "author-probe-sqlite.xml": {
+      "tests": "3",
+      "assertions": "4",
+      "errors": "0",
+      "failures": "2",
+      "skipped": "0",
+      "time": "0.197973"
+    },
+    "author-probe-mysql.xml": {
+      "tests": "3",
+      "assertions": "2",
+      "errors": "0",
+      "failures": "2",
+      "skipped": "1",
+      "time": "0.613691"
+    }
+  },
+  "blocking_findings": [
+    "Reserved object namespaces/types/duplicate identities are not fully checked before adoption/DDL",
+    "Dependencies missing/invalid are not proved before DDL: native partial write then FK1824",
+    "Terminal customer-policy resolver can withdraw consent notice after config comparison and old grant still commits",
+    "Final DDL callback removes earlier guard; actualMigrator records incomplete installation"
+  ],
+  "actual_native_database": "isolated vaseyaudio_service_review; separate limited account",
+  "native_engine": "8.0.46-0ubuntu0.24.04.4",
+  "harness_note": "Initial nativeauthor7selection starts after own minimal fixture and no migrationsrepository; migrate:fresh skippedcleanup and firstprefix1 errored1050existingusers. Sixothercases passed39assertions. Explicit db:wipe ownschema then onlyfailedprefix1 rerunpassed1/11. Bothoriginalerrorandcorrectedreceiptretained; no false nativeallgreenclaim.",
+  "native_race": "Independent processes, actualREPEATABLE-READ snapshot0 before domaintransaction; exact users PRIMARY RECORD WAITING proved, withdrawal saved revision1, stalegrant409, oneevent/no policy, finaltransactionlevels0; 1/14 passed.",
+  "limits": [
+    "Blocked originalleaf; no composedapproval",
+    "Originalauthor101SQLite/486 and frontend27 are genuine separate coverage, notnativecoverage",
+    "No8.4/Foundation/browser/production activation proof",
+    "No reviewer runtime repair, push, merge or hostedCI"
+  ]
+}

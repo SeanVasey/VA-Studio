@@ -1,0 +1,4 @@
+App\Domain\Customers\Preferences\CustomerConsentPreferences /workspace/VA-Studio-customer-consent/app/Domain/Customers/Preferences/CustomerConsentPreferences.php
+Tests\Feature\CustomerConsentPreferencesTest /workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentPreferencesTest.php
+Tests\Feature\CustomerConsentBoundaryTest /workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentBoundaryTest.php
+Tests\Feature\CustomerConsentMigrationTest /workspace/VA-Studio-customer-consent/tests/Feature/CustomerConsentMigrationTest.php

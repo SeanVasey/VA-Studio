@@ -1,0 +1,39 @@
+{
+  "source": "49b9154756b96b2ae11de1c63d75efc274e2f326",
+  "tree": "bf8f16e84273818937cc9ceb0c2f83b09e7e746c",
+  "base": "ff4602cc849577232a6ab532d96edd772cc1b428",
+  "pinned_actual_pre_notes_reader": "ca3b1fa7eb60edd2228b73742da33179228a277e",
+  "pinned_reader_sha256": "30aca52bd3d15e314bdfa6bad146870991a1269a4178cd64d9c27b7e376aa2a7",
+  "runtime": "PHP8.4.26, locked current Laravel; SQLite isolated in-memory; Node24.19.0; synthetic test key and explicit synthetic rollout reference",
+  "native_author_execution": false,
+  "source_blobs": {
+    "app/Domain/Customers/Listening/ListeningEvidence.php": "af04d52897ae591475882e5680cd2900ec9de42b",
+    "app/Domain/Customers/Listening/ListeningLibrary.php": "efc5ed5daa985c8aa29fde143260136d7cdc4309",
+    "app/Domain/Customers/Listening/ListeningRollout.php": "7006db214ef7e19f16e60959cfe037279bc3b55a",
+    "config/customer-listening.php": "bd9b1e46a01f8a1f0c85efea80ccf6703b28af7a",
+    "resources/js/components/CustomerListeningLibrary.tsx": "f90487a4c0b5ea27ea107b133896a55d129e669c",
+    "tests/Feature/CustomerListeningCompatibilityTest.php": "104b3676dcc602ee3bdd893f1d59c5fccad38ebe",
+    "tests/Feature/CustomerListeningNotesBoundaryTest.php": "ebd6e517c0e213574f720eaf11778a73032e3fd6",
+    "tests/Feature/CustomerListeningNotesCapacityTest.php": "db7a29159e6cd4c0abb48e6d096c2d669254ede0",
+    "tests/Feature/CustomerListeningNotesTest.php": "b73a9f917f8435af1be2c811f9142e7ccd85b706",
+    "tests/Fixtures/customer-listening-v1/ListeningLibrary.php.txt": "2a4db92c0d7ea2548f0e1f80aac5bd4f351dcc63",
+    "tests/Support/ListeningNotesFixtures.php": "c5c1073fc28f5a235ce440ce2ad97d6f0b28006d",
+    "tests/Support/PreviousListeningV1.php": "36b1a0497004e249a7f914e11c27d633ee6f1a66",
+    "tests/frontend/customer-listening-notes.test.tsx": "03744cc62a1faed99791f2da0d2e21cb25e8ec69"
+  },
+  "source_sha256": {
+    "app/Domain/Customers/Listening/ListeningEvidence.php": "fbd6bc655b50ed16d717121f5c34db8f0d33da4e9ecf0b42754d77cadb2727a3",
+    "app/Domain/Customers/Listening/ListeningLibrary.php": "cb7ebe24aa6acf92c0a1dff217d22985b983ae4dbf8d7487d7a051f27ad2979e",
+    "app/Domain/Customers/Listening/ListeningRollout.php": "87889d622833bf06a4a6c23b0aa6d662ee48e1bfff1766eb7f5107507632eedd",
+    "config/customer-listening.php": "98bd11fa066501b5d37a5073b3fad56af70e771efa4016d37c15e1d35de506d0",
+    "resources/js/components/CustomerListeningLibrary.tsx": "9dd0f16c4d50be3c785a2dfcd6e81590b7bdda9a69398c29243484a29893a06a",
+    "tests/Feature/CustomerListeningCompatibilityTest.php": "7346456e0f5718fe3e328f3751412db949e74c8b8099a64ce29b862a58d5be70",
+    "tests/Feature/CustomerListeningNotesBoundaryTest.php": "184596af8f0078b7a6f3429506ce4f84bac83496fb39b53c702551f5f40be4d5",
+    "tests/Feature/CustomerListeningNotesCapacityTest.php": "9eebdcaa709afdf99d60423968b3526611cc843a8580b18921d2f986da2f0bc8",
+    "tests/Feature/CustomerListeningNotesTest.php": "0d6e7e76623d3f1da9c7436ae3aaf09c7bdb0b371eadbc965af51d157fa62ec9",
+    "tests/Fixtures/customer-listening-v1/ListeningLibrary.php.txt": "30aca52bd3d15e314bdfa6bad146870991a1269a4178cd64d9c27b7e376aa2a7",
+    "tests/Support/ListeningNotesFixtures.php": "f7c2d001f448f3937b008fb55bffa6650b38dc65eead292ec8ce95b390cbfdc3",
+    "tests/Support/PreviousListeningV1.php": "7e5403a27df33c4cc5f9a6abed6ac4db5b66e513e82881aaedfa61c12db6eaeb",
+    "tests/frontend/customer-listening-notes.test.tsx": "59526c131e37be4c667c51bf03b075c30511d58f52c1d97312d6af998f72e33d"
+  }
+}

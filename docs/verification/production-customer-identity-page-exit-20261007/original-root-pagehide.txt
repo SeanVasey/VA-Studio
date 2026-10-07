@@ -1,0 +1,35 @@
+
+> test
+> vitest run tests/frontend/production-identity-registration.test.tsx
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-identity-registration
+
+ ❯ tests/frontend/production-identity-registration.test.tsx (1 test | 1 failed) 203ms
+   × erases completion credentials on page departure and ignores the pending acknowledgement 201ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/production-identity-registration.test.tsx > erases completion credentials on page departure and ignores the pending acknowledgement
+Error: expect(element).toHaveValue()
+
+Expected the element to have value:
+
+Received:
+  SyntheticPassword123
+ ❯ tests/frontend/production-identity-registration.test.tsx:19:45
+     17|   fireEvent.submit(screen.getByRole('button', { name: 'Complete accoun…
+     18|   fireEvent(window, new Event('pagehide'));
+     19|   expect(screen.getByLabelText('Password')).toHaveValue('');
+       |                                             ^
+     20|   expect(screen.getByLabelText('Your name')).toHaveValue('');
+     21|   await act(async () => { finish(new Response('{"completed":true,"next…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  08:53:29
+   Duration  1.26s (environment 63%, tests 18%, setup 10%, transform 7%, import 1%)
+

@@ -1,0 +1,10 @@
+{
+  "setup": "source /workspace/.va-studio-toolchain/activate.sh; composer dump-autoload --no-scripts --no-interaction using own copied locked metadata and symlinked package directories",
+  "phpunit_runner": "php -r '$GLOBALS[\"_composer_autoload_path\"]=getcwd().\"/vendor/autoload.php\"; require \"vendor/phpunit/phpunit/phpunit\";' --",
+  "sqlite": "APP_ENV=testing synthetic APP_KEY; -c docs/verification/cloud-identity-floor-independent-20261007/sqlite-selection.xml --log-junit docs/verification/cloud-identity-floor-independent-20261007/final-sqlite.xml",
+  "native": "source /workspace/.va-studio-toolchain/mysql/service_review-task.env privately; APP_ENV=testing synthetic APP_KEY; -c docs/verification/cloud-identity-floor-independent-20261007/native-selection.xml --filter test_missing_native_parent_columns_are_refused_before_owned_ddl|test_registered_http_uses_actual_smtp_proof_and_recovery_preserves_owner_but_invalidates_old_session --log-junit docs/verification/cloud-identity-floor-independent-20261007/final-native.xml",
+  "network_permission": "with_additional_permissions network enabled for loopback DB and SMTP; native and SQLite synthetic schemas independent",
+  "pint": "php vendor/laravel/pint/builds/pint --test app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php",
+  "snapshots": "Copy fresh original-probe snapshots into new corrected-* files after each runner finishes; restore original snapshot paths from exact e48 Git blobs; verify all 26 original artifact SHA256 entries in filesystem and committed source",
+  "whitespace": "git -c core.whitespace=-blank-at-eof diff --cached --check -- . :(exclude)docs/verification/cloud-identity-floor-independent-20261007/*.txt; verbatim console whitespace excluded only"
+}

@@ -1,0 +1,27 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/probe-mysql.xml
+
+[41;37mF[0m[36;1mS[0m[41;37mF[0m                                                                 3 / 3 (100%)
+
+Time: 00:00.615, Memory: 59.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ConsentMigrationProbeTest::test_reserved_table_name_as_foreign_trigger_is_refused_before_any_ddl
+Reserved table identity collides with a foreign trigger and must refuse before any DDL.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php:39
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ConsentMigrationProbeTest::test_missing_required_dependency_is_refused_before_owned_table_creation
+Missing required dependency must be refused before any owned DDL.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php:60
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 3[0m[37;41m, Assertions: 2[0m[37;41m, Failures: 2[0m[37;41m, Skipped: 1[0m[37;41m.[0m

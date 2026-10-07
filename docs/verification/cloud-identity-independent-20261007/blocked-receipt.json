@@ -1,0 +1,78 @@
+{
+  "reviewed_executable": "4b3d47860373aad181c382899b9ab9677023eca0",
+  "tree": "f4460145b52a3e2153b31714dec8b97bca5f76ef",
+  "decision": "WITHHOLD approval: incompatible required dependency admitted before migration247ownedDDL on bothactualengines",
+  "independent_runs": [
+    {
+      "stdout": "final-sqlite-http.txt",
+      "junit": "final-sqlite-http-junit.xml",
+      "scope": "actualSQLite registered15HTTP/private cases +unchanged permanent-password/TEMP-user canary",
+      "tests": 16,
+      "assertions": 187,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "stdout": "final-native-registered.txt",
+      "junit": "final-native-registered-junit.xml",
+      "scope": "actualnative registeredSMTP enrollment/recovery/session journey",
+      "tests": 1,
+      "assertions": 38,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "stdout": "final-frontend.txt",
+      "junit": "final-frontend-junit.xml",
+      "scope": "actualmounted lifecycle UI14cases",
+      "tests": 14,
+      "assertions": 0,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "stdout": "dependency-admission-red.txt",
+      "junit": "dependency-admission-red-junit.xml",
+      "scope": "actualSQLite incompatible parent source-admission blocker",
+      "tests": 1,
+      "assertions": 3,
+      "errors": 0,
+      "failures": 1,
+      "skipped": 0
+    },
+    {
+      "stdout": "native-dependency-admission-red.txt",
+      "junit": "native-dependency-admission-red-junit.xml",
+      "scope": "actualnative missingusers credential columns source-admission blocker",
+      "tests": 1,
+      "assertions": 3,
+      "errors": 0,
+      "failures": 1,
+      "skipped": 0
+    }
+  ],
+  "original_canary_sha256": {
+    "IdentityDependencyAdmissionCanaryTest.php": "161571fc869801381a5905b30a30901c0fd6d798e87e1d59f182bb5aeb63b4d6",
+    "IdentityNativeDependencyAdmissionCanaryTest.php": "4ad5a40000a13a65716bbfa26bb53e1062eaca280605e3e2c03386c188463b23"
+  },
+  "native_runtime": {
+    "server_version": "8.0.46-0ubuntu0.24.04.4",
+    "foreign_key_checks_restored": 1,
+    "php": "8.4.26",
+    "schema_scope": "reviewer-only service_review limitedaccount; distinct from authorDB; full actualmigrations rebuilt perprobe"
+  },
+  "native_result": "requiredusers credential columns missing; compatibleBIGINT primarykey/nativeengine/collation; all7ownedtables installed ratherthan refusal",
+  "sqlite_result": "requiredusers incompatibleidTEXT PK-only; all7ownedtables and21guards installed ratherthan refusal",
+  "repair_owner": "root/completion_audit; exact parent columns/keys/enforcement/authority guards before anyDDL and final fullfloor closure; rerun unchangedoriginals",
+  "scope": "sharedroute/privacy/session/UI behavior testedgreen; fullcandidateheldformigrationrepair",
+  "preparation_failures": "First newworktreepath alreadyexisted. Initialtests usedoldreviewcheckoutd8 and missingnewselectionXML; noapplicationtestexecutedinthosetwoPHPinvocations. OldUI8-case pass is retainedbutexcludedfromfinalevidence. Newindependentworktree4b andownselectionfilescorrected; actualfinalruns above.",
+  "evidence_carry": "author46native8.0.46/1464 unchangedsourcehistory staysvalid; doesnotclose newdependencyfloorcase; root45sourcebindings and16artifacts,author33artifacts,UI4artifactsverified",
+  "not_claimed": [
+    "No fullmatrix repeat, MySQL8.4, hostedbrowser orproductionactivation.",
+    "Noexternalmailorprovidercredentials; operativeHTTPproofs camefromlocalSMTPsyntheticmailbox only.",
+    "No legalbuyer, marketingconsent, historicalclaim linking or downstreamcommercebinding inferred."
+  ]
+}

@@ -2,18 +2,19 @@
 
 ## Active cloud ownership — October 7, 2026 UTC
 
-One integration owner `/root`; verified main3fb7dd0 includes PRs25–29.
+One integration owner `/root`; verified main `9f805b8e3cf92c73247c6da24045e96ed8857a99` includes PRs25–32.
 Historical owner tables below describe earlier source, not active workers.
 
 | Worker | Isolated boundary | Current handoff |
 | --- | --- | --- |
-| `/root` | Primary/shared registration/evidence/publication | PR29 merged; service7dc8bd8 authority/P2 repairs independently approved; freshpreflight next; notes capacity approved; mount next identity, checkout and attachments after review |
-| `/root/pr25_recovery` | New ProductionCheckout246000/provider adapter/private routes/tests | Immutable review→assent→payable order→provider initiation/reconciliation; qualified exemption first, provider-calculated tax next |
-| `/root/completion_audit` | ProductionIdentity247000/routes/UI/local SMTP proof | Immutable origin, mailbox challenge, recovery/credential fencing, typed principal; no synthetic-account adoption by email |
-| `/root/native_mysql` | ServiceProjects244000; source adapter then free origins245000 | Service7dc independently approved; adapterb209b85 has root actualSQLite/native1/8 approval; free245 implementation active |
-| `/root/pr26_review` | Independent service composition/canaries | Service follow-up approved in2ddb; native consent250/source review next; notes approved in fbe178ea |
-| `/root/crawler_routes` | Listening notes/export/clear domain/UI/tests | Notes capacity handoff complete; consent250 domain/schema/UI active, suppression251 follows |
-| `/root/recovery_inventory` | Private attachments249000/scanner/routes/UI/tests | Quarantine→scan→immutable manifest, owner/source current proof, download/retry/retention; approved listening review carry complete |
+| `/root` | Primary/shared registration/evidence/publication | Consent merged after preflight37599609975; approved identity e48 publication next; free/discovery registration and suppression native review |
+| `/root/pr25_recovery` | ProductionCheckout246/provider/tax | Frozen f0 held-source successor SQLite123/613 plus seven precise skips; native affected proof in flight; supported automatic tax next |
+| `/root/completion_audit` | ProductionIdentity247 and new typed SMTP/account adapters | Exact parent floor3c approved in e48; separate configured TLS SMTP and sealed committed read-only feature frame under development |
+| `/root/native_mysql` | Paid252; service committed-read receipt | Free245 independently approved; service receipt598+8444 actual key-rotation repair handed off; isolated paid origins continue |
+| `/root/pr26_review` | Independent identity composition | Exact e48 approved: unchanged refusal probes, SQLite10/52, native2/42 registered actual SMTP/recovery; original reds retained |
+| `/root/crawler_routes` | Production feature253; narrow suppression251 repair | Production library/consent explicit original binding underway; actual native251 foreign-FK collision requires before-DDL refusal |
+| `/root/recovery_inventory` | Attachment249 closure; frozen discovery248 | Original registered download/DDL failures corrected provisionally; final receipt composition under checks. New discovery97d frozen SQLite36/218+one native skip/native16/68 |
+
 
 Each worker has an isolated branch, independent autoload over unchanged locked
 packages and separate synthetic native databases where needed. Root owns shared

@@ -1,0 +1,54 @@
+{
+  "approved_source": "d412759ab193f7c7a5cbd2de91eb83320cbc9618",
+  "approved_tree": "07a264ddb0a231d7e85ca0f8839383e7efc3fa2f",
+  "independent_review": "f18a3cf609b788cef9b15098f8155c0ec3aafc3b",
+  "runtime_and_test_git_blobs": {
+    "app/Domain/Customers/Listening/ListeningEvidence.php": "af04d52897ae591475882e5680cd2900ec9de42b",
+    "app/Domain/Customers/Listening/ListeningLibrary.php": "efc5ed5daa985c8aa29fde143260136d7cdc4309",
+    "app/Domain/Customers/Listening/ListeningRollout.php": "7006db214ef7e19f16e60959cfe037279bc3b55a",
+    "app/Http/Controllers/CustomerListeningLibraryController.php": "947b940daffcbf766e5334bea767917b0f02d770",
+    "app/Http/Middleware/CustomerPrivacy.php": "581c64d83facfd10643a51a8ecc37be6e1662e61",
+    "app/Http/Requests/CustomerListeningRequest.php": "818e4f79c0402e766410c9162a5941d6c39ed713",
+    "config/customer-listening.php": "bd9b1e46a01f8a1f0c85efea80ccf6703b28af7a",
+    "resources/js/components/CustomerListeningLibrary.tsx": "f90487a4c0b5ea27ea107b133896a55d129e669c",
+    "routes/customer.php": "5ae1a0bb58d8cfa6abcf72bc8039a7c9a76f3f51",
+    "tests/Feature/CustomerListeningCompatibilityTest.php": "104b3676dcc602ee3bdd893f1d59c5fccad38ebe",
+    "tests/Feature/CustomerListeningExportHttpTest.php": "6b1856b0860a21e919442f161a733882826e963d",
+    "tests/Feature/CustomerListeningLibraryHttpTest.php": "a865bad42082b0c026259c3c0ecad1dd10a28578",
+    "tests/Feature/CustomerListeningNotesBoundaryTest.php": "ebd6e517c0e213574f720eaf11778a73032e3fd6",
+    "tests/Feature/CustomerListeningNotesCapacityTest.php": "db7a29159e6cd4c0abb48e6d096c2d669254ede0",
+    "tests/Feature/CustomerListeningNotesTest.php": "b73a9f917f8435af1be2c811f9142e7ccd85b706",
+    "tests/Fixtures/customer-listening-v1/ListeningLibrary.php.txt": "2a4db92c0d7ea2548f0e1f80aac5bd4f351dcc63",
+    "tests/Support/ListeningNotesFixtures.php": "c5c1073fc28f5a235ce440ce2ad97d6f0b28006d",
+    "tests/Support/PreviousListeningV1.php": "36b1a0497004e249a7f914e11c27d633ee6f1a66",
+    "tests/frontend/customer-listening-library.test.tsx": "fdf2e5b02cf248132a83af4599baeec438f5c9ea",
+    "tests/frontend/customer-listening-notes.test.tsx": "03744cc62a1faed99791f2da0d2e21cb25e8ec69"
+  },
+  "actual_root_results": {
+    "php": {
+      "tests": 53,
+      "assertions": 464,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    "frontend": 82,
+    "typescript": "passed",
+    "scoped_pint": "passed"
+  },
+  "independent_results": {
+    "prior_reader_sqlite": [
+      34,
+      207
+    ],
+    "native_capacity_mysql_8_0_46": [
+      3,
+      111
+    ]
+  },
+  "limits": [
+    "Native8.4/fullFoundation/browser pending final exact candidate",
+    "Default promotion false; explicit reviewed stopped backup upgrade required",
+    "ExistingV2 is not readable by oldV1-only code"
+  ]
+}

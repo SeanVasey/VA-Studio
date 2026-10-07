@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/probe-sqlite.xml" tests="4" assertions="13" errors="0" failures="0" skipped="0" time="1.756128">
+    <testsuite name="Independent consent migration probes" tests="4" assertions="13" errors="0" failures="0" skipped="0" time="1.756128">
+      <testsuite name="Tests\Feature\ConsentMigrationProbeTest" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php" tests="4" assertions="13" errors="0" failures="0" skipped="0" time="1.756128">
+        <testcase name="test_reserved_table_name_as_foreign_trigger_is_refused_before_any_ddl" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php" line="49" class="Tests\Feature\ConsentMigrationProbeTest" classname="Tests.Feature.ConsentMigrationProbeTest" assertions="3" time="0.690983"/>
+        <testcase name="test_reserved_table_and_foreign_trigger_coexistence_is_refused_before_adoption" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php" line="68" class="Tests\Feature\ConsentMigrationProbeTest" classname="Tests.Feature.ConsentMigrationProbeTest" assertions="3" time="0.368182"/>
+        <testcase name="test_final_ddl_callback_cannot_remove_an_earlier_guard_and_record_completed_installation" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php" line="88" class="Tests\Feature\ConsentMigrationProbeTest" classname="Tests.Feature.ConsentMigrationProbeTest" assertions="4" time="0.331027"/>
+        <testcase name="test_missing_required_dependency_is_refused_before_owned_table_creation" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php" line="112" class="Tests\Feature\ConsentMigrationProbeTest" classname="Tests.Feature.ConsentMigrationProbeTest" assertions="3" time="0.365937"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

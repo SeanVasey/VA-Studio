@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CustomerCommunicationPreferencesController;
 use App\Http\Controllers\CustomerIdentityController;
 use App\Http\Controllers\CustomerListeningLibraryController;
 use App\Http\Controllers\CustomerMembershipHistoryController;
@@ -23,10 +24,16 @@ Route::withoutMiddleware(HandleInertiaRequests::class)->group(function (): void 
 });
 
 Route::withoutMiddleware(HandleInertiaRequests::class)->group(function (): void {
+    Route::get('/account/communication-preferences', [CustomerCommunicationPreferencesController::class, 'index'])
+        ->middleware('throttle:60,1,customer-pages')->block(20, 5)->name('customer.communication-preferences.index');
+    Route::post('/account/communication-preferences', [CustomerCommunicationPreferencesController::class, 'store'])
+        ->middleware('throttle:30,1,customer-preferences')->block(20, 5)->name('customer.communication-preferences.store');
     Route::get('/account/listening-library', [CustomerListeningLibraryController::class, 'index'])
         ->middleware('throttle:60,1,customer-pages')->block(20, 5)->name('customer.listening-library.index');
     Route::post('/account/listening-library', [CustomerListeningLibraryController::class, 'store'])
         ->middleware('throttle:30,1,customer-listening')->block(20, 5)->name('customer.listening-library.store');
+    Route::post('/account/listening-library/export', [CustomerListeningLibraryController::class, 'export'])
+        ->middleware('throttle:10,1,customer-listening-export')->block(20, 5)->name('customer.listening-library.export');
     Route::get('/account/membership-credits', [CustomerMembershipHistoryController::class, 'index'])
         ->middleware('throttle:60,1,customer-pages')->block(20, 5)->name('customer.membership-credits.index');
     Route::get('/account/membership-credits/{bucket}', [CustomerMembershipHistoryController::class, 'show'])

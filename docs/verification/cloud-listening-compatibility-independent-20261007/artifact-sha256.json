@@ -1,0 +1,21 @@
+{
+  "count": 15,
+  "scope": "tracked durable reviewer artifacts only; excludes this self-referential manifest and report",
+  "sha256": {
+    "docs/verification/cloud-listening-compatibility-independent-20261007/author-evidence-reconciliation.json": "fc7802f487a323f2200bec68ae0519c636396deeb590f674b41987eaaa7be2ac",
+    "docs/verification/cloud-listening-compatibility-independent-20261007/commands.json": "e7331f60d490ea8a52de581dcfa313a6fefe05de9c081a7f1caa8ab464712e34",
+    "docs/verification/cloud-listening-compatibility-independent-20261007/dependency-binding.json": "072fb6f83921e442ebd153675638e4d090779eadfc079ee41a9459eeabe2cfe5",
+    "docs/verification/cloud-listening-compatibility-independent-20261007/final-native-capacity-junit.xml": "a0c8f62560a3354170df5a3cd594a83a1f370094aee3802606e54bf11da27734",
+    "docs/verification/cloud-listening-compatibility-independent-20261007/final-native-capacity.txt": "c13778e0044d67cf66eb47808268a9f49648d516eb23d6a707579afd103d3a64",
+    "docs/verification/cloud-listening-compatibility-independent-20261007/final-sqlite-junit.xml": "c4226367347ad30d1396070472e3abd2a295f66606b0062e9d3b3eea3d058fdb",
+    "docs/verification/cloud-listening-compatibility-independent-20261007/final-sqlite.txt": "4fdfc76051ad2569d358c9c5cab3324525368e057cfdcadc439bdc1d16e5dc56",
+    "docs/verification/cloud-listening-compatibility-independent-20261007/native-capacity-selection.xml": "16c3d0ece35b7a45b9971092bf045c044d5f65787cfee352c7b686a27b082b2c",
+    "docs/verification/cloud-listening-compatibility-independent-20261007/native-isolated-setup.txt": "81a80bfcc5a4b4d5e923548d0718c8d2a07432ba7bde9ddae39e29d0faf12046",
+    "docs/verification/cloud-listening-compatibility-independent-20261007/native-runtime.json": "af8ef9c3e7f410bd871ab0dc38c8e8fb863d1fcc78501e3071cd2d1fc9a56d86",
+    "docs/verification/cloud-listening-compatibility-independent-20261007/own-autoload.txt": "8af5bdd789fc58191dbfc85b820ea60c7104dc91d598e82f790ab38b065e9276",
+    "docs/verification/cloud-listening-compatibility-independent-20261007/pinned-reader-binding.json": "3d2c141f1db1acf365612bb85ee35028fa9df268d1bd06dd4c202712342231c5",
+    "docs/verification/cloud-listening-compatibility-independent-20261007/receipt.json": "34ae2ec60daa71fd2ac0c5c4763779f62560b078c5e72e10d74247c69fd08e15",
+    "docs/verification/cloud-listening-compatibility-independent-20261007/source-binding.json": "b608bb6916059ca89bc38aa3eb66dfbade4da0085f439e4300f8a0dbfb60d0ee",
+    "docs/verification/cloud-listening-compatibility-independent-20261007/sqlite-compatibility-selection.xml": "818933257d592312f4dcb046fc91f402f2e95cafeae532ad1c89a13b54357b71"
+  }
+}

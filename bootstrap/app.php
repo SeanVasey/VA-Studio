@@ -4,11 +4,12 @@ use App\Http\Middleware\CustomerPrivacy;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\InquiryPrivacy;
 use App\Http\Middleware\PrivateTrackReviewPrivacy;
+use App\Http\Middleware\ProductionIdentity\IdentityPrivacy;
 use App\Http\Middleware\ResumableUploadPrivacy;
 use App\Http\Middleware\ServiceProjectPrivacy;
+use App\Http\Middleware\SupportAttachmentPrivacy;
 use App\Http\Middleware\SitePreviewPrivacy;
 use App\Http\Middleware\StripeWebhookBodyLimit;
-use App\Http\Middleware\SupportAttachmentPrivacy;
 use App\Http\Middleware\TestDeliveryPrivacy;
 use App\Http\Middleware\TestExceptionResolutionPrivacy;
 use App\Http\Responses\InquiryResponse;
@@ -46,11 +47,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(ResumableUploadPrivacy::class);
         $middleware->prepend(CustomerPrivacy::class);
         $middleware->prepend(ServiceProjectPrivacy::class);
+        $middleware->prepend(IdentityPrivacy::class);
         $middleware->prepend(SupportAttachmentPrivacy::class);
         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
         $middleware->web(append: [HandleInertiaRequests::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation', 'proof', 'requestKey']);
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => ((CustomerPrivacy::matches($request) || ServiceProjectPrivacy::matches($request)) && $request->isMethod('POST')) || ResumableUploadPrivacy::endpoint($request) || $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
         );
@@ -58,6 +61,14 @@ return Application::configure(basePath: dirname(__DIR__))
             if (SupportAttachmentPrivacy::matches(request())) {
                 try {
                     Log::error('Private attachment request failed.', ['exception_class' => $exception::class]);
+                } catch (Throwable) { /* Preserve the private response. */
+                }
+
+                return false;
+            }
+            if (IdentityPrivacy::matches(request())) {
+                try {
+                    Log::error('Customer identity request failed.', ['exception_class' => $exception::class]);
                 } catch (Throwable) { /* Preserve the private response. */
                 }
 
@@ -152,6 +163,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request): Response {
             if (SupportAttachmentPrivacy::matches($request)) {
                 return $response->getStatusCode() >= 400 ? SupportAttachmentResponse::error($response->getStatusCode()) : SupportAttachmentResponse::protect($response);
+            }
+            if (IdentityPrivacy::matches($request)) {
+                return $response->getStatusCode() >= 400 ? IdentityPrivacy::error($response->getStatusCode()) : IdentityPrivacy::protect($response);
             }
             if (ServiceProjectPrivacy::matches($request)) {
                 return $response->getStatusCode() >= 400 ? ServiceProjectPrivacy::error($response->getStatusCode()) : ServiceProjectPrivacy::protect($response);

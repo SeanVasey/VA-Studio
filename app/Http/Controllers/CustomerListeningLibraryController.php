@@ -26,10 +26,15 @@ final class CustomerListeningLibraryController
 
     public function store(Request $request): Response
     {
-        return $this->handle($request, true);
+        return $this->handle($request, 'change');
     }
 
-    private function handle(Request $request, bool $change = false): Response
+    public function export(Request $request): Response
+    {
+        return $this->handle($request, 'export');
+    }
+
+    private function handle(Request $request, string $operation = 'read'): Response
     {
         try {
             $identity = app(CommerceRequestIdentity::class);
@@ -39,11 +44,13 @@ final class CustomerListeningLibraryController
                 return CustomerPrivacy::error(403);
             }
             $service = app(ListeningLibrary::class);
-            $library = $change
-                ? $service->change($principal, $buyer, CustomerListeningRequest::body($request))
-                : $service->read($principal, $buyer);
+            $result = match ($operation) {
+                'change' => $service->change($principal, $buyer, CustomerListeningRequest::body($request)),
+                'export' => $service->export($principal, $buyer, CustomerListeningRequest::exportVersion($request)),
+                default => $service->read($principal, $buyer),
+            };
 
-            return CustomerPrivacy::protect(response()->json(['library' => $library]));
+            return CustomerPrivacy::protect(response()->json([$operation === 'export' ? 'export' : 'library' => $result]));
         } catch (CustomerAccessException) {
             return CustomerPrivacy::error(403);
         } catch (ListeningException $error) {

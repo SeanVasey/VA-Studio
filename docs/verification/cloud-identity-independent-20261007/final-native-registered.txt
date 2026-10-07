@@ -1,0 +1,10 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-identity-registration-independent/docs/verification/cloud-identity-independent-20261007/native-registered-selection.xml
+
+.                                                                   1 / 1 (100%)
+
+Time: 00:54.216, Memory: 79.00 MB
+
+[30;42mOK (1 test, 38 assertions)[0m

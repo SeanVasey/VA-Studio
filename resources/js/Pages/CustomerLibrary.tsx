@@ -5,6 +5,7 @@ import type { PendingPurchaseClaim } from '../lib/purchase-claim';
 import { SiteFooter, SiteHeader } from '../components/SiteChrome';
 import { CustomerOrderLookup } from '../components/CustomerOrderLookup';
 import { CustomerListeningLibrary } from '../components/CustomerListeningLibrary';
+import { CustomerCommunicationPreferences } from '../components/CustomerCommunicationPreferences';
 import { OwnedMembershipHistory } from '../components/OwnedMembershipHistory';
 import { OwnedTestOrderHistory } from '../components/OwnedTestOrderHistory';
 import { OrderStatus } from '../components/OrderPreparation';
@@ -12,8 +13,8 @@ import type { SiteContent } from '../lib/site-content';
 import { changeCustomerSession, navigateCustomerSession } from '../lib/customer-session';
 import '../../css/customer-account.css';
 
-export default function CustomerLibrary({ siteContent, customer, testCheckoutEnabled = false, testMembershipsEnabled = false, membershipHistoryScope, testListeningLibraryEnabled = false, listeningLibraryScope, guestPurchaseClaim, serviceProjectsEnabled = false }: {
-  testOnly: true; siteContent: SiteContent; customer: { name: string }; testCheckoutEnabled?: boolean; testMembershipsEnabled?: boolean; membershipHistoryScope?: string | null; testListeningLibraryEnabled?: boolean; listeningLibraryScope?: string | null; guestPurchaseClaim?: PendingPurchaseClaim; serviceProjectsEnabled?: boolean;
+export default function CustomerLibrary({ siteContent, customer, testCheckoutEnabled = false, testMembershipsEnabled = false, membershipHistoryScope, testListeningLibraryEnabled = false, listeningLibraryScope, guestPurchaseClaim, serviceProjectsEnabled = false, communicationPreferencesAvailable = false, communicationPreferencesScope }: {
+  testOnly: true; siteContent: SiteContent; customer: { name: string }; testCheckoutEnabled?: boolean; testMembershipsEnabled?: boolean; membershipHistoryScope?: string | null; testListeningLibraryEnabled?: boolean; listeningLibraryScope?: string | null; guestPurchaseClaim?: PendingPurchaseClaim; serviceProjectsEnabled?: boolean; communicationPreferencesAvailable?: boolean; communicationPreferencesScope?: string | null;
 }) {
   const [leaving, setLeaving] = useState(false), [message, setMessage] = useState('');
   const active = useRef(false), pending = useRef(false);
@@ -48,6 +49,7 @@ export default function CustomerLibrary({ siteContent, customer, testCheckoutEna
         <p className="customer-account-note">Test mode only. Order status, contracts and downloads remain subject to their current availability checks.</p>
         {serviceProjectsEnabled === true && <a className="text-link" href="/services/projects">Your service projects</a>}
         {testListeningLibraryEnabled === true && typeof listeningLibraryScope === 'string' && /^[0-9a-f]{32}$/.test(listeningLibraryScope) && <CustomerListeningLibrary key={listeningLibraryScope} />}
+        {communicationPreferencesAvailable === true && typeof communicationPreferencesScope === 'string' && /^[0-9a-f]{32}$/.test(communicationPreferencesScope) && <CustomerCommunicationPreferences key={communicationPreferencesScope} scope={communicationPreferencesScope} />}
         {guestPurchaseClaim && <CustomerPurchaseClaim key={guestPurchaseClaim.orderId} claim={guestPurchaseClaim} />}
         <CustomerOrderLookup renderOrder={order => <OrderStatus order={order} testCheckoutEnabled={testCheckoutEnabled} />} />
         {testMembershipsEnabled === true && typeof membershipHistoryScope === 'string' && /^[0-9a-f]{32}$/.test(membershipHistoryScope) && <OwnedMembershipHistory key={membershipHistoryScope} />}

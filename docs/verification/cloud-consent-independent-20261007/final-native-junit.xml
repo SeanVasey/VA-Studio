@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/final-native-selection.xml" tests="8" assertions="31" errors="0" failures="0" skipped="1" time="168.573160">
+    <testsuite name="Final composed consent meaningful native regressions" tests="8" assertions="31" errors="0" failures="0" skipped="1" time="168.573160">
+      <testsuite name="Tests\Feature\ConsentMigrationProbeTest" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php" tests="4" assertions="10" errors="0" failures="0" skipped="1" time="65.336486">
+        <testcase name="test_reserved_table_name_as_foreign_trigger_is_refused_before_any_ddl" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php" line="49" class="Tests\Feature\ConsentMigrationProbeTest" classname="Tests.Feature.ConsentMigrationProbeTest" assertions="3" time="20.124729"/>
+        <testcase name="test_reserved_table_and_foreign_trigger_coexistence_is_refused_before_adoption" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php" line="68" class="Tests\Feature\ConsentMigrationProbeTest" classname="Tests.Feature.ConsentMigrationProbeTest" assertions="0" time="0.014497">
+          <skipped/>
+        </testcase>
+        <testcase name="test_final_ddl_callback_cannot_remove_an_earlier_guard_and_record_completed_installation" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php" line="88" class="Tests\Feature\ConsentMigrationProbeTest" classname="Tests.Feature.ConsentMigrationProbeTest" assertions="4" time="26.676060"/>
+        <testcase name="test_missing_required_dependency_is_refused_before_owned_table_creation" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php" line="112" class="Tests\Feature\ConsentMigrationProbeTest" classname="Tests.Feature.ConsentMigrationProbeTest" assertions="3" time="18.521201"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\ConsentTerminalPolicyProbeTest" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentTerminalPolicyProbeTest.php" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="18.575767">
+        <testcase name="test_actual_terminal_policy_resolver_cannot_disable_notice_after_configuration_check_and_commit_old_grant" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentTerminalPolicyProbeTest.php" line="20" class="Tests\Feature\ConsentTerminalPolicyProbeTest" classname="Tests.Feature.ConsentTerminalPolicyProbeTest" assertions="3" time="18.575767"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\ConsentNativeRaceProbeTest" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentNativeRaceProbeTest.php" tests="1" assertions="14" errors="0" failures="0" skipped="0" time="30.454140">
+        <testcase name="test_real_withdrawal_serializes_a_stale_grant_even_with_old_repeatable_read_snapshot" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentNativeRaceProbeTest.php" line="26" class="Tests\Feature\ConsentNativeRaceProbeTest" classname="Tests.Feature.ConsentNativeRaceProbeTest" assertions="14" time="30.454140"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\CustomerConsentAdmissionTest" file="/workspace/VA-Studio-consent-independent/tests/Feature/CustomerConsentAdmissionTest.php" tests="2" assertions="4" errors="0" failures="0" skipped="0" time="54.206766">
+        <testsuite name="Tests\Feature\CustomerConsentAdmissionTest::test_reserved_identity_across_object_kinds_is_refused_on_full_valid_dependencies" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="29.578641">
+          <testcase name="test_reserved_identity_across_object_kinds_is_refused_on_full_valid_dependencies with data set &quot;dictionary case/accent alias&quot;" file="/workspace/VA-Studio-consent-independent/tests/Feature/CustomerConsentAdmissionTest.php" line="94" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="2" time="29.578641"/>
+        </testsuite>
+        <testsuite name="Tests\Feature\CustomerConsentAdmissionTest::test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="24.628125">
+          <testcase name="test_dependency_shape_keys_guards_enforcement_and_shadow_refuse_before_schema_installation with data set &quot;temporary accounts&quot;" file="/workspace/VA-Studio-consent-independent/tests/Feature/CustomerConsentAdmissionTest.php" line="118" class="Tests\Feature\CustomerConsentAdmissionTest" classname="Tests.Feature.CustomerConsentAdmissionTest" assertions="2" time="24.628125"/>
+        </testsuite>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

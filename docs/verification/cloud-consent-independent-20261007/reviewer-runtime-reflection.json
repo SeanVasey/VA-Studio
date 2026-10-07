@@ -1,0 +1,10 @@
+{
+    "php": "8.4.26",
+    "sqlite": {
+        "versionString": "3.46.1",
+        "versionNumber": 3046001
+    },
+    "consent_class": "\/workspace\/VA-Studio-consent-independent\/app\/Domain\/Customers\/Preferences\/CustomerConsentPreferences.php",
+    "consent_proof": "\/workspace\/VA-Studio-consent-independent\/app\/Domain\/Customers\/Preferences\/ConsentEvidence.php",
+    "customer_access": "\/workspace\/VA-Studio-consent-independent\/app\/Domain\/Customers\/CustomerAccess.php"
+}

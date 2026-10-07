@@ -1,0 +1,12 @@
+{
+  "claim": "Preserved prior independent native receipts; this author did not rerun native on49b9154.",
+  "artifacts": {
+    "docs/verification/cloud-listening-notes-independent-20261007/native-text-predecessor.txt": "57c6c466ea5167d57940af7c2a05053bd1368b0548f234370eaf584b595ea42f",
+    "docs/verification/cloud-listening-notes-independent-20261007/native-text-predecessor.xml": "0f9b9658143b99721f5a75b31a132a90ec025b160a892aa53bb226227ac5ebbc",
+    "docs/verification/cloud-listening-notes-independent-20261007/native-text-predecessor-probe.json": "73dc0bed77a106b76a4de7c14e4de0ad58c8805c17dac91a194fc52181302714",
+    "docs/verification/cloud-listening-notes-independent-20261007/native-text-successor-probe.json": "47b6818e28b241d6e835cde900df0a83592b974bf21735d3c20774f92c6876de",
+    "docs/verification/cloud-listening-notes-independent-20261007/native-successor.txt": "b3920319826aac4a46f6648be39cd23ab3720109c385d1234caa1f7ea24c88e0",
+    "docs/verification/cloud-listening-notes-independent-20261007/native-successor.xml": "7d9730f0c8987168e04d3a58832872732b56317e957777b7d222ebbde424174e",
+    "docs/verification/cloud-listening-notes-independent-20261007/final-review-receipt.json": "df3fe3f6d10e1531b4c6ae261d96f420f509e8d87dd93473200850446b483bd8"
+  }
+}

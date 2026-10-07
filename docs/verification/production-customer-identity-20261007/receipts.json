@@ -1,0 +1,271 @@
+{
+  "source_commit": "eaaa55be3bf35193e68a3ad8cac3cc99eec85e5e",
+  "source_tree": "285651f8bca91799b6917aaa3b48eb87d10e54f8",
+  "base_commit": "28eba5e0832a0cbccbf636d4e73fbc77e15968af",
+  "source_map_sha256": "f649367232471b73b532a5d97a97cf3a66cdf95b2f4bb8573156a01aea7db270",
+  "source_files_verified": 38,
+  "new_source_files": 37,
+  "existing_source_exception": {
+    "path": "app/Domain/Commerce/ProductionPolicy/CurrentRows.php",
+    "added_lines": 10,
+    "removed_lines": 0,
+    "getters": [
+      "identityPrimary(): PDO",
+      "identityDriver(): string"
+    ],
+    "existing_method_bodies_and_sql": "unchanged"
+  },
+  "independent_review": "pending_root_exact_source_review; author evidence confers no approval",
+  "parent_composition_reported_commit": "d8d4cec083133b37cd80eb2748ceeb5b07c35f46",
+  "parent_composition_status": "root reported unchanged original temporary-users canary passed 1 test / 5 assertions; broader review pending",
+  "native_engine": "8.0.46-0ubuntu0.24.04.4",
+  "native_engine_distribution": "Ubuntu",
+  "native_environment": "isolated author MySQL schema/account; not hosted MySQL8.4, CI or deployment acceptance",
+  "checks": [
+    {
+      "artifact": "final-native.xml",
+      "source_commit": "eaaa55be3bf35193e68a3ad8cac3cc99eec85e5e",
+      "tests_recorded": 46,
+      "tests_executed": 46,
+      "assertions": 1464,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "20783fb592893c3f906dbfb1511c1190606a236ddd0eefce258146fd5026d9fb",
+      "per_class_recorded": {
+        "Tests.Feature.ProductionIdentity.ProductionIdentityHttpTest": 8,
+        "Tests.Feature.ProductionIdentity.ProductionIdentityJourneyTest": 8,
+        "Tests.Feature.ProductionIdentity.ProductionIdentityMigrationTest": 5,
+        "Tests.Feature.ProductionIdentity.ProductionIdentityNativeRaceTest": 6,
+        "Tests.Feature.ProductionIdentity.ProductionIdentityNoticeTest": 8,
+        "Tests.Feature.ProductionIdentity.ProductionIdentityRuntimeTest": 11
+      }
+    },
+    {
+      "artifact": "final-sqlite.xml",
+      "source_commit": "eaaa55be3bf35193e68a3ad8cac3cc99eec85e5e",
+      "tests_recorded": 46,
+      "tests_executed": 39,
+      "assertions": 209,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 7,
+      "sha256": "9f06a68505f44a9dab4a85d3269e0f5cbff722ebfe823bb9c023300d67b4338d",
+      "per_class_recorded": {
+        "Tests.Feature.ProductionIdentity.ProductionIdentityHttpTest": 8,
+        "Tests.Feature.ProductionIdentity.ProductionIdentityJourneyTest": 8,
+        "Tests.Feature.ProductionIdentity.ProductionIdentityMigrationTest": 5,
+        "Tests.Feature.ProductionIdentity.ProductionIdentityNativeRaceTest": 6,
+        "Tests.Feature.ProductionIdentity.ProductionIdentityNoticeTest": 8,
+        "Tests.Feature.ProductionIdentity.ProductionIdentityRuntimeTest": 11
+      }
+    },
+    {
+      "artifact": "unchanged-review-canaries.xml",
+      "source_commit": "eaaa55be3bf35193e68a3ad8cac3cc99eec85e5e",
+      "tests_recorded": 2,
+      "tests_executed": 2,
+      "assertions": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "5389d5f8cb5e2758216fbbf0164ecbb65445d7a73747557d04863208bfd9f8ed",
+      "per_class_recorded": {
+        "Tests.IndependentIdentity.ProductionIdentityPermanentUserCanaryTest": 1,
+        "Tests.AuthorIdentityCanaries.IdentityUnknownRoleCanaryTest": 1
+      }
+    },
+    {
+      "artifact": "frontend.xml",
+      "source_commit": "eaaa55be3bf35193e68a3ad8cac3cc99eec85e5e",
+      "tests_recorded": 8,
+      "tests_executed": 8,
+      "assertions": 0,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "d77323b4df9e6d3f6008f34b3642d387969b49e882351a134af8309ad80d8672",
+      "per_class_recorded": {
+        "tests/frontend/production-customer-identity.test.tsx": 8
+      }
+    }
+  ],
+  "commands": {
+    "native": "APP_KEY=<fixed synthetic test key> VA_IDENTITY_ISOLATED_NATIVE=1 vendor/bin/phpunit tests/Feature/ProductionIdentity --log-junit docs/verification/production-customer-identity-20261007/final-native.xml",
+    "sqlite": "APP_KEY=<fixed synthetic test key> DB_CONNECTION=sqlite DB_DATABASE=:memory: vendor/bin/phpunit tests/Feature/ProductionIdentity --log-junit docs/verification/production-customer-identity-20261007/final-sqlite.xml",
+    "canaries": "APP_KEY=<fixed synthetic test key> DB_CONNECTION=sqlite DB_DATABASE=:memory: vendor/bin/phpunit docs/verification/production-customer-identity-20261007/ProductionIdentityPermanentUserCanaryTest.php docs/verification/production-customer-identity-20261007/IdentityUnknownRoleCanaryTest.php --log-junit docs/verification/production-customer-identity-20261007/unchanged-review-canaries.xml",
+    "frontend": "npm run test -- tests/frontend/production-customer-identity.test.tsx --reporter=default --reporter=junit --outputFile=docs/verification/production-customer-identity-20261007/frontend.xml",
+    "typecheck": "npm run typecheck",
+    "formatting": "vendor/bin/pint --test <all owned PHP paths including two-getter CurrentRows exception>"
+  },
+  "non_junit_checks": {
+    "typecheck": "passed",
+    "owned_php_formatting": "passed",
+    "actual_server_version_select": "passed"
+  },
+  "unchanged_canary_snapshots": {
+    "ProductionIdentityPermanentUserCanaryTest.php": "e6e91f0e2d38f4c8458510c602c4f3d080ee85114aeafa4332f245df1e5bde98",
+    "IdentityUnknownRoleCanaryTest.php": "0341c4a89c96bc78e9d66a3ffb05c3688d85a80f72ba955b51ff5c12ecfdff1b"
+  },
+  "author_unknown_role_original": {
+    "source_commit": "8e551ca71be9467e305e28ac29f3b23ab76a3739",
+    "artifact": "unknown-role-original.xml",
+    "tests_recorded": 1,
+    "assertions": 4,
+    "failures": 1,
+    "errors": 0,
+    "status": "actual blocker preserved, repaired by final source"
+  },
+  "sqlite_native_only_skips": [
+    {
+      "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityMigrationTest",
+      "method": "test_native_dictionary_unicode_guard_alias_on_foreign_table_is_refused",
+      "reason": "MySQL dictionary collation alias requires native MySQL.",
+      "native_case": {
+        "artifact": "final-native.xml",
+        "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityMigrationTest",
+        "method": "test_native_dictionary_unicode_guard_alias_on_foreign_table_is_refused",
+        "assertions": 1,
+        "outcome": "passed",
+        "junit_classname": "Tests.Feature.ProductionIdentity.ProductionIdentityMigrationTest"
+      },
+      "junit_classname": "Tests.Feature.ProductionIdentity.ProductionIdentityMigrationTest"
+    },
+    {
+      "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+      "method": "test_competing_completion_waits_on_exact_address_and_retains_one_verification with data set #0",
+      "reason": "Independent native MySQL sessions and exact InnoDB record waits required.",
+      "native_case": {
+        "artifact": "final-native.xml",
+        "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+        "method": "test_competing_completion_waits_on_exact_address_and_retains_one_verification with data set #0",
+        "assertions": 242,
+        "outcome": "passed",
+        "junit_classname": "Tests.Feature.ProductionIdentity.ProductionIdentityNativeRaceTest"
+      },
+      "junit_classname": "Tests.Feature.ProductionIdentity.ProductionIdentityNativeRaceTest"
+    },
+    {
+      "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+      "method": "test_competing_completion_waits_on_exact_address_and_retains_one_verification with data set #1",
+      "reason": "Independent native MySQL sessions and exact InnoDB record waits required.",
+      "native_case": {
+        "artifact": "final-native.xml",
+        "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+        "method": "test_competing_completion_waits_on_exact_address_and_retains_one_verification with data set #1",
+        "assertions": 237,
+        "outcome": "passed",
+        "junit_classname": "Tests.Feature.ProductionIdentity.ProductionIdentityNativeRaceTest"
+      },
+      "junit_classname": "Tests.Feature.ProductionIdentity.ProductionIdentityNativeRaceTest"
+    },
+    {
+      "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+      "method": "test_competing_completion_waits_on_exact_address_and_retains_one_verification with data set #2",
+      "reason": "Independent native MySQL sessions and exact InnoDB record waits required.",
+      "native_case": {
+        "artifact": "final-native.xml",
+        "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+        "method": "test_competing_completion_waits_on_exact_address_and_retains_one_verification with data set #2",
+        "assertions": 211,
+        "outcome": "passed",
+        "junit_classname": "Tests.Feature.ProductionIdentity.ProductionIdentityNativeRaceTest"
+      },
+      "junit_classname": "Tests.Feature.ProductionIdentity.ProductionIdentityNativeRaceTest"
+    },
+    {
+      "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+      "method": "test_competing_completion_waits_on_exact_address_and_retains_one_verification with data set #3",
+      "reason": "Independent native MySQL sessions and exact InnoDB record waits required.",
+      "native_case": {
+        "artifact": "final-native.xml",
+        "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+        "method": "test_competing_completion_waits_on_exact_address_and_retains_one_verification with data set #3",
+        "assertions": 222,
+        "outcome": "passed",
+        "junit_classname": "Tests.Feature.ProductionIdentity.ProductionIdentityNativeRaceTest"
+      },
+      "junit_classname": "Tests.Feature.ProductionIdentity.ProductionIdentityNativeRaceTest"
+    },
+    {
+      "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+      "method": "test_competing_workers_wait_on_exact_address_then_handoff_only_once",
+      "reason": "Independent native MySQL sessions and exact InnoDB record waits required.",
+      "native_case": {
+        "artifact": "final-native.xml",
+        "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+        "method": "test_competing_workers_wait_on_exact_address_then_handoff_only_once",
+        "assertions": 256,
+        "outcome": "passed",
+        "junit_classname": "Tests.Feature.ProductionIdentity.ProductionIdentityNativeRaceTest"
+      },
+      "junit_classname": "Tests.Feature.ProductionIdentity.ProductionIdentityNativeRaceTest"
+    },
+    {
+      "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+      "method": "test_committed_credential_withdrawal_wins_exact_user_fence_before_recovery",
+      "reason": "Independent native MySQL sessions and exact InnoDB record waits required.",
+      "native_case": {
+        "artifact": "final-native.xml",
+        "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+        "method": "test_committed_credential_withdrawal_wins_exact_user_fence_before_recovery",
+        "assertions": 121,
+        "outcome": "passed",
+        "junit_classname": "Tests.Feature.ProductionIdentity.ProductionIdentityNativeRaceTest"
+      },
+      "junit_classname": "Tests.Feature.ProductionIdentity.ProductionIdentityNativeRaceTest"
+    }
+  ],
+  "completion_datasets": {
+    "#0": "enrollment exact duplicate",
+    "#1": "enrollment conflicting completion",
+    "#2": "recovery exact duplicate",
+    "#3": "recovery conflicting completion"
+  },
+  "historical_evidence_status": "See history-status.json; original manifest/raw bytes preserved without approval carry; intermediate native run is superseded development-only and not final-frozen evidence.",
+  "activation_boundaries": {
+    "shared_registration": "parent owned, not enabled by this source",
+    "production_flags": "default off; no external SMTP transport binding",
+    "smtp_250": "submission acceptance only, never delivery or identity verification",
+    "external_sends": "none",
+    "live_credentials": "none",
+    "payment_provider_writes": "none",
+    "hosted_ci": "not dispatched",
+    "push_merge": "none"
+  },
+  "artifacts": {
+    "IdentityUnknownRoleCanaryTest.php": "0341c4a89c96bc78e9d66a3ffb05c3688d85a80f72ba955b51ff5c12ecfdff1b",
+    "ProductionIdentityPermanentUserCanaryTest.php": "e6e91f0e2d38f4c8458510c602c4f3d080ee85114aeafa4332f245df1e5bde98",
+    "final-native.txt": "cb168bebd20a9d601755c0b0c296ed931949be18df841c2ed507380a13a29ade",
+    "final-native.xml": "20783fb592893c3f906dbfb1511c1190606a236ddd0eefce258146fd5026d9fb",
+    "final-sqlite.txt": "5a726b7e39cfcc8e5a0bedcd08d7144629e7d7212a29e41b8c5bdb9950d2aeaf",
+    "final-sqlite.xml": "9f06a68505f44a9dab4a85d3269e0f5cbff722ebfe823bb9c023300d67b4338d",
+    "frontend.txt": "6310c34299aedb010026159ef60600e46dbd440bbbf092b85a2778c822525bba",
+    "frontend.xml": "d77323b4df9e6d3f6008f34b3642d387969b49e882351a134af8309ad80d8672",
+    "historical-1d90a165/final-native.txt": "b0347f651ad97dfe6cd1391194935f879b262c5296bf1daa8b5b5112014bcb50",
+    "historical-1d90a165/final-native.xml": "399d990c5252c678842dd79c4a56e2b933bc81c8bd92756c0696c981976173c2",
+    "historical-1d90a165/final-sqlite.txt": "cb487cb7057ee3fa1d9b8caa2d96a353adda1c790b7303c4a0ad666279d71dda",
+    "historical-1d90a165/final-sqlite.xml": "8c0630757c9b283cf69ae1c3fc7b3c47b0d2b459fe539982d8bbc1c9b92879d4",
+    "historical-1d90a165/pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "historical-1d90a165/source-map.json": "e11090f4f7addac05a5f992460e74ed408cc245e86aee581b79b6a3aeb402af6",
+    "history-status.json": "bc05da4186fedeb6f3ab999d8cea190b2fd4a7eabc98394088fd0560ec42a776",
+    "native-version.txt": "8190f04420569cb60dc4f6bdbed5368fdfd20d27429d1c76cea57c143c9418f5",
+    "pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "repair-canaries.txt": "a247764f9285aa4bfeda06146159ebbcc5c3015596c24ca1d42453e86a6f7574",
+    "repair-canaries.xml": "477139a9b147e3ffd990b38ff239c5216333048cd131ed7e489572a8eb7889ef",
+    "source-map.json": "f649367232471b73b532a5d97a97cf3a66cdf95b2f4bb8573156a01aea7db270",
+    "superseded-8e551ca/final-native.txt": "24573a418c9ccbe6ee799a96ee590627a0d6580942cb00922a3bd50e5ea5d3a1",
+    "superseded-8e551ca/final-native.xml": "17ff9068fa95fab94f81a816dd411200ca1cf3626b90e2ba38a5109663c5b5e8",
+    "superseded-8e551ca/final-sqlite.txt": "f793db69d5216769e3f71d1ae675a972a8d4a7270fb04ede8bf73269fa4e2001",
+    "superseded-8e551ca/final-sqlite.xml": "8da70c827d3cd7fb47e90f7b9af633a8eb61c1a89ff7549c967845c2791250d8",
+    "superseded-8e551ca/pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "superseded-8e551ca/unchanged-review-canary.txt": "616123b1ba322cee7839b46392bcbe397e5313a58c823053a89c438fb32da9ce",
+    "superseded-8e551ca/unchanged-review-canary.xml": "bcf27ab7cd2ede892009ac71aa55e7c6089537696d23639d0ee7840bf5d914fc",
+    "typecheck.txt": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f",
+    "unchanged-review-canaries.txt": "26c6c152a81874d893b2143fb24000953c6ced2806b2522e9f6c019c9b61fbbf",
+    "unchanged-review-canaries.xml": "5389d5f8cb5e2758216fbbf0164ecbb65445d7a73747557d04863208bfd9f8ed",
+    "unknown-role-original.txt": "7fe5cf5992436b4aa332496b7134bfacd855c2bf9d74499c7a3f0dd3c54944b5",
+    "unknown-role-original.xml": "6141a4f60dd99df7f1a6c24a1a29399a7607466ad0003e3fb7ee01a7831aa31a",
+    "historical-1d90a165/receipts.json": "96fdec41b76423b3bf7ef5c92a841d043dc9eec2caef6edd41641250088cb730"
+  }
+}
