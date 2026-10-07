@@ -3,8 +3,10 @@
 namespace App\Domain\Customers;
 
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
+use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
 use App\Domain\Customers\ProductionIdentity\IdentityEvidence;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
+use App\Domain\Customers\ProductionIdentity\IdentityHistoricalPlainRows;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\IdentityRows;
 use App\Models\User;
@@ -76,6 +78,22 @@ final class ProductionCustomerAccess
         }
     }
 
+    /** Revalidate the original evidence in an owned read-only frame; this mints no renewed principal. */
+    public function proveCommitted(ProductionCustomerPrincipal $principal, User $trustedActor, IdentityCommittedFrame $frame, array $expectedRaw): void
+    {
+        $reader = IdentityRows::committed($frame);
+        $proof = $this->read($trustedActor, $frame->reader(), $reader);
+        $this->match($principal, $trustedActor, $proof);
+        if ($this->strings($proof) !== $this->strings($expectedRaw)) {
+            throw new IdentityException;
+        }
+        // Deep history/permanent-floor work is complete. Close mutable authority with fresh direct reads.
+        if ($this->strings($reader->one('users', $principal->userId)) !== $this->strings($expectedRaw['user'])
+            || $this->strings($reader->one('customer_accounts', $principal->accountId)) !== $this->strings($expectedRaw['account'])) {
+            throw new IdentityException;
+        }
+    }
+
     public function durableBinding(ProductionCustomerPrincipal $principal): array
     {
         return $principal->durableBinding();
@@ -87,7 +105,32 @@ final class ProductionCustomerAccess
         return $this->historical($binding, IdentityRows::from($reader));
     }
 
-    private function historical(array $binding, IdentityRows $reader): array
+    public function verifyHistoricalBindingCommitted(array $binding, IdentityCommittedFrame $frame): array
+    {
+        return $this->historical($binding, IdentityRows::committed($frame));
+    }
+
+    public function proveHistoricalBindingCommitted(array $binding, IdentityCommittedFrame $frame, array $expectedRaw): void
+    {
+        if ($this->strings($this->verifyHistoricalBindingCommitted($binding, $frame)) !== $this->strings($expectedRaw)) {
+            throw new IdentityException;
+        }
+    }
+
+    /** Original historical facts using the receipt's fixed permanent nonlocking reader only. */
+    public function verifyHistoricalBindingPlain(array $binding, IdentityHistoricalPlainRows $reader): array
+    {
+        return $this->historical($binding, $reader);
+    }
+
+    public function proveHistoricalBindingPlain(array $binding, IdentityHistoricalPlainRows $reader, array $expectedRaw): void
+    {
+        if ($this->strings($this->verifyHistoricalBindingPlain($binding, $reader)) !== $this->strings($expectedRaw)) {
+            throw new IdentityException;
+        }
+    }
+
+    private function historical(array $binding, IdentityRows|IdentityHistoricalPlainRows $reader): array
     {
         $keys = ['schema_version', 'origin_id', 'provenance', 'account_id', 'account_public_id', 'user_id', 'verification_observation_id', 'verification_observation_hash', 'identity_policy_version', 'identity_policy_hash'];
         $actual = array_keys($binding);
@@ -167,9 +210,9 @@ final class ProductionCustomerAccess
         }
     }
 
-    private function read(User $actor, CurrentRows $sourceReader): array
+    private function read(User $actor, CurrentRows $sourceReader, ?IdentityRows $committedReader = null): array
     {
-        $reader = IdentityRows::from($sourceReader);
+        $reader = $committedReader ?? IdentityRows::from($sourceReader);
         $policy = new IdentityPolicy;
         $policy->requireEnabled();
         if ($actor::class !== User::class || ! $actor->exists || ! is_int($actor->getKey()) || $actor->id < 1) {
