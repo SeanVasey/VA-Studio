@@ -542,3 +542,28 @@ remain explicitly handed forward. Necessary synthetic membership setup is
 authorized; real credential/payment/purchase/deploy/DNS actions remain pending
 separate authorization. The final main tree is this checkpoint plus this
 documentation-only publication entry. Read origin/main before continuation.
+
+
+### Open late review findings handed to Claude
+
+Two actual automated PR39 P2 findings arrived after the checkpoint merge and
+remain open. Sean directed stopping additional implementation/repair rounds;
+they are recorded here for continuation, without claiming they are resolved:
+
+- [4206829225](https://github.com/SeanVasey/VA-Studio/pull/39#discussion_r4206829225),
+  `SuppressionDelivery.php`: after a current account email change, delivery/reconcile
+  derives a new recipient HMAC and can miss the retained withdrawal target for
+  the old address. Select and process the authentic captured pending target while
+  retaining original scope/privacy/unknown-outcome safeguards.
+- [4206829231](https://github.com/SeanVasey/VA-Studio/pull/39#discussion_r4206829231),
+  `IdentityCommittedFrame.php`: the caller-owned replacement correctly retains
+  its read-only setting, but ordinary single-close usage can leave SQLite query_only
+  enabled after the replacement later ends. The current bounded proof uses a
+  deliberate later close. Add lifecycle restoration that preserves foreign-frame
+  ownership without relying on that extra call, then independently review and
+  verify it. Earlier approval/tests remain bounded to their exact recorded cases.
+
+No further code or diagnostic tests are started in this handoff chat. These
+findings add to the already recorded native paid-delivery409 and other incomplete
+implementation/review/final-verification items. Read this latest ledger before
+older component approval wording. Production activation remains unaccepted.
