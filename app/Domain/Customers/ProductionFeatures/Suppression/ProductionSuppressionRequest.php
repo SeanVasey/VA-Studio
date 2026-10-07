@@ -4,6 +4,7 @@ namespace App\Domain\Customers\ProductionFeatures\Suppression;
 
 use JsonSerializable;
 use LogicException;
+use SensitiveParameter;
 use WeakMap;
 
 /** Private provider transport input built only from durable target/attempt rows; never HTTP output or log context.
@@ -14,14 +15,14 @@ final class ProductionSuppressionRequest implements JsonSerializable
     /** @var WeakMap<self, array>|null */
     private static ?WeakMap $sealed = null;
 
-    private function __construct(array $values)
+    private function __construct(#[SensitiveParameter] array $values)
     {
         self::$sealed ??= new WeakMap;
         self::$sealed[$this] = $values;
     }
 
     /** @internal Minted by ProductionSuppressionRecords from re-validated durable rows only. */
-    public static function fromRecords(string $operationId, string $targetId, string $recipient, string $recipientHmac, string $providerHash, string $requestHash): self
+    public static function fromRecords(string $operationId, string $targetId, #[SensitiveParameter] string $recipient, string $recipientHmac, string $providerHash, string $requestHash): self
     {
         return new self(compact('operationId', 'targetId', 'recipient', 'recipientHmac', 'providerHash', 'requestHash'));
     }

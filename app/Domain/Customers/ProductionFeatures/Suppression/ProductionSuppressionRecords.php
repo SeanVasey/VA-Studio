@@ -11,6 +11,7 @@ use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Support\CanonicalJson;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
+use SensitiveParameter;
 use Throwable;
 
 /** One retained meaning for the 254 graph. Lineage is only the 253 binding and its production withdrawal events. */
@@ -73,7 +74,7 @@ final class ProductionSuppressionRecords
         }
     }
 
-    public function request(array $target, array $capture, array $attempt): ProductionSuppressionRequest
+    public function request(array $target, #[SensitiveParameter] array $capture, array $attempt): ProductionSuppressionRequest
     {
         try {
             $provider = $this->plain($attempt['provider_ciphertext'] ?? null);
@@ -121,7 +122,7 @@ final class ProductionSuppressionRecords
             'purpose' => ConsentPolicy::PURPOSE, 'recipientHmac' => $target['recipient_hmac'], 'providerHash' => $providerHash]);
     }
 
-    public function encrypt(array $plain): string
+    public function encrypt(#[SensitiveParameter] array $plain): string
     {
         $cipher = Crypt::encryptString(CanonicalJson::encode($plain));
         $this->context->admitConfiguration();
