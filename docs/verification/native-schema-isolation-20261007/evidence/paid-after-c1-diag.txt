@@ -1,0 +1,52 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-trigscan-paid/phpunit.xml
+
+DIAGNOSTIC run start prepare 15:31:58
+DIAGNOSTIC run end prepare 21.9 s
+DIAGNOSTIC run start prepare 15:32:21
+DIAGNOSTIC run end prepare 21.2 s
+DIAGNOSTIC run start prepare 15:32:42
+DIAGNOSTIC run end prepare 22.9 s
+DIAGNOSTIC run start complete 15:33:05
+DIAGNOSTIC run end complete 17.0 s
+DIAGNOSTIC run start complete 15:33:22
+DIAGNOSTIC run end complete 19.5 s
+DIAGNOSTIC run start authorize 15:33:42
+DIAGNOSTIC run end authorize 20.1 s
+DIAGNOSTIC run start authorize 15:34:02
+DIAGNOSTIC run end authorize 17.0 s
+DIAGNOSTIC run start redeem 15:34:23
+DIAGNOSTIC run end redeem 16.3 s
+DIAGNOSTIC run start redeem 15:34:39
+DIAGNOSTIC run refused redeem 9.5 s
+DIAGNOSTIC identity refusal: This customer identity request could not be confirmed. at /home/user/VA-Studio-trigscan-paid/app/Domain/Customers/ProductionIdentity/IdentityOriginalCommitWitness.php:178
+#0 /home/user/VA-Studio-trigscan-paid/app/Domain/Customers/ProductionIdentity/IdentityOriginalCommitWitness.php(122): App\Domain\Customers\ProductionIdentity\IdentityOriginalCommitWitness->context()
+#1 /home/user/VA-Studio-trigscan-paid/app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommittedReceipt.php(28): App\Domain\Customers\ProductionIdentity\IdentityOriginalCommitWitness->assertHeld()
+#2 /home/user/VA-Studio-trigscan-paid/app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderSourceV1.php(74): App\Domain\Customers\ProductionIdentity\IdentityHistoricalCommittedReceipt::capture()
+#3 /home/user/VA-Studio-trigscan-paid/app/Domain/Commerce/ProductionCheckout/OriginalCommitDispatcher.php(58): App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderSourceV1->historicalCommittedReceipt()
+#4 /home/user/VA-Studio-trigscan-paid/app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderCommittedReadReceiptV1.php(31): App\Domain\Commerce\ProductionCheckout\OriginalCommitDispatcher->historicalReceipt()
+#5 /home/user/VA-Studio-trigscan-paid/app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderSourceV1.php(58): App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderCommittedReadReceiptV1::capture()
+#6 /home/user/VA-Studio-trigscan-paid/app/Domain/Grants/Paid/PaidGrantCommands.php(74): App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderSourceV1->committedReadReceipt()
+#7 /home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php(35): App\Domain\Grants\Paid\PaidGrantCommands->{closure:App\Domain\Grants\Paid\PaidGrantCommands::run():46}()
+#8 /home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php(502): Illuminate\Database\Connection->transaction()
+#9 /home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(364): Illuminate\Database\DatabaseManager->__call()
+#10 /home/user/VA-Studio-trigscan-paid/app/Domain/Grants/Paid/PaidGrantCommands.php(46): Illuminate\Support\Facades\Facade::__callStatic()
+#11 /home/user/VA-Studio-trigscan-paid/app/Domain/Grants/Paid/PaidGrantDownloads.php(132): App\Domain\Grants\Paid\PaidGrantCommands->run()
+E                                                                   1 / 1 (100%)
+
+Time: 06:26.440, Memory: 95.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\PaidGrantDownloadJourneyTest::test_exact_paid_master_and_original_pdf_are_one_attempt_each_with_token_free_bounded_status_and_consumed_replay_refusal
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/home/user/VA-Studio-trigscan-paid/app/Domain/Grants/Paid/PaidGrantCommands.php:97
+/home/user/VA-Studio-trigscan-paid/app/Domain/Grants/Paid/PaidGrantDownloads.php:132
+/home/user/VA-Studio-trigscan-paid/tests/Feature/PaidGrantDownloadJourneyTest.php:146
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 1, Assertions: 14, Errors: 1.

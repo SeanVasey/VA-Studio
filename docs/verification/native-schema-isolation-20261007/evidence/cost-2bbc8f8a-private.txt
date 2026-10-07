@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-trigscan/phpunit.xml
+
+identity inspection: 140 statements, 292.4 ms
+F                                                                   1 / 1 (100%)
+
+Time: 01:24.909, Memory: 77.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionIdentity\IdentityInspectionCostTest::test_one_native_inspection_issues_a_small_fixed_number_of_statements
+Failed asserting that 140 is equal to 110 or is less than 110.
+
+/home/user/VA-Studio-trigscan/tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php:66
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 6, Failures: 1.
