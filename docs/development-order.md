@@ -518,3 +518,52 @@ Read-only exception visibility is accepted in #66; verified-admin/MFA checks on 
 Before each PR: inspect current main, this record and the selected issue; name its dependency and remaining criteria; record tests at the actual head; update the next handoff here and in the issue. Do not close broad work packages from a partial increment, revive stale “next task” paragraphs, or use provider setup as a reason to skip earlier work.
 
 The [source/parity records](migration/README.md) remain the omission checklist. Their `planned` target statuses are a baseline, not a fresh implementation audit; mark a requirement accepted only with its specific implementation and acceptance evidence. No authenticated audit, completed import, production transaction or live cutover is implied by this reconciliation.
+
+
+## Final cloud checkpoint and Claude Code handoff — October7,2026
+
+PR [#39](https://github.com/SeanVasey/VA-Studio/pull/39) merged the completed reviewed
+current batch and detailed handoff at `8545a2d4315dff7d15b40b24db45628d1e3355ce` on
+2026-10-07T12:24:56Z. Published head is`0214c17f546f2d5cac49fdc7a4d42e0c5dca6d09`; actual cheap
+preflight37620414423 passed all required jobs (documentation skipped as expected
+for the runtime candidate). Support37 and identity/SMTP/history38 are already
+incorporated. Suppression983 and identity-frame cleanup5053 retain independent
+source-bound approval and their actual original/corrected receipts. No final
+Foundation/native8.4/browser or live acceptance is claimed.
+
+The [Claude handoff](handoff/2026-10-07/README.md),
+[continuation prompt](handoff/2026-10-07/CLAUDE-RESUME.md) and
+[42-ref inventory](handoff/2026-10-07/remote-branches.json) preserve all six frozen
+owner packets, exact remote heads, original failures, tests and next steps.
+All agents are idle; remaining code is pushed on indexed development branches.
+Fresh checkout/paid252/253/257Rows/member258 still need specified review, diagnosis
+or integration;255/256/254/Billing259 and broader content/product/hosting work
+remain explicitly handed forward. Necessary synthetic membership setup is
+authorized; real credential/payment/purchase/deploy/DNS actions remain pending
+separate authorization. The final main tree is this checkpoint plus this
+documentation-only publication entry. Read origin/main before continuation.
+
+
+### Open late review findings handed to Claude
+
+Two actual automated PR39 P2 findings arrived after the checkpoint merge and
+remain open. Sean directed stopping additional implementation/repair rounds;
+they are recorded here for continuation, without claiming they are resolved:
+
+- [4206829225](https://github.com/SeanVasey/VA-Studio/pull/39#discussion_r4206829225),
+  `SuppressionDelivery.php`: after a current account email change, delivery/reconcile
+  derives a new recipient HMAC and can miss the retained withdrawal target for
+  the old address. Select and process the authentic captured pending target while
+  retaining original scope/privacy/unknown-outcome safeguards.
+- [4206829231](https://github.com/SeanVasey/VA-Studio/pull/39#discussion_r4206829231),
+  `IdentityCommittedFrame.php`: the caller-owned replacement correctly retains
+  its read-only setting, but ordinary single-close usage can leave SQLite query_only
+  enabled after the replacement later ends. The current bounded proof uses a
+  deliberate later close. Add lifecycle restoration that preserves foreign-frame
+  ownership without relying on that extra call, then independently review and
+  verify it. Earlier approval/tests remain bounded to their exact recorded cases.
+
+No further code or diagnostic tests are started in this handoff chat. These
+findings add to the already recorded native paid-delivery409 and other incomplete
+implementation/review/final-verification items. Read this latest ledger before
+older component approval wording. Production activation remains unaccepted.
