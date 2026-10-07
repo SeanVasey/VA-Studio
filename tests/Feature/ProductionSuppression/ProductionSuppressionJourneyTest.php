@@ -83,6 +83,39 @@ class ProductionSuppressionJourneyTest extends TestCase
         }
     }
 
+    public function test_receipts_scoped_to_another_recipient_provider_or_account_never_confirm(): void
+    {
+        $owner = $this->withdrawn();
+        $other = $this->withdrawn('suppression-other@example.test');
+        $intents = new ProductionSuppressionIntents($this->provider);
+        $this->assertSame(['status' => 'unknown'], $intents->request($owner, 1));
+        $this->assertSame(['status' => 'unknown'], $intents->request($other, 1));
+        $this->assertCount(2, $this->provider->suppressed);
+        $otherRequest = $this->provider->last;
+        $this->assertNotSame(self::OWNER, $otherRequest->recipient());
+
+        // Each answer matches the owner's request in every field except the one named, so only that comparison can refuse it.
+        $answers = [
+            'wrong recipient hmac' => fn (ProductionSuppressionRequest $r) => new ProductionSuppressionReceipt($r->operationId(), $r->requestHash(), hash('sha256', 'another recipient'), $r->providerHash(), 'SYNTHETIC-1', 'suppressed'),
+            'other account recipient hmac' => fn (ProductionSuppressionRequest $r) => new ProductionSuppressionReceipt($r->operationId(), $r->requestHash(), $otherRequest->recipientHmac(), $r->providerHash(), 'SYNTHETIC-1', 'suppressed'),
+            'wrong provider hash' => fn (ProductionSuppressionRequest $r) => new ProductionSuppressionReceipt($r->operationId(), $r->requestHash(), $r->recipientHmac(), hash('sha256', 'another provider binding'), 'SYNTHETIC-1', 'suppressed'),
+            'other account whole receipt' => fn () => new ProductionSuppressionReceipt($otherRequest->operationId(), $otherRequest->requestHash(), $otherRequest->recipientHmac(), $otherRequest->providerHash(), 'SYNTHETIC-1', 'suppressed'),
+            'other account operation id' => fn (ProductionSuppressionRequest $r) => new ProductionSuppressionReceipt($otherRequest->operationId(), $r->requestHash(), $r->recipientHmac(), $r->providerHash(), 'SYNTHETIC-1', 'suppressed'),
+        ];
+        foreach ($answers as $name => $answer) {
+            $this->provider->answer = $answer;
+            $this->assertSame(['status' => 'unknown'], $intents->reconcile($owner), $name);
+            $this->assertSame(0, DB::table('production_suppression_confirmations')->count(), $name);
+        }
+        $this->assertCount(2, $this->provider->suppressed, 'Reconciliation never resends.');
+
+        // The exactly scoped receipt still confirms, so the refusals above are not a broken fixture.
+        $this->provider->answer = RecordingSuppressionProvider::positive(...);
+        $this->assertSame(['status' => 'confirmed'], $intents->reconcile($owner));
+        $this->assertSame(1, DB::table('production_suppression_confirmations')->count());
+        $this->assertSame(['status' => 'unknown'], $intents->status($other), 'Another account stays unconfirmed.');
+    }
+
     public function test_later_grant_never_deletes_or_reverses_a_suppression(): void
     {
         $owner = $this->withdrawn();
@@ -233,9 +266,9 @@ class ProductionSuppressionJourneyTest extends TestCase
         }
     }
 
-    private function withdrawn(): ProductionAccountFeatureIdentity
+    private function withdrawn(string $email = self::OWNER): ProductionAccountFeatureIdentity
     {
-        $owner = $this->featureIdentity('consent_preferences', self::OWNER);
+        $owner = $this->featureIdentity('consent_preferences', $email);
         $preferences = new ProductionConsentPreferences;
         $preferences->initialize($owner);
         $preferences->change($owner, $this->productionWithdraw());

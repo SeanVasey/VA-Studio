@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest" file="/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php" tests="1" assertions="8" errors="0" failures="1" skipped="0" time="4.621182">
+    <testcase name="test_receipts_scoped_to_another_recipient_provider_or_account_never_confirm" file="/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php" line="86" class="Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest" classname="Tests.Feature.ProductionSuppression.ProductionSuppressionJourneyTest" assertions="8" time="4.621182">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest::test_receipts_scoped_to_another_recipient_provider_or_account_never_confirm
+wrong recipient hmac
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+-    'status' =&gt; 'unknown',
++    'status' =&gt; 'confirmed',
+ ]
+
+/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:107
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>
