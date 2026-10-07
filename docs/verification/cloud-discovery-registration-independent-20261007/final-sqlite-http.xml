@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-discovery-registration-independent/docs/verification/cloud-discovery-registration-independent-20261007/sqlite-http-selection.xml" tests="4" assertions="68" errors="0" failures="0" skipped="0" time="2.588725">
+    <testsuite name="Independent actual discovery HTTP registration" tests="4" assertions="68" errors="0" failures="0" skipped="0" time="2.588725">
+      <testsuite name="Tests\Feature\DiscoverySitemapRegistrationTest" file="/workspace/VA-Studio-discovery-registration-independent/tests/Feature/DiscoverySitemapRegistrationTest.php" tests="4" assertions="68" errors="0" failures="0" skipped="0" time="2.588725">
+        <testcase name="test_default_off_keeps_existing_site_index_and_public_routes_have_no_session_stack" file="/workspace/VA-Studio-discovery-registration-independent/tests/Feature/DiscoverySitemapRegistrationTest.php" line="44" class="Tests\Feature\DiscoverySitemapRegistrationTest" classname="Tests.Feature.DiscoverySitemapRegistrationTest" assertions="6" time="0.475585"/>
+        <testcase name="test_registered_complete_generation_is_canonical_and_respects_production_evidence_and_epoch" file="/workspace/VA-Studio-discovery-registration-independent/tests/Feature/DiscoverySitemapRegistrationTest.php" line="54" class="Tests\Feature\DiscoverySitemapRegistrationTest" classname="Tests.Feature.DiscoverySitemapRegistrationTest" assertions="52" time="1.547860"/>
+        <testsuite name="Tests\Feature\DiscoverySitemapRegistrationTest::test_response_creation_cannot_resolve_callbacks_after_terminal_source_proof" tests="2" assertions="10" errors="0" failures="0" skipped="0" time="0.565280">
+          <testcase name="test_response_creation_cannot_resolve_callbacks_after_terminal_source_proof with data set #0" file="/workspace/VA-Studio-discovery-registration-independent/tests/Feature/DiscoverySitemapRegistrationTest.php" line="83" class="Tests\Feature\DiscoverySitemapRegistrationTest" classname="Tests.Feature.DiscoverySitemapRegistrationTest" assertions="5" time="0.271772"/>
+          <testcase name="test_response_creation_cannot_resolve_callbacks_after_terminal_source_proof with data set #1" file="/workspace/VA-Studio-discovery-registration-independent/tests/Feature/DiscoverySitemapRegistrationTest.php" line="83" class="Tests\Feature\DiscoverySitemapRegistrationTest" classname="Tests.Feature.DiscoverySitemapRegistrationTest" assertions="5" time="0.293508"/>
+        </testsuite>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>
