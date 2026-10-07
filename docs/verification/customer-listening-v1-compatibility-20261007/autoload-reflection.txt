@@ -1,0 +1,5 @@
+App\Domain\Customers\Listening\ListeningLibrary /workspace/VA-Studio-listening-v1-compatibility/app/Domain/Customers/Listening/ListeningLibrary.php
+App\Domain\Customers\Listening\ListeningEvidence /workspace/VA-Studio-listening-v1-compatibility/app/Domain/Customers/Listening/ListeningEvidence.php
+App\Domain\Customers\Listening\ListeningRollout /workspace/VA-Studio-listening-v1-compatibility/app/Domain/Customers/Listening/ListeningRollout.php
+Tests\Feature\CustomerListeningCompatibilityTest /workspace/VA-Studio-listening-v1-compatibility/tests/Feature/CustomerListeningCompatibilityTest.php
+Tests\Support\PreviousListeningV1 /workspace/VA-Studio-listening-v1-compatibility/tests/Support/PreviousListeningV1.php
