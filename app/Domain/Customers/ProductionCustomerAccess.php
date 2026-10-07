@@ -178,8 +178,8 @@ final class ProductionCustomerAccess
         $user = $reader->one('users', $actor->id);
         $accounts = $reader->rows('customer_accounts', 'user_id = ?', [$actor->id], 2);
         $account = count($accounts) === 1 ? $accounts[0] : [];
-        if ($user === [] || (int) $user['is_admin'] !== 0 || $user['email_verified_at'] === null
-            || $account === [] || (int) $account['active'] !== 1 || (int) $account['access_version'] < 1
+        if ($user === [] || (string) $user['is_admin'] !== '0' || $user['email_verified_at'] === null
+            || $account === [] || (string) $account['active'] !== '1' || (int) $account['access_version'] < 1
             || ! preg_match('/\A[a-f0-9]{64}\z/D', $account['owner_key'])) {
             throw new IdentityException;
         }

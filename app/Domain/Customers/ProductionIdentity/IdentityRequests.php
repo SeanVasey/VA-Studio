@@ -113,8 +113,8 @@ final class IdentityRequests
 
     private function recoverable(array $user, array $account, array $origin, array $observations, string $scope, string $policyHash, string $email): bool
     {
-        if ($origin === [] || $observations === [] || count($observations) > 128 || (int) $user['is_admin'] !== 0
-            || $user['email_verified_at'] === null || (int) $account['active'] !== 1 || $origin['provenance'] !== $scope
+        if ($origin === [] || $observations === [] || count($observations) > 128 || (string) $user['is_admin'] !== '0'
+            || $user['email_verified_at'] === null || (string) $account['active'] !== '1' || $origin['provenance'] !== $scope
             || $origin['identity_policy_version'] !== IdentityPolicy::VERSION || ! hash_equals($origin['identity_policy_hash'], $policyHash)) {
             return false;
         }
