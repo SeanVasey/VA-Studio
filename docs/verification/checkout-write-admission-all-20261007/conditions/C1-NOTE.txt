@@ -1,0 +1,9 @@
+C1 (reviewer F-1) evidence. Source: app/ tree of c70aae57 (= 2c3efc4e) plus the C1 version of
+tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php (committed with this note). SQLite.
+
+C1-green : unmutated, 15 tests / 87 assertions, exit 0.
+C1-M1    : CheckoutStaffWriteAdmission::open() without $plans->staff(...) -> exit 1, 4 failures
+           (basis role, basis MFA, authority role, authority MFA). Reverted with git checkout.
+C1-M3    : CheckoutIntentAdmission::capture() without $plans->history(...) -> exit 1, 1 failure
+           (committing capability closure on a NEW intent: reason was not write_source_changed). Reverted.
+After both runs `git diff --quiet -- app` succeeded (no mutation left in the tree).

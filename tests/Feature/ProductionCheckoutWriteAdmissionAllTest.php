@@ -18,6 +18,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\ProductionCheckoutFixtures as F;
 use Tests\Support\ProductionCheckoutGatewayFixture;
@@ -186,6 +187,56 @@ class ProductionCheckoutWriteAdmissionAllTest extends TestCase
         }
     }
 
+    public function test_committing_capability_closure_refuses_new_intent_and_provider_io(): void
+    {
+        $f = $this->payable();
+        $candidate = (array) DB::table(CapabilityHistory::CANDIDATES)->where('id', $f['catalog']['candidate']->id)->first();
+        $active = true;
+        app('events')->listen(TransactionCommitting::class, function () use ($candidate, $f, &$active): void {
+            if ($active) {
+                $active = false;
+                $this->closeCapability($candidate, $f['catalog']['actor']->id);
+            }
+        });
+        $this->assertRefused('write_source_changed', fn () => $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']));
+        $this->assertSame([], $f['gateway']->creates);
+        $this->assertDatabaseCount(CheckoutSchema::TABLES['intent'], 0);
+        $this->assertDatabaseCount(CapabilityHistory::CLOSURES, 0);
+    }
+
+    public static function staffWithdrawals(): array
+    {
+        return [
+            'role' => [['is_admin' => false], 'is_admin', true],
+            'mfa' => [['app_authentication_secret' => null, 'app_authentication_recovery_codes' => null], 'app_authentication_secret', 'SYNTHETIC-ENROLLED-SECRET'],
+        ];
+    }
+
+    #[DataProvider('staffWithdrawals')]
+    public function test_committing_qualifier_staff_withdrawal_refuses_new_basis(array $withdrawal, string $column, mixed $original): void
+    {
+        $catalog = F::catalog();
+        $buyer = $this->enrollThroughLocalSmtp();
+        $authority = app(ApproveExemptionAuthority::class)->approve($catalog['candidate']->id, F::exemptionPolicy($catalog), 'synthetic-owner-policy', $catalog['actor']);
+        $this->enrollStaffMfa($catalog['actor']->id);
+        $this->withdrawStaffDuringCommit($catalog['actor']->id, $withdrawal);
+        $this->assertRefused('write_source_changed', fn () => $this->qualify($catalog, $buyer, $authority, 'synthetic-qualified-buyer'));
+        $this->assertDatabaseCount(CheckoutSchema::TABLES['basis'], 0);
+        $this->assertStaffRestored($catalog['actor']->id, $column, $original);
+    }
+
+    #[DataProvider('staffWithdrawals')]
+    public function test_committing_owner_staff_withdrawal_refuses_new_authority(array $withdrawal, string $column, mixed $original): void
+    {
+        $catalog = F::catalog();
+        $this->enrollStaffMfa($catalog['actor']->id);
+        $this->withdrawStaffDuringCommit($catalog['actor']->id, $withdrawal);
+        $this->assertRefused('write_source_changed', fn () => app(ApproveExemptionAuthority::class)->approve($catalog['candidate']->id,
+            F::exemptionPolicy($catalog), 'synthetic-owner-policy', $catalog['actor']));
+        $this->assertDatabaseCount(CheckoutSchema::TABLES['authority'], 0);
+        $this->assertStaffRestored($catalog['actor']->id, $column, $original);
+    }
+
     public function test_staff_replays_install_no_observer_and_positive_caller_write_survives(): void
     {
         $catalog = F::catalog();
@@ -209,6 +260,38 @@ class ProductionCheckoutWriteAdmissionAllTest extends TestCase
         $this->assertDatabaseCount(CheckoutSchema::TABLES['authority'], 1);
         $this->assertDatabaseCount(CheckoutSchema::TABLES['basis'], 1);
         $this->assertSame($delegate, DB::connection()->getEventDispatcher());
+    }
+
+    private function enrollStaffMfa(int $userId): void
+    {
+        DB::table('users')->where('id', $userId)->update(['app_authentication_secret' => 'SYNTHETIC-ENROLLED-SECRET',
+            'app_authentication_recovery_codes' => 'SYNTHETIC-RECOVERY']);
+    }
+
+    /** One ordinary committing listener withdraws staff authority in the same physical commit as the NEW write. */
+    private function withdrawStaffDuringCommit(int $userId, array $withdrawal): void
+    {
+        $active = true;
+        app('events')->listen(TransactionCommitting::class, function () use ($userId, $withdrawal, &$active): void {
+            if ($active) {
+                $active = false;
+                DB::table('users')->where('id', $userId)->update($withdrawal);
+            }
+        });
+    }
+
+    private function assertStaffRestored(int $userId, string $column, mixed $original): void
+    {
+        $value = DB::table('users')->where('id', $userId)->value($column);
+        $this->assertSame($original, is_bool($original) ? (bool) $value : $value);
+    }
+
+    private function closeCapability(array $candidate, int $actorId): void
+    {
+        DB::table(CapabilityHistory::CLOSURES)->insert(['production_track_capability_candidate_id' => $candidate['id'],
+            'closed_by' => $actorId, 'candidate_hash' => $candidate['payload_hash'],
+            'closure_ciphertext' => 'SYNTHETIC CLOSURE IN THE SAME PHYSICAL COMMIT', 'closure_hash' => hash('sha256', 'synthetic-closure'),
+            'canonicalization_version' => 'vasey-json-v1', 'created_at' => $candidate['created_at']]);
     }
 
     private ?array $attestation = null;
