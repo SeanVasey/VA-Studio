@@ -7,7 +7,7 @@ or Mac execution was used. The current branch is
 
 ## Current recovery state
 
-Verified main3fb7dd0 includes the immediate PR25/26/23 repairs. Starting-state
+Verified mainda70eba includes the immediate PR25/26/23 repairs and PRs27–30. Starting-state
 sections below are historical. Current owned work and source receipts are in
 the newest milestone and current agent queue.
 
@@ -329,3 +329,39 @@ source/cleanupauthorization tests are active. T22 actualSMTP buyer/order/provide
 journeys are provisional onunapprovedidentity; its own shadowfences/races underway.
 Free245 continues. Fullpersonalstore/member/products/migration/host preparation
 and finalFoundation/native8.4/browser remain open. No external production action.
+
+## Ninth checkpoint: published notes held; corrected authority compositions
+
+PR31 publishedff4602cc849577232a6ab532d96edd772cc1b428 has successful
+cheap preflight37595386546 and completed automatic reviews on that exact source.
+Code finding4204862600 correctly identifies ordinary V1 favorite/playlist writes
+promoting to V2, unreadable by the previous reader during rollback/rolling deploy.
+Merge remains held. Crawler owns V1-safe ordinary writes and default-off promotion
+requiring an explicit stopped-upgrade rollout review reference; existing V2 reads
+must remain supported. Earlier capacity approval remains valid for unchanged code,
+but does not resolve this new compatibility finding. Main remainsda70eba.
+
+Consent correctedfa06b77/evidencef7afbc55 is composed with root719b0bd as
+d22e1ddc9f01089dec15c2eca0519c2bc5424876. The four real admission/callback
+failures remain retained; exact independent SQLite/native verification is active.
+Identity finalflag correctioneaaa55be atop8e is composed asd8d4cec: the unchanged
+root temporary-user/actualSMTP canary passes1/5. One initial invocation omitted
+the required synthetic APP_KEY and errored before enrollment; the corrected run
+uses an explicit synthetic key without source/test changes. The author's genuine
+unknown-role failure on8e is retained. Final source/native review precedes approval.
+
+Service attachmentb209 approval is superseded after actual customer/policy resolver
+withdrawal escaped the raw snapshot. Correctedc7bc894 resolves dependencies before
+the terminal raw proof; independent actual consumer probes pass SQLite2/10 and
+native2/10, all8 native consumers8/56. Root selectively composes contract1a,
+adaptere765/b209/c7 and consumer1914/5a on reviewed mainda70 as eaf550a in
+/workspace/VA-Studio-support-registration, without importing old unsafe service
+ancestry. The consumer is still held for a reproduced inquiry-panel callback gap;
+root shared registration/mounts are pending. Original projection/cleanup failures
+and native final-slot lock-wait proof remain preserved, not replaced by this hold.
+
+Checkout ownff4c674 is frozen; qualified-exemption flow and provider-calculated-tax
+successor, paid grants/product/member fulfillment remain open. Its borrowed identity
+8e is historical pending correcteaaa composition. Free245 and suppression251
+advance in owned branches. No whole-parent acceptance, final Foundation dispatch,
+external transport/payment, production credential, deployment or cutover is claimed.
