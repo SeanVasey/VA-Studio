@@ -19,6 +19,9 @@ use App\Domain\Memberships\Production\MembershipPolicyFactsProof;
 use App\Domain\Memberships\Production\MembershipRows;
 use App\Domain\Memberships\Production\MembershipValues;
 use App\Models\User;
+use Illuminate\Container\Container;
+use ReflectionMethod;
+use ReflectionProperty;
 use Tests\TestCase;
 
 class MembershipPreparationTest extends TestCase
@@ -123,6 +126,40 @@ class MembershipPreparationTest extends TestCase
                 $this->fail('Technical value validation must reject an unusable benefit declaration.');
             } catch (MembershipException) {
                 $this->assertTrue(true);
+            }
+        }
+    }
+
+    public function test_nullable_cached_environment_is_an_ordinary_baseline_without_award_authority(): void
+    {
+        $property = new ReflectionProperty(Container::class, 'instances');
+        $instances = $property->getValue($this->app);
+        $withoutEnvironment = $instances;
+        unset($withoutEnvironment['env']);
+        $property->setValue($this->app, $withoutEnvironment);
+        try {
+            $policy = new MembershipPolicy;
+            $baseline = (new ReflectionMethod(MembershipPolicy::class, 'configuration'))->invoke($policy);
+            $this->assertNull($baseline['environment']);
+            $this->assertFalse($baseline['enabled']);
+            $policy->proveConfiguration($baseline);
+        } finally {
+            $property->setValue($this->app, $instances);
+        }
+    }
+
+    public function test_object_policy_leaves_cannot_become_a_held_configuration_baseline(): void
+    {
+        foreach (['enabled', 'version', 'provenance', 'approved_policy_hash'] as $key) {
+            $original = config('production-memberships.'.$key);
+            config(['production-memberships.'.$key => new \stdClass]);
+            try {
+                (new ReflectionMethod(MembershipPolicy::class, 'configuration'))->invoke(new MembershipPolicy);
+                $this->fail('A held baseline must refuse non-scalar policy leaves.');
+            } catch (MembershipException) {
+                $this->assertTrue(true);
+            } finally {
+                config(['production-memberships.'.$key => $original]);
             }
         }
     }
