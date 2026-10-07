@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ServiceAttachmentTerminalCanaryTest" file="/workspace/VA-Studio-service-attachment-independent/docs/verification/cloud-service-attachment-independent-20261007/ServiceAttachmentTerminalCanaryTest.php" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="13.288923">
+    <testcase name="test_service_policy_withdrawn_at_the_final_staff_framework_query_cannot_mint_source_proof" file="/workspace/VA-Studio-service-attachment-independent/docs/verification/cloud-service-attachment-independent-20261007/ServiceAttachmentTerminalCanaryTest.php" line="19" class="Tests\Feature\ServiceAttachmentTerminalCanaryTest" classname="Tests.Feature.ServiceAttachmentTerminalCanaryTest" assertions="1" time="13.288923">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ServiceAttachmentTerminalCanaryTest::test_service_policy_withdrawn_at_the_final_staff_framework_query_cannot_mint_source_proof
+Withdrawn service policy must refuse before a source proof escapes.
+
+/workspace/VA-Studio-service-attachment-independent/docs/verification/cloud-service-attachment-independent-20261007/ServiceAttachmentTerminalCanaryTest.php:40</failure>
+    </testcase>
+  </testsuite>
+</testsuites>
