@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"app\/Domain\/Memberships\/Production\/MembershipRows.php","fixers":["fully_qualified_strict_types","ordered_imports"]}]}

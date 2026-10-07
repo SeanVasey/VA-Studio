@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="24" assertions="47" errors="4" failures="0" skipped="3" time="7.997509">
+    <testsuite name="Tests\Feature\ProductionMembership\MembershipNativeStatementClosureTest" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipNativeStatementClosureTest.php" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="0.677581">
+      <testcase name="test_captured_reader_refuses_application_statement_callbacks_before_any_metadata_sql" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipNativeStatementClosureTest.php" line="17" class="Tests\Feature\ProductionMembership\MembershipNativeStatementClosureTest" classname="Tests.Feature.ProductionMembership.MembershipNativeStatementClosureTest" assertions="0" time="0.677581">
+        <error type="App\Domain\Memberships\Production\MembershipException">Tests\Feature\ProductionMembership\MembershipNativeStatementClosureTest::test_captured_reader_refuses_application_statement_callbacks_before_any_metadata_sql
+App\Domain\Memberships\Production\MembershipException: Production membership preparation unavailable.
+
+/workspace/VA-Studio-production-membership/app/Domain/Memberships/Production/MembershipException.php:16
+/workspace/VA-Studio-production-membership/app/Domain/Memberships/Production/MembershipRows.php:154
+/workspace/VA-Studio-production-membership/app/Domain/Memberships/Production/MembershipRows.php:47
+/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipNativeStatementClosureTest.php:21
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipNativeStatementClosureTest.php:20</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionMembership\MembershipPreparationTest" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipPreparationTest.php" tests="8" assertions="16" errors="0" failures="0" skipped="0" time="0.096846">
+      <testcase name="test_default_off_and_missing_approved_facts_refuse_even_with_claimed_enablement" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipPreparationTest.php" line="29" class="Tests\Feature\ProductionMembership\MembershipPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipPreparationTest" assertions="3" time="0.012942"/>
+      <testcase name="test_flag_and_policy_hash_cannot_replace_actual_typed_invoice_capability" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipPreparationTest.php" line="42" class="Tests\Feature\ProductionMembership\MembershipPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipPreparationTest" assertions="1" time="0.012401"/>
+      <testcase name="test_provider_callback_cannot_withdraw_policy_then_return_a_configuration_baseline" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipPreparationTest.php" line="50" class="Tests\Feature\ProductionMembership\MembershipPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipPreparationTest" assertions="1" time="0.011813"/>
+      <testcase name="test_value_bindings_refuse_secret_fields_and_test_owner_keys" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipPreparationTest.php" line="109" class="Tests\Feature\ProductionMembership\MembershipPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipPreparationTest" assertions="1" time="0.014015"/>
+      <testcase name="test_original_dates_are_exact_utc_and_do_not_silently_normalize" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipPreparationTest.php" line="115" class="Tests\Feature\ProductionMembership\MembershipPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipPreparationTest" assertions="1" time="0.011617"/>
+      <testcase name="test_policy_value_requires_actual_bounded_allowance_and_explicit_billing_currency" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipPreparationTest.php" line="121" class="Tests\Feature\ProductionMembership\MembershipPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipPreparationTest" assertions="3" time="0.011305"/>
+      <testcase name="test_nullable_cached_environment_is_an_ordinary_baseline_without_award_authority" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipPreparationTest.php" line="133" class="Tests\Feature\ProductionMembership\MembershipPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipPreparationTest" assertions="2" time="0.011311"/>
+      <testcase name="test_object_policy_leaves_cannot_become_a_held_configuration_baseline" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipPreparationTest.php" line="151" class="Tests\Feature\ProductionMembership\MembershipPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipPreparationTest" assertions="4" time="0.011441"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionMembership\MembershipRawConfigurationClosureTest" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php" tests="2" assertions="3" errors="1" failures="0" skipped="0" time="0.885241">
+      <testcase name="test_captured_reader_refuses_overloaded_database_parent_before_late_policy_callback" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php" line="21" class="Tests\Feature\ProductionMembership\MembershipRawConfigurationClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRawConfigurationClosureTest" assertions="0" time="0.437107">
+        <error type="App\Domain\Memberships\Production\MembershipException">Tests\Feature\ProductionMembership\MembershipRawConfigurationClosureTest::test_captured_reader_refuses_overloaded_database_parent_before_late_policy_callback
+App\Domain\Memberships\Production\MembershipException: Production membership preparation unavailable.
+
+/workspace/VA-Studio-production-membership/app/Domain/Memberships/Production/MembershipException.php:16
+/workspace/VA-Studio-production-membership/app/Domain/Memberships/Production/MembershipRows.php:154
+/workspace/VA-Studio-production-membership/app/Domain/Memberships/Production/MembershipRows.php:47
+/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php:25
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php:24</error>
+      </testcase>
+      <testcase name="test_captured_policy_baseline_refuses_overloaded_parent_before_identity_policy_callback" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php" line="44" class="Tests\Feature\ProductionMembership\MembershipRawConfigurationClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRawConfigurationClosureTest" assertions="3" time="0.448134"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" tests="13" assertions="28" errors="2" failures="0" skipped="3" time="6.337842">
+      <testcase name="test_fresh_schema_owned_retry_preserves_t23_and_has_no_incoming_child_dependencies" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="24" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="2" time="0.485467"/>
+      <testcase name="test_owned_contiguous_empty_prefix_resumes_but_hole_before_retained_guard_refuses" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="34" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="3" time="0.480660"/>
+      <testcase name="test_foreign_table_same_as_reserved_guard_refuses_without_dropping_marker" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="46" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="2" time="0.478977"/>
+      <testcase name="test_native_foreign_check_reserves_actual_global_symbol_before_any_owned_ddl" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="55" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="0" time="0.449398">
+        <skipped/>
+      </testcase>
+      <testcase name="test_native_foreign_table_local_unique_does_not_pollute_owned_fk_dictionary" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="69" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="0" time="0.483154">
+        <skipped/>
+      </testcase>
+      <testcase name="test_native_changed_enum_check_is_not_normalized_into_owned_provenance" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="82" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="0" time="0.499908">
+        <skipped/>
+      </testcase>
+      <testcase name="test_data_bearing_partial_guard_prefix_refuses_and_retains_original_plan" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="93" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="3" time="0.475842"/>
+      <testcase name="test_single_invoice_is_global_immutable_and_cannot_bind_different_persisted_owner" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="106" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="5" time="0.547118"/>
+      <testcase name="test_reserved_intent_stays_pending_until_exact_distinct_member_purpose_terminal_event" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="120" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="7" time="0.504254"/>
+      <testcase name="test_request_key_cannot_be_reused_across_periods_or_award_fabricate_grant_fields" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="146" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="3" time="0.480389"/>
+      <testcase name="test_raw_reader_closes_after_framework_commit_and_direct_pdo_commit_reopen" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="159" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="0" time="0.451968">
+        <error type="App\Domain\Memberships\Production\MembershipException">Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest::test_raw_reader_closes_after_framework_commit_and_direct_pdo_commit_reopen
+App\Domain\Memberships\Production\MembershipException: Production membership preparation unavailable.
+
+/workspace/VA-Studio-production-membership/app/Domain/Memberships/Production/MembershipException.php:16
+/workspace/VA-Studio-production-membership/app/Domain/Memberships/Production/MembershipRows.php:154
+/workspace/VA-Studio-production-membership/app/Domain/Memberships/Production/MembershipRows.php:47
+/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php:162
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php:161</error>
+      </testcase>
+      <testcase name="test_raw_reader_refuses_shadow_floor_and_preserves_owned_rows" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="180" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="0" time="0.512684">
+        <error type="App\Domain\Memberships\Production\MembershipException">Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest::test_raw_reader_refuses_shadow_floor_and_preserves_owned_rows
+App\Domain\Memberships\Production\MembershipException: Production membership preparation unavailable.
+
+/workspace/VA-Studio-production-membership/app/Domain/Memberships/Production/MembershipException.php:16
+/workspace/VA-Studio-production-membership/app/Domain/Memberships/Production/MembershipRows.php:154
+/workspace/VA-Studio-production-membership/app/Domain/Memberships/Production/MembershipRows.php:47
+/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php:184
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php:183</error>
+      </testcase>
+      <testcase name="test_down_refuses_without_query_or_schema_mutation" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="196" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="3" time="0.488022"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembership\MembershipNativeStatementClosureTest" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipNativeStatementClosureTest.php" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="34.836667">
+    <testcase name="test_captured_reader_refuses_application_statement_callbacks_before_any_metadata_sql" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipNativeStatementClosureTest.php" line="17" class="Tests\Feature\ProductionMembership\MembershipNativeStatementClosureTest" classname="Tests.Feature.ProductionMembership.MembershipNativeStatementClosureTest" assertions="3" time="34.836667"/>
+  </testsuite>
+</testsuites>

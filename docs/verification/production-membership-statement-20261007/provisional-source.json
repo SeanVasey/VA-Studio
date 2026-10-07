@@ -1,0 +1,13 @@
+{
+  "base": "2a0786ed655253d852ae11eac8745ea78357be2d",
+  "runtime_uncommitted": true,
+  "runtime_sha256": "67547a0c461f13fd1ae2cb637efd9a63ddb408ff89496f4f27ffacacf98e3773",
+  "actual_ordinary_header": {
+    "pdo_class": "Pdo\\Sqlite",
+    "internal": true,
+    "statement_class": [
+      "PDOStatement"
+    ]
+  },
+  "reason": "Finite guard initially omitted legitimate PHP8.4 internal driver class; errors occurred before injected statement factory."
+}

@@ -1,0 +1,50 @@
+{
+  "source": "3cd105667a76bb15443a9fd0119065effda8bb34",
+  "original_source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+  "original_evidence": "2a0786ed655253d852ae11eac8745ea78357be2d",
+  "reviewed_preparation_source": "16e084b924fb9132b76095f26a35f28dc5f1feaf",
+  "reviewed_preparation_evidence": "8fdacaf255caf50f1433eb21f88d1d0aa0d8df3f",
+  "independent_successor_review": "pending",
+  "files": {
+    "app/Domain/Memberships/Production/MembershipRows.php": "154b0296b74d37bd4b376861e20482ba7fff99bc54d722781566b41965ace8aa",
+    "tests/Feature/ProductionMembership/MembershipNativeStatementClosureTest.php": "1b1bd944129a527e16cb11962a24f7acc4d40a2244b7216580dfad20a2c7965e"
+  },
+  "results": {
+    "final-sqlite.xml": {
+      "name": "CLI Arguments",
+      "tests": "24",
+      "assertions": "58",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "3",
+      "time": "7.917708"
+    },
+    "final-native.xml": {
+      "name": "Tests\\Feature\\ProductionMembership\\MembershipNativeStatementClosureTest",
+      "file": "/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipNativeStatementClosureTest.php",
+      "tests": "1",
+      "assertions": "3",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "34.836667"
+    }
+  },
+  "provisional_error_scope": "Uncommitted strict PDO-only guard omitted ordinary internal Pdo\\Sqlite. 24 recorded/47 assertions/4 errors/3 named native-only skips; not the final source.",
+  "artifacts": {
+    "docs/verification/production-membership-statement-20261007/MembershipNativeStatementClosureTest.php": "1b1bd944129a527e16cb11962a24f7acc4d40a2244b7216580dfad20a2c7965e",
+    "docs/verification/production-membership-statement-20261007/final-native.txt": "fe2011fc82a312cc2993c9bc5d4f70347d34ca629cdc9a0c7d8aa312a3b17d67",
+    "docs/verification/production-membership-statement-20261007/final-native.xml": "65962ce0be2eac167bf1273a12af182d8e066382a0951cda91b5f36af5dab3c4",
+    "docs/verification/production-membership-statement-20261007/final-pint.txt": "9ed23d2299f5d35c668fc42d916787e681a150a22f3d2d59d79fc557d12573e5",
+    "docs/verification/production-membership-statement-20261007/final-sqlite.txt": "8fbc7570e68d7c71f742409078e5518d05c852664634cea1c90f5cd30c8b53f8",
+    "docs/verification/production-membership-statement-20261007/final-sqlite.xml": "a9a066e569e2e41fe500faaa53547504e523f210d6953bc2c1ffae85096d66c8",
+    "docs/verification/production-membership-statement-20261007/original-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "docs/verification/production-membership-statement-20261007/original-receipt.json": "ffa66b215cde0a62d393717d58822a8c646311b0c9193dba76f04e246f7788da",
+    "docs/verification/production-membership-statement-20261007/original-red.txt": "f01be0fa60b9bc210c02c597812c1c5e5f75aa654b7edeeb363ac6a9659f5d0e",
+    "docs/verification/production-membership-statement-20261007/original-red.xml": "02ae61422f17c4071f536f94803d6b71586a49311a5e9c0a2f060184637af92e",
+    "docs/verification/production-membership-statement-20261007/provisional-exact-PDO-only-sqlite.txt": "4f23a004a61565b0ee2cea47f7ca8e47b1d90e7872b76d2e26f291e676de78d0",
+    "docs/verification/production-membership-statement-20261007/provisional-exact-PDO-only-sqlite.xml": "8d01a58ba24ddcf172f9daea1de2adfea5363cd44d8d5cedd81ac4aaa2d84806",
+    "docs/verification/production-membership-statement-20261007/provisional-rows.php.txt": "67547a0c461f13fd1ae2cb637efd9a63ddb408ff89496f4f27ffacacf98e3773",
+    "docs/verification/production-membership-statement-20261007/provisional-source.json": "6c899c268cfee231027cb1410aaadd7e8f1cc2a25bc77939d86eb7f03ab1a072"
+  }
+}
