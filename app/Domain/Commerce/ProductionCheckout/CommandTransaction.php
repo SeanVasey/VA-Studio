@@ -19,13 +19,13 @@ final class CommandTransaction
             $rows = new Records($primary, $driver);
             $result = $command($rows);
             $rows->provePrimary();
-            CheckoutException::require($connection->getPdo() === $primary && $primary->inTransaction());
+            CheckoutException::require($connection->getRawPdo() === $primary && $primary->inTransaction());
 
             return $result;
         });
         // Framework commit listeners run after the closure's terminal proof.
         // A later alias/writer change suppresses the result; committed original evidence is retained.
-        CheckoutException::require(DB::connection() === $connection && $connection->getPdo() === $primary
+        CheckoutException::require(ResolvedConnection::current() === $connection && $connection->getRawPdo() === $primary
             && $connection->transactionLevel() === 0 && ! $primary->inTransaction(), 'primary_changed');
         PrimaryBoundary::prove($primary, $driver);
 

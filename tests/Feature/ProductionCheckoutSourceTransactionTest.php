@@ -4,11 +4,13 @@ namespace Tests\Feature;
 
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use App\Domain\Commerce\ProductionCheckout\CheckoutSchema;
+use App\Domain\Commerce\ProductionCheckout\CommandTransaction;
 use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderLocatorV1;
 use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderSourceV1;
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
+use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
@@ -87,6 +89,109 @@ class ProductionCheckoutSourceTransactionTest extends TestCase
             $this->assertSame('held_transaction', $error->reason);
             $this->assertNull($error->getPrevious());
         }
+        $this->assertDatabaseCount(CheckoutSchema::TABLES['payment'], 1);
+    }
+
+    public function test_expired_source_refusal_does_not_resolve_a_lazy_primary_that_withdraws_buyer_credentials(): void
+    {
+        [$f, $locator] = $this->paid();
+        $connection = DB::connection();
+        $pdo = $connection->getPdo();
+        $reader = new CurrentRows($pdo, DB::getDriverName());
+        $source = DB::transaction(fn () => $this->source($f, $locator, $reader));
+        $f['access']->current($f['buyer']['principal'], $f['buyer']['user']);
+        $called = false;
+        $connection->setPdo(function () use ($pdo, $f, &$called) {
+            $called = true;
+            $statement = $pdo->prepare('UPDATE users SET password = ? WHERE id = ?');
+            $statement->execute(['WITHDRAWN_BY_LATE_PRIMARY_CALLBACK', $f['buyer']['user']->id]);
+
+            return $pdo;
+        });
+        try {
+            try {
+                $source->proveRetainedCurrent($reader);
+                $this->fail('Expired source renewed authority through a lazy primary.');
+            } catch (CheckoutException $error) {
+                $this->assertSame('held_transaction', $error->reason);
+                $this->assertFalse($called);
+            }
+        } finally {
+            $connection->setPdo($pdo);
+        }
+        $f['access']->current($f['buyer']['principal'], $f['buyer']['user']);
+        $this->assertDatabaseCount(CheckoutSchema::TABLES['payment'], 1);
+    }
+
+    public function test_command_postcommit_refusal_does_not_resolve_a_lazy_primary_or_return_prepared_result(): void
+    {
+        $f = $this->payable();
+        $connection = DB::connection();
+        $pdo = $connection->getPdo();
+        $called = false;
+        $active = true;
+        app('events')->listen(TransactionCommitted::class, function () use ($connection, $pdo, $f, &$called, &$active): void {
+            if (! $active) {
+                return;
+            }
+            $active = false;
+            $connection->setPdo(function () use ($pdo, $f, &$called) {
+                $called = true;
+                $statement = $pdo->prepare('UPDATE users SET password = ? WHERE id = ?');
+                $statement->execute(['WITHDRAWN_BY_LATE_COMMAND_CALLBACK', $f['buyer']['user']->id]);
+
+                return $pdo;
+            });
+        });
+        try {
+            try {
+                CommandTransaction::run(static fn (): string => 'PREPARED_RESULT_MUST_NOT_ESCAPE');
+                $this->fail('Prepared result escaped through lazy primary.');
+            } catch (CheckoutException $error) {
+                $this->assertSame('primary_changed', $error->reason);
+                $this->assertFalse($called);
+            }
+        } finally {
+            $active = false;
+            $connection->setPdo($pdo);
+        }
+        $f['access']->current($f['buyer']['principal'], $f['buyer']['user']);
+        $this->assertDatabaseCount(CheckoutSchema::TABLES['order'], 1);
+    }
+
+    public function test_expired_source_refusal_does_not_invoke_an_uncached_connection_resolver(): void
+    {
+        [$f, $locator] = $this->paid();
+        $connection = DB::connection();
+        $pdo = $connection->getPdo();
+        $driver = DB::getDriverName();
+        $reader = new CurrentRows($pdo, $driver);
+        $source = DB::transaction(fn () => $this->source($f, $locator, $reader));
+        $called = false;
+        $active = true;
+        DB::extend($driver, function () use ($connection, $pdo, $f, &$called, &$active) {
+            if ($active) {
+                $called = true;
+                $statement = $pdo->prepare('UPDATE users SET password = ? WHERE id = ?');
+                $statement->execute(['WITHDRAWN_BY_CONNECTION_RESOLVER', $f['buyer']['user']->id]);
+            }
+
+            return $connection->setPdo($pdo);
+        });
+        DB::purge();
+        try {
+            try {
+                $source->proveRetainedCurrent($reader);
+                $this->fail('Expired source renewed through a connector.');
+            } catch (CheckoutException $error) {
+                $this->assertSame('held_transaction', $error->reason);
+                $this->assertFalse($called);
+            }
+        } finally {
+            $active = false;
+            DB::connection();
+        }
+        $f['access']->current($f['buyer']['principal'], $f['buyer']['user']);
         $this->assertDatabaseCount(CheckoutSchema::TABLES['payment'], 1);
     }
 

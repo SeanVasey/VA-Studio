@@ -4,7 +4,6 @@ namespace App\Domain\Commerce\ProductionCheckout;
 
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use Illuminate\Database\Connection;
-use Illuminate\Support\Facades\DB;
 use PDO;
 use Throwable;
 
@@ -22,9 +21,9 @@ final readonly class HeldSourceTransaction
 
     public static function requireCurrent(CurrentRows $reader): void
     {
-        $connection = DB::connection();
+        $connection = ResolvedConnection::current('held_transaction');
         $primary = $reader->identityPrimary();
-        CheckoutException::require($connection->getPdo() === $primary
+        CheckoutException::require($connection->getRawPdo() === $primary
             && $connection->getDriverName() === $reader->identityDriver()
             && $primary->getAttribute(PDO::ATTR_DRIVER_NAME) === $reader->identityDriver()
             && in_array($reader->identityDriver(), ['sqlite', 'mysql'], true)
@@ -34,7 +33,7 @@ final readonly class HeldSourceTransaction
     public static function capture(CurrentRows $reader): self
     {
         self::requireCurrent($reader);
-        $connection = DB::connection();
+        $connection = ResolvedConnection::current('held_transaction');
         $frame = new self($connection, $reader->identityPrimary(), $reader->identityDriver(),
             $connection->getDatabaseName(), $connection->getTablePrefix(), 'pco_hold_'.bin2hex(random_bytes(16)));
         $frame->requireFrame($reader);
@@ -55,7 +54,7 @@ final readonly class HeldSourceTransaction
     private function requireFrame(CurrentRows $reader): void
     {
         self::requireCurrent($reader);
-        CheckoutException::require(DB::connection() === $this->connection && $reader->identityPrimary() === $this->primary
+        CheckoutException::require(ResolvedConnection::current('held_transaction') === $this->connection && $reader->identityPrimary() === $this->primary
             && $reader->identityDriver() === $this->driver && $this->connection->getDatabaseName() === $this->database
             && $this->connection->getTablePrefix() === $this->prefix
             && $this->primary->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION, 'held_transaction');

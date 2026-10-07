@@ -4,7 +4,6 @@ namespace App\Domain\Commerce\ProductionCheckout;
 
 use App\Domain\Commerce\ProductionPolicy\CapabilityHistory;
 use App\Domain\Commerce\ProductionPolicy\SourceCommitment;
-use Illuminate\Support\Facades\DB;
 use PDO;
 
 /** Callback-free captured writer and permanent-table fence for the exact checkout/source/catalog graph. */
@@ -21,8 +20,8 @@ final class PrimaryBoundary
 
     public static function prove(PDO $primary, string $driver): void
     {
-        $connection = DB::connection();
-        CheckoutException::require($connection->getPdo() === $primary && $connection->getDriverName() === $driver
+        $connection = ResolvedConnection::current();
+        CheckoutException::require($connection->getRawPdo() === $primary && $connection->getDriverName() === $driver
             && in_array($driver, ['sqlite', 'mysql'], true), 'primary_changed');
         $tables = self::tables();
         if ($driver === 'sqlite') {
@@ -47,6 +46,6 @@ final class PrimaryBoundary
                     && str_starts_with($definition[1], 'CREATE TABLE '), 'temporary_or_foreign_schema');
             }
         }
-        CheckoutException::require(DB::connection() === $connection && $connection->getPdo() === $primary, 'primary_changed');
+        CheckoutException::require(ResolvedConnection::current() === $connection && $connection->getRawPdo() === $primary, 'primary_changed');
     }
 }
