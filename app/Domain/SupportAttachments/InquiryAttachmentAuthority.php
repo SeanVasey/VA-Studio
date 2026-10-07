@@ -84,7 +84,9 @@ final class InquiryAttachmentAuthority implements AttachmentMutationAuthority
                 throw new AttachmentException(403);
             }
         }
-        AttachmentException::require(config('app.key') === $key && config('inquiries.enabled') === $enabled && $this->staffPolicy($actor) === $staffPolicy);
+        // Panel policy evaluation may itself call framework closures; finish it before comparing admission/key state.
+        $currentStaffPolicy = $this->staffPolicy($actor);
+        AttachmentException::require(config('app.key') === $key && config('inquiries.enabled') === $enabled && $currentStaffPolicy === $staffPolicy);
         AttachmentException::require($user === [] || $rows->one('users', 'id = ?', [$user['id']]) === $user, 403);
         AttachmentException::require($rows->one('customer_inquiries', 'id = ?', [$inquiry['id']]) === $inquiry, 409, 'reload');
         $rows->assertCurrent();
