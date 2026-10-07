@@ -1,0 +1,6 @@
+{"phase":"before-fence","ready":{"connection":25,"pid":11373,"depth":1},"wait":null,"result":{"status":"refused","reason":"Discovery evidence changed during capture.","connection":25,"depth":0}}
+{"phase":"before-fence","ready":{"connection":27,"pid":12095,"depth":1},"wait":null,"result":{"status":"refused","reason":"Discovery evidence changed during capture.","connection":27,"depth":0}}
+{"phase":"before-fence","ready":{"connection":29,"pid":12816,"depth":1},"wait":null,"result":{"status":"refused","reason":"Discovery evidence changed during capture.","connection":29,"depth":0}}
+{"phase":"before-fence","ready":{"connection":31,"pid":13537,"depth":1},"wait":null,"result":{"status":"refused","reason":"Discovery evidence changed during capture.","connection":31,"depth":0}}
+{"phase":"before-fence","ready":{"connection":35,"pid":14979,"depth":1},"wait":null,"result":{"status":"refused","reason":"Discovery evidence changed during capture.","connection":35,"depth":0}}
+{"phase":"after-fence","ready":{"connection":37,"pid":15700,"depth":1},"wait":{"LOCK_STATUS":"WAITING","LOCK_TYPE":"RECORD","INDEX_NAME":"PRIMARY","OBJECT_NAME":"catalog_discovery_epoch","LOCK_DATA":"1"},"result":{"status":"captured","paths":["\/tracks\/quote-fixture-ac8fe4b2-e04a-4577-b806-b6c308162898"],"connection":37,"depth":0}}

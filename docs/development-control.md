@@ -83,6 +83,44 @@ per coherent batch and expected-head merges; full Foundation/native/browser
 acceptance is manual final exact expected_sha. Parent T22/T36 and launch
 criteria remain open; no deployment, DNS, customer import or provider operation.
 
+## Historical original PR25 branch checkpoint — before cloud recovery
+
+PR #24 merged at `717f0866444701637e7c396b4376891aa5dd995d`, tree
+`1c43bb29aefb56f3698ba734e756d685fd018245`, after cheap preflight
+37574833236 attempt 1 passed. Native main/tree/ordered parents were read back.
+Atomic default-off/test-only PDF v2 adoption is accepted for development; PR #3
+auto-closed, and its replacement receipt was updated/read back without moving its head.
+
+[Bounded track discovery](verification/track-discovery-composition-20261007/README.md)
+corrected the retained deadline renewal defect before publication. All fifteen
+paths match approved `10dcb64`; local executable `9f1bda29` equals native
+`7ecaa7e9`, tree `fe4be565`, with PR #24 as sole native parent. Fresh independent
+MySQL 14/362 and seven real witnesses, selector 50/cadence 14 and all 158 current
+package identities passed. Actual stopped-copy 14/14 and a separate historical
+pre-epoch 1/1 pass preserve all 60 prior migration records/data/schema/bytes and
+add only the epoch table, 54 guards, singleton and 61st record. Down refuses
+before any read/DDL; forward migrate remains usable. Cheap preflight and
+expected-head development merge remain publication gates for this candidate.
+
+Read-only D28 amount requirements retain unknown tax/total and false authority
+flags. Corrected `20c85aa` actual MySQL 52/182 and SQLite 52/183 passed without
+skips; independent actual MySQL 12/81 plus two explicit SQLite canaries passed.
+Fresh root `a86a7e2` V2-graph independent SQLite 52/183 and strict/platform/audit
+passed. Root will carry this five-path batch onto the discovery merge before
+its publication; unchanged-source native evidence is explicit carry.
+
+Next parallel child ownership: native author implements private identity
+generation/store/staff one-step command from the reviewed proposal; registry
+author implements a strict untrusted amount consistency comparator. Root owns
+shared registration/current status/publication. Independent sensitive review
+precedes publication. The public sitemap consumer/index proposal remains
+dependency-blocked on the private generation API and exact native proofs.
+
+Focused local checks, one cheap PR preflight per coherent batch and expected-head
+merges remain the low-cost policy. Full Foundation/native/browser acceptance
+is manual final exact expected_sha. Parent tasks T22/T36 and final launch
+criteria remain open; no provider, DNS, customer import or deployment follows.
+
 
 ## Atomic PDF adoption and ongoing independent prerequisites — October 7 UTC
 

@@ -1,0 +1,7 @@
+{"phase":"before-fence","ready":{"connection":17,"pid":5854,"depth":1},"wait":null,"result":{"status":"refused","reason":"Discovery evidence changed during capture.","connection":17,"depth":0}}
+{"phase":"before-fence","ready":{"connection":19,"pid":6576,"depth":1},"wait":null,"result":{"status":"refused","reason":"Discovery evidence changed during capture.","connection":19,"depth":0}}
+{"phase":"before-fence","ready":{"connection":21,"pid":7297,"depth":1},"wait":null,"result":{"status":"refused","reason":"Discovery evidence changed during capture.","connection":21,"depth":0}}
+{"phase":"before-fence","ready":{"connection":23,"pid":8018,"depth":1},"wait":null,"result":{"status":"refused","reason":"Discovery evidence changed during capture.","connection":23,"depth":0}}
+{"phase":"before-fence","ready":{"connection":25,"pid":8739,"depth":1},"wait":null,"result":{"status":"refused","reason":"Discovery evidence changed during capture.","connection":25,"depth":0}}
+{"phase":"before-fence","ready":{"connection":27,"pid":9490,"depth":1},"wait":null,"result":{"status":"refused","reason":"Discovery evidence changed during capture.","connection":27,"depth":0}}
+{"phase":"after-fence","ready":{"connection":29,"pid":10211,"depth":1},"wait":{"LOCK_STATUS":"WAITING","LOCK_TYPE":"RECORD","INDEX_NAME":"PRIMARY","OBJECT_NAME":"catalog_discovery_epoch","LOCK_DATA":"1"},"result":{"status":"captured","paths":["\/tracks\/quote-fixture-ed43cc31-47f3-40dc-bd2b-8d15bc740cd7"],"connection":29,"depth":0}}

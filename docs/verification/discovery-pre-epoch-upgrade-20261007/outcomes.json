@@ -1,0 +1,267 @@
+{
+  "old_source": "5cba90191a21aca3acef7b9e01f65efecdbd0dcd",
+  "new_source": "9f1bda29a20a6f6936efa9b86e9731194bd3ccf7",
+  "reviewed_old": {
+    "checkout": "/workspace/scratch/2876616e88c3/VA-Studio-pre-epoch-upgrade-old",
+    "sha": "5cba90191a21aca3acef7b9e01f65efecdbd0dcd",
+    "trackedFiles": 2212,
+    "schemaHash": "285073ba9c4e076661392a822ebcf2147c09af8347998788396c9acad4c3047b"
+  },
+  "reviewed_new": {
+    "checkout": "/workspace/scratch/2876616e88c3/VA-Studio-pre-epoch-upgrade-new",
+    "sha": "9f1bda29a20a6f6936efa9b86e9731194bd3ccf7",
+    "trackedFiles": 2221,
+    "schemaHash": "ba39a1732dde5511ccc116bcaac85b0e99764b8d524581ac4f2ecbacf5adb7ac"
+  },
+  "old_migration_records": 60,
+  "new_migration_records": 61,
+  "old_tables_verified": 107,
+  "old_rows_verified": 65,
+  "old_schema_objects_verified": 604,
+  "original_files_verified": 55,
+  "original_files_unchanged": true,
+  "old_cells_and_bookkeeping_exact": true,
+  "old_schema_exact": true,
+  "business_sequences_exact": true,
+  "installation_key_and_session_identity_exact": true,
+  "new_schema_objects": [
+    {
+      "type": "table",
+      "name": "catalog_discovery_epoch"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_0_delete"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_0_insert"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_0_update"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_10_delete"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_10_insert"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_10_update"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_11_delete"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_11_insert"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_11_update"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_12_delete"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_12_insert"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_12_update"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_13_delete"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_13_insert"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_13_update"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_14_delete"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_14_insert"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_14_update"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_15_delete"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_15_insert"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_15_update"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_16_delete"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_16_insert"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_16_update"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_1_delete"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_1_insert"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_1_update"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_2_delete"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_2_insert"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_2_update"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_3_delete"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_3_insert"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_3_update"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_4_delete"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_4_insert"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_4_update"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_5_delete"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_5_insert"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_5_update"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_6_delete"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_6_insert"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_6_update"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_7_delete"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_7_insert"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_7_update"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_8_delete"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_8_insert"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_8_update"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_9_delete"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_9_insert"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_9_update"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_own_delete"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_own_insert"
+    },
+    {
+      "type": "trigger",
+      "name": "cde_own_update"
+    }
+  ],
+  "new_epoch_singleton": [
+    {
+      "id": 1,
+      "epoch": 0,
+      "schema_version": 1
+    }
+  ],
+  "new_migration": [
+    {
+      "id": 61,
+      "migration": "2026_10_07_240000_catalog_discovery_epoch",
+      "batch": 2
+    }
+  ],
+  "forward_migrate_usable": true,
+  "owned_epoch_verified": true,
+  "synthetic_only": true,
+  "provider_calls": 0
+}

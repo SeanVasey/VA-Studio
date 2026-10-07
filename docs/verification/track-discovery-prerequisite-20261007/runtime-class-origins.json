@@ -1,0 +1,9 @@
+{
+    "php": "8.4.26",
+    "classes": [
+        "\/workspace\/scratch\/2876616e88c3\/VA-Studio-bounded-track-discovery\/app\/Domain\/Catalog\/Discovery\/CurrentEligibleTrackSnapshot.php",
+        "\/workspace\/scratch\/2876616e88c3\/VA-Studio-bounded-track-discovery\/vendor\/laravel\/framework\/src\/Illuminate\/Foundation\/Application.php",
+        "\/workspace\/scratch\/2876616e88c3\/VA-Studio-bounded-track-discovery\/vendor\/tecnickcom\/tc-lib-pdf\/src\/Tcpdf.php",
+        "\/workspace\/scratch\/2876616e88c3\/VA-Studio-bounded-track-discovery\/vendor\/tecnickcom\/tc-lib-pdf-font\/src\/Font.php"
+    ]
+}

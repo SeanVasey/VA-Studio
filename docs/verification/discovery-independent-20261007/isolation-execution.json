@@ -1,0 +1,23 @@
+{
+  "executed_source": "10dcb64d9c30231bd6949fd4d00811a283e820b0",
+  "executed_tree": "7e6ccdb4459775b67210c4d01c1413757946c418",
+  "command": [
+    "python3",
+    "/workspace/scratch/0c039e9e0645/mysql-runtime/run-tests.py",
+    "--",
+    "/workspace/scratch/0c039e9e0645/runtime-recovery/bin/php",
+    "-d",
+    "memory_limit=512M",
+    "vendor/bin/phpunit",
+    "docs/verification/discovery-independent-20261007/CurrentReadIsolationCanaryTest.php",
+    "--fail-on-empty-test-suite",
+    "--fail-on-warning",
+    "--log-junit",
+    "docs/verification/discovery-independent-20261007/isolation-tests.xml"
+  ],
+  "exit_code": 0,
+  "fresh_ephemeral_app_key": true,
+  "key_retained": false,
+  "own_fresh_native_server": true,
+  "canary_sha256": "134ffe2688ea8b6a1d0c6ea668712c9b360852876644c8c7cef818ea0886e9eb"
+}

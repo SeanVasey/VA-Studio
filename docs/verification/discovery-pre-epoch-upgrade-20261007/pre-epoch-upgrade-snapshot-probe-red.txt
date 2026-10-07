@@ -1,0 +1,33 @@
+✖ exact historical pre-epoch installation upgrades through genuine stopped-copy CLI without rewriting old evidence (2051.712963ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2174.280269
+
+✖ failing tests:
+
+test at docs/verification/discovery-pre-epoch-upgrade-20261007/pre-epoch-upgrade-canary.mjs:28:1
+✖ exact historical pre-epoch installation upgrades through genuine stopped-copy CLI without rewriting old evidence (2051.712963ms)
+  AssertionError [ERR_ASSERTION]:
+  Parse error: syntax error, unexpected double-quoted string ".str_replace(", expecting ")" in Command line code on line 1
+
+
+  255 !== 0
+
+      at php (file:///workspace/scratch/2876616e88c3/VA-Studio-pre-epoch-upgrade-new/docs/verification/discovery-pre-epoch-upgrade-20261007/pre-epoch-upgrade-canary.mjs:18:9)
+      at snapshot (file:///workspace/scratch/2876616e88c3/VA-Studio-pre-epoch-upgrade-new/docs/verification/discovery-pre-epoch-upgrade-20261007/pre-epoch-upgrade-canary.mjs:26:20)
+      at TestContext.<anonymous> (file:///workspace/scratch/2876616e88c3/VA-Studio-pre-epoch-upgrade-new/docs/verification/discovery-pre-epoch-upgrade-20261007/pre-epoch-upgrade-canary.mjs:40:57)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 255,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

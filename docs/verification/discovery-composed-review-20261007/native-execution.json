@@ -1,0 +1,24 @@
+{
+  "executed_executable": "9f1bda29a20a6f6936efa9b86e9731194bd3ccf7",
+  "executed_tree": "fe4be5659d1d769a0175e2a2c43da15cf1f7954d",
+  "command": [
+    "python3",
+    "/workspace/scratch/0c039e9e0645/mysql-runtime/run-tests.py",
+    "--",
+    "/workspace/scratch/0c039e9e0645/runtime-recovery/bin/php",
+    "-d",
+    "memory_limit=512M",
+    "vendor/bin/phpunit",
+    "-c",
+    "discovery-composed-review.phpunit.xml",
+    "--fail-on-empty-test-suite",
+    "--fail-on-warning",
+    "--log-junit",
+    "docs/verification/discovery-composed-review-20261007/native-tests.xml"
+  ],
+  "exit_code": 0,
+  "fresh_ephemeral_app_key": true,
+  "key_retained": false,
+  "own_fresh_native_server": true,
+  "normal_durability_runner_sha256": "35bdde4f03a9d7a23d90337a77a938c1044f297553e0afe38d13eaee73ac854a"
+}

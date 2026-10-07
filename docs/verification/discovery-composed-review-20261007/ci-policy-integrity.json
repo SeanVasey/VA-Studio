@@ -1,0 +1,18 @@
+{
+  "original_skip_structure_prefix_preserved": true,
+  "source_sha256": {
+    "scripts/ci/test-focused-tests.py": "0bbd612427a53113196aa3ba7a3cbfd6a42d49786d8cc8f486db422ea8eda0c6",
+    "scripts/ci/test-workflow-cadence.py": "5913073b2e4cd7364d914d77aed3cea60fdcebdfe93c67489bad150a21c83cc5"
+  },
+  "automatic_and_foundation_workflows": {
+    "base_mode_type_blob_exact_except_manual_focused_registration": true
+  },
+  "selector_cases": 50,
+  "cadence_cases": 14,
+  "new_native_tuple_methods": 2,
+  "new_native_scenarios": 7,
+  "original_tuples": 150,
+  "final_tuples": 152,
+  "maximum_files": 32,
+  "manual_only_suite": "track-discovery"
+}

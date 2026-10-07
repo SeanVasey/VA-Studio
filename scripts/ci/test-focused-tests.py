@@ -120,6 +120,38 @@ class SelectionTests(unittest.TestCase):
         policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
         self.assertFalse(any(row[0] in selected_classes for row in policy["methods"]))
 
+    def test_track_discovery_has_exact_bounded_files_and_only_new_native_scenarios(self):
+        required = (
+            "tests/Feature/CurrentEligibleTrackSnapshotTest.php",
+            "tests/Feature/DiscoveryEpochMigrationTest.php",
+            "tests/Feature/DiscoveryEpochRecoveryTest.php",
+            "tests/Feature/DiscoverySnapshotConcurrencyTest.php",
+            "tests/Feature/CatalogPaginationTest.php",
+            "tests/Feature/PublicCatalogRelatedLinksTest.php",
+        )
+        for engine in focused.ENGINES:
+            selected = focused.selection({"FOCUSED_SUITE": "track-discovery", "FOCUSED_ENGINE": engine})
+            self.assertEqual(selected.kind, "php")
+            self.assertEqual(selected.files, required)
+            self.assertEqual(focused.MAX_FILES, 32)
+            focused.validate_files(ROOT, selected)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        original = json.dumps(policy["methods"][:150], separators=(",", ":")).encode()
+        self.assertEqual(__import__("hashlib").sha256(original).hexdigest(), "d93da4e7a13a8c6aff8f97f363eb6d93dde884bad53c9ae50eeb0ed32514c71c")
+        native_class = "Tests\\Feature\\DiscoverySnapshotConcurrencyTest"
+        methods = {
+            "test_committed_writers_before_final_fence_refuse_prechange_capture",
+            "test_writer_waits_on_actual_final_epoch_record_and_retained_capture_then_refuses_consumption",
+        }
+        actual = [row[1] for row in policy["methods"] if row[0] == native_class]
+        self.assertEqual(len(actual), 2)
+        self.assertEqual(set(actual), methods)
+        source = (ROOT / "tests/Feature/DiscoverySnapshotConcurrencyTest.php").read_text()
+        for method in methods:
+            self.assertIn("function " + method + "(", source)
+        self.assertFalse(any(row[0] in {"Tests\\Feature\\DiscoveryEpochMigrationTest", "Tests\\Feature\\DiscoveryEpochRecoveryTest", "Tests\\Feature\\CurrentEligibleTrackSnapshotTest"}
+                             for row in policy["methods"]))
+
     def test_production_preparation_keeps_complete_adapter_fences_in_bounded_feedback(self):
         required = {
             "tests/Feature/ProductionTrackPreparationPacketTest.php",

@@ -1,0 +1,196 @@
+{
+  "tested_source": "6a5da20d9cd2ab078d79b05288d583436cc731a0",
+  "tree": "1f8d7d3879acfeb905b185a5275f19cbfe6ad4c2",
+  "published_pr25_base": "f713ce641cb043c9171c4a3b35c2e666d2bf146e",
+  "source_sha256": {
+    "database/migrations/2026_10_07_240000_catalog_discovery_epoch.php": "c1e8bb47e1e3794b1883d3741565fa3c18c6f54ba2548ad8fa6d81b534b6dc86",
+    "tests/Feature/DiscoveryEpochRecoveryTest.php": "da2f389ff8d5a1f63f16171ba652a63e85a6d9c7b4540ebcca056ae717419e7e",
+    "tests/Feature/DiscoveryEpochMigrationTest.php": "5756e7b7f9e3316c1aabf60034050fbf5de9e2717d7da274b8a00e59c70c2d40",
+    "composer.lock": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9"
+  },
+  "results": {
+    "native.xml": {
+      "tests": 14,
+      "assertions": 3923,
+      "errors": 1,
+      "failures": 0,
+      "skips": 0,
+      "by_class": {
+        "Tests\\Feature\\DiscoveryEpochRecoveryTest": {
+          "tests": 9,
+          "assertions": 3901,
+          "errors": 0,
+          "failures": 0,
+          "skips": 0
+        },
+        "Tests\\Feature\\DiscoveryRecoveryIndependentCanaryTest": {
+          "tests": 5,
+          "assertions": 22,
+          "errors": 1,
+          "failures": 0,
+          "skips": 0
+        }
+      },
+      "cases": [
+        {
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "name": "test_failed_trigger_creation_retries_through_real_migrator_without_erasing_prior_data",
+          "assertions": 6
+        },
+        {
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "name": "test_every_creation_statement_failure_resumes_only_missing_parts_and_preserves_surviving_guards",
+          "assertions": 3812
+        },
+        {
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "name": "test_final_assertion_failure_resumes_without_replacing_any_object_or_seed",
+          "assertions": 28
+        },
+        {
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "name": "test_real_final_assertion_drift_preserves_unlogged_objects_and_retry_refuses_before_ddl",
+          "assertions": 7
+        },
+        {
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "name": "test_real_migrator_resumes_before_repository_log_and_uncertain_completed_log_is_not_duplicated",
+          "assertions": 30
+        },
+        {
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"guard gap\"",
+          "assertions": 4
+        },
+        {
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"advanced partial epoch\"",
+          "assertions": 4
+        },
+        {
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"temporary epoch\"",
+          "assertions": 5
+        },
+        {
+          "class": "Tests\\Feature\\DiscoveryEpochRecoveryTest",
+          "name": "test_drift_and_foreign_identities_are_refused_without_schema_row_or_guard_changes with data set \"temporary dependency\"",
+          "assertions": 5
+        },
+        {
+          "class": "Tests\\Feature\\DiscoveryRecoveryIndependentCanaryTest",
+          "name": "test_native_extra_metadata_drift_refuses_before_any_ddl_and_preserves_permanent_rows with data set \"unenforced check\"",
+          "assertions": 5
+        },
+        {
+          "class": "Tests\\Feature\\DiscoveryRecoveryIndependentCanaryTest",
+          "name": "test_native_extra_metadata_drift_refuses_before_any_ddl_and_preserves_permanent_rows with data set \"changed check bound\"",
+          "assertions": 5
+        },
+        {
+          "class": "Tests\\Feature\\DiscoveryRecoveryIndependentCanaryTest",
+          "name": "test_native_extra_metadata_drift_refuses_before_any_ddl_and_preserves_permanent_rows with data set \"foreign check identity\"",
+          "assertions": 2
+        },
+        {
+          "class": "Tests\\Feature\\DiscoveryRecoveryIndependentCanaryTest",
+          "name": "test_native_extra_metadata_drift_refuses_before_any_ddl_and_preserves_permanent_rows with data set \"table storage comment\"",
+          "assertions": 5
+        },
+        {
+          "class": "Tests\\Feature\\DiscoveryRecoveryIndependentCanaryTest",
+          "name": "test_native_extra_metadata_drift_refuses_before_any_ddl_and_preserves_permanent_rows with data set \"view identity\"",
+          "assertions": 5
+        }
+      ]
+    },
+    "native-extra.xml": {
+      "tests": 2,
+      "assertions": 9,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0,
+      "by_class": {
+        "Tests\\Feature\\DiscoveryRecoveryIndependentCanaryTest": {
+          "tests": 1,
+          "assertions": 5,
+          "errors": 0,
+          "failures": 0,
+          "skips": 0
+        },
+        "Tests\\Feature\\NativeCheckGroupingCanaryTest": {
+          "tests": 1,
+          "assertions": 4,
+          "errors": 0,
+          "failures": 0,
+          "skips": 0
+        }
+      },
+      "cases": [
+        {
+          "class": "Tests\\Feature\\DiscoveryRecoveryIndependentCanaryTest",
+          "name": "test_native_extra_metadata_drift_refuses_before_any_ddl_and_preserves_permanent_rows with data set \"foreign check identity\"",
+          "assertions": 5
+        },
+        {
+          "class": "Tests\\Feature\\NativeCheckGroupingCanaryTest",
+          "name": "test_different_check_grouping_cannot_be_normalized_into_owned_constraint",
+          "assertions": 4
+        }
+      ]
+    },
+    "sqlite-identity.xml": {
+      "tests": 1,
+      "assertions": 2,
+      "errors": 0,
+      "failures": 1,
+      "skips": 0,
+      "by_class": {
+        "Tests\\Feature\\SQLiteReservedIdentityCanaryTest": {
+          "tests": 1,
+          "assertions": 2,
+          "errors": 0,
+          "failures": 1,
+          "skips": 0
+        }
+      },
+      "cases": [
+        {
+          "class": "Tests\\Feature\\SQLiteReservedIdentityCanaryTest",
+          "name": "test_foreign_table_in_guard_namespace_cannot_hide_behind_exact_later_trigger",
+          "assertions": 2
+        }
+      ]
+    },
+    "native-alias-red.xml": {
+      "tests": 1,
+      "assertions": 2,
+      "errors": 0,
+      "failures": 1,
+      "skips": 0,
+      "by_class": {
+        "Tests\\Feature\\NativeReservedAliasCanaryTest": {
+          "tests": 1,
+          "assertions": 2,
+          "errors": 0,
+          "failures": 1,
+          "skips": 0
+        }
+      },
+      "cases": [
+        {
+          "class": "Tests\\Feature\\NativeReservedAliasCanaryTest",
+          "name": "test_native_dictionary_alias_refuses_before_creating_epoch_table_or_seed",
+          "assertions": 2
+        }
+      ]
+    }
+  },
+  "historical_command_descriptions": {
+    "native_boundaries": "php -r own_autoload_override -c native-selection.xml --filter every_creation_statement_failure|failed_trigger_creation|final_assertion_failure|real_final_assertion_drift|real_migrator_resumes|drift_and_foreign(temporary|advanced partial|guard gap)|native_extra_metadata_drift",
+    "native_extra": "same own-autoload invocation -c native-extra-selection.xml --filter foreign check identity|test_different_check_grouping",
+    "sqlite_red": "same own-autoload invocation -c phpunit.xml SQLiteReservedIdentityCanaryTest.php",
+    "native_alias_red": "same own-autoload invocation -c native-alias-selection.xml"
+  },
+  "command_description_limits": "These are descriptive summaries retained from the review. Exact selected case identities are provided by JUnit; reproducible successor argv is provided in final-review-receipt.json."
+}

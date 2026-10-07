@@ -1,0 +1,11 @@
+{
+  "executable": "9f1bda29a20a6f6936efa9b86e9731194bd3ccf7",
+  "tree": "fe4be5659d1d769a0175e2a2c43da15cf1f7954d",
+  "selection": {
+    "tests/Feature/CurrentEligibleTrackSnapshotTest.php": "cd046872eeddddac71c313f0b892f2dac533714b27d46d5db6cb1af4e27e2e15",
+    "tests/Feature/DiscoverySnapshotConcurrencyTest.php": "bafda9296abd0eea20850a623f9c5e0141538858b7b0037b7441a9811825dbf5"
+  },
+  "expected_native_cases": 14,
+  "own_fresh_app_key": true,
+  "private_effects_only": true
+}

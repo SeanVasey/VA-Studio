@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="11" assertions="54" errors="0" failures="1" skipped="0" time="4.678037">
+    <testsuite name="Tests\Feature\DiscoveryEpochMigrationTest" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" tests="6" assertions="28" errors="0" failures="1" skipped="0" time="1.277869">
+      <testsuite name="Tests\Feature\DiscoveryEpochMigrationTest::test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate" tests="2" assertions="12" errors="0" failures="0" skipped="0" time="0.599044">
+        <testcase name="test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set &quot;empty&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="28" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="6" time="0.424302"/>
+        <testcase name="test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set &quot;populated&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="28" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="6" time="0.174742"/>
+      </testsuite>
+      <testcase name="test_actual_insert_update_delete_upsert_replace_aba_and_rollback_invalidate_atomically" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="50" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="9" time="0.159509"/>
+      <testcase name="test_missing_changed_guard_and_modified_table_fail_closed" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="77" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="3" time="0.172713"/>
+      <testcase name="test_overflow_refuses_parent_write_and_preserves_epoch_and_data" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="103" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="3" time="0.166472">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\DiscoveryEpochMigrationTest::test_overflow_refuses_parent_write_and_preserves_epoch_and_data
+Failed asserting that exception of type "PDOException" matches expected exception "LogicException". Message was: "SQLSTATE[23000]: Integrity constraint violation: 19 Invalid discovery epoch" at
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/app/Domain/Catalog/Discovery/CurrentEligibleTrackSnapshot.php:77
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/app/Domain/Catalog/Discovery/CurrentEligibleTrackSnapshot.php:74
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/app/Domain/Catalog/Discovery/CurrentEligibleTrackSnapshot.php:31
+/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php:118
+.</failure>
+      </testcase>
+      <testcase name="test_new_installation_collision_refuses_before_ddl" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/DiscoveryEpochMigrationTest.php" line="121" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="1" time="0.180131"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\CurrentEligibleTrackSnapshotTest" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/CurrentEligibleTrackSnapshotTest.php" tests="5" assertions="26" errors="0" failures="0" skipped="0" time="3.400169">
+      <testcase name="test_empty_and_49_candidate_pages_are_bounded_private_and_complete_by_continuation" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/CurrentEligibleTrackSnapshotTest.php" line="32" class="Tests\Feature\CurrentEligibleTrackSnapshotTest" classname="Tests.Feature.CurrentEligibleTrackSnapshotTest" assertions="9" time="0.214070"/>
+      <testcase name="test_current_paths_match_public_catalog_and_reject_unknown_or_changed_evidence" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/CurrentEligibleTrackSnapshotTest.php" line="59" class="Tests\Feature\CurrentEligibleTrackSnapshotTest" classname="Tests.Feature.CurrentEligibleTrackSnapshotTest" assertions="7" time="1.084490"/>
+      <testcase name="test_private_byte_loss_and_configuration_changes_refuse_retained_projection" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/CurrentEligibleTrackSnapshotTest.php" line="81" class="Tests\Feature\CurrentEligibleTrackSnapshotTest" classname="Tests.Feature.CurrentEligibleTrackSnapshotTest" assertions="2" time="1.041275"/>
+      <testcase name="test_caller_transaction_and_forged_continuation_are_refused" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/CurrentEligibleTrackSnapshotTest.php" line="98" class="Tests\Feature\CurrentEligibleTrackSnapshotTest" classname="Tests.Feature.CurrentEligibleTrackSnapshotTest" assertions="3" time="0.153669"/>
+      <testcase name="test_default_and_explicit_time_remain_equivalent_and_epoch_changes_during_read_fail_closed" file="/workspace/scratch/2876616e88c3/VA-Studio-bounded-track-discovery/tests/Feature/CurrentEligibleTrackSnapshotTest.php" line="120" class="Tests\Feature\CurrentEligibleTrackSnapshotTest" classname="Tests.Feature.CurrentEligibleTrackSnapshotTest" assertions="5" time="0.906664"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

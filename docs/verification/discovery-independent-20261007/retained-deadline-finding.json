@@ -1,0 +1,18 @@
+{
+  "reviewed_source": "18c7d357acc74dbff1c2fb7ad149832873d76bc3",
+  "tree": "46f264a3ff556e1f948692bdbb3564671493b4c7",
+  "finding": "retained capture deadline can lapse during currentPaths consumption while fresh capture resets expiry",
+  "severity": "publication blocker for bounded retained-evidence lifetime contract",
+  "result": "independent red canary failed1case3assertions",
+  "source_sha256": {
+    "app/Domain/Catalog/Discovery/CurrentEligibleTrackSnapshot.php": "be8fb7e81cb495bc09843dc155efcf1df32a1e5c26e000006c2a00f378600d8a",
+    "app/Domain/Catalog/Discovery/DiscoveryEpoch.php": "540b5d43c02e0a100e39290598b96668a4bf6c30fd0813da6161f307bec801bf",
+    "app/Domain/Catalog/Discovery/EligibleTrackSnapshot.php": "72f1d990e90be9b3153277892678eb34a77c97ab21e3f8ca29232686c86863b3",
+    "database/migrations/2026_10_07_240000_catalog_discovery_epoch.php": "90664cb7f077cd7ef0a8744e147a0344f13fcc17139edae6f29b7d6c50812313"
+  },
+  "red_canary_sha256": "83e6063734fd71b84d4d420c130d9a4090dad1c0f0eb5e635f88da0bf7651827",
+  "fresh_ephemeral_key": true,
+  "key_retained": false,
+  "source_edited_by_reviewer": false,
+  "approval": false
+}

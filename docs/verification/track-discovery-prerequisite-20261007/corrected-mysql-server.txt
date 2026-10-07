@@ -1,0 +1,17 @@
+2026-10-07T05:16:52.210849Z 0 [System] [MY-015017] [Server] MySQL Server Initialization - start.
+2026-10-07T05:16:52.212013Z 0 [System] [MY-013169] [Server] /workspace/scratch/0c039e9e0645/runtime-recovery/root/usr/sbin/mysqld (mysqld 8.4.11) initializing of server in progress as process 7
+2026-10-07T05:16:52.216482Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-10-07T05:16:52.451183Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-10-07T05:16:53.621592Z 5 [Warning] [MY-010453] [Server] root@localhost is created with an empty password ! Please consider switching off the --initialize-insecure option.
+2026-10-07T05:16:55.064272Z 0 [System] [MY-015018] [Server] MySQL Server Initialization - end.
+2026-10-07T05:16:55.331017Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+2026-10-07T05:16:55.528267Z 0 [System] [MY-010116] [Server] /workspace/scratch/0c039e9e0645/runtime-recovery/root/usr/sbin/mysqld (mysqld 8.4.11) starting as process 46
+2026-10-07T05:16:55.535667Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-10-07T05:16:55.691787Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-10-07T05:16:55.906658Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2026-10-07T05:16:55.906961Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2026-10-07T05:16:55.908794Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/tmp' in the path is accessible to all OS users. Consider choosing a different directory.
+2026-10-07T05:16:55.932554Z 0 [System] [MY-010931] [Server] /workspace/scratch/0c039e9e0645/runtime-recovery/root/usr/sbin/mysqld: ready for connections. Version: '8.4.11'  socket: ''  port: 52997  MySQL Community Server - GPL.
+2026-10-07T05:18:29.382264Z 31 [System] [MY-013172] [Server] Received SHUTDOWN from user root. Shutting down mysqld (Version: 8.4.11).
+2026-10-07T05:18:30.412781Z 0 [System] [MY-010910] [Server] /workspace/scratch/0c039e9e0645/runtime-recovery/root/usr/sbin/mysqld: Shutdown complete (mysqld 8.4.11)  MySQL Community Server - GPL.
+2026-10-07T05:18:30.412798Z 0 [System] [MY-015016] [Server] MySQL Server - end.

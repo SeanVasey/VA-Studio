@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd" bootstrap="/workspace/VA-Studio-pr25-recovery-review/vendor/autoload.php" colors="true">
+    <testsuites>
+        <testsuite name="Independent native epoch recovery boundaries"><file>/workspace/VA-Studio-pr25-recovery-review/docs/verification/cloud-pr25-recovery-independent-20261007/NativeReservedAliasCanaryTest.php</file></testsuite></testsuites>
+    <source>
+        <include>
+            <directory>/workspace/VA-Studio-pr25-recovery-review/app</directory>
+        </include>
+    </source>
+    <php>
+        <env name="APP_ENV" value="testing" />
+        <env name="APP_MAINTENANCE_DRIVER" value="file" />
+        <env name="BCRYPT_ROUNDS" value="4" />
+        <env name="BROADCAST_CONNECTION" value="null" />
+        <env name="CACHE_STORE" value="array" />
+        <env name="MAIL_MAILER" value="array" />
+        <env name="QUEUE_CONNECTION" value="sync" />
+        <env name="SESSION_DRIVER" value="array" />
+        <env name="PULSE_ENABLED" value="false" />
+        <env name="TELESCOPE_ENABLED" value="false" />
+        <env name="NIGHTWATCH_ENABLED" value="false" />
+    </php>
+</phpunit>

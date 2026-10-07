@@ -1,0 +1,11 @@
+{
+  "README.md": "3676bd59c5a1bc749394f39652ee627eeef9dbf8e58a0e527be614fbd2e0dfc9",
+  "RetainedDeadlineCanaryTest.php": "83e6063734fd71b84d4d420c130d9a4090dad1c0f0eb5e635f88da0bf7651827",
+  "autoload.txt": "e399acde710f4abc7bda4c8afc5fb5598d09980bda4277f83c7e535c93159330",
+  "retained-deadline-finding.json": "0ec2dc392e5e81903f06ff69c33a2232a1b64f93bd747af1ec1f1a238b55f28e",
+  "retained-deadline-red-execution.json": "d8b2e6cf14de8041f8504d95e4ade598c167ddbcfe68640abefa4f9e7579f8a4",
+  "retained-deadline-red.txt": "f9001293cc363091502c1b0aeb3c6b01157221aa11ec0c5d814cdaaa1b55d747",
+  "retained-deadline-red.xml": "c25b303e7b3dd5ebcc5fe7216c1f20fbeb076aca94efcffdc9f20889402a5ea2",
+  "retained-deadline-runtime-graph.json": "075752f88b7f66a8f088a1daaa65b79e244135802622499b611fa97e2a249f25",
+  "runtime-probe.php": "1813a0fe0001e893ec690c86ee9e342d4b752382e53f3a2a9125e0b8f1f35098"
+}

@@ -1,0 +1,43 @@
+{
+  "approved_executable": "10dcb64d9c30231bd6949fd4d00811a283e820b0",
+  "approved_tree": "7e6ccdb4459775b67210c4d01c1413757946c418",
+  "result": "approved_bounded_discovery_prerequisite_leaf",
+  "unresolved_findings": [],
+  "original_rejected_executable": "18c7d357acc74dbff1c2fb7ad149832873d76bc3",
+  "original_red_evidence": "1edf61e2a80b67617fa6971c21e7df2634aa15c2",
+  "own_corrected_native": {
+    "tests": "21",
+    "assertions": "416",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "123.246884"
+  },
+  "own_actual_isolation_native": {
+    "tests": "1",
+    "assertions": "8",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "6.534362"
+  },
+  "own_unchanged_deadline_sqlite": {
+    "tests": "1",
+    "assertions": "4",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "1.545567"
+  },
+  "actual_native_lock_witnesses": 7,
+  "actual_candidate_installed_references_verified": 158,
+  "dependency_exit_codes": {
+    "validate": 0,
+    "platform": 0,
+    "audit": 0
+  },
+  "audit_advisories": 0,
+  "audit_abandoned": 0,
+  "hosted_full_browser_matrix_or_live_effect": false,
+  "private_db_pdf_key_retained": false
+}
