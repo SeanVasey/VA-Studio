@@ -17,7 +17,10 @@ final class PublicDiscoveryController extends Controller
             try {
                 return $this->response(app(SitemapStore::class)->currentIndexXml(), 'application/xml; charset=UTF-8');
             } catch (SitemapException $error) {
-                return $this->response('', 'application/xml; charset=UTF-8', $error->status);
+                if (! in_array($error->reason, ['no_current_generation', 'expired_generation'], true)) {
+                    return $this->response('', 'application/xml; charset=UTF-8', $error->status);
+                }
+                // The editorial family is independently available when no authentic track generation is current.
             } catch (\Throwable) {
                 return $this->response('', 'application/xml; charset=UTF-8', 503);
             }

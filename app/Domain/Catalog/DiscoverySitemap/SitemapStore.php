@@ -230,7 +230,7 @@ final class SitemapStore
         $records = null;
         $xml = $this->transaction(function (PDO $pdo) use ($origin, &$records): string {
             $pointer = $this->pointer($pdo, true);
-            SitemapException::require(is_string($pointer['generation_id']), 'unavailable', 404);
+            SitemapException::require(is_string($pointer['generation_id']), 'no_current_generation', 404);
             $generation = $this->generation($pdo, $pointer['generation_id'], true);
             SitemapException::require($generation !== null, 'corrupt_generation');
             $header = $this->header($generation);
@@ -262,7 +262,8 @@ final class SitemapStore
     {
         $this->schema->assertOwned($pdo);
         SitemapException::require($this->pointer($pdo) === $records['pointer'] && $this->generation($pdo, $records['generation']['id']) === $records['generation'], 'changed_manifest');
-        $this->assertConfiguration($records['header']['configuration_hash'], $records['header']['expires_at']);
+        // An expired generation is a harmless omission only after epoch and config remain authentic.
+        $this->fence($pdo, $records['header']['epoch'], $records['header']['configuration_hash'], $records['header']['expires_at'], false);
     }
 
     private function producer(string $sealed): array
@@ -486,6 +487,7 @@ final class SitemapStore
     private function assertConfiguration(string $configuration, int $expires): void
     {
         SitemapConfiguration::assertEnabled();
-        SitemapException::require(hash_equals($configuration, SitemapConfiguration::hash()) && CarbonImmutable::instance(now())->utc()->getTimestamp() < $expires, 'expired_configuration');
+        SitemapException::require(hash_equals($configuration, SitemapConfiguration::hash()), 'changed_configuration');
+        SitemapException::require(CarbonImmutable::instance(now())->utc()->getTimestamp() < $expires, 'expired_generation');
     }
 }

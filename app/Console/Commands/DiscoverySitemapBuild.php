@@ -22,7 +22,12 @@ final class DiscoverySitemapBuild extends Command
                 }
                 $request = $store->newRequest();
                 $path = $this->option('new-request');
-                $file = fopen($path, 'x');
+                $previousMask = umask(0077);
+                try {
+                    $file = fopen($path, 'x');
+                } finally {
+                    umask($previousMask);
+                }
                 if ($file === false) {
                     throw new \LogicException;
                 }
