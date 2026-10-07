@@ -1,0 +1,44 @@
+{
+  "source": "d6933489ae701c5b45192fc3f368a225d41a9185",
+  "original_source": "b635e12992dc91f5131f35e5c46b8dab6ff30eee",
+  "original_evidence": "468142803c27991c9a02e44cc9e13f397bcf87bf",
+  "changed": {
+    "app/Domain/Memberships/Production/MembershipPolicy.php": "816f79d6487343a5bd7f3d2bdc25c28f57a4becccf6debfafd0c6b88c503af16",
+    "app/Domain/Memberships/Production/MembershipRows.php": "a62d9848a193f78358d2ec6538d35f2d3871a5973d36c4d660d1ae8f7e93783c",
+    "tests/Feature/ProductionMembership/MembershipPreparationTest.php": "5ec07be316eb1bdfc0a5110d2a62717a098887cbbfbfb557097d3427fcee77b4"
+  },
+  "original_probe_sha256": "42c9a1fe718de819a5d17fd38cb4d09f04e5519f8d3c731be437b3c91fd722b0",
+  "results": {
+    "final-sqlite.xml": {
+      "name": "CLI Arguments",
+      "tests": "23",
+      "assertions": "55",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "3",
+      "time": "9.464450"
+    },
+    "final-native.xml": {
+      "name": "Tests\\Feature\\ProductionMembership\\MembershipRawConfigurationClosureTest",
+      "file": "/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php",
+      "tests": "1",
+      "assertions": "3",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "58.668823"
+    }
+  },
+  "artifacts": {
+    "docs/verification/production-membership-raw-parent-20261007/final-sqlite.xml": "566d03e58ec8837fe3a5b5190c4ddb0618b5795734772563dc3e4d492c259d8f",
+    "docs/verification/production-membership-raw-parent-20261007/original-receipt.json": "fc883acbc81e439cc3045f2ff3dae417167f3d94ff48a71634e2ca9ab34e4350",
+    "docs/verification/production-membership-raw-parent-20261007/final-native.txt": "60da6c4259333bedb0f5523f22d8133da539270d95590365e91896c5a50198b5",
+    "docs/verification/production-membership-raw-parent-20261007/MembershipRawConfigurationClosureTest.php": "42c9a1fe718de819a5d17fd38cb4d09f04e5519f8d3c731be437b3c91fd722b0",
+    "docs/verification/production-membership-raw-parent-20261007/final-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "docs/verification/production-membership-raw-parent-20261007/final-native.xml": "3a31dbfe3f41ebef063a4460c2b610da71d422b8acde90ccdaa021a7eed555ee",
+    "docs/verification/production-membership-raw-parent-20261007/final-sqlite.txt": "1538ad3fead80c0f0ff56cba5a1b0d980d6fcf5574356592c8fae1583372c048",
+    "docs/verification/production-membership-raw-parent-20261007/original-red.txt": "1bc2768d978ceb3e7f06bb38138694047bad968464f927c2c6cf54e8dd8bcc6a",
+    "docs/verification/production-membership-raw-parent-20261007/original-red.xml": "825e94632ffb64fcd886dd06f74dba23921f45c9d3dc2acca9fa11c2d89ea852",
+    "docs/verification/production-membership-raw-parent-20261007/original-probe-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+  }
+}

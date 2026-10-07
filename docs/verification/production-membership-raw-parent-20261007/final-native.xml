@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembership\MembershipRawConfigurationClosureTest" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="58.668823">
+    <testcase name="test_captured_reader_refuses_overloaded_database_parent_before_late_policy_callback" file="/workspace/VA-Studio-production-membership/tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php" line="21" class="Tests\Feature\ProductionMembership\MembershipRawConfigurationClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRawConfigurationClosureTest" assertions="3" time="58.668823"/>
+  </testsuite>
+</testsuites>
