@@ -1,18 +1,31 @@
 # Remaining development and completion plan
 
-## Current cloud execution — October 7, 2026 UTC
+## Current cloud integration — October 7, 2026 UTC
 
-PR26 and PR27 are merged at verified main
-`22d340bd0a19cfb025b0f2b48171283f4b61d156`. The
-[source-backed completion audit](verification/cloud-completion-audit-20261007.md)
-reconciles all40 groups and103 parity mappings against actual source; counts
-are outcome tracking, not a completion percentage. The
-[current agent queue](development-agent-queue.md) replaces stale active owner
-tables below. Reviewed installation/checkout recovery is composed; PR25
-migration recovery, private listening, inquiry notifications and service
-projects continue with independent sensitive review and focused local checks.
-The full personal-store scope and existing obligations remain required. No
-final acceptance or production readiness follows from these development passes.
+Verified main is `cad70a7dffb3e20049564fd9d543185c9c0fa9ec`, with PR26
+amount preparation, PR27 crawler/source recovery, PR28 installation/private
+checkout presentation and corrected PR25 epoch recovery merged. Immediate
+review threads are resolved after exact-source independent review and focused
+SQLite/native proof; cheap preflights and expected-head merges passed. No full
+Foundation acceptance has run.
+
+Private saved favorites/playlists and recovered inquiry alerts are composed at
+`3ccd2af747f476c28ccd021e1dd2f580d1813325`, with independent review,
+actual107 PHP passes/987 assertions/four native-only skips,65 mounted frontend
+passes, TypeScript/Pint and50 selector checks. See the
+[shared evidence](verification/cloud-listening-registration-20261007/README.md).
+Publication/preflight remain pending here. No external transport is bound.
+Service projects have corrected exact-prefix migration and private-input denial
+source; actual native and independent final evidence reconciliation is active.
+
+Operative checkout246000 and additive identity/local-SMTP247000, listening
+notes/export/clear and scanned attachments249000 are actively authored in
+isolated worktrees. Distinct free-origin grants245000 follow reviewed service/
+source-adapter work, then membership and remaining product fulfillment. The
+all-scope audit retains40 groups/103 mappings, six accepted parent groups and34
+open; focused child merges do not close those criteria. Actual legal/source/
+provider/hosting facts and final exact-SHA verification retain concrete gates.
+`/root` remains the sole integration owner.
 
 ## Reviewed corrective development candidate — October 7, 2026 UTC
 

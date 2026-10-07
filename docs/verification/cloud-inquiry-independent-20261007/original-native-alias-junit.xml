@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\InquiryNativeAliasCanaryTest" file="/workspace/VA-Studio-inquiry-independent/docs/verification/cloud-inquiry-independent-20261007/InquiryNativeAliasCanaryTest.php" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="9.437363">
+    <testcase name="test_native_reserved_trigger_alias_is_refused_before_any_schema_write" file="/workspace/VA-Studio-inquiry-independent/docs/verification/cloud-inquiry-independent-20261007/InquiryNativeAliasCanaryTest.php" line="14" class="Tests\Feature\InquiryNativeAliasCanaryTest" classname="Tests.Feature.InquiryNativeAliasCanaryTest" assertions="2" time="9.437363"/>
+  </testsuite>
+</testsuites>

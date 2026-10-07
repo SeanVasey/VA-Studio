@@ -1,0 +1,47 @@
+{
+  "testedSource": "d540f60aabe8a802f1a9d242b90569e9886b257c",
+  "testedTree": "e58ac373e92494c84949c0760b63dc3fa41af6ed",
+  "baseSource": "717f0866444701637e7c396b4376891aa5dd995d",
+  "runtime": "PHP 8.4.26 / SQLite :memory: / Node 24.19.0",
+  "installedLockedIdentitiesMatch": true,
+  "installedPackages": 158,
+  "sourcePaths": {
+    "app/Domain/Customers/Listening/ListeningException.php": "753bceac6616693eeba91a160640ff554dc81d5ba1db41e714731af95daed03c",
+    "app/Domain/Customers/Listening/ListeningLibrary.php": "7e7b793f3d9f6ff5b9b72f9376f550a0bdc3c79d0c2c7f9d791c5155db055dc8",
+    "app/Domain/Customers/Listening/SavedListeningLibrary.php": "a16d0d1fc1095563ffee8409633ea1a53a1f2dc34718f5ef0fba0cd4706d863c",
+    "database/migrations/2026_10_07_242000_customer_saved_tracks.php": "e46cfe52b74631e535fa8ef3579730c39d7b1ce9bc484c52d4b47b66205cfc65",
+    "resources/js/components/CustomerListeningLibrary.tsx": "6ede69f0214f4aee801b2d8ec9733c8725da22354c3c464599fea48ed82bcc06",
+    "tests/Feature/CustomerListeningLibraryTest.php": "3e93f9d627d65a5168dca0a84f42d5268a59812607b893a2e9deaa1ddff742ad",
+    "tests/Feature/CustomerListeningMigrationTest.php": "1fd5ee1f8c0affa88a202b4c11572cd9ac7dd0bc5eaa5b6be0e939ea42b53de9",
+    "tests/frontend/customer-listening-library.test.tsx": "c3bb1ba05c1f2485296923237b5d4728efa21e3cfac4d726b0ba9b9dcb44bee3"
+  },
+  "dependencies": {
+    "composer.json": "132cb2a16c6ce2960d059cfddecae8e1accf6138a258dd8bab2c0c7b822f5607",
+    "composer.lock": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9",
+    "package.json": "65db43e1b171566d2d89e075bc4a29af75a82a6782a3313751bb4d7e832a7ae0",
+    "package-lock.json": "6407d3a63e3b6e04f5824f53c41b8dc8a33581f987b21d780c795480122f93ea"
+  },
+  "vendorLayout": "Package namespaces symlink the existing locked /workspace/VA-Studio/vendor; independent vendor/composer, autoload.php and bin wrappers regenerated no-scripts/no-plugins; own domain/test reflection checked.",
+  "focusedPhp": {
+    "tests": 66,
+    "assertions": 385,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "focusedFrontend": {
+    "tests": 24,
+    "files": 1,
+    "failures": 0
+  },
+  "evidenceHashes": {
+    "autoload-reflection.txt": "2185b53a0e907deffbf62cd1ec468888a12b4bece6f6915ab32615f2207686b6",
+    "focused-frontend.txt": "3065e1840cc729aebc1c09fbaf65c40658b1988ccb0333c252221dbe4d816785",
+    "focused-php.txt": "ee0b4e3e332bde85317c11cc12247d29c2dd4c5993780e6bfce62fa00b072546",
+    "focused-php.xml": "fa85ec8f44ff4915c95ea54ff8f2b8c7bd4b3f40f0a595060eb5182c70462dc8",
+    "membership-fixture-guard-failure.txt": "7b7e9c2d1d1c6cb9808da9ad76a93b1e6429334ded7b8e7afb3c575a1870fb37",
+    "membership-fixture-repair.txt": "37aff1fd875c4d2e55c777ec379fa33d2715177210f18cebf0b94a6fd1c1f009",
+    "pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "typecheck.txt": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f"
+  }
+}
