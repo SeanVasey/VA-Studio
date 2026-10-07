@@ -1,0 +1,26 @@
+{
+  "scope": "tracked durable new reviewer artifacts only; excludes this manifest and report; original evidence remains in its original tracked manifest",
+  "count": 20,
+  "sha256": {
+    "docs/verification/cloud-identity-floor-independent-20261007/approval-receipt.json": "7af239b79e2b3692b75bbab73f88b3c9dd6977b23b6b7b7687bff09567323009",
+    "docs/verification/cloud-identity-floor-independent-20261007/commands.json": "0d031e8ade364978eeba4568c6dace3bd2ec2a995b742943ac50987f48a23229",
+    "docs/verification/cloud-identity-floor-independent-20261007/corrected-native-dependency-admission-snapshot.json": "524b8443f5524f7b54b8f48307735fb65b913352eb3be0ed1c8a8f013e26643f",
+    "docs/verification/cloud-identity-floor-independent-20261007/corrected-sqlite-dependency-admission-snapshot.json": "7512ba0aa4904830a3841c578007687280f78e82b68a784fb7793d67dc0564b4",
+    "docs/verification/cloud-identity-floor-independent-20261007/final-native.txt": "1b94ad010e80b8f105996865cf97d5fd576df614aeca3105a8611c055211431e",
+    "docs/verification/cloud-identity-floor-independent-20261007/final-native.xml": "4ed23ce36bb24012cd7447e2a4eb70810c5ba5b08fa07724c5f1fa4c20390a87",
+    "docs/verification/cloud-identity-floor-independent-20261007/final-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "docs/verification/cloud-identity-floor-independent-20261007/final-sqlite.txt": "939b7a1fb2e50aba436e453dac66d3e1d92fbfa1db10b8fc985d8744decfc85b",
+    "docs/verification/cloud-identity-floor-independent-20261007/final-sqlite.xml": "638813e01cacc76ddb1e4079c5956e273910f0b7e64463333c047a665531c7f9",
+    "docs/verification/cloud-identity-floor-independent-20261007/native-selection.xml": "4abfc97c973223528046806db9cd115fffa384fa5dda0cf2da24fc11ecab3cc5",
+    "docs/verification/cloud-identity-floor-independent-20261007/own-autoload.txt": "8edc8b4d4f4ba6062ddd47033d3acc944d4845e344cf3f6cd878699c4145212b",
+    "docs/verification/cloud-identity-floor-independent-20261007/runtime.txt": "ea1f68a590afab9fe5ebb70a9b885be868c793af39bfa956b6b81c0d1d2c80b3",
+    "docs/verification/cloud-identity-floor-independent-20261007/source-evidence-reconciliation.json": "f202dfdc002bf5248c795a73ee4820d51a78599206af329d4706a9b2bada72af",
+    "docs/verification/cloud-identity-floor-independent-20261007/sqlite-selection.xml": "32c0a87c04dea5b2e4f3a8ecc29083d3cec49c3ad6a90230fb891ef9acb17b2a",
+    "docs/verification/cloud-identity-floor-independent-20261007/va-identity-e48-original-probe.txt": "21402130b9a41219a6b396dd7723c536ce48e4189499dbe5ff4aa61ef99f87f7",
+    "docs/verification/cloud-identity-floor-independent-20261007/va-identity-e48-original-probe.xml": "40b006e944eb475057e5fee6e51389adef942fd343394dde3fc4e2f33e8ff57f",
+    "docs/verification/cloud-identity-floor-independent-20261007/va-identity-e48-registered-floor-corrected.txt": "37efd565ccd541e8ca47f45265b44808acdf74a62709501948e88fed0ba8a103",
+    "docs/verification/cloud-identity-floor-independent-20261007/va-identity-e48-registered-floor-corrected.xml": "8f98704dc655d332fe23c2921c1e3c1bb8a038f4a67438e943d6d940138d81d4",
+    "docs/verification/cloud-identity-floor-independent-20261007/va-identity-e48-registered-floor.txt": "451b4b16a711676a7208e81597b31dfb8a8ecfe0c5434b86ee78409690046bd2",
+    "docs/verification/cloud-identity-floor-independent-20261007/va-identity-e48-registered-floor.xml": "abc4619a582bcf2aa95d43499c29f47e0131843971b38a06d0cb6b26b7bab398"
+  }
+}

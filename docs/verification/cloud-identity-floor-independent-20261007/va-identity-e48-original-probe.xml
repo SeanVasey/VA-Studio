@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\IndependentIdentityRegistration\IdentityDependencyAdmissionCanaryTest" file="/workspace/VA-Studio-identity-registration/docs/verification/cloud-identity-independent-20261007/IdentityDependencyAdmissionCanaryTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="0.479615">
+    <testcase name="test_incompatible_actual_dependency_is_refused_before_owned_ddl" file="/workspace/VA-Studio-identity-registration/docs/verification/cloud-identity-independent-20261007/IdentityDependencyAdmissionCanaryTest.php" line="15" class="Tests\IndependentIdentityRegistration\IdentityDependencyAdmissionCanaryTest" classname="Tests.IndependentIdentityRegistration.IdentityDependencyAdmissionCanaryTest" assertions="4" time="0.479615"/>
+  </testsuite>
+</testsuites>

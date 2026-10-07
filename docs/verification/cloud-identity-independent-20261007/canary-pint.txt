@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fail","files":[{"path":"docs\/verification\/cloud-identity-independent-20261007\/IdentityDependencyAdmissionCanaryTest.php","fixers":["binary_operator_spaces"]},{"path":"docs\/verification\/cloud-identity-independent-20261007\/IdentityNativeDependencyAdmissionCanaryTest.php","fixers":["binary_operator_spaces"]}]}

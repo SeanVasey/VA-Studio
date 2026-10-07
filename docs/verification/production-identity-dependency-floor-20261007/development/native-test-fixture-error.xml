@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="13" assertions="17" errors="8" failures="0" skipped="0" time="40.501994">
+    <testsuite name="Tests\Feature\ProductionIdentity\ProductionIdentityMigrationTest" file="/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityMigrationTest.php" tests="5" assertions="15" errors="0" failures="0" skipped="0" time="25.225966">
+      <testcase name="test_exact_empty_prefix_is_resumed_and_empty_down_up_is_reviewable" file="/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityMigrationTest.php" line="27" class="Tests\Feature\ProductionIdentity\ProductionIdentityMigrationTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityMigrationTest" assertions="6" time="16.240634"/>
+      <testcase name="test_retained_history_refuses_down_and_missing_guard_refuses_repair_before_ddl" file="/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityMigrationTest.php" line="54" class="Tests\Feature\ProductionIdentity\ProductionIdentityMigrationTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityMigrationTest" assertions="3" time="2.479820"/>
+      <testcase name="test_foreign_view_dependency_and_temporary_owned_shadow_refuse_before_any_ddl" file="/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityMigrationTest.php" line="77" class="Tests\Feature\ProductionIdentity\ProductionIdentityMigrationTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityMigrationTest" assertions="2" time="2.910382"/>
+      <testcase name="test_raw_replacement_update_and_delete_cannot_rewrite_retained_challenge" file="/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityMigrationTest.php" line="104" class="Tests\Feature\ProductionIdentity\ProductionIdentityMigrationTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityMigrationTest" assertions="3" time="1.805252"/>
+      <testcase name="test_native_dictionary_unicode_guard_alias_on_foreign_table_is_refused" file="/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityMigrationTest.php" line="126" class="Tests\Feature\ProductionIdentity\ProductionIdentityMigrationTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityMigrationTest" assertions="1" time="1.789878"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest" file="/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php" tests="8" assertions="2" errors="8" failures="0" skipped="0" time="15.276028">
+      <testsuite name="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest::test_actual_parent_metadata_is_refused_before_any_owned_ddl" tests="4" assertions="2" errors="4" failures="0" skipped="0" time="15.276028">
+        <testcase name="test_actual_parent_metadata_is_refused_before_any_owned_ddl with data set &quot;users credential column&quot;" file="/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php" line="34" class="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityDependencyAdmissionTest" assertions="2" time="15.276028">
+          <error type="PDOException">Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest::test_actual_parent_metadata_is_refused_before_any_owned_ddl with data set "users credential column"
+PDOException: SQLSTATE[42S02]: Base table or view not found: 1051 Unknown table 'vaseyaudio_production_identity.users'
+
+/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php:64</error>
+        </testcase>
+        <testcase name="test_actual_parent_metadata_is_refused_before_any_owned_ddl with data set &quot;users credential nullability&quot;" file="/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php" line="34" class="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityDependencyAdmissionTest" assertions="0" time="0.000000">
+          <error type="PDOException">Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest::test_actual_parent_metadata_is_refused_before_any_owned_ddl with data set "users credential nullability"
+PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vaseyaudio_production_identity.production_identity_outcomes' doesn't exist
+
+/workspace/VA-Studio-production-identity/tests/Support/ProductionIdentityFixture.php:34
+/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php:20</error>
+        </testcase>
+        <testcase name="test_actual_parent_metadata_is_refused_before_any_owned_ddl with data set &quot;account access generation&quot;" file="/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php" line="34" class="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityDependencyAdmissionTest" assertions="0" time="0.000000">
+          <error type="PDOException">Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest::test_actual_parent_metadata_is_refused_before_any_owned_ddl with data set "account access generation"
+PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vaseyaudio_production_identity.production_identity_outcomes' doesn't exist
+
+/workspace/VA-Studio-production-identity/tests/Support/ProductionIdentityFixture.php:34
+/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php:20</error>
+        </testcase>
+        <testcase name="test_actual_parent_metadata_is_refused_before_any_owned_ddl with data set &quot;owner identity type&quot;" file="/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php" line="34" class="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityDependencyAdmissionTest" assertions="0" time="0.000000">
+          <error type="PDOException">Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest::test_actual_parent_metadata_is_refused_before_any_owned_ddl with data set "owner identity type"
+PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vaseyaudio_production_identity.production_identity_outcomes' doesn't exist
+
+/workspace/VA-Studio-production-identity/tests/Support/ProductionIdentityFixture.php:34
+/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php:20</error>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest::test_changed_or_missing_actual_parent_guard_is_refused_before_owned_ddl" tests="2" assertions="0" errors="2" failures="0" skipped="0" time="0.000000">
+        <testcase name="test_changed_or_missing_actual_parent_guard_is_refused_before_owned_ddl with data set &quot;account immutable owner&quot;" file="/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php" line="81" class="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityDependencyAdmissionTest" assertions="0" time="0.000000">
+          <error type="PDOException">Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest::test_changed_or_missing_actual_parent_guard_is_refused_before_owned_ddl with data set "account immutable owner"
+PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vaseyaudio_production_identity.production_identity_outcomes' doesn't exist
+
+/workspace/VA-Studio-production-identity/tests/Support/ProductionIdentityFixture.php:34
+/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php:20</error>
+        </testcase>
+        <testcase name="test_changed_or_missing_actual_parent_guard_is_refused_before_owned_ddl with data set &quot;retained owner&quot;" file="/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php" line="81" class="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityDependencyAdmissionTest" assertions="0" time="0.000000">
+          <error type="PDOException">Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest::test_changed_or_missing_actual_parent_guard_is_refused_before_owned_ddl with data set "retained owner"
+PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vaseyaudio_production_identity.production_identity_outcomes' doesn't exist
+
+/workspace/VA-Studio-production-identity/tests/Support/ProductionIdentityFixture.php:34
+/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php:20</error>
+        </testcase>
+      </testsuite>
+      <testcase name="test_required_unique_key_and_disabled_foreign_keys_are_refused_before_owned_ddl" file="/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php" line="106" class="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityDependencyAdmissionTest" assertions="0" time="0.000000">
+        <error type="PDOException">Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest::test_required_unique_key_and_disabled_foreign_keys_are_refused_before_owned_ddl
+PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vaseyaudio_production_identity.production_identity_outcomes' doesn't exist
+
+/workspace/VA-Studio-production-identity/tests/Support/ProductionIdentityFixture.php:34
+/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php:20</error>
+      </testcase>
+      <testcase name="test_permanent_parent_temporary_shadow_is_refused_before_owned_ddl" file="/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php" line="128" class="Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityDependencyAdmissionTest" assertions="0" time="0.000000">
+        <error type="PDOException">Tests\Feature\ProductionIdentity\ProductionIdentityDependencyAdmissionTest::test_permanent_parent_temporary_shadow_is_refused_before_owned_ddl
+PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vaseyaudio_production_identity.production_identity_outcomes' doesn't exist
+
+/workspace/VA-Studio-production-identity/tests/Support/ProductionIdentityFixture.php:34
+/workspace/VA-Studio-production-identity/tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php:20</error>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -2,18 +2,18 @@
 
 ## Active cloud ownership — October 7, 2026 UTC
 
-One integration owner `/root`; verified main `4150b858d05c837cf85801cf0ee1537a3c98464f` includes PRs25–31.
+One integration owner `/root`; verified main `2cdd3da12261d27479955722952123d3a21ecc49` includes PRs25–33.
 Historical owner tables below describe earlier source, not active workers.
 
 | Worker | Isolated boundary | Current handoff |
 | --- | --- | --- |
-| `/root` | Primary/shared registration/evidence/publication | PR31 merged after fresh preflight37598818397; consent250 approved and composed on main4150b858; identity migration held; attachment registration checks pass |
-| `/root/pr25_recovery` | ProductionCheckout246/provider/tax | Narrow9f948b successor repairs actual staff-role/FK/routine defects; final affected native and independent review pending; supported automatic tax next |
-| `/root/completion_audit` | ProductionIdentity247 and new typed SMTP/account adapters | Independent247 incompatible-parent admission failure held; narrow repair active. New adaptersd9b3937 remain unbound/provisional |
-| `/root/native_mysql` | Free245, then paid252 origins | Freeebf provisional during actual retry/status repair; new paid consumer preparation follows verified producer source |
-| `/root/pr26_review` | Independent identity composition | Actual registered HTTP16/187, frontend14 and nativeSMTP recovery1/38 pass; dependency-admission canary fails and withholds overall approval |
-| `/root/crawler_routes` | Preferences/Suppression251 | Additive suppression outbox on approved250; exact current-choice DTO status, default-off/unbound provider; focused SQLite101/518 and UI34 provisional |
-| `/root/recovery_inventory` | New private discovery generation248 and two additive snapshot seams | Explicit new replacement; append-only bounded completeness plus fresh eligibility and terminal/post-commit fences under implementation |
+| `/root` | Primary/shared registration/evidence/publication | Identity247 merged; independently approved private free245 registration publication; attachment request966 and suppression251 composition |
+| `/root/pr25_recovery` | ProductionCheckout246/provider/tax | Actual three lazy-PDO/connection callbacks repaired in frozenb6f; exact checks then NEW committed-source receipt and supported automatic-tax255 |
+| `/root/completion_audit` | Typed identity adapters; operative free-origin child | Frozen101 adapter with retained genuine reds/final affected native proof awaits independent review; rootfreec59 independently approved; NEW typed productionfree original lineage/purpose |
+| `/root/native_mysql` | Paid252 consumers | Schema2bdd frozen; current typedV1 paidorigin3714 with genuine source/asset/current-proof checks; original fulfilment, full-order delivery and future255V2 consumer remain unfinished |
+| `/root/pr26_review` | Independent review and owned service producer | Service8444 permanent-view drift requires owned BASE_TABLE correction; then adapter101 independent review; T36 rootHTTP4/68 passed but schema blocker holds publication |
+| `/root/crawler_routes` | Production feature253; suppression251 successor | Narrow251 reserved-key admissionaed proven on unchanged native probe; NEW253 actual legacy/authority/initialization and prefix checks underway; NEW254 distinct production suppression follows |
+| `/root/recovery_inventory` | Independent attachment review; owned discovery schema | Sharedrequest966 actual20/343 passed, independent native review next; service permanent-view genuine red retained; discovery97 reserved CHECK collision requires Schema-only successor |
 
 
 Each worker has an isolated branch, independent autoload over unchanged locked

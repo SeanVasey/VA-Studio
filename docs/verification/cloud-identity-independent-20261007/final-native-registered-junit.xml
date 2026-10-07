@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-identity-registration-independent/docs/verification/cloud-identity-independent-20261007/native-registered-selection.xml" tests="1" assertions="38" errors="0" failures="0" skipped="0" time="54.214894">
+    <testsuite name="Independent identity native-registered-selection.xml" tests="1" assertions="38" errors="0" failures="0" skipped="0" time="54.214894">
+      <testsuite name="Tests\Feature\ProductionIdentityRegistrationTest" file="/workspace/VA-Studio-identity-registration-independent/tests/Feature/ProductionIdentityRegistrationTest.php" tests="1" assertions="38" errors="0" failures="0" skipped="0" time="54.214894">
+        <testcase name="test_registered_http_uses_actual_smtp_proof_and_recovery_preserves_owner_but_invalidates_old_session" file="/workspace/VA-Studio-identity-registration-independent/tests/Feature/ProductionIdentityRegistrationTest.php" line="26" class="Tests\Feature\ProductionIdentityRegistrationTest" classname="Tests.Feature.ProductionIdentityRegistrationTest" assertions="38" time="54.214894"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

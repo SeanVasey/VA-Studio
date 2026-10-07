@@ -1,0 +1,709 @@
+{
+  "tested_executable": "e48e539c63ff9febe53248940fadf420cd330255",
+  "tested_tree": "3f9f9bd8b1c103846761a8c4f5a563b1416e32e4",
+  "docs_only_evidence_successor": "91b51fcbd1c5b2ef578df32fb3de709406886833",
+  "all_45_original_source_bindings": [
+    {
+      "path": "app/Console/Commands/ProcessProductionIdentityNotices.php",
+      "git_blob": "a1edbed5480e85674ba96a1484aa25f36d0fb0ef",
+      "sha256": "1d7cdcd3cd5facc769df0f69e0c87997cb7753f06cbe92837648e164da6dcdb7",
+      "current_git_blob": "a1edbed5480e85674ba96a1484aa25f36d0fb0ef",
+      "current_sha256": "1d7cdcd3cd5facc769df0f69e0c87997cb7753f06cbe92837648e164da6dcdb7",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/CurrentRows.php",
+      "git_blob": "eb357333f427bea8e124818564c6b083e7c75d31",
+      "sha256": "02421b3afb5911bab22bec749c3c691f45379aab4f48c3522831be051235e428",
+      "current_git_blob": "eb357333f427bea8e124818564c6b083e7c75d31",
+      "current_sha256": "02421b3afb5911bab22bec749c3c691f45379aab4f48c3522831be051235e428",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Domain/Customers/ProductionCustomerAccess.php",
+      "git_blob": "c922cc3dd6cc21dabf3316328680df6091331591",
+      "sha256": "4f013b5114b8b8ee8cd53d42277368a215861b8c48a07672fd2337e4fc483eb4",
+      "current_git_blob": "c922cc3dd6cc21dabf3316328680df6091331591",
+      "current_sha256": "4f013b5114b8b8ee8cd53d42277368a215861b8c48a07672fd2337e4fc483eb4",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Domain/Customers/ProductionCustomerPrincipal.php",
+      "git_blob": "abf7273087e9308a26df98759d695cb8788c8840",
+      "sha256": "ab0ddc7dcabb41fd8d003582c9a78814a90f5cd4fa80be4bc2c5208192306b0c",
+      "current_git_blob": "abf7273087e9308a26df98759d695cb8788c8840",
+      "current_sha256": "ab0ddc7dcabb41fd8d003582c9a78814a90f5cd4fa80be4bc2c5208192306b0c",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/CompleteIdentity.php",
+      "git_blob": "b8e35a04fe164affd445ee401eaff2b606432039",
+      "sha256": "b8820fa80d7ab8bf588d443dfdf31dc80617e289b54c3116a8b3a8f685cf8546",
+      "current_git_blob": "b8e35a04fe164affd445ee401eaff2b606432039",
+      "current_sha256": "b8820fa80d7ab8bf588d443dfdf31dc80617e289b54c3116a8b3a8f685cf8546",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityDatabase.php",
+      "git_blob": "15bee82c4a0f655970e70b7dc56d34169153d598",
+      "sha256": "03a9411dc14cf1883226ae552a3333c74a349a8d5c6a6fea588a9544d5dfc732",
+      "current_git_blob": "15bee82c4a0f655970e70b7dc56d34169153d598",
+      "current_sha256": "03a9411dc14cf1883226ae552a3333c74a349a8d5c6a6fea588a9544d5dfc732",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityEvidence.php",
+      "git_blob": "88850d925ec4d163b3368481942203f7ac938592",
+      "sha256": "23f855f53a01e5df3a4dab630e9fc8e2d513f23bf56de391f2380d41d29ee9a8",
+      "current_git_blob": "88850d925ec4d163b3368481942203f7ac938592",
+      "current_sha256": "23f855f53a01e5df3a4dab630e9fc8e2d513f23bf56de391f2380d41d29ee9a8",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityException.php",
+      "git_blob": "7d0cc1adebf3237f6949a3c3a01e7b75e5ee61c9",
+      "sha256": "91259fe2f5e59549b8f385edc2194b51ea70266fbe2a8992fce3615696661563",
+      "current_git_blob": "7d0cc1adebf3237f6949a3c3a01e7b75e5ee61c9",
+      "current_sha256": "91259fe2f5e59549b8f385edc2194b51ea70266fbe2a8992fce3615696661563",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php",
+      "git_blob": "7515ddbae114b41948c9c5d05e4cf2b5bda7d0f2",
+      "sha256": "c294948fc459e9f202fcd1194e3ae5cc2a3e9a0b4500e8359d54613f27e675f1",
+      "current_git_blob": "193215351accc8f6d053a1bb2257e0de6e6d58dc",
+      "current_sha256": "6058e3e4ced2900e1ccc93bd9110691c041ad0c4ecafe2f0373d323ceb17cb90",
+      "changed_from_4b": true
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityPolicy.php",
+      "git_blob": "00d1d575b626b9dbadac71a99860d28c1cf3e959",
+      "sha256": "445a001b81c7125b4c87188a3515406424ce2d89bb97cb3d3edc02f1dc12298f",
+      "current_git_blob": "00d1d575b626b9dbadac71a99860d28c1cf3e959",
+      "current_sha256": "445a001b81c7125b4c87188a3515406424ce2d89bb97cb3d3edc02f1dc12298f",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityRequests.php",
+      "git_blob": "6398ff07cdb72cc5467fbe078019480a6408d5a5",
+      "sha256": "5b4b0a0b90b252589794de84f34d44a12a9c9cdf39613521a13cffcedcae9dc9",
+      "current_git_blob": "6398ff07cdb72cc5467fbe078019480a6408d5a5",
+      "current_sha256": "5b4b0a0b90b252589794de84f34d44a12a9c9cdf39613521a13cffcedcae9dc9",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityRows.php",
+      "git_blob": "a9b7cba29c07d879020d3affe910e66aca5efe91",
+      "sha256": "deb303101abe98ca505c43e34ab49cc636b56fed42e5b808044380108fdb42bd",
+      "current_git_blob": "a9b7cba29c07d879020d3affe910e66aca5efe91",
+      "current_sha256": "deb303101abe98ca505c43e34ab49cc636b56fed42e5b808044380108fdb42bd",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentitySchema.php",
+      "git_blob": "55f4ef40660051ef924018b013fc173bfb6f9ccc",
+      "sha256": "6ca4d4ca4260e13b8a26752ebd8466f3c3edd7047c9ddc71004e45f242e619dc",
+      "current_git_blob": "55f4ef40660051ef924018b013fc173bfb6f9ccc",
+      "current_sha256": "6ca4d4ca4260e13b8a26752ebd8466f3c3edd7047c9ddc71004e45f242e619dc",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/DefinitelyNotSubmitted.php",
+      "git_blob": "3acd5f0237eda2db881b18e50fe440dca1644734",
+      "sha256": "042cb2c999c0b275083ad0df6dba31a19a682dafcc666911eafaebd554089ee4",
+      "current_git_blob": "3acd5f0237eda2db881b18e50fe440dca1644734",
+      "current_sha256": "042cb2c999c0b275083ad0df6dba31a19a682dafcc666911eafaebd554089ee4",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentityAcceptance.php",
+      "git_blob": "53900b095aa873af42dbede4bf1b2af96dba684a",
+      "sha256": "65d588591c45e30b6511f2c3a175418f90df0df97f60391199a97823a6b1d30a",
+      "current_git_blob": "53900b095aa873af42dbede4bf1b2af96dba684a",
+      "current_sha256": "65d588591c45e30b6511f2c3a175418f90df0df97f60391199a97823a6b1d30a",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentityMail.php",
+      "git_blob": "5661025016b847a00de0bbe9e6b0a2afbdcf7a9f",
+      "sha256": "7c2aae31553bf34f9ea33f57fa350976e1ab91e93e9333061504c3f9b488b715",
+      "current_git_blob": "5661025016b847a00de0bbe9e6b0a2afbdcf7a9f",
+      "current_sha256": "7c2aae31553bf34f9ea33f57fa350976e1ab91e93e9333061504c3f9b488b715",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentityNoticeTransport.php",
+      "git_blob": "4c504ac765267916cfb1527ea701677f83d7b64d",
+      "sha256": "9877286016507f010adcd7b3bae0d95071fb2fdf91a519d5df74b4f3424ba3e1",
+      "current_git_blob": "4c504ac765267916cfb1527ea701677f83d7b64d",
+      "current_sha256": "9877286016507f010adcd7b3bae0d95071fb2fdf91a519d5df74b4f3424ba3e1",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/LoopbackSmtp.php",
+      "git_blob": "298f922517c4ef7f3c2a254cb1159ff7fb4c8d30",
+      "sha256": "8569b270d19b981334ee506db4046c74bf2d80b143712506adbea6307b38c682",
+      "current_git_blob": "298f922517c4ef7f3c2a254cb1159ff7fb4c8d30",
+      "current_sha256": "8569b270d19b981334ee506db4046c74bf2d80b143712506adbea6307b38c682",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/WorkIdentityNotice.php",
+      "git_blob": "63f49f136dc5bb29d762c79f39d6b888bf3eef50",
+      "sha256": "bc32bdaba43bf9ad0956121da38820eb9adf5da5f421ba160140f0606d224c93",
+      "current_git_blob": "63f49f136dc5bb29d762c79f39d6b888bf3eef50",
+      "current_sha256": "bc32bdaba43bf9ad0956121da38820eb9adf5da5f421ba160140f0606d224c93",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/ProductionCustomerSessions.php",
+      "git_blob": "e2ee7dc46eb6d5e8f1afde877f2751aa9096c14c",
+      "sha256": "73efe65ab06626178fc1aa6ecd6ff426b30a04d58acd68b164acaa31c9a5d1d6",
+      "current_git_blob": "e2ee7dc46eb6d5e8f1afde877f2751aa9096c14c",
+      "current_sha256": "73efe65ab06626178fc1aa6ecd6ff426b30a04d58acd68b164acaa31c9a5d1d6",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Http/Controllers/ProductionIdentity/CustomerIdentityController.php",
+      "git_blob": "f48c80440eb3e4310dfc0c6256921c6da03a9f90",
+      "sha256": "5c260d6ef4edbe9e72065cb4e9379375239ba706c7a4a71eb322d7d6c965eb37",
+      "current_git_blob": "f48c80440eb3e4310dfc0c6256921c6da03a9f90",
+      "current_sha256": "5c260d6ef4edbe9e72065cb4e9379375239ba706c7a4a71eb322d7d6c965eb37",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Http/Controllers/PublicDiscoveryController.php",
+      "git_blob": "9b4945f8f86c16a05900471e8d1f54dcd5b7febd",
+      "sha256": "5e344be355cef201083cdf02d685cc13ad9f3cffdfbc6d4c6df0af26c9ce5f55",
+      "current_git_blob": "9b4945f8f86c16a05900471e8d1f54dcd5b7febd",
+      "current_sha256": "5e344be355cef201083cdf02d685cc13ad9f3cffdfbc6d4c6df0af26c9ce5f55",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Http/Middleware/ProductionIdentity/IdentityPrivacy.php",
+      "git_blob": "76241e9afbc8eac92c4dbe247fa9da5cb2e652fc",
+      "sha256": "4c4d7a232282d9edd621ffff6b129b53468a8263e84d853b0077e4766bc307f6",
+      "current_git_blob": "76241e9afbc8eac92c4dbe247fa9da5cb2e652fc",
+      "current_sha256": "4c4d7a232282d9edd621ffff6b129b53468a8263e84d853b0077e4766bc307f6",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Http/Requests/ProductionIdentity/IdentityBody.php",
+      "git_blob": "fcbe2dbf31edc11d3ac1b4983054d2bc233a2223",
+      "sha256": "09c14e6ccd9edf02d413cdad03238b5d82dbf704a22fb8bbb0638f81846575e1",
+      "current_git_blob": "fcbe2dbf31edc11d3ac1b4983054d2bc233a2223",
+      "current_sha256": "09c14e6ccd9edf02d413cdad03238b5d82dbf704a22fb8bbb0638f81846575e1",
+      "changed_from_4b": false
+    },
+    {
+      "path": "app/Jobs/DeliverProductionIdentityNotice.php",
+      "git_blob": "b57f6eb902104974b858fc4f044988163ca8ef02",
+      "sha256": "061de336297e398ded168dad925457b69dbf4c05242bde6f9591e7837280e539",
+      "current_git_blob": "b57f6eb902104974b858fc4f044988163ca8ef02",
+      "current_sha256": "061de336297e398ded168dad925457b69dbf4c05242bde6f9591e7837280e539",
+      "changed_from_4b": false
+    },
+    {
+      "path": "bootstrap/app.php",
+      "git_blob": "23149997a0c043072ffe2ecfa506fe7b51c9213d",
+      "sha256": "98e7dd237b917c08cb23d2ca40021b01ca9adcb090f2eaebd051f61dac104a6e",
+      "current_git_blob": "23149997a0c043072ffe2ecfa506fe7b51c9213d",
+      "current_sha256": "98e7dd237b917c08cb23d2ca40021b01ca9adcb090f2eaebd051f61dac104a6e",
+      "changed_from_4b": false
+    },
+    {
+      "path": "config/production-customer-identity.php",
+      "git_blob": "5832ea430ca56a532abb5d1bae15a7c9df9078c4",
+      "sha256": "5e4bf0c3b2505a735c833a195e441d67913e71a62438f083a30c353f73c34188",
+      "current_git_blob": "5832ea430ca56a532abb5d1bae15a7c9df9078c4",
+      "current_sha256": "5e4bf0c3b2505a735c833a195e441d67913e71a62438f083a30c353f73c34188",
+      "changed_from_4b": false
+    },
+    {
+      "path": "database/migrations/2026_10_07_247000_production_customer_identity.php",
+      "git_blob": "f82b5334e2d582ea63f91674b835f43f5bd28815",
+      "sha256": "a2cfa089ea5452aec894f24f6779f5deee63fb3a2453fd6c12d4a5d8b1273166",
+      "current_git_blob": "f82b5334e2d582ea63f91674b835f43f5bd28815",
+      "current_sha256": "a2cfa089ea5452aec894f24f6779f5deee63fb3a2453fd6c12d4a5d8b1273166",
+      "changed_from_4b": false
+    },
+    {
+      "path": "resources/js/Pages/ProductionCustomerIdentity.tsx",
+      "git_blob": "47ef9453242bd3005955a061365c49079d307a8c",
+      "sha256": "52b5ce92536e539e457463fde5ebc4b7087e6b8596d0a9cf81b44ee42b839c28",
+      "current_git_blob": "47ef9453242bd3005955a061365c49079d307a8c",
+      "current_sha256": "52b5ce92536e539e457463fde5ebc4b7087e6b8596d0a9cf81b44ee42b839c28",
+      "changed_from_4b": false
+    },
+    {
+      "path": "resources/js/app.tsx",
+      "git_blob": "e29d138382dfd84cc0c0eca22a3fc77ee2a21635",
+      "sha256": "cf826c343865eb2bfba5b94a972d59357da2a7a06619f9eadcc16d3dbae1e02f",
+      "current_git_blob": "e29d138382dfd84cc0c0eca22a3fc77ee2a21635",
+      "current_sha256": "cf826c343865eb2bfba5b94a972d59357da2a7a06619f9eadcc16d3dbae1e02f",
+      "changed_from_4b": false
+    },
+    {
+      "path": "resources/js/lib/production-customer-identity.ts",
+      "git_blob": "51328605b458cf534245f317193300bfbbacc2c4",
+      "sha256": "76e725ca9709e78b96989e667686563e2f1040c579a2cac6b70d389ad7942a65",
+      "current_git_blob": "51328605b458cf534245f317193300bfbbacc2c4",
+      "current_sha256": "76e725ca9709e78b96989e667686563e2f1040c579a2cac6b70d389ad7942a65",
+      "changed_from_4b": false
+    },
+    {
+      "path": "routes/production-customer-identity.php",
+      "git_blob": "e0e1c8fe62ee26f0d7b94ab635e9d56d8e049518",
+      "sha256": "2f9b3f7f03d50a3c8930f52a6d8187e533ead4d1c0acb1c156b2c8c161abca43",
+      "current_git_blob": "e0e1c8fe62ee26f0d7b94ab635e9d56d8e049518",
+      "current_sha256": "2f9b3f7f03d50a3c8930f52a6d8187e533ead4d1c0acb1c156b2c8c161abca43",
+      "changed_from_4b": false
+    },
+    {
+      "path": "routes/web.php",
+      "git_blob": "f6a6431e32814aa99421443136cd836662f6812e",
+      "sha256": "f486df21f6bc2511a487967a796b550930c9acb80bb29a5ca532cc76dee90cfb",
+      "current_git_blob": "f6a6431e32814aa99421443136cd836662f6812e",
+      "current_sha256": "f486df21f6bc2511a487967a796b550930c9acb80bb29a5ca532cc76dee90cfb",
+      "changed_from_4b": false
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityHttpTest.php",
+      "git_blob": "feefa1e63a5553723f3d83813e001159ad8fdee6",
+      "sha256": "db494d78a1710827df7c8dd407771c14dfa699e6224353d0f89e38973e07006c",
+      "current_git_blob": "feefa1e63a5553723f3d83813e001159ad8fdee6",
+      "current_sha256": "db494d78a1710827df7c8dd407771c14dfa699e6224353d0f89e38973e07006c",
+      "changed_from_4b": false
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityJourneyTest.php",
+      "git_blob": "0771d846f66f99e09a24806851b005ceba788360",
+      "sha256": "72bc446efba9065be3d3b4ddc2725516449b54a53752aa59329a82d1df36e4bc",
+      "current_git_blob": "0771d846f66f99e09a24806851b005ceba788360",
+      "current_sha256": "72bc446efba9065be3d3b4ddc2725516449b54a53752aa59329a82d1df36e4bc",
+      "changed_from_4b": false
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityMigrationTest.php",
+      "git_blob": "ce95a30e5d2dd51749e1de356e3fd1596a4819f9",
+      "sha256": "7a7997f60d985e5d303b3bf58128d5fd00ff476a4873897337f196c4b67c0098",
+      "current_git_blob": "ce95a30e5d2dd51749e1de356e3fd1596a4819f9",
+      "current_sha256": "7a7997f60d985e5d303b3bf58128d5fd00ff476a4873897337f196c4b67c0098",
+      "changed_from_4b": false
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityNativeRaceTest.php",
+      "git_blob": "6fe9cbeb99c5747a727ed8350d52d25831e43962",
+      "sha256": "602c72b951f3a8464e610338274d1b0698325e2be26843a29cfa84199053372f",
+      "current_git_blob": "6fe9cbeb99c5747a727ed8350d52d25831e43962",
+      "current_sha256": "602c72b951f3a8464e610338274d1b0698325e2be26843a29cfa84199053372f",
+      "changed_from_4b": false
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityNoticeTest.php",
+      "git_blob": "6575474d73a734edbbb476b63f9f01934c76e152",
+      "sha256": "7167840fc7eb738b5ccd6397d877542d0246c41af67e5d205d341a87299d2fc8",
+      "current_git_blob": "6575474d73a734edbbb476b63f9f01934c76e152",
+      "current_sha256": "7167840fc7eb738b5ccd6397d877542d0246c41af67e5d205d341a87299d2fc8",
+      "changed_from_4b": false
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityRuntimeTest.php",
+      "git_blob": "97230fd61d225833144d4135ad5714e1e4a7f9c9",
+      "sha256": "b1ab853981c69c12209b551991b1a9df7171f68f3ded9701aab574ac6f40b995",
+      "current_git_blob": "97230fd61d225833144d4135ad5714e1e4a7f9c9",
+      "current_sha256": "b1ab853981c69c12209b551991b1a9df7171f68f3ded9701aab574ac6f40b995",
+      "changed_from_4b": false
+    },
+    {
+      "path": "tests/Feature/ProductionIdentityRegistrationTest.php",
+      "git_blob": "ab958ec0ede0b80620a736863df20cb50aa16634",
+      "sha256": "1773d77cbdf06ac2d806b6b5abff9002b96e7df2f81e7f3a96d77cfb1eb62364",
+      "current_git_blob": "ab958ec0ede0b80620a736863df20cb50aa16634",
+      "current_sha256": "1773d77cbdf06ac2d806b6b5abff9002b96e7df2f81e7f3a96d77cfb1eb62364",
+      "changed_from_4b": false
+    },
+    {
+      "path": "tests/Support/ProductionIdentityFixture.php",
+      "git_blob": "1ab9e07719ae248173ac5c766dbc4257a62076ab",
+      "sha256": "558b6269d305b7b213e4b8c102c7e9e117dfb8cce30c4c76a7520482609391b7",
+      "current_git_blob": "1ab9e07719ae248173ac5c766dbc4257a62076ab",
+      "current_sha256": "558b6269d305b7b213e4b8c102c7e9e117dfb8cce30c4c76a7520482609391b7",
+      "changed_from_4b": false
+    },
+    {
+      "path": "tests/Support/production-identity-race-worker.php",
+      "git_blob": "b7432df17d7243786ea605fb7217f992d6a96392",
+      "sha256": "67a526ef790be061f0661d58a8b19a0069e3a3972d74d591df0c80dfe2cd1a33",
+      "current_git_blob": "b7432df17d7243786ea605fb7217f992d6a96392",
+      "current_sha256": "67a526ef790be061f0661d58a8b19a0069e3a3972d74d591df0c80dfe2cd1a33",
+      "changed_from_4b": false
+    },
+    {
+      "path": "tests/Support/production_identity_smtp_sink.py",
+      "git_blob": "ad852c9ddfc2b039306abf7cd5c9be61a997a647",
+      "sha256": "d0291a72f85013c9ae994dd4a391404645c6e6e535961339a539b44ae9fd44c6",
+      "current_git_blob": "ad852c9ddfc2b039306abf7cd5c9be61a997a647",
+      "current_sha256": "d0291a72f85013c9ae994dd4a391404645c6e6e535961339a539b44ae9fd44c6",
+      "changed_from_4b": false
+    },
+    {
+      "path": "tests/frontend/production-customer-identity.test.tsx",
+      "git_blob": "afd87830179614d0bd8bc997f9458edccecea697",
+      "sha256": "f04717fb863642fbf2605e6aeb6fe0cc4ea41821b02d506b571c9212bcb84074",
+      "current_git_blob": "afd87830179614d0bd8bc997f9458edccecea697",
+      "current_sha256": "f04717fb863642fbf2605e6aeb6fe0cc4ea41821b02d506b571c9212bcb84074",
+      "changed_from_4b": false
+    },
+    {
+      "path": "tests/frontend/production-identity-registration.test.tsx",
+      "git_blob": "3764d5fa2ce771bcb93911a643c26397a86d619c",
+      "sha256": "b1856e9c1993d790128cf00dced3e036dae9abafaa93646607848b2f11068a74",
+      "current_git_blob": "3764d5fa2ce771bcb93911a643c26397a86d619c",
+      "current_sha256": "b1856e9c1993d790128cf00dced3e036dae9abafaa93646607848b2f11068a74",
+      "changed_from_4b": false
+    }
+  ],
+  "changed_bindings": [
+    "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php"
+  ],
+  "narrow_floor_changed_paths": [
+    "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php",
+    "tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php"
+  ],
+  "author_floor_artifacts_verified": [
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/final-sqlite.xml",
+      "sha256": "449bfb9fc657d17ecbad5c10fb852cc3701b30a17d78e33cd926fe1d190061c6",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/final-native.txt",
+      "sha256": "31947318d8f281fbf401462755670ecc7e880b1a9ba5b803afed5f2e2974643d",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/unchanged-sqlite-snapshot.json",
+      "sha256": "5d8233374950d2182ccb4196aab4d42503575ec5ad2b1c84892f92a08fab013b",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/unchanged-runtime.txt",
+      "sha256": "39a9a41a62d49f12febe7a90f9531136ec14b0f4ce6f4cdae4fc0acc74f396cd",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/unchanged-native.txt",
+      "sha256": "8ca2206faa629340aceeb31171fd3820f197094be2f3a3eba2c7209a739c3924",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/unchanged-runtime.xml",
+      "sha256": "65faa52e1a093507b9faa8f89ed5d6a7b9cf68aee6af46850ee2225c201d95ad",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/unchanged-sqlite.xml",
+      "sha256": "04bcf5e0bde231dd8068b253f20e921d5388852207f1a43b0846772f150f049c",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/unchanged-native.xml",
+      "sha256": "b2161af7793283179785c0f6ce792f19a7c580a8d5626aa85c58df759f8cb5d6",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/final-native.xml",
+      "sha256": "83e6675caafea5439050d4dd93397cae59f4387da64481476152a141bd6463c8",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/source-map.json",
+      "sha256": "2728b84f4d8ef9721348accf3f834c3ebafcadc555e50d8b4ffb4e7be771c218",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/unchanged-native-snapshot.json",
+      "sha256": "017b46ed7ce6eaa11da93b57da3df3acacda94ec0c675e22ce9b7b66ac6b96c1",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/unchanged-sqlite.txt",
+      "sha256": "51c2a0a544d405a8d44c44813d398b4646e314dcd83ca4513563f12b629430d9",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/final-sqlite.txt",
+      "sha256": "f14f3eeedbbf5fefba25f1c1fdb1a4df9057b206da889ce6ed41f75920abb668",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/probes/IdentityNativeDependencyAdmissionCanaryTest.php",
+      "sha256": "4ad5a40000a13a65716bbfa26bb53e1062eaca280605e3e2c03386c188463b23",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/probes/IdentityDependencyAdmissionCanaryTest.php",
+      "sha256": "161571fc869801381a5905b30a30901c0fd6d798e87e1d59f182bb5aeb63b4d6",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/historical-4b/dependency-admission-red-junit.xml",
+      "sha256": "25abc86204dda2591d434e0f778b3d28b1f8347562e207626ea845c39d39fe8b",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/historical-4b/dependency-admission-red.txt",
+      "sha256": "3a44727e558c5b2b2cea1b57c96b3815923298503538de763f6980d29a3b68f5",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/historical-4b/native-dependency-admission-snapshot.json",
+      "sha256": "a6f20817d5ec4a982c015941dc87f573ccb45876edd18364a0776742aebc8172",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/historical-4b/native-dependency-admission-red-junit.xml",
+      "sha256": "7c7b4632d849e8928674c904a152399ccbc805169c8107113c79c379d0a1ecea",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/historical-4b/native-dependency-admission-red.txt",
+      "sha256": "c90fd326a6fbb0740e632aba078313c6e6668c0580770fc85f28812e05fa3865",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/historical-4b/dependency-admission-snapshot.json",
+      "sha256": "9064ac569d0567f4ab8dc82fa2f8826ffec46ac4c3e96838f5886a5f45584d48",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    },
+    {
+      "path": "docs/verification/production-identity-dependency-floor-20261007/development/native-test-fixture-error.xml",
+      "sha256": "c3365e8adcc8892f16c870a134bcbe666ca3650cc0c17094730da12c1f852a65",
+      "evidence_commit": "91b51fcbd1c5b2ef578df32fb3de709406886833"
+    }
+  ],
+  "author_floor_checks_verified": {
+    "final-native": {
+      "tests": 22,
+      "assertions": 97,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "source": "3c2158e726a3bd3fdd57597adcb5756c49dff2ce"
+    },
+    "final-sqlite": {
+      "tests": 22,
+      "assertions": 115,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "source": "3c2158e726a3bd3fdd57597adcb5756c49dff2ce"
+    },
+    "unchanged-sqlite": {
+      "tests": 1,
+      "assertions": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "source": "3c2158e726a3bd3fdd57597adcb5756c49dff2ce"
+    },
+    "unchanged-native": {
+      "tests": 1,
+      "assertions": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "source": "3c2158e726a3bd3fdd57597adcb5756c49dff2ce"
+    },
+    "unchanged-runtime": {
+      "tests": 2,
+      "assertions": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "source": "3c2158e726a3bd3fdd57597adcb5756c49dff2ce"
+    }
+  },
+  "original_26_artifacts_verified": [
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/IdentityDependencyAdmissionCanaryTest.php",
+      "sha256": "161571fc869801381a5905b30a30901c0fd6d798e87e1d59f182bb5aeb63b4d6",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/IdentityNativeDependencyAdmissionCanaryTest.php",
+      "sha256": "4ad5a40000a13a65716bbfa26bb53e1062eaca280605e3e2c03386c188463b23",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/blocked-receipt.json",
+      "sha256": "5940a90066ac7b070f0317a06d6ce705746a421c9d005d7ad6418e05a34bfef5",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/canary-pint.txt",
+      "sha256": "541d85d43f3da09966440a4011ae98ae754304cf123aa467818382cf0ab64173",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/commands.json",
+      "sha256": "3a21e514806a5ca2a36ea4178a95d401f5a611d1a30ca2b31e5256dec6291ece",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/dependency-admission-red-junit.xml",
+      "sha256": "25abc86204dda2591d434e0f778b3d28b1f8347562e207626ea845c39d39fe8b",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/dependency-admission-red.txt",
+      "sha256": "3a44727e558c5b2b2cea1b57c96b3815923298503538de763f6980d29a3b68f5",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/dependency-admission-snapshot.json",
+      "sha256": "9064ac569d0567f4ab8dc82fa2f8826ffec46ac4c3e96838f5886a5f45584d48",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/final-frontend-junit.xml",
+      "sha256": "21ee88f2d04b98f9ff94a028ab84b1021df8e5a2f50918e508692df2a568a82b",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/final-frontend.txt",
+      "sha256": "8201bf91a69b689c2179a25d46f1a98a4a9161f26d3b41d76296df0d7bbe0299",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/final-native-registered-junit.xml",
+      "sha256": "36501b9f9395b89256ec3c3ab252b805e4b70cb3cdfdf9acea59761f4431871c",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/final-native-registered.txt",
+      "sha256": "3ade90057e2e0f3abd9293aecebc8577dee8e24b9082bb5e2e51c71f96168cb0",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/final-sqlite-http-junit.xml",
+      "sha256": "9219f2f99dc6e2ee273d19381665f9f2b56c43f81fff16d71c28673f0aeccf77",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/final-sqlite-http.txt",
+      "sha256": "0d8cd6a3d797dbe0316df7679e30f1048729aee88d60a0384f36162c2693ed46",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/native-dependency-admission-red-junit.xml",
+      "sha256": "7c7b4632d849e8928674c904a152399ccbc805169c8107113c79c379d0a1ecea",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/native-dependency-admission-red.txt",
+      "sha256": "c90fd326a6fbb0740e632aba078313c6e6668c0580770fc85f28812e05fa3865",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/native-dependency-admission-snapshot.json",
+      "sha256": "a6f20817d5ec4a982c015941dc87f573ccb45876edd18364a0776742aebc8172",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/native-registered-selection.xml",
+      "sha256": "07ea1bb9372ad290930e9de7f1b0c6784fa0a849877824b967d8c03c73a2c54d",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/own-autoload.txt",
+      "sha256": "11b7ad6d0e3a9c59266d0b0506ac947dd3d033d520818c58f53196ace77b9145",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/preparation-old-checkout-final-frontend-junit.xml",
+      "sha256": "c69b982f670eb4c8fc14173779c7451afcfba7633ebeb9d60d55cee7baf2562c",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/preparation-old-checkout-final-frontend.txt",
+      "sha256": "0d60d72536ff3cd7d9960b5b98ddbd3a91e054da90cb1a9e910d5b47ef72d48a",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/preparation-old-checkout-final-native-registered.txt",
+      "sha256": "b7f1f9f98a90ad2e9c855b6eddaeba8f9c3eb07520a3412f2df67c930920844f",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/preparation-old-checkout-final-sqlite-http.txt",
+      "sha256": "e9facf9fe9aa44e0c975069b6fd36f3ae84c82c196b19d6c6173a759b6d101fa",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/preparation-old-checkout-own-autoload.txt",
+      "sha256": "2ce351bb5890a7f6762e6b3f959420fd6bdf8880555ac5770498136b9e3360ae",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/source-evidence-reconciliation.json",
+      "sha256": "8316a49bd117d53d7cd5c1951b981eb7d0b877237356a6cccecfaabc6446c20c",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    },
+    {
+      "path": "docs/verification/cloud-identity-independent-20261007/sqlite-http-selection.xml",
+      "sha256": "0aa0aefa637c1c88c280134a61b2a0947e2cac792dc30eb4a4b49cb9b76016ae",
+      "evidence_commit": "e48e539c63ff9febe53248940fadf420cd330255"
+    }
+  ],
+  "locked_php_package_identities_verified": 158,
+  "all_runtime_changes_e48_to_91": [],
+  "author_floor_source_bindings_exact_current": [
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php",
+      "git_blob": "193215351accc8f6d053a1bb2257e0de6e6d58dc",
+      "sha256": "6058e3e4ced2900e1ccc93bd9110691c041ad0c4ecafe2f0373d323ceb17cb90",
+      "changed_in_repair": true
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php",
+      "git_blob": "75947ba8a625fcbdf9df0f63de13f568d9e4dc59",
+      "sha256": "a2a1d7608e9c47d07c9456b8828a0c83141b4a7f078e7e3b01019598d285e0d0",
+      "changed_in_repair": true
+    },
+    {
+      "path": "database/migrations/2026_10_07_247000_production_customer_identity.php",
+      "git_blob": "f82b5334e2d582ea63f91674b835f43f5bd28815",
+      "sha256": "a2cfa089ea5452aec894f24f6779f5deee63fb3a2453fd6c12d4a5d8b1273166",
+      "changed_in_repair": false
+    }
+  ],
+  "locked_graph_bindings": [
+    {
+      "path": "composer.json",
+      "sha256": "132cb2a16c6ce2960d059cfddecae8e1accf6138a258dd8bab2c0c7b822f5607",
+      "unchanged_from_4b": true
+    },
+    {
+      "path": "composer.lock",
+      "sha256": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9",
+      "unchanged_from_4b": true
+    },
+    {
+      "path": "package.json",
+      "sha256": "65db43e1b171566d2d89e075bc4a29af75a82a6782a3313751bb4d7e832a7ae0",
+      "unchanged_from_4b": true
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "6407d3a63e3b6e04f5824f53c41b8dc8a33581f987b21d780c795480122f93ea",
+      "unchanged_from_4b": true
+    }
+  ]
+}

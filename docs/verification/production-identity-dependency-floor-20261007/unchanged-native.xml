@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\IndependentIdentityRegistration\IdentityNativeDependencyAdmissionCanaryTest" file="/workspace/VA-Studio-production-identity/docs/verification/production-identity-dependency-floor-20261007/probes/IdentityNativeDependencyAdmissionCanaryTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="10.426781">
+    <testcase name="test_missing_native_parent_columns_are_refused_before_owned_ddl" file="/workspace/VA-Studio-production-identity/docs/verification/production-identity-dependency-floor-20261007/probes/IdentityNativeDependencyAdmissionCanaryTest.php" line="15" class="Tests\IndependentIdentityRegistration\IdentityNativeDependencyAdmissionCanaryTest" classname="Tests.IndependentIdentityRegistration.IdentityNativeDependencyAdmissionCanaryTest" assertions="4" time="10.426781"/>
+  </testsuite>
+</testsuites>

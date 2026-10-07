@@ -7,7 +7,7 @@ or Mac execution was used. The current branch is
 
 ## Current recovery state
 
-Verified mainda70eba includes the immediate PR25/26/23 repairs and PRs27–30. Starting-state
+Verified main2cdd3da includes immediate PR25/26/23 repairs and PRs27–33. Starting-state
 sections below are historical. Current owned work and source receipts are in
 the newest milestone and current agent queue.
 
@@ -411,3 +411,35 @@ Consent independently approved d22 source is composed onto that main as e319; al
 Identity registration4b3 passed root15/182 and frontend14. Independent source review found actual247 installer accepts an incompatible users idTEXT-only table; the original1failure/3assertions is retained and approval withheld pending narrow owned repair. Reviewer shared16/187/nativeSMTP journey1/38 are green component checks. New default-off configured TLS SMTP/account adaptersd9b3937 remain provisional and unbound.
 
 Attachment root registered six checks/247 assertions and mounted five pass; prior accidental getJson GET bodies, incomplete frontend Link mock and wrong default-off status expectations are retained as harness errors. Actual HTML pages allow same-origin UI assets; API/stream/error responses keep sandbox. Whole source/independent review remains pending. Checkout9f narrow successor repairs actual three admission/authority defects and awaits native/independent proof; freeebf remains provisional during retry/status correction. New paid252, suppression251 and discovery248 replacement continue. No user-content, credentials, external messages, money or deployment actions occurred.
+
+
+## Twelfth checkpoint — consent merged; identity floor approved
+
+PR32 expected head47278112e320d4054400249557738bdfd634f7d7 merged on October7 at09:20:52UTC as9f805b8e3cf92c73247c6da24045e96ed8857a99, treec8b6fe09e44e6fb12d05ad1bbb7326be8b6f1b2a, parents4150b858/47278112. Cheap preflight37599609975 passed; no protection/settings changes or production activation. Primary is fast-forwarded with its checkpoint ancestry intact.
+
+Identity's original SQLite/native incompatible-users admission failures are corrected by narrow3c. Exact registered e48e539c63ff9febe53248940fadf420cd330255 is independently approved in c669: unchanged original probes refuse before owned DDL with unchanged catalog; own SQLite10/52/native2/42 including actual registered SMTP recovery. Root24/230 and original1/4 pass. The original invocation missing synthetic key/network permission retains six harness errors. Separate TLS SMTP/account feature adapters and final acceptance remain unfinished.
+
+Attachment root781/93e retains actual three failing integration cases: final commit callback returns original bytes after withdrawal, noncontiguous guard repair and coexisting reserved table/trigger adoption. Owned249 successor and service committed-read598+8444 are composed under affected checks; original failures stay preserved. Service598 key rotation failed actual canary1/2; final8444 passes unchanged SQLite/native1/4. No attachment approval yet.
+
+Free245 retry/status and purpose isolation are independently approved at821/2b52, awaiting root registration/production identity. Discovery248 is a NEW replacement97d with bounded signed completeness, fresh eligibility and post-commit refusal: SQLite36/218 plus one precise native skip, native16/68, all five old snapshot method bodies exact. Root public registration/independent acceptance remain pending.
+
+Checkout f0 closes actual unlocked/reopened producer-source frames; SQLite123/613 plus seven precise native skips and unchanged original1/4 pass. Native affected proof/independent composition and supported provider automatic tax follow. Paid252 remains isolated new work. Production feature253 preserves legacy data, requires explicit owner-bound initialization and authentic immutable original history; new production suppression254 follows its distinct withdrawal lineage.
+
+Suppression251's default-off registered HTTP16/175 and mounted39/TypeScript pass. Independent actual native reserved foreign key on an unrelated table causes owned targets DDL before MySQL1826; original1failure/7assertions and catalog snapshot retained. Narrow before-DDL namespace repair is assigned, no approval or provider delivery claim. Native8.0.46 proof does not satisfy final8.4. No full hosted CI, real content, external mail, credentials, money, deployment or DNS action occurred. Continue the complete personal-store scope without another user continuation prompt.
+
+
+## Thirteenth checkpoint — identity merged; free registration approved; genuine held repairs
+
+PR33 expected head40150b20595d31704ac4fface6e467683ee5cd5e merged October7 at09:45:46UTC as2cdd3da12261d27479955722952123d3a21ecc49, treece979924bbaeccf96e97ce64be359ab120128827, parents9f805b8/40150b2. Cheap preflight37602399345 passed with actual scoped checks; completed automatic review had no findings. The original identity floor admission reds and independent c669 approval are retained. No configured production mail or full acceptance is claimed.
+
+Free245 root executablec59e739baa0e997a3bb08a1d6cb27fe271d32b32 (tree135a338efa1fe522caaadadeffd76ac0a4d62928) mounts actual private routes, current owner/CSRF/privacy handling, account link and random page scope/encrypted history. Root3/153, native registered1/99 and UI13/TypeScript/Pint pass. Independent e4fe6e9 passes5/191 and UI8/TypeScript/Pint; old50 mapped paths carry48 exact with only page-history/scope2 changed. cf20 changes only existing crawler fixture for current actual prefixes; composed public+registration26/256 passes. This default-off test-family development registration is approved for publication; NEW production identity/original lineage/terms/purpose/assets/fulfilment remains required and cannot adopt test originals.
+
+Attachment249 owned a858/598/8444 closes earlier three root failures, but independent review found five actual request-binding defects on registered3eb: provider-time owner replacement, manager user resolver, manager replacement, app key during resolution and default guard replacement. Original SQLite/native failures are retained. Root966f842c0d187435fe2da787c78ee80be8c79e29 fixes callback ordering and exact cached request/context identities; actual20/343 plus Pint pass. Independent native review is pending. A separate genuine native service receipt admits a permanent view replacing its event base table; original1/4 failure is preserved and producer-owned correction remains a publication blocker.
+
+Discovery248 rootbfb7bd0aeafa198415c94b720d116955373be934 passes27/171 and independent rootHTTP4/68. Actual registered middleware and response-factory callback failures are retained and corrected; production synthetic scanner correctly emits no track URLs. Independent native foreign reserved CHECK causes MySQL3822 after owned generations plus threeguards, actual1/4 red on97d/rootexactSchema. NEW Schema-only namespace correction is assigned; no schema or production completeness acceptance yet.
+
+Suppression251's unchanged actual reserved-FK probe passes1/9 after narrowaed; author current prefix/derived-key cases and original red are preserved. Root registeredHTTP16/175 and mounted39/TypeScript remain source-bound, composition/evidence freeze follows. Provider remains unbound/default off; no actual remote suppression effect occurred.
+
+Typed identity adapters101 close genuine committed and ordinary late lazy-PDO callbacks; exact final authorSQLite30/210 plus one named native skip, original2/8, nativeaffected4/35/original2/8/READ COMMITTED1/6 are green. Independent final review is pending. Checkoutf0 retained original actual callback defects; newb6f refuses lazy primary/uncached connection before invocation, source-owned exact checks continue before a NEW post-commit producer receipt. Paid252 schema and provisional consumer proofs are separate; full-order fulfilment, browser delivery and supported automatic-tax255/V2 remain unfinished. Production253 explicit owner-bound initialization and distinct withdrawal lineage continue, with NEW254 suppression child required.
+
+All six named workers remain on the full requested personal-store objective. Memberships, other product commerce/fulfilment, promotion/inventory, source migration, content and hosting preparation are implementation dependencies; six accepted/34open groups are unchanged, not progress percentages. Final MySQL8.4/native browser/consolidated exact-SHA Foundation verification is deferred until the integrated candidate. No full hosted CI, user content, external mail, credentials, money, production deployment, DNS or settings changes occurred.

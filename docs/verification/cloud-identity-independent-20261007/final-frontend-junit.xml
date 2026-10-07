@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="14" failures="0" errors="0" time="0.664124729">
+    <testsuite name="tests/frontend/production-customer-identity.test.tsx" timestamp="2026-10-07T09:12:15.492Z" hostname="4fe41ffd3696" tests="13" failures="0" errors="0" skipped="0" time="0.415118516">
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; clears fragments/query/history and consumes the proof once without storage or props" time="0.019968322">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; rejects malformed bearer " time="0.002913032">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; rejects malformed bearer #enroll.bad.proof" time="0.001269932">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; rejects malformed bearer #enroll.aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&amp;email=private" time="0.001305364">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; rejects malformed bearer #ENROLL.aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" time="0.001028068">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; retries identical request after uncertain response and accepts only the fixed minimal envelope" time="0.247927656">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; keeps completion proof out of rendered markup and sends it only in the fixed POST body" time="0.029299005">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; erases enroll private input and permanently closes the departed page even when fetch ignores abort" time="0.028117213">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; erases recover private input and permanently closes the departed page even when fetch ignores abort" time="0.026275902">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; erases sign-in private input and permanently closes the departed page even when fetch ignores abort" time="0.018740262">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; erases a completion attempt, refuses BFCache restoration and aborts on unmount" time="0.01835433">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; preserves a fresh completion link through React effect rehearsal and aborts real removal" time="0.016527938">
+        </testcase>
+        <testcase classname="tests/frontend/production-customer-identity.test.tsx" name="new account access privacy and replay &gt; rejects duplicate keys and arbitrary redirects in success envelopes and uses current CSRF cookie" time="0.001353355">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/frontend/production-identity-registration.test.tsx" timestamp="2026-10-07T09:12:15.499Z" hostname="4fe41ffd3696" tests="1" failures="0" errors="0" skipped="0" time="0.249006213">
+        <testcase classname="tests/frontend/production-identity-registration.test.tsx" name="erases completion credentials on page departure and ignores the pending acknowledgement" time="0.247656994">
+        </testcase>
+    </testsuite>
+</testsuites>

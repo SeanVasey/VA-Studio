@@ -4,6 +4,7 @@ use App\Http\Middleware\CustomerPrivacy;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\InquiryPrivacy;
 use App\Http\Middleware\PrivateTrackReviewPrivacy;
+use App\Http\Middleware\ProductionIdentity\IdentityPrivacy;
 use App\Http\Middleware\ResumableUploadPrivacy;
 use App\Http\Middleware\ServiceProjectPrivacy;
 use App\Http\Middleware\SitePreviewPrivacy;
@@ -44,14 +45,24 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(ResumableUploadPrivacy::class);
         $middleware->prepend(CustomerPrivacy::class);
         $middleware->prepend(ServiceProjectPrivacy::class);
+        $middleware->prepend(IdentityPrivacy::class);
         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
         $middleware->web(append: [HandleInertiaRequests::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation', 'proof', 'requestKey']);
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => ((CustomerPrivacy::matches($request) || ServiceProjectPrivacy::matches($request)) && $request->isMethod('POST')) || ResumableUploadPrivacy::endpoint($request) || $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
         );
         $exceptions->report(function (Throwable $exception) {
+            if (IdentityPrivacy::matches(request())) {
+                try {
+                    Log::error('Customer identity request failed.', ['exception_class' => $exception::class]);
+                } catch (Throwable) { /* Preserve the private response. */
+                }
+
+                return false;
+            }
             if (ServiceProjectPrivacy::matches(request())) {
                 try {
                     Log::error('Service project request failed.', ['exception_class' => $exception::class]);
@@ -139,6 +150,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // Middleware failures occur before the controller. Keep those private and
         // generic too, including in debug mode, without changing other routes.
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request): Response {
+            if (IdentityPrivacy::matches($request)) {
+                return $response->getStatusCode() >= 400 ? IdentityPrivacy::error($response->getStatusCode()) : IdentityPrivacy::protect($response);
+            }
             if (ServiceProjectPrivacy::matches($request)) {
                 return $response->getStatusCode() >= 400 ? ServiceProjectPrivacy::error($response->getStatusCode()) : ServiceProjectPrivacy::protect($response);
             }

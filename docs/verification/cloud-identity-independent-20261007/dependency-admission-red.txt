@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-identity-registration-independent/docs/verification/cloud-identity-independent-20261007/sqlite-http-selection.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:00.538, Memory: 75.00 MB
+
+There was 1 failure:
+
+1) Tests\IndependentIdentityRegistration\IdentityDependencyAdmissionCanaryTest::test_incompatible_actual_dependency_is_refused_before_owned_ddl
+Incompatible required users dependency must be refused before identity DDL.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-identity-registration-independent/docs/verification/cloud-identity-independent-20261007/IdentityDependencyAdmissionCanaryTest.php:35
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 3[0m[37;41m, Failures: 1[0m[37;41m.[0m

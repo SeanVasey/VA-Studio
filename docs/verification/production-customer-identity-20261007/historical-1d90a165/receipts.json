@@ -1,0 +1,86 @@
+{
+  "source_commit": "1d90a1658618d79e36519d57c75b77af8b48d74a",
+  "independent_review": "pending_root_exact_source_review",
+  "native_engine": "8.0.46-0ubuntu0.24.04.4 (Ubuntu)",
+  "native_environment": "isolated author MySQL; not hosted MySQL8.4 or CI",
+  "checks": [
+    {
+      "artifact": "final-native.xml",
+      "tests_recorded": 35,
+      "tests_executed": 35,
+      "assertions": 510,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "399d990c5252c678842dd79c4a56e2b933bc81c8bd92756c0696c981976173c2"
+    },
+    {
+      "artifact": "final-sqlite.xml",
+      "tests_recorded": 35,
+      "tests_executed": 28,
+      "assertions": 174,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 7,
+      "sha256": "8c0630757c9b283cf69ae1c3fc7b3c47b0d2b459fe539982d8bbc1c9b92879d4"
+    },
+    {
+      "artifact": "frontend.xml",
+      "tests_recorded": 8,
+      "tests_executed": 8,
+      "assertions": 0,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "793d0d0566caa620ebd5d9c0d8f11dca79bd62f4236e2f87237b27a863448e63"
+    }
+  ],
+  "sqlite_native_only_skips": [
+    {
+      "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityMigrationTest",
+      "method": "test_native_dictionary_unicode_guard_alias_on_foreign_table_is_refused",
+      "reason": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+      "method": "test_competing_completion_waits_on_exact_address_and_retains_one_verification with data set #0",
+      "reason": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+      "method": "test_competing_completion_waits_on_exact_address_and_retains_one_verification with data set #1",
+      "reason": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+      "method": "test_competing_completion_waits_on_exact_address_and_retains_one_verification with data set #2",
+      "reason": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+      "method": "test_competing_completion_waits_on_exact_address_and_retains_one_verification with data set #3",
+      "reason": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+      "method": "test_competing_workers_wait_on_exact_address_then_handoff_only_once",
+      "reason": ""
+    },
+    {
+      "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+      "method": "test_committed_credential_withdrawal_wins_exact_user_fence_before_recovery",
+      "reason": ""
+    }
+  ],
+  "artifacts": {
+    "final-native.txt": "b0347f651ad97dfe6cd1391194935f879b262c5296bf1daa8b5b5112014bcb50",
+    "final-native.xml": "399d990c5252c678842dd79c4a56e2b933bc81c8bd92756c0696c981976173c2",
+    "final-sqlite.txt": "cb487cb7057ee3fa1d9b8caa2d96a353adda1c790b7303c4a0ad666279d71dda",
+    "final-sqlite.xml": "8c0630757c9b283cf69ae1c3fc7b3c47b0d2b459fe539982d8bbc1c9b92879d4",
+    "frontend.txt": "0f74f4bdf6b833415d454843687cf859eb4f20fd88e06b1a17b6ac05aebd343e",
+    "frontend.xml": "793d0d0566caa620ebd5d9c0d8f11dca79bd62f4236e2f87237b27a863448e63",
+    "pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "source-map.json": "e11090f4f7addac05a5f992460e74ed408cc245e86aee581b79b6a3aeb402af6",
+    "typecheck.txt": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f"
+  }
+}

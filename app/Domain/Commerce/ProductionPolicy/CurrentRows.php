@@ -11,6 +11,16 @@ final class CurrentRows
 {
     public function __construct(private PDO $primary, private string $driver) {}
 
+    public function identityPrimary(): PDO
+    {
+        return $this->primary;
+    }
+
+    public function identityDriver(): string
+    {
+        return $this->driver;
+    }
+
     public function rows(string $table, string $where, array $bindings, ?int $limit = null): array
     {
         $sql = 'SELECT * FROM '.$table.' WHERE '.$where.' ORDER BY id'.($limit === null ? '' : ' LIMIT '.$limit)
