@@ -1,6 +1,10 @@
 # Completion execution plan
 
-## Current execution — October 6, 2026 UTC
+## Current cloud execution — October 7, 2026 UTC
+
+Verified main9f805b8 includes PRs25–32. The [current ownership/checkpoint](verification/cloud-primary-checkpoint-20261007.md) records approved identity247, held attachment249 integration, checkout246 held-frame/tax repair, approved free245 and discovery248, suppression251 native admission repair and new paid252/production feature253 work. The full personal-store objective continues through memberships, other product fulfillment, migration, content/payment/hosting preparation and one consolidated final exact-SHA Foundation run. Six accepted parent groups and34 open remain unchanged; focused development merges do not establish full acceptance.
+
+## Historical October6 execution
 
 Main `13d7474f` incorporates all product ancestry from PRs #7–#13 and the
 manual-only CI policy merged in PR #14 at `4abee918`. PR #13 is a completed,
