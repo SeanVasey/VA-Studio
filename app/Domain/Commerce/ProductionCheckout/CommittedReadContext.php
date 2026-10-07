@@ -15,6 +15,7 @@ use Pdo\Mysql;
 use Pdo\Sqlite;
 use PDOStatement;
 use ReflectionClass;
+use ReflectionProperty;
 
 /** Captured before source decryption; a receipt may compare this frame but cannot extend its budget. */
 final readonly class CommittedReadContext
@@ -69,8 +70,9 @@ final readonly class CommittedReadContext
 
     public function requireReceiptsEnabled(): void
     {
-        CheckoutException::require($this->configuration->get('production_checkout.committed_read_receipts_enabled') === true
-            && $this->configuration->get('production_checkout.committed_read_receipt_version') === 'production-checkout-committed-read-v1', 'unsupported');
+        $items = self::configurationItems($this->configuration);
+        CheckoutException::require(($items['production_checkout']['committed_read_receipts_enabled'] ?? null) === true
+            && ($items['production_checkout']['committed_read_receipt_version'] ?? null) === 'production-checkout-committed-read-v1', 'unsupported');
     }
 
     public function prove(CurrentRows $reader, int $depth): void
@@ -79,7 +81,7 @@ final readonly class CommittedReadContext
             && Container::getInstance() === $this->container && DB::getFacadeApplication() === $this->container
             && ($this->rawBindings)() === $this->originalBindings
             && self::configurationHash($this->configuration) === $this->configurationHash, 'committed_read_frame');
-        $name = $this->configuration->get('database.default');
+        $name = self::configurationItems($this->configuration)['database']['default'];
         $connection = $this->manager->getConnections()[$name] ?? null;
         $classes = $this->driver === 'mysql' ? [PDO::class, Mysql::class] : [PDO::class, Sqlite::class];
         CheckoutException::require($connection === $this->connection && $connection->getRawPdo() === $this->primary
@@ -103,8 +105,25 @@ final readonly class CommittedReadContext
 
     private static function configurationHash(Repository $configuration): string
     {
-        return CanonicalJson::hash($configuration->get(['database.default', 'app.key', 'app.previous_keys', 'app.cipher', 'app.env',
-            'production_checkout', 'production-customer-identity']));
+        $items = self::configurationItems($configuration);
+
+        return CanonicalJson::hash(['database.default' => $items['database']['default'], 'app.key' => $items['app']['key'],
+            'app.previous_keys' => $items['app']['previous_keys'] ?? null, 'app.cipher' => $items['app']['cipher'] ?? null,
+            'app.env' => $items['app']['env'] ?? null, 'production_checkout' => $items['production_checkout'],
+            'production-customer-identity' => $items['production-customer-identity']]);
+    }
+
+    private static function configurationItems(Repository $configuration): array
+    {
+        $items = (new ReflectionProperty(Repository::class, 'items'))->getValue($configuration);
+        CheckoutException::require(is_array($items), 'committed_read_frame');
+        foreach (['app', 'database', 'production_checkout', 'production-customer-identity'] as $parent) {
+            CheckoutException::require(is_array($items[$parent] ?? null), 'committed_read_frame');
+        }
+        CheckoutException::require(is_string($items['database']['default'] ?? null) && $items['database']['default'] !== ''
+            && is_string($items['app']['key'] ?? null) && $items['app']['key'] !== '', 'committed_read_frame');
+
+        return $items;
     }
 
     public function __debugInfo(): array
