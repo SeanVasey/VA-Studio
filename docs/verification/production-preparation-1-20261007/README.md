@@ -273,6 +273,12 @@ Codex's fourth pass (P2, docs): the mode check rejected sealed `0400` originals,
 `0400` for files and `0700` for directories (rehearsed: 0400 and 0600 accepted, 0644 and
 0666 refused, 0755 directory refused).
 
+Codex's fifth pass (P2 ×2, docs): `sha256sum --check --strict` rejects the empty manifest an
+empty private store now produces (the check is skipped for a zero-byte manifest; the exact
+name diff still proves the empty tree), and `! -name .gitignore` exempted a nested
+`.gitignore` (now `! -path ./.gitignore`, root only). Rehearsed: empty store passes; nested
+0644 `.gitignore` refused; root 0644 `.gitignore` still accepted.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings are accepted for merge and must be fixed or explicitly

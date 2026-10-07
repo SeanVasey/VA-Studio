@@ -86,14 +86,18 @@ mkdir -m 700 <RESTORE_PRIVATE_ROOT>
 tar --extract --file=<BACKUP_DIR>/private.tar --directory=<RESTORE_PRIVATE_ROOT> --no-same-owner
 
 # 4. Verify. The restored tree must hold exactly the manifest's files and nothing else.
-(cd <RESTORE_PRIVATE_ROOT> && sha256sum --check --strict <BACKUP_DIR>/private.sha256) || exit 1
+#    --strict rejects an empty manifest, so an empty private store is proven by the name diff alone.
+if [ -s <BACKUP_DIR>/private.sha256 ]; then
+  (cd <RESTORE_PRIVATE_ROOT> && sha256sum --check --strict <BACKUP_DIR>/private.sha256) || exit 1
+fi
 diff <(cd <RESTORE_PRIVATE_ROOT> && find . ! -type d | LC_ALL=C sort) \
      <(cut -c67- <BACKUP_DIR>/private.sha256 | LC_ALL=C sort)
 #    Hashes and names say nothing about modes: masters and contracts must stay owner-only.
 #    Owner-only means 0600, or 0400 for sealed originals (issued contracts, immutable media
-#    revisions and sound-kit originals are written as 0400). The tracked
-#    storage/app/private/.gitignore is the one 0644 file the checkout itself places there.
-(cd <RESTORE_PRIVATE_ROOT> && ! find . \( -type f ! -name .gitignore ! -perm 0600 ! -perm 0400 \) -o \( -type d ! -perm 0700 \) | grep -q .) \
+#    revisions and sound-kit originals are written as 0400). The tracked root
+#    storage/app/private/.gitignore is the one 0644 file the checkout itself places there;
+#    a .gitignore anywhere deeper is not exempt.
+(cd <RESTORE_PRIVATE_ROOT> && ! find . \( -type f ! -path ./.gitignore ! -perm 0600 ! -perm 0400 \) -o \( -type d ! -perm 0700 \) | grep -q .) \
   || { echo 'restored entry outside owner-only modes (0600/0400 files, 0700 directories)'; exit 1; }
 mysqldump --defaults-extra-file=<RESTORE_OPTION_FILE> --single-transaction --quick \
   --routines --triggers --events --hex-blob --no-tablespaces --set-gtid-purged=OFF \
