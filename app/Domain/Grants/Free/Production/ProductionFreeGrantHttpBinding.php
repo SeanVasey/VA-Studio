@@ -156,8 +156,9 @@ final class ProductionFreeGrantHttpBinding implements JsonSerializable
             // ArrayAccess parents can execute after the preceding fixed marker/actor proof.
             FreeGrantException::require(is_array($items[$parent] ?? []), 403);
         }
+        $environment = $instances['env'] ?? null;
         FreeGrantException::require(is_string($items['app']['key'] ?? null) && $items['app']['key'] !== ''
-            && is_string($instances['env'] ?? null) && $instances['env'] !== '', 403);
+            && ($environment === null || (is_string($environment) && $environment !== '')), 403);
 
         return ['key' => $items['app']['key'] ?? null, 'environment' => $instances['env'] ?? null,
             'auth' => $items['auth'] ?? null, 'identity' => $items['production-customer-identity'] ?? null,
