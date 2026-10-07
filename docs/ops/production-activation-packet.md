@@ -150,10 +150,15 @@ if [ -e <RELEASES_DIR>/current ]; then
   systemctl stop <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> || exit 1
   systemctl is-active --quiet <QUEUE_WORKER_SERVICE> && exit 1; systemctl is-active --quiet <SCHEDULER_SERVICE> && exit 1
 fi
-# Back up now (docs/ops/backup-restore-proof.md, MySQL procedure, steps 1-2 only): the host
-# is already quiesced, so skip that procedure's own `artisan down` and its resume step and
-# stay in maintenance with the services stopped through the migration and the switch, so no
-# request or job meets a partially migrated schema. The resume happens once, at the end.
+# Back up now and prove the backup restores before anything destructive runs
+# (docs/ops/backup-restore-proof.md, MySQL procedure, steps 1-4): the host is already
+# quiesced, so skip that procedure's own `artisan down` and its resume step and stay in
+# maintenance with the services stopped through the backup, its isolated restore proof, the
+# migration and the switch, so no request or job meets a partially migrated schema. The
+# restore proof (steps 3-4, into the isolated restore server and a fresh private directory)
+# must end in its final diff and checks passing before `migrate --force` below; a dump or
+# archive that only proves unrestorable after a failed migration is no backup. The resume
+# happens once, at the end.
 
 # Migrate from the new release; this checkout enters maintenance too, so the switch below
 # never exposes a release without a marker.
@@ -214,7 +219,14 @@ curl -fsS -o /dev/null https://<STAGING_ORIGIN>/ || { echo 'staging still unavai
    `systemctl is-active` reports them inactive: an in-flight media, contract, payment or
    scheduled-publication job must not write to the database or private storage while the
    restore runs (the backup procedure quiesces the same way).
-2. Restore the pre-migration backup into the **staging** schema only, and the paired private
+2. Restore the pre-migration backup into the **staging** schema only, after dropping and
+   recreating that schema: the dump is taken with `--databases` and without
+   `--add-drop-database`, and MySQL's default `--add-drop-table` drops only tables the dump
+   contains, so a table the failed migration created would survive a plain load while the
+   restored `migrations` table says the migration never ran. With writers stopped, run
+   `DROP DATABASE <STAGING_DATABASE>; CREATE DATABASE <STAGING_DATABASE>` (or restore into a
+   fresh isolated schema and switch the runtime to it), then load the dump with `|| exit 1`
+   and re-dump and diff it as the backup procedure's step 4 does. Restore the paired private
    archive with it: the backup captured database and private storage as one moment, and an
    upload, contract or media job that wrote the bind-mounted private root after the snapshot
    would otherwise leave the earlier database with a later tree (orphaned files, missing

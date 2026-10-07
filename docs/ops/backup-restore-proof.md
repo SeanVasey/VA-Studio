@@ -145,11 +145,15 @@ foreign=$(cd <RESTORE_PRIVATE_ROOT> && find . \( ! -user <APP_USER> -o ! -group 
 (cd <RESTORE_PRIVATE_ROOT> && { [ ! -e .gitignore ] || [ "$(stat -c %a .gitignore)" = 644 ]; }) \
   || { echo 'root .gitignore is not 0644'; exit 1; }
 #    The re-dump goes to a file first: in a pipeline only diff's status would be seen, so a
-#    mysqldump that fails after emitting acceptable output would pass.
+#    mysqldump that fails after emitting acceptable output would pass. It is a full copy of
+#    the restored production database, so it lives inside the operator-only <BACKUP_DIR>
+#    (0700), is created 0600 before anything is written to it, and is removed once compared.
+( umask 077; : > <BACKUP_DIR>/redump.sql ) && [ "$(stat -c %a <BACKUP_DIR>/redump.sql)" = 600 ] || exit 1
 mysqldump --defaults-extra-file=<RESTORE_OPTION_FILE> --single-transaction --quick \
   --routines --triggers --events --hex-blob --no-tablespaces --set-gtid-purged=OFF \
-  --skip-dump-date --skip-comments --databases <DATABASE> > <RESTORE_PRIVATE_ROOT>.redump.sql || exit 1
-diff <RESTORE_PRIVATE_ROOT>.redump.sql <BACKUP_DIR>/database.sql || exit 1
+  --skip-dump-date --skip-comments --databases <DATABASE> > <BACKUP_DIR>/redump.sql || exit 1
+diff <BACKUP_DIR>/redump.sql <BACKUP_DIR>/database.sql || exit 1
+rm -f <BACKUP_DIR>/redump.sql
 mysql --defaults-extra-file=<RESTORE_OPTION_FILE> -e 'CHECKSUM TABLE <DATABASE>.orders EXTENDED'  # repeat per table and compare with the source
 ```
 

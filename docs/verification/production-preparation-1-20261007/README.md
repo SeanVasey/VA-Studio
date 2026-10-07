@@ -413,6 +413,13 @@ into a 0700 sibling, verified entries moved in, device:inode unchanged, manifest
 through the previous release's bind mount) instead of swapping the directory object, which a
 bind mount would not follow.
 
+Codex's twentieth pass (P1 ×2, P2 ×1, docs): the verification re-dump is now created 0600
+inside the operator-only `<BACKUP_DIR>` under `umask 077` and removed after the diff; the S1
+upgrade requires the backup's isolated restore proof (steps 3-4) to pass before
+`migrate --force`, while writers stay quiesced; the S1 rollback drops and recreates the
+staging schema (the dump has no `--add-drop-database`) before loading the dump, then
+re-dumps and diffs it.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex
