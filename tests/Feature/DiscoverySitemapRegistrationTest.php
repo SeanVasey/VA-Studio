@@ -47,7 +47,7 @@ final class DiscoverySitemapRegistrationTest extends TestCase
         $this->get('/sitemap.xml')->assertOk()->assertSee('https://synthetic.example/site-pages-sitemap.xml', false)->assertDontSee('track-sitemaps', false);
         $this->get('/track-sitemaps/'.str_repeat('a', 32).'/1.xml')->assertNotFound();
         $route = Route::getRoutes()->getByName('discovery.tracks');
-        $this->assertSame(['throttle:120,1,public-discovery'], $route->gatherMiddleware());
+        $this->assertSame(['throttle:128,1,public-discovery-tracks'], $route->gatherMiddleware());
         $this->assertFalse(in_array('web', $route->gatherMiddleware(), true));
     }
 
@@ -77,6 +77,24 @@ final class DiscoverySitemapRegistrationTest extends TestCase
         $fixture['track']->update(['status' => 'draft']);
         $this->get('/track-sitemaps/'.$id.'/1.xml')->assertStatus(503)->assertDontSee('<url>', false);
         $this->get('/sitemap.xml')->assertStatus(503)->assertDontSee('<sitemap>', false);
+    }
+
+    public function test_complete_advertised_sitemap_family_fits_an_independent_bounded_track_budget(): void
+    {
+        $this->app->instance('env', 'production');
+        for ($request = 0; $request < 58; $request++) {
+            $this->get('/robots.txt')->assertOk();
+        }
+        $id = $this->publish();
+        $index = $this->get('/sitemap.xml')->assertOk();
+        $this->assertSame(129, substr_count($index->getContent(), '<sitemap>'));
+        $this->get('/site-pages-sitemap.xml')->assertOk();
+        for ($slot = 1; $slot <= 128; $slot++) {
+            $this->get('/track-sitemaps/'.$id.'/'.$slot.'.xml')->assertOk();
+        }
+        // The independent track family remains rate limited after its complete crawl.
+        $this->get('/track-sitemaps/'.$id.'/1.xml')->assertStatus(429);
+        $this->get('/robots.txt')->assertStatus(429);
     }
 
     #[DataProvider('publicPaths')]
