@@ -229,6 +229,44 @@ final class ProductionIdentityCommittedFrameTest extends TestCase
         $this->assertFalse($pdo->inTransaction());
     }
 
+    public function test_close_preserves_replacement_transaction_read_only_state(): void
+    {
+        $pdo = DB::connection()->getPdo();
+        $frame = IdentityCommittedFrame::begin($this->reader(), hrtime(true) + 30_000_000_000);
+        try {
+            $pdo->commit();
+            $pdo->beginTransaction();
+            $pdo->exec('SAVEPOINT foreign_replacement_fixture');
+            $before = DB::getDriverName() === 'sqlite' ? (int) $pdo->query('PRAGMA query_only')->fetchColumn()
+                : $pdo->query('SELECT @@SESSION.transaction_read_only')->fetchColumn();
+            $frame->close();
+            $this->assertTrue($pdo->inTransaction());
+            $after = DB::getDriverName() === 'sqlite' ? (int) $pdo->query('PRAGMA query_only')->fetchColumn()
+                : $pdo->query('SELECT @@SESSION.transaction_read_only')->fetchColumn();
+            $this->assertSame($before, $after, 'Cleanup must not change a foreign transaction session setting.');
+            $pdo->exec('RELEASE SAVEPOINT foreign_replacement_fixture');
+            $this->addToAssertionCount(1);
+            if (DB::getDriverName() === 'sqlite') {
+                try {
+                    $pdo->exec('INSERT INTO committed_frame_fixture (id) VALUES (42)');
+                    $this->fail('The untouched replacement transaction remains read-only.');
+                } catch (PDOException) {
+                    $this->assertSame(1, $after);
+                }
+            }
+        } finally {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            $frame->close();
+            // Restore the original idle setting only after the caller ends the replacement.
+            if (DB::getDriverName() === 'sqlite') {
+                $this->assertSame(0, (int) $pdo->query('PRAGMA query_only')->fetchColumn());
+                $pdo->exec('PRAGMA query_only=OFF');
+            }
+        }
+    }
+
     public function test_expiring_original_deadline_cannot_be_renewed_by_starting_final_proof(): void
     {
         $owner = $this->owner();

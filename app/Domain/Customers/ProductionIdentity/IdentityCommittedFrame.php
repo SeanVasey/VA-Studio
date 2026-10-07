@@ -136,7 +136,9 @@ final class IdentityCommittedFrame
             }
         } finally {
             $this->restoreSqlite();
-            $this->closed = true;
+            // A replacement belongs to its caller. A later close may restore
+            // the captured idle setting only after that caller ends its frame.
+            $this->closed = ! $this->primary->inTransaction();
         }
     }
 
@@ -160,7 +162,7 @@ final class IdentityCommittedFrame
 
     private function restoreSqlite(): void
     {
-        if ($this->driver === 'sqlite' && isset($this->defaults['query_only'])) {
+        if ($this->driver === 'sqlite' && isset($this->defaults['query_only']) && ! $this->primary->inTransaction()) {
             $this->primary->exec('PRAGMA query_only='.(int) $this->defaults['query_only']);
         }
     }
