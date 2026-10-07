@@ -268,6 +268,11 @@ always failed on a normal checkout because the tracked `storage/app/private/.git
 0644 (now excluded by name). Rehearsed: a tampered archive now stops the script; a tree
 holding only the 0644 `.gitignore` passes; any other 0644 file is still refused.
 
+Codex's fourth pass (P2, docs): the mode check rejected sealed `0400` originals, which
+`ContractFiles` and `PrivateMediaFiles` write deliberately. The check now accepts `0600` or
+`0400` for files and `0700` for directories (rehearsed: 0400 and 0600 accepted, 0644 and
+0666 refused, 0755 directory refused).
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings are accepted for merge and must be fixed or explicitly
