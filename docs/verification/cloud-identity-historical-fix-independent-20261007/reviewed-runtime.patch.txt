@@ -1,0 +1,616 @@
+diff --git a/app/Domain/Customers/ProductionCustomerAccess.php b/app/Domain/Customers/ProductionCustomerAccess.php
+index 29f1a22..34ad6a3 100644
+--- a/app/Domain/Customers/ProductionCustomerAccess.php
++++ b/app/Domain/Customers/ProductionCustomerAccess.php
+@@ -6,6 +6,7 @@ use App\Domain\Commerce\ProductionPolicy\CurrentRows;
+ use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
+ use App\Domain\Customers\ProductionIdentity\IdentityEvidence;
+ use App\Domain\Customers\ProductionIdentity\IdentityException;
++use App\Domain\Customers\ProductionIdentity\IdentityHistoricalPlainRows;
+ use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
+ use App\Domain\Customers\ProductionIdentity\IdentityRows;
+ use App\Models\User;
+@@ -116,7 +117,20 @@ final class ProductionCustomerAccess
+         }
+     }
+ 
+-    private function historical(array $binding, IdentityRows $reader): array
++    /** Original historical facts using the receipt's fixed permanent nonlocking reader only. */
++    public function verifyHistoricalBindingPlain(array $binding, IdentityHistoricalPlainRows $reader): array
++    {
++        return $this->historical($binding, $reader);
++    }
++
++    public function proveHistoricalBindingPlain(array $binding, IdentityHistoricalPlainRows $reader, array $expectedRaw): void
++    {
++        if ($this->strings($this->verifyHistoricalBindingPlain($binding, $reader)) !== $this->strings($expectedRaw)) {
++            throw new IdentityException;
++        }
++    }
++
++    private function historical(array $binding, IdentityRows|IdentityHistoricalPlainRows $reader): array
+     {
+         $keys = ['schema_version', 'origin_id', 'provenance', 'account_id', 'account_public_id', 'user_id', 'verification_observation_id', 'verification_observation_hash', 'identity_policy_version', 'identity_policy_hash'];
+         $actual = array_keys($binding);
+diff --git a/app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommitSeal.php b/app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommitSeal.php
+new file mode 100644
+index 0000000..0bcf7b1
+--- /dev/null
++++ b/app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommitSeal.php
+@@ -0,0 +1,45 @@
++<?php
++
++namespace App\Domain\Customers\ProductionIdentity;
++
++use JsonSerializable;
++
++/** Opaque sibling-specific seal. Only the exact object retained by its receipt is accepted. */
++final readonly class IdentityHistoricalCommitSeal implements JsonSerializable
++{
++    private function __construct(private IdentityHistoricalCommittedReceipt $receipt,
++        private IdentityOriginalCommitWitness $witness, private int $originalDeadlineNs) {}
++
++    /** @internal Minting another opaque object cannot replace the exact retained receipt seal. */
++    public static function capture(IdentityHistoricalCommittedReceipt $receipt, IdentityOriginalCommitWitness $witness, int $originalDeadlineNs): self
++    {
++        $witness->assertHeld();
++        if (! $receipt->belongsTo($witness, $witness->reader(), $originalDeadlineNs)) {
++            throw new IdentityException('historical_commit_required');
++        }
++
++        return new self($receipt, $witness, $originalDeadlineNs);
++    }
++
++    public function matches(IdentityHistoricalCommittedReceipt $receipt, IdentityOriginalCommitWitness $witness, int $deadlineNs): bool
++    {
++        return $receipt === $this->receipt && $witness === $this->witness && $deadlineNs === $this->originalDeadlineNs;
++    }
++
++    private function __clone() {}
++
++    public function __serialize(): never
++    {
++        throw new IdentityException('historical_commit_required');
++    }
++
++    public function jsonSerialize(): never
++    {
++        throw new IdentityException('historical_commit_required');
++    }
++
++    public function __debugInfo(): array
++    {
++        return ['original_commit_seal' => true];
++    }
++}
+diff --git a/app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommittedReceipt.php b/app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommittedReceipt.php
+new file mode 100644
+index 0000000..78489b6
+--- /dev/null
++++ b/app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommittedReceipt.php
+@@ -0,0 +1,165 @@
++<?php
++
++namespace App\Domain\Customers\ProductionIdentity;
++
++use App\Domain\Commerce\ProductionPolicy\CurrentRows;
++use App\Domain\Customers\ProductionCustomerAccess;
++use JsonSerializable;
++use Throwable;
++
++/** One original historical-prefix closure after the matching producer-observed commit. No renewed access. */
++final class IdentityHistoricalCommittedReceipt implements JsonSerializable
++{
++    public const VERSION = 'identity-historical-committed-receipt-v1';
++
++    private string $phase = 'held';
++
++    private ?IdentityHistoricalCommitSeal $seal = null;
++
++    private array $privateRaw;
++
++    private function __construct(private readonly array $binding, private readonly CurrentRows $reader,
++        private readonly array $expectedHistoricalRaw, private readonly int $originalDeadlineNs,
++        private readonly IdentityOriginalCommitWitness $witness) {}
++
++    public static function capture(array $binding, CurrentRows $reader, array $expectedHistoricalRaw,
++        int $originalDeadlineNs, IdentityOriginalCommitWitness $witness): self
++    {
++        $witness->assertHeld();
++        $receipt = new self($binding, $reader, $expectedHistoricalRaw, $originalDeadlineNs, $witness);
++        if (! $witness->matches($reader, $originalDeadlineNs)) {
++            throw new IdentityException('historical_commit_required');
++        }
++        $access = new ProductionCustomerAccess;
++        $access->proveHistoricalBindingCurrent($binding, $reader, $expectedHistoricalRaw);
++        $plain = IdentityHistoricalPlainRows::fromWitness($witness);
++        $receipt->privateRaw = $receipt->rawPrefix($plain);
++        $account = $receipt->privateRaw['account'];
++        if (! hash_equals($expectedHistoricalRaw['account']['owner_digest'], IdentityPolicy::digest('owner', $account['owner_key'] ?? ''))) {
++            throw new IdentityException('historical_commit_required');
++        }
++        $receipt->provePrefix($plain);
++        $witness->register($receipt);
++
++        return $receipt;
++    }
++
++    public function sealOriginalCommit(): IdentityHistoricalCommitSeal
++    {
++        if ($this->phase !== 'held') {
++            throw new IdentityException('historical_commit_required');
++        }
++        try {
++            $this->witness->assertHeld();
++            $plain = IdentityHistoricalPlainRows::fromWitness($this->witness);
++            (new ProductionCustomerAccess)->proveHistoricalBindingPlain($this->binding, $plain, $this->expectedHistoricalRaw);
++            $seal = IdentityHistoricalCommitSeal::capture($this, $this->witness, $this->originalDeadlineNs);
++            // Deep parsing/configuration work precedes the last fixed raw prefix/schema/context comparison.
++            $this->provePrefix($plain);
++            $this->witness->sealed($this);
++            $this->phase = 'sealed';
++            $this->seal = $seal;
++
++            return $seal;
++        } catch (Throwable $error) {
++            $this->invalidate();
++            throw $error;
++        }
++    }
++
++    public function observeOriginalCommitted(IdentityHistoricalCommitSeal $seal): void
++    {
++        try {
++            if ($this->phase !== 'sealed' || $seal !== $this->seal || ! $seal->matches($this, $this->witness, $this->originalDeadlineNs)) {
++                throw new IdentityException('historical_commit_required');
++            }
++            $this->witness->assertClosed();
++            $this->phase = 'committed';
++        } catch (Throwable $error) {
++            $this->invalidate();
++            throw $error;
++        }
++    }
++
++    /** One use, depth zero, captured permanent plain SELECT; starts no transaction or statement lock. */
++    public function proveClosed(): void
++    {
++        if ($this->phase !== 'committed') {
++            throw new IdentityException('historical_commit_required');
++        }
++        $this->phase = 'used';
++        try {
++            $this->witness->assertClosed();
++            $plain = IdentityHistoricalPlainRows::fromWitness($this->witness);
++            // This exact private prefix was authenticated while held and sealed before the producer's
++            // final fence. Re-parsing crypto/config here could invoke callbacks after that source fence.
++            $this->provePrefix($plain);
++        } catch (Throwable $error) {
++            $this->invalidate();
++            throw $error;
++        }
++    }
++
++    /** @internal Identity of an existing server capture; never caller evidence or a new deadline. */
++    public function belongsTo(IdentityOriginalCommitWitness $witness, CurrentRows $reader, int $deadlineNs): bool
++    {
++        return $this->witness === $witness && $this->reader === $reader && $this->originalDeadlineNs === $deadlineNs;
++    }
++
++    public function invalidate(): void
++    {
++        $this->phase = 'invalid';
++        $this->witness->invalidate();
++    }
++
++    private function provePrefix(IdentityHistoricalPlainRows $plain): void
++    {
++        $plain->assertPermanent();
++        if ($this->strings($this->rawPrefix($plain)) !== $this->strings($this->privateRaw)) {
++            throw new IdentityException('historical_commit_required');
++        }
++        $plain->assertPermanent();
++        $this->witness->assertReading();
++    }
++
++    private function rawPrefix(IdentityHistoricalPlainRows $plain): array
++    {
++        $origin = $plain->one('production_identity_origins', (int) $this->expectedHistoricalRaw['origin']['id']);
++        $prefix = $challenges = [];
++        foreach ($this->expectedHistoricalRaw['verification_prefix'] as $entry) {
++            $prefix[] = $plain->one('production_identity_verifications', (int) $entry['id']);
++        }
++        foreach ($this->expectedHistoricalRaw['challenges'] as $entry) {
++            $challenges[] = $plain->one('production_identity_challenges', (int) $entry['id']);
++        }
++        // Original act survives legitimate credential/access changes; owner relation/key is closed last.
++        $user = $plain->one('users', $this->binding['user_id']);
++        $account = $plain->one('customer_accounts', $this->binding['account_id']);
++
++        return ['user_id' => $user['id'] ?? null,
++            'account' => array_intersect_key($account, array_flip(['id', 'public_id', 'user_id', 'owner_key'])),
++            'origin' => $origin, 'verification_prefix' => $prefix, 'challenges' => $challenges];
++    }
++
++    private function strings(mixed $value): mixed
++    {
++        return is_array($value) ? array_map($this->strings(...), $value) : ($value === null ? null : (string) $value);
++    }
++
++    private function __clone() {}
++
++    public function __serialize(): never
++    {
++        throw new IdentityException('historical_commit_required');
++    }
++
++    public function jsonSerialize(): never
++    {
++        throw new IdentityException('historical_commit_required');
++    }
++
++    public function __debugInfo(): array
++    {
++        return ['original_historical_receipt' => true];
++    }
++}
+diff --git a/app/Domain/Customers/ProductionIdentity/IdentityHistoricalPlainRows.php b/app/Domain/Customers/ProductionIdentity/IdentityHistoricalPlainRows.php
+new file mode 100644
+index 0000000..0cfc288
+--- /dev/null
++++ b/app/Domain/Customers/ProductionIdentity/IdentityHistoricalPlainRows.php
+@@ -0,0 +1,103 @@
++<?php
++
++namespace App\Domain\Customers\ProductionIdentity;
++
++use PDO;
++use Throwable;
++
++/** Fixed permanent plain SELECT only. No FOR UPDATE, transaction, identity mint, or write API. */
++final readonly class IdentityHistoricalPlainRows
++{
++    private PDO $primary;
++
++    private string $driver;
++
++    private string $schema;
++
++    private function __construct(private IdentityOriginalCommitWitness $witness)
++    {
++        $reader = $witness->reader();
++        $this->primary = $reader->identityPrimary();
++        $this->driver = $reader->identityDriver();
++        $this->schema = $witness->schema();
++        $this->assertPermanent();
++    }
++
++    public static function fromWitness(IdentityOriginalCommitWitness $witness): self
++    {
++        return new self($witness);
++    }
++
++    public function assertPermanent(): void
++    {
++        try {
++            $this->witness->assertReading();
++            [$present] = (new IdentityMigrationOwnership)->inspect($this->primary, $this->driver);
++            if (in_array(false, $present, true)) {
++                throw new IdentityException;
++            }
++            $this->witness->assertReading();
++        } catch (Throwable) {
++            throw new IdentityException('historical_permanent_primary_required');
++        }
++    }
++
++    public function rows(string $table, string $where, array $bindings, ?int $limit = null): array
++    {
++        $allowed = match ($table) {
++            'users', 'customer_accounts', 'production_identity_challenges' => [['id = ?', 1]],
++            'production_identity_origins' => [['id = ?', 1], ['account_id = ?', 2]],
++            'production_identity_verifications' => [['id = ?', 1], ['origin_id = ?', 129]],
++            default => [],
++        };
++        if (! in_array([$where, $limit], $allowed, true) || count($bindings) !== 1 || ! is_int($bindings[0]) || $bindings[0] < 1) {
++            throw new IdentityException('historical_fixed_read_required');
++        }
++        $this->assertTable($table);
++        $statement = $this->primary->prepare('SELECT * FROM '.$this->table($table).' WHERE '.$where.' ORDER BY id LIMIT '.$limit);
++        $statement->execute($bindings);
++        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
++        $this->witness->assertReading();
++
++        return $rows;
++    }
++
++    public function one(string $table, int $id): array
++    {
++        return $this->rows($table, 'id = ?', [$id], 1)[0] ?? [];
++    }
++
++    private function assertTable(string $table): void
++    {
++        try {
++            $this->witness->assertReading();
++            if ($this->driver === 'sqlite') {
++                $statement = $this->primary->prepare('SELECT name,type,sql FROM main.sqlite_master WHERE LOWER(name)=?');
++                $statement->execute([$table]);
++                $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
++                $temporary = $this->primary->prepare('SELECT name FROM sqlite_temp_master WHERE LOWER(name)=? OR LOWER(tbl_name)=?');
++                $temporary->execute([$table, $table]);
++                if ($temporary->fetchAll(PDO::FETCH_ASSOC) !== [] || count($rows) !== 1 || $rows[0]['name'] !== $table || $rows[0]['type'] !== 'table'
++                    || (isset(IdentitySchema::definitions()[$table]) && $rows[0]['sql'] !== IdentitySchema::tableSql($table, $this->driver))) {
++                    throw new IdentityException;
++                }
++            } else {
++                $statement = $this->primary->prepare('SELECT TABLE_NAME,TABLE_TYPE,ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=? AND LOWER(TABLE_NAME)=?');
++                $statement->execute([$this->schema, $table]);
++                $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
++                $shown = $this->primary->query('SHOW CREATE TABLE '.$this->table($table))->fetch(PDO::FETCH_ASSOC);
++                if (count($rows) !== 1 || $rows[0]['TABLE_NAME'] !== $table || $rows[0]['TABLE_TYPE'] !== 'BASE TABLE' || $rows[0]['ENGINE'] !== 'InnoDB'
++                    || ! is_string($shown['Create Table'] ?? null) || str_starts_with($shown['Create Table'], 'CREATE TEMPORARY TABLE ')) {
++                    throw new IdentityException;
++                }
++            }
++        } catch (Throwable) {
++            throw new IdentityException('historical_permanent_primary_required');
++        }
++    }
++
++    private function table(string $table): string
++    {
++        return '`'.str_replace('`', '``', $this->schema).'`.`'.$table.'`';
++    }
++}
+diff --git a/app/Domain/Customers/ProductionIdentity/IdentityOriginalCommitWitness.php b/app/Domain/Customers/ProductionIdentity/IdentityOriginalCommitWitness.php
+new file mode 100644
+index 0000000..4303292
+--- /dev/null
++++ b/app/Domain/Customers/ProductionIdentity/IdentityOriginalCommitWitness.php
+@@ -0,0 +1,245 @@
++<?php
++
++namespace App\Domain\Customers\ProductionIdentity;
++
++use App\Domain\Commerce\ProductionPolicy\CurrentRows;
++use Illuminate\Config\Repository;
++use Illuminate\Container\Container;
++use Illuminate\Database\Connection;
++use Illuminate\Database\DatabaseManager;
++use Illuminate\Support\Facades\DB;
++use Illuminate\Support\Facades\Facade;
++use JsonSerializable;
++use PDO;
++use PDOStatement;
++use ReflectionClass;
++use ReflectionProperty;
++use SplObjectStorage;
++
++/** Cooperates with ONE producer-owned original-commit observer. It is not a financial source proof. */
++final class IdentityOriginalCommitWitness implements JsonSerializable
++{
++    private string $phase = 'held';
++
++    private SplObjectStorage $receipts;
++
++    private readonly DatabaseManager $manager;
++
++    private readonly Connection $connection;
++
++    private readonly Container $container;
++
++    private readonly Repository $config;
++
++    private readonly PDO $primary;
++
++    private readonly string $driver;
++
++    private readonly string $schema;
++
++    private readonly string $databaseName;
++
++    private readonly string $name;
++
++    private readonly array $configuration;
++
++    private function __construct(private readonly CurrentRows $reader, private readonly int $originalDeadlineNs)
++    {
++        $this->primary = $reader->identityPrimary();
++        $this->driver = $reader->identityDriver();
++        $this->statementAdmission();
++        $this->manager = DB::getFacadeRoot();
++        $this->container = app();
++        $this->config = config();
++        $this->configuration = $this->configuration();
++        // Even default connection selection can dereference database configuration. Admit parents first.
++        $this->connection = $this->manager->connection();
++        $this->schema = $this->driver === 'sqlite' ? 'main' : $this->connection->getDatabaseName();
++        $this->databaseName = $this->connection->getDatabaseName();
++        $this->name = $this->connection->getName();
++        $this->receipts = new SplObjectStorage;
++        if ($originalDeadlineNs <= hrtime(true) || $originalDeadlineNs > hrtime(true) + 300_000_000_000) {
++            throw new IdentityException('historical_commit_required');
++        }
++        $this->assertHeld();
++    }
++
++    public static function capture(CurrentRows $reader, int $originalDeadlineNs): self
++    {
++        return new self($reader, $originalDeadlineNs);
++    }
++
++    public function register(IdentityHistoricalCommittedReceipt $receipt): void
++    {
++        $this->assertHeld();
++        if (count($this->receipts) >= 2 || $this->receipts->contains($receipt)
++            || ! $receipt->belongsTo($this, $this->reader, $this->originalDeadlineNs)) {
++            throw new IdentityException('historical_commit_required');
++        }
++        $this->receipts->attach($receipt, false);
++    }
++
++    public function sealed(IdentityHistoricalCommittedReceipt $receipt): void
++    {
++        $this->assertHeld();
++        if (! $this->receipts->contains($receipt) || $this->receipts[$receipt] !== false) {
++            throw new IdentityException('historical_commit_required');
++        }
++        $this->receipts[$receipt] = true;
++    }
++
++    /** Producer calls only after its original anchor and full raw financial/source fence. No callbacks follow. */
++    public function prepareOriginalCommit(): void
++    {
++        $this->assertHeld();
++        if (count($this->receipts) < 1) {
++            throw new IdentityException('historical_commit_required');
++        }
++        foreach ($this->receipts as $receipt) {
++            if ($this->receipts[$receipt] !== true) {
++                throw new IdentityException('historical_commit_required');
++            }
++        }
++        $this->phase = 'prepared';
++    }
++
++    /** ONE producer observer certifies the matching positive framework commit after all existing callbacks. */
++    public function observeOriginalPositiveCommit(): void
++    {
++        if ($this->phase !== 'prepared') {
++            throw new IdentityException('historical_commit_required');
++        }
++        $this->phase = 'invalid';
++        $this->context(0);
++        $this->phase = 'committed';
++    }
++
++    public function assertHeld(): void
++    {
++        if ($this->phase !== 'held') {
++            throw new IdentityException('historical_commit_required');
++        }
++        $this->context(1);
++    }
++
++    public function assertClosed(): void
++    {
++        if ($this->phase !== 'committed') {
++            throw new IdentityException('historical_commit_required');
++        }
++        $this->context(0);
++    }
++
++    /** Plain identity reads may run while sealing the original held frame or after its observed commit. */
++    public function assertReading(): void
++    {
++        $this->phase === 'held' ? $this->assertHeld() : $this->assertClosed();
++    }
++
++    public function reader(): CurrentRows
++    {
++        $this->assertReading();
++
++        return $this->reader;
++    }
++
++    public function matches(CurrentRows $reader, int $deadlineNs): bool
++    {
++        return $reader === $this->reader && $deadlineNs === $this->originalDeadlineNs;
++    }
++
++    public function schema(): string
++    {
++        $this->assertReading();
++
++        return $this->schema;
++    }
++
++    public function invalidate(): void
++    {
++        $this->phase = 'invalid';
++    }
++
++    private function context(int $depth): void
++    {
++        $this->statementAdmission();
++        $resolved = (new ReflectionProperty(Facade::class, 'resolvedInstance'))->getValue();
++        $instances = $this->property(Container::class, 'instances', $this->container);
++        $connections = $this->property(DatabaseManager::class, 'connections', $this->manager);
++        if (Container::getInstance() !== $this->container || (new ReflectionProperty(Facade::class, 'app'))->getValue() !== $this->container
++            || ($resolved['db'] ?? null) !== $this->manager || ($instances['db'] ?? null) !== $this->manager
++            || ($instances['config'] ?? null) !== $this->config || ($connections[$this->name] ?? null) !== $this->connection
++            || $this->configuration() !== $this->configuration || hrtime(true) >= $this->originalDeadlineNs
++            || ! in_array($this->driver, ['sqlite', 'mysql'], true) || $this->connection->getRawPdo() !== $this->primary
++            || $this->connection->getDatabaseName() !== $this->databaseName || $this->connection->getName() !== $this->name
++            || $this->primary->getAttribute(PDO::ATTR_DRIVER_NAME) !== $this->driver
++            || $this->connection->getDriverName() !== $this->driver || $this->connection->transactionLevel() !== $depth
++            || $this->primary->inTransaction() !== ($depth === 1)) {
++            throw new IdentityException('historical_commit_required');
++        }
++        foreach ($connections as $connection) {
++            $raw = $connection->getRawPdo();
++            if (! $raw instanceof PDO || ($connection !== $this->connection && ($connection->transactionLevel() !== 0 || $raw->inTransaction()))) {
++                throw new IdentityException('historical_commit_required');
++            }
++        }
++        if ($this->driver === 'mysql' && ($this->connection->getDatabaseName() !== $this->schema
++            || $this->primary->query('SELECT DATABASE()')->fetchColumn() !== $this->schema)) {
++            throw new IdentityException('historical_commit_required');
++        }
++    }
++
++    private function statementAdmission(): void
++    {
++        $classes = match ($this->driver) {
++            'sqlite' => [PDO::class, 'Pdo\\Sqlite'],
++            'mysql' => [PDO::class, 'Pdo\\Mysql'],
++            default => [],
++        };
++        if (! in_array($this->primary::class, $classes, true) || ! (new ReflectionClass($this->primary))->isInternal()
++            || $this->primary->getAttribute(PDO::ATTR_STATEMENT_CLASS) !== [PDOStatement::class]) {
++            throw new IdentityException('historical_plain_statement_required');
++        }
++    }
++
++    private function configuration(): array
++    {
++        $items = $this->property(Repository::class, 'items', $this->config);
++        // Raw parents may be ArrayAccess extensions. Reject them before any nested lookup can run code.
++        if (! is_array($items) || ! is_array($items['app'] ?? null)
++            || ! is_array($items['production-customer-identity'] ?? null) || ! is_array($items['database'] ?? null)) {
++            throw new IdentityException('historical_plain_configuration_required');
++        }
++        $identity = $items['production-customer-identity'];
++        if (($identity['historical_receipts_enabled'] ?? null) !== true
++            || ($identity['historical_receipts_version'] ?? null) !== IdentityHistoricalCommittedReceipt::VERSION
++            || ! is_string($items['app']['key'] ?? null) || $items['app']['key'] === ''
++            || ! is_string($items['database']['default'] ?? null) || $items['database']['default'] === '') {
++            throw new IdentityException('historical_commit_required');
++        }
++
++        return ['key' => $items['app']['key'], 'identity' => $identity, 'default' => $items['database']['default'] ?? null];
++    }
++
++    private function property(string $class, string $name, object $object): mixed
++    {
++        return (new ReflectionProperty($class, $name))->getValue($object);
++    }
++
++    private function __clone() {}
++
++    public function __serialize(): never
++    {
++        throw new IdentityException('historical_commit_required');
++    }
++
++    public function jsonSerialize(): never
++    {
++        throw new IdentityException('historical_commit_required');
++    }
++
++    public function __debugInfo(): array
++    {
++        return ['original_commit_witness' => true];
++    }
++}

@@ -1,0 +1,164 @@
+{
+  "source": "e8f744163600bb394e3f09c8c7f838f9fc62c885",
+  "native": {
+    "counts": {
+      "name": "/workspace/VA-Studio-identity-historical-fix-independent/docs/verification/cloud-identity-historical-fix-independent-20261007/native-selection.xml",
+      "tests": "3",
+      "assertions": "19",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "107.255117"
+    },
+    "cases": [
+      {
+        "name": "test_actual_smtp_original_commit_has_two_one_use_plain_prefix_closures_without_new_transactions",
+        "file": "/workspace/VA-Studio-identity-historical-fix-independent/tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php",
+        "line": "52",
+        "class": "Tests\\Feature\\ProductionIdentityAdapters\\IdentityHistoricalCommittedReceiptTest",
+        "classname": "Tests.Feature.ProductionIdentityAdapters.IdentityHistoricalCommittedReceiptTest",
+        "assertions": "9",
+        "time": "45.176194"
+      },
+      {
+        "name": "test_original_closure_never_resolves_nested_configuration_callbacks",
+        "file": "/workspace/VA-Studio-identity-historical-fix-independent/docs/verification/cloud-identity-historical-fix-independent-20261007/HistoricalNestedConfigurationAdmissionCanaryTest.php",
+        "line": "21",
+        "class": "Tests\\Canary\\HistoricalNestedConfigurationAdmissionCanaryTest",
+        "classname": "Tests.Canary.HistoricalNestedConfigurationAdmissionCanaryTest",
+        "assertions": "5",
+        "time": "26.903959"
+      },
+      {
+        "name": "test_original_closed_prefix_does_not_invoke_configuration_callbacks_after_the_original_commit",
+        "file": "/workspace/VA-Studio-identity-historical-fix-independent/docs/verification/cloud-identity-historical-fix-independent-20261007/HistoricalCommittedConfigurationCallbackCanaryTest.php",
+        "line": "19",
+        "class": "Tests\\Feature\\ProductionIdentityAdapters\\HistoricalCommittedConfigurationCallbackCanaryTest",
+        "classname": "Tests.Feature.ProductionIdentityAdapters.HistoricalCommittedConfigurationCallbackCanaryTest",
+        "assertions": "5",
+        "time": "35.174964"
+      }
+    ]
+  },
+  "sqlite": {
+    "counts": {
+      "name": "/workspace/VA-Studio-identity-historical-fix-independent/docs/verification/cloud-identity-historical-fix-independent-20261007/sqlite-selection.xml",
+      "tests": "12",
+      "assertions": "55",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "8.034004"
+    },
+    "cases": [
+      {
+        "name": "test_actual_smtp_original_commit_has_two_one_use_plain_prefix_closures_without_new_transactions",
+        "file": "/workspace/VA-Studio-identity-historical-fix-independent/tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php",
+        "line": "52",
+        "class": "Tests\\Feature\\ProductionIdentityAdapters\\IdentityHistoricalCommittedReceiptTest",
+        "classname": "Tests.Feature.ProductionIdentityAdapters.IdentityHistoricalCommittedReceiptTest",
+        "assertions": "9",
+        "time": "0.935511"
+      },
+      {
+        "name": "test_current_original_closed_prefix_refuses_changed_policy_primary_or_owner_without_callback with data set #0",
+        "file": "/workspace/VA-Studio-identity-historical-fix-independent/tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php",
+        "line": "105",
+        "class": "Tests\\Feature\\ProductionIdentityAdapters\\IdentityHistoricalCommittedReceiptTest",
+        "classname": "Tests.Feature.ProductionIdentityAdapters.IdentityHistoricalCommittedReceiptTest",
+        "assertions": "3",
+        "time": "0.684012"
+      },
+      {
+        "name": "test_current_original_closed_prefix_refuses_changed_policy_primary_or_owner_without_callback with data set #1",
+        "file": "/workspace/VA-Studio-identity-historical-fix-independent/tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php",
+        "line": "105",
+        "class": "Tests\\Feature\\ProductionIdentityAdapters\\IdentityHistoricalCommittedReceiptTest",
+        "classname": "Tests.Feature.ProductionIdentityAdapters.IdentityHistoricalCommittedReceiptTest",
+        "assertions": "3",
+        "time": "0.698371"
+      },
+      {
+        "name": "test_current_original_closed_prefix_refuses_changed_policy_primary_or_owner_without_callback with data set #2",
+        "file": "/workspace/VA-Studio-identity-historical-fix-independent/tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php",
+        "line": "105",
+        "class": "Tests\\Feature\\ProductionIdentityAdapters\\IdentityHistoricalCommittedReceiptTest",
+        "classname": "Tests.Feature.ProductionIdentityAdapters.IdentityHistoricalCommittedReceiptTest",
+        "assertions": "5",
+        "time": "0.676657"
+      },
+      {
+        "name": "test_current_original_closed_prefix_refuses_changed_policy_primary_or_owner_without_callback with data set #3",
+        "file": "/workspace/VA-Studio-identity-historical-fix-independent/tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php",
+        "line": "105",
+        "class": "Tests\\Feature\\ProductionIdentityAdapters\\IdentityHistoricalCommittedReceiptTest",
+        "classname": "Tests.Feature.ProductionIdentityAdapters.IdentityHistoricalCommittedReceiptTest",
+        "assertions": "3",
+        "time": "0.788215"
+      },
+      {
+        "name": "test_current_original_closed_prefix_refuses_changed_policy_primary_or_owner_without_callback with data set #4",
+        "file": "/workspace/VA-Studio-identity-historical-fix-independent/tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php",
+        "line": "105",
+        "class": "Tests\\Feature\\ProductionIdentityAdapters\\IdentityHistoricalCommittedReceiptTest",
+        "classname": "Tests.Feature.ProductionIdentityAdapters.IdentityHistoricalCommittedReceiptTest",
+        "assertions": "3",
+        "time": "0.644337"
+      },
+      {
+        "name": "test_direct_commit_reopen_loses_producer_anchor_and_refuses_original_commit",
+        "file": "/workspace/VA-Studio-identity-historical-fix-independent/tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php",
+        "line": "201",
+        "class": "Tests\\Feature\\ProductionIdentityAdapters\\IdentityHistoricalCommittedReceiptTest",
+        "classname": "Tests.Feature.ProductionIdentityAdapters.IdentityHistoricalCommittedReceiptTest",
+        "assertions": "3",
+        "time": "0.606249"
+      },
+      {
+        "name": "test_later_framework_transaction_invalidates_both_original_siblings",
+        "file": "/workspace/VA-Studio-identity-historical-fix-independent/tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php",
+        "line": "221",
+        "class": "Tests\\Feature\\ProductionIdentityAdapters\\IdentityHistoricalCommittedReceiptTest",
+        "classname": "Tests.Feature.ProductionIdentityAdapters.IdentityHistoricalCommittedReceiptTest",
+        "assertions": "4",
+        "time": "0.667208"
+      },
+      {
+        "name": "test_rollback_or_nested_event_cannot_be_observed_as_original_positive_commit with data set #0",
+        "file": "/workspace/VA-Studio-identity-historical-fix-independent/tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php",
+        "line": "243",
+        "class": "Tests\\Feature\\ProductionIdentityAdapters\\IdentityHistoricalCommittedReceiptTest",
+        "classname": "Tests.Feature.ProductionIdentityAdapters.IdentityHistoricalCommittedReceiptTest",
+        "assertions": "6",
+        "time": "0.594160"
+      },
+      {
+        "name": "test_rollback_or_nested_event_cannot_be_observed_as_original_positive_commit with data set #1",
+        "file": "/workspace/VA-Studio-identity-historical-fix-independent/tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php",
+        "line": "243",
+        "class": "Tests\\Feature\\ProductionIdentityAdapters\\IdentityHistoricalCommittedReceiptTest",
+        "classname": "Tests.Feature.ProductionIdentityAdapters.IdentityHistoricalCommittedReceiptTest",
+        "assertions": "6",
+        "time": "0.593960"
+      },
+      {
+        "name": "test_original_closure_never_resolves_nested_configuration_callbacks",
+        "file": "/workspace/VA-Studio-identity-historical-fix-independent/docs/verification/cloud-identity-historical-fix-independent-20261007/HistoricalNestedConfigurationAdmissionCanaryTest.php",
+        "line": "21",
+        "class": "Tests\\Canary\\HistoricalNestedConfigurationAdmissionCanaryTest",
+        "classname": "Tests.Canary.HistoricalNestedConfigurationAdmissionCanaryTest",
+        "assertions": "5",
+        "time": "0.515391"
+      },
+      {
+        "name": "test_original_closed_prefix_does_not_invoke_configuration_callbacks_after_the_original_commit",
+        "file": "/workspace/VA-Studio-identity-historical-fix-independent/docs/verification/cloud-identity-historical-fix-independent-20261007/HistoricalCommittedConfigurationCallbackCanaryTest.php",
+        "line": "19",
+        "class": "Tests\\Feature\\ProductionIdentityAdapters\\HistoricalCommittedConfigurationCallbackCanaryTest",
+        "classname": "Tests.Feature.ProductionIdentityAdapters.HistoricalCommittedConfigurationCallbackCanaryTest",
+        "assertions": "5",
+        "time": "0.629933"
+      }
+    ]
+  }
+}
