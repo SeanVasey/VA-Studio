@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Domain\SupportAttachments\AttachmentActor;
-use App\Domain\SupportAttachments\AttachmentActorResolver;
 use App\Domain\SupportAttachments\AttachmentException;
-use App\Domain\SupportAttachments\RehearsalAttachmentActors;
 use App\Domain\SupportAttachments\SupportAttachments;
 use App\Http\Requests\SupportAttachmentRequest;
 use App\Http\Responses\SupportAttachmentResponse as PrivateResponse;
-use App\Support\InquiryOwner;
+use App\Support\SupportAttachmentRequestIdentity;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,15 +17,9 @@ final class SupportAttachmentController
     {
         $temporary = null;
         try {
-            $audience = $request->route('support_audience');
             $kind = $request->route('support_kind');
             $action = $request->route('support_action');
-            $actor = match ($audience) {
-                'visitor' => AttachmentActor::visitor(app(InquiryOwner::class)->forRequest($request), $request->user()),
-                'operator' => $request->user() === null ? throw new AttachmentException(403) : AttachmentActor::operator($request->user()),
-                'customer' => $this->customer($request, $kind, $source),
-                default => throw new AttachmentException(403),
-            };
+            $actor = app(SupportAttachmentRequestIdentity::class)->actor($request);
             $service = app(SupportAttachments::class);
             if ($action === 'list') {
                 return PrivateResponse::protect(response()->json($service->list($kind, $source, $actor)));
@@ -82,19 +73,12 @@ final class SupportAttachmentController
             return PrivateResponse::protect($response);
         } catch (AttachmentException $error) {
             return PrivateResponse::error($error->status);
-        } catch (\Throwable) {
-            return PrivateResponse::error(503);
+        } catch (\Throwable $error) {
+            return PrivateResponse::failure($error);
         } finally {
             if (is_resource($temporary)) {
                 fclose($temporary);
             }
         }
-    }
-
-    private function customer(Request $request, string $kind, string $source): AttachmentActor
-    {
-        $resolver = app()->bound(AttachmentActorResolver::class) ? app(AttachmentActorResolver::class) : app(RehearsalAttachmentActors::class);
-
-        return $resolver->customer($request, $kind, $source);
     }
 }

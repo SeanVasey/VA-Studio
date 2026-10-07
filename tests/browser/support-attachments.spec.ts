@@ -18,6 +18,7 @@ test('visitor attachment uses real quarantine, exact upload replay, scanner refu
     await page.getByRole('button', { name: 'Send inquiry', exact: true }).click(); const accepted = await submitted; expect(accepted.status()).toBe(201);
     const { receipt } = await accepted.json();
     await page.getByRole('button', { name: 'Read replies and follow up', exact: true }).click();
+    await page.getByRole('link', { name: 'Open private attachment files', exact: true }).click();
     const panel = page.getByRole('region', { name: 'Private attachments', exact: true });
     await panel.getByRole('button', { name: 'Open private attachments', exact: true }).click();
     const base = `/private-support/inquiries/${receipt}/attachments`;

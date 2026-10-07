@@ -7,6 +7,8 @@ import CustomerSignIn from './Pages/CustomerSignIn';
 import CustomerLibrary from './Pages/CustomerLibrary';
 import CustomerAccessRequest from './Pages/CustomerAccessRequest';
 import CustomerAccessFinish from './Pages/CustomerAccessFinish';
+import PrivateSupportAttachments from './Pages/PrivateSupportAttachments';
+import ServiceProjects from './Pages/ServiceProjects';
 import { captureCustomerIdentityProof } from './lib/customer-identity';
 import { registerStorefrontOfflineRecovery } from './lib/storefront-offline';
 import '../css/app.css';
@@ -22,6 +24,8 @@ createInertiaApp({
     if (name === 'CustomerLibrary') return CustomerLibrary;
     if (name === 'CustomerAccessRequest') return CustomerAccessRequest;
     if (name === 'CustomerAccessFinish') return CustomerAccessFinish;
+    if (name === 'PrivateSupportAttachments') return PrivateSupportAttachments;
+    if (name === 'ServiceProjects') return ServiceProjects;
     throw new Error(`Unknown page: ${name}`);
   },
   setup({ el, App, props }) { createRoot(el).render(<App {...props} />); },

@@ -64,15 +64,17 @@ final class SupportAttachmentPrivacy
             }
         }
         try {
-            return PrivateResponse::protect($next($request));
+            $response = $next($request);
+
+            return PrivateResponse::protect($response, $request->attributes->get('_support_attachment_page') === true);
         } catch (AuthorizationException) {
             return PrivateResponse::error(403);
         } catch (TokenMismatchException) {
             return PrivateResponse::error(419);
         } catch (HttpExceptionInterface $error) {
             return PrivateResponse::error($error->getStatusCode());
-        } catch (\Throwable) {
-            return PrivateResponse::error(503);
+        } catch (\Throwable $error) {
+            return PrivateResponse::failure($error);
         }
     }
 }
