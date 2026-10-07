@@ -92,9 +92,13 @@ class SupportAttachmentHttpTest extends TestCase
         $this->withSession(['_inquiry_owner' => ['context' => 'guest', 'secret' => str_repeat('c', 64)]]);
         $this->private($this->get($this->base)->assertStatus(404));
         app()->detectEnvironment(fn () => 'production');
-        $response = $this->call('POST', $this->base.'/upload', [], [], [], ['CONTENT_TYPE' => 'application/octet-stream', 'HTTP_ACCEPT' => 'application/json'], 'Synthetic text file.');
-        $this->private($response->assertStatus(419));
-        $this->assertDatabaseCount('support_attachments', 1);
+        try {
+            $response = $this->call('POST', $this->base.'/upload', [], [], [], ['CONTENT_TYPE' => 'application/octet-stream', 'HTTP_ACCEPT' => 'application/json'], 'Synthetic text file.');
+            $this->private($response->assertStatus(419));
+            $this->assertDatabaseCount('support_attachments', 1);
+        } finally {
+            app()->detectEnvironment(fn () => 'testing');
+        }
     }
 
     private function upload(string $bytes, array $extra = [])
