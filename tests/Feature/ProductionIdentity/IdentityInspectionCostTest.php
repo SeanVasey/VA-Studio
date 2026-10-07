@@ -17,7 +17,7 @@ use Tests\TestCase;
 class IdentityInspectionCostTest extends TestCase
 {
     /** Statements sent by one MySQL inspection of the complete installed graph. */
-    private const STATEMENT_BOUND = 150;
+    private const STATEMENT_BOUND = 110;
 
     public function test_one_native_inspection_issues_a_small_fixed_number_of_statements(): void
     {

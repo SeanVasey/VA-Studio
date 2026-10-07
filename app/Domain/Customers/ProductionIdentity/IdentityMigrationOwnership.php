@@ -12,9 +12,13 @@ final class IdentityMigrationOwnership
 {
     private ?string $database = null;
 
+    /** @var array<string, array<string, list<array<string, mixed>>>> per-inspection batched per-name results */
+    private array $batches = [];
+
     public function inspect(PDO $pdo, string $driver): array
     {
         $this->database = null;
+        $this->batches = [];
         if (! in_array($driver, ['sqlite', 'mysql'], true) || $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) !== $driver) {
             $this->reject();
         }
@@ -312,8 +316,9 @@ final class IdentityMigrationOwnership
                 }
             }
         } else {
+            $parents = array_keys($this->parentColumns());
             foreach ($this->parentColumns() as $table => $columns) {
-                if ($this->query($pdo, 'SELECT ENGINE,TABLE_TYPE,TABLE_COMMENT,TABLE_COLLATION,CREATE_OPTIONS FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?', [$table])
+                if ($this->named($pdo, 'SELECT ENGINE,TABLE_TYPE,TABLE_COMMENT,TABLE_COLLATION,CREATE_OPTIONS FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?', $table, $parents)
                     !== [['ENGINE' => 'InnoDB', 'TABLE_TYPE' => 'BASE TABLE', 'TABLE_COMMENT' => '', 'TABLE_COLLATION' => 'utf8mb4_unicode_ci', 'CREATE_OPTIONS' => '']]) {
                     $this->reject();
                 }
@@ -324,7 +329,7 @@ final class IdentityMigrationOwnership
                         'EXTRA' => $extra, 'CHARACTER_SET_NAME' => $text ? 'utf8mb4' : null, 'COLLATION_NAME' => $text ? 'utf8mb4_unicode_ci' : null,
                         'COLUMN_COMMENT' => '', 'GENERATION_EXPRESSION' => ''];
                 }
-                if ($this->query($pdo, 'SELECT COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,EXTRA,CHARACTER_SET_NAME,COLLATION_NAME,COLUMN_COMMENT,GENERATION_EXPRESSION FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY ORDINAL_POSITION', [$table]) !== $expected) {
+                if ($this->named($pdo, 'SELECT COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,EXTRA,CHARACTER_SET_NAME,COLLATION_NAME,COLUMN_COMMENT,GENERATION_EXPRESSION FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY ORDINAL_POSITION', $table, $parents) !== $expected) {
                     $this->reject();
                 }
                 $expected = [];
@@ -336,7 +341,7 @@ final class IdentityMigrationOwnership
                             'INDEX_TYPE' => 'BTREE', 'SUB_PART' => null, 'COLLATION' => 'A', 'EXPRESSION' => null, 'IS_VISIBLE' => 'YES', 'INDEX_COMMENT' => ''];
                     }
                 }
-                $actual = $this->query($pdo, 'SELECT INDEX_NAME,COLUMN_NAME,NON_UNIQUE,SEQ_IN_INDEX,INDEX_TYPE,SUB_PART,COLLATION,EXPRESSION,IS_VISIBLE,INDEX_COMMENT FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY INDEX_NAME,SEQ_IN_INDEX', [$table]);
+                $actual = $this->named($pdo, 'SELECT INDEX_NAME,COLUMN_NAME,NON_UNIQUE,SEQ_IN_INDEX,INDEX_TYPE,SUB_PART,COLLATION,EXPRESSION,IS_VISIBLE,INDEX_COMMENT FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY INDEX_NAME,SEQ_IN_INDEX', $table, $parents);
                 usort($actual, fn ($left, $right) => strcmp($left['INDEX_NAME'], $right['INDEX_NAME']) ?: $left['SEQ_IN_INDEX'] <=> $right['SEQ_IN_INDEX']);
                 if ($actual !== $expected) {
                     $this->reject();
@@ -348,8 +353,8 @@ final class IdentityMigrationOwnership
                             'REFERENCED_TABLE_NAME' => $target, 'REFERENCED_COLUMN_NAME' => $key, 'UPDATE_RULE' => 'NO ACTION', 'DELETE_RULE' => 'RESTRICT'];
                     }
                 }
-                if ($this->query($pdo, 'SELECT k.CONSTRAINT_NAME,k.COLUMN_NAME,k.REFERENCED_TABLE_SCHEMA,k.REFERENCED_TABLE_NAME,k.REFERENCED_COLUMN_NAME,r.UPDATE_RULE,r.DELETE_RULE FROM information_schema.KEY_COLUMN_USAGE k JOIN information_schema.REFERENTIAL_CONSTRAINTS r ON r.CONSTRAINT_SCHEMA=k.CONSTRAINT_SCHEMA AND r.CONSTRAINT_NAME=k.CONSTRAINT_NAME AND r.TABLE_NAME=k.TABLE_NAME WHERE k.TABLE_SCHEMA=DATABASE() AND k.TABLE_NAME=? AND k.REFERENCED_TABLE_NAME IS NOT NULL ORDER BY k.COLUMN_NAME', [$table]) !== $foreign
-                    || (int) $this->query($pdo, 'SELECT COUNT(*) total FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?', [$table])[0]['total'] !== count($indexes) + count($foreign)) {
+                if ($this->named($pdo, 'SELECT k.CONSTRAINT_NAME,k.COLUMN_NAME,k.REFERENCED_TABLE_SCHEMA,k.REFERENCED_TABLE_NAME,k.REFERENCED_COLUMN_NAME,r.UPDATE_RULE,r.DELETE_RULE FROM information_schema.KEY_COLUMN_USAGE k JOIN information_schema.REFERENTIAL_CONSTRAINTS r ON r.CONSTRAINT_SCHEMA=k.CONSTRAINT_SCHEMA AND r.CONSTRAINT_NAME=k.CONSTRAINT_NAME AND r.TABLE_NAME=k.TABLE_NAME WHERE k.TABLE_SCHEMA=DATABASE() AND k.REFERENCED_TABLE_NAME IS NOT NULL AND k.TABLE_NAME=? ORDER BY k.COLUMN_NAME', $table, $parents) !== $foreign
+                    || count($this->named($pdo, 'SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?', $table, $parents)) !== count($indexes) + count($foreign)) {
                     $this->reject();
                 }
             }
@@ -365,7 +370,7 @@ final class IdentityMigrationOwnership
         }
         foreach (['users', 'customer_accounts', 'quote_owners'] as $table) {
             $actual = $driver === 'sqlite' ? $this->query($pdo, "SELECT name FROM main.sqlite_master WHERE type='trigger' AND tbl_name=? ORDER BY name", [$table])
-                : $this->query($pdo, 'SELECT TRIGGER_NAME name FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND EVENT_OBJECT_TABLE=? ORDER BY TRIGGER_NAME', [$table]);
+                : $this->named($pdo, 'SELECT TRIGGER_NAME name FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND EVENT_OBJECT_TABLE=? ORDER BY TRIGGER_NAME', $table, ['users', 'customer_accounts', 'quote_owners']);
             $names = array_keys(array_filter($guards, fn ($guard) => $guard['table'] === $table));
             sort($names);
             if ($actual !== array_map(fn ($name) => ['name' => $name], $names)) {
@@ -440,7 +445,8 @@ final class IdentityMigrationOwnership
             $this->reject();
         }
         $expected = ['id' => 'bigint'] + $definition['columns'];
-        $columns = $this->query($pdo, 'SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY ORDINAL_POSITION', [$table]);
+        $tables = array_keys(IdentitySchema::definitions());
+        $columns = $this->named($pdo, 'SELECT COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_COMMENT,GENERATION_EXPRESSION,EXTRA,CHARACTER_SET_NAME,COLLATION_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY ORDINAL_POSITION', $table, $tables);
         if (array_column($columns, 'COLUMN_NAME') !== array_keys($expected)) {
             $this->reject();
         }
@@ -466,7 +472,7 @@ final class IdentityMigrationOwnership
                 $indexes[$name] = [[$column], 1];
             }
         }
-        $parts = $this->query($pdo, 'SELECT * FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY INDEX_NAME,SEQ_IN_INDEX', [$table]);
+        $parts = $this->named($pdo, 'SELECT INDEX_NAME,COLUMN_NAME,NON_UNIQUE,SUB_PART,EXPRESSION,INDEX_TYPE,COLLATION,IS_VISIBLE,INDEX_COMMENT FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY INDEX_NAME,SEQ_IN_INDEX', $table, $tables);
         $actual = [];
         foreach ($parts as $part) {
             if (! isset($indexes[$part['INDEX_NAME']]) || $part['SUB_PART'] !== null || $part['EXPRESSION'] !== null
@@ -481,7 +487,7 @@ final class IdentityMigrationOwnership
         if ($actual !== $indexes) {
             $this->reject();
         }
-        $keys = $this->query($pdo, 'SELECT k.*,r.UPDATE_RULE,r.DELETE_RULE FROM information_schema.KEY_COLUMN_USAGE k JOIN information_schema.REFERENTIAL_CONSTRAINTS r ON r.CONSTRAINT_SCHEMA=k.CONSTRAINT_SCHEMA AND r.CONSTRAINT_NAME=k.CONSTRAINT_NAME WHERE k.TABLE_SCHEMA=DATABASE() AND k.TABLE_NAME=?', [$table]);
+        $keys = $this->named($pdo, 'SELECT k.CONSTRAINT_NAME,k.COLUMN_NAME,k.REFERENCED_TABLE_SCHEMA,k.REFERENCED_TABLE_NAME,k.REFERENCED_COLUMN_NAME,k.ORDINAL_POSITION,r.UPDATE_RULE,r.DELETE_RULE FROM information_schema.KEY_COLUMN_USAGE k JOIN information_schema.REFERENTIAL_CONSTRAINTS r ON r.CONSTRAINT_SCHEMA=k.CONSTRAINT_SCHEMA AND r.CONSTRAINT_NAME=k.CONSTRAINT_NAME WHERE k.TABLE_SCHEMA=DATABASE() AND k.TABLE_NAME=?', $table, $tables);
         if (count($keys) !== count($definition['foreign'])) {
             $this->reject();
         }
@@ -493,7 +499,7 @@ final class IdentityMigrationOwnership
                 $this->reject();
             }
         }
-        if ($this->query($pdo, "SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? AND CONSTRAINT_TYPE='CHECK'", [$table]) !== []) {
+        if ($this->named($pdo, "SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA=DATABASE() AND CONSTRAINT_TYPE='CHECK' AND TABLE_NAME=?", $table, $tables) !== []) {
             $this->reject();
         }
     }
@@ -533,17 +539,25 @@ final class IdentityMigrationOwnership
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /** One name's rows from a per-inspection batch of the same single-name statement over all $names. */
+    private function named(PDO $pdo, string $sql, string $name, array $names): array
+    {
+        $this->batches[$sql] ??= $this->lookups($pdo, $sql, $names);
+
+        return $this->batches[$sql][$name] ?? throw new LogicException('Unbatched identity dictionary name.');
+    }
+
     /**
      * One statement for many per-name dictionary lookups. The schema's catalog rows are
-     * materialized once as a CTE (NO_MERGE, otherwise every branch rescans the dictionary);
-     * each UNION ALL branch then applies the unchanged single-name predicate, parameter and
-     * column collation to those rows.
+     * materialized once as a CTE (NO_MERGE, otherwise every branch rescans the dictionary)
+     * with only the selected, lookup and ordering columns; each UNION ALL branch then applies
+     * the unchanged single-name predicate, parameter and column collation to those rows.
      *
-     * @return array<string, list<array<string, mixed>>> rows per requested name
+     * @return array<string, list<array<string, mixed>>> rows per requested name, in the statement's order
      */
     private function lookups(PDO $pdo, string $sql, array $names): array
     {
-        if (preg_match('/\ASELECT (.+) FROM (information_schema\.[A-Z_]+) WHERE ([A-Z_]+=DATABASE\(\)) AND (LOWER\()?([A-Z_]+)(\)?)=\?\z/', $sql, $part) !== 1
+        if (preg_match('/\ASELECT (.+?) FROM (information_schema\..+?) WHERE (.+) AND (LOWER\()?((?:[a-z]\.)?[A-Z_]+)(\)?)=\?(?: ORDER BY ([a-zA-Z_.,]+))?\z/', $sql, $part) !== 1
             || $part[4] !== ($part[6] === '' ? '' : 'LOWER(')) {
             throw new LogicException('Unsupported identity dictionary lookup.');
         }
@@ -552,13 +566,22 @@ final class IdentityMigrationOwnership
         if ($names === []) {
             return $result;
         }
-        // Only the selected columns plus the unchanged lookup column are materialized.
+        $order = isset($part[7]) && $part[7] !== '' ? explode(',', $part[7]) : [];
+        $ordering = implode('', array_map(fn (int $index, string $column): string => ', '.$column.' AS identity_order_'.$index, array_keys($order), $order));
         $predicate = $part[4].'identity_key'.$part[6].'=?';
         $branches = array_map(fn (int $position): string => 'SELECT /*+ NO_MERGE(lookup) */ '.$position.' AS identity_lookup, lookup.* FROM lookup WHERE '.$predicate, array_keys($names));
-        $statement = 'WITH lookup AS (SELECT '.$part[1].', '.$part[5].' AS identity_key FROM '.$part[2].' WHERE '.$part[3].') '.implode(' UNION ALL ', $branches);
-        foreach ($this->query($pdo, $statement, $names) as $row) {
+        // An exact predicate may prefilter with the same column equality; a LOWER() alias lookup scans every row.
+        $exact = $part[4] === '';
+        $prefilter = $exact ? ' AND '.$part[5].' IN ('.implode(',', array_fill(0, count($names), '?')).')' : '';
+        $statement = 'WITH lookup AS (SELECT '.$part[1].', '.$part[5].' AS identity_key'.$ordering.' FROM '.$part[2].' WHERE '.$part[3].$prefilter.') '.implode(' UNION ALL ', $branches)
+            .($order === [] ? '' : ' ORDER BY identity_lookup'.implode('', array_map(fn (int $index): string => ', identity_order_'.$index, array_keys($order))));
+        foreach ($this->query($pdo, $statement, $exact ? [...$names, ...$names] : $names) as $row) {
             $name = $names[(int) $row['identity_lookup']];
-            unset($row['identity_lookup'], $row['identity_key']);
+            foreach (array_keys($row) as $column) {
+                if (str_starts_with($column, 'identity_')) {
+                    unset($row[$column]);
+                }
+            }
             $result[$name][] = $row;
         }
 
