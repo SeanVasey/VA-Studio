@@ -31,14 +31,14 @@ final class WorkIdentityNotice
         if ($scope !== $policy->provenance() || $capability !== config('production-customer-identity.transport_capability')) {
             return;
         }
-        $selectorStatement = $database->primary->prepare('SELECT * FROM production_identity_notices WHERE id=?');
+        $selectorStatement = $database->primary->prepare('SELECT * FROM '.$database->rows->table('production_identity_notices').' WHERE id=?');
         $selectorStatement->execute([$noticeId]);
         $selectedNotice = $selectorStatement->fetch(\PDO::FETCH_ASSOC);
         if (! is_array($selectedNotice)) {
             return;
         }
         IdentityEvidence::verify('notice', $selectedNotice, 'notice_hash');
-        $selectorStatement = $database->primary->prepare('SELECT * FROM production_identity_challenges WHERE id=?');
+        $selectorStatement = $database->primary->prepare('SELECT * FROM '.$database->rows->table('production_identity_challenges').' WHERE id=?');
         $selectorStatement->execute([(int) $selectedNotice['challenge_id']]);
         $selectedChallenge = $selectorStatement->fetch(\PDO::FETCH_ASSOC);
         if (! is_array($selectedChallenge)) {
@@ -101,6 +101,7 @@ final class WorkIdentityNotice
         try {
             // Every application/crypto/adapter hook above is closed by direct reads against the captured writer.
             $database->close(false);
+            $terminalClockStarted = hrtime(true);
             $terminalNow = $this->now();
             $database->same($claim['authority'], $this->authority($database, $claim['notice'], $selectedChallenge, $email, $terminalNow, true));
             $database->same($claim['notice'], $database->rows->one('production_identity_notices', $noticeId));
@@ -114,6 +115,12 @@ final class WorkIdentityNotice
             if ($scope !== $policy->provenance() || config('production-customer-identity.notifications_enabled', false) !== true
                 || $capability !== config('production-customer-identity.transport_capability')) {
                 throw new IdentityException('configuration_withdrawn');
+            }
+            // No Date/container callback after proof. Account conservatively for metadata elapsed time.
+            $handoffNow = gmdate('Y-m-d H:i:s', strtotime($terminalNow.' UTC') + (int) ceil((hrtime(true) - $terminalClockStarted) / 1_000_000_000));
+            if ($handoffNow < $attempt['started_at'] || $handoffNow >= $attempt['lease_expires_at']
+                || $handoffNow < $selectedChallenge['created_at'] || $handoffNow >= $selectedChallenge['expires_at']) {
+                throw new IdentityException;
             }
         } catch (Throwable) {
             $this->finish($database, $attempt, 'blocked', 'authority_withdrawn', IdentityEvidence::EMPTY_HASH);
