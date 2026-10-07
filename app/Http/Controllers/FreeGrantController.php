@@ -39,7 +39,9 @@ final class FreeGrantController
                 $identity->provePrimary($principal, $actor, $rows, $raw);
             });
 
-            return Inertia::render('FreeGrants')->toResponse($request);
+            Inertia::encryptHistory();
+
+            return Inertia::render('FreeGrants', ['renderScope' => bin2hex(random_bytes(16))])->toResponse($request);
         });
     }
 
