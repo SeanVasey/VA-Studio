@@ -21,6 +21,18 @@ import xml.etree.ElementTree as ET
 
 
 PHP_TARGETS = {
+    "membership-migrations": (
+        "tests/Feature/MembershipCreditMigrationTest.php",
+        "tests/Feature/CustomerAccountMigrationTest.php",
+        "tests/Feature/CustomerPurchaseClaimMigrationTest.php",
+        "tests/Feature/OrderPreparationMigrationTest.php",
+        "tests/Feature/QuotePricingMigrationTest.php",
+        "tests/Feature/SharedInventoryMigrationTest.php",
+        "tests/Feature/TestPaymentEvidenceMigrationTest.php",
+        "tests/Feature/TestOrderFinalizationMigrationTest.php",
+        "tests/Feature/TestContractIssuanceMigrationTest.php",
+        "tests/Feature/TestFulfillmentActivationMigrationTest.php",
+    ),
     "production-preparation": (
         "tests/Feature/ProductionTrackPreparationPacketTest.php",
         "tests/Feature/ProductionTrackPreparationPacketGuardsTest.php",

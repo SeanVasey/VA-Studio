@@ -43,6 +43,30 @@ def junit(root, content='<testsuites><testsuite><testcase name="one" assertions=
 
 
 class SelectionTests(unittest.TestCase):
+    def test_membership_migration_feedback_is_exact_bounded_and_keeps_native_policy(self):
+        required = (
+        "tests/Feature/MembershipCreditMigrationTest.php",
+        "tests/Feature/CustomerAccountMigrationTest.php",
+        "tests/Feature/CustomerPurchaseClaimMigrationTest.php",
+        "tests/Feature/OrderPreparationMigrationTest.php",
+        "tests/Feature/QuotePricingMigrationTest.php",
+        "tests/Feature/SharedInventoryMigrationTest.php",
+        "tests/Feature/TestPaymentEvidenceMigrationTest.php",
+        "tests/Feature/TestOrderFinalizationMigrationTest.php",
+        "tests/Feature/TestContractIssuanceMigrationTest.php",
+        "tests/Feature/TestFulfillmentActivationMigrationTest.php",
+        )
+        self.assertEqual(focused.MAX_FILES, 32)
+        for engine in focused.ENGINES:
+            selected = focused.selection({"FOCUSED_SUITE": "membership-migrations", "FOCUSED_ENGINE": engine})
+            self.assertEqual(selected.kind, "php")
+            self.assertEqual(selected.files, required)
+            focused.validate_files(ROOT, selected)
+        selected_classes = {"Tests\\\\" + path.removeprefix("tests/").removesuffix(".php").replace("/", "\\\\")
+                            for path in required}
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        self.assertFalse(any(row[0] in selected_classes for row in policy["methods"]))
+
     def test_production_preparation_keeps_complete_adapter_fences_in_bounded_feedback(self):
         required = {
             "tests/Feature/ProductionTrackPreparationPacketTest.php",
