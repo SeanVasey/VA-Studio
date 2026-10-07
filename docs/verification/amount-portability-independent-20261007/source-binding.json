@@ -1,0 +1,14 @@
+{
+  "reviewed_source": "20c85aa185503e0543e02567c28bad6799988aac",
+  "reviewed_tree": "3d1cb5442978c992b194bac816aaca406cbeabf8",
+  "fixture_sha256": "7e26e01f9b43c37984964618139a9939f7acb558a2be23bd70ccff9433c3ccef",
+  "protected_app_unit_architecture_source_sha256": {
+    "app/Domain/Commerce/ProductionPreparation/AmountRequirementsV1.php": "505502b7b03667041e2c3e37633b6eea9fab23bce15cf64930ad063cc163bd80",
+    "app/Domain/Commerce/ProductionPreparation/ProductionAmountRequirements.php": "1deab826a0bb416b57e78245ce6112d3bcaf3d49c9c67d8ee5ccd72b9449e3e5",
+    "docs/architecture/D-28-production-amount-evidence-requirements.md": "dd826ff7fa2a42d53bc549f839eb75b2df5168a8634fee2e3bc958ec63800bec",
+    "tests/Unit/ProductionAmountRequirementsTest.php": "01db646d46c9a280721728fbbcc735eb4e2e65783b4b4ca16407c7e136cd349b"
+  },
+  "independent_canary_sha256": "01437632af6a306a4b98012a8aadfbea3664468593e0ed629c616e850821b827",
+  "original_sqlite_application_approval": "31ececd4510ba9b9f14ebb0950389299e8b09b6c",
+  "author_portability_evidence": "df00b2983f31bf20289158530a515a621505d389"
+}

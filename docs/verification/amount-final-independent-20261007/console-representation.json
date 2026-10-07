@@ -1,0 +1,10 @@
+{
+  "reviewed_executable": "a86a7e2e8b72495dc35ba053dd01467702d88b8a",
+  "original_evidence_commit": "d4e4b63b8f17f64911b5fd0f7a608df789e18e99",
+  "scope": "console representation only; no application or test change",
+  "original_platform_sha256": "ce0b72bfb8101c604fdde9ee721dcd7fb97ccee9662f30c13e213adf6b319a03",
+  "display_platform_sha256": "6a23d993097851fd70fc74fae97afd889a04734cc0db6d77b356cd93d2f9c547",
+  "original_artifacts": 20,
+  "raw_byte_preservation": true,
+  "normalization": "trailing spaces/tabs removed per display line; base64 companion preserves original stdout"
+}

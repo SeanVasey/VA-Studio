@@ -1,0 +1,16 @@
+{
+  "source": "20c85aa185503e0543e02567c28bad6799988aac",
+  "command": [
+    "php",
+    "-d",
+    "memory_limit=512M",
+    "vendor/bin/phpunit",
+    "-c",
+    "amount-portability-sqlite.phpunit.xml",
+    "--log-junit",
+    "docs/verification/amount-portability-independent-20261007/sqlite.xml",
+    "--fail-on-warning",
+    "--fail-on-empty-test-suite"
+  ],
+  "exit_code": 0
+}

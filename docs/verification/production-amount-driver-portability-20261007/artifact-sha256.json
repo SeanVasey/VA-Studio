@@ -1,0 +1,62 @@
+[
+  {
+    "path": "README.md",
+    "bytes": 4602,
+    "sha256": "560cb022dc2bdae881f994f710e1e05c762bca0cc7796c4b5bd5cba906a943d3"
+  },
+  {
+    "path": "eab-access-source.php",
+    "bytes": 9605,
+    "sha256": "49ac0f9b8d1f2826ddfd355dc75f4811c097179f134d037ffa5ac32bb850da78"
+  },
+  {
+    "path": "eab-red-mysql.txt",
+    "bytes": 1146,
+    "sha256": "8c30e40e0bbe5a30044ce535c1882db670119feb35af12d685760457566c6e25"
+  },
+  {
+    "path": "eab-red-mysql.xml",
+    "bytes": 1498,
+    "sha256": "9aa3d04d8d3778bd7d2e8db19ef5b99617cd9fb24c8b619c2a4b007e8c2e4b06"
+  },
+  {
+    "path": "mysql.txt",
+    "bytes": 286,
+    "sha256": "6f115950585d719d372147455f65e101c340f229d450a0253c79111ca9f698de"
+  },
+  {
+    "path": "mysql.xml",
+    "bytes": 22668,
+    "sha256": "682699bcfdbfb88e25c49a1b5a13ffce9dae763f8285c2492918a650dccaccf8"
+  },
+  {
+    "path": "pint-final.txt",
+    "bytes": 33,
+    "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+  },
+  {
+    "path": "pint.txt",
+    "bytes": 33,
+    "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+  },
+  {
+    "path": "run-mysql.py",
+    "bytes": 5827,
+    "sha256": "35bdde4f03a9d7a23d90337a77a938c1044f297553e0afe38d13eaee73ac854a"
+  },
+  {
+    "path": "source-and-outcomes.json",
+    "bytes": 2801,
+    "sha256": "4fbef7ce30d9aa4a8de3c347ee8c83eaee2e456fb082f7fab9dc379cd46eaaa0"
+  },
+  {
+    "path": "sqlite.txt",
+    "bytes": 97,
+    "sha256": "e61bc92351919f5f17464cd883c34794ff023e51e1d57d53f45eba5322170ee5"
+  },
+  {
+    "path": "sqlite.xml",
+    "bytes": 22666,
+    "sha256": "0cd3392333f42515d7efcb185589aa3050f63239525d15a7acd3cb8f5d337ca4"
+  }
+]

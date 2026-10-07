@@ -1,0 +1,167 @@
+{
+  "status": "read-only proposal; no implementation or test results claimed",
+  "inspected_native_main": "717f0866444701637e7c396b4376891aa5dd995d",
+  "proposal_base": "df00b2983f31bf20289158530a515a621505d389",
+  "reviewed_d28_source": "20c85aa185503e0543e02567c28bad6799988aac",
+  "bindings": [
+    {
+      "path": "app/Domain/Commerce/ProductionPreparation/ProductionTrackPreparationPackets.php",
+      "source": "717f0866444701637e7c396b4376891aa5dd995d",
+      "sha256": "8f56e0e889541726bf69e0289ba7b8de2f71849ce9f33126f7a49153e5206030",
+      "git_blob": "307f2db72cb65a814594f908ac30c1ca7df3b594",
+      "native_fetched_equals_inspected": true
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPreparation/PacketAuthority.php",
+      "source": "717f0866444701637e7c396b4376891aa5dd995d",
+      "sha256": "6bedd17a3a78274414d51fea648d4d4106247fcde488c16f0f38783a33cea361",
+      "git_blob": "c44df54e75a8ca6b907c92881e2ec28263321f25",
+      "native_fetched_equals_inspected": true
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPreparation/PacketEvidence.php",
+      "source": "717f0866444701637e7c396b4376891aa5dd995d",
+      "sha256": "8b771f131a40dca96d0681ebaa5b41a8d76afb190dd2502542e4c1cf90bea53f",
+      "git_blob": "af3cf5c0b562365246c9b8fc659fff8f9346f811",
+      "native_fetched_equals_inspected": true
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPreparation/PreparationSelection.php",
+      "source": "717f0866444701637e7c396b4376891aa5dd995d",
+      "sha256": "49a2001d9927bb94f676a4551d771f60870ebb740a4594d3e33e79dc08e3421c",
+      "git_blob": "5354a8751e21c6ffe98f8c4c10b473b5416b381d",
+      "native_fetched_equals_inspected": true
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPreparation/ProductionBuyerAssentObservations.php",
+      "source": "717f0866444701637e7c396b4376891aa5dd995d",
+      "sha256": "c0ec62635af45cda1499652739be15065aa71857eb4a2102dcd8c4ba4d2ab4d6",
+      "git_blob": "38a8665bebbededf7740c1b5f25b4afda5cd94b3",
+      "native_fetched_equals_inspected": true
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php",
+      "source": "717f0866444701637e7c396b4376891aa5dd995d",
+      "sha256": "ebdd882d4e8f6ac4d2a58b8da67784d336a0cabf0d58d2024d77d8bb601480dc",
+      "git_blob": "0d205d23b2c5fc04d7d99b719b5989e5dc758ad6",
+      "native_fetched_equals_inspected": true
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/PreparationContextV1.php",
+      "source": "717f0866444701637e7c396b4376891aa5dd995d",
+      "sha256": "1e022477267c0b65a1b3d74b4aa81e76e89a1b5e543604be4f4528a9b553db05",
+      "git_blob": "6e8c3d4b66ea462c75c41abbe7890c879d853590",
+      "native_fetched_equals_inspected": true
+    },
+    {
+      "path": "app/Support/Money/MinorUnits.php",
+      "source": "717f0866444701637e7c396b4376891aa5dd995d",
+      "sha256": "ad6b875ebcb416cffee737e1eb7b9e48f65e7a6a9c974ffe84de600c9dc9ef55",
+      "git_blob": "bf5863a362b2d316e16fc177f1edb194244c0d5a",
+      "native_fetched_equals_inspected": true
+    },
+    {
+      "path": "app/Support/CanonicalJson.php",
+      "source": "717f0866444701637e7c396b4376891aa5dd995d",
+      "sha256": "6e8f14f950bbb7ed3c4a8162ecf7c2fd2752031d1679285cea8bb0a5f5f82d89",
+      "git_blob": "4450b0c4f0a147f49db4732ea4d34c0804c54a25",
+      "native_fetched_equals_inspected": true
+    },
+    {
+      "path": "app/Domain/Customers/CustomerAccessPolicy.php",
+      "source": "717f0866444701637e7c396b4376891aa5dd995d",
+      "sha256": "2a144608b6988d0cd96a1f2eb9b7164c226b3fa60e822496bda8fe3f2099fd40",
+      "git_blob": "ceccc3a417413dec27b855d465d30349cef20fa3",
+      "native_fetched_equals_inspected": true
+    },
+    {
+      "path": "app/Domain/Customers/CustomerIdentityPolicy.php",
+      "source": "717f0866444701637e7c396b4376891aa5dd995d",
+      "sha256": "5ac7896fa90c2a68e0aa6efc93ebe5066e72da1a562bb28be53b4ac2a58ecb5d",
+      "git_blob": "451943f650cb82b7f240d4c812eae2b616ec8832",
+      "native_fetched_equals_inspected": true
+    },
+    {
+      "path": "app/Domain/Commerce/ComparePricingSettlement.php",
+      "source": "717f0866444701637e7c396b4376891aa5dd995d",
+      "sha256": "d2595df77a8b034bec088d9de5cbaa328095c1254ef6bea02d9cedfca49545c6",
+      "git_blob": "6a2216ac08b8c2a3d11a0d1c42efa22e19476fc4",
+      "native_fetched_equals_inspected": true
+    },
+    {
+      "path": "app/Domain/Commerce/PricingPolicy.php",
+      "source": "717f0866444701637e7c396b4376891aa5dd995d",
+      "sha256": "78e196ba15f89adc53dbc2804b8c7583ddd42514ab680075bff08f2b79ac2a30",
+      "git_blob": "873c3a8a29ef37068ebc3d381ff0c0dd4035586f",
+      "native_fetched_equals_inspected": true
+    },
+    {
+      "path": "docs/architecture/D-26-production-track-preparation.md",
+      "source": "717f0866444701637e7c396b4376891aa5dd995d",
+      "sha256": "1915694e827016d1ad4b8eb496a2c443578cf1c6c7a23b04f6020a51f0519504",
+      "git_blob": "0cdd4d87149429eec779bd755e38fc6d64d1d857",
+      "native_fetched_equals_inspected": true
+    },
+    {
+      "path": "docs/architecture/D-27-production-buyer-assent-reports.md",
+      "source": "717f0866444701637e7c396b4376891aa5dd995d",
+      "sha256": "588721848be2df0644fba372eddfb3324e55d5c6003205b57e9612d2f27b1693",
+      "git_blob": "8e1911142a1c15f7ec66240bacae7019f785e7b9",
+      "native_fetched_equals_inspected": true
+    },
+    {
+      "path": "docs/remaining-development-plan.md",
+      "source": "717f0866444701637e7c396b4376891aa5dd995d",
+      "sha256": "99f21edeb9cfb63dda1660780db788bd847372854454bff5936e4cf451c9bf0c",
+      "git_blob": "d6a4dc81635196e1a7bfa57edf3ccd9e5137b5c2",
+      "native_fetched_equals_inspected": true
+    },
+    {
+      "path": "docs/remaining-development-tasks.csv",
+      "source": "717f0866444701637e7c396b4376891aa5dd995d",
+      "sha256": "869dfa4fcafcbcfa6a3b01ba6a241a0b40f1da733c5f81ab277d3554e25965c8",
+      "git_blob": "93ef80cc64481060847211be7f0562a110be46bd",
+      "native_fetched_equals_inspected": true
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPreparation/AmountRequirementsV1.php",
+      "source": "20c85aa185503e0543e02567c28bad6799988aac",
+      "sha256": "505502b7b03667041e2c3e37633b6eea9fab23bce15cf64930ad063cc163bd80",
+      "git_blob": "64b4478f16f7b2defeb22519400c82bdac20c905",
+      "native_fetched_equals_inspected": null,
+      "authority": "reviewed D28 executable; publication separately held by root"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPreparation/ProductionAmountRequirements.php",
+      "source": "20c85aa185503e0543e02567c28bad6799988aac",
+      "sha256": "1deab826a0bb416b57e78245ce6112d3bcaf3d49c9c67d8ee5ccd72b9449e3e5",
+      "git_blob": "295fbff3b156f57cecc483223be0b018ec46c2e4",
+      "native_fetched_equals_inspected": null,
+      "authority": "reviewed D28 executable; publication separately held by root"
+    },
+    {
+      "path": "tests/Unit/ProductionAmountRequirementsTest.php",
+      "source": "20c85aa185503e0543e02567c28bad6799988aac",
+      "sha256": "01db646d46c9a280721728fbbcc735eb4e2e65783b4b4ca16407c7e136cd349b",
+      "git_blob": "709ac59efe25b9eb4cc2f961f7b8c3ccc9d44d09",
+      "native_fetched_equals_inspected": null,
+      "authority": "reviewed D28 executable; publication separately held by root"
+    },
+    {
+      "path": "tests/Feature/ProductionAmountRequirementsAccessTest.php",
+      "source": "20c85aa185503e0543e02567c28bad6799988aac",
+      "sha256": "7e26e01f9b43c37984964618139a9939f7acb558a2be23bd70ccff9433c3ccef",
+      "git_blob": "2e7cf5a83621043ba106a16252974cdf9adbfca4",
+      "native_fetched_equals_inspected": null,
+      "authority": "reviewed D28 executable; publication separately held by root"
+    },
+    {
+      "path": "docs/architecture/D-28-production-amount-evidence-requirements.md",
+      "source": "20c85aa185503e0543e02567c28bad6799988aac",
+      "sha256": "dd826ff7fa2a42d53bc549f839eb75b2df5168a8634fee2e3bc958ec63800bec",
+      "git_blob": "8d17cdc47a2b78b83da20e22f48e52938b6faf5d",
+      "native_fetched_equals_inspected": null,
+      "authority": "reviewed D28 executable; publication separately held by root"
+    }
+  ]
+}

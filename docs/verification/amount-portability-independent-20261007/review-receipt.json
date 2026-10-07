@@ -1,0 +1,56 @@
+{
+  "disposition": "approved focused development integration; corrected selected-driver fixture portability",
+  "reviewed_source": "20c85aa185503e0543e02567c28bad6799988aac",
+  "reviewed_tree": "3d1cb5442978c992b194bac816aaca406cbeabf8",
+  "independent_results_by_class": {
+    "sqlite": {
+      "Tests\\Feature\\ProductionAmountRequirementsAccessTest": {
+        "tests": 12,
+        "assertions": 82,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "Tests\\Feature\\AmountRequirementsIsolatedSQLiteCanaryTest": {
+        "tests": 2,
+        "assertions": 13,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    "mysql": {
+      "Tests\\Feature\\ProductionAmountRequirementsAccessTest": {
+        "tests": 12,
+        "assertions": 81,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "Tests\\Feature\\AmountRequirementsIsolatedSQLiteCanaryTest": {
+        "tests": 2,
+        "assertions": 13,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "mysql_runtime": {
+    "version": "8.4.11",
+    "flush_at_commit": 1,
+    "sync_binlog": 1,
+    "doublewrite": "ON",
+    "log_bin": true,
+    "schema": "fresh disposable"
+  },
+  "historical_review_paths_byte_exact": 19,
+  "protected_app_unit_D28_files_unchanged": 4,
+  "installed_package_identities": 158,
+  "findings": [],
+  "full_acceptance": false,
+  "hosted_dispatch": false,
+  "browser": false,
+  "native_concurrency": false,
+  "new_pdf_graph_integration": "parent scope still required"
+}

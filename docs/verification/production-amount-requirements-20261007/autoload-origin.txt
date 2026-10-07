@@ -1,0 +1,3 @@
+8.4.26
+/workspace/scratch/2876616e88c3/VA-Studio-production-amount-requirements/app/Domain/Commerce/ProductionPreparation/ProductionAmountRequirements.php
+/workspace/scratch/2876616e88c3/VA-Studio-production-amount-requirements/tests/Feature/ProductionAmountRequirementsAccessTest.php

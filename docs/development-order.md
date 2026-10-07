@@ -1,5 +1,22 @@
 # Ordered development status
 
+## Current development continuation — October 7, 2026 UTC
+
+PRs #17–#24 are merged in SeanVasey/VA-Studio; actual main is
+`717f0866444701637e7c396b4376891aa5dd995d`, tree `1c43bb29`.
+Dependency PRs #1–#3 and the original PR #16 membership rollback review
+are reconciled. The independently approved [D28/D29 amount batch](verification/amount-preparation-composition-20261007/README.md)
+is next: read-only frozen requirements and untrusted consistency with null
+authoritative amounts and false commerce flags. PR #25 discovery remains
+open for a concrete MySQL partial-DDL retry fix after successful cheap preflight;
+no source/merge is silently treated as accepted across that repair.
+
+Private candidate generation proceeds separately. T22/T36/full final acceptance
+and launch remain open; six parent groups remain accepted and 34 open.
+Current AGENTS.md governs focused low-cost development merges; historical
+source/results below retain their original scope.
+
+
 ## Current production preparation checkpoint — October 6, 2026 UTC
 
 [PR #16](https://github.com/SeanVasey/VA-Studio/pull/16) merged reviewed private

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionAmountRequirementsAccessTest" file="/workspace/scratch/2876616e88c3/VA-Studio-production-amount-requirements/tests/Feature/ProductionAmountRequirementsAccessTest.php" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="7.427003">
+    <testcase name="test_authenticated_projection_is_read_only_and_does_not_consume_reported_buyer_pii" file="/workspace/scratch/2876616e88c3/VA-Studio-production-amount-requirements/tests/Feature/ProductionAmountRequirementsAccessTest.php" line="55" class="Tests\Feature\ProductionAmountRequirementsAccessTest" classname="Tests.Feature.ProductionAmountRequirementsAccessTest" assertions="0" time="7.427003">
+      <error type="PDOException">Tests\Feature\ProductionAmountRequirementsAccessTest::test_authenticated_projection_is_read_only_and_does_not_consume_reported_buyer_pii
+PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'sql FROM sqlite_master ORDER BY type, name' at line 1
+
+/workspace/scratch/2876616e88c3/VA-Studio-production-amount-requirements/tests/Feature/ProductionAmountRequirementsAccessTest.php:42
+/workspace/scratch/2876616e88c3/VA-Studio-production-amount-requirements/tests/Feature/ProductionAmountRequirementsAccessTest.php:63</error>
+    </testcase>
+  </testsuite>
+</testsuites>

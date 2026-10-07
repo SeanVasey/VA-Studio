@@ -1,0 +1,22 @@
+{
+  "source": "a86a7e2e8b72495dc35ba053dd01467702d88b8a",
+  "tree": "3729a1e04e593274526af0fe8d421cb538da47a7",
+  "sqlite": {
+    "name": "/workspace/scratch/2876616e88c3/VA-Studio-amount-final-independent/amount-final.phpunit.xml",
+    "tests": "52",
+    "assertions": "183",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "13.348547"
+  },
+  "validate_strict_exit": 0,
+  "check_platform_exit": 0,
+  "audit_locked_exit": 0,
+  "audit_advisories": 0,
+  "installed_exact_versions_source_dist_references": 158,
+  "autoload_origin": "own final review app classes; immutable shared package directories with private composer metadata/autoload",
+  "failed_initial_launch": "No tests started: shared phpunit entry selected its own autoloader, duplicating Composer class. Repaired only invocation with _composer_autoload_path to own autoload. Raw failure preserved.",
+  "graph_diagnostic_failure": "Comparison completed and saved all158 exact refs; optional diagnostic attempted nonexistent dompdf package name and raised KeyError. Graph receipt was already written. Actual PDF packages are tecnickcom.",
+  "tested_command": "php -r '$GLOBALS[\"_composer_autoload_path\"] = getcwd().\"/vendor/autoload.php\"; require \"vendor/phpunit/phpunit/phpunit\";' -- -c amount-final.phpunit.xml --log-junit docs/verification/amount-final-independent-20261007/sqlite.xml"
+}

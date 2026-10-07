@@ -1,0 +1,4 @@
+8.4.26
+/workspace/scratch/2876616e88c3/VA-Studio-production-amount-input-consistency/app/Domain/Commerce/ProductionPreparation/CompareProductionAmountInputs.php
+/workspace/scratch/2876616e88c3/VA-Studio-production-amount-input-consistency/app/Domain/Commerce/ProductionPreparation/AmountInputConsistencyV1.php
+/workspace/scratch/2876616e88c3/VA-Studio-production-amount-input-consistency/tests/Feature/ProductionAmountInputConsistencyAccessTest.php

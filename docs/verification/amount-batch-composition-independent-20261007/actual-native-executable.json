@@ -1,0 +1,35 @@
+{
+  "sha": "3398299cd72139b37a64f84a8ec91ce43cbeeefd",
+  "node_id": "C_kwDOU5febtoAKDMzOTgyOTljZDcyMTM5YjM3YTY0Zjg0YThlYzkxY2U0M2NiZWVlZmQ",
+  "url": "https://api.github.com/repos/SeanVasey/VA-Studio/git/commits/3398299cd72139b37a64f84a8ec91ce43cbeeefd",
+  "html_url": "https://github.com/SeanVasey/VA-Studio/commit/3398299cd72139b37a64f84a8ec91ce43cbeeefd",
+  "author": {
+    "name": "Sean Vasey",
+    "email": "sean@vasey.audio",
+    "date": "2026-10-07T05:47:39Z"
+  },
+  "committer": {
+    "name": "Sean Vasey",
+    "email": "sean@vasey.audio",
+    "date": "2026-10-07T05:47:39Z"
+  },
+  "tree": {
+    "sha": "a5e7fe3d890c6a68790d8cee6fdc32397f5ade56",
+    "url": "https://api.github.com/repos/SeanVasey/VA-Studio/git/trees/a5e7fe3d890c6a68790d8cee6fdc32397f5ade56"
+  },
+  "message": "Add frozen production amount requirements and untrusted consistency comparison",
+  "parents": [
+    {
+      "sha": "717f0866444701637e7c396b4376891aa5dd995d",
+      "url": "https://api.github.com/repos/SeanVasey/VA-Studio/git/commits/717f0866444701637e7c396b4376891aa5dd995d",
+      "html_url": "https://github.com/SeanVasey/VA-Studio/commit/717f0866444701637e7c396b4376891aa5dd995d"
+    }
+  ],
+  "verification": {
+    "verified": false,
+    "reason": "unsigned",
+    "signature": null,
+    "payload": null,
+    "verified_at": null
+  }
+}
