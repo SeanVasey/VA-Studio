@@ -1,0 +1,3 @@
+M11-4d-canary exit=0 wall=3.576320645s
+M11-terminal-canary exit=1 wall=3.865969192s
+M11-terminal-cases exit=2 wall=30.257030550s

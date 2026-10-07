@@ -1,0 +1,48 @@
+source b8886440c59bd1f001d0278e6d545a570f813f11
+$ git diff --stat 43ae65e6 b8886440 -- app tests
+ .../Commerce/ProductionCheckout/HostedCheckout.php |  7 +-
+ .../ProductionCheckoutWriteAdmissionAllTest.php    | 95 +++++++++++++++++++++-
+ 2 files changed, 99 insertions(+), 3 deletions(-)
+$ git diff --stat 43ae65e6 b8886440 -- routes bootstrap config database .github composer.json composer.lock package.json package-lock.json phpunit.xml (empty = untouched)
+$ git diff --name-only 43ae65e6 b8886440 outside conditions/codex-terminal-reproof/
+app/Domain/Commerce/ProductionCheckout/HostedCheckout.php
+docs/verification/checkout-write-admission-all-20261007/README.md
+tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php
+$ sha256sum (b8886440)
+79681bdde327f7c8f9ae24184e038af2097fa78204df75c3ccfa0d93375a48d3  app/Domain/Commerce/ProductionCheckout/HostedCheckout.php
+92e48fe7e3a7b8d7e1d979ba8534845e353bd8ad8dcd1d3fc895e1863a2cdcd4  tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php
+7887f431140e6965927c4ff2dd408fd6e5b20c92013609a7bde38fa5cc826b70  docs/verification/checkout-write-admission-all-20261007/conditions/codex-terminal-reproof/canary/TerminalReproofCanaryTest.php
+8b596d769c5c77c6e1cbc6da994b1b84a46a78e2da11ae985f95f14e97b5335c  docs/verification/checkout-write-admission-all-20261007/conditions/codex-reprove-admission/canary/ReproveCommitAdmissionCanaryTest.php
+fd8fccde5538dd316bb1d799e91e0a718fd6289cf7a793fc898e6eaaba394be8  app/Domain/Commerce/ProductionCheckout/CommandTransaction.php
+ed529e8f69b2ae6733d767aeae6bebd693faa114c55cd1c5c3a3a5824ddcd372  app/Domain/Commerce/ProductionCheckout/OriginalCommitDispatcher.php
+7dbaeed358ab1051dd34608fbf966645ae7756f163700733bf9708f1233aba42  app/Domain/Customers/ProductionCustomerAccess.php
+13324e490e705ba745161cb391fb865d9bbb3a9a2e46c4c7bebb92a90f221138  app/Domain/Commerce/ProductionCheckout/CheckoutIntentAdmission.php
+$ git diff --quiet 43ae65e6 b8886440 -- <frozen/admission files>
+identical app/Domain/Commerce/ProductionCheckout/CommandTransaction.php
+identical app/Domain/Commerce/ProductionCheckout/OriginalCommitDispatcher.php
+identical app/Domain/Commerce/ProductionCheckout/CheckoutIntentAdmission.php
+identical app/Domain/Customers/ProductionCustomerAccess.php
+identical docs/verification/checkout-write-admission-all-20261007/conditions/codex-reprove-admission/canary/ReproveCommitAdmissionCanaryTest.php
+$ git diff --quiet ece5a9ee b8886440 -- CommandTransaction OriginalCommitDispatcher
+identical-from-ece5a9ee
+$ git diff --numstat 43ae65e6 b8886440 -- app tests
+6	1	app/Domain/Commerce/ProductionCheckout/HostedCheckout.php
+93	2	tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php
+$ git diff --numstat 0cb13ca5 b8886440 -- app tests config routes bootstrap database
+21	2	app/Domain/Commerce/ProductionCheckout/CheckoutIntentAdmission.php
+17	2	app/Domain/Commerce/ProductionCheckout/HostedCheckout.php
+144	4	tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php
+$ git diff --stat 0cb13ca5 b8886440 -- routes bootstrap config database .github app/Providers composer.json composer.lock package.json package-lock.json phpunit.xml (empty = untouched)
+$ byte identity 0cb13ca5..b8886440
+identical app/Domain/Commerce/ProductionCheckout/CheckoutWriteAdmission.php
+identical app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
+identical app/Domain/Commerce/ProductionCheckout/CheckoutCommandFrame.php
+identical app/Domain/Commerce/ProductionCheckout/CheckoutCommandCommitDispatcher.php
+identical app/Domain/Commerce/ProductionCheckout/CheckoutRawPlans.php
+identical app/Domain/Commerce/ProductionCheckout/CheckoutCommitAdmission.php
+identical app/Domain/Commerce/ProductionCheckout/FreshCheckoutPolicy.php
+identical app/Domain/Commerce/ProductionCheckout/Records.php
+identical app/Domain/Commerce/ProductionCheckout/TaxExemptions.php
+identical app/Domain/Commerce/ProductionCheckout/ApproveExemptionAuthority.php
+identical app/Domain/Commerce/ProductionCheckout/CommandTransaction.php
+identical app/Domain/Commerce/ProductionCheckout/OriginalCommitDispatcher.php

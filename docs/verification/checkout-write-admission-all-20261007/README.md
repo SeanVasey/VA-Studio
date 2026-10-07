@@ -342,3 +342,24 @@ Pint passes on the changed files. No native run was made for this item.
 - initiate succeeds with one session.
 
 Pint passes on the changed files. No native run was made for this item.
+
+## 4f. Independent review addendum 3 (`0cb13ca5..b8886440`)
+
+APPROVE WITH CONDITIONS carries to `b8886440` (`independent-review/DECISION.md`, addendum 3;
+evidence `independent-review/review-evidence/addendum3/`). Codex P1 r4210033214 (§4d) and
+P1 r4210180698 (§4e) are closed with the residual scope stated there. No new condition;
+nothing above Info. SQLite at `b8886440`: the admission file 26/187, journey 7/81, exemption
+authority 11/50, terminal canary 1/5, c6 physical canary 1/5; mutations M8 (no `reprove()`),
+M11 (move reverted) caught; M12 (leading `current()` deleted) survives because the frame's own
+`lock()` throws the same `IdentityException` (Info A3-6). Native MySQL 8.4.11, one schema per
+private instance: the admission file 26/187 across six shards, 0 skips; terminal canary 1/5;
+native M8 red on every case. The reviewer's first native attempt put six schemas on one server
+and the migrations' server-wide trigger guards refused each other (harness error, retained
+under `native/b8886440/harness-error-parallel-schemas/`; PR #50 fixes that scan).
+
+The archived §4d canary's drift (§4e above) is judged benign: it acts on the first commit after
+`provenance()`, which is now the leading `current()` transaction before the frame, so it lands
+in the "window" case (refused `changed`, 0 creates, 0 sessions, offer left inactive). Its pinned
+`write_source_changed` / `inactive_offers: 0` assertions are therefore **superseded** by the
+permanent §4d regression that targets the admitted frame explicitly; the archived file is kept
+unchanged as evidence of the `0cb13ca5` state and is not counted as a current failure (Info A3-7).

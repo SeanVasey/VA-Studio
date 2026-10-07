@@ -1,0 +1,2 @@
+M8-canary exit=1 wall=4.060242742s
+M8-reprove-cases exit=2 wall=16.698763968s
