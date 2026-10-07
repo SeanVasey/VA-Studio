@@ -81,6 +81,7 @@ sha256sum <BACKUP_DIR>/private.tar > <BACKUP_DIR>/private.tar.sha256
 sha256sum --check <BACKUP_DIR>/database.sql.sha256
 sed 's/`<DATABASE>`/`<RESTORE_DATABASE>`/g' <BACKUP_DIR>/database.sql \
   | mysql --defaults-extra-file=<RESTORE_OPTION_FILE>
+sha256sum --check <BACKUP_DIR>/private.tar.sha256   # the archive, not only its members, must be the one step 2 wrote
 mkdir -m 700 <RESTORE_PRIVATE_ROOT>
 tar --extract --file=<BACKUP_DIR>/private.tar --directory=<RESTORE_PRIVATE_ROOT> --no-same-owner
 
@@ -88,6 +89,9 @@ tar --extract --file=<BACKUP_DIR>/private.tar --directory=<RESTORE_PRIVATE_ROOT>
 (cd <RESTORE_PRIVATE_ROOT> && sha256sum --check --strict <BACKUP_DIR>/private.sha256)
 diff <(cd <RESTORE_PRIVATE_ROOT> && find . ! -type d | LC_ALL=C sort) \
      <(cut -c67- <BACKUP_DIR>/private.sha256 | LC_ALL=C sort)
+#    Hashes and names say nothing about modes: masters and contracts must stay owner-only.
+(cd <RESTORE_PRIVATE_ROOT> && ! find . \( -type f ! -perm 0600 \) -o \( -type d ! -perm 0700 \) | grep -q .) \
+  || { echo 'restored entry outside modes 0600/0700'; exit 1; }
 mysqldump --defaults-extra-file=<RESTORE_OPTION_FILE> --single-transaction --quick \
   --routines --triggers --events --hex-blob --no-tablespaces --set-gtid-purged=OFF \
   --skip-dump-date --databases <RESTORE_DATABASE> \

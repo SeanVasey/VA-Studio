@@ -69,15 +69,14 @@ class StripeCapabilityPreflightTest extends TestCase
     private static function account(array $fields = []): array
     {
         return [...['object' => 'account', 'id' => self::ACCOUNT, 'charges_enabled' => true, 'payouts_enabled' => true,
-            'details_submitted' => true, 'default_currency' => 'usd', 'email' => 'private-merchant@example.invalid'], ...$fields];
+            'details_submitted' => true, 'default_currency' => 'usd', 'email' => 'private-merchant@example.invalid',
+            'capabilities' => ['transfers' => 'inactive', 'card_payments' => 'active']], ...$fields];
     }
 
-    private static function capabilities(string $cardPayments = 'active'): array
+    /** The own-account response with a different card_payments capability status. */
+    private static function accountWithCardPayments(string $status): array
     {
-        return ['object' => 'list', 'has_more' => false, 'url' => '/v1/accounts/'.self::ACCOUNT.'/capabilities', 'data' => [
-            ['object' => 'capability', 'id' => 'transfers', 'account' => self::ACCOUNT, 'status' => 'inactive', 'requested' => false],
-            ['object' => 'capability', 'id' => 'card_payments', 'account' => self::ACCOUNT, 'status' => $cardPayments, 'requested' => true],
-        ]];
+        return self::account(['capabilities' => ['transfers' => 'inactive', 'card_payments' => $status]]);
     }
 
     public function test_default_configuration_reports_blocked_shape_and_valid_pins_without_any_provider_io(): void
@@ -235,7 +234,7 @@ class StripeCapabilityPreflightTest extends TestCase
     #[DataProvider('refusals')]
     public function test_probe_refusals_happen_before_any_transport_use(array $options, array $config, string $reason): void
     {
-        $fixture = $this->fixture([self::account(), self::capabilities()]);
+        $fixture = $this->fixture([self::account()]);
         $this->shaped(['production_checkout.secret_key' => self::SECRET, 'production_checkout.provider_io_enabled' => true, ...$config]);
         $previous = ApiRequestor::httpClient();
         [$exit, $report] = $this->preflight($options);
@@ -254,7 +253,7 @@ class StripeCapabilityPreflightTest extends TestCase
         $this->assertSame(1, $exit);
         $this->assertSame('fixture_transport_required_in_testing', $report['probe']['reason']);
 
-        $fixture = $this->fixture([self::account(), self::capabilities()]);
+        $fixture = $this->fixture([self::account()]);
         DB::beginTransaction();
         try {
             $report = app(StripeCapabilityPreflight::class)->collect(true, true);
@@ -283,9 +282,9 @@ class StripeCapabilityPreflightTest extends TestCase
         $this->assertSame([], $fixture->calls);
     }
 
-    public function test_confirmed_probe_reads_only_own_account_and_capabilities_with_pinned_headers(): void
+    public function test_confirmed_probe_reads_only_the_own_account_with_pinned_headers(): void
     {
-        $fixture = $this->fixture([self::account(), self::capabilities()]);
+        $fixture = $this->fixture([self::account()]);
         $this->shaped(['production_checkout.secret_key' => self::SECRET, 'production_checkout.provider_io_enabled' => true]);
         $previous = ApiRequestor::httpClient();
         [$exit, $report] = $this->preflight(['--probe' => true, '--i-understand-this-calls-stripe' => true]);
@@ -299,9 +298,9 @@ class StripeCapabilityPreflightTest extends TestCase
             'default_currency_is_usd' => true, 'capabilities' => ['card_payments' => 'active', 'transfers' => 'inactive']], $report['probe']['observation']);
         $this->assertStringNotContainsString('private-merchant@example.invalid', json_encode($report, JSON_THROW_ON_ERROR));
 
-        $this->assertCount(2, $fixture->calls);
+        // One read only: the own-account response carries the capabilities hash; no Connect endpoint is touched.
+        $this->assertCount(1, $fixture->calls);
         $this->assertSame(['get', 'https://api.stripe.com/v1/account'], [$fixture->calls[0]['method'], $fixture->calls[0]['url']]);
-        $this->assertSame(['get', 'https://api.stripe.com/v1/accounts/'.self::ACCOUNT.'/capabilities'], [$fixture->calls[1]['method'], $fixture->calls[1]['url']]);
         foreach ($fixture->calls as $call) {
             $headers = implode("\n", $call['headers']);
             $this->assertStringContainsString('Stripe-Version: '.ExecutionContextV1::API_VERSION, $headers);
@@ -315,16 +314,16 @@ class StripeCapabilityPreflightTest extends TestCase
     public function test_live_mode_requires_charges_and_active_card_payments_from_observed_evidence(): void
     {
         $live = ['production_checkout.funds_mode' => 'live', 'production_checkout.secret_key' => 'sk_live_SYNTHETIC', 'production_checkout.provider_io_enabled' => true];
-        $this->fixture([self::account(['charges_enabled' => false]), self::capabilities()]);
+        $this->fixture([self::account(['charges_enabled' => false])]);
         $this->shaped($live);
         [$exit, $report] = $this->preflight(['--probe' => true, '--i-understand-this-calls-stripe' => true]);
         $this->assertSame([1, 'blocked'], [$exit, $report['probe']['status']]);
 
-        $this->fixture([self::account(), self::capabilities('pending')]);
+        $this->fixture([self::accountWithCardPayments('pending')]);
         [$exit, $report] = $this->preflight(['--probe' => true, '--i-understand-this-calls-stripe' => true]);
         $this->assertSame([1, 'blocked'], [$exit, $report['probe']['status']]);
 
-        $this->fixture([self::account(), self::capabilities()]);
+        $this->fixture([self::account()]);
         [$exit, $report] = $this->preflight(['--probe' => true, '--i-understand-this-calls-stripe' => true]);
         $this->assertSame([0, 'pass'], [$exit, $report['probe']['status']]);
         $this->assertFalse($report['live_payments_authorized']);
@@ -349,8 +348,8 @@ class StripeCapabilityPreflightTest extends TestCase
         return [
             'transport exception' => [[], true],
             'not an account' => [[['object' => 'customer', 'id' => self::ACCOUNT]], false],
-            'unknown capability status' => [[self::account(), ['object' => 'list', 'data' => [['object' => 'capability', 'id' => 'card_payments', 'status' => 'PRIVATE-STATUS']]]], false],
-            'capability of another account' => [[self::account(), ['object' => 'list', 'data' => [['object' => 'capability', 'id' => 'card_payments', 'account' => 'acct_OTHER', 'status' => 'active']]]], false],
+            'unknown capability status' => [[self::account(['capabilities' => ['card_payments' => 'PRIVATE-STATUS']])], false],
+            'capabilities not a hash' => [[self::account(['capabilities' => 'active'])], false],
         ];
     }
 
@@ -418,9 +417,29 @@ class StripeCapabilityPreflightTest extends TestCase
         $this->assertSame($status === 'pass', $report['configuration_shape_valid']);
     }
 
+    #[DataProvider('malformedCapabilities')]
+    public function test_malformed_capabilities_hash_fails_closed(mixed $capabilities): void
+    {
+        $fixture = $this->fixture([self::account(['capabilities' => $capabilities])]);
+        $this->shaped(['production_checkout.secret_key' => self::SECRET, 'production_checkout.provider_io_enabled' => true]);
+        [$exit, $report] = $this->preflight(['--probe' => true, '--i-understand-this-calls-stripe' => true]);
+        $this->assertSame([1, 'failed'], [$exit, $report['probe']['status']]);
+        $this->assertCount(1, $fixture->calls);
+    }
+
+    public static function malformedCapabilities(): array
+    {
+        return [
+            'not a hash' => ['active'],
+            'unknown status' => [['card_payments' => 'enabled']],
+            'numeric name' => [[0 => 'active']],
+            'hostile name' => [['card payments; drop' => 'active']],
+        ];
+    }
+
     public function test_probe_class_refuses_fixture_transport_outside_testing(): void
     {
-        $probe = new StripeCapabilityProbe(new StripePreflightHttpFixture([self::account(), self::capabilities()]));
+        $probe = new StripeCapabilityProbe(new StripePreflightHttpFixture([self::account()]));
         $this->app->instance('env', 'production');
         $this->expectException(RuntimeException::class);
         $probe->observe('test', self::ACCOUNT, self::SECRET);

@@ -22,7 +22,8 @@ use Throwable;
  */
 final class StripeCapabilityProbe
 {
-    public const ENDPOINTS = ['GET /v1/account', 'GET /v1/accounts/{account}/capabilities'];
+    // The own-account read carries the capabilities hash; /v1/accounts/{id}/... is a Connect lookup.
+    public const ENDPOINTS = ['GET /v1/account'];
 
     private const STATUSES = ['active', 'inactive', 'pending', 'unrequested', 'disabled'];
 
@@ -65,14 +66,12 @@ final class StripeCapabilityProbe
                 $matches = hash_equals($accountId, $account['id']);
                 $capabilities = [];
                 if ($matches) {
-                    $list = $client->accounts->allCapabilities($accountId, ['limit' => 100])->toArray();
-                    self::require(($list['object'] ?? null) === 'list' && is_array($list['data'] ?? null) && array_is_list($list['data']));
-                    foreach ($list['data'] as $capability) {
-                        $name = $capability['id'] ?? null;
-                        $status = $capability['status'] ?? null;
-                        self::require(($capability['object'] ?? null) === 'capability' && is_string($name)
-                            && preg_match('/\A[a-z][a-z0-9_]{0,63}\z/D', $name) === 1 && in_array($status, self::STATUSES, true)
-                            && ($capability['account'] ?? $accountId) === $accountId);
+                    // Same source as OwnAccountStripeGateway: the account's own capabilities hash (name => status).
+                    $hash = $account['capabilities'] ?? [];
+                    self::require(is_array($hash));
+                    foreach ($hash as $name => $status) {
+                        self::require(is_string($name) && preg_match('/\A[a-z][a-z0-9_]{0,63}\z/D', $name) === 1
+                            && in_array($status, self::STATUSES, true));
                         $capabilities[$name] = $status;
                     }
                     ksort($capabilities, SORT_STRING);

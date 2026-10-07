@@ -24,7 +24,9 @@ It used no native MySQL: every PHP test ran on the SQLite default from `phpunit.
 | `a2b56002` | 6: this receipt (first version) |
 | `3d615162` | Review R-1 and R-2 fixes (probe class guard; funds mode bound to `APP_ENV`) |
 | `e8d84306` | Review R-6: this README, the packet's plan path and R-3 note, the queue row, and `independent-review/DECISION.md` |
-| the commit after `e8d84306` | Codex P2 ×2 on PR #46: raw-PDO transaction guard in the preflight and probe (with regression test); documented MySQL backup refuses unmanifested entries and verifies the exact restored tree |
+| `f4c55acf` | Codex P2 ×2 on PR #46: raw-PDO transaction guard in the preflight and probe (with regression test); documented MySQL backup refuses unmanifested entries and verifies the exact restored tree |
+| `6abeaa94`, `99974a07` | Review addendum 2; Codex P2 ×2 on docs (`xargs -r`; clean-worktree deploy check) |
+| the commit after `99974a07` | Codex P2 ×2: the probe reads capabilities from the own-account response instead of the Connect list endpoint; the backup procedure verifies the archive digest before extraction and the restored modes after |
 
 The first tested source was `01a2590d29ea27ebe5bb10df78c1ef5bb5f0ece6`, and the reviewer
 assessed exactly that. The review follow-up was tested at
@@ -238,6 +240,26 @@ now yields an empty manifest, rehearsed), and the packet's staging deploy step a
 dirty reused checkout (it now refuses any tracked edit, untracked or ignored file, and
 requires `HEAD^{tree}` to equal `git write-tree`; rehearsed in a throwaway repository:
 clean accepted, tracked edit refused, untracked/ignored file refused).
+
+Codex's third pass on `99974a07` added two more P2 findings. The probe called
+`GET /v1/accounts/{id}/capabilities` after `GET /v1/account`; that is a Connect lookup, which
+`StripeSdkCheckoutGateway` documents as not applicable to the own-account credential, and
+`OwnAccountStripeGateway` already reads `capabilities.card_payments` from the `/v1/account`
+response. The probe now derives the capability map from the own-account response's
+`capabilities` hash (name to status, same statuses, same name pattern) and makes exactly one
+request; `ENDPOINTS` is `['GET /v1/account']`. Fixtures moved into the account response, the
+two provider-failure datasets that modelled the list endpoint became a hash with an unknown
+status and a non-hash value, and a new data-provided test checks four malformed hashes fail
+closed with one call. The documented MySQL restore now checks `private.tar.sha256` before
+extraction (a replaced archive with the same member bytes but widened modes passed the
+member hashes) and, after extraction, refuses any restored entry outside modes 0600/0700.
+Rehearsed on a synthetic tree: digest accepted; a replaced archive refused by the digest;
+with the digest bypassed, widened modes still pass the member hashes and are refused by the
+mode check.
+
+| Run | Tests | Assertions | Failures |
+| --- | ---: | ---: | ---: |
+| `StripeCapabilityPreflightTest` after the probe change | 41 | 336 | 0 |
 
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
