@@ -5,6 +5,8 @@ namespace App\Domain\Services\Projects\Attachments;
 use App\Domain\Customers\CustomerAccessException;
 use App\Domain\Services\Projects\ServiceProjectException;
 use App\Domain\SupportAttachments\AttachmentActor;
+use App\Domain\SupportAttachments\AttachmentCommittedReadAuthority;
+use App\Domain\SupportAttachments\AttachmentCommittedReadReceipt;
 use App\Domain\SupportAttachments\AttachmentException;
 use App\Domain\SupportAttachments\AttachmentMutationAuthority;
 use App\Domain\SupportAttachments\AttachmentRows;
@@ -13,7 +15,7 @@ use Illuminate\Validation\ValidationException;
 use Throwable;
 
 /** Server registry bridge; no HTTP body can select or manufacture this adapter. */
-final class ServiceProjectAttachmentAuthority implements AttachmentMutationAuthority
+final class ServiceProjectAttachmentAuthority implements AttachmentCommittedReadAuthority, AttachmentMutationAuthority
 {
     public function lock(string $sourceId, ?int $expectedVersion, string $purpose, AttachmentActor $actor, AttachmentRows $rows): AttachmentSourceProof
     {
@@ -33,6 +35,15 @@ final class ServiceProjectAttachmentAuthority implements AttachmentMutationAutho
         $this->closed(function () use ($proof, $expectedVersion, $purpose, $rows): void {
             AttachmentException::require($proof->token instanceof ServiceProjectAttachmentSourceV1);
             $proof->token->authorizeMutation($expectedVersion, $purpose, $rows);
+        });
+    }
+
+    public function committedReadReceipt(AttachmentSourceProof $proof, AttachmentRows $rows): AttachmentCommittedReadReceipt
+    {
+        return $this->closed(function () use ($proof, $rows): AttachmentCommittedReadReceipt {
+            AttachmentException::require($proof->token instanceof ServiceProjectAttachmentSourceV1);
+
+            return ServiceProjectCommittedReadReceipt::capture($proof->token, $rows);
         });
     }
 
