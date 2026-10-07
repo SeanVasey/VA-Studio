@@ -2,12 +2,12 @@
 
 ## Active cloud ownership — October 7, 2026 UTC
 
-One integration owner `/root`; verified main3fb7dd0 includes PRs25–29.
+One integration owner `/root`; verified mainda70eba includes PRs25–30.
 Historical owner tables below describe earlier source, not active workers.
 
 | Worker | Isolated boundary | Current handoff |
 | --- | --- | --- |
-| `/root` | Primary/shared registration/evidence/publication | PR29 merged; service7dc8bd8 authority/P2 repairs independently approved; freshpreflight next; notes capacity approved; mount next identity, checkout and attachments after review |
+| `/root` | Primary/shared registration/evidence/publication | PR30 merged/preflightpassed; notes7e finalbase review/publication; consent/identity/attachments held for concrete repairs; notes capacity approved; mount next identity, checkout and attachments after review |
 | `/root/pr25_recovery` | New ProductionCheckout246000/provider adapter/private routes/tests | Immutable review→assent→payable order→provider initiation/reconciliation; qualified exemption first, provider-calculated tax next |
 | `/root/completion_audit` | ProductionIdentity247000/routes/UI/local SMTP proof | Immutable origin, mailbox challenge, recovery/credential fencing, typed principal; no synthetic-account adoption by email |
 | `/root/native_mysql` | ServiceProjects244000; source adapter then free origins245000 | Service7dc independently approved; adapterb209b85 has root actualSQLite/native1/8 approval; free245 implementation active |

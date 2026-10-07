@@ -304,3 +304,28 @@ repairs captured permanent read/write/reader identity before review. Attachments
 failures; successor work is underway. Serviceadapterroot approvalbe8a494 binds
 originalSQLite/native red-now-green1/8 each and15exactsourcebindings. Checkout,
 free,consent/suppression and remaining personal-store scope continue separately.
+
+## Eighth milestone: service corrections merged; notes final-main composition
+
+PR30 expectedhead00705ad3d3c7b5455bf2197579c84bc18dc1fb6e merged
+asda70eba95c46522cd4084db4e79f764ba401fd7c at08:35:51UTC,
+tree34449b797650c78ffc72eacd26cbb11dcd2ca7d4. Fresh preflight37594438072
+passed scope/frontend/backend/aggregate with docs appropriatelyskipped. Actual
+mergeparents3fb7dd0/00705ad andtree match publishedcandidate. Automatic reviews
+were on old9d968 and their two threads now resolve true after meaningful source
+fixes; final actual independent review7dc supersedes13d. No claim that oldauto
+reviews certify updatedsource. PrimaryFFmainclean; no fullFoundation dispatch.
+
+Notes current7e80766 containsactualmain ancestry; all13notes sources exactaf87.
+Three onlybasechanges CustomerSessionController/bootstrap/CustomerLibrary are
+reviewedservice registration; no executablechange from tested4d36. Actual
+PHP21/289 and mounted98/TypeScript pass; bounded final-basereview precedesPR31.
+Consent rootHTTP16/171 and mounted63/TS pass, but250held for actual reservedname,
+missingdependency andlatepolicycallback defects; author repairs before251.
+T23 successor8e551ca fixes root-confirmed old-temp-user sign-in defect; identical
+independentcanary now1/5green. Remaining identity review/nativefinals are active.
+Attachments1914held for actualterminaldecrypt/stalereplay defects; corrected
+source/cleanupauthorization tests are active. T22 actualSMTP buyer/order/provider
+journeys are provisional onunapprovedidentity; its own shadowfences/races underway.
+Free245 continues. Fullpersonalstore/member/products/migration/host preparation
+and finalFoundation/native8.4/browser remain open. No external production action.

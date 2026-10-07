@@ -1,0 +1,17 @@
+
+> test
+> vitest run tests/frontend/customer-account.test.tsx tests/frontend/customer-listening-library.test.tsx tests/frontend/customer-listening-notes.test.tsx tests/frontend/cloud-listening-independent.test.tsx tests/frontend/service-project-journey.test.tsx
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-listening-notes-registration
+
+
+ Test Files  5 passed (5)
+      Tests  98 passed (98)
+   Start at  08:28:16
+   Duration  4.37s (tests 50%, environment 30%, transform 10%, import 6%, setup 4%)
+
+Environment  jsdom was created 5 times · 3.55s total, 30% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+

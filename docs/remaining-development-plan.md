@@ -2,21 +2,20 @@
 
 ## Current cloud execution — October 7, 2026 UTC
 
-Verified main `3fb7dd05142e4539e2f0af17831d66a1544d0cb0` includes PRs25–29:
+Verified main `da70eba95c46522cd4084db4e79f764ba401fd7c` includes PRs25–30:
 epoch recovery, amount preparation, actual crawler correction, installation/
 private checkout and private listening/inquiry alerts. Exact-source independent
 review, cheap preflight and expected-head merges pass; complete Foundation
 verification remains reserved for the final integrated candidate.
 
-PR30 automatic P2 and independently demonstrated authority defects are now
+MergedPR30 automatic P2 and independently demonstrated authority defects are now
 repaired and independently approved on exact7dc8bd8028d6b4eb4a73cbc9b10e9b9402cec63e.
 Predecessor13d7ae approval is superseded; original red receipts remain. Actual
 native3/13, SQLite2+one named native skip/8, private middleware2/10 and50selector
-checks pass; root affected10/66, frontend7 and TypeScript pass. Fresh final-head
-preflight/publication follow. See [follow-up review](verification/cloud-service-followup-independent-20261007.md).
+checks pass; root affected10/66, frontend7 and TypeScript pass. Final-head preflight37594438072 passed; actual merge/tree/parents verified. See [follow-up review](verification/cloud-service-followup-independent-20261007.md).
 Notes/export/clear capacity repair is independently approved ataf87b702 in
 fbe178ea: actual native86,184-byte rejection retains original64,800-byte history.
-It awaits publication on the corrected service/main graph.
+Its actual-main composition7e80766 passes affected21/289 and mounted98/TypeScript; final-base review/publication follow.
 
 ProductionCheckout246, ProductionIdentity247/localSMTP, attachments249 and
 preferences/consent250 are active isolated code lanes. Service source adapter
