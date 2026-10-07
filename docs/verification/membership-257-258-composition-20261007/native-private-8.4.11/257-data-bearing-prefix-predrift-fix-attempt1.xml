@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" file="/home/user/VA-Studio-member257/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="91.617910">
+    <testcase name="test_data_bearing_partial_guard_prefix_refuses_and_retains_original_plan" file="/home/user/VA-Studio-member257/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="93" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="0" time="91.617910">
+      <error type="PDOException">Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest::test_data_bearing_partial_guard_prefix_refuses_and_retains_original_plan
+PDOException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'production_membership_redemptions' referenced by a foreign key constraint 'production_member_origins_f0' on table 'production_member_origins'.
+
+/home/user/VA-Studio-member257/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php:98
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+  </testsuite>
+</testsuites>

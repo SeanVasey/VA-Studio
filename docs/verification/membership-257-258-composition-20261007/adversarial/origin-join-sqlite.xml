@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\MembershipReview\MemberOriginalRedemptionJoinReviewTest" file="/home/user/VA-Studio-member257/docs/verification/membership-257-258-composition-20261007/adversarial/MemberOriginalRedemptionJoinReviewTest.php" tests="1" assertions="8" errors="0" failures="0" skipped="0" time="1.601419">
+    <testcase name="test_origin_join_refuses_uncovered_owner_variants_and_characterizes_reserve_coupling" file="/home/user/VA-Studio-member257/docs/verification/membership-257-258-composition-20261007/adversarial/MemberOriginalRedemptionJoinReviewTest.php" line="25" class="Tests\Feature\MembershipReview\MemberOriginalRedemptionJoinReviewTest" classname="Tests.Feature.MembershipReview.MemberOriginalRedemptionJoinReviewTest" assertions="8" time="1.601419"/>
+  </testsuite>
+</testsuites>

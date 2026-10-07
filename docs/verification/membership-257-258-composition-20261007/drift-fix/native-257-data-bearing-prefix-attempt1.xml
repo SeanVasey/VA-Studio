@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" file="/home/user/VA-Studio-member257/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="148.620445">
+    <testcase name="test_data_bearing_partial_guard_prefix_refuses_and_retains_original_plan" file="/home/user/VA-Studio-member257/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="94" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="3" time="148.620445"/>
+  </testsuite>
+</testsuites>

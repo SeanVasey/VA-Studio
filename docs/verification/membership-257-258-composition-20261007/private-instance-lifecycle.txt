@@ -1,0 +1,8 @@
+Private disposable mysqld 8.4.11 for this review: 127.0.0.1:3317, datadir/socket/binlog under the session scratchpad (mysql3317/), --initialize-insecure then root password set to the synthetic CI-only value; started ~13:47Z after shared-server interference (DECISION O2).
+2026-10-07T14:22:13Z private instance pre-shutdown schemata:
+vaseyaudio_member257
+2026-10-07T14:22:13Z shutdown
+mysqladmin: connect to server at '127.0.0.1' failed
+error: 'Can't connect to MySQL server on '127.0.0.1:3317' (111)'
+2026-10-07T14:22:16Z datadir removed: yes
+Shared 3306 server: own schema vaseyaudio_member257 left with 0 tables and 0 triggers; no other schema on 3306 was created, changed or dropped by this review.
