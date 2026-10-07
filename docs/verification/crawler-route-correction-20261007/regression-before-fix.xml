@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PublicDiscoveryIndexTest" file="/workspace/VA-Studio-crawler-routes/tests/Feature/PublicDiscoveryIndexTest.php" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="0.157971">
+    <testcase name="test_production_crawler_policy_covers_registered_private_inquiry_routes_and_allows_public_contact" file="/workspace/VA-Studio-crawler-routes/tests/Feature/PublicDiscoveryIndexTest.php" line="37" class="Tests\Feature\PublicDiscoveryIndexTest" classname="Tests.Feature.PublicDiscoveryIndexTest" assertions="3" time="0.157971">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\PublicDiscoveryIndexTest::test_production_crawler_policy_covers_registered_private_inquiry_routes_and_allows_public_contact
+contact.inquiries must be disallowed for crawlers.
+Failed asserting that an array is not empty.
+
+/workspace/VA-Studio-crawler-routes/tests/Feature/PublicDiscoveryIndexTest.php:52</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -24,7 +24,7 @@ class PublicDiscoveryIndexTest extends TestCase
         $this->assertSame(['https://audio.example.test/site-pages-sitemap.xml'], array_map(fn ($loc) => (string) $loc, $xml->xpath('/s:sitemapindex/s:sitemap/s:loc')));
         $this->assertCount(1, $xml->xpath('/s:sitemapindex/s:sitemap/*'));
         $robots = $this->withHeaders($headers)->get('/robots.txt')->assertOk()->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
-        $this->assertSame("User-agent: *\nDisallow: /admin\nDisallow: /account\nDisallow: /orders\nDisallow: /quotes\nDisallow: /api\nDisallow: /inquiries\nSitemap: https://audio.example.test/sitemap.xml\n", $robots->getContent());
+        $this->assertSame("User-agent: *\nDisallow: /admin\nDisallow: /account\nDisallow: /orders\nDisallow: /quotes\nDisallow: /api\nDisallow: /contact/inquiries\nSitemap: https://audio.example.test/sitemap.xml\n", $robots->getContent());
         foreach ([$index, $robots] as $response) {
             $response->assertHeader('Cache-Control', 'no-store, private')->assertHeader('X-Content-Type-Options', 'nosniff')->assertHeader('X-Robots-Tag', 'noindex, follow');
             $this->assertSame([], $response->headers->getCookies());
@@ -32,6 +32,27 @@ class PublicDiscoveryIndexTest extends TestCase
                 $response->assertDontSee($private, false);
             }
         }
+    }
+
+    public function test_production_crawler_policy_covers_registered_private_inquiry_routes_and_allows_public_contact(): void
+    {
+        $robots = $this->get('/robots.txt')->assertOk()->getContent();
+        preg_match_all('/^Disallow: (.+)$/m', $robots, $matches);
+        $prefixes = $matches[1];
+        $inquiryRoutes = [];
+        foreach (app('router')->getRoutes() as $route) {
+            $name = (string) $route->getName();
+            if ($name !== 'contact.inquiries' && ! str_starts_with($name, 'inquiries.')) {
+                continue;
+            }
+            $inquiryRoutes[$name] = '/'.$route->uri();
+        }
+        $this->assertCount(8, $inquiryRoutes);
+        foreach ($inquiryRoutes as $name => $path) {
+            $this->assertNotEmpty(array_filter($prefixes, fn ($prefix) => str_starts_with($path, $prefix)), $name.' must be disallowed for crawlers.');
+        }
+        $this->assertSame([], array_values(array_filter($prefixes, fn ($prefix) => str_starts_with('/contact', $prefix))));
+        $this->get('/sitemap.xml')->assertOk()->assertDontSee('/contact/inquiries', false);
     }
 
     #[DataProvider('nonproductionEnvironments')]

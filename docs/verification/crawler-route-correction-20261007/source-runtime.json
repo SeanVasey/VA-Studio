@@ -1,0 +1,37 @@
+{
+  "installedPackages": 158,
+  "lockedPackages": 158,
+  "allVersionsAndSourceReferencesMatch": true,
+  "sourcePaths": {
+    "app/Http/Controllers/PublicDiscoveryController.php": "9b2b694e412e6fa0555de102ac32782e3c535748e6deee74e31b5483ae017814",
+    "tests/Feature/PublicDiscoveryIndexTest.php": "cd936bde6e22bb1defd2598107d025bcd062dd617acb665e203ed8a2467a0f8e"
+  },
+  "dependencyPaths": {
+    "composer.json": "132cb2a16c6ce2960d059cfddecae8e1accf6138a258dd8bab2c0c7b822f5607",
+    "composer.lock": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9",
+    "package.json": "65db43e1b171566d2d89e075bc4a29af75a82a6782a3313751bb4d7e832a7ae0",
+    "package-lock.json": "6407d3a63e3b6e04f5824f53c41b8dc8a33581f987b21d780c795480122f93ea"
+  },
+  "testedSource": "99478464f9b8dd89c5595ab15b75466f90ea6555",
+  "testedTree": "16e480cbd797ad1884dd262124e42e4cdd8dfbe2",
+  "runtime": "PHP 8.4.26 / SQLite :memory:",
+  "autoloadReflection": [
+    "/workspace/VA-Studio-crawler-routes/app/Http/Controllers/PublicDiscoveryController.php",
+    "/workspace/VA-Studio-crawler-routes/tests/Feature/PublicDiscoveryIndexTest.php"
+  ],
+  "focusedResult": {
+    "tests": 185,
+    "assertions": 4218,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "evidenceHashes": {
+    "focused.txt": "050ab4496fa61382af24e711a1cca4981fc909f0cdf0966a0efcc17155f62423",
+    "focused.xml": "5d41310c9e0beb4cbf06c2ba3318840bd1c0f0126515febdb98517e060e8e24a",
+    "pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "registered-inquiry-routes.json": "6cbdaa10e941b3d7599cf912faa74f4dee1eddf64aaf1b5730052db5b7908e18",
+    "regression-before-fix.txt": "73e4819c3e12a9a197ee74586af068e59b036eba831ebe1fd1483851b73258cf",
+    "regression-before-fix.xml": "e90246bcacdffb2c4ca5c692d466b7c4a400128bdf961bc3f09bc21c1e10e49a"
+  }
+}
