@@ -66,6 +66,19 @@ final class ProductionTrackPreparationPackets
 
         return app(ReadProductionTrackCapabilities::class)->withLockedForAdapter($candidate, $request['context'], $actor,
             function (array $capability, CurrentRows $reader) use ($capture, $request, $actor, &$expected): ProductionTrackPreparationPacket {
+                // The standalone historical miss released its actor lock. A
+                // concurrent creator may have committed before this transaction
+                // acquired the same actor lock; authenticate that exact request
+                // through the captured primary before any fresh preparation.
+                $rows = $reader->rows(PacketEvidence::PACKETS, 'created_by = ? AND request_key = ?', [$actor->id, $request['key_digest']], 2);
+                Check::require(count($rows) <= 1);
+                if ($rows !== []) {
+                    $row = $rows[0];
+                    Check::require($row['request_hash'] === CanonicalJson::hash($request));
+                    $expected = ['historical' => true, 'row' => $row, ...PacketEvidence::retained($reader, $row)];
+
+                    return $this->model($row);
+                }
                 $this->supported($capability);
                 Check::require(CanonicalJson::encode($capability) === CanonicalJson::encode($capture['capability']));
                 if (CanonicalJson::hash(PacketAuthority::raw($reader, $actor->id)) !== $capture['authority_hash']) {
@@ -99,6 +112,11 @@ final class ProductionTrackPreparationPackets
 
                 return $this->model($row);
             }, function (CurrentRows $reader) use ($request, $capture, $actor, &$expected): void {
+                if ($expected['historical'] ?? false) {
+                    $this->proveRetained($reader, $expected);
+
+                    return;
+                }
                 $this->proveCurrent($reader, $request['items'], $actor->id, $request['key_digest'], $capture['public_id'], $expected['id'] ?? null, $expected);
             });
     }
@@ -143,9 +161,7 @@ final class ProductionTrackPreparationPackets
             if ($rows === []) {
                 return;
             }
-            $row = $expected['row'];
-            Check::require(CanonicalJson::encode(PacketEvidence::selectors($reader, $row['created_by'], $row['request_key'], $row['public_id'], $row['id'])) === CanonicalJson::encode($expected['selectors'])
-                && CanonicalJson::encode(PacketEvidence::historyRaw($reader, $expected['history_raw'])) === CanonicalJson::encode($expected['history_raw']));
+            $this->proveRetained($reader, $expected);
         });
     }
 
@@ -189,5 +205,13 @@ final class ProductionTrackPreparationPackets
         $model->exists = true;
 
         return $model;
+    }
+
+    /** Retained identity/source proof only; no decryption, model hooks or current catalog eligibility. */
+    private function proveRetained(CurrentRows $reader, array $expected): void
+    {
+        $row = $expected['row'];
+        Check::require(CanonicalJson::encode(PacketEvidence::selectors($reader, $row['created_by'], $row['request_key'], $row['public_id'], $row['id'])) === CanonicalJson::encode($expected['selectors'])
+            && CanonicalJson::encode(PacketEvidence::historyRaw($reader, $expected['history_raw'])) === CanonicalJson::encode($expected['history_raw']));
     }
 }

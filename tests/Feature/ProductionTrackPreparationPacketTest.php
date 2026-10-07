@@ -8,6 +8,7 @@ use App\Domain\Commerce\ProductionPolicy\CloseProductionTrackCapabilities;
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Commerce\ProductionPolicy\PreparationContextV1;
 use App\Domain\Commerce\ProductionPolicy\PrepareProductionTrackCapabilities;
+use App\Domain\Commerce\ProductionPolicy\ProductionTrackCapabilities;
 use App\Domain\Commerce\ProductionPolicy\ReadProductionTrackCapabilities;
 use App\Domain\Commerce\ProductionPolicy\ReviewProductionTrackCapabilities;
 use App\Domain\Commerce\ProductionPolicy\SaveProductionTrackCapabilities;
@@ -16,6 +17,7 @@ use App\Domain\Commerce\ProductionPreparation\PrepareProductionTrackPreparationP
 use App\Domain\Commerce\ProductionPreparation\ReadProductionTrackPreparationPacket;
 use App\Domain\Commerce\ProductionPreparation\SaveProductionTrackPreparationPacket;
 use App\Support\CanonicalJson;
+use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Support\Facades\Crypt;
@@ -193,7 +195,7 @@ class ProductionTrackPreparationPacketTest extends TestCase
         });
         $same = app(SaveProductionTrackPreparationPacket::class)->applyReviewed($f['capture'], $f['actor']);
         $this->assertNotNull($winner);
-        $this->assertSame($winner->getAttributes(), $same->getAttributes());
+        $this->assertSame(CanonicalJson::encode($winner->getAttributes()), CanonicalJson::encode($same->getAttributes()));
         $this->assertSame($before, Fixture::rows());
         $this->assertDatabaseCount(PacketEvidence::PACKETS, 1);
         $this->assertDatabaseCount(PacketEvidence::LINES, 1);
@@ -238,6 +240,135 @@ class ProductionTrackPreparationPacketTest extends TestCase
         } catch (AuthorizationException) {
             $this->assertSame($before, Fixture::rows());
             $this->assertNull(app(ReadProductionTrackPreparationPacket::class)->recover($f['key'], $f['reviewer']));
+        }
+    }
+
+    public function test_distinct_confirmations_of_the_same_request_retain_the_winners_public_identity(): void
+    {
+        $f = Fixture::prepared();
+        $other = app(PrepareProductionTrackPreparationPacket::class)->review($f['candidate'], $f['context'], $f['items'], $f['key'], $f['actor']);
+        $this->assertSame($f['capture']['request'], $other['request']);
+        $this->assertNotSame($f['capture']['public_id'], $other['public_id']);
+        $winner = null;
+        $before = null;
+        $armed = true;
+        Event::listen(TransactionCommitted::class, function () use ($f, &$armed, &$winner, &$before): void {
+            if (! $armed) {
+                return;
+            }
+            $armed = false;
+            $winner = app(SaveProductionTrackPreparationPacket::class)->applyReviewed($f['capture'], $f['actor']);
+            $before = Fixture::rows();
+        });
+        $same = app(SaveProductionTrackPreparationPacket::class)->applyReviewed($other, $f['actor']);
+        $this->assertSame(CanonicalJson::encode($winner->getAttributes()), CanonicalJson::encode($same->getAttributes()));
+        $this->assertSame($before, Fixture::rows());
+    }
+
+    public static function damagedConcurrentWinner(): array
+    {
+        return [['ciphertext'], ['line'], ['audit'], ['staff'], ['mfa']];
+    }
+
+    #[DataProvider('damagedConcurrentWinner')]
+    public function test_concurrent_winner_still_requires_authenticated_retained_evidence_and_current_authority(string $scenario): void
+    {
+        $f = Fixture::prepared();
+        $before = null;
+        $armed = true;
+        Event::listen(TransactionCommitted::class, function () use ($f, $scenario, &$armed, &$before): void {
+            if (! $armed) {
+                return;
+            }
+            $armed = false;
+            app(SaveProductionTrackPreparationPacket::class)->applyReviewed($f['capture'], $f['actor']);
+            // Damaged restore fixtures remove only their own write guard;
+            // operational migration guards remain unchanged.
+            if ($scenario === 'ciphertext') {
+                DB::unprepared('DROP TRIGGER ptp_packet_update');
+                DB::table(PacketEvidence::PACKETS)->update(['payload_ciphertext' => 'damaged synthetic cipher', 'payload_hash' => hash('sha256', 'damaged synthetic cipher')]);
+            } elseif ($scenario === 'line') {
+                DB::unprepared('DROP TRIGGER ptp_line_update');
+                DB::table(PacketEvidence::LINES)->update(['price_minor' => 1]);
+            } elseif ($scenario === 'audit') {
+                DB::table('audit_events')->where('action', 'commerce.production_preparation.packet_retained')->update(['action' => 'synthetic.damaged']);
+            } elseif ($scenario === 'staff') {
+                DB::table('users')->where('id', $f['actor']->id)->update(['is_admin' => false]);
+            } else {
+                Filament::getPanel('admin')->multiFactorAuthentication(Filament::getPanel('admin')->getMultiFactorAuthenticationProviders(), isRequired: true);
+                $f['actor']->saveAppAuthenticationSecret(null);
+            }
+            $before = Fixture::rows();
+        });
+        try {
+            app(SaveProductionTrackPreparationPacket::class)->applyReviewed($f['capture'], $f['actor']);
+            $this->fail('Concurrent winner bypassed evidence or authority.');
+        } catch (ValidationException|AuthorizationException) {
+            $this->assertNotNull($before);
+            $this->assertSame($before, Fixture::rows());
+        }
+    }
+
+    public static function lateReplayDrift(): array
+    {
+        return [['packet'], ['line'], ['audit'], ['source audit'], ['actor']];
+    }
+
+    #[DataProvider('lateReplayDrift')]
+    public function test_concurrent_replay_final_authority_query_drift_refuses_without_changing_committed_winner(string $scenario): void
+    {
+        $f = Fixture::prepared();
+        $before = null;
+        $gap = true;
+        $armed = false;
+        $mutated = false;
+        Event::listen(TransactionCommitted::class, function () use ($f, $scenario, &$gap, &$armed, &$before): void {
+            if (! $gap) {
+                return;
+            }
+            $gap = false;
+            $winner = app(SaveProductionTrackPreparationPacket::class)->applyReviewed($f['capture'], $f['actor']);
+            foreach (match ($scenario) {
+                'packet' => ['ptp_packet_update'], 'line' => ['ptp_line_update'], default => []
+            } as $trigger) {
+                DB::unprepared('DROP TRIGGER '.$trigger);
+            }
+            $before = Fixture::rows();
+            $original = Crypt::getFacadeRoot();
+            $encrypter = Mockery::mock($original)->makePartial();
+            $encrypter->shouldNotReceive('encryptString');
+            $encrypter->shouldReceive('decryptString')->andReturnUsing(function (string $value) use ($original, $winner, &$armed): string {
+                $result = $original->decryptString($value);
+                if ($value === $winner->payload_ciphertext) {
+                    $armed = true;
+                }
+
+                return $result;
+            });
+            Crypt::swap($encrypter);
+        });
+        DB::listen(function ($query) use ($f, $scenario, &$armed, &$mutated): void {
+            if (! $armed || ! str_contains($query->sql, 'from "users"') && ! str_contains($query->sql, 'from `users`')) {
+                return;
+            }
+            $armed = false;
+            $mutated = true;
+            match ($scenario) {
+                'packet' => DB::table(PacketEvidence::PACKETS)->update(['request_hash' => str_repeat('0', 64)]),
+                'line' => DB::table(PacketEvidence::LINES)->update(['price_minor' => 1]),
+                'audit' => DB::table('audit_events')->where('action', 'commerce.production_preparation.packet_retained')->update(['action' => 'synthetic.late_replay']),
+                'source audit' => DB::table('audit_events')->where('subject_type', ProductionTrackCapabilities::class)->update(['action' => 'synthetic.late_source']),
+                'actor' => DB::table('users')->where('id', $f['actor']->id)->update(['is_admin' => false]),
+            };
+        });
+        try {
+            app(SaveProductionTrackPreparationPacket::class)->applyReviewed($f['capture'], $f['actor']);
+            $this->fail('Late replay drift was admitted.');
+        } catch (ValidationException|AuthorizationException) {
+            $this->assertTrue($mutated, 'Drift must follow retained authentication during final authority refresh.');
+            $this->assertSame($before, Fixture::rows());
+        } finally {
+            $armed = false;
         }
     }
 
