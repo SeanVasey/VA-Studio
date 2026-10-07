@@ -1,0 +1,29 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-trigscan/phpunit.xml
+
+P3 capability backtick+comment: refused LogicException: Unexpected production capability external or additional table guard; rollback refused before schema changes.
+P3 capability unquoted+newlines: refused LogicException: Unexpected production capability external routine reference; rollback refused before schema changes.
+P3 capability ansi-quotes: refused LogicException: Unexpected production capability external or additional table guard; rollback refused before schema changes.
+P3 capability upper-case-qualifier: refused LogicException: Unexpected production capability external or additional table guard; rollback refused before schema changes.
+P3 capability line-comment-then-name: refused LogicException: Unexpected production capability external routine reference; rollback refused before schema changes.
+P3 inquiry backtick+comment: refused LogicException: Unexpected inquiry notification external trigger reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P3 inquiry unquoted+newlines: refused LogicException: Unexpected inquiry notification external routine reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P3 inquiry ansi-quotes: refused LogicException: Unexpected inquiry notification external trigger reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P3 inquiry upper-case-qualifier: admitted
+F                                                                   1 / 1 (100%)
+
+Time: 03:59.383, Memory: 79.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeTest::test_p3_quoted_commented_ansi_and_mixed_case_qualifiers_are_refused
+P3 inquiry upper-case-qualifier
+Failed asserting that two strings are not identical.
+
+/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php:144
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 17, Failures: 1.

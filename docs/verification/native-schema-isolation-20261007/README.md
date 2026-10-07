@@ -12,6 +12,7 @@ was changed. Nothing was pushed.
 | Identity cost | `2bbc8f8a`, `58baafbb`, `489369c7` (`perf(identity): ...`) |
 | 253 source (coordinator request, cherry-picked unchanged) | `49b64262` (from `709fbd45`), `581ac049` (from `3946afda`), `c7f9987b` (from `8773b720`) |
 | Tested head | `c7f9987b` (this README is the next commit; documentation only) |
+| Independent review | APPROVE WITH CONDITIONS at `61b8ee17` (`independent-review/DECISION.md`): native 40/308 on a private MySQL 8.4.11 plus 8 reviewer probes; mutations M1/M2/M4 caught by lane tests, M3 (case-sensitive 243 database match) caught only by the reviewer's probe (R-2). Conditions: upper-case-qualifier regressions for all three guards before U-02; token-aware qualifier match or a documented `[a-z0-9_]` peer-name rule before the next shared-daemon batch (R-1: a peer named `<db>-x`/`<db>$x` still blocks through its qualified views); the cost test is not a latency bound (paid252 60 s journey still open) |
 
 Runtime: PHP 8.4.26 through a runner that points PHPUnit at the worktree's own
 Composer autoload (`$GLOBALS['_composer_autoload_path']`; `vendor/bin` is a symlink

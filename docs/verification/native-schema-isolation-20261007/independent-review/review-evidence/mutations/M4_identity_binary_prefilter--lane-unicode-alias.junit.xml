@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionIdentity\ProductionIdentityMigrationTest" file="/home/user/VA-Studio-review-trigscan/tests/Feature/ProductionIdentity/ProductionIdentityMigrationTest.php" tests="1" assertions="1" errors="1" failures="0" skipped="0" time="74.086788">
+    <testcase name="test_native_dictionary_unicode_guard_alias_on_foreign_table_is_refused" file="/home/user/VA-Studio-review-trigscan/tests/Feature/ProductionIdentity/ProductionIdentityMigrationTest.php" line="126" class="Tests\Feature\ProductionIdentity\ProductionIdentityMigrationTest" classname="Tests.Feature.ProductionIdentity.ProductionIdentityMigrationTest" assertions="1" time="74.086788">
+      <error type="PDOException">Tests\Feature\ProductionIdentity\ProductionIdentityMigrationTest::test_native_dictionary_unicode_guard_alias_on_foreign_table_is_refused
+PDOException: SQLSTATE[HY000]: General error: 1359 Trigger already exists
+
+/home/user/VA-Studio-review-trigscan/database/migrations/2026_10_07_247000_production_customer_identity.php:24
+/home/user/VA-Studio-review-trigscan/tests/Feature/ProductionIdentity/ProductionIdentityMigrationTest.php:137
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+  </testsuite>
+</testsuites>

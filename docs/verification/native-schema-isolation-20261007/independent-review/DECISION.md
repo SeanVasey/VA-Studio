@@ -1,0 +1,247 @@
+# Independent review: native schema isolation and identity inspection cost (PR #50)
+
+- Reviewed SHA: `61b8ee173b6d331610215a99bf65202edc90e042` (`harness/native-schema-isolation`).
+- Code head: `c7f9987b`. `61b8ee17` changes docs only: `git diff --stat c7f9987b 61b8ee17 -- app database tests scripts config routes` is empty.
+- Base: `e86381bf139b4351bba534f3fe0b26f4f8efbdd0` (merge-base with `origin/main`).
+- Change under review:
+  - `5dd4e35b` fix(migrations): isolate server-wide dependency scans to the selected schema.
+  - `2bbc8f8a`, `58baafbb` and `489369c7` perf(identity).
+  - Two tests and the SQLite census entry.
+- The 253 commits (`49b64262`, `581ac049`, `c7f9987b`) carry no diff against `origin/main` (`73c898db`) on their paths. See `review-evidence/source-identity.txt`.
+- Reviewer: independent reviewer agent. It authored no lane commit and changed no app code, flag or registration. Mutations were temporary and reverted (see below). Nothing was committed.
+- Date: 2026-10-07 (UTC).
+
+## Environment
+
+- **Worktree.** A detached review worktree, `/home/user/VA-Studio-review-trigscan`, made with `scripts/dev/mkworktree.sh` at `61b8ee17`. It has the main checkout's locked `vendor/` symlinked and its own Composer autoload.
+- **Runtime.** PHP 8.4.26 and PHPUnit 12.5.34. PHPUnit ran as `php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- <args>`, never `php artisan test`.
+- **Database.** A private `mysqld` 8.4.11 started with `--no-defaults` on 127.0.0.1:3497 (`lower_case_table_names=0`). Its datadir and socket were under `$scratchpad/review-trigscan-mysql/` and its schema was `vaseyaudio_review_trigscan`.
+  - The shared :3306 server was not touched, and neither were the other agents' instances on :3471 and :3493.
+  - It was shut down cleanly and its datadir removed. The lifecycle is in `review-evidence/native/private-instance-lifecycle.txt`.
+- **Load.** The host load average was 5 to 10 from other lanes, so wall times are noisy. Statement counts are deterministic.
+
+## Decision
+
+**APPROVE WITH CONDITIONS** for a development merge.
+
+The isolation fix does what it claims. In every case I tried, an object in another schema that can actually reach the selected schema's owned tables is still refused, with the original exact message:
+
+- a qualified name with backticks, comments, newlines, ANSI quotes or upper case;
+- a view that MySQL stored already qualified;
+- a dynamic-SQL procedure.
+
+Objects whose unqualified names MySQL resolves to their own schema are admitted. I checked this by executing them: they hit the peer's table, not ours.
+
+The three perf commits change no refusal rule:
+
+- Every batched lookup returned exactly the rows of the original single-name statement: 21 statements, 68 requested names, 608 rows, 0 mismatches, including case and accent dictionary aliases.
+- The 110-statement bound does not depend on how many schemas or objects the server holds.
+
+No finding is Medium or above, and every finding fails closed. The two Low findings are a residual over-refusal of the kind this PR fixes (R-1) and a gap in what the tests pin (R-2). Neither blocks the merge.
+
+This decision does **not** approve:
+
+- the paid252 60 s journey, which the lane README records as still failing;
+- the section 4 per-frame cache proposal;
+- any change to deadlines, refusal floors, authorization lifetimes or audit settings;
+- Foundation acceptance.
+
+## Findings
+
+| ID | Severity | Area | Finding | Recommendation | Evidence |
+| --- | --- | --- | --- | --- | --- |
+| R-1 | Low (availability; fails closed) | Qualifier match, all three guards | The selected database name counts as named when the next character is outside `[a-z0-9_]`. A peer schema whose name extends the selected name with `-`, `$` or a non-ASCII character still blocks all three guards, through its own views. MySQL always stores a view definition qualified (`` `<db>-rv4`.`t` ``), and that text contains `<db>` followed by `-`. This is the failure class the PR fixes: a parallel lane named `vaseyaudio_x-2` would again block `migrate:fresh` for `vaseyaudio_x`. Peers named `<db>_x` and `vaseyaudio_review` (a prefix of the selected name) are correctly admitted. | Match the selected name as a whole identifier token followed by optional quote, whitespace or comments and then `.`. Alternatively, record in the parallel-lane runbook that peer schema names must extend the selected name only with `[a-z0-9_]`. Add a hyphenated-peer regression either way. | `probes/probes-head-v2.txt` (P4: `hyphen-extension` and `dollar-extension` refused by capability, inquiry and identity; `longer-underscore` and `shorter-prefix` admitted) |
+| R-2 | Low (test gap) | Case of the qualifier | Matching the qualifier case-insensitively is what keeps an upper-case `` `VASEYAUDIO_X`.`t` `` refused on a `lower_case_table_names=1/2` server, where it names the same schema. The production host is undecided (U-02). No lane test pins this. Mutation M3 makes the 243 database-name match case-sensitive while keeping `prepare` case-insensitive. All 25 `NativeSchemaIsolationTest` cases still pass under M3; only reviewer probe P3 fails. The same pattern in the capability and identity helpers is unpinned for the same reason. | Add an upper-case-qualifier case (trigger and routine) per guard to `NativeSchemaIsolationTest`. | `mutations/M3_inquiry_case_sensitive_qualifier--lane-isolation.txt` (OK 25/235), `--probes-p3.txt` (`P3 inquiry upper-case-qualifier: admitted`) |
+| I-1 | Info (over-refusal, conservative) | Case-variant peer | On `lower_case_table_names=0`, a peer `VASEYAUDIO_REVIEW_TRIGSCAN` is a different schema. Because the schema comparison uses `strtolower`, its unqualified same-named triggers are classified as local and refused by all three guards. This is the safe direction and consistent with R-2. | None required. Document it with R-1. | `probes-head-v2.txt` (P5) |
+| I-2 | Info (pre-existing, unchanged from base) | `EVENTS` not scanned | None of the three scans reads `information_schema.EVENTS`. A peer event `DO DELETE FROM <db>.<owned table>` is admitted by all three guards, at base as at head, since base read only TRIGGERS, VIEWS and ROUTINES. Owned BEFORE guards still fire on event DML, so this is a missed dependency for adoption and rollback, not a write bypass. | In a separate change, add `EVENT_DEFINITION` with the same per-schema classification. | `probes-head-v2.txt` (P6) |
+| I-3 | Info (pre-existing) | Literal table name prerequisite | Every rule, the new `PREPARE` rule included, applies only when the owned table name appears literally (`references($sql, $tables)` is unchanged). A procedure that assembles both the qualifier and the table name at run time (`CONCAT('pi_','origins')`) is not refused, at base as at head. Conversely, the lane's "peer dynamic routine" case builds an unqualified name that resolves to the peer, and it is refused conservatively. | None for this PR. State the limitation alongside the `PREPARE` rule. | Code: `CapabilityMigrationOwnership::dependsOn`, `IdentityMigrationOwnership::dependsOn`, 243 `dependsOnTable` |
+| I-4 | Info (pre-existing) | Dictionary visibility | `information_schema` lists only objects the connected account can see. With a least-privilege production account, foreign triggers, views and routines are invisible to these scans (before and after this change). All runs here used root. | Keep in mind when choosing the production account (U-02). | MySQL semantics; not probed |
+| I-5 | Info | Exception type in tests | The batching helpers throw `LogicException` (`Unbatched identity dictionary name`, `Unsupported identity dictionary lookup`), the same class as the identity refusal. Several existing refusal tests catch bare `LogicException`. Fail-closed. Under mutation M4, the lane's unicode alias test caught the defect only because the guard DDL later failed with `PDOException 1359` at `247000...php:24`. By then the inspection had admitted and `up()` had already executed owned DDL. | Assert the exact refusal message in identity refusal tests, or throw a distinct type from the helpers. | `mutations/M4_identity_binary_prefilter--lane-unicode-alias.txt` |
+| I-6 | Info | Cost bound semantics | The bound is a real invariant with respect to the server's schemas and objects. It does grow by one statement per namespace or owned name, through the per-name `SHOW CREATE TABLE` proofs; headroom is 6 at 104. Wall time still scales with server object volume, because the three server-wide scans read every row, and the bound does not measure that. | None required. Do not cite the test as a latency bound; the paid252 budget remains open per the lane README. | `probes-head-v2.txt` (P8: 104 statements with no peers, and 104 with 2 cloned peers: 1,421 server triggers, 200 views, 148 routines, 7 schemata); `native/IdentityInspectionCostTest.txt` (104 statements) |
+
+## Answers to the review questions
+
+### (a) Can a foreign schema get a dependency past the classification?
+
+I found no static route.
+
+- **Views.** A view created in a peer schema while the selected schema was the default, with an unqualified name, is stored by MySQL as `` select `vaseyaudio_review_trigscan`.`<t>`.`id` ... from `vaseyaudio_review_trigscan`.`<t>` ``. It is refused by its own guard only (P1). The cross-check matrix shows that the other two guards admit it.
+- **Routines and triggers.** A routine or trigger created in a peer schema the same way keeps its unqualified body. Executing it fails with `1146 Table 'vaseyaudio_review_trigscan_rv2.production_identity_origins' doesn't exist` (P2). MySQL resolves the name to the object's own schema, as the fix assumes, so admitting it is correct.
+- **Qualifier spellings.** Each of these is refused in all three guards (P3):
+  - `` `<db>` /* note */ . `<t>` ``;
+  - `<db>` newline `.` newline `<t>`;
+  - `-- comment` then `` `<db>`.`<t>` ``;
+  - ANSI `"<db>"."<t>"`;
+  - an upper-case qualifier.
+- **Dynamic SQL.** A peer dynamic-SQL procedure is refused by the `PREPARE` rule (lane tests). Triggers and stored functions cannot prepare statements.
+- **Remaining routes.** All are pre-existing and unchanged from base: events (I-2), names assembled at run time (I-3) and privilege-limited visibility (I-4).
+
+### (b) Does the qualifier match handle quoting, case and prefixes?
+
+- **Quoting.** Backtick-quoted, unquoted and ANSI-quoted forms all match (P3). The boundary class is `[a-z0-9_]` under `/i`, so quotes, dots, spaces and comment markers are boundaries.
+- **Case.** Matching is case-insensitive. On `lower_case_table_names=0` this over-refuses (I-1); on 1/2 it is required, and no lane test pins it (R-2).
+- **Prefixes.** `vaseyaudio_review_trigscan_rv4` (longer, `_`) and `vaseyaudio_review` (shorter) are correctly not treated as the selected schema (P4). Mutation M2, a raw `stripos` substring match, is caught by the lane isolation test and by P4.
+- **Other extensions.** Extensions with `-`, `$` or non-ASCII characters are over-refused (R-1).
+
+### (c) Can batching or prefiltering return fewer rows than the per-name queries?
+
+No, as far as I could find.
+
+- **Name sets.** `$namedIndexes` and `$namedConstraints` are requested over `$reserved`, and `$reserved` is built from exactly the `unique` and `foreign` keys the loop reads. `$namedTables` and `$namedTriggers` request supersets of the names they serve. A name outside a batch throws in `named()` (fails closed). An unrequested key in `lookups()` would raise a PHP warning, which Laravel turns into an exception.
+- **Branch predicate.** Each `UNION ALL` branch applies the unchanged predicate to a `NO_MERGE` CTE. The derived column keeps the dictionary column's collation.
+- **Prefilter.** It is `<same expression> IN (<same names>)`, which compares with the same collation as `=`.
+- **NULL.** The looked-up columns (`TABLE_NAME`, `TRIGGER_NAME`, `INDEX_NAME`, `CONSTRAINT_NAME`, `EVENT_OBJECT_TABLE`, `ROUTINE_NAME`, `EVENT_NAME`) are never NULL. A NULL would match neither `=` nor `IN`.
+- **Projected columns.** The narrowed columns cover every key the checks read. I cross-checked each `$rows[0][...]`, `$row[...]`, `$part[...]` and `$key[...]` access.
+- **Empirical check (P7, v2).** The probe ran every one of the 21 lookup statements in the file (17 literals plus the 4 expansions of the `$dictionary` template). It compared the head's single-name statement with `lookups()` over the names the inspection requests plus one absent name. Before running it, I created these aliases in the selected schema:
+  - a case-alias table `Customer_Accounts`;
+  - an upper-case index `PIA_ADDRESS_UNIQUE`;
+  - an accent-alias trigger `pia_address_uniqué`, which the single-name `LOWER(TRIGGER_NAME)=?` does return.
+
+  Result: 608 rows, 0 mismatches. A superset run including the alias spellings gave 636 rows, 0 mismatches.
+- **Mutation M4.** M4 makes the prefilter `BINARY`. P7 v2 then fails, missing the accent row for `pia_address_unique`. The lane unicode alias test also goes red, as described in I-5.
+- **A probe defect of my own (retained).** P7 v1 put the alias spellings into the requested set, which let a binary prefilter keep the row, so v1 passed under M4. See `mutations/M4_identity_binary_prefilter--probes-p7-v1-alias-in-name-set.txt`.
+
+### (d) Is the 110-statement bound a real invariant?
+
+Yes, with respect to schemas on the server. It does not track owned-name growth or wall time (I-6).
+
+- **Measurement.** P8 measured 104 statements before and after adding two full peer clones (every table, all guards, and 50 views and 50 routines each).
+- **What can and cannot change the count.**
+  - Every server-wide read is a single statement.
+  - `DATABASE()` is read once per inspection.
+  - No loop issues a statement per dictionary row.
+
+## Verified claims (with evidence)
+
+- **Reproduction premise.** The base scans were unfiltered, and the three owners are the only server-wide TRIGGERS, VIEWS and ROUTINES readers. Checked by grep at `61b8ee17` and at `origin/main`, including dynamically named catalogs. `MemberGrantSchema` and `MembershipSchema`, new on main since base, filter every read to `BINARY ... = BINARY DATABASE()`. See `review-evidence/main-drift.txt`. `main` has not changed any lane file since base, and `git merge-tree --write-tree origin/main 61b8ee17` is clean (exit 0).
+- **Refusal rules unchanged for local objects.** In all three diffs, an object in the selected schema still goes through the original `references()` test, and the extra-trigger-on-owned-table rule is kept. NULL definitions are still refused in every schema, because `references()` rejects non-strings before classification. The FK scans are textually unchanged apart from the projected columns.
+- **Exact original messages.** These come from the lane tests (24 refusal cases) and from my probes P1, P3, P4 and P5. The probes report the original strings:
+  - `Unexpected production capability external view reference; rollback refused before schema changes.`
+  - `Unexpected inquiry notification external trigger reference; ...`
+  - `Unexpected production identity schema or retained evidence; refused before DDL.`
+- **Selected catalog unchanged by every probe.** Each probe compared the selected schema's tables, triggers and routines before and after (`assertSame($before, $this->catalog())`). Before shutdown, the instance listed only `vaseyaudio_review_trigscan` plus the system schemata.
+- **Identity cost.** `IdentityInspectionCostTest` reported 104 statements (bound 110) and the admission equal to the ordinary connection's. The lane's 876 → 104 history was not re-measured.
+- **Pint.** `vendor/bin/pint --test` over the five changed PHP files: `passed` (`review-evidence/pint.txt`).
+- **SQLite census.** `NativeSchemaIsolationTest` and `IdentityInspectionCostTest` both appear in `scripts/ci/database-sqlite-skips.json`. On SQLite: 26 tests, 26 skipped, exit 0 (`review-evidence/sqlite/`).
+
+### Native runs at `61b8ee17` (private 8.4.11, port 3497)
+
+Counts are from each run's JUnit top-level `testsuite`. Exit codes are PHPUnit's own: `run.sh` captures `$?` directly after the `timeout php ...` command.
+
+| Selection | Exit | Tests | Assertions | Failures | Errors | Skipped | Wall (s) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `tests/Feature/NativeSchemaIsolationTest.php` | 0 | 25 | 235 | 0 | 0 | 0 | 312 |
+| `tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php` (104 statements) | 0 | 1 | 6 | 0 | 0 | 0 | 73 |
+| `tests/Feature/ProductionIdentity/ProductionIdentityMigrationTest.php` (whole file) | 0 | 5 | 19 | 0 | 0 | 0 | 715 |
+| `tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php` (whole file) | 0 | 9 | 48 | 0 | 0 | 0 | 1,009 |
+| **Lane total** | all 0 | **40** | **308** | **0** | **0** | **0** | 2,109 |
+| Reviewer probes `probes/ReviewerSchemaIsolationProbeTest.php` (final, v2) | 0 | 8 | 3,074 | 0 | 0 | 0 | 105 |
+
+Earlier probe runs, retained:
+
+- attempt 1: a PHP fatal, because the helper was named `count()`; no test ran;
+- v1 head run: 8/1,646, exit 0.
+
+All runs show `tree=61b8ee17 dirty_app_db=0` in `native/summary.txt` and `probes/summary.txt`.
+
+### Mutations (each reverted with `git checkout -- app database`, then `git diff --quiet -- app database` exit 0)
+
+| ID | Mutation | Lane test | Reviewer probe |
+| --- | --- | --- | --- |
+| M1 | Identity `dependsOn` by schema only (drops the qualifier and `PREPARE` rule) | `NativeSchemaIsolationTest` exit 1: **4 failures**: `identity: peer trigger / routine / view naming this schema`, `identity: peer dynamic routine` (25/219) | P1+P3 exit 1: **2 failures** (`P1 identity view vs identity`, `P3 identity backtick+comment: admitted`) |
+| M2 | Capability qualifier as a raw `stripos` substring (prefix-unsafe) | `NativeSchemaIsolationTest` exit 2: **1 error**: the isolation case, `Unexpected production capability external view reference` at migrate (25/233) | P4 exit 1: **1 failure** (`longer-underscore capability` refused) |
+| M3 | 243 database-name match case-sensitive (`prepare` still case-insensitive) | `NativeSchemaIsolationTest` exit 0: **not caught** (25/235). This is R-2. | P3 exit 1: **1 failure** (`P3 inquiry upper-case-qualifier: admitted`) |
+| M4 | Batched prefilter compared with `BINARY` | Unicode alias test exit 2: **1 error** (`PDOException 1359` at 247 `up()` line 24, after the inspection admitted). Cost test exit 0, still 104 statements. | P7 v2 exit 1: **1 failure** (accent row missing for `pia_address_unique`). P7 v1 exit 0 is retained as a probe-design defect. |
+
+Each mutation's diff is in `mutations/<ID>.diff`, and `mutate.py` applies it. After all reverts, the three code files hash to the reviewed values (`mutations/summary.txt`), and `git status --short -- app database` is empty.
+
+## SHA-256 at `61b8ee17`
+
+Each is identical in `git show 61b8ee17:<path>`, in the worktree and at `489369c7` (`review-evidence/sha256-reviewed-files.txt`).
+
+| Path | SHA-256 |
+| --- | --- |
+| `app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php` | `b0002097caa3575d7e76d48a8fd4d39134cfe0bf5c90f38c33374d4c7ab02040` |
+| `app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php` | `1715515c80d8333dd930eb0053005779a5fa19d55315a69b2d8b72192198531b` |
+| `database/migrations/2026_10_07_243000_inquiry_notification_intents.php` | `ee11f3595d0f9535f59f0e06bf1450f685150b07db015ae360e7eaf597db1387` |
+| `tests/Feature/NativeSchemaIsolationTest.php` | `d0d2a8af0904dda719d9b2272d1cfb1b6cac9d043a223776d4b0766dec38da2d` |
+| `tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php` | `d745a4066d120342b2821995f8f61e6708bd8033091550a54d23a3cbdeba47d3` |
+| `scripts/ci/database-sqlite-skips.json` (census) | `94f0666a4226e2a8988f30028f51453f24e5c4a20ec0b6fa09ba13b6aa09a933` |
+| Reviewer probe `review-evidence/probes/ReviewerSchemaIsolationProbeTest.php` (v2, final) | `3fb133e1f69c53c52fe79f1d756558e7324977c0560ff828cf4b3d29633472eb` |
+
+## Conditions
+
+None blocks the development merge. Each attaches to the step named.
+
+1. **R-2, before production host selection (U-02) or any reliance on the guards on a `lower_case_table_names` 1/2 server.** Add upper-case-qualifier regressions for the capability, inquiry and identity guards, so that the case-insensitive match is pinned. M3 must then fail a lane test.
+2. **R-1, before the next parallel-lane native batch on a shared daemon.** Do one of:
+   - make the qualifier match token-aware and add a hyphenated-peer regression; or
+   - record in the native runbook that peer schema names may extend the selected name only with `[a-z0-9_]`.
+3. **I-6, carried forward from the lane README.** Do not cite `IdentityInspectionCostTest` as a latency bound. The paid252 60 s journey remains open and needs the section 4 owner decision. This review does not approve that cache.
+
+## Not reviewed
+
+- The 253 commits' content. They carry no diff against `origin/main`, so they are out of scope here.
+- Re-measurement of the lane's base and intermediate statement counts (876, 1,463 and 140), the 253 initialize timings and the paid252 profiles.
+- The archived membership canary. It was not re-run.
+- These lane selections, which I did not run natively: `ProductionIdentityRuntimeTest`, `ProductionIdentityCommittedFrameTest`, `IdentityHistoricalCommittedReceiptTest`, `ProductionBuyerAssentObservationMigrationTest`, `ProductionFeatureNativeAdmissionTest` and the selected `InquiryNotificationMigrationTest` methods.
+- SQLite lane directories other than the two native-only files.
+- Behaviour on `lower_case_table_names` 1/2 servers and with a least-privilege account (all runs: lctn=0, root).
+- Full native directories, the full suite and Foundation CI (cost policy).
+
+## Commands and results
+
+From `/home/user/VA-Studio-review-trigscan`, with the native environment `APP_ENV=testing DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3497 DB_DATABASE=vaseyaudio_review_trigscan DB_USERNAME=root DB_PASSWORD=<ci-only> DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync`. `review-evidence/native/run.sh` sourced it from the scratchpad file `review-trigscan-mysql/native.env`, which was removed with the datadir.
+
+```
+scripts/dev/mkworktree.sh /home/user/VA-Studio-review-trigscan 61b8ee17
+mysqld --no-defaults --initialize-insecure --datadir=$scratchpad/review-trigscan-mysql/data
+mysqld --no-defaults --port=3497 --bind-address=127.0.0.1 --socket=$scratchpad/review-trigscan-mysql/s ...   # lifecycle file
+review-evidence/native/run.sh NativeSchemaIsolationTest tests/Feature/NativeSchemaIsolationTest.php                       # exit 0, OK 25/235
+review-evidence/native/run.sh IdentityInspectionCostTest tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php  # exit 0, OK 1/6, 104 statements
+review-evidence/native/run.sh ProductionIdentityMigrationTest tests/Feature/ProductionIdentity/ProductionIdentityMigrationTest.php                     # exit 0, OK 5/19
+review-evidence/native/run.sh ProductionIdentityDependencyAdmissionTest tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php # exit 0, OK 9/48
+OUT=.../probes review-evidence/native/run.sh probes-head-v2 review-evidence/probes/ReviewerSchemaIsolationProbeTest.php    # exit 0, OK 8/3074
+review-evidence/mutations/run-mutations.sh                                                                                 # M1-M4 as tabled; each reverted
+python3 review-evidence/mutations/mutate.py M4_identity_binary_prefilter; run.sh ... --filter test_p7_; git checkout -- app database   # P7 v2: exit 1
+vendor/bin/pint --test <5 changed PHP files>                                                                               # passed
+$P tests/Feature/NativeSchemaIsolationTest.php tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php (SQLite defaults)  # exit 0, 26 skipped
+git merge-tree --write-tree origin/main 61b8ee17                                                                           # exit 0
+mysqladmin --no-defaults -h127.0.0.1 -P3497 -uroot shutdown; rm -rf $scratchpad/review-trigscan-mysql
+```
+
+## Evidence index (`review-evidence/`)
+
+- `source-identity.txt`: SHAs, merge-base, the 253 no-diff check, the docs-only head check and the lane diff stat.
+- `main-drift.txt`: `main` movement since base, the trial merge, and the grep of server-wide and dynamically named dictionary reads at `origin/main` and head.
+- `sha256-reviewed-files.txt`: hashes at `61b8ee17`, the worktree and `489369c7`.
+- `pint.txt`: the Pint result.
+- `native/`:
+  - `run.sh` (runner);
+  - `summary.txt` (ledger with PHPUnit exit codes);
+  - JUnit and text for the four lane selections;
+  - `private-instance-lifecycle.txt`.
+- `probes/`:
+  - `ReviewerSchemaIsolationProbeTest.php` (P1 to P8, final v2);
+  - `probes-head-v2.*` (final run);
+  - `probes-head-v1.*` (P7 v1);
+  - `attempt1-harness-fatal.*`;
+  - `summary.txt`.
+- `mutations/`:
+  - `mutate.py` and `run-mutations.sh`;
+  - one `.diff` per mutation;
+  - JUnit and text per mutation and selection, including the retained P7 v1 run under M4;
+  - `summary.txt` (revert proofs and post-revert hashes);
+  - `driver-output.txt`.
+- `sqlite/`: the SQLite run of the two native-only files (26 skipped).
+
+## Cleanup
+
+- **Mutations.** All were reverted. `git diff --quiet -- app database` returned exit 0 after each, and the post-revert hashes equal the reviewed values.
+- **Worktree.** `git status --short` in the review worktree shows only `?? docs/verification/native-schema-isolation-20261007/independent-review/`.
+- **Peer schemas.** Every peer schema the probes created (`_rv1` to `_rv8b`, `_rv4`, `vaseyaudio_review`, `-rv4`, `$rv4`, the upper-case variant) and the lane test's `_other` were dropped in teardown. Before shutdown the instance listed `information_schema, mysql, performance_schema, sys, vaseyaudio_review_trigscan`.
+- **Private mysqld.**
+  - pid 18644 on :3497 was shut down with `mysqladmin shutdown`; `err.log` ends `MySQL Server - end.`
+  - Afterwards `/proc/18644` was absent, there was no LISTEN on 3497 (`0DA9`) in `/proc/net/tcp`, and no `mysqld` process had `port=3497`.
+  - `$scratchpad/review-trigscan-mysql` (223M) was removed.
+  - The other agents' daemons on :3471 and :3493 and the shared :3306 were not touched.
