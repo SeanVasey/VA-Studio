@@ -245,5 +245,11 @@
       "path": "tests/Feature/ProductionCheckoutSourceTransactionTest.php",
       "sha256": "8eca201fa649da6853f0e194b864f48fcd2a20a2c8b0d688497e80bdbccdf6d0"
     }
-  ]
+  ],
+  "scope_attribution": "Owned path counts include four original verification documentation/provider-source files. Runtime/test-only counts are reported separately; evidence-only README updates do not alter executable source.",
+  "runtime_and_registered_test_counts": {
+    "owned_byte_exact_files": 40,
+    "owned_changed_files": 2,
+    "owned_added_files": 2
+  }
 }

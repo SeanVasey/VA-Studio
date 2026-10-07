@@ -117,8 +117,10 @@ Final checkout executable source is
 `9094a25b28cc353678753cff47101239864b2ef8`. The evidence-only commit following it
 adds standalone verification snapshots and receipts; runtime, registered test
 suite, dependency and activation bytes remain exact. The final
-manifest retains SHA256 and Git blob identity for all 48 owned executable/test
-files and all 38 borrowed dependency files.
+manifest retains SHA256 and Git blob identity for all 44 owned runtime/registered-test
+files, four original checkout evidence files, and all 38 borrowed dependency
+files. Original evidence hashes describe the f0 tree; its original README is
+retained separately. Current receipt bytes have their own artifact digests.
 
 The isolated worktree borrows exact T23 commits
 `1d90a1658618d79e36519d57c75b77af8b48d74a`,
@@ -145,9 +147,11 @@ accent aliases collide with the original reserved constraint, error1826. Its
 receipt is retained. A fourth actual unchanged 9f red canary demonstrated paid
 source mint in autocommit; f0 adds the original-frame savepoint fence above.
 
-The ff4→9f source map records 42/46 owned files byte-exact and four changed files.
-The 9f→f0 map records 44/46 prior owned files byte-exact, two changed files and two
-new files. Migration/DDL/guard definitions, owner-authority repair, request/
+The ff4→9f source map records 42/46 original owned paths byte-exact and four
+changed paths; these counts include four original evidence files. Runtime/test
+counts are 38/42 exact and four changed. The 9f→f0 map records 44/46 prior owned
+paths exact, two changed and two new; runtime/test counts are 40/42 exact, two
+changed and two new. Migration/DDL/guard definitions, owner-authority repair, request/
 reconciliation, line projection, public DTO method signatures and prior tests
 remain exact after 9f. The 9f native installer/authority/physical-boundary/race
 proof remains attributable to 9f with that mapping; it is not reported as a new

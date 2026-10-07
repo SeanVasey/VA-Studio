@@ -171,30 +171,6 @@
       "git_blob": "7fe1867e146fef83e23765c16c42896f737cbe71"
     },
     {
-      "path": "docs/verification/operative-checkout-new-20261007/README.md",
-      "bytes": 9199,
-      "sha256": "5ea4dc2787d8f1f19decb5b6505cda77b90a19086b09ed62c30d29e25b2967a8",
-      "git_blob": "76a4250020ea51d9ea2f33f9e0831e793ee5c187"
-    },
-    {
-      "path": "docs/verification/operative-checkout-new-20261007/provider-source/checkout-create-properties.json",
-      "bytes": 10123,
-      "sha256": "374de301a562efd659491d828b1b9a18b51fd14dc576f4fa556047963f6d636d",
-      "git_blob": "9b90f7742a3f7aed392af78bacc0a884df915e31"
-    },
-    {
-      "path": "docs/verification/operative-checkout-new-20261007/provider-source/receipt.json",
-      "bytes": 1415,
-      "sha256": "ce41f4135cb1a922ec16ef1f262fb79635d5b15c7e333f6feb15a670255d7464",
-      "git_blob": "953c6afa514b57efbf622a6a9ce44274e8dbabbc"
-    },
-    {
-      "path": "docs/verification/operative-checkout-new-20261007/provider-source/stripe-openapi-bcfd59f4.json.gz",
-      "bytes": 702524,
-      "sha256": "00ee065b56734b028cdadabfa7b67264caecb306eeb2d698e56942d21169721b",
-      "git_blob": "8267bfaf97d9b18f0ee9f2849c99b60b4526bbd4"
-    },
-    {
       "path": "routes/production-checkout.php",
       "bytes": 1545,
       "sha256": "415b6c42a8381f5d62519d1f0b108538e6ed86ccf19d85e267dc3e2f1c2ac496",
@@ -531,5 +507,37 @@
       "git_blob": "7389be6888cbffc9eb41430a28b56d4393e24267"
     }
   ],
-  "approval": "Author evidence only; exact T23 dependency independent review and checkout independent review remain separate."
+  "approval": "Author evidence only; exact T23 dependency independent review and checkout independent review remain separate.",
+  "original_checkout_evidence_files": [
+    {
+      "path": "docs/verification/operative-checkout-new-20261007/README.md",
+      "bytes": 9199,
+      "sha256": "5ea4dc2787d8f1f19decb5b6505cda77b90a19086b09ed62c30d29e25b2967a8",
+      "git_blob": "76a4250020ea51d9ea2f33f9e0831e793ee5c187"
+    },
+    {
+      "path": "docs/verification/operative-checkout-new-20261007/provider-source/checkout-create-properties.json",
+      "bytes": 10123,
+      "sha256": "374de301a562efd659491d828b1b9a18b51fd14dc576f4fa556047963f6d636d",
+      "git_blob": "9b90f7742a3f7aed392af78bacc0a884df915e31"
+    },
+    {
+      "path": "docs/verification/operative-checkout-new-20261007/provider-source/receipt.json",
+      "bytes": 1415,
+      "sha256": "ce41f4135cb1a922ec16ef1f262fb79635d5b15c7e333f6feb15a670255d7464",
+      "git_blob": "953c6afa514b57efbf622a6a9ce44274e8dbabbc"
+    },
+    {
+      "path": "docs/verification/operative-checkout-new-20261007/provider-source/stripe-openapi-bcfd59f4.json.gz",
+      "bytes": 702524,
+      "sha256": "00ee065b56734b028cdadabfa7b67264caecb306eeb2d698e56942d21169721b",
+      "git_blob": "8267bfaf97d9b18f0ee9f2849c99b60b4526bbd4"
+    }
+  ],
+  "file_counts": {
+    "owned_runtime_and_registered_tests": 44,
+    "original_checkout_evidence_snapshots": 4,
+    "borrowed_dependency_files": 38
+  },
+  "original_evidence_attribution": "Hashes describe executable-source f0 tree. The evidence-only README is intentionally updated; original README is retained at evidence/historical/f0-README.md and via git show f0:path. Artifact digests describe current receipt bytes."
 }

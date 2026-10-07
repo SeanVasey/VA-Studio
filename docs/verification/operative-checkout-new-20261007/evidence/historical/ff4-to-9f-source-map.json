@@ -235,5 +235,11 @@
       "old_sha256": "ca63ae8463338554de3703c233810a3af2287649a98aaa1fef6dfb82c2706281",
       "new_sha256": "ca63ae8463338554de3703c233810a3af2287649a98aaa1fef6dfb82c2706281"
     }
-  ]
+  ],
+  "scope_attribution": "Owned path counts include four original verification documentation/provider-source files. Runtime/test-only counts are reported separately; evidence-only README updates do not alter executable source.",
+  "runtime_and_registered_test_counts": {
+    "owned_byte_exact_files": 38,
+    "owned_changed_files": 4,
+    "owned_added_files": 0
+  }
 }
