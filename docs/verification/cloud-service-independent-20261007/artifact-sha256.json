@@ -1,5 +1,4 @@
 {
-  ".phpunit.result.cache": "253a7ca6665e453849a36db281a2def4dda5bab65eaddc451e578f0a510a8de8",
   "ServiceProjectAuthorityCanaryTest.php": "3980a2200529d93f44618594427f18590cc36a9801ad636fce7fa200d297b97a",
   "ServiceProjectDependencyCanaryTest.php": "ba0a49b94bc2cd4661f249a12a8beed21aee91fdd51481880d599a4caf8e1401",
   "ServiceProjectRecoveryCanaryTest.php": "ac63dca47d80e0ec02570f8c1a623fa0d88cbb6aa60d140e2f1f56da786e129b",
