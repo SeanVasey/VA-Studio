@@ -8,7 +8,7 @@ use LogicException;
 /** Server-only immutable request, not authority. Every captured producer token must be re-proved. */
 final readonly class MemberGrantIntent implements JsonSerializable
 {
-    public const FAMILY = 'production-member-grant-v1';
+    public const FAMILY = 'production-member-origin-v1';
 
     public const PURPOSE = 'production-member-license-grant-v1';
 
