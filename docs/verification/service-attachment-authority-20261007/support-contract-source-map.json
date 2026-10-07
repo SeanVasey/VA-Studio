@@ -1,0 +1,13 @@
+{
+  "kind": "borrowed-isolated-test-contracts",
+  "source_sha": "peer-uncommitted-at-collection",
+  "files": {
+    "app/Domain/SupportAttachments/AttachmentActor.php": "e194941df9e66585b6a17a00a7e11ad9ca7b8dd3f7d604ffe6f69f66d87c6b83",
+    "app/Domain/SupportAttachments/AttachmentRows.php": "cdb8a75ef67e54b1b39855dc9868f703abc7f1150ee21d830cb48b09624395ae",
+    "app/Domain/SupportAttachments/AttachmentSourceToken.php": "00f03e7fb5bdb059c2b8c37f2264dd398a43e0c9ea944aa39990abf8f54eb1ab",
+    "app/Domain/SupportAttachments/AttachmentSourceProof.php": "388610f6340467938fac1e8a5bb6f7a80a54debff9f78a178571b10a19c3dc25",
+    "app/Domain/SupportAttachments/AttachmentSourceAuthority.php": "3ffa8dfe9437f8838eded591a9daa1119ebfef582bde57b3562c58c849b9807c",
+    "app/Domain/SupportAttachments/AttachmentMutationAuthority.php": "07399afcf97da7d6294b109a1dd022dd9567c88b39036e46cfa4d63ee43fc8c0",
+    "app/Domain/SupportAttachments/AttachmentException.php": "3ce2e774906120a7a3e15211d88c110aed83c13625267e4e3caa36146aa2a583"
+  }
+}
