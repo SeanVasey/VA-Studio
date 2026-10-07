@@ -92,6 +92,11 @@ sha256sum <BACKUP_DIR>/database.sql > <BACKUP_DIR>/database.sql.sha256
 unmanifested=$(cd <PRIVATE_ROOT> && find . \( ! -type f ! -type d \) -o \( -type f -links +1 \)) || exit 1
 [ -z "$unmanifested" ] || { echo 'unmanifested entry in <PRIVATE_ROOT>'; exit 1; }
 (cd <PRIVATE_ROOT> && find . -type f -print0 | sort -z | xargs -0 -r sha256sum) > <BACKUP_DIR>/private.sha256   # -r: an empty tree gives an empty manifest, not a hash of stdin
+#    The file manifest cannot see an empty directory, so the directory names are manifested
+#    too (every directory, including empty ones; `.` itself is the first entry) and step 4
+#    compares them. A restore missing an empty directory is not the exact tree.
+dirs=$(cd <PRIVATE_ROOT> && find . -type d) || exit 1
+printf '%s\n' "$dirs" | LC_ALL=C sort > <BACKUP_DIR>/private.dirs
 #    A partial archive (tar stopped by a read error) can omit an empty directory the
 #    file-only manifest cannot see, so archive creation is fatal, as extraction is in step 3.
 tar --create --file=<BACKUP_DIR>/private.tar --directory=<PRIVATE_ROOT> --numeric-owner . || exit 1
@@ -101,7 +106,12 @@ sha256sum <BACKUP_DIR>/private.tar > <BACKUP_DIR>/private.tar.sha256
 # jobs). Service names are the host's; the private-server runbook names them. If a service
 # fails to start the application stays in maintenance mode (fail safe): fix the service,
 # then run `php artisan up` by hand. Everything below touches only the isolated targets.
-systemctl start <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> && systemctl is-active <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> || exit 1
+# `is-active` with several units exits 0 when at least ONE is active, so each unit is
+# checked on its own: a worker or scheduler that exited right after starting must stop the
+# procedure before `artisan up` reopens traffic.
+systemctl start <QUEUE_WORKER_SERVICE> <SCHEDULER_SERVICE> || exit 1
+systemctl is-active --quiet <QUEUE_WORKER_SERVICE> || exit 1
+systemctl is-active --quiet <SCHEDULER_SERVICE> || exit 1
 php artisan up || exit 1   # lifts maintenance mode only, and only once the writers above are back; a failed up must not continue into the restore
 
 # 3. Restore into the isolated targets only. The dump is loaded unchanged (its CREATE DATABASE
@@ -129,6 +139,10 @@ if [ -s <BACKUP_DIR>/private.sha256 ]; then
 fi
 diff <(cd <RESTORE_PRIVATE_ROOT> && find . ! -type d | LC_ALL=C sort) \
      <(cut -c67- <BACKUP_DIR>/private.sha256 | LC_ALL=C sort) || exit 1
+#    And exactly the manifest's directories (empty ones included): a missing or extra
+#    directory is a different tree even when every file hash and name matches.
+restored_dirs=$(cd <RESTORE_PRIVATE_ROOT> && find . -type d) || exit 1
+diff <(printf '%s\n' "$restored_dirs" | LC_ALL=C sort) <BACKUP_DIR>/private.dirs || exit 1
 #    Hashes and names say nothing about modes: masters and contracts must stay owner-only.
 #    Owner-only means 0600, or 0400 for sealed originals (issued contracts, immutable media
 #    revisions and sound-kit originals are written as 0400). The tracked root

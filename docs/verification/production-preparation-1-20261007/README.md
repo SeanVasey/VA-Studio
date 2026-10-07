@@ -457,6 +457,14 @@ names the `systemctl` and mount lines as the only privileged steps, under a unit
 sudoers grant). Info: the worker `cwd` proof assumes the unit sets `WorkingDirectory` to
 the `current` release.
 
+Codex's twenty-fifth pass (P2 ×2, docs): the backup manifests the directory names too
+(`private.dirs`, empty directories included) and step 4 diffs them, since the file-only
+manifest cannot see a missing empty directory (rehearsed on a synthetic tree:
+`conditions/codex-dir-manifest/rehearsal.txt`, a removed empty directory and an extra
+directory are both refused); the resume checks each restarted unit with its own
+`is-active --quiet`, because a multi-unit `is-active` exits 0 when at least one unit is
+active.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex
