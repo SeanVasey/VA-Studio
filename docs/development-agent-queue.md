@@ -2,18 +2,18 @@
 
 ## Active cloud ownership — October 7, 2026 UTC
 
-One integration owner `/root`; verified main `2cdd3da12261d27479955722952123d3a21ecc49` includes PRs25–33.
+One integration owner `/root`; verified main `760da5ac70a1082f13d87351a4446459e19947bb` includes PRs25–34.
 Historical owner tables below describe earlier source, not active workers.
 
 | Worker | Isolated boundary | Current handoff |
 | --- | --- | --- |
-| `/root` | Primary/shared registration/evidence/publication | Identity247 merged; independently approved private free245 registration publication; attachment request966 and suppression251 composition |
-| `/root/pr25_recovery` | ProductionCheckout246/provider/tax | Actual three lazy-PDO/connection callbacks repaired in frozenb6f; exact checks then NEW committed-source receipt and supported automatic-tax255 |
-| `/root/completion_audit` | Typed identity adapters; operative free-origin child | Frozen101 adapter with retained genuine reds/final affected native proof awaits independent review; rootfreec59 independently approved; NEW typed productionfree original lineage/purpose |
-| `/root/native_mysql` | Paid252 consumers | Schema2bdd frozen; current typedV1 paidorigin3714 with genuine source/asset/current-proof checks; original fulfilment, full-order delivery and future255V2 consumer remain unfinished |
-| `/root/pr26_review` | Independent review and owned service producer | Service8444 permanent-view drift requires owned BASE_TABLE correction; then adapter101 independent review; T36 rootHTTP4/68 passed but schema blocker holds publication |
-| `/root/crawler_routes` | Production feature253; suppression251 successor | Narrow251 reserved-key admissionaed proven on unchanged native probe; NEW253 actual legacy/authority/initialization and prefix checks underway; NEW254 distinct production suppression follows |
-| `/root/recovery_inventory` | Independent attachment review; owned discovery schema | Sharedrequest966 actual20/343 passed, independent native review next; service permanent-view genuine red retained; discovery97 reserved CHECK collision requires Schema-only successor |
+| `/root` | Primary/shared registration/evidence/publication | Free245 merged; reviewed support registration and final test fixtures; discovery/suppression publication; final source and CI census coordination |
+| `/root/pr25_recovery` | ProductionCheckout246/provider/tax | Frozenb6 callback repair; root selected5/38; NEW producer committed receipt and cached plain-read CurrentRows1fdd; then supported automatic-tax255 |
+| `/root/completion_audit` | Typed identity producer; operative free256 | Adapter101 independently approved; NEW historical committed identity receipt; repair actual3f revoked-session marker before distinct production free family256 |
+| `/root/native_mysql` | Paid252 consumers; service source repair | Service permanent-view correction9ce independently approved; paid whole-order original fulfilment/PDF proof; producer receipt and HTTP/UI/delivery completion remain dependencies |
+| `/root/pr26_review` | Independent discovery and SMTP review | Discovery07 native4/17 and all source/receipt bindings verified; final registereddc0 review, then unchanged actual SMTP parent callback probe on repairedf5 |
+| `/root/crawler_routes` | Production feature253 and suppression254 | Suppression983 root original native2/13 green;253 native consent boundary diagnosis and source freeze; NEW distinct production suppression254 follows |
+| `/root/recovery_inventory` | Independent free review; membership257/member258 | Genuine free marker1/7 fails SQLite/native; frozen c28 evidence; NEW real invoice/period/benefit membership schema/contracts with separate member-purpose grant258 |
 
 
 Each worker has an isolated branch, independent autoload over unchanged locked
