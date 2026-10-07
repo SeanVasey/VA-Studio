@@ -1,0 +1,39 @@
+{
+  "source_composition": "77f834c3da10cb67420ba24bd6fe30079f6446cd",
+  "published_predecessor": "cd83b0cf4bddaeac9b113fabe7a918e37bfd2901",
+  "actual_review_finding": "https://github.com/SeanVasey/VA-Studio/pull/35#discussion_r4206158388",
+  "original": {
+    "tests": 1,
+    "failures": 1,
+    "errors": 0,
+    "assertions": 124,
+    "behavior": "Actual complete-family route test is rate limited during128-child crawl on published shared120 prefix."
+  },
+  "corrected": {
+    "tests": 34,
+    "passed": 34,
+    "assertions": 384,
+    "files": [
+      "DiscoverySitemapRegistrationTest",
+      "DiscoverySitemapReviewRegressionTest",
+      "PublicDiscoveryIndexTest"
+    ],
+    "behavior": "58 prior editorial requests plus real generated index/editorial/128 children all200;129th track and next editorial429. No retry, time travel, disabled middleware or mocked response."
+  },
+  "source_sha256": {
+    "routes/discovery-track-sitemaps.php": "7537a4120fa840eeb9e44bdc65c6a04567c121880a40ca128ac472286d4961ec",
+    "tests/Feature/DiscoverySitemapRegistrationTest.php": "f569470a7a0dee246ca4a44e447f8cc58fa107518dabd753d85939c538fe3661"
+  },
+  "artifact_sha256": {
+    "va-discovery-throttle-original.txt": "bed975fe0ec0ffbcb932062a846d86972c03db4b674e4e3f60f16873ebe80c1b",
+    "va-discovery-throttle-original.xml": "e707052f34dda3856ef3d32d3d6ebda7ad5481bce5b321bb716e09d91c0a2963",
+    "va-discovery-throttle-corrected.txt": "ac317125ea4cec592004ba91cc6c699956a72eb89f379135651437c8d00b58ca",
+    "va-discovery-throttle-corrected.xml": "ade32b750e6d7c32bfaaf9ae8aa7f3e58fb0e2a01fe5535ba6ef2dfd4f8a41ae",
+    "va-discovery-throttle-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+  },
+  "limits": [
+    "SQLite focused component evidence; unchanged prior Schema/worker/native evidence remains source-bound carry",
+    "No native8.4/browser/full Foundation acceptance claimed",
+    "Only track limiter prefix/budget changes; public editorial limit remains60 and independent track limit128"
+  ]
+}

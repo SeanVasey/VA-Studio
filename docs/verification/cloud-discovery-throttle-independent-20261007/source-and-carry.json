@@ -1,0 +1,21 @@
+{
+  "tested_source": "0aa1d744a7c9c24182339fe975e4cb9d3bee9498",
+  "runtime_commit": "29dff1a7d8ef0337e7f6e59c880ddb2fb6ad4abc",
+  "changed_source": {
+    "routes/discovery-track-sitemaps.php": "7537a4120fa840eeb9e44bdc65c6a04567c121880a40ca128ac472286d4961ec",
+    "tests/Feature/DiscoverySitemapRegistrationTest.php": "f569470a7a0dee246ca4a44e447f8cc58fa107518dabd753d85939c538fe3661"
+  },
+  "unchanged_published_source": {
+    "app/Domain/Catalog/DiscoverySitemap/SitemapSchema.php": "2f8100ff89111a7632b62386e05e0210727c5e84be8b58ebbbf0f10d3cc513a6",
+    "app/Domain/Catalog/DiscoverySitemap/SitemapStore.php": "001a1e18cd64605522479fddade10cafb80ab8d3389a0a52e5d3d8dff626953b",
+    "app/Domain/Catalog/Discovery/CurrentEligibleTrackSnapshot.php": "ae98d542c70383d30656164a03c212a859dec1ab583780a68ec705c27f6bd12e",
+    "app/Http/Controllers/PublicDiscoveryController.php": "78a33252d59db9f4f72ded60908e699c8a472d89758ab7215bab99d997f0c50a",
+    "app/Console/Commands/DiscoverySitemapBuild.php": "1d5611412373b1796dc8c7d2e2a9a3882d52e7b7bb637507c0e47d832de700d9",
+    "routes/public-discovery.php": "5c2ab822fd9ba99a6a59d125f139b6c0c00daabdc2d535a934bd8273bf464c61"
+  },
+  "runtime_delta": [
+    "routes/discovery-track-sitemaps.php",
+    "tests/Feature/DiscoverySitemapRegistrationTest.php"
+  ],
+  "locked_throttle_middleware_sha256": "fca89bf4357713f91e9940e368f6d174aaae70a63a3b6f19ff5b877397ae1290"
+}
