@@ -1,0 +1,16 @@
+{
+    "original": "0143f4b6bb7c529aed003fdfc741bf93f2e3a9ed",
+    "successor": "d22e1ddc9f01089dec15c2eca0519c2bc5424876",
+    "unchanged_owned_SQL": {
+        "sqlite": {
+            "all_table_column_index_fk_and_nine_trigger_values_byte_exact": true,
+            "sha256": "70569871a9c2504d75371278b64ae87c9d4cd4e18e11ee466ea751fb01f3c63c",
+            "ddl_statements": 12
+        },
+        "mysql": {
+            "all_table_column_index_fk_and_nine_trigger_values_byte_exact": true,
+            "sha256": "11bb76e761bbf0d6662ae6332e606c1ee5dcfc03ef27e5c1a958367bda91535f",
+            "ddl_statements": 12
+        }
+    }
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/race-mysql-selection.xml" tests="1" assertions="14" errors="0" failures="0" skipped="0" time="12.406534">
+    <testsuite name="Independent consent migration probes" tests="1" assertions="14" errors="0" failures="0" skipped="0" time="12.406534">
+      <testsuite name="Tests\Feature\ConsentNativeRaceProbeTest" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentNativeRaceProbeTest.php" tests="1" assertions="14" errors="0" failures="0" skipped="0" time="12.406534">
+        <testcase name="test_real_withdrawal_serializes_a_stale_grant_even_with_old_repeatable_read_snapshot" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentNativeRaceProbeTest.php" line="16" class="Tests\Feature\ConsentNativeRaceProbeTest" classname="Tests.Feature.ConsentNativeRaceProbeTest" assertions="14" time="12.406534"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,40 @@
+<?php
+namespace Tests\Feature;
+
+use App\Domain\Customers\CustomerAccessException;
+use App\Domain\Customers\CustomerAccessPolicy;
+use App\Domain\Customers\Preferences\ConsentException;
+use App\Domain\Customers\Preferences\CustomerConsentPreferences;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use PDO;
+use Tests\Support\ConsentFixtures;
+use Tests\Support\CustomerFixtures;
+use Tests\TestCase;
+
+class ConsentTerminalPolicyProbeTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_actual_terminal_policy_resolver_cannot_disable_notice_after_configuration_check_and_commit_old_grant(): void
+    {
+        ConsentFixtures::configure();$customer=CustomerFixtures::account();$service=app(CustomerConsentPreferences::class);
+        $before=$this->raw();$resolved=0;$fired=false;
+        app()->resolving(CustomerAccessPolicy::class,function () use (&$resolved,&$fired): void {
+            if(++$resolved===3){$fired=true;config(['customer-preferences.test_grants_enabled'=>false,'customer-preferences.email_marketing'=>null]);}
+        });
+        $refused=false;$status=null;
+        try{$service->change($customer['principal'],$customer['user'],ConsentFixtures::grant());}
+        catch(CustomerAccessException|ConsentException $e){$refused=true;$status=$e instanceof ConsentException?$e->status:403;}
+        $after=$this->raw();
+        file_put_contents(__DIR__.'/'.getenv('CONSENT_PROBE_PREFIX').'-terminal-policy.json',json_encode(['source'=>getenv('CONSENT_REVIEW_SOURCE'),'driver'=>DB::getDriverName(),'policy_resolution_count'=>$resolved,'actual_terminal_policy_resolver_fired'=>$fired,'notice_disabled'=>config('customer-preferences.email_marketing')===null,'command_refused'=>$refused,'status'=>$status,'retained_rows_exact'=>$before===$after,'event_count'=>count($after[3])],JSON_PRETTY_PRINT)."\n");
+        $this->assertTrue($fired,'Genuine terminal policy resolver callback must have fired.');
+        $this->assertTrue($refused,'Grant under a notice withdrawn before final proof must be refused.');
+        $this->assertSame($before,$after,'Callback and grant transition must both roll back.');
+    }
+    private function raw(): array
+    {
+        $pdo=DB::connection()->getPdo();
+        return array_map(fn($t)=>$pdo->query('SELECT * FROM '.$t.' ORDER BY id')->fetchAll(PDO::FETCH_ASSOC),['users','customer_accounts','customer_consent_policies','customer_consent_events','customer_consent_states']);
+    }
+}

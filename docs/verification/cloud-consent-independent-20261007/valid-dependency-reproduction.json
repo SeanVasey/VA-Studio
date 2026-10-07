@@ -1,0 +1,24 @@
+{
+  "source": "0143f4b6bb7c529aed003fdfc741bf93f2e3a9ed",
+  "fixture_upgrade": "Each probe invokes the real complete prior migrations, removes only own empty consent tables and record, creates synthetic sentinel, then injects its one catalog/dependency/final-guard change. No minimal dependency can mask a later repair.",
+  "cases": {
+    "author-valid-dependencies-sqlite-junit.xml": {
+      "tests": "4",
+      "assertions": "10",
+      "errors": "0",
+      "failures": "3",
+      "skipped": "0",
+      "time": "1.098457"
+    },
+    "author-valid-dependencies-mysql-junit.xml": {
+      "tests": "4",
+      "assertions": "7",
+      "errors": "0",
+      "failures": "3",
+      "skipped": "1",
+      "time": "61.290425"
+    }
+  },
+  "native_final_ddl": "Actual last CREATE TRIGGER callback drops earlier guard; source returns0 and records migration250 once despite missing guard.",
+  "original_fixture_source_retained": "author-three-migration-probes.php.txt and author-final-ddl-probe-source.php.txt; upgraded executable canary reset only changes fixture admission, same original refusal/full-catalog assertions."
+}

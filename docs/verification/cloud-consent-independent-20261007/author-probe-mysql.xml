@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/probe-mysql.xml" tests="3" assertions="2" errors="0" failures="2" skipped="1" time="0.613691">
+    <testsuite name="Independent consent migration probes" tests="3" assertions="2" errors="0" failures="2" skipped="1" time="0.613691">
+      <testsuite name="Tests\Feature\ConsentMigrationProbeTest" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php" tests="3" assertions="2" errors="0" failures="2" skipped="1" time="0.613691">
+        <testcase name="test_reserved_table_name_as_foreign_trigger_is_refused_before_any_ddl" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php" line="31" class="Tests\Feature\ConsentMigrationProbeTest" classname="Tests.Feature.ConsentMigrationProbeTest" assertions="1" time="0.435989">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ConsentMigrationProbeTest::test_reserved_table_name_as_foreign_trigger_is_refused_before_any_ddl
+Reserved table identity collides with a foreign trigger and must refuse before any DDL.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php:39
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+        </testcase>
+        <testcase name="test_reserved_table_and_foreign_trigger_coexistence_is_refused_before_adoption" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php" line="42" class="Tests\Feature\ConsentMigrationProbeTest" classname="Tests.Feature.ConsentMigrationProbeTest" assertions="0" time="0.016041">
+          <skipped/>
+        </testcase>
+        <testcase name="test_missing_required_dependency_is_refused_before_owned_table_creation" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php" line="53" class="Tests\Feature\ConsentMigrationProbeTest" classname="Tests.Feature.ConsentMigrationProbeTest" assertions="1" time="0.161660">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ConsentMigrationProbeTest::test_missing_required_dependency_is_refused_before_owned_table_creation
+Missing required dependency must be refused before any owned DDL.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php:60
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

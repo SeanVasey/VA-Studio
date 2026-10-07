@@ -1,0 +1,352 @@
+{
+  "approved_source": "d22e1ddc9f01089dec15c2eca0519c2bc5424876",
+  "approved_tree": "934921d804e65ca7163fa59748da54c3b950dac5",
+  "author_executable": "fa06b77aeae756949888fa968de42a90b0ff124b",
+  "author_docs": "f7afbc55c6429e783586e7b565d7e802242cc330",
+  "root_registration_base": "719b0bde69523367cfb28f323356242789457826",
+  "decision": "approve consent250 for focused development; all four reproduced original blockers corrected on actual composition",
+  "source": {
+    "app/Domain/Catalog/Discovery/DiscoveryEpoch.php": {
+      "blob": "53a4355d7658d40901c901cf0ae3896952a17e09",
+      "sha256": "540b5d43c02e0a100e39290598b96668a4bf6c30fd0813da6161f307bec801bf"
+    },
+    "app/Domain/Customers/CustomerAccess.php": {
+      "blob": "310bb10219405110a3db5a5844132c42d0291887",
+      "sha256": "cb59745ecbdea2a9cedce51be535d428f2e1a3613829547716e9633fbff061bd"
+    },
+    "app/Domain/Customers/CustomerAccessPolicy.php": {
+      "blob": "ceccc3a417413dec27b855d465d30349cef20fa3",
+      "sha256": "2a144608b6988d0cd96a1f2eb9b7164c226b3fa60e822496bda8fe3f2099fd40"
+    },
+    "app/Domain/Customers/Preferences/ConsentEvidence.php": {
+      "blob": "bfd36e625dfe0a422dab48d5b02efb3a2de2853e",
+      "sha256": "af03ae8feab2a85cf592fe9414b9425389a60286553080288b9bc115b223b96a"
+    },
+    "app/Domain/Customers/Preferences/ConsentException.php": {
+      "blob": "9ac4bdea57424de3cfbdac5b58ad9eea194cf1b9",
+      "sha256": "0f1c8ecc7372fb4ad8370a9dafeb9fb55e96a722210ff78fbe38397bdf6d93c2"
+    },
+    "app/Domain/Customers/Preferences/ConsentMigrationAdmission.php": {
+      "blob": "12a0d2ee252b233ebcc0919aefd5c25607a196cd",
+      "sha256": "d5d6c464c2d28e32ef65f1d801aa98eaa59f28b45658af19a753ebf46a0f6f03"
+    },
+    "app/Domain/Customers/Preferences/ConsentPolicy.php": {
+      "blob": "0da507e0811d9cb0f1df2e01a0c716ea5aef7bc6",
+      "sha256": "faf7bf988a35534cc9e18c6f68af3ec00f5185c1e5f196bf8eeaa08fa2639da1"
+    },
+    "app/Domain/Customers/Preferences/ConsentRuntime.php": {
+      "blob": "3aad7d30abfec79aa2f40fec8bcb46eca82edbbc",
+      "sha256": "2115006f35a6929c0b4b439ecc58c06b51705b96a770ee607f0ecf9c13ae3490"
+    },
+    "app/Domain/Customers/Preferences/CustomerConsentPreferences.php": {
+      "blob": "495b4782e7f951321f93eb0c20a2fd8d01da5cd2",
+      "sha256": "faef7e43aa94b2c10c50fbede77fed90d0208a31e354f26214bc5a2a22b44716"
+    },
+    "app/Domain/Customers/Preferences/LocalConsentRuntime.php": {
+      "blob": "83371168323a3c89aa1a9dbd024912e2b3e2fa98",
+      "sha256": "131bd85fe8b6a6ea041f44b6ca78aa5edea3a458c7d6e453b4a667847a6b6ef8"
+    },
+    "app/Domain/Customers/Preferences/Models/ConsentEvent.php": {
+      "blob": "c35611aeaa798693b529ab45f38cfbc0be0715bd",
+      "sha256": "20cb33ca5d06d700375187840ca5bd90f6b6f5cdeed691dbe6bc499112371b05"
+    },
+    "app/Domain/Customers/Preferences/Models/ConsentPolicySnapshot.php": {
+      "blob": "464334388b931028854a2b026a045bb2380b75b9",
+      "sha256": "113bfed543a32c8948dd40190363f32a8288a451fb5b4c3078c013c7b0c0b462"
+    },
+    "app/Domain/Customers/Preferences/Models/ConsentState.php": {
+      "blob": "c977bbe246f6852725011515a4366733b54dafe2",
+      "sha256": "1975503b1fd021f2867b0f1296127b67becdc43bddf283942aad8be6c87fa051"
+    },
+    "app/Http/Controllers/CustomerCommunicationPreferencesController.php": {
+      "blob": "6fb7396943400727953e6f50fd1819023e7dc129",
+      "sha256": "65c6abfab2a221169442bf4a7d3079b3abf250eb00589e5906b7fdf7288206d6"
+    },
+    "app/Http/Controllers/CustomerSessionController.php": {
+      "blob": "bf55ccaf3a8fba6b793a3a21a509699e72a50a32",
+      "sha256": "b51e73ac36c2e6ff352cbd18db89ac12834eaede4c3faf15635ca935b3fe2582"
+    },
+    "app/Http/Middleware/CustomerPrivacy.php": {
+      "blob": "c09b2b197b5c8fe88e419a33ba830447077af3ea",
+      "sha256": "a718aaa54bba4559de97cae1894f591af77306760176b2e1659cbc8250c634f9"
+    },
+    "app/Http/Requests/CustomerCommunicationPreferencesRequest.php": {
+      "blob": "b1c0fe774cafacf4c6f9b0c93357368208156f97",
+      "sha256": "483918eb02c2ea8c293389fa4f533886bfa49ff9ba2185ea2af0b9adfa3a266e"
+    },
+    "app/Support/CommerceRequestIdentity.php": {
+      "blob": "21c8de9947441cf8ecd0b17d48daf530117959c5",
+      "sha256": "848c758e0dbdb56b80884e3f91e6fd2946c005717d8805ebba9a7ec21871de1a"
+    },
+    "bootstrap/app.php": {
+      "blob": "ad1074da34581130a90c7ca61b528c29c6c5b42a",
+      "sha256": "e9fcaa1432324ca8cc7e3edab0c5ae978a75ba1aed5683f1a3230196c2fd4ce5"
+    },
+    "composer.lock": {
+      "blob": "9e58027dcd989282b026d56347e26ea867723db9",
+      "sha256": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9"
+    },
+    "config/customer-preferences.php": {
+      "blob": "f657798850583428af51d7479f3a3d3aeab1844d",
+      "sha256": "dd069f3a1d7450a90f0923a423b6cab0cdc31ffab4af2c5fbbb8be569ffbbb19"
+    },
+    "database/migrations/0001_01_01_000000_create_users_table.php": {
+      "blob": "05fb5d9ea95d1b527ba0e7074936553944b8d302",
+      "sha256": "10d79883bc08ce46510f9ad8b1830b4d06d586dc56ae2c8bac3b3e491f69a90f"
+    },
+    "database/migrations/2026_09_04_000001_create_catalog_foundation.php": {
+      "blob": "377bb10dbb0bc40b22a9077eab1d715cf64fc123",
+      "sha256": "cb2f0670080c6ae9ad48b8512bc1bcdbd78b93d1f5ddb6dcb8b50cc1fd384366"
+    },
+    "database/migrations/2026_09_06_000006_provisional_quotes.php": {
+      "blob": "2600c1140a8d996d9c4d20d2dd590c57d26e8462",
+      "sha256": "26a32a75d2c0223c2b2304d3aa33968fda4fa647dc4f019565dee34df8baa818"
+    },
+    "database/migrations/2026_10_06_000040_customer_accounts.php": {
+      "blob": "f139df54108dcc1410352e524da2c94a4f5ab7ad",
+      "sha256": "659db171c443ee652dad9a13f92bbc30f41c167cfab7a557ab50bc58538f0c63"
+    },
+    "database/migrations/2026_10_07_250000_customer_consent.php": {
+      "blob": "2d2f75ab7d3c5b0bf4867666571a1097a63546f1",
+      "sha256": "9de1cc2783fd73eacdd84eea80445b8d573d53b0e73d4a0bae8cbd2a5e73ae12"
+    },
+    "package-lock.json": {
+      "blob": "614350366e7af397c14603dae9272082ecfae066",
+      "sha256": "6407d3a63e3b6e04f5824f53c41b8dc8a33581f987b21d780c795480122f93ea"
+    },
+    "resources/js/Pages/CustomerLibrary.tsx": {
+      "blob": "d0fa69585b36299dd89774737662d18bb5b7ab6c",
+      "sha256": "e304d4ebdf57382c6aee52d833edf1bcdb8b6261c50cbb4cd5b08feef697965a"
+    },
+    "resources/js/components/CustomerCommunicationPreferences.tsx": {
+      "blob": "c3f449c633e85f56a2f3560a4e46e42bbe2d8b97",
+      "sha256": "c98efec148592deae7886b63647339cff3d4d4f70c7c57cd597318dad8f8067e"
+    },
+    "routes/customer.php": {
+      "blob": "90e18e649ef726ece6ddd1e14faf8c58fb3efa99",
+      "sha256": "b722e67cf67950da760edeebc29768d961ed8b48eac576001b57927059dcab09"
+    },
+    "tests/Feature/CustomerCommunicationPreferencesHttpTest.php": {
+      "blob": "dca2564757ba051f367b7c2b5edc488a42ae3049",
+      "sha256": "f5e445569cec71bc7ec87ab86648e380810caecbc19956308a27749acee0c41d"
+    },
+    "tests/Feature/CustomerConsentAdmissionTest.php": {
+      "blob": "0d33d43e3ef6302206c8c3db0b47ed8549597255",
+      "sha256": "11d3e542e64e74e4c0558c76f24333b7b925df2c52d495d8f2f36a4ba7413c05"
+    },
+    "tests/Feature/CustomerConsentBoundaryTest.php": {
+      "blob": "b1bb91ce3e9fb7557c52caa71707d99dc86fa9dc",
+      "sha256": "3fdc845b048a602b88b50df7b5fc5d8b8dbb9af4e8a37373cc49fc73135c998a"
+    },
+    "tests/Feature/CustomerConsentMigrationTest.php": {
+      "blob": "68ad89ffdc5175f5bbe3e6cb6748fa93307463c3",
+      "sha256": "8226286ebf90b2c4cb7c459d55bed57e40504aad6f97ff68bff5bc3049577403"
+    },
+    "tests/Feature/CustomerConsentPreferencesTest.php": {
+      "blob": "664f12b271bc56c5fd6180de862dc8ec86b86e8f",
+      "sha256": "9dccd2d115fdb47d2b94d73964d12463b64af7275668c6a740f40d4bc653ae6c"
+    },
+    "tests/Support/ConsentFixtures.php": {
+      "blob": "9d0a6847e0f3ca14fb3c06815cf5fd455ddf4d6c",
+      "sha256": "bbccae78ee99f140f334341b2b965f2dc7496afcd3b24befbcf8996a62588dc7"
+    },
+    "tests/frontend/customer-communication-preferences.test.tsx": {
+      "blob": "effa3db8440da9195e3bbd48b26d115d03087bf8",
+      "sha256": "c7501740d346924d049f3bc8f3e2bd3488cada544da9ab150c3caf264d8a6b79"
+    },
+    "tests/frontend/customer-communication-registration.test.tsx": {
+      "blob": "92809c8e1b9785b86c7a1e77a67dafd477d9e51e",
+      "sha256": "03ce9e608fb962fd521211e8f5e356226fb622c7d97609e135bb68e23790b1e2"
+    }
+  },
+  "independent_final": {
+    "final-native-junit.xml": {
+      "tests": "8",
+      "assertions": "31",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "1",
+      "time": "168.573160"
+    },
+    "final-migration-sqlite-junit.xml": {
+      "tests": "4",
+      "assertions": "13",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "1.756128"
+    },
+    "final-terminal-policy-sqlite-junit.xml": {
+      "tests": "1",
+      "assertions": "3",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "0.570073"
+    }
+  },
+  "native_skipped_case": "SQLite-only shared object-namespace table/trigger coexistence, passed in SQLite4/13. All seven native-applicable cases passed31; no native race or alias check skipped.",
+  "final_probes": {
+    "final-native-terminal-policy.json": {
+      "source": "d22e1ddc9f01089dec15c2eca0519c2bc5424876",
+      "driver": "mysql",
+      "policy_resolution_count": 3,
+      "actual_terminal_policy_resolver_fired": true,
+      "notice_disabled": true,
+      "command_refused": true,
+      "status": 503,
+      "retained_rows_exact": true,
+      "event_count": 0
+    },
+    "final-native-terminal-ddl.json": {
+      "source": "d22e1ddc9f01089dec15c2eca0519c2bc5424876",
+      "driver": "mysql",
+      "last_actual_ddl_callback_fired": true,
+      "migration_refused": true,
+      "status": null,
+      "recorded": 0
+    },
+    "final-native-race.json": {
+      "source": "d22e1ddc9f01089dec15c2eca0519c2bc5424876",
+      "mysql": "8.0.46-0ubuntu0.24.04.4",
+      "exact_users_record_wait": {
+        "index_name": "PRIMARY",
+        "lock_type": "RECORD",
+        "lock_status": "WAITING"
+      },
+      "workers": {
+        "first": {
+          "result": "saved",
+          "status": null,
+          "snapshot_revision": null,
+          "transaction_level": 0,
+          "isolation": "REPEATABLE-READ"
+        },
+        "second": {
+          "result": "rejected",
+          "status": 409,
+          "snapshot_revision": 0,
+          "transaction_level": 0,
+          "isolation": "REPEATABLE-READ"
+        }
+      },
+      "final_revision": 1,
+      "final_status": "withdrawn",
+      "events": 1,
+      "policies": 0
+    },
+    "final-sqlite-terminal-policy.json": {
+      "source": "d22e1ddc9f01089dec15c2eca0519c2bc5424876",
+      "driver": "sqlite",
+      "policy_resolution_count": 3,
+      "actual_terminal_policy_resolver_fired": true,
+      "notice_disabled": true,
+      "command_refused": true,
+      "status": 503,
+      "retained_rows_exact": true,
+      "event_count": 0
+    },
+    "final-sqlite-terminal-ddl.json": {
+      "source": "d22e1ddc9f01089dec15c2eca0519c2bc5424876",
+      "driver": "sqlite",
+      "last_actual_ddl_callback_fired": true,
+      "migration_refused": true,
+      "status": null,
+      "recorded": 0
+    }
+  },
+  "native_runtime": {
+    "source": "d22e1ddc9f01089dec15c2eca0519c2bc5424876",
+    "isolated_schema": "vaseyaudio_service_review",
+    "php": "8.4.26",
+    "driver": "mysql",
+    "server": {
+      "server": "8.0.46-0ubuntu0.24.04.4",
+      "version_comment": "(Ubuntu)",
+      "isolation_level": "REPEATABLE-READ",
+      "flush_at_commit": 1,
+      "sync_binlog": 1,
+      "doublewrite": "ON",
+      "log_bin": 0,
+      "case_mode": 0,
+      "sql_mode": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+      "foreign_keys": 1
+    },
+    "production_data": false,
+    "credentials_retained": false
+  },
+  "original_failures_retained": [
+    "Original minimal fixture probes, source copies and raw red outcomes frozen56385541068ce15ff6b9c72fa84260d83b050b8a",
+    "Same migration findings with actual full prior schema frozenecabdb5a5d1a9088310648da98603bcb95e73e8b",
+    "Initial isolated fixture cleanup error and only affected corrected1/11 retained distinctly"
+  ],
+  "artifact_reconciliation": {
+    "original_author_digests": 19,
+    "correction_author_digests": 21,
+    "original_source_paths": 17,
+    "correction_source_changed_or_added": 5,
+    "worktree_product_code_diff_from_composition": []
+  },
+  "parent_attribution": {
+    "source": "719b0bde69523367cfb28f323356242789457826",
+    "http_cases": 16,
+    "http_assertions": 171,
+    "frontend_cases": 63,
+    "typecheck": "passed",
+    "scope": "Unchanged root HTTP/privacy/request/capability/component/mount paths and tests. Exactfa author123SQLite covers changed domain/migration; independent composed probes verify defects/native branches. These are attributed root executions, not reviewer reruns on d22."
+  },
+  "source_carry": {
+    "original": "0143f4b6bb7c529aed003fdfc741bf93f2e3a9ed",
+    "successor": "d22e1ddc9f01089dec15c2eca0519c2bc5424876",
+    "unchanged_owned_SQL": {
+      "sqlite": {
+        "all_table_column_index_fk_and_nine_trigger_values_byte_exact": true,
+        "sha256": "70569871a9c2504d75371278b64ae87c9d4cd4e18e11ee466ea751fb01f3c63c",
+        "ddl_statements": 12
+      },
+      "mysql": {
+        "all_table_column_index_fk_and_nine_trigger_values_byte_exact": true,
+        "sha256": "11bb76e761bbf0d6662ae6332e606c1ee5dcfc03ef27e5c1a958367bda91535f",
+        "ddl_statements": 12
+      }
+    }
+  },
+  "earlier_native_prefix_selection": {
+    "source": "0143f4b6bb7c529aed003fdfc741bf93f2e3a9ed",
+    "proven_after_DDL_steps": [
+      1,
+      3,
+      12
+    ],
+    "earlier_selected_cases": 7,
+    "earlier_selected_passes": 6,
+    "earlier_selected_assertions": 39,
+    "first_prefix_harness_error_retained": true,
+    "corrected_prefix1_pass_cases": 1,
+    "corrected_prefix1_assertions": 11,
+    "limits": "Unchanged SQL and original prefix controls carried by exact definitions; no claim that all12steps received independent native successor execution. Author exactfa SQLite tests all12steps. Corrected native probes run real full migrations before each catalog/dependency/final-DDL case."
+  },
+  "dependency_identity": {
+    "locked_packages": 158,
+    "all_installed_version_source_dist_identities_exact": true,
+    "new_package_install": false,
+    "shared_package_read_only_symlinks": true,
+    "own_autoload_regenerated_without_scripts": true
+  },
+  "commands": {
+    "runner": "php -r own composer autoload then locked vendor/phpunit/phpunit/phpunit; argv retained in selection XML and records",
+    "native_config": "final-native-selection.xml",
+    "native_filter": "~(test_reserved_table_name|test_reserved_table_and|test_final_ddl_callback|test_missing_required_dependency|test_actual_terminal_policy_resolver|test_real_withdrawal|test_reserved_identity.*dictionary case/accent alias|test_dependency_shape.*temporary accounts)~",
+    "sqlite_configs": [
+      "probe-sqlite.xml",
+      "terminal-policy-sqlite.xml"
+    ],
+    "activation": "Rootless activate.sh; own autoload; synthetic32-byte test key. Native private reviewer env, additional loopback network permission. Credentials never printed or retained."
+  },
+  "limits": [
+    "Focused overlapping selections, not full Foundation/browser/device/MySQL8.4 acceptance",
+    "No historical/legal consent inference, customer import, provider suppression/send, live marketing, production identity or retention approval",
+    "Suppression251 remains separate; pending notes older-client preservation and identity repairs outside this approval",
+    "No reviewer product source/shared file mutation, push, merge of product branches, hostedCI or external operation"
+  ]
+}

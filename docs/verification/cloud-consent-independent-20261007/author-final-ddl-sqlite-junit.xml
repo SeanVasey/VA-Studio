@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/probe-sqlite.xml" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="0.261844">
+    <testsuite name="Independent consent migration probes" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="0.261844">
+      <testsuite name="Tests\Feature\ConsentMigrationProbeTest" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="0.261844">
+        <testcase name="test_final_ddl_callback_cannot_remove_an_earlier_guard_and_record_completed_installation" file="/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php" line="53" class="Tests\Feature\ConsentMigrationProbeTest" classname="Tests.Feature.ConsentMigrationProbeTest" assertions="2" time="0.261844">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ConsentMigrationProbeTest::test_final_ddl_callback_cannot_remove_an_earlier_guard_and_record_completed_installation
+Final full-graph assertion must detect an earlier dropped guard before migrator bookkeeping.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-consent-independent/docs/verification/cloud-consent-independent-20261007/ConsentMigrationProbeTest.php:64
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

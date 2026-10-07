@@ -1,0 +1,137 @@
+{
+    "source": "0143f4b6bb7c529aed003fdfc741bf93f2e3a9ed",
+    "driver": "sqlite",
+    "refused": false,
+    "error": null,
+    "objects_unchanged": false,
+    "before": [
+        {
+            "type": "table",
+            "name": "review_sentinel",
+            "tbl_name": "review_sentinel",
+            "sql": "CREATE TABLE review_sentinel (id INTEGER PRIMARY KEY, value VARCHAR(80))"
+        },
+        {
+            "type": "table",
+            "name": "users",
+            "tbl_name": "users",
+            "sql": "CREATE TABLE users (id INTEGER PRIMARY KEY)"
+        }
+    ],
+    "after": [
+        {
+            "type": "index",
+            "name": "sqlite_autoindex_customer_consent_events_1",
+            "tbl_name": "customer_consent_events",
+            "sql": null
+        },
+        {
+            "type": "index",
+            "name": "sqlite_autoindex_customer_consent_events_2",
+            "tbl_name": "customer_consent_events",
+            "sql": null
+        },
+        {
+            "type": "index",
+            "name": "sqlite_autoindex_customer_consent_policies_1",
+            "tbl_name": "customer_consent_policies",
+            "sql": null
+        },
+        {
+            "type": "index",
+            "name": "sqlite_autoindex_customer_consent_states_1",
+            "tbl_name": "customer_consent_states",
+            "sql": null
+        },
+        {
+            "type": "table",
+            "name": "customer_consent_events",
+            "tbl_name": "customer_consent_events",
+            "sql": "CREATE TABLE \"customer_consent_events\" (\"id\" integer primary key autoincrement not null, \"public_id\" text not null, \"customer_account_id\" integer not null, \"purpose\" text not null, \"revision\" integer not null, \"status\" text not null, \"policy_id\" integer null, \"source\" text not null, \"affirmative\" integer not null, \"recipient_hmac\" text not null, \"recipient_ciphertext\" text not null, \"created_at\" datetime not null, CONSTRAINT \"customer_consent_events_public_unique\" UNIQUE (`public_id`), CONSTRAINT \"customer_consent_events_account_revision_unique\" UNIQUE (`customer_account_id`, `purpose`, `revision`), CONSTRAINT `customer_consent_events_customer_account_id_fk` FOREIGN KEY (`customer_account_id`) REFERENCES `customer_accounts` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT, CONSTRAINT `customer_consent_events_policy_id_fk` FOREIGN KEY (`policy_id`) REFERENCES `customer_consent_policies` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT)"
+        },
+        {
+            "type": "table",
+            "name": "customer_consent_policies",
+            "tbl_name": "customer_consent_policies",
+            "sql": "CREATE TABLE \"customer_consent_policies\" (\"id\" integer primary key autoincrement not null, \"purpose\" text not null, \"version\" text not null, \"notice\" text not null, \"notice_hash\" text not null, \"review_reference\" text not null, \"policy_hash\" text not null, \"created_at\" datetime not null, CONSTRAINT \"customer_consent_policies_purpose_version_unique\" UNIQUE (`purpose`, `version`))"
+        },
+        {
+            "type": "table",
+            "name": "customer_consent_states",
+            "tbl_name": "customer_consent_states",
+            "sql": "CREATE TABLE \"customer_consent_states\" (\"id\" integer primary key autoincrement not null, \"customer_account_id\" integer not null, \"purpose\" text not null, \"revision\" integer not null, \"event_id\" integer not null, \"created_at\" datetime not null, \"updated_at\" datetime not null, CONSTRAINT \"customer_consent_states_account_unique\" UNIQUE (`customer_account_id`, `purpose`), CONSTRAINT `customer_consent_states_customer_account_id_fk` FOREIGN KEY (`customer_account_id`) REFERENCES `customer_accounts` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT, CONSTRAINT `customer_consent_states_event_id_fk` FOREIGN KEY (`event_id`) REFERENCES `customer_consent_events` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT)"
+        },
+        {
+            "type": "table",
+            "name": "review_sentinel",
+            "tbl_name": "review_sentinel",
+            "sql": "CREATE TABLE review_sentinel (id INTEGER PRIMARY KEY, value VARCHAR(80))"
+        },
+        {
+            "type": "table",
+            "name": "sqlite_sequence",
+            "tbl_name": "sqlite_sequence",
+            "sql": "CREATE TABLE sqlite_sequence(name,seq)"
+        },
+        {
+            "type": "table",
+            "name": "users",
+            "tbl_name": "users",
+            "sql": "CREATE TABLE users (id INTEGER PRIMARY KEY)"
+        },
+        {
+            "type": "trigger",
+            "name": "customer_consent_events_retain_delete",
+            "tbl_name": "customer_consent_events",
+            "sql": "CREATE TRIGGER `customer_consent_events_retain_delete` BEFORE DELETE ON `customer_consent_events` FOR EACH ROW BEGIN SELECT RAISE(ABORT, 'Retained consent graph refused') WHERE NOT (0=1); END"
+        },
+        {
+            "type": "trigger",
+            "name": "customer_consent_events_retain_insert",
+            "tbl_name": "customer_consent_events",
+            "sql": "CREATE TRIGGER `customer_consent_events_retain_insert` BEFORE INSERT ON `customer_consent_events` FOR EACH ROW BEGIN SELECT RAISE(ABORT, 'Retained consent graph refused') WHERE NOT (NEW.purpose='email_marketing' AND NEW.source='first_party_customer' AND NEW.revision BETWEEN 1 AND 2147483646 AND length(NEW.recipient_hmac)=64 AND NEW.recipient_hmac NOT GLOB '*[^a-f0-9]*' AND length(CAST(NEW.recipient_ciphertext AS BLOB)) BETWEEN 1 AND 4096 AND length(NEW.public_id)=36 AND ((NEW.status='granted' AND NEW.affirmative=1 AND NEW.policy_id IS NOT NULL) OR (NEW.status='withdrawn' AND NEW.affirmative=0)) AND (NEW.policy_id IS NULL OR EXISTS (SELECT 1 FROM customer_consent_policies WHERE id=NEW.policy_id AND purpose=NEW.purpose)) AND NEW.revision=COALESCE((SELECT revision FROM customer_consent_states WHERE customer_account_id=NEW.customer_account_id AND purpose=NEW.purpose),0)+1 AND EXISTS (SELECT 1 FROM customer_accounts a JOIN users u ON u.id=a.user_id WHERE a.id=NEW.customer_account_id AND a.active=1 AND u.is_admin=0 AND u.email_verified_at IS NOT NULL) AND NOT EXISTS (SELECT 1 FROM customer_consent_events WHERE id=NEW.id OR public_id=NEW.public_id OR (customer_account_id=NEW.customer_account_id AND purpose=NEW.purpose AND revision=NEW.revision))); END"
+        },
+        {
+            "type": "trigger",
+            "name": "customer_consent_events_retain_update",
+            "tbl_name": "customer_consent_events",
+            "sql": "CREATE TRIGGER `customer_consent_events_retain_update` BEFORE UPDATE ON `customer_consent_events` FOR EACH ROW BEGIN SELECT RAISE(ABORT, 'Retained consent graph refused') WHERE NOT (0=1); END"
+        },
+        {
+            "type": "trigger",
+            "name": "customer_consent_policies_retain_delete",
+            "tbl_name": "customer_consent_policies",
+            "sql": "CREATE TRIGGER `customer_consent_policies_retain_delete` BEFORE DELETE ON `customer_consent_policies` FOR EACH ROW BEGIN SELECT RAISE(ABORT, 'Retained consent graph refused') WHERE NOT (0=1); END"
+        },
+        {
+            "type": "trigger",
+            "name": "customer_consent_policies_retain_insert",
+            "tbl_name": "customer_consent_policies",
+            "sql": "CREATE TRIGGER `customer_consent_policies_retain_insert` BEFORE INSERT ON `customer_consent_policies` FOR EACH ROW BEGIN SELECT RAISE(ABORT, 'Retained consent graph refused') WHERE NOT (NEW.purpose='email_marketing' AND length(NEW.version) BETWEEN 1 AND 80 AND length(NEW.notice) BETWEEN 1 AND 2000 AND length(CAST(NEW.notice AS BLOB))<=8000 AND length(NEW.review_reference) BETWEEN 1 AND 200 AND length(CAST(NEW.review_reference AS BLOB))<=800 AND length(NEW.notice_hash)=64 AND NEW.notice_hash NOT GLOB '*[^a-f0-9]*' AND length(NEW.policy_hash)=64 AND NEW.policy_hash NOT GLOB '*[^a-f0-9]*' AND NOT EXISTS (SELECT 1 FROM customer_consent_policies WHERE id=NEW.id OR (purpose=NEW.purpose AND version=NEW.version))); END"
+        },
+        {
+            "type": "trigger",
+            "name": "customer_consent_policies_retain_update",
+            "tbl_name": "customer_consent_policies",
+            "sql": "CREATE TRIGGER `customer_consent_policies_retain_update` BEFORE UPDATE ON `customer_consent_policies` FOR EACH ROW BEGIN SELECT RAISE(ABORT, 'Retained consent graph refused') WHERE NOT (0=1); END"
+        },
+        {
+            "type": "trigger",
+            "name": "customer_consent_states_retain_delete",
+            "tbl_name": "customer_consent_states",
+            "sql": "CREATE TRIGGER `customer_consent_states_retain_delete` BEFORE DELETE ON `customer_consent_states` FOR EACH ROW BEGIN SELECT RAISE(ABORT, 'Retained consent graph refused') WHERE NOT (0=1); END"
+        },
+        {
+            "type": "trigger",
+            "name": "customer_consent_states_retain_insert",
+            "tbl_name": "customer_consent_states",
+            "sql": "CREATE TRIGGER `customer_consent_states_retain_insert` BEFORE INSERT ON `customer_consent_states` FOR EACH ROW BEGIN SELECT RAISE(ABORT, 'Retained consent graph refused') WHERE NOT (NEW.purpose='email_marketing' AND NEW.revision=1 AND EXISTS (SELECT 1 FROM customer_consent_events WHERE id=NEW.event_id AND customer_account_id=NEW.customer_account_id AND purpose=NEW.purpose AND revision=NEW.revision) AND NOT EXISTS (SELECT 1 FROM customer_consent_states WHERE id=NEW.id OR (customer_account_id=NEW.customer_account_id AND purpose=NEW.purpose))); END"
+        },
+        {
+            "type": "trigger",
+            "name": "customer_consent_states_retain_update",
+            "tbl_name": "customer_consent_states",
+            "sql": "CREATE TRIGGER `customer_consent_states_retain_update` BEFORE UPDATE ON `customer_consent_states` FOR EACH ROW BEGIN SELECT RAISE(ABORT, 'Retained consent graph refused') WHERE NOT (NEW.id=OLD.id AND NEW.customer_account_id=OLD.customer_account_id AND NEW.purpose=OLD.purpose AND NEW.created_at=OLD.created_at AND NEW.revision=OLD.revision+1 AND NEW.revision<=2147483646 AND NEW.updated_at>=OLD.updated_at AND EXISTS (SELECT 1 FROM customer_consent_events WHERE id=NEW.event_id AND customer_account_id=NEW.customer_account_id AND purpose=NEW.purpose AND revision=NEW.revision)); END"
+        }
+    ]
+}
