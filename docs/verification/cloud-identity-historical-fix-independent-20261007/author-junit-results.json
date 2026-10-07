@@ -1,0 +1,83 @@
+{
+  "historical-receipt-config-original-red.xml": {
+    "tests": 1,
+    "assertions": 3,
+    "errors": 0,
+    "failures": 1,
+    "skipped": 0,
+    "seconds": 0.950572
+  },
+  "historical-receipt-native-final.xml": {
+    "status": "incomplete",
+    "tests": null,
+    "reason": "Deliberate physical reopen left test-owned replacement transaction; subsequent disposable TRUNCATE waited for metadata lock. Verified own PHPUnit PID704348 terminated SIGTERM; exit143, no passing count. Test-only dc17 cleanup releases its own foreign frame."
+  },
+  "historical-receipt-sqlite-parent-final.xml": {
+    "tests": 23,
+    "assertions": 110,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 1,
+    "seconds": 15.254334,
+    "executable_source": "e8f744163600bb394e3f09c8c7f838f9fc62c885"
+  },
+  "historical-receipt-pilot.xml": {
+    "tests": 1,
+    "assertions": 2,
+    "errors": 1,
+    "failures": 0,
+    "skipped": 0,
+    "seconds": 0.771605
+  },
+  "historical-receipt-sqlite-development.xml": {
+    "tests": 12,
+    "assertions": 53,
+    "errors": 1,
+    "failures": 0,
+    "skipped": 0,
+    "seconds": 9.074545
+  },
+  "historical-receipt-sqlite-final.xml": {
+    "tests": 18,
+    "assertions": 81,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 1,
+    "seconds": 11.459674
+  },
+  "historical-receipt-sqlite-source-ready.xml": {
+    "tests": 12,
+    "assertions": 55,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "seconds": 8.396444
+  },
+  "historical-receipt-sqlite-repaired.xml": {
+    "tests": 18,
+    "assertions": 81,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 1,
+    "seconds": 11.826615
+  },
+  "historical-receipt-sqlite-observers.xml": {
+    "tests": 17,
+    "assertions": 76,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 1,
+    "seconds": 10.875353
+  },
+  "historical-receipt-native-repaired-final.xml": {
+    "tests": 5,
+    "assertions": 24,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "seconds": 132.331476,
+    "executable_source": "dc17abcd3a60a0c47bd1247b52f239caede912c4",
+    "runtime_source": "e6c02b90719923bc4ba435f86399b077980c1ddc",
+    "status": "historical bounded native nonlocking/direct-reopen/getter/positive coverage; not e8 native acceptance"
+  }
+}

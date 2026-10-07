@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-identity-historical-fix-independent/docs/verification/cloud-identity-historical-fix-independent-20261007/native-selection.xml" tests="3" assertions="19" errors="0" failures="0" skipped="0" time="107.255117">
+    <testsuite name="Independent corrected original historical receipt" tests="3" assertions="19" errors="0" failures="0" skipped="0" time="107.255117">
+      <testsuite name="Tests\Feature\ProductionIdentityAdapters\IdentityHistoricalCommittedReceiptTest" file="/workspace/VA-Studio-identity-historical-fix-independent/tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php" tests="1" assertions="9" errors="0" failures="0" skipped="0" time="45.176194">
+        <testcase name="test_actual_smtp_original_commit_has_two_one_use_plain_prefix_closures_without_new_transactions" file="/workspace/VA-Studio-identity-historical-fix-independent/tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php" line="52" class="Tests\Feature\ProductionIdentityAdapters\IdentityHistoricalCommittedReceiptTest" classname="Tests.Feature.ProductionIdentityAdapters.IdentityHistoricalCommittedReceiptTest" assertions="9" time="45.176194"/>
+      </testsuite>
+      <testsuite name="Tests\Canary\HistoricalNestedConfigurationAdmissionCanaryTest" file="/workspace/VA-Studio-identity-historical-fix-independent/docs/verification/cloud-identity-historical-fix-independent-20261007/HistoricalNestedConfigurationAdmissionCanaryTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="26.903959">
+        <testcase name="test_original_closure_never_resolves_nested_configuration_callbacks" file="/workspace/VA-Studio-identity-historical-fix-independent/docs/verification/cloud-identity-historical-fix-independent-20261007/HistoricalNestedConfigurationAdmissionCanaryTest.php" line="21" class="Tests\Canary\HistoricalNestedConfigurationAdmissionCanaryTest" classname="Tests.Canary.HistoricalNestedConfigurationAdmissionCanaryTest" assertions="5" time="26.903959"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\ProductionIdentityAdapters\HistoricalCommittedConfigurationCallbackCanaryTest" file="/workspace/VA-Studio-identity-historical-fix-independent/docs/verification/cloud-identity-historical-fix-independent-20261007/HistoricalCommittedConfigurationCallbackCanaryTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="35.174964">
+        <testcase name="test_original_closed_prefix_does_not_invoke_configuration_callbacks_after_the_original_commit" file="/workspace/VA-Studio-identity-historical-fix-independent/docs/verification/cloud-identity-historical-fix-independent-20261007/HistoricalCommittedConfigurationCallbackCanaryTest.php" line="19" class="Tests\Feature\ProductionIdentityAdapters\HistoricalCommittedConfigurationCallbackCanaryTest" classname="Tests.Feature.ProductionIdentityAdapters.HistoricalCommittedConfigurationCallbackCanaryTest" assertions="5" time="35.174964"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

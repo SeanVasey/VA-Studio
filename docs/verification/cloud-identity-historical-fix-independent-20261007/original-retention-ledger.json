@@ -1,0 +1,7 @@
+{
+  "held_docs_commit": "de636f96d2a5ad36705dd5f9c3318e59169b8d75",
+  "admission_aware_probe_commit": "ed7c019e0ab6e95f680f676806093a42bdd3e8e8",
+  "verified_unchanged_original_artifacts": 25,
+  "original_dc17_result": "1 genuine failure/3 assertions/0errors/0skips,60callbacks,fixture9723,receipt_closed=true",
+  "probe3de_successor_snapshot_note": "Exact unchanged original probe embeds the original dc17 string in its snapshot. The new snapshot value is a fixed original-source label; executed code is independently bound to e8f744 by source hashes, command/JUnit and receipt."
+}

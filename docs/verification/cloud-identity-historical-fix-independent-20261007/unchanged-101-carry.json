@@ -1,0 +1,7 @@
+{
+  "app/Domain/Customers/ProductionIdentity/IdentityRows.php": "470a2a4816739aef151ad429f9b8b6c359a0eba0b8068a60d1f215b6547794a4",
+  "app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php": "623e31f469a0a1779e3f992f5d1c48b0aaa2382d308109bc33cc78f70a7c821b",
+  "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php": "6058e3e4ced2900e1ccc93bd9110691c041ad0c4ecafe2f0373d323ceb17cb90",
+  "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureAccess.php": "7b47e7ae6617581d18d25687e35ea28d6804394ead13550555b81b7a91f02fd6",
+  "app/Domain/Commerce/ProductionPolicy/CurrentRows.php": "02421b3afb5911bab22bec749c3c691f45379aab4f48c3522831be051235e428"
+}
