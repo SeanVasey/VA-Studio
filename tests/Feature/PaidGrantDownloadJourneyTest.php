@@ -174,6 +174,7 @@ final class PaidGrantDownloadJourneyTest extends TestCase
         $f = $this->complete();
         $downloads = new PaidGrantDownloads;
         $authorization = $this->authorize($f);
+        $originalAuthorization = (array) DB::table('paid_authorizations')->where('public_id', $authorization['id'])->sole();
         $original = (array) DB::table('paid_originals')->sole();
         $batch = (array) DB::table('paid_order_origins')->sole();
         $line = (array) DB::table('paid_grant_origins')->sole();
@@ -197,7 +198,14 @@ final class PaidGrantDownloadJourneyTest extends TestCase
         $this->assertNotNull($current);
         $this->assertSame($f['buyer']['principal']->accountId, $current['principal']->accountId);
         $this->assertSame($f['batch'], (new PaidGrantReads)->show($f['batch']['id'], $current['principal'], $current['user']));
-        $transfer = $downloads->redeem($authorization['id'], $authorization['token'], $current['principal'], $current['user']);
+        // Recovery and authentication never renew a previously issued download deadline.
+        // Deliberately authorize a new request only after fresh same-account authentication.
+        $fresh = $f;
+        $fresh['buyer'] = $current;
+        $freshAuthorization = $this->authorize($fresh);
+        $this->assertNotSame($authorization['id'], $freshAuthorization['id']);
+        $this->assertSame($originalAuthorization, (array) DB::table('paid_authorizations')->where('public_id', $authorization['id'])->sole());
+        $transfer = $downloads->redeem($freshAuthorization['id'], $freshAuthorization['token'], $current['principal'], $current['user']);
         $bytes = '';
         $transfer->writeTo(static function (string $chunk) use (&$bytes): void {
             $bytes .= $chunk;
@@ -207,6 +215,8 @@ final class PaidGrantDownloadJourneyTest extends TestCase
         $this->assertSame($batch, (array) DB::table('paid_order_origins')->sole());
         $this->assertSame($line, (array) DB::table('paid_grant_origins')->sole());
         $this->assertSame($pdf, file_get_contents(Storage::disk('local')->path($artifact['storage_path'])));
+        $this->assertDatabaseCount('paid_authorizations', 2);
+        $this->assertSame($originalAuthorization, (array) DB::table('paid_authorizations')->where('public_id', $authorization['id'])->sole());
         $this->assertDatabaseCount('paid_redemptions', 1);
         $this->assertDatabaseCount('license_grants', 0);
     }
