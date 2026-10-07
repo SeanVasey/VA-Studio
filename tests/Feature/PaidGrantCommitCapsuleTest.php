@@ -16,7 +16,6 @@ use App\Domain\Grants\Paid\PaidGrantPolicy;
 use App\Domain\Grants\Paid\PaidGrantReadReceipt;
 use App\Domain\Grants\Paid\PaidGrantRows;
 use App\Domain\Grants\Paid\PaidGrants;
-use App\Providers\ProductionCheckoutServiceProvider;
 use Illuminate\Config\Repository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -24,6 +23,7 @@ use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\Process;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\PaidGrantDependencyFixtures;
 use Tests\Support\ProductionCheckoutJourneyFixture;
 use Tests\TestCase;
 
@@ -31,19 +31,12 @@ use Tests\TestCase;
 final class PaidGrantCommitCapsuleTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
+    use PaidGrantDependencyFixtures;
     use ProductionCheckoutJourneyFixture;
-
-    private const DEPENDENCY = '/workspace/.va-studio-dependencies/paid/2ec1854-e8f7441';
 
     protected function beforeRefreshingDatabase(): void
     {
-        $this->assertTrue(app()->environment('testing'));
-        if (DB::getDriverName() === 'mysql') {
-            $this->assertSame(getenv('DB_DATABASE'), DB::getDatabaseName(), 'The externally selected disposable testing schema is required.');
-        }
-        $this->assertFileExists(self::DEPENDENCY.'/source-map.json', 'Exact provisional producer/identity fixture snapshot is required.');
-        app('migrator')->path(self::DEPENDENCY.'/database/migrations');
-        app()->register(ProductionCheckoutServiceProvider::class);
+        $this->preparePaidDependencies();
     }
 
     protected function setUp(): void
@@ -68,7 +61,7 @@ final class PaidGrantCommitCapsuleTest extends TestCase
     protected function smtp(string $mode, int $noticeId): array
     {
         $capture = tempnam(sys_get_temp_dir(), 'va-paid-synthetic-smtp-');
-        $process = new Process(['python3', self::DEPENDENCY.'/tests/Support/production_identity_smtp_sink.py', $mode, $capture], timeout: 20);
+        $process = new Process(['python3', $this->paidDependencyPath('tests/Support/production_identity_smtp_sink.py'), $mode, $capture], timeout: 20);
         $process->start();
         try {
             $process->waitUntil(fn (): bool => preg_match('/\A[0-9]+\n/', $process->getOutput()) === 1);
