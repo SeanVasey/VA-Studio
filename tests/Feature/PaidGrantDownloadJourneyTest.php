@@ -7,14 +7,17 @@ use App\Domain\Commerce\ProductionCheckout\HostedCheckout;
 use App\Domain\Commerce\ProductionCheckout\ProductionCheckout;
 use App\Domain\Commerce\ProductionCheckout\TaxExemptions;
 use App\Domain\Customers\ProductionCustomerAccess;
+use App\Domain\Customers\ProductionIdentity\CompleteIdentity;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTransport;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
 use App\Domain\Customers\ProductionIdentity\Notifications\WorkIdentityNotice;
+use App\Domain\Customers\ProductionIdentity\ProductionCustomerSessions;
 use App\Domain\Grants\Paid\PaidGrantDocuments;
 use App\Domain\Grants\Paid\PaidGrantDownloads;
 use App\Domain\Grants\Paid\PaidGrantException;
 use App\Domain\Grants\Paid\PaidGrantPrepareStream;
+use App\Domain\Grants\Paid\PaidGrantReads;
 use App\Domain\Grants\Paid\PaidGrantRecords;
 use App\Domain\Grants\Paid\PaidGrants;
 use App\Providers\ProductionCheckoutServiceProvider;
@@ -40,7 +43,7 @@ final class PaidGrantDownloadJourneyTest extends TestCase
     use FinalizationDatabaseMigrations;
     use ProductionCheckoutJourneyFixture;
 
-    private const DEPENDENCY = '/workspace/.va-studio-dependencies/paid/90d09a5-e6c02b9';
+    private const DEPENDENCY = '/workspace/.va-studio-dependencies/paid/2ec1854-e8f7441';
 
     protected function beforeRefreshingDatabase(): void
     {
@@ -170,6 +173,48 @@ final class PaidGrantDownloadJourneyTest extends TestCase
         $this->assertSame(['attempted', 'attempted'], array_column($status['lines'][0]['history'], 'status'));
         $this->assertSame($original, (array) DB::table('paid_originals')->sole());
         $this->assertDatabaseCount('paid_redemptions', 2);
+        $this->assertDatabaseCount('license_grants', 0);
+    }
+
+    public function test_actual_mailbox_recovery_keeps_original_paid_origin_and_pdf_and_allows_only_fresh_same_account_download(): void
+    {
+        $f = $this->complete();
+        $downloads = new PaidGrantDownloads;
+        $authorization = $this->authorize($f);
+        $original = (array) DB::table('paid_originals')->sole();
+        $batch = (array) DB::table('paid_order_origins')->sole();
+        $line = (array) DB::table('paid_grant_origins')->sole();
+        $artifact = PaidGrantRecords::decode($original)['artifact'];
+        $pdf = file_get_contents(Storage::disk('local')->path($artifact['storage_path']));
+        $expected = file_get_contents(Storage::disk('local')->path($f['catalog']['media']['master_wav']->storage_path));
+        $replacement = 'RecoveredPaidMailboxPassword123';
+        $this->requestIdentity('recover', $f['buyer']['user']->email);
+        $id = (int) DB::table('production_identity_notices')->orderByDesc('id')->value('id');
+        $received = $this->smtp('accept', $id);
+        $this->assertSame(1, preg_match('~http://localhost/customer/access#recover\.([a-f0-9-]{36})\.([a-f0-9]{64})~', $received['data'], $match));
+        (new CompleteIdentity)->complete($match[1], $match[2], $replacement, 'Recovered declared buyer', str_repeat('e', 64));
+        try {
+            $downloads->redeem($authorization['id'], $authorization['token'], $f['buyer']['principal'], $f['buyer']['user']);
+            $this->fail('The pre-recovery principal retained paid download authority.');
+        } catch (PaidGrantException $error) {
+            $this->assertSame(403, $error->status);
+            $this->assertDatabaseCount('paid_redemptions', 0);
+        }
+        $current = (new ProductionCustomerSessions)->authenticate($f['buyer']['user']->email, $replacement);
+        $this->assertNotNull($current);
+        $this->assertSame($f['buyer']['principal']->accountId, $current['principal']->accountId);
+        $this->assertSame($f['batch'], (new PaidGrantReads)->show($f['batch']['id'], $current['principal'], $current['user']));
+        $transfer = $downloads->redeem($authorization['id'], $authorization['token'], $current['principal'], $current['user']);
+        $bytes = '';
+        $transfer->writeTo(static function (string $chunk) use (&$bytes): void {
+            $bytes .= $chunk;
+        });
+        $this->assertSame($expected, $bytes);
+        $this->assertSame($original, (array) DB::table('paid_originals')->sole());
+        $this->assertSame($batch, (array) DB::table('paid_order_origins')->sole());
+        $this->assertSame($line, (array) DB::table('paid_grant_origins')->sole());
+        $this->assertSame($pdf, file_get_contents(Storage::disk('local')->path($artifact['storage_path'])));
+        $this->assertDatabaseCount('paid_redemptions', 1);
         $this->assertDatabaseCount('license_grants', 0);
     }
 

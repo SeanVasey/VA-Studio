@@ -88,13 +88,15 @@ independently reviewed.
 ## Remaining binding
 
 The exact provisional fixture snapshot is recorded outside the repository under
-`/workspace/.va-studio-dependencies/paid/90d09a5-e6c02b9`. This combines exact
-producer `90d09a5363c78eb54531526916008f197d4dcb8d`, T23 family
+`/workspace/.va-studio-dependencies/paid/2ec1854-e8f7441`. This combines exact
+producer `2ec1854c2b3606250e59b157f06703151318af0a`, T23 family
 `b9871dff4cd734779cd12809d736fb69af4e3dc7`, and its single historical-receipt
-callback repair `e6c02b90719923bc4ba435f86399b077980c1ddc`.
-Those dependencies remain unapproved and held for new source findings. In
-particular, producer and consumer raw configuration admission must refuse
-callback-capable configuration parents before reading them. The final candidate
+callback repair `e6c02b90719923bc4ba435f86399b077980c1ddc`, plus the exact
+historical-witness parent repair `e8f744163600bb394e3f09c8c7f838f9fc62c885`.
+The witness successor has independent approval; the producer remains unapproved
+and its inherited fresh-checkout policy still needs a separate repaired child.
+Producer and consumer raw configuration admission refuse callback-capable
+configuration parents before reading them. The final candidate
 must bind reviewed successors and rerun the original canaries and affected tests
 on the actual composed source. No final response/download authority approval is
 claimed.

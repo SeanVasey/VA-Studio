@@ -26,7 +26,7 @@ final class PaidGrantCommittingAdmissionTest extends TestCase
     use FinalizationDatabaseMigrations;
     use ProductionCheckoutJourneyFixture;
 
-    private const DEPENDENCY = '/workspace/.va-studio-dependencies/paid/90d09a5-e6c02b9';
+    private const DEPENDENCY = '/workspace/.va-studio-dependencies/paid/2ec1854-e8f7441';
 
     protected function beforeRefreshingDatabase(): void
     {

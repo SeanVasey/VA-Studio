@@ -2,8 +2,9 @@
 
 This is the proposed T24/T25 implementation contract for a new
 `App\Domain\Grants\Paid` child and migration
-`2026_10_07_252000_paid_grant_origins`. It is not an executable grant, independent
-approval, production activation, or completion receipt. The isolated branch is
+`2026_10_07_252000_paid_grant_origins`. Executable preparation now follows this
+contract; independent approval, production activation and completion remain open.
+The initial isolated branch is
 `codex/paid-grant-origins-20261007`, from root main
 `4150b858d05c837cf85801cf0ee1537a3c98464f`.
 
@@ -27,21 +28,21 @@ without promotions; this consumer does not expand that offer surface.
 
 ## Dependencies and typed source
 
-The executable preparation currently borrows a separate immutable snapshot of
-`f0a1615be0833804959662fad5d7a7a8e1389ee0`. It repairs the original 9f
-autocommit/transaction-continuity boundary, but later failed the genuine expired
-same-PDO lazy callback case. The producer's callback repair is frozen separately at
-`b6f1dfbb7b92cee5319eac79443b88bf24178ab2`, with independent review pending.
-Its additive committed-read receipt and the required T23 witness are still being
-implemented. Public signatures or local preparation results confer no dependency
-approval; the final consumer must bind exact reviewed successor bytes.
+The current child `codex/paid-grant-commit-admission-20261007` borrows the separate
+immutable producer snapshot `2ec1854c2b3606250e59b157f06703151318af0a` and T23
+family `b9871dff4cd734779cd12809d736fb69af4e3dc7` with the exact e6 historical
+receipt and e8 historical-witness callback repairs. The receipt/witness binding is
+executable, but the producer has not completed independent review and its inherited
+fresh-checkout policy needs another repaired child. Earlier f0/90 dependencies and
+their confirmed failures remain historical evidence. Public signatures or local
+preparation results confer no dependency approval; the final consumer must bind
+exact reviewed successor bytes.
 
 T23 supplies a privately minted `ProductionCustomerPrincipal`, original session
 verification, current raw actor/account/origin proof, and historical verification
-prefix proof. Its `eaaa55be3bf35193e68a3ad8cac3cc99eec85e5e` candidate is also a
-provisional dependency; independent review later found a parent-key migration
-admission defect. Borrowed actual source is recorded by exact commit/hash and
-never called approved production identity.
+prefix proof. Borrowed actual source is recorded by exact commit/hash, including
+the independently approved e8 witness correction, without inferring approval for
+the whole producer/consumer composition or actual production legal/merchant facts.
 
 The producer contract is deliberately two step:
 
@@ -69,14 +70,19 @@ The producer contract is deliberately two step:
    SQLite also expires younger savepoints. The producer's final commit observer
    must retain its original anchor through all ordinary committing callbacks.
 
-The separate proposed producer receipt is
-`committedReadReceipt(CurrentRows, int originalDeadlineNs)`. At most two opaque,
+The separate producer receipt is
+`committedReadReceipt(CurrentRows, int originalDeadlineNs,
+?ProductionPaidOrderConsumerCommitAdmissionV1)`. At most two opaque,
 one-use siblings bind the same original reader/source/frame/deadline. One closes
 the producer financial graph immediately after commit; the second closes it after
 response work and before first bytes. Neither an expired SourceV1 nor stored raw
-arrays can replace that receipt. Current preparation closes the owned origin and
-current owner after commit, but this producer receipt binding is unfinished and
-blocks final private-response/stream acceptance.
+arrays can replace that receipt. Both siblings use one current consumer write
+capsule, reader and original capped budget. After ordinary committing callbacks,
+the original producer observer checks callback-free current consumer admission
+before historical/source seals and physical commit. Consumer-owned failure cleanup
+aborts only its still-held original frame, including depth-zero/PDO-active listener
+failure. The final private-response/stream acceptance remains dependent on source
+review and the actual parent-composed application.
 
 Line evidence includes original producer/order/line/payment UUID/hash, provider
 payment/account/mode and receipt provenance, buyer verification binding and original
