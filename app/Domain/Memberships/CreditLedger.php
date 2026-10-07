@@ -108,19 +108,44 @@ final class CreditLedger
 
     public function read(int $bucketId, CustomerPrincipal $principal, User $buyer): array
     {
+        return $this->customerRead($bucketId, $principal, $buyer, false);
+    }
+
+    /** Retained synthetic benefits only; no subscription, paid period or download assertion. */
+    public function customerHistory(int $bucketId, CustomerPrincipal $principal, User $buyer): array
+    {
+        return $this->customerRead($bucketId, $principal, $buyer, true);
+    }
+
+    private function customerRead(int $bucketId, CustomerPrincipal $principal, User $buyer, bool $withHistory): array
+    {
         $this->policy->standalone();
 
-        return DB::transaction(function () use ($bucketId, $principal, $buyer): array {
+        return DB::transaction(function () use ($bucketId, $principal, $buyer, $withHistory): array {
             $authority = $this->evidence->buyer($principal, $buyer);
             [$parent, $version, $bucket, $policy] = $this->scope($bucketId, $principal->accountId);
             $events = $this->history($bucket, $policy);
             $cursor = $this->evidence->cursor(MembershipCreditBucket::class, $bucketId);
-            $this->finish($buyer, $principal, $authority['users'], $authority['account'], $parent, $version, $bucket, $events, null, $cursor);
             $last = $events[array_key_last($events)];
-
-            return ['bucket_id' => $bucketId, 'plan_version_id' => (int) $version['id'], 'unit' => $policy['unit'], 'expires_at' => $bucket['expires_at'],
+            $at = $this->at();
+            $result = ['bucket_id' => $bucketId, 'plan_version_id' => (int) $version['id'], 'unit' => $policy['unit'], 'expires_at' => $bucket['expires_at'],
                 'last_event_id' => (int) $last['id'], 'balance' => $this->balance($last['after_balance']),
-                'spendable_credits' => $bucket['expires_at'] !== null && $this->at() >= $bucket['expires_at'] ? 0 : $this->balance($last['after_balance'])['available']];
+                'spendable_credits' => $bucket['expires_at'] !== null && $at >= $bucket['expires_at'] ? 0 : $this->balance($last['after_balance'])['available']];
+            if ($withHistory) {
+                $result += ['test_only' => true, 'plan' => ['version_id' => (int) $version['id'], 'number' => (int) $version['number'],
+                    'title' => $version['title'], 'policy' => $policy],
+                    'events' => array_map(fn ($event) => ['id' => (int) $event['id'], 'sequence' => (int) $event['sequence'],
+                        'kind' => $event['kind'], 'amount' => (int) $event['amount'], 'created_at' => $event['created_at'],
+                        'balance' => $this->balance($event['after_balance'])], $events)];
+            }
+            // Build projections before callbacks, then retain exact primary rows and current buyer authority.
+            $this->finish($buyer, $principal, $authority['users'], $authority['account'], $parent, $version, $bucket, $events, null, $cursor);
+            $finalAt = $this->at();
+            if ($finalAt < $at || ($bucket['expires_at'] !== null && ($at < $bucket['expires_at']) !== ($finalAt < $bucket['expires_at']))) {
+                $this->unavailable();
+            }
+
+            return $result;
         });
     }
 

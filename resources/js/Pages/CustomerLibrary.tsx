@@ -4,14 +4,15 @@ import { CustomerPurchaseClaim } from '../components/CustomerPurchaseClaim';
 import type { PendingPurchaseClaim } from '../lib/purchase-claim';
 import { SiteFooter, SiteHeader } from '../components/SiteChrome';
 import { CustomerOrderLookup } from '../components/CustomerOrderLookup';
+import { OwnedMembershipHistory } from '../components/OwnedMembershipHistory';
 import { OwnedTestOrderHistory } from '../components/OwnedTestOrderHistory';
 import { OrderStatus } from '../components/OrderPreparation';
 import type { SiteContent } from '../lib/site-content';
 import { changeCustomerSession, navigateCustomerSession } from '../lib/customer-session';
 import '../../css/customer-account.css';
 
-export default function CustomerLibrary({ siteContent, customer, testCheckoutEnabled = false, guestPurchaseClaim }: {
-  testOnly: true; siteContent: SiteContent; customer: { name: string }; testCheckoutEnabled?: boolean; guestPurchaseClaim?: PendingPurchaseClaim;
+export default function CustomerLibrary({ siteContent, customer, testCheckoutEnabled = false, testMembershipsEnabled = false, membershipHistoryScope, guestPurchaseClaim }: {
+  testOnly: true; siteContent: SiteContent; customer: { name: string }; testCheckoutEnabled?: boolean; testMembershipsEnabled?: boolean; membershipHistoryScope?: string | null; guestPurchaseClaim?: PendingPurchaseClaim;
 }) {
   const [leaving, setLeaving] = useState(false), [message, setMessage] = useState('');
   const active = useRef(false), pending = useRef(false);
@@ -46,6 +47,7 @@ export default function CustomerLibrary({ siteContent, customer, testCheckoutEna
         <p className="customer-account-note">Test mode only. Order status, contracts and downloads remain subject to their current availability checks.</p>
         {guestPurchaseClaim && <CustomerPurchaseClaim key={guestPurchaseClaim.orderId} claim={guestPurchaseClaim} />}
         <CustomerOrderLookup renderOrder={order => <OrderStatus order={order} testCheckoutEnabled={testCheckoutEnabled} />} />
+        {testMembershipsEnabled === true && typeof membershipHistoryScope === 'string' && /^[0-9a-f]{32}$/.test(membershipHistoryScope) && <OwnedMembershipHistory key={membershipHistoryScope} />}
         <OwnedTestOrderHistory scope="account" renderOrder={order => <OrderStatus order={order} testCheckoutEnabled={testCheckoutEnabled} />} />
       </>}
       <a className="text-link customer-account-back" href="/">Back to the catalog</a>

@@ -1,0 +1,49 @@
+{
+  "reviewer": "/root/dependency_independent_review",
+  "decision": "approve bounded client privacy change; requires canonical approved server capability/scope props integration",
+  "source_commit": "ca7cb13d107a0395e93b6c1ab333bfac668713ec",
+  "source_tree": "e96442fafde96a821cab05d9fa898ab675e81ca4",
+  "source_paths_sha256": {
+    "resources/js/Pages/CustomerLibrary.tsx": "5a8a5b32ad25ce71ed76892f92e8841e1a75a4cb17e0863e962b35748145b382",
+    "resources/js/components/OwnedMembershipHistory.tsx": "c066d7251b50a46630b1333df0a1ed0c35309a013e74fd38b1faecf11df32523",
+    "resources/js/lib/membership-history.ts": "63916b77722643c9aba5ed281c0697b07879feabf37871d9d124124d92c4a607",
+    "tests/frontend/membership-history.test.tsx": "bfd57fb41a7a06e6a879380af5b8f8287c53363c0209afd32930aa71583d242c",
+    "vitest.config.ts": "5c3bf6c180bea188e98e69de7fa39e5e6ffde84adbee58e51017d6028d18923a",
+    "resources/js/test/setup.ts": "7af65bf74e01119f207abca6af1eae00aef2bfdb18226a2e273e0b3cd69fea55"
+  },
+  "executed_tests": {
+    "total": 34,
+    "passed": 34,
+    "failed": 0,
+    "membership_existing": 31,
+    "reviewer_privacy_canaries": 3
+  },
+  "command": "node node_modules/vitest/vitest.mjs run tests/frontend/membership-history.test.tsx tests/frontend/membership-history.independent.test.tsx --reporter=json --outputFile=/workspace/scratch/2876616e88c3/membership-ui-independent-evidence/combined-result.json",
+  "node": "24.19.0",
+  "dependency_graph": "immutable runtime-recovery/frontend node_modules historical DOM10.4.1; independent reviewer symlink, own test/config/app origin",
+  "reviewed_behaviors": [
+    "default-off canonical true capability and exact32 lowercase hex scope; scope key remount clears same-name account history",
+    "same-origin bodyless no-store request; exact envelope/content-type/bytes/date/ID/balance bounds and no private errors reflected",
+    "abort+requestgeneration ownership prevents pagehide/unmount/timeout stale completion; signout immediately removes private component",
+    "no browser storage or subscription/payment/download action; server spendability displayed as observed, not grant"
+  ],
+  "canaries": [
+    "committed history cleared immediately on same-name scope replacement then capability removal",
+    "old pagehide completion cannot replace newer completed generation",
+    "pending detail unmount aborts; late private bytes cannot enter fresh component"
+  ],
+  "findings": [],
+  "limits": [
+    "Serverprops69fce09 not present in this client-only branch; root must compose separately approved canonicaltestmode/capability and transient privacy scope.",
+    "No MySQL/browser/production commerce proof from frontend tests.",
+    "New DOM10.4.2 composition compatibility belongs to root; this review uses historical installed graph.",
+    "Canary test copied under evidence only; executed as scratch tests/frontend/membership-history.independent.test.tsx and not proposed product source."
+  ],
+  "artifact_sha256": {
+    "privacy-canary.test.tsx": "89394f1763e118fa560a3423ebf37d92be0a76ed37d1479f64af9ece361c7ff0",
+    "combined.txt": "37022947563d8e5bb746ac82f56d9d78d81e99d6f5c21de0c098931c97657b24",
+    "combined-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "report-location.txt": "0555bcb10d64c4b48d7e4c581c96661dd4562e39b9997a767a8d4b3307d7817e",
+    "combined-result.json": "a9d13691a9b44fd730e182494923280226a16a96874419f1b24c587b00309577"
+  }
+}

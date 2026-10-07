@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionBuyerReportIndependentCanaryTest" file="/workspace/scratch/2876616e88c3/ProductionBuyerReportIndependentCanaryTest.php" tests="2" assertions="9" errors="0" failures="0" skipped="0" time="3.162132">
+    <testcase name="test_extra_late_observation_audit_causes_whole_write_rollback" file="/workspace/scratch/2876616e88c3/ProductionBuyerReportIndependentCanaryTest.php" line="17" class="Tests\Feature\ProductionBuyerReportIndependentCanaryTest" classname="Tests.Feature.ProductionBuyerReportIndependentCanaryTest" assertions="4" time="1.701691"/>
+    <testcase name="test_recovery_decrypt_callback_withdraws_actor_without_exposing_plaintext" file="/workspace/scratch/2876616e88c3/ProductionBuyerReportIndependentCanaryTest.php" line="26" class="Tests\Feature\ProductionBuyerReportIndependentCanaryTest" classname="Tests.Feature.ProductionBuyerReportIndependentCanaryTest" assertions="5" time="1.460441"/>
+  </testsuite>
+</testsuites>

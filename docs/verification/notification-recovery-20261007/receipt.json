@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "source_commit": "9ca32a4b2a90f3cacfeba1ad61c90c7a61add40e",
+  "source_tree": "79c8f0651798345669a63619d1190f18f22284e3",
+  "runtime": "PHP 8.4.26; SQLite in-memory; separate copied vendor and regenerated autoload",
+  "commands": [
+    "php vendor/bin/phpunit tests/Feature/TransactionalNotificationRecoveryTest.php --log-junit scanner-sqlite.xml --colors=never",
+    "php vendor/bin/phpunit tests/Feature/TransactionalNotificationRecoveryCommandTest.php --log-junit command-sqlite.xml --colors=never"
+  ],
+  "passed_selected_cases": 21,
+  "assertions": 92,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "earlier_combined_attempt": {
+    "started_source_commit": "5e0b55847a958161de030b3cbd4baf491d335285",
+    "command_successor_files_added_during_run": true,
+    "tests": 62,
+    "passed": 61,
+    "assertions": 373,
+    "errors": 1,
+    "failures": 0,
+    "unchanged_existing_notification_cases": 52,
+    "unchanged_existing_notification_assertions": 334,
+    "existing_cases_errors": 0,
+    "error": "New second-customer fixture media derivative processing failed under concurrent local test processes; exact final scanner rerun passed all10 cases. This is not a passing combined suite."
+  },
+  "initial_harness_failures": "10cases:4passed,5identity-comparison failures,1invalid account withdrawal mutation error. Corrected assertions to raw arrays and advanced withdrawal access_version; no production guard weakened.",
+  "limits": [
+    "No new MySQL concurrency evidence; existing notification service locking/final proof unchanged.",
+    "No full Foundation/browser suite or external message; provider, consent and CRM remain open.",
+    "CLI is internal filesystem-operator local/testing preparation; production and default-off refused."
+  ],
+  "artifacts": {
+    "command-sqlite.xml": "5dd1a72050a7227a34077d2fd87464936245f7d602fc7a5c11150f20f8b0f6a5",
+    "scanner-sqlite.txt": "dc146e4c395c8b1c4f7d1d7bf815391bd30e8a1c1a5568f07b581e759ccc165e",
+    "scanner-sqlite.xml": "3ac5f17bbd46ce8bdda7660cc1b934cc67eb6c99f4d1d2b23a99f13acc82c5f6",
+    "command-sqlite.txt": "a60674734d34e43c57fa7e9784e7dca90e6be43f8f202ff6e1cb08d3a288d159",
+    "sqlite.txt": "cfc3181773eca7f79d2d756d45b867b39cddcc84032f9aa434ff1972509f6573",
+    "sqlite.xml": "7c0d201d7c154e9c18d99db6cba81964d9b79853727b7b402eedda3b50cc69bb"
+  }
+}

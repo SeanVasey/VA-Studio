@@ -1,0 +1,8 @@
+{
+  "locked_packages": 158,
+  "installed_packages": 158,
+  "version_and_source_ref_mismatches": [],
+  "laravel": "v13.33.0",
+  "phpunit": "12.5.34",
+  "composer_lock_sha256": "51e9c3cc1073e96a1c130376e1ab9980765a5c441c0dcd2a5454fd0909406962"
+}

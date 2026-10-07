@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "executed_commit": "8ea44c0a2bd3b0bb2bbc61da268478b028e1d052",
+  "executed_tree": "1011d423df354183779a9bc2bacabe9a02a0542e",
+  "native_base_main": "df7f12e24ef481cee020910c3764850761ae4596",
+  "source_sha256": {
+    "app/Domain/Memberships/CreditLedger.php": "da00984fc8dfb9e610d19c18d63ed91520efe6d846cc879010ae67156ef139ac",
+    "tests/Feature/MembershipCustomerHistoryTest.php": "4e197932a1a23781dcd1c8611d1b6dc099d3c5e2974c53fc14a8ff1555bb36ed",
+    "composer.lock": "51e9c3cc1073e96a1c130376e1ab9980765a5c441c0dcd2a5454fd0909406962",
+    "phpunit.xml": "493369cfb7feea104da4bec214c2cc6526ca2f1b9d937c50a2961fc59cb61aaf"
+  },
+  "runtime": {
+    "php": "8.4.26",
+    "mysql": "8.4.11",
+    "mysql_runner_sha256": "35bdde4f03a9d7a23d90337a77a938c1044f297553e0afe38d13eaee73ac854a",
+    "native_database": "fresh disposable vaseyaudio_test private loopback TCP",
+    "durability": {
+      "innodb_flush_log_at_trx_commit": 1,
+      "sync_binlog": 1,
+      "innodb_doublewrite": "ON",
+      "log_bin": true
+    },
+    "installed_composer_packages_match_lock": 158
+  },
+  "results": {
+    "sqlite": {
+      "tests": "104",
+      "assertions": "461",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "1",
+      "time": "19.398898"
+    },
+    "mysql": {
+      "tests": "14",
+      "assertions": "58",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "108.815232"
+    }
+  },
+  "untested": [
+    "Full matrix/browser/device acceptance",
+    "HTTP/UI mounting",
+    "Recurring billing/renewal/cancellation/U-10 source continuity",
+    "Native concurrency; no new write or race semantics introduced"
+  ],
+  "failed_predecessor": {
+    "cases": 13,
+    "passed": 11,
+    "assertions": 49,
+    "errors": 2,
+    "cause": "Customer retained-identity guards rejected malformed test fixture state changes; corrected fixture, unchanged guards"
+  },
+  "predecessor_native": {
+    "cases": 13,
+    "passed": 13,
+    "assertions": 55,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "source_binding": "Prior loaded13-case source; test file edited while batch ran; never claim final source coverage"
+  },
+  "commands": {
+    "sqlite": "/workspace/scratch/0c039e9e0645/runtime-recovery/bin/php vendor/bin/phpunit tests/Feature/MembershipCustomerHistoryTest.php tests/Feature/MembershipCreditLedgerTest.php tests/Feature/MembershipCreditEngineTest.php tests/Feature/MembershipPrimaryProofTest.php tests/Feature/MembershipGrantClockBoundaryTest.php tests/Feature/MembershipAdministrationTest.php --log-junit /workspace/scratch/2876616e88c3/membership-history-final-sqlite.xml",
+    "mysql": "python3 /workspace/scratch/0c039e9e0645/mysql-runtime/run-tests.py -- php vendor/bin/phpunit tests/Feature/MembershipCustomerHistoryTest.php --log-junit /workspace/scratch/2876616e88c3/membership-history-final-mysql.xml"
+  },
+  "artifact_sha256": {
+    "README.md": "7b3d234965e0eb65480772cb27b333138819acec94d7114afd29aac782b8cd79",
+    "membership-history-final-mysql.txt": "3c5e45dee7869c13a2083bca92c0c2977e3fd87bfe0d5f23fcf01d4917df7356",
+    "membership-history-final-mysql.xml": "3f2c9b82dcd8325fecaa69cbf21797204a7e16ffea55658c335520499001259d",
+    "membership-history-final-sqlite.txt": "3471a16a96496b6a6109ebde3c6c3740a6c79fefb1cd7717d9f98ada9802120c",
+    "membership-history-final-sqlite.xml": "e5f4a0b8ebb17de3b56b450ea7bebb0061c2b10b6b880dd6d84f60cac0df68d7",
+    "membership-history-first.xml": "6c7da15a2973e980ffd40e7f4567f90cabc08b621715dd41fa70e6c6250013dd",
+    "membership-history-mysql.txt": "7a3898a242f4ef4a10bc898951a64d027dda87aa8941848e45ad51e208c0b49e",
+    "membership-history-mysql.xml": "d2b5fe3b01e67e506665e35bae898d804bc7c8f850ab29e9a2a6bc1a5bbed43b",
+    "membership-history-sqlite.txt": "a6db359db6450c08844f9687fcf02bbdaa85df647acc09b32f687176fa8de0a0",
+    "membership-history-sqlite.xml": "c89afa9ac451c70f7685e7875f08b4d5f7dd945e82bbf0afdb859d3b25f6f4c7"
+  }
+}

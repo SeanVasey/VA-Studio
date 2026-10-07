@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CustomerIdentityController;
+use App\Http\Controllers\CustomerMembershipHistoryController;
 use App\Http\Controllers\CustomerPurchaseClaimController;
 use App\Http\Controllers\CustomerSessionController;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -18,4 +19,11 @@ Route::withoutMiddleware(HandleInertiaRequests::class)->group(function (): void 
     Route::post('/account/purchase-claim/complete', [CustomerPurchaseClaimController::class, 'complete'])->middleware('throttle:10,1,customer-purchase-claim-complete')->block(20, 5)->name('customer.purchase-claim.complete');
     Route::post('/account/sign-in', [CustomerSessionController::class, 'store'])->middleware('throttle:10,1,customer-auth')->block(20, 5)->name('customer.sign-in.store');
     Route::post('/account/sign-out', [CustomerSessionController::class, 'destroy'])->middleware('throttle:20,1,customer-auth')->block(20, 5)->name('customer.sign-out');
+});
+
+Route::withoutMiddleware(HandleInertiaRequests::class)->group(function (): void {
+    Route::get('/account/membership-credits', [CustomerMembershipHistoryController::class, 'index'])
+        ->middleware('throttle:60,1,customer-pages')->block(20, 5)->name('customer.membership-credits.index');
+    Route::get('/account/membership-credits/{bucket}', [CustomerMembershipHistoryController::class, 'show'])
+        ->where('bucket', '[1-9][0-9]{0,17}')->middleware('throttle:60,1,customer-pages')->block(20, 5)->name('customer.membership-credits.show');
 });

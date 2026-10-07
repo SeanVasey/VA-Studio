@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\MembershipCustomerHistoryHttpTest" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php" tests="16" assertions="58" errors="0" failures="11" skipped="0" time="7.612387">
+    <testcase name="test_real_customer_session_discovers_owned_bucket_and_reads_retained_history_without_staff_login_or_writes" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php" line="18" class="Tests\Feature\MembershipCustomerHistoryHttpTest" classname="Tests.Feature.MembershipCustomerHistoryHttpTest" assertions="2" time="1.492942">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\MembershipCustomerHistoryHttpTest::test_real_customer_session_discovers_owned_bucket_and_reads_retained_history_without_staff_login_or_writes
+Expected response status code [200] but received 422.
+Failed asserting that 422 is identical to 200.
+
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php:24</failure>
+    </testcase>
+    <testcase name="test_empty_account_discovery_is_authorized_and_empty_without_invented_benefits" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php" line="36" class="Tests\Feature\MembershipCustomerHistoryHttpTest" classname="Tests.Feature.MembershipCustomerHistoryHttpTest" assertions="2" time="0.431061">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\MembershipCustomerHistoryHttpTest::test_empty_account_discovery_is_authorized_and_empty_without_invented_benefits
+Expected response status code [200] but received 422.
+Failed asserting that 422 is identical to 200.
+
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php:41</failure>
+    </testcase>
+    <testcase name="test_guest_staff_and_different_customer_cannot_read_bucket" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php" line="45" class="Tests\Feature\MembershipCustomerHistoryHttpTest" classname="Tests.Feature.MembershipCustomerHistoryHttpTest" assertions="1" time="0.209390">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\MembershipCustomerHistoryHttpTest::test_guest_staff_and_different_customer_cannot_read_bucket
+Expected response status code [403] but received 422.
+Failed asserting that 422 is identical to 403.
+
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:141
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php:48</failure>
+    </testcase>
+    <testsuite name="Tests\Feature\MembershipCustomerHistoryHttpTest::test_current_server_session_and_synthetic_boundaries_cannot_be_overridden_by_client" tests="5" assertions="10" errors="0" failures="5" skipped="0" time="2.052286">
+      <testcase name="test_current_server_session_and_synthetic_boundaries_cannot_be_overridden_by_client with data set &quot;production&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php" line="62" class="Tests\Feature\MembershipCustomerHistoryHttpTest" classname="Tests.Feature.MembershipCustomerHistoryHttpTest" assertions="2" time="0.395115">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\MembershipCustomerHistoryHttpTest::test_current_server_session_and_synthetic_boundaries_cannot_be_overridden_by_client with data set "production"
+Expected response status code [403] but received 422.
+Failed asserting that 422 is identical to 403.
+
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:141
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php:74</failure>
+      </testcase>
+      <testcase name="test_current_server_session_and_synthetic_boundaries_cannot_be_overridden_by_client with data set &quot;disabled&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php" line="62" class="Tests\Feature\MembershipCustomerHistoryHttpTest" classname="Tests.Feature.MembershipCustomerHistoryHttpTest" assertions="2" time="0.412104">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\MembershipCustomerHistoryHttpTest::test_current_server_session_and_synthetic_boundaries_cannot_be_overridden_by_client with data set "disabled"
+Expected response status code [403] but received 422.
+Failed asserting that 422 is identical to 403.
+
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:141
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php:74</failure>
+      </testcase>
+      <testcase name="test_current_server_session_and_synthetic_boundaries_cannot_be_overridden_by_client with data set &quot;customer disabled&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php" line="62" class="Tests\Feature\MembershipCustomerHistoryHttpTest" classname="Tests.Feature.MembershipCustomerHistoryHttpTest" assertions="2" time="0.398796">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\MembershipCustomerHistoryHttpTest::test_current_server_session_and_synthetic_boundaries_cannot_be_overridden_by_client with data set "customer disabled"
+Expected response status code [403] but received 422.
+Failed asserting that 422 is identical to 403.
+
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:141
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php:74</failure>
+      </testcase>
+      <testcase name="test_current_server_session_and_synthetic_boundaries_cannot_be_overridden_by_client with data set &quot;withdrawn&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php" line="62" class="Tests\Feature\MembershipCustomerHistoryHttpTest" classname="Tests.Feature.MembershipCustomerHistoryHttpTest" assertions="2" time="0.453566">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\MembershipCustomerHistoryHttpTest::test_current_server_session_and_synthetic_boundaries_cannot_be_overridden_by_client with data set "withdrawn"
+Expected response status code [403] but received 422.
+Failed asserting that 422 is identical to 403.
+
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:141
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php:74</failure>
+      </testcase>
+      <testcase name="test_current_server_session_and_synthetic_boundaries_cannot_be_overridden_by_client with data set &quot;credentials&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php" line="62" class="Tests\Feature\MembershipCustomerHistoryHttpTest" classname="Tests.Feature.MembershipCustomerHistoryHttpTest" assertions="2" time="0.392706">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\MembershipCustomerHistoryHttpTest::test_current_server_session_and_synthetic_boundaries_cannot_be_overridden_by_client with data set "credentials"
+Expected response status code [403] but received 422.
+Failed asserting that 422 is identical to 403.
+
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:141
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php:74</failure>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\MembershipCustomerHistoryHttpTest::test_request_override_and_cross_origin_forms_are_refused_privately" tests="4" assertions="20" errors="0" failures="0" skipped="0" time="1.687057">
+      <testcase name="test_request_override_and_cross_origin_forms_are_refused_privately with data set &quot;account query&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php" line="87" class="Tests\Feature\MembershipCustomerHistoryHttpTest" classname="Tests.Feature.MembershipCustomerHistoryHttpTest" assertions="5" time="0.429278"/>
+      <testcase name="test_request_override_and_cross_origin_forms_are_refused_privately with data set &quot;owner query&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php" line="87" class="Tests\Feature\MembershipCustomerHistoryHttpTest" classname="Tests.Feature.MembershipCustomerHistoryHttpTest" assertions="5" time="0.391411"/>
+      <testcase name="test_request_override_and_cross_origin_forms_are_refused_privately with data set &quot;range&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php" line="87" class="Tests\Feature\MembershipCustomerHistoryHttpTest" classname="Tests.Feature.MembershipCustomerHistoryHttpTest" assertions="5" time="0.444233"/>
+      <testcase name="test_request_override_and_cross_origin_forms_are_refused_privately with data set &quot;cross origin&quot;" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php" line="87" class="Tests\Feature\MembershipCustomerHistoryHttpTest" classname="Tests.Feature.MembershipCustomerHistoryHttpTest" assertions="5" time="0.422135"/>
+    </testsuite>
+    <testcase name="test_get_body_and_invalid_bucket_identity_are_refused" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php" line="95" class="Tests\Feature\MembershipCustomerHistoryHttpTest" classname="Tests.Feature.MembershipCustomerHistoryHttpTest" assertions="17" time="0.419823"/>
+    <testcase name="test_discovery_refuses_extra_bucket_appended_after_retained_range_query" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php" line="105" class="Tests\Feature\MembershipCustomerHistoryHttpTest" classname="Tests.Feature.MembershipCustomerHistoryHttpTest" assertions="2" time="0.414268">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\MembershipCustomerHistoryHttpTest::test_discovery_refuses_extra_bucket_appended_after_retained_range_query
+Expected response status code [403] but received 422.
+Failed asserting that 422 is identical to 403.
+
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:141
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php:118</failure>
+    </testcase>
+    <testcase name="test_discovery_withdrawal_at_range_query_cannot_return_owned_ids" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php" line="123" class="Tests\Feature\MembershipCustomerHistoryHttpTest" classname="Tests.Feature.MembershipCustomerHistoryHttpTest" assertions="2" time="0.460271">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\MembershipCustomerHistoryHttpTest::test_discovery_withdrawal_at_range_query_cannot_return_owned_ids
+Expected response status code [403] but received 422.
+Failed asserting that 422 is identical to 403.
+
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:141
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php:136</failure>
+    </testcase>
+    <testcase name="test_max_plus_one_discovery_refuses_entire_result_instead_of_omitting_buckets" file="/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php" line="141" class="Tests\Feature\MembershipCustomerHistoryHttpTest" classname="Tests.Feature.MembershipCustomerHistoryHttpTest" assertions="2" time="0.445290">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\MembershipCustomerHistoryHttpTest::test_max_plus_one_discovery_refuses_entire_result_instead_of_omitting_buckets
+Expected response status code [200] but received 422.
+Failed asserting that 422 is identical to 200.
+
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/workspace/scratch/2876616e88c3/VA-Studio-membership-http/tests/Feature/MembershipCustomerHistoryHttpTest.php:148</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

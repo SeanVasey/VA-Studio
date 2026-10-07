@@ -29,6 +29,9 @@ class ProductionTrackCapabilitiesMigrationOwnershipTest extends TestCase
         });
         $this->artisan('migrate:fresh', ['--database' => 'production_capability_ownership_fixture', '--force' => true])->assertExitCode(0);
         // Remove the explicitly empty additive child before testing retained capability ownership.
+        // Explicit disposable-fixture cleanup, with FK enforcement unchanged.
+        $this->assertDatabaseCount('production_buyer_assent_observations', 0);
+        Schema::drop('production_buyer_assent_observations');
         foreach (['production_track_preparation_packet_lines', 'production_track_preparation_packets'] as $table) {
             $this->assertDatabaseCount($table, 0);
         }

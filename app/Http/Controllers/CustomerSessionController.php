@@ -10,6 +10,7 @@ use App\Domain\Customers\CustomerIdentityPolicy;
 use App\Domain\Customers\CustomerPurchaseClaimPolicy;
 use App\Domain\Customers\CustomerPurchaseClaims;
 use App\Domain\Customers\CustomerSessions;
+use App\Domain\Memberships\MembershipPolicy;
 use App\Domain\SiteBuilder\EditorialContent;
 use App\Domain\SiteBuilder\SiteContent;
 use App\Http\Middleware\CustomerPrivacy;
@@ -90,6 +91,9 @@ final class CustomerSessionController
                 }
             }
             app(CustomerAccess::class)->current($principal);
+            $props['testMembershipsEnabled'] = app(MembershipPolicy::class)->enabled();
+            // Transient UI invalidation only; never customer identity or request authority.
+            $props['membershipHistoryScope'] = $props['testMembershipsEnabled'] ? bin2hex(random_bytes(16)) : null;
 
             Inertia::encryptHistory();
 

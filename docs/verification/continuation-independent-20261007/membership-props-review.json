@@ -1,0 +1,32 @@
+{
+  "reviewer": "continuation_security_review",
+  "source_commit": "69fce09d7b73f4675ff4a7b73422d55451c17385",
+  "source_tree": "7d56567acc179860be2514df04a7c87a8861be9a",
+  "disposition": "approved for focused private synthetic membership UI-advertising development",
+  "command": "php vendor/bin/phpunit tests/Feature/MembershipCustomerLibraryCapabilityTest.php --log-junit /workspace/scratch/2876616e88c3/continuation-membership-props-independent.xml",
+  "runtime": "PHP 8.4.26; SQLite in-memory; own regenerated Composer autoload metadata and immutable matching-lock package-dir symlinks; reflection confirmed own app source",
+  "results": {
+    "tests": 8,
+    "assertions": 48,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "review_findings": [],
+  "reviewed_boundaries": [
+    "Canonical enabled() predicate exactly preserves strict previous local/testing-and-boolean policy",
+    "Library is current credential-bound customer-only; disabled or production returns no enabled scope",
+    "Fresh per-render random128bit scope is UI invalidation only, no account/owner/credential or request authority",
+    "Same-name account switches receive distinct scope; guest/revoked customers receive no scope",
+    "Existing no-store library/privacy and enabled-domain endpoint checks remain authoritative"
+  ],
+  "limits": [
+    "Does not implement customer UI component or enable paid membership/production",
+    "Checks apply to standalone source matching original lock; composed upgraded dependency graph requires separately bound root results",
+    "No new native concurrency or whole acceptance claim"
+  ],
+  "artifacts": {
+    "continuation-membership-props-independent.txt": "d2e2851d14b9c4676c4f7e290ecf44fb2bfbd867012e93a778659f7f5e2fc17b",
+    "continuation-membership-props-independent.xml": "2ea8204eb6505b25fb7712897ee14be2aa7342a6a697f074cc9d1f192516e542"
+  }
+}

@@ -1,0 +1,769 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionBuyerAssentObservationsTest" file="/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php" tests="18" assertions="34" errors="0" failures="4" skipped="0" time="22.029672">
+    <testcase name="test_exact_disclosure_private_retention_and_recovery_never_establish_buyer_act_or_purchase" file="/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php" line="39" class="Tests\Feature\ProductionBuyerAssentObservationsTest" classname="Tests.Feature.ProductionBuyerAssentObservationsTest" assertions="1" time="2.119510">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionBuyerAssentObservationsTest::test_exact_disclosure_private_retention_and_recovery_never_establish_buyer_act_or_purchase
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+-    'version' =&gt; 'synthetic-assent-v1',
+     'text' =&gt; 'NONBINDING SYNTHETIC ASSENT\n
+ Explicit review fixture only.',
++    'version' =&gt; 'synthetic-assent-v1',
+ ]
+
+/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php:44</failure>
+    </testcase>
+    <testsuite name="Tests\Feature\ProductionBuyerAssentObservationsTest::test_closed_report_input_rejects_nonaffirmative_or_malformed_identity" tests="10" assertions="20" errors="0" failures="0" skipped="0" time="12.651828">
+      <testcase name="test_closed_report_input_rejects_nonaffirmative_or_malformed_identity with data set #0" file="/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php" line="75" class="Tests\Feature\ProductionBuyerAssentObservationsTest" classname="Tests.Feature.ProductionBuyerAssentObservationsTest" assertions="2" time="1.113050"/>
+      <testcase name="test_closed_report_input_rejects_nonaffirmative_or_malformed_identity with data set #1" file="/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php" line="75" class="Tests\Feature\ProductionBuyerAssentObservationsTest" classname="Tests.Feature.ProductionBuyerAssentObservationsTest" assertions="2" time="2.695240"/>
+      <testcase name="test_closed_report_input_rejects_nonaffirmative_or_malformed_identity with data set #2" file="/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php" line="75" class="Tests\Feature\ProductionBuyerAssentObservationsTest" classname="Tests.Feature.ProductionBuyerAssentObservationsTest" assertions="2" time="1.101236"/>
+      <testcase name="test_closed_report_input_rejects_nonaffirmative_or_malformed_identity with data set #3" file="/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php" line="75" class="Tests\Feature\ProductionBuyerAssentObservationsTest" classname="Tests.Feature.ProductionBuyerAssentObservationsTest" assertions="2" time="1.124347"/>
+      <testcase name="test_closed_report_input_rejects_nonaffirmative_or_malformed_identity with data set #4" file="/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php" line="75" class="Tests\Feature\ProductionBuyerAssentObservationsTest" classname="Tests.Feature.ProductionBuyerAssentObservationsTest" assertions="2" time="1.139652"/>
+      <testcase name="test_closed_report_input_rejects_nonaffirmative_or_malformed_identity with data set #5" file="/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php" line="75" class="Tests\Feature\ProductionBuyerAssentObservationsTest" classname="Tests.Feature.ProductionBuyerAssentObservationsTest" assertions="2" time="1.142584"/>
+      <testcase name="test_closed_report_input_rejects_nonaffirmative_or_malformed_identity with data set #6" file="/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php" line="75" class="Tests\Feature\ProductionBuyerAssentObservationsTest" classname="Tests.Feature.ProductionBuyerAssentObservationsTest" assertions="2" time="1.037982"/>
+      <testcase name="test_closed_report_input_rejects_nonaffirmative_or_malformed_identity with data set #7" file="/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php" line="75" class="Tests\Feature\ProductionBuyerAssentObservationsTest" classname="Tests.Feature.ProductionBuyerAssentObservationsTest" assertions="2" time="1.103666"/>
+      <testcase name="test_closed_report_input_rejects_nonaffirmative_or_malformed_identity with data set #8" file="/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php" line="75" class="Tests\Feature\ProductionBuyerAssentObservationsTest" classname="Tests.Feature.ProductionBuyerAssentObservationsTest" assertions="2" time="1.082271"/>
+      <testcase name="test_closed_report_input_rejects_nonaffirmative_or_malformed_identity with data set #9" file="/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php" line="75" class="Tests\Feature\ProductionBuyerAssentObservationsTest" classname="Tests.Feature.ProductionBuyerAssentObservationsTest" assertions="2" time="1.111802"/>
+    </testsuite>
+    <testcase name="test_changed_input_or_changed_disclosure_does_not_reuse_retained_key" file="/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php" line="88" class="Tests\Feature\ProductionBuyerAssentObservationsTest" classname="Tests.Feature.ProductionBuyerAssentObservationsTest" assertions="1" time="1.185789">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionBuyerAssentObservationsTest::test_changed_input_or_changed_disclosure_does_not_reuse_retained_key
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+-    'schema_version' =&gt; 1,
+-    'purpose' =&gt; 'staff_reported_production_buyer_assent',
+-    'public_id' =&gt; 'c14075ab-f3ef-4bda-9dfa-779ad98043d6',
++    'buyer_act_verified' =&gt; false,
++    'buyer_identity_verified' =&gt; false,
++    'created_at' =&gt; '2026-10-07 03:12:04',
++    'execution_allowed' =&gt; false,
++    'external_facts_verified' =&gt; false,
+     'observer_id' =&gt; 1,
++    'packet_hash' =&gt; '0976d36ef7a3294f12ee8c4c2f060735734d918f8c52a5102ba5b83ec2b6ad90',
+     'packet_id' =&gt; 1,
+-    'packet_hash' =&gt; '0976d36ef7a3294f12ee8c4c2f060735734d918f8c52a5102ba5b83ec2b6ad90',
+-    'created_at' =&gt; '2026-10-07 03:12:04',
++    'payable' =&gt; false,
++    'public_id' =&gt; 'c14075ab-f3ef-4bda-9dfa-779ad98043d6',
++    'purchase_bound' =&gt; false,
++    'purpose' =&gt; 'staff_reported_production_buyer_assent',
+     'request' =&gt; Array &amp;1 [
+-        'review' =&gt; Array &amp;2 [
+-            'schema_version' =&gt; 1,
+-            'purpose' =&gt; 'review_staff_reported_buyer_assent',
+-            'observer_id' =&gt; 1,
+-            'packet_id' =&gt; 'c8b30646-e567-441b-93f3-dd63f67bdf5c',
+-            'packet_hash' =&gt; '0976d36ef7a3294f12ee8c4c2f060735734d918f8c52a5102ba5b83ec2b6ad90',
+-            'seller' =&gt; Array &amp;3 [
+-                'legal_name' =&gt; 'NONBINDING SYNTHETIC SELLER',
++        'input' =&gt; Array &amp;2 [
++            'buyer' =&gt; Array &amp;3 [
++                'email' =&gt; 'buyer@example.test',
++                'legal_name' =&gt; 'Synthetic Buyer',
+             ],
+-            'assent' =&gt; Array &amp;4 [
++            'observation_reference' =&gt; 'synthetic-report-v1',
++            'reported_accepted' =&gt; true,
++        ],
++        'review' =&gt; Array &amp;4 [
++            'assent' =&gt; Array &amp;5 [
+                 'text' =&gt; 'NONBINDING SYNTHETIC ASSENT\n
+ Explicit review fixture only.',
+                 'version' =&gt; 'synthetic-assent-v1',
+             ],
+-            'selection' =&gt; Array &amp;5 [
++            'observer_id' =&gt; 1,
++            'packet_hash' =&gt; '0976d36ef7a3294f12ee8c4c2f060735734d918f8c52a5102ba5b83ec2b6ad90',
++            'packet_id' =&gt; 'c8b30646-e567-441b-93f3-dd63f67bdf5c',
++            'purpose' =&gt; 'review_staff_reported_buyer_assent',
++            'report_boundary' =&gt; 'staff_report_only_requires_independent_verified_buyer_act_and_purchase_binding',
++            'schema_version' =&gt; 1,
++            'selection' =&gt; Array &amp;6 [
+                 'advertised_subtotal_minor' =&gt; 4999,
+                 'assent_state' =&gt; 'not_collected',
+                 'buyer_state' =&gt; 'not_bound',
+@@ @@
+                 'currency' =&gt; 'USD',
+                 'execution_allowed' =&gt; false,
+                 'external_facts_verified' =&gt; false,
+-                'lines' =&gt; Array &amp;6 [
+-                    0 =&gt; Array &amp;7 [
++                'lines' =&gt; Array &amp;7 [
++                    0 =&gt; Array &amp;8 [
+                         'currency' =&gt; 'USD',
+                         'license_version_id' =&gt; 1,
+                         'offer_id' =&gt; 1,
+                         'offer_revision_id' =&gt; 1,
+-                        'offer_snapshot' =&gt; Array &amp;8 [
+-                            'assets' =&gt; Array &amp;9 [
+-                                0 =&gt; Array &amp;10 [
++                        'offer_snapshot' =&gt; Array &amp;9 [
++                            'assets' =&gt; Array &amp;10 [
++                                0 =&gt; Array &amp;11 [
+                                     'id' =&gt; 2,
+                                     'mime_type' =&gt; 'audio/wav',
+                                     'original_name' =&gt; 'master.wav',
+@@ @@
+                                     'size_bytes' =&gt; 211758,
+                                 ],
+                             ],
+-                            'commercial' =&gt; Array &amp;11 [
++                            'commercial' =&gt; Array &amp;12 [
+                                 'currency' =&gt; 'USD',
+                                 'price_minor' =&gt; 4999,
+                                 'type' =&gt; 'non-exclusive',
+                             ],
+-                            'license' =&gt; Array &amp;12 [
++                            'license' =&gt; Array &amp;13 [
+                                 'approval_reference' =&gt; 'SYNTHETIC-TEST-ONLY',
+                                 'approved_at' =&gt; '2026-10-07T03:12:03.000000Z',
+                                 'approved_by' =&gt; 2,
+@@ @@
+                                 'authored_source' =&gt; 'NONBINDING SYNTHETIC REVIEW FIXTURE. This is test evidence only.',
+                                 'effective_from' =&gt; null,
+                                 'effective_until' =&gt; null,
+-                                'features' =&gt; Array &amp;13 [
++                                'features' =&gt; Array &amp;14 [
+                                     0 =&gt; 'Synthetic test WAV deliverable',
+                                 ],
+                                 'id' =&gt; 1,
+@@ @@
+                                 'name' =&gt; 'NONBINDING TEST FIXTURE',
+                                 'render_fixture_hash' =&gt; '41ff145d7b7f3f3318b6359e18a023480476b246a41914eed86bd68f8c75504b',
+                                 'renderer_version' =&gt; 'vasey-license-review-html-v1',
+-                                'required_asset_roles' =&gt; Array &amp;14 [
++                                'required_asset_roles' =&gt; Array &amp;15 [
+                                     0 =&gt; 'master_wav',
+                                 ],
+                                 'review_evidence_hash' =&gt; '93ddb9af3367908075540c0bfa1633d81e92780b3ff238f3f63e83e77bcbd78f',
+                                 'review_evidence_id' =&gt; 1,
+                                 'source_hash' =&gt; 'ecec6ef73ca540150f2c8ff2858c6feccfa733684d11b3a7af452ac1b2bb08aa',
+-                                'structured_terms' =&gt; Array &amp;15 [
+-                                    'features' =&gt; Array &amp;16 [
++                                'structured_terms' =&gt; Array &amp;16 [
++                                    'features' =&gt; Array &amp;17 [
+                                         0 =&gt; 'Synthetic test WAV deliverable',
+                                     ],
+-                                    'required_asset_roles' =&gt; Array &amp;17 [
++                                    'required_asset_roles' =&gt; Array &amp;18 [
+                                         0 =&gt; 'master_wav',
+                                     ],
+                                     'schema_version' =&gt; 1,
+@@ @@
+                                 'type' =&gt; 'non-exclusive',
+                                 'version' =&gt; 1,
+                             ],
+-                            'preview' =&gt; Array &amp;18 [
++                            'preview' =&gt; Array &amp;19 [
+                                 'id' =&gt; 4,
+                                 'parent_asset_id' =&gt; 1,
+                                 'sha256' =&gt; 'ff31339e6606312190dee5f11e0bea9ab75236b75c32d9ede7b9927b22e9d7c7',
+                             ],
+-                            'product' =&gt; Array &amp;19 [
++                            'product' =&gt; Array &amp;20 [
+                                 'artist' =&gt; 'Test only',
+                                 'bpm' =&gt; 90,
+                                 'genre' =&gt; 'Test',
+@@ @@
+                                 'tags' =&gt; null,
+                                 'title' =&gt; 'Synthetic quote recording',
+                             ],
+-                            'rights' =&gt; Array &amp;20 [
++                            'rights' =&gt; Array &amp;21 [
+                                 'id' =&gt; 1,
+                                 'identity_hash' =&gt; '5fedf74a65b0a3f0b9f29e8a52f36a5f450a15ba5880ea171acd7735afb6c0ec',
+                             ],
+@@ @@
+                 'tax_state' =&gt; 'unresolved',
+                 'total_minor' =&gt; null,
+             ],
+-            'report_boundary' =&gt; 'staff_report_only_requires_independent_verified_buyer_act_and_purchase_binding',
++            'seller' =&gt; Array &amp;22 [
++                'legal_name' =&gt; 'NONBINDING SYNTHETIC SELLER',
++            ],
+             'signature' =&gt; 'a2bd873d14fa6446e5579e48067ae9a85bc8c8fdc6c96f2bc4df3c63db2f2d62',
+         ],
+-        'input' =&gt; Array &amp;21 [
+-            'buyer' =&gt; Array &amp;22 [
+-                'legal_name' =&gt; 'Synthetic Buyer',
+-                'email' =&gt; 'buyer@example.test',
+-            ],
+-            'reported_accepted' =&gt; true,
+-            'observation_reference' =&gt; 'synthetic-report-v1',
+-        ],
+     ],
+-    'buyer_identity_verified' =&gt; false,
+-    'buyer_act_verified' =&gt; false,
+-    'purchase_bound' =&gt; false,
+-    'payable' =&gt; false,
+-    'execution_allowed' =&gt; false,
+-    'external_facts_verified' =&gt; false,
++    'schema_version' =&gt; 1,
+ ]
+
+/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php:106</failure>
+    </testcase>
+    <testcase name="test_recovery_after_closure_stays_historical_but_requires_current_mfa" file="/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php" line="111" class="Tests\Feature\ProductionBuyerAssentObservationsTest" classname="Tests.Feature.ProductionBuyerAssentObservationsTest" assertions="1" time="1.305113">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionBuyerAssentObservationsTest::test_recovery_after_closure_stays_historical_but_requires_current_mfa
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+-    'schema_version' =&gt; 1,
+-    'purpose' =&gt; 'staff_reported_production_buyer_assent',
+-    'public_id' =&gt; '185675bc-2eef-4c38-ad6a-09eaa9c07e9a',
++    'buyer_act_verified' =&gt; false,
++    'buyer_identity_verified' =&gt; false,
++    'created_at' =&gt; '2026-10-07 03:12:05',
++    'execution_allowed' =&gt; false,
++    'external_facts_verified' =&gt; false,
+     'observer_id' =&gt; 1,
++    'packet_hash' =&gt; '3f64f34bfff61471b94339f02d0365c4ad23d26264df8cf7862ea7f03ebc320e',
+     'packet_id' =&gt; 1,
+-    'packet_hash' =&gt; '3f64f34bfff61471b94339f02d0365c4ad23d26264df8cf7862ea7f03ebc320e',
+-    'created_at' =&gt; '2026-10-07 03:12:05',
++    'payable' =&gt; false,
++    'public_id' =&gt; '185675bc-2eef-4c38-ad6a-09eaa9c07e9a',
++    'purchase_bound' =&gt; false,
++    'purpose' =&gt; 'staff_reported_production_buyer_assent',
+     'request' =&gt; Array &amp;1 [
+-        'review' =&gt; Array &amp;2 [
+-            'schema_version' =&gt; 1,
+-            'purpose' =&gt; 'review_staff_reported_buyer_assent',
+-            'observer_id' =&gt; 1,
+-            'packet_id' =&gt; 'fa06b685-3581-4de6-8bfc-1c526a17c13e',
+-            'packet_hash' =&gt; '3f64f34bfff61471b94339f02d0365c4ad23d26264df8cf7862ea7f03ebc320e',
+-            'seller' =&gt; Array &amp;3 [
+-                'legal_name' =&gt; 'NONBINDING SYNTHETIC SELLER',
++        'input' =&gt; Array &amp;2 [
++            'buyer' =&gt; Array &amp;3 [
++                'email' =&gt; 'buyer@example.test',
++                'legal_name' =&gt; 'Synthetic Buyer',
+             ],
+-            'assent' =&gt; Array &amp;4 [
++            'observation_reference' =&gt; 'synthetic-report-v1',
++            'reported_accepted' =&gt; true,
++        ],
++        'review' =&gt; Array &amp;4 [
++            'assent' =&gt; Array &amp;5 [
+                 'text' =&gt; 'NONBINDING SYNTHETIC ASSENT\n
+ Explicit review fixture only.',
+                 'version' =&gt; 'synthetic-assent-v1',
+             ],
+-            'selection' =&gt; Array &amp;5 [
++            'observer_id' =&gt; 1,
++            'packet_hash' =&gt; '3f64f34bfff61471b94339f02d0365c4ad23d26264df8cf7862ea7f03ebc320e',
++            'packet_id' =&gt; 'fa06b685-3581-4de6-8bfc-1c526a17c13e',
++            'purpose' =&gt; 'review_staff_reported_buyer_assent',
++            'report_boundary' =&gt; 'staff_report_only_requires_independent_verified_buyer_act_and_purchase_binding',
++            'schema_version' =&gt; 1,
++            'selection' =&gt; Array &amp;6 [
+                 'advertised_subtotal_minor' =&gt; 4999,
+                 'assent_state' =&gt; 'not_collected',
+                 'buyer_state' =&gt; 'not_bound',
+@@ @@
+                 'currency' =&gt; 'USD',
+                 'execution_allowed' =&gt; false,
+                 'external_facts_verified' =&gt; false,
+-                'lines' =&gt; Array &amp;6 [
+-                    0 =&gt; Array &amp;7 [
++                'lines' =&gt; Array &amp;7 [
++                    0 =&gt; Array &amp;8 [
+                         'currency' =&gt; 'USD',
+                         'license_version_id' =&gt; 1,
+                         'offer_id' =&gt; 1,
+                         'offer_revision_id' =&gt; 1,
+-                        'offer_snapshot' =&gt; Array &amp;8 [
+-                            'assets' =&gt; Array &amp;9 [
+-                                0 =&gt; Array &amp;10 [
++                        'offer_snapshot' =&gt; Array &amp;9 [
++                            'assets' =&gt; Array &amp;10 [
++                                0 =&gt; Array &amp;11 [
+                                     'id' =&gt; 2,
+                                     'mime_type' =&gt; 'audio/wav',
+                                     'original_name' =&gt; 'master.wav',
+@@ @@
+                                     'size_bytes' =&gt; 211758,
+                                 ],
+                             ],
+-                            'commercial' =&gt; Array &amp;11 [
++                            'commercial' =&gt; Array &amp;12 [
+                                 'currency' =&gt; 'USD',
+                                 'price_minor' =&gt; 4999,
+                                 'type' =&gt; 'non-exclusive',
+                             ],
+-                            'license' =&gt; Array &amp;12 [
++                            'license' =&gt; Array &amp;13 [
+                                 'approval_reference' =&gt; 'SYNTHETIC-TEST-ONLY',
+                                 'approved_at' =&gt; '2026-10-07T03:12:05.000000Z',
+                                 'approved_by' =&gt; 2,
+@@ @@
+                                 'authored_source' =&gt; 'NONBINDING SYNTHETIC REVIEW FIXTURE. This is test evidence only.',
+                                 'effective_from' =&gt; null,
+                                 'effective_until' =&gt; null,
+-                                'features' =&gt; Array &amp;13 [
++                                'features' =&gt; Array &amp;14 [
+                                     0 =&gt; 'Synthetic test WAV deliverable',
+                                 ],
+                                 'id' =&gt; 1,
+@@ @@
+                                 'name' =&gt; 'NONBINDING TEST FIXTURE',
+                                 'render_fixture_hash' =&gt; 'f9c41c2724b67e3067e1cbfb4524798c8fa7472bbda5c34af566163d0c50b242',
+                                 'renderer_version' =&gt; 'vasey-license-review-html-v1',
+-                                'required_asset_roles' =&gt; Array &amp;14 [
++                                'required_asset_roles' =&gt; Array &amp;15 [
+                                     0 =&gt; 'master_wav',
+                                 ],
+                                 'review_evidence_hash' =&gt; 'ee1087934ab89f94cb7e8ee46f49203cabea0bd9708eee0802ff0a8595fa6095',
+                                 'review_evidence_id' =&gt; 1,
+                                 'source_hash' =&gt; 'ecec6ef73ca540150f2c8ff2858c6feccfa733684d11b3a7af452ac1b2bb08aa',
+-                                'structured_terms' =&gt; Array &amp;15 [
+-                                    'features' =&gt; Array &amp;16 [
++                                'structured_terms' =&gt; Array &amp;16 [
++                                    'features' =&gt; Array &amp;17 [
+                                         0 =&gt; 'Synthetic test WAV deliverable',
+                                     ],
+-                                    'required_asset_roles' =&gt; Array &amp;17 [
++                                    'required_asset_roles' =&gt; Array &amp;18 [
+                                         0 =&gt; 'master_wav',
+                                     ],
+                                     'schema_version' =&gt; 1,
+@@ @@
+                                 'type' =&gt; 'non-exclusive',
+                                 'version' =&gt; 1,
+                             ],
+-                            'preview' =&gt; Array &amp;18 [
++                            'preview' =&gt; Array &amp;19 [
+                                 'id' =&gt; 4,
+                                 'parent_asset_id' =&gt; 1,
+                                 'sha256' =&gt; 'ff31339e6606312190dee5f11e0bea9ab75236b75c32d9ede7b9927b22e9d7c7',
+                             ],
+-                            'product' =&gt; Array &amp;19 [
++                            'product' =&gt; Array &amp;20 [
+                                 'artist' =&gt; 'Test only',
+                                 'bpm' =&gt; 90,
+                                 'genre' =&gt; 'Test',
+@@ @@
+                                 'tags' =&gt; null,
+                                 'title' =&gt; 'Synthetic quote recording',
+                             ],
+-                            'rights' =&gt; Array &amp;20 [
++                            'rights' =&gt; Array &amp;21 [
+                                 'id' =&gt; 1,
+                                 'identity_hash' =&gt; 'baa4f06d89fc5f434576e4809d26e66652aeb2e6c189bc6e04dfbb5564c7d2ed',
+                             ],
+@@ @@
+                 'tax_state' =&gt; 'unresolved',
+                 'total_minor' =&gt; null,
+             ],
+-            'report_boundary' =&gt; 'staff_report_only_requires_independent_verified_buyer_act_and_purchase_binding',
++            'seller' =&gt; Array &amp;22 [
++                'legal_name' =&gt; 'NONBINDING SYNTHETIC SELLER',
++            ],
+             'signature' =&gt; '9a1e553f145146db7d6a35771ea2055f34442a3764872102fa0f6662c266eedb',
+         ],
+-        'input' =&gt; Array &amp;21 [
+-            'buyer' =&gt; Array &amp;22 [
+-                'legal_name' =&gt; 'Synthetic Buyer',
+-                'email' =&gt; 'buyer@example.test',
+-            ],
+-            'reported_accepted' =&gt; true,
+-            'observation_reference' =&gt; 'synthetic-report-v1',
+-        ],
+     ],
+-    'buyer_identity_verified' =&gt; false,
+-    'buyer_act_verified' =&gt; false,
+-    'purchase_bound' =&gt; false,
+-    'payable' =&gt; false,
+-    'execution_allowed' =&gt; false,
+-    'external_facts_verified' =&gt; false,
++    'schema_version' =&gt; 1,
+ ]
+
+/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php:119</failure>
+    </testcase>
+    <testcase name="test_encryption_failure_rolls_back_and_key_remains_available" file="/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php" line="125" class="Tests\Feature\ProductionBuyerAssentObservationsTest" classname="Tests.Feature.ProductionBuyerAssentObservationsTest" assertions="3" time="1.176681"/>
+    <testsuite name="Tests\Feature\ProductionBuyerAssentObservationsTest::test_sql_guards_reject_overwrite_and_delete" tests="3" assertions="6" errors="0" failures="0" skipped="0" time="3.361746">
+      <testcase name="test_sql_guards_reject_overwrite_and_delete with data set #0" file="/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php" line="151" class="Tests\Feature\ProductionBuyerAssentObservationsTest" classname="Tests.Feature.ProductionBuyerAssentObservationsTest" assertions="2" time="1.247264"/>
+      <testcase name="test_sql_guards_reject_overwrite_and_delete with data set #1" file="/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php" line="151" class="Tests\Feature\ProductionBuyerAssentObservationsTest" classname="Tests.Feature.ProductionBuyerAssentObservationsTest" assertions="2" time="1.104236"/>
+      <testcase name="test_sql_guards_reject_overwrite_and_delete with data set #2" file="/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php" line="151" class="Tests\Feature\ProductionBuyerAssentObservationsTest" classname="Tests.Feature.ProductionBuyerAssentObservationsTest" assertions="2" time="1.010246"/>
+    </testsuite>
+    <testcase name="test_real_migrator_rollback_preserves_empty_and_populated_data_schema_and_bookkeeping" file="/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php" line="172" class="Tests\Feature\ProductionBuyerAssentObservationsTest" classname="Tests.Feature.ProductionBuyerAssentObservationsTest" assertions="2" time="0.229004">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionBuyerAssentObservationsTest::test_real_migrator_rollback_preserves_empty_and_populated_data_schema_and_bookkeeping
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+-    0 =&gt; stdClass Object #1989 (
++    0 =&gt; stdClass Object #925 (
+         'id' =&gt; 1,
+         'migration' =&gt; '0001_01_01_000000_create_users_table',
+         'batch' =&gt; 1,
+     ),
+-    1 =&gt; stdClass Object #8653 (
++    1 =&gt; stdClass Object #4449 (
+         'id' =&gt; 2,
+         'migration' =&gt; '0001_01_01_000001_create_cache_table',
+         'batch' =&gt; 1,
+     ),
+-    2 =&gt; stdClass Object #6119 (
++    2 =&gt; stdClass Object #6830 (
+         'id' =&gt; 3,
+         'migration' =&gt; '0001_01_01_000002_create_jobs_table',
+         'batch' =&gt; 1,
+     ),
+-    3 =&gt; stdClass Object #3019 (
++    3 =&gt; stdClass Object #4237 (
+         'id' =&gt; 4,
+         'migration' =&gt; '2026_09_04_000001_create_catalog_foundation',
+         'batch' =&gt; 1,
+     ),
+-    4 =&gt; stdClass Object #2295 (
++    4 =&gt; stdClass Object #4477 (
+         'id' =&gt; 5,
+         'migration' =&gt; '2026_09_04_000002_add_admin_mfa_and_immutable_evidence',
+         'batch' =&gt; 1,
+     ),
+-    5 =&gt; stdClass Object #826 (
++    5 =&gt; stdClass Object #2487 (
+         'id' =&gt; 6,
+         'migration' =&gt; '2026_09_04_000003_media_processing',
+         'batch' =&gt; 1,
+     ),
+-    6 =&gt; stdClass Object #6088 (
++    6 =&gt; stdClass Object #2715 (
+         'id' =&gt; 7,
+         'migration' =&gt; '2026_09_04_000004_license_evidence',
+         'batch' =&gt; 1,
+     ),
+-    7 =&gt; stdClass Object #8770 (
++    7 =&gt; stdClass Object #8325 (
+         'id' =&gt; 8,
+         'migration' =&gt; '2026_09_04_000005_offer_revisions',
+         'batch' =&gt; 1,
+     ),
+-    8 =&gt; stdClass Object #5769 (
++    8 =&gt; stdClass Object #256 (
+         'id' =&gt; 9,
+         'migration' =&gt; '2026_09_06_000006_provisional_quotes',
+         'batch' =&gt; 1,
+     ),
+-    9 =&gt; stdClass Object #8670 (
++    9 =&gt; stdClass Object #4651 (
+         'id' =&gt; 10,
+         'migration' =&gt; '2026_09_09_000007_stripe_webhook_receipts',
+         'batch' =&gt; 1,
+     ),
+-    10 =&gt; stdClass Object #6114 (
++    10 =&gt; stdClass Object #6516 (
+         'id' =&gt; 11,
+         'migration' =&gt; '2026_09_09_000008_track_metadata_and_public_urls',
+         'batch' =&gt; 1,
+     ),
+-    11 =&gt; stdClass Object #4068 (
++    11 =&gt; stdClass Object #6874 (
+         'id' =&gt; 12,
+         'migration' =&gt; '2026_09_09_000009_stems_recordings',
+         'batch' =&gt; 1,
+     ),
+-    12 =&gt; stdClass Object #5785 (
++    12 =&gt; stdClass Object #8796 (
+         'id' =&gt; 13,
+         'migration' =&gt; '2026_09_10_000010_typed_license_terms',
+         'batch' =&gt; 1,
+     ),
+-    13 =&gt; stdClass Object #5709 (
++    13 =&gt; stdClass Object #7552 (
+         'id' =&gt; 14,
+         'migration' =&gt; '2026_09_11_000011_license_scope_terms',
+         'batch' =&gt; 1,
+     ),
+-    14 =&gt; stdClass Object #7304 (
++    14 =&gt; stdClass Object #1055 (
+         'id' =&gt; 15,
+         'migration' =&gt; '2026_09_12_000012_license_economic_terms',
+         'batch' =&gt; 1,
+     ),
+-    15 =&gt; stdClass Object #5541 (
++    15 =&gt; stdClass Object #4358 (
+         'id' =&gt; 16,
+         'migration' =&gt; '2026_09_12_000013_quote_pricing',
+         'batch' =&gt; 1,
+     ),
+-    16 =&gt; stdClass Object #825 (
++    16 =&gt; stdClass Object #5200 (
+         'id' =&gt; 17,
+         'migration' =&gt; '2026_09_14_000014_promotion_usage',
+         'batch' =&gt; 1,
+     ),
+-    17 =&gt; stdClass Object #5093 (
++    17 =&gt; stdClass Object #4350 (
+         'id' =&gt; 18,
+         'migration' =&gt; '2026_09_17_000015_shared_rights_inventory',
+         'batch' =&gt; 1,
+     ),
+-    18 =&gt; stdClass Object #8716 (
++    18 =&gt; stdClass Object #4407 (
+         'id' =&gt; 19,
+         'migration' =&gt; '2026_09_23_000016_exclusive_activations',
+         'batch' =&gt; 1,
+     ),
+-    19 =&gt; stdClass Object #8639 (
++    19 =&gt; stdClass Object #45 (
+         'id' =&gt; 20,
+         'migration' =&gt; '2026_09_24_000017_order_preparation',
+         'batch' =&gt; 1,
+     ),
+-    20 =&gt; stdClass Object #4645 (
++    20 =&gt; stdClass Object #6826 (
+         'id' =&gt; 21,
+         'migration' =&gt; '2026_09_26_000018_hosted_test_checkout',
+         'batch' =&gt; 1,
+     ),
+-    21 =&gt; stdClass Object #2794 (
++    21 =&gt; stdClass Object #4964 (
+         'id' =&gt; 22,
+         'migration' =&gt; '2026_09_26_000019_test_payment_evidence',
+         'batch' =&gt; 1,
+     ),
+-    22 =&gt; stdClass Object #3957 (
++    22 =&gt; stdClass Object #3516 (
+         'id' =&gt; 23,
+         'migration' =&gt; '2026_09_26_000020_test_order_finalization',
+         'batch' =&gt; 1,
+     ),
+-    23 =&gt; stdClass Object #6000 (
++    23 =&gt; stdClass Object #3888 (
+         'id' =&gt; 24,
+         'migration' =&gt; '2026_09_26_000021_test_contract_issuance',
+         'batch' =&gt; 1,
+     ),
+-    24 =&gt; stdClass Object #5853 (
++    24 =&gt; stdClass Object #6661 (
+         'id' =&gt; 25,
+         'migration' =&gt; '2026_09_26_000022_test_fulfillment_activation',
+         'batch' =&gt; 1,
+     ),
+-    25 =&gt; stdClass Object #8635 (
++    25 =&gt; stdClass Object #1938 (
+         'id' =&gt; 26,
+         'migration' =&gt; '2026_09_26_000023_test_owner_delivery',
+         'batch' =&gt; 1,
+     ),
+-    26 =&gt; stdClass Object #5806 (
++    26 =&gt; stdClass Object #4297 (
+         'id' =&gt; 27,
+         'migration' =&gt; '2026_09_28_000024_site_content_releases',
+         'batch' =&gt; 1,
+     ),
+-    27 =&gt; stdClass Object #831 (
++    27 =&gt; stdClass Object #7038 (
+         'id' =&gt; 28,
+         'migration' =&gt; '2026_09_29_000025_promotion_administration',
+         'batch' =&gt; 1,
+     ),
+-    28 =&gt; stdClass Object #5032 (
++    28 =&gt; stdClass Object #4709 (
+         'id' =&gt; 29,
+         'migration' =&gt; '2026_09_29_000026_site_publication_schedules',
+         'batch' =&gt; 1,
+     ),
+-    29 =&gt; stdClass Object #8396 (
++    29 =&gt; stdClass Object #6666 (
+         'id' =&gt; 30,
+         'migration' =&gt; '2026_09_30_000027_site_images',
+         'batch' =&gt; 1,
+     ),
+-    30 =&gt; stdClass Object #4565 (
++    30 =&gt; stdClass Object #6478 (
+         'id' =&gt; 31,
+         'migration' =&gt; '2026_09_30_000028_site_release_images',
+         'batch' =&gt; 1,
+     ),
+-    31 =&gt; stdClass Object #4962 (
++    31 =&gt; stdClass Object #6791 (
+         'id' =&gt; 32,
+         'migration' =&gt; '2026_10_01_000029_byte_exact_hash_guards',
+         'batch' =&gt; 1,
+     ),
+-    32 =&gt; stdClass Object #8409 (
++    32 =&gt; stdClass Object #8813 (
+         'id' =&gt; 33,
+         'migration' =&gt; '2026_10_01_000030_byte_exact_uuid_guards',
+         'batch' =&gt; 1,
+     ),
+-    33 =&gt; stdClass Object #6152 (
++    33 =&gt; stdClass Object #2488 (
+         'id' =&gt; 34,
+         'migration' =&gt; '2026_10_01_000031_customer_inquiries',
+         'batch' =&gt; 1,
+     ),
+-    34 =&gt; stdClass Object #8354 (
++    34 =&gt; stdClass Object #7053 (
+         'id' =&gt; 35,
+         'migration' =&gt; '2026_10_01_000032_editorial_related_tracks_images',
+         'batch' =&gt; 1,
+     ),
+-    35 =&gt; stdClass Object #8222 (
++    35 =&gt; stdClass Object #2153 (
+         'id' =&gt; 36,
+         'migration' =&gt; '2026_10_02_000033_track_metadata_presets',
+         'batch' =&gt; 1,
+     ),
+-    36 =&gt; stdClass Object #2788 (
++    36 =&gt; stdClass Object #4029 (
+         'id' =&gt; 37,
+         'migration' =&gt; '2026_10_02_000034_track_publication_version',
+         'batch' =&gt; 1,
+     ),
+-    37 =&gt; stdClass Object #8664 (
++    37 =&gt; stdClass Object #5829 (
+         'id' =&gt; 38,
+         'migration' =&gt; '2026_10_02_000035_rights_evidence_guards',
+         'batch' =&gt; 1,
+     ),
+-    38 =&gt; stdClass Object #7517 (
++    38 =&gt; stdClass Object #3896 (
+         'id' =&gt; 39,
+         'migration' =&gt; '2026_10_02_000036_test_payment_exception_operations',
+         'batch' =&gt; 1,
+     ),
+-    39 =&gt; stdClass Object #6585 (
++    39 =&gt; stdClass Object #6809 (
+         'id' =&gt; 40,
+         'migration' =&gt; '2026_10_06_000038_resumable_media_uploads',
+         'batch' =&gt; 1,
+     ),
+-    40 =&gt; stdClass Object #6115 (
++    40 =&gt; stdClass Object #6814 (
+         'id' =&gt; 41,
+         'migration' =&gt; '2026_10_06_000039_test_payment_financial_observations',
+         'batch' =&gt; 1,
+     ),
+-    41 =&gt; stdClass Object #4640 (
++    41 =&gt; stdClass Object #6815 (
+         'id' =&gt; 42,
+         'migration' =&gt; '2026_10_06_000040_customer_accounts',
+         'batch' =&gt; 1,
+     ),
+-    42 =&gt; stdClass Object #1883 (
++    42 =&gt; stdClass Object #4033 (
+         'id' =&gt; 43,
+         'migration' =&gt; '2026_10_06_000041_product_draft_versions',
+         'batch' =&gt; 1,
+     ),
+-    43 =&gt; stdClass Object #3168 (
++    43 =&gt; stdClass Object #5810 (
+         'id' =&gt; 44,
+         'migration' =&gt; '2026_10_06_000042_test_unpaid_releases',
+         'batch' =&gt; 1,
+     ),
+-    44 =&gt; stdClass Object #6801 (
++    44 =&gt; stdClass Object #4868 (
+         'id' =&gt; 45,
+         'migration' =&gt; '2026_10_06_000043_inquiry_messages',
+         'batch' =&gt; 1,
+     ),
+-    45 =&gt; stdClass Object #3444 (
++    45 =&gt; stdClass Object #1795 (
+         'id' =&gt; 46,
+         'migration' =&gt; '2026_10_06_000044_sound_kit_intake',
+         'batch' =&gt; 1,
+     ),
+-    46 =&gt; stdClass Object #4334 (
++    46 =&gt; stdClass Object #7796 (
+         'id' =&gt; 47,
+         'migration' =&gt; '2026_10_06_000045_customer_identity_challenges',
+         'batch' =&gt; 1,
+     ),
+-    47 =&gt; stdClass Object #558 (
++    47 =&gt; stdClass Object #6917 (
+         'id' =&gt; 48,
+         'migration' =&gt; '2026_10_06_000046_sound_kit_upload_sessions',
+         'batch' =&gt; 1,
+     ),
+-    48 =&gt; stdClass Object #8549 (
++    48 =&gt; stdClass Object #6723 (
+         'id' =&gt; 49,
+         'migration' =&gt; '2026_10_06_000047_test_refund_resolutions',
+         'batch' =&gt; 1,
+     ),
+-    49 =&gt; stdClass Object #7718 (
++    49 =&gt; stdClass Object #8001 (
+         'id' =&gt; 50,
+         'migration' =&gt; '2026_10_06_000048_customer_purchase_claims',
+         'batch' =&gt; 1,
+     ),
+-    50 =&gt; stdClass Object #7314 (
++    50 =&gt; stdClass Object #6820 (
+         'id' =&gt; 51,
+         'migration' =&gt; '2026_10_06_000049_inquiry_order_contexts',
+         'batch' =&gt; 1,
+     ),
+-    51 =&gt; stdClass Object #4654 (
++    51 =&gt; stdClass Object #8026 (
+         'id' =&gt; 52,
+         'migration' =&gt; '2026_10_06_230000_membership_credit_foundation',
+         'batch' =&gt; 1,
+     ),
+-    52 =&gt; stdClass Object #2972 (
++    52 =&gt; stdClass Object #3414 (
+         'id' =&gt; 53,
+         'migration' =&gt; '2026_10_06_231000_test_transactional_notifications',
+         'batch' =&gt; 1,
+     ),
+-    53 =&gt; stdClass Object #6817 (
++    53 =&gt; stdClass Object #5275 (
+         'id' =&gt; 54,
+         'migration' =&gt; '2026_10_06_233000_production_track_policy_drafts',
+         'batch' =&gt; 1,
+     ),
+-    54 =&gt; stdClass Object #7647 (
++    54 =&gt; stdClass Object #2049 (
+         'id' =&gt; 55,
+         'migration' =&gt; '2026_10_06_234000_service_draft_versions',
+         'batch' =&gt; 1,
+     ),
+-    55 =&gt; stdClass Object #5549 (
++    55 =&gt; stdClass Object #8623 (
+         'id' =&gt; 56,
+         'migration' =&gt; '2026_10_06_235000_merch_draft_versions',
+         'batch' =&gt; 1,
+     ),
+-    56 =&gt; stdClass Object #7609 (
++    56 =&gt; stdClass Object #5397 (
+         'id' =&gt; 57,
+         'migration' =&gt; '2026_10_06_236000_production_track_policy_capabilities',
+         'batch' =&gt; 1,
+     ),
+-    57 =&gt; stdClass Object #6829 (
++    57 =&gt; stdClass Object #7739 (
+         'id' =&gt; 58,
+         'migration' =&gt; '2026_10_06_237000_catalog_import_progress',
+         'batch' =&gt; 1,
+     ),
+-    58 =&gt; stdClass Object #793 (
++    58 =&gt; stdClass Object #6765 (
+         'id' =&gt; 59,
+         'migration' =&gt; '2026_10_06_238000_production_track_preparation_packets',
+         'batch' =&gt; 1,
+     ),
+-    59 =&gt; stdClass Object #3396 (
++    59 =&gt; stdClass Object #6819 (
+         'id' =&gt; 60,
+         'migration' =&gt; '2026_10_07_239000_production_buyer_assent_observations',
+         'batch' =&gt; 1,
+     ),
+ ]
+
+/workspace/scratch/2876616e88c3/VA-Studio-buyer-assent/tests/Feature/ProductionBuyerAssentObservationsTest.php:187</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

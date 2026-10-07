@@ -1,0 +1,40 @@
+{
+  "name": "vaseyaudio",
+  "dependencies": {
+    "@testing-library/dom": {
+      "version": "10.4.2",
+      "resolved": "https://registry.npmjs.org/@testing-library/dom/-/dom-10.4.2.tgz",
+      "overridden": false
+    },
+    "@testing-library/jest-dom": {
+      "version": "7.0.1",
+      "resolved": "https://registry.npmjs.org/@testing-library/jest-dom/-/jest-dom-7.0.1.tgz",
+      "overridden": false,
+      "dependencies": {
+        "@testing-library/dom": {
+          "version": "10.4.2"
+        }
+      }
+    },
+    "@testing-library/react": {
+      "version": "16.3.3",
+      "resolved": "https://registry.npmjs.org/@testing-library/react/-/react-16.3.3.tgz",
+      "overridden": false,
+      "dependencies": {
+        "@testing-library/dom": {
+          "version": "10.4.2"
+        }
+      }
+    },
+    "@testing-library/user-event": {
+      "version": "14.6.7",
+      "resolved": "https://registry.npmjs.org/@testing-library/user-event/-/user-event-14.6.7.tgz",
+      "overridden": false,
+      "dependencies": {
+        "@testing-library/dom": {
+          "version": "10.4.2"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> test
+> vitest run tests/frontend/membership-history.test.tsx tests/frontend/customer-account.test.tsx
+
+
+ RUN  v5.0.1 /workspace/scratch/2876616e88c3/VA-Studio-membership-history-ui
+
+
+ Test Files  2 passed (2)
+      Tests  62 passed (62)
+   Start at  23:21:32
+   Duration  3.00s (tests 47%, environment 24%, transform 17%, import 8%, setup 3%)
+

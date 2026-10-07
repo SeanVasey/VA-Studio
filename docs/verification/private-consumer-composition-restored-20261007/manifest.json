@@ -1,0 +1,598 @@
+{
+  "schema_version": 1,
+  "composition_source_commit": "b474ead3e8f1c5aab4356019f40e25fd04b2cbb1",
+  "composition_source_tree": "02f7d4d0cd0ebae301ea9ab063973083583ddf61",
+  "baseline_local": "c498006e780edb1494e55d3a9ea9bad5c38ffc93",
+  "baseline_tree": "2b0bce73c56bc3b29eb2479a6bfd3f7473102591",
+  "retained_private_local": "192ec8d93f346ba59f07da428e50cbd04513878b",
+  "retained_private_tree": "4b47a549775e1e2d8e62efb26902bbb98a7e0253",
+  "private_feature_and_evidence_paths": [
+    {
+      "status": "A",
+      "path": "app/Console/Commands/RecoverTestNotifications.php",
+      "sha256": "35c41e82625980c46368b91cb08824e16f135d7afb03e4cef5dd91887d16f34d"
+    },
+    {
+      "status": "A",
+      "path": "app/Domain/Commerce/ProductionPreparation/Models/ProductionBuyerAssentObservation.php",
+      "sha256": "8d350a09900e3e0a8673991690d350d3988deddd49e82a1ab8a69c6eda563cfd"
+    },
+    {
+      "status": "A",
+      "path": "app/Domain/Commerce/ProductionPreparation/ProductionBuyerAssentObservations.php",
+      "sha256": "c0ec62635af45cda1499652739be15065aa71857eb4a2102dcd8c4ba4d2ab4d6"
+    },
+    {
+      "status": "M",
+      "path": "app/Domain/Memberships/CreditLedger.php",
+      "sha256": "da00984fc8dfb9e610d19c18d63ed91520efe6d846cc879010ae67156ef139ac"
+    },
+    {
+      "status": "A",
+      "path": "app/Domain/Memberships/MembershipCustomerHistory.php",
+      "sha256": "e80d3069501883ccbcc6bef8adad91b60a04c93747bb91a5af7068fc633604de"
+    },
+    {
+      "status": "M",
+      "path": "app/Domain/Memberships/MembershipEvidence.php",
+      "sha256": "efa3205598a107798c974ba3e2bce801423d71b62879dc96f1b981a822bb2532"
+    },
+    {
+      "status": "M",
+      "path": "app/Domain/Memberships/MembershipPolicy.php",
+      "sha256": "6676a5db75015a0b3bcea89566447f93eed114c560b1fee635b74d7462caa36e"
+    },
+    {
+      "status": "A",
+      "path": "app/Domain/Notifications/TestTransactionalNotificationRecovery.php",
+      "sha256": "4d4369e39ae108ae66fa920a91b45bf40e25082437219c0db1ccb64842362b71"
+    },
+    {
+      "status": "A",
+      "path": "app/Http/Controllers/CustomerMembershipHistoryController.php",
+      "sha256": "2e49381825db82d993e1fed344a19716a8f4144f3d05320ba5ff4511215ec43d"
+    },
+    {
+      "status": "M",
+      "path": "app/Http/Controllers/CustomerSessionController.php",
+      "sha256": "98696c67b1d30b4d0d392d46071d2d4a319905032c6c9215724b31cbfd228baf"
+    },
+    {
+      "status": "A",
+      "path": "database/migrations/2026_10_07_239000_production_buyer_assent_observations.php",
+      "sha256": "defcef254a47d104510f7778102cf31edf02f203cd5a9f120b5db44cc0288b24"
+    },
+    {
+      "status": "A",
+      "path": "docs/architecture/D-27-production-buyer-assent-reports.md",
+      "sha256": "588721848be2df0644fba372eddfb3324e55d5c6003205b57e9612d2f27b1693"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/ProductionBuyerReportIndependentCanaryTest.php.txt",
+      "sha256": "fdb8e54f48f4eb0fddec25b7d7270ecf81ca3607e0aa5448dd3af92b5f763893"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/commerce-review.json",
+      "sha256": "c8d9452b38a51cd18ec45e18c8aee8f2bd81182aa95fae6ce128eb7c8bfdfb1a"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/continuation-commerce-canary.txt",
+      "sha256": "be1c7afd54f6f9d473d1ee02add5fa936b1ea3ffa6dd82dc9150441cf0b5cd89"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/continuation-commerce-canary.xml",
+      "sha256": "99dc7004340706e9932a1b2c21666eeda5e84b78376a7776ae9a5797559e2658"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/continuation-commerce-final-independent.txt",
+      "sha256": "d1c9cd9929fceb1ec462662610d2da0a28b2ef812f8355c9c1d29b943386b0b7"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/continuation-commerce-final-independent.xml",
+      "sha256": "1def76d96e0940234a99c3664c2f2697a43a928d73c84c7da4ab0dee02c5352e"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/continuation-commerce-independent.txt",
+      "sha256": "b2290b0f074d5544559595d77ec851368e1f4df4d3ffc33f5f465a647f5140a5"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/continuation-commerce-independent.xml",
+      "sha256": "a4495d5a1f65db64bcf6f141893496d9f5049cda0bc67d47e3cb6c472ac3c229"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/continuation-membership-http-independent.txt",
+      "sha256": "3f4d977e4f734ea5921c897365bd6ae9a7526d838e352b2143297b2dcc0b4d1b"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/continuation-membership-http-independent.xml",
+      "sha256": "438acccf8fcb92650447639bb2ccc259e0e077c8a1f08ebf0cdadabb2cd94b3b"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/continuation-membership-independent.txt",
+      "sha256": "cc592fd70007cba58b2afc5a00e6d8ed2cfc892ab90b4443e4de64bd66df8b0c"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/continuation-membership-independent.xml",
+      "sha256": "29015ba5412872a41bc70dd6a0995bfbb2b0ffebe95abeb7d7467b1afe2e84c5"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/continuation-membership-props-independent.txt",
+      "sha256": "d2e2851d14b9c4676c4f7e290ecf44fb2bfbd867012e93a778659f7f5e2fc17b"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/continuation-membership-props-independent.xml",
+      "sha256": "2ea8204eb6505b25fb7712897ee14be2aa7342a6a697f074cc9d1f192516e542"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/continuation-notification-command-independent.txt",
+      "sha256": "d39c95c364057375ce6717b713e4683008a02b50367a0e3fc3e5f6bec36a20c2"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/continuation-notification-command-independent.xml",
+      "sha256": "80751d8a7e36087619232ac312af22d949f4637b4ddfd3f927763d42ba28da20"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/continuation-notification-independent.txt",
+      "sha256": "05082fc2dbb91d1a6d8efbe01757388b424e14380f5761890a2135cff3d47f29"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/continuation-notification-independent.xml",
+      "sha256": "e0d911561d3f88585ca31e9ef3f1b8fb311e9ecadb172f3be79f694c322b7eeb"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/membership-http-review.json",
+      "sha256": "730b768cf3e9b21a72478f949ba445d8571b7923659d419083f10f282bc04ec4"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/membership-props-review.json",
+      "sha256": "20e2218ae972e7ccfbb7b2b1fdc387af85727e298a72cc0289545eda7fe4ec90"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/membership-review.json",
+      "sha256": "a8a06a5bfcb8545cb156d8bb8794ebca03f09f8aafa121d24a4e91a7ead2e90b"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/notification-review.json",
+      "sha256": "9a7854df60cbf6a96f30f992917f0a166d7f27c70cfa2179516f89ae902ca53b"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/continuation-independent-20261007/review.md",
+      "sha256": "49823464cc6eba1fc21bb1f0ef04160fc1a0ab5c2d8f3fa6027446e2e2006c8a"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-history-20261007/README.md",
+      "sha256": "7b3d234965e0eb65480772cb27b333138819acec94d7114afd29aac782b8cd79"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-history-20261007/membership-history-final-mysql.txt",
+      "sha256": "3c5e45dee7869c13a2083bca92c0c2977e3fd87bfe0d5f23fcf01d4917df7356"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-history-20261007/membership-history-final-mysql.xml",
+      "sha256": "3f2c9b82dcd8325fecaa69cbf21797204a7e16ffea55658c335520499001259d"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-history-20261007/membership-history-final-sqlite.txt",
+      "sha256": "3471a16a96496b6a6109ebde3c6c3740a6c79fefb1cd7717d9f98ada9802120c"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-history-20261007/membership-history-final-sqlite.xml",
+      "sha256": "e5f4a0b8ebb17de3b56b450ea7bebb0061c2b10b6b880dd6d84f60cac0df68d7"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-history-20261007/membership-history-first.xml",
+      "sha256": "6c7da15a2973e980ffd40e7f4567f90cabc08b621715dd41fa70e6c6250013dd"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-history-20261007/membership-history-mysql.txt",
+      "sha256": "7a3898a242f4ef4a10bc898951a64d027dda87aa8941848e45ad51e208c0b49e"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-history-20261007/membership-history-mysql.xml",
+      "sha256": "d2b5fe3b01e67e506665e35bae898d804bc7c8f850ab29e9a2a6bc1a5bbed43b"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-history-20261007/membership-history-sqlite.txt",
+      "sha256": "a6db359db6450c08844f9687fcf02bbdaa85df647acc09b32f687176fa8de0a0"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-history-20261007/membership-history-sqlite.xml",
+      "sha256": "c89afa9ac451c70f7685e7875f08b4d5f7dd945e82bbf0afdb859d3b25f6f4c7"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-history-20261007/receipt.json",
+      "sha256": "df39ebbe4e5638f0f44c34635d90c1d8ed476770b88346ad4ceee40596a34840"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-http-20261007/README.md",
+      "sha256": "bace2c4a9f976ba02251363d7d2c2b7212365da6e354df42b51a673e009cc574"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-http-20261007/membership-http-corrected.txt",
+      "sha256": "b25208f38554b3395c8f4e52ffabc0c0a7b80db4c4cf7edb0b7924f9fddb116c"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-http-20261007/membership-http-corrected.xml",
+      "sha256": "b41b25d91a3e6f11d1eac7429d6e04a80736f79de4411235c0399bf0158d9871"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-http-20261007/membership-http-final-mysql.txt",
+      "sha256": "69a3d778375fcbc8483a24bf9254be3e7f50a2326f5ae547449a8ccba7b42f7c"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-http-20261007/membership-http-final-mysql.xml",
+      "sha256": "28d43f525d37c1673ae18c08b96376f70683fbbf1f10bba7d1acda77185e529e"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-http-20261007/membership-http-final-sqlite.txt",
+      "sha256": "b6ddb2762522a4db526759fffaa1a7a932d0140f39b793ca401a70114be776aa"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-http-20261007/membership-http-final-sqlite.xml",
+      "sha256": "26d3bc65c88324b02aa336ea0a1a32f2228bf6340eb050809607a31d91b2f0a7"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-http-20261007/membership-http-first.txt",
+      "sha256": "58b1e7cfb8d4fee375825ca927dcbfdd157e94f582abd9ea1ca759196f1a902a"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-http-20261007/membership-http-first.xml",
+      "sha256": "431232745050e8b01c3e929be80d8b174383c259152c988673a163e1f03b0ef7"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-customer-http-20261007/receipt.json",
+      "sha256": "651d287667b1d521ca3c12dfd1e63c7123462c83270331812cfc8738cdca73e2"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-library-props-20261007/README.md",
+      "sha256": "e6396b10c2533bca40b33437a0403e63afd820caa6b0d15e059dca439b30f12c"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-library-props-20261007/membership-props-final-sqlite.txt",
+      "sha256": "1f84d0acf1b561a8f12579eee2d8292331fc82c6c7e483dc7dae9b98de27907e"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-library-props-20261007/membership-props-final-sqlite.xml",
+      "sha256": "8c3fa7e359284d3defe0d5b6d334dff02a89bb9b5039f517a223336481c63d55"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-library-props-20261007/membership-props-first.txt",
+      "sha256": "23a638d74038eb884e29829a5eed5023f236fd6c8fa17ea1c29e7d7cc78639b2"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-library-props-20261007/membership-props-first.xml",
+      "sha256": "042921447e8eac64f71d502d2e4cc52ac8400efa1bf0e31ddeb0c1520a279763"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/membership-library-props-20261007/receipt.json",
+      "sha256": "0618d8cb858c23f12cce066f7cd8db6854961bc0966b7bd12ebcafd66e75f2f3"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/notification-recovery-20261007/command-sqlite.txt",
+      "sha256": "a60674734d34e43c57fa7e9784e7dca90e6be43f8f202ff6e1cb08d3a288d159"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/notification-recovery-20261007/command-sqlite.xml",
+      "sha256": "5dd1a72050a7227a34077d2fd87464936245f7d602fc7a5c11150f20f8b0f6a5"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/notification-recovery-20261007/receipt.json",
+      "sha256": "359ab9f906fe890c4754bf4105e02a043bc8feb4aa9b3411e2b28299ec472922"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/notification-recovery-20261007/scanner-sqlite.txt",
+      "sha256": "dc146e4c395c8b1c4f7d1d7bf815391bd30e8a1c1a5568f07b581e759ccc165e"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/notification-recovery-20261007/scanner-sqlite.xml",
+      "sha256": "3ac5f17bbd46ce8bdda7660cc1b934cc67eb6c99f4d1d2b23a99f13acc82c5f6"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/notification-recovery-20261007/sqlite.txt",
+      "sha256": "cfc3181773eca7f79d2d756d45b867b39cddcc84032f9aa434ff1972509f6573"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/notification-recovery-20261007/sqlite.xml",
+      "sha256": "7c0d201d7c154e9c18d99db6cba81964d9b79853727b7b402eedda3b50cc69bb"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/notification-recovery-scan.md",
+      "sha256": "a15b44597cb940db5adc093c2fb18e5ffce9ab56a7f7eef743b7382dd3af7e94"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/production-buyer-reports-20261007/77d-installed-graph.json",
+      "sha256": "b2c1f3fafecee0aef79d27b9b5352e53a47854e8b20d35f9a233c421bcb0c373"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/production-buyer-reports-20261007/77d-mysql.txt",
+      "sha256": "3247443c71e34bde537043d2b5af5d7a7247fbc9720522d3013dc30c3607b3dd"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/production-buyer-reports-20261007/77d-mysql.xml",
+      "sha256": "89786528ba8dd8840606a8fb17713e2487622bfeecb549f0754987e1dde1b787"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/production-buyer-reports-20261007/77d-pint.txt",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/production-buyer-reports-20261007/77d-runtime.json",
+      "sha256": "ba778b924b48ca8ce7682b5f5ac3d5741d5f84ba7d356e044fb0c42d7bc8952a"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/production-buyer-reports-20261007/77d-sqlite.txt",
+      "sha256": "d54d4c2b0ebdafefe9d749d45ec79dc8c7935307da8058059c6100ea5fb4b84a"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/production-buyer-reports-20261007/77d-sqlite.xml",
+      "sha256": "b3789412ece120183070cdfb8d1381d1de6b642930bd9f10714fe9b9e9f95fbd"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/production-buyer-reports-20261007/README.md",
+      "sha256": "1f8c97c60153ecf6d0d9c2ce40e7b6190209786acf8905f1e73914c84e950197"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/production-buyer-reports-20261007/baa4-parent-sqlite.txt",
+      "sha256": "48bfcf1ed2819aaa8f38b44014bbcff077066d78502258a6b6124ad60ddda9b5"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/production-buyer-reports-20261007/baa4-parent-sqlite.xml",
+      "sha256": "63f5de0f37e9a9039acca7b9dc7bbb3082783780174303da64c03b4b1a1da513"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/production-buyer-reports-20261007/baa4-sqlite-21-passed.xml",
+      "sha256": "729528c05ea1a3874178d6ab98400a68aa0c196d30324aed01b1755d5b5aa7ac"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/production-buyer-reports-20261007/initial-sqlite-failed.xml",
+      "sha256": "408ab1547ab53133e9bbb1fb4c711451424c5744e10bc815ec34f24d6ab503ed"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/production-buyer-reports-20261007/mutable-native-predecessor.txt",
+      "sha256": "fd13ae150aea67c36d39819098d124de07aaa8a7ac6d26389b938d133520195f"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/production-buyer-reports-20261007/mutable-native-predecessor.xml",
+      "sha256": "731dc2c6735e780359f849722b8b1297adbac352b4279be7bb4036c2d851c037"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/production-buyer-reports-20261007/receipt.json",
+      "sha256": "91e2220a4d67adc9d7475e01ce11cf334c7162cb45d87b75d667397254386579"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/production-buyer-reports-20261007/second-sqlite-failed.xml",
+      "sha256": "9e23655967c9e78c7e67810dc27739ec1cd38f399174f8c900e6eba5e7d41f4e"
+    },
+    {
+      "status": "A",
+      "path": "docs/verification/production-buyer-reports-20261007/source-receipt-draft.json",
+      "sha256": "329594ee960bc7b115532d8f8f1c10837bfbc9ed7ccfbc854b0eba005ef4e7f2"
+    },
+    {
+      "status": "M",
+      "path": "routes/customer.php",
+      "sha256": "e0bd543ae73e62df12fc07265e845fa070b897dece15a57bf6cd122c32336246"
+    },
+    {
+      "status": "A",
+      "path": "tests/Feature/MembershipCustomerHistoryHttpTest.php",
+      "sha256": "a0d95ed53c18293d917c1a30abd92fbf151fba0b82b8df6d3792d4be9a5d45a7"
+    },
+    {
+      "status": "A",
+      "path": "tests/Feature/MembershipCustomerHistoryTest.php",
+      "sha256": "4e197932a1a23781dcd1c8611d1b6dc099d3c5e2974c53fc14a8ff1555bb36ed"
+    },
+    {
+      "status": "A",
+      "path": "tests/Feature/MembershipCustomerLibraryCapabilityTest.php",
+      "sha256": "655c9f161f9e2e4d46deb14a0a85459a574cac8142af98218a60e58e75c8564f"
+    },
+    {
+      "status": "A",
+      "path": "tests/Feature/ProductionBuyerAssentObservationMigrationTest.php",
+      "sha256": "b33e93511d06200b54f9593ed0a7a67eba6e755257ec01bce9430c1f66f0c9f3"
+    },
+    {
+      "status": "A",
+      "path": "tests/Feature/ProductionBuyerAssentObservationsTest.php",
+      "sha256": "13661ade24fe43cf94db045492acac589d8de8db2b128676fb66838ac88b3b0b"
+    },
+    {
+      "status": "M",
+      "path": "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php",
+      "sha256": "e7798b5c0576bb56b6dbb44dd9f14ac771cfbf572640c877a9927ea70d1157e6"
+    },
+    {
+      "status": "M",
+      "path": "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+      "sha256": "b4388c4c37adeee5da0bb25f16a46b4c5cb4d1a8e20cad3eb251b44b8af6fdd0"
+    },
+    {
+      "status": "M",
+      "path": "tests/Feature/ProductionTrackPolicyEngineTest.php",
+      "sha256": "a2fac268b141f9bb7477069c79ac25fb27993ea01f1c047dd43d2d497915ce96"
+    },
+    {
+      "status": "M",
+      "path": "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+      "sha256": "4b245c4907b8b27596fc13fc28bb91480187254ee186a5eef1e61ebc67047484"
+    },
+    {
+      "status": "A",
+      "path": "tests/Feature/TransactionalNotificationRecoveryCommandTest.php",
+      "sha256": "353313fed4ab6b5801e4660d277231a9ec1f3db782d28b25f5c1fd3c225a1f36"
+    },
+    {
+      "status": "A",
+      "path": "tests/Feature/TransactionalNotificationRecoveryTest.php",
+      "sha256": "c8d53ccbfaaea373913c652b4e569bcb7cf956b7dd2be9bac16ab2ed24e3f837"
+    }
+  ],
+  "ui_review_source_paths_sha256": {
+    "resources/js/Pages/CustomerLibrary.tsx": "5a8a5b32ad25ce71ed76892f92e8841e1a75a4cb17e0863e962b35748145b382",
+    "resources/js/components/OwnedMembershipHistory.tsx": "c066d7251b50a46630b1333df0a1ed0c35309a013e74fd38b1faecf11df32523",
+    "resources/js/lib/membership-history.ts": "63916b77722643c9aba5ed281c0697b07879feabf37871d9d124124d92c4a607",
+    "tests/frontend/membership-history.test.tsx": "bfd57fb41a7a06e6a879380af5b8f8287c53363c0209afd32930aa71583d242c",
+    "vitest.config.ts": "5c3bf6c180bea188e98e69de7fa39e5e6ffde84adbee58e51017d6028d18923a",
+    "resources/js/test/setup.ts": "7af65bf74e01119f207abca6af1eae00aef2bfdb18226a2e273e0b3cd69fea55"
+  },
+  "unchanged_lockfiles_sha256": {
+    "composer.json": "132cb2a16c6ce2960d059cfddecae8e1accf6138a258dd8bab2c0c7b822f5607",
+    "composer.lock": "996bc7f800d5cc6b4312f5303fbd67a5cadd17e0eb640f3e2e94035e713289aa",
+    "package.json": "65db43e1b171566d2d89e075bc4a29af75a82a6782a3313751bb4d7e832a7ae0",
+    "package-lock.json": "6407d3a63e3b6e04f5824f53c41b8dc8a33581f987b21d780c795480122f93ea"
+  },
+  "preserved_dependency_evidence_paths": [
+    "docs/verification/dependency-compatibility-20261007/README.md",
+    "docs/verification/dependency-compatibility-20261007/artifact-sha256.json",
+    "docs/verification/dependency-compatibility-20261007/build.txt",
+    "docs/verification/dependency-compatibility-20261007/changed-lock-identity-first-failure.txt",
+    "docs/verification/dependency-compatibility-20261007/changed-lock-identity-script.txt",
+    "docs/verification/dependency-compatibility-20261007/changed-lock-identity.txt",
+    "docs/verification/dependency-compatibility-20261007/commands.json",
+    "docs/verification/dependency-compatibility-20261007/composer-audit-stderr.txt",
+    "docs/verification/dependency-compatibility-20261007/composer-audit.json",
+    "docs/verification/dependency-compatibility-20261007/composer-install.txt",
+    "docs/verification/dependency-compatibility-20261007/composer-validate.txt",
+    "docs/verification/dependency-compatibility-20261007/copy-upgrade-first-seven.txt",
+    "docs/verification/dependency-compatibility-20261007/copy-upgrade-last-seven.txt",
+    "docs/verification/dependency-compatibility-20261007/copy-upgrade.txt",
+    "docs/verification/dependency-compatibility-20261007/frontend.txt",
+    "docs/verification/dependency-compatibility-20261007/graph-binding.json",
+    "docs/verification/dependency-compatibility-20261007/independent/autoload.txt",
+    "docs/verification/dependency-compatibility-20261007/independent/copy-upgrade.txt",
+    "docs/verification/dependency-compatibility-20261007/independent/graph-review.json",
+    "docs/verification/dependency-compatibility-20261007/independent/harness-failures.txt",
+    "docs/verification/dependency-compatibility-20261007/independent/lock-identity-probe.mjs",
+    "docs/verification/dependency-compatibility-20261007/independent/lock-identity.json",
+    "docs/verification/dependency-compatibility-20261007/independent/receipt.json",
+    "docs/verification/dependency-compatibility-20261007/independent/review.md",
+    "docs/verification/dependency-compatibility-20261007/independent/runtime-profile.json",
+    "docs/verification/dependency-compatibility-20261007/independent/tcpdf.txt",
+    "docs/verification/dependency-compatibility-20261007/independent/tcpdf.xml",
+    "docs/verification/dependency-compatibility-20261007/installed-dom.json",
+    "docs/verification/dependency-compatibility-20261007/installed-php.json",
+    "docs/verification/dependency-compatibility-20261007/native-executable-map.json",
+    "docs/verification/dependency-compatibility-20261007/npm-audit-stderr.txt",
+    "docs/verification/dependency-compatibility-20261007/npm-audit.json",
+    "docs/verification/dependency-compatibility-20261007/npm-ci.txt",
+    "docs/verification/dependency-compatibility-20261007/outcomes.json",
+    "docs/verification/dependency-compatibility-20261007/php-mysql-corrected.txt",
+    "docs/verification/dependency-compatibility-20261007/php-mysql-final.txt",
+    "docs/verification/dependency-compatibility-20261007/php-mysql.txt",
+    "docs/verification/dependency-compatibility-20261007/php-mysql.xml",
+    "docs/verification/dependency-compatibility-20261007/php-sqlite-final.txt",
+    "docs/verification/dependency-compatibility-20261007/php-sqlite-final.xml",
+    "docs/verification/dependency-compatibility-20261007/php-sqlite-first.xml",
+    "docs/verification/dependency-compatibility-20261007/php-sqlite.txt",
+    "docs/verification/dependency-compatibility-20261007/php-sqlite.xml",
+    "docs/verification/dependency-compatibility-20261007/platform.txt",
+    "docs/verification/dependency-compatibility-20261007/raw-output-bytes.json",
+    "docs/verification/dependency-compatibility-20261007/selection-mysql.xml",
+    "docs/verification/dependency-compatibility-20261007/selection-sqlite.xml",
+    "docs/verification/dependency-compatibility-20261007/selection.json",
+    "docs/verification/dependency-compatibility-20261007/sqlite-skips.json",
+    "docs/verification/dependency-compatibility-20261007/typecheck.txt",
+    "docs/dependency-pr-integration.md"
+  ],
+  "excluded_root_owned_paths": [
+    ".github/workflows/focused-feedback.yml",
+    "scripts/ci/focused-tests.py",
+    "scripts/ci/test-focused-tests.py",
+    "docs/dependency-pr-integration.md",
+    "README.md",
+    "docs/development-control.md"
+  ],
+  "historical_test_carry": {
+    "private_source": "192ec8d93f346ba59f07da428e50cbd04513878b",
+    "sqlite_cases": 548,
+    "assertions": 2464,
+    "executed_by": "root before composition; exact copied feature source unchanged here",
+    "ui_source": "29af96ef491c9f56b8e152b7b9ae751577b95767",
+    "cases": 62,
+    "graph": "Fresh current DOM10.4.2",
+    "claim": "Exact UI/harness/package lock digests unchanged; fresh source-bound receipt carried without relabeling execution"
+  },
+  "limitations": [
+    "No new runtime or acceptance execution performed by composition step.",
+    "Root must compose approved guard test correction e955 and controls separately.",
+    "No hosted workflow or publication."
+  ],
+  "baseline_mapping": "Recovered dependency baseline c498006 is exact native merged PR18 main tree; full native SHA binding is root publication metadata.",
+  "dependency_locks_match_private_test_source": true
+}

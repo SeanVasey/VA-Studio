@@ -21,6 +21,34 @@ import xml.etree.ElementTree as ET
 
 
 PHP_TARGETS = {
+    "private-continuation": (
+        "tests/Feature/MembershipCustomerHistoryTest.php",
+        "tests/Feature/MembershipCustomerHistoryHttpTest.php",
+        "tests/Feature/MembershipCustomerLibraryCapabilityTest.php",
+        "tests/Feature/MembershipCreditLedgerTest.php",
+        "tests/Feature/MembershipPrimaryProofTest.php",
+        "tests/Feature/MembershipGrantClockBoundaryTest.php",
+        "tests/Feature/MembershipCreditEngineTest.php",
+        "tests/Feature/MembershipCreditMigrationTest.php",
+        "tests/Feature/CustomerAccountMigrationTest.php",
+        "tests/Feature/TransactionalNotificationRecoveryTest.php",
+        "tests/Feature/TransactionalNotificationRecoveryCommandTest.php",
+        "tests/Feature/TransactionalNotificationTest.php",
+        "tests/Feature/TransactionalNotificationMigrationTest.php",
+        "tests/Feature/ProductionBuyerAssentObservationsTest.php",
+        "tests/Feature/ProductionBuyerAssentObservationMigrationTest.php",
+        "tests/Feature/ProductionTrackPreparationPacketTest.php",
+        "tests/Feature/ProductionTrackPreparationReplayConcurrencyTest.php",
+        "tests/Feature/ProductionTrackPreparationPacketGuardsTest.php",
+        "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+        "tests/Feature/ProductionTrackCapabilitiesTest.php",
+        "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php",
+        "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+        "tests/Feature/ProductionTrackPolicyEngineTest.php",
+        "tests/Feature/ProductionTrackPolicyFinalProofTest.php",
+        "tests/Unit/ProductionTrackPreparationSnapshotTest.php",
+        "tests/Unit/ProductionTrackMachinePolicyTest.php",
+    ),
     "membership-migrations": (
         "tests/Feature/MembershipCreditMigrationTest.php",
         "tests/Feature/CustomerAccountMigrationTest.php",
@@ -236,6 +264,14 @@ FRONTEND_TARGETS = (
     "tests/frontend/editorial-related-tracks.test.tsx",
     "tests/frontend/resumable-media-upload.test.ts",
 )
+FRONTEND_SUBSETS = {
+    "frontend": FRONTEND_TARGETS,
+    "membership-history-frontend": (
+        "tests/frontend/membership-history.test.tsx",
+        "tests/frontend/customer-account.test.tsx",
+        "tests/frontend/owned-order-history.test.tsx",
+    ),
+}
 BROWSER_TARGETS = (
     "tests/browser/license-template-authoring.spec.ts",
     "tests/browser/customer-library-browsing.spec.ts",
@@ -266,7 +302,7 @@ BROWSER_SUBSETS = {
     "browser": BROWSER_TARGETS,
     "bulk-license-browser": ("tests/browser/bulk-license-draft-source.spec.ts",),
 }
-SUITES = (*PHP_TARGETS, "frontend", *BROWSER_SUBSETS)
+SUITES = (*PHP_TARGETS, *FRONTEND_SUBSETS, *BROWSER_SUBSETS)
 ENGINES = ("sqlite", "mysql")
 MAX_FILES = 32
 EVIDENCE = "focused-ci-evidence.json"
@@ -297,8 +333,8 @@ def selection(env: Mapping[str, str]) -> Selection:
         return Selection(suite, engine, "php", PHP_TARGETS[suite])
     if engine != "sqlite":
         raise FocusedError("Frontend/browser modes require engine=sqlite; frontend has no database and the browser wrapper isolates SQLite")
-    if suite == "frontend":
-        return Selection(suite, "none", "frontend", FRONTEND_TARGETS)
+    if suite in FRONTEND_SUBSETS:
+        return Selection(suite, "none", "frontend", FRONTEND_SUBSETS[suite])
     return Selection(suite, "sqlite", "browser", BROWSER_SUBSETS[suite])
 
 

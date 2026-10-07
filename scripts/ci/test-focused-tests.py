@@ -43,6 +43,66 @@ def junit(root, content='<testsuites><testsuite><testcase name="one" assertions=
 
 
 class SelectionTests(unittest.TestCase):
+    def test_membership_history_frontend_is_bounded_and_rejects_mysql(self):
+        selected = focused.selection({"FOCUSED_SUITE": "membership-history-frontend", "FOCUSED_ENGINE": "sqlite"})
+        self.assertEqual(selected.kind, "frontend")
+        self.assertEqual(selected.engine, "none")
+        self.assertEqual(selected.files, (
+            "tests/frontend/membership-history.test.tsx",
+            "tests/frontend/customer-account.test.tsx",
+            "tests/frontend/owned-order-history.test.tsx",
+        ))
+        focused.validate_files(ROOT, selected)
+        with self.assertRaises(focused.FocusedError):
+            focused.selection({"FOCUSED_SUITE": "membership-history-frontend", "FOCUSED_ENGINE": "mysql"})
+        self.assertEqual(len(focused.FRONTEND_TARGETS), 32)
+        self.assertEqual(focused.MAX_FILES, 32)
+        commands = focused.commands(selected)
+        self.assertEqual(commands[0][3:-3], list(selected.files))
+        self.assertIn(["python3", "scripts/ci/scan-client-bundle.py"], commands)
+
+    def test_private_continuation_is_fixed_bounded_and_never_waives_functional_children(self):
+        required = (
+            "tests/Feature/MembershipCustomerHistoryTest.php",
+            "tests/Feature/MembershipCustomerHistoryHttpTest.php",
+            "tests/Feature/MembershipCustomerLibraryCapabilityTest.php",
+            "tests/Feature/MembershipCreditLedgerTest.php",
+            "tests/Feature/MembershipPrimaryProofTest.php",
+            "tests/Feature/MembershipGrantClockBoundaryTest.php",
+            "tests/Feature/MembershipCreditEngineTest.php",
+            "tests/Feature/MembershipCreditMigrationTest.php",
+            "tests/Feature/CustomerAccountMigrationTest.php",
+            "tests/Feature/TransactionalNotificationRecoveryTest.php",
+            "tests/Feature/TransactionalNotificationRecoveryCommandTest.php",
+            "tests/Feature/TransactionalNotificationTest.php",
+            "tests/Feature/TransactionalNotificationMigrationTest.php",
+            "tests/Feature/ProductionBuyerAssentObservationsTest.php",
+            "tests/Feature/ProductionBuyerAssentObservationMigrationTest.php",
+            "tests/Feature/ProductionTrackPreparationPacketTest.php",
+            "tests/Feature/ProductionTrackPreparationReplayConcurrencyTest.php",
+            "tests/Feature/ProductionTrackPreparationPacketGuardsTest.php",
+            "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+            "tests/Feature/ProductionTrackCapabilitiesTest.php",
+            "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php",
+            "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+            "tests/Feature/ProductionTrackPolicyEngineTest.php",
+            "tests/Feature/ProductionTrackPolicyFinalProofTest.php",
+            "tests/Unit/ProductionTrackPreparationSnapshotTest.php",
+            "tests/Unit/ProductionTrackMachinePolicyTest.php",
+        )
+        for engine in focused.ENGINES:
+            selected = focused.selection({"FOCUSED_SUITE": "private-continuation", "FOCUSED_ENGINE": engine})
+            self.assertEqual(selected.kind, "php")
+            self.assertEqual(selected.files, required)
+            self.assertEqual(focused.MAX_FILES, 32)
+            focused.validate_files(ROOT, selected)
+        policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
+        new_classes = {"Tests\\Feature\\" + name for name in (
+            "MembershipCustomerHistoryTest", "MembershipCustomerHistoryHttpTest",
+            "TransactionalNotificationRecoveryTest", "TransactionalNotificationRecoveryCommandTest",
+            "ProductionBuyerAssentObservationsTest", "ProductionBuyerAssentObservationMigrationTest")}
+        self.assertFalse(any(row[0] in new_classes for row in policy["methods"]))
+
     def test_membership_migration_feedback_is_exact_bounded_and_keeps_native_policy(self):
         required = (
         "tests/Feature/MembershipCreditMigrationTest.php",

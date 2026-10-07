@@ -207,7 +207,7 @@ final class MembershipEvidence
         $allowed = [
             'users' => ['id'], 'customer_accounts' => ['id'], 'membership_plans' => ['id'],
             'membership_plan_versions' => ['id', 'membership_plan_id', 'number'],
-            'membership_credit_buckets' => ['id'],
+            'membership_credit_buckets' => ['id', 'customer_account_id'],
             'membership_credit_events' => ['id', 'membership_credit_bucket_id', 'sequence'],
             'audit_events' => ['id', 'subject_type', 'subject_id'],
         ];
