@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="50" assertions="340" errors="0" failures="7" skipped="0" time="10.467879">
+    <testsuite name="Tests\Feature\CustomerListeningNotesTest" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" tests="25" assertions="129" errors="0" failures="7" skipped="0" time="3.001736">
+      <testcase name="test_actual_lyric_notes_persist_encrypted_and_private_export_contains_exact_own_inputs_only" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="63" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="23" time="1.587812"/>
+      <testcase name="test_exact_v1_payload_reads_and_exports_without_rewrite_and_promotes_only_effective_mutation" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="95" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="6" time="0.026617">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningNotesTest::test_exact_v1_payload_reads_and_exports_without_rewrite_and_promotes_only_effective_mutation
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
++    'id' =&gt; 1,
+     'customer_account_id' =&gt; 1,
+     'version' =&gt; 1,
+     'payload' =&gt; 'eyJpdiI6IjFqYUwwbVBuMURSd0tNQklVVkY5eGc9PSIsInZhbHVlIjoiQ0d1MmpRMzF3ZllqckppNWNGcmpiSDB4b1EyUWFNWmlid0w4d2pKUUhZT1Axand6WmxMUloxZnFNYng3WStDZ1k0dS8wUk9EbDlTR0cyUzhVMHdFbVhzanRFRXhXQUhMdExRSUZVQmFNcFlYcFp6T2F5Y0xLS05UYXFNYmdlaytZUTlSWTZVa2hGbFlnMzdiMDY2NGREYUVaNndkODZEQ1NCQzJxRjFGMC9qS05OZTRRc2wvNCtSS3V2SGkrcVBNMmFkR3RiTEh2NHJBdkUyMXlGQVg1TjFEOStUVCtpYTY2WGpRbjdKMHBVRT0iLCJtYWMiOiJmYTM1NjcxMzYyZGQxNjdhMzNlNzMzZDdkMzhlYzIwMWNjYzNmMzAzN2I2NWQ4YTJmMDRkM2U0MzQxOGQyMDdhIiwidGFnIjoiIn0=',
++    'created_at' =&gt; '2026-10-07 07:46:44',
+     'updated_at' =&gt; '2026-10-07 07:46:44',
+-    'created_at' =&gt; '2026-10-07 07:46:44',
+-    'id' =&gt; 1,
+ ]
+
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php:106</failure>
+      </testcase>
+      <testcase name="test_notes_require_existing_owned_references_without_allowing_private_catalog_discovery" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="116" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="16" time="0.962192"/>
+      <testcase name="test_removing_last_retained_reference_prunes_notes_but_shared_reference_preserves_them" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="134" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="4" time="0.023638"/>
+      <testcase name="test_clear_actually_removes_feature_contents_retains_monotonic_revision_and_blocks_stale_resurrection" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="147" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="14" time="0.028004"/>
+      <testcase name="test_clear_empty_absent_library_also_advances_and_leaves_empty_owned_row" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="165" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="6" time="0.018930"/>
+      <testsuite name="Tests\Feature\CustomerListeningNotesTest::test_note_character_byte_utf8_and_control_bounds_are_strict" tests="12" assertions="36" errors="0" failures="0" skipped="0" time="0.195930">
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #0" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.016888"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #1" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.016503"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #2" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.016332"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #3" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.016164"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #4" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.016013"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #5" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.015618"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #6" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.015771"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #7" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.016700"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #8" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.017771"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #9" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.016615"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #10" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.015923"/>
+        <testcase name="test_note_character_byte_utf8_and_control_bounds_are_strict with data set #11" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="181" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.015630"/>
+      </testsuite>
+      <testcase name="test_maximum_utf8_and_count_bounds_are_accepted_without_exceeding_owned_note_capacity" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="189" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="6" time="0.030089"/>
+      <testsuite name="Tests\Feature\CustomerListeningNotesTest::test_malformed_v1_v2_payloads_are_refused_without_replacing_private_contents" tests="6" assertions="18" errors="0" failures="6" skipped="0" time="0.128524">
+        <testcase name="test_malformed_v1_v2_payloads_are_refused_without_replacing_private_contents with data set #0" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="213" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.021439">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningNotesTest::test_malformed_v1_v2_payloads_are_refused_without_replacing_private_contents with data set #0
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
++    'id' =&gt; 1,
+     'customer_account_id' =&gt; 1,
+     'version' =&gt; 2,
+     'payload' =&gt; 'eyJpdiI6IjRlc3ZGU2lSVFVVNC9kUTFqT1pYZEE9PSIsInZhbHVlIjoiVFdvWWZ5TlRZR296eDRtWjRLOFk4RGlrOWlFeDNUdUdybVNiWW5XNnVQV2NSeE50VVFVRGhqTThwY3dSdmlwM24rdEp6bUNqNnNtWmdpUFZ3azlMUUV3VFNzbXQzaExpcFdPTmpyQkdlb0hEV2NDSVZlQjQxOGdLZ2RGY3M5QS8iLCJtYWMiOiJkNTcwNDAxZWUzY2U1YjZmMjRkMGFmNDQ3ZDUwMTA2M2ViNGQ4OTFhMjBiOTM5YzQ5ZGIwYTdmYWE5OThmMDNmIiwidGFnIjoiIn0=',
++    'created_at' =&gt; '2026-10-07 07:46:45',
+     'updated_at' =&gt; '2026-10-07 07:46:45',
+-    'created_at' =&gt; '2026-10-07 07:46:45',
+-    'id' =&gt; 1,
+ ]
+
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php:234</failure>
+        </testcase>
+        <testcase name="test_malformed_v1_v2_payloads_are_refused_without_replacing_private_contents with data set #1" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="213" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.024855">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningNotesTest::test_malformed_v1_v2_payloads_are_refused_without_replacing_private_contents with data set #1
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
++    'id' =&gt; 1,
+     'customer_account_id' =&gt; 1,
+     'version' =&gt; 2,
+     'payload' =&gt; 'eyJpdiI6InZtSm50NlRBOTJteTF6ZzRGVjNWOEE9PSIsInZhbHVlIjoiSUgzMFhhN0N6eTVmdGx4ZHVwT3ZlODdXbUFFeEJ4SGhGekZ4eWt4cXUzOWJmOTdCZW54MGp5TjdkZ3l4aS82QStiMkVWZUFxVG1YZDlDbWlhZTNJSkI4RU1qWm1VMXFGeHg0b0JGWnJIRGM9IiwibWFjIjoiNmNlOTJjZjY4MzNiOWQ0M2ZjNWNhNzc0ZTNjOTMwYmRjNzBiZDFlYTRkNWU2MzQ5OGQwOWY3MDM4MzYzOTAwOSIsInRhZyI6IiJ9',
++    'created_at' =&gt; '2026-10-07 07:46:45',
+     'updated_at' =&gt; '2026-10-07 07:46:45',
+-    'created_at' =&gt; '2026-10-07 07:46:45',
+-    'id' =&gt; 1,
+ ]
+
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php:234</failure>
+        </testcase>
+        <testcase name="test_malformed_v1_v2_payloads_are_refused_without_replacing_private_contents with data set #2" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="213" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.020562">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningNotesTest::test_malformed_v1_v2_payloads_are_refused_without_replacing_private_contents with data set #2
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
++    'id' =&gt; 1,
+     'customer_account_id' =&gt; 1,
+     'version' =&gt; 2,
+     'payload' =&gt; 'eyJpdiI6Im82YzVSOGVpZmZuR29YNThvTVU1VEE9PSIsInZhbHVlIjoiNDQvbFhvNWZoc0FGQkhwSG9OZ1M4em0yK2ovb1VLSjFjYU9BMm5tZjkrZFQ2VC85UDBhcUE1OXVEK3F5dEIxalhycko2RUFVZ3V1eHlDdldUNjVtaVg4TlUxblVtRWVCeFhlWnpyNTY2WWpCTVFld3NnVnA5blpnZVNYOGRQQ0t5R2pHMHVXVVNoN2lBWXUwcWlmTzVkcVBQZHVVdk44TThkenZySUVuamNvPSIsIm1hYyI6IjBiYzA4NGY0MTQwOGQ1MTYxMDk5Y2Q1N2ZmYmFkOWU3NTJjYjU3NzJkNTQwODdiNThiYWFhZmYxMTY5MTQwOGEiLCJ0YWciOiIifQ==',
++    'created_at' =&gt; '2026-10-07 07:46:45',
+     'updated_at' =&gt; '2026-10-07 07:46:45',
+-    'created_at' =&gt; '2026-10-07 07:46:45',
+-    'id' =&gt; 1,
+ ]
+
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php:234</failure>
+        </testcase>
+        <testcase name="test_malformed_v1_v2_payloads_are_refused_without_replacing_private_contents with data set #3" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="213" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.021846">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningNotesTest::test_malformed_v1_v2_payloads_are_refused_without_replacing_private_contents with data set #3
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
++    'id' =&gt; 1,
+     'customer_account_id' =&gt; 1,
+     'version' =&gt; 2,
+     'payload' =&gt; 'eyJpdiI6InBJU0lyamRxbEp6bStsV21iVGV4d2c9PSIsInZhbHVlIjoiMmltRE5kYzZGeUZGTVE4Q1docjFCNEJQL1dGZFJHWjFhbUY5RkJTaE5WTk9UTk9ZcGgvMTFObnlCbWlrdVZoOFdWTGxKSEtvam1KTTlYVXlJSVZ1UXFzODIrRFhyWFc4VWVHd2RPSE5EY2R3aXFTa0hpMXRzOHZocFNCY0pTOGhkTWFyRG5Vb2huMUNJVjFtM0x5QURYSWNQenZBOUZhMnhHMmRtd1c5UXhXc0dJK2tRWUZiQnlnUllxRnlDSndsejVDRExxWjZUQWREL0lOTGcwdXFNSFFCMWRIR2h4aHZKMmIxZnZJdUIxOD0iLCJtYWMiOiI2MmEwMzdlZTEwYTQzZWI2ZDNiNWQ2OWQ5ODMzZWNiNjVjMmE5YzVjNDUxOWE4OWUyYzI3NjQ1NmRjYjYyNTU1IiwidGFnIjoiIn0=',
++    'created_at' =&gt; '2026-10-07 07:46:45',
+     'updated_at' =&gt; '2026-10-07 07:46:45',
+-    'created_at' =&gt; '2026-10-07 07:46:45',
+-    'id' =&gt; 1,
+ ]
+
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php:234</failure>
+        </testcase>
+        <testcase name="test_malformed_v1_v2_payloads_are_refused_without_replacing_private_contents with data set #4" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="213" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.020476">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningNotesTest::test_malformed_v1_v2_payloads_are_refused_without_replacing_private_contents with data set #4
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
++    'id' =&gt; 1,
+     'customer_account_id' =&gt; 1,
+     'version' =&gt; 2,
+     'payload' =&gt; 'eyJpdiI6IlVBeUMzcE1QOXRnSGFjZjhkN1c2Qmc9PSIsInZhbHVlIjoiK24zQlZmQTFNb1AxVFVrNFZpdzJyRUFlbFpDUUphZm5XejJDdHZrYytCZEV5ZjFoUnJBRmZGQ05wQ2hWVmtuVzdRZzVudm5YUVVndmVQTHcrUG1nelFiQ1Zad2JNdXhlK2ZOaXpEblNUVkE4QVdVc3RkQkJZaHBPcHN6OG5EdEdxNC9nOWdoOXNvQWM2bXRFUUZDZWRza1RLZEpuOXhZRjVlMkRMaW1lTWJ1b3BsdjhTZzltdmVwZk1oUTh1Z3c1NUVZN05EK2ZCLys3dWZrN2hXempWUT09IiwibWFjIjoiZDkyNWNiNDY4ODE4ZjRlZTUxYWIyMzZkNzU4YWU4OTY1ZmFlZjcxNGNiMzY4YjkzNWVmZDlhOWI5M2M0ZTllZSIsInRhZyI6IiJ9',
++    'created_at' =&gt; '2026-10-07 07:46:45',
+     'updated_at' =&gt; '2026-10-07 07:46:45',
+-    'created_at' =&gt; '2026-10-07 07:46:45',
+-    'id' =&gt; 1,
+ ]
+
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php:234</failure>
+        </testcase>
+        <testcase name="test_malformed_v1_v2_payloads_are_refused_without_replacing_private_contents with data set #5" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php" line="213" class="Tests\Feature\CustomerListeningNotesTest" classname="Tests.Feature.CustomerListeningNotesTest" assertions="3" time="0.019346">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\CustomerListeningNotesTest::test_malformed_v1_v2_payloads_are_refused_without_replacing_private_contents with data set #5
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
++    'id' =&gt; 1,
+     'customer_account_id' =&gt; 1,
+     'version' =&gt; 2,
+     'payload' =&gt; 'eyJpdiI6IkZ4VTc0a2VCMlJydkV1UGRDRjR3b2c9PSIsInZhbHVlIjoiUlkyQlBBSVdGUkE2ejFRek40eGIvdWhrSWdOdkJVb2p3eS9BVE02VWdDWS9pa2c5VVRJOVpGQXdLaFo4amlDZjVtNUs0eXZ4M0d3K2dJckhYc2VFdUhOYU9SVHVRQnJPZmdzeDN4dDFtRTUyVlB6OStmUFJaNk5DVUJKNDBxalU0cW9rV1ZER3JMQTRXekM3QlN0aU9HWFE5eklxMFhVN2wzajRxM3pUYjZjPSIsIm1hYyI6IjMxMzM3YzY2MGNiMTI3YjhiMTViYTE3MGZjOThjYjVhNzNkNzgyZDk2MjgxYzhhNzNlMmQyZGU1ZWIwZTc1NzYiLCJ0YWciOiIifQ==',
++    'created_at' =&gt; '2026-10-07 07:46:45',
+     'updated_at' =&gt; '2026-10-07 07:46:45',
+-    'created_at' =&gt; '2026-10-07 07:46:45',
+-    'id' =&gt; 1,
+ ]
+
+/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningNotesTest.php:234</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\CustomerListeningLibraryTest" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" tests="25" assertions="211" errors="0" failures="0" skipped="0" time="7.466143">
+      <testcase name="test_favorites_and_ordered_named_playlists_persist_with_encrypted_private_names" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="35" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="23" time="2.032066"/>
+      <testcase name="test_duplicates_are_noops_and_stale_mutations_cannot_overwrite_fresh_state" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="75" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="9" time="1.042552"/>
+      <testcase name="test_cross_account_playlist_ids_never_reveal_or_modify_foreign_state" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="91" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="8" time="0.022982"/>
+      <testsuite name="Tests\Feature\CustomerListeningLibraryTest::test_read_and_change_recheck_disabled_revoked_unverified_admin_and_credential_changed_access" tests="6" assertions="12" errors="0" failures="0" skipped="0" time="0.109577">
+        <testcase name="test_read_and_change_recheck_disabled_revoked_unverified_admin_and_credential_changed_access with data set #0" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="107" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="2" time="0.017769"/>
+        <testcase name="test_read_and_change_recheck_disabled_revoked_unverified_admin_and_credential_changed_access with data set #1" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="107" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="2" time="0.016866"/>
+        <testcase name="test_read_and_change_recheck_disabled_revoked_unverified_admin_and_credential_changed_access with data set #2" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="107" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="2" time="0.018119"/>
+        <testcase name="test_read_and_change_recheck_disabled_revoked_unverified_admin_and_credential_changed_access with data set #3" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="107" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="2" time="0.018058"/>
+        <testcase name="test_read_and_change_recheck_disabled_revoked_unverified_admin_and_credential_changed_access with data set #4" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="107" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="2" time="0.018665"/>
+        <testcase name="test_read_and_change_recheck_disabled_revoked_unverified_admin_and_credential_changed_access with data set #5" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="107" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="2" time="0.020101"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\CustomerListeningLibraryTest::test_fresh_availability_hides_withdrawn_or_unready_metadata_and_keeps_removal_usable" tests="2" assertions="12" errors="0" failures="0" skipped="0" time="2.095636">
+        <testcase name="test_fresh_availability_hides_withdrawn_or_unready_metadata_and_keeps_removal_usable with data set #0" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="135" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="6" time="1.037881"/>
+        <testcase name="test_fresh_availability_hides_withdrawn_or_unready_metadata_and_keeps_removal_usable with data set #1" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="135" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="6" time="1.057754"/>
+      </testsuite>
+      <testcase name="test_unknown_draft_and_falsely_published_tracks_are_not_savable" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="158" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="7" time="0.025399"/>
+      <testcase name="test_favorite_playlist_and_per_playlist_track_bounds_fail_without_changing_retained_state" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="168" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="102" time="1.003498"/>
+      <testsuite name="Tests\Feature\CustomerListeningLibraryTest::test_invalid_commands_are_refused_without_creating_state" tests="9" assertions="27" errors="0" failures="0" skipped="0" time="0.155380">
+        <testcase name="test_invalid_commands_are_refused_without_creating_state with data set #0" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="197" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="3" time="0.019439"/>
+        <testcase name="test_invalid_commands_are_refused_without_creating_state with data set #1" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="197" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="3" time="0.016439"/>
+        <testcase name="test_invalid_commands_are_refused_without_creating_state with data set #2" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="197" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="3" time="0.018410"/>
+        <testcase name="test_invalid_commands_are_refused_without_creating_state with data set #3" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="197" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="3" time="0.017148"/>
+        <testcase name="test_invalid_commands_are_refused_without_creating_state with data set #4" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="197" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="3" time="0.016404"/>
+        <testcase name="test_invalid_commands_are_refused_without_creating_state with data set #5" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="197" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="3" time="0.016725"/>
+        <testcase name="test_invalid_commands_are_refused_without_creating_state with data set #6" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="197" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="3" time="0.017315"/>
+        <testcase name="test_invalid_commands_are_refused_without_creating_state with data set #7" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="197" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="3" time="0.015552"/>
+        <testcase name="test_invalid_commands_are_refused_without_creating_state with data set #8" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="197" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="3" time="0.017948"/>
+      </testsuite>
+      <testcase name="test_corrupt_encrypted_state_fails_closed_and_is_never_replaced_by_empty_lists" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="218" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="5" time="0.021300"/>
+      <testcase name="test_encrypted_state_is_bound_to_its_account_and_database_revision" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="227" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="4" time="0.027920"/>
+      <testcase name="test_access_withdrawn_by_a_projection_callback_refuses_the_projection_and_rolls_back_the_save" file="/workspace/VA-Studio-customer-listening-notes/tests/Feature/CustomerListeningLibraryTest.php" line="239" class="Tests\Feature\CustomerListeningLibraryTest" classname="Tests.Feature.CustomerListeningLibraryTest" assertions="2" time="0.929832"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

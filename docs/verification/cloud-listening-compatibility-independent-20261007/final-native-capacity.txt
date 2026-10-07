@@ -1,0 +1,10 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-listening-compatibility-independent/docs/verification/cloud-listening-compatibility-independent-20261007/native-capacity-selection.xml
+
+...                                                                 3 / 3 (100%)
+
+Time: 00:21.240, Memory: 81.00 MB
+
+[30;42mOK (3 tests, 111 assertions)[0m

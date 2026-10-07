@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-notes-independent/docs/verification/cloud-listening-notes-independent-20261007/mysql-selection.xml" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="8.003932">
+    <testsuite name="Independent listening notes capacity and export" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="8.003932">
+      <testsuite name="Tests\IndependentListeningNotes\ListeningNotesCapacityCanaryTest" file="/workspace/VA-Studio-notes-independent/docs/verification/cloud-listening-notes-independent-20261007/ListeningNotesCapacityCanaryTest.php" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="8.003932">
+        <testcase name="test_real_oversized_encrypted_text_intent_is_refused_before_sql_and_retains_exportable_state" file="/workspace/VA-Studio-notes-independent/docs/verification/cloud-listening-notes-independent-20261007/ListeningNotesCapacityCanaryTest.php" line="20" class="Tests\IndependentListeningNotes\ListeningNotesCapacityCanaryTest" classname="Tests.IndependentListeningNotes.ListeningNotesCapacityCanaryTest" assertions="0" time="8.003932">
+          <error type="RuntimeException">Tests\IndependentListeningNotes\ListeningNotesCapacityCanaryTest::test_real_oversized_encrypted_text_intent_is_refused_before_sql_and_retains_exportable_state
+RuntimeException: Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/Encrypter.php:61
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php:32
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1140
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:939
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1846
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:240
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:211
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1487
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1466
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php:1130
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:700
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:331
+/workspace/VA-Studio-notes-independent/docs/verification/cloud-listening-notes-independent-20261007/ListeningNotesCapacityCanaryTest.php:29
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

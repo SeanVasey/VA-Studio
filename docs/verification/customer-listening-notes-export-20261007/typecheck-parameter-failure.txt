@@ -1,0 +1,5 @@
+
+> typecheck
+> tsc --noEmit
+
+resources/js/components/CustomerListeningLibrary.tsx(44,113): error TS7006: Parameter 'item' implicitly has an 'any' type.

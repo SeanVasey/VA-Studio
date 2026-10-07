@@ -1,0 +1,10 @@
+{
+  "pinned_commit": "ca3b1fa7eb60edd2228b73742da33179228a277e",
+  "pinned_path": "app/Domain/Customers/Listening/ListeningLibrary.php",
+  "fixture_path": "tests/Fixtures/customer-listening-v1/ListeningLibrary.php.txt",
+  "sha256": "30aca52bd3d15e314bdfa6bad146870991a1269a4178cd64d9c27b7e376aa2a7",
+  "bytes": 11417,
+  "exact_git_blob_bytes": true,
+  "execution_transform": "strip initial <?php and rename final class ListeningLibrary to PreviousListeningLibrary; otherwise unchanged trusted test source",
+  "scope": "actual prior ListeningLibrary class with current unchanged auth/model dependencies; not an old deployment or a rolling-upgrade approval"
+}

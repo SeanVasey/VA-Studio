@@ -1,0 +1,148 @@
+{
+  "reviewed_commit": "d412759ab193f7c7a5cbd2de91eb83320cbc9618",
+  "reviewed_tree": "07a264ddb0a231d7e85ca0f8839383e7efc3fa2f",
+  "author_commit": "49b9154756b96b2ae11de1c63d75efc274e2f326",
+  "parent_approved_commit": "ff4602cc849577232a6ab532d96edd772cc1b428",
+  "changed_paths_count": 14,
+  "bindings": [
+    {
+      "path": "app/Domain/Customers/Listening/ListeningEvidence.php",
+      "git_blob": "af04d52897ae591475882e5680cd2900ec9de42b",
+      "sha256": "fbd6bc655b50ed16d717121f5c34db8f0d33da4e9ecf0b42754d77cadb2727a3",
+      "bytes": 10802
+    },
+    {
+      "path": "app/Domain/Customers/Listening/ListeningLibrary.php",
+      "git_blob": "efc5ed5daa985c8aa29fde143260136d7cdc4309",
+      "sha256": "cb7ebe24aa6acf92c0a1dff217d22985b983ae4dbf8d7487d7a051f27ad2979e",
+      "bytes": 17665
+    },
+    {
+      "path": "app/Domain/Customers/Listening/ListeningRollout.php",
+      "git_blob": "7006db214ef7e19f16e60959cfe037279bc3b55a",
+      "sha256": "87889d622833bf06a4a6c23b0aa6d662ee48e1bfff1766eb7f5107507632eedd",
+      "bytes": 1180
+    },
+    {
+      "path": "app/Domain/Customers/Listening/SavedListeningLibrary.php",
+      "git_blob": "4f2cba6a93cb3430890cba7f676195bfe2cb3528",
+      "sha256": "a16d0d1fc1095563ffee8409633ea1a53a1f2dc34718f5ef0fba0cd4706d863c",
+      "bytes": 997
+    },
+    {
+      "path": "app/Http/Controllers/CustomerSessionController.php",
+      "git_blob": "6b82e0e070815eb8d36f4f44a4d0fe3ca2ed5def",
+      "sha256": "9063fc5e3a44e43606d2c907a9fcfd39566ec1ae5c6a1bf3bb45fce899985dfc",
+      "bytes": 6678
+    },
+    {
+      "path": "bootstrap/app.php",
+      "git_blob": "ad1074da34581130a90c7ca61b528c29c6c5b42a",
+      "sha256": "e9fcaa1432324ca8cc7e3edab0c5ae978a75ba1aed5683f1a3230196c2fd4ce5",
+      "bytes": 12876
+    },
+    {
+      "path": "composer.json",
+      "git_blob": "cbb669c31bb1610a4b9cd93b2762905a82a7312c",
+      "sha256": "132cb2a16c6ce2960d059cfddecae8e1accf6138a258dd8bab2c0c7b822f5607",
+      "bytes": 3051
+    },
+    {
+      "path": "composer.lock",
+      "git_blob": "9e58027dcd989282b026d56347e26ea867723db9",
+      "sha256": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9",
+      "bytes": 430440
+    },
+    {
+      "path": "config/customer-listening.php",
+      "git_blob": "bd9b1e46a01f8a1f0c85efea80ccf6703b28af7a",
+      "sha256": "98bd11fa066501b5d37a5073b3fad56af70e771efa4016d37c15e1d35de506d0",
+      "bytes": 382
+    },
+    {
+      "path": "package-lock.json",
+      "git_blob": "614350366e7af397c14603dae9272082ecfae066",
+      "sha256": "6407d3a63e3b6e04f5824f53c41b8dc8a33581f987b21d780c795480122f93ea",
+      "bytes": 88363
+    },
+    {
+      "path": "package.json",
+      "git_blob": "1c5a39755658dde7d625498391b4acf640994b5a",
+      "sha256": "65db43e1b171566d2d89e075bc4a29af75a82a6782a3313751bb4d7e832a7ae0",
+      "bytes": 1395
+    },
+    {
+      "path": "phpunit.xml",
+      "git_blob": "e7f0a48df619422a48dd39ceac63c30f998fe389",
+      "sha256": "493369cfb7feea104da4bec214c2cc6526ca2f1b9d937c50a2961fc59cb61aaf",
+      "bytes": 1322
+    },
+    {
+      "path": "resources/js/Pages/CustomerLibrary.tsx",
+      "git_blob": "9e058aabcc7520d3f7771cb6911898efc7c9df31",
+      "sha256": "fe19c03c50d1d3d413b252ecfd3e37a2eca847c0cb20700963204c7758f31ba7",
+      "bytes": 4821
+    },
+    {
+      "path": "resources/js/components/CustomerListeningLibrary.tsx",
+      "git_blob": "f90487a4c0b5ea27ea107b133896a55d129e669c",
+      "sha256": "9dd0f16c4d50be3c785a2dfcd6e81590b7bdda9a69398c29243484a29893a06a",
+      "bytes": 24352
+    },
+    {
+      "path": "tests/Feature/CustomerListeningCompatibilityTest.php",
+      "git_blob": "104b3676dcc602ee3bdd893f1d59c5fccad38ebe",
+      "sha256": "7346456e0f5718fe3e328f3751412db949e74c8b8099a64ce29b862a58d5be70",
+      "bytes": 13055
+    },
+    {
+      "path": "tests/Feature/CustomerListeningExportHttpTest.php",
+      "git_blob": "6b1856b0860a21e919442f161a733882826e963d",
+      "sha256": "024eaee79a36336a6b0e06c9ee6d164805848c41bb77c3a41986989806480c56",
+      "bytes": 6961
+    },
+    {
+      "path": "tests/Feature/CustomerListeningNotesBoundaryTest.php",
+      "git_blob": "ebd6e517c0e213574f720eaf11778a73032e3fd6",
+      "sha256": "184596af8f0078b7a6f3429506ce4f84bac83496fb39b53c702551f5f40be4d5",
+      "bytes": 6679
+    },
+    {
+      "path": "tests/Feature/CustomerListeningNotesCapacityTest.php",
+      "git_blob": "db7a29159e6cd4c0abb48e6d096c2d669254ede0",
+      "sha256": "9eebdcaa709afdf99d60423968b3526611cc843a8580b18921d2f986da2f0bc8",
+      "bytes": 7617
+    },
+    {
+      "path": "tests/Feature/CustomerListeningNotesTest.php",
+      "git_blob": "b73a9f917f8435af1be2c811f9142e7ccd85b706",
+      "sha256": "0d6e7e76623d3f1da9c7436ae3aaf09c7bdb0b371eadbc965af51d157fa62ec9",
+      "bytes": 13122
+    },
+    {
+      "path": "tests/Fixtures/customer-listening-v1/ListeningLibrary.php.txt",
+      "git_blob": "2a4db92c0d7ea2548f0e1f80aac5bd4f351dcc63",
+      "sha256": "30aca52bd3d15e314bdfa6bad146870991a1269a4178cd64d9c27b7e376aa2a7",
+      "bytes": 11417
+    },
+    {
+      "path": "tests/Support/ListeningNotesFixtures.php",
+      "git_blob": "c5c1073fc28f5a235ce440ce2ad97d6f0b28006d",
+      "sha256": "f7c2d001f448f3937b008fb55bffa6650b38dc65eead292ec8ce95b390cbfdc3",
+      "bytes": 310
+    },
+    {
+      "path": "tests/Support/PreviousListeningV1.php",
+      "git_blob": "36b1a0497004e249a7f914e11c27d633ee6f1a66",
+      "sha256": "7e5403a27df33c4cc5f9a6abed6ac4db5b66e513e82881aaedfa61c12db6eaeb",
+      "bytes": 1065
+    },
+    {
+      "path": "tests/frontend/customer-listening-notes.test.tsx",
+      "git_blob": "03744cc62a1faed99791f2da0d2e21cb25e8ec69",
+      "sha256": "59526c131e37be4c667c51bf03b075c30511d58f52c1d97312d6af998f72e33d",
+      "bytes": 15519
+    }
+  ],
+  "root_delta": "only synthetic ListeningNotesFixtures::enablePromotion() in CustomerListeningExportHttpTest login helper; no runtime delta from author49"
+}

@@ -1,0 +1,10 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-notes-independent/docs/verification/cloud-listening-notes-independent-20261007/mysql-selection.xml
+
+...                                                                 3 / 3 (100%)
+
+Time: 00:09.176, Memory: 79.00 MB
+
+[30;42mOK (3 tests, 30 assertions)[0m

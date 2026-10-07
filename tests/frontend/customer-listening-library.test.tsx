@@ -114,7 +114,7 @@ describe('saved tracks and named playlists', () => {
     expect(screen.getByRole('link', { name: 'Open a fresh sign-in page' })).toHaveAttribute('href', '/account/sign-in');
   });
   it('bounds streamed bytes and clears state after a malformed private envelope', async () => {
-    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(' '.repeat(512 * 1024 + 1), { headers: { 'Content-Type': 'application/json' } }))
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(' '.repeat(3 * 1024 * 1024 + 1), { headers: { 'Content-Type': 'application/json' } }))
       .mockResolvedValueOnce(response({ library: empty(), private: 'PRIVATE' }));
     render(<CustomerListeningLibrary />); fireEvent.click(screen.getByRole('button', { name: 'Open saved tracks' })); await screen.findByRole('alert');
     fireEvent.click(screen.getByRole('button', { name: 'Open saved tracks' })); await waitFor(() => expect(fetcher).toHaveBeenCalledTimes(2));
