@@ -1,0 +1,188 @@
+diff --git a/app/Console/Commands/DiscoverySitemapBuild.php b/app/Console/Commands/DiscoverySitemapBuild.php
+index 3b62759..5eff913 100644
+--- a/app/Console/Commands/DiscoverySitemapBuild.php
++++ b/app/Console/Commands/DiscoverySitemapBuild.php
+@@ -22,7 +22,12 @@ final class DiscoverySitemapBuild extends Command
+                 }
+                 $request = $store->newRequest();
+                 $path = $this->option('new-request');
+-                $file = fopen($path, 'x');
++                $previousMask = umask(0077);
++                try {
++                    $file = fopen($path, 'x');
++                } finally {
++                    umask($previousMask);
++                }
+                 if ($file === false) {
+                     throw new \LogicException;
+                 }
+diff --git a/app/Domain/Catalog/DiscoverySitemap/SitemapStore.php b/app/Domain/Catalog/DiscoverySitemap/SitemapStore.php
+index 6e4389a..372721a 100644
+--- a/app/Domain/Catalog/DiscoverySitemap/SitemapStore.php
++++ b/app/Domain/Catalog/DiscoverySitemap/SitemapStore.php
+@@ -230,7 +230,7 @@ final class SitemapStore
+         $records = null;
+         $xml = $this->transaction(function (PDO $pdo) use ($origin, &$records): string {
+             $pointer = $this->pointer($pdo, true);
+-            SitemapException::require(is_string($pointer['generation_id']), 'unavailable', 404);
++            SitemapException::require(is_string($pointer['generation_id']), 'no_current_generation', 404);
+             $generation = $this->generation($pdo, $pointer['generation_id'], true);
+             SitemapException::require($generation !== null, 'corrupt_generation');
+             $header = $this->header($generation);
+@@ -262,7 +262,8 @@ final class SitemapStore
+     {
+         $this->schema->assertOwned($pdo);
+         SitemapException::require($this->pointer($pdo) === $records['pointer'] && $this->generation($pdo, $records['generation']['id']) === $records['generation'], 'changed_manifest');
+-        $this->assertConfiguration($records['header']['configuration_hash'], $records['header']['expires_at']);
++        // An expired generation is a harmless omission only after epoch and config remain authentic.
++        $this->fence($pdo, $records['header']['epoch'], $records['header']['configuration_hash'], $records['header']['expires_at'], false);
+     }
+ 
+     private function producer(string $sealed): array
+@@ -486,6 +487,7 @@ final class SitemapStore
+     private function assertConfiguration(string $configuration, int $expires): void
+     {
+         SitemapConfiguration::assertEnabled();
+-        SitemapException::require(hash_equals($configuration, SitemapConfiguration::hash()) && CarbonImmutable::instance(now())->utc()->getTimestamp() < $expires, 'expired_configuration');
++        SitemapException::require(hash_equals($configuration, SitemapConfiguration::hash()), 'changed_configuration');
++        SitemapException::require(CarbonImmutable::instance(now())->utc()->getTimestamp() < $expires, 'expired_generation');
+     }
+ }
+diff --git a/app/Http/Controllers/PublicDiscoveryController.php b/app/Http/Controllers/PublicDiscoveryController.php
+index 315d753..6bfedef 100644
+--- a/app/Http/Controllers/PublicDiscoveryController.php
++++ b/app/Http/Controllers/PublicDiscoveryController.php
+@@ -17,7 +17,10 @@ final class PublicDiscoveryController extends Controller
+             try {
+                 return $this->response(app(SitemapStore::class)->currentIndexXml(), 'application/xml; charset=UTF-8');
+             } catch (SitemapException $error) {
+-                return $this->response('', 'application/xml; charset=UTF-8', $error->status);
++                if (! in_array($error->reason, ['no_current_generation', 'expired_generation'], true)) {
++                    return $this->response('', 'application/xml; charset=UTF-8', $error->status);
++                }
++                // The editorial family is independently available when no authentic track generation is current.
+             } catch (\Throwable) {
+                 return $this->response('', 'application/xml; charset=UTF-8', 503);
+             }
+diff --git a/tests/Feature/DiscoverySitemapReviewRegressionTest.php b/tests/Feature/DiscoverySitemapReviewRegressionTest.php
+new file mode 100644
+index 0000000..a01fbc2
+--- /dev/null
++++ b/tests/Feature/DiscoverySitemapReviewRegressionTest.php
+@@ -0,0 +1,116 @@
++<?php
++
++namespace App\Console\Commands;
++
++use Tests\Feature\DiscoverySitemapReviewRegressionTest;
++
++/** Observe the actual exclusive create before the command's following chmod. */
++function fopen(string $filename, string $mode): mixed
++{
++    $file = \fopen($filename, $mode);
++    if (DiscoverySitemapReviewRegressionTest::$observeCreate && is_resource($file)) {
++        DiscoverySitemapReviewRegressionTest::$modeAtCreate = fstat($file)['mode'] & 0777;
++    }
++
++    return $file;
++}
++
++namespace Tests\Feature;
++
++use App\Domain\Catalog\Discovery\DiscoveryEpoch;
++use App\Domain\Catalog\DiscoverySitemap\SitemapStore;
++use Illuminate\Support\Facades\Artisan;
++use Illuminate\Support\Facades\DB;
++use Tests\Support\FinalizationDatabaseMigrations;
++use Tests\TestCase;
++
++class DiscoverySitemapReviewRegressionTest extends TestCase
++{
++    use FinalizationDatabaseMigrations;
++
++    public static bool $observeCreate = false;
++
++    public static ?int $modeAtCreate = null;
++
++    protected function setUp(): void
++    {
++        parent::setUp();
++        config(['app.key' => 'base64:'.base64_encode(str_repeat('s', 32)), 'app.url' => 'https://synthetic.example', 'discovery-sitemap.enabled' => true]);
++        $this->travelTo(now()->startOfSecond());
++    }
++
++    protected function tearDown(): void
++    {
++        $this->app?->instance('env', 'testing');
++        parent::tearDown();
++    }
++
++    public function test_no_current_track_generation_preserves_editorial_sitemap_entry(): void
++    {
++        $this->app->instance('env', 'production');
++        $this->get('/sitemap.xml')->assertOk()->assertSee('https://synthetic.example/site-pages-sitemap.xml', false)->assertDontSee('track-sitemaps', false);
++    }
++
++    public function test_expired_authentic_track_generation_preserves_editorial_sitemap_entry(): void
++    {
++        $this->publish();
++        $this->travel(3600)->seconds();
++        $this->get('/sitemap.xml')->assertOk()->assertSee('https://synthetic.example/site-pages-sitemap.xml', false)->assertDontSee('track-sitemaps', false);
++    }
++
++    public function test_expiry_cannot_hide_changed_configuration(): void
++    {
++        $this->publish();
++        $this->travel(3600)->seconds();
++        config(['app.url' => 'https://changed.synthetic.example']);
++        $this->get('/sitemap.xml')->assertStatus(503)->assertDontSee('site-pages-sitemap', false)->assertDontSee('track-sitemaps', false);
++    }
++
++    public function test_expiry_cannot_hide_a_changed_source_epoch(): void
++    {
++        $this->publish();
++        $this->travel(3600)->seconds();
++        DB::connection()->getPdo()->exec('UPDATE '.DiscoveryEpoch::TABLE.' SET epoch = epoch + 1 WHERE id = 1');
++        $this->get('/sitemap.xml')->assertStatus(503)->assertDontSee('site-pages-sitemap', false)->assertDontSee('track-sitemaps', false);
++    }
++
++    public function test_expiry_cannot_hide_a_corrupt_current_pointer(): void
++    {
++        $this->publish();
++        $this->travel(3600)->seconds();
++        DB::table('discovery_sitemap_current')->where('id', 1)->update(['revision' => 2, 'certificate' => '{}', 'seal' => str_repeat('0', 64)]);
++        $this->get('/sitemap.xml')->assertStatus(503)->assertDontSee('site-pages-sitemap', false)->assertDontSee('track-sitemaps', false);
++    }
++
++    public function test_capability_file_is_private_at_exclusive_create_and_caller_umask_is_restored(): void
++    {
++        $path = sys_get_temp_dir().'/synthetic-discovery-permission-'.bin2hex(random_bytes(10));
++        $original = umask(0022);
++        self::$observeCreate = true;
++        self::$modeAtCreate = null;
++        try {
++            $this->assertSame(0, Artisan::call('discovery-sitemap:build', ['--new-request' => $path]));
++            $this->assertSame(0600, self::$modeAtCreate, 'Observe the actual create before any subsequent chmod.');
++            $this->assertSame(0022, umask());
++            $request = file_get_contents($path);
++            $this->assertNotSame('', $request);
++            $this->assertStringNotContainsString($request, Artisan::output());
++        } finally {
++            self::$observeCreate = false;
++            umask($original);
++            if (is_file($path)) {
++                unlink($path);
++            }
++        }
++    }
++
++    private function publish(): void
++    {
++        $this->app->instance('env', 'production');
++        $store = app(SitemapStore::class);
++        $request = $store->newRequest();
++        $store->start($request);
++        $store->step($request, 1);
++        $store->publish($request, 0);
++    }
++}

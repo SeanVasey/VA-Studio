@@ -1,0 +1,15 @@
+{
+  "prior_executable": "dc0eb1b65b26eab5e4c0f965a852f2c6b42eb25e",
+  "current_executable": "4fe8274204d70aa9ed371ba98e7e434c53c104b5",
+  "prior_review": "81fbea7ccb333c9b42d294c634e4e584d645443b",
+  "verified_prior_bindings": 31,
+  "unchanged_bindings": 28,
+  "changed_paths": [
+    "app/Console/Commands/DiscoverySitemapBuild.php",
+    "app/Domain/Catalog/DiscoverySitemap/SitemapStore.php",
+    "app/Http/Controllers/PublicDiscoveryController.php"
+  ],
+  "schema_source_exact": "07bfbe9a9a8867df875bb99973b724bc67316eae",
+  "snapshot_file_byte_exact": true,
+  "five_preworker_method_bodies_unchanged": true
+}
