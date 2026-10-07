@@ -637,6 +637,14 @@
     [
       "Tests\\Feature\\ServiceProjectCurrentAuthorityTest",
       "test_temporary_users_copy_cannot_mask_permanent_required_mfa_withdrawal_after_real_audit_callback"
+    ],
+    [
+      "Tests\\Feature\\NativeSchemaIsolationTest",
+      "test_dependencies_reaching_the_selected_schema_are_still_refused"
+    ],
+    [
+      "Tests\\Feature\\NativeSchemaIsolationTest",
+      "test_same_named_objects_in_a_parallel_schema_do_not_block_a_fresh_migration"
     ]
   ]
 }

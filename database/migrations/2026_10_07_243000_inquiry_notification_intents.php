@@ -431,20 +431,42 @@ return new class extends Migration
             if ($guard->TRIGGER_SCHEMA === $database && in_array($guard->TRIGGER_NAME, $ownedGuards, true)) {
                 continue;
             }
-            if ($this->referencesTable($guard->ACTION_STATEMENT)) {
+            if ($this->dependsOnTable($guard->TRIGGER_SCHEMA, $guard->ACTION_STATEMENT, $database)) {
                 $this->unexpected('external trigger reference');
             }
         }
         foreach (DB::table('information_schema.VIEWS')->get() as $view) {
-            if ($this->referencesTable($view->VIEW_DEFINITION)) {
+            if ($this->dependsOnTable($view->TABLE_SCHEMA, $view->VIEW_DEFINITION, $database)) {
                 $this->unexpected('external view reference');
             }
         }
         foreach (DB::table('information_schema.ROUTINES')->get() as $routine) {
-            if ($this->referencesTable($routine->ROUTINE_DEFINITION)) {
+            if ($this->dependsOnTable($routine->ROUTINE_SCHEMA, $routine->ROUTINE_DEFINITION, $database)) {
                 $this->unexpected('external routine reference');
             }
         }
+    }
+
+    /**
+     * Unqualified names in a stored trigger, routine or view resolve to that object's
+     * own schema, so another schema reaches this table only by naming this database
+     * or through dynamic SQL. Same-named objects in a parallel schema are not dependents.
+     */
+    private function dependsOnTable(mixed $schema, mixed $sql, string $database): bool
+    {
+        if (! $this->referencesTable($sql)) {
+            return false;
+        }
+        if (strtolower((string) $schema) === strtolower($database)) {
+            return true;
+        }
+        foreach ([$database, 'prepare'] as $name) {
+            if (preg_match('/(?<![a-z0-9_])'.preg_quote($name, '/').'(?![a-z0-9_])/i', $sql) === 1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function referencesTable(mixed $sql): bool

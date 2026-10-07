@@ -181,7 +181,7 @@ final class IdentityMigrationOwnership
                     continue;
                 }
                 if (($object['TRIGGER_SCHEMA'] === $this->database($pdo) && in_array($object['EVENT_OBJECT_TABLE'], $tables, true))
-                    || $this->references($object['ACTION_STATEMENT'], $tables)) {
+                    || $this->dependsOn($pdo, $object['TRIGGER_SCHEMA'], $object['ACTION_STATEMENT'], $tables)) {
                     $this->reject();
                 }
             }
@@ -191,9 +191,9 @@ final class IdentityMigrationOwnership
                     $this->reject();
                 }
             }
-            foreach (['VIEWS' => 'VIEW_DEFINITION', 'ROUTINES' => 'ROUTINE_DEFINITION'] as $catalog => $column) {
-                foreach ($pdo->query('SELECT '.$column.' FROM information_schema.'.$catalog)->fetchAll(PDO::FETCH_ASSOC) as $object) {
-                    if ($this->references($object[$column], $tables)) {
+            foreach (['VIEWS' => ['TABLE_SCHEMA', 'VIEW_DEFINITION'], 'ROUTINES' => ['ROUTINE_SCHEMA', 'ROUTINE_DEFINITION']] as $catalog => [$schema, $column]) {
+                foreach ($pdo->query('SELECT '.$schema.','.$column.' FROM information_schema.'.$catalog)->fetchAll(PDO::FETCH_ASSOC) as $object) {
+                    if ($this->dependsOn($pdo, $object[$schema], $object[$column], $tables)) {
                         $this->reject();
                     }
                 }
@@ -479,6 +479,19 @@ final class IdentityMigrationOwnership
         if ($this->query($pdo, "SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? AND CONSTRAINT_TYPE='CHECK'", [$table]) !== []) {
             $this->reject();
         }
+    }
+
+    /**
+     * Unqualified names in a stored trigger, routine or view resolve to that object's
+     * own schema, so another schema reaches these tables only by naming this database
+     * or through dynamic SQL. Same-named objects in a parallel schema are not dependents.
+     */
+    private function dependsOn(PDO $pdo, mixed $schema, mixed $sql, array $tables): bool
+    {
+        $database = $this->database($pdo);
+
+        return $this->references($sql, $tables) && (strtolower((string) $schema) === strtolower($database)
+            || $this->references($sql, [$database, 'prepare']));
     }
 
     private function references(mixed $sql, array $tables): bool

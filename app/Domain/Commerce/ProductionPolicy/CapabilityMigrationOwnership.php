@@ -162,7 +162,8 @@ final class CapabilityMigrationOwnership
             if ($guard->TRIGGER_SCHEMA === $database && isset($guards[$guard->TRIGGER_NAME])) {
                 continue;
             }
-            if (($guard->TRIGGER_SCHEMA === $database && in_array($guard->EVENT_OBJECT_TABLE, $tables, true)) || $this->references($guard->ACTION_STATEMENT, $tables)) {
+            if (($guard->TRIGGER_SCHEMA === $database && in_array($guard->EVENT_OBJECT_TABLE, $tables, true))
+                || $this->dependsOn($guard->TRIGGER_SCHEMA, $guard->ACTION_STATEMENT, $tables, $database)) {
                 $this->reject('external or additional table guard');
             }
         }
@@ -172,12 +173,12 @@ final class CapabilityMigrationOwnership
             }
         }
         foreach (DB::table('information_schema.VIEWS')->get() as $view) {
-            if ($this->references($view->VIEW_DEFINITION, $tables)) {
+            if ($this->dependsOn($view->TABLE_SCHEMA, $view->VIEW_DEFINITION, $tables, $database)) {
                 $this->reject('external view reference');
             }
         }
         foreach (DB::table('information_schema.ROUTINES')->get() as $routine) {
-            if ($this->references($routine->ROUTINE_DEFINITION, $tables)) {
+            if ($this->dependsOn($routine->ROUTINE_SCHEMA, $routine->ROUTINE_DEFINITION, $tables, $database)) {
                 $this->reject('external routine reference');
             }
         }
@@ -252,6 +253,17 @@ final class CapabilityMigrationOwnership
         if ($foreign !== [] || DB::table('information_schema.TABLE_CONSTRAINTS')->where('TABLE_SCHEMA', $database)->where('TABLE_NAME', $table)->where('CONSTRAINT_TYPE', 'CHECK')->exists()) {
             $this->reject('missing or additional table constraint');
         }
+    }
+
+    /**
+     * Unqualified names in a stored trigger, routine or view resolve to that object's
+     * own schema, so another schema reaches these tables only by naming this database
+     * or through dynamic SQL. Same-named objects in a parallel schema are not dependents.
+     */
+    private function dependsOn(mixed $schema, mixed $sql, array $tables, string $database): bool
+    {
+        return $this->references($sql, $tables) && (strtolower((string) $schema) === strtolower($database)
+            || $this->references($sql, [$database, 'prepare']));
     }
 
     private function references(mixed $sql, array $tables): bool
