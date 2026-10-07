@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ServiceProjectCommittedSchemaIndependentTest" file="/workspace/VA-Studio-support-session-independent/tests/Feature/ServiceProjectCommittedSchemaIndependentTest.php" tests="1" assertions="4" errors="0" failures="1" skipped="0" time="22.549902">
+    <testcase name="test_permanent_view_cannot_replace_the_captured_source_event_table_after_commit" file="/workspace/VA-Studio-support-session-independent/tests/Feature/ServiceProjectCommittedSchemaIndependentTest.php" line="29" class="Tests\Feature\ServiceProjectCommittedSchemaIndependentTest" classname="Tests.Feature.ServiceProjectCommittedSchemaIndependentTest" assertions="4" time="22.549902">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ServiceProjectCommittedSchemaIndependentTest::test_permanent_view_cannot_replace_the_captured_source_event_table_after_commit
+The original complete base table cannot be replaced by an unowned durable view.
+
+/workspace/VA-Studio-support-session-independent/tests/Feature/ServiceProjectCommittedSchemaIndependentTest.php:51</failure>
+    </testcase>
+  </testsuite>
+</testsuites>
