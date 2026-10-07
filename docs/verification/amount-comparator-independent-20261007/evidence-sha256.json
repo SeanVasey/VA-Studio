@@ -1,0 +1,21 @@
+{
+  "ComparatorIsolatedSQLiteCanaryTest.php": "9bb8392e0dad90e2dbe0fe2ab7a020fce837bfd12d732f5fa16676bc93751f00",
+  "ComparatorPrimitiveCanaryTest.php": "5a389d5ccced0e00bee9800e4cf965d49bea00de9cff5ccf9cce4022afbf1fe6",
+  "REVIEW.md": "54ee0aad408bdf32f4eb061c9403722e3d871a9668c36f2de60618feaab89a7c",
+  "SOURCE-REVIEW.md": "4056f1d62bbb2fceebbd5b5fbf6de7c190faabd505e7f4d19dc1ff5aa2eb3632",
+  "autoload-origin.txt": "940b82eccf9b526d3092614aa042c7f09f27aedc9d09b701b18a4a1181ff792f",
+  "autoload.txt": "94ad0a30cf44098f989d9e4df065086af0fe29ef47d75661e089de52ce91bc2f",
+  "graph.json": "d6c8dd6491bbfe22b0d98ebfdf105c610c588c6b8b431f857b652fbb708e2407",
+  "mysql-config.xml": "33799aeea6e7ac3b3d4bae7b92738e932f077897371e6338fef75566bf0ca72c",
+  "mysql-harness.py": "35bdde4f03a9d7a23d90337a77a938c1044f297553e0afe38d13eaee73ac854a",
+  "mysql-harness.sha256": "8366568f6dff371d183d24221c26ef386a48fa98d425a697b8a4d0154ef59591",
+  "mysql-server.txt": "5ebd63efee3bd19d9821bf610c75bafe92b4962ea16bc8c680d78e03390dd9d3",
+  "mysql.txt": "ace41c327b06ea9aa74d8efe651e33a4d62a6a115337095bea80a051119064d1",
+  "mysql.xml": "4e3e078af7fea9fc7f8e1ab996e532f155921d267c66a15bf49bab3432576270",
+  "outcomes.json": "a61648bcbd260f6fa679e386545dafbb5cc758a2adb34a408b4a5328de777521",
+  "raw-output-companions.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+  "source-bound.json": "262140df99c6cc099e3edc8d15c7c12f7202a9f74af02c98c625d6a058a7af0f",
+  "sqlite-config.xml": "3bfb179c57fd51ae7bbba0a95920ffb55c12039634fbc2fa51a29f7f887c2d9a",
+  "sqlite.txt": "59c2c435baf7e18146b42b21d885a0726fbc7715fb9c11a775112f3944a56caf",
+  "sqlite.xml": "3f24051ef3c3c22275e8200dea21860067e0cba13433d22e6696f304769c4587"
+}

@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"tests\/Feature\/ProductionAmountInputConsistencyAccessTest.php","fixers":["class_attributes_separation","unary_operator_spaces","not_operator_with_successor_space"]}]}

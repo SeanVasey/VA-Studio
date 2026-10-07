@@ -1,0 +1,17 @@
+{
+  "AmountRequirementsIsolatedSQLiteCanaryTest.php": "01437632af6a306a4b98012a8aadfbea3664468593e0ed629c616e850821b827",
+  "README.md": "5483660eab13b85f90e728cbd962be3292a65125a23ca017121a601e930ae3dd",
+  "installed-graph.json": "472168afe296f499f52d4cb5a67c57d445b2eb519880e156773c734f9c311e71",
+  "mysql-execution.json": "cb718827cf6732921c8dd6311c7957df25e08f1aedb2cf0f7f189f64c145a0c3",
+  "mysql-selection.xml": "62b09c4c0e0125ca2f989ae81b52bae38c42a4191ba5004bd2eeefbef6b7ab00",
+  "mysql-server.txt": "4ab23cd4ecb123f94d7b5b83eb5f8ba3b9dc6df4a6717e83865510097346f67f",
+  "mysql.txt": "160b85919ba4b52fd28c3779587932ea57fc0e88216ad536ccfe6a4fb3fa8870",
+  "mysql.xml": "a4f52b8199eb53c744c9abe86030d33b5047ac4bdde10b264fa04467369569f6",
+  "native-harness.py": "35bdde4f03a9d7a23d90337a77a938c1044f297553e0afe38d13eaee73ac854a",
+  "review-receipt.json": "617c3c83e95b4c7bab97df37d2935406acd661734c668252222a2f009f520345",
+  "source-binding.json": "1e6e5c1d36f992f3885bf2824b054d44c3cb45fcb0994b1a3358d26eeba4a23e",
+  "sqlite-execution.json": "45304220f4d2e068ea7136f905be3955ed8b03a63c2b1d9aedf243040d3751df",
+  "sqlite-selection.xml": "f6e88cf6f8982f77076f3f152f0ade37da284e3544f591dad3a7bcef2e026e00",
+  "sqlite.txt": "ebb8b1add9e9ac5e2009b1ea908fb05ad4e62e83513c24a086f3acfb271e2f61",
+  "sqlite.xml": "4856485490f5db385575846c0c7997376b08744729a3509ccd16f81305da7fe3"
+}

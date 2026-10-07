@@ -1,0 +1,33 @@
+{
+  "disposition": "approved focused development integration",
+  "reviewed_source": "eab36455dff392e429d751488ae4c17f076e6296",
+  "reviewed_tree": "5f6281c0be8a8243ef8f49c7681912be95d40d0c",
+  "initial_invocation": {
+    "tests": 54,
+    "passed": 53,
+    "assertions": 158,
+    "errors": 1,
+    "failures": 0,
+    "skipped": 0,
+    "result": "failed",
+    "reason": "Reviewer decoy fixture reached current Gate authorization refusal before intended primary proof"
+  },
+  "corrected_targeted_canary": {
+    "tests": 1,
+    "assertions": 4,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "result": "passed"
+  },
+  "distinct_cases_with_passing_evidence": 54,
+  "passing_assertions_across_invocations": 162,
+  "installed_package_identities": 158,
+  "findings": [],
+  "raw_failed_run_retained": true,
+  "product_or_author_assertion_changes": false,
+  "native_mysql": false,
+  "browser": false,
+  "full_acceptance": false,
+  "hosted_dispatch": false
+}

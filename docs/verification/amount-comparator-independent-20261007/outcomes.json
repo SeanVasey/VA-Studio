@@ -1,0 +1,47 @@
+{
+  "source": "4eb0ebe90de695aad5a2851022de185881424e9a",
+  "tree": "a5e7fe3d890c6a68790d8cee6fdc32397f5ade56",
+  "independent_results": {
+    "sqlite": {
+      "name": "/workspace/scratch/2876616e88c3/VA-Studio-amount-comparator-independent/comparator-sqlite.phpunit.xml",
+      "tests": "70",
+      "assertions": "698",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "22.053607"
+    },
+    "mysql": {
+      "name": "/workspace/scratch/2876616e88c3/VA-Studio-amount-comparator-independent/comparator-mysql.phpunit.xml",
+      "tests": "15",
+      "assertions": "112",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "104.817885"
+    }
+  },
+  "sqlite_partition": {
+    "author_pure": "51/548",
+    "author_actual_access": "15/113",
+    "own_explicit_isolated_sqlite": "2/13",
+    "own_pure_canaries": "2/24"
+  },
+  "mysql_partition": "15 actual default MySQL access cases/112 assertions; no pure-unit repetition or SQLite switch",
+  "durability": {
+    "server": "8.4.11",
+    "flush_log_at_commit": 1,
+    "sync_binlog": 1,
+    "doublewrite": "ON",
+    "log_bin": true
+  },
+  "own_graph": 158,
+  "own_setup": "Package directories borrowed immutably through symlinks; own composer installed metadata/autoload regenerated and app origin reflected in own worktree. No inode-heavy vendor copies.",
+  "failures": "No test/setup failures in these invocations. Prior unrelated amount review launch failure remains preserved in d4e4b63; source contains no repairs.",
+  "author_evidence_received": "c94c1d0f59a4a84dfdd34ca8dc1a3dbf2ac7d129; results are separately authored, not independent execution",
+  "commands": {
+    "sqlite": "php -r '$GLOBALS[\"_composer_autoload_path\"] = getcwd().\"/vendor/autoload.php\"; require \"vendor/phpunit/phpunit/phpunit\";' -- -c comparator-sqlite.phpunit.xml --log-junit docs/verification/amount-comparator-independent-20261007/sqlite.xml",
+    "mysql": "VA_MYSQL_DIAGNOSTIC_LOG=.../mysql-server.txt python mysql-runtime/run-tests.py -- php -r '$GLOBALS[\"_composer_autoload_path\"] = getcwd().\"/vendor/autoload.php\"; require \"vendor/phpunit/phpunit/phpunit\";' -- -c comparator-mysql.phpunit.xml --log-junit docs/verification/amount-comparator-independent-20261007/mysql.xml"
+  },
+  "untested": "No full Foundation/browser/native-concurrency/provider/merchant acceptance; changed migration composition needs a fresh combined guard/bookkeeping gate."
+}
