@@ -97,7 +97,13 @@ final class ListeningEvidence
     private function table(string $table): string
     {
         $qualified = $this->driver === 'sqlite' ? 'main."'.$table.'"' : '`'.str_replace('`', '``', $this->database).'`.`'.$table.'`';
-        if ($this->driver === 'mysql') {
+        if ($this->driver === 'sqlite') {
+            $statement = $this->primary->prepare('SELECT COUNT(*) FROM sqlite_temp_master WHERE lower(name)=?');
+            $statement->execute([$table]);
+            if ((int) $statement->fetchColumn() !== 0) {
+                throw new ListeningException(503);
+            }
+        } else {
             $schema = (array) $this->primary->query('SHOW CREATE TABLE '.$qualified)->fetch(PDO::FETCH_ASSOC);
             if (str_contains(strtoupper((string) ($schema['Create Table'] ?? '')), 'CREATE TEMPORARY TABLE')) {
                 throw new ListeningException(503);
