@@ -1,0 +1,5 @@
+1) Tests\Feature\StripeCapabilityPreflightTest::test_each_malformed_value_is_blocked_without_echoing_it@origin localhost with data (['https://localhost'], 'return_origin_https')
+2) Tests\Feature\StripeCapabilityPreflightTest::test_each_malformed_value_is_blocked_without_echoing_it@origin loopback ip with data (['https://127.0.0.1'], 'return_origin_https')
+3) Tests\Feature\StripeCapabilityPreflightTest::test_each_malformed_value_is_blocked_without_echoing_it@origin invalid host with data (['https://-'], 'return_origin_https')
+FAILURES!
+Tests: 7, Assertions: 48, Failures: 3.
