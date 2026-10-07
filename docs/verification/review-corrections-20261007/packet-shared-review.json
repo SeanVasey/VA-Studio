@@ -1,0 +1,225 @@
+{
+  "schema": 1,
+  "verdict": "approved-for-focused-development-integration",
+  "scope": "packet replay shared composition and exact evidence carry",
+  "source": "0916f78f843626eac2b9126504d9773c02d21e5e",
+  "tree": "6712ec499f84393e1c32fb2cfe0c4db0b782e60d",
+  "baseline": "211577eece5c4f9a3c708db25e4ad67d4462721e",
+  "author": "7a202e98296d10ec96dee11803433dd8f5391cab",
+  "ordered_parents": [
+    "a1a835ac7e3b9cd16f337bacbacf20bb28643a53",
+    "7a202e98296d10ec96dee11803433dd8f5391cab"
+  ],
+  "actual_sqlite_source": "a1a835ac7e3b9cd16f337bacbacf20bb28643a53",
+  "actual_native_source": "7a202e98296d10ec96dee11803433dd8f5391cab",
+  "sole_post_sqlite_delta": "tests/Support/ProductionTrackPreparationReplayRace.php",
+  "no_application_or_assertion_change_after_sqlite": true,
+  "native_helper_output_not_executed_by_sqlite_skips": true,
+  "all_six_author_paths_exact": true,
+  "shared_paths": [
+    "scripts/ci/database-sqlite-skips.json",
+    "scripts/ci/focused-tests.py",
+    "scripts/ci/test-focused-tests.py"
+  ],
+  "changed_paths": [
+    "app/Domain/Commerce/ProductionPreparation/ProductionTrackPreparationPackets.php",
+    "docs/verification/production-track-preparation-packets.md",
+    "scripts/ci/database-sqlite-skips.json",
+    "scripts/ci/focused-tests.py",
+    "scripts/ci/test-focused-tests.py",
+    "tests/Feature/ProductionTrackPreparationPacketTest.php",
+    "tests/Feature/ProductionTrackPreparationReplayConcurrencyTest.php",
+    "tests/Support/ProductionTrackPreparationReplayRace.php",
+    "tests/Support/production-track-preparation-replay-worker.php"
+  ],
+  "tracked_paths": 1610,
+  "unchanged_baseline_paths": 1601,
+  "all_tracked_source_sha256_verified": true,
+  "all_membership_dependencies_unchanged": true,
+  "membership_actual_execution_not_repeated_or_relabeled_from_211577": true,
+  "other_prior_selector_tuples_preserved": 12,
+  "production_preparation_original_nine_plus_exact_one_file": true,
+  "max_files": 32,
+  "all_prior_148_native_pairs_preserved": true,
+  "native_policy_methods": 150,
+  "new_exact_native_methods": [
+    [
+      "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest",
+      "test_changed_capture_cannot_recover_winner_in_either_worker_order"
+    ],
+    [
+      "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest",
+      "test_same_capture_miss_gap_replays_exact_packet_in_both_commit_orders"
+    ]
+  ],
+  "all_40_original_acceptance_criteria_status_dependencies_unchanged": true,
+  "workflow_security_locks_config_frontend_unchanged": true,
+  "fresh_discovery": {
+    "files": 10,
+    "cases": 273,
+    "case_identity_sha256": "034154a45717ffc25c5bf98b6b2baeb3323afcc583acdc17d94ddedca66d7723",
+    "group_identity_sha256": "a1406fe450cdce8dd53bab5f361491507a56d59ba36fc05ac990a5750cb2a4ba"
+  },
+  "sqlite": {
+    "reported_cases": 273,
+    "executed_cases": 269,
+    "skipped_cases": 4,
+    "skipped_ids": [
+      "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest::test_changed_capture_cannot_recover_winner_in_either_worker_order#worker one first",
+      "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest::test_changed_capture_cannot_recover_winner_in_either_worker_order#worker zero first",
+      "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest::test_same_capture_miss_gap_replays_exact_packet_in_both_commit_orders#worker one first",
+      "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest::test_same_capture_miss_gap_replays_exact_packet_in_both_commit_orders#worker zero first"
+    ],
+    "assertions": 823,
+    "failures": 0,
+    "errors": 0,
+    "warning_evidence": "not represented by JUnit; existing PHPUnit-warning exit flag retained"
+  },
+  "native": {
+    "reported_cases": 4,
+    "executed_cases": 4,
+    "skipped_cases": 0,
+    "skipped_ids": [],
+    "assertions": 412,
+    "failures": 0,
+    "errors": 0,
+    "warning_evidence": "not represented by JUnit; existing PHPUnit-warning exit flag retained"
+  },
+  "four_native_exact_users_primary_waits_and_committed_misses_verified": true,
+  "four_raw_worker_witnesses_verified": true,
+  "installed_dependencies": {
+    "package_count": 158,
+    "installed_identity_sha256": "fa4e51a585ac7d9278b6a1890c86a4e10b109e7f37aef36eca97bff718ccb093",
+    "composer_lock_sha256": "51e9c3cc1073e96a1c130376e1ab9980765a5c441c0dcd2a5454fd0909406962"
+  },
+  "independent_reflected_origins": 15,
+  "independent_selector_controls": {
+    "source": "a1a835ac7e3b9cd16f337bacbacf20bb28643a53",
+    "passed": 47,
+    "bytes_identical_in_final_source": true
+  },
+  "guard_negative_canaries": [
+    {
+      "mutation": "unchanged",
+      "guard_tests": 1,
+      "guard_failures": 0,
+      "guard_errors": 0,
+      "passed": true,
+      "source_and_actual_policy_unmodified": true
+    },
+    {
+      "mutation": "extra_packet_waiver",
+      "guard_tests": 1,
+      "guard_failures": 1,
+      "guard_errors": 0,
+      "passed": false,
+      "source_and_actual_policy_unmodified": true
+    },
+    {
+      "mutation": "missing_allowed_method",
+      "guard_tests": 1,
+      "guard_failures": 1,
+      "guard_errors": 0,
+      "passed": false,
+      "source_and_actual_policy_unmodified": true
+    },
+    {
+      "mutation": "doubled_namespace",
+      "guard_tests": 1,
+      "guard_failures": 1,
+      "guard_errors": 0,
+      "passed": false,
+      "source_and_actual_policy_unmodified": true
+    }
+  ],
+  "root_controls_inspected": {
+    "source": "a1a835ac7e3b9cd16f337bacbacf20bb28643a53",
+    "selector": 47,
+    "cadence": 14,
+    "partition": 36,
+    "receipt": 34,
+    "all_passed": true
+  },
+  "remaining_shared_source_blockers": [],
+  "publication_still_requires": [
+    "independent sensitive packet approval",
+    "fresh cheap preflight on final PR head"
+  ],
+  "old_preflight_not_reused": "37547488659",
+  "tracked_worktree_clean": true,
+  "known_untracked_execution_configurations": [
+    "?? phpunit-membership-regression-mysql.xml",
+    "?? phpunit-membership-regression-sqlite.xml"
+  ],
+  "no_reviewer_source_edit_product_suite_native_execution_hosted_dispatch_or_publication": true,
+  "production_commerce_cutover_and_full_acceptance_deferred": true,
+  "artifacts_sha256": {
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/autoload-origins.json": "d94913aef2ffb6e8c2a6895cdc2772b13341323f3f4e46fe2fcf30fa7ee9dad7",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/config.xml": "a7998cb2923d9e250c05e5c565ad5710454622fc8151d88e2a27ec40b380fda7",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/controls.json": "3a200c1163f29bea79d159171587797154d1bd0c51b132aeea44df355e6f275b",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/final-source-carry.json": "579fd884da69062ee90a9b8acd5a7bafe9399b15ab73b0c4056dd67f4f35fa05",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/results.xml": "75ecdd694e368888df2b8a0ba30d646120da2701b5814d38ee026c8033a01196",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/run.json": "bffd8bdcab04acd83bb5865e4f0419c91e54e9a1e4041484524f98d09d2598d1",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/run.log": "a0fbe72985dc41833c4a14bf0cf39544a5d89a0b5caf45ee2b19dd85d54c948e",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/source-carry.json": "31e2e15e272aac20ca20da18c850c960fb6e15da63010fa06c60ae6f8db99707",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/source.json": "c52722a6865af9868ef658da0bd1bbdae482093a90259c86457816587d21a8bd",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/test-database-receipts.py.log": "3fe172511e7f58a261d29bf9bf43743a0e269ec3e26be9b82e0235f96ed98800",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/test-focused-tests.py.log": "9403d468ceb6470edfbd67a5be26f16a19d0cbffe62193f461e20aa4717365de",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/test-phpunit-shards.py.log": "0bc266e3409a4509828639c370e8f289ea0a36c540427cf868cf2ecfa35acfdf",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/test-workflow-cadence.py.log": "c9811dcd7d51683ba5e61910b5aa26e91e8766a287b6a6f52a04bac8ac9f3a3d",
+    "/workspace/scratch/2876616e88c3/preparation-replay-composed-evidence/verified-receipt.json": "52f36a03d95cb1df4819ed78b4cbf9fa942725fdfe425227fb64e40412ea5870",
+    "/workspace/scratch/2876616e88c3/preparation-replay-shared-review/capture-origins.php": "6063feac9384942f61782dc5094b9df0a99b204474abebdba7f7f613703f4909",
+    "/workspace/scratch/2876616e88c3/preparation-replay-shared-review/check-native-guard.py": "1787b0d700c49b9d12a9c835dba4e55325d8cda29403b0c146a911c80e5174a0",
+    "/workspace/scratch/2876616e88c3/preparation-replay-shared-review/composition-0916f78.json": "2a97685d3afb07a1c802fa57b2575284256af496766a26ee8867cd4980c3a2f6",
+    "/workspace/scratch/2876616e88c3/preparation-replay-shared-review/composition-a1a835a.json": "8cabaf933339560a59a23f25f4fb000e2a536885f70e769a5040b501fdf38f0a",
+    "/workspace/scratch/2876616e88c3/preparation-replay-shared-review/discovery-0916f78.log": "59bc566d13c8391c49154fb92156df115b7d57bb62fa6a28684ef0bf06213122",
+    "/workspace/scratch/2876616e88c3/preparation-replay-shared-review/discovery-0916f78.xml": "78e038865c1cd0bd5d725c2cfeec28d45f54e0b79de8497771e5af4c84212bfc",
+    "/workspace/scratch/2876616e88c3/preparation-replay-shared-review/discovery-config.xml": "ccbfeb3b76cde66205ff621ae264d8437097089a65c7e1902170f316ef724dec",
+    "/workspace/scratch/2876616e88c3/preparation-replay-shared-review/focused-controls-a1a835a.log": "33f3faa64d70733ba4d8da7a4cf2851f7a0dd77819f78ff368b922f98dfe400a",
+    "/workspace/scratch/2876616e88c3/preparation-replay-shared-review/inspect-shared-source.py": "27774aef746c6f2f14bd8ecdfeba0a8db6570287d287dfb92c24628e9fc78e36",
+    "/workspace/scratch/2876616e88c3/preparation-replay-shared-review/native-guard-canaries.json": "83774bf92e153f32c4aeed537777f1b43946e47a7bfbd6210e4b30686aeeb80b",
+    "/workspace/scratch/2876616e88c3/preparation-replay-shared-review/native-guard-doubled_namespace.log": "311fb813eef23df7429139cd358b569b138c5b0cdd3db3d24e4f8fc4f140d373",
+    "/workspace/scratch/2876616e88c3/preparation-replay-shared-review/native-guard-extra_packet_waiver.log": "b92c69ae711f7e3700326cf67008e3b1b4f08e64632f8c7f1b16fc243f1cd245",
+    "/workspace/scratch/2876616e88c3/preparation-replay-shared-review/native-guard-missing_allowed_method.log": "b9ab565f74a739f39067e634fbbad2dcd3138e012b769cbaaba0d938ed309a3a",
+    "/workspace/scratch/2876616e88c3/preparation-replay-shared-review/native-guard-unchanged.log": "44cac71d886243940c7666d01ea98cafc3061e440c7d9f3915ba8821c49e89af",
+    "/workspace/scratch/2876616e88c3/preparation-replay-shared-review/origins-0916f78.json": "4a891cb08e7aa7483caaa219ab7a02c8c286ba2775d1c3209f496548800922d2",
+    "/workspace/scratch/2876616e88c3/preparation-replay-shared-review/origins-a1a835a.json": "8640d29db5423b5d03f69859c27fc77ae724310a69d3c64335b6647fd57f2f8a",
+    "/workspace/scratch/2876616e88c3/preparation-replay-shared-review/review-0916f78.md": "b4a6de6044eb03b195c12fc149a8a42eb73dcc00447a379f48e2a547f565d6f3",
+    "/workspace/scratch/2876616e88c3/preparation-replay-shared-review/validate-final-evidence.py": "7fc59e2d1340ca3494adc2768cf5879978f742a85095c38cd9f3ec27d1065251",
+    "/workspace/scratch/2876616e88c3/preparation-replay-shared-review/validated-evidence-0916f78.json": "18ea03ebb941925f2341ccb3603b07151dad2649d9b5d6db8923dc22c122b378",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/final-autoload.json": "8501361bdd9fbe8656f0b23b83701dfea57952a6b161c342d7c55ba6002b00c1",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/final-native.log": "bf800a32e7bd6ec07459123b623fcb75218fc07cbebef86defb52beffb442730",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/final-native.xml": "3eab265743e86e9e982a6e95936e7967e1ba19fe23d56347895b0747f5fdd913",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/final-pint.log": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/final-source-after.json": "d8f14d3d394b661343f81a903f3474ac969b2f2e3fa76e9e2369a7b828b63b2b",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/final-source-before.json": "d8f14d3d394b661343f81a903f3474ac969b2f2e3fa76e9e2369a7b828b63b2b",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/final-syntax.log": "1c63bff0fea9d304a846dbcc1b215ba8ac8df791f95ddcd2c221c033a728d222",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/fix-first-interleaving.log": "34e2c9da71b9280adcca9fe727f77ef8395a422d839807f331a1502463da5335",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/fix-first-interleaving.xml": "1ac4f256585e9f2ecf9811ec0374fcdeb84ca876594bd25e56c6de14d4314a92",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/freeze-receipt.json": "391049718959b184da02d207adba18c1163f387d6d76ec2000bff8ffc64b5c83",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/frozen-behavior-sqlite.log": "3fb05e1ebf63ed1562681f4ea4bb7890bb9f15d13d27c70cd86dceb8f9953b27",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/frozen-behavior-sqlite.xml": "d2c695239537e88df0b22d6c3d0334e615864c0f6a028e63eed82df350f03217",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/frozen-native.log": "6babd78e99eaf8d517d7e69bc2086e78e161955833c215fc0510b758ad52374d",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/frozen-native.xml": "5cb477ba7acc6b6a24baa141da0ae7f99e168f8de00323f0959041352e6f2b51",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/native-fixture-successor.patch": "b93de1e3a7a5e5f082c75eea79d905e0331f0a58adf403a10e67e26026cff43c",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/native-worker-witnesses.json": "b3fa2da8ead13345c66d81848048d62195944fa859f20b053fffa94076dde90d",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/red-interleaving.log": "cdf33978ccb10bf8f963d627f77f352d26f7989a0642c56551e8a0523f63580a",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/red-interleaving.xml": "3a68dee5eabf2380244c250f8ae16768ff86bd4ec032e07135748f6ca756abfb",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/red-native.log": "7d61fb035a58e7c9d45674cff5894f4d102c796f79ba59b465136eeaffa483dc",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/red-native.xml": "630794da681f24f54e3a7f9ab1c0876120933c1ec5a50dfe7d41780801770c43",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/red-source-after.json": "4cfa6708ee2ff649e4134f69ece02bef63000131c8535da4484c5213c7d72dfa",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/red-source-before.json": "4cfa6708ee2ff649e4134f69ece02bef63000131c8535da4484c5213c7d72dfa",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/runtime-equivalence.json": "eda6163be8f972dad82194791234210672aa00cc3032271987c1e63dd13f007a",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/successor-source-after.json": "0947c1588f41edf494deefe8d3c22a8df5628f12caf4b1c9f59667d2fd73f8c5",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/successor-source-before.json": "0947c1588f41edf494deefe8d3c22a8df5628f12caf4b1c9f59667d2fd73f8c5",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/successor.patch": "cf686f512e9ce01739364f3c8cfc00aa862c9a88479b060e2b520921aa3cce1d",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/witness-autoload.json": "78548e7b7049befa3427e140f5f27434347a0608a922222236b1657a775f4fa6",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/witness-native.log": "09606f930dbe30378f3fba203b0f4178aae6ed1497f999c7c670b6af3dbfc96d",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/witness-native.xml": "19355c612ec4893b7ee26021f113ec45080c5f12cbb35773faa4475f8a9b64e6",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/witness-pint.log": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/witness-source-after.json": "c556725a97c4a924bb5350d7dda94f88d41f5bf71c334c029fb8dd24f82bd6a6",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/witness-source-before.json": "c556725a97c4a924bb5350d7dda94f88d41f5bf71c334c029fb8dd24f82bd6a6",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/witness-successor.patch": "a7d491afb05a2977b1406e2c34cdd8c263e86a4ce983856fb69fcfd0ee2a2dde",
+    "/workspace/scratch/2876616e88c3/production-preparation-replay-evidence/witness-syntax.log": "1c63bff0fea9d304a846dbcc1b215ba8ac8df791f95ddcd2c221c033a728d222"
+  }
+}

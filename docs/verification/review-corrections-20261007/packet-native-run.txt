@@ -1,0 +1,2 @@
+{"mysql": "8.4.11", "innodb_flush_log_at_trx_commit": 1, "sync_binlog": 1, "innodb_doublewrite": "ON", "log_bin": true, "transport": "private loopback TCP", "database": "fresh disposable"}
+{"tool":"phpunit","result":"passed","tests":4,"passed":4,"assertions":412,"duration_ms":26061}

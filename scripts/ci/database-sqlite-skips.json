@@ -593,6 +593,14 @@
     [
       "Tests\\Feature\\TransactionalNotificationConcurrencyTest",
       "test_withdrawal_committed_after_an_exact_user_wait_blocks_every_notification_entrypoint_without_capture"
+    ],
+    [
+      "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest",
+      "test_same_capture_miss_gap_replays_exact_packet_in_both_commit_orders"
+    ],
+    [
+      "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest",
+      "test_changed_capture_cannot_recover_winner_in_either_worker_order"
     ]
   ]
 }

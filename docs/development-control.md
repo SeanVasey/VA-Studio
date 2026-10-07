@@ -1,5 +1,46 @@
 # Current development queue
 
+## Production preparation continuation — October 6, 2026 UTC
+
+PR #16 merged the seven-component private foundations batch at native main
+`a348f67eff1fdd16b1945efd3b99aa27af3dd242`, tree
+`9142a8d4436aea99bb0f8aba5570601587e0e5a9`. Required cheap preflight
+`37542249783`, attempt 1, passed on head `ea722029`; fresh main/PR/Git-data
+reads verified the merge and exact tree. The timeout lost no source or results.
+The original frozen worktree remains clean and its component evidence is retained.
+
+Branch `codex/production-consumers-20261006` composes the reviewed
+[D-26 production preparation](architecture/D-26-production-track-preparation.md).
+Clean executable local `04f27462fee24103b554ca18aac17a4ce87308b8` equals native
+`c27d1f4d47c863f1a13364b4cf882141c8848993`, tree
+`c4a24f4bda577bff1d9348307dbe9781bde1d678`. Nine affected PHP files passed
+255 cases / 779 assertions and actual copy-upgrade checks passed 14/14, with
+zero failures/errors/skips. Sensitive and shared review approve the exact source;
+[the integration receipt](verification/production-preparation-integration-20261006.md)
+retains original fixture/bootstrap/runtime failures and the separate FK-name
+portability correction. MySQL compilation makes no native-execution claim.
+
+The packet retains encrypted current approved policy, immutable non-exclusive USD
+selection/line evidence, server-advertised subtotal and future order commitments.
+Tax/total stay unknown; buyer identity/assent are uncollected, and execution,
+payable/external-fact/private-byte verification stays false. The trusted final
+consumer proof follows query/model authority callbacks; old adapter invocation
+remains compatible. Exact replay/recovery authenticates original staff evidence
+after closure or catalog movement without restoring purchase eligibility.
+
+Root preserves bounded selection, manual workflow/audit guards, all native
+exceptions and original parent fixture assertions. Only measured SQLite timing
+rows and evidence/status successors follow the executable freeze. The integrating
+PR records cheap preflight, expected-head merge and fresh main/tree readback;
+no routine MySQL/browser/full matrix, provider, sale or source import is performed.
+Authoritative amounts, identity/assent, inventory/provider/order consumers,
+original documents and private delivery remain next dependencies.
+
+[Dependency reconciliation](dependency-pr-integration.md) names a later fresh-main
+#1/#2 compatibility batch and the separate PDF-profile blocker for #3. These
+reviews change no installed graph and claim no unrun compatibility pass. All 40
+parent groups retain six accepted and 34 open outcomes.
+
 ## Resumed foundations integration — October 6, 2026 UTC
 
 The live GitHub main at continuation is `4d39a7d02f9094085f9a74610ebdc42b42e8a059`,

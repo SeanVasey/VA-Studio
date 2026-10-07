@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "driver": "mysql",
-  "source": "Verified database artifacts of GitHub run 37410220669 attempt 1; head 12a5c70bc4b9dbb94353c290e031975803d24fa7; tree 86584c422341d8f03ac885d59916aba8faf34521; overall run failed non-database gates; four captured-offer files use focused component timing only from frozen core229/native087/UIe9ef, offer-editor-final-native.xml:f3b04776b8c8d0b7e272acb87e32ce33f702593b2571b95b2bd3d8f41ddfaeb4, domain-races-mysql-final.xml:1a3a026a8e6164fc0c4341e7a0c754b3aa7a5e3a0f07574c5427b6d4ac8722b6. Helper subprocesses intentionally use disposable SQLite. Timings are balance weights, not acceptance.; bulk license files use source-bound focused component timing only from domainfec177/d79a, UI06ff9b2/2f980, native6fe2: final-native.xml:7ad1ebdbb48fffb40a31769e75c41bbc87a1d61f278becc0566f1a965eda8903; ui-and-editor-final-native.xml:f60ef59d9f0d570e91ad97b735e92a060e1c731efd48d32af40d15ec4832663d; bulk-native-helper-row-hash.xml:4836f525c584c32cb3a8b49484cf46fb2be4add1069ff91ace5a111b8bda6aaa. Browser helper intentionally executes disposable SQLite subprocesses for both balance tables. Old weights preserved; timings are not final acceptance.",
+  "source": "Verified database artifacts of GitHub run 37410220669 attempt 1; head 12a5c70bc4b9dbb94353c290e031975803d24fa7; tree 86584c422341d8f03ac885d59916aba8faf34521; overall run failed non-database gates; four captured-offer files use focused component timing only from frozen core229/native087/UIe9ef, offer-editor-final-native.xml:f3b04776b8c8d0b7e272acb87e32ce33f702593b2571b95b2bd3d8f41ddfaeb4, domain-races-mysql-final.xml:1a3a026a8e6164fc0c4341e7a0c754b3aa7a5e3a0f07574c5427b6d4ac8722b6. Helper subprocesses intentionally use disposable SQLite. Timings are balance weights, not acceptance.; bulk license files use source-bound focused component timing only from domainfec177/d79a, UI06ff9b2/2f980, native6fe2: final-native.xml:7ad1ebdbb48fffb40a31769e75c41bbc87a1d61f278becc0566f1a965eda8903; ui-and-editor-final-native.xml:f60ef59d9f0d570e91ad97b735e92a060e1c731efd48d32af40d15ec4832663d; bulk-native-helper-row-hash.xml:4836f525c584c32cb3a8b49484cf46fb2be4add1069ff91ace5a111b8bda6aaa. Browser helper intentionally executes disposable SQLite subprocesses for both balance tables. Old weights preserved; timings are not final acceptance.; two membership/account rows measured on genuine local mysql at211577eece5c4f9a3c708db25e4ad67d4462721e, JUnit SHA256 1aa4f1bd3fb2cefa609c148548911bb7de5fc7ae0bc875ee69b1055010d010cd. Four actual durable MySQL replay race cases measured at7a202e98296d10ec96dee11803433dd8f5391cab, JUnit SHA256 19355c612ec4893b7ee26021f113ec45080c5f12cbb35773faa4475f8a9b64e6. Unrelated rows/fallback preserved; balance weights do not establish full acceptance.",
   "fallback_ms_per_case": 3830,
   "files": {
     "tests/Feature/BulkLicenseDraftSourceAuthoringActionTest.php": {"cases": 39, "ms": 178132},
@@ -18,7 +18,7 @@
     "tests/Feature/CustomerAccountAccessTest.php": {"cases": 6, "ms": 56250},
     "tests/Feature/CustomerAccountCommerceTest.php": {"cases": 8, "ms": 71180},
     "tests/Feature/CustomerAccountConcurrencyTest.php": {"cases": 9, "ms": 61946},
-    "tests/Feature/CustomerAccountMigrationTest.php": {"cases": 7, "ms": 56531},
+    "tests/Feature/CustomerAccountMigrationTest.php": {"cases": 7, "ms": 36472},
     "tests/Feature/CustomerIdentityConcurrencyTest.php": {"cases": 9, "ms": 60509},
     "tests/Feature/CustomerIdentityHttpTest.php": {"cases": 10, "ms": 57804},
     "tests/Feature/CustomerIdentityMigrationTest.php": {"cases": 14, "ms": 75927},
@@ -64,6 +64,7 @@
     "tests/Feature/MediaWorkflowBudgetTest.php": {"cases": 4, "ms": 8630},
     "tests/Feature/MediaWriterAuthorityTest.php": {"cases": 29, "ms": 157257},
     "tests/Feature/MediaWriterConcurrencyTest.php": {"cases": 10, "ms": 83750},
+    "tests/Feature/MembershipCreditMigrationTest.php": {"cases": 38, "ms": 194253},
     "tests/Feature/OfferDraftAuthoringActionTest.php": {"cases": 13, "ms": 70798},
     "tests/Feature/OfferRevisionTest.php": {"cases": 22, "ms": 22105},
     "tests/Feature/OfferWriterAuthorityTest.php": {"cases": 9, "ms": 66126},
@@ -82,6 +83,7 @@
     "tests/Feature/ProductDraftEditorTest.php": {"cases": 17, "ms": 7812},
     "tests/Feature/ProductDraftMigrationTest.php": {"cases": 5, "ms": 34256},
     "tests/Feature/ProductDraftTest.php": {"cases": 23, "ms": 5017},
+    "tests/Feature/ProductionTrackPreparationReplayConcurrencyTest.php": {"cases": 4, "ms": 26058},
     "tests/Feature/PromotionAdminHttpTest.php": {"cases": 19, "ms": 2767},
     "tests/Feature/PromotionAdministrationMySqlConcurrencyTest.php": {"cases": 7, "ms": 48543},
     "tests/Feature/PromotionAdministrationSettlementTest.php": {"cases": 1, "ms": 8669},

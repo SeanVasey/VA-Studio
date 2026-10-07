@@ -1,0 +1,42 @@
+{
+  "method": "unchanged canonical phpunit-timings.py read_junit/combine",
+  "membership_execution_source": "211577eece5c4f9a3c708db25e4ad67d4462721e",
+  "packet_sqlite_execution_source": "a1a835ac7e3b9cd16f337bacbacf20bb28643a53",
+  "packet_mysql_execution_source": "7a202e98296d10ec96dee11803433dd8f5391cab",
+  "measured_rows": {
+    "sqlite": {
+      "tests/Feature/CustomerAccountMigrationTest.php": [
+        7,
+        1471
+      ],
+      "tests/Feature/MembershipCreditMigrationTest.php": [
+        38,
+        6974
+      ],
+      "tests/Feature/ProductionTrackPreparationPacketTest.php": [
+        30,
+        28765
+      ],
+      "tests/Feature/ProductionTrackPreparationReplayConcurrencyTest.php": [
+        4,
+        0
+      ]
+    },
+    "mysql": {
+      "tests/Feature/CustomerAccountMigrationTest.php": [
+        7,
+        36472
+      ],
+      "tests/Feature/MembershipCreditMigrationTest.php": [
+        38,
+        194253
+      ],
+      "tests/Feature/ProductionTrackPreparationReplayConcurrencyTest.php": [
+        4,
+        26058
+      ]
+    }
+  },
+  "unrelated_rows_and_fallback_preserved": true,
+  "full_acceptance_claim": false
+}

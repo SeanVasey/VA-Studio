@@ -28,6 +28,11 @@ class ProductionTrackCapabilitiesMigrationOwnershipTest extends TestCase
             Schema::clearResolvedInstance('db.schema');
         });
         $this->artisan('migrate:fresh', ['--database' => 'production_capability_ownership_fixture', '--force' => true])->assertExitCode(0);
+        // Remove the explicitly empty additive child before testing retained capability ownership.
+        foreach (['production_track_preparation_packet_lines', 'production_track_preparation_packets'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
+        (require database_path('migrations/2026_10_06_238000_production_track_preparation_packets.php'))->down();
     }
 
     private function migration(): object

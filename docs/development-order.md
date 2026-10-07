@@ -1,6 +1,33 @@
 # Ordered development status
 
-## Current execution checkpoint
+## Current production preparation checkpoint — October 6, 2026 UTC
+
+[PR #16](https://github.com/SeanVasey/VA-Studio/pull/16) merged reviewed private
+foundations at native main `a348f67eff1fdd16b1945efd3b99aa27af3dd242`, tree
+`9142a8d4436aea99bb0f8aba5570601587e0e5a9`, after successful cheap preflight
+`37542249783`. Its focused evidence and component ancestry are preserved in the
+[composition record](verification/store-foundations-integration-20261006.md).
+The timeout did not leave that merge or its required checks incomplete.
+
+The current isolated increment implements [D-26 preparation
+packets](architecture/D-26-production-track-preparation.md). Current approved
+capabilities bind immutable non-exclusive USD offer/license/media row evidence,
+server-advertised subtotal and future order terms. Encrypted exact replay and
+staff recovery remain usable after source closure or catalog movement. Tax and
+total stay unknown; buyer identity and assent are uncollected, and execution,
+payable and private-byte verification claims remain false. The composed source passed 255 PHP cases / 779 assertions and 14 actual copy-upgrade
+checks without failures or skips. Sensitive and shared reviews approve its exact
+source; [the integration record](verification/production-preparation-integration-20261006.md)
+binds evidence and the corrected migration identifier boundary.
+
+Authoritative production amounts, buyer identity/assent, inventory/provider
+bindings, verified payment, original documents and private delivery follow this
+bounded interface. Dependency PRs #1/#2 await a fresh-main compatibility batch;
+#3 has a separate retained PDF-profile compatibility blocker. All 40 parent
+groups retain six accepted and 34 open outcomes. Current AGENTS.md governs the
+focused development cadence; dated full-per-merge instructions below are history.
+
+## Preserved earlier execution checkpoint
 
 October 6, 2026 UTC. Main through PR #6 remains the accepted baseline in [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio). [PR #13](https://github.com/SeanVasey/VA-Studio/pull/13) is the inclusive candidate against `main`; its next coherent update preserves all reviewed ancestry from PRs #7–#12 and includes captured license/offer-draft editing, effective customer download-request recovery, anonymous offline retry and the reviewed native transport/fixture corrections. The [continuation record](verification/customer-operator-recovery-continuation.md) binds implementation, regression evidence and the fresh acceptance boundary.
 

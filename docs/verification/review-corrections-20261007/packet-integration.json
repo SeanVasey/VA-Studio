@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "executed_source": "a1a835ac7e3b9cd16f337bacbacf20bb28643a53",
+  "executed_tree": "4409ae8811d51807aac38a8c9bdb2e5520d7d7fc",
+  "engine": "sqlite",
+  "exit": 0,
+  "source_before_after_identical": true,
+  "tracked_worktree_clean": true,
+  "selected_files": [
+    "tests/Feature/ProductionTrackPreparationPacketTest.php",
+    "tests/Feature/ProductionTrackPreparationReplayConcurrencyTest.php",
+    "tests/Feature/ProductionTrackPreparationPacketGuardsTest.php",
+    "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+    "tests/Unit/ProductionTrackPreparationSnapshotTest.php",
+    "tests/Feature/ProductionTrackCapabilitiesTest.php",
+    "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php",
+    "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+    "tests/Unit/ProductionTrackMachinePolicyTest.php",
+    "tests/Feature/ProductionTrackPolicyFinalProofTest.php"
+  ],
+  "actual_totals": {
+    "cases": 273,
+    "assertions": 823,
+    "errors": 0,
+    "failures": 0,
+    "skips": 4
+  },
+  "class_totals": {
+    "Tests\\Feature\\ProductionTrackPreparationPacketTest": {
+      "cases": 30,
+      "assertions": 96,
+      "skips": 0
+    },
+    "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest": {
+      "cases": 4,
+      "assertions": 0,
+      "skips": 4
+    },
+    "Tests\\Feature\\ProductionTrackPreparationPacketGuardsTest": {
+      "cases": 26,
+      "assertions": 70,
+      "skips": 0
+    },
+    "Tests\\Feature\\ProductionTrackPreparationPacketMigrationTest": {
+      "cases": 23,
+      "assertions": 303,
+      "skips": 0
+    },
+    "Tests\\Unit\\ProductionTrackPreparationSnapshotTest": {
+      "cases": 10,
+      "assertions": 11,
+      "skips": 0
+    },
+    "Tests\\Feature\\ProductionTrackCapabilitiesTest": {
+      "cases": 36,
+      "assertions": 77,
+      "skips": 0
+    },
+    "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest": {
+      "cases": 26,
+      "assertions": 38,
+      "skips": 0
+    },
+    "Tests\\Feature\\ProductionTrackCapabilitiesMigrationOwnershipTest": {
+      "cases": 23,
+      "assertions": 123,
+      "skips": 0
+    },
+    "Tests\\Unit\\ProductionTrackMachinePolicyTest": {
+      "cases": 93,
+      "assertions": 97,
+      "skips": 0
+    },
+    "Tests\\Feature\\ProductionTrackPolicyFinalProofTest": {
+      "cases": 2,
+      "assertions": 8,
+      "skips": 0
+    }
+  },
+  "declared_native_only_skips": [
+    {
+      "class": "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest",
+      "method": "test_same_capture_miss_gap_replays_exact_packet_in_both_commit_orders with data set \"worker zero first\"",
+      "assertions": 0
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest",
+      "method": "test_same_capture_miss_gap_replays_exact_packet_in_both_commit_orders with data set \"worker one first\"",
+      "assertions": 0
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest",
+      "method": "test_changed_capture_cannot_recover_winner_in_either_worker_order with data set \"worker zero first\"",
+      "assertions": 0
+    },
+    {
+      "class": "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest",
+      "method": "test_changed_capture_cannot_recover_winner_in_either_worker_order with data set \"worker one first\"",
+      "assertions": 0
+    }
+  ],
+  "actual_autoload_origins": 15,
+  "controls": [
+    {
+      "script": "test-focused-tests.py",
+      "cases": 47,
+      "passed": true
+    },
+    {
+      "script": "test-workflow-cadence.py",
+      "cases": 14,
+      "passed": true
+    },
+    {
+      "script": "test-phpunit-shards.py",
+      "cases": 36,
+      "passed": true
+    },
+    {
+      "script": "test-database-receipts.py",
+      "cases": 34,
+      "passed": true
+    }
+  ],
+  "artifact_sha256": {
+    "source.json": "c52722a6865af9868ef658da0bd1bbdae482093a90259c86457816587d21a8bd",
+    "results.xml": "75ecdd694e368888df2b8a0ba30d646120da2701b5814d38ee026c8033a01196",
+    "autoload-origins.json": "d94913aef2ffb6e8c2a6895cdc2772b13341323f3f4e46fe2fcf30fa7ee9dad7",
+    "run.json": "bffd8bdcab04acd83bb5865e4f0419c91e54e9a1e4041484524f98d09d2598d1",
+    "test-focused-tests.py.log": "9403d468ceb6470edfbd67a5be26f16a19d0cbffe62193f461e20aa4717365de",
+    "source-carry.json": "31e2e15e272aac20ca20da18c850c960fb6e15da63010fa06c60ae6f8db99707",
+    "test-workflow-cadence.py.log": "c9811dcd7d51683ba5e61910b5aa26e91e8766a287b6a6f52a04bac8ac9f3a3d",
+    "test-database-receipts.py.log": "3fe172511e7f58a261d29bf9bf43743a0e269ec3e26be9b82e0235f96ed98800",
+    "controls.json": "3a200c1163f29bea79d159171587797154d1bd0c51b132aeea44df355e6f275b",
+    "config.xml": "a7998cb2923d9e250c05e5c565ad5710454622fc8151d88e2a27ec40b380fda7",
+    "run.log": "a0fbe72985dc41833c4a14bf0cf39544a5d89a0b5caf45ee2b19dd85d54c948e",
+    "test-phpunit-shards.py.log": "0bc266e3409a4509828639c370e8f289ea0a36c540427cf868cf2ecfa35acfdf"
+  },
+  "full_matrix": false,
+  "hosted_dispatch": false
+}

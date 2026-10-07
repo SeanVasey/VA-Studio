@@ -67,3 +67,8 @@ Follow the current [ordered development record](../development-order.md) for acc
 [D-25](D-25-editable-site-images.md) makes the home hero, studio and share images editable. This first part adds a private library: uploads with provenance, scanning, metadata-free re-encoding into fixed JPEG and WebP sizes, a manifest hash per image and retained failures. The second part adds image slots to site releases (schema version 3), serves an image publicly at a content-hashed URL once a release using it has been live, and renders the images on the storefront.
 
 [T12-PUBLICATION-EVIDENCE-01](T12-PUBLICATION-EVIDENCE-01.md) describes the internal read-only track publication manifest foundation: fresh staff authority, current ready evidence and a minimized immutable content identity. Its [source-bound verification record](../verification/track-publication-manifest-foundation.md) retains focused feedback and pending acceptance. This partial scheduling prerequisite supplies no retained approval, apply fence or track timing policy; D-24's site-release choices do not transfer to tracks.
+
+[D-26](D-26-production-track-preparation.md) records the current production
+preparation consumer: encrypted immutable selections and future-order commitments,
+explicitly unknown tax/total, and composed source/consumer proof. This increment
+does not grant commerce or delivery authority.

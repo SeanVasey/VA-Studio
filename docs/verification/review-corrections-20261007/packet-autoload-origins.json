@@ -1,0 +1,77 @@
+[
+  {
+    "class": "Tests\\Feature\\ProductionTrackPreparationPacketTest",
+    "path": "/workspace/scratch/2876616e88c3/VA-Studio-membership-rollback-integration/tests/Feature/ProductionTrackPreparationPacketTest.php",
+    "sha256": "77ac40f4ba94919b41edc76d598328548a60166e1bf5870dd9a14f141775aeac"
+  },
+  {
+    "class": "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest",
+    "path": "/workspace/scratch/2876616e88c3/VA-Studio-membership-rollback-integration/tests/Feature/ProductionTrackPreparationReplayConcurrencyTest.php",
+    "sha256": "ebf0211495b34cfda5b6c0f65327bb571b91d7cd67e7c077677c10de979f8bf2"
+  },
+  {
+    "class": "Tests\\Feature\\ProductionTrackPreparationPacketGuardsTest",
+    "path": "/workspace/scratch/2876616e88c3/VA-Studio-membership-rollback-integration/tests/Feature/ProductionTrackPreparationPacketGuardsTest.php",
+    "sha256": "fa46831a526259a5caf1be9ee0b5ad7efac78f0226133792fe193b7e0303139a"
+  },
+  {
+    "class": "Tests\\Feature\\ProductionTrackPreparationPacketMigrationTest",
+    "path": "/workspace/scratch/2876616e88c3/VA-Studio-membership-rollback-integration/tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+    "sha256": "3da6dc394b4e04615f22706bd3fa9db216557e1b194cd6b672bd02953da098ec"
+  },
+  {
+    "class": "Tests\\Unit\\ProductionTrackPreparationSnapshotTest",
+    "path": "/workspace/scratch/2876616e88c3/VA-Studio-membership-rollback-integration/tests/Unit/ProductionTrackPreparationSnapshotTest.php",
+    "sha256": "e52dff632967b8d1e7b0b954637688e75f3a3f2ccc452c81c6082fc2d89c8f1c"
+  },
+  {
+    "class": "Tests\\Feature\\ProductionTrackCapabilitiesTest",
+    "path": "/workspace/scratch/2876616e88c3/VA-Studio-membership-rollback-integration/tests/Feature/ProductionTrackCapabilitiesTest.php",
+    "sha256": "19e912da5359b908731c982327ff744e2d93aa382ff60f07ca74693a5d814047"
+  },
+  {
+    "class": "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest",
+    "path": "/workspace/scratch/2876616e88c3/VA-Studio-membership-rollback-integration/tests/Feature/ProductionTrackCapabilitiesGuardsTest.php",
+    "sha256": "0bf9288f4cdb604419f8a158d485332dd947b0c14ca130ae88883653bf6fa898"
+  },
+  {
+    "class": "Tests\\Feature\\ProductionTrackCapabilitiesMigrationOwnershipTest",
+    "path": "/workspace/scratch/2876616e88c3/VA-Studio-membership-rollback-integration/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+    "sha256": "d2ea699a5ac32dc9edf7f71c589884eff94a67d3d9b956f889b6584987cb97cc"
+  },
+  {
+    "class": "Tests\\Unit\\ProductionTrackMachinePolicyTest",
+    "path": "/workspace/scratch/2876616e88c3/VA-Studio-membership-rollback-integration/tests/Unit/ProductionTrackMachinePolicyTest.php",
+    "sha256": "71c4e45483a6ac8ec66c3abb324c0dbfd9f2f2d05b06a477a153c07e3375d5a2"
+  },
+  {
+    "class": "Tests\\Feature\\ProductionTrackPolicyFinalProofTest",
+    "path": "/workspace/scratch/2876616e88c3/VA-Studio-membership-rollback-integration/tests/Feature/ProductionTrackPolicyFinalProofTest.php",
+    "sha256": "df0aa879ec0b10a510e39f31d4870e2265cc124335a78101d04b1de0a4aac01e"
+  },
+  {
+    "class": "App\\Domain\\Commerce\\ProductionPreparation\\ProductionTrackPreparationPackets",
+    "path": "/workspace/scratch/2876616e88c3/VA-Studio-membership-rollback-integration/app/Domain/Commerce/ProductionPreparation/ProductionTrackPreparationPackets.php",
+    "sha256": "8f56e0e889541726bf69e0289ba7b8de2f71849ce9f33126f7a49153e5206030"
+  },
+  {
+    "class": "Tests\\Support\\ProductionTrackPreparationReplayRace",
+    "path": "/workspace/scratch/2876616e88c3/VA-Studio-membership-rollback-integration/tests/Support/ProductionTrackPreparationReplayRace.php",
+    "sha256": "8ade3d1e1cddeb6a18409cf4029b0568a2173c33d1f7a24119575aa0f26e5a97"
+  },
+  {
+    "class": "App\\Domain\\Commerce\\ProductionPreparation\\PacketEvidence",
+    "path": "/workspace/scratch/2876616e88c3/VA-Studio-membership-rollback-integration/app/Domain/Commerce/ProductionPreparation/PacketEvidence.php",
+    "sha256": "8b771f131a40dca96d0681ebaa5b41a8d76afb190dd2502542e4c1cf90bea53f"
+  },
+  {
+    "class": "App\\Domain\\Commerce\\ProductionPolicy\\CurrentRows",
+    "path": "/workspace/scratch/2876616e88c3/VA-Studio-membership-rollback-integration/app/Domain/Commerce/ProductionPolicy/CurrentRows.php",
+    "sha256": "ca24e0b28d5cc6e53a1ccdcfd472390e984e0a68bbf2ee4aeea19dab166b0a27"
+  },
+  {
+    "class": "Illuminate\\Database\\Migrations\\Migrator",
+    "path": "/workspace/scratch/2876616e88c3/VA-Studio-membership-rollback-integration/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php",
+    "sha256": "4bf5687d98eef422ef2e13fa044c393350686e042439b5f940a6236db098d754"
+  }
+]

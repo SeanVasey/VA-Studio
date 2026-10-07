@@ -1,0 +1,30 @@
+{
+  "membership_executed_source": "211577eece5c4f9a3c708db25e4ad67d4462721e",
+  "composed_source": "a1a835ac7e3b9cd16f337bacbacf20bb28643a53",
+  "composed_tree": "4409ae8811d51807aac38a8c9bdb2e5520d7d7fc",
+  "changed_paths": [
+    "app/Domain/Commerce/ProductionPreparation/ProductionTrackPreparationPackets.php",
+    "docs/verification/production-track-preparation-packets.md",
+    "scripts/ci/database-sqlite-skips.json",
+    "scripts/ci/focused-tests.py",
+    "scripts/ci/test-focused-tests.py",
+    "tests/Feature/ProductionTrackPreparationPacketTest.php",
+    "tests/Feature/ProductionTrackPreparationReplayConcurrencyTest.php",
+    "tests/Support/ProductionTrackPreparationReplayRace.php",
+    "tests/Support/production-track-preparation-replay-worker.php"
+  ],
+  "unchanged_baseline_files": 1601,
+  "unchanged_baseline_files_manifest_sha256": "ab50b040ea3d8df717aa7ed181771c0e5faf9aad889723138d07f3f046d5df30",
+  "prior_native_method_pairs_preserved": 148,
+  "new_exact_native_method_pairs": [
+    [
+      "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest",
+      "test_same_capture_miss_gap_replays_exact_packet_in_both_commit_orders"
+    ],
+    [
+      "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest",
+      "test_changed_capture_cannot_recover_winner_in_either_worker_order"
+    ]
+  ],
+  "membership_runtime_reexecuted_on_composed_source": false
+}

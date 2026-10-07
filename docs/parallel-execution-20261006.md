@@ -1,6 +1,26 @@
 # Parallel development execution — October 6, 2026
 
-## Resumed foundations batch
+## Current production preparation increment
+
+PR #16 is merged at native main `a348f67eff1fdd16b1945efd3b99aa27af3dd242`,
+tree `9142a8d4436aea99bb0f8aba5570601587e0e5a9`. Its clean ordered-parent local
+mirror `fde182b5b65d419cd8d1215fc2144366c520ace6` anchors the current isolated
+`codex/production-consumers-20261006` branch. Original source and failed evidence
+remain preserved.
+
+`production_capabilities_continue` owns the new preparation domain, migration
+`238000`, narrow optional adapter proof and dedicated tests. Root owns shared
+selection/workflow formatting, three explicitly empty-child parent fixtures and
+status/publication. `notifications_continue` independently reviews the sensitive
+implementation; `service_merch_review` reviews the clean shared composition.
+Authors keep separate worktrees and do not publish. Final clean executable composition `04f27462` passed 255/779 affected PHP
+and 14/14 actual copy-upgrade checks; sensitive and shared reviews approve it.
+[The integration record](verification/production-preparation-integration-20261006.md)
+binds exact native identities and remaining acceptance. Evidence-only publication
+uses cheap preflight and expected-head merge; [D-26](architecture/D-26-production-track-preparation.md)
+keeps the bounded preparation and remaining operative consumers explicit.
+
+## Preserved foundations batch
 
 The continuation starts from verified GitHub main
 `4d39a7d02f9094085f9a74610ebdc42b42e8a059`, tree

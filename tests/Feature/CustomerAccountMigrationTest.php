@@ -26,7 +26,12 @@ class CustomerAccountMigrationTest extends TestCase
         $this->assertDatabaseCount('membership_credit_events', 0);
         $this->assertDatabaseCount('membership_plans', 0);
         $this->assertDatabaseCount('membership_plan_versions', 0);
-        (require database_path('migrations/2026_10_06_230000_membership_credit_foundation.php'))->down();
+        // Dispose only this fresh test's verified empty child schema; operational rollback must refuse.
+        // Keep foreign keys enabled and remove child tables before their referenced parents.
+        foreach (['membership_credit_events', 'membership_credit_buckets', 'membership_plan_versions', 'membership_plans'] as $table) {
+            Schema::drop($table);
+            $this->assertFalse(Schema::hasTable($table));
+        }
         (require database_path('migrations/2026_10_06_000048_customer_purchase_claims.php'))->down();
         (require database_path('migrations/2026_10_06_000045_customer_identity_challenges.php'))->down();
     }

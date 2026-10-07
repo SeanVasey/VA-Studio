@@ -1,5 +1,20 @@
 # [WP-07] Hosted checkout, durable payment inbox and idempotent finalization
 
+## Current production prerequisite — October 6, 2026 UTC
+
+The [D-26 preparation increment](../architecture/D-26-production-track-preparation.md)
+consumes merged PR #16's approved typed capabilities and freezes staff-only
+selection/subtotal evidence for future production order consumers. It creates no
+buyer, assent, order, inventory hold, provider request, payment, grant or delivery
+authority. Tax and final total stay unknown. Historical preparation recovery is
+current-authority/MFA protected and does not restore current purchase eligibility.
+The composed source passed 255 affected PHP cases / 779 assertions and 14 actual copy-upgrade checks, with no failures or skips. Separate sensitive and shared reviews approve its exact source; [the integration record](../verification/production-preparation-integration-20261006.md) retains evidence and remaining acceptance limits.
+
+Explicit production identity/assent and authoritative amount observations must
+precede hosted/payment adaptation. Verified provider state, resource binding,
+original contracts and private delivery retain their existing acceptance gates;
+this bounded interface does not complete WP-07 or enable sales.
+
 Status: **Stripe test-event receipts, private test orders, hosted test checkout and durable authoritative payment verification are merged. Local/testing finalization, grants, pending fulfillment and customer status merged in PR #64. The broader work package and issue #7 remain open.** Operator exception resolution, production payment policy and the acceptance evidence below remain required.
 
 T19-OPS-01 now has a bounded [operational history candidate](../test-payment-exception-operations.md): audited acknowledgment/review dispositions and leased own-account GET-only test-payment observations. It preserves terminal `paid_exception`, pending resources and blocked fulfillment. This is not financial resolution or completion of T19; the integrating merge request must bind its final tests, review and acceptance.

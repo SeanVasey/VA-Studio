@@ -1,4 +1,34 @@
-# Dependency PR integration — 2026-09-23
+# Dependency PR integration
+
+## Current VA-Studio reconciliation — October 6, 2026
+
+Read-only review is bound to native main
+`a348f67eff1fdd16b1945efd3b99aa27af3dd242`, after PR #16, and the exact
+heads below. No dependency graph is installed or changed by this review.
+
+| PR | Reviewed head | Current disposition |
+| --- | --- | --- |
+| [#1](https://github.com/SeanVasey/VA-Studio/pull/1) | `0ea7f822246279a1584664e4f620de058a540d83` | Candidate DOM 10.4.2 update in a later fresh-main compatibility batch with #2. Preserve main's source-map-js 1.2.2; copying the old lock would downgrade it. |
+| [#2](https://github.com/SeanVasey/VA-Studio/pull/2) | `8c401f52785c347987b1bb4e9dcce255a55c4a0b` | Candidate Laravel 13.34 and fourteen accompanying locked-package updates. Installed-graph and affected runtime compatibility checks remain unrun. |
+| [#3](https://github.com/SeanVasey/VA-Studio/pull/3) | `e8cd1588623c8ea96300d7594fce94b4ff629a27` | Deferred: PDF 8.76.3/font 4.4.1 conflict with retained `test-buyer-pdf-v1` version/reference pins. A reviewed successor must preserve historical validation and original documents. |
+
+The exact-source review is `recommendation-a348f67.md`, SHA256
+`d54bb14470b83daaa3850a997d9db080ee803d46949d5140de2947d86a4b4f75`.
+It binds 32 file blobs and upstream comparisons. The PDF runtime incompatibility
+is derived from the current `ContractRenderProfile::verifyRuntime` contract;
+no failed rendering run is invented and the v1 manifest must not be rewritten.
+
+After production preparation, form a separate #1/#2 compatibility candidate from
+current main using intentional package-manager resolution, preserving unrelated
+locks and PDF/font pins. Verify the actual installed identities, platform
+requirements, affected framework/auth/publication/catalog/membership/notification
+and renderer behavior, frontend/typechecking and genuine audits. Changed
+`composer.lock` also requires stopped-installation copy/recovery checks. Use the
+approved cheap PR preflight; full acceptance stays manual on its exact candidate.
+The three old branches retain their original `cae053e` base and are not evidence
+that current manual CI policy is integrated. No old automatic workflow may return.
+
+## Preserved VASEYAUDIO dependency integration — September 23, 2026
 
 Sean requested review and appropriate integration of every open PR. The connector's blank-query PR listing omitted ten open Dependabot PRs. The explicit `is:open` query recovered them. Do not use the blank-query listing alone as proof that the PR backlog is empty.
 

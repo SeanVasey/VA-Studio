@@ -1,5 +1,19 @@
 # Remaining development and completion plan
 
+## Reviewed corrective development candidate — October 7, 2026 UTC
+
+PR #17 retains policy-bound preparation and corrects both the PR #16 membership
+rollback bookkeeping finding and the PR #17 concurrent replay finding. The
+[reconciliation record](verification/review-corrections-20261007/reconciliation.md)
+binds actual focused MySQL/SQLite execution, independent review and unchanged
+release boundaries. Source `0916f78` is a focused development composition;
+fresh final-head cheap preflight and expected-head merge are pending at this
+checkpoint. The PR will record their actual outcomes after the branch update.
+Complete Foundation verification stays manual for the final reviewed candidate.
+All forty criteria and their acceptance counts remain unchanged. After this
+batch, dependency PRs #1/#2 need selective current-main compatibility; #3 retains
+its immutable PDF-profile blocker.
+
 ## Current development policy and source — October 6, 2026 UTC
 
 Verified main `13d7474f` includes merged PR #13 and every preceding product

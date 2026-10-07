@@ -81,6 +81,16 @@ class CadenceTests(unittest.TestCase):
         for capability, target in targets:
             self.assertIn(capability + '=1 node --test ' + target, job)
 
+    def test_preparation_adapter_formatting_is_checked_in_development_and_manual_quality(self):
+        target = 'app/Domain/Commerce/ProductionPreparation'
+        for source in (CI, (ROOT / '.github/workflows/preflight.yml').read_text()):
+            job = block(source, 'backend-quality')
+            self.assertIn('php vendor/bin/pint --test', job)
+            self.assertEqual(1, job.count(target))
+        gitlab = (ROOT / '.gitlab-ci.yml').read_text()
+        job = gitlab.split('backend-quality:\n', 1)[1].split('\n.database:', 1)[0]
+        self.assertEqual(1, job.count(target))
+
     def test_optional_feedback_has_no_automatic_push_or_pr_trigger(self):
         events = FOCUSED.split('on:\n', 1)[1].split('\npermissions:', 1)[0]
         self.assertEqual(['workflow_dispatch'], re.findall(r'^  ([a-z_]+):', events, re.M))

@@ -1,5 +1,19 @@
 # [WP-06] Server quotes, promotion calculations and exclusive reservations
 
+## Current production prerequisite — October 6, 2026 UTC
+
+Merged PR #16 supplies reviewed authored policy and typed capabilities. The
+current [D-26 preparation increment](../architecture/D-26-production-track-preparation.md)
+retains encrypted immutable non-exclusive USD offer/license/media row commitments,
+server-owned integer advertised subtotal and future-order policy commitments.
+Exact replay and current staff/MFA recovery preserve the original evidence after
+source closure or catalog movement. Tax and total remain unknown; payable,
+execution and physical-byte verification claims remain false. The composed source passed 255 affected PHP cases / 779 assertions and 14 actual copy-upgrade checks, with no failures or skips. Separate sensitive and shared reviews approve its exact source; [the integration record](../verification/production-preparation-integration-20261006.md) retains evidence and remaining acceptance limits.
+
+Authoritative production amounts, buyer identity and affirmative assent precede
+operative quote/order consumers. Inventory, promotions, exclusivity and provider
+acceptance retain their own dependencies; this packet does not close WP-06.
+
 Status: **Foundations through PR #50 are merged. The current integration batch adds explicitly configured test exclusive activation, quote/disclosure v2, pricing v3, promotion eligibility and atomic scoped acquisition. Final CI/review belongs in its PR.** Quotes remain non-payable; order/assent/verified terminal effects and production-policy acceptance remain open.
 
 - Suggested issue title: `[WP-06] Server quotes, promotion calculations and exclusive reservations`

@@ -1,6 +1,26 @@
 # Development agents and launch queue
 
-## Active parallel execution — October 6, 2026 UTC
+## Active production preparation — October 6, 2026 UTC
+
+Verified main `a348f67eff1fdd16b1945efd3b99aa27af3dd242` includes merged PR #16
+and the approved manual-matrix CI policy. The current isolated integration is
+`codex/production-consumers-20261006`; prior assignments below remain historical.
+
+| Worker | Owned boundary | Current handoff |
+| --- | --- | --- |
+| `/root` | Shared selection, workflow formatting, empty-child fixtures, status and publication | Completed composed 255/779 and 14 actual copy-upgrade checks; source/review are frozen, evidence-only publication, cheap preflight and expected-head merge follow |
+| `/root/production_capabilities_continue` | Preparation domain, additive adapter proof, migration `238000`, dedicated tests and verification record | Completed encrypted immutable packet/line evidence, exact replay/recovery, callback drift refusal and the isolated short-FK repair; frozen source is independently reviewed |
+| `/root/notifications_continue` | Independent sensitive source and regression review | Approved exact corrected source after independent 23/100 functional and 23/303 migration/control checks; native/full limits remain explicit |
+| `/root/service_merch_review` | Independent shared composition review | Approved exact corrected composition, all 255/779 and 14 CLI receipts, preserved controls, origins and original criteria |
+
+The read-only dependency review recommends a later selective #1/#2 compatibility
+batch and records #3's retained PDF-profile blocker. No installed dependency graph
+has changed. Execution/payable authority, authoritative tax/total, buyer assent,
+physical storage and operative provider/order/delivery consumers retain their
+separate dependencies. The full final matrix is manual on its exact reviewed
+candidate. Six parent groups remain accepted and 34 open.
+
+## Preserved foundations parallel execution — October 6, 2026 UTC
 
 Verified main `13d7474f` includes PR #13 and the merged PR #14 manual CI policy.
 The integration owner uses `codex/bulk-license-integration-20261006`. All seven
