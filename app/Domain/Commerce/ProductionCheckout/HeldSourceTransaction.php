@@ -17,6 +17,7 @@ final readonly class HeldSourceTransaction
         private string $database,
         private string $prefix,
         private string $anchor,
+        private CommittedReadContext $committedReadContext,
     ) {}
 
     public static function requireCurrent(CurrentRows $reader): void
@@ -35,7 +36,8 @@ final readonly class HeldSourceTransaction
         self::requireCurrent($reader);
         $connection = ResolvedConnection::current('held_transaction');
         $frame = new self($connection, $reader->identityPrimary(), $reader->identityDriver(),
-            $connection->getDatabaseName(), $connection->getTablePrefix(), 'pco_hold_'.bin2hex(random_bytes(16)));
+            $connection->getDatabaseName(), $connection->getTablePrefix(), 'pco_hold_'.bin2hex(random_bytes(16)),
+            CommittedReadContext::capture($reader));
         $frame->requireFrame($reader);
         $frame->execute('SAVEPOINT ');
 
@@ -49,6 +51,14 @@ final readonly class HeldSourceTransaction
         $this->execute('RELEASE SAVEPOINT ');
         $this->execute('SAVEPOINT ');
         $this->requireFrame($reader);
+    }
+
+    public function committedReadContext(CurrentRows $reader): CommittedReadContext
+    {
+        $this->requireFrame($reader);
+        $this->committedReadContext->prove($reader, 1);
+
+        return $this->committedReadContext;
     }
 
     private function requireFrame(CurrentRows $reader): void

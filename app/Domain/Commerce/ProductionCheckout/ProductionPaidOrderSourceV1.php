@@ -4,6 +4,8 @@ namespace App\Domain\Commerce\ProductionCheckout;
 
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Customers\ProductionCustomerAccess;
+use App\Domain\Customers\ProductionIdentity\IdentityHistoricalCommittedReceipt;
+use App\Domain\Customers\ProductionIdentity\IdentityOriginalCommitWitness;
 use App\Support\CanonicalJson;
 use LogicException;
 
@@ -49,6 +51,37 @@ final readonly class ProductionPaidOrderSourceV1 implements \JsonSerializable
         (new ProductionCustomerAccess)->proveHistoricalBindingCurrent($this->locator->historicalBuyerBinding(), $reader, $this->historicalIdentity);
         $rows->provePrimary();
         $this->transaction->prove($reader);
+    }
+
+    public function committedReadReceipt(CurrentRows $reader, int $originalDeadlineNs, ?ProductionPaidOrderConsumerCommitAdmissionV1 $admission = null): ProductionPaidOrderCommittedReadReceiptV1
+    {
+        return ProductionPaidOrderCommittedReadReceiptV1::capture($this, $reader, $originalDeadlineNs, $admission);
+    }
+
+    /** @internal Opaque original frame metadata; this does not export the paid graph or renew authority. */
+    public function committedReadContext(CurrentRows $reader): CommittedReadContext
+    {
+        $this->proveRetainedCurrent($reader);
+
+        return $this->transaction->committedReadContext($reader);
+    }
+
+    /** @internal Identity-owned seal; the producer never interprets private identity history. */
+    public function historicalCommittedReceipt(CurrentRows $reader, int $deadlineNs, IdentityOriginalCommitWitness $witness): IdentityHistoricalCommittedReceipt
+    {
+        $this->proveRetainedCurrent($reader);
+
+        return IdentityHistoricalCommittedReceipt::capture($this->locator->historicalBuyerBinding(), $reader,
+            $this->historicalIdentity, $deadlineNs, $witness);
+    }
+
+    /** @internal Compare original frozen rows only; it cannot mint a source or create a transaction. */
+    public function proveCommittedOriginal(ProductionPaidOrderCommittedReadReceiptV1 $receipt, Records $rows): void
+    {
+        CheckoutException::require($receipt->belongsTo($this, $rows->current), 'committed_read_frame');
+        OrderEvidence::proveRetained($rows, $this->order['raw']);
+        HostedEvidence::proveRetained($rows, $this->intent['raw']);
+        $rows->provePrimary();
     }
 
     /** Safe immutable producer evidence. No credential stamp, identity token or private storage path. */

@@ -82,6 +82,19 @@ class ProductionCheckoutCommittedRowsTest extends TestCase
         }
     }
 
+    public function test_application_pdo_subclass_is_refused_before_its_write_capable_metadata_override(): void
+    {
+        $wrapper = new CommittedRowsMetadataPdo($this->primary, $this->table);
+        try {
+            CurrentRows::committedReadOnly($wrapper, $this->driver);
+            $this->fail('Plain reader invoked application PDO metadata.');
+        } catch (LogicException $error) {
+            $this->assertSame('committed_read_frame', $error->getMessage());
+        }
+        $this->assertFalse($wrapper->called);
+        $this->assertSame(9123, (int) $this->primary->query('SELECT marker FROM '.$this->table.' WHERE id=1')->fetchColumn());
+    }
+
     public function test_factory_refuses_statement_constructor_that_writes_original_committed_row(): void
     {
         $this->refuseWritingStatement(fn () => CurrentRows::committedReadOnly($this->primary, $this->driver));
@@ -138,6 +151,22 @@ class ProductionCheckoutCommittedRowsTest extends TestCase
             $this->primary->exec('SET SESSION innodb_lock_wait_timeout='.$timeout);
         }
         $this->assertSame(9123, (int) $this->primary->query('SELECT marker FROM '.$this->table.' WHERE id=1')->fetchColumn());
+    }
+}
+
+/** Application subtype whose metadata override can write through the real primary fixture. */
+final class CommittedRowsMetadataPdo extends PDO
+{
+    public bool $called = false;
+
+    public function __construct(private readonly PDO $actual, private readonly string $table) {}
+
+    public function getAttribute(int $attribute): mixed
+    {
+        $this->called = true;
+        $this->actual->exec('UPDATE '.$this->table.' SET marker=9133 WHERE id=1');
+
+        return $this->actual->getAttribute($attribute);
     }
 }
 
