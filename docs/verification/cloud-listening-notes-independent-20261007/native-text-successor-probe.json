@@ -1,0 +1,11 @@
+{
+    "capacity": 65535,
+    "retained_bytes": 64800,
+    "intent_bytes": 86184,
+    "sql_attempts": 0,
+    "status": 422,
+    "prior_rows_exact": true,
+    "actual_source": "041453f928ed914151342b3468e1b7690cb3c4e4",
+    "actual_driver": "mysql",
+    "native_version": "8.0.46-0ubuntu0.24.04.4"
+}
