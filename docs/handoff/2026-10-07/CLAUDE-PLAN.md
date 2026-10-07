@@ -60,17 +60,17 @@ sensitive, flags still default-off unless Sean activates.
 | Step | Deliverable | Status |
 | --- | --- | --- |
 | A1 | Checkout physical-write c6 + receipt 2ec composed, observer guard, refused-frame record fix, config int fix | **merged** PR #41 → `37653bf1`; release blocker A1b below |
-| A1b | Frame admission for intent/basis/authority writes + initiate() re-proof (Codex P1/P2 ×2) | lane `harness/checkout-write-admission-all` running; RELEASE BLOCKER |
+| A1b | Frame admission for intent/basis/authority writes + initiate() re-proof (Codex P1/P2 ×2) | built on `harness/checkout-write-admission-all` at `c70aae57` (fix `2c3efc4e`; red canaries 7/7 on both drivers, green SQLite family 188/914, native 12/72); independent review running; not pushed; RELEASE BLOCKER until merged. Open: race across the provider call stays with reconciliation; `CheckoutRawPlans` duplicates c6 plan logic (separate refactor) |
 | A2 | Paid252 consumer on composed producer; native 409 root cause; whole-order delivery; root route mount | composed + diagnosed on `harness/paid252-composition` (pushed): root cause is identity `IdentityMigrationOwnership::inspect()` cost (~470 metadata statements per identity assertion on MySQL) exhausting the 60 s authorization budget; fix routed to `harness/native-schema-isolation`; HTTP whole-order and root mount still open |
 | A3 | Tax255: `ProductionTaxCheckout`, Stripe Checkout `automatic_tax`, SourceV2 + V2 consumer adapter, migration 255000, default off | queued after A1 |
-| A4 | Live-payment preparation packet: SDK/API/mode preflight, webhook signature+dedup checks, unknown-outcome reconciliation, dry-run commands, activation checklist with Sean's inputs | built on `harness/production-preparation-1` → PR #46 draft; independent review running. Gaps found: no live webhook receiver; test-mode payments need local/testing APP_ENV (staging path = Sean's decision); no operator reconciliation command |
+| A4 | Live-payment preparation packet: SDK/API/mode preflight, webhook signature+dedup checks, unknown-outcome reconciliation, dry-run commands, activation checklist with Sean's inputs | PR #46 ready at `f4c55acf`; independent APPROVE WITH CONDITIONS carried to `e8d84306`; Codex P2 ×2 (raw-PDO transaction guard; unmanifested backup entries) fixed in `f4c55acf`, condition-3 re-review running. Gaps found: no live webhook receiver; test-mode payments need local/testing APP_ENV (staging path = Sean's decision); no operator reconciliation command |
 | A5 | Refund/dispute lifecycle (T21) on top of A2 provider-authoritative state | after A4 |
 
 ### Phase B — Customer identity, features, mail (T23/T32)
 | Step | Deliverable | Status |
 | --- | --- | --- |
 | B1 | Account features 253 reviewed + composed + canonical default-off `production-account-features` config | **merged** PR #45 → `1462e822` (dev merge; C1 activation blocker → `harness/native-schema-isolation`; C2/C3 → 254 lane) |
-| B2 | PR39 late P2 findings: SuppressionDelivery old-recipient target; IdentityCommittedFrame single-close restoration | identity fix APPROVED; suppression fix APPROVE WITH CONDITION C-A1 (HMAC-mismatched older target must 503) being fixed on `harness/pr39-late-findings` |
+| B2 | PR39 late P2 findings: SuppressionDelivery old-recipient target; IdentityCommittedFrame single-close restoration | identity fix APPROVED; C-A1 + Low fixed in `f65d921d` on `harness/pr39-late-findings` (pushed; red/green on SQLite and native 8.4.11); re-review of `f65d921d` running, then PR |
 | B3 | Suppression254 (distinct family from 251; built on 253 withdrawal reader; provider contract default-off) | after B1 |
 | B4 | Root HTTP mount for 253 (session-bound routes, privacy middleware, body caps) + frontend | after B1 |
 | B5 | Email operations preflight: sender/origin/TLS/provider scope, queue/scheduler/retention facts | after B3 |
