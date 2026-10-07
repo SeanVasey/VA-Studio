@@ -261,6 +261,13 @@ mode check.
 | --- | ---: | ---: | ---: |
 | `StripeCapabilityPreflightTest` after the probe change | 41 | 336 | 0 |
 
+Addendum 3 (re-review of `83a891bc`) carries APPROVE WITH CONDITIONS and adds two Low
+findings on the documented procedure, fixed in the next docs commit: B-1, the step-3 and
+step-4 checksum checks printed FAILED without stopping (now `|| exit 1`); B-2, the mode check
+always failed on a normal checkout because the tracked `storage/app/private/.gitignore` is
+0644 (now excluded by name). Rehearsed: a tampered archive now stops the script; a tree
+holding only the 0644 `.gitignore` passes; any other 0644 file is still refused.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings are accepted for merge and must be fixed or explicitly

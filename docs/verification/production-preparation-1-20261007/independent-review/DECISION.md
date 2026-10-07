@@ -390,3 +390,78 @@ ea700b3c225b64fb8ad0b94ef9122fb72e6de98eade793a52141dba214753c5b  docs/ops/backu
 37a3c9d2b1aedf1e022c257de9d3dce920633c3747f8d55c2c50abcccfd154ff  review-evidence/ReviewerPdoProbeAddendumTest.php.txt (VA-Studio-review-prep)
 9718c7538207dad88d7308b043747dfcad5fe484255732c434cb1b3aaa9f4b3a  review-evidence/backup-doc-rehearsal.sh.txt (VA-Studio-review-prep)
 ```
+
+---
+
+## Addendum 3: condition-3 re-review of `83a891bc` (2026-10-07)
+
+**Result: APPROVE WITH CONDITIONS carries to `83a891bc249c14155e53b4afd2b4ce5c0c7a7736`.** Conditions 1 and 3 still apply. Two new Low findings (B-1, B-2) concern the documented procedure, which is not executed, so neither blocks merge. Fix them before anyone runs that procedure.
+
+**Still open before any real probe:** N-1 and N-2 from Addendum 2 (`getPdo()` reconnects, and crashes on a disconnected connection). Both are unchanged here and are recorded in the lane README.
+
+### Delta
+
+| Range | What changed |
+| --- | --- |
+| `f4c55acf..99974a07` | Docs only: Addendum 2, `xargs -0 -r`, "run in bash", and the packet's clean-worktree checks. |
+| `99974a07..83a891bc` | Code: `StripeCapabilityProbe.php` (+8/−9). Tests: `StripeCapabilityPreflightTest.php`. Docs: steps 3 and 4 of `backup-restore-proof.md`, and the lane README. |
+
+- **`observe()`.** The only change replaces the `allCapabilities()` call and list loop with a read of `$account['capabilities']`. The read requires `is_array`, the name regex, and a status in the strict `STATUSES` set. It runs only when `$matches` is true.
+- **`ENDPOINTS`.** Now `['GET /v1/account']`.
+- **Unchanged.** Guards, client construction, the transport builder and restore, the exception wrapping, and the redacted return shape.
+- **Same source as checkout.** This is the field `OwnAccountStripeGateway::ownAccount()` reads (`:118-119`: `charges_enabled === true` and `capabilities.card_payments === 'active'`).
+- **Lane test file:** 41 tests, 336 assertions, all passing.
+
+### Adversarial check
+
+Throwaway test: `review-evidence/ReviewerCapabilitiesHashAddendumTest.php.txt` (18 tests, 106 assertions, all passing).
+
+- **Foreign account.** The account id doesn't match, and its hash includes a marker capability name, an invalid name and an odd status.
+  - Test mode: exactly 1 call, even with extra queued responses, and `blocked`. The observation has `capabilities: []` and `charges_enabled: null`.
+  - The report contains neither the foreign id, the marker name, the invalid name nor the status.
+  - Live mode: still 1 call, and `blocked`.
+- **Live gating (15 data sets).** Only `charges_enabled === true` together with `card_payments: 'active'` passes. Each data set made exactly one call, and `live_payments_authorized` stayed false throughout.
+
+  | Case | Result |
+  | --- | --- |
+  | `charges_enabled` false, string `'true'`, or missing | blocked |
+  | Capabilities missing, empty, or `null` | blocked |
+  | `card_payments` pending, inactive, or absent while `transfers` is active | blocked |
+  | `card_payments` nested object, capabilities as a list or string, an uppercase name, an uppercase status | failed, with a null observation |
+
+- **Secrets.** A provider body that echoes the key as a capability name or status fails closed (`failed`), and the report doesn't contain the key. Calling `observe()` directly on a non-hash raised a `RuntimeException` with no previous exception and no secret in the error. Every report was asserted secret-free.
+- **Test mode with no capabilities hash** gives `pass` with `capabilities: []`. That is a report detail, not a gate, because test mode never required capabilities.
+- **Earlier throwaway tests at `83a891bc`.**
+  - The builder test (12) and the PDO test (4) pass, and the PDO test reproduces N-1 and N-2.
+  - The gating test passes 22 of 23. The single failure is its own `assertCount(2, calls)`, which now sees 1 call. That is the intended reduction from two requests to one, not a regression.
+
+### Rehearsal of the documentation fragments
+
+Fragments copied verbatim into `review-evidence/backup-doc-rehearsal-83a891bc.sh.txt` and run in bash on synthetic trees.
+
+**Behaviour that works as documented:**
+
+- **Clean tree** (all files 0600, all directories 0700): step 3's archive check prints `OK`, and step 4's checksums, names and modes are all clean.
+- **Wrong modes:** a 0644 file, a 0755 directory, or a 0755 private root makes step 4 print `restored entry outside modes 0600/0700` and exit 1.
+- **Empty tree:** with `xargs -r` the manifest is empty (0 bytes), where the old command wrote the hash of stdin (`e3b0…`).
+- **Packet clean-worktree checks** (`git status --porcelain --untracked-files=all --ignored`, then `HEAD^{tree}` against `git write-tree`): they refuse an ignored `vendor/`, an untracked file, a tracked edit, an index/worktree mismatch and a mode change, and pass on a clean checkout.
+
+**Findings:**
+
+- **B-1 (Low): step 3's archive check does not halt.** I flipped a byte of `private.tar` after step 2. `sha256sum --check private.tar.sha256` printed `FAILED`, but the next lines still ran `mkdir` and `tar --extract`, and extraction went ahead. Unlike steps 2 and 4, this line has no `|| { …; exit 1; }`, and neither does the `database.sql.sha256` check. Step 4 would still catch damaged members, but the stated intent ("the archive … must be the one step 2 wrote") is not enforced. Add `|| { echo 'archive checksum mismatch'; exit 1; }` to both checks, or start the block with `set -euo pipefail`.
+- **B-2 (Low): the mode check falsely fails on a stock checkout.** `storage/app/private/.gitignore` is tracked with mode 100644. It is in the documented `<PRIVATE_ROOT>`, so step 2 archives it and step 4 then always fails. Reproduced with a synthetic `.gitignore` at 0644. Either exclude `./.gitignore` explicitly, or have the host set it to 0600 and record that.
+- **Info:** for an empty private tree, step 4's `sha256sum --check --strict` on an empty manifest errors with "no properly formatted checksum lines found". This fails closed.
+- **Info:** the packet's clean-worktree check needs a fresh directory per release, because an earlier `vendor/`, `node_modules/`, `public/build` or runtime `storage/` files count as ignored entries. That is consistent with the packet's intent; state it in the packet.
+
+### SHA-256 (at `83a891bc`)
+
+```
+501421b9f0f2bb0a58d61d1ecdb4a31776564d14a03235413d5286b9ed5188a8  app/Domain/Commerce/Readiness/StripeCapabilityProbe.php
+d7fff6c43b1f080c0779f08c00f3f5ac8174128f25157c0d39b6256214ce4055  app/Domain/Commerce/Readiness/StripeCapabilityPreflight.php (unchanged since f4c55acf)
+c8a02083d2e602d7b19e70d3a1d76261f579966eb0fcc6fb2286e66241ef032b  tests/Feature/StripeCapabilityPreflightTest.php
+fb46c1f7a536b34a4f8d54334de7a0180869ec6670589c8854327e3191249b21  docs/ops/backup-restore-proof.md
+a503344c4cf9fd5d4df2be9aaa698035dfb68ade19864b913a39782e9c7f87ec  docs/ops/production-activation-packet.md
+a9af2b53ae75e0b4c450d897f35520d19249270650c7cb594b6bb7fc1c938247  independent-review/DECISION.md as committed at 83a891bc (before this addendum)
+27954a6988c9315d05eb666c5501f6fa9b03204e21f63c44f4f9d4ba230e7ca9  review-evidence/ReviewerCapabilitiesHashAddendumTest.php.txt (VA-Studio-review-prep)
+e6e062128306a50d2f55bbe8297be56e6d36360035375c11d2953b7544ddd983  review-evidence/backup-doc-rehearsal-83a891bc.sh.txt (VA-Studio-review-prep)
+```
