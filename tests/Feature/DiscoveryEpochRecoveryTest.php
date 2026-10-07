@@ -271,6 +271,8 @@ class DiscoveryEpochRecoveryTest extends TestCase
             case 'missing seed':
                 $pdo->exec('DROP TRIGGER cde_own_delete');
                 $pdo->exec('DELETE FROM '.DiscoveryEpoch::TABLE);
+                // Keep the exact prefix so seed refusal cannot be masked by a guard gap.
+                $pdo->exec(DiscoveryEpoch::guards($driver)['cde_own_delete']['sql']);
                 break;
             case 'advanced partial epoch':
                 DB::table('tracks')->insert(['title' => 'Synthetic write while incomplete', 'slug' => 'incomplete-write']);
@@ -313,6 +315,75 @@ class DiscoveryEpochRecoveryTest extends TestCase
                 $pdo->exec($driver === 'mysql' ? 'DROP TEMPORARY TABLE '.$temporary : 'DROP TABLE temp.'.$temporary);
             }
         }
+    }
+
+    public function test_reserved_objects_cannot_hide_across_table_index_view_and_trigger_namespaces(): void
+    {
+        $pdo = DB::connection()->getPdo();
+        $driver = DB::getDriverName();
+        DB::table('tracks')->insert(['title' => 'Synthetic namespace preservation draft', 'slug' => 'namespace-retained']);
+        $migration = require database_path('migrations/'.self::MIGRATION.'.php');
+        $cases = [];
+        foreach ($driver === 'sqlite' ? ['table', 'index', 'view'] : ['table'] as $type) {
+            foreach (['cde_own_insert', 'CDE_OWN_INSERT'] as $name) {
+                foreach ([true, false] as $foreignFirst) {
+                    $cases[] = [$type, $name, $foreignFirst];
+                }
+            }
+        }
+        foreach ([DiscoveryEpoch::TABLE, strtoupper(DiscoveryEpoch::TABLE)] as $name) {
+            foreach ([true, false] as $foreignFirst) {
+                $cases[] = ['trigger', $name, $foreignFirst];
+            }
+        }
+        foreach ($cases as [$type, $name, $foreignFirst]) {
+            $this->removeFixtureEpoch($pdo);
+            $foreign = match ($type) {
+                'table' => 'CREATE TABLE '.$name.' (id INTEGER)',
+                'index' => 'CREATE INDEX '.$name.' ON tracks (id)',
+                'view' => 'CREATE VIEW '.$name.' AS SELECT 9123 AS id',
+                'trigger' => $driver === 'mysql' ? 'CREATE TRIGGER '.$name.' BEFORE UPDATE ON tracks FOR EACH ROW SET @discovery_foreign_canary = 1'
+                    : 'CREATE TRIGGER '.$name.' BEFORE UPDATE ON tracks BEGIN SELECT 1; END',
+            };
+            if ($foreignFirst) {
+                $pdo->exec($foreign);
+            }
+            $pdo->exec(DiscoveryEpoch::tableSql($driver));
+            $pdo->exec('INSERT INTO '.DiscoveryEpoch::TABLE.' (id, epoch, schema_version) VALUES (1, 0, 1)');
+            $pdo->exec(DiscoveryEpoch::guards($driver)['cde_own_insert']['sql']);
+            if (! $foreignFirst) {
+                $pdo->exec($foreign);
+            }
+            if ($type === 'table') {
+                $pdo->exec('INSERT INTO '.$name.' (id) VALUES (9123)');
+            }
+            try {
+                $this->assertRecoveryRefusedWithSnapshot($pdo, fn () => $migration->up());
+            } finally {
+                // Only the explicitly constructed foreign namespace is removed.
+                $pdo->exec('DROP '.strtoupper($type).' '.$name);
+            }
+        }
+    }
+
+    private function assertRecoveryRefusedWithSnapshot(PDO $pdo, callable $operation): void
+    {
+        $before = $this->databaseSnapshot($pdo);
+        $writes = [];
+        DB::connection()->setPdo($this->faultPdo($pdo, function (string $operation, string $sql, string $when) use (&$writes): void {
+            if ($operation === 'exec' && $when === 'before') {
+                $writes[] = $sql;
+            }
+        }));
+        try {
+            $operation();
+            $this->fail('Foreign reserved identity was adopted.');
+        } catch (LogicException) {
+            $this->assertSame([], $writes);
+        } finally {
+            DB::connection()->setPdo($pdo);
+        }
+        $this->assertSame($before, $this->databaseSnapshot($pdo));
     }
 
     private function databaseSnapshot(PDO $pdo): array

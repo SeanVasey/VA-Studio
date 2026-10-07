@@ -59,15 +59,21 @@ return new class extends Migration
             }
         }
         $objects = $pdo->query('SELECT type, name, tbl_name, sql FROM sqlite_master')->fetchAll(PDO::FETCH_ASSOC);
-        $byName = array_column($objects, null, 'name');
+        $reserved = [];
         foreach ($objects as $object) {
-            if (in_array(strtolower($object['name']), $names, true) && ! in_array($object['name'], $names, true)) {
-                throw new LogicException('Discovery identity collision; recovery refused before DDL.');
+            $folded = strtolower($object['name']);
+            if (in_array($folded, $names, true)) {
+                $type = $folded === DiscoveryEpoch::TABLE ? 'table' : 'trigger';
+                if ($object['name'] !== $folded || $object['type'] !== $type || isset($reserved[$folded])) {
+                    throw new LogicException('Discovery identity collision; recovery refused before DDL.');
+                }
+                $reserved[$folded] = true;
             }
             if (strtolower($object['tbl_name']) === DiscoveryEpoch::TABLE && $object['name'] !== DiscoveryEpoch::TABLE && ! isset($guards[$object['name']])) {
                 throw new LogicException('Unexpected discovery object; recovery refused before DDL.');
             }
         }
+        $byName = array_column($objects, null, 'name');
         foreach (DiscoveryEpoch::DEPENDENCIES as $table) {
             if (($byName[$table]['type'] ?? null) !== 'table') {
                 throw new LogicException('Discovery dependency unavailable.');
