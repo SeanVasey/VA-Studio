@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ReviewProbes\ReviewerOperativeProbeTest" file="/home/user/VA-Studio-review-member/docs/verification/membership-operative-1-20261007/independent-review/review-evidence/probes/ReviewerOperativeProbeTest.php" tests="12" assertions="31" errors="1" failures="0" skipped="0" time="11.261513">
+    <testcase name="test_f1_variadic_lower_registered_after_capture_is_refused_by_the_catalog" file="/home/user/VA-Studio-review-member/docs/verification/membership-operative-1-20261007/independent-review/review-evidence/probes/ReviewerOperativeProbeTest.php" line="49" class="Tests\Feature\ReviewProbes\ReviewerOperativeProbeTest" classname="Tests.Feature.ReviewProbes.ReviewerOperativeProbeTest" assertions="4" time="1.264640"/>
+    <testcase name="test_f1_two_argument_max_registered_after_capture_is_refused_by_the_catalog" file="/home/user/VA-Studio-review-member/docs/verification/membership-operative-1-20261007/independent-review/review-evidence/probes/ReviewerOperativeProbeTest.php" line="73" class="Tests\Feature\ReviewProbes\ReviewerOperativeProbeTest" classname="Tests.Feature.ReviewProbes.ReviewerOperativeProbeTest" assertions="2" time="0.939665"/>
+    <testcase name="test_f1_pin_still_blocks_collation_replacement_after_repeated_savepoint_cycles" file="/home/user/VA-Studio-review-member/docs/verification/membership-operative-1-20261007/independent-review/review-evidence/probes/ReviewerOperativeProbeTest.php" line="95" class="Tests\Feature\ReviewProbes\ReviewerOperativeProbeTest" classname="Tests.Feature.ReviewProbes.ReviewerOperativeProbeTest" assertions="3" time="1.009947"/>
+    <testcase name="test_f1_allowlisted_extension_name_registered_by_the_application_is_admitted" file="/home/user/VA-Studio-review-member/docs/verification/membership-operative-1-20261007/independent-review/review-evidence/probes/ReviewerOperativeProbeTest.php" line="123" class="Tests\Feature\ReviewProbes\ReviewerOperativeProbeTest" classname="Tests.Feature.ReviewProbes.ReviewerOperativeProbeTest" assertions="2" time="1.037898"/>
+    <testcase name="test_o3_forged_container_scoped_closure_diverges_from_the_resolved_environment" file="/home/user/VA-Studio-review-member/docs/verification/membership-operative-1-20261007/independent-review/review-evidence/probes/ReviewerOperativeProbeTest.php" line="148" class="Tests\Feature\ReviewProbes\ReviewerOperativeProbeTest" classname="Tests.Feature.ReviewProbes.ReviewerOperativeProbeTest" assertions="4" time="0.849308">
+      <error type="Mockery\Exception\BadMethodCallException">Tests\Feature\ReviewProbes\ReviewerOperativeProbeTest::test_o3_forged_container_scoped_closure_diverges_from_the_resolved_environment
+Mockery\Exception\BadMethodCallException: Received Mockery_1_Illuminate_Console_OutputStyle::askQuestion(), but no expectations were specified
+
+/home/user/VA-Studio/vendor/symfony/console/Style/SymfonyStyle.php:234
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Confirm.php:17
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Component.php:117
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Confirm.php:16
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Factory.php:61
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/ConfiguresPrompts.php:78
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/ConfiguresPrompts.php:141
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/ConfiguresPrompts.php:77
+/home/user/VA-Studio/vendor/laravel/prompts/src/Concerns/Fallback.php:59
+/home/user/VA-Studio/vendor/laravel/prompts/src/Prompt.php:108
+/home/user/VA-Studio/vendor/laravel/prompts/src/helpers.php:149
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/ConfirmableTrait.php:33
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/WipeCommand.php:41
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/symfony/console/Application.php:1094
+/home/user/VA-Studio/vendor/symfony/console/Application.php:356
+/home/user/VA-Studio/vendor/symfony/console/Application.php:195
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+/home/user/VA-Studio-review-member/tests/Support/FinalizationDatabaseMigrations.php:32
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:333
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:129
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:101
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_o3_env_instance_precedence" file="/home/user/VA-Studio-review-member/docs/verification/membership-operative-1-20261007/independent-review/review-evidence/probes/ReviewerOperativeProbeTest.php" line="172" class="Tests\Feature\ReviewProbes\ReviewerOperativeProbeTest" classname="Tests.Feature.ReviewProbes.ReviewerOperativeProbeTest" assertions="3" time="0.860197"/>
+    <testcase name="test_f2_reservation_hash_of_award_or_consume_seal_is_refused" file="/home/user/VA-Studio-review-member/docs/verification/membership-operative-1-20261007/independent-review/review-evidence/probes/ReviewerOperativeProbeTest.php" line="188" class="Tests\Feature\ReviewProbes\ReviewerOperativeProbeTest" classname="Tests.Feature.ReviewProbes.ReviewerOperativeProbeTest" assertions="1" time="0.839113"/>
+    <testcase name="test_f2_consume_with_mismatched_reserve_redemption" file="/home/user/VA-Studio-review-member/docs/verification/membership-operative-1-20261007/independent-review/review-evidence/probes/ReviewerOperativeProbeTest.php" line="204" class="Tests\Feature\ReviewProbes\ReviewerOperativeProbeTest" classname="Tests.Feature.ReviewProbes.ReviewerOperativeProbeTest" assertions="1" time="0.840048"/>
+    <testcase name="test_f2_equal_timestamp_is_admitted_and_one_second_earlier_activation_is_refused" file="/home/user/VA-Studio-review-member/docs/verification/membership-operative-1-20261007/independent-review/review-evidence/probes/ReviewerOperativeProbeTest.php" line="222" class="Tests\Feature\ReviewProbes\ReviewerOperativeProbeTest" classname="Tests.Feature.ReviewProbes.ReviewerOperativeProbeTest" assertions="1" time="0.841892"/>
+    <testcase name="test_billing_failed_dispatch_after_commit_is_not_rescheduled_by_redelivery" file="/home/user/VA-Studio-review-member/docs/verification/membership-operative-1-20261007/independent-review/review-evidence/probes/ReviewerOperativeProbeTest.php" line="237" class="Tests\Feature\ReviewProbes\ReviewerOperativeProbeTest" classname="Tests.Feature.ReviewProbes.ReviewerOperativeProbeTest" assertions="5" time="0.887836"/>
+    <testcase name="test_billing_first_retrieval_under_wrong_binding_pins_the_invoice_identity" file="/home/user/VA-Studio-review-member/docs/verification/membership-operative-1-20261007/independent-review/review-evidence/probes/ReviewerOperativeProbeTest.php" line="260" class="Tests\Feature\ReviewProbes\ReviewerOperativeProbeTest" classname="Tests.Feature.ReviewProbes.ReviewerOperativeProbeTest" assertions="3" time="1.070971"/>
+    <testcase name="test_billing_signed_paid_event_alone_appends_no_observation" file="/home/user/VA-Studio-review-member/docs/verification/membership-operative-1-20261007/independent-review/review-evidence/probes/ReviewerOperativeProbeTest.php" line="286" class="Tests\Feature\ReviewProbes\ReviewerOperativeProbeTest" classname="Tests.Feature.ReviewProbes.ReviewerOperativeProbeTest" assertions="2" time="0.819997"/>
+  </testsuite>
+</testsuites>

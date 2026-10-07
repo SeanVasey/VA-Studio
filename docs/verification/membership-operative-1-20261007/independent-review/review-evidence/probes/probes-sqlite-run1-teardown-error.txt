@@ -1,0 +1,61 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-member/phpunit.xml
+
+OBSERVATION F1 variadic lower after capture: registered=true assertCurrent=changed_primary_or_schema calls=0
+.OBSERVATION F1 max(2) after capture: registered=true one()=changed_primary_or_schema calls=0
+.OBSERVATION F1 pin after cycles: BINARY=false NOCASE=false lower(1)=false
+.OBSERVATION F1 allowlisted extension names snippet/highlight registered by app: reader=admitted calls=0
+.OBSERVATION O3 forged closure: policy env=testing billing env=testing calls during policy reads=0 app()->environment()=production
+[31;1mE[0mOBSERVATION O3 instance: membership env=testing app()->environment()=testing billing=changed_policy
+.OBSERVATION F2 reservation hash = award/consume/reserve seal: {"award":"refused","consume":"refused","reserve":"admitted"}
+.OBSERVATION F2 consume(R1) against reserve(R2): consume=refused_by_257 activation=refused
+.OBSERVATION F2 timestamps: earlier=refused equal=admitted
+.OBSERVATION Billing sync dispatch: first=threw BindingResolutionException events=1 redelivery duplicate=true scheduled=null observations=0 binding=79211820-6bd8-4644-9b7a-e4c54ad5ab8e
+.OBSERVATION Billing wrong binding first: first outcome=refused reason=subscription then right binding=conflicting_invoice invoices=1
+.OBSERVATION Billing signed paid event: disposition=retrieval_hint observations=0 credit_events=0
+.                                                      12 / 12 (100%)
+
+Time: 00:11.265, Memory: 91.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ReviewProbes\ReviewerOperativeProbeTest::test_o3_forged_container_scoped_closure_diverges_from_the_resolved_environment
+Mockery\Exception\BadMethodCallException: Received Mockery_1_Illuminate_Console_OutputStyle::askQuestion(), but no expectations were specified
+
+/home/user/VA-Studio/vendor/symfony/console/Style/SymfonyStyle.php:234
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Confirm.php:17
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Component.php:117
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Confirm.php:16
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Factory.php:61
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/ConfiguresPrompts.php:78
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/ConfiguresPrompts.php:141
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/ConfiguresPrompts.php:77
+/home/user/VA-Studio/vendor/laravel/prompts/src/Concerns/Fallback.php:59
+/home/user/VA-Studio/vendor/laravel/prompts/src/Prompt.php:108
+/home/user/VA-Studio/vendor/laravel/prompts/src/helpers.php:149
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/ConfirmableTrait.php:33
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/WipeCommand.php:41
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/symfony/console/Application.php:1094
+/home/user/VA-Studio/vendor/symfony/console/Application.php:356
+/home/user/VA-Studio/vendor/symfony/console/Application.php:195
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+/home/user/VA-Studio-review-member/tests/Support/FinalizationDatabaseMigrations.php:32
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:333
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:129
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:101
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 12[0m[37;41m, Assertions: 31[0m[37;41m, Errors: 1[0m[37;41m.[0m
