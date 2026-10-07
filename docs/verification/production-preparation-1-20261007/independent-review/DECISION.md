@@ -625,3 +625,103 @@ fa4bad6d658c0559b1f571fb042266fa4c612b73f813d7d4f61c57cae24c1a7e  docs/ops/backu
 b7f818120632ff095f774eaed1cb387612e2f9a8125b5d1441d5ee6a43977beb  independent-review/DECISION.md as committed at 4e76bf5a (before this addendum)
 bcf5dc84e4b0cff2692d005c3bbcec2eb0ee7841be96ad530e54097724b9c8e1  review-evidence/backup-doc-rehearsal-4e76bf5a.sh.txt (VA-Studio-review-prep)
 ```
+
+---
+
+## Addendum 6: condition-3 re-review of the preflight origin rule, `f8fed104` (2026-10-07)
+
+**Result: APPROVE WITH CONDITIONS carries to `f8fed1048ed0f0613ba59facddc25780e51dcf6e` (code head `13712e4fbb16375c528653b5b15975e11c76a272`).** Conditions 1 and 3 still apply. This addendum didn't re-check or re-rehearse whether B-4/B-5 from Addendum 5 are fixed in `docs/ops/backup-restore-proof.md`. Three new Low findings (O-1, O-2, D-1) don't block a development merge.
+
+### Scope and environment
+
+- **Delta `4e76bf5a..f8fed104`.** `git diff --stat 4e76bf5a f8fed104 -- app tests scripts config database` lists four files, not three:
+  - `13712e4f` changes `MachinePolicyV1.php`, `StripeCapabilityPreflight.php` and `StripeCapabilityPreflightTest.php`.
+  - `41653a32` adds one case to `tests/Unit/BackupRestoreProofTest.php`: `symlink_private_root`, the Info case suggested in Addendum 5.
+  - Nothing in `scripts/`, `config/` or `database/` changed. Everything else is documentation.
+- **Environment.** Worktree `/home/user/VA-Studio-review-prep`, detached at `f8fed104`. PHP 8.4.26, PHPUnit 12.5.34, SQLite, no `public/build`, no network. PHPUnit ran directly with the worktree's own autoload, not through `php artisan test`.
+
+### `MachinePolicyV1::origin()` made public
+
+- **No logic change.** The diff touches two lines: `private` becomes `public`, and a one-line docblock is added. The body is byte-identical.
+- **Callers.** There are exactly two:
+  - `MachinePolicyV1::validate()`, as before;
+  - `StripeCapabilityPreflight::collect()`.
+- **Surface.** Making it public adds no meaningful surface. It is a pure static predicate over `mixed`: no state, no I/O, no side effects, and it never throws.
+
+### Predicate comparison
+
+**Is the preflight now exactly the production rule?** Yes, by construction:
+
+- `ExecutionContextV1::make()` first runs `MachinePolicyV1::validate()`, which applies `origin()` to `provider_account.return_origin`.
+- It then requires `config('production_checkout.return_origin') === $p['return_origin']`.
+- So a configured origin is usable only if it is a string that passes `MachinePolicyV1::origin()`, and the preflight now applies that same predicate.
+
+**False negative: none.** The preflight cannot refuse an origin the policy and `ExecutionContextV1` would accept. Every input the old preflight accepted and the new one refuses (12 below) is one the policy already refused, so none of them was ever usable.
+
+**False positive (the Codex finding): closed.** `localhost` (any case, with a port, or with a trailing dot), `127.0.0.1`, IPv6 literals, `-`, `_`, IDN in Unicode form, and hosts with a trailing dot all passed the old preflight and are now refused. No input the policy refuses still passes.
+
+**The one input that moved the other way:** `https://…:0` was refused by the old preflight and now passes (O-2).
+
+Probe: `review-evidence/addendum6/origin-predicate-probe.php` fed 43 inputs to both predicates; output is in `origin-predicate-probe.out.txt`. Rows where the predicates differ, plus the boundary rows:
+
+| Input | `httpsOrigin` (old preflight) | `MachinePolicyV1::origin` (policy = new preflight) |
+| --- | --- | --- |
+| `https://localhost`, `https://LOCALHOST`, `https://localhost:443`, `https://localhost.` | accept | **refuse** |
+| `https://127.0.0.1` | accept | **refuse** |
+| `https://[::1]`, `https://[::1]:443`, `https://[2001:db8::1]` | accept | **refuse** |
+| `https://-`, `https://review_invalid`, `https://review.invalid.` | accept | **refuse** |
+| `https://bücher.example` (IDN, Unicode) | accept | **refuse** |
+| `https://review.invalid:0` | refuse | **accept** (O-2) |
+| `https://127.0.0.2`, `https://10.0.0.1`, `https://0.0.0.0`, `https://2130706433`, `https://a..b` | accept | accept (O-1) |
+| `https://xn--bcher-kva.example` (punycode), `https://REVIEW.INVALID`, `:443`, `:1`, `:65535`, and the trailing-colon form `https://review.invalid:` | accept | accept |
+| `https://review.invalid:65536`, `HTTPS://review.invalid`, `http://…`, a trailing `/`, a path, an empty `?` or `#`, userinfo, a leading space, a backslash, `null`, int `443` | refuse | refuse |
+| 255-char input / 256-char input | accept / refuse | accept / refuse |
+
+The trailing slash was already refused by the old preflight, because `parse_url` returns a `path` for it. That is why only three of the four new test cases are red before the fix.
+
+### Commands and results
+
+`$P` stands for `php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' --`.
+
+| Command | Result |
+| --- | --- |
+| `$P tests/Feature/StripeCapabilityPreflightTest.php` | OK, 46 tests, 378 assertions |
+| `$P tests/Unit/ProductionTrackMachinePolicyTest.php` | OK, 93 tests, 97 assertions |
+| `$P tests/Feature/ProductionCommerceReadinessTest.php` | OK, 66 tests, 334 assertions |
+| `$P tests/Unit/BackupRestoreProofTest.php` | OK, 12 tests, 286 assertions |
+| Red before the fix: `git show 4e76bf5a:app/…/StripeCapabilityPreflight.php` over the file, then the preflight test | 46 tests, 363 assertions, **3 failures**: `origin localhost`, `origin loopback ip`, `origin invalid host` |
+| Mutation: only `$originValid = ProductionCommerceReadiness::httpsOrigin($origin);` restored | the same 3 failures |
+| Red before for the backup case: `git show 9b6b48be:scripts/ops/backup-restore-proof.php` over the script, then the backup test | 12 tests, **2 failures**: `restored private root widened` and the new `restored private root replaced by a symlink` |
+| Restore: `git checkout -- app scripts` and `git diff --quiet -- app tests scripts` | exit 0 |
+| `vendor/bin/pint --test` on the four changed PHP files | passed |
+
+The lane's `conditions/codex-origin-rule/` receipts match these results: 46/378; red 3 failures; regression 159/431 = 93+66 tests and 97+334 assertions.
+
+### Findings
+
+- **O-1 (Low): the preflight message overclaims.** The `return_origin_https` message says "never localhost or an IP literal". The code comment says "a syntactically valid hostname". The shared predicate accepts `127.0.0.2`, `10.0.0.1`, `0.0.0.0`, `2130706433` and `a..b`; it refuses only `localhost`, `127.0.0.1` and bracketed IPv6. This is pre-existing policy behavior, and the preflight correctly mirrors it. Either reword the message to say "never localhost or 127.0.0.1", or tighten `MachinePolicyV1::origin()`. Tightening is a policy change and needs its own review.
+- **O-2 (Low): port 0 now passes the preflight.** `httpsOrigin` range-checked the port (1–65535); `MachinePolicyV1::origin()` does not, and PHP's `parse_url` accepts `:0`. The policy and `ExecutionContextV1` already accepted `https://host:0`, so the preflight is now consistent with them, but the origin is unusable. The fix belongs in the policy predicate: `! isset($parts['port']) || $parts['port'] >= 1`. Add a test case for it in both suites.
+- **D-1 (Low): S1 mixes privilege levels.** The S1 shell block starts with "as the unprivileged application user". It now also runs `systemctl stop`/`start` on system units and `install -o <APP_USER> -g <APP_GROUP>`. Without root or a polkit/sudo rule, `systemctl stop <QUEUE_WORKER_SERVICE>` fails after `artisan down` has already marked the served release. That stops at `|| exit 1`, so it fails closed, but it leaves the site in maintenance with the workers still running. Name the privileged steps, for example as `sudo` lines with a stated sudoers scope.
+- **Info:** the worker `/proc/<MainPID>/cwd` proof only holds if the worker unit sets `WorkingDirectory=<RELEASES_DIR>/current`, because `php …/current/artisan` doesn't change directory. The inputs paragraph doesn't state this requirement. Without it the proof fails closed.
+- **Info:** the review brief said all code changes were in `13712e4f`. `41653a32` also changes a test (see Scope); that change was verified above.
+
+No other outright error was found in the `docs/ops/production-activation-packet.md` delta (sanity read only; not rehearsed).
+
+### SHA-256 (at `f8fed104`)
+
+```
+a42d2b216d7815a44ad7743896edd92d3b001d4307dfe287aee97bedb79d4a7e  app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php
+46e72bf3d531e326c1b9d4d4681526b5ed169915153c94cf84fb443c55f038b5  app/Domain/Commerce/Readiness/StripeCapabilityPreflight.php
+c65fb5ada75de30a07d1608e1a1e9e19885fce7f96bc4c94245d609a5f5e299e  tests/Feature/StripeCapabilityPreflightTest.php
+81c2b7b91edb999c17188c4e3435fe81d065a8083ae9768d7d9b0390ea36dfb8  tests/Unit/BackupRestoreProofTest.php
+7a036232c2a4eaef6b1f5ed61b123a57e88c5115d4db5d37a0dd6d6786155590  docs/ops/production-activation-packet.md
+02a9c1d035ef1aacde330c9b4b43f22c249ab2c529fb8dc5c3cf102efad62cb2  independent-review/DECISION.md as committed at f8fed104 (before this addendum)
+c58335e3137714edcdccac39a4a376f7dac311c30cec8792711b4dc7f6f71ec0  review-evidence/addendum6/origin-predicate-probe.php (VA-Studio-review-prep)
+c1333aaf5d3ce1d6e7fc9f1af15ab13e0ea61e9176940aa3c3625a2418cd7415  review-evidence/addendum6/origin-predicate-probe.out.txt (VA-Studio-review-prep)
+```
+
+### Cleanup
+
+- Every temporary overwrite (the old preflight, the mutation and the old backup script) was restored with `git checkout`, and `git diff --quiet -- app tests scripts` exits 0.
+- The only uncommitted paths left are this file and the untracked `review-evidence/` directory.
+- This addendum is uncommitted; the integration owner commits it.

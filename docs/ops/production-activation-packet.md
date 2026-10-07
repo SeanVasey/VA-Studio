@@ -102,9 +102,15 @@ host's unit names; the web unit serves `<RELEASES_DIR>/current/public` and the o
 `<RELEASES_DIR>/current/artisan`.
 
 ```sh
-# On the staging host, as the unprivileged application user. Every release is a fresh,
-# immutable checkout in its own directory; nothing is reused, and persistent data never
-# lives inside it. <RELEASES_DIR> holds one directory per authorized SHA; <PERSISTENT_ROOT>
+# On the staging host, as the unprivileged application user. Two kinds of step need more
+# than that user: the `systemctl stop`/`start`/`is-active` lines on <WEB_SERVICE>,
+# <QUEUE_WORKER_SERVICE> and <SCHEDULER_SERVICE>, and the bind mount. Grant exactly those
+# through a sudoers scope limited to the named units and the mount line (never a general
+# sudo), and run them as `sudo systemctl ...`; every other line runs as the application
+# user. A `systemctl stop` that is refused stops the sequence at its `|| exit 1` with the
+# site in maintenance and the workers still running: grant the scope before starting.
+# Every release is a fresh, immutable checkout in its own directory; nothing is reused, and
+# persistent data never lives inside it. <RELEASES_DIR> holds one directory per authorized SHA; <PERSISTENT_ROOT>
 # holds storage/app/private (masters, contracts, originals) and survives releases.
 git clone --no-checkout <REPO_URL> <RELEASES_DIR>/<SHA> && cd <RELEASES_DIR>/<SHA>
 git checkout --detach <SHA> && test "$(git rev-parse HEAD)" = "<SHA>"

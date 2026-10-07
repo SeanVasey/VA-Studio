@@ -445,6 +445,18 @@ the preflight; four new malformed cases, three red before the fix
 (`conditions/codex-origin-rule/`); `StripeCapabilityPreflightTest` 46 / 378. The S1
 `migrate --pretend` preview is fatal, so a failed preview never proceeds to `migrate --force`.
 
+Under condition 3 the preflight change was re-reviewed (`independent-review/DECISION.md`,
+addendum 6): APPROVE WITH CONDITIONS carries to `f8fed104`; the preflight now accepts
+exactly the origins `ExecutionContextV1` can use (no false negative by construction; the
+twelve policy-refused inputs the old helper admitted are now refused). Three Lows: O-1 the
+check message overclaimed "never an IP literal" (reworded here: the shared rule refuses
+only `localhost` and `127.0.0.1`); O-2 `MachinePolicyV1::origin()` has no port range check,
+so `:0` passes the preflight as it already passed the policy (queued as a policy change under
+its own review, not widened into this PR); D-1 the S1 block mixes privilege levels (now
+names the `systemctl` and mount lines as the only privileged steps, under a unit-scoped
+sudoers grant). Info: the worker `cwd` proof assumes the unit sets `WorkingDirectory` to
+the `current` release.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex
