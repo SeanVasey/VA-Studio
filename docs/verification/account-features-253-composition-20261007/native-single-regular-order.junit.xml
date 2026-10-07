@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" tests="1" assertions="2" errors="1" failures="0" skipped="0" time="160.338672">
+    <testcase name="test_regular_begin_commit_and_aftercommit_callback_order_is_preserved" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" line="105" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionEventsTest" assertions="2" time="160.338672">
+      <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_regular_begin_commit_and_aftercommit_callback_order_is_preserved
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:103
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:54
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:29
+/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:109</error>
+    </testcase>
+  </testsuite>
+</testsuites>
