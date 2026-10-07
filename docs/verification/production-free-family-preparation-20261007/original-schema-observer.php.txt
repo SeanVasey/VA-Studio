@@ -1,0 +1,40 @@
+<?php
+
+require getcwd().'/vendor/autoload.php';
+$application = require getcwd().'/bootstrap/app.php';
+$application->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+if (! $application->environment('testing')) {
+    throw new LogicException('Disposable synthetic metadata preparation requires testing.');
+}
+$driver = Illuminate\Support\Facades\DB::getDriverName();
+if ($driver === 'mysql' && Illuminate\Support\Facades\DB::connection()->getDatabaseName() !== 'vaseyaudio_production_identity') {
+    throw new LogicException('The metadata generator owns only its explicitly allocated disposable author schema.');
+}
+$status = Illuminate\Support\Facades\Artisan::call('migrate:fresh', ['--force' => true]);
+if ($status !== 0) {
+    throw new LogicException('Actual prior migrations failed.');
+}
+$primary = Illuminate\Support\Facades\DB::connection()->getPdo();
+$tables = ['users', 'customer_accounts', 'audit_events', 'license_versions', 'license_templates',
+    'license_review_evidence', 'tracks', 'rights_scopes', 'media_assets', 'media_processing_runs',
+    'rights_declarations', 'inventory_claims', 'inventory_reservations', 'stems_recordings'];
+$facts = [];
+foreach ($tables as $table) {
+    if ($driver === 'sqlite') {
+        $columns = $primary->query('PRAGMA main.table_xinfo("'.$table.'")')->fetchAll(PDO::FETCH_ASSOC);
+        $facts[$table] = array_map(fn (array $row): array => array_diff_key($row, ['cid' => true]), $columns);
+    } else {
+        $statement = $primary->prepare('SELECT COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,EXTRA,CHARACTER_SET_NAME,COLLATION_NAME,GENERATION_EXPRESSION FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY ORDINAL_POSITION');
+        $statement->execute([$table]);
+        $facts[$table] = $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+    if ($facts[$table] === []) {
+        throw new LogicException('Actual dependency table is absent: '.$table);
+    }
+}
+$target = getcwd().'/resources/contracts/production-free-v1/parents-'.$driver.'.json';
+if (! is_dir(dirname($target))) {
+    mkdir(dirname($target), 0755, true);
+}
+file_put_contents($target, json_encode($facts, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR)."\n");
+echo json_encode(['driver' => $driver, 'metadata_tables' => count($facts), 'sha256' => hash_file('sha256', $target)], JSON_THROW_ON_ERROR), "\n";

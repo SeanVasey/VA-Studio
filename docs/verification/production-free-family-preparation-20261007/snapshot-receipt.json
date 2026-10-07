@@ -1,0 +1,77 @@
+{
+  "status": "INCOMPLETE_PREPARATION_NO_256_RUNTIME",
+  "canonical_dependency": "519170f9e5541602577381f17fa39c366b8e608b",
+  "original_metadata_source": "7131d878f6446712de62cfa8b77aa8778b789449",
+  "canonical_sqlite_reproduction": "actual fresh prior migrations, same14-table column metadata digest",
+  "native_observation": "actual prior7131 migrations on isolated synthetic author-only schema; no native rerun on519",
+  "native_engine": "8.0.46-0ubuntu0.24.04.4",
+  "schema_only": true,
+  "no_row_values": true,
+  "no_grant_assets_or_credentials": true,
+  "metadata": {
+    "sqlite": {
+      "tables": 14,
+      "columns": 167,
+      "sha256": "22411305c176acbe9ae892a659ec599c96c1239218249c8e852cdd836c039243",
+      "table_names": [
+        "users",
+        "customer_accounts",
+        "audit_events",
+        "license_versions",
+        "license_templates",
+        "license_review_evidence",
+        "tracks",
+        "rights_scopes",
+        "media_assets",
+        "media_processing_runs",
+        "rights_declarations",
+        "inventory_claims",
+        "inventory_reservations",
+        "stems_recordings"
+      ]
+    },
+    "mysql": {
+      "tables": 14,
+      "columns": 167,
+      "sha256": "3901099ff55cafc8859532e507cf97679a103342ad643ec9ff10359276868b05",
+      "table_names": [
+        "users",
+        "customer_accounts",
+        "audit_events",
+        "license_versions",
+        "license_templates",
+        "license_review_evidence",
+        "tracks",
+        "rights_scopes",
+        "media_assets",
+        "media_processing_runs",
+        "rights_declarations",
+        "inventory_claims",
+        "inventory_reservations",
+        "stems_recordings"
+      ]
+    }
+  },
+  "identical_prior_migration_tree": {
+    "7131d878f6446712de62cfa8b77aa8778b789449": "8d700d17f5d03618f3dbb5198dea2854e79ffbad",
+    "519170f9e5541602577381f17fa39c366b8e608b": "8d700d17f5d03618f3dbb5198dea2854e79ffbad"
+  },
+  "not_proven": [
+    "dependency admission before DDL",
+    "parent keys or indexes",
+    "temporary shadow exclusion",
+    "trigger enforcement",
+    "migration256 install/recovery",
+    "production definition/review/provenance",
+    "grant/current-owner/commit authority",
+    "PDF/render/private assets",
+    "HTTP/header/first-byte acceptance"
+  ],
+  "original_observer_limits": [
+    "Evidence-only script uses a guarded disposable author schema and migrate:fresh; do not transplant the schema name guard into portable runtime or final fixtures.",
+    "Original native shell command was not durably recorded; only extractor/source/stdout are retained.",
+    "No encryption or authentication was exercised by the metadata observer."
+  ],
+  "command_current_sqlite": "source /workspace/.va-studio-toolchain/activate.sh && APP_ENV=testing APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA= DB_CONNECTION=sqlite DB_DATABASE=:memory: php /tmp/production-free-parent-facts.php",
+  "current_command_uses_retained_original_observer": "original-schema-observer.php.txt"
+}
