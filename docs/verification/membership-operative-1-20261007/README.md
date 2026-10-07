@@ -9,7 +9,7 @@
   - `2dcfe136` — the O3 environment-read fix (coordinator follow-up).
   - `9c1ca807` — test-only drift D2 fix.
   - The docs commit that updates this file.
-- Status: implemented and tested on SQLite and native MySQL 8.4.11, with the selections listed below. Not independently reviewed. Nothing is registered, bound or enabled. Pushed as `origin/harness/membership-operative-1`.
+- Status: implemented and tested on SQLite and native MySQL 8.4.11, with the selections listed below. Independently reviewed at `c689ffdc`: APPROVE WITH CONDITIONS for a development merge only (`independent-review/DECISION.md`, conditions R-1 to R-5 are forward obligations before C2/C3/C4, webhook intake mounting and activation; the review's native runner did not capture PHPUnit exit codes, so its table cites the green summaries). Nothing is registered, bound or enabled. Pushed as `origin/harness/membership-operative-1`.
 
 ## What changed
 
