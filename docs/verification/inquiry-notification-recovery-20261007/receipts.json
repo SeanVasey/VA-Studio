@@ -1,0 +1,59 @@
+{
+  "code_source": "e2900e800d375e6956a0948aecb50cb323009d7d",
+  "code_tree": "6da96085d7cc20d7f463787df19bb559b7dfd0a3",
+  "php_version": "8.4.26",
+  "native_mysql_version": "8.0.46-0ubuntu0.24.04.4",
+  "target_mysql_8_4_acceptance": false,
+  "full_foundation_or_browser_acceptance": false,
+  "receipts": [
+    {
+      "file": "sqlite-final-junit.xml",
+      "tested_source": "e2900e800d375e6956a0948aecb50cb323009d7d",
+      "database": "sqlite",
+      "sha256": "02aa0ff0851fcb35b0b011fe943f12a2742b300b900095308b2331464cde8f31",
+      "recorded_cases": 194,
+      "executed_cases": 189,
+      "assertions": 4543,
+      "failures": 0,
+      "errors": 0,
+      "skips": [
+        "Tests\\Feature\\InquiryNotificationMigrationTest::test_nonempty_notification_table_with_a_missing_mysql_foreign_key_is_never_retroactively_adopted",
+        "Tests\\Feature\\InquiryNotificationMigrationTest::test_changed_mysql_notification_foreign_key_is_refused_before_any_ddl",
+        "Tests\\Feature\\InquiryNotificationMigrationTest::test_shortened_mysql_notification_due_index_prefix_is_refused_before_any_ddl",
+        "Tests\\Feature\\InquiryNotificationMigrationTest::test_changed_mysql_notification_fk_support_index_in_a_partial_installation_is_refused_before_any_ddl",
+        "Tests\\Feature\\InquiryNotificationConcurrencyTest::test_independent_workers_serialize_one_handoff_without_duplicate_attempt_or_submission"
+      ]
+    },
+    {
+      "file": "mysql-final-junit.xml",
+      "tested_source": "e2900e800d375e6956a0948aecb50cb323009d7d",
+      "database": "mysql8.0.46",
+      "sha256": "b5436f5ce3d5eeac802b8f34562c56c8737a66bb4e1d63674116e148f3aebdc9",
+      "recorded_cases": 24,
+      "executed_cases": 24,
+      "assertions": 373,
+      "failures": 0,
+      "errors": 0,
+      "skips": []
+    },
+    {
+      "file": "mysql-core-junit.xml",
+      "tested_source": "5c8d31f723368094651a536f016caca18f76b458",
+      "database": "mysql8.0.46",
+      "sha256": "40fc409c5e41d5b5cf54b5f4c68aad25202d655bd88205ff0fe30a95421d0ffb",
+      "recorded_cases": 42,
+      "executed_cases": 42,
+      "assertions": 733,
+      "failures": 0,
+      "errors": 0,
+      "skips": []
+    }
+  ],
+  "unchanged_independent_terminal_probe": {
+    "file": "InquiryTerminalHandoffCanaryTest.php",
+    "sha256": "cc9145d169c99055c6b73084767a67b44a43353871840c990befc9121a7bbf05",
+    "executed_as": "/workspace/VA-Studio-inquiry-independent/docs/verification/cloud-inquiry-independent-20261007/InquiryTerminalHandoffCanaryTest.php",
+    "cases": 3,
+    "relationship": "Same unchanged bytes copied here for reproduction; exact final runs included the original independent path."
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "approved_executable": "e2900e800d375e6956a0948aecb50cb323009d7d",
+  "evidence_successor": "a6145547ac91faca24e1965a6112c440e4680ab6",
+  "reviewer": "/root",
+  "independent_original_terminal": {
+    "cases": 3,
+    "assertions": 6,
+    "failures": 3,
+    "errors": 0
+  },
+  "independent_corrected_terminal": {
+    "tested_source": "e2900e800d375e6956a0948aecb50cb323009d7d",
+    "cases": 3,
+    "assertions": 6,
+    "failures": 0,
+    "errors": 0
+  },
+  "independent_native_alias": {
+    "tested_source": "59d5b0b336ef14bd9e78d9cd18ab314bd35fe596",
+    "engine": "MySQL8.0.46",
+    "cases": 1,
+    "assertions": 2,
+    "failures": 0,
+    "errors": 0,
+    "migration_at_approved_source": "byte-identical"
+  },
+  "canary_source": "executed original sources retained as .php.txt; .php successors change formatting only after these runs",
+  "full_acceptance": false
+}
