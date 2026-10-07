@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\FreeGrantRegistrationTest" file="/workspace/VA-Studio-free-registration/tests/Feature/FreeGrantRegistrationTest.php" tests="1" assertions="99" errors="0" failures="0" skipped="0" time="53.289888">
+    <testcase name="test_registered_routes_preserve_actual_assent_original_pdf_and_exact_downloads" file="/workspace/VA-Studio-free-registration/tests/Feature/FreeGrantRegistrationTest.php" line="44" class="Tests\Feature\FreeGrantRegistrationTest" classname="Tests.Feature.FreeGrantRegistrationTest" assertions="99" time="53.289888"/>
+  </testsuite>
+</testsuites>
