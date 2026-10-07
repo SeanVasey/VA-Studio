@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/sitemap-independent.phpunit.xml" tests="17" assertions="46" errors="3" failures="0" skipped="0" time="0.925681">
+    <testsuite name="Independent public sitemap projection" tests="17" assertions="46" errors="3" failures="0" skipped="0" time="0.925681">
+      <testsuite name="Tests\Feature\PublicPagesSitemapTest" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/tests/Feature/PublicPagesSitemapTest.php" tests="13" assertions="44" errors="0" failures="0" skipped="0" time="0.846311">
+        <testcase name="test_only_current_verified_public_paths_are_discovered_without_private_fields_or_session" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/tests/Feature/PublicPagesSitemapTest.php" line="23" class="Tests\Feature\PublicPagesSitemapTest" classname="Tests.Feature.PublicPagesSitemapTest" assertions="19" time="0.518408"/>
+        <testcase name="test_unpublished_editorial_is_absent_and_preview_queries_are_rejected" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/tests/Feature/PublicPagesSitemapTest.php" line="45" class="Tests\Feature\PublicPagesSitemapTest" classname="Tests.Feature.PublicPagesSitemapTest" assertions="7" time="0.038923"/>
+        <testcase name="test_full_verified_schema_bound_has_sixty_five_urls_and_replacement_removes_old_entries" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/tests/Feature/PublicPagesSitemapTest.php" line="54" class="Tests\Feature\PublicPagesSitemapTest" classname="Tests.Feature.PublicPagesSitemapTest" assertions="5" time="0.113581"/>
+        <testcase name="test_nonproduction_environment_exposes_no_indexable_urls" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/tests/Feature/PublicPagesSitemapTest.php" line="76" class="Tests\Feature\PublicPagesSitemapTest" classname="Tests.Feature.PublicPagesSitemapTest" assertions="4" time="0.017171"/>
+        <testsuite name="Tests\Feature\PublicPagesSitemapTest::test_invalid_canonical_configuration_fails_closed" tests="9" assertions="9" errors="0" failures="0" skipped="0" time="0.158228">
+          <testcase name="test_invalid_canonical_configuration_fails_closed with data set #0" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/tests/Feature/PublicPagesSitemapTest.php" line="83" class="Tests\Feature\PublicPagesSitemapTest" classname="Tests.Feature.PublicPagesSitemapTest" assertions="1" time="0.017319"/>
+          <testcase name="test_invalid_canonical_configuration_fails_closed with data set #1" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/tests/Feature/PublicPagesSitemapTest.php" line="83" class="Tests\Feature\PublicPagesSitemapTest" classname="Tests.Feature.PublicPagesSitemapTest" assertions="1" time="0.017267"/>
+          <testcase name="test_invalid_canonical_configuration_fails_closed with data set #2" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/tests/Feature/PublicPagesSitemapTest.php" line="83" class="Tests\Feature\PublicPagesSitemapTest" classname="Tests.Feature.PublicPagesSitemapTest" assertions="1" time="0.020547"/>
+          <testcase name="test_invalid_canonical_configuration_fails_closed with data set #3" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/tests/Feature/PublicPagesSitemapTest.php" line="83" class="Tests\Feature\PublicPagesSitemapTest" classname="Tests.Feature.PublicPagesSitemapTest" assertions="1" time="0.018620"/>
+          <testcase name="test_invalid_canonical_configuration_fails_closed with data set #4" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/tests/Feature/PublicPagesSitemapTest.php" line="83" class="Tests\Feature\PublicPagesSitemapTest" classname="Tests.Feature.PublicPagesSitemapTest" assertions="1" time="0.016201"/>
+          <testcase name="test_invalid_canonical_configuration_fails_closed with data set #5" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/tests/Feature/PublicPagesSitemapTest.php" line="83" class="Tests\Feature\PublicPagesSitemapTest" classname="Tests.Feature.PublicPagesSitemapTest" assertions="1" time="0.017252"/>
+          <testcase name="test_invalid_canonical_configuration_fails_closed with data set #6" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/tests/Feature/PublicPagesSitemapTest.php" line="83" class="Tests\Feature\PublicPagesSitemapTest" classname="Tests.Feature.PublicPagesSitemapTest" assertions="1" time="0.017210"/>
+          <testcase name="test_invalid_canonical_configuration_fails_closed with data set #7" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/tests/Feature/PublicPagesSitemapTest.php" line="83" class="Tests\Feature\PublicPagesSitemapTest" classname="Tests.Feature.PublicPagesSitemapTest" assertions="1" time="0.016800"/>
+          <testcase name="test_invalid_canonical_configuration_fails_closed with data set #8" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/tests/Feature/PublicPagesSitemapTest.php" line="83" class="Tests\Feature\PublicPagesSitemapTest" classname="Tests.Feature.PublicPagesSitemapTest" assertions="1" time="0.017013"/>
+        </testsuite>
+      </testsuite>
+      <testsuite name="Tests\Feature\SitemapIndependentCanaryTest" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/docs/verification/sitemap-independent-20261007/SitemapIndependentCanaryTest.php" tests="4" assertions="2" errors="3" failures="0" skipped="0" time="0.079370">
+        <testcase name="test_forwarded_host_identity_headers_and_cookies_cannot_change_public_projection" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/docs/verification/sitemap-independent-20261007/SitemapIndependentCanaryTest.php" line="28" class="Tests\Feature\SitemapIndependentCanaryTest" classname="Tests.Feature.SitemapIndependentCanaryTest" assertions="0" time="0.019851">
+          <error type="Illuminate\Validation\ValidationException">Tests\Feature\SitemapIndependentCanaryTest::test_forwarded_host_identity_headers_and_cookies_cannot_change_public_projection
+Illuminate\Validation\ValidationException: The selected content.navigation.4.href is invalid.
+
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/vendor/laravel/framework/src/Illuminate/Validation/Validator.php:611
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/app/Domain/SiteBuilder/SiteContentSchema.php:188
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/app/Domain/SiteBuilder/SiteContentSchema.php:48
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/app/Domain/SiteBuilder/SiteContent.php:43
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/app/Domain/SiteBuilder/SiteContent.php:39
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/docs/verification/sitemap-independent-20261007/SitemapIndependentCanaryTest.php:26
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/docs/verification/sitemap-independent-20261007/SitemapIndependentCanaryTest.php:30</error>
+        </testcase>
+        <testcase name="test_pointer_movement_keeps_one_coherent_release_and_next_request_observes_replacement" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/docs/verification/sitemap-independent-20261007/SitemapIndependentCanaryTest.php" line="41" class="Tests\Feature\SitemapIndependentCanaryTest" classname="Tests.Feature.SitemapIndependentCanaryTest" assertions="0" time="0.019442">
+          <error type="Illuminate\Validation\ValidationException">Tests\Feature\SitemapIndependentCanaryTest::test_pointer_movement_keeps_one_coherent_release_and_next_request_observes_replacement
+Illuminate\Validation\ValidationException: The selected content.navigation.4.href is invalid.
+
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/vendor/laravel/framework/src/Illuminate/Validation/Validator.php:611
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/app/Domain/SiteBuilder/SiteContentSchema.php:188
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/app/Domain/SiteBuilder/SiteContentSchema.php:48
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/app/Domain/SiteBuilder/SiteContent.php:43
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/app/Domain/SiteBuilder/SiteContent.php:39
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/docs/verification/sitemap-independent-20261007/SitemapIndependentCanaryTest.php:26
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/docs/verification/sitemap-independent-20261007/SitemapIndependentCanaryTest.php:43</error>
+        </testcase>
+        <testcase name="test_nonproduction_published_release_stays_empty_and_cookie_free" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/docs/verification/sitemap-independent-20261007/SitemapIndependentCanaryTest.php" line="57" class="Tests\Feature\SitemapIndependentCanaryTest" classname="Tests.Feature.SitemapIndependentCanaryTest" assertions="0" time="0.023411">
+          <error type="Illuminate\Validation\ValidationException">Tests\Feature\SitemapIndependentCanaryTest::test_nonproduction_published_release_stays_empty_and_cookie_free
+Illuminate\Validation\ValidationException: The selected content.navigation.4.href is invalid.
+
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/vendor/laravel/framework/src/Illuminate/Validation/Validator.php:611
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/app/Domain/SiteBuilder/SiteContentSchema.php:188
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/app/Domain/SiteBuilder/SiteContentSchema.php:48
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/app/Domain/SiteBuilder/SiteContent.php:43
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/app/Domain/SiteBuilder/SiteContent.php:39
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/docs/verification/sitemap-independent-20261007/SitemapIndependentCanaryTest.php:26
+/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/docs/verification/sitemap-independent-20261007/SitemapIndependentCanaryTest.php:59</error>
+        </testcase>
+        <testcase name="test_nonempty_get_body_is_accepted_diagnostic_for_missing_bodyless_boundary" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/docs/verification/sitemap-independent-20261007/SitemapIndependentCanaryTest.php" line="65" class="Tests\Feature\SitemapIndependentCanaryTest" classname="Tests.Feature.SitemapIndependentCanaryTest" assertions="2" time="0.016666"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

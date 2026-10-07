@@ -1,5 +1,31 @@
 # Current development queue
 
+## Public discovery and renderer successor continuation — October 7 UTC
+
+PR #20 merged the retained-v1 registry at native
+`fc905fc7781ed618e6b86529bf372106de4ebd51`, tree
+`5835124c39fe3ecdee4b71c3c5a4b81a39e141a7`, after exact-head cheap preflight
+37572489799 attempt 1 passed. Main/PR/tree and ordered parents were read back.
+Current policy/profile, historical metadata and original PDF bytes are preserved.
+
+The public-pages discovery candidate adds `/site-pages-sitemap.xml` for home and
+verified currently published editorial paths, at most 65 URLs. Production uses
+configured canonical origin; other environments expose no URLs. No private
+release fields, sessions or cookies enter the projection. A fixed one-byte stream
+probe rejects actual nonempty GET/HEAD bodies and all query parameters refuse.
+Author 18/50 and independent 23/87 passed. Original body-admission and reviewer
+fixture failures remain visible. Code freeze `5b0dc7d` equals the five paths
+approved at `24e6ad3`; all registry/private dependencies and CI files are retained.
+Track sitemap/index, robots, actual redirects and deployed SEO acceptance remain
+separate T36/FP-014 criteria; this child does not close the parent.
+
+The actual successor PDF/font seam remains a separate held candidate. Both direct
+renderer cross-version defects were reproduced and are being corrected without
+changing v1 renderer/assets. Upgraded packages are experimental and excluded from
+publishable ancestry. PR #3, pending-v1 disposition and current-policy activation
+stay open. Continuous development preserves focused local checks, cheap preflight
+and exact-head merges; complete final acceptance is still manual.
+
 ## Merged private consumers and retained-profile continuation — October 7 UTC
 
 PR #19 is merged at `a1d74ca5250a62d77f9888405c748194ca3dc2c7`, tree

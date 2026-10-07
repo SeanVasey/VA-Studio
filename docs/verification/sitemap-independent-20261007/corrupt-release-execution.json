@@ -1,0 +1,18 @@
+{
+  "source": "24e6ad3538abc0cfd1e21b7615a1e72d8020daac",
+  "command": [
+    "php",
+    "-d",
+    "memory_limit=512M",
+    "vendor/bin/phpunit",
+    "-c",
+    "sitemap-independent.phpunit.xml",
+    "--filter",
+    "test_corrupt_retained_release_fails_closed_without_private_content_or_fallback_urls",
+    "--log-junit",
+    "docs/verification/sitemap-independent-20261007/corrupt-release.xml",
+    "--fail-on-warning",
+    "--fail-on-empty-test-suite"
+  ],
+  "exit_code": 0
+}

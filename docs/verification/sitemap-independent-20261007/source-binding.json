@@ -1,0 +1,20 @@
+{
+  "reviewed_source": "24e6ad3538abc0cfd1e21b7615a1e72d8020daac",
+  "reviewed_tree": "ee92a437e45f5d6a14840b25c696bfcfb429a79d",
+  "source_sha256": {
+    "app/Domain/SiteBuilder/PublicPagesSitemap.php": "c1bded06e8edfbdc365239a681cd120ac862f1a6cd3e70a80b645cfeb9e6a12f",
+    "app/Http/Controllers/PublicPagesSitemapController.php": "ce67c8e9d3c3f1dbbec010ca174929b5584d257589c8f0fba22666b88c04fe5c",
+    "docs/verification/public-pages-sitemap-20261007/README.md": "826e7f37ae995d8e291d54d7389060c9d3c7eed6766bf7cff86565395456a477",
+    "docs/verification/public-pages-sitemap-20261007/public-pages-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "docs/verification/public-pages-sitemap-20261007/public-pages-sitemap-exact.txt": "d30926d1137c64ae640db2d24a2d1b78ca43eb9d608888c342a5ac86344d9381",
+    "docs/verification/public-pages-sitemap-20261007/public-pages-sitemap-exact.xml": "73b9e4c2ecc7f3f4bcc7b694863c22a9bd6579c2776c340b9177e6f3c3809ab9",
+    "docs/verification/public-pages-sitemap-20261007/public-pages-sitemap-final.txt": "cf921856d015200d401d990809c01b1fc194f4f09723c647e05c2a205079f87d",
+    "docs/verification/public-pages-sitemap-20261007/public-pages-sitemap-final.xml": "a84b113a17c182d827c8ce26cbad234dbe32fa90f12a5d9853185b7b06f19eea",
+    "docs/verification/public-pages-sitemap-20261007/public-pages-sitemap-first.txt": "3552280861094772341f7e9a07414b5123be9cfff740948069fc9d69190db31a",
+    "docs/verification/public-pages-sitemap-20261007/receipt.json": "747a5d3a1bd264634aa2a59bb6485c8234be7c824fe58718606612fe773dd8c0",
+    "routes/public-discovery.php": "57543f33bf32f632b0fe48ce91a572a87bd1b543f5c0989d8a3da38f138f0fd1",
+    "routes/web.php": "3f2c2990adac53df1d2f68c8a0afda12fcf04e9354b803469451c38446ca696b",
+    "tests/Feature/PublicPagesSitemapTest.php": "32c2b9f68b2b982cb9237fbc78ff528394109d72f60375b2bfbc3d5ac699ff31"
+  },
+  "reviewer_canary_sha256": "61db7bda69ffb799c7b8604c23307eb9a2d0082b3ea9f6ced9d6b9e050d6e582"
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/sitemap-independent.phpunit.xml" tests="1" assertions="8" errors="0" failures="0" skipped="0" time="0.612430">
+    <testsuite name="Independent public sitemap projection" tests="1" assertions="8" errors="0" failures="0" skipped="0" time="0.612430">
+      <testsuite name="Tests\Feature\SitemapIndependentCanaryTest" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/docs/verification/sitemap-independent-20261007/SitemapIndependentCanaryTest.php" tests="1" assertions="8" errors="0" failures="0" skipped="0" time="0.612430">
+        <testcase name="test_corrupt_retained_release_fails_closed_without_private_content_or_fallback_urls" file="/workspace/scratch/2876616e88c3/VA-Studio-sitemap-independent-review/docs/verification/sitemap-independent-20261007/SitemapIndependentCanaryTest.php" line="70" class="Tests\Feature\SitemapIndependentCanaryTest" classname="Tests.Feature.SitemapIndependentCanaryTest" assertions="8" time="0.612430"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>
