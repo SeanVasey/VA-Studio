@@ -7,6 +7,8 @@ use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use PDO;
 
 /** Operative current/historical seam. Consumers must retain this binding with newly authored data. */
 final class ProductionAccountFeatureAccess
@@ -32,6 +34,8 @@ final class ProductionAccountFeatureAccess
     /** Pure direct terminal proof after all module/decrypt/render/audit hooks. */
     public function proveCurrent(ProductionAccountFeatureIdentity $identity, CurrentRows $reader, array $expectedRaw): void
     {
+        // A lazy PDO resolver is application work. Never invoke one after the terminal policy check.
+        $this->resolvedConnections($reader);
         $policy = $this->policy($identity);
         if (array_keys($expectedRaw) !== ['configuration', 'identity'] || ! is_array($expectedRaw['identity'])
             || $policy->current() !== $expectedRaw['configuration']) {
@@ -119,5 +123,21 @@ final class ProductionAccountFeatureAccess
         }
 
         return $policy;
+    }
+
+    private function resolvedConnections(CurrentRows $reader): void
+    {
+        $primary = $reader->identityPrimary();
+        $connection = DB::connection();
+        if ($connection->getRawPdo() !== $primary || $connection->getDriverName() !== $reader->identityDriver()
+            || $connection->transactionLevel() !== 1 || ! $primary->inTransaction()) {
+            throw new IdentityException;
+        }
+        foreach (DB::getConnections() as $other) {
+            $pdo = $other->getRawPdo();
+            if (! $pdo instanceof PDO || ($other !== $connection && ($other->transactionLevel() !== 0 || $pdo->inTransaction()))) {
+                throw new IdentityException;
+            }
+        }
     }
 }
