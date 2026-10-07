@@ -5,6 +5,7 @@ import CheckoutReturn from './Pages/CheckoutReturn';
 import Editorial from './Pages/Editorial';
 import CustomerSignIn from './Pages/CustomerSignIn';
 import CustomerLibrary from './Pages/CustomerLibrary';
+import FreeGrants from './Pages/FreeGrants';
 import CustomerAccessRequest from './Pages/CustomerAccessRequest';
 import CustomerAccessFinish from './Pages/CustomerAccessFinish';
 import ProductionCustomerIdentity from './Pages/ProductionCustomerIdentity';
@@ -25,6 +26,7 @@ createInertiaApp({
     if (name === 'Editorial') return Editorial;
     if (name === 'CustomerSignIn') return CustomerSignIn;
     if (name === 'CustomerLibrary') return CustomerLibrary;
+    if (name === 'FreeGrants') return FreeGrants;
     if (name === 'CustomerAccessRequest') return CustomerAccessRequest;
     if (name === 'CustomerAccessFinish') return CustomerAccessFinish;
     if (name === 'ProductionCustomerIdentity') return ProductionCustomerIdentity;

@@ -1,0 +1,26 @@
+{
+  "count": 20,
+  "scope": "tracked durable independent artifacts only; excludes this manifest and report",
+  "sha256": {
+    "docs/verification/cloud-free-grants-independent-20261007/FreeGrantPurposeProfileCanaryTest.php": "749802cd1178d8bcea44fd7a895e72cb53c96696fc7eb4ea761a1d8fd6cc5659",
+    "docs/verification/cloud-free-grants-independent-20261007/author-evidence-binding.json": "9b4efb5f210b1a88830e7f327a752969d3c65e86e8e9b9ef4bb8f50990a14c08",
+    "docs/verification/cloud-free-grants-independent-20261007/canary-format.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "docs/verification/cloud-free-grants-independent-20261007/canary-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "docs/verification/cloud-free-grants-independent-20261007/commands.json": "2b1466bd92189c3117d01d144344eec09063251a08ca101b58ab069d2b0d4dcc",
+    "docs/verification/cloud-free-grants-independent-20261007/dependency-binding.json": "f40a0ea7ab8d5759f81fba7b323257588c4db9c877b90da1500eaa6b74c85c5f",
+    "docs/verification/cloud-free-grants-independent-20261007/final-frontend-junit.xml": "c2377099cf427b40ddb91413c4e6f528c39739670276b841ed4646b8361be51e",
+    "docs/verification/cloud-free-grants-independent-20261007/final-frontend.txt": "c50e2f5b17374693a5431ed0008354c237e08be79dd378798274dfe3fa2ab8f2",
+    "docs/verification/cloud-free-grants-independent-20261007/final-native-adverse-junit.xml": "369f8b71a4e9e5a0577c922f837d7c3587ee9a73bc1baca352c61b72151d2812",
+    "docs/verification/cloud-free-grants-independent-20261007/final-native-adverse.txt": "744dd21b1de256807c6b7cffaddd929ad6670165e968e2e5454d7b649c51c1ce",
+    "docs/verification/cloud-free-grants-independent-20261007/final-sqlite-adverse-junit.xml": "c816ca2d7ee2cd6285d38871089e3230055317ba103717b3a4f0924a1a162171",
+    "docs/verification/cloud-free-grants-independent-20261007/final-sqlite-adverse.txt": "04d75a6b162ed331d852ff6e0b54e8da08a363416ae7825390136e099537635c",
+    "docs/verification/cloud-free-grants-independent-20261007/native-adverse-selection.xml": "db831326fb8c6729badf83d24d648641844719e98fb37801328dbc79058d9efd",
+    "docs/verification/cloud-free-grants-independent-20261007/native-runtime.json": "01b9161d833e4ce1d8e777afadb81cc9c4dc35f2b770bef0f1fa6f65047302c4",
+    "docs/verification/cloud-free-grants-independent-20261007/own-autoload.txt": "641c1bbc49cb1fb365e925fa057ad50f122daac42c4a586c5ce92ed4bdf64f55",
+    "docs/verification/cloud-free-grants-independent-20261007/purpose-profile-junit.xml": "0d86d9e064a6fb84016698f4c73981e6d54ccfa8ad8085603b33c38aac82b43f",
+    "docs/verification/cloud-free-grants-independent-20261007/purpose-profile.txt": "e0e51d7513fd1f873e4ad05c649f2e811875d98d4e7e4a9dcab1663c2fe1a446",
+    "docs/verification/cloud-free-grants-independent-20261007/receipt.json": "1e1eba02083c18b7790cb817d3d1bf080a724aa7a44606c88d5a2a101050936b",
+    "docs/verification/cloud-free-grants-independent-20261007/source-binding.json": "0395a3fc791197467ad21dadb5822feadf1150d0bfd02f3897f3b05bc1f04a59",
+    "docs/verification/cloud-free-grants-independent-20261007/sqlite-adverse-selection.xml": "4db6eff52ca4b6370b7e8d395a3fbb32d3c0ba8b64bd1f01635dd55655c6f426"
+  }
+}

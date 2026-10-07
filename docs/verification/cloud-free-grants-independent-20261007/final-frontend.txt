@@ -1,0 +1,15 @@
+
+> test
+> vitest run tests/frontend/free-grant-journey.test.tsx --reporter=default --reporter=junit --outputFile=docs/verification/cloud-free-grants-independent-20261007/final-frontend-junit.xml
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-free-grants-independent
+
+ ✓ tests/frontend/free-grant-journey.test.tsx (8 tests) 577ms
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  09:22:16
+   Duration  1.40s (tests 44%, environment 43%, transform 6%, setup 6%, import 1%)
+
+JUNIT report written to /workspace/VA-Studio-free-grants-independent/docs/verification/cloud-free-grants-independent-20261007/final-frontend-junit.xml

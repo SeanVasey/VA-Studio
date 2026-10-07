@@ -13,8 +13,8 @@ import type { SiteContent } from '../lib/site-content';
 import { changeCustomerSession, navigateCustomerSession } from '../lib/customer-session';
 import '../../css/customer-account.css';
 
-export default function CustomerLibrary({ siteContent, customer, testCheckoutEnabled = false, testMembershipsEnabled = false, membershipHistoryScope, testListeningLibraryEnabled = false, listeningLibraryScope, guestPurchaseClaim, serviceProjectsEnabled = false, communicationPreferencesAvailable = false, communicationPreferencesScope }: {
-  testOnly: true; siteContent: SiteContent; customer: { name: string }; testCheckoutEnabled?: boolean; testMembershipsEnabled?: boolean; membershipHistoryScope?: string | null; testListeningLibraryEnabled?: boolean; listeningLibraryScope?: string | null; guestPurchaseClaim?: PendingPurchaseClaim; serviceProjectsEnabled?: boolean; communicationPreferencesAvailable?: boolean; communicationPreferencesScope?: string | null;
+export default function CustomerLibrary({ siteContent, customer, testCheckoutEnabled = false, testMembershipsEnabled = false, membershipHistoryScope, testListeningLibraryEnabled = false, listeningLibraryScope, guestPurchaseClaim, serviceProjectsEnabled = false, freeGrantsEnabled = false, communicationPreferencesAvailable = false, communicationPreferencesScope }: {
+  testOnly: true; siteContent: SiteContent; customer: { name: string }; testCheckoutEnabled?: boolean; testMembershipsEnabled?: boolean; membershipHistoryScope?: string | null; testListeningLibraryEnabled?: boolean; listeningLibraryScope?: string | null; guestPurchaseClaim?: PendingPurchaseClaim; serviceProjectsEnabled?: boolean; freeGrantsEnabled?: boolean; communicationPreferencesAvailable?: boolean; communicationPreferencesScope?: string | null;
 }) {
   const [leaving, setLeaving] = useState(false), [message, setMessage] = useState('');
   const active = useRef(false), pending = useRef(false);
@@ -47,6 +47,7 @@ export default function CustomerLibrary({ siteContent, customer, testCheckoutEna
       </section> : <>
         <div className="customer-account-identity"><p>Signed in as <strong>{customer.name}</strong></p><button type="button" className="button button-outline" onClick={() => void signOut()}>Sign out</button></div>
         <p className="customer-account-note">Test mode only. Order status, contracts and downloads remain subject to their current availability checks.</p>
+        {freeGrantsEnabled === true && <a className="text-link" href="/free-grants">Your free grants</a>}
         {serviceProjectsEnabled === true && <a className="text-link" href="/services/projects">Your service projects</a>}
         {testListeningLibraryEnabled === true && typeof listeningLibraryScope === 'string' && /^[0-9a-f]{32}$/.test(listeningLibraryScope) && <CustomerListeningLibrary key={listeningLibraryScope} />}
         {communicationPreferencesAvailable === true && typeof communicationPreferencesScope === 'string' && /^[0-9a-f]{32}$/.test(communicationPreferencesScope) && <CustomerCommunicationPreferences key={communicationPreferencesScope} scope={communicationPreferencesScope} />}

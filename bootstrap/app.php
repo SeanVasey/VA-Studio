@@ -1,15 +1,16 @@
 <?php
 
 use App\Http\Middleware\CustomerPrivacy;
+use App\Http\Middleware\FreeGrantPrivacy;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\InquiryPrivacy;
 use App\Http\Middleware\PrivateTrackReviewPrivacy;
 use App\Http\Middleware\ProductionIdentity\IdentityPrivacy;
 use App\Http\Middleware\ResumableUploadPrivacy;
 use App\Http\Middleware\ServiceProjectPrivacy;
-use App\Http\Middleware\SupportAttachmentPrivacy;
 use App\Http\Middleware\SitePreviewPrivacy;
 use App\Http\Middleware\StripeWebhookBodyLimit;
+use App\Http\Middleware\SupportAttachmentPrivacy;
 use App\Http\Middleware\TestDeliveryPrivacy;
 use App\Http\Middleware\TestExceptionResolutionPrivacy;
 use App\Http\Responses\InquiryResponse;
@@ -48,6 +49,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(CustomerPrivacy::class);
         $middleware->prepend(ServiceProjectPrivacy::class);
         $middleware->prepend(IdentityPrivacy::class);
+        $middleware->prepend(FreeGrantPrivacy::class);
         $middleware->prepend(SupportAttachmentPrivacy::class);
         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
         $middleware->web(append: [HandleInertiaRequests::class]);
@@ -63,6 +65,11 @@ return Application::configure(basePath: dirname(__DIR__))
                     Log::error('Private attachment request failed.', ['exception_class' => $exception::class]);
                 } catch (Throwable) { /* Preserve the private response. */
                 }
+
+                return false;
+            }
+            if (FreeGrantPrivacy::matches(request())) {
+                FreeGrantPrivacy::report($exception);
 
                 return false;
             }
@@ -163,6 +170,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request): Response {
             if (SupportAttachmentPrivacy::matches($request)) {
                 return $response->getStatusCode() >= 400 ? SupportAttachmentResponse::error($response->getStatusCode()) : SupportAttachmentResponse::protect($response);
+            }
+            if (FreeGrantPrivacy::matches($request)) {
+                return $response->getStatusCode() >= 400 ? FreeGrantPrivacy::error($response->getStatusCode()) : FreeGrantPrivacy::protect($response);
             }
             if (IdentityPrivacy::matches($request)) {
                 return $response->getStatusCode() >= 400 ? IdentityPrivacy::error($response->getStatusCode()) : IdentityPrivacy::protect($response);

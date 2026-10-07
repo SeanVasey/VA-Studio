@@ -24,7 +24,7 @@ class PublicDiscoveryIndexTest extends TestCase
         $this->assertSame(['https://audio.example.test/site-pages-sitemap.xml'], array_map(fn ($loc) => (string) $loc, $xml->xpath('/s:sitemapindex/s:sitemap/s:loc')));
         $this->assertCount(1, $xml->xpath('/s:sitemapindex/s:sitemap/*'));
         $robots = $this->withHeaders($headers)->get('/robots.txt')->assertOk()->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
-        $this->assertSame("User-agent: *\nDisallow: /admin\nDisallow: /account\nDisallow: /orders\nDisallow: /quotes\nDisallow: /api\nDisallow: /contact/inquiries\nDisallow: /services/projects\nDisallow: /customer\nDisallow: /private-support\nSitemap: https://audio.example.test/sitemap.xml\n", $robots->getContent());
+        $this->assertSame("User-agent: *\nDisallow: /admin\nDisallow: /account\nDisallow: /orders\nDisallow: /quotes\nDisallow: /api\nDisallow: /contact/inquiries\nDisallow: /services/projects\nDisallow: /customer\nDisallow: /free-grants\nDisallow: /private-support\nSitemap: https://audio.example.test/sitemap.xml\n", $robots->getContent());
         foreach ([$index, $robots] as $response) {
             $response->assertHeader('Cache-Control', 'no-store, private')->assertHeader('X-Content-Type-Options', 'nosniff')->assertHeader('X-Robots-Tag', 'noindex, follow');
             $this->assertSame([], $response->headers->getCookies());

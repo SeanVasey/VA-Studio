@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="3" assertions="109" errors="1" failures="0" skipped="0" time="92.649809">
+    <testsuite name="Tests\Feature\FreeGrantAuthorityTest" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="29.954461">
+      <testsuite name="Tests\Feature\FreeGrantAuthorityTest::test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="29.954461">
+        <testcase name="test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #3" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" line="34" class="Tests\Feature\FreeGrantAuthorityTest" classname="Tests.Feature.FreeGrantAuthorityTest" assertions="0" time="29.954461">
+          <error type="PDOException">Tests\Feature\FreeGrantAuthorityTest::test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #3
+PDOException: SQLSTATE[HY000]: General error: 1366 Incorrect integer value: '' for column 'is_admin' at row 1
+
+/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php:66
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1647
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1585
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:1571
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:957
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1086
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:867
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1066
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/helpers.php:138
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/TestFreeGrantIdentity.php:35
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:141
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:71
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:28
+/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php:73</error>
+        </testcase>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\FreeGrantPreparationStatusTest" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantPreparationStatusTest.php" tests="1" assertions="10" errors="0" failures="0" skipped="0" time="28.556387">
+      <testcase name="test_abandoned_live_claim_is_closed_then_exact_deadline_status_admits_retry_under_the_original_assent" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantPreparationStatusTest.php" line="18" class="Tests\Feature\FreeGrantPreparationStatusTest" classname="Tests.Feature.FreeGrantPreparationStatusTest" assertions="10" time="28.556387"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\FreeGrantHttpTest" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantHttpTest.php" tests="1" assertions="99" errors="0" failures="0" skipped="0" time="34.138960">
+      <testcase name="test_actual_customer_page_review_assent_real_pdf_and_native_attachment_preserve_exact_free_origin" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantHttpTest.php" line="56" class="Tests\Feature\FreeGrantHttpTest" classname="Tests.Feature.FreeGrantHttpTest" assertions="99" time="34.138960"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

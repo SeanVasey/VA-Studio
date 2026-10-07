@@ -27,7 +27,7 @@ final class PublicDiscoveryController extends Controller
         $text = "User-agent: *\n";
         if (app()->environment('production')) {
             // Crawler advice complements server authorization; it grants no access.
-            foreach (['/admin', '/account', '/orders', '/quotes', '/api', '/contact/inquiries', '/services/projects', '/customer', '/private-support'] as $path) {
+            foreach (['/admin', '/account', '/orders', '/quotes', '/api', '/contact/inquiries', '/services/projects', '/customer', '/free-grants', '/private-support'] as $path) {
                 $text .= 'Disallow: '.$path."\n";
             }
             $text .= 'Sitemap: '.$origin.'/sitemap.xml'."\n";

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\FreeGrantAuthorityTest" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" tests="6" assertions="11" errors="4" failures="0" skipped="0" time="9.600703">
+    <testsuite name="Tests\Feature\FreeGrantAuthorityTest::test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph" tests="4" assertions="4" errors="3" failures="0" skipped="0" time="6.452890">
+      <testcase name="test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #0" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" line="34" class="Tests\Feature\FreeGrantAuthorityTest" classname="Tests.Feature.FreeGrantAuthorityTest" assertions="0" time="1.872587">
+        <error type="App\Domain\Customers\CustomerAccessException">Tests\Feature\FreeGrantAuthorityTest::test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #0
+App\Domain\Customers\CustomerAccessException: Customer access is unavailable.
+
+/workspace/VA-Studio-free-grants/app/Domain/Customers/CustomerAccess.php:67
+/workspace/VA-Studio-free-grants/app/Domain/Customers/CustomerAccess.php:45
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/TestFreeGrantIdentity.php:33
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:140
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:71
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:28
+/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php:72</error>
+      </testcase>
+      <testcase name="test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #1" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" line="34" class="Tests\Feature\FreeGrantAuthorityTest" classname="Tests.Feature.FreeGrantAuthorityTest" assertions="0" time="1.468951">
+        <error type="App\Domain\Customers\CustomerAccessException">Tests\Feature\FreeGrantAuthorityTest::test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #1
+App\Domain\Customers\CustomerAccessException: Customer access is unavailable.
+
+/workspace/VA-Studio-free-grants/app/Domain/Customers/CustomerAccess.php:75
+/workspace/VA-Studio-free-grants/app/Domain/Customers/CustomerAccess.php:63
+/workspace/VA-Studio-free-grants/app/Domain/Customers/CustomerAccess.php:45
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/TestFreeGrantIdentity.php:33
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:140
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:71
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:28
+/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php:72</error>
+      </testcase>
+      <testcase name="test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #2" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" line="34" class="Tests\Feature\FreeGrantAuthorityTest" classname="Tests.Feature.FreeGrantAuthorityTest" assertions="4" time="1.536749"/>
+      <testcase name="test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #3" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" line="34" class="Tests\Feature\FreeGrantAuthorityTest" classname="Tests.Feature.FreeGrantAuthorityTest" assertions="0" time="1.574603">
+        <error type="App\Domain\Customers\CustomerAccessException">Tests\Feature\FreeGrantAuthorityTest::test_terminal_real_container_resolution_withdrawal_cannot_commit_assent_or_return_private_customer_graph with data set #3
+App\Domain\Customers\CustomerAccessException: Customer access is unavailable.
+
+/workspace/VA-Studio-free-grants/app/Domain/Customers/CustomerAccess.php:67
+/workspace/VA-Studio-free-grants/app/Domain/Customers/CustomerAccess.php:45
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/TestFreeGrantIdentity.php:33
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:140
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:71
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-free-grants/app/Domain/Grants/Free/FreeGrants.php:28
+/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php:72</error>
+      </testcase>
+    </testsuite>
+    <testcase name="test_audit_callback_closure_refuses_assent_preserving_authored_terms_prior_events_and_original_actor" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" line="89" class="Tests\Feature\FreeGrantAuthorityTest" classname="Tests.Feature.FreeGrantAuthorityTest" assertions="0" time="1.484853">
+      <error type="Error">Tests\Feature\FreeGrantAuthorityTest::test_audit_callback_closure_refuses_assent_preserving_authored_terms_prior_events_and_original_actor
+Error: Class "App\Models\AuditEvent" not found
+
+/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php:96</error>
+    </testcase>
+    <testcase name="test_forged_principal_unverified_staff_buyer_and_stale_assent_have_no_free_authority" file="/workspace/VA-Studio-free-grants/tests/Feature/FreeGrantAuthorityTest.php" line="113" class="Tests\Feature\FreeGrantAuthorityTest" classname="Tests.Feature.FreeGrantAuthorityTest" assertions="7" time="1.662960"/>
+  </testsuite>
+</testsuites>
