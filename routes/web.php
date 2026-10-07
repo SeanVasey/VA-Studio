@@ -60,3 +60,5 @@ Route::post('/checkout', fn () => response()->json([
 
 require __DIR__.'/customer.php';
 require __DIR__.'/inquiry-conversations.php';
+
+require __DIR__.'/public-discovery.php';
