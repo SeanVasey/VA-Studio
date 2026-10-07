@@ -60,13 +60,20 @@ final class MembershipPolicy
     private function configuration(): array
     {
         $instances = (new ReflectionProperty(Container::class, 'instances'))->getValue($this->container);
-        MembershipException::require(Container::getInstance() === $this->container
+        MembershipException::require(is_array($instances) && Container::getInstance() === $this->container
             && ($instances['config'] ?? null) === $this->repository, 'changed_policy');
         $items = (new ReflectionProperty(Repository::class, 'items'))->getValue($this->repository);
+        MembershipException::require(is_array($items) && is_array($items['production-memberships'] ?? []), 'changed_policy');
         $policy = $items['production-memberships'] ?? [];
+        $environment = $instances['env'] ?? null;
+        MembershipException::require(is_bool($policy['enabled'] ?? null)
+            && is_string($policy['version'] ?? null)
+            && (($policy['provenance'] ?? null) === null || is_string($policy['provenance']))
+            && (($policy['approved_policy_hash'] ?? null) === null || is_string($policy['approved_policy_hash']))
+            && ($environment === null || is_string($environment)), 'changed_policy');
 
         return ['enabled' => $policy['enabled'] ?? null, 'version' => $policy['version'] ?? null,
             'provenance' => $policy['provenance'] ?? null, 'approved_policy_hash' => $policy['approved_policy_hash'] ?? null,
-            'environment' => $instances['env'] ?? null];
+            'environment' => $environment];
     }
 }

@@ -123,6 +123,9 @@ final class MembershipRows
         $resolved = (new ReflectionProperty(Facade::class, 'resolvedInstance'))->getValue();
         $connections = self::property($this->manager, DatabaseManager::class, 'connections');
         $items = self::property($this->configuration, Repository::class, 'items');
+        MembershipException::require(is_array($instances) && is_array($resolved) && is_array($connections)
+            && is_array($items) && is_array($items['database'] ?? null)
+            && is_string($items['database']['default'] ?? null), 'changed_connection');
         MembershipException::require(Container::getInstance() === $this->container
             && ($instances['db'] ?? null) === $this->manager && ($resolved['db'] ?? null) === $this->manager
             && ($instances['config'] ?? null) === $this->configuration
