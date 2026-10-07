@@ -66,16 +66,38 @@ class StripeSdkBillingGatewayTest extends TestCase
         $this->assertSame(['refused', 'provider_incomplete'], [$refused['outcome'], BillingValues::decrypt($refused['payload_ciphertext'])['reason']]);
     }
 
-    public function test_transport_failure_is_redacted_into_an_unknown_observation(): void
+    public function test_transport_failure_is_redacted_into_an_unknown_observation_under_an_owned_identity(): void
+    {
+        $binding = F::binding();
+        $routes = $this->routes(F::graph());
+        $first = (new BillingReconciliation(new StripeSdkBillingGateway(new BillingHttpFixture($routes))))->retrieve($binding['id'], F::INVOICE);
+        $routes['/v1/charges/'.F::CHARGE] = new RuntimeException('PRIVATE URL HEADER sk_test_SYNTHETICREHEARSAL BODY');
+        $observation = (new BillingReconciliation(new StripeSdkBillingGateway(new BillingHttpFixture($routes))))->retrieve($binding['id'], F::INVOICE);
+        $this->assertSame(['unknown', 2, $first['invoice_id']], [$observation['outcome'], $observation['sequence'], $observation['invoice_id']]);
+        $payload = BillingValues::decrypt($observation['payload_ciphertext']);
+        $this->assertSame('provider_unavailable', $payload['reason']);
+        $this->assertStringNotContainsString('PRIVATE', json_encode($payload));
+    }
+
+    /** Codex P2 (unknown-outcomes, Finding A): transport failure and an unbounded list on a first retrieval leave no row and a redacted refusal. */
+    public function test_first_retrieval_with_transport_failure_or_incomplete_list_leaves_no_ledger_row(): void
     {
         $binding = F::binding();
         $routes = $this->routes(F::graph());
         $routes['/v1/charges/'.F::CHARGE] = new RuntimeException('PRIVATE URL HEADER sk_test_SYNTHETICREHEARSAL BODY');
-        $observation = (new BillingReconciliation(new StripeSdkBillingGateway(new BillingHttpFixture($routes))))->retrieve($binding['id'], F::INVOICE);
-        $this->assertSame('unknown', $observation['outcome']);
-        $payload = BillingValues::decrypt($observation['payload_ciphertext']);
-        $this->assertSame('provider_unavailable', $payload['reason']);
-        $this->assertStringNotContainsString('PRIVATE', json_encode($payload));
+        $incomplete = $this->routes(F::graph());
+        $incomplete['/v1/invoice_payments?invoice='.F::INVOICE.'&limit=10']['has_more'] = true;
+        foreach ([[$routes, 'provider_unavailable'], [$incomplete, 'provider_incomplete']] as [$served, $reason]) {
+            try {
+                (new BillingReconciliation(new StripeSdkBillingGateway(new BillingHttpFixture($served))))->retrieve($binding['id'], F::INVOICE);
+                $this->fail('A first retrieval that validated no provider graph claims no identity.');
+            } catch (BillingException $error) {
+                $this->assertSame($reason, $error->reason);
+                $this->assertStringNotContainsString('PRIVATE', $error->getMessage());
+            }
+            $this->assertSame([0, 0], [DB::table('production_membership_billing_invoices')->count(), DB::table('production_membership_billing_observations')->count()]);
+        }
+        $this->assertSame('settled', (new BillingReconciliation(new StripeSdkBillingGateway(new BillingHttpFixture($this->routes(F::graph())))))->retrieve($binding['id'], F::INVOICE)['outcome']);
     }
 
     public function test_configuration_transport_and_transaction_refusals_happen_before_any_request(): void

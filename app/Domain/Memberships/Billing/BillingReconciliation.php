@@ -7,9 +7,11 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Retrieves one invoice graph outside any database transaction, evaluates it, then appends exactly
- * one observation in a short transaction. A timeout or ambiguous provider response appends `unknown`
- * under the same invoice identity, so a retry continues the same chain. Nothing is reversed, awarded
- * or written to the provider.
+ * one observation in a short transaction. Once the binding owns the invoice identity, a timeout or
+ * ambiguous provider response appends `unknown` under it, so a retry continues the same chain. A FIRST
+ * retrieval that ends unknown or provider-incomplete leaves no ledger row at all (it throws): the immutable
+ * identity is claimed only after a provider graph validated the binding, and an unvalidated binding must not
+ * pin the invoice. Nothing is reversed, awarded or written to the provider.
  */
 final class BillingReconciliation
 {
@@ -50,11 +52,17 @@ final class BillingReconciliation
         }
         // Configuration withdrawn during provider I/O records nothing.
         $policy->proveConfiguration($configuration);
-        // The invoice-identity row is immutable and its unique hash can never move to another binding. A retrieved account,
-        // customer or parent subscription that contradicts this binding proves nothing about ownership, so it claims no
-        // identity (and, with no identity, has no observation chain to hold a refusal): it fails closed instead (review R-3).
-        // Unknown and provider-incomplete outcomes carry no retrieved graph to validate, so they still claim the identity.
+        // The invoice-identity row is immutable and its unique hash can never move to another binding, so it is claimed only
+        // after a retrieved provider graph has validated the binding (reviews R-3 and Codex unknown-outcomes). On a first
+        // retrieval, which has no identity yet, nothing durable is written unless the verdict rests on such a graph:
+        //  - a retrieved account, customer or parent subscription that contradicts the binding proves nothing about ownership;
+        //  - an unknown (timeout, ambiguous response) or provider-incomplete outcome retrieved no validated graph at all.
+        // Those throw and leave no identity or observation row. The evidence is the failed job plus the retained webhook hint, and
+        // a redelivery of that hint dispatches the retrieval again (BillingWebhookIntake::recoverLostDispatch). Once the binding
+        // owns the identity, the same outcomes are appended as observations exactly as before.
         if ($invoice === null) {
+            BillingException::require($verdict->outcome !== 'unknown', (string) $verdict->reason);
+            BillingException::require(! ($verdict->outcome === 'refused' && $verdict->reason === 'provider_incomplete'), 'provider_incomplete');
             BillingException::require(! ($verdict->outcome === 'refused' && in_array($verdict->reason, self::BINDING_REFUSALS, true)),
                 'binding_refused_'.$verdict->reason);
             $invoice = $this->ledger->invoice($binding, $invoiceRef);

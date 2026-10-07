@@ -107,7 +107,7 @@ final class BillingWebhookIntake
     /**
      * A hint is committed before its retrieval is dispatched, so a failed dispatch leaves a hint the provider will redeliver.
      * A duplicate delivery therefore dispatches that retrieval again unless the hint is already covered. "Covered" means the
-     * invoice's identity row has an observation row (any outcome, including unknown or refused) created strictly after the
+     * invoice's identity row has a definitive observation row (see observedAfter(); never `unknown`) created strictly after the
      * hint's received_at; an older observation, or an identity row with no observation, does not cover it. Only the observation
      * table is consulted because an observation is the one row appended after a retrieval completes. The dispatch is read-only
      * against the provider and each retrieval appends one chained observation, so a redundant dispatch is harmless and the
@@ -137,14 +137,35 @@ final class BillingWebhookIntake
         return ['binding_id' => $binding, 'invoice_ref' => $invoiceRef];
     }
 
+    /**
+     * Whether a definitive observation was appended after the hint. The ledger's outcomes are settled, not_settled, refused and
+     * reversed (each a retrieved provider state, so each covers a hint) and unknown (a timeout or ambiguous response). `unknown`
+     * never covers, and neither does a `refused` observation whose reason is `provider_incomplete`: the provider's unbounded list
+     * meant no state was read. Otherwise a transient provider outage whose one-try job ended cleanly would hide the hint, leaving
+     * a paid invoice unreconciled until some different event arrived. The retry bound is the provider's own redelivery schedule;
+     * this reads the reason from the encrypted payload, so only `refused` rows are decrypted.
+     */
     private function observedAfter(string $invoiceRefHash, string $receivedAt): bool
     {
         $schema = new BillingSchema;
-        $statement = DB::connection()->getPdo()->prepare('SELECT 1 FROM '.$schema->table(BillingSchema::TABLES[2]).' o JOIN '.$schema->table(BillingSchema::TABLES[1])
-            .' i ON i.id = o.invoice_id WHERE i.invoice_ref_hash = ? AND o.created_at > ? LIMIT 1');
-        $statement->execute([$invoiceRefHash, $receivedAt]);
+        $statement = DB::connection()->getPdo()->prepare('SELECT o.outcome, o.payload_ciphertext FROM '.$schema->table(BillingSchema::TABLES[2]).' o JOIN '
+            .$schema->table(BillingSchema::TABLES[1]).' i ON i.id = o.invoice_id WHERE i.invoice_ref_hash = ? AND o.created_at > ? AND o.outcome <> ? '
+            .'ORDER BY o.sequence LIMIT '.BillingLedger::MAX_OBSERVATIONS);
+        $statement->execute([$invoiceRefHash, $receivedAt, 'unknown']);
+        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            if ($row['outcome'] !== 'refused') {
+                return true;
+            }
+            try {
+                if ((BillingValues::decrypt($row['payload_ciphertext'])['reason'] ?? null) !== 'provider_incomplete') {
+                    return true;
+                }
+            } catch (BillingException) {
+                // An unreadable payload proves nothing; retrieving again is safe and the job audits the chain.
+            }
+        }
 
-        return $statement->fetchColumn() !== false;
+        return false;
     }
 
     private function event(string $eventHash): ?array

@@ -2,15 +2,18 @@
 
 namespace Tests\Feature\ProductionMembershipBilling;
 
+use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Memberships\Billing\BillingLedger;
 use App\Domain\Memberships\Billing\BillingProviderPin;
 use App\Domain\Memberships\Billing\BillingReconciliation;
+use App\Domain\Memberships\Billing\BillingVerdict;
 use App\Domain\Memberships\Billing\BillingWebhookIntake;
 use App\Jobs\RetrieveMembershipInvoice;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Stripe\Event;
 use Stripe\WebhookSignature;
 use Tests\Support\BillingStripeFixtures as F;
@@ -142,6 +145,63 @@ class BillingWebhookRedeliveryTest extends TestCase
         Queue::assertNothingPushed();
     }
 
+    /**
+     * Codex P2 (unknown-outcomes, Finding C): only a definitive observation covers a hint. An `unknown` outcome (timeout, ambiguous
+     * response) and a `provider_incomplete` refusal retrieved no usable state, so a redelivery must dispatch again.
+     *
+     * @return array<string, array{0: string, 1: bool}> observation kind, whether it covers the hint
+     */
+    public static function observationKinds(): array
+    {
+        return [
+            'unknown_unavailable' => ['unavailable', false],
+            'unknown_inconsistent' => ['inconsistent', false],
+            'refused_provider_incomplete' => ['incomplete', false],
+            'settled' => ['settled', true],
+            'refused_currency' => ['refused', true],
+            'not_settled_invoice_open' => ['open', true],
+            'reversed_refunded' => ['refunded', true],
+        ];
+    }
+
+    #[DataProvider('observationKinds')]
+    public function test_only_a_definitive_observation_after_the_hint_covers_it(string $kind, bool $covers): void
+    {
+        $binding = F::binding();
+        $this->runRetrieval($binding['id'], 0); // The binding owns the identity, as an unknown can only be recorded under one.
+        $this->at(60);
+        $payload = $this->event('evt_SYNTHETICKIND');
+        $this->loseFirstDispatch($payload);
+        $this->observe($binding['id'], $kind, 70);
+        $this->at(80);
+        Queue::fake();
+        $duplicate = $this->receive($payload);
+        if ($covers) {
+            $this->assertNull($duplicate['scheduled']);
+            Queue::assertNothingPushed();
+        } else {
+            $this->assertSame(['binding_id' => $binding['id'], 'invoice_ref' => F::INVOICE], $duplicate['scheduled']);
+            Queue::assertPushed(RetrieveMembershipInvoice::class, 1);
+        }
+    }
+
+    public function test_a_definitive_observation_after_an_unknown_one_covers_the_hint(): void
+    {
+        $binding = F::binding();
+        $this->runRetrieval($binding['id'], 0);
+        $this->at(60);
+        $payload = $this->event('evt_SYNTHETICUNKNOWN');
+        $this->loseFirstDispatch($payload);
+        $this->observe($binding['id'], 'unavailable', 70);
+        $this->at(75);
+        Queue::fake();
+        $this->assertNotNull($this->receive($payload)['scheduled']);
+        $this->runRetrieval($binding['id'], 80);
+        $this->at(90);
+        $this->assertNull($this->receive($payload)['scheduled']);
+        Queue::assertPushed(RetrieveMembershipInvoice::class, 1);
+    }
+
     /** Codex P2 (intake-2, line 56): an InvoicePayment carries no invoice parent, so the binding comes from the invoice's existing identity. */
     public function test_invoice_payment_paid_dispatches_for_the_binding_that_owns_the_invoice_identity(): void
     {
@@ -253,10 +313,33 @@ class BillingWebhookRedeliveryTest extends TestCase
         $this->assertSame(1, DB::table('production_membership_billing_events')->count());
     }
 
-    private function runRetrieval(string $bindingId, int $offset): void
+    private function runRetrieval(string $bindingId, int $offset, array $graph = []): void
     {
         $this->at($offset);
-        (new RetrieveMembershipInvoice($bindingId, F::INVOICE))->handle(new BillingReconciliation(new RehearsalBillingGateway(F::graph())));
+        (new RetrieveMembershipInvoice($bindingId, F::INVOICE))->handle(new BillingReconciliation(new RehearsalBillingGateway(F::graph($graph))));
+    }
+
+    /** Appends one observation of the named kind under the identity the binding already owns. */
+    private function observe(string $bindingId, string $kind, int $offset): void
+    {
+        match ($kind) {
+            'settled' => $this->runRetrieval($bindingId, $offset),
+            'refused' => $this->runRetrieval($bindingId, $offset, ['invoice' => ['currency' => 'usd']]),
+            'open' => $this->runRetrieval($bindingId, $offset, ['invoice' => ['status' => 'open']]),
+            'refunded' => $this->runRetrieval($bindingId, $offset, ['charge' => ['refunded' => true, 'amount_refunded' => F::AMOUNT]]),
+            'unavailable', 'inconsistent', 'incomplete' => $this->appendVerdict($offset, match ($kind) {
+                'unavailable' => BillingVerdict::unknown('provider_unavailable', ['invoice_ref' => F::INVOICE]),
+                'inconsistent' => BillingVerdict::unknown('provider_inconsistent', ['invoice_ref' => F::INVOICE]),
+                'incomplete' => new BillingVerdict('refused', 'provider_incomplete', ['invoice_ref' => F::INVOICE]),
+            }),
+        };
+    }
+
+    private function appendVerdict(int $offset, BillingVerdict $verdict): void
+    {
+        $this->at($offset);
+        $identity = (array) DB::table('production_membership_billing_invoices')->first();
+        (new BillingLedger)->append($identity, $verdict, self::T0 + $offset, IdentityPolicy::REHEARSAL);
     }
 
     private function at(int $offset): void
