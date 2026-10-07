@@ -62,3 +62,28 @@ version rule, Filament's numeric UI dehydration, private GET test-body negotiati
 form error paths, generic exception rendering and a malformed synthetic JSON
 fixture; these were corrected before recording the passing candidate. No passing
 claim is made for those earlier failed attempts.
+
+## Recorded source and outcomes
+
+Implementation commit: `e561ce821feaa9d85c4a07b4bf6c882f8d989377`.
+Native test-only comparator correction: `ea659b714e789a274f0c97542ee75522ff7707e0`.
+The correction compares fresh trigger records by their exact scalar names; the
+production implementation is unchanged. Final SQLite/frontend and focused native
+schema receipts apply to that corrected source. This evidence commit changes
+only receipts and documentation.
+
+- Final SQLite: **35 cases, 144 assertions, no skips**.
+- Mounted React buyer journey: **4 cases, all passed**.
+- Scoped Pint, TypeScript and Vite production build: **passed**. The build retains
+  its bundle-size advisory; no full performance acceptance is claimed.
+- Initial native MySQL selection: **35 of 36 passed, 214 assertions**. All domain,
+  mounted HTTP/operator and exact independent-worker/MVCC contention cases passed.
+  The one failure compared two distinct `stdClass` instances despite identical
+  retained trigger names; the failing receipt is preserved.
+- Corrected native schema selection on `ea659b7`: **3 cases, 19 assertions, all
+  passed**, including actual interrupted-DDL retry refusal/preservation and actual
+  rollback bookkeeping. No assertion was removed or condition skipped.
+
+These focused receipts do not claim a fully passing final composed MySQL matrix,
+rendered browser/device acceptance, independent approval, full service parity or
+production readiness. Root owns shared integration and exact composed review.
