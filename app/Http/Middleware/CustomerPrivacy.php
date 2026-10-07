@@ -61,6 +61,10 @@ final class CustomerPrivacy
 
     public static function error(int $status): Response
     {
+        if (request()->is('account/listening-library')) {
+            return self::protect(response()->json(['code' => 'CUSTOMER_LISTENING_UNAVAILABLE',
+                'message' => 'Saved tracks and playlists could not be confirmed. Reload your library before making another change.'], $status >= 500 ? 503 : $status));
+        }
         if (request()->is('account/create', 'account/recover', 'account/access', 'account/identity/*')) {
             return self::protect(response()->json(['code' => 'CUSTOMER_IDENTITY_UNAVAILABLE',
                 'message' => 'This account request could not be completed. Try the original request again or request a new message.'], $status >= 500 ? 503 : $status));

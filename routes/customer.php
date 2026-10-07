@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CustomerIdentityController;
+use App\Http\Controllers\CustomerListeningLibraryController;
 use App\Http\Controllers\CustomerMembershipHistoryController;
 use App\Http\Controllers\CustomerPurchaseClaimController;
 use App\Http\Controllers\CustomerSessionController;
@@ -22,6 +23,10 @@ Route::withoutMiddleware(HandleInertiaRequests::class)->group(function (): void 
 });
 
 Route::withoutMiddleware(HandleInertiaRequests::class)->group(function (): void {
+    Route::get('/account/listening-library', [CustomerListeningLibraryController::class, 'index'])
+        ->middleware('throttle:60,1,customer-pages')->block(20, 5)->name('customer.listening-library.index');
+    Route::post('/account/listening-library', [CustomerListeningLibraryController::class, 'store'])
+        ->middleware('throttle:30,1,customer-listening')->block(20, 5)->name('customer.listening-library.store');
     Route::get('/account/membership-credits', [CustomerMembershipHistoryController::class, 'index'])
         ->middleware('throttle:60,1,customer-pages')->block(20, 5)->name('customer.membership-credits.index');
     Route::get('/account/membership-credits/{bucket}', [CustomerMembershipHistoryController::class, 'show'])
