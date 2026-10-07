@@ -1,0 +1,21 @@
+{
+  "README.md": "971bfffc8189f7033cd974d1dc5924b1a7617c00ade37b4b90403ec2617fdf9a",
+  "affected-selection.phpunit.xml.txt": "0842dbef74502412c3e312e9dd9afc3b5b5938374fe1725f67da6aea9f6dbcc7",
+  "combined-frontend.txt": "01a744ba9ea45e89e9fc98b98ddfc4fc0871518c2a0e664eb414a254c7c39f11",
+  "combined-junit.xml": "0300c1809d336393cc4168971421a96efeacba73841429444f6d07f15c6ff235",
+  "combined-php.txt": "ec918cb8e48c929dc16a9a5e9e84804fa75cdf43aadbc30b22f2104cd437da78",
+  "combined-selection.phpunit.xml.txt": "2b6719e9f74cbc3d448e8ed107829e277d7e3cda88f1d6419aabae3ab42e38bb",
+  "combined-typecheck.txt": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f",
+  "composed-e07-junit.xml": "14870dcdaf227f04586f24380105e05efcb3d3b40630151717e2ec9f8ebe980e",
+  "composed-e07.txt": "0201d39568e675d0921c663ae08a0ee4e18d7861e4182823bcf309e06853e60d",
+  "corrected-http-junit.xml": "2d6feb3ad9b34cf68a9cebb6903e861d581d132a4f680006bc5747e203785125",
+  "final-account-frontend.txt": "b0e5ea94f55a542fc96d3e0a375bd0501844be64c7e3c6489fbc566e6cef8317",
+  "final-affected-junit.xml": "f2b25bc6ad5a14a2ea11ecabee5df36b428a9c23ca02110659856cec3c213bba",
+  "final-affected.txt": "c04329ad30cc5a94327fa957b420edae4a55832e7434d48f4f14d2475ca4aa21",
+  "initial-http-fixture-failures.xml": "96c4ec524ba3c87aec2db5ad087bc3d09b67e385eea935cc6f3c5ab016cebebc",
+  "npm-script-setup-failure.txt": "24e315545b90698aebdd9078aa8a789150ac325d484b5f63fb46f28e3a58ef3d",
+  "npm-tool-setup-failure.txt": "c77e67ee5b64b27300ff62822a623ba2083e98172acfe5f6b29a659195291fb0",
+  "registration-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+  "selector-controls.txt": "f54cae3088ba8af8d269d4a2a16cf305755842a2831df6f1dcbbc71b9f812bda",
+  "source-map.json": "45d8a986674ef5896ff2711fbc6d5dbde5d439cac1caf529f8cb21c37d5217bd"
+}

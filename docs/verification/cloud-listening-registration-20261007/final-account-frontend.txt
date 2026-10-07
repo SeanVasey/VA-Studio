@@ -1,0 +1,13 @@
+
+> test
+> vitest run tests/frontend/customer-account.test.tsx tests/frontend/customer-listening-library.test.tsx
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-listening-registration
+
+
+ Test Files  2 passed (2)
+      Tests  55 passed (55)
+   Start at  07:36:51
+   Duration  3.34s (tests 56%, environment 21%, transform 14%, import 6%, setup 3%)
+
