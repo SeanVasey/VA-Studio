@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeIdentityTest" file="/workspace/VA-Studio-production-free-identity/tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php" tests="3" assertions="23" errors="0" failures="0" skipped="0" time="119.194317">
+    <testcase name="test_actual_mailbox_owner_has_distinct_safe_free_binding_and_locked_original_proof" file="/workspace/VA-Studio-production-free-identity/tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php" line="29" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeIdentityTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeIdentityTest" assertions="14" time="55.356918"/>
+    <testcase name="test_current_recovery_rejects_old_marker_while_retaining_exact_original_origin_history" file="/workspace/VA-Studio-production-free-identity/tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php" line="56" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeIdentityTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeIdentityTest" assertions="5" time="42.938358"/>
+    <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeIdentityTest::test_actual_normal_mutation_rolls_back_on_terminal_policy_credential_or_lazy_connection_withdrawal" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="20.899041">
+      <testcase name="test_actual_normal_mutation_rolls_back_on_terminal_policy_credential_or_lazy_connection_withdrawal with data set #1" file="/workspace/VA-Studio-production-free-identity/tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php" line="93" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeIdentityTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeIdentityTest" assertions="4" time="20.899041"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

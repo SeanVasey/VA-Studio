@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="7" assertions="44" errors="1" failures="0" skipped="0" time="6.492734">
+    <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeIdentityTest" file="/workspace/VA-Studio-production-free-identity/tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php" tests="7" assertions="44" errors="1" failures="0" skipped="0" time="6.492734">
+      <testcase name="test_actual_mailbox_owner_has_distinct_safe_free_binding_and_locked_original_proof" file="/workspace/VA-Studio-production-free-identity/tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php" line="28" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeIdentityTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeIdentityTest" assertions="13" time="1.217467"/>
+      <testcase name="test_current_recovery_rejects_old_marker_while_retaining_exact_original_origin_history" file="/workspace/VA-Studio-production-free-identity/tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php" line="54" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeIdentityTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeIdentityTest" assertions="2" time="0.810311">
+        <error type="App\Domain\Grants\Free\FreeGrantException">Tests\Feature\ProductionFreeIdentity\ProductionFreeIdentityTest::test_current_recovery_rejects_old_marker_while_retaining_exact_original_origin_history
+App\Domain\Grants\Free\FreeGrantException: Free grant preparation is unavailable.
+
+/workspace/VA-Studio-production-free-identity/app/Domain/Grants/Free/Production/ProductionFreeGrantHttpIdentity.php:21
+/workspace/VA-Studio-production-free-identity/tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php:61</error>
+      </testcase>
+      <testsuite name="Tests\Feature\ProductionFreeIdentity\ProductionFreeIdentityTest::test_actual_normal_mutation_rolls_back_on_terminal_policy_credential_or_lazy_connection_withdrawal" tests="3" assertions="15" errors="0" failures="0" skipped="0" time="2.786741">
+        <testcase name="test_actual_normal_mutation_rolls_back_on_terminal_policy_credential_or_lazy_connection_withdrawal with data set #0" file="/workspace/VA-Studio-production-free-identity/tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php" line="91" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeIdentityTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeIdentityTest" assertions="5" time="0.867943"/>
+        <testcase name="test_actual_normal_mutation_rolls_back_on_terminal_policy_credential_or_lazy_connection_withdrawal with data set #1" file="/workspace/VA-Studio-production-free-identity/tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php" line="91" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeIdentityTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeIdentityTest" assertions="5" time="0.976936"/>
+        <testcase name="test_actual_normal_mutation_rolls_back_on_terminal_policy_credential_or_lazy_connection_withdrawal with data set #2" file="/workspace/VA-Studio-production-free-identity/tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php" line="91" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeIdentityTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeIdentityTest" assertions="5" time="0.941861"/>
+      </testsuite>
+      <testcase name="test_old_test_binding_foreign_origin_and_purpose_or_provenance_relabels_are_refused" file="/workspace/VA-Studio-production-free-identity/tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php" line="135" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeIdentityTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeIdentityTest" assertions="7" time="0.869326"/>
+      <testcase name="test_default_off_missing_real_marker_and_old_principal_are_refused" file="/workspace/VA-Studio-production-free-identity/tests/Feature/ProductionFreeIdentity/ProductionFreeIdentityTest.php" line="163" class="Tests\Feature\ProductionFreeIdentity\ProductionFreeIdentityTest" classname="Tests.Feature.ProductionFreeIdentity.ProductionFreeIdentityTest" assertions="7" time="0.808889"/>
+    </testsuite>
+  </testsuite>
+</testsuites>
