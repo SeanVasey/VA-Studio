@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "vendor/bin/phpunit",
+    "/tmp/CheckoutReadonlyStatementCallbackCanaryTest.php",
+    "--colors=never",
+    "--log-junit",
+    "/tmp/va-checkout-statement-callback-red-native.xml"
+  ],
+  "affected_source": "CurrentRows byte-exact1fddf3d726245265745e9e285a653d5603d483c6",
+  "environment": "Actual MySQL8.0.46 isolated metadata schema; private task.env; loopback network grant",
+  "other_runtime": "uncommitted receipt work is not invoked by this canary"
+}

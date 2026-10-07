@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Canary\CheckoutReadonlyStatementCallbackCanaryTest" file="/tmp/CheckoutReadonlyStatementCallbackCanaryTest.php" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="0.160737">
+    <testcase name="test_plain_receipt_reader_never_runs_statement_constructor_that_withdraws_committed_marker" file="/tmp/CheckoutReadonlyStatementCallbackCanaryTest.php" line="19" class="Tests\Canary\CheckoutReadonlyStatementCallbackCanaryTest" classname="Tests.Canary.CheckoutReadonlyStatementCallbackCanaryTest" assertions="0" time="0.160737">
+      <error type="LogicException">Tests\Canary\CheckoutReadonlyStatementCallbackCanaryTest::test_plain_receipt_reader_never_runs_statement_constructor_that_withdraws_committed_marker
+LogicException: committed_read_frame
+
+/workspace/VA-Studio-checkout-committed-receipt/app/Domain/Commerce/ProductionPolicy/CurrentRows.php:69
+/workspace/VA-Studio-checkout-committed-receipt/app/Domain/Commerce/ProductionPolicy/CurrentRows.php:21
+/tmp/CheckoutReadonlyStatementCallbackCanaryTest.php:26</error>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "vendor/bin/phpunit",
+    "tests/Feature/ProductionCheckoutCommittedRowsTest.php",
+    "--colors=never",
+    "--log-junit",
+    "docs/verification/checkout-committed-receipt-20261007/evidence/read-only-sqlite.xml"
+  ],
+  "source_sha": "1fddf3d726245265745e9e285a653d5603d483c6",
+  "environment": "SQLite in-memory; locked local dependencies"
+}

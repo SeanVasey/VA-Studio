@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Canary\CheckoutReadonlyStatementRefusalCanaryTest" file="/tmp/CheckoutReadonlyStatementRefusalCanaryTest.php" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="0.176064">
+    <testcase name="test_plain_receipt_reader_never_runs_statement_constructor_that_withdraws_committed_marker" file="/tmp/CheckoutReadonlyStatementRefusalCanaryTest.php" line="19" class="Tests\Canary\CheckoutReadonlyStatementRefusalCanaryTest" classname="Tests.Canary.CheckoutReadonlyStatementRefusalCanaryTest" assertions="3" time="0.176064"/>
+  </testsuite>
+</testsuites>
