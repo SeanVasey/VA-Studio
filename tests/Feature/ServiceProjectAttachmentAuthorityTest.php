@@ -2,7 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Customers\CustomerAccess;
+use App\Domain\Customers\CustomerAccessPolicy;
 use App\Domain\Services\Projects\Attachments\ServiceProjectAttachmentAuthority;
+use App\Domain\Services\Projects\ServiceProjectPolicy;
 use App\Domain\SupportAttachments\AttachmentActor;
 use App\Domain\SupportAttachments\AttachmentException;
 use App\Domain\SupportAttachments\AttachmentRows;
@@ -13,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LogicException;
 use PDO;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\CustomerFixtures;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\ServiceProjectFixtures as F;
@@ -307,6 +311,61 @@ final class ServiceProjectAttachmentAuthorityTest extends TestCase
             config(['customer.test_accounts_enabled' => true]);
             $this->refused(fn () => $authority->lock(strtoupper($f['project']['id']), 0, 'intake', $this->actor($f), $rows), 404);
         });
+    }
+
+    public function test_final_customer_stamp_resolution_withdrawal_is_seen_before_raw_actor_capture_and_preserves_all_original_rows(): void
+    {
+        $f = F::setup();
+        $pdo = DB::connection()->getPdo();
+        $before = [];
+        foreach (['users', 'customer_accounts', 'service_projects', 'service_project_events'] as $table) {
+            $before[$table] = $pdo->query('SELECT * FROM '.$table.' ORDER BY id')->fetchAll(PDO::FETCH_ASSOC);
+        }
+        $resolutions = 0;
+        app()->afterResolving(CustomerAccess::class, function () use (&$resolutions, $f): void {
+            if (++$resolutions === 3) {
+                $f['customer']['user']->fresh()->forceFill(['password' => 'Synthetic late stamp credential only!'])->save();
+            }
+        });
+        $this->refused(fn () => DB::transaction(function () use ($f): void {
+            $authority = new ServiceProjectAttachmentAuthority;
+            $rows = new AttachmentRows;
+            $proof = $authority->lock($f['project']['id'], null, 'list', $this->actor($f), $rows);
+            $authority->proveCurrent($proof, $rows);
+        }), 403);
+        $this->assertSame(3, $resolutions);
+        foreach ($before as $table => $expected) {
+            $this->assertSame($expected, $pdo->query('SELECT * FROM '.$table.' ORDER BY id')->fetchAll(PDO::FETCH_ASSOC));
+        }
+    }
+
+    public static function admissionResolvers(): array
+    {
+        return [[ServiceProjectPolicy::class], [CustomerAccessPolicy::class]];
+    }
+
+    #[DataProvider('admissionResolvers')]
+    public function test_terminal_policy_resolution_cannot_withdraw_account_after_raw_authority_fence(string $policy): void
+    {
+        $f = F::setup();
+        $pdo = DB::connection()->getPdo();
+        $before = $pdo->query('SELECT * FROM customer_accounts ORDER BY id')->fetchAll(PDO::FETCH_ASSOC);
+        $resolutions = 0;
+        app()->afterResolving($policy, function () use (&$resolutions, $f): void {
+            if (++$resolutions === 3) {
+                DB::table('customer_accounts')->where('id', $f['customer']['account']->id)->update(['active' => false, 'access_version' => 2]);
+            }
+        });
+        $this->refused(fn () => DB::transaction(function () use ($f): void {
+            $authority = new ServiceProjectAttachmentAuthority;
+            $rows = new AttachmentRows;
+            $proof = $authority->lock($f['project']['id'], null, 'list', $this->actor($f), $rows);
+            $authority->proveCurrent($proof, $rows);
+        }), 403);
+        $this->assertSame(3, $resolutions);
+        $this->assertSame($before, $pdo->query('SELECT * FROM customer_accounts ORDER BY id')->fetchAll(PDO::FETCH_ASSOC));
+        $this->assertDatabaseCount('service_projects', 1);
+        $this->assertDatabaseCount('service_project_events', 0);
     }
 
     public function test_same_list_proof_authorizes_exact_open_mutation_without_new_tokens_and_refuses_closed_or_wrong_purpose(): void

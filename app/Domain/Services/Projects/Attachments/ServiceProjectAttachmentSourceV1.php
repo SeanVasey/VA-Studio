@@ -90,21 +90,23 @@ final class ServiceProjectAttachmentSourceV1 implements AttachmentSourceToken, J
     {
         $rows->assertCurrent();
         AttachmentException::require($this->valid && $rows->identity() === $this->primary && DB::transactionLevel() === 1, 503);
+        // Container resolution itself may invoke callbacks. Resolve dependencies
+        // before the terminal actor/account/source bytes, never after them.
+        $policy = app(ServiceProjectPolicy::class);
+        $customerPolicy = $this->actor->audience === 'customer' ? app(CustomerAccessPolicy::class) : null;
         // Gate/MFA may query framework models. Their callbacks precede the terminal raw fence.
         self::staffPolicy($this->actor, $this->authority['user']);
         // A private savepoint disappears even on a direct PDO commit/reopen that bypasses
         // Laravel transaction events. Releasing it never rolls back consumer writes.
         $this->primary->exec('RELEASE SAVEPOINT '.$this->transactionMarker);
         $this->primary->exec('SAVEPOINT '.$this->transactionMarker);
-        $current = self::authority($this->actor, $rows, false);
+        $current = self::authority($this->actor, $rows, false, $customerPolicy);
         AttachmentException::require($current === $this->authority, 403);
         AttachmentException::require(self::graph($this->sourceId, $rows) === $this->graph, 409);
         // Admission may be withdrawn by the last framework query or MFA provider.
         // Recheck after every callback-capable policy operation and raw evidence read.
-        app(ServiceProjectPolicy::class)->requireEnabled();
-        if ($this->actor->audience === 'customer') {
-            app(CustomerAccessPolicy::class)->requireEnabled();
-        }
+        $policy->requireEnabled();
+        $customerPolicy?->requireEnabled();
         $rows->assertCurrent();
     }
 
@@ -117,16 +119,22 @@ final class ServiceProjectAttachmentSourceV1 implements AttachmentSourceToken, J
         $this->proveCurrent($rows);
     }
 
-    private static function authority(AttachmentActor $actor, AttachmentRows $rows, bool $frameworkPolicy = true): array
+    private static function authority(AttachmentActor $actor, AttachmentRows $rows, bool $frameworkPolicy = true, ?CustomerAccessPolicy $customerPolicy = null): array
     {
         AttachmentException::require(in_array($actor->audience, ['customer', 'operator'], true) && $actor->user?->exists === true, 403);
         $userId = (int) $actor->user->getKey();
         AttachmentException::require($userId > 0, 403);
+        $access = null;
+        if ($actor->audience === 'customer') {
+            $customerPolicy ??= app(CustomerAccessPolicy::class);
+            $access = app(CustomerAccess::class);
+            $customerPolicy->requireEnabled();
+        }
+        $rows->assertCurrent();
         $user = $rows->one('users', 'id = ?', [$userId]);
         AttachmentException::require($user !== [] && $user['email_verified_at'] !== null, 403);
         $account = null;
         if ($actor->audience === 'customer') {
-            app(CustomerAccessPolicy::class)->requireEnabled();
             $principal = $actor->principal;
             AttachmentException::require($principal instanceof CustomerPrincipal && $principal->userId === $userId && ! $user['is_admin'], 403);
             $account = $rows->one('customer_accounts', 'id = ?', [$principal->accountId]);
@@ -134,7 +142,7 @@ final class ServiceProjectAttachmentSourceV1 implements AttachmentSourceToken, J
             AttachmentException::require($account !== [] && $account['active'] && (int) $account['user_id'] === $userId
                 && (int) $account['access_version'] === $principal->accessVersion && $principal->accessVersion >= 1
                 && hash_equals($account['owner_key'], $principal->ownerKey)
-                && hash_equals(app(CustomerAccess::class)->stamp($hydrated), $principal->credentialStamp), 403);
+                && hash_equals($access->stamp($hydrated), $principal->credentialStamp), 403);
         } else {
             AttachmentException::require($actor->principal === null && $user['is_admin'], 403);
             if ($frameworkPolicy) {
