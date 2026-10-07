@@ -286,10 +286,24 @@ unchanged into an isolated MySQL server under the original schema name (no renam
 Both dumps use `--skip-comments`, which also closes the accepted R-4 dump-header noise. The
 "Name rewriting" open limit became "Server isolation". Still documented, not executed.
 
+Codex's seventh pass (P2 ×2): the raw-PDO guard called `getPdo()`, which opens a lazy
+connection just to answer the guard and dereferences null after a disconnect — the
+reviewer's N-1/N-2. Both guards now inspect `getRawPdo()` only when it is already a `PDO`
+(a lazy connection holds a resolver closure, a disconnected one null), keeping
+`transactionLevel()` for framework transactions; N-1 and N-2 are closed. New regression
+`test_guard_never_opens_an_unopened_connection`: a resolved `mysql` connection to an
+unreachable port stays unopened across a probe (red on the old guard: `PDOException
+Connection refused`; green after). The documented restore's dump `diff` now exits 1 on a
+mismatch instead of letting the following `CHECKSUM TABLE` mask it.
+
+| Run | Tests | Assertions | Failures |
+| --- | ---: | ---: | ---: |
+| `StripeCapabilityPreflightTest` after the guard change | 42 | 342 | 0 |
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
-`f4c55acf`. Two Low findings are accepted for merge and must be fixed or explicitly
-accepted before the first real probe: N-1, `getPdo()` physically opens a configured but
+`f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex
+pass, below): N-1, `getPdo()` physically opens a configured but
 unused connection, so an unreachable database crashes `collect()` instead of refusing; N-2,
 after `DB::disconnect()` the guard fails with `inTransaction()` on null. Both fail closed
 (no transport built, no secret in the error). Suggested fix: `getRawPdo() instanceof \PDO
@@ -315,8 +329,8 @@ newline give a false mismatch (fails safe); the `<(...)` verify step is bash-onl
 
 1. Re-review the R-1 and R-2 delta (`a2b56002..3d615162`) — done, see the DECISION.md
    addendum — and the Codex transaction-guard delta after `e8d84306`.
-2. Fix or accept N-1 and N-2 (transaction guard on a configured-but-unopened or
-   disconnected connection) before the first real probe.
+2. N-1 and N-2 (transaction guard on a configured-but-unopened or disconnected
+   connection) are closed; re-review the guard change under condition 3.
 3. Root composition then decides whether to ship this with A4 or after A3 (Tax255).
 4. Sean decides between S2a and S2b.
 

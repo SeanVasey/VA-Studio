@@ -110,7 +110,7 @@ diff <(cd <RESTORE_PRIVATE_ROOT> && find . ! -type d | LC_ALL=C sort) \
   || { echo 'restored entry outside owner-only modes (0600/0400 files, 0700 directories)'; exit 1; }
 mysqldump --defaults-extra-file=<RESTORE_OPTION_FILE> --single-transaction --quick \
   --routines --triggers --events --hex-blob --no-tablespaces --set-gtid-purged=OFF \
-  --skip-dump-date --skip-comments --databases <DATABASE> | diff - <BACKUP_DIR>/database.sql
+  --skip-dump-date --skip-comments --databases <DATABASE> | diff - <BACKUP_DIR>/database.sql || exit 1
 mysql --defaults-extra-file=<RESTORE_OPTION_FILE> -e 'CHECKSUM TABLE <DATABASE>.orders EXTENDED'  # repeat per table and compare with the source
 ```
 

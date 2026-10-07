@@ -5,6 +5,7 @@ namespace App\Domain\Commerce\Readiness;
 use App\Domain\Commerce\ProductionCheckout\ExecutionContextV1;
 use Closure;
 use Illuminate\Support\Facades\DB;
+use PDO;
 use RuntimeException;
 use SensitiveParameter;
 use Stripe\ApiRequestor;
@@ -50,7 +51,9 @@ final class StripeCapabilityProbe
                 && Stripe::$accountId === null && Stripe::$verifySslCerts === true && Stripe::$logger === null);
             foreach (DB::getConnections() as $connection) {
                 // Framework depth and the raw PDO both: a caller's own beginTransaction() is invisible to the first.
-                self::require($connection->transactionLevel() === 0 && ! $connection->getPdo()->inTransaction());
+                // Inspect only an already-open handle; never connect, and tolerate a disconnected connection.
+                $pdo = $connection->getRawPdo();
+                self::require($connection->transactionLevel() === 0 && ! ($pdo instanceof PDO && $pdo->inTransaction()));
             }
             $client = new StripeClient(['api_key' => $secret, 'api_base' => BaseStripeClient::DEFAULT_API_BASE,
                 'stripe_version' => ExecutionContextV1::API_VERSION, 'stripe_account' => null, 'stripe_context' => null,

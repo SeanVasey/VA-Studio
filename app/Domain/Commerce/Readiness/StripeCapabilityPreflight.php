@@ -7,6 +7,7 @@ use App\Domain\Commerce\Payments\StripeSdkCheckoutGateway;
 use App\Domain\Commerce\ProductionCheckout\ExecutionContextV1;
 use Composer\InstalledVersions;
 use Illuminate\Support\Facades\DB;
+use PDO;
 use Stripe\Stripe;
 use Stripe\Util\ApiVersion;
 use Throwable;
@@ -187,7 +188,10 @@ final class StripeCapabilityPreflight
     {
         foreach (DB::getConnections() as $connection) {
             // A transaction begun on the raw PDO leaves the framework depth at zero, so ask both.
-            if ($connection->transactionLevel() !== 0 || $connection->getPdo()->inTransaction()) {
+            // Only an already-open handle is inspected: getPdo() would connect a lazy connection
+            // just to answer the guard, and a disconnected connection holds no PDO at all.
+            $pdo = $connection->getRawPdo();
+            if ($connection->transactionLevel() !== 0 || ($pdo instanceof PDO && $pdo->inTransaction())) {
                 return true;
             }
         }

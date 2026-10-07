@@ -7,6 +7,7 @@ use App\Domain\Commerce\Readiness\StripeCapabilityPreflight;
 use App\Domain\Commerce\Readiness\StripeCapabilityProbe;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Stripe\ApiRequestor;
@@ -415,6 +416,20 @@ class StripeCapabilityPreflightTest extends TestCase
         }
         $this->assertSame($status, $this->check($report, 'funds_mode_environment'));
         $this->assertSame($status === 'pass', $report['configuration_shape_valid']);
+    }
+
+    public function test_guard_never_opens_an_unopened_connection(): void
+    {
+        $fixture = $this->fixture([self::account()]);
+        $this->shaped(['production_checkout.secret_key' => self::SECRET, 'production_checkout.provider_io_enabled' => true]);
+        // A resolved-but-never-queried connection must not be opened just to answer the guard.
+        config(['database.connections.unreachable' => ['driver' => 'mysql', 'host' => '127.0.0.1', 'port' => 1, 'database' => 'none', 'username' => 'x', 'password' => 'x']]);
+        $lazy = DB::connection('unreachable');
+        $this->assertNotInstanceOf(PDO::class, $lazy->getRawPdo());   // a resolver closure (or null) until first use
+        [$exit, $report] = $this->preflight(['--probe' => true, '--i-understand-this-calls-stripe' => true]);
+        $this->assertSame([0, 'pass'], [$exit, $report['probe']['status']]);
+        $this->assertNotInstanceOf(PDO::class, $lazy->getRawPdo());   // still never opened
+        DB::purge('unreachable');
     }
 
     #[DataProvider('malformedCapabilities')]
