@@ -1,0 +1,8 @@
+{
+    "source": "dc17abcd3a60a0c47bd1247b52f239caede912c4",
+    "callbacks": 0,
+    "fixture_value": 9123,
+    "receipt_closed": false,
+    "refusal": "historical_plain_configuration_required",
+    "active_transaction": false
+}

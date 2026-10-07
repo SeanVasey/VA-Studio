@@ -1,0 +1,27 @@
+{
+  "executable_source": "e8f744163600bb394e3f09c8c7f838f9fc62c885",
+  "base_source": "101e3832e8e5637cab784eb2a800d60642a746b4",
+  "files": {
+    "app/Domain/Customers/ProductionCustomerAccess.php": "7dbaeed358ab1051dd34608fbf966645ae7756f163700733bf9708f1233aba42",
+    "app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommitSeal.php": "3a0686a3f04bf3679d384ce06a33bdfa0c6599a593d7f0cc59476f3cf4937b97",
+    "app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommittedReceipt.php": "82a2b5217f57da35eb90e099b4d26240c4c40082fa18977356de25b4c862cd78",
+    "app/Domain/Customers/ProductionIdentity/IdentityHistoricalPlainRows.php": "2117a278b26b7b643429f460e549adcbe0b499efdfca8ee14ab8939c4a048769",
+    "app/Domain/Customers/ProductionIdentity/IdentityOriginalCommitWitness.php": "1bc64f515cd6707b5e3dd9577aa98ac3aa32fc8b731d87654eb484caf1dc65fc",
+    "tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php": "f16fc133a0130687a06db97cf534d3a8c8852ff8d91ad9941723067a2b3c3dd1",
+    "tests/Feature/ProductionIdentityAdapters/IdentityHistoricalConfigurationAdmissionTest.php": "b7436258def3ac2cd814f86ff9b6d8af7895945b3ff4949e76cec62501ed156d",
+    "tests/Support/IdentityHistoricalCommitFixture.php": "c36d6def466cb27d742c1b9596177a295d9d3f0820a7b51314a0b43425c450a2"
+  },
+  "unchanged_101": {
+    "app/Domain/Customers/ProductionIdentity/IdentityRows.php": "470a2a4816739aef151ad429f9b8b6c359a0eba0b8068a60d1f215b6547794a4",
+    "app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php": "623e31f469a0a1779e3f992f5d1c48b0aaa2382d308109bc33cc78f70a7c821b",
+    "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php": "6058e3e4ced2900e1ccc93bd9110691c041ad0c4ecafe2f0373d323ceb17cb90",
+    "tests/Support/ProductionIdentityFixture.php": "558b6269d305b7b213e4b8c102c7e9e117dfb8cce30c4c76a7520482609391b7",
+    "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureAccess.php": "7b47e7ae6617581d18d25687e35ea28d6804394ead13550555b81b7a91f02fd6"
+  },
+  "existing_production_customer_access_bodies": "Exact 101 class recovered by removal of the one import/two new typed helpers and private parameter union; no existing method body changed.",
+  "original_probe_sources": {
+    "getter": "7d88a4a133952595c60234b53ebdfe7650381e0dbde5f40ae85510029cd46d34",
+    "original_nested": "c02f3d96d679793ff37cdf5588023a6744e05c2643ba59f90a8e3525d7cbb7fa",
+    "admission_aware_nested": "3de75325f858953b2927026703dc1d006eb7005d2e62c1ef210e2f812ddd79e2"
+  }
+}

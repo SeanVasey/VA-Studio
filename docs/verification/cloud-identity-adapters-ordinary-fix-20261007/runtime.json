@@ -1,0 +1,6 @@
+{
+    "php": "8.4.26",
+    "mysql": "8.0.46-0ubuntu0.24.04.4",
+    "database_scope": "separate limited reviewer schema\/account",
+    "transaction_isolation": "REPEATABLE-READ"
+}

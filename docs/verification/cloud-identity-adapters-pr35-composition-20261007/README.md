@@ -1,0 +1,3 @@
+# Identity adapters and strict SMTP binding composed with PR35
+
+All22 independently reviewed bindings and27 artifacts remain exact after currentmain/public Discovery composition. Existing17 adapter paths have final101 proof; registered raw-parent correctionf5 has own22/182 and independent15/64 with genuine TLS/AUTH fixtures, while native registered1/18 is explicitly prior5d. No owned identity behavior changes in this merge and no duplicate unchanged native matrix runs. Config remainsnull/default off and credentials unconfigured; this is a development preparation batch with final native8.4/browser/full acceptance outstanding.

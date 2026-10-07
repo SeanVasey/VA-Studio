@@ -1,0 +1,10 @@
+{
+    "source": "cdc99263b8fd9b624cce326519545e0fe5f18d05",
+    "callback_count": 1,
+    "ordinary_write_count": 1,
+    "feature_enabled_after_final_proof": false,
+    "refused": false,
+    "private_projection_released": true,
+    "framework_transaction_depth": 0,
+    "physical_transaction_active": false
+}

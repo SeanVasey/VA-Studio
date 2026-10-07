@@ -1,0 +1,1 @@
+/bin/bash: line 11: vendor/bin/pint: No such file or directory

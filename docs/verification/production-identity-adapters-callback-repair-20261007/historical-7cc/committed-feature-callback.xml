@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-identity-adapters-independent/docs/verification/cloud-identity-adapters-independent-20261007/callback-selection.xml" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="0.973712">
+    <testsuite name="Independent terminal feature callback" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="0.973712">
+      <testsuite name="Tests\IndependentIdentityAdapters\CommittedFeatureCallbackCanaryTest" file="/workspace/VA-Studio-identity-adapters-independent/docs/verification/cloud-identity-adapters-independent-20261007/CommittedFeatureCallbackCanaryTest.php" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="0.973712">
+        <testcase name="test_lazy_secondary_connection_withdrawal_cannot_follow_terminal_feature_policy" file="/workspace/VA-Studio-identity-adapters-independent/docs/verification/cloud-identity-adapters-independent-20261007/CommittedFeatureCallbackCanaryTest.php" line="21" class="Tests\IndependentIdentityAdapters\CommittedFeatureCallbackCanaryTest" classname="Tests.IndependentIdentityAdapters.CommittedFeatureCallbackCanaryTest" assertions="3" time="0.973712">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\IndependentIdentityAdapters\CommittedFeatureCallbackCanaryTest::test_lazy_secondary_connection_withdrawal_cannot_follow_terminal_feature_policy
+A real lazy secondary connection callback withdrew feature authority after the policy check.
+Failed asserting that true is false.
+
+/workspace/VA-Studio-identity-adapters-independent/docs/verification/cloud-identity-adapters-independent-20261007/CommittedFeatureCallbackCanaryTest.php:75
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

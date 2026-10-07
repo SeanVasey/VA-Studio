@@ -1,0 +1,7 @@
+{
+  "snapshot": "sqlite-nested-snapshot.raw.json",
+  "actual_executable_source": "e8f744163600bb394e3f09c8c7f838f9fc62c885",
+  "probe_hash": "3de75325f858953b2927026703dc1d006eb7005d2e62c1ef210e2f812ddd79e2",
+  "embedded_source_label": "dc17abcd3a60a0c47bd1247b52f239caede912c4",
+  "explanation": "Unchanged external probe intentionally retains its historical hard-coded label. This separate binding records the actual successor execution; original red snapshots are preserved byte exact in both nested folders."
+}

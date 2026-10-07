@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\IndependentIdentityAdapters\CommittedFeatureCallbackCanaryTest" file="/workspace/VA-Studio-production-identity-adapters-repair/docs/verification/production-identity-adapters-callback-repair-20261007/probes/CommittedFeatureCallbackCanaryTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="0.913094">
+    <testcase name="test_lazy_secondary_connection_withdrawal_cannot_follow_terminal_feature_policy" file="/workspace/VA-Studio-production-identity-adapters-repair/docs/verification/production-identity-adapters-callback-repair-20261007/probes/CommittedFeatureCallbackCanaryTest.php" line="21" class="Tests\IndependentIdentityAdapters\CommittedFeatureCallbackCanaryTest" classname="Tests.IndependentIdentityAdapters.CommittedFeatureCallbackCanaryTest" assertions="4" time="0.913094"/>
+  </testsuite>
+</testsuites>
