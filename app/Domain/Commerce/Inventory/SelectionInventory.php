@@ -8,33 +8,43 @@ use App\Domain\Commerce\Models\ExclusiveSale;
 use App\Domain\Commerce\Models\RightsScope;
 use App\Domain\Commerce\Models\RightsScopeOffer;
 use App\Domain\Commerce\QuoteException;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 
 /** Advisory browse/review availability. The reservation command performs the authoritative locked check. */
 final class SelectionInventory
 {
-    public function available(int $revisionId, ?int $ownQuoteId = null): bool
+    public function available(int $revisionId, ?int $ownQuoteId = null, ?CarbonInterface $at = null): bool
     {
         $link = RightsScopeOffer::where('offer_revision_id', $revisionId)->first();
         $revision = OfferRevision::find($revisionId);
-        if (! $revision) { return false; }
+        if (! $revision) {
+            return false;
+        }
         // Once a track has explicitly linked into an activated or sold scope, a new unlinked
         // successor cannot evade its cutoff. This only blocks; it never creates a link.
         $governed = $this->governedScopes($revision->track_id);
-        if ($governed !== [] && (count($governed) !== 1 || ! $link || $link->rights_scope_id !== $governed[0])) { return false; }
+        if ($governed !== [] && (count($governed) !== 1 || ! $link || $link->rights_scope_id !== $governed[0])) {
+            return false;
+        }
         // A sale has no own-quote exemption and applies to every explicitly linked
         // variant, including legacy offers without their own exclusive activation.
-        if ($link && ExclusiveSale::where('rights_scope_id', $link->rights_scope_id)->exists()) { return false; }
+        if ($link && ExclusiveSale::where('rights_scope_id', $link->rights_scope_id)->exists()) {
+            return false;
+        }
         // Legacy inventory exercises retain their original behavior until an exclusive is explicitly activated.
-        if (! $link || ! ExclusiveActivation::where('rights_scope_id', $link->rights_scope_id)->exists()) { return true; }
-        if (RightsScope::whereKey($link->rights_scope_id)->where('blocked', true)->exists()) { return false; }
+        if (! $link || ! ExclusiveActivation::where('rights_scope_id', $link->rights_scope_id)->exists()) {
+            return true;
+        }
+        if (RightsScope::whereKey($link->rights_scope_id)->where('blocked', true)->exists()) {
+            return false;
+        }
 
         return ! DB::table('inventory_reservations')->join('inventory_claims',
             'inventory_claims.inventory_reservation_id', '=', 'inventory_reservations.id')
             ->where('inventory_claims.rights_scope_id', $link->rights_scope_id)
             ->when($ownQuoteId !== null, fn ($query) => $query->where('quote_id', '<>', $ownQuoteId))
-            ->where(fn ($query) => $query->where('state', 'pending')->orWhere(fn ($held) =>
-                $held->where('state', 'held')->where('expires_at', '>', now())))
+            ->where(fn ($query) => $query->where('state', 'pending')->orWhere(fn ($held) => $held->where('state', 'held')->where('expires_at', '>', $at ?? now())))
             ->exists();
     }
 
@@ -42,10 +52,10 @@ final class SelectionInventory
     {
         return DB::table('rights_scope_offers as links')->join('offer_revisions as revisions', 'revisions.id', '=', 'links.offer_revision_id')
             ->where('revisions.track_id', $trackId)->where(fn ($scope) => $scope
-                ->whereExists(fn ($query) => $query->selectRaw('1')->from('exclusive_activations')
-                    ->whereColumn('exclusive_activations.rights_scope_id', 'links.rights_scope_id'))
-                ->orWhereExists(fn ($query) => $query->selectRaw('1')->from('exclusive_sales')
-                    ->whereColumn('exclusive_sales.rights_scope_id', 'links.rights_scope_id')))
+            ->whereExists(fn ($query) => $query->selectRaw('1')->from('exclusive_activations')
+                ->whereColumn('exclusive_activations.rights_scope_id', 'links.rights_scope_id'))
+            ->orWhereExists(fn ($query) => $query->selectRaw('1')->from('exclusive_sales')
+                ->whereColumn('exclusive_sales.rights_scope_id', 'links.rights_scope_id')))
             ->distinct()->pluck('links.rights_scope_id')->map(fn ($id) => (int) $id)->all();
     }
 
