@@ -1,0 +1,29 @@
+{
+  "sqlite": [
+    "tests/Feature/OperatorAuthorityTest.php",
+    "tests/Feature/OperatorMfaTest.php",
+    "tests/Feature/TrackPublicationApplyTest.php",
+    "tests/Feature/PersistentCatalogDraftImportTest.php",
+    "tests/Feature/MembershipGrantClockBoundaryTest.php",
+    "tests/Feature/SiteScheduleRunnerTest.php",
+    "tests/Feature/MediaWorkerIdentityTest.php",
+    "tests/Feature/TransactionalNotificationTest.php",
+    "tests/Feature/ProductionTrackPreparationPacketTest.php",
+    "tests/Feature/ProductionTrackPreparationPacketGuardsTest.php",
+    "tests/Feature/ProductionTrackPolicyFinalProofTest.php",
+    "tests/Feature/ProductionTrackCapabilitiesTest.php",
+    "tests/Feature/ProductionTrackPolicyEngineTest.php",
+    "tests/Feature/ProductionTrackPolicyDraftTest.php",
+    "tests/Feature/ProductionCommerceReadinessTest.php",
+    "tests/Unit/TcpdfContractRendererTest.php",
+    "tests/Unit/ProductionTrackPreparationSnapshotTest.php",
+    "tests/Unit/ProductionTrackMachinePolicyTest.php"
+  ],
+  "mysql": [
+    "tests/Feature/ProductionTrackPreparationReplayConcurrencyTest.php",
+    "tests/Feature/ProductionTrackPolicyFinalProofTest.php",
+    "tests/Feature/TransactionalNotificationConcurrencyTest.php",
+    "tests/Feature/MembershipCreditMigrationTest.php",
+    "tests/Feature/CustomerAccountMigrationTest.php"
+  ]
+}

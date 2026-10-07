@@ -1,0 +1,56 @@
+Traceback (most recent call last):
+  File "/workspace/scratch/0c039e9e0645/mysql-runtime/run-tests.py", line 120, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/workspace/scratch/0c039e9e0645/mysql-runtime/run-tests.py", line 82, in main
+    raise RuntimeError('MySQL startup failed: ' + log.read_text()[-3000:])
+RuntimeError: MySQL startup failed: 33.904094Z 0 [System] [MY-015017] [Server] MySQL Server Initialization - start.
+2026-10-07T03:11:33.909653Z 0 [System] [MY-013169] [Server] /workspace/scratch/0c039e9e0645/runtime-recovery/root/usr/sbin/mysqld (mysqld 8.4.11) initializing of server in progress as process 9
+2026-10-07T03:11:33.917986Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-10-07T03:11:34.112038Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-10-07T03:11:35.207151Z 5 [Warning] [MY-010453] [Server] root@localhost is created with an empty password ! Please consider switching off the --initialize-insecure option.
+2026-10-07T03:11:36.847948Z 0 [System] [MY-015018] [Server] MySQL Server Initialization - end.
+2026-10-07T03:11:36.934979Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+2026-10-07T03:11:37.190605Z 0 [System] [MY-010116] [Server] /workspace/scratch/0c039e9e0645/runtime-recovery/root/usr/sbin/mysqld (mysqld 8.4.11) starting as process 48
+2026-10-07T03:11:37.204455Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+mysqld: Can't create/write to file '/tmp/ibmCM9lz' (OS errno 28 - No space left on device)
+2026-10-07T03:11:37.398682Z 1 [ERROR] [MY-012576] [InnoDB] Unable to create temporary file inside "/tmp"; errno: 28
+2026-10-07T03:11:37.398707Z 1 [ERROR] [MY-013183] [InnoDB] Assertion failure: dict0dict.cc:1033:dict_foreign_err_file thread 140432390665920
+InnoDB: We intentionally generate a memory trap.
+InnoDB: Submit a detailed bug report to http://bugs.mysql.com.
+InnoDB: If you get repeated assertion failures or crashes, even
+InnoDB: immediately after the mysqld startup, there may be
+InnoDB: corruption in the InnoDB tablespace. Please refer to
+InnoDB: http://dev.mysql.com/doc/refman/8.4/en/forcing-innodb-recovery.html
+InnoDB: about forcing recovery.
+2026-10-07T03:11:37Z UTC - mysqld got signal 6 ;
+Most likely, you have hit a bug, but this error can also be caused by malfunctioning hardware.
+BuildID[sha1]=afc3fcec720f8df1e1407d6a9f483822fd6211aa
+Thread pointer: 0x55d2abe820c0
+Attempting backtrace. You can use the following information to find out
+where mysqld died. If you see no messages after this, something went
+terribly wrong...
+stack_bottom = 7fb8f6c2ab60 thread_stack 0x100000
+ #0 0x55d26ffbf04e <unknown>
+ #1 0x55d270a6100d <unknown>
+ #2 0x55d270c21e97 <unknown>
+ #3 0x55d270d0ecda <unknown>
+ #4 0x55d270d0ed82 <unknown>
+ #5 0x55d270c175d9 <unknown>
+ #6 0x55d270add087 <unknown>
+ #7 0x55d2708e5fad <unknown>
+ #8 0x55d2708f2b5b <unknown>
+ #9 0x55d27008b4e7 <unknown>
+ #10 0x55d2710d620e <unknown>
+ #11 0x7fb903ac6aa3 <unknown>
+ #12 0x7fb903b53c6b <unknown>
+ #13 0xffffffffffffffff <unknown>
+
+Trying to get some variables.
+Some pointers may be invalid and cause the dump to abort.
+Query (0): is an invalid pointer
+Connection ID (thread ID): 1
+Status: NOT_KILLED
+
+The manual page at http://dev.mysql.com/doc/mysql/en/crashing.html contains
+information that should help you find out what is causing the crash.

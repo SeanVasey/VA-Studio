@@ -1,6 +1,40 @@
 # Dependency PR integration
 
-## Current VA-Studio reconciliation — October 6, 2026
+## Current-main compatibility candidate — October 7, 2026
+
+Merged PR #17 is native main `df7f12e24ef481cee020910c3764850761ae4596`,
+tree `56a3f0c58af0176b8a9a19414fffed80b9285fcf`. Its membership rollback and
+production replay review corrections are retained. This separate candidate
+transfers only the intended DOM 10.4.2 and Laravel 13.34/fourteen accompanying
+locked package updates from PRs #1/#2. Current source-map-js 1.2.2 and complete
+historical PDF/font records stay unchanged; no old workflow is imported.
+
+Executable author `66fde20d538521fc036f4e7d268fdc316e3698ea` equals clean local
+integration `33152288bb3d559b4a874787d6fd5778ef4a6dfc`, tree
+`3f2986157f59681dff3988a0a25b9ed884c9d4ad`. Locked installs, installed version/reference
+checks, strict Composer/platform validation, both genuine audits, typecheck,
+production build and 80 selected frontend cases passed. Focused SQLite passed
+489 cases / 1,786 assertions with four declared native-only skips; genuine
+normal-durability MySQL 8.4.11 passed 57 / 1,226 without skips, including the
+45-case / 218-assertion empty/populated membership rollback and bookkeeping
+regression. All fourteen actual stopped-copy checks passed in two disjoint
+seven-case processes. Original setup/key/resource failures remain recorded.
+
+[Author evidence](verification/dependency-compatibility-20261007/README.md) and
+[independent review](verification/dependency-compatibility-20261007/independent/review.md)
+bind exact source and limits. Independently executed renderer 4 / 18 and two
+stopped-copy checks passed. Root cadence 14 and scope-routing 27 checks passed
+at integration `33152288`; workflow files are byte-identical to PR #17. Evidence
+successors change only documentation. The integrating PR records its fresh cheap
+preflight and expected-head merge; no routine full matrix or final acceptance is
+claimed. PRs #1/#2 are superseded only after this corrected candidate merges.
+
+PR #3 remains deferred: a version-specific trusted render-profile successor must
+preserve v1 historical request validation and original documents. A future
+renderer must not silently process pending v1 work under different pins.
+Independent private-consumer implementation continues in separate worktrees.
+
+## Preserved read-only VA-Studio reconciliation — October 6, 2026
 
 Read-only review is bound to native main
 `a348f67eff1fdd16b1945efd3b99aa27af3dd242`, after PR #16, and the exact

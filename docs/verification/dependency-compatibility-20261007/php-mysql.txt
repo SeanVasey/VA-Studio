@@ -1,0 +1,4 @@
+{"mysql": "8.4.11", "innodb_flush_log_at_trx_commit": 1, "sync_binlog": 1, "innodb_doublewrite": "ON", "log_bin": true, "transport": "private loopback TCP", "database": "fresh disposable"}
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Test file "/workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/tests/Feature/MemberCreditMigrationTest.php" not found

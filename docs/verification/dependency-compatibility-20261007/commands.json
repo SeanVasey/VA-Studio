@@ -1,0 +1,29 @@
+{
+  "executable_source": "66fde20d538521fc036f4e7d268fdc316e3698ea",
+  "tree": "3f2986157f59681dff3988a0a25b9ed884c9d4ad",
+  "commands": {
+    "composer-install": "composer install --no-interaction --prefer-dist",
+    "composer-validate": "composer validate --strict",
+    "platform": "composer check-platform-reqs",
+    "composer-audit": "composer audit --format=json",
+    "npm-ci": "npm ci",
+    "typecheck": "npm run typecheck",
+    "frontend": "npm test -- tests/frontend/storefront.test.tsx tests/frontend/license-disclosure.test.tsx tests/frontend/customer-account.test.tsx tests/frontend/order-preparation.test.tsx",
+    "build": "npm run build",
+    "npm-audit": "npm audit --json",
+    "sqlite": "php vendor/bin/phpunit -c dependency-compat.phpunit.xml --log-junit <evidence>/php-sqlite-final.xml",
+    "mysql": "python3 /workspace/scratch/0c039e9e0645/mysql-runtime/run-tests.py -- php vendor/bin/phpunit -c dependency-native.phpunit.xml --log-junit <evidence>/php-mysql.xml",
+    "copy_first_seven": "PERSISTENT_UPGRADE_REQUIRE_PHP=1 node --test --test-name-pattern='^(a reviewed|a genuine|real authenticated|unchanged|old SQLite|removing|BLOB)' scripts/ops/persistent-content-upgrade.test.mjs",
+    "copy_last_seven": "PERSISTENT_UPGRADE_REQUIRE_PHP=1 node --test --test-name-pattern='^(migration failure|locked source|in-flight|a moved|tracked-source|Git replacement|source descendant)' scripts/ops/persistent-content-upgrade.test.mjs"
+  },
+  "environment": {
+    "php": "8.4.26",
+    "mysql": "8.4.11",
+    "node": "24.19.0",
+    "sqlite_db": ":memory:",
+    "mysql_db": "fresh disposable private loopback TCP",
+    "app_key": "fresh ephemeral secret for corrected SQLite and native runner; not retained",
+    "full_matrix": "not run",
+    "CI": "no hosted dispatch, no workflow changes"
+  }
+}

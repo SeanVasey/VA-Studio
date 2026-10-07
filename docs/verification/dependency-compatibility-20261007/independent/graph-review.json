@@ -1,0 +1,87 @@
+{
+  "added_or_removed": [],
+  "changed": {
+    "doctrine/lexer": {
+      "before": "3.0.2",
+      "after": "3.0.3",
+      "runtime_require_unchanged": true
+    },
+    "laravel/framework": {
+      "before": "v13.33.0",
+      "after": "v13.34.0",
+      "runtime_require_unchanged": true
+    },
+    "monolog/monolog": {
+      "before": "3.12.0",
+      "after": "3.12.1",
+      "runtime_require_unchanged": true
+    },
+    "nesbot/carbon": {
+      "before": "3.14.0",
+      "after": "3.14.2",
+      "runtime_require_unchanged": true
+    },
+    "symfony/console": {
+      "before": "v7.4.19",
+      "after": "v7.4.20",
+      "runtime_require_unchanged": true
+    },
+    "symfony/polyfill-intl-grapheme": {
+      "before": "v1.41.0",
+      "after": "v1.43.0",
+      "runtime_require_unchanged": true
+    },
+    "symfony/polyfill-intl-idn": {
+      "before": "v1.42.0",
+      "after": "v1.43.0",
+      "runtime_require_unchanged": true
+    },
+    "symfony/polyfill-intl-normalizer": {
+      "before": "v1.42.0",
+      "after": "v1.43.0",
+      "runtime_require_unchanged": true
+    },
+    "symfony/polyfill-mbstring": {
+      "before": "v1.38.2",
+      "after": "v1.43.0",
+      "runtime_require_unchanged": true
+    },
+    "symfony/polyfill-php80": {
+      "before": "v1.37.0",
+      "after": "v1.43.0",
+      "runtime_require_unchanged": true
+    },
+    "symfony/polyfill-php82": {
+      "before": "v1.38.1",
+      "after": "v1.43.0",
+      "runtime_require_unchanged": true
+    },
+    "symfony/polyfill-php84": {
+      "before": "v1.38.1",
+      "after": "v1.43.0",
+      "runtime_require_unchanged": true
+    },
+    "symfony/polyfill-php85": {
+      "before": "v1.41.0",
+      "after": "v1.43.0",
+      "runtime_require_unchanged": true
+    },
+    "symfony/polyfill-php86": {
+      "before": "v1.41.0",
+      "after": "v1.43.0",
+      "runtime_require_unchanged": true
+    },
+    "symfony/polyfill-uuid": {
+      "before": "v1.37.0",
+      "after": "v1.43.0",
+      "runtime_require_unchanged": true
+    }
+  },
+  "other_top_level_changes": [],
+  "npm_changed_records": [
+    "",
+    "node_modules/@testing-library/dom"
+  ],
+  "source_map_js": "1.2.2",
+  "pdf_font_records_unchanged": true
+}

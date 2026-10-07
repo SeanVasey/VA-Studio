@@ -1,0 +1,9 @@
+{
+  "old_schema_hash": "7c04927f30032263232b4bfe9fa9956cf44b1fb501603b1968484b0ae8fc4229",
+  "candidate_schema_hash": "090be358fdd44395b6465a60e4420d09a8aa8fbe0ccc514ad2bbabbd067011a3",
+  "refused_changed_lock": true,
+  "retained_file_digests_unchanged": true,
+  "old_graph_recovery": true,
+  "state": "initializing",
+  "boundary": "readWorkspace identity gate; not initialized HTTP restart"
+}

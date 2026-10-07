@@ -1,0 +1,91 @@
+{
+  "npm_install": 0,
+  "composer_install": 0,
+  "composer_validate_strict": 0,
+  "composer_platform": 0,
+  "composer_audit": 0,
+  "npm_audit": 0,
+  "typecheck": 0,
+  "focused_frontend": {
+    "files": 4,
+    "cases": 80,
+    "failed": 0
+  },
+  "build": 0,
+  "changed_lock_identity": 0,
+  "failures_retained": {
+    "first_sqlite": {
+      "tests": 489,
+      "passed": 458,
+      "errors": 27,
+      "skipped": 4,
+      "reason": "26 missingAPP_KEY setup errors;1boundedmedia fixture failure under concurrent resource pressure; no code change"
+    },
+    "first_mysql": {
+      "tests_executed": 0,
+      "reason": "untracked selection typo MemberCreditMigrationTest.php"
+    },
+    "second_mysql": {
+      "tests_executed": 0,
+      "reason": "startup inodeENOSPC before tests"
+    },
+    "first_copy_upgrade": {
+      "tests": 14,
+      "passed": 11,
+      "failed": 3,
+      "reason": "inodeENOSPC while copying fixture/checkouts"
+    },
+    "first_changed_lock_probe": {
+      "reason": "scratchscript wrong argument type"
+    }
+  },
+  "sqlite": {
+    "tests": "489",
+    "assertions": "1786",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "4",
+    "time": "250.060242"
+  },
+  "mysql": {
+    "tests": "57",
+    "assertions": "1226",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "435.838737"
+  },
+  "mysql_membership_subset": {
+    "cases": 45,
+    "assertions": 218,
+    "errors": 0,
+    "failures": 0,
+    "skips": 0
+  },
+  "mysql_production_replay_subset": {
+    "cases": 4,
+    "assertions": 606,
+    "errors": 0,
+    "failures": 0,
+    "skips": 0
+  },
+  "copy_first_seven": {
+    "executed": 7,
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0
+  },
+  "copy_last_seven": {
+    "executed": 7,
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0
+  },
+  "copy_total": {
+    "executed": 14,
+    "passed": 14,
+    "failed": 0,
+    "skipped": 0,
+    "partitions": 2
+  }
+}

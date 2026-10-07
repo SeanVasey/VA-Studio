@@ -1,0 +1,429 @@
+Composer plugins have been disabled for safety in this non-interactive session.
+Set COMPOSER_ALLOW_SUPERUSER=1 if you want to allow plugins to run as root/super user.
+Do not run Composer as root/super user! See https://getcomposer.org/root for details
+Installing dependencies from lock file (including require-dev)
+Verifying lock file contents can be installed on current platform.
+Package operations: 158 installs, 0 updates, 0 removals
+  - Downloading voku/portable-ascii (2.1.1)
+  - Downloading symfony/polyfill-php80 (v1.43.0)
+  - Downloading symfony/polyfill-mbstring (v1.43.0)
+  - Downloading symfony/polyfill-ctype (v1.37.0)
+  - Downloading phpoption/phpoption (1.10.0)
+  - Downloading graham-campbell/result-type (v1.2.0)
+  - Downloading vlucas/phpdotenv (v5.7.0)
+  - Downloading symfony/css-selector (v8.0.9)
+  - Downloading tijsverkoyen/css-to-inline-styles (v2.4.0)
+  - Downloading symfony/var-dumper (v8.0.15)
+  - Downloading symfony/polyfill-uuid (v1.43.0)
+  - Downloading symfony/uid (v8.0.9)
+  - Downloading symfony/deprecation-contracts (v3.7.1)
+  - Downloading symfony/routing (v8.0.15)
+  - Downloading symfony/process (v8.0.13)
+  - Downloading symfony/polyfill-php86 (v1.43.0)
+  - Downloading symfony/polyfill-php85 (v1.43.0)
+  - Downloading symfony/polyfill-php84 (v1.43.0)
+  - Downloading symfony/polyfill-intl-normalizer (v1.43.0)
+  - Downloading symfony/polyfill-intl-idn (v1.43.0)
+  - Downloading symfony/mime (v8.0.15)
+  - Downloading psr/container (2.0.2)
+  - Downloading symfony/service-contracts (v3.7.3)
+  - Downloading psr/event-dispatcher (1.0.0)
+  - Downloading symfony/event-dispatcher-contracts (v3.7.1)
+  - Downloading symfony/event-dispatcher (v8.0.15)
+  - Downloading psr/log (3.0.2)
+  - Downloading doctrine/lexer (3.0.3)
+  - Downloading egulias/email-validator (4.0.4)
+  - Downloading symfony/mailer (v8.0.15)
+  - Downloading symfony/http-foundation (v8.0.15)
+  - Downloading symfony/error-handler (v8.0.15)
+  - Downloading symfony/http-kernel (v8.0.15)
+  - Downloading symfony/finder (v8.0.14)
+  - Downloading symfony/polyfill-intl-grapheme (v1.43.0)
+  - Downloading symfony/string (v8.0.15)
+  - Downloading symfony/console (v7.4.20)
+  - Downloading ramsey/collection (2.1.1)
+  - Downloading brick/math (1.0.0)
+  - Downloading ramsey/uuid (4.9.4)
+  - Downloading psr/simple-cache (3.0.0)
+  - Downloading psr/http-message (2.0)
+  - Downloading nunomaduro/termwind (v2.4.0)
+  - Downloading symfony/translation-contracts (v3.7.1)
+  - Downloading symfony/translation (v8.0.14)
+  - Downloading psr/clock (1.0.0)
+  - Downloading symfony/clock (v8.0.8)
+  - Downloading carbonphp/carbon-doctrine-types (3.2.1)
+  - Downloading nesbot/carbon (3.14.2)
+  - Downloading monolog/monolog (3.12.1)
+  - Downloading psr/http-factory (1.1.0)
+  - Downloading league/uri-interfaces (7.8.1)
+  - Downloading league/uri (7.8.1)
+  - Downloading league/mime-type-detection (1.17.0)
+  - Downloading league/flysystem-local (3.35.3)
+  - Downloading league/flysystem (3.36.0)
+  - Downloading nette/utils (v4.1.5)
+  - Downloading nette/schema (v1.3.6)
+  - Downloading dflydev/dot-access-data (v3.0.3)
+  - Downloading league/config (v1.2.0)
+  - Downloading league/commonmark (2.10.3)
+  - Downloading laravel/serializable-closure (v2.1.0)
+  - Downloading laravel/prompts (v0.3.24)
+  - Downloading guzzlehttp/uri-template (v2.0.1)
+  - Downloading symfony/polyfill-php82 (v1.43.0)
+  - Downloading guzzlehttp/psr7 (3.1.0)
+  - Downloading guzzlehttp/promises (3.0.2)
+  - Downloading psr/http-client (1.0.3)
+  - Downloading guzzlehttp/guzzle (8.2.0)
+  - Downloading fruitcake/php-cors (v1.4.0)
+  - Downloading dragonmantank/cron-expression (v3.6.0)
+  - Downloading doctrine/inflector (2.1.0)
+  - Downloading laravel/framework (v13.34.0)
+  - Downloading anourvalar/eloquent-serialize (1.3.12)
+  - Downloading blade-ui-kit/blade-icons (1.10.1)
+  - Downloading blade-ui-kit/blade-heroicons (2.7.0)
+  - Downloading chillerlan/php-settings-container (3.3.0)
+  - Downloading danharrin/date-format-converter (v0.3.1)
+  - Downloading danharrin/livewire-rate-limiting (v2.3.0)
+  - Downloading fakerphp/faker (v1.24.1)
+  - Downloading paragonie/constant_time_encoding (v3.1.3)
+  - Downloading pragmarx/google2fa (v9.1.0)
+  - Downloading pragmarx/google2fa-qrcode (v4.0.0)
+  - Downloading symfony/html-sanitizer (v8.0.14)
+  - Downloading spatie/laravel-package-tools (1.93.2)
+  - Downloading spatie/invade (2.1.1)
+  - Downloading ryangjchandler/blade-capture-directive (v1.1.1)
+  - Downloading nette/php-generator (v4.2.2)
+  - Downloading livewire/livewire (v4.4.6)
+  - Downloading league/uri-components (7.8.1)
+  - Downloading kirschbaum-development/eloquent-power-joins (4.3.3)
+  - Downloading filament/support (v5.8.4)
+  - Downloading openspout/openspout (v4.32.0)
+  - Downloading league/csv (9.28.0)
+  - Downloading filament/actions (v5.8.4)
+  - Downloading filament/notifications (v5.8.4)
+  - Downloading filament/schemas (v5.8.4)
+  - Downloading filament/infolists (v5.8.4)
+  - Downloading spatie/shiki-php (2.4.0)
+  - Downloading scrivo/highlight.php (v9.18.1.10)
+  - Downloading ueberdosis/tiptap-php (2.2.0)
+  - Downloading filament/forms (v5.8.4)
+  - Downloading filament/widgets (v5.8.4)
+  - Downloading filament/query-builder (v5.8.4)
+  - Downloading filament/tables (v5.8.4)
+  - Downloading chillerlan/php-qrcode (5.0.5)
+  - Downloading filament/filament (v5.8.4)
+  - Downloading inertiajs/inertia-laravel (v3.3.4)
+  - Downloading laravel/pail (v1.2.7)
+  - Downloading laravel/agent-detector (v2.0.2)
+  - Downloading laravel/pao (v1.1.5)
+  - Downloading laravel/pint (v1.32.1)
+  - Downloading nikic/php-parser (v5.8.0)
+  - Downloading psy/psysh (v0.12.24)
+  - Downloading laravel/tinker (v3.0.2)
+  - Downloading hamcrest/hamcrest-php (v3.0.0)
+  - Downloading mockery/mockery (1.6.15)
+  - Downloading filp/whoops (2.18.4)
+  - Downloading nunomaduro/collision (v8.9.5)
+  - Downloading staabm/side-effects-detector (1.0.5)
+  - Downloading sebastian/version (6.0.0)
+  - Downloading sebastian/type (6.0.4)
+  - Downloading sebastian/recursion-context (7.0.1)
+  - Downloading sebastian/object-reflector (5.0.0)
+  - Downloading sebastian/object-enumerator (7.0.0)
+  - Downloading sebastian/global-state (8.0.3)
+  - Downloading sebastian/exporter (7.0.3)
+  - Downloading sebastian/environment (8.1.2)
+  - Downloading sebastian/diff (7.0.1)
+  - Downloading sebastian/comparator (7.1.8)
+  - Downloading sebastian/cli-parser (4.2.1)
+  - Downloading phpunit/php-timer (8.0.0)
+  - Downloading phpunit/php-text-template (5.0.0)
+  - Downloading phpunit/php-invoker (6.0.0)
+  - Downloading phpunit/php-file-iterator (6.0.2)
+  - Downloading theseer/tokenizer (2.0.1)
+  - Downloading sebastian/lines-of-code (4.0.1)
+  - Downloading sebastian/complexity (5.0.0)
+  - Downloading phpunit/php-code-coverage (12.5.7)
+  - Downloading phar-io/version (3.2.1)
+  - Downloading phar-io/manifest (2.0.4)
+  - Downloading myclabs/deep-copy (1.14.0)
+  - Downloading phpunit/phpunit (12.5.34)
+  - Downloading stripe/stripe-php (v21.3.2)
+  - Downloading tecnickcom/tc-lib-unicode-data (3.0.9)
+  - Downloading tecnickcom/tc-lib-unicode (3.0.9)
+  - Downloading tecnickcom/tc-lib-pdf-sign (2.0.5)
+  - Downloading tecnickcom/tc-lib-pdf-filter (2.11.4)
+  - Downloading tecnickcom/tc-lib-pdf-parser (3.16.2)
+  - Downloading tecnickcom/tc-lib-pdf-encrypt (2.11.4)
+  - Downloading tecnickcom/tc-lib-color (3.0.7)
+  - Downloading tecnickcom/tc-lib-pdf-page (4.16.5)
+  - Downloading tecnickcom/tc-lib-file (3.9.4)
+  - Downloading tecnickcom/tc-lib-pdf-image (3.14.4)
+  - Downloading tecnickcom/tc-lib-pdf-graph (2.18.2)
+  - Downloading tecnickcom/tc-lib-pdf-font (4.4.0)
+  - Downloading tecnickcom/tc-lib-barcode (2.16.4)
+  - Downloading tecnickcom/tc-lib-pdf (8.76.2)
+   0/158 [>---------------------------]   0%
+   5/158 [>---------------------------]   3%
+  22/158 [===>------------------------]  13%
+  36/158 [======>---------------------]  22%
+  51/158 [=========>------------------]  32%
+  64/158 [===========>----------------]  40%
+  81/158 [==============>-------------]  51%
+  95/158 [================>-----------]  60%
+ 122/158 [=====================>------]  77%
+ 130/158 [=======================>----]  82%
+ 143/158 [=========================>--]  90%
+ 158/158 [============================] 100%
+  - Installing voku/portable-ascii (2.1.1): Extracting archive
+  - Installing symfony/polyfill-php80 (v1.43.0): Extracting archive
+  - Installing symfony/polyfill-mbstring (v1.43.0): Extracting archive
+  - Installing symfony/polyfill-ctype (v1.37.0): Extracting archive
+  - Installing phpoption/phpoption (1.10.0): Extracting archive
+  - Installing graham-campbell/result-type (v1.2.0): Extracting archive
+  - Installing vlucas/phpdotenv (v5.7.0): Extracting archive
+  - Installing symfony/css-selector (v8.0.9): Extracting archive
+  - Installing tijsverkoyen/css-to-inline-styles (v2.4.0): Extracting archive
+  - Installing symfony/var-dumper (v8.0.15): Extracting archive
+  - Installing symfony/polyfill-uuid (v1.43.0): Extracting archive
+  - Installing symfony/uid (v8.0.9): Extracting archive
+  - Installing symfony/deprecation-contracts (v3.7.1): Extracting archive
+  - Installing symfony/routing (v8.0.15): Extracting archive
+  - Installing symfony/process (v8.0.13): Extracting archive
+  - Installing symfony/polyfill-php86 (v1.43.0): Extracting archive
+  - Installing symfony/polyfill-php85 (v1.43.0): Extracting archive
+  - Installing symfony/polyfill-php84 (v1.43.0): Extracting archive
+  - Installing symfony/polyfill-intl-normalizer (v1.43.0): Extracting archive
+  - Installing symfony/polyfill-intl-idn (v1.43.0): Extracting archive
+  - Installing symfony/mime (v8.0.15): Extracting archive
+  - Installing psr/container (2.0.2): Extracting archive
+  - Installing symfony/service-contracts (v3.7.3): Extracting archive
+  - Installing psr/event-dispatcher (1.0.0): Extracting archive
+  - Installing symfony/event-dispatcher-contracts (v3.7.1): Extracting archive
+  - Installing symfony/event-dispatcher (v8.0.15): Extracting archive
+  - Installing psr/log (3.0.2): Extracting archive
+  - Installing doctrine/lexer (3.0.3): Extracting archive
+  - Installing egulias/email-validator (4.0.4): Extracting archive
+  - Installing symfony/mailer (v8.0.15): Extracting archive
+  - Installing symfony/http-foundation (v8.0.15): Extracting archive
+  - Installing symfony/error-handler (v8.0.15): Extracting archive
+  - Installing symfony/http-kernel (v8.0.15): Extracting archive
+  - Installing symfony/finder (v8.0.14): Extracting archive
+  - Installing symfony/polyfill-intl-grapheme (v1.43.0): Extracting archive
+  - Installing symfony/string (v8.0.15): Extracting archive
+  - Installing symfony/console (v7.4.20): Extracting archive
+  - Installing ramsey/collection (2.1.1): Extracting archive
+  - Installing brick/math (1.0.0): Extracting archive
+  - Installing ramsey/uuid (4.9.4): Extracting archive
+  - Installing psr/simple-cache (3.0.0): Extracting archive
+  - Installing psr/http-message (2.0): Extracting archive
+  - Installing nunomaduro/termwind (v2.4.0): Extracting archive
+  - Installing symfony/translation-contracts (v3.7.1): Extracting archive
+  - Installing symfony/translation (v8.0.14): Extracting archive
+  - Installing psr/clock (1.0.0): Extracting archive
+  - Installing symfony/clock (v8.0.8): Extracting archive
+  - Installing carbonphp/carbon-doctrine-types (3.2.1): Extracting archive
+  - Installing nesbot/carbon (3.14.2): Extracting archive
+  - Installing monolog/monolog (3.12.1): Extracting archive
+  - Installing psr/http-factory (1.1.0): Extracting archive
+  - Installing league/uri-interfaces (7.8.1): Extracting archive
+  - Installing league/uri (7.8.1): Extracting archive
+  - Installing league/mime-type-detection (1.17.0): Extracting archive
+  - Installing league/flysystem-local (3.35.3): Extracting archive
+  - Installing league/flysystem (3.36.0): Extracting archive
+  - Installing nette/utils (v4.1.5): Extracting archive
+  - Installing nette/schema (v1.3.6): Extracting archive
+  - Installing dflydev/dot-access-data (v3.0.3): Extracting archive
+  - Installing league/config (v1.2.0): Extracting archive
+  - Installing league/commonmark (2.10.3): Extracting archive
+  - Installing laravel/serializable-closure (v2.1.0): Extracting archive
+  - Installing laravel/prompts (v0.3.24): Extracting archive
+  - Installing guzzlehttp/uri-template (v2.0.1): Extracting archive
+  - Installing symfony/polyfill-php82 (v1.43.0): Extracting archive
+  - Installing guzzlehttp/psr7 (3.1.0): Extracting archive
+  - Installing guzzlehttp/promises (3.0.2): Extracting archive
+  - Installing psr/http-client (1.0.3): Extracting archive
+  - Installing guzzlehttp/guzzle (8.2.0): Extracting archive
+  - Installing fruitcake/php-cors (v1.4.0): Extracting archive
+  - Installing dragonmantank/cron-expression (v3.6.0): Extracting archive
+  - Installing doctrine/inflector (2.1.0): Extracting archive
+  - Installing laravel/framework (v13.34.0): Extracting archive
+  - Installing anourvalar/eloquent-serialize (1.3.12): Extracting archive
+  - Installing blade-ui-kit/blade-icons (1.10.1): Extracting archive
+  - Installing blade-ui-kit/blade-heroicons (2.7.0): Extracting archive
+  - Installing chillerlan/php-settings-container (3.3.0): Extracting archive
+  - Installing danharrin/date-format-converter (v0.3.1): Extracting archive
+  - Installing danharrin/livewire-rate-limiting (v2.3.0): Extracting archive
+  - Installing fakerphp/faker (v1.24.1): Extracting archive
+  - Installing paragonie/constant_time_encoding (v3.1.3): Extracting archive
+  - Installing pragmarx/google2fa (v9.1.0): Extracting archive
+  - Installing pragmarx/google2fa-qrcode (v4.0.0): Extracting archive
+  - Installing symfony/html-sanitizer (v8.0.14): Extracting archive
+  - Installing spatie/laravel-package-tools (1.93.2): Extracting archive
+  - Installing spatie/invade (2.1.1): Extracting archive
+  - Installing ryangjchandler/blade-capture-directive (v1.1.1): Extracting archive
+  - Installing nette/php-generator (v4.2.2): Extracting archive
+  - Installing livewire/livewire (v4.4.6): Extracting archive
+  - Installing league/uri-components (7.8.1): Extracting archive
+  - Installing kirschbaum-development/eloquent-power-joins (4.3.3): Extracting archive
+  - Installing filament/support (v5.8.4): Extracting archive
+  - Installing openspout/openspout (v4.32.0): Extracting archive
+  - Installing league/csv (9.28.0): Extracting archive
+  - Installing filament/actions (v5.8.4): Extracting archive
+  - Installing filament/notifications (v5.8.4): Extracting archive
+  - Installing filament/schemas (v5.8.4): Extracting archive
+  - Installing filament/infolists (v5.8.4): Extracting archive
+  - Installing spatie/shiki-php (2.4.0): Extracting archive
+  - Installing scrivo/highlight.php (v9.18.1.10): Extracting archive
+  - Installing ueberdosis/tiptap-php (2.2.0): Extracting archive
+  - Installing filament/forms (v5.8.4): Extracting archive
+  - Installing filament/widgets (v5.8.4): Extracting archive
+  - Installing filament/query-builder (v5.8.4): Extracting archive
+  - Installing filament/tables (v5.8.4): Extracting archive
+  - Installing chillerlan/php-qrcode (5.0.5): Extracting archive
+  - Installing filament/filament (v5.8.4): Extracting archive
+  - Installing inertiajs/inertia-laravel (v3.3.4): Extracting archive
+  - Installing laravel/pail (v1.2.7): Extracting archive
+  - Installing laravel/agent-detector (v2.0.2): Extracting archive
+  - Installing laravel/pao (v1.1.5): Extracting archive
+  - Installing laravel/pint (v1.32.1): Extracting archive
+  - Installing nikic/php-parser (v5.8.0): Extracting archive
+  - Installing psy/psysh (v0.12.24): Extracting archive
+  - Installing laravel/tinker (v3.0.2): Extracting archive
+  - Installing hamcrest/hamcrest-php (v3.0.0): Extracting archive
+  - Installing mockery/mockery (1.6.15): Extracting archive
+  - Installing filp/whoops (2.18.4): Extracting archive
+  - Installing nunomaduro/collision (v8.9.5): Extracting archive
+  - Installing staabm/side-effects-detector (1.0.5): Extracting archive
+  - Installing sebastian/version (6.0.0): Extracting archive
+  - Installing sebastian/type (6.0.4): Extracting archive
+  - Installing sebastian/recursion-context (7.0.1): Extracting archive
+  - Installing sebastian/object-reflector (5.0.0): Extracting archive
+  - Installing sebastian/object-enumerator (7.0.0): Extracting archive
+  - Installing sebastian/global-state (8.0.3): Extracting archive
+  - Installing sebastian/exporter (7.0.3): Extracting archive
+  - Installing sebastian/environment (8.1.2): Extracting archive
+  - Installing sebastian/diff (7.0.1): Extracting archive
+  - Installing sebastian/comparator (7.1.8): Extracting archive
+  - Installing sebastian/cli-parser (4.2.1): Extracting archive
+  - Installing phpunit/php-timer (8.0.0): Extracting archive
+  - Installing phpunit/php-text-template (5.0.0): Extracting archive
+  - Installing phpunit/php-invoker (6.0.0): Extracting archive
+  - Installing phpunit/php-file-iterator (6.0.2): Extracting archive
+  - Installing theseer/tokenizer (2.0.1): Extracting archive
+  - Installing sebastian/lines-of-code (4.0.1): Extracting archive
+  - Installing sebastian/complexity (5.0.0): Extracting archive
+  - Installing phpunit/php-code-coverage (12.5.7): Extracting archive
+  - Installing phar-io/version (3.2.1): Extracting archive
+  - Installing phar-io/manifest (2.0.4): Extracting archive
+  - Installing myclabs/deep-copy (1.14.0): Extracting archive
+  - Installing phpunit/phpunit (12.5.34): Extracting archive
+  - Installing stripe/stripe-php (v21.3.2): Extracting archive
+  - Installing tecnickcom/tc-lib-unicode-data (3.0.9): Extracting archive
+  - Installing tecnickcom/tc-lib-unicode (3.0.9): Extracting archive
+  - Installing tecnickcom/tc-lib-pdf-sign (2.0.5): Extracting archive
+  - Installing tecnickcom/tc-lib-pdf-filter (2.11.4): Extracting archive
+  - Installing tecnickcom/tc-lib-pdf-parser (3.16.2): Extracting archive
+  - Installing tecnickcom/tc-lib-pdf-encrypt (2.11.4): Extracting archive
+  - Installing tecnickcom/tc-lib-color (3.0.7): Extracting archive
+  - Installing tecnickcom/tc-lib-pdf-page (4.16.5): Extracting archive
+  - Installing tecnickcom/tc-lib-file (3.9.4): Extracting archive
+  - Installing tecnickcom/tc-lib-pdf-image (3.14.4): Extracting archive
+  - Installing tecnickcom/tc-lib-pdf-graph (2.18.2): Extracting archive
+  - Installing tecnickcom/tc-lib-pdf-font (4.4.0): Extracting archive
+  - Installing tecnickcom/tc-lib-barcode (2.16.4): Extracting archive
+  - Installing tecnickcom/tc-lib-pdf (8.76.2): Extracting archive
+   0/158 [>---------------------------]   0%
+  41/158 [=======>--------------------]  25%
+  54/158 [=========>------------------]  34%
+  73/158 [============>---------------]  46%
+  87/158 [===============>------------]  55%
+ 101/158 [=================>----------]  63%
+ 115/158 [====================>-------]  72%
+ 134/158 [=======================>----]  84%
+ 147/158 [==========================>-]  93%
+ 158/158 [============================] 100%
+Generating optimized autoload files
+Class OrderInquiryBrowserFixture located in ./tests/browser/order-inquiry-fixture.php does not comply with psr-4 autoloading standard (rule: Tests\ => ./tests). Skipping.
+Class UnpaidReleaseBrowserFixture located in ./tests/browser/unpaid-release-fixture.php does not comply with psr-4 autoloading standard (rule: Tests\ => ./tests). Skipping.
+Class RefundResolutionBrowserFixture located in ./tests/browser/refund-resolution-fixture.php does not comply with psr-4 autoloading standard (rule: Tests\ => ./tests). Skipping.
+Class RelatedTrackBrowserFixture located in ./tests/browser/prepare-related-tracks.php does not comply with psr-4 autoloading standard (rule: Tests\ => ./tests). Skipping.
+> Illuminate\Foundation\ComposerScripts::postAutoloadDump
+> @php artisan package:discover --ansi
+
+ INFO Discovering packages.
+
+ anourvalar/eloquent-serialize .. DONE
+ blade-ui-kit/blade-heroicons .. DONE
+ blade-ui-kit/blade-icons .. DONE
+ filament/actions .. DONE
+ filament/filament .. DONE
+ filament/forms .. DONE
+ filament/infolists .. DONE
+ filament/notifications .. DONE
+ filament/query-builder .. DONE
+ filament/schemas .. DONE
+ filament/support .. DONE
+ filament/tables .. DONE
+ filament/widgets .. DONE
+ inertiajs/inertia-laravel .. DONE
+ kirschbaum-development/eloquent-power-joins .. DONE
+ laravel/pail .. DONE
+ laravel/pao .. DONE
+ laravel/tinker .. DONE
+ livewire/livewire .. DONE
+ nesbot/carbon .. DONE
+ nunomaduro/collision .. DONE
+ nunomaduro/termwind .. DONE
+ ryangjchandler/blade-capture-directive .. DONE
+
+> @php artisan filament:upgrade
+ ⇂ public/js/filament/forms/components/checkbox-list.js
+ ⇂ public/js/filament/forms/components/code-editor.js
+ ⇂ public/js/filament/forms/components/color-picker.js
+ ⇂ public/js/filament/forms/components/date-time-picker.js
+ ⇂ public/js/filament/forms/components/file-upload.js
+ ⇂ public/js/filament/forms/components/key-value.js
+ ⇂ public/js/filament/forms/components/markdown-editor.js
+ ⇂ public/js/filament/forms/components/rich-editor.js
+ ⇂ public/js/filament/forms/components/select.js
+ ⇂ public/js/filament/forms/components/slider.js
+ ⇂ public/js/filament/forms/components/tags-input.js
+ ⇂ public/js/filament/forms/components/textarea.js
+ ⇂ public/js/filament/schemas/components/actions.js
+ ⇂ public/js/filament/schemas/components/tabs.js
+ ⇂ public/js/filament/schemas/components/wizard.js
+ ⇂ public/js/filament/tables/components/columns/checkbox.js
+ ⇂ public/js/filament/tables/components/columns/select.js
+ ⇂ public/js/filament/tables/components/columns/text-input.js
+ ⇂ public/js/filament/tables/components/columns/toggle.js
+ ⇂ public/js/filament/widgets/components/chart.js
+ ⇂ public/js/filament/widgets/components/stats-overview/stat/chart.js
+ ⇂ public/fonts/filament/filament/inter/index.css
+ ⇂ public/fonts/filament/filament/inter/inter-cyrillic-ext-wght-normal-SP7Z6XGK.woff2
+ ⇂ public/fonts/filament/filament/inter/inter-cyrillic-wght-normal-DR6K5BQD.woff2
+ ⇂ public/fonts/filament/filament/inter/inter-greek-ext-wght-normal-A2J6H3EX.woff2
+ ⇂ public/fonts/filament/filament/inter/inter-greek-wght-normal-ZABHMKQG.woff2
+ ⇂ public/fonts/filament/filament/inter/inter-latin-ext-wght-normal-ZIT2UBIY.woff2
+ ⇂ public/fonts/filament/filament/inter/inter-latin-wght-normal-DIHYUR35.woff2
+ ⇂ public/fonts/filament/filament/inter/inter-vietnamese-wght-normal-VWEHJHBA.woff2
+ ⇂ public/js/filament/actions/actions.js
+ ⇂ public/js/filament/filament/app.js
+ ⇂ public/js/filament/filament/echo.js
+ ⇂ public/js/filament/notifications/notifications.js
+ ⇂ public/js/filament/schemas/schemas.js
+ ⇂ public/js/filament/support/support.js
+ ⇂ public/js/filament/tables/tables.js
+ ⇂ public/css/filament/filament/app.css
+
+ INFO Successfully published assets!
+
+ INFO Configuration cache cleared successfully.
+
+ INFO Route cache cleared successfully.
+
+ INFO Compiled views cleared successfully.
+
+ INFO Successfully upgraded!
+
+110 packages you are using are looking for funding.
+Use the `composer fund` command to find out more!

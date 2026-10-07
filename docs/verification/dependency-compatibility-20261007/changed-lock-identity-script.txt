@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import {mkdtempSync,mkdirSync,cpSync,readFileSync,writeFileSync,rmSync} from 'node:fs';
+import {join} from 'node:path';
+import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
+import {createWorkspace,readWorkspace,schemaHash,root} from '/workspace/scratch/2876616e88c3/VA-Studio-dependency-compat/scripts/dev/persistent-content.mjs';
+const parent=mkdtempSync('/tmp/dependency-lock-identity-');
+const digest=p=>createHash('sha256').update(readFileSync(p)).digest('hex');
+try{
+ const checkout=join(parent,'checkout');mkdirSync(checkout,{mode:0o700});
+ for(const p of ['database/migrations','public/build','vendor/autoload.php']){mkdirSync(join(checkout,p,'..'),{recursive:true,mode:0o700});cpSync(join(root,p),join(checkout,p),{recursive:true});}
+ const beforeLock=execFileSync('git',['show','HEAD^:composer.lock'],{cwd:root});writeFileSync(join(checkout,'composer.lock'),beforeLock);
+ const workspace=createWorkspace(join(parent,'content'),checkout);
+ const before={identity:digest(join(workspace.directory,'identity.json')),database:digest(join(workspace.directory,'database.sqlite'))};
+ readWorkspace(workspace.directory,checkout,{allowInitializing:true});
+ const beforeSchema=schemaHash(checkout);
+ writeFileSync(join(checkout,'composer.lock'),readFileSync(join(root,'composer.lock')));
+ assert.notEqual(schemaHash(checkout),beforeSchema);
+ assert.throws(()=>readWorkspace(workspace.directory,checkout,{allowInitializing:true}),/safety checks/);
+ assert.deepEqual({identity:digest(join(workspace.directory,'identity.json')),database:digest(join(workspace.directory,'database.sqlite'))},before);
+ console.log('PASS: actual prior/candidate Composer lockbytes change schema identity and refuse existing protected initializing workspace without identity/database mutation. No actual oldruntime or completed readyinstallation claimed.');
+}finally{rmSync(parent,{recursive:true,force:true});}

@@ -1,0 +1,15 @@
+✔ a reviewed additive copy upgrade preserves original bytes, every old cell, key, session and business sequence (3543.109507ms)
+✔ a genuine crash-retained WAL and SHM are captured without opening or checkpointing the original database (2504.66055ms)
+✔ real authenticated HTTP sessions survive copy upgrade and restart while private paths and checkout remain blocked (7124.900464ms)
+✔ unchanged row counts do not hide a rewritten old value or timestamp; only the unavailable copy is affected (3132.175249ms)
+✔ old SQLite business sequence changes refuse even when all table rows remain identical (2463.953142ms)
+✔ removing an old CHECK refuses even when every column, row and business sequence remains identical (3006.305355ms)
+✔ BLOB to TEXT storage-class rewriting refuses despite identical retained binary bytes and row counts (2581.295784ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 31752.493885

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Unit\TcpdfContractRendererTest" file="/workspace/scratch/2876616e88c3/VA-Studio-dependency-independent/tests/Unit/TcpdfContractRendererTest.php" tests="4" assertions="18" errors="0" failures="0" skipped="0" time="0.444665">
+    <testcase name="test_real_profile_reproduces_unicode_multpage_contract_and_all_integrity_metadata" file="/workspace/scratch/2876616e88c3/VA-Studio-dependency-independent/tests/Unit/TcpdfContractRendererTest.php" line="14" class="Tests\Unit\TcpdfContractRendererTest" classname="Tests.Unit.TcpdfContractRendererTest" assertions="14" time="0.433328"/>
+    <testcase name="test_profile_limits_and_provenance_cannot_be_relaxed_by_a_stored_request" file="/workspace/scratch/2876616e88c3/VA-Studio-dependency-independent/tests/Unit/TcpdfContractRendererTest.php" line="44" class="Tests\Unit\TcpdfContractRendererTest" classname="Tests.Unit.TcpdfContractRendererTest" assertions="1" time="0.002973"/>
+    <testcase name="test_missing_runtime_assets_do_not_destroy_historical_profile_metadata_validation" file="/workspace/scratch/2876616e88c3/VA-Studio-dependency-independent/tests/Unit/TcpdfContractRendererTest.php" line="52" class="Tests\Unit\TcpdfContractRendererTest" classname="Tests.Unit.TcpdfContractRendererTest" assertions="2" time="0.003228"/>
+    <testcase name="test_a_common_script_codepoint_absent_from_the_actual_font_fails_closed" file="/workspace/scratch/2876616e88c3/VA-Studio-dependency-independent/tests/Unit/TcpdfContractRendererTest.php" line="60" class="Tests\Unit\TcpdfContractRendererTest" classname="Tests.Unit.TcpdfContractRendererTest" assertions="1" time="0.005136"/>
+  </testsuite>
+</testsuites>
