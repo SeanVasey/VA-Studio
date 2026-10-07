@@ -357,3 +357,32 @@ bdb6fd945cea8265d5534f544ef56214e2bb1796a763efe67112787ec5fde471  scripts/dev/mk
 6bbd5bae16d62eee805b444f28d7cd735b38844afbf3eea07cafb4a2f3566a20  CLAUDE.md
 ed529e8f69b2ae6733d767aeae6bebd693faa114c55cd1c5c3a3a5824ddcd372  app/Domain/Commerce/ProductionCheckout/OriginalCommitDispatcher.php
 ```
+
+---
+
+## Addendum 2: `a97937ad1e2f899240a8828cd71abad06256eee6` (2026-10-07)
+
+**Decision: APPROVE carries over to `a97937ad`.** It is unconditional and has the same §1 scope as before. Evidence is in `review-evidence/a97937ad/`.
+
+- **Diff.** `git diff e86381bf a97937ad -- . ':!docs'` touches exactly three files:
+
+  | File | SHA256 prefix |
+  | --- | --- |
+  | `config/production_checkout.php` | `460c9c6a…` |
+  | `tests/Unit/ProductionCheckoutConfigTest.php` | `e798e5bf…` |
+  | `tests/frontend/customer-listening-library.test.tsx` | `39edab2a…` |
+
+  The frontend change is test-only: an assertion now waits with `waitFor`, which is imported. I did not run the frontend test here.
+- **Tests.** On SQLite, `tests/Unit/ProductionCheckoutConfigTest.php` and `tests/Unit/ProductionCheckoutProviderTest.php` gave 28 tests, 95 assertions, 0 failures, errors or skips (`a97937ad/sqlite-config-provider.xml`).
+- **Plain scalars.** The config value is still a plain scalar: an `int`, an unchanged string, or `null`. So `CheckoutCommandFrame::requirePlain`, `FreshCheckoutPolicy` and the `CommittedReadContext` configuration hash all still admit it.
+- **No coercion into an admitted value.** Only an exact `0` or a digit string with no leading zero is converted. Values like `+600`, `0600`, `600.5` and `" 600"` stay strings, and `ExecutionContextV1::make` refuses them as `unsupported`.
+- **Range check still applies.** The `is_int` check and the 30–3600 bound in `make()` are unchanged. An overflowing digit string becomes `PHP_INT_MAX` (checked: `var_dump((int)"99999999999999999999")` printed 9223372036854775807), which is refused, and `0` is refused.
+- **Codex r4208109348** (`ApproveExemptionAuthority` lacks commit-time staff admission). **I agree with deferring it.**
+  - It is a real path: `StaffProof` is locked at the start of the command but not re-proved when the approval commits.
+  - At `a97937ad`, a grep of `app` and `routes` finds no HTTP or Filament caller of `ApproveExemptionAuthority`; it is reached only from test fixtures.
+  - The deferral holds only on four conditions:
+    1. It is recorded as an open release blocker.
+    2. No route, panel action or command exposes it until the follow-up lands.
+    3. The follow-up starts with a genuine red canary (a staff role or MFA withdrawn in a committing listener).
+    4. The follow-up gets its own independent review.
+- **Not covered** (as before): Paid252 and other consumers, grants, tax, live payments, release, and Foundation CI.
