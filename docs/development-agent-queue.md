@@ -2,18 +2,18 @@
 
 ## Active cloud ownership — October 7, 2026 UTC
 
-One integration owner `/root`; verified main `cd83b0cf4bddaeac9b113fabe7a918e37bfd2901` includes PRs25–35.
+One integration owner `/root`; verified main `ef444949bd694b841112695c90b7d27c2f698ead` includes PRs25–36.
 Historical owner tables below describe earlier source, not active workers.
 
 | Worker | Isolated boundary | Current handoff |
 | --- | --- | --- |
-| `/root` | Primary/shared registration/evidence/publication | PR35 merged; actual new sitemap throttle repair; approved support fixtures662, suppression4f9 and SMTPf5 publication; final test census |
-| `/root/pr25_recovery` | ProductionCheckout246/provider/tax | b6 whole review is held by actual terminal media-policy withdrawal; narrow6e repair under checks. Producer90 is held by actual nested-parent postcommit write; owned repair then automatic-tax255 |
-| `/root/completion_audit` | Typed identity producer; operative free256 | Production-free233 independently approveda82; historical witness e8 corrects actual nested-parent callback, independent native3/19 passes pending map/freeze; next operativefree256 |
+| `/root` | Primary/shared registration/evidence/publication | PR36 bounded full sitemap crawl merged; Support sharedde314/runtime15c/lifecycle662 publication; SMTPf5/suppression983; final test census |
+| `/root/pr25_recovery` | ProductionCheckout246/provider/tax | 6e media repair passesSQLite/native5/39+original1/5; actual physicalcommit flagwithdraw stillwrites1order/line/attempt, wholeHELD. ProducerContext2ec parent repair under native review; NEWcommandwriteobserver, then automatictax255 |
+| `/root/completion_audit` | Typed identity producer; operative free256 | Production-free233 independently approveda82; historical witness e8 independently approvedb24; NEW free233 parent callback1FAIL3 repairff0 under checks, then operativefree256 |
 | `/root/native_mysql` | Paid252 consumers | def native4/118 is component proof; actual precommit policy/password changes left durable origins2FAIL14. NEW same-observer consumer capsule closes original SQLite probes; source/HTTP/native review pending |
-| `/root/pr26_review` | Independent historical and public boundary review | SMTPf5 independently approved5b; Discovery P2 approvaleb2; e8 historical review/native3/19 green pending author map, then narrow sitemap throttle follow-up |
+| `/root/pr26_review` | Independent historical and public boundary review | SMTPf5 independently approved5b; Discovery P2 approvaleb2; e8 historical approvedb24 and throttleapproved2dead merged36; current NEW257 prep review, author parent correction pending |
 | `/root/crawler_routes` | Production feature253 and suppression254 | 253 native boundary/config parent and server-only withdrawal reader repairs before freeze; NEW254 immutable suppression follows distinct production withdrawal lineage |
-| `/root/recovery_inventory` | Membership257/member258; free/support independent review | Free233 approveda82; support lifecycle approved662. Membership preparationb635 native9/30 green, docs919; NEW258 preparation followed by operative257 invoice/award/reservation and member fulfilment |
+| `/root/recovery_inventory` | Membership257/member258; free/support independent review | Free233 approval historicalHELD by newparentred; supportlifecycle662/sharedde314 approved. Membership preparationb635 native9/30 is historical, raw-parent/review corrections pending; NEW258 then operative257/258 fulfilment |
 
 
 Each worker has an isolated branch, independent autoload over unchanged locked

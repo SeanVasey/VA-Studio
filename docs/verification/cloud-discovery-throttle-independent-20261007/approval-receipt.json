@@ -1,0 +1,40 @@
+{
+  "decision": "APPROVED for focused development throttle follow-up",
+  "reviewed_composition": "0aa1d744a7c9c24182339fe975e4cb9d3bee9498",
+  "reviewed_tree": "54589c4e2b8fd4b21f3ca764d4c302823af9f034",
+  "runtime_commit": "29dff1a7d8ef0337e7f6e59c880ddb2fb6ad4abc",
+  "root_execution_composition": "77f834c3da10cb67420ba24bd6fe30079f6446cd",
+  "source_carry": "Exactly the same two source blobs from root execution composition through runtime29d and reviewed0aa; later primary checkpoint is documentation-only for executable paths.",
+  "junit_counts": {
+    "independent": {
+      "tests": "1",
+      "assertions": "193",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    "root-original": {
+      "tests": "1",
+      "assertions": "124",
+      "failures": "1",
+      "errors": "0",
+      "skipped": "0"
+    },
+    "root-corrected": {
+      "tests": "34",
+      "assertions": "384",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  },
+  "root_artifact_hashes_verified": 5,
+  "source_hashes_verified": 2,
+  "limiter_semantics": "Inline Laravel limiter key = explicit prefix + request signature; new public-discovery-tracks makes128/min track requests independent of existing public-discovery60/min editorial bucket. Check-before-hit preserves exact 128th allowed and129th denied.",
+  "observed_workflow": "Actual128-child family, generated index/editorial after58 editorial requests;129th track429 and61st editorial429. No time travel/retry/middleware suppression or response mocking.",
+  "native_execution": "Not repeated: only route limiter/test changes; all domain/schema/worker/P2 runtime unchanged, prior native evidence applies only to those bytes.",
+  "limits": [
+    "Focused actual Laravel array-cache HTTP counter evidence; production cache deployment, browser, native8.4 and complete Foundation remain separately gated.",
+    "No activation, real positive production track URL or provider call claim."
+  ]
+}
