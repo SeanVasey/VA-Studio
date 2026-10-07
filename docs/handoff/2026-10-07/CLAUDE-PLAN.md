@@ -78,7 +78,7 @@ sensitive, flags still default-off unless Sean activates.
 ### Phase C — Memberships and member originals (T30/T31, WP11)
 | Step | Deliverable | Status |
 | --- | --- | --- |
-| C1 | 257 (incl. 3cd Rows guard) + 258 preparation reviewed and composed; implementation plan file | reviewed; PR #42 draft; findings F1/F2 → C1b |
+| C1 | 257 (incl. 3cd Rows guard) + 258 preparation reviewed and composed; implementation plan file | **merged** PR #42 → `3716324a`; findings F1/F2 → C1b |
 | C1b | F1 (SQLite app-function bypass of Rows guard) and F2 (activation without credit events) | lane `harness/membership-operative-1` running |
 | C2 | Operative 257 writer: reserve/lock/proveCurrent, one period per invoice, award/reserve/consume/release/expire, duplicate-invoice + last-credit independent-process MySQL races | after C1 |
 | C3 | Billing259: Stripe subscription/invoice/payment/charge/balance-transaction evidence adapter, default-off, pinned SDK 21.3.2 / API 2026-08-26.dahlia | after C2 |
@@ -122,3 +122,5 @@ geometry (not to be recreated). Each is listed again in the activation packets
 | 2026-10-07 | A1 compose c6+2ec+guard | `d20d4394`, PR #41 draft | `docs/verification/checkout-composition-20261007/` — SQLite 170/162/8 native-only skips (pre-guard), red regression retained, canaries 5/5, affected 38/37/1 skip, native 8.4.11: exclusion 2/2, rows native 1/1, reviewer receipt pair 2/2, c6 physical canary 1/1 (0 fail/err/skip) | independent review pending; preflight run on d20d4394 was cancelled by the concurrency group (superseded push), live run on aa514349 pending |
 | 2026-10-07 | A1 fix: refused-frame transaction record (reviewer Medium) | `e86381bf`, PR #41 | regression red on 4a8cec40 retained; affected SQLite 37/37; canaries 1/1; native 8.4 regression 1/1; preflight run 42 success on 9d70b4ac | independent APPROVE for e86381bf (addendum in `independent-review/DECISION.md`); carried forward: consumers wrapping a receipt in their own transaction must clear the manager record after abort with a probe-B regression on both drivers |
 | 2026-10-07 | A1 merged | PR #41 merged at `37653bf1` (head `ece5a9ee`, code head `a97937ad`) | preflight run 47 success; Codex security review no findings; Codex code review P1 r4208264406 + P2 r4208264416 + P2 r4208109348 answered and deferred with reviewer agreement | independent APPROVE (addenda 1–3); open RELEASE BLOCKERS: frame admission for intent/basis/authority writes on `harness/checkout-write-admission-all`; conditions: no route/provider registration, no provider_io_enabled until closed |
+| 2026-10-07 | C1 merged | PR #42 merged at `3716324a` (head `de6ae38a`) | preflight run 48 success; Codex code+security no findings | independent decision: composition APPROVED, Rows 3cd narrow APPROVE (F1 open), 258 join APPROVED (F2 open before activation) |
+| 2026-10-07 | docs ledger | PR #43 merged at `03c58d87` | preflight run 50 success | docs-only |
