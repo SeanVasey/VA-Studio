@@ -2,6 +2,7 @@
 
 namespace App\Domain\Customers\ProductionIdentity;
 
+use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Support\CanonicalJson;
 use Illuminate\Support\Facades\Crypt;
@@ -119,13 +120,17 @@ final class CompleteIdentity
                     'account_id' => (int) $account['id'], 'account_public_id' => $account['public_id'], 'user_id' => (int) $user['id'],
                     'verification_observation_id' => $observations[array_key_last($observations)]['public_id'],
                     'verification_observation_hash' => $observations[array_key_last($observations)]['observation_hash'],
-                    'identity_policy_version' => IdentityPolicy::VERSION, 'identity_policy_hash' => $policy->hash()], $database->rows);
+                    'identity_policy_version' => IdentityPolicy::VERSION, 'identity_policy_hash' => $policy->hash()], new CurrentRows($database->primary, $database->driver));
                 // Direct current rows after any model creation callbacks, before credential replacement.
                 $database->same($user, $database->rows->one('users', (int) $user['id']));
                 $database->same($account, $database->rows->one('customer_accounts', (int) $account['id']));
-                $statement = $database->primary->prepare('UPDATE users SET name=?, password=?, remember_token=NULL, updated_at=? WHERE id=?');
+                $statement = $database->primary->prepare('UPDATE '.$database->rows->table('users').' SET name=?, password=?, remember_token=NULL, updated_at=? WHERE id=?');
                 $statement->execute([$name, $passwordHash, $now, (int) $user['id']]);
                 $user = $database->rows->one('users', (int) $user['id']);
+            }
+            if ($user['password'] !== $passwordHash || $user['email'] !== $email || (string) $user['is_admin'] !== '0'
+                || $user['email_verified_at'] === null || (string) $account['active'] !== '1') {
+                throw new IdentityException;
             }
             $observation = ['public_id' => (string) Str::uuid(), 'provenance' => $challenge['provenance'], 'identity_policy_version' => IdentityPolicy::VERSION,
                 'identity_policy_hash' => $policy->hash(), 'origin_id' => (int) $origin['id'], 'account_id' => (int) $account['id'],

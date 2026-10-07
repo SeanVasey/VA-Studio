@@ -24,34 +24,38 @@ final class ProductionCustomerSessions
         }
 
         return (new Timebox)->call(function () use ($email, $password): ?array {
-            $database = new IdentityDatabase;
-            $database->close(false);
-            $dummy = Hash::make('Synthetic invalid identity credential123');
-            $user = $database->connection->transaction(function () use ($database, $email, $password, $dummy): ?array {
-                $users = $database->rows->rows('users', 'LOWER(email) = ?', [$email], 2);
-                $user = count($users) === 1 ? $users[0] : [];
-                $valid = Hash::check($password, $user['password'] ?? $dummy);
-                if (! $valid || $user === []) {
+            try {
+                $database = new IdentityDatabase;
+                $database->close(false);
+                $dummy = Hash::make('Synthetic invalid identity credential123');
+                $user = $database->connection->transaction(function () use ($database, $email, $password, $dummy): ?array {
+                    $users = $database->rows->rows('users', 'LOWER(email) = ?', [$email], 2);
+                    $user = count($users) === 1 ? $users[0] : [];
+                    $valid = Hash::check($password, $user['password'] ?? $dummy);
+                    if (! $valid || $user === []) {
+                        return null;
+                    }
+                    $database->same($user, $database->rows->one('users', (int) $user['id']));
+                    $database->close(true);
+
+                    return $user;
+                });
+                if ($user === null) {
                     return null;
                 }
-                $database->same($user, $database->rows->one('users', (int) $user['id']));
-                $database->close(true);
+                try {
+                    $actor = (new User)->newFromBuilder($user);
+                    $access = new ProductionCustomerAccess;
+                    $principal = $access->principal($actor);
+                    $proof = $access->current($principal, $actor);
+                    // Pin the credential actually checked. Rehashing would require a new retained observation.
+                    $database->same($user, $proof['user']);
+                    $database->close(false);
 
-                return $user;
-            });
-            if ($user === null) {
-                return null;
-            }
-            try {
-                $actor = (new User)->newFromBuilder($user);
-                $access = new ProductionCustomerAccess;
-                $principal = $access->principal($actor);
-                $proof = $access->current($principal, $actor);
-                // Pin the credential actually checked. Rehashing would require a new retained observation.
-                $database->same($user, $proof['user']);
-                $database->close(false);
-
-                return ['user' => $actor, 'principal' => $principal];
+                    return ['user' => $actor, 'principal' => $principal];
+                } catch (IdentityException) {
+                    return null;
+                }
             } catch (IdentityException) {
                 return null;
             }

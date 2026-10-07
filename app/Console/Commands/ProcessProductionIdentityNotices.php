@@ -25,10 +25,10 @@ final class ProcessProductionIdentityNotices extends Command
         }
         $policy->outsideTransactions();
         $database = new IdentityDatabase;
-        $statement = $database->primary->prepare('SELECT n.id FROM production_identity_notices n JOIN production_identity_challenges c ON c.id=n.challenge_id WHERE '
-            .'(EXISTS (SELECT 1 FROM production_identity_attempts p WHERE p.notice_id=n.id AND NOT EXISTS (SELECT 1 FROM production_identity_outcomes r WHERE r.attempt_id=p.id)) '
-            .'OR (c.created_at<=? AND c.expires_at>? AND NOT EXISTS (SELECT 1 FROM production_identity_verifications v WHERE v.challenge_id=c.id))) '
-            .'AND NOT EXISTS (SELECT 1 FROM production_identity_attempts a JOIN production_identity_outcomes o ON o.attempt_id=a.id WHERE a.notice_id=n.id AND (o.status IN (\'accepted\',\'unknown\',\'blocked\') OR a.number>=3)) ORDER BY n.id LIMIT '.$limit);
+        $statement = $database->primary->prepare('SELECT n.id FROM '.$database->rows->table('production_identity_notices').' n JOIN '.$database->rows->table('production_identity_challenges').' c ON c.id=n.challenge_id WHERE '
+            .'(EXISTS (SELECT 1 FROM '.$database->rows->table('production_identity_attempts').' p WHERE p.notice_id=n.id AND NOT EXISTS (SELECT 1 FROM '.$database->rows->table('production_identity_outcomes').' r WHERE r.attempt_id=p.id)) '
+            .'OR (c.created_at<=? AND c.expires_at>? AND NOT EXISTS (SELECT 1 FROM '.$database->rows->table('production_identity_verifications').' v WHERE v.challenge_id=c.id))) '
+            .'AND NOT EXISTS (SELECT 1 FROM '.$database->rows->table('production_identity_attempts').' a JOIN '.$database->rows->table('production_identity_outcomes').' o ON o.attempt_id=a.id WHERE a.notice_id=n.id AND (o.status IN (\'accepted\',\'unknown\',\'blocked\') OR a.number>=3)) ORDER BY n.id LIMIT '.$limit);
         $now = now()->utc()->format('Y-m-d H:i:s');
         $statement->execute([$now, $now]);
         $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
