@@ -1,0 +1,403 @@
+{
+  "source": "3c2158e726a3bd3fdd57597adcb5756c49dff2ce",
+  "native_version": "8.0.46-0ubuntu0.24.04.4",
+  "review_status": "independent composed-source review pending",
+  "original_review_source": "4b3d47860373aad181c382899b9ab9677023eca0",
+  "original_review_evidence_commit": "d7631a43ba608d0cce384b1af015b87f6ffffdde",
+  "checks": {
+    "final-native": {
+      "tests": 22,
+      "assertions": 97,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "source": "3c2158e726a3bd3fdd57597adcb5756c49dff2ce",
+      "duration_seconds": 99.977315,
+      "files": {
+        "xml": "83e6675caafea5439050d4dd93397cae59f4387da64481476152a141bd6463c8",
+        "txt": "31947318d8f281fbf401462755670ecc7e880b1a9ba5b803afed5f2e2974643d"
+      },
+      "test_methods": [
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityMigrationTest",
+          "name": "test_exact_empty_prefix_is_resumed_and_empty_down_up_is_reviewable",
+          "assertions": 6,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityMigrationTest",
+          "name": "test_retained_history_refuses_down_and_missing_guard_refuses_repair_before_ddl",
+          "assertions": 3,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityMigrationTest",
+          "name": "test_foreign_view_dependency_and_temporary_owned_shadow_refuse_before_any_ddl",
+          "assertions": 2,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityMigrationTest",
+          "name": "test_raw_replacement_update_and_delete_cannot_rewrite_retained_challenge",
+          "assertions": 3,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityMigrationTest",
+          "name": "test_native_dictionary_unicode_guard_alias_on_foreign_table_is_refused",
+          "assertions": 1,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityDependencyAdmissionTest",
+          "name": "test_actual_parent_metadata_is_refused_before_any_owned_ddl with data set \"users credential column\"",
+          "assertions": 5,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityDependencyAdmissionTest",
+          "name": "test_actual_parent_metadata_is_refused_before_any_owned_ddl with data set \"users credential nullability\"",
+          "assertions": 4,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityDependencyAdmissionTest",
+          "name": "test_actual_parent_metadata_is_refused_before_any_owned_ddl with data set \"account access generation\"",
+          "assertions": 4,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityDependencyAdmissionTest",
+          "name": "test_actual_parent_metadata_is_refused_before_any_owned_ddl with data set \"owner identity type\"",
+          "assertions": 4,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityDependencyAdmissionTest",
+          "name": "test_changed_or_missing_actual_parent_guard_is_refused_before_owned_ddl with data set \"account immutable owner\"",
+          "assertions": 6,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityDependencyAdmissionTest",
+          "name": "test_changed_or_missing_actual_parent_guard_is_refused_before_owned_ddl with data set \"retained owner\"",
+          "assertions": 6,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityDependencyAdmissionTest",
+          "name": "test_required_unique_key_and_disabled_foreign_keys_are_refused_before_owned_ddl",
+          "assertions": 5,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityDependencyAdmissionTest",
+          "name": "test_permanent_parent_temporary_shadow_is_refused_before_owned_ddl",
+          "assertions": 3,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityDependencyAdmissionTest",
+          "name": "test_empty_owned_prefix_does_not_allow_a_withdrawn_dependency_guard_to_be_repaired",
+          "assertions": 3,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityJourneyTest",
+          "name": "test_reusable_operative_fixture_uses_received_smtp_proof_and_current_authenticated_principal",
+          "assertions": 6,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityJourneyTest",
+          "name": "test_actual_smtp_enrollment_creates_only_mailbox_control_and_typed_current_authority",
+          "assertions": 16,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityJourneyTest",
+          "name": "test_recovery_preserves_original_origin_and_historical_act_and_revokes_old_principal",
+          "assertions": 6,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityJourneyTest",
+          "name": "test_exact_completion_replay_has_no_new_identity_and_changed_replay_fails",
+          "assertions": 4,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityJourneyTest",
+          "name": "test_existing_verified_legacy_account_is_never_adopted_and_requests_are_replay_safe",
+          "assertions": 5,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityJourneyTest",
+          "name": "test_expired_or_wrong_mailbox_proof_never_creates_a_user",
+          "assertions": 2,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityJourneyTest",
+          "name": "test_default_off_production_rehearsal_mismatch_and_outer_transaction_are_refused",
+          "assertions": 1,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityJourneyTest",
+          "name": "test_retained_identity_and_mail_objects_cannot_be_serialized",
+          "assertions": 2,
+          "skipped": false
+        }
+      ]
+    },
+    "final-sqlite": {
+      "tests": 22,
+      "assertions": 115,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "source": "3c2158e726a3bd3fdd57597adcb5756c49dff2ce",
+      "duration_seconds": 6.210224,
+      "files": {
+        "xml": "449bfb9fc657d17ecbad5c10fb852cc3701b30a17d78e33cd926fe1d190061c6",
+        "txt": "f14f3eeedbbf5fefba25f1c1fdb1a4df9057b206da889ce6ed41f75920abb668"
+      },
+      "test_methods": [
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityMigrationTest",
+          "name": "test_exact_empty_prefix_is_resumed_and_empty_down_up_is_reviewable",
+          "assertions": 6,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityMigrationTest",
+          "name": "test_retained_history_refuses_down_and_missing_guard_refuses_repair_before_ddl",
+          "assertions": 4,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityMigrationTest",
+          "name": "test_foreign_view_dependency_and_temporary_owned_shadow_refuse_before_any_ddl",
+          "assertions": 3,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityMigrationTest",
+          "name": "test_raw_replacement_update_and_delete_cannot_rewrite_retained_challenge",
+          "assertions": 4,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityMigrationTest",
+          "name": "test_native_dictionary_unicode_guard_alias_on_foreign_table_is_refused",
+          "assertions": 1,
+          "skipped": true
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityDependencyAdmissionTest",
+          "name": "test_actual_parent_metadata_is_refused_before_any_owned_ddl with data set \"users credential column\"",
+          "assertions": 5,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityDependencyAdmissionTest",
+          "name": "test_actual_parent_metadata_is_refused_before_any_owned_ddl with data set \"users credential nullability\"",
+          "assertions": 5,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityDependencyAdmissionTest",
+          "name": "test_actual_parent_metadata_is_refused_before_any_owned_ddl with data set \"account access generation\"",
+          "assertions": 5,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityDependencyAdmissionTest",
+          "name": "test_actual_parent_metadata_is_refused_before_any_owned_ddl with data set \"owner identity type\"",
+          "assertions": 5,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityDependencyAdmissionTest",
+          "name": "test_changed_or_missing_actual_parent_guard_is_refused_before_owned_ddl with data set \"account immutable owner\"",
+          "assertions": 7,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityDependencyAdmissionTest",
+          "name": "test_changed_or_missing_actual_parent_guard_is_refused_before_owned_ddl with data set \"retained owner\"",
+          "assertions": 7,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityDependencyAdmissionTest",
+          "name": "test_required_unique_key_and_disabled_foreign_keys_are_refused_before_owned_ddl",
+          "assertions": 6,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityDependencyAdmissionTest",
+          "name": "test_permanent_parent_temporary_shadow_is_refused_before_owned_ddl",
+          "assertions": 4,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityDependencyAdmissionTest",
+          "name": "test_empty_owned_prefix_does_not_allow_a_withdrawn_dependency_guard_to_be_repaired",
+          "assertions": 4,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityJourneyTest",
+          "name": "test_reusable_operative_fixture_uses_received_smtp_proof_and_current_authenticated_principal",
+          "assertions": 6,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityJourneyTest",
+          "name": "test_actual_smtp_enrollment_creates_only_mailbox_control_and_typed_current_authority",
+          "assertions": 17,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityJourneyTest",
+          "name": "test_recovery_preserves_original_origin_and_historical_act_and_revokes_old_principal",
+          "assertions": 7,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityJourneyTest",
+          "name": "test_exact_completion_replay_has_no_new_identity_and_changed_replay_fails",
+          "assertions": 5,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityJourneyTest",
+          "name": "test_existing_verified_legacy_account_is_never_adopted_and_requests_are_replay_safe",
+          "assertions": 6,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityJourneyTest",
+          "name": "test_expired_or_wrong_mailbox_proof_never_creates_a_user",
+          "assertions": 3,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityJourneyTest",
+          "name": "test_default_off_production_rehearsal_mismatch_and_outer_transaction_are_refused",
+          "assertions": 2,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentity\\ProductionIdentityJourneyTest",
+          "name": "test_retained_identity_and_mail_objects_cannot_be_serialized",
+          "assertions": 3,
+          "skipped": false
+        }
+      ]
+    },
+    "unchanged-sqlite": {
+      "tests": 1,
+      "assertions": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "source": "3c2158e726a3bd3fdd57597adcb5756c49dff2ce",
+      "duration_seconds": 0.465405,
+      "files": {
+        "xml": "04bcf5e0bde231dd8068b253f20e921d5388852207f1a43b0846772f150f049c",
+        "txt": "51c2a0a544d405a8d44c44813d398b4646e314dcd83ca4513563f12b629430d9"
+      },
+      "test_methods": [
+        {
+          "class": "Tests\\IndependentIdentityRegistration\\IdentityDependencyAdmissionCanaryTest",
+          "name": "test_incompatible_actual_dependency_is_refused_before_owned_ddl",
+          "assertions": 4,
+          "skipped": false
+        }
+      ]
+    },
+    "unchanged-native": {
+      "tests": 1,
+      "assertions": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "source": "3c2158e726a3bd3fdd57597adcb5756c49dff2ce",
+      "duration_seconds": 10.426781,
+      "files": {
+        "xml": "b2161af7793283179785c0f6ce792f19a7c580a8d5626aa85c58df759f8cb5d6",
+        "txt": "8ca2206faa629340aceeb31171fd3820f197094be2f3a3eba2c7209a739c3924"
+      },
+      "test_methods": [
+        {
+          "class": "Tests\\IndependentIdentityRegistration\\IdentityNativeDependencyAdmissionCanaryTest",
+          "name": "test_missing_native_parent_columns_are_refused_before_owned_ddl",
+          "assertions": 4,
+          "skipped": false
+        }
+      ]
+    },
+    "unchanged-runtime": {
+      "tests": 2,
+      "assertions": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "source": "3c2158e726a3bd3fdd57597adcb5756c49dff2ce",
+      "duration_seconds": 1.710615,
+      "files": {
+        "xml": "65faa52e1a093507b9faa8f89ed5d6a7b9cf68aee6af46850ee2225c201d95ad",
+        "txt": "39a9a41a62d49f12febe7a90f9531136ec14b0f4ce6f4cdae4fc0acc74f396cd"
+      },
+      "test_methods": [
+        {
+          "class": "Tests\\IndependentIdentity\\ProductionIdentityPermanentUserCanaryTest",
+          "name": "test_sign_in_observes_permanent_credential_withdrawal_and_refuses_a_temporary_old_user_copy",
+          "assertions": 5,
+          "skipped": false
+        },
+        {
+          "class": "Tests\\AuthorIdentityCanaries\\IdentityUnknownRoleCanaryTest",
+          "name": "test_unknown_permanent_role_flag_never_counts_as_nonstaff_customer_authority",
+          "assertions": 4,
+          "skipped": false
+        }
+      ]
+    }
+  },
+  "artifacts_sha256": {
+    "pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "final-sqlite.xml": "449bfb9fc657d17ecbad5c10fb852cc3701b30a17d78e33cd926fe1d190061c6",
+    "final-native.txt": "31947318d8f281fbf401462755670ecc7e880b1a9ba5b803afed5f2e2974643d",
+    "unchanged-sqlite-snapshot.json": "5d8233374950d2182ccb4196aab4d42503575ec5ad2b1c84892f92a08fab013b",
+    "unchanged-runtime.txt": "39a9a41a62d49f12febe7a90f9531136ec14b0f4ce6f4cdae4fc0acc74f396cd",
+    "unchanged-native.txt": "8ca2206faa629340aceeb31171fd3820f197094be2f3a3eba2c7209a739c3924",
+    "unchanged-runtime.xml": "65faa52e1a093507b9faa8f89ed5d6a7b9cf68aee6af46850ee2225c201d95ad",
+    "unchanged-sqlite.xml": "04bcf5e0bde231dd8068b253f20e921d5388852207f1a43b0846772f150f049c",
+    "unchanged-native.xml": "b2161af7793283179785c0f6ce792f19a7c580a8d5626aa85c58df759f8cb5d6",
+    "final-native.xml": "83e6675caafea5439050d4dd93397cae59f4387da64481476152a141bd6463c8",
+    "source-map.json": "2728b84f4d8ef9721348accf3f834c3ebafcadc555e50d8b4ffb4e7be771c218",
+    "unchanged-native-snapshot.json": "017b46ed7ce6eaa11da93b57da3df3acacda94ec0c675e22ce9b7b66ac6b96c1",
+    "unchanged-sqlite.txt": "51c2a0a544d405a8d44c44813d398b4646e314dcd83ca4513563f12b629430d9",
+    "final-sqlite.txt": "f14f3eeedbbf5fefba25f1c1fdb1a4df9057b206da889ce6ed41f75920abb668",
+    "probes/IdentityNativeDependencyAdmissionCanaryTest.php": "4ad5a40000a13a65716bbfa26bb53e1062eaca280605e3e2c03386c188463b23",
+    "probes/IdentityDependencyAdmissionCanaryTest.php": "161571fc869801381a5905b30a30901c0fd6d798e87e1d59f182bb5aeb63b4d6",
+    "historical-4b/dependency-admission-red-junit.xml": "25abc86204dda2591d434e0f778b3d28b1f8347562e207626ea845c39d39fe8b",
+    "historical-4b/dependency-admission-red.txt": "3a44727e558c5b2b2cea1b57c96b3815923298503538de763f6980d29a3b68f5",
+    "historical-4b/native-dependency-admission-snapshot.json": "a6f20817d5ec4a982c015941dc87f573ccb45876edd18364a0776742aebc8172",
+    "historical-4b/native-dependency-admission-red-junit.xml": "7c7b4632d849e8928674c904a152399ccbc805169c8107113c79c379d0a1ecea",
+    "historical-4b/native-dependency-admission-red.txt": "c90fd326a6fbb0740e632aba078313c6e6668c0580770fc85f28812e05fa3865",
+    "historical-4b/dependency-admission-snapshot.json": "9064ac569d0567f4ab8dc82fa2f8826ffec46ac4c3e96838f5886a5f45584d48",
+    "development/native-test-fixture-error.xml": "c3365e8adcc8892f16c870a134bcbe666ca3650cc0c17094730da12c1f852a65"
+  },
+  "not_run": [
+    "full46 identity suite",
+    "hosted MySQL8.4",
+    "hosted CI",
+    "external mail"
+  ]
+}
