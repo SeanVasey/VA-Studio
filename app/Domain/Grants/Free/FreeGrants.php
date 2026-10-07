@@ -138,6 +138,8 @@ final class FreeGrants
 
     public function customerFence(object $principal, User $actor, FreeGrantIdentity $identity, array $authority, array $graph, FreeGrantRows $rows, bool $newAdmission, ?int $expectedCount = null): void
     {
+        $original = $identity instanceof FreeGrantOriginalIdentity
+            ? $identity->lockOriginal($principal, $actor, $graph['payload']['buyer_binding'], $rows) : null;
         $identity->proveCurrent($principal, $actor, $rows, $authority);
         FreeGrantException::require($this->originGraph($graph['origin']['public_id'], (int) $graph['origin']['account_id'], $rows) === $graph, 409);
         (new FreeGrantSources)->proveCurrent($graph['payload']['definition']['source'], $rows, $newAdmission);
@@ -149,6 +151,9 @@ final class FreeGrants
                 && $expectedCount <= $graph['payload']['definition']['max_origins'], 409);
         }
         (new FreeGrantPolicy)->requireDefinition($graph['payload']['definition']);
+        if ($identity instanceof FreeGrantOriginalIdentity) {
+            $identity->proveOriginalPrimary($principal, $actor, $graph['payload']['buyer_binding'], $rows, $original);
+        }
         $identity->provePrimary($principal, $actor, $rows, $authority);
         $rows->assertCurrent();
     }
