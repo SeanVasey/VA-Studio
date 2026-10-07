@@ -112,8 +112,12 @@ test -z "$(git status --porcelain --untracked-files=all --ignored)" || { echo 'd
 test "$(git rev-parse HEAD^{tree})" = "$(git write-tree)" || { echo 'checkout differs from <SHA>'; exit 1; }
 composer install --no-dev --no-interaction --classmap-authoritative   # composer.lock is frozen
 npm ci && npm run build
-# Persistent private storage is attached after the source checks, never copied into the release.
-rmdir storage/app/private && ln -s <PERSISTENT_ROOT>/private storage/app/private
+# Persistent private storage is attached after the source checks, never copied into the
+# release. The checkout's storage/app/private holds only the tracked .gitignore; it is
+# replaced by a link to the persistent root (the disk root is storage_path('app/private'),
+# config/filesystems.php, and has no environment override).
+rm -r storage/app/private && ln -s <PERSISTENT_ROOT>/private storage/app/private
+test "$(readlink storage/app/private)" = "<PERSISTENT_ROOT>/private" || { echo 'private storage not attached'; exit 1; }
 
 # Configuration lives outside the repository, mode 0600, assembled from the two templates:
 #   ops/private-server/env.example       (host baseline; fill host inputs only)
