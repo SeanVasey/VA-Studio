@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionIdentityAdapters\HistoricalCommittedConfigurationCallbackCanaryTest" file="/workspace/VA-Studio-checkout-committed-receipt/docs/verification/checkout-committed-receipt-20261007/evidence/identity-callback/HistoricalCommittedConfigurationCallbackCanaryTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="1.072275">
+    <testcase name="test_original_closed_prefix_does_not_invoke_configuration_callbacks_after_the_original_commit" file="/workspace/VA-Studio-checkout-committed-receipt/docs/verification/checkout-committed-receipt-20261007/evidence/identity-callback/HistoricalCommittedConfigurationCallbackCanaryTest.php" line="19" class="Tests\Feature\ProductionIdentityAdapters\HistoricalCommittedConfigurationCallbackCanaryTest" classname="Tests.Feature.ProductionIdentityAdapters.HistoricalCommittedConfigurationCallbackCanaryTest" assertions="5" time="1.072275"/>
+  </testsuite>
+</testsuites>

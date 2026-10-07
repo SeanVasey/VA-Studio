@@ -1,0 +1,15 @@
+{
+  "source_sha": "90d09a5363c78eb54531526916008f197d4dcb8d",
+  "source_tree": "ec6e31ba66a72d813c6c13683b6a4fc7a3d20c67",
+  "argv": [
+    "vendor/bin/phpunit",
+    "tests/Feature/ProductionCheckoutCommittedRowsTest.php",
+    "docs/verification/checkout-committed-receipt-20261007/evidence/statement-callback/CheckoutReadonlyStatementRefusalCanaryTest.php",
+    "--colors=never",
+    "--log-junit",
+    "docs/verification/checkout-committed-receipt-20261007/evidence/frozen-native-reader.xml"
+  ],
+  "identity_base": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+  "identity_successor": "e6c02b90719923bc4ba435f86399b077980c1ddc",
+  "environment": "Actual Oracle MySQL 8.0.46-0ubuntu0.24.04.4 limited isolated schema; private task.env; loopback network grant"
+}

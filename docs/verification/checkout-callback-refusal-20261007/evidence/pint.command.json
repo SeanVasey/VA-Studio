@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "vendor/bin/pint",
+    "--test",
+    "app/Domain/Commerce/ProductionCheckout/HeldSourceTransaction.php",
+    "app/Domain/Commerce/ProductionCheckout/PrimaryBoundary.php",
+    "app/Domain/Commerce/ProductionCheckout/CommandTransaction.php",
+    "app/Domain/Commerce/ProductionCheckout/ResolvedConnection.php",
+    "tests/Feature/ProductionCheckoutSourceTransactionTest.php"
+  ],
+  "source_sha": "b6f1dfbb7b92cee5319eac79443b88bf24178ab2"
+}

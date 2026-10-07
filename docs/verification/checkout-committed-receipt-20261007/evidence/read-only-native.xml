@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionCheckoutCommittedRowsTest" file="/workspace/VA-Studio-checkout-committed-receipt/tests/Feature/ProductionCheckoutCommittedRowsTest.php" tests="4" assertions="11" errors="0" failures="0" skipped="0" time="1.329123">
+    <testcase name="test_explicit_reader_reads_original_committed_rows_without_opening_a_transaction" file="/workspace/VA-Studio-checkout-committed-receipt/tests/Feature/ProductionCheckoutCommittedRowsTest.php" line="40" class="Tests\Feature\ProductionCheckoutCommittedRowsTest" classname="Tests.Feature.ProductionCheckoutCommittedRowsTest" assertions="3" time="0.239956"/>
+    <testcase name="test_capturing_readonly_mode_inside_physical_transaction_is_refused" file="/workspace/VA-Studio-checkout-committed-receipt/tests/Feature/ProductionCheckoutCommittedRowsTest.php" line="48" class="Tests\Feature\ProductionCheckoutCommittedRowsTest" classname="Tests.Feature.ProductionCheckoutCommittedRowsTest" assertions="2" time="0.031179"/>
+    <testcase name="test_original_readonly_reader_refuses_later_physical_transaction" file="/workspace/VA-Studio-checkout-committed-receipt/tests/Feature/ProductionCheckoutCommittedRowsTest.php" line="60" class="Tests\Feature\ProductionCheckoutCommittedRowsTest" classname="Tests.Feature.ProductionCheckoutCommittedRowsTest" assertions="2" time="0.028258"/>
+    <testcase name="test_native_plain_reader_does_not_wait_for_foreign_row_lock_while_default_reader_still_locks" file="/workspace/VA-Studio-checkout-committed-receipt/tests/Feature/ProductionCheckoutCommittedRowsTest.php" line="73" class="Tests\Feature\ProductionCheckoutCommittedRowsTest" classname="Tests.Feature.ProductionCheckoutCommittedRowsTest" assertions="4" time="1.029730"/>
+  </testsuite>
+</testsuites>

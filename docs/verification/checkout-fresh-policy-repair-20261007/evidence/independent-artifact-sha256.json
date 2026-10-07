@@ -1,0 +1,11 @@
+{
+  "docs/verification/cloud-checkout-terminal-policy-independent-20261007.md": "474b3c4508f4c9a483785ff8b08a3d37715352c967db18f6f32e884751b2a314",
+  "docs/verification/cloud-checkout-terminal-policy-independent-20261007/CheckoutTerminalFreshPolicyCanaryTest.php": "1c9ebf899a1cce43238b6eef7bef035177cd360d926493df311115318c935712",
+  "docs/verification/cloud-checkout-terminal-policy-independent-20261007/original-red.txt": "65d55b74a015ed925ee406f18adf443245b6283f5b28486fd8cb34896bc6827e",
+  "docs/verification/cloud-checkout-terminal-policy-independent-20261007/original-red.xml": "b01d731e6c936ae9deaa732f9c72e7ab4ddaa8a3a1c3e45954ae8e1d86a70f61",
+  "docs/verification/cloud-checkout-terminal-policy-independent-20261007/original-snapshot.json.txt": "dc270f867659178808d1af24af82e9fbcb30ddaa2aec95640a9fef83af24f449",
+  "docs/verification/cloud-checkout-terminal-policy-independent-20261007/own-autoload.txt": "9b51f00444349d6cfcfc03eaa7f09ff2d53f4c98a62bc48816028ae1f91a1e78",
+  "docs/verification/cloud-checkout-terminal-policy-independent-20261007/receipt.json": "319f9f66f1ae41a3004940d25fd55e2326142a1ba8c5b09dff34903182a8881e",
+  "docs/verification/cloud-checkout-terminal-policy-independent-20261007/snapshot-parsed.json": "d4d51e71ff484809bc02ffbc15b219479e8499f3ca55ee67922e3df4910e28a8",
+  "docs/verification/cloud-checkout-terminal-policy-independent-20261007/sqlite-selection.xml": "c469ec3f0e418c148327a7a4c95062311854859130c7fc537b88e0d7292a388d"
+}

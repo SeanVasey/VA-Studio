@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Canary\ProductionCheckoutUnresolvedConnectionCanaryTest" file="/tmp/ProductionCheckoutUnresolvedConnectionCanaryTest.php" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="2.792389">
+    <testcase name="test_expired_source_never_resolves_uncached_connection_that_withdraws_buyer" file="/tmp/ProductionCheckoutUnresolvedConnectionCanaryTest.php" line="11" class="Tests\Canary\ProductionCheckoutUnresolvedConnectionCanaryTest" classname="Tests.Canary.ProductionCheckoutUnresolvedConnectionCanaryTest" assertions="3" time="2.792389">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Canary\ProductionCheckoutUnresolvedConnectionCanaryTest::test_expired_source_never_resolves_uncached_connection_that_withdraws_buyer
+Terminal source refusal invoked uncached connection resolver.
+Failed asserting that true is false.
+
+/tmp/ProductionCheckoutUnresolvedConnectionCanaryTest.php:25</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

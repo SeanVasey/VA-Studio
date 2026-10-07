@@ -1,0 +1,175 @@
+{
+  "source_sha": "6e3932aa22d2668508dc66b696b6108b6d094f53",
+  "files": [
+    {
+      "path": "CheckoutTerminalFreshPolicyCanaryTest.php",
+      "bytes": 2649,
+      "sha256": "1c9ebf899a1cce43238b6eef7bef035177cd360d926493df311115318c935712"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2784,
+      "sha256": "5b43cf4d4ca64388c9c01f0ab4860f27862aa950bf2b0c33717df34f550e8a81"
+    },
+    {
+      "path": "evidence/checkout-fresh-affected-corrected-pilot.txt",
+      "bytes": 93,
+      "sha256": "4a3885f24460a0bb963615e22001a2469d327899c9007a32570646a3afa58e65"
+    },
+    {
+      "path": "evidence/checkout-fresh-affected-corrected-pilot.xml",
+      "bytes": 2618,
+      "sha256": "0e39f8a4c48d325f168bbdced97a5966734bea722ed9dd542981df08dcc7a098"
+    },
+    {
+      "path": "evidence/checkout-fresh-affected-pilot.txt",
+      "bytes": 2286,
+      "sha256": "ca5725affa3394780efeb97a3cd14f4a6f5dd48f182668034976b040e96365f7"
+    },
+    {
+      "path": "evidence/checkout-fresh-affected-pilot.xml",
+      "bytes": 6472,
+      "sha256": "47d3a9ddf6f78929bf5f07cf6760790d425b4cd681859a98a769552550dc1f1c"
+    },
+    {
+      "path": "evidence/checkout-fresh-own-original-red-corrected.txt",
+      "bytes": 566,
+      "sha256": "a3a6b4d69c236236824631ba88867f7f54dadec595f181e5c13242a89945249d"
+    },
+    {
+      "path": "evidence/checkout-fresh-own-original-red.txt",
+      "bytes": 177,
+      "sha256": "1f7f89016baeec91432fa9387b52fb55d939dafd4e21183407894e9fb38a92ac"
+    },
+    {
+      "path": "evidence/checkout-fresh-own-original-red.xml",
+      "bytes": 1310,
+      "sha256": "a9a8dfbf153df0750b4085db9a98e23ce5a351a6edafad71ba997ee5a86beb89"
+    },
+    {
+      "path": "evidence/checkout-fresh-own-repaired-canary.txt",
+      "bytes": 92,
+      "sha256": "3e98c464c8eb8f47bb1200a2e61eb4392648a94607540c2b908fc827a8f0ae67"
+    },
+    {
+      "path": "evidence/checkout-fresh-own-repaired-canary.xml",
+      "bytes": 809,
+      "sha256": "23064cb9ddc46cbf6d7f9cac18fc2068436e4cb51d8bc0a6621054227fa23dec"
+    },
+    {
+      "path": "evidence/frozen-native-affected.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/frozen-native-affected.txt",
+      "bytes": 95,
+      "sha256": "6aec9bfe19456dcf12bfe4435fa258a662e3de7c39416edb17282427a9c8da7d"
+    },
+    {
+      "path": "evidence/frozen-native-affected.xml",
+      "bytes": 2628,
+      "sha256": "36fd6c0cc4c79273bac10e09a1f2b6ea8185c72f326fdb86a533cea69d3d6f85"
+    },
+    {
+      "path": "evidence/frozen-native-unchanged-canary.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/frozen-native-unchanged-canary.txt",
+      "bytes": 93,
+      "sha256": "83b6ab4e9bae16f5b677c6771f372ab573eda9652630bf98dccacb448af10ab6"
+    },
+    {
+      "path": "evidence/frozen-native-unchanged-canary.xml",
+      "bytes": 811,
+      "sha256": "77c9e97800bc58da38d575370c027ec17568d01474e77d295133c15861a6a4f2"
+    },
+    {
+      "path": "evidence/frozen-native.command.json",
+      "bytes": 1139,
+      "sha256": "8002670707bb9d169cf049f704e9074fe57b86bae4a65941a4acae6a4a0ff394"
+    },
+    {
+      "path": "evidence/frozen-sqlite-affected.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/frozen-sqlite-affected.txt",
+      "bytes": 94,
+      "sha256": "d2345af74538e5e567a5f125f9512458e0aa274a08ab6e0698f31b699494435a"
+    },
+    {
+      "path": "evidence/frozen-sqlite-affected.xml",
+      "bytes": 2619,
+      "sha256": "078cf6bca59d6d7c9615e3f7d13d9fb84f1b1688ddbb579c43314d4a09d87ac0"
+    },
+    {
+      "path": "evidence/frozen-sqlite-unchanged-canary.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/frozen-sqlite-unchanged-canary.txt",
+      "bytes": 92,
+      "sha256": "89ed761c5ad9f7a9d44f0e8d1e483a761de3127229b93a4c1c79892d4b46c3dd"
+    },
+    {
+      "path": "evidence/frozen-sqlite-unchanged-canary.xml",
+      "bytes": 809,
+      "sha256": "3f77e53a8572b0452863099352857f6d751c027c2ade5b72f3d33fbe68e8f288"
+    },
+    {
+      "path": "evidence/frozen-sqlite.command.json",
+      "bytes": 1077,
+      "sha256": "0a01396604c79491355822bba974539c28605e10247618df296205383c430832"
+    },
+    {
+      "path": "evidence/independent-artifact-sha256.json",
+      "bytes": 1468,
+      "sha256": "4e57d7db81254e5a1e0eefbab5436e8debcec3942f7b9c68db51b8c9759dac06"
+    },
+    {
+      "path": "evidence/independent-original-snapshot.json.txt",
+      "bytes": 758,
+      "sha256": "dc270f867659178808d1af24af82e9fbcb30ddaa2aec95640a9fef83af24f449"
+    },
+    {
+      "path": "evidence/independent-receipt.json",
+      "bytes": 1828,
+      "sha256": "319f9f66f1ae41a3004940d25fd55e2326142a1ba8c5b09dff34903182a8881e"
+    },
+    {
+      "path": "evidence/independent-snapshot-parsed.json",
+      "bytes": 669,
+      "sha256": "d4d51e71ff484809bc02ffbc15b219479e8499f3ca55ee67922e3df4910e28a8"
+    },
+    {
+      "path": "evidence/junit-reconciliation.json",
+      "bytes": 845,
+      "sha256": "9f7fd32b1bef713b784674ba73db77fd3aa90da9a0fad2a929ad53f00c018bc6"
+    },
+    {
+      "path": "evidence/source-manifest.json",
+      "bytes": 755,
+      "sha256": "5270c3e19df929af44d6e7d737427a3cfdd29bc13cf4f18dcffe40b63cca1eba"
+    },
+    {
+      "path": "original-red.txt",
+      "bytes": 998,
+      "sha256": "65d55b74a015ed925ee406f18adf443245b6283f5b28486fd8cb34896bc6827e"
+    },
+    {
+      "path": "original-red.xml",
+      "bytes": 1872,
+      "sha256": "b01d731e6c936ae9deaa732f9c72e7ab4ddaa8a3a1c3e45954ae8e1d86a70f61"
+    },
+    {
+      "path": "snapshot.json",
+      "bytes": 351,
+      "sha256": "27f2245d30a2613df3a6175d5017a49efa95365b8aa94e29abb61c4c2335152b"
+    }
+  ]
+}

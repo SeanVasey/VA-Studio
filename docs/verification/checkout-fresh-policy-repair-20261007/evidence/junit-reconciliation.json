@@ -1,0 +1,34 @@
+[
+  {
+    "path": "docs/verification/checkout-fresh-policy-repair-20261007/evidence/frozen-native-affected.xml",
+    "tests": 5,
+    "assertions": 39,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "path": "docs/verification/checkout-fresh-policy-repair-20261007/evidence/frozen-native-unchanged-canary.xml",
+    "tests": 1,
+    "assertions": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "path": "docs/verification/checkout-fresh-policy-repair-20261007/evidence/frozen-sqlite-affected.xml",
+    "tests": 5,
+    "assertions": 39,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  {
+    "path": "docs/verification/checkout-fresh-policy-repair-20261007/evidence/frozen-sqlite-unchanged-canary.xml",
+    "tests": 1,
+    "assertions": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+]

@@ -1,0 +1,79 @@
+{
+  "prior_source_sha": "f0a1615be0833804959662fad5d7a7a8e1389ee0",
+  "source_sha": "b6f1dfbb7b92cee5319eac79443b88bf24178ab2",
+  "file": "tests/Feature/ProductionCheckoutSourceTransactionTest.php",
+  "unchanged_original_test_methods": {
+    "test_raw_pdo_transaction_without_framework_transaction_never_mints_source": {
+      "bytes": 971,
+      "sha256": "e4311967d444d4445b21498487407379f55f539380f6bb540956adb398ccee56"
+    },
+    "test_source_proof_after_original_framework_commit_is_refused": {
+      "bytes": 808,
+      "sha256": "b599bdf9df3ce2270c616c58fa97a7b610fb49e9ef66a86937e634f8a2d81321"
+    },
+    "test_original_transaction_frame_cannot_be_replaced_or_nested": {
+      "bytes": 1826,
+      "sha256": "5f100dd745af6c2c4206f4ba90ed09503e12b5376b3199817ae6ccaf3fd3a62e"
+    },
+    "test_direct_commit_reopen_during_source_decryption_cannot_mint_rebound_source": {
+      "bytes": 1581,
+      "sha256": "65efbd3b468670edaa72b079709fd318cdecb675eb0c0a79a6f1e89cd6a29017"
+    },
+    "test_repeated_terminal_proofs_preserve_consumer_writes_after_source_capture": {
+      "bytes": 1219,
+      "sha256": "289a7daae84e083a8b8dd4cf6b37e6f9e1ff353c067818d217d0583978ca777f"
+    }
+  },
+  "new_test_methods": {
+    "test_expired_source_refusal_does_not_resolve_a_lazy_primary_that_withdraws_buyer_credentials": {
+      "bytes": 1380,
+      "sha256": "1db6f7fe3d125d1745efbadf73be52bf0e2ea1e234447cba0762d7b539cbabc9"
+    },
+    "test_command_postcommit_refusal_does_not_resolve_a_lazy_primary_or_return_prepared_result": {
+      "bytes": 1488,
+      "sha256": "fcb4d8e07a9bd28d52ff745114c7eec169385c1c4e6ad492bdec290499b1b86c"
+    },
+    "test_expired_source_refusal_does_not_invoke_an_uncached_connection_resolver": {
+      "bytes": 1459,
+      "sha256": "0b227dd6022fde66ded604f42d48fc258c39887ddf7b10a7bcaa685448d68b52"
+    }
+  },
+  "all_unchanged_original_method_bodies": {
+    "setUp": {
+      "bytes": 688,
+      "sha256": "92bc09b8dc025ef7fcde6c4ca0c717cfe7ade91ee03df13ea64ed15f87c73bff"
+    },
+    "paid": {
+      "bytes": 392,
+      "sha256": "8e4ffb5f6338744dbac2f7027f4e8991124caf14721b52522e3eef776c54b9b5"
+    },
+    "source": {
+      "bytes": 317,
+      "sha256": "709de8ca7a1c0f7636d240cccc76fce73d6e07014b6821a183d54ab713002b29"
+    },
+    "test_raw_pdo_transaction_without_framework_transaction_never_mints_source": {
+      "bytes": 971,
+      "sha256": "e4311967d444d4445b21498487407379f55f539380f6bb540956adb398ccee56"
+    },
+    "test_source_proof_after_original_framework_commit_is_refused": {
+      "bytes": 808,
+      "sha256": "b599bdf9df3ce2270c616c58fa97a7b610fb49e9ef66a86937e634f8a2d81321"
+    },
+    "interruptedFrames": {
+      "bytes": 169,
+      "sha256": "a55cd289d44101e6c3b9f1370e9b401567731d01c5f8690cc76c77b16f557872"
+    },
+    "test_original_transaction_frame_cannot_be_replaced_or_nested": {
+      "bytes": 1826,
+      "sha256": "5f100dd745af6c2c4206f4ba90ed09503e12b5376b3199817ae6ccaf3fd3a62e"
+    },
+    "test_direct_commit_reopen_during_source_decryption_cannot_mint_rebound_source": {
+      "bytes": 1581,
+      "sha256": "65efbd3b468670edaa72b079709fd318cdecb675eb0c0a79a6f1e89cd6a29017"
+    },
+    "test_repeated_terminal_proofs_preserve_consumer_writes_after_source_capture": {
+      "bytes": 1219,
+      "sha256": "289a7daae84e083a8b8dd4cf6b37e6f9e1ff353c067818d217d0583978ca777f"
+    }
+  }
+}

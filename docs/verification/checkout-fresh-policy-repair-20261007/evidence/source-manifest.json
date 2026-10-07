@@ -1,0 +1,19 @@
+{
+  "base_sha": "b6f1dfbb7b92cee5319eac79443b88bf24178ab2",
+  "source_sha": "6e3932aa22d2668508dc66b696b6108b6d094f53",
+  "files": [
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/FreshCheckoutPolicy.php",
+      "sha256": "49388132bd3fcc79f5520188d580970cc780d6c4799205951902925ec6609faa"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionCheckout.php",
+      "sha256": "df0f466922e8819b549fb3eaa3c1da755d77eb3cf6957bc36294076bc3d00d78"
+    },
+    {
+      "path": "tests/Feature/ProductionCheckoutFreshPolicyTest.php",
+      "sha256": "588c4546e9a9a0bca4582a0a90f27ea66f5cf1065b2cc1529a064e4b09264792"
+    }
+  ],
+  "unchanged_root_probe_sha256": "1c9ebf899a1cce43238b6eef7bef035177cd360d926493df311115318c935712"
+}
