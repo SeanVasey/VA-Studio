@@ -384,6 +384,13 @@ maintenance mode (fatal `down`, 503 or marker check) before quiescing, enters ma
 inside the previous release before switching units and confirms 503 after the switch, and
 lifts it only there after the services are verified.
 
+Codex's sixteenth pass (P2 ×3, docs): the restore proof's re-dump was piped into `diff`, so
+only `diff`'s status was seen; the re-dump now goes to a file with its own `|| exit 1`. The S1
+deploy, when run on a host already serving traffic, now skips the backup procedure's resume
+step and stays in maintenance with workers stopped through the migration until the new
+release is activated. The S1 rollback restores the paired private archive (verified as in the
+backup's step 4) alongside the database while writers are stopped, before any release switch.
+
 Under the review's condition 3, the preflight and probe change was re-reviewed
 (`independent-review/DECISION.md`, addendum 2): APPROVE WITH CONDITIONS carries to
 `f4c55acf`. Two Low findings were accepted for merge and are now closed (seventh Codex

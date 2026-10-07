@@ -144,9 +144,12 @@ foreign=$(cd <RESTORE_PRIVATE_ROOT> && find . \( ! -user <APP_USER> -o ! -group 
 #    The exempted root .gitignore must itself be exactly 0644 when present.
 (cd <RESTORE_PRIVATE_ROOT> && { [ ! -e .gitignore ] || [ "$(stat -c %a .gitignore)" = 644 ]; }) \
   || { echo 'root .gitignore is not 0644'; exit 1; }
+#    The re-dump goes to a file first: in a pipeline only diff's status would be seen, so a
+#    mysqldump that fails after emitting acceptable output would pass.
 mysqldump --defaults-extra-file=<RESTORE_OPTION_FILE> --single-transaction --quick \
   --routines --triggers --events --hex-blob --no-tablespaces --set-gtid-purged=OFF \
-  --skip-dump-date --skip-comments --databases <DATABASE> | diff - <BACKUP_DIR>/database.sql || exit 1
+  --skip-dump-date --skip-comments --databases <DATABASE> > <RESTORE_PRIVATE_ROOT>.redump.sql || exit 1
+diff <RESTORE_PRIVATE_ROOT>.redump.sql <BACKUP_DIR>/database.sql || exit 1
 mysql --defaults-extra-file=<RESTORE_OPTION_FILE> -e 'CHECKSUM TABLE <DATABASE>.orders EXTENDED'  # repeat per table and compare with the source
 ```
 

@@ -136,7 +136,12 @@ php scripts/ops/private-server-preflight.php --env-file <RUNTIME_ENV> --runtime
 # a unit may instead carry EnvironmentFile=<RUNTIME_ENV>, but never both.
 install -m 0600 -o <APP_USER> -g <APP_GROUP> <RUNTIME_ENV> .env && cmp -s <RUNTIME_ENV> .env || { echo '.env not installed'; exit 1; }
 
-# Back up first (docs/ops/backup-restore-proof.md, MySQL procedure), then migrate.
+# Back up first (docs/ops/backup-restore-proof.md, MySQL procedure) and stay quiesced: on a
+# host that already serves traffic, skip that procedure's resume step (its `systemctl start`
+# and `php artisan up` after step 2) and keep maintenance mode and the stopped workers and
+# scheduler in effect through the migration and until this release is activated below, so
+# no request or job meets a partially migrated schema. The resume happens once, at the end
+# of this stage, in the new release.
 php artisan migrate:status
 php artisan migrate --pretend      # review the SQL
 php artisan migrate --force
@@ -179,7 +184,15 @@ php artisan queue:work database --queue=payments,inquiry-alerts,default --tries=
    `systemctl is-active` reports them inactive: an in-flight media, contract, payment or
    scheduled-publication job must not write to the database or private storage while the
    restore runs (the backup procedure quiesces the same way).
-2. Restore the pre-migration backup into the **staging** schema only.
+2. Restore the pre-migration backup into the **staging** schema only, and the paired private
+   archive with it: the backup captured database and private storage as one moment, and an
+   upload, contract or media job that wrote the bind-mounted private root after the snapshot
+   would otherwise leave the earlier database with a later tree (orphaned files, missing
+   references). With writers still stopped, extract `private.tar` into a fresh directory as
+   the application user and verify it exactly as the backup procedure's step 4 does (digest,
+   manifest, names, modes, ownership); then replace the contents of `<PERSISTENT_ROOT>/private`
+   with the verified tree (move the current tree aside, never delete it) before any release
+   is switched.
 3. Enter maintenance in the previous release before switching: `APP_MAINTENANCE_DRIVER=file`
    writes a release-local `storage/framework/maintenance.php`, and S1 shares only
    `storage/app/private` between releases, so switching the web unit to a release without
