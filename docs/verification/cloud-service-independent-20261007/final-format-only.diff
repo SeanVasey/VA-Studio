@@ -1,0 +1,17 @@
+diff --git a/bootstrap/app.php b/bootstrap/app.php
+index 1559d68..ad1074d 100644
+--- a/bootstrap/app.php
++++ b/bootstrap/app.php
+@@ -13 +12,0 @@ use App\Http\Middleware\TestExceptionResolutionPrivacy;
+-use App\Http\Responses\TestExceptionResolutionResponse;
+@@ -16,0 +16 @@ use App\Http\Responses\TestDeliveryResponse;
++use App\Http\Responses\TestExceptionResolutionResponse;
+diff --git a/routes/web.php b/routes/web.php
+index 2c79998..da743b2 100644
+--- a/routes/web.php
++++ b/routes/web.php
+@@ -10,0 +11 @@ use App\Http\Controllers\TestCheckoutController;
++use App\Http\Controllers\TestExceptionResolutionController;
+@@ -46 +47 @@ Route::withoutMiddleware(HandleInertiaRequests::class)->middleware(CustomerComme
+-    Route::get('/orders/{order}/exception-resolution', \App\Http\Controllers\TestExceptionResolutionController::class)->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.exception-resolution');
++    Route::get('/orders/{order}/exception-resolution', TestExceptionResolutionController::class)->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.exception-resolution');

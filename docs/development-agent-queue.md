@@ -2,17 +2,17 @@
 
 ## Active cloud ownership — October 7, 2026 UTC
 
-One integration owner `/root`; verified maincad70a7 includes PRs25–28.
+One integration owner `/root`; verified main3fb7dd0 includes PRs25–29.
 Historical owner tables below describe earlier source, not active workers.
 
 | Worker | Isolated boundary | Current handoff |
 | --- | --- | --- |
-| `/root` | Primary/shared registration/evidence/publication | Publish reviewed listening/inquiry composition; mount next export, identity, checkout and attachments after exact source review |
+| `/root` | Primary/shared registration/evidence/publication | PR29 merged; service7dc8bd8 authority/P2 repairs independently approved; freshpreflight next; notes capacity approved; mount next identity, checkout and attachments after review |
 | `/root/pr25_recovery` | New ProductionCheckout246000/provider adapter/private routes/tests | Immutable review→assent→payable order→provider initiation/reconciliation; qualified exemption first, provider-calculated tax next |
 | `/root/completion_audit` | ProductionIdentity247000/routes/UI/local SMTP proof | Immutable origin, mailbox challenge, recovery/credential fencing, typed principal; no synthetic-account adoption by email |
-| `/root/native_mysql` | ServiceProjects244000; source adapter then free origins245000 | Corrected migration/private-input denial under final review; next attachment source adapter, then explicit free-purpose assent/document/download |
-| `/root/pr26_review` | Independent service composition/canaries | Three original blockers now green on dccd15e; reconcile author final evidence and record final approval |
-| `/root/crawler_routes` | Listening notes/export/clear domain/UI/tests | Preserve V1, effect-only V2 notes, expected-version export and retained empty row on clear; root owns HTTP grammar/privacy/export route |
+| `/root/native_mysql` | ServiceProjects244000; source adapter then free origins245000 | Service7dc independently approved; adapterb209b85 has root actualSQLite/native1/8 approval; free245 implementation active |
+| `/root/pr26_review` | Independent service composition/canaries | Service follow-up approved in2ddb; native consent250/source review next; notes approved in fbe178ea |
+| `/root/crawler_routes` | Listening notes/export/clear domain/UI/tests | Notes capacity handoff complete; consent250 domain/schema/UI active, suppression251 follows |
 | `/root/recovery_inventory` | Private attachments249000/scanner/routes/UI/tests | Quarantine→scan→immutable manifest, owner/source current proof, download/retry/retention; approved listening review carry complete |
 
 Each worker has an isolated branch, independent autoload over unchanged locked

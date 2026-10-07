@@ -7,7 +7,7 @@ or Mac execution was used. The current branch is
 
 ## Current recovery state
 
-Verified maincad70a7 includes the immediate PR25/26/23 repairs. Starting-state
+Verified main3fb7dd0 includes the immediate PR25/26/23 repairs. Starting-state
 sections below are historical. Current owned work and source receipts are in
 the newest milestone and current agent queue.
 
@@ -222,3 +222,85 @@ export/clear and attachments249 advance independently. Service source adapter
 precedes distinct free-grant245, then membership/product delivery. No external
 message, live payment, entitlement import, deploy or full verification is claimed.
 Work continues without a new user prompt.
+
+## Fifth milestone: PR29 merged and service publication candidate
+
+PR29 merged expected head `85ebb0c36eb13def6c3f272a3905185d88fde1a3`
+as `3fb7dd05142e4539e2f0af17831d66a1544d0cb0` at03:01 America/Chicago,
+tree `00ae5a84254b1fe55913bc00c42016a9d39f7c10`. Fresh merged-state/tree/
+ordered-parent readbacks passed. Cheap preflight37590341640 and automatic
+code/security review on85ebb completed without findings. Original receipts,
+independent source review and default-off unbound notification boundary remain.
+
+Service final executable `13d7ae7896c1f3c43f8428e624e5731842072261`,
+tree `b917b4e0cbe647952d928f41abf837904eca1cb3`, is independently approved
+in review7769db35. Its exact author38105 schema/authority/quote/milestone/event
+and interface paths are retained; all29 owned paths map exactly. Independent
+original restart/composite-key/denial canaries now pass, plus actual native
+MFA/registration, CSRF and fresh migration retry on the graph containing242/243.
+Root shared50/422, mounted48, TypeScript, formatted boot2/32, scoped Pint and
+50 selector checks pass. One actual native service contention identity extends
+the registry158 with exact original150/prior157 order. Root's initial wrong
+filename, formatting failures and accidental sort failure are retained with
+corrected proof; no guards/assertions were weakened.
+
+The buyer can save a bound encrypted brief, review/accept/decline an explicit
+immutable staff quote, follow milestones, request bounded revisions and retain
+cancellation history. Scope acceptance does not collect money or grant delivery.
+Service publication/preflight remains pending here; fullT28 criteria stay open.
+Next service authority adapter unlocks attachment source writes; free245 follows.
+Listening notes/export/clear is composed and HTTP-tested but held for confirmed
+aggregateTEXT capacity repair and independent actual overflow proof. Checkout246,
+identity247/localSMTP, attachments249 and consent/preferences250 advance with
+separate ownership. Final Foundation/MySQL8.4/browser, actual legal/provider/
+content/hosting prerequisites and remaining paid product/member fulfillment are
+still open. No external activation or launch action occurred.
+
+## Sixth checkpoint: service review held, corrected authority pending review
+
+Main remains3fb7dd05142e4539e2f0af17831d66a1544d0cb0. PR30 published
+9d9680ed51fc3fb0c3c4afa8ac7c2e42b991d5f1 has cheap preflight37591585279,
+but two automatic P2 findings remain awaiting verified repair. Root8c7feaee
+fixes newest50 accessibility and fixed private diagnostic reporting (5/76).
+Independent actual native temporary-users shadow and actual SQLite MFA-provider
+callback each demonstrated unauthorized quote commits on predecessor13d7ae.
+That prior approval is superseded, not silently carried. Root62de352 captures
+permanent primary reads/refuses shadows and moves callbacks before final raw
+actor/graph proof (affected15/156; frontend7/typecheck). Original successor
+canaries and actual-source independent review precede one batched update.
+
+Notes/export/clear is now approved: rootaf87b702 plus independent fbe178ea
+retains original native overflow1406 and proves86,184-byte next envelope rejected
+with zero SQL writes, original64,800-byte/history preserved; V1 and empty clear
+fences pass. Root notes worktree nowfbe178ea; publication awaits corrected base.
+Service attachmentb209b85 repairs root-confirmed last-query flag withdrawal;
+root's original SQLite1/1 failure and native1/1 failure are preserved, successor
+SQLite1/8 passes, native retest remains active. Its held source is not in PR30.
+Checkout246, identity247/localSMTP, attachments249, consent250 and free245
+continue isolated code. Whole personal-store/member/product/migration/hosting
+preparation and final exact-SHA Foundation remain open; no cutover or activation.
+
+## Seventh checkpoint: service corrections approved for one publication update
+
+Final executable7dc8bd8028d6b4eb4a73cbc9b10e9b9402cec63e/treef5bca4c342de5b5a8742a51b7956b06d67ce6511
+has independent approval2ddb95e, now root docs-only20df473. The intermediate62de
+customer-resolver failure remains alongside both original13d actor failures;8188
+moves stamp/policy resolution before terminal raw proof. All three original
+regressions now pass actualnative3/13 with callbacks exercised and complete
+retained snapshots exact. SQLite2passed+one precise native skip/8, privacy2/10
+and50selector checks pass. Promoted feature cases and exact159th skip tuple are
+retained; original158 order and CI controls stay exact. Root affected10/66,
+frontend7/typecheck/finalPint also pass; overlap is not summed as acceptance.
+One freshPR30update/preflight/expected-headmerge follows. No service payment or
+delivery authority is introduced. Main remains3fb7dd0 until verified merge.
+
+Notes+repairedservice composition4d36fb2 passes affected21/289, mounted frontend
+andTypeScript; nativeoverflow proof carries unchanged exact notes sources. Root
+consent registration35712e1 +realHTTP16/171 passes, independent250review next.
+T23 frozen1d90a165 has a new root-confirmed temporary oldusers sign-in failure
+using actualSMTP-enrolled identity; originalSQLite1/5 failure retained, author
+repairs captured permanent read/write/reader identity before review. Attachments
+1914 is held for author-confirmed late decrypt/retained replay projection
+failures; successor work is underway. Serviceadapterroot approvalbe8a494 binds
+originalSQLite/native red-now-green1/8 each and15exactsourcebindings. Checkout,
+free,consent/suppression and remaining personal-store scope continue separately.

@@ -1,0 +1,13 @@
+
+> test
+> vitest run --maxWorkers=2 tests/frontend/service-project-journey.test.tsx
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-service-projects
+
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  07:36:43
+   Duration  1.32s (environment 55%, tests 32%, setup 7%, transform 5%, import 1%, worker 1%)
+

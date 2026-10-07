@@ -1,0 +1,3 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Test file "/workspace/VA-Studio-service-registration/tests/Feature/PublicDiscoveryTest.php" not found

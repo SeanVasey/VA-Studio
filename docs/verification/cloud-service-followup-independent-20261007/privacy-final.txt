@@ -1,0 +1,10 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/privacy-selection.xml
+
+..                                                                  2 / 2 (100%)
+
+Time: 00:00.187, Memory: 61.00 MB
+
+[30;42mOK (2 tests, 10 assertions)[0m

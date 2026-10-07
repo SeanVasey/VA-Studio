@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/privacy-selection.xml" tests="2" assertions="10" errors="0" failures="0" skipped="0" time="0.186516">
+    <testsuite name="Private middleware and logger failure" tests="2" assertions="10" errors="0" failures="0" skipped="0" time="0.186516">
+      <testsuite name="Tests\IndependentServiceFollowup\ServicePrivacyFailureCanaryTest" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/ServicePrivacyFailureCanaryTest.php" tests="2" assertions="10" errors="0" failures="0" skipped="0" time="0.186516">
+        <testcase name="test_middleware_exception_reports_only_fixed_class_and_returns_private_503" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/ServicePrivacyFailureCanaryTest.php" line="14" class="Tests\IndependentServiceFollowup\ServicePrivacyFailureCanaryTest" classname="Tests.IndependentServiceFollowup.ServicePrivacyFailureCanaryTest" assertions="5" time="0.171226"/>
+        <testcase name="test_logging_failure_preserves_the_same_private_response_without_exception_echo" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/ServicePrivacyFailureCanaryTest.php" line="27" class="Tests\IndependentServiceFollowup\ServicePrivacyFailureCanaryTest" classname="Tests.IndependentServiceFollowup.ServicePrivacyFailureCanaryTest" assertions="5" time="0.015290"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

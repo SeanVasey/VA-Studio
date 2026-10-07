@@ -1,0 +1,13 @@
+
+> test
+> vitest run tests/frontend/customer-account.test.tsx tests/frontend/cloud-listening-independent.test.tsx tests/frontend/service-project-journey.test.tsx
+
+
+ RUN  v5.0.1 /workspace/VA-Studio-service-registration
+
+
+ Test Files  3 passed (3)
+      Tests  48 passed (48)
+   Start at  07:59:07
+   Duration  3.39s (tests 46%, environment 28%, transform 14%, import 7%, setup 4%)
+

@@ -1,0 +1,16 @@
+{
+  "README.md": "f681c8cec749848e309146fc9588b7b71e1065ba675bc3646a2dbd15e9332326",
+  "authority-php.txt": "dfa55156f7a9cc1d294ce4a6fb432702e329915e65c2bf8ff0639c6b29090415",
+  "authority-php.xml": "02d0bf9cf70d447ecc17694f80835bd36ea1ad5194e77ca8377f85a5ce696d09",
+  "authority-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+  "final-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+  "final-root-php.txt": "4eba52f76f48afd7e99457d05de3f9ba4bfee22f9b395ae75d56015309d55191",
+  "final-root-php.xml": "6e2763b20d28e226b7c51014ca486db09578908425ab728c02c2f7cac553774c",
+  "final-selector.txt": "3697dedf515be1cf4560b6557ccc4766cfe7e7de05faa89129cd4b6969a5544d",
+  "frontend.txt": "97cf87780aa0c629e014dddb43f065fd1b02c4161483cdd77a3e8d2b464b302b",
+  "p2-php.txt": "9dedecb2b365414b0f0a3932adeb0244bc0272be418d7d801855815f4f0f4c11",
+  "p2-php.xml": "956dac7b93a295d68e2695971090f8fe247998e4076811439c69ae76b9d81502",
+  "p2-pint.txt": "23fa982cd96d0a3f97d3fd85ad846f3b0dddd166c65f6709bcd705fdd48d1d86",
+  "source-map.json": "1c4581bcab642d77047afd6f1b40cbd8679f8e7580f7244902a416fe0ac6ae5c",
+  "typecheck.txt": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f"
+}
