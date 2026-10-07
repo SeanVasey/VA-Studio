@@ -1,0 +1,18 @@
+{
+  "docs/verification/cloud-checkout-receipt-independent-20261007/README.md": "c31dda50ba456688fada804bf8364faa607531a94a9ad478ade8ada7bac44d3a",
+  "docs/verification/cloud-checkout-receipt-independent-20261007/author-artifact-map.json": "8f2cf6a1541f03068a65d8e410c10147d0994736c72239fafde59e8afd458c7f",
+  "docs/verification/cloud-checkout-receipt-independent-20261007/author-full-source-map.json": "91a2329dfc04b32f6b50e8a81e6e932343f3b8d19440a89723872a701283735c",
+  "docs/verification/cloud-checkout-receipt-independent-20261007/author-junit-reconciliation.json": "c2daf07bd6a932639f661f41d8b38164ab70f91c1490e4cf5df3f040b2915417",
+  "docs/verification/cloud-checkout-receipt-independent-20261007/author-original-red-command.json": "9b32027c2ea98faa93745af6a03db8777121db3a0bc2dbd72c69f87e9871bfee",
+  "docs/verification/cloud-checkout-receipt-independent-20261007/native-selection.xml": "c60433edb73f9dc4af45465f08aa890857da0559d6ab996e0b9f7150d3fd99ea",
+  "docs/verification/cloud-checkout-receipt-independent-20261007/own-autoload.txt": "f6efe6f82104747f3b4723b45d915c5e0a335946137e6c889cd4e2169228f265",
+  "docs/verification/cloud-checkout-receipt-independent-20261007/own-native.txt": "1ac6666e5a8bf576eed22680080d38751bb261ee112fda1510e3156d6335b575",
+  "docs/verification/cloud-checkout-receipt-independent-20261007/own-native.xml": "a7046743d2d4beb680e629d141725b66331aa04c87ab71e6912a94ac943799b4",
+  "docs/verification/cloud-checkout-receipt-independent-20261007/own-original-parent-snapshot.json": "45b9e1df5af3b473c46222dc9421511fcd2b37f05e7823b9f482a2a83b105a3d",
+  "docs/verification/cloud-checkout-receipt-independent-20261007/own-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+  "docs/verification/cloud-checkout-receipt-independent-20261007/own-sqlite.txt": "d6e561af45c2e3fc2bbbce368739b8fcf99194f710653d004a054d9202ba15b5",
+  "docs/verification/cloud-checkout-receipt-independent-20261007/own-sqlite.xml": "722179378e1a60eac63ff277bb115ba3cdedd1da1734fb4d0ecce2e42c8d79d6",
+  "docs/verification/cloud-checkout-receipt-independent-20261007/receipts.json": "a2a787d28b413ee6992946c8aaf64f958542938befed64c5d9f6572f6b25f982",
+  "docs/verification/cloud-checkout-receipt-independent-20261007/source-map.json": "25af7c8477081da043af06c82a41a4c7ddd056da6bb010513f26d83120b721b6",
+  "docs/verification/cloud-checkout-receipt-independent-20261007/sqlite-selection.xml": "29f91dbf7a88868e368faeb2f57f1be91ab42b017b79ae367bdd1a775cad75f9"
+}
