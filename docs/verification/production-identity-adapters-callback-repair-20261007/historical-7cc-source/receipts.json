@@ -1,0 +1,419 @@
+{
+  "source": "7ccf880d5af1e61b604c9dd9e27743fc7b1e5238",
+  "status": "historical source blocked by independently reproduced lazy-PDO terminal callback; no successor or approval carry",
+  "reviewer_original_red_commit": "a5dd8dcfe2d1e9df9232afb0e5f1b3573cf45760",
+  "reviewer_supplemental_native_commit": "1a2824a24633ce9ba97725e8dac3920a984d6455",
+  "final_checks_on_original_source": {
+    "final-native": {
+      "tests": 25,
+      "assertions": 146,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "source": "7ccf880d5af1e61b604c9dd9e27743fc7b1e5238",
+      "duration_seconds": 520.228958,
+      "methods": [
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ConfiguredIdentitySmtpTest",
+          "name": "test_actual_tls_auth_notice_creates_identity_only_after_received_mailbox_proof with data set #0",
+          "assertions": 10,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ConfiguredIdentitySmtpTest",
+          "name": "test_actual_tls_auth_notice_creates_identity_only_after_received_mailbox_proof with data set #1",
+          "assertions": 9,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ConfiguredIdentitySmtpTest",
+          "name": "test_tls_auth_and_data_failure_classification_is_retained_without_private_diagnostics with data set #0",
+          "assertions": 6,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ConfiguredIdentitySmtpTest",
+          "name": "test_tls_auth_and_data_failure_classification_is_retained_without_private_diagnostics with data set #1",
+          "assertions": 7,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ConfiguredIdentitySmtpTest",
+          "name": "test_tls_auth_and_data_failure_classification_is_retained_without_private_diagnostics with data set #2",
+          "assertions": 6,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ConfiguredIdentitySmtpTest",
+          "name": "test_tls_auth_and_data_failure_classification_is_retained_without_private_diagnostics with data set #3",
+          "assertions": 6,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ConfiguredIdentitySmtpTest",
+          "name": "test_tls_auth_and_data_failure_classification_is_retained_without_private_diagnostics with data set #4",
+          "assertions": 6,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ConfiguredIdentitySmtpTest",
+          "name": "test_settings_changes_get_new_capability_and_live_settings_never_execute_as_rehearsal",
+          "assertions": 6,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ConfiguredIdentitySmtpTest",
+          "name": "test_cleartext_external_alias_and_header_injection_settings_are_refused",
+          "assertions": 3,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionAccountFeatureAccessTest",
+          "name": "test_received_mailbox_identity_and_marker_bind_new_features_without_credential_or_owner_projection",
+          "assertions": 20,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionAccountFeatureAccessTest",
+          "name": "test_recovery_preserves_original_feature_act_but_an_old_session_cannot_remint_current_authority",
+          "assertions": 4,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionAccountFeatureAccessTest",
+          "name": "test_module_callbacks_cannot_commit_after_current_identity_or_feature_withdrawal with data set #0",
+          "assertions": 2,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionAccountFeatureAccessTest",
+          "name": "test_module_callbacks_cannot_commit_after_current_identity_or_feature_withdrawal with data set #1",
+          "assertions": 2,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionAccountFeatureAccessTest",
+          "name": "test_unbound_old_data_cross_feature_owner_and_provenance_bindings_are_refused",
+          "assertions": 6,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionAccountFeatureAccessTest",
+          "name": "test_default_off_missing_marker_unknown_feature_and_serialization_are_refused",
+          "assertions": 6,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+          "name": "test_committed_read_frame_is_read_only_one_use_and_fires_no_new_framework_commit_event",
+          "assertions": 11,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+          "name": "test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response with data set \"credential\"",
+          "assertions": 4,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+          "name": "test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response with data set \"actor\"",
+          "assertions": 4,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+          "name": "test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response with data set \"feature config\"",
+          "assertions": 4,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+          "name": "test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response with data set \"identity config\"",
+          "assertions": 4,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+          "name": "test_direct_commit_reopen_loses_physical_anchor_and_is_not_rolled_back_as_owned_work",
+          "assertions": 4,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+          "name": "test_foreign_reader_existing_or_nested_transaction_and_expired_original_deadline_are_refused",
+          "assertions": 6,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+          "name": "test_expiring_original_deadline_cannot_be_renewed_by_starting_final_proof",
+          "assertions": 3,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+          "name": "test_active_secondary_transaction_refuses_a_new_committed_frame",
+          "assertions": 2,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+          "name": "test_native_validation_reads_current_committed_credential_instead_of_an_old_repeatable_read_snapshot",
+          "assertions": 5,
+          "skip_reason": null
+        }
+      ]
+    },
+    "final-sqlite": {
+      "tests": 25,
+      "assertions": 163,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "source": "7ccf880d5af1e61b604c9dd9e27743fc7b1e5238",
+      "duration_seconds": 19.120957,
+      "methods": [
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ConfiguredIdentitySmtpTest",
+          "name": "test_actual_tls_auth_notice_creates_identity_only_after_received_mailbox_proof with data set #0",
+          "assertions": 10,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ConfiguredIdentitySmtpTest",
+          "name": "test_actual_tls_auth_notice_creates_identity_only_after_received_mailbox_proof with data set #1",
+          "assertions": 10,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ConfiguredIdentitySmtpTest",
+          "name": "test_tls_auth_and_data_failure_classification_is_retained_without_private_diagnostics with data set #0",
+          "assertions": 7,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ConfiguredIdentitySmtpTest",
+          "name": "test_tls_auth_and_data_failure_classification_is_retained_without_private_diagnostics with data set #1",
+          "assertions": 8,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ConfiguredIdentitySmtpTest",
+          "name": "test_tls_auth_and_data_failure_classification_is_retained_without_private_diagnostics with data set #2",
+          "assertions": 7,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ConfiguredIdentitySmtpTest",
+          "name": "test_tls_auth_and_data_failure_classification_is_retained_without_private_diagnostics with data set #3",
+          "assertions": 7,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ConfiguredIdentitySmtpTest",
+          "name": "test_tls_auth_and_data_failure_classification_is_retained_without_private_diagnostics with data set #4",
+          "assertions": 7,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ConfiguredIdentitySmtpTest",
+          "name": "test_settings_changes_get_new_capability_and_live_settings_never_execute_as_rehearsal",
+          "assertions": 7,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ConfiguredIdentitySmtpTest",
+          "name": "test_cleartext_external_alias_and_header_injection_settings_are_refused",
+          "assertions": 4,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionAccountFeatureAccessTest",
+          "name": "test_received_mailbox_identity_and_marker_bind_new_features_without_credential_or_owner_projection",
+          "assertions": 20,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionAccountFeatureAccessTest",
+          "name": "test_recovery_preserves_original_feature_act_but_an_old_session_cannot_remint_current_authority",
+          "assertions": 5,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionAccountFeatureAccessTest",
+          "name": "test_module_callbacks_cannot_commit_after_current_identity_or_feature_withdrawal with data set #0",
+          "assertions": 3,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionAccountFeatureAccessTest",
+          "name": "test_module_callbacks_cannot_commit_after_current_identity_or_feature_withdrawal with data set #1",
+          "assertions": 3,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionAccountFeatureAccessTest",
+          "name": "test_unbound_old_data_cross_feature_owner_and_provenance_bindings_are_refused",
+          "assertions": 7,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionAccountFeatureAccessTest",
+          "name": "test_default_off_missing_marker_unknown_feature_and_serialization_are_refused",
+          "assertions": 7,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+          "name": "test_committed_read_frame_is_read_only_one_use_and_fires_no_new_framework_commit_event",
+          "assertions": 11,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+          "name": "test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response with data set \"credential\"",
+          "assertions": 5,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+          "name": "test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response with data set \"actor\"",
+          "assertions": 5,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+          "name": "test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response with data set \"feature config\"",
+          "assertions": 5,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+          "name": "test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response with data set \"identity config\"",
+          "assertions": 5,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+          "name": "test_direct_commit_reopen_loses_physical_anchor_and_is_not_rolled_back_as_owned_work",
+          "assertions": 5,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+          "name": "test_foreign_reader_existing_or_nested_transaction_and_expired_original_deadline_are_refused",
+          "assertions": 7,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+          "name": "test_expiring_original_deadline_cannot_be_renewed_by_starting_final_proof",
+          "assertions": 4,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+          "name": "test_active_secondary_transaction_refuses_a_new_committed_frame",
+          "assertions": 3,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+          "name": "test_native_validation_reads_current_committed_credential_instead_of_an_old_repeatable_read_snapshot",
+          "assertions": 1,
+          "skip_reason": null
+        }
+      ]
+    },
+    "unchanged-runtime": {
+      "tests": 2,
+      "assertions": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "source": "7ccf880d5af1e61b604c9dd9e27743fc7b1e5238",
+      "duration_seconds": 2.130144,
+      "methods": [
+        {
+          "class": "Tests\\IndependentIdentity\\ProductionIdentityPermanentUserCanaryTest",
+          "name": "test_sign_in_observes_permanent_credential_withdrawal_and_refuses_a_temporary_old_user_copy",
+          "assertions": 5,
+          "skip_reason": null
+        },
+        {
+          "class": "Tests\\AuthorIdentityCanaries\\IdentityUnknownRoleCanaryTest",
+          "name": "test_unknown_permanent_role_flag_never_counts_as_nonstaff_customer_authority",
+          "assertions": 4,
+          "skip_reason": null
+        }
+      ]
+    }
+  },
+  "native_context": {
+    "version": "8.0.46-0ubuntu0.24.04.4",
+    "defaults": {
+      "isolation_level": "REPEATABLE-READ",
+      "read_only": 0
+    },
+    "active_author_connections": [
+      {
+        "ID": 1336,
+        "TIME": 22,
+        "STATE": "",
+        "COMMAND": "Sleep"
+      },
+      {
+        "ID": 1305,
+        "TIME": 113,
+        "STATE": "",
+        "COMMAND": "Sleep"
+      },
+      {
+        "ID": 1330,
+        "TIME": 45,
+        "STATE": "",
+        "COMMAND": "Sleep"
+      },
+      {
+        "ID": 1324,
+        "TIME": 67,
+        "STATE": "",
+        "COMMAND": "Sleep"
+      },
+      {
+        "ID": 1292,
+        "TIME": 161,
+        "STATE": "",
+        "COMMAND": "Sleep"
+      },
+      {
+        "ID": 1343,
+        "TIME": 0,
+        "STATE": "committing alter table to storage engine",
+        "COMMAND": "Execute"
+      },
+      {
+        "ID": 1319,
+        "TIME": 91,
+        "STATE": "",
+        "COMMAND": "Sleep"
+      }
+    ]
+  },
+  "artifacts_sha256": {
+    "pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "final-sqlite.xml": "20f9e7ded6e85b412ec53af357ca06ad0c5d58561bfbf44cf8ae4a4d8680870b",
+    "final-native.txt": "5a16df3db94c87d4b8c3059aab89893606ae8914b6101d6e130a30d9eea6df8a",
+    "native-runtime-context.json": "89b3e93d5deb1d712aab214c5fe5e6bc0812b1ec0cfb950d406cecde0fc1ff39",
+    "unchanged-runtime.txt": "de1ebb31d60bff288c324efb7d2f664ffd34eb93575c0906b95329796605667c",
+    "unchanged-runtime.xml": "f9fc455a1f0a3e13a5091b3f5ec4e5f5fb1a7fcd0a0dc43e0b2674b7dfede080",
+    "final-native.xml": "4450c06be2e65e22459b4d3b285a75073a24a220175858ddd8adf2789b3e88db",
+    "source-map.json": "b8498289eb2f14e67e254a63423e0a12199c379e3f245ded6d122021f2b9cf1c",
+    "final-sqlite.txt": "85565298c42d1a214c3141d836ca2a7b7da20ab96e924feccd5bd8081d7995a0",
+    "development/committed-sqlite-fixture-error.xml": "68581b0b9171228d7ed0f8003b73b3be7aabf47acfebff2e747cfd9e6ff04dc9",
+    "development/committed-native-unfrozen.xml": "9246456a7280ad3a53b14c08f173e3677714d3047d8273a0fb2a19635f3c8218",
+    "historical-5f-parent/adapter-sqlite.xml": "21f75cf1d92d090902cdb98812d7dac240591cf476b3baa4fedf2c5f17fc2c3a",
+    "historical-5f-parent/adapter-sqlite.txt": "7d113d682d89a4b28a8b88d32cd165016d445e518f2890cc8cdab497d88cb30c"
+  }
+}

@@ -1,0 +1,7 @@
+# Reviewed identity, SMTP and historical receipt composition
+
+Executable source519170f9e5541602577381f17fa39c366b8e608b composes the independently reviewed SMTPf5 binding and historical identitye8 successor on verified main36. The actual affected loopback SQLite selection passes6/93 with zero failures/errors/skips: ordinary positive and three terminal lazy connection modes, registered enrollment/recovery SMTP and two one-use historical siblings. No financial Source90 observer is included.
+
+Root verifies all8 historical source files plus5 unchanged101 dependencies,21 exact SMTP bindings,26 historical peer artifact hashes and50 author artifacts. The only changed member of the22-path SMTP source list is the approved additive ProductionCustomerAccess historical helper/reader union. Removing those additions recovers its complete preexisting f5 class byte-for-byte, including all old method bodies. `composition-binding.json` records those counts and `composed.txt`/`composed.xml` retain actual source-bound execution.
+
+Initial root byte-recovery verification omitted the new private parameter name and adjacent added comment, causing a verification-script assertion; no runtime changed. Correctly removing the declared approved additions proves the complete original class exact. Prior original callback failures, harness errors and interrupted native evidence remain separately preserved in author/peer records. Production SMTP credentials and transport stay unconfigured/default-off; native8.4 and final exact-SHA/browser acceptance remain pending.

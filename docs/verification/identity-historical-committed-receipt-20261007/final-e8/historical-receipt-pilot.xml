@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionIdentityAdapters\IdentityHistoricalCommittedReceiptTest" file="/workspace/VA-Studio-identity-historical-receipt/tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php" tests="1" assertions="2" errors="1" failures="0" skipped="0" time="0.771605">
+    <testcase name="test_actual_smtp_original_commit_has_two_one_use_plain_prefix_closures_without_new_transactions" file="/workspace/VA-Studio-identity-historical-receipt/tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php" line="42" class="Tests\Feature\ProductionIdentityAdapters\IdentityHistoricalCommittedReceiptTest" classname="Tests.Feature.ProductionIdentityAdapters.IdentityHistoricalCommittedReceiptTest" assertions="2" time="0.771605">
+      <error type="App\Domain\Customers\ProductionIdentity\IdentityException">Tests\Feature\ProductionIdentityAdapters\IdentityHistoricalCommittedReceiptTest::test_actual_smtp_original_commit_has_two_one_use_plain_prefix_closures_without_new_transactions
+App\Domain\Customers\ProductionIdentity\IdentityException: This customer identity request could not be confirmed.
+
+/workspace/VA-Studio-identity-historical-receipt/app/Domain/Customers/ProductionIdentity/IdentityOriginalCommitWitness.php:189
+/workspace/VA-Studio-identity-historical-receipt/app/Domain/Customers/ProductionIdentity/IdentityOriginalCommitWitness.php:47
+/workspace/VA-Studio-identity-historical-receipt/app/Domain/Customers/ProductionIdentity/IdentityOriginalCommitWitness.php:64
+/workspace/VA-Studio-identity-historical-receipt/tests/Support/IdentityHistoricalCommitFixture.php:41
+/workspace/VA-Studio-identity-historical-receipt/tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php:236
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-identity-historical-receipt/tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php:232
+/workspace/VA-Studio-identity-historical-receipt/tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php:52</error>
+    </testcase>
+  </testsuite>
+</testsuites>

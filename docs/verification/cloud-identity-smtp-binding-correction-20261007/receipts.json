@@ -1,0 +1,40 @@
+{
+  "source": "f5c7144ffc03859017335d696ce7322de3274247",
+  "tree": "ae5af354ebe210b0bd36954bc0365b5900de47f8",
+  "main_base": "760da5ac70a1082f13d87351a4446459e19947bb",
+  "prior_approved_adapter_source": "101e3832e8e5637cab784eb2a800d60642a746b4",
+  "prior_independent_approval": "5d53585fb3ea65c8a6f4162d8e71bd043caea538",
+  "original_binding_source": "5d035ff62a2cf3c885678cb0a9c459cee821e78a",
+  "original_binding_red": "5c2289ab1e7341a4b75d297b05e5c1f6f8e532f9",
+  "actual_original": "1FAIL/1assertion zeroerrors, callback1/credentialwithdrawal/reallocalTLS+AUTH+DATAacceptance",
+  "corrected": "22/182: unchangedoriginal1 +newbinding14 +oldregistered7, zeroerrors/failures/skips",
+  "native_carry": "one actual root implicitTLS registeredcomplete/login1/18 green on frozen5d; parentguard adds only earlyrefusal, earlier positive unchanged; final native correction proof pending if independently required",
+  "configured_credentials": false,
+  "external_messages": false,
+  "default": "settingsnull/enrollmentfalse/notificationsfalse; provider binding transient and endpoint construction fails closed",
+  "source_sha256": {
+    "app/Domain/Customers/ProductionIdentity/Notifications/IdentitySmtpFactory.php": "a294f78b62fa353eb1a80e1adacac8b93acae14aba0e7b5b5b8b6fd5db0e41b9",
+    "app/Domain/Customers/ProductionIdentity/Notifications/ConfigurationBoundIdentityTransport.php": "4c369241dde1ff5d4214434f284745b8d7ed53fb9488a03c8b72b397083dd454",
+    "config/production-identity-smtp.php": "75413404f81d57f54eb4c4d838c795c50a18a0b44cbb50e0d3363961df75b3f9",
+    "app/Providers/AppServiceProvider.php": "3af097c9efcf180e0540fc3d62053fab23f426dd765282e29a2209571819d4d0",
+    "tests/Feature/ProductionIdentitySmtpBindingTest.php": "e359ebcacd4da09b3ec10def4310455952d494c97a41ddb2da6fd792f0e6d3cf"
+  },
+  "probe_sha256": "e9ddc3ea6eb47d64605a767abe8a0fd67e25ed3ec6048c28828bcdf6bcbdd07d",
+  "final_independent_review": "pending",
+  "final_foundation_browser_native84": "deferred",
+  "artifact_sha256": {
+    "va-identity-smtp-binding.txt": "ccbc81ab73a5b5bdd663d10c09afa41a981e62c70d0d356918874582588416f4",
+    "original-NestedConfigurationCallbackCanaryTest.php.txt": "e9ddc3ea6eb47d64605a767abe8a0fd67e25ed3ec6048c28828bcdf6bcbdd07d",
+    "va-identity-smtp-binding-final-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "va-identity-smtp-binding-final.xml": "cc464cb3161686f1622a33dd74a724003079388e3507b5c3f372ea79d2e99da9",
+    "va-identity-adapters-registration-autoload.txt": "b25886faf8ef0f467ece55ff4f0bf6ad0a336537ac44df5014ebf21adab06978",
+    "va-identity-smtp-binding-final.txt": "e5ac61467dd98813d490e637ed0fe99f870212760dacda10428d4539438b6866",
+    "va-identity-smtp-binding-native.txt": "e9b3a7a749ff4394d759ed94098b8f2e88e39a0f263d6834bbe30f3ff9ad78e9",
+    "va-identity-smtp-binding-native.xml": "23ee246d230b5c7f285126f20c79986a60b4abbf250841094a36a3c1f41fe4c3",
+    "va-identity-smtp-parent-final.txt": "aa68fc5d8dc8244f2618e36584a7193b949e72611c73bcbc01524e5c4b998ecd",
+    "va-identity-smtp-parent-guard-pint.txt": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "va-identity-smtp-binding.xml": "1e98ff49486a71a33a8dbc9dd44accab47f0446ffe72c707b52a0c2c87091f27",
+    "corrected-nested-configuration-snapshot.json": "d2e317fe1298adc0433e5b92a6e43ec80cc8ca33f675a406b0b95aacdbeccf84",
+    "va-identity-smtp-parent-final.xml": "d6c4b7147af03a963e646d0b0239b220e53fff31f1fd50d54ab0634d1d5753b4"
+  }
+}

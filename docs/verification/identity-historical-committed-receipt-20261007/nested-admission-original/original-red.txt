@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-identity-historical-independent/docs/verification/cloud-identity-historical-independent-20261007/admission-probe-correction/sqlite-selection.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:00.924, Memory: 75.00 MB
+
+There was 1 failure:
+
+1) Tests\Canary\HistoricalNestedConfigurationAdmissionCanaryTest::test_original_closure_never_resolves_nested_configuration_callbacks
+Raw configuration parent lookup invoked an actual ArrayAccess callback after commit.
+Failed asserting that 60 is identical to 0.
+
+/workspace/VA-Studio-identity-historical-independent/docs/verification/cloud-identity-historical-independent-20261007/admission-probe-correction/HistoricalNestedConfigurationAdmissionCanaryTest.php:60
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 3[0m[37;41m, Failures: 1[0m[37;41m.[0m

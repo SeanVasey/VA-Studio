@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-identity-historical-independent/docs/verification/cloud-identity-historical-independent-20261007/admission-probe-correction/sqlite-selection.xml" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="0.908945">
+    <testsuite name="Bounded historical nested configuration callback" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="0.908945">
+      <testsuite name="Tests\Canary\HistoricalNestedConfigurationAdmissionCanaryTest" file="/workspace/VA-Studio-identity-historical-independent/docs/verification/cloud-identity-historical-independent-20261007/admission-probe-correction/HistoricalNestedConfigurationAdmissionCanaryTest.php" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="0.908945">
+        <testcase name="test_original_closure_never_resolves_nested_configuration_callbacks" file="/workspace/VA-Studio-identity-historical-independent/docs/verification/cloud-identity-historical-independent-20261007/admission-probe-correction/HistoricalNestedConfigurationAdmissionCanaryTest.php" line="21" class="Tests\Canary\HistoricalNestedConfigurationAdmissionCanaryTest" classname="Tests.Canary.HistoricalNestedConfigurationAdmissionCanaryTest" assertions="3" time="0.908945">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Canary\HistoricalNestedConfigurationAdmissionCanaryTest::test_original_closure_never_resolves_nested_configuration_callbacks
+Raw configuration parent lookup invoked an actual ArrayAccess callback after commit.
+Failed asserting that 60 is identical to 0.
+
+/workspace/VA-Studio-identity-historical-independent/docs/verification/cloud-identity-historical-independent-20261007/admission-probe-correction/HistoricalNestedConfigurationAdmissionCanaryTest.php:60
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,55 @@
+{
+  "decision": "APPROVED for focused development owned historical identity seam",
+  "reviewed_executable": "e8f744163600bb394e3f09c8c7f838f9fc62c885",
+  "reviewed_tree": "65856267483cffe1e17ded2a31d46654476df04c",
+  "author_docs_only_successor": "3cf11d745f51fdacdc72a3a222469403e795aed9",
+  "own_sqlite": {
+    "tests": 12,
+    "assertions": 55,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "own_native": {
+    "tests": 3,
+    "assertions": 19,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "engine": "MySQL8.0.46-0ubuntu0.24.04.4",
+    "schema": "vaseyaudio_service_review"
+  },
+  "author_source_bindings_verified": 8,
+  "author_unchanged_101_bindings_verified": 5,
+  "author_artifacts_verified": 50,
+  "author_current_sqlite": {
+    "recorded": 23,
+    "executed": 22,
+    "assertions": 110,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1
+  },
+  "author_historical_native": {
+    "source": "dc17abcd3a60a0c47bd1247b52f239caede912c4",
+    "runtime": "e6c02b90719923bc4ba435f86399b077980c1ddc",
+    "tests": 5,
+    "assertions": 24,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "scope": "Retained positive/getter/custom-statement/raw-reopen/nonlocking evidence on exact older source; SQL/plain-reader/receipt bodies unchanged in e8, only pure witness parent admission/constructor order changes. Not an author e8 native execution."
+  },
+  "original_artifacts_verified_unchanged": 25,
+  "original_probes": {
+    "getter": "7d88a4a133952595c60234b53ebdfe7650381e0dbde5f40ae85510029cd46d34",
+    "original_nested": "c02f3d96d679793ff37cdf5588023a6744e05c2643ba59f90a8e3525d7cbb7fa",
+    "admission_aware_nested": "3de75325f858953b2927026703dc1d006eb7005d2e62c1ef210e2f812ddd79e2"
+  },
+  "snapshot_binding_note": "Exact original nested probe embeds dc17 historical source string; authoritative executed source is e8 current source hashes and command/JUnit ledger. Native snapshot safely refuses capture with callback0/fixture9123/PDOidle.",
+  "limits": [
+    "Default off owned API only; producer/consumer registration and complete financial physical observer are separate review boundaries.",
+    "Historical identity prefix is neither current customer authority nor payment/grant/legal buyer evidence.",
+    "No fullFoundation/native8.4/browser/activation/external delivery claim or zero-skip waiver."
+  ]
+}

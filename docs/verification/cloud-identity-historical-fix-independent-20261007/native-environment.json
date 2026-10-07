@@ -1,0 +1,6 @@
+{
+    "version": "8.0.46-0ubuntu0.24.04.4",
+    "schema_name": "vaseyaudio_service_review",
+    "foreign_keys": 1,
+    "sql_mode": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
+}

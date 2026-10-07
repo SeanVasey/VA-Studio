@@ -1,0 +1,45 @@
+{
+  "decision": "HELD: genuine terminal nested configuration callback",
+  "actual_tested_executable": "5d035ff62a2cf3c885678cb0a9c459cee821e78a",
+  "tree": "99da75afac7a47ed1ad1539a490598120158e955",
+  "approved_owned_adapter_source": "101e3832e8e5637cab784eb2a800d60642a746b4",
+  "root_new_paths": 5,
+  "owned_source_carry": 17,
+  "independent_actual": {
+    "final-sqlite.xml": {
+      "tests": 12,
+      "assertions": 57,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "original-nested-config.xml": {
+      "tests": 1,
+      "assertions": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "pint": "passed",
+  "canary_sha256": "e9ddc3ea6eb47d64605a767abe8a0fd67e25ed3ec6048c28828bcdf6bcbdd07d",
+  "observed": {
+    "source": "5d035ff62a2cf3c885678cb0a9c459cee821e78a",
+    "callback_count": 1,
+    "raw_credentials_withdrawn": true,
+    "refused": false,
+    "smtp_acceptance_returned": true,
+    "actual_tls": true,
+    "actual_authenticated": true,
+    "actual_smtp_data_received": true
+  },
+  "required_repair": "Require actual raw array SMTP/app parents before any nested terminal lookup; unchanged canary must pass exact frozen successor.",
+  "commands": {
+    "environment": "APP_ENV=testing and explicit synthetic APP_KEY; existing rootless activation; literal loopback network permission only",
+    "runner": "own copied composer metadata/autoload, 158 locked packages; direct phpunit entrypoint with own _composer_autoload_path",
+    "positive": "-c sqlite-selection.xml --log-junit final-sqlite.xml",
+    "canary": "-c sqlite-canary.xml --log-junit original-nested-config.xml",
+    "pint": "--test five root paths plus own canary; canary formatted before execution"
+  },
+  "no_shared_edits_or_external_delivery": true
+}

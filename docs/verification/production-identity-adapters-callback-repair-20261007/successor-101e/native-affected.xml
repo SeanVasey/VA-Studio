@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="4" assertions="35" errors="0" failures="0" skipped="0" time="105.594656">
+    <testsuite name="Tests\Feature\ProductionIdentityAdapters\ProductionAccountFeatureAccessTest" file="/workspace/VA-Studio-production-identity-adapters-repair/tests/Feature/ProductionIdentityAdapters/ProductionAccountFeatureAccessTest.php" tests="3" assertions="24" errors="0" failures="0" skipped="0" time="68.107278">
+      <testsuite name="Tests\Feature\ProductionIdentityAdapters\ProductionAccountFeatureAccessTest::test_ordinary_terminal_connection_admission_precedes_policy_and_preserves_normal_rollback" tests="3" assertions="24" errors="0" failures="0" skipped="0" time="68.107278">
+        <testcase name="test_ordinary_terminal_connection_admission_precedes_policy_and_preserves_normal_rollback with data set #0" file="/workspace/VA-Studio-production-identity-adapters-repair/tests/Feature/ProductionIdentityAdapters/ProductionAccountFeatureAccessTest.php" line="146" class="Tests\Feature\ProductionIdentityAdapters\ProductionAccountFeatureAccessTest" classname="Tests.Feature.ProductionIdentityAdapters.ProductionAccountFeatureAccessTest" assertions="9" time="28.853303"/>
+        <testcase name="test_ordinary_terminal_connection_admission_precedes_policy_and_preserves_normal_rollback with data set #1" file="/workspace/VA-Studio-production-identity-adapters-repair/tests/Feature/ProductionIdentityAdapters/ProductionAccountFeatureAccessTest.php" line="146" class="Tests\Feature\ProductionIdentityAdapters\ProductionAccountFeatureAccessTest" classname="Tests.Feature.ProductionIdentityAdapters.ProductionAccountFeatureAccessTest" assertions="8" time="19.354073"/>
+        <testcase name="test_ordinary_terminal_connection_admission_precedes_policy_and_preserves_normal_rollback with data set #2" file="/workspace/VA-Studio-production-identity-adapters-repair/tests/Feature/ProductionIdentityAdapters/ProductionAccountFeatureAccessTest.php" line="146" class="Tests\Feature\ProductionIdentityAdapters\ProductionAccountFeatureAccessTest" classname="Tests.Feature.ProductionIdentityAdapters.ProductionAccountFeatureAccessTest" assertions="7" time="19.899902"/>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest" file="/workspace/VA-Studio-production-identity-adapters-repair/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php" tests="1" assertions="11" errors="0" failures="0" skipped="0" time="37.487378">
+      <testcase name="test_committed_read_frame_is_read_only_one_use_and_fires_no_new_framework_commit_event" file="/workspace/VA-Studio-production-identity-adapters-repair/tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php" line="70" class="Tests\Feature\ProductionIdentityAdapters\ProductionIdentityCommittedFrameTest" classname="Tests.Feature.ProductionIdentityAdapters.ProductionIdentityCommittedFrameTest" assertions="11" time="37.487378"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

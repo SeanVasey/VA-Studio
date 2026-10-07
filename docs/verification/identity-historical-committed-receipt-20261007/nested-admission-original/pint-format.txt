@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"docs\/verification\/cloud-identity-historical-independent-20261007\/admission-probe-correction\/HistoricalNestedConfigurationAdmissionCanaryTest.php","fixers":["statement_indentation"]}]}

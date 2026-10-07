@@ -1,0 +1,23 @@
+{
+  "historical8": {
+    "verified_unchanged": 13,
+    "expected_additive_delta": []
+  },
+  "smtp22": {
+    "verified_unchanged": 21,
+    "expected_additive_delta": [
+      "app/Domain/Customers/ProductionCustomerAccess.php"
+    ]
+  },
+  "peer26": {
+    "verified_unchanged": 26,
+    "expected_additive_delta": []
+  },
+  "author50": {
+    "verified_unchanged": 50,
+    "expected_additive_delta": []
+  },
+  "production_customer_access_original_bodies": "Exact f5 class after removing one added import/two typed helpers/private parameter union/new helper comment.",
+  "source": "519170f9e5541602577381f17fa39c366b8e608b",
+  "actual_sqlite": "6/93,zero failures/errors/skips; ordinary positive+three terminal lazy resolutions+registered enrollment/recovery SMTP+historical sibling receipts"
+}

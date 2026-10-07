@@ -1,0 +1,9 @@
+{
+  "composition_head": "b16b6e814f9ce97f19f907713c45f1d32cf499b4",
+  "main37": "899df195a4c7b74b1cccb26bf48b0cae920037b9",
+  "approved_executable": "519170f9e5541602577381f17fa39c366b8e608b",
+  "independent_composition_review": "34cd180037874a21a1a4b511f0d9b038511493ed",
+  "verified_current_source_bindings": 30,
+  "shared_effect": "Incoming support request/error mounts match private-support only; existing identity route/error hooks and SMTP bindings retain their reviewed bytes. No new identity authority or SMTP configuration.",
+  "execution_carry": "Root6/93 on51917; all30 currentsource hashes unchanged. Earlier independent TLS/native receipts retain their original source; no duplicate matrix."
+}
