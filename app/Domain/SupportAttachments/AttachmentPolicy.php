@@ -6,10 +6,17 @@ namespace App\Domain\SupportAttachments;
 interface AttachmentPolicy
 {
     public function commitment(): array;
+
+    /** Callback-free configuration/clock assertions; no framework queries, network, or caller callbacks. */
     public function assertCurrent(array $sourceBinding): void;
+
     public function maxBytes(): int;
+
     public function maxFiles(): int;
+
     public function lifetimeSeconds(): int;
+
     public function allowsMime(string $mime): bool;
+
     public function allowsScanEngine(string $engine): bool;
 }
