@@ -1,0 +1,16 @@
+{
+  "scope": "docs-only finish/handoff, no new operative Billing/host runtime",
+  "membership_parent_head": "7fa3c62e61fae6e98e61e75eb0451edd588683d0",
+  "membership_runtime": "3cd105667a76bb15443a9fd0119065effda8bb34",
+  "member_originals_head": "fb573a410cda76dd97884e81bc8e15437831a9ae",
+  "member_originals_runtime": "c4cd6d9355257a39d2740b0a4fe55c3e376ef5b3",
+  "new_statement_independent_review": "pending",
+  "billing_schema_reserved": 259000,
+  "billing_runtime_implemented": false,
+  "host_ops_runtime_implemented": false,
+  "files": {
+    "docs/handoff/production-membership-billing-259-20261007.md": "fa338d3f73679424ae667319939e636837e58dbf48d0f955994d909acce77b11",
+    "docs/handoff/production-operations-readiness-20261007.md": "a86cacd8da386d4ae3630f05b9f42c808cf1408f2adac23009129df4fb024ffb",
+    "docs/handoff/recovery-inventory-claude-code-20261007.md": "4dfa8c8d94ee6f2e2aa2a8b8d2120e37160a15b50143abbecc73bb901e248960"
+  }
+}

@@ -1,0 +1,18 @@
+# Queued production operations readiness
+
+This is a source-backed planning handoff. No production operations preflight tool, deployment manifest, backup/restore acceptance or host approval packet was implemented in this lane before Sean's finish-current-batches instruction. Existing development checks/fixtures do not establish a production host. No deployment/new environment/provisioning/DNS/credentials/live money was changed.
+
+Recorded local facts: PHP8.4.26 and Node24.19.0 via existing `/workspace/.va-studio-toolchain/activate.sh`; actual isolated native tests on MySQL8.0.46. `clamscan`/`mysqld` were not on that activation's PATH; that is only an observation, not proof that binaries or a scanner daemon are absent. MySQL exists under the previously provisioned toolchain; independent scanner receipts belong to their exact existing owner sources. Vendor packages remain locked/shared with isolated generated metadata. Preserve original vendor/cache/keys/evidence/source and never capture private `.env` contents in reports.
+
+Read actual source/contracts before authoring the next executable dry-run packet:
+
+- `docs/architecture/security-operations.md`: target controls, not deployed facts.
+- `docs/media-processing.md`: private quarantine/scanner/worker prerequisites and approved asset separation.
+- `docs/migration/cutover_runbook.md` and `docs/work-packages/WP-14-cutover-and-postlaunch-reconciliation.md`: actual source/URL/obligation inventories and explicit release gates.
+- Exact current session/request/committed-read/private consumer receipts, plus scheduled publication/queue configuration and root's current default-off production adapters.
+
+The next bounded tool should inventory only authorized source and supplied approved host facts without printing secrets, then produce an explicit unavailable/unknown/verified manifest. It must not infer production readiness from installed packages or development flags. Packet needs exact deployed source/tool versions, canonical origin/DNS/domain facts, current session/cookie/CSRF/private cache policy, private storage roots/permissions/encryption/stream policy, scanner engine/definitions/isolation and real clean/infected/error limits, separate public media/master roles, bounded queue/scheduler ownership/retry/expiry, audit/log redaction, encrypted backup/retention/restore verification, deploy rollback against preserved immutable schema/history and observation/alerting operators.
+
+Run a real private synthetic backup→restore→verification dry run in `/workspace` only after owning its disposable fixture lifecycle. No real customer exports or production DB dump are authorized by this handoff. Database/software provenance, executed time/digest, before/after rows and rollback outcome must be bound to exact source; SQLite does not stand in for native contention or host durability. No auto-relabel of synthetic/visitor/test provenance. Current captured actor/provider/storage policy must remain valid after callback work and actual commit; irreversible cleanup uses its reviewed durable authorization rules, not a refreshed revoked actor.
+
+Actual host/storage/scanner/provider/mail/queue/scheduler/backup/restore facts, production credentials/account bindings, original membership/paid/free terms, final URL/DNS inventory and remaining historical obligations are still unavailable or separate human/provider gates. Root coordinates crawler/email readiness, pr25 payment/tax/account capability and native storage/DB ownership. Final complete verification belongs to the exact integrated reviewed candidate, with Sean's CI cost policy preserved; do not dispatch routine hosted matrices from these planning branches.
