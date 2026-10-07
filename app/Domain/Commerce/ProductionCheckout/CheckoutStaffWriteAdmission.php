@@ -42,7 +42,8 @@ final class CheckoutStaffWriteAdmission implements CheckoutCommitAdmission
     public static function basis(Records $rows, User $qualifier, array $staff, User $buyer, array $identity, array $current,
         array $selection, array $authority, array $policy, array $attestation, array $record, string $requestKey): self
     {
-        [$frame, $plans] = self::open($rows, $qualifier, $staff, [$policy['effective_until'], $attestation['effective_until']]);
+        $until = [$policy['effective_until'], $attestation['effective_until'], ...self::licenseUntil($selection)];
+        [$frame, $plans] = self::open($rows, $qualifier, $staff, $until);
         $plans->actor($buyer);
         $plans->identity($identity);
         $plans->selection($selection);
@@ -76,6 +77,38 @@ final class CheckoutStaffWriteAdmission implements CheckoutCommitAdmission
             && Container::getInstance() === $this->container
             && ($instances['config'] ?? null) === $this->configuration && $aliases === $this->aliases
             && ($policy['exemption_authoring_enabled'] ?? null) === true && in_array($this->ownerId, $owners, true), 'authority', 403);
+    }
+
+    /**
+     * Non-null effective_until of every active selected offer's current license, built exactly as
+     * CheckoutIntentAdmission does: an expiring license leaves its rows byte-identical, so only the
+     * original deadline cap can refuse a commit after the selection stopped being effective.
+     */
+    private static function licenseUntil(array $selection): array
+    {
+        $until = [];
+        foreach ($selection['graph']['offers'] as $offer) {
+            if ((string) $offer['is_active'] !== '1') {
+                continue;
+            }
+            $revision = self::one($selection['graph']['revisions'], $offer['current_revision_id']);
+            $license = self::one($selection['graph']['licenses'], $revision['license_version_id']);
+            if ($license['effective_until'] !== null) {
+                $until[] = $license['effective_until'];
+            }
+        }
+
+        return $until;
+    }
+
+    private static function one(array $rows, int $id): array
+    {
+        foreach ($rows as $row) {
+            if ($row['id'] === $id) {
+                return $row;
+            }
+        }
+        CheckoutException::require(false);
     }
 
     /** @return array{0: CheckoutCommandFrame, 1: CheckoutRawPlans} */

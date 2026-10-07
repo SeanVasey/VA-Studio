@@ -270,6 +270,33 @@ class ProductionCheckoutWriteAdmissionAllTest extends TestCase
         $this->assertStaffRestored($catalog['actor']->id, $column, $original);
     }
 
+    public function test_new_basis_admission_is_capped_at_the_selected_license_expiry(): void
+    {
+        // The only selected license expires shortly after qualify() seals its admission. Its rows stay
+        // byte-identical, so only the original deadline cap can refuse the commit once it has expired.
+        $until = CarbonImmutable::now('UTC')->addMinutes(10)->startOfSecond();
+        $catalog = F::catalog($until->format('Y-m-d\TH:i:s\Z'));
+        $buyer = $this->enrollThroughLocalSmtp();
+        $authority = app(ApproveExemptionAuthority::class)->approve($catalog['candidate']->id, F::exemptionPolicy($catalog), 'synthetic-owner-policy', $catalog['actor']);
+        $slept = false;
+        app('events')->listen(TransactionCommitting::class, function () use (&$slept): void {
+            if (! $slept && DB::connection()->getEventDispatcher() instanceof CheckoutCommandCommitDispatcher) {
+                $slept = true;
+                // Real monotonic time passes the license expiry inside the same physical commit.
+                usleep(2_500_000);
+            }
+        });
+        CarbonImmutable::setTestNow($until->subMilliseconds(1500));
+        try {
+            $this->assertRefused('write_frame', fn () => $this->qualify($catalog, $buyer, $authority, 'synthetic-qualified-buyer'));
+        } finally {
+            CarbonImmutable::setTestNow();
+        }
+        $this->assertTrue($slept);
+        $this->assertDatabaseCount(CheckoutSchema::TABLES['basis'], 0);
+        $this->assertFalse(DB::connection()->getRawPdo()->inTransaction());
+    }
+
     public function test_staff_replays_install_no_observer_and_positive_caller_write_survives(): void
     {
         $catalog = F::catalog();

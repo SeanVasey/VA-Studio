@@ -207,3 +207,34 @@ README's "left untracked" wording) is corrected above; A1-2 and A1-3 record why 
 `proveFresh()` test and the pinned `write_frame` reasons cannot pass by accident. F-5, F-6
 and F-7 remain open items, not conditions.
 
+
+## 4c. Codex P2 r4209950553: NEW-basis deadline ignored the selected license expiry
+
+**Finding.** `CheckoutStaffWriteAdmission::basis()` capped the frame deadline only at the policy and attestation `effective_until`. A selected license that expires while `qualify()` is still running leaves its rows byte-identical, so the raw plans passed. The immutable basis then committed after its selection had stopped being effective. `CheckoutIntentAdmission` already folds in every active selected offer's license `effective_until`.
+
+**Fix (this commit).**
+
+- `basis()` now builds `$until` from the policy and attestation `effective_until`, plus a private `licenseUntil($selection)`. That helper walks the same `$selection['graph']` loop as `CheckoutIntentAdmission`: active offer, then current revision, then license, keeping each non-null `effective_until`.
+- `authority()` is unchanged; it has no selection.
+- No c6 file and no `CheckoutIntentAdmission` change.
+- `tests/Support/ProductionCheckoutFixtures::catalog()` gains an optional `$licenseUntil` that passes through to the existing `ProductionTrackPreparationFixtures::prepared(licenseUntil:)`. The default is unchanged.
+
+**Regression.** `test_new_basis_admission_is_capped_at_the_selected_license_expiry` in `tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php`:
+
+1. The only selected license is published with `effective_until = now + 10 min`.
+2. The test clock is frozen 1.5 s before that expiry, so `qualify()` sees an effective selection.
+3. A committing listener sleeps 2.5 s of real monotonic time inside the physical commit.
+
+The test requires a `CheckoutException` with reason `write_frame` (`CheckoutCommandFrame::prove()` refuses once `hrtime` passes the capped deadline), 0 basis rows, and no open PDO transaction.
+
+**Runs (SQLite), in `conditions/codex-license-expiry/`:**
+
+| Run | Source | Result |
+| --- | --- | --- |
+| `red/regression` | app tree of `9f3f1115` (unchanged; `red/app-state.txt`) plus the new test | exit 1, 1 test, 2 assertions, **1 failure**: "A withdrawn NEW checkout write was admitted" (the basis committed) |
+| `green/regression` | the fix | exit 0, 1 test, 6 assertions |
+| `green/ProductionCheckoutWriteAdmissionAllTest` | the fix | 18 tests, 102 assertions, green |
+| `green/ProductionCheckoutExemptionAuthorityTest` | the fix | 11 tests, 50 assertions, green |
+| `green/ProductionCheckoutJourneyTest` | the fix | 7 tests, 81 assertions, green |
+
+Pint passes on the three changed PHP files. No native run was made for this item.
