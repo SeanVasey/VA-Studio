@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/sqlite-selection.xml" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="0.587884">
+    <testsuite name="Independent service physical authority shadow" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="0.587884">
+      <testsuite name="Tests\IndependentServiceFollowup\ServiceAuthorityShadowCanaryTest" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/ServiceAuthorityShadowCanaryTest.php" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="0.587884">
+        <testcase name="test_real_mfa_provider_callback_cannot_withdraw_enrollment_after_the_verified_user_read" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/ServiceAuthorityShadowCanaryTest.php" line="84" class="Tests\IndependentServiceFollowup\ServiceAuthorityShadowCanaryTest" classname="Tests.IndependentServiceFollowup.ServiceAuthorityShadowCanaryTest" assertions="3" time="0.587884">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\IndependentServiceFollowup\ServiceAuthorityShadowCanaryTest::test_real_mfa_provider_callback_cannot_withdraw_enrollment_after_the_verified_user_read
+The MFA provider must run before the final current user proof; its stored enrollment withdrawal cannot follow verified authority.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/ServiceAuthorityShadowCanaryTest.php:135
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

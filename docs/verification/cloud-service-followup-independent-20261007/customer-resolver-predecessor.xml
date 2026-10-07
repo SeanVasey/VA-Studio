@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/customer-resolver-sqlite.xml" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="0.510639">
+    <testsuite name="Genuine customer credential-stamp resolver" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="0.510639">
+      <testsuite name="Tests\IndependentServiceFollowup\ServiceCustomerResolverCanaryTest" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/ServiceCustomerResolverCanaryTest.php" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="0.510639">
+        <testcase name="test_real_customer_access_resolver_cannot_withdraw_credentials_after_final_physical_user_proof" file="/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/ServiceCustomerResolverCanaryTest.php" line="19" class="Tests\IndependentServiceFollowup\ServiceCustomerResolverCanaryTest" classname="Tests.IndependentServiceFollowup.ServiceCustomerResolverCanaryTest" assertions="3" time="0.510639">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\IndependentServiceFollowup\ServiceCustomerResolverCanaryTest::test_real_customer_access_resolver_cannot_withdraw_credentials_after_final_physical_user_proof
+Resolving the credential-stamp service must precede the final permanent user proof.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/ServiceCustomerResolverCanaryTest.php:55
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

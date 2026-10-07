@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"tests\/Feature\/ServiceProjectCurrentAuthorityTest.php","fixers":["class_definition","unary_operator_spaces","braces_position","not_operator_with_successor_space","ordered_imports"]}]}

@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/customer-resolver-sqlite.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:00.512, Memory: 77.00 MB
+
+There was 1 failure:
+
+1) Tests\IndependentServiceFollowup\ServiceCustomerResolverCanaryTest::test_real_customer_access_resolver_cannot_withdraw_credentials_after_final_physical_user_proof
+Resolving the credential-stamp service must precede the final permanent user proof.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/ServiceCustomerResolverCanaryTest.php:55
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 3[0m[37;41m, Failures: 1[0m[37;41m.[0m

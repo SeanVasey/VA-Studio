@@ -1,0 +1,10 @@
+{
+    "tested_source": "62de352163c25630530cd2467f1cef1461f8b56f",
+    "driver": "sqlite",
+    "genuine_customer_access_resolver_fired": true,
+    "acceptance_audit_created": true,
+    "command_refused": false,
+    "retained_rows_exact": false,
+    "prior_service_event_count": 1,
+    "final_service_event_count": 2
+}

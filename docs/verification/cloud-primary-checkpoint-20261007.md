@@ -279,3 +279,28 @@ SQLite1/8 passes, native retest remains active. Its held source is not in PR30.
 Checkout246, identity247/localSMTP, attachments249, consent250 and free245
 continue isolated code. Whole personal-store/member/product/migration/hosting
 preparation and final exact-SHA Foundation remain open; no cutover or activation.
+
+## Seventh checkpoint: service corrections approved for one publication update
+
+Final executable7dc8bd8028d6b4eb4a73cbc9b10e9b9402cec63e/treef5bca4c342de5b5a8742a51b7956b06d67ce6511
+has independent approval2ddb95e, now root docs-only20df473. The intermediate62de
+customer-resolver failure remains alongside both original13d actor failures;8188
+moves stamp/policy resolution before terminal raw proof. All three original
+regressions now pass actualnative3/13 with callbacks exercised and complete
+retained snapshots exact. SQLite2passed+one precise native skip/8, privacy2/10
+and50selector checks pass. Promoted feature cases and exact159th skip tuple are
+retained; original158 order and CI controls stay exact. Root affected10/66,
+frontend7/typecheck/finalPint also pass; overlap is not summed as acceptance.
+One freshPR30update/preflight/expected-headmerge follows. No service payment or
+delivery authority is introduced. Main remains3fb7dd0 until verified merge.
+
+Notes+repairedservice composition4d36fb2 passes affected21/289, mounted frontend
+andTypeScript; nativeoverflow proof carries unchanged exact notes sources. Root
+consent registration35712e1 +realHTTP16/171 passes, independent250review next.
+T23 frozen1d90a165 has a new root-confirmed temporary oldusers sign-in failure
+using actualSMTP-enrolled identity; originalSQLite1/5 failure retained, author
+repairs captured permanent read/write/reader identity before review. Attachments
+1914 is held for author-confirmed late decrypt/retained replay projection
+failures; successor work is underway. Serviceadapterroot approvalbe8a494 binds
+originalSQLite/native red-now-green1/8 each and15exactsourcebindings. Checkout,
+free,consent/suppression and remaining personal-store scope continue separately.

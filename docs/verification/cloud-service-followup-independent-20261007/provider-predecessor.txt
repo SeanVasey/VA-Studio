@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/sqlite-selection.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:00.589, Memory: 77.00 MB
+
+There was 1 failure:
+
+1) Tests\IndependentServiceFollowup\ServiceAuthorityShadowCanaryTest::test_real_mfa_provider_callback_cannot_withdraw_enrollment_after_the_verified_user_read
+The MFA provider must run before the final current user proof; its stored enrollment withdrawal cannot follow verified authority.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-service-independent/docs/verification/cloud-service-followup-independent-20261007/ServiceAuthorityShadowCanaryTest.php:135
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 3[0m[37;41m, Failures: 1[0m[37;41m.[0m

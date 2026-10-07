@@ -29,3 +29,18 @@ and npm run typecheck. Both PHP selections use isolated SQLite; they do not prov
 MySQL concurrency. Independent actual native shadow and provider successor review
 remain required before publication. No Foundation dispatch, dependency change,
 production configuration, payment, external message or deployment occurred.
+
+## Final repaired authority approval
+
+Independent approval now binds7dc8bd8028d6b4eb4a73cbc9b10e9b9402cec63e,
+treef5bca4c342de5b5a8742a51b7956b06d67ce6511, identical to tested e9cae388.
+8188af0 moves actual CustomerAccess stamp and both policy resolutions before
+terminal physical proof after an actual intermediate62de resolver failure.
+The three original independent regressions now pass actual native3/13 with
+complete snapshots preserved; SQLite2pass+one precise native skip/8. Fixed-class
+middleware/logger2/10 and50selectorchecks pass. Both promoted test files and
+the exact159th SQLite exception are part of normal source; all prior158 tuples
+retain their original order. Root8188 journey/P2 cases10/66 and final7PHP Pint
+plus50selectorchecks pass. These source-bound results overlap earlier runs.
+All21 independent source bindings and46 tracked independent artifacts verify
+on this docs-only descendant. Fresh final-head cheap preflight is next.

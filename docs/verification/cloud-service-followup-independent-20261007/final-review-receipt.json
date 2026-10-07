@@ -1,0 +1,412 @@
+{
+  "decision": "Approved focused development integration; prior13d approval superseded by confirmed failures and final repaired actual regressions",
+  "approved_source": "7dc8bd8028d6b4eb4a73cbc9b10e9b9402cec63e",
+  "approved_tree": "f5bca4c342de5b5a8742a51b7956b06d67ce6511",
+  "independently_tested_source": "e9cae388dae632b235c1f05870fd9930a12f56aa",
+  "independently_tested_tree": "f5bca4c342de5b5a8742a51b7956b06d67ce6511",
+  "source_repair": "8188af0f6ef83a787a7579741d9fd1da2b3fd1d2",
+  "runtime_tree": "503fc7a104d15e73a482bc2f99228fe31db9593b",
+  "promoted_test_commit": "e9cae388dae632b235c1f05870fd9930a12f56aa",
+  "superseded_approval": "13d7ae7896c1f3c43f8428e624e5731842072261",
+  "original_tested_checkout": "d2b1b4ee30b7a17f0e7695ea7e60f40f91a902af (review-docs-only successor; original13 runtime byte-exact)",
+  "source": {
+    "app/Domain/Services/Projects/ServiceProjects.php": {
+      "git_blob": "9e9d156070a67d5570d32c69f8ccee82abc9514b",
+      "sha256": "b02ca51607f5e11cee4e019507d131b908b16b2e631194f3e8f04c1e629ab529",
+      "approved_and_tested_identical": true
+    },
+    "app/Domain/Services/Projects/ServiceProjectRows.php": {
+      "git_blob": "11bd9da1707818c158a4d815d7a6dd55f397348a",
+      "sha256": "677a2e089f40254119b1e9c10051189bd2311c10fc016519fdad5c94f2277470",
+      "approved_and_tested_identical": true
+    },
+    "app/Http/Controllers/ServiceProjectController.php": {
+      "git_blob": "fbc70a415bb4d3675d13daaec400ad9eabf3d784",
+      "sha256": "71ad053d97c7252558188e031d8af7ac5a36ab2ccaccd3aec7321129197127b8",
+      "approved_and_tested_identical": true
+    },
+    "app/Http/Middleware/ServiceProjectPrivacy.php": {
+      "git_blob": "b8d778a687f6414cc9833ccbc94010b1e570853b",
+      "sha256": "13898baa0c0cf9e73a09055ec6396926ee00c7ab1e7252c8d4d5f85522f7efc3",
+      "approved_and_tested_identical": true
+    },
+    "resources/js/components/services/ServiceProjectJourney.tsx": {
+      "git_blob": "f68ffc8083d44a4a65fa107852f5f1c1721410cf",
+      "sha256": "1a1fdd08cd481dcdb1f81c32421fd00932aad99e0dc181824eecc2386892f764",
+      "approved_and_tested_identical": true
+    },
+    "tests/Feature/ServiceProjectReviewRegressionTest.php": {
+      "git_blob": "3bce05effba31fb15e268cb4d08174c693b03596",
+      "sha256": "a5a1420426a9f75936453637fb30a79936e4eb5bb057198ead59ce675d77d169",
+      "approved_and_tested_identical": true
+    },
+    "tests/Feature/ServiceProjectCurrentAuthorityTest.php": {
+      "git_blob": "6a5b666b038046dc066d5d6e25113f5798c65d55",
+      "sha256": "54b31fe1867ddf5d793e404d795fe0204bedb8fd1c2cbc40633a5416b9eb1878",
+      "approved_and_tested_identical": true
+    },
+    "tests/Feature/ServiceProjectCredentialResolverTest.php": {
+      "git_blob": "49c01121ae4b909c806383c2774adcbc47ef91e1",
+      "sha256": "0636916b14ccede687f3a38a5e7a256a934f07c5b11a41055a5a068fb7adc785",
+      "approved_and_tested_identical": true
+    },
+    "scripts/ci/database-sqlite-skips.json": {
+      "git_blob": "c50ad8e90f4b366e535aca498ae0fa193e36ac6d",
+      "sha256": "a7a5fc7de840a37e786c3e4c7c9d00406289e65c3e1b1bee7319046d97bd271a",
+      "approved_and_tested_identical": true
+    },
+    "composer.lock": {
+      "git_blob": "9e58027dcd989282b026d56347e26ea867723db9",
+      "sha256": "8318cb2dd022e5614af4d551bb86231707a18485311478dd4b51a57ee108eeb9",
+      "approved_and_tested_identical": true
+    },
+    "package-lock.json": {
+      "git_blob": "614350366e7af397c14603dae9272082ecfae066",
+      "sha256": "6407d3a63e3b6e04f5824f53c41b8dc8a33581f987b21d780c795480122f93ea",
+      "approved_and_tested_identical": true
+    },
+    "app/Domain/Services/Projects/ServiceProjectSchema.php": {
+      "git_blob": "2e1b90e8222fd2ad789acb2deb79d5a98d63a3d0",
+      "sha256": "e11600099cfaffedc9b0b5b96e1081d1a8ad635dc4891d0cd33cbf3679a0bba0",
+      "approved_and_tested_identical": true
+    },
+    "database/migrations/2026_10_07_244000_service_projects.php": {
+      "git_blob": "af9d99e0d8e6aa69cc29e7e33ab94c6fdfb449ad",
+      "sha256": "eb1a5beb518ae7c50c2f4f852231d6bb0c2b98cf80cb8ae8eb3d0d73b81757f8",
+      "approved_and_tested_identical": true
+    },
+    "app/Domain/Services/Projects/ServiceProjectInput.php": {
+      "git_blob": "4e3b1428854ac7185e29e7abdeecdb91f4ffaf88",
+      "sha256": "890c372f8f08b75570948fd7827caeb5f0d7ad52368aafe407d511c78f2b8a3d",
+      "approved_and_tested_identical": true
+    },
+    "app/Domain/Services/Projects/ServiceProjectJson.php": {
+      "git_blob": "cdd77ce54c7d9bee96f467491128b8dde4c34d64",
+      "sha256": "c69871f6a6a6524b81a7c8b7c1567ba822ce8fdf47d1fb0fcfb78bef99a5167c",
+      "approved_and_tested_identical": true
+    },
+    "app/Domain/Services/Projects/ServiceProjectPolicy.php": {
+      "git_blob": "d531e06712de758a66313ae6c6c444e2bcfe34b5",
+      "sha256": "6c63197b8f213277431cbba23cc04b27ee52713a9d31cc279fec61a3e065cea7",
+      "approved_and_tested_identical": true
+    },
+    "app/Domain/Services/Projects/Models/ServiceProject.php": {
+      "git_blob": "eb33653676d77f132943bea4e0e097f01e588fc2",
+      "sha256": "e4ca06bc02739092c400e6c96f16d98a66d1d4562cf1a5822cc5e427c11a8388",
+      "approved_and_tested_identical": true
+    },
+    "app/Domain/Services/Projects/Models/ServiceProjectEvent.php": {
+      "git_blob": "7d14707eef0d703afa00780bb5d74798b01c7eab",
+      "sha256": "467e5bc3121564d3d670c94b54c7db79885712e7ad4af0435912698402136de4",
+      "approved_and_tested_identical": true
+    },
+    "tests/Support/ServiceProjectFixtures.php": {
+      "git_blob": "b8d8e4a96e74104af9e9b6596934640c6e97ff33",
+      "sha256": "86b5ed7ab50a90a2c3b1c543f70167f6697cbaed810311ffdbe093c333da777f",
+      "approved_and_tested_identical": true
+    },
+    "app/Domain/Customers/CustomerAccess.php": {
+      "git_blob": "310bb10219405110a3db5a5844132c42d0291887",
+      "sha256": "cb59745ecbdea2a9cedce51be535d428f2e1a3613829547716e9633fbff061bd",
+      "approved_and_tested_identical": true
+    },
+    "app/Support/Access/AdminMultiFactor.php": {
+      "git_blob": "db0367fc9ee1fd1e1c81c1b0ed6ab174a758e6a5",
+      "sha256": "dc83e64ae86754c6ac2a6b64cb420e687d5ecaf4f5d87225060d021597681710",
+      "approved_and_tested_identical": true
+    }
+  },
+  "unchanged_original_schema_input_models_dependency_and_native_worker_proof": {
+    "composer.lock": {
+      "original_blob": "9e58027dcd989282b026d56347e26ea867723db9",
+      "approved_blob": "9e58027dcd989282b026d56347e26ea867723db9",
+      "byte_identical": true
+    },
+    "package-lock.json": {
+      "original_blob": "614350366e7af397c14603dae9272082ecfae066",
+      "approved_blob": "614350366e7af397c14603dae9272082ecfae066",
+      "byte_identical": true
+    },
+    "app/Domain/Services/Projects/ServiceProjectSchema.php": {
+      "original_blob": "2e1b90e8222fd2ad789acb2deb79d5a98d63a3d0",
+      "approved_blob": "2e1b90e8222fd2ad789acb2deb79d5a98d63a3d0",
+      "byte_identical": true
+    },
+    "database/migrations/2026_10_07_244000_service_projects.php": {
+      "original_blob": "af9d99e0d8e6aa69cc29e7e33ab94c6fdfb449ad",
+      "approved_blob": "af9d99e0d8e6aa69cc29e7e33ab94c6fdfb449ad",
+      "byte_identical": true
+    },
+    "app/Domain/Services/Projects/ServiceProjectInput.php": {
+      "original_blob": "4e3b1428854ac7185e29e7abdeecdb91f4ffaf88",
+      "approved_blob": "4e3b1428854ac7185e29e7abdeecdb91f4ffaf88",
+      "byte_identical": true
+    },
+    "app/Domain/Services/Projects/ServiceProjectJson.php": {
+      "original_blob": "cdd77ce54c7d9bee96f467491128b8dde4c34d64",
+      "approved_blob": "cdd77ce54c7d9bee96f467491128b8dde4c34d64",
+      "byte_identical": true
+    },
+    "app/Domain/Services/Projects/ServiceProjectPolicy.php": {
+      "original_blob": "d531e06712de758a66313ae6c6c444e2bcfe34b5",
+      "approved_blob": "d531e06712de758a66313ae6c6c444e2bcfe34b5",
+      "byte_identical": true
+    },
+    "app/Domain/Services/Projects/Models/ServiceProject.php": {
+      "original_blob": "eb33653676d77f132943bea4e0e097f01e588fc2",
+      "approved_blob": "eb33653676d77f132943bea4e0e097f01e588fc2",
+      "byte_identical": true
+    },
+    "app/Domain/Services/Projects/Models/ServiceProjectEvent.php": {
+      "original_blob": "7d14707eef0d703afa00780bb5d74798b01c7eab",
+      "approved_blob": "7d14707eef0d703afa00780bb5d74798b01c7eab",
+      "byte_identical": true
+    },
+    "tests/Support/ServiceProjectFixtures.php": {
+      "original_blob": "b8d8e4a96e74104af9e9b6596934640c6e97ff33",
+      "approved_blob": "b8d8e4a96e74104af9e9b6596934640c6e97ff33",
+      "byte_identical": true
+    },
+    "app/Domain/Customers/CustomerAccess.php": {
+      "original_blob": "310bb10219405110a3db5a5844132c42d0291887",
+      "approved_blob": "310bb10219405110a3db5a5844132c42d0291887",
+      "byte_identical": true
+    },
+    "app/Support/Access/AdminMultiFactor.php": {
+      "original_blob": "db0367fc9ee1fd1e1c81c1b0ed6ab174a758e6a5",
+      "approved_blob": "db0367fc9ee1fd1e1c81c1b0ed6ab174a758e6a5",
+      "byte_identical": true
+    }
+  },
+  "independent_junit": {
+    "customer-resolver-predecessor.xml": {
+      "tests": "1",
+      "assertions": "3",
+      "errors": "0",
+      "failures": "1",
+      "skipped": "0",
+      "time": "0.510639"
+    },
+    "final-native.xml": {
+      "tests": "3",
+      "assertions": "13",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "41.531573"
+    },
+    "final-sqlite.xml": {
+      "tests": "3",
+      "assertions": "8",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "1",
+      "time": "0.857241"
+    },
+    "native-authority-successor.xml": {
+      "tests": "2",
+      "assertions": "9",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "32.558574"
+    },
+    "native-shadow-predecessor.xml": {
+      "tests": "1",
+      "assertions": "4",
+      "errors": "0",
+      "failures": "1",
+      "skipped": "0",
+      "time": "22.415050"
+    },
+    "privacy-final.xml": {
+      "tests": "2",
+      "assertions": "10",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "0.186516"
+    },
+    "provider-predecessor.xml": {
+      "tests": "1",
+      "assertions": "3",
+      "errors": "0",
+      "failures": "1",
+      "skipped": "0",
+      "time": "0.587884"
+    }
+  },
+  "independent_probes": {
+    "customer-resolver-predecessor-probe.json": {
+      "tested_source": "62de352163c25630530cd2467f1cef1461f8b56f",
+      "driver": "sqlite",
+      "genuine_customer_access_resolver_fired": true,
+      "acceptance_audit_created": true,
+      "command_refused": false,
+      "retained_rows_exact": false,
+      "prior_service_event_count": 1,
+      "final_service_event_count": 2
+    },
+    "final-native-customer-resolver-probe.json": {
+      "tested_source": "e9cae388dae632b235c1f05870fd9930a12f56aa",
+      "driver": "mysql",
+      "genuine_customer_access_resolver_fired": true,
+      "acceptance_audit_created": true,
+      "command_refused": true,
+      "retained_rows_exact": true,
+      "prior_service_event_count": 1,
+      "final_service_event_count": 1
+    },
+    "final-native-provider-probe.json": {
+      "tested_source": "e9cae388dae632b235c1f05870fd9930a12f56aa",
+      "driver": "mysql",
+      "genuine_provider_callback_fired": true,
+      "quote_audit_was_created": true,
+      "command_refused": true,
+      "retained_rows_exact": true,
+      "service_event_count": 0
+    },
+    "final-native-shadow-probe.json": {
+      "tested_source": "e9cae388dae632b235c1f05870fd9930a12f56aa",
+      "server": "8.0.46-0ubuntu0.24.04.4",
+      "real_callback_fired": true,
+      "temporary_users_copy_created": true,
+      "command_refused": true,
+      "permanent_user_mfa_after": "retained",
+      "retained_rows_exact": true,
+      "service_event_count": 0
+    },
+    "final-sqlite-customer-resolver-probe.json": {
+      "tested_source": "e9cae388dae632b235c1f05870fd9930a12f56aa",
+      "driver": "sqlite",
+      "genuine_customer_access_resolver_fired": true,
+      "acceptance_audit_created": true,
+      "command_refused": true,
+      "retained_rows_exact": true,
+      "prior_service_event_count": 1,
+      "final_service_event_count": 1
+    },
+    "final-sqlite-provider-probe.json": {
+      "tested_source": "e9cae388dae632b235c1f05870fd9930a12f56aa",
+      "driver": "sqlite",
+      "genuine_provider_callback_fired": true,
+      "quote_audit_was_created": true,
+      "command_refused": true,
+      "retained_rows_exact": true,
+      "service_event_count": 0
+    },
+    "native-provider-successor-probe.json": {
+      "tested_source": "62de352163c25630530cd2467f1cef1461f8b56f",
+      "driver": "mysql",
+      "genuine_provider_callback_fired": true,
+      "quote_audit_was_created": true,
+      "command_refused": true,
+      "retained_rows_exact": true,
+      "service_event_count": 0
+    },
+    "native-shadow-predecessor-probe.json": {
+      "tested_source": "13d7ae7896c1f3c43f8428e624e5731842072261",
+      "server": "8.0.46-0ubuntu0.24.04.4",
+      "real_callback_fired": true,
+      "temporary_users_copy_created": true,
+      "command_refused": false,
+      "permanent_user_mfa_after": "withdrawn",
+      "retained_rows_exact": false,
+      "service_event_count": 1
+    },
+    "native-shadow-successor-probe.json": {
+      "tested_source": "62de352163c25630530cd2467f1cef1461f8b56f",
+      "server": "8.0.46-0ubuntu0.24.04.4",
+      "real_callback_fired": true,
+      "temporary_users_copy_created": true,
+      "command_refused": true,
+      "permanent_user_mfa_after": "retained",
+      "retained_rows_exact": true,
+      "service_event_count": 0
+    },
+    "provider-predecessor-probe.json": {
+      "tested_source": "13d7ae7896c1f3c43f8428e624e5731842072261",
+      "driver": "sqlite",
+      "genuine_provider_callback_fired": true,
+      "quote_audit_was_created": true,
+      "command_refused": false,
+      "retained_rows_exact": false,
+      "service_event_count": 1
+    }
+  },
+  "native_skip_registry": {
+    "old_count": 158,
+    "new_count": 159,
+    "entire_previous_prefix_preserved": true,
+    "added_method": [
+      "Tests\\Feature\\ServiceProjectCurrentAuthorityTest",
+      "test_temporary_users_copy_cannot_mask_permanent_required_mfa_withdrawal_after_real_audit_callback"
+    ],
+    "selector_checks": 50,
+    "selector_passed": true
+  },
+  "native_engine": {
+    "server": "8.0.46-0ubuntu0.24.04.4",
+    "php": "8.4.26",
+    "isolated_schema": "vaseyaudio_service_review",
+    "target8_4_not_executed": true
+  },
+  "root_attribution": {
+    "8c_p2_plus_http": {
+      "cases": 5,
+      "assertions": 76,
+      "passed": true
+    },
+    "62de_journey_http_registration_p2": {
+      "cases": 15,
+      "assertions": 156,
+      "passed": true
+    },
+    "8188_journey_p2": {
+      "cases": 10,
+      "assertions": 66,
+      "passed": true
+    },
+    "frontend_cases": 7,
+    "frontend_and_typecheck_carry": "Reported root; unchanged controller/privacy/UI seams only, no complete matrix claim",
+    "7dc_scoped_pint_files": 7,
+    "7dc_scoped_pint_passed": true,
+    "7dc_selector_checks": 50,
+    "7dc_selector_passed": true
+  },
+  "promotion_changes": [
+    "Normal Tests\\Feature namespaces and class names",
+    "Native-only SQLite skip precisely appended",
+    "Optional structured proof output conditional when envpath unset",
+    "Pint formatting before final execution; refusal/callback/full-row assertions retained"
+  ],
+  "commands": {
+    "runner": [
+      "php",
+      "-r",
+      "$GLOBALS[\"_composer_autoload_path\"] = getcwd().\"/vendor/autoload.php\"; require \"vendor/phpunit/phpunit/phpunit\";",
+      "--"
+    ],
+    "final_native_config": "docs/verification/cloud-service-followup-independent-20261007/promoted-mysql-selection.xml",
+    "final_sqlite_config": "docs/verification/cloud-service-followup-independent-20261007/promoted-sqlite-selection.xml",
+    "privacy_config": "docs/verification/cloud-service-followup-independent-20261007/privacy-selection.xml",
+    "selector": [
+      "python3",
+      "scripts/ci/test-focused-tests.py"
+    ],
+    "pint": [
+      "php",
+      "vendor/laravel/pint/builds/pint",
+      "tests/Feature/ServiceProjectCurrentAuthorityTest.php",
+      "tests/Feature/ServiceProjectCredentialResolverTest.php"
+    ],
+    "environment": "Rootless activate.sh; native private service_review-task.env plus additional loopback network permission. SERVICE_FOLLOWUP_SOURCE=e9... and distinct optional structured-probe paths."
+  },
+  "harness_tool_note": "Initial Pint invocation through nonexistent own vendor/bin/pint returned255; standalone locked vendor/laravel/pint/builds/pint corrected this before promoted source freeze/testing. No application or assertion repair involved.",
+  "limits": [
+    "No new vulnerability exploration beyond authorized existing actual regressions after root8188 freeze",
+    "No repeated full native schema sweep or worker race; unaffected owned DDL/dependency/native concurrency proof carried by exact source",
+    "Focused overlapping selections, not full Foundation/browser/device/8.4/production acceptance",
+    "No reviewer runtime/UI/source repair, provider, push, merge or hostedCI action"
+  ]
+}
