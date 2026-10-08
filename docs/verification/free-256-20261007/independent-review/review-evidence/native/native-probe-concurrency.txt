@@ -1,0 +1,12 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256/phpunit.xml
+
+PROBE race: cap violations=0 [{"round":0,"scenario":"cap1-free","cap":1,"origins":1,"outcomes":[{"refused":"refused_by_guard"},{"ok":"2398e8da-7af8-4447-b50f-fa587770d74b"}]},{"round":1,"scenario":"cap1-held","cap":1,"origins":1,"outcomes":[{"ok":"abf1d3be-c8a7-4039-80bb-9c27537a9f8a"},{"refused":"refused_by_guard"}]},{"round":2,"scenario":"cap1-free","cap":1,"origins":1,"outcomes":[{"ok":"6aa6640a-2fb6-4e49-9edf-fefd23e2ec59"},{"refused":"refused_by_guard"}]},{"round":3,"scenario":"cap1-held","cap":1,"origins":1,"outcomes":[{"ok":"d37b80d9-772e-48e5-bca8-1f53398b0535"},{"refused":"refused_by_guard"}]},{"round":4,"scenario":"cap1-free","cap":1,"origins":1,"outcomes":[{"refused":"refused_by_guard"},{"ok":"f29474b6-299d-489e-9e73-169d436b0ddf"}]},{"round":5,"scenario":"cap1-held","cap":1,"origins":1,"outcomes":[{"ok":"46285777-42fd-4baa-a312-48c89ac15034"},{"refused":"refused_by_guard"}]},{"round":6,"scenario":"cap2-free","cap":2,"origins":2,"outcomes":[{"ok":"8074220d-99e0-47e0-9a5e-89f2947c4ab4"},{"ok":"02dca9b1-238b-48a6-a7dc-0b8d07bcdf86"}]},{"round":7,"scenario":"cap2-held","cap":2,"origins":2,"outcomes":[{"ok":"a0b4acc3-4169-46d7-9f6a-96155e01b1cd"},{"ok":"1fdb99ae-35d3-40a4-9885-6f89bd7ad14c"}]},{"round":8,"scenario":"cap2-free","cap":2,"origins":2,"outcomes":[{"ok":"03f209e5-8d1f-422d-8a9b-24d8097e186d"},{"ok":"f03f4b2c-58a9-42bc-b15b-90be650ace68"}]},{"round":9,"scenario":"cap2-held","cap":2,"origins":2,"outcomes":[{"ok":"c3e782ed-4884-4d27-a8c3-cc6eb4d451e0"},{"ok":"f1893a37-c53f-4195-a867-b27aeed29124"}]},{"scenario":"render-race","outcomes":[{"refused":"claim_in_progress"},{"ok":"complete"}],"work":["claimed"],"originals":1},{"scenario":"redemption-race","attempts":[{"outcomes":[{"ok":"streamed:49"},{"refused":"refused_by_guard"}],"redemptions":1},{"outcomes":[{"refused":"refused_by_guard"},{"ok":"streamed:49"}],"redemptions":1},{"outcomes":[{"refused":"refused_by_guard"},{"ok":"streamed:49"}],"redemptions":1}]}]
+.                                                                   1 / 1 (100%)
+
+Time: 12:00.565, Memory: 81.00 MB
+
+OK (1 test, 30 assertions)
+rc=0

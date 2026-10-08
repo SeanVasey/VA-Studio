@@ -1,0 +1,10 @@
+$ ln -s <out>/target.pdf root/original.pdf; echo data > root/tmp.bin
+$ php: link(root/tmp.bin, root/original.pdf) with a dangling destination symlink
+bool(false)
+bool(false)
+$ php: link() onto a free name, then again onto the now-existing name
+bool(true)
+bool(false)
+total 8
+1974695 -rw-r--r-- 2 root root 5 Oct  8 06:53 original.pdf
+1974695 -rw-r--r-- 2 root root 5 Oct  8 06:53 tmp.bin

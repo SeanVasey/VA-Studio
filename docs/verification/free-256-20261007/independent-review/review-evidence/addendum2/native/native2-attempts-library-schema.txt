@@ -1,0 +1,39 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b/phpunit.xml
+
+..E.                                                                4 / 4 (100%)
+
+Time: 06:51.222, Memory: 91.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantLibraryWindowTest::test_the_newest_origins_are_listed_when_the_account_holds_more_than_the_scan_cap
+Illuminate\Database\QueryException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'sql FROM sqlite_master WHERE type = 'trigger' AND tbl_name = ? ORDER BY rowid' at line 1 (Connection: mysql, Host: 127.0.0.1, Port: 3731, Database: rv256b, SQL: SELECT name, sql FROM sqlite_master WHERE type = 'trigger' AND tbl_name = production_free_origins ORDER BY rowid)
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:426
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantLibraryWindowTest.php:56
+/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantLibraryWindowTest.php:44
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+Caused by
+PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'sql FROM sqlite_master WHERE type = 'trigger' AND tbl_name = ? ORDER BY rowid' at line 1
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:435
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:846
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:426
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantLibraryWindowTest.php:56
+/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantLibraryWindowTest.php:44
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 4, Assertions: 82, Errors: 1.
+rc=2

@@ -1,0 +1,13 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b/phpunit.xml
+
+PROBE default_off.migration: with enabled=false the migration installed 9 tables + 27 triggers, 0 rows; down() refuses: Production free grant originals require an explicit retention migration.
+.PROBE default_off: 14 entry points x 5 conditions all refused with the exact reason; shipped enabled=false provenance=null approved=[]; an already-redeemed transfer streamed 759094 bytes after disable
+.                                                                  2 / 2 (100%)
+
+Time: 00:03.734, Memory: 89.00 MB
+
+OK (2 tests, 83 assertions)
+rc=0

@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b/phpunit.xml
+
+......F...                                                        10 / 10 (100%)
+
+Time: 23:21.653, Memory: 99.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantStalledSourceTest::test_a_stalled_source_is_refused_at_once_and_releases_its_slot_and_reservation
+Failed asserting that 5665906280 is less than 5000000000.
+
+/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantStalledSourceTest.php:60
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 10, Assertions: 83, Failures: 1.
+rc=1

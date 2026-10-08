@@ -1,0 +1,122 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256/phpunit.xml
+
+EEEEEEEEE........................                                 33 / 33 (100%)
+
+Time: 01:07.023, Memory: 119.00 MB
+
+There were 9 errors:
+
+1) Tests\Feature\RightsEvidenceGuardMigrationTest::test_additive_install_retry_and_operational_rollback_preserve_exact_historical_rows_audits_and_protection
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:159
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:159
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 0 with data (0)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 1 with data (1)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 2 with data (2)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 3 with data (3)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 4 with data (4)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+7) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 5 with data (5)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+8) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 6 with data (6)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+9) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 7 with data (7)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-free256/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-free256/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 33, Assertions: 93, Errors: 9.
+rc=2

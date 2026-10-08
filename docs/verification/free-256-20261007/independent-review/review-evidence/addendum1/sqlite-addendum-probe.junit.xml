@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\ReviewProbes\Free256\Addendum1\AddendumProbeTest" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum1/probes/AddendumProbeTest.php" tests="2" assertions="14" errors="0" failures="0" skipped="0" time="5.902346">
+    <testcase name="test_spool_crash_residue_cross_process_leases_and_aggregate_space" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum1/probes/AddendumProbeTest.php" line="39" class="Tests\ReviewProbes\Free256\Addendum1\AddendumProbeTest" classname="Tests.ReviewProbes.Free256.Addendum1.AddendumProbeTest" assertions="8" time="3.801754"/>
+    <testcase name="test_render_attempt_budget_and_previous_key_forging_power" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum1/probes/AddendumProbeTest.php" line="100" class="Tests\ReviewProbes\Free256\Addendum1\AddendumProbeTest" classname="Tests.ReviewProbes.Free256.Addendum1.AddendumProbeTest" assertions="6" time="2.100592"/>
+  </testsuite>
+</testsuites>

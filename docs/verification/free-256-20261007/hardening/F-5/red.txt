@@ -1,0 +1,21 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-free256h/phpunit.xml
+
+[41;37mF[0m..                                                                 3 / 3 (100%)
+
+Time: 00:02.780, Memory: 83.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantFilesTest::test_a_dangling_symlink_at_the_original_path_creates_nothing_outside_the_root
+The store created a file at the symlink target.
+Failed asserting that true is false.
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFilesTest.php:39
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 3[0m[37;41m, Assertions: 16[0m[37;41m, Failures: 1[0m[37;41m.[0m
+rc=1

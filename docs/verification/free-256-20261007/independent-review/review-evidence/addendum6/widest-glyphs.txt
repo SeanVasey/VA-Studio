@@ -1,0 +1,107 @@
+{
+    "admissible": 3847,
+    "widest_per_byte": [
+        {
+            "cp": "U+0040",
+            "width": 1000,
+            "bytes": 1,
+            "per_byte": 1000
+        },
+        {
+            "cp": "U+0057",
+            "width": 989,
+            "bytes": 1,
+            "per_byte": 989
+        },
+        {
+            "cp": "U+006D",
+            "width": 974,
+            "bytes": 1,
+            "per_byte": 974
+        },
+        {
+            "cp": "U+0025",
+            "width": 950,
+            "bytes": 1,
+            "per_byte": 950
+        },
+        {
+            "cp": "U+004D",
+            "width": 863,
+            "bytes": 1,
+            "per_byte": 863
+        },
+        {
+            "cp": "U+0023",
+            "width": 838,
+            "bytes": 1,
+            "per_byte": 838
+        },
+        {
+            "cp": "U+002B",
+            "width": 838,
+            "bytes": 1,
+            "per_byte": 838
+        },
+        {
+            "cp": "U+003C",
+            "width": 838,
+            "bytes": 1,
+            "per_byte": 838
+        }
+    ],
+    "widest": [
+        {
+            "cp": "U+2031",
+            "width": 1735,
+            "bytes": 3,
+            "per_byte": 578.3
+        },
+        {
+            "cp": "U+1F634",
+            "width": 1604,
+            "bytes": 4,
+            "per_byte": 401
+        },
+        {
+            "cp": "U+2328",
+            "width": 1443,
+            "bytes": 3,
+            "per_byte": 481
+        },
+        {
+            "cp": "U+27F5",
+            "width": 1434,
+            "bytes": 3,
+            "per_byte": 478
+        },
+        {
+            "cp": "U+27F6",
+            "width": 1434,
+            "bytes": 3,
+            "per_byte": 478
+        },
+        {
+            "cp": "U+27F7",
+            "width": 1434,
+            "bytes": 3,
+            "per_byte": 478
+        },
+        {
+            "cp": "U+27F8",
+            "width": 1434,
+            "bytes": 3,
+            "per_byte": 478
+        },
+        {
+            "cp": "U+27F9",
+            "width": 1434,
+            "bytes": 3,
+            "per_byte": 478
+        }
+    ],
+    "W": 989,
+    "@": 1000,
+    "space": 318
+}
+rc=0

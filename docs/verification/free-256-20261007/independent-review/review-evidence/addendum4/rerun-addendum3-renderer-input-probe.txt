@@ -1,0 +1,22 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b/phpunit.xml
+
+E                                                                   1 / 1 (100%)
+
+Time: 00:03.328, Memory: 83.00 MB
+
+There was 1 error:
+
+1) Tests\ReviewProbes\Free256\Addendum3\RendererInputProbeTest::test_assent_accepts_names_the_renderer_refuses
+App\Domain\Grants\ProductionFree\ProductionFreeGrantException: Production free grant unavailable.
+
+/home/user/VA-Studio-review-free256b/app/Domain/Grants/ProductionFree/ProductionFreeGrantRenderable.php:50
+/home/user/VA-Studio-review-free256b/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:24
+/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum3/probes/RendererInputProbeTest.php:26
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 1, Assertions: 2, Errors: 1.
+rc=2

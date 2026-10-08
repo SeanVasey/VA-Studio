@@ -1,0 +1,24 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-free256h/phpunit.xml
+
+..E.                                                                4 / 4 (100%)
+
+Time: 00:20.822, Memory: 89.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSpoolResidualTest::test_partial_reservation_sidecars_left_by_a_crash_are_reclaimed
+App\Domain\Grants\ProductionFree\ProductionFreeGrantException: Production free grant unavailable.
+
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php:82
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php:143
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php:83
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php:146
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php:108
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 4, Assertions: 25, Errors: 1.
+rc=2

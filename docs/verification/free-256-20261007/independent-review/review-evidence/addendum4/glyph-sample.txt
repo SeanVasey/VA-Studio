@@ -1,0 +1,15 @@
+{
+    "sampled": 112293,
+    "covered_by_both_styles": 5381,
+    "differences": 0,
+    "first": [],
+    "checks": [
+        "U+02EF=false",
+        "U+0301=true",
+        "U+0627=true",
+        "U+00E9=true",
+        "U+0416=true",
+        "U+03A9=true"
+    ]
+}
+rc=0

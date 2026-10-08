@@ -1,0 +1,26 @@
+== U3 at 68c4e03c6be3ea65439ab34f1c794734a7ddd8a1
+applied U3
+ resources/contracts/production-free-v1/profile-assets.json | 1 +
+ 1 file changed, 1 insertion(+)
+diff --git a/resources/contracts/production-free-v1/profile-assets.json b/resources/contracts/production-free-v1/profile-assets.json
+index 1092bce7..e24f850f 100644
+--- a/resources/contracts/production-free-v1/profile-assets.json
++++ b/resources/contracts/production-free-v1/profile-assets.json
+@@ -9,3 +9,4 @@
+     "scripts/render-production-free-grant.php": "ecf6cf22f902a180b7dbcb3ae771fe9fcb0e5282b74274a6d53e08412e6a3199"
+   }
+ }
++
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b-mut/phpunit.xml
+
+PROBE upgrade[U3]: {"rendered.library.show":"ok:complete","rendered.library.index":"ok:1","rendered.authorize.master_wav":"ok:master_wav","pending.library.show":"ok:pending","pending.library.index":"ok:1","pending.authorize.master_wav":"refused:original_pending","pending.render":"refused:profile_changed","pending.work":""}
+.                                                                   1 / 1 (100%)
+
+Time: 00:01.483, Memory: 63.00 MB
+
+OK (1 test, 3 assertions)
+rc=0
+after revert: git diff --quiet -- app database resources rc=0

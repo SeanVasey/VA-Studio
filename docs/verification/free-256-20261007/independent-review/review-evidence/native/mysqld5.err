@@ -1,0 +1,11 @@
+2026-10-08T04:50:49.971935Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+2026-10-08T04:50:50.344227Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.4.11) starting as process 27595
+2026-10-08T04:50:50.357798Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-10-08T04:50:51.448671Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-10-08T04:50:52.041186Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2026-10-08T04:50:52.041217Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2026-10-08T04:50:52.043562Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/tmp' in the path is accessible to all OS users. Consider choosing a different directory.
+2026-10-08T04:50:52.065349Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.4.11'  socket: ''  port: 3645  MySQL Community Server - GPL.
+2026-10-08T05:28:41.987399Z 63 [System] [MY-013172] [Server] Received SHUTDOWN from user root. Shutting down mysqld (Version: 8.4.11).
+2026-10-08T05:28:43.679637Z 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.4.11)  MySQL Community Server - GPL.
+2026-10-08T05:28:43.679655Z 0 [System] [MY-015016] [Server] MySQL Server - end.
