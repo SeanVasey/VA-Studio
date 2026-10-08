@@ -481,3 +481,24 @@ Red is the pre-fix renderable at `4c659ae0`: both new tests fail (`red-4c659ae0.
 (`sqlite-directory.txt`), and Pint passed on the changed files (`pint.txt`). A6-2 (slow clients holding spool slots)
 remains a condition before the delivery mount, recorded in addendum 6. The long-token renderer failure itself is input
 for the renderer r2 work.
+
+## Codex review round 14: the redemption guard applies valid-to-start (`codex-14/`)
+
+Codex P2 on `e382e195`: both application inspections compare the authorization expiry with the moment the redemption
+began, but the redemption row was stamped after the snapshot. Its guard (`NEW.created_at < a.expires_at`) therefore
+refused a redemption that started in time when the snapshot finished after the expiry. That discarded a valid prepared
+download as `refused_by_guard`. The guarded `created_at` is now the request-start instant, the same `$requested` both
+inspections use. The sealed payload keeps the completion time (`at`). The guard is unchanged, so a start at or after
+the expiry is still refused in the database.
+
+Regressions in `ProductionFreeGrantTransferDeadlineTest`:
+
+- `test_a_redemption_started_before_expiry_is_recorded_when_its_snapshot_finishes_after_expiry`: the fake source moves
+  the clock 301 s while the snapshot opens. The redemption is recorded at the start time and all 8 MiB stream.
+- `test_the_redemption_guard_still_refuses_a_start_time_at_or_after_expiry`: a direct insert at `expires_at` is refused
+  by the trigger, and one second earlier the same row is admitted.
+
+Red is the pre-fix downloads at `e382e195`: `refused_by_guard` from `ProductionFreeGrantRows::insert` (`red-e382e195.txt`).
+Green is 7 tests / 41 assertions (`green.txt`). The directory runs on SQLite at 158 / 1127 with 2 native-only skips
+(`sqlite-directory.txt`), and Pint passed (`pint.txt`). The trigger predicate is generated identically for MySQL and was
+not re-run natively for this one-value change.

@@ -1,0 +1,29 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-free256h/phpunit.xml
+
+....[31;1mE[0m..                                                             7 / 7 (100%)
+
+Time: 00:19.632, Memory: 99.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantTransferDeadlineTest::test_a_redemption_started_before_expiry_is_recorded_when_its_snapshot_finishes_after_expiry
+App\Domain\Grants\ProductionFree\ProductionFreeGrantException: Production free grant unavailable.
+
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantRows.php:131
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php:98
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:215
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantTransactions.php:22
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:207
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php:93
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php:111
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 7[0m[37;41m, Assertions: 37[0m[37;41m, Errors: 1[0m[37;41m.[0m
+rc=2
