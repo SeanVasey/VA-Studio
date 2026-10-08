@@ -6,9 +6,21 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Livewire\Livewire;
 
 abstract class TestCase extends BaseTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Livewire::test() leaves static auto-injection state set after it renders a component
+        // (SupportAutoInjectedAssets::$hasRenderedAComponentThisRequest). That state outlives the
+        // application, so a later test in the same process would get Livewire's <style>/<script>
+        // injected into every full-HTML response, such as the script-free public embed.
+        Livewire::flushState();
+    }
+
     protected function fakePrivateMediaStorage(): void
     {
         // Each test owns its storage, including across separate PHPUnit processes.
