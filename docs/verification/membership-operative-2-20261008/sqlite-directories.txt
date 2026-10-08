@@ -1,0 +1,28 @@
+=== tests/Feature/ProductionMembershipBilling
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+.....S.........................................................  63 / 143 ( 44%)
+............................................................... 126 / 143 ( 88%)
+.................                                               143 / 143 (100%)
+
+Time: 02:01.391, Memory: 171.00 MB
+
+OK, but some tests were skipped!
+Tests: 143, Assertions: 626, Skipped: 1.
+rc=0
+=== tests/Feature/ProductionMembership
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+..................................SSS.......                      44 / 44 (100%)
+
+Time: 00:35.056, Memory: 113.00 MB
+
+OK, but some tests were skipped!
+Tests: 44, Assertions: 130, Skipped: 3.
+rc=0

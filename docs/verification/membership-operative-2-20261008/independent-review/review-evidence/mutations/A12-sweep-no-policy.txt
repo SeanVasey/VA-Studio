@@ -1,0 +1,37 @@
+### tests/Feature/ProductionMembershipBilling/BillingSweepHintsCommandTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+F.FF.                                                               5 / 5 (100%)
+
+Time: 00:06.210, Memory: 93.00 MB
+
+There were 3 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingSweepHintsCommandTest::test_it_refuses_while_the_billing_policy_is_off_and_neither_lists_nor_dispatches
+Failed asserting that 0 is identical to 1.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCommandTest.php:58
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingSweepHintsCommandTest::test_dispatch_queues_one_retrieval_per_uncovered_invoice_and_leaves_covered_hints_alone
+Failed asserting that 1 is identical to 0.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCommandTest.php:101
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingSweepHintsCommandTest::test_a_second_sweep_after_the_retrieval_ran_dispatches_nothing
+The expected [App\Jobs\RetrieveMembershipInvoice] job was pushed 0 times instead of 1 time.
+Failed asserting that 0 is identical to 1.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Testing/Fakes/QueueFake.php:172
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Testing/Fakes/QueueFake.php:152
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCommandTest.php:119
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 5, Assertions: 11, Failures: 3.
+rc=1

@@ -1,0 +1,2 @@
+# pint --test app/Domain/Memberships/Billing/BillingSchema.php tests/Feature/ProductionMembershipBilling/BillingNativeCrossInvoiceClaimTest.php tests/Support/membership-billing-cross-invoice-worker.php
+{"tool":"pint","result":"passed"}rc=0

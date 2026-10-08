@@ -1,0 +1,24 @@
+### tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+....                                                                4 / 4 (100%)
+
+Time: 00:07.700, Memory: 91.00 MB
+
+OK (4 tests, 18 assertions)
+rc=0
+### tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+...................                                               19 / 19 (100%)
+
+Time: 00:26.407, Memory: 105.00 MB
+
+OK (19 tests, 81 assertions)
+rc=0

@@ -65,9 +65,15 @@ class ServiceProjectSchemaTest extends TestCase
     {
         $f = F::setup();
         F::author($f);
+        // Later migrations legitimately run after 244, so a fixed step 1 selects the newest
+        // migration, which is absent from the path ("Migration not found") and never reaches 244.
+        // Derive the smallest step that reaches 244 in the repository's own rollback order.
+        $order = array_column(app('migration.repository')->getMigrations(PHP_INT_MAX), 'migration');
+        $position = array_search(self::MIGRATION, $order, true);
+        $this->assertIsInt($position, 'The service project migration must be recorded before rollback is exercised.');
         $before = $this->rows();
         try {
-            app('migrator')->rollback([database_path('migrations/'.self::MIGRATION.'.php')], ['step' => 1]);
+            app('migrator')->rollback([database_path('migrations/'.self::MIGRATION.'.php')], ['step' => $position + 1]);
             $this->fail('Retained service evidence must refuse rollback.');
         } catch (LogicException) {
             $this->assertSame($before, $this->rows());

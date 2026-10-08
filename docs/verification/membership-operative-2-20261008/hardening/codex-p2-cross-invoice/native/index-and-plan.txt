@@ -1,0 +1,39 @@
+# index and plan check, MySQL 8.4.11 private 127.0.0.1:3923, scratch database p2ci_plan migrated with 'php artisan migrate --force' on 2e08af42 + this change
+INDEX_NAME	NON_UNIQUE	COLUMN_NAME
+PRIMARY	0	id
+production_membership_billing_invoices_f0	1	subscription_binding_id
+production_membership_billing_invoices_u0	0	invoice_ref_hash
+production_membership_billing_invoices_u1	0	source_invoice_hash
+id	select_type	table	partitions	type	possible_keys	key	key_len	ref	rows	filtered	Extra
+1	SIMPLE	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	no matching row in const table
+id	select_type	table	partitions	type	possible_keys	key	key_len	ref	rows	filtered	Extra
+1	SIMPLE	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	no matching row in const table
+id	select_type	table	partitions	type	possible_keys	key	key_len	ref	rows	filtered	Extra
+1	SIMPLE	production_membership_billing_invoices	NULL	ALL	production_membership_billing_invoices_u0,production_membership_billing_invoices_u1	NULL	NULL	NULL	1	100.00	Using where
+*************************** 1. row ***************************
+ACTION_STATEMENT: BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `production_membership_billing_invoices` WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM `production_membership_billing_invoices` WHERE invoice_ref_hash = NEW.invoice_ref_hash) AND NOT EXISTS (SELECT 1 FROM `production_membership_billing_invoices` WHERE source_invoice_hash = NEW.source_invoice_hash) AND EXISTS (SELECT 1 FROM `production_membership_billing_subscriptions` WHERE id = NEW.subscription_binding_id AND provider_account_hash = NEW.provider_account_hash AND mode = NEW.mode)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership billing evidence'; END IF; END
+rc=0
+
+# other billing guard subqueries: observations (IN lists on one unique column each; the (invoice_id, sequence) lookups) and events
+id	select_type	table	partitions	type	possible_keys	key	key_len	ref	rows	filtered	Extra
+1	SIMPLE	production_membership_billing_observations	NULL	index	production_membership_billing_observations_u1	production_membership_billing_observations_u1	8	NULL	1	100.00	Using where; Using index
+id	select_type	table	partitions	type	possible_keys	key	key_len	ref	rows	filtered	Extra
+1	SIMPLE	production_membership_billing_observations	NULL	index	production_membership_billing_observations_u2	production_membership_billing_observations_u2	8	NULL	1	100.00	Using where; Using index
+id	select_type	table	partitions	type	possible_keys	key	key_len	ref	rows	filtered	Extra
+1	SIMPLE	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	no matching row in const table
+id	select_type	table	partitions	type	possible_keys	key	key_len	ref	rows	filtered	Extra
+1	SIMPLE	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	No matching min/max row
+id	select_type	table	partitions	type	possible_keys	key	key_len	ref	rows	filtered	Extra
+1	SIMPLE	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	no matching row in const table
+id	select_type	table	partitions	type	possible_keys	key	key_len	ref	rows	filtered	Extra
+1	SIMPLE	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	no matching row in const table
+id	select_type	table	partitions	type	possible_keys	key	key_len	ref	rows	filtered	Extra
+1	SIMPLE	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	no matching row in const table
+rc=0
+
+# after splitting the IN lists: equality on each unique position column
+id	select_type	table	partitions	type	possible_keys	key	key_len	ref	rows	filtered	Extra
+1	SIMPLE	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	no matching row in const table
+id	select_type	table	partitions	type	possible_keys	key	key_len	ref	rows	filtered	Extra
+1	SIMPLE	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	no matching row in const table
+rc=0

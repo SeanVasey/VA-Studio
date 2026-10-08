@@ -1,0 +1,27 @@
+# head: 59e8f8e2a60e378499c9df103b2e28ecf3b8ad1b  (worktree clean apart from untracked review files: 0 tracked changes)
+# engine: mysqld 8.4.11 --no-defaults, 127.0.0.1:3794, database r54b_lane; DB_CONNECTION=mysql APP_ENV=testing
+# cmd: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never tests/Feature/ProductionMembershipBilling/BillingNativeCrossInvoiceClaimTest.php
+# start: 2026-10-08T21:21:30Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-m54/phpunit.xml
+
+OBSERVATION cross-invoice: {"claim_seconds":3.444,"claim":"claimed 36","retrieve_seconds":9.18,"retrieve":"saved sequence 1","lock_wait_timeout":3,"connection_id":100,"pid":20856,"transaction_level":0,"done_while_locked":true,"held_seconds":12.639}
+F                                                                   1 / 1 (100%)
+
+Time: 02:41.618, Memory: 85.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingNativeCrossInvoiceClaimTest::test_claiming_and_retrieving_unrelated_invoices_never_waits_for_another_invoices_append_lock
+{"claim_seconds":3.444,"claim":"claimed 36","retrieve_seconds":9.18,"retrieve":"saved sequence 1","lock_wait_timeout":3,"connection_id":100,"pid":20856,"transaction_level":0,"done_while_locked":true,"held_seconds":12.639}
+Failed asserting that 3.444 is less than 3.
+
+/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/BillingNativeCrossInvoiceClaimTest.php:54
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 11, Failures: 1.
+rc=1
+# end: 2026-10-08T21:24:12Z

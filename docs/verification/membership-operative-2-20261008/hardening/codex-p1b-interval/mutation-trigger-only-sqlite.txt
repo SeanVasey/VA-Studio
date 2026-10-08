@@ -1,0 +1,105 @@
+# mutation: application interval check removed from BillingLedger::append (trigger only), scratch copy of the worktree, SQLite. Expected: reasons change (observation_contention) but no stale row is ever appended.
+--- /home/user/VA-Studio-member-ops2/app/Domain/Memberships/Billing/BillingLedger.php	2026-10-08 18:19:27.531602400 +0000
++++ app/Domain/Memberships/Billing/BillingLedger.php	2026-10-08 18:49:31.265844820 +0000
+@@ -174,9 +174,6 @@
+                     $chain = $this->observations($invoice['id']);
+                     $last = $chain === [] ? null : $chain[array_key_last($chain)];
+                     BillingException::require(count($chain) < self::MAX_OBSERVATIONS, 'technical_bound');
+-                    if ($last !== null && $last['retrieval_end_position'] >= $position) {
+-                        throw new BillingException($endPosition < $last['retrieval_position'] ? 'superseded_retrieval' : 'concurrent_retrieval');
+-                    }
+                     $now = CarbonImmutable::now('UTC')->timestamp;
+                     $createdAt = BillingValues::utc($now);
+                     BillingException::require($last === null || $last['created_at'] <= $createdAt, 'clock');
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p1bi/mutation-cp4/phpunit.xml
+
+FFFF...FFF.                                                       11 / 11 (100%)
+
+Time: 00:12.996, Memory: 97.00 MB
+
+There were 7 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_the_reversal_appended_first_keeps_the_tail_when_the_overlapping_older_settled_read_appends_after_it
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'concurrent_retrieval'
++'observation_contention'
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p1bi/mutation-cp4/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:78
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_the_reversal_that_overlaps_a_settled_tail_is_refused_for_retry_and_the_retry_reads_and_records_the_reversal
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'concurrent_retrieval'
++'observation_contention'
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p1bi/mutation-cp4/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:95
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_a_read_that_began_after_the_tails_read_finished_is_admitted_and_one_that_wholly_preceded_it_is_superseded
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'superseded_retrieval'
++'observation_contention'
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p1bi/mutation-cp4/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:116
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_a_read_enclosing_the_tails_read_or_starting_at_its_end_position_is_concurrent
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'concurrent_retrieval'
++'observation_contention'
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p1bi/mutation-cp4/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:133
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_retrieval_a_stalled_before_reading_appends_the_reversal_and_overlapping_b_cannot_append_its_older_settlement_after_it
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'concurrent_retrieval'
++'observation_contention'
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p1bi/mutation-cp4/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:204
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_retrieval_a_stalled_before_reading_is_retried_when_b_appended_first_and_the_retry_records_the_reversal
+A read that began before the tail's read finished is retried, not ended.
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'concurrent_retrieval'
++'observation_contention'
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p1bi/mutation-cp4/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:223
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+7) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_a_read_that_finished_before_the_tails_read_began_is_superseded
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'superseded_retrieval'
++'observation_contention'
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p1bi/mutation-cp4/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:240
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 11, Assertions: 48, Failures: 7.
+rc=1

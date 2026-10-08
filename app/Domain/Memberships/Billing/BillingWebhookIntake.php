@@ -73,16 +73,22 @@ final class BillingWebhookIntake
                 'created' => is_int($event['created'] ?? null) ? $event['created'] : null, 'invoice_ref' => $invoiceRef,
                 'subscription_ref' => BillingValues::is('subscription', $subscriptionRef) ? $subscriptionRef : null])];
         $row['created_at'] = $row['received_at'];
-        $row['seal'] = BillingValues::seal($row);
         $existing = $this->event($eventHash);
         if ($existing !== null) {
             return ['event' => $existing, 'duplicate' => true, 'scheduled' => $this->recoverLostDispatch($existing, $configuration, $policy)];
         }
         try {
-            DB::transaction(function () use ($row) {
+            $row = DB::transaction(function () use ($row): array {
+                // The hint's database-issued position, allocated after the hint arrived and in the same transaction as its row, so a
+                // retrieval covers the hint only if its own position (committed before its provider reads) is larger. `received_at`
+                // is the intake host's clock and is information only (Codex P1 on PR #54, review L2-3).
+                $row['hint_position'] = (new BillingLedger)->position('hint');
+                $row['seal'] = BillingValues::seal($row);
                 $statement = DB::connection()->getPdo()->prepare('INSERT INTO '.(new BillingSchema)->table(BillingSchema::TABLES[3])
                     .' ('.implode(', ', array_keys($row)).') VALUES ('.implode(', ', array_fill(0, count($row), '?')).')');
                 $statement->execute(array_values($row));
+
+                return $row;
             });
         } catch (PDOException) {
             // A concurrent delivery of the same event id won; this one is the replay.
@@ -94,7 +100,7 @@ final class BillingWebhookIntake
         $policy->proveConfiguration($configuration);
         $scheduled = null;
         if ($invoiceRef !== null) {
-            $binding = $this->bindingForHint($type, $invoiceRef, $subscriptionRef, $account, $mode);
+            $binding = (new BillingHintRecovery)->bindingForHint($type, $invoiceRef, $subscriptionRef, $account, $mode);
             if ($binding !== null) {
                 $scheduled = ['binding_id' => $binding, 'invoice_ref' => $invoiceRef];
                 RetrieveMembershipInvoice::dispatch($binding, $invoiceRef);
@@ -106,66 +112,23 @@ final class BillingWebhookIntake
 
     /**
      * A hint is committed before its retrieval is dispatched, so a failed dispatch leaves a hint the provider will redeliver.
-     * A duplicate delivery therefore dispatches that retrieval again unless the hint is already covered. "Covered" means the
-     * invoice's identity row has a definitive observation row (see observedAfter(); never `unknown`) created strictly after the
-     * hint's received_at; an older observation, or an identity row with no observation, does not cover it. Only the observation
-     * table is consulted because an observation is the one row appended after a retrieval completes. The dispatch is read-only
-     * against the provider and each retrieval appends one chained observation, so a redundant dispatch is harmless and the
-     * stored event row is never touched. A hint that names no bound subscription, and every non-hint event, stays unscheduled.
+     * A duplicate delivery therefore dispatches that retrieval again unless the hint is already covered (BillingHintRecovery::pending():
+     * a definitive observation from a retrieval that began after the hint). The dispatch is read-only against the provider and each
+     * retrieval appends one chained observation, so a redundant dispatch is harmless and the stored event row is never touched. A hint
+     * that names no bound subscription, and every non-hint event, stays unscheduled.
      *
      * @return array{binding_id: string, invoice_ref: string}|null
      */
     private function recoverLostDispatch(array $event, array $configuration, BillingPolicy $policy): ?array
     {
-        if ($event['disposition'] !== 'retrieval_hint') {
-            return null;
-        }
-        $hint = BillingValues::decrypt($event['payload_ciphertext']);
-        $invoiceRef = $hint['invoice_ref'] ?? null;
-        $subscriptionRef = $hint['subscription_ref'] ?? null;
-        if (! BillingValues::is('invoice', $invoiceRef)
-            || ! hash_equals(BillingValues::hash('invoice', $configuration['account_ref'], $configuration['mode'], $invoiceRef), (string) $event['invoice_ref_hash'])) {
-            return null;
-        }
-        $binding = $this->bindingForHint($event['type'], $invoiceRef, $subscriptionRef, $configuration['account_ref'], $configuration['mode']);
-        if ($binding === null || $this->observedAfter($event['invoice_ref_hash'], $event['received_at'])) {
+        $pending = (new BillingHintRecovery)->pending($event, $configuration);
+        if ($pending === null) {
             return null;
         }
         $policy->proveConfiguration($configuration);
-        RetrieveMembershipInvoice::dispatch($binding, $invoiceRef);
+        RetrieveMembershipInvoice::dispatch($pending['binding_id'], $pending['invoice_ref']);
 
-        return ['binding_id' => $binding, 'invoice_ref' => $invoiceRef];
-    }
-
-    /**
-     * Whether a definitive observation was appended after the hint. The ledger's outcomes are settled, not_settled, refused and
-     * reversed (each a retrieved provider state, so each covers a hint) and unknown (a timeout or ambiguous response). `unknown`
-     * never covers, and neither does a `refused` observation whose reason is `provider_incomplete`: the provider's unbounded list
-     * meant no state was read. Otherwise a transient provider outage whose one-try job ended cleanly would hide the hint, leaving
-     * a paid invoice unreconciled until some different event arrived. The retry bound is the provider's own redelivery schedule;
-     * this reads the reason from the encrypted payload, so only `refused` rows are decrypted.
-     */
-    private function observedAfter(string $invoiceRefHash, string $receivedAt): bool
-    {
-        $schema = new BillingSchema;
-        $statement = DB::connection()->getPdo()->prepare('SELECT o.outcome, o.payload_ciphertext FROM '.$schema->table(BillingSchema::TABLES[2]).' o JOIN '
-            .$schema->table(BillingSchema::TABLES[1]).' i ON i.id = o.invoice_id WHERE i.invoice_ref_hash = ? AND o.created_at > ? AND o.outcome <> ? '
-            .'ORDER BY o.sequence LIMIT '.BillingLedger::MAX_OBSERVATIONS);
-        $statement->execute([$invoiceRefHash, $receivedAt, 'unknown']);
-        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            if ($row['outcome'] !== 'refused') {
-                return true;
-            }
-            try {
-                if ((BillingValues::decrypt($row['payload_ciphertext'])['reason'] ?? null) !== 'provider_incomplete') {
-                    return true;
-                }
-            } catch (BillingException) {
-                // An unreadable payload proves nothing; retrieving again is safe and the job audits the chain.
-            }
-        }
-
-        return false;
+        return $pending;
     }
 
     private function event(string $eventHash): ?array
@@ -174,41 +137,9 @@ final class BillingWebhookIntake
         (new BillingSchema)->assertOwned($pdo);
         $statement = $pdo->prepare('SELECT * FROM '.(new BillingSchema)->table(BillingSchema::TABLES[3]).' WHERE provider_event_ref_hash = ? LIMIT 2');
         $statement->execute([$eventHash]);
-        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $rows = array_map(fn (array $row): array => BillingValues::integers($row, ['hint_position']), $statement->fetchAll(PDO::FETCH_ASSOC));
         BillingException::require(count($rows) <= 1 && ($rows === [] || hash_equals(BillingValues::seal($rows[0]), $rows[0]['seal'])), 'tampered_ledger');
 
         return $rows[0] ?? null;
-    }
-
-    /**
-     * Which approved binding a hint selects (retrieval proves it). An invoice event names its subscription. An InvoicePayment
-     * (`invoice_payment.*`) has no invoice parent, so it takes the binding of the identity row the invoice already has; with
-     * no identity row the hint is only retained and nothing is dispatched.
-     */
-    private function bindingForHint(string $type, string $invoiceRef, mixed $subscriptionRef, string $account, string $mode): ?string
-    {
-        if (BillingValues::is('subscription', $subscriptionRef)) {
-            return $this->bindingFor(BillingValues::hash('subscription', $account, $mode, $subscriptionRef));
-        }
-        if (! str_starts_with($type, 'invoice_payment.')) {
-            return null;
-        }
-        $schema = new BillingSchema;
-        $statement = DB::connection()->getPdo()->prepare('SELECT subscription_binding_id FROM '.$schema->table(BillingSchema::TABLES[1]).' WHERE invoice_ref_hash = ? LIMIT 2');
-        $statement->execute([BillingValues::hash('invoice', $account, $mode, $invoiceRef)]);
-        $ids = $statement->fetchAll(PDO::FETCH_COLUMN);
-        BillingException::require(count($ids) <= 1, 'ambiguous_source');
-
-        return isset($ids[0]) && is_string($ids[0]) ? $ids[0] : null;
-    }
-
-    private function bindingFor(string $subscriptionHash): ?string
-    {
-        $statement = DB::connection()->getPdo()->prepare('SELECT id FROM '.(new BillingSchema)->table(BillingSchema::TABLES[0]).' WHERE subscription_ref_hash = ? LIMIT 2');
-        $statement->execute([$subscriptionHash]);
-        $ids = $statement->fetchAll(PDO::FETCH_COLUMN);
-        BillingException::require(count($ids) <= 1, 'ambiguous_source');
-
-        return isset($ids[0]) && is_string($ids[0]) ? $ids[0] : null;
     }
 }

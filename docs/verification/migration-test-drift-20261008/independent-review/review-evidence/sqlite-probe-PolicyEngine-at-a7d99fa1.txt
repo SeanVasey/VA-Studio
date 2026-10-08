@@ -1,0 +1,16 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-migdrift/phpunit.xml
+
+[36;1mS[0m                                                                   1 / 1 (100%)
+
+Time: 00:00.164, Memory: 59.00 MB
+
+There was 1 skipped test:
+
+1) Tests\Feature\ReviewProbePolicyEngineAtA7d99fa1Test::test_owned_policy_tables_require_innodb_when_session_defaults_to_myisam
+MySQL session storage defaults and InnoDB foreign keys require native MySQL.
+
+[30;42mOK, but some tests were skipped![0m
+[30;42mTests: 1[0m[30;42m, Assertions: 0[0m[30;42m, Skipped: 1[0m[30;42m.[0m

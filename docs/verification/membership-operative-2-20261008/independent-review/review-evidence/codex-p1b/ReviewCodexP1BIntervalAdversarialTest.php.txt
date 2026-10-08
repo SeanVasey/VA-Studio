@@ -1,0 +1,576 @@
+<?php
+
+namespace Tests\Feature\ProductionMembershipBilling;
+
+use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
+use App\Domain\Memberships\Billing\BillingException;
+use App\Domain\Memberships\Billing\BillingLedger;
+use App\Domain\Memberships\Billing\BillingPolicy;
+use App\Domain\Memberships\Billing\BillingProviderGateway;
+use App\Domain\Memberships\Billing\BillingProviderPin;
+use App\Domain\Memberships\Billing\BillingReconciliation;
+use App\Domain\Memberships\Billing\BillingSchema;
+use App\Domain\Memberships\Billing\BillingSettlement;
+use App\Domain\Memberships\Billing\BillingVerdict;
+use App\Domain\Memberships\Billing\BillingWebhookIntake;
+use App\Jobs\RetrieveMembershipInvoice;
+use Carbon\CarbonImmutable;
+use Closure;
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
+use ReflectionMethod;
+use Stripe\Event;
+use Stripe\WebhookSignature;
+use Tests\Support\BillingStripeFixtures as F;
+use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\InterleavingBillingGateway;
+use Tests\Support\RehearsalBillingGateway;
+use Tests\Support\SuspendingBillingGateway;
+use Tests\TestCase;
+use Throwable;
+
+/**
+ * Independent review of 6184118d..2e08af42 (Codex P1 at BillingReconciliation.php:42, the read-interval fix). Untracked review
+ * probes; synthetic values only. A test named `probe_` asserts the behaviour the reviewer observed, including a residual.
+ */
+class ReviewCodexP1BIntervalAdversarialTest extends TestCase
+{
+    use FinalizationDatabaseMigrations;
+
+    private const SECRET = 'whsec_SYNTHETICREHEARSAL';
+
+    private const T0 = F::PERIOD_START + 3600;
+
+    private const REFUND = ['charge' => ['refunded' => true, 'amount_refunded' => F::AMOUNT]];
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        F::configure();
+        $this->at(0);
+    }
+
+    protected function tearDown(): void
+    {
+        CarbonImmutable::setTestNow();
+        parent::tearDown();
+    }
+
+    /**
+     * The reviewer's CP-1 probe from ADDENDUM-CODEX-P1, unchanged in shape, through the real job: A takes its start and stalls before
+     * its first read; B starts later, reads settled and appends; the provider reverses; A reads the reversal. A is now released with
+     * the backoff (not a normal end), and its retry records the reversal.
+     */
+    public function test_cp1_gateway_before_read_is_released_for_retry_and_the_retry_records_the_reversal(): void
+    {
+        $binding = F::binding();
+        $bindingId = $binding['id'];
+        $state = [];
+        $a = $this->beforeFirstRead(new RehearsalBillingGateway(F::graph(self::REFUND)), function () use ($bindingId, &$state): void {
+            $b = (new BillingReconciliation(new RehearsalBillingGateway(F::graph())))->retrieve($bindingId, F::INVOICE);
+            $state['b'] = [$b['outcome'], $b['retrieval_position'], $b['retrieval_end_position']];
+        });
+        $job = (new RetrieveMembershipInvoice($bindingId, F::INVOICE))->withFakeQueueInteractions();
+        $job->job->attempts = 1;
+        $job->handle(new BillingReconciliation($a));
+        $job->assertReleased(60);
+        $invoiceId = (string) DB::table('production_membership_billing_invoices')->value('id');
+        $this->assertSame(['settled'], array_column((new BillingLedger)->observations($invoiceId), 'outcome'));
+
+        $retry = (new RetrieveMembershipInvoice($bindingId, F::INVOICE))->withFakeQueueInteractions();
+        $retry->job->attempts = 2;
+        $retry->handle(new BillingReconciliation(new RehearsalBillingGateway(F::graph(self::REFUND))));
+        $retry->assertNotReleased();
+        $chain = (new BillingLedger)->observations($invoiceId);
+        fwrite(STDERR, "\n[review] driver=".DB::getDriverName().' cp1 state='.json_encode($state + ['chain' => array_map(fn ($o) => [$o['outcome'], $o['retrieval_position'], $o['retrieval_end_position']], $chain)])."\n");
+        $this->assertSame(['settled', 'reversed'], array_column($chain, 'outcome'));
+        $this->assertNull((new BillingLedger)->currentSettled($invoiceId, self::T0 + 1));
+    }
+
+    /**
+     * Three real reconciliations, Fibers: A stalls before its first read (reversal graph), B stalls after its last read (settled
+     * graph), C runs to completion (settled) while both are stalled; then A and B finish in both orders. No older read may follow a
+     * newer admitted one, and A (the only post-reversal read) must never end normally.
+     */
+    public static function orders(): array
+    {
+        return ['A then B' => ['A then B'], 'B then A' => ['B then A']];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('orders')]
+    public function test_three_way_interleavings_through_the_reconciliation_never_admit_an_older_read_after_a_newer_one(string $order): void
+    {
+        {
+            $binding = F::binding();
+            $this->retrieve($binding['id'], F::graph());
+            $a = $this->fiber($binding['id'], new SuspendingBillingGateway(new RehearsalBillingGateway(F::graph(self::REFUND)), 'before_first_read'));
+            $b = $this->fiber($binding['id'], new SuspendingBillingGateway(new RehearsalBillingGateway(F::graph()), 'after_last_read'));
+            $a->start();
+            $b->start();
+            $c = $this->retrieve($binding['id'], F::graph());
+            $this->assertSame('settled', $c['outcome']);
+            $order === 'A then B' ? [$a->resume(), $b->resume()] : [$b->resume(), $a->resume()];
+            $results = ['A' => $a->getReturn(), 'B' => $b->getReturn()];
+            $invoiceId = (string) DB::table('production_membership_billing_invoices')->value('id');
+            $chain = (new BillingLedger)->observations($invoiceId);
+            fwrite(STDERR, "\n[review] driver=".DB::getDriverName()." three-way {$order}: ".json_encode(array_map(fn ($r) => is_array($r) ? [$r['outcome'], $r['retrieval_position'], $r['retrieval_end_position']] : $r, $results))
+                .' chain='.json_encode(array_map(fn ($o) => [$o['outcome'], $o['retrieval_position'], $o['retrieval_end_position']], $chain))."\n");
+            $this->assertSame('concurrent_retrieval', $results['A'], 'The post-reversal read must be retried, never a normal end.');
+            $this->assertContains($results['B'], ['concurrent_retrieval', 'superseded_retrieval']);
+            $this->assertChainOrdered($chain);
+            $retry = $this->retrieve($binding['id'], F::graph(self::REFUND));
+            $this->assertSame('reversed', $retry['outcome']);
+            $this->assertNull((new BillingLedger)->currentSettled($invoiceId, self::T0 + 1));
+        }
+    }
+
+    /**
+     * Exhaustive ledger schedules: three retrievals X, Y, Z, each Start, End, Append, in all 1680 interleavings, each on its own
+     * invoice identity. Checks, on the engine's triggers and the application rule together: every admitted row starts after the
+     * previous tail ended; a refusal is `superseded_retrieval` exactly when the refused read ended before the tail's began, otherwise
+     * `concurrent_retrieval`; an append is admitted exactly when its start is above the tail's end.
+     */
+    public function test_all_1680_three_retrieval_schedules_admit_exactly_the_reads_that_began_after_the_tail_ended(): void
+    {
+        $binding = F::binding();
+        $ledger = new BillingLedger;
+        $resolved = $ledger->binding($binding['id'], (new BillingPolicy)->current());
+        $schedules = $this->interleavings([['X', 'S'], ['X', 'E'], ['X', 'P']], [['Y', 'S'], ['Y', 'E'], ['Y', 'P']], [['Z', 'S'], ['Z', 'E'], ['Z', 'P']]);
+        $this->assertCount(1680, $schedules);
+        // MySQL: every 40th three-retrieval schedule (42) plus all 20 two-retrieval schedules; SQLite: all 1680.
+        $stride = DB::getDriverName() === 'mysql' ? 40 : 1;
+        $schedules = array_values(array_filter($schedules, fn ($k) => $k % $stride === 0, ARRAY_FILTER_USE_KEY));
+        if ($stride > 1) {
+            array_push($schedules, ...$this->interleavings([['X', 'S'], ['X', 'E'], ['X', 'P']], [['Y', 'S'], ['Y', 'E'], ['Y', 'P']]));
+        }
+        $counts = ['admitted' => 0, 'superseded_retrieval' => 0, 'concurrent_retrieval' => 0];
+        foreach ($schedules as $n => $schedule) {
+            $invoice = $ledger->invoice($resolved, sprintf('in_SYNTHETICSCHED%04d', $n));
+            $pos = [];
+            $tail = null;
+            foreach ($schedule as [$who, $step]) {
+                if ($step === 'S') {
+                    $pos[$who] = ['s' => $ledger->startRetrieval()];
+                } elseif ($step === 'E') {
+                    $pos[$who]['e'] = $ledger->endRetrieval($pos[$who]['s']);
+                } else {
+                    [$s, $e] = [$pos[$who]['s'], $pos[$who]['e']];
+                    $expected = $tail === null || $s > $tail['e'] ? 'admitted' : ($e < $tail['s'] ? 'superseded_retrieval' : 'concurrent_retrieval');
+                    try {
+                        $row = $ledger->append($invoice, BillingVerdict::unknown('provider_unavailable', ['invoice_ref' => 'in_SYNTHETICSCHED']), self::T0,
+                            IdentityPolicy::REHEARSAL, $s, $e, CarbonImmutable::now('UTC'));
+                        $actual = 'admitted';
+                        $this->assertSame([$s, $e], [$row['retrieval_position'], $row['retrieval_end_position']]);
+                        $tail = ['s' => $s, 'e' => $e];
+                    } catch (BillingException $error) {
+                        $actual = $error->reason;
+                    }
+                    $this->assertSame($expected, $actual, 'schedule '.$n.' '.json_encode($schedule).' '.json_encode($pos));
+                    $counts[$actual]++;
+                }
+            }
+            $this->assertChainOrdered($ledger->observations($invoice['id']));
+        }
+        fwrite(STDERR, "\n[review] driver=".DB::getDriverName().' '.count($schedules).' schedules, appends by result: '.json_encode($counts)."\n");
+        $this->assertSame($stride === 1 ? 1680 * 3 : 42 * 3 + 20 * 2, array_sum($counts));
+    }
+
+    /**
+     * Liveness bound. A job N refused three times, each time by a different overlapping winner W1..W3 that appended first. The
+     * adversarial schedule lets W2 start before N's first read ended (so W2 may have read before the reversal N1 saw), but W3 must
+     * start after N1 ended. With `$tries = 3` the tail a failed job leaves began after its first read ended; with 2 it would not.
+     */
+    public function test_probe_a_job_exhausted_by_three_overlapping_winners_leaves_a_tail_that_began_after_its_first_read_ended(): void
+    {
+        [$ledger, $invoice] = $this->seeded();
+        $append = fn (BillingVerdict $v, int $s, int $e) => $ledger->append($invoice, $v, self::T0, IdentityPolicy::REHEARSAL, $s, $e, CarbonImmutable::now('UTC'));
+        $refuse = function (Closure $op): string {
+            try {
+                $op();
+
+                return 'admitted';
+            } catch (BillingException $e) {
+                return $e->reason;
+            }
+        };
+        $n1s = $ledger->startRetrieval();
+        $w1s = $ledger->startRetrieval();
+        $w1e = $ledger->endRetrieval($w1s);
+        $append($this->settled(), $w1s, $w1e);
+        $w2s = $ledger->startRetrieval();            // W2 starts after W1 ended, but before N1's reads ended
+        $n1e = $ledger->endRetrieval($n1s);
+        $r1 = $refuse(fn () => $append($this->reversed(), $n1s, $n1e));
+        $n2s = $ledger->startRetrieval();
+        $w2e = $ledger->endRetrieval($w2s);          // W2 stalled across N2's start
+        $append($this->settled(), $w2s, $w2e);
+        $w3s = $ledger->startRetrieval();
+        $n2e = $ledger->endRetrieval($n2s);
+        $r2 = $refuse(fn () => $append($this->reversed(), $n2s, $n2e));
+        $n3s = $ledger->startRetrieval();
+        $w3e = $ledger->endRetrieval($w3s);
+        $append($this->reversed(), $w3s, $w3e);       // W3 began after N1 ended, so it read after the reversal N1 saw
+        $n3e = $ledger->endRetrieval($n3s);
+        $r3 = $refuse(fn () => $append($this->reversed(), $n3s, $n3e));
+
+        fwrite(STDERR, "\n[review] driver=".DB::getDriverName().' liveness: '.json_encode(compact('n1s', 'n1e', 'w1s', 'w1e', 'w2s', 'w2e', 'w3s', 'w3e', 'r1', 'r2', 'r3'))."\n");
+        $this->assertSame(['concurrent_retrieval', 'concurrent_retrieval', 'concurrent_retrieval'], [$r1, $r2, $r3]);
+        $this->assertLessThan($n1e, $w2s, 'After two attempts the tail (W2) may have begun before N1 ended: it may predate the reversal.');
+        $this->assertGreaterThan($n1e, $w3s, 'After three attempts the tail (W3) began after N1 ended.');
+        $this->assertChainOrdered($ledger->observations($invoice['id']));
+    }
+
+    /**
+     * A definitive read wholly earlier than an `unknown` tail ends normally as superseded (carried I-2). It must not leave a stale
+     * `settled` current: the tail is `unknown`, so currentSettled() is null.
+     */
+    public function test_a_definitive_read_superseded_by_a_later_unknown_tail_leaves_nothing_settled_current(): void
+    {
+        [$ledger, $invoice] = $this->seeded();
+        $ns = $ledger->startRetrieval();
+        $ne = $ledger->endRetrieval($ns);
+        $us = $ledger->startRetrieval();
+        $ue = $ledger->endRetrieval($us);
+        $ledger->append($invoice, BillingVerdict::unknown('provider_unavailable', ['invoice_ref' => F::INVOICE]), self::T0, IdentityPolicy::REHEARSAL, $us, $ue, CarbonImmutable::now('UTC'));
+        try {
+            $ledger->append($invoice, $this->reversed(), self::T0, IdentityPolicy::REHEARSAL, $ns, $ne, CarbonImmutable::now('UTC'));
+            $this->fail('Expected a refusal.');
+        } catch (BillingException $e) {
+            $this->assertSame('superseded_retrieval', $e->reason);
+        }
+        $this->assertSame(['settled', 'unknown'], array_column($ledger->observations($invoice['id']), 'outcome'));
+        $this->assertNull($ledger->currentSettled($invoice['id'], self::T0 + 1));
+    }
+
+    /**
+     * Question 3. (a) The end allocation fails (a transaction is open when it runs): the retrieval throws, appends nothing, leaves one
+     * anonymous start position. (b) The end is committed but the append never happens (configuration withdrawn during the reads,
+     * standing in for a crash between end and append): two anonymous positions. In both cases a pending hint stays uncovered and the
+     * next retrieval is admitted (anonymous positions never block or cover anything).
+     */
+    public function test_a_failed_end_allocation_or_a_lost_append_leaves_only_anonymous_positions_and_changes_no_coverage(): void
+    {
+        $binding = F::binding();
+        $this->retrieve($binding['id'], F::graph());
+        $payload = $this->event('evt_SYNTHETICENDFAIL');
+        $this->at(5);
+        $this->lose($payload);
+        $before = DB::table('production_membership_billing_positions')->count();
+
+        $failEnd = new InterleavingBillingGateway(new RehearsalBillingGateway(F::graph(self::REFUND)), fn () => DB::beginTransaction());
+        try {
+            (new BillingReconciliation($failEnd))->retrieve($binding['id'], F::INVOICE);
+            $this->fail('The end allocation must refuse while a transaction is open.');
+        } catch (BillingException $e) {
+            $this->assertSame('transaction_open', $e->reason);
+        } finally {
+            while (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
+        }
+        $this->assertSame($before + 1, DB::table('production_membership_billing_positions')->count(), 'Only the start position remains.');
+
+        $lostAppend = new InterleavingBillingGateway(new RehearsalBillingGateway(F::graph(self::REFUND)),
+            fn () => config(['production-membership-billing.approved_subscription_policy_hash' => hash('sha256', 'withdrawn during reads')]));
+        try {
+            (new BillingReconciliation($lostAppend))->retrieve($binding['id'], F::INVOICE);
+            $this->fail('A configuration change during the reads must record nothing.');
+        } catch (BillingException $e) {
+            fwrite(STDERR, "\n[review] driver=".DB::getDriverName().' lost-append refusal: '.$e->reason."\n");
+        }
+        F::configure();
+        $this->assertSame($before + 3, DB::table('production_membership_billing_positions')->count(), 'Start and end remain, unused.');
+        $this->assertSame(1, DB::table('production_membership_billing_observations')->count());
+
+        Queue::fake();
+        $this->at(10);
+        $this->assertSame(['binding_id' => $binding['id'], 'invoice_ref' => F::INVOICE], $this->receive($payload)['scheduled'], 'The hint stays uncovered.');
+        $next = $this->retrieve($binding['id'], F::graph(self::REFUND));
+        $this->assertSame(['reversed', 2], [$next['outcome'], $next['sequence']]);
+        Queue::fake();
+        $this->assertNull($this->receive($payload)['scheduled'], 'A later retrieval covers it.');
+    }
+
+    /**
+     * CP-2 under the interval design (failure model, simulated as in ADDENDUM-CODEX-P1): the in-flight stale retrieval R holds a
+     * start whose row is lost; the counter reissues that id as the start of a newer retrieval R2. R's END is a fresh allocation, so
+     * only one collision is needed. R is admitted and covers the hint; R2 is now refused as `concurrent_retrieval` (its start equals
+     * R's), so its job retries and the retry records the later state: the stale tail is transient, no longer a silent normal end.
+     */
+    public function test_probe_cp2_a_reissued_start_still_admits_the_stale_read_once_but_the_holder_is_retried_not_ended(): void
+    {
+        $binding = F::binding();
+        $first = $this->retrieve($binding['id'], F::graph());
+        $ledger = new BillingLedger;
+        $lostDummy = $ledger->startRetrieval();
+        $payload = $this->event('evt_SYNTHETICREISSUE2');
+        $state = [];
+        $this->at(10);
+        $stale = new InterleavingBillingGateway(new RehearsalBillingGateway(F::graph()), function () use (&$state, $lostDummy, $payload, $ledger): void {
+            $p = (int) DB::table('production_membership_billing_positions')->max('id');
+            $state['stale_start'] = $p;
+            $this->losePositions([$lostDummy, $p], $lostDummy - 1);
+            $this->at(20);
+            $this->lose($payload);
+            $state['hint'] = (int) DB::table('production_membership_billing_events')->value('hint_position');
+            $state['r2_start'] = $ledger->startRetrieval();
+            $this->at(30);
+        });
+        $appended = (new BillingReconciliation($stale))->retrieve($binding['id'], F::INVOICE);
+        $state['stale_row'] = [$appended['outcome'], $appended['retrieval_position'], $appended['retrieval_end_position']];
+        $this->assertSame($state['stale_start'], $state['r2_start'], 'One reissued id: the stale start.');
+        $this->assertSame('settled', $appended['outcome'], 'Observed: the stale read is admitted under the reissued start.');
+        Queue::fake();
+        $this->assertNull($this->receive($payload)['scheduled'], 'Observed: and covers the hint that arrived after its reads.');
+
+        $r2End = $ledger->endRetrieval($state['r2_start']);
+        try {
+            $ledger->append($ledger->existingInvoice($ledger->binding($binding['id'], (new BillingPolicy)->current()), F::INVOICE),
+                $this->reversed(), self::T0 + 40, IdentityPolicy::REHEARSAL, $state['r2_start'], $r2End, CarbonImmutable::now('UTC'));
+            $this->fail('The reissued start is already used.');
+        } catch (BillingException $e) {
+            $state['r2_refusal'] = $e->reason;
+        }
+        $retry = $this->retrieve($binding['id'], F::graph(self::REFUND));
+        $state['retry'] = [$retry['outcome'], $retry['retrieval_position'], $retry['retrieval_end_position']];
+        fwrite(STDERR, "\n[review] driver=".DB::getDriverName().' cp2 state='.json_encode($state)."\n");
+        $this->assertSame('concurrent_retrieval', $state['r2_refusal'], 'Now retried, not a normal end.');
+        $this->assertSame('reversed', $retry['outcome']);
+        $this->assertNull((new BillingLedger)->currentSettled($first['invoice_id'], self::T0 + 41));
+    }
+
+    /** CP-3 residual, unchanged by the range: a clock-ahead tail refuses a later reversal with `clock` and stays fresh for the skew. */
+    public function test_probe_cp3_a_clock_ahead_tail_still_refuses_a_later_reversal_with_clock(): void
+    {
+        $binding = F::binding();
+        $this->at(1000);
+        $first = $this->retrieve($binding['id'], F::graph());
+        $this->at(10);
+        try {
+            $this->retrieve($binding['id'], F::graph(self::REFUND));
+            $this->fail('Expected the clock refusal.');
+        } catch (BillingException $e) {
+            $this->assertSame('clock', $e->reason);
+        }
+        $this->assertNotNull((new BillingLedger)->currentSettled($first['invoice_id'], self::T0 + 1500));
+    }
+
+    /** The two earlier 259000 shapes (83821fc0: no positions; 6184118d: no end position) are refused as `schema` and not adopted. */
+    public function test_both_earlier_259000_shapes_are_refused_and_not_adopted(): void
+    {
+        foreach (['83821fc0' => 'production_membership_billing_positions', '6184118d' => null] as $revision => $absentTable) {
+            $source = shell_exec('git show '.$revision.':app/Domain/Memberships/Billing/BillingSchema.php 2>/dev/null');
+            if (! is_string($source) || ! str_contains($source, 'final class BillingSchema')) {
+                $this->markTestSkipped('git history unavailable');
+            }
+            $class = 'BillingSchemaAt'.$revision;
+            if (! class_exists('App\\Domain\\Memberships\\Billing\\'.$class, false)) {
+                eval('?>'.str_replace('final class BillingSchema', 'final class '.$class, $source));
+            }
+            $pdo = DB::connection()->getPdo();
+            foreach (array_reverse(BillingSchema::TABLES) as $logical) {
+                $pdo->exec('DROP TABLE IF EXISTS '.(DB::getDriverName() === 'mysql' ? '`'.$logical.'`' : '"'.$logical.'"'));
+            }
+            $old = 'App\\Domain\\Memberships\\Billing\\'.$class;
+            (new $old)->up();
+            foreach (['assertOwned' => fn () => (new BillingSchema)->assertOwned($pdo), 'up' => fn () => (new BillingSchema)->up()] as $label => $op) {
+                try {
+                    $op();
+                    $this->fail($revision.' '.$label.' must refuse.');
+                } catch (BillingException $e) {
+                    fwrite(STDERR, "\n[review] driver=".DB::getDriverName()." {$revision}-shape {$label} refused: {$e->reason}\n");
+                    $this->assertSame('schema', $e->reason);
+                }
+            }
+            if ($absentTable !== null) {
+                $this->assertSame(0, (int) $pdo->query(DB::getDriverName() === 'sqlite' ? "SELECT COUNT(*) FROM sqlite_master WHERE name = '{$absentTable}'"
+                    : "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '{$absentTable}'")->fetchColumn());
+            }
+        }
+    }
+
+    private function assertChainOrdered(array $chain): void
+    {
+        for ($i = 1; $i < count($chain); $i++) {
+            $this->assertGreaterThan($chain[$i - 1]['retrieval_end_position'], $chain[$i]['retrieval_position'], 'Each admitted read began after the previous tail ended.');
+            $this->assertGreaterThan($chain[$i]['retrieval_position'], $chain[$i]['retrieval_end_position']);
+        }
+    }
+
+    /** All interleavings of the given event sequences, each keeping its own order. */
+    private function interleavings(array ...$sequences): array
+    {
+        $sequences = array_values(array_filter($sequences, fn ($s) => $s !== []));
+        if ($sequences === []) {
+            return [[]];
+        }
+        $result = [];
+        foreach ($sequences as $i => $sequence) {
+            $rest = $sequences;
+            $head = array_shift($rest[$i]);
+            foreach ($this->interleavings(...$rest) as $tail) {
+                $result[] = [$head, ...$tail];
+            }
+        }
+
+        return $result;
+    }
+
+    private function seeded(): array
+    {
+        $binding = F::binding();
+        $first = $this->retrieve($binding['id'], F::graph());
+
+        return [new BillingLedger, (array) DB::table('production_membership_billing_invoices')->where('id', $first['invoice_id'])->first()];
+    }
+
+    private function settled(): BillingVerdict
+    {
+        return BillingSettlement::evaluate(F::snapshots(F::graph()), F::expectation());
+    }
+
+    private function reversed(): BillingVerdict
+    {
+        return BillingSettlement::evaluate(F::snapshots(F::graph(self::REFUND)), F::expectation());
+    }
+
+    private function retrieve(string $bindingId, array $graph): array
+    {
+        return (new BillingReconciliation(new RehearsalBillingGateway($graph)))->retrieve($bindingId, F::INVOICE);
+    }
+
+    private function fiber(string $bindingId, SuspendingBillingGateway $gateway): \Fiber
+    {
+        return new \Fiber(function () use ($bindingId, $gateway): array|string {
+            try {
+                return (new BillingReconciliation($gateway))->retrieve($bindingId, F::INVOICE);
+            } catch (BillingException $error) {
+                return $error->reason;
+            }
+        });
+    }
+
+    /** A gateway that runs `$before` once, just before the first provider read. */
+    private function beforeFirstRead(RehearsalBillingGateway $inner, Closure $before): BillingProviderGateway
+    {
+        return new class($inner, $before) implements BillingProviderGateway
+        {
+            private bool $fired = false;
+
+            public function __construct(private readonly RehearsalBillingGateway $inner, private readonly Closure $before) {}
+
+            private function fire(): void
+            {
+                if (! $this->fired) {
+                    $this->fired = true;
+                    ($this->before)();
+                }
+            }
+
+            public function provenance(): string
+            {
+                return $this->inner->provenance();
+            }
+
+            public function account(): array
+            {
+                $this->fire();
+
+                return $this->inner->account();
+            }
+
+            public function retrieveInvoice(string $ref): array
+            {
+                $this->fire();
+
+                return $this->inner->retrieveInvoice($ref);
+            }
+
+            public function listInvoicePayments(string $invoiceRef): array
+            {
+                $this->fire();
+
+                return $this->inner->listInvoicePayments($invoiceRef);
+            }
+
+            public function retrievePaymentIntent(string $ref): array
+            {
+                $this->fire();
+
+                return $this->inner->retrievePaymentIntent($ref);
+            }
+
+            public function retrieveCharge(string $ref): array
+            {
+                $this->fire();
+
+                return $this->inner->retrieveCharge($ref);
+            }
+
+            public function retrieveBalanceTransaction(string $ref): array
+            {
+                $this->fire();
+
+                return $this->inner->retrieveBalanceTransaction($ref);
+            }
+
+            public function retrieveSubscription(string $ref): array
+            {
+                $this->fire();
+
+                return $this->inner->retrieveSubscription($ref);
+            }
+        };
+    }
+
+    /** Simulates lost committed position rows and a rewound counter (delete guard and bounds CHECK restored exactly). */
+    private function losePositions(array $ids, int $counter): void
+    {
+        $pdo = DB::connection()->getPdo();
+        $driver = DB::getDriverName();
+        $schema = new BillingSchema;
+        $logical = BillingSchema::TABLES[4];
+        $name = DB::connection()->getTablePrefix().$logical;
+        $table = $schema->table($logical);
+        $guards = (new ReflectionMethod(BillingSchema::class, 'guards'))->invoke($schema, $logical, $driver, $name, $table);
+        $guard = $name.'_delete';
+        $pdo->exec($driver === 'mysql' ? 'DROP TRIGGER `'.$guard.'`' : 'DROP TRIGGER "'.$guard.'"');
+        $pdo->exec('DELETE FROM '.$table.' WHERE id IN ('.implode(',', array_map('intval', $ids)).')');
+        if ($driver === 'mysql') {
+            $check = (new ReflectionMethod(BillingSchema::class, 'definition'))->invoke($schema, $logical, $driver)['check'];
+            $pdo->exec('ALTER TABLE '.$table.' AUTO_INCREMENT = '.($counter + 1).', DROP CHECK `'.$name.'_bounds`, ADD CONSTRAINT `'.$name.'_bounds` CHECK ('.$check.')');
+        } else {
+            $pdo->prepare('UPDATE sqlite_sequence SET seq = ? WHERE name = ?')->execute([$counter, $name]);
+        }
+        $pdo->exec($guards[$guard]['sql']);
+        $schema->assertOwned($pdo);
+    }
+
+    private function lose(string $payload): void
+    {
+        try {
+            $this->receive($payload);
+        } catch (BindingResolutionException) {
+            // Expected: no gateway is bound, so the post-commit dispatch fails as a queue outage would.
+        }
+    }
+
+    private function receive(string $payload): array
+    {
+        return (new BillingWebhookIntake)->receive($payload, WebhookSignature::generateSignatureHeader($payload, self::SECRET));
+    }
+
+    private function event(string $id): string
+    {
+        $values = ['id' => $id, 'object' => 'event', 'api_version' => BillingProviderPin::API_VERSION, 'created' => F::PERIOD_START,
+            'livemode' => false, 'pending_webhooks' => 1, 'request' => ['id' => null, 'idempotency_key' => null], 'type' => 'invoice.paid',
+            'data' => ['object' => F::graph()['invoice']]];
+
+        return json_encode(F::sdk(Event::class, $values), JSON_THROW_ON_ERROR);
+    }
+
+    private function at(int $offset): void
+    {
+        CarbonImmutable::setTestNow(CarbonImmutable::createFromTimestampUTC(self::T0 + $offset));
+    }
+}

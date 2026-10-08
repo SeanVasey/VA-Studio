@@ -1,0 +1,4 @@
+2026-10-08T10:54:28Z reviewer (lane 2): private mysqld 8.4.11 --no-defaults --user=root, 127.0.0.1:3751 (free per /proc/net/tcp: listeners 2024 2025 38167 41033; 3306 and 3711 untouched), --socket= (empty), --mysqlx=OFF, datadir $scratchpad/review-member2-mysql/data
+2026-10-08T10:54:37Z initialize-insecure rc=0
+2026-10-08T10:54:41Z started pid 1886; ping rc=0; root password set (review-only, synthetic); database vaseyaudio_review_member2 created rc=0
+2026-10-08T13:08:04Z all native runs finished; mysqladmin shutdown rc=0; pid 1886 exited=yes; port 3751 listener=none; mysqld processes on this datadir=0; server log copied to native/mysqld-server.log; datadir $scratchpad/review-member2-mysql (255M) removed rc=0. Other lanes' mysqld instances and :3306 untouched.

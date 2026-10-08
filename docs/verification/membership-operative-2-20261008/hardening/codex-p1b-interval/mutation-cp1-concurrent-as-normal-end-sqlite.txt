@@ -1,0 +1,49 @@
+# mutation CP-1: the job treats concurrent_retrieval as a normal end (like superseded_retrieval), scratch copy of the worktree, SQLite
+--- /home/user/VA-Studio-member-ops2/app/Jobs/RetrieveMembershipInvoice.php	2026-10-08 18:19:43.700550227 +0000
++++ app/Jobs/RetrieveMembershipInvoice.php	2026-10-08 18:49:04.981503675 +0000
+@@ -60,7 +60,7 @@
+         try {
+             $observation = $reconciliation->retrieve($this->bindingId, $this->invoiceRef());
+         } catch (BillingException $error) {
+-            if ($error->reason === 'superseded_retrieval') {
++            if ($error->reason === 'superseded_retrieval' || $error->reason === 'concurrent_retrieval') {
+                 return;
+             }
+             if ($error->reason === 'concurrent_retrieval' && $this->attempts() < $this->tries) {
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p1bi/mutation-cp4/phpunit.xml
+
+...........FFF..                                                  16 / 16 (100%)
+
+Time: 00:17.182, Memory: 101.00 MB
+
+There were 3 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_retrieval_whose_read_overlapped_the_tails_read_is_released_with_the_backoff_and_records_nothing@first attempt with data (1, 60)
+Job was expected to be released, but was not.
+Failed asserting that false is true.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Queue/InteractsWithQueue.php:227
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p1bi/mutation-cp4/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:181
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_retrieval_whose_read_overlapped_the_tails_read_is_released_with_the_backoff_and_records_nothing@second attempt with data (2, 600)
+Job was expected to be released, but was not.
+Failed asserting that false is true.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Queue/InteractsWithQueue.php:227
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p1bi/mutation-cp4/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:181
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_retrieval_whose_read_overlapped_the_tails_read_is_released_with_the_backoff_and_records_nothing@last attempt fails visibly with data (3, null)
+The last attempt must fail visibly, not end normally.
+Failed asserting that null is not null.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p1bi/mutation-cp4/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:180
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 16, Assertions: 47, Failures: 3.
+rc=1

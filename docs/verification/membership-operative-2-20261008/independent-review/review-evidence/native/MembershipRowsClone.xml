@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest" file="/home/user/VA-Studio-review-member2/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="145.229718">
+    <testcase name="test_a_clone_of_a_captured_frame_is_refused_and_destroying_it_never_releases_the_live_pin" file="/home/user/VA-Studio-review-member2/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php" line="188" class="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRowsFunctionClosureTest" assertions="1" time="145.229718"/>
+  </testsuite>
+</testsuites>

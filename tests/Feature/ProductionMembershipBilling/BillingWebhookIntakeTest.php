@@ -63,7 +63,7 @@ class BillingWebhookIntakeTest extends TestCase
         $this->assertSame(['binding_id' => $binding['id'], 'invoice_ref' => F::INVOICE], $result['scheduled']);
         $this->assertSame('retrieval_hint', $result['event']['disposition']);
         $this->assertSame(BillingValues::hash('invoice', F::ACCOUNT, 'test', F::INVOICE), $result['event']['invoice_ref_hash']);
-        Queue::assertPushed(RetrieveMembershipInvoice::class, fn ($job) => $job->bindingId === $binding['id'] && $job->invoiceRef === F::INVOICE);
+        Queue::assertPushed(RetrieveMembershipInvoice::class, fn ($job) => $job->bindingId === $binding['id'] && $job->invoiceRef() === F::INVOICE);
         $this->assertNothingObservedOrAwarded();
     }
 

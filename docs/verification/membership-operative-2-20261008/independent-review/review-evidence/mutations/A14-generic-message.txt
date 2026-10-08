@@ -1,0 +1,21 @@
+### tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+............F                                                     13 / 13 (100%)
+
+Time: 00:16.867, Memory: 99.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_first_retrieval_refusal_message_names_its_reason
+Failed asserting that 'Production membership billing unavailable.' [ASCII](length: 42) contains "binding_refused_subscription" [ASCII](length: 28).
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:170
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 13, Assertions: 39, Failures: 1.
+rc=1

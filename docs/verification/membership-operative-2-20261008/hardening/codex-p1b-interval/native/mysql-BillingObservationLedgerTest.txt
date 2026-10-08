@@ -1,0 +1,14 @@
+# green: BillingObservationLedgerTest, MySQL 8.4.11 private 127.0.0.1:3917, worktree /home/user/VA-Studio-member-ops2 (3fed2392 + this change)
+2026-10-08T19:36:25Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+..............                                                    14 / 14 (100%)
+
+Time: 14:48.043, Memory: 99.00 MB
+
+OK (14 tests, 54 assertions)
+rc=0
+elapsed_seconds=888

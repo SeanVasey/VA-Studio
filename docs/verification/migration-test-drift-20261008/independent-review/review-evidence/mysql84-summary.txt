@@ -1,0 +1,15 @@
+server: 8.4.11 flags: --innodb-flush-log-at-trx-commit=0 --innodb-doublewrite=OFF --skip-log-bin
+DiscoveryEpochMigrationTest rc=0 secs=540 :: [30;42mOK (9 tests, 42 assertions)[0m
+ServiceProjectSchemaTest rc=0 secs=274 :: [30;42mOK (3 tests, 19 assertions)[0m
+ProductionTrackCapabilitiesGuardsTest-rollback rc=0 secs=123 :: [30;42mOK (2 tests, 52 assertions)[0m
+probe-CapabilityFixture rc=1 secs=215 :: [37;41mTests: 5[0m[37;41m, Assertions: 76[0m[37;41m, Failures: 1[0m[37;41m.[0m
+probe-GuardsReasons rc=0 secs=110 :: [30;42mOK (2 tests, 53 assertions)[0m
+probe-ServiceReasons rc=0 secs=93 :: [30;42mOK (1 test, 5 assertions)[0m
+probe-DiscoveryReasons rc=0 secs=64 :: [30;42mOK (2 tests, 32 assertions)[0m
+probe-RightsSetUp-future rc=0 secs=23 :: [30;42mOK (1 test, 2 assertions)[0m
+probe-RightsSetUp-renamed_cde rc=0 secs=30 :: [30;42mOK (1 test, 2 assertions)[0m
+probe-RightsSetUp-cde_on_other_table rc=0 secs=80 :: [30;42mOK (1 test, 5 assertions)[0m
+RightsEvidenceGuardMigrationTest rc=0 secs=1726 :: [30;42mOK (33 tests, 191 assertions)[0m
+probe-RightsReasons rc=0 secs=1845 :: [30;42mOK (33 tests, 191 assertions)[0m
+ProductionTrackCapabilitiesGuardsTest rc=0 secs=1515 :: [30;42mOK (28 tests, 126 assertions)[0m
+DONE

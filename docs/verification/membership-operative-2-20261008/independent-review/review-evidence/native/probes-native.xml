@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ReviewProbes\Lane2ReviewProbeTest" file="/home/user/VA-Studio-review-member2/docs/verification/membership-operative-2-20261008/independent-review/review-evidence/probes/Lane2ReviewProbeTest.php" tests="2" assertions="52" errors="0" failures="1" skipped="0" time="273.674213">
+    <testcase name="test_native_concurrent_appends_are_ordered_by_start_under_the_lock" file="/home/user/VA-Studio-review-member2/docs/verification/membership-operative-2-20261008/independent-review/review-evidence/probes/Lane2ReviewProbeTest.php" line="185" class="Tests\Feature\ReviewProbes\Lane2ReviewProbeTest" classname="Tests.Feature.ReviewProbes.Lane2ReviewProbeTest" assertions="45" time="141.767849"/>
+    <testcase name="test_native_append_lock_blocks_only_appends_of_the_same_invoice" file="/home/user/VA-Studio-review-member2/docs/verification/membership-operative-2-20261008/independent-review/review-evidence/probes/Lane2ReviewProbeTest.php" line="225" class="Tests\Feature\ReviewProbes\Lane2ReviewProbeTest" classname="Tests.Feature.ReviewProbes.Lane2ReviewProbeTest" assertions="7" time="131.906364">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ReviewProbes\Lane2ReviewProbeTest::test_native_append_lock_blocks_only_appends_of_the_same_invoice
+Failed asserting that 2.73 is greater than 3.0.
+
+/home/user/VA-Studio-review-member2/docs/verification/membership-operative-2-20261008/independent-review/review-evidence/probes/Lane2ReviewProbeTest.php:256
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

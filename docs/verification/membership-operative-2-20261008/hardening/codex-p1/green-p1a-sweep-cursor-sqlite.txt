@@ -1,0 +1,13 @@
+$ base HEAD 83821fc0423d4eadd0715c7077c7ed64caba158d + uncommitted lane changes (git status in README)
+$ php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+.......                                                             7 / 7 (100%)
+
+Time: 00:11.773, Memory: 93.00 MB
+
+OK (7 tests, 112 assertions)
+rc=0

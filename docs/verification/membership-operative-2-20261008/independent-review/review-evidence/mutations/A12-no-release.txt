@@ -1,0 +1,39 @@
+### tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+.FF.F........                                                     13 / 13 (100%)
+
+Time: 00:17.211, Memory: 99.00 MB
+
+There were 3 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_an_unknown_outcome_under_an_owned_identity_is_appended_then_released_while_attempts_remain@first attempt with data (1, 60)
+Job was expected to be released, but was not.
+Failed asserting that false is true.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Queue/InteractsWithQueue.php:227
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:70
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_an_unknown_outcome_under_an_owned_identity_is_appended_then_released_while_attempts_remain@second attempt with data (2, 600)
+Job was expected to be released, but was not.
+Failed asserting that false is true.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Queue/InteractsWithQueue.php:227
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:70
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_provider_incomplete_outcome_under_an_owned_identity_is_appended_then_released
+Job was expected to be released, but was not.
+Failed asserting that false is true.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Queue/InteractsWithQueue.php:227
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:85
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 13, Assertions: 37, Failures: 3.
+rc=1

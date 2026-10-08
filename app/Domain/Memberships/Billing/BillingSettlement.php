@@ -235,6 +235,22 @@ final class BillingSettlement
             'amount_minor' => $amount, 'currency' => $e->currency]);
     }
 
+    /**
+     * Whether the retrieved account, invoice, customer and parent subscription all match the binding. `evaluate()` checks these in
+     * the order account, invoice identity, mode, customer, subscription, so a refusal for invoice identity or mode can arrive
+     * before the binding was ever compared. Pure, like evaluate().
+     */
+    public static function bindingValidated(BillingSnapshots $s, BillingExpectation $e): bool
+    {
+        $invoice = $s->invoice;
+
+        return ($s->account['object'] ?? null) === 'account' && ($s->account['id'] ?? null) === $e->accountRef
+            && ($invoice['object'] ?? null) === 'invoice' && ($invoice['id'] ?? null) === $s->requestedInvoiceRef
+            && BillingValues::ref($invoice['customer'] ?? null) === $e->customerRef
+            && ($invoice['parent']['type'] ?? null) === 'subscription_details'
+            && BillingValues::ref($invoice['parent']['subscription_details']['subscription'] ?? null) === $e->subscriptionRef;
+    }
+
     private static function none(mixed $value): bool
     {
         return $value === null || $value === [];

@@ -1,0 +1,17 @@
+["missing owned guard"] => guard identity or definition
+["changed owned guard"] => guard identity or definition
+["uppercase owned guard"] => guard identity or definition
+["foreign guard on owned table"] => additional table guard
+["changed table columns"] => table identity or definition
+["changed table definition"] => table identity or definition
+["missing unique index"] => index identity or definition
+["changed unique index"] => index identity or definition
+["extra table index"] => additional table index
+["partial owned tables"] => partial table installation
+["foreign key child"] => external foreign key reference
+["external view"] => external foreign key reference
+["external trigger"] => external foreign key reference
+["temporary owned table"] => temporary object shadow
+["temporary owned guard name"] => temporary object shadow
+["temporary foreign key child"] => external foreign key reference
+["temporary external view"] => external foreign key reference
