@@ -252,7 +252,9 @@ final class PaidGrantSchemaRecoveryTest extends TestCase
         if (DB::getDriverName() !== 'mysql') {
             $this->markTestSkipped('Native schema-global identifier collision evidence.');
         }
-        $this->assertStringStartsWith('8.0.46', DB::selectOne('SELECT VERSION() AS version')->version);
+        // The collision evidence is engine-specific, so the case binds to the supported MySQL families (8.0 and the 8.4 CI/production
+        // engine); the independent review re-ran every refusal on 8.4.11 (independent-review/review-evidence/item5-*).
+        $this->assertMatchesRegularExpression('/\A8\.(0|4)\./', DB::selectOne('SELECT VERSION() AS version')->version);
         foreach (['paid_grant_origins_batch', 'PAID_GRANT_ORIGINS_BATCH', 'páid_grant_origins_batch'] as $foreignName) {
             Schema::create('foreign_paid_marker', function (Blueprint $table) use ($foreignName): void {
                 $table->id();
