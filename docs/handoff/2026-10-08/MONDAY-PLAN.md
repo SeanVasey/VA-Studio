@@ -136,6 +136,7 @@ The best case, with no interop defects, is about 19 hours. If H0 is Friday 12:00
 
 | Time (UTC) | Update |
 | --- | --- |
+| 2026-10-08 23:30 | Claude handoff to Codex: see `CODEX-HANDOFF.md`. Open: #56 (addendum 15), #60, #62, #63; WIP branches for D1, M-16, B2 and the embed fix. |
 | 2026-10-08 23:00 | PR #44 merged (`672f5826`). PR #56 round 22 pushed, addendum 14 APPROVE WITH CONDITIONS. Census run complete: PR #60 opened. M-18 done. |
 | 2026-10-08 22:45 | Sean confirmed S-1 (interim local mode, locked down) and chose a staging subdomain for S-3. |
 | 2026-10-08 22:40 | Audits complete. Lanes A, B and B2 started. PR #56 at `94d32518` with addendum 13 running. Census run on `d3e1c39a` in progress. Inputs S-1 to S-11 listed. |
