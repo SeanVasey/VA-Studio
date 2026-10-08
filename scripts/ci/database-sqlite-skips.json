@@ -641,6 +641,22 @@
     [
       "Tests\\Unit\\MysqlConnectionTimezoneTest",
       "test_native_session_is_utc_and_a_local_dst_gap_instant_round_trips_byte_identical"
+    ],
+    [
+      "Tests\\Feature\\NativeSchemaIsolationTest",
+      "test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration"
+    ],
+    [
+      "Tests\\Feature\\NativeSchemaIsolationTest",
+      "test_dependencies_reaching_the_selected_schema_are_still_refused"
+    ],
+    [
+      "Tests\\Feature\\NativeSchemaIsolationTest",
+      "test_same_named_objects_in_a_parallel_schema_do_not_block_a_fresh_migration"
+    ],
+    [
+      "Tests\\Feature\\ProductionIdentity\\IdentityInspectionCostTest",
+      "test_one_native_inspection_issues_a_small_fixed_number_of_statements"
     ]
   ]
 }

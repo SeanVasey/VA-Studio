@@ -1,0 +1,13 @@
+diff --git a/database/migrations/2026_10_07_243000_inquiry_notification_intents.php b/database/migrations/2026_10_07_243000_inquiry_notification_intents.php
+index 0af173bd..7c74451f 100644
+--- a/database/migrations/2026_10_07_243000_inquiry_notification_intents.php
++++ b/database/migrations/2026_10_07_243000_inquiry_notification_intents.php
+@@ -461,7 +461,7 @@ return new class extends Migration
+             return true;
+         }
+         foreach ([$database, 'prepare'] as $name) {
+-            if (preg_match('/(?<![a-z0-9_])'.preg_quote($name, '/').'(?![a-z0-9_])/i', $sql) === 1) {
++            if (preg_match('/(?<![a-zA-Z0-9_])'.preg_quote($name, '/').'(?![a-zA-Z0-9_])/'.($name === $database ? '' : 'i'), $sql) === 1) {
+                 return true;
+             }
+         }

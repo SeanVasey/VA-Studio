@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeTest" file="/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php" tests="1" assertions="106" errors="0" failures="1" skipped="0" time="83.377783">
+    <testcase name="test_p7_batched_lookups_equal_the_original_per_name_queries" file="/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php" line="220" class="Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeTest" classname="Tests.Feature.ReviewProbes.ReviewerSchemaIsolationProbeTest" assertions="106" time="83.377783">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeTest::test_p7_batched_lookups_equal_the_original_per_name_queries
+P7 requested mismatch for pia_address_unique in SELECT TRIGGER_NAME,EVENT_OBJECT_TABLE,EVENT_MANIPULATION,ACTION_TIMING,ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND LOWER(TRIGGER_NAME)=?
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &amp;0 [
+-    0 =&gt; Array &amp;1 [
+-        'TRIGGER_NAME' =&gt; 'pia_address_uniqué',
+-        'EVENT_OBJECT_TABLE' =&gt; 'p7_alias_source',
+-        'EVENT_MANIPULATION' =&gt; 'INSERT',
+-        'ACTION_TIMING' =&gt; 'BEFORE',
+-        'ACTION_STATEMENT' =&gt; 'SET @p7 = 2',
+-    ],
+-]
++Array &amp;0 []
+
+/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php:299
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

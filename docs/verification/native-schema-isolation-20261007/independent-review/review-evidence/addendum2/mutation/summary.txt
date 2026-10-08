@@ -1,0 +1,9 @@
+M-capability-backtick rc=1 :: Tests: 5, Assertions: 18, Failures: 2. :: failing: test_each_matcher_refuses_a_delimited_database_name_before_matching@backtick test_each_matcher_refuses_a_delimited_database_name_before_matching@doubled  :: reverted_clean=0
+M-capability-dquote rc=1 :: Tests: 5, Assertions: 18, Failures: 2. :: failing: test_each_matcher_refuses_a_delimited_database_name_before_matching@double test_each_matcher_refuses_a_delimited_database_name_before_matching@leading  :: reverted_clean=0
+M-identity-backtick rc=1 :: Tests: 5, Assertions: 22, Failures: 2. :: failing: test_each_matcher_refuses_a_delimited_database_name_before_matching@backtick test_each_matcher_refuses_a_delimited_database_name_before_matching@doubled  :: reverted_clean=0
+M-identity-dquote rc=1 :: Tests: 5, Assertions: 22, Failures: 2. :: failing: test_each_matcher_refuses_a_delimited_database_name_before_matching@double test_each_matcher_refuses_a_delimited_database_name_before_matching@leading  :: reverted_clean=0
+M-inquiry-backtick rc=1 :: Tests: 5, Assertions: 24, Failures: 2. :: failing: test_each_matcher_refuses_a_delimited_database_name_before_matching@backtick test_each_matcher_refuses_a_delimited_database_name_before_matching@doubled  :: reverted_clean=0
+M-inquiry-dquote rc=1 :: Tests: 5, Assertions: 24, Failures: 2. :: failing: test_each_matcher_refuses_a_delimited_database_name_before_matching@double test_each_matcher_refuses_a_delimited_database_name_before_matching@leading  :: reverted_clean=0
+app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php: OK
+app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php: OK
+database/migrations/2026_10_07_243000_inquiry_notification_intents.php: OK

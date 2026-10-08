@@ -1,0 +1,12 @@
+2026-10-07T16:22:37Z patched source=de6ae38a2064e5b06e5ed919c4d944500eab5bdb staged-fix-files=app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php database/migrations/2026_10_07_243000_inquiry_notification_intents.php scripts/ci/database-sqlite-skips.json tests/Feature/NativeSchemaIsolationTest.php tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php 
+2026-10-07T16:22:37Z allocated vaseyaudio_service_review and vaseyaudio_trigscan_canary_foreign (root; no user or GRANT created)
+server version 8.4.11; other schemas present: vaseyaudio_test,vaseyaudio_paid252,vaseyaudio_features253,vaseyaudio_member257,vaseyaudio_review,vaseyaudio_trigscan,vaseyaudio_service_review,vaseyaudio_trigscan_canary_foreign
+canary sha256 before: 72648803519da41d025222e000ecfeceef051ca3e0cdcd0dd01c4dbdbcdaca8a
+phpunit exit=0
+canary sha256 after: 72648803519da41d025222e000ecfeceef051ca3e0cdcd0dd01c4dbdbcdaca8a
+OK (1 test, 7 assertions)
+snapshot saved
+2026-10-07T16:24:50Z cleanup: dropped vaseyaudio_service_review then vaseyaudio_trigscan_canary_foreign
+post-cleanup schemata matching: 0
+post-cleanup cross-schema FKs referencing foreign schema: 0
+post-cleanup mysql.db grants for either schema: 0

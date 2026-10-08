@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-trigscan/phpunit.xml
+
+E                                                                   1 / 1 (100%)
+
+Time: 01:14.089, Memory: 77.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionIdentity\ProductionIdentityMigrationTest::test_native_dictionary_unicode_guard_alias_on_foreign_table_is_refused
+PDOException: SQLSTATE[HY000]: General error: 1359 Trigger already exists
+
+/home/user/VA-Studio-review-trigscan/database/migrations/2026_10_07_247000_production_customer_identity.php:24
+/home/user/VA-Studio-review-trigscan/tests/Feature/ProductionIdentity/ProductionIdentityMigrationTest.php:137
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 1, Assertions: 1, Errors: 1.

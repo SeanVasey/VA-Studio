@@ -1,0 +1,6 @@
+2026-10-07T22:17:35Z reviewer private mysqld 8.4.11 --no-defaults, port 3497 (checked free in /proc/net/tcp), datadir $scratchpad/review-trigscan-mysql/data, socket $scratchpad/review-trigscan-mysql/s; shared 3306 and other reviewers' 3471/3493 untouched
+2026-10-07T22:17:49Z started pid 18644; root password set to the CI-only value; database vaseyaudio_review_trigscan created (utf8mb4_unicode_ci); lower_case_table_names=0
+2026-10-07T23:29:29Z before shutdown: schemata on 3497 = information_schema,mysql,performance_schema,sys,vaseyaudio_review_trigscan (no probe or lane peer schema remains)
+2026-10-07T23:29:31Z mysqladmin shutdown issued for pid 18644; err.log last line: 2026-10-07T23:29:30.561129Z 0 [System] [MY-015016] [Server] MySQL Server - end.
+2026-10-07T23:29:31Z after shutdown: /proc/18644 absent; LISTEN on 3497 (0DA9) in /proc/net/tcp = 0; remaining mysqld processes are other agents' (ports 3471, 3493): 2 ; any mysqld with port=3497: 0
+2026-10-07T23:29:33Z removed $scratchpad/review-trigscan-mysql (223M: data err.log init.log native.env start.sh ); exists after rm: no. Shared 3306 and other agents' instances untouched.

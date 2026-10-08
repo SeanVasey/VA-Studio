@@ -1,0 +1,6 @@
+2026-10-07T22:53:39Z probes-head exit=255 wall=0s tree=61b8ee17 dirty_app_db=0 :: 
+# attempt1 (22:53:39Z): PHP fatal, probe helper named count() overrides final TestCase::count(); renamed to countedInspection(); no test ran
+2026-10-07T22:57:58Z probes-head exit=0 wall=244s tree=61b8ee17 dirty_app_db=0 :: OK (8 tests, 1646 assertions)
+# 2026-10-07T23:25:37Z P7 revised to v2 after M4 v1 run showed the alias spelling in the requested-name set masks a binary prefilter (see mutations/M4_identity_binary_prefilter--probes-p7-v1-alias-in-name-set.txt). Probe sha256 v2: 3fb133e1f69c53c52fe79f1d756558e7324977c0560ff828cf4b3d29633472eb
+# v1 head run files renamed probes-head-v1.* (P7 v1); the v2 run below is the final probe file
+2026-10-07T23:27:29Z probes-head-v2 exit=0 wall=105s tree=61b8ee17 dirty_app_db=0 :: OK (8 tests, 3074 assertions)

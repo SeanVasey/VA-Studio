@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionIdentity\IdentityInspectionCostTest" file="/home/user/VA-Studio-trigscan/tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php" tests="1" assertions="6" errors="0" failures="0" skipped="0" time="86.079783">
+    <testcase name="test_one_native_inspection_issues_a_small_fixed_number_of_statements" file="/home/user/VA-Studio-trigscan/tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php" line="22" class="Tests\Feature\ProductionIdentity\IdentityInspectionCostTest" classname="Tests.Feature.ProductionIdentity.IdentityInspectionCostTest" assertions="6" time="86.079783"/>
+  </testsuite>
+</testsuites>

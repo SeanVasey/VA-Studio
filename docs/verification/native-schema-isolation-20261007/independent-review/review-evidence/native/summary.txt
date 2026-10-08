@@ -1,0 +1,6 @@
+start 2026-10-07T22:18:19Z head=61b8ee173b6d331610215a99bf65202edc90e042
+2026-10-07T22:23:31Z NativeSchemaIsolationTest exit=0 wall=312s tree=61b8ee17 dirty_app_db=0 :: OK (25 tests, 235 assertions)
+2026-10-07T22:24:44Z IdentityInspectionCostTest exit=0 wall=73s tree=61b8ee17 dirty_app_db=0 :: OK (1 test, 6 assertions)
+2026-10-07T22:36:40Z ProductionIdentityMigrationTest exit=0 wall=716s tree=61b8ee17 dirty_app_db=0 :: OK (5 tests, 19 assertions)
+2026-10-07T22:53:30Z ProductionIdentityDependencyAdmissionTest exit=0 wall=1010s tree=61b8ee17 dirty_app_db=0 :: OK (9 tests, 48 assertions)
+done 2026-10-07T22:53:30Z
