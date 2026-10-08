@@ -1,0 +1,12 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2.php b/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2.php
+index 4dadb7ca..4e231857 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2.php
+@@ -39,7 +39,6 @@ final class ProductionTaxPaidLineAdapterV2
+      */
+     public static function accept(ProductionTaxPaidOrderSourceV2 $source, int $position, array $line, string $provenance): array
+     {
+-        CheckoutException::require($provenance === 'synthetic_rehearsal', 'live_unsupported');
+         self::requireV2Shape($line);
+         CheckoutException::require(CanonicalJson::encode($source->line($position)) === CanonicalJson::encode($line), 'source_binding');
+         self::assertSelfConsistent($line, $provenance);

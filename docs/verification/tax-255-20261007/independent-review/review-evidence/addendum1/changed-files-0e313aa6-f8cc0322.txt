@@ -1,0 +1,11 @@
+app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxCheckout.php
+app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2.php
+app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchema.php
+app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php
+scripts/ci/database-sqlite-skips.json
+tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php
+tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php
+tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php
+tests/Feature/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2Test.php
+tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php
+tests/Support/RecordingTaxCheckoutTransport.php

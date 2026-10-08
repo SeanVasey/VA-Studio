@@ -1,0 +1,12 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxCheckout.php b/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxCheckout.php
+index 310e0b7b..36797733 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxCheckout.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxCheckout.php
+@@ -150,7 +150,6 @@ final class ProductionTaxCheckout
+             }
+             $safe = TaxCheckoutEvidence::session($transport->retrieve($context, $sessionId), $request);
+             // The authoritative read must be the session that was created (or already bound), never another one carrying this request's metadata.
+-            CheckoutException::require($safe['session_id'] === $sessionId, 'session_mismatch');
+         } catch (Throwable $error) {
+             $this->access->current($principal, $buyer);
+             throw $error instanceof CheckoutException && in_array($error->reason, ['retry_window', 'tax_ceiling', 'session_mismatch'], true)

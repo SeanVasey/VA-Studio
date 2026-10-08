@@ -1,0 +1,36 @@
+2026-10-08T03:19:00Z start Guard (tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php) db=review_tax255_guard
+2026-10-08T03:20:23Z reviewer stopped the first Guard run (pid 28941, no result yet) to split the queue into two background groups under the 2-hour limit; its partial receipt is discarded and the class is rerun below
+2026-10-08T03:20:27Z start Guard (tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php) db=review_tax255_guard
+2026-10-08T03:31:00Z end Guard exit=143 ....
+2026-10-08T03:31:00Z start NativeSchema (tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeSchemaTest.php) db=review_tax255_nativeschema
+2026-10-08T03:31:21Z Guard run above was terminated externally (exit 143, SIGTERM at 03:31:00Z, not sent by the reviewer); receipts moved to interrupted-external-sigterm/; Guard is rerun after Policy
+2026-10-08T03:31:53Z end NativeSchema exit=2 Tests: 3, Assertions: 0, Errors: 3.
+2026-10-08T03:31:54Z start Migration (tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutMigrationTest.php) db=review_tax255_migration
+2026-10-08T03:35:42Z end Migration exit=2 Tests: 10, Assertions: 0, Errors: 10.
+2026-10-08T03:35:42Z start Policy (tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutPolicyTest.php) db=review_tax255_policy
+2026-10-08T03:35:44Z end Policy exit=0 OK (43 tests, 147 assertions)
+2026-10-08T03:41:27Z NativeSchema and Migration results above are an environment error (leftover populated review_tax255_guard schema from the externally killed run; cross-schema trigger scan); receipts moved to env-error-leftover-schema/; all review_tax255_* schemas dropped; runner now drops other review schemas before each class
+2026-10-08T03:41:39Z start Guard (tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php) db=review_tax255_guard
+2026-10-08T03:53:24Z end Guard exit=0 OK (6 tests, 118 assertions)
+2026-10-08T03:53:24Z start NativeSchema (tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeSchemaTest.php) db=review_tax255_nativeschema
+2026-10-08T04:02:53Z end NativeSchema exit=0 OK (3 tests, 22 assertions)
+2026-10-08T04:02:53Z start Migration (tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutMigrationTest.php) db=review_tax255_migration
+2026-10-08T04:25:37Z end Migration exit=0 Tests: 10, Assertions: 191, Skipped: 8.
+2026-10-08T04:25:37Z start TaxReviewGuardAnchorProbeTest (docs/verification/tax-255-20261007/independent-review/review-evidence/probes/TaxReviewGuardAnchorProbeTest.php) db=review_tax255_taxreviewguardanchorprobetest
+2026-10-08T04:26:41Z coordinator: another lane ran pkill -f vendor/phpunit/phpunit/phpunit ~03:20-03:30Z; explains the 03:31:00Z terminations; all affected runs were repeated
+2026-10-08T04:27:28Z end TaxReviewGuardAnchorProbeTest exit=2 Tests: 1, Assertions: 1, Errors: 1.
+2026-10-08T04:27:28Z start TaxReviewNativeInstallerProbeTest (docs/verification/tax-255-20261007/independent-review/review-evidence/probes/TaxReviewNativeInstallerProbeTest.php) db=review_tax255_taxreviewnativeinstallerprobetest
+2026-10-08T04:27:50Z anchor probe run 1 = reviewer probe bug (receipts in anchor-probe-run1-probe-bug/); fixed; rerun queued after the installer probe
+2026-10-08T05:03:19Z end TaxReviewNativeInstallerProbeTest exit=0 OK (12 tests, 29 assertions)
+2026-10-08T05:03:49Z start TaxReviewGuardAnchorProbeTest (docs/verification/tax-255-20261007/independent-review/review-evidence/probes/TaxReviewGuardAnchorProbeTest.php) db=review_tax255_taxreviewguardanchorprobetest
+2026-10-08T05:07:24Z end TaxReviewGuardAnchorProbeTest exit=0 OK (1 test, 4 assertions)
+2026-10-08T05:07:24Z start Journey (tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php) db=review_tax255_journey
+2026-10-08T05:58:22Z end Journey exit=0 OK (15 tests, 109 assertions)
+2026-10-08T05:58:23Z start SourceV2 (tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php) db=review_tax255_sourcev2
+2026-10-08T06:06:46Z end SourceV2 exit=0 OK (3 tests, 42 assertions)
+2026-10-08T06:06:46Z start PaidLineAdapterV2 (tests/Feature/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2Test.php) db=review_tax255_paidlineadapterv2
+2026-10-08T06:06:46Z end PaidLineAdapterV2 exit=0 OK (19 tests, 24 assertions)
+2026-10-08T06:06:47Z start FrozenV1 (tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutFrozenV1Test.php) db=review_tax255_frozenv1
+2026-10-08T06:06:47Z end FrozenV1 exit=0 OK (2 tests, 27 assertions)
+2026-10-08T06:06:47Z start HttpBoundary (tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutHttpBoundaryTest.php) db=review_tax255_httpboundary
+2026-10-08T06:06:50Z reviewer stopped the queue at HttpBoundary (not requested natively; would exceed the 2-hour background limit). HttpBoundary is SQLite-only in this review

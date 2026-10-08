@@ -1,0 +1,11 @@
+--- a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchema.php	2026-10-07 23:43:24.789204045 +0000
++++ b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchema.php	2026-10-07 23:43:54.600268935 +0000
+@@ -182,7 +182,7 @@
+         if ($driver === 'sqlite') {
+             $pattern = str_repeat($h, 8).'-'.str_repeat($h, 4).'-4'.str_repeat($h, 3).'-[89ab]'.str_repeat($h, 3).'-'.str_repeat($h, 12);
+ 
+-            return "LENGTH(NEW.{$column}) = 36 AND NEW.{$column} GLOB '{$pattern}'";
++            return "LENGTH(NEW.{$column}) = 36";
+         }
+ 
+         return "CHAR_LENGTH(NEW.{$column}) = 36 AND NEW.{$column} REGEXP '^{$h}{8}-{$h}{4}-4{$h}{3}-[89ab]{$h}{3}-{$h}{12}\$'";

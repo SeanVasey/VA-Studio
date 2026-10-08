@@ -1,0 +1,1 @@
+Interrupted, retained: the run was killed at the 30-minute background limit after 11 of 20 cases (F........S.). The JUnit file is empty because PHPUnit was killed before writing it. The first F is diagnosed separately (native-dictionary-*).

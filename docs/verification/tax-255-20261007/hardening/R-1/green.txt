@@ -1,0 +1,23 @@
+# green: R-1 on the fixed adapter (SourceV2 + adapter classes)
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-tax255h/phpunit.xml
+
+.....                                                               5 / 5 (100%)
+
+Time: 00:16.122, Memory: 100.00 MB
+
+OK (5 tests, 52 assertions)
+rc=0
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-tax255h/phpunit.xml
+
+....................                                              20 / 20 (100%)
+
+Time: 00:00.682, Memory: 63.00 MB
+
+OK (20 tests, 26 assertions)
+rc=0

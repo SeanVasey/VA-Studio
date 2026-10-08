@@ -1,0 +1,15 @@
+# R-3: Migration class on native MySQL, fixed schema (8 SQLite-only cases skip by design)
+# native MySQL 8.4.11 private instance 127.0.0.1:3721 schema h255_g6 root=/home/user/VA-Studio-tax255h start 2026-10-08T07:18:39Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-tax255h/phpunit.xml
+
+S.SSSSSSS.                                                        10 / 10 (100%)
+
+Time: 16:17.037, Memory: 89.00 MB
+
+OK, but some tests were skipped!
+Tests: 10, Assertions: 191, Skipped: 8.
+rc=0
+# end 2026-10-08T07:34:56Z

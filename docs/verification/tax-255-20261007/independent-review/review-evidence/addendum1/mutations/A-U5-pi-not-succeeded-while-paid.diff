@@ -1,0 +1,12 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
+index d8834d2c..ae0e554e 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
+@@ -267,7 +267,6 @@ final class TaxCheckoutEvidence
+                     && $safe['status'] === 'complete' && $safe['payment_status'] === 'paid' && $safe['automatic_tax']['status'] === 'complete', 'provider_inconsistent');
+                 $outcome = 'confirmed';
+             } else {
+-                CheckoutException::require($safe['payment_status'] !== 'paid', 'provider_inconsistent');
+                 $outcome = $payment['status'] === 'requires_capture' ? 'authorized' : ($payment['status'] === 'canceled' ? 'canceled' : 'pending');
+             }
+             $safePayment = array_intersect_key($payment, array_flip(['id', 'object', 'livemode', 'currency', 'amount', 'amount_received', 'amount_capturable',

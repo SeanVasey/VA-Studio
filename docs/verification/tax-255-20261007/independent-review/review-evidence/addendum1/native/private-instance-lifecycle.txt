@@ -1,0 +1,6 @@
+2026-10-08T07:44:08Z reviewer private mysqld 8.4.11 --no-defaults, port 3767 (listeners per /proc/net/tcp: 2024 2025 3711 3741 3751 37277 41441; 3306/3711/3721/3741 excluded), datadir $scratchpad/review-tax255b-mysql/data, --socket= empty, --mysqlx=OFF; other lanes' mysqld pids 823 8401 14614 untouched
+2026-10-08T07:44:15Z started pid 17822; throwaway root password ci-only-password (loopback only)
+2026-10-08T09:02:10Z before shutdown: pid 17822 alive=yes; remaining rv_ schemas: 
+2026-10-08T09:02:14Z mysqladmin shutdown exit=0; /proc/17822 present=no; LISTEN sockets on 3767 (/proc/net/tcp)=0; err.log last: 2026-10-08T09:02:12.354669Z 0 [System] [MY-015016] [Server] MySQL Server - end.
+2026-10-08T09:02:14Z removed $scratchpad/review-tax255b-mysql (253M); exists after=no; pgrep -x mysqld now: 823 8401 (other lanes, untouched)
+2026-10-08T09:02:15Z removed /home/user/VA-Studio-review-tax255b-aux (0 tracked changes; --force only for vendor symlinks and .env)

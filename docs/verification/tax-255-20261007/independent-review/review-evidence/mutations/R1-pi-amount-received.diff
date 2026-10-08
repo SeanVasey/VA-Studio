@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
+index d8834d2c..d66d4523 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
+@@ -263,7 +263,7 @@ final class TaxCheckoutEvidence
+                 CheckoutException::require(($payment[$field] ?? null) === null);
+             }
+             if ($payment['status'] === 'succeeded') {
+-                CheckoutException::require($payment['amount_received'] === $total && $payment['amount_capturable'] === 0
++                CheckoutException::require($payment['amount_capturable'] === 0
+                     && $safe['status'] === 'complete' && $safe['payment_status'] === 'paid' && $safe['automatic_tax']['status'] === 'complete', 'provider_inconsistent');
+                 $outcome = 'confirmed';
+             } else {

@@ -1,0 +1,29 @@
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php exit=1
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255b-aux/phpunit.xml
+
+.................F...                                             21 / 21 (100%)
+
+Time: 02:15.152, Memory: 114.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutJourneyTest::test_reconcile_refuses_a_retrieved_session_that_is_not_the_bound_one_and_retains_nothing
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 'session_mismatch',
++    0 => 'changed',
+     1 => 409,
+ ]
+
+/home/user/VA-Studio-review-tax255b-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php:298
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 21, Assertions: 137, Failures: 1.
+

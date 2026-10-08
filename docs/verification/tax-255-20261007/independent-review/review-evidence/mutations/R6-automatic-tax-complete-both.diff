@@ -1,0 +1,22 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
+index d8834d2c..b85d129a 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
+@@ -221,7 +221,7 @@ final class TaxCheckoutEvidence
+         $net = $behavior === 'exclusive' ? $subtotal : $subtotal - $tax;
+         CheckoutException::require($net >= 0 && $tax * 10000 <= $net * $ceiling, 'tax_ceiling');
+         if ($session['status'] === 'complete' || $session['payment_status'] === 'paid') {
+-            CheckoutException::require($automatic['status'] === 'complete', 'provider_inconsistent');
++            
+         }
+         $payment = $session['payment_intent'] ?? null;
+         CheckoutException::require($payment === null || (is_string($payment) && preg_match('/\Api_[A-Za-z0-9]{1,120}\z/D', $payment) === 1));
+@@ -264,7 +264,7 @@ final class TaxCheckoutEvidence
+             }
+             if ($payment['status'] === 'succeeded') {
+                 CheckoutException::require($payment['amount_received'] === $total && $payment['amount_capturable'] === 0
+-                    && $safe['status'] === 'complete' && $safe['payment_status'] === 'paid' && $safe['automatic_tax']['status'] === 'complete', 'provider_inconsistent');
++                    && $safe['status'] === 'complete' && $safe['payment_status'] === 'paid', 'provider_inconsistent');
+                 $outcome = 'confirmed';
+             } else {
+                 CheckoutException::require($safe['payment_status'] !== 'paid', 'provider_inconsistent');

@@ -1,0 +1,14 @@
+# R-6 green: definer and sql_mode drift cases on native MySQL, fixed installer
+# native MySQL 8.4.11 private instance 127.0.0.1:3721 schema h255_g2 root=/home/user/VA-Studio-tax255h start 2026-10-08T06:29:27Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-tax255h/phpunit.xml
+
+..                                                                  2 / 2 (100%)
+
+Time: 04:37.653, Memory: 87.00 MB
+
+OK (2 tests, 6 assertions)
+rc=0
+# end 2026-10-08T06:34:05Z

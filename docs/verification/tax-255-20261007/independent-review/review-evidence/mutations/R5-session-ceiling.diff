@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
+index d8834d2c..d3c46daf 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
+@@ -219,7 +219,7 @@ final class TaxCheckoutEvidence
+             && $session['amount_total'] === ($behavior === 'exclusive' ? $subtotal + $tax : $subtotal), 'provider_inconsistent');
+         // The approved machine-policy ceiling bounds what may be retained; the amount itself is never adjusted.
+         $net = $behavior === 'exclusive' ? $subtotal : $subtotal - $tax;
+-        CheckoutException::require($net >= 0 && $tax * 10000 <= $net * $ceiling, 'tax_ceiling');
++        
+         if ($session['status'] === 'complete' || $session['payment_status'] === 'paid') {
+             CheckoutException::require($automatic['status'] === 'complete', 'provider_inconsistent');
+         }

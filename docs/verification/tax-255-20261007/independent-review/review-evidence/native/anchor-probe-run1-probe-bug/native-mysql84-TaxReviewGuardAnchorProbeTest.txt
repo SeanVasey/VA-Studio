@@ -1,0 +1,36 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255/phpunit.xml
+
+E                                                                   1 / 1 (100%)
+
+Time: 01:50.644, Memory: 79.00 MB
+
+There was 1 error:
+
+1) Tests\ReviewProbes\TaxReviewGuardAnchorProbeTest::test_q3_trailing_line_feed_in_provider_identifiers
+Illuminate\Database\UniqueConstraintViolationException: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '1' for key 'production_tax_checkout_requests.ptx_r_u0' (Connection: mysql, Host: 127.0.0.1, Port: 3567, Database: review_tax255_taxreviewguardanchorprobetest, SQL: insert into `production_tax_checkout_requests` (`public_id`, `created_at`, `payload_ciphertext`, `payload_hash`, `canonicalization_version`, `order_id`, `account_id`, `funds_mode`, `idempotency_key`, `currency`, `subtotal_minor`, `tax_behavior`, `maximum_rate_bps`, `provider_expires_at`) values (33333333-3333-4333-8333-333333333334, 2026-10-07T12:00:01Z, synthetic-ciphertext, aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, vasey-json-v1, 1, acct_SYNTHETIC, test, va-production-tax-checkout-v2-33333333-3333-4333-8333-333333333334, USD, 4999, exclusive, 2500, 2026-10-07T13:00:01Z))
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php:42
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/MySqlProcessor.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4320
+/home/user/VA-Studio-review-tax255/docs/verification/tax-255-20261007/independent-review/review-evidence/probes/TaxReviewGuardAnchorProbeTest.php:56
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+Caused by
+PDOException: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '1' for key 'production_tax_checkout_requests.ptx_r_u0'
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php:53
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:846
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php:42
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/MySqlProcessor.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4320
+/home/user/VA-Studio-review-tax255/docs/verification/tax-255-20261007/independent-review/review-evidence/probes/TaxReviewGuardAnchorProbeTest.php:56
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 1, Assertions: 1, Errors: 1.
