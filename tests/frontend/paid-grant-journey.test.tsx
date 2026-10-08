@@ -104,6 +104,37 @@ describe('mounted original paid-purpose journey', () => {
       expect(fetcher.mock.calls[4][0]).toBe(fetcher.mock.calls[2][0]); expect(fetcher.mock.calls[4][1]?.body).toBe(fetcher.mock.calls[2][1]?.body);
     } finally { visibility.mockRestore(); }
   });
+  it('keeps a refused download retryable only after a later saved read shows that exact authorization still unused', async () => {
+    const token = 'KEPT_SYNTHETIC_PAID_TOKEN'.padEnd(43, 'a');
+    const auth = { id: authorizationId, token, expiresAt: '2026-10-07 01:03:03', kind: 'contract', filename: `paid-license-${lineId}-contract.pdf`, mimeType: 'application/pdf' };
+    const statusWith = (state: 'unused' | 'attempted') => response({ status: { schemaVersion: 1, originId: batchId, fulfilled: true, lines: [{ id: lineId, attemptCount: state === 'attempted' ? 1 : 0, maxDownloads: 3, historyLimit: 20,
+      renderRetryAllowed: false, renderRetryAfter: null, history: [{ id: authorizationId, kind: 'contract', issuedAt: '2026-10-07 01:02:03', expiresAt: '2026-10-07 01:03:03', status: state, attemptedAt: state === 'attempted' ? '2026-10-07 01:02:09' : null }] }] } });
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete })).mockResolvedValueOnce(response({ authorization: auth }))
+      .mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete })).mockResolvedValueOnce(statusWith('unused')).mockResolvedValueOnce(statusWith('attempted'));
+    const forms: { action: string; token: string }[] = [];
+    vi.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(function (this: HTMLFormElement) { forms.push({ action: this.getAttribute('action')!, token: (this.querySelector('input[name="token"]') as HTMLInputElement).value }); });
+    render(<PaidGrantJourney />); await openSaved();
+    fireEvent.click(screen.getByRole('button', { name: 'Authorize contract for Original synthetic recording' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Download authorized file' }));
+    // The server refuses before recording anything (for example its spool is busy): the page is cleared as for any refusal.
+    const frame = document.querySelector<HTMLIFrameElement>('iframe[title="Paid license attachment response"]')!;
+    Object.defineProperty(frame, 'contentDocument', { value: { location: { href: 'http://localhost/paid-grants/authorizations/x/redeem' }, body: { textContent: JSON.stringify({ code: 'PAID_GRANT_UNAVAILABLE' }) } } });
+    await act(async () => { frame.dispatchEvent(new Event('load')); });
+    expect(screen.getByRole('alert')).toHaveTextContent('still unused can then be retried');
+    expect(screen.queryByLabelText('Retained paid order')).not.toBeInTheDocument(); expect(document.body.innerHTML).not.toContain(token);
+    expect(screen.queryByRole('button', { name: 'Retry the authorized download' })).not.toBeInTheDocument();
+    // A saved read taken after the submission shows that authorization unused: the same token may be submitted again.
+    fireEvent.click(screen.getByRole('button', { name: 'Open paid licenses' }));
+    fireEvent.click(await screen.findByRole('button', { name: `Open saved order ${orderId}` })); await screen.findByLabelText('Retained paid order');
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh preparation and download status' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Retry the authorized download' }));
+    expect(forms).toEqual([{ action: `/paid-grants/authorizations/${authorizationId}/redeem`, token }, { action: `/paid-grants/authorizations/${authorizationId}/redeem`, token }]);
+    // The retry cleared the earlier status; once status shows the authorization attempted, no retry is offered.
+    expect(screen.queryByRole('button', { name: 'Retry the authorized download' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh preparation and download status' })); await screen.findByText(/contract \/ attempted/);
+    expect(screen.queryByRole('button', { name: 'Retry the authorized download' })).not.toBeInTheDocument();
+    expect(document.body.innerHTML).not.toContain(token);
+  });
   it('uses token-free saved lease admission before retrying a claimed original and displays consumed attempts truthfully', async () => {
     const claimed: PaidOrigin = { ...origin, lines: [{ ...origin.lines[0], documentStatus: 'claimed', attempts: 1 }] };
     const status = { schemaVersion: 1, originId: batchId, fulfilled: false, lines: [{ id: lineId, attemptCount: 1, maxDownloads: 3, historyLimit: 20, renderRetryAllowed: true, renderRetryAfter: '2026-10-07 01:07:03',

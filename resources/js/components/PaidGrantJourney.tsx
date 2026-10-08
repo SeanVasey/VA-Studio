@@ -90,12 +90,12 @@ export function PaidGrantJourney() {
   const [status, setStatus] = useState<Status | null>(null), [authorization, setAuthorization] = useState<Authorization | null>(null);
   const [pending, setPending] = useState<Pending | null>(null), [reviewedSaved, setReviewedSaved] = useState(false), [statusAfter, setStatusAfter] = useState<{ pending: Pending; issuedAt: number } | null>(null);
   const [busy, setBusy] = useState(false), [denied, setDenied] = useState(false), [message, setMessage] = useState('');
-  const sentAt = useRef(0), active = useRef(false), generation = useRef(0), request = useRef<AbortController | null>(null), inflight = useRef(false), frames = useRef<HTMLIFrameElement[]>([]), alert = useRef<HTMLDivElement>(null);
+  const sentAt = useRef(0), kept = useRef<Authorization | null>(null), active = useRef(false), generation = useRef(0), request = useRef<AbortController | null>(null), inflight = useRef(false), frames = useRef<HTMLIFrameElement[]>([]), alert = useRef<HTMLDivElement>(null);
   function clear(keepPending = false) { setData(null); setOrigin(null); setOrder(''); setStatus(null); setAuthorization(null); if (!keepPending) setPending(null); setReviewedSaved(false); setStatusAfter(null); frames.current.forEach(f => f.remove()); frames.current = []; }
-  function refuse() { clear(); setDenied(true); setMessage('Access changed. Open a fresh sign-in page before continuing.'); }
+  function refuse() { clear(); kept.current = null; setDenied(true); setMessage('Access changed. Open a fresh sign-in page before continuing.'); }
   useEffect(() => {
     active.current = true;
-    const leave = () => { generation.current++; request.current?.abort(); clear(); inflight.current = false; setBusy(false); };
+    const leave = () => { generation.current++; request.current?.abort(); clear(); kept.current = null; inflight.current = false; setBusy(false); };
     // Hiding the tab is not leaving: everything shown is cleared and an in-flight request is abandoned, but an uncertain
     // finalize or authorize keeps its exact replay (same request key and nonce, held in memory and never rendered), so a
     // committed authorization can still be recovered instead of duplicated. Actual departure (pagehide) clears it too.
@@ -163,14 +163,20 @@ export function PaidGrantJourney() {
     const p: Pending = { path: `/paid-grants/origins/${origin.id}/lines/${lineId}/authorize`, body: { requestKey: crypto.randomUUID(), originHash: line.originHash, kind: k, nonce }, origin, lineId };
     setPending(p); setReviewedSaved(false); execute(p);
   }
-  function download() {
-    const token = csrf(), a = authorization; if (!a || !token || denied || busy) return; setAuthorization(null);
+  // A refusal can come before anything is recorded (for example a busy spool), leaving the authorization live and unused.
+  // Its token is kept in memory only (never rendered) so that, once a saved status read taken after the submission shows
+  // that exact authorization still unused, the customer can retry it instead of issuing another. The server refuses a
+  // spent or expired token, so a retry can never redeem twice. A denial or leaving the page drops it.
+  function download() { if (authorization) submit(authorization); }
+  function retryDownload() { if (kept.current) submit(kept.current); }
+  function submit(a: Authorization) {
+    const token = csrf(); if (!token || denied || busy) return; setAuthorization(null); kept.current = a; setStatus(null);
     if (frames.current.length === 3) frames.current.shift()?.remove();
     const frame = document.createElement('iframe'); frame.name = `paid-grant-${crypto.randomUUID()}`; frame.title = 'Paid license attachment response'; frame.hidden = true; frame.setAttribute('referrerpolicy', 'no-referrer');
     const mine = generation.current;
     frame.addEventListener('load', () => { if (!active.current || mine !== generation.current) return; try {
       const doc = frame.contentDocument; if (!doc || doc.location.href === 'about:blank') return; const raw = doc.body?.textContent ?? ''; if (raw.length > 4096) throw new Error(); const failure = JSON.parse(raw);
-      if (obj(failure) && failure.code === 'PAID_GRANT_UNAVAILABLE') { clear(); setMessage('The download was refused. Refresh saved licenses before trying again.'); } else throw new Error();
+      if (obj(failure) && failure.code === 'PAID_GRANT_UNAVAILABLE') { clear(); setMessage('The download was refused. Refresh saved licenses and download status; an authorization that is still unused can then be retried.'); } else throw new Error();
     } catch { setMessage('The attachment result could not be confirmed. Check browser downloads and refresh saved status.'); } });
     document.body.append(frame); frames.current.push(frame);
     const form = document.createElement('form'); form.method = 'POST'; form.action = `/paid-grants/authorizations/${a.id}/redeem`; form.target = frame.name; form.enctype = 'application/x-www-form-urlencoded'; form.hidden = true;
@@ -178,6 +184,8 @@ export function PaidGrantJourney() {
     document.body.append(form); try { HTMLFormElement.prototype.submit.call(form); setMessage('A download attempt was submitted. Check browser downloads; an interrupted attempt can be consumed without file receipt.'); }
     catch { setMessage(unknown); } finally { form.querySelectorAll('input').forEach(f => { f.value = ''; }); form.remove(); }
   }
+  const retained = kept.current, keptUnused = !!retained && !denied && !!origin && status?.originId === origin.id
+    && status.lines.some(l => l.history.some(h => h.id === retained.id && h.kind === retained.kind && h.status === 'unused'));
   const unfinished = origin?.lines.filter(l => l.documentStatus !== 'complete') ?? [];
   const retryAllowed = unfinished.length > 0 && unfinished.every(l => l.attempts < 5 && (l.documentStatus !== 'claimed' || status?.lines.find(s => s.id === l.id)?.renderRetryAllowed === true));
   return <section aria-label="Paid license journey" aria-busy={busy}>
@@ -204,6 +212,7 @@ export function PaidGrantJourney() {
         {l.files.map(f => <div key={f.kind}><p>{f.kind} / {f.sizeBytes} bytes / SHA256 {f.sha256}</p><button type="button" disabled={busy || !!pending} onClick={() => authorize(l.id, f.kind)}>Authorize {f.kind} for {l.title}</button></div>)}
       </article>)}
       {authorization && <div><p>{authorization.filename}; expires {authorization.expiresAt} UTC.</p><button type="button" disabled={busy} onClick={download}>Download authorized file</button></div>}
+      {!authorization && keptUnused && retained && <div><p>{retained.filename} is still authorized and unused; expires {retained.expiresAt} UTC.</p><button type="button" disabled={busy} onClick={retryDownload}>Retry the authorized download</button></div>}
     </section>}
   </section>;
 }
