@@ -101,7 +101,9 @@ describe('per-operation request timeouts', () => {
   const authorization = { id: authorizationId, token: 'REPLAYED_SYNTHETIC_PAID_TOKEN'.padEnd(43, 'a'), expiresAt: '2026-10-07 01:03:03', kind: 'master_wav', filename: `paid-license-${lineId}-master_wav.wav`, mimeType: 'audio/wav' };
   const pendingFetch = (signals: AbortSignal[]) => (_: unknown, init?: RequestInit) => { signals.push(init!.signal!); return new Promise<Response>(() => {}); };
   it('sizes each abort from the measured server work instead of one 20 s limit', async () => {
-    expect(paidRequestTimeouts).toEqual({ read: 30_000, finalize: 80_000, authorize: 80_000, document: 320_000 });
+    expect(paidRequestTimeouts).toEqual({ read: 80_000, finalize: 80_000, authorize: 80_000, document: 320_000 });
+    // Reads share the 60 s server budget (PaidGrantReads::index, PaidGrantCommands::run) and the 5 s session-lock wait.
+    expect(paidRequestTimeouts.read).toBeGreaterThanOrEqual(60_000 + 5_000 + 15_000);
     const timers = vi.spyOn(window, 'setTimeout');
     const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin })).mockResolvedValueOnce(response({ origin: complete }))
       .mockResolvedValueOnce(response({ status: { schemaVersion: 1, originId: batchId, fulfilled: true, lines: [{ id: lineId, attemptCount: 0, maxDownloads: 3, historyLimit: 20, renderRetryAllowed: false, renderRetryAfter: null, history: [] }] } }))
@@ -118,7 +120,7 @@ describe('per-operation request timeouts', () => {
     const aborts = timers.mock.calls.map(([, delay]) => delay ?? 0).filter(delay => delay > 1_000);
     expect(fetcher.mock.calls.map(([path]) => String(path))).toEqual(['/paid-grants/index', `/paid-grants/origins/${batchId}`, `/paid-grants/origins/${batchId}/document`,
       `/paid-grants/origins/${batchId}/downloads`, `/paid-grants/origins/${batchId}/lines/${lineId}/authorize`, `/paid-grants/orders/${orderId}/finalize`]);
-    expect(aborts).toEqual([30_000, 30_000, 320_000, 30_000, 80_000, 80_000]);
+    expect(aborts).toEqual([80_000, 80_000, 320_000, 80_000, 80_000, 80_000]);
   });
   it('keeps a measured-length document preparation open and still aborts it at its own bound', async () => {
     const signals: AbortSignal[] = [];

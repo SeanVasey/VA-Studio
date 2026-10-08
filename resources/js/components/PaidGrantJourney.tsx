@@ -75,13 +75,13 @@ async function readJson(response: Response, signal: AbortSignal): Promise<unknow
 const csrf = () => document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ?? null;
 const unknown = 'The result could not be confirmed. Refresh saved licenses before deliberately retrying the same request.';
 /**
- * Client abort per operation, in milliseconds. A mutating request waits past the server's own hard budget (60 s for
+ * Client abort per operation, in milliseconds. Every request waits past the server's own hard budget (60 s for reads,
  * finalize and authorize, the 300 s render lease for document) plus the 5 s session-lock wait and a 15 s margin, so the
- * browser never discards an answer the server can still commit; a deliberate retry then cannot race the original.
- * Reads change nothing and stay short. Measured native work: finalize 18 s, authorize 12-20 s, document 65-76 s
+ * browser never discards an answer the server can still give or commit; a deliberate retry then cannot race the original.
+ * Measured native work: finalize 18 s, authorize 12-20 s, document 65-76 s
  * (docs/verification/paid252-composition-20261007/hardening/codex-1/README.md).
  */
-export const paidRequestTimeouts = { read: 30_000, finalize: 80_000, authorize: 80_000, document: 320_000 } as const;
+export const paidRequestTimeouts = { read: 80_000, finalize: 80_000, authorize: 80_000, document: 320_000 } as const;
 export type PaidOperation = keyof typeof paidRequestTimeouts;
 export function PaidGrantJourney() {
   const [data, setData] = useState<Listing | null>(null), [origin, setOrigin] = useState<PaidOrigin | null>(null), [order, setOrder] = useState('');
