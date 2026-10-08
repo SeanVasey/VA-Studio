@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\ReviewProbes\Free256\NativeConcurrencyProbeTest" file="/home/user/VA-Studio-review-free256/docs/verification/free-256-20261007/independent-review/review-evidence/probes/NativeConcurrencyProbeTest.php" tests="1" assertions="30" errors="0" failures="0" skipped="0" time="720.555518">
+    <testcase name="test_two_processes_race_at_the_cap_on_native_mysql" file="/home/user/VA-Studio-review-free256/docs/verification/free-256-20261007/independent-review/review-evidence/probes/NativeConcurrencyProbeTest.php" line="24" class="Tests\ReviewProbes\Free256\NativeConcurrencyProbeTest" classname="Tests.ReviewProbes.Free256.NativeConcurrencyProbeTest" assertions="30" time="720.555518"/>
+  </testsuite>
+</testsuites>

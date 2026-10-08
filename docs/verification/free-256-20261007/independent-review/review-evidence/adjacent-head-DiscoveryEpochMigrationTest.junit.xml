@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\DiscoveryEpochMigrationTest" file="/home/user/VA-Studio-review-free256/tests/Feature/DiscoveryEpochMigrationTest.php" tests="9" assertions="22" errors="0" failures="2" skipped="0" time="13.927934">
+    <testsuite name="Tests\Feature\DiscoveryEpochMigrationTest::test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate" tests="2" assertions="2" errors="0" failures="2" skipped="0" time="3.564735">
+      <testcase name="test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set &quot;empty&quot;" file="/home/user/VA-Studio-review-free256/tests/Feature/DiscoveryEpochMigrationTest.php" line="31" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="1" time="2.419818">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\DiscoveryEpochMigrationTest::test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set "empty"
+Operational teardown admitted.
+
+/home/user/VA-Studio-review-free256/tests/Feature/DiscoveryEpochMigrationTest.php:43
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set &quot;populated&quot;" file="/home/user/VA-Studio-review-free256/tests/Feature/DiscoveryEpochMigrationTest.php" line="31" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="1" time="1.144917">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\DiscoveryEpochMigrationTest::test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set "populated"
+Operational teardown admitted.
+
+/home/user/VA-Studio-review-free256/tests/Feature/DiscoveryEpochMigrationTest.php:43
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+    </testsuite>
+    <testcase name="test_down_refuses_before_any_database_read_or_write" file="/home/user/VA-Studio-review-free256/tests/Feature/DiscoveryEpochMigrationTest.php" line="69" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="1" time="1.093664"/>
+    <testcase name="test_actual_insert_update_delete_upsert_replace_aba_and_rollback_invalidate_atomically" file="/home/user/VA-Studio-review-free256/tests/Feature/DiscoveryEpochMigrationTest.php" line="84" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="9" time="1.395780"/>
+    <testcase name="test_missing_changed_guard_and_modified_table_fail_closed" file="/home/user/VA-Studio-review-free256/tests/Feature/DiscoveryEpochMigrationTest.php" line="111" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="3" time="1.724649"/>
+    <testcase name="test_overflow_refuses_parent_write_and_preserves_epoch_and_data" file="/home/user/VA-Studio-review-free256/tests/Feature/DiscoveryEpochMigrationTest.php" line="137" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="3" time="1.389823"/>
+    <testcase name="test_exact_installed_migration_is_idempotent_and_preserves_retained_data" file="/home/user/VA-Studio-review-free256/tests/Feature/DiscoveryEpochMigrationTest.php" line="155" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="1" time="1.534111"/>
+    <testcase name="test_foreign_guard_on_absent_installation_is_not_adopted_or_replaced" file="/home/user/VA-Studio-review-free256/tests/Feature/DiscoveryEpochMigrationTest.php" line="164" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="2" time="1.531576"/>
+    <testcase name="test_connection_local_dependency_shadow_refuses_capture" file="/home/user/VA-Studio-review-free256/tests/Feature/DiscoveryEpochMigrationTest.php" line="188" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="1" time="1.693596"/>
+  </testsuite>
+</testsuites>

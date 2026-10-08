@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+export VA_REVIEW_RACE_LOG=/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum3/native-held-race-log.json
+date -u +%FT%TZ > /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-free256c-run/native3-start.txt
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-free256c-run/run.sh /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-free256c-run/native3-tests --filter 'ProductionFreeGrantLibraryWindowTest|ProductionFreeGrantAvailabilityBoundTest|ProductionFreeGrantContentionTest|test_migration_installs_nine_tables' tests/Feature/ProductionFreeGrants
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-free256c-run/run.sh /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-free256c-run/native3-held-race /home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum3/probes/NativeHeldRaceProbeTest.php
+date -u +%FT%TZ > /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-free256c-run/native3-end.txt

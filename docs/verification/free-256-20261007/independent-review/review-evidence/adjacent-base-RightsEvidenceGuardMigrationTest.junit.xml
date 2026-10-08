@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\RightsEvidenceGuardMigrationTest" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" tests="33" assertions="93" errors="9" failures="0" skipped="0" time="53.097712">
+    <testcase name="test_additive_install_retry_and_operational_rollback_preserve_exact_historical_rows_audits_and_protection" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="141" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="5.791869">
+      <error type="LogicException">Tests\Feature\RightsEvidenceGuardMigrationTest::test_additive_install_retry_and_operational_rollback_preserve_exact_historical_rows_audits_and_protection
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:159
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:159
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testsuite name="Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored" tests="8" assertions="0" errors="8" failures="0" skipped="0" time="10.494119">
+      <testcase name="test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set &quot;recognized prefix 0&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="183" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="0" time="1.282350">
+        <error type="LogicException">Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set "recognized prefix 0"
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set &quot;recognized prefix 1&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="183" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="0" time="1.083658">
+        <error type="LogicException">Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set "recognized prefix 1"
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set &quot;recognized prefix 2&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="183" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="0" time="1.430593">
+        <error type="LogicException">Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set "recognized prefix 2"
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set &quot;recognized prefix 3&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="183" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="0" time="1.549802">
+        <error type="LogicException">Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set "recognized prefix 3"
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set &quot;recognized prefix 4&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="183" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="0" time="1.636037">
+        <error type="LogicException">Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set "recognized prefix 4"
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set &quot;recognized prefix 5&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="183" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="0" time="1.219145">
+        <error type="LogicException">Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set "recognized prefix 5"
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set &quot;recognized prefix 6&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="183" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="0" time="1.275212">
+        <error type="LogicException">Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set "recognized prefix 6"
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set &quot;recognized prefix 7&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="183" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="0" time="1.017322">
+        <error type="LogicException">Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set "recognized prefix 7"
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-free256-base/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+    </testsuite>
+    <testcase name="test_an_impossible_nonprefix_installation_is_refused_before_any_ddl_or_data_repair" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="202" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.400443"/>
+    <testsuite name="Tests\Feature\RightsEvidenceGuardMigrationTest::test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard" tests="7" assertions="21" errors="0" failures="0" skipped="0" time="10.282353">
+      <testcase name="test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard with data set &quot;rights_evidence_immutable_update&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="217" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.451675"/>
+      <testcase name="test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard with data set &quot;rights_evidence_immutable_delete&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="217" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.916331"/>
+      <testcase name="test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard with data set &quot;rights_evidence_verified_insert&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="217" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.436281"/>
+      <testcase name="test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard with data set &quot;rights_evidence_verified_identity_insert&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="217" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.415485"/>
+      <testcase name="test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard with data set &quot;tracks_rights_evidence_delete&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="217" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.430101"/>
+      <testcase name="test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard with data set &quot;tracks_rights_evidence_update&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="217" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.219931"/>
+      <testcase name="test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard with data set &quot;tracks_rights_evidence_insert&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="217" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.412549"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\RightsEvidenceGuardMigrationTest::test_late_owned_guard_drift_is_refused_before_restoring_an_earlier_missing_guard" tests="5" assertions="20" errors="0" failures="0" skipped="0" time="7.374376">
+      <testcase name="test_late_owned_guard_drift_is_refused_before_restoring_an_earlier_missing_guard with data set &quot;body&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="238" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="4" time="1.102261"/>
+      <testcase name="test_late_owned_guard_drift_is_refused_before_restoring_an_earlier_missing_guard with data set &quot;table&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="238" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="4" time="1.730961"/>
+      <testcase name="test_late_owned_guard_drift_is_refused_before_restoring_an_earlier_missing_guard with data set &quot;timing&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="238" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="4" time="1.636723"/>
+      <testcase name="test_late_owned_guard_drift_is_refused_before_restoring_an_earlier_missing_guard with data set &quot;operation&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="238" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="4" time="1.490380"/>
+      <testcase name="test_late_owned_guard_drift_is_refused_before_restoring_an_earlier_missing_guard with data set &quot;case&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="238" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="4" time="1.414052"/>
+    </testsuite>
+    <testcase name="test_temporary_table_and_engine_specific_trigger_shadows_cannot_redirect_schema_or_guard_recovery" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="268" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="12" time="1.697048"/>
+    <testsuite name="Tests\Feature\RightsEvidenceGuardMigrationTest::test_unowned_unique_conflict_keys_are_refused_before_restoring_missing_guards" tests="2" assertions="6" errors="0" failures="0" skipped="0" time="2.950308">
+      <testcase name="test_unowned_unique_conflict_keys_are_refused_before_restoring_missing_guards with data set &quot;rights verification key&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="302" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.343908"/>
+      <testcase name="test_unowned_unique_conflict_keys_are_refused_before_restoring_missing_guards with data set &quot;track title key&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="302" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.606400"/>
+    </testsuite>
+    <testcase name="test_a_collation_or_prefix_change_to_the_actual_parent_unique_key_is_refused_without_ddl" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="312" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.222588"/>
+    <testcase name="test_a_cascading_foreign_key_is_not_silently_accepted_as_the_supported_restrict_schema" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="325" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.765990"/>
+    <testcase name="test_a_changed_required_rights_column_is_refused_without_correcting_data_or_installing_guards" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="338" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.985024"/>
+    <testcase name="test_an_additional_trigger_on_a_protected_table_is_refused_before_restoring_missing_guards" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="348" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.740014"/>
+    <testcase name="test_engine_specific_column_or_index_collation_drift_is_refused_before_any_guard_ddl" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="360" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.422484"/>
+    <testsuite name="Tests\Feature\RightsEvidenceGuardMigrationTest::test_retained_orphan_references_are_refused_before_any_guard_ddl_and_remain_exact" tests="2" assertions="8" errors="0" failures="0" skipped="0" time="3.271965">
+      <testcase name="test_retained_orphan_references_are_refused_before_any_guard_ddl_and_remain_exact with data set &quot;orphan track&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="382" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="4" time="2.009568"/>
+      <testcase name="test_retained_orphan_references_are_refused_before_any_guard_ddl_and_remain_exact with data set &quot;orphan verifier&quot;" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="382" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="4" time="1.262397"/>
+    </testsuite>
+    <testcase name="test_retained_nonpositive_verified_identity_is_refused_without_fabricating_or_repairing_history" file="/home/user/VA-Studio-review-free256-base/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="398" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="5" time="1.699131"/>
+  </testsuite>
+</testsuites>

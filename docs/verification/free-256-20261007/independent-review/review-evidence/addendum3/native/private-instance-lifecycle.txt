@@ -1,0 +1,4 @@
+start port 3751 2026-10-08T07:22:48Z
+shutdown port 3751 pid 14614 mysqladmin rc=0 2026-10-08T07:44:44Z
+verify 2026-10-08T07:44:50Z: pid 14614 gone, 3751 not listening, error log ends 'MySQL Server - end'; datadir data deleted; 3711/3721/3741 untouched
+LISTEN on 3751: False ; 3751 entries are TIME_WAIT (06) only: True

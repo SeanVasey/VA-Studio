@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\ReviewProbes\Free256\RenderingProbeTest" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/probes/RenderingProbeTest.php" tests="4" assertions="55" errors="0" failures="1" skipped="0" time="9.155444">
+    <testcase name="test_rerender_is_byte_identical_recovery_is_by_hash_and_rewrite_or_truncation_is_refused" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/probes/RenderingProbeTest.php" line="43" class="Tests\ReviewProbes\Free256\RenderingProbeTest" classname="Tests.ReviewProbes.Free256.RenderingProbeTest" assertions="13" time="3.637224"/>
+    <testcase name="test_symlinked_claim_file_and_directory_are_refused_and_outside_targets_untouched" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/probes/RenderingProbeTest.php" line="82" class="Tests\ReviewProbes\Free256\RenderingProbeTest" classname="Tests.ReviewProbes.Free256.RenderingProbeTest" assertions="6" time="1.985362">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\ReviewProbes\Free256\RenderingProbeTest::test_symlinked_claim_file_and_directory_are_refused_and_outside_targets_untouched
+Failed asserting that file "/tmp/va-free256-outside-a4b40172340b/created-through-link.pdf" exists.
+
+/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/probes/RenderingProbeTest.php:106
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_path_traversal_in_origin_or_claim_segments_is_refused" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/probes/RenderingProbeTest.php" line="130" class="Tests\ReviewProbes\Free256\RenderingProbeTest" classname="Tests.ReviewProbes.Free256.RenderingProbeTest" assertions="21" time="1.568690"/>
+    <testcase name="test_renderer_child_isolation_and_bounded_input" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/probes/RenderingProbeTest.php" line="148" class="Tests\ReviewProbes\Free256\RenderingProbeTest" classname="Tests.ReviewProbes.Free256.RenderingProbeTest" assertions="15" time="1.964168"/>
+  </testsuite>
+</testsuites>

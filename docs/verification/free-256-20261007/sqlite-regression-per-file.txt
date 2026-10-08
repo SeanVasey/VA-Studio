@@ -1,0 +1,79 @@
+tests/Feature/CustomerAccountMigrationTest.php :: OK (7 tests, 106 assertions) 
+tests/Feature/CustomerConsentAdmissionTest.php :: OK (22 tests, 48 assertions) 
+tests/Feature/CustomerConsentMigrationTest.php :: OK (20 tests, 162 assertions) 
+tests/Feature/CustomerIdentityMigrationTest.php :: OK (14 tests, 141 assertions) 
+tests/Feature/CustomerInquiryMigrationTest.php :: OK, but some tests were skipped! Tests: 27, Assertions: 287, Skipped: 3. 
+tests/Feature/CustomerListeningMigrationTest.php :: OK (9 tests, 37 assertions) 
+tests/Feature/CustomerPurchaseClaimMigrationTest.php :: OK (8 tests, 37 assertions) 
+tests/Feature/CustomerSuppressionKeyAdmissionTest.php :: OK, but some tests were skipped! Tests: 19, Assertions: 133, Skipped: 2. 
+tests/Feature/CustomerSuppressionMigrationTest.php :: OK (29 tests, 132 assertions) 
+tests/Feature/CustomerSuppressionNativeAdmissionTest.php :: OK, but some tests were skipped! Tests: 1, Assertions: 0, Skipped: 1. 
+tests/Feature/DiscoveryEpochMigrationTest.php :: FAILURES! Tests: 9, Assertions: 22, Failures: 2. 
+tests/Feature/DiscoveryEpochRecoveryTest.php :: OK (18 tests, 3965 assertions) 
+tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php :: OK, but some tests were skipped! Tests: 6, Assertions: 3, Skipped: 5. 
+tests/Feature/DiscoverySitemapSchemaTest.php :: OK, but some tests were skipped! Tests: 10, Assertions: 24, Skipped: 1. 
+tests/Feature/EconomicLicenseMigrationTest.php :: OK (1 test, 27 assertions) 
+tests/Feature/ExclusiveActivationMigrationTest.php :: OK (1 test, 6 assertions) 
+tests/Feature/FreeGrantAdministrationTest.php :: OK (2 tests, 27 assertions) 
+tests/Feature/FreeGrantAuthorityTest.php :: OK (6 tests, 26 assertions) 
+tests/Feature/FreeGrantConcurrencyTest.php :: OK, but some tests were skipped! Tests: 1, Assertions: 0, Skipped: 1. 
+tests/Feature/FreeGrantDefinitionsTest.php :: OK (1 test, 14 assertions) 
+tests/Feature/FreeGrantDownloadsTest.php :: OK (4 tests, 55 assertions) 
+tests/Feature/FreeGrantHttpTest.php :: OK (14 tests, 292 assertions) 
+tests/Feature/FreeGrantJourneyTest.php :: OK (2 tests, 23 assertions) 
+tests/Feature/FreeGrantPreparationStatusTest.php :: OK (2 tests, 39 assertions) 
+tests/Feature/FreeGrantRegistrationTest.php :: OK (3 tests, 153 assertions) 
+tests/Feature/FreeGrantSchemaRecoveryTest.php :: OK (8 tests, 1941 assertions) 
+tests/Feature/HashByteGuardMigrationTest.php :: OK (10 tests, 207 assertions) 
+tests/Feature/HostedCheckoutMigrationTest.php :: OK (8 tests, 126 assertions) 
+tests/Feature/InquiryMessageMigrationTest.php :: OK (4 tests, 23 assertions) 
+tests/Feature/InquiryNotificationMigrationTest.php :: OK, but some tests were skipped! Tests: 37, Assertions: 546, Skipped: 4. 
+tests/Feature/LicenseEvidenceMigrationTest.php :: OK (1 test, 25 assertions) 
+tests/Feature/MediaUploadCommitRecoveryTest.php :: OK (6 tests, 165 assertions) 
+tests/Feature/MembershipCreditMigrationTest.php :: OK (38 tests, 115 assertions) 
+tests/Feature/OrderInquiryMigrationTest.php :: OK (8 tests, 33 assertions) 
+tests/Feature/OrderPreparationMigrationTest.php :: OK (2 tests, 44 assertions) 
+tests/Feature/PrivateProductDraftSchemaTest.php :: OK (4 tests, 20 assertions) 
+tests/Feature/ProductDraftMigrationTest.php :: OK (5 tests, 33 assertions) 
+tests/Feature/ProductionBuyerAssentObservationMigrationTest.php :: OK (4 tests, 24 assertions) 
+tests/Feature/ProductionCheckoutMigrationTest.php :: OK, but some tests were skipped! Tests: 18, Assertions: 132, Skipped: 5. 
+tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php :: OK (26 tests, 187 assertions) 
+tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php :: OK (4 tests, 9 assertions) 
+tests/Feature/ProductionMemberOriginals/MemberOriginalSchemaPreparationTest.php :: OK, but some tests were skipped! Tests: 10, Assertions: 27, Skipped: 1. 
+tests/Feature/ProductionMembership/MembershipNativeStatementClosureTest.php :: OK (1 test, 3 assertions) 
+tests/Feature/ProductionMembership/MembershipPreparationTest.php :: OK (8 tests, 16 assertions) 
+tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php :: OK (2 tests, 6 assertions) 
+tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php :: OK, but some tests were skipped! Tests: 13, Assertions: 33, Skipped: 3. 
+tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php :: ERRORS! Tests: 23, Assertions: 126, Errors: 6. 
+tests/Feature/ProductionTrackPreparationPacketMigrationTest.php :: OK (23 tests, 326 assertions) 
+tests/Feature/PromotionMigrationTest.php :: OK (1 test, 21 assertions) 
+tests/Feature/QuotePricingMigrationTest.php :: OK (1 test, 23 assertions) 
+tests/Feature/RightsEvidenceGuardMigrationTest.php :: ERRORS! Tests: 33, Assertions: 93, Errors: 9. 
+tests/Feature/ScopedLicenseMigrationTest.php :: OK (1 test, 15 assertions) 
+tests/Feature/ServiceProjectCommittedSchemaIndependentTest.php :: OK, but some tests were skipped! Tests: 1, Assertions: 0, Skipped: 1. 
+tests/Feature/ServiceProjectRecoveryTest.php :: OK (7 tests, 104 assertions) 
+tests/Feature/ServiceProjectSchemaTest.php :: FAILURES! Tests: 3, Assertions: 17, Failures: 1. 
+tests/Feature/SharedInventoryMigrationTest.php :: OK (1 test, 19 assertions) 
+tests/Feature/SiteImageMigrationTest.php :: OK (1 test, 8 assertions) 
+tests/Feature/SiteRelatedTrackImageMigrationTest.php :: OK (37 tests, 335 assertions) 
+tests/Feature/SoundKitMigrationTest.php :: OK (5 tests, 44 assertions) 
+tests/Feature/SoundKitRecoveryTest.php :: OK (10 tests, 48 assertions) 
+tests/Feature/SoundKitUploadMigrationTest.php :: OK (4 tests, 35 assertions) 
+tests/Feature/SupportAttachmentSchemaClosureTest.php :: OK, but some tests were skipped! Tests: 2, Assertions: 1, Skipped: 1. 
+tests/Feature/SupportAttachmentSchemaTest.php :: OK (4 tests, 12 assertions) 
+tests/Feature/SyntheticPrivateRestoreTest.php :: OK (5 tests, 532 assertions) 
+tests/Feature/TestContractIssuanceMigrationTest.php :: OK (13 tests, 171 assertions) 
+tests/Feature/TestFulfillmentActivationMigrationTest.php :: OK (8 tests, 80 assertions) 
+tests/Feature/TestOrderFinalizationMigrationTest.php :: OK (15 tests, 225 assertions) 
+tests/Feature/TestOwnerDeliveryMigrationTest.php :: OK (7 tests, 165 assertions) 
+tests/Feature/TestPaymentEvidenceMigrationTest.php :: OK (20 tests, 193 assertions) 
+tests/Feature/TestRefundResolutionMigrationTest.php :: OK (10 tests, 122 assertions) 
+tests/Feature/TestUnpaidReleaseMigrationTest.php :: OK (6 tests, 44 assertions) 
+tests/Feature/TrackMetadataMigrationTest.php :: OK (1 test, 54 assertions) 
+tests/Feature/TrackMetadataPresetsMigrationTest.php :: OK (5 tests, 19 assertions) 
+tests/Feature/TrackPublicationGuardMigrationTest.php :: OK (10 tests, 31 assertions) 
+tests/Feature/TransactionalNotificationMigrationTest.php :: OK (20 tests, 270 assertions) 
+tests/Feature/TransactionalNotificationRecoveryCommandTest.php :: OK (11 tests, 46 assertions) 
+tests/Feature/TransactionalNotificationRecoveryTest.php :: OK (10 tests, 46 assertions) 
+tests/Feature/TypedLicenseMigrationTest.php :: OK (1 test, 7 assertions) 
+tests/Feature/UuidByteGuardMigrationTest.php :: OK (11 tests, 165 assertions) 

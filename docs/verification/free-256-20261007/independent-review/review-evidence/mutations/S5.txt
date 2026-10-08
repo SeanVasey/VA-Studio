@@ -1,0 +1,40 @@
+== S5 at 1860e00d3a7d3852d19126ae01ee54f50cef8660
+applied S5
+$ git diff --stat
+ app/Domain/Grants/ProductionFree/ProductionFreeGrantFiles.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+diff --git a/app/Domain/Grants/ProductionFree/ProductionFreeGrantFiles.php b/app/Domain/Grants/ProductionFree/ProductionFreeGrantFiles.php
+index 63405db1..84bc455d 100644
+--- a/app/Domain/Grants/ProductionFree/ProductionFreeGrantFiles.php
++++ b/app/Domain/Grants/ProductionFree/ProductionFreeGrantFiles.php
+@@ -42,7 +42,7 @@ final class ProductionFreeGrantFiles
+             $path = $directory.'/original.pdf';
+             $mask = umask(0077);
+             try {
+-                $output = @fopen($path, 'x+b');
++                $output = @fopen($path, 'c+b');
+             } finally {
+                 umask($mask);
+             }
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256-mut/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 00:03.213, Memory: 83.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantRenderingTest::test_a_preexisting_file_at_the_claim_path_is_never_overwritten
+Must refuse storage_failed
+
+/home/user/VA-Studio-review-free256-mut/tests/Feature/ProductionFreeGrants/ProductionFreeGrantRenderingTest.php:205
+/home/user/VA-Studio-review-free256-mut/tests/Feature/ProductionFreeGrants/ProductionFreeGrantRenderingTest.php:144
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 3, Failures: 1.
+rc=1
+after revert: git diff --quiet -- app database resources rc=0

@@ -1,0 +1,3 @@
+start port 3797 2026-10-08T09:02:47Z
+no clean shutdown: the container reboot ended pid 6562 after native6 finished (native6-end 09:18Z region, rc=0 recorded before); verify 2026-10-08T10:54:26Z: /proc/6562 absent, no LISTEN on 3797, error log has no Shutdown line
+datadir data deleted 2026-10-08T10:54:26Z; remaining: initialize.log lifecycle.txt mysqld.err mysqld.pid 

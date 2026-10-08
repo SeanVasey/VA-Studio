@@ -679,6 +679,14 @@
       "test_native_case_alias_of_a_reserved_constraint_name_is_refused_before_ddl"
     ],
     [
+      "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSchemaTest",
+      "test_native_schema_global_check_symbol_collision_is_refused_before_the_first_owned_ddl"
+    ],
+    [
+      "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSchemaTest",
+      "test_native_temporary_shadow_of_an_owned_table_is_refused"
+    ],
+    [
       "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeStaleRetrievalRaceTest",
       "test_a_stale_settled_retrieval_from_a_second_process_is_refused_after_a_newer_reversal"
     ],

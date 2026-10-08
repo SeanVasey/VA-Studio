@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b/phpunit.xml
+
+PROBE addendum7.skip:
+  max newlines (a + 1,992 newlines + a): characters=2000 preflight_renders=0 -> pages=3 bytes=760465
+  alternating @ and newline: characters=1999 preflight_renders=0 -> pages=16 bytes=893100
+  alternating space and newline around @: characters=2000 preflight_renders=0 -> pages=3 bytes=760465
+  tabs between @ (tab becomes 4 spaces): characters=2000 preflight_renders=0 -> pages=3 bytes=765843
+  words of 51 @: characters=2000 preflight_renders=0 -> pages=3 bytes=766577
+  one unbroken @ token: characters=2000 preflight_renders=0 -> pages=2 bytes=763380
+  widest multi-byte glyph U+2031, newline separated: characters=1999 preflight_renders=0 -> pages=16 bytes=893123
+  CR LF pairs (normalized to one newline): characters=2000 preflight_renders=0 -> pages=3 bytes=760465
+.                                                                   1 / 1 (100%)
+
+Time: 00:07.520, Memory: 87.00 MB
+
+OK (1 test, 2 assertions)
+rc=0

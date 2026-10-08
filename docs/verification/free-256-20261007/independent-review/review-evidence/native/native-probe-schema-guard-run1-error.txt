@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256/phpunit.xml
+
+E                                                                   1 / 1 (100%)
+
+Time: 06:54.615, Memory: 85.00 MB
+
+There was 1 error:
+
+1) Tests\ReviewProbes\Free256\NativeSchemaGuardProbeTest::test_native_guards_snapshot_cap_shadowing_prefix_recovery_and_parent_floor
+PDOException: SQLSTATE[42000]: Syntax error or access violation: 1066 Not unique table/alias: 'users'
+
+/home/user/VA-Studio-review-free256/docs/verification/free-256-20261007/independent-review/review-evidence/probes/NativeSchemaGuardProbeTest.php:141
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 1, Assertions: 54, Errors: 1.
+rc=2

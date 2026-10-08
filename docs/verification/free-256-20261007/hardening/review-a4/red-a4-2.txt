@@ -1,0 +1,24 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-free256h/phpunit.xml
+
+E                                                                   1 / 1 (100%)
+
+Time: 00:03.491, Memory: 83.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSpoolResidualTest::test_an_unreclaimable_sidecar_skips_its_slot_instead_of_blocking_admission
+App\Domain\Grants\ProductionFree\ProductionFreeGrantException: Production free grant unavailable.
+
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php:82
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php:143
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php:83
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php:169
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php:153
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 1, Assertions: 2, Errors: 1.
+rc=2

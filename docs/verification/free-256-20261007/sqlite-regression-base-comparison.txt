@@ -1,0 +1,5 @@
+Base fad3ab444e89ffb57dc915f61f7f788b626e330a (detached worktree without any 256 file), same runner, SQLite:
+tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php :: ERRORS! Tests: 23, Assertions: 126, Errors: 6.
+tests/Feature/RightsEvidenceGuardMigrationTest.php :: ERRORS! Tests: 33, Assertions: 93, Errors: 9.
+tests/Feature/ServiceProjectSchemaTest.php :: FAILURES! Tests: 3, Assertions: 17, Failures: 1.
+tests/Feature/DiscoveryEpochMigrationTest.php :: FAILURES! Tests: 9, Assertions: 22, Failures: 2.

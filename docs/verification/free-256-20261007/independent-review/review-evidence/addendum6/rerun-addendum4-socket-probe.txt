@@ -1,0 +1,16 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b/phpunit.xml
+
+PROBE addendum4.stall:
+  gap 3 s: ok in 3.2s; slot-0.reserve='00000000000000000000' residue=0
+  gap 7 s: refused:artifact_unavailable in 5.1s; slot-0.reserve='00000000000000000000' residue=0
+  trickle 1 byte/s for 8 s: ok in 8.2s; slot-0.reserve='00000000000000000000' residue=0
+  single slot reusable afterwards: ok
+.                                                                   1 / 1 (100%)
+
+Time: 00:21.357, Memory: 87.00 MB
+
+OK (1 test, 3 assertions)
+rc=0
