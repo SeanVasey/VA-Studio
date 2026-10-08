@@ -207,8 +207,10 @@ class PaidGrantPrepareStream
             [$lease, $snapshot, $number] = $this->slot($spool);
             $reservation = null;
             try {
-                $space = $this->freeBytes($spool);
+                // Written sizes are read before free space: a byte another holder writes in between is then still counted
+                // as pending and also missing from free space (conservative), never counted as written but still free.
                 $pending = $this->pending($spool, $number);
+                $space = $this->freeBytes($spool);
                 if (! is_numeric($space) || ! is_finite((float) $space) || $space - $pending < $bytes + self::RESERVE_BYTES) {
                     throw new \UnexpectedValueException;
                 }
