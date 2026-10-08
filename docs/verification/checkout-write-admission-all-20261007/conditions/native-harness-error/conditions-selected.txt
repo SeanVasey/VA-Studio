@@ -1,0 +1,238 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-admission/phpunit.xml
+
+[31;1mE[0m[31;1mE[0m[31;1mE[0m[31;1mE[0m[31;1mE[0m[31;1mE[0m[31;1mE[0m[31;1mE[0m                                                            8 / 8 (100%)
+
+Time: 21:31.750, Memory: 87.00 MB
+
+There were 8 errors:
+
+1) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_committing_owner_delegation_or_offer_withdrawal_refuses_new_basis@owner delegation with data ('owner', 'write_frame')
+Symfony\Component\Process\Exception\ProcessFailedException: The command "'/usr/bin/ffmpeg' '-nostdin' '-hide_banner' '-loglevel' 'error' '-f' 'lavfi' '-i' 'sine=frequency=1800:sample_rate=44100:duration=0.2' '-threads' '1' '-c:a' 'pcm_s16le' '-ac' '2' '/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-4814c03d-7030-4ee4-8d7c-119640e4f963.wav'" failed.
+
+Exit Code: 254(Unknown error)
+
+Working directory: /home/user/VA-Studio-admission
+
+Output:
+================
+
+
+Error Output:
+================
+[out#0/wav @ 0x55a758917780] Error opening output /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-4814c03d-7030-4ee4-8d7c-119640e4f963.wav: No such file or directory
+Error opening output file /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-4814c03d-7030-4ee4-8d7c-119640e4f963.wav.
+Error opening output files: No such file or directory
+
+
+/home/user/VA-Studio/vendor/symfony/process/Process.php:291
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:41
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:28
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:69
+/home/user/VA-Studio-admission/tests/Support/QuoteFixtures.php:23
+/home/user/VA-Studio-admission/tests/Support/ProductionTrackPreparationFixtures.php:23
+/home/user/VA-Studio-admission/tests/Support/ProductionCheckoutFixtures.php:16
+/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:177
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_committing_owner_delegation_or_offer_withdrawal_refuses_new_basis@offer with data ('offer', 'write_source_changed')
+Symfony\Component\Process\Exception\ProcessFailedException: The command "'/usr/bin/ffmpeg' '-nostdin' '-hide_banner' '-loglevel' 'error' '-f' 'lavfi' '-i' 'sine=frequency=1800:sample_rate=44100:duration=0.2' '-threads' '1' '-c:a' 'pcm_s16le' '-ac' '2' '/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-bee4c1a1-81d2-48f0-9212-6f63e4e9ba37.wav'" failed.
+
+Exit Code: 254(Unknown error)
+
+Working directory: /home/user/VA-Studio-admission
+
+Output:
+================
+
+
+Error Output:
+================
+[out#0/wav @ 0x55fcb67df780] Error opening output /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-bee4c1a1-81d2-48f0-9212-6f63e4e9ba37.wav: No such file or directory
+Error opening output file /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-bee4c1a1-81d2-48f0-9212-6f63e4e9ba37.wav.
+Error opening output files: No such file or directory
+
+
+/home/user/VA-Studio/vendor/symfony/process/Process.php:291
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:41
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:28
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:69
+/home/user/VA-Studio-admission/tests/Support/QuoteFixtures.php:23
+/home/user/VA-Studio-admission/tests/Support/ProductionTrackPreparationFixtures.php:23
+/home/user/VA-Studio-admission/tests/Support/ProductionCheckoutFixtures.php:16
+/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:177
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_staff_capsule_fresh_admission_itself_refuses_authoring_and_owner_withdrawal
+Symfony\Component\Process\Exception\ProcessFailedException: The command "'/usr/bin/ffmpeg' '-nostdin' '-hide_banner' '-loglevel' 'error' '-f' 'lavfi' '-i' 'sine=frequency=1800:sample_rate=44100:duration=0.2' '-threads' '1' '-c:a' 'pcm_s16le' '-ac' '2' '/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-560af88b-08c3-4730-ad29-0d7c41fb051c.wav'" failed.
+
+Exit Code: 254(Unknown error)
+
+Working directory: /home/user/VA-Studio-admission
+
+Output:
+================
+
+
+Error Output:
+================
+[out#0/wav @ 0x55b2023fd780] Error opening output /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-560af88b-08c3-4730-ad29-0d7c41fb051c.wav: No such file or directory
+Error opening output file /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-560af88b-08c3-4730-ad29-0d7c41fb051c.wav.
+Error opening output files: No such file or directory
+
+
+/home/user/VA-Studio/vendor/symfony/process/Process.php:291
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:41
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:28
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:69
+/home/user/VA-Studio-admission/tests/Support/QuoteFixtures.php:23
+/home/user/VA-Studio-admission/tests/Support/ProductionTrackPreparationFixtures.php:23
+/home/user/VA-Studio-admission/tests/Support/ProductionCheckoutFixtures.php:16
+/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:194
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_committing_capability_closure_refuses_new_intent_and_provider_io
+Symfony\Component\Process\Exception\ProcessFailedException: The command "'/usr/bin/ffmpeg' '-nostdin' '-hide_banner' '-loglevel' 'error' '-f' 'lavfi' '-i' 'sine=frequency=1800:sample_rate=44100:duration=0.2' '-threads' '1' '-c:a' 'pcm_s16le' '-ac' '2' '/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-c9a27297-0608-41d5-b796-e283cd6bce95.wav'" failed.
+
+Exit Code: 254(Unknown error)
+
+Working directory: /home/user/VA-Studio-admission
+
+Output:
+================
+
+
+Error Output:
+================
+[out#0/wav @ 0x558adda15780] Error opening output /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-c9a27297-0608-41d5-b796-e283cd6bce95.wav: No such file or directory
+Error opening output file /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-c9a27297-0608-41d5-b796-e283cd6bce95.wav.
+Error opening output files: No such file or directory
+
+
+/home/user/VA-Studio/vendor/symfony/process/Process.php:291
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:41
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:28
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:69
+/home/user/VA-Studio-admission/tests/Support/QuoteFixtures.php:23
+/home/user/VA-Studio-admission/tests/Support/ProductionTrackPreparationFixtures.php:23
+/home/user/VA-Studio-admission/tests/Support/ProductionCheckoutFixtures.php:16
+/home/user/VA-Studio-admission/tests/Support/ProductionCheckoutJourneyFixture.php:20
+/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:225
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_committing_qualifier_staff_withdrawal_refuses_new_basis@role with data ([false], 'is_admin', true)
+Symfony\Component\Process\Exception\ProcessFailedException: The command "'/usr/bin/ffmpeg' '-nostdin' '-hide_banner' '-loglevel' 'error' '-f' 'lavfi' '-i' 'sine=frequency=1800:sample_rate=44100:duration=0.2' '-threads' '1' '-c:a' 'pcm_s16le' '-ac' '2' '/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-4cf6960a-3372-442d-a773-b71a5e0840a6.wav'" failed.
+
+Exit Code: 254(Unknown error)
+
+Working directory: /home/user/VA-Studio-admission
+
+Output:
+================
+
+
+Error Output:
+================
+[out#0/wav @ 0x558428c80780] Error opening output /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-4cf6960a-3372-442d-a773-b71a5e0840a6.wav: No such file or directory
+Error opening output file /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-4cf6960a-3372-442d-a773-b71a5e0840a6.wav.
+Error opening output files: No such file or directory
+
+
+/home/user/VA-Studio/vendor/symfony/process/Process.php:291
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:41
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:28
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:69
+/home/user/VA-Studio-admission/tests/Support/QuoteFixtures.php:23
+/home/user/VA-Studio-admission/tests/Support/ProductionTrackPreparationFixtures.php:23
+/home/user/VA-Studio-admission/tests/Support/ProductionCheckoutFixtures.php:16
+/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:251
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_committing_qualifier_staff_withdrawal_refuses_new_basis@mfa with data ([null, null], 'app_authentication_secret', 'SYNTHETIC-ENROLLED-SECRET')
+Symfony\Component\Process\Exception\ProcessFailedException: The command "'/usr/bin/ffmpeg' '-nostdin' '-hide_banner' '-loglevel' 'error' '-f' 'lavfi' '-i' 'sine=frequency=1800:sample_rate=44100:duration=0.2' '-threads' '1' '-c:a' 'pcm_s16le' '-ac' '2' '/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-7adb3e0c-793e-4f16-a735-06473bc19774.wav'" failed.
+
+Exit Code: 254(Unknown error)
+
+Working directory: /home/user/VA-Studio-admission
+
+Output:
+================
+
+
+Error Output:
+================
+[out#0/wav @ 0x556b4eea9780] Error opening output /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-7adb3e0c-793e-4f16-a735-06473bc19774.wav: No such file or directory
+Error opening output file /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-7adb3e0c-793e-4f16-a735-06473bc19774.wav.
+Error opening output files: No such file or directory
+
+
+/home/user/VA-Studio/vendor/symfony/process/Process.php:291
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:41
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:28
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:69
+/home/user/VA-Studio-admission/tests/Support/QuoteFixtures.php:23
+/home/user/VA-Studio-admission/tests/Support/ProductionTrackPreparationFixtures.php:23
+/home/user/VA-Studio-admission/tests/Support/ProductionCheckoutFixtures.php:16
+/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:251
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+7) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_committing_owner_staff_withdrawal_refuses_new_authority@role with data ([false], 'is_admin', true)
+Symfony\Component\Process\Exception\ProcessFailedException: The command "'/usr/bin/ffmpeg' '-nostdin' '-hide_banner' '-loglevel' 'error' '-f' 'lavfi' '-i' 'sine=frequency=1800:sample_rate=44100:duration=0.2' '-threads' '1' '-c:a' 'pcm_s16le' '-ac' '2' '/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-3d80e4dd-4665-43ac-8453-2ec89e2a75ee.wav'" failed.
+
+Exit Code: 254(Unknown error)
+
+Working directory: /home/user/VA-Studio-admission
+
+Output:
+================
+
+
+Error Output:
+================
+[out#0/wav @ 0x559e792bd780] Error opening output /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-3d80e4dd-4665-43ac-8453-2ec89e2a75ee.wav: No such file or directory
+Error opening output file /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-3d80e4dd-4665-43ac-8453-2ec89e2a75ee.wav.
+Error opening output files: No such file or directory
+
+
+/home/user/VA-Studio/vendor/symfony/process/Process.php:291
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:41
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:28
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:69
+/home/user/VA-Studio-admission/tests/Support/QuoteFixtures.php:23
+/home/user/VA-Studio-admission/tests/Support/ProductionTrackPreparationFixtures.php:23
+/home/user/VA-Studio-admission/tests/Support/ProductionCheckoutFixtures.php:16
+/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:264
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+8) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_committing_owner_staff_withdrawal_refuses_new_authority@mfa with data ([null, null], 'app_authentication_secret', 'SYNTHETIC-ENROLLED-SECRET')
+Symfony\Component\Process\Exception\ProcessFailedException: The command "'/usr/bin/ffmpeg' '-nostdin' '-hide_banner' '-loglevel' 'error' '-f' 'lavfi' '-i' 'sine=frequency=1800:sample_rate=44100:duration=0.2' '-threads' '1' '-c:a' 'pcm_s16le' '-ac' '2' '/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-b0a312f2-c3da-43a3-a8d0-b5cd761dabec.wav'" failed.
+
+Exit Code: 254(Unknown error)
+
+Working directory: /home/user/VA-Studio-admission
+
+Output:
+================
+
+
+Error Output:
+================
+[out#0/wav @ 0x561ae0ab4780] Error opening output /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-b0a312f2-c3da-43a3-a8d0-b5cd761dabec.wav: No such file or directory
+Error opening output file /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tmp-native2/vasey-test-b0a312f2-c3da-43a3-a8d0-b5cd761dabec.wav.
+Error opening output files: No such file or directory
+
+
+/home/user/VA-Studio/vendor/symfony/process/Process.php:291
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:41
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:28
+/home/user/VA-Studio-admission/tests/Support/MediaFixtures.php:69
+/home/user/VA-Studio-admission/tests/Support/QuoteFixtures.php:23
+/home/user/VA-Studio-admission/tests/Support/ProductionTrackPreparationFixtures.php:23
+/home/user/VA-Studio-admission/tests/Support/ProductionCheckoutFixtures.php:16
+/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:264
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 8[0m[37;41m, Assertions: 0[0m[37;41m, Errors: 8[0m[37;41m.[0m

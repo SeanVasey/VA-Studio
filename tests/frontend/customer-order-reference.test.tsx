@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CustomerOrderLookup } from '../../resources/js/components/CustomerOrderLookup';
@@ -88,7 +88,8 @@ describe('account library order lookup', () => {
     const write = vi.spyOn(Storage.prototype, 'setItem'); const url = window.location.href;
     render(fixture()); expect(fetcher).not.toHaveBeenCalled();
     await user.type(field(), id().toUpperCase()); await user.keyboard('{Enter}');
-    expect(await screen.findByRole('heading', { name: 'Order found' })).toHaveFocus();
+    // Focus moves in an effect after the result renders; wait for it rather than racing it.
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Order found' })).toHaveFocus());
     expect(screen.getByText(`Original order ${id()}`)).toBeInTheDocument();
     expect(fetcher).toHaveBeenCalledTimes(1); expect(read).not.toHaveBeenCalled(); expect(write).not.toHaveBeenCalled();
     expect(window.location.href).toBe(url);
@@ -100,7 +101,7 @@ describe('account library order lookup', () => {
     const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(json({ order: order() })).mockResolvedValueOnce(json({ message: 'PRIVATE' }, 404));
     render(fixture()); change(id()); submit(); await screen.findByText(`Original order ${id()}`);
     change(id(2)); expect(screen.queryByText(`Original order ${id()}`)).not.toBeInTheDocument(); submit();
-    expect(await screen.findByRole('alert')).toHaveFocus(); expect(screen.getByRole('alert')).toHaveTextContent('not available to your account');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveFocus()); expect(screen.getByRole('alert')).toHaveTextContent('not available to your account');
     expect(screen.queryByText(/PRIVATE/)).not.toBeInTheDocument(); expect(fetcher).toHaveBeenCalledTimes(2);
   });
 

@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionCheckout/CheckoutIntentAdmission.php b/app/Domain/Commerce/ProductionCheckout/CheckoutIntentAdmission.php
+index 0e88edb7..7dc9ce78 100644
+--- a/app/Domain/Commerce/ProductionCheckout/CheckoutIntentAdmission.php
++++ b/app/Domain/Commerce/ProductionCheckout/CheckoutIntentAdmission.php
+@@ -49,7 +49,7 @@ final class CheckoutIntentAdmission implements CheckoutCommitAdmission
+         $plans->actor($buyer);
+         $plans->identity($identity);
+         $plans->selection($selection);
+-        $plans->history($current['raw']);
++        // MUTATION M3: history plan removed
+         foreach (['authority', 'basis', 'review', 'order', 'attempt'] as $kind) {
+             $plans->row($kind, $order['raw'][$kind]);
+         }

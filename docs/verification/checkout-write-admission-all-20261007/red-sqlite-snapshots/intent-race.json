@@ -1,0 +1,13 @@
+{
+    "case": "race",
+    "driver": "sqlite",
+    "callbacks": 1,
+    "refused": null,
+    "provider_creates": 1,
+    "counts": {
+        "intent": 1,
+        "session": 1,
+        "observation": 1,
+        "payment": 0
+    }
+}

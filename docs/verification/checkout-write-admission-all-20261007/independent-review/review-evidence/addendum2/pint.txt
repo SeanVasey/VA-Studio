@@ -1,0 +1,2 @@
+$ vendor/bin/pint --test <3 changed files>
+{"tool":"pint","result":"passed"}exit 0

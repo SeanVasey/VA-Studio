@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionCheckoutRefusedFrameCallbackTest" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutRefusedFrameCallbackTest.php" tests="1" assertions="11" errors="0" failures="0" skipped="0" time="3.179011">
+    <testcase name="test_refused_new_order_frame_does_not_leak_after_commit_callbacks_into_next_commit" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutRefusedFrameCallbackTest.php" line="39" class="Tests\Feature\ProductionCheckoutRefusedFrameCallbackTest" classname="Tests.Feature.ProductionCheckoutRefusedFrameCallbackTest" assertions="11" time="3.179011"/>
+  </testsuite>
+</testsuites>

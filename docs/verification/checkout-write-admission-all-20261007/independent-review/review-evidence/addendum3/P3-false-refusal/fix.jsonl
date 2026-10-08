@@ -1,0 +1,16 @@
+{"scenario":"window\/unrelated_audit\/first","acted":1,"outcome":"ok","new_creates":1,"sessions":1,"observations":1}
+{"scenario":"window\/unrelated_audit\/retry","acted":1,"outcome":"ok","new_creates":1,"sessions":1,"observations":2}
+{"scenario":"window\/capability_audit\/first","acted":1,"outcome":"refused:changed","new_creates":0,"sessions":0,"observations":0}
+{"scenario":"window\/capability_audit\/retry","acted":1,"outcome":"refused:changed","new_creates":0,"sessions":0,"observations":1}
+{"scenario":"window\/track_audit\/first","acted":1,"outcome":"refused:changed","new_creates":0,"sessions":0,"observations":0}
+{"scenario":"window\/track_audit\/retry","acted":1,"outcome":"refused:changed","new_creates":0,"sessions":0,"observations":1}
+{"scenario":"window\/unrelated_user\/first","acted":1,"outcome":"ok","new_creates":1,"sessions":1,"observations":1}
+{"scenario":"window\/unrelated_user\/retry","acted":1,"outcome":"ok","new_creates":1,"sessions":1,"observations":2}
+{"scenario":"commit\/unrelated_audit\/first","acted":1,"outcome":"ok","new_creates":1,"sessions":1,"observations":1}
+{"scenario":"commit\/unrelated_audit\/retry","acted":1,"outcome":"ok","new_creates":1,"sessions":1,"observations":2}
+{"scenario":"commit\/capability_audit\/first","acted":1,"outcome":"refused:write_source_changed","new_creates":0,"sessions":0,"observations":0}
+{"scenario":"commit\/capability_audit\/retry","acted":1,"outcome":"refused:write_source_changed","new_creates":0,"sessions":0,"observations":1}
+{"scenario":"commit\/track_audit\/first","acted":1,"outcome":"refused:write_source_changed","new_creates":0,"sessions":0,"observations":0}
+{"scenario":"commit\/track_audit\/retry","acted":1,"outcome":"refused:write_source_changed","new_creates":0,"sessions":0,"observations":1}
+{"scenario":"commit\/unrelated_user\/first","acted":1,"outcome":"ok","new_creates":1,"sessions":1,"observations":1}
+{"scenario":"commit\/unrelated_user\/retry","acted":1,"outcome":"ok","new_creates":1,"sessions":1,"observations":2}

@@ -1,0 +1,24 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-admission4/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 03:57.204, Memory: 88.00 MB
+
+There was 1 failure:
+
+1) Tests\Canary\ReproveCommitAdmissionCanaryTest::test_offer_withdrawn_in_the_reprove_commit_refuses_before_provider_create
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'CheckoutException:write_source_changed'
++'CheckoutException:changed'
+
+/home/user/VA-Studio-review-admission4/docs/verification/checkout-write-admission-all-20261007/conditions/codex-reprove-admission/canary/ReproveCommitAdmissionCanaryTest.php:72
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 4, Failures: 1.

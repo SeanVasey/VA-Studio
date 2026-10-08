@@ -1,0 +1,14 @@
+diff --git a/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php b/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
+index f73ebfe2..e656a59b 100644
+--- a/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
++++ b/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
+@@ -74,8 +74,7 @@ final class CheckoutStaffWriteAdmission implements CheckoutCommitAdmission
+         $owners = is_array($policy) ? ($policy['exemption_policy_owner_ids'] ?? null) : null;
+         CheckoutException::require(is_array($instances) && is_array($items) && is_array($policy) && is_array($owners)
+             && Container::getInstance() === $this->container
+-            && ($instances['config'] ?? null) === $this->configuration && $aliases === $this->aliases
+-            && ($policy['exemption_authoring_enabled'] ?? null) === true && in_array($this->ownerId, $owners, true), 'authority', 403);
++            && ($instances['config'] ?? null) === $this->configuration && $aliases === $this->aliases, 'authority', 403);
+     }
+ 
+     /** @return array{0: CheckoutCommandFrame, 1: CheckoutRawPlans} */

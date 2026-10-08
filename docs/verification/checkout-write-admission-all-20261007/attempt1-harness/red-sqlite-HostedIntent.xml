@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Canary\HostedIntentCommitAdmissionCanaryTest" file="/home/user/VA-Studio-admission/docs/verification/checkout-write-admission-all-20261007/canaries/HostedIntentCommitAdmissionCanaryTest.php" tests="3" assertions="7" errors="1" failures="2" skipped="0" time="17.036688">
+    <testcase name="test_committing_offer_deactivation_refuses_new_intent_and_provider_io" file="/home/user/VA-Studio-admission/docs/verification/checkout-write-admission-all-20261007/canaries/HostedIntentCommitAdmissionCanaryTest.php" line="44" class="Tests\Canary\HostedIntentCommitAdmissionCanaryTest" classname="Tests.Canary.HostedIntentCommitAdmissionCanaryTest" assertions="3" time="6.766269">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Canary\HostedIntentCommitAdmissionCanaryTest::test_committing_offer_deactivation_refuses_new_intent_and_provider_io
+Failed asserting that false is true.
+
+/home/user/VA-Studio-admission/docs/verification/checkout-write-admission-all-20261007/canaries/HostedIntentCommitAdmissionCanaryTest.php:56
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_committing_capability_closure_refuses_new_intent_and_provider_io" file="/home/user/VA-Studio-admission/docs/verification/checkout-write-admission-all-20261007/canaries/HostedIntentCommitAdmissionCanaryTest.php" line="63" class="Tests\Canary\HostedIntentCommitAdmissionCanaryTest" classname="Tests.Canary.HostedIntentCommitAdmissionCanaryTest" assertions="1" time="4.299362">
+      <error type="Illuminate\Validation\ValidationException">Tests\Canary\HostedIntentCommitAdmissionCanaryTest::test_committing_capability_closure_refuses_new_intent_and_provider_io
+Illuminate\Validation\ValidationException: Review the current source and supply every supported production machine-policy choice.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Validation/ValidationException.php:70
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php:153
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionPolicy/SourceCommitment.php:93
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionPolicy/CapabilityHistory.php:56
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/CurrentPolicy.php:39
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/OrderEvidence.php:24
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/OrderEvidence.php:67
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:197
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:27
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:24
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:195
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:40
+/home/user/VA-Studio-admission/docs/verification/checkout-write-admission-all-20261007/canaries/HostedIntentCommitAdmissionCanaryTest.php:108
+/home/user/VA-Studio-admission/docs/verification/checkout-write-admission-all-20261007/canaries/HostedIntentCommitAdmissionCanaryTest.php:76
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_offer_withdrawn_after_intent_commit_before_first_create_refuses_provider_io" file="/home/user/VA-Studio-admission/docs/verification/checkout-write-admission-all-20261007/canaries/HostedIntentCommitAdmissionCanaryTest.php" line="85" class="Tests\Canary\HostedIntentCommitAdmissionCanaryTest" classname="Tests.Canary.HostedIntentCommitAdmissionCanaryTest" assertions="3" time="5.971058">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Canary\HostedIntentCommitAdmissionCanaryTest::test_offer_withdrawn_after_intent_commit_before_first_create_refuses_provider_io
+Failed asserting that false is true.
+
+/home/user/VA-Studio-admission/docs/verification/checkout-write-admission-all-20261007/canaries/HostedIntentCommitAdmissionCanaryTest.php:97
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

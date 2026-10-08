@@ -1,0 +1,41 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-admission2/phpunit.xml
+
+............FFFF.                                                 17 / 17 (100%)
+
+Time: 00:43.058, Memory: 102.00 MB
+
+There were 4 failures:
+
+1) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_committing_qualifier_staff_withdrawal_refuses_new_basis@role with data ([false], 'is_admin', true)
+A withdrawn NEW checkout write was admitted.
+
+/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:348
+/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:256
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_committing_qualifier_staff_withdrawal_refuses_new_basis@mfa with data ([null, null], 'app_authentication_secret', 'SYNTHETIC-ENROLLED-SECRET')
+A withdrawn NEW checkout write was admitted.
+
+/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:348
+/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:256
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_committing_owner_staff_withdrawal_refuses_new_authority@role with data ([false], 'is_admin', true)
+A withdrawn NEW checkout write was admitted.
+
+/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:348
+/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:267
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_committing_owner_staff_withdrawal_refuses_new_authority@mfa with data ([null, null], 'app_authentication_secret', 'SYNTHETIC-ENROLLED-SECRET')
+A withdrawn NEW checkout write was admitted.
+
+/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:348
+/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:267
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 17, Assertions: 84, Failures: 4.

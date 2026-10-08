@@ -1,0 +1,41 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-admission4/phpunit.xml
+
+FFFF                                                                4 / 4 (100%)
+
+Time: 17:44.210, Memory: 100.00 MB
+
+There were 4 failures:
+
+1) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create@offer, first initiate with data ('offer', false)
+A withdrawn NEW checkout write was admitted.
+
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:475
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:139
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create@capability, first initiate with data ('capability', false)
+A withdrawn NEW checkout write was admitted.
+
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:475
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:139
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create@offer, retry with data ('offer', true)
+A withdrawn NEW checkout write was admitted.
+
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:475
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:139
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create@capability, retry with data ('capability', true)
+A withdrawn NEW checkout write was admitted.
+
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:475
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:139
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 4, Assertions: 12, Failures: 4.

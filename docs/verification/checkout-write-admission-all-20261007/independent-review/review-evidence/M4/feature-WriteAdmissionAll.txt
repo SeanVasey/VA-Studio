@@ -1,0 +1,52 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-admission/phpunit.xml
+
+...EFF....                                                        10 / 10 (100%)
+
+Time: 00:32.152, Memory: 100.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_capability_closed_after_intent_commit_refuses_before_first_create
+Illuminate\Validation\ValidationException: Review the current source and supply every supported production machine-policy choice.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Validation/ValidationException.php:70
+/home/user/VA-Studio-review-admission/app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php:153
+/home/user/VA-Studio-review-admission/app/Domain/Commerce/ProductionPolicy/SourceCommitment.php:93
+/home/user/VA-Studio-review-admission/app/Domain/Commerce/ProductionPolicy/CapabilityHistory.php:56
+/home/user/VA-Studio-review-admission/app/Domain/Commerce/ProductionCheckout/CurrentPolicy.php:39
+/home/user/VA-Studio-review-admission/app/Domain/Commerce/ProductionCheckout/OrderEvidence.php:24
+/home/user/VA-Studio-review-admission/app/Domain/Commerce/ProductionCheckout/OrderEvidence.php:67
+/home/user/VA-Studio-review-admission/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:229
+/home/user/VA-Studio-review-admission/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:27
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio-review-admission/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:24
+/home/user/VA-Studio-review-admission/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:227
+/home/user/VA-Studio-review-admission/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:45
+/home/user/VA-Studio-review-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:107
+/home/user/VA-Studio-review-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:231
+/home/user/VA-Studio-review-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:107
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_fresh_withdrawal_after_intent_commit_refuses_before_first_create_with_disabled
+A withdrawn NEW checkout write was admitted.
+
+/home/user/VA-Studio-review-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:232
+/home/user/VA-Studio-review-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:119
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_offer_withdrawn_before_retried_create_refuses_second_provider_call
+A withdrawn NEW checkout write was admitted.
+
+/home/user/VA-Studio-review-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:232
+/home/user/VA-Studio-review-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:133
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 10, Assertions: 53, Errors: 1, Failures: 2.

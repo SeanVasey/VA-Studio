@@ -1,0 +1,6 @@
+{
+    "driver": "mysql",
+    "callbacks": 1,
+    "refused": true,
+    "basis_rows": 0
+}

@@ -1,0 +1,8 @@
+native-g1 db=va_rev_a3 port=3471 exit=0 wall=1402.808018631s
+native-terminal-canary db=va_rev_a3 port=3471 exit=0 wall=281.284698592s
+native-g3 db=va_rev_a3 port=3473 exit=0 wall=1758.014655339s
+native-4d-canary db=va_rev_a3 port=3471 exit=1 wall=237.544658449s
+native-g6 db=va_rev_a3 port=3473 exit=0 wall=493.428235455s
+native-g5 db=va_rev_a3 port=3471 exit=0 wall=542.884939918s
+native-g2 db=va_rev_a3 port=3472 exit=0 wall=2554.145864546s
+native-g4 db=va_rev_a3 port=3472 exit=0 wall=446.865947018s

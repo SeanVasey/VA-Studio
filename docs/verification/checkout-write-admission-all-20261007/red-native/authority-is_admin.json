@@ -1,0 +1,6 @@
+{
+    "driver": "mysql",
+    "callbacks": 1,
+    "refused": false,
+    "authority_rows": 1
+}

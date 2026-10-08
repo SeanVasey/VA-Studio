@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-admission/phpunit.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:05.691, Memory: 86.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_new_basis_admission_is_capped_at_the_selected_license_expiry
+A withdrawn NEW checkout write was admitted.
+
+/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:375
+/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:291
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 2[0m[37;41m, Failures: 1[0m[37;41m.[0m

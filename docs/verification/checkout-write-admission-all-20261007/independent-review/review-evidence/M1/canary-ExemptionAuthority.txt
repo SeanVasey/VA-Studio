@@ -1,0 +1,25 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-admission/phpunit.xml
+
+FF                                                                  2 / 2 (100%)
+
+Time: 00:13.988, Memory: 92.00 MB
+
+There were 2 failures:
+
+1) Tests\Canary\ExemptionAuthorityCommitAdmissionCanaryTest::test_committing_owner_role_withdrawal_refuses_new_authority
+Failed asserting that false is true.
+
+/home/user/VA-Studio-review-admission/docs/verification/checkout-write-admission-all-20261007/canaries/ExemptionAuthorityCommitAdmissionCanaryTest.php:32
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Canary\ExemptionAuthorityCommitAdmissionCanaryTest::test_committing_owner_mfa_withdrawal_refuses_new_authority
+Failed asserting that false is true.
+
+/home/user/VA-Studio-review-admission/docs/verification/checkout-write-admission-all-20261007/canaries/ExemptionAuthorityCommitAdmissionCanaryTest.php:42
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 2, Assertions: 4, Failures: 2.
