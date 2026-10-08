@@ -15,6 +15,6 @@ php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; req
 - `initial-sqlite.txt`: the command suite on `3506c75d`; exit 0, 8 tests / 192 assertions. It proves linking allows order preparation, current staff/password/environment refusals, malformed/missing IDs, immutable conflicts, readiness refusal and idempotent repeats without duplicate audits. References and password values are absent from operator output.
 - `pint.txt`: `php vendor/bin/pint app/Console/Commands/ManageRightsScopes.php tests/Feature/RightsScopeCommandTest.php`, exit 0, no runtime source diff.
 
-The affected inventory/order selection is recorded separately when complete. An independent rights/authorization review must precede merge.
+`affected-sqlite.txt`: the direct PHPUnit command above with `tests/Feature/RightsScopeCommandTest.php tests/Feature/SharedInventoryTest.php tests/Feature/SharedInventoryMigrationTest.php tests/Feature/RightsScopeWriterAuthorityTest.php tests/Feature/OrderPreparationTest.php`; exit 0, **112 tests / 1,051 assertions**, no skips. An independent rights/authorization review must precede merge.
 
 Native MySQL is unavailable locally. Attempts to retrieve the official MySQL 8.4.11 archive from `cdn.mysql.com` and the server package from `repo.mysql.com` returned HTTP 403. SQLite evidence does not prove native concurrency. The command delegates mutation to the existing reviewed domain service and changes no migration or lock ordering; no new concurrency claim, actual seller rights, real provider transaction or staging deployment is made.
