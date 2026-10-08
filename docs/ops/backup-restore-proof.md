@@ -175,7 +175,15 @@ foreign=$(cd <RESTORE_PRIVATE_ROOT> && find . \( ! -user <APP_USER> -o ! -group 
 mysqldump --defaults-extra-file=<RESTORE_OPTION_FILE> --single-transaction --quick \
   --routines --triggers --events --hex-blob --no-tablespaces --set-gtid-purged=OFF \
   --skip-dump-date --skip-comments --databases <DATABASE> > <BACKUP_DIR>/redump.sql || exit 1
-diff <BACKUP_DIR>/redump.sql <BACKUP_DIR>/database.sql || exit 1
+#    MySQL 8.4 renders a column whose collation was stated explicitly (as every column in a loaded
+#    dump is) as `CHARACTER SET utf8mb4 COLLATE ...` and an inherited one as `COLLATE ...` only, so a
+#    first-generation dump and its re-dump differ in that rendering alone (328 columns on this schema).
+#    Exactly that difference is accepted; every other byte, all rows included, must match. This is the
+#    comparison `ops/staging/backup.sh restore-check` performs.
+if ! diff -q <BACKUP_DIR>/redump.sql <BACKUP_DIR>/database.sql >/dev/null; then
+  norm='s/ CHARACTER SET utf8mb4 COLLATE utf8mb4_/ COLLATE utf8mb4_/g'
+  diff -q <(sed "$norm" <BACKUP_DIR>/redump.sql) <(sed "$norm" <BACKUP_DIR>/database.sql) >/dev/null || exit 1
+fi
 rm -f <BACKUP_DIR>/redump.sql
 mysql --defaults-extra-file=<RESTORE_OPTION_FILE> -e 'CHECKSUM TABLE <DATABASE>.orders EXTENDED'  # repeat per table and compare with the source
 ```
